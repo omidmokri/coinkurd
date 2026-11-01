@@ -247,6 +247,8 @@ def main():
                     help="حداکثر صفحات به عقب (هر صفحه ~۲۰ پست)")
     ap.add_argument("--delay", type=float, default=1.2)
     ap.add_argument("--html", help="برای تست: فایل HTML محلی به‌جای شبکه")
+    ap.add_argument("--backfill", action="store_true", default=os.environ.get("BACKFILL", "") == "1",
+                    help="تا سقف --pages به عقب برو حتی اگر به پست‌های شناخته‌شده رسیدیم")
     args = ap.parse_args()
 
     existing = load_existing()
@@ -274,7 +276,7 @@ def main():
         oldest = min(m["id"] for m in msgs)
         print(f"page {page+1}: {len(msgs)} posts, oldest id {oldest}")
         # در حالت افزایشی: اگر به پست‌های شناخته‌شده رسیدیم، ادامه ندهیم
-        if known_max and oldest <= known_max and page >= 0 and not args.html:
+        if known_max and oldest <= known_max and not args.backfill and not args.html:
             break
         if args.html:
             break
