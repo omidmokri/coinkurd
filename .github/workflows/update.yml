@@ -8,6 +8,9 @@ on:
       pages:
         description: "تعداد صفحات برای بک‌فیل (هر صفحه ~۲۰ پست)"
         default: "3"
+      translate_limit:
+        description: "حداکثر پست برای ترجمه در این اجرا"
+        default: "40"
   push:
     branches: [main]
 
@@ -34,6 +37,11 @@ jobs:
           MAX_PAGES: ${{ github.event.inputs.pages || '3' }}
           BACKFILL: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/fetch.py
+      - name: Translate new posts (fa → ckb, en)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '40' }}
+        run: python scripts/translate.py
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"
