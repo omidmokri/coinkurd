@@ -218,6 +218,14 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .social a{padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-family:var(--mono);transition:.2s}
 .social a:hover{background:var(--lime);color:#000;border-color:transparent}
 img.tge{width:1.2em;height:1.2em;vertical-align:-.25em;display:inline-block;margin:0 .05em}
+.fresh{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.fresh span{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--mute)}
+.fresh i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;background:#22c55e}.fresh i.w{background:#f59e0b}.fresh i.e{background:#ef4444}
+.intel{display:grid;grid-template-columns:1fr 1fr;gap:4px}.ibox{background:#121212;padding:24px;min-height:200px}.ibox.wide{grid-column:span 2}@media(max-width:800px){.intel{grid-template-columns:1fr}.ibox.wide{grid-column:span 1}}
+.ibox h3{font-size:1rem;margin-bottom:12px;font-weight:800}.gauge{display:flex;align-items:center;gap:18px}.gauge svg{flex:0 0 150px}.big{font-family:var(--mono);font-size:2.4rem;font-weight:700;line-height:1;direction:ltr;unicode-bidi:isolate}
+.otab{width:100%;border-collapse:collapse;font-size:.88rem}.otab td,.otab th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:start}.otab th{color:var(--mute);font-weight:500;font-family:var(--mono);font-size:.75rem}
+.otab a{color:var(--ink);font-family:var(--mono);font-weight:700}.num{direction:ltr;unicode-bidi:isolate;font-family:var(--mono)}.pos{color:#22c55e}.neg{color:#ef4444}
+.bar2{height:6px;background:rgba(255,255,255,.07);border-radius:9px;overflow:hidden;min-width:60px}.bar2 i{display:block;height:100%;background:var(--lime)}
+.disc{color:var(--mute);font-size:.75rem;margin-top:10px}
 /* footer */
 footer{padding:120px 0 40px;position:relative;overflow:hidden}
 footer .big{font-size:clamp(2.6rem,9vw,9rem);line-height:.95}
@@ -250,7 +258,8 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <a href="#top" data-i="mHome">خانه</a>
     <a href="#feed" data-i="mFeed">آرشیو</a>
     <a href="#hall" data-i="mCats">دسته‌ها</a>
-    <a href="#coinswall" data-i="mCoins">کوین‌ها</a>
+    <a href="coins/" data-i="mCoins">کوین‌ها</a>
+    <a href="#intel" data-i="intT">داشبورد هوشمند</a>
     <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">Telegram ↗</a>
   </div>
   <div class="mosaic" id="mosaic"></div>
@@ -280,6 +289,18 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <p class="lead" data-i="mktL">قیمت‌ها لحظه‌ای از TradingView</p>
     <div class="mini" id="mini"></div>
     <div class="chartbox" id="chartbox"></div>
+  </section>
+
+  <section class="sec wrap reveal" id="intel">
+    <h2 class="display" data-i="intT">داشبورد هوشمند</h2>
+    <p class="lead" data-i="intL">اسکنر خودکار بازار، شاخص ترس و طمع و کارنامهٔ واقعی پست‌ها</p>
+    <div class="fresh" id="fresh"></div>
+    <div class="intel">
+      <div class="ibox" id="fngBox"></div>
+      <div class="ibox" id="globBox"></div>
+      <div class="ibox wide" id="oppBox"></div>
+      <div class="ibox wide" id="impBox"></div>
+    </div>
   </section>
 
   <section class="msg wrap reveal">
@@ -338,19 +359,19 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
 
 <script>
 const I18N={
- fa:{noTr:'ترجمهٔ این پست هنوز آماده نیست',mktT:'بازار زنده',mktL:'قیمت‌ها لحظه‌ای از TradingView · برای جزئیات روی نماد کلیک کنید',dir:'rtl',locale:'fa-IR',join:'تلگرام',role:'تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام',latest:'آخرین پست',scroll:'اسکرول کنید',
+ fa:{intT:'داشبورد هوشمند',intL:'اسکنر خودکار بازار، شاخص ترس و طمع و کارنامهٔ واقعی پست‌ها',fngT:'شاخص ترس و طمع',globT:'وضعیت کل بازار',oppT:'اسکنر فرصت‌ها (۱ ساعته)',impT:'کارنامهٔ پست‌ها: حرکت قیمت ۲۴ ساعت بعد از انتشار',fresh_price:'قیمت: زنده',fresh_scan:'اسکنر',fresh_arch:'آرشیو تلگرام',fresh_health:'سلامت سیستم',ago:'پیش',min:'دقیقه',hr:'ساعت',mcap:'ارزش کل بازار',btcd:'دامیننس BTC',ethd:'دامیننس ETH',vol:'حجم ۲۴ ساعته',coin:'کوین',signal:'یافته',str:'قدرت',conf:'اطمینان',high:'بالا',med:'متوسط',noOpp:'در حال حاضر الگوی قابل‌توجهی پیدا نشد.',posts:'پست',avg24:'میانگین ۲۴h',upr:'درصد مثبت',disc:'یافته‌های تکنیکال خودکار هستند و توصیهٔ خرید یا فروش نیستند.',rsi_oversold:'RSI اشباع فروش',rsi_overbought:'RSI اشباع خرید',ema_golden_cross:'تقاطع طلایی EMA',ema_death_cross:'تقاطع مرگ EMA',breakout_up:'شکست سقف ۴۸h',breakdown:'شکست کف ۴۸h',volume_spike:'جهش حجم',fg_ExtremeFear:'ترس شدید',fg_Fear:'ترس',fg_Neutral:'خنثی',fg_Greed:'طمع',fg_ExtremeGreed:'طمع شدید',noData:'داده هنوز آماده نیست (اولین اجرای ربات)',noTr:'ترجمهٔ این پست هنوز آماده نیست',mktT:'بازار زنده',mktL:'قیمت‌ها لحظه‌ای از TradingView · برای جزئیات روی نماد کلیک کنید',dir:'rtl',locale:'fa-IR',join:'تلگرام',role:'تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام',latest:'آخرین پست',scroll:'اسکرول کنید',
   msg:'هر پستی که در <b>Coin_Kurd</b> منتشر می‌شود، <em>به‌صورت خودکار</em> خوانده، بر اساس <b>دسته</b>، <b>کوین</b> و <b>زمان</b> طبقه‌بندی و همین‌جا منتشر می‌شود. بدون دخالت دست؛ هر ساعت.',
   posts:'پست',cats:'دسته',coins:'کوین',updated:'آخرین به‌روزرسانی',onA:'تحلیل<span>تکنیکال</span>',onB:'خبر<span>بازار</span>',hallT:'دسته‌ها',hallL:'هر پست با قواعد کلیدواژه و هشتگ به یکی از این دسته‌ها می‌رود',
   dCat:'دسته',dCoin:'کوین',dTime:'زمان',search:'جستجو در متن، هشتگ، کوین…',sNew:'جدیدترین',sViews:'پربازدیدترین',vGrid:'کارت‌ها',vTl:'تایم‌لاین',vHeat:'نقشهٔ حرارتی',vStats:'آمار',
   wallT:'کوین‌ها',wallL:'کوین‌هایی که بیشتر از همه در کانال درباره‌شان صحبت شده',tag:'بازار را <span>بفهم،</span> نه فقط دنبال کن.',auto:'به‌روزرسانی خودکار از تلگرام',
   mHome:'خانه',mFeed:'آرشیو',mCats:'دسته‌ها',mCoins:'کوین‌ها',all:'همه',t24:'۲۴ ساعت',t7:'۷ روز',t30:'۳۰ روز',result:'نتیجه',empty:'پستی با این فیلترها پیدا نشد.',open:'مشاهده در تلگرام',share:'کپی لینک',copied:'کپی شد!',byCat:'توزیع دسته‌ها',byCoin:'کوین‌های پرتکرار',heatHint:'تعداد پست به تفکیک دسته × کوین — روی هر خانه کلیک کنید',related:'مرتبط'},
- ckb:{noTr:'وەرگێڕانی ئەم پۆستە هێشتا ئامادە نییە',mktT:'بازاڕی زیندوو',mktL:'نرخەکان ساتەوەخت لە TradingView',dir:'rtl',locale:'ckb-IQ',join:'تێلێگرام',role:'شیکاری بازاڕی کریپتۆ · ئیندیکاتۆری زیرەک · ئەرشیڤی ئۆتۆماتیکی کەناڵ',latest:'دوایین پۆست',scroll:'بڕۆ خوارەوە',
+ ckb:{intT:'داشبۆردی زیرەک',intL:'سکانەری ئۆتۆماتیکی بازاڕ، پێوەری ترس و تەماع و ئەنجامی ڕاستەقینەی پۆستەکان',fngT:'پێوەری ترس و تەماع',globT:'دۆخی گشتیی بازاڕ',oppT:'سکانەری دەرفەتەکان (١ کاتژمێری)',impT:'ئەنجامی پۆستەکان: جووڵەی نرخ ٢٤ کاتژمێر دوای بڵاوکردنەوە',fresh_price:'نرخ: زیندوو',fresh_scan:'سکانەر',fresh_arch:'ئەرشیڤی تێلێگرام',fresh_health:'تەندروستیی سیستەم',ago:'لەمەوبەر',min:'خولەک',hr:'کاتژمێر',mcap:'بەهای گشتیی بازاڕ',btcd:'باڵادەستیی BTC',ethd:'باڵادەستیی ETH',vol:'قەبارەی ٢٤ کاتژمێر',coin:'کۆین',signal:'دۆزینەوە',str:'هێز',conf:'متمانە',high:'بەرز',med:'مامناوەند',noOpp:'ئێستا هیچ نەخشێکی بەرچاو نەدۆزرایەوە.',posts:'پۆست',avg24:'تێکڕای ٢٤h',upr:'ڕێژەی ئەرێنی',disc:'دۆزینەوە تەکنیکییەکان ئۆتۆماتیکین و ڕاسپاردەی کڕین یان فرۆشتن نین.',rsi_oversold:'RSI زیادە فرۆشتن',rsi_overbought:'RSI زیادە کڕین',ema_golden_cross:'یەکتربڕینی زێڕینی EMA',ema_death_cross:'یەکتربڕینی مەرگی EMA',breakout_up:'شکاندنی بەرزترین ٤٨h',breakdown:'شکاندنی نزمترین ٤٨h',volume_spike:'بازدانی قەبارە',fg_ExtremeFear:'ترسی زۆر',fg_Fear:'ترس',fg_Neutral:'بێلایەن',fg_Greed:'تەماع',fg_ExtremeGreed:'تەماعی زۆر',noData:'داتا هێشتا ئامادە نییە',noTr:'وەرگێڕانی ئەم پۆستە هێشتا ئامادە نییە',mktT:'بازاڕی زیندوو',mktL:'نرخەکان ساتەوەخت لە TradingView',dir:'rtl',locale:'ckb-IQ',join:'تێلێگرام',role:'شیکاری بازاڕی کریپتۆ · ئیندیکاتۆری زیرەک · ئەرشیڤی ئۆتۆماتیکی کەناڵ',latest:'دوایین پۆست',scroll:'بڕۆ خوارەوە',
   msg:'هەر پۆستێک لە <b>Coin_Kurd</b> بڵاو بکرێتەوە، <em>بە شێوەی ئۆتۆماتیکی</em> دەخوێنرێتەوە، بەپێی <b>پۆل</b>، <b>کۆین</b> و <b>کات</b> پۆلێن دەکرێت و لێرە بڵاو دەکرێتەوە. بەبێ دەستکاری؛ هەر کاتژمێرێک.',
   posts:'پۆست',cats:'پۆل',coins:'کۆین',updated:'دوایین نوێکردنەوە',onA:'شیکاری<span>تەکنیکی</span>',onB:'هەواڵی<span>بازاڕ</span>',hallT:'پۆلەکان',hallL:'هەر پۆستێک بە یاسای وشەی سەرەکی و هاشتاگ دەچێتە ناو یەکێک لەم پۆلانە',
   dCat:'پۆل',dCoin:'کۆین',dTime:'کات',search:'گەڕان لە دەق، هاشتاگ، کۆین…',sNew:'نوێترین',sViews:'زۆرترین بینین',vGrid:'کارتەکان',vTl:'هێڵی کات',vHeat:'نەخشەی گەرمی',vStats:'ئامار',
   wallT:'کۆینەکان',wallL:'ئەو کۆینانەی زۆرترین باسیان کراوە',tag:'بازاڕ <span>تێبگە،</span> نەک تەنها شوێنی بکەوە.',auto:'نوێکردنەوەی ئۆتۆماتیکی لە تێلێگرام',
   mHome:'سەرەکی',mFeed:'ئەرشیڤ',mCats:'پۆلەکان',mCoins:'کۆینەکان',all:'هەموو',t24:'٢٤ کاتژمێر',t7:'٧ ڕۆژ',t30:'٣٠ ڕۆژ',result:'ئەنجام',empty:'هیچ پۆستێک نەدۆزرایەوە.',open:'بینین لە تێلێگرام',share:'کۆپی لینک',copied:'کۆپی کرا!',byCat:'دابەشکردنی پۆلەکان',byCoin:'کۆینە باوەکان',heatHint:'ژمارەی پۆست بەپێی پۆل × کۆین — کلیک لەسەر خانە بکە',related:'پەیوەندیدار'},
- en:{noTr:'translation for this post is not ready yet',mktT:'Live Market',mktL:'real-time prices from TradingView',dir:'ltr',locale:'en-US',join:'telegram',role:'crypto market analysis · ai indicators · auto-archived telegram channel',latest:'latest post',scroll:'scroll',
+ en:{intT:'Smart Dashboard',intL:'automatic market scanner, fear & greed index and a real track record of posts',fngT:'Fear & Greed Index',globT:'Global market',oppT:'Opportunity scanner (1h)',impT:'Post track record: price move 24h after publishing',fresh_price:'price: live',fresh_scan:'scanner',fresh_arch:'telegram archive',fresh_health:'system health',ago:'ago',min:'min',hr:'h',mcap:'Total market cap',btcd:'BTC dominance',ethd:'ETH dominance',vol:'24h volume',coin:'coin',signal:'finding',str:'strength',conf:'confidence',high:'high',med:'medium',noOpp:'No notable patterns right now.',posts:'posts',avg24:'avg 24h',upr:'% positive',disc:'Technical findings are automatic and are not buy or sell advice.',rsi_oversold:'RSI oversold',rsi_overbought:'RSI overbought',ema_golden_cross:'EMA golden cross',ema_death_cross:'EMA death cross',breakout_up:'48h high breakout',breakdown:'48h low breakdown',volume_spike:'volume spike',fg_ExtremeFear:'Extreme Fear',fg_Fear:'Fear',fg_Neutral:'Neutral',fg_Greed:'Greed',fg_ExtremeGreed:'Extreme Greed',noData:'data not ready yet (first bot run)',noTr:'translation for this post is not ready yet',mktT:'Live Market',mktL:'real-time prices from TradingView',dir:'ltr',locale:'en-US',join:'telegram',role:'crypto market analysis · ai indicators · auto-archived telegram channel',latest:'latest post',scroll:'scroll',
   msg:'Every post published on <b>Coin_Kurd</b> is read <em>automatically</em>, classified by <b>category</b>, <b>coin</b> and <b>time</b>, and published right here. No hands. Every hour.',
   posts:'posts',cats:'categories',coins:'coins',updated:'last update',onA:'Technical<span>Analysis</span>',onB:'Market<span>News</span>',hallT:'Categories',hallL:'every post lands in one of these via keyword & hashtag rules',
   dCat:'category',dCoin:'coin',dTime:'time',search:'search text, hashtags, coins…',sNew:'Newest',sViews:'Most viewed',vGrid:'cards',vTl:'timeline',vHeat:'heatmap',vStats:'stats',
@@ -375,7 +396,7 @@ async function load(){
   const bust='?v='+Math.floor(Date.now()/3e5);
   const [p,m]=await Promise.all([fetch('data/posts.json'+bust).then(r=>r.json()),fetch('data/meta.json'+bust).then(r=>r.json())]);
   S.posts=p;S.meta=m;
-  applyLang();buildStatic();render();reveal();tvWidgets();coin3d();
+  applyLang();buildStatic();render();reveal();tvWidgets();coin3d();loadIntel();setInterval(loadIntel,3e5);
 }
 function applyLang(){
   const t=I18N[lang];document.documentElement.lang=lang;document.documentElement.dir=t.dir;document.body.dir=t.dir;
@@ -459,7 +480,7 @@ function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=ca
     ${p.link&&p.link.url?`<a class="lp" href="${esc(p.link.url)}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small><br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
     <div class="coins">${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}</div>
     ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>{const ic=/discord/.test(f.url)?'👾 ':/youtu/.test(f.url)?'🎥 ':/instagram/.test(f.url)?'📸 ':/twitter|x\.com/.test(f.url)?'💬 ':'';return `<a href="${esc(f.url)}" target="_blank" rel="noopener">${ic}${esc(f.label)}</a>`}).join('')}</div>`:''}
-    <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
+    <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><a class="btn" href="p/${p.id}/">🔗 ${lang==='en'?'page':lang==='ckb'?'پەڕە':'صفحهٔ مطلب'}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
     ${rel.length?`<h3 style="margin-top:26px;font-weight:800">${T('related')}</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:10px 0 0">${rel.map((x,i)=>cardHTML(x,i)).join('')}</div>`:''}</div>`;
   emojify($('#sheet'));$('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
   $('#close').onclick=closeModal;$('#copy').onclick=e=>{navigator.clipboard&&navigator.clipboard.writeText(location.href.split('#')[0]+'#p'+p.id);e.target.textContent='✓ '+T('copied')};
@@ -473,7 +494,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('#me
 $('#q').addEventListener('input',e=>{S.q=e.target.value;render()});
 $('#sort').addEventListener('change',e=>{S.sort=e.target.value;render()});
 $('#views').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.view=b.dataset.v;render()}});
-$('#langs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang();buildStatic();render()}});
+$('#langs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang();buildStatic();render();renderIntel&&X.market!==undefined&&renderIntel()}});
 $('#burger').addEventListener('click',()=>{const m=$('#menu');const o=m.classList.toggle('open');$('#burger').textContent=o?'✕':'☰'});
 $('#menu').addEventListener('click',e=>{if(e.target.closest('a')){$('#menu').classList.remove('open');$('#burger').textContent='☰'}});
 /* ---- TradingView live widgets ---- */
@@ -525,6 +546,32 @@ function emojify(root){
     f.append(t.slice(last));n.replaceWith(f)});
 }
 function emojifyAll(){['#out','#sheet','#strip','#mq','#next','#hallGrid','#catChips'].forEach(s=>emojify(document.querySelector(s)))}
+/* ---- smart dashboard (market.json / impact.json / health.json) ---- */
+const X={market:null,impact:null,health:null};
+async function loadIntel(){const b='?v='+Math.floor(Date.now()/12e4);const g=u=>fetch(u+b).then(r=>r.ok?r.json():null).catch(()=>null);
+  [X.market,X.impact,X.health]=await Promise.all([g('data/market.json'),g('data/impact.json'),g('data/health.json')]);renderIntel()}
+function ago(iso){if(!iso)return '—';const m=Math.max(0,(Date.now()-new Date(iso))/6e4);return m<90?`${fmtN(Math.round(m))} ${T('min')} ${T('ago')}`:`${fmtN(Math.round(m/60))} ${T('hr')} ${T('ago')}`}
+function dot(iso,warnMin,errMin){if(!iso)return 'e';const m=(Date.now()-new Date(iso))/6e4;return m>errMin?'e':m>warnMin?'w':''}
+const usd=v=>v>=1e12?'$'+(v/1e12).toFixed(2)+'T':v>=1e9?'$'+(v/1e9).toFixed(1)+'B':'$'+fmtN(Math.round(v));
+const pr=v=>v>=1?v.toLocaleString('en-US',{maximumFractionDigits:2}):String(+v.toPrecision(4));
+function renderIntel(){
+  const m=X.market,h=X.health,newest=S.posts.reduce((a,p)=>p.date>a?p.date:a,'');
+  $('#fresh').innerHTML=`<span><i></i>${T('fresh_price')}</span><span><i class="${dot(m&&m.updated_at,45,120)}"></i>${T('fresh_scan')}: ${ago(m&&m.updated_at)}</span><span><i class="${dot(S.meta.updated_at,70,240)}"></i>${T('fresh_arch')}: ${ago(S.meta.updated_at)}</span>`+(h?`<span><i class="${h.status==='ok'?'':h.status==='warn'?'w':'e'}"></i>${T('fresh_health')}: ${h.status}</span>`:'');
+  if(!m){['#fngBox','#globBox','#oppBox'].forEach(s=>$(s).innerHTML=`<p class="disc">${T('noData')}</p>`)}
+  else{
+    if(m.fng){const v=m.fng.value,a=Math.PI*(1-v/100),x=75+60*Math.cos(a),y=80-60*Math.sin(a),col=v<25?'#ef4444':v<45?'#f97316':v<55?'#eab308':v<75?'#84cc16':'#22c55e';
+      const hist=m.fng.history||[];const pts=hist.map((d,i)=>`${(i/(hist.length-1||1)*200).toFixed(1)},${(40-d[1]*.4).toFixed(1)}`).join(' ');
+      $('#fngBox').innerHTML=`<h3>${T('fngT')}</h3><div class="gauge"><svg viewBox="0 0 150 90"><path d="M15 80 A60 60 0 0 1 135 80" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12" stroke-linecap="round"/><path d="M15 80 A60 60 0 0 1 135 80" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(v/100*188.5).toFixed(1)} 400"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="#fff"/></svg><div><div class="big" style="color:${col}">${v}</div><div>${T('fg_'+m.fng.class.replace(/\s/g,''))}</div></div></div>${pts?`<svg viewBox="0 0 200 42" style="width:100%;height:50px;margin-top:10px"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.5"/></svg><p class="disc">30d · alternative.me</p>`:''}`}
+    if(m.global){const g=m.global;$('#globBox').innerHTML=`<h3>${T('globT')}</h3><table class="otab"><tr><td>${T('mcap')}</td><td class="num">${usd(g.mcap)} <span class="${g.mcap_chg24>=0?'pos':'neg'}">${g.mcap_chg24>=0?'+':''}${g.mcap_chg24}%</span></td></tr><tr><td>${T('vol')}</td><td class="num">${usd(g.vol)}</td></tr><tr><td>${T('btcd')}</td><td class="num">${g.btc_d}%</td></tr><tr><td>${T('ethd')}</td><td class="num">${g.eth_d}%</td></tr></table><p class="disc">CoinGecko · ${ago(m.sources&&m.sources.coingecko)}</p>`}
+    const op=m.opportunities||[];
+    $('#oppBox').innerHTML=`<h3>${T('oppT')}</h3>`+(op.length?`<table class="otab"><tr><th>${T('coin')}</th><th>${T('signal')}</th><th>${T('str')}</th><th>${T('conf')}</th><th></th></tr>${op.slice(0,14).map(o=>`<tr><td><a href="coins/${o.coin.toLowerCase()}/">${o.coin}</a></td><td>${T(o.type)}${o.detail&&o.detail.rsi?` <span class="num">(${o.detail.rsi})</span>`:''}${o.detail&&o.detail.x?` <span class="num">×${o.detail.x}</span>`:''}</td><td><div class="bar2"><i style="width:${o.strength}%"></i></div></td><td>${o.confidence==='high'?T('high'):T('med')}</td><td class="num">${pr(o.price)}</td></tr>`).join('')}</table>`:`<p class="disc">${T('noOpp')}</p>`)+
+      `<table class="otab" style="margin-top:14px"><tr>${(m.coins||[]).slice(0,10).map(c=>`<td style="text-align:center"><a href="coins/${c.coin.toLowerCase()}/">${c.coin}</a><div class="num ${c.chg24>=0?'pos':'neg'}">${c.chg24>=0?'+':''}${c.chg24}%</div><div class="num" style="color:var(--mute);font-size:.75rem">RSI ${c.rsi}</div></td>`).join('')}</tr></table><p class="disc">${T('disc')} · Binance · ${ago(m.updated_at)}</p>`;
+  }
+  const im=X.impact;if(!im){$('#impBox').innerHTML=`<h3>${T('impT')}</h3><p class="disc">${T('noData')}</p>`;return}
+  const by={};Object.values(im).forEach(r=>{if(r.r24h==null)return;(by[r.coin]=by[r.coin]||[]).push(r.r24h)});
+  const rows=Object.entries(by).filter(([,a])=>a.length>=2).sort((a,b)=>b[1].length-a[1].length).slice(0,10);
+  $('#impBox').innerHTML=`<h3>${T('impT')}</h3>`+(rows.length?`<table class="otab"><tr><th>${T('coin')}</th><th>${T('posts')}</th><th>${T('avg24')}</th><th>${T('upr')}</th></tr>${rows.map(([c,a])=>{const av=a.reduce((x,y)=>x+y,0)/a.length,up=Math.round(a.filter(x=>x>0).length*100/a.length);return `<tr><td><a href="coins/${c.toLowerCase()}/">${c}</a></td><td class="num">${a.length}</td><td class="num ${av>=0?'pos':'neg'}">${av>=0?'+':''}${av.toFixed(2)}%</td><td><div class="bar2"><i style="width:${up}%"></i></div><span class="num" style="font-size:.75rem">${up}%</span></td></tr>`}).join('')}</table>`:`<p class="disc">${T('noData')}</p>`)+`<p class="disc">Binance 1h · ${T('disc')}</p>`;
+}
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'0px':'118px');lastY=y},{passive:true});
 load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
 </script>
