@@ -105,12 +105,13 @@ def main():
     gen = os.environ.get("COIN_KURD_API_KEY", "").strip()
     print(f"COIN_KURD_API_KEY: {'set, len=%d, prefix=%s' % (len(gen), gen[:6]) if gen else 'EMPTY / not set'}")
     if gen:
+        # (ورک‌فلو متغیرهای خالی می‌فرستد؛ پس باید صریحاً جایگزین کنیم)
         if gen.startswith("sk-ant-"):
-            os.environ.setdefault("ANTHROPIC_API_KEY", gen)
+            os.environ["ANTHROPIC_API_KEY"] = gen
         elif gen.startswith("sk-"):
-            os.environ.setdefault("OPENAI_API_KEY", gen)
+            os.environ["OPENAI_API_KEY"] = gen
         else:
-            os.environ.setdefault("ANTHROPIC_API_KEY", gen)
+            os.environ["ANTHROPIC_API_KEY"] = gen
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     engine = "claude" if api_key else ("openai" if os.environ.get("OPENAI_API_KEY", "").strip() else "google")
 
