@@ -70,7 +70,8 @@ def universe():
         if not sym.endswith("USDT"):
             continue
         base = sym[:-4]
-        if base in STABLE or base.endswith(("UP", "DOWN", "BULL", "BEAR")) or float(x.get("quoteVolume", 0)) <= 0:
+        if (base in STABLE or base.endswith(("UP", "DOWN", "BULL", "BEAR")) or float(x.get("quoteVolume", 0)) <= 0
+                or not __import__("re").fullmatch(r"[A-Z0-9]{2,12}", base)):
             continue
         rows.append((base, float(x["quoteVolume"])))
     rows.sort(key=lambda r: -r[1])
