@@ -24,6 +24,9 @@ concurrency:
   group: sync
   cancel-in-progress: false
 
+env:
+  PYTHONUNBUFFERED: "1"
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -52,6 +55,14 @@ jobs:
           python scripts/repair.py
           python scripts/merge_tr.py
 
+      - name: Pick fastest working Gemini model
+        continue-on-error: true
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_CHECK_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: timeout 300 python scripts/ai_check.py
+
       - name: Translate new posts (fa → ckb, en)
         id: translate
         continue-on-error: true
@@ -61,6 +72,7 @@ jobs:
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '25' }}
+        timeout-minutes: 8
         run: python scripts/translate.py
 
       - name: Market dashboard & opportunity scanner (Binance / CoinGecko / alternative.me)
@@ -90,6 +102,7 @@ jobs:
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BRAIN_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        timeout-minutes: 5
         run: python scripts/brain.py
 
       - name: Health check & Telegram alert
