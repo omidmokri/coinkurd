@@ -59,7 +59,11 @@ def main():
     else:
         h = age_h(m["updated_at"])
         add("market_fresh", h < 1.5 and not m.get("stale"), f"بازار {h*60:.0f} دقیقه پیش، {len(m.get('coins', []))} کوین", "warn")
-        add("market_sources", not m.get("errors"), "; ".join(m.get("errors", [])[:3]) or "همهٔ منابع پاسخ دادند", "warn")
+        add("market_sources", len(m.get("errors", [])) <= max(2, len(m.get("coins", [])) // 10), "; ".join(m.get("errors", [])[:3]) or "همهٔ منابع پاسخ دادند", "warn")
+    nw = load("news.json")
+    if isinstance(nw, dict):
+        okf = sum(1 for f in nw.get("feeds", {}).values() if f.get("ok"))
+        add("news_feeds", okf >= 2, f"{okf}/{len(nw.get('feeds', {}))} منبع خبری پاسخ دادند", "warn")
     for k, v in os.environ.items():
         if k.startswith("STEP_") and v:
             add(k[5:].lower(), v in ("success", "skipped"), f"مرحلهٔ {k[5:].lower()}: {v}")

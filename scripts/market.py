@@ -23,8 +23,10 @@ OUT = os.path.join(ROOT, "data", "market.json")
 LOG = os.path.join(ROOT, "data", "opps_log.json")
 
 BINANCE = ["https://data-api.binance.vision", "https://api.binance.com", "https://api1.binance.com"]
-COINS = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "TON", "ADA", "AVAX", "LINK", "DOT", "TRX",
+CORE = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "TON", "ADA", "AVAX", "LINK", "DOT", "TRX",
          "LTC", "NEAR", "SUI", "APT", "ARB", "OP", "PEPE", "SHIB", "UNI", "ATOM"]
+STABLE = {"USDC", "FDUSD", "TUSD", "USDP", "DAI", "BUSD", "USDE", "EURI", "EUR", "AEUR", "PAXG", "XUSD", "USD1", "BFUSD", "RLUSD", "WBTC", "WBETH", "BNSOL"}
+TOP_N = int(__import__("os").environ.get("SCAN_TOP", "150"))
 UA = {"User-Agent": "entekhab.net market bot (+https://entekhab.net)"}
 
 
@@ -53,6 +55,28 @@ def binance(path, params):
         except Exception as e:  # noqa: BLE001
             last = e
     raise RuntimeError(last)
+
+
+def universe():
+    """کوین‌های اسکن: CORE + پرحجم‌ترین جفت‌های USDT بایننس (بدون استیبل‌کوین و توکن اهرمی)"""
+    try:
+        t = binance("/api/v3/ticker/24hr", {"type": "MINI"})
+    except Exception as e:  # noqa: BLE001
+        print(f"universe fallback: {e}")
+        return list(CORE), {}
+    rows = []
+    for x in t:
+        sym = x["symbol"]
+        if not sym.endswith("USDT"):
+            continue
+        base = sym[:-4]
+        if base in STABLE or base.endswith(("UP", "DOWN", "BULL", "BEAR")) or float(x.get("quoteVolume", 0)) <= 0:
+            continue
+        rows.append((base, float(x["quoteVolume"])))
+    rows.sort(key=lambda r: -r[1])
+    vol = dict(rows)
+    out = list(CORE) + [b for b, _ in rows if b not in CORE]
+    return out[:max(TOP_N, len(CORE))], vol
 
 
 def klines(sym, interval="1h", limit=200, start=None):
@@ -119,9 +143,23 @@ def analyse(sym, k):
         add("breakdown", min(100, round((1 - last["c"] / lo48) * 2000)), {"level": lo48})
     if vavg and last["v"] > 2.5 * vavg:
         add("volume_spike", min(100, round(last["v"] / vavg * 20)), {"x": round(last["v"] / vavg, 1)})
+    # واگرایی RSI: دو کف/سقف محلی آخر در ۴۰ کندل
+    rs = [rsi(c[:i + 1]) for i in range(len(c) - 40, len(c))]
+    lows, highs = [x["l"] for x in k[-40:]], [x["h"] for x in k[-40:]]
+    def piv(arr, cmp):
+        return [i for i in range(2, len(arr) - 2) if arr[i] != arr[i - 1] and all(cmp(arr[i], arr[j]) for j in (i - 2, i - 1, i + 1, i + 2))]
+    pl, ph = piv(lows, lambda a, b: a <= b), piv(highs, lambda a, b: a >= b)
+    if len(pl) >= 2 and None not in (rs[pl[-1]], rs[pl[-2]]):
+        a, b = pl[-2], pl[-1]
+        if len(lows) - b <= 6 and lows[b] < lows[a] and rs[b] > rs[a] + 2:
+            add("bull_divergence", min(100, round((rs[b] - rs[a]) * 5)), {"rsi": round(rs[b], 1)})
+    if len(ph) >= 2 and None not in (rs[ph[-1]], rs[ph[-2]]):
+        a, b = ph[-2], ph[-1]
+        if len(highs) - b <= 6 and highs[b] > highs[a] and rs[b] < rs[a] - 2:
+            add("bear_divergence", min(100, round((rs[a] - rs[b]) * 5)), {"rsi": round(rs[b], 1)})
     # «تأیید» = دو سیگنال هم‌جهت → اطمینان بیشتر
-    bull = {"rsi_oversold", "ema_golden_cross", "breakout_up"}
-    bear = {"rsi_overbought", "ema_death_cross", "breakdown"}
+    bull = {"rsi_oversold", "ema_golden_cross", "breakout_up", "bull_divergence"}
+    bear = {"rsi_overbought", "ema_death_cross", "breakdown", "bear_divergence"}
     kinds = {o["type"] for o in opps}
     for o in opps:
         same = bull if o["type"] in bull else bear if o["type"] in bear else set()
@@ -137,14 +175,16 @@ def analyse(sym, k):
 def main():
     now = datetime.now(timezone.utc)
     out = {"updated_at": now.isoformat(), "sources": {}, "coins": [], "opportunities": [], "errors": []}
-    for sym in COINS:
+    syms, qvol = universe()
+    for sym in syms:
         try:
-            a, o = analyse(sym, klines(sym))
+            a, o = analyse(sym, klines(sym, limit=150))
+            a["qvol"] = round(qvol.get(sym, 0))
             out["coins"].append(a)
             out["opportunities"].extend(o)
         except Exception as e:  # noqa: BLE001
             out["errors"].append(f"{sym}: {e}")
-        time.sleep(0.15)
+        time.sleep(0.08)
     out["sources"]["binance"] = now.isoformat() if out["coins"] else None
     try:
         f = get("https://api.alternative.me/fng/", {"limit": 30})["data"]
@@ -169,7 +209,8 @@ def main():
         prev["errors"] = out["errors"]
         prev["stale"] = True
         out = prev
-    out["opportunities"].sort(key=lambda o: -o["strength"])
+    out["opportunities"].sort(key=lambda o: (o.get("confidence") != "high", -o["strength"]))
+    out["scanned"] = len(out["coins"])
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
     # تاریخچهٔ فرصت‌ها (بدون تکرار)
