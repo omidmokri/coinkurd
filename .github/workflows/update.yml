@@ -27,7 +27,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -59,7 +59,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
-          TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '120' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '25' }}
         run: python scripts/translate.py
 
       - name: Market dashboard & opportunity scanner (Binance / CoinGecko / alternative.me)
@@ -82,6 +83,15 @@ jobs:
         continue-on-error: true
         run: python scripts/score.py
 
+      - name: Market Brain (regime, why-it-moved, Gemini report)
+        id: brain
+        continue-on-error: true
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BRAIN_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python scripts/brain.py
+
       - name: Health check & Telegram alert
         id: health
         continue-on-error: true
@@ -94,6 +104,7 @@ jobs:
           STEP_IMPACT: ${{ steps.impact.outcome }}
           STEP_NEWS: ${{ steps.news.outcome }}
           STEP_SCORE: ${{ steps.score.outcome }}
+          STEP_BRAIN: ${{ steps.brain.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
