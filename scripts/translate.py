@@ -176,7 +176,7 @@ def main():
             os.environ["ANTHROPIC_API_KEY"] = gen
         elif gen.startswith("sk-"):
             os.environ["OPENAI_API_KEY"] = gen
-        elif gen.startswith("AIza"):
+        elif gen.startswith(("AIza", "AQ.")):
             os.environ["GEMINI_API_KEY"] = gen
         else:
             os.environ["ANTHROPIC_API_KEY"] = gen

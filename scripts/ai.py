@@ -3,7 +3,7 @@
 """
 لایهٔ مشترک هوش مصنوعی — Google Gemini (AI Studio، سطح رایگان)
 
-کلید از یکی از این متغیرها خوانده می‌شود: GEMINI_API_KEY یا COIN_KURD_API_KEY (اگر با AIza شروع شود).
+کلید از یکی از این متغیرها خوانده می‌شود: GEMINI_API_KEY یا COIN_KURD_API_KEY (اگر با AIza یا AQ. شروع شود).
 مدل به‌طور خودکار از فهرست مدل‌های در دسترس حساب انتخاب می‌شود (اولویت: flash).
 محدودیت نرخ سطح رایگان رعایت می‌شود (فاصلهٔ حداقل بین درخواست‌ها + تلاش مجدد روی 429/503).
 """
@@ -29,7 +29,7 @@ def key():
     if k:
         return k
     g = os.environ.get("COIN_KURD_API_KEY", "").strip()
-    return g if g.startswith("AIza") else ""
+    return g if g.startswith(("AIza", "AQ.")) else ""
 
 
 def available():
@@ -45,7 +45,7 @@ def model():
         _model = env
         return env
     try:
-        r = requests.get(f"{BASE}/models", params={"key": key(), "pageSize": 200}, timeout=30)
+        r = requests.get(f"{BASE}/models", params={"pageSize": 200}, headers={"x-goog-api-key": key()}, timeout=30)
         r.raise_for_status()
         names = [m["name"].split("/", 1)[1] for m in r.json().get("models", [])
                  if "generateContent" in m.get("supportedGenerationMethods", [])]
@@ -76,7 +76,7 @@ def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=4):
         if wait > 0:
             time.sleep(wait)
         _last = time.time()
-        r = requests.post(f"{BASE}/models/{model()}:generateContent", params={"key": k}, json=body, timeout=120)
+        r = requests.post(f"{BASE}/models/{model()}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=120)
         if r.status_code in (429, 500, 503):
             if r.status_code == 429 and ("PerDay" in r.text or "per day" in r.text.lower()):
                 raise QuotaError("daily quota exhausted")
