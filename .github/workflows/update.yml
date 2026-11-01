@@ -91,6 +91,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/lab.py
 
+      - name: Market Wrapped (weekly / monthly)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/wrapped.py
+
       - name: Post & signal track record
         id: impact
         continue-on-error: true
