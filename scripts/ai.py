@@ -80,7 +80,8 @@ def model():
 def fallbacks():
     try:
         c = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ai_model.json")))
-        return [m for m in c.get("fallbacks", []) if m not in _exhausted]
+        fb = c.get("fallbacks") or ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-flash-lite-latest"]
+        return [m for m in fb if m not in _exhausted]
     except Exception:  # noqa: BLE001
         return [m for m in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-flash-lite-latest") if m not in _exhausted]
 
