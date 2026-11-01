@@ -146,6 +146,8 @@ def parse_messages(html: str, channel: str) -> list:
                 label = a.get_text("", strip=False)
                 if href.startswith("?q=") or not href:  # لینک هشتگ تلگرام
                     a.replace_with(label)
+                elif not re.sub(r"[\s\u200b-\u200f\u2060\ufeff]", "", label):
+                    a.replace_with("")  # لینک بدون متن (پنهان) → حذف
                 elif label.strip() and label.strip() != href:
                     a.replace_with(f"[{label.strip()}]({href})")
                 else:
