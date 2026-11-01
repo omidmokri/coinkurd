@@ -101,7 +101,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/#intel">داشبورد بازار</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
+<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -224,5 +224,94 @@ def main():
     print(f"pages={len(urls)} posts={len(posts)} coins={len(order)}")
 
 
+
+
+# ====================================================================== prerender
+# پیش‌رندر صفحهٔ اصلی + صفحات /dashboard/ و /categories/<id>/
+# تا موتورهای جستجو و ابزارهایی که جاوااسکریپت اجرا نمی‌کنند هم دادهٔ واقعی ببینند.
+# جاوااسکریپت صفحه بعد از بارگذاری همین بخش‌ها را با دادهٔ تازه جایگزین می‌کند.
+
+def intel_html():
+    m, out = market, {}
+    if m.get("fng"):
+        f = m["fng"]
+        out["fng"] = f'<h3>شاخص ترس و طمع</h3><div class="big">{f["value"]}</div><p>{e(f["class"])}</p><p class="disc">alternative.me</p>'
+    if m.get("global"):
+        g = m["global"]
+        out["glob"] = ('<h3>وضعیت کل بازار</h3><table class="otab">'
+                       f'<tr><td>ارزش کل بازار</td><td class="num">${g["mcap"]/1e12:.2f}T ({g["mcap_chg24"]:+}%)</td></tr>'
+                       f'<tr><td>حجم ۲۴ ساعته</td><td class="num">${g["vol"]/1e9:.1f}B</td></tr>'
+                       f'<tr><td>دامیننس BTC</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>دامیننس ETH</td><td class="num">{g["eth_d"]}%</td></tr></table><p class="disc">CoinGecko</p>')
+    ops = m.get("opportunities", [])
+    rows = "".join(f'<tr><td><a href="/coins/{o["coin"].lower()}/">{o["coin"]}</a></td><td>{OPP_FA.get(o["type"], o["type"])}</td><td class="num">{o["strength"]}</td><td>{"بالا" if o["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(o["price"])}</td></tr>' for o in ops[:14])
+    coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
+    out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
+                  + f'<table class="otab"><tr>{coins}</tr></table><p class="disc">Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
+    by = {}
+    for r in impact.values():
+        if r.get("r24h") is not None:
+            by.setdefault(r["coin"], []).append(r["r24h"])
+    rws = ""
+    for c, a in sorted(by.items(), key=lambda kv: -len(kv[1]))[:10]:
+        if len(a) < 2:
+            continue
+        av = sum(a) / len(a)
+        rws += f'<tr><td><a href="/coins/{c.lower()}/">{c}</a></td><td class="num">{len(a)}</td><td class="num">{av:+.2f}%</td><td class="num">{sum(1 for x in a if x > 0)*100//len(a)}%</td></tr>'
+    out["imp"] = '<h3>کارنامهٔ پست‌ها: حرکت قیمت ۲۴ ساعت بعد از انتشار</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>پست</th><th>میانگین ۲۴h</th><th>درصد مثبت</th></tr>{rws}</table>' if rws else '<p class="disc">داده هنوز کافی نیست.</p>') + '<p class="disc">Binance 1h</p>'
+    h = load("health.json", {})
+    out["fresh"] = f'<span>اسکنر: {fmt_date(m.get("updated_at",""))}</span><span>آرشیو تلگرام: {fmt_date(meta.get("updated_at",""))}</span><span>سلامت سیستم: {e(h.get("status","—"))}</span>'
+    return out
+
+
+def post_li(p):
+    cat = CATS.get(p["category"], {}).get("name", {}).get("fa", "")
+    return f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a><small>{fmt_date(p.get("date",""))} · {e(cat)} · {" ".join(p.get("coins", [])[:4])}</small></li>'
+
+
+def prerender():
+    idx = os.path.join(ROOT, "index.html")
+    s = open(idx, encoding="utf-8").read()
+    it = intel_html()
+    n_cats = len([c for c in meta.get("by_category", {}) if meta["by_category"][c]])
+    n_coins = len(meta.get("by_coin", {}))
+    reps = {
+        '<b id="sPosts">—</b>': f'<b id="sPosts">{len(posts)}</b>',
+        '<b id="sCats">—</b>': f'<b id="sCats">{n_cats}</b>',
+        '<b id="sCoins">—</b>': f'<b id="sCoins">{n_coins}</b>',
+        '<b id="sUpd" style="font-size:1.2rem;padding-top:14px">—</b>': f'<b id="sUpd" style="font-size:1.2rem;padding-top:14px">{fmt_date(meta.get("updated_at",""))}</b>',
+        '<b id="nextTitle" dir="auto">…</b>': f'<b id="nextTitle" dir="auto">{e(posts[0]["title"]) if posts else "…"}</b>',
+        '<div class="fresh" id="fresh"></div>': f'<div class="fresh" id="fresh">{it["fresh"]}</div>',
+        '<div class="ibox" id="fngBox"></div>': f'<div class="ibox" id="fngBox">{it.get("fng","")}</div>',
+        '<div class="ibox" id="globBox"></div>': f'<div class="ibox" id="globBox">{it.get("glob","")}</div>',
+        '<div class="ibox wide" id="oppBox"></div>': f'<div class="ibox wide" id="oppBox">{it["opp"]}</div>',
+        '<div class="ibox wide" id="impBox"></div>': f'<div class="ibox wide" id="impBox">{it["imp"]}</div>',
+        '<div class="hall" id="hallGrid"></div>': '<div class="hall" id="hallGrid">' + "".join(
+            f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic">{c["icon"]}</span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
+            for c in meta.get("categories", []) if meta.get("by_category", {}).get(c["id"])) + "</div>",
+        '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in posts[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
+    }
+    miss = [k for k in reps if k not in s]
+    for k, v in reps.items():
+        s = s.replace(k, v, 1)
+    open(idx, "w", encoding="utf-8").write(s)
+    # /dashboard/
+    css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
+    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("fng", "glob", "opp", "imp"))
+    urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}</style>")]
+    # /categories/<id>/
+    for c in meta.get("categories", []):
+        ps = [p for p in posts if p["category"] == c["id"]]
+        if not ps:
+            continue
+        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1>{c["icon"]} {e(c["name"]["fa"])}</h1><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب</p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
+        urls.append(page(f"categories/{c['id']}/", f'{c["name"]["fa"]} — {c["name"].get("en","")}', f'آرشیو مطالب دستهٔ {c["name"]["fa"]} در entekhab.net', body))
+    print(f"prerendered index (missing placeholders: {miss}); extra pages {len(urls)}")
+    return urls
+
+
 if __name__ == "__main__":
     main()
+    extra = prerender()
+    sm = os.path.join(ROOT, "sitemap.xml")
+    s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
+    open(sm, "w", encoding="utf-8").write(s)
