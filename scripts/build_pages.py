@@ -105,7 +105,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
+<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -348,8 +348,48 @@ def prerender():
             continue
         body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1>{c["icon"]} {e(c["name"]["fa"])}</h1><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب</p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
         urls.append(page(f"categories/{c['id']}/", f'{c["name"]["fa"]} — {c["name"].get("en","")}', f'آرشیو مطالب دستهٔ {c["name"]["fa"]} در entekhab.net', body))
+    urls.append(build_replay())
     print(f"prerendered index (missing placeholders: {miss}); extra pages {len(urls)}")
     return urls
+
+
+REPLAY_JS = r"""
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const RG={bull:'صعودی',bear:'نزولی',sideways:'رنج / خنثی',high_volatility:'نوسان بالا'};
+let IDX=[];
+async function init(){IDX=(await fetch('/data/history/index.json?'+Date.now()).then(r=>r.json())).slots;
+  const days=[...new Set(IDX.map(s=>s.slot.slice(0,10)))];const sel=$('#day');sel.innerHTML=days.map(d=>`<option>${d}</option>`).join('');
+  sel.value=days[days.length-1];sel.onchange=()=>slots();slots();
+  const pts=IDX.filter(s=>s.btc);if(pts.length>1){const mn=Math.min(...pts.map(p=>p.btc)),mx=Math.max(...pts.map(p=>p.btc));
+    $('#spark').innerHTML=`<polyline fill="none" stroke="#f7931a" stroke-width="1.5" points="${pts.map((p,i)=>`${(i/(pts.length-1)*600).toFixed(1)},${(70-(p.btc-mn)/((mx-mn)||1)*60).toFixed(1)}`).join(' ')}"/>`;}
+}
+function slots(){const d=$('#day').value;const ss=IDX.filter(s=>s.slot.startsWith(d));$('#slots').innerHTML=ss.map(s=>`<button data-s="${s.slot}">${s.slot.slice(11)}:00 UTC</button>`).join('');
+  $('#slots').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.s));if(ss.length)show(ss[ss.length-1].slot)}
+async function show(slot){document.querySelectorAll('#slots button').forEach(b=>b.classList.toggle('on',b.dataset.s===slot));
+  const s=await fetch(`/data/history/${slot}.json`).then(r=>r.json());const i=IDX.findIndex(x=>x.slot===slot);
+  const later=[[1,'۶ ساعت بعد'],[4,'۲۴ ساعت بعد'],[28,'۷ روز بعد']].map(([n,l])=>{const x=IDX[i+n];if(!x||!x.btc||!s.prices.BTC)return `<div class="kpi"><small>${l}</small><b>—</b></div>`;const r=(x.btc/s.prices.BTC.price-1)*100;return `<div class="kpi"><small>BTC ${l}</small><b class="${r>=0?'up':'down'}">${r>=0?'+':''}${r.toFixed(2)}%</b></div>`}).join('');
+  const rp=s.report&&s.report.fa;const rg=s.regime||{};
+  $('#out').innerHTML=`<h2>وضعیت بازار در ${slot.replace('T',' ساعت ')}:00 UTC</h2>
+  <div class="grid"><div class="kpi"><small>رژیم بازار</small><b>${RG[rg.regime]||'—'}</b></div><div class="kpi"><small>ترس و طمع</small><b>${s.fng??'—'}</b></div>
+  ${Object.entries(s.prices).slice(0,6).map(([c,p])=>`<div class="kpi"><small>${c}</small><b>${p.price>=1?p.price.toLocaleString('en-US',{maximumFractionDigits:2}):p.price}</b><small class="${p.chg24>=0?'up':'down'}">${p.chg24>=0?'+':''}${p.chg24}% · RSI ${p.rsi}</small></div>`).join('')}</div>
+  <h2>بعداً چه شد؟</h2><div class="grid">${later}</div>
+  ${rp?`<h2>گزارش هوش مصنوعی در آن لحظه</h2><details open><summary>${esc(rp.headline)}</summary><div class="txt" style="white-space:pre-wrap">${esc(rp.body)}</div></details>`:''}
+  ${s.opportunities&&s.opportunities.length?`<h2>یافته‌های اسکنر (اطمینان بالا)</h2><ul class="list">${s.opportunities.map(o=>`<li><a href="/coins/${o.coin.toLowerCase()}/">${o.coin}</a> — ${esc(o.type)}<small>قیمت ${o.price}</small></li>`).join('')}</ul>`:''}
+  ${s.narratives&&s.narratives.length?`<h2>روایت‌های داغ</h2><ul class="list">${s.narratives.map(n=>`<li>${esc(n.name.fa)}<small>${n.mentions_24h} تیتر · عملکرد ${n.perf_24h??'—'}%</small></li>`).join('')}</ul>`:''}
+  ${s.headlines&&s.headlines.length?`<h2>تیترهای آن لحظه</h2><ul class="list">${s.headlines.map(h=>`<li dir="ltr"><a href="${esc(h.url)}" target="_blank" rel="noopener nofollow">${esc(h.title)}</a><small>${esc(h.source)}</small></li>`).join('')}</ul>`:''}
+  ${s.channel&&s.channel.length?`<h2>آخرین پست‌های کانال</h2><ul class="list">${s.channel.map(p=>`<li><a href="/p/${p.id}/">${esc(p.title)}</a></li>`).join('')}</ul>`:''}`}
+init().catch(e=>$('#out').innerHTML='<p class=note>هنوز هیچ عکس فوری ذخیره نشده است.</p>');
+"""
+
+
+def build_replay():
+    css = "#slots button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;margin:4px;cursor:pointer;font-family:inherit}#slots button.on{background:var(--acc);color:#000}select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit}.kpi small.up,.kpi small.down{display:block}"
+    body = ('<h1>⏪ بازپخش بازار (Market Replay)</h1><p class="txt">وضعیت بازار، گزارش هوش مصنوعی، یافته‌های اسکنر، روایت‌ها و تیترها در هر لحظهٔ گذشته — و اینکه بعداً قیمت چه کرد. '
+            'از ۱ نوامبر ۲۰۲۶ هر ۶ ساعت یک عکس فوری ذخیره می‌شود.</p>'
+            '<svg id="spark" viewBox="0 0 600 75" style="width:100%;height:80px;border:1px solid var(--line);border-radius:10px;margin:8px 0"></svg>'
+            '<p><label>روز: <select id="day"></select></label></p><div id="slots"></div><div id="out"><p class="note">در حال بارگذاری…</p></div>')
+    return page("replay/", "بازپخش بازار کریپتو (Market Replay)", "وضعیت بازار کریپتو در هر لحظهٔ گذشته: رژیم بازار، گزارش هوش مصنوعی، اسکنر، روایت‌ها و تیترها",
+                body, f"<style>{css}</style><script defer>{REPLAY_JS}</script>".replace("<script defer>", "<script>document.addEventListener('DOMContentLoaded',()=>{").replace("</script>", "})</script>"))
 
 
 def build_api():
