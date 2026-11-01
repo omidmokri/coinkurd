@@ -83,6 +83,22 @@ footer{padding:40px 0;color:var(--mute);font-size:.8rem;text-align:center;border
   <section id="dnaS"><h2><b data-t="dnaT"></b><span>SHARE</span></h2><p class="lead" data-t="dnaL"></p>
     <div class="grid"><div class="card" id="dnaQ"></div><div class="card" id="dnaOut"><p class="disc" data-t="dnaWait"></p></div></div></section>
 
+  <section id="watchS"><h2><b data-t="wT"></b><span>MY</span></h2><p class="lead" data-t="wL"></p>
+    <div class="card"><div id="wPick" class="row"></div><div id="wList" class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div><div id="wRep" style="margin-top:12px"></div></div></section>
+
+  <section id="radarS"><h2><b data-t="rT"></b><span>SCAN</span></h2><p class="lead" data-t="rL"></p>
+    <div class="grid"><div class="card"><svg id="radar" viewBox="-220 -220 440 440" style="width:100%;max-width:520px;display:block;margin:auto"></svg></div><div class="card" id="radarInfo"></div></div></section>
+
+  <section id="graphS"><h2><b data-t="gT"></b></h2><p class="lead" data-t="gL"></p>
+    <div class="card"><svg id="graph" viewBox="0 0 1000 560" style="width:100%;height:auto"></svg><div id="graphInfo" class="disc"></div></div></section>
+
+  <section id="galS"><h2><b data-t="galT"></b><span>3D</span></h2><p class="lead" data-t="galL"></p>
+    <div class="card" style="padding:0"><div id="galaxy" style="width:100%;height:560px;cursor:grab"></div><div id="galInfo" class="disc" style="padding:10px 16px"></div></div></section>
+
+  <section id="wrapS"><h2><b data-t="wrT"></b><span>SHARE</span></h2><p class="lead" data-t="wrL"></p>
+    <div class="row" style="margin-bottom:10px"><button class="btn p" data-wp="week" data-t="wk"></button><button class="btn" data-wp="month" data-t="mo"></button></div>
+    <div class="grid"><div class="card" id="wrap"></div><div class="card" id="wrapImg"></div></div></section>
+
   <section id="councilS"><h2><b data-t="cT"></b><span>AI</span></h2><p class="lead" data-t="cL"></p><div class="card" id="council"></div></section>
 
   <section id="memS"><h2><b data-t="memT"></b></h2><p class="lead" data-t="memL"></p>
@@ -97,6 +113,7 @@ footer{padding:40px 0;color:var(--mute);font-size:.8rem;text-align:center;border
 </div>
 <footer>entekhab.net · Binance · Deribit · Coinbase · Kraken · OKX · GitHub · CoinGecko — <span data-t="nfa"></span></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const I={
@@ -190,7 +207,7 @@ async function px(sym='BTCUSDT'){const r=await j(`${BN}/ticker/price?symbol=${sy
 function applyLang(){const rtl=lang!=='en';document.documentElement.lang=lang;document.documentElement.dir=rtl?'rtl':'ltr';
  $('#hT').innerHTML=T('hT');$('#hL').textContent=T('hL');$('#honest').innerHTML=T('honest');
  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=T(e.dataset.t));
- const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
+ const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=[['watchS',T('wT')],['radarS',T('rT')],['galS',T('galT')],['wrapS',T('wrT')]].map(([a,t])=>`<a href="#${a}">${t}</a>`).join('')+T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
  document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));renderAll()}
 $('#langs').onclick=e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang()};
 
@@ -297,10 +314,129 @@ function coneChart(f){const W=520,H=200,c=f.cone,lo=Math.min(...c['5'],f.price),
 function renderCouncil(){const c=D.council,el=$('#council');if(!c?.council){el.innerHTML=`<p class="disc">${T('noData')}</p>`;return}const r=c.council,L=r[lang]||r.en,cl={bullish:'#22c55e',bearish:'#ef4444',neutral:'#9ca3af'};
  el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${r.agents.map(a=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px;border-top:3px solid ${cl[a.stance]||'#888'}"><b>${T('ag')[a.id]||esc(a.id)}</b> <span class="chip" style="color:${cl[a.stance]}">${esc(a.stance)} · ${'●'.repeat(a.confidence||0)}</span><ul style="margin:8px 18px 0;font-size:.85rem">${((a[lang]||a.en||{}).evidence||[]).map(e=>`<li>${esc(e)}</li>`).join('')}</ul></div>`).join('')}</div>
  ${L.disagreements?.length?`<h3 style="margin-top:14px">⚔</h3><ul style="margin:0 18px;font-size:.9rem">${L.disagreements.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}<p style="margin-top:12px"><b>${esc(L.summary)}</b></p><p class="disc">${esc(c.engine)} · ${c.at.slice(0,16).replace('T',' ')} UTC</p>`}
-function renderAll(){renderCouncil();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
-(async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council]=await Promise.all(['lab','narratives','market','brain','council'].map(n=>j(`/data/${n}.json${v}`)));
+function renderAll(){renderCouncil();renderWatch();renderRadar();renderGraph();renderWrap();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
+(async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council,D.news,D.score,D.wrapped]=await Promise.all(['lab','narratives','market','brain','council','news','score','wrapped'].map(n=>j(`/data/${n}.json${v}`)));
  $('#tmCoin').innerHTML=TM_COINS.map(c=>`<option>${c}</option>`).join('');const t=new Date();$('#tmB').value=t.toISOString().slice(0,10);t.setFullYear(t.getFullYear()-1);$('#tmA').value=t.toISOString().slice(0,10);$('#tmGo').onclick=timeMachine;
- applyLang();newGuess()})();
+ applyLang();newGuess();galaxy()})();
+/* ================= stage 2: watchlist, radar, brain graph, galaxy, wrapped ================= */
+const I2={
+fa:{wT:'لیست مراقبت و گزارش شخصی',wL:'کوین‌های خودت را انتخاب کن؛ قیمت، RSI، روند، سیگنال‌های اسکنر، امتیاز Entekhab و خبرهای ۲۴ ساعت هر کدام اینجا جمع می‌شود و می‌توانی گزارش امروزت را به شکل تصویر بفرستی. (روی مرورگر خودت ذخیره می‌شود)',
+ add:'افزودن',myRep:'گزارش امروز من',sig:'سیگنال',news24:'خبر ۲۴h',scoreL:'امتیاز',none:'—',
+ rT:'رادار فرصت‌های پنهان',rL:'هر نقطه یک یافتهٔ واقعی اسکنر روی ۱۵۰ کوین است؛ هرچه به مرکز نزدیک‌تر، قوی‌تر. رنگ = نوع سیگنال. روی نقطه کلیک کن.',
+ gT:'نقشهٔ مغز بازار',gL:'ارتباط روایت‌ها، کوین‌ها و خبرهای ۲۴ ساعت اخیر؛ خط یعنی «هم‌زمان در یک خبر یا یک روایت آمده‌اند»، نه رابطهٔ علّی.',
+ galT:'کهکشان ارزها',galL:'۸۰ کوین پرحجم در فضای سه‌بعدی؛ کوین‌هایی که در ۴۸ ساعت اخیر شبیه هم حرکت کرده‌اند (همبستگی بازده ساعتی) به هم نزدیک‌ترند. رنگ = تغییر ۲۴ ساعته، اندازه = حجم. بکش تا بچرخد، کلیک کن تا جزئیات ببینی.',
+ wrT:'Wrapped بازار',wrL:'خلاصهٔ تصویری هفته و ماه از دادهٔ واقعی ۶۰ کوین پرحجم؛ تصویرش را دانلود کن و منتشر کن.',wk:'این هفته',mo:'این ماه',
+ gain:'بیشترین رشد',lose:'بیشترین افت',traded:'پرمعامله‌ترین',wild:'پرنوسان‌ترین',newsy:'پرخبرترین',upc:'کوین‌های مثبت',btcP:'BTC در این بازه',bigDay:'بزرگ‌ترین روز',greenD:'روزهای سبز',hotN:'روایت داغ',
+ types:{ema_golden_cross:'تقاطع طلایی EMA',ema_death_cross:'تقاطع مرگ EMA',breakout_up:'شکست سقف ۴۸h',bull_divergence:'واگرایی مثبت RSI',bear_divergence:'واگرایی منفی RSI',rsi_oversold:'RSI اشباع فروش',rsi_overbought:'RSI اشباع خرید',ema_cross_up:'تقاطع صعودی EMA',ema_cross_down:'تقاطع نزولی EMA',breakout:'شکست سقف ۴۸h',breakdown:'شکست کف ۴۸h',volume_spike:'جهش حجم',bull_div:'واگرایی مثبت',bear_div:'واگرایی منفی'}},
+ckb:{wT:'لیستی چاودێری و ڕاپۆرتی تایبەت',wL:'دراوەکانی خۆت هەڵبژێرە؛ نرخ، RSI، ڕەوت، ئاماژەکانی پشکنەر، خاڵی Entekhab و هەواڵەکانی ٢٤ کاتژمێر لێرە کۆ دەبنەوە و دەتوانیت ڕاپۆرتی ئەمڕۆت وەک وێنە بنێریت.',
+ add:'زیادکردن',myRep:'ڕاپۆرتی ئەمڕۆم',sig:'ئاماژە',news24:'هەواڵی ٢٤h',scoreL:'خاڵ',none:'—',
+ rT:'ڕاداری دەرفەتە شاراوەکان',rL:'هەر خاڵێک دۆزینەوەیەکی ڕاستەقینەی پشکنەرە لەسەر ١٥٠ دراو؛ هەتا نزیکتر لە ناوەڕاست، بەهێزتر. ڕەنگ = جۆری ئاماژە.',
+ gT:'نەخشەی مێشکی بازاڕ',gL:'پەیوەندیی چیرۆکەکان، دراوەکان و هەواڵەکانی ٢٤ کاتژمێر؛ هێڵ واتە «پێکەوە لە هەواڵێک یان چیرۆکێکدا هاتوون»، نەک هۆکار.',
+ galT:'گەلەئەستێرەی دراوەکان',galL:'٨٠ دراوی پڕقەبارە لە بۆشاییەکی سێ ڕەهەندیدا؛ ئەوانەی لە ٤٨ کاتژمێردا هاوشێوە جوڵاون نزیکترن. ڕەنگ = گۆڕانی ٢٤ کاتژمێر، قەبارە = بازرگانی. ڕایبکێشە بۆ سووڕاندن.',
+ wrT:'Wrappedی بازاڕ',wrL:'پوختەی وێنەیی هەفتە و مانگ لە داتای ڕاستەقینەی ٦٠ دراو؛ وێنەکەی دابگرە و بڵاوی بکەوە.',wk:'ئەم هەفتەیە',mo:'ئەم مانگە',
+ gain:'زۆرترین گەشە',lose:'زۆرترین دابەزین',traded:'زۆرترین مامەڵە',wild:'پڕلەرزینترین',newsy:'زۆرترین هەواڵ',upc:'دراوە ئەرێنییەکان',btcP:'BTC لەم ماوەیەدا',bigDay:'گەورەترین ڕۆژ',greenD:'ڕۆژە سەوزەکان',hotN:'چیرۆکی گەرم',
+ types:{ema_golden_cross:'بڕینی زێڕینی EMA',ema_death_cross:'بڕینی مردنی EMA',breakout_up:'شکاندنی بەرزایی',bull_divergence:'جیاوازیی ئەرێنی RSI',bear_divergence:'جیاوازیی نەرێنی RSI',rsi_oversold:'RSI زۆرفرۆشراو',rsi_overbought:'RSI زۆرکڕدراو',ema_cross_up:'بڕینی سەرەوەی EMA',ema_cross_down:'بڕینی خوارەوەی EMA',breakout:'شکاندنی بەرزایی',breakdown:'شکاندنی نزمایی',volume_spike:'بازدانی قەبارە',bull_div:'جیاوازیی ئەرێنی',bear_div:'جیاوازیی نەرێنی'}},
+en:{wT:'Watchlist & my report',wL:'Pick your coins: price, RSI, trend, scanner signals, Entekhab Score and 24h news for each, and share today’s report as an image. (Saved in your browser)',
+ add:'Add',myRep:'My report today',sig:'Signals',news24:'24h news',scoreL:'Score',none:'—',
+ rT:'Opportunity Radar',rL:'Each blip is a real scanner finding across 150 coins; closer to the centre = stronger. Colour = signal type. Click a blip.',
+ gT:'Market Brain map',gL:'Links between narratives, coins and the last 24h of headlines; a line means “appeared together in a headline or narrative”, not causation.',
+ galT:'Coin Galaxy',galL:'The 80 most-traded coins in 3D; coins that moved alike over the last 48h (hourly-return correlation) sit closer. Colour = 24h change, size = volume. Drag to rotate, click for details.',
+ wrT:'Market Wrapped',wrL:'A visual recap of the week and month from real data on 60 high-volume coins — download the image and post it.',wk:'This week',mo:'This month',
+ gain:'Top gainers',lose:'Top losers',traded:'Most traded',wild:'Wildest',newsy:'Most in the news',upc:'Coins up',btcP:'BTC this period',bigDay:'Biggest day',greenD:'Green days',hotN:'Hot narrative',
+ types:{ema_golden_cross:'EMA golden cross',ema_death_cross:'EMA death cross',breakout_up:'48h breakout',bull_divergence:'Bullish RSI divergence',bear_divergence:'Bearish RSI divergence',rsi_oversold:'RSI oversold',rsi_overbought:'RSI overbought',ema_cross_up:'EMA cross up',ema_cross_down:'EMA cross down',breakout:'48h breakout',breakdown:'48h breakdown',volume_spike:'Volume spike',bull_div:'Bullish divergence',bear_div:'Bearish divergence'}}};
+for(const l in I2)Object.assign(I[l],I2[l]);
+const tName=t=>T('types')[t]||t.replace(/_/g,' ');
+const bullT=t=>/oversold|up|breakout|bull/.test(t);
+
+/* ---- watchlist + personal report ---- */
+function renderWatch(){const m=D.market;if(!m?.coins){$('#wList').innerHTML=`<p class="disc">${T('noData')}</p>`;return}
+ let w=ls.get('ek_watch',['BTC','ETH','SOL']);const all=m.coins.map(c=>c.coin);
+ $('#wPick').innerHTML=`<select id="wSel">${all.filter(c=>!w.includes(c)).map(c=>`<option>${c}</option>`).join('')}</select><button class="btn p" id="wAdd">+ ${T('add')}</button>`+w.map(c=>`<span class="chip">${c} <a href="#" data-x="${c}" style="color:var(--r)">×</a></span>`).join('');
+ $('#wAdd').onclick=()=>{w.push($('#wSel').value);ls.set('ek_watch',w.slice(0,20));renderWatch()};
+ $('#wPick').querySelectorAll('[data-x]').forEach(a=>a.onclick=e=>{e.preventDefault();ls.set('ek_watch',w.filter(x=>x!==a.dataset.x));renderWatch()});
+ const cut=Date.now()-864e5,info=w.map(c=>{const k=m.coins.find(x=>x.coin===c);if(!k)return null;return{k,sig:(m.opportunities||[]).filter(o=>o.coin===c),news:(D.news?.items||[]).filter(n=>n.coins?.includes(c)&&Date.parse(n.date)>=cut),sc:D.score?.coins?.[c]}}).filter(Boolean);
+ $('#wList').innerHTML=info.map(({k,sig,news,sc})=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div class="row" style="justify-content:space-between"><b style="font-size:1.1rem">${k.coin}</b>${sg(k.chg24)}</div><div class="big" style="font-size:1.4rem">$${fm(k.price,k.price<1?6:2)}</div>
+ <div class="disc">RSI <span class="num">${k.rsi??'—'}</span> · ${k.trend==='up'?'⬆':k.trend==='down'?'⬇':'↔'} ${sc?`· ${T('scoreL')} <span class="num">${sc.score}</span>`:''}</div>
+ ${sig.length?`<div style="margin-top:6px">${sig.slice(0,4).map(o=>`<span class="chip" style="color:${bullT(o.type)?'var(--g)':'var(--r)'}">${tName(o.type)} · ${o.tf}</span>`).join('')}</div>`:''}
+ ${news.length?`<div class="disc" dir="ltr" style="margin-top:6px">${news.slice(0,2).map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener nofollow">• ${esc(n.title.slice(0,90))}</a>`).join('<br>')}</div>`:''}</div>`).join('');
+ $('#wRep').innerHTML=info.length?`<button class="btn p" id="wImg">🖼 ${T('myRep')}</button> <span id="wOut"></span>`:'';
+ if(info.length)$('#wImg').onclick=()=>{const cv=document.createElement('canvas');cv.width=1080;cv.height=280+info.length*130;const x=cv.getContext('2d');bgPaint(x,cv.width,cv.height);
+  x.textAlign='center';x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk"';x.fillText('MY CRYPTO REPORT · '+new Date().toISOString().slice(0,10),540,90);
+  info.forEach(({k,sig,news},i)=>{const y=190+i*130;x.fillStyle='rgba(255,255,255,.05)';x.fillRect(60,y-60,960,112);x.textAlign='left';x.fillStyle='#fff';x.font='800 46px "Space Grotesk"';x.fillText(k.coin,90,y);x.font='500 30px "Space Grotesk"';x.fillStyle='#bbb';x.fillText('$'+fm(k.price,k.price<1?6:2)+'   RSI '+(k.rsi??'—'),90,y+40);
+   x.textAlign='right';x.font='800 46px "Space Grotesk"';x.fillStyle=k.chg24>=0?'#22c55e':'#ef4444';x.fillText((k.chg24>=0?'+':'')+k.chg24+'%',990,y);x.font='500 26px "Space Grotesk"';x.fillStyle='#999';x.fillText(`${sig.length} signals · ${news.length} news`,990,y+40)});
+  x.textAlign='center';x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk"';x.fillText('entekhab.net/lab',540,cv.height-40);
+  const u=cv.toDataURL('image/png');$('#wOut').innerHTML=`<a class="btn" download="entekhab-my-report.png" href="${u}">⬇ ${T('dl')}</a>`;cv.className='card-out';cv.style.maxWidth='420px';$('#wOut').append(cv)}}
+function bgPaint(x,W,H){const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#1a1006');g.addColorStop(.5,'#0b0c0f');g.addColorStop(1,'#071018');x.fillStyle=g;x.fillRect(0,0,W,H);x.strokeStyle='rgba(255,255,255,.05)';for(let i=0;i<W;i+=54){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke()}for(let i=0;i<H;i+=54){x.beginPath();x.moveTo(0,i);x.lineTo(W,i);x.stroke()}}
+
+/* ---- opportunity radar ---- */
+function renderRadar(){const s=$('#radar'),op=(D.market?.opportunities)||[];if(!op.length){s.innerHTML=`<text fill="#888" text-anchor="middle">${T('noData')}</text>`;return}
+ const h=c=>{let v=0;for(const ch of c)v=(v*31+ch.charCodeAt(0))%3600;return v/10},types=[...new Set(op.map(o=>o.type))],pal=['#f7931a','#22c55e','#ef4444','#38bdf8','#a78bfa','#f472b6','#facc15','#2dd4bf','#fb923c'];
+ const pts=op.slice(0,120).map((o,i)=>{const a=(h(o.coin+o.type)-90)*Math.PI/180,r=40+(1-(o.strength||50)/100)*160;return{o,x:Math.cos(a)*r,y:Math.sin(a)*r,c:pal[types.indexOf(o.type)%pal.length]}});
+ s.innerHTML=`<defs><linearGradient id="sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(247,147,26,0)"/><stop offset="1" stop-color="rgba(247,147,26,.35)"/></linearGradient></defs>${[50,100,150,200].map(r=>`<circle r="${r}" fill="none" stroke="rgba(255,255,255,.08)"/>`).join('')}<line x1="-200" x2="200" stroke="rgba(255,255,255,.06)"/><line y1="-200" y2="200" stroke="rgba(255,255,255,.06)"/>
+ <g><path d="M0,0 L200,0 A200,200 0 0,0 141,-141 Z" fill="url(#sw)"/><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite"/></g>
+ ${pts.map((p,i)=>`<g data-i="${i}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="${p.o.confidence==='high'?6:4}" fill="${p.c}"><animate attributeName="opacity" values="1;.35;1" dur="${2+i%3}s" repeatCount="indefinite"/></circle>${p.o.confidence==='high'?`<text x="${p.x+8}" y="${p.y+4}" fill="#ddd" font-size="10">${p.o.coin}</text>`:''}</g>`).join('')}<circle r="4" fill="#f7931a"/>`;
+ const legend=`<div style="margin-bottom:10px">${types.map((t,i)=>`<span class="chip"><span style="color:${pal[i%pal.length]}">●</span> ${tName(t)} <span class="num">${op.filter(o=>o.type===t).length}</span></span>`).join('')}</div>`;
+ const top=op.filter(o=>o.confidence==='high').slice(0,8);
+ $('#radarInfo').innerHTML=`<h3>${T('rT')}</h3>${legend}<table>${top.map(o=>`<tr><td><b>${o.coin}</b></td><td>${tName(o.type)}</td><td class="num">${o.tf}</td><td class="num">${o.strength??''}</td></tr>`).join('')}</table><p class="disc">${op.length} findings · ${(D.market.coins||[]).length} coins · Binance</p>`;
+ s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const o=pts[+g.dataset.i].o,k=(D.market.coins||[]).find(c=>c.coin===o.coin)||{};
+  $('#radarInfo').innerHTML=`<h3>${o.coin} · ${tName(o.type)}</h3><div class="big">$${fm(k.price,k.price<1?6:2)}</div>${sg(k.chg24)} · RSI <span class="num">${k.rsi??'—'}</span><p class="disc">tf ${o.tf} · strength ${o.strength??'—'} · ${o.confidence} · ${esc(JSON.stringify(o.detail||{}))}</p>${legend}`}}
+
+/* ---- market brain graph ---- */
+function renderGraph(){const s=$('#graph'),nr=D.narr?.narratives||[],items=(D.news?.items||[]).filter(n=>Date.parse(n.date)>=Date.now()-864e5&&n.coins?.length).slice(0,14);
+ if(!nr.length&&!items.length){s.innerHTML=`<text x="500" y="280" fill="#888" text-anchor="middle">${T('noData')}</text>`;return}
+ const N=[],E=[],idx={},add=(id,o)=>{if(idx[id]==null){idx[id]=N.length;N.push({id,...o,x:500+(Math.random()-.5)*600,y:280+(Math.random()-.5)*360})}return idx[id]};
+ const mk=D.market?.coins||[];nr.filter(n=>n.mentions_24h>0).slice(0,6).forEach(n=>{const a=add('n:'+n.id,{t:'n',label:n.name[lang]||n.name.en,r:18,o:n});n.members.slice(0,4).forEach(m=>E.push([a,add('c:'+m.coin,{t:'c',label:m.coin,r:11})]))});
+ items.forEach((it,i)=>{const a=add('h:'+i,{t:'h',label:'',r:5,o:it});it.coins.slice(0,3).forEach(c=>E.push([a,add('c:'+c,{t:'c',label:c,r:11})]))});
+ N.forEach(n=>{if(n.t==='c'){const k=mk.find(x=>x.coin===n.label);n.chg=k?.chg24}});
+ for(let it=0;it<400;it++){for(const a of N)for(const b of N){if(a===b)continue;const dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+1,f=900/d2;a.x+=dx*f*.05;a.y+=dy*f*.05}for(const [i,j] of E){const a=N[i],b=N[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-90)*.02;a.x+=dx/d*f;a.y+=dy/d*f;b.x-=dx/d*f;b.y-=dy/d*f}for(const a of N){a.x+=(500-a.x)*.004;a.y+=(280-a.y)*.004;a.x=Math.max(30,Math.min(970,a.x));a.y=Math.max(20,Math.min(540,a.y))}}
+ const col=n=>n.t==='n'?'#f7931a':n.t==='h'?'#38bdf8':n.chg==null?'#666':n.chg>=0?'#22c55e':'#ef4444';
+ s.innerHTML=E.map(([i,j])=>`<line x1="${N[i].x}" y1="${N[i].y}" x2="${N[j].x}" y2="${N[j].y}" stroke="rgba(255,255,255,.12)"/>`).join('')+N.map((n,i)=>`<g data-i="${i}" style="cursor:pointer"><circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${col(n)}" fill-opacity="${n.t==='n'?.85:.9}"/>${n.label?`<text x="${n.x}" y="${n.y-n.r-4}" fill="#ddd" text-anchor="middle" font-size="${n.t==='n'?13:11}" font-family="Vazirmatn">${esc(n.label)}</text>`:''}</g>`).join('');
+ s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const n=N[+g.dataset.i];$('#graphInfo').innerHTML=n.t==='h'?`<a href="${esc(n.o.url)}" target="_blank" rel="noopener nofollow" dir="ltr" style="color:#fff">${esc(n.o.title)}</a> — ${esc(n.o.source)}`:n.t==='n'?`<b style="color:#fff">${esc(n.label)}</b> · ${n.o.mentions_24h} · ×${n.o.momentum} · ${sg(n.o.perf_24h)}`:`<b style="color:#fff">${n.label}</b> ${sg(n.chg)}`}}
+
+/* ---- coin galaxy (three.js) ---- */
+function galaxy(){const box=$('#galaxy'),m=D.market;if(!window.THREE||!m?.coins){box.innerHTML=`<p class="disc" style="padding:16px">${T('noData')}</p>`;return}
+ const cs=m.coins.filter(c=>(c.spark||[]).length>=24).sort((a,b)=>(b.qvol||0)-(a.qvol||0)).slice(0,80);if(cs.length<5){box.innerHTML=`<p class="disc" style="padding:16px">${T('noData')}</p>`;return}
+ const R=cs.map(c=>{const s=c.spark;return s.slice(1).map((v,i)=>v/s[i]-1)}),n=cs.length;
+ const cor=(a,b)=>{const k=Math.min(a.length,b.length);a=a.slice(-k);b=b.slice(-k);const ma=a.reduce((x,y)=>x+y)/k,mb=b.reduce((x,y)=>x+y)/k;let c=0,da=0,db=0;for(let i=0;i<k;i++){c+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2}return da&&db?c/Math.sqrt(da*db):0};
+ const C=[...Array(n)].map((_,i)=>[...Array(n)].map((_,j)=>i===j?1:0));for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)C[i][j]=C[j][i]=cor(R[i],R[j]);
+ const P=cs.map(()=>new THREE.Vector3((Math.random()-.5)*60,(Math.random()-.5)*60,(Math.random()-.5)*60));
+ for(let it=0;it<260;it++){for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const d=P[i].clone().sub(P[j]),L=d.length()||.01,rest=4+(1-C[i][j])*26,f=(L-rest)*.02;d.multiplyScalar(f/L);P[i].sub(d);P[j].add(d)}}
+ const ctr=P.reduce((a,b)=>a.add(b.clone()),new THREE.Vector3()).multiplyScalar(1/n);P.forEach(p=>p.sub(ctr));
+ const W=box.clientWidth,H=box.clientHeight,sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,W/H,.1,1000);cam.position.set(0,0,70);
+ const rd=new THREE.WebGLRenderer({antialias:true,alpha:true});rd.setPixelRatio(Math.min(2,devicePixelRatio));rd.setSize(W,H);box.innerHTML='';box.append(rd.domElement);
+ const grp=new THREE.Group();sc.add(grp);const mx=Math.max(...cs.map(c=>c.qvol||1));
+ const stars=new THREE.BufferGeometry(),sp=[];for(let i=0;i<900;i++)sp.push((Math.random()-.5)*600,(Math.random()-.5)*600,(Math.random()-.5)*600);stars.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));sc.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0x666666,size:.6})));
+ const meshes=cs.map((c,i)=>{const ch=c.chg24||0,col=new THREE.Color(ch>=0?0x22c55e:0xef4444).lerp(new THREE.Color(0x777777),Math.max(0,1-Math.abs(ch)/6));if(c.coin==='BTC')col.set(0xf7931a);
+  const r=.8+Math.sqrt((c.qvol||1)/mx)*3.2,me=new THREE.Mesh(new THREE.SphereGeometry(r,20,16),new THREE.MeshBasicMaterial({color:col}));me.position.copy(P[i]);me.userData=c;grp.add(me);
+  const cv=document.createElement('canvas');cv.width=256;cv.height=64;const x=cv.getContext('2d');x.font='700 34px "Space Grotesk",Arial';x.fillStyle='#eee';x.textAlign='center';x.fillText(c.coin,128,44);
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));spr.scale.set(8,2,1);spr.position.copy(P[i]).add(new THREE.Vector3(0,r+1.4,0));grp.add(spr);return me});
+ for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(C[i][j]>.85){const g=new THREE.BufferGeometry().setFromPoints([P[i],P[j]]);grp.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0xf7931a,transparent:true,opacity:.18})))}
+ let drag=null,rx=0,ry=0,auto=true;const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
+ box.onpointerdown=e=>{drag=[e.clientX,e.clientY,e.clientX,e.clientY];auto=false};window.addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag[2],e.clientY-drag[3])<4){const b=rd.domElement.getBoundingClientRect();mv.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(mv,cam);const h=ray.intersectObjects(meshes)[0];if(h){const c=h.object.userData,i=cs.indexOf(c),near=C[i].map((v,j)=>[v,cs[j].coin]).filter((_,j)=>j!==i).sort((a,b)=>b[0]-a[0]).slice(0,5);$('#galInfo').innerHTML=`<b style="color:#fff">${c.coin}</b> $${fm(c.price,c.price<1?6:2)} ${sg(c.chg24)} · RSI <span class="num">${c.rsi??'—'}</span> — ${near.map(([v,k])=>`<span class="chip">${k} <span class="num">${v.toFixed(2)}</span></span>`).join('')}`}}drag=null});
+ window.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-drag[0])*.005;rx+=(e.clientY-drag[1])*.005;drag[0]=e.clientX;drag[1]=e.clientY});
+ box.addEventListener('wheel',e=>{e.preventDefault();cam.position.z=Math.max(30,Math.min(200,cam.position.z+e.deltaY*.05))},{passive:false});
+ (function loop(){if(auto)ry+=.0015;grp.rotation.set(rx,ry,0);rd.render(sc,cam);requestAnimationFrame(loop)})();
+ window.addEventListener('resize',()=>{const w=box.clientWidth;cam.aspect=w/H;cam.updateProjectionMatrix();rd.setSize(w,H)});
+ $('#galInfo').textContent=`${n} coins · 48×1h returns · lines = correlation > 0.85`}
+
+/* ---- wrapped ---- */
+let WP='week';
+function renderWrap(){const w=D.wrapped?.[WP];document.querySelectorAll('[data-wp]').forEach(b=>{b.classList.toggle('p',b.dataset.wp===WP);b.onclick=()=>{WP=b.dataset.wp;renderWrap()}});
+ if(!w){$('#wrap').innerHTML=`<p class="disc">${T('noData')}</p>`;$('#wrapImg').innerHTML='';return}
+ const li=(a,f)=>a.map(r=>`<div class="row" style="justify-content:space-between"><b>${r.coin}</b>${f(r)}</div>`).join('');
+ $('#wrap').innerHTML=`<p class="disc num">${w.from} → ${w.to} · ${w.n_coins} coins</p>${w.btc?`<h3 style="margin-top:8px">${T('btcP')}</h3><div class="big">${sg(w.btc.chg)}</div><p class="disc">$${fm(w.btc.low,0)} – $${fm(w.btc.high,0)} · ${T('bigDay')}: <span class="num">${w.btc.biggest_day.date}</span> ${sg(w.btc.biggest_day.chg)} · ${T('greenD')}: <span class="num">${w.btc.green_days}/${w.days}</span></p>`:''}
+ <div class="grid" style="margin-top:10px"><div><h3>🚀 ${T('gain')}</h3>${li(w.top_gainers,r=>sg(r.chg))}</div><div><h3>📉 ${T('lose')}</h3>${li(w.top_losers,r=>sg(r.chg))}</div><div><h3>💰 ${T('traded')}</h3>${li(w.most_traded,r=>`<span class="num">$${fm(r.qvol/1e9,2)}B</span>`)}</div><div><h3>🌪 ${T('wild')}</h3>${li(w.wildest,r=>`<span class="num">${r.avg_range}%/d</span>`)}</div></div>
+ <p style="margin-top:10px">${T('upc')}: <b class="num">${w.up_count}/${w.n_coins}</b>${w.most_news?.length?` · 📰 ${T('newsy')}: ${w.most_news.slice(0,3).map(x=>`<span class="chip">${x.coin} ${x.n}</span>`).join('')}`:''}${w.hot_narrative?` · 🔥 ${esc(w.hot_narrative[lang]||w.hot_narrative.en)}`:''}</p>`;
+ const cv=document.createElement('canvas');cv.width=1080;cv.height=1350;const x=cv.getContext('2d');bgPaint(x,1080,1350);x.textAlign='center';
+ x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk"';x.fillText('CRYPTO WRAPPED · '+(WP==='week'?'WEEK':'MONTH'),540,90);x.fillStyle='#999';x.font='500 30px "Space Grotesk"';x.fillText(`${w.from} → ${w.to}`,540,140);
+ if(w.btc){x.fillStyle='#fff';x.font='800 64px "Space Grotesk"';x.fillText('BTC',540,250);x.fillStyle=w.btc.chg>=0?'#22c55e':'#ef4444';x.font='800 120px "Space Grotesk"';x.fillText((w.btc.chg>=0?'+':'')+w.btc.chg+'%',540,380)}
+ const col=(t,a,f,cx,y)=>{x.textAlign='center';x.fillStyle='#f7931a';x.font='700 34px "Space Grotesk"';x.fillText(t,cx,y);a.slice(0,5).forEach((r,i)=>{x.fillStyle='#fff';x.font='700 36px "Space Grotesk"';x.textAlign='left';x.fillText(r.coin,cx-200,y+70+i*62);x.textAlign='right';const [s,c]=f(r);x.fillStyle=c;x.fillText(s,cx+200,y+70+i*62)})};
+ col('TOP GAINERS',w.top_gainers,r=>[`+${r.chg}%`,'#22c55e'],285,500);col('TOP LOSERS',w.top_losers,r=>[`${r.chg}%`,'#ef4444'],795,500);
+ col('MOST TRADED',w.most_traded,r=>[`$${fm(r.qvol/1e9,1)}B`,'#ddd'],285,900);col('WILDEST',w.wildest,r=>[`${r.avg_range}%/d`,'#38bdf8'],795,900);
+ x.textAlign='center';x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('entekhab.net/lab',540,1300);
+ const u=cv.toDataURL('image/png');cv.className='card-out';$('#wrapImg').innerHTML='';$('#wrapImg').append(cv);const r=document.createElement('div');r.className='row';r.style.marginTop='10px';r.innerHTML=`<a class="btn p" download="entekhab-wrapped-${WP}.png" href="${u}">⬇ ${T('dl')}</a><button class="btn" id="wrSh">📤 ${T('share')}</button>`;$('#wrapImg').append(r);
+ $('#wrSh').onclick=()=>share(`Crypto Wrapped (${w.from} → ${w.to}) — BTC ${w.btc?w.btc.chg+'%':''}`,'https://entekhab.net/lab/#wrapS')}
+
 </script>
 </body>
 </html>
