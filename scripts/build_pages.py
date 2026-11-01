@@ -105,7 +105,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
+<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -242,7 +242,8 @@ def main():
     body = "<h1>کوین‌ها</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر و مطالب مرتبط.</p><div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "کوین‌ها — پروفایل ارزهای دیجیتال", "فهرست ارزهای دیجیتال با قیمت زنده، تحلیل و آرشیو مطالب", body), market.get("updated_at")))
-    urls.append(("lab/", market.get("updated_at")))
+    for pth in ("lab/", "dna/", "terminal/", "developers/"):
+        urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
         lm = f"<lastmod>{d[:10]}</lastmod>" if d else ""
@@ -415,16 +416,169 @@ def build_api():
     for c in MK:
         w(f"coins/{c.lower()}.json", {"coin": c, "market": MK[c], "score": SC.get(c), "opportunities": [o for o in market.get("opportunities", []) if o["coin"] == c],
                                      "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})
+    for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped"):
+        dd = load(f"{nm}.json", None)
+        if dd:
+            w(f"{nm}.json", {"data": dd})
     idx = sorted(os.path.relpath(os.path.join(dp, f), base) for dp, _, fs in os.walk(base) for f in fs)
     json.dump({"endpoints": [f"{SITE}/api/v1/{x}" for x in idx if x != "index.json"], "note": "free, read-only, updated every 15 minutes; attribution to entekhab.net appreciated; not financial advice"},
               open(os.path.join(base, "index.json"), "w"), indent=1)
     print(f"api endpoints: {len(idx)}")
 
 
+GN_FA = {"liquidity": "نقدشوندگی", "volatility": "نوسان", "flow": "جریان خریداران", "sentiment": "احساسات خبری", "attention": "توجه رسانه‌ای",
+         "leverage": "اهرم مشتقه", "developers": "فعالیت توسعه", "momentum": "مومنتوم"}
+
+
+def build_dna():
+    """/dna/<coin>/ — صفحات ثابت قابل ایندکس برای DNA هر ارز (همان صفحهٔ تعاملی با ارز از پیش انتخاب‌شده + خلاصهٔ متنی)"""
+    dna = load("dna.json", {})
+    tpl_p = os.path.join(ROOT, "dna", "index.html")
+    if not dna.get("coins") or not os.path.exists(tpl_p):
+        return []
+    tpl = open(tpl_p, encoding="utf-8").read()
+    urls = []
+    for c, d in dna["coins"].items():
+        g = d.get("genes", {})
+        genes_txt = "، ".join(f"{GN_FA.get(k, k)} {('—' if v is None else v)}" for k, v in g.items())
+        sim = "، ".join(f"{o} ({s}٪)" for o, s in d.get("similar", [])[:5])
+        ts = d.get("twin_stats") or {}
+        title = f"DNA بازار {c} — {NAMES.get(c, c)}"
+        desc = f"DNA تحلیلی {c}: {genes_txt}. ارزهای مشابه: {sim or '—'}."
+        seo = (f'<h2>DNA {e(c)}</h2><p>{e(desc)}</p>'
+               f'<p>کد DNA: <span dir="ltr">{e(d.get("code", ""))}</span> · همبستگی با BTC: {e(str((d.get("raw") or {}).get("corr_btc")))}'
+               + (f' · دوقلوهای تاریخی: {ts.get("up30")}/{ts.get("n")} صعودی پس از ۳۰ روز (میانگین {ts.get("avg30")}٪)' if ts else "")
+               + f' · به‌روزرسانی {e(dna.get("updated_at", "")[:16])} UTC</p>'
+               + "<p>" + " · ".join(f'<a href="/dna/{o.lower()}/">{e(o)}</a>' for o in [x for x, _ in d.get("similar", [])]) + "</p>")
+        url = f"{SITE}/dna/{c.lower()}/"
+        doc = (tpl.replace("<title>Market DNA — DNA بازار ارزهای دیجیتال | entekhab.net</title>", f"<title>{e(title)} | entekhab.net</title>")
+               .replace('<link rel="canonical" href="https://entekhab.net/dna/">', f'<link rel="canonical" href="{url}">')
+               .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc[:300])} — ', 1)
+               .replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{seo}</div>')
+               .replace('<script src="/assets/ui.js"></script>', f'<script>window.DNA_COIN={json.dumps(c)}</script><script src="/assets/ui.js"></script>'))
+        out = os.path.join(ROOT, "dna", c.lower(), "index.html")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, "w", encoding="utf-8").write(doc)
+        urls.append(url)
+    print(f"dna pages: {len(urls)}")
+    return urls
+
+
+def build_weekly():
+    """/weekly/ مجلهٔ هفتگی بازار (#94) — از data/weekly/<ISO-week>.json؛ هر شماره صفحهٔ ثابت خودش را دارد"""
+    wd = os.path.join(D, "weekly")
+    if not os.path.isdir(wd):
+        return []
+    issues = []
+    for f in sorted(os.listdir(wd)):
+        if f.endswith(".json"):
+            try:
+                issues.append(json.load(open(os.path.join(wd, f), encoding="utf-8")))
+            except Exception:  # noqa: BLE001
+                pass
+    if not issues:
+        return []
+    css = ".mag h2{margin-top:26px}.mag table{width:100%;border-collapse:collapse}.mag td,.mag th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.pos{color:#22c55e}.neg{color:#ef4444}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.cards div{border:1px solid var(--line);border-radius:12px;padding:12px}"
+    pct = lambda v: "—" if v is None else f'<span class="num {"pos" if v >= 0 else "neg"}">{"+" if v >= 0 else ""}{v}%</span>'  # noqa: E731
+    urls = []
+
+    def body(it, nav):
+        w = it.get("wrapped") or {}
+        b = w.get("btc") or {}
+        rep = ((it.get("brain") or {}).get("report") or {}).get("fa") or {}
+        h = [f'<div class="meta"><a href="/">خانه</a> / <a href="/weekly/">مجلهٔ هفتگی</a></div><div class="mag"><h1>مجلهٔ هفتگی بازار — {e(it["week"])}</h1>',
+             f'<p class="note">{e(it["from"])} تا {e(it["to"])} · ساخته‌شده از دادهٔ واقعی Binance، اخبار، کانال Coin_Kurd و هوش مصنوعی Entekhab</p>']
+        if b:
+            h.append(f'<div class="cards"><div><b>BTC این هفته</b><br>{pct(b.get("chg"))}<br><small class="note">${fm(b.get("low"))} – ${fm(b.get("high"))}</small></div>'
+                     f'<div><b>بزرگ‌ترین روز</b><br><span class="num">{e(str((b.get("biggest_day") or {}).get("date")))}</span> {pct((b.get("biggest_day") or {}).get("chg"))}</div>'
+                     f'<div><b>روزهای سبز</b><br><span class="num">{b.get("green_days")}/{w.get("days")}</span></div>'
+                     f'<div><b>کوین‌های مثبت</b><br><span class="num">{w.get("up_count")}/{w.get("n_coins")}</span></div></div>')
+        if rep.get("headline"):
+            h.append(f'<h2>{e(rep["headline"])}</h2><div class="txt">{rich(rep.get("body", ""))}</div>')
+        if w.get("top_gainers"):
+            h.append('<h2>برندگان و بازندگان هفته</h2><table><tr><th>بیشترین رشد</th><th></th><th>بیشترین افت</th><th></th></tr>' + "".join(
+                f'<tr><td><a href="/coins/{g["coin"].lower()}/">{e(g["coin"])}</a></td><td>{pct(g["chg"])}</td><td><a href="/coins/{l["coin"].lower()}/">{e(l["coin"])}</a></td><td>{pct(l["chg"])}</td></tr>'
+                for g, l in zip(w["top_gainers"], w.get("top_losers", []))) + "</table>")
+        if it.get("council") and it["council"].get("fa"):
+            h.append(f'<h2>نتیجهٔ میزگرد هوش مصنوعی</h2><p>{e(it["council"]["fa"])}</p>')
+        if it.get("narratives"):
+            h.append("<h2>روایت‌های داغ</h2><ul>" + "".join(f'<li>{e((n.get("name") or {}).get("fa") or "")} — {n.get("mentions_24h")} تیتر · {pct(n.get("perf_24h"))}</li>' for n in it["narratives"]) + "</ul>")
+        if it.get("events"):
+            h.append("<h2>رویدادهای اقتصادی و واکنش بیت‌کوین</h2><table><tr><th></th><th>۱ ساعت بعد</th><th>۴ ساعت بعد</th></tr>" + "".join(
+                f'<tr><td>{e(x.get("title_fa") or x.get("title") or "")} <small class="note">{e((x.get("date") or "")[:10])}</small></td><td>{pct(x.get("btc_1h"))}</td><td>{pct(x.get("btc_4h"))}</td></tr>' for x in it["events"]) + "</table>")
+        if it.get("headlines"):
+            h.append("<h2>تیترهای مهم</h2><ul>" + "".join(f'<li><a href="{e(n["url"])}" rel="noopener nofollow" target="_blank" dir="ltr">{e(n["title"])}</a> <small class="note">{e(n["source"])}</small></li>' for n in it["headlines"]) + "</ul>")
+        if it.get("dna_momentum"):
+            h.append("<h2>DNA هفته</h2><p>بیشترین مومنتوم: " + "، ".join(f'<a href="/dna/{c.lower()}/">{e(c)}</a> ({v})' for c, v in it["dna_momentum"]) +
+                     "<br>بیشترین سهم خریداران: " + "، ".join(f'<a href="/dna/{c.lower()}/">{e(c)}</a> ({v}٪)' for c, v in (it.get("dna_flow") or [])) + "</p>")
+        if it.get("channel"):
+            h.append("<h2>از کانال Coin_Kurd</h2><ul>" + "".join(f'<li><a href="/p/{x["id"]}/">{e(x.get("title") or "")}</a></li>' for x in it["channel"]) + "</ul>")
+        h.append('<p class="note">آموزشی است، توصیهٔ مالی نیست. <a href="/lab/#wrapS">تصویر Wrapped هفته را بساز و منتشر کن ←</a></p>' + nav + "</div>")
+        return "".join(h)
+
+    arch = '<h2>آرشیو شماره‌ها</h2><ul>' + "".join(f'<li><a href="/weekly/{e(it["week"].lower())}/">{e(it["week"])}</a> <small class="note">{e(it["from"])} – {e(it["to"])}</small></li>' for it in reversed(issues)) + "</ul>"
+    for it in issues:
+        urls.append(page(f'weekly/{it["week"].lower()}/', f'مجلهٔ هفتگی بازار کریپتو {it["week"]}', f'خلاصهٔ هفتهٔ {it["from"]} تا {it["to"]}: بیت‌کوین، برندگان و بازندگان، روایت‌ها، رویدادها و تحلیل هوش مصنوعی', body(it, arch), f"<style>{css}</style>"))
+    urls.append(page("weekly/", "مجلهٔ هفتگی بازار کریپتو — آخرین شماره", "مجلهٔ هفتگی entekhab.net: خلاصهٔ تصویری و تحلیلی بازار کریپتو هر هفته", body(issues[-1], arch), f"<style>{css}</style>"))
+    print(f"weekly issues: {len(issues)}")
+    return urls
+
+
+def fm(v):
+    try:
+        return f"{float(v):,.0f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def build_compare():
+    """/compare/<a>-vs-<b>/ (#61 #93) — مقایسهٔ واقعی دو ارز با DNA و داده‌های زنده؛ ۶۶ صفحه برای ۱۲ ارز پرحجم"""
+    dna = load("dna.json", {}).get("coins") or {}
+    if not dna:
+        return []
+    top = [c for c, _ in sorted(dna.items(), key=lambda kv: -(kv[1]["raw"].get("qvol30") or 0))][:12]
+    css = ".cmp{width:100%;border-collapse:collapse}.cmp td,.cmp th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.win{color:#22c55e;font-weight:700}"
+    rows = [("price", "قیمت (دلار)", 0), ("ret7", "بازده ۷ روز ٪", 1), ("ret30", "بازده ۳۰ روز ٪", 1), ("ret90", "بازده ۹۰ روز ٪", 1), ("vol30", "نوسان ۳۰ روزه ٪ (کمتر = آرام‌تر)", -1),
+            ("taker7", "سهم خریداران ٪", 1), ("funding_ann", "فاندینگ سالانه ٪", 0), ("commits30", "کامیت‌های ۳۰ روز", 1), ("corr_btc", "همبستگی با BTC", 0), ("from_high", "فاصله از سقف ۱۰۰۰ روزه ٪", 1)]
+    urls = []
+    for i, a in enumerate(top):
+        for b in top[i + 1:]:
+            A, B = dna[a], dna[b]
+            shared = [g for g in A["genes"] if A["genes"][g] is not None and B["genes"].get(g) is not None]
+            sim = round((1 - (sum((A["genes"][g] - B["genes"][g]) ** 2 for g in shared) / len(shared)) ** 0.5 / 100) * 100) if shared else None
+            tr = []
+            wa = wb = 0
+            for k, label, d in rows:
+                va, vb = A["raw"].get(k), B["raw"].get(k)
+                ca = cb = ""
+                if d and va is not None and vb is not None and va != vb:
+                    if (va > vb) == (d > 0):
+                        ca, wa = ' class="num win"', wa + 1
+                    else:
+                        cb, wb = ' class="num win"', wb + 1
+                fmt = lambda v: "—" if v is None else (f"{v:,.6g}" if isinstance(v, float) else str(v))  # noqa: E731
+                tr.append(f'<tr><td>{label}</td><td{ca or " class=num"}>{fmt(va)}</td><td{cb or " class=num"}>{fmt(vb)}</td></tr>')
+            genes = "".join(f'<tr><td>ژن {e(GN_FA.get(g, g))}</td><td class="num">{A["genes"][g] if A["genes"][g] is not None else "—"}</td><td class="num">{B["genes"].get(g) if B["genes"].get(g) is not None else "—"}</td></tr>' for g in A["genes"])
+            body = (f'<div class="meta"><a href="/">خانه</a> / مقایسه</div><h1>{e(a)} یا {e(b)}؟ مقایسهٔ داده‌محور</h1>'
+                    f'<p class="note">{e(NAMES.get(a, a))} در برابر {e(NAMES.get(b, b))} — شباهت DNA: <b class="num">{sim if sim is not None else "—"}٪</b> · امتیاز معیارها: <b class="num">{a} {wa} : {wb} {b}</b> · به‌روزرسانی هر ۳ ساعت</p>'
+                    f'<table class="cmp"><tr><th>معیار</th><th>{e(a)}</th><th>{e(b)}</th></tr>{"".join(tr)}{genes}</table>'
+                    f'<p><a href="/dna/{a.lower()}/">DNA {e(a)}</a> · <a href="/dna/{b.lower()}/">DNA {e(b)}</a> · <a href="/lab/#discS">⚔️ دوئل تعاملی</a> · <a href="/coins/{a.lower()}/">{e(a)}</a> · <a href="/coins/{b.lower()}/">{e(b)}</a></p>'
+                    '<p class="note">برنده در هر ردیف فقط بر اساس همان معیار مشخص شده است؛ این مقایسه آموزشی است و توصیهٔ مالی نیست.</p>')
+            urls.append(page(f"compare/{a.lower()}-vs-{b.lower()}/", f"{a} یا {b}؟ مقایسهٔ {NAMES.get(a, a)} و {NAMES.get(b, b)}",
+                             f"مقایسهٔ داده‌محور {a} و {b}: بازده، نوسان، سهم خریداران، فاندینگ، فعالیت توسعه، همبستگی و DNA بازار", body, f"<style>{css}</style>"))
+    hub = "<h1>مقایسهٔ ارزها</h1><ul>" + "".join(f'<li><a href="{u}">{e(u.rsplit("/", 2)[-2].replace("-vs-", " یا ").upper())}</a></li>' for u in urls) + "</ul>"
+    urls.append(page("compare/", "مقایسهٔ ارزهای دیجیتال", "مقایسهٔ داده‌محور ارزهای پرحجم با DNA بازار", hub, f"<style>{css}</style>"))
+    print(f"compare pages: {len(urls)}")
+    return urls
+
+
 if __name__ == "__main__":
     main()
     build_api()
     extra = prerender()
+    extra += build_dna()
+    extra += build_weekly()
+    extra += build_compare()
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
     open(sm, "w", encoding="utf-8").write(s)
