@@ -101,6 +101,15 @@ def main():
     ap.add_argument("--force", action="store_true", help="ترجمهٔ مجدد همه")
     args = ap.parse_args()
 
+    # کلید عمومی COIN_KURD_API_KEY: نوع آن از پیشوند تشخیص داده می‌شود
+    gen = os.environ.get("COIN_KURD_API_KEY", "").strip()
+    if gen:
+        if gen.startswith("sk-ant-"):
+            os.environ.setdefault("ANTHROPIC_API_KEY", gen)
+        elif gen.startswith("sk-"):
+            os.environ.setdefault("OPENAI_API_KEY", gen)
+        else:
+            os.environ.setdefault("ANTHROPIC_API_KEY", gen)
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     engine = "claude" if api_key else ("openai" if os.environ.get("OPENAI_API_KEY", "").strip() else "google")
 
