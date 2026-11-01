@@ -41,6 +41,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '40' }}
         run: python scripts/translate.py
       - name: Commit data
