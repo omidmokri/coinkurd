@@ -214,6 +214,9 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .btn:hover{transform:translateY(-2px)}
 .close{position:sticky;top:12px;float:inline-end;margin:12px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:2;border:1px solid var(--line)}
 
+.social{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);white-space:nowrap}
+.social a{padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-family:var(--mono);transition:.2s}
+.social a:hover{background:var(--lime);color:#000;border-color:transparent}
 /* footer */
 footer{padding:120px 0 40px;position:relative;overflow:hidden}
 footer .big{font-size:clamp(2.6rem,9vw,9rem);line-height:.95}
@@ -429,7 +432,7 @@ function cardHTML(p,i,big){const c=catOf(p.category);const img=p.photos&&p.photo
   return `<article class="card${big?' big':''}" data-id="${p.id}" style="--c:${c.color};animation-delay:${Math.min(i,12)*40}ms">
     ${img?`<div class="media" style="background-image:url('${esc(img)}')">${p.video?'<div class="play">▶</div>':''}</div>`:''}
     <div class="body"><div class="meta"><span class="cat">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'medium'}):''}</time></div>
-    <h3 dir="auto">${esc(PT(p).title)}</h3>${(()=>{const t=PT(p);const body=(t.text||'').replace(/#\S+/g,'').trim();const tt=(t.title||'').replace(/…$/,'');const rest=tt&&body.startsWith(tt)?body.slice(tt.length).trim():body;return rest?`<p dir="auto">${esc(rest)}</p>`:''})()}
+    <h3 dir="auto">${esc(PT(p).title)}</h3>${(()=>{const t=PT(p);const body=(t.text||'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'$1').replace(/#\S+/g,'').trim();const tt=(t.title||'').replace(/…$/,'');const rest=tt&&body.startsWith(tt)?body.slice(tt.length).trim():body;return rest?`<p dir="auto">${esc(rest)}</p>`:''})()}
     <div class="coins">${p.coins.slice(0,6).map(k=>`<span class="coin">${k}</span>`).join('')}</div>
     <div class="foot"><span>👁 ${esc(p.views||'—')}</span><span>${p.hashtags.slice(0,3).map(h=>'#'+esc(h)).join(' ')}</span></div></div></article>`}
 function tilt(root){root.querySelectorAll('.card,.tile').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.transform=`perspective(900px) rotateX(${(0.5-y)*9}deg) rotateY(${(x-0.5)*11}deg) translateZ(10px)`});el.addEventListener('mouseleave',()=>el.style.transform='')})}
@@ -446,13 +449,14 @@ function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p
   requestAnimationFrame(()=>out.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'))}
 
 function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=catOf(p.category);
-  const linkify=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/#([\w؀-ۿ‌]+)/g,'<a href="#" data-h="$1">#$1</a>');
+  const linkify=t=>esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>').replace(/#([\w؀-ۿ‌]+)/g,'<a href="#" data-h="$1">#$1</a>');
   const rel=S.posts.filter(x=>x.id!==p.id&&(x.category===p.category||x.coins.some(k=>p.coins.includes(k)))).slice(0,4);
   $('#sheet').innerHTML=`<button class="close" id="close">✕</button>${p.photos&&p.photos[0]?`<img src="${esc(p.photos[0])}" alt="">`:''}<div class="in">
     <div class="meta"><span class="cat" style="--c:${c.color}">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon} ${esc(cname(x))}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'full',timeStyle:'short'}):''}</time><span>· 👁 ${esc(p.views||'—')}</span></div>
     <div class="txt" dir="auto">${linkify(PT(p).text)}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
     ${p.link&&p.link.url?`<a class="lp" href="${esc(p.link.url)}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small><br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
     <div class="coins">${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}</div>
+    ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.label)}</a>`).join('')}</div>`:''}
     <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
     ${rel.length?`<h3 style="margin-top:26px;font-weight:800">${T('related')}</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:10px 0 0">${rel.map((x,i)=>cardHTML(x,i)).join('')}</div>`:''}</div>`;
   $('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
