@@ -62,7 +62,7 @@ def model():
     return _model
 
 
-def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=4):
+def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
     global _last
     k = key()
     if not k:
@@ -71,12 +71,25 @@ def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=4):
             "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens}}
     if as_json:
         body["generationConfig"]["responseMimeType"] = "application/json"
+    mname = model()
+    if "2.5" in mname:   # تفکر داخلی را خاموش کن: سریع‌تر و ارزان‌تر، برای ترجمه/خلاصه لازم نیست
+        body["generationConfig"]["thinkingConfig"] = {"thinkingBudget": 0}
+    elif re.search(r"gemini-[3-9]", mname):
+        body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": "low"}
     for i in range(tries):
         wait = MIN_GAP - (time.time() - _last)
         if wait > 0:
             time.sleep(wait)
         _last = time.time()
-        r = requests.post(f"{BASE}/models/{model()}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=120)
+        try:
+            r = requests.post(f"{BASE}/models/{mname}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=90)
+        except requests.exceptions.Timeout:
+            if i == tries - 1:
+                raise
+            continue
+        if r.status_code == 400 and "thinking" in r.text.lower() and "thinkingConfig" in body["generationConfig"]:
+            body["generationConfig"].pop("thinkingConfig")
+            continue
         if r.status_code in (429, 500, 503):
             if r.status_code == 429 and ("PerDay" in r.text or "per day" in r.text.lower()):
                 raise QuotaError("daily quota exhausted")
