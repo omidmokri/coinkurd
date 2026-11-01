@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Coin_Kurd ₿</title>
+<title>entekhab.net</title>
 <meta name="theme-color" content="#f7931a">
-<meta name="description" content="آرشیو چندبُعدی و دسته‌بندی‌شدهٔ پست‌های کانال Coin_Kurd — تحلیل، خبر، آموزش و اندیکاتورهای کریپتو">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c6ff00'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<meta name="description" content="entekhab.net — آرشیو چندبُعدی و دسته‌بندی‌شدهٔ پست‌های کانال Coin_Kurd — تحلیل، خبر، آموزش و اندیکاتورهای کریپتو">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&family=Archivo+Black&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root{
   --bg:#0a0a0a;--ink:#f4f4f2;--mute:#9a9a94;--lime:#f7931a;--lime2:#c86f00;--gold:#ffb347;--line:rgba(255,255,255,.1);
-  --panel:#121212;--fontB:'Vazirmatn',system-ui,sans-serif;--fontD:'Archivo Black','Space Grotesk','Vazirmatn',sans-serif;--mono:'Space Grotesk',monospace;
+  --panel:#121212;--emo:'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji';--fontB:'Vazirmatn',system-ui,sans-serif,var(--emo);--fontD:'Archivo Black','Space Grotesk','Vazirmatn',sans-serif,var(--emo);--mono:'Space Grotesk','Vazirmatn',monospace,var(--emo);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -236,7 +236,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
 </head>
 <body>
 <nav><div class="wrap">
-  <a class="brand" href="#top"><i></i>coin_kurd</a>
+  <a class="brand" href="#top"><i></i>entekhab.net</a>
   <div class="navr">
     <div class="langs" id="langs"><button data-l="fa">فارسی</button><button data-l="ckb">کوردی</button><button data-l="en">en</button></div>
     <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener" data-i="join">telegram</a>
@@ -264,7 +264,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <div class="bgimg" id="heroImg"></div><div class="blob"></div><canvas id="coin3d"></canvas>
     <div class="wrap">
       <div>
-        <h1 class="display"><span>Coin</span><em>Kurd</em></h1>
+        <h1 class="display"><span>Entekhab</span><em>.net</em></h1>
         <div class="role" data-i="role">تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام</div>
       </div>
       <a class="next" id="next" href="#feed"><span class="lc" data-i="latest">آخرین پست</span><b id="nextTitle" dir="auto">…</b><small id="nextTime"></small></a>
@@ -327,7 +327,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
   <footer><div class="fblob"></div><div class="wrap">
     <div class="big display" data-i="tag">بازار را <span>بفهم،</span> نه فقط دنبال کن.</div>
     <div class="fr">
-      <span>© <span id="yr"></span> coin_kurd ₿ — <span data-i="auto">به‌روزرسانی خودکار از تلگرام</span></span>
+      <span>© <span id="yr"></span> entekhab.net — <span data-i="auto">به‌روزرسانی خودکار از تلگرام</span></span>
       <span><a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">telegram</a> · <a href="https://t.me/Coin_Kurd_Group" target="_blank" rel="noopener">group</a> · <a href="https://www.kurds.ir" target="_blank" rel="noopener">kurds.ir</a></span>
     </div>
   </div></footer>
@@ -367,7 +367,8 @@ const cname=c=>c.name[lang]||c.name.fa;
 const fmtDate=(d,o)=>{try{return new Intl.DateTimeFormat(T('locale'),o).format(new Date(d))}catch(e){return new Date(d).toLocaleString()}};
 const fmtN=n=>{try{return new Intl.NumberFormat(T('locale')).format(n)}catch(e){return n}};
 const PT=p=>(lang!=='fa'&&p.tr&&p.tr[lang])?p.tr[lang]:{title:p.title,text:p.text};
-const withPhoto=()=>S.posts.filter(p=>p.photos&&p.photos[0]);
+const VP=()=>lang==='fa'?S.posts:S.posts.filter(p=>p.tr&&p.tr[lang]);
+const withPhoto=()=>VP().filter(p=>p.photos&&p.photos[0]);
 
 async function load(){
   const bust='?v='+Math.floor(Date.now()/3e5);
@@ -383,13 +384,13 @@ function applyLang(){
   document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
   $('#yr').textContent=new Date().getFullYear();
   if(!S.meta)return;
-  $('#sPosts').textContent=fmtN(S.meta.count);$('#sCats').textContent=fmtN(Object.keys(S.meta.by_category).length);
+  $('#sPosts').textContent=fmtN(VP().length);$('#sCats').textContent=fmtN(Object.keys(S.meta.by_category).length);
   $('#sCoins').textContent=fmtN(Object.keys(S.meta.by_coin).length);$('#sUpd').textContent=fmtDate(S.meta.updated_at,{dateStyle:'medium',timeStyle:'short'});
-  document.title=(S.meta.channel_title||'Coin_Kurd')+' — '+T('hallT');
-  const latest=S.posts[0];if(latest){$('#nextTitle').textContent=PT(latest).title;$('#nextTime').textContent=latest.date?fmtDate(latest.date,{dateStyle:'medium',timeStyle:'short'}):'';$('#next').onclick=e=>{e.preventDefault();openPost(latest.id)}}
+  document.title='entekhab.net — '+T('hallT');
+  const latest=VP()[0];if(latest){$('#nextTitle').textContent=PT(latest).title;$('#nextTime').textContent=latest.date?fmtDate(latest.date,{dateStyle:'medium',timeStyle:'short'}):'';$('#next').onclick=e=>{e.preventDefault();openPost(latest.id)}}
   $('#halfAn').textContent=`${fmtN(S.meta.by_category.technical||0)} ${T('posts')}`;$('#halfBn').textContent=`${fmtN(S.meta.by_category.news||0)} ${T('posts')}`;
   // marquee
-  const mq=[...S.posts.slice(0,12)].map(p=>`<span><b>${esc(catOf(p.category).icon)}</b> ${esc(PT(p).title)}</span>`).join('');$('#mq').innerHTML=mq+mq;
+  const mq=[...VP().slice(0,12)].map(p=>`<span><b>${esc(catOf(p.category).icon)}</b> ${esc(PT(p).title)}</span>`).join('');$('#mq').innerHTML=mq+mq;
 }
 function buildStatic(){
   const ph=withPhoto();
@@ -410,14 +411,14 @@ function scrollFeed(){window.scrollTo({top:$('#feed').offsetTop-10,behavior:'smo
 
 function chip(label,on,color,n,cb){const b=document.createElement('button');b.className='chip'+(on?' on':'');if(color)b.style.setProperty('--c',color);b.innerHTML=label+(n!=null?` <span class="n">${fmtN(n)}</span>`:'');b.onclick=cb;return b}
 function buildChips(){
-  const cc=$('#catChips');cc.innerHTML='';cc.append(chip(T('all'),!S.cat,null,S.meta.count,()=>{S.cat=null;render()}));
-  S.meta.categories.filter(c=>S.meta.by_category[c.id]).sort((a,b)=>S.meta.by_category[b.id]-S.meta.by_category[a.id]).forEach(c=>cc.append(chip(`${c.icon} ${cname(c)}`,S.cat===c.id,c.color,S.meta.by_category[c.id],()=>{S.cat=S.cat===c.id?null:c.id;render()})));
+  const cnt={};VP().forEach(p=>cnt[p.category]=(cnt[p.category]||0)+1);const cc=$('#catChips');cc.innerHTML='';cc.append(chip(T('all'),!S.cat,null,VP().length,()=>{S.cat=null;render()}));
+  S.meta.categories.filter(c=>cnt[c.id]).sort((a,b)=>cnt[b.id]-cnt[a.id]).forEach(c=>cc.append(chip(`${c.icon} ${cname(c)}`,S.cat===c.id,c.color,cnt[c.id],()=>{S.cat=S.cat===c.id?null:c.id;render()})));
     const tc=$('#timeChips');tc.innerHTML='';if(S.coin)tc.append(chip('🪙 '+S.coin+' ✕',true,'#f3c969',null,()=>{S.coin=null;render()}));[['all','all'],['24h','t24'],['7d','t7'],['30d','t30']].forEach(([v,k])=>tc.append(chip(T(k),S.time===v,'#c6ff00',null,()=>{S.time=v;render()})));
   document.querySelectorAll('#wall button').forEach(b=>b.classList.toggle('on',b.dataset.coin===S.coin));
 }
 function filtered(){
   const now=Date.now();const span={'24h':864e5,'7d':6048e5,'30d':2592e6}[S.time];const q=S.q.trim().toLowerCase();
-  let r=S.posts.filter(p=>(!S.cat||p.category===S.cat||p.tags.includes(S.cat))&&(!S.coin||p.coins.includes(S.coin))&&(!span||(p.date&&now-new Date(p.date).getTime()<=span))
+  let r=VP().filter(p=>(!S.cat||p.category===S.cat||p.tags.includes(S.cat))&&(!S.coin||p.coins.includes(S.coin))&&(!span||(p.date&&now-new Date(p.date).getTime()<=span))
     &&(!q||(p.text||'').toLowerCase().includes(q)||(p.tr&&Object.values(p.tr).some(v=>v&&v.text&&v.text.toLowerCase().includes(q)))||p.hashtags.join(' ').toLowerCase().includes(q)||p.coins.join(' ').toLowerCase().includes(q)));
   if(S.sort==='views')r=r.slice().sort((a,b)=>parseViews(b.views)-parseViews(a.views));
   return r;
@@ -434,7 +435,7 @@ function cardHTML(p,i,big){const c=catOf(p.category);const img=p.photos&&p.photo
     <div class="body"><div class="meta"><span class="cat">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'medium'}):''}</time></div>
     <h3 dir="auto">${esc(PT(p).title)}</h3>${(()=>{const t=PT(p);const body=(t.text||'').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'$1').replace(/#\S+/g,'').trim();const tt=(t.title||'').replace(/…$/,'');const rest=tt&&body.startsWith(tt)?body.slice(tt.length).trim():body;return rest?`<p dir="auto">${esc(rest)}</p>`:''})()}
     <div class="coins">${p.coins.slice(0,6).map(k=>`<span class="coin">${k}</span>`).join('')}</div>
-    <div class="foot"><span>👁 ${esc(p.views||'—')}</span><span>${p.hashtags.slice(0,3).map(h=>'#'+esc(h)).join(' ')}</span></div></div></article>`}
+    <div class="foot"><span>👁 ${esc(p.views||'—')}</span><span>${((PT(p).text||'').match(/#[^\s#]+/g)||[]).slice(0,3).map(esc).join(' ')}</span></div></div></article>`}
 function tilt(root){root.querySelectorAll('.card,.tile').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;el.style.transform=`perspective(900px) rotateX(${(0.5-y)*9}deg) rotateY(${(x-0.5)*11}deg) translateZ(10px)`});el.addEventListener('mouseleave',()=>el.style.transform='')})}
 function renderGrid(r,out){out.innerHTML=`<div class="cards">${r.slice(0,150).map((p,i)=>cardHTML(p,i,i===0&&!!(p.photos&&p.photos[0]))).join('')}</div>`;tilt(out)}
 function renderTimeline(r,out){const g={};r.forEach(p=>{const k=p.date?p.date.slice(0,10):'—';(g[k]=g[k]||[]).push(p)});
@@ -449,8 +450,8 @@ function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p
   requestAnimationFrame(()=>out.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'))}
 
 function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=catOf(p.category);
-  const linkify=t=>esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>').replace(/#([\w؀-ۿ‌]+)/g,'<a href="#" data-h="$1">#$1</a>');
-  const rel=S.posts.filter(x=>x.id!==p.id&&(x.category===p.category||x.coins.some(k=>p.coins.includes(k)))).slice(0,4);
+  const linkify=t=>esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/(^|[^"=])(https?:\/\/[^\s<]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>').replace(/(^|[^&\w])#([\w؀-ۿ‌]+)/g,'$1<a href="#" data-h="$2">#$2</a>');
+  const rel=VP().filter(x=>x.id!==p.id&&(x.category===p.category||x.coins.some(k=>p.coins.includes(k)))).slice(0,4);
   $('#sheet').innerHTML=`<button class="close" id="close">✕</button>${p.photos&&p.photos[0]?`<img src="${esc(p.photos[0])}" alt="">`:''}<div class="in">
     <div class="meta"><span class="cat" style="--c:${c.color}">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon} ${esc(cname(x))}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'full',timeStyle:'short'}):''}</time><span>· 👁 ${esc(p.views||'—')}</span></div>
     <div class="txt" dir="auto">${linkify(PT(p).text)}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
