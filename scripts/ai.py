@@ -20,6 +20,15 @@ _last = 0.0
 MIN_GAP = float(os.environ.get("GEMINI_MIN_GAP", "4.5"))  # ثانیه بین درخواست‌ها (~۱۳ در دقیقه)
 
 
+def thinking(mname):
+    """تفکر داخلی را تا حد ممکن خاموش کن: برای ترجمه/خلاصه لازم نیست و کندی و هزینه می‌آورد"""
+    if "2.5" in mname:
+        return {"thinkingBudget": 0}
+    if re.search(r"gemini-([3-9]|\d\d)", mname) or "latest" in mname:
+        return {"thinkingLevel": "minimal"}
+    return None
+
+
 class QuotaError(RuntimeError):
     pass
 
@@ -56,11 +65,9 @@ def model():
         r.raise_for_status()
         names = [m["name"].split("/", 1)[1] for m in r.json().get("models", [])
                  if "generateContent" in m.get("supportedGenerationMethods", [])]
-        def rank(n):
-            bad = any(x in n for x in ("preview", "exp", "tts", "image", "live", "thinking", "embedding", "lite"))
-            ver = [float(v) for v in re.findall(r"(\d+(?:\.\d+)?)", n)[:1]] or [0]
-            return (("flash" in n) and not bad, not bad, ver[0])
-        names.sort(key=rank, reverse=True)
+        fl = [n for n in names if re.fullmatch(r"gemini-\d+(?:\.\d+)?-flash", n)]
+        fl.sort(key=lambda n: -float(re.search(r"gemini-(\d+(?:\.\d+)?)", n).group(1)))
+        names = fl + [n for n in names if n not in fl]
         _model = names[0] if names else "gemini-2.0-flash"
     except Exception as e:  # noqa: BLE001
         print(f"gemini model list failed: {e}")
@@ -79,10 +86,9 @@ def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
     if as_json:
         body["generationConfig"]["responseMimeType"] = "application/json"
     mname = model()
-    if "2.5" in mname:   # تفکر داخلی را خاموش کن: سریع‌تر و ارزان‌تر، برای ترجمه/خلاصه لازم نیست
-        body["generationConfig"]["thinkingConfig"] = {"thinkingBudget": 0}
-    elif re.search(r"gemini-[3-9]", mname):
-        body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": "low"}
+    tc = thinking(mname)
+    if tc:
+        body["generationConfig"]["thinkingConfig"] = tc
     for i in range(tries):
         wait = MIN_GAP - (time.time() - _last)
         if wait > 0:
