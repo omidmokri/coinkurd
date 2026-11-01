@@ -103,6 +103,7 @@ def main():
 
     # کلید عمومی COIN_KURD_API_KEY: نوع آن از پیشوند تشخیص داده می‌شود
     gen = os.environ.get("COIN_KURD_API_KEY", "").strip()
+    print(f"COIN_KURD_API_KEY: {'set, len=%d, prefix=%s' % (len(gen), gen[:6]) if gen else 'EMPTY / not set'}")
     if gen:
         if gen.startswith("sk-ant-"):
             os.environ.setdefault("ANTHROPIC_API_KEY", gen)
