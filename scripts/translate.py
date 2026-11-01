@@ -155,7 +155,8 @@ def gemini_translate(p):
             raise RuntimeError(f"incomplete {lg}")
     if not re.search(r"[ەێۆڵڕ]", r["ckb"]["text"]):
         raise RuntimeError("ckb output has no Sorani letters")
-    if len(re.findall(r"[\u0600-\u06FF]", r["en"]["text"])) > 10:
+    en_body = re.sub(r"#\S+", "", r["en"]["text"])
+    if len(re.findall(r"[\u0600-\u06FF]", en_body)) > max(10, len(en_body) * 0.03):
         raise RuntimeError("en output contains Persian")
     return {"engine": "gemini", "ckb": r["ckb"], "en": r["en"]}
 
