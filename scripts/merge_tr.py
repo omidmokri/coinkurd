@@ -28,5 +28,23 @@ for p in posts:
                    "ckb": {"title": t["ckb"]["title"].strip(), "text": clean(t["ckb"]["text"])},
                    "en": {"title": t["en"]["title"].strip(), "text": clean(t["en"]["text"])}}
         n += 1
+def good_title(tt, text):
+    if len(re.findall(r"[\w\u0600-\u06FF]", re.sub(r"\d", "", tt or ""))) >= 3:
+        return tt.strip()
+    for ln in (text or "").split("\n"):
+        c = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
+        c = re.sub(r"#\S+", "", c).strip(" :–-—|•\t")
+        if len(re.findall(r"[\w\u0600-\u06FF]", c)) >= 3:
+            return c[:117] + "…" if len(c) > 120 else c
+    return tt
+fixed = 0
+for p in posts:
+    for lg in ("ckb", "en"):
+        t = (p.get("tr") or {}).get(lg)
+        if t:
+            nt = good_title(t.get("title"), t.get("text"))
+            if nt != t.get("title"):
+                t["title"], fixed = nt, fixed + 1
+print(f"fixed {fixed} translated titles")
 json.dump(posts, open(POSTS, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(f"merged {n}, total translated {sum(1 for p in posts if p.get('tr'))}")
