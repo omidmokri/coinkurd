@@ -227,7 +227,7 @@ async function renderArena(){const el=$('#arena');let st=ls.get('ek_arena',{call
 
 /* ---------- Guess next move ---------- */
 let G=null;
-async function newGuess(){const start=Date.UTC(2018,0,1),end=Date.now()-90*864e5,t=start+Math.random()*(end-start);const k=await kl('BTCUSDT',t,null,74);if(k.length<74){$('#guess').innerHTML=`<p class="disc">${T('noData')}</p>`;return}G={k,ans:null};drawGuess()}
+async function newGuess(){const start=Date.UTC(2018,0,1),end=Date.now()-90*864e5,t=Math.floor(start+Math.random()*(end-start));const k=await kl('BTCUSDT',t,null,74);if(k.length<74){$('#guess').innerHTML=`<p class="disc">${T('noData')}</p>`;return}G={k,ans:null};drawGuess()}
 function spark(k,hide,W=520,H=200,rv=G&&G.ans!=null){const lo=Math.min(...k.map(x=>x.l)),hi=Math.max(...k.map(x=>x.h)),n=k.length,X=i=>i*(W/(n-1)),Y=v=>H-6-(v-lo)/(hi-lo||1)*(H-12);
  const pts=k.slice(0,hide).map((x,i)=>`${X(i)},${Y(x.c)}`).join(' '),rest=k.slice(hide-1).map((x,i)=>`${X(i+hide-1)},${Y(x.c)}`).join(' ');
  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><polyline points="${pts}" fill="none" stroke="#f7931a" stroke-width="2"/>${rv?`<polyline points="${rest}" fill="none" stroke="${k[n-1].c>=k[hide-1].c?'#22c55e':'#ef4444'}" stroke-width="2.5" stroke-dasharray="5 3"/>`:`<rect x="${X(hide-1)}" y="0" width="${W-X(hide-1)}" height="${H}" fill="rgba(255,255,255,.04)"/><text x="${(X(hide-1)+W)/2}" y="${H/2}" fill="#888" text-anchor="middle" font-size="28">?</text>`}<line x1="${X(hide-1)}" x2="${X(hide-1)}" y1="0" y2="${H}" stroke="#555" stroke-dasharray="3 3"/></svg>`}
