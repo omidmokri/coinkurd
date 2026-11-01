@@ -191,8 +191,13 @@ def main():
     print(f"engine={engine}, to translate: {len(todo)} of {len(posts)}")
 
     store = json.load(open(TR_FILE, encoding="utf-8")) if os.path.exists(TR_FILE) else {}
-    done = 0
+    done, fails = 0, 0
+    if engine == "gemini":
+        print(f"gemini model: {ai.model()}")
     for p in todo:
+        if fails >= 3:
+            print("3 consecutive failures; stopping for this run", file=sys.stderr)
+            break
         try:
             if engine == "gemini":
                 tr = gemini_translate(p)
@@ -204,11 +209,13 @@ def main():
                         "text": translate(p["text"], lang, api_key),
                     }
             p["tr"] = tr
+            fails = 0
             store[str(p["id"])] = {"ckb": tr["ckb"], "en": tr["en"]}
             done += 1
             print(f"  {p['id']} ok")
         except Exception as e:  # noqa: BLE001
             print(f"  {p['id']} FAILED: {e}", file=sys.stderr)
+            fails += 1
             # اگر گوگل ما را محدود کرد، بقیه را برای اجرای بعدی بگذاریم
             if isinstance(e, ai.QuotaError) or "429" in str(e) or "too many" in str(e).lower() or "credit balance" in str(e).lower() or "401" in str(e):
                 print("rate-limited; stopping for this run", file=sys.stderr)
