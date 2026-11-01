@@ -2,7 +2,7 @@ name: Sync Telegram → Site
 
 on:
   schedule:
-    - cron: "17 * * * *"      # هر ساعت (دقیقهٔ ۱۷)
+    - cron: "7,22,37,52 * * * *"   # هر ۱۵ دقیقه
   workflow_dispatch:
     inputs:
       pages:
@@ -13,6 +13,7 @@ on:
         default: "120"
   push:
     branches: [main]
+    paths-ignore: ["data/**"]
 
 permissions:
   contents: write
@@ -26,36 +27,77 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -r requirements.txt
+
+      # هر مرحله مستقل است: شکست یکی مانع انتشار بقیه نمی‌شود (continue-on-error)
       - name: Fetch & classify posts
+        id: fetch
+        continue-on-error: true
         env:
           TG_CHANNEL: Coin_Kurd
           MAX_PAGES: ${{ github.event.inputs.pages || '3' }}
           BACKFILL: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
-        run: python scripts/fetch.py
+        run: |
+          python scripts/fetch.py || (sleep 30 && python scripts/fetch.py)
+
       - name: Repair links/footers & merge stored translations
+        id: repair
+        continue-on-error: true
         run: |
           python scripts/repair.py
           python scripts/merge_tr.py
+
       - name: Translate new posts (fa → ckb, en)
+        id: translate
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '120' }}
         run: python scripts/translate.py
+
+      - name: Market dashboard & opportunity scanner (Binance / CoinGecko / alternative.me)
+        id: market
+        continue-on-error: true
+        run: python scripts/market.py
+
+      - name: Post & signal track record
+        id: impact
+        continue-on-error: true
+        run: python scripts/impact.py
+
+      - name: Health check & Telegram alert
+        id: health
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_ALERT_CHAT: ${{ secrets.TG_ALERT_CHAT }}
+          STEP_FETCH: ${{ steps.fetch.outcome }}
+          STEP_REPAIR: ${{ steps.repair.outcome }}
+          STEP_MARKET: ${{ steps.market.outcome }}
+          STEP_IMPACT: ${{ steps.impact.outcome }}
+        run: python scripts/health.py
+
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/
-          git diff --cached --quiet || git commit -m "chore: sync posts $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git pull --rebase -X theirs origin main || true
-          git push
+          git diff --cached --quiet || git commit -m "chore: sync data $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push && break
+            sleep 5
+          done
+
+      - name: Build static SEO pages (posts, coins, sitemap)
+        run: python scripts/build_pages.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: "." }
