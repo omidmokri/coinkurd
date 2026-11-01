@@ -68,6 +68,18 @@ jobs:
         continue-on-error: true
         run: python scripts/market.py
 
+      - name: Bitcoin network snapshot (mempool.space blocks, bitnodes nodes)
+        id: chain
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/chain.py
+
+      - name: Derivatives command room (OKX funding, OI, long/short, liquidations)
+        id: deriv
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/derivatives.py
+
       - name: Coin logos (CoinGecko, only new ones)
         continue-on-error: true
         timeout-minutes: 3
@@ -77,6 +89,12 @@ jobs:
         id: news
         continue-on-error: true
         run: python scripts/news.py
+
+      - name: Capital flow by sector + exchanges globe (CoinGecko)
+        id: flows
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/flows.py
 
       - name: Narrative Radar
         id: narr
@@ -95,6 +113,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/lab.py
+
+      - name: Market DNA (genes, similar coins, historical twins)
+        id: dna
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/dna.py
 
       - name: Market Wrapped (weekly / monthly)
         continue-on-error: true
@@ -161,6 +185,10 @@ jobs:
           STEP_NARR: ${{ steps.narr.outcome }}
           STEP_EVENTS: ${{ steps.events.outcome }}
           STEP_LAB: ${{ steps.lab.outcome }}
+          STEP_CHAIN: ${{ steps.chain.outcome }}
+          STEP_DERIV: ${{ steps.deriv.outcome }}
+          STEP_FLOWS: ${{ steps.flows.outcome }}
+          STEP_DNA: ${{ steps.dna.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
