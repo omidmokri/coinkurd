@@ -61,7 +61,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .hero .blob{position:absolute;width:48vw;height:48vw;border-radius:46% 54% 60% 40%/50% 40% 60% 50%;background:var(--lime);filter:blur(60px);opacity:.14;top:-10%;inset-inline-end:-10%;animation:morph 14s ease-in-out infinite alternate}
 @keyframes morph{to{border-radius:60% 40% 40% 60%/40% 60% 40% 60%;transform:rotate(30deg) scale(1.15)}}
 .hero .wrap{position:relative;display:grid;grid-template-columns:1fr auto;align-items:end;gap:30px}
-.hero h1{font-size:clamp(3.2rem,13vw,13rem);color:var(--ink)}
+.hero h1{font-size:clamp(2.6rem,9.5vw,9.5rem);text-align:start;color:var(--ink)}
 .hero h1 em{font-style:normal;color:var(--lime);-webkit-text-stroke:0;display:block}
 .hero .role{font-family:var(--mono);text-transform:lowercase;color:var(--mute);margin-top:14px;font-size:1.05rem}
 .next{border:1px solid var(--line);border-radius:18px;padding:18px 22px;min-width:300px;max-width:380px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px)}
@@ -265,7 +265,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <div class="bgimg" id="heroImg"></div><div class="blob"></div><canvas id="coin3d"></canvas>
     <div class="wrap">
       <div>
-        <h1 class="display"><span>Entekhab</span><em>.net</em></h1>
+        <h1 class="display" dir="ltr"><span>Entekhab</span><em>.net</em></h1>
         <div class="role" data-i="role">تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام</div>
       </div>
       <a class="next" id="next" href="#feed"><span class="lc" data-i="latest">آخرین پست</span><b id="nextTitle" dir="auto">…</b><small id="nextTime"></small></a>
