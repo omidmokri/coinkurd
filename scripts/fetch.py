@@ -94,6 +94,27 @@ def detect_coins(text: str, hashtags: list) -> list:
 
 HASHTAG_RE = re.compile(r"#([\w؀-ۿ‌]+)")
 
+MDLINK_RE = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
+
+
+def split_footer(text: str):
+    """خطوط پایانی که عمدتاً لینک شبکه‌های اجتماعی‌اند را جدا می‌کند → (متن، [{label,url}])"""
+    lines = text.split("\n")
+    footer = []
+    while lines:
+        last = lines[-1].strip()
+        if not last:
+            lines.pop()
+            continue
+        links = MDLINK_RE.findall(last)
+        rest = re.sub(r"[\s\W]", "", MDLINK_RE.sub("", last))
+        if links and len(rest) <= 2:
+            footer = [{"label": l.strip(), "url": u} for l, u in links] + footer
+            lines.pop()
+        else:
+            break
+    return "\n".join(lines).strip(), footer
+
 
 def extract_hashtags(text: str) -> list:
     return list(dict.fromkeys(HASHTAG_RE.findall(text or "")))
@@ -119,8 +140,20 @@ def parse_messages(html: str, channel: str) -> list:
         if text_el:
             for br in text_el.find_all("br"):
                 br.replace_with("\n")
-            text = text_el.get_text("\n", strip=False)
+            # لینک‌ها را به شکل مارک‌داون نگه می‌داریم تا در سایت فعال باشند
+            for a in text_el.find_all("a"):
+                href = a.get("href", "")
+                label = a.get_text("", strip=False)
+                if href.startswith("?q=") or not href:  # لینک هشتگ تلگرام
+                    a.replace_with(label)
+                elif label.strip() and label.strip() != href:
+                    a.replace_with(f"[{label.strip()}]({href})")
+                else:
+                    a.replace_with(href)
+            text = text_el.get_text("", strip=False)
+            text = re.sub(r"[ \t]+\n", "\n", text)
             text = re.sub(r"\n{3,}", "\n\n", text).strip()
+        text, footer = split_footer(text)
 
         time_el = wrap.select_one("time[datetime]")
         dt = time_el["datetime"] if time_el else None
@@ -176,6 +209,7 @@ def parse_messages(html: str, channel: str) -> list:
             "photos": photos,
             "video": video_src,
             "link": link_preview,
+            "footer": footer,
         })
     return out
 
@@ -272,6 +306,8 @@ def main():
         for m in msgs:
             if m["id"] not in existing:
                 new_count += 1
+            elif existing[m["id"]].get("tr"):
+                m["tr"] = existing[m["id"]]["tr"]  # ترجمه را نگه دار
             existing[m["id"]] = m  # به‌روزرسانی بازدیدها/ویرایش‌ها
         oldest = min(m["id"] for m in msgs)
         print(f"page {page+1}: {len(msgs)} posts, oldest id {oldest}")
