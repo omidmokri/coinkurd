@@ -217,6 +217,7 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .social{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);white-space:nowrap}
 .social a{padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-family:var(--mono);transition:.2s}
 .social a:hover{background:var(--lime);color:#000;border-color:transparent}
+img.tge{width:1.2em;height:1.2em;vertical-align:-.25em;display:inline-block;margin:0 .05em}
 /* footer */
 footer{padding:120px 0 40px;position:relative;overflow:hidden}
 footer .big{font-size:clamp(2.6rem,9vw,9rem);line-height:.95}
@@ -427,7 +428,7 @@ function render(){
   buildChips();const r=filtered();$('#count').textContent=`${fmtN(r.length)} ${T('result')}`;
   document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
   const out=$('#out');if(!r.length){out.innerHTML=`<div class="empty">${T('empty')}</div>`;return}
-  ({grid:renderGrid,timeline:renderTimeline,heat:renderHeat,stats:renderStats})[S.view](r,out);
+  ({grid:renderGrid,timeline:renderTimeline,heat:renderHeat,stats:renderStats})[S.view](r,out);emojifyAll();
 }
 function cardHTML(p,i,big){const c=catOf(p.category);const img=p.photos&&p.photos[0];
   return `<article class="card${big?' big':''}" data-id="${p.id}" style="--c:${c.color};animation-delay:${Math.min(i,12)*40}ms">
@@ -460,7 +461,7 @@ function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=ca
     ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.label)}</a>`).join('')}</div>`:''}
     <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
     ${rel.length?`<h3 style="margin-top:26px;font-weight:800">${T('related')}</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:10px 0 0">${rel.map((x,i)=>cardHTML(x,i)).join('')}</div>`:''}</div>`;
-  $('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
+  emojify($('#sheet'));$('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
   $('#close').onclick=closeModal;$('#copy').onclick=e=>{navigator.clipboard&&navigator.clipboard.writeText(location.href.split('#')[0]+'#p'+p.id);e.target.textContent='✓ '+T('copied')};
   $('#sheet').querySelectorAll('[data-h]').forEach(a=>a.onclick=ev=>{ev.preventDefault();closeModal();S.q='#'+a.dataset.h;$('#q').value=S.q;render();scrollFeed()})}
 function closeModal(){$('#modal').classList.remove('open');document.body.style.overflow='';history.replaceState(null,'',location.pathname)}
@@ -514,6 +515,16 @@ function coin3d(){
   place();addEventListener('resize',place);
   const t0=performance.now();(function loop(){const t=(performance.now()-t0)/1000;grp.rotation.y=t*.6+mx*1.2;grp.rotation.x=Math.sin(t*.7)*.15-my*.6;grp.position.y+= (Math.sin(t*1.3)*.004);pts.rotation.z=t*.05;pts.rotation.x=my*.3;renderer.render(scene,cam);requestAnimationFrame(loop)})();
 }
+/* ---- Telegram-exact emoji (Apple-style PNGs served by telegram.org) ---- */
+const EMO_RE=/(?:[\u{1F1E6}-\u{1F1FF}]{2}|(?:\p{Extended_Pictographic}|[\u{1F170}-\u{1F251}])(?:️|[\u{1F3FB}-\u{1F3FF}]|‍(?:\p{Extended_Pictographic})️?)*)/gu;
+const emoHex=e=>[...new TextEncoder().encode(e.replace(/️/g,''))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+function emojify(root){
+  if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentNode&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION)$/.test(n.parentNode.nodeName)&&EMO_RE.test(n.nodeValue)?(EMO_RE.lastIndex=0,1):(EMO_RE.lastIndex=0,3)});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  nodes.forEach(n=>{const f=document.createDocumentFragment();let last=0;    const t=n.nodeValue;let mm;EMO_RE.lastIndex=0;while((mm=EMO_RE.exec(t))){if(/^[0-9#*]$/.test(mm[0]))continue;f.append(t.slice(last,mm.index));const img=document.createElement('img');img.className='tge';img.alt=mm[0];img.draggable=false;img.src='https://telegram.org/img/emoji/40/'+emoHex(mm[0])+'.png';img.onerror=function(){this.replaceWith(this.alt)};f.append(img);last=mm.index+mm[0].length}
+    f.append(t.slice(last));n.replaceWith(f)});
+}
+function emojifyAll(){['#out','#sheet','#strip','#mq','#next','#hallGrid','#catChips'].forEach(s=>emojify(document.querySelector(s)))}
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'0px':'118px');lastY=y},{passive:true});
 load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
 </script>
