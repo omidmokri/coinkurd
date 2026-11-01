@@ -64,6 +64,9 @@ footer{padding:40px 0;color:var(--mute);font-size:.8rem;text-align:center;border
     <p class="disc" id="pulseNote"></p>
   </div>
 
+  <section id="discS"><h2><b data-t="dT"></b><span>DAILY</span></h2><p class="lead" data-t="dL"></p>
+    <div class="grid"><div class="card" id="unusual"></div><div class="card" id="missions"></div><div class="card" id="weather" style="grid-column:1/-1"></div><div class="card" id="battle"></div><div class="card" id="poster"></div></div></section>
+
   <section id="flowS"><h2><b data-t="flowT"></b><span>LIVE</span></h2><p class="lead" data-t="flowL"></p>
     <div class="card"><svg id="flow" viewBox="0 0 1000 440"></svg><div id="flowInfo" class="disc"></div></div></section>
 
@@ -207,7 +210,7 @@ async function px(sym='BTCUSDT'){const r=await j(`${BN}/ticker/price?symbol=${sy
 function applyLang(){const rtl=lang!=='en';document.documentElement.lang=lang;document.documentElement.dir=rtl?'rtl':'ltr';
  $('#hT').innerHTML=T('hT');$('#hL').textContent=T('hL');$('#honest').innerHTML=T('honest');
  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=T(e.dataset.t));
- const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=[['watchS',T('wT')],['radarS',T('rT')],['galS',T('galT')],['wrapS',T('wrT')]].map(([a,t])=>`<a href="#${a}">${t}</a>`).join('')+T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
+ const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=[['discS',T('dT')],['watchS',T('wT')],['radarS',T('rT')],['galS',T('galT')],['wrapS',T('wrT')]].map(([a,t])=>`<a href="#${a}">${t}</a>`).join('')+T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
  document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));renderAll()}
 $('#langs').onclick=e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang()};
 
@@ -314,8 +317,8 @@ function coneChart(f){const W=520,H=200,c=f.cone,lo=Math.min(...c['5'],f.price),
 function renderCouncil(){const c=D.council,el=$('#council');if(!c?.council){el.innerHTML=`<p class="disc">${T('noData')}</p>`;return}const r=c.council,L=r[lang]||r.en,cl={bullish:'#22c55e',bearish:'#ef4444',neutral:'#9ca3af'};
  el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${r.agents.map(a=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px;border-top:3px solid ${cl[a.stance]||'#888'}"><b>${T('ag')[a.id]||esc(a.id)}</b> <span class="chip" style="color:${cl[a.stance]}">${esc(a.stance)} · ${'●'.repeat(a.confidence||0)}</span><ul style="margin:8px 18px 0;font-size:.85rem">${((a[lang]||a.en||{}).evidence||[]).map(e=>`<li>${esc(e)}</li>`).join('')}</ul></div>`).join('')}</div>
  ${L.disagreements?.length?`<h3 style="margin-top:14px">⚔</h3><ul style="margin:0 18px;font-size:.9rem">${L.disagreements.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}<p style="margin-top:12px"><b>${esc(L.summary)}</b></p><p class="disc">${esc(c.engine)} · ${c.at.slice(0,16).replace('T',' ')} UTC</p>`}
-function renderAll(){renderCouncil();renderWatch();renderRadar();renderGraph();renderWrap();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
-(async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council,D.news,D.score,D.wrapped]=await Promise.all(['lab','narratives','market','brain','council','news','score','wrapped'].map(n=>j(`/data/${n}.json${v}`)));
+function renderAll(){renderDisc();renderCouncil();renderWatch();renderRadar();renderGraph();renderWrap();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
+(async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council,D.news,D.score,D.wrapped,D.logos]=await Promise.all(['lab','narratives','market','brain','council','news','score','wrapped','logos/index'].map(n=>j(`/data/${n}.json${v}`)));LOGO=new Set(D.logos||[]);
  $('#tmCoin').innerHTML=TM_COINS.map(c=>`<option>${c}</option>`).join('');const t=new Date();$('#tmB').value=t.toISOString().slice(0,10);t.setFullYear(t.getFullYear()-1);$('#tmA').value=t.toISOString().slice(0,10);$('#tmGo').onclick=timeMachine;
  applyLang();newGuess();galaxy()})();
 /* ================= stage 2: watchlist, radar, brain graph, galaxy, wrapped ================= */
@@ -355,7 +358,7 @@ function renderWatch(){const m=D.market;if(!m?.coins){$('#wList').innerHTML=`<p 
  $('#wAdd').onclick=()=>{w.push($('#wSel').value);ls.set('ek_watch',w.slice(0,20));renderWatch()};
  $('#wPick').querySelectorAll('[data-x]').forEach(a=>a.onclick=e=>{e.preventDefault();ls.set('ek_watch',w.filter(x=>x!==a.dataset.x));renderWatch()});
  const cut=Date.now()-864e5,info=w.map(c=>{const k=m.coins.find(x=>x.coin===c);if(!k)return null;return{k,sig:(m.opportunities||[]).filter(o=>o.coin===c),news:(D.news?.items||[]).filter(n=>n.coins?.includes(c)&&Date.parse(n.date)>=cut),sc:D.score?.coins?.[c]}}).filter(Boolean);
- $('#wList').innerHTML=info.map(({k,sig,news,sc})=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div class="row" style="justify-content:space-between"><b style="font-size:1.1rem">${k.coin}</b>${sg(k.chg24)}</div><div class="big" style="font-size:1.4rem">$${fm(k.price,k.price<1?6:2)}</div>
+ $('#wList').innerHTML=info.map(({k,sig,news,sc})=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px"><div class="row" style="justify-content:space-between"><b style="font-size:1.1rem">${logoTag(k.coin,26)}${k.coin}</b>${sg(k.chg24)}</div><div class="big" style="font-size:1.4rem">$${fm(k.price,k.price<1?6:2)}</div>
  <div class="disc">RSI <span class="num">${k.rsi??'—'}</span> · ${k.trend==='up'?'⬆':k.trend==='down'?'⬇':'↔'} ${sc?`· ${T('scoreL')} <span class="num">${sc.score}</span>`:''}</div>
  ${sig.length?`<div style="margin-top:6px">${sig.slice(0,4).map(o=>`<span class="chip" style="color:${bullT(o.type)?'var(--g)':'var(--r)'}">${tName(o.type)} · ${o.tf}</span>`).join('')}</div>`:''}
  ${news.length?`<div class="disc" dir="ltr" style="margin-top:6px">${news.slice(0,2).map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener nofollow">• ${esc(n.title.slice(0,90))}</a>`).join('<br>')}</div>`:''}</div>`).join('');
@@ -379,19 +382,19 @@ function renderRadar(){const s=$('#radar'),op=(D.market?.opportunities)||[];if(!
  const top=op.filter(o=>o.confidence==='high').slice(0,8);
  $('#radarInfo').innerHTML=`<h3>${T('rT')}</h3>${legend}<table>${top.map(o=>`<tr><td><b>${o.coin}</b></td><td>${tName(o.type)}</td><td class="num">${o.tf}</td><td class="num">${o.strength??''}</td></tr>`).join('')}</table><p class="disc">${op.length} findings · ${(D.market.coins||[]).length} coins · Binance</p>`;
  s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const o=pts[+g.dataset.i].o,k=(D.market.coins||[]).find(c=>c.coin===o.coin)||{};
-  $('#radarInfo').innerHTML=`<h3>${o.coin} · ${tName(o.type)}</h3><div class="big">$${fm(k.price,k.price<1?6:2)}</div>${sg(k.chg24)} · RSI <span class="num">${k.rsi??'—'}</span><p class="disc">tf ${o.tf} · strength ${o.strength??'—'} · ${o.confidence} · ${esc(JSON.stringify(o.detail||{}))}</p>${legend}`}}
+  $('#radarInfo').innerHTML=`<h3>${logoTag(o.coin,28)}${o.coin} · ${tName(o.type)}</h3><div class="big">$${fm(k.price,k.price<1?6:2)}</div>${sg(k.chg24)} · RSI <span class="num">${k.rsi??'—'}</span><p class="disc">tf ${o.tf} · strength ${o.strength??'—'} · ${o.confidence} · ${esc(JSON.stringify(o.detail||{}))}</p>${legend}`}}
 
 /* ---- market brain graph ---- */
 function renderGraph(){const s=$('#graph'),nr=D.narr?.narratives||[],items=(D.news?.items||[]).filter(n=>Date.parse(n.date)>=Date.now()-864e5&&n.coins?.length).slice(0,14);
  if(!nr.length&&!items.length){s.innerHTML=`<text x="500" y="280" fill="#888" text-anchor="middle">${T('noData')}</text>`;return}
  const N=[],E=[],idx={},add=(id,o)=>{if(idx[id]==null){idx[id]=N.length;N.push({id,...o,x:500+(Math.random()-.5)*600,y:280+(Math.random()-.5)*360})}return idx[id]};
- const mk=D.market?.coins||[];nr.filter(n=>n.mentions_24h>0).slice(0,6).forEach(n=>{const a=add('n:'+n.id,{t:'n',label:n.name[lang]||n.name.en,r:18,o:n});n.members.slice(0,4).forEach(m=>E.push([a,add('c:'+m.coin,{t:'c',label:m.coin,r:11})]))});
- items.forEach((it,i)=>{const a=add('h:'+i,{t:'h',label:'',r:5,o:it});it.coins.slice(0,3).forEach(c=>E.push([a,add('c:'+c,{t:'c',label:c,r:11})]))});
+ const mk=D.market?.coins||[];nr.filter(n=>n.mentions_24h>0).slice(0,6).forEach(n=>{const a=add('n:'+n.id,{t:'n',label:n.name[lang]||n.name.en,r:18,o:n});n.members.slice(0,4).forEach(m=>E.push([a,add('c:'+m.coin,{t:'c',label:m.coin,r:13})]))});
+ items.forEach((it,i)=>{const a=add('h:'+i,{t:'h',label:'',r:5,o:it});it.coins.slice(0,3).forEach(c=>E.push([a,add('c:'+c,{t:'c',label:c,r:13})]))});
  N.forEach(n=>{if(n.t==='c'){const k=mk.find(x=>x.coin===n.label);n.chg=k?.chg24}});
  for(let it=0;it<400;it++){for(const a of N)for(const b of N){if(a===b)continue;const dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+1,f=900/d2;a.x+=dx*f*.05;a.y+=dy*f*.05}for(const [i,j] of E){const a=N[i],b=N[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-90)*.02;a.x+=dx/d*f;a.y+=dy/d*f;b.x-=dx/d*f;b.y-=dy/d*f}for(const a of N){a.x+=(500-a.x)*.004;a.y+=(280-a.y)*.004;a.x=Math.max(30,Math.min(970,a.x));a.y=Math.max(20,Math.min(540,a.y))}}
  const col=n=>n.t==='n'?'#f7931a':n.t==='h'?'#38bdf8':n.chg==null?'#666':n.chg>=0?'#22c55e':'#ef4444';
- s.innerHTML=E.map(([i,j])=>`<line x1="${N[i].x}" y1="${N[i].y}" x2="${N[j].x}" y2="${N[j].y}" stroke="rgba(255,255,255,.12)"/>`).join('')+N.map((n,i)=>`<g data-i="${i}" style="cursor:pointer"><circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${col(n)}" fill-opacity="${n.t==='n'?.85:.9}"/>${n.label?`<text x="${n.x}" y="${n.y-n.r-4}" fill="#ddd" text-anchor="middle" font-size="${n.t==='n'?13:11}" font-family="Vazirmatn">${esc(n.label)}</text>`:''}</g>`).join('');
- s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const n=N[+g.dataset.i];$('#graphInfo').innerHTML=n.t==='h'?`<a href="${esc(n.o.url)}" target="_blank" rel="noopener nofollow" dir="ltr" style="color:#fff">${esc(n.o.title)}</a> — ${esc(n.o.source)}`:n.t==='n'?`<b style="color:#fff">${esc(n.label)}</b> · ${n.o.mentions_24h} · ×${n.o.momentum} · ${sg(n.o.perf_24h)}`:`<b style="color:#fff">${n.label}</b> ${sg(n.chg)}`}}
+ s.innerHTML=E.map(([i,j])=>`<line x1="${N[i].x}" y1="${N[i].y}" x2="${N[j].x}" y2="${N[j].y}" stroke="rgba(255,255,255,.12)"/>`).join('')+`<defs>${N.map((n,i)=>n.t==='c'?`<clipPath id="cp${i}"><circle cx="${n.x}" cy="${n.y}" r="${n.r+2}"/></clipPath>`:'').join('')}</defs>`+N.map((n,i)=>`<g data-i="${i}" style="cursor:pointer">${n.t==='c'&&logoUrl(n.label)?`<circle cx="${n.x}" cy="${n.y}" r="${n.r+4}" fill="#fff" stroke="${col(n)}" stroke-width="3"/><image href="${logoUrl(n.label)}" x="${n.x-n.r-2}" y="${n.y-n.r-2}" width="${2*n.r+4}" height="${2*n.r+4}" clip-path="url(#cp${i})"/>`:`<circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="${col(n)}" fill-opacity="${n.t==='n'?.85:.9}"/>`}${n.label?`<text x="${n.x}" y="${n.y-n.r-4}" fill="#ddd" text-anchor="middle" font-size="${n.t==='n'?13:11}" font-family="Vazirmatn">${esc(n.label)}</text>`:''}</g>`).join('');
+ s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const n=N[+g.dataset.i];$('#graphInfo').innerHTML=n.t==='h'?`<a href="${esc(n.o.url)}" target="_blank" rel="noopener nofollow" dir="ltr" style="color:#fff">${esc(n.o.title)}</a> — ${esc(n.o.source)}`:n.t==='n'?`<b style="color:#fff">${esc(n.label)}</b> · ${n.o.mentions_24h} · ×${n.o.momentum} · ${sg(n.o.perf_24h)}`:`${logoTag(n.label,24)}<b style="color:#fff">${n.label}</b> ${sg(n.chg)}`}}
 
 /* ---- coin galaxy (three.js) ---- */
 function galaxy(){const box=$('#galaxy'),m=D.market;if(!window.THREE||!m?.coins){box.innerHTML=`<p class="disc" style="padding:16px">${T('noData')}</p>`;return}
@@ -400,19 +403,19 @@ function galaxy(){const box=$('#galaxy'),m=D.market;if(!window.THREE||!m?.coins)
  const cor=(a,b)=>{const k=Math.min(a.length,b.length);a=a.slice(-k);b=b.slice(-k);const ma=a.reduce((x,y)=>x+y)/k,mb=b.reduce((x,y)=>x+y)/k;let c=0,da=0,db=0;for(let i=0;i<k;i++){c+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2}return da&&db?c/Math.sqrt(da*db):0};
  const C=[...Array(n)].map((_,i)=>[...Array(n)].map((_,j)=>i===j?1:0));for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)C[i][j]=C[j][i]=cor(R[i],R[j]);
  const P=cs.map(()=>new THREE.Vector3((Math.random()-.5)*60,(Math.random()-.5)*60,(Math.random()-.5)*60));
- for(let it=0;it<260;it++){for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const d=P[i].clone().sub(P[j]),L=d.length()||.01,rest=4+(1-C[i][j])*26,f=(L-rest)*.02;d.multiplyScalar(f/L);P[i].sub(d);P[j].add(d)}}
+ for(let it=0;it<260;it++){for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const d=P[i].clone().sub(P[j]),L=d.length()||.01,rest=7+(1-C[i][j])*36,f=(L-rest)*.02;d.multiplyScalar(f/L);P[i].sub(d);P[j].add(d)}}
  const ctr=P.reduce((a,b)=>a.add(b.clone()),new THREE.Vector3()).multiplyScalar(1/n);P.forEach(p=>p.sub(ctr));
- const W=box.clientWidth,H=box.clientHeight,sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,W/H,.1,1000);cam.position.set(0,0,70);
+ const W=box.clientWidth,H=box.clientHeight,sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,W/H,.1,1000);cam.position.set(0,0,90);
  const rd=new THREE.WebGLRenderer({antialias:true,alpha:true});rd.setPixelRatio(Math.min(2,devicePixelRatio));rd.setSize(W,H);box.innerHTML='';box.append(rd.domElement);
  const grp=new THREE.Group();sc.add(grp);const mx=Math.max(...cs.map(c=>c.qvol||1));
  const stars=new THREE.BufferGeometry(),sp=[];for(let i=0;i<900;i++)sp.push((Math.random()-.5)*600,(Math.random()-.5)*600,(Math.random()-.5)*600);stars.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));sc.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0x666666,size:.6})));
- const meshes=cs.map((c,i)=>{const ch=c.chg24||0,col=new THREE.Color(ch>=0?0x22c55e:0xef4444).lerp(new THREE.Color(0x777777),Math.max(0,1-Math.abs(ch)/6));if(c.coin==='BTC')col.set(0xf7931a);
-  const r=.8+Math.sqrt((c.qvol||1)/mx)*3.2,me=new THREE.Mesh(new THREE.SphereGeometry(r,20,16),new THREE.MeshBasicMaterial({color:col}));me.position.copy(P[i]);me.userData=c;grp.add(me);
+ const meshes=cs.map((c,i)=>{const ch=c.chg24||0,col=c.coin==='BTC'?'#f7931a':ch>=0?`rgba(34,197,94,${.35+Math.min(.65,ch/6)})`:`rgba(239,68,68,${.35+Math.min(.65,-ch/6)})`;
+  const r=1+Math.sqrt((c.qvol||1)/mx)*2.6,me=new THREE.Sprite(new THREE.SpriteMaterial({map:coinTexture(c.coin,col),transparent:true}));me.scale.set(r*2,r*2,1);me.position.copy(P[i]);me.userData=c;grp.add(me);
   const cv=document.createElement('canvas');cv.width=256;cv.height=64;const x=cv.getContext('2d');x.font='700 34px "Space Grotesk",Arial';x.fillStyle='#eee';x.textAlign='center';x.fillText(c.coin,128,44);
   const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));spr.scale.set(8,2,1);spr.position.copy(P[i]).add(new THREE.Vector3(0,r+1.4,0));grp.add(spr);return me});
  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(C[i][j]>.85){const g=new THREE.BufferGeometry().setFromPoints([P[i],P[j]]);grp.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0xf7931a,transparent:true,opacity:.18})))}
  let drag=null,rx=0,ry=0,auto=true;const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
- box.onpointerdown=e=>{drag=[e.clientX,e.clientY,e.clientX,e.clientY];auto=false};window.addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag[2],e.clientY-drag[3])<4){const b=rd.domElement.getBoundingClientRect();mv.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(mv,cam);const h=ray.intersectObjects(meshes)[0];if(h){const c=h.object.userData,i=cs.indexOf(c),near=C[i].map((v,j)=>[v,cs[j].coin]).filter((_,j)=>j!==i).sort((a,b)=>b[0]-a[0]).slice(0,5);$('#galInfo').innerHTML=`<b style="color:#fff">${c.coin}</b> $${fm(c.price,c.price<1?6:2)} ${sg(c.chg24)} · RSI <span class="num">${c.rsi??'—'}</span> — ${near.map(([v,k])=>`<span class="chip">${k} <span class="num">${v.toFixed(2)}</span></span>`).join('')}`}}drag=null});
+ box.onpointerdown=e=>{drag=[e.clientX,e.clientY,e.clientX,e.clientY];auto=false};window.addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag[2],e.clientY-drag[3])<4){const b=rd.domElement.getBoundingClientRect();mv.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(mv,cam);const h=ray.intersectObjects(meshes)[0];if(h){const c=h.object.userData,i=cs.indexOf(c),near=C[i].map((v,j)=>[v,cs[j].coin]).filter((_,j)=>j!==i).sort((a,b)=>b[0]-a[0]).slice(0,5);$('#galInfo').innerHTML=`${logoTag(c.coin,26)}<b style="color:#fff">${c.coin}</b> $${fm(c.price,c.price<1?6:2)} ${sg(c.chg24)} · RSI <span class="num">${c.rsi??'—'}</span> — ${near.map(([v,k])=>`<span class="chip">${k} <span class="num">${v.toFixed(2)}</span></span>`).join('')}`}}drag=null});
  window.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-drag[0])*.005;rx+=(e.clientY-drag[1])*.005;drag[0]=e.clientX;drag[1]=e.clientY});
  box.addEventListener('wheel',e=>{e.preventDefault();cam.position.z=Math.max(30,Math.min(200,cam.position.z+e.deltaY*.05))},{passive:false});
  (function loop(){if(auto)ry+=.0015;grp.rotation.set(rx,ry,0);rd.render(sc,cam);requestAnimationFrame(loop)})();
@@ -436,6 +439,100 @@ function renderWrap(){const w=D.wrapped?.[WP];document.querySelectorAll('[data-w
  x.textAlign='center';x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('entekhab.net/lab',540,1300);
  const u=cv.toDataURL('image/png');cv.className='card-out';$('#wrapImg').innerHTML='';$('#wrapImg').append(cv);const r=document.createElement('div');r.className='row';r.style.marginTop='10px';r.innerHTML=`<a class="btn p" download="entekhab-wrapped-${WP}.png" href="${u}">⬇ ${T('dl')}</a><button class="btn" id="wrSh">📤 ${T('share')}</button>`;$('#wrapImg').append(r);
  $('#wrSh').onclick=()=>share(`Crypto Wrapped (${w.from} → ${w.to}) — BTC ${w.btc?w.btc.chg+'%':''}`,'https://entekhab.net/lab/#wrapS')}
+
+/* ================= stage 3: logos + Discovery Engine ================= */
+const I3={
+fa:{dT:'موتور کشف امروز',dL:'هر روز از دادهٔ واقعی ساخته می‌شود: اتفاقات غیرعادی، آب‌وهوای کوین‌ها، مأموریت‌های روزانه، دوئل ارزها و پوستر روز.',unT:'امروز چه چیزی غیرعادی است؟',
+ weT:'آب‌وهوای کریپتو',msT:'مأموریت‌های امروز',baT:'دوئل ارزها',poT:'پوستر روز بازار',hb:'ضربان بازار',bpm:'ضربان',fight:'مبارزه!',win:'برنده',pts:'امتیاز',done:'انجام شد',ok:'درست! +۱۰',bad:'نه؛ جواب درست:',
+ W:{storm:'طوفانی',sun:'آفتابی',fog:'مه‌آلود',hot:'داغ',cold:'سرد',rain:'بارانی'},
+ rows:{chg24:'تغییر ۲۴h',c7:'۷ روز',c30:'۳۰ روز',vol:'نوسان ۳۰ روز',rsi:'RSI',qvol:'حجم ۲۴h',score:'امتیاز Entekhab',dd:'بیشترین افت ۳۰ روز',corr:'همبستگی ۳۰ روز'},
+ un:{scan:'سیگنال قوی اسکنر',spread:'بیشترین اختلاف قیمت صرافی‌ها',vol:'تغییر رژیم نوسان',narr:'روایت با شتاب غیرعادی',lone:'حرکت بزرگ بدون خبر',dvol:'تغییر نوسان ضمنی آپشن',squeeze:'فشردگی شدید نوسان'},
+ q:{topVol:'کدام کوین امروز قوی‌ترین جهش حجم را داشت؟',btcRsi:'RSI بیت‌کوین الان بالای ۵۰ است یا پایین؟',narr:'داغ‌ترین روایت ۲۴ ساعت اخیر کدام است؟',gain:'کدام کوین در ۲۴ ساعت بیشترین رشد را داشت؟',above:'بالای ۵۰',below:'پایین ۵۰'}},
+ckb:{dT:'بزوێنەری دۆزینەوەی ئەمڕۆ',dL:'هەموو ڕۆژێک لە داتای ڕاستەقینە دروست دەبێت: ڕووداوە نائاساییەکان، کەشوهەوای دراوەکان، ئەرکە ڕۆژانەکان، دووەلی دراوەکان و پۆستەری ڕۆژ.',unT:'ئەمڕۆ چی نائاساییە؟',
+ weT:'کەشوهەوای کریپتۆ',msT:'ئەرکەکانی ئەمڕۆ',baT:'دووەلی دراوەکان',poT:'پۆستەری ڕۆژی بازاڕ',hb:'لێدانی دڵی بازاڕ',bpm:'لێدان',fight:'شەڕ!',win:'براوە',pts:'خاڵ',done:'تەواو بوو',ok:'ڕاستە! +١٠',bad:'نا؛ وەڵامی ڕاست:',
+ W:{storm:'زریانی',sun:'خۆرەتاو',fog:'تەماوی',hot:'گەرم',cold:'سارد',rain:'باراناوی'},
+ rows:{chg24:'گۆڕانی ٢٤h',c7:'٧ ڕۆژ',c30:'٣٠ ڕۆژ',vol:'لەرزینی ٣٠ ڕۆژ',rsi:'RSI',qvol:'قەبارەی ٢٤h',score:'خاڵی Entekhab',dd:'زۆرترین دابەزینی ٣٠ ڕۆژ',corr:'پەیوەندیی ٣٠ ڕۆژ'},
+ un:{scan:'ئاماژەی بەهێزی پشکنەر',spread:'زۆرترین جیاوازیی نرخ',vol:'گۆڕانی دۆخی لەرزین',narr:'چیرۆک بە خێرایی نائاسایی',lone:'جوڵەی گەورە بێ هەواڵ',dvol:'گۆڕانی لەرزینی ئۆپشن',squeeze:'پەستانی توندی لەرزین'},
+ q:{topVol:'کام دراو ئەمڕۆ بەهێزترین بازدانی قەبارەی هەبوو؟',btcRsi:'RSIی بیتکۆین ئێستا سەروو ٥٠ە یان خوار؟',narr:'گەرمترین چیرۆکی ٢٤ کاتژمێر کامەیە؟',gain:'کام دراو لە ٢٤ کاتژمێردا زۆرترین گەشەی کرد؟',above:'سەروو ٥٠',below:'خوار ٥٠'}},
+en:{dT:"Today's Discovery Engine",dL:'Rebuilt daily from real data: unusual events, coin weather, daily missions, coin battles and the daily poster.',unT:"What's unusual today?",
+ weT:'Crypto weather',msT:"Today's missions",baT:'Coin Battle',poT:'Daily market poster',hb:'Market heartbeat',bpm:'bpm',fight:'Fight!',win:'Winner',pts:'Points',done:'Done',ok:'Correct! +10',bad:'No — the answer:',
+ W:{storm:'Stormy',sun:'Sunny',fog:'Foggy',hot:'Overheated',cold:'Frozen',rain:'Rainy'},
+ rows:{chg24:'24h change',c7:'7 days',c30:'30 days',vol:'30d volatility',rsi:'RSI',qvol:'24h volume',score:'Entekhab Score',dd:'30d max drawdown',corr:'30d correlation'},
+ un:{scan:'Strong scanner signal',spread:'Widest cross-exchange gap',vol:'Volatility regime shift',narr:'Narrative with unusual momentum',lone:'Big move with no news',dvol:'Options implied-vol change',squeeze:'Hard volatility squeeze'},
+ q:{topVol:'Which coin had the strongest volume spike today?',btcRsi:'Is BTC RSI above or below 50 right now?',narr:'Which narrative is hottest in the last 24h?',gain:'Which coin gained the most in 24h?',above:'Above 50',below:'Below 50'}}};
+for(const l in I3)Object.assign(I[l],I3[l]);
+
+/* ---- logos ---- */
+let LOGO=new Set();
+const logoUrl=c=>LOGO.has(c)?`/data/logos/${c}.png`:null;
+const logoTag=(c,s=22)=>logoUrl(c)?`<img src="${logoUrl(c)}" alt="" width="${s}" height="${s}" style="border-radius:50%;vertical-align:middle;margin-inline-end:6px;background:#fff1">`:`<span style="display:inline-grid;place-items:center;width:${s}px;height:${s}px;border-radius:50%;background:#333;font-size:${s*.4}px;margin-inline-end:6px;vertical-align:middle">${esc(c.slice(0,3))}</span>`;
+function coinTexture(c,col){const cv=document.createElement('canvas');cv.width=cv.height=128;const x=cv.getContext('2d');const ring=()=>{x.lineWidth=10;x.strokeStyle=col;x.beginPath();x.arc(64,64,58,0,7);x.stroke()};
+ x.fillStyle='#15171b';x.beginPath();x.arc(64,64,58,0,7);x.fill();x.fillStyle='#eee';x.font='700 34px "Space Grotesk",Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(c.slice(0,4),64,66);ring();
+ const tex=new THREE.CanvasTexture(cv),u=logoUrl(c);if(u){const im=new Image();im.onload=()=>{x.clearRect(0,0,128,128);x.save();x.beginPath();x.arc(64,64,54,0,7);x.clip();x.fillStyle='#fff';x.fillRect(0,0,128,128);x.drawImage(im,10,10,108,108);x.restore();ring();tex.needsUpdate=true};im.src=u}return tex}
+
+/* ---- heartbeat ---- */
+function heartbeat(){const v=(D.lab||{}).vol?.BTC,b=D.brain?.regime;if(!$('#hbeat')){const d=document.createElement('div');d.id='hbeat';d.className='card';d.style.marginTop='10px';$('#pulse').after(d)}
+ const rv=v?.rv7||40,bpm=Math.round(Math.min(160,Math.max(50,40+rv*1.2))),col=b?.regime==='bull'?'#22c55e':b?.regime==='bear'?'#ef4444':b?.regime==='high_volatility'?'#f59e0b':'#f7931a',dur=(60/bpm*4).toFixed(2);
+ const seg='l20 0 l6 -6 l6 6 l10 0 l5 10 l7 -48 l7 58 l6 -20 l14 0 l8 -8 l8 8 l20 0';
+ $('#hbeat').innerHTML=`<div class="row" style="justify-content:space-between"><b>❤️ ${T('hb')}</b><span class="num" style="color:${col}">${bpm} ${T('bpm')} · RV7 ${rv}%</span></div><svg viewBox="0 0 800 80" style="width:100%;height:70px"><path d="M0 50 ${Array(7).fill(seg).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" stroke-dasharray="1200" stroke-dashoffset="1200"><animate attributeName="stroke-dashoffset" from="1200" to="0" dur="${dur}s" repeatCount="indefinite"/></path></svg><p class="disc">BTC realized vol (7d) → bpm · ${T('reg')[b?.regime]||''}</p>`}
+
+/* ---- unusual today ---- */
+function unusual(){const m=D.market||{},L=D.lab||{},out=[],U=T('un'),cut=Date.now()-864e5,news=D.news?.items||[];
+ (m.opportunities||[]).filter(o=>o.confidence==='high').sort((a,b)=>(b.strength||0)-(a.strength||0)).slice(0,3).forEach(o=>out.push({c:o.coin,k:'scan',w:(o.strength||50)/10,t:`${tName(o.type)} · ${o.tf}`}));
+ const x=(L.xex||[]).slice().sort((a,b)=>b.spread_pct-a.spread_pct)[0];if(x)out.push({c:x.coin,k:'spread',w:x.spread_pct*20,t:`${x.spread_pct}% · ${x.hi} vs ${x.lo}`});
+ Object.entries(L.vol||{}).forEach(([c,v])=>{if(v.shift)out.push({c,k:'vol',w:7,t:`${T('shift')[v.shift]} · RV7 ${v.rv7}% / RV90 ${v.rv90}%`});if(v.bw_rank<=5)out.push({c,k:'squeeze',w:6,t:`BB rank ${v.bw_rank}`})});
+ (D.narr?.narratives||[]).filter(n=>n.momentum>=1.8&&n.mentions_24h>=3).slice(0,2).forEach(n=>out.push({c:n.members[0]?.coin||'',n:n.name[lang]||n.name.en,k:'narr',w:n.momentum*3,t:`×${n.momentum} · ${n.mentions_24h}`}));
+ (m.coins||[]).filter(c=>(c.qvol||0)>=5e6&&Math.abs(c.chg24||0)>=10&&!news.some(n=>n.coins?.includes(c.coin)&&Date.parse(n.date)>=cut)).sort((a,b)=>Math.abs(b.chg24)-Math.abs(a.chg24)).slice(0,3).forEach(c=>out.push({c:c.coin,k:'lone',w:Math.abs(c.chg24)/2,t:`${c.chg24>0?'+':''}${c.chg24}% · 0 news`}));
+ Object.entries(L.options||{}).forEach(([c,o])=>{if(o.dvol&&Math.abs(o.dvol.now-o.dvol.d7_ago)>=5)out.push({c,k:'dvol',w:Math.abs(o.dvol.now-o.dvol.d7_ago),t:`DVOL ${o.dvol.d7_ago} → ${o.dvol.now}`})});
+ const top=out.sort((a,b)=>b.w-a.w).slice(0,10);
+ $('#unusual').innerHTML=`<h3>🔎 ${T('unT')}</h3>`+(top.length?`<ol style="margin:0 20px">${top.map(u=>`<li style="margin:6px 0">${u.c?logoTag(u.c,20):''}<b>${esc(u.n||u.c)}</b> — <span style="color:var(--o)">${U[u.k]}</span> <span class="disc num">${esc(u.t)}</span></li>`).join('')}</ol><p class="disc">Binance · Coinbase · Kraken · OKX · Deribit · RSS — ${new Date().toISOString().slice(0,10)}</p>`:`<p class="disc">${T('noData')}</p>`)}
+
+/* ---- crypto weather ---- */
+function weather(){const m=D.market;if(!m?.coins)return;const W=T('W'),ic={storm:'⛈️',sun:'☀️',fog:'🌫️',hot:'🔥',cold:'🥶',rain:'🌧️'};
+ const cs=m.coins.slice().sort((a,b)=>(b.qvol||0)-(a.qvol||0)).slice(0,16).map(c=>{const s=c.spark||[],r=s.slice(1).map((v,i)=>v/s[i]-1),sd=Math.sqrt(r.reduce((a,b)=>a+b*b,0)/(r.length||1))*100;
+  const w=(c.rsi||50)>=72?'hot':(c.rsi||50)<=28?'cold':sd>1.2&&c.chg24<0?'storm':c.chg24<=-2?'rain':c.chg24>=2?'sun':'fog';return{c,w,sd}});
+ $('#weather').innerHTML=`<h3>🌦 ${T('weT')}</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px">${cs.map(({c,w,sd})=>`<div style="border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center"><div style="font-size:1.8rem">${ic[w]}</div>${logoTag(c.coin,18)}<b>${c.coin}</b><div class="disc" style="margin:0">${W[w]}</div><div style="font-size:.78rem">${sg(c.chg24)} · RSI <span class="num">${c.rsi??'—'}</span></div></div>`).join('')}</div><p class="disc">☀️ chg≥+2% · 🌧 ≤−2% · ⛈ σ1h>1.2% & down · 🔥 RSI≥72 · 🥶 RSI≤28 · 🌫 otherwise</p>`}
+
+/* ---- daily missions ---- */
+function missions(){const m=D.market;if(!m?.coins)return;const Q=T('q'),day=new Date().toISOString().slice(0,10),st=ls.get('ek_miss',{pts:0,done:{}});
+ const seed=[...day].reduce((a,c)=>a+c.charCodeAt(0),0),pick=(arr,n)=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=(seed*(i+7))%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)};
+ const qs=[],ops=(m.opportunities||[]).filter(o=>o.type==='volume_spike').sort((a,b)=>(b.strength||0)-(a.strength||0));
+ if(ops.length>=1){const ans=ops[0].coin,opt=pick([...new Set([ans,...pick(m.coins.map(c=>c.coin).filter(c=>c!==ans),3)])],4);qs.push({id:'v',q:Q.topVol,opt,ans})}
+ const btc=m.coins.find(c=>c.coin==='BTC');if(btc?.rsi!=null)qs.push({id:'r',q:Q.btcRsi,opt:[Q.above,Q.below],ans:btc.rsi>=50?Q.above:Q.below});
+ const nr=(D.narr?.narratives||[]).slice().sort((a,b)=>b.mentions_24h-a.mentions_24h);if(nr.length>=4){const nm=n=>n.name[lang]||n.name.en;qs.push({id:'n',q:Q.narr,opt:pick(nr.slice(0,4).map(nm),4),ans:nm(nr[0])})}
+ const liq=m.coins.filter(c=>(c.qvol||0)>=5e6&&c.chg24!=null).sort((a,b)=>b.chg24-a.chg24);if(liq.length>=4)qs.push({id:'g',q:Q.gain,opt:pick([liq[0].coin,...liq.slice(5,8).map(c=>c.coin)],4),ans:liq[0].coin});
+ $('#missions').innerHTML=`<h3>🗺 ${T('msT')} <span class="chip num">${T('pts')} ${st.pts}</span></h3>`+qs.map(q=>{const k=day+q.id,d=st.done[k];return `<div class="q" data-k="${k}"><p>${esc(q.q)}</p><div class="row">${q.opt.map(o=>`<button class="btn" ${d?'disabled':''} data-a="${esc(o)}" style="${d&&o===q.ans?'background:var(--g);color:#000':''}">${LOGO.has(o)?logoTag(o,16):''}${esc(o)}</button>`).join('')}</div>${d?`<p class="disc">${d==='ok'?T('ok'):T('bad')+' '+esc(q.ans)}</p>`:''}</div>`}).join('');
+ $('#missions').querySelectorAll('.q').forEach(el=>el.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const q=qs.find(q=>day+q.id===el.dataset.k),s=ls.get('ek_miss',{pts:0,done:{}});if(s.done[el.dataset.k])return;const ok=b.dataset.a===q.ans;s.done[el.dataset.k]=ok?'ok':'no';if(ok)s.pts+=10;ls.set('ek_miss',s);missions()}))}
+
+/* ---- coin battle ---- */
+async function battle(){const m=D.market;if(!m?.coins)return;const cs=m.coins.slice().sort((a,b)=>(b.qvol||0)-(a.qvol||0)).map(c=>c.coin);
+ if(!$('#bA')){$('#battle').innerHTML=`<h3>⚔️ ${T('baT')}</h3><div class="row"><select id="bA">${cs.map(c=>`<option ${c==='BTC'?'selected':''}>${c}</option>`).join('')}</select><b>VS</b><select id="bB">${cs.map(c=>`<option ${c==='ETH'?'selected':''}>${c}</option>`).join('')}</select><button class="btn p" id="bGo">${T('fight')}</button></div><div id="bOut" style="margin-top:12px"></div>`;$('#bGo').onclick=battle;return}
+ const A=$('#bA').value,B=$('#bB').value;if(A===B)return;$('#bOut').innerHTML='…';
+ const [ka,kb]=await Promise.all([kl(A+'USDT',null,null,31),kl(B+'USDT',null,null,31)]);
+ const st=(k,c)=>{const cl=k.map(x=>x.c),r=cl.slice(1).map((v,i)=>v/cl[i]-1),sd=Math.sqrt(r.reduce((a,b)=>a+b*b,0)/(r.length||1))*Math.sqrt(365)*100;let pk=cl[0],dd=0;cl.forEach(v=>{pk=Math.max(pk,v);dd=Math.min(dd,(v/pk-1)*100)});const mc=m.coins.find(x=>x.coin===c)||{};
+  return{chg24:mc.chg24,c7:cl.length>8?+((cl.at(-1)/cl.at(-8)-1)*100).toFixed(2):null,c30:cl.length>30?+((cl.at(-1)/cl[0]-1)*100).toFixed(2):null,vol:+sd.toFixed(1),rsi:mc.rsi,qvol:mc.qvol,score:D.score?.coins?.[c]?.score,dd:+dd.toFixed(1),r}};
+ const a=st(ka,A),b=st(kb,B),cr=corr2(a.r,b.r),R=T('rows'),better={chg24:1,c7:1,c30:1,vol:-1,rsi:0,qvol:1,score:1,dd:1};let sa=0,sb=0;
+ const rows=Object.keys(better).map(k=>{const va=a[k],vb=b[k];let w='';if(better[k]&&va!=null&&vb!=null&&va!==vb){w=(va>vb)===(better[k]>0)?'a':'b';w==='a'?sa++:sb++}const f=v=>v==null?'—':k==='qvol'?'$'+fm(v/1e6,1)+'M':['chg24','c7','c30','dd'].includes(k)?(v>0?'+':'')+v+'%':k==='vol'?v+'%':v;
+  return`<tr><td style="${w==='a'?'color:var(--g);font-weight:800':''}" class="num">${f(va)}</td><td style="text-align:center">${R[k]}</td><td style="${w==='b'?'color:var(--g);font-weight:800':''}" class="num">${f(vb)}</td></tr>`}).join('');
+ $('#bOut').innerHTML=`<div class="row" style="justify-content:space-around;font-size:1.3rem">${logoTag(A,40)}<b>${A}</b><span class="big">${sa} : ${sb}</span><b>${B}</b>${logoTag(B,40)}</div><table style="margin-top:8px">${rows}<tr><td></td><td style="text-align:center">${R.corr}: <span class="num">${cr??'—'}</span></td><td></td></tr></table><p style="margin-top:8px">🏆 ${T('win')}: <b>${sa===sb?'=':sa>sb?A:B}</b> · <button class="btn" id="bSh">📤 ${T('share')}</button></p><p class="disc">${T('nfa')} · Binance 30d</p>`;
+ $('#bSh').onclick=()=>share(`Coin Battle: ${A} ${sa} : ${sb} ${B}`,'https://entekhab.net/lab/#discS')}
+function corr2(a,b){const n=Math.min(a.length,b.length);if(n<5)return null;a=a.slice(-n);b=b.slice(-n);const ma=a.reduce((x,y)=>x+y)/n,mb=b.reduce((x,y)=>x+y)/n;let c=0,da=0,db=0;for(let i=0;i<n;i++){c+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2}return da&&db?+(c/Math.sqrt(da*db)).toFixed(2):null}
+
+/* ---- daily poster ---- */
+function poster(){const m=D.market,b=D.brain;if(!m?.coins){$('#poster').innerHTML='';return}const btc=m.coins.find(c=>c.coin==='BTC')||{},eth=m.coins.find(c=>c.coin==='ETH')||{};
+ const cv=document.createElement('canvas');cv.width=1080;cv.height=1920;const x=cv.getContext('2d');bgPaint(x,1080,1920);x.textAlign='center';
+ x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('ENTEKHAB · DAILY MARKET',540,120);x.fillStyle='#999';x.font='500 34px "Space Grotesk"';x.fillText(new Date().toUTCString().slice(0,16),540,175);
+ x.fillStyle='#fff';x.font='800 70px "Space Grotesk"';x.fillText('BTC',540,330);x.font='800 130px "Space Grotesk"';x.fillText('$'+fm(btc.price,0),540,470);x.fillStyle=btc.chg24>=0?'#22c55e':'#ef4444';x.font='800 64px "Space Grotesk"';x.fillText((btc.chg24>=0?'+':'')+btc.chg24+'%  (24h)',540,560);
+ const tiles=[['ETH','$'+fm(eth.price,0),(eth.chg24>=0?'+':'')+eth.chg24+'%'],['FEAR & GREED',String(m.fng?.value??'—'),m.fng?.class||''],['REGIME',(b?.regime?.regime||'—').replace('_',' ').toUpperCase(),''],['BREADTH',(b?.regime?.breadth?.up_pct??'—')+'% UP','']];
+ tiles.forEach((t,i)=>{const cx=i%2?810:270,y=700+Math.floor(i/2)*230;x.fillStyle='rgba(255,255,255,.05)';x.fillRect(cx-240,y-80,480,200);x.fillStyle='#f7931a';x.font='700 30px "Space Grotesk"';x.fillText(t[0],cx,y-25);x.fillStyle='#fff';x.font='800 56px "Space Grotesk"';x.fillText(t[1],cx,y+45);x.fillStyle='#aaa';x.font='500 30px "Space Grotesk"';x.fillText(t[2],cx,y+95)});
+ const g=(b?.gainers||[]).slice(0,4),l=(b?.losers||[]).slice(0,4);x.fillStyle='#f7931a';x.font='700 36px "Space Grotesk"';x.fillText('TOP GAINERS',270,1240);x.fillText('TOP LOSERS',810,1240);
+ g.forEach((r,i)=>{x.fillStyle='#fff';x.font='700 40px "Space Grotesk"';x.textAlign='left';x.fillText(r.coin,80,1310+i*70);x.textAlign='right';x.fillStyle='#22c55e';x.fillText('+'+r.chg24+'%',470,1310+i*70)});
+ l.forEach((r,i)=>{x.fillStyle='#fff';x.font='700 40px "Space Grotesk"';x.textAlign='left';x.fillText(r.coin,620,1310+i*70);x.textAlign='right';x.fillStyle='#ef4444';x.fillText(r.chg24+'%',1010,1310+i*70)});
+ x.textAlign='center';const h=(b?.report?.en?.headline||'').slice(0,90);if(h){x.fillStyle='#ddd';x.font='500 34px "Space Grotesk"';wrap(x,h,540,1660,940,46)}
+ x.fillStyle='#f7931a';x.font='700 50px "Space Grotesk"';x.fillText('entekhab.net',540,1850);
+ const u=cv.toDataURL('image/png');cv.className='card-out';cv.style.maxWidth='320px';$('#poster').innerHTML=`<h3>🖼 ${T('poT')}</h3>`;$('#poster').append(cv);const r=document.createElement('div');r.className='row';r.style.marginTop='8px';r.innerHTML=`<a class="btn p" download="entekhab-daily-${new Date().toISOString().slice(0,10)}.png" href="${u}">⬇ ${T('dl')}</a><span class="disc">1080×1920 · story</span>`;$('#poster').append(r)}
+
+function renderDisc(){heartbeat();unusual();weather();missions();if(!$('#bA'))battle();poster()}
 
 </script>
 </body>
