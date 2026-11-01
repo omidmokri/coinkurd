@@ -15,6 +15,9 @@ def clean(t):
     return re.sub(r"\n{3,}", "\n\n", t).strip()
 posts = json.load(open(POSTS, encoding="utf-8"))
 tr = {}
+import os
+if os.path.exists("data/translations.json"):
+    tr.update(json.load(open("data/translations.json", encoding="utf-8")))
 for f in sorted(glob.glob("tests/out/batch_*.json")):
     tr.update(json.load(open(f, encoding="utf-8")))
 n = 0
