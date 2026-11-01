@@ -5,7 +5,8 @@
 
 موتور ترجمه (به ترتیب اولویت):
   1. Claude (Anthropic)  ← اگر ANTHROPIC_API_KEY تنظیم شده باشد (کیفیت بالا، دقیق)
-  2. Google Translate (رایگان، از طریق deep-translator)  ← پیش‌فرض
+  2. OpenAI              ← اگر OPENAI_API_KEY تنظیم شده باشد
+  3. Google Translate (رایگان، deep-translator) ← پیش‌فرض؛ از IP گیت‌هاب اغلب محدود می‌شود
 
 خروجی در هر پست: p["tr"] = {"ckb": {"title":..., "text":...}, "en": {...}, "engine": "claude"|"google"}
 فقط پست‌هایی ترجمه می‌شوند که هنوز ترجمه ندارند؛ سقف هر اجرا با --limit.
@@ -49,6 +50,21 @@ def claude_translate(text: str, lang: str, api_key: str) -> str:
     return "".join(b.get("text", "") for b in r.json()["content"]).strip()
 
 
+def openai_translate(text: str, lang: str, api_key: str) -> str:
+    import requests
+    prompt = (
+        f"Translate the following Persian (Farsi) crypto-channel post into {LANGS[lang]}. "
+        "Keep the meaning exact, keep numbers, tickers, hashtags, emojis, URLs and line breaks unchanged. "
+        "For Sorani use standard Sorani Kurdish orthography in Arabic script. Return ONLY the translation.\n\n" + text
+    )
+    r = requests.post("https://api.openai.com/v1/chat/completions",
+                      headers={"Authorization": f"Bearer {api_key}", "content-type": "application/json"},
+                      json={"model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"), "temperature": 0.2,
+                            "messages": [{"role": "user", "content": prompt}]}, timeout=60)
+    r.raise_for_status()
+    return r.json()["choices"][0]["message"]["content"].strip()
+
+
 _google = {}
 
 
@@ -69,10 +85,10 @@ def google_translate(text: str, lang: str) -> str:
 
 def translate(text: str, lang: str, api_key: str) -> str:
     if api_key:
-        try:
-            return claude_translate(text, lang, api_key)
-        except Exception as e:  # noqa: BLE001
-            print(f"  claude failed ({e}); falling back to google", file=sys.stderr)
+        return claude_translate(text, lang, api_key)
+    oa = os.environ.get("OPENAI_API_KEY", "").strip()
+    if oa:
+        return openai_translate(text, lang, oa)
     return google_translate(text, lang)
 
 
@@ -86,7 +102,7 @@ def main():
     args = ap.parse_args()
 
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-    engine = "claude" if api_key else "google"
+    engine = "claude" if api_key else ("openai" if os.environ.get("OPENAI_API_KEY", "").strip() else "google")
 
     with open(POSTS_FILE, encoding="utf-8") as f:
         posts = json.load(f)
@@ -110,7 +126,8 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"  {p['id']} FAILED: {e}", file=sys.stderr)
             # اگر گوگل ما را محدود کرد، بقیه را برای اجرای بعدی بگذاریم
-            if "429" in str(e) or "Too Many" in str(e):
+            if "429" in str(e) or "too many" in str(e).lower():
+                print("rate-limited; stopping for this run", file=sys.stderr)
                 break
         if done and done % 10 == 0:
             _save(posts)
