@@ -31,6 +31,35 @@ def has_persian(t: str) -> bool:
 
 # ------------------------------------------------------------------ engines
 
+_claude_model = None
+
+
+def claude_model(api_key: str) -> str:
+    """مدل را از تنظیمات یا از لیست مدل‌های در دسترس حساب انتخاب می‌کند."""
+    global _claude_model
+    if _claude_model:
+        return _claude_model
+    env = os.environ.get("CLAUDE_MODEL", "").strip()
+    if env:
+        _claude_model = env
+        return env
+    import requests
+    try:
+        r = requests.get("https://api.anthropic.com/v1/models?limit=100",
+                         headers={"x-api-key": api_key, "anthropic-version": "2023-06-01"}, timeout=30)
+        r.raise_for_status()
+        ids = [m["id"] for m in r.json().get("data", [])]
+        pick = next((i for i in ids if "sonnet" in i), None) or next((i for i in ids if "haiku" in i), None) or (ids[0] if ids else None)
+        if pick:
+            print(f"claude model: {pick}")
+            _claude_model = pick
+            return pick
+    except Exception as e:  # noqa: BLE001
+        print(f"could not list models: {e}", file=sys.stderr)
+    _claude_model = "claude-sonnet-4-5"
+    return _claude_model
+
+
 def claude_translate(text: str, lang: str, api_key: str) -> str:
     import requests
     prompt = (
@@ -42,11 +71,12 @@ def claude_translate(text: str, lang: str, api_key: str) -> str:
     r = requests.post(
         "https://api.anthropic.com/v1/messages",
         headers={"x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
-        json={"model": os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-5"), "max_tokens": 2000,
+        json={"model": claude_model(api_key), "max_tokens": 2000,
               "messages": [{"role": "user", "content": prompt}]},
         timeout=60,
     )
-    r.raise_for_status()
+    if r.status_code >= 400:
+        raise RuntimeError(f"{r.status_code}: {r.text[:300]}")
     return "".join(b.get("text", "") for b in r.json()["content"]).strip()
 
 
