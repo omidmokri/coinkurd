@@ -35,6 +35,7 @@ impact = load("impact.json", {})
 news = load("news.json", {})
 score = load("score.json", {})
 SC = score.get("coins", {})
+brain = load("brain.json", {})
 CATS = {c["id"]: c for c in meta.get("categories", [])}
 MK = {c["coin"]: c for c in market.get("coins", [])}
 TV = {"BTC": "BITSTAMP:BTCUSD", "ETH": "BITSTAMP:ETHUSD", "TON": "OKX:TONUSDT", "GOLD": "OANDA:XAUUSD"}
@@ -285,6 +286,12 @@ def intel_html():
         av = sum(a) / len(a)
         rws += f'<tr><td><a href="/coins/{c.lower()}/">{c}</a></td><td class="num">{len(a)}</td><td class="num">{av:+.2f}%</td><td class="num">{sum(1 for x in a if x > 0)*100//len(a)}%</td></tr>'
     out["imp"] = '<h3>کارنامهٔ پست‌ها: حرکت قیمت ۲۴ ساعت بعد از انتشار</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>پست</th><th>میانگین ۲۴h</th><th>درصد مثبت</th></tr>{rws}</table>' if rws else '<p class="disc">داده هنوز کافی نیست.</p>') + '<p class="disc">Binance 1h</p>'
+    if brain.get("regime"):
+        RG = {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"}
+        r, b = brain["regime"], brain["regime"]["breadth"]
+        rp = (brain.get("report") or {}).get("fa")
+        out["brain"] = (f'<h3>مغز بازار Entekhab</h3><p><b>رژیم بازار: {RG[r["regime"]]}</b> · پهنای بازار: {b["up_pct"]}% صعودی، {b["down_pct"]}% نزولی، میانگین تغییر ۲۴h {b["avg_chg24"]}% (n={b["n"]})</p>'
+                        + (f'<div><b>{e(rp["headline"])}</b><p style="white-space:pre-wrap">{e(rp["body"])}</p><p class="disc">گزارش هوش مصنوعی ({e(brain.get("report_engine",""))}) — {fmt_date(brain.get("report_at",""))}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.</p></div>' if rp else ""))
     arr = sorted(SC.items(), key=lambda kv: -kv[1]["score"])
     if arr:
         out["score"] = '<h3>امتیاز Entekhab</h3><p class="disc">تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کارنامهٔ کانال ۱۵٪ — توصیف وضعیت، نه پیش‌بینی</p><table class="otab"><tr><th>کوین</th><th>امتیاز</th><th>وضعیت</th></tr>' + "".join(
@@ -317,6 +324,7 @@ def prerender():
         '<div class="ibox" id="fngBox"></div>': f'<div class="ibox" id="fngBox">{it.get("fng","")}</div>',
         '<div class="ibox" id="globBox"></div>': f'<div class="ibox" id="globBox">{it.get("glob","")}</div>',
         '<div class="ibox wide" id="oppBox"></div>': f'<div class="ibox wide" id="oppBox">{it["opp"]}</div>',
+        '<div class="ibox wide" id="brainBox"></div>': f'<div class="ibox wide" id="brainBox">{it.get("brain","")}</div>',
         '<div class="ibox wide" id="scoreBox"></div>': f'<div class="ibox wide" id="scoreBox">{it.get("score","")}</div>',
         '<div class="ibox wide" id="newsBox"></div>': f'<div class="ibox wide" id="newsBox">{it.get("news","")}</div>',
         '<div class="ibox wide" id="impBox"></div>': f'<div class="ibox wide" id="impBox">{it["imp"]}</div>',
@@ -331,7 +339,7 @@ def prerender():
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
-    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("score", "fng", "glob", "opp", "news", "imp"))
+    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
     urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}</style>")]
     # /categories/<id>/
     for c in meta.get("categories", []):
@@ -344,8 +352,37 @@ def prerender():
     return urls
 
 
+def build_api():
+    """API عمومی ثابت: /api/v1/*.json (فقط‌خواندنی، هر ۱۵ دقیقه به‌روز)"""
+    base = os.path.join(ROOT, "api", "v1")
+    os.makedirs(os.path.join(base, "coins"), exist_ok=True)
+    now = datetime.now(timezone.utc).isoformat()
+    def w(rel, obj):
+        json.dump({"generated_at": now, "source": SITE, **obj}, open(os.path.join(base, rel), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    w("market/overview.json".replace("/", "_"), {"regime": brain.get("regime"), "fng": market.get("fng"), "global": market.get("global"),
+                                                 "gainers": brain.get("gainers"), "losers": brain.get("losers")})
+    w("scanner_opportunities.json", {"updated_at": market.get("updated_at"), "scanned": market.get("scanned"), "opportunities": market.get("opportunities", [])})
+    w("news_latest.json", {"updated_at": news.get("updated_at"), "items": news.get("items", [])[:100]})
+    w("score.json", {"updated_at": score.get("updated_at"), "method": score.get("method"), "coins": SC})
+    w("report.json", {"report_at": brain.get("report_at"), "engine": brain.get("report_engine"), "report": brain.get("report")})
+    by = {}
+    for r in impact.values():
+        if r.get("r24h") is not None:
+            by.setdefault(r["coin"], []).append(r["r24h"])
+    w("signals_performance.json", {"by_coin": {c: {"n": len(a), "avg_r24h": round(sum(a) / len(a), 3), "pct_positive": round(sum(1 for x in a if x > 0) * 100 / len(a))} for c, a in by.items()}})
+    w("posts_latest.json", {"posts": [{k: p.get(k) for k in ("id", "date", "title", "category", "coins", "url")} | {"page": f"{SITE}/p/{p['id']}/"} for p in posts[:100]]})
+    for c in MK:
+        w(f"coins/{c.lower()}.json", {"coin": c, "market": MK[c], "score": SC.get(c), "opportunities": [o for o in market.get("opportunities", []) if o["coin"] == c],
+                                     "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})
+    idx = sorted(os.path.relpath(os.path.join(dp, f), base) for dp, _, fs in os.walk(base) for f in fs)
+    json.dump({"endpoints": [f"{SITE}/api/v1/{x}" for x in idx if x != "index.json"], "note": "free, read-only, updated every 15 minutes; attribution to entekhab.net appreciated; not financial advice"},
+              open(os.path.join(base, "index.json"), "w"), indent=1)
+    print(f"api endpoints: {len(idx)}")
+
+
 if __name__ == "__main__":
     main()
+    build_api()
     extra = prerender()
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
