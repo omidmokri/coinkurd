@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entekhab Lab — آزمایشگاه بازار | entekhab.net</title>
+<meta name="description" content="آزمایشگاه تعاملی entekhab.net: جریان پول، چالش پیش‌بینی، ماشین زمان، کارت DNA معامله‌گر، حافظهٔ بازار، شبیه‌سازی مونت‌کارلو، آپشن و فعالیت توسعه‌دهندگان — همه با دادهٔ واقعی">
+<meta property="og:title" content="Entekhab Lab"><meta property="og:description" content="Money flow, prediction arena, time machine, Trader DNA — live crypto lab"><meta property="og:url" content="https://entekhab.net/lab/">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080a;--ink:#f2f2ee;--mute:#8d8f93;--o:#f7931a;--o2:#ffb347;--g:#22c55e;--r:#ef4444;--c:#38bdf8;--line:rgba(255,255,255,.09);--p:#0f1114;--mono:'Space Grotesk','Vazirmatn',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Vazirmatn',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;overflow-x:hidden;
+ background-image:radial-gradient(circle at 15% 0%,rgba(247,147,26,.12),transparent 40%),radial-gradient(circle at 90% 30%,rgba(56,189,248,.06),transparent 40%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:auto,auto,40px 40px,40px 40px}
+a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:0;color:inherit;background:none}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,40px)}
+.num,.mono{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+header{position:sticky;top:0;z-index:50;background:rgba(7,8,10,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.brand{font-family:var(--mono);font-weight:700;display:flex;gap:8px;align-items:center}.brand i{width:10px;height:10px;border-radius:50%;background:var(--o);box-shadow:0 0 12px var(--o)}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}.tabs a{font-size:.85rem;padding:6px 10px;border-radius:8px;color:var(--mute);white-space:nowrap}.tabs a:hover{color:var(--ink);background:#ffffff0d}
+.langs button{font-family:var(--mono);font-size:.8rem;padding:4px 8px;border-radius:6px;color:var(--mute)}.langs button.on{background:var(--o);color:#000}
+.hero{padding:56px 0 24px}.hero h1{font-size:clamp(2.2rem,6vw,4.6rem);font-weight:900;line-height:1.05}.hero h1 em{font-style:normal;color:var(--o);text-shadow:0 0 40px rgba(247,147,26,.4)}
+.hero p{color:var(--mute);max-width:720px;margin-top:10px}
+.pulse{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:22px 0 8px}
+.pulse div{background:var(--p);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.pulse small{color:var(--mute);font-size:.75rem;display:block}.pulse b{font-family:var(--mono);font-size:1.25rem}
+section{padding:34px 0;border-top:1px solid var(--line)}
+section>h2{font-size:clamp(1.4rem,3vw,2rem);font-weight:900;display:flex;align-items:center;gap:10px}section>h2 span{font-family:var(--mono);font-size:.75rem;color:var(--o);border:1px solid var(--o);padding:1px 8px;border-radius:99px}
+.lead{color:var(--mute);margin:4px 0 18px;max-width:820px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+.card h3{font-size:1rem;font-weight:800;margin-bottom:10px}
+.disc{color:var(--mute);font-size:.78rem;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;background:#ffffff10;border:1px solid var(--line);font-weight:700;font-size:.9rem;transition:.15s}.btn:hover{background:#ffffff1c}
+.btn.p{background:var(--o);color:#000;border-color:var(--o)}.btn.g{background:var(--g);color:#000}.btn.r{background:var(--r);color:#fff}
+.pos{color:var(--g)}.neg{color:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:.86rem}td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:start}th{color:var(--mute);font-weight:600;font-size:.75rem}
+select,input{background:#000;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:.9rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#flow{width:100%;height:440px;display:block;cursor:pointer}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;background:#ffffff10;font-size:.78rem;margin:2px}
+.big{font-family:var(--mono);font-size:2rem;font-weight:700}
+.q{margin:12px 0}.q p{font-weight:700;margin-bottom:6px}.q label{display:block;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin:4px 0;cursor:pointer;font-size:.9rem}.q input{margin-inline-end:8px}.q label:has(input:checked){border-color:var(--o);background:rgba(247,147,26,.08)}
+canvas.card-out{max-width:100%;border-radius:14px;display:block;margin-top:12px}
+svg text{font-family:var(--mono)}
+.bar{height:6px;background:#ffffff12;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--o)}
+footer{padding:40px 0;color:var(--mute);font-size:.8rem;text-align:center;border-top:1px solid var(--line)}
+.honest{border:1px dashed rgba(247,147,26,.5);border-radius:14px;padding:16px;font-size:.88rem;color:#d6d6d0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1 id="hT"></h1><p id="hL"></p>
+    <div class="pulse" id="pulse"></div>
+    <p class="disc" id="pulseNote"></p>
+  </div>
+
+  <section id="flowS"><h2><b data-t="flowT"></b><span>LIVE</span></h2><p class="lead" data-t="flowL"></p>
+    <div class="card"><svg id="flow" viewBox="0 0 1000 440"></svg><div id="flowInfo" class="disc"></div></div></section>
+
+  <section id="arenaS"><h2><b data-t="arenaT"></b><span>DAILY</span></h2><p class="lead" data-t="arenaL"></p>
+    <div class="grid"><div class="card" id="arena"></div><div class="card" id="guess"></div></div></section>
+
+  <section id="tmS"><h2><b data-t="tmT"></b></h2><p class="lead" data-t="tmL"></p>
+    <div class="card"><div class="row">
+      <select id="tmCoin"></select>
+      <label class="disc" data-t="tmFrom"></label><input type="date" id="tmA" min="2017-09-01">
+      <label class="disc" data-t="tmTo"></label><input type="date" id="tmB" min="2017-09-01">
+      <input type="number" id="tmAmt" value="1000" min="1" style="width:110px"> <span class="mono">USDT</span>
+      <input type="number" id="tmStop" placeholder="SL %" style="width:90px">
+      <button class="btn p" id="tmGo" data-t="tmGo"></button></div>
+      <div id="tmOut" style="margin-top:14px"></div></div></section>
+
+  <section id="dnaS"><h2><b data-t="dnaT"></b><span>SHARE</span></h2><p class="lead" data-t="dnaL"></p>
+    <div class="grid"><div class="card" id="dnaQ"></div><div class="card" id="dnaOut"><p class="disc" data-t="dnaWait"></p></div></div></section>
+
+  <section id="councilS"><h2><b data-t="cT"></b><span>AI</span></h2><p class="lead" data-t="cL"></p><div class="card" id="council"></div></section>
+
+  <section id="memS"><h2><b data-t="memT"></b></h2><p class="lead" data-t="memL"></p>
+    <div class="grid"><div class="card" id="mem"></div><div class="card" id="mc"></div></div></section>
+
+  <section id="derS"><h2><b data-t="derT"></b></h2><p class="lead" data-t="derL"></p>
+    <div class="grid"><div class="card" id="vol"></div><div class="card" id="opt"></div><div class="card" id="xex"></div><div class="card" id="macro"></div></div></section>
+
+  <section id="devS"><h2><b data-t="devT"></b></h2><p class="lead" data-t="devL"></p><div class="card" id="dev"></div></section>
+
+  <section><div class="honest" id="honest"></div></section>
+</div>
+<footer>entekhab.net · Binance · Deribit · Coinbase · Kraken · OKX · GitHub · CoinGecko — <span data-t="nfa"></span></footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const I={
+fa:{cT:'میزگرد هوش مصنوعی',cL:'پنج تحلیلگر هوش مصنوعی — تکنیکال، مشتقه، احساسات، کلان و تاریخ — هر کدام فقط با دادهٔ خودشان نظر می‌دهند؛ شواهد و اختلاف‌ها نمایش داده می‌شود. روزی یک بار.',ag:{technical:'Technical',derivatives:'Derivatives',sentiment:'Sentiment',macro:'Macro',history:'History'},hT:'آزمایشگاه <em>Entekhab</em>',hL:'بازار را فقط نخوان؛ با آن کار کن. جریان پول را ببین، پیش‌بینی کن، به گذشته سفر کن و کارت معامله‌گری‌ات را بساز. همهٔ اعداد از دادهٔ واقعی می‌آیند.',
+ tabs:['جریان پول','نبرد پیش‌بینی','ماشین زمان','DNA معامله‌گر','حافظهٔ بازار','مشتقه و نوسان','توسعه‌دهندگان','خانه'],
+ flowT:'جهان جریان پول',flowL:'هر حباب یک روایت بازار است؛ اندازه = تعداد اشاره در خبرهای ۲۴ ساعت، رنگ = بازده ۲۴ ساعتهٔ کوین‌های آن روایت. روی حباب کلیک کن.',
+ arenaT:'نبرد پیش‌بینی',arenaL:'هر روز یک پیش‌بینی: BTC تا ۲۴ ساعت دیگر بالاتر است یا پایین‌تر؟ قیمت لحظهٔ ثبت از Binance ذخیره می‌شود و فردا خودکار داوری می‌شود. بدون پول و بدون شرط.',
+ tmT:'ماشین زمان — اگر آن روز…',tmL:'تاریخ ورود و خروج را انتخاب کن (از ۲۰۱۷)؛ نتیجهٔ واقعی با قیمت‌های روزانهٔ Binance، بیشترین افت در مسیر و اثر حد ضرر حساب می‌شود.',
+ tmFrom:'ورود',tmTo:'خروج',tmGo:'محاسبه',
+ dnaT:'کارت DNA معامله‌گر',dnaL:'به ۶ سؤال جواب بده و کارت اختصاصی‌ات را بگیر؛ دانلود کن و در تلگرام و اینستاگرام بفرست.',dnaWait:'بعد از پاسخ به سؤال‌ها، کارت اینجا ساخته می‌شود.',
+ memT:'حافظهٔ بازار و آینده‌های موازی',memL:'روزهایی از تاریخ BTC که شبیه امروز بودند (بازده ۷ و ۳۰ روزه، نوسان، فاصله از MA200، RSI) و اینکه بعدشان چه شد؛ در کنار ۳۰۰۰ مسیر شبیه‌سازی‌شده از بازده‌های واقعی یک سال اخیر. این‌ها پیش‌بینی نیستند؛ توزیع احتمال‌اند.',
+ derT:'نوسان، آپشن و صرافی‌ها',derL:'فشردگی نوسان، Put/Call و Max Pain از Deribit، اختلاف قیمت بین صرافی‌ها و همبستگی با طلا و یورو/دلار.',
+ devT:'فعالیت توسعه‌دهندگان',devL:'کامیت‌های ۷ و ۳۰ روز اخیر مخزن اصلی هر پروژه در GitHub و آخرین نسخهٔ منتشرشده.',
+ nfa:'آموزشی است، توصیهٔ مالی نیست',noData:'دادهٔ این بخش هنوز در اولین اجرای خودکار ساخته نشده.',
+ up:'بالاتر ⬆',dn:'پایین‌تر ⬇',yourCall:'پیش‌بینی امروز تو',locked:'ثبت شد در قیمت',resolveAt:'داوری',score:'امتیاز',streak:'رکورد پیاپی',hits:'درست',total:'کل',history:'تاریخچه',share:'اشتراک‌گذاری',
+ guessT:'حرکت بعدی را حدس بزن',guessL:'یک بازهٔ ۶۰ روزهٔ واقعی از تاریخ BTC؛ ۱۴ روز بعدش مخفی است.',reveal:'نتیجه',next:'نمودار بعدی',right:'درست گفتی!',wrong:'این بار نه',was:'تاریخ واقعی',
+ price:'قیمت',chg:'تغییر',result:'نتیجه',maxdd:'بیشترین افت در مسیر',stopHit:'حد ضرر فعال شد در',hold:'نگه‌داری',
+ analogs:'روزهای مشابه',after7:'۷ روز بعد',after30:'۳۰ روز بعد',dd30:'بیشترین افت',upOf:'صعودی از',avg:'میانگین',today:'امروز',
+ cone:'مخروط احتمال ۳۰ روزه',pUp:'احتمال بالاتر بودن',p10:'+۱۰٪ یا بیشتر',m10:'−۱۰٪ یا بیشتر',
+ volT:'فشردگی نوسان',state:{squeeze:'فشردگی شدید',tight:'فشرده',normal:'عادی',expanded:'باز'},shift:{vol_spike:'⚠ جهش نوسان',vol_drought:'⚠ خشکسالی نوسان'},
+ optT:'آپشن (Deribit)',pc:'Put/Call (OI)',iv:'IV میانگین',mp:'Max Pain',exp:'سررسید',xexT:'اختلاف قیمت صرافی‌ها',spread:'اختلاف',
+ macroT:'کلان: همبستگی با BTC',gold:'طلا (PAXG)',eur:'یورو/دلار',c30:'همبستگی ۳۰ روز',c90:'۹۰ روز',
+ commits:'کامیت',rel:'آخرین نسخه',updated:'به‌روزرسانی',
+ pulse:['BTC','رژیم بازار','ترس و طمع','پهنای بازار','بیشترین رشد','ریسک نوسان'],reg:{bull:'صعودی',bear:'نزولی',sideways:'خنثی',high_volatility:'پرنوسان'},
+ dnaQs:[['وقتی بازار ۱۰٪ می‌ریزد…',['می‌خرم','صبر می‌کنم','می‌فروشم','تحلیل می‌کنم بعد تصمیم']],['بازهٔ زمانی معاملاتت؟',['دقیقه‌ای','روزانه','هفته‌ای','ماه‌ها و سال‌ها']],['حد ضرر؟',['همیشه','گاهی','ذهنی','ندارم']],['مهم‌ترین ابزار تو؟',['خط روند و پرایس‌اکشن','اندیکاتور','خبر و فاندامنتال','حس بازار']],['ریسک در هر معامله؟',['کمتر از ۱٪','۱ تا ۳٪','۳ تا ۱۰٪','بیشتر']],['بعد از سود بزرگ…',['سود را برمی‌دارم','پله‌ای خارج می‌شوم','حجم را بیشتر می‌کنم','نگه می‌دارم']]],
+ dnaTypes:{sniper:['تک‌تیرانداز روند','صبور، دقیق، با حد ضرر؛ منتظر شکست تمیز می‌ماند.'],surfer:['موج‌سوار','با روند می‌رود و سود را پله‌ای برمی‌دارد.'],hunter:['شکارچی نوسان','سریع، پرتحرک و عاشق نوسان کوتاه‌مدت.'],oak:['بلوط','بلندمدت، آرام و بی‌اعتنا به نویز روزانه.'],gambler:['ریسک‌باز','جسور با ریسک بالا — مدیریت سرمایه را جدی‌تر بگیر!'],analyst:['تحلیلگر','اول داده، بعد تصمیم؛ منطقی و منظم.']},
+ dnaMake:'ساخت کارت',dl:'دانلود تصویر',
+ honest:'<b>شفافیت:</b> جدول رتبه‌بندی بین کاربران، حساب کاربری و هشدار شخصی نیاز به سرور و پایگاه‌داده دارند؛ فعلاً امتیازها روی مرورگر خودت ذخیره می‌شود. داده‌های آنچین (نهنگ‌ها، MVRV/SOPR، جریان صرافی‌ها) و آزادسازی توکن منبع رایگان قابل‌اتکا ندارند و به‌جای حدس، نمایش داده نمی‌شوند.'},
+ckb:{cT:'مێزگردی زیرەکیی دەستکرد',cL:'پێنج شیکەرەوەی زیرەکیی دەستکرد — تەکنیکی، مەشتەقە، هەست، ماکرۆ و مێژوو — هەر یەک تەنها بە داتای خۆی ڕا دەدات؛ بەڵگە و جیاوازییەکان نیشان دەدرێن. ڕۆژی جارێک.',ag:{technical:'Technical',derivatives:'Derivatives',sentiment:'Sentiment',macro:'Macro',history:'History'},hT:'تاقیگەی <em>Entekhab</em>',hL:'بازاڕ تەنها مەخوێنەوە؛ کاری لەگەڵ بکە. ڕەوتی پارە ببینە، پێشبینی بکە، گەشت بۆ ڕابردوو بکە و کارتی بازرگانییەکەت دروست بکە. هەموو ژمارەکان لە داتای ڕاستەقینەوە دێن.',
+ tabs:['ڕەوتی پارە','شەڕی پێشبینی','ماشێنی کات','DNAی بازرگان','بیرەوەریی بازاڕ','مەشتەقە و لەرزین','گەشەپێدەران','ماڵەوە'],
+ flowT:'جیهانی ڕەوتی پارە',flowL:'هەر بڵقێک چیرۆکێکی بازاڕە؛ قەبارە = ژمارەی ئاماژە لە هەواڵەکانی ٢٤ کاتژمێر، ڕەنگ = قازانجی ٢٤ کاتژمێری دراوەکانی. کلیک لە بڵق بکە.',
+ arenaT:'شەڕی پێشبینی',arenaL:'هەموو ڕۆژێک یەک پێشبینی: BTC دوای ٢٤ کاتژمێر بەرزترە یان نزمتر؟ نرخی کاتی تۆمارکردن لە Binance هەڵدەگیرێت و سبەی خۆکار دادوەری دەکرێت. بێ پارە و بێ گرەو.',
+ tmT:'ماشێنی کات — ئەگەر ئەو ڕۆژە…',tmL:'ڕێکەوتی چوونەژوورەوە و دەرچوون هەڵبژێرە (لە ٢٠١٧ەوە)؛ ئەنجامی ڕاستەقینە بە نرخی ڕۆژانەی Binance، زۆرترین دابەزین و کاریگەریی وەستاندنی زیان.',
+ tmFrom:'چوونەژوورەوە',tmTo:'دەرچوون',tmGo:'هەژمارکردن',
+ dnaT:'کارتی DNAی بازرگان',dnaL:'وەڵامی ٦ پرسیار بدەوە و کارتی تایبەتی خۆت وەربگرە؛ دایبگرە و لە تێلێگرام و ئینستاگرام بڵاوی بکەوە.',dnaWait:'دوای وەڵامدانەوە، کارتەکە لێرە دروست دەبێت.',
+ memT:'بیرەوەریی بازاڕ و داهاتووە هاوتەریبەکان',memL:'ئەو ڕۆژانەی مێژووی BTC کە لە ئەمڕۆ دەچن و دواتر چی ڕوویدا؛ لەگەڵ ٣٠٠٠ ڕێڕەوی لاساییکراوە لە قازانجی ڕاستەقینەی ساڵی ڕابردوو. ئەمانە پێشبینی نین؛ دابەشبوونی ئەگەرن.',
+ derT:'لەرزین، ئۆپشن و ئاڵوگۆڕگەکان',derL:'پەستانی لەرزین، Put/Call و Max Pain لە Deribit، جیاوازیی نرخ لە نێوان ئاڵوگۆڕگەکان و پەیوەندی لەگەڵ زێڕ و یۆرۆ/دۆلار.',
+ devT:'چالاکیی گەشەپێدەران',devL:'کۆمیتەکانی ٧ و ٣٠ ڕۆژی ڕابردووی کۆگای سەرەکیی هەر پرۆژەیەک لە GitHub و دوایین وەشان.',
+ nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',noData:'داتای ئەم بەشە هێشتا لە یەکەم جێبەجێکردنی خۆکاردا دروست نەکراوە.',
+ up:'بەرزتر ⬆',dn:'نزمتر ⬇',yourCall:'پێشبینیی ئەمڕۆت',locked:'تۆمارکرا لە نرخی',resolveAt:'دادوەری',score:'خاڵ',streak:'زنجیرە',hits:'ڕاست',total:'کۆ',history:'مێژوو',share:'هاوبەشکردن',
+ guessT:'جوڵەی داهاتوو مەزەندە بکە',guessL:'ماوەیەکی ٦٠ ڕۆژەی ڕاستەقینە لە مێژووی BTC؛ ١٤ ڕۆژی دواتر شاراوەیە.',reveal:'ئەنجام',next:'نەخشەی دواتر',right:'ڕاستت گوت!',wrong:'ئەم جارە نا',was:'ڕێکەوتی ڕاستەقینە',
+ price:'نرخ',chg:'گۆڕان',result:'ئەنجام',maxdd:'زۆرترین دابەزین',stopHit:'وەستاندنی زیان چالاک بوو لە',hold:'هێشتنەوە',
+ analogs:'ڕۆژە هاوشێوەکان',after7:'٧ ڕۆژ دواتر',after30:'٣٠ ڕۆژ دواتر',dd30:'زۆرترین دابەزین',upOf:'بەرزبوونەوە لە',avg:'تێکڕا',today:'ئەمڕۆ',
+ cone:'قووچەکی ئەگەری ٣٠ ڕۆژە',pUp:'ئەگەری بەرزتربوون',p10:'+١٠٪ یان زیاتر',m10:'−١٠٪ یان زیاتر',
+ volT:'پەستانی لەرزین',state:{squeeze:'پەستانی توند',tight:'پەستاو',normal:'ئاسایی',expanded:'کراوە'},shift:{vol_spike:'⚠ بازدانی لەرزین',vol_drought:'⚠ وشکەساڵیی لەرزین'},
+ optT:'ئۆپشن (Deribit)',pc:'Put/Call (OI)',iv:'تێکڕای IV',mp:'Max Pain',exp:'بەسەرچوون',xexT:'جیاوازیی نرخی ئاڵوگۆڕگەکان',spread:'جیاوازی',
+ macroT:'ماکرۆ: پەیوەندی لەگەڵ BTC',gold:'زێڕ (PAXG)',eur:'یۆرۆ/دۆلار',c30:'پەیوەندیی ٣٠ ڕۆژ',c90:'٩٠ ڕۆژ',
+ commits:'کۆمیت',rel:'دوایین وەشان',updated:'نوێکردنەوە',
+ pulse:['BTC','دۆخی بازاڕ','ترس و تەماح','پانیی بازاڕ','زۆرترین گەشە','مەترسیی لەرزین'],reg:{bull:'بەرزبوونەوە',bear:'دابەزین',sideways:'بێلایەن',high_volatility:'پڕلەرزین'},
+ dnaQs:[['کاتێک بازاڕ ١٠٪ دادەبەزێت…',['دەکڕم','چاوەڕێ دەکەم','دەفرۆشم','شیکاری دەکەم پاشان بڕیار']],['ماوەی بازرگانیت؟',['خولەکی','ڕۆژانە','هەفتانە','مانگ و ساڵ']],['وەستاندنی زیان؟',['هەمیشە','هەندێک جار','لە مێشکدا','نییە']],['گرنگترین ئامرازت؟',['هێڵی ڕەوت و پرایس ئاکشن','ئیندیکاتۆر','هەواڵ و بنەڕەت','هەستی بازاڕ']],['مەترسی لە هەر مامەڵەیەک؟',['کەمتر لە ١٪','١ بۆ ٣٪','٣ بۆ ١٠٪','زیاتر']],['دوای قازانجێکی گەورە…',['قازانج هەڵدەگرم','پلە بە پلە دەردەچم','قەبارە زیاد دەکەم','دەیهێڵمەوە']]],
+ dnaTypes:{sniper:['تەقەکەری ڕەوت','ئارام، ورد، بە وەستاندنی زیان؛ چاوەڕێی شکاندنێکی پاک دەکات.'],surfer:['شەپۆلسوار','لەگەڵ ڕەوت دەڕوات و قازانج پلە بە پلە هەڵدەگرێت.'],hunter:['ڕاوچیی لەرزین','خێرا، چالاک و ئەوینداری لەرزینی کورتخایەن.'],oak:['بەڕوو','درێژخایەن، ئارام و بێخەم لە ژاوەژاوی ڕۆژانە.'],gambler:['مەترسیخواز','ئازا بە مەترسیی زۆر — بەڕێوەبردنی سەرمایە جددیتر بگرە!'],analyst:['شیکەرەوە','سەرەتا داتا، پاشان بڕیار؛ لۆژیکی و ڕێکخراو.']},
+ dnaMake:'دروستکردنی کارت',dl:'داگرتنی وێنە',
+ honest:'<b>ڕوونی:</b> خشتەی پلەبەندی لە نێوان بەکارهێنەران، هەژماری بەکارهێنەر و ئاگادارکردنەوەی تایبەت پێویستیان بە سێرڤەر و بنکەدراوە هەیە؛ ئێستا خاڵەکان لە وێبگەڕەکەی خۆتدا هەڵدەگیرێن. داتای ئانچەین و کردنەوەی تۆکن سەرچاوەی بەخۆڕایی و متمانەپێکراویان نییە، بۆیە لە جیاتی مەزەندە نیشان نادرێن.'},
+en:{cT:'AI Council',cL:'Five AI analysts — technical, derivatives, sentiment, macro and history — each argues only from its own data slice; evidence and disagreements are shown. Once a day.',ag:{technical:'Technical',derivatives:'Derivatives',sentiment:'Sentiment',macro:'Macro',history:'History'},hT:'Entekhab <em>Lab</em>',hL:"Don't just read the market — work with it. See where money flows, make calls, travel back in time and build your trader card. Every number comes from real data.",
+ tabs:['Money flow','Prediction arena','Time machine','Trader DNA','Market memory','Derivatives & vol','Developers','Home'],
+ flowT:'Money Flow Universe',flowL:'Each bubble is a market narrative; size = mentions in the last 24h of news, colour = 24h return of its coins. Click a bubble.',
+ arenaT:'Prediction Arena',arenaL:'One call a day: will BTC be higher or lower in 24 hours? The Binance price at the moment of your call is saved and judged automatically tomorrow. No money, no betting.',
+ tmT:'Time Machine — what if…',tmL:'Pick entry and exit dates (since 2017): real result from Binance daily prices, worst drawdown on the way and the effect of a stop-loss.',
+ tmFrom:'Entry',tmTo:'Exit',tmGo:'Calculate',
+ dnaT:'Trader DNA card',dnaL:'Answer 6 questions and get your personal card — download it and share it on Telegram and Instagram.',dnaWait:'Your card will appear here after you answer.',
+ memT:'Market memory & parallel futures',memL:'Days in BTC history that looked like today (7/30-day return, volatility, distance from MA200, RSI) and what happened next — next to 3,000 paths simulated from the last year of real returns. These are distributions, not predictions.',
+ derT:'Volatility, options & exchanges',derL:'Volatility compression, Deribit put/call and max pain, cross-exchange price gaps and correlation with gold and EUR/USD.',
+ devT:'Developer activity',devL:'Commits in the last 7 and 30 days to each project’s main GitHub repository, plus the latest release.',
+ nfa:'Educational, not financial advice',noData:'This section is built on the first automatic run.',
+ up:'Higher ⬆',dn:'Lower ⬇',yourCall:'Your call today',locked:'Locked at',resolveAt:'Judged',score:'Score',streak:'Streak',hits:'Hits',total:'Total',history:'History',share:'Share',
+ guessT:'Guess the next move',guessL:'A real 60-day window of BTC history; the next 14 days are hidden.',reveal:'Result',next:'Next chart',right:'You got it!',wrong:'Not this time',was:'Real dates',
+ price:'Price',chg:'Change',result:'Result',maxdd:'Max drawdown on the way',stopHit:'Stop-loss hit on',hold:'Hold',
+ analogs:'Similar days',after7:'+7 days',after30:'+30 days',dd30:'Max drop',upOf:'up of',avg:'Avg',today:'Today',
+ cone:'30-day probability cone',pUp:'P(higher)',p10:'+10% or more',m10:'−10% or more',
+ volT:'Volatility compression',state:{squeeze:'Hard squeeze',tight:'Tight',normal:'Normal',expanded:'Expanded'},shift:{vol_spike:'⚠ Vol spike',vol_drought:'⚠ Vol drought'},
+ optT:'Options (Deribit)',pc:'Put/Call (OI)',iv:'Avg IV',mp:'Max Pain',exp:'Expiry',xexT:'Cross-exchange gap',spread:'Gap',
+ macroT:'Macro: correlation with BTC',gold:'Gold (PAXG)',eur:'EUR/USD',c30:'30d corr',c90:'90d',
+ commits:'commits',rel:'Latest release',updated:'Updated',
+ pulse:['BTC','Regime','Fear & Greed','Breadth','Top gainer','Vol risk'],reg:{bull:'Bull',bear:'Bear',sideways:'Sideways',high_volatility:'High volatility'},
+ dnaQs:[['When the market drops 10%…',['I buy','I wait','I sell','I analyse, then decide']],['Your timeframe?',['Minutes','Daily','Weekly','Months & years']],['Stop-loss?',['Always','Sometimes','Mental','Never']],['Main tool?',['Trendlines & price action','Indicators','News & fundamentals','Gut feeling']],['Risk per trade?',['< 1%','1–3%','3–10%','More']],['After a big win…',['Take profit','Scale out','Size up','Hold']]],
+ dnaTypes:{sniper:['Trend Sniper','Patient, precise, always with a stop; waits for the clean break.'],surfer:['Wave Surfer','Rides the trend and scales out of profits.'],hunter:['Volatility Hunter','Fast, active, loves short-term swings.'],oak:['The Oak','Long-term, calm, ignores daily noise.'],gambler:['Risk Taker','Bold with high risk — take money management seriously!'],analyst:['The Analyst','Data first, decision second; logical and disciplined.']},
+ dnaMake:'Make my card',dl:'Download image',
+ honest:'<b>Transparency:</b> a shared leaderboard, user accounts and personal alerts need a server and database; for now scores live in your own browser. On-chain data (whales, MVRV/SOPR, exchange flows) and token unlocks have no reliable free source, so they are not shown rather than guessed.'}};
+let lang=(()=>{try{return localStorage.getItem('ck_lang')}catch(e){return null}})()||'fa';
+const T=k=>(I[lang]||I.en)[k]??I.en[k];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fm=(n,d=2)=>n==null?'—':Number(n).toLocaleString('en-US',{maximumFractionDigits:d});
+const sg=n=>n==null?'—':`<span class="num ${n>=0?'pos':'neg'}">${n>=0?'+':''}${fm(n)}%</span>`;
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const BN='https://data-api.binance.vision/api/v3';
+const D={};
+async function j(u){try{const r=await fetch(u);return r.ok?r.json():null}catch(e){return null}}
+async function kl(sym,start,end,limit=1000){let u=`${BN}/klines?symbol=${sym}&interval=1d&limit=${limit}`;if(start)u+=`&startTime=${start}`;if(end)u+=`&endTime=${end}`;const k=await j(u);return (k||[]).map(x=>({t:x[0],o:+x[1],h:+x[2],l:+x[3],c:+x[4]}))}
+async function px(sym='BTCUSDT'){const r=await j(`${BN}/ticker/price?symbol=${sym}`);return r?+r.price:null}
+
+function applyLang(){const rtl=lang!=='en';document.documentElement.lang=lang;document.documentElement.dir=rtl?'rtl':'ltr';
+ $('#hT').innerHTML=T('hT');$('#hL').textContent=T('hL');$('#honest').innerHTML=T('honest');
+ document.querySelectorAll('[data-t]').forEach(e=>e.textContent=T(e.dataset.t));
+ const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
+ document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));renderAll()}
+$('#langs').onclick=e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang()};
+
+/* ---------- 60s pulse ---------- */
+function renderPulse(){const m=D.market,b=D.brain,v=(D.lab||{}).vol||{};if(!m){$('#pulse').innerHTML='';return}
+ const btc=(m.coins||[]).find(c=>c.coin==='BTC')||{},r=(b||{}).regime||{},br=r.breadth||{},g=(b?.gainers||[])[0],P=T('pulse');
+ const sq=Object.entries(v).filter(([,x])=>x.state==='squeeze'||x.shift).map(([k])=>k);
+ $('#pulse').innerHTML=[[P[0],`$${fm(btc.price,0)}`,sg(btc.chg24)],[P[1],(T('reg')[r.regime]||'—'),''],[P[2],m.fng?.value??'—',esc(m.fng?.class||'')],[P[3],br.up_pct!=null?`${br.up_pct}% ⬆`:'—',br.down_pct!=null?`${br.down_pct}% ⬇`:''],[P[4],g?g.coin:'—',g?sg(g.chg24):''],[P[5],sq.length?sq.slice(0,4).join(' '):'—','']].map(([a,b,c])=>`<div><small>${a}</small><b>${b}</b> <span style="font-size:.8rem">${c}</span></div>`).join('');
+ const rep=b?.report?.[lang]||b?.report?.en;$('#pulseNote').innerHTML=rep?`<b>${esc(rep.headline)}</b>`:''}
+
+/* ---------- Money flow ---------- */
+function renderFlow(){const s=$('#flow'),nr=D.narr;if(!nr?.narratives?.length){s.innerHTML=`<text x="500" y="220" fill="#888" text-anchor="middle">${T('noData')}</text>`;return}
+ const ns=nr.narratives.slice(0,12),mx=Math.max(1,...ns.map(n=>n.mentions_24h)),W=1000,H=440;
+ const nodes=ns.map((n,i)=>({n,r:28+Math.sqrt(n.mentions_24h/mx)*70,x:W/2+Math.cos(i*2.4)*260*(i%3+1)/3,y:H/2+Math.sin(i*2.4)*150*(i%3+1)/3}));
+ for(let it=0;it<300;it++){for(const a of nodes){a.x+=(W/2-a.x)*.01;a.y+=(H/2-a.y)*.012;for(const b of nodes){if(a===b)continue;const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy)||1,m=a.r+b.r+6;if(d<m){const k=(m-d)/d*.5;a.x+=dx*k;a.y+=dy*k}}a.x=Math.max(a.r,Math.min(W-a.r,a.x));a.y=Math.max(a.r,Math.min(H-a.r,a.y))}}
+ const col=p=>p==null?'#3a3d42':p>=0?`rgba(34,197,94,${.25+Math.min(.65,p/8)})`:`rgba(239,68,68,${.25+Math.min(.65,-p/8)})`;
+ s.innerHTML=`<defs><filter id="gl"><feGaussianBlur stdDeviation="6"/></filter></defs>`+nodes.map((o,i)=>`<g data-i="${i}" style="cursor:pointer"><circle cx="${o.x}" cy="${o.y}" r="${o.r}" fill="${col(o.n.perf_24h)}" stroke="${o.n.momentum>1.3?'#f7931a':'rgba(255,255,255,.2)'}" stroke-width="${o.n.momentum>1.3?3:1}"><animate attributeName="r" values="${o.r};${o.r*1.04};${o.r}" dur="${3+i%4}s" repeatCount="indefinite"/></circle><text x="${o.x}" y="${o.y-4}" fill="#fff" text-anchor="middle" font-size="${Math.max(11,o.r/4)}" font-family="Vazirmatn">${esc(o.n.name[lang]||o.n.name.en)}</text><text x="${o.x}" y="${o.y+16}" fill="#ddd" text-anchor="middle" font-size="12">${o.n.perf_24h==null?'':(o.n.perf_24h>=0?'+':'')+o.n.perf_24h+'%'} · ${o.n.mentions_24h}</text></g>`).join('');
+ s.onclick=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const n=nodes[+g.dataset.i].n;$('#flowInfo').innerHTML=`<b style="color:#fff">${esc(n.name[lang]||n.name.en)}</b> — ×${n.momentum} · ${n.members.map(m=>`<span class="chip">${m.coin} ${m.chg24!=null?sg(m.chg24):''}</span>`).join('')}<br>${(n.headlines||[]).slice(0,3).map(h=>`<a href="${esc(h.url)}" target="_blank" rel="noopener nofollow" dir="ltr">• ${esc(h.title)}</a>`).join('<br>')}`}}
+
+/* ---------- Prediction arena ---------- */
+async function renderArena(){const el=$('#arena');let st=ls.get('ek_arena',{calls:[]});const now=Date.now(),p=await px();
+ let changed=false;
+ for(const c of st.calls){if(c.res==null&&now>=c.at+864e5){const k=await kl('BTCUSDT',c.at+864e5-6e4,c.at+864e5+36e5,1);const end=k[0]?.o||(now-c.at<9e7?p:null);if(end){c.end=end;c.res=(c.dir==='up')===(end>c.p)?1:0;changed=true}}}
+ if(changed)ls.set('ek_arena',st);
+ const done=st.calls.filter(c=>c.res!=null),hits=done.filter(c=>c.res).length;let streak=0;for(const c of [...done].reverse()){if(c.res)streak++;else break}
+ const today=st.calls.find(c=>now-c.at<864e5);
+ el.innerHTML=`<h3>${T('arenaT')} · BTC</h3><div class="big">$${fm(p,0)}</div>`+(today?`<p>${T('yourCall')}: <b>${today.dir==='up'?T('up'):T('dn')}</b> — ${T('locked')} <span class="num">$${fm(today.p,0)}</span> · ${T('resolveAt')}: <span class="num">${new Date(today.at+864e5).toLocaleString(lang==='en'?'en-GB':'fa-IR',{hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})}</span></p>`
+ :`<div class="row" style="margin:12px 0"><button class="btn g" data-d="up">${T('up')}</button><button class="btn r" data-d="dn">${T('dn')}</button></div>`)
+ +`<div class="row" style="gap:18px;margin-top:10px"><div><small class="disc">${T('hits')}</small><div class="big">${hits}/${done.length}</div></div><div><small class="disc">${T('streak')}</small><div class="big">🔥${streak}</div></div><div><small class="disc">%</small><div class="big">${done.length?Math.round(hits*100/done.length):0}</div></div></div>`
+ +(done.length?`<table style="margin-top:10px"><tr><th>${T('history')}</th><th></th><th>${T('price')}</th><th></th></tr>${done.slice(-6).reverse().map(c=>`<tr><td class="num">${new Date(c.at).toISOString().slice(0,10)}</td><td>${c.dir==='up'?'⬆':'⬇'}</td><td class="num">${fm(c.p,0)} → ${fm(c.end,0)}</td><td>${c.res?'✅':'❌'}</td></tr>`).join('')}</table>`:'')
+ +`<p style="margin-top:12px"><button class="btn" id="arShare">📤 ${T('share')}</button></p>`;
+ el.querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{const pp=await px();if(!pp)return;st.calls.push({at:Date.now(),dir:b.dataset.d,p:pp});st.calls=st.calls.slice(-200);ls.set('ek_arena',st);renderArena()});
+ $('#arShare').onclick=()=>share(`Entekhab Prediction Arena — ${hits}/${done.length} ✅ 🔥${streak}`,'https://entekhab.net/lab/#arenaS')}
+
+/* ---------- Guess next move ---------- */
+let G=null;
+async function newGuess(){const start=Date.UTC(2018,0,1),end=Date.now()-90*864e5,t=start+Math.random()*(end-start);const k=await kl('BTCUSDT',t,null,74);if(k.length<74){$('#guess').innerHTML=`<p class="disc">${T('noData')}</p>`;return}G={k,ans:null};drawGuess()}
+function spark(k,hide,W=520,H=200,rv=G&&G.ans!=null){const lo=Math.min(...k.map(x=>x.l)),hi=Math.max(...k.map(x=>x.h)),n=k.length,X=i=>i*(W/(n-1)),Y=v=>H-6-(v-lo)/(hi-lo||1)*(H-12);
+ const pts=k.slice(0,hide).map((x,i)=>`${X(i)},${Y(x.c)}`).join(' '),rest=k.slice(hide-1).map((x,i)=>`${X(i+hide-1)},${Y(x.c)}`).join(' ');
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><polyline points="${pts}" fill="none" stroke="#f7931a" stroke-width="2"/>${rv?`<polyline points="${rest}" fill="none" stroke="${k[n-1].c>=k[hide-1].c?'#22c55e':'#ef4444'}" stroke-width="2.5" stroke-dasharray="5 3"/>`:`<rect x="${X(hide-1)}" y="0" width="${W-X(hide-1)}" height="${H}" fill="rgba(255,255,255,.04)"/><text x="${(X(hide-1)+W)/2}" y="${H/2}" fill="#888" text-anchor="middle" font-size="28">?</text>`}<line x1="${X(hide-1)}" x2="${X(hide-1)}" y1="0" y2="${H}" stroke="#555" stroke-dasharray="3 3"/></svg>`}
+function drawGuess(){const el=$('#guess'),s=ls.get('ek_guess',{h:0,n:0});if(!G){el.innerHTML='';return}const k=G.k,h=60;
+ const up=k[k.length-1].c>=k[h-1].c,ch=(k[k.length-1].c/k[h-1].c-1)*100;
+ el.innerHTML=`<h3>${T('guessT')}</h3><p class="disc" style="margin:-4px 0 8px">${T('guessL')}</p>${spark(k,h)}`+(G.ans==null?`<div class="row" style="margin-top:10px"><button class="btn g" data-g="1">${T('up')}</button><button class="btn r" data-g="0">${T('dn')}</button></div>`
+ :`<p style="margin-top:8px"><b>${G.ans===up?T('right'):T('wrong')}</b> ${sg(+ch.toFixed(2))} · ${T('was')}: <span class="num">${new Date(k[0].t).toISOString().slice(0,10)} → ${new Date(k[k.length-1].t).toISOString().slice(0,10)}</span></p><button class="btn p" id="gNext">${T('next')}</button>`)
+ +`<p class="disc">${T('score')}: <span class="num">${s.h}/${s.n}</span></p>`;
+ el.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{G.ans=b.dataset.g==='1';const s2=ls.get('ek_guess',{h:0,n:0});s2.n++;if(G.ans===up)s2.h++;ls.set('ek_guess',s2);drawGuess()});
+ const nx=$('#gNext');if(nx)nx.onclick=newGuess}
+
+/* ---------- Time machine ---------- */
+const TM_COINS=['BTC','ETH','BNB','SOL','XRP','DOGE','ADA','TRX','LINK','AVAX','TON','DOT','LTC','BCH','NEAR','SUI'];
+async function timeMachine(){const c=$('#tmCoin').value,a=Date.parse($('#tmA').value),b=Date.parse($('#tmB').value),amt=+$('#tmAmt').value||1000,sl=Math.abs(+$('#tmStop').value)||0,o=$('#tmOut');
+ if(!(a<b)){o.innerHTML='<p class="neg">⚠ date</p>';return}o.innerHTML='…';
+ let k=[],s=a;while(s<b){const part=await kl(c+'USDT',s,b);if(!part.length)break;k=k.concat(part);s=part[part.length-1].t+864e5;if(part.length<1000)break}
+ if(k.length<2){o.innerHTML=`<p class="disc">${T('noData')}</p>`;return}
+ const e=k[0].o,x=k[k.length-1].c;let peak=e,mdd=0,stop=null;for(const d of k){if(sl&&!stop&&d.l<=e*(1-sl/100))stop=d;peak=Math.max(peak,d.h);mdd=Math.min(mdd,(d.l/peak-1)*100)}
+ const r=(x/e-1)*100,rs=stop?-sl:r;
+ o.innerHTML=`<div class="row" style="gap:28px"><div><small class="disc">${T('hold')}</small><div class="big ${r>=0?'pos':'neg'}">$${fm(amt*(1+r/100),2)}</div>${sg(+r.toFixed(2))}</div>${sl?`<div><small class="disc">SL ${sl}%</small><div class="big ${rs>=0?'pos':'neg'}">$${fm(amt*(1+rs/100),2)}</div>${stop?`${T('stopHit')} <span class="num">${new Date(stop.t).toISOString().slice(0,10)}</span>`:'—'}</div>`:''}<div><small class="disc">${T('maxdd')}</small><div class="big neg">${fm(mdd,1)}%</div></div></div>
+ <p class="disc"><span class="num">${c}: $${fm(e,6)} → $${fm(x,6)} · ${k.length}d</span></p>${(()=>{const kk=k.length>400?k.filter((_,i)=>i%Math.ceil(k.length/400)===0):k;return spark(kk,kk.length,900,180,true)})()}
+ <p style="margin-top:8px"><button class="btn" id="tmShare">📤 ${T('share')}</button></p>`;
+ $('#tmShare').onclick=()=>share(`Entekhab Time Machine: $${amt} ${c} ${$('#tmA').value} → ${$('#tmB').value} = $${fm(amt*(1+r/100),0)} (${r>=0?'+':''}${fm(r,1)}%)`,'https://entekhab.net/lab/#tmS')}
+
+/* ---------- Trader DNA ---------- */
+function renderDNA(){const qs=T('dnaQs');$('#dnaQ').innerHTML=qs.map((q,i)=>`<div class="q"><p>${i+1}. ${q[0]}</p>${q[1].map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}">${o}</label>`).join('')}</div>`).join('')+`<button class="btn p" id="dnaGo">${T('dnaMake')}</button>`;$('#dnaGo').onclick=makeDNA;
+ const prev=ls.get('ek_dna',null);if(prev)drawDNA(prev)}
+function makeDNA(){const a=[...Array(6)].map((_,i)=>+(document.querySelector(`input[name=q${i}]:checked`)?.value??-1));if(a.includes(-1)){alert('?');return}
+ const sc={sniper:0,surfer:0,hunter:0,oak:0,gambler:0,analyst:0};
+ [['hunter','analyst','gambler','analyst'],['hunter','sniper','surfer','oak'],['sniper','surfer','gambler','gambler'],['sniper','analyst','oak','hunter'],['sniper','surfer','hunter','gambler'],['sniper','surfer','gambler','oak']].forEach((m,i)=>sc[m[a[i]]]+=2);
+ if(a[0]===0)sc.oak++;if(a[3]===0)sc.sniper++;
+ const type=Object.entries(sc).sort((x,y)=>y[1]-x[1])[0][0],risk=[10,35,70,95][a[4]],disc=[95,65,40,15][a[2]],pat=[30,55,75,95][a[1]],data=[80,85,70,25][a[3]];
+ const r={type,risk,disc,pat,data};ls.set('ek_dna',r);drawDNA(r)}
+function drawDNA(r){const [name,desc]=T('dnaTypes')[r.type],cv=document.createElement('canvas');cv.width=1080;cv.height=1350;cv.className='card-out';const x=cv.getContext('2d'),rtl=lang!=='en';
+ const g=x.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#1a1006');g.addColorStop(.5,'#0b0c0f');g.addColorStop(1,'#071018');x.fillStyle=g;x.fillRect(0,0,1080,1350);
+ x.strokeStyle='rgba(255,255,255,.05)';for(let i=0;i<1080;i+=54){x.beginPath();x.moveTo(i,0);x.lineTo(i,1350);x.stroke()}for(let i=0;i<1350;i+=54){x.beginPath();x.moveTo(0,i);x.lineTo(1080,i);x.stroke()}
+ x.fillStyle='#f7931a';x.beginPath();x.arc(540,330,150,0,7);x.fill();x.fillStyle='#000';x.font='900 190px Arial';x.textAlign='center';x.fillText('₿',540,398);
+ x.fillStyle='#f7931a';x.font='700 38px "Space Grotesk",sans-serif';x.fillText('TRADER DNA',540,90);
+ x.fillStyle='#fff';x.font='900 92px Vazirmatn,sans-serif';x.direction=rtl?'rtl':'ltr';x.fillText(name,540,620);
+ x.fillStyle='#bbb';x.font='400 38px Vazirmatn,sans-serif';wrap(x,desc,540,690,880,54);
+ const bars=[[T('dnaQs')[4][0].replace('؟','').replace('?',''),r.risk],['Discipline / '+(lang==='en'?'stop-loss':'انضباط'),r.disc],['Patience',r.pat],['Data-driven',r.data]];
+ bars.forEach(([l,v],i)=>{const y=880+i*95;x.textAlign=rtl?'right':'left';x.fillStyle='#ddd';x.font='600 32px Vazirmatn,sans-serif';x.fillText(l,rtl?960:120,y);x.fillStyle='rgba(255,255,255,.1)';x.fillRect(120,y+18,840,18);x.fillStyle='#f7931a';rtl?x.fillRect(960-840*v/100,y+18,840*v/100,18):x.fillRect(120,y+18,840*v/100,18)});
+ x.textAlign='center';x.direction='ltr';x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk",sans-serif';x.fillText('entekhab.net/lab',540,1290);
+ const url=cv.toDataURL('image/png');$('#dnaOut').innerHTML='';$('#dnaOut').append(cv);
+ const row=document.createElement('div');row.className='row';row.style.marginTop='10px';row.innerHTML=`<a class="btn p" download="entekhab-trader-dna.png" href="${url}">⬇ ${T('dl')}</a><button class="btn" id="dnaSh">📤 ${T('share')}</button>`;$('#dnaOut').append(row);
+ $('#dnaSh').onclick=async()=>{try{const b=await (await fetch(url)).blob(),f=new File([b],'entekhab-dna.png',{type:'image/png'});if(navigator.canShare?.({files:[f]})){await navigator.share({files:[f],text:`${name} — entekhab.net/lab`});return}}catch(e){}share(`My Trader DNA: ${name}`,'https://entekhab.net/lab/#dnaS')}}
+function wrap(x,t,cx,y,w,lh){const ws=t.split(' ');let line='';for(const wd of ws){const tt=line?line+' '+wd:wd;if(x.measureText(tt).width>w){x.fillText(line,cx,y);y+=lh;line=wd}else line=tt}x.fillText(line,cx,y)}
+function share(text,url){const tg=`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;if(navigator.share){navigator.share({text,url}).catch(()=>window.open(tg,'_blank'))}else window.open(tg,'_blank')}
+
+/* ---------- Lab data panels ---------- */
+function renderLab(){const L=D.lab||{},nd=`<p class="disc">${T('noData')}</p>`;
+ const m=L.memory;$('#mem').innerHTML=`<h3>${T('analogs')} · BTC</h3>`+(m?`<p class="disc" style="margin:-4px 0 8px"><span class="num">${m.since} → ${m.today.date} · ${m.history_days}d</span> — ${T('today')}: 7d ${sg(m.today.ret7)} · 30d ${sg(m.today.ret30)} · RSI <span class="num">${m.today.rsi}</span> · MA200 ${sg(m.today.vs_ma200)}</p>
+ <div class="row" style="gap:22px"><div><small class="disc">${T('after30')} ${T('upOf')}</small><div class="big">${m.stats.up30}/${m.stats.n}</div></div><div><small class="disc">${T('avg')} 30d</small><div class="big">${sg(m.stats.avg30)}</div></div><div><small class="disc">${T('avg')} 7d</small><div class="big">${sg(m.stats.avg7)}</div></div></div>
+ ${analogChart(m.analogs)}<table><tr><th></th><th>${T('price')}</th><th>${T('after7')}</th><th>${T('after30')}</th><th>${T('dd30')}</th></tr>${m.analogs.map(a=>`<tr><td class="num">${a.date}</td><td class="num">$${fm(a.price,0)}</td><td>${sg(a.f7)}</td><td>${sg(a.f30)}</td><td>${sg(a.dd30)}</td></tr>`).join('')}</table>`:nd);
+ const f=L.futures;$('#mc').innerHTML=`<h3>${T('cone')}</h3>`+(f?coneChart(f)+`<table><tr><td>${T('pUp')}</td><td class="num">${f.p_up}%</td></tr><tr><td>${T('p10')}</td><td class="num pos">${f.p_up10}%</td></tr><tr><td>${T('m10')}</td><td class="num neg">${f.p_dn10}%</td></tr><tr><td>P5 / P50 / P95</td><td class="num">$${fm(f.cone['5'].at(-1),0)} / $${fm(f.cone['50'].at(-1),0)} / $${fm(f.cone['95'].at(-1),0)}</td></tr></table><p class="disc">${f.paths} paths · block bootstrap · ${f.sample_days}d · σ ${f.sim_vol_annual}%/y</p>`:nd);
+ const v=L.vol;$('#vol').innerHTML=`<h3>${T('volT')}</h3>`+(v?`<table><tr><th></th><th>BB rank</th><th>ATR14/100</th><th>RV7 / RV90</th><th></th></tr>${Object.entries(v).sort((a,b)=>a[1].bw_rank-b[1].bw_rank).map(([c,x])=>`<tr><td><b>${c}</b></td><td><div class="bar" style="width:70px;display:inline-block"><i style="width:${x.bw_rank}%;background:${x.bw_rank<=10?'#38bdf8':x.bw_rank>=85?'#ef4444':'#f7931a'}"></i></div> <span class="num">${x.bw_rank}</span></td><td class="num">${x.atr_ratio}</td><td class="num">${x.rv7}% / ${x.rv90}%</td><td>${T('state')[x.state]}${x.shift?` <b style="color:#f59e0b">${T('shift')[x.shift]}</b>`:''}</td></tr>`).join('')}</table><p class="disc">BB rank = percentile of Bollinger bandwidth in 1y (≤10 = squeeze)</p>`:nd);
+ const o=L.options;$('#opt').innerHTML=`<h3>${T('optT')}</h3>`+(o&&Object.keys(o).length?`<table><tr><th></th>${Object.keys(o).map(k=>`<th>${k}</th>`).join('')}</tr>${[[T('pc'),k=>o[k].pc_oi],['Put/Call (vol)',k=>o[k].pc_vol],[T('iv'),k=>o[k].iv_oi_weighted!=null?o[k].iv_oi_weighted+'%':'—'],['DVOL',k=>o[k].dvol?`${o[k].dvol.now} <span class="disc">(7d: ${o[k].dvol.d7_ago})</span>`:'—'],[T('mp'),k=>o[k].max_pain?`$${fm(o[k].max_pain.max_pain,0)} ${sg(o[k].max_pain.vs_spot_pct)}`:'—'],[T('exp'),k=>o[k].max_pain?.expiry||'—']].map(([l,f])=>`<tr><td>${l}</td>${Object.keys(o).map(k=>`<td class="num">${f(k)??'—'}</td>`).join('')}</tr>`).join('')}</table>`:nd);
+ const xe=L.xex;$('#xex').innerHTML=`<h3>${T('xexT')}</h3>`+(xe?.length?`<table><tr><th></th><th>Binance</th><th>Coinbase</th><th>Kraken</th><th>OKX</th><th>${T('spread')}</th></tr>${xe.map(r=>`<tr><td><b>${r.coin}</b></td>${['Binance','Coinbase','Kraken','OKX'].map(e=>`<td class="num">${r.prices[e]!=null?fm(r.prices[e],r.prices[e]<5?5:2):'—'}</td>`).join('')}<td class="num" style="color:${r.spread_pct>0.3?'#f59e0b':'inherit'}">${r.spread_pct}%</td></tr>`).join('')}</table><p class="disc">USD vs USDT pairs — part of the gap is the USDT premium.</p>`:nd);
+ const mc=L.macro;$('#macro').innerHTML=`<h3>${T('macroT')}</h3>`+(mc&&(mc.gold||mc.eurusd)?`<table><tr><th></th><th>${T('price')}</th><th>30d</th><th>${T('c30')}</th><th>${T('c90')}</th></tr>${[['BTC',{chg30:mc.btc_chg30}],[T('gold'),mc.gold],[T('eur'),mc.eurusd]].filter(r=>r[1]).map(([n,x])=>`<tr><td>${n}</td><td class="num">${x.price?fm(x.price,4):''}</td><td>${sg(x.chg30)}</td><td class="num">${x.corr30??''}</td><td class="num">${x.corr90??''}</td></tr>`).join('')}</table><p class="disc">Pearson correlation of daily returns · −1 … +1</p>`:nd);
+ const dv=L.dev;$('#dev').innerHTML=dv?.length?`<table><tr><th></th><th>repo</th><th>7d</th><th>30d</th><th>×</th><th>${T('rel')}</th></tr>${dv.map(r=>`<tr><td><b>${r.coin}</b></td><td><a href="https://github.com/${r.repo}" target="_blank" rel="noopener" class="num" style="color:var(--mute)">${r.repo}</a></td><td class="num">${r.c7}</td><td><div class="bar" style="width:90px;display:inline-block"><i style="width:${Math.min(100,r.c30/Math.max(...dv.map(x=>x.c30))*100)}%"></i></div> <span class="num">${r.c30}${r.c30>=500?'+':''}</span></td><td class="num ${r.trend>1.15?'pos':r.trend<.85?'neg':''}">${r.trend??'—'}</td><td class="num">${esc(r.release||'—')} <span class="disc">${r.release_at?r.release_at.slice(0,10):''}</span></td></tr>`).join('')}</table><p class="disc">× = 7d pace vs 30d average · GitHub API</p>`:nd}
+function analogChart(a){const W=520,H=160,all=a.flatMap(x=>x.path),lo=Math.min(...all),hi=Math.max(...all),Y=v=>H-4-(v-lo)/(hi-lo||1)*(H-8),X=i=>i*W/30;
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;margin:8px 0"><line x1="0" x2="${W}" y1="${Y(100)}" y2="${Y(100)}" stroke="#444" stroke-dasharray="3 3"/>${a.map(x=>`<polyline points="${x.path.map((v,i)=>`${X(i)},${Y(v)}`).join(' ')}" fill="none" stroke="${x.f30>=0?'rgba(34,197,94,.55)':'rgba(239,68,68,.55)'}" stroke-width="1.5"/>`).join('')}<text x="4" y="12" fill="#888" font-size="10">+${fm(hi-100,0)}%</text><text x="4" y="${H-6}" fill="#888" font-size="10">${fm(lo-100,0)}%</text></svg>`}
+function coneChart(f){const W=520,H=200,c=f.cone,lo=Math.min(...c['5'],f.price),hi=Math.max(...c['95']),n=c['50'].length,X=i=>(i+1)*W/n,Y=v=>H-4-(v-lo)/(hi-lo)*(H-8);
+ const band=(a,b,op)=>`<polygon points="${[`0,${Y(f.price)}`,...c[a].map((v,i)=>`${X(i)},${Y(v)}`),...c[b].map((v,i)=>`${X(i)},${Y(v)}`).reverse()].join(' ')}" fill="rgba(247,147,26,${op})"/>`;
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${band('5','95',.12)}${band('25','75',.25)}<polyline points="0,${Y(f.price)} ${c['50'].map((v,i)=>`${X(i)},${Y(v)}`).join(' ')}" fill="none" stroke="#f7931a" stroke-width="2"/><line x1="0" x2="${W}" y1="${Y(f.price)}" y2="${Y(f.price)}" stroke="#555" stroke-dasharray="3 3"/><text x="${W-4}" y="14" fill="#aaa" text-anchor="end" font-size="11">P95 $${fm(c['95'].at(-1),0)}</text><text x="${W-4}" y="${H-8}" fill="#aaa" text-anchor="end" font-size="11">P5 $${fm(c['5'].at(-1),0)}</text></svg>`}
+
+function renderCouncil(){const c=D.council,el=$('#council');if(!c?.council){el.innerHTML=`<p class="disc">${T('noData')}</p>`;return}const r=c.council,L=r[lang]||r.en,cl={bullish:'#22c55e',bearish:'#ef4444',neutral:'#9ca3af'};
+ el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${r.agents.map(a=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px;border-top:3px solid ${cl[a.stance]||'#888'}"><b>${T('ag')[a.id]||esc(a.id)}</b> <span class="chip" style="color:${cl[a.stance]}">${esc(a.stance)} · ${'●'.repeat(a.confidence||0)}</span><ul style="margin:8px 18px 0;font-size:.85rem">${((a[lang]||a.en||{}).evidence||[]).map(e=>`<li>${esc(e)}</li>`).join('')}</ul></div>`).join('')}</div>
+ ${L.disagreements?.length?`<h3 style="margin-top:14px">⚔</h3><ul style="margin:0 18px;font-size:.9rem">${L.disagreements.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}<p style="margin-top:12px"><b>${esc(L.summary)}</b></p><p class="disc">${esc(c.engine)} · ${c.at.slice(0,16).replace('T',' ')} UTC</p>`}
+function renderAll(){renderCouncil();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
+(async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council]=await Promise.all(['lab','narratives','market','brain','council'].map(n=>j(`/data/${n}.json${v}`)));
+ $('#tmCoin').innerHTML=TM_COINS.map(c=>`<option>${c}</option>`).join('');const t=new Date();$('#tmB').value=t.toISOString().slice(0,10);t.setFullYear(t.getFullYear()-1);$('#tmA').value=t.toISOString().slice(0,10);$('#tmGo').onclick=timeMachine;
+ applyLang();newGuess()})();
+</script>
+</body>
+</html>
