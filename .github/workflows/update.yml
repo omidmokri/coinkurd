@@ -32,6 +32,7 @@ jobs:
         env:
           TG_CHANNEL: Coin_Kurd
           MAX_PAGES: ${{ github.event.inputs.pages || '3' }}
+          BACKFILL: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/fetch.py
       - name: Commit data
         run: |
