@@ -10,7 +10,7 @@ on:
         default: "3"
       translate_limit:
         description: "حداکثر پست برای ترجمه در این اجرا"
-        default: "40"
+        default: "120"
   push:
     branches: [main]
 
@@ -42,7 +42,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
-          TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '40' }}
+          TRANSLATE_LIMIT: ${{ github.event.inputs.translate_limit || '120' }}
         run: python scripts/translate.py
       - name: Commit data
         run: |
