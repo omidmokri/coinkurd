@@ -63,6 +63,8 @@ def main():
                 r = requests.post(f"{ai.BASE}/models/{m}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=40)
             dt = round(time.time() - t0, 2)
             ok = r.status_code == 200 and "itcoin" in r.text
+            if r.status_code == 429:
+                print(f"{m}: quota exhausted now; kept as fallback")
             print(f"{m}: {r.status_code} {dt}s {'OK' if ok else r.text[:160]}")
             if ok:
                 results.append((dt, m))
@@ -73,8 +75,9 @@ def main():
         time.sleep(4)
     if results:
         results.sort()
+        rest = [m for m in ranked(names) if m not in {x[1] for x in results}] if names else []
         json.dump({"model": results[0][1], "latency_s": results[0][0], "checked_at": datetime.now(timezone.utc).isoformat(),
-                   "all": results}, open(OUT, "w"), indent=1)
+                   "all": results, "fallbacks": [x[1] for x in results[1:]] + rest}, open(OUT, "w"), indent=1)
         print("selected:", results[0][1])
     else:
         print("no working Gemini model")

@@ -16,6 +16,7 @@ import requests
 
 BASE = "https://generativelanguage.googleapis.com/v1beta"
 _model = None
+_exhausted = set()
 _last = 0.0
 MIN_GAP = float(os.environ.get("GEMINI_MIN_GAP", "4.5"))  # ثانیه بین درخواست‌ها (~۱۳ در دقیقه)
 
@@ -76,7 +77,30 @@ def model():
     return _model
 
 
+def fallbacks():
+    try:
+        c = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ai_model.json")))
+        return [m for m in c.get("fallbacks", []) if m not in _exhausted]
+    except Exception:  # noqa: BLE001
+        return [m for m in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-flash-lite-latest") if m not in _exhausted]
+
+
 def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
+    """اگر سهمیهٔ روزانهٔ مدل فعلی تمام شد، خودکار به مدل بعدی می‌رود"""
+    global _model
+    while True:
+        try:
+            return _generate(prompt, as_json, temperature, max_tokens, tries)
+        except QuotaError:
+            _exhausted.add(model())
+            nxt = fallbacks()
+            if not nxt:
+                raise
+            print(f"quota exhausted on {_model}; switching to {nxt[0]}")
+            _model = nxt[0]
+
+
+def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
     global _last
     k = key()
     if not k:
