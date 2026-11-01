@@ -458,7 +458,7 @@ function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=ca
     <div class="txt" dir="auto">${linkify(PT(p).text)}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
     ${p.link&&p.link.url?`<a class="lp" href="${esc(p.link.url)}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small><br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
     <div class="coins">${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}</div>
-    ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.label)}</a>`).join('')}</div>`:''}
+    ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>{const ic=/discord/.test(f.url)?'👾 ':/youtu/.test(f.url)?'🎥 ':/instagram/.test(f.url)?'📸 ':/twitter|x\.com/.test(f.url)?'💬 ':'';return `<a href="${esc(f.url)}" target="_blank" rel="noopener">${ic}${esc(f.label)}</a>`}).join('')}</div>`:''}
     <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
     ${rel.length?`<h3 style="margin-top:26px;font-weight:800">${T('related')}</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:10px 0 0">${rel.map((x,i)=>cardHTML(x,i)).join('')}</div>`:''}</div>`;
   emojify($('#sheet'));$('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
