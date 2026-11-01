@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entekhab API — مرکز توسعه‌دهندگان | entekhab.net</title>
+<meta name="description" content="API رایگان و فقط‌خواندنی entekhab.net: بازار، اسکنر، اخبار، امتیاز، DNA بازار، مشتقات، شبکهٔ بیت‌کوین، جریان سرمایه — JSON، هر ۱۵ دقیقه به‌روز">
+<link rel="canonical" href="https://entekhab.net/developers/">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>pre{background:#000;border:1px solid var(--line);border-radius:12px;padding:14px;overflow:auto;direction:ltr;text-align:left;font-family:var(--mono);font-size:.82rem;color:#e5e5e5}
+.ep{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.ep code{font-family:var(--mono);direction:ltr;font-size:.82rem;word-break:break-all}</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero"><h1 data-t="h1"></h1><p data-t="lead"></p></div>
+  <div class="grid">
+    <div class="card"><h3 data-t="epT"></h3><div id="eps"><p class="disc">…</p></div></div>
+    <div class="card"><h3 data-t="exT"></h3>
+<pre>// JavaScript
+const r = await fetch('https://entekhab.net/api/v1/dna.json');
+const { data } = await r.json();
+console.log(data.coins.BTC.code, data.coins.BTC.similar);</pre>
+<pre># Python
+import requests
+d = requests.get("https://entekhab.net/api/v1/derivatives.json").json()["data"]
+print(d["avg_funding"], d["BTC"]["funding_ann"])</pre>
+<pre># curl
+curl -s https://entekhab.net/api/v1/scanner_opportunities.json | jq '.opportunities[0]'</pre>
+      <p data-t="terms" style="font-size:.88rem;line-height:1.9;color:#cfcfc8"></p>
+    </div>
+  </div>
+</div>
+<footer>entekhab.net — <span data-t="nfa"></span></footer>
+<script src="/assets/ui.js"></script>
+<script>
+Object.assign(I.fa,{h1:'API <em>Entekhab</em>',lead:'همهٔ داده‌هایی که سایت را می‌سازند، به‌صورت JSON رایگان و فقط‌خواندنی؛ هر ۱۵ دقیقه به‌روز می‌شوند. برای ربات تلگرام، اکسل، داشبورد شخصی یا پروژهٔ دانشجویی.',epT:'Endpointها',exT:'نمونه‌کد',nfa:'آموزشی است، توصیهٔ مالی نیست',
+ terms:'• بدون کلید و بدون ثبت‌نام؛ CORS باز است.<br>• لطفاً بیش از یک درخواست در دقیقه برای هر endpoint نفرستید (داده هر ۱۵ دقیقه عوض می‌شود).<br>• ذکر منبع (entekhab.net) مایهٔ خوشحالی است. منابع اصلی داده: Binance، OKX، Deribit، CoinGecko، mempool.space، bitnodes.io، GitHub و خبرگزاری‌ها.<br>• هیچ‌کدام توصیهٔ مالی نیست.'});
+Object.assign(I.ckb,{h1:'APIی <em>Entekhab</em>',lead:'هەموو ئەو داتایانەی ماڵپەڕەکە دروست دەکەن، وەک JSONی بەخۆڕایی و تەنها-خوێندنەوە؛ هەر ١٥ خولەک نوێ دەبنەوە.',epT:'Endpointەکان',exT:'نموونەکۆد',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',
+ terms:'• بێ کلیل و بێ تۆمارکردن؛ CORS کراوەیە.<br>• تکایە لە خولەکێکدا زیاتر لە یەک داواکاری مەنێرە.<br>• ئاماژەدان بە سەرچاوە (entekhab.net) جێی دڵخۆشییە.'});
+Object.assign(I.en,{h1:'Entekhab <em>API</em>',lead:'Every dataset that powers the site, as free read-only JSON, refreshed every 15 minutes. Use it for a Telegram bot, a spreadsheet, a personal dashboard or a student project.',epT:'Endpoints',exT:'Examples',nfa:'Educational, not financial advice',
+ terms:'• No key, no sign-up; CORS is open.<br>• Please keep it to about one request per minute per endpoint (data changes every 15 minutes).<br>• Attribution (entekhab.net) is appreciated. Underlying sources: Binance, OKX, Deribit, CoinGecko, mempool.space, bitnodes.io, GitHub and news outlets.<br>• Nothing here is financial advice.'});
+uiLang();
+(async()=>{const d=await j('/api/v1/index.json'+V());const el=$('#eps');if(!d||!d.endpoints){el.innerHTML='<p class="disc">—</p>';return}
+ el.innerHTML=d.endpoints.filter(u=>!/\/coins\//.test(u)).map(u=>`<div class="ep"><code>${esc(u)}</code><a class="btn" href="${esc(u)}" target="_blank" rel="noopener">JSON ↗</a></div>`).join('')+`<div class="ep"><code>https://entekhab.net/api/v1/coins/{btc,eth,sol,…}.json</code><a class="btn" href="/api/v1/coins/btc.json" target="_blank">BTC ↗</a></div><p class="disc">${d.endpoints.length} endpoints · ${esc(d.note||'')}</p>`})();
+</script>
+</body>
+</html>
