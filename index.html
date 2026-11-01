@@ -132,8 +132,8 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .chip:hover{border-color:var(--ink)}
 .chip.on{background:var(--c,var(--lime));color:#000;border-color:transparent;font-weight:700}
 .chip .n{opacity:.6;font-size:.72rem;font-family:var(--mono)}
-.search{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 4px}
-.search input{flex:1;background:none;border:0;outline:0;color:var(--ink);font-family:inherit;font-size:.95rem}
+.search{flex:1 1 200px;min-width:0;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 4px}
+.search input{flex:1;min-width:0;width:100%;background:none;border:0;outline:0;color:var(--ink);font-family:inherit;font-size:.95rem}
 select{background:#141414;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 12px;font-family:inherit}
 .views{display:flex;gap:2px}
 .views button{padding:7px 12px;font-family:var(--mono);text-transform:lowercase;color:var(--mute);border-bottom:2px solid transparent}
@@ -241,6 +241,24 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
 .marquee div{display:inline-block;animation:mq 40s linear infinite}
 .marquee span{margin:0 28px}.marquee span b{color:var(--lime);font-weight:500}
 @keyframes mq{to{transform:translateX(calc(var(--dir) * 50%))}}
+/* cinematic hero */
+.hero.cine .bgimg,.hero.cine .blob{display:none}
+.hero.cine #coin3d{background:#000}
+.hero.cine::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.5) 0,transparent 16%,transparent 50%,rgba(0,0,0,.9) 100%)}
+.cine-fx{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0}
+.cine-cap{position:absolute;left:50%;bottom:15%;transform:translate(-50%,8px);z-index:3;font-family:var(--mono);font-size:.95rem;color:#f4e3c3;letter-spacing:.03em;text-align:center;opacity:0;transition:opacity .6s,transform .6s;pointer-events:none;width:min(92vw,720px);text-shadow:0 2px 18px #000}
+.cine-cap.on{opacity:1;transform:translate(-50%,0)}
+.cine-data{position:absolute;top:134px;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;opacity:0;transition:opacity 1.2s;width:min(94vw,920px);pointer-events:none}
+.cine-data.on{opacity:1;pointer-events:auto}
+.cine-data span{font-family:var(--mono);font-size:.82rem;color:#e9e4da;background:rgba(18,14,8,.55);border:1px solid rgba(247,147,26,.28);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:5px 12px;border-radius:99px;white-space:nowrap;direction:ltr}
+.cine-data b{color:#fff}.cine-data i{font-style:normal}.cine-data .up{color:#22c55e}.cine-data .dn{color:#ef4444}
+.cine-btn{position:absolute;z-index:4;left:50%;bottom:24px;transform:translateX(-50%);font-family:var(--mono);font-size:.8rem;color:#ddd;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);padding:6px 14px;border-radius:99px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none}
+.hero.cine .cine-btn{display:block}
+.hero.cine .wrap,.hero.cine .scroll{transition:opacity 1.2s ease,transform 1.2s ease}
+.hero.cine-intro .wrap,.hero.cine-intro .scroll{opacity:0;transform:translateY(24px);pointer-events:none}
+.hero.cine-titled h1{animation:cineTitle 1.8s cubic-bezier(.2,.7,.1,1) both}
+@keyframes cineTitle{from{opacity:0;filter:blur(14px);transform:translateY(22px) scale(.96)}to{opacity:1;filter:blur(0);transform:none}}
+@media(max-width:900px){.cine-data{top:128px}.cine-data span{font-size:.74rem;padding:4px 9px}.cine-cap{bottom:30%;font-size:.85rem}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -274,7 +292,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
 </script></div></div>
 <main id="top">
   <section class="hero">
-    <div class="bgimg" id="heroImg"></div><div class="blob"></div><canvas id="coin3d"></canvas>
+    <div class="bgimg" id="heroImg"></div><div class="blob"></div><canvas id="coin3d"></canvas><div class="cine-fx" id="cineFx"></div><div class="cine-cap" id="cineCap" aria-live="polite"></div><div class="cine-data" id="cineData"></div><button class="cine-btn" id="cineBtn" type="button"></button>
     <div class="wrap">
       <div>
         <h1 class="display" dir="ltr"><span>Entekhab</span><em>.net</em></h1>
@@ -410,7 +428,7 @@ async function load(){
   const bust='?v='+Math.floor(Date.now()/3e5);
   const [p,m]=await Promise.all([fetch('data/posts.json'+bust).then(r=>r.json()),fetch('data/meta.json'+bust).then(r=>r.json())]);
   S.posts=p;S.meta=m;
-  applyLang();buildStatic();render();reveal();tvWidgets();coin3d();loadIntel();setInterval(loadIntel,3e5);
+  applyLang();buildStatic();render();reveal();tvWidgets();loadIntel();setInterval(loadIntel,3e5);
 }
 function applyLang(){
   const t=I18N[lang];document.documentElement.lang=lang;document.documentElement.dir=t.dir;document.body.dir=t.dir;
@@ -616,6 +634,7 @@ function renderIntel(){
   $('#impBox').innerHTML=`<h3>${T('impT')}</h3>`+(rows.length?`<table class="otab"><tr><th>${T('coin')}</th><th>${T('posts')}</th><th>${T('avg24')}</th><th>${T('upr')}</th></tr>${rows.map(([c,a])=>{const av=a.reduce((x,y)=>x+y,0)/a.length,up=Math.round(a.filter(x=>x>0).length*100/a.length);return `<tr><td><a href="coins/${c.toLowerCase()}/">${c}</a></td><td class="num">${a.length}</td><td class="num ${av>=0?'pos':'neg'}">${av>=0?'+':''}${av.toFixed(2)}%</td><td><div class="bar2"><i style="width:${up}%"></i></div><span class="num" style="font-size:.75rem">${up}%</span></td></tr>`}).join('')}</table>`:`<p class="disc">${T('noData')}</p>`)+`<p class="disc">Binance 1h · ${T('disc')}</p>`;
 }
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'0px':'118px');lastY=y},{passive:true});
+window.__cineFail=()=>{window.__cineFail=null;coin3d()};(function(){const s=document.createElement('script');s.src='assets/cinema.js?v=1';s.onerror=()=>window.__cineFail&&window.__cineFail();document.body.appendChild(s)})();
 load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
 </script>
 </body>
