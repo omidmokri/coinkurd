@@ -123,7 +123,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .tile:hover .n{color:#000}
 
 /* dims */
-.dims{position:sticky;top:0;z-index:60;background:rgba(10,10,10,.85);backdrop-filter:blur(16px);border-block:1px solid var(--line);padding:14px 0}
+.dims{position:sticky;top:var(--top,118px);z-index:60;background:rgba(10,10,10,.85);backdrop-filter:blur(16px);border-block:1px solid var(--line);padding:14px 0}
 .dims .wrap{display:grid;gap:10px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .lbl{font-family:var(--mono);text-transform:lowercase;color:var(--mute);font-size:.8rem;min-width:70px}
@@ -304,8 +304,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
   <section id="feed">
     <div class="dims"><div class="wrap">
       <div class="row"><span class="lbl" data-i="dCat">دسته</span><div class="chips" id="catChips"></div></div>
-      <div class="row"><span class="lbl" data-i="dCoin">کوین</span><div class="chips" id="coinChips"></div></div>
-      <div class="row">
+            <div class="row">
         <span class="lbl" data-i="dTime">زمان</span><div class="chips" id="timeChips"></div>
         <label class="search">🔎 <input id="q" data-ph="search" placeholder="جستجو…"></label>
         <select id="sort"><option value="new" data-i="sNew">جدیدترین</option><option value="views" data-i="sViews">پربازدیدترین</option></select>
@@ -410,9 +409,7 @@ function chip(label,on,color,n,cb){const b=document.createElement('button');b.cl
 function buildChips(){
   const cc=$('#catChips');cc.innerHTML='';cc.append(chip(T('all'),!S.cat,null,S.meta.count,()=>{S.cat=null;render()}));
   S.meta.categories.filter(c=>S.meta.by_category[c.id]).sort((a,b)=>S.meta.by_category[b.id]-S.meta.by_category[a.id]).forEach(c=>cc.append(chip(`${c.icon} ${cname(c)}`,S.cat===c.id,c.color,S.meta.by_category[c.id],()=>{S.cat=S.cat===c.id?null:c.id;render()})));
-  const kc=$('#coinChips');kc.innerHTML='';kc.append(chip(T('all'),!S.coin,null,null,()=>{S.coin=null;render()}));
-  Object.entries(S.meta.by_coin).slice(0,14).forEach(([k,n])=>kc.append(chip(k,S.coin===k,'#f3c969',n,()=>{S.coin=S.coin===k?null:k;render()})));
-  const tc=$('#timeChips');tc.innerHTML='';[['all','all'],['24h','t24'],['7d','t7'],['30d','t30']].forEach(([v,k])=>tc.append(chip(T(k),S.time===v,'#c6ff00',null,()=>{S.time=v;render()})));
+    const tc=$('#timeChips');tc.innerHTML='';if(S.coin)tc.append(chip('🪙 '+S.coin+' ✕',true,'#f3c969',null,()=>{S.coin=null;render()}));[['all','all'],['24h','t24'],['7d','t7'],['30d','t30']].forEach(([v,k])=>tc.append(chip(T(k),S.time===v,'#c6ff00',null,()=>{S.time=v;render()})));
   document.querySelectorAll('#wall button').forEach(b=>b.classList.toggle('on',b.dataset.coin===S.coin));
 }
 function filtered(){
@@ -493,16 +490,17 @@ function coin3d(){
   const scene=new THREE.Scene();const cam=new THREE.PerspectiveCamera(40,1,0.1,100);cam.position.set(0,0,9);
   scene.add(new THREE.AmbientLight(0xffffff,.45));const key=new THREE.DirectionalLight(0xffd9a0,1.6);key.position.set(4,5,6);scene.add(key);
   const rim=new THREE.PointLight(0xf7931a,2.2,30);rim.position.set(-5,-3,4);scene.add(rim);
-  // face texture with ₿
-  const tc=document.createElement('canvas');tc.width=tc.height=512;const g=tc.getContext('2d');
-  const grd=g.createRadialGradient(256,256,40,256,256,256);grd.addColorStop(0,'#ffb347');grd.addColorStop(1,'#d9781a');g.fillStyle=grd;g.fillRect(0,0,512,512);
-  g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=14;g.beginPath();g.arc(256,256,215,0,7);g.stroke();
-  g.fillStyle='#fff';g.font='bold 330px Arial';g.textAlign='center';g.textBaseline='middle';g.save();g.translate(256,270);g.rotate(-0.22);g.fillText('₿',0,0);g.restore();
-  const tex=new THREE.CanvasTexture(tc);
-  const matFace=new THREE.MeshStandardMaterial({map:tex,metalness:.75,roughness:.3});const matSide=new THREE.MeshStandardMaterial({color:0xf7931a,metalness:.9,roughness:.25});
-  const R=2.1,H=.32;const side=new THREE.Mesh(new THREE.CylinderGeometry(R,R,H,96,1,true),matSide);side.rotation.x=Math.PI/2;
-  const f1=new THREE.Mesh(new THREE.CircleGeometry(R,96),matFace);f1.position.z=H/2;const f2=new THREE.Mesh(new THREE.CircleGeometry(R,96),matFace);f2.position.z=-H/2;f2.rotation.y=Math.PI;
+  const ld=new THREE.TextureLoader();const T=(f)=>{const t=ld.load('assets/'+f);t.anisotropy=8;return t};
+  const matFront=new THREE.MeshStandardMaterial({map:T('coin-front.png'),bumpMap:T('coin-front-bump.png'),bumpScale:.025,metalness:.85,roughness:.32,transparent:true});
+  const matBack=new THREE.MeshStandardMaterial({map:T('coin-back.png'),bumpMap:T('coin-back-bump.png'),bumpScale:.025,metalness:.85,roughness:.32,transparent:true});
+  // reeded edge texture
+  const ec=document.createElement('canvas');ec.width=1024;ec.height=64;const eg=ec.getContext('2d');for(let i=0;i<1024;i+=8){eg.fillStyle=i%16?'#b8781c':'#f0b24a';eg.fillRect(i,0,8,64)}
+  const etex=new THREE.CanvasTexture(ec);etex.wrapS=THREE.RepeatWrapping;etex.repeat.x=6;
+  const matSide=new THREE.MeshStandardMaterial({map:etex,color:0xf2b24c,metalness:.9,roughness:.3});
+  const R=2.1,H=.3;const side=new THREE.Mesh(new THREE.CylinderGeometry(R,R,H,128,1,true),matSide);side.rotation.x=Math.PI/2;
+  const f1=new THREE.Mesh(new THREE.CircleGeometry(R,128),matFront);f1.position.z=H/2;const f2=new THREE.Mesh(new THREE.CircleGeometry(R,128),matBack);f2.position.z=-H/2;f2.rotation.y=Math.PI;
   const grp=new THREE.Group();grp.add(side,f1,f2);scene.add(grp);
+  const env=new THREE.PointLight(0xffffff,1.2,40);env.position.set(0,6,8);scene.add(env);
   // orbiting particles
   const pg=new THREE.BufferGeometry();const N=400;const pos=new Float32Array(N*3);for(let i=0;i<N;i++){const r=3+Math.random()*4,a=Math.random()*6.28,z=(Math.random()-.5)*4;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.sin(a)*r;pos[i*3+2]=z}
   pg.setAttribute('position',new THREE.BufferAttribute(pos,3));const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xf7931a,size:.04,transparent:true,opacity:.8}));scene.add(pts);
@@ -511,7 +509,7 @@ function coin3d(){
   place();addEventListener('resize',place);
   const t0=performance.now();(function loop(){const t=(performance.now()-t0)/1000;grp.rotation.y=t*.6+mx*1.2;grp.rotation.x=Math.sin(t*.7)*.15-my*.6;grp.position.y+= (Math.sin(t*1.3)*.004);pts.rotation.z=t*.05;pts.rotation.x=my*.3;renderer.render(scene,cam);requestAnimationFrame(loop)})();
 }
-let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);lastY=y},{passive:true});
+let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'0px':'118px');lastY=y},{passive:true});
 load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
 </script>
 </body>
