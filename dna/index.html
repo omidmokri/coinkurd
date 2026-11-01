@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market DNA — DNA بازار ارزهای دیجیتال | entekhab.net</title>
+<meta name="description" content="DNA بازار هر ارز دیجیتال: ۸ ژن نقدشوندگی، نوسان، جریان خریداران، احساسات خبری، توجه رسانه‌ای، اهرم، فعالیت توسعه و مومنتوم؛ ارزهای مشابه و دوقلوهای تاریخی — با دادهٔ واقعی">
+<meta property="og:title" content="Entekhab Market DNA"><meta property="og:description" content="8-gene market DNA for every major coin, similar coins and historical twins — real data">
+<link rel="canonical" href="https://entekhab.net/dna/">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+#helix{width:100%;height:440px;display:block;cursor:grab}
+.pick{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:thin}
+.pick button{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:99px;border:1px solid var(--line);background:#ffffff08;font-family:var(--mono);font-size:.82rem;white-space:nowrap}
+.pick button.on{border-color:var(--o);background:rgba(247,147,26,.14)}
+.gene{display:grid;grid-template-columns:150px 1fr 54px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.gene b{font-size:.9rem}.gene small{display:block;color:var(--mute);font-size:.72rem;line-height:1.4;grid-column:1/-1}
+.gbar{height:10px;border-radius:6px;background:#ffffff10;overflow:hidden}.gbar i{display:block;height:100%;border-radius:6px}
+.code{font-family:var(--mono);font-size:1.05rem;letter-spacing:.06em;direction:ltr;color:var(--o2);word-break:break-all}
+.strip{display:inline-flex;gap:2px;vertical-align:middle}.strip i{width:10px;height:14px;border-radius:2px;display:inline-block}
+.tip{position:absolute;pointer-events:none;background:rgba(0,0,0,.85);border:1px solid var(--o);border-radius:8px;padding:6px 10px;font-size:.8rem;display:none;z-index:5}
+@media(max-width:600px){.gene{grid-template-columns:110px 1fr 44px}#helix{height:340px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero">
+    <h1 data-t="h1"></h1><p data-t="lead"></p>
+  </div>
+  <div class="pick" id="pick"></div>
+  <div class="grid">
+    <div class="card" style="padding:0"><canvas id="helix" aria-label="DNA helix"></canvas><div class="tip" id="tip"></div>
+      <div style="padding:12px 18px"><div class="row" style="justify-content:space-between"><div id="who"></div><div id="price"></div></div><div class="code" id="code"></div></div></div>
+    <div class="card"><h3 data-t="genesT"></h3><div id="genes"></div><p class="disc" id="meta"></p></div>
+  </div>
+  <section><h2><b data-t="simT"></b><span>SIMILAR</span></h2><p class="lead" data-t="simL"></p><div class="card" id="similar"></div></section>
+  <section><h2><b data-t="twT"></b><span>TWINS</span></h2><p class="lead" data-t="twL"></p><div class="grid"><div class="card" id="twChart"></div><div class="card" id="twTable"></div></div></section>
+  <section><h2><b data-t="shT"></b><span>SHARE</span></h2><div class="grid"><div class="card" id="card"></div><div class="card"><h3 data-t="howT"></h3><div data-t="how" style="font-size:.88rem;color:#cfcfc8;line-height:1.9"></div></div></div></section>
+  <div id="seo" class="disc" style="margin:30px 0"></div>
+</div>
+<footer>entekhab.net · Binance · OKX · GitHub · RSS news — <span data-t="nfa"></span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/assets/ui.js"></script>
+<script>
+const GENES=['liquidity','volatility','flow','sentiment','attention','leverage','developers','momentum'];
+Object.assign(I.fa,{h1:'DNA <em>بازار</em>',lead:'هر ارز یک هویت تحلیلی دارد: ۸ ژن از دادهٔ واقعی، ارزهایی که الان شبیه آن هستند و روزهایی از تاریخ خودش که شبیه امروز بوده‌اند — و اینکه بعدش چه شد.',
+ genesT:'۸ ژن (صدک بین ارزهای اسکن‌شده؛ ۰ کمترین، ۱۰۰ بیشترین)',simT:'DNA مشابه',simL:'ارزهایی که الان از نظر این ۸ ژن بیشترین شباهت را دارند (۱۰۰٪ = یکسان).',twT:'دوقلوهای تاریخی',twL:'۵ روز از تاریخ همین ارز که وضعیتش (بازده ۷ و ۳۰ روز، نوسان، فاصله از MA200، RSI، سهم خریداران و حجم) بیشترین شباهت را به امروز داشت؛ و ۳۰ روز بعدش. این پیش‌بینی نیست.',
+ shT:'کارت DNA',howT:'روش و شفافیت',nfa:'آموزشی است، توصیهٔ مالی نیست',noData:'دادهٔ DNA هنوز در اولین اجرای خودکار ساخته نشده.',dl:'دانلود تصویر',share:'اشتراک‌گذاری',
+ G:{liquidity:['نقدشوندگی','میانگین حجم معاملات ۳۰ روز در Binance'],volatility:['نوسان','نوسان واقعی ۳۰ روزه (سالانه)'],flow:['جریان خریداران','سهم خریدهای تهاجمی (taker) در ۷ روز — دادهٔ معاملات صرافی، نه کیف‌پول نهنگ‌ها'],sentiment:['احساسات خبری','لحن تیترهای ۷ روز دربارهٔ این ارز (۵۰ = خنثی)'],attention:['توجه رسانه‌ای','تعداد تیترهای ۷ روز'],leverage:['اهرم مشتقه','نرخ تأمین مالی سالانهٔ قرارداد دائمی OKX'],developers:['فعالیت توسعه','کامیت‌های ۳۰ روز مخزن اصلی GitHub'],momentum:['مومنتوم','۰٫۲×بازده ۷ روز + ۰٫۵×۳۰ روز + ۰٫۳×۹۰ روز']},
+ none:'بدون داده',corr:'همبستگی با BTC (۹۰ روز)',fromHigh:'فاصله از سقف ۱۰۰۰ روزه',sim:'شباهت',date:'تاریخ',a7:'۷ روز بعد',a30:'۳۰ روز بعد',dd:'بیشترین افت',up30:'صعودی پس از ۳۰ روز',avg30:'میانگین ۳۰ روز',
+ how:'• هر ژن صدک ارز بین حدود ۴۰ ارز پرحجم Binance است (به‌جز احساسات که مستقیم از لحن تیترها حساب می‌شود).<br>• «نهنگ‌ها»: دادهٔ آنچین رایگانِ قابل‌اعتماد وجود ندارد؛ به‌جایش «جریان خریداران» از معاملات واقعی صرافی آمده است.<br>• «فعالیت شبکه»: به‌جای تراکنش‌های آنچین، فعالیت واقعی توسعه‌دهندگان در GitHub (فقط برای پروژه‌های دارای مخزن مشخص).<br>• شباهت = ۱ − فاصلهٔ میانگین ژن‌های مشترک. دوقلوها با فاصلهٔ اقلیدسی ویژگی‌های استانداردشده پیدا می‌شوند.<br>• هر ۳ ساعت به‌روز می‌شود. گذشته تضمینی برای آینده نیست.'});
+Object.assign(I.ckb,{h1:'DNAی <em>بازاڕ</em>',lead:'هەر دراوێک ناسنامەیەکی شیکاری هەیە: ٨ جین لە داتای ڕاستەقینە، ئەو دراوانەی ئێستا لێی دەچن و ئەو ڕۆژانەی مێژووی خۆی کە لە ئەمڕۆ دەچوون — و دواتر چی ڕوویدا.',
+ genesT:'٨ جین (سەدی لە نێوان دراوە پشکنراوەکان؛ ٠ کەمترین، ١٠٠ زۆرترین)',simT:'DNAی هاوشێوە',simL:'ئەو دراوانەی ئێستا لەم ٨ جینەدا زۆرترین لێکچوونیان هەیە (١٠٠٪ = وەک یەک).',twT:'دووانە مێژووییەکان',twL:'٥ ڕۆژ لە مێژووی هەمان دراو کە دۆخەکەی زۆرترین لێکچوونی لەگەڵ ئەمڕۆ هەبوو؛ و ٣٠ ڕۆژ دواتر. ئەمە پێشبینی نییە.',
+ shT:'کارتی DNA',howT:'ڕێباز و ڕوونی',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',noData:'داتای DNA هێشتا دروست نەکراوە.',dl:'داگرتنی وێنە',share:'هاوبەشکردن',
+ G:{liquidity:['نەختینەیی','تێکڕای قەبارەی ٣٠ ڕۆژ لە Binance'],volatility:['لەرزین','لەرزینی ڕاستەقینەی ٣٠ ڕۆژە'],flow:['ڕەوتی کڕیاران','بەشی کڕینە هێرشبەرەکان (taker) لە ٧ ڕۆژدا — داتای ئاڵوگۆڕگە، نەک جزدانی نەهەنگەکان'],sentiment:['هەستی هەواڵ','تۆنی سەردێڕەکانی ٧ ڕۆژ (٥٠ = بێلایەن)'],attention:['سەرنجی میدیا','ژمارەی سەردێڕەکانی ٧ ڕۆژ'],leverage:['لیڤەریجی مەشتەقە','ڕێژەی فەندینگی ساڵانەی OKX'],developers:['چالاکیی گەشەپێدان','کۆمیتەکانی ٣٠ ڕۆژ لە GitHub'],momentum:['مۆمێنتۆم','٠.٢×٧ ڕۆژ + ٠.٥×٣٠ ڕۆژ + ٠.٣×٩٠ ڕۆژ']},
+ none:'داتا نییە',corr:'پەیوەندی لەگەڵ BTC (٩٠ ڕۆژ)',fromHigh:'دووری لە لووتکەی ١٠٠٠ ڕۆژ',sim:'لێکچوون',date:'ڕێکەوت',a7:'٧ ڕۆژ دواتر',a30:'٣٠ ڕۆژ دواتر',dd:'زۆرترین دابەزین',up30:'بەرزبوونەوە دوای ٣٠ ڕۆژ',avg30:'تێکڕای ٣٠ ڕۆژ',
+ how:'• هەر جینێک سەدی دراوەکەیە لە نێوان نزیکەی ٤٠ دراوی پڕقەبارەی Binance.<br>• «نەهەنگەکان»: داتای ئانچەینی بەخۆڕایی و متمانەپێکراو نییە؛ لە جیاتی ئەوە «ڕەوتی کڕیاران» لە مامەڵە ڕاستەقینەکانی ئاڵوگۆڕگەوە هاتووە.<br>• «چالاکیی تۆڕ»: چالاکیی ڕاستەقینەی گەشەپێدەران لە GitHub.<br>• هەر ٣ کاتژمێر نوێ دەبێتەوە. ڕابردوو گەرەنتی داهاتوو نییە.'});
+Object.assign(I.en,{h1:'Market <em>DNA</em>',lead:'Every coin has an analytical identity: 8 genes from real data, the coins that look most like it right now, and the days in its own history that looked like today — and what came next.',
+ genesT:'8 genes (percentile among scanned coins; 0 lowest, 100 highest)',simT:'Similar DNA',simL:'Coins whose 8 genes are closest right now (100% = identical).',twT:'Historical twins',twL:'The 5 days in this coin’s own history whose state (7/30-day return, volatility, distance from MA200, RSI, taker share, volume) was closest to today — and the next 30 days. Not a prediction.',
+ shT:'DNA card',howT:'Method & transparency',nfa:'Educational, not financial advice',noData:'DNA data is built on the first automatic run.',dl:'Download image',share:'Share',
+ G:{liquidity:['Liquidity','30-day average Binance volume'],volatility:['Volatility','30-day realised volatility (annualised)'],flow:['Taker flow','Share of aggressive (taker) buys over 7 days — exchange trades, not whale wallets'],sentiment:['News sentiment','Tone of the last 7 days of headlines (50 = neutral)'],attention:['Attention','Headlines in 7 days'],leverage:['Leverage','Annualised OKX perpetual funding'],developers:['Developers','30-day commits to the main GitHub repo'],momentum:['Momentum','0.2×7d + 0.5×30d + 0.3×90d return']},
+ none:'no data',corr:'Correlation with BTC (90d)',fromHigh:'From 1000-day high',sim:'Similarity',date:'Date',a7:'+7 days',a30:'+30 days',dd:'Max drop',up30:'Up after 30 days',avg30:'Avg 30d',
+ how:'• Each gene is the coin’s percentile among ~40 high-volume Binance coins (sentiment is computed directly from headline tone).<br>• “Whales”: there is no reliable free on-chain source, so the honest substitute is taker flow from real exchange trades.<br>• “Network activity”: real developer activity on GitHub (only for projects with a known main repo).<br>• Similarity = 1 − RMS distance over shared genes. Twins = nearest standardised past states.<br>• Updated every 3 hours. The past does not guarantee the future.'});
+let DNA=null,cur=(window.DNA_COIN||location.hash.slice(1)||'BTC').toUpperCase();
+const col=v=>v==null?'#3a3d42':v>=66?'#f7931a':v>=33?'#b88a3c':'#2b6cb0';
+function rawFmt(g,r){return g==='liquidity'?'$'+fm(r.qvol30/1e6,1)+'M/d':g==='volatility'?r.vol30+'%':g==='flow'?r.taker7+'%':g==='sentiment'?(r.sent==null?'—':(r.sent>0?'+':'')+r.sent):g==='attention'?String(r.news7):g==='leverage'?(r.funding_ann==null?'—':r.funding_ann+'%/y'):g==='developers'?(r.commits30==null?'—':r.commits30):g==='momentum'?`${r.ret7??'—'} / ${r.ret30??'—'} / ${r.ret90??'—'}%`:''}
+function pick(){const cs=Object.keys(DNA.coins).sort((a,b)=>(DNA.coins[b].raw.qvol30||0)-(DNA.coins[a].raw.qvol30||0));
+ $('#pick').innerHTML=cs.map(c=>`<button data-c="${c}" class="${c===cur?'on':''}">${logoTag(c,18)}${c}</button>`).join('');
+ $('#pick').querySelectorAll('button').forEach(b=>b.onclick=()=>{cur=b.dataset.c;history.replaceState(null,'','#'+cur);render()})}
+function render(){if(!DNA||!DNA.coins){$('#genes').innerHTML=`<p class="disc">${T('noData')}</p>`;return}
+ if(!DNA.coins[cur])cur='BTC';const C=DNA.coins[cur],G=T('G');pick();
+ $('#who').innerHTML=`${logoTag(cur,30)}<b style="font-size:1.3rem">${cur}</b>`;$('#price').innerHTML=`<span class="num">$${fm(C.raw.price,C.raw.price<1?6:2)}</span>`;
+ $('#code').textContent=C.code;
+ $('#genes').innerHTML=GENES.map(g=>{const v=C.genes[g];return `<div class="gene"><b>${G[g][0]}</b><div class="gbar"><i style="width:${v??0}%;background:${col(v)}"></i></div><span class="num">${v??'—'}</span><small>${G[g][1]} · <span class="num">${esc(rawFmt(g,C.raw))}</span></small></div>`}).join('');
+ $('#meta').innerHTML=`${T('corr')}: <b class="num">${C.raw.corr_btc??'—'}</b> · ${T('fromHigh')}: ${sg(C.raw.from_high,1)} · ${DNA.universe} coins · ${DNA.updated_at.slice(0,16).replace('T',' ')} UTC`;
+ const strip=c=>`<span class="strip">${GENES.map(g=>`<i style="background:${col(DNA.coins[c].genes[g])}" title="${G[g][0]}: ${DNA.coins[c].genes[g]??'—'}"></i>`).join('')}</span>`;
+ $('#similar').innerHTML=`<table><tr><th></th><th>${T('sim')}</th><th>DNA</th><th>${T('corr')}</th></tr>${(C.similar||[]).map(([c,s])=>`<tr><td><a href="#${c}" data-go="${c}">${logoTag(c,22)}<b>${c}</b></a></td><td><div class="bar" style="width:90px;display:inline-block"><i style="width:${s}%"></i></div> <span class="num">${s}%</span></td><td>${strip(c)}</td><td class="num">${DNA.coins[c].raw.corr_btc??'—'}</td></tr>`).join('')}<tr><td>${logoTag(cur,22)}<b>${cur}</b></td><td></td><td>${strip(cur)}</td><td class="num">${C.raw.corr_btc??'—'}</td></tr></table>`;
+ $('#similar').querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();cur=a.dataset.go;history.replaceState(null,'','#'+cur);render();scrollTo({top:0,behavior:'smooth'})});
+ const tw=C.twins||[],st=C.twin_stats;
+ $('#twChart').innerHTML=tw.length?`<h3>${cur} · ${T('twT')}</h3>${pathChart(tw)}<div class="row" style="gap:22px"><div><small class="disc">${T('up30')}</small><div class="big">${st.up30}/${st.n}</div></div><div><small class="disc">${T('avg30')}</small><div class="big">${sg(st.avg30)}</div></div></div>`:`<p class="disc">${T('noData')}</p>`;
+ $('#twTable').innerHTML=tw.length?`<table><tr><th>${T('date')}</th><th>${T('a7')}</th><th>${T('a30')}</th><th>${T('dd')}</th></tr>${tw.map(r=>`<tr><td class="num">${r.date}</td><td>${sg(r.f7)}</td><td>${sg(r.f30)}</td><td>${sg(r.dd30)}</td></tr>`).join('')}</table>`:'';
+ helixSet(C);card(C);document.title=`${cur} Market DNA | entekhab.net`}
+function pathChart(tw){const W=520,H=170,all=tw.flatMap(x=>x.path),lo=Math.min(...all,100),hi=Math.max(...all,100),Y=v=>H-4-(v-lo)/(hi-lo||1)*(H-8),X=i=>i*W/30;
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;margin:6px 0"><line x1="0" x2="${W}" y1="${Y(100)}" y2="${Y(100)}" stroke="#444" stroke-dasharray="3 3"/>${tw.map(x=>`<polyline points="${x.path.map((v,i)=>`${X(i)},${Y(v)}`).join(' ')}" fill="none" stroke="${x.f30>=0?'rgba(34,197,94,.7)':'rgba(239,68,68,.7)'}" stroke-width="1.6"/>`).join('')}<text x="4" y="12" fill="#888" font-size="10">+${fm(hi-100,0)}%</text><text x="4" y="${H-6}" fill="#888" font-size="10">${fm(lo-100,0)}%</text></svg>`}
+/* ---- 3D double helix ---- */
+let H3=null;
+function helixInit(){if(!window.THREE)return;const cv=$('#helix');let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(e){return}
+ r.setPixelRatio(Math.min(devicePixelRatio,2));const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,100);cam.position.set(0,0,17);
+ const grp=new THREE.Group();sc.add(grp);const rungs=[],TURN=3,N=GENES.length*TURN,HGT=12,R=2.4;
+ const s1=[],s2=[];for(let i=0;i<=200;i++){const t=i/200,a=t*TURN*Math.PI*2,y=(t-.5)*HGT;s1.push(new THREE.Vector3(Math.cos(a)*R,y,Math.sin(a)*R));s2.push(new THREE.Vector3(Math.cos(a+Math.PI)*R,y,Math.sin(a+Math.PI)*R))}
+ const tube=(pts,c)=>new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),400,.13,10,false),new THREE.MeshStandardMaterial({color:c,metalness:.6,roughness:.35,emissive:c,emissiveIntensity:.25}));
+ grp.add(tube(s1,0xf7931a),tube(s2,0x8a5a1c));
+ for(let i=0;i<N;i++){const t=(i+.5)/N,a=t*TURN*Math.PI*2,y=(t-.5)*HGT;const g=GENES[i%GENES.length];
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,R*2,10),new THREE.MeshStandardMaterial({color:0x444444,metalness:.3,roughness:.5,emissive:0x000000}));
+  m.position.set(0,y,0);m.rotation.z=Math.PI/2;m.rotation.y=-a;m.userData={g};grp.add(m);
+  const b1=new THREE.Mesh(new THREE.SphereGeometry(.22,16,12),m.material);b1.position.set(Math.cos(a)*R,y,Math.sin(a)*R);b1.userData={g};
+  const b2=b1.clone();b2.position.set(Math.cos(a+Math.PI)*R,y,Math.sin(a+Math.PI)*R);grp.add(b1,b2);rungs.push(m,b1,b2)}
+ sc.add(new THREE.AmbientLight(0xffffff,.55));const d=new THREE.DirectionalLight(0xffffff,1.1);d.position.set(5,6,8);sc.add(d);const p=new THREE.PointLight(0xf7931a,1.4,40);p.position.set(-6,-4,6);sc.add(p);
+ let drag=null,ry=0,rx=.25,auto=true;const ray=new THREE.Raycaster(),mv=new THREE.Vector2(),tip=$('#tip');
+ cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];auto=false;cv.style.cursor='grabbing'});addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
+ cv.addEventListener('pointermove',e=>{if(drag){ry+=(e.clientX-drag[0])*.008;rx=Math.max(-1,Math.min(1,rx+(e.clientY-drag[1])*.005));drag=[e.clientX,e.clientY];tip.style.display='none';return}
+  const b=cv.getBoundingClientRect();mv.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);ray.setFromCamera(mv,cam);const h=ray.intersectObjects(rungs)[0];
+  if(h&&H3.C){const g=h.object.userData.g,v=H3.C.genes[g];tip.innerHTML=`<b>${T('G')[g][0]}</b>: <span class="num">${v??T('none')}</span>`;tip.style.display='block';tip.style.left=(e.clientX-b.left+12)+'px';tip.style.top=(e.clientY-b.top+12)+'px'}else tip.style.display='none'});
+ cv.addEventListener('pointerleave',()=>{tip.style.display='none'});
+ const size=()=>{const w=cv.clientWidth,h=cv.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()};size();addEventListener('resize',size);
+ let vis=true;new IntersectionObserver(e=>{vis=e[0].isIntersecting;if(vis)loop()}).observe(cv);let raf=0;
+ function loop(){if(raf)return;raf=requestAnimationFrame(f)}function f(){raf=0;if(!vis)return;if(auto)ry+=.004;grp.rotation.set(rx,ry,0);r.render(sc,cam);loop()}
+ H3={rungs,C:null};loop()}
+function helixSet(C){if(!H3)return;H3.C=C;H3.rungs.forEach(o=>{const v=C.genes[o.userData.g],c=new THREE.Color(col(v));o.material.color.copy(c);o.material.emissive.copy(c).multiplyScalar(v==null?0:.25+v/250)})}
+/* ---- share card ---- */
+function card(C){const cv=document.createElement('canvas');cv.width=1080;cv.height=1350;const x=cv.getContext('2d');bgPaint(x,1080,1350);const G=T('G'),rtl=lang!=='en';
+ const draw=img=>{x.textAlign='center';x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk"';x.fillText('MARKET DNA',540,90);
+  if(img){x.save();x.beginPath();x.arc(540,200,70,0,7);x.clip();x.fillStyle='#fff';x.fillRect(470,130,140,140);x.drawImage(img,470,130,140,140);x.restore()}
+  x.fillStyle='#fff';x.font='800 84px "Space Grotesk"';x.fillText(cur,540,img?350:250);x.fillStyle='#ffb347';x.font='600 30px "Space Grotesk"';x.fillText(C.code,540,img?405:305);
+  GENES.forEach((g,i)=>{const y=480+i*92,v=C.genes[g];x.textAlign=rtl?'right':'left';x.fillStyle='#ddd';x.font='600 34px Vazirmatn,sans-serif';x.direction=rtl?'rtl':'ltr';x.fillText(G[g][0],rtl?960:120,y);
+   x.direction='ltr';x.textAlign=rtl?'left':'right';x.fillStyle='#fff';x.font='700 34px "Space Grotesk"';x.fillText(v==null?'—':String(v),rtl?120:960,y);
+   x.fillStyle='rgba(255,255,255,.1)';x.fillRect(120,y+16,840,16);x.fillStyle=col(v);const w=840*(v||0)/100;rtl?x.fillRect(960-w,y+16,w,16):x.fillRect(120,y+16,w,16)});
+  x.textAlign='center';x.direction='ltr';x.fillStyle='#f7931a';x.font='700 42px "Space Grotesk"';x.fillText('entekhab.net/dna/'+cur.toLowerCase(),540,1290);
+  const u=cv.toDataURL('image/png');cv.className='card-out';cv.style.maxWidth='360px';$('#card').innerHTML='';$('#card').append(cv);const r=document.createElement('div');r.className='row';r.style.marginTop='10px';
+  r.innerHTML=`<a class="btn p" download="entekhab-dna-${cur}.png" href="${u}">⬇ ${T('dl')}</a><button class="btn" id="shb">📤 ${T('share')}</button>`;$('#card').append(r);
+  $('#shb').onclick=()=>share(`${cur} Market DNA ${C.code}`,`https://entekhab.net/dna/${cur.toLowerCase()}/`)};
+ const u=logoUrl(cur);if(u){const im=new Image();im.onload=()=>draw(im);im.onerror=()=>draw(null);im.src=u}else draw(null)}
+(async()=>{const [d,lg]=await Promise.all([j('/data/dna.json'+V()),j('/data/logos/index.json'+V())]);DNA=d;LOGO=new Set(lg||[]);helixInit();uiLang(render)})();
+</script>
+</body>
+</html>
