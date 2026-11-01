@@ -167,7 +167,7 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"  {p['id']} FAILED: {e}", file=sys.stderr)
             # اگر گوگل ما را محدود کرد، بقیه را برای اجرای بعدی بگذاریم
-            if "429" in str(e) or "too many" in str(e).lower():
+            if "429" in str(e) or "too many" in str(e).lower() or "credit balance" in str(e).lower() or "401" in str(e):
                 print("rate-limited; stopping for this run", file=sys.stderr)
                 break
         if done and done % 10 == 0:
