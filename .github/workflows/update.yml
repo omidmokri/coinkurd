@@ -67,10 +67,20 @@ jobs:
         continue-on-error: true
         run: python scripts/market.py
 
+      - name: Multi-source news (RSS)
+        id: news
+        continue-on-error: true
+        run: python scripts/news.py
+
       - name: Post & signal track record
         id: impact
         continue-on-error: true
         run: python scripts/impact.py
+
+      - name: Entekhab Score
+        id: score
+        continue-on-error: true
+        run: python scripts/score.py
 
       - name: Health check & Telegram alert
         id: health
@@ -82,6 +92,8 @@ jobs:
           STEP_REPAIR: ${{ steps.repair.outcome }}
           STEP_MARKET: ${{ steps.market.outcome }}
           STEP_IMPACT: ${{ steps.impact.outcome }}
+          STEP_NEWS: ${{ steps.news.outcome }}
+          STEP_SCORE: ${{ steps.score.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
