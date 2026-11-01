@@ -44,6 +44,13 @@ def model():
     if env:
         _model = env
         return env
+    try:  # مدلی که ai_check.py آزموده و انتخاب کرده
+        cached = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ai_model.json")))
+        if cached.get("model"):
+            _model = cached["model"]
+            return _model
+    except Exception:  # noqa: BLE001
+        pass
     try:
         r = requests.get(f"{BASE}/models", params={"pageSize": 200}, headers={"x-goog-api-key": key()}, timeout=30)
         r.raise_for_status()
