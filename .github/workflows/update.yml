@@ -68,6 +68,11 @@ jobs:
         continue-on-error: true
         run: python scripts/market.py
 
+      - name: Coin logos (CoinGecko, only new ones)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/logos.py
+
       - name: Multi-source news (RSS)
         id: news
         continue-on-error: true
