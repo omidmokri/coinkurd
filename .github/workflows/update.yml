@@ -73,6 +73,16 @@ jobs:
         continue-on-error: true
         run: python scripts/news.py
 
+      - name: Narrative Radar
+        id: narr
+        continue-on-error: true
+        run: python scripts/narratives.py
+
+      - name: Economic calendar & market reaction
+        id: events
+        continue-on-error: true
+        run: python scripts/events.py
+
       - name: Post & signal track record
         id: impact
         continue-on-error: true
@@ -92,6 +102,10 @@ jobs:
           BRAIN_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         timeout-minutes: 5
         run: python scripts/brain.py
+
+      - name: Market Replay snapshot
+        continue-on-error: true
+        run: python scripts/snapshot.py
 
       - name: Translate new posts (fa → ckb, en)
         id: translate
@@ -118,6 +132,8 @@ jobs:
           STEP_NEWS: ${{ steps.news.outcome }}
           STEP_SCORE: ${{ steps.score.outcome }}
           STEP_BRAIN: ${{ steps.brain.outcome }}
+          STEP_NARR: ${{ steps.narr.outcome }}
+          STEP_EVENTS: ${{ steps.events.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
