@@ -190,8 +190,14 @@ def parse_messages(html: str, channel: str) -> list:
 
         hashtags = extract_hashtags(text)
         cls = classify(text, hashtags)
-        first_line = text.split("\n", 1)[0].strip() if text else ""
-        title = re.sub(r"#\S+", "", first_line).strip(" :–-—|•") or (cls["category"])
+        title = ""
+        for ln in text.split("\n"):
+            cand = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
+            cand = re.sub(r"#\S+", "", cand).strip(" :–-—|•\t")
+            if len(re.findall(r"[\w\u0600-\u06FF]", cand)) >= 3:
+                title = cand
+                break
+        title = title or cls["category"]
         if len(title) > 120:
             title = title[:117].rstrip() + "…"
 
