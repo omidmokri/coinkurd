@@ -162,7 +162,11 @@ def main():
     out = {"updated_at": datetime.now(timezone.utc).isoformat(), "regime": reg, "movers": facts["movers_context"],
            "gainers": facts["top_gainers"], "losers": facts["top_losers"],
            "report": prev.get("report"), "report_at": prev.get("report_at"), "report_engine": prev.get("report_engine")}
-    due = not prev.get("report_at") or datetime.now(timezone.utc) - datetime.fromisoformat(prev["report_at"]) >= timedelta(hours=REPORT_EVERY_H)
+    stamps = [prev.get("report_at")] + [x.get("at") for x in load("brain_log.json", [])[-3:]]
+    stamps = [datetime.fromisoformat(t) for t in stamps if t]
+    last = max(stamps) if stamps else None
+    print("last report:", last, "prev keys:", sorted(prev)[:8])
+    due = last is None or datetime.now(timezone.utc) - last >= timedelta(hours=REPORT_EVERY_H)
     if os.environ.get("BRAIN_FORCE") == "1":
         due = True
     if ai.available() and due:
