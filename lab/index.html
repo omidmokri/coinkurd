@@ -67,6 +67,10 @@ footer{padding:40px 0;color:var(--mute);font-size:.8rem;text-align:center;border
   <section id="discS"><h2><b data-t="dT"></b><span>DAILY</span></h2><p class="lead" data-t="dL"></p>
     <div class="grid"><div class="card" id="unusual"></div><div class="card" id="missions"></div><div class="card" id="weather" style="grid-column:1/-1"></div><div class="card" id="battle"></div><div class="card" id="poster"></div></div></section>
 
+  <section id="studioS"><h2><b data-t="stT"></b><span>STUDIO</span></h2><p class="lead" data-t="stL"></p><div class="card" id="studio"></div></section>
+
+  <section id="histS"><h2><b data-t="hiT"></b><span>HISTORY</span></h2><p class="lead" data-t="hiL"></p><div class="card" id="hist"></div></section>
+
   <section id="flowS"><h2><b data-t="flowT"></b><span>LIVE</span></h2><p class="lead" data-t="flowL"></p>
     <div class="card"><svg id="flow" viewBox="0 0 1000 440"></svg><div id="flowInfo" class="disc"></div></div></section>
 
@@ -210,7 +214,7 @@ async function px(sym='BTCUSDT'){const r=await j(`${BN}/ticker/price?symbol=${sy
 function applyLang(){const rtl=lang!=='en';document.documentElement.lang=lang;document.documentElement.dir=rtl?'rtl':'ltr';
  $('#hT').innerHTML=T('hT');$('#hL').textContent=T('hL');$('#honest').innerHTML=T('honest');
  document.querySelectorAll('[data-t]').forEach(e=>e.textContent=T(e.dataset.t));
- const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=[['discS',T('dT')],['watchS',T('wT')],['radarS',T('rT')],['galS',T('galT')],['wrapS',T('wrT')]].map(([a,t])=>`<a href="#${a}">${t}</a>`).join('')+T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
+ const ids=['flowS','arenaS','tmS','dnaS','memS','derS','devS'];$('#tabs').innerHTML=[['discS',T('dT')],['studioS',T('stT')],['histS',T('hiT')],['watchS',T('wT')],['radarS',T('rT')],['galS',T('galT')],['wrapS',T('wrT')]].map(([a,t])=>`<a href="#${a}">${t}</a>`).join('')+T('tabs').map((t,i)=>`<a href="${i<7?'#'+ids[i]:'/'}">${t}</a>`).join('');
  document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));renderAll()}
 $('#langs').onclick=e=>{const b=e.target.closest('button');if(!b)return;lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang()};
 
@@ -317,10 +321,10 @@ function coneChart(f){const W=520,H=200,c=f.cone,lo=Math.min(...c['5'],f.price),
 function renderCouncil(){const c=D.council,el=$('#council');if(!c?.council){el.innerHTML=`<p class="disc">${T('noData')}</p>`;return}const r=c.council,L=r[lang]||r.en,cl={bullish:'#22c55e',bearish:'#ef4444',neutral:'#9ca3af'};
  el.innerHTML=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${r.agents.map(a=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px;border-top:3px solid ${cl[a.stance]||'#888'}"><b>${T('ag')[a.id]||esc(a.id)}</b> <span class="chip" style="color:${cl[a.stance]}">${esc(a.stance)} · ${'●'.repeat(a.confidence||0)}</span><ul style="margin:8px 18px 0;font-size:.85rem">${((a[lang]||a.en||{}).evidence||[]).map(e=>`<li>${esc(e)}</li>`).join('')}</ul></div>`).join('')}</div>
  ${L.disagreements?.length?`<h3 style="margin-top:14px">⚔</h3><ul style="margin:0 18px;font-size:.9rem">${L.disagreements.map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`:''}<p style="margin-top:12px"><b>${esc(L.summary)}</b></p><p class="disc">${esc(c.engine)} · ${c.at.slice(0,16).replace('T',' ')} UTC</p>`}
-function renderAll(){renderDisc();renderCouncil();renderWatch();renderRadar();renderGraph();renderWrap();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
+function renderAll(){renderDisc();renderStudio();if(!$('#hD'))renderHist();renderCouncil();renderWatch();renderRadar();renderGraph();renderWrap();renderPulse();renderFlow();renderArena();drawGuess();renderDNA();renderLab()}
 (async()=>{const v='?v='+Math.floor(Date.now()/12e4);[D.lab,D.narr,D.market,D.brain,D.council,D.news,D.score,D.wrapped,D.logos]=await Promise.all(['lab','narratives','market','brain','council','news','score','wrapped','logos/index'].map(n=>j(`/data/${n}.json${v}`)));LOGO=new Set(D.logos||[]);
  $('#tmCoin').innerHTML=TM_COINS.map(c=>`<option>${c}</option>`).join('');const t=new Date();$('#tmB').value=t.toISOString().slice(0,10);t.setFullYear(t.getFullYear()-1);$('#tmA').value=t.toISOString().slice(0,10);$('#tmGo').onclick=timeMachine;
- applyLang();newGuess();galaxy()})();
+ applyLang();newGuess();galaxy();setTimeout(battleLink,1500)})();
 /* ================= stage 2: watchlist, radar, brain graph, galaxy, wrapped ================= */
 const I2={
 fa:{wT:'لیست مراقبت و گزارش شخصی',wL:'کوین‌های خودت را انتخاب کن؛ قیمت، RSI، روند، سیگنال‌های اسکنر، امتیاز Entekhab و خبرهای ۲۴ ساعت هر کدام اینجا جمع می‌شود و می‌توانی گزارش امروزت را به شکل تصویر بفرستی. (روی مرورگر خودت ذخیره می‌شود)',
@@ -533,6 +537,82 @@ function poster(){const m=D.market,b=D.brain;if(!m?.coins){$('#poster').innerHTM
  const u=cv.toDataURL('image/png');cv.className='card-out';cv.style.maxWidth='320px';$('#poster').innerHTML=`<h3>🖼 ${T('poT')}</h3>`;$('#poster').append(cv);const r=document.createElement('div');r.className='row';r.style.marginTop='8px';r.innerHTML=`<a class="btn p" download="entekhab-daily-${new Date().toISOString().slice(0,10)}.png" href="${u}">⬇ ${T('dl')}</a><span class="disc">1080×1920 · story</span>`;$('#poster').append(r)}
 
 function renderDisc(){heartbeat();unusual();weather();missions();if(!$('#bA'))battle();poster()}
+
+/* ================= stage 4: studio, prediction card, history calendar, battle links ================= */
+const I4={
+fa:{stT:'استودیو ساخت محتوا',stL:'برای هر ارز با یک کلیک کارت نمودار (مربع یا استوری) و ویدئوی کوتاه ۶ ثانیه‌ای بساز؛ با لوگو و لینک entekhab.net و دادهٔ واقعی Binance.',mk:'ساخت کارت',vid:'ساخت ویدئو',rec:'در حال ضبط…',sq:'مربع',story:'استوری',
+ hiT:'تقویم تاریخی بازار',hiL:'یک روز از سال را انتخاب کن: قیمت بیت‌کوین در همین روز در هر سال (Binance، از ۲۰۱۷) و رویدادهای مهم تاریخ کریپتو در نزدیکی این تاریخ.',close:'قیمت بسته‌شدن',evNear:'رویدادهای نزدیک این تاریخ',noEv:'رویداد ثبت‌شده‌ای در ±۳ روز این تاریخ نداریم.',
+ card:'کارت پیش‌بینی',myCall:'پیش‌بینی من',pending:'در انتظار نتیجه'},
+ckb:{stT:'ستۆدیۆی دروستکردنی ناوەڕۆک',stL:'بۆ هەر دراوێک بە یەک کلیک کارتی نەخشە و ڤیدیۆی کورتی ٦ چرکەیی دروست بکە؛ بە لۆگۆ و لینکی entekhab.net و داتای ڕاستەقینە.',mk:'دروستکردنی کارت',vid:'دروستکردنی ڤیدیۆ',rec:'تۆمار دەکرێت…',sq:'چوارگۆشە',story:'ستۆری',
+ hiT:'ڕۆژژمێری مێژوویی بازاڕ',hiL:'ڕۆژێکی ساڵ هەڵبژێرە: نرخی بیتکۆین لەم ڕۆژەدا لە هەموو ساڵێکدا و ڕووداوە گرنگەکانی مێژووی کریپتۆ.',close:'نرخی داخستن',evNear:'ڕووداوە نزیکەکان',noEv:'هیچ ڕووداوێکی تۆمارکراو لە ±٣ ڕۆژدا نییە.',
+ card:'کارتی پێشبینی',myCall:'پێشبینیی من',pending:'چاوەڕێی ئەنجام'},
+en:{stT:'Content studio',stL:'One click to make a chart card (square or story) and a 6-second video for any coin — with the entekhab.net logo and link and real Binance data.',mk:'Make card',vid:'Make video',rec:'Recording…',sq:'Square',story:'Story',
+ hiT:'Market history calendar',hiL:'Pick a day of the year: Bitcoin’s price on that day in every year (Binance, since 2017) and the major crypto-history events near that date.',close:'Close',evNear:'Events near this date',noEv:'No recorded event within ±3 days of this date.',
+ card:'Prediction card',myCall:'My call',pending:'pending'}};
+for(const l in I4)Object.assign(I[l],I4[l]);
+/* ---- prediction card (#92) ---- */
+function predCard(c){const cv=document.createElement('canvas');cv.width=1080;cv.height=1080;const x=cv.getContext('2d');bgPaint(x,1080,1080);x.textAlign='center';
+ x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('PREDICTION ARENA',540,110);
+ x.fillStyle='#fff';x.font='800 120px "Space Grotesk"';x.fillText('BTC',540,300);
+ x.fillStyle=c.dir==='up'?'#22c55e':'#ef4444';x.font='800 96px "Space Grotesk"';x.fillText(c.dir==='up'?'▲ HIGHER':'▼ LOWER',540,440);
+ x.fillStyle='#bbb';x.font='500 40px "Space Grotesk"';x.fillText('in 24 hours',540,510);
+ x.fillStyle='#fff';x.font='600 44px "Space Grotesk"';x.fillText('locked at $'+fm(c.p,0),540,640);
+ x.fillStyle='#999';x.font='500 34px "Space Grotesk"';x.fillText(new Date(c.at).toISOString().slice(0,16).replace('T',' ')+' UTC',540,700);
+ const res=c.res==null?'⏳ pending':c.res?`✅ right  ($${fm(c.end,0)})`:`❌ wrong  ($${fm(c.end,0)})`;x.fillStyle=c.res==null?'#fbbf24':c.res?'#22c55e':'#ef4444';x.font='700 54px "Space Grotesk"';x.fillText(res,540,820);
+ x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('entekhab.net/lab',540,1010);
+ const u=cv.toDataURL('image/png');cv.className='card-out';cv.style.maxWidth='300px';const o=$('#arCardOut');o.innerHTML='';o.append(cv);const a=document.createElement('a');a.className='btn p';a.download='entekhab-call.png';a.href=u;a.textContent='⬇ PNG';a.style.marginTop='8px';o.append(a)}
+function hookArena(){const el=$('#arena');if(!el||el.querySelector('#arCard'))return;const st=ls.get('ek_arena',{calls:[]});const c=st.calls[st.calls.length-1];if(!c)return;
+ const p=el.querySelector('#arShare')?.parentElement;if(!p)return;const b=document.createElement('button');b.className='btn';b.id='arCard';b.textContent='🖼 '+T('card');b.style.marginInlineStart='6px';b.onclick=()=>predCard(c);p.append(b);
+ const o=document.createElement('div');o.id='arCardOut';el.append(o)}
+new MutationObserver(()=>hookArena()).observe(document.getElementById('arena'),{childList:true});
+/* ---- battle deep link (#93): #battle=BTC-ETH ---- */
+function battleLink(){const m=location.hash.match(/^#battle=([A-Z0-9]+)-([A-Z0-9]+)/i);if(!m||!$('#bA'))return;const A=m[1].toUpperCase(),B=m[2].toUpperCase();
+ if([...$('#bA').options].some(o=>o.value===A)&&[...$('#bB').options].some(o=>o.value===B)){$('#bA').value=A;$('#bB').value=B;$('#discS').scrollIntoView();battle()}}
+const _bSh=()=>{const s=$('#bSh');if(s&&!s.dataset.k){s.dataset.k=1;s.onclick=()=>{const A=$('#bA').value,B=$('#bB').value;share(`Coin Battle: ${A} vs ${B}`,`https://entekhab.net/lab/#battle=${A}-${B}`)}}};
+new MutationObserver(_bSh).observe(document.getElementById('battle'),{childList:true,subtree:true});
+/* ---- content studio (#91) ---- */
+async function studioData(c,days){const k=await kl(c+'USDT',null,null,days+1);return k}
+function drawChart(x,W,H,k,c,prog,fmt){bgPaint(x,W,H);const mk=(D.market?.coins||[]).find(z=>z.coin===c)||{},dn=window.DNAJ?.coins?.[c];
+ const cl=k.map(z=>z.c),lo=Math.min(...cl),hi=Math.max(...cl),chg=(cl.at(-1)/cl[0]-1)*100;const top=fmt==='story'?420:200,ch=fmt==='story'?760:520,left=80,w=W-160;
+ x.textAlign='left';x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk"';x.fillText('ENTEKHAB',left,fmt==='story'?150:90);
+ x.fillStyle='#fff';x.font='800 92px "Space Grotesk"';x.fillText(c,left,fmt==='story'?280:180-20);
+ x.textAlign='right';x.font='700 64px "Space Grotesk"';x.fillStyle='#fff';x.fillText('$'+fm(cl.at(-1),cl.at(-1)<1?6:2),W-left,fmt==='story'?250:150-10);
+ x.fillStyle=chg>=0?'#22c55e':'#ef4444';x.font='700 46px "Space Grotesk"';x.fillText((chg>=0?'+':'')+chg.toFixed(2)+'% · '+(k.length-1)+'d',W-left,fmt==='story'?320:200-10);
+ const n=Math.max(2,Math.round(cl.length*prog)),X=i=>left+i*w/(cl.length-1),Y=v=>top+ch-(v-lo)/(hi-lo||1)*ch;
+ const g=x.createLinearGradient(0,top,0,top+ch);g.addColorStop(0,chg>=0?'rgba(34,197,94,.35)':'rgba(239,68,68,.35)');g.addColorStop(1,'rgba(0,0,0,0)');
+ x.beginPath();x.moveTo(X(0),top+ch);for(let i=0;i<n;i++)x.lineTo(X(i),Y(cl[i]));x.lineTo(X(n-1),top+ch);x.closePath();x.fillStyle=g;x.fill();
+ x.beginPath();for(let i=0;i<n;i++){i?x.lineTo(X(i),Y(cl[i])):x.moveTo(X(i),Y(cl[i]))}x.strokeStyle='#f7931a';x.lineWidth=6;x.stroke();
+ x.beginPath();x.arc(X(n-1),Y(cl[n-1]),12,0,7);x.fillStyle='#fff';x.fill();
+ x.textAlign='left';x.fillStyle='#ddd';x.font='500 34px "Space Grotesk"';const yb=top+ch+90;
+ x.fillText(`RSI ${mk.rsi??'—'}   ·   Score ${D.score?.coins?.[c]?.score??'—'}`,left,yb);if(dn)x.fillText('DNA '+dn.code,left,yb+56);
+ x.textAlign='center';x.fillStyle='#f7931a';x.font='700 42px "Space Grotesk"';x.fillText('entekhab.net',W/2,H-60)}
+async function studio(video){const c=$('#stC').value,days=+$('#stD').value,fmt=$('#stF').value,W=1080,H=fmt==='story'?1920:1080,o=$('#stOut');o.innerHTML='…';
+ const k=await studioData(c,days);if(k.length<3){o.innerHTML=`<p class="disc">${T('noData')}</p>`;return}
+ if(!window.DNAJ)window.DNAJ=await (async()=>{try{return await (await fetch('/data/dna.json')).json()}catch(e){return null}})();
+ const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');cv.className='card-out';cv.style.maxWidth=fmt==='story'?'240px':'340px';
+ if(!video){drawChart(x,W,H,k,c,1,fmt);o.innerHTML='';o.append(cv);const a=document.createElement('a');a.className='btn p';a.download=`entekhab-${c}-${days}d.png`;a.href=cv.toDataURL('image/png');a.textContent='⬇ PNG';a.style.marginTop='8px';o.append(a);return}
+ if(!window.MediaRecorder||!cv.captureStream){o.innerHTML='<p class="disc">MediaRecorder ✕</p>';return}
+ o.innerHTML='';o.append(cv);const s=cv.captureStream(30),mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'].find(t=>MediaRecorder.isTypeSupported(t))||'';const rec=new MediaRecorder(s,mime?{mimeType:mime,videoBitsPerSecond:5e6}:{});const parts=[];
+ rec.ondataavailable=e=>e.data.size&&parts.push(e.data);rec.onstop=()=>{const b=new Blob(parts,{type:rec.mimeType||'video/webm'}),a=document.createElement('a');a.className='btn p';a.download=`entekhab-${c}-${days}d.${(rec.mimeType||'').includes('mp4')?'mp4':'webm'}`;a.href=URL.createObjectURL(b);a.textContent='⬇ '+T('vid');a.style.marginTop='8px';o.append(a)};
+ const t0=performance.now(),dur=6000;rec.start();const lbl=document.createElement('p');lbl.className='disc';lbl.textContent=T('rec');o.append(lbl);
+ (function f(){const p=Math.min(1,(performance.now()-t0)/(dur*.8));drawChart(x,W,H,k,c,p,fmt);if(performance.now()-t0<dur)requestAnimationFrame(f);else{rec.stop();lbl.remove()}})()}
+function renderStudio(){const el=$('#studio');if(!el||el.dataset.ok===lang)return;el.dataset.ok=lang;const cs=(D.market?.coins||[]).slice().sort((a,b)=>(b.qvol||0)-(a.qvol||0)).map(c=>c.coin);
+ el.innerHTML=`<div class="row"><select id="stC">${cs.map(c=>`<option>${c}</option>`).join('')}</select><select id="stD"><option value="7">7d</option><option value="30" selected>30d</option><option value="90">90d</option></select><select id="stF"><option value="square">${T('sq')}</option><option value="story">${T('story')}</option></select><button class="btn p" id="stMk">🖼 ${T('mk')}</button><button class="btn" id="stV">🎬 ${T('vid')}</button></div><div id="stOut" style="margin-top:10px"></div>`;
+ $('#stMk').onclick=()=>studio(false);$('#stV').onclick=()=>studio(true)}
+/* ---- history calendar (#65) — curated, verifiable dates ---- */
+const HIST=[['2008-10-31','Bitcoin whitepaper published by Satoshi Nakamoto','انتشار وایت‌پیپر بیت‌کوین'],['2009-01-03','Bitcoin genesis block','بلاک پیدایش بیت‌کوین'],['2010-05-22','Bitcoin Pizza Day (10,000 BTC for two pizzas)','روز پیتزای بیت‌کوین'],
+ ['2012-11-28','First Bitcoin halving','نخستین هاوینگ بیت‌کوین'],['2014-02-24','Mt. Gox halts operations','توقف صرافی Mt. Gox'],['2015-07-30','Ethereum mainnet launch (Frontier)','راه‌اندازی شبکهٔ اتریوم'],['2016-07-09','Second Bitcoin halving','دومین هاوینگ بیت‌کوین'],
+ ['2017-08-01','Bitcoin Cash hard fork','هاردفورک بیت‌کوین کش'],['2017-12-17','BTC peaks near $19.7k (2017 cycle top)','سقف چرخهٔ ۲۰۱۷ بیت‌کوین'],['2020-03-12','“Black Thursday” COVID crash','سقوط «پنجشنبهٔ سیاه» کرونا'],['2020-05-11','Third Bitcoin halving','سومین هاوینگ بیت‌کوین'],
+ ['2021-04-14','Coinbase lists on Nasdaq','عرضهٔ سهام کوین‌بیس در نزدک'],['2021-09-07','Bitcoin becomes legal tender in El Salvador','بیت‌کوین پول قانونی السالوادور'],['2021-11-10','BTC all-time high near $69k','سقف تاریخی ۶۹ هزار دلاری'],
+ ['2022-05-09','Terra/UST depeg and LUNA collapse','سقوط ترا و لونا'],['2022-09-15','Ethereum “Merge” to proof-of-stake','ادغام اتریوم (Merge)'],['2022-11-11','FTX files for bankruptcy','ورشکستگی FTX'],
+ ['2024-01-10','US spot Bitcoin ETFs approved','تأیید ETFهای اسپات بیت‌کوین در آمریکا'],['2024-03-14','BTC all-time high near $73.8k','سقف تاریخی ۷۳٫۸ هزار دلاری'],['2024-04-20','Fourth Bitcoin halving','چهارمین هاوینگ بیت‌کوین'],
+ ['2024-12-05','BTC crosses $100,000','عبور بیت‌کوین از ۱۰۰ هزار دلار'],['2025-10-06','BTC all-time high near $126k','سقف تاریخی حدود ۱۲۶ هزار دلار'],['2025-10-10','Largest liquidation day in crypto history (~$19B)','بزرگ‌ترین روز لیکوییدیشن تاریخ کریپتو (~۱۹ میلیارد دلار)']];
+async function renderHist(){const el=$('#hist');if(!el)return;if(!$('#hD')){const t=new Date();el.innerHTML=`<div class="row"><input type="date" id="hD" value="${t.toISOString().slice(0,10)}"><button class="btn p" id="hGo">↵</button></div><div id="hOut" style="margin-top:10px"></div>`;$('#hGo').onclick=renderHist}
+ const d=new Date($('#hD').value+'T00:00:00Z');if(isNaN(d))return;const md=$('#hD').value.slice(5),out=$('#hOut');out.innerHTML='…';const now=new Date();const yrs=[];for(let y=2017;y<=now.getUTCFullYear();y++){const t=Date.UTC(y,d.getUTCMonth(),d.getUTCDate());if(t>=Date.UTC(2017,7,17)&&t<=Date.now())yrs.push([y,t])}
+ const rows=await Promise.all(yrs.map(async([y,t])=>{const k=await kl('BTCUSDT',t,null,1);return [y,k[0]?.c]}));const val=rows.filter(r=>r[1]);const mx=Math.max(...val.map(r=>r[1]),1);
+ const near=HIST.filter(([ds])=>{const e=new Date(ds+'T00:00:00Z'),a=Date.UTC(2000,e.getUTCMonth(),e.getUTCDate()),b=Date.UTC(2000,d.getUTCMonth(),d.getUTCDate());const diff=Math.abs(a-b)/864e5;return Math.min(diff,366-diff)<=3});
+ out.innerHTML=`<table><tr><th></th><th>${T('close')} (${md})</th><th></th></tr>${val.map(([y,c],i)=>`<tr><td class="num">${y}</td><td class="num">$${fm(c,0)}</td><td style="width:45%"><div class="bar"><i style="width:${c/mx*100}%"></i></div>${i?` ${sg((c/val[i-1][1]-1)*100,1)}`:''}</td></tr>`).join('')}</table>
+ <h3 style="margin-top:12px;font-size:.95rem">${T('evNear')}</h3>${near.length?near.map(([ds,en,fa])=>`<div class="evd" style="margin:4px 0">📅 <span class="num">${ds}</span> — ${esc(lang==='en'?en:fa)}</div>`).join(''):`<p class="disc">${T('noEv')}</p>`}<p class="disc">Binance BTCUSDT daily close · curated history</p>`}
 
 </script>
 </body>
