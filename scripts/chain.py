@@ -65,9 +65,13 @@ def main():
         out["adjustment"] = {k: da.get(k) for k in ("progressPercent", "difficultyChange", "remainingBlocks", "estimatedRetargetDate")}
 
     last = (prev.get("nodes") or {}).get("at")
-    if not last or NOW - datetime.fromisoformat(last) >= timedelta(hours=6):
+    if not last or NOW - datetime.fromisoformat(last) >= timedelta(hours=6) or not (prev.get("nodes") or {}).get("cells"):
+        coords = get("https://bitnodes.io/api/v1/snapshots/latest/?field=coordinates", timeout=90)
+        if coords is not None:
+            print("  coordinates sample:", str(coords)[:300])
         sn = get("https://bitnodes.io/api/v1/snapshots/latest/", timeout=120)
         if sn and isinstance(sn.get("nodes"), dict):
+            print("  node sample:", str(next(iter(sn["nodes"].items())))[:300])
             cells, countries, located = Counter(), Counter(), 0
             for v in sn["nodes"].values():
                 try:
@@ -80,6 +84,18 @@ def main():
                     continue          # Tor / unknown location
                 located += 1
                 cells[(int(round(lat / 2.0) * 2), int(round(lon / 2.0) * 2))] += 1
+            if not located and coords:          # geolocation via ?field=coordinates
+                lst = coords.get("coordinates") if isinstance(coords, dict) else coords
+                for it in (lst or []):
+                    try:
+                        lat, lon = float(it[0]), float(it[1])
+                        n = int(it[2]) if len(it) > 2 and str(it[2]).isdigit() else 1
+                    except (TypeError, ValueError, IndexError):
+                        continue
+                    if lat == 0 and lon == 0:
+                        continue
+                    located += n
+                    cells[(int(round(lat / 2.0) * 2), int(round(lon / 2.0) * 2))] += n
             out["nodes"] = {
                 "at": NOW.isoformat(), "snapshot": sn.get("timestamp"), "height": sn.get("latest_height"),
                 "total": sn.get("total_nodes") or len(sn["nodes"]), "located": located, "countries": len(countries),

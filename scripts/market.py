@@ -199,7 +199,8 @@ def main():
         out["global"] = {"mcap": g["total_market_cap"]["usd"], "vol": g["total_volume"]["usd"],
                          "btc_d": round(g["market_cap_percentage"]["btc"], 2),
                          "eth_d": round(g["market_cap_percentage"]["eth"], 2),
-                         "mcap_chg24": round(g.get("market_cap_change_percentage_24h_usd", 0), 2)}
+                         "mcap_chg24": round(g.get("market_cap_change_percentage_24h_usd", 0), 2),
+                         "stable_d": round(sum(g["market_cap_percentage"].get(k, 0) for k in ("usdt", "usdc", "dai", "usde", "fdusd")), 2)}
         out["sources"]["coingecko"] = now.isoformat()
     except Exception as e:  # noqa: BLE001
         out["errors"].append(f"coingecko: {e}")

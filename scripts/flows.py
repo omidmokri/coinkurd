@@ -46,7 +46,7 @@ GEO = {
     "Chile": (-35, -71), "Colombia": (4, -72), "Peru": (-10, -76), "Venezuela": (7, -66), "Kenya": (0, 38), "Egypt": (27, 30),
     "Saint Kitts and Nevis": (17.3, -62.7), "Curaçao": (12.2, -69), "Marshall Islands": (7.1, 171), "Samoa": (-13.8, -172),
     "Anguilla": (18.2, -63.1), "Liechtenstein": (47.2, 9.6), "Bulgaria": (42.7, 25.5), "Romania": (46, 25), "Hungary": (47.2, 19.5),
-    "Belgium": (50.6, 4.6), "Portugal": (39.6, -8), "Greece": (39, 22), "Russia": (61, 99), "Belarus": (53.7, 28), "Armenia": (40.1, 45),
+    "Belgium": (50.6, 4.6), "Vanuatu": (-15.4, 166.9), "Costa Rica": (9.7, -83.8), "Isle of Man": (54.2, -4.5), "Lebanon": (33.9, 35.9), "Hong Kong SAR": (22.3, 114.2), "Jersey": (49.2, -2.1), "Guernsey": (49.45, -2.58), "Portugal": (39.6, -8), "Greece": (39, 22), "Russia": (61, 99), "Belarus": (53.7, 28), "Armenia": (40.1, 45),
     "Uzbekistan": (41.4, 64.6), "Saudi Arabia": (24, 45), "Bahrain": (26, 50.5), "Qatar": (25.3, 51.2), "Kuwait": (29.3, 47.6),
 }
 
@@ -88,20 +88,20 @@ def main():
             mc, ch = float(c["market_cap"]), c.get("market_cap_change_24h")
             delta = None if ch is None else mc - mc / (1 + ch / 100.0)
             rows.append({"id": cid, "name": c.get("name"), "short": short, "mcap": round(mc), "chg24": None if ch is None else round(ch, 2),
+                         "suspect": ch is not None and abs(ch) > 25,   # >25% sector move in 24h is almost always a constituent/data change
                          "delta_usd": None if delta is None else round(delta), "vol24": round(c.get("volume_24h") or 0),
                          "top": (c.get("top_3_coins") or [])[:3]})
         rows.sort(key=lambda r: -(r["delta_usd"] or 0))
         out["sectors"] = rows
     else:
         out["errors"]["sectors"] = "coingecko categories unavailable"
-    time.sleep(3)
-    g = get("/global")
-    if g and g.get("data"):
-        d = g["data"]
-        pct = d.get("market_cap_percentage") or {}
-        st = sum(pct.get(k, 0) for k in ("usdt", "usdc", "dai", "usde", "fdusd"))
-        point = {"t": int(NOW.timestamp()), "mcap": round((d.get("total_market_cap") or {}).get("usd") or 0),
-                 "btc": round(pct.get("btc", 0), 3), "eth": round(pct.get("eth", 0), 3), "stable": round(st, 3)}
+    # dominance from market.json (market.py already calls CoinGecko /global — avoids a second, rate-limited call)
+    try:
+        g = json.load(open(os.path.join(ROOT, "data", "market.json"), encoding="utf-8")).get("global") or {}
+    except Exception:  # noqa: BLE001
+        g = {}
+    if g.get("btc_d"):
+        point = {"t": int(NOW.timestamp()), "mcap": round(g.get("mcap") or 0), "btc": g["btc_d"], "eth": g.get("eth_d") or 0, "stable": g.get("stable_d") or 0}
         point["others"] = round(100 - point["btc"] - point["eth"] - point["stable"], 3)
         hist = [h for h in prev.get("dominance", []) if h["t"] >= NOW.timestamp() - 30 * 86400]
         if not hist or point["t"] - hist[-1]["t"] >= 50 * 60:

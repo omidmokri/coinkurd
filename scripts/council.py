@@ -57,6 +57,11 @@ def main():
             raise RuntimeError(f"numbers not in data: {bad[:6]}")
         out = {"at": datetime.now(timezone.utc).isoformat(), "engine": "gemini:" + ai.model(), "council": rep, "facts": facts}
         json.dump(out, open(os.path.join(D, "council.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        # public track record: every council verdict is logged and later scored against BTC's real 7-day move
+        log = load("council_log.json", [])
+        log.append({"at": out["at"], "btc": (facts.get("technical") or {}).get("price"),
+                    "stances": {a["id"]: [a.get("stance"), a.get("confidence")] for a in rep["agents"]}})
+        json.dump(log[-400:], open(os.path.join(D, "council_log.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         print("council ok:", [(a["id"], a["stance"], a.get("confidence")) for a in rep["agents"]])
     except Exception as e:  # noqa: BLE001
         print("council skipped:", e)
