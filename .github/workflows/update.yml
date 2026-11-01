@@ -37,6 +37,10 @@ jobs:
           MAX_PAGES: ${{ github.event.inputs.pages || '3' }}
           BACKFILL: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/fetch.py
+      - name: Repair links/footers & merge stored translations
+        run: |
+          python scripts/repair.py
+          python scripts/merge_tr.py
       - name: Translate new posts (fa → ckb, en)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -50,6 +54,7 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add data/
           git diff --cached --quiet || git commit -m "chore: sync posts $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git pull --rebase -X theirs origin main || true
           git push
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
