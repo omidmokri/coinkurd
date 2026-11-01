@@ -32,6 +32,9 @@ posts = load("posts.json", [])
 meta = load("meta.json", {})
 market = load("market.json", {})
 impact = load("impact.json", {})
+news = load("news.json", {})
+score = load("score.json", {})
+SC = score.get("coins", {})
 CATS = {c["id"]: c for c in meta.get("categories", [])}
 MK = {c["coin"]: c for c in market.get("coins", [])}
 TV = {"BTC": "BITSTAMP:BTCUSD", "ETH": "BITSTAMP:ETHUSD", "TON": "OKX:TONUSDT", "GOLD": "OANDA:XAUUSD"}
@@ -42,7 +45,7 @@ NAMES = {"BTC": "Bitcoin · بیت‌کوین", "ETH": "Ethereum · اتریوم
          "GOLD": "Gold · طلا", "SUI": "Sui", "NEAR": "NEAR", "PEPE": "Pepe", "SHIB": "Shiba Inu", "HYPE": "Hyperliquid"}
 OPP_FA = {"rsi_oversold": "RSI اشباع فروش", "rsi_overbought": "RSI اشباع خرید", "ema_golden_cross": "تقاطع طلایی EMA20/50",
           "ema_death_cross": "تقاطع مرگ EMA20/50", "breakout_up": "شکست سقف ۴۸ ساعته", "breakdown": "شکست کف ۴۸ ساعته",
-          "volume_spike": "جهش حجم معاملات"}
+          "volume_spike": "جهش حجم معاملات", "bull_divergence": "واگرایی مثبت RSI", "bear_divergence": "واگرایی منفی RSI"}
 e = html.escape
 MD = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
 
@@ -108,6 +111,26 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
     return url
+
+
+LBL = {"strong": "قوی", "positive": "مثبت", "neutral": "خنثی", "weak": "ضعیف", "very_weak": "خیلی ضعیف"}
+CMP = {"technical": "تکنیکال", "sentiment": "احساسات بازار", "news": "اخبار", "channel": "کارنامهٔ کانال"}
+
+
+def score_html(c, full=True):
+    v = SC.get(c)
+    if not v:
+        return ""
+    rows = "".join(f'<tr><td>{CMP[k]}</td><td class="num">{round(x)}</td><td class="num">{round(v["weights"][k]*100)}%</td></tr>' for k, x in v["components"].items())
+    s = f'<h2>امتیاز Entekhab</h2><div class="grid"><div class="kpi"><small>امتیاز کل (۰ تا ۱۰۰)</small><b>{v["score"]}</b></div><div class="kpi"><small>وضعیت</small><b>{LBL[v["label"]]}</b></div></div>'
+    if full:
+        s += f'<table style="margin-top:10px"><tr><th>جزء</th><th>امتیاز</th><th>وزن</th></tr>{rows}</table><p class="note">روش: ترکیب شفاف چهار جزء؛ ۵۰ یعنی خنثی. توصیف وضعیت فعلی است، نه پیش‌بینی یا توصیهٔ معاملاتی. به‌روزرسانی {fmt_date(score.get("updated_at",""))}.</p>'
+    return s
+
+
+def news_li(i):
+    srcs = " · ".join(f'<a href="{e(x["url"])}" rel="noopener nofollow" target="_blank">{e(x["source"])}</a>' for x in i["sources"])
+    return f'<li dir="ltr"><a href="{e(i["url"])}" rel="noopener nofollow" target="_blank">{e(i["title"])}</a><small>{srcs} · {fmt_date(i["date"])}</small></li>'
 
 
 def impact_html(im):
@@ -187,6 +210,10 @@ def build_coin(c, cposts):
                 f'<li>{OPP_FA.get(o["type"], o["type"])} · قدرت {o["strength"]} · اطمینان {"بالا" if o["confidence"] == "high" else "متوسط"}<small>تایم‌فریم {o["tf"]} — صرفاً یافتهٔ تکنیکال، نه توصیهٔ خرید/فروش</small></li>' for o in opps) + "</ul>"
     else:
         body += '<p class="note">دادهٔ بازار Binance برای این دارایی در دسترس نیست.</p>'
+    body += score_html(c)
+    cn = [i for i in news.get("items", []) if c in i.get("coins", [])][:15]
+    if cn:
+        body += "<h2>آخرین اخبار از منابع مختلف</h2><ul class=list>" + "".join(news_li(i) for i in cn) + "</ul>"
     ims = [impact[str(p["id"])] for p in cposts if str(p["id"]) in impact and impact[str(p["id"])].get("r24h") is not None]
     body += f'<h2>حضور در کانال</h2><div class="grid"><div class="kpi"><small>۲۴ ساعت</small><b>{n24}</b></div><div class="kpi"><small>۷ روز</small><b>{n7}</b></div><div class="kpi"><small>۳۰ روز</small><b>{n30}</b></div><div class="kpi"><small>کل آرشیو</small><b>{len(cposts)}</b></div></div>'
     if ims:
@@ -246,7 +273,7 @@ def intel_html():
     rows = "".join(f'<tr><td><a href="/coins/{o["coin"].lower()}/">{o["coin"]}</a></td><td>{OPP_FA.get(o["type"], o["type"])}</td><td class="num">{o["strength"]}</td><td>{"بالا" if o["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(o["price"])}</td></tr>' for o in ops[:14])
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
     out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
-                  + f'<table class="otab"><tr>{coins}</tr></table><p class="disc">Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
+                  + f'<table class="otab"><tr>{coins}</tr></table><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
     by = {}
     for r in impact.values():
         if r.get("r24h") is not None:
@@ -258,6 +285,12 @@ def intel_html():
         av = sum(a) / len(a)
         rws += f'<tr><td><a href="/coins/{c.lower()}/">{c}</a></td><td class="num">{len(a)}</td><td class="num">{av:+.2f}%</td><td class="num">{sum(1 for x in a if x > 0)*100//len(a)}%</td></tr>'
     out["imp"] = '<h3>کارنامهٔ پست‌ها: حرکت قیمت ۲۴ ساعت بعد از انتشار</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>پست</th><th>میانگین ۲۴h</th><th>درصد مثبت</th></tr>{rws}</table>' if rws else '<p class="disc">داده هنوز کافی نیست.</p>') + '<p class="disc">Binance 1h</p>'
+    arr = sorted(SC.items(), key=lambda kv: -kv[1]["score"])
+    if arr:
+        out["score"] = '<h3>امتیاز Entekhab</h3><p class="disc">تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کارنامهٔ کانال ۱۵٪ — توصیف وضعیت، نه پیش‌بینی</p><table class="otab"><tr><th>کوین</th><th>امتیاز</th><th>وضعیت</th></tr>' + "".join(
+            f'<tr><td><a href="/coins/{k.lower()}/">{k}</a></td><td class="num">{v["score"]}</td><td>{LBL[v["label"]]}</td></tr>' for k, v in arr[:12]) + "</table>"
+    if news.get("items"):
+        out["news"] = '<h3>اخبار چندمنبعی</h3><ul class="list">' + "".join(news_li(i) for i in news["items"][:15]) + "</ul>"
     h = load("health.json", {})
     out["fresh"] = f'<span>اسکنر: {fmt_date(m.get("updated_at",""))}</span><span>آرشیو تلگرام: {fmt_date(meta.get("updated_at",""))}</span><span>سلامت سیستم: {e(h.get("status","—"))}</span>'
     return out
@@ -284,6 +317,8 @@ def prerender():
         '<div class="ibox" id="fngBox"></div>': f'<div class="ibox" id="fngBox">{it.get("fng","")}</div>',
         '<div class="ibox" id="globBox"></div>': f'<div class="ibox" id="globBox">{it.get("glob","")}</div>',
         '<div class="ibox wide" id="oppBox"></div>': f'<div class="ibox wide" id="oppBox">{it["opp"]}</div>',
+        '<div class="ibox wide" id="scoreBox"></div>': f'<div class="ibox wide" id="scoreBox">{it.get("score","")}</div>',
+        '<div class="ibox wide" id="newsBox"></div>': f'<div class="ibox wide" id="newsBox">{it.get("news","")}</div>',
         '<div class="ibox wide" id="impBox"></div>': f'<div class="ibox wide" id="impBox">{it["imp"]}</div>',
         '<div class="hall" id="hallGrid"></div>': '<div class="hall" id="hallGrid">' + "".join(
             f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic">{c["icon"]}</span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
@@ -296,7 +331,7 @@ def prerender():
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
-    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("fng", "glob", "opp", "imp"))
+    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("score", "fng", "glob", "opp", "news", "imp"))
     urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}</style>")]
     # /categories/<id>/
     for c in meta.get("categories", []):
