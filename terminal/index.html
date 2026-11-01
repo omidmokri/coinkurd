@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entekhab Terminal — ترمینال هوشمند بازار | entekhab.net</title>
+<meta name="description" content="ترمینال هوشمند Entekhab: از Entekhab بپرس، دیوار زندهٔ رویدادها، اتاق فرمان مشتقات (فاندینگ، اوپن‌اینترست، لیکوییدیشن)، آبشار سرمایه، کره‌زمین کریپتو، دماسنج احساسات و آزمایشگاه اثبات ادعا — با دادهٔ واقعی">
+<link rel="canonical" href="https://entekhab.net/terminal/">
+<meta property="og:title" content="Entekhab Terminal"><meta property="og:description" content="Ask Entekhab, live events wall, derivatives command room, capital waterfall, crypto globe, sentiment thermometer, claim-proof lab">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+.tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.pan{background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px 18px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);position:relative;min-width:0}
+.pan.w2{grid-column:span 2}.pan.hide{display:none}
+.pan>header{position:static;background:none;border:0;backdrop-filter:none;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.pan>header h3{font-size:1rem;font-weight:800;margin:0}.pan>header .ctl button{color:var(--mute);font-size:.8rem;padding:2px 6px;border-radius:6px}.pan>header .ctl button:hover{background:#ffffff12;color:var(--ink)}
+@media(max-width:900px){.tgrid{grid-template-columns:1fr}.pan.w2{grid-column:span 1}}
+.modes{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 18px}.modes button{padding:7px 14px;border-radius:99px;border:1px solid var(--line);font-size:.85rem}.modes button.on{background:var(--o);color:#000;border-color:var(--o)}
+.ask{display:flex;gap:8px}.ask input{flex:1;min-width:0;font-size:1rem;padding:12px 14px;border-radius:12px}
+.ask button{padding:0 14px;border-radius:12px;border:1px solid var(--line);font-size:1.1rem}.ask .mic.on{background:var(--r);color:#fff}
+.ans{margin-top:12px;line-height:1.9;font-size:.95rem}.ans .src{color:var(--mute);font-size:.75rem}
+.ex{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ex button{font-size:.78rem;padding:4px 10px;border-radius:99px;background:#ffffff0d;border:1px solid var(--line)}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-height:560px;overflow:auto;padding-inline-end:4px}
+.ev{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(0,0,0,.25);cursor:pointer;transition:.15s;animation:pop .5s ease both}
+.ev:hover{border-color:var(--o)}.ev small{color:var(--mute);font-size:.72rem;display:block}.ev .k{font-size:.7rem;padding:1px 7px;border-radius:99px;background:#ffffff12;margin-inline-end:4px}
+.ev .more{display:none;font-size:.8rem;color:#cfcfc8;margin-top:6px}.ev.open .more{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}.kpis div{border:1px solid var(--line);border-radius:12px;padding:8px 10px}.kpis small{display:block;color:var(--mute);font-size:.72rem}.kpis b{font-family:var(--mono);font-size:1.05rem}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:4px}.heat div{border-radius:8px;padding:6px 4px;text-align:center;font-family:var(--mono);font-size:.72rem;line-height:1.3}
+.heat b{display:block;font-size:.8rem}
+#globe{width:100%;height:380px;display:block;cursor:grab}
+.therm{display:flex;gap:18px;align-items:center}.therm .tube{width:26px;height:200px;border-radius:13px;background:#ffffff10;position:relative;overflow:hidden;flex:none}
+.therm .tube i{position:absolute;bottom:0;left:0;right:0;border-radius:13px;background:linear-gradient(0deg,#2b6cb0,#22c55e 50%,#f59e0b 75%,#ef4444)}
+.verdict{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:800;font-size:.85rem}
+.ok{background:rgba(34,197,94,.18);color:#4ade80}.nd{background:rgba(148,163,184,.16);color:#cbd5e1}.no{background:rgba(239,68,68,.18);color:#f87171}.mix{background:rgba(245,158,11,.18);color:#fbbf24}.na{background:#ffffff14;color:var(--mute)}
+.evd{margin:6px 0;padding-inline-start:4px;font-size:.86rem}.evd span{font-family:var(--mono)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero" style="padding-bottom:6px"><h1 data-t="h1"></h1><p data-t="lead"></p></div>
+  <div class="modes" id="modes"></div>
+  <div class="tgrid" id="grid">
+    <div class="pan w2" data-p="ask"><header><h3 data-t="askT"></h3><span class="ctl"></span></header>
+      <div class="ask"><input id="q" autocomplete="off"><button class="mic" id="mic" title="voice">🎙</button><button id="go" class="btn p" style="border-radius:12px">↵</button></div>
+      <div class="ex" id="ex"></div><div class="ans" id="ans"></div></div>
+    <div class="pan w2" data-p="wall"><header><h3 data-t="wallT"></h3><span class="ctl"></span></header><div class="wall" id="wall"></div></div>
+    <div class="pan w2" data-p="deriv"><header><h3 data-t="derT"></h3><span class="ctl"></span></header><div id="deriv"></div></div>
+    <div class="pan w2" data-p="flow"><header><h3 data-t="flowT"></h3><span class="ctl"></span></header><div id="flow"></div></div>
+    <div class="pan" data-p="globe"><header><h3 data-t="globeT"></h3><span class="ctl"></span></header><div class="row" id="gsw" style="margin-bottom:6px"></div><canvas id="globe"></canvas><div class="disc" id="ginfo"></div></div>
+    <div class="pan" data-p="therm"><header><h3 data-t="thT"></h3><span class="ctl"></span></header><div id="therm"></div></div>
+    <div class="pan" data-p="claim"><header><h3 data-t="clT"></h3><span class="ctl"></span></header><select id="claimSel" style="width:100%"></select><div id="claim" style="margin-top:10px"></div></div>
+    <div class="pan" data-p="acc"><header><h3 data-t="accT"></h3><span class="ctl"></span></header><div id="acc"></div></div>
+  </div>
+  <section><div class="honest" data-t="honest"></div></section>
+</div>
+<footer>entekhab.net · OKX · CoinGecko · Binance · mempool.space · bitnodes.io · RSS — <span data-t="nfa"></span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/assets/ui.js"></script>
+<script>
+Object.assign(I.fa,{h1:'ترمینال <em>Entekhab</em>',lead:'یک محیط شیشه‌ای و زنده: بپرس، کشف کن، ادعاها را با داده بسنج. هر عدد منبع دارد و هر پنل را می‌توانی جابه‌جا یا پنهان کنی.',
+ modes:{beginner:'مبتدی',trader:'معامله‌گر',analyst:'تحلیلگر',all:'همه'},askT:'از Entekhab بپرس',ph:'مثلاً: چرا سولانا امروز ریخت؟ · قیمت بیت‌کوین · اتریوم یا سولانا؟',
+ ex:['امروز بازار چه خبر؟','قیمت بیت‌کوین','چرا سولانا تغییر کرد؟','اتریوم یا سولانا؟','فاندینگ بازار','ترس و طمع','رویدادهای مهم','DNA اتریوم'],
+ wallT:'دیوار زندهٔ رویدادها',derT:'اتاق فرمان مشتقات (OKX)',flowT:'آبشار سرمایه — کدام بخش بازار ارزش گرفت یا از دست داد؟',globeT:'کره‌زمین کریپتو',thT:'دماسنج احساسات واقعی',clT:'آزمایشگاه اثبات ادعا',accT:'شاخص عمومی دقت پیش‌بینی',
+ nfa:'آموزشی است، توصیهٔ مالی نیست',noData:'داده هنوز در اولین اجرای خودکار ساخته نشده.',
+ honest:'<b>شفافیت:</b> «جریان سرمایه» تغییر ارزش بازار هر بخش است (قیمت × عرضه) و ورود/خروج خالص پول را مستقیم اندازه نمی‌گیرد. دادهٔ کیف‌پول نهنگ‌ها و احساسات شبکه‌های اجتماعی منبع رایگان و قابل‌اعتماد ندارند؛ به‌جایش جریان معاملات صرافی و لحن تیترهای خبری نمایش داده می‌شود. پاسخ‌های «از Entekhab بپرس» با قواعد روی دادهٔ همین سایت ساخته می‌شوند، نه با حدس.'});
+Object.assign(I.ckb,{h1:'تێرمیناڵی <em>Entekhab</em>',lead:'ژینگەیەکی شووشەیی و زیندوو: بپرسە، بدۆزەوە، بانگەشەکان بە داتا بپێوە. هەر ژمارەیەک سەرچاوەی هەیە.',
+ modes:{beginner:'سەرەتایی',trader:'بازرگان',analyst:'شیکەرەوە',all:'هەموو'},askT:'لە Entekhab بپرسە',ph:'بۆ نموونە: بۆچی سۆلانا ئەمڕۆ دابەزی؟ · نرخی بیتکۆین · ئیتریۆم یان سۆلانا؟',
+ ex:['ئەمڕۆ بازاڕ چۆنە؟','نرخی بیتکۆین','بۆچی سۆلانا گۆڕا؟','ئیتریۆم یان سۆلانا؟','فەندینگی بازاڕ','ترس و تەماح','ڕووداوە گرنگەکان','DNA ئیتریۆم'],
+ wallT:'دیواری زیندووی ڕووداوەکان',derT:'ژووری فەرمانی مەشتەقە (OKX)',flowT:'تاڤگەی سەرمایە — کام بەشی بازاڕ بەها وەرگرت یان لەدەستیدا؟',globeT:'گۆی زەویی کریپتۆ',thT:'گەرمیپێوی هەستی ڕاستەقینە',clT:'تاقیگەی سەلماندنی بانگەشە',accT:'پێوەری گشتیی وردی پێشبینی',
+ nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',noData:'داتا هێشتا دروست نەکراوە.',
+ honest:'<b>ڕوونی:</b> «ڕەوتی سەرمایە» گۆڕانی بەهای بازاڕی هەر بەشێکە (نرخ × خستنەڕوو) و هاتنە ژوورەوە/دەرچوونی پارەی خاوێن ڕاستەوخۆ ناپێوێت. داتای جزدانی نەهەنگەکان و هەستی تۆڕە کۆمەڵایەتییەکان سەرچاوەی بەخۆڕایی و متمانەپێکراویان نییە.'});
+Object.assign(I.en,{h1:'Entekhab <em>Terminal</em>',lead:'A live glass workspace: ask, discover, and test claims against data. Every number has a source, and every panel can be moved or hidden.',
+ modes:{beginner:'Beginner',trader:'Trader',analyst:'Analyst',all:'All'},askT:'Ask Entekhab',ph:'e.g. why is Solana down today? · price of bitcoin · ETH or SOL?',
+ ex:['What happened today?','Price of bitcoin','Why did SOL move?','ETH or SOL?','Market funding','Fear and greed','Upcoming events','DNA of ETH'],
+ wallT:'Live events wall',derT:'Derivatives command room (OKX)',flowT:'Capital waterfall — which sectors gained or lost value?',globeT:'Crypto globe',thT:'Real sentiment thermometer',clT:'Claim-proof lab',accT:'Public prediction-quality index',
+ nfa:'Educational, not financial advice',noData:'Data is built on the first automatic run.',
+ honest:'<b>Transparency:</b> “capital flow” is each sector’s market-cap change (price × supply), not a measured net inflow. Whale-wallet and social-media sentiment data have no reliable free source, so exchange trade flow and headline tone are shown instead. “Ask Entekhab” answers are built by rules over this site’s data, never guessed.'});
+const D={};let MODE=ls.get('ek_tmode','all'),ORDER=ls.get('ek_torder',null),HIDE=ls.get('ek_thide',[]);
+const MODES={beginner:['ask','wall','therm','claim','globe'],trader:['ask','wall','deriv','flow','claim','therm'],analyst:['ask','deriv','flow','globe','therm','claim','acc','wall'],all:null};
+const ago=t=>{const s=(Date.now()-t)/1e3;return s<3600?Math.round(s/60)+'m':s<86400?Math.round(s/3600)+'h':Math.round(s/86400)+'d'};
+const usd=v=>v==null?'—':Math.abs(v)>=1e9?'$'+fm(v/1e9,2)+'B':Math.abs(v)>=1e6?'$'+fm(v/1e6,1)+'M':'$'+fm(v,0);
+/* ---------- layout: modes, order, hide ---------- */
+function layout(){const g=$('#grid'),pans=[...g.querySelectorAll('.pan')];
+ if(ORDER){ORDER.forEach(id=>{const p=g.querySelector(`[data-p="${id}"]`);if(p)g.append(p)})}
+ const show=MODES[MODE];pans.forEach(p=>{const id=p.dataset.p;p.classList.toggle('hide',(show&&!show.includes(id))||HIDE.includes(id));
+  p.querySelector('.ctl').innerHTML=`<button data-a="up" title="↑">▲</button><button data-a="dn" title="↓">▼</button><button data-a="x" title="hide">✕</button>`});
+ $('#modes').innerHTML=Object.entries(T('modes')).map(([k,v])=>`<button data-m="${k}" class="${k===MODE?'on':''}">${v}</button>`).join('')+(HIDE.length?`<button data-m="reset">↺</button>`:'');}
+$('#modes').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.m==='reset'){HIDE=[];ls.set('ek_thide',HIDE)}else{MODE=b.dataset.m;ls.set('ek_tmode',MODE)}layout()};
+$('#grid').onclick=e=>{const b=e.target.closest('.ctl button');if(!b)return;const p=b.closest('.pan'),g=$('#grid');
+ if(b.dataset.a==='x'){HIDE.push(p.dataset.p);ls.set('ek_thide',HIDE)}else if(b.dataset.a==='up'&&p.previousElementSibling)g.insertBefore(p,p.previousElementSibling);else if(b.dataset.a==='dn'&&p.nextElementSibling)g.insertBefore(p.nextElementSibling,p);
+ ORDER=[...g.querySelectorAll('.pan')].map(x=>x.dataset.p);ls.set('ek_torder',ORDER);layout()};
+/* ---------- Ask Entekhab (rule-based over real data) ---------- */
+const NAMES={'بیت کوین':'BTC','بیتکوین':'BTC','بیت‌کوین':'BTC','بیتکۆین':'BTC','bitcoin':'BTC','اتریوم':'ETH','اتریم':'ETH','ئیتریۆم':'ETH','ethereum':'ETH','اتر':'ETH','سولانا':'SOL','سۆلانا':'SOL','solana':'SOL','ریپل':'XRP','ڕیپڵ':'XRP','ripple':'XRP','دوج':'DOGE','دوج کوین':'DOGE','dogecoin':'DOGE','تون':'TON','تون کوین':'TON','toncoin':'TON','کاردانو':'ADA','cardano':'ADA','بایننس':'BNB','بی ان بی':'BNB','لایت کوین':'LTC','litecoin':'LTC','ترون':'TRX','tron':'TRX','چین لینک':'LINK','chainlink':'LINK','آوالانچ':'AVAX','avalanche':'AVAX','پولکادات':'DOT','polkadot':'DOT','شیبا':'SHIB','پپه':'PEPE','سویی':'SUI','نیر':'NEAR','آپتوس':'APT','آربیتروم':'ARB','اپتیمیزم':'OP','هایپر لیکوئید':'HYPE','طلا':'PAXG'};
+function coinsIn(q){const s=' '+q.toLowerCase()+' ',out=[];Object.keys(NAMES).sort((a,b)=>b.length-a.length).forEach(n=>{const i=s.indexOf(n);if(i>=0&&!out.some(o=>o[1]===NAMES[n]))out.push([i,NAMES[n]])});
+ const tick=new Set((D.market?.coins||[]).map(c=>c.coin));const STOP=new Set(['WHY','IS','THE','OF','AND','OR','VS','PRICE','DOWN','UP','TODAY','WHAT','HOW','IN','ON','TO','ME','MY','IT','AT','BE','DO','GO','NO','SO','AN','AS','BY','IF','DNA','ARE','WAS','FOR','WITH','NOW','NEWS','COIN','COINS','MARKET']);(q.toUpperCase().match(/\b[A-Z0-9]{2,10}\b/g)||[]).forEach(w=>{const i=q.toUpperCase().indexOf(w);if(tick.has(w)&&!STOP.has(w)&&!out.some(o=>o[1]===w))out.push([i,w])});
+ return out.sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+const has=(q,arr)=>arr.some(w=>q.includes(w));
+const L3=(fa,ckb,en)=>lang==='en'?en:lang==='ckb'?ckb:fa;
+function coinLine(c){const k=(D.market?.coins||[]).find(x=>x.coin===c);if(!k)return L3(`دادهٔ ${c} در اسکنر نیست.`,`داتای ${c} لە پشکنەردا نییە.`,`${c} is not in the scanner.`);
+ const sc=D.score?.coins?.[c],dn=D.dna?.coins?.[c],sig=(D.market.opportunities||[]).filter(o=>o.coin===c);
+ return `${logoTag(c,20)}<b>${c}</b> <span class="num">$${fm(k.price,k.price<1?6:2)}</span> ${sg(k.chg24)} · RSI <span class="num">${k.rsi??'—'}</span> · ${k.trend==='up'?'⬆':k.trend==='down'?'⬇':'↔'}${sc?` · Score <span class="num">${sc.score}</span>`:''}${dn?` · DNA <a href="/dna/${c.toLowerCase()}/" class="num" style="color:var(--o2)">${dn.code}</a>`:''}${sig.length?`<br>${L3('سیگنال‌ها','ئاماژەکان','Signals')}: ${sig.slice(0,4).map(o=>`<span class="chip">${o.type.replace(/_/g,' ')} · ${o.tf}</span>`).join('')}`:''}`}
+function why(c){const k=(D.market?.coins||[]).find(x=>x.coin===c),btc=(D.market?.coins||[]).find(x=>x.coin==='BTC');if(!k)return coinLine(c);const out=[coinLine(c)];
+ const cut=Date.now()-30*36e5,nn=(D.news?.items||[]).filter(n=>n.coins?.includes(c)&&Date.parse(n.date)>=cut);
+ if(btc&&c!=='BTC'){const d=(k.chg24||0)-(btc.chg24||0);out.push(Math.abs(d)<2&&Math.sign(k.chg24)===Math.sign(btc.chg24)?L3(`• هم‌جهت با بیت‌کوین (${btc.chg24}٪) حرکت کرده؛ حرکت عمومی بازار.`,`• هاوئاڕاستە لەگەڵ بیتکۆین (${btc.chg24}٪).`,`• Moved with Bitcoin (${btc.chg24}%) — a market-wide move.`):L3(`• حرکت مستقل از بیت‌کوین: ${d>0?'+':''}${d.toFixed(2)} واحد درصد اختلاف.`,`• جوڵەی سەربەخۆ لە بیتکۆین: ${d.toFixed(2)} خاڵ.`,`• Independent of Bitcoin: ${d>0?'+':''}${d.toFixed(2)} pp difference.`))}
+ const vs=(D.market.opportunities||[]).filter(o=>o.coin===c&&o.type==='volume_spike');if(vs.length)out.push(L3(`• جهش حجم معاملات (×${vs[0].detail?.x??'?'}) هم‌زمان با حرکت.`,`• بازدانی قەبارە لەگەڵ جوڵەکە.`,`• A volume spike (×${vs[0].detail?.x??'?'}) coincided with the move.`));
+ const sw=(D.deriv?.swaps||[]).find(s=>s.coin===c);if(sw&&sw.funding!=null)out.push(L3(`• فاندینگ OKX: ${sw.funding}٪ هر ۸ ساعت (${sw.funding_ann}٪ سالانه).`,`• فەندینگی OKX: ${sw.funding}٪.`,`• OKX funding: ${sw.funding}% per 8h (${sw.funding_ann}%/yr).`));
+ const nar=(D.narr?.narratives||[]).filter(n=>n.members?.some(m=>m.coin===c)&&n.mentions_24h>0);if(nar.length)out.push(L3('• روایت‌های مرتبط: ','• چیرۆکە پەیوەندیدارەکان: ','• Related narratives: ')+nar.map(n=>`${esc(n.name[lang]||n.name.en)} (${n.mentions_24h})`).join('، '));
+ out.push(nn.length?L3('• خبرهای هم‌زمان:','• هەواڵە هاوکاتەکان:','• Coinciding headlines:')+'<br>'+nn.slice(0,3).map(n=>`<a href="${esc(n.url)}" target="_blank" rel="noopener nofollow" dir="ltr">— ${esc(n.title)}</a> <span class="src">${esc(n.source)}</span>`).join('<br>'):L3('• در ۳۰ ساعت اخیر خبری دربارهٔ این ارز پیدا نشد.','• لە ٣٠ کاتژمێری ڕابردوودا هەواڵ نەدۆزرایەوە.','• No headline about it in the last 30 hours.'));
+ out.push(`<span class="src">${L3('هم‌زمانی به معنی علت نیست.','هاوکاتی واتای هۆکار نییە.','Coincidence is not causation.')}</span>`);return out.join('<br>')}
+function compare(a,b){const A=(D.market?.coins||[]).find(x=>x.coin===a),B=(D.market?.coins||[]).find(x=>x.coin===b);if(!A||!B)return coinLine(A?b:a);
+ const da=D.dna?.coins?.[a],db=D.dna?.coins?.[b];const rows=[['24h',A.chg24,B.chg24,1],['RSI',A.rsi,B.rsi,0],['Score',D.score?.coins?.[a]?.score,D.score?.coins?.[b]?.score,1],['30d',da?.raw?.ret30,db?.raw?.ret30,1],['Vol30',da?.raw?.vol30,db?.raw?.vol30,-1]];
+ return `<table><tr><th></th><th>${logoTag(a,18)}${a}</th><th>${logoTag(b,18)}${b}</th></tr>${rows.map(([n,x,y,w])=>`<tr><td>${n}</td><td class="num" style="${w&&x!=null&&y!=null&&(x>y)===(w>0)?'color:var(--g);font-weight:800':''}">${x??'—'}</td><td class="num" style="${w&&x!=null&&y!=null&&(y>x)===(w>0)?'color:var(--g);font-weight:800':''}">${y??'—'}</td></tr>`).join('')}</table><a class="btn" style="margin-top:8px" href="/lab/#discS">⚔️ Coin Battle</a> <a class="btn" style="margin-top:8px" href="/compare/${a.toLowerCase()}-vs-${b.toLowerCase()}/">🔗 ${a} vs ${b}</a>`}
+function answer(q0){const q=q0.trim().toLowerCase();if(!q)return'';const cs=coinsIn(q0);
+ if(has(q,['dna']))return cs.length?`DNA ${cs[0]}: <a href="/dna/${cs[0].toLowerCase()}/" class="num" style="color:var(--o2)">${D.dna?.coins?.[cs[0]]?.code||'—'}</a> → <a href="/dna/${cs[0].toLowerCase()}/">/dna/${cs[0].toLowerCase()}/</a>`:'<a href="/dna/">/dna/</a>';
+ if(cs.length>=2&&has(q,[' یا ',' vs',' or ','مقایسه','compare','یان ','بەراورد']))return compare(cs[0],cs[1]);
+ if(cs.length&&has(q,['چرا','why','بۆچی','دلیل','ریخت','رشد','ریزش','افت','down','up ','pump','dump','دابەزی','بەرزبوو']))return why(cs[0]);
+ if(cs.length)return cs.slice(0,3).map(coinLine).join('<hr style="border-color:#ffffff10">');
+ if(has(q,['فاندینگ','funding','اهرم','leverage','لیکوئید','liquidat','فەندینگ','اوپن','open interest','oi ']))return derivAnswer();
+ if(has(q,['ترس','طمع','fear','greed','تەماح','احساسات','sentiment','هەست']))return thermAnswer();
+ if(has(q,['رویداد','تقویم','event','calendar','ڕووداو','cpi','fomc','نرخ بهره']))return eventsAnswer();
+ if(has(q,['دامیننس','dominance','جریان','flow','سرمایه','ڕەوت','sector','بخش']))return flowAnswer();
+ if(has(q,['شبکه','network','هش','hash','نود','node','کارمزد','fee','بلاک','block','تۆڕ']))return chainAnswer();
+ return todayAnswer()}
+function todayAnswer(){const b=D.brain,r=b?.regime,u=D.unusual||[];const rep=b?.report?.[lang]||b?.report?.en;
+ return `${rep?`<b>${esc(rep.headline)}</b><br>`:''}${r?`${L3('رژیم بازار','دۆخی بازاڕ','Regime')}: <b>${esc(r.regime)}</b> · ${L3('پهنای بازار','پانیی بازاڕ','Breadth')}: <span class="num">${r.breadth?.up_pct}% ⬆ / ${r.breadth?.down_pct}% ⬇</span><br>`:''}${(b?.gainers||[]).slice(0,3).map(g=>`${logoTag(g.coin,16)}${g.coin} ${sg(g.chg24)}`).join(' · ')}<br>${(b?.losers||[]).slice(0,3).map(g=>`${logoTag(g.coin,16)}${g.coin} ${sg(g.chg24)}`).join(' · ')}<br><span class="src">Binance · brain ${b?.updated_at?.slice(11,16)||''} UTC</span>`}
+function derivAnswer(){const d=D.deriv;if(!d)return T('noData');const B=d.BTC||{},E=d.ETH||{};return `${L3('کل اوپن‌اینترست','کۆی OI','Total OI')}: <b class="num">${usd(d.total_oi_usd)}</b> · ${L3('میانگین وزنی فاندینگ','تێکڕای فەندینگ','OI-weighted funding')}: <b class="num">${d.avg_funding}%</b>/8h<br>BTC: <span class="num">${B.funding}% · ${B.funding_ann}%/y · OI ${usd(B.oi_usd)}</span>${B.long_short?.length?` · L/S <span class="num">${B.long_short.at(-1)[1]}</span>`:''}<br>ETH: <span class="num">${E.funding}% · ${E.funding_ann}%/y · OI ${usd(E.oi_usd)}</span><br><span class="src">OKX · ${d.updated_at?.slice(11,16)} UTC</span>`}
+function thermAnswer(){const s=D.dna?.headline_sentiment,f=D.market?.fng;return `${L3('ترس و طمع','ترس و تەماح','Fear & Greed')}: <b class="num">${f?.value??'—'}</b> (${esc(f?.class||'')})<br>${L3('لحن تیترهای ۷ روز','تۆنی سەردێڕەکانی ٧ ڕۆژ','7-day headline tone')}: <b class="num">${s?.score7??'—'}</b> (n=${s?.n7??0})<br><span class="src">alternative.me · RSS</span>`}
+function eventsAnswer(){const ev=(D.events?.events||[]).filter(e=>Date.parse(e.date)>Date.now()).slice(0,5);return ev.length?ev.map(e=>`• ${esc(lang==='en'?e.title:(e.title_fa||e.title))} — <span class="num">${new Date(e.date).toISOString().slice(0,16).replace('T',' ')} UTC</span> (${e.impact})`).join('<br>')+'<br><span class="src">ForexFactory</span>':T('noData')}
+function flowAnswer(){const s=D.flows?.sectors||[];if(!s.length)return T('noData');return `⬆ ${s.slice(0,3).map(r=>`${esc(r.short)} ${sg(r.chg24)}`).join(' · ')}<br>⬇ ${s.slice(-3).reverse().map(r=>`${esc(r.short)} ${sg(r.chg24)}`).join(' · ')}<br><span class="src">CoinGecko · ${L3('تغییر ارزش بازار، نه ورود خالص پول','گۆڕانی بەهای بازاڕ','market-cap change, not net inflow')}</span>`}
+function chainAnswer(){const c=D.chain;if(!c)return T('noData');const b=(c.blocks||[])[0]||{};return `⛏ #${fm(b.height,0)} · ${fm(b.tx_count,0)} tx · ⚡ ${c.hashrate?(c.hashrate/1e21).toFixed(2)+' ZH/s':'—'} · ⛽ ${c.fees?.halfHourFee??'—'} sat/vB · 🌍 ${fm(c.nodes?.total,0)} nodes<br><span class="src">mempool.space · bitnodes.io</span>`}
+let speakOn=false;
+function ask(q){$('#q').value=q;const a=answer(q);$('#ans').innerHTML=a;if(speakOn&&window.speechSynthesis){const t=$('#ans').innerText.slice(0,400),u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'fa-IR';const v=speechSynthesis.getVoices().find(v=>v.lang.startsWith(lang==='en'?'en':'fa'));if(v||lang==='en'){if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}}
+ const h=ls.get('ek_asks',[]);h.unshift({q,t:Date.now()});ls.set('ek_asks',h.slice(0,30))}
+$('#go').onclick=()=>ask($('#q').value);$('#q').onkeydown=e=>{if(e.key==='Enter')ask($('#q').value)};
+$('#ex').onclick=e=>{const b=e.target.closest('button');if(b)ask(b.textContent)};
+$('#mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('#ans').innerHTML=L3('مرورگر شما تشخیص گفتار را پشتیبانی نمی‌کند.','وێبگەڕەکەت پشتگیریی ناسینەوەی دەنگ ناکات.','Your browser does not support speech recognition.');return}
+ const r=new SR();r.lang=lang==='en'?'en-US':'fa-IR';r.interimResults=false;$('#mic').classList.add('on');speakOn=true;r.onresult=e=>{ask(e.results[0][0].transcript)};r.onend=()=>$('#mic').classList.remove('on');r.onerror=()=>$('#mic').classList.remove('on');r.start()};
+/* ---------- live events wall ---------- */
+function wall(){const cards=[],m=D.market||{};const now=Date.now();
+ (D.news?.items||[]).slice(0,14).forEach(n=>cards.push({t:Date.parse(n.date),k:'📰',c:(n.coins||[])[0],h:esc(n.title),s:n.source,more:`<a href="${esc(n.url)}" target="_blank" rel="noopener nofollow">${esc(n.source)} ↗</a> ${(n.coins||[]).map(c=>`<span class="chip">${c}</span>`).join('')}`}));
+ (m.opportunities||[]).filter(o=>o.confidence==='high').slice(0,10).forEach(o=>cards.push({t:o.bar||Date.parse(m.updated_at),k:'📡',c:o.coin,h:`${o.coin} · ${o.type.replace(/_/g,' ')} · ${o.tf}`,s:'scanner',more:coinLine(o.coin)}));
+ (D.events?.events||[]).filter(e=>Date.parse(e.date)>now).slice(0,4).forEach(e=>cards.push({t:Date.parse(e.date),k:'🗓',h:esc(lang==='en'?e.title:(e.title_fa||e.title)),s:`ForexFactory · ${e.impact}`,more:`${L3('پیش‌بینی','پێشبینی','forecast')} ${esc(e.forecast||'—')} · ${L3('قبلی','پێشوو','previous')} ${esc(e.previous||'—')}`,future:1}));
+ ['BTC','ETH'].forEach(c=>{const lq=D.deriv?.[c]?.liq;(lq?.biggest||[]).slice(0,2).forEach(x=>cards.push({t:x.ts,k:'💥',c,h:`${c} ${x.side==='long'?'LONG':'SHORT'} ${L3('لیکویید','لیکوید','liquidated')} ${usd(x.usd)}`,s:'OKX',more:L3('لیکوییدیشن واقعی ثبت‌شده در OKX','','Real liquidation reported by OKX')}))});
+ (D.chain?.blocks||[]).slice(0,3).forEach(b=>cards.push({t:b.timestamp*1000,k:'⛏',c:'BTC',h:`Block #${fm(b.height,0)} · ${fm(b.tx_count,0)} tx`,s:`mempool.space · ${esc(b.extras?.pool?.name||'')}`,more:`${(b.size/1e6).toFixed(2)} MB`}));
+ cards.sort((a,b)=>(b.future?-1:0)-(a.future?-1:0)||b.t-a.t);
+ $('#wall').innerHTML=cards.slice(0,32).map(c=>`<div class="ev"><small><span class="k">${c.k}</span>${c.future?'⏳ ':''}${c.t?ago(Math.min(c.t,now)):''} · ${esc(c.s||'')}</small>${c.c?logoTag(c.c,16):''}<span>${c.h}</span><div class="more">${c.more||''}</div></div>`).join('')||`<p class="disc">${T('noData')}</p>`;
+ $('#wall').querySelectorAll('.ev').forEach(e=>e.onclick=ev=>{if(ev.target.closest('a'))return;e.classList.toggle('open')})}
+/* ---------- derivatives command room ---------- */
+function line(arr,W,H,col,fill){if(!arr.length)return'';const lo=Math.min(...arr),hi=Math.max(...arr),X=i=>i*W/(arr.length-1||1),Y=v=>H-3-(v-lo)/(hi-lo||1)*(H-6);const pts=arr.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');return `${fill?`<polygon points="0,${H} ${pts} ${W},${H}" fill="${fill}"/>`:''}<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.8"/>`}
+function deriv(){const d=D.deriv;if(!d||!d.swaps){$('#deriv').innerHTML=`<p class="disc">${T('noData')}</p>`;return}const B=d.BTC||{},E=d.ETH||{};
+ const lq=B.liq||{},le=E.liq||{};
+ $('#deriv').innerHTML=`<div class="kpis"><div><small>${L3('کل اوپن‌اینترست USDT','کۆی OI','Total OI (USDT perps)')}</small><b>${usd(d.total_oi_usd)}</b></div><div><small>${L3('فاندینگ وزنی','فەندینگی کێشدار','OI-weighted funding')}</small><b>${d.avg_funding}%</b></div><div><small>BTC funding</small><b>${B.funding??'—'}% <span class="disc">${B.funding_ann??''}%/y</span></b></div><div><small>ETH funding</small><b>${E.funding??'—'}%</b></div><div><small>BTC long/short</small><b>${B.long_short?.length?B.long_short.at(-1)[1]:'—'}</b></div><div><small>${L3('لیکویید BTC+ETH (لانگ/شورت)','لیکوید','Liquidations L/S')}</small><b>${usd((lq.long_usd||0)+(le.long_usd||0))} / ${usd((lq.short_usd||0)+(le.short_usd||0))}</b></div></div>
+ <div class="grid"><div><h3 style="font-size:.9rem">${L3('نقشهٔ حرارتی فاندینگ (۴۰ قرارداد با بیشترین OI)','نەخشەی گەرمیی فەندینگ','Funding heatmap (top-40 by OI)')}</h3><div class="heat">${d.swaps.slice(0,40).map(s=>{const f=s.funding||0,a=Math.min(1,Math.abs(f)/0.05);return `<div style="background:${f>=0?`rgba(239,68,68,${.12+a*.6})`:`rgba(56,189,248,${.12+a*.6})`}" title="${s.coin}: ${s.funding}%/8h · OI ${usd(s.oi_usd)}">${logoTag(s.coin,14)}<b>${s.coin}</b>${s.funding??'—'}%</div>`}).join('')}</div><p class="disc">${L3('قرمز: لانگ‌ها کارمزد می‌دهند (هیجان خرید) · آبی: شورت‌ها می‌دهند','','Red: longs pay (crowded longs) · Blue: shorts pay')}</p></div>
+ <div>${B.oi_hist?.length?`<h3 style="font-size:.9rem">BTC OI (${B.oi_hist.length}h)</h3><svg viewBox="0 0 400 90" style="width:100%;height:auto">${line(B.oi_hist.map(x=>x[1]),400,90,'#f7931a','rgba(247,147,26,.12)')}</svg>`:''}
+ ${B.long_short?.length?`<h3 style="font-size:.9rem">BTC long/short ${L3('حساب‌ها','هەژمارەکان','accounts')}</h3><svg viewBox="0 0 400 70" style="width:100%;height:auto">${line(B.long_short.map(x=>x[1]),400,70,'#38bdf8')}</svg>`:''}
+ ${B.taker?.length?`<h3 style="font-size:.9rem">BTC taker ${L3('خرید/فروش','کڕین/فرۆشتن','buy/sell')}</h3><svg viewBox="0 0 400 70" style="width:100%;height:auto">${B.taker.slice(-36).map((x,i)=>{const t=(x[1]||0)+(x[2]||0)||1,bw=400/36;return `<rect x="${i*bw}" y="${70-70*(x[2]||0)/t}" width="${bw-1}" height="${70*(x[2]||0)/t}" fill="rgba(34,197,94,.7)"/><rect x="${i*bw}" y="0" width="${bw-1}" height="${70*(x[1]||0)/t}" fill="rgba(239,68,68,.55)"/>`}).join('')}<line x1="0" x2="400" y1="35" y2="35" stroke="#fff" stroke-opacity=".3" stroke-dasharray="3 3"/></svg>`:''}
+ ${!B.oi_hist&&!B.long_short?`<p class="disc">${L3('آمار ساعتی OKX (rubik) در این اجرا در دسترس نبود.','','OKX hourly stats were not available in this run.')}</p>`:''}</div></div>
+ <p class="disc">OKX public API · ${d.updated_at?.slice(0,16).replace('T',' ')} UTC</p>`}
+/* ---------- capital waterfall ---------- */
+function flow(){const f=D.flows;if(!f||!f.sectors){$('#flow').innerHTML=`<p class="disc">${T('noData')}</p>`;return}const sus=f.sectors.filter(r=>r.suspect),s=f.sectors.filter(r=>r.delta_usd!=null&&r.id!=='stablecoins'&&!r.suspect),mx=Math.max(...s.map(r=>Math.abs(r.delta_usd)))||1;
+ const W=900,rowH=26,H=s.length*rowH+10,mid=W/2;
+ const ins=s.filter(r=>r.delta_usd>0),outs=s.filter(r=>r.delta_usd<0);
+ let bars=s.map((r,i)=>{const w=Math.abs(r.delta_usd)/mx*(mid-150),y=5+i*rowH,pos=r.delta_usd>=0;return `<g><rect x="${pos?mid:mid-w}" y="${y}" width="${w}" height="${rowH-8}" rx="4" fill="${pos?'rgba(34,197,94,.75)':'rgba(239,68,68,.7)'}"/><text x="${pos?mid-8:mid+8}" y="${y+13}" fill="#ddd" font-size="12" text-anchor="${pos?'end':'start'}" font-family="Vazirmatn">${esc(r.short)}</text><text x="${pos?mid+w+6:mid-w-6}" y="${y+13}" fill="#aaa" font-size="11" text-anchor="${pos?'start':'end'}">${r.delta_usd>=0?'+':''}${usd(r.delta_usd)} (${r.chg24>0?'+':''}${r.chg24}%)</text></g>`}).join('');
+ let parts='';outs.forEach((o,i)=>ins.forEach((n,k)=>{if((i+k)%2)return;const y1=5+s.indexOf(o)*rowH+9,y2=5+s.indexOf(n)*rowH+9,x1=mid-20,x2=mid+20,dur=(2.5+((i*3+k)%5)*.5).toFixed(1);
+  parts+=`<circle r="2.6" fill="#ffd27a" opacity=".85"><animateMotion dur="${dur}s" repeatCount="indefinite" path="M${x1},${y1} C${mid-120},${y1} ${mid+120},${y2} ${x2},${y2}"/></circle>`}));
+ const dom=f.dominance||[];let domSvg='';
+ if(dom.length>1){const Wd=900,Hd=120,keys=[['btc','#f7931a'],['eth','#8b9cf7'],['stable','#22c55e'],['others','#a3a3a3']];const X=i=>i*Wd/(dom.length-1);let acc=dom.map(()=>0);
+  domSvg=keys.map(([k,c])=>{const top=dom.map((d,i)=>acc[i]+(d[k]||0)),poly=dom.map((d,i)=>`${X(i)},${Hd-acc[i]*Hd/100}`).reverse(),up=top.map((v,i)=>`${X(i)},${Hd-v*Hd/100}`);acc=top;return `<polygon points="${up.join(' ')} ${poly.join(' ')}" fill="${c}" opacity=".75"/>`}).join('');
+  const l=dom.at(-1),fst=dom[0];domSvg=`<h3 style="font-size:.9rem;margin-top:14px">${L3('سهم از کل بازار','بەشی بازاڕ','Market-cap share')} (${dom.length} ${L3('نمونه','نموونە','points')})</h3><svg viewBox="0 0 900 120" style="width:100%;height:auto">${domSvg}</svg><p class="disc" dir="ltr">BTC ${fm(l.btc,2)}% (${(l.btc-fst.btc>=0?'+':'')+(l.btc-fst.btc).toFixed(2)} pp) · ETH ${fm(l.eth,2)}% · Stable ${fm(l.stable,2)}% · Others ${fm(l.others,2)}%</p>`}
+ $('#flow').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;direction:ltr"><line x1="${mid}" x2="${mid}" y1="0" y2="${H}" stroke="#ffffff30"/>${bars}${parts}</svg>${domSvg}${sus.length?`<p class="disc">⚠ ${L3('حذف از نمودار به‌دلیل تغییر غیرعادی (احتمالاً تغییر ترکیب دسته در CoinGecko)','لابرا بەهۆی گۆڕانی نائاسایی','Excluded as a likely data artifact (category constituent change)')}: ${sus.map(r=>`${esc(r.short)} ${r.chg24}%`).join(', ')}</p>`:''}<p class="disc">CoinGecko · ${L3('تغییر ۲۴ ساعتهٔ ارزش بازار هر بخش (قیمت × عرضه)؛ ذرات فقط جهت را نمایش می‌دهند','','24h market-cap change per sector (price × supply); particles only illustrate direction')} · ${f.updated_at?.slice(0,16).replace('T',' ')} UTC</p>`}
+/* ---------- crypto globe ---------- */
+let GL=null,GMODE='ex';
+function globeInit(){if(!window.THREE)return;const cv=$('#globe');let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true})}catch(e){return}
+ r.setPixelRatio(Math.min(devicePixelRatio,2));const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,100);cam.position.set(0,1.5,13.5);cam.lookAt(0,0,0);
+ const g=new THREE.Group();sc.add(g);const R=4;g.add(new THREE.Mesh(new THREE.SphereGeometry(R*.99,64,48),new THREE.MeshBasicMaterial({color:0x06080d})));
+ const ll=(la,lo,rr)=>{const ph=(90-la)*Math.PI/180,th=(lo+180)*Math.PI/180;return new THREE.Vector3(-rr*Math.sin(ph)*Math.cos(th),rr*Math.cos(ph),rr*Math.sin(ph)*Math.sin(th))};
+ const pts=[];for(let la=-84;la<=84;la+=4){const st=4/Math.max(.15,Math.cos(la*Math.PI/180));for(let lo=-180;lo<180;lo+=st){const v=ll(la,lo,R*1.002);pts.push(v.x,v.y,v.z)}}
+ const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));g.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0x2c3644,size:.045})));
+ const layer=new THREE.Group();g.add(layer);GL={r,sc,cam,g,layer,ll,R};
+ let drag=null,ry=0,rx=.35,auto=true;cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];auto=false});addEventListener('pointerup',()=>drag=null);
+ addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-drag[0])*.008;rx=Math.max(-1.2,Math.min(1.2,rx+(e.clientY-drag[1])*.006));drag=[e.clientX,e.clientY]});
+ const size=()=>{const w=cv.clientWidth,h=cv.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()};size();addEventListener('resize',size);
+ let vis=true,raf=0;new IntersectionObserver(e=>{vis=e[0].isIntersecting;if(vis&&!raf)raf=requestAnimationFrame(f)}).observe(cv);
+ function f(){raf=0;if(!vis)return;if(auto)ry+=.003;g.rotation.set(rx,ry,0);r.render(sc,cam);raf=requestAnimationFrame(f)}raf=requestAnimationFrame(f);globeLayer()}
+function globeLayer(){if(!GL)return;const {layer,ll,R}=GL;while(layer.children.length){const o=layer.children.pop();o.geometry?.dispose();o.material?.dispose()}
+ $('#gsw').innerHTML=`<button class="btn ${GMODE==='ex'?'p':''}" data-g="ex">🏦 ${L3('حجم صرافی‌ها بر اساس کشور','قەبارەی ئاڵوگۆڕگەکان','Exchange volume by country')}</button><button class="btn ${GMODE==='nodes'?'p':''}" data-g="nodes">🌍 ${L3('نودهای بیت‌کوین','نۆدەکانی بیتکۆین','Bitcoin nodes')}</button>`;
+ $('#gsw').querySelectorAll('button').forEach(b=>b.onclick=()=>{GMODE=b.dataset.g;globeLayer()});
+ if(GMODE==='ex'){const ex=(D.flows?.exchanges||[]).filter(x=>x.lat!=null);if(!ex.length){$('#ginfo').textContent=T('noData');return}const mx=Math.max(...ex.map(x=>x.vol_btc));
+  ex.forEach(x=>{const h=.15+Math.sqrt(x.vol_btc/mx)*2.6,base=ll(x.lat,x.lon,R),dir=base.clone().normalize(),geo=new THREE.CylinderGeometry(.07,.07,h,8);geo.translate(0,h/2,0);const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:0xf7931a,transparent:true,opacity:.9}));m.position.copy(base);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);layer.add(m)});
+  $('#ginfo').innerHTML=ex.slice(0,6).map(x=>`${esc(x.country)} <span class="num">${fm(x.vol_btc,0)} BTC</span> <span style="color:#777">(${x.top.slice(0,2).map(esc).join(', ')})</span>`).join(' · ')+`<br>${esc(D.flows?.exchanges_note||'')}`}
+ else{const n=D.chain?.nodes;if(!n?.cells){$('#ginfo').textContent=T('noData');return}const P=[],C=[];n.cells.forEach(([la,lo,c])=>{const v=ll(la,lo,R*1.01);P.push(v.x,v.y,v.z);const k=Math.min(1,Math.log2(1+c)/8);C.push(1,.55+.4*k,.15+.6*k)});
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(P,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(C,3));layer.add(new THREE.Points(geo,new THREE.PointsMaterial({size:.12,vertexColors:true})));
+  $('#ginfo').innerHTML=`<span class="num">${fm(n.total,0)}</span> ${L3('نود در دسترس','نۆدی بەردەست','reachable nodes')} · ${n.countries} ${L3('کشور','وڵات','countries')} · ${(n.top_countries||[]).slice(0,5).map(([c,k])=>`${c} ${k}`).join(' · ')}<br>bitnodes.io · ${n.at?.slice(0,16).replace('T',' ')} UTC`}}
+/* ---------- sentiment thermometer ---------- */
+function therm(){const s=D.dna?.headline_sentiment,f=D.market?.fng,btc=D.dna?.coins?.BTC?.raw,br=D.brain?.regime?.breadth;if(!s&&!f){$('#therm').innerHTML=`<p class="disc">${T('noData')}</p>`;return}
+ const hs=s?.score7==null?null:Math.round(50+50*s.score7),mood=[hs,f?.value].filter(v=>v!=null),moodV=mood.length?Math.round(mood.reduce((a,b)=>a+b)/mood.length):null;
+ const real=btc?.ret7!=null?Math.max(0,Math.min(100,50+btc.ret7*4)):null,realV=real!=null&&br?Math.round((real+br.up_pct)/2):real;
+ const gap=moodV!=null&&realV!=null?moodV-realV:null;
+ $('#therm').innerHTML=`<div class="therm"><div style="text-align:center"><div class="tube"><i style="height:${moodV??0}%"></i></div><small class="disc">${L3('هیجان','هەست','Mood')}</small><div class="big" style="font-size:1.3rem">${moodV??'—'}</div></div>
+ <div style="text-align:center"><div class="tube"><i style="height:${realV??0}%"></i></div><small class="disc">${L3('رفتار واقعی','ڕەفتاری ڕاستەقینە','Reality')}</small><div class="big" style="font-size:1.3rem">${realV??'—'}</div></div>
+ <div style="flex:1;font-size:.86rem;line-height:1.9">${L3('هیجان = میانگین ترس‌وطمع','هەست = تێکڕای ترس و تەماح','Mood = avg of Fear & Greed')} (<b class="num">${f?.value??'—'}</b>) ${L3('و لحن تیترهای ۷ روز','و تۆنی سەردێڕەکان','and 7-day headline tone')} (<b class="num">${hs??'—'}</b>, n=${s?.n7??0})<br>${L3('رفتار واقعی = بازده ۷ روزهٔ BTC','ڕەفتار = قازانجی ٧ ڕۆژی BTC','Reality = BTC 7-day return')} (${sg(btc?.ret7)}) ${L3('و پهنای بازار','و پانیی بازاڕ','and breadth')} (<b class="num">${br?.up_pct??'—'}%</b> ⬆)<br><b>${gap==null?'—':Math.abs(gap)<10?L3('هم‌راستا: هیجان با واقعیت می‌خواند.','هاوئاڕاستە.','Aligned: mood matches reality.'):gap>0?L3('هیجان جلوتر از واقعیت است (خوش‌بینی بیش از حد؟)','هەست لە پێش ڕاستییە','Mood runs ahead of reality (over-optimism?)'):L3('بدبینی بیشتر از واقعیت است (ترس بیش از حد؟)','ترس زیاترە لە ڕاستی','Pessimism exceeds reality (excess fear?)')}</b> <span class="num">(${gap>0?'+':''}${gap??''})</span></div></div>
+ ${s?.days?.length?`<div class="row" style="margin-top:10px">${s.days.map(d=>`<span class="chip" title="+${d.pos} / −${d.neg}">${d.day.slice(5)} <b class="num" style="color:${d.score>0?'var(--g)':d.score<0?'var(--r)':'#aaa'}">${d.score>0?'+':''}${d.score}</b></span>`).join('')}</div>`:''}
+ <p class="disc">alternative.me · RSS (${L3('لحن تیتر با واژه‌نامه؛ نه شبکه‌های اجتماعی','تۆنی سەردێڕ بە فەرهەنگ','lexicon headline tone; not social media')}) · Binance</p>`}
+/* ---------- claim-proof lab ---------- */
+const CLAIMS=[
+ ['btcUp',{fa:'بیت‌کوین در روند صعودی است',ckb:'بیتکۆین لە ڕەوتی بەرزبوونەوەدایە',en:'Bitcoin is in an uptrend'}],
+ ['altSeason',{fa:'فصل آلت‌کوین‌ها شروع شده',ckb:'وەرزی ئاڵتکۆینەکان دەستی پێکردووە',en:'Altcoin season is starting'}],
+ ['overheat',{fa:'بازار مشتقات بیش از حد داغ است',ckb:'بازاڕی مەشتەقە زۆر گەرمە',en:'Leverage is overheated'}],
+ ['whales',{fa:'نهنگ‌ها در حال خرید هستند',ckb:'نەهەنگەکان دەکڕن',en:'Whales are buying'}],
+ ['fear',{fa:'بازار در ترس است',ckb:'بازاڕ لە ترسدایە',en:'The market is fearful'}],
+ ['volExp',{fa:'نوسان بیت‌کوین در آستانهٔ انفجار است',ckb:'لەرزینی بیتکۆین نزیکە بتەقێتەوە',en:'Bitcoin volatility is about to expand'}],
+ ['aiFlow',{fa:'پول به سمت کوین‌های هوش مصنوعی می‌رود',ckb:'پارە بەرەو دراوەکانی AI دەچێت',en:'Money is flowing into AI coins'}],
+ ['netHealth',{fa:'شبکهٔ بیت‌کوین سالم و فعال است',ckb:'تۆڕی بیتکۆین تەندروستە',en:'The Bitcoin network is healthy'}]];
+function claimEval(id){const E=[],add=(l,v,ok,src)=>E.push({l,v,ok,src});const m=D.market||{},btc=(m.coins||[]).find(c=>c.coin==='BTC')||{},dr=D.dna?.coins?.BTC?.raw||{},br=D.brain?.regime;
+ if(id==='btcUp'){add('trend (1h EMA20/50)',btc.trend,btc.trend==='up'?1:btc.trend==='down'?-1:0,'Binance');add('30d',dr.ret30!=null?dr.ret30+'%':null,dr.ret30==null?0:dr.ret30>0?1:-1,'Binance');add('90d',dr.ret90!=null?dr.ret90+'%':null,dr.ret90==null?0:dr.ret90>0?1:-1,'Binance');add('regime',br?.regime,br?.regime==='bull'?1:br?.regime==='bear'?-1:0,'brain')}
+ if(id==='altSeason'){const cs=Object.entries(D.dna?.coins||{}).filter(([c])=>c!=='BTC'),b30=dr.ret30;const out=b30==null?null:cs.filter(([,v])=>v.raw.ret30!=null&&v.raw.ret30>b30).length;add(L3('آلت‌های بهتر از BTC در ۳۰ روز','','Alts beating BTC over 30d'),out==null?null:`${out}/${cs.length}`,out==null?0:out/cs.length>.6?1:out/cs.length<.4?-1:0,'Binance');
+  const dom=D.flows?.dominance||[];if(dom.length>1){const d=dom.at(-1).btc-dom[0].btc;add('BTC dominance Δ',`${d>0?'+':''}${d.toFixed(2)} pp`,d<-.3?1:d>.3?-1:0,'CoinGecko')}add('breadth',br?`${br.breadth?.up_pct}% ⬆`:null,br?br.breadth.up_pct>55?1:br.breadth.up_pct<40?-1:0:0,'brain')}
+ if(id==='overheat'){const d=D.deriv||{},B=d.BTC||{};add('OI-weighted funding (8h)',d.avg_funding!=null?d.avg_funding+'%':null,d.avg_funding==null?0:d.avg_funding>0.03?1:d.avg_funding<0.005?-1:0,'OKX');add('BTC funding (ann.)',B.funding_ann!=null?B.funding_ann+'%':null,B.funding_ann==null?0:B.funding_ann>30?1:B.funding_ann<8?-1:0,'OKX');add('BTC long/short',B.long_short?.length?B.long_short.at(-1)[1]:null,B.long_short?.length?(B.long_short.at(-1)[1]>2.2?1:B.long_short.at(-1)[1]<1.2?-1:0):0,'OKX');
+  const h=d.history||[];if(h.length>24){const ch=(h.at(-1).oi/h.at(-25).oi-1)*100;add('OI 24h',ch.toFixed(1)+'%',ch>8?1:ch<-5?-1:0,'OKX')}}
+ if(id==='whales'){add(L3('دادهٔ کیف‌پول نهنگ‌ها','داتای جزدانی نەهەنگ','Whale wallet data'),L3('منبع رایگان معتبر ندارد','نییە','no reliable free source'),0,'—');add('BTC taker buy share 7d',dr.taker7!=null?dr.taker7+'%':null,dr.taker7==null?0:dr.taker7>52?1:dr.taker7<48?-1:0,'Binance');const lq=D.deriv?.BTC?.liq;if(lq)add('BTC liquidations short vs long',`${usd(lq.short_usd)} / ${usd(lq.long_usd)}`,lq.short_usd>lq.long_usd*1.5?1:lq.long_usd>lq.short_usd*1.5?-1:0,'OKX')}
+ if(id==='fear'){const f=m.fng;add('Fear & Greed',f?.value,f?.value==null?0:f.value<40?1:f.value>60?-1:0,'alternative.me');const s=D.dna?.headline_sentiment?.score7;add('headline tone 7d',s,s==null?0:s<-.1?1:s>.1?-1:0,'RSS')}
+ if(id==='volExp'){const v=D.lab?.vol?.BTC;if(v){add('BB width rank (1y)',v.bw_rank,v.bw_rank<=15?1:v.bw_rank>=60?-1:0,'Binance');add('RV7 / RV90',`${v.rv7}% / ${v.rv90}%`,v.rv7<v.rv90*.6?1:v.rv7>v.rv90?-1:0,'Binance')}const o=D.lab?.options?.BTC;if(o?.dvol)add('DVOL now vs 7d',`${o.dvol.now} / ${o.dvol.d7_ago}`,o.dvol.now<o.dvol.d7_ago-3?1:0,'Deribit')}
+ if(id==='aiFlow'){const s=(D.flows?.sectors||[]).find(r=>r.id==='artificial-intelligence');if(s)add('AI sector mcap 24h',`${s.chg24}% (${usd(s.delta_usd)})`,s.chg24>1?1:s.chg24<-1?-1:0,'CoinGecko');const n=(D.narr?.narratives||[]).find(x=>/ai/i.test(x.id));if(n){add('AI narrative mentions / momentum',`${n.mentions_24h} · ×${n.momentum}`,n.momentum>1.3?1:n.momentum<.8?-1:0,'RSS');add('AI coins 24h',n.perf_24h!=null?n.perf_24h+'%':null,n.perf_24h==null?0:n.perf_24h>0?1:-1,'Binance')}}
+ if(id==='netHealth'){const c=D.chain||{},b=c.blocks||[];if(b.length>1){const span=(b[0].timestamp-b.at(-1).timestamp)/(b.length-1)/60;add('avg block time (last 15)',span.toFixed(1)+' min',span<12?1:span>15?-1:0,'mempool.space')}add('hashrate',c.hashrate?(c.hashrate/1e21).toFixed(2)+' ZH/s':null,c.hashrate?1:0,'mempool.space');add('reachable nodes',c.nodes?.total,c.nodes?.total?(c.nodes.total>10000?1:0):0,'bitnodes.io');add('fee (30 min)',c.fees?c.fees.halfHourFee+' sat/vB':null,c.fees?1:0,'mempool.space')}
+ const known=E.filter(e=>e.v!=null&&e.v!==undefined),sc=known.reduce((a,e)=>a+e.ok,0);
+ const v=id==='whales'?'na':!known.length?'na':known.every(e=>e.ok===0)?'nd':sc>=Math.max(2,known.length*.5)?'ok':sc<=-Math.max(1,known.length*.4)?'no':'mix';
+ return {E,v}}
+function claim(){const sel=$('#claimSel');if(!sel.options.length||sel.dataset.l!==lang){const cur=sel.value;sel.innerHTML=CLAIMS.map(([id,t])=>`<option value="${id}">${esc(t[lang]||t.en)}</option>`).join('');sel.dataset.l=lang;if(cur)sel.value=cur}
+ const {E,v}=claimEval(sel.value||CLAIMS[0][0]);const VL={ok:L3('پشتیبانی می‌شود','پشتگیری دەکرێت','Supported'),no:L3('رد می‌شود','ڕەت دەکرێتەوە','Contradicted'),mix:L3('شواهد متناقض','بەڵگەی ناکۆک','Mixed evidence'),nd:L3('دادهٔ فعلی آن را تأیید نمی‌کند','داتای ئێستا پشتگیری ناکات','Not supported by current data'),na:L3('قابل‌اثبات نیست','ناسەلمێندرێت','Cannot be verified')};
+ $('#claim').innerHTML=`<span class="verdict ${v}">${VL[v]}</span>${E.map(e=>`<div class="evd">${e.ok>0?'✅':e.ok<0?'❌':'➖'} ${esc(e.l)}: <span>${esc(e.v??'—')}</span> <span class="disc">${esc(e.src)}</span></div>`).join('')}<p class="disc">${L3('قواعد ساده و شفاف روی دادهٔ واقعی؛ ✅ موافق ادعا، ❌ مخالف، ➖ خنثی/نامعلوم.','','Simple transparent rules on real data; ✅ supports, ❌ contradicts, ➖ neutral/unknown.')}</p>`}
+$('#claimSel').onchange=claim;
+/* ---------- prediction-quality index ---------- */
+function acc(){const log=D.clog||[];if(!log.length){$('#acc').innerHTML=`<p class="disc">${L3('ثبت پیش‌بینی‌های میزگرد هوش مصنوعی از امروز شروع شده؛ هر نظر ۷ روز بعد با حرکت واقعی بیت‌کوین سنجیده می‌شود.','تۆمارکردن لە ئەمڕۆوە دەستی پێکردووە.','Logging of the AI council’s calls has started; each call is scored against Bitcoin’s real move 7 days later.')}</p>`;return}
+ const btcNow=(D.market?.coins||[]).find(c=>c.coin==='BTC')?.price,sc={},pend=[];
+ log.forEach(e=>{const age=(Date.now()-Date.parse(e.at))/864e5;const later=log.find(x=>Math.abs((Date.parse(x.at)-Date.parse(e.at))/864e5-7)<1.5);const p2=later?.btc??(age>=7&&age<9?btcNow:null);
+  if(age<7||!e.btc||!p2){pend.push(e);return}const r=(p2/e.btc-1)*100;Object.entries(e.stances||{}).forEach(([a,[s]])=>{sc[a]=sc[a]||{n:0,hit:0};if(s==='neutral'){if(Math.abs(r)<3){sc[a].n++;sc[a].hit++}else sc[a].n++}else{sc[a].n++;if((s==='bullish')===(r>0))sc[a].hit++}})});
+ const rows=Object.entries(sc);$('#acc').innerHTML=(rows.length?`<table><tr><th></th><th>n</th><th>${L3('دقت','وردی','Hit rate')}</th></tr>${rows.map(([a,v])=>`<tr><td>${esc(a)}</td><td class="num">${v.n}</td><td class="num">${Math.round(v.hit*100/v.n)}%</td></tr>`).join('')}</table>`:'')+`<p class="disc">${log.length} ${L3('نظر ثبت‌شده','بۆچوونی تۆمارکراو','logged calls')} · ${pend.length} ${L3('در انتظار ۷ روز','چاوەڕێی ٧ ڕۆژ','waiting for 7 days')} · ${L3('روش: صعودی/نزولی = جهت درست بازده ۷ روزه؛ خنثی = حرکت کمتر از ۳٪','','method: bullish/bearish = correct sign of the 7-day BTC return; neutral = |move| < 3%')}</p>`}
+/* ---------- boot ---------- */
+async function load(){const v=V();[D.market,D.news,D.brain,D.deriv,D.flows,D.chain,D.dna,D.narr,D.events,D.score,D.lab,D.clog,D.logos]=await Promise.all(['market','news','brain','derivatives','flows','chain','dna','narratives','events','score','lab','council_log','logos/index'].map(n=>j(`/data/${n}.json${v}`)));LOGO=new Set(D.logos||[]);render()}
+function render(){layout();$('#q').placeholder=T('ph');$('#ex').innerHTML=T('ex').map(x=>`<button>${esc(x)}</button>`).join('');wall();deriv();flow();therm();claim();acc();globeLayer()}
+uiLang(()=>{if(D.market!==undefined)render()});load().then(()=>{globeInit();const q=new URLSearchParams(location.search).get('q');if(q)ask(q)});setInterval(()=>{if(!document.hidden)load()},120000);
+</script>
+</body>
+</html>
