@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coin_Kurd ₿</title>
+<meta name="description" content="آرشیو چندبُعدی و دسته‌بندی‌شدهٔ پست‌های کانال Coin_Kurd — تحلیل، خبر، آموزش و اندیکاتورهای کریپتو">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c6ff00'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&family=Archivo+Black&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--ink:#f4f4f2;--mute:#9a9a94;--lime:#c6ff00;--lime2:#8fc400;--gold:#f3c969;--line:rgba(255,255,255,.1);
+  --panel:#121212;--fontB:'Vazirmatn',system-ui,sans-serif;--fontD:'Archivo Black','Space Grotesk','Vazirmatn',sans-serif;--mono:'Space Grotesk',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fontB);background:var(--bg);color:var(--ink);line-height:1.7;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+::selection{background:var(--lime);color:#000}
+.wrap{max-width:1400px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+.lc{text-transform:lowercase;letter-spacing:.02em;font-family:var(--mono)}
+.display{font-family:var(--fontD);text-transform:uppercase;line-height:.92;letter-spacing:-.02em}
+[dir=rtl] .display{font-family:'Vazirmatn',var(--fontD);font-weight:900;text-transform:none;line-height:1.05;letter-spacing:0}
+.hero h1.display{font-family:var(--fontD)!important;text-transform:uppercase;line-height:.92;letter-spacing:-.02em}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:90;mix-blend-mode:difference;color:#fff;transition:transform .35s}
+nav.hide{transform:translateY(-100%)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{font-family:var(--mono);font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:10px}
+.brand i{width:12px;height:12px;background:var(--lime);border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(198,255,0,.18)}}
+.navr{display:flex;gap:22px;align-items:center}
+.navr a,.navr button{font-family:var(--mono);text-transform:lowercase;font-size:.95rem;opacity:.9}
+.langs{display:flex;gap:10px}
+.langs button.on{text-decoration:underline;text-underline-offset:6px;text-decoration-color:var(--lime);text-decoration-thickness:2px}
+.burger{width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.4);border-radius:50%}
+
+/* menu overlay */
+.menu{position:fixed;inset:0;z-index:80;background:#0a0a0a;display:none;grid-template-columns:1fr 1fr;align-items:center;padding:100px clamp(16px,6vw,80px) 40px;gap:40px}
+.menu.open{display:grid}
+.menu .links a{display:block;font-size:clamp(2.2rem,6vw,5rem);line-height:1.1;transition:.2s;font-weight:900}
+.menu .links a:hover{color:var(--lime);transform:translateX(calc(var(--dir) * -12px))}
+.menu .mosaic{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.menu .mosaic div{aspect-ratio:1;background:#1a1a1a center/cover;border-radius:6px;filter:grayscale(.3)}
+.menu .mosaic div:hover{filter:none}
+@media(max-width:900px){.menu{grid-template-columns:1fr}.menu .mosaic{display:none}}
+
+/* hero */
+.hero{min-height:100svh;display:grid;align-content:end;position:relative;padding-bottom:110px;overflow:hidden}
+.hero .bgimg{position:absolute;inset:0;background:#111 center/cover no-repeat;opacity:.55;mask-image:linear-gradient(#000 40%,transparent);transform:scale(1.05)}
+.hero .blob{position:absolute;width:48vw;height:48vw;border-radius:46% 54% 60% 40%/50% 40% 60% 50%;background:var(--lime);filter:blur(60px);opacity:.14;top:-10%;inset-inline-end:-10%;animation:morph 14s ease-in-out infinite alternate}
+@keyframes morph{to{border-radius:60% 40% 40% 60%/40% 60% 40% 60%;transform:rotate(30deg) scale(1.15)}}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1fr auto;align-items:end;gap:30px}
+.hero h1{font-size:clamp(3.2rem,13vw,13rem);color:var(--ink)}
+.hero h1 em{font-style:normal;color:var(--lime);-webkit-text-stroke:0;display:block}
+.hero .role{font-family:var(--mono);text-transform:lowercase;color:var(--mute);margin-top:14px;font-size:1.05rem}
+.next{border:1px solid var(--line);border-radius:18px;padding:18px 22px;min-width:300px;max-width:380px;background:rgba(10,10,10,.6);backdrop-filter:blur(10px)}
+.next .lc{color:var(--lime);font-size:.8rem}
+.next b{display:block;margin:6px 0 2px;font-size:1.05rem;line-height:1.4;font-weight:700}
+.next small{color:var(--mute);font-family:var(--mono)}
+.scroll{position:absolute;bottom:26px;inset-inline-start:clamp(16px,4vw,48px);font-family:var(--mono);text-transform:lowercase;color:var(--mute);font-size:.85rem;display:flex;gap:10px;align-items:center}
+.scroll i{display:inline-block;width:1px;height:46px;background:linear-gradient(var(--lime),transparent);animation:drop 1.6s infinite}
+@keyframes drop{from{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}to{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.scroll{display:none}}
+
+/* message */
+.msg{padding:120px 0 60px}
+.msg p{font-size:clamp(1.4rem,3vw,2.4rem);line-height:1.45;max-width:1000px;font-weight:300}
+.msg p b{font-weight:900;color:var(--ink)}
+.msg p em{font-style:normal;color:var(--lime)}
+.kpis{display:flex;gap:40px;flex-wrap:wrap;margin-top:40px}
+.kpi b{font-family:var(--mono);font-size:clamp(2rem,4vw,3.4rem);font-weight:700;display:block;line-height:1}
+.kpi small{color:var(--mute);text-transform:lowercase;font-family:var(--mono)}
+
+/* photo strip */
+.strip{display:flex;gap:14px;overflow-x:auto;padding:30px clamp(16px,4vw,48px) 60px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.shot{flex:0 0 clamp(260px,32vw,420px);scroll-snap-align:start;cursor:pointer}
+.shot .img{aspect-ratio:4/5;background:#171717 center/cover;border-radius:4px;transition:.5s cubic-bezier(.2,.8,.2,1);filter:saturate(.85)}
+.shot:hover .img{transform:translateY(-8px);filter:none}
+.shot .cap{display:flex;justify-content:space-between;font-family:var(--mono);text-transform:lowercase;color:var(--mute);font-size:.8rem;margin-top:10px}
+.shot .cap b{color:var(--ink);font-weight:500}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 clamp(16px,4vw,48px)}
+.half{position:relative;min-height:62vh;display:grid;align-content:end;padding:40px;overflow:hidden;cursor:pointer;background:#141414}
+.half .bgi{position:absolute;inset:0;background:#1a1a1a center/cover;opacity:.5;transition:.7s;filter:grayscale(.4)}
+.half:hover .bgi{transform:scale(1.06);opacity:.7;filter:none}
+.half h2{position:relative;font-size:clamp(2.6rem,6vw,6rem)}
+.half h2 span{display:block;color:var(--lime)}
+.half .lc{position:relative;color:var(--mute);margin-top:10px}
+@media(max-width:800px){.split{grid-template-columns:1fr}.half{min-height:44vh}}
+
+/* category hall */
+.sec{padding:120px 0 40px}
+.sec h2{font-size:clamp(2.4rem,6vw,5.6rem);margin-bottom:10px}
+.sec .lead{color:var(--mute);font-family:var(--mono);text-transform:lowercase;margin-bottom:40px}
+.hall{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
+.tile{position:relative;aspect-ratio:1;background:#141414;display:grid;align-content:space-between;padding:22px;cursor:pointer;overflow:hidden;transition:.3s}
+.tile .ic{font-size:2.6rem;transition:.4s}
+.tile:hover{background:var(--c)}
+.tile:hover .ic{transform:scale(1.25) rotate(-8deg)}
+.tile:hover b,.tile:hover small{color:#000}
+.tile b{display:block;font-size:1.05rem;font-weight:800;line-height:1.3}
+.tile small{font-family:var(--mono);color:var(--mute)}
+.tile .n{position:absolute;top:18px;inset-inline-end:18px;font-family:var(--mono);font-size:.8rem;color:var(--mute)}
+.tile:hover .n{color:#000}
+
+/* dims */
+.dims{position:sticky;top:0;z-index:60;background:rgba(10,10,10,.85);backdrop-filter:blur(16px);border-block:1px solid var(--line);padding:14px 0}
+.dims .wrap{display:grid;gap:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lbl{font-family:var(--mono);text-transform:lowercase;color:var(--mute);font-size:.8rem;min-width:70px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:.84rem;transition:.18s;display:inline-flex;gap:6px;align-items:center;color:var(--ink)}
+.chip:hover{border-color:var(--ink)}
+.chip.on{background:var(--c,var(--lime));color:#000;border-color:transparent;font-weight:700}
+.chip .n{opacity:.6;font-size:.72rem;font-family:var(--mono)}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:8px 4px}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--ink);font-family:inherit;font-size:.95rem}
+select{background:#141414;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 12px;font-family:inherit}
+.views{display:flex;gap:2px}
+.views button{padding:7px 12px;font-family:var(--mono);text-transform:lowercase;color:var(--mute);border-bottom:2px solid transparent}
+.views button.on{color:var(--ink);border-color:var(--lime)}
+.count{color:var(--mute);font-size:.82rem;font-family:var(--mono)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px;margin:4px 0 100px}
+.card{position:relative;background:#121212;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:background .3s;animation:in .5s both}
+@keyframes in{from{opacity:0;transform:translateY(16px)}to{opacity:1}}
+.card:hover{background:#181818}
+.card::after{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;background:var(--c);transform:scaleY(0);transition:.3s;transform-origin:top}
+.card:hover::after{transform:scaleY(1)}
+.card .media{aspect-ratio:16/10;background:#0e0e0e center/cover no-repeat;position:relative;filter:saturate(.8);transition:.5s}
+.card:hover .media{filter:none}
+.card .media .play{position:absolute;inset:0;display:grid;place-items:center;font-size:2.4rem}
+.card .body{padding:20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.76rem;color:var(--mute);font-family:var(--mono);text-transform:lowercase}
+.cat{text-transform:none;display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;color:var(--c);font-weight:700;font-size:.76rem;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);font-family:var(--fontB)}
+.card h3{font-size:1.05rem;font-weight:800;line-height:1.5}
+.card p{color:var(--mute);font-size:.9rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.coins{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.coin{font-family:var(--mono);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.07)}
+.foot{display:flex;justify-content:space-between;font-size:.76rem;color:var(--mute);border-top:1px solid var(--line);padding-top:10px;font-family:var(--mono)}
+.card.big{grid-column:span 2}.card.big .media{aspect-ratio:21/9}
+@media(max-width:700px){.card.big{grid-column:span 1}}
+
+/* timeline */
+.timeline{position:relative;margin:30px 0 100px;padding-inline-start:30px}
+.timeline::before{content:"";position:absolute;inset-inline-start:9px;top:0;bottom:0;width:1px;background:linear-gradient(var(--lime),transparent)}
+.day{margin-bottom:34px}
+.day h4{position:relative;font-family:var(--mono);color:var(--lime);font-size:.9rem;text-transform:lowercase;margin-bottom:12px}
+.day h4::before{content:"";position:absolute;inset-inline-start:-26px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--lime)}
+.tl-item{display:grid;grid-template-columns:60px 1fr;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;transition:.2s}
+.tl-item:hover{background:#121212;transform:translateX(calc(var(--dir) * -4px))}
+.tl-item time{font-family:var(--mono);color:var(--mute);font-size:.85rem}
+.tl-item .t{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* heat */
+.heat{overflow:auto;margin:20px 0 100px}
+.heat table{border-collapse:separate;border-spacing:3px;min-width:640px}
+.heat th{font-size:.78rem;color:var(--mute);font-weight:500;padding:6px;white-space:nowrap;font-family:var(--mono)}
+.heat th.rowh{text-align:start;font-family:var(--fontB);padding-inline-end:12px}
+.heat td{width:54px;height:42px;text-align:center;font-family:var(--mono);font-size:.8rem;font-weight:700;cursor:pointer;transition:.15s;background:#141414}
+.heat td:hover{transform:scale(1.1);outline:1px solid var(--ink)}
+
+/* stats */
+.bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:4px;margin:20px 0 100px}
+.bars .box{background:#121212;padding:28px}
+.bars h3{font-size:1.1rem;margin-bottom:14px;font-weight:800}
+.bar-row{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;font-size:.88rem;margin:8px 0}
+.bar-row .track{height:10px;background:rgba(255,255,255,.06);overflow:hidden}
+.bar-row .fill{height:100%;background:var(--c);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.bar-row b{font-family:var(--mono);color:var(--mute);text-align:end;font-weight:500}
+
+/* coins wall */
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;margin-bottom:100px}
+.wall button{aspect-ratio:1.6;background:#121212;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:1.15rem;color:var(--mute);transition:.25s}
+.wall button:hover,.wall button.on{background:var(--gold);color:#000}
+.wall button small{display:block;font-size:.7rem;font-weight:400}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);padding:20px}
+.modal.open{display:grid}
+.sheet{width:min(780px,100%);max-height:92vh;overflow:auto;background:#111;border:1px solid var(--line);animation:pop .25s}
+@keyframes pop{from{transform:translateY(20px);opacity:0}}
+.sheet img{width:100%;display:block;max-height:440px;object-fit:cover}
+.sheet .in{padding:28px}
+.sheet .txt{white-space:pre-wrap;line-height:1.95;margin:16px 0;font-size:1rem}
+.sheet .txt a{color:var(--lime)}
+.sheet .lp{display:block;border:1px solid var(--line);padding:12px;margin:12px 0}
+.sheet .lp small{color:var(--mute)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{padding:11px 18px;border:1px solid var(--line);font-weight:600;display:inline-flex;gap:8px;align-items:center;transition:.2s;border-radius:999px;font-family:var(--mono);text-transform:lowercase}
+.btn.p{background:var(--lime);color:#000;border-color:transparent}
+.btn:hover{transform:translateY(-2px)}
+.close{position:sticky;top:12px;float:inline-end;margin:12px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:2;border:1px solid var(--line)}
+
+/* footer */
+footer{padding:120px 0 40px;position:relative;overflow:hidden}
+footer .big{font-size:clamp(2.6rem,9vw,9rem);line-height:.95}
+footer .big span{color:var(--lime)}
+footer .fr{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:50px;border-top:1px solid var(--line);padding-top:24px;color:var(--mute);font-family:var(--mono);text-transform:lowercase;font-size:.85rem}
+footer .fr a:hover{color:var(--lime)}
+footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60% 50%;background:var(--lime);opacity:.08;filter:blur(50px);bottom:-20%;inset-inline-start:-10%}
+.empty{text-align:center;color:var(--mute);padding:90px 0;font-family:var(--mono)}
+.reveal{opacity:0;transform:translateY(30px);transition:.8s cubic-bezier(.2,.8,.2,1)}
+.reveal.v{opacity:1;transform:none}
+.marquee{overflow:hidden;border-block:1px solid var(--line);padding:14px 0;font-family:var(--mono);text-transform:lowercase;color:var(--mute);white-space:nowrap}
+.marquee div{display:inline-block;animation:mq 40s linear infinite}
+.marquee span{margin:0 28px}.marquee span b{color:var(--lime);font-weight:500}
+@keyframes mq{to{transform:translateX(calc(var(--dir) * 50%))}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="brand" href="#top"><i></i>coin_kurd</a>
+  <div class="navr">
+    <div class="langs" id="langs"><button data-l="fa">فارسی</button><button data-l="ckb">کوردی</button><button data-l="en">en</button></div>
+    <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener" data-i="join">telegram</a>
+    <button class="burger" id="burger" aria-label="menu">☰</button>
+  </div>
+</div></nav>
+
+<div class="menu" id="menu">
+  <div class="links display">
+    <a href="#top" data-i="mHome">خانه</a>
+    <a href="#feed" data-i="mFeed">آرشیو</a>
+    <a href="#hall" data-i="mCats">دسته‌ها</a>
+    <a href="#coinswall" data-i="mCoins">کوین‌ها</a>
+    <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">Telegram ↗</a>
+  </div>
+  <div class="mosaic" id="mosaic"></div>
+</div>
+
+<main id="top">
+  <section class="hero">
+    <div class="bgimg" id="heroImg"></div><div class="blob"></div>
+    <div class="wrap">
+      <div>
+        <h1 class="display"><span>Coin</span><em>Kurd</em></h1>
+        <div class="role" data-i="role">تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام</div>
+      </div>
+      <a class="next" id="next" href="#feed"><span class="lc" data-i="latest">آخرین پست</span><b id="nextTitle" dir="auto">…</b><small id="nextTime"></small></a>
+    </div>
+    <div class="scroll"><i></i><span data-i="scroll">اسکرول کنید</span></div>
+  </section>
+
+  <div class="marquee" dir="ltr"><div id="mq"></div></div>
+
+  <section class="msg wrap reveal">
+    <p data-i="msg">هر پستی که در <b>Coin_Kurd</b> منتشر می‌شود، <em>به‌صورت خودکار</em> خوانده، بر اساس <b>دسته</b>، <b>کوین</b> و <b>زمان</b> طبقه‌بندی و همین‌جا منتشر می‌شود. بدون دخالت دست؛ هر ساعت.</p>
+    <div class="kpis">
+      <div class="kpi"><b id="sPosts">—</b><small data-i="posts">پست</small></div>
+      <div class="kpi"><b id="sCats">—</b><small data-i="cats">دسته</small></div>
+      <div class="kpi"><b id="sCoins">—</b><small data-i="coins">کوین</small></div>
+      <div class="kpi"><b id="sUpd" style="font-size:1.2rem;padding-top:14px">—</b><small data-i="updated">آخرین به‌روزرسانی</small></div>
+    </div>
+  </section>
+
+  <div class="strip" id="strip"></div>
+
+  <section class="split reveal">
+    <div class="half" id="halfA"><div class="bgi"></div><h2 class="display" data-i="onA">تحلیل<span>تکنیکال</span></h2><div class="lc" id="halfAn"></div></div>
+    <div class="half" id="halfB"><div class="bgi"></div><h2 class="display" data-i="onB">خبر<span>بازار</span></h2><div class="lc" id="halfBn"></div></div>
+  </section>
+
+  <section class="sec wrap reveal" id="hall">
+    <h2 class="display" data-i="hallT">دسته‌ها</h2>
+    <p class="lead" data-i="hallL">هر پست با قواعد کلیدواژه و هشتگ به یکی از این دسته‌ها می‌رود</p>
+    <div class="hall" id="hallGrid"></div>
+  </section>
+
+  <section id="feed">
+    <div class="dims"><div class="wrap">
+      <div class="row"><span class="lbl" data-i="dCat">دسته</span><div class="chips" id="catChips"></div></div>
+      <div class="row"><span class="lbl" data-i="dCoin">کوین</span><div class="chips" id="coinChips"></div></div>
+      <div class="row">
+        <span class="lbl" data-i="dTime">زمان</span><div class="chips" id="timeChips"></div>
+        <label class="search">🔎 <input id="q" data-ph="search" placeholder="جستجو…"></label>
+        <select id="sort"><option value="new" data-i="sNew">جدیدترین</option><option value="views" data-i="sViews">پربازدیدترین</option></select>
+        <div class="views" id="views"><button data-v="grid" class="on" data-i="vGrid">کارت‌ها</button><button data-v="timeline" data-i="vTl">تایم‌لاین</button><button data-v="heat" data-i="vHeat">نقشهٔ حرارتی</button><button data-v="stats" data-i="vStats">آمار</button></div>
+        <span class="count" id="count"></span>
+      </div>
+    </div></div>
+    <div class="wrap" id="out"></div>
+  </section>
+
+  <section class="sec wrap reveal" id="coinswall">
+    <h2 class="display" data-i="wallT">کوین‌ها</h2>
+    <p class="lead" data-i="wallL">کوین‌هایی که بیشتر از همه در کانال درباره‌شان صحبت شده</p>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <footer><div class="fblob"></div><div class="wrap">
+    <div class="big display" data-i="tag">بازار را <span>بفهم،</span> نه فقط دنبال کن.</div>
+    <div class="fr">
+      <span>© <span id="yr"></span> coin_kurd ₿ — <span data-i="auto">به‌روزرسانی خودکار از تلگرام</span></span>
+      <span><a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">telegram</a> · <a href="https://t.me/Coin_Kurd_Group" target="_blank" rel="noopener">group</a> · <a href="https://www.kurds.ir" target="_blank" rel="noopener">kurds.ir</a></span>
+    </div>
+  </div></footer>
+</main>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const I18N={
+ fa:{dir:'rtl',locale:'fa-IR',join:'تلگرام',role:'تحلیل بازار کریپتو · اندیکاتورهای هوشمند · آرشیو خودکار کانال تلگرام',latest:'آخرین پست',scroll:'اسکرول کنید',
+  msg:'هر پستی که در <b>Coin_Kurd</b> منتشر می‌شود، <em>به‌صورت خودکار</em> خوانده، بر اساس <b>دسته</b>، <b>کوین</b> و <b>زمان</b> طبقه‌بندی و همین‌جا منتشر می‌شود. بدون دخالت دست؛ هر ساعت.',
+  posts:'پست',cats:'دسته',coins:'کوین',updated:'آخرین به‌روزرسانی',onA:'تحلیل<span>تکنیکال</span>',onB:'خبر<span>بازار</span>',hallT:'دسته‌ها',hallL:'هر پست با قواعد کلیدواژه و هشتگ به یکی از این دسته‌ها می‌رود',
+  dCat:'دسته',dCoin:'کوین',dTime:'زمان',search:'جستجو در متن، هشتگ، کوین…',sNew:'جدیدترین',sViews:'پربازدیدترین',vGrid:'کارت‌ها',vTl:'تایم‌لاین',vHeat:'نقشهٔ حرارتی',vStats:'آمار',
+  wallT:'کوین‌ها',wallL:'کوین‌هایی که بیشتر از همه در کانال درباره‌شان صحبت شده',tag:'بازار را <span>بفهم،</span> نه فقط دنبال کن.',auto:'به‌روزرسانی خودکار از تلگرام',
+  mHome:'خانه',mFeed:'آرشیو',mCats:'دسته‌ها',mCoins:'کوین‌ها',all:'همه',t24:'۲۴ ساعت',t7:'۷ روز',t30:'۳۰ روز',result:'نتیجه',empty:'پستی با این فیلترها پیدا نشد.',open:'مشاهده در تلگرام',share:'کپی لینک',copied:'کپی شد!',byCat:'توزیع دسته‌ها',byCoin:'کوین‌های پرتکرار',heatHint:'تعداد پست به تفکیک دسته × کوین — روی هر خانه کلیک کنید',related:'مرتبط'},
+ ckb:{dir:'rtl',locale:'ckb-IQ',join:'تێلێگرام',role:'شیکاری بازاڕی کریپتۆ · ئیندیکاتۆری زیرەک · ئەرشیڤی ئۆتۆماتیکی کەناڵ',latest:'دوایین پۆست',scroll:'بڕۆ خوارەوە',
+  msg:'هەر پۆستێک لە <b>Coin_Kurd</b> بڵاو بکرێتەوە، <em>بە شێوەی ئۆتۆماتیکی</em> دەخوێنرێتەوە، بەپێی <b>پۆل</b>، <b>کۆین</b> و <b>کات</b> پۆلێن دەکرێت و لێرە بڵاو دەکرێتەوە. بەبێ دەستکاری؛ هەر کاتژمێرێک.',
+  posts:'پۆست',cats:'پۆل',coins:'کۆین',updated:'دوایین نوێکردنەوە',onA:'شیکاری<span>تەکنیکی</span>',onB:'هەواڵی<span>بازاڕ</span>',hallT:'پۆلەکان',hallL:'هەر پۆستێک بە یاسای وشەی سەرەکی و هاشتاگ دەچێتە ناو یەکێک لەم پۆلانە',
+  dCat:'پۆل',dCoin:'کۆین',dTime:'کات',search:'گەڕان لە دەق، هاشتاگ، کۆین…',sNew:'نوێترین',sViews:'زۆرترین بینین',vGrid:'کارتەکان',vTl:'هێڵی کات',vHeat:'نەخشەی گەرمی',vStats:'ئامار',
+  wallT:'کۆینەکان',wallL:'ئەو کۆینانەی زۆرترین باسیان کراوە',tag:'بازاڕ <span>تێبگە،</span> نەک تەنها شوێنی بکەوە.',auto:'نوێکردنەوەی ئۆتۆماتیکی لە تێلێگرام',
+  mHome:'سەرەکی',mFeed:'ئەرشیڤ',mCats:'پۆلەکان',mCoins:'کۆینەکان',all:'هەموو',t24:'٢٤ کاتژمێر',t7:'٧ ڕۆژ',t30:'٣٠ ڕۆژ',result:'ئەنجام',empty:'هیچ پۆستێک نەدۆزرایەوە.',open:'بینین لە تێلێگرام',share:'کۆپی لینک',copied:'کۆپی کرا!',byCat:'دابەشکردنی پۆلەکان',byCoin:'کۆینە باوەکان',heatHint:'ژمارەی پۆست بەپێی پۆل × کۆین — کلیک لەسەر خانە بکە',related:'پەیوەندیدار'},
+ en:{dir:'ltr',locale:'en-US',join:'telegram',role:'crypto market analysis · ai indicators · auto-archived telegram channel',latest:'latest post',scroll:'scroll',
+  msg:'Every post published on <b>Coin_Kurd</b> is read <em>automatically</em>, classified by <b>category</b>, <b>coin</b> and <b>time</b>, and published right here. No hands. Every hour.',
+  posts:'posts',cats:'categories',coins:'coins',updated:'last update',onA:'Technical<span>Analysis</span>',onB:'Market<span>News</span>',hallT:'Categories',hallL:'every post lands in one of these via keyword & hashtag rules',
+  dCat:'category',dCoin:'coin',dTime:'time',search:'search text, hashtags, coins…',sNew:'Newest',sViews:'Most viewed',vGrid:'cards',vTl:'timeline',vHeat:'heatmap',vStats:'stats',
+  wallT:'Coins',wallL:'the coins the channel talks about most',tag:'Understand the <span>market,</span> don\'t just follow it.',auto:'auto-synced from telegram',
+  mHome:'home',mFeed:'archive',mCats:'categories',mCoins:'coins',all:'all',t24:'24h',t7:'7d',t30:'30d',result:'results',empty:'No posts match these filters.',open:'open in telegram',share:'copy link',copied:'copied!',byCat:'Category distribution',byCoin:'Top coins',heatHint:'posts by category × coin — click a cell to filter',related:'Related'}
+};
+let lang=(()=>{try{return localStorage.getItem('ck_lang')}catch(e){return null}})()||'fa';
+const T=k=>(I18N[lang]&&I18N[lang][k])||I18N.fa[k]||k;
+const S={posts:[],meta:null,cat:null,coin:null,time:'all',q:'',sort:'new',view:'grid'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const parseViews=v=>{if(!v)return 0;const m=String(v).replace(',','').match(/([\d.]+)\s*([KM]?)/i);if(!m)return 0;return parseFloat(m[1])*({K:1e3,M:1e6}[(m[2]||'').toUpperCase()]||1)};
+const catOf=id=>(S.meta.categories.find(c=>c.id===id))||{id,name:{fa:id,ckb:id,en:id},icon:'•',color:'#9a9a94'};
+const cname=c=>c.name[lang]||c.name.fa;
+const fmtDate=(d,o)=>{try{return new Intl.DateTimeFormat(T('locale'),o).format(new Date(d))}catch(e){return new Date(d).toLocaleString()}};
+const fmtN=n=>{try{return new Intl.NumberFormat(T('locale')).format(n)}catch(e){return n}};
+const withPhoto=()=>S.posts.filter(p=>p.photos&&p.photos[0]);
+
+async function load(){
+  const bust='?v='+Math.floor(Date.now()/3e5);
+  const [p,m]=await Promise.all([fetch('data/posts.json'+bust).then(r=>r.json()),fetch('data/meta.json'+bust).then(r=>r.json())]);
+  S.posts=p;S.meta=m;
+  applyLang();buildStatic();render();reveal();
+}
+function applyLang(){
+  const t=I18N[lang];document.documentElement.lang=lang;document.documentElement.dir=t.dir;document.body.dir=t.dir;
+  document.documentElement.style.setProperty('--dir',t.dir==='rtl'?'1':'-1');
+  document.querySelectorAll('[data-i]').forEach(el=>{el.innerHTML=T(el.dataset.i)});
+  document.querySelectorAll('[data-ph]').forEach(el=>el.placeholder=T(el.dataset.ph));
+  document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+  $('#yr').textContent=new Date().getFullYear();
+  if(!S.meta)return;
+  $('#sPosts').textContent=fmtN(S.meta.count);$('#sCats').textContent=fmtN(Object.keys(S.meta.by_category).length);
+  $('#sCoins').textContent=fmtN(Object.keys(S.meta.by_coin).length);$('#sUpd').textContent=fmtDate(S.meta.updated_at,{dateStyle:'medium',timeStyle:'short'});
+  document.title=(S.meta.channel_title||'Coin_Kurd')+' — '+T('hallT');
+  const latest=S.posts[0];if(latest){$('#nextTitle').textContent=latest.title;$('#nextTime').textContent=latest.date?fmtDate(latest.date,{dateStyle:'medium',timeStyle:'short'}):'';$('#next').onclick=e=>{e.preventDefault();openPost(latest.id)}}
+  $('#halfAn').textContent=`${fmtN(S.meta.by_category.technical||0)} ${T('posts')}`;$('#halfBn').textContent=`${fmtN(S.meta.by_category.news||0)} ${T('posts')}`;
+  // marquee
+  const mq=[...S.posts.slice(0,12)].map(p=>`<span><b>${esc(catOf(p.category).icon)}</b> ${esc(p.title)}</span>`).join('');$('#mq').innerHTML=mq+mq;
+}
+function buildStatic(){
+  const ph=withPhoto();
+  if(ph[0])$('#heroImg').style.backgroundImage=`url('${esc(ph[0].photos[0])}')`;
+  const tA=S.posts.find(p=>p.category==='technical'&&p.photos[0]),tB=S.posts.find(p=>p.category==='news'&&p.photos[0]);
+  if(tA)$('#halfA .bgi').style.backgroundImage=`url('${esc(tA.photos[0])}')`;if(tB)$('#halfB .bgi').style.backgroundImage=`url('${esc(tB.photos[0])}')`;
+  $('#halfA').onclick=()=>goFilter('technical');$('#halfB').onclick=()=>goFilter('news');
+  $('#strip').innerHTML=ph.slice(0,14).map(p=>`<div class="shot" data-id="${p.id}"><div class="img" style="background-image:url('${esc(p.photos[0])}')"></div><div class="cap"><b>${esc(cname(catOf(p.category)))}</b><span>${p.date?fmtDate(p.date,{month:'short',day:'numeric'}):''} · ${esc(p.coins[0]||'')}</span></div></div>`).join('');
+  $('#mosaic').innerHTML=ph.slice(0,9).map(p=>`<div style="background-image:url('${esc(p.photos[0])}')"></div>`).join('');
+  const cats=S.meta.categories.filter(c=>S.meta.by_category[c.id]).sort((a,b)=>S.meta.by_category[b.id]-S.meta.by_category[a.id]);
+  $('#hallGrid').innerHTML=cats.map(c=>`<div class="tile" data-cat="${c.id}" style="--c:${c.color}"><span class="n">${fmtN(S.meta.by_category[c.id])}</span><span class="ic">${c.icon}</span><div><b>${esc(cname(c))}</b><small>${esc(c.name.en)}</small></div></div>`).join('');
+  $('#hallGrid').querySelectorAll('.tile').forEach(t=>t.onclick=()=>goFilter(t.dataset.cat));
+  $('#wall').innerHTML=Object.entries(S.meta.by_coin).slice(0,18).map(([k,n])=>`<button data-coin="${k}" class="${S.coin===k?'on':''}">${k}<small>${fmtN(n)} ${T('posts')}</small></button>`).join('');
+  $('#wall').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.coin=S.coin===b.dataset.coin?null:b.dataset.coin;S.cat=null;render();scrollFeed()});
+}
+function goFilter(cat){S.cat=cat;S.coin=null;S.view='grid';render();scrollFeed()}
+function scrollFeed(){window.scrollTo({top:$('#feed').offsetTop-10,behavior:'smooth'})}
+
+function chip(label,on,color,n,cb){const b=document.createElement('button');b.className='chip'+(on?' on':'');if(color)b.style.setProperty('--c',color);b.innerHTML=label+(n!=null?` <span class="n">${fmtN(n)}</span>`:'');b.onclick=cb;return b}
+function buildChips(){
+  const cc=$('#catChips');cc.innerHTML='';cc.append(chip(T('all'),!S.cat,null,S.meta.count,()=>{S.cat=null;render()}));
+  S.meta.categories.filter(c=>S.meta.by_category[c.id]).sort((a,b)=>S.meta.by_category[b.id]-S.meta.by_category[a.id]).forEach(c=>cc.append(chip(`${c.icon} ${cname(c)}`,S.cat===c.id,c.color,S.meta.by_category[c.id],()=>{S.cat=S.cat===c.id?null:c.id;render()})));
+  const kc=$('#coinChips');kc.innerHTML='';kc.append(chip(T('all'),!S.coin,null,null,()=>{S.coin=null;render()}));
+  Object.entries(S.meta.by_coin).slice(0,14).forEach(([k,n])=>kc.append(chip(k,S.coin===k,'#f3c969',n,()=>{S.coin=S.coin===k?null:k;render()})));
+  const tc=$('#timeChips');tc.innerHTML='';[['all','all'],['24h','t24'],['7d','t7'],['30d','t30']].forEach(([v,k])=>tc.append(chip(T(k),S.time===v,'#c6ff00',null,()=>{S.time=v;render()})));
+  document.querySelectorAll('#wall button').forEach(b=>b.classList.toggle('on',b.dataset.coin===S.coin));
+}
+function filtered(){
+  const now=Date.now();const span={'24h':864e5,'7d':6048e5,'30d':2592e6}[S.time];const q=S.q.trim().toLowerCase();
+  let r=S.posts.filter(p=>(!S.cat||p.category===S.cat||p.tags.includes(S.cat))&&(!S.coin||p.coins.includes(S.coin))&&(!span||(p.date&&now-new Date(p.date).getTime()<=span))
+    &&(!q||(p.text||'').toLowerCase().includes(q)||p.hashtags.join(' ').toLowerCase().includes(q)||p.coins.join(' ').toLowerCase().includes(q)));
+  if(S.sort==='views')r=r.slice().sort((a,b)=>parseViews(b.views)-parseViews(a.views));
+  return r;
+}
+function render(){
+  buildChips();const r=filtered();$('#count').textContent=`${fmtN(r.length)} ${T('result')}`;
+  document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+  const out=$('#out');if(!r.length){out.innerHTML=`<div class="empty">${T('empty')}</div>`;return}
+  ({grid:renderGrid,timeline:renderTimeline,heat:renderHeat,stats:renderStats})[S.view](r,out);
+}
+function cardHTML(p,i,big){const c=catOf(p.category);const img=p.photos&&p.photos[0];
+  return `<article class="card${big?' big':''}" data-id="${p.id}" style="--c:${c.color};animation-delay:${Math.min(i,12)*40}ms">
+    ${img?`<div class="media" style="background-image:url('${esc(img)}')">${p.video?'<div class="play">▶</div>':''}</div>`:''}
+    <div class="body"><div class="meta"><span class="cat">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'medium'}):''}</time></div>
+    <h3 dir="auto">${esc(p.title)}</h3>${(()=>{const body=(p.text||'').replace(/#\S+/g,'').trim();const rest=body.startsWith(p.title.replace(/…$/,''))?body.slice(p.title.replace(/…$/,'').length).trim():body;return rest?`<p dir="auto">${esc(rest)}</p>`:''})()}
+    <div class="coins">${p.coins.slice(0,6).map(k=>`<span class="coin">${k}</span>`).join('')}</div>
+    <div class="foot"><span>👁 ${esc(p.views||'—')}</span><span>${p.hashtags.slice(0,3).map(h=>'#'+esc(h)).join(' ')}</span></div></div></article>`}
+function renderGrid(r,out){out.innerHTML=`<div class="cards">${r.slice(0,150).map((p,i)=>cardHTML(p,i,i===0&&!!(p.photos&&p.photos[0]))).join('')}</div>`}
+function renderTimeline(r,out){const g={};r.forEach(p=>{const k=p.date?p.date.slice(0,10):'—';(g[k]=g[k]||[]).push(p)});
+  out.innerHTML=`<div class="timeline">${Object.keys(g).sort().reverse().map(k=>`<div class="day"><h4>${k!=='—'?fmtDate(k,{dateStyle:'full'}):'—'}</h4>${g[k].map(p=>{const c=catOf(p.category);return `<div class="tl-item" data-id="${p.id}"><time>${p.date?fmtDate(p.date,{timeStyle:'short'}):''}</time><div class="t"><span class="cat" style="--c:${c.color}">${c.icon} ${esc(cname(c))}</span><span>${esc(p.title)}</span>${p.coins.slice(0,3).map(k=>`<span class="coin">${k}</span>`).join('')}</div></div>`}).join('')}</div>`).join('')}</div>`}
+function renderHeat(r,out){const coins=Object.keys(S.meta.by_coin).slice(0,12);const cats=S.meta.categories.filter(c=>S.meta.by_category[c.id]);const m={};let max=1;
+  r.forEach(p=>p.coins.forEach(k=>{if(!coins.includes(k))return;const key=p.category+'|'+k;m[key]=(m[key]||0)+1;max=Math.max(max,m[key])}));
+  out.innerHTML=`<p class="count" style="margin-top:18px">${T('heatHint')}</p><div class="heat"><table><thead><tr><th></th>${coins.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>${cats.map(c=>`<tr><th class="rowh">${c.icon} ${esc(cname(c))}</th>${coins.map(k=>{const n=m[c.id+'|'+k]||0;const a=n?0.15+0.85*n/max:0;return `<td data-cat="${c.id}" data-coin="${k}" style="${n?`background:color-mix(in srgb,${c.color} ${Math.round(a*100)}%,#141414);color:${a>.6?'#000':'#fff'}`:''}">${n||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+  out.querySelectorAll('td[data-cat]').forEach(td=>td.onclick=()=>{S.cat=td.dataset.cat;S.coin=td.dataset.coin;S.view='grid';render();scrollFeed()})}
+function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p.category]||0)+1;p.coins.forEach(k=>bk[k]=(bk[k]||0)+1)});const mc=Math.max(1,...Object.values(bc)),mk=Math.max(1,...Object.values(bk));
+  const rows=(o,max,lab,col)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,n])=>`<div class="bar-row"><span>${lab(k)}</span><div class="track"><div class="fill" style="--c:${col(k)};width:0" data-w="${n/max*100}"></div></div><b>${fmtN(n)}</b></div>`).join('');
+  out.innerHTML=`<div class="bars"><div class="box"><h3>${T('byCat')}</h3>${rows(bc,mc,k=>{const c=catOf(k);return `${c.icon} ${esc(cname(c))}`},k=>catOf(k).color)}</div><div class="box"><h3>${T('byCoin')}</h3>${rows(bk,mk,k=>k,()=>'#f3c969')}</div></div>`;
+  requestAnimationFrame(()=>out.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'))}
+
+function openPost(id){const p=S.posts.find(x=>x.id===id);if(!p)return;const c=catOf(p.category);
+  const linkify=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/#([\w؀-ۿ‌]+)/g,'<a href="#" data-h="$1">#$1</a>');
+  const rel=S.posts.filter(x=>x.id!==p.id&&(x.category===p.category||x.coins.some(k=>p.coins.includes(k)))).slice(0,4);
+  $('#sheet').innerHTML=`<button class="close" id="close">✕</button>${p.photos&&p.photos[0]?`<img src="${esc(p.photos[0])}" alt="">`:''}<div class="in">
+    <div class="meta"><span class="cat" style="--c:${c.color}">${c.icon} ${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${x.icon} ${esc(cname(x))}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'full',timeStyle:'short'}):''}</time><span>· 👁 ${esc(p.views||'—')}</span></div>
+    <div class="txt" dir="auto">${linkify(p.text)}</div>
+    ${p.link&&p.link.url?`<a class="lp" href="${esc(p.link.url)}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small><br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
+    <div class="coins">${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}</div>
+    <div class="actions"><a class="btn p" href="${esc(p.url)}" target="_blank" rel="noopener">✈ ${T('open')}</a><button class="btn" id="copy">🔗 ${T('share')}</button></div>
+    ${rel.length?`<h3 style="margin-top:26px;font-weight:800">${T('related')}</h3><div class="cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin:10px 0 0">${rel.map((x,i)=>cardHTML(x,i)).join('')}</div>`:''}</div>`;
+  $('#modal').classList.add('open');document.body.style.overflow='hidden';history.replaceState(null,'','#p'+p.id);
+  $('#close').onclick=closeModal;$('#copy').onclick=e=>{navigator.clipboard&&navigator.clipboard.writeText(location.href.split('#')[0]+'#p'+p.id);e.target.textContent='✓ '+T('copied')};
+  $('#sheet').querySelectorAll('[data-h]').forEach(a=>a.onclick=ev=>{ev.preventDefault();closeModal();S.q='#'+a.dataset.h;$('#q').value=S.q;render();scrollFeed()})}
+function closeModal(){$('#modal').classList.remove('open');document.body.style.overflow='';history.replaceState(null,'',location.pathname)}
+function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('v');io.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el))}
+
+document.addEventListener('click',e=>{const el=e.target.closest('[data-id]');if(el&&!e.target.closest('a'))openPost(+el.dataset.id)});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('#menu').classList.remove('open')}});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;render()});
+$('#sort').addEventListener('change',e=>{S.sort=e.target.value;render()});
+$('#views').addEventListener('click',e=>{const b=e.target.closest('button');if(b){S.view=b.dataset.v;render()}});
+$('#langs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){lang=b.dataset.l;try{localStorage.setItem('ck_lang',lang)}catch(_){}applyLang();buildStatic();render()}});
+$('#burger').addEventListener('click',()=>{const m=$('#menu');const o=m.classList.toggle('open');$('#burger').textContent=o?'✕':'☰'});
+$('#menu').addEventListener('click',e=>{if(e.target.closest('a')){$('#menu').classList.remove('open');$('#burger').textContent='☰'}});
+let lastY=0;addEventListener('scroll',()=>{const y=scrollY;document.querySelector('nav').classList.toggle('hide',y>lastY&&y>400);lastY=y},{passive:true});
+load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
+</script>
+</body>
+</html>
