@@ -83,6 +83,14 @@ jobs:
         continue-on-error: true
         run: python scripts/events.py
 
+      - name: Lab (memory, Monte Carlo, volatility, options, exchanges, dev activity, macro)
+        id: lab
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/lab.py
+
       - name: Post & signal track record
         id: impact
         continue-on-error: true
@@ -102,6 +110,14 @@ jobs:
           BRAIN_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         timeout-minutes: 5
         run: python scripts/brain.py
+
+      - name: AI Council (daily)
+        continue-on-error: true
+        timeout-minutes: 4
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/council.py
 
       - name: Market Replay snapshot
         continue-on-error: true
@@ -134,6 +150,7 @@ jobs:
           STEP_BRAIN: ${{ steps.brain.outcome }}
           STEP_NARR: ${{ steps.narr.outcome }}
           STEP_EVENTS: ${{ steps.events.outcome }}
+          STEP_LAB: ${{ steps.lab.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
