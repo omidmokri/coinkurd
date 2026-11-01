@@ -129,8 +129,15 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
             body["generationConfig"].pop("thinkingConfig")
             continue
         if r.status_code in (429, 500, 503):
-            if r.status_code == 429 and ("PerDay" in r.text or "per day" in r.text.lower()):
-                raise QuotaError("daily quota exhausted")
+            if r.status_code == 429:
+                m = re.search(r'"retryDelay":\s*"(\d+(?:\.\d+)?)s"', r.text)
+                delay = float(m.group(1)) if m else None
+                print(f"429 on {mname}: retryDelay={delay} {('PerDay' in r.text) and 'per-day quota' or ''}")
+                if delay is not None and delay <= 90 and i < tries - 1:
+                    time.sleep(delay + 1)   # سهمیهٔ دقیقه‌ای: صبر کن و دوباره
+                    continue
+                if "PerDay" in r.text or "per day" in r.text.lower() or delay is None or delay > 90:
+                    raise QuotaError("daily quota exhausted")
             time.sleep(15 * (i + 1))
             continue
         if r.status_code >= 400:
