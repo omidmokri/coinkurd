@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""ادغام فایل‌های ترجمهٔ tests/out/batch_*.json در data/posts.json (با پاک‌سازی فوتر و هشتگ‌ها)"""
+import json, re, glob, sys
+POSTS = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
+FOOT = re.compile(r"^[\s🅲🅾️🅸🅽🅺🆄🆁🅳👾🎥📸💬]*(Discord|Youtube|YouTube|Instagram|X|[\s🅲🅾️🅸🅽🅺🆄🆁🅳👾🎥📸💬]+)?[\s]*$")
+def clean(t):
+    lines = t.split("\n")
+    while lines and (FOOT.match(lines[-1]) ):
+        lines.pop()
+    t = "\n".join(lines)
+    # هشتگ‌های پشت‌سرهم که با خط خالی/فاصله جدا شده‌اند → یک خط
+    t = re.sub(r"(#\S+)(?:\n\s*\n?)+(?=#)", r"\1 ", t)
+    # ایموجی تنها در یک خط + خط بعد → یک خط
+    t = re.sub(r"\n([^\w\s#؀-ۿ]{1,3})\n\s*", r"\n\1 ", t)
+    return re.sub(r"\n{3,}", "\n\n", t).strip()
+posts = json.load(open(POSTS, encoding="utf-8"))
+tr = {}
+for f in sorted(glob.glob("tests/out/batch_*.json")):
+    tr.update(json.load(open(f, encoding="utf-8")))
+n = 0
+for p in posts:
+    t = tr.get(str(p["id"]))
+    if t and not p.get("tr"):
+        p["tr"] = {"engine": "claude-session",
+                   "ckb": {"title": t["ckb"]["title"].strip(), "text": clean(t["ckb"]["text"])},
+                   "en": {"title": t["en"]["title"].strip(), "text": clean(t["en"]["text"])}}
+        n += 1
+json.dump(posts, open(POSTS, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+print(f"merged {n}, total translated {sum(1 for p in posts if p.get('tr'))}")
