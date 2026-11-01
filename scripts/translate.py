@@ -18,6 +18,9 @@ import re
 import sys
 import time
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ai  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 POSTS_FILE = os.path.join(ROOT, "data", "posts.json")
 
@@ -124,6 +127,39 @@ def translate(text: str, lang: str, api_key: str) -> str:
 
 # ------------------------------------------------------------------ main
 
+TR_FILE = os.path.join(ROOT, "data", "translations.json")
+GLOSSARY = """Crypto glossary (Persian → Sorani / English) — use these consistently:
+بیت‌کوین → بیتکۆین / Bitcoin; اتریوم → ئیسریۆم / Ethereum; رمزارز / ارز دیجیتال → دراوی دیجیتاڵ / cryptocurrency;
+صرافی → ئاڵوگۆڕگە / exchange; نهنگ → نەهەنگ / whale; حمایت → پاڵپشتی / support; مقاومت → بەرگری / resistance;
+خط روند → هێڵی ڕەوت / trendline; روند صعودی → ڕەوتی سەعودی / uptrend; روند نزولی → ڕەوتی دابەزین / downtrend;
+حد ضرر → سنووری زیان / stop loss; حد سود / تارگت → ئامانج / take profit, target; لیکوییدیشن → لیکویدەیشن / liquidation;
+نرخ تأمین مالی (فاندینگ) → Funding Rate (keep English term); اوپن اینترست → Open Interest (keep); ETF → ETF (keep);
+صندوق → سندووق / fund; خزانه‌داری → گەنجینە / treasury; هک → هاک / hack; استیبل‌کوین → ستەیبڵکۆین / stablecoin;
+اندیکاتور → ئیندیکاتۆر / indicator; واگرایی → لادان / divergence; اشباع خرید → زیادە کڕین / overbought; اشباع فروش → زیادە فرۆشتن / oversold."""
+
+
+def gemini_translate(p):
+    prompt = (
+        "You are a professional financial translator. Translate this Persian (Farsi) crypto-channel post into\n"
+        "1) Central Kurdish (Sorani, Arabic script, standard orthography with ە ێ ۆ ڵ ڕ ڤ) and 2) English.\n"
+        "Rules: exact meaning, no additions or commentary; keep numbers, tickers, emojis, URLs and markdown links "
+        "[label](url) unchanged; translate hashtag words but keep # and underscores; keep line breaks.\n"
+        "If the title is emoji-only, write a short headline from the post.\n"
+        + GLOSSARY +
+        "\nReturn JSON exactly: {\"ckb\":{\"title\":\"\",\"text\":\"\"},\"en\":{\"title\":\"\",\"text\":\"\"}}\n\n"
+        f"TITLE:\n{p['title']}\n\nTEXT:\n{p['text']}"
+    )
+    r = ai.generate(prompt, as_json=True, max_tokens=8192)
+    for lg in ("ckb", "en"):
+        if not (r.get(lg) or {}).get("text"):
+            raise RuntimeError(f"incomplete {lg}")
+    if not re.search(r"[ەێۆڵڕ]", r["ckb"]["text"]):
+        raise RuntimeError("ckb output has no Sorani letters")
+    if len(re.findall(r"[\u0600-\u06FF]", r["en"]["text"])) > 10:
+        raise RuntimeError("en output contains Persian")
+    return {"engine": "gemini", "ckb": r["ckb"], "en": r["en"]}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=int(os.environ.get("TRANSLATE_LIMIT", "40")),
@@ -140,10 +176,12 @@ def main():
             os.environ["ANTHROPIC_API_KEY"] = gen
         elif gen.startswith("sk-"):
             os.environ["OPENAI_API_KEY"] = gen
+        elif gen.startswith("AIza"):
+            os.environ["GEMINI_API_KEY"] = gen
         else:
             os.environ["ANTHROPIC_API_KEY"] = gen
     api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-    engine = "claude" if api_key else ("openai" if os.environ.get("OPENAI_API_KEY", "").strip() else "google")
+    engine = "gemini" if ai.available() else "claude" if api_key else ("openai" if os.environ.get("OPENAI_API_KEY", "").strip() else "google")
 
     with open(POSTS_FILE, encoding="utf-8") as f:
         posts = json.load(f)
@@ -152,27 +190,33 @@ def main():
     todo = todo[: args.limit]  # جدیدترین‌ها اول (فایل نزولی است)
     print(f"engine={engine}, to translate: {len(todo)} of {len(posts)}")
 
+    store = json.load(open(TR_FILE, encoding="utf-8")) if os.path.exists(TR_FILE) else {}
     done = 0
     for p in todo:
         try:
-            tr = {"engine": engine}
-            for lang in LANGS:
-                tr[lang] = {
-                    "title": translate(p["title"], lang, api_key) if has_persian(p["title"]) else p["title"],
-                    "text": translate(p["text"], lang, api_key),
-                }
+            if engine == "gemini":
+                tr = gemini_translate(p)
+            else:
+                tr = {"engine": engine}
+                for lang in LANGS:
+                    tr[lang] = {
+                        "title": translate(p["title"], lang, api_key) if has_persian(p["title"]) else p["title"],
+                        "text": translate(p["text"], lang, api_key),
+                    }
             p["tr"] = tr
+            store[str(p["id"])] = {"ckb": tr["ckb"], "en": tr["en"]}
             done += 1
             print(f"  {p['id']} ok")
         except Exception as e:  # noqa: BLE001
             print(f"  {p['id']} FAILED: {e}", file=sys.stderr)
             # اگر گوگل ما را محدود کرد، بقیه را برای اجرای بعدی بگذاریم
-            if "429" in str(e) or "too many" in str(e).lower() or "credit balance" in str(e).lower() or "401" in str(e):
+            if isinstance(e, ai.QuotaError) or "429" in str(e) or "too many" in str(e).lower() or "credit balance" in str(e).lower() or "401" in str(e):
                 print("rate-limited; stopping for this run", file=sys.stderr)
                 break
         if done and done % 10 == 0:
             _save(posts)
     _save(posts)
+    json.dump(store, open(TR_FILE, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"translated {done}")
 
 
