@@ -127,6 +127,14 @@ def big(t, lang="fa"):
     return _BIGN.sub(f, t or "")
 
 
+FOOT = {"fa": '© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.',
+        "ckb": '© entekhab.net — داتاکان بە شێوەی ئۆتۆماتیکی لە کەناڵی <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me نوێ دەکرێنەوە. هیچ کامێکیان ئامۆژگاریی دارایی نییە.',
+        "en": '© entekhab.net — data is updated automatically from the <a href="https://t.me/Coin_Kurd">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me. Nothing here is financial advice.'}
+# "recently viewed" for /me/ — stored only in the visitor's own browser (localStorage), never sent anywhere
+RECENT_JS = ("try{var k='ek_recent',p=location.pathname,a=JSON.parse(localStorage.getItem(k)||'[]').filter(function(x){return x&&x.p!==p});"
+             "a.unshift({p:p,t:document.title.replace(/\\s*\\|\\s*entekhab\\.net\\s*$/i,''),at:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,30)))}catch(e){}")
+
+
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
@@ -138,7 +146,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <style>{CSS}</style>{extra_head}</head><body>
 <header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
 <main class="w">{body}</main>
-<footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
+<footer><div class="w">{FOOT.get(lang, FOOT["fa"])}</div></footer><script>{RECENT_JS}</script></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
