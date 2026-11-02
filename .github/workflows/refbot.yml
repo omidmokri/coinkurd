@@ -37,6 +37,7 @@ jobs:
             mkdir state && git -C state init -q -b refbot-state && echo '{}' > state/referrals.json
             git -C state remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           fi
+          git worktree add --detach mainwt origin/main
 
       - name: Run bot
         id: bot
@@ -55,6 +56,9 @@ jobs:
           PUBLIC_PATH: state/leaderboard.json
           STATE_GIT: state
           STATE_PUSH_EVERY: "600"
+          MAIN_WORKTREE: mainwt
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/refbot.py
 
       - name: Save state
