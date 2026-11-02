@@ -396,8 +396,22 @@ def export_site(s, worktree, every=900):
         git("fetch", "-q", "origin", "main")
         git("reset", "-q", "--hard", "origin/main")
         wrote = False
+        keep = set()
+        imgdir = os.path.join(worktree, "data", "feedimg")
+        os.makedirs(imgdir, exist_ok=True)
+        for kind in SITE_FILES:
+            for it in f["items"].get(kind, []):
+                if it.get("photo") and not it.get("img"):
+                    it["img"] = save_image(it["photo"], it["id"], imgdir)
+                if it.get("img"):
+                    keep.add(os.path.basename(it["img"]))
+        for fn_ in os.listdir(imgdir):                       # drop pictures of items that left the feed
+            if fn_ not in keep:
+                os.remove(os.path.join(imgdir, fn_))
+                wrote = True
         for kind, fn in SITE_FILES.items():
-            items = [{k: v for k, v in it.items() if k in ("id", "at", "made", "fa", "ckb", "photo")} for it in f["items"].get(kind, [])]
+            items = [{k: v for k, v in it.items() if k in ("id", "at", "made", "fa", "ckb", "photo", "img")}
+                     for it in f["items"].get(kind, [])]
             path = os.path.join(worktree, "data", fn)
             body = {"updated_at": datetime.now(timezone.utc).isoformat(), "items": items}
             old = None
@@ -410,7 +424,7 @@ def export_site(s, worktree, every=900):
                 wrote = True
         if not wrote:
             return
-        git("add", "data/onchain.json", "data/cryptonews.json")
+        git("add", "-A", "data/onchain.json", "data/cryptonews.json", "data/feedimg")
         git("commit", "-q", "-m", "chore: on-chain & news feed for site")
         for _ in range(4):
             r = git("push", "-q", "origin", "HEAD:main")
@@ -423,6 +437,34 @@ def export_site(s, worktree, every=900):
         log.warning("site feed push failed: %s", r.stderr[:200])
     except Exception:
         log.exception("export_site failed")
+
+
+def save_image(url, item_id, imgdir):
+    """store a small copy of the picture in the repo (Telegram CDN links expire); -> site path or None"""
+    name = re.sub(r"[^A-Za-z0-9_-]", "_", item_id) + ".jpg"
+    path = os.path.join(imgdir, name)
+    if os.path.exists(path):
+        return "/data/feedimg/" + name
+    try:
+        r = requests.get(url, headers=IR.UA, timeout=30)
+        if not r.ok or len(r.content) < 2000:
+            return None
+        data = r.content
+        try:
+            from io import BytesIO
+            from PIL import Image
+            im = Image.open(BytesIO(data)).convert("RGB")
+            im.thumbnail((960, 960))
+            buf = BytesIO()
+            im.save(buf, "JPEG", quality=72, optimize=True, progressive=True)
+            data = buf.getvalue()
+        except Exception:
+            if len(data) > 600_000:
+                return None
+        open(path, "wb").write(data)
+        return "/data/feedimg/" + name
+    except Exception:
+        return None
 
 
 _last_build = [0.0]

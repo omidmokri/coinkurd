@@ -748,8 +748,8 @@ def build_feeds():
             ckb = e(it.get("ckb", "")).replace("\n", "<br>")
             when = fmt_date(it.get("at") or it.get("made") or "")
             block = f'<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
-            ph = it.get("photo") or ""
-            if ph.startswith("https://"):
+            ph = it.get("img") or it.get("photo") or ""
+            if ph.startswith(("https://", "/data/feedimg/")):
                 block += f'<img class="img" src="{e(ph)}" alt="" loading="lazy" referrerpolicy="no-referrer">'
             block += f'<small class="note">{when}</small><div lang="fa" dir="rtl">{fa}</div>'
             if ckb:
