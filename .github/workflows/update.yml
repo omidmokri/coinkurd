@@ -68,6 +68,12 @@ jobs:
         continue-on-error: true
         run: python scripts/market.py
 
+      - name: Scanner track record (one-time 40-day backtest + live log of every finding)
+        id: scanlog
+        continue-on-error: true
+        timeout-minutes: 6
+        run: python scripts/scanlog.py
+
       - name: Bitcoin network snapshot (mempool.space blocks, bitnodes nodes)
         id: chain
         continue-on-error: true
@@ -211,6 +217,7 @@ jobs:
           STEP_KIND: ${{ steps.kind.outcome }}
           STEP_SIGNALS: ${{ steps.signals.outcome }}
           STEP_ENRICH: ${{ steps.enrich.outcome }}
+          STEP_SCANLOG: ${{ steps.scanlog.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
