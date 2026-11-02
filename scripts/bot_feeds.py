@@ -36,7 +36,7 @@ TOPIC_HINTS = {  # words that identify each topic by its name
     "fx": ["تبدیل ارز", "گۆڕینی دراو"],
 }
 CHECK_EVERY = int(os.environ.get("FEED_CHECK_EVERY", "600"))      # seconds between channel checks
-MAX_PER_CHECK = int(os.environ.get("FEED_MAX_PER_CHECK", "2"))    # new posts summarised per channel per check
+MAX_PER_CHECK = int(os.environ.get("FEED_MAX_PER_CHECK", "4"))    # new posts summarised per channel per check
 FX_EVERY = int(os.environ.get("FX_POST_EVERY", "1800"))           # seconds between price cards in the fx topic
 POST_LANGS = [x for x in os.environ.get("GROUP_POST_LANGS", "fa,ckb").split(",") if x]
 KEEP = 60                                                        # items kept per feed for the bot and the site
@@ -208,33 +208,39 @@ def _post_id(url):
 
 
 def article_text(url, limit=3500):
-    """main text of a linked article, so a one-line headline post is summarised from facts, not guessed"""
+    """-> (main text, og:image) of a linked article, so a one-line headline post is summarised from facts"""
     try:
         r = requests.get(url, headers=IR.UA, timeout=20)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
+        og = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
+        img = og.get("content") if og and (og.get("content") or "").startswith("http") else None
         for t in soup(["script", "style", "nav", "header", "footer", "aside", "form"]):
             t.decompose()
         root = soup.find("article") or soup
         paras = [p.get_text(" ", strip=True) for p in root.find_all("p")]
         txt = "\n".join(p for p in paras if len(p) > 60)
-        return txt[:limit]
+        return txt[:limit], img
     except Exception:
-        return ""
+        return "", None
 
 
 def read_posts(channel):
-    """-> [(id, iso, text, links)] oldest→newest"""
-    return [(pid, iso, (text or "").strip(), links) for iso, text, pid, links in IR.read_channel_full(channel) if pid]
+    """-> [(id, iso, text, links, photos)] oldest→newest"""
+    return [(pid, iso, (text or "").strip(), links, photos)
+            for iso, text, pid, links, photos in IR.read_channel_full(channel) if pid]
 
 
-def expand(text, links):
-    """short posts (headline + link) get their linked article appended"""
-    if len(text) < 400 and links:
-        extra = article_text(links[0])
-        if extra:
-            return text + "\n\n" + extra
-    return text
+def expand(text, links, photos):
+    """short posts (headline + link) get their linked article appended; the article image is used if the post has none.
+    -> (text, photo_url)"""
+    photo = photos[0] if photos else None
+    if links and (len(text) < 400 or not photo):
+        extra, img = article_text(links[0])
+        if extra and len(text) < 400:
+            text = text + "\n\n" + extra
+        photo = photo or img
+    return text, photo
 
 
 # ------------------------------------------------------------------ main job
@@ -267,39 +273,82 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
     f["last_check"] = now
     changed = True
 
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    backfill = f.get("backfill_day") != today          # once a day: also pick up every post published earlier today
+    f["backfill_day"] = today
     for kind, channels in FEEDS.items():
         for ch in channels:
             posts = read_posts(ch)
             if not posts:
                 log.info("feed %s: no posts readable", ch)
                 continue
-            last = f["seen"].get(ch)
-            if last is None:                       # first time: start from the newest post only
+            todays = [p for p in posts if (p[1] or "")[:10] == today]
+            if f["seen"].get(ch) is None:
                 f["seen"][ch] = posts[-1][0] - 1
-                last = f["seen"][ch]
-            new = [p for p in posts if p[0] > last][-MAX_PER_CHECK:]
-            for pid, iso, text, links in new:
+            if backfill and todays:
+                f["seen"][ch] = min(f["seen"][ch], todays[0][0] - 1)
+            done = {it["id"] for it in f["items"].get(kind, [])}
+            new = [p for p in posts if p[0] > f["seen"][ch] and f"{ch}/{p[0]}" not in done][:MAX_PER_CHECK]
+            for pid, iso, text, links, photos in new:
                 f["seen"][ch] = max(f["seen"][ch], pid)
-                text = expand(text, links)
+                text, photo = expand(text, links, photos)
                 if len(text) < 60:
                     continue
-                item = {"id": f"{ch}/{pid}", "kind": kind, "at": iso, "made": datetime.now(timezone.utc).isoformat()}
+                item = {"id": f"{ch}/{pid}", "kind": kind, "at": iso, "made": datetime.now(timezone.utc).isoformat(),
+                        "photo": photo, "posted": False}
                 for lang in ("fa", "ckb"):
                     out = summarize(text, lang)
                     if out:
                         item[lang] = out
                 if not item.get("fa"):
                     continue
-                f["items"][kind] = ([item] + f["items"][kind])[:KEEP]
-                th = topics.get(kind)
-                if group_id and th:
-                    for lang in POST_LANGS:
-                        if item.get(lang):
-                            send_fn(group_id, item[lang], None, message_thread_id=th, plain=True)
-                            time.sleep(1)
-                log.info("feed %s/%s summarised (%s)", ch, pid, ",".join(k for k in ("fa", "ckb") if item.get(k)))
-            f["seen"][ch] = max(f["seen"][ch], posts[-1][0]) if not new else f["seen"][ch]
+                f["items"][kind] = sorted([item] + f["items"][kind], key=lambda x: x.get("at") or "", reverse=True)[:KEEP]
+                log.info("feed %s/%s summarised (%s)%s", ch, pid, ",".join(k for k in ("fa", "ckb") if item.get(k)),
+                         " +photo" if photo else "")
+            if not new and f["seen"][ch] < posts[-1][0] and not any(p[0] > f["seen"][ch] for p in posts if f"{ch}/{p[0]}" not in done):
+                f["seen"][ch] = posts[-1][0]
+    publish(s, f, topics, group_id, send_fn)
     return changed
+
+
+def find_photo(item_id):
+    """picture of an already-summarised post (items made before pictures were stored)"""
+    ch, _, pid = item_id.partition("/")
+    for p_id, iso, text, links, photos in read_posts(ch):
+        if str(p_id) == pid:
+            return expand(text, links, photos)[1]
+    return None
+
+
+PUBLISH_PER_LOOP = int(os.environ.get("FEED_PUBLISH_PER_LOOP", "6"))
+
+
+def publish(s, f, topics, group_id, send_fn):
+    """post today's not-yet-posted items to their topic, oldest first, each with its picture"""
+    if not group_id:
+        return
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    budget = PUBLISH_PER_LOOP
+    for kind in ("onchain", "news"):
+        th = topics.get(kind)
+        if not th:
+            continue
+        for it in sorted(f["items"].get(kind, []), key=lambda x: x.get("at") or ""):
+            if it.get("posted", True) is True and "posted" in it:
+                continue
+            if (it.get("at") or "")[:10] != today:
+                it["posted"] = True                     # older than today: never flood the topic with backlog
+                continue
+            if budget <= 0:
+                return
+            if not it.get("photo"):
+                it["photo"] = find_photo(it["id"])
+            for lang in POST_LANGS:
+                if it.get(lang):
+                    send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
+                    time.sleep(1.5)
+            it["posted"] = True
+            budget -= 1
 
 
 # ------------------------------------------------------------------ site export (data/onchain.json, data/cryptonews.json on main)
@@ -319,7 +368,7 @@ def export_site(s, worktree, every=900):
         git("reset", "-q", "--hard", "origin/main")
         wrote = False
         for kind, fn in SITE_FILES.items():
-            items = [{k: v for k, v in it.items() if k in ("id", "at", "made", "fa", "ckb")} for it in f["items"].get(kind, [])]
+            items = [{k: v for k, v in it.items() if k in ("id", "at", "made", "fa", "ckb", "photo")} for it in f["items"].get(kind, [])]
             path = os.path.join(worktree, "data", fn)
             body = {"updated_at": datetime.now(timezone.utc).isoformat(), "items": items}
             old = None

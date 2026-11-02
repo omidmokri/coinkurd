@@ -53,9 +53,14 @@ def _fetch_channel(name):
             links = [a.get("href") for a in body.find_all("a") if (a.get("href") or "").startswith("http")]
             for br in body.find_all("br"):
                 br.replace_with("\n")
+            photos = []
+            for ph in m.select(".tgme_widget_message_photo_wrap, .tgme_widget_message_video_thumb"):
+                mm = re.search(r"url\('?\"?([^'\")]+)'?\"?\)", ph.get("style", ""))
+                if mm:
+                    photos.append(mm.group(1))
             dp = m.get("data-post") or ""
             pid = int(dp.rsplit("/", 1)[-1]) if dp.rsplit("/", 1)[-1].isdigit() else 0
-            posts.append({"iso": tm.get("datetime"), "text": body.get_text(), "id": pid, "links": links})
+            posts.append({"iso": tm.get("datetime"), "text": body.get_text(), "id": pid, "links": links, "photos": photos})
     except Exception:
         posts = ent[1] if ent else []
     _cache[name] = (time.time(), posts)
@@ -68,8 +73,8 @@ def read_channel(name):
 
 
 def read_channel_full(name):
-    """-> list of (iso_time, text, post_id, links) oldest→newest"""
-    return [(p["iso"], p["text"], p["id"], p["links"]) for p in _fetch_channel(name)]
+    """-> list of (iso_time, text, post_id, links, photos) oldest→newest"""
+    return [(p["iso"], p["text"], p["id"], p["links"], p.get("photos", [])) for p in _fetch_channel(name)]
 
 
 def _strip(line):
