@@ -37,6 +37,12 @@ FEEDS = {
     "Blockworks": "https://blockworks.co/feed",
     "U.Today": "https://u.today/rss",
 }
+# Persian-language crypto news (shown in its own tab); kept separate from the English de-duplication
+FEEDS_FA = {
+    "ارزدیجیتال": "https://arzdigital.com/feed/",
+    "رمزارز": "https://ramzarz.news/feed/",
+    "مجله نوبیتکس": "https://nobitex.ir/mag/feed/",
+}
 UA = {"User-Agent": "Mozilla/5.0 (entekhab.net news bot; +https://entekhab.net)"}
 KEEP_DAYS = 7
 
@@ -138,8 +144,30 @@ def main():
     merged.sort(key=lambda i: i["date"], reverse=True)
     for m in merged:
         m.pop("_n", None)
+    # regional (Persian) feeds: newest first, 3 days, tagged with coin names in any language
+    reg_items, reg_status = [], {}
+    for name, url in FEEDS_FA.items():
+        try:
+            got = fetch(name, url)
+            reg_status[name] = {"ok": True, "n": len(got)}
+            reg_items.extend(got)
+        except Exception as e:  # noqa: BLE001
+            reg_status[name] = {"ok": False, "err": str(e)[:120]}
+        time.sleep(0.3)
+    if not reg_items:                                    # keep the previous regional list if every source failed this run
+        reg_items = [i for i in (old.get("regional") or {}).get("items", [])]
+    rcut = datetime.now(timezone.utc) - timedelta(days=3)
+    seen, regional = set(), []
+    for it in sorted(reg_items, key=lambda i: i["date"], reverse=True):
+        if datetime.fromisoformat(it["date"]) < rcut or it["url"] in seen:
+            continue
+        seen.add(it["url"])
+        t = it["title"].lower()
+        it["coins"] = [k for k, names in COINS.items() if any(nm.lower() in t for nm in names if len(nm) > 2)][:4]
+        regional.append(it)
     ok = sum(1 for s in status.values() if s["ok"])
-    json.dump({"updated_at": datetime.now(timezone.utc).isoformat(), "feeds": status, "items": merged[:400]},
+    json.dump({"updated_at": datetime.now(timezone.utc).isoformat(), "feeds": status, "items": merged[:400],
+               "regional": {"feeds": reg_status, "items": regional[:40]}},
               open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"feeds ok {ok}/{len(FEEDS)}; items {len(merged)}; multi-source {sum(1 for m in merged if len(m['sources']) > 1)}")
     if ok == 0:

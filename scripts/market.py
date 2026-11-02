@@ -194,6 +194,42 @@ def analyse(sym, k):
     }, opps
 
 
+def tf_trend(sym, interval):
+    """trend on a higher timeframe: close vs EMA20 vs EMA50 (same rule as the 1h scanner)"""
+    k = klines(sym, interval=interval, limit=80)
+    if len(k) < 55:
+        return None
+    c = [x["c"] for x in k]
+    e20, e50 = ema(c, 20)[-1], ema(c, 50)[-1]
+    return "up" if c[-1] > e20 > e50 else "down" if c[-1] < e20 < e50 else "range"
+
+
+def add_mtf(out):
+    """multi-timeframe confluence for every finding: 4h and daily trend of the same coin"""
+    coins = sorted({o["coin"] for o in out.get("opportunities", [])})[:60]
+    if not coins:
+        return
+    res = {}
+    def job(c):
+        try:
+            return c, {"4h": tf_trend(c, "4h"), "1d": tf_trend(c, "1d")}
+        except Exception:  # noqa: BLE001
+            return c, None
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(6) as ex:
+        for c, r in ex.map(job, coins):
+            if r:
+                res[c] = r
+    for o in out["opportunities"]:
+        m = res.get(o["coin"])
+        if not m:
+            continue
+        o["mtf"] = m
+        want = "up" if o.get("dir") == "bull" else "down" if o.get("dir") == "bear" else None
+        if want:
+            o["mtf_align"] = sum(1 for v in m.values() if v == want) - sum(1 for v in m.values() if v and v not in (want, "range"))
+
+
 def main():
     now = datetime.now(timezone.utc)
     out = {"updated_at": now.isoformat(), "sources": {}, "coins": [], "opportunities": [], "errors": []}
@@ -236,6 +272,7 @@ def main():
         prev["stale"] = True
         out = prev
     out["opportunities"].sort(key=lambda o: (o.get("confidence") != "high", -o["strength"]))
+    add_mtf(out)
     out["scanned"] = len(out["coins"])
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 
