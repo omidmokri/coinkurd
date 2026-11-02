@@ -162,9 +162,30 @@ def analyse(sym, k):
     bull = {"rsi_oversold", "ema_golden_cross", "breakout_up", "bull_divergence"}
     bear = {"rsi_overbought", "ema_death_cross", "breakdown", "bear_divergence"}
     kinds = {o["type"] for o in opps}
+    # decision-support context (same for every finding of this coin): volume, distance to 48h support/resistance, swing levels
+    lo12, hi12 = min(x["l"] for x in k[-12:]), max(x["h"] for x in k[-12:])
+    px = c[-1]
     for o in opps:
         same = bull if o["type"] in bull else bear if o["type"] in bear else set()
         o["confidence"] = "high" if len(kinds & same) >= 2 or ("volume_spike" in kinds and o["type"] != "volume_spike") else "medium"
+        o["confirms"] = sorted((kinds & same) - {o["type"]}) + (["volume_spike"] if "volume_spike" in kinds and o["type"] != "volume_spike" else [])
+        d = "bull" if o["type"] in bull else "bear" if o["type"] in bear else ("bull" if last["c"] >= last["o"] else "bear")
+        o["dir"] = d
+        o["vol_x"] = round(last["v"] / vavg, 2) if vavg else None
+        o["to_res"] = round((hi48 / px - 1) * 100, 2)          # % to the 48h high (resistance)
+        o["to_sup"] = round((lo48 / px - 1) * 100, 2)          # % to the 48h low (support)
+        o["trend"] = trend
+        # invalidation = where the idea is wrong; hypothetical target = the opposite 48h extreme, or 2R when already beyond it
+        if o["type"] == "breakout_up":
+            inval = hi48
+        elif o["type"] == "breakdown":
+            inval = lo48
+        else:
+            inval = lo12 if d == "bull" else hi12
+        risk = abs(px - inval)
+        if risk > 0 and risk / px < 0.25:
+            tgt = (hi48 if hi48 > px * 1.002 else px + 2 * risk) if d == "bull" else (lo48 if lo48 < px * 0.998 else px - 2 * risk)
+            o["inval"], o["target"], o["rr"] = round(inval, 8), round(tgt, 8), round(abs(tgt - px) / risk, 2)
     return {
         "coin": sym, "price": c[-1], "chg24": None if chg24 is None else round(chg24, 2),
         "vol24": round(sum(x["v"] for x in k[-24:])), "rsi": None if r is None else round(r, 1),
@@ -179,7 +200,10 @@ def main():
     syms, qvol = universe()
     for sym in syms:
         try:
-            a, o = analyse(sym, klines(sym, limit=150))
+            kk = klines(sym, limit=150)
+            if not kk or now.timestamp() * 1000 - kk[-1]["t"] > 3 * 3600 * 1000:
+                continue                                  # halted / delisted market: last candle older than 3 h
+            a, o = analyse(sym, kk)
             a["qvol"] = round(qvol.get(sym, 0))
             out["coins"].append(a)
             out["opportunities"].extend(o)
