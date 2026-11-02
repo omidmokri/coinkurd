@@ -18,6 +18,7 @@
 .br{border:1px solid var(--line);border-radius:14px;padding:10px}.br h4{font-size:.85rem;margin-bottom:8px}.nd{padding:6px 8px;border-radius:8px;margin:4px 0;font-size:.78rem;border:1px solid var(--line)}.nd.on{border-color:var(--o);background:rgba(247,147,26,.12)}
 .form{display:flex;flex-wrap:wrap;gap:6px}.form input,.form select{min-width:0}
 .note{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0}.note small{color:var(--mute)}
+.tg{cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--mute);padding:5px 12px;font-size:.82rem}.tg.on{background:rgba(247,147,26,.16);border-color:var(--o);color:var(--ink)}.fd{display:block;padding:9px 12px}.fd b{font-weight:600}.fd small{color:var(--mute)}
 .lv-info{background:rgba(56,189,248,.15);color:#7dd3fc}.lv-important{background:rgba(245,158,11,.18);color:#fbbf24}.lv-critical{background:rgba(239,68,68,.2);color:#f87171}
 </style>
 </head>
@@ -32,6 +33,12 @@
   <div class="grid">
     <div class="card"><h3 data-t="lvT"></h3><div id="lvl"></div></div>
     <div class="card"><h3 data-t="trT"></h3><div class="tree" id="tree"></div></div>
+  </div>
+  <section><h2><b data-t="fdT"></b><span>MY FEED</span></h2><p class="lead" data-t="fdL"></p>
+    <div class="card"><div class="row" id="fTop"></div><div id="feedL" style="margin-top:12px"></div></div></section>
+  <div class="grid">
+    <div class="card"><h3 data-t="rvT"></h3><div id="recent"></div></div>
+    <div class="card"><h3 data-t="dnT"></h3><div id="tdna"></div></div>
   </div>
   <section><h2><b data-t="bdT"></b><span>BADGES</span></h2><p class="lead" data-t="bdL"></p><div class="badges" id="badges"></div></section>
   <section><h2><b data-t="pfT"></b><span>PRIVATE</span></h2><p class="lead" data-t="pfL"></p>
@@ -48,7 +55,8 @@
 <footer>entekhab.net — <span data-t="nfa"></span></footer>
 <script src="/assets/ui.js"></script>
 <script>
-Object.assign(I.fa,{h1:'فضای <em>من</em>',lead:'سطح، زنجیرهٔ حضور، مهارت‌ها و نشان‌های تو؛ سبد خصوصی، دفترچهٔ تحقیق و مرکز هشدار. همه‌چیز فقط در همین مرورگر ذخیره می‌شود.',
+Object.assign(I.fa,{fdT:'فید شخصی من',fdL:'موضوع‌هایی را که دنبال می‌کنی انتخاب کن؛ تازه‌ترین پست‌های کانال دربارهٔ همان‌ها اینجا جمع می‌شود. پست‌های تبلیغاتی، اطلاعیه‌ها و تکراری‌ها حذف می‌شوند.',fdHint:'هنوز موضوعی انتخاب نکرده‌ای؛ فعلاً تازه‌ترین پست‌های باکیفیت نمایش داده می‌شود.',newT:'تازه',moreF:'نمایش بیشتر',topics:{btc:'بیت‌کوین',eth:'اتریوم',alt:'آلت‌کوین‌ها',etf:'ETF و نهادی',reg:'قانون‌گذاری',chain:'آن‌چین',sec:'امنیت و هک',macro:'اقتصاد کلان',ta:'تحلیل و سیگنال',edu:'آموزش',watch:'لیست مراقبت من'},rvT:'اخیراً دیده‌شده',clr:'پاک کردن تاریخچه',rvNo:'هنوز صفحه‌ای ثبت نشده؛ از این به بعد صفحه‌هایی که باز می‌کنی (پست‌ها، کوین‌ها، ابزارها) اینجا می‌آیند.',dnT:'DNA معامله‌گری من',dnNo:'هنوز کارت DNA معامله‌گری نساخته‌ای — ۶ سؤال کوتاه در آزمایشگاه.',dnMake:'ساخت کارت DNA',dnRedo:'ساخت دوباره',dnAx:{risk:'ریسک‌پذیری',disc:'انضباط و حد ضرر',pat:'صبر',data:'داده‌محوری'},u:['دقیقه','ساعت','روز'],agoW:'پیش',dnaTypes:{sniper:['تک‌تیرانداز روند','صبور، دقیق، با حد ضرر؛ منتظر شکست تمیز می‌ماند.'],surfer:['موج‌سوار','با روند می‌رود و سود را پله‌ای برمی‌دارد.'],hunter:['شکارچی نوسان','سریع، پرتحرک و عاشق نوسان کوتاه‌مدت.'],oak:['بلوط','بلندمدت، آرام و بی‌اعتنا به نویز روزانه.'],gambler:['ریسک‌باز','جسور با ریسک بالا — مدیریت سرمایه را جدی‌تر بگیر!'],analyst:['تحلیلگر','اول داده، بعد تصمیم؛ منطقی و منظم.']},
+ h1:'فضای <em>من</em>',lead:'سطح، زنجیرهٔ حضور، مهارت‌ها و نشان‌های تو؛ سبد خصوصی، دفترچهٔ تحقیق و مرکز هشدار. همه‌چیز فقط در همین مرورگر ذخیره می‌شود.',
  lvT:'سطح و زنجیرهٔ حضور',trT:'درخت مهارت معامله‌گری',bdT:'نشان‌ها',bdL:'نشان‌های غیرمالی برای یادگیری و مشارکت مفید؛ با استفاده از ابزارهای سایت باز می‌شوند.',
  pfT:'گزارشگر خصوصی سبد',pfL:'دارایی‌هایت را وارد کن: ارزش، سود/زیان، سهم هر دارایی، تمرکز، نوسان ۳۰ روزه و همبستگی. فقط در مرورگر خودت؛ کارت اشتراک فقط درصدها را نشان می‌دهد.',
  alT:'مرکز هشدار هوشمند',alL:'قانون بساز (قیمت، تغییر ۲۴ ساعته، RSI، سیگنال اسکنر، فاندینگ)؛ هشدارهای تکراری ادغام می‌شوند و هر قانون حداکثر هر ۶ ساعت یک بار فعال می‌شود. وقتی یکی از صفحه‌های Entekhab باز است بررسی می‌شود.',alLogT:'هشدارهای اخیر',
@@ -60,7 +68,8 @@ Object.assign(I.fa,{h1:'فضای <em>من</em>',lead:'سطح، زنجیرهٔ ح
  notePh:'عنوان یا فرضیه…',tagPh:'برچسب‌ها',searchPh:'جستجو در یادداشت‌ها…',bodyPh:'متن یادداشت…',then:'در زمان ثبت',now:'الان',
  B:[['first','🧭','قدم اول','۳ صفحهٔ ابزار را ببین'],['streak3','🔥','۳ روز پیاپی','۳ روز پشت سر هم بیا'],['streak7','🔥','۷ روز پیاپی','یک هفتهٔ کامل'],['sharp','🎯','چشم تیزبین','۵ پیش‌بینی درست در نبرد پیش‌بینی'],['chart','🧠','نمودارخوان','۱۰ حدس درست حرکت بعدی'],['explorer','🗺','کاشف','۵۰ امتیاز مأموریت'],['dna','🧬','DNAخوان','صفحهٔ DNA بازار را ببین'],['research','📓','پژوهشگر','۵ یادداشت تحقیق'],['risk','💼','ریسک‌آگاه','سبدی با ۳ دارایی یا بیشتر'],['curious','🤖','کنجکاو','۱۰ سؤال از Entekhab'],['alert','🔔','نگهبان','یک هشدار بساز'],['trader','⚔️','دوئلیست','کارت DNA معامله‌گر را بساز']],
  TR:[['تحلیل تکنیکال',['chart','sharp','explorer']],['مدیریت ریسک',['risk','alert','research']],['داده و کشف',['first','dna','curious']],['نظم و پیوستگی',['streak3','streak7','trader']]]});
-Object.assign(I.ckb,{h1:'بۆشاییی <em>من</em>',lead:'ئاست، زنجیرەی ئامادەبوون، کارامەیی و نیشانەکانت؛ سەبەتەی تایبەت، دەفتەری توێژینەوە و ناوەندی ئاگادارکردنەوە. هەموو شتێک تەنها لەم وێبگەڕەدا هەڵدەگیرێت.',
+Object.assign(I.ckb,{fdT:'فیدی تایبەتی من',fdL:'ئەو بابەتانەی دوایان دەکەویت هەڵبژێرە؛ نوێترین پۆستەکانی کەناڵ دەربارەیان لێرە کۆدەبنەوە. پۆستی ڕیکلام، ئاگاداری و دووبارە لادەبرێن.',fdHint:'هێشتا بابەتێکت هەڵنەبژاردووە؛ ئێستا نوێترین پۆستە باشەکان پیشان دەدرێن.',newT:'نوێ',moreF:'زیاتر',topics:{btc:'بیتکۆین',eth:'ئیتریۆم',alt:'ئاڵتکۆینەکان',etf:'ETF و دامەزراوەکان',reg:'یاسادانان',chain:'ئۆن‌چەین',sec:'ئاسایش و هاک',macro:'ئابووریی گشتی',ta:'شیکاری و ئاماژە',edu:'فێرکاری',watch:'لیستی چاودێریم'},rvT:'دوایین بینراوەکان',clr:'سڕینەوەی مێژوو',rvNo:'هێشتا هیچ پەڕەیەک تۆمار نەکراوە؛ لەمەودوا ئەو پەڕانەی دەیانکەیتەوە لێرە دەردەکەون.',dnT:'DNAی بازرگانیی من',dnNo:'هێشتا کارتی DNAی بازرگانیت دروست نەکردووە — ٦ پرسیاری کورت لە تاقیگە.',dnMake:'دروستکردنی کارتی DNA',dnRedo:'دووبارە دروستکردنەوە',dnAx:{risk:'مەترسیخوازی',disc:'ڕێکوپێکی و وەستاندنی زیان',pat:'ئارامی',data:'پشت‌بەستن بە داتا'},u:['خولەک','کاتژمێر','ڕۆژ'],agoW:'لەمەوبەر',dnaTypes:{sniper:['تەقەکەری ڕەوت','ئارام، ورد، بە وەستاندنی زیان؛ چاوەڕێی شکاندنێکی پاک دەکات.'],surfer:['شەپۆلسوار','لەگەڵ ڕەوت دەڕوات و قازانج پلە بە پلە هەڵدەگرێت.'],hunter:['ڕاوچیی لەرزین','خێرا، چالاک و ئەوینداری لەرزینی کورتخایەن.'],oak:['بەڕوو','درێژخایەن، ئارام و بێخەم لە ژاوەژاوی ڕۆژانە.'],gambler:['مەترسیخواز','ئازا بە مەترسیی زۆر — بەڕێوەبردنی سەرمایە جددیتر بگرە!'],analyst:['شیکەرەوە','سەرەتا داتا، پاشان بڕیار؛ لۆژیکی و ڕێکخراو.']},
+ h1:'بۆشاییی <em>من</em>',lead:'ئاست، زنجیرەی ئامادەبوون، کارامەیی و نیشانەکانت؛ سەبەتەی تایبەت، دەفتەری توێژینەوە و ناوەندی ئاگادارکردنەوە. هەموو شتێک تەنها لەم وێبگەڕەدا هەڵدەگیرێت.',
  lvT:'ئاست و زنجیرەی ئامادەبوون',trT:'درەختی کارامەیی',bdT:'نیشانەکان',bdL:'نیشانەی نا-دارایی بۆ فێربوون و بەشداریی بەسوود.',
  pfT:'ڕاپۆرتەری تایبەتی سەبەتە',pfL:'سامانەکانت بنووسە: بەها، قازانج/زیان، بەش، چڕبوونەوە، لەرزینی ٣٠ ڕۆژ و پەیوەندی. تەنها لە وێبگەڕەکەتدا.',
  alT:'ناوەندی ئاگادارکردنەوەی زیرەک',alL:'یاسا دروست بکە؛ ئاگادارییە دووبارەکان یەکدەخرێن و هەر یاسایەک هەر ٦ کاتژمێر جارێک چالاک دەبێت.',alLogT:'دوایین ئاگادارییەکان',
@@ -72,7 +81,8 @@ Object.assign(I.ckb,{h1:'بۆشاییی <em>من</em>',lead:'ئاست، زنجی
  notePh:'ناونیشان یان گریمانە…',tagPh:'تاگەکان',searchPh:'گەڕان…',bodyPh:'دەقی تێبینی…',then:'لە کاتی تۆمار',now:'ئێستا',
  B:[['first','🧭','هەنگاوی یەکەم','٣ پەڕەی ئامراز ببینە'],['streak3','🔥','٣ ڕۆژ لەسەریەک','٣ ڕۆژ بێ پچڕان'],['streak7','🔥','٧ ڕۆژ لەسەریەک','هەفتەیەکی تەواو'],['sharp','🎯','چاوی تیژ','٥ پێشبینیی ڕاست'],['chart','🧠','نەخشەخوێن','١٠ مەزەندەی ڕاست'],['explorer','🗺','دۆزەرەوە','٥٠ خاڵی ئەرک'],['dna','🧬','DNAخوێن','پەڕەی DNA ببینە'],['research','📓','توێژەر','٥ تێبینی'],['risk','💼','ئاگای مەترسی','سەبەتەیەک بە ٣ سامان'],['curious','🤖','کونجکاو','١٠ پرسیار'],['alert','🔔','پاسەوان','ئاگادارییەک دروست بکە'],['trader','⚔️','دووەلکار','کارتی DNA دروست بکە']],
  TR:[['شیکاریی تەکنیکی',['chart','sharp','explorer']],['بەڕێوەبردنی مەترسی',['risk','alert','research']],['داتا و دۆزینەوە',['first','dna','curious']],['ڕێکوپێکی',['streak3','streak7','trader']]]});
-Object.assign(I.en,{h1:'My <em>space</em>',lead:'Your level, streak, skills and badges; a private portfolio, research notebook and alert center. Everything is stored only in this browser.',
+Object.assign(I.en,{fdT:'My feed',fdL:'Pick the topics you follow; the newest channel posts about them collect here. Promos, notices and repeats are removed.',fdHint:'No topics selected yet — showing the newest quality posts for now.',newT:'new',moreF:'Show more',topics:{btc:'Bitcoin',eth:'Ethereum',alt:'Altcoins',etf:'ETF & institutions',reg:'Regulation',chain:'On-chain',sec:'Security & hacks',macro:'Macro',ta:'Analysis & signals',edu:'Education',watch:'My watchlist'},rvT:'Recently viewed',clr:'Clear history',rvNo:'Nothing recorded yet — from now on, pages you open (posts, coins, tools) appear here.',dnT:'My trader DNA',dnNo:'You have not made your Trader DNA card yet — 6 quick questions in the Lab.',dnMake:'Make my DNA card',dnRedo:'Redo',dnAx:{risk:'Risk appetite',disc:'Discipline & stop-loss',pat:'Patience',data:'Data-driven'},u:['minute','hour','day'],agoW:'ago',dnaTypes:{sniper:['Trend Sniper','Patient, precise, always with a stop; waits for the clean break.'],surfer:['Wave Surfer','Rides the trend and scales out of profits.'],hunter:['Volatility Hunter','Fast, active, loves short-term swings.'],oak:['The Oak','Long-term, calm, ignores daily noise.'],gambler:['Risk Taker','Bold with high risk — take money management seriously!'],analyst:['The Analyst','Data first, decision second; logical and disciplined.']},
+ h1:'My <em>space</em>',lead:'Your level, streak, skills and badges; a private portfolio, research notebook and alert center. Everything is stored only in this browser.',
  lvT:'Level & streak',trT:'Trader skill tree',bdT:'Badges',bdL:'Non-financial badges for learning and useful participation; unlocked by using the site’s tools.',
  pfT:'Private portfolio reporter',pfL:'Enter your holdings: value, P&L, allocation, concentration, 30-day volatility and correlation. Only in your browser; the share card shows percentages only.',
  alT:'Smart alert center',alL:'Create rules (price, 24h change, RSI, scanner signal, funding). Duplicates are merged and each rule fires at most once per 6 hours. Checked while any Entekhab tool page is open.',alLogT:'Recent alerts',
@@ -137,7 +147,34 @@ $('#nImp').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].tex
 function forms(){const cs=coinsList(),opt=cs.map(c=>`<option>${c}</option>`).join('');$('#pC').innerHTML=opt;$('#aC').innerHTML=opt;$('#nC').innerHTML='<option value="">—</option>'+opt;
  $('#aM').innerHTML=Object.entries(T('metrics')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');$('#aL').innerHTML=Object.entries(T('lv')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
  $('#nT').placeholder=T('notePh');$('#nG').placeholder=T('tagPh');$('#nS').placeholder=T('searchPh');$('#nB').placeholder=T('bodyPh')}
-function renderAll(){forms();renderLvl();renderPf();renderAlerts();renderNotes()}
+/* ---- my feed: followed topics over the archive (quality posts only) ---- */
+const ago=t=>{const s=(Date.now()-(typeof t==='number'?t:Date.parse(t)))/1e3;if(!(s>=0))return '';const u=T('u'),[n,k]=s<3600?[Math.max(1,Math.round(s/60)),0]:s<86400?[Math.round(s/3600),1]:[Math.round(s/86400),2];
+ return lang==='en'?`${n} ${u[k]}${n>1?'s':''} ${T('agoW')}`:`${n.toLocaleString(lang==='ckb'?'ar-IQ':'fa-IR')} ${u[k]} ${T('agoW')}`};
+const STABLE=['BTC','ETH','USDT','USDC','GOLD'],MACRO=['CPI / inflation','Interest rates','Federal Reserve','US Treasury'];
+const TOP={btc:p=>p.coins.includes('BTC'),eth:p=>p.coins.includes('ETH'),alt:p=>p.coins.some(c=>!STABLE.includes(c)),etf:p=>p.category==='etf_institutional',reg:p=>p.category==='regulation',
+ chain:p=>p.category==='onchain',sec:p=>p.category==='security'||((p.ents||[]).includes('Hack / exploit')&&/هک|سرقت|نفوذ|باگ|hack|exploit|stolen|drain/i.test(p.title||'')),macro:p=>(p.ents||[]).some(x=>MACRO.includes(x)),
+ ta:p=>['analysis','signal'].includes(p.kind)||['technical','signal'].includes(p.category),edu:p=>p.kind==='education'||p.category==='education',watch:p=>{const w=ls.get('ek_watch',[]);return p.coins.some(c=>w.includes(c))}};
+let PL=null,fN=12,SEEN=null;
+async function renderFeed(){const f=ls.get('ek_follow',[]),TN=T('topics');
+ $('#fTop').innerHTML=Object.keys(TOP).map(k=>`<button class="chip tg${f.includes(k)?' on':''}" data-k="${k}" aria-pressed="${f.includes(k)}">${TN[k]}</button>`).join('');
+ $('#fTop').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const a=ls.get('ek_follow',[]),k=b.dataset.k;ls.set('ek_follow',a.includes(k)?a.filter(x=>x!==k):[...a,k]);fN=12;renderFeed()});
+ if(!PL){PL=await j('/data/posts_lite.json'+V());if(PL)PL.sort((a,b)=>Date.parse(b.date)-Date.parse(a.date))}
+ if(!PL){$('#feedL').innerHTML=`<p class="disc">${T('none')}</p>`;return}
+ if(SEEN===null){SEEN=ls.get('ek_feed_seen',0);ls.set('ek_feed_seen',Math.max(0,...PL.map(p=>p.id)))}
+ const good=PL.filter(p=>p.q!=='low'&&!['promo','notice'].includes(p.kind)),sel=f.length?good.filter(p=>f.some(k=>TOP[k](p))):good,list=sel.slice(0,fN);
+ $('#feedL').innerHTML=(f.length?'':`<p class="disc" style="margin:0 0 8px">${T('fdHint')}</p>`)+(list.length?list.map(p=>{const tt=String(p.title||'').replace(/\s+/g,' ').slice(0,140);
+   return `<a class="note fd" href="/p/${p.id}/"><b>${esc(tt)}</b>${SEEN&&p.id>SEEN?` <span class="chip lv-important">${T('newT')}</span>`:''}<br><small>${ago(p.date)}${f.length?' · '+f.filter(k=>TOP[k](p)).map(k=>TN[k]).join(' · '):''}${p.coins.length?' · '+p.coins.slice(0,4).join(' '):''}</small></a>`}).join(''):`<p class="disc">${T('none')}</p>`)
+  +(sel.length>fN?`<button class="btn" id="fMore" style="margin-top:6px">${T('moreF')} (${sel.length-fN})</button>`:'');
+ const mb=$('#fMore');if(mb)mb.onclick=()=>{fN+=12;renderFeed()}}
+/* ---- recently viewed (recorded locally by every Entekhab page) ---- */
+function renderRecent(){const a=ls.get('ek_recent',[]).filter(x=>x&&x.p&&x.p!=='/me/').slice(0,10);
+ $('#recent').innerHTML=a.length?a.map(x=>`<a class="note fd" href="${esc(x.p)}">${esc(x.t||x.p)}<br><small>${ago(x.at)} · <bdi dir="ltr">${esc(decodeURI(x.p))}</bdi></small></a>`).join('')+`<button class="btn" id="rcClr" style="margin-top:6px">${T('clr')}</button>`:`<p class="disc">${T('rvNo')}</p>`;
+ const b=$('#rcClr');if(b)b.onclick=()=>{ls.set('ek_recent',[]);renderRecent()}}
+/* ---- trader DNA (made in the Lab) ---- */
+function renderTD(){const r=ls.get('ek_dna',null),el=$('#tdna');if(!r||!r.type){el.innerHTML=`<p class="disc" style="margin:0 0 10px">${T('dnNo')}</p><a class="btn p" href="/lab/#dnaS">🧬 ${T('dnMake')}</a>`;return}
+ const [n,d]=T('dnaTypes')[r.type]||[r.type,''],ax=T('dnAx');
+ el.innerHTML=`<div class="big" style="font-size:1.5rem">${esc(n)}</div><p class="disc" style="margin:4px 0 10px">${esc(d)}</p>`+[['risk',r.risk],['disc',r.disc],['pat',r.pat],['data',r.data]].map(([k,v])=>`<div style="margin:7px 0"><small>${ax[k]} <b class="num">${+v||0}</b></small><div class="bar"><i style="width:${+v||0}%"></i></div></div>`).join('')+`<p style="margin-top:12px"><a class="btn" href="/lab/#dnaS">↻ ${T('dnRedo')}</a></p>`}
+function renderAll(){forms();renderLvl();renderFeed();renderRecent();renderTD();renderPf();renderAlerts();renderNotes()}
 (async()=>{const [m,lg]=await Promise.all([j('/data/market.json'+V()),j('/data/logos/index.json'+V())]);M=m;LOGO=new Set(lg||[]);uiLang(renderAll)})();
 </script>
 </body>
