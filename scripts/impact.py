@@ -102,12 +102,23 @@ def btc_bench(btc, t0):
 def main():
     posts = json.load(open(POSTS, encoding="utf-8"))
     data = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
+    # BTC 1h series covering every record that still needs a benchmark (≤4 requests of 1000 candles)
+    need = [v["t0"] for v in data.values() if v.get("coin") != "BTC" and v.get("btc_r24h") is None and v.get("t0")]
+    start = min(need) - 3600_000 if need else time.time() * 1000 - 1000 * 3600_000
+    bb = []
     try:
-        bb = klines("BTC", "1h", 1000)
-        btc = {"bars": bb, "idx": {x["t"]: i for i, x in enumerate(bb)}}
+        for _ in range(4):
+            part = klines("BTC", "1h", 1000, start=start)
+            if not part:
+                break
+            bb.extend(part)
+            if len(part) < 1000:
+                break
+            start = part[-1]["t"] + 3600_000
+        btc = {"bars": bb, "idx": {x["t"]: i for i, x in enumerate(bb)}} if bb else None
     except Exception as e:  # noqa: BLE001
-        btc = None
-        print(f"btc benchmark unavailable: {e}", file=sys.stderr)
+        btc = {"bars": bb, "idx": {x["t"]: i for i, x in enumerate(bb)}} if bb else None
+        print(f"btc benchmark partial/unavailable: {e}", file=sys.stderr)
     cutoff = datetime.now(timezone.utc) - timedelta(days=DAYS)
     calls = 0
     for p in posts:
