@@ -134,6 +134,14 @@ jobs:
           KIND_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/kind.py
 
+      - name: Crypto vs global markets (FRED + Binance correlations)
+        id: macro
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          MACRO_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python scripts/macro.py
+
       - name: Indicator signals (TradingView alert relay + real outcomes)
         id: signals
         continue-on-error: true
