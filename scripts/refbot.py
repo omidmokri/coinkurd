@@ -14,6 +14,7 @@ alerts, language) lives in a JSON file that the workflow keeps on the
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import time
@@ -24,6 +25,7 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
+import bot_iran as IR  # noqa: E402
 from bot_i18n import LANGS, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
@@ -41,6 +43,10 @@ STATE_PUSH_EVERY = int(os.environ.get("STATE_PUSH_EVERY", "600"))
 BRIEF_HOUR = int(os.environ.get("BRIEF_HOUR_UTC", "5"))   # 05:00 UTC ≈ 08:30 Tehran
 API = f"https://api.telegram.org/bot{TOKEN}/"
 MAX_ALERTS = 10
+WATCH_PCT = float(os.environ.get("WATCH_PCT", "1.0"))
+WATCH_MIN = 15
+LIVE = {}          # (chat_id, message_id) -> {until, uid}
+USDT_SERIES = []   # [(ts, price)] for the tether spike watch
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("refbot")
@@ -56,6 +62,8 @@ def load_state():
     s.setdefault("offset", 0)
     s.setdefault("users", {})   # uid -> {username,name,referrer,joined,created,lang,brief,alerts,rewarded}
     s.setdefault("last_brief", "")
+    s.setdefault("proxy", "")
+    s.setdefault("watch_last", 0)
     return s
 
 
@@ -154,7 +162,16 @@ def tg(method, **params):
         return {"ok": False}
 
 
+_AMP = re.compile(r"&(?!(?:amp|lt|gt|quot|#\d+|#x[0-9a-fA-F]+);)")
+
+
+def fix_amp(text):
+    """escape bare '&' so Telegram's HTML parser never rejects a message"""
+    return _AMP.sub("&amp;", text or "")
+
+
 def send(chat_id, text, kb=None, preview=False, **kw):
+    text = fix_amp(text)
     p = dict(chat_id=chat_id, text=text, parse_mode="HTML",
              link_preview_options={"is_disabled": not preview}, **kw)
     if kb:
@@ -163,6 +180,7 @@ def send(chat_id, text, kb=None, preview=False, **kw):
 
 
 def edit(chat_id, mid, text, kb=None):
+    text = fix_amp(text)
     p = dict(chat_id=chat_id, message_id=mid, text=text, parse_mode="HTML",
              link_preview_options={"is_disabled": True})
     if kb:
@@ -192,6 +210,7 @@ def btn(text, data=None, url=None):
 def kb_main(lang):
     b = lambda k, d: btn(t(k, lang), d)
     rows = [
+        [b("b_irr", "m:irr")],
         [b("b_market", "m:mkt"), b("b_brain", "m:brain")],
         [b("b_coin", "m:coin"), b("b_opps", "m:opps")],
         [b("b_movers", "m:movers"), b("b_score", "m:score")],
@@ -203,7 +222,7 @@ def kb_main(lang):
         [b("b_posts", "m:posts"), b("b_track", "m:track")],
         [b("b_ind", "m:ind"), b("b_alerts", "m:alerts")],
         [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
-        [btn(t("b_site", lang), url=D.SITE)],
+        [b("b_proxy", "m:proxy"), btn(t("b_site", lang), url=D.SITE)],
     ]
     return {"inline_keyboard": rows}
 
@@ -243,6 +262,21 @@ def kb_coin(coin, lang):
         [btn(t("b_more", lang), url=D.coin_url(coin)), btn(t("b_back", lang), "m:main")]]}
 
 
+def alert_label(a, lang):
+    return IR.L3(IR.ASSET_NAME.get(a["coin"], {"fa": a["coin"]}), lang) if a.get("iran") else a["coin"]
+
+
+def fmt_alert_price(a, p):
+    return IR.toman(p) if a.get("iran") and a["coin"] not in ("XAU", "XAG") else D.fp(p)
+
+
+def kb_irr(lang, live=False):
+    rows = [[btn(t("b_refresh", lang), "m:irr")] + ([] if live else [btn(t("b_live", lang), "live:irr")]),
+            [btn(t("b_alerts", lang), "m:alerts"), btn(t("b_calc", lang), "calc")],
+            [btn(t("b_back", lang), "m:main")]]
+    return {"inline_keyboard": rows}
+
+
 def kb_lang():
     return {"inline_keyboard": [[btn("فارسی", "l:fa"), btn("کوردی", "l:ckb"), btn("English", "l:en")]]}
 
@@ -261,9 +295,10 @@ def kb_ref(uid, lang):
 def kb_alerts(s, uid, lang):
     x = user(s, uid) or {}
     sub = x.get("brief")
-    rows = [[btn(t("b_sub_off" if sub else "b_sub_on", lang), "brief")]]
+    rows = [[btn(t("b_sub_off" if sub else "b_sub_on", lang), "brief")],
+            [btn(t("b_watch_off" if x.get("watch") else "b_watch_on", lang), "watch")]]
     for i, a in enumerate(x.get("alerts", []), 1):
-        rows.append([btn(f"🗑 {i}. {a['coin']} {'≥' if a['op'] == '>' else '≤'} {D.fp(a['price'])}", f"ad:{i}")])
+        rows.append([btn(f"🗑 {i}. {alert_label(a, lang)} {'≥' if a['op'] == '>' else '≤'} {fmt_alert_price(a, a['price'])}", f"ad:{i}")])
     rows.append([btn(t("b_back", lang), "m:main")])
     return {"inline_keyboard": rows}
 
@@ -289,6 +324,14 @@ def render(s, uid, key):
     lang = lang_of(s, uid)
     if key == "main":
         return t("menu_title", lang), kb_main(lang)
+    if key == "irr":
+        try:
+            return IR.card(lang), kb_irr(lang)
+        except Exception:
+            log.exception("irr card failed")
+            return t("no_data", lang), kb_back(lang)
+    if key == "proxy":
+        return (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), kb_back(lang)
     if key == "lab":
         return f"🧪 <b>{t('b_lab', lang)[2:]}</b>", kb_lab(lang)
     if key == "coin":
@@ -342,6 +385,14 @@ def coin_card(s, uid, sym):
     if not text:
         return t("unknown_coin", lang) + D.e(sym.upper()), kb_coins(lang)
     coin = D.find_coin(sym)["coin"]
+    try:
+        usdt = IR.snapshot().get("usdt")
+        px = D.live_prices().get(coin, (D.find_coin(coin).get("price"),))[0]
+        if usdt and px:
+            label = {"fa": "به تومان", "ckb": "بە تمەن", "en": "in toman"}[lang]
+            text = text.replace("\n", f"\n💵 {label}: ≈ {IR.toman(px * usdt)}\n", 1)
+    except Exception:
+        pass
     return text, kb_coin(coin, lang)
 
 
@@ -380,10 +431,21 @@ def parse_alert(args, s, uid):
     if len(parts) != 2:
         return t("alert_usage", lang)
     sym, val = parts
-    try:
-        price = float(val.replace(",", ""))
-    except ValueError:
+    price = IR.num(val)
+    if price is None:
         return t("alert_usage", lang)
+    if len(x["alerts"]) >= MAX_ALERTS:
+        return t("alert_max", lang)
+    key = IR.resolve_asset(sym)
+    if key:
+        now = IR.asset_price(key)
+        if not now:
+            return t("no_data", lang)
+        op = ">" if price > now else "<"
+        a = {"coin": key, "price": price, "op": op, "at": int(time.time()), "iran": True}
+        x["alerts"].append(a)
+        return t("alert_set", lang, coin=alert_label(a, lang), op="≥" if op == ">" else "≤",
+                 price=fmt_alert_price(a, price), now=fmt_alert_price(a, now))
     c = D.find_coin(sym)
     if not c:
         return t("unknown_coin", lang) + D.e(sym.upper())
@@ -407,21 +469,71 @@ def check_alerts(s):
     if not any(x.get("alerts") for x in s["users"].values()):
         return False
     px = D.live_prices()
-    if not px:
-        return False
+    need_ir = any(a.get("iran") for x in s["users"].values() for a in x.get("alerts", []))
+    snap = IR.snapshot() if need_ir else {}
     changed = False
     for uid, x in s["users"].items():
         keep = []
+        lang = x.get("lang", "fa")
         for a in x.get("alerts", []):
-            now = (px.get(a["coin"]) or (None,))[0]
+            if a.get("iran"):
+                now = IR.asset_price(a["coin"], snap)
+            else:
+                now = (px.get(a["coin"]) or (None,))[0]
             hit = now is not None and ((a["op"] == ">" and now >= a["price"]) or (a["op"] == "<" and now <= a["price"]))
             if hit:
-                send(int(uid), t("alert_hit", x.get("lang", "fa"), coin=a["coin"], price=D.fp(a["price"]), now=D.fp(now)),
-                     {"inline_keyboard": [[btn("🪙 " + a["coin"], f"c:{a['coin']}")]]})
+                kb = ({"inline_keyboard": [[btn(t("b_irr", lang), "m:irr")]]} if a.get("iran")
+                      else {"inline_keyboard": [[btn("🪙 " + a["coin"], f"c:{a['coin']}")]]})
+                send(int(uid), t("alert_hit", lang, coin=alert_label(a, lang), price=fmt_alert_price(a, a["price"]),
+                                 now=fmt_alert_price(a, now)), kb)
                 changed = True
             else:
                 keep.append(a)
         x["alerts"] = keep
+    return changed
+
+
+_last_tick = [0.0]
+
+
+def minute_jobs(s):
+    """every ~60s: tether spike watch + live message refresh"""
+    if time.time() - _last_tick[0] < 60:
+        return False
+    _last_tick[0] = time.time()
+    changed = False
+    watchers = [(uid, x.get("lang", "fa")) for uid, x in s["users"].items() if x.get("watch")]
+    if watchers or LIVE:
+        p = IR.snapshot().get("usdt")
+        now = time.time()
+        if p:
+            USDT_SERIES.append((now, p))
+            del USDT_SERIES[:-40]
+            window = [(ts, v) for ts, v in USDT_SERIES if now - ts <= WATCH_MIN * 60]
+            if watchers and len(window) >= 3 and now - s.get("watch_last", 0) > 30 * 60:
+                lo = min(window, key=lambda kv: kv[1])
+                hi = max(window, key=lambda kv: kv[1])
+                first, last = (lo, hi) if lo[0] < hi[0] else (hi, lo)
+                pct = (last[1] / first[1] - 1) * 100
+                if abs(pct) >= WATCH_PCT:
+                    s["watch_last"] = now
+                    changed = True
+                    mins = max(1, round((last[0] - first[0]) / 60))
+                    for uid, lang in watchers:
+                        d = {"fa": "جهش" if pct > 0 else "سقوط", "ckb": "بەرزبوونەوە" if pct > 0 else "کەوتن",
+                             "en": "up" if pct > 0 else "down"}[lang]
+                        send(int(uid), t("watch_hit", lang, dir=d, pct=f"{pct:+.2f}", mins=mins,
+                                         p0=IR.toman(first[1]), p1=IR.toman(last[1])),
+                             {"inline_keyboard": [[btn(t("b_irr", lang), "m:irr")]]})
+    for key, info in list(LIVE.items()):
+        if time.time() > info["until"]:
+            LIVE.pop(key, None)
+            continue
+        lang = lang_of(s, info["uid"])
+        try:
+            edit(key[0], key[1], IR.card(lang) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
+        except Exception:
+            log.exception("live refresh failed")
     return changed
 
 
@@ -476,6 +588,20 @@ def handle_private(s, msg):
         if cmd == "/dna" and arg:
             return send(chat_id, D.sec_dna(lang, arg.upper()), kb_back(lang, more=D.SITE + "/dna/"))
         return send(chat_id, *render(s, uid, simple[cmd]))
+    if cmd in ("/dollar", "/usdt", "/tether", "/irr", "/dolar"):
+        return send(chat_id, *render(s, uid, "irr"))
+    if cmd == "/calc":
+        parts = arg.split()
+        amt = IR.num(parts[0]) if parts else None
+        if not amt:
+            return send(chat_id, t("calc_usage", lang))
+        unit = "usdt" if len(parts) > 1 and IR.resolve_asset(parts[1]) == "USDT" else "toman"
+        return send(chat_id, IR.calc(lang, amt, unit), kb_irr(lang))
+    if cmd == "/watch":
+        x["watch"] = not x.get("watch")
+        return send(chat_id, t("watch_on" if x["watch"] else "watch_off", lang))
+    if cmd == "/proxy":
+        return send(chat_id, *render(s, uid, "proxy"))
     if cmd in ("/help", "/start_help"):
         return send(chat_id, t("help", lang), kb_back(lang))
     if cmd == "/coin":
@@ -511,6 +637,9 @@ def handle_private(s, msg):
             requests.post(API + "sendDocument", data={"chat_id": chat_id},
                           files={"document": ("users.csv", "﻿" + "\n".join(lines))}, timeout=60)
             return
+        if cmd == "/setproxy":
+            s["proxy"] = arg[:3500]
+            return send(chat_id, "🛡 proxy text " + ("saved" if arg else "cleared") + ".")
         if cmd == "/broadcast":
             src = msg.get("reply_to_message")
             if not src:
@@ -524,6 +653,9 @@ def handle_private(s, msg):
 
     # free text: coin symbol or search
     if text and not text.startswith("/"):
+        low = text.lower()
+        if any(k in low for k in ("دلار", "تتر", "usdt", "dollar", "tether", "دۆلار", "تەتەر", "یورو", "سکه", "طلا", "درهم", "لیر")):
+            return send(chat_id, *render(s, uid, "irr"))
         word = text.split()[0]
         if len(text.split()) == 1 and 2 <= len(word) <= 12 and D.find_coin(word):
             return send(chat_id, *coin_card(s, uid, word))
@@ -575,6 +707,15 @@ def handle_callback(s, cb):
         if 0 <= i < len(x["alerts"]):
             x["alerts"].pop(i)
         return edit(chat_id, mid, *render(s, uid, "alerts"))
+    if data == "live:irr":
+        LIVE[(chat_id, mid)] = {"until": time.time() + 15 * 60, "uid": uid}
+        return edit(chat_id, mid, IR.card(lang) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
+    if data == "calc":
+        return send(chat_id, t("calc_usage", lang))
+    if data == "watch":
+        x["watch"] = not x.get("watch")
+        text, kb = render(s, uid, "alerts")
+        return edit(chat_id, mid, t("watch_on" if x["watch"] else "watch_off", lang) + "\n\n" + text, kb)
     if data == "brief":
         x["brief"] = not x.get("brief")
         text, kb = render(s, uid, "alerts")
@@ -617,15 +758,18 @@ def handle_update(s, up):
 
 # ================================================================== setup
 COMMANDS = {
-    "fa": [("menu", "منوی اصلی"), ("coin", "تحلیل کوین — /coin BTC"), ("market", "وضعیت بازار"),
+    "fa": [("dollar", "قیمت دلار و تتر به تومان"), ("calc", "ماشین‌حساب تتر"), ("watch", "هشدار جهش تتر"),
+           ("menu", "منوی اصلی"), ("coin", "تحلیل کوین — /coin BTC"), ("market", "وضعیت بازار"),
            ("brain", "مغز بازار"), ("opps", "فرصت‌های اسکنر"), ("news", "اخبار"), ("search", "جستجو در آرشیو کانال"),
            ("alert", "هشدار قیمت — /alert BTC 80000"), ("brief", "گزارش روزانه"), ("invite", "دعوت و پاداش"),
            ("lang", "زبان"), ("help", "راهنما")],
-    "ckb": [("menu", "لیستی سەرەکی"), ("coin", "شیکاری دراو — /coin BTC"), ("market", "دۆخی بازاڕ"),
+    "ckb": [("dollar", "نرخی دۆلار و تەتەر"), ("calc", "ژمێرەری تەتەر"), ("watch", "ئاگاداری تەتەر"),
+            ("menu", "لیستی سەرەکی"), ("coin", "شیکاری دراو — /coin BTC"), ("market", "دۆخی بازاڕ"),
             ("brain", "مێشکی بازاڕ"), ("opps", "دەرفەتەکان"), ("news", "هەواڵ"), ("search", "گەڕان لە ئەرشیڤ"),
             ("alert", "ئاگاداری نرخ"), ("brief", "ڕاپۆرتی ڕۆژانە"), ("invite", "بانگهێشت و خەڵات"),
             ("lang", "زمان"), ("help", "ڕێنمایی")],
-    "en": [("menu", "Main menu"), ("coin", "Coin card — /coin BTC"), ("market", "Market overview"),
+    "en": [("dollar", "Dollar & tether in toman"), ("calc", "Tether calculator"), ("watch", "Tether spike alert"),
+           ("menu", "Main menu"), ("coin", "Coin card — /coin BTC"), ("market", "Market overview"),
            ("brain", "Market brain"), ("opps", "Scanner opportunities"), ("news", "News"), ("search", "Search the archive"),
            ("alert", "Price alert — /alert BTC 80000"), ("brief", "Daily brief"), ("invite", "Invite & earn"),
            ("lang", "Language"), ("help", "Help")],
@@ -674,6 +818,7 @@ def main():
             time.sleep(5)
         try:
             dirty |= check_alerts(s)
+            dirty |= minute_jobs(s)
             dirty |= maybe_brief(s)
         except Exception:
             log.exception("periodic job failed")

@@ -9,6 +9,25 @@ T = {
         "fa": "📡 <b>انتخاب · Coin_Kurd</b>\nهمهٔ ابزارهای سایت entekhab.net داخل تلگرام. یک بخش را انتخاب کن 👇",
         "ckb": "📡 <b>ئینتیخاب · Coin_Kurd</b>\nهەموو ئامرازەکانی ماڵپەڕی entekhab.net لەناو تێلێگرام. بەشێک هەڵبژێرە 👇",
         "en": "📡 <b>Entekhab · Coin_Kurd</b>\nEvery tool from entekhab.net, inside Telegram. Pick a section 👇"},
+    "b_irr": {"fa": "💵 دلار و تتر (تومان)", "ckb": "💵 دۆلار و تەتەر (تمەن)", "en": "💵 Dollar & tether (IRR)"},
+    "b_live": {"fa": "📡 زنده (۱۵ دقیقه)", "ckb": "📡 ڕاستەوخۆ (١٥ خولەک)", "en": "📡 Live (15 min)"},
+    "b_calc": {"fa": "🧮 ماشین‌حساب", "ckb": "🧮 ژمێرەر", "en": "🧮 Calculator"},
+    "b_watch_on": {"fa": "🚨 هشدار جهش تتر: روشن کن", "ckb": "🚨 ئاگاداری تەتەر: هەڵیبکە", "en": "🚨 Tether spike alert: on"},
+    "b_watch_off": {"fa": "🚨 هشدار جهش تتر: خاموش کن", "ckb": "🚨 ئاگاداری تەتەر: بیکوژێنەوە", "en": "🚨 Tether spike alert: off"},
+    "b_proxy": {"fa": "🛡 پروکسی اضطراری", "ckb": "🛡 پرۆکسی فریاکەوتن", "en": "🛡 Emergency proxy"},
+    "watch_on": {"fa": "🚨 روشن شد: اگر تتر در ۱۵ دقیقه ±۱٪ یا بیشتر تکان بخورد خبرت می‌کنم.",
+                 "ckb": "🚨 هەڵکرا: ئەگەر تەتەر لە ١٥ خولەکدا ±١٪ جووڵا ئاگادارت دەکەم.",
+                 "en": "🚨 On: I'll ping you if tether moves ±1% or more within 15 minutes."},
+    "watch_off": {"fa": "🔕 هشدار جهش تتر خاموش شد.", "ckb": "🔕 ئاگاداری تەتەر کوژایەوە.", "en": "🔕 Tether spike alert off."},
+    "watch_hit": {"fa": "🚨 <b>تتر {dir} {pct}٪ در {mins} دقیقه</b>\n{p0} ← {p1} تومان",
+                  "ckb": "🚨 <b>تەتەر {dir} {pct}٪ لە {mins} خولەکدا</b>\n{p0} ← {p1} تمەن",
+                  "en": "🚨 <b>Tether {dir} {pct}% in {mins} min</b>\n{p0} → {p1} toman"},
+    "calc_usage": {"fa": "🧮 مثال: <code>/calc 10000000</code> (تومان → تتر) یا <code>/calc 500 usdt</code> (تتر → تومان)",
+                   "ckb": "🧮 نموونە: <code>/calc 10000000</code> (تمەن → تەتەر) یان <code>/calc 500 usdt</code>",
+                   "en": "🧮 Example: <code>/calc 10000000</code> (toman → USDT) or <code>/calc 500 usdt</code>"},
+    "proxy_none": {"fa": "فعلاً پروکسی اضطراری ثبت نشده است.", "ckb": "هێشتا پرۆکسی تۆمار نەکراوە.", "en": "No emergency proxy posted yet."},
+    "live_on": {"fa": "📡 این پیام تا ۱۵ دقیقه هر دقیقه به‌روز می‌شود.", "ckb": "📡 ئەم پەیامە تا ١٥ خولەک هەموو خولەکێک نوێ دەبێتەوە.",
+                "en": "📡 This message refreshes every minute for 15 minutes."},
     "b_market": {"fa": "📊 وضعیت بازار", "ckb": "📊 دۆخی بازاڕ", "en": "📊 Market"},
     "b_brain": {"fa": "🧠 مغز بازار", "ckb": "🧠 مێشکی بازاڕ", "en": "🧠 Market Brain"},
     "b_coin": {"fa": "🪙 تحلیل کوین", "ckb": "🪙 شیکاری دراو", "en": "🪙 Coin lookup"},
@@ -109,9 +128,24 @@ T = {
              "en": "{name} please join the channel to chat here 👇"},
     # ---------------------------------------------------------------- alerts / brief
     "alert_usage": {
-        "fa": "مثال: <code>/alert BTC 80000</code> — وقتی قیمت به این عدد برسد خبرت می‌کنم.\nحذف: <code>/alert del 1</code>",
-        "ckb": "نموونە: <code>/alert BTC 80000</code> — کاتێک نرخ گەیشتە ئەم ژمارەیە ئاگادارت دەکەم.\nسڕینەوە: <code>/alert del 1</code>",
-        "en": "Example: <code>/alert BTC 80000</code> — I'll ping you when price crosses it.\nDelete: <code>/alert del 1</code>"},
+        "fa": ("🔔 <b>هشدار قیمت</b> — تا ۱۰ هشدار برای هر ارزی که بخواهی؛ وقتی قیمت به عدد تو برسد فوراً پیام می‌گیری "
+               "(حتی اگر بعداً اینترنت قطع شود، پیام در تلگرامت می‌ماند).\n\n<b>مثال‌ها:</b>\n"
+               "<code>/alert BTC 80000</code> بیت‌کوین ۸۰ هزار دلار\n<code>/alert ETH 2000</code> اتریوم\n"
+               "<code>/alert PEPE 0.00001</code> هر ارز بایننس\n<code>/alert تتر 280000</code> تتر به تومان\n"
+               "<code>/alert دلار 270000</code> دلار تهران\n<code>/alert سکه 270000000</code> سکه امامی\n"
+               "<code>/alert یورو 310000</code> · <code>/alert طلا 26000000</code>\n\n"
+               "حذف: <code>/alert del 2</code> یا دکمهٔ 🗑 · لیست: /alerts\n"
+               "🚨 هشدار جهش/سقوط ناگهانی تتر (±۱٪ در ۱۵ دقیقه): /watch"),
+        "ckb": ("🔔 <b>ئاگاداری نرخ</b> — تا ١٠ ئاگاداری بۆ هەر دراوێک؛ کاتێک نرخ گەیشتە ژمارەکەت یەکسەر پەیام وەردەگریت.\n\n<b>نموونە:</b>\n"
+                "<code>/alert BTC 80000</code>\n<code>/alert ETH 2000</code>\n<code>/alert PEPE 0.00001</code>\n"
+                "<code>/alert تتر 280000</code> تەتەر بە تمەن\n<code>/alert دلار 270000</code> دۆلاری تاران\n"
+                "<code>/alert سکه 270000000</code>\n\nسڕینەوە: <code>/alert del 2</code> · لیست: /alerts\n"
+                "🚨 ئاگاداری بازدان/کەوتنی لەناکاوی تەتەر (±١٪ لە ١٥ خولەک): /watch"),
+        "en": ("🔔 <b>Price alerts</b> — up to 10 alerts on any asset; you get a message the moment price crosses your level.\n\n<b>Examples:</b>\n"
+               "<code>/alert BTC 80000</code>\n<code>/alert ETH 2000</code>\n<code>/alert PEPE 0.00001</code> any Binance coin\n"
+               "<code>/alert USDT 280000</code> tether in toman\n<code>/alert USD 270000</code> Tehran dollar\n"
+               "<code>/alert سکه 270000000</code> Emami gold coin\n\nDelete: <code>/alert del 2</code> · list: /alerts\n"
+               "🚨 Sudden tether pump/dump alert (±1% in 15 min): /watch")},
     "alert_set": {"fa": "🔔 هشدار ثبت شد: {coin} {op} {price}  (قیمت فعلی {now})",
                   "ckb": "🔔 ئاگاداری تۆمارکرا: {coin} {op} {price}  (نرخی ئێستا {now})",
                   "en": "🔔 Alert set: {coin} {op} {price}  (now {now})"},
