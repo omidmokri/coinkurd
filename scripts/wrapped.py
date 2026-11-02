@@ -92,7 +92,9 @@ def save_issue(w, news, narr):
 
 def main():
     prev = load("wrapped.json", {})
-    if prev.get("updated_at") and NOW - datetime.fromisoformat(prev["updated_at"]) < timedelta(hours=6) and os.environ.get("WRAPPED_FORCE") != "1":
+    iso = NOW.isocalendar()
+    have_issue = os.path.exists(os.path.join(D, "weekly", f"{iso[0]}-W{iso[1]:02d}.json"))
+    if prev.get("updated_at") and NOW - datetime.fromisoformat(prev["updated_at"]) < timedelta(hours=6) and have_issue and os.environ.get("WRAPPED_FORCE") != "1":
         print("wrapped not due")
         return
     m = load("market.json", {})
