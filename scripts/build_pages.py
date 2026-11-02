@@ -86,7 +86,7 @@ CSS = """:root{--bg:#0a0a0a;--ink:#f4f4f2;--mute:#9a9a94;--acc:#f7931a;--line:rg
 *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--ink);font-family:Vazirmatn,system-ui,sans-serif,'Apple Color Emoji','Noto Color Emoji';line-height:1.9}
 a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
 .w{max-width:960px;margin:0 auto;padding:0 16px}header{border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;background:rgba(10,10,10,.9);backdrop-filter:blur(10px);z-index:5}
-header .w{display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-family:'Space Grotesk',monospace;font-weight:700;color:var(--ink)}.lv-up{animation:lvu 1.2s ease-out}.lv-dn{animation:lvd 1.2s ease-out}@keyframes lvu{from{color:#22c55e}}@keyframes lvd{from{color:#ef4444}}.lvl{display:none;color:#22c55e;font-size:.7rem}html.live-on .lvl{display:inline}.logo{display:flex;align-items:center;gap:8px}.logo img{height:40px;width:auto;display:block}@media(max-width:640px){.logo span{display:none}}.logo b{color:var(--acc)}
+header .w{display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-family:'Space Grotesk',monospace;font-weight:700;color:var(--ink)}.lv-up{animation:lvu 1.2s ease-out}.lv-dn{animation:lvd 1.2s ease-out}@keyframes lvu{from{color:#22c55e}}@keyframes lvd{from{color:#ef4444}}.lvl{display:none;color:#22c55e;font-size:.7rem}html.live-on .lvl{display:inline}.acts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}.wbtn{display:inline-flex;gap:6px;align-items:center;background:#ffffff10;border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:7px 14px;font:inherit;font-size:.85rem;cursor:pointer}.wbtn.on{border-color:var(--acc);color:var(--acc)}.faq{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}.faq summary{cursor:pointer;font-weight:700}.faq p{margin:8px 0 0}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.bnav{display:none}@media(max-width:700px){.bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:95;background:rgba(10,10,10,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.62rem;color:var(--mute)}.bnav a span{font-size:1.15rem;line-height:1}body{padding-bottom:62px}}.logo{display:flex;align-items:center;gap:8px}.logo img{height:40px;width:auto;display:block}@media(max-width:640px){.logo span{display:none}}.logo b{color:var(--acc)}
 nav a{color:var(--mute);margin-inline-start:16px;font-size:.9rem}header nav{min-width:0}@media(max-width:760px){header .w{gap:10px}header nav{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}header nav::-webkit-scrollbar{display:none}nav a{margin-inline-start:12px;flex:none}}main{padding:32px 0 60px}
 h1{font-size:clamp(1.5rem,4vw,2.3rem);line-height:1.45;margin:10px 0 12px}h2{font-size:1.15rem;margin:34px 0 12px;color:var(--acc)}
 .meta{color:var(--mute);font-size:.85rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--ink)}
@@ -146,9 +146,43 @@ OG_DEFAULT = (f'<meta property="og:image" content="{SITE}/assets/og.jpg"><meta p
               '<meta name="twitter:card" content="summary_large_image">')
 
 
+BNAV = {"fa": ["خانه", "داشبورد", "نبرد", "آموزش", "فضای من"], "ckb": ["ماڵەوە", "داشبۆرد", "شەڕ", "فێربوون", "بۆشاییم"], "en": ["Home", "Dashboard", "Battle", "Learn", "My space"]}
+HOME_NAME = {"fa": "خانه", "ckb": "ماڵەوە", "en": "Home"}
+
+
+def crumbs_ld(body, title, url, lang="fa"):
+    """BreadcrumbList from the page's own breadcrumb row (<div class="meta">a / b / c</div>); None when there is no trail"""
+    m = re.search(r'<div class="meta">(.*?)</div>', body, re.S)
+    if not m or " / " not in m.group(1):
+        return ""
+    items = [(HOME_NAME.get(lang, "Home"), f"{SITE}/")]
+    for part in m.group(1).split(" / "):
+        a = re.search(r'<a href="([^"]+)">(.*?)</a>', part)
+        if a:
+            if a.group(1) != "/":
+                items.append((html.unescape(re.sub(r"<[^>]+>", "", a.group(2))), SITE + a.group(1)))
+        else:
+            txt = html.unescape(re.sub(r"<[^>]+>", "", part)).strip()
+            if txt:
+                items.append((txt[:80], url))
+    if len(items) < 2:
+        return ""
+    ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
+          "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, "item": u} for i, (n, u) in enumerate(items)]}
+    return f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
+
+
+WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c=b.dataset.watch,K='ek_watch';function g(){try{return JSON.parse(localStorage.getItem(K)||'[]')}catch(e){return []}}"
+            "function d(){var on=g().indexOf(c)>=0;b.classList.toggle('on',on);b.querySelector('span').textContent=on?'در لیست مراقبت ✓':'افزودن به لیست مراقبت'}"
+            "b.onclick=function(){var a=g();if(a.indexOf(c)>=0)a=a.filter(function(x){return x!==c});else a.push(c);try{localStorage.setItem(K,JSON.stringify(a.slice(0,20)))}catch(e){}d()};d()});")
+
+
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
+    bn = BNAV.get(lang, BNAV["en"])
+    bnav = ('<nav class="bnav" aria-label="bottom">' + "".join(f'<a href="{h}"><span>{ic}</span><small>{bn[i]}</small></a>' for i, (h, ic) in enumerate((("/", "🏠"), ("/#intel", "🧠"), ("/battle/", "⚔️"), ("/learn/", "🎓"), ("/me/", "👤")))) + "</nav>")
+    extra_head = extra_head + crumbs_ld(body, title, url, lang)
     doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
@@ -157,7 +191,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <style>{CSS}</style>{extra_head}</head><body>
 <header><div class="w"><a class="logo" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab<b>.net</b></span></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
 <main class="w">{body}</main>
-<footer><div class="w">{FOOT.get(lang, FOOT["fa"])}</div></footer><script>{RECENT_JS}</script></body></html>"""
+<footer><div class="w">{FOOT.get(lang, FOOT["fa"])}</div></footer>{bnav}<script>{RECENT_JS}{WATCH_JS}</script></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
@@ -397,7 +431,9 @@ def build_coin(c, cposts):
         except Exception:  # noqa: BLE001
             return False
     n24, n7, n30 = (sum(1 for p in cposts if within(p, d)) for d in (1, 7, 30))
-    body = f'<div class="meta"><a href="/coins/">کوین‌ها</a> / {c}</div><h1>{e(name)} ({c})</h1>'
+    body = (f'<div class="meta"><a href="/coins/">کوین‌ها</a> / {c}</div><h1>{e(name)} ({c})</h1>'
+            f'<p class="acts"><button class="wbtn" data-watch="{c}" type="button">⭐ <span>افزودن به لیست مراقبت</span></button> '
+            f'<a class="wbtn" href="/tools/?cmp={",".join([c] + [x for x in ("BTC", "ETH", "SOL") if x != c][:2])}#compare">⚖️ مقایسه با کوین‌های اصلی</a> <a class="wbtn" href="/me/?paper={c}#paper">📝 معاملهٔ آزمایشی</a></p>')
     tv = TV.get(c, f"BINANCE:{c}USDT")
     body += f'''<div class="tv"><div class="tradingview-widget-container" style="height:100%"><div class="tradingview-widget-container__widget" style="height:100%"></div>
 <script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{json.dumps({"autosize": True, "symbol": tv, "interval": "60", "theme": "dark", "style": "1", "locale": "en", "backgroundColor": "rgba(18,18,18,1)", "allow_symbol_change": False, "save_image": False, "support_host": "https://www.tradingview.com"})}</script></div></div>'''
@@ -433,10 +469,15 @@ def build_coin(c, cposts):
         body += f'<h2>کارنامهٔ پست‌ها</h2><p class="txt">در {len(ims)} پست اخیر دربارهٔ {c}، قیمت ۲۴ ساعت بعد از انتشار به‌طور میانگین <b class="{"up" if avg > 0 else "down"}">{avg:+.2f}%</b> حرکت کرد و در {upn} مورد ({upn*100//len(ims)}٪) بالاتر بود.</p>'
     body += "<h2>آخرین مطالب</h2><ul class=list>" + "".join(
         f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a><small>{fmt_date(p.get("date",""))} · {e(CATS.get(p["category"],{}).get("name",{}).get("fa",""))}</small></li>' for p in cposts[:60]) + "</ul>"
+    faq = [("امتیاز Entekhab برای " + c + " چطور محاسبه می‌شود؟", "امتیاز (۰ تا ۱۰۰) جمع وزنی چهار جزء است: تکنیکال (RSI، روند و فاصله از سقف و کف ۴۸ ساعته)، احساسات بازار (شاخص ترس و طمع)، اخبار ۴۸ ساعت اخیر و کارنامهٔ پست‌های کانال. وزن‌ها و سهم هر جزء در همین صفحه نمایش داده می‌شود. امتیاز توصیف وضعیت فعلی است، نه پیش‌بینی."),
+           ("داده‌های این صفحه هر چند وقت به‌روز می‌شوند؟", "قیمت و تغییرات ۲۴ ساعته به‌صورت زنده از Binance می‌آیند؛ اسکنر تکنیکال، امتیاز و اخبار هر ۱۵ دقیقه با GitHub Actions بازسازی می‌شوند و زمان آخرین به‌روزرسانی کنار هر بخش نوشته شده است."),
+           ("آیا این صفحه توصیهٔ خرید یا فروش " + c + " است؟", "خیر. همهٔ اعداد و یافته‌ها توصیف خودکار وضعیت بازار برای آموزش‌اند و کارنامهٔ واقعی هر الگو در صفحهٔ شفافیت منتشر می‌شود. تصمیم و مدیریت ریسک با خود شماست.")]
+    body += "<h2>پرسش‌های متداول</h2>" + "".join(f'<details class="faq"><summary>{e(q)}</summary><p class="txt">{e(a)}</p></details>' for q, a in faq)
+    faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
     desc = f"{name}: قیمت زنده، تحلیل تکنیکال، فرصت‌های اسکنر و {len(cposts)} مطلب مرتبط در entekhab.net"
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{name} ({c})", "about": {"@type": "Thing", "name": name}, "url": f"{SITE}/coins/{c.lower()}/"}
     return page(f"coins/{c.lower()}/", f"{name} ({c}) — قیمت، تحلیل و اخبار", desc, body,
-                f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><script src="/assets/live.js" defer></script>')
+                f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><script type="application/ld+json">{json.dumps(faq_ld, ensure_ascii=False)}</script><script src="/assets/live.js" defer></script>')
 
 
 def main():
@@ -460,7 +501,7 @@ def main():
     body = "<h1>کوین‌ها</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر و مطالب مرتبط.</p><div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "کوین‌ها — پروفایل ارزهای دیجیتال", "فهرست ارزهای دیجیتال با قیمت زنده، تحلیل و آرشیو مطالب", body), market.get("updated_at")))
-    for pth in ("lab/", "dna/", "terminal/", "developers/", "status/", "weekly/"):
+    for pth in ("lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "me/"):
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
@@ -468,7 +509,7 @@ def main():
         sm.append(f"<url><loc>{e(u)}</loc>{lm}</url>")
     sm.append("</urlset>")
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write("\n".join(sm))
-    open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
+    open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /me/\nDisallow: /offline.html\nSitemap: {SITE}/sitemap.xml\n")
     print(f"pages={len(urls)} posts={len(posts)} coins={len(order)}")
 
 
@@ -1037,7 +1078,7 @@ def build_learn():
         rel = [g for g in LD.GLOSSARY if g[1] == grp and g[0] != slug][:8]
         exh = ("<ul class=list>" + "".join(f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a> <small class="note">{fmt_date(p.get("date", ""))}</small></li>' for p in ex) + "</ul>"
                if ex else '<p class="note">هنوز مثالی از این اصطلاح در آرشیو کانال پیدا نشد.</p>')
-        body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/glossary/">واژه‌نامه</a> / {e(LD.GROUPS[grp]["fa"])}</div>'
+        body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/glossary/">واژه‌نامه</a> / {e(fat)}</div>'
                 f'<h1>{e(fat)} <small class="note" dir="ltr">— {e(et)}</small></h1><p class="txt">{e(fad)}</p>'
                 f'<h2 lang="ckb">کوردی: {e(kt)}</h2><p class="txt" lang="ckb">{e(kd)}</p>'
                 f'<h2 dir="ltr" lang="en">English: {e(et)}</h2><p class="txt" dir="ltr" lang="en">{e(ed)}</p>'
