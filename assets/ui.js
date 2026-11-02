@@ -24,9 +24,9 @@ function bgPaint(x, W, H) {
 }
 function wrapText(x, t, cx, y, w, lh) { let line = ''; for (const wd of String(t).split(' ')) { const tt = line ? line + ' ' + wd : wd; if (x.measureText(tt).width > w && line) { x.fillText(line, cx, y); y += lh; line = wd; } else line = tt; } x.fillText(line, cx, y); return y; }
 const NAV = {
-  fa: [['/', 'خانه'], ['/lab/', 'آزمایشگاه'], ['/dna/', 'DNA بازار'], ['/terminal/', 'ترمینال'], ['/me/', 'فضای من'], ['/dashboard/', 'داشبورد']],
-  ckb: [['/', 'ماڵەوە'], ['/lab/', 'تاقیگە'], ['/dna/', 'DNAی بازاڕ'], ['/terminal/', 'تێرمیناڵ'], ['/me/', 'بۆشاییی من'], ['/dashboard/', 'داشبۆرد']],
-  en: [['/', 'Home'], ['/lab/', 'Lab'], ['/dna/', 'Market DNA'], ['/terminal/', 'Terminal'], ['/me/', 'My space'], ['/dashboard/', 'Dashboard']]
+  fa: [['/', 'خانه'], ['/indicators/', 'اندیکاتورها'], ['/lab/', 'آزمایشگاه'], ['/dna/', 'DNA بازار'], ['/terminal/', 'ترمینال'], ['/me/', 'فضای من'], ['/dashboard/', 'داشبورد']],
+  ckb: [['/', 'ماڵەوە'], ['/indicators/', 'ئیندیکاتۆرەکان'], ['/lab/', 'تاقیگە'], ['/dna/', 'DNAی بازاڕ'], ['/terminal/', 'تێرمیناڵ'], ['/me/', 'بۆشاییی من'], ['/dashboard/', 'داشبۆرد']],
+  en: [['/', 'Home'], ['/indicators/', 'Indicators'], ['/lab/', 'Lab'], ['/dna/', 'Market DNA'], ['/terminal/', 'Terminal'], ['/me/', 'My space'], ['/dashboard/', 'Dashboard']]
 };
 function uiLang(onChange) {
   const apply = () => {
