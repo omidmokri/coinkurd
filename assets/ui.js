@@ -45,6 +45,7 @@ function uiLang(onChange) {
   if (days[days.length - 1] !== d) { days.push(d); ls.set('ek_days', days.slice(-400)); }
   const pg = ls.get('ek_pages', []);
   if (!pg.includes(location.pathname)) { pg.push(location.pathname); ls.set('ek_pages', pg.slice(-60)); }
+  if (location.pathname !== '/me/') { const rc = ls.get('ek_recent', []).filter(x => x && x.p !== location.pathname); rc.unshift({ p: location.pathname, t: document.title.replace(/\s*\|\s*entekhab\.net\s*$/i, ''), at: Date.now() }); ls.set('ek_recent', rc.slice(0, 30)); }
 })();
 function streak() { const days = ls.get('ek_days', []); let s = 0, cur = new Date(); cur.setUTCHours(0, 0, 0, 0); const set = new Set(days);
   for (; ;) { const k = cur.toISOString().slice(0, 10); if (set.has(k)) { s++; cur.setUTCDate(cur.getUTCDate() - 1); } else break; } return s; }
