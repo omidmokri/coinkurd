@@ -4,6 +4,9 @@ import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch import split_footer  # noqa: E402
 P = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
+# Discord invites in older posts have expired; this permanent invite of the COIN_KURD server still works (checked 2026-11-02)
+DISCORD = "https://discord.gg/TtT2BHmZyJ"
+DISCORD_RE = re.compile(r"https?://(?:www\.)?(?:discord\.gg|discord(?:app)?\.com/invite)/[\w-]+", re.I)
 ps = json.load(open(P, encoding="utf-8"))
 n = 0
 for p in ps:
@@ -24,5 +27,15 @@ for p in ps:
             break
     if title:
         p["title"] = title
+    for f in p.get("footer") or []:
+        if DISCORD_RE.fullmatch(f.get("url", "")):
+            f["url"] = DISCORD
+    if DISCORD_RE.search(p["text"]):
+        p["text"] = DISCORD_RE.sub(DISCORD, p["text"])
+    for lg in (p.get("tr") or {}).values():
+        if isinstance(lg, dict) and DISCORD_RE.search(lg.get("text") or ""):
+            lg["text"] = DISCORD_RE.sub(DISCORD, lg["text"])
+    if isinstance(p.get("link"), dict) and DISCORD_RE.fullmatch(p["link"].get("url") or ""):
+        p["link"]["url"] = DISCORD
 json.dump(ps, open(P, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(f"repaired {n}; with footer {sum(1 for p in ps if p.get('footer'))}")
