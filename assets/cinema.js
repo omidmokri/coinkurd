@@ -102,18 +102,19 @@ void main(){vec2 d=gl_PointCoord-.5;float r=length(d);if(r>.5)discard;float a=sm
   /* ---------------- dust: particles that form the coin ---------------- */
   const N = low ? 4200 : 13000;
   const BH_POS = new THREE.Vector3(0, 0, -10), TILT = 0.16;
-  const dustU = { uTime: { value: 0 }, uMix: { value: 0 }, uMix2: { value: 0 }, uPhase: { value: 0 }, uSize: { value: low ? 0.3 : 0.2 }, uPR: { value: PR }, uOp: { value: 0 }, uBH: { value: BH_POS.clone() }, uTilt: { value: TILT } };
-  const DUST_VS = `uniform float uTime,uMix,uMix2,uPhase,uSize,uPR,uOp,uTilt;uniform vec3 uBH;
+  const dustU = { uTime: { value: 0 }, uMix: { value: 0 }, uMix2: { value: 0 }, uPhase: { value: 0 }, uSize: { value: low ? 0.3 : 0.2 }, uPR: { value: PR }, uOp: { value: 0 }, uBH: { value: BH_POS.clone() }, uTilt: { value: TILT }, uCoinM: { value: new THREE.Matrix4() } };
+  const DUST_VS = `uniform float uTime,uMix,uMix2,uPhase,uSize,uPR,uOp,uTilt;uniform vec3 uBH;uniform mat4 uCoinM;
 attribute vec3 aStart,aColor;attribute float aRand,aDR,aDA;varying vec3 vC;varying float vA;
 float eio(float x){return x<.5?4.*x*x*x:1.-pow(-2.*x+2.,3.)/2.;}
 void main(){
   float an=aDA+uTime*(2.4/pow(aDR,1.1));
   vec3 dp=vec3(cos(an)*aDR,0.,sin(an)*aDR);float c=cos(uTilt),s=sin(uTilt);
   dp=uBH+vec3(dp.x,dp.y*c-dp.z*s,dp.y*s+dp.z*c);
-  vec3 from=mix(aStart,dp,uPhase);
+  vec3 from=mix((uCoinM*vec4(aStart,1.)).xyz,dp,uPhase);
+  vec3 to=(uCoinM*vec4(position,1.)).xyz;
   float m=mix(uMix,uMix2,uPhase);
   float p=eio(clamp(m*1.45-aRand*.45,0.,1.));
-  vec3 pos=mix(from,position,p);
+  vec3 pos=mix(from,to,p);
   float sw=sin(p*3.14159);
   pos+=vec3(sin(uTime*1.7+aRand*50.),cos(uTime*1.3+aRand*37.),sin(uTime*.9+aRand*21.))*(sw*.6+(1.-p)*(1.-uPhase)*.35);
   vec4 mv=modelViewMatrix*vec4(pos,1.);
@@ -153,7 +154,7 @@ void main(){
     geo.setAttribute('aColor', new THREE.BufferAttribute(C, 3)); geo.setAttribute('aRand', new THREE.BufferAttribute(Rn, 1));
     geo.setAttribute('aDR', new THREE.BufferAttribute(DR, 1)); geo.setAttribute('aDA', new THREE.BufferAttribute(DA, 1));
     dust = new THREE.Points(geo, new THREE.ShaderMaterial({ uniforms: dustU, vertexShader: DUST_VS, fragmentShader: PT_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
-    dust.frustumCulled = false; coin.add(dust);
+    dust.frustumCulled = false; scene.add(dust);   // world space: targets follow the coin via uCoinM
   }
   const coinImg = new Image();
   coinImg.onload = () => buildDust(coinImg);
@@ -280,6 +281,7 @@ vC=mix(vec3(1.,.55,.1),vec3(1.,.93,.75),clamp((aS-1.)/4.,0.,1.));vA=uOp*(.75+.25
   /* ---------------- black hole ---------------- */
   const bh = new THREE.Group(); bh.position.copy(BH_POS); bh.visible = false; scene.add(bh);
   const HR = 4.2;
+  const RING_C = new THREE.Vector3(0, 0, BH_POS.z - 0.5), RING_FIT = HR * 1.02;   // coin fills the white photon ring
   bh.add(new THREE.Mesh(new THREE.SphereGeometry(HR, 64, 48), new THREE.MeshBasicMaterial({ color: 0x000000 })));
   const DISK_VS = 'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
   const DISK_FS = `uniform float uTime,uIn,uOut,uOp;varying vec2 vP;${NOISE}
@@ -402,13 +404,14 @@ float x=(r-uIn)/span;vA=uOp*(1.-x)*smoothstep(0.,.08,x)*smoothstep(1.,.85,x);vC=
     smx += (mx - smx) * 0.05; smy += (my - smy) * 0.05;
     const A = t < 8, B = t >= 8 && t < 15.5, C = t >= 15.5;
     coin.visible = A || C; tunnel.visible = B && t < 12.8; globe.visible = B && t > 9; bh.visible = C;
+    if (dust) dust.visible = coin.visible;
     stars.material.opacity = A ? 0.9 * S(t, 0, 2) : B ? 0.55 : 0.85;
     scene.fog.density = B && t < 12 ? 0.028 * (1 - S(t, 11, 12)) : 0.00001;
     let fov = 40, flash = 0, flashBg = '#000', bloomS = 1.0, k = 0;
     if (A) {
       dustU.uPhase.value = 0; dustU.uOp.value = S(t, 0.2, 2) * (1 - 0.72 * S(t, 5.2, 6.4)); dustU.uMix.value = EIO(S(t, 2.5, 5.8));
       setCoinOp(S(t, 5, 6.2)); glow.material.opacity = 0.9 * S(t, 4.6, 6.2);
-      coin.position.set(0, 0, 0);
+      coin.position.set(0, 0, 0); coin.scale.setScalar(1);
       coin.rotation.set(Math.sin(uT * 0.7) * 0.08 * (1 - S(t, 6, 6.6)), (1 - EIO(S(t, 2.2, 6.4))) * Math.PI * 1.5, 0);
       const z = t < 6 ? lerp(18, 13.5, SN(S(t, 0, 6))) : lerp(13.5, 1.15, EI(S(t, 6, 8)));
       cam.position.set(0, 0, z); look.set(0, 0, 0);
@@ -448,12 +451,16 @@ float x=(r-uIn)/span;vA=uOp*(1.-x)*smoothstep(0.,.08,x)*smoothstep(1.,.85,x);vC=
       halo.quaternion.copy(cam.quaternion);
       dustU.uPhase.value = 1; dustU.uMix2.value = EIO(S(t, 17.2, 20.4)); dustU.uOp.value = S(t, 15.6, 16.6) * (1 - 0.78 * S(t, 20, 21.5));
       setCoinOp(S(t, 19.6, 21)); glow.material.opacity = 0.7 * S(t, 19.6, 21);
-      coin.position.set(0, 0, 0);
-      coin.rotation.set(Math.sin(uT * 0.6) * 0.1 * idle, t < 21 ? 0 : Math.sin((t - 21) * 0.32) * 0.55 + smx * 0.7, 0);
+      { // keep the coin concentric with the white ring and exactly its size, whatever the camera does
+        const f = cam.position.z / (cam.position.z - RING_C.z);
+        coin.position.copy(cam.position).lerp(RING_C, f); coin.scale.setScalar(RING_FIT * f / CR);
+      }
+      coin.rotation.set(Math.sin(uT * 0.6) * 0.06 * idle, t < 21 ? 0 : Math.sin((t - 21) * 0.32) * 0.3 + smx * 0.35, 0);
       backL.intensity = 2.6 * S(t, 19, 21);
       flash = 1 - S(t, 15.5, 16.3); flashBg = '#000'; bloomS = lerp(0.9, 0.55, S(t, 18, 21));
       k = (aspect > 1 ? 0.045 : 0.12) * EIO(S(t, 19, 22.5));
     }
+    coin.updateMatrixWorld(); dustU.uCoinM.value.copy(coin.matrixWorld);
     if (Math.abs(fov - lastFov) > 0.01 || Math.abs(k - viewK) > 0.0005) {
       cam.fov = fov; lastFov = fov; viewK = k;
       const w = hero.clientWidth, h = hero.clientHeight;
