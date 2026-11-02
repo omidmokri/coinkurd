@@ -900,6 +900,7 @@ def main():
     setup_commands()
     s = load_state()
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
+    F.start(s, group_send, group_delete, GROUP, MAIN_WT)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
@@ -920,8 +921,9 @@ def main():
         try:
             dirty |= check_alerts(s)
             dirty |= minute_jobs(s)
-            dirty |= F.run(s, group_send, group_delete, GROUP)
-            F.export_site(s, MAIN_WT)
+            if F.DIRTY.is_set():
+                F.DIRTY.clear()
+                dirty = True
             dirty |= maybe_brief(s)
         except Exception:
             log.exception("periodic job failed")
