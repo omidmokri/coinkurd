@@ -1,39 +1,52 @@
 """
-Coin_Kurd referral bot — runs inside GitHub Actions (no server needed).
+Coin_Kurd / Entekhab Telegram bot — runs inside GitHub Actions (no server).
 
-Each run long-polls Telegram for RUN_SECONDS, then exits; the workflow
-commits data/bot/referrals.json so state survives between runs.
-Only `requests` (already in requirements.txt) is needed.
+Brings every section of entekhab.net into Telegram (market, brain, coin cards,
+scanner, score, news, narratives, calendar, AI council, derivatives, lab,
+cycle, on-chain, flows, DNA, track record, indicators, channel archive search)
+in Persian, Sorani Kurdish and English, plus price alerts, a daily brief,
+the referral programme and the group join-gate.
 
-Env:
-  REF_BOT_TOKEN   bot token (falls back to TG_BOT_TOKEN)
-  CHANNEL         @Coin_Kurd            channel to check membership in
-  CHANNEL_LINK    https://t.me/Coin_Kurd
-  GROUP           @Coin_Kurd_Group      group with join-gate ("" = off)
-  ADMIN_IDS       comma-separated numeric ids
-  REWARD_AT       5
-  REWARD_TEXT     message sent to the referrer when REWARD_AT is reached
-  RUN_SECONDS     840
+Each run long-polls Telegram for RUN_SECONDS, then exits. State (users, points,
+alerts, language) lives in a JSON file that the workflow keeps on the
+`refbot-state` branch; it is also pushed every STATE_PUSH_EVERY seconds.
 """
-import json, logging, os, sys, time, urllib.parse
+import json
+import logging
+import os
+import subprocess
+import sys
+import time
+import urllib.parse
+from datetime import datetime, timezone
+
 import requests
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import bot_data as D  # noqa: E402
+from bot_i18n import LANGS, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
 CHANNEL = os.environ.get("CHANNEL", "@Coin_Kurd")
 CHANNEL_LINK = os.environ.get("CHANNEL_LINK", "https://t.me/Coin_Kurd")
 GROUP = os.environ.get("GROUP", "@Coin_Kurd_Group").strip()
 ADMIN_IDS = {int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip().lstrip("-").isdigit()}
-REWARD_AT = int(os.environ.get("REWARD_AT", "5"))
+REWARD_AT = int(os.environ.get("REWARD_AT") or "5")
 REWARD_TEXT = os.environ.get("REWARD_TEXT") or "🎁 تبریک! به {n} دعوت رسیدی. برای دریافت پاداش به ادمین پیام بده."
 RUN_SECONDS = int(os.environ.get("RUN_SECONDS", "840"))
 STATE = os.environ.get("STATE_PATH", "data/bot/referrals.json")
 PUBLIC = os.environ.get("PUBLIC_PATH", "data/bot/leaderboard.json")
+STATE_GIT = os.environ.get("STATE_GIT", "")              # dir of a git checkout to push periodically
+STATE_PUSH_EVERY = int(os.environ.get("STATE_PUSH_EVERY", "600"))
+BRIEF_HOUR = int(os.environ.get("BRIEF_HOUR_UTC", "5"))   # 05:00 UTC ≈ 08:30 Tehran
 API = f"https://api.telegram.org/bot{TOKEN}/"
+MAX_ALERTS = 10
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("refbot")
 
-# ------------------------------------------------------------------ state
+
+# ================================================================== state
 def load_state():
     try:
         with open(STATE, encoding="utf-8") as f:
@@ -41,202 +54,559 @@ def load_state():
     except (FileNotFoundError, json.JSONDecodeError):
         s = {}
     s.setdefault("offset", 0)
-    s.setdefault("users", {})          # uid(str) -> {username, name, referrer, joined, created}
+    s.setdefault("users", {})   # uid -> {username,name,referrer,joined,created,lang,brief,alerts,rewarded}
+    s.setdefault("last_brief", "")
     return s
 
+
 def save_state(s):
-    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    d = os.path.dirname(STATE)
+    if d:
+        os.makedirs(d, exist_ok=True)
     tmp = STATE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(s, f, ensure_ascii=False, indent=1)
     os.replace(tmp, STATE)
-    # public leaderboard (no ids) for the website
     with open(PUBLIC, "w", encoding="utf-8") as f:
-        json.dump({"updated": int(time.time()), "reward_at": REWARD_AT,
+        json.dump({"updated": int(time.time()), "reward_at": REWARD_AT, "users": len(s["users"]),
                    "top": [{"name": n, "points": p} for _, n, p in leaderboard(s, 20)]},
                   f, ensure_ascii=False, indent=1)
 
-def upsert(s, user, referrer=None):
-    uid = str(user["id"])
-    u = s["users"].get(uid)
-    if u is None:
+
+def push_state():
+    if not STATE_GIT:
+        return
+    try:
+        run = lambda *a: subprocess.run(["git", "-C", STATE_GIT, *a], capture_output=True, text=True, timeout=60)
+        run("add", "-A")
+        if run("diff", "--cached", "--quiet").returncode == 0:
+            return
+        run("commit", "-q", "-m", f"refbot state {datetime.now(timezone.utc):%Y-%m-%d %H:%M} UTC")
+        r = run("push", "-q", "origin", "HEAD:refbot-state")
+        log.info("state pushed (%s)", "ok" if r.returncode == 0 else r.stderr.strip()[:200])
+    except Exception as ex:
+        log.warning("push_state failed: %s", ex)
+
+
+def user(s, uid):
+    return s["users"].get(str(uid))
+
+
+def upsert(s, u, referrer=None):
+    uid = str(u["id"])
+    x = s["users"].get(uid)
+    if x is None:
         if referrer is not None and str(referrer) == uid:
-            referrer = None                     # no self-referral
-        s["users"][uid] = {"username": user.get("username"), "name": user.get("first_name", ""),
-                           "referrer": referrer, "joined": False, "created": int(time.time())}
+            referrer = None
+        lc = (u.get("language_code") or "").lower()
+        lang = "en" if lc.startswith("en") else "fa"
+        x = s["users"][uid] = {"username": u.get("username"), "name": u.get("first_name", ""),
+                               "referrer": referrer, "joined": False, "created": int(time.time()),
+                               "lang": lang}
     else:
-        u["username"] = user.get("username"); u["name"] = user.get("first_name", "")
+        x["username"], x["name"] = u.get("username"), u.get("first_name", "")
+    x.setdefault("lang", "fa")
+    x.setdefault("alerts", [])
+    x.setdefault("brief", False)
+    return x
+
+
+def lang_of(s, uid):
+    x = user(s, uid)
+    return (x or {}).get("lang", "fa")
+
 
 def mark_joined(s, uid):
-    """Returns referrer id the first time this user is confirmed, else None."""
-    u = s["users"].get(str(uid))
-    if not u or u["joined"]:
+    x = user(s, uid)
+    if not x or x["joined"]:
         return None
-    u["joined"] = True
-    return u["referrer"]
+    x["joined"] = True
+    return x["referrer"]
+
 
 def points(s, uid):
-    return sum(1 for u in s["users"].values() if u["referrer"] == uid and u["joined"])
+    return sum(1 for x in s["users"].values() if x["referrer"] == uid and x["joined"])
+
 
 def leaderboard(s, n=10):
     counts = {}
-    for u in s["users"].values():
-        if u["joined"] and u["referrer"] is not None:
-            counts[u["referrer"]] = counts.get(u["referrer"], 0) + 1
+    for x in s["users"].values():
+        if x["joined"] and x["referrer"] is not None:
+            counts[x["referrer"]] = counts.get(x["referrer"], 0) + 1
     rows = []
-    for uid, p in sorted(counts.items(), key=lambda x: -x[1])[:n]:
+    for uid, p in sorted(counts.items(), key=lambda kv: -kv[1])[:n]:
         info = s["users"].get(str(uid), {})
         name = f"@{info['username']}" if info.get("username") else (info.get("name") or str(uid))
         rows.append((uid, name, p))
     return rows
 
-# ------------------------------------------------------------------ telegram
+
+# ================================================================== telegram
 def tg(method, **params):
     try:
         r = requests.post(API + method, json=params, timeout=60)
         data = r.json()
-        if not data.get("ok"):
+        if not data.get("ok") and "message is not modified" not in str(data.get("description")):
             log.warning("%s -> %s", method, data.get("description"))
         return data
-    except Exception as e:
-        log.warning("%s failed: %s", method, e)
+    except Exception as ex:
+        log.warning("%s failed: %s", method, ex)
         return {"ok": False}
 
-def send(chat_id, text, kb=None, **kw):
-    p = dict(chat_id=chat_id, text=text, parse_mode="HTML", disable_web_page_preview=True, **kw)
-    if kb: p["reply_markup"] = kb
+
+def send(chat_id, text, kb=None, preview=False, **kw):
+    p = dict(chat_id=chat_id, text=text, parse_mode="HTML",
+             link_preview_options={"is_disabled": not preview}, **kw)
+    if kb:
+        p["reply_markup"] = kb
     return tg("sendMessage", **p)
+
+
+def edit(chat_id, mid, text, kb=None):
+    p = dict(chat_id=chat_id, message_id=mid, text=text, parse_mode="HTML",
+             link_preview_options={"is_disabled": True})
+    if kb:
+        p["reply_markup"] = kb
+    r = tg("editMessageText", **p)
+    if not r.get("ok") and "not modified" not in str(r.get("description")):
+        send(chat_id, text, kb)
+
 
 def is_member(uid):
     d = tg("getChatMember", chat_id=CHANNEL, user_id=uid)
-    return d.get("ok") and d["result"]["status"] in ("member", "administrator", "creator")
+    return bool(d.get("ok")) and d["result"]["status"] in ("member", "administrator", "creator")
 
-def join_kb():
-    return {"inline_keyboard": [[{"text": "📢 عضویت در کانال Coin_Kurd", "url": CHANNEL_LINK}],
-                                [{"text": "✅ عضو شدم", "callback_data": "check"}]]}
 
-def main_kb(link):
-    share = "https://t.me/share/url?" + urllib.parse.urlencode(
-        {"url": link, "text": "تحلیل روزانه کریپتو به فارسی و کوردی 📊"})
-    return {"inline_keyboard": [
-        [{"text": "🔗 لینک دعوت من", "callback_data": "mylink"}],
-        [{"text": "📊 امتیاز من", "callback_data": "score"}, {"text": "🏆 برترین‌ها", "callback_data": "top"}],
-        [{"text": "↗️ اشتراک‌گذاری لینک", "url": share}]]}
-
-def welcome(link, p):
-    return (f"سڵاو / سلام 👋\n\nبا دعوت دوستانت به کانال <b>Coin_Kurd</b> امتیاز بگیر.\n"
-            f"هر دوستی که با لینک تو عضو کانال شود = ۱ امتیاز.\n"
-            f"با <b>{REWARD_AT}</b> امتیاز پاداش می‌گیری.\n\n"
-            f"🔗 لینک دعوت تو:\n<code>{link}</code>\n\n📊 امتیاز فعلی: <b>{p}</b>")
-
-def format_top(s):
-    rows = leaderboard(s)
-    if not rows:
-        return "هنوز کسی امتیازی نگرفته. اولین نفر باش! 🚀"
-    medals = ["🥇", "🥈", "🥉"]
-    out = ["🏆 <b>برترین دعوت‌کننده‌ها</b>\n"]
-    for i, (_, name, p) in enumerate(rows):
-        out.append(f"{medals[i] if i < 3 else str(i+1)+'.'} {name} — <b>{p}</b>")
-    return "\n".join(out)
-
-# ------------------------------------------------------------------ handlers
 BOT_USERNAME = None
+
+
 def invite_link(uid):
     return f"https://t.me/{BOT_USERNAME}?start={uid}"
 
-def after_verified(s, uid, chat_id, edit_msg_id=None):
+
+# ================================================================== keyboards
+def btn(text, data=None, url=None):
+    return {"text": text, "url": url} if url else {"text": text, "callback_data": data}
+
+
+def kb_main(lang):
+    b = lambda k, d: btn(t(k, lang), d)
+    rows = [
+        [b("b_market", "m:mkt"), b("b_brain", "m:brain")],
+        [b("b_coin", "m:coin"), b("b_opps", "m:opps")],
+        [b("b_movers", "m:movers"), b("b_score", "m:score")],
+        [b("b_news", "m:news"), b("b_narr", "m:narr")],
+        [b("b_events", "m:events"), b("b_council", "m:council")],
+        [b("b_deriv", "m:deriv"), b("b_lab", "m:lab")],
+        [b("b_cycle", "m:cycle"), b("b_chain", "m:chain")],
+        [b("b_flows", "m:flows"), b("b_week", "m:week")],
+        [b("b_posts", "m:posts"), b("b_track", "m:track")],
+        [b("b_ind", "m:ind"), b("b_alerts", "m:alerts")],
+        [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
+        [btn(t("b_site", lang), url=D.SITE)],
+    ]
+    return {"inline_keyboard": rows}
+
+
+def kb_lab(lang):
+    b = lambda k, d: btn(t(k, lang), d)
+    return {"inline_keyboard": [
+        [b("b_mc", "m:mc"), b("b_mem", "m:mem")],
+        [b("b_vol", "m:vol"), b("b_opt", "m:opt")],
+        [b("b_xex", "m:xex"), b("b_dev", "m:dev")],
+        [b("b_macro", "m:macro"), b("b_dna", "m:dna")],
+        [btn(t("b_more", lang), url=D.SITE + "/lab/"), b("b_back", "m:main")]]}
+
+
+def kb_back(lang, refresh=None, more=None):
+    row = []
+    if refresh:
+        row.append(btn(t("b_refresh", lang), refresh))
+    row.append(btn(t("b_back", lang), "m:main"))
+    rows = [row]
+    if more:
+        rows.insert(0, [btn(t("b_more", lang), url=more)])
+    return {"inline_keyboard": rows}
+
+
+def kb_coins(lang):
+    pick = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "ADA", "LINK", "AVAX", "SUI", "LTC", "HYPE"]
+    rows = [[btn(c, f"c:{c}") for c in pick[i:i + 4]] for i in range(0, len(pick), 4)]
+    rows.append([btn(t("b_back", lang), "m:main")])
+    return {"inline_keyboard": rows}
+
+
+def kb_coin(coin, lang):
+    return {"inline_keyboard": [
+        [btn("🎯", f"co:{coin}"), btn("📰", f"cn:{coin}"), btn("📢", f"cp:{coin}"), btn("🧬", f"cd:{coin}"),
+         btn("🔔", f"ca:{coin}"), btn(t("b_refresh", lang)[:2], f"c:{coin}")],
+        [btn(t("b_more", lang), url=D.coin_url(coin)), btn(t("b_back", lang), "m:main")]]}
+
+
+def kb_lang():
+    return {"inline_keyboard": [[btn("فارسی", "l:fa"), btn("کوردی", "l:ckb"), btn("English", "l:en")]]}
+
+
+def kb_join(lang):
+    return {"inline_keyboard": [[btn(t("b_join", lang), url=CHANNEL_LINK)], [btn(t("b_joined", lang), "check")]]}
+
+
+def kb_ref(uid, lang):
+    link = invite_link(uid)
+    share = "https://t.me/share/url?" + urllib.parse.urlencode({"url": link, "text": t("share_text", lang)})
+    return {"inline_keyboard": [[btn(t("b_share", lang), url=share)],
+                                [btn(t("b_top", lang), "m:top"), btn(t("b_back", lang), "m:main")]]}
+
+
+def kb_alerts(s, uid, lang):
+    x = user(s, uid) or {}
+    sub = x.get("brief")
+    rows = [[btn(t("b_sub_off" if sub else "b_sub_on", lang), "brief")]]
+    for i, a in enumerate(x.get("alerts", []), 1):
+        rows.append([btn(f"🗑 {i}. {a['coin']} {'≥' if a['op'] == '>' else '≤'} {D.fp(a['price'])}", f"ad:{i}")])
+    rows.append([btn(t("b_back", lang), "m:main")])
+    return {"inline_keyboard": rows}
+
+
+# ================================================================== sections
+SECTIONS = {
+    "mkt": (D.sec_market, "/dashboard/"), "brain": (D.sec_brain, "/dashboard/"),
+    "opps": (D.sec_opps, "/dashboard/"), "movers": (D.sec_movers, "/dashboard/"),
+    "score": (D.sec_score, "/coins/"), "news": (D.sec_news, "/"), "narr": (D.sec_narr, "/dashboard/"),
+    "events": (D.sec_events, "/dashboard/"), "council": (D.sec_council, "/lab/"),
+    "deriv": (D.sec_deriv, "/terminal/"), "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
+    "flows": (D.sec_flows, "/terminal/"), "week": (D.sec_week, "/"), "track": (D.sec_track, "/status/"),
+    "ind": (D.sec_ind, "/indicators/"), "posts": (D.sec_posts, "/"),
+    "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
+    "opt": (D.sec_opt, "/lab/"), "xex": (D.sec_xex, "/lab/"), "dev": (D.sec_dev, "/lab/"),
+    "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
+}
+LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
+
+
+def render(s, uid, key):
+    """-> (text, keyboard) for a menu key"""
+    lang = lang_of(s, uid)
+    if key == "main":
+        return t("menu_title", lang), kb_main(lang)
+    if key == "lab":
+        return f"🧪 <b>{t('b_lab', lang)[2:]}</b>", kb_lab(lang)
+    if key == "coin":
+        return t("ask_coin", lang), kb_coins(lang)
+    if key == "lang":
+        return t("choose_lang", lang), kb_lang()
+    if key == "ref":
+        return t("ref_text", lang, goal=REWARD_AT, link=invite_link(uid), p=points(s, uid)), kb_ref(uid, lang)
+    if key == "top":
+        return format_top(s, lang), kb_back(lang)
+    if key == "alerts":
+        x = user(s, uid) or {}
+        head = f"🔔 <b>{t('b_alerts', lang)[2:]}</b>"
+        if not x.get("alerts"):
+            head += "\n" + t("alert_none", lang)
+        return head + "\n\n" + t("alert_usage", lang), kb_alerts(s, uid, lang)
+    if key in SECTIONS:
+        fn, path = SECTIONS[key]
+        try:
+            text = fn(lang)
+        except Exception:
+            log.exception("section %s failed", key)
+            text = t("no_data", lang)
+        if key == "posts":
+            text += "\n\n" + t("search_hint", lang)
+        if key in LAB:
+            return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key), btn(t("b_lab", lang), "m:lab")],
+                                              [btn(t("b_back", lang), "m:main")]]}
+        return text, kb_back(lang, refresh="m:" + key, more=D.SITE + path)
+    return t("menu_title", lang), kb_main(lang)
+
+
+def format_top(s, lang):
+    rows = leaderboard(s)
+    if not rows:
+        return t("top_empty", lang)
+    medals = ["🥇", "🥈", "🥉"]
+    out = [t("top_title", lang), ""]
+    for i, (_, name, p) in enumerate(rows):
+        out.append(f"{medals[i] if i < 3 else str(i + 1) + '.'} {D.e(name)} — <b>{p}</b>")
+    return "\n".join(out)
+
+
+def coin_card(s, uid, sym):
+    lang = lang_of(s, uid)
+    try:
+        text = D.sec_coin(sym, lang)
+    except Exception:
+        log.exception("coin card failed")
+        text = None
+    if not text:
+        return t("unknown_coin", lang) + D.e(sym.upper()), kb_coins(lang)
+    coin = D.find_coin(sym)["coin"]
+    return text, kb_coin(coin, lang)
+
+
+# ================================================================== referral flow
+def after_verified(s, uid, chat_id, edit_mid=None):
     referrer = mark_joined(s, uid)
     if referrer is not None:
         p = points(s, referrer)
-        send(referrer, f"🎉 یکی از دوستانت با لینک تو عضو شد! امتیاز: <b>{p}</b>")
-        if p == REWARD_AT:
+        rl = lang_of(s, referrer)
+        send(referrer, t("ref_new", rl, p=p))
+        r = user(s, referrer)
+        if p >= REWARD_AT and r is not None and not r.get("rewarded"):
+            r["rewarded"] = True
             send(referrer, REWARD_TEXT.format(n=REWARD_AT))
-    link = invite_link(uid)
-    text = welcome(link, points(s, uid))
-    if edit_msg_id:
-        tg("editMessageText", chat_id=chat_id, message_id=edit_msg_id, text=text,
-           parse_mode="HTML", disable_web_page_preview=True, reply_markup=main_kb(link))
+            for a in ADMIN_IDS:
+                nm = f"@{r['username']}" if r.get("username") else r.get("name")
+                send(a, f"🎁 reward reached: {D.e(nm)} (id <code>{referrer}</code>) — {p} invites")
+    text, kb = render(s, uid, "main")
+    if edit_mid:
+        edit(chat_id, edit_mid, text, kb)
     else:
-        send(chat_id, text, main_kb(link))
+        send(chat_id, text, kb)
 
+
+# ================================================================== alerts & brief
+def parse_alert(args, s, uid):
+    lang = lang_of(s, uid)
+    x = user(s, uid)
+    parts = args.split()
+    if len(parts) == 2 and parts[0].lower() in ("del", "rm", "حذف") and parts[1].isdigit():
+        i = int(parts[1]) - 1
+        if 0 <= i < len(x["alerts"]):
+            x["alerts"].pop(i)
+            return t("alert_del", lang)
+        return t("alert_none", lang)
+    if len(parts) != 2:
+        return t("alert_usage", lang)
+    sym, val = parts
+    try:
+        price = float(val.replace(",", ""))
+    except ValueError:
+        return t("alert_usage", lang)
+    c = D.find_coin(sym)
+    if not c:
+        return t("unknown_coin", lang) + D.e(sym.upper())
+    if len(x["alerts"]) >= MAX_ALERTS:
+        return t("alert_max", lang)
+    now = D.live_prices().get(c["coin"], (c.get("price"), 0))[0]
+    if not now:
+        return t("no_data", lang)
+    op = ">" if price > now else "<"
+    x["alerts"].append({"coin": c["coin"], "price": price, "op": op, "at": int(time.time())})
+    return t("alert_set", lang, coin=c["coin"], op="≥" if op == ">" else "≤", price=D.fp(price), now=D.fp(now))
+
+
+_last_alert_check = [0.0]
+
+
+def check_alerts(s):
+    if time.time() - _last_alert_check[0] < 60:
+        return False
+    _last_alert_check[0] = time.time()
+    if not any(x.get("alerts") for x in s["users"].values()):
+        return False
+    px = D.live_prices()
+    if not px:
+        return False
+    changed = False
+    for uid, x in s["users"].items():
+        keep = []
+        for a in x.get("alerts", []):
+            now = (px.get(a["coin"]) or (None,))[0]
+            hit = now is not None and ((a["op"] == ">" and now >= a["price"]) or (a["op"] == "<" and now <= a["price"]))
+            if hit:
+                send(int(uid), t("alert_hit", x.get("lang", "fa"), coin=a["coin"], price=D.fp(a["price"]), now=D.fp(now)),
+                     {"inline_keyboard": [[btn("🪙 " + a["coin"], f"c:{a['coin']}")]]})
+                changed = True
+            else:
+                keep.append(a)
+        x["alerts"] = keep
+    return changed
+
+
+def maybe_brief(s):
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    if now.hour < BRIEF_HOUR or s.get("last_brief") == today:
+        return False
+    subs = [(uid, x.get("lang", "fa")) for uid, x in s["users"].items() if x.get("brief")]
+    s["last_brief"] = today
+    cache = {}
+    for uid, lang in subs:
+        if lang not in cache:
+            cache[lang] = D.daily_brief(lang)
+        send(int(uid), cache[lang], {"inline_keyboard": [[btn(t("b_back", lang), "m:main")]]})
+        time.sleep(0.05)
+    log.info("daily brief sent to %d users", len(subs))
+    return True
+
+
+# ================================================================== handlers
 def handle_private(s, msg):
-    user, uid, chat_id = msg["from"], msg["from"]["id"], msg["chat"]["id"]
+    u, uid, chat_id = msg["from"], msg["from"]["id"], msg["chat"]["id"]
     text = (msg.get("text") or "").strip()
     cmd, _, arg = text.partition(" ")
     cmd = cmd.split("@")[0].lower()
+    arg = arg.strip()
+
     if cmd == "/start":
-        ref = int(arg) if arg.strip().isdigit() else None
-        upsert(s, user, ref)
+        ref = int(arg) if arg.isdigit() else None
+        x = upsert(s, u, ref)
+        if not x["joined"]:
+            if is_member(uid):
+                return after_verified(s, uid, chat_id)
+            return send(chat_id, t("join_first", x["lang"]), kb_join(x["lang"]))
+        return send(chat_id, *render(s, uid, "main"))
+
+    x = upsert(s, u)
+    lang = x["lang"]
+    if not x["joined"] and uid not in ADMIN_IDS:
         if is_member(uid):
-            after_verified(s, uid, chat_id)
+            mark_joined(s, uid)
         else:
-            send(chat_id, "برای استفاده از ربات اول عضو کانال شو، بعد روی «عضو شدم» بزن 👇", join_kb())
-    elif cmd == "/top":
-        send(chat_id, format_top(s))
-    elif cmd == "/id":
-        send(chat_id, f"user_id: <code>{uid}</code>")
-    elif cmd == "/stats" and uid in ADMIN_IDS:
-        us = s["users"].values()
-        send(chat_id, "📊 <b>آمار ربات</b>\n"
-             f"کاربران ربات: {len(s['users'])}\n"
-             f"تأییدشدهٔ عضو کانال: {sum(u['joined'] for u in us)}\n"
-             f"عضو شده از طریق دعوت: {sum(1 for u in us if u['joined'] and u['referrer'] is not None)}\n"
-             f"کاربر جدید ۲۴ ساعت اخیر: {sum(1 for u in us if u['created'] > time.time()-86400)}")
-    elif cmd == "/export" and uid in ADMIN_IDS:
-        lines = ["id,username,name,referrer,joined,points"]
-        for k, u in s["users"].items():
-            lines.append(f"{k},{u.get('username') or ''},{(u.get('name') or '').replace(',', ' ')},"
-                         f"{u['referrer'] or ''},{int(u['joined'])},{points(s, int(k))}")
-        requests.post(API + "sendDocument", data={"chat_id": chat_id},
-                      files={"document": ("referrals.csv", "﻿" + "\n".join(lines))}, timeout=60)
-    else:
-        upsert(s, user)
-        link = invite_link(uid)
-        send(chat_id, welcome(link, points(s, uid)), main_kb(link))
+            return send(chat_id, t("join_first", lang), kb_join(lang))
+
+    simple = {"/menu": "main", "/market": "mkt", "/brain": "brain", "/opps": "opps", "/news": "news",
+              "/score": "score", "/narratives": "narr", "/calendar": "events", "/council": "council",
+              "/lab": "lab", "/derivatives": "deriv", "/cycle": "cycle", "/chain": "chain", "/flows": "flows",
+              "/week": "week", "/posts": "posts", "/track": "track", "/indicators": "ind", "/invite": "ref",
+              "/top": "top", "/lang": "lang", "/alerts": "alerts", "/dna": "dna"}
+    if cmd in simple:
+        if cmd == "/dna" and arg:
+            return send(chat_id, D.sec_dna(lang, arg.upper()), kb_back(lang, more=D.SITE + "/dna/"))
+        return send(chat_id, *render(s, uid, simple[cmd]))
+    if cmd in ("/help", "/start_help"):
+        return send(chat_id, t("help", lang), kb_back(lang))
+    if cmd == "/coin":
+        return send(chat_id, *(coin_card(s, uid, arg) if arg else render(s, uid, "coin")))
+    if cmd == "/search":
+        if not arg:
+            return send(chat_id, t("search_hint", lang))
+        return send(chat_id, D.sec_posts(lang, query=arg, n=12), kb_back(lang))
+    if cmd == "/alert":
+        return send(chat_id, parse_alert(arg, s, uid), kb_alerts(s, uid, lang))
+    if cmd == "/brief":
+        x["brief"] = not x.get("brief")
+        return send(chat_id, t("brief_on" if x["brief"] else "brief_off", lang))
+    if cmd == "/id":
+        return send(chat_id, f"user_id: <code>{uid}</code>")
+
+    # admin
+    if uid in ADMIN_IDS:
+        if cmd == "/stats":
+            us = list(s["users"].values())
+            return send(chat_id, "📊 <b>Bot stats</b>\n"
+                        f"users: {len(us)}\nverified members: {sum(1 for x in us if x['joined'])}\n"
+                        f"joined via invite: {sum(1 for x in us if x['joined'] and x['referrer'] is not None)}\n"
+                        f"new 24h: {sum(1 for x in us if x['created'] > time.time() - 86400)}\n"
+                        f"daily-brief subs: {sum(1 for x in us if x.get('brief'))}\n"
+                        f"active alerts: {sum(len(x.get('alerts', [])) for x in us)}\n"
+                        f"langs: " + ", ".join(f"{l} {sum(1 for x in us if x.get('lang') == l)}" for l in LANGS))
+        if cmd == "/export":
+            lines = ["id,username,name,referrer,joined,points,lang,brief"]
+            for k, x2 in s["users"].items():
+                lines.append(f"{k},{x2.get('username') or ''},{(x2.get('name') or '').replace(',', ' ')},"
+                             f"{x2['referrer'] or ''},{int(x2['joined'])},{points(s, int(k))},{x2.get('lang')},{int(bool(x2.get('brief')))}")
+            requests.post(API + "sendDocument", data={"chat_id": chat_id},
+                          files={"document": ("users.csv", "﻿" + "\n".join(lines))}, timeout=60)
+            return
+        if cmd == "/broadcast":
+            src = msg.get("reply_to_message")
+            if not src:
+                return send(chat_id, "Reply to a message with /broadcast to copy it to every bot user.")
+            n = 0
+            for k in list(s["users"]):
+                r = tg("copyMessage", chat_id=int(k), from_chat_id=chat_id, message_id=src["message_id"])
+                n += bool(r.get("ok"))
+                time.sleep(0.05)
+            return send(chat_id, f"📣 sent to {n}/{len(s['users'])}")
+
+    # free text: coin symbol or search
+    if text and not text.startswith("/"):
+        word = text.split()[0]
+        if len(text.split()) == 1 and 2 <= len(word) <= 12 and D.find_coin(word):
+            return send(chat_id, *coin_card(s, uid, word))
+        return send(chat_id, D.sec_posts(lang, query=text[:60], n=10), kb_back(lang))
+    return send(chat_id, *render(s, uid, "main"))
+
 
 def handle_callback(s, cb):
     uid, data = cb["from"]["id"], cb.get("data", "")
-    chat_id = cb["message"]["chat"]["id"]; mid = cb["message"]["message_id"]
+    chat_id, mid = cb["message"]["chat"]["id"], cb["message"]["message_id"]
+    x = upsert(s, cb["from"])
+    lang = x["lang"]
+    ans = lambda text=None, alert=False: tg("answerCallbackQuery", callback_query_id=cb["id"],
+                                            **({"text": text, "show_alert": alert} if text else {}))
     if data == "check":
         if is_member(uid):
-            upsert(s, cb["from"])
-            after_verified(s, uid, chat_id, edit_msg_id=mid)
-            tg("answerCallbackQuery", callback_query_id=cb["id"], text="✅ تأیید شد")
+            ans(t("verified", lang))
+            return after_verified(s, uid, chat_id, edit_mid=mid)
+        return ans(t("not_joined", lang), True)
+    if not x["joined"] and uid not in ADMIN_IDS:
+        if is_member(uid):
+            mark_joined(s, uid)
         else:
-            tg("answerCallbackQuery", callback_query_id=cb["id"], text="هنوز عضو کانال نشدی ❌", show_alert=True)
-    elif data == "mylink":
-        send(chat_id, f"🔗 لینک دعوت تو:\n<code>{invite_link(uid)}</code>\n\nاین لینک را برای دوستانت بفرست.")
-        tg("answerCallbackQuery", callback_query_id=cb["id"])
-    elif data == "score":
-        p = points(s, uid)
-        tg("answerCallbackQuery", callback_query_id=cb["id"], show_alert=True,
-           text=f"امتیاز تو: {p}\nتا پاداش: {max(REWARD_AT-p, 0)} دعوت دیگر")
-    elif data == "top":
-        send(chat_id, format_top(s))
-        tg("answerCallbackQuery", callback_query_id=cb["id"])
+            ans(t("not_joined", lang), True)
+            return edit(chat_id, mid, t("join_first", lang), kb_join(lang))
+    ans()
+    kind, _, val = data.partition(":")
+    if kind == "m":
+        return edit(chat_id, mid, *render(s, uid, val))
+    if kind == "l" and val in LANGS:
+        x["lang"] = val
+        text, kb = render(s, uid, "main")
+        return edit(chat_id, mid, t("lang_set", val) + "\n\n" + text, kb)
+    if kind == "c":
+        return edit(chat_id, mid, *coin_card(s, uid, val))
+    back = {"inline_keyboard": [[btn("🪙 " + val, f"c:{val}"), btn(t("b_back", lang), "m:main")]]}
+    if kind == "co":
+        return edit(chat_id, mid, D.sec_opps(lang, coin=val), back)
+    if kind == "cn":
+        return edit(chat_id, mid, D.sec_news(lang, coin=val), back)
+    if kind == "cp":
+        return edit(chat_id, mid, D.sec_posts(lang, coin=val), back)
+    if kind == "cd":
+        return edit(chat_id, mid, D.sec_dna(lang, coin=val), back)
+    if kind == "ca":
+        return send(chat_id, t("alert_usage", lang).replace("BTC", val))
+    if kind == "ad" and val.isdigit():
+        i = int(val) - 1
+        if 0 <= i < len(x["alerts"]):
+            x["alerts"].pop(i)
+        return edit(chat_id, mid, *render(s, uid, "alerts"))
+    if data == "brief":
+        x["brief"] = not x.get("brief")
+        text, kb = render(s, uid, "alerts")
+        return edit(chat_id, mid, t("brief_on" if x["brief"] else "brief_off", lang) + "\n\n" + text, kb)
+
 
 def handle_group(s, msg):
-    """Join-gate: delete messages from people who are not channel members."""
-    user = msg.get("from") or {}
-    if not GROUP or user.get("is_bot") or user.get("id") in ADMIN_IDS:
+    u = msg.get("from") or {}
+    if not GROUP or u.get("is_bot") or u.get("id") in ADMIN_IDS:
         return
     chat = msg["chat"]
     if GROUP.lstrip("-").isdigit():
-        if str(chat["id"]) != GROUP: return
+        if str(chat["id"]) != GROUP:
+            return
     elif (chat.get("username") or "").lower() != GROUP.lstrip("@").lower():
         return
     if (msg.get("text") or "").split("@")[0] == "/id":
-        send(chat["id"], f"chat_id: <code>{chat['id']}</code>", reply_to_message_id=msg["message_id"]); return
-    if is_member(user["id"]):
+        send(chat["id"], f"chat_id: <code>{chat['id']}</code>", reply_to_message_id=msg["message_id"])
+        return
+    if is_member(u["id"]):
         return
     tg("deleteMessage", chat_id=chat["id"], message_id=msg["message_id"])
-    name = user.get("first_name", "کاربر")
-    send(chat["id"], f'<a href="tg://user?id={user["id"]}">{name}</a> برای گفتگو در گروه اول عضو کانال شو 👇',
-         {"inline_keyboard": [[{"text": "📢 عضویت در کانال", "url": CHANNEL_LINK}]]})
+    name = f'<a href="tg://user?id={u["id"]}">{D.e(u.get("first_name", "user"))}</a>'
+    send(chat["id"], t("gate", "fa", name=name),
+         {"inline_keyboard": [[btn(t("b_join", "fa"), url=CHANNEL_LINK)]]})
+
 
 def handle_update(s, up):
     if "message" in up:
         m = up["message"]
+        if "from" not in m:
+            return
         if m["chat"]["type"] == "private":
             handle_private(s, m)
         elif m["chat"]["type"] in ("group", "supergroup"):
@@ -244,36 +614,79 @@ def handle_update(s, up):
     elif "callback_query" in up:
         handle_callback(s, up["callback_query"])
 
-# ------------------------------------------------------------------ main loop
+
+# ================================================================== setup
+COMMANDS = {
+    "fa": [("menu", "منوی اصلی"), ("coin", "تحلیل کوین — /coin BTC"), ("market", "وضعیت بازار"),
+           ("brain", "مغز بازار"), ("opps", "فرصت‌های اسکنر"), ("news", "اخبار"), ("search", "جستجو در آرشیو کانال"),
+           ("alert", "هشدار قیمت — /alert BTC 80000"), ("brief", "گزارش روزانه"), ("invite", "دعوت و پاداش"),
+           ("lang", "زبان"), ("help", "راهنما")],
+    "ckb": [("menu", "لیستی سەرەکی"), ("coin", "شیکاری دراو — /coin BTC"), ("market", "دۆخی بازاڕ"),
+            ("brain", "مێشکی بازاڕ"), ("opps", "دەرفەتەکان"), ("news", "هەواڵ"), ("search", "گەڕان لە ئەرشیڤ"),
+            ("alert", "ئاگاداری نرخ"), ("brief", "ڕاپۆرتی ڕۆژانە"), ("invite", "بانگهێشت و خەڵات"),
+            ("lang", "زمان"), ("help", "ڕێنمایی")],
+    "en": [("menu", "Main menu"), ("coin", "Coin card — /coin BTC"), ("market", "Market overview"),
+           ("brain", "Market brain"), ("opps", "Scanner opportunities"), ("news", "News"), ("search", "Search the archive"),
+           ("alert", "Price alert — /alert BTC 80000"), ("brief", "Daily brief"), ("invite", "Invite & earn"),
+           ("lang", "Language"), ("help", "Help")],
+}
+
+
+def setup_commands():
+    for lang, cmds in COMMANDS.items():
+        p = {"commands": [{"command": c, "description": d} for c, d in cmds]}
+        if lang == "fa":
+            tg("setMyCommands", **p)
+        tg("setMyCommands", language_code={"ckb": "ku"}.get(lang, lang), **p)
+
+
+# ================================================================== main loop
 def main():
     global BOT_USERNAME
     if not TOKEN:
-        log.error("REF_BOT_TOKEN missing"); return 1
+        log.error("REF_BOT_TOKEN missing")
+        return 1
     me = tg("getMe")
     if not me.get("ok"):
-        log.error("bad token"); return 1
+        log.error("bad token")
+        return 1
     BOT_USERNAME = me["result"]["username"]
-    tg("deleteWebhook")                                      # polling mode
+    tg("deleteWebhook")
+    setup_commands()
     s = load_state()
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
+    for name in ("market", "brain", "posts_lite"):   # warm cache
+        D.load(name)
     deadline = time.time() + RUN_SECONDS
-    handled = 0
+    last_push, handled, dirty = time.time(), 0, False
     while time.time() < deadline:
-        d = tg("getUpdates", offset=s["offset"], timeout=25,
-               allowed_updates=["message", "callback_query"])
-        if not d.get("ok"):
-            time.sleep(5); continue
-        for up in d["result"]:
-            s["offset"] = up["update_id"] + 1
-            try:
-                handle_update(s, up); handled += 1
-            except Exception:
-                log.exception("update %s failed", up["update_id"])
-        if d["result"]:
+        d = tg("getUpdates", offset=s["offset"], timeout=25, allowed_updates=["message", "callback_query"])
+        if d.get("ok"):
+            for up in d["result"]:
+                s["offset"] = up["update_id"] + 1
+                try:
+                    handle_update(s, up)
+                    handled += 1
+                except Exception:
+                    log.exception("update %s failed", up["update_id"])
+                dirty = True
+        else:
+            time.sleep(5)
+        try:
+            dirty |= check_alerts(s)
+            dirty |= maybe_brief(s)
+        except Exception:
+            log.exception("periodic job failed")
+        if dirty:
             save_state(s)
+            dirty = False
+        if time.time() - last_push > STATE_PUSH_EVERY:
+            push_state()
+            last_push = time.time()
     save_state(s)
     log.info("done: %d updates handled", handled)
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
