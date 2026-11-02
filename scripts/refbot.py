@@ -29,7 +29,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
-from bot_i18n import LANGS, t  # noqa: E402
+from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
 CHANNEL = os.environ.get("CHANNEL", "@Coin_Kurd")
@@ -172,7 +172,7 @@ def upsert(s, u, referrer=None):
         if referrer is not None and str(referrer) == uid:
             referrer = None
         lc = (u.get("language_code") or "").lower()
-        lang = "en" if lc.startswith("en") else "fa"
+        lang = "en" if lc.startswith("en") else ("kmr" if lc in ("ku", "kmr") or lc.startswith("tr") else "fa")
         x = s["users"][uid] = {"username": u.get("username"), "name": u.get("first_name", ""),
                                "referrer": referrer, "joined": False, "created": int(time.time()),
                                "lang": lang}
@@ -343,7 +343,8 @@ def kb_irr(lang, live=False):
 
 
 def kb_lang():
-    return {"inline_keyboard": [[btn("فارسی", "l:fa"), btn("کوردی", "l:ckb"), btn("English", "l:en")]]}
+    return {"inline_keyboard": [[btn(LANG_NAMES["ckb"], "l:ckb"), btn(LANG_NAMES["kmr"], "l:kmr")],
+                                [btn(LANG_NAMES["fa"], "l:fa"), btn(LANG_NAMES["en"], "l:en")]]}
 
 
 def kb_join(lang):
@@ -454,7 +455,7 @@ def coin_card(s, uid, sym):
         usdt = IR.snapshot().get("usdt")
         px = D.live_prices().get(coin, (D.find_coin(coin).get("price"),))[0]
         if usdt and px:
-            label = {"fa": "به تومان", "ckb": "بە تمەن", "en": "in toman"}[lang]
+            label = pick({"fa": "به تومان", "ckb": "بە تمەن", "en": "in toman"}, lang)
             text = text.replace("\n", f"\n💵 {label}: ≈ {IR.toman(px * usdt)}\n", 1)
     except Exception:
         pass
@@ -585,8 +586,8 @@ def minute_jobs(s):
                     changed = True
                     mins = max(1, round((last[0] - first[0]) / 60))
                     for uid, lang in watchers:
-                        d = {"fa": "جهش" if pct > 0 else "سقوط", "ckb": "بەرزبوونەوە" if pct > 0 else "کەوتن",
-                             "en": "up" if pct > 0 else "down"}[lang]
+                        d = pick({"fa": "جهش" if pct > 0 else "سقوط", "ckb": "بەرزبوونەوە" if pct > 0 else "کەوتن",
+                             "en": "up" if pct > 0 else "down"}, lang)
                         send(int(uid), t("watch_hit", lang, dir=d, pct=f"{pct:+.2f}", mins=mins,
                                          p0=IR.toman(first[1]), p1=IR.toman(last[1])),
                              {"inline_keyboard": [[btn(t("b_irr", lang), "m:irr")]]})
@@ -804,8 +805,8 @@ def handle_group(s, msg):
         return
     tg("deleteMessage", chat_id=chat["id"], message_id=msg["message_id"])
     name = f'<a href="tg://user?id={u["id"]}">{D.e(u.get("first_name", "user"))}</a>'
-    send(chat["id"], t("gate", "fa", name=name),
-         {"inline_keyboard": [[btn(t("b_join", "fa"), url=CHANNEL_LINK)]]})
+    send(chat["id"], "\n".join(t("gate", lg, name=name) for lg in ("fa", "ckb", "kmr")),
+         {"inline_keyboard": [[btn(t("b_join", "ckb"), url=CHANNEL_LINK)]]})
 
 
 def handle_update(s, up):
@@ -839,14 +840,16 @@ COMMANDS = {
            ("alert", "Price alert — /alert BTC 80000"), ("brief", "Daily brief"), ("invite", "Invite & earn"),
            ("lang", "Language"), ("help", "Help")],
 }
+COMMANDS["kmr"] = [(c, KMR.get(d, d)) for c, d in COMMANDS["en"]]
 
 
 def setup_commands():
     for lang, cmds in COMMANDS.items():
         p = {"commands": [{"command": c, "description": d} for c, d in cmds]}
         if lang == "fa":
-            tg("setMyCommands", **p)
-        tg("setMyCommands", language_code={"ckb": "ku"}.get(lang, lang), **p)
+            tg("setMyCommands", **p)                       # default (also used by Sorani clients)
+        elif lang in ("kmr", "en"):
+            tg("setMyCommands", language_code={"kmr": "ku"}.get(lang, lang), **p)
 
 
 # ================================================================== main loop

@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
+from bot_i18n import pick
+
 UA = {"User-Agent": "Mozilla/5.0 (compatible; CoinKurdBot/1.0; +https://entekhab.net)"}
 TTL = 60
 _cache = {}
@@ -252,7 +254,16 @@ def asset_price(key, snap=None):
 
 
 # ------------------------------------------------------------------ messages
-L3 = lambda d, lang: d.get(lang) or d.get("fa")
+L3 = lambda d, lang: pick(d, lang)
+
+EX_LATIN = {"والکس": "Wallex", "بیت‌پین": "Bitpin", "بیت پین": "Bitpin", "رمزینکس": "Ramzinex", "تبدیل": "Tabdil",
+            "نوبیتکس": "Nobitex", "موربیت": "Morbit", "افکس": "Afex", "آبان‌تتر": "AbanTether", "آبان تتر": "AbanTether",
+            "تترلند": "Tetherland", "اکسیر": "Exir", "رمزارز۲۴": "Ramzarz24", "بیت۲۴": "Bit24"}
+
+
+def exname(name, lang):
+    """Latin exchange names for Latin-script languages"""
+    return EX_LATIN.get(name, name) if lang in ("kmr", "en") else name
 
 
 def card(lang, focus=None):
@@ -260,10 +271,10 @@ def card(lang, focus=None):
     tt = s.get("tt", {})
     ex = s.get("exchanges", [])
     if not (s.get("usdt") or s.get("usd") or ex):
-        return {"fa": "منابع قیمت دلار و تتر فعلاً در دسترس نیستند؛ چند دقیقهٔ دیگر امتحان کن.",
+        return pick({"fa": "منابع قیمت دلار و تتر فعلاً در دسترس نیستند؛ چند دقیقهٔ دیگر امتحان کن.",
                 "ckb": "سەرچاوەکانی نرخی دۆلار و تەتەر ئێستا بەردەست نین؛ چەند خولەکی تر هەوڵ بدەرەوە.",
-                "en": "Dollar/tether sources are unavailable right now; try again shortly."}[lang]
-    T = lambda fa, ckb, en: {"fa": fa, "ckb": ckb, "en": en}[lang]
+                "en": "Dollar/tether sources are unavailable right now; try again shortly."}, lang)
+    T = lambda fa, ckb, en, kmr=None: pick({"fa": fa, "ckb": ckb, "en": en, "kmr": kmr}, lang)
     out = [T("💵 <b>دلار و تتر — بازار ایران</b> (تومان)", "💵 <b>دۆلار و تەتەر — بازاڕی ئێران</b> (تمەن)",
              "💵 <b>Dollar &amp; tether — Iran market</b> (toman)"), ""]
     ut, nd = s.get("usdtp", {}), s.get("nerkh", {})
@@ -290,15 +301,17 @@ def card(lang, focus=None):
                   "<i>buy = exchange buys from you · sell = exchange sells to you</i>")]
         for e in sorted(ex, key=lambda e: e["sell"]):
             flag = " ⚠️" if e["sanctioned"] else ""
-            out.append(f"• {e['name']}{flag}: {toman(e['buy'])} | <b>{toman(e['sell'])}</b>")
+            out.append(f"• {exname(e['name'], lang)}{flag}: {toman(e['buy'])} | <b>{toman(e['sell'])}</b>")
         if s.get("arb_toman") is not None:
             bb, bs = s["best_buy_from"], s["best_sell_to"]
-            out.append(T(f"🔁 آربیتراژ: خرید از {bb['name']} ({toman(bb['sell'])}) → فروش به {bs['name']} ({toman(bs['buy'])}) = "
+            out.append(T(f"🔁 آربیتراژ: خرید از {exname(bb['name'], lang)} ({toman(bb['sell'])}) → فروش به {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
                          f"<b>{toman(s['arb_toman'])}</b> تومان ({s['arb_pct']:+.2f}%) قبل از کارمزد",
-                         f"🔁 ئاربیتراژ: کڕین لە {bb['name']} ({toman(bb['sell'])}) → فرۆشتن بە {bs['name']} ({toman(bs['buy'])}) = "
+                         f"🔁 ئاربیتراژ: کڕین لە {exname(bb['name'], lang)} ({toman(bb['sell'])}) → فرۆشتن بە {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
                          f"<b>{toman(s['arb_toman'])}</b> تمەن ({s['arb_pct']:+.2f}%) پێش کرێ",
-                         f"🔁 Arbitrage: buy at {bb['name']} ({toman(bb['sell'])}) → sell at {bs['name']} ({toman(bs['buy'])}) = "
-                         f"<b>{toman(s['arb_toman'])}</b> ({s['arb_pct']:+.2f}%) before fees"))
+                         f"🔁 Arbitrage: buy at {exname(bb['name'], lang)} ({toman(bb['sell'])}) → sell at {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
+                         f"<b>{toman(s['arb_toman'])}</b> ({s['arb_pct']:+.2f}%) before fees",
+                         f"🔁 Arbîtraj: ji {exname(bb['name'], lang)} bikire ({toman(bb['sell'])}) → li {exname(bs['name'], lang)} bifiroşe ({toman(bs['buy'])}) = "
+                         f"<b>{toman(s['arb_toman'])}</b> tomen ({s['arb_pct']:+.2f}%) berî heqê bazirganiyê"))
         if any(e["sanctioned"] for e in ex):
             out.append(T("⚠️ = تحت تحریم؛ خطر مسدود شدن کیف پول.", "⚠️ = لە ژێر سزادا؛ مەترسی بلۆککردنی جزدان.",
                          "⚠️ = under sanctions; wallet-freeze risk."))
@@ -322,21 +335,21 @@ def calc(lang, amount, unit):
     """unit: 'toman' (how much USDT can I buy) or 'usdt' (how much toman if I sell)"""
     s = snapshot()
     ex = s.get("exchanges", [])
-    T = lambda fa, ckb, en: {"fa": fa, "ckb": ckb, "en": en}[lang]
+    T = lambda fa, ckb, en, kmr=None: pick({"fa": fa, "ckb": ckb, "en": en, "kmr": kmr}, lang)
     if not ex and not s.get("usdt"):
         return T("قیمت تتر فعلاً در دسترس نیست.", "نرخی تەتەر ئێستا بەردەست نییە.", "Tether price unavailable.")
     out = [T("🧮 <b>ماشین‌حساب تتر</b>", "🧮 <b>ژمێرەری تەتەر</b>", "🧮 <b>Tether calculator</b>"), ""]
     if unit == "toman":
         out.append(T(f"با {toman(amount)} تومان می‌توانی بخری:", f"بە {toman(amount)} تمەن دەتوانیت بکڕیت:",
-                     f"With {toman(amount)} toman you can buy:"))
+                     f"With {toman(amount)} toman you can buy:", f"Bi {toman(amount)} tomenan dikarî bikirî:"))
         rows = sorted(ex, key=lambda e: e["sell"]) or [{"name": "~", "sell": s["usdt"]}]
         for e in rows[:6]:
-            out.append(f"• {e['name']}: <b>{amount / e['sell']:,.2f}</b> USDT")
+            out.append(f"• {exname(e['name'], lang)}: <b>{amount / e['sell']:,.2f}</b> USDT")
     else:
-        out.append(T(f"فروش {amount:,.2f} تتر:", f"فرۆشتنی {amount:,.2f} تەتەر:", f"Selling {amount:,.2f} USDT:"))
+        out.append(T(f"فروش {amount:,.2f} تتر:", f"فرۆشتنی {amount:,.2f} تەتەر:", f"Selling {amount:,.2f} USDT:", f"Firotina {amount:,.2f} tetherê:"))
         rows = sorted(ex, key=lambda e: -e["buy"]) or [{"name": "~", "buy": s["usdt"]}]
         for e in rows[:6]:
-            out.append(f"• {e['name']}: <b>{toman(amount * e['buy'])}</b> {T('تومان', 'تمەن', 'toman')}")
+            out.append(f"• {exname(e['name'], lang)}: <b>{toman(amount * e['buy'])}</b> {T('تومان', 'تمەن', 'toman')}")
     out += ["", T("⚠️ کارمزد معامله و کارمزد شبکهٔ انتقال (TRC20/TON/BEP20…) هر صرافی جداست و در این عدد کم نشده؛ قبل از معامله در خود صرافی چک کن.",
                   "⚠️ کرێی مامەڵە و کرێی تۆڕی گواستنەوە لێرە کەم نەکراوەتەوە؛ پێش مامەڵە لە ئاڵوگۆڕەکە بیپشکنە.",
                   "⚠️ Trading and network (TRC20/TON/BEP20…) fees differ per exchange and are not deducted here.")]
