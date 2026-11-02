@@ -58,7 +58,7 @@ def sentiment_inputs(s):
             if it.get("fa"):
                 out.append((f"{kind}:{it['id']}", it.get("at") or it.get("made") or now_iso(), it["fa"]))
     for it in (s.get("deep") or {}).get("posts", []):
-        out.append((f"deep:{it['id']}", it["at"], re.sub(r"</?b>", "", it["fa"])))
+        out.append((f"deep:{it['id']}", it["at"], re.sub(r"</?b>", "", it["fa"]).split("\n", 1)[-1].strip()))
     return out
 
 
@@ -110,6 +110,10 @@ def score_new(s, limit=25):
             title = by[k][1].split("\n")[0][:140]
             h["scores"][k] = {"score": sc, "coins": coins, "at": by[k][0], "title": title}
             n += 1
+    for k, v in h["scores"].items():                  # dossier titles: skip the fixed header line
+        if k.startswith("deep:") and v["title"].startswith("🧠"):
+            txt = next((t_ for kk, _, t_ in sentiment_inputs(s) if kk == k), "")
+            v["title"] = txt.split("\n")[0][:140] or v["title"]
     if len(h["scores"]) > 1500:                         # keep the newest
         for k in sorted(h["scores"], key=lambda k: h["scores"][k]["at"])[:-1500]:
             del h["scores"][k]
