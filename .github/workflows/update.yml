@@ -228,6 +228,11 @@ jobs:
           STEP_SCANLOG: ${{ steps.scanlog.outcome }}
         run: python scripts/health.py
 
+      - name: IndexNow (notify search engines of new pages)
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/indexnow.py
+
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"
