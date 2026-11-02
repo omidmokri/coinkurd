@@ -658,7 +658,7 @@ function renderIntel(){
   $('#impBox').innerHTML=`<h3>${T('impT')}</h3>`+(rows.length?`<table class="otab"><tr><th>${T('coin')}</th><th>${T('posts')}</th><th>${T('avg24')}</th><th>${T('upr')}</th></tr>${rows.map(([c,a])=>{const av=a.reduce((x,y)=>x+y,0)/a.length,up=Math.round(a.filter(x=>x>0).length*100/a.length);return `<tr><td><a href="coins/${c.toLowerCase()}/">${c}</a></td><td class="num">${a.length}</td><td class="num ${av>=0?'pos':'neg'}">${av>=0?'+':''}${av.toFixed(2)}%</td><td><div class="bar2"><i style="width:${up}%"></i></div><span class="num" style="font-size:.75rem">${up}%</span></td></tr>`}).join('')}</table>`:`<p class="disc">${T('noData')}</p>`)+`<p class="disc">Binance 1h · ${T('disc')}</p>`;
 }
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;document.querySelector('nav').classList.toggle('hide',h);$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'0px':'118px');lastY=y},{passive:true});
-window.__cineFail=()=>{window.__cineFail=null;coin3d()};(function(){const s=document.createElement('script');s.src='assets/cinema.js?v=1';s.onerror=()=>window.__cineFail&&window.__cineFail();document.body.appendChild(s)})();
+window.__cineFail=()=>{window.__cineFail=null;coin3d()};(function(){const s=document.createElement('script');s.src='assets/cinema.js?v=2';s.onerror=()=>window.__cineFail&&window.__cineFail();document.body.appendChild(s)})();
 load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${e.message}</div>`});
 </script>
 </body>
