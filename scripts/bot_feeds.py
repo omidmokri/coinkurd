@@ -282,7 +282,10 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
             log.info("fx post skipped: %s", ex)
 
     if now - f["last_check"] < CHECK_EVERY:
-        return changed
+        before = sum(1 for k in ("onchain", "news") for it in f["items"].get(k, []) if it.get("posted"))
+        publish(s, f, topics, group_id, send_fn)          # keep draining the queue between channel checks
+        after = sum(1 for k in ("onchain", "news") for it in f["items"].get(k, []) if it.get("posted"))
+        return changed or after != before
     f["last_check"] = now
     changed = True
 
