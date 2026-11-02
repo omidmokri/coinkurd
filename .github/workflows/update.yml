@@ -120,6 +120,20 @@ jobs:
         timeout-minutes: 5
         run: python scripts/dna.py
 
+      - name: Kurdistani indicators engine (open-source ports — Power Law, Style Cycle, Spiral)
+        id: kind
+        continue-on-error: true
+        timeout-minutes: 4
+        env:
+          KIND_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python scripts/kind.py
+
+      - name: Indicator signals (TradingView alert relay + real outcomes)
+        id: signals
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/signals.py
+
       - name: Market Wrapped (weekly / monthly)
         continue-on-error: true
         timeout-minutes: 3
@@ -189,6 +203,8 @@ jobs:
           STEP_DERIV: ${{ steps.deriv.outcome }}
           STEP_FLOWS: ${{ steps.flows.outcome }}
           STEP_DNA: ${{ steps.dna.outcome }}
+          STEP_KIND: ${{ steps.kind.outcome }}
+          STEP_SIGNALS: ${{ steps.signals.outcome }}
         run: python scripts/health.py
 
       - name: Commit data
