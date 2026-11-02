@@ -315,10 +315,6 @@ def card(lang, focus=None):
                 chs = f" ({ch:+.2f}%)" if ch else ""
                 val = f"${p:,.2f}" if k in ("XAU", "XAG") else toman(p)
                 out.append(f"• {L3(ASSET_NAME[k], lang)}: {val}{chs}")
-        out.append(f"<i>@ttprice · {ago(tt.get('time'))}</i>")
-    out += ["", T("منابع: @USDTTetherp · @NerkhDollarIRT · @ttprice — نرخ‌ها لحظه‌ای نیستند؛ زمان هر منبع کنارش آمده.",
-                  "سەرچاوە: @USDTTetherp · @NerkhDollarIRT · @ttprice — کاتی هەر سەرچاوەیەک لە تەنیشتی نووسراوە.",
-                  "Sources: @USDTTetherp · @NerkhDollarIRT · @ttprice — each source's age is shown next to it.")]
     return "\n".join(out)
 
 
