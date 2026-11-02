@@ -26,6 +26,7 @@ from categories import CATEGORIES, DEFAULT_CATEGORY, COINS, SHORT_TOKENS  # noqa
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 POSTS_FILE = os.path.join(DATA_DIR, "posts.json")
+EXCLUDE_FILE = os.path.join(DATA_DIR, "exclude_posts.json")  # channel post ids the owner removed from the site
 META_FILE = os.path.join(DATA_DIR, "meta.json")
 
 HEADERS = {
@@ -230,10 +231,19 @@ def fetch_page(session, channel: str, before: int = None) -> str:
     return r.text
 
 
+def excluded() -> set:
+    try:
+        with open(EXCLUDE_FILE, encoding="utf-8") as f:
+            return set(json.load(f))
+    except Exception:
+        return set()
+
+
 def load_existing() -> dict:
     if os.path.exists(POSTS_FILE):
         with open(POSTS_FILE, encoding="utf-8") as f:
-            return {p["id"]: p for p in json.load(f)}
+            ex = excluded()
+            return {p["id"]: p for p in json.load(f) if p["id"] not in ex}
     return {}
 
 
@@ -311,7 +321,10 @@ def main():
         msgs = parse_messages(html, args.channel)
         if not msgs:
             break
+        ex = excluded()
         for m in msgs:
+            if m["id"] in ex:
+                continue
             if m["id"] not in existing:
                 new_count += 1
             elif existing[m["id"]].get("tr"):
