@@ -229,7 +229,7 @@ G.makeEnv = function (ren) {
 /* ------------------------------------------------------------------ terrain */
 G.heightFn = function () {
   const sm = (a, b, x) => { const t = cl((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
-  return function (x, z) {
+  const f = function (x, z) {
     const ax = Math.abs(x);
     const core = .32 * G.fbmW(x * .035 + 3.1, z * .035 - 1.7, 3) + .1 * G.fbmW(x * .2, z * .2, 2);
     const edge = Math.max(sm(70, 110, ax), sm(44, 76, -z), sm(62, 100, z) * .7);
@@ -242,6 +242,7 @@ G.heightFn = function () {
     const rd = Math.abs(z - 2 * Math.sin(x * .035)); if (rd < 3.2 && ax < 90) h -= .12 * sm(3.2, 1.2, rd);
     return h;
   };
+  return G.terrainMod ? G.terrainMod(f) : f;     /* 4.0: pads under structures and lake basins (gfx4.js) */
 };
 G.terrainMaterial = function (tier) {
   const T = G.terrainTextures();
