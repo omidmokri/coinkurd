@@ -156,7 +156,8 @@ function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).v
  if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
  $('#tlinks').innerHTML=T('links').map(([h,a,b])=>`<a href="${h}"><b>${a}</b><small>${b}</small></a>`).join('')}
 function render(){forms();renderCmp();renderRisk();renderFx()}
-(async()=>{const [m,s,fx,mc]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V())]);M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
+(async()=>{const qc=new URLSearchParams(location.search).get('cmp');if(qc){const a=qc.split(',').map(x=>x.trim().toUpperCase()).filter(x=>/^[A-Z0-9]{2,10}$/.test(x)).slice(0,6);if(a.length)cmp=[...new Set(a)]}
+ const [m,s,fx,mc]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V())]);M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
  if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();
 </script>
 </body>
