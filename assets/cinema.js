@@ -227,11 +227,14 @@ void main(){
     vertexShader: 'varying vec3 vN;varying vec3 vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
     fragmentShader: 'uniform vec3 c;uniform float uOp;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.4);gl_FragColor=vec4(c*f*.85*uOp,1.);}'
   })));
-  const gridMat = new THREE.PointsMaterial({ color: 0x3b4656, size: 0.05, sizeAttenuation: true, transparent: true, opacity: 0, depthWrite: false });
+  const gridMat = new THREE.PointsMaterial({ color: 0x1f2834, size: 0.04, sizeAttenuation: true, transparent: true, opacity: 0, depthWrite: false });
+  const landMat = new THREE.PointsMaterial({ color: 0x7f91ab, size: 0.075, sizeAttenuation: true, transparent: true, opacity: 0, depthWrite: false });
   {
-    const pts = [];
-    for (let la = -84; la <= 84; la += 3) { const st = 3 / Math.max(0.15, Math.cos(la * Math.PI / 180)); for (let lo = -180; lo < 180; lo += st) { const v = ll(la, lo, GR * 1.002); pts.push(v.x, v.y, v.z); } }
-    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); globe.add(new THREE.Points(g, gridMat));
+    // continents from the 0.5° land mask (assets/land.js); falls back to a plain grid when it is not loaded
+    const dots = window.EK_LAND ? EK_LAND.dots(1.6, GR * 1.002, ll) : null;
+    const mk = (arr, mat) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); globe.add(new THREE.Points(g, mat)); };
+    if (dots) { mk(dots.sea, gridMat); mk(dots.land, landMat); }
+    else { const pts = []; for (let la = -84; la <= 84; la += 3) { const st = 3 / Math.max(0.15, Math.cos(la * Math.PI / 180)); for (let lo = -180; lo < 180; lo += st) { const v = ll(la, lo, GR * 1.002); pts.push(v.x, v.y, v.z); } } mk(pts, gridMat); }
   }
   const nodeU = { uTime: { value: 0 }, uPR: { value: PR }, uOp: { value: 0 } };
   const NODE_VS = `attribute float aS;uniform float uTime,uPR,uOp;varying vec3 vC;varying float vA;
@@ -431,7 +434,7 @@ float x=(r-uIn)/span;vA=uOp*(1.-x)*smoothstep(0.,.08,x)*smoothstep(1.,.85,x);vC=
       flash = t < 8.6 ? 1 - S(t, 8, 8.6) : S(t, 15.0, 15.5); flashBg = t < 8.6 ? GOLD : '#000';
       globe.rotation.set(0.42, uT * 0.12 - 1.2, 0);
       const gOp = S(t, 11.2, 12.6);
-      nodeU.uOp.value = gOp; gridMat.opacity = 0.9 * gOp; atmU.uOp.value = gOp;
+      nodeU.uOp.value = gOp; gridMat.opacity = 0.9 * gOp; landMat.opacity = 0.95 * gOp; atmU.uOp.value = gOp;
       arcMat.opacity = 0.55 * S(t, 12.6, 13.6);
       flowRings.forEach(f => { f.pts.material.opacity = 0.75 * S(t, 12.8, 13.8); f.pts.parent.rotation.y = uT * f.sp; });
       if (pulses.pts) {
