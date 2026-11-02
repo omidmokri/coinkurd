@@ -66,6 +66,7 @@
 </div>
 <footer>entekhab.net · OKX · CoinGecko · Binance · mempool.space · bitnodes.io · RSS — <span data-t="nfa"></span></footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/assets/land.js"></script>
 <script src="/assets/ui.js"></script>
 <script>
 Object.assign(I.fa,{mcT:'🌍 کریپتو و بازارهای جهانی',lqT:'💥 لیکوئید شدن‌های زنده',h1:'ترمینال <em>Entekhab</em>',lead:'یک محیط شیشه‌ای و زنده: بپرس، کشف کن، ادعاها را با داده بسنج. هر عدد منبع دارد و هر پنل را می‌توانی جابه‌جا یا پنهان کنی.',
@@ -185,8 +186,7 @@ function globeInit(){if(!window.THREE)return;const cv=$('#globe');let r;try{r=ne
  r.setPixelRatio(Math.min(devicePixelRatio,2));const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,100);cam.position.set(0,1.5,13.5);cam.lookAt(0,0,0);
  const g=new THREE.Group();sc.add(g);const R=4;g.add(new THREE.Mesh(new THREE.SphereGeometry(R*.99,64,48),new THREE.MeshBasicMaterial({color:0x06080d})));
  const ll=(la,lo,rr)=>{const ph=(90-la)*Math.PI/180,th=(lo+180)*Math.PI/180;return new THREE.Vector3(-rr*Math.sin(ph)*Math.cos(th),rr*Math.cos(ph),rr*Math.sin(ph)*Math.sin(th))};
- const pts=[];for(let la=-84;la<=84;la+=4){const st=4/Math.max(.15,Math.cos(la*Math.PI/180));for(let lo=-180;lo<180;lo+=st){const v=ll(la,lo,R*1.002);pts.push(v.x,v.y,v.z)}}
- const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));g.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0x2c3644,size:.045})));
+ const dots=window.EK_LAND?EK_LAND.dots(1.6,R*1.003,ll):{land:[],sea:[]};const mk=(arr,col,sz,op)=>{const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.Float32BufferAttribute(arr,3));return new THREE.Points(pg,new THREE.PointsMaterial({color:col,size:sz,transparent:true,opacity:op,depthWrite:false}))};g.add(mk(dots.sea,0x182029,.03,.9));g.add(mk(dots.land,0xa3b4cc,.078,.97));g.add(new THREE.Mesh(new THREE.SphereGeometry(R*1.12,48,36),new THREE.ShaderMaterial({uniforms:{c:{value:new THREE.Color(0x4f7fc4)}},side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,vertexShader:'varying vec3 vN;varying vec3 vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',fragmentShader:'uniform vec3 c;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.2);gl_FragColor=vec4(c*f*.9,1.);}'})));
  const layer=new THREE.Group();g.add(layer);GL={r,sc,cam,g,layer,ll,R};
  let drag=null,ry=0,rx=.35,auto=true;cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY];auto=false});addEventListener('pointerup',()=>drag=null);
  addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-drag[0])*.008;rx=Math.max(-1.2,Math.min(1.2,rx+(e.clientY-drag[1])*.006));drag=[e.clientX,e.clientY]});
