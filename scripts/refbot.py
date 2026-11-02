@@ -11,6 +11,9 @@ Each run long-polls Telegram for RUN_SECONDS, then exits. State (users, points,
 alerts, language) lives in a JSON file that the workflow keeps on the
 `refbot-state` branch; it is also pushed every STATE_PUSH_EVERY seconds.
 """
+import base64
+import hashlib
+import hmac
 import json
 import logging
 import os
@@ -38,6 +41,7 @@ REWARD_TEXT = os.environ.get("REWARD_TEXT") or "🎁 تبریک! به {n} دعو
 RUN_SECONDS = int(os.environ.get("RUN_SECONDS", "840"))
 STATE = os.environ.get("STATE_PATH", "data/bot/referrals.json")
 PUBLIC = os.environ.get("PUBLIC_PATH", "data/bot/leaderboard.json")
+STATE_ENC = STATE + ".enc"                               # encrypted at rest: the refbot-state branch is public
 STATE_GIT = os.environ.get("STATE_GIT", "")              # dir of a git checkout to push periodically
 STATE_PUSH_EVERY = int(os.environ.get("STATE_PUSH_EVERY", "600"))
 BRIEF_HOUR = int(os.environ.get("BRIEF_HOUR_UTC", "5"))   # 05:00 UTC ≈ 08:30 Tehran
@@ -53,12 +57,63 @@ log = logging.getLogger("refbot")
 
 
 # ================================================================== state
+# The state holds Telegram ids, names and alerts, and the branch it lives on is public, so it is
+# stored encrypted (stdlib only): HMAC-SHA256 in counter mode as the key stream + an HMAC-SHA256 tag
+# over version|nonce|ciphertext (encrypt-then-MAC). The key comes from STATE_KEY if set, else from the
+# bot token — both are Actions secrets, so nobody reading the branch can decrypt it.
+def _state_keys():
+    root = (os.environ.get("STATE_KEY") or TOKEN or "").encode()
+    if not root:
+        return None
+    prk = hmac.new(b"entekhab-refbot-state-v1", root, hashlib.sha256).digest()
+    return hmac.new(prk, b"enc", hashlib.sha256).digest(), hmac.new(prk, b"mac", hashlib.sha256).digest()
+
+
+def _keystream(key, nonce, n):
+    out = bytearray()
+    for ctr in range((n + 31) // 32):
+        out += hmac.new(key, nonce + ctr.to_bytes(8, "big"), hashlib.sha256).digest()
+    return bytes(out[:n])
+
+
+def _xor(a, b):
+    return (int.from_bytes(a, "big") ^ int.from_bytes(b, "big")).to_bytes(len(a), "big") if a else b""
+
+
+def seal(plain, keys):
+    ek, mk = keys
+    nonce = os.urandom(16)
+    ct = _xor(plain, _keystream(ek, nonce, len(plain)))
+    return b"v1" + nonce + ct + hmac.new(mk, b"v1" + nonce + ct, hashlib.sha256).digest()
+
+
+def unseal(blob, keys):
+    ek, mk = keys
+    if len(blob) < 50 or blob[:2] != b"v1":
+        raise ValueError("unknown format")
+    nonce, ct, tag = blob[2:18], blob[18:-32], blob[-32:]
+    if not hmac.compare_digest(tag, hmac.new(mk, b"v1" + nonce + ct, hashlib.sha256).digest()):
+        raise ValueError("wrong key or tampered file")
+    return _xor(ct, _keystream(ek, nonce, len(ct)))
+
+
 def load_state():
-    try:
-        with open(STATE, encoding="utf-8") as f:
-            s = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        s = {}
+    s, keys = None, _state_keys()
+    if keys and os.path.exists(STATE_ENC):
+        try:
+            with open(STATE_ENC, encoding="ascii") as f:
+                s = json.loads(unseal(base64.b64decode(f.read()), keys).decode("utf-8"))
+        except Exception as ex:  # noqa: BLE001 — e.g. the token was rotated without setting STATE_KEY
+            bak = f"{STATE_ENC}.{int(time.time())}.unreadable"
+            os.replace(STATE_ENC, bak)
+            log.error("encrypted state unreadable (%s); kept as %s and starting fresh", ex, bak)
+            s = None
+    if s is None:                                   # first run, or one-time migration from the old plaintext file
+        try:
+            with open(STATE, encoding="utf-8") as f:
+                s = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            s = {}
     s.setdefault("offset", 0)
     s.setdefault("users", {})   # uid -> {username,name,referrer,joined,created,lang,brief,alerts,rewarded}
     s.setdefault("last_brief", "")
@@ -71,10 +126,20 @@ def save_state(s):
     d = os.path.dirname(STATE)
     if d:
         os.makedirs(d, exist_ok=True)
-    tmp = STATE + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(s, f, ensure_ascii=False, indent=1)
-    os.replace(tmp, STATE)
+    keys = _state_keys()
+    if keys:
+        blob = seal(json.dumps(s, ensure_ascii=False, separators=(",", ":")).encode("utf-8"), keys)
+        tmp = STATE_ENC + ".tmp"
+        with open(tmp, "w", encoding="ascii") as f:
+            f.write(base64.b64encode(blob).decode("ascii"))
+        os.replace(tmp, STATE_ENC)
+        if os.path.exists(STATE):                   # the plaintext copy leaves the public branch
+            os.remove(STATE)
+    else:                                           # local runs without a token
+        tmp = STATE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(s, f, ensure_ascii=False, indent=1)
+        os.replace(tmp, STATE)
     with open(PUBLIC, "w", encoding="utf-8") as f:
         json.dump({"updated": int(time.time()), "reward_at": REWARD_AT, "users": len(s["users"]),
                    "top": [{"name": n, "points": p} for _, n, p in leaderboard(s, 20)]},
