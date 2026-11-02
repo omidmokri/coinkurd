@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://entekhab.net/terminal/">
 <meta property="og:title" content="Entekhab Terminal"><meta property="og:description" content="Ask Entekhab, live events wall, derivatives command room, capital waterfall, crypto globe, sentiment thermometer, claim-proof lab">
 <meta name="theme-color" content="#f7931a">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/ui.css">
 <style>
@@ -41,7 +41,7 @@
 </head>
 <body>
 <header><div class="wrap">
-  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <a class="brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab.net</span></a>
   <nav class="tabs" id="tabs"></nav>
   <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
 </div></header>
@@ -59,6 +59,8 @@
     <div class="pan" data-p="therm"><header><h3 data-t="thT"></h3><span class="ctl"></span></header><div id="therm"></div></div>
     <div class="pan" data-p="claim"><header><h3 data-t="clT"></h3><span class="ctl"></span></header><select id="claimSel" style="width:100%"></select><div id="claim" style="margin-top:10px"></div></div>
     <div class="pan" data-p="acc"><header><h3 data-t="accT"></h3><span class="ctl"></span></header><div id="acc"></div></div>
+    <div class="pan w2" data-p="macro"><header><h3 data-t="mcT"></h3><span class="ctl"></span></header><div id="macro"></div></div>
+    <div class="pan" data-p="liq"><header><h3 data-t="lqT"></h3><span class="ctl"></span></header><div id="liq"></div></div>
   </div>
   <section><div class="honest" data-t="honest"></div></section>
 </div>
@@ -66,26 +68,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/assets/ui.js"></script>
 <script>
-Object.assign(I.fa,{h1:'ترمینال <em>Entekhab</em>',lead:'یک محیط شیشه‌ای و زنده: بپرس، کشف کن، ادعاها را با داده بسنج. هر عدد منبع دارد و هر پنل را می‌توانی جابه‌جا یا پنهان کنی.',
+Object.assign(I.fa,{mcT:'🌍 کریپتو و بازارهای جهانی',lqT:'💥 لیکوئید شدن‌های زنده',h1:'ترمینال <em>Entekhab</em>',lead:'یک محیط شیشه‌ای و زنده: بپرس، کشف کن، ادعاها را با داده بسنج. هر عدد منبع دارد و هر پنل را می‌توانی جابه‌جا یا پنهان کنی.',
  modes:{beginner:'مبتدی',trader:'معامله‌گر',analyst:'تحلیلگر',all:'همه'},askT:'از Entekhab بپرس',ph:'مثلاً: چرا سولانا امروز ریخت؟ · قیمت بیت‌کوین · اتریوم یا سولانا؟',
  ex:['امروز بازار چه خبر؟','قیمت بیت‌کوین','چرا سولانا تغییر کرد؟','اتریوم یا سولانا؟','فاندینگ بازار','ترس و طمع','رویدادهای مهم','DNA اتریوم'],
  wallT:'دیوار زندهٔ رویدادها',derT:'اتاق فرمان مشتقات (OKX)',flowT:'آبشار سرمایه — کدام بخش بازار ارزش گرفت یا از دست داد؟',globeT:'کره‌زمین کریپتو',thT:'دماسنج احساسات واقعی',clT:'آزمایشگاه اثبات ادعا',accT:'شاخص عمومی دقت پیش‌بینی',
  nfa:'آموزشی است، توصیهٔ مالی نیست',noData:'داده هنوز در اولین اجرای خودکار ساخته نشده.',
  honest:'<b>شفافیت:</b> «جریان سرمایه» تغییر ارزش بازار هر بخش است (قیمت × عرضه) و ورود/خروج خالص پول را مستقیم اندازه نمی‌گیرد. دادهٔ کیف‌پول نهنگ‌ها و احساسات شبکه‌های اجتماعی منبع رایگان و قابل‌اعتماد ندارند؛ به‌جایش جریان معاملات صرافی و لحن تیترهای خبری نمایش داده می‌شود. پاسخ‌های «از Entekhab بپرس» با قواعد روی دادهٔ همین سایت ساخته می‌شوند، نه با حدس.'});
-Object.assign(I.ckb,{h1:'تێرمیناڵی <em>Entekhab</em>',lead:'ژینگەیەکی شووشەیی و زیندوو: بپرسە، بدۆزەوە، بانگەشەکان بە داتا بپێوە. هەر ژمارەیەک سەرچاوەی هەیە.',
+Object.assign(I.ckb,{mcT:'🌍 کریپتۆ و بازاڕە جیهانییەکان',lqT:'💥 لیکویدەیشنی زیندوو',h1:'تێرمیناڵی <em>Entekhab</em>',lead:'ژینگەیەکی شووشەیی و زیندوو: بپرسە، بدۆزەوە، بانگەشەکان بە داتا بپێوە. هەر ژمارەیەک سەرچاوەی هەیە.',
  modes:{beginner:'سەرەتایی',trader:'بازرگان',analyst:'شیکەرەوە',all:'هەموو'},askT:'لە Entekhab بپرسە',ph:'بۆ نموونە: بۆچی سۆلانا ئەمڕۆ دابەزی؟ · نرخی بیتکۆین · ئیتریۆم یان سۆلانا؟',
  ex:['ئەمڕۆ بازاڕ چۆنە؟','نرخی بیتکۆین','بۆچی سۆلانا گۆڕا؟','ئیتریۆم یان سۆلانا؟','فەندینگی بازاڕ','ترس و تەماح','ڕووداوە گرنگەکان','DNA ئیتریۆم'],
  wallT:'دیواری زیندووی ڕووداوەکان',derT:'ژووری فەرمانی مەشتەقە (OKX)',flowT:'تاڤگەی سەرمایە — کام بەشی بازاڕ بەها وەرگرت یان لەدەستیدا؟',globeT:'گۆی زەویی کریپتۆ',thT:'گەرمیپێوی هەستی ڕاستەقینە',clT:'تاقیگەی سەلماندنی بانگەشە',accT:'پێوەری گشتیی وردی پێشبینی',
  nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',noData:'داتا هێشتا دروست نەکراوە.',
  honest:'<b>ڕوونی:</b> «ڕەوتی سەرمایە» گۆڕانی بەهای بازاڕی هەر بەشێکە (نرخ × خستنەڕوو) و هاتنە ژوورەوە/دەرچوونی پارەی خاوێن ڕاستەوخۆ ناپێوێت. داتای جزدانی نەهەنگەکان و هەستی تۆڕە کۆمەڵایەتییەکان سەرچاوەی بەخۆڕایی و متمانەپێکراویان نییە.'});
-Object.assign(I.en,{h1:'Entekhab <em>Terminal</em>',lead:'A live glass workspace: ask, discover, and test claims against data. Every number has a source, and every panel can be moved or hidden.',
+Object.assign(I.en,{mcT:'🌍 Crypto vs global markets',lqT:'💥 Live liquidations',h1:'Entekhab <em>Terminal</em>',lead:'A live glass workspace: ask, discover, and test claims against data. Every number has a source, and every panel can be moved or hidden.',
  modes:{beginner:'Beginner',trader:'Trader',analyst:'Analyst',all:'All'},askT:'Ask Entekhab',ph:'e.g. why is Solana down today? · price of bitcoin · ETH or SOL?',
  ex:['What happened today?','Price of bitcoin','Why did SOL move?','ETH or SOL?','Market funding','Fear and greed','Upcoming events','DNA of ETH'],
  wallT:'Live events wall',derT:'Derivatives command room (OKX)',flowT:'Capital waterfall — which sectors gained or lost value?',globeT:'Crypto globe',thT:'Real sentiment thermometer',clT:'Claim-proof lab',accT:'Public prediction-quality index',
  nfa:'Educational, not financial advice',noData:'Data is built on the first automatic run.',
  honest:'<b>Transparency:</b> “capital flow” is each sector’s market-cap change (price × supply), not a measured net inflow. Whale-wallet and social-media sentiment data have no reliable free source, so exchange trade flow and headline tone are shown instead. “Ask Entekhab” answers are built by rules over this site’s data, never guessed.'});
 const D={};let MODE=ls.get('ek_tmode','all'),ORDER=ls.get('ek_torder',null),HIDE=ls.get('ek_thide',[]);
-const MODES={beginner:['ask','wall','therm','claim','globe'],trader:['ask','wall','deriv','flow','claim','therm'],analyst:['ask','deriv','flow','globe','therm','claim','acc','wall'],all:null};
+const MODES={beginner:['ask','wall','therm','claim','globe'],trader:['ask','wall','deriv','liq','flow','claim','therm'],analyst:['ask','deriv','macro','liq','flow','globe','therm','claim','acc','wall'],all:null};
 const ago=t=>{const s=(Date.now()-t)/1e3;return s<3600?Math.round(s/60)+'m':s<86400?Math.round(s/3600)+'h':Math.round(s/86400)+'d'};
 const usd=v=>v==null?'—':Math.abs(v)>=1e9?'$'+fm(v/1e9,2)+'B':Math.abs(v)>=1e6?'$'+fm(v/1e6,1)+'M':'$'+fm(v,0);
 /* ---------- layout: modes, order, hide ---------- */
@@ -245,8 +247,30 @@ function acc(){const log=D.clog||[];if(!log.length){$('#acc').innerHTML=`<p clas
   if(age<7||!e.btc||!p2){pend.push(e);return}const r=(p2/e.btc-1)*100;Object.entries(e.stances||{}).forEach(([a,[s]])=>{sc[a]=sc[a]||{n:0,hit:0};if(s==='neutral'){if(Math.abs(r)<3){sc[a].n++;sc[a].hit++}else sc[a].n++}else{sc[a].n++;if((s==='bullish')===(r>0))sc[a].hit++}})});
  const rows=Object.entries(sc);$('#acc').innerHTML=(rows.length?`<table><tr><th></th><th>n</th><th>${L3('دقت','وردی','Hit rate')}</th></tr>${rows.map(([a,v])=>`<tr><td>${esc(a)}</td><td class="num">${v.n}</td><td class="num">${Math.round(v.hit*100/v.n)}%</td></tr>`).join('')}</table>`:'')+`<p class="disc">${log.length} ${L3('نظر ثبت‌شده','بۆچوونی تۆمارکراو','logged calls')} · ${pend.length} ${L3('در انتظار ۷ روز','چاوەڕێی ٧ ڕۆژ','waiting for 7 days')} · ${L3('روش: صعودی/نزولی = جهت درست بازده ۷ روزه؛ خنثی = حرکت کمتر از ۳٪','','method: bullish/bearish = correct sign of the 7-day BTC return; neutral = |move| < 3%')}</p>`}
 /* ---------- boot ---------- */
-async function load(){const v=V();[D.market,D.news,D.brain,D.deriv,D.flows,D.chain,D.dna,D.narr,D.events,D.score,D.lab,D.clog,D.logos]=await Promise.all(['market','news','brain','derivatives','flows','chain','dna','narratives','events','score','lab','council_log','logos/index'].map(n=>j(`/data/${n}.json${v}`)));LOGO=new Set(D.logos||[]);render()}
-function render(){layout();$('#q').placeholder=T('ph');$('#ex').innerHTML=T('ex').map(x=>`<button>${esc(x)}</button>`).join('');wall();deriv();flow();therm();claim();acc();globeLayer()}
+/* ---------- crypto vs global markets (data/macro.json: FRED + Binance) ---------- */
+let MW='3m';
+function macro(){const d=D.macro,el=$('#macro');if(!d||!d.windows){el.innerHTML=`<p class="disc">${L3('دادهٔ همبستگی هنوز آماده نیست؛ بعد از اجرای بعدی به‌روزرسانی ساخته می‌شود.','داتای پەیوەندی هێشتا ئامادە نییە.','Correlation data is not ready yet; it is built on the next update run.')}</p>`;return}
+ const w=d.windows[MW]||d.windows['3m'],A=d.assets,nm=a=>(d.names[a]||{})[lang==='en'?'en':'fa']||a,col=v=>v==null?'#ffffff08':v>=0?`rgba(34,197,94,${Math.min(.85,Math.abs(v))})`:`rgba(239,68,68,${Math.min(.85,Math.abs(v))})`;
+ const b=w.matrix.BTC||{},desc=v=>v==null?'—':Math.abs(v)>=.6?L3('قوی','بەهێز','strong'):Math.abs(v)>=.3?L3('متوسط','مامناوەند','moderate'):L3('ضعیف','لاواز','weak');
+ const rl=d.rolling_btc_spx_30d||[],mn=-1,mx=1,pts=rl.map((r,i)=>`${(i/(rl.length-1||1)*300).toFixed(1)},${(36-(r[1]-mn)/(mx-mn)*32).toFixed(1)}`).join(' ');
+ el.innerHTML=`<div class="row" style="justify-content:space-between"><span class="seg">${['3m','1y'].map(k=>`<button class="btn" data-mw="${k}" style="padding:3px 10px;${k===MW?'background:var(--o);color:#000':''}">${k==='3m'?L3('۳ ماه','٣ مانگ','3 months'):L3('۱ سال','١ ساڵ','1 year')}</button>`).join(' ')}</span><small class="disc">n=${w.n} · ${esc(w.from||'')}</small></div>`
+ +`<p style="margin:8px 0">${L3('بیت‌کوین و S&P 500','بیتکۆین و S&P 500','Bitcoin & S&P 500')}: <b class="num">${b.SPX??'—'}</b> (${desc(b.SPX)}) · ${L3('با دلار','لەگەڵ دۆلار','with the dollar')}: <b class="num">${b.DXY??'—'}</b> (${desc(b.DXY)}) · ${L3('با طلا','لەگەڵ زێڕ','with gold')}: <b class="num">${b.GOLD??'—'}</b></p>`
+ +`<div style="overflow-x:auto"><table style="font-size:.74rem;min-width:520px"><tr><th></th>${A.map(a=>`<th class="num">${a}</th>`).join('')}</tr>${A.map(r=>`<tr><th title="${esc(nm(r))}">${esc(nm(r))}</th>${A.map(c=>{const v=w.matrix[r][c];return `<td class="num" style="text-align:center;background:${r===c?'#ffffff10':col(v)}">${r===c?'·':v==null?'—':v.toFixed(2)}</td>`}).join('')}</tr>`).join('')}</table></div>`
+ +(rl.length>2?`<p class="disc" style="margin-top:8px">${L3('همبستگی ۳۰ روزهٔ بیت‌کوین با S&P 500 در طول زمان','پەیوەندیی ٣٠ ڕۆژەی بیتکۆین و S&P 500','Rolling 30-day BTC ↔ S&P 500 correlation')} (${esc(rl[0][0])} → ${esc(rl.at(-1)[0])})</p><svg viewBox="0 0 300 40" style="width:100%;height:60px" preserveAspectRatio="none"><line x1="0" x2="300" y1="20" y2="20" stroke="#ffffff25" stroke-dasharray="3 3"/><polyline points="${pts}" fill="none" stroke="#f7931a" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`:'')
+ +`<div class="kpis" style="margin-top:8px">${['SPX','NDX','DXY','GOLD','OIL','US10Y'].filter(a=>d.last[a]).map(a=>`<div><small>${esc(nm(a))}</small><b>${a==='US10Y'?d.last[a].value.toFixed(2)+'%':fm(d.last[a].value,2)}</b> ${d.chg_1m[a]!=null?(a==='US10Y'?`<small class="disc num">${d.chg_1m[a]>=0?'+':''}${d.chg_1m[a]} pp</small>`:sg(d.chg_1m[a])):''}</div>`).join('')}</div>`
+ +`<p class="src" style="font-size:.72rem;color:var(--mute)">FRED (SP500, NASDAQCOM, DTWEXBGS, DCOILWTICO, DGS10) · Binance (BTC, ETH, SOL, PAXG) · ${esc((d.updated_at||'').slice(0,16).replace('T',' '))} UTC · ${L3('همبستگی بازده‌های روزانه در روزهای معاملاتی آمریکا؛ همبستگی علیت نیست.','پەیوەندیی قازانجی ڕۆژانە؛ پەیوەندی هۆکار نییە.','Correlation of daily returns on US trading days; correlation is not causation.')}</p>`;
+ el.querySelectorAll('[data-mw]').forEach(x=>x.onclick=()=>{MW=x.dataset.mw;macro()})}
+/* ---------- live liquidations (Binance USDⓈ-M futures public stream) ---------- */
+let LQ=null,LQE=[],LQS={long:0,short:0,n:0,t0:Date.now()},LQT=null;
+function liqDraw(){const el=$('#liq');if(!el)return;const min=Math.max(1,Math.round((Date.now()-LQS.t0)/6e4));
+ el.innerHTML=`<div class="kpis"><div><small>${L3('لانگ‌های لیکوئیدشده','لۆنگی لیکویدکراو','Longs liquidated')}</small><b class="neg">$${fm(LQS.long,0)}</b></div><div><small>${L3('شورت‌های لیکوئیدشده','شۆرتی لیکویدکراو','Shorts liquidated')}</small><b class="pos">$${fm(LQS.short,0)}</b></div><div><small>${L3('مدت پایش','ماوەی چاودێری','Watching')}</small><b>${min}m · ${LQS.n}</b></div></div>`
+ +(LQE.length?`<table style="font-size:.78rem">${LQE.slice(0,14).map(x=>`<tr><td class="num">${new Date(x.t).toLocaleTimeString('en-GB')}</td><td><b>${esc(x.s)}</b></td><td class="${x.long?'neg':'pos'}">${x.long?L3('لانگ','لۆنگ','long'):L3('شورت','شۆرت','short')}</td><td class="num">$${fm(x.p,x.p<1?6:2)}</td><td class="num"${x.v>=1e5?' style="color:var(--o);font-weight:800"':''}>$${fm(x.v,0)}</td></tr>`).join('')}</table>`:`<p class="disc">${L3('در انتظار لیکوئید شدن بعدی…','چاوەڕێی لیکویدەیشنی داهاتوو…','Waiting for the next liquidation…')}</p>`)
+ +`<p class="src">Binance Futures · ${L3('بایننس حداکثر یک لیکوئید در ثانیه برای هر نماد منتشر می‌کند؛ این نمونهٔ زنده است نه جمع کامل.','نموونەی زیندووە نەک کۆی تەواو.','Binance publishes at most one liquidation per symbol per second — a live sample, not the full total.')}</p>`}
+function liqInit(){if(LQ||!('WebSocket' in window))return liqDraw();try{LQ=new WebSocket('wss://fstream.binance.com/ws/!forceOrder@arr')}catch(e){return}
+ LQ.onmessage=ev=>{try{const o=JSON.parse(ev.data).o;const v=+o.ap*+o.z||+o.p*+o.q,long=o.S==='SELL';LQE.unshift({t:o.T,s:o.s.replace(/USDT$/,''),p:+o.ap||+o.p,v,long});LQE=LQE.slice(0,60);LQS[long?'long':'short']+=v;LQS.n++;
+  if(!LQT)LQT=setTimeout(()=>{LQT=null;liqDraw()},1000)}catch(e){}};LQ.onclose=()=>{LQ=null;setTimeout(()=>{if(!document.hidden)liqInit()},5000)};liqDraw()}
+async function load(){const v=V();[D.market,D.news,D.brain,D.deriv,D.flows,D.chain,D.dna,D.narr,D.events,D.score,D.lab,D.clog,D.logos]=await Promise.all(['market','news','brain','derivatives','flows','chain','dna','narratives','events','score','lab','council_log','logos/index'].map(n=>j(`/data/${n}.json${v}`)));D.macro=await j(`/data/macro.json${v}`);LOGO=new Set(D.logos||[]);render()}
+function render(){layout();$('#q').placeholder=T('ph');$('#ex').innerHTML=T('ex').map(x=>`<button>${esc(x)}</button>`).join('');wall();deriv();flow();therm();claim();acc();macro();liqInit();globeLayer()}
 uiLang(()=>{if(D.market!==undefined)render()});load().then(()=>{globeInit();const q=new URLSearchParams(location.search).get('q');if(q)ask(q)});setInterval(()=>{if(!document.hidden)load()},120000);
 </script>
 </body>
