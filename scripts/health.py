@@ -64,6 +64,13 @@ def main():
     if isinstance(nw, dict):
         okf = sum(1 for f in nw.get("feeds", {}).values() if f.get("ok"))
         add("news_feeds", okf >= 2, f"{okf}/{len(nw.get('feeds', {}))} منبع خبری پاسخ دادند", "warn")
+    kd = load("kind.json")
+    if isinstance(kd, dict) and kd.get("updated_at"):
+        hk = age_h(kd["updated_at"])
+        add("indicators_engine", hk < 8, f"موتور اندیکاتورها {hk:.1f} ساعت پیش", "warn")
+    sgn = load("signals.json")
+    if isinstance(sgn, dict):
+        add("signals", True, f"{len(sgn.get('signals', []))} سیگنال؛ رله: {(sgn.get('relay') or {}).get('channel') or 'خاموش'}")
     for k, v in os.environ.items():
         if k.startswith("STEP_") and v:
             add(k[5:].lower(), v in ("success", "skipped"), f"مرحلهٔ {k[5:].lower()}: {v}")
