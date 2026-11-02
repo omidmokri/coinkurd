@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Writes data/indicators.json — catalogue of Coin_Kurd's public TradingView scripts shown on entekhab.net/indicators/.
+Texts are summaries of the authors' own TradingView descriptions; backtest figures are copied from each strategy's
+TradingView "Strategy report" (publication chart) on 2026-11-02. Edit here, run once, commit the JSON."""
+import json
+import os
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TV = "https://www.tradingview.com/script/"
+
+
+def it(id_, tv, slug, name, kind, access, group, esig, chart, w, h, t, bt=None, engine="tv"):
+    return {"id": id_, "tv": tv, "url": f"{TV}{tv}-{slug}/", "name": name, "kind": kind, "access": access, "group": group,
+            "esig": esig, "chart": chart, "img": {"w": w, "h": h}, "engine": engine, "bt": bt, "t": t}
+
+
+ITEMS = [
+    it("kurdistan-roj-rsi", "jxwqCFUw", "Kurdistan-Roj-RSI", "Kurdistan Roj RSI", "strategy", "invite-only", "mokri", "kroj-rsi", "BTCUSDT · 4h · OKX", 1227, 847, {
+        "fa": {"sum": "استراتژی چندتایم‌فریمی که شکست تأییدشدهٔ خطوط روند اصلی را — همان‌طور که در روش موکری (Coin_Kurd) با دست رسم می‌شوند — معامله می‌کند و RSI ۱۷ با خطوط روند و خطوط واگرایی‌اش موتور دوم آن است.",
+               "how": ["خط روند فقط وقتی «اصلی» است که برخورد واقعی کافی داشته باشد (پیش‌فرض ۱۰ برخورد)؛ فقط خطوط نارنجی معامله می‌شوند و شکست فقط با بسته‌شدن کندل معتبر است، نه با سایه.",
+                       "هدف با Body Way اندازه‌گیری می‌شود: از بدنهٔ حدی آخرین موج تا خط در لحظهٔ شکست. حد ضرر پشت ساختار شکست است (ATR یا فاصلهٔ ثابت هم قابل انتخاب است).",
+                       "سوگیری EMA تایم‌فریم بالاتر جلوی سیگنال خلاف روند را می‌گیرد و فیلتر آخر هفته برای کریپتوی درون‌روزی فعال است.",
+                       "موتور RSI ۱۷: شکست خطوط روند RSI و خطوط واگرایی با دست‌کم ۳ برخورد هم پوزیشن باز می‌کند؛ موتور سطوح RSI (عبور از ۵۵ و ۴۵) کنار شکست خطوط کار می‌کند.",
+                       "بدون ری‌پینت: همهٔ سیگنال‌ها روی کندل بسته و کندل بستهٔ قبلیِ تایم‌فریم بالاتر ساخته می‌شوند."]},
+        "ckb": {"sum": "ستراتیژییەکی چەند تایمفرەیمییە کە شکانی پشتڕاستکراوەی هێڵە سەرەکییەکانی ڕەوت بازرگانی پێ دەکات — هەروەک لە ڕێبازی موکری (Coin_Kurd) بە دەست دەکێشرێن — و RSI 17 لەگەڵ هێڵەکانی ڕەوت و جیاوازییەکانی بزوێنەری دووەمیەتی.",
+                "how": ["هێڵی ڕەوت تەنها کاتێک «سەرەکی»یە کە بەرکەوتنی ڕاستەقینەی تەواوی هەبێت (بنەڕەت ١٠ بەرکەوتن)؛ تەنها هێڵە پرتەقاڵییەکان بازرگانییان پێ دەکرێت و شکان تەنها بە داخرانی مۆم دەژمێردرێت، نەک بە سێبەر.",
+                        "ئامانج بە Body Way دەپێورێت: لە لاشەی کۆتایی دوایین شەپۆلەوە تا هێڵەکە لە ساتی شکاندا. وەستاندنی زیان لە پشت پێکهاتەی شکانەوەیە (ATR یان دووریی جێگیریش هەیە).",
+                        "لایەنگیریی EMAی تایمفرەیمی بەرزتر ڕێگە لە سیگناڵی دژە-ڕەوت دەگرێت و فلتەری کۆتایی هەفتە بۆ کریپتۆی ناو-ڕۆژ چالاکە.",
+                        "بزوێنەری RSI 17: شکانی هێڵەکانی ڕەوتی RSI و هێڵەکانی جیاوازی بە لانیکەم ٣ بەرکەوتنیش پۆزیشن دەکەنەوە؛ بزوێنەری ئاستەکانی RSI (تێپەڕینی ٥٥ و ٤٥) لە تەنیشت شکانی هێڵەکان کار دەکات.",
+                        "بێ repaint: هەموو سیگناڵەکان لەسەر مۆمی داخراو و مۆمی داخراوی پێشووی تایمفرەیمی بەرزتر دروست دەبن."]},
+        "en": {"sum": "Multi-timeframe strategy that trades confirmed breaks of major trendlines drawn the way they are drawn by hand in the Mokri (Coin_Kurd) method, with RSI 17 — its own trendlines and divergence lines — as a second engine.",
+               "how": ["A line becomes “major” only after enough real touches (default 10); only the orange major lines trade, and a break counts only on a candle close, never on a wick.",
+                       "Target = Body Way, measured from the extreme body of the leg to the line at the break; stop beyond the break structure (ATR or fixed distance optional).",
+                       "A higher-timeframe EMA bias blocks counter-trend signals; weekend filter for intraday crypto.",
+                       "RSI 17 engine: breaks of RSI trendlines and of divergence lines with 3+ touches can open trades; an RSI-level engine (55 / 45 crosses) runs next to the line breaks.",
+                       "No repaint: all signals use closed candles and the previous closed higher-timeframe bar."]}},
+       bt={"pnl": "+100.07%", "dd": "15.20%", "win": "53.21%", "trades": "83/156", "pf": "1.695"}),
+    it("kurdistan-roj", "bW7DWvRc", "Kurdistan-Roj", "Kurdistan Roj", "strategy", "invite-only", "mokri", "kroj", "BTCUSDT · 1h · Binance", 1227, 797, {
+        "fa": {"sum": "روژ کردستان («روژ» یعنی خورشیدِ وسط پرچم کردستان): استراتژی قابل بک‌تست با دو موتور مستقل روی یک چارت — شکست خط روند با هدف Body Way، و روش قاعده‌مند پنج‌ناحیه‌ای برای الگوهای همگرا (مثلث و گُوِه) و موازی (تونل/کانال).",
+               "how": ["موتور اول شکست خطوط روند را پیدا، امتیازدهی و معامله می‌کند؛ هدف از بدنهٔ کندل‌های موجِ شکننده اندازه‌گیری می‌شود (Body Way).",
+                       "موتور دوم الگوهای همگرا را به پنج ناحیهٔ زمانی فیبوناچی تقسیم می‌کند و شکست معتبر ناحیه‌ها و تونل‌ها را با پلکان هدف (TP1…TP4) معامله می‌کند.",
+                       "داشبورد فارسی روی چارت: الگو، وضعیت، ناحیه، کیفیت، جهت محتمل، معامله، حداکثر هدف و افق زمانی."]},
+        "ckb": {"sum": "ڕۆژی کوردستان («ڕۆژ» خۆرەکەی ناوەڕاستی ئاڵای کوردستانە): ستراتیژییەکی تاقیکراوە (backtest) بە دوو بزوێنەری سەربەخۆ لەسەر یەک چارت — شکانی هێڵی ڕەوت بە ئامانجی Body Way، و ڕێبازێکی یاسامەندی پێنج-ناوچەیی بۆ نەخشە نزیکبووەکان (سێگۆشە و گوێزە) و تەریبەکان (تونێل/کەناڵ).",
+                "how": ["بزوێنەری یەکەم شکانی هێڵەکانی ڕەوت دەدۆزێتەوە، نمرەیان دەداتێ و بازرگانییان پێ دەکات؛ ئامانج لە لاشەی مۆمەکانی شەپۆلی شکێنەرەوە دەپێورێت (Body Way).",
+                        "بزوێنەری دووەم نەخشە نزیکبووەکان دابەشی پێنج ناوچەی کاتیی فیبۆناچی دەکات و شکانی دروستی ناوچەکان و تونێلەکان بە پەیژەی ئامانج (TP1…TP4) بازرگانی پێ دەکات.",
+                        "داشبۆردێکی سەر چارت: نەخشە، دۆخ، ناوچە، کوالیتی، ئاراستەی گونجاو، مامەڵە، بەرزترین ئامانج و ئاسۆی کات."]},
+        "en": {"sum": "Kurdistani Roj (“Roj” — the sun at the centre of the Kurdish flag): a backtestable strategy with two independent engines on one chart — trendline breaks with a Body Way target, and a rule-based five-zone method for converging patterns (triangles / wedges) and parallel patterns (tunnels / channels).",
+               "how": ["Engine 1 finds, scores and trades trendline breaks; the target is measured from the candle bodies of the breaking leg (Body Way).",
+                       "Engine 2 splits converging patterns into five Fibonacci-time zones and trades valid zone and tunnel breaks with a target ladder (TP1…TP4).",
+                       "On-chart dashboard: pattern, state, zone, quality, likely direction, trade, maximum target and time horizon."]}},
+       bt={"pnl": "+13.64%", "dd": "5.01%", "win": "71.70%", "trades": "38/53", "pf": "2.153"}),
+    it("kurdistan-omid-d-mokri", "TytPblTo", "Kurdistan-Omid-D-Mokri", "Kurdistan Omid D Mokri", "strategy", "invite-only", "mokri", "komid", "BTCUSDT · 4h · OKX", 1227, 755, {
+        "fa": {"sum": "استراتژی جامع پرایس‌اکشن با دو موتور مستقل: «خط روند × Body Way» (از جمله خطوط کوتاهِ شبیه رسم دستی که به سایه‌های زیادی چسبیده‌اند و سبز نشان داده می‌شوند) و «موتور مثلث و تونل موکری» با پنج ناحیهٔ زمانی فیبوناچی و پلکان کامل هدف.",
+               "how": ["شکست خطوط روند واقعی و پرآزمون را پیدا و معامله می‌کند.",
+                       "مثلث، گُوِه و تونل (کانال) را تشخیص می‌دهد؛ شکست معتبر با TP1 تا TP4، انتقال حد ضرر به نقطهٔ سربه‌سر و دنباله‌روی بخش باقی‌مانده مدیریت می‌شود.",
+                       "داشبورد نتیجهٔ هر موتور را جدا نشان می‌دهد: شکست خط روند، تونل/کانال، مثلث/گُوِه و خطوط کوتاه — با نرخ برد و فاکتور سود."]},
+        "ckb": {"sum": "ستراتیژییەکی گشتگیری پرایس-ئاکشنە بە دوو بزوێنەری سەربەخۆ: «هێڵی ڕەوت × Body Way» (لەوانە هێڵە کورتەکانی وەک کێشانی دەستی کە بە زۆر سێبەرەوە نووساون و بە سەوز نیشان دەدرێن) و «بزوێنەری سێگۆشە و تونێلی موکری» بە پێنج ناوچەی کاتیی فیبۆناچی و پەیژەیەکی تەواوی ئامانج.",
+                "how": ["شکانی هێڵە ڕاستەقینە و تاقیکراوەکانی ڕەوت دەدۆزێتەوە و بازرگانییان پێ دەکات.",
+                        "سێگۆشە، گوێزە و تونێل (کەناڵ) دەناسێتەوە؛ شکانی دروست بە TP1 تا TP4، گواستنەوەی وەستاندنی زیان بۆ خاڵی یەکسانی و شوێنکەوتنی بەشی ماوە بەڕێوە دەبرێت.",
+                        "داشبۆرد ئەنجامی هەر بزوێنەرێک جیا نیشان دەدات: شکانی هێڵ، تونێل/کەناڵ، سێگۆشە/گوێزە و هێڵە کورتەکان — لەگەڵ ڕێژەی بردنەوە و فاکتەری قازانج."]},
+        "en": {"sum": "All-in-one price-action strategy on two independent engines: Trendline × Body Way (including short “hand-drawn style” lines that hug many wicks, shown in green) and the Mokri Triangle & Tunnel engine with five Fibonacci-time zones and a full TP ladder.",
+               "how": ["Finds and trades the breaks of real, well-tested trendlines.",
+                       "Detects triangles, wedges and tunnels (channels); valid breaks are managed with TP1…TP4, a move to breakeven and a trailing runner.",
+                       "The dashboard reports each engine separately — trendline breaks, tunnels, triangles and short lines — with win rate and profit factor."]}},
+       bt={"pnl": "+22.06%", "dd": "10.31%", "win": "62.88%", "trades": "144/229", "pf": "1.254"}),
+    it("kurdistani-rsi-helper-strategy", "NtzzIr6R", "Kurdistani-RSI-Helper-Strategy", "Kurdistani RSI Helper Strategy", "strategy", "invite-only", "signals", "krsih", "BTCUSDT · 1h · MEXC", 1227, 197, {
+        "fa": {"sum": "نسخهٔ قابل بک‌تستِ اندیکاتور Kurdistani RSI Helper: فقط یک ستاپ را معامله می‌کند — شکست خط روندِ خوب‌آزموده که وضعیت روند RSI، برچسب‌های مومنتوم و فیلتر روند تایم‌فریم بالاتر آن را تأیید کرده باشند — و هرگز زیر مقاومت نمی‌خرد یا روی حمایت نمی‌فروشد.",
+               "how": ["همهٔ ترسیم‌های اندیکاتور حفظ شده‌اند: خطوط روند، حمایت و مقاومت پیوت‌های چندتایم‌فریمی، هدف‌ها و حد ضررها.",
+                       "نشانه‌های پوزیشن (ورود، هدف‌های مبتنی بر ATR و حد ضرر) فقط جایی رسم می‌شوند که استراتژی واقعاً وارد معامله شده است."]},
+        "ckb": {"sum": "وەشانی تاقیکراوەی (backtest) ئیندیکاتۆری Kurdistani RSI Helper: تەنها یەک ستاپ بازرگانی پێ دەکات — شکانی هێڵێکی ڕەوتی باش تاقیکراوە کە دۆخی ڕەوتی RSI، نیشانەکانی مۆمێنتۆم و فلتەری ڕەوتی تایمفرەیمی بەرزتر پشتڕاستیان کردبێتەوە — و هەرگیز لە ژێر بەرگری ناکڕێت و لەسەر پاڵپشتی نافرۆشێت.",
+                "how": ["هەموو کێشانەکانی ئیندیکاتۆرەکە پارێزراون: هێڵەکانی ڕەوت، پاڵپشتی و بەرگریی پیڤۆتی چەند تایمفرەیم، ئامانجەکان و وەستاندنی زیان.",
+                        "نیشانەکانی پۆزیشن (چوونەژوورەوە، ئامانجی ATR و وەستاندنی زیان) تەنها لەو شوێنانە دەکێشرێن کە ستراتیژییەکە بەڕاستی مامەڵەی کردووە."]},
+        "en": {"sum": "Backtestable version of the Kurdistani RSI Helper indicator: it trades one setup only — the breakout of a well-tested trendline confirmed by the indicator’s RSI trend state, momentum labels and a higher-timeframe trend filter — and refuses to buy into resistance or sell into support.",
+               "how": ["All original drawings are kept: trendlines, multi-timeframe pivot support / resistance, targets and stops.",
+                       "Position marks (entry, ATR-based targets, stops) are drawn only where the strategy actually took the trade."]}},
+       bt={"pnl": "+2.70%", "dd": "4.74%", "win": "69.86%", "trades": "51/73", "pf": "1.208"}),
+    it("kurdistani-trend-line-strategy", "yCRpqOq2", "Kurdistani-Trend-Line-Strategy", "Kurdistani Trend Line Strategy", "strategy", "invite-only", "signals", "ktls", "BTCUSDT · 1h · Binance", 1227, 551, {
+        "fa": {"sum": "استراتژی شکست خط روند که خطوط روند پویا را خودکار پیدا می‌کند، سیگنال خرید و فروش می‌دهد و فیلترهای اختیاری و ابزار مدیریت معامله برای بهتر کردن کیفیت سیگنال دارد؛ روی کریپتو، فارکس، سهام و شاخص‌ها کار می‌کند.",
+               "how": ["خط روند از پیوت‌ها ساخته می‌شود و با شکست آن ورود صادر می‌شود.", "فیلترهای چندلایه و مدیریت خروج (هدف و حد ضرر) اختیاری‌اند."]},
+        "ckb": {"sum": "ستراتیژیی شکانی هێڵی ڕەوت کە بە شێوەی خۆکار هێڵە گۆڕاوەکانی ڕەوت دەدۆزێتەوە، سیگناڵی کڕین و فرۆشتن دەدات و فلتەری ئارەزوومەندانە و ئامرازی بەڕێوەبردنی مامەڵەی هەیە بۆ باشترکردنی کوالیتیی سیگناڵ؛ لەسەر کریپتۆ، فۆرێکس، پشک و پێوەرەکان کار دەکات.",
+                "how": ["هێڵی ڕەوت لە پیڤۆتەکان دروست دەبێت و بە شکانی، چوونەژوورەوە دەردەچێت.", "فلتەری چەند چین و بەڕێوەبردنی دەرچوون (ئامانج و وەستاندنی زیان) ئارەزوومەندانەن."]},
+        "en": {"sum": "Trendline breakout strategy that automatically detects dynamic trendlines, generates Buy and Sell signals and includes optional filters and trade-management tools to improve signal quality; works on crypto, forex, stocks and indices.",
+               "how": ["Trendlines are built from pivots; a break triggers the entry.", "Multi-layer filters and exit management (targets and stops) are optional."]}},
+       bt={"pnl": "+1.26%", "dd": "3.35%", "win": "57.73%", "trades": "112/194", "pf": "1.055"}),
+    it("kurdistani-quantum-trend-matrix", "extXd6k0", "Kurdistani-Quantum-Trend-Matrix", "Kurdistani Quantum Trend Matrix", "indicator", "invite-only", "signals", "kqtm", "BTCUSDT · 15m · Binance", 1227, 561, {
+        "fa": {"sum": "سیستم روندیاب چندلایه و تطبیقی: هستهٔ فیلتر کالمن، تشخیص رژیم با نمای هِرست، تحلیل آنتروپی، همسویی چندتایم‌فریمی و ماژول مدیریت ریسک — با سیگنال خرید/فروش و احتمال آن.",
+               "how": ["جدول کنار چارت: رژیم، نمای هرست، بُعد فرکتال، آنتروپی، رژیم نوسان، RSI، MACD، حجم، همسویی تایم‌فریم‌ها، واگرایی، مومنتوم، سیگنال، احتمال و پوزیشن.",
+                       "برچسب‌های ▼S / ▲B روی چارت سیگنال‌ها را با درصد احتمال نشان می‌دهند."]},
+        "ckb": {"sum": "سیستەمێکی شوێنکەوتنی ڕەوتی چەند چین و خۆگونجێنە: ناوکی فلتەری کالمەن، ناسینەوەی ڕژێم بە نمای هێرست، شیکاریی ئەنترۆپی، هاوئاهەنگیی چەند تایمفرەیم و مۆدیولی بەڕێوەبردنی مەترسی — بە سیگناڵی کڕین/فرۆشتن و ئەگەرەکەی.",
+                "how": ["خشتەی تەنیشت چارت: ڕژێم، نمای هێرست، ڕەهەندی فرەکتاڵ، ئەنترۆپی، ڕژێمی هەڵچوون، RSI، MACD، قەبارە، هاوئاهەنگیی تایمفرەیمەکان، جیاوازی، مۆمێنتۆم، سیگناڵ، ئەگەر و پۆزیشن.",
+                        "نیشانەکانی ▼S / ▲B لەسەر چارت سیگناڵەکان بە ڕێژەی ئەگەر نیشان دەدەن."]},
+        "en": {"sum": "Multi-layer adaptive trend-following system: an adaptive Kalman-filter core, Hurst-exponent regime detection, entropy analysis, multi-timeframe confluence and a risk-management module — with buy / sell signals and their probability.",
+               "how": ["Side table: regime, Hurst, fractal dimension, entropy, volatility regime, RSI, MACD, volume, MTF, divergence, momentum, signal, probability and position.",
+                       "▼S / ▲B labels mark the signals with their probability."]}}),
+    it("kurdistani-market-intelligence-x", "kRBxzeDE", "Kurdistani-Market-Intelligence-X", "Kurdistani Market Intelligence X", "indicator", "invite-only", "analysis", "kmix", "BTCUSDT · 1D · Binance", 579, 847, {
+        "fa": {"sum": "Kurdistani MIX: موتور تحلیل چندعاملی که ده‌ها متغیر مستقل — روند، ساختار بازار، رفتار نقدینگی، نوسان، مومنتوم، فعالیت نهادی و مدل‌های احتمال — را هم‌زمان می‌سنجد و در یک پنل تصمیم خلاصه می‌کند.",
+               "how": ["خروجی‌ها از جمله: رتبهٔ فرصت، احتمال پولبک و برگشت، فشار فروشنده، نسبت ریسک به بازده، کیفیت ورود و خروج، آمادگی و زمان‌بندی معامله، پیش‌بینی روند و نوسان.",
+                       "نقاط نقدینگی (Buy/Sell Liquidity) و میانگین‌ها روی چارت مشخص می‌شوند."]},
+        "ckb": {"sum": "Kurdistani MIX: بزوێنەری شیکاریی فرە-هۆکار کە دەیان گۆڕاوی سەربەخۆ — ڕەوت، پێکهاتەی بازاڕ، ڕەفتاری لیکویدیتی، هەڵچوون، مۆمێنتۆم، چالاکیی دامەزراوەیی و مۆدێلەکانی ئەگەر — بە یەکەوە دەپێوێت و لە یەک پانێڵی بڕیاردا کورتیان دەکاتەوە.",
+                "how": ["دەرچوونەکان لەوانە: پلەی دەرفەت، ئەگەری گەڕانەوە و هەڵگەڕانەوە، فشاری فرۆشیار، ڕێژەی مەترسی بۆ قازانج، کوالیتیی چوونەژوورەوە و دەرچوون، ئامادەیی و کاتی مامەڵە، پێشبینیی ڕەوت و هەڵچوون.",
+                        "خاڵەکانی لیکویدیتی (Buy/Sell Liquidity) و تێکڕاکان لەسەر چارت دیاری دەکرێن."]},
+        "en": {"sum": "Kurdistani MIX: a multi-factor market analysis engine that evaluates dozens of independent variables — trend, market structure, liquidity behaviour, volatility, momentum, institutional activity and probability models — and condenses them into one decision panel.",
+               "how": ["Outputs include opportunity rank, pullback and reversal chance, seller pressure, risk / reward, entry and exit quality, trade readiness and timing, trend and volatility forecasts.",
+                       "Buy / sell liquidity pools and moving averages are marked on the chart."]}}),
+    it("kurdistani-qmde", "98PTwV4Z", "Kurdistani-Quantum-Market-Dynamics-Engine-v6", "Kurdistani Quantum Market Dynamics Engine v6", "indicator", "invite-only", "analysis", "kqmde", "Kurdistani QMDE (KATS v6.0)", 791, 847, {
+        "fa": {"sum": "موتور تصمیم نوسانگر (KATS v6) که کیفیت، قدرت و اطمینان، ریسک، رژیم بازار، نقدینگی و استرس، آمادگی، جهت تایم‌فریم بالاتر و چرخه را در یک تصمیم واحد (مثلاً «صبر») جمع می‌کند.",
+               "how": ["دو خط نوسانگر بین ۱۰۰- و ۱۰۰+ با سطوح ۵۰ و ۵۰- و نشانه‌های رویداد روی پنل.", "جدول تصمیم: Decision، Quality، Str/Conf، Risk، Regime، Liq/Stress، Ready، HTF، Cause و Cycle."]},
+        "ckb": {"sum": "بزوێنەری بڕیاری لەرزۆکی (KATS v6) کە کوالیتی، هێز و دڵنیایی، مەترسی، ڕژێمی بازاڕ، لیکویدیتی و فشار، ئامادەیی، ئاراستەی تایمفرەیمی بەرزتر و خول لە یەک بڕیاری تاکدا (بۆ نموونە «چاوەڕوانی») کۆ دەکاتەوە.",
+                "how": ["دوو هێڵی لەرزۆک لە نێوان ١٠٠- و ١٠٠+ بە ئاستەکانی ٥٠ و ٥٠- و نیشانەی ڕووداو لەسەر پانێڵەکە.", "خشتەی بڕیار: Decision، Quality، Str/Conf، Risk، Regime، Liq/Stress، Ready، HTF، Cause و Cycle."]},
+        "en": {"sum": "Oscillator-style decision engine (KATS v6) that combines quality, strength / confidence, risk, market regime, liquidity / stress, readiness, higher-timeframe direction and cycle into one decision (e.g. “Wait”).",
+               "how": ["Two oscillator lines between −100 and +100 with ±50 levels and event markers.", "Decision table: Decision, Quality, Str/Conf, Risk, Regime, Liq/Stress, Ready, HTF, Cause and Cycle."]}}),
+    it("kurdistani-ciya", "MCrLeLm5", "Kurdistani-Crypto-Institutional-Yield-Analyzer", "Kurdistani ÇIYA — Crypto Institutional Yield Analyzer", "indicator", "invite-only", "analysis", "kciya", "BTCUSDT · 15m · Binance", 1227, 563, {
+        "fa": {"sum": "سیستم تحلیل چندلایهٔ کریپتو در سطح نهادی (ÇIYA یعنی «کوه»): رأی‌گیری مجموعه‌ای روند، مومنتوم، همسویی تایم‌فریم‌ها، کلان و پول هوشمند، فیلتر بیزی، موتور ریسک، همبستگی‌ها، پیش‌بینی آماری و سیگنال نهایی با درجهٔ اطمینان.",
+               "how": ["پنل چپ: امتیاز مجموعه، احتمال پسین، حد ضرر و هدف بر پایهٔ ATR، نسبت ریسک به بازده و اندازهٔ پوزیشن.", "پنل راست: رژیم بازار، شیب کالمن، بعد فرکتال، نمای هرست، فصل آلت‌کوین، رهبری بیت‌کوین، VIX و نشانه‌های BOS و جمع‌آوری نقدینگی."]},
+        "ckb": {"sum": "سیستەمی شیکاریی چەند چینی کریپتۆ لە ئاستی دامەزراوەیی (ÇIYA واتە «چیا»): دەنگدانی کۆمەڵەیی ڕەوت، مۆمێنتۆم، هاوئاهەنگیی تایمفرەیمەکان، ماکرۆ و پارەی زیرەک، فلتەری بەیزی، بزوێنەری مەترسی، پەیوەندییەکان، پێشبینیی ئاماری و سیگناڵی کۆتایی بە پلەی دڵنیایی.",
+                "how": ["پانێڵی چەپ: نمرەی کۆمەڵە، ئەگەری دواتر، وەستاندنی زیان و ئامانجی ATR، ڕێژەی مەترسی بۆ قازانج و قەبارەی پۆزیشن.", "پانێڵی ڕاست: ڕژێمی بازاڕ، لێژیی کالمەن، ڕەهەندی فرەکتاڵ، نمای هێرست، وەرزی ئاڵتکۆین، پێشەنگیی بیتکۆین، VIX و نیشانەکانی BOS و کۆکردنەوەی لیکویدیتی."]},
+        "en": {"sum": "Institutional-grade multi-layer crypto analysis system (ÇIYA = “mountain”): an ensemble vote of trend, momentum, multi-timeframe, macro and smart-money models with a Bayesian filter, risk engine, correlations, statistical projection and a final signal with confidence.",
+               "how": ["Left panel: ensemble score, posterior probability, ATR-based stop and target, risk / reward and position size.", "Right panel: market regime, Kalman slope, fractal dimension, Hurst exponent, alt season, BTC leadership, VIX, BOS and liquidity-sweep markers."]}}),
+    it("kurdistani-market-analyzer-pro", "qxfuPkL1", "Kurdistani-Market-Analyzer-PRO", "Kurdistani Market Analyzer PRO", "indicator", "invite-only", "analysis", "kmap", "BTCUSDT · 1D", 1227, 565, {
+        "fa": {"sum": "داشبورد کامل فصلی‌بودن (سه‌زبانه): بازده تاریخی بر اساس سال، فصل، ماه، هفتهٔ سال، روز هفته و روز ماه — با نرخ برد، میانگین بیشینه و کمینه، بیشترین افت، فاکتور سود، امید ریاضی، شارپ و امتیاز ۰ تا ۱۰۰.",
+               "how": ["خلاصه: بهترین و بدترین سال، فصل و ماه، و بهترین بازهٔ نگهداری.", "مناسب برای پاسخ به این سؤال: «در این ماه/روز، این دارایی معمولاً چه کرده است؟»"]},
+        "ckb": {"sum": "داشبۆردی تەواوی وەرزیبوون (سێ زمانە): قازانجی مێژوویی بەپێی ساڵ، وەرز، مانگ، هەفتەی ساڵ، ڕۆژی هەفتە و ڕۆژی مانگ — بە ڕێژەی بردنەوە، تێکڕای بەرزترین و نزمترین، گەورەترین دابەزین، فاکتەری قازانج، چاوەڕوانی، شارپ و نمرەی ٠ تا ١٠٠.",
+                "how": ["کورتە: باشترین و خراپترین ساڵ، وەرز و مانگ، و باشترین ماوەی هەڵگرتن.", "گونجاوە بۆ وەڵامی ئەم پرسیارە: «لەم مانگە/ڕۆژەدا ئەم سامانە بە زۆری چی کردووە؟»"]},
+        "en": {"sum": "Complete seasonality dashboard (trilingual): historical returns by year, quarter, month, week of year, weekday and day of month — with win rate, average high / low, max drawdown, profit factor, expectancy, Sharpe and a 0–100 score.",
+               "how": ["Summary: best / worst year, quarter and month, and the best holding window.", "Answers the question “what has this asset usually done in this month / on this day?”"]}}),
+    it("kurdistani-btc-quant", "CwJjrBlv", "Kurdistani-BTC-Quant", "Kurdistani BTC Quant", "indicator", "invite-only", "cycle", "kbtcq", "BTCUSDT · 1h · Binance", 1227, 559, {
+        "fa": {"sum": "سیستم امتیازدهی کمّی چندعاملی ویژهٔ بیت‌کوین: تحلیل تکنیکال، داده‌های آن‌چین (MVRV Z، NUPL، SOPR، جریان صرافی‌ها، عرضهٔ در سود) و همبستگی‌های کلان (NDX، DXY، ETH) را در یک «امتیاز کوانت» ۰ تا ۱۰۰ با وضعیت روشن بازار و سطوح ورود/حد ضرر ترکیب می‌کند.",
+               "how": ["جدول KRD BTC QUANT: امتیاز، قیمت، فاصله از حمایت و قیمت تحقق‌یافته، RSI چندتایم‌فریمی، MACD، چینش EMA، باند بولینگر، ADX، حجم، VWAP، ساختار بازار و ATR.", "بخش آن‌چین و کلان: MVRV Z، NUPL، SOPR، فاندینگ، جریان صرافی، OI، ترس و طمع و همبستگی با NDX، DXY و ETH."]},
+        "ckb": {"sum": "سیستەمی نمرەدانی چەندایەتیی فرە-هۆکار تایبەت بە بیتکۆین: شیکاریی تەکنیکی، داتای ئۆن-چەین (MVRV Z، NUPL، SOPR، ڕۆیشتنی ئاڵوگۆڕخانەکان، دابینکردنی لە قازانجدا) و پەیوەندییە ماکرۆکان (NDX، DXY، ETH) لە یەک «نمرەی کوانت»ی ٠ تا ١٠٠ بە دۆخێکی ڕوونی بازاڕ و ئاستەکانی چوونەژوورەوە/وەستاندنی زیان کۆ دەکاتەوە.",
+                "how": ["خشتەی KRD BTC QUANT: نمرە، نرخ، دووری لە پاڵپشتی و نرخی بەدیهاتوو، RSIی چەند تایمفرەیم، MACD، ڕیزبوونی EMA، باندی بۆلینگەر، ADX، قەبارە، VWAP، پێکهاتەی بازاڕ و ATR.", "بەشی ئۆن-چەین و ماکرۆ: MVRV Z، NUPL، SOPR، فاندینگ، ڕۆیشتنی ئاڵوگۆڕخانە، OI، ترس و تەماع و پەیوەندی لەگەڵ NDX، DXY و ETH."]},
+        "en": {"sum": "Multi-factor quantitative scoring system built for Bitcoin only: fuses technical analysis, on-chain metrics (MVRV Z, NUPL, SOPR, exchange flow, supply in profit) and macro correlations (NDX, DXY, ETH) into one 0–100 “Quant Score” with a clear market state and entry / stop levels.",
+               "how": ["KRD BTC QUANT table: score, price, distance to support and realized price, multi-timeframe RSI, MACD, EMA stack, Bollinger %B, ADX, volume, VWAP, market structure and ATR.", "On-chain & macro block: MVRV Z, NUPL, SOPR, funding, exchange flow, OI, Fear & Greed and correlations with NDX, DXY and ETH."]}}),
+    it("kurdistani-s2f-btc-cycle", "j0Wp8dey", "Kurdistani-S2F-BTC-Cycle", "Kurdistani S2F BTC Cycle", "indicator", "invite-only", "cycle", "ks2f", "BTCUSDT · 1D · Binance", 563, 847, {
+        "fa": {"sum": "چارچوب چرخه، ارزش‌گذاری و فاز بازار بیت‌کوین: چند مدل ارزش‌گذاری مستقل (از جمله Stock-to-Flow)، داده‌های آن‌چین، تکنیکال، کلان و وزن‌دهی احتمالی تطبیقی را در امتیازهای ارزش‌گذاری، روند، چرخه، ساختار، نقدینگی و مومنتوم و یک تصمیم نهایی (مثل «انباشت قوی») ترکیب می‌کند.",
+               "how": ["جدول نسخهٔ ۱۰: رژیم بازار، امتیاز هر بخش، اطمینان، نوسان، سیگنال، تصمیم، همسویی ۴ساعته/روزانه/هفتگی و Z مدل S2F.", "برچسب‌هایی مثل «STRONG ACCUMULATE · BUY CONFIRMED» با امتیاز روی چارت."]},
+        "ckb": {"sum": "چوارچێوەی خول، نرخاندن و قۆناغی بازاڕی بیتکۆین: چەند مۆدێلی نرخاندنی سەربەخۆ (لەوانە Stock-to-Flow)، داتای ئۆن-چەین، تەکنیکی، ماکرۆ و قورساییدانی ئەگەریی خۆگونجێن لە نمرەکانی نرخاندن، ڕەوت، خول، پێکهاتە، لیکویدیتی و مۆمێنتۆم و بڕیارێکی کۆتایی (وەک «کۆکردنەوەی بەهێز») کۆ دەکاتەوە.",
+                "how": ["خشتەی وەشانی ١٠: ڕژێمی بازاڕ، نمرەی هەر بەشێک، دڵنیایی، هەڵچوون، سیگناڵ، بڕیار، هاوئاهەنگیی ٤ کاتژمێری/ڕۆژانە/هەفتانە و Zی مۆدێلی S2F.", "نیشانەی وەک «STRONG ACCUMULATE · BUY CONFIRMED» بە نمرەوە لەسەر چارت."]},
+        "en": {"sum": "Bitcoin cycle, valuation and market-phase framework: combines several independent valuation models (including stock-to-flow), on-chain metrics, technicals, macro and adaptive probability weighting into valuation, trend, cycle, structure, liquidity and momentum scores and one decision (e.g. “Strong accumulate”).",
+               "how": ["v10 table: market regime, per-block scores, confidence, volatility, signal, decision, 4h / 1D / 1W confluence and the S2F z-score.", "Labels such as “STRONG ACCUMULATE · BUY CONFIRMED” with their score on the chart."]}}),
+    it("kurdistani-market-cycle", "RhIgYiYS", "Kurdistani-Market-Cycle", "Kurdistani Market Cycle", "indicator", "invite-only", "cycle", "kmc", "BTCUSDT · 1M · Binance", 1227, 559, {
+        "fa": {"sum": "نوسانگر چرخهٔ بازار (نسخهٔ ۳) که از مومنتوم (CMO)، روند (ADX)، نوسان و ساختار بازار ساخته شده و فاز چرخه را از «حراج» و «تقاضای سنگین» تا «HODL»، «FOMO»، «حباب؟» و «الان کمی بفروش» برچسب می‌زند و واگرایی‌ها را هشدار می‌دهد.",
+               "how": ["جدول: CMO، روند، ADX، ATR، فاز، همسویی تایم‌فریم‌ها، ساختار، نسبت گاوی/خرسی، امتیاز و وضعیت.", "هشدار واگرایی نزولی (Bear Div) و مناطق پرمیوم/دیسکانت روی چارت قیمت."]},
+        "ckb": {"sum": "لەرزۆکی خولی بازاڕ (وەشانی ٣) کە لە مۆمێنتۆم (CMO)، ڕەوت (ADX)، هەڵچوون و پێکهاتەی بازاڕ دروست کراوە و قۆناغی خول لە «هەرزانفرۆشی» و «داواکاریی قورس»ەوە تا «HODL»، «FOMO»، «بڵق؟» و «ئێستا هەندێک بفرۆشە» ناو دەنێت و ئاگاداری جیاوازییەکان دەکاتەوە.",
+                "how": ["خشتە: CMO، ڕەوت، ADX، ATR، قۆناغ، هاوئاهەنگیی تایمفرەیمەکان، پێکهاتە، ڕێژەی گا/ورچ، نمرە و دۆخ.", "ئاگاداریی جیاوازیی دابەزین (Bear Div) و ناوچەکانی پرێمیەم/داشکاندن لەسەر چارتی نرخ."]},
+        "en": {"sum": "Market-cycle oscillator (v3) built from momentum (CMO), trend (ADX), volatility and market structure; it labels the cycle phase from “Fire sale” and “Heavy bid” through “HODL” to “FOMO”, “Bubble?” and “Sell some now”, with divergence warnings.",
+               "how": ["Table: CMO, trend, ADX, ATR, phase, multi-timeframe, structure, bull / bear ratio, score and state.", "Bearish-divergence warnings and premium / discount zones on the price chart."]}}),
+    it("kurdistani-style-cycle", "DRuCJ6Bk", "Kurdistani-Style-Cycle", "Kurdistani Style Cycle", "indicator", "open-source", "cycle", "ksc", "BTCUSD · 1D · Bitstamp", 1227, 685, {
+        "fa": {"sum": "اندیکاتور ترکیبی آن‌چین برای فازهای چرخهٔ بیت‌کوین: Z-score وزنی MVRV، NUPL و یک جایگزین قیمتی برای SOPR «شاخص سود و زیان» را می‌سازد و فاصلهٔ آن از میانگین یک‌ساله‌اش بازار را در پنج فاز طبقه‌بندی می‌کند: خرسی شدید، خرسی، گاوی اولیه، گاوی و گاوی داغ.",
+               "how": ["MVRV = ارزش بازار ÷ ارزش تحقق‌یافته؛ NUPL = ۱ − ۱/MVRV؛ جایگزین SOPR = جایگاه قیمت در بازهٔ ۱۵۵ روزه منهای جایگاه آن در بازهٔ ۳۶۵ روزه (میانگین ۵ روزه).",
+                       "Z-score هر جزء با بازهٔ ۳۶۵ روز؛ وزن‌ها ۰٫۴، ۰٫۴ و ۰٫۲؛ Bull-Bear = شاخص سود و زیان منهای میانگین ۳۶۵ روزهٔ خودش.",
+                       "فازها: ۱٫۵− و پایین‌تر خرسی شدید (منطقهٔ انباشت بلندمدت) · تا ۰ خرسی · تا ۰٫۵ گاوی اولیه · تا ۱٫۵ گاوی · بالای ۱٫۵ گاوی داغ (زمان سیو سود).",
+                       "این اندیکاتور متن‌باز است؛ entekhab.net همان کد را خط‌به‌خط روی دادهٔ واقعی (Coin Metrics و Binance) اجرا می‌کند و فاز زنده را نشان می‌دهد."]},
+        "ckb": {"sum": "ئیندیکاتۆرێکی تێکەڵی ئۆن-چەین بۆ قۆناغەکانی خولی بیتکۆین: Z-scoreی قورسایی‌دراوی MVRV، NUPL و جێگرەوەیەکی نرخیی SOPR «پێوەری قازانج و زیان» دروست دەکەن و دووریی ئەو لە تێکڕای یەک ساڵەی خۆی بازاڕەکە لە پێنج قۆناغدا پۆلێن دەکات: ورچی توند، ورچ، گای سەرەتایی، گا و گای گەرم.",
+                "how": ["MVRV = بەهای بازاڕ ÷ بەهای بەدیهاتوو؛ NUPL = ١ − ١/MVRV؛ جێگرەوەی SOPR = شوێنی نرخ لە ماوەی ١٥٥ ڕۆژەدا لێدەرکراو لە شوێنی لە ماوەی ٣٦٥ ڕۆژەدا (تێکڕای ٥ ڕۆژە).",
+                        "Z-scoreی هەر بەشێک بە ماوەی ٣٦٥ ڕۆژ؛ قورساییەکان ٠٫٤، ٠٫٤ و ٠٫٢؛ Bull-Bear = پێوەری قازانج و زیان لێدەرکراو لە تێکڕای ٣٦٥ ڕۆژەی خۆی.",
+                        "قۆناغەکان: ١٫٥− و خوارتر ورچی توند (ناوچەی کۆکردنەوەی درێژخایەن) · تا ٠ ورچ · تا ٠٫٥ گای سەرەتایی · تا ١٫٥ گا · سەروو ١٫٥ گای گەرم (کاتی هەڵگرتنی قازانج).",
+                        "ئەم ئیندیکاتۆرە سەرچاوە-کراوەیە؛ entekhab.net هەمان کۆد هێڵ بە هێڵ لەسەر داتای ڕاستەقینە (Coin Metrics و Binance) جێبەجێ دەکات و قۆناغی زیندوو نیشان دەدات."]},
+        "en": {"sum": "Composite on-chain cycle indicator: weighted z-scores of MVRV, NUPL and a price-based SOPR proxy form a PnL index; its distance from its own 1-year average classifies Bitcoin into five phases — Extreme Bear, Bear, Early Bull, Bull and Overheated Bull.",
+               "how": ["MVRV = market cap ÷ realized cap; NUPL = 1 − 1/MVRV; SOPR proxy = price position in its 155-day range minus its position in the 365-day range (5-day SMA).",
+                       "Each component is z-scored over 365 days; weights 0.4 / 0.4 / 0.2; Bull-Bear = PnL index minus its own 365-day average.",
+                       "Phases: ≤ −1.5 Extreme Bear (long-term accumulation zone) · ≤ 0 Bear · ≤ 0.5 Early Bull · ≤ 1.5 Bull · > 1.5 Overheated Bull (take-profit zone).",
+                       "The script is open-source; entekhab.net runs the same code line by line on real data (Coin Metrics and Binance) and shows the live phase."]}},
+       engine="server"),
+    it("kurdistani-power-law", "umPv6JPM", "Kurdistani-BITCOIN-POWER-LAW", "Kurdistani Bitcoin Power Law", "indicator", "open-source", "cycle", "kpl", "BTCUSD · 1D · Bitstamp", 815, 847, {
+        "fa": {"sum": "مدل قانون توان بلندمدت بیت‌کوین: ارزش منصفانه \u2066P(t) = 8.31×10⁻¹⁷ · t^5.48\u2069 (\u2066t\u2069 = روزهای گذشته از بلاک پیدایش، R² = ۰٫۹۹۷۶) با باندهای ۱۰٪± ، منطقهٔ خرید عمیق ۱۸٪ زیر باند پایین و کمترین قیمتِ «لمس» در هر سال چرخه.",
+               "how": ["خط قرمز = ارزش منصفانه؛ زرد = باند بالا (۱۰٪+) ؛ سبز = باند پایین (۱۰٪−).",
+                       "وقتی قیمت ۱۸٪ زیر باند پایین بسته شود، «منطقهٔ خرید» فعال می‌شود — همان هشداری که خود اسکریپت دارد.",
+                       "این اندیکاتور متن‌باز است و entekhab.net فرمول را دقیقاً اجرا می‌کند؛ عدد ارزش منصفانهٔ چارت انتشار (۶۰٬۲۱۴ دلار در ۱۹ ژوئیه ۲۰۲۶) با همین موتور بازتولید می‌شود."]},
+        "ckb": {"sum": "مۆدێلی یاسای توانی درێژخایەنی بیتکۆین: بەهای دادپەروەرانە \u2066P(t) = 8.31×10⁻¹⁷ · t^5.48\u2069 (\u2066t\u2069 = ڕۆژەکانی دوای بلۆکی سەرەتا، R² = ٠٫٩٩٧٦) بە باندەکانی ١٠٪± ، ناوچەی کڕینی قووڵ ١٨٪ لە ژێر باندی خوارەوە و نزمترین نرخی «بەرکەوتن» لە هەر ساڵێکی خولدا.",
+                "how": ["هێڵی سوور = بەهای دادپەروەرانە؛ زەرد = باندی سەرەوە (١٠٪+) ؛ سەوز = باندی خوارەوە (١٠٪−).",
+                        "کاتێک نرخ ١٨٪ لە ژێر باندی خوارەوە دابخرێت، «ناوچەی کڕین» چالاک دەبێت — هەمان ئاگادارکردنەوەی خودی سکریپتەکە.",
+                        "ئەم ئیندیکاتۆرە سەرچاوە-کراوەیە و entekhab.net هاوکێشەکە وەک خۆی جێبەجێ دەکات؛ ژمارەی بەهای دادپەروەرانەی چارتی بڵاوکراوە (٦٠٬٢١٤ دۆلار لە ١٩ی تەممووزی ٢٠٢٦) بەم بزوێنەرە دووبارە دەبێتەوە."]},
+        "en": {"sum": "Long-term power-law model of Bitcoin: fair value P(t) = 8.31×10⁻¹⁷ · t^5.48 (t = days since the genesis block, R² = 0.9976) with ±10 % bands, a deep-value buy zone 18 % under the lower band and the lowest “touch” price of each cycle year.",
+               "how": ["Red = fair value; yellow = upper band (+10 %); green = lower band (−10 %).",
+                       "A daily close 18 % under the lower band switches on the “buy zone” — the script’s own alert.",
+                       "The script is open-source and entekhab.net runs the formula exactly; the fair value on the publication chart ($60,214 on 19 July 2026) is reproduced by this engine."]}},
+       engine="server"),
+    it("kurdistani-bitcoin-spiral", "tECCygHQ", "Kurdistani-Bitcoin-Spiral-Historical-Logarithmic-Visualization", "Kurdistani Bitcoin Spiral", "indicator", "open-source", "cycle", "kspiral", "BTCUSD · 1D · Bitstamp", 945, 847, {
+        "fa": {"sum": "کل تاریخ قیمت بیت‌کوین به شکل یک مارپیچ لگاریتمی: هر سال تقویمی یک دور کامل، و فاصله از مرکز = لگاریتم قیمت؛ سقف‌های تاریخی، کف‌های چرخه، هاوینگ‌ها و قیمت زنده علامت خورده‌اند.",
+               "how": ["بیش از شانزده سال تاریخ بیت‌کوین در یک نمودار فشرده.", "entekhab.net همین مارپیچ را با دادهٔ هفتگی واقعی به‌صورت زنده می‌کشد."]},
+        "ckb": {"sum": "هەموو مێژووی نرخی بیتکۆین وەک پێچێکی لۆگاریتمی: هەر ساڵێکی ڕۆژژمێری یەک خولی تەواو، و دووری لە ناوەند = لۆگاریتمی نرخ؛ بەرزترین نرخە مێژووییەکان، بنەکانی خول، هاڵڤینگەکان و نرخی زیندوو نیشانە کراون.",
+                "how": ["زیاتر لە شازدە ساڵ مێژووی بیتکۆین لە یەک چارتی چڕدا.", "entekhab.net هەمان پێچ بە داتای هەفتانەی ڕاستەقینە بە زیندوویی دەکێشێت."]},
+        "en": {"sum": "Bitcoin’s entire price history as a logarithmic spiral: one full revolution per calendar year, distance from the centre = log of price; all-time highs, cycle bottoms, halvings and the live price are marked.",
+               "how": ["More than sixteen years of Bitcoin history in one compact chart.", "entekhab.net draws the same spiral live from real weekly data."]}},
+       engine="server"),
+    it("kurdistani-macro-regime", "IUgkPeGI", "Kurdistani-Macro-Regime", "Kurdistani Macro Regime", "indicator", "open-source", "macro", "kmacro", "BTCUSDT · 15m · Binance", 1227, 563, {
+        "fa": {"sum": "داشبورد اقتصاد کلان که داده‌های عمومی اقتصادی (تورم، نرخ بهرهٔ واقعی و فدرال رزرو، VIX، بیکاری، نفت، ISM، رشد GDP، منحنی بازده، نرخ بانک مرکزی اروپا، اسپرد اعتباری، M2 و …) را به یک رژیم قاعده‌مند بازار — مثل رونق یا بهبود — تبدیل می‌کند، به‌جای پیش‌بینی قیمت.",
+               "how": ["خروجی: رژیم فعلی، ریسک رکود، امتیاز سلامت کلان، امتیاز چرخش فدرال رزرو و قاعدهٔ ساهم.", "چشم‌انداز کمّی طلا (XAU)، بیت‌کوین و شاخص دلار (DXY) از ۰ (خرسی) تا ۱۰۰ (گاوی)."]},
+        "ckb": {"sum": "داشبۆردی ئابووریی ماکرۆ کە داتا گشتییە ئابوورییەکان (هەڵاوسان، ڕێژەی سوودی ڕاستەقینە و فیدراڵ ڕیزێرڤ، VIX، بێکاری، نەوت، ISM، گەشەی GDP، کەوانەی قازانج، ڕێژەی بانکی ناوەندیی ئەوروپا، جیاوازیی قەرز، M2 و …) دەگۆڕێت بۆ ڕژێمێکی یاسامەندی بازاڕ — وەک گەشە یان چاکبوونەوە — لە جیاتی پێشبینیی نرخ.",
+                "how": ["دەرچوون: ڕژێمی ئێستا، مەترسیی دابەزینی ئابووری، نمرەی تەندروستیی ماکرۆ، نمرەی وەرچەرخانی فیدراڵ ڕیزێرڤ و یاسای ساهم.", "دیدی چەندایەتیی زێڕ (XAU)، بیتکۆین و پێوەری دۆلار (DXY) لە ٠ (ورچ) تا ١٠٠ (گا)."]},
+        "en": {"sum": "Macroeconomic dashboard that converts public economic data (inflation, real and Fed rates, VIX, unemployment, oil, ISM, GDP growth, yield curves, ECB rate, credit spreads, M2 …) into a rule-based market regime — such as expansion or recovery — instead of predicting prices.",
+               "how": ["Outputs: current regime, recession risk, macro health score, Fed pivot score and the Sahm rule.", "Quant outlook for gold (XAU), Bitcoin and the dollar index (DXY) from 0 (bear) to 100 (bull)."]}}),
+]
+
+GROUPS = {
+    "mokri": {"fa": "روش موکری · خط روند و Body Way", "ckb": "ڕێبازی موکری · هێڵی ڕەوت و Body Way", "en": "Mokri method · trendlines & Body Way"},
+    "signals": {"fa": "استراتژی‌ها و سیگنال‌ها", "ckb": "ستراتیژی و سیگناڵ", "en": "Strategies & signals"},
+    "analysis": {"fa": "موتورهای تحلیل بازار", "ckb": "بزوێنەرەکانی شیکاریی بازاڕ", "en": "Market analysis engines"},
+    "cycle": {"fa": "چرخه و ارزش‌گذاری بیت‌کوین", "ckb": "خول و نرخاندنی بیتکۆین", "en": "Bitcoin cycle & valuation"},
+    "macro": {"fa": "اقتصاد کلان", "ckb": "ئابووریی ماکرۆ", "en": "Macro"},
+}
+
+doc = {"updated": "2026-11-02", "author": "Coin_Kurd", "profile": "https://www.tradingview.com/u/Coin_Kurd/#published-scripts",
+       "relay": {"channel": "", "note": "public Telegram channel that receives the TradingView webhook alerts; empty = not set up yet"},
+       "groups": GROUPS, "items": ITEMS}
+json.dump(doc, open(os.path.join(ROOT, "data", "indicators.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+print("items", len(ITEMS))

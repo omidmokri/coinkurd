@@ -105,7 +105,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
+<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -416,7 +416,7 @@ def build_api():
     for c in MK:
         w(f"coins/{c.lower()}.json", {"coin": c, "market": MK[c], "score": SC.get(c), "opportunities": [o for o in market.get("opportunities", []) if o["coin"] == c],
                                      "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})
-    for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped"):
+    for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped", "indicators", "kind", "signals"):
         dd = load(f"{nm}.json", None)
         if dd:
             w(f"{nm}.json", {"data": dd})
@@ -572,6 +572,70 @@ def build_compare():
     return urls
 
 
+def build_indicators():
+    """/indicators/<id>/ — صفحهٔ ثابت هر اندیکاتور Coin_Kurd (تصویر، توضیح، بک‌تست، سیگنال‌ها) + /signals/ + خلاصهٔ متنی برای موتورهای جستجو"""
+    ind = load("indicators.json", {})
+    tpl_p = os.path.join(ROOT, "indicators", "index.html")
+    if not ind.get("items") or not os.path.exists(tpl_p):
+        return []
+    tpl = open(tpl_p, encoding="utf-8").read()
+    kind_ = load("kind.json", {})
+    urls = []
+    KFA = {"strategy": "استراتژی", "indicator": "اندیکاتور"}
+    AFA = {"invite-only": "دعوتی", "open-source": "متن‌باز"}
+
+    def seo_of(it):
+        t = it["t"]["fa"]
+        h = f'<h2>{e(it["name"])}</h2><p>{e(t["sum"])}</p><ul>' + "".join(f"<li>{e(x)}</li>" for x in t["how"]) + "</ul>"
+        if it.get("bt"):
+            b = it["bt"]
+            h += (f'<p>بک‌تست چارت انتشار ({e(it["chart"])}): سود کل {e(b["pnl"])}، بیشترین افت {e(b["dd"])}، معاملات سودده {e(b["win"])} ({e(b["trades"])})، '
+                  f'فاکتور سود {e(b["pf"])} — منبع: گزارش استراتژی TradingView.</p>')
+        h += f'<p>{KFA.get(it["kind"], "")} · {AFA.get(it["access"], "")} · <a href="{e(it["url"])}" rel="noopener">TradingView</a></p>'
+        h += f'<p lang="en" dir="ltr">{e(it["t"]["en"]["sum"])}</p><p lang="ckb">{e(it["t"]["ckb"]["sum"])}</p>'
+        return h
+
+    for it in ind["items"]:
+        t = it["t"]["fa"]
+        url = f"{SITE}/indicators/{it['id']}/"
+        title = f"{it['name']} — {KFA.get(it['kind'], '')} اختصاصی Coin_Kurd در TradingView"
+        desc = t["sum"][:300]
+        extra = ""
+        if it["id"] == "kurdistani-power-law" and kind_.get("power_law"):
+            pl = kind_["power_law"]
+            extra = f'<p>اکنون: ارزش منصفانه {pl["fair"]:,.0f} دلار، قیمت {pl["price"]:,.0f} دلار ({pl["dev_pct"]:+.1f}٪) — به‌روزرسانی {e(kind_.get("updated_at", "")[:16])} UTC</p>'
+        if it["id"] == "kurdistani-style-cycle" and kind_.get("style_cycle"):
+            sc = kind_["style_cycle"]
+            extra = f'<p>اکنون: فاز {e(sc["phase"])}، Bull-Bear {sc["bull_bear"]}، NUPL {sc["nupl"]}، MVRV {sc["mvrv"]} — {e(sc["date"])}</p>'
+        ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": it["name"], "applicationCategory": "FinanceApplication",
+              "operatingSystem": "TradingView (Pine Script)", "description": it["t"]["en"]["sum"], "url": it["url"], "image": f"{SITE}/assets/tv-{it['tv']}.webp",
+              "author": {"@type": "Person", "name": "Omid Dabbaghchi Mokri (Coin_Kurd)", "url": "https://www.tradingview.com/u/Coin_Kurd/"},
+              "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"} if it["access"] == "open-source" else None}
+        ld = {k: v for k, v in ld.items() if v is not None}
+        doc = (tpl.replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", f"<title>{e(title)} | entekhab.net</title>")
+               .replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{url}"><script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>')
+               .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc)} — ', 1)
+               .replace('<meta property="og:title" content="اندیکاتورهای اختصاصی Coin_Kurd | entekhab.net">', f'<meta property="og:title" content="{e(it["name"])} | entekhab.net">')
+               .replace('<meta property="og:image" content="https://entekhab.net/assets/tv-jxwqCFUw.webp">', f'<meta property="og:image" content="{SITE}/assets/tv-{it["tv"]}.webp">')
+               .replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{seo_of(it)}{extra}</div>')
+               .replace('<script src="/assets/ui.js"></script>', f'<script>window.IND_ID={json.dumps(it["id"])}</script><script src="/assets/ui.js"></script>'))
+        out = os.path.join(ROOT, "indicators", it["id"], "index.html")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, "w", encoding="utf-8").write(doc)
+        urls.append(url)
+    hub_seo = "<h2>فهرست اندیکاتورها</h2><ul>" + "".join(f'<li><a href="/indicators/{it["id"]}/">{e(it["name"])}</a> — {e(it["t"]["fa"]["sum"][:180])}</li>' for it in ind["items"]) + "</ul>"
+    hub = tpl.replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{hub_seo}</div>')
+    open(tpl_p, "w", encoding="utf-8").write(hub)
+    sig = (hub.replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{SITE}/signals/">')
+              .replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", "<title>سیگنال‌های اندیکاتورهای Coin_Kurd و نتیجهٔ واقعی آن‌ها | entekhab.net</title>")
+              .replace('<script src="/assets/ui.js"></script>', '<script>window.IND_TAB="signals"</script><script src="/assets/ui.js"></script>'))
+    os.makedirs(os.path.join(ROOT, "signals"), exist_ok=True)
+    open(os.path.join(ROOT, "signals", "index.html"), "w", encoding="utf-8").write(sig)
+    urls += [f"{SITE}/indicators/", f"{SITE}/signals/"]
+    print(f"indicator pages: {len(urls)}")
+    return urls
+
+
 if __name__ == "__main__":
     main()
     build_api()
@@ -579,6 +643,7 @@ if __name__ == "__main__":
     extra += build_dna()
     extra += build_weekly()
     extra += build_compare()
+    extra += build_indicators()
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
     open(sm, "w", encoding="utf-8").write(s)
