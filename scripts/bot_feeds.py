@@ -14,6 +14,7 @@ import logging
 import os
 import re
 import subprocess
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -170,6 +171,9 @@ def summarize(source_text, lang):
 def feed_state(s):
     f = s.setdefault("feeds", {})
     f.setdefault("seen", {})          # channel -> last processed post id
+    for chs in FEEDS.values():        # all keys exist up front, so the worker thread never resizes dicts
+        for ch in chs:
+            f["seen"].setdefault(ch, None)
     f.setdefault("items", {"onchain": [], "news": []})
     f.setdefault("last_check", 0)
     f.setdefault("last_fx", 0)
@@ -347,3 +351,27 @@ def section(s, kind, lang, n=3):
     items = feed_state(s)["items"].get(kind, [])[:n]
     key = "ckb" if lang == "ckb" else "fa"
     return [it.get(key) or it.get("fa") for it in items if it.get(key) or it.get("fa")]
+
+
+# ------------------------------------------------------------------ background worker
+DIRTY = threading.Event()
+
+
+def start(s, send_fn, delete_fn, group_id, worktree=""):
+    """run feeds + site export in a daemon thread so slow AI/HTTP calls never block the bot's replies"""
+    feed_state(s)
+    s.setdefault("topics", {})
+
+    def loop():
+        while True:
+            try:
+                if run(s, send_fn, delete_fn, group_id):
+                    DIRTY.set()
+                export_site(s, worktree)
+            except Exception:
+                log.exception("feed worker error")
+            time.sleep(20)
+
+    th = threading.Thread(target=loop, name="feeds", daemon=True)
+    th.start()
+    return th
