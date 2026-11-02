@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ابزارهای معامله‌گر — مقایسهٔ کوین‌ها، اندازهٔ پوزیشن، «اگر خریده بودم» و مبدل ارز | entekhab.net</title>
+<meta name="description" content="ابزارهای رایگان entekhab.net: مقایسهٔ چند کوین روی یک نمودار، ماشین‌حساب اندازهٔ پوزیشن و R:R، محاسبهٔ سود اگر در گذشته خریده بودید یا خرید پله‌ای، و تبدیل قیمت کریپتو به دینار، تومان و لیر">
+<link rel="canonical" href="https://entekhab.net/tools/">
+<meta property="og:title" content="ابزارهای معامله‌گر | entekhab.net"><meta property="og:url" content="https://entekhab.net/tools/"><meta property="og:site_name" content="entekhab.net">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+.tl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:8px;margin:6px 0 4px}.tl a{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--p)}.tl a b{display:block}.tl a small{color:var(--mute);font-size:.78rem}
+.card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;scroll-margin-top:80px}.card h2{font-size:1.15rem;margin-bottom:4px}
+.f{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px;margin:10px 0}.f label{display:flex;flex-direction:column;gap:3px;font-size:.78rem;color:var(--mute)}.f input,.f select{width:100%}
+.out{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,160px),1fr));gap:8px;margin-top:10px}.out div{border:1px solid var(--line);border-radius:12px;padding:9px 11px}.out small{display:block;color:var(--mute);font-size:.72rem}.out b{font-family:var(--mono);font-size:1.1rem;direction:ltr;unicode-bidi:isolate}
+.chipc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:3px 10px;margin:2px;font-family:var(--mono);font-size:.82rem}.chipc i{width:9px;height:9px;border-radius:50%;display:inline-block}.chipc button{color:var(--mute)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden}.seg button{padding:5px 12px;font-size:.82rem;color:var(--mute)}.seg button.on{background:var(--o);color:#000;font-weight:800}
+#cmpSvg{width:100%;height:300px;display:block;background:#000;border-radius:12px;border:1px solid var(--line);margin-top:10px}
+.tscroll{overflow-x:auto}.warn{color:#fbbf24;font-size:.82rem;margin-top:8px}.err{color:var(--r);font-size:.85rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab.net</span></a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero" style="padding-bottom:6px"><h1 data-t="h1"></h1><p data-t="lead"></p></div>
+  <div class="tl" id="tlinks"></div>
+
+  <section class="card" id="compare"><h2 data-t="cmpT"></h2><p class="lead" data-t="cmpL"></p>
+    <div class="row"><select id="cmpAdd"></select><button class="btn p" id="cmpAddB">+</button><span class="seg" id="cmpP"><button data-d="7">7d</button><button data-d="30">30d</button><button data-d="90" class="on">90d</button><button data-d="365">1y</button></span></div>
+    <div id="cmpChips" style="margin-top:8px"></div><svg id="cmpSvg" viewBox="0 0 800 300" preserveAspectRatio="none" dir="ltr"></svg><p class="disc" id="cmpRange"></p><div class="tscroll"><table id="cmpTab" style="margin-top:10px"></table></div><p class="disc" data-t="cmpNote"></p></section>
+
+  <section class="card" id="risk"><h2 data-t="rkT"></h2><p class="lead" data-t="rkL"></p>
+    <div class="f"><label><span data-t="cap"></span><input id="rCap" type="number" min="0" step="any" value="1000"></label><label><span data-t="riskP"></span><input id="rPct" type="number" min="0" step="any" value="1"></label>
+      <label><span data-t="side"></span><select id="rSide"></select></label><label><span data-t="entry"></span><input id="rEn" type="number" min="0" step="any"></label>
+      <label><span data-t="stop"></span><input id="rSl" type="number" min="0" step="any"></label><label><span data-t="target"></span><input id="rTp" type="number" min="0" step="any"></label>
+      <label><span data-t="lev"></span><input id="rLev" type="number" min="1" max="125" step="1" value="1"></label><label><span data-t="coinOpt"></span><select id="rCoin"></select></label></div>
+    <div class="out" id="rOut"></div><div id="rWarn"></div></section>
+
+  <section class="card" id="whatif"><h2 data-t="wiT"></h2><p class="lead" data-t="wiL"></p>
+    <div class="f"><label><span data-t="coin"></span><select id="wCoin"></select></label><label><span data-t="date"></span><input id="wDate" type="date"></label>
+      <label><span data-t="amt"></span><input id="wAmt" type="number" min="0" step="any" value="100"></label><label><span data-t="mode"></span><select id="wMode"></select></label></div>
+    <button class="btn p" id="wGo" data-t="calc"></button><div class="out" id="wOut"></div><p class="disc" data-t="wiNote"></p></section>
+
+  <section class="card" id="fx"><h2 data-t="fxT"></h2><p class="lead" data-t="fxL"></p>
+    <div class="f"><label><span data-t="coin"></span><select id="fCoin"></select></label><label><span data-t="qty"></span><input id="fQty" type="number" min="0" step="any" value="1"></label>
+      <label><span data-t="cur"></span><select id="fCur"></select></label><label><span data-t="myRate"></span><input id="fRate" type="number" min="0" step="any"></label></div>
+    <div class="out" id="fOut"></div><p class="disc" id="fNote"></p></section>
+
+  <section><div class="honest" data-t="honest"></div></section>
+</div>
+<footer>entekhab.net — <span data-t="nfa"></span></footer>
+<script src="/assets/ui.js"></script>
+<script>
+Object.assign(I.fa,{mkt:'نرخ بازار (نوبیتکس، USDT)',mktSrc:'برای تومان، نرخ بازار آزاد USDT از نوبیتکس استفاده شده است؛ می‌توانید نرخ خودتان را وارد کنید.',h1:'ابزارهای <em>معامله‌گر</em>',lead:'مقایسهٔ چند کوین، ماشین‌حساب اندازهٔ پوزیشن، «اگر خریده بودم…»، و تبدیل قیمت به ارزهای منطقه — همه با دادهٔ زندهٔ Binance و بدون ثبت‌نام.',
+ links:[['/safety/','🛡 بررسی امنیت توکن','هانی‌پات، مالیات پنهان، قفل نقدینگی'],['/me/#paper','📝 معاملهٔ آزمایشی','پول مجازی، متصل به اسکنر'],['/me/','🔔 هشدار ترکیبی','RSI + امتیاز + حجم + خبر'],['/terminal/','🖥 ترمینال','همبستگی با بازارهای جهانی، لیکوئید زنده'],['/learn/','🎓 آموزش','مسیر یادگیری و واژه‌نامه']],
+ cmpT:'⚖️ مقایسهٔ چندکوینه',cmpL:'تا ۶ کوین را روی یک نمودار مقایسه کنید: بازده، نوسان، بیشترین افت، همبستگی با بیت‌کوین و امتیاز Entekhab.',cmpNote:'بازده از قیمت بسته‌شدن روزانهٔ Binance؛ نوسان سالانه‌شده و همبستگی از بازده‌های روزانه. نتیجهٔ گذشته تضمین آینده نیست.',
+ ret:'بازده',vol:'نوسان سالانه',mdd:'بیشترین افت',corr:'همبستگی با BTC',score:'امتیاز',
+ rkT:'🧮 ماشین‌حساب اندازهٔ پوزیشن و R:R',rkL:'حجم معامله را طوری بگیرید که اگر حد ضرر خورد فقط درصد کوچکی از سرمایه از دست برود.',cap:'سرمایه (دلار)',riskP:'ریسک هر معامله (٪)',side:'جهت',entry:'قیمت ورود',stop:'حد ضرر',target:'هدف (اختیاری)',lev:'اهرم',coinOpt:'پر کردن با قیمت زنده',
+ sides:{long:'لانگ (خرید)',short:'شورت (فروش)'},pos:'اندازهٔ معامله',units:'تعداد واحد',maxLoss:'ضرر در صورت خوردن حد ضرر',rr:'R:R',be:'نرخ برد لازم برای سربه‌سر',profit:'سود در صورت رسیدن به هدف',margin:'وثیقهٔ لازم',liq:'قیمت تقریبی لیکوئید',
+ wStop:'حد ضرر باید زیر ورود (لانگ) یا بالای ورود (شورت) باشد.',wLiq:'⚠️ با این اهرم، قیمت لیکوئید قبل از حد ضرر می‌رسد؛ اهرم را کم کنید.',wBig:'⚠️ اندازهٔ معامله از کل سرمایه بزرگ‌تر است؛ یعنی بدون اهرم ممکن نیست.',
+ wiT:'⏳ «اگر خریده بودم…»',wiL:'اگر در یک تاریخ گذشته خرید یکجا یا خرید پله‌ای هفتگی کرده بودید، الان چقدر داشتید؟',coin:'کوین',date:'تاریخ شروع',amt:'مبلغ (دلار)',mode:'روش',modes:{once:'خرید یکجا',dca:'خرید پله‌ای هفتگی (DCA)'},calc:'محاسبه',
+ inv:'کل سرمایهٔ واردشده',now:'ارزش امروز',pnl:'سود / زیان',vsBtc:'همین کار با بیت‌کوین',buys:'تعداد خرید',noData:'دادهٔ این تاریخ در Binance نیست (کوین هنوز لیست نشده بود یا تاریخ آینده است).',wiNote:'با قیمت بسته‌شدن روزانهٔ Binance، بدون کارمزد. فقط برای آموزش.',
+ fxT:'💱 قیمت کریپتو به ارزهای منطقه',fxL:'قیمت کوین را به دینار عراق، تومان، لیر ترکیه، درهم و یورو ببینید. نرخ رسمی خودکار است؛ نرخ بازار آزاد خودتان را هم می‌توانید وارد کنید.',qty:'مقدار',cur:'ارز مقصد',myRate:'نرخ دلخواه شما (هر دلار)',
+ val:'ارزش',rateUsed:'نرخ استفاده‌شده',official:'نرخ رسمی',custom:'نرخ شما',fxSrc:'نرخ رسمی از exchangerate-api.com، به‌روزرسانی ',fxWarn:'⚠️ برای تومان و دینار، نرخ رسمی با نرخ بازار آزاد تفاوت زیادی دارد؛ برای عدد واقعی نرخ بازار خودتان را وارد کنید (فقط در مرورگر شما ذخیره می‌شود).',
+ curs:{IQD:'دینار عراق',IRT:'تومان ایران',TRY:'لیر ترکیه',AED:'درهم امارات',EUR:'یورو',GBP:'پوند'},
+ honest:'<b>شفافیت:</b> همهٔ محاسبه‌ها در مرورگر شما و با داده‌های عمومی Binance و exchangerate-api انجام می‌شود؛ چیزی برای ما ارسال نمی‌شود. این ابزارها آموزشی‌اند و توصیهٔ مالی نیستند.',nfa:'آموزشی است، توصیهٔ مالی نیست'});
+Object.assign(I.ckb,{mkt:'نرخی بازاڕ (نۆبیتێکس، USDT)',mktSrc:'بۆ تمەن، نرخی بازاڕی ئازادی USDT لە نۆبیتێکس بەکارهاتووە.',h1:'ئامرازەکانی <em>بازرگان</em>',lead:'بەراوردی چەند دراو، ژمێرەری قەبارەی پۆزیشن، «ئەگەر کڕیبام…»، و گۆڕینی نرخ بۆ دراوەکانی ناوچە — هەمووی بە داتای زیندووی Binance.',
+ links:[['/safety/','🛡 پشکنینی ئاسایشی تۆکن','هانی‌پۆت، باجی شاراوە، قوفڵی نەختینە'],['/me/#paper','📝 مامەڵەی تاقیکاری','پارەی خەیاڵی، بەستراو بە پشکنەر'],['/me/','🔔 ئاگاداریی تێکەڵ','RSI + نمرە + قەبارە + هەواڵ'],['/terminal/','🖥 تێرمیناڵ','پەیوەندی لەگەڵ بازاڕە جیهانییەکان'],['/learn/','🎓 فێربوون','ڕێڕەوی فێربوون و فەرهەنگ']],
+ cmpT:'⚖️ بەراوردی چەند دراو',cmpL:'تا ٦ دراو لەسەر یەک نەخشە بەراورد بکە: قازانج، لەرزین، گەورەترین دابەزین، پەیوەندی لەگەڵ بیتکۆین و نمرەی Entekhab.',cmpNote:'قازانج لە نرخی داخستنی ڕۆژانەی Binance. ئەنجامی ڕابردوو گەرەنتیی داهاتوو نییە.',
+ ret:'قازانج',vol:'لەرزینی ساڵانە',mdd:'گەورەترین دابەزین',corr:'پەیوەندی لەگەڵ BTC',score:'نمرە',
+ rkT:'🧮 ژمێرەری قەبارەی پۆزیشن و R:R',rkL:'قەبارەی مامەڵە وا هەڵبژێرە کە ئەگەر وەستاندنی زیان کرا تەنها بەشێکی بچووک لە سەرمایە بڕوات.',cap:'سەرمایە (دۆلار)',riskP:'مەترسیی هەر مامەڵە (٪)',side:'ئاراستە',entry:'نرخی چوونەژوورەوە',stop:'وەستاندنی زیان',target:'ئامانج (ئارەزوومەندانە)',lev:'لێڤەرێج',coinOpt:'پڕکردنەوە بە نرخی زیندوو',
+ sides:{long:'لۆنگ (کڕین)',short:'شۆرت (فرۆشتن)'},pos:'قەبارەی مامەڵە',units:'ژمارەی یەکە',maxLoss:'زیان ئەگەر وەستاندن کرا',rr:'R:R',be:'ڕێژەی بردنەوەی پێویست',profit:'قازانج ئەگەر گەیشتە ئامانج',margin:'بارمتەی پێویست',liq:'نرخی نزیکەیی لیکویدەیشن',
+ wStop:'وەستاندنی زیان دەبێت خوار چوونەژوورەوە (لۆنگ) یان سەرووی (شۆرت) بێت.',wLiq:'⚠️ بەم لێڤەرێجە، نرخی لیکویدەیشن پێش وەستاندنی زیان دەگات؛ لێڤەرێج کەم بکەرەوە.',wBig:'⚠️ قەبارەی مامەڵە لە کۆی سەرمایە گەورەترە.',
+ wiT:'⏳ «ئەگەر کڕیبام…»',wiL:'ئەگەر لە ڕێکەوتێکی ڕابردوودا یەکجار یان پلە بە پلە هەفتانە کڕیبات، ئێستا چەندت دەبوو؟',coin:'دراو',date:'ڕێکەوتی دەستپێک',amt:'بڕ (دۆلار)',mode:'ڕێگە',modes:{once:'کڕینی یەکجار',dca:'کڕینی پلە بە پلەی هەفتانە (DCA)'},calc:'ژمێرە',
+ inv:'کۆی سەرمایەی دانراو',now:'بەهای ئەمڕۆ',pnl:'قازانج / زیان',vsBtc:'هەمان کار بە بیتکۆین',buys:'ژمارەی کڕین',noData:'داتای ئەم ڕێکەوتە لە Binance نییە.',wiNote:'بە نرخی داخستنی ڕۆژانەی Binance، بێ کرێ. تەنها بۆ فێربوون.',
+ fxT:'💱 نرخی کریپتۆ بە دراوەکانی ناوچە',fxL:'نرخی دراو بە دیناری عێراقی، تمەن، لیرەی تورکی، درهەم و یۆرۆ ببینە. نرخی فەرمی خۆکارە؛ دەتوانیت نرخی بازاڕی خۆت بنووسیت.',qty:'بڕ',cur:'دراوی مەبەست',myRate:'نرخی خۆت (هەر دۆلارێک)',
+ val:'بەها',rateUsed:'نرخی بەکارهاتوو',official:'نرخی فەرمی',custom:'نرخی تۆ',fxSrc:'نرخی فەرمی لە exchangerate-api.com، نوێکردنەوە ',fxWarn:'⚠️ بۆ تمەن و دینار، نرخی فەرمی جیاوازییەکی زۆری لەگەڵ بازاڕی ئازاد هەیە؛ نرخی بازاڕی خۆت بنووسە.',
+ curs:{IQD:'دیناری عێراقی',IRT:'تمەنی ئێران',TRY:'لیرەی تورکی',AED:'درهەمی ئیمارات',EUR:'یۆرۆ',GBP:'پاوەند'},
+ honest:'<b>ڕوونی:</b> هەموو ژمێرکارییەکان لە وێبگەڕەکەتدا بە داتای گشتیی Binance و exchangerate-api دەکرێن؛ هیچ شتێک بۆ ئێمە نانێردرێت. فێرکارییە، ئامۆژگاریی دارایی نییە.',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە'});
+Object.assign(I.en,{mkt:'Market rate (Nobitex, USDT)',mktSrc:'For the toman, the free-market USDT rate from Nobitex is used; you can enter your own rate.',h1:'Trader <em>tools</em>',lead:'Multi-coin comparison, position-size calculator, “what if I had bought…”, and crypto prices in regional currencies — all with live Binance data, no sign-up.',
+ links:[['/safety/','🛡 Token safety check','Honeypots, hidden taxes, liquidity locks'],['/me/#paper','📝 Paper trading','Virtual money, linked to the scanner'],['/me/','🔔 Combined alerts','RSI + score + volume + news'],['/terminal/','🖥 Terminal','Correlation with global markets, live liquidations'],['/learn/','🎓 Learn','Learning path and glossary']],
+ cmpT:'⚖️ Multi-coin comparison',cmpL:'Compare up to 6 coins on one chart: return, volatility, maximum drawdown, correlation with bitcoin and Entekhab score.',cmpNote:'Returns from Binance daily closes; annualised volatility and correlation from daily returns. Past results do not guarantee the future.',
+ ret:'Return',vol:'Volatility (ann.)',mdd:'Max drawdown',corr:'Corr. with BTC',score:'Score',
+ rkT:'🧮 Position-size & R:R calculator',rkL:'Size the trade so that hitting your stop costs only a small share of capital.',cap:'Capital ($)',riskP:'Risk per trade (%)',side:'Side',entry:'Entry price',stop:'Stop-loss',target:'Target (optional)',lev:'Leverage',coinOpt:'Fill with live price',
+ sides:{long:'Long (buy)',short:'Short (sell)'},pos:'Position size',units:'Units',maxLoss:'Loss if stopped',rr:'R:R',be:'Break-even win rate',profit:'Profit at target',margin:'Margin needed',liq:'Approx. liquidation price',
+ wStop:'The stop must be below entry (long) or above entry (short).',wLiq:'⚠️ At this leverage the liquidation price comes before your stop — lower the leverage.',wBig:'⚠️ The position is larger than your whole capital — not possible without leverage.',
+ wiT:'⏳ “What if I had bought…”',wiL:'If you had bought once — or weekly (DCA) — from a past date, what would you have today?',coin:'Coin',date:'Start date',amt:'Amount ($)',mode:'Method',modes:{once:'Lump sum',dca:'Weekly DCA'},calc:'Calculate',
+ inv:'Total invested',now:'Value today',pnl:'Profit / loss',vsBtc:'Same with bitcoin',buys:'Buys',noData:'Binance has no data for this date (coin not listed yet, or a future date).',wiNote:'Binance daily closes, no fees. Educational only.',
+ fxT:'💱 Crypto in regional currencies',fxL:'See a coin in Iraqi dinar, Iranian toman, Turkish lira, dirham or euro. Official rates are automatic; you can also enter your own free-market rate.',qty:'Quantity',cur:'Currency',myRate:'Your own rate (per $1)',
+ val:'Value',rateUsed:'Rate used',official:'Official rate',custom:'Your rate',fxSrc:'Official rates from exchangerate-api.com, updated ',fxWarn:'⚠️ For the toman and dinar the official rate differs a lot from the free market — enter your market rate for a realistic number (saved only in your browser).',
+ curs:{IQD:'Iraqi dinar',IRT:'Iranian toman',TRY:'Turkish lira',AED:'UAE dirham',EUR:'Euro',GBP:'Pound'},
+ honest:'<b>Transparency:</b> every calculation runs in your browser with public Binance and exchangerate-api data; nothing is sent to us. These tools are educational, not financial advice.',nfa:'Educational, not financial advice'});
+const PAL=['#f7931a','#38bdf8','#22c55e','#a78bfa','#f472b6','#facc15'];let M=null,SC=null,FX=null,MAC=null,cmpD=90,cmp=ls.get('ek_cmp',['BTC','ETH','SOL']);
+const KL={};async function daily(c,limit){const k=c+limit;if(KL[k])return KL[k];const r=await j(`https://data-api.binance.vision/api/v3/klines?symbol=${c}USDT&interval=1d&limit=${limit}`);KL[k]=(r||[]).map(x=>({t:x[0],c:+x[4]}));return KL[k]}
+const coins=()=>[...new Set(['BTC','ETH','SOL','BNB','XRP',...(M?.coins||[]).map(c=>c.coin)])].filter(c=>!['USDT','USDC','FDUSD','DAI'].includes(c));
+const opt=(a,sel)=>a.map(c=>`<option${c===sel?' selected':''}>${c}</option>`).join('');
+const pct=(v,d=2)=>v==null||!isFinite(v)?'—':`<span class="${v>=0?'pos':'neg'}">${v>=0?'+':''}${v.toFixed(d)}%</span>`;
+const sd=a=>{const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/(a.length-1||1))};
+const cor=(a,b)=>{const n=Math.min(a.length,b.length);if(n<5)return null;a=a.slice(-n);b=b.slice(-n);const ma=a.reduce((x,y)=>x+y)/n,mb=b.reduce((x,y)=>x+y)/n;let c=0,da=0,db=0;for(let i=0;i<n;i++){c+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2}return da&&db?c/Math.sqrt(da*db):null};
+/* ---- compare ---- */
+async function renderCmp(){ls.set('ek_cmp',cmp);$('#cmpAdd').innerHTML=opt(coins().filter(c=>!cmp.includes(c)));
+ $('#cmpChips').innerHTML=cmp.map((c,i)=>`<span class="chipc"><i style="background:${PAL[i]}"></i>${c}<button data-x="${c}" aria-label="remove">×</button></span>`).join('');
+ const lim=cmpD+1,ser=await Promise.all(cmp.map(c=>daily(c,lim))),btc=await daily('BTC',lim);
+ const all=ser.filter(s=>s.length>2);if(!all.length){$('#cmpSvg').innerHTML='';$('#cmpTab').innerHTML=`<tr><td class="err">${T('noData')}</td></tr>`;return}
+ const t0=Math.max(...all.map(s=>s[0].t)),norm=ser.map(s=>s.filter(x=>x.t>=t0)).map(s=>s.length?s.map(x=>({t:x.t,v:(x.c/s[0].c-1)*100})):[]);
+ const vs=norm.flat().map(x=>x.v),mn=Math.min(0,...vs),mx=Math.max(0,...vs),T0=t0,T1=Math.max(...norm.flat().map(x=>x.t)),X=t=>((t-T0)/((T1-T0)||1)*780+10).toFixed(1),Y=v=>(290-(v-mn)/((mx-mn)||1)*280).toFixed(1);
+ let svg=`<line x1="10" x2="790" y1="${Y(0)}" y2="${Y(0)}" stroke="#ffffff30" stroke-dasharray="4 4"/>`;
+ norm.forEach((s,i)=>{if(s.length>1)svg+=`<polyline fill="none" stroke="${PAL[i]}" stroke-width="2" vector-effect="non-scaling-stroke" points="${s.map(x=>X(x.t)+','+Y(x.v)).join(' ')}"/>`});
+ $('#cmpSvg').innerHTML=svg;$('#cmpRange').innerHTML=`<span class="num">↑ ${mx.toFixed(1)}%</span> · <span class="num">↓ ${mn.toFixed(1)}%</span> · <span class="num">${new Date(T0).toISOString().slice(0,10)} → ${new Date(T1).toISOString().slice(0,10)}</span>`;
+ const br=btc.filter(x=>x.t>=t0).map((x,i,a)=>i?Math.log(x.c/a[i-1].c):null).slice(1);
+ $('#cmpTab').innerHTML=`<tr><th></th><th>${T('ret')}</th><th>${T('vol')}</th><th>${T('mdd')}</th><th>${T('corr')}</th><th>${T('score')}</th></tr>`+cmp.map((c,i)=>{const s=ser[i].filter(x=>x.t>=t0);if(s.length<3)return `<tr><td>${c}</td><td colspan="5" class="disc">—</td></tr>`;
+  const r=s.slice(1).map((x,k)=>Math.log(x.c/s[k].c));let pk=-1,md=0;s.forEach(x=>{pk=Math.max(pk,x.c);md=Math.min(md,x.c/pk-1)});const sc=SC?.coins?.[c];
+  return `<tr><td><i style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${PAL[i]}"></i> <a href="/coins/${c.toLowerCase()}/"><b>${c}</b></a></td><td class="num">${pct((s.at(-1).c/s[0].c-1)*100)}</td><td class="num">${(sd(r)*Math.sqrt(365)*100).toFixed(0)}%</td><td class="num">${pct(md*100,1)}</td><td class="num">${(()=>{const cr=c==='BTC'?1:cor(r,br);return cr==null?'—':cr.toFixed(2)})()}</td><td class="num">${sc?sc.score:'—'}</td></tr>`}).join('')}
+$('#cmpAddB').onclick=()=>{const c=$('#cmpAdd').value;if(c&&!cmp.includes(c)&&cmp.length<6){cmp.push(c);renderCmp()}};
+$('#cmpChips').onclick=e=>{const b=e.target.closest('[data-x]');if(b&&cmp.length>1){cmp=cmp.filter(x=>x!==b.dataset.x);renderCmp()}};
+$('#cmpP').onclick=e=>{const b=e.target.closest('button');if(!b)return;cmpD=+b.dataset.d;$('#cmpP').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));renderCmp()};
+/* ---- position size ---- */
+function renderRisk(){const cap=+$('#rCap').value,rp=+$('#rPct').value,en=+$('#rEn').value,sl=+$('#rSl').value,tp=+$('#rTp').value,lev=Math.max(1,+$('#rLev').value||1),long=$('#rSide').value==='long';
+ $('#rWarn').innerHTML='';if(!(cap>0&&rp>0&&en>0&&sl>0)){$('#rOut').innerHTML='';return}
+ if(long?sl>=en:sl<=en){$('#rOut').innerHTML='';$('#rWarn').innerHTML=`<p class="err">${T('wStop')}</p>`;return}
+ const dist=Math.abs(en-sl)/en,risk=cap*rp/100,size=risk/dist,units=size/en,rr=tp>0?Math.abs(tp-en)/Math.abs(en-sl):null,liq=lev>1?(long?en*(1-1/lev):en*(1+1/lev)):null;
+ const cells=[[T('pos'),'$'+fm(size,2)],[T('units'),fm(units,6)],[T('maxLoss'),'$'+fm(risk,2)],[T('margin'),'$'+fm(size/lev,2)]];
+ if(rr!=null){cells.push([T('rr'),rr.toFixed(2)],[T('be'),(100/(1+rr)).toFixed(1)+'%'],[T('profit'),'$'+fm(size*Math.abs(tp-en)/en,2)])}
+ if(liq)cells.push([T('liq'),'$'+fm(liq,en<1?6:2)]);
+ $('#rOut').innerHTML=cells.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('');
+ const w=[];if(liq&&(long?liq>=sl:liq<=sl))w.push(T('wLiq'));if(size/lev>cap)w.push(T('wBig'));$('#rWarn').innerHTML=w.map(x=>`<p class="warn">${x}</p>`).join('')}
+['#rCap','#rPct','#rEn','#rSl','#rTp','#rLev','#rSide'].forEach(s=>$(s).addEventListener('input',renderRisk));
+$('#rCoin').onchange=async()=>{const c=$('#rCoin').value;if(!c)return;const d=await j(`https://data-api.binance.vision/api/v3/ticker/price?symbol=${c}USDT`);if(d&&d.price){$('#rEn').value=+d.price;renderRisk()}};
+/* ---- what if ---- */
+async function whatIf(){const c=$('#wCoin').value,amt=+$('#wAmt').value,mode=$('#wMode').value,d=$('#wDate').value,o=$('#wOut');if(!(amt>0)||!d)return;o.innerHTML='…';
+ const start=Date.parse(d+'T00:00:00Z');if(!(start<Date.now())){o.innerHTML=`<p class="err">${T('noData')}</p>`;return}
+ async function hist(sym){const out=[];let s=start;for(let k=0;k<4;k++){const r=await j(`https://data-api.binance.vision/api/v3/klines?symbol=${sym}USDT&interval=1d&startTime=${s}&limit=1000`);if(!r||!r.length)break;r.forEach(x=>out.push({t:x[0],c:+x[4]}));if(r.length<1000)break;s=r.at(-1)[0]+864e5}return out}
+ function run(h){if(!h.length||h[0].t-start>7*864e5)return null;const last=h.at(-1).c;if(mode==='once'){const u=amt/h[0].c;return{inv:amt,now:u*last,n:1}}
+  let u=0,inv=0,n=0;for(let i=0;i<h.length;i+=7){u+=amt/h[i].c;inv+=amt;n++}return{inv,now:u*last,n}}
+ const [a,b]=await Promise.all([hist(c),c==='BTC'?null:hist('BTC')]);const r=run(a),rb=b?run(b):null;if(!r){o.innerHTML=`<p class="err">${T('noData')}</p>`;return}
+ o.innerHTML=[[T('inv'),'$'+fm(r.inv,2)],[T('now'),'$'+fm(r.now,2)],[T('pnl'),pct((r.now/r.inv-1)*100)],[T('buys'),r.n]].concat(rb?[[T('vsBtc'),'$'+fm(rb.now,2)+' '+pct((rb.now/rb.inv-1)*100)]]:[]).map(([x,y])=>`<div><small>${x}</small><b>${y}</b></div>`).join('')}
+$('#wGo').onclick=whatIf;
+/* ---- regional currencies ---- */
+async function renderFx(){const c=$('#fCoin').value,q=+$('#fQty').value||0,cur=$('#fCur').value,R=ls.get('ek_fx',{});if(R[cur]&&!$('#fRate').value)$('#fRate').value=R[cur];
+ const px=await j(`https://data-api.binance.vision/api/v3/ticker/price?symbol=${c}USDT`),usd=px&&px.price?+px.price*q:null;
+ const off=FX&&FX.rates?(cur==='IRT'?FX.rates.IRR/10:FX.rates[cur]):null,mkt=cur==='IRT'&&MAC&&MAC.usdt_irt?MAC.usdt_irt.value:null,mine=+$('#fRate').value||null,rate=mine||mkt||off;
+ $('#fOut').innerHTML=[[T('val')+' (USD)',usd==null?'—':'$'+fm(usd,2)],[T('val')+' — '+T('curs')[cur],usd==null||!rate?'—':fm(usd*rate,0)],[mine?T('custom'):mkt?T('mkt'):T('official'),rate?fm(rate,2):'—'],[T('official'),off?fm(off,2):'—']].map(([x,y])=>`<div><small>${x}</small><b>${y}</b></div>`).join('');
+ $('#fNote').innerHTML=(FX?.time_last_update_utc?T('fxSrc')+esc(FX.time_last_update_utc.slice(5,22))+'. ':'')+(mkt&&!mine?T('mktSrc'):['IRT','IQD'].includes(cur)?T('fxWarn'):'')}
+$('#fRate').addEventListener('change',()=>{const R=ls.get('ek_fx',{}),v=+$('#fRate').value;if(v>0)R[$('#fCur').value]=v;else delete R[$('#fCur').value];ls.set('ek_fx',R);renderFx()});
+['#fCoin','#fQty'].forEach(s=>$(s).addEventListener('input',renderFx));$('#fCur').addEventListener('change',()=>{$('#fRate').value='';renderFx()});
+function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).value||'BTC';$(s).innerHTML=opt(cs,v)});$('#rCoin').innerHTML='<option value="">—</option>'+opt(cs);
+ $('#rSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');$('#wMode').innerHTML=Object.entries(T('modes')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+ const fc=$('#fCur').value||'IQD';$('#fCur').innerHTML=Object.entries(T('curs')).map(([k,v])=>`<option value="${k}"${k===fc?' selected':''}>${v} (${k})</option>`).join('');
+ if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
+ $('#tlinks').innerHTML=T('links').map(([h,a,b])=>`<a href="${h}"><b>${a}</b><small>${b}</small></a>`).join('')}
+function render(){forms();renderCmp();renderRisk();renderFx()}
+(async()=>{const [m,s,fx,mc]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V())]);M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
+ if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();
+</script>
+</body>
+</html>
