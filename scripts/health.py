@@ -81,6 +81,22 @@ def main():
     out = {"checked_at": datetime.now(timezone.utc).isoformat(), "status": status, "checks": checks,
            "post_count": len(posts) if isinstance(posts, list) else prev.get("post_count"),
            "last_alert_status": prev.get("last_alert_status", "ok")}
+    # freshness of every dataset for the public /status/ page (time of the last successful update + size)
+    files = {}
+    for fn in sorted(os.listdir(D)):
+        if not fn.endswith(".json"):
+            continue
+        d = load(fn)
+        ts = None
+        if isinstance(d, dict):
+            ts = d.get("updated_at") or d.get("generated_at") or d.get("checked_at") or d.get("at")
+        elif isinstance(d, list) and d and isinstance(d[0], dict):
+            ts = max((x.get("date") or x.get("at") or "" for x in d[:50]), default=None) or None
+        files[fn[:-5]] = {"at": ts, "kb": round(os.path.getsize(os.path.join(D, fn)) / 1024)}
+    hi = load("history/index.json")
+    if isinstance(hi, dict):
+        files["history"] = {"at": hi.get("updated_at"), "kb": round(os.path.getsize(os.path.join(D, "history", "index.json")) / 1024)}
+    out["files"] = files
 
     tok, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_ALERT_CHAT")
     if tok and chat and status != out["last_alert_status"]:
