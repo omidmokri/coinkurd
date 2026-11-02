@@ -62,6 +62,26 @@ def sentiment_inputs(s):
     return out
 
 
+def parse_scores(raw):
+    """the model may answer a bare list, {"items": [...]}, or JSON wrapped in prose/fences (ai.generate(as_json=True)
+    may also hand back the already-parsed object)"""
+    if isinstance(raw, (list, dict)):
+        raw = json.dumps(raw)
+    raw = re.sub(r"^```\w*|```$", "", (raw or "").strip()).strip()
+    for cand in (raw, (re.search(r"\[.*\]", raw, re.S) or [None])[0]):
+        if not cand:
+            continue
+        try:
+            res = json.loads(cand)
+        except Exception:
+            continue
+        if isinstance(res, dict):
+            res = next((v for v in res.values() if isinstance(v, list)), [res])
+        if isinstance(res, list):
+            return [r for r in res if isinstance(r, dict)]
+    return []
+
+
 def score_new(s, limit=25):
     h = hub(s)
     todo = [x for x in sentiment_inputs(s) if x[0] not in h["scores"]][:limit]
@@ -69,10 +89,13 @@ def score_new(s, limit=25):
         return False
     body = "\n\n".join(f"[id={k}]\n{t[:700]}" for k, _, t in todo)
     try:
-        raw = ai.generate(SENT_PROMPT + body, as_json=True, temperature=0.1, max_tokens=3000)
-        res = json.loads(re.sub(r"^```\w*|```$", "", raw.strip()))
+        raw = ai.generate(SENT_PROMPT + body, as_json=True, temperature=0.1, max_tokens=4000)
     except Exception as ex:
-        log.info("sentiment scoring failed: %s", ex)
+        log.warning("sentiment scoring failed: %s", ex)
+        return False
+    res = parse_scores(raw)
+    if not res:
+        log.warning("sentiment: unreadable answer: %s", str(raw)[:200])
         return False
     by = {k: (at, t) for k, at, t in todo}
     n = 0
