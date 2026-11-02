@@ -24,16 +24,23 @@ function bgPaint(x, W, H) {
 }
 function wrapText(x, t, cx, y, w, lh) { let line = ''; for (const wd of String(t).split(' ')) { const tt = line ? line + ' ' + wd : wd; if (x.measureText(tt).width > w && line) { x.fillText(line, cx, y); y += lh; line = wd; } else line = tt; } x.fillText(line, cx, y); return y; }
 const NAV = {
-  fa: [['/', 'خانه'], ['/indicators/', 'اندیکاتورها'], ['/lab/', 'آزمایشگاه'], ['/dna/', 'DNA بازار'], ['/terminal/', 'ترمینال'], ['/me/', 'فضای من'], ['/learn/', 'آموزش'], ['/tools/', 'ابزارها']],
-  ckb: [['/', 'ماڵەوە'], ['/indicators/', 'ئیندیکاتۆرەکان'], ['/lab/', 'تاقیگە'], ['/dna/', 'DNAی بازاڕ'], ['/terminal/', 'تێرمیناڵ'], ['/me/', 'بۆشاییی من'], ['/learn/', 'فێربوون'], ['/tools/', 'ئامرازەکان']],
-  en: [['/', 'Home'], ['/indicators/', 'Indicators'], ['/lab/', 'Lab'], ['/dna/', 'Market DNA'], ['/terminal/', 'Terminal'], ['/me/', 'My space'], ['/learn/', 'Learn'], ['/tools/', 'Tools']]
+  fa: [['/', 'خانه'], ['/indicators/', 'اندیکاتورها'], ['/lab/', 'آزمایشگاه'], ['/dna/', 'DNA بازار'], ['/terminal/', 'ترمینال'], ['/me/', 'فضای من'], ['/battle/', '⚔️ میدان نبرد'], ['/learn/', 'آموزش'], ['/tools/', 'ابزارها']],
+  ckb: [['/', 'ماڵەوە'], ['/indicators/', 'ئیندیکاتۆرەکان'], ['/lab/', 'تاقیگە'], ['/dna/', 'DNAی بازاڕ'], ['/terminal/', 'تێرمیناڵ'], ['/me/', 'بۆشاییی من'], ['/battle/', '⚔️ مەیدانی شەڕ'], ['/learn/', 'فێربوون'], ['/tools/', 'ئامرازەکان']],
+  en: [['/', 'Home'], ['/indicators/', 'Indicators'], ['/lab/', 'Lab'], ['/dna/', 'Market DNA'], ['/terminal/', 'Terminal'], ['/me/', 'My space'], ['/battle/', '⚔️ Battlefield'], ['/learn/', 'Learn'], ['/tools/', 'Tools']]
 };
+const BNAV = { fa: ['خانه', 'داشبورد', 'نبرد', 'آموزش', 'فضای من'], ckb: ['ماڵەوە', 'داشبۆرد', 'شەڕ', 'فێربوون', 'بۆشاییم'], en: ['Home', 'Dashboard', 'Battle', 'Learn', 'My space'] };
+function bottomNav() {
+  let n = document.getElementById('bnav'); if (!n) { n = document.createElement('nav'); n.id = 'bnav'; n.className = 'bnav'; n.setAttribute('aria-label', 'bottom'); document.body.appendChild(n); }
+  const L = BNAV[lang] || BNAV.en, items = [['/', '🏠'], ['/#intel', '🧠'], ['/battle/', '⚔️'], ['/learn/', '🎓'], ['/me/', '👤']];
+  n.innerHTML = items.map(([h, ic], i) => `<a href="${h}"${location.pathname === h ? ' class="on"' : ''}><span>${ic}</span><small>${L[i]}</small></a>`).join('');
+}
 function uiLang(onChange) {
   const apply = () => {
     document.documentElement.lang = lang; document.documentElement.dir = lang === 'en' ? 'ltr' : 'rtl';
     document.querySelectorAll('[data-t]').forEach(e => { const v = T(e.dataset.t); if (v !== undefined) e.innerHTML = v; });
     const tabs = $('#tabs'); if (tabs) tabs.innerHTML = (NAV[lang] || NAV.en).map(([h, t]) => `<a href="${h}"${location.pathname === h ? ' style="color:var(--ink);background:#ffffff12"' : ''}>${t}</a>`).join('');
     document.querySelectorAll('#langs button').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    bottomNav();
     onChange && onChange();
   };
   const L = $('#langs'); if (L) L.onclick = e => { const b = e.target.closest('button'); if (!b) return; lang = b.dataset.l; try { localStorage.setItem('ck_lang', lang); } catch (_) { } apply(); };
