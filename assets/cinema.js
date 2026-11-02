@@ -332,9 +332,9 @@ float x=(r-uIn)/span;vA=uOp*(1.-x)*smoothstep(0.,.08,x)*smoothstep(1.,.85,x);vC=
   const loadScript = u => new Promise((res, rej) => { const s = document.createElement('script'); s.src = u; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
   async function initBloom() {
     if (low) return;
-    const base = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/';
+    const base = '/assets/vendor/three/';   // self-hosted three r128 examples (flat folder)
     try {
-      for (const f of ['shaders/CopyShader.js', 'shaders/LuminosityHighPassShader.js', 'postprocessing/EffectComposer.js', 'postprocessing/RenderPass.js', 'postprocessing/ShaderPass.js', 'postprocessing/UnrealBloomPass.js']) await loadScript(base + f);
+      for (const f of ['CopyShader.js', 'LuminosityHighPassShader.js', 'EffectComposer.js', 'RenderPass.js', 'ShaderPass.js', 'UnrealBloomPass.js']) await loadScript(base + f);
       const c = new THREE.EffectComposer(renderer); c.setPixelRatio(PR);
       c.addPass(new THREE.RenderPass(scene, cam));
       bloom = new THREE.UnrealBloomPass(new THREE.Vector2(hero.clientWidth, hero.clientHeight), 0.9, 0.5, 0.58);
