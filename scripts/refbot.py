@@ -31,7 +31,7 @@ import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
-import bot_studio as S  # noqa: E402
+import bot_deep as DP  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
@@ -974,7 +974,7 @@ def main():
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
     F.start(s, group_send, group_delete, GROUP, MAIN_WT)
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
-    S.start(s, group_send, CHANNEL, channel_poll)
+    DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
