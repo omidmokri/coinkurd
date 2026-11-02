@@ -566,14 +566,56 @@ def check_alerts(s):
     return changed
 
 
-def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
-    body = D.e(text) if plain else text
-    if photo:                                   # picture + summary as caption (summaries are ≤1024 chars, Telegram's caption limit)
-        r = tg("sendPhoto", chat_id=chat_id, photo=photo, caption=fix_amp(body), parse_mode="HTML", **kw)
+def _post_with_retry(method, data, files=None, tries=3):
+    """Bot API call that waits out Telegram's per-group rate limit (429 retry_after) instead of dropping the post"""
+    r = {"ok": False}
+    for _ in range(tries):
+        try:
+            if files:
+                r = requests.post(API + method, data=data, files=files, timeout=90).json()
+            else:
+                r = requests.post(API + method, json=data, timeout=60).json()
+        except Exception as ex:
+            r = {"ok": False, "description": str(ex)}
         if r.get("ok"):
             return r
-        log.info("sendPhoto failed (%s); sending text only", r.get("description"))
-    return send(chat_id, body, kb, **kw)
+        wait = (r.get("parameters") or {}).get("retry_after")
+        if wait:
+            time.sleep(min(int(wait) + 1, 90))
+            continue
+        break
+    log.warning("%s -> %s", method, r.get("description"))
+    return r
+
+
+def _image_bytes(url):
+    try:
+        g = requests.get(url, timeout=30, headers={"User-Agent": "Mozilla/5.0 (CoinKurdBot)"})
+        if g.ok and len(g.content) > 2000 and len(g.content) < 9_500_000:
+            return g.content
+    except Exception:
+        pass
+    return None
+
+
+def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
+    """post to the group; with a picture the summary becomes its caption (summaries are ≤1024 chars, the caption limit).
+    The picture is downloaded and uploaded by the bot, because Telegram cannot fetch t.me CDN links itself."""
+    body = fix_amp(D.e(text) if plain else text)
+    if photo:
+        img = _image_bytes(photo)
+        if img:
+            data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML"}
+            data.update({k: v for k, v in kw.items() if v is not None})
+            r = _post_with_retry("sendPhoto", data, files={"photo": ("chart.jpg", img)})
+            if r.get("ok"):
+                return r
+        log.info("picture unavailable for this post; sending text only")
+    data = {"chat_id": chat_id, "text": body, "parse_mode": "HTML", "link_preview_options": {"is_disabled": True}}
+    data.update({k: v for k, v in kw.items() if v is not None})
+    if kb:
+        data["reply_markup"] = kb
+    return _post_with_retry("sendMessage", data)
 
 
 def group_delete(chat_id, mid):
