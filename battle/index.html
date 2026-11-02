@@ -4,49 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>میدان نبرد بیت‌کوین — نبرد زندهٔ گاوها و خرس‌ها با اوردربوک، معاملات و لیکوئید شدن‌ها | entekhab.net</title>
-<meta name="description" content="بازار زندهٔ بیت‌کوین به شکل یک میدان نبرد سه‌بعدی: سفارش‌های خرید سپاه سبز گاوها، سفارش‌های فروش سپاه قرمز خرس‌ها، هر معامله یک شلیک، هر لیکوئید شدن یک حملهٔ هوایی و قیمت لحظه‌ای خط مقدم. دادهٔ زندهٔ Binance و OKX، بدون ثبت‌نام.">
+<meta name="description" content="بازار زندهٔ بیت‌کوین به شکل یک میدان نبرد سه‌بعدی: سفارش‌های خرید سپاه سبز گاوها، سفارش‌های فروش سپاه قرمز خرس‌ها، هر معامله یک شلیک، هر لیکوئید شدن یک حملهٔ هوایی و قیمت لحظه‌ای خط مقدم. دادهٔ زندهٔ Binance، OKX و Bybit، بدون ثبت‌نام.">
 <link rel="canonical" href="https://entekhab.net/battle/">
-<meta property="og:title" content="میدان نبرد بیت‌کوین — گاوها در برابر خرس‌ها، زنده | entekhab.net"><meta property="og:description" content="اوردربوک، معاملات و لیکوئید شدن‌های زندهٔ بیت‌کوین به شکل یک نبرد سه‌بعدی"><meta property="og:url" content="https://entekhab.net/battle/"><meta property="og:site_name" content="entekhab.net">
+<meta property="og:title" content="میدان نبرد بیت‌کوین — گاوها در برابر خرس‌ها، زنده | entekhab.net"><meta property="og:description" content="اوردربوک، معاملات و لیکوئید شدن‌های زندهٔ بیت‌کوین به شکل یک نبرد سه‌بعدی با ارتش‌های متحرک، حمله‌های هوایی، آب‌وهوای وابسته به نوسان و صدای فضایی"><meta property="og:url" content="https://entekhab.net/battle/"><meta property="og:site_name" content="entekhab.net">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/ui.css">
 <style>
 body{overflow-x:hidden}
-.bf{position:relative;direction:ltr;height:calc(100vh - 60px);min-height:520px;background:#0a0a0a;overflow:hidden;user-select:none}
+.bf{position:relative;direction:ltr;height:calc(100vh - 60px);min-height:540px;background:#0a0a0a;overflow:hidden;user-select:none;--glass:rgba(10,12,16,.55);--gb:rgba(255,255,255,.08)}
 .bf.fs{position:fixed;inset:0;height:100vh;z-index:200}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .12s}
 .hud{position:absolute;inset:0;pointer-events:none;font-family:var(--mono)}
 .hud>*{pointer-events:auto}
-.pan{position:absolute;background:rgba(8,9,12,.62);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:8px 12px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#e8e6e0;font-size:.8rem}
-.pan small{display:block;color:var(--mute);font-size:.68rem;letter-spacing:.04em;text-transform:uppercase}
-.top{top:10px;left:50%;transform:translateX(-50%);text-align:center;min-width:300px;max-width:calc(100% - 20px);max-width:min(560px,calc(100% - 20px))}
-.top .px{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700;line-height:1.1}
+.pan{position:absolute;background:var(--glass);border:1px solid var(--gb);border-radius:14px;padding:8px 12px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#e8e6e0;font-size:.8rem;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.pan small{display:block;color:var(--mute);font-size:.66rem;letter-spacing:.04em;text-transform:uppercase}
+.top{top:10px;left:50%;transform:translateX(-50%);text-align:center;min-width:300px;max-width:min(600px,calc(100% - 20px))}
+.top .px{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;transition:color .25s}
+.top .px.up{color:#4ade80}.top .px.dn{color:#f87171}
 .top .ch{font-size:.82rem}.top .ch.pos{color:var(--g)}.top .ch.neg{color:var(--r)}
 .rnd{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-top:6px;font-size:.72rem}
 .rnd .bar{height:7px;border-radius:5px;background:linear-gradient(90deg,#ef4444,#3f3f46 50%,#22c55e);position:relative}
-.rnd .bar i{position:absolute;top:-4px;width:3px;height:15px;background:#fff;border-radius:2px;margin-left:-1px;box-shadow:0 0 8px #fff}
+.rnd .bar i{position:absolute;top:-4px;width:3px;height:15px;background:#fff;border-radius:2px;margin-left:-1px;box-shadow:0 0 8px #fff;transition:left .15s}
 .rnd .bear{color:#f87171;text-align:left;white-space:nowrap}.rnd .bull{color:#4ade80;text-align:right;white-space:nowrap}.rnd .lbl{color:var(--mute)}
-.liq{top:128px;font-size:1.2rem;font-weight:700}.liq.l{left:10px;color:#4ade80}.liq.r{right:10px;color:#f87171;text-align:right}
-.stats{display:grid;grid-template-columns:1.3fr 1fr .7fr;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:.72rem;text-align:left}.stats small{text-transform:none;letter-spacing:0}.stats .row2{display:flex;justify-content:space-between;gap:6px;margin:2px 0}
-.pbar{height:6px;border-radius:4px;background:#ef4444;overflow:hidden;margin:3px 0 6px}.pbar i{display:block;height:100%;background:#22c55e}
-.depth{left:10px;bottom:10px;width:min(330px,calc(100% - 20px));padding:8px 10px}.depth canvas{width:100%;height:120px;display:block}
+.stats{display:grid;grid-template-columns:1.3fr 1.1fr .7fr;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:.72rem;text-align:left}.stats small{text-transform:none;letter-spacing:0}.stats .row2{display:flex;justify-content:space-between;gap:6px;margin:2px 0}
+.pbar{height:6px;border-radius:4px;background:#ef4444;overflow:hidden;margin:3px 0 6px}.pbar i{display:block;height:100%;background:#22c55e;transition:width .4s}
+.pill{display:inline-block;font-size:.6rem;padding:1px 6px;border-radius:99px;border:1px solid rgba(255,255,255,.14);color:var(--mute);margin:2px 3px 0 0}.pill.on{color:#e8e6e0;border-color:rgba(255,255,255,.3)}
+.liq{top:132px;font-size:1.15rem;font-weight:700;min-width:150px}.liq.l{left:10px;color:#4ade80}.liq.r{right:10px;color:#f87171;text-align:right}.liq .sub{font-size:.66rem;color:var(--mute);font-weight:400}
+.status{left:10px;top:205px;padding:5px 9px;font-size:.66rem;display:flex;gap:8px;align-items:center}.status i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#71717a;vertical-align:middle;margin-right:4px}.status i.ok{background:#22c55e;box-shadow:0 0 6px #22c55e}.status i.fb{background:#f59e0b}.status i.bad{background:#ef4444}.status span{white-space:nowrap}
+.depth{left:10px;bottom:10px;width:min(330px,calc(100% - 20px));padding:8px 10px}.depth canvas{width:100%;height:120px;display:block;cursor:crosshair}
 .depth .ax{display:flex;justify-content:space-between;font-size:.66rem;color:var(--mute)}
-.feed{right:10px;bottom:10px;width:300px;max-height:min(300px,45%);overflow:auto;padding:6px 10px}
-.feed h4{font-size:.7rem;color:var(--mute);margin:2px 0 4px;display:flex;justify-content:space-between}.feed h4 b{color:#4ade80}
-.feed .it{display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.07);font-size:.72rem;align-items:center}
-.feed .it .t{color:var(--mute)}.feed .it.buy .k{color:#4ade80}.feed .it.sell .k{color:#f87171}.feed .it.win .k{color:#fbbf24;font-weight:800}.feed .it .u{font-weight:700;text-align:right}
-.ctl{position:absolute;top:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:30%}
-.ctl button,.ctl select{background:rgba(8,9,12,.7);border:1px solid rgba(255,255,255,.15);color:#e8e6e0;border-radius:9px;padding:6px 9px;font:inherit;font-size:.76rem;cursor:pointer}
-.ctl button.on{border-color:var(--o);color:var(--o)}
+.feed{right:10px;bottom:10px;width:310px;max-height:min(320px,46%);overflow:auto;padding:6px 10px}
+.feed h4{font-size:.7rem;color:var(--mute);margin:2px 0 4px;display:flex;justify-content:space-between}.feed h4 b{color:#4ade80}.feed h4 b.rp{color:#fbbf24}
+.fchips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}.fchips button{font-size:.62rem;padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.14);background:none;color:var(--mute);cursor:pointer}.fchips button.on{color:#e8e6e0;border-color:var(--o)}
+.feed .it{display:grid;grid-template-columns:auto 1fr auto;gap:8px;padding:4px 0;border-top:1px solid rgba(255,255,255,.07);font-size:.72rem;align-items:center;cursor:pointer}
+.feed .it .t{color:var(--mute)}.feed .it.buy .k{color:#4ade80}.feed .it.sell .k{color:#f87171}.feed .it.win .k{color:#fbbf24;font-weight:800}.feed .it.info .k{color:#93c5fd}.feed .it .u{font-weight:700;text-align:right}.feed .it .x{font-size:.6rem;color:var(--mute)}
+.ctl{position:absolute;top:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:34%}
+.ctl button,.ctl select,.grp button{background:rgba(10,12,16,.62);border:1px solid rgba(255,255,255,.14);color:#e8e6e0;border-radius:10px;padding:6px 9px;font:inherit;font-size:.76rem;cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.ctl button.on,.grp button.on{border-color:var(--o);color:var(--o)}
+.grp{display:inline-flex;gap:0}.grp button{border-radius:0}.grp button:first-child{border-radius:10px 0 0 10px}.grp button:last-child{border-radius:0 10px 10px 0}
+.settings{right:10px;top:56px;width:min(300px,calc(100% - 20px));font-size:.74rem;z-index:3}.settings label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0}.settings select,.settings input[type=range]{max-width:55%}.settings input[type=range]{width:140px}
+.settings h5{margin:8px 0 2px;font-size:.66rem;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.replay{position:absolute;left:50%;bottom:142px;transform:translateX(-50%);width:min(560px,calc(100% - 20px));padding:6px 12px;display:flex;gap:8px;align-items:center;font-size:.72rem}
+.replay input[type=range]{flex:1;min-width:0}.replay .mk{position:relative;flex:1;height:22px}.replay .mk i{position:absolute;top:0;width:2px;height:8px;background:#fbbf24;border-radius:1px}.replay .mk input{position:absolute;inset:0;width:100%;margin:0}
+.replay button{background:none;border:1px solid rgba(255,255,255,.16);color:#e8e6e0;border-radius:8px;padding:3px 8px;cursor:pointer;font:inherit;font-size:.72rem}.replay button.on{color:var(--o);border-color:var(--o)}
+.tip{position:absolute;padding:6px 9px;font-size:.68rem;pointer-events:none;white-space:nowrap;z-index:4}
 .banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);text-align:center;font-size:clamp(1.6rem,5vw,3.2rem);font-weight:900;letter-spacing:.06em;text-shadow:0 0 30px rgba(0,0,0,.9);pointer-events:none;transition:opacity .5s;opacity:0}
-.banner.show{opacity:1}.banner.bull{color:#4ade80}.banner.bear{color:#f87171}.banner small{display:block;font-size:.9rem;letter-spacing:0;color:#e8e6e0;font-weight:400;margin-top:4px}
-.intro{left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;background:rgba(8,9,12,.7);padding:14px 22px;border-radius:14px;max-width:min(420px,90%);pointer-events:none}
+.banner.show{opacity:1}.banner.bull{color:#4ade80}.banner.bear{color:#f87171}.banner.warn{color:#fbbf24;font-size:clamp(1.2rem,3.5vw,2.2rem)}.banner small{display:block;font-size:.9rem;letter-spacing:0;color:#e8e6e0;font-weight:400;margin-top:4px}
+.intro{left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;background:rgba(8,9,12,.72);padding:14px 22px;border-radius:14px;max-width:min(440px,90%);pointer-events:none}
 .intro b{font-size:1.1rem}.intro p{font-size:.76rem;color:#cfcfc8;margin:6px 0 0;line-height:1.7}
 .nogl{left:50%;top:40%;transform:translate(-50%,-50%);text-align:center;max-width:420px}
+.loading{left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;min-width:220px}.loading .lb{height:4px;border-radius:3px;background:rgba(255,255,255,.1);margin-top:8px;overflow:hidden}.loading .lb i{display:block;height:100%;width:0;background:var(--o);transition:width .3s}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.7rem;color:#cfcfc8;margin-top:6px;justify-content:center}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
-@media(max-width:760px){.stats{display:none}.rnd .lbl{display:none}.top{min-width:0;width:calc(100% - 20px);padding:6px 10px}.top .px{font-size:1.5rem}.liq{top:auto;bottom:118px;font-size:.95rem;padding:5px 9px}.liq small{font-size:.6rem}.ctl{top:182px;max-width:100%;left:10px;right:10px;justify-content:flex-end}.ctl #lightSel,.ctl #helpB{display:none}.ctl button,.ctl select{padding:4px 7px;font-size:.7rem}.feed{width:min(260px,48%);max-height:34%;font-size:.66rem}.depth{width:46%;bottom:10px}.depth canvas{height:80px}}
-@media(max-width:480px){.feed{display:none}.depth{width:calc(100% - 20px)}.depth canvas{height:64px}.liq{bottom:124px}.bf{height:calc(100vh - 110px)}.intro{top:50%}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.hud [hidden]{display:none!important}.mstats{display:none}
+.tabs2{display:none}
+.bf[data-l-depth="0"] .depth,.bf[data-l-feed="0"] .feed{display:none}
+@media(max-width:1180px){.top{max-width:min(470px,calc(100% - 20px))}.stats{font-size:.64rem;gap:6px}.ctl{max-width:42%}.liq{min-width:0}}
+@media(max-width:1000px){.stats{display:none}.status{top:170px}}
+@media(max-width:760px){.stats,.status{display:none}.rnd .lbl{display:none}.top{min-width:0;width:calc(100% - 20px);padding:6px 10px}.top .px{font-size:1.5rem}.liq{top:auto;bottom:196px;font-size:.95rem;padding:5px 9px;min-width:0}.liq small{font-size:.6rem}.ctl{top:118px;max-width:100%;left:10px;right:10px;justify-content:flex-end}.ctl #helpB,.ctl #setB{display:inline-block}.ctl button,.ctl select{padding:4px 7px;font-size:.7rem}.ctl .grp.cams{display:none}
+ .tabs2{display:flex;position:absolute;left:0;right:0;bottom:150px;justify-content:center;gap:4px;z-index:2}.tabs2 button{background:rgba(10,12,16,.7);border:1px solid rgba(255,255,255,.14);color:var(--mute);border-radius:9px 9px 0 0;padding:4px 12px;font:inherit;font-size:.68rem}.tabs2 button.on{color:var(--o);border-color:var(--o)}
+ .depth,.feed,.mstats{display:none!important;left:0;right:0;bottom:0;top:auto;width:auto;max-height:150px;height:150px;border-radius:0;border-left:0;border-right:0;border-bottom:0;overflow:auto}
+ .bf[data-tab=depth] .depth,.bf[data-tab=feed] .feed,.bf[data-tab=stats] .mstats{display:block!important}.depth canvas{height:92px}
+ .mstats{padding:8px 12px;font-size:.72rem}.mstats .row2{display:flex;justify-content:space-between;margin:3px 0}
+ .replay{bottom:184px}.settings{top:160px}}
+@media(max-width:480px){.bf{height:calc(100vh - 110px)}.intro{top:50%}.liq{bottom:196px}}
+@media(prefers-reduced-motion:reduce){.rnd .bar i,.pbar i{transition:none}}
 .how{margin:28px auto}.how h2{font-size:1.15rem;margin:18px 0 6px}.how p,.how li{line-height:1.95;color:#dcdcd6}.how ul{padding-inline-start:20px}
 </style>
 </head>
@@ -56,197 +81,45 @@ body{overflow-x:hidden}
   <nav class="tabs" id="tabs"></nav>
   <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
 </div></header>
-<div class="bf" id="bf">
+<div class="bf" id="bf" data-tab="depth">
   <canvas id="gl"></canvas>
+  <div id="flash"></div>
   <div class="hud">
-    <div class="pan top"><small id="srcLbl">BINANCE SPOT · BTC/USDT</small><div class="px" id="px">—</div><div class="ch" id="ch"></div>
+    <div class="pan top" id="topPan"><small id="srcLbl">BINANCE SPOT · BTC/USDT</small><div class="px" id="px">—</div><div class="ch" id="ch"></div>
       <div class="rnd"><div class="bear">🐻 <span class="lbl" data-t="bearWin"></span> <b id="lowP">—</b></div><div class="bar"><i id="rndI" style="left:50%"></i></div><div class="bull"><b id="highP">—</b> <span class="lbl" data-t="bullWin"></span> 🐂</div></div>
-      <div class="stats"><div><small data-t="press"></small><div class="row2"><span id="buyP" style="color:#4ade80">—</span><span id="sellP" style="color:#f87171">—</span></div><div class="pbar"><i id="pI" style="width:50%"></i></div></div>
-        <div><small data-t="liq10"></small><div class="row2"><span style="color:#4ade80" id="lqS">—</span><span style="color:#f87171" id="lqL">—</span></div><small data-t="liqSrcT"></small><div id="liqSrc" style="font-size:.68rem;color:var(--mute)">…</div></div>
-        <div><small data-t="score"></small><div class="row2"><span style="color:#4ade80">🐂 <b id="scB">0</b></span><span style="color:#f87171">🐻 <b id="scR">0</b></span></div></div></div></div>
-    <div class="pan liq l"><small data-t="bidLiq"></small><span id="bidL">—</span></div>
-    <div class="pan liq r"><small data-t="askLiq"></small><span id="askL">—</span></div>
-    <div class="pan depth"><small data-t="depthT"></small><canvas id="depth" width="640" height="240"></canvas><div class="ax"><span id="axL"></span><span id="axM"></span><span id="axR"></span></div></div>
-    <div class="pan feed"><h4><span data-t="feedT"></span><b>● LIVE</b></h4><div id="feed"></div></div>
-    <div class="ctl"><select id="sym"></select><select id="lightSel"></select><button id="sndB">🔇</button><button id="zIn" title="zoom in">＋</button><button id="zOut" title="zoom out">－</button><button id="fsB" title="fullscreen">⛶</button><button id="helpB">?</button></div>
+      <div class="stats"><div><small data-t="press"></small><div class="row2"><span id="buyP" style="color:#4ade80">—</span><span id="sellP" style="color:#f87171">—</span></div><div class="pbar"><i id="pI" style="width:50%"></i></div><small><span data-t="intensity"></span> <b id="intI">—</b> · σ5m <b id="sig">—</b></small></div>
+        <div><small data-t="liq10"></small><div class="row2"><span style="color:#4ade80" id="lqS">—</span><span style="color:#f87171" id="lqL">—</span></div><div id="liqSrc"></div></div>
+        <div><small data-t="score"></small><div class="row2"><span style="color:#4ade80">🐂 <b id="scB">0</b></span><span style="color:#f87171">🐻 <b id="scR">0</b></span></div><small data-t="unitT"></small><div id="unLbl" style="font-size:.68rem">—</div></div></div></div>
+    <div class="pan liq l"><small data-t="bidLiq"></small><span id="bidL">—</span><div class="sub" id="bidN"></div></div>
+    <div class="pan liq r"><small data-t="askLiq"></small><span id="askL">—</span><div class="sub" id="askN"></div></div>
+    <div class="pan status" id="status"><span><i id="stP"></i><span data-t="stPrice"></span> <b id="stPl"></b></span><span><i id="stD"></i><span data-t="stDepth"></span> <b id="stDl"></b></span><span><i id="stL"></i><span data-t="stLiq"></span> <b id="stLl"></b></span></div>
+    <div class="pan depth"><small data-t="depthT"></small><canvas id="depth" width="660" height="240"></canvas><div class="ax"><span id="axL"></span><span id="axM"></span><span id="axR"></span></div></div>
+    <div class="pan feed"><h4><span data-t="feedT"></span><b id="feedLive">● LIVE</b></h4><div class="fchips" id="fchips"></div><div id="feed"></div></div>
+    <div class="pan mstats" id="mstats"></div>
+    <div class="tabs2" id="tabs2"><button data-tab="stats" data-t="tabStats"></button><button data-tab="depth" class="on" data-t="depthT"></button><button data-tab="feed" data-t="feedT"></button></div>
+    <div class="ctl"><select id="sym"></select><span class="grp cams" id="cams"></span><button id="layB" title="layers">◧</button><button id="sndB">🔇</button><button id="rpB" title="replay">⏮</button><button id="fsB" title="fullscreen">⛶</button><button id="setB" title="settings">⚙</button><button id="helpB">?</button></div>
+    <div class="pan settings" id="settings" hidden></div>
+    <div class="pan replay" id="replayBar" hidden><button id="rpPlay">⏸</button><button id="rpSpd">1x</button><div class="mk" id="rpMk"><input type="range" id="rpPos" min="0" max="1000" value="1000"></div><span id="rpT">00:00</span><button id="rpExit">✕</button></div>
+    <div class="pan tip" id="tip" hidden></div>
     <div class="banner" id="banner"></div>
     <div class="pan intro" id="intro"><b data-t="introT"></b><p data-t="introP"></p><div class="legend"><span><i style="background:#22c55e"></i><span data-t="lgBull"></span></span><span><i style="background:#ef4444"></i><span data-t="lgBear"></span></span><span><i style="background:#f7931a"></i><span data-t="lgFront"></span></span><span><i style="background:#fbbf24"></i><span data-t="lgLiq"></span></span></div></div>
     <div class="pan nogl" id="nogl" hidden></div>
+    <div class="pan loading" id="loading"><span data-t="loading"></span> <b id="ldP">0%</b><div class="lb"><i id="ldB"></i></div></div>
   </div>
+  <div class="sr" aria-live="polite" id="live"></div>
 </div>
 <div class="wrap how" id="how">
   <h1 data-t="h1" style="font-size:1.5rem"></h1><p data-t="lead"></p>
   <h2 data-t="h2a"></h2><div data-t="pa"></div>
   <h2 data-t="h2b"></h2><div data-t="pb"></div>
+  <h2 data-t="h2d"></h2><div data-t="pd"></div>
   <h2 data-t="h2c"></h2><div data-t="pc"></div>
   <section><div class="honest" data-t="honest"></div></section>
 </div>
 <footer>entekhab.net — <span data-t="nfa"></span></footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/assets/ui.js"></script>
-<script>
-Object.assign(I.fa,{bearWin:'خرس‌ها می‌برند در',bullWin:'گاوها می‌برند در',bidLiq:'نقدینگی خرید (سپاه گاوها)',askLiq:'نقدینگی فروش (سپاه خرس‌ها)',press:'فشار معاملات ۶۰ ثانیه (خرید / فروش)',liq10:'لیکوئید ۱۰ دقیقه (شورت‌ها / لانگ‌ها)',score:'امتیاز این نشست',liqSrcT:'منبع لیکوئید',depthT:'عمق اوردربوک',feedT:'رویدادهای میدان',
- introT:'⚔️ نبرد آغاز شد',introP:'سپاه سبز = سفارش‌های خرید زیر قیمت. سپاه قرمز = سفارش‌های فروش بالای قیمت. هر معامله یک شلیک، هر لیکوئید شدن یک حملهٔ هوایی. قیمت خط مقدم را جابه‌جا می‌کند؛ هر طرف که قیمت را تا پایگاه دشمن ببرد، این دور را می‌برد.',lgBull:'گاوها (خرید)',lgBear:'خرس‌ها (فروش)',lgFront:'خط مقدم = قیمت',lgLiq:'لیکوئید شدن',
- lights:{day:'روز',dusk:'غروب',night:'شب',storm:'طوفان'},snd:'صدا',bullsWin:'🐂 گاوها این دور را بردند',bearsWin:'🐻 خرس‌ها این دور را بردند',newRound:'دور جدید حول',
- f:{bigBuy:'خرید بزرگ',bigSell:'فروش بزرگ',hugeBuy:'خرید خیلی بزرگ',hugeSell:'فروش خیلی بزرگ',liqL:'لیکوئید لانگ',liqS:'لیکوئید شورت',bullsWin:'گاوها بردند',bearsWin:'خرس‌ها بردند',wallB:'دیوار خرید',wallA:'دیوار فروش'},
- nogl:'مرورگر شما WebGL را پشتیبانی نمی‌کند یا غیرفعال است؛ نمودار عمق و رویدادها همچنان زنده‌اند.',conn:'در حال اتصال به Binance…',
- h1:'میدان نبرد بیت‌کوین: نبرد زندهٔ گاوها و خرس‌ها',lead:'بازار لحظه‌ای به شکل یک میدان نبرد سه‌بعدی. به‌جای خواندن کندل، ببینید فشار خرید، فشار فروش، دیوارهای سفارش و لیکوئید شدن‌ها همین الان کجا جمع شده‌اند.',
- h2a:'چطور بخوانیمش؟',pa:'<ul><li><b>خط نارنجی</b> قیمت لحظه‌ای است. وقتی قیمت بالا می‌رود گاوها جلو می‌روند و وقتی پایین می‌آید خرس‌ها.</li><li><b>سربازهای سبز</b> از سفارش‌های خرید (bid) زیر قیمت ساخته می‌شوند و <b>سربازهای قرمز</b> از سفارش‌های فروش (ask) بالای آن. هر سرباز مقدار ثابتی دلار سفارش است؛ یک صف شلوغ یعنی دیوار سفارش، و تانک‌ها جایی هستند که یک سطح قیمت سفارش خیلی سنگینی دارد.</li><li><b>شلیک‌ها</b> معاملات واقعی‌اند: خرید بازار (سبز) به سمت خط خرس‌ها و فروش بازار (قرمز) به سمت گاوها. اندازهٔ شلیک با حجم دلاری معامله بزرگ می‌شود و معامله‌های بالای ۱۰۰ هزار دلار در فهرست رویدادها ثبت می‌شوند.</li><li><b>حمله‌های هوایی</b> لیکوئید شدن‌ها در بازار آتی‌اند: لیکوئید شدن لانگ‌ها روی سپاه گاوها فرود می‌آید و شورت‌ها روی سپاه خرس‌ها. بالای ۵۰ هزار دلار موشک، بالای ۱۵۰ هزار حملهٔ بزرگ و بالای ۵۰۰ هزار دلار بمباران.</li><li><b>هر دور</b> یک بازهٔ قیمتی حدود ±۰٫۳٪ است. اگر قیمت به بالای بازه برسد گاوها برنده‌اند و اگر به پایین برسد خرس‌ها؛ بعد دور تازه حول قیمت جدید شروع می‌شود. امتیاز فقط در همین مرورگر ذخیره می‌شود.</li></ul>',
- h2b:'داده‌ها از کجا می‌آیند؟',pb:'<ul><li>قیمت، معاملات و اوردربوک: استریم عمومی اسپات Binance (جفت USDT؛ ۱۰۰۰ سطح سفارش هر ۲ ثانیه و معاملات لحظه‌ای).</li><li>لیکوئید شدن‌ها: استریم آتی Binance و اگر در شبکهٔ شما در دسترس نباشد، به‌صورت خودکار OKX.</li><li>همهٔ محاسبه‌ها در مرورگر شما انجام می‌شود؛ هیچ چیزی به سرور entekhab فرستاده نمی‌شود.</li></ul>',
- h2c:'محدودیت‌ها',pc:'<p>این یک تصویرسازی زنده از ساختار فعلی بازار است، نه پیش‌بینی قیمت. دیوارهای سفارش در لحظه می‌توانند برداشته یا پر شوند و سپاه بزرگ‌تر به معنی حرکت قطعی قیمت نیست. لیکوئید شدن‌ها فقط از یک یا دو صرافی خوانده می‌شوند، پس جمع کل بازار نیستند.</p>',
- honest:'<b>شفافیت:</b> منبع هر عدد روی خود صفحه نوشته شده و اندازهٔ هر واحد سرباز بر اساس اولین عکس از اوردربوک همان نشست تعیین می‌شود. آموزشی است، توصیهٔ مالی نیست.',nfa:'آموزشی است، توصیهٔ مالی نیست'});
-Object.assign(I.ckb,{bearWin:'ورچەکان دەبەنەوە لە',bullWin:'گاکان دەبەنەوە لە',bidLiq:'نەختینەی کڕین (سوپای گاکان)',askLiq:'نەختینەی فرۆشتن (سوپای ورچەکان)',press:'فشاری مامەڵە ٦٠ چرکە (کڕین / فرۆشتن)',liq10:'لیکویدەیشنی ١٠ خولەک (شۆرت / لۆنگ)',score:'خاڵی ئەم دانیشتنە',liqSrcT:'سەرچاوەی لیکوێد',depthT:'قووڵایی ئۆردەربووک',feedT:'ڕووداوەکانی مەیدان',
- introT:'⚔️ شەڕ دەستی پێکرد',introP:'سوپای سەوز = داواکاریی کڕین لە ژێر نرخ. سوپای سوور = داواکاریی فرۆشتن لە سەرووی نرخ. هەر مامەڵەیەک تەقەیەکە، هەر لیکویدەیشنێک هێرشێکی ئاسمانییە. نرخ هێڵی پێشەوە دەجووڵێنێت؛ هەر لایەک نرخ بگەیەنێتە بنکەی دوژمن ئەم خولە دەباتەوە.',lgBull:'گاکان (کڕین)',lgBear:'ورچەکان (فرۆشتن)',lgFront:'هێڵی پێشەوە = نرخ',lgLiq:'لیکویدەیشن',
- lights:{day:'ڕۆژ',dusk:'ئێوارە',night:'شەو',storm:'زریان'},snd:'دەنگ',bullsWin:'🐂 گاکان ئەم خولەیان بردەوە',bearsWin:'🐻 ورچەکان ئەم خولەیان بردەوە',newRound:'خولی نوێ لە دەوری',
- f:{bigBuy:'کڕینی گەورە',bigSell:'فرۆشتنی گەورە',hugeBuy:'کڕینی زۆر گەورە',hugeSell:'فرۆشتنی زۆر گەورە',liqL:'لیکوێدی لۆنگ',liqS:'لیکوێدی شۆرت',bullsWin:'گاکان بردیانەوە',bearsWin:'ورچەکان بردیانەوە',wallB:'دیواری کڕین',wallA:'دیواری فرۆشتن'},
- nogl:'وێبگەڕەکەت WebGL پشتگیری ناکات؛ نەخشەی قووڵایی و ڕووداوەکان هێشتا زیندوون.',conn:'پەیوەندی بە Binance…',
- h1:'مەیدانی شەڕی بیتکۆین: شەڕی زیندووی گاکان و ورچەکان',lead:'بازاڕی ئێستا وەک مەیدانێکی شەڕی سێ‌ڕەهەند. لە جیاتی خوێندنەوەی مۆم، ببینە فشاری کڕین، فشاری فرۆشتن، دیوارەکانی داواکاری و لیکویدەیشنەکان ئێستا لە کوێ کۆبوونەتەوە.',
- h2a:'چۆن بیخوێنینەوە؟',pa:'<ul><li><b>هێڵی پرتەقاڵی</b> نرخی ئێستایە.</li><li><b>سەربازە سەوزەکان</b> لە داواکاریی کڕین و <b>سوورەکان</b> لە داواکاریی فرۆشتن دروست دەبن؛ هەر سەربازێک بڕێکی جێگیر دۆلارە.</li><li><b>تەقەکان</b> مامەڵەی ڕاستەقینەن و <b>هێرشە ئاسمانییەکان</b> لیکویدەیشنەکانن.</li><li><b>هەر خولێک</b> مەودایەکی نرخە (نزیکەی ±٠٫٣٪)؛ هەر لایەک نرخ بگەیەنێتە کۆتایی مەودا، دەباتەوە.</li></ul>',
- h2b:'داتا لە کوێوە دێت؟',pb:'<ul><li>نرخ، مامەڵە و ئۆردەربووک: ستریمی گشتیی سپۆتی Binance.</li><li>لیکویدەیشن: ستریمی داهاتووی Binance و ئەگەر بەردەست نەبوو، خۆکار OKX.</li><li>هەموو ژمێرکارییەکان لە وێبگەڕەکەتدا.</li></ul>',
- h2c:'سنوورەکان',pc:'<p>ئەمە وێناکردنێکی زیندووی پێکهاتەی ئێستای بازاڕە، نەک پێشبینیی نرخ. دیوارەکان لە چرکەیەکدا دەگۆڕدرێن و سوپای گەورەتر واتای جووڵەی بێگومانی نرخ نییە.</p>',
- honest:'<b>ڕوونی:</b> سەرچاوەی هەر ژمارەیەک لەسەر پەڕەکە نووسراوە. فێرکارییە، ئامۆژگاریی دارایی نییە.',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە'});
-Object.assign(I.en,{bearWin:'Bears win at',bullWin:'Bulls win at',bidLiq:'Bid liquidity (bull army)',askLiq:'Ask liquidity (bear army)',press:'Trade pressure 60s (buy / sell)',liq10:'Liquidations 10m (shorts / longs)',score:'Session score',liqSrcT:'Liquidation source',depthT:'Order book depth',feedT:'Battlefield feed',
- introT:'⚔️ Battle begins',introP:'Green army = buy orders below price. Red army = sell orders above it. Every trade is a shot, every liquidation an air strike. Price moves the front line; the side that pushes price into the enemy base wins the round.',lgBull:'Bulls (bids)',lgBear:'Bears (asks)',lgFront:'Front line = price',lgLiq:'Liquidation',
- lights:{day:'Day',dusk:'Dusk',night:'Night',storm:'Storm'},snd:'Sound',bullsWin:'🐂 Bulls win the round',bearsWin:'🐻 Bears win the round',newRound:'New round around',
- f:{bigBuy:'Large buy',bigSell:'Large sell',hugeBuy:'Huge buy',hugeSell:'Huge sell',liqL:'Long liquidated',liqS:'Short liquidated',bullsWin:'Bulls won',bearsWin:'Bears won',wallB:'Buy wall',wallA:'Sell wall'},
- nogl:'Your browser does not support WebGL or it is disabled; the depth chart and feed are still live.',conn:'Connecting to Binance…',
- h1:'Bitcoin Battlefield: bulls vs bears, live',lead:'The live market as a 3D battlefield. Instead of reading candles, watch where buy pressure, sell pressure, order walls and liquidations are piling up right now.',
- h2a:'How to read it',pa:'<ul><li>The <b>orange line</b> is the live price. Bulls advance when price rises, bears when it falls.</li><li><b>Green soldiers</b> are built from bid orders below price, <b>red soldiers</b> from ask orders above it. Each soldier is a fixed dollar amount of orders; a crowded rank is an order wall, and tanks mark price levels with very heavy orders.</li><li><b>Shots</b> are real trades: market buys (green) fired at the bear line, market sells (red) at the bulls. Shot size grows with the dollar size of the trade, and trades above $100k are logged in the feed.</li><li><b>Air strikes</b> are futures liquidations: liquidated longs land on the bull army, liquidated shorts on the bears. Above $50k a missile, above $150k a heavy strike, above $500k a bombing run.</li><li><b>Each round</b> is a price range of about ±0.3%. If price reaches the top, the bulls win; the bottom, the bears; then a new round starts around the new price. The score is stored only in this browser.</li></ul>',
- h2b:'Where the data comes from',pb:'<ul><li>Price, trades and order book: the public Binance spot stream (USDT pairs; 1,000 order levels every 2 seconds plus live trades).</li><li>Liquidations: the Binance futures stream, with an automatic fallback to OKX if it is unreachable on your network.</li><li>Everything is computed in your browser; nothing is sent to entekhab servers.</li></ul>',
- h2c:'Limits',pc:'<p>This is a live picture of current market structure, not a price prediction. Order walls can be pulled or filled in an instant, and a bigger army does not guarantee a move. Liquidations come from one or two exchanges, so they are not the whole market.</p>',
- honest:'<b>Transparency:</b> every number names its source on the page, and the dollar size of one soldier is fixed from the first order-book snapshot of the session. Educational, not financial advice.',nfa:'Educational, not financial advice'});
-/* ======================= state ======================= */
-const SYMS=['BTC','ETH','SOL','BNB','XRP','DOGE'];let SYM=ls.get('ek_bf_sym','BTC');if(!SYMS.includes(SYM))SYM='BTC';
-const S={price:null,open:null,bids:[],asks:[],bidL:0,askL:0,trades:[],liqs:[],round:null,score:ls.get('ek_battle',{bulls:0,bears:0}),feed:[],UN:null,step:50,ws:null,lws:null,lqSrc:'',shake:0,walls:new Set(),pxT:0};
-const SND={on:ls.get('ek_bf_snd',false),ctx:null};
-const fmtP=p=>p==null?'—':'$'+p.toLocaleString('en-US',{minimumFractionDigits:p>=1000?2:p>=1?3:5,maximumFractionDigits:p>=1000?2:p>=1?3:5});
-const fmtU=v=>v>=1e9?'$'+(v/1e9).toFixed(2)+'B':v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v.toFixed(0);
-const niceStep=v=>{const e=Math.pow(10,Math.floor(Math.log10(v)));const m=v/e;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*e};
-function newRound(p){S.step=niceStep(p*0.00064);const R=Math.max(S.step*3,Math.ceil(p*0.003/S.step)*S.step);S.round={p0:p,low:p-R,high:p+R,R,t:Date.now()};S.scale=60/R;rebuildMarkers();updRound()}
-const X=p=>S.round?(p-S.round.p0)*S.scale:0;
-/* ======================= three.js scene ======================= */
-let R3=null,scene,cam,ren,terrain,front,frontLbl,markers=null,bull,bear,proj,PJ=[],EX=[],lightSet,hemi,sun,cz=104,cy=71,yaw=0,tgt=0,lastF=0,paused=false;
-const PCAP=320,ACAP=1400,TCAP=90;
-function hasGL(){try{const c=document.createElement('canvas');return !!(window.WebGLRenderingContext&&(c.getContext('webgl')||c.getContext('experimental-webgl')))}catch(e){return false}}
-function makeLabel(txt,col,size){const cv=document.createElement('canvas');cv.width=256;cv.height=64;const x=cv.getContext('2d');x.font='700 36px "Space Grotesk",monospace';x.textAlign='center';x.textBaseline='middle';x.shadowColor='#000';x.shadowBlur=8;x.fillStyle=col;x.fillText(txt,128,32);
- const tx=new THREE.CanvasTexture(cv);tx.minFilter=THREE.LinearFilter;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthTest:false}));sp.scale.set(size*4,size,1);sp.userData.cv=cv;sp.userData.tx=tx;return sp}
-function relabel(sp,txt,col){const cv=sp.userData.cv,x=cv.getContext('2d');x.clearRect(0,0,256,64);x.font='700 36px "Space Grotesk",monospace';x.textAlign='center';x.textBaseline='middle';x.shadowColor='#000';x.shadowBlur=8;x.fillStyle=col;x.fillText(txt,128,32);sp.userData.tx.needsUpdate=true}
-function noise(x,z){return Math.sin(x*.11)*Math.cos(z*.17)+.5*Math.sin(x*.31+1.3)*Math.sin(z*.23)+.25*Math.sin(x*.7)*Math.cos(z*.9+2)}
-function buildTerrain(){const g=new THREE.PlaneGeometry(260,120,130,60);g.rotateX(-Math.PI/2);const pos=g.attributes.position,col=[];const c1=new THREE.Color(0x24481f),c2=new THREE.Color(0x5a3320),cr=new THREE.Color(0x15181c),cv=new THREE.Color();
- for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);const edge=Math.max(0,(Math.abs(x)-64)/30,(Math.abs(z)-36)/20);const h=Math.max(0,noise(x,z))*3.2*Math.min(1,edge)+noise(x*3,z*3)*.08;pos.setY(i,h);
-  const t=THREE.MathUtils.clamp(x/40+.5,0,1);cv.copy(c1).lerp(c2,t);const road=Math.abs(z)<3.2&&Math.abs(x)<70;if(road)cv.copy(cr);const v=1+noise(x*2.3,z*1.7)*.12;cv.multiplyScalar(v);col.push(cv.r,cv.g,cv.b)}
- g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.computeVertexNormals();terrain=new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true}));scene.add(terrain);
- const trees=new THREE.InstancedMesh(new THREE.ConeGeometry(1.1,3.4,6),new THREE.MeshLambertMaterial({color:0x1d3a1a}),140),d=new THREE.Object3D();let n=0;
- for(let i=0;i<140;i++){const x=(Math.random()*2-1)*120,z=(Math.random()*2-1)*55;if(Math.abs(x)<68&&Math.abs(z)<38)continue;d.position.set(x,Math.max(0,noise(x,z))*3.2*Math.min(1,Math.max(0,(Math.abs(x)-64)/30,(Math.abs(z)-36)/20))+1.7,z);d.scale.setScalar(.7+Math.random()*.8);d.updateMatrix();trees.setMatrixAt(n++,d.matrix)}trees.count=n;scene.add(trees);
- const base=(x,col)=>{const grp=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(7,3.2,12),new THREE.MeshLambertMaterial({color:0x2a2d33}));b.position.y=1.6;grp.add(b);const tw=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.5,6,8),new THREE.MeshLambertMaterial({color:0x3a3e46}));tw.position.set(0,3,0);grp.add(tw);
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,9,6),new THREE.MeshBasicMaterial({color:0xdddddd}));pole.position.set(0,7,-3);grp.add(pole);const fl=new THREE.Mesh(new THREE.PlaneGeometry(4,2.2),new THREE.MeshBasicMaterial({color:col,side:THREE.DoubleSide}));fl.position.set(x<0?2:-2,10.2,-3);grp.add(fl);grp.position.x=x;scene.add(grp);return grp};
- base(-68,0x22c55e);base(68,0xef4444);
- const lb=makeLabel('BULLS',  '#4ade80',4);lb.position.set(-68,14,-3);scene.add(lb);const lr=makeLabel('BEARS','#f87171',4);lr.position.set(68,14,-3);scene.add(lr)}
-function makeArmy(col,colH,colT){const g=new THREE.Group();const body=new THREE.InstancedMesh(new THREE.CylinderGeometry(.24,.32,1.1,6),new THREE.MeshLambertMaterial({color:col}),ACAP);const head=new THREE.InstancedMesh(new THREE.SphereGeometry(.26,6,5),new THREE.MeshLambertMaterial({color:colH}),ACAP);
- const tg=new THREE.BoxGeometry(2.2,.9,1.5);const tank=new THREE.InstancedMesh(tg,new THREE.MeshLambertMaterial({color:colT}),TCAP);const tur=new THREE.InstancedMesh(new THREE.CylinderGeometry(.55,.6,.6,8),new THREE.MeshLambertMaterial({color:col}),TCAP);
- [body,head,tank,tur].forEach(m=>{m.count=0;g.add(m)});scene.add(g);return {body,head,tank,tur}}
-function placeArmy(A,buckets,sign){const d=new THREE.Object3D();let n=0,t=0;const UN=S.UN;
- for(const b of buckets){const x0=X(b.p);if(Math.abs(x0)>76)continue;let c=Math.min(ACAP,Math.round(b.usd/UN));const tk=Math.min(6,Math.floor(c/40));c-=tk*40;
-  for(let i=0;i<tk&&t<TCAP;i++){const z=-30+((b.k*7+i*13)%61);d.position.set(x0+sign*.6+(((b.k*3+i)%5)-2)*.3,.45,z);d.rotation.set(0,0,0);d.scale.setScalar(1);d.updateMatrix();A.tank.setMatrixAt(t,d.matrix);d.position.y=1.1;d.updateMatrix();A.tur.setMatrixAt(t,d.matrix);t++}
-  const w=b.w*S.scale;for(let i=0;i<c&&n<ACAP;i++){const f=((i*0.618034)+(b.k*0.137))%1,jx=(((i*0.381966)+b.k*.29)%1-.5)*w*.9;d.position.set(x0+jx,.55,-38+76*f);d.scale.setScalar(1);d.updateMatrix();A.body.setMatrixAt(n,d.matrix);d.position.y=1.35;d.updateMatrix();A.head.setMatrixAt(n,d.matrix);n++}}
- A.body.count=A.head.count=n;A.tank.count=A.tur.count=t;[A.body,A.head,A.tank,A.tur].forEach(m=>m.instanceMatrix.needsUpdate=true)}
-function rebuildMarkers(){if(!scene)return;if(markers){scene.remove(markers);markers.traverse(o=>{if(o.material&&o.material.map)o.material.map.dispose()})}markers=new THREE.Group();const r=S.round,pts=[];const col=new THREE.Color(0xffffff);
- const k0=Math.ceil(r.low/S.step),k1=Math.floor(r.high/S.step);for(let k=k0;k<=k1;k++){const p=k*S.step,x=X(p);pts.push(x,.06,-40,x,.06,40);const lb=makeLabel(p.toLocaleString('en-US',{maximumFractionDigits:S.step<1?Math.max(0,-Math.floor(Math.log10(S.step))):0}),Math.abs(p-r.low)<1e-9?'#f87171':Math.abs(p-r.high)<1e-9?'#4ade80':'#c9c7bd',2.4);lb.position.set(x,1.2,43);markers.add(lb)}
- const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));markers.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.22})));
- const wl=new THREE.Mesh(new THREE.BoxGeometry(.3,2.5,82),new THREE.MeshBasicMaterial({color:0xef4444,transparent:true,opacity:.5}));wl.position.set(X(r.low),1.25,0);markers.add(wl);const wh=wl.clone();wh.material=new THREE.MeshBasicMaterial({color:0x22c55e,transparent:true,opacity:.5});wh.position.x=X(r.high);markers.add(wh);scene.add(markers)}
-const LIGHTS={day:{sky:0x8fb8e6,gnd:0x2e4a26,sun:0xfff2d6,si:1.05,hi:.55,fog:0x8aa8c4},dusk:{sky:0xff9d5c,gnd:0x3b2a1e,sun:0xffb070,si:.9,hi:.45,fog:0xb86a3e},night:{sky:0x1b2744,gnd:0x0e1310,sun:0x9fb4ff,si:.45,hi:.35,fog:0x121a2b},storm:{sky:0x6b7280,gnd:0x2a2f2a,sun:0xcfd3d8,si:.55,hi:.5,fog:0x5b6168}};
-function setLight(k){const L=LIGHTS[k]||LIGHTS.day;hemi.color.set(L.sky);hemi.groundColor.set(L.gnd);hemi.intensity=L.hi;sun.color.set(L.sun);sun.intensity=L.si;scene.fog.color.set(L.fog);scene.background.set(L.fog);ls.set('ek_bf_light',k);lightSet=k}
-function init3d(){const c=$('#gl');ren=new THREE.WebGLRenderer({canvas:c,antialias:true,powerPreference:'high-performance'});ren.setPixelRatio(Math.min(devicePixelRatio||1,1.5));scene=new THREE.Scene();scene.background=new THREE.Color(0x8aa8c4);scene.fog=new THREE.Fog(0x8aa8c4,110,260);
- cam=new THREE.PerspectiveCamera(48,1,1,600);hemi=new THREE.HemisphereLight(0x8fb8e6,0x2e4a26,.55);scene.add(hemi);sun=new THREE.DirectionalLight(0xfff2d6,1.05);sun.position.set(-40,80,30);scene.add(sun);
- buildTerrain();bull=makeArmy(0x22c55e,0x86efac,0x166534);bear=makeArmy(0xef4444,0xfca5a5,0x7f1d1d);
- front=new THREE.Mesh(new THREE.BoxGeometry(.4,4.5,82),new THREE.MeshBasicMaterial({color:0xf7931a,transparent:true,opacity:.75}));front.position.y=2.25;scene.add(front);const glow=new THREE.Mesh(new THREE.PlaneGeometry(6,84),new THREE.MeshBasicMaterial({color:0xf7931a,transparent:true,opacity:.18,blending:THREE.AdditiveBlending,depthWrite:false}));glow.rotation.x=-Math.PI/2;glow.position.y=.08;front.add(glow);glow.position.y=-2.17;
- frontLbl=makeLabel('—','#ffd59a',4.5);frontLbl.position.set(0,9.5,0);scene.add(frontLbl);
- proj=new THREE.InstancedMesh(new THREE.SphereGeometry(.42,8,6),new THREE.MeshBasicMaterial({color:0xffffff}),PCAP);const d=new THREE.Object3D();d.scale.setScalar(0);d.updateMatrix();for(let i=0;i<PCAP;i++){proj.setMatrixAt(i,d.matrix);proj.setColorAt(i,new THREE.Color(0xffffff))}proj.count=PCAP;scene.add(proj);
- for(let i=0;i<28;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(1,10,8),new THREE.MeshBasicMaterial({color:0xffb347,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));m.visible=false;scene.add(m);const r=new THREE.Mesh(new THREE.RingGeometry(.7,1,28),new THREE.MeshBasicMaterial({color:0xffe4b0,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));r.rotation.x=-Math.PI/2;r.visible=false;scene.add(r);EX.push({m,r,t0:0,dur:0,size:0,on:false})}
- setLight(ls.get('ek_bf_light','day'));resize();addEventListener('resize',resize);
- let drag=null;c.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:yaw};c.setPointerCapture(e.pointerId)});c.addEventListener('pointermove',e=>{if(drag)yaw=THREE.MathUtils.clamp(drag.y+(e.clientX-drag.x)*.004,-.9,.9)});c.addEventListener('pointerup',()=>drag=null);c.addEventListener('pointercancel',()=>drag=null);
- c.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoom(e.deltaY*.06)},{passive:false});
- R3=true;requestAnimationFrame(loop)}
-function zoom(d){cz=THREE.MathUtils.clamp(cz+d,45,150);cy=cz*.68}
-function resize(){if(!ren)return;const b=$('#bf'),w=b.clientWidth,h=b.clientHeight;ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
-function shoot(side,usd,liq){const now=performance.now();const sz=liq?(usd>=5e5?2.6:usd>=1.5e5?2:1.4):(usd>=2.5e5?1.7:usd>=5e4?1.25:usd>=1e4?.85:.55);const fx=X(S.price||S.round.p0);
- let x0,x1,h;if(liq){const hit=side==='long';x1=fx+(hit?-1:1)*(4+Math.random()*26);x0=x1+(hit?1:-1)*55;h=9+sz*3}else{const buy=side==='buy';x0=fx+(buy?-1:1)*(10+Math.random()*28);x1=fx+(buy?1:-1)*(1+Math.random()*3);h=2+sz*1.5}
- const z0=(Math.random()*2-1)*36,z1=liq?z0+(Math.random()*2-1)*6:(Math.random()*2-1)*36;const col=liq?(side==='long'?0xff9a3c:0xffd166):(side==='buy'?0x4ade80:0xf87171);
- if(PJ.length>=PCAP)PJ.shift();PJ.push({x0,x1,z0,z1,h,t0:now,dur:liq?900+sz*120:520+Math.random()*420,sz,col,liq,usd,side,i:-1})}
-function boom(x,z,size,col){const e=EX.find(e=>!e.on);if(!e)return;e.on=true;e.t0=performance.now();e.dur=700+size*260;e.size=size;e.m.visible=e.r.visible=true;e.m.material.color.set(col||0xffb347);e.m.position.set(x,.8+size*.5,z);e.r.position.set(x,.15,z);S.shake=Math.min(3,S.shake+size*.6)}
-function loop(ts){if(!R3)return;requestAnimationFrame(loop);if(paused||document.hidden)return;const dt=Math.min(.05,(ts-lastF)/1000||0);lastF=ts;
- const fx=S.round?X(S.price||S.round.p0):0;tgt+=(fx-tgt)*Math.min(1,dt*3);front.position.x+=(fx-front.position.x)*Math.min(1,dt*6);front.material.opacity=.6+.25*Math.sin(ts*.004);frontLbl.position.x=front.position.x;
- const d=new THREE.Object3D(),now=performance.now();let k=0;
- for(let i=PJ.length-1;i>=0;i--){const p=PJ[i];const t=(now-p.t0)/p.dur;if(t>=1){PJ.splice(i,1);if(p.liq)boom(p.x1,p.z1,p.sz,p.side==='long'?0xff7a2a:0xffd166);else if(p.sz>=1.25)boom(p.x1,p.z1,p.sz*.55,p.side==='buy'?0x86efac:0xfca5a5);continue}
-  d.position.set(p.x0+(p.x1-p.x0)*t,.9+p.h*4*t*(1-t),p.z0+(p.z1-p.z0)*t);d.scale.setScalar(p.sz);d.updateMatrix();proj.setMatrixAt(k,d.matrix);proj.setColorAt(k,new THREE.Color(p.col));k++}
- d.scale.setScalar(0);d.updateMatrix();for(let i=k;i<PCAP;i++)proj.setMatrixAt(i,d.matrix);proj.instanceMatrix.needsUpdate=true;if(proj.instanceColor)proj.instanceColor.needsUpdate=true;
- EX.forEach(e=>{if(!e.on)return;const t=(now-e.t0)/e.dur;if(t>=1){e.on=false;e.m.visible=e.r.visible=false;return}e.m.scale.setScalar(e.size*(.4+2.2*t));e.m.material.opacity=(1-t)*.9;e.r.scale.setScalar(e.size*(1+6*t));e.r.material.opacity=(1-t)*.5});
- S.shake*=Math.pow(.02,dt);const sh=S.shake*(Math.random()-.5);cam.position.set(tgt+Math.sin(yaw)*cz+sh,cy+sh*.5,Math.cos(yaw)*cz);cam.lookAt(tgt,0,-6);ren.render(scene,cam)}
-/* ======================= order book → armies ======================= */
-function bucketize(levels,side){const bw=S.step/5,m=new Map();for(const [p,q] of levels){const pr=+p,usd=pr*+q;const k=Math.floor(pr/bw);const b=m.get(k)||{k,p:(k+.5)*bw,w:bw,usd:0};b.usd+=usd;m.set(k,b)}return [...m.values()]}
-function onBook(bids,asks){S.bids=bids;S.asks=asks;const r=S.round;if(!r)return;const vis=(a,lo,hi)=>a.filter(([p])=>+p>=lo&&+p<=hi).reduce((s,[p,q])=>s+(+p)*(+q),0);
- S.bidL=vis(bids,r.low-r.R*.3,1e18);S.askL=vis(asks,0,r.high+r.R*.3);$('#bidL').textContent=fmtU(S.bidL);$('#askL').textContent=fmtU(S.askL);
- if(!S.UN){S.UN=Math.max(500,(S.bidL+S.askL)/1000)}const bb=bucketize(bids),ab=bucketize(asks);const maxC=Math.max(...bb.map(b=>b.usd),...ab.map(b=>b.usd),1)/S.UN;
- const tot=(bb.reduce((s,b)=>s+b.usd,0)+ab.reduce((s,b)=>s+b.usd,0))/S.UN;if(tot>2*ACAP)S.UN*=1.5;
- if(R3){placeArmy(bull,bb,-1);placeArmy(bear,ab,1)}drawDepth();
- const wall=(bk,kind)=>{for(const b of bk){if(b.usd>=S.UN*120&&Math.abs(X(b.p))<70&&!S.walls.has(kind+b.k)){S.walls.add(kind+b.k);feed({k:kind,usd:b.usd,p:b.p})}}};wall(bb,'wallB');wall(ab,'wallA');if(S.walls.size>400)S.walls=new Set()}
-function drawDepth(){const cv=$('#depth'),x=cv.getContext('2d'),W=cv.width,H=cv.height,r=S.round;if(!r)return;x.clearRect(0,0,W,H);const lo=r.low-r.R*.6,hi=r.high+r.R*.6,px=p=>(p-lo)/(hi-lo)*W;
- const cum=(a,asc)=>{let s=0;const o=[];for(const [p,q] of a){if(+p<lo||+p>hi)continue;s+=(+p)*(+q);o.push([+p,s])}return o};const B=cum(S.bids),A=cum(S.asks);const mx=Math.max(B.length?B[B.length-1][1]:0,A.length?A[A.length-1][1]:0,1);
- const area=(arr,col)=>{if(!arr.length)return;x.beginPath();x.moveTo(px(arr[0][0]),H);arr.forEach(([p,s])=>x.lineTo(px(p),H-s/mx*(H-10)));x.lineTo(px(arr[arr.length-1][0]),H);x.closePath();x.fillStyle=col;x.fill()};
- area(B,'rgba(34,197,94,.45)');area(A,'rgba(239,68,68,.45)');x.strokeStyle='#f7931a';x.lineWidth=2;const fp=px(S.price||r.p0);x.beginPath();x.moveTo(fp,0);x.lineTo(fp,H);x.stroke();
- $('#axL').textContent=fmtP(lo);$('#axM').textContent=fmtP(S.price||r.p0);$('#axR').textContent=fmtP(hi)}
-/* ======================= trades / liquidations ======================= */
-function onTrade(p,q,isSell,t){if(!S.round)return;const usd=p*q;S.trades.push({t,usd,sell:isSell});const cut=t-6e4;while(S.trades.length&&S.trades[0].t<cut)S.trades.shift();
- if(usd>=800||Math.random()<.15)shoot(isSell?'sell':'buy',usd,false);if(usd>=1e5){feed({k:usd>=5e5?(isSell?'hugeSell':'hugeBuy'):(isSell?'bigSell':'bigBuy'),usd,p});snd(isSell?220:440,.08,.05)}}
-function onLiq(side,usd,p,t){if(!S.round||usd<1000)return;S.liqs.push({t,usd,side});const cut=t-6e5;while(S.liqs.length&&S.liqs[0].t<cut)S.liqs.shift();
- if(usd>=5e5){for(let i=0;i<3;i++)setTimeout(()=>shoot(side,usd/3,true),i*260)}else shoot(side,usd,true);if(usd>=1e4)feed({k:side==='long'?'liqL':'liqS',usd,p});snd(side==='long'?90:140,.25,Math.min(.25,usd/2e6+.06))}
-function updStats(){const now=Date.now();const b=S.trades.filter(x=>!x.sell).reduce((s,x)=>s+x.usd,0),s=S.trades.filter(x=>x.sell).reduce((a,x)=>a+x.usd,0),tot=b+s||1;$('#buyP').textContent=fmtU(b)+' · '+Math.round(b/tot*100)+'%';$('#sellP').textContent=Math.round(s/tot*100)+'% · '+fmtU(s);$('#pI').style.width=(b/tot*100)+'%';
- const ll=S.liqs.filter(x=>x.side==='long').reduce((a,x)=>a+x.usd,0),ls_=S.liqs.filter(x=>x.side==='short').reduce((a,x)=>a+x.usd,0);$('#lqS').textContent=fmtU(ls_);$('#lqL').textContent=fmtU(ll);$('#scB').textContent=S.score.bulls;$('#scR').textContent=S.score.bears;$('#liqSrc').textContent=S.lqSrc||'…';void now}
-function feed(ev){ev.t=Date.now();S.feed.unshift(ev);S.feed=S.feed.slice(0,60);renderFeed()}
-function renderFeed(){const F=T('f');$('#feed').innerHTML=S.feed.slice(0,30).map(e=>{const cls=/Buy|liqS|wallB/.test(e.k)?'buy':/Sell|liqL|wallA/.test(e.k)?'sell':'win';return `<div class="it ${cls}"><span class="t">${new Date(e.t).toLocaleTimeString('en-GB')}</span><span class="k">${e.k==='win'?(e.side==='bulls'?F.bullsWin:F.bearsWin):F[e.k]||e.k}${e.p?` <span class="t">@ ${fmtP(e.p)}</span>`:''}</span><span class="u">${e.usd?fmtU(e.usd):''}</span></div>`}).join('')}
-function updRound(){const r=S.round,p=S.price||r.p0;$('#lowP').textContent=fmtP(r.low);$('#highP').textContent=fmtP(r.high);$('#rndI').style.left=(THREE.MathUtils.clamp((p-r.low)/(r.high-r.low),0,1)*100)+'%'}
-function onPrice(p){S.price=p;if(!S.round)newRound(p);const r=S.round;if(p>=r.high){win('bulls');return}if(p<=r.low){win('bears');return}const now=performance.now();if(now-S.pxT<120)return;S.pxT=now;
- $('#px').textContent=fmtP(p);if(S.open){const c=(p/S.open-1)*100;const e=$('#ch');e.textContent=(c>=0?'+':'')+c.toFixed(2)+'% 24h';e.className='ch '+(c>=0?'pos':'neg')}if(R3)relabel(frontLbl,fmtP(p),'#ffd59a');updRound()}
-function win(side){S.score[side]++;ls.set('ek_battle',S.score);feed({k:'win',side});const bn=$('#banner');bn.className='banner show '+(side==='bulls'?'bull':'bear');bn.innerHTML=(side==='bulls'?T('bullsWin'):T('bearsWin'))+`<small>${T('newRound')} ${fmtP(S.price)}</small>`;setTimeout(()=>bn.classList.remove('show'),4200);
- if(R3){const bx=side==='bulls'?68:-68;for(let i=0;i<5;i++)setTimeout(()=>boom(bx+(Math.random()-.5)*10,(Math.random()-.5)*12,2.2,side==='bulls'?0x86efac:0xfca5a5),i*180)}snd(side==='bulls'?660:160,.5,.2);
- newRound(S.price);S.pxT=0;if(S.bids.length)onBook(S.bids,S.asks)}
-/* ======================= sound (optional, synthesized) ======================= */
-function snd(freq,dur,vol){if(!SND.on)return;try{if(!SND.ctx)SND.ctx=new (window.AudioContext||window.webkitAudioContext)();const c=SND.ctx,o=c.createOscillator(),g=c.createGain();o.type=freq<200?'sawtooth':'triangle';o.frequency.setValueAtTime(freq,c.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(30,freq*.4),c.currentTime+dur);g.gain.setValueAtTime(vol,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+dur);o.connect(g).connect(c.destination);o.start();o.stop(c.currentTime+dur)}catch(e){}}
-/* ======================= streams ======================= */
-let bookTimer=null,retry=0;
-async function pollBook(){if(document.hidden)return;const d=await j(`https://data-api.binance.vision/api/v3/depth?symbol=${SYM}USDT&limit=1000`);if(d&&d.bids&&S.round)onBook(d.bids,d.asks)}
-function connect(){disconnect();const s=SYM.toLowerCase();$('#srcLbl').textContent=`BINANCE SPOT · ${SYM}/USDT`;$('#px').textContent=T('conn');
- try{S.ws=new WebSocket(`wss://data-stream.binance.vision/stream?streams=${s}usdt@aggTrade/${s}usdt@bookTicker/${s}usdt@miniTicker`)}catch(e){return}
- S.ws.onopen=()=>{retry=0;pollBook();bookTimer=setInterval(pollBook,2200)};
- S.ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}const st=m.stream||'',d=m.data||{};
-  if(st.endsWith('@bookTicker')){const mid=(+d.b+(+d.a))/2;if(mid>0)onPrice(mid)}
-  else if(st.endsWith('@aggTrade')){onTrade(+d.p,+d.q,!!d.m,d.T||Date.now())}
-  else if(st.endsWith('@miniTicker')){S.open=+d.o;if(!S.price)onPrice(+d.c)}};
- S.ws.onclose=()=>{clearInterval(bookTimer);S.ws=null;if(!document.hidden)setTimeout(connect,Math.min(2e4,1500*Math.pow(2,retry++)))};
- liqConnect()}
-function disconnect(){clearInterval(bookTimer);if(S.ws){S.ws.onclose=null;try{S.ws.close()}catch(e){}S.ws=null}if(S.lws){S.lws.onclose=null;try{S.lws.close()}catch(e){}S.lws=null}clearTimeout(S.lfb)}
-function liqConnect(){const s=SYM.toLowerCase();let got=false;S.lqSrc='Binance Futures …';try{S.lws=new WebSocket(`wss://fstream.binance.com/ws/${s}usdt@forceOrder`)}catch(e){return liqOkx()}
- S.lws.onmessage=ev=>{try{const o=JSON.parse(ev.data).o;if(!o)return;got=true;S.lqSrc='Binance Futures';const px=+o.ap||+o.p,usd=px*(+o.z||+o.q);onLiq(o.S==='SELL'?'long':'short',usd,px,o.T||Date.now())}catch(e){}};
- S.lws.onerror=()=>{if(!got)liqOkx()};S.lws.onclose=()=>{if(S.lqSrc==='OKX')return;S.lws=null;if(!document.hidden)setTimeout(liqConnect,6000)};
- S.lfb=setTimeout(()=>{if(!got)liqOkx()},15000)}
-async function liqOkx(){if(S.lws){S.lws.onclose=null;try{S.lws.close()}catch(e){}}S.lqSrc='OKX';const ins=await j('https://www.okx.com/api/v5/public/instruments?instType=SWAP'),CT={};((ins&&ins.data)||[]).forEach(x=>CT[x.instId]={v:+x.ctVal,t:x.ctType});
- try{S.lws=new WebSocket('wss://ws.okx.com/ws/v5/public')}catch(e){return}let ping=null;
- S.lws.onopen=()=>{S.lws.send(JSON.stringify({op:'subscribe',args:[{channel:'liquidation-orders',instType:'SWAP'}]}));ping=setInterval(()=>{try{S.lws&&S.lws.readyState===1&&S.lws.send('ping')}catch(e){}},25000)};
- S.lws.onmessage=ev=>{if(ev.data==='pong')return;let m;try{m=JSON.parse(ev.data)}catch(e){return}(m.data||[]).forEach(it=>{const fam=it.instFamily||'';if(fam!==`${SYM}-USDT`&&fam!==`${SYM}-USD`)return;const c=CT[it.instId]||{v:1,t:'linear'};(it.details||[]).forEach(d=>{const px=+d.bkPx,sz=+d.sz;if(!px||!sz)return;onLiq(d.posSide==='long'||(d.posSide==='net'&&d.side==='sell')?'long':'short',c.t==='inverse'?sz*c.v:sz*c.v*px,px,+d.ts||Date.now())})})};
- S.lws.onclose=()=>{clearInterval(ping);S.lws=null;if(!document.hidden)setTimeout(liqOkx,6000)}}
-/* ======================= ui ======================= */
-function setSym(s){SYM=s;ls.set('ek_bf_sym',s);S.price=null;S.open=null;S.round=null;S.UN=null;S.bids=[];S.asks=[];S.trades=[];S.liqs=[];S.walls=new Set();PJ.length=0;$('#feed').innerHTML='';if(R3){[bull,bear].forEach(A=>{[A.body,A.head,A.tank,A.tur].forEach(m=>m.count=0)})}connect()}
-function ui(){$('#sym').innerHTML=SYMS.map(s=>`<option${s===SYM?' selected':''}>${s}</option>`).join('');$('#sym').onchange=()=>setSym($('#sym').value);
- const L=T('lights');$('#lightSel').innerHTML=Object.entries(L).map(([k,v])=>`<option value="${k}"${k===lightSet?' selected':''}>${v}</option>`).join('');$('#lightSel').onchange=()=>R3&&setLight($('#lightSel').value);
- const sb=$('#sndB');sb.textContent=(SND.on?'🔊 ':'🔇 ')+T('snd');sb.classList.toggle('on',SND.on);sb.onclick=()=>{SND.on=!SND.on;ls.set('ek_bf_snd',SND.on);ui();if(SND.on)snd(440,.15,.1)};
- $('#fsB').onclick=()=>{const b=$('#bf');if(document.fullscreenElement){document.exitFullscreen()}else if(b.requestFullscreen){b.requestFullscreen().catch(()=>b.classList.toggle('fs'))}else b.classList.toggle('fs');setTimeout(resize,300)};
- $('#helpB').onclick=()=>{const i=$('#intro');i.hidden=!i.hidden};$('#zIn').onclick=()=>zoom(-12);$('#zOut').onclick=()=>zoom(12);
- $('#nogl').innerHTML=T('nogl');renderFeed()}
-document.addEventListener('fullscreenchange',()=>setTimeout(resize,200));
-document.addEventListener('visibilitychange',()=>{if(document.hidden)disconnect();else{lastF=performance.now();connect()}});
-uiLang(ui);setInterval(updStats,1000);setTimeout(()=>{$('#intro').hidden=true},9000);
-if(hasGL()){try{init3d()}catch(e){R3=null;$('#nogl').hidden=false}}else{$('#nogl').hidden=false}
-connect();
-</script>
+<script src="/battle/i18n.js?v=2"></script>
+<script src="/battle/battle.js?v=2"></script>
 </body>
 </html>
