@@ -2,8 +2,10 @@
 Daily videos for the main channel (@Coin_Kurd) + daily drafts for the admin.
 
 - Reads the RSS feeds of well-known crypto YouTube channels, keeps Bitcoin/Ethereum videos of the last 48h,
-  ranks them by views per hour and posts the top 5 each day: thumbnail + house-prompt Persian caption +
-  the channel signature, with a "watch" button to the original video (we never re-upload other people's videos).
+  ranks them by views per hour and posts the top 5 each day as Coin_Kurd's OWN short vertical clip (bot_reel:
+  branded slides of the Persian summary + real BTC chart, downloadable in Telegram) with the house-prompt caption
+  and the channel signature. Other people's videos are never re-uploaded.
+- Rule: one day's videos come from different sources (max one per source per day, never the same twice in a row).
 - 10 drafts a day (Persian summaries of the day's news/on-chain items + signature) go to the admins' private
   chat, ready to be forwarded to Saved Messages and given a picture.
 - Posted videos are also written to data/videos.json on main for the site.
@@ -21,7 +23,9 @@ from datetime import datetime, timezone
 
 import requests
 
+import bot_data as D
 import bot_feeds as F
+import bot_reel as R
 
 log = logging.getLogger("videos")
 
@@ -30,10 +34,20 @@ CHANNELS = [x for x in os.environ.get("VIDEO_CHANNELS", ",".join([
     "UCRvqjQPSeaWn-uEx-w0XOIg",   # Benjamin Cowen
     "UCAl9Ld79qaZxp9JzEOwd3aA",   # Bankless
     "UCbLhGKVY-bJPcawebgtNfbw",   # Altcoin Daily
+    "UCN9Nj4tjXbVTLYWN0EKly_Q",   # Crypto Banter
+    "UClgJyzwGs-GyaNxUHcLZrkg",   # InvestAnswers
+    "UCl2oCaw8hdR_kbqyqd2klIA",   # Lark Davis
+    "UC4VPa7EOvObpyCRI4YKRQRw",   # Paul Barron Network
+    "UCBH5VZE_Y4F3CMcPIzPEB5A",   # Real Vision
+    "UCCatR7nWbYrkVXdxXb4cGXw",   # DataDash
+    "UCjemQfjaXAzA-95RKoy9n_g",   # Discover Crypto
+    "UCMtJYS0PrtiUwlk6zjGDEMA",   # EllioTrades
+    "UCiUnrCUGCJTCC7KjuW493Ww",   # Crypto Zombie
+    "UCxODjeUwZHk3p-7TU-IsDOA",   # Boxmining
 ])).split(",") if x]
 PER_DAY = int(os.environ.get("VIDEOS_PER_DAY", "5"))
 DRAFTS_PER_DAY = int(os.environ.get("DRAFTS_PER_DAY", "10"))
-SLOTS_UTC = [7, 10, 13, 16, 19]          # posting hours (Iran ≈ +3:30)
+SLOTS_UTC = [5, 8, 11, 15, 19]          # posting hours (Iran ≈ +3:30)
 GAP_FIRST_DAY = 180                       # seconds between posts when catching up
 KEYS = re.compile(r"\b(bitcoin|btc|ethereum|eth|ether|crypto|etf|halving|altcoin)", re.I)
 NS = {"a": "http://www.w3.org/2005/Atom", "m": "http://search.yahoo.com/mrss/",
@@ -97,9 +111,18 @@ def candidates(seen):
             if len(v["text"]) < 120:      # too little to summarise honestly
                 continue
             v["score"] = v["views"] / max(age_h, 1)
+            v["cid"] = cid
             vids.append(v)
     vids.sort(key=lambda v: -v["score"])
     return vids
+
+
+# Rule (part of the posting prompt): videos of one day must come from different people —
+# at most one video per source channel per day, and never two in a row from the same source.
+def diverse(vids, st):
+    today = {p.get("cid") for p in st["posted"] if p.get("at", "")[:10] == st["day"]}
+    last = st["posted"][0].get("cid") if st["posted"] else None
+    return [v for v in vids if v["cid"] not in today and v["cid"] != last]
 
 
 def thumb(vid):
@@ -123,21 +146,28 @@ def state(s):
     v.setdefault("last_post", 0)
     v.setdefault("drafts_day", "")
     v.setdefault("fail_note", 0)
+    if not v.get("reel_v1"):                       # switch to own clips: post today's five again as clips
+        v["reel_v1"] = True
+        v["day"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        v["today"] = 0
+        v["catchup"] = v["day"]
     return v
 
 
 def post_one(s, st, send_fn, channel, admins):
-    for v in candidates(set(st["seen"])):
+    for v in diverse(candidates(set(st["seen"])), st):
         st["seen"].append(v["vid"])
         src = f"عنوان ویدیو: {v['title']}\n\n{v['text']}"
         fa = F.summarize(src, "fa", limit=1024 - SIG_LEN - 2)
         if not fa:
             continue
-        img = thumb(v["vid"])
-        url = "https://www.youtube.com/watch?v=" + v["vid"]
-        kb = {"inline_keyboard": [[{"text": "▶️ تماشای ویدیو", "url": url}]]}
+        series, label = btc_series()
+        clip = R.make_reel(fa, series, label)
+        if not clip:
+            log.warning("reel render failed for %s", v["vid"])
+            continue
         cap = html.escape(fa, quote=False) + "\n\n" + SIG
-        r = send_fn(channel, cap, kb=kb, photo=img)
+        r = send_fn(channel, cap, video=clip)
         if not r.get("ok"):
             log.warning("channel post failed: %s", r.get("description"))
             if time.time() - st["fail_note"] > 6 * 3600:
@@ -145,13 +175,22 @@ def post_one(s, st, send_fn, channel, admins):
                 for a in admins:
                     send_fn(a, "⚠️ ارسال ویدیو به کانال انجام نشد: " + html.escape(str(r.get("description"))))
             return False
-        st["posted"].insert(0, {"vid": v["vid"], "url": url, "title": v["title"], "fa": fa, "photo": img,
+        st["posted"].insert(0, {"vid": v["vid"], "cid": v["cid"], "title": v["title"], "fa": fa,
                                 "at": datetime.now(timezone.utc).isoformat()})
         del st["posted"][40:]
-        del st["seen"][:-400]
-        log.info("video posted: %s", v["vid"])
+        del st["seen"][:-600]
+        log.info("video posted: %s (%s)", v["vid"], v["author"])
         return True
     return False
+
+
+def btc_series():
+    try:
+        m = D.load("market") or {}
+        c = next(x for x in m.get("coins", []) if x.get("coin") == "BTC")
+        return c.get("spark") or None, "بیت‌کوین ۴۸ ساعت"
+    except Exception:
+        return None, ""
 
 
 def drafts(s, st, send_fn, admins):
