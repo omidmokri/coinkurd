@@ -32,9 +32,9 @@
   const fx = q('#cineFx'), cap = q('#cineCap'), chips = q('#cineData'), btn = q('#cineBtn');
   const lang = () => { let l = ''; try { l = localStorage.getItem('ck_lang') || ''; } catch (e) { } return l || document.documentElement.lang || 'fa'; };
   const TX = {
-    fa: { blocks: 'تونلی از ۱۵ بلاک آخر شبکهٔ بیت‌کوین — زنده از mempool.space', nodes: (n, c) => `${n} نود فعال بیت‌کوین در ${c} کشور — bitnodes.io`, skip: 'رد کردن ⏭', replay: '↻ پخش دوباره', nodeW: 'نود' },
-    ckb: { blocks: 'تونێلێک لە ١٥ بلۆکی کۆتایی تۆڕی بیتکۆین — ڕاستەوخۆ لە mempool.space', nodes: (n, c) => `${n} نۆدی چالاکی بیتکۆین لە ${c} وڵات — bitnodes.io`, skip: 'تێپەڕاندن ⏭', replay: '↻ دووبارە', nodeW: 'نۆد' },
-    en: { blocks: 'A tunnel of the latest 15 Bitcoin blocks — live from mempool.space', nodes: (n, c) => `${n} reachable Bitcoin nodes in ${c} countries — bitnodes.io`, skip: 'Skip ⏭', replay: '↻ Replay', nodeW: 'nodes' }
+    fa: { blocks: 'تونلی از ۱۵ بلاک آخر شبکهٔ بیت‌کوین — زنده از mempool.space', nodes: (n, c) => c ? `${n} نود فعال بیت‌کوین در ${c} کشور — bitnodes.io` : `${n} نود فعال شبکهٔ بیت‌کوین در سراسر جهان — bitnodes.io`, skip: 'رد کردن ⏭', replay: '↻ پخش دوباره', nodeW: 'نود' },
+    ckb: { blocks: 'تونێلێک لە ١٥ بلۆکی کۆتایی تۆڕی بیتکۆین — ڕاستەوخۆ لە mempool.space', nodes: (n, c) => c ? `${n} نۆدی چالاکی بیتکۆین لە ${c} وڵات — bitnodes.io` : `${n} نۆدی چالاکی تۆڕی بیتکۆین لە سەرانسەری جیهان — bitnodes.io`, skip: 'تێپەڕاندن ⏭', replay: '↻ دووبارە', nodeW: 'نۆد' },
+    en: { blocks: 'A tunnel of the latest 15 Bitcoin blocks — live from mempool.space', nodes: (n, c) => c ? `${n} reachable Bitcoin nodes in ${c} countries — bitnodes.io` : `${n} reachable Bitcoin nodes worldwide — bitnodes.io`, skip: 'Skip ⏭', replay: '↻ Replay', nodeW: 'nodes' }
   };
   const tx = k => (TX[lang()] || TX.en)[k];
   const fmtN = n => Number(n).toLocaleString('en-US');
@@ -466,7 +466,7 @@ float x=(r-uIn)/span;vA=uOp*(1.-x)*smoothstep(0.,.08,x)*smoothstep(1.,.85,x);vC=
     if (bloom) bloom.strength = bloomS;
     let c = '';
     if (B && t >= 8.4 && t < 11.8 && D.blocks) c = tx('blocks');
-    else if (B && t >= 12.4 && t < 15.2 && nodesInfo) c = tx('nodes')(fmtN(nodesInfo.total), nodesInfo.countries || '—');
+    else if (B && t >= 12.4 && t < 15.2 && nodesInfo) c = tx('nodes')(fmtN(nodesInfo.total), nodesInfo.countries || 0);
     if (cap && c !== capNow) { capNow = c; cap.textContent = c; cap.classList.toggle('on', !!c); }
     if (!titled && t >= 21) reveal();
   }
