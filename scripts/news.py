@@ -81,6 +81,9 @@ def fetch(name, url):
             le = it.find("{http://www.w3.org/2005/Atom}link")
             link = le.get("href") if le is not None else ""
         d = parse_date(tx("pubDate") or tx("published") or tx("updated"))
+        link = (link or "").strip()
+        if not re.match(r"^https?://[^\s\"'<>]+$", link, re.I):   # never publish javascript:/data: links from a feed
+            continue
         if title and link and d:
             out.append({"title": title, "url": link, "source": name, "date": d.isoformat()})
     return out

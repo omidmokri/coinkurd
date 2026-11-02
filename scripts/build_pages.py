@@ -10,6 +10,7 @@
 
 این فایل‌ها در گیت کامیت نمی‌شوند؛ در هر اجرای ورک‌فلو از روی data/*.json ساخته می‌شوند.
 """
+import chrome  # shared header/footer (scripts/chrome.py)
 import html
 import json
 import os
@@ -52,6 +53,19 @@ OPP_FA = {"rsi_oversold": "RSI اشباع فروش", "rsi_overbought": "RSI اش
           "ema_death_cross": "تقاطع مرگ EMA20/50", "breakout_up": "شکست سقف ۴۸ ساعته", "breakdown": "شکست کف ۴۸ ساعته",
           "volume_spike": "جهش حجم معاملات", "bull_divergence": "واگرایی مثبت RSI", "bear_divergence": "واگرایی منفی RSI"}
 e = html.escape
+
+
+def sj(o):
+    """JSON for inline <script> blocks: '<', '>' and '&' are escaped so data can never close the tag."""
+    return json.dumps(o, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
+def su(u):
+    """Only http(s), protocol-relative, site-relative or #hash links are allowed to come from data."""
+    u = str(u or "").strip()
+    return u if re.match(r"^(https?:)?//", u, re.I) or re.match(r"^/(?!/)", u) or u.startswith("#") else "#"
+
+
 MD = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
 
 
@@ -130,6 +144,9 @@ def big(t, lang="fa"):
 FOOT = {"fa": '© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.',
         "ckb": '© entekhab.net — داتاکان بە شێوەی ئۆتۆماتیکی لە کەناڵی <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me نوێ دەکرێنەوە. هیچ کامێکیان ئامۆژگاریی دارایی نییە.',
         "en": '© entekhab.net — data is updated automatically from the <a href="https://t.me/Coin_Kurd">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me. Nothing here is financial advice.'}
+CREDIT = {"fa": 'داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند.',
+          "ckb": 'داتاکان بە شێوەی ئۆتۆماتیکی لە کەناڵی <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a>، Binance، CoinGecko و alternative.me نوێ دەکرێنەوە.',
+          "en": 'Data is updated automatically from the <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me.'}
 # "recently viewed" for /me/ — stored only in the visitor's own browser (localStorage), never sent anywhere
 RECENT_JS = ("try{var k='ek_recent',p=location.pathname,a=JSON.parse(localStorage.getItem(k)||'[]').filter(function(x){return x&&x.p!==p});"
              "a.unshift({p:p,t:document.title.replace(/\\s*\\|\\s*entekhab\\.net\\s*$/i,''),at:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,30)))}catch(e){}"
@@ -169,7 +186,7 @@ def crumbs_ld(body, title, url, lang="fa"):
         return ""
     ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
           "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, "item": u} for i, (n, u) in enumerate(items)]}
-    return f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
+    return f'<script type="application/ld+json">{sj(ld)}</script>'
 
 
 WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c=b.dataset.watch,K='ek_watch';function g(){try{return JSON.parse(localStorage.getItem(K)||'[]')}catch(e){return []}}"
@@ -180,18 +197,16 @@ WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
-    bn = BNAV.get(lang, BNAV["en"])
-    bnav = ('<nav class="bnav" aria-label="bottom">' + "".join(f'<a href="{h}"><span>{ic}</span><small>{bn[i]}</small></a>' for i, (h, ic) in enumerate((("/", "🏠"), ("/#intel", "🧠"), ("/battle/", "⚔️"), ("/learn/", "🎓"), ("/me/", "👤")))) + "</nav>")
     extra_head = extra_head + crumbs_ld(body, title, url, lang)
-    doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8">{chrome.CSP_META}<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 {ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}
-<style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab<b>.net</b></span></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
+<style>{CSS}</style>{chrome.HEAD_TAGS}{extra_head}</head><body>
+{chrome.header(lang)}
 <main class="w">{body}</main>
-<footer><div class="w">{FOOT.get(lang, FOOT["fa"])}</div></footer>{bnav}<script>{RECENT_JS}{WATCH_JS}</script></body></html>"""
+<p class="ek-credit">{CREDIT.get(lang, CREDIT["fa"])}</p>{chrome.bottom(lang)}{chrome.footer(lang)}<script>{RECENT_JS}{WATCH_JS}</script>{chrome.BODY_TAGS}</body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
@@ -214,8 +229,8 @@ def score_html(c, full=True):
 
 
 def news_li(i):
-    srcs = " · ".join(f'<a href="{e(x["url"])}" rel="noopener nofollow" target="_blank">{e(x["source"])}</a>' for x in i["sources"])
-    return f'<li dir="ltr"><a href="{e(i["url"])}" rel="noopener nofollow" target="_blank">{e(i["title"])}</a><small>{srcs} · {fmt_date(i["date"])}</small></li>'
+    srcs = " · ".join(f'<a href="{e(su(x["url"]))}" rel="noopener nofollow" target="_blank">{e(x["source"])}</a>' for x in i["sources"])
+    return f'<li dir="ltr"><a href="{e(su(i["url"]))}" rel="noopener nofollow" target="_blank">{e(i["title"])}</a><small>{srcs} · {fmt_date(i["date"])}</small></li>'
 
 
 def impact_html(im):
@@ -254,16 +269,16 @@ def build_post(p):
             body += f'<details{d} lang="{lg}"><summary>{lbl}: {e(tr[lg]["title"])}</summary><div class="txt">{rich(tr[lg]["text"])}</div></details>'
     if p.get("footer"):
         ic = lambda u: "👾 " if "discord" in u else "🎥 " if "youtu" in u else "📸 " if "instagram" in u else "💬 " if "twitter" in u or "x.com" in u else ""  # noqa: E731
-        body += '<div class="social">' + "".join(f'<a href="{e(f["url"])}" rel="noopener" target="_blank">{ic(f["url"])}{e(f["label"])}</a>' for f in p["footer"]) + "</div>"
+        body += '<div class="social">' + "".join(f'<a href="{e(su(f["url"]))}" rel="noopener" target="_blank">{ic(f["url"])}{e(f["label"])}</a>' for f in p["footer"]) + "</div>"
     body += impact_html(impact.get(str(p["id"])))
-    body += (f'<p class="note"><a href="{e(p["url"])}">مشاهدهٔ این پست در تلگرام ↗</a> · <a href="/#p{p["id"]}">نمایش در آرشیو</a> · '
+    body += (f'<p class="note"><a href="{e(su(p["url"]))}">مشاهدهٔ این پست در تلگرام ↗</a> · <a href="/#p{p["id"]}">نمایش در آرشیو</a> · '
              f'<a href="{GROUP}" rel="noopener" target="_blank">💬 گفتگو در گروه تلگرام Coin_Kurd</a></p>')
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"),
           "inLanguage": ["fa"] + [k for k in ("ckb", "en") if tr.get(k)], "image": [img] if img else [],
           "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
           "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE},
           "mainEntityOfPage": f"{SITE}/p/{p['id']}/", "description": desc, "about": p.get("coins", [])}
-    head = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
+    head = f'<script type="application/ld+json">{sj(ld)}</script>'
     if img:
         head += f'<meta property="og:image" content="{e(img)}"><meta name="twitter:card" content="summary_large_image">'
     head += alt_links(p)
@@ -301,12 +316,12 @@ def build_post_lang(p, lg):
     if img:
         body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy">'
     body += f'<div class="txt">{rich(t["text"])}</div>'
-    body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(p["url"])}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
+    body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(su(p["url"]))}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
           "image": [img] if img else [], "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
           "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE}, "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
           "description": desc, "translationOfWork": {"@id": f"{SITE}/p/{p['id']}/"}}
-    head = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>' + alt_links(p)
+    head = f'<script type="application/ld+json">{sj(ld)}</script>' + alt_links(p)
     if img:
         head += f'<meta property="og:image" content="{e(img)}">'
     if p.get("q") == "low":
@@ -436,7 +451,7 @@ def build_coin(c, cposts):
             f'<a class="wbtn" href="/tools/?cmp={",".join([c] + [x for x in ("BTC", "ETH", "SOL") if x != c][:2])}#compare">⚖️ مقایسه با کوین‌های اصلی</a> <a class="wbtn" href="/me/?paper={c}#paper">📝 معاملهٔ آزمایشی</a></p>')
     tv = TV.get(c, f"BINANCE:{c}USDT")
     body += f'''<div class="tv"><div class="tradingview-widget-container" style="height:100%"><div class="tradingview-widget-container__widget" style="height:100%"></div>
-<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{json.dumps({"autosize": True, "symbol": tv, "interval": "60", "theme": "dark", "style": "1", "locale": "en", "backgroundColor": "rgba(18,18,18,1)", "allow_symbol_change": False, "save_image": False, "support_host": "https://www.tradingview.com"})}</script></div></div>'''
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{sj({"autosize": True, "symbol": tv, "interval": "60", "theme": "dark", "style": "1", "locale": "en", "backgroundColor": "rgba(18,18,18,1)", "allow_symbol_change": False, "save_image": False, "support_host": "https://www.tradingview.com"})}</script></div></div>'''
     body += '<h2>وضعیت تکنیکال (۱ ساعته)</h2>'
     if m:
         tr = {"up": "صعودی", "down": "نزولی", "range": "خنثی / رنج"}[m["trend"]]
@@ -477,7 +492,7 @@ def build_coin(c, cposts):
     desc = f"{name}: قیمت زنده، تحلیل تکنیکال، فرصت‌های اسکنر و {len(cposts)} مطلب مرتبط در entekhab.net"
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{name} ({c})", "about": {"@type": "Thing", "name": name}, "url": f"{SITE}/coins/{c.lower()}/"}
     return page(f"coins/{c.lower()}/", f"{name} ({c}) — قیمت، تحلیل و اخبار", desc, body,
-                f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><script type="application/ld+json">{json.dumps(faq_ld, ensure_ascii=False)}</script><script src="/assets/live.js" defer></script>')
+                f'<script type="application/ld+json">{sj(ld)}</script><script type="application/ld+json">{sj(faq_ld)}</script><script src="/assets/live.js" defer></script>')
 
 
 def main():
@@ -501,7 +516,7 @@ def main():
     body = "<h1>کوین‌ها</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر و مطالب مرتبط.</p><div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "کوین‌ها — پروفایل ارزهای دیجیتال", "فهرست ارزهای دیجیتال با قیمت زنده، تحلیل و آرشیو مطالب", body), market.get("updated_at")))
-    for pth in ("lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/"):  # /me/ is personal → robots Disallow, so not in the sitemap
+    for pth in ("lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/"):  # /me/ is personal → robots Disallow, so not in the sitemap
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
@@ -535,7 +550,7 @@ def intel_html():
     rows = "".join(f'<tr><td><a href="/coins/{o["coin"].lower()}/">{o["coin"]}</a></td><td>{OPP_FA.get(o["type"], o["type"])}</td><td class="num">{o["strength"]}</td><td>{"بالا" if o["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(o["price"])}</td></tr>' for o in ops[:14])
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
     out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
-                  + f'<table class="otab"><tr>{coins}</tr></table><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
+                  + f'<div class="tsc"><table class="otab"><tr>{coins}</tr></table></div><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
     by = {}
     for r in impact.values():
         if r.get("r24h") is not None:
@@ -600,7 +615,7 @@ def prerender():
         s = s.replace(k, v, 1)
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
-    css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
+    css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.tsc,.ibox{overflow-x:auto;-webkit-overflow-scrolling:touch}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
     body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
     urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}</style>")]
     # /categories/<id>/
@@ -675,7 +690,7 @@ def snap_html(sn, full=True):
         h.append("<h2>یافته‌های قوی اسکنر</h2><ul class=list>" + "".join(f'<li>{e(o["coin"])} · {OPP_FA.get(o["type"], o["type"])} · قدرت {o.get("strength")}</li>' for o in op[:10]) + "</ul>")
     hd = sn.get("headlines") or []
     if hd and full:
-        h.append("<h2>تیترهای همان لحظه</h2><ul class=list>" + "".join(f'<li><a href="{e(x["url"])}" rel="noopener nofollow" target="_blank" dir="ltr">{e(x["title"])}</a> <small>{e(x.get("source", ""))}</small></li>' for x in hd[:8]) + "</ul>")
+        h.append("<h2>تیترهای همان لحظه</h2><ul class=list>" + "".join(f'<li><a href="{e(su(x["url"]))}" rel="noopener nofollow" target="_blank" dir="ltr">{e(x["title"])}</a> <small>{e(x.get("source", ""))}</small></li>' for x in hd[:8]) + "</ul>")
     return "".join(h)
 
 
@@ -829,7 +844,7 @@ def build_dna():
                .replace('<link rel="canonical" href="https://entekhab.net/dna/">', f'<link rel="canonical" href="{url}">')
                .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc[:300])} — ', 1)
                .replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{seo}</div>')
-               .replace('<script src="/assets/ui.js"></script>', f'<script>window.DNA_COIN={json.dumps(c)}</script><script src="/assets/ui.js"></script>'))
+               .replace('<script src="/assets/ui.js"></script>', f'<script>window.DNA_COIN={sj(c)}</script><script src="/assets/ui.js"></script>'))
         out = os.path.join(ROOT, "dna", c.lower(), "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
         open(out, "w", encoding="utf-8").write(doc)
@@ -881,7 +896,7 @@ def build_weekly():
             h.append("<h2>رویدادهای اقتصادی و واکنش بیت‌کوین</h2><table><tr><th></th><th>۱ ساعت بعد</th><th>۴ ساعت بعد</th></tr>" + "".join(
                 f'<tr><td>{e(x.get("title_fa") or x.get("title") or "")} <small class="note">{e((x.get("date") or "")[:10])}</small></td><td>{pct(x.get("btc_1h"))}</td><td>{pct(x.get("btc_4h"))}</td></tr>' for x in it["events"]) + "</table>")
         if it.get("headlines"):
-            h.append("<h2>تیترهای مهم</h2><ul>" + "".join(f'<li><a href="{e(n["url"])}" rel="noopener nofollow" target="_blank" dir="ltr">{e(n["title"])}</a> <small class="note">{e(n["source"])}</small></li>' for n in it["headlines"]) + "</ul>")
+            h.append("<h2>تیترهای مهم</h2><ul>" + "".join(f'<li><a href="{e(su(n["url"]))}" rel="noopener nofollow" target="_blank" dir="ltr">{e(n["title"])}</a> <small class="note">{e(n["source"])}</small></li>' for n in it["headlines"]) + "</ul>")
         if it.get("dna_momentum"):
             h.append("<h2>DNA هفته</h2><p>بیشترین مومنتوم: " + "، ".join(f'<a href="/dna/{c.lower()}/">{e(c)}</a> ({v})' for c, v in it["dna_momentum"]) +
                      "<br>بیشترین سهم خریداران: " + "، ".join(f'<a href="/dna/{c.lower()}/">{e(c)}</a> ({v}٪)' for c, v in (it.get("dna_flow") or [])) + "</p>")
@@ -965,7 +980,7 @@ def build_indicators():
             b = it["bt"]
             h += (f'<p>بک‌تست چارت انتشار ({e(it["chart"])}): سود کل {e(b["pnl"])}، بیشترین افت {e(b["dd"])}، معاملات سودده {e(b["win"])} ({e(b["trades"])})، '
                   f'فاکتور سود {e(b["pf"])} — منبع: گزارش استراتژی TradingView.</p>')
-        h += f'<p>{KFA.get(it["kind"], "")} · {AFA.get(it["access"], "")} · <a href="{e(it["url"])}" rel="noopener">TradingView</a></p>'
+        h += f'<p>{KFA.get(it["kind"], "")} · {AFA.get(it["access"], "")} · <a href="{e(su(it["url"]))}" rel="noopener">TradingView</a></p>'
         h += f'<p lang="en" dir="ltr">{e(it["t"]["en"]["sum"])}</p><p lang="ckb">{e(it["t"]["ckb"]["sum"])}</p>'
         return h
 
@@ -987,12 +1002,12 @@ def build_indicators():
               "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"} if it["access"] == "open-source" else None}
         ld = {k: v for k, v in ld.items() if v is not None}
         doc = (tpl.replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", f"<title>{e(title)} | entekhab.net</title>")
-               .replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{url}"><script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>')
+               .replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{url}"><script type="application/ld+json">{sj(ld)}</script>')
                .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc)} — ', 1)
                .replace('<meta property="og:title" content="اندیکاتورهای اختصاصی Coin_Kurd | entekhab.net">', f'<meta property="og:title" content="{e(it["name"])} | entekhab.net">')
                .replace('<meta property="og:image" content="https://entekhab.net/assets/tv-jxwqCFUw.webp">', f'<meta property="og:image" content="{SITE}/assets/tv-{it["tv"]}.webp">')
                .replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{seo_of(it)}{extra}</div>')
-               .replace('<script src="/assets/ui.js"></script>', f'<script>window.IND_ID={json.dumps(it["id"])}</script><script src="/assets/ui.js"></script>'))
+               .replace('<script src="/assets/ui.js"></script>', f'<script>window.IND_ID={sj(it["id"])}</script><script src="/assets/ui.js"></script>'))
         out = os.path.join(ROOT, "indicators", it["id"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
         open(out, "w", encoding="utf-8").write(doc)
@@ -1088,7 +1103,7 @@ def build_learn():
         ld = {"@context": "https://schema.org", "@type": "DefinedTerm", "name": fat, "alternateName": [et, kt], "description": fad,
               "inDefinedTermSet": f"{SITE}/glossary/", "url": f"{SITE}/glossary/{slug}/"}
         urls.append(page(f"glossary/{slug}/", f"{fat} ({et}) — معنی و توضیح ساده", fad[:155], body,
-                         f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{LEARN_CSS}</style>'))
+                         f'<script type="application/ld+json">{sj(ld)}</script><style>{LEARN_CSS}</style>'))
     # ---- glossary hub (interactive: search, group filter, language)
     cards = "".join(
         f'<div class="gt" data-g="{g[1]}" data-s="{e(_norm(" ".join([g[2], g[4], g[6], g[3]])))}"><h3><a href="/glossary/{g[0]}/">{tri(e(g[2]), e(g[4]), e(g[6]))}</a></h3>'
@@ -1163,7 +1178,7 @@ if(location.hash){var t=document.querySelector(location.hash);if(t&&t.tagName===
     ld = {"@context": "https://schema.org", "@type": "Course", "name": "مسیر یادگیری کریپتو — entekhab.net", "description": "سه سطح آموزش کریپتو و تحلیل تکنیکال با آزمون و گواهی",
           "provider": {"@type": "Organization", "name": "entekhab.net", "sameAs": "https://t.me/Coin_Kurd"}, "inLanguage": ["fa", "ckb", "en"], "isAccessibleForFree": True}
     urls.append(page("learn/", "مسیر یادگیری کریپتو — آموزش رایگان از مبتدی تا پیشرفته با آزمون و گواهی", "سه سطح آموزش کریپتو و تحلیل تکنیکال به فارسی، کوردی و انگلیسی: درس‌های کوتاه، واژه‌نامه، نمونه‌های واقعی کانال Coin_Kurd، آزمون و گواهی",
-                     body, f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{LEARN_CSS}</style>'
+                     body, f'<script type="application/ld+json">{sj(ld)}</script><style>{LEARN_CSS}</style>'
                            f"<script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}{ljs}}})</script>"))
     print(f"learn pages: {len(urls)}")
     return urls
@@ -1180,6 +1195,7 @@ if __name__ == "__main__":
     extra += build_daily()
     extra += build_seo_extra()
     extra += build_learn()
+    print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
     open(sm, "w", encoding="utf-8").write(s)
