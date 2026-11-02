@@ -6,3 +6,9 @@ tests/out/
 /sitemap.xml
 /robots.txt
 /api/
+
+# Android signing keys must never be committed
+*.p12
+*.jks
+*.keystore
+ks_pass*
