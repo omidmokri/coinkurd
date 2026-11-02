@@ -45,7 +45,7 @@ CHANNELS = [x for x in os.environ.get("VIDEO_CHANNELS", ",".join([
     "UCiUnrCUGCJTCC7KjuW493Ww",   # Crypto Zombie
     "UCxODjeUwZHk3p-7TU-IsDOA",   # Boxmining
 ])).split(",") if x]
-PER_DAY = int(os.environ.get("VIDEOS_PER_DAY", "5"))
+PER_DAY = int(os.environ.get("VIDEOS_PER_DAY", "0"))   # off: owner turned automatic videos off
 DRAFTS_PER_DAY = int(os.environ.get("DRAFTS_PER_DAY", "10"))
 SLOTS_UTC = [5, 8, 11, 15, 19]          # posting hours (Iran ≈ +3:30)
 GAP_FIRST_DAY = 180                       # seconds between posts when catching up
