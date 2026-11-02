@@ -9,7 +9,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(7,8,10,.82);backdrop-fil
 header .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
 .brand{font-family:var(--mono);font-weight:700;display:flex;gap:8px;align-items:center}.brand i{width:10px;height:10px;border-radius:50%;background:var(--o);box-shadow:0 0 12px var(--o)}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}.tabs a{font-size:.85rem;padding:6px 10px;border-radius:8px;color:var(--mute);white-space:nowrap}.tabs a:hover{color:var(--ink);background:#ffffff0d}
-.langs button{font-family:var(--mono);font-size:.8rem;padding:4px 8px;border-radius:6px;color:var(--mute)}.langs button.on{background:var(--o);color:#000}
+.langs{display:flex;flex-shrink:0;gap:2px}.langs button{font-family:var(--mono);font-size:.8rem;padding:4px 8px;border-radius:6px;color:var(--mute)}.langs button.on{background:var(--o);color:#000}
 .hero{padding:56px 0 24px}.hero h1{font-size:clamp(2.2rem,6vw,4.6rem);font-weight:900;line-height:1.05}.hero h1 em{font-style:normal;color:var(--o);text-shadow:0 0 40px rgba(247,147,26,.4)}
 .hero p{color:var(--mute);max-width:720px;margin-top:10px}
 .pulse{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:22px 0 8px}
