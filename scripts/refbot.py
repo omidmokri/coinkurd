@@ -828,11 +828,11 @@ def handle_group(s, msg):
     if text.split("@")[0].startswith("/settopic") and u.get("id") in ADMIN_IDS:
         arg = text.split(maxsplit=1)[1].strip().lower() if len(text.split()) > 1 else ""
         th = msg.get("message_thread_id")
-        if arg in ("onchain", "news", "fx") and th:
+        if arg in ("onchain", "news", "fx", "onchain:fa", "onchain:ckb", "news:fa", "news:ckb") and th:
             s.setdefault("topics", {})[arg] = th
             send(chat["id"], f"✅ {arg} → this topic", message_thread_id=th)
         else:
-            send(chat["id"], "usage (inside the topic): /settopic onchain | news | fx", message_thread_id=th)
+            send(chat["id"], "usage (inside the topic): /settopic onchain:fa | onchain:ckb | news:fa | news:ckb | fx", message_thread_id=th)
         return
     if u.get("is_bot") or u.get("id") in ADMIN_IDS:
         return
