@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>
+<meta name="description" content="۱۷ اندیکاتور و استراتژی اختصاصی Coin_Kurd در TradingView با تصویر، توضیح، بک‌تست و سیگنال‌های زنده: روش موکری، Body Way، قانون توان بیت‌کوین، چرخهٔ آن‌چین و بیشتر">
+<link rel="canonical" href="https://entekhab.net/indicators/">
+<meta property="og:title" content="اندیکاتورهای اختصاصی Coin_Kurd | entekhab.net">
+<meta property="og:image" content="https://entekhab.net/assets/tv-jxwqCFUw.webp">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.ic{background:var(--p);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+.ic:hover{border-color:rgba(247,147,26,.55);transform:translateY(-2px)}
+.ic .im{aspect-ratio:16/10;background:#05070a;display:block;position:relative;overflow:hidden;cursor:zoom-in}
+.ic .im img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.ic .im img.ct{object-fit:contain;object-position:center}
+.ic .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ic h3{font-size:1.02rem;font-weight:800;line-height:1.4}
+.ic p{color:#cfcfc8;font-size:.86rem;line-height:1.85}
+.bdg{display:inline-block;font-size:.68rem;font-family:var(--mono);padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute);margin-inline-end:4px}
+.bdg.s{border-color:var(--o);color:var(--o)}.bdg.o{border-color:var(--g);color:var(--g)}.bdg.l{border-color:var(--c);color:var(--c)}
+.bt{display:flex;flex-wrap:wrap;gap:6px}.bt span{font-size:.75rem;background:#ffffff0c;border-radius:8px;padding:3px 8px;font-family:var(--mono)}
+.bt span b{font-weight:700}.ic .act{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.flt button{padding:6px 12px;border-radius:99px;border:1px solid var(--line);font-size:.85rem;color:var(--mute)}.flt button.on{background:var(--o);color:#000;border-color:var(--o)}
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:1000px){.lgrid{grid-template-columns:1fr}}
+.lc canvas{width:100%;display:block;border-radius:10px;background:#04060a;margin-top:10px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin-top:8px}.kv div{background:#ffffff08;border-radius:10px;padding:8px 10px}.kv small{color:var(--mute);font-size:.7rem;display:block}.kv b{font-family:var(--mono);font-size:1rem}
+.ph{display:inline-block;padding:3px 12px;border-radius:99px;font-weight:800;color:#000}
+.sg{width:100%;border-collapse:collapse}.sg td{vertical-align:middle;font-size:.84rem}.sg tr{cursor:pointer}.sg tr:hover td{background:#ffffff06}
+.sd{display:inline-block;min-width:54px;text-align:center;padding:2px 8px;border-radius:7px;font-size:.75rem;font-weight:800}
+.sd.long{background:rgba(34,197,94,.15);color:var(--g)}.sd.short{background:rgba(239,68,68,.15);color:var(--r)}.sd.info{background:#ffffff12;color:var(--mute)}
+.oc{font-family:var(--mono);font-size:.78rem;white-space:nowrap}.oc i{font-style:normal;color:var(--mute);font-size:.68rem;margin-inline-end:2px}
+.det{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px}@media(max-width:960px){.det{grid-template-columns:1fr}}
+.det .big img{width:100%;border-radius:14px;border:1px solid var(--line);display:block;cursor:zoom-in;background:#05070a}
+.det ul{padding-inline-start:20px;margin:8px 0}.det li{margin:6px 0;color:#d8d8d2;font-size:.92rem;line-height:1.9}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:grid;place-items:center;padding:16px}.modal[hidden]{display:none}
+.mbox{background:var(--p);border:1px solid var(--line);border-radius:16px;max-width:min(1200px,96vw);max-height:94vh;overflow:auto;padding:16px;position:relative;width:100%}
+.mbox img{width:100%;display:block;border-radius:10px}.mbox canvas{width:100%;display:block;border-radius:10px;background:#04060a}
+.x{position:sticky;top:0;float:inline-end;font-size:1.6rem;line-height:1;width:36px;height:36px;border-radius:50%;background:#ffffff14;margin-bottom:6px}
+.empty{border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--mute);font-size:.9rem;line-height:1.9}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero"><h1 data-t="h1"></h1><p data-t="lead"></p><div class="pulse" id="pulse"></div></div>
+  <section id="detail" hidden></section>
+  <section id="liveS"><h2><span data-t="liveTag"></span><b data-t="liveT"></b></h2><p class="lead" data-t="liveL"></p><div class="lgrid" id="live"></div></section>
+  <section id="libS"><h2><span data-t="libTag"></span><b data-t="libT"></b></h2><p class="lead" data-t="libL"></p>
+    <div class="row flt" id="flt" style="margin-bottom:14px"></div><div class="igrid" id="lib"></div></section>
+  <section id="sigS"><h2><span data-t="sigTag"></span><b data-t="sigT"></b></h2><p class="lead" data-t="sigL"></p>
+    <div class="row" style="margin-bottom:10px"><select id="sInd"></select><select id="sSide"><option value="">*</option><option value="long">▲</option><option value="short">▼</option></select></div>
+    <div id="stats" style="margin-bottom:12px"></div><div class="scroll" id="sigs"></div></section>
+  <section id="howS"><h2><span>?</span><b data-t="howT"></b></h2>
+    <div class="grid"><div class="card"><h3 data-t="h1T"></h3><p class="lead" style="margin:0" data-t="h1B"></p></div><div class="card"><h3 data-t="h2T"></h3><p class="lead" style="margin:0" data-t="h2B"></p></div></div>
+    <p class="honest" style="margin-top:12px" data-t="honest"></p></section>
+  <div id="seo" class="disc" style="margin:30px 0"></div>
+</div>
+<div class="modal" id="mod" hidden><div class="mbox"><button class="x" id="mx" aria-label="close">×</button><div id="mbody"></div></div></div>
+<footer>entekhab.net — <span data-t="nfa"></span> · <a href="https://www.tradingview.com/u/Coin_Kurd/#published-scripts" target="_blank" rel="noopener">TradingView · Coin_Kurd ↗</a></footer>
+<script src="/assets/ui.js"></script>
+<script>
+Object.assign(I.fa,{h1:'اندیکاتورهای اختصاصی <em>Coin_Kurd</em>',lead:'همهٔ اندیکاتورها و استراتژی‌های منتشرشدهٔ Coin_Kurd در TradingView — با تصویر خود نویسنده، توضیح، نتیجهٔ بک‌تست و سیگنال‌هایشان؛ سه اندیکاتور متن‌باز همین حالا روی سرور entekhab.net با دادهٔ واقعی اجرا می‌شوند.',
+ liveTag:'LIVE',liveT:'اجرای زنده روی entekhab.net',liveL:'کد متن‌باز این سه اندیکاتور خط‌به‌خط روی دادهٔ واقعی اجرا می‌شود (Coin Metrics و Binance، هر ۳ ساعت).',
+ libTag:'TV',libT:'کتابخانهٔ اندیکاتورها',libL:'روی تصویر بزنید تا بزرگ شود؛ «جزئیات» صفحهٔ کامل هر اندیکاتور را با سیگنال‌هایش باز می‌کند.',
+ sigTag:'SIG',sigT:'سیگنال‌ها و نتیجهٔ واقعی آن‌ها',sigL:'هر سیگنال با قیمت لحظهٔ صدور ثبت می‌شود و نتیجه‌اش بعداً روی کندل‌های واقعی Binance اندازه‌گیری می‌شود — موفق و ناموفق، همه نمایش داده می‌شوند. روی هر ردیف بزنید تا نمودارش باز شود.',
+ howT:'سیگنال‌ها از کجا می‌آیند؟',h1T:'۱) محاسبه روی سرور entekhab.net',h1B:'برای اندیکاتورهای متن‌باز (قانون توان، چرخهٔ سبک، مارپیچ) همان کد منتشرشده با همان تنظیمات پیش‌فرض روی دادهٔ واقعی اجرا می‌شود؛ تغییر وضعیت فقط بعد از ۳ بستهٔ روزانهٔ متوالی سیگنال حساب می‌شود و با قیمت همان روز ثبت می‌شود.',
+ h2T:'۲) هشدارهای خود TradingView',h2B:'برای استراتژی‌های بسته (invite-only) سیگنال‌ها مستقیماً از هشدارهای حساب TradingView نویسنده می‌آیند: هشدار → وب‌هوک → کانال تلگرام سیگنال‌ها → این صفحه. یعنی دقیقاً همان سیگنالی که TradingView صادر کرده؛ هیچ سیگنالی دستی اضافه یا حذف نمی‌شود.',
+ honest:'⚠️ صادقانه: بک‌تست‌ها مربوط به چارت انتشار هر استراتژی در TradingView است و تضمینی برای آینده نیست. سیگنال‌ها آموزشی‌اند و توصیهٔ مالی نیستند؛ نتیجهٔ هر سیگنال (حتی ضررده) همین‌جا ثبت می‌ماند.',
+ nfa:'آموزشی است، توصیهٔ مالی نیست',all:'همه',det:'جزئیات',tv:'TradingView ↗',strategy:'استراتژی',indicator:'اندیکاتور','invite-only':'دعوتی','open-source':'متن‌باز',live:'زنده در سایت',
+ bt:'بک‌تست چارت انتشار',pnl:'سود کل',dd:'بیشترین افت',win:'معاملات سودده',pf:'فاکتور سود',n:'اندیکاتور',ns:'استراتژی',no:'متن‌باز',nl:'اجرای زنده',n30:'سیگنال ۳۰ روز',
+ fair:'ارزش منصفانه',price:'قیمت BTC',dev:'فاصله از ارزش منصفانه',zone:'وضعیت',upper:'باند بالا',lower:'باند پایین',buyb:'آستانهٔ منطقهٔ خرید',
+ phase:'فاز فعلی',bb:'Bull-Bear',nupl:'NUPL',mvrv:'MVRV',sopr:'SOPR (جایگزین)',upd:'به‌روزرسانی',
+ plT:'قانون توان بیت‌کوین',scT:'چرخهٔ سبک (Style Cycle)',spT:'مارپیچ بیت‌کوین',spL:'هر دور = ۴ سال (یک چرخهٔ هاوینگ)، فاصله از مرکز = لگاریتم قیمت',
+ when:'زمان',ind:'اندیکاتور',sym:'نماد',side:'جهت',what:'رویداد',at:'قیمت',res:'نتیجه',long:'صعودی',short:'نزولی',info:'اطلاع',
+ entry:'ورود',exit:'خروج',partial:'خروج بخشی',state:'تغییر وضعیت',none:'هنوز سیگنالی ثبت نشده است.',relayOff:'سیگنال‌های لحظه‌ای استراتژی‌های دعوتی از طریق هشدارهای TradingView نویسنده در حال راه‌اندازی است و به‌محض فعال‌شدن، اینجا و در کانال سیگنال‌ها نمایش داده می‌شود. تا آن زمان سیگنال‌های اندیکاتورهای زنده (محاسبهٔ سرور) نمایش داده می‌شوند.',
+ statN:'تعداد',statW:'درصد مثبت',statA:'میانگین',hz:'افق',back:'← همهٔ اندیکاتورها',how:'چطور کار می‌کند',acc:'دسترسی',accInv:'این اسکریپت دعوتی است؛ برای دسترسی به کانال تلگرام Coin_Kurd پیام دهید.',accOpen:'متن‌باز و رایگان؛ کد آن در TradingView قابل مشاهده است.',
+ chart:'چارت تصویر',src:'منبع: گزارش استراتژی (Strategy report) همان چارت انتشار در TradingView، ۱۱ آبان ۱۴۰۵. نتیجهٔ گذشته تضمین آینده نیست.',sigsOf:'سیگنال‌های این اندیکاتور',open:'باز',done:'کامل',mfe:'بیشترین سود',mae:'بیشترین افت',
+ zone_buy_zone:'منطقهٔ خرید عمیق',zone_below_lower:'زیر باند پایین',zone_lower_fair:'زیر ارزش منصفانه',zone_fair_upper:'بالای ارزش منصفانه',zone_above_upper:'بالای باند بالا (کشیده)',
+ ph_0:'خرسی شدید',ph_1:'خرسی',ph_2:'گاوی اولیه',ph_3:'گاوی',ph_4:'گاوی داغ',chk:'راستی‌آزمایی',chkPL:'ارزش منصفانهٔ ۱۹ ژوئیه ۲۰۲۶ در این موتور: {v} دلار — روی چارت انتشار TradingView: ۶۰٬۲۱۴ دلار.',
+ mini:'نمودار سیگنال روی کندل‌های واقعی Binance',more:'نمایش بیشتر',fut:'پیش‌بینی مدل',tch:'کف لمس سالانه'});
+Object.assign(I.ckb,{h1:'ئیندیکاتۆرە تایبەتەکانی <em>Coin_Kurd</em>',lead:'هەموو ئیندیکاتۆر و ستراتیژییە بڵاوکراوەکانی Coin_Kurd لە TradingView — بە وێنەی خودی نووسەر، ڕوونکردنەوە، ئەنجامی backtest و سیگناڵەکانیان؛ سێ ئیندیکاتۆری سەرچاوە-کراوە ئێستا لەسەر سێرڤەری entekhab.net بە داتای ڕاستەقینە کار دەکەن.',
+ liveTag:'LIVE',liveT:'جێبەجێکردنی زیندوو لەسەر entekhab.net',liveL:'کۆدی سەرچاوە-کراوەی ئەم سێ ئیندیکاتۆرە هێڵ بە هێڵ لەسەر داتای ڕاستەقینە کار دەکات (Coin Metrics و Binance، هەر ٣ کاتژمێر).',
+ libTag:'TV',libT:'کتێبخانەی ئیندیکاتۆرەکان',libL:'کرتە لەسەر وێنە بکە بۆ گەورەکردن؛ «وردەکاری» پەڕەی تەواوی هەر ئیندیکاتۆرێک لەگەڵ سیگناڵەکانی دەکاتەوە.',
+ sigTag:'SIG',sigT:'سیگناڵەکان و ئەنجامی ڕاستەقینەیان',sigL:'هەر سیگناڵێک بە نرخی ساتی دەرچوون تۆمار دەکرێت و دواتر ئەنجامەکەی لەسەر مۆمی ڕاستەقینەی Binance دەپێورێت — سەرکەوتوو و ناسەرکەوتوو، هەمووی نیشان دەدرێت. کرتە لە هەر ڕیزێک بکە بۆ چارتەکەی.',
+ howT:'سیگناڵەکان لە کوێوە دێن؟',h1T:'١) ژمێریاری لەسەر سێرڤەری entekhab.net',h1B:'بۆ ئیندیکاتۆرە سەرچاوە-کراوەکان (یاسای توان، خولی ستایل، پێچ) هەمان کۆدی بڵاوکراوە بە هەمان ڕێکخستنی بنەڕەت لەسەر داتای ڕاستەقینە کار دەکات؛ گۆڕانی دۆخ تەنها دوای ٣ داخرانی ڕۆژانەی یەک لە دوای یەک وەک سیگناڵ دەژمێردرێت.',
+ h2T:'٢) ئاگادارکردنەوەکانی خودی TradingView',h2B:'بۆ ستراتیژییە داخراوەکان (invite-only) سیگناڵەکان ڕاستەوخۆ لە ئاگادارکردنەوەکانی هەژماری TradingViewی نووسەرەوە دێن: ئاگادارکردنەوە ← وێبهووک ← کەناڵی تێلێگرامی سیگناڵەکان ← ئەم پەڕەیە. واتە هەمان ئەو سیگناڵەی TradingView دەری کردووە.',
+ honest:'⚠️ بە ڕاستگۆیی: backtestەکان هی چارتی بڵاوکردنەوەی هەر ستراتیژییەکن لە TradingView و گەرەنتی داهاتوو نین. سیگناڵەکان فێرکارین و ئامۆژگاریی دارایی نین؛ ئەنجامی هەر سیگناڵێک (تەنانەت زیانبار) لێرە دەمێنێتەوە.',
+ nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',all:'هەموو',det:'وردەکاری',tv:'TradingView ↗',strategy:'ستراتیژی',indicator:'ئیندیکاتۆر','invite-only':'بانگهێشتی','open-source':'سەرچاوە-کراوە',live:'زیندوو لە ماڵپەڕ',
+ bt:'backtestی چارتی بڵاوکردنەوە',pnl:'قازانجی گشتی',dd:'گەورەترین دابەزین',win:'مامەڵەی قازانجدار',pf:'فاکتەری قازانج',n:'ئیندیکاتۆر',ns:'ستراتیژی',no:'سەرچاوە-کراوە',nl:'زیندوو',n30:'سیگناڵی ٣٠ ڕۆژ',
+ fair:'بەهای دادپەروەرانە',price:'نرخی BTC',dev:'دووری لە بەهای دادپەروەرانە',zone:'دۆخ',upper:'باندی سەرەوە',lower:'باندی خوارەوە',buyb:'سنووری ناوچەی کڕین',
+ phase:'قۆناغی ئێستا',bb:'Bull-Bear',nupl:'NUPL',mvrv:'MVRV',sopr:'SOPR (جێگرەوە)',upd:'نوێکردنەوە',
+ plT:'یاسای توانی بیتکۆین',scT:'خولی ستایل (Style Cycle)',spT:'پێچی بیتکۆین',spL:'هەر خولێک = ٤ ساڵ (یەک خولی هاڵڤینگ)، دووری لە ناوەند = لۆگاریتمی نرخ',
+ when:'کات',ind:'ئیندیکاتۆر',sym:'هێما',side:'ئاراستە',what:'ڕووداو',at:'نرخ',res:'ئەنجام',long:'بەرزبوونەوە',short:'دابەزین',info:'زانیاری',
+ entry:'چوونەژوورەوە',exit:'دەرچوون',partial:'دەرچوونی بەشی',state:'گۆڕانی دۆخ',none:'هێشتا هیچ سیگناڵێک تۆمار نەکراوە.',relayOff:'سیگناڵە زیندووەکانی ستراتیژییە بانگهێشتییەکان لە ڕێگەی ئاگادارکردنەوەکانی TradingViewی نووسەرەوە ئامادە دەکرێن و هەر کە چالاک بوون لێرە دەردەکەون. تا ئەو کاتە سیگناڵی ئیندیکاتۆرە زیندووەکان (ژمێریاریی سێرڤەر) نیشان دەدرێن.',
+ statN:'ژمارە',statW:'ڕێژەی ئەرێنی',statA:'تێکڕا',hz:'ئاسۆ',back:'← هەموو ئیندیکاتۆرەکان',how:'چۆن کار دەکات',acc:'دەستگەیشتن',accInv:'ئەم سکریپتە بانگهێشتییە؛ بۆ دەستگەیشتن پەیام بنێرە بۆ کەناڵی تێلێگرامی Coin_Kurd.',accOpen:'سەرچاوە-کراوە و بەخۆڕایی؛ کۆدەکەی لە TradingView دەبینرێت.',
+ chart:'چارتی وێنە',src:'سەرچاوە: ڕاپۆرتی ستراتیژی (Strategy report)ی هەمان چارتی بڵاوکردنەوە لە TradingView، ٢ی تشرینی دووەمی ٢٠٢٦. ئەنجامی ڕابردوو گەرەنتی داهاتوو نییە.',sigsOf:'سیگناڵەکانی ئەم ئیندیکاتۆرە',open:'کراوە',done:'تەواو',mfe:'زۆرترین قازانج',mae:'زۆرترین دابەزین',
+ zone_buy_zone:'ناوچەی کڕینی قووڵ',zone_below_lower:'ژێر باندی خوارەوە',zone_lower_fair:'ژێر بەهای دادپەروەرانە',zone_fair_upper:'سەروو بەهای دادپەروەرانە',zone_above_upper:'سەروو باندی سەرەوە (کێشراو)',
+ ph_0:'ورچی توند',ph_1:'ورچ',ph_2:'گای سەرەتایی',ph_3:'گا',ph_4:'گای گەرم',chk:'پشتڕاستکردنەوە',chkPL:'بەهای دادپەروەرانەی ١٩ی تەممووزی ٢٠٢٦ لەم بزوێنەرەدا: {v} دۆلار — لەسەر چارتی بڵاوکراوەی TradingView: ٦٠٬٢١٤ دۆلار.',
+ mini:'چارتی سیگناڵ لەسەر مۆمی ڕاستەقینەی Binance',more:'زیاتر',fut:'پێشبینیی مۆدێل',tch:'بنی بەرکەوتنی ساڵانە'});
+Object.assign(I.en,{h1:'Coin_Kurd’s <em>exclusive</em> indicators',lead:'Every indicator and strategy Coin_Kurd has published on TradingView — with the author’s own chart, an explanation, backtest results and their signals; three open-source ones already run live on entekhab.net’s server with real data.',
+ liveTag:'LIVE',liveT:'Running live on entekhab.net',liveL:'The open-source code of these three indicators runs line by line on real data (Coin Metrics and Binance, every 3 hours).',
+ libTag:'TV',libT:'Indicator library',libL:'Tap an image to enlarge it; “Details” opens the full page of each indicator with its signals.',
+ sigTag:'SIG',sigT:'Signals and their real outcome',sigL:'Every signal is recorded with the price at the moment it fired; its outcome is measured later on real Binance candles — winners and losers alike. Tap a row to see its chart.',
+ howT:'Where do the signals come from?',h1T:'1) Computed on entekhab.net’s server',h1B:'For the open-source indicators (Power Law, Style Cycle, Spiral) the published code runs with its default inputs on real data; a state change becomes a signal only after 3 consecutive daily closes and is recorded at that day’s price.',
+ h2T:'2) TradingView’s own alerts',h2B:'For the closed (invite-only) strategies, signals come straight from the author’s TradingView alerts: alert → webhook → Telegram signals channel → this page. They are exactly the signals TradingView fired; none are added or removed by hand.',
+ honest:'⚠️ Honestly: backtests come from each strategy’s publication chart on TradingView and do not guarantee the future. Signals are educational, not financial advice; the outcome of every signal — losers included — stays on this page.',
+ nfa:'Educational, not financial advice',all:'All',det:'Details',tv:'TradingView ↗',strategy:'Strategy',indicator:'Indicator','invite-only':'Invite-only','open-source':'Open-source',live:'Live on site',
+ bt:'Publication-chart backtest',pnl:'Total P&L',dd:'Max drawdown',win:'Profitable trades',pf:'Profit factor',n:'Indicators',ns:'Strategies',no:'Open-source',nl:'Live engines',n30:'Signals · 30d',
+ fair:'Fair value',price:'BTC price',dev:'Distance from fair value',zone:'State',upper:'Upper band',lower:'Lower band',buyb:'Buy-zone threshold',
+ phase:'Current phase',bb:'Bull-Bear',nupl:'NUPL',mvrv:'MVRV',sopr:'SOPR (proxy)',upd:'Updated',
+ plT:'Bitcoin Power Law',scT:'Style Cycle',spT:'Bitcoin Spiral',spL:'one turn = 4 years (a halving cycle), distance from centre = log of price',
+ when:'Time',ind:'Indicator',sym:'Symbol',side:'Side',what:'Event',at:'Price',res:'Outcome',long:'Long',short:'Short',info:'Info',
+ entry:'Entry',exit:'Exit',partial:'Partial exit',state:'State change',none:'No signal recorded yet.',relayOff:'Live signals of the invite-only strategies come from the author’s TradingView alerts and are being connected; as soon as the relay is on they appear here and in the signals channel. Until then the live (server-computed) indicators’ signals are shown.',
+ statN:'Count',statW:'% positive',statA:'Average',hz:'Horizon',back:'← all indicators',how:'How it works',acc:'Access',accInv:'Invite-only script; message the Coin_Kurd Telegram channel for access.',accOpen:'Open-source and free; the code is visible on TradingView.',
+ chart:'Image chart',src:'Source: the TradingView “Strategy report” of the same publication chart, 2 Nov 2026. Past results do not guarantee the future.',sigsOf:'Signals of this indicator',open:'open',done:'done',mfe:'max favourable',mae:'max adverse',
+ zone_buy_zone:'Deep-value buy zone',zone_below_lower:'Below lower band',zone_lower_fair:'Below fair value',zone_fair_upper:'Above fair value',zone_above_upper:'Above upper band (stretched)',
+ ph_0:'Extreme Bear',ph_1:'Bear',ph_2:'Early Bull',ph_3:'Bull',ph_4:'Overheated Bull',chk:'Verification',chkPL:'Fair value on 19 Jul 2026 in this engine: ${v} — on the TradingView publication chart: $60,214.',
+ mini:'Signal chart on real Binance candles',more:'Show more',fut:'Model projection',tch:'Yearly touch floor'});
+
+const PHC = ['#1565C0', '#00BCD4', '#00C853', '#FF8C00', '#FF0000'], PHN = ['Extreme Bear', 'Bear', 'Early Bull', 'Bull', 'Overheated Bull'];
+const IND_ID = window.IND_ID || null;
+let IND = null, KIND = null, SIG = null, grp = '', sLim = 40;
+const tl = it => (it.t[lang] || it.t.en);
+const nm = id => (IND && IND.items.find(x => x.id === id) || {}).name || id;
+const dt = s => { try { return new Date(s).toLocaleString(lang === 'en' ? 'en-GB' : lang === 'ckb' ? 'ckb-IQ' : 'fa-IR', { year: '2-digit', month: 'short', day: 'numeric', hour: s.includes('T00:00:00') ? undefined : '2-digit', minute: s.includes('T00:00:00') ? undefined : '2-digit' }); } catch (e) { return s.slice(0, 10); } };
+const img = (it, big) => `/assets/tv-${it.tv}${big ? '' : '-sm'}.webp`;
+const phName = p => T('ph_' + PHN.indexOf(p)) || p;
+const stTxt = s => s.ind === 'kurdistani-style-cycle' ? `${phName(s.prev)} → <b>${phName(s.state)}</b>` : s.ind === 'kurdistani-power-law' ? `${T('zone_' + s.prev)} → <b>${T('zone_' + s.state)}</b>` : '';
+function cnv(c, h) { const r = window.devicePixelRatio || 1, w = c.clientWidth || c.parentElement.clientWidth || 600; c.width = w * r; c.height = h * r; c.style.height = h + 'px'; const x = c.getContext('2d'); x.scale(r, r); return [x, w, h]; }
+
+/* ---------- live engines ---------- */
+function drawPL(c, pl, H = 230) {
+  const [x, W] = cnv(c, H), s = (pl.series || []).filter(r => r[0] >= '2012-01-01'); if (!s.length) return;
+  const t0 = Date.parse(s[0][0]), t1 = Date.parse('2027-12-31'), lo = Math.log10(Math.min(...s.map(r => Math.min(r[1], r[2] * .9)))), hi = Math.log10(Math.max(...s.map(r => Math.max(r[1], r[2] * 1.1))) * 1.4);
+  const X = t => 34 + (t - t0) / (t1 - t0) * (W - 40), Y = v => 8 + (1 - (Math.log10(v) - lo) / (hi - lo)) * (H - 24);
+  x.font = '10px Space Grotesk'; x.fillStyle = '#6b6f76';
+  for (let p = Math.ceil(lo); p <= hi; p++) { x.strokeStyle = '#ffffff10'; x.beginPath(); x.moveTo(34, Y(10 ** p)); x.lineTo(W, Y(10 ** p)); x.stroke(); x.fillText(p >= 3 ? (10 ** (p - 3)) + 'k' : String(10 ** p), 2, Y(10 ** p) + 3); }
+  for (let y = 2013; y <= 2027; y += 2) { const xx = X(Date.parse(y + '-01-01')); x.fillText(String(y), xx - 12, H - 3); }
+  const fut = []; for (let t = Date.parse(s[s.length - 1][0]); t <= t1; t += 30 * 864e5) { const d = (t - Date.parse('2009-01-03')) / 864e5; fut.push([t, 8.31e-17 * d ** 5.48]); }
+  const all = s.map(r => [Date.parse(r[0]), r[2]]).concat(fut);
+  x.beginPath(); all.forEach(([t, v], i) => i ? x.lineTo(X(t), Y(v * 1.1)) : x.moveTo(X(t), Y(v * 1.1))); [...all].reverse().forEach(([t, v]) => x.lineTo(X(t), Y(v * .9))); x.closePath(); x.fillStyle = 'rgba(255,255,0,.07)'; x.fill();
+  [[1.1, '#ffff00'], [1, '#ff2a2a'], [.9, '#00ff00']].forEach(([k, col]) => { x.strokeStyle = col; x.lineWidth = k === 1 ? 2 : 1.2; x.beginPath(); all.forEach(([t, v], i) => i ? x.lineTo(X(t), Y(v * k)) : x.moveTo(X(t), Y(v * k))); x.stroke(); });
+  x.strokeStyle = '#e8e8e8'; x.lineWidth = 1.3; x.beginPath(); s.forEach((r, i) => i ? x.lineTo(X(Date.parse(r[0])), Y(r[1])) : x.moveTo(X(Date.parse(r[0])), Y(r[1]))); x.stroke();
+  const L = s[s.length - 1]; x.fillStyle = '#f7931a'; x.beginPath(); x.arc(X(Date.parse(L[0])), Y(pl.price), 4, 0, 7); x.fill();
+}
+function drawSC(c, sc, H = 230) {
+  const [x, W] = cnv(c, H), rows = sc.series || []; if (!rows.length) return;
+  const mx = Math.max(2, ...rows.map(r => Math.abs(r[1]))), Y = v => H / 2 - v / mx * (H / 2 - 14), bw = (W - 30) / rows.length;
+  x.font = '10px Space Grotesk'; x.fillStyle = '#6b6f76';
+  [[1.5, '#ff000066'], [0.5, '#ffffff22'], [0, '#22c55e88'], [-1.5, '#1565C099']].forEach(([v, col]) => { x.strokeStyle = col; x.setLineDash(v ? [4, 4] : []); x.beginPath(); x.moveTo(26, Y(v)); x.lineTo(W, Y(v)); x.stroke(); x.fillText(String(v), 0, Y(v) + 3); });
+  x.setLineDash([]);
+  rows.forEach((r, i) => { x.fillStyle = PHC[r[2]]; const y0 = Y(0), y1 = Y(r[1]); x.fillRect(26 + i * bw, Math.min(y0, y1), Math.max(1, bw), Math.abs(y1 - y0) || 1); });
+  let last = ''; rows.forEach((r, i) => { const yy = r[0].slice(0, 4); if (yy !== last && r[0].slice(5, 7) === '01') { x.fillStyle = '#6b6f76'; x.fillText(yy, 26 + i * bw, H - 2); last = yy; } });
+}
+function drawSpiral(c, sp, H = 330) {
+  const [x, W] = cnv(c, H), wk = sp.weekly || []; if (!wk.length) return;
+  const cx = W / 2, cy = H / 2, S = Math.min(W, H) / 2 / 410, LMIN = -3.1, LMAX = 6.15, RMIN = 18, RMAX = 400;
+  const dec = d => { const t = new Date(d + 'T00:00:00Z'), y = t.getUTCFullYear(), st = Date.UTC(y, 0, 1), en = Date.UTC(y + 1, 0, 1); return y + (t - st) / (en - st); };
+  const R = p => (RMIN + (Math.max(LMIN, Math.min(LMAX, Math.log10(p))) - LMIN) / (LMAX - LMIN) * (RMAX - RMIN)) * S;
+  const A = t => ((((t - 2009) % 4) + 4) % 4) / 4 * 2 * Math.PI, P = (t, p) => [cx + R(p) * Math.sin(A(t)), cy - R(p) * Math.cos(A(t))];
+  x.strokeStyle = '#ffffff12'; x.fillStyle = '#5f636a'; x.font = '9px Space Grotesk';
+  for (let l = -2; l <= 6; l++) { const r = R(10 ** l); x.beginPath(); x.arc(cx, cy, r, 0, 7); x.stroke(); if (l >= 0) x.fillText('$' + (l >= 3 ? 10 ** (l - 3) + 'k' : 10 ** l), cx + 3, cy - r - 2); }
+  for (let q = 0; q < 4; q++) { const a = q / 4 * 2 * Math.PI; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + 410 * S * Math.sin(a), cy - 410 * S * Math.cos(a)); x.stroke(); }
+  x.font = '11px Space Grotesk'; x.fillStyle = '#7d8189'; x.textAlign = 'center';
+  ["2009, '13, '17, '21, '25", "2010, '14, '18, '22, '26", "2011, '15, '19, '23, '27", "2012, '16, '20, '24, '28"].forEach((s, q) => { const a = q / 4 * 2 * Math.PI, r = 395 * S; x.fillText(s, cx + r * Math.sin(a) * (q % 2 ? .78 : 1), cy - r * Math.cos(a) + (q === 0 ? -2 : q === 2 ? 10 : 4)); });
+  x.textAlign = 'start'; x.shadowColor = '#f7931a'; x.shadowBlur = 8; x.strokeStyle = '#ffb347'; x.lineWidth = 1.6; x.beginPath();
+  wk.forEach((r, i) => { const [px, py] = P(dec(r[0]), r[1]); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke(); x.shadowBlur = 0;
+  const athPts = []; let m = 0; wk.forEach(r => { if (r[1] > m) { m = r[1]; athPts.push(r); } });
+  [2013.83, 2017.85, 2021.78, 2024.9, 2025.66].forEach(ts => { const r = athPts.filter(a => Math.abs(dec(a[0]) - ts) < .25).pop(); if (r) { const [px, py] = P(dec(r[0]), r[1]); x.fillStyle = '#3b6cff'; x.beginPath(); x.arc(px, py, 5, 0, 7); x.fill(); } });
+  (sp.halvings || []).forEach(h => { const r = wk.find(w => w[0] >= h); if (r) { const [px, py] = P(dec(r[0]), r[1]); x.strokeStyle = '#86efac'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, 6, 0, 7); x.stroke(); } });
+  [['2015-01-01', '2016-01-01'], ['2018-10-01', '2019-03-01'], ['2022-10-01', '2023-01-15']].forEach(([a, b]) => { const seg = wk.filter(w => w[0] >= a && w[0] <= b); if (!seg.length) return; const r = seg.reduce((m, w) => w[1] < m[1] ? w : m); const [px, py] = P(dec(r[0]), r[1]); x.fillStyle = '#e11d48'; x.save(); x.translate(px, py); x.rotate(Math.PI / 4); x.fillRect(-4, -4, 8, 8); x.restore(); });
+  const L = wk[wk.length - 1], [lx, ly] = P(dec(L[0]), L[1]); x.fillStyle = '#f7931a'; x.beginPath(); x.moveTo(lx, ly - 8); x.lineTo(lx + 7, ly + 5); x.lineTo(lx - 7, ly + 5); x.closePath(); x.fill();
+  x.fillStyle = '#e8e8e8'; x.font = '11px Space Grotesk'; x.fillText('$' + fm(L[1], 0), lx + 9, ly + 4);
+}
+function liveCards(only) {
+  const pl = KIND && KIND.power_law, sc = KIND && KIND.style_cycle, sp = KIND && KIND.spiral, upd = KIND ? `<p class="disc">${T('upd')}: ${dt(KIND.updated_at)} · Coin Metrics · Binance</p>` : '';
+  const out = [];
+  if (pl && (!only || only === 'kurdistani-power-law')) out.push(`<div class="card lc"><h3>📈 ${T('plT')} <a class="bdg l" href="/indicators/kurdistani-power-law/">${T('det')}</a></h3>
+    <div class="kv"><div><small>${T('fair')}</small><b>$${fm(pl.fair, 0)}</b></div><div><small>${T('price')}</small><b>$${fm(pl.price, 0)}</b></div><div><small>${T('dev')}</small><b>${sg(pl.dev_pct, 1)}</b></div><div><small>${T('zone')}</small><b style="font-family:inherit;font-size:.85rem">${T('zone_' + pl.zone)}</b></div></div>
+    <canvas id="cPL"></canvas><div class="kv"><div><small>${T('upper')}</small><b>$${fm(pl.upper, 0)}</b></div><div><small>${T('lower')}</small><b>$${fm(pl.lower, 0)}</b></div><div><small>${T('buyb')}</small><b>$${fm(pl.buy_below, 0)}</b></div></div>
+    ${only ? `<div class="kv">${Object.entries(pl.future || {}).map(([y, v]) => `<div><small>${T('fut')} ${y}</small><b>$${fm(v, 0)}</b></div>`).join('')}</div><p class="disc">${T('tch')}: ${(pl.touches || []).map(t => `${t[0]} $${fm(t[1], 0)}`).join(' · ')}</p><p class="disc">✅ ${T('chk')}: ${T('chkPL').replace('{v}', fm((pl.check || {})['2026-07-19'], 0))}</p>` : ''}${upd}</div>`);
+  if (sc && (!only || only === 'kurdistani-style-cycle')) { const k = PHN.indexOf(sc.phase); out.push(`<div class="card lc"><h3>🌀 ${T('scT')} <a class="bdg l" href="/indicators/kurdistani-style-cycle/">${T('det')}</a></h3>
+    <div class="kv"><div><small>${T('phase')}</small><b><span class="ph" style="background:${PHC[k]}">${phName(sc.phase)}</span></b></div><div><small>${T('bb')}</small><b>${fm(sc.bull_bear, 3)}</b></div><div><small>${T('nupl')}</small><b>${fm(sc.nupl, 3)}</b></div><div><small>${T('mvrv')}</small><b>${fm(sc.mvrv, 3)}</b></div></div>
+    <canvas id="cSC"></canvas><div class="row" style="margin-top:6px">${PHN.map((p, i) => `<span class="chip" style="border:1px solid ${PHC[i]};color:${PHC[i]}">${phName(p)}</span>`).join('')}</div>
+    ${only ? `<div class="kv"><div><small>PnL index (Z)</small><b>${fm(sc.pnl, 3)}</b></div><div><small>${T('sopr')}</small><b>${fm(sc.sopr, 3)}</b></div><div><small>BTC (Z-norm)</small><b>${fm(sc.price_z, 3)}</b></div><div><small>${T('upd')}</small><b style="font-size:.8rem">${esc(sc.date)}</b></div></div><p class="disc">${esc(sc.sources || '')}</p>` : ''}${upd}</div>`); }
+  if (sp && (!only || only === 'kurdistani-bitcoin-spiral')) out.push(`<div class="card lc"><h3>🌀 ${T('spT')} <a class="bdg l" href="/indicators/kurdistani-bitcoin-spiral/">${T('det')}</a></h3><p class="disc" style="margin:0">${T('spL')}</p><canvas id="cSP"></canvas>
+    <div class="row" style="margin-top:6px;font-size:.75rem;color:var(--mute)"><span style="color:#3b6cff">● ATH</span><span style="color:#e11d48">◆ bottom</span><span style="color:#86efac">○ halving</span><span style="color:#f7931a">▲ now</span></div>${upd}</div>`);
+  return out.join('');
+}
+function paintLive() { const pl = KIND && KIND.power_law, sc = KIND && KIND.style_cycle, sp = KIND && KIND.spiral; const big = !!IND_ID;
+  const a = document.getElementById('cPL'); if (a && pl) drawPL(a, pl, big ? 320 : 230);
+  const b = document.getElementById('cSC'); if (b && sc) drawSC(b, sc, big ? 300 : 230);
+  const c = document.getElementById('cSP'); if (c && sp) drawSpiral(c, sp, big ? 520 : 330); }
+
+/* ---------- library ---------- */
+function card(it) {
+  const t = tl(it), st = (SIG && SIG.stats && SIG.stats[it.id]) || {};
+  const thin = it.img.w / it.img.h > 2.2 || it.img.h > it.img.w;
+  return `<div class="ic"><a class="im" data-zoom="${it.id}"><img src="${img(it)}" alt="${esc(it.name)}" loading="lazy" ${thin ? 'class="ct"' : ''}></a><div class="bd">
+   <div><span class="bdg s">${T(it.kind)}</span><span class="bdg ${it.access === 'open-source' ? 'o' : ''}">${T(it.access)}</span>${it.engine === 'server' ? `<span class="bdg l">● ${T('live')}</span>` : ''}</div>
+   <h3>${esc(it.name)}</h3><p>${esc(t.sum)}</p>
+   ${it.bt ? `<div class="bt"><span>${T('pnl')} <b class="pos">${it.bt.pnl}</b></span><span>${T('win')} <b>${it.bt.win}</b></span><span>PF <b>${it.bt.pf}</b></span><span>DD <b class="neg">${it.bt.dd}</b></span></div>` : ''}
+   ${st.n ? `<div class="bt"><span>📡 ${st.n} · ${T('n30')} ${st.n30}</span>${st.win != null ? `<span>${T('statW')} ${st.h}: <b>${st.win}%</b></span>` : ''}</div>` : ''}
+   <div class="act"><a class="btn p" href="/indicators/${it.id}/">${T('det')}</a><a class="btn" href="${it.url}" target="_blank" rel="noopener">${T('tv')}</a></div></div></div>`;
+}
+function renderLib() {
+  const g = IND.groups; $('#flt').innerHTML = `<button data-g="" class="${grp ? '' : 'on'}">${T('all')} · ${IND.items.length}</button>` + Object.keys(g).map(k => `<button data-g="${k}" class="${grp === k ? 'on' : ''}">${esc(g[k][lang] || g[k].en)} · ${IND.items.filter(i => i.group === k).length}</button>`).join('');
+  $('#lib').innerHTML = IND.items.filter(i => (!grp || i.group === grp) && i.id !== IND_ID).map(card).join('');
+}
+
+/* ---------- signals ---------- */
+const HZ = s => s.tf === '1D' || s.tf === '1W' ? ['7d', '30d', '90d'] : ['6h', '24h', '72h'];
+function row(s) {
+  const o = s.out || {}, r = o.r || {}, what = s.kind === 'state' ? stTxt(s) : `${T(s.kind)}${s.order ? ' · ' + esc(s.order) : ''}${s.sl ? ` · SL ${fm(s.sl, 6)}` : ''}${s.tp ? ` · TP ${fm(s.tp, 6)}` : ''}`;
+  const res = s.kind === 'exit' ? '' : HZ(s).map(h => `<span class="oc"><i>${h}</i>${r[h] == null ? '—' : sg(r[h], 1)}</span>`).join(' ') + (o.trade ? ` <span class="oc"><i>trade</i>${sg(o.trade.r, 2)}</span>` : '') + (o.hit ? ` <span class="chip">${o.hit.toUpperCase()}</span>` : '');
+  return `<tr data-s="${esc(s.id)}"><td class="num" style="white-space:nowrap">${dt(s.t)}</td><td>${esc(nm(s.ind))}</td><td class="num">${esc((s.tv_sym || s.sym || '').replace(/^.*:/, ''))} · ${esc(s.tf || '')}</td>
+   <td><span class="sd ${s.side}">${s.side === 'long' ? '▲ ' : s.side === 'short' ? '▼ ' : ''}${T(s.side)}</span></td><td>${what}</td><td class="num">${fm(s.price, s.price > 100 ? 0 : 4)}</td><td>${res}</td></tr>`;
+}
+function renderSigs() {
+  const list = (SIG && SIG.signals) || [], ids = [...new Set(list.map(s => s.ind))];
+  const si = $('#sInd'); if (!IND_ID) { const cur = si.value; si.innerHTML = `<option value="">${T('all')}</option>` + ids.map(i => `<option value="${esc(i)}">${esc(nm(i))}</option>`).join(''); si.value = cur; } else si.style.display = 'none';
+  const fi = IND_ID || si.value, fs = $('#sSide').value;
+  const all = list.filter(s => (!fi || s.ind === fi) && (!fs || s.side === fs)), L = all.slice(0, sLim);
+  const relayOff = !(SIG && SIG.relay && SIG.relay.channel);
+  const it = IND_ID && IND.items.find(x => x.id === IND_ID);
+  const note = relayOff && (!it || it.engine !== 'server') ? `<div class="empty" style="margin-bottom:10px">📡 ${T('relayOff')}</div>` : '';
+  $('#sigs').innerHTML = note + (L.length ? `<table class="sg"><tr><th>${T('when')}</th><th>${T('ind')}</th><th>${T('sym')}</th><th>${T('side')}</th><th>${T('what')}</th><th>${T('at')}</th><th>${T('res')}</th></tr>${L.map(row).join('')}</table>` + (all.length > L.length ? `<p style="text-align:center;margin-top:10px"><button class="btn" id="sMore">${T('more')} (${all.length - L.length})</button></p>` : '') : (note ? '' : `<div class="empty">${T('none')}</div>`));
+  const st = (SIG && SIG.stats) || {}, keys = Object.keys(st).filter(k => !fi || k === fi);
+  $('#stats').innerHTML = keys.length ? `<div class="kv">${keys.map(k => { const a = st[k]; return `<div><small>${esc(nm(k))}</small><b style="font-size:.85rem">${T('statN')} ${a.n} · ▲${a.long} ▼${a.short}${a.win != null ? ` · ${T('statW')} ${a.h} ${a.win}% · ${T('statA')} ${a.avg >= 0 ? '+' : ''}${a.avg}%` : ''}${a.trades ? ` · trades ${a.trades} (${a.twin}%)` : ''}</b></div>`; }).join('')}</div>` : '';
+}
+async function miniChart(s) {
+  const daily = s.tf === '1D' || s.tf === '1W', iv = daily ? '1d' : ({ '1h': '1h', '2h': '2h', '4h': '4h', '15m': '15m', '30m': '30m' }[s.tf] || '1h');
+  const ms = { '1d': 864e5, '4h': 144e5, '2h': 72e5, '1h': 36e5, '30m': 18e5, '15m': 9e5 }[iv], t0 = Date.parse(s.t);
+  $('#mbody').innerHTML = `<h3 style="margin-bottom:6px">${esc(nm(s.ind))} · ${esc(s.sym || '')} · ${esc(s.tf)} · <span class="sd ${s.side}">${T(s.side)}</span></h3><p class="disc" style="margin:0 0 8px">${T('mini')} · ${dt(s.t)} · ${s.kind === 'state' ? stTxt(s) : T(s.kind)}</p><canvas id="mc"></canvas><p class="disc">${s.msg ? `<a href="${esc(s.msg)}" target="_blank" rel="noopener">Telegram ↗</a>` : ''}</p>`;
+  $('#mod').hidden = false;
+  if (!s.sym) return;
+  const k = await j(`https://data-api.binance.vision/api/v3/klines?symbol=${s.sym}&interval=${iv}&startTime=${t0 - 60 * ms}&limit=130`);
+  const c = $('#mc'); if (!k || !k.length || !c) return;
+  const [x, W, H] = cnv(c, 340), hi = Math.max(...k.map(q => +q[2]), s.tp || 0), lo = Math.min(...k.map(q => +q[3]), s.sl || 1e18), bw = (W - 60) / k.length;
+  const Y = v => 10 + (hi - v) / (hi - lo || 1) * (H - 30), X = i => 4 + i * bw;
+  x.font = '10px Space Grotesk'; x.fillStyle = '#6b6f76'; for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4; x.fillText(fm(v, v > 100 ? 0 : 4), W - 54, Y(v) + 3); x.strokeStyle = '#ffffff0d'; x.beginPath(); x.moveTo(0, Y(v)); x.lineTo(W - 58, Y(v)); x.stroke(); }
+  k.forEach((q, i) => { const o = +q[1], h = +q[2], l = +q[3], cl = +q[4], up = cl >= o; x.strokeStyle = x.fillStyle = up ? '#22c55e' : '#ef4444'; x.beginPath(); x.moveTo(X(i) + bw / 2, Y(h)); x.lineTo(X(i) + bw / 2, Y(l)); x.stroke(); x.fillRect(X(i) + bw * .15, Math.min(Y(o), Y(cl)), bw * .7, Math.max(1, Math.abs(Y(o) - Y(cl)))); });
+  const si = k.findIndex(q => +q[0] >= t0 - (daily ? 0 : ms)), ix = si < 0 ? k.length - 1 : si;
+  const line = (v, col, lab) => { if (!v) return; x.strokeStyle = col; x.setLineDash([5, 4]); x.beginPath(); x.moveTo(X(ix), Y(v)); x.lineTo(W - 58, Y(v)); x.stroke(); x.setLineDash([]); x.fillStyle = col; x.fillText(lab, X(ix) + 4, Y(v) - 3); };
+  line(s.price, '#f7931a', T('at') + ' ' + fm(s.price, s.price > 100 ? 0 : 4)); line(s.sl, '#ef4444', 'SL'); line(s.tp, '#22c55e', 'TP');
+  x.fillStyle = s.side === 'short' ? '#ef4444' : s.side === 'long' ? '#22c55e' : '#f7931a'; const px = X(ix) + bw / 2, py = Y(s.price);
+  x.beginPath(); if (s.side === 'short') { x.moveTo(px, py - 14); x.lineTo(px - 7, py - 26); x.lineTo(px + 7, py - 26); } else { x.moveTo(px, py + 14); x.lineTo(px - 7, py + 26); x.lineTo(px + 7, py + 26); } x.closePath(); x.fill();
+}
+
+/* ---------- detail ---------- */
+function renderDetail() {
+  const it = IND.items.find(x => x.id === IND_ID), D = $('#detail'); if (!it) { D.hidden = true; return; }
+  const t = tl(it); D.hidden = false;
+  $('.hero h1').innerHTML = esc(it.name); $('.hero p').innerHTML = `${esc((IND.groups[it.group] || {})[lang] || '')} — ${T(it.kind)} · ${T(it.access)} · Coin_Kurd / TradingView`; $('#pulse').hidden = true;
+  D.innerHTML = `<p><a class="btn" href="/indicators/">${T('back')}</a></p>
+   <div style="margin:12px 0"><span class="bdg s">${T(it.kind)}</span><span class="bdg ${it.access === 'open-source' ? 'o' : ''}">${T(it.access)}</span>${it.engine === 'server' ? `<span class="bdg l">● ${T('live')}</span>` : ''}<span class="bdg">${T('chart')}: ${esc(it.chart)}</span></div>
+   <div class="det"><div class="big"><img src="${img(it, true)}" alt="${esc(it.name)} — TradingView chart by Coin_Kurd" data-zoom="${it.id}" width="${it.img.w}" height="${it.img.h}"></div>
+   <div><p style="font-size:1rem;line-height:2">${esc(t.sum)}</p><h3 style="margin-top:14px">${T('how')}</h3><ul>${t.how.map(h => `<li>${esc(h)}</li>`).join('')}</ul>
+   ${it.bt ? `<div class="card" style="margin-top:12px"><h3>${T('bt')} · <span class="num" style="font-size:.85rem">${esc(it.chart)}</span></h3><div class="kv"><div><small>${T('pnl')}</small><b class="pos">${it.bt.pnl}</b></div><div><small>${T('dd')}</small><b class="neg">${it.bt.dd}</b></div><div><small>${T('win')}</small><b>${it.bt.win}</b><small>${it.bt.trades}</small></div><div><small>${T('pf')}</small><b>${it.bt.pf}</b></div></div><p class="disc">${T('src')}</p></div>` : ''}
+   <p class="disc" style="margin-top:10px"><b>${T('acc')}:</b> ${it.access === 'open-source' ? T('accOpen') : T('accInv')}</p>
+   <div class="row" style="margin-top:10px"><a class="btn p" href="${it.url}" target="_blank" rel="noopener">${T('tv')}</a><a class="btn" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">Telegram</a><button class="btn" id="shr">↗ share</button></div></div></div>
+   ${it.engine === 'server' ? `<div style="margin-top:16px">${liveCards(it.id)}</div>` : ''}`;
+  const b = $('#shr'); if (b) b.onclick = () => share(`${it.name} — ${t.sum.slice(0, 120)}…`, location.href);
+  $('#sigS h2 b').textContent = T('sigsOf');
+}
+
+function render() {
+  if (!IND) return;
+  const items = IND.items, st = (SIG && SIG.stats) || {};
+  $('#pulse').innerHTML = [[T('n'), items.length], [T('ns'), items.filter(i => i.kind === 'strategy').length], [T('no'), items.filter(i => i.access === 'open-source').length], [T('nl'), items.filter(i => i.engine === 'server').length], [T('n30'), Object.values(st).reduce((a, b) => a + (b.n30 || 0), 0)]].map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
+  if (IND_ID) { renderDetail(); $('#liveS').hidden = true; } else $('#live').innerHTML = liveCards();
+  renderLib(); renderSigs(); paintLive();
+}
+document.addEventListener('click', e => {
+  const z = e.target.closest('[data-zoom]'); if (z && IND) { e.preventDefault(); const it = IND.items.find(x => x.id === z.dataset.zoom); $('#mbody').innerHTML = `<h3 style="margin-bottom:8px">${esc(it.name)}</h3><img src="${img(it, true)}" alt="${esc(it.name)}"><p class="disc">${esc(it.chart)} · © Coin_Kurd / TradingView</p>`; $('#mod').hidden = false; return; }
+  const g = e.target.closest('#flt button'); if (g) { grp = g.dataset.g; renderLib(); return; }
+  const r = e.target.closest('tr[data-s]'); if (r && SIG) { const s = SIG.signals.find(x => x.id === r.dataset.s); if (s) miniChart(s); return; }
+  if (e.target.id === 'sMore') { sLim += 60; renderSigs(); return; }
+  if (e.target.id === 'mx' || e.target.id === 'mod') $('#mod').hidden = true;
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#mod').hidden = true; });
+$('#sInd').onchange = () => { sLim = 40; renderSigs(); }; $('#sSide').onchange = () => { sLim = 40; renderSigs(); };
+let rT = 0; addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(paintLive, 200); });
+uiLang(render);
+(async () => {
+  [IND, KIND, SIG] = await Promise.all([j('/data/indicators.json' + V()), j('/data/kind.json' + V()), j('/data/signals.json' + V())]);
+  if (!IND) { $('#lib').innerHTML = '<p class="disc">—</p>'; return; }
+  render();
+  if (location.hash === '#signals' || window.IND_TAB === 'signals') document.getElementById('sigS').scrollIntoView();
+})();
+</script>
+</body>
+</html>
