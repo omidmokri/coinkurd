@@ -32,6 +32,7 @@ import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
+import bot_hub as HB  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
@@ -292,7 +293,8 @@ def kb_main(lang):
         [b("b_posts", "m:posts"), b("b_track", "m:track")],
         [b("b_ind", "m:ind"), b("b_alerts", "m:alerts")],
         [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
-        [b("b_proxy", "m:proxy"), btn(t("b_site", lang), url=D.SITE)],
+        [b("b_predict", "m:predict"), b("b_proxy", "m:proxy")],
+        [btn(t("b_site", lang), url=D.SITE)],
     ]
     return {"inline_keyboard": rows}
 
@@ -408,6 +410,11 @@ def render(s, uid, key):
             log.exception("proxy section failed")
             text, rows = (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), []
         kb = kb_back(lang, refresh="m:proxy")
+        kb["inline_keyboard"] = rows + kb["inline_keyboard"]
+        return text, kb
+    if key == "predict":
+        text, rows = HB.section(s, uid)
+        kb = kb_back(lang, refresh="m:predict", more=D.SITE + "/predict/")
         kb["inline_keyboard"] = rows + kb["inline_keyboard"]
         return text, kb
     if key == "lab":
@@ -823,6 +830,12 @@ def handle_callback(s, cb):
     lang = x["lang"]
     ans = lambda text=None, alert=False: tg("answerCallbackQuery", callback_query_id=cb["id"],
                                             **({"text": text, "show_alert": alert} if text else {}))
+    if data.startswith("pv:"):                       # prediction vote (bot menu or the channel post)
+        _, rid, opt = data.split(":")
+        ans(HB.vote(s, cb["from"], rid, opt), True)
+        if cb["message"]["chat"].get("type") == "private":
+            return edit(chat_id, mid, *render(s, uid, "predict"))
+        return None
     if data == "check":
         if is_member(uid):
             ans(t("verified", lang))
@@ -975,6 +988,7 @@ def main():
     F.start(s, group_send, group_delete, GROUP, MAIN_WT)
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
+    HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS

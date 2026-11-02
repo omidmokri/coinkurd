@@ -775,6 +775,94 @@ def build_feeds():
     print(f"feed pages: {len(urls)}")
     return urls
 
+LWC = '<script src="/assets/vendor/lightweight-charts.js"></script>'
+CHART_JS = """<script>
+function ekChart(id, rows, opt){var el=document.getElementById(id); if(!el||!window.LightweightCharts||!rows.length) return;
+ var c=LightweightCharts.createChart(el,{height:opt.h||300,layout:{background:{color:'transparent'},textColor:'#9a9a94',fontFamily:'Vazirmatn'},
+  grid:{vertLines:{color:'rgba(255,255,255,.05)'},horzLines:{color:'rgba(255,255,255,.05)'}},rightPriceScale:{borderVisible:false},
+  timeScale:{borderVisible:false},handleScroll:false,handleScale:false});
+ var s=opt.hist?c.addHistogramSeries({color:opt.color||'#f7931a'}):c.addLineSeries({color:opt.color||'#f7931a',lineWidth:3});
+ s.setData(rows); if(opt.zero){s.createPriceLine({price:0,color:'rgba(255,255,255,.35)',lineWidth:1,lineStyle:2});}
+ c.timeScale().fitContent(); new ResizeObserver(function(){c.applyOptions({width:el.clientWidth});}).observe(el);}
+</script>"""
+
+
+def _box(inner):
+    return f'<div style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;background:var(--card)">{inner}</div>'
+
+
+def _short(a):
+    return (a[:6] + "…" + a[-4:]) if a and len(a) > 14 else (a or "—")
+
+
+def build_hub():
+    """/sentiment/ /predict/ /whales/ — data produced by the Telegram bot (bot_hub.py)"""
+    urls = []
+    # ---------------- sentiment
+    d = load("sentiment.json", {})
+    now = d.get("now")
+    col = "#22c55e" if (now or 0) >= 12 else "#ef4444" if (now or 0) <= -12 else "#eab308"
+    pos = 50 + (now or 0) / 2
+    gauge = (f'<div style="font-size:52px;font-weight:900;color:{col}">{"—" if now is None else f"{now:+.0f}"}</div>'
+             f'<div style="font-size:22px;font-weight:700">{e(d.get("label", "بدون داده"))}</div>'
+             f'<div style="position:relative;height:14px;border-radius:7px;margin:14px 0;background:linear-gradient(90deg,#ef4444,#eab308,#22c55e)" dir="ltr">'
+             f'<span style="position:absolute;top:-6px;left:calc({pos:.0f}% - 4px);width:8px;height:26px;border-radius:4px;background:#fff"></span></div>'
+             f'<small class="note">بر پایهٔ {d.get("n24", 0)} خبر و تحلیل ۲۴ ساعت گذشته · از ۱۰۰- (خیلی نزولی) تا ۱۰۰+ (خیلی صعودی)</small>')
+    coins = "".join(f'<div class="kpi"><small>{e(c)}</small><b style="color:{"#22c55e" if v["v"] >= 12 else "#ef4444" if v["v"] <= -12 else "#eab308"}">{v["v"]:+.0f}</b><small>{e(v["label"])} · {v["n"]} خبر</small></div>'
+                    for c, v in (d.get("coins") or {}).items())
+    rows = json.dumps([{"time": h["d"], "value": h["v"]} for h in d.get("history", [])])
+    items = "".join(f'<li style="margin:8px 0"><b style="color:{"#22c55e" if x["score"] >= 12 else "#ef4444" if x["score"] <= -12 else "#eab308"}">{x["score"]:+d}</b> — {e(x["title"])}</li>'
+                    for x in d.get("items", [])[:20])
+    body = ('<div class="meta"><a href="/">خانه</a> / شاخص احساسات اخبار</div><h1>شاخص احساسات اخبار انتخاب</h1>'
+            '<p class="note">هوش مصنوعی هر خبر، تحلیل آنچین و پروندهٔ کوین کورد را از نظر اثر بر بازار نمره می‌دهد؛ میانگین ۲۴ ساعت، حس و حال اخبار امروز بازار است</p>'
+            + _box(gauge) + (f'<h2>به تفکیک ارز</h2><div class="grid">{coins}</div>' if coins else "")
+            + '<h2>روند روزانهٔ شاخص</h2><div id="sentc" style="width:100%"></div>'
+            + (f'<h2>خبرهای ۲۴ ساعت اخیر و نمرهٔ آن‌ها</h2><ul class="txt">{items}</ul>' if items else "")
+            + f'<p class="note">به‌روزرسانی {fmt_date(d.get("updated_at", ""))} · آموزشی است، توصیهٔ مالی نیست</p>'
+            + LWC + CHART_JS + f"<script>ekChart('sentc',{rows},{{zero:true,h:280}});</script>")
+    urls.append(page("sentiment/", "شاخص احساسات اخبار کریپتو امروز", "شاخص اختصاصی انتخاب: حس و حال اخبار امروز بازار کریپتو، صعودی یا نزولی، به تفکیک بیت‌کوین و اتریوم", body))
+    # ---------------- predictions
+    d = load("predict.json", {})
+    cards = []
+    for r in d.get("rounds", [])[:12]:
+        n = r.get("n") or 0
+        bars = "".join(f'<div style="margin:6px 0">{e(o)} — {round(100 * c / n) if n else 0}٪<div style="height:8px;border-radius:4px;background:var(--line)"><div style="height:8px;border-radius:4px;background:var(--acc);width:{round(100 * c / n) if n else 0}%"></div></div></div>'
+                       for o, c in zip(r.get("opts", []), r.get("tally", [])))
+        res = (f'<p>🏁 نتیجه: <b>{e(r["opts"][r["result"]])}</b> · قیمت نهایی {r["final"]:,.0f} دلار</p>' if r.get("result") is not None
+               else f'<p class="note">رأی‌گیری تا {e(r["close"][:16].replace("T", " "))} به وقت جهانی · <a href="https://t.me/Kurd_kurdistan_bot">رأی بده در ربات</a></p>')
+        cards.append(_box(f'<small class="note">{"هفتگی" if r["kind"] == "weekly" else "روزانه"} · قیمت هنگام طرح {r["ref"]:,.0f} دلار · {n} شرکت‌کننده</small>'
+                          f'<h3>{e(r["q"])}</h3>{bars}{res}'))
+    top = "".join(f'<tr><td>{i}</td><td>{e(x["name"])}</td><td>{x["pts"]}</td><td>{x["ok"]} از {x["n"]}</td></tr>' for i, x in enumerate(d.get("top", []), 1))
+    body = ('<div class="meta"><a href="/">خانه</a> / بازی پیش‌بینی</div><h1>بازی پیش‌بینی انتخاب</h1>'
+            '<p class="note">هر روز یک سؤال و هر هفته یک سؤال بزرگ دربارهٔ قیمت بیت‌کوین؛ در ربات کوین کورد رأی بده، پاسخ درست روزانه ۳ و هفتگی ۱۰ امتیاز دارد. بازی با امتیاز است و پولی در کار نیست</p>'
+            + ("".join(cards) or '<p class="note">اولین سؤال به‌زودی</p>')
+            + (f'<h2>🏆 جدول برترین‌ها</h2><table class="txt" style="width:100%"><tr><th>#</th><th>نام</th><th>امتیاز</th><th>درست</th></tr>{top}</table>' if top else "")
+            + f'<p class="note">به‌روزرسانی {fmt_date(d.get("updated_at", ""))}</p>')
+    urls.append(page("predict/", "بازی پیش‌بینی قیمت بیت‌کوین", "هر روز و هر هفته قیمت بیت‌کوین را پیش‌بینی کن، امتیاز بگیر و در جدول برترین‌های انتخاب بالا برو", body))
+    # ---------------- whales
+    d = load("whales.json", {})
+    names = {"BTC": "بیت‌کوین", "ETH": "اتریوم", "USDT": "تتر", "USDC": "یو‌اس‌دی‌سی"}
+    exp = {"BTC": "https://mempool.space/tx/", "ETH": "https://etherscan.io/tx/", "USDT": "https://etherscan.io/tx/", "USDC": "https://etherscan.io/tx/"}
+    kpis = "".join(f'<div class="kpi"><small>{names.get(a, a)} · ۲۴ ساعت</small><b>{v["n"]} انتقال</b><small>{v["amount"]:,.0f} {a} · ${v["usd"] / 1e6:,.0f}M</small></div>'
+                   for a, v in (d.get("totals24") or {}).items())
+    hrs = json.dumps([{"time": int(datetime.fromisoformat(h["h"] + ":00:00+00:00").timestamp()), "value": round(h["usd"] / 1e6, 1)} for h in d.get("hourly", [])])
+    rows_ = "".join(f'<tr><td>{fmt_date(x["at"])}</td><td><b>{x["amount"]:,.0f} {e(x["asset"])}</b><br><small class="note">${x["usd"] / 1e6:,.1f}M</small></td>'
+                    f'<td dir="ltr"><small>{e(_short(x.get("from", "")))} → {e(_short(x.get("to", "")))}</small></td>'
+                    f'<td><a href="{exp.get(x["asset"], "#")}{e(x["tx"])}" target="_blank" rel="noopener">مشاهده</a></td></tr>' for x in d.get("events", [])[:60])
+    m = d.get("min", {})
+    body = ('<div class="meta"><a href="/">خانه</a> / رادار نهنگ‌ها</div><h1>رادار نهنگ‌های انتخاب</h1>'
+            f'<p class="note">انتقال‌های بزرگ روی زنجیره: بیت‌کوین از {m.get("BTC", 500):,} واحد، اتریوم از {m.get("ETH", 1000):,} واحد و تتر و یو‌اس‌دی‌سی از {m.get("stable", 10_000_000) / 1e6:,.0f} میلیون دلار. هر بلاک تازه بررسی می‌شود. '
+            'توجه: بخشی از این انتقال‌ها جابه‌جایی داخلی صرافی‌هاست و هر انتقال بزرگ لزوماً خرید یا فروش نیست</p>'
+            + (f'<div class="grid">{kpis}</div>' if kpis else "")
+            + '<h2>حجم انتقال‌های بزرگ در هر ساعت (میلیون دلار)</h2><div id="whc" style="width:100%"></div>'
+            + (f'<h2>آخرین انتقال‌ها</h2><div style="overflow-x:auto"><table class="txt" style="width:100%"><tr><th>زمان</th><th>مقدار</th><th>از ← به</th><th>تراکنش</th></tr>{rows_}</table></div>' if rows_ else '<p class="note">هنوز انتقال بزرگی ثبت نشده است</p>')
+            + f'<p class="note">به‌روزرسانی {fmt_date(d.get("updated_at", ""))}</p>'
+            + LWC + CHART_JS + f"<script>ekChart('whc',{hrs},{{hist:true,h:240}});</script>")
+    urls.append(page("whales/", "رادار نهنگ‌ها — انتقال‌های بزرگ بیت‌کوین، اتریوم و تتر", "رصد انتقال‌های بزرگ روی زنجیرهٔ بیت‌کوین، اتریوم، تتر و یو‌اس‌دی‌سی در ۲۴ ساعت گذشته", body))
+    print(f"hub pages: {len(urls)}")
+    return urls
+
+
 def build_seo_extra():
     """/fear-greed/ و /sectors/ — صفحات ثابت شاخص ترس و طمع و بخش‌های بازار با دادهٔ واقعی"""
     urls = []
@@ -1238,6 +1326,7 @@ if __name__ == "__main__":
     extra += build_indicators()
     extra += build_daily()
     extra += build_feeds()
+    extra += build_hub()
     extra += build_seo_extra()
     extra += build_learn()
     print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
