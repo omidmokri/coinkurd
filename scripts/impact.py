@@ -87,9 +87,27 @@ def evaluate(post, coin, bars):
     return res
 
 
+def btc_bench(btc, t0):
+    """BTC's own 24h move from the same hour — the benchmark for 'did the coin beat the market after the post?'"""
+    if not btc:
+        return None
+    h0 = int(t0 // 3600_000 * 3600_000)
+    i = btc["idx"].get(h0)
+    if i is None or i + 24 >= len(btc["bars"]):
+        return None
+    b = btc["bars"]
+    return round((b[i + 24]["c"] / b[i]["o"] - 1) * 100, 3)
+
+
 def main():
     posts = json.load(open(POSTS, encoding="utf-8"))
     data = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
+    try:
+        bb = klines("BTC", "1h", 1000)
+        btc = {"bars": bb, "idx": {x["t"]: i for i, x in enumerate(bb)}}
+    except Exception as e:  # noqa: BLE001
+        btc = None
+        print(f"btc benchmark unavailable: {e}", file=sys.stderr)
     cutoff = datetime.now(timezone.utc) - timedelta(days=DAYS)
     calls = 0
     for p in posts:
@@ -116,8 +134,17 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"{key} {coin}: {e}", file=sys.stderr)
         time.sleep(0.12)
+    # benchmark: BTC's move over the same 24h (no extra API calls — one BTC series covers ~40 days)
+    for v in data.values():
+        if v.get("coin") != "BTC" and v.get("r24h") is not None and v.get("btc_r24h") is None:
+            bm = btc_bench(btc, v["t0"])
+            if bm is not None:
+                v["btc_r24h"] = bm
     json.dump(data, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     sigs = [v for v in data.values() if v.get("signal")]
+    al = [v["r24h"] - v["btc_r24h"] for v in data.values() if v.get("btc_r24h") is not None]
+    if al:
+        print(f"alt posts vs BTC over 24h: n={len(al)} avg excess {sum(al) / len(al):+.2f}%")
     print(f"impact records={len(data)} api_calls={calls} signals={len(sigs)}")
 
 

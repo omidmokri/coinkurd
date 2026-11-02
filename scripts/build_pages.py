@@ -86,8 +86,8 @@ CSS = """:root{--bg:#0a0a0a;--ink:#f4f4f2;--mute:#9a9a94;--acc:#f7931a;--line:rg
 *{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--ink);font-family:Vazirmatn,system-ui,sans-serif,'Apple Color Emoji','Noto Color Emoji';line-height:1.9}
 a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
 .w{max-width:960px;margin:0 auto;padding:0 16px}header{border-bottom:1px solid var(--line);padding:16px 0;position:sticky;top:0;background:rgba(10,10,10,.9);backdrop-filter:blur(10px);z-index:5}
-header .w{display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-family:'Space Grotesk',monospace;font-weight:700;color:var(--ink)}.logo b{color:var(--acc)}
-nav a{color:var(--mute);margin-inline-start:16px;font-size:.9rem}main{padding:32px 0 60px}
+header .w{display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-family:'Space Grotesk',monospace;font-weight:700;color:var(--ink)}.lv-up{animation:lvu 1.2s ease-out}.lv-dn{animation:lvd 1.2s ease-out}@keyframes lvu{from{color:#22c55e}}@keyframes lvd{from{color:#ef4444}}.lvl{display:none;color:#22c55e;font-size:.7rem}html.live-on .lvl{display:inline}.logo{display:flex;align-items:center;gap:8px}.logo img{height:40px;width:auto;display:block}@media(max-width:640px){.logo span{display:none}}.logo b{color:var(--acc)}
+nav a{color:var(--mute);margin-inline-start:16px;font-size:.9rem}header nav{min-width:0}@media(max-width:760px){header .w{gap:10px}header nav{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}header nav::-webkit-scrollbar{display:none}nav a{margin-inline-start:12px;flex:none}}main{padding:32px 0 60px}
 h1{font-size:clamp(1.5rem,4vw,2.3rem);line-height:1.45;margin:10px 0 12px}h2{font-size:1.15rem;margin:34px 0 12px;color:var(--acc)}
 .meta{color:var(--mute);font-size:.85rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--ink)}
 .img{width:100%;border-radius:10px;margin:18px 0;display:block}.txt{font-size:1.02rem;margin:18px 0}
@@ -101,9 +101,9 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-si
 .coins a{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:4px;color:var(--ink);font-family:'Space Grotesk',monospace}"""
 
 
-NAVFA = '<a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a>'
-NAV_L = {"en": '<a href="/#feed">Archive</a><a href="/coins/">Coins</a><a href="/indicators/">📡 Indicators</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 Terminal</a><a href="https://t.me/Coin_Kurd" rel="noopener">Telegram</a>',
-         "ckb": '<a href="/#feed">ئەرشیڤ</a><a href="/coins/">دراوەکان</a><a href="/indicators/">📡 ئیندیکاتۆر</a><a href="/dna/">🧬 DNA</a><a href="https://t.me/Coin_Kurd" rel="noopener">تێلێگرام</a>'}
+NAVFA = '<a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/learn/">🎓 آموزش</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a>'
+NAV_L = {"en": '<a href="/#feed">Archive</a><a href="/coins/">Coins</a><a href="/indicators/">📡 Indicators</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 Terminal</a><a href="/learn/">🎓 Learn</a><a href="https://t.me/Coin_Kurd" rel="noopener">Telegram</a>',
+         "ckb": '<a href="/#feed">ئەرشیڤ</a><a href="/coins/">دراوەکان</a><a href="/indicators/">📡 ئیندیکاتۆر</a><a href="/dna/">🧬 DNA</a><a href="/learn/">🎓 فێربوون</a><a href="https://t.me/Coin_Kurd" rel="noopener">تێلێگرام</a>'}
 
 
 _BIGN = re.compile(r"[0-9۰-۹٠-٩][0-9۰-۹٠-٩,٬]{9,}(?:[.٫][0-9۰-۹٠-٩]+)?")
@@ -132,7 +132,18 @@ FOOT = {"fa": '© entekhab.net — داده‌ها به‌صورت خودکار 
         "en": '© entekhab.net — data is updated automatically from the <a href="https://t.me/Coin_Kurd">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me. Nothing here is financial advice.'}
 # "recently viewed" for /me/ — stored only in the visitor's own browser (localStorage), never sent anywhere
 RECENT_JS = ("try{var k='ek_recent',p=location.pathname,a=JSON.parse(localStorage.getItem(k)||'[]').filter(function(x){return x&&x.p!==p});"
-             "a.unshift({p:p,t:document.title.replace(/\\s*\\|\\s*entekhab\\.net\\s*$/i,''),at:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,30)))}catch(e){}")
+             "a.unshift({p:p,t:document.title.replace(/\\s*\\|\\s*entekhab\\.net\\s*$/i,''),at:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,30)))}catch(e){}"
+             "if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});"
+             # what-if box on post pages: value today of $100 bought at the moment of publication (live Binance price)
+             "document.querySelectorAll('[data-whatif]').forEach(function(el){var c=el.dataset.whatif,p0=+el.dataset.p0;if(!p0)return;"
+             "fetch('https://data-api.binance.vision/api/v3/ticker/price?symbol='+c+'USDT').then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||!d.price){el.hidden=true;return}"
+             "var v=100*d.price/p0,ch=(v-100);el.querySelector('b').innerHTML='$'+v.toFixed(2)+' <small class=\\''+(ch>=0?'up':'down')+'\\'>('+(ch>=0?'+':'')+ch.toFixed(2)+'%)</small>'}).catch(function(){el.hidden=true})});")
+
+
+ICONS = ('<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">'
+         '<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest">')
+OG_DEFAULT = (f'<meta property="og:image" content="{SITE}/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'
+              '<meta name="twitter:card" content="summary_large_image">')
 
 
 def page(path, title, desc, body, extra_head="", lang="fa"):
@@ -142,9 +153,9 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+{ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
+<header><div class="w"><a class="logo" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab<b>.net</b></span></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">{FOOT.get(lang, FOOT["fa"])}</div></footer><script>{RECENT_JS}</script></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -180,7 +191,9 @@ def impact_html(im):
         return "up" if v and v > 0 else "down" if v and v < 0 else ""
     cells = "".join(f'<div class="kpi"><small>{lbl}</small><b class="{cls(im.get(k))}">{"—" if im.get(k) is None else f"{im[k]:+.2f}%"}</b></div>'
                     for k, lbl in (("r1h", "۱ ساعت بعد"), ("r4h", "۴ ساعت بعد"), ("r24h", "۲۴ ساعت بعد"), ("mfe", "بیشترین رشد ۲۴h"), ("mae", "بیشترین افت ۲۴h")))
-    s = f'<h2>حرکت قیمت {e(im["coin"])} بعد از انتشار</h2><div class="grid"><div class="kpi"><small>قیمت لحظهٔ انتشار</small><b>{fmt_price(im["p0"])}</b></div>{cells}</div>'
+    wi = (f'<div class="kpi" data-whatif="{e(im["coin"])}" data-p0="{im["p0"]}"><small>۱۰۰ دلار خرید در لحظهٔ انتشار، ارزش امروز</small><b>…</b></div>'
+          if im.get("p0") and re.fullmatch(r"[A-Z0-9]{2,12}", im.get("coin") or "") and im["coin"] not in ("USDT", "USDC", "GOLD") else "")
+    s = f'<h2>حرکت قیمت {e(im["coin"])} بعد از انتشار</h2><div class="grid"><div class="kpi"><small>قیمت لحظهٔ انتشار</small><b>{fmt_price(im["p0"])}</b></div>{cells}{wi}</div>'
     if im.get("signal"):
         sg = im["signal"]
         res = {"tp1": "✅ هدف اول لمس شد", "stop": "❌ حد ضرر فعال شد", "open": "⏳ هنوز باز", "ambiguous": "⚠️ هدف و حد ضرر در یک کندل"}[sg["result"]]
@@ -209,7 +222,8 @@ def build_post(p):
         ic = lambda u: "👾 " if "discord" in u else "🎥 " if "youtu" in u else "📸 " if "instagram" in u else "💬 " if "twitter" in u or "x.com" in u else ""  # noqa: E731
         body += '<div class="social">' + "".join(f'<a href="{e(f["url"])}" rel="noopener" target="_blank">{ic(f["url"])}{e(f["label"])}</a>' for f in p["footer"]) + "</div>"
     body += impact_html(impact.get(str(p["id"])))
-    body += f'<p class="note"><a href="{e(p["url"])}">مشاهدهٔ این پست در تلگرام ↗</a> · <a href="/#p{p["id"]}">نمایش در آرشیو</a></p>'
+    body += (f'<p class="note"><a href="{e(p["url"])}">مشاهدهٔ این پست در تلگرام ↗</a> · <a href="/#p{p["id"]}">نمایش در آرشیو</a> · '
+             f'<a href="{GROUP}" rel="noopener" target="_blank">💬 گفتگو در گروه تلگرام Coin_Kurd</a></p>')
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"),
           "inLanguage": ["fa"] + [k for k in ("ckb", "en") if tr.get(k)], "image": [img] if img else [],
           "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
@@ -232,8 +246,11 @@ def alt_links(p):
     return "".join(f'<link rel="alternate" hreflang="{lg}" href="{u}">' for lg, u in alts) + f'<link rel="alternate" hreflang="x-default" href="{alts[0][1]}">'
 
 
-LBL_L = {"en": {"tg": "View this post on Telegram ↗", "fa": "Persian original", "arch": "Open in the archive", "nfa": "Educational, not financial advice."},
-         "ckb": {"tg": "بینینی ئەم پۆستە لە تێلێگرام ↗", "fa": "دەقی ئەسڵی فارسی", "arch": "کردنەوە لە ئەرشیڤ", "nfa": "فێرکارییە، ئامۆژگاریی دارایی نییە."}}
+GROUP = "https://t.me/Coin_Kurd_Group"
+LBL_L = {"en": {"tg": "View this post on Telegram ↗", "fa": "Persian original", "arch": "Open in the archive", "nfa": "Educational, not financial advice.",
+                "grp": "💬 Discuss in the Coin_Kurd Telegram group"},
+         "ckb": {"tg": "بینینی ئەم پۆستە لە تێلێگرام ↗", "fa": "دەقی ئەسڵی فارسی", "arch": "کردنەوە لە ئەرشیڤ", "nfa": "فێرکارییە، ئامۆژگاریی دارایی نییە.",
+                 "grp": "💬 گفتوگۆ لە گرووپی تێلێگرامی Coin_Kurd"}}
 
 
 def build_post_lang(p, lg):
@@ -250,7 +267,7 @@ def build_post_lang(p, lg):
     if img:
         body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy">'
     body += f'<div class="txt">{rich(t["text"])}</div>'
-    body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(p["url"])}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · {L["nfa"]}</p>'
+    body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(p["url"])}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
           "image": [img] if img else [], "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
           "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE}, "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
@@ -388,8 +405,8 @@ def build_coin(c, cposts):
     if m:
         tr = {"up": "صعودی", "down": "نزولی", "range": "خنثی / رنج"}[m["trend"]]
         ch = m.get("chg24")
-        body += f'''<div class="grid"><div class="kpi"><small>قیمت (هنگام ساخت صفحه)</small><b>{fmt_price(m["price"])}</b></div>
-<div class="kpi"><small>تغییر ۲۴ ساعته</small><b class="{"up" if (ch or 0) > 0 else "down"}">{"—" if ch is None else f"{ch:+.2f}%"}</b></div>
+        body += f'''<div class="grid"><div class="kpi"><small>قیمت <span class="lvl">زنده</span></small><b data-live="{c}">{fmt_price(m["price"])}</b></div>
+<div class="kpi"><small>تغییر ۲۴ ساعته</small><b class="{"up" if (ch or 0) > 0 else "down"}" data-livechg="{c}">{"—" if ch is None else f"{ch:+.2f}%"}</b></div>
 <div class="kpi"><small>RSI 14</small><b>{m["rsi"]}</b></div><div class="kpi"><small>روند (EMA20/50)</small><b>{tr}</b></div>
 <div class="kpi"><small>سقف ۴۸ ساعت</small><b>{fmt_price(m["hi48"])}</b></div><div class="kpi"><small>کف ۴۸ ساعت</small><b>{fmt_price(m["lo48"])}</b></div></div>
 <p class="note">به‌روزرسانی: {fmt_date(market.get("updated_at",""))} — منبع Binance. قیمت لحظه‌ای را در نمودار بالا ببینید.</p>'''
@@ -418,7 +435,8 @@ def build_coin(c, cposts):
         f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a><small>{fmt_date(p.get("date",""))} · {e(CATS.get(p["category"],{}).get("name",{}).get("fa",""))}</small></li>' for p in cposts[:60]) + "</ul>"
     desc = f"{name}: قیمت زنده، تحلیل تکنیکال، فرصت‌های اسکنر و {len(cposts)} مطلب مرتبط در entekhab.net"
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{name} ({c})", "about": {"@type": "Thing", "name": name}, "url": f"{SITE}/coins/{c.lower()}/"}
-    return page(f"coins/{c.lower()}/", f"{name} ({c}) — قیمت، تحلیل و اخبار", desc, body, f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>')
+    return page(f"coins/{c.lower()}/", f"{name} ({c}) — قیمت، تحلیل و اخبار", desc, body,
+                f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><script src="/assets/live.js" defer></script>')
 
 
 def main():
@@ -951,6 +969,165 @@ def build_indicators():
     return urls
 
 
+# ---------------------------------------------------------------- learning hub + glossary
+LANG_JS = ("(function(){var L;try{L=localStorage.getItem('ck_lang')}catch(e){}L=L||'fa';function ap(l){L=l;try{localStorage.setItem('ck_lang',l)}catch(e){}"
+           "document.documentElement.lang=l;document.documentElement.dir=l==='en'?'ltr':'rtl';"
+           "document.querySelectorAll('[data-lang]').forEach(function(e){e.hidden=e.dataset.lang!==l});"
+           "document.querySelectorAll('.lsw button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});"
+           "window.dispatchEvent(new CustomEvent('ek-lang',{detail:l}))}window.EKL=function(){return L};"
+           "document.querySelectorAll('.lsw').forEach(function(w){w.addEventListener('click',function(e){var b=e.target.closest('button');if(b)ap(b.dataset.l)})});ap(L)})();")
+LSW = '<div class="lsw"><button data-l="fa">فارسی</button><button data-l="ckb">کوردی</button><button data-l="en">English</button></div>'
+LEARN_CSS = (".lsw{display:flex;gap:6px;margin:6px 0 14px}.lsw button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 12px;cursor:pointer;font:inherit;font-size:.82rem}"
+             ".lsw button.on{background:var(--acc);border-color:var(--acc);color:#000;font-weight:800}"
+             ".gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin-top:12px}.gt{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card)}"
+             ".gt h3{margin:0 0 6px;font-size:1rem}.gt p{margin:0;color:#d6d6d0;font-size:.88rem;line-height:1.85}.gt a.more{font-size:.78rem}.gch{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}"
+             ".gch button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:4px 11px;cursor:pointer;font:inherit;font-size:.8rem}.gch button.on{border-color:var(--acc);color:var(--ink);background:rgba(247,147,26,.14)}"
+             "#gq{width:100%;max-width:520px;background:#000;border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit}"
+             ".lv{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:14px 0;background:var(--card)}.lv>h2{margin:0 0 8px}"
+             ".ls{border-top:1px solid var(--line);padding:10px 0}.ls summary{cursor:pointer;font-weight:700;list-style:none;display:flex;gap:8px;align-items:center}.ls summary::-webkit-details-marker{display:none}"
+             ".ls p{line-height:1.95;color:#dcdcd6}.ls .done{margin-inline-start:auto;font-size:.78rem;color:var(--mute)}.ls.read summary:before{content:'✅'}.ls:not(.read) summary:before{content:'📘'}"
+             ".chips a{display:inline-block;margin:2px;padding:2px 9px;border-radius:99px;background:#ffffff10;font-size:.78rem}"
+             ".qz{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}.qq{margin:10px 0}.qq label{display:block;margin:4px 0;cursor:pointer;font-size:.9rem}"
+             ".qq.ok{border-inline-start:3px solid #22c55e;padding-inline-start:8px}.qq.no{border-inline-start:3px solid #ef4444;padding-inline-start:8px}"
+             ".pbar{height:10px;border-radius:9px;background:#ffffff12;overflow:hidden;margin:8px 0}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#c86f00,#f7931a)}"
+             ".btn2{display:inline-block;background:var(--acc);color:#000;border:0;border-radius:99px;padding:8px 16px;font:inherit;font-weight:800;cursor:pointer}"
+             ".btn3{display:inline-block;background:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font:inherit;cursor:pointer}"
+             "#cert canvas{max-width:100%;border-radius:12px;margin-top:10px;border:1px solid var(--line)}")
+_ZW = re.compile("[‌‍‎‏]")
+
+
+def _norm(t):
+    return _ZW.sub("", (t or "").replace("ي", "ی").replace("ك", "ک")).lower()
+
+
+def _kw_re(kws):
+    parts = [re.escape(_norm(k)) for k in kws if k]
+    return re.compile(r"(?<![\w؀-ۿ])(?:" + "|".join(parts) + ")") if parts else None
+
+
+_PS = sorted(posts, key=lambda p: p.get("date") or "", reverse=True)
+
+
+def channel_examples(kws, n=5):
+    rx = _kw_re(kws)
+    if not rx:
+        return []
+    out = []
+    for p in _PS:                                     # newest first
+        if p.get("q") == "low" or p.get("kind") in ("promo", "notice"):
+            continue
+        if rx.search(_norm((p.get("title") or "") + " " + (p.get("text") or ""))):
+            out.append(p)
+            if len(out) >= n:
+                break
+    return out
+
+
+def build_learn():
+    """/glossary/, /glossary/<term>/ and /learn/ (learning path with quizzes and a local certificate)"""
+    import learn_data as LD
+    urls = []
+    G = {g[0]: g for g in LD.GLOSSARY}
+    def tri(fa, ckb, en, tag="span"):
+        return (f'<{tag} data-lang="fa">{fa}</{tag}><{tag} data-lang="ckb" hidden>{ckb}</{tag}>'
+                f'<{tag} data-lang="en" hidden dir="ltr">{en}</{tag}>')
+    # ---- term pages
+    for slug, grp, fat, fad, kt, kd, et, ed, kws in LD.GLOSSARY:
+        ex = channel_examples(kws)
+        rel = [g for g in LD.GLOSSARY if g[1] == grp and g[0] != slug][:8]
+        exh = ("<ul class=list>" + "".join(f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a> <small class="note">{fmt_date(p.get("date", ""))}</small></li>' for p in ex) + "</ul>"
+               if ex else '<p class="note">هنوز مثالی از این اصطلاح در آرشیو کانال پیدا نشد.</p>')
+        body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/glossary/">واژه‌نامه</a> / {e(LD.GROUPS[grp]["fa"])}</div>'
+                f'<h1>{e(fat)} <small class="note" dir="ltr">— {e(et)}</small></h1><p class="txt">{e(fad)}</p>'
+                f'<h2 lang="ckb">کوردی: {e(kt)}</h2><p class="txt" lang="ckb">{e(kd)}</p>'
+                f'<h2 dir="ltr" lang="en">English: {e(et)}</h2><p class="txt" dir="ltr" lang="en">{e(ed)}</p>'
+                f'<h2>نمونه‌هایی از کانال Coin_Kurd</h2>{exh}'
+                '<h2>اصطلاحات مرتبط</h2><p class="chips">' + "".join(f'<a href="/glossary/{g[0]}/">{e(g[2])}</a>' for g in rel) + '</p>'
+                '<p class="note"><a href="/learn/">🎓 مسیر یادگیری گام‌به‌گام</a> · <a href="/glossary/">همهٔ اصطلاحات</a> · آموزشی است، توصیهٔ مالی نیست.</p>')
+        ld = {"@context": "https://schema.org", "@type": "DefinedTerm", "name": fat, "alternateName": [et, kt], "description": fad,
+              "inDefinedTermSet": f"{SITE}/glossary/", "url": f"{SITE}/glossary/{slug}/"}
+        urls.append(page(f"glossary/{slug}/", f"{fat} ({et}) — معنی و توضیح ساده", fad[:155], body,
+                         f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{LEARN_CSS}</style>'))
+    # ---- glossary hub (interactive: search, group filter, language)
+    cards = "".join(
+        f'<div class="gt" data-g="{g[1]}" data-s="{e(_norm(" ".join([g[2], g[4], g[6], g[3]])))}"><h3><a href="/glossary/{g[0]}/">{tri(e(g[2]), e(g[4]), e(g[6]))}</a></h3>'
+        f'<p>{tri(e(g[3]), e(g[5]), e(g[7]))}</p><a class="more" href="/glossary/{g[0]}/">{tri("نمونه از کانال ←", "نموونە لە کەناڵ ←", "Channel examples →")}</a></div>'
+        for g in LD.GLOSSARY)
+    chips = '<button class="on" data-g="">' + tri("همه", "هەموو", "All") + "</button>" + "".join(
+        f'<button data-g="{k}">{tri(e(v["fa"]), e(v["ckb"]), e(v["en"]))}</button>' for k, v in LD.GROUPS.items())
+    hub = (f'<h1>{tri("واژه‌نامهٔ تعاملی کریپتو", "فەرهەنگی کارلێکەری کریپتۆ", "Interactive crypto glossary")}</h1>{LSW}'
+           f'<p class="txt">{tri(f"{len(LD.GLOSSARY)} اصطلاح ضروری بازار کریپتو به زبان ساده، به سه زبان — هر کدام با نمونه‌های واقعی از پست‌های کانال Coin_Kurd.", f"{len(LD.GLOSSARY)} زاراوەی پێویستی بازاڕی کریپتۆ بە زمانێکی سادە، بە سێ زمان — هەریەکە بە نموونەی ڕاستەقینە لە کەناڵی Coin_Kurd.", f"{len(LD.GLOSSARY)} essential crypto terms in plain language, in three languages — each with real examples from Coin_Kurd channel posts.")}</p>'
+           '<input id="gq" type="search" placeholder="🔎 جستجو… / Search…" autocomplete="off"><div class="gch" id="gch">' + chips + '</div>'
+           f'<div class="gl" id="gl">{cards}</div><p class="note" id="gn"></p><p class="note"><a href="/learn/">🎓 مسیر یادگیری</a> · آموزشی است، توصیهٔ مالی نیست.</p>')
+    gjs = ("(function(){var q=document.getElementById('gq'),G='';function nz(t){return (t||'').replace(/[\\u200c-\\u200f]/g,'').replace(/ي/g,'ی').replace(/ك/g,'ک').toLowerCase()}"
+           "function f(){var s=nz(q.value),n=0;document.querySelectorAll('.gt').forEach(function(c){var v=(!G||c.dataset.g===G)&&(!s||c.dataset.s.indexOf(s)>=0);c.hidden=!v;if(v)n++});document.getElementById('gn').textContent=n+' / " + str(len(LD.GLOSSARY)) + "'}"
+           "q.addEventListener('input',f);document.getElementById('gch').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;G=b.dataset.g;"
+           "document.querySelectorAll('#gch button').forEach(function(x){x.classList.toggle('on',x===b)});f()});f()})();")
+    urls.append(page("glossary/", "واژه‌نامهٔ تعاملی کریپتو — اصطلاحات بازار به زبان ساده", "اصطلاحات ضروری کریپتو و تحلیل تکنیکال به فارسی، کوردی و انگلیسی با نمونه‌های واقعی از کانال Coin_Kurd",
+                     hub, f"<style>{LEARN_CSS}</style><script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}{gjs}}})</script>"))
+    # ---- learning path
+    lv_html = []
+    for lv in LD.LEVELS:
+        ls_html = []
+        for (lvl, slug, tt, bd, terms, kws, link) in [x for x in LD.LESSONS if x[0] == lv["id"]]:
+            ex = channel_examples(kws, 3)
+            paras = "".join(tri(e(a), e(b), e(c), "p") for a, b, c in zip(bd["fa"], bd["ckb"] + [""] * 9, bd["en"]))
+            chips = '<p class="chips">' + "".join(f'<a href="/glossary/{t}/">{tri(e(G[t][2]), e(G[t][4]), e(G[t][6]))}</a>' for t in terms) + "</p>"
+            exh = ('<p class="note">' + tri("از کانال:", "لە کەناڵ:", "From the channel:") + " " + " · ".join(f'<a href="/p/{p["id"]}/">{e(p["title"][:70])}</a>' for p in ex) + "</p>") if ex else ""
+            lk = f'<p><a class="btn3" href="{link[0]}">🔗 {tri(e(link[1]["fa"]), e(link[1]["ckb"]), e(link[1]["en"]))}</a></p>' if link else ""
+            ls_html.append(f'<details class="ls" data-ls="{slug}"><summary>{tri(e(tt["fa"]), e(tt["ckb"]), e(tt["en"]))}<span class="done"></span></summary>{paras}{chips}{exh}{lk}'
+                           f'<p><button class="btn3 rd" data-ls="{slug}">{tri("✔ خواندم", "✔ خوێندمەوە", "✔ Mark as read")}</button></p></details>')
+        qs = LD.QUIZ[lv["id"]]
+        qh = "".join(f'<div class="qq" data-a="{a}"><p><b>{i + 1}.</b> {tri(e(q["fa"]), e(q["ckb"]), e(q["en"]))}</p>' + "".join(
+            f'<label><input type="radio" name="{lv["id"]}q{i}" value="{j}"> {tri(e(o["fa"][j]), e(o["ckb"][j]), e(o["en"][j]))}</label>' for j in range(len(o["fa"]))) + "</div>"
+            for i, (q, o, a) in enumerate(qs))
+        lv_html.append(f'<section class="lv" id="{lv["id"]}"><h2>{lv["icon"]} {tri(e(lv["fa"]), e(lv["ckb"]), e(lv["en"]))}</h2>{"".join(ls_html)}'
+                       f'<div class="qz"><h3>{tri("آزمون این سطح", "تاقیکردنەوەی ئەم ئاستە", "Level quiz")} <small class="note">{tri("قبولی: ۴ از ۵", "دەرچوون: ٤ لە ٥", "Pass: 4 of 5")}</small></h3>{qh}'
+                       f'<button class="btn2 qchk" data-lv="{lv["id"]}">{tri("بررسی پاسخ‌ها", "پشکنینی وەڵامەکان", "Check answers")}</button> <span class="qres" data-lv="{lv["id"]}"></span></div></section>')
+    body = (f'<h1>{tri("🎓 مسیر یادگیری کریپتو — از صفر تا پیشرفته", "🎓 ڕێڕەوی فێربوونی کریپتۆ — لە سفرەوە تا پێشکەوتوو", "🎓 Crypto learning path — from zero to advanced")}</h1>{LSW}'
+            f'<p class="txt">{tri("سه سطح، دوازده درس کوتاه، با اصطلاحات واژه‌نامه و نمونه‌های واقعی از کانال Coin_Kurd. هر سطح یک آزمون پنج‌سؤالی دارد؛ با قبولی در هر سه سطح گواهی پایان مسیر را دریافت می‌کنید. پیشرفت فقط در مرورگر خودتان ذخیره می‌شود.", "سێ ئاست، دوازدە وانەی کورت، بە زاراوەکانی فەرهەنگ و نموونەی ڕاستەقینە لە کەناڵی Coin_Kurd. هەر ئاستێک تاقیکردنەوەیەکی پێنج پرسیاری هەیە؛ بە دەرچوون لە هەر سێ ئاست بڕوانامەی کۆتایی وەردەگریت. پێشکەوتن تەنها لە وێبگەڕەکەتدا هەڵدەگیرێت.", "Three levels, twelve short lessons, with glossary terms and real examples from the Coin_Kurd channel. Each level has a five-question quiz; pass all three to get your completion certificate. Progress is stored only in your own browser.")}</p>'
+            f'<div class="pbar"><i id="pb" style="width:0"></i></div><p class="note" id="pt"></p>{"".join(lv_html)}'
+            f'<section class="lv" id="cert"><h2>🏅 {tri("گواهی پایان مسیر", "بڕوانامەی کۆتایی ڕێڕەو", "Completion certificate")}</h2><div id="certIn"></div></section>'
+            f'<p class="note"><a href="/glossary/">📖 {tri("واژه‌نامهٔ کامل", "فەرهەنگی تەواو", "Full glossary")}</a> · {tri("آموزشی است، توصیهٔ مالی نیست.", "فێرکارییە، ئامۆژگاریی دارایی نییە.", "Educational, not financial advice.")}</p>')
+    ljs = r"""(function(){var K='ek_learn',S;try{S=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){S={}}S.read=S.read||{};S.pass=S.pass||{};
+function sv(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+var TX={fa:{rd:'خوانده شد',pass:'قبول شدید',fail:'دوباره تلاش کنید',of:'از',lessons:'درس خوانده شده',levels:'سطح قبول شده',locked:'برای دریافت گواهی باید در آزمون هر سه سطح قبول شوید.',name:'نام شما روی گواهی',make:'ساخت گواهی',dl:'دانلود گواهی',t1:'گواهی پایان مسیر یادگیری کریپتو',t2:'این گواهی تأیید می‌کند که',t3:'سه سطح مبتدی، تحلیل تکنیکال و پیشرفته را با موفقیت گذرانده است',t4:'گواهی آموزشی entekhab.net — مدرک رسمی نیست'},
+ckb:{rd:'خوێندرایەوە',pass:'دەرچوویت',fail:'دووبارە هەوڵ بدەرەوە',of:'لە',lessons:'وانەی خوێندراو',levels:'ئاستی دەرچوو',locked:'بۆ وەرگرتنی بڕوانامە دەبێت لە تاقیکردنەوەی هەر سێ ئاست دەربچیت.',name:'ناوت لەسەر بڕوانامە',make:'دروستکردنی بڕوانامە',dl:'داگرتنی بڕوانامە',t1:'بڕوانامەی کۆتایی ڕێڕەوی فێربوونی کریپتۆ',t2:'ئەم بڕوانامەیە پشتڕاستی دەکاتەوە کە',t3:'سێ ئاستی سەرەتایی، شیکاریی تەکنیکی و پێشکەوتووی بە سەرکەوتوویی تەواو کردووە',t4:'بڕوانامەی فێرکاریی entekhab.net — بڕوانامەی فەرمی نییە'},
+en:{rd:'read',pass:'Passed',fail:'Try again',of:'of',lessons:'lessons read',levels:'levels passed',locked:'Pass all three level quizzes to unlock your certificate.',name:'Your name on the certificate',make:'Create certificate',dl:'Download certificate',t1:'Crypto Learning Path — Certificate of Completion',t2:'This certifies that',t3:'has successfully completed the Beginner, Technical Analysis and Advanced levels',t4:'An entekhab.net learning certificate — not an official qualification'}};
+function T(k){var l=(window.EKL&&EKL())||'fa';return (TX[l]||TX.fa)[k]}
+var LS=[].slice.call(document.querySelectorAll('details.ls')),LV=['l1','l2','l3'];
+function upd(){var r=0;LS.forEach(function(d){var on=!!S.read[d.dataset.ls];d.classList.toggle('read',on);if(on)r++;d.querySelector('.done').textContent=on?T('rd'):''});
+ var p=LV.filter(function(l){return S.pass[l]>=4}).length,tot=LS.length+LV.length;document.getElementById('pb').style.width=Math.round((r+p)*100/tot)+'%';
+ document.getElementById('pt').textContent=r+' '+T('of')+' '+LS.length+' '+T('lessons')+' · '+p+' '+T('of')+' 3 '+T('levels');
+ LV.forEach(function(l){var el=document.querySelector('.qres[data-lv="'+l+'"]');if(S.pass[l]!=null&&!el.dataset.fresh)el.textContent=(S.pass[l]>=4?'✅ '+T('pass'):'↻ '+T('fail'))+' ('+S.pass[l]+'/5)'});cert(p===3)}
+document.addEventListener('click',function(e){var b=e.target.closest('.rd');if(b){S.read[b.dataset.ls]=1;sv();var d=b.closest('details');d.open=false;upd();return}
+ var q=e.target.closest('.qchk');if(q){var l=q.dataset.lv,sc=0;document.querySelectorAll('#'+l+' .qq').forEach(function(x,i){var c=x.querySelector('input:checked'),ok=c&&+c.value===+x.dataset.a;if(ok)sc++;x.classList.toggle('ok',!!ok);x.classList.toggle('no',!ok)});
+  S.pass[l]=Math.max(S.pass[l]||0,sc);sv();var el=document.querySelector('.qres[data-lv="'+l+'"]');el.dataset.fresh=1;el.textContent=(sc>=4?'✅ '+T('pass'):'↻ '+T('fail'))+' ('+sc+'/5)';upd()}});
+function cert(open){var box=document.getElementById('certIn');if(!open){box.innerHTML='<p class="note">🔒 '+T('locked')+'</p>';return}
+ if(box.dataset.ready===((window.EKL&&EKL())||'fa'))return;box.dataset.ready=(window.EKL&&EKL())||'fa';
+ box.innerHTML='<p><input id="cn" maxlength="40" placeholder="'+T('name')+'" style="background:#000;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;min-width:min(100%,260px)"> <button class="btn2" id="cm">🏅 '+T('make')+'</button></p><div id="co"></div>';
+ document.getElementById('cm').onclick=function(){var n=(document.getElementById('cn').value||'').trim().slice(0,40);if(!n)return;var l=(window.EKL&&EKL())||'fa',rtl=l!=='en';
+  var cv=document.createElement('canvas');cv.width=1600;cv.height=1130;var x=cv.getContext('2d');var g=x.createLinearGradient(0,0,1600,1130);g.addColorStop(0,'#1a1006');g.addColorStop(.5,'#0b0c0f');g.addColorStop(1,'#071018');x.fillStyle=g;x.fillRect(0,0,1600,1130);
+  x.strokeStyle='#f7931a';x.lineWidth=6;x.strokeRect(40,40,1520,1050);x.strokeStyle='rgba(247,147,26,.35)';x.lineWidth=2;x.strokeRect(62,62,1476,1006);
+  var img=new Image();img.onload=function(){var h=230,w=img.width*h/img.height;x.drawImage(img,800-w/2,95,w,h);fin()};img.onerror=fin;img.src='/assets/logo-hero.webp';
+  function fin(){x.textAlign='center';x.direction=rtl?'rtl':'ltr';x.fillStyle='#f7931a';x.font='800 50px Vazirmatn,Tahoma,sans-serif';x.fillText(T('t1'),800,400);
+   x.fillStyle='#cfcfcf';x.font='400 34px Vazirmatn,Tahoma,sans-serif';x.fillText(T('t2'),800,480);x.fillStyle='#fff';x.font='900 76px Vazirmatn,Tahoma,sans-serif';x.fillText(n,800,590);
+   x.fillStyle='#cfcfcf';x.font='400 32px Vazirmatn,Tahoma,sans-serif';x.fillText(T('t3'),800,670);
+   var d=new Date();x.fillStyle='#9a9a94';x.font='400 28px Vazirmatn,Tahoma,sans-serif';x.fillText(d.toLocaleDateString(l==='en'?'en-GB':l==='ckb'?'ar-IQ':'fa-IR',{year:'numeric',month:'long',day:'numeric'}),800,770);
+   x.fillText('L1 '+S.pass.l1+'/5 · L2 '+S.pass.l2+'/5 · L3 '+S.pass.l3+'/5',800,820);x.fillStyle='#f7931a';x.font='700 40px "Space Grotesk",sans-serif';x.direction='ltr';x.fillText('entekhab.net/learn',800,960);
+   x.fillStyle='#777';x.font='400 22px Vazirmatn,Tahoma,sans-serif';x.direction=rtl?'rtl':'ltr';x.fillText(T('t4'),800,1010);
+   var u=cv.toDataURL('image/png'),o=document.getElementById('co');o.innerHTML='';o.appendChild(cv);var a=document.createElement('a');a.className='btn2';a.download='entekhab-certificate.png';a.href=u;a.textContent='⬇ '+T('dl');a.style.marginTop='10px';o.appendChild(a)}}}
+addEventListener('ek-lang',function(){var b=document.getElementById('certIn');if(b)b.dataset.ready='';upd()});upd();
+if(location.hash){var t=document.querySelector(location.hash);if(t&&t.tagName==='DETAILS')t.open=true}})();"""
+    ld = {"@context": "https://schema.org", "@type": "Course", "name": "مسیر یادگیری کریپتو — entekhab.net", "description": "سه سطح آموزش کریپتو و تحلیل تکنیکال با آزمون و گواهی",
+          "provider": {"@type": "Organization", "name": "entekhab.net", "sameAs": "https://t.me/Coin_Kurd"}, "inLanguage": ["fa", "ckb", "en"], "isAccessibleForFree": True}
+    urls.append(page("learn/", "مسیر یادگیری کریپتو — آموزش رایگان از مبتدی تا پیشرفته با آزمون و گواهی", "سه سطح آموزش کریپتو و تحلیل تکنیکال به فارسی، کوردی و انگلیسی: درس‌های کوتاه، واژه‌نامه، نمونه‌های واقعی کانال Coin_Kurd، آزمون و گواهی",
+                     body, f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script><style>{LEARN_CSS}</style>'
+                           f"<script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}{ljs}}})</script>"))
+    print(f"learn pages: {len(urls)}")
+    return urls
+
+
 if __name__ == "__main__":
     main()
     build_api()
@@ -961,6 +1138,7 @@ if __name__ == "__main__":
     extra += build_indicators()
     extra += build_daily()
     extra += build_seo_extra()
+    extra += build_learn()
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
     open(sm, "w", encoding="utf-8").write(s)
