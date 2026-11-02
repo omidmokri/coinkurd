@@ -1,15 +1,17 @@
 name: Referral Bot
 
-# ربات دعوت روی GitHub Actions اجرا می‌شود؛ هر اجرا ~۱۴ دقیقه به تلگرام گوش می‌دهد.
-# state (کاربران/امتیازها) در برنچ جداگانهٔ refbot-state نگه داشته می‌شود تا
-# روی سایت (GitHub Pages) منتشر نشود. کرون هر ۱۵ دقیقه اجرای بعدی را شروع می‌کند.
+# ربات تلگرام انتخاب/Coin_Kurd روی GitHub Actions.
+# هر اجرا ~۵۵ دقیقه به تلگرام گوش می‌دهد و در پایان، اجرای بعدی را خودش فوراً شروع می‌کند
+# (پس ربات تقریباً بی‌وقفه آنلاین است). کرون فقط نگهبان است اگر زنجیره قطع شد.
+# state (کاربران، امتیازها، هشدارها، زبان) در برنچ refbot-state است و هر ۱۰ دقیقه push می‌شود.
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: refbot
@@ -18,7 +20,7 @@ concurrency:
 jobs:
   bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,13 +29,17 @@ jobs:
 
       - name: Load state branch
         run: |
+          git config --global user.name  "coinkurd-bot"
+          git config --global user.email "bot@users.noreply.github.com"
           if git fetch origin refbot-state:refbot-state; then
             git worktree add state refbot-state
           else
             mkdir state && git -C state init -q -b refbot-state && echo '{}' > state/referrals.json
+            git -C state remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           fi
 
       - name: Run bot
+        id: bot
         env:
           REF_BOT_TOKEN: ${{ secrets.REF_BOT_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
@@ -43,19 +49,25 @@ jobs:
           ADMIN_IDS: ${{ vars.ADMIN_IDS }}
           REWARD_AT: ${{ vars.REWARD_AT || '5' }}
           REWARD_TEXT: ${{ vars.REWARD_TEXT }}
-          RUN_SECONDS: "840"
+          BRIEF_HOUR_UTC: ${{ vars.BRIEF_HOUR_UTC || '5' }}
+          RUN_SECONDS: "3300"
           STATE_PATH: state/referrals.json
           PUBLIC_PATH: state/leaderboard.json
+          STATE_GIT: state
+          STATE_PUSH_EVERY: "600"
         run: python scripts/refbot.py
 
       - name: Save state
         if: always()
         working-directory: state
         run: |
-          git config user.name  "coinkurd-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           git add -A
           git diff --cached --quiet && exit 0
           git commit -q -m "refbot state $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push origin HEAD:refbot-state
+
+      - name: Start next run
+        if: steps.bot.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run refbot.yml --repo "${{ github.repository }}" --ref main || true
