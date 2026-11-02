@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بررسی امنیت توکن — تشخیص هانی‌پات، مالیات پنهان و قفل نقدینگی | entekhab.net</title>
+<meta name="description" content="قبل از خرید یک توکن ناشناخته، قرارداد آن را بررسی کنید: هانی‌پات، مالیات خرید و فروش، امکان ضرب توکن، مالک پنهان، قفل نقدینگی، تمرکز دارندگان و سن جفت معاملاتی — روی اتریوم، BNB، Base، آربیتروم، پالیگان و سولانا">
+<link rel="canonical" href="https://entekhab.net/safety/">
+<meta property="og:title" content="بررسی امنیت توکن | entekhab.net"><meta property="og:url" content="https://entekhab.net/safety/"><meta property="og:site_name" content="entekhab.net">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+.card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+.f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.f select{min-width:150px}.f input{flex:1 1 320px;font-family:var(--mono);direction:ltr}
+.ex button{font-size:.78rem;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:3px 10px;margin:2px}
+.verdict{border-radius:14px;padding:14px 16px;margin:12px 0;font-weight:800;font-size:1.1rem}.v-ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4)}.v-mid{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4)}.v-bad{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.45)}
+.flags{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:6px}.fl{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.88rem}.fl.bad{border-color:rgba(239,68,68,.5)}.fl.mid{border-color:rgba(245,158,11,.5)}.fl.ok{opacity:.8}
+.fl small{display:block;color:var(--mute);font-size:.75rem}
+.kp{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px;margin:10px 0}.kp div{border:1px solid var(--line);border-radius:12px;padding:8px 10px}.kp small{display:block;color:var(--mute);font-size:.72rem}.kp b{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+.err{color:var(--r)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="انتخاب" width="64" height="40"><span>entekhab.net</span></a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero" style="padding-bottom:6px"><h1 data-t="h1"></h1><p data-t="lead"></p></div>
+  <section class="card">
+    <div class="f"><select id="ch"></select><input id="ad" placeholder="0x… / Solana mint" autocomplete="off" spellcheck="false"><button class="btn p" id="go" data-t="check"></button></div>
+    <div class="ex" style="margin-top:8px"><span class="disc" data-t="tryT"></span> <button data-c="1" data-a="0xdAC17F958D2ee523a2206206994597C13D831ec7">USDT · Ethereum</button><button data-c="1" data-a="0x6982508145454Ce325dDbE47a25d4ec3d2311933">PEPE · Ethereum</button><button data-c="56" data-a="0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82">CAKE · BNB Chain</button></div>
+    <div id="out"></div>
+  </section>
+  <section><div class="honest" data-t="honest"></div></section>
+</div>
+<footer>entekhab.net — <span data-t="nfa"></span></footer>
+<script src="/assets/ui.js"></script>
+<script>
+const CH=[['1','Ethereum'],['56','BNB Chain'],['8453','Base'],['42161','Arbitrum'],['137','Polygon'],['10','Optimism'],['43114','Avalanche'],['solana','Solana']];
+Object.assign(I.fa,{known:'✅ توکن شناخته‌شده — کنترل‌هایی مثل امکان ضرب، فریز یا لیست سیاه برای توکن‌های متمرکز (مثل استیبل‌کوین‌ها) عادی است؛ بدانید که صادرکننده چنین اختیاری دارد.',h1:'بررسی <em>امنیت توکن</em>',lead:'آدرس قرارداد توکن را وارد کنید تا خطرهای رایج پیش از خرید بررسی شود: هانی‌پات (خرید ممکن، فروش ناممکن)، مالیات پنهان، امکان ضرب توکن، مالک پنهان، قفل نقدینگی، تمرکز دارندگان و سن بازار.',
+ check:'بررسی',tryT:'نمونه:',bad:'🚨 پرخطر — نشانه‌های جدی خطر دیده شد',mid:'⚠️ احتیاط — چند نشانهٔ نگران‌کننده',ok:'✅ نشانهٔ خطر جدی دیده نشد',notFound:'این آدرس در شبکهٔ انتخاب‌شده پیدا نشد؛ شبکه و آدرس را بررسی کنید.',netErr:'سرویس بررسی در دسترس نبود؛ کمی بعد دوباره امتحان کنید.',badAddr:'آدرس معتبر نیست.',
+ price:'قیمت',liq:'نقدینگی',vol:'حجم ۲۴h',fdv:'ارزش کامل (FDV)',age:'سن جفت معاملاتی',holders:'تعداد دارندگان',top10:'سهم ۱۰ دارندهٔ بزرگ',days:'روز',dex:'بازار اصلی',
+ F:{honeypot:['هانی‌پات','قرارداد اجازهٔ فروش نمی‌دهد'],sellTax:['مالیات فروش','درصدی که هنگام فروش کم می‌شود'],buyTax:['مالیات خرید','درصدی که هنگام خرید کم می‌شود'],cannotSellAll:['محدودیت فروش کامل','نمی‌توان همهٔ موجودی را فروخت'],
+  mint:['امکان ضرب توکن جدید','مالک می‌تواند عرضه را زیاد کند'],hiddenOwner:['مالک پنهان','کنترل پنهان روی قرارداد'],takeBack:['بازپس‌گیری مالکیت','مالکیت واگذارشده قابل برگشت است'],blacklist:['لیست سیاه','مالک می‌تواند کیف پول‌ها را مسدود کند'],
+  pause:['توقف انتقال','مالک می‌تواند معاملات را متوقف کند'],slippage:['تغییر مالیات','مالک می‌تواند مالیات را تغییر دهد'],proxy:['قرارداد پراکسی','منطق قرارداد قابل تعویض است'],openSource:['کد منبع منتشرنشده','کد قرارداد قابل بررسی نیست'],
+  lpLock:['قفل نقدینگی','درصد نقدینگی قفل‌شده'],concentration:['تمرکز دارندگان','سهم ۱۰ دارندهٔ بزرگ'],creator:['سهم سازنده','درصد توکن نزد سازنده'],lowLiq:['نقدینگی کم','لغزش قیمت و خطر دستکاری'],young:['بازار تازه','جفت معاملاتی کمتر از ۷ روز عمر دارد'],
+  freeze:['امکان فریز حساب','صادرکننده می‌تواند حساب‌ها را فریز کند'],mintSol:['امکان ضرب توکن','صادرکننده هنوز اختیار ضرب دارد'],meta:['متادیتای قابل تغییر','نام و نماد قابل تغییر است'],trusted:['توکن شناخته‌شده','در فهرست توکن‌های معتبر GoPlus']},
+ yes:'بله',no:'خیر',src:'منبع: GoPlus Security و DexScreener (رایگان و عمومی) · ',
+ honest:'<b>مهم:</b> این بررسی خودکار است و فقط خطرهای شناخته‌شدهٔ قرارداد را نشان می‌دهد؛ نبودن هشدار به معنی امن بودن پروژه یا سودآور بودن خرید نیست. آدرس فقط به GoPlus و DexScreener فرستاده می‌شود و هیچ کلید یا عبارت بازیابی‌ای نخواهید. هرگز کیف پول خود را به سایت ناشناس وصل نکنید.',nfa:'آموزشی است، توصیهٔ مالی نیست'});
+Object.assign(I.ckb,{known:'✅ تۆکنی ناسراو — کۆنترۆڵی وەک دروستکردن یان بەستن بۆ تۆکنە ناوەندییەکان (وەک ستەیبڵکۆین) ئاساییە.',h1:'پشکنینی <em>ئاسایشی تۆکن</em>',lead:'ناونیشانی گرێبەستی تۆکن بنووسە بۆ پشکنینی مەترسییە باوەکان پێش کڕین: هانی‌پۆت، باجی شاراوە، توانای دروستکردنی تۆکنی نوێ، خاوەنی شاراوە، قوفڵی نەختینە و چڕبوونەوەی خاوەنەکان.',
+ check:'پشکنین',tryT:'نموونە:',bad:'🚨 مەترسیدار — نیشانەی مەترسیی جددی بینرا',mid:'⚠️ ئاگادار بە — چەند نیشانەی نیگەرانکەر',ok:'✅ نیشانەی مەترسیی جددی نەبینرا',notFound:'ئەم ناونیشانە لەم تۆڕەدا نەدۆزرایەوە.',netErr:'خزمەتگوزاری بەردەست نەبوو؛ دواتر هەوڵ بدەرەوە.',badAddr:'ناونیشان دروست نییە.',
+ price:'نرخ',liq:'نەختینە',vol:'قەبارەی ٢٤h',fdv:'بەهای تەواو (FDV)',age:'تەمەنی جووتە',holders:'ژمارەی خاوەنەکان',top10:'بەشی ١٠ خاوەنی گەورە',days:'ڕۆژ',dex:'بازاڕی سەرەکی',
+ F:{honeypot:['هانی‌پۆت','گرێبەستەکە ڕێگەی فرۆشتن نادات'],sellTax:['باجی فرۆشتن','لەسەدی کەمکراو لە فرۆشتن'],buyTax:['باجی کڕین','لەسەدی کەمکراو لە کڕین'],cannotSellAll:['سنووری فرۆشتنی تەواو','ناتوانرێت هەموو بفرۆشرێت'],
+  mint:['توانای دروستکردنی تۆکن','خاوەن دەتوانێت کۆ زیاد بکات'],hiddenOwner:['خاوەنی شاراوە','کۆنترۆڵی شاراوە'],takeBack:['گەڕاندنەوەی خاوەنداری','خاوەنداری دەگەڕێتەوە'],blacklist:['لیستی ڕەش','خاوەن دەتوانێت جزدان ببەستێت'],
+  pause:['ڕاگرتنی گواستنەوە','خاوەن دەتوانێت مامەڵە ڕابگرێت'],slippage:['گۆڕینی باج','خاوەن دەتوانێت باج بگۆڕێت'],proxy:['گرێبەستی پرۆکسی','لۆژیکی گرێبەست دەگۆڕدرێت'],openSource:['کۆدی سەرچاوە بڵاونەکراوە','کۆد ناپشکنرێت'],
+  lpLock:['قوفڵی نەختینە','لەسەدی نەختینەی قوفڵکراو'],concentration:['چڕبوونەوەی خاوەنەکان','بەشی ١٠ خاوەنی گەورە'],creator:['بەشی دروستکەر','لەسەدی تۆکن لای دروستکەر'],lowLiq:['نەختینەی کەم','مەترسیی یاری بە نرخ'],young:['بازاڕی نوێ','جووتە کەمتر لە ٧ ڕۆژە'],
+  freeze:['توانای بەستنی هەژمار','دەرکەر دەتوانێت هەژمار ببەستێت'],mintSol:['توانای دروستکردنی تۆکن','دەرکەر هێشتا دەسەڵاتی هەیە'],meta:['زانیاری گۆڕاو','ناو و هێما دەگۆڕدرێن'],trusted:['تۆکنی ناسراو','لە لیستی باوەڕپێکراوی GoPlus']},
+ yes:'بەڵێ',no:'نەخێر',src:'سەرچاوە: GoPlus Security و DexScreener · ',
+ honest:'<b>گرنگ:</b> ئەم پشکنینە خۆکارە و تەنها مەترسییە ناسراوەکانی گرێبەست پیشان دەدات؛ نەبوونی ئاگاداری واتای سەلامەتی پڕۆژە نییە. هەرگیز کلیل یان ڕستەی گەڕاندنەوە مەنووسە.',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە'});
+Object.assign(I.en,{known:'✅ Known token — issuer controls such as minting, freezing or blacklisting are normal for centralized tokens (e.g. stablecoins); just know the issuer has them.',h1:'Token <em>safety check</em>',lead:'Paste a token contract address to check common risks before you buy: honeypots (you can buy but not sell), hidden taxes, mintable supply, hidden owners, liquidity locks, holder concentration and market age.',
+ check:'Check',tryT:'Try:',bad:'🚨 High risk — serious red flags found',mid:'⚠️ Caution — some worrying signs',ok:'✅ No serious red flags found',notFound:'This address was not found on the selected network — check the network and address.',netErr:'The checking service is unavailable — try again shortly.',badAddr:'Invalid address.',
+ price:'Price',liq:'Liquidity',vol:'24h volume',fdv:'Fully diluted value',age:'Pair age',holders:'Holders',top10:'Top-10 holders',days:'days',dex:'Main market',
+ F:{honeypot:['Honeypot','The contract blocks selling'],sellTax:['Sell tax','Share taken when you sell'],buyTax:['Buy tax','Share taken when you buy'],cannotSellAll:['Cannot sell all','You cannot sell your whole balance'],
+  mint:['Mintable','The owner can increase supply'],hiddenOwner:['Hidden owner','Hidden control over the contract'],takeBack:['Ownership can be reclaimed','Renounced ownership can come back'],blacklist:['Blacklist','The owner can block wallets'],
+  pause:['Transfers pausable','The owner can stop trading'],slippage:['Modifiable tax','The owner can change taxes'],proxy:['Proxy contract','Contract logic can be swapped'],openSource:['Source not verified','The code cannot be reviewed'],
+  lpLock:['Liquidity lock','Share of liquidity locked'],concentration:['Holder concentration','Top-10 holders share'],creator:['Creator share','Tokens held by the creator'],lowLiq:['Low liquidity','Slippage and manipulation risk'],young:['New market','The pair is less than 7 days old'],
+  freeze:['Freezable accounts','The issuer can freeze accounts'],mintSol:['Mint authority','The issuer can still mint'],meta:['Mutable metadata','Name and symbol can change'],trusted:['Known token','On GoPlus trusted list']},
+ yes:'yes',no:'no',src:'Source: GoPlus Security and DexScreener (free, public) · ',
+ honest:'<b>Important:</b> this is an automated check of known contract risks; no warning does not mean the project is safe or the trade will profit. The address is sent only to GoPlus and DexScreener — never enter keys or recovery phrases, and never connect your wallet to unknown sites.',nfa:'Educational, not financial advice'});
+const yes=v=>v==='1'||v===1||v===true;const pc=v=>v==null||v===''?null:+v*100;
+const usd=v=>v==null?'—':'$'+(v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(1)+'K':(+v).toLocaleString('en-US',{maximumSignificantDigits:4}));
+function flag(k,level,val){const [n,d]=T('F')[k];return {k,level,html:`<div class="fl ${level}"><b>${level==='bad'?'🚨':level==='mid'?'⚠️':'✅'} ${n}</b>${val!=null?` <span class="num">${val}</span>`:''}<small>${d}</small></div>`}}
+async function check(){const c=$('#ch').value,a=$('#ad').value.trim(),o=$('#out');
+ if(c==='solana'?!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a):!/^0x[0-9a-fA-F]{40}$/.test(a)){o.innerHTML=`<p class="err">${T('badAddr')}</p>`;return}
+ o.innerHTML='<p class="disc">…</p>';
+ const gp=c==='solana'?`https://api.gopluslabs.io/api/v1/solana/token_security?contract_addresses=${a}`:`https://api.gopluslabs.io/api/v1/token_security/${c}?contract_addresses=${a}`;
+ const [g,d]=await Promise.all([j(gp),j(`https://api.dexscreener.com/latest/dex/tokens/${a}`)]);
+ if(!g&&!d){o.innerHTML=`<p class="err">${T('netErr')}</p>`;return}
+ const res=g&&g.result?(g.result[a.toLowerCase()]||g.result[a]||Object.values(g.result)[0]):null;
+ const pairs=((d&&d.pairs)||[]).filter(p=>c==='solana'?p.chainId==='solana':true).sort((x,y)=>(y.liquidity?.usd||0)-(x.liquidity?.usd||0));const P=pairs[0];
+ if(!res&&!P){o.innerHTML=`<p class="err">${T('notFound')}</p>`;return}
+ const F=[];
+ if(res&&c!=='solana'){
+  if(yes(res.is_honeypot))F.push(flag('honeypot','bad',T('yes')));
+  const st=pc(res.sell_tax),bt=pc(res.buy_tax);if(st!=null)F.push(flag('sellTax',st>=10?'bad':st>=5?'mid':'ok',st.toFixed(1)+'%'));if(bt!=null)F.push(flag('buyTax',bt>=10?'bad':bt>=5?'mid':'ok',bt.toFixed(1)+'%'));
+  if(yes(res.cannot_sell_all))F.push(flag('cannotSellAll','bad',T('yes')));if(yes(res.hidden_owner))F.push(flag('hiddenOwner','bad',T('yes')));if(yes(res.can_take_back_ownership))F.push(flag('takeBack','bad',T('yes')));
+  const owned=res.owner_address&&!/^0x0{40}$/i.test(res.owner_address)&&!/dead$/i.test(res.owner_address),trusted=yes(res.trust_list);
+  if(yes(res.is_mintable))F.push(flag('mint',owned&&!trusted?'bad':'mid',T('yes')));if(yes(res.is_blacklisted))F.push(flag('blacklist','mid',T('yes')));if(yes(res.transfer_pausable))F.push(flag('pause','mid',T('yes')));
+  if(yes(res.slippage_modifiable))F.push(flag('slippage','mid',T('yes')));if(yes(res.is_proxy))F.push(flag('proxy','mid',T('yes')));if(res.is_open_source==='0')F.push(flag('openSource','bad',T('no')));
+  const lp=(res.lp_holders||[]);if(lp.length){const lk=lp.filter(h=>yes(h.is_locked)||/^0x0{40}$|dead$/i.test(h.address||'')).reduce((s,h)=>s+(+h.percent||0),0)*100;F.push(flag('lpLock',lk>=80?'ok':lk>=40?'mid':'bad',lk.toFixed(0)+'%'))}
+  const hs=(res.holders||[]).filter(h=>!yes(h.is_locked)&&!/^0x0{40}$|dead$/i.test(h.address||'')).slice(0,10).reduce((s,h)=>s+(+h.percent||0),0)*100;if(res.holders&&res.holders.length)F.push(flag('concentration',hs>=70?'bad':hs>=45?'mid':'ok',hs.toFixed(0)+'%'));
+  const cp=pc(res.creator_percent);if(cp!=null&&cp>=5)F.push(flag('creator',cp>=20?'bad':'mid',cp.toFixed(1)+'%'));if(yes(res.trust_list))F.push(flag('trusted','ok',T('yes')));
+ }
+ if(res&&c==='solana'){const st=x=>x&&String(x.status)==='1';if(st(res.freezable))F.push(flag('freeze','bad',T('yes')));if(st(res.mintable))F.push(flag('mintSol','mid',T('yes')));if(st(res.metadata_mutable))F.push(flag('meta','mid',T('yes')));
+  const hs=(res.holders||[]).slice(0,10).reduce((s,h)=>s+(+h.percent||0),0)*100;if(res.holders&&res.holders.length)F.push(flag('concentration',hs>=70?'bad':hs>=45?'mid':'ok',hs.toFixed(0)+'%'));if(yes(res.trusted_token))F.push(flag('trusted','ok',T('yes')))}
+ if(P){const L=P.liquidity?.usd;if(L!=null&&L<50000)F.push(flag('lowLiq',L<10000?'bad':'mid',usd(L)));const age=P.pairCreatedAt?(Date.now()-P.pairCreatedAt)/864e5:null;if(age!=null&&age<7)F.push(flag('young','mid',age.toFixed(1)+' '+T('days')))}
+ const trusted=res&&yes(res.trust_list||res.trusted_token),nb=F.filter(f=>f.level==='bad').length,nm=F.filter(f=>f.level==='mid').length,v=nb?'bad':trusted?'known':nm>=2?'mid':'ok';
+ const name=res?.token_name||res?.metadata?.name||P?.baseToken?.name||'',sym=res?.token_symbol||res?.metadata?.symbol||P?.baseToken?.symbol||'';
+ const age=P&&P.pairCreatedAt?((Date.now()-P.pairCreatedAt)/864e5).toFixed(0)+' '+T('days'):'—';
+ o.innerHTML=`<h2 style="margin-top:14px">${esc(name)} <span class="num" style="color:var(--mute)">${esc(sym)}</span></h2><div class="verdict v-${v==="known"?"ok":v}">${T(v)}</div>`+
+  `<div class="kp"><div><small>${T('price')}</small><b>${P?.priceUsd?'$'+(+P.priceUsd).toLocaleString('en-US',{maximumSignificantDigits:5}):'—'}</b></div><div><small>${T('liq')}</small><b>${usd(P?.liquidity?.usd)}</b></div><div><small>${T('vol')}</small><b>${usd(P?.volume?.h24)}</b></div><div><small>${T('fdv')}</small><b>${usd(P?.fdv)}</b></div><div><small>${T('age')}</small><b>${age}</b></div><div><small>${T('holders')}</small><b>${res?.holder_count?(+res.holder_count).toLocaleString('en-US'):'—'}</b></div></div>`+
+  `<div class="flags">${F.sort((x,y)=>({bad:0,mid:1,ok:2}[x.level]-{bad:0,mid:1,ok:2}[y.level])).map(f=>f.html).join('')}</div>`+
+  `<p class="disc">${T('src')}${P?`<a href="${esc(P.url)}" target="_blank" rel="noopener nofollow">${T('dex')}: ${esc(P.dexId)} ↗</a>`:''}</p>`}
+$('#go').onclick=check;$('#ad').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+document.querySelector('.ex').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#ch').value=b.dataset.c;$('#ad').value=b.dataset.a;check()});
+function render(){const v=$('#ch').value||'1';$('#ch').innerHTML=CH.map(([k,n])=>`<option value="${k}"${k===v?' selected':''}>${n}</option>`).join('');const q=new URLSearchParams(location.search);
+ if(q.get('a')&&!$('#ad').value){$('#ad').value=q.get('a');if(q.get('c'))$('#ch').value=q.get('c');check()}else if($('#out').innerHTML&&$('#ad').value)check()}
+uiLang(render);
+</script>
+</body>
+</html>
