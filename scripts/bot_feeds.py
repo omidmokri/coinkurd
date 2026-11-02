@@ -416,12 +416,27 @@ def export_site(s, worktree, every=900):
             r = git("push", "-q", "origin", "HEAD:main")
             if r.returncode == 0:
                 log.info("site feeds pushed")
+                rebuild_site()
                 return
             git("fetch", "-q", "origin", "main")
             git("rebase", "-q", "-X", "theirs", "origin/main")
         log.warning("site feed push failed: %s", r.stderr[:200])
     except Exception:
         log.exception("export_site failed")
+
+
+_last_build = [0.0]
+
+
+def rebuild_site(every=900):
+    """ask the site workflow to rebuild now (its own cron is throttled by GitHub), at most every 30 min"""
+    if time.time() - _last_build[0] < every or not os.environ.get("GH_TOKEN"):
+        return
+    _last_build[0] = time.time()
+    repo = os.environ.get("GITHUB_REPOSITORY", "omidmokri/coinkurd")
+    r = subprocess.run(["gh", "workflow", "run", "pages.yml", "--repo", repo, "--ref", "main"],
+                       capture_output=True, text=True, timeout=60)
+    log.info("site rebuild requested (%s)", "ok" if r.returncode == 0 else r.stderr.strip()[:150])
 
 
 def section(s, kind, lang, n=3):
