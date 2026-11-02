@@ -30,11 +30,24 @@ FEEDS = {
     "onchain": ["glassnode", "cryptoquant_kr", "cryptoquant_official"],
     "news": ["cryptoslatenews"],
 }
-TOPIC_HINTS = {  # words that identify each topic by its name
-    "onchain": ["آنچین", "ئانچین", "انچین", "on-chain", "onchain"],
-    "news": ["اخبار کریپتو", "هەواڵی کریپتۆ", "هه‌واڵی کریپتۆ"],
+TOPIC_HINTS = {  # words that identify each topic by its name (Persian and Sorani topics are separate)
+    "onchain:ckb": ["ئانچین", "ئۆنچەین"],
+    "onchain:fa": ["آنچین", "انچین"],
+    "news:ckb": ["هەواڵی کریپتۆ", "هه‌واڵی کریپتۆ"],
+    "news:fa": ["اخبار کریپتو"],
     "fx": ["تبدیل ارز", "گۆڕینی دراو"],
 }
+# known topic ids in @Coin_Kurd_Group, e.g. "onchain:fa=47623,onchain:ckb=219340,news:fa=42033,news:ckb=69794,fx=33986"
+TOPIC_IDS = os.environ.get("TOPIC_IDS", "")
+
+
+def env_topics():
+    out = {}
+    for part in TOPIC_IDS.split(","):
+        k, _, v = part.strip().partition("=")
+        if k and v.strip().isdigit():
+            out[k.strip()] = int(v)
+    return out
 CHECK_EVERY = int(os.environ.get("FEED_CHECK_EVERY", "600"))      # seconds between channel checks
 MAX_PER_CHECK = int(os.environ.get("FEED_MAX_PER_CHECK", "4"))    # new posts summarised per channel per check
 FX_EVERY = int(os.environ.get("FX_POST_EVERY", "1800"))           # seconds between price cards in the fx topic
@@ -330,8 +343,7 @@ def publish(s, f, topics, group_id, send_fn):
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     budget = PUBLISH_PER_LOOP
     for kind in ("onchain", "news"):
-        th = topics.get(kind)
-        if not th:
+        if not any(topics.get(k) for k in (kind, f"{kind}:fa", f"{kind}:ckb")):
             continue
         for it in sorted(f["items"].get(kind, []), key=lambda x: x.get("at") or ""):
             if it.get("posted", True) is True and "posted" in it:
@@ -344,7 +356,8 @@ def publish(s, f, topics, group_id, send_fn):
             if not it.get("photo"):
                 it["photo"] = find_photo(it["id"])
             for lang in POST_LANGS:
-                if it.get(lang):
+                th = topics.get(f"{kind}:{lang}") or topics.get(kind)
+                if it.get(lang) and th:
                     send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
                     time.sleep(1.5)
             it["posted"] = True
@@ -410,6 +423,8 @@ def start(s, send_fn, delete_fn, group_id, worktree=""):
     """run feeds + site export in a daemon thread so slow AI/HTTP calls never block the bot's replies"""
     feed_state(s)
     s.setdefault("topics", {})
+
+    s["topics"].update(env_topics())
 
     def loop():
         while True:
