@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>شفافیت داده و عملکرد واقعی ابزارها | entekhab.net</title>
+<meta name="description" content="منبع، زمان به‌روزرسانی، تأخیر و روش هر دادهٔ entekhab.net به‌همراه کارنامهٔ واقعی اسکنر، سیگنال اندیکاتورها و پست‌های کانال">
+<link rel="canonical" href="https://entekhab.net/status/">
+<meta name="theme-color" content="#f7931a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/ui.css">
+<style>
+.st{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:6px;background:var(--g)}.st.w{background:#eab308}.st.e{background:var(--r)}
+.dt td{font-size:.84rem;vertical-align:top}.dt td small{display:block;color:var(--mute);font-size:.74rem;line-height:1.7}
+.scroll{overflow-x:auto}.pt td,.pt th{text-align:center}.pt td:first-child,.pt th:first-child{text-align:start}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><i></i>entekhab.net</a>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="langs" id="langs"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+</div></header>
+<div class="wrap">
+  <div class="hero"><h1 data-t="h1"></h1><p data-t="lead"></p><div class="pulse" id="pulse"></div></div>
+  <section id="srcS"><h2><span>DATA</span><b data-t="srcT"></b></h2><p class="lead" data-t="srcL"></p><div class="scroll"><table class="dt" id="src"></table></div></section>
+  <section id="perf"><h2><span>PERF</span><b data-t="perfT"></b></h2><p class="lead" data-t="perfL"></p>
+    <div class="grid"><div class="card"><h3 data-t="scT"></h3><div class="scroll" id="scan"></div><p class="disc" data-t="scN"></p></div>
+    <div class="card"><h3 data-t="sgT"></h3><div id="sig"></div><h3 style="margin-top:16px" data-t="imT"></h3><div id="imp"></div><p class="disc" data-t="imN"></p></div></div></section>
+  <section id="hcS"><h2><span>OK?</span><b data-t="hcT"></b></h2><div class="scroll"><table class="dt" id="hc"></table></div></section>
+  <section><p class="honest" data-t="honest"></p></section>
+</div>
+<footer>entekhab.net — <span data-t="nfa"></span></footer>
+<script src="/assets/ui.js"></script>
+<script>
+const DS = [
+ ['meta', 'Telegram t.me/s/Coin_Kurd', 15, {fa:'آرشیو کانال: متن، عکس، دسته و ترجمه‌ها',ckb:'ئەرشیڤی کەناڵ: دەق، وێنە، پۆل و وەرگێڕانەکان',en:'Channel archive: text, photos, categories and translations'}, {fa:'اگر تلگرام در دسترس نباشد، آرشیو قبلی دست‌نخورده می‌ماند.',ckb:'ئەگەر تێلێگرام بەردەست نەبێت، ئەرشیڤی پێشوو دەمێنێتەوە.',en:'If Telegram is unreachable the previous archive is kept untouched.'}],
+ ['market', 'Binance 1h · CoinGecko global · alternative.me', 15, {fa:'قیمت، RSI، روند، اسکنر ۱۵۰ ارز، ترس و طمع، ارزش کل بازار',ckb:'نرخ، RSI، ڕەوت، پشکنەری ١٥٠ دراو، ترس و تەماع، بەهای گشتی',en:'Prices, RSI, trend, 150-coin scanner, Fear & Greed, total market cap'}, {fa:'اسکنر روی کندل ۱ ساعتهٔ در جریان کار می‌کند؛ اگر Binance قطع باشد دادهٔ قبلی با برچسب «قدیمی» می‌ماند.',ckb:'پشکنەر لەسەر مۆمی ١ کاتژمێریی ئێستا کار دەکات؛ ئەگەر Binance نەبێت داتای پێشوو بە نیشانەی «کۆن» دەمێنێتەوە.',en:'The scanner works on the current 1h candle; if Binance is down the previous data stays, flagged “stale”.'}],
+ ['brain', 'market.json + news.json + Gemini', 15, {fa:'رژیم بازار و پهنا (قاعده‌مند) + گزارش هوش مصنوعی',ckb:'ڕژێم و پانیی بازاڕ (یاسامەند) + ڕاپۆرتی AI',en:'Market regime & breadth (rule-based) + AI report'}, {fa:'گزارش هر چند ساعت یک بار نوشته می‌شود و اعداد آن با داده‌ها خودکار چک می‌شود؛ اعداد زمان نوشتن کنار اعداد زنده نمایش داده می‌شود.',ckb:'ڕاپۆرت هەر چەند کاتژمێرێک دەنووسرێت و ژمارەکانی خۆکار پشکنین دەکرێن.',en:'The report is written every few hours and its numbers are machine-checked against the data; its numbers are shown next to the live ones.'}],
+ ['score', 'market + news + impact', 15, {fa:'امتیاز Entekhab: تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کانال ۱۵٪',ckb:'خاڵی Entekhab: تەکنیکی ٤٠٪ · هەست ٢٥٪ · هەواڵ ٢٠٪ · کەناڵ ١٥٪',en:'Entekhab Score: technical 40% · sentiment 25% · news 20% · channel 15%'}, {fa:'توصیف وضعیت است، نه پیش‌بینی.',ckb:'وەسفی دۆخە، نەک پێشبینی.',en:'Describes conditions, not a forecast.'}],
+ ['news', 'RSS (CoinDesk, Cointelegraph, …)', 15, {fa:'تیترهای چندمنبعی با لینک منبع',ckb:'سەردێڕی فرە سەرچاوە بە بەستەری سەرچاوە',en:'Multi-source headlines with source links'}, {fa:'فقط تیتر و لینک؛ متن خبرها کپی نمی‌شود.',ckb:'تەنها سەردێڕ و بەستەر.',en:'Headlines and links only.'}],
+ ['narratives', 'news.json + market.json', 15, {fa:'رادار روایت‌ها',ckb:'ڕاداری چیرۆکەکان',en:'Narrative radar'}, {fa:'شمارش تیترها و عملکرد کوین‌های هر روایت.',ckb:'ژماردنی سەردێڕ و ئەدای دراوەکان.',en:'Headline counts and member-coin performance.'}],
+ ['events', 'ForexFactory', 15, {fa:'تقویم اقتصادی و واکنش بیت‌کوین',ckb:'ڕۆژژمێری ئابووری و کاردانەوەی بیتکۆین',en:'Economic calendar & BTC reaction'}, {fa:'هم‌زمانی را نشان می‌دهد، نه علیت.',ckb:'هاوکاتی نیشان دەدات، نەک هۆکار.',en:'Shows coincidence, not causation.'}],
+ ['chain', 'mempool.space · bitnodes.io', 15, {fa:'بلاک‌ها، کارمزد، هش‌ریت، نودها',ckb:'بلۆک، کرێ، هاشرەیت، نۆد',en:'Blocks, fees, hashrate, nodes'}, {fa:'نودها هر ۶ ساعت.',ckb:'نۆدەکان هەر ٦ کاتژمێر.',en:'Nodes every 6 h.'}],
+ ['derivatives', 'OKX public API', 15, {fa:'فاندینگ، OI، نسبت لانگ/شورت، لیکوئیدیشن',ckb:'فاندینگ، OI، لانگ/شۆرت',en:'Funding, OI, long/short, liquidations'}, {fa:'فقط OKX؛ کل بازار نیست.',ckb:'تەنها OKX.',en:'OKX only, not the whole market.'}],
+ ['flows', 'CoinGecko categories & exchanges', 60, {fa:'جریان سرمایه بین بخش‌ها و صرافی‌ها',ckb:'ڕۆیشتنی سەرمایە نێوان بەشەکان',en:'Capital flow across sectors and exchanges'}, {fa:'بخش‌های با تغییر غیرعادی (>۲۵٪) مشکوک علامت می‌خورند.',ckb:'بەشی نائاسایی نیشانە دەکرێن.',en:'Sectors with abnormal moves (>25%) are flagged as suspect.'}],
+ ['dna', 'Binance · OKX · GitHub · news', 180, {fa:'DNA بازار ۸ ژنی',ckb:'DNAی ٨ جینی',en:'8-gene Market DNA'}, {fa:'ژن‌ها رتبهٔ صدکی بین ارزها هستند.',ckb:'جینەکان پلەی سەدیین.',en:'Genes are percentile ranks across coins.'}],
+ ['kind', 'Coin Metrics (MVRV) · Binance', 180, {fa:'اندیکاتورهای متن‌باز Coin_Kurd: قانون توان، چرخهٔ سبک، مارپیچ',ckb:'ئیندیکاتۆرە سەرچاوە-کراوەکانی Coin_Kurd',en:'Coin_Kurd open-source indicators: Power Law, Style Cycle, Spiral'}, {fa:'کد TradingView خط‌به‌خط اجرا می‌شود؛ ارزش منصفانهٔ چارت انتشار دقیقاً بازتولید شد.',ckb:'کۆدی TradingView هێڵ بە هێڵ جێبەجێ دەکرێت.',en:'The TradingView code runs line by line; the publication chart’s fair value is reproduced exactly.'}],
+ ['signals', 'TradingView alerts relay · kind.json', 15, {fa:'سیگنال اندیکاتورها و نتیجهٔ واقعی آن‌ها',ckb:'سیگناڵی ئیندیکاتۆرەکان و ئەنجامیان',en:'Indicator signals and their real outcome'}, {fa:'نتیجه روی کندل واقعی Binance اندازه‌گیری می‌شود.',ckb:'ئەنجام لەسەر مۆمی Binance دەپێورێت.',en:'Outcomes are measured on real Binance candles.'}],
+ ['scanstats', 'market.json + Binance 1h', 15, {fa:'کارنامهٔ اسکنر (بک‌تست + ثبت زنده)',ckb:'ئەنجامی پشکنەر',en:'Scanner track record (backtest + live log)'}, {fa:'بک‌تست روی کندل بسته؛ ثبت زنده با قیمت لحظهٔ انتشار.',ckb:'باکتێست لەسەر مۆمی داخراو.',en:'Backtest on closed candles; live log at the published price.'}],
+ ['council', 'Gemini (5 agents)', 1440, {fa:'میزگرد هوش مصنوعی',ckb:'مێزگردی AI',en:'AI council'}, {fa:'روزانه؛ اعداد با داده‌ها چک می‌شوند.',ckb:'ڕۆژانە.',en:'Daily; numbers are checked against the data.'}],
+ ['wrapped', 'Binance daily', 360, {fa:'خلاصهٔ هفته و ماه',ckb:'کورتەی هەفتە و مانگ',en:'Weekly & monthly recap'}, {fa:'بدون کندل روز جاری (ناقص).',ckb:'بێ مۆمی ئەمڕۆ.',en:'Excludes today’s incomplete candle.'}],
+ ['history', '6-hour snapshots', 360, {fa:'بازپخش بازار (عکس فوری هر ۶ ساعت)',ckb:'دووبارە لێدانەوەی بازاڕ',en:'Market replay (6-hourly snapshots)'}, {fa:'از ۱ نوامبر ۲۰۲۶.',ckb:'لە ١ی تشرینی دووەمی ٢٠٢٦.',en:'Since 1 Nov 2026.'}],
+];
+Object.assign(I.fa,{h1:'شفافیت <em>داده</em> و عملکرد',lead:'هر عددی که در entekhab.net می‌بینید از کجا آمده، کی به‌روز شده و ابزارها در عمل چقدر درست بوده‌اند — موفق و ناموفق.',srcT:'منبع و تازگی هر داده',srcL:'زمان آخرین به‌روزرسانی مستقیم از خود فایل داده خوانده می‌شود. سبز = طبق برنامه، زرد = با تأخیر، قرمز = قدیمی.',
+ perfT:'عملکرد واقعی ابزارها',perfL:'کارنامهٔ عمومی؛ هیچ نتیجه‌ای حذف نمی‌شود.',scT:'اسکنر فرصت‌ها — پیشینهٔ هر الگو',scN:'«مثبت ۲۴h» = درصد یافته‌هایی که ۲۴ ساعت بعد در جهت سیگنال بودند. بک‌تست = اجرای همان قوانین روی ۴۰ روز کندل گذشتهٔ ۴۰ ارز پرحجم.',sgT:'سیگنال اندیکاتورهای Coin_Kurd',imT:'حرکت قیمت بعد از پست‌های کانال',imN:'میانگین قدرمطلق حرکت و درصد مثبت؛ جهت پست‌ها مشخص نیست.',hcT:'بررسی سلامت خودکار',
+ honest:'⚠️ صادقانه: داده‌های رایگان گاهی قطع می‌شوند؛ هر بخش زمان و منبع خودش را نشان می‌دهد. هیچ‌کدام از ابزارها توصیهٔ مالی نیست.',nfa:'آموزشی است، توصیهٔ مالی نیست',
+ ds:'داده',src:'منبع',every:'برنامه',last:'آخرین به‌روزرسانی',note:'روش / در صورت قطعی',min:'دقیقه',pat:'الگو',bt:'بک‌تست',live:'زنده',n:'تعداد',p24:'مثبت ۲۴h',a24:'میانگین ۲۴h',a72:'میانگین ۷۲h',ok:'سالم',files:'فایل داده',stale:'قدیمی',status:'وضعیت کل',chk:'آخرین بررسی',none:'هنوز دادهٔ کافی نیست',
+ rsi_oversold:'RSI اشباع فروش',rsi_overbought:'RSI اشباع خرید',ema_golden_cross:'تقاطع طلایی EMA',ema_death_cross:'تقاطع مرگ EMA',breakout_up:'شکست سقف ۴۸h',breakdown:'شکست کف ۴۸h',volume_spike:'جهش حجم',bull_divergence:'واگرایی مثبت RSI',bear_divergence:'واگرایی منفی RSI',_all:'همه'});
+Object.assign(I.ckb,{h1:'ڕوونیی <em>داتا</em> و ئەدا',lead:'هەر ژمارەیەک لە entekhab.net دەیبینیت لە کوێوە هاتووە، کەی نوێ بووەتەوە و ئامرازەکان لە کرداردا چەند ڕاست بوون — سەرکەوتوو و ناسەرکەوتوو.',srcT:'سەرچاوە و تازەیی هەر داتایەک',srcL:'کاتی دوایین نوێکردنەوە ڕاستەوخۆ لە فایلی داتاکە دەخوێنرێتەوە. سەوز = بەپێی بەرنامە، زەرد = دواکەوتوو، سوور = کۆن.',
+ perfT:'ئەدای ڕاستەقینەی ئامرازەکان',perfL:'ئەنجامی گشتی؛ هیچ ئەنجامێک لا نابرێت.',scT:'پشکنەری دەرفەت — پێشینەی هەر نەخشەیەک',scN:'«ئەرێنی ٢٤h» = ڕێژەی دۆزینەوەکان کە ٢٤ کاتژمێر دواتر لە ئاراستەی سیگناڵدا بوون.',sgT:'سیگناڵی ئیندیکاتۆرەکانی Coin_Kurd',imT:'جووڵەی نرخ دوای پۆستەکانی کەناڵ',imN:'تێکڕای جووڵە و ڕێژەی ئەرێنی؛ ئاراستەی پۆستەکان دیار نییە.',hcT:'پشکنینی تەندروستیی خۆکار',
+ honest:'⚠️ بە ڕاستگۆیی: داتای بەخۆڕایی جاروبار دەپچڕێت؛ هەر بەشێک کات و سەرچاوەی خۆی نیشان دەدات. هیچ ئامرازێک ئامۆژگاریی دارایی نییە.',nfa:'فێرکارییە، ئامۆژگاریی دارایی نییە',
+ ds:'داتا',src:'سەرچاوە',every:'بەرنامە',last:'دوایین نوێکردنەوە',note:'ڕێباز / لە کاتی پچڕان',min:'خولەک',pat:'نەخشە',bt:'باکتێست',live:'زیندوو',n:'ژمارە',p24:'ئەرێنی ٢٤h',a24:'تێکڕای ٢٤h',a72:'تێکڕای ٧٢h',ok:'تەندروست',files:'فایلی داتا',stale:'کۆن',status:'دۆخی گشتی',chk:'دوایین پشکنین',none:'هێشتا داتای تەواو نییە',
+ rsi_oversold:'RSI زیادە فرۆشتن',rsi_overbought:'RSI زیادە کڕین',ema_golden_cross:'یەکتربڕینی زێڕین',ema_death_cross:'یەکتربڕینی مەرگ',breakout_up:'شکاندنی بەرزترین ٤٨h',breakdown:'شکاندنی نزمترین ٤٨h',volume_spike:'بازدانی قەبارە',bull_divergence:'لادانی ئەرێنیی RSI',bear_divergence:'لادانی نەرێنیی RSI',_all:'هەموو'});
+Object.assign(I.en,{h1:'Data <em>transparency</em> & performance',lead:'Where every number on entekhab.net comes from, when it was last updated, and how right the tools have actually been — hits and misses.',srcT:'Source and freshness of every dataset',srcL:'The last-update time is read directly from each data file. Green = on schedule, yellow = delayed, red = stale.',
+ perfT:'Real performance of the tools',perfL:'A public track record; no result is ever removed.',scT:'Opportunity scanner — record of each pattern',scN:'“positive 24h” = share of findings that were in the signal’s direction 24h later. Backtest = the same rules replayed on the last 40 days of candles for the 40 most liquid coins.',sgT:'Coin_Kurd indicator signals',imT:'Price move after channel posts',imN:'Average absolute move and share positive; post direction is not known.',hcT:'Automatic health checks',
+ honest:'⚠️ Honestly: free data sources sometimes fail; every section shows its own time and source. None of the tools is financial advice.',nfa:'Educational, not financial advice',
+ ds:'Dataset',src:'Source',every:'Schedule',last:'Last update',note:'Method / when the source fails',min:'min',pat:'Pattern',bt:'Backtest',live:'Live',n:'n',p24:'+ 24h',a24:'avg 24h',a72:'avg 72h',ok:'ok',files:'data file',stale:'stale',status:'Overall status',chk:'Last check',none:'not enough data yet',
+ rsi_oversold:'RSI oversold',rsi_overbought:'RSI overbought',ema_golden_cross:'EMA golden cross',ema_death_cross:'EMA death cross',breakout_up:'48h high breakout',breakdown:'48h low breakdown',volume_spike:'Volume spike',bull_divergence:'Bullish RSI divergence',bear_divergence:'Bearish RSI divergence',_all:'All'});
+let H = null, SC = null, SG = null, IM = null, IND = null;
+const ago = iso => { if (!iso) return '—'; const m = (Date.now() - Date.parse(iso)) / 6e4; return m < 90 ? Math.round(m) + ' ' + T('min') : m < 2880 ? Math.round(m / 60) + 'h' : Math.round(m / 1440) + 'd'; };
+const cls = (iso, every) => { if (!iso) return 'e'; const m = (Date.now() - Date.parse(iso)) / 6e4; return m > every * 6 + 60 ? 'e' : m > every * 2 + 30 ? 'w' : ''; };
+function render() {
+  if (H) {
+    const f = H.files || {};
+    $('#pulse').innerHTML = `<div><small>${T('status')}</small><b><i class="st ${H.status === 'ok' ? '' : H.status === 'warn' ? 'w' : 'e'}"></i>${esc(H.status)}</b></div><div><small>${T('chk')}</small><b>${ago(H.checked_at)}</b></div><div><small>${T('files')}</small><b>${Object.keys(f).length}</b></div>`;
+    $('#src').innerHTML = `<tr><th>${T('ds')}</th><th>${T('src')}</th><th>${T('every')}</th><th>${T('last')}</th><th>${T('note')}</th></tr>` + DS.map(([k, s, every, d, n]) => { const x = f[k] || {}; return `<tr><td><b>${esc(d[lang] || d.en)}</b><small class="num">data/${k === 'meta' ? 'posts' : k === 'history' ? 'history/index' : k}.json · ${(k === 'meta' ? (f.posts || {}).kb : x.kb) ?? '—'} KB</small></td><td><small>${esc(s)}</small></td><td class="num">${every >= 1440 ? '24h' : every >= 60 ? every / 60 + 'h' : every + ' ' + T('min')}</td><td><i class="st ${cls(x.at, every)}"></i><span class="num">${ago(x.at)}</span></td><td><small>${esc(n[lang] || n.en)}</small></td></tr>`; }).join('');
+    $('#hc').innerHTML = (H.checks || []).map(c => `<tr><td><i class="st ${c.level === 'ok' ? '' : c.level === 'warn' ? 'w' : 'e'}"></i>${esc(c.name)}</td><td><small>${esc(c.msg)}</small></td></tr>`).join('');
+  }
+  const st = (SC && SC.stats) || {}, pats = ['breakout_up', 'breakdown', 'rsi_oversold', 'rsi_overbought', 'ema_golden_cross', 'ema_death_cross', 'bull_divergence', 'bear_divergence', 'volume_spike', '_all'];
+  const cell = a => a && a.n24 ? `<td class="num">${a.n24}</td><td class="num">${a.win24}%</td><td class="num ${a.avg24 >= 0 ? 'pos' : 'neg'}">${a.avg24 >= 0 ? '+' : ''}${a.avg24}%</td>` : `<td class="num">—</td><td></td><td></td>`;
+  $('#scan').innerHTML = Object.keys(st).length ? `<table class="pt"><tr><th>${T('pat')}</th><th colspan="3">${T('bt')}</th><th colspan="3">${T('live')}</th></tr><tr><th></th><th>${T('n')}</th><th>${T('p24')}</th><th>${T('a24')}</th><th>${T('n')}</th><th>${T('p24')}</th><th>${T('a24')}</th></tr>` +
+    pats.map(p => `<tr><td>${T(p)}</td>${cell(p === '_all' ? st._bt : st[p + '|bt'])}${cell(p === '_all' ? st._live : st[p + '|live'])}</tr>`).join('') + `</table><p class="disc">${SC.backfilled ? `${T('bt')}: ${esc((SC.backfilled.at || '').slice(0, 10))} · ` : ''}${T('live')}: ${esc((SC.live_since || '—').slice(0, 10))} →</p>` : `<p class="disc">${T('none')}</p>`;
+  const ss = (SG && SG.stats) || {}, nm = id => ((IND && IND.items || []).find(x => x.id === id) || {}).name || id;
+  $('#sig').innerHTML = Object.keys(ss).length ? `<table><tr><th></th><th>${T('n')}</th><th>${T('p24')}</th><th></th></tr>${Object.entries(ss).map(([k, a]) => `<tr><td><a href="/indicators/${esc(k)}/">${esc(nm(k))}</a></td><td class="num">${a.n}</td><td class="num">${a.win != null ? a.win + '% (' + a.h + ')' : '—'}</td><td class="num ${a.avg >= 0 ? 'pos' : 'neg'}">${a.avg != null ? (a.avg >= 0 ? '+' : '') + a.avg + '%' : ''}</td></tr>`).join('')}</table>` : `<p class="disc">${T('none')}</p>`;
+  if (IM) { const rows = Object.values(IM).filter(r => r.r4h != null); const n = rows.length, abs4 = n ? rows.reduce((a, r) => a + Math.abs(r.r4h), 0) / n : 0, pos4 = n ? rows.filter(r => r.r4h > 0).length * 100 / n : 0, abs1 = n ? rows.reduce((a, r) => a + Math.abs(r.r1h || 0), 0) / n : 0;
+    $('#imp').innerHTML = n ? `<div class="kv" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><div class="card" style="padding:10px"><small class="disc">${T('n')}</small><b class="num">${n}</b></div><div class="card" style="padding:10px"><small class="disc">|Δ| 1h / 4h</small><b class="num">${abs1.toFixed(2)}% / ${abs4.toFixed(2)}%</b></div><div class="card" style="padding:10px"><small class="disc">+4h</small><b class="num">${pos4.toFixed(0)}%</b></div></div>` : `<p class="disc">${T('none')}</p>`; }
+}
+uiLang(render);
+(async () => { [H, SC, SG, IM, IND] = await Promise.all(['/data/health.json', '/data/scanstats.json', '/data/signals.json', '/data/impact.json', '/data/indicators.json'].map(u => j(u + V()))); render(); if (location.hash === '#perf') document.getElementById('perf').scrollIntoView(); })();
+</script>
+</body>
+</html>
