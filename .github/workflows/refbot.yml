@@ -60,6 +60,7 @@ jobs:
           TOPIC_IDS: "onchain:fa=47623,onchain:ckb=219340,news:fa=42033,news:ckb=69794,fx=33986"
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
         run: python scripts/refbot.py
 
       - name: Save state

@@ -1,0 +1,40 @@
+name: Site pages (light rebuild)
+
+# بازسازی سریع صفحات سایت از داده‌های فعلی data/ — بدون واکشی یا هوش مصنوعی.
+# ربات بعد از ذخیرهٔ خوراک آنچین/اخبار این را اجرا می‌کند تا /onchain/ و /crypto-news/ زود به‌روز شوند.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-light
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - name: Build static pages
+        run: python scripts/build_pages.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: "." }
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
