@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
+import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
@@ -399,7 +400,14 @@ def render(s, uid, key):
             log.exception("irr card failed")
             return t("no_data", lang), kb_back(lang)
     if key == "proxy":
-        return (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), kb_back(lang)
+        try:
+            text, rows = PX.section(s, lang, D.e)
+        except Exception:
+            log.exception("proxy section failed")
+            text, rows = (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), []
+        kb = kb_back(lang, refresh="m:proxy")
+        kb["inline_keyboard"] = rows + kb["inline_keyboard"]
+        return text, kb
     if key == "lab":
         return f"🧪 <b>{t('b_lab', lang)[2:]}</b>", kb_lab(lang)
     if key == "coin":
