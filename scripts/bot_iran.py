@@ -35,8 +35,8 @@ def num(s):
 
 
 # ------------------------------------------------------------------ channel reader
-def read_channel(name):
-    """-> list of (iso_time, text) oldest→newest for the last ~20 posts; cached TTL s."""
+def _fetch_channel(name):
+    """-> [{"iso", "text", "id", "links"}] oldest→newest for the last ~20 posts; cached TTL s."""
     ent = _cache.get(name)
     if ent and time.time() - ent[0] < TTL:
         return ent[1]
@@ -50,13 +50,26 @@ def read_channel(name):
             tm = m.select_one("time")
             if not body or not tm:
                 continue
+            links = [a.get("href") for a in body.find_all("a") if (a.get("href") or "").startswith("http")]
             for br in body.find_all("br"):
                 br.replace_with("\n")
-            posts.append((tm.get("datetime"), body.get_text()))
+            dp = m.get("data-post") or ""
+            pid = int(dp.rsplit("/", 1)[-1]) if dp.rsplit("/", 1)[-1].isdigit() else 0
+            posts.append({"iso": tm.get("datetime"), "text": body.get_text(), "id": pid, "links": links})
     except Exception:
         posts = ent[1] if ent else []
     _cache[name] = (time.time(), posts)
     return posts
+
+
+def read_channel(name):
+    """-> list of (iso_time, text) oldest→newest"""
+    return [(p["iso"], p["text"]) for p in _fetch_channel(name)]
+
+
+def read_channel_full(name):
+    """-> list of (iso_time, text, post_id, links) oldest→newest"""
+    return [(p["iso"], p["text"], p["id"], p["links"]) for p in _fetch_channel(name)]
 
 
 def _strip(line):

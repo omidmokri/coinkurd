@@ -29,6 +29,7 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
+import bot_feeds as F  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
@@ -44,6 +45,7 @@ PUBLIC = os.environ.get("PUBLIC_PATH", "data/bot/leaderboard.json")
 STATE_ENC = STATE + ".enc"                               # encrypted at rest: the refbot-state branch is public
 STATE_GIT = os.environ.get("STATE_GIT", "")              # dir of a git checkout to push periodically
 STATE_PUSH_EVERY = int(os.environ.get("STATE_PUSH_EVERY", "600"))
+MAIN_WT = os.environ.get("MAIN_WORKTREE", "")            # checkout of main used to publish feeds to the site
 BRIEF_HOUR = int(os.environ.get("BRIEF_HOUR_UTC", "5"))   # 05:00 UTC ≈ 08:30 Tehran
 API = f"https://api.telegram.org/bot{TOKEN}/"
 MAX_ALERTS = 10
@@ -418,6 +420,11 @@ def render(s, uid, key):
         fn, path = SECTIONS[key]
         try:
             text = fn(lang)
+            if key in ("chain", "news"):
+                feed = F.section(s, "onchain" if key == "chain" else "news", lang, n=2)
+                if feed:
+                    sep = "\n\n━━━━━━━━━━\n\n"
+                    text = D.cut(sep.join(D.e(x) for x in feed) + sep + text, 4000)
         except Exception:
             log.exception("section %s failed", key)
             text = t("no_data", lang)
@@ -557,6 +564,14 @@ def check_alerts(s):
                 keep.append(a)
         x["alerts"] = keep
     return changed
+
+
+def group_send(chat_id, text, kb=None, plain=False, **kw):
+    return send(chat_id, D.e(text) if plain else text, kb, **kw)
+
+
+def group_delete(chat_id, mid):
+    return tg("deleteMessage", chat_id=chat_id, message_id=mid)
 
 
 _last_tick = [0.0]
@@ -788,15 +803,32 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, t("brief_on" if x["brief"] else "brief_off", lang) + "\n\n" + text, kb)
 
 
+def is_target_group(chat):
+    if GROUP.lstrip("-").isdigit():
+        return str(chat["id"]) == GROUP
+    return (chat.get("username") or "").lower() == GROUP.lstrip("@").lower()
+
+
 def handle_group(s, msg):
     u = msg.get("from") or {}
-    if not GROUP or u.get("is_bot") or u.get("id") in ADMIN_IDS:
-        return
     chat = msg["chat"]
-    if GROUP.lstrip("-").isdigit():
-        if str(chat["id"]) != GROUP:
-            return
-    elif (chat.get("username") or "").lower() != GROUP.lstrip("@").lower():
+    if not GROUP or not is_target_group(chat):
+        return
+    kind = F.learn_topic(s, msg)
+    if kind:
+        for a in ADMIN_IDS:
+            send(a, f"✅ topic «{kind}» linked (thread {msg.get('message_thread_id')}) — the bot will post there.")
+    text = (msg.get("text") or "").strip()
+    if text.split("@")[0].startswith("/settopic") and u.get("id") in ADMIN_IDS:
+        arg = text.split(maxsplit=1)[1].strip().lower() if len(text.split()) > 1 else ""
+        th = msg.get("message_thread_id")
+        if arg in ("onchain", "news", "fx") and th:
+            s.setdefault("topics", {})[arg] = th
+            send(chat["id"], f"✅ {arg} → this topic", message_thread_id=th)
+        else:
+            send(chat["id"], "usage (inside the topic): /settopic onchain | news | fx", message_thread_id=th)
+        return
+    if u.get("is_bot") or u.get("id") in ADMIN_IDS:
         return
     if (msg.get("text") or "").split("@")[0] == "/id":
         send(chat["id"], f"chat_id: <code>{chat['id']}</code>", reply_to_message_id=msg["message_id"])
@@ -805,8 +837,9 @@ def handle_group(s, msg):
         return
     tg("deleteMessage", chat_id=chat["id"], message_id=msg["message_id"])
     name = f'<a href="tg://user?id={u["id"]}">{D.e(u.get("first_name", "user"))}</a>'
+    extra = {"message_thread_id": msg["message_thread_id"]} if msg.get("message_thread_id") else {}
     send(chat["id"], "\n".join(t("gate", lg, name=name) for lg in ("fa", "ckb", "kmr")),
-         {"inline_keyboard": [[btn(t("b_join", "ckb"), url=CHANNEL_LINK)]]})
+         {"inline_keyboard": [[btn(t("b_join", "ckb"), url=CHANNEL_LINK)]]}, **extra)
 
 
 def handle_update(s, up):
@@ -887,6 +920,8 @@ def main():
         try:
             dirty |= check_alerts(s)
             dirty |= minute_jobs(s)
+            dirty |= F.run(s, group_send, group_delete, GROUP)
+            F.export_site(s, MAIN_WT)
             dirty |= maybe_brief(s)
         except Exception:
             log.exception("periodic job failed")
