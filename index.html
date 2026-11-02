@@ -433,7 +433,7 @@ async function load(){
   const lite=await fetch('data/posts_lite.json'+bust).then(r=>r.ok?r.json():null).catch(()=>null);
   const [p,m]=await Promise.all([lite?Promise.resolve(lite):fetch('data/posts.json'+bust).then(r=>r.json()),fetch('data/meta.json'+bust).then(r=>r.json())]);
   S.posts=p;S.meta=m;S.full=!lite;const qp=new URLSearchParams(location.search).get('q');if(qp){S.q=qp;$('#q').value=qp;setTimeout(scrollFeed,700)}
-  applyLang();buildStatic();render();reveal();tvWidgets();loadIntel().catch(()=>{}).then(homeLive);setInterval(()=>loadIntel().catch(()=>{}).then(homeLive),3e5);
+  for(const f of [applyLang,buildStatic,render,reveal,tvWidgets]){try{f()}catch(e){console.error(e)}}loadIntel().catch(()=>{}).then(homeLive);setInterval(()=>loadIntel().catch(()=>{}).then(homeLive),3e5);
 }
 let fullP=null;
 function loadFull(){if(S.full)return Promise.resolve();if(fullP)return fullP;
@@ -457,7 +457,7 @@ function applyLang(){
   document.querySelectorAll('[data-i]').forEach(el=>{el.innerHTML=T(el.dataset.i)});
   document.querySelectorAll('[data-ph]').forEach(el=>el.placeholder=T(el.dataset.ph));
   document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
-  $('#yr').textContent=new Date().getFullYear();
+  document.querySelectorAll('.ek-yr,#yr').forEach(e=>e.textContent=new Date().getFullYear());
   if(!S.meta)return;
   $('#sPosts').textContent=fmtN(VPall().length);$('#sCats').textContent=fmtN(Object.keys(S.meta.by_category).length);
   $('#sCoins').textContent=fmtN(Object.keys(S.meta.by_coin).length);$('#sUpd').textContent=fmtDate(S.meta.updated_at,{dateStyle:'medium',timeStyle:'short'});
@@ -552,7 +552,7 @@ async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="cl
   $('#sheet').querySelectorAll('[data-ent]').forEach(a=>a.onclick=ev=>{ev.preventDefault();closeModal();S.q=a.dataset.ent;$('#q').value=S.q;render();scrollFeed()});
   $('#sheet').querySelectorAll('[data-open]').forEach(a=>a.onclick=ev=>{ev.preventDefault();openPost(+a.dataset.open)})}
 function closeModal(){$('#modal').classList.remove('open');document.body.style.overflow='';history.replaceState(null,'',location.pathname)}
-function reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('v');io.unobserve(e.target)}}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el))}
+function reveal(){window.__rv=1;const els=document.querySelectorAll('.reveal');if(!('IntersectionObserver' in window)){els.forEach(el=>el.classList.add('v'));return}const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('v');io.unobserve(e.target)}}),{threshold:0,rootMargin:'0px 0px -8% 0px'});els.forEach(el=>io.observe(el))}
 
 document.addEventListener('click',e=>{if(e.target.id==='oppMore'){S.oppAll=!S.oppAll;renderIntel();return}const sb=e.target.closest('[data-sv]');if(sb){e.stopPropagation();const id=+sb.dataset.sv,a=SV.get(),i=a.indexOf(id);if(i>=0)a.splice(i,1);else a.push(id);SV.set(a);document.querySelectorAll(`[data-sv="${id}"]`).forEach(b=>{const on=a.includes(id);b.classList.toggle('on',on);b.innerHTML=b.innerHTML.replace(/[★☆]/,on?'★':'☆')});return}
   const el=e.target.closest('[data-id]');if(el&&!e.target.closest('a'))openPost(+el.dataset.id)});
@@ -735,7 +735,8 @@ function _renderIntel(){
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'var(--ekh,60px)':'calc(var(--ekh,60px) + 46px)');lastY=y},{passive:true});
 window.__cineFail=()=>{window.__cineFail=null;coin3d()};(function(){const add=(src,ok,bad)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=bad;document.body.appendChild(s)};const cine=()=>add('assets/cinema.js?v=4',null,()=>window.__cineFail&&window.__cineFail());add('assets/land.js',cine,cine)})();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
-initMode();tilesInit();load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{$('#out').innerHTML=`<div class="empty">⚠ ${esc(e.message)}</div>`});
+initMode();tilesInit();load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{try{reveal()}catch(_){}$('#out').innerHTML=`<div class="empty">⚠ ${esc(e.message)}</div>`});
 </script>
+<script>setTimeout(function(){if(!window.__rv)document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('v')})},4000)</script>
 <script src="/assets/chrome.js?v=3" defer></script></body>
 </html>
