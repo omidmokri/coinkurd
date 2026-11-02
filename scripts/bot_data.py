@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 import requests
 
-from bot_i18n import H, OPP, WHY, h, t, v
+from bot_i18n import H, OPP, WHY, h, pick, t, v
 
 REPO_RAW = os.environ.get("DATA_RAW", "https://raw.githubusercontent.com/omidmokri/coinkurd/main/data/")
 LOCAL = os.environ.get("DATA_DIR", "data")
@@ -128,7 +128,7 @@ def L(d, lang):
     """pick a language from {fa,ckb,en} dict"""
     if not isinstance(d, dict):
         return d or ""
-    return d.get(lang) or d.get("fa") or d.get("en") or ""
+    return pick(d, lang)
 
 
 def cut(s, n=4000):
@@ -179,7 +179,7 @@ def sec_market(lang):
     lines.append("")
     lines.append(f"💰 {h('mcap', lang)}: {fbig(g.get('mcap'))} ({fpct(g.get('mcap_chg24'))})")
     lines.append(f"👑 {h('dom', lang)}: BTC {(g.get('btc_d') or 0):.1f}% · ETH {(g.get('eth_d') or 0):.1f}%")
-    fng_name = {"fa": "ترس و طمع", "ckb": "ترس و تەماع", "en": "Fear &amp; Greed"}[lang]
+    fng_name = pick({"fa": "ترس و طمع", "ckb": "ترس و تەماع", "en": "Fear &amp; Greed"}, lang)
     lines.append(f"😱 {fng_name}: <b>{f.get('value', '—')}</b> ({e(f.get('class', ''))})")
     if b and b.get("regime"):
         r = b["regime"]
@@ -266,9 +266,9 @@ def sec_score(lang):
         return t("no_data", lang)
     rows = sorted(cs.items(), key=lambda kv: -kv[1]["score"])
     out = [f"🏅 <b>{h('score', lang)}</b>",
-           {"fa": "تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کانال ۱۵٪",
+           pick({"fa": "تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کانال ۱۵٪",
             "ckb": "تەکنیکی ٤٠٪ · هەست ٢٥٪ · هەواڵ ٢٠٪ · کەناڵ ١٥٪",
-            "en": "technical 40% · sentiment 25% · news 20% · channel 15%"}[lang], "", "⬆️"]
+            "en": "technical 40% · sentiment 25% · news 20% · channel 15%"}, lang), "", "⬆️"]
     for c, x in rows[:10]:
         out.append(f"<b>{c}</b> {x['score']} {bar(x['score'])} {v('label', x['label'], lang)}")
     out += ["", "⬇️"]
@@ -340,10 +340,10 @@ def sec_council(lang):
              "sentiment": {"fa": "احساسات", "ckb": "هەست", "en": "Sentiment"},
              "macro": {"fa": "کلان", "ckb": "ماکرۆ", "en": "Macro"},
              "history": {"fa": "تاریخ", "ckb": "مێژوو", "en": "History"}}
-    loc = co.get(lang) or co.get("fa", {})
+    loc = co.get(lang) or co.get("en" if lang == "kmr" else "fa", {})
     out = [f"🏛 <b>{t('b_council', lang)[2:]}</b>", "", e(loc.get("summary", "")), ""]
     for a in co.get("agents", []):
-        ev = (a.get(lang) or a.get("fa") or {}).get("evidence", [])
+        ev = (a.get(lang) or a.get("en" if lang == "kmr" else "fa") or {}).get("evidence", [])
         out.append(f"{v('stance', a.get('stance'), lang)} <b>{L(names.get(a['id'], {'en': a['id']}), lang)}</b>"
                    f" ({a.get('stance')}, {'●' * int(a.get('confidence', 0))})")
         for x in ev[:2]:
@@ -369,9 +369,9 @@ def sec_deriv(lang):
         out.append(f"<b>{c}</b> OI {fbig(x.get('oi_usd'))} · {h('funding', lang)} {(x.get('funding') or 0):.4f}% "
                    f"({(x.get('funding_ann') or 0):+.1f}%/y) · L/S {ls}")
         out.append(f"   {h('liq', lang)} 1h: 🟢L {fbig(liq.get('long_usd_1h'))} · 🔴S {fbig(liq.get('short_usd_1h'))}")
-    out += ["", "🔥 " + {"fa": "فاندینگ داغ", "ckb": "فاندینگی گەرم", "en": "Hot funding"}[lang]]
+    out += ["", "🔥 " + pick({"fa": "فاندینگ داغ", "ckb": "فاندینگی گەرم", "en": "Hot funding"}, lang)]
     out += [f"  {x['coin']} {(x.get('funding') or 0):+.4f}% ({(x.get('funding_ann') or 0):+.0f}%/y)" for x in d.get("funding_hot", [])[:5]]
-    out += ["🧊 " + {"fa": "فاندینگ منفی", "ckb": "فاندینگی نەرێنی", "en": "Negative funding"}[lang]]
+    out += ["🧊 " + pick({"fa": "فاندینگ منفی", "ckb": "فاندینگی نەرێنی", "en": "Negative funding"}, lang)]
     out += [f"  {x['coin']} {(x.get('funding') or 0):+.4f}% ({(x.get('funding_ann') or 0):+.0f}%/y)" for x in d.get("funding_cold", [])[:5]]
     out += ["", age(d.get("updated_at"), lang)]
     return "\n".join(out)
@@ -385,15 +385,15 @@ def sec_mc(lang):
         return t("no_data", lang)
     cone = f.get("cone", {})
     end = {k: (vals[-1] if vals else None) for k, vals in cone.items()}
-    title = {"fa": "شبیه‌سازی مونت‌کارلو بیت‌کوین (۳۰ روز، {n} مسیر)",
+    title = pick({"fa": "شبیه‌سازی مونت‌کارلو بیت‌کوین (۳۰ روز، {n} مسیر)",
              "ckb": "شێوەکاری مۆنتی کارلۆی بیتکۆین (٣٠ ڕۆژ، {n} ڕێڕەو)",
-             "en": "BTC Monte Carlo (30 days, {n} paths)"}[lang].format(n=f.get("paths"))
-    p = {"fa": "احتمال", "ckb": "ئەگەری", "en": "P"}[lang]
+             "en": "BTC Monte Carlo (30 days, {n} paths)"}, lang).format(n=f.get("paths"))
+    p = pick({"fa": "احتمال", "ckb": "ئەگەری", "en": "P"}, lang)
     out = [f"🎲 <b>{title}</b>", f"{h('price', lang)}: {fp(f.get('price'))}", "",
            f"{p} ⬆️: <b>{f.get('p_up')}%</b>",
            f"{p} +10%: {f.get('p_up10')}% · −10%: {f.get('p_dn10')}%",
            f"{p} +20%: {f.get('p_up20')}% · −20%: {f.get('p_dn20')}%", "",
-           {"fa": "بازهٔ قیمت روز ۳۰:", "ckb": "مەودای نرخی ڕۆژی ٣٠:", "en": "Day-30 price cone:"}[lang],
+           pick({"fa": "بازهٔ قیمت روز ۳۰:", "ckb": "مەودای نرخی ڕۆژی ٣٠:", "en": "Day-30 price cone:"}, lang),
            f"P5 {fp(end.get('5'))} · P25 {fp(end.get('25'))} · <b>P50 {fp(end.get('50'))}</b> · P75 {fp(end.get('75'))} · P95 {fp(end.get('95'))}",
            f"σ {f.get('sim_vol_annual')}%/y", "", t("nfa", lang)]
     return "\n".join(out)
@@ -404,12 +404,12 @@ def sec_mem(lang):
     if not mem:
         return t("no_data", lang)
     st, td = mem.get("stats", {}), mem.get("today", {})
-    title = {"fa": "حافظهٔ بازار: {n} روز مشابه امروز از {s}",
+    title = pick({"fa": "حافظهٔ بازار: {n} روز مشابه امروز از {s}",
              "ckb": "بیرەوەری بازاڕ: {n} ڕۆژی هاوشێوەی ئەمڕۆ لە {s}ەوە",
-             "en": "Market memory: {n} days most like today since {s}"}[lang].format(n=st.get("n"), s=mem.get("since"))
+             "en": "Market memory: {n} days most like today since {s}"}, lang).format(n=st.get("n"), s=mem.get("since"))
     out = [f"🕰 <b>{title}</b>",
            f"7d {td.get('ret7')}% · 30d {td.get('ret30')}% · RSI {td.get('rsi')} · vs MA200 {td.get('vs_ma200')}%", "",
-           {"fa": "بعد از آن روزها:", "ckb": "دوای ئەو ڕۆژانە:", "en": "What happened next:"}[lang],
+           pick({"fa": "بعد از آن روزها:", "ckb": "دوای ئەو ڕۆژانە:", "en": "What happened next:"}, lang),
            f"7d ⬆️ {st.get('up7')}/{st.get('n')} · avg {st.get('avg7')}%",
            f"30d ⬆️ {st.get('up30')}/{st.get('n')} · avg {st.get('avg30')}% · med {st.get('med30')}%",
            f"best {st.get('best30')}% · worst {st.get('worst30')}%", ""]
@@ -424,9 +424,9 @@ def sec_vol(lang):
           "normal": {"fa": "عادی", "ckb": "ئاسایی", "en": "normal"},
           "wide": {"fa": "باز 💥", "ckb": "فراوان 💥", "en": "wide 💥"}}
     out = [f"🌡 <b>{t('b_vol', lang)[2:]}</b>",
-           {"fa": "فشردگی باند بولینگر معمولاً پیش از حرکت بزرگ است.",
+           pick({"fa": "فشردگی باند بولینگر معمولاً پیش از حرکت بزرگ است.",
             "ckb": "تەسکبوونی باندی بۆلینگەر زۆرجار پێش جووڵەی گەورەیە.",
-            "en": "Tight Bollinger bands often precede big moves."}[lang], ""]
+            "en": "Tight Bollinger bands often precede big moves."}, lang), ""]
     for c, x in vol.items():
         shift = " ⚡️" if x.get("shift") else ""
         out.append(f"<b>{c}</b> {L(st.get(x.get('state'), {'en': x.get('state')}), lang)}{shift} · BW {x.get('bw_pct')}% "
@@ -474,12 +474,12 @@ def sec_macro(lang):
     mx = w.get("matrix", {})
     row = mx.get("BTC") if isinstance(mx.get("BTC"), dict) else None
     if row:
-        out.append({"fa": "همبستگی ۳ ماهه با بیت‌کوین:", "ckb": "پەیوەندی ٣ مانگە لەگەڵ بیتکۆین:",
-                    "en": "3-month correlation with BTC:"}[lang])
+        out.append(pick({"fa": "همبستگی ۳ ماهه با بیت‌کوین:", "ckb": "پەیوەندی ٣ مانگە لەگەڵ بیتکۆین:",
+                    "en": "3-month correlation with BTC:"}, lang))
         for k, val in row.items():
             if k == "BTC" or val is None:
                 continue
-            nm = L(m.get("names", {}).get(k, {"en": k}), lang if lang != "ckb" else "fa")
+            nm = L(m.get("names", {}).get(k, {"en": k}), "en" if lang in ("kmr", "en") else "fa")
             out.append(f"  {e(nm)}: <b>{val:+.2f}</b>")
     if lab:
         g = lab.get("gold", {})
@@ -495,16 +495,16 @@ def sec_dna(lang, coin=None):
         return t("no_data", lang)
     genes = {"liquidity": "L", "volatility": "V", "flow": "F", "sentiment": "S", "attention": "A",
              "leverage": "X", "developers": "D", "momentum": "M"}
-    gname = {"fa": "L نقدشوندگی · V نوسان · F جریان · S احساسات · A توجه · X اهرم · D توسعه · M مومنتوم",
+    gname = pick({"fa": "L نقدشوندگی · V نوسان · F جریان · S احساسات · A توجه · X اهرم · D توسعه · M مومنتوم",
              "ckb": "L شلەیی · V لەرزین · F ڕەوت · S هەست · A سەرنج · X لیڤەرێج · D گەشەپێدان · M خێرایی",
-             "en": "L liquidity · V volatility · F flow · S sentiment · A attention · X leverage · D developers · M momentum"}[lang]
+             "en": "L liquidity · V volatility · F flow · S sentiment · A attention · X leverage · D developers · M momentum"}, lang)
     if coin and coin in cs:
         x = cs[coin]
         ts = x.get("twin_stats", {})
         out = [f"🧬 <b>DNA {coin}</b>", f"<code>{x.get('code')}</code>", gname, "",
                f"{h('similar', lang)}: " + ", ".join(f"{c} {s}%" for c, s in x.get("similar", [])[:5])]
         if ts:
-            out.append({"fa": "دوقلوهای تاریخی", "ckb": "دووانە مێژووییەکان", "en": "Historical twins"}[lang] +
+            out.append(pick({"fa": "دوقلوهای تاریخی", "ckb": "دووانە مێژووییەکان", "en": "Historical twins"}, lang) +
                        f": 7d avg {ts.get('avg7')}% ({ts.get('up7')}/{ts.get('n')} ⬆️) · 30d avg {ts.get('avg30')}% ({ts.get('up30')}/{ts.get('n')} ⬆️)")
         return "\n".join(out)
     out = [f"🧬 <b>{t('b_dna', lang)[2:]}</b>", gname, ""]
@@ -585,15 +585,15 @@ def sec_track(lang):
     st = (load("scanstats") or {}).get("stats", {})
     sig = load("signals") or {}
     out = [f"📈 <b>{t('b_track', lang)[2:]}</b>",
-           {"fa": "نتیجهٔ واقعی سیگنال‌های اسکنر (۲۴ و ۷۲ ساعت بعد):",
+           pick({"fa": "نتیجهٔ واقعی سیگنال‌های اسکنر (۲۴ و ۷۲ ساعت بعد):",
             "ckb": "ئەنجامی ڕاستەقینەی سیگناڵەکانی سکانەر (٢٤ و ٧٢ کاتژمێر دواتر):",
-            "en": "Real outcome of scanner signals (24h / 72h later):"}[lang], ""]
+            "en": "Real outcome of scanner signals (24h / 72h later):"}, lang), ""]
     for k, s in sorted(((k, s) for k, s in st.items() if "|" not in k), key=lambda kv: -kv[1].get("n", 0)):
         out.append(f"• {L(OPP.get(k, {'en': k}), lang)}: n={s.get('n')} · 24h win {s.get('win24')}% ({(s.get('avg24') or 0):+.2f}%)"
                    f" · 72h win {s.get('win72')}% ({(s.get('avg72') or 0):+.2f}%)")
     ss = sig.get("stats", {})
     if ss:
-        out += ["", {"fa": "اندیکاتورهای Kurdistani:", "ckb": "ئیندیکاتۆرەکانی Kurdistani:", "en": "Kurdistani indicators:"}[lang]]
+        out += ["", pick({"fa": "اندیکاتورهای Kurdistani:", "ckb": "ئیندیکاتۆرەکانی Kurdistani:", "en": "Kurdistani indicators:"}, lang)]
         for k, s in ss.items():
             out.append(f"• {k}: {s.get('n')} sig · win {s.get('win')}% · avg {s.get('avg')}% ({s.get('h')})")
     im = load("impact") or {}
@@ -601,9 +601,9 @@ def sec_track(lang):
     if done:
         avg = sum(x.get("r24h", 0) for x in done) / len(done)
         up = sum(1 for x in done if x.get("r24h", 0) > 0)
-        out += ["", {"fa": "واکنش بازار ۲۴ساعت بعد از پست‌های کانال",
+        out += ["", pick({"fa": "واکنش بازار ۲۴ساعت بعد از پست‌های کانال",
                      "ckb": "کاردانەوەی بازاڕ ٢٤ کاتژمێر دوای پۆستەکانی کەناڵ",
-                     "en": "Market 24h after channel posts"}[lang] + f": n={len(done)} · ⬆️ {up * 100 // len(done)}% · avg {avg:+.2f}%"]
+                     "en": "Market 24h after channel posts"}, lang) + f": n={len(done)} · ⬆️ {up * 100 // len(done)}% · avg {avg:+.2f}%"]
     out += ["", f"🔗 {SITE}/status/"]
     return cut("\n".join(out))
 
@@ -622,9 +622,9 @@ def sec_ind(lang):
         bt = it.get("bt") or {}
         perf = f" · PnL {bt['pnl']} · WR {bt['win']}" if bt.get("pnl") else ""
         out.append(f"{lock} <a href=\"{e(it.get('url'))}\">{e(it['name'])}</a>{perf}")
-    out += ["", {"fa": "🔒 = دعوتی؛ با «دعوت و پاداش» می‌توانی هدیه بگیری.",
+    out += ["", pick({"fa": "🔒 = دعوتی؛ با «دعوت و پاداش» می‌توانی هدیه بگیری.",
                  "ckb": "🔒 = بە بانگهێشت؛ بە «بانگهێشت و خەڵات» دەتوانیت وەک دیاری وەریبگریت.",
-                 "en": "🔒 = invite-only; earn one through “Invite & earn”."}[lang],
+                 "en": "🔒 = invite-only; earn one through “Invite & earn”."}, lang),
             f"🔗 {SITE}/indicators/"]
     return cut("\n".join(out))
 
@@ -632,7 +632,7 @@ def sec_ind(lang):
 # ---------------------------------------------------------------- posts
 def _post_title(p, lang):
     if lang != "fa":
-        tr = (load("translations") or {}).get(str(p["id"]), {}).get(lang)
+        tr = (load("translations") or {}).get(str(p["id"]), {}).get("en" if lang == "kmr" else lang)
         if tr and tr.get("title"):
             return tr["title"]
     return p.get("title") or ""

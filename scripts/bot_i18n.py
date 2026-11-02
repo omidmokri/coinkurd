@@ -1,7 +1,24 @@
 """UI strings for the Coin_Kurd / Entekhab Telegram bot (fa · ckb · en)."""
 
-LANGS = ("fa", "ckb", "en")
-RTL = {"fa": True, "ckb": True, "en": False}
+from bot_kmr import KMR
+
+LANGS = ("fa", "ckb", "kmr", "en")
+RTL = {"fa": True, "ckb": True, "kmr": False, "en": False}
+LANG_NAMES = {"fa": "فارسی", "ckb": "کوردی (سۆرانی)", "kmr": "Kurdî (Kurmancî)", "en": "English"}
+
+
+def pick(d, lang):
+    """choose a language from a {fa, ckb, en[, kmr]} dict; Kurmanji falls back to KMR[en], then English"""
+    if not isinstance(d, dict):
+        return d or ""
+    if d.get(lang):
+        return d[lang]
+    if lang == "kmr":
+        en = d.get("en")
+        if isinstance(en, str):
+            return KMR.get(en, en)
+        return en or d.get("fa") or ""
+    return d.get("fa") or d.get("en") or ""
 
 T = {
     # ---------------------------------------------------------------- menu
@@ -78,7 +95,7 @@ T = {
     "ago_min": {"fa": "دقیقه پیش", "ckb": "خولەک لەمەوبەر", "en": "min ago"},
     "nfa": {"fa": "⚠️ آموزشی است، توصیهٔ مالی نیست.", "ckb": "⚠️ فێرکارییە، ئامۆژگاری دارایی نییە.",
             "en": "⚠️ Educational, not financial advice."},
-    "lang_set": {"fa": "زبان: فارسی ✅", "ckb": "زمان: کوردی ✅", "en": "Language: English ✅"},
+    "lang_set": {"fa": "زبان: فارسی ✅", "ckb": "زمان: کوردی سۆرانی ✅", "kmr": "Ziman: Kurmancî ✅", "en": "Language: English ✅"},
     "choose_lang": {"fa": "زبان را انتخاب کن:", "ckb": "زمان هەڵبژێرە:", "en": "Choose language:"},
     "search_hint": {
         "fa": "🔎 برای جستجو در آرشیو کانال بنویس: <code>/search هک بایننس</code>",
@@ -229,16 +246,16 @@ OPP = {  # scanner pattern names
 
 
 def t(key, lang, **kw):
-    s = T.get(key, {}).get(lang) or T.get(key, {}).get("fa") or key
+    s = pick(T.get(key, {}), lang) or key
     return s.format(**kw) if kw else s
 
 
 def v(group, key, lang):
     d = V.get(group, {}).get(key)
     if isinstance(d, dict):
-        return d.get(lang) or d.get("en") or key
+        return pick(d, lang) or key
     return d or key
 
 
 def h(key, lang):
-    return H.get(key, {}).get(lang, key)
+    return pick(H.get(key, {}), lang) or key
