@@ -36,6 +36,10 @@ news = load("news.json", {})
 score = load("score.json", {})
 SC = score.get("coins", {})
 brain = load("brain.json", {})
+DNA = (load("dna.json", {}) or {}).get("coins", {})
+DERIV = {x["coin"]: x for x in (load("derivatives.json", {}) or {}).get("swaps", [])}
+KIND = load("kind.json", {})
+SCANS = (load("scanstats.json", {}) or {}).get("stats", {})
 CATS = {c["id"]: c for c in meta.get("categories", [])}
 MK = {c["coin"]: c for c in market.get("coins", [])}
 TV = {"BTC": "BITSTAMP:BTCUSD", "ETH": "BITSTAMP:ETHUSD", "TON": "OKX:TONUSDT", "GOLD": "OANDA:XAUUSD"}
@@ -97,15 +101,42 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-si
 .coins a{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:4px;color:var(--ink);font-family:'Space Grotesk',monospace}"""
 
 
+NAVFA = '<a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a>'
+NAV_L = {"en": '<a href="/#feed">Archive</a><a href="/coins/">Coins</a><a href="/indicators/">📡 Indicators</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 Terminal</a><a href="https://t.me/Coin_Kurd" rel="noopener">Telegram</a>',
+         "ckb": '<a href="/#feed">ئەرشیڤ</a><a href="/coins/">دراوەکان</a><a href="/indicators/">📡 ئیندیکاتۆر</a><a href="/dna/">🧬 DNA</a><a href="https://t.me/Coin_Kurd" rel="noopener">تێلێگرام</a>'}
+
+
+_BIGN = re.compile(r"[0-9۰-۹٠-٩][0-9۰-۹٠-٩,٬]{9,}(?:[.٫][0-9۰-۹٠-٩]+)?")
+_DIG = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
+_FAD = str.maketrans("0123456789.", "۰۱۲۳۴۵۶۷۸۹٫")
+
+
+def big(t, lang="fa"):
+    """2,630,839,154,201.14 → 2.63 تریلیون (same rule as the homepage JS) so AI-report text stays readable"""
+    def f(m):
+        try:
+            n = float(m.group(0).translate(_DIG).replace(",", "").replace("٬", "").replace("٫", "."))
+        except ValueError:
+            return m.group(0)
+        if n < 1e9:
+            return m.group(0)
+        v = (f"{n / 1e12:.2f}" if n >= 1e12 else f"{n / 1e9:.1f}").rstrip("0").rstrip(".")
+        if lang != "en":
+            v = v.translate(_FAD)
+        return v + ({"en": " trillion", "ckb": " تریلیۆن"}.get(lang, " تریلیون") if n >= 1e12 else {"en": " billion", "ckb": " ملیار"}.get(lang, " میلیارد"))
+    return _BIGN.sub(f, t or "")
+
+
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
-    doc = f"""<!doctype html><html lang="{lang}" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    dirn = "ltr" if lang == "en" else "rtl"
+    doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f7931a'/><text x='50' y='72' text-anchor='middle' font-size='64' font-weight='900' font-family='Arial'>₿</text></svg>">
 <style>{CSS}</style>{extra_head}</head><body>
-<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav><a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a></nav></div></header>
+<header><div class="w"><a class="logo" href="/">entekhab<b>.net</b></a><nav>{NAV_L.get(lang, NAVFA)}</nav></div></header>
 <main class="w">{body}</main>
 <footer><div class="w">© entekhab.net — داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند. هیچ‌یک از مطالب توصیهٔ مالی نیست.</div></footer></body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
@@ -179,7 +210,156 @@ def build_post(p):
     head = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
     if img:
         head += f'<meta property="og:image" content="{e(img)}"><meta name="twitter:card" content="summary_large_image">'
+    head += alt_links(p)
+    if p.get("q") == "low":
+        head += '<meta name="robots" content="noindex,follow">'           # promos / repeats: keep the page, keep it out of search
     return page(f"p/{p['id']}/", title, desc, body, head)
+
+
+def alt_links(p):
+    tr = p.get("tr") or {}
+    alts = [("fa", f"{SITE}/p/{p['id']}/")] + [(lg, f"{SITE}/{lg}/p/{p['id']}/") for lg in ("ckb", "en") if isinstance(tr.get(lg), dict) and tr[lg].get("text")]
+    if len(alts) == 1:
+        return ""
+    return "".join(f'<link rel="alternate" hreflang="{lg}" href="{u}">' for lg, u in alts) + f'<link rel="alternate" hreflang="x-default" href="{alts[0][1]}">'
+
+
+LBL_L = {"en": {"tg": "View this post on Telegram ↗", "fa": "Persian original", "arch": "Open in the archive", "nfa": "Educational, not financial advice."},
+         "ckb": {"tg": "بینینی ئەم پۆستە لە تێلێگرام ↗", "fa": "دەقی ئەسڵی فارسی", "arch": "کردنەوە لە ئەرشیڤ", "nfa": "فێرکارییە، ئامۆژگاریی دارایی نییە."}}
+
+
+def build_post_lang(p, lg):
+    """/en/p/<id>/ and /ckb/p/<id>/ — translated version of a post as its own page (hreflang-linked to the Persian original)"""
+    t = (p.get("tr") or {}).get(lg)
+    if not isinstance(t, dict) or not t.get("text"):
+        return None
+    L = LBL_L[lg]
+    title = t.get("title") or p["title"]
+    desc = plain(t["text"]) or title
+    img = p["photos"][0] if p.get("photos") else ""
+    coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
+    body = f'<div class="meta">{coins}<time datetime="{p.get("date", "")}">{fmt_date(p.get("date", ""))}</time></div><h1>{e(title)}</h1>'
+    if img:
+        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy">'
+    body += f'<div class="txt">{rich(t["text"])}</div>'
+    body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(p["url"])}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · {L["nfa"]}</p>'
+    ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
+          "image": [img] if img else [], "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
+          "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE}, "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
+          "description": desc, "translationOfWork": {"@id": f"{SITE}/p/{p['id']}/"}}
+    head = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>' + alt_links(p)
+    if img:
+        head += f'<meta property="og:image" content="{e(img)}">'
+    if p.get("q") == "low":
+        head += '<meta name="robots" content="noindex,follow">'
+    return page(f"{lg}/p/{p['id']}/", title, desc, body, head, lang=lg)
+
+
+def build_rss():
+    """/feed.xml (Persian) and /en/feed.xml — the latest 50 real posts (promos and repeats excluded)"""
+    good = [p for p in posts if p.get("q") != "low"][:50]
+    now = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
+    def item(p, lg):
+        t = p if lg == "fa" else (p.get("tr") or {}).get(lg)
+        if not isinstance(t, dict) or not (t.get("title") or p.get("title")):
+            return ""
+        u = f"{SITE}/p/{p['id']}/" if lg == "fa" else f"{SITE}/{lg}/p/{p['id']}/"
+        try:
+            pd = datetime.fromisoformat(p["date"]).strftime("%a, %d %b %Y %H:%M:%S +0000")
+        except Exception:  # noqa: BLE001
+            pd = now
+        return f"<item><title>{e(t.get('title') or p['title'])}</title><link>{u}</link><guid>{u}</guid><pubDate>{pd}</pubDate><description>{e(plain(t.get('text') or '', 400))}</description></item>"
+    for lg, path, ttl in (("fa", "feed.xml", "entekhab.net — تحلیل و اخبار کریپتو"), ("en", "en/feed.xml", "entekhab.net — crypto analysis & news")):
+        xml = (f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{e(ttl)}</title><link>{SITE}/</link><description>{e(ttl)}</description>'
+               f"<language>{lg}</language><lastBuildDate>{now}</lastBuildDate>" + "".join(item(p, lg) for p in good) + "</channel></rss>")
+        full = os.path.join(ROOT, path)
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        open(full, "w", encoding="utf-8").write(xml)
+    print("rss: 2 feeds")
+
+
+GENE_FA = {"liquidity": "نقدشوندگی", "volatility": "نوسان", "flow": "جریان خریداران", "sentiment": "احساسات خبری", "attention": "توجه رسانه‌ای",
+           "leverage": "اهرم مشتقه", "developers": "فعالیت توسعه", "momentum": "مومنتوم"}
+
+
+def intel_profile(c, m):
+    """Coin Intelligence Profile: plain-language state, score breakdown with history, risks, DNA, derivatives, Coin_Kurd indicators"""
+    v, d, dv = SC.get(c), DNA.get(c), DERIV.get(c)
+    hist = (score.get("history") or {}).get(c) or []
+    out = []
+    bits = []
+    if m:
+        bits.append(f'روند ۱ ساعته {({"up": "صعودی", "down": "نزولی", "range": "خنثی"}).get(m.get("trend"), "—")} با RSI {m.get("rsi")}')
+        if m.get("chg24") is not None:
+            bits.append(f'تغییر ۲۴ ساعته {m["chg24"]:+.2f}٪')
+    if v:
+        bits.append(f'امتیاز Entekhab {v["score"]} ({LBL.get(v["label"], v["label"])})')
+    if d:
+        bits.append(f'DNA {d.get("code", "")}')
+    if bits:
+        out.append('<h2>خلاصهٔ هوشمند</h2><p class="txt">' + e(c) + " اکنون: " + "، ".join(e(b) for b in bits) + ".</p>")
+    if v:
+        def ch(n):
+            return (v["score"] - hist[-1 - n][1]) if len(hist) > n else None
+        c1, c7 = ch(1), ch(7)
+        rows = "".join(f'<tr><td>{CMP[k]}</td><td class="num">{round(x)}</td><td class="num">{round(v["weights"][k] * 100)}%</td><td class="num">{round(x * v["weights"][k], 1)}</td></tr>'
+                       for k, x in v["components"].items())
+        inp = v.get("inputs") or {}
+        c1s = "—" if c1 is None else f"{c1:+d}"
+        c7s = "—" if c7 is None else f"{c7:+d}"
+        out.append('<h2>امتیاز Entekhab — شفاف</h2><div class="grid">'
+                   f'<div class="kpi"><small>امتیاز (۰ تا ۱۰۰)</small><b>{v["score"]}</b></div><div class="kpi"><small>وضعیت</small><b>{LBL[v["label"]]}</b></div>'
+                   f'<div class="kpi"><small>تغییر ۲۴ ساعت</small><b>{c1s}</b></div><div class="kpi"><small>تغییر ۷ روز</small><b>{c7s}</b></div></div>'
+                   f'<table style="margin-top:10px"><tr><th>جزء</th><th>امتیاز جزء</th><th>وزن</th><th>سهم در امتیاز</th></tr>{rows}</table>'
+                   f'<p class="note">فرمول: امتیاز = جمع (امتیاز هر جزء × وزن آن). ورودی‌ها: {inp.get("news_48h", "—")} خبر در ۴۸ ساعت، {inp.get("channel_posts", "—")} پست کانال، '
+                   f'شاخص ترس و طمع {inp.get("fng", "—")}. آخرین محاسبه {fmt_date(score.get("updated_at", ""))}. '
+                   'محدودیت: برای ارزهای کم‌خبر، اجزای خبر و کانال اطلاعات کمی دارند؛ امتیاز توصیف وضعیت است، نه پیش‌بینی.</p>')
+        if len(hist) >= 2:
+            pts = hist[-60:]
+            mn, mx = min(x[1] for x in pts), max(x[1] for x in pts)
+            poly = " ".join(f"{i / max(1, len(pts) - 1) * 300:.1f},{58 - (x[1] - mn) / max(1, mx - mn) * 52:.1f}" for i, x in enumerate(pts))
+            out.append(f'<svg viewBox="0 0 300 62" style="width:100%;height:70px;border:1px solid var(--line);border-radius:10px;margin-top:8px"><polyline points="{poly}" fill="none" stroke="#f7931a" stroke-width="2"/></svg>'
+                       f'<p class="note">تاریخچهٔ امتیاز از {e(pts[0][0])} تا {e(pts[-1][0])} ({len(pts)} روز)</p>')
+        buck = {"≥60": [], "45–59": [], "<45": []}
+        for hh in (score.get("history") or {}).values():
+            for i in range(len(hh) - 7):
+                if hh[i][2] and hh[i + 7][2]:
+                    r7 = (hh[i + 7][2] / hh[i][2] - 1) * 100
+                    buck["≥60" if hh[i][1] >= 60 else "45–59" if hh[i][1] >= 45 else "<45"].append(r7)
+        if sum(len(x) for x in buck.values()) >= 30:
+            out.append('<p class="note">سنجش امتیاز با بازده واقعی ۷ روز بعد (همهٔ ارزها): ' + " · ".join(f"{k}: {sum(x) / len(x):+.2f}٪ (n={len(x)})" for k, x in buck.items() if x) + "</p>")
+        else:
+            out.append('<p class="note">سنجش امتیاز با بازده واقعی بعدی: تاریخچهٔ امتیاز از ۱ نوامبر ۲۰۲۶ ذخیره می‌شود؛ پس از دست‌کم ۷ روز نتیجه اینجا نمایش داده می‌شود.</p>')
+    risks = []
+    if m:
+        if (m.get("rsi") or 50) >= 70:
+            risks.append("RSI بالای ۷۰ (اشباع خرید کوتاه‌مدت)")
+        if (m.get("rsi") or 50) <= 30:
+            risks.append("RSI زیر ۳۰ (اشباع فروش کوتاه‌مدت)")
+        if (m.get("qvol") or 0) < 5e6:
+            risks.append("نقدشوندگی پایین (حجم ۲۴ ساعته زیر ۵ میلیون دلار) — لغزش قیمت بیشتر")
+    if d:
+        r = d.get("raw") or {}
+        if (r.get("vol30") or 0) >= 80:
+            risks.append(f'نوسان ۳۰ روزه بسیار بالا ({r["vol30"]}٪ سالانه)')
+        if r.get("from_high") is not None and r["from_high"] <= -70:
+            risks.append(f'{-r["from_high"]:.0f}٪ پایین‌تر از سقف ۱۰۰۰ روزه')
+    if dv and dv.get("funding_ann") is not None and abs(dv["funding_ann"]) >= 30:
+        risks.append(f'فاندینگ سالانهٔ {dv["funding_ann"]}٪ در OKX (اهرم یک‌طرفه)')
+    out.append("<h2>ریسک‌ها و نکات قابل توجه</h2>" + ("<ul class=list>" + "".join(f"<li>{e(x)}</li>" for x in risks) + "</ul>" if risks else '<p class="note">پرچم ریسک خاصی از داده‌های فعلی دیده نمی‌شود.</p>'))
+    if d:
+        g = d.get("genes") or {}
+        sim = "، ".join(f'<a href="/dna/{o.lower()}/">{e(o)}</a>' for o, _ in d.get("similar", [])[:5])
+        out.append(f"<h2>DNA بازار {e(c)}</h2><table>" + "".join(f'<tr><td>{GENE_FA.get(k, k)}</td><td class="num">{"—" if x is None else x}</td></tr>' for k, x in g.items())
+                   + f'</table><p class="note">کد: <span dir="ltr">{e(d.get("code", ""))}</span> · مشابه‌ها: {sim} · <a href="/dna/{c.lower()}/">صفحهٔ کامل DNA</a></p>')
+    if dv:
+        out.append(f'<h2>مشتقات (OKX)</h2><div class="grid"><div class="kpi"><small>فاندینگ ۸ ساعته</small><b>{dv.get("funding")}%</b></div>'
+                   f'<div class="kpi"><small>فاندینگ سالانه</small><b>{dv.get("funding_ann")}%</b></div><div class="kpi"><small>Open Interest</small><b>${(dv.get("oi_usd") or 0) / 1e6:,.0f}M</b></div></div>')
+    if c == "BTC" and KIND.get("power_law"):
+        pl, sc = KIND["power_law"], KIND.get("style_cycle") or {}
+        out.append(f'<h2>اندیکاتورهای Coin_Kurd</h2><p class="txt">قانون توان: ارزش منصفانه {pl["fair"]:,.0f} دلار ({pl["dev_pct"]:+.1f}٪) · '
+                   f'چرخهٔ سبک: {e(sc.get("phase", "—"))} (Bull-Bear {sc.get("bull_bear", "—")}) — <a href="/indicators/">همهٔ اندیکاتورها و سیگنال‌ها</a></p>')
+    return "".join(out)
 
 
 def build_coin(c, cposts):
@@ -207,11 +387,16 @@ def build_coin(c, cposts):
 <p class="note">به‌روزرسانی: {fmt_date(market.get("updated_at",""))} — منبع Binance. قیمت لحظه‌ای را در نمودار بالا ببینید.</p>'''
         opps = [o for o in market.get("opportunities", []) if o["coin"] == c]
         if opps:
+            def rec(o):
+                a = SCANS.get(o["type"]) or {}
+                return f' · پیشینهٔ این الگو: {a["win24"]}٪ مثبت پس از ۲۴ ساعت (n={a["n24"]})' if a.get("n24") else ""
             body += "<h2>فرصت‌های کشف‌شده توسط اسکنر</h2><ul class=list>" + "".join(
-                f'<li>{OPP_FA.get(o["type"], o["type"])} · قدرت {o["strength"]} · اطمینان {"بالا" if o["confidence"] == "high" else "متوسط"}<small>تایم‌فریم {o["tf"]} — صرفاً یافتهٔ تکنیکال، نه توصیهٔ خرید/فروش</small></li>' for o in opps) + "</ul>"
+                f'<li><b class="{"down" if o.get("dir") == "bear" else "up"}">{"▼ نزولی" if o.get("dir") == "bear" else "▲ صعودی"}</b> · {OPP_FA.get(o["type"], o["type"])} · قدرت {o["strength"]} · اطمینان {"بالا" if o["confidence"] == "high" else "متوسط"}'
+                + (f' · ابطال {fmt_price(o["inval"])} · هدف فرضی {fmt_price(o["target"])} · R:R {o["rr"]}' if o.get("inval") is not None else "")
+                + f'<small>تایم‌فریم {o["tf"]}{rec(o)} — صرفاً یافتهٔ تکنیکال، نه توصیهٔ خرید/فروش</small></li>' for o in opps) + "</ul>"
     else:
         body += '<p class="note">دادهٔ بازار Binance برای این دارایی در دسترس نیست.</p>'
-    body += score_html(c)
+    body += intel_profile(c, m)
     cn = [i for i in news.get("items", []) if c in i.get("coins", [])][:15]
     if cn:
         body += "<h2>آخرین اخبار از منابع مختلف</h2><ul class=list>" + "".join(news_li(i) for i in cn) + "</ul>"
@@ -235,7 +420,14 @@ def main():
         for c in p.get("coins", []):
             by_coin.setdefault(c, []).append(p)
     for p in posts:
-        urls.append((build_post(p), p.get("date")))
+        u = build_post(p)
+        if p.get("q") != "low":
+            urls.append((u, p.get("date")))
+        for lg in ("en", "ckb"):
+            ul = build_post_lang(p, lg)
+            if ul and p.get("q") != "low":
+                urls.append((ul, p.get("date")))
+    build_rss()
     for c in set(by_coin) | set(MK):
         urls.append((build_coin(c, by_coin.get(c, [])), market.get("updated_at")))
     order = sorted(set(by_coin) | set(MK), key=lambda c: -len(by_coin.get(c, [])))
@@ -293,7 +485,7 @@ def intel_html():
         r, b = brain["regime"], brain["regime"]["breadth"]
         rp = (brain.get("report") or {}).get("fa")
         out["brain"] = (f'<h3>مغز بازار Entekhab</h3><p><b>رژیم بازار: {RG[r["regime"]]}</b> · پهنای بازار: {b["up_pct"]}% صعودی، {b["down_pct"]}% نزولی، میانگین تغییر ۲۴h {b["avg_chg24"]}% (n={b["n"]})</p>'
-                        + (f'<div><b>{e(rp["headline"])}</b><p style="white-space:pre-wrap">{e(rp["body"])}</p><p class="disc">گزارش هوش مصنوعی ({e(brain.get("report_engine",""))}) — {fmt_date(brain.get("report_at",""))}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.</p></div>' if rp else ""))
+                        + (f'<div><b>{e(big(rp["headline"]))}</b><p style="white-space:pre-wrap">{e(big(rp["body"]))}</p><p class="disc">گزارش هوش مصنوعی ({e(brain.get("report_engine",""))}) — {fmt_date(brain.get("report_at",""))}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.</p></div>' if rp else ""))
     arr = sorted(SC.items(), key=lambda kv: -kv[1]["score"])
     if arr:
         out["score"] = '<h3>امتیاز Entekhab</h3><p class="disc">تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کارنامهٔ کانال ۱۵٪ — توصیف وضعیت، نه پیش‌بینی</p><table class="otab"><tr><th>کوین</th><th>امتیاز</th><th>وضعیت</th></tr>' + "".join(
@@ -368,6 +560,7 @@ async function init(){IDX=(await fetch('/data/history/index.json?'+Date.now()).t
 }
 function slots(){const d=$('#day').value;const ss=IDX.filter(s=>s.slot.startsWith(d));$('#slots').innerHTML=ss.map(s=>`<button data-s="${s.slot}">${s.slot.slice(11)}:00 UTC</button>`).join('');
   $('#slots').querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.s));if(ss.length)show(ss[ss.length-1].slot)}
+const big=t=>String(t||'').replace(/[0-9۰-۹٠-٩][0-9۰-۹٠-٩,٬]{9,}(?:[.٫][0-9۰-۹٠-٩]+)?/g,m=>{const n=+m.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,٬]/g,'').replace('٫','.');if(!isFinite(n)||n<1e9)return m;return n>=1e12?(+(n/1e12).toFixed(2)).toLocaleString('fa-IR')+' تریلیون':(+(n/1e9).toFixed(1)).toLocaleString('fa-IR')+' میلیارد'});
 async function show(slot){document.querySelectorAll('#slots button').forEach(b=>b.classList.toggle('on',b.dataset.s===slot));
   const s=await fetch(`/data/history/${slot}.json`).then(r=>r.json());const i=IDX.findIndex(x=>x.slot===slot);
   const later=[[1,'۶ ساعت بعد'],[4,'۲۴ ساعت بعد'],[28,'۷ روز بعد']].map(([n,l])=>{const x=IDX[i+n];if(!x||!x.btc||!s.prices.BTC)return `<div class="kpi"><small>${l}</small><b>—</b></div>`;const r=(x.btc/s.prices.BTC.price-1)*100;return `<div class="kpi"><small>BTC ${l}</small><b class="${r>=0?'up':'down'}">${r>=0?'+':''}${r.toFixed(2)}%</b></div>`}).join('');
@@ -376,7 +569,7 @@ async function show(slot){document.querySelectorAll('#slots button').forEach(b=>
   <div class="grid"><div class="kpi"><small>رژیم بازار</small><b>${RG[rg.regime]||'—'}</b></div><div class="kpi"><small>ترس و طمع</small><b>${s.fng??'—'}</b></div>
   ${Object.entries(s.prices).slice(0,6).map(([c,p])=>`<div class="kpi"><small>${c}</small><b>${p.price>=1?p.price.toLocaleString('en-US',{maximumFractionDigits:2}):p.price}</b><small class="${p.chg24>=0?'up':'down'}">${p.chg24>=0?'+':''}${p.chg24}% · RSI ${p.rsi}</small></div>`).join('')}</div>
   <h2>بعداً چه شد؟</h2><div class="grid">${later}</div>
-  ${rp?`<h2>گزارش هوش مصنوعی در آن لحظه</h2><details open><summary>${esc(rp.headline)}</summary><div class="txt" style="white-space:pre-wrap">${esc(rp.body)}</div></details>`:''}
+  ${rp?`<h2>گزارش هوش مصنوعی در آن لحظه</h2><details open><summary>${esc(big(rp.headline))}</summary><div class="txt" style="white-space:pre-wrap">${esc(big(rp.body))}</div></details>`:''}
   ${s.opportunities&&s.opportunities.length?`<h2>یافته‌های اسکنر (اطمینان بالا)</h2><ul class="list">${s.opportunities.map(o=>`<li><a href="/coins/${o.coin.toLowerCase()}/">${o.coin}</a> — ${esc(o.type)}<small>قیمت ${o.price}</small></li>`).join('')}</ul>`:''}
   ${s.narratives&&s.narratives.length?`<h2>روایت‌های داغ</h2><ul class="list">${s.narratives.map(n=>`<li>${esc(n.name.fa)}<small>${n.mentions_24h} تیتر · عملکرد ${n.perf_24h??'—'}%</small></li>`).join('')}</ul>`:''}
   ${s.headlines&&s.headlines.length?`<h2>تیترهای آن لحظه</h2><ul class="list">${s.headlines.map(h=>`<li dir="ltr"><a href="${esc(h.url)}" target="_blank" rel="noopener nofollow">${esc(h.title)}</a><small>${esc(h.source)}</small></li>`).join('')}</ul>`:''}
@@ -385,12 +578,125 @@ init().catch(e=>$('#out').innerHTML='<p class=note>هنوز هیچ عکس فور
 """
 
 
+REG_FA = {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"}
+
+
+def snap_html(sn, full=True):
+    """static summary of one Market Replay snapshot (shown without JavaScript and to search engines)"""
+    reg = sn.get("regime") or {}
+    b = reg.get("breadth") or {}
+    pr = sn.get("prices") or {}
+    g = sn.get("global") or {}
+    h = [f'<div class="grid"><div class="kpi"><small>رژیم بازار</small><b>{e(REG_FA.get(reg.get("regime"), reg.get("regime") or "—"))}</b></div>'
+         f'<div class="kpi"><small>ترس و طمع</small><b>{sn.get("fng", "—")}</b></div>'
+         f'<div class="kpi"><small>پهنای بازار</small><b>{b.get("up_pct", "—")}٪ صعودی</b></div>'
+         + (f'<div class="kpi"><small>BTC</small><b>${pr["BTC"]["price"]:,.0f}</b></div>' if pr.get("BTC") else "")
+         + (f'<div class="kpi"><small>ارزش کل بازار</small><b>${g["mcap"] / 1e12:,.2f}T</b></div>' if g.get("mcap") else "") + "</div>"]
+    rp = ((sn.get("report") or {}).get("fa") or {})
+    if rp.get("headline"):
+        bl = [big(x.strip("•-* ").strip()) for x in (rp.get("body") or "").split("\n") if x.strip()]
+        h.append(f'<h2>{e(big(rp["headline"]))}</h2><ul class="list">' + "".join(f"<li>{e(x)}</li>" for x in (bl if full else bl[:2])) + "</ul>"
+                 f'<p class="note">گزارش هوش مصنوعی · {e((sn.get("report_at") or "")[:16].replace("T", " "))} UTC — فقط از داده‌های همان لحظه</p>')
+    if pr:
+        def chs(v):
+            return "—" if v.get("chg24") is None else "%+.2f%%" % v["chg24"]
+        h.append("<h2>قیمت ارزهای اصلی</h2><table><tr><th>ارز</th><th>قیمت</th><th>۲۴ ساعت</th><th>RSI</th></tr>" + "".join(
+            f'<tr><td><a href="/coins/{c.lower()}/">{e(c)}</a></td><td class="num">{fmt_price(v.get("price"))}</td><td class="num">{chs(v)}</td><td class="num">{v.get("rsi", "—")}</td></tr>'
+            for c, v in pr.items()) + "</table>")
+    op = sn.get("opportunities") or []
+    if op and full:
+        h.append("<h2>یافته‌های قوی اسکنر</h2><ul class=list>" + "".join(f'<li>{e(o["coin"])} · {OPP_FA.get(o["type"], o["type"])} · قدرت {o.get("strength")}</li>' for o in op[:10]) + "</ul>")
+    hd = sn.get("headlines") or []
+    if hd and full:
+        h.append("<h2>تیترهای همان لحظه</h2><ul class=list>" + "".join(f'<li><a href="{e(x["url"])}" rel="noopener nofollow" target="_blank" dir="ltr">{e(x["title"])}</a> <small>{e(x.get("source", ""))}</small></li>' for x in hd[:8]) + "</ul>")
+    return "".join(h)
+
+
+def build_daily():
+    """/daily/<YYYY-MM-DD>/ — گزارش روزانهٔ بازار از آخرین عکس فوری هر روز (Market Replay) + /daily/ ؛ و محتوای ثابت صفحهٔ /replay/"""
+    hd = os.path.join(D, "history")
+    idx = load("history/index.json", {})
+    slots = [s["slot"] for s in idx.get("slots", [])]
+    if not slots:
+        return []
+    by_day = {}
+    for sl in slots:
+        by_day[sl[:10]] = sl                       # last slot of each day
+    urls, days = [], sorted(by_day)
+    for i, day in enumerate(days):
+        try:
+            sn = json.load(open(os.path.join(hd, f"{by_day[day]}.json"), encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        nav = " · ".join(x for x in ((f'<a href="/daily/{days[i - 1]}/">← {days[i - 1]}</a>' if i else ""), '<a href="/daily/">همهٔ روزها</a>', (f'<a href="/daily/{days[i + 1]}/">{days[i + 1]} →</a>' if i + 1 < len(days) else "")) if x)
+        body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/daily/">گزارش روزانه</a> / {day}</div><h1>گزارش روزانهٔ بازار کریپتو — {day}</h1>'
+                f'<p class="note">عکس فوری {e(by_day[day])} UTC از «بازپخش بازار»؛ اعداد مربوط به همان لحظه است. <a href="/replay/">بازپخش تعاملی ←</a></p>'
+                + snap_html(sn) + f'<p class="note">{nav}</p><p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
+        rp = ((sn.get("report") or {}).get("fa") or {})
+        urls.append(page(f"daily/{day}/", f"گزارش روزانهٔ بازار کریپتو {day}", (rp.get("headline") or f"وضعیت بازار کریپتو در {day}")[:200], body))
+    hub = "<h1>گزارش روزانهٔ بازار کریپتو</h1><p class=\"txt\">آرشیو وضعیت روزانهٔ بازار: رژیم، ترس و طمع، قیمت‌ها، گزارش هوش مصنوعی و تیترها — از ۱ نوامبر ۲۰۲۶.</p><ul class=list>" + "".join(
+        f'<li><a href="/daily/{d}/">{d}</a></li>' for d in reversed(days)) + "</ul>"
+    urls.append(page("daily/", "گزارش روزانهٔ بازار کریپتو — آرشیو", "آرشیو گزارش روزانهٔ بازار کریپتو با داده‌های واقعی", hub))
+    print(f"daily pages: {len(urls)}")
+    return urls
+
+
+SECTOR_FA = {"layer-1": "لایهٔ یک (L1)", "exchange-based-tokens": "توکن صرافی‌ها", "meme-token": "میم‌کوین‌ها", "artificial-intelligence": "هوش مصنوعی (AI)",
+             "decentralized-finance-defi": "دیفای (DeFi)", "real-world-assets-rwa": "دارایی‌های واقعی (RWA)", "layer-2": "لایهٔ دو (L2)", "gaming": "گیمینگ",
+             "stablecoins": "استیبل‌کوین‌ها", "liquid-staking-tokens": "استیکینگ نقد", "smart-contract-platform": "پلتفرم قرارداد هوشمند",
+             "privacy-coins": "حریم خصوصی", "solana-ecosystem": "اکوسیستم سولانا", "ethereum-ecosystem": "اکوسیستم اتریوم", "depin": "DePIN",
+             "oracle": "اوراکل", "storage": "ذخیره‌سازی", "nft": "NFT", "metaverse": "متاورس", "decentralized-exchange": "صرافی‌های غیرمتمرکز (DEX)",
+             "lending-borrowing": "وام‌دهی و وام‌گیری", "non-fungible-tokens-nft": "NFT", "zero-knowledge-zk": "دانش صفر (ZK)"}
+
+
+def build_seo_extra():
+    """/fear-greed/ و /sectors/ — صفحات ثابت شاخص ترس و طمع و بخش‌های بازار با دادهٔ واقعی"""
+    urls = []
+    fg = market.get("fng") or {}
+    if fg.get("value") is not None:
+        hist = fg.get("history") or []
+        pts = " ".join(f"{i / max(1, len(hist) - 1) * 600:.1f},{100 - v:.1f}" for i, (_, v) in enumerate(hist))
+        cls = {"Extreme Fear": "ترس شدید", "Fear": "ترس", "Neutral": "خنثی", "Greed": "طمع", "Extreme Greed": "طمع شدید"}.get(fg.get("class"), fg.get("class"))
+        body = (f'<div class="meta"><a href="/">خانه</a> / شاخص ترس و طمع</div><h1>شاخص ترس و طمع کریپتو امروز: {fg["value"]} ({e(cls)})</h1>'
+                f'<div class="grid"><div class="kpi"><small>امروز</small><b>{fg["value"]}</b></div><div class="kpi"><small>وضعیت</small><b>{e(cls)}</b></div>'
+                + (f'<div class="kpi"><small>۷ روز پیش</small><b>{hist[-8][1]}</b></div>' if len(hist) >= 8 else "")
+                + (f'<div class="kpi"><small>۳۰ روز پیش</small><b>{hist[0][1]}</b></div>' if hist else "") + "</div>"
+                + (f'<svg viewBox="0 0 600 100" style="width:100%;height:140px;border:1px solid var(--line);border-radius:10px;margin:14px 0"><line x1="0" x2="600" y1="50" y2="50" stroke="#ffffff22"/><polyline points="{pts}" fill="none" stroke="#f7931a" stroke-width="2"/></svg><p class="note">۳۰ روز اخیر · منبع alternative.me · به‌روزرسانی {fmt_date(market.get("updated_at", ""))}</p>' if hist else "")
+                + '<h2>این شاخص چیست؟</h2><p class="txt">شاخص ترس و طمع (۰ تا ۱۰۰) احساس کلی بازار کریپتو را از نوسان، حجم، شبکه‌های اجتماعی، دامیننس بیت‌کوین و روندها خلاصه می‌کند. '
+                'زیر ۲۵ «ترس شدید»، ۲۵ تا ۴۵ «ترس»، ۴۵ تا ۵۵ «خنثی»، ۵۵ تا ۷۵ «طمع» و بالای ۷۵ «طمع شدید» است. ترس شدید گاهی با کف‌های بازار هم‌زمان بوده و طمع شدید با سقف‌ها — اما این قاعدهٔ قطعی نیست.</p>'
+                '<p class="txt">برای دیدن رژیم بازار، پهنای بازار و گزارش هوش مصنوعی به <a href="/#intel">مغز بازار</a> و برای تاریخچهٔ روزانه به <a href="/daily/">گزارش‌های روزانه</a> بروید.</p><p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
+        urls.append(page("fear-greed/", f"شاخص ترس و طمع کریپتو امروز — {fg['value']} ({cls})", f"شاخص ترس و طمع بازار کریپتو امروز {fg['value']} است ({cls}). نمودار ۳۰ روزه و توضیح شاخص.", body))
+    fl = load("flows.json", {})
+    secs = [x for x in fl.get("sectors", []) if not x.get("suspect")]
+    if secs:
+        rows = []
+        for x in secs:
+            nm = SECTOR_FA.get(x["id"], x["name"])
+            ch = x.get("chg24")
+            chs = "—" if ch is None else "%+.2f%%" % ch
+            body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/sectors/">بخش‌های بازار</a> / {e(nm)}</div><h1>وضعیت بخش {e(nm)} در بازار کریپتو</h1>'
+                    f'<div class="grid"><div class="kpi"><small>ارزش بازار</small><b>${x["mcap"] / 1e9:,.1f}B</b></div><div class="kpi"><small>تغییر ۲۴ ساعت</small><b class="{"up" if (ch or 0) >= 0 else "down"}">{chs}</b></div>'
+                    f'<div class="kpi"><small>ورود/خروج ارزش ۲۴h</small><b>${x.get("delta_usd", 0) / 1e9:+,.2f}B</b></div><div class="kpi"><small>حجم ۲۴h</small><b>${(x.get("vol24") or 0) / 1e9:,.1f}B</b></div></div>'
+                    f'<p class="txt">نام در CoinGecko: <span dir="ltr">{e(x["name"])}</span>. «ورود/خروج ارزش» تغییر ارزش بازار این بخش در ۲۴ ساعت است، نه جریان پول خالص.</p>'
+                    f'<p><a href="/terminal/#flow">آبشار سرمایه در ترمینال ←</a> · <a href="/sectors/">همهٔ بخش‌ها</a></p><p class="note">منبع CoinGecko · به‌روزرسانی {fmt_date(fl.get("updated_at", ""))} · آموزشی است، توصیهٔ مالی نیست.</p>')
+            urls.append(page(f"sectors/{x['id']}/", f"بخش {nm} کریپتو — ارزش بازار و تغییرات امروز", f"وضعیت امروز بخش {nm} در بازار کریپتو: ارزش بازار، تغییر ۲۴ ساعته و حجم معاملات", body))
+            rows.append(f'<tr><td><a href="/sectors/{x["id"]}/">{e(nm)}</a></td><td class="num">${x["mcap"] / 1e9:,.1f}B</td><td class="num {"up" if (ch or 0) >= 0 else "down"}">{chs}</td></tr>')
+        hub = "<h1>بخش‌های بازار کریپتو</h1><p class=\"txt\">ارزش بازار و تغییر ۲۴ ساعتهٔ بخش‌های اصلی (CoinGecko).</p><table><tr><th>بخش</th><th>ارزش بازار</th><th>۲۴ ساعت</th></tr>" + "".join(rows) + "</table>"
+        urls.append(page("sectors/", "بخش‌های بازار کریپتو — DeFi، AI، RWA، میم و …", "ارزش بازار و تغییرات بخش‌های اصلی بازار کریپتو", hub))
+    print(f"seo extra pages: {len(urls)}")
+    return urls
+
+
 def build_replay():
+    idx = load("history/index.json", {})
+    last = (idx.get("slots") or [{}])[-1].get("slot")
+    sn = load(f"history/{last}.json", {}) if last else {}
+    ssr = (f'<p class="note">آخرین عکس فوری: {e(last)} UTC — <a href="/daily/">آرشیو گزارش‌های روزانه</a></p>' + snap_html(sn, full=False)) if sn else '<p class="note">در حال بارگذاری…</p>'
     css = "#slots button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;margin:4px;cursor:pointer;font-family:inherit}#slots button.on{background:var(--acc);color:#000}select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font-family:inherit}.kpi small.up,.kpi small.down{display:block}"
     body = ('<h1>⏪ بازپخش بازار (Market Replay)</h1><p class="txt">وضعیت بازار، گزارش هوش مصنوعی، یافته‌های اسکنر، روایت‌ها و تیترها در هر لحظهٔ گذشته — و اینکه بعداً قیمت چه کرد. '
             'از ۱ نوامبر ۲۰۲۶ هر ۶ ساعت یک عکس فوری ذخیره می‌شود.</p>'
             '<svg id="spark" viewBox="0 0 600 75" style="width:100%;height:80px;border:1px solid var(--line);border-radius:10px;margin:8px 0"></svg>'
-            '<p><label>روز: <select id="day"></select></label></p><div id="slots"></div><div id="out"><p class="note">در حال بارگذاری…</p></div>')
+            '<p><label>روز: <select id="day"></select></label></p><div id="slots"></div><div id="out">' + ssr + '</div>')
     return page("replay/", "بازپخش بازار کریپتو (Market Replay)", "وضعیت بازار کریپتو در هر لحظهٔ گذشته: رژیم بازار، گزارش هوش مصنوعی، اسکنر، روایت‌ها و تیترها",
                 body, f"<style>{css}</style><script defer>{REPLAY_JS}</script>".replace("<script defer>", "<script>document.addEventListener('DOMContentLoaded',()=>{").replace("</script>", "})</script>"))
 
@@ -645,6 +951,8 @@ if __name__ == "__main__":
     extra += build_weekly()
     extra += build_compare()
     extra += build_indicators()
+    extra += build_daily()
+    extra += build_seo_extra()
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
     open(sm, "w", encoding="utf-8").write(s)
