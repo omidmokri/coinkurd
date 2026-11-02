@@ -566,8 +566,14 @@ def check_alerts(s):
     return changed
 
 
-def group_send(chat_id, text, kb=None, plain=False, **kw):
-    return send(chat_id, D.e(text) if plain else text, kb, **kw)
+def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
+    body = D.e(text) if plain else text
+    if photo:                                   # picture + summary as caption (summaries are ≤1024 chars, Telegram's caption limit)
+        r = tg("sendPhoto", chat_id=chat_id, photo=photo, caption=fix_amp(body), parse_mode="HTML", **kw)
+        if r.get("ok"):
+            return r
+        log.info("sendPhoto failed (%s); sending text only", r.get("description"))
+    return send(chat_id, body, kb, **kw)
 
 
 def group_delete(chat_id, mid):
