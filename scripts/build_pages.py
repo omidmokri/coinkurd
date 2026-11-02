@@ -311,6 +311,7 @@ def post_li(p):
 
 
 def prerender():
+    good = [p for p in posts if p.get("q") != "low"]           # promos / repeats are not shown as "latest"
     idx = os.path.join(ROOT, "index.html")
     s = open(idx, encoding="utf-8").read()
     it = intel_html()
@@ -321,7 +322,7 @@ def prerender():
         '<b id="sCats">—</b>': f'<b id="sCats">{n_cats}</b>',
         '<b id="sCoins">—</b>': f'<b id="sCoins">{n_coins}</b>',
         '<b id="sUpd" style="font-size:1.2rem;padding-top:14px">—</b>': f'<b id="sUpd" style="font-size:1.2rem;padding-top:14px">{fmt_date(meta.get("updated_at",""))}</b>',
-        '<b id="nextTitle" dir="auto">…</b>': f'<b id="nextTitle" dir="auto">{e(posts[0]["title"]) if posts else "…"}</b>',
+        '<b id="nextTitle" dir="auto">…</b>': f'<b id="nextTitle" dir="auto">{e(good[0]["title"]) if good else "…"}</b>',
         '<div class="fresh" id="fresh"></div>': f'<div class="fresh" id="fresh">{it["fresh"]}</div>',
         '<div class="ibox" id="fngBox"></div>': f'<div class="ibox" id="fngBox">{it.get("fng","")}</div>',
         '<div class="ibox" id="globBox"></div>': f'<div class="ibox" id="globBox">{it.get("glob","")}</div>',
@@ -333,7 +334,7 @@ def prerender():
         '<div class="hall" id="hallGrid"></div>': '<div class="hall" id="hallGrid">' + "".join(
             f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic">{c["icon"]}</span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
             for c in meta.get("categories", []) if meta.get("by_category", {}).get(c["id"])) + "</div>",
-        '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in posts[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
+        '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in good[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
     }
     miss = [k for k in reps if k not in s]
     for k, v in reps.items():

@@ -111,6 +111,7 @@ def build_facts(m, reg, news, score, posts):
         "time_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
         "regime": reg, "fng": m.get("fng", {}).get("value"), "fng_class": m.get("fng", {}).get("class"),
         "global": m.get("global"),
+        "global_fmt": {"mcap_trillion_usd": round((m.get("global") or {}).get("mcap", 0) / 1e12, 2), "vol_billion_usd": round((m.get("global") or {}).get("vol", 0) / 1e9, 1)},
         "btc": btc and {k: btc[k] for k in ("price", "chg24", "rsi", "trend")},
         "eth": eth and {k: eth[k] for k in ("price", "chg24", "rsi", "trend")},
         "top_gainers": [{"coin": c["coin"], "chg24": c["chg24"]} for c in gain],
@@ -130,7 +131,9 @@ Write a concise market briefing using ONLY the JSON facts below. Hard rules:
   4) key headlines; 5) risks / what to watch (only things derivable from the facts).
 Produce three versions with the same content: Persian (fa), Central Kurdish Sorani in Arabic script (ckb), English (en).
 Return JSON: {"fa":{"headline":"","body":""},"ckb":{"headline":"","body":""},"en":{"headline":"","body":""}}
-Use short paragraphs or "• " bullets inside body; no markdown headings.
+Use "• " bullets inside body; no markdown headings. Keep it short and readable: headline ≤ 14 words; body = at most 5 bullets,
+each at most 2 short sentences. Never write a number with more than 6 digits: for market cap and volume use global_fmt
+(e.g. "$2.63 trillion", "$114.6 billion"); round prices to whole dollars when above 100.
 
 FACTS:
 """
@@ -161,7 +164,8 @@ def main():
     facts = build_facts(m, reg, news, score, posts)
     out = {"updated_at": datetime.now(timezone.utc).isoformat(), "regime": reg, "movers": facts["movers_context"],
            "gainers": facts["top_gainers"], "losers": facts["top_losers"],
-           "report": prev.get("report"), "report_at": prev.get("report_at"), "report_engine": prev.get("report_engine")}
+           "report": prev.get("report"), "report_at": prev.get("report_at"), "report_engine": prev.get("report_engine"),
+           "report_facts": prev.get("report_facts")}
     stamps = [prev.get("report_at")] + [x.get("at") for x in load("brain_log.json", [])[-3:]]
     stamps = [datetime.fromisoformat(t) for t in stamps if t]
     last = max(stamps) if stamps else None
@@ -177,7 +181,12 @@ def main():
             if bad:
                 raise RuntimeError(f"report contains numbers not in data: {bad[:6]}")
             out.update({"report": rep, "report_at": out["updated_at"], "report_engine": "gemini:" + ai.model(),
-                        "report_flags": bad})
+                        "report_flags": bad,
+                        # the numbers the report was written from (shown next to today's numbers on the site)
+                        "report_facts": {"fng": facts.get("fng"), "fng_class": facts.get("fng_class"), "regime": reg.get("regime"),
+                                         "btc": (facts.get("btc") or {}).get("price"), "btc_chg24": (facts.get("btc") or {}).get("chg24"),
+                                         "eth": (facts.get("eth") or {}).get("price"), "up_pct": reg["breadth"]["up_pct"], "down_pct": reg["breadth"]["down_pct"],
+                                         "mcap_t": facts["global_fmt"]["mcap_trillion_usd"]}})
             log = load("brain_log.json", [])
             log.append({"at": out["updated_at"], "regime": reg["regime"], "report": rep, "facts": facts})
             json.dump(log[-60:], open(os.path.join(D, "brain_log.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
