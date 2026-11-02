@@ -731,6 +731,36 @@ SECTOR_FA = {"layer-1": "لایهٔ یک (L1)", "exchange-based-tokens": "توک
              "lending-borrowing": "وام‌دهی و وام‌گیری", "non-fungible-tokens-nft": "NFT", "zero-knowledge-zk": "دانش صفر (ZK)"}
 
 
+
+def build_feeds():
+    """/onchain/ and /crypto-news/ — Persian and Sorani summaries written by the Telegram bot (data/onchain.json, data/cryptonews.json)"""
+    urls = []
+    spec = [("onchain.json", "onchain/", "تحلیل آنچین — ئاناڵیزی ئانچین",
+             "خلاصهٔ تحلیل‌های آنچین بیت‌کوین و بازار کریپتو به فارسی و کوردی سورانی"),
+            ("cryptonews.json", "crypto-news/", "اخبار کریپتو — هەواڵی کریپتۆ",
+             "خلاصهٔ اخبار روز بازار کریپتو به فارسی و کوردی سورانی")]
+    for fn, path, title, desc in spec:
+        d = load(fn, {})
+        items = d.get("items", [])
+        cards = []
+        for it in items[:40]:
+            fa = e(it.get("fa", "")).replace("\n", "<br>")
+            ckb = e(it.get("ckb", "")).replace("\n", "<br>")
+            when = fmt_date(it.get("at") or it.get("made") or "")
+            block = f'<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
+            block += f'<small class="note">{when}</small><div lang="fa" dir="rtl">{fa}</div>'
+            if ckb:
+                block += f'<details style="margin-top:10px"><summary>کوردی سۆرانی</summary><div lang="ckb" dir="rtl">{ckb}</div></details>'
+            block += "</article>"
+            cards.append(block)
+        body = (f'<div class="meta"><a href="/">خانه</a> / {e(title)}</div><h1>{e(title)}</h1>'
+                f'<p class="note">{e(desc)} · به‌روز خودکار از ربات Coin_Kurd</p>'
+                + ("".join(cards) or '<p class="note">هنوز موردی منتشر نشده است.</p>')
+                + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
+        urls.append(page(path, title, desc, body))
+    print(f"feed pages: {len(urls)}")
+    return urls
+
 def build_seo_extra():
     """/fear-greed/ و /sectors/ — صفحات ثابت شاخص ترس و طمع و بخش‌های بازار با دادهٔ واقعی"""
     urls = []
@@ -1193,6 +1223,7 @@ if __name__ == "__main__":
     extra += build_compare()
     extra += build_indicators()
     extra += build_daily()
+    extra += build_feeds()
     extra += build_seo_extra()
     extra += build_learn()
     print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
