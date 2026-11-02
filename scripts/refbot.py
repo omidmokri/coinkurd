@@ -31,6 +31,7 @@ import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
+import bot_studio as S  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
@@ -607,12 +608,19 @@ def _image_bytes(url):
     return None
 
 
-def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
+def group_send(chat_id, text, kb=None, plain=False, photo=None, video=None, **kw):
     """post to the group; with a picture the summary becomes its caption (summaries are ≤1024 chars, the caption limit).
     The picture is downloaded and uploaded by the bot, because Telegram cannot fetch t.me CDN links itself."""
     body = fix_amp(D.e(text) if plain else text)
+    if video:                                    # bytes of an mp4 made by the bot (bot_reel)
+        data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML", "supports_streaming": "true",
+                "width": "720", "height": "1280"}
+        data.update({k: v for k, v in kw.items() if v is not None})
+        if kb:
+            data["reply_markup"] = json.dumps(kb)
+        return _post_with_retry("sendVideo", data, files={"video": ("coin_kurd.mp4", video, "video/mp4")})
     if photo:
-        img = _image_bytes(photo)
+        img = photo if isinstance(photo, bytes) else _image_bytes(photo)
         if img:
             data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML"}
             data.update({k: v for k, v in kw.items() if v is not None})
@@ -627,6 +635,11 @@ def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
     if kb:
         data["reply_markup"] = kb
     return _post_with_retry("sendMessage", data)
+
+
+def channel_poll(chat_id, question, options):
+    return _post_with_retry("sendPoll", {"chat_id": chat_id, "question": question[:300],
+                                         "options": [{"text": o[:100]} for o in options], "is_anonymous": True})
 
 
 def group_delete(chat_id, mid):
@@ -961,6 +974,7 @@ def main():
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
     F.start(s, group_send, group_delete, GROUP, MAIN_WT)
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
+    S.start(s, group_send, CHANNEL, channel_poll)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
