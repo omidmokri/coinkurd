@@ -73,7 +73,7 @@ def save_issue(w, news, narr):
     os.makedirs(os.path.join(D, "weekly"), exist_ok=True)
     brain, council, events, posts, dna = load("brain.json", {}), load("council.json", {}), load("events.json", {}), load("posts.json", []), load("dna.json", {})
     cut = NOW - timedelta(days=7)
-    week_posts = [{"id": p["id"], "title": p.get("title"), "date": p.get("date"), "tr": {k: (v or {}).get("title") for k, v in (p.get("tr") or {}).items()}}
+    week_posts = [{"id": p["id"], "title": p.get("title"), "date": p.get("date"), "tr": {k: v.get("title") for k, v in (p.get("tr") or {}).items() if isinstance(v, dict)}}
                   for p in posts if p.get("date") and datetime.fromisoformat(p["date"]) >= cut][:8]
     ev = [e for e in events.get("events", []) if e.get("btc_4h") is not None and datetime.fromisoformat(e["date"]) >= cut][:6]
     coins = (dna.get("coins") or {})
