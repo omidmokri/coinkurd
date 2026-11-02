@@ -341,6 +341,12 @@ def publish(s, f, topics, group_id, send_fn):
     if not group_id:
         return
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if not f.get("photo_fix_v1"):                    # today's items went out without pictures once: post them again with pictures
+        f["photo_fix_v1"] = today
+        for kind in ("onchain", "news"):
+            for it in f["items"].get(kind, []):
+                if (it.get("at") or "")[:10] == today:
+                    it["posted"] = False
     budget = PUBLISH_PER_LOOP
     for kind in ("onchain", "news"):
         if not any(topics.get(k) for k in (kind, f"{kind}:fa", f"{kind}:ckb")):
@@ -355,12 +361,19 @@ def publish(s, f, topics, group_id, send_fn):
                 return
             if not it.get("photo"):
                 it["photo"] = find_photo(it["id"])
+            ok = True
             for lang in POST_LANGS:
                 th = topics.get(f"{kind}:{lang}") or topics.get(kind)
-                if it.get(lang) and th:
-                    send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
-                    time.sleep(1.5)
-            it["posted"] = True
+                if it.get(lang) and th and lang not in it.get("sent", []):
+                    r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
+                    if r.get("ok"):
+                        it.setdefault("sent", []).append(lang)
+                        it.setdefault("msgs", []).append(r["result"]["message_id"])
+                    else:
+                        ok = False
+                    time.sleep(3.5)                     # stay under Telegram's ~20 messages/minute per group
+            if ok:
+                it["posted"] = True
             budget -= 1
 
 
