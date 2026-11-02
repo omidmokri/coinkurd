@@ -30,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
+import bot_videos as V  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
@@ -615,6 +616,8 @@ def group_send(chat_id, text, kb=None, plain=False, photo=None, **kw):
         if img:
             data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML"}
             data.update({k: v for k, v in kw.items() if v is not None})
+            if kb:
+                data["reply_markup"] = json.dumps(kb)
             r = _post_with_retry("sendPhoto", data, files={"photo": ("chart.jpg", img)})
             if r.get("ok"):
                 return r
@@ -957,6 +960,7 @@ def main():
     s = load_state()
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
     F.start(s, group_send, group_delete, GROUP, MAIN_WT)
+    V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS

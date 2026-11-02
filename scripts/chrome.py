@@ -117,6 +117,8 @@ NAV = [
          L("خلاصهٔ تحلیل‌های آنچین به فارسی و کوردی", "پوختەی شیکارییە ئانچینەکان بە کوردی و فارسی", "On-chain analysis digests in Persian and Kurdish")),
         ("/crypto-news/", "news", L("اخبار کریپتو", "هەواڵی کریپتۆ", "Crypto news"),
          L("خلاصهٔ اخبار روز بازار", "پوختەی هەواڵەکانی ڕۆژ", "Today's crypto news, summarised")),
+        ("/videos/", "news", L("ویدیوهای روز", "ڤیدیۆکانی ڕۆژ", "Videos of the day"),
+         L("۵ ویدیوی مهم بیت‌کوین و اتریوم", "٥ ڤیدیۆی گرنگی بیتکۆین و ئیتریۆم", "5 key Bitcoin & Ethereum videos")),
         ("/daily/", "calendar", L("گزارش روزانه", "ڕاپۆرتی ڕۆژانە", "Daily report"),
          L("خلاصهٔ هوشمند هر روز بازار", "پوختەی زیرەکی هەر ڕۆژێکی بازاڕ", "A smart summary of every market day")),
         ("/weekly/", "news", L("مجلهٔ هفتگی", "گۆڤاری هەفتانە", "Weekly magazine"),

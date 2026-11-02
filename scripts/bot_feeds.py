@@ -130,11 +130,11 @@ PROMPT = """✅ شما یک دستیار حرفه‌ای خلاصه‌سازی �
 LATIN_CJK = re.compile(r"[A-Za-z぀-ヿ㐀-鿿가-힯]")
 
 
-def problems(text):
+def problems(text, limit=1024):
     """rule violations a reader would notice; [] = publishable"""
     p = []
-    if len(text) > 1024:
-        p.append(f"طول {len(text)} کاراکتر است و باید زیر ۱۰۲۴ باشد")
+    if len(text) > limit:
+        p.append(f"طول {len(text)} کاراکتر است و باید زیر {limit} باشد")
     if LATIN_CJK.search(text):
         bad = sorted(set(re.findall(r"[A-Za-z]+|[぀-ヿ㐀-鿿가-힯]+", text)))[:8]
         p.append("این کلمه‌های غیرفارسی را حذف یا ترجمه کن: " + "، ".join(bad))
@@ -157,7 +157,7 @@ def tidy(text):
     return "\n".join(out).strip()
 
 
-def summarize(source_text, lang):
+def summarize(source_text, lang, limit=1024):
     """-> text that passes problems(), or None"""
     if not ai.available():
         return None
@@ -170,7 +170,7 @@ def summarize(source_text, lang):
         except Exception as ex:  # quota, network
             log.warning("ai failed: %s", ex)
             return None
-        pr = problems(out)
+        pr = problems(out, limit)
         if not pr:
             return out
         last = out

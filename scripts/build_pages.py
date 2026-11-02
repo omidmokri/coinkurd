@@ -761,6 +761,17 @@ def build_feeds():
                 + ("".join(cards) or '<p class="note">هنوز موردی منتشر نشده است.</p>')
                 + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
         urls.append(page(path, title, desc, body))
+    v = load("videos.json", {}).get("items", [])
+    cards = []
+    for it in v[:40]:
+        ph = it.get("photo") or ""
+        cards.append('<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
+                     + (f'<a href="{e(it.get("url", ""))}" target="_blank" rel="noopener"><img class="img" src="{e(ph)}" alt="" loading="lazy"></a>' if ph.startswith("https://i.ytimg.com/") else "")
+                     + f'<small class="note">{fmt_date(it.get("at", ""))}</small><div lang="fa" dir="rtl">{e(it.get("fa", "")).replace(chr(10), "<br>")}</div>'
+                     + f'<p><a href="{e(it.get("url", ""))}" target="_blank" rel="noopener">▶️ تماشای ویدیو</a></p></article>')
+    vt, vd = "ویدیوهای مهم روز کریپتو", "هر روز ۵ ویدیوی مهم بیت‌کوین و اتریوم با خلاصهٔ فارسی، منتشرشده در کانال Coin_Kurd"
+    urls.append(page("videos/", vt, vd, f'<div class="meta"><a href="/">خانه</a> / {vt}</div><h1>{vt}</h1><p class="note">{vd}</p>'
+                     + ("".join(cards) or '<p class="note">هنوز موردی منتشر نشده است.</p>') + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>'))
     print(f"feed pages: {len(urls)}")
     return urls
 
