@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>پرسشنامه — پژوهش شرط‌بندی آنلاین</title>
+<meta name="theme-color" content="#070b16">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+<body>
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="grain"></div>
+
+<header class="top"><div class="inner">
+  <div class="brand"><span class="dot"></span> پرسشنامه پژوهش</div>
+  <nav class="top-nav">
+    <a href="index.html">خانه</a>
+    <a href="survey.html" aria-current="page">پرسشنامه</a>
+    <a href="model.html">مدل پژوهش</a>
+  </nav>
+</div></header>
+
+<div class="progress-shell">
+  <div class="wrap">
+    <div class="bar"><i></i></div>
+    <div class="pct">۰٪</div>
+  </div>
+</div>
+
+<main><div class="wrap"><div id="app"></div></div></main>
+
+<footer><div class="wrap">
+  <p>پاسخ‌های شما بی‌نام ثبت می‌شود · هیچ نشانی IP یا اطلاعات شناسایی‌کننده ذخیره نمی‌گردد</p>
+</div></footer>
+
+<script type="module">
+import { start } from './assets/js/survey.js';
+start();
+</script>
+</body>
+</html>

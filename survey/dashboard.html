@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>داشبورد نتایج</title>
+<meta name="theme-color" content="#070b16">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="grain"></div>
+
+<header class="top"><div class="inner">
+  <div class="brand"><span class="dot"></span> داشبورد نتایج</div>
+  <nav class="top-nav">
+    <a href="index.html">خانه</a>
+    <a href="model.html">مدل پژوهش</a>
+    <a href="dashboard.html" aria-current="page">داشبورد</a>
+  </nav>
+</div></header>
+
+<main><div class="wrap-wide">
+
+  <!-- دروازه ورود -->
+  <section id="gate">
+    <h1>داشبورد نتایج</h1>
+    <p class="lead">این بخش ویژه پژوهشگر است. رمزی را که در <code>config.js</code> و
+    <code>Code.gs</code> تنظیم کرده‌اید وارد کنید.</p>
+    <div class="card" style="max-width:460px">
+      <input class="field" id="tok" type="password" placeholder="رمز داشبورد"
+             autocomplete="off">
+      <div class="btn-row">
+        <button class="btn btn-primary" id="enter">ورود</button>
+        <button class="btn btn-ghost" id="demo">نمایش با داده نمونه</button>
+      </div>
+    </div>
+    <div class="card card-amber">
+      <p style="margin:0"><strong>درباره این رمز.</strong> چون سایت ایستا است، این رمز
+      فقط جلوی بازدید اتفاقی را می‌گیرد و امنیت واقعی ندارد. امنیت واقعی در
+      <code>Code.gs</code> اعمال می‌شود که بدون توکن درست، داده‌ای برنمی‌گرداند.
+      در هر حال هرگز داده شناسایی‌کننده در شیت نگذارید.</p>
+    </div>
+  </section>
+
+  <!-- داشبورد -->
+  <section id="panel" hidden>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+                justify-content:space-between">
+      <h1 style="margin:0">نتایج</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="refresh"
+                style="min-height:44px;padding:10px 18px;font-size:13.5px">به‌روزرسانی</button>
+        <button class="btn btn-ghost" id="csv"
+                style="min-height:44px;padding:10px 18px;font-size:13.5px">خروجی CSV</button>
+      </div>
+    </div>
+    <div id="mode"></div>
+
+    <div class="stats" id="stats"></div>
+
+    <h2>فضای سه‌بعدی متغیرها</h2>
+    <p class="muted">هر کره یک شرکت‌کننده است. محورها: اجتناب تجربه‌ای (افقی)، تنظیم هیجان
+    (عمودی) و انعطاف‌ناپذیری روان‌شناختی (عمق). رنگ و اندازه کره‌ها بر پایه شدت اختلال قمار است.</p>
+    <div class="stage stage-tall" id="scatter">
+      <div class="hint">بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی</div>
+    </div>
+
+    <h2>توزیع طبقات شدت قمار</h2>
+    <div class="stage stage-mid" id="bars">
+      <div class="hint">بکشید تا بچرخد</div>
+    </div>
+
+    <h2>آمار توصیفی</h2>
+    <div class="t-wrap"><table class="t" id="desc"></table></div>
+
+    <h2>ماتریس همبستگی پیرسون</h2>
+    <p class="muted">همبستگی‌ها در جدول خواناتر از نمایش سه‌بعدی‌اند، بنابراین عمداً
+    دوبعدی مانده‌اند.</p>
+    <div class="t-wrap"><table class="t" id="corr"></table></div>
+
+    <div class="card card-amber">
+      <p style="margin:0">این داشبورد برای <strong>پایش روند گردآوری</strong> است، نه
+      جایگزین تحلیل. آزمون فرضیه‌ها باید در AMOS یا lavaan با همان نحو پیوست ث
+      پایان‌نامه انجام شود.</p>
+    </div>
+  </section>
+
+</div></main>
+
+<footer><div class="wrap"><p>داشبورد پایش گردآوری داده</p></div></footer>
+
+<script type="module">
+import { CONFIG } from './assets/js/config.js';
+import { fetchRows, isLive, toCSV, download } from './assets/js/storage.js';
+import { drawScatter, drawBars, pearson, describe, BAND_FA } from './assets/js/dashboard3d.js';
+import { fa } from './assets/js/scoring.js';
+
+const $ = s => document.querySelector(s);
+let rows = [], disposers = [];
+
+/* ---------- داده نمونه ---------- */
+function demoRows(n = 180) {
+  const g = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; // ~نرمال
+  return Array.from({ length: n }, () => {
+    const ea = 52 + g() * 14;                       // BEAQ 15-90
+    const pi = 26 + g() * 8 + (ea - 52) * 0.22;     // AAQ 7-49
+    const er = 95 + g() * 22 + (ea - 52) * 0.9 + (pi - 26) * 0.8;  // DERS 36-180
+    const pg = 6 + g() * 4 + (er - 95) * 0.11 + (ea - 52) * 0.07;
+    const cl = (v, a, b) => Math.max(a, Math.min(b, Math.round(v)));
+    return {
+      ts: new Date(Date.now() - Math.random() * 2.4e9).toISOString(),
+      beaq_total: cl(ea, 15, 90), aaq_total: cl(pi, 7, 49),
+      ders_total: cl(er, 36, 180), pgsi_total: cl(pg, 0, 27),
+      gender: Math.random() < 0.76 ? 1 : 2,
+      activity: 1 + Math.floor(Math.random() * 3),
+      age: cl(27 + g() * 7, 18, 60),
+      dur_sec: cl(900 + g() * 320, 300, 2400),
+      attn1: Math.random() < 0.95 ? 1 : 0, attn2: Math.random() < 0.95 ? 1 : 0,
+    };
+  });
+}
+
+/* ---------- رسم ---------- */
+function render(label) {
+  $('#gate').hidden = true; $('#panel').hidden = false;
+  disposers.forEach(d => d && d()); disposers = [];
+
+  $('#mode').innerHTML = label
+    ? `<div class="card card-amber"><p style="margin:0">${label}</p></div>` : '';
+
+  const col = k => rows.map(r => +r[k]).filter(Number.isFinite);
+  const pg = col('pgsi_total');
+  const counts = { none: 0, low: 0, mod: 0, high: 0 };
+  pg.forEach(p => counts[p === 0 ? 'none' : p <= 2 ? 'low' : p <= 7 ? 'mod' : 'high']++);
+  const flagged = rows.filter(r => +r.attn1 === 0 || +r.attn2 === 0).length;
+
+  $('#stats').innerHTML = [
+    ['پاسخ ثبت‌شده', fa(rows.length)],
+    ['میانگین PGSI', pg.length ? fa(describe(pg).m.toFixed(1)) : '—'],
+    ['قمار مشکل‌ساز', fa(counts.high) + ' نفر'],
+    ['علامت‌خورده (کنترل توجه)', fa(flagged)],
+    ['میانگین زمان', col('dur_sec').length
+      ? fa(Math.round(describe(col('dur_sec')).m / 60)) + ' دقیقه' : '—'],
+  ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`)
+   .join('');
+
+  disposers.push(drawScatter($('#scatter'), rows));
+  disposers.push(drawBars($('#bars'), counts));
+
+  const VARS = [['beaq_total', 'اجتناب تجربه‌ای'], ['aaq_total', 'انعطاف‌ناپذیری'],
+                ['ders_total', 'تنظیم هیجان'], ['pgsi_total', 'شدت اختلال قمار']];
+  $('#desc').innerHTML = '<tr><th>متغیر</th><th>تعداد</th><th>میانگین</th>' +
+    '<th>انحراف معیار</th><th>کمینه</th><th>بیشینه</th></tr>' +
+    VARS.map(([k, n]) => { const d = describe(col(k));
+      return `<tr><td>${n}</td><td>${fa(d.n)}</td>
+        <td>${d.m === null ? '—' : fa(d.m.toFixed(2))}</td>
+        <td>${d.sd === null ? '—' : fa(d.sd.toFixed(2))}</td>
+        <td>${d.min === null ? '—' : fa(d.min)}</td><td>${d.max === null ? '—' : fa(d.max)}</td></tr>`; }).join('');
+
+  $('#corr').innerHTML = '<tr><th></th>' + VARS.map(v => `<th>${v[1]}</th>`).join('') + '</tr>' +
+    VARS.map(([k1, n1]) => '<tr><td><strong>' + n1 + '</strong></td>' +
+      VARS.map(([k2]) => {
+        if (k1 === k2) return '<td>۱</td>';
+        const r = pearson(rows.map(x => +x[k1]), rows.map(x => +x[k2]));
+        if (r === null) return '<td>—</td>';
+        const c = Math.abs(r) > .4 ? '#6ea8ff' : 'inherit';
+        return `<td style="color:${c}">${fa(r.toFixed(2))}</td>`;
+      }).join('') + '</tr>').join('');
+}
+
+/* ---------- رویدادها ---------- */
+$('#enter').onclick = async () => {
+  const t = $('#tok').value.trim();
+  if (!t) return;
+  $('#enter').disabled = true; $('#enter').textContent = 'در حال خواندن…';
+  try {
+    rows = await fetchRows(t);
+    sessionStorage.setItem('dash_tok', t);
+    if (!rows.length) { render('هنوز پاسخی ثبت نشده است. با «داده نمونه» می‌توانید ' +
+      'شکل نهایی داشبورد را ببینید.'); return; }
+    render(isLive() ? '' : 'حالت آزمایشی — داده از همین مرورگر خوانده شد.');
+  } catch (e) {
+    alert('خواندن داده ناموفق بود: ' + e.message);
+  } finally { $('#enter').disabled = false; $('#enter').textContent = 'ورود'; }
+};
+$('#tok').addEventListener('keydown', e => { if (e.key === 'Enter') $('#enter').click(); });
+
+$('#demo').onclick = () => {
+  rows = demoRows();
+  render('<strong>داده نمونه.</strong> این اعداد ساختگی‌اند و فقط برای نشان دادن شکل ' +
+         'داشبورد تولید شده‌اند؛ هیچ ربطی به پاسخ‌های واقعی ندارند.');
+};
+
+$('#refresh').onclick = async () => {
+  const t = sessionStorage.getItem('dash_tok');
+  if (!t) return location.reload();
+  try { rows = await fetchRows(t); render(''); }
+  catch (e) { alert('به‌روزرسانی ناموفق: ' + e.message); }
+};
+
+$('#csv').onclick = () => {
+  if (!rows.length) return;
+  download('responses-' + new Date().toISOString().slice(0, 10) + '.csv', toCSV(rows));
+};
+
+// ورود خودکار اگر در همین نشست رمز زده شده
+const saved = sessionStorage.getItem('dash_tok');
+if (saved) { $('#tok').value = saved; $('#enter').click(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدل مفهومی پژوهش</title>
+<meta name="theme-color" content="#070b16">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<div class="aurora"><span></span><span></span><span></span></div>
+<div class="grain"></div>
+
+<header class="top"><div class="inner">
+  <div class="brand"><span class="dot"></span> مدل مفهومی پژوهش</div>
+  <nav class="top-nav">
+    <a href="index.html">خانه</a>
+    <a href="survey.html">پرسشنامه</a>
+    <a href="model.html" aria-current="page">مدل پژوهش</a>
+    <a href="dashboard.html">داشبورد</a>
+  </nav>
+</div></header>
+
+<main><div class="wrap-wide">
+
+  <h1>مدل میانجی پژوهش</h1>
+  <p class="lead">دو متغیر پیش‌بین، یک میانجی و یک ملاک. اثر هر پیش‌بین هم مستقیم است
+  (مسیرهای c′) و هم غیرمستقیم از راه تنظیم هیجان (مسیرهای a و b).</p>
+
+  <div class="stage stage-model" id="stage">
+    <div class="legend">
+      <b><i style="background:#6ea8ff"></i> اجتناب تجربه‌ای</b>
+      <b><i style="background:#9d8cff"></i> انعطاف‌ناپذیری روان‌شناختی</b>
+      <b><i style="background:#f0b254"></i> تنظیم هیجان (میانجی)</b>
+      <b><i style="background:#5fd6a0"></i> شدت اختلال قمار</b>
+    </div>
+    <div class="hint">بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی · روی کره‌ها بزنید</div>
+  </div>
+
+  <div class="card tight" id="info">
+    <p class="muted" style="margin:0">روی یکی از کره‌ها بزنید تا توضیح آن متغیر اینجا بیاید.</p>
+  </div>
+
+  <h2>مسیرها</h2>
+  <div class="t-wrap"><table class="t">
+    <tr><th>مسیر</th><th>از</th><th>به</th><th>معنا</th></tr>
+    <tr><td><code>a1</code></td><td>اجتناب تجربه‌ای</td><td>تنظیم هیجان</td>
+      <td>اجتناب از تجربه درونی، فرصت یادگیری راهبردهای کارآمد را از بین می‌برد</td></tr>
+    <tr><td><code>a2</code></td><td>انعطاف‌ناپذیری روان‌شناختی</td><td>تنظیم هیجان</td>
+      <td>غلبه واکنش‌های درونی بر ارزش‌ها، تنظیم هیجان را تضعیف می‌کند</td></tr>
+    <tr><td><code>b</code></td><td>تنظیم هیجان</td><td>شدت اختلال قمار</td>
+      <td>تنظیم هیجان ضعیف، قمار را به راهبرد گریز تبدیل می‌کند</td></tr>
+    <tr><td><code>c′1</code></td><td>اجتناب تجربه‌ای</td><td>شدت اختلال قمار</td>
+      <td>اثر مستقیم، مستقل از تنظیم هیجان</td></tr>
+    <tr><td><code>c′2</code></td><td>انعطاف‌ناپذیری روان‌شناختی</td><td>شدت اختلال قمار</td>
+      <td>اثر مستقیم، مستقل از تنظیم هیجان</td></tr>
+    <tr><td><code>r</code></td><td colspan="2">اجتناب تجربه‌ای ↔ انعطاف‌ناپذیری</td>
+      <td>همبستگی آزاد میان دو متغیر برون‌زا</td></tr>
+  </table></div>
+
+  <h2>فرضیه‌ها</h2>
+  <div class="card">
+    <ul class="ticks">
+      <li>اجتناب تجربه‌ای با شدت اختلال قمار رابطه مستقیم و مثبت دارد.</li>
+      <li>انعطاف‌ناپذیری روان‌شناختی با شدت اختلال قمار رابطه مستقیم و مثبت دارد.</li>
+      <li>تنظیم هیجان، رابطه اجتناب تجربه‌ای با شدت اختلال قمار را میانجی‌گری می‌کند.</li>
+      <li>تنظیم هیجان، رابطه انعطاف‌ناپذیری روان‌شناختی با شدت اختلال قمار را میانجی‌گری می‌کند.</li>
+      <li>مدل مفهومی پژوهش با داده‌های تجربی برازش مناسب دارد.</li>
+    </ul>
+  </div>
+
+</div></main>
+
+<footer><div class="wrap"><p>مدل بر پایه مدل انعطاف‌پذیری روان‌شناختی (هیز و همکاران)
+و مدل فرایندی تنظیم هیجان (گراس)</p></div></footer>
+
+<script type="module">
+import { drawModel } from './assets/js/model3d.js';
+const info = document.getElementById('info');
+drawModel(document.getElementById('stage'), n => {
+  info.innerHTML = `<h3 style="margin-top:0;color:#${n.color.toString(16).padStart(6,'0')}">${n.fa}</h3>
+    <p class="muted" style="margin:0 0 8px">${n.role} · سنجش با ${n.en}</p>
+    <p style="margin:0">${n.desc}</p>`;
+});
+</script>
+</body>
+</html>
