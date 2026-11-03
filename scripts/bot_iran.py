@@ -278,6 +278,44 @@ def asset_price(key, snap=None):
 # ------------------------------------------------------------------ messages
 L3 = lambda d, lang: pick(d, lang)
 
+# ------------------------------------------------------------------ crypto
+# @ttprice already carries these four in tether; parse_ttprice() fills
+# snap["tt"]["crypto"]. Toman is derived, not quoted: the coin's USDT price x the
+# Iranian tether rate, which is what an Iranian actually pays.
+CRYPTO_ORDER = ["BTC", "ETH", "SOL", "TRX"]
+CRYPTO_ICON = {"BTC": "🟠", "ETH": "🔷", "SOL": "🟣", "TRX": "🔶"}
+CRYPTO_NAME = {
+    "BTC": {"fa": "بیت‌کوین", "ckb": "بیتکۆین", "en": "Bitcoin"},
+    "ETH": {"fa": "اتریوم", "ckb": "ئیتریۆم", "en": "Ethereum"},
+    "SOL": {"fa": "سولانا", "ckb": "سۆلانا", "en": "Solana"},
+    "TRX": {"fa": "ترون", "ckb": "ترۆن", "en": "Tron"},
+}
+
+
+def _cdec(p):
+    """Decimals for a coin price: none for big ones, 4 for sub-dollar (TRX)."""
+    return 0 if p >= 1000 else (2 if p >= 1 else 4)
+
+
+def crypto_prices(s):
+    """[(key, usdt_price)] for the coins @ttprice carries, in a fixed order."""
+    cr = (s.get("tt") or {}).get("crypto") or {}
+    return [(k, cr[k]) for k in CRYPTO_ORDER if cr.get(k)]
+
+
+def crypto_row(k, p, lang, rate):
+    """One coin line, in tether and - when the tether rate is known - in toman.
+
+    Both figures and the separator between them sit inside ONE isolate, for the
+    same reason as the buy|sell rows: a neutral separator between two LTR
+    numbers in an RTL line can otherwise swap the two columns.
+    """
+    body = f"{B.n(p, _cdec(p))} USDT"
+    if rate:
+        body += f" · {B.n(p * rate, 0)}"
+    return f"{CRYPTO_ICON.get(k, '•')} {L3(CRYPTO_NAME[k], lang)} ➜ <b>{B.iso(body)}</b>"
+
+
 EX_LATIN = {"والکس": "Wallex", "بیت‌پین": "Bitpin", "بیت پین": "Bitpin", "رمزینکس": "Ramzinex", "تبدیل": "Tabdil",
             "نوبیتکس": "Nobitex", "موربیت": "Morbit", "افکس": "Afex", "آبان‌تتر": "AbanTether", "آبان تتر": "AbanTether",
             "تترلند": "Tetherland", "اکسیر": "Exir", "رمزارز۲۴": "Ramzarz24", "بیت۲۴": "Bit24"}
@@ -340,6 +378,13 @@ def card(lang, focus=None):
         if any(e["sanctioned"] for e in ex):
             out.append(T("⚠️ = تحت تحریم؛ خطر مسدود شدن کیف پول.", "⚠️ = لە ژێر سزادا؛ مەترسی بلۆککردنی جزدان.",
                          "⚠️ = under sanctions; wallet-freeze risk."))
+    cr = crypto_prices(s)
+    if cr:
+        out += ["", T("💰 <b>کریپتو</b> (تتر · تومان)",
+                      "💰 <b>کریپتۆ</b> (تەتەر · تمەن)",
+                      "💰 <b>Crypto</b> (USDT · toman)")]
+        for k, p in cr:
+            out.append(crypto_row(k, p, lang, s.get("usdt")))
     fiat = tt.get("fiat", {})
     if fiat:
         out += ["", T("💱 <b>ارز، سکه و طلا</b>", "💱 <b>دراو، سکە و زێڕ</b>", "💱 <b>FX, coins &amp; gold</b>")]
@@ -408,6 +453,8 @@ BL = {  # board labels: fa, ckb, en (kmr falls back to en)
     "ex": ("🏦 <b>ارزان‌ترین تتر در صرافی‌ها</b>", "🏦 <b>هەرزانترین تەتەر لە ئاڵوگۆڕەکان</b>", "🏦 <b>Cheapest USDT on exchanges</b>"),
     "arb": ("🔁 سود آربیتراژ بین صرافی‌ها (قبل از کارمزد): <b>{a}</b> تومان ({p})", "🔁 قازانجی ئاربیتراژ (پێش کرێ): <b>{a}</b> تمەن ({p})",
             "🔁 Arbitrage between exchanges (before fees): <b>{a}</b> toman ({p})"),
+    "crypto": ("💰 <b>کریپتو</b> (تتر · تومان)", "💰 <b>کریپتۆ</b> (تەتەر · تمەن)",
+               "💰 <b>Crypto</b> (USDT · toman)"),
     "fx": ("💱 <b>ارزها</b>", "💱 <b>دراوەکان</b>", "💱 <b>Currencies</b>"),
     "gold": ("🏅 <b>سکه و طلا</b>", "🏅 <b>سکە و زێڕ</b>", "🏅 <b>Coins &amp; gold</b>"),
     "legend": ("🔺🔻 تغییر نسبت به تابلوی قبلی · 🟢🔴 تغییر روزانه", "🔺🔻 گۆڕان بەراورد بە پێشوو · 🟢🔴 گۆڕانی ڕۆژانە",
@@ -457,6 +504,12 @@ def board(prev=None, lang="fa", footer=True):
             out.append(bl("arb", lang, a=toman(s["arb_toman"]), p=B.pct(s["arb_pct"])))
         if any(e["sanctioned"] for e in sorted(ex, key=lambda e: e["sell"])[:5]):
             out.append(bl("warn", lang))
+    cr = crypto_prices(s)
+    if cr:
+        out += ["━━━━━━━━━━━━━━", bl("crypto", lang)]
+        for k, p in cr:
+            vals[k] = p
+            out.append(crypto_row(k, p, lang, s.get("usdt")) + _move(p, prev.get(k)))
     fiat = tt.get("fiat", {})
     groups = [(bl("fx", lang), ["USD_HERAT", "USD_REMIT", "EUR", "GBP", "AED", "TRY", "CNY"]),
               (bl("gold", lang), ["COIN_EMAMI", "COIN_HALF", "COIN_QUARTER", "GOLD_18", "GOLD_MESGHAL", "XAU"])]
