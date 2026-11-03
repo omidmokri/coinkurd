@@ -435,6 +435,8 @@ def render(s, uid, key):
         if not x.get("alerts"):
             head += "\n" + t("alert_none", lang)
         return head + "\n\n" + t("alert_usage", lang), kb_alerts(s, uid, lang)
+    if key == "news":
+        return news_list(s, lang)
     if key in SECTIONS:
         fn, path = SECTIONS[key]
         try:
@@ -454,6 +456,48 @@ def render(s, uid, key):
                                               [btn(t("b_back", lang), "m:main")]]}
         return text, kb_back(lang, refresh="m:" + key, more=D.SITE + path)
     return t("menu_title", lang), kb_main(lang)
+
+
+# ------------------------------------------------------------------ news: Persian titles -> full text with picture
+def news_items(s):
+    deep = [{"id": "d" + x["id"], "fa": re.sub(r"</?b>", "", x["fa"]).split("\n", 1)[-1].strip(), "img": x.get("img"),
+             "at": x["at"], "deep": True} for x in (s.get("deep") or {}).get("posts", [])[:4]]
+    feed = [x for x in F.feed_state(s)["items"].get("news", []) if x.get("fa")]
+    return deep + feed
+
+
+def news_title(it, lang):
+    txt = (it.get("ckb") if lang == "ckb" else None) or it["fa"]
+    first = next((ln.strip() for ln in txt.split("\n") if ln.strip()), "")
+    return ("🧠 " if it.get("deep") else "📰 ") + (first[:58] + "…" if len(first) > 60 else first)
+
+
+def news_list(s, lang):
+    items = news_items(s)[:14]
+    head = {"ckb": "📰 <b>هەواڵەکانی کریپتۆ</b>\nلەسەر هەر هەواڵێک دابگرە بۆ خوێندنەوەی تەواو لەگەڵ وێنە",
+            }.get(lang, "📰 <b>اخبار کریپتو</b>\nروی هر خبر بزن تا متن کامل همراه با تصویرش باز شود")
+    if not items:
+        return head + "\n\n" + t("no_data", lang), kb_back(lang, refresh="m:news", more=D.SITE + "/crypto-news/")
+    rows = [[btn(news_title(it, lang), "nw:" + str(it["id"])[:56])] for it in items]
+    kb = kb_back(lang, refresh="m:news", more=D.SITE + "/crypto-news/")
+    kb["inline_keyboard"] = rows + kb["inline_keyboard"]
+    return head, kb
+
+
+def news_open(s, chat_id, nid, lang):
+    it = next((x for x in news_items(s) if str(x["id"])[:56] == nid), None)
+    if not it:
+        return send(chat_id, t("no_data", lang))
+    txt = (it.get("ckb") if lang == "ckb" else None) or it["fa"]
+    if it.get("deep"):
+        txt = txt[:1000]
+    img = it.get("img") or it.get("photo")
+    if img and img.startswith("/"):
+        img = D.SITE + img
+    page = D.SITE + ("/dossier/" if it.get("deep") else "/crypto-news/")
+    kb = {"inline_keyboard": [[btn("🔙 " + ("گەڕانەوە بۆ هەواڵەکان" if lang == "ckb" else "بازگشت به اخبار"), "m:news"),
+                               btn("🌐 " + ("لە ماڵپەڕ" if lang == "ckb" else "در سایت"), url=page)]]}
+    return group_send(chat_id, D.cut(D.e(txt), 1020), kb=kb, photo=img)
 
 
 def format_top(s, lang):
@@ -878,11 +922,13 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, t("lang_set", val) + "\n\n" + text, kb)
     if kind == "c":
         return edit(chat_id, mid, *coin_card(s, uid, val))
+    if kind == "nw":
+        return news_open(s, chat_id, val, lang)
     back = {"inline_keyboard": [[btn("🪙 " + val, f"c:{val}"), btn(t("b_back", lang), "m:main")]]}
     if kind == "co":
         return edit(chat_id, mid, D.sec_opps(lang, coin=val), back)
     if kind == "cn":
-        return edit(chat_id, mid, D.sec_news(lang, coin=val), back)
+        return edit(chat_id, mid, *news_list(s, lang))
     if kind == "cp":
         return edit(chat_id, mid, D.sec_posts(lang, coin=val), back)
     if kind == "cd":
