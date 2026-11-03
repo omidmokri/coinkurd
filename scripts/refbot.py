@@ -15,6 +15,7 @@ import base64
 import hashlib
 import hmac
 import json
+import threading
 import logging
 import os
 import re
@@ -715,7 +716,27 @@ def maybe_brief(s):
 
 
 # ================================================================== handlers
+def repost_video(msg):
+    """admin forwards a video (e.g. one too big for the web preview) -> house-prompt caption -> channel"""
+    chat = msg["chat"]["id"]
+    src = (msg.get("caption") or "").strip()
+    if len(src) < 25:
+        return send(chat, "⚠️ این فیلم متن کافی ندارد؛ فیلم را همراه متنش فوروارد کن")
+    cap = F.summarize(src, "fa", limit=1024 - CL.SIG_LEN - 2)
+    if not cap:
+        return send(chat, "⚠️ متن مطابق قانون‌های پرامپت ساخته نشد؛ دوباره امتحان کن")
+    fid = (msg.get("video") or msg.get("document"))["file_id"]
+    body = fix_amp(D.e(cap) + "\n\n" + CL.SIG)
+    key = "video" if msg.get("video") else "document"
+    r = _post_with_retry("sendVideo" if key == "video" else "sendDocument",
+                         {"chat_id": CHANNEL, key: fid, "caption": body, "parse_mode": "HTML", "supports_streaming": True})
+    send(chat, "✅ در کانال منتشر شد" if r.get("ok") else "⚠️ انتشار نشد: " + D.e(str(r.get("description"))))
+
+
 def handle_private(s, msg):
+    if msg["from"]["id"] in ADMIN_IDS and (msg.get("video") or (msg.get("document") or {}).get("mime_type", "").startswith("video")):
+        threading.Thread(target=repost_video, args=(msg,), daemon=True).start()
+        return send(msg["chat"]["id"], "🎬 دریافت شد؛ متنش طبق پرامپت ساخته و در کانال منتشر می‌شود…")
     u, uid, chat_id = msg["from"], msg["from"]["id"], msg["chat"]["id"]
     text = (msg.get("text") or "").strip()
     cmd, _, arg = text.partition(" ")
