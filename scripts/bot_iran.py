@@ -12,7 +12,7 @@ The bot always shows each source's own post time so users see how fresh a number
 """
 import re
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 from bs4 import BeautifulSoup
@@ -372,3 +372,70 @@ def calc(lang, amount, unit):
                   "⚠️ کرێی مامەڵە و کرێی تۆڕی گواستنەوە لێرە کەم نەکراوەتەوە؛ پێش مامەڵە لە ئاڵوگۆڕەکە بیپشکنە.",
                   "⚠️ Trading and network (TRC20/TON/BEP20…) fees differ per exchange and are not deducted here.")]
     return "\n".join(out)
+
+
+# ------------------------------------------------------------------ the "تبدیل ارز" topic card (group)
+BOARD_ICON = {"USD_HERAT": "🇦🇫", "USD_REMIT": "🏦", "EUR": "🇪🇺", "GBP": "🇬🇧", "AED": "🇦🇪", "TRY": "🇹🇷",
+              "CNY": "🇨🇳", "COIN_EMAMI": "🪙", "COIN_HALF": "🪙", "COIN_QUARTER": "🪙", "GOLD_18": "📿",
+              "GOLD_MESGHAL": "⚖️", "XAU": "🌕"}
+
+
+def _move(now, before):
+    """🔺 / 🔻 / ▫️ against the previous card"""
+    if not now or not before:
+        return ""
+    d = (now / before - 1) * 100
+    if abs(d) < 0.05:
+        return " ▫️"
+    return f" {'🔺' if d > 0 else '🔻'}{abs(d):.2f}٪"
+
+
+def board(prev=None):
+    """-> (html, values) — Persian price board for the group's FX topic; prev = values of the last board"""
+    prev = prev or {}
+    s = snapshot()
+    tt, ex = s.get("tt", {}), s.get("exchanges", [])
+    if not (s.get("usdt") or s.get("usd") or ex):
+        return None, prev
+    vals = {}
+    tehran = datetime.now(timezone.utc) + timedelta(hours=3, minutes=30)
+    out = ["💎 <b>تابلوی ارز کوین کورد</b> 💎", f"🕰 ساعت {tehran:%H:%M} به وقت تهران · قیمت‌ها به تومان",
+           "━━━━━━━━━━━━━━", "💵 <b>دلار و تتر</b>"]
+    ut, nd = s.get("usdtp", {}), s.get("nerkh", {})
+    usdt = (ut.get("sell") or (None,))[0] or s.get("usdt")
+    if usdt:
+        vals["usdt"] = usdt
+        buy = (ut.get("buy") or (None,))[0]
+        out.append(f"🟢 <b>تتر</b> ➜ <b>{toman(usdt)}</b>{_move(usdt, prev.get('usdt'))}"
+                   + (f"\n      🛒 خرید {toman(buy)} · 💰 فروش {toman(usdt)}" if buy else ""))
+    usd = (nd.get("sell") or (None,))[0] or s.get("usd")
+    if usd:
+        vals["usd"] = usd
+        out.append(f"🇺🇸 <b>دلار تهران</b> ➜ <b>{toman(usd)}</b>{_move(usd, prev.get('usd'))}")
+    if s.get("bubble_pct") is not None:
+        bp = s["bubble_pct"]
+        out.append(f"🫧 حباب تتر نسبت به دلار: <b>{bp:+.2f}٪</b> {'🔥' if abs(bp) >= 3 else '✅'}")
+    if ex:
+        out += ["━━━━━━━━━━━━━━", "🏦 <b>ارزان‌ترین تتر در صرافی‌ها</b>"]
+        medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+        for m, e in zip(medals, sorted(ex, key=lambda e: e["sell"])[:5]):
+            out.append(f"{m} {e['name']}{' ⚠️' if e['sanctioned'] else ''} ➜ <b>{toman(e['sell'])}</b>")
+        if s.get("arb_toman") is not None and s["arb_toman"] > 0:
+            out.append(f"🔁 سود آربیتراژ بین صرافی‌ها (قبل از کارمزد): <b>{toman(s['arb_toman'])}</b> تومان ({s['arb_pct']:+.2f}٪)")
+    fiat = tt.get("fiat", {})
+    groups = [("💱 <b>ارزها</b>", ["USD_HERAT", "USD_REMIT", "EUR", "GBP", "AED", "TRY", "CNY"]),
+              ("🏅 <b>سکه و طلا</b>", ["COIN_EMAMI", "COIN_HALF", "COIN_QUARTER", "GOLD_18", "GOLD_MESGHAL", "XAU"])]
+    for title, keys in groups:
+        rows = []
+        for k in keys:
+            if k in fiat and fiat[k][0]:
+                p, ch = fiat[k]
+                vals[k] = p
+                val = f"${p:,.2f}" if k == "XAU" else toman(p)
+                day = f" {'🟢' if ch > 0 else '🔴'} {ch:+.2f}٪" if ch else ""
+                rows.append(f"{BOARD_ICON.get(k, '•')} {ASSET_NAME[k]['fa']} ➜ <b>{val}</b>{day}")
+        if rows:
+            out += ["━━━━━━━━━━━━━━", title] + rows
+    out += ["━━━━━━━━━━━━━━", "🔺🔻 تغییر نسبت به تابلوی قبلی · 🟢🔴 تغییر روزانه",
+            "🤖 قیمت لحظه‌ای و هشدار قیمت: @Kurd_kurdistan_bot"]
+    return "\n".join(out), vals
