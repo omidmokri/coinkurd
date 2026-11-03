@@ -272,11 +272,12 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
             snap = IR.snapshot()
             if not (snap.get("usdt") or snap.get("exchanges")):
                 raise RuntimeError("no price data; skip this round")
-            card = IR.card("fa")
+            card, vals = IR.board(f.get("fx_prev"))
+            if not card:
+                raise RuntimeError("no board")
             r = send_fn(group_id, card, None, message_thread_id=topics["fx"])
-            if r.get("ok"):
-                if f.get("fx_msg"):
-                    delete_fn(group_id, f["fx_msg"])
+            if r.get("ok"):                      # earlier boards stay in the topic (owner's request)
+                f["fx_prev"] = vals
                 f["fx_msg"] = r["result"]["message_id"]
         except Exception as ex:
             log.info("fx post skipped: %s", ex)
