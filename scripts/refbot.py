@@ -401,7 +401,7 @@ def render(s, uid, key):
         return t("menu_title", lang), kb_main(lang)
     if key == "irr":
         try:
-            return IR.card(lang), kb_irr(lang)
+            return (IR.bot_board(lang) or IR.card(lang)), kb_irr(lang)
         except Exception:
             log.exception("irr card failed")
             return t("no_data", lang), kb_back(lang)
@@ -692,7 +692,7 @@ def minute_jobs(s):
             continue
         lang = lang_of(s, info["uid"])
         try:
-            edit(key[0], key[1], IR.card(lang) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
+            edit(key[0], key[1], (IR.bot_board(lang) or IR.card(lang)) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
         except Exception:
             log.exception("live refresh failed")
     return changed
@@ -896,7 +896,7 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, *render(s, uid, "alerts"))
     if data == "live:irr":
         LIVE[(chat_id, mid)] = {"until": time.time() + 15 * 60, "uid": uid}
-        return edit(chat_id, mid, IR.card(lang) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
+        return edit(chat_id, mid, (IR.bot_board(lang) or IR.card(lang)) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
     if data == "calc":
         return send(chat_id, t("calc_usage", lang))
     if data == "watch":

@@ -390,8 +390,35 @@ def _move(now, before):
     return f" {'🔺' if d > 0 else '🔻'}{abs(d):.2f}٪"
 
 
-def board(prev=None):
-    """-> (html, values) — Persian price board for the group's FX topic; prev = values of the last board"""
+BL = {  # board labels: fa, ckb, en (kmr falls back to en)
+    "title": ("💎 <b>تابلوی ارز کوین کورد</b> 💎", "💎 <b>تابلۆی دراوی کۆین کورد</b> 💎", "💎 <b>Coin Kurd FX board</b> 💎"),
+    "time": ("🕰 ساعت {t} به وقت تهران · قیمت‌ها به تومان", "🕰 کاتژمێر {t}ی تاران · نرخەکان بە تمەن", "🕰 {t} Tehran time · prices in toman"),
+    "usd_usdt": ("💵 <b>دلار و تتر</b>", "💵 <b>دۆلار و تەتەر</b>", "💵 <b>Dollar &amp; tether</b>"),
+    "usdt": ("تتر", "تەتەر", "USDT"),
+    "usd": ("دلار تهران", "دۆلاری تاران", "USD Tehran"),
+    "buy": ("خرید", "کڕین", "buy"), "sell": ("فروش", "فرۆشتن", "sell"),
+    "bubble": ("حباب تتر نسبت به دلار", "بڵقی تەتەر بەرامبەر دۆلار", "Tether premium vs USD"),
+    "ex": ("🏦 <b>ارزان‌ترین تتر در صرافی‌ها</b>", "🏦 <b>هەرزانترین تەتەر لە ئاڵوگۆڕەکان</b>", "🏦 <b>Cheapest USDT on exchanges</b>"),
+    "arb": ("🔁 سود آربیتراژ بین صرافی‌ها (قبل از کارمزد): <b>{a}</b> تومان ({p})", "🔁 قازانجی ئاربیتراژ (پێش کرێ): <b>{a}</b> تمەن ({p})",
+            "🔁 Arbitrage between exchanges (before fees): <b>{a}</b> toman ({p})"),
+    "fx": ("💱 <b>ارزها</b>", "💱 <b>دراوەکان</b>", "💱 <b>Currencies</b>"),
+    "gold": ("🏅 <b>سکه و طلا</b>", "🏅 <b>سکە و زێڕ</b>", "🏅 <b>Coins &amp; gold</b>"),
+    "legend": ("🔺🔻 تغییر نسبت به تابلوی قبلی · 🟢🔴 تغییر روزانه", "🔺🔻 گۆڕان بەراورد بە پێشوو · 🟢🔴 گۆڕانی ڕۆژانە",
+               "🔺🔻 change vs previous board · 🟢🔴 daily change"),
+    "bot": ("🤖 قیمت لحظه‌ای و هشدار قیمت: @Kurd_kurdistan_bot", "🤖 نرخی ڕاستەوخۆ و ئاگاداری نرخ: @Kurd_kurdistan_bot",
+            "🤖 Live prices &amp; alerts: @Kurd_kurdistan_bot"),
+    "warn": ("⚠️ = صرافی تحت تحریم", "⚠️ = ئاڵوگۆڕی ژێر سزا", "⚠️ = sanctioned exchange"),
+}
+_BOT_PREV = {"t": 0, "vals": {}, "cur": {}}
+
+
+def bl(k, lang, **kw):
+    i = {"fa": 0, "ckb": 1}.get(lang, 2)
+    return BL[k][i].format(**kw) if kw else BL[k][i]
+
+
+def board(prev=None, lang="fa", footer=True):
+    """-> (html, values) — price board (group FX topic and the bot); prev = values of the previous board"""
     prev = prev or {}
     s = snapshot()
     tt, ex = s.get("tt", {}), s.get("exchanges", [])
@@ -399,32 +426,33 @@ def board(prev=None):
         return None, prev
     vals = {}
     tehran = datetime.now(timezone.utc) + timedelta(hours=3, minutes=30)
-    out = ["💎 <b>تابلوی ارز کوین کورد</b> 💎", f"🕰 ساعت {tehran:%H:%M} به وقت تهران · قیمت‌ها به تومان",
-           "━━━━━━━━━━━━━━", "💵 <b>دلار و تتر</b>"]
+    out = [bl("title", lang), bl("time", lang, t=f"{tehran:%H:%M}"), "━━━━━━━━━━━━━━", bl("usd_usdt", lang)]
     ut, nd = s.get("usdtp", {}), s.get("nerkh", {})
     usdt = (ut.get("sell") or (None,))[0] or s.get("usdt")
     if usdt:
         vals["usdt"] = usdt
         buy = (ut.get("buy") or (None,))[0]
-        out.append(f"🟢 <b>تتر</b> ➜ <b>{toman(usdt)}</b>{_move(usdt, prev.get('usdt'))}"
-                   + (f"\n      🛒 خرید {toman(buy)} · 💰 فروش {toman(usdt)}" if buy else ""))
+        out.append(f"🟢 <b>{bl('usdt', lang)}</b> ➜ <b>{toman(usdt)}</b>{_move(usdt, prev.get('usdt'))}"
+                   + (f"\n      🛒 {bl('buy', lang)} {toman(buy)} · 💰 {bl('sell', lang)} {toman(usdt)}" if buy else ""))
     usd = (nd.get("sell") or (None,))[0] or s.get("usd")
     if usd:
         vals["usd"] = usd
-        out.append(f"🇺🇸 <b>دلار تهران</b> ➜ <b>{toman(usd)}</b>{_move(usd, prev.get('usd'))}")
+        out.append(f"🇺🇸 <b>{bl('usd', lang)}</b> ➜ <b>{toman(usd)}</b>{_move(usd, prev.get('usd'))}")
     if s.get("bubble_pct") is not None:
         bp = s["bubble_pct"]
-        out.append(f"🫧 حباب تتر نسبت به دلار: <b>{bp:+.2f}٪</b> {'🔥' if abs(bp) >= 3 else '✅'}")
+        out.append(f"🫧 {bl('bubble', lang)}: <b>{bp:+.2f}٪</b> {'🔥' if abs(bp) >= 3 else '✅'}")
     if ex:
-        out += ["━━━━━━━━━━━━━━", "🏦 <b>ارزان‌ترین تتر در صرافی‌ها</b>"]
+        out += ["━━━━━━━━━━━━━━", bl("ex", lang)]
         medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
         for m, e in zip(medals, sorted(ex, key=lambda e: e["sell"])[:5]):
-            out.append(f"{m} {e['name']}{' ⚠️' if e['sanctioned'] else ''} ➜ <b>{toman(e['sell'])}</b>")
+            out.append(f"{m} {exname(e['name'], lang)}{' ⚠️' if e['sanctioned'] else ''} ➜ <b>{toman(e['sell'])}</b>")
         if s.get("arb_toman") is not None and s["arb_toman"] > 0:
-            out.append(f"🔁 سود آربیتراژ بین صرافی‌ها (قبل از کارمزد): <b>{toman(s['arb_toman'])}</b> تومان ({s['arb_pct']:+.2f}٪)")
+            out.append(bl("arb", lang, a=toman(s["arb_toman"]), p=f"{s['arb_pct']:+.2f}٪"))
+        if any(e["sanctioned"] for e in sorted(ex, key=lambda e: e["sell"])[:5]):
+            out.append(bl("warn", lang))
     fiat = tt.get("fiat", {})
-    groups = [("💱 <b>ارزها</b>", ["USD_HERAT", "USD_REMIT", "EUR", "GBP", "AED", "TRY", "CNY"]),
-              ("🏅 <b>سکه و طلا</b>", ["COIN_EMAMI", "COIN_HALF", "COIN_QUARTER", "GOLD_18", "GOLD_MESGHAL", "XAU"])]
+    groups = [(bl("fx", lang), ["USD_HERAT", "USD_REMIT", "EUR", "GBP", "AED", "TRY", "CNY"]),
+              (bl("gold", lang), ["COIN_EMAMI", "COIN_HALF", "COIN_QUARTER", "GOLD_18", "GOLD_MESGHAL", "XAU"])]
     for title, keys in groups:
         rows = []
         for k in keys:
@@ -433,9 +461,21 @@ def board(prev=None):
                 vals[k] = p
                 val = f"${p:,.2f}" if k == "XAU" else toman(p)
                 day = f" {'🟢' if ch > 0 else '🔴'} {ch:+.2f}٪" if ch else ""
-                rows.append(f"{BOARD_ICON.get(k, '•')} {ASSET_NAME[k]['fa']} ➜ <b>{val}</b>{day}")
+                rows.append(f"{BOARD_ICON.get(k, '•')} {L3(ASSET_NAME[k], lang)} ➜ <b>{val}</b>{day}")
         if rows:
             out += ["━━━━━━━━━━━━━━", title] + rows
-    out += ["━━━━━━━━━━━━━━", "🔺🔻 تغییر نسبت به تابلوی قبلی · 🟢🔴 تغییر روزانه",
-            "🤖 قیمت لحظه‌ای و هشدار قیمت: @Kurd_kurdistan_bot"]
+    out += ["━━━━━━━━━━━━━━", bl("legend", lang)]
+    if footer:
+        out.append(bl("bot", lang))
     return "\n".join(out), vals
+
+
+def bot_board(lang):
+    """the bot's dollar card: same board; 🔺🔻 compare with the price ~30 minutes earlier"""
+    now = time.time()
+    text, vals = board(_BOT_PREV["vals"], lang, footer=False)
+    if text and now - _BOT_PREV["t"] > 1800:
+        _BOT_PREV["vals"], _BOT_PREV["t"] = _BOT_PREV["cur"] or vals, now
+    if vals:
+        _BOT_PREV["cur"] = vals
+    return text
