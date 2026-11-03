@@ -23,6 +23,8 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; CoinKurdBot/1.0; +https://entekhab
 TTL = 60
 _cache = {}
 
+import bidi as B  # noqa: E402  (isolate helpers: see scripts/bidi.py)
+
 FA_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩٫", "01234567890123456789.")
 
 
@@ -201,14 +203,16 @@ def snapshot():
 
 
 def toman(x):
-    return "—" if x is None else f"{x:,.0f}"
+    # Isolated so the grouping commas cannot drag the figure around inside an
+    # RTL line. B.n(x) is the bare number for use inside B.pair()/B.iso().
+    return "—" if x is None else B.amount(x)
 
 
 def ago(iso):
     try:
         dt = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
         m = int((datetime.now(timezone.utc) - dt).total_seconds() // 60)
-        return f"{max(m, 0)}′"
+        return B.iso(f"{max(m, 0)}′")
     except Exception:
         return "?"
 
@@ -311,7 +315,7 @@ def card(lang, focus=None):
     if s.get("bubble_pct") is not None:
         bp = s["bubble_pct"]
         out.append(f"🫧 {T('حباب تتر نسبت به دلار آزاد', 'بڵقی تەتەر بەراورد بە دۆلاری ئازاد', 'Tether premium vs cash USD')}: "
-                   f"<b>{bp:+.2f}%</b>")
+                   f"<b>{B.pct(bp)}</b>")
     if ex:
         out += ["", T("🏦 <b>نرخ تتر در صرافی‌ها</b>", "🏦 <b>نرخی تەتەر لە ئاڵوگۆڕەکان</b>", "🏦 <b>USDT on Iranian exchanges</b>"),
                 T("<i>خرید = صرافی از تو می‌خرد · فروش = صرافی به تو می‌فروشد</i>",
@@ -319,17 +323,20 @@ def card(lang, focus=None):
                   "<i>buy = exchange buys from you · sell = exchange sells to you</i>")]
         for e in sorted(ex, key=lambda e: e["sell"]):
             flag = " ⚠️" if e["sanctioned"] else ""
-            out.append(f"• {exname(e['name'], lang)}{flag}: {toman(e['buy'])} | <b>{toman(e['sell'])}</b>")
+            # buy | sell as a single isolated run: the separator can no
+            # longer swap the two columns around inside an RTL line.
+            out.append(f"• {exname(e['name'], lang)}{flag}: "
+                       + B.pair(e['buy'], e['sell'], bold_b=True))
         if s.get("arb_toman") is not None:
             bb, bs = s["best_buy_from"], s["best_sell_to"]
             out.append(T(f"🔁 آربیتراژ: خرید از {exname(bb['name'], lang)} ({toman(bb['sell'])}) → فروش به {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
-                         f"<b>{toman(s['arb_toman'])}</b> تومان ({s['arb_pct']:+.2f}%) قبل از کارمزد",
+                         f"<b>{toman(s['arb_toman'])}</b> تومان ({B.pct(s['arb_pct'])}) قبل از کارمزد",
                          f"🔁 ئاربیتراژ: کڕین لە {exname(bb['name'], lang)} ({toman(bb['sell'])}) → فرۆشتن بە {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
-                         f"<b>{toman(s['arb_toman'])}</b> تمەن ({s['arb_pct']:+.2f}%) پێش کرێ",
+                         f"<b>{toman(s['arb_toman'])}</b> تمەن ({B.pct(s['arb_pct'])}) پێش کرێ",
                          f"🔁 Arbitrage: buy at {exname(bb['name'], lang)} ({toman(bb['sell'])}) → sell at {exname(bs['name'], lang)} ({toman(bs['buy'])}) = "
-                         f"<b>{toman(s['arb_toman'])}</b> ({s['arb_pct']:+.2f}%) before fees",
+                         f"<b>{toman(s['arb_toman'])}</b> ({B.pct(s['arb_pct'])}) before fees",
                          f"🔁 Arbîtraj: ji {exname(bb['name'], lang)} bikire ({toman(bb['sell'])}) → li {exname(bs['name'], lang)} bifiroşe ({toman(bs['buy'])}) = "
-                         f"<b>{toman(s['arb_toman'])}</b> tomen ({s['arb_pct']:+.2f}%) berî heqê bazirganiyê"))
+                         f"<b>{toman(s['arb_toman'])}</b> tomen ({B.pct(s['arb_pct'])}) berî heqê bazirganiyê"))
         if any(e["sanctioned"] for e in ex):
             out.append(T("⚠️ = تحت تحریم؛ خطر مسدود شدن کیف پول.", "⚠️ = لە ژێر سزادا؛ مەترسی بلۆککردنی جزدان.",
                          "⚠️ = under sanctions; wallet-freeze risk."))
@@ -343,8 +350,8 @@ def card(lang, focus=None):
         for k in order:
             if k in fiat and fiat[k][0]:
                 p, ch = fiat[k]
-                chs = f" ({ch:+.2f}%)" if ch else ""
-                val = f"${p:,.2f}" if k in ("XAU", "XAG") else toman(p)
+                chs = f" ({B.pct(ch)})" if ch else ""
+                val = B.usd(p) if k in ("XAU", "XAG") else toman(p)
                 out.append(f"• {L3(ASSET_NAME[k], lang)}: {val}{chs}")
     return "\n".join(out)
 
@@ -362,9 +369,9 @@ def calc(lang, amount, unit):
                      f"With {toman(amount)} toman you can buy:", f"Bi {toman(amount)} tomenan dikarî bikirî:"))
         rows = sorted(ex, key=lambda e: e["sell"]) or [{"name": "~", "sell": s["usdt"]}]
         for e in rows[:6]:
-            out.append(f"• {exname(e['name'], lang)}: <b>{amount / e['sell']:,.2f}</b> USDT")
+            out.append(f"• {exname(e['name'], lang)}: <b>{B.amount(amount / e['sell'], 2)}</b> USDT")
     else:
-        out.append(T(f"فروش {amount:,.2f} تتر:", f"فرۆشتنی {amount:,.2f} تەتەر:", f"Selling {amount:,.2f} USDT:", f"Firotina {amount:,.2f} tetherê:"))
+        out.append(T(f"فروش {B.amount(amount, 2)} تتر:", f"فرۆشتنی {B.amount(amount, 2)} تەتەر:", f"Selling {B.amount(amount, 2)} USDT:", f"Firotina {B.amount(amount, 2)} tetherê:"))
         rows = sorted(ex, key=lambda e: -e["buy"]) or [{"name": "~", "buy": s["usdt"]}]
         for e in rows[:6]:
             out.append(f"• {exname(e['name'], lang)}: <b>{toman(amount * e['buy'])}</b> {T('تومان', 'تمەن', 'toman')}")
@@ -387,7 +394,7 @@ def _move(now, before):
     d = (now / before - 1) * 100
     if abs(d) < 0.05:
         return " ▫️"
-    return f" {'🔺' if d > 0 else '🔻'}{abs(d):.2f}٪"
+    return " " + B.pct(d, arrow="🔺" if d > 0 else "🔻")
 
 
 BL = {  # board labels: fa, ckb, en (kmr falls back to en)
@@ -426,7 +433,7 @@ def board(prev=None, lang="fa", footer=True):
         return None, prev
     vals = {}
     tehran = datetime.now(timezone.utc) + timedelta(hours=3, minutes=30)
-    out = [bl("title", lang), bl("time", lang, t=f"{tehran:%H:%M}"), "━━━━━━━━━━━━━━", bl("usd_usdt", lang)]
+    out = [bl("title", lang), bl("time", lang, t=B.iso(f"{tehran:%H:%M}")), "━━━━━━━━━━━━━━", bl("usd_usdt", lang)]
     ut, nd = s.get("usdtp", {}), s.get("nerkh", {})
     usdt = (ut.get("sell") or (None,))[0] or s.get("usdt")
     if usdt:
@@ -440,14 +447,14 @@ def board(prev=None, lang="fa", footer=True):
         out.append(f"🇺🇸 <b>{bl('usd', lang)}</b> ➜ <b>{toman(usd)}</b>{_move(usd, prev.get('usd'))}")
     if s.get("bubble_pct") is not None:
         bp = s["bubble_pct"]
-        out.append(f"🫧 {bl('bubble', lang)}: <b>{bp:+.2f}٪</b> {'🔥' if abs(bp) >= 3 else '✅'}")
+        out.append(f"🫧 {bl('bubble', lang)}: <b>{B.pct(bp)}</b> {'🔥' if abs(bp) >= 3 else '✅'}")
     if ex:
         out += ["━━━━━━━━━━━━━━", bl("ex", lang)]
         medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
         for m, e in zip(medals, sorted(ex, key=lambda e: e["sell"])[:5]):
             out.append(f"{m} {exname(e['name'], lang)}{' ⚠️' if e['sanctioned'] else ''} ➜ <b>{toman(e['sell'])}</b>")
         if s.get("arb_toman") is not None and s["arb_toman"] > 0:
-            out.append(bl("arb", lang, a=toman(s["arb_toman"]), p=f"{s['arb_pct']:+.2f}٪"))
+            out.append(bl("arb", lang, a=toman(s["arb_toman"]), p=B.pct(s["arb_pct"])))
         if any(e["sanctioned"] for e in sorted(ex, key=lambda e: e["sell"])[:5]):
             out.append(bl("warn", lang))
     fiat = tt.get("fiat", {})
@@ -459,8 +466,8 @@ def board(prev=None, lang="fa", footer=True):
             if k in fiat and fiat[k][0]:
                 p, ch = fiat[k]
                 vals[k] = p
-                val = f"${p:,.2f}" if k == "XAU" else toman(p)
-                day = f" {'🟢' if ch > 0 else '🔴'} {ch:+.2f}٪" if ch else ""
+                val = B.usd(p) if k == "XAU" else toman(p)
+                day = f" {'🟢' if ch > 0 else '🔴'} {B.pct(ch)}" if ch else ""
                 rows.append(f"{BOARD_ICON.get(k, '•')} {L3(ASSET_NAME[k], lang)} ➜ <b>{val}</b>{day}")
         if rows:
             out += ["━━━━━━━━━━━━━━", title] + rows
