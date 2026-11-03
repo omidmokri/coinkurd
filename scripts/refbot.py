@@ -33,6 +33,7 @@ import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
 import bot_hub as HB  # noqa: E402
+import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
@@ -620,8 +621,7 @@ def group_send(chat_id, text, kb=None, plain=False, photo=None, video=None, **kw
     The picture is downloaded and uploaded by the bot, because Telegram cannot fetch t.me CDN links itself."""
     body = fix_amp(D.e(text) if plain else text)
     if video:                                    # bytes of an mp4 made by the bot (bot_reel)
-        data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML", "supports_streaming": "true",
-                "width": "720", "height": "1280"}
+        data = {"chat_id": chat_id, "caption": body, "parse_mode": "HTML", "supports_streaming": "true"}
         data.update({k: v for k, v in kw.items() if v is not None})
         if kb:
             data["reply_markup"] = json.dumps(kb)
@@ -989,6 +989,7 @@ def main():
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
+    CL.start(s, group_send, CHANNEL)
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
