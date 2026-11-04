@@ -51,7 +51,12 @@ def fake_tg(method, **p):
 
 
 R.tg = fake_tg
-R.requests.post = lambda *a, **k: type("Rsp", (), {"json": lambda self: {"ok": True}})()
+def fake_post(url, *a, **k):
+    SENT.append((url.rsplit("/", 1)[-1], dict(k.get("data") or k.get("json") or {})))
+    return type("Rsp", (), {"json": lambda self: {"ok": True, "result": {"message_id": 77, "photo": [{"file_id": "F1"}]}}})()
+
+
+R.requests.post = fake_post
 R.BOT_USERNAME = "test_bot"
 R.time.sleep = lambda *_: None
 W.time.sleep = lambda *_: None
@@ -377,6 +382,45 @@ R.promote(S)
 check(not any(m == "sendMessage" and p.get("chat_id") == R.CHANNEL for m, p in SENT[n:]), "not repeated on the next run")
 R.handle_update(S, upd(1, "/promote"))
 check(any(m == "pinChatMessage" for m, p in SENT[n:]), "/promote reposts for admins")
+print("9) v3 navigation: 8-section home, sub-menus, standard back/home row, favourites")
+import bot_menu as MN  # noqa: E402
+
+
+def kb_of(i=-1):
+    return (SENT[i][1].get("reply_markup") or {}).get("inline_keyboard") or []
+
+
+for i, lang in enumerate(LANGS):
+    uid = 300 + i
+    R.handle_update(S, upd(uid, "/start", lang=lang))
+    S["users"][str(uid)]["lang"] = lang
+    check(any(m == "sendPhoto" for m, p in SENT[-3:]), f"{lang} /start sends the banner + welcome")
+    R.handle_update(S, upd(uid, data="m:main"))
+    cbs = [b.get("callback_data") for r in kb_of() for b in r]
+    check(all("m:" + k in cbs for k in MN.HOME_ITEMS), f"{lang} home has the 8 sections")
+    check(len(kb_of()) <= 7, f"{lang} home is compact ({len(kb_of())} rows)")
+    for key in list(MN.S) + list(MN.GROUPS) + MN.LAB_ITEMS:
+        R.handle_update(S, upd(uid, data="m:" + key))
+        kb = kb_of()
+        txt = SENT[-1][1].get("text", "")
+        check(txt and len(txt) <= 4096, f"{lang}/{key} text")
+        flat = [b for r in kb for b in r]
+        check(all(len((b.get("callback_data") or "").encode()) <= 64 for b in flat), f"{lang}/{key} callback size")
+        check(any(b.get("callback_data") == "m:main" for b in kb[-1]) if kb else False, f"{lang}/{key} ends with 🏠")
+        parent = MN.PARENT.get(key, "main")
+        if parent != "main" and key not in MN.GROUPS:
+            check(any(b.get("callback_data") == "m:" + parent for b in kb[-1]), f"{lang}/{key} has ⬅️ {parent}")
+R.handle_update(S, upd(300, data="fv:chain"))
+R.handle_update(S, upd(300, data="m:main"))
+check(any(b.get("callback_data") == "m:chain" for b in kb_of()[0] + (kb_of()[1] if len(kb_of()) > 1 else [])), "favourite shows on home")
+R.handle_update(S, upd(300, data="c:BTC"))
+check(any(b.get("callback_data") == "m:coin" for b in kb_of()[-1]), "coin card goes back to the coin list")
+ok_prof = R.setup_profile(S) is None and bool(S.get("profile_hash"))
+check(ok_prof, "bot profile set (name/about/description)")
+n = len(SENT)
+R.setup_profile(S)
+check(not any(m == "setMyName" for m, p in SENT[n:]), "profile not re-sent when unchanged")
+
 print("8) scam report reaches admins; state saves")
 R.handle_update(S, upd(103, data="lr:0"))
 n = len(SENT)
