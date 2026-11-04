@@ -96,6 +96,14 @@ jobs:
         continue-on-error: true
         run: python scripts/news.py
 
+      - name: News live translation (Gemini → Google fallback) → Persian & Sorani
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: timeout 330 python scripts/news_tr.py
+
       - name: Capital flow by sector + exchanges globe (CoinGecko)
         id: flows
         continue-on-error: true
