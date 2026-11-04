@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#070b16">
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="assets/css/app.css">
+<link rel="preload" href="assets/fonts/Lalezar-Regular.woff" as="font" type="font/woff" crossorigin>
 </head>
 <body>
 <div class="aurora"><span></span><span></span><span></span></div>
@@ -16,7 +17,7 @@
   <div class="brand"><span class="dot"></span> مدل مفهومی پژوهش</div>
   <nav class="top-nav">
     <a href="index.html">خانه</a>
-    <a href="survey.html">پرسشنامه</a>
+    <a href="survey.html" class="nav-cta">شرکت در پرسشنامه</a>
     <a href="model.html" aria-current="page">مدل پژوهش</a>
     <a href="dashboard.html">داشبورد</a>
   </nav>
@@ -74,13 +75,25 @@
     <p class="muted" style="margin:10px 0 0">چون DERS دشواری تنظیم هیجان را می‌سنجد (نمره بالاتر = تنظیم ضعیف‌تر)، ضریب مثبت در مسیرهای a1، a2 و b همان جهت پیش‌بینی‌شده فرضیه‌های ۳ تا ۵ است.</p>
   </div>
 
+  <section class="invite invite-strip" id="end-cta">
+    <h2>این فرضیه‌ها با پاسخ شما آزموده می‌شوند</h2>
+    <p>۷۸ پرسش کوتاه، ۱۵ تا ۲۰ دقیقه، بدون ثبت هیچ اطلاعات شناسایی.</p>
+    <div class="btn-row">
+      <a href="survey.html" class="btn btn-primary btn-lg btn-ring">شروع پرسشنامه</a>
+    </div>
+  </section>
+
 </div></main>
+
+<a href="survey.html" class="dock" id="dock" aria-hidden="true" tabindex="-1"><b>شروع پرسشنامه</b><span>۱۵ تا ۲۰ دقیقه، بی‌نام</span></a>
 
 <footer><div class="wrap"><p>مدل بر پایه مدل انعطاف‌پذیری روان‌شناختی (هیز و همکاران)
 و مدل فرایندی تنظیم هیجان (گراس)</p></div></footer>
 
 <script type="module">
 import { drawModel } from './assets/js/model3d.js';
+import { mountDock } from './assets/js/dock.js';
+mountDock(['end-cta']);
 const info = document.getElementById('info');
 drawModel(document.getElementById('stage'), n => {
   info.innerHTML = `<h3 style="margin-top:0;color:#${n.color.toString(16).padStart(6,'0')}">${n.fa}</h3>

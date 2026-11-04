@@ -9,6 +9,7 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="assets/css/app.css">
 <link rel="preload" href="assets/fonts/Vazirmatn-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/Lalezar-Regular.woff" as="font" type="font/woff" crossorigin>
 </head>
 <body>
 <div class="aurora"><span></span><span></span><span></span></div>
@@ -18,27 +19,37 @@
   <div class="brand"><span class="dot"></span> پژوهش شرط‌بندی آنلاین و تنظیم هیجان</div>
   <nav class="top-nav">
     <a href="index.html" aria-current="page">خانه</a>
-    <a href="survey.html">پرسشنامه</a>
+    <a href="survey.html" class="nav-cta">شرکت در پرسشنامه</a>
     <a href="model.html">مدل پژوهش</a>
     <a href="dashboard.html">داشبورد</a>
   </nav>
 </div></header>
 
-<main><div class="wrap">
-
-  <div class="eyebrow">پژوهش دانشگاهی · کاملاً بی‌نام · ۱۵ تا ۲۰ دقیقه</div>
-
-  <h1>چه چیزی شرط‌بندی را از یک سرگرمی به یک مشکل تبدیل می‌کند؟</h1>
-
-  <p class="lead">این پژوهش کارشناسی ارشد روان‌شناسی بالینی، نقش <strong>اجتناب از
-  تجربه‌های درونی ناخوشایند</strong> و <strong>انعطاف‌ناپذیری روان‌شناختی</strong> را در
-  شدت اختلال قمار بررسی می‌کند و می‌پرسد آیا <strong>تنظیم هیجان</strong> حلقه واسط
-  میان آن‌هاست.</p>
-
-  <div class="btn-row">
-    <a href="survey.html" class="btn btn-primary btn-lg">شروع پرسشنامه</a>
-    <a href="model.html" class="btn btn-ghost btn-lg">دیدن مدل پژوهش</a>
+<main>
+<section class="hero">
+  <div>
+    <h1>چه چیزی شرط‌بندی را از یک سرگرمی به یک مشکل تبدیل می‌کند؟</h1>
+    <p class="lead">این پژوهش کارشناسی ارشد روان‌شناسی بالینی، نقش <strong>اجتناب از
+    تجربه‌های درونی ناخوشایند</strong> و <strong>انعطاف‌ناپذیری روان‌شناختی</strong> را در
+    شدت اختلال قمار بررسی می‌کند و می‌پرسد آیا <strong>تنظیم هیجان</strong> حلقه واسط
+    میان آن‌هاست.</p>
+    <p><a href="model.html">مدل پژوهش را ببینید</a></p>
   </div>
+
+  <aside class="invite" aria-labelledby="invite-h">
+    <h2 id="invite-h">تجربه شما، پاسخ این پرسش است</h2>
+    <p>هر پاسخ کامل به درمانگران کمک می‌کند بدانند از کجا شروع کنند.</p>
+    <dl class="facts">
+      <div><dt>۱۵–۲۰</dt><dd>دقیقه زمان</dd></div>
+      <div><dt>۷۸</dt><dd>پرسش کوتاه</dd></div>
+      <div><dt>بی‌نام</dt><dd>بدون نام، تلفن یا IP</dd></div>
+    </dl>
+    <a href="survey.html" class="btn btn-primary btn-lg btn-ring" id="hero-cta">شروع پرسشنامه</a>
+    <small>ویژه افراد ۱۸ سال و بالاتر که در ۱۲ ماه گذشته دست‌کم یک بار شرط‌بندی یا بازی شانسی آنلاین داشته‌اند.</small>
+  </aside>
+</section>
+
+<div class="wrap">
 
   <hr class="sep">
 
@@ -76,11 +87,17 @@
     <p class="muted" style="margin:0">روی یکی از کره‌ها بزنید تا توضیح آن متغیر اینجا بیاید.</p>
   </div>
 
-  <div class="btn-row">
-    <a href="survey.html" class="btn btn-primary btn-lg">شروع پرسشنامه</a>
-  </div>
+  <section class="invite-strip" id="end-cta">
+    <h2>آماده‌اید؟ پرسشنامه از همین‌جا شروع می‌شود</h2>
+    <p>۷۸ پرسش کوتاه، ۱۵ تا ۲۰ دقیقه، بدون ثبت هیچ اطلاعات شناسایی.</p>
+    <div class="btn-row">
+      <a href="survey.html" class="btn btn-primary btn-lg">شروع پرسشنامه</a>
+    </div>
+  </section>
 
 </div></main>
+
+<a href="survey.html" class="dock" id="dock" aria-hidden="true" tabindex="-1"><b>شروع پرسشنامه</b><span>۱۵ تا ۲۰ دقیقه، بی‌نام</span></a>
 
 <footer><div class="wrap">
   <p id="foot">پایان‌نامه کارشناسی ارشد روان‌شناسی بالینی</p>
@@ -92,6 +109,9 @@ import { drawModel } from './assets/js/model3d.js';
 
 document.getElementById('foot').textContent =
   `پایان‌نامه کارشناسی ارشد روان‌شناسی بالینی · ${CONFIG.RESEARCHER} · استاد راهنما: ${CONFIG.SUPERVISOR} · ${CONFIG.UNIVERSITY}`;
+
+import { mountDock } from './assets/js/dock.js';
+mountDock(['hero-cta','end-cta']);
 
 const info = document.getElementById('info');
 drawModel(document.getElementById('stage'), n => {
