@@ -1171,6 +1171,9 @@ def handle_private(s, msg):
         if cmd == "/setproxy":
             s["proxy"] = arg[:3500]
             return send(chat_id, "🛡 proxy text " + ("saved" if arg else "cleared") + ".")
+        if cmd == "/promote":
+            rep = promote(s, force=True) or []
+            return send(chat_id, "📣 " + ("\n".join(rep) or "nothing posted"))
         if cmd == "/broadcast":
             src = msg.get("reply_to_message")
             if not src:
@@ -1381,6 +1384,49 @@ def handle_update(s, up):
         handle_callback(s, up["callback_query"])
 
 
+# ================================================================== bot announcement (channel + group)
+PROMO_KEY = "promo_v2"
+PROMO_TEXT = (
+    "🤖 <b>ربات رسمی Coin_Kurd فعال شد:</b> @{bot}\n"
+    "💵 قیمت لحظه‌ای دلار، تتر، طلا و کریپتو + هشدار قیمت و درصدی\n"
+    "🔎 بررسی توکن با آدرس قرارداد (CA) و هشدار اسکم/راگ\n"
+    "🐋 هشدار نهنگ، جهش حجم و لانچ‌های جدید (فیلترشده)\n"
+    "💼 پورتفولیو، خرید پله‌ای (DCA) و محاسبهٔ حجم معامله\n"
+    "🛡 پروکسی اضطراری و حالت قطعی اینترنت ایران\n"
+    "📚 آموزش شروع امن و قوانین عراق، اقلیم و ایران\n"
+    "🌐 فارسی · کوردی سۆرانی · Kurmancî · العربية · English\n"
+    "رایگان — ربات هیچ‌وقت کلید خصوصی یا رمز نمی‌خواهد.\n\n"
+    "🤖 <b>بۆتی فەرمی Coin_Kurd چالاک کرا:</b> @{bot}\n"
+    "💵 نرخی ڕاستەوخۆی دۆلار، تەتەر، زێڕ و کریپتۆ + ئاگاداری نرخ\n"
+    "🔎 پشکنینی تۆکن بە ناونیشانی گرێبەست و ئاگاداری فێڵ\n"
+    "🐋 ئاگاداری نەهەنگ، قەبارە و لانچی نوێ\n"
+    "🛡 پرۆکسی فریاکەوتن · 📚 فێربوونی دەستپێکی ئارام\n"
+    "بەخۆڕایی — بۆت هەرگیز کلیلی تایبەت یان وشەی نهێنی داوا ناکات.")
+
+
+def promote(s, force=False):
+    """post the bot announcement (with a Start button) to the channel and the group and pin it — once, or again on /promote"""
+    if s.get(PROMO_KEY) and not force:
+        return None
+    text = PROMO_TEXT.format(bot=BOT_USERNAME)
+    kb = {"inline_keyboard": [[btn("▶️ شروع ربات · دەستپێکردنی بۆت · Start", url=f"https://t.me/{BOT_USERNAME}?start=promo")]]}
+    report = []
+    for target in (CHANNEL, GROUP):
+        if not target:
+            continue
+        r = tg("sendMessage", chat_id=target, text=text, parse_mode="HTML", reply_markup=kb,
+               link_preview_options={"is_disabled": True})
+        if not r.get("ok"):
+            report.append(f"{target}: send failed — {r.get('description')}")
+            continue
+        mid = (r.get("result") or {}).get("message_id")
+        p = tg("pinChatMessage", chat_id=target, message_id=mid, disable_notification=False)
+        report.append(f"{target}: posted #{mid}, " + ("pinned" if p.get("ok") else f"pin failed — {p.get('description')}"))
+    s[PROMO_KEY] = int(time.time())
+    notify_admins("📣 bot announcement\n" + "\n".join(report))
+    return report
+
+
 # ================================================================== setup
 COMMANDS = {
     "fa": [("dollar", "قیمت دلار و تتر به تومان"), ("calc", "ماشین‌حساب تتر"), ("watch", "هشدار جهش تتر"),
@@ -1453,6 +1499,11 @@ def main():
     HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
     CL.start(s, group_send, CHANNEL)
     threading.Thread(target=watch_loop, args=(s,), name="watch-v2", daemon=True).start()
+    try:
+        if promote(s):
+            save_state(s)
+    except Exception:
+        log.exception("bot announcement failed")
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
