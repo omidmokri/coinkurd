@@ -1,0 +1,43 @@
+:root{--bg:#0b0b0c;--card:#151517;--ink:#f4f4f2;--mute:#9a9a94;--acc:#f7931a;--line:rgba(255,255,255,.1);--up:#22c55e;--dn:#ef4444}
+@media (prefers-color-scheme:light){:root{--bg:#f7f6f2;--card:#fff;--ink:#17171a;--mute:#5d5d66;--acc:#c46a00;--line:rgba(0,0,0,.12)}}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:380px}
+body{background:var(--bg);color:var(--ink);font:13px/1.7 Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;padding:10px 12px 8px;min-height:520px}
+html[dir=ltr] body{font-family:"Segoe UI",system-ui,sans-serif}
+a{color:var(--acc);text-decoration:none}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.brand{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px}.brand img{border-radius:6px}
+.hr{display:flex;gap:6px;align-items:center}
+.lang{display:flex;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--mute);padding:3px 9px;font:inherit;font-size:11px;cursor:pointer}.lang button.on{background:var(--acc);color:#000;font-weight:700}
+.ib{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:99px;width:28px;height:28px;cursor:pointer;font-size:15px}
+.ib.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.kpi small{display:block;color:var(--mute);font-size:10.5px;line-height:1.4}.kpi b{font-size:14px;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:6px 0;font:inherit;cursor:pointer}
+.tabs button.on{color:var(--acc);border-color:var(--acc);font-weight:700}
+main section{display:none;max-height:300px;overflow-y:auto}main section.on{display:block}
+#q,.af input,.af select,.row select{width:100%;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font:inherit}
+#q{margin-bottom:6px}
+.list .it{display:grid;grid-template-columns:52px 1fr 70px 60px;gap:6px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);color:var(--ink)}
+.list .it:hover{background:var(--card)}
+.it .c{font-weight:700;font-family:"Segoe UI",system-ui,sans-serif}.it .p{direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
+.it .ch{direction:ltr;text-align:center;border-radius:6px;padding:1px 4px;font-size:12px}
+.up{color:var(--up)}.dn{color:var(--dn)}.it .ch.up{background:rgba(34,197,94,.12)}.it .ch.dn{background:rgba(239,68,68,.12)}
+.it svg{width:60px;height:20px}
+.post{display:block;padding:7px 4px;border-bottom:1px solid var(--line);color:var(--ink)}.post small{display:block;color:var(--mute)}
+.report h3{font-size:14px;margin:4px 0 8px;color:var(--acc)}.report p{margin:0 0 6px;white-space:pre-line}
+.af{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:5px;margin-bottom:8px}
+.af button{background:var(--acc);color:#000;border:0;border-radius:8px;padding:0 10px;font:inherit;font-weight:700;cursor:pointer}
+.al{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line)}
+.al button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:6px;cursor:pointer;padding:0 7px}
+.al.hit{opacity:.6}
+h4{margin:12px 0 4px;color:var(--mute);font-size:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0}.row select{width:110px}
+.row input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
+.note,.empty{color:var(--mute);font-size:11.5px;padding:6px 2px}
+footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+footer a{font-size:12px}
+.nfa{color:var(--mute);font-size:10.5px;text-align:center;margin-top:6px}

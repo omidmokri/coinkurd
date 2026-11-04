@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entekhab</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="https://entekhab.net/" target="_blank" rel="noopener"><img src="icons/icon48.png" alt="" width="28" height="28"><b data-t="brand">انتخاب</b></a>
+  <div class="hr">
+    <div class="lang" role="group" aria-label="language"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+    <button id="refresh" class="ib" title="refresh" aria-label="refresh">↻</button>
+  </div>
+</header>
+<section class="kpis" id="kpis"></section>
+<nav class="tabs" role="tablist">
+  <button data-tab="market" class="on" data-t="tMarket">بازار</button>
+  <button data-tab="report" data-t="tReport">گزارش</button>
+  <button data-tab="posts" data-t="tPosts">کانال</button>
+  <button data-tab="alerts" data-t="tAlerts">هشدار</button>
+</nav>
+<main>
+  <section data-pane="market" class="on">
+    <input id="q" type="search" autocomplete="off" data-tp="search">
+    <div id="list" class="list"></div>
+  </section>
+  <section data-pane="report"><div id="report" class="report"></div></section>
+  <section data-pane="posts"><div id="posts" class="list"></div></section>
+  <section data-pane="alerts">
+    <form id="af" class="af">
+      <select id="aCoin"></select>
+      <select id="aOp"><option value=">" data-t="above">بالاتر از</option><option value="<" data-t="below">پایین‌تر از</option></select>
+      <input id="aPx" type="number" step="any" min="0" placeholder="$" required>
+      <button type="submit" data-t="add">افزودن</button>
+    </form>
+    <div id="alerts" class="list"></div>
+    <h4 data-t="settings">تنظیمات</h4>
+    <label class="row"><span data-t="badge">عدد روی آیکون</span><select id="badge"></select></label>
+    <label class="row"><span data-t="notifyPosts">اعلان پست‌های تازهٔ Coin_Kurd</span><input type="checkbox" id="notifyPosts"></label>
+    <p class="note" data-t="privacy">همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.</p>
+  </section>
+</main>
+<footer>
+  <a href="https://entekhab.net/academy/" target="_blank" rel="noopener" data-t="academy">🏛 آکادمی</a>
+  <a href="https://entekhab.net/academy/lab/" target="_blank" rel="noopener" data-t="lab">🧪 شبیه‌ساز</a>
+  <a href="https://entekhab.net/dashboard/" target="_blank" rel="noopener" data-t="dash">📊 داشبورد</a>
+  <a href="https://t.me/Kurd_kurdistan_bot" target="_blank" rel="noopener" data-t="bot">🤖 ربات</a>
+  <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">✈️ Coin_Kurd</a>
+</footer>
+<p class="nfa"><span id="upd"></span> · <span data-t="nfa">توصیهٔ مالی نیست</span></p>
+<script src="popup.js"></script>
+</body>
+</html>
