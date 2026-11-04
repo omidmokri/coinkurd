@@ -259,6 +259,9 @@ M = {
              "kmr": "📚 <b>Perwerde û ewlehî</b>\nJi bo destpêkeke ewle, gav bi gav «Destpêka ewle» bişopîne.",
              "ar": "📚 <b>التعلم والأمان</b>\nللبداية الآمنة، تابع «البداية الآمنة» خطوة بخطوة.",
              "en": "📚 <b>Learn & stay safe</b>\nFor a safe start, go through “Safe start” step by step."},
+    "b_academy": {"fa": "🏛 آکادمی کریپتو و مسیر یادگیری سایت", "ckb": "🏛 ئەکادیمیای کریپتۆ و ڕێڕەوی فێربوون",
+                  "kmr": "🏛 Akademiya kriptoyê û rêya fêrbûnê", "ar": "🏛 أكاديمية الكريبتو ومسار التعلم",
+                  "en": "🏛 Crypto academy & learning path"},
     "b_start": {"fa": "🧭 شروع امن (۵ قدم)", "ckb": "🧭 دەستپێکی ئارام (٥ هەنگاو)", "kmr": "🧭 Destpêka ewle (5 gav)",
                 "ar": "🧭 البداية الآمنة (5 خطوات)", "en": "🧭 Safe start (5 steps)"},
     "b_reg": {"fa": "⚖️ قوانین منطقه", "ckb": "⚖️ یاساکانی ناوچە", "kmr": "⚖️ Qanûnên herêmê", "ar": "⚖️ قوانين المنطقة",
@@ -271,8 +274,10 @@ M = {
                 "ar": "🔎 فحص رمز (CA)", "en": "🔎 Check a token (CA)"},
     "b_next": {"fa": "بعدی ⬅️", "ckb": "دواتر ⬅️", "kmr": "Pêş ➡️", "ar": "التالي ⬅️", "en": "Next ➡️"},
     "b_prev": {"fa": "➡️ قبلی", "ckb": "➡️ پێشتر", "kmr": "⬅️ Paş", "ar": "➡️ السابق", "en": "⬅️ Back"},
-    "done": {"fa": "🎓 آفرین! دورهٔ شروع امن تمام شد.", "ckb": "🎓 ئافەرین! خولەکە تەواو بوو.", "kmr": "🎓 Aferîn! Kurs qediya.",
-             "ar": "🎓 أحسنت! أنهيت دورة البداية الآمنة.", "en": "🎓 Well done — you finished Safe start."},
+    "done": {"fa": "🎓 آفرین! دورهٔ شروع امن تمام شد. قدم بعدی: آکادمی کریپتو و مسیر یادگیری سایت 👇",
+             "ckb": "🎓 ئافەرین! خولەکە تەواو بوو. هەنگاوی دواتر: ئەکادیمیای کریپتۆ 👇", "kmr": "🎓 Aferîn! Kurs qediya. Gava din: akademiya kriptoyê 👇",
+             "ar": "🎓 أحسنت! أنهيت دورة البداية الآمنة. الخطوة التالية: أكاديمية الكريبتو ومسار التعلم 👇",
+             "en": "🎓 Well done — you finished Safe start. Next step: the crypto academy and learning path 👇"},
     "report_ask": {"fa": "🚩 لینک، آیدی یا توضیح کلاهبرداری را در یک پیام بفرست تا برای ادمین‌ها ارسال شود. (اطلاعات حساس مثل رمز یا عبارت بازیابی نفرست.)",
                    "ckb": "🚩 بەستەر، ئایدی یان ڕوونکردنەوەی فێڵەکە لە یەک پەیامدا بنێرە بۆ ئەدمینەکان. (وشەی نهێنی مەنێرە.)",
                    "kmr": "🚩 Girêdan, ID an şiroveya xapandinê di yek peyamê de bişîne da ku ji adminan re biçe. (Şîfre neşîne.)",
@@ -291,8 +296,114 @@ M = {
 
 def menu(lang):
     b = lambda k, d: {"text": L(M[k], lang), "callback_data": d}
-    return L(M["head"], lang), [[b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
+    return L(M["head"], lang), [[b("b_academy", "la:0")],
+                                [b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
                                 [b("b_check", "m:token"), b("b_report", "lr:0")]]
+
+
+# ================================================================== entekhab.net academy (inside the bot)
+SITE = "https://entekhab.net"
+# faculty titles in the bot's other languages (Persian titles and the English ones come from academy_data)
+FAC_T = {
+    "f1": {"ckb": "بنەماکانی ئابووری و بازاڕی کریپتۆ", "kmr": "Bingehên aborî û bazara kriptoyê", "ar": "أساسيات الاقتصاد وسوق الكريبتو"},
+    "f2": {"ckb": "بلۆکچەین و نهێنینووسی", "kmr": "Blockchain û kriptografî", "ar": "البلوكتشين والتشفير"},
+    "f3": {"ckb": "بیتکۆین، ئیتریۆم و دراوە دیجیتاڵەکان", "kmr": "Bitcoin, Ethereum û kripto", "ar": "البيتكوين والإيثريوم والعملات الرقمية"},
+    "f4": {"ckb": "جزدان و ئاسایشی سامان", "kmr": "Cûzdan û ewlehiya malê", "ar": "المحافظ وأمان الأصول"},
+    "f5": {"ckb": "ئاڵوگۆڕخانەکان و میکانیزمی مامەڵە", "kmr": "Borsa û mekanîzmaya bazirganiyê", "ar": "المنصات وآلية التداول"},
+    "f6": {"ckb": "شیکاری تەکنیکی", "kmr": "Analîza teknîkî", "ar": "التحليل الفني"},
+    "f7": {"ckb": "شیکاری بنەڕەتی", "kmr": "Analîza bingehîn", "ar": "التحليل الأساسي"},
+    "f8": {"ckb": "شیکاری ئۆنچەین", "kmr": "Analîza on-chain", "ar": "تحليل البيانات على السلسلة"},
+    "f9": {"ckb": "بازرگانی پرۆفیشناڵ", "kmr": "Bazirganiya profesyonel", "ar": "التداول الاحترافي"},
+    "f10": {"ckb": "بەڕێوەبردنی سەرمایە و مەترسی", "kmr": "Rêveberiya sermaye û xeterê", "ar": "إدارة رأس المال والمخاطر"},
+    "f11": {"ckb": "DeFi، وێب ٣ و تەکنەلۆژیای پێشکەوتوو", "kmr": "DeFi, Web3 û teknolojiya pêşketî", "ar": "التمويل اللامركزي والويب 3 والتقنيات المتقدمة"},
+    "f12": {"ckb": "توێژینەوەی پسپۆڕی و پڕۆژەی کۆتایی", "kmr": "Pisporî û projeya dawî", "ar": "التخصص والمشروع النهائي"},
+}
+AC = {
+    "title": {"fa": "🏛 <b>آکادمی کریپتو انتخاب</b>", "ckb": "🏛 <b>ئەکادیمیای کریپتۆی ئینتیخاب</b>", "kmr": "🏛 <b>Akademiya Kriptoyê ya Entekhab</b>",
+              "ar": "🏛 <b>أكاديمية انتخاب للكريبتو</b>", "en": "🏛 <b>Entekhab Crypto Academy</b>"},
+    "desc": {"fa": "۱۲ دانشکده از صفر تا حرفه‌ای، با آزمون، شبیه‌ساز معامله و گواهی — رایگان در entekhab.net",
+             "ckb": "١٢ کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە، سیمولەیتەر و بڕوانامە — بەخۆڕایی لە entekhab.net",
+             "kmr": "12 fakulte ji sifirê heta profesyonel, bi ezmûn, sîmulator û sertîfîka — belaş li entekhab.net",
+             "ar": "12 كلية من الصفر حتى الاحتراف، مع اختبارات ومحاكي تداول وشهادات — مجاناً على entekhab.net",
+             "en": "12 faculties from zero to pro, with quizzes, a trading simulator and certificates — free on entekhab.net"},
+    "stat": {"fa": "✅ {p} دانشکده منتشر شده · {n} درس · بقیه به‌ترتیب اضافه می‌شوند",
+             "ckb": "✅ {p} کۆلێژ بڵاوکراوەتەوە · {n} وانە · ئەوانی تر بە ڕیز زیاد دەکرێن",
+             "kmr": "✅ {p} fakulte hatine weşandin · {n} ders · yên din li pey hev tên",
+             "ar": "✅ نُشرت {p} كليات · {n} درساً · وتُضاف البقية تباعاً",
+             "en": "✅ {p} faculties published · {n} lessons · the rest are added in order"},
+    "soon": {"fa": "به‌زودی", "ckb": "بەم زووانە", "kmr": "di nêzîk de", "ar": "قريباً", "en": "soon"},
+    "path": {"fa": "🎓 <b>مسیر یادگیری</b> — ۳ سطح، ۱۲ درس کوتاه با آزمون؛ بهترین نقطهٔ شروع.",
+             "ckb": "🎓 <b>ڕێڕەوی فێربوون</b> — ٣ ئاست، ١٢ وانەی کورت بە تاقیکردنەوە؛ باشترین خاڵی دەستپێک.",
+             "kmr": "🎓 <b>Rêya fêrbûnê</b> — 3 ast, 12 dersên kurt bi ezmûn; cihê herî baş ê destpêkê.",
+             "ar": "🎓 <b>مسار التعلم</b> — 3 مستويات و12 درساً قصيراً مع اختبارات؛ أفضل نقطة للبدء.",
+             "en": "🎓 <b>Learning path</b> — 3 levels, 12 short lessons with quizzes; the best place to start."},
+    "note": {"fa": "🔒 پیشرفت شما فقط در مرورگر خودتان ذخیره می‌شود. آموزشی است، توصیهٔ مالی نیست.",
+             "ckb": "🔒 پێشکەوتنەکەت تەنها لە وێبگەڕەکەی خۆتدا هەڵدەگیرێت. فێرکارییە، ئامۆژگاری دارایی نییە.",
+             "kmr": "🔒 Pêşketina te tenê di geroka te de tê tomarkirin. Perwerdeyî ye, ne şîreta darayî ye.",
+             "ar": "🔒 يُحفظ تقدمك في متصفحك فقط. محتوى تعليمي وليس نصيحة مالية.",
+             "en": "🔒 Your progress is stored only in your own browser. Educational, not financial advice."},
+    "b_enter": {"fa": "🏛 ورود به آکادمی", "ckb": "🏛 چوونە ناو ئەکادیمیا", "kmr": "🏛 Têkeve akademiyê", "ar": "🏛 ادخل الأكاديمية",
+                "en": "🏛 Open the academy"},
+    "b_path": {"fa": "🎓 مسیر یادگیری", "ckb": "🎓 ڕێڕەوی فێربوون", "kmr": "🎓 Rêya fêrbûnê", "ar": "🎓 مسار التعلم", "en": "🎓 Learning path"},
+    "b_lab": {"fa": "🧪 آزمایشگاه و شبیه‌ساز", "ckb": "🧪 تاقیگە و سیمولەیتەر", "kmr": "🧪 Laboratuwar û sîmulator", "ar": "🧪 المختبر والمحاكي",
+              "en": "🧪 Lab & simulator"},
+    "b_place": {"fa": "🧭 آزمون تعیین سطح", "ckb": "🧭 تاقیکردنەوەی ئاست", "kmr": "🧭 Ezmûna astê", "ar": "🧭 اختبار تحديد المستوى",
+                "en": "🧭 Placement test"},
+    "b_gloss": {"fa": "📖 واژه‌نامه", "ckb": "📖 فەرهەنگ", "kmr": "📖 Ferheng", "ar": "📖 المسرد", "en": "📖 Glossary"},
+    "b_me": {"fa": "📊 داشبورد من", "ckb": "📊 داشبۆردەکەم", "kmr": "📊 Panela min", "ar": "📊 لوحتي", "en": "📊 My dashboard"},
+    "b_back": {"fa": "📚 آموزش و امنیت", "ckb": "📚 فێربوون و ئاسایش", "kmr": "📚 Perwerde û ewlehî", "ar": "📚 التعلم والأمان",
+               "en": "📚 Learning & safety"},
+    "b_home": {"fa": "🏠 خانه", "ckb": "🏠 سەرەکی", "kmr": "🏠 Mal", "ar": "🏠 الرئيسية", "en": "🏠 Home"},
+}
+_FA_DIG = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+_CKB_DIG = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
+
+
+def _num(n, lang):
+    s = str(n)
+    return s.translate(_FA_DIG) if lang == "fa" else s.translate(_CKB_DIG) if lang in ("ckb", "ar") else s
+
+
+def faculties():
+    """[(faculty dict, n_lessons)] from the site's own academy data; [] if it can't be read"""
+    try:
+        import academy_data as AD
+        content = AD.load_content()
+        return [(f, len(getattr(content.get(f["id"]), "LESSONS", []) or [])) for f in AD.FACULTIES]
+    except Exception:
+        return []
+
+
+def fac_title(f, lang):
+    if lang == "fa":
+        return f["title"]
+    if lang == "en":
+        return f.get("en") or f["title"]
+    return FAC_T.get(f["id"], {}).get(lang) or f.get("en") or f["title"]
+
+
+def academy(lang):
+    """-> (text, rows): the site's academy, inside the bot — live list of faculties + direct links"""
+    fs = faculties()
+    pub = [(f, n) for f, n in fs if n]
+    out = [L(AC["title"], lang), L(AC["desc"], lang)]
+    if fs:
+        out.append(L(AC["stat"], lang, p=_num(len(pub), lang), n=_num(sum(n for _, n in pub), lang)))
+        out.append("")
+        for f, n in fs:
+            mark = "✅" if n else "⏳"
+            tail = "" if n else f" <i>({L(AC['soon'], lang)})</i>"
+            out.append(f"{mark} {f['icon']} {_num(f['n'], lang)}. {fac_title(f, lang)}{tail}")
+    out += ["", L(AC["path"], lang), "", L(AC["note"], lang)]
+    u = lambda k, path: {"text": L(AC[k], lang), "url": SITE + path}
+    rows = [[u("b_enter", "/academy/")]]
+    fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
+    rows += [fac_btns[i:i + 2] for i in range(0, len(fac_btns), 2)]
+    rows += [[u("b_path", "/learn/"), u("b_lab", "/academy/lab/")],
+             [u("b_place", "/academy/placement/"), u("b_gloss", "/glossary/")],
+             [u("b_me", "/academy/me/")],
+             [{"text": L(AC["b_back"], lang), "callback_data": "m:learn"}, {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    return "\n".join(out), rows
 
 
 def lesson(i, lang):
@@ -305,6 +416,8 @@ def lesson(i, lang):
         nav.append({"text": L(M["b_next"], lang), "callback_data": f"ln:{i + 1}"})
     else:
         text += "\n\n" + L(M["done"], lang)
+        return text, [nav, [{"text": L(M["b_academy"], lang), "callback_data": "la:0"}],
+                      [{"text": "📚", "callback_data": "m:learn"}]]
     return text, [nav, [{"text": "📚", "callback_data": "m:learn"}]]
 
 
