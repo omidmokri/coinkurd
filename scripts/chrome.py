@@ -141,6 +141,10 @@ NAV = [
          L("داده‌های باز JSON برای ساخت ابزار", "داتای کراوەی JSON بۆ دروستکردنی ئامراز", "Open JSON data to build on")),
     ]},
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
+        ("/academy/", "cap", L("آکادمی کریپتو", "ئەکادیمیای کریپتۆ", "Crypto Academy"),
+         L("۱۲ دانشکده از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز", "١٢ کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە و سیمولەیتەر", "12 faculties, zero to pro, with quizzes and a simulator")),
+        ("/academy/lab/", "flask", L("آزمایشگاه آکادمی", "تاقیگەی ئەکادیمیا", "Academy lab"),
+         L("شبیه‌ساز معامله، بک‌تست و ماشین‌حساب‌ها", "سیمولەیتەری مامەڵە، باکتێست و ژمێرەرەکان", "Paper trading, backtests and calculators")),
         ("/learn/", "cap", L("مسیر یادگیری", "ڕێڕەوی فێربوون", "Learning path"),
          L("از مبتدی تا پیشرفته، همراه آزمون", "لە سەرەتاییەوە تا پێشکەوتوو، لەگەڵ تاقیکردنەوە", "Beginner to advanced, with quizzes")),
         ("/glossary/", "book", L("واژه‌نامه", "فەرهەنگ", "Glossary"),
