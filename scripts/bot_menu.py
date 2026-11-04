@@ -425,41 +425,72 @@ def coin_nav(lang):
 # Shown in Telegram search, on t.me/Kurd_kurdistan_bot and in the empty chat before /start.
 # Limits: name 64, short description 120, description 512 characters.
 PROFILE = {
-    "": {   # default = Persian + Sorani (Telegram has no separate Sorani UI language code)
+    "": {   # default = Persian (+ one Sorani line); Telegram has no separate Sorani UI language code
         "name": "Kurd Kurdistan Bot | ربات کوین کورد",
-        "short": "دستیار هوشمند کریپتو برای جامعه کرد: دلار و تتر، بررسی توکن و اسکم، هشدار نهنگ، پروکسی. رایگان · Coin_Kurd",
-        "desc": ("🌞 Kurd Kurdistan Bot — دستیار هوشمند کریپتوی کانال Coin_Kurd\n"
-                 "💵 قیمت لحظه‌ای دلار، تتر، طلا و کریپتو · 🔔 هشدار قیمت و درصدی\n"
-                 "🔎 بررسی توکن با آدرس قرارداد و هشدار اسکم/راگ · 🐋 نهنگ‌ها و لانچ‌ها\n"
-                 "💼 پورتفولیو · 🛡 پروکسی اضطراری و راهنمای قطعی اینترنت · 📚 آموزش\n\n"
-                 "🌞 یاریدەدەری زیرەکی کریپتۆ بۆ کۆمەڵگەی کورد: نرخی دۆلار و تەتەر، پشکنینی تۆکن، ئاگاداری، پرۆکسی.\n"
-                 "فارسی · کوردی · Kurmancî · العربية · English — رایگان؛ هیچ‌وقت کلید خصوصی نمی‌خواهد."),
+        "short": "دستیار کریپتوی Coin_Kurd: دلار و تتر، بررسی توکن، هشدار، پروکسی · دعوت کن، اندیکاتور هدیه بگیر · entekhab.net/bot",
+        "desc": ("🌞 Kurd Kurdistan Bot — دستیار هوشمند کریپتوی Coin_Kurd\n"
+                 "💵 قیمت لحظه‌ای دلار، تتر، طلا و کریپتو + هشدار قیمت\n"
+                 "🔎 بررسی توکن با آدرس قرارداد و هشدار اسکم\n"
+                 "🐋 نهنگ‌ها، لانچ‌ها، تحلیل، اخبار · 🛡 پروکسی اضطراری\n"
+                 "🎁 با {n} دعوت موفق، اندیکاتور Kurdistan Roj RSI هدیه بگیر\n\n"
+                 "📢 t.me/Coin_Kurd\n💬 t.me/Coin_Kurd_Group\n🌐 entekhab.net/bot\n"
+                 "𝕏 x.com/omid_mokri · 📷 instagram.com/coin_kurd\n\n"
+                 "رایگان؛ هیچ‌وقت کلید یا رمز نمی‌خواهد. بۆ دەستپێکردن 👇 Start"),
     },
     "en": {
         "name": "Kurd Kurdistan Bot | Coin_Kurd crypto",
-        "short": "Smart crypto assistant for the Kurdish community: prices, token & scam check, whale alerts, proxies. Free.",
-        "desc": ("🌞 Kurd Kurdistan Bot — the smart crypto assistant of the Coin_Kurd channel.\n"
-                 "💵 Live dollar/tether (toman), gold and crypto prices · 🔔 price & % alerts\n"
-                 "🔎 Token check by contract address with scam/rug warnings · 🐋 whales, volume, new launches\n"
-                 "💼 Portfolio · 🛡 emergency proxies & internet-outage guide · 📚 safe-start lessons\n"
-                 "Persian · Kurdish (Sorani, Kurmanji) · Arabic · English. Free — never asks for keys."),
+        "short": "Coin_Kurd crypto assistant: prices, token & scam check, alerts, proxies · invite friends, win an indicator",
+        "desc": ("🌞 Kurd Kurdistan Bot — the smart crypto assistant of Coin_Kurd\n"
+                 "💵 Live dollar/tether, gold & crypto prices + price alerts\n"
+                 "🔎 Token check by contract address with scam warnings\n"
+                 "🐋 Whales, launches, analysis, news · 🛡 emergency proxies\n"
+                 "🎁 {n} successful invites = Kurdistan Roj RSI indicator as a gift\n\n"
+                 "📢 t.me/Coin_Kurd\n💬 t.me/Coin_Kurd_Group\n🌐 entekhab.net/bot\n"
+                 "𝕏 x.com/omid_mokri · 📷 instagram.com/coin_kurd\n\n"
+                 "Free; never asks for keys or passwords. Tap Start 👇"),
     },
     "ar": {
         "name": "Kurd Kurdistan Bot | بوت كوين كورد",
-        "short": "مساعد كريبتو ذكي للمجتمع الكردي: الأسعار، فحص الرموز والاحتيال، تنبيهات الحيتان، بروكسي. مجاني.",
-        "desc": ("🌞 Kurd Kurdistan Bot — مساعد الكريبتو الذكي لقناة Coin_Kurd.\n"
-                 "💵 أسعار الدولار والتيثر والذهب والكريبتو · 🔔 تنبيهات السعر والنسبة\n"
-                 "🔎 فحص الرمز بعنوان العقد مع تحذيرات الاحتيال · 🐋 الحيتان والإطلاقات الجديدة\n"
-                 "💼 المحفظة · 🛡 بروكسي الطوارئ ودليل انقطاع الإنترنت · 📚 دروس البداية الآمنة\n"
-                 "مجاني — لا يطلب أبداً مفاتيحك الخاصة."),
+        "short": "مساعد كريبتو من Coin_Kurd: الأسعار، فحص الرموز والاحتيال، تنبيهات، بروكسي · ادعُ أصدقاءك واربح مؤشراً",
+        "desc": ("🌞 Kurd Kurdistan Bot — مساعد الكريبتو الذكي لقناة Coin_Kurd\n"
+                 "💵 أسعار الدولار والتيثر والذهب والكريبتو + تنبيهات السعر\n"
+                 "🔎 فحص الرمز بعنوان العقد مع تحذيرات الاحتيال\n"
+                 "🐋 الحيتان والإطلاقات والتحليل والأخبار · 🛡 بروكسي الطوارئ\n"
+                 "🎁 {n} دعوات ناجحة = مؤشر Kurdistan Roj RSI هدية\n\n"
+                 "📢 t.me/Coin_Kurd\n💬 t.me/Coin_Kurd_Group\n🌐 entekhab.net/bot\n"
+                 "𝕏 x.com/omid_mokri · 📷 instagram.com/coin_kurd\n\n"
+                 "مجاني؛ لا يطلب أبداً مفاتيح أو كلمات مرور. اضغط Start 👇"),
     },
     "ku": {   # Kurdish clients (Kurmanji)
         "name": "Kurd Kurdistan Bot | Coin_Kurd",
-        "short": "Alîkarê jîr ê kriptoyê ji bo civaka Kurd: biha, kontrola token û xapandinê, hişyarî, proxy. Belaş.",
-        "desc": ("🌞 Kurd Kurdistan Bot — alîkarê jîr ê kriptoyê yê kanala Coin_Kurd.\n"
-                 "💵 Bihayên dolar, tether, zêr û kriptoyê · 🔔 hişyariyên bihayê\n"
-                 "🔎 Kontrola tokenê bi navnîşana peymanê û hişyariya xapandinê · 🐋 neheng û destpêkên nû\n"
-                 "💼 Portfolyo · 🛡 proxyên awarte · 📚 perwerde\n"
-                 "Kurmancî · سۆرانی · فارسی · العربية · English. Belaş — tu carî mifteya taybet naxwaze."),
+        "short": "Alîkarê kriptoyê yê Coin_Kurd: biha, kontrola token û xapandinê, hişyarî, proxy · hevalan vexwîne, xelat bistîne",
+        "desc": ("🌞 Kurd Kurdistan Bot — alîkarê jîr ê kriptoyê yê Coin_Kurd\n"
+                 "💵 Bihayên dolar, tether, zêr û kriptoyê + hişyariya bihayê\n"
+                 "🔎 Kontrola tokenê bi navnîşana peymanê û hişyariya xapandinê\n"
+                 "🐋 Neheng, destpêkên nû, analîz, nûçe · 🛡 proxyên awarte\n"
+                 "🎁 {n} vexwendinên serkeftî = îndîkatora Kurdistan Roj RSI diyarî\n\n"
+                 "📢 t.me/Coin_Kurd\n💬 t.me/Coin_Kurd_Group\n🌐 entekhab.net/bot\n"
+                 "𝕏 x.com/omid_mokri · 📷 instagram.com/coin_kurd\n\n"
+                 "Belaş; tu carî mifte an şîfre naxwaze. Start bitikîne 👇"),
     },
 }
+
+
+def profile(reward_at):
+    """PROFILE with the invite goal filled in"""
+    return {code: {k: v.replace("{n}", str(reward_at)) for k, v in p.items()} for code, p in PROFILE.items()}
+
+
+# links shown under the welcome banner
+LINKS = [("📢", "https://t.me/Coin_Kurd", {"fa": "کانال", "ckb": "کەناڵ", "kmr": "Kanal", "ar": "القناة", "en": "Channel"}),
+         ("💬", "https://t.me/Coin_Kurd_Group", {"fa": "گروه", "ckb": "گرووپ", "kmr": "Kom", "ar": "المجموعة", "en": "Group"}),
+         ("🌐", "https://entekhab.net/bot/", {"fa": "راهنما و سایت", "ckb": "ڕێنمایی و ماڵپەڕ", "kmr": "Rêber û malper",
+                                              "ar": "الدليل والموقع", "en": "Guide & site"}),
+         ("𝕏", "https://x.com/omid_mokri", {"fa": "X", "ckb": "X", "kmr": "X", "ar": "X", "en": "X"}),
+         ("📷", "https://www.instagram.com/coin_kurd/", {"fa": "اینستاگرام", "ckb": "ئینستاگرام", "kmr": "Instagram", "ar": "إنستغرام",
+                                                         "en": "Instagram"})]
+
+
+def links_rows(lang):
+    b = [{"text": f"{ic} {L(nm, lang)}", "url": url} for ic, url, nm in LINKS]
+    return [b[:3], b[3:]]
