@@ -115,7 +115,7 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-si
 .coins a{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:4px;color:var(--ink);font-family:'Space Grotesk',monospace}"""
 
 
-NAVFA = '<a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/learn/">🎓 آموزش</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a>'
+NAVFA = '<a href="/#feed">آرشیو</a><a href="/coins/">کوین‌ها</a><a href="/dashboard/">داشبورد بازار</a><a href="/replay/">بازپخش</a><a href="/lab/">🧪 آزمایشگاه</a><a href="/indicators/">📡 اندیکاتورها</a><a href="/dna/">🧬 DNA</a><a href="/status/">📊 شفافیت</a><a href="/academy/">🏛 آکادمی</a><a href="/learn/">🎓 آموزش</a><a href="/terminal/">🖥 ترمینال</a><a href="https://t.me/Coin_Kurd" rel="noopener">تلگرام</a>'
 NAV_L = {"en": '<a href="/#feed">Archive</a><a href="/coins/">Coins</a><a href="/indicators/">📡 Indicators</a><a href="/dna/">🧬 DNA</a><a href="/terminal/">🖥 Terminal</a><a href="/learn/">🎓 Learn</a><a href="https://t.me/Coin_Kurd" rel="noopener">Telegram</a>',
          "ckb": '<a href="/#feed">ئەرشیڤ</a><a href="/coins/">دراوەکان</a><a href="/indicators/">📡 ئیندیکاتۆر</a><a href="/dna/">🧬 DNA</a><a href="/learn/">🎓 فێربوون</a><a href="https://t.me/Coin_Kurd" rel="noopener">تێلێگرام</a>'}
 
@@ -1329,6 +1329,13 @@ if __name__ == "__main__":
     extra += build_hub()
     extra += build_seo_extra()
     extra += build_learn()
+    try:  # CRYPTO MASTER ACADEMY (/academy/) — never allowed to break the rest of the site build
+        import build_academy
+        extra += build_academy.build()
+    except Exception as ex:  # noqa: BLE001
+        import traceback
+        traceback.print_exc()
+        print("academy build failed:", ex)
     print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
