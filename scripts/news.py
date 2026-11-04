@@ -67,7 +67,6 @@ FEEDS_WORLD = {
     "CNBC Markets": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
     "CNBC Economy": "https://www.cnbc.com/id/20910258/device/rss/rss.html",
     "MarketWatch": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
-    "Yahoo Finance": "https://finance.yahoo.com/news/rssindex",
     "Guardian Business": "https://www.theguardian.com/uk/business/rss",
     "Al Jazeera Economy": "https://www.aljazeera.com/xml/rss/all.xml",
 }
@@ -79,8 +78,6 @@ FEEDS_FA = {
     "میهن بلاکچین": "https://mihanblockchain.com/feed/",
     "بلاگ والکس": "https://wallex.ir/blog/feed/",
     "ارز تودی": "https://arztoday.com/feed/",
-    "کوین ایران": "https://coiniran.com/feed",
-    "دیجی ارز": "https://digiarz.com/feed/",
 }
 # فارسی: اقتصاد ایران (فقط خبرهای مرتبط با بازارها نگه داشته می‌شوند)
 FEEDS_FA_ECON = {
