@@ -11,7 +11,7 @@ export const CONFIG = {
      تا وقتی خالی باشد، سایت در «حالت آزمایشی» کار می‌کند:
      پاسخ‌ها در مرورگر ذخیره و با دکمه، خروجی CSV گرفته می‌شود.
      --------------------------------------------------------------- */
-  APPS_SCRIPT_URL: '',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwL_GxK8nO1c06BXmqX9zNeW99n-Cur9nPAQTvPTBc9hyWSDTrgfsd82NqHiJjOPRzf/exec',
 
   /* ---------------------------------------------------------------
      ۲) رمز داشبورد نتایج عمداً اینجا نیست.
