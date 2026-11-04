@@ -47,7 +47,7 @@ def fake_tg(method, **p):
     SENT.append((method, p))
     if method == "getChatMember":
         return {"ok": True, "result": {"status": "member"}}
-    return {"ok": True, "result": {}}
+    return {"ok": True, "result": {"message_id": 77}}
 
 
 R.tg = fake_tg
@@ -365,6 +365,18 @@ W._wcache.clear()
 check(W.wallet_holdings("0x" + "7" * 40, D) is None, "wallet API error → None, not an empty wallet")
 W.requests.get = _real_get
 check(W.diff({"ETH": (1.0, 2000.0)}, {"ETH": (1.0, 2000.0), "SPAM": (1e6, 0.0)}) == [], "unpriced spam is not a 'buy'")
+print("7c) one-time announcement in channel + group, pinned; /promote reposts")
+n = len(SENT)
+R.promote(S)
+posts = [p for m, p in SENT[n:] if m == "sendMessage" and p.get("chat_id") in (R.CHANNEL, R.GROUP)]
+pins = [p for m, p in SENT[n:] if m == "pinChatMessage"]
+check(len(posts) == 2 and len(pins) == 2, "posted and pinned in channel and group")
+check(len(posts[0]["text"]) < 4096 and "@test_bot" in posts[0]["text"], "announcement text")
+n = len(SENT)
+R.promote(S)
+check(not any(m == "sendMessage" and p.get("chat_id") == R.CHANNEL for m, p in SENT[n:]), "not repeated on the next run")
+R.handle_update(S, upd(1, "/promote"))
+check(any(m == "pinChatMessage" for m, p in SENT[n:]), "/promote reposts for admins")
 print("8) scam report reaches admins; state saves")
 R.handle_update(S, upd(103, data="lr:0"))
 n = len(SENT)
