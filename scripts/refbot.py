@@ -658,18 +658,20 @@ _BANNER_ID = {}          # Telegram file_id of the uploaded banner, reused after
 def welcome(chat_id, lang):
     """banner (drawn by bot_art from the site logo) + welcome text, once per /start; the home screen stays short"""
     cap = MN.L(MN.T["welcome"], lang)
+    links = {"inline_keyboard": MN.links_rows(lang)}           # channel, group, guide/site, X, Instagram
     if _BANNER_ID.get("id"):
-        r = tg("sendPhoto", chat_id=chat_id, photo=_BANNER_ID["id"], caption=cap, parse_mode="HTML")
+        r = tg("sendPhoto", chat_id=chat_id, photo=_BANNER_ID["id"], caption=cap, parse_mode="HTML", reply_markup=links)
     else:
         img = ART.banner(BOT_USERNAME or "Kurd_kurdistan_bot")
-        r = _post_with_retry("sendPhoto", {"chat_id": chat_id, "caption": cap, "parse_mode": "HTML"},
+        r = _post_with_retry("sendPhoto", {"chat_id": chat_id, "caption": cap, "parse_mode": "HTML",
+                                           "reply_markup": json.dumps(links)},
                              files={"photo": ("banner.jpg", img, "image/jpeg")}) if img else {"ok": False}
         try:
             _BANNER_ID["id"] = r["result"]["photo"][-1]["file_id"]
         except Exception:
             pass
     if not r.get("ok"):
-        send(chat_id, cap)
+        send(chat_id, cap, links)
 
 
 def after_verified(s, uid, chat_id, edit_mid=None):
@@ -1541,11 +1543,12 @@ def setup_commands():
 
 def setup_profile(s):
     """name / about / description per language; sent only when the texts change (setMyName is rate-limited)"""
-    digest = hashlib.sha1(json.dumps(MN.PROFILE, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    prof = MN.profile(REWARD_AT)
+    digest = hashlib.sha1(json.dumps(prof, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     if s.get("profile_hash") == digest:
         return
     ok = True
-    for code, p in MN.PROFILE.items():
+    for code, p in prof.items():
         lc = {"language_code": code} if code else {}
         for method, field, value in (("setMyName", "name", p["name"]), ("setMyShortDescription", "short_description", p["short"]),
                                      ("setMyDescription", "description", p["desc"])):
