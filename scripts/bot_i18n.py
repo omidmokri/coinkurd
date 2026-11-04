@@ -1,14 +1,15 @@
-"""UI strings for the Coin_Kurd / Entekhab Telegram bot (fa · ckb · en)."""
+"""UI strings for the Coin_Kurd / Entekhab Telegram bot (fa · ckb · kmr · ar · en)."""
 
+from bot_ar import AR
 from bot_kmr import KMR
 
-LANGS = ("fa", "ckb", "kmr", "en")
-RTL = {"fa": True, "ckb": True, "kmr": False, "en": False}
-LANG_NAMES = {"fa": "فارسی", "ckb": "کوردی (سۆرانی)", "kmr": "Kurdî (Kurmancî)", "en": "English"}
+LANGS = ("fa", "ckb", "kmr", "ar", "en")
+RTL = {"fa": True, "ckb": True, "kmr": False, "ar": True, "en": False}
+LANG_NAMES = {"fa": "فارسی", "ckb": "کوردی (سۆرانی)", "kmr": "Kurdî (Kurmancî)", "ar": "العربية", "en": "English"}
 
 
 def pick(d, lang):
-    """choose a language from a {fa, ckb, en[, kmr]} dict; Kurmanji falls back to KMR[en], then English"""
+    """choose a language from a {fa, ckb, en[, kmr, ar]} dict; Kurmanji/Arabic fall back to KMR[en]/AR[en], then English"""
     if not isinstance(d, dict):
         return d or ""
     if d.get(lang):
@@ -17,6 +18,11 @@ def pick(d, lang):
         en = d.get("en")
         if isinstance(en, str):
             return KMR.get(en, en)
+        return en or d.get("fa") or ""
+    if lang == "ar":                                  # Arabic: AR[en], then English (not Persian)
+        en = d.get("en")
+        if isinstance(en, str):
+            return AR.get(en, en)
         return en or d.get("fa") or ""
     return d.get("fa") or d.get("en") or ""
 
@@ -33,6 +39,56 @@ T = {
     "b_watch_off": {"fa": "🚨 هشدار جهش تتر: خاموش کن", "ckb": "🚨 ئاگاداری تەتەر: بیکوژێنەوە", "en": "🚨 Tether spike alert: off"},
     "b_predict": {"fa": "🎯 بازی پیش‌بینی", "ckb": "🎯 یاری پێشبینی", "en": "🎯 Prediction game"},
     "b_proxy": {"fa": "🛡 پروکسی اضطراری", "ckb": "🛡 پرۆکسی فریاکەوتن", "en": "🛡 Emergency proxy"},
+    # ---------------------------------------------------------------- v2 sections (all five languages explicit)
+    "b_token": {"fa": "🔎 بررسی توکن (CA)", "ckb": "🔎 پشکنینی تۆکن (CA)", "kmr": "🔎 Kontrola tokenê (CA)",
+                "ar": "🔎 فحص رمز (CA)", "en": "🔎 Token check (CA)"},
+    "b_pf": {"fa": "💼 پورتفولیو", "ckb": "💼 پۆرتفۆلیۆ", "kmr": "💼 Portfolyo", "ar": "💼 المحفظة", "en": "💼 Portfolio"},
+    "b_center": {"fa": "🔔 مرکز هشدارها", "ckb": "🔔 ناوەندی ئاگادارییەکان", "kmr": "🔔 Navenda hişyariyan",
+                 "ar": "🔔 مركز التنبيهات", "en": "🔔 Alert centre"},
+    "b_learn": {"fa": "📚 آموزش و امنیت", "ckb": "📚 فێربوون و ئاسایش", "kmr": "📚 Perwerde û ewlehî",
+                "ar": "📚 التعلم والأمان", "en": "📚 Learn & safety"},
+    "b_outage": {"fa": "🆘 قطعی اینترنت", "ckb": "🆘 پچڕانی ئینتەرنێت", "kmr": "🆘 Qutbûna înternetê",
+                 "ar": "🆘 انقطاع الإنترنت", "en": "🆘 Internet outage"},
+    "b_outage_live": {"fa": "🆘 اینترنت ایران مختل است — راهنما", "ckb": "🆘 ئینتەرنێتی ئێران تێکچووە — ڕێنمایی",
+                      "kmr": "🆘 Înterneta Îranê tevlihev e — rêber", "ar": "🆘 إنترنت إيران مضطرب — الدليل",
+                      "en": "🆘 Iran internet disrupted — guide"},
+    "b_follow": {"fa": "👀 دنبال کردن کیف‌ها", "ckb": "👀 شوێنکەوتنی جزدان", "kmr": "👀 Şopandina cûzdanan",
+                 "ar": "👀 متابعة المحافظ", "en": "👀 Follow wallets"},
+    "b_dca": {"fa": "📆 خرید پله‌ای و حجم معامله", "ckb": "📆 DCA و قەبارەی مامەڵە", "kmr": "📆 DCA û mezinahî",
+              "ar": "📆 الشراء الدوري وحجم الصفقة", "en": "📆 DCA & position size"},
+    "b_lite": {"fa": "📋 نسخهٔ سبک", "ckb": "📋 سووک", "kmr": "📋 Sivik", "ar": "📋 نسخة خفيفة", "en": "📋 Lite"},
+    "help2": {"fa": ("<b>ابزارهای جدید</b>\n/check آدرس — بررسی توکن و تشخیص اسکم (یا فقط آدرس را بفرست)\n"
+                     "/alert BTC +5% هشدار درصدی  ·  /center مرکز هشدارها (نهنگ، حجم، لانچ، سیگنال)\n"
+                     "/pf پورتفولیو  ·  /wallet add آدرس  ·  /follow آدرس\n/dca خرید پله‌ای  ·  /size حجم معامله\n"
+                     "/learn آموزش و قوانین  ·  /proxy پروکسی  ·  /outage حالت قطعی  ·  /lite قیمت سبک"),
+              "ckb": ("<b>ئامرازە نوێیەکان</b>\n/check ناونیشان — پشکنینی تۆکن (یان تەنها ناونیشانەکە بنێرە)\n"
+                      "/alert BTC +5% ئاگاداری ڕێژەیی  ·  /center ناوەندی ئاگادارییەکان\n"
+                      "/pf پۆرتفۆلیۆ  ·  /wallet add ناونیشان  ·  /follow ناونیشان\n/dca کڕینی پلەیی  ·  /size قەبارەی مامەڵە\n"
+                      "/learn فێربوون  ·  /proxy پرۆکسی  ·  /outage دۆخی پچڕان  ·  /lite نرخی سووک"),
+              "kmr": ("<b>Amûrên nû</b>\n/check navnîşan — kontrola tokenê (an tenê navnîşanê bişîne)\n"
+                      "/alert BTC +5% hişyariya ji sedî  ·  /center navenda hişyariyan\n"
+                      "/pf portfolyo  ·  /wallet add navnîşan  ·  /follow navnîşan\n/dca DCA  ·  /size mezinahiya bazirganiyê\n"
+                      "/learn perwerde  ·  /proxy proxy  ·  /outage rewşa qutbûnê  ·  /lite bihayên sivik"),
+              "ar": ("<b>أدوات جديدة</b>\n/check العنوان — فحص الرمز وكشف الاحتيال (أو أرسل العنوان فقط)\n"
+                     "/alert BTC +5% تنبيه بالنسبة  ·  /center مركز التنبيهات (حيتان، حجم، إطلاقات، إشارات)\n"
+                     "/pf المحفظة  ·  /wallet add العنوان  ·  /follow العنوان\n/dca الشراء الدوري  ·  /size حجم الصفقة\n"
+                     "/learn التعلم والقوانين  ·  /proxy البروكسي  ·  /outage وضع الانقطاع  ·  /lite أسعار خفيفة"),
+              "en": ("<b>New tools</b>\n/check address — token check & scam warnings (or just paste the address)\n"
+                     "/alert BTC +5% percent alert  ·  /center alert centre (whales, volume, launches, signals)\n"
+                     "/pf portfolio  ·  /wallet add address  ·  /follow address\n/dca DCA plans  ·  /size position size\n"
+                     "/learn lessons & local rules  ·  /proxy proxies  ·  /outage outage mode  ·  /lite light prices")},
+    "qa_head": {"fa": "🔔 هشدار سریع برای {c} (قیمت فعلی {p}):", "ckb": "🔔 ئاگاداری خێرا بۆ {c} (ئێستا {p}):",
+                "kmr": "🔔 Hişyariya bilez ji bo {c} (niha {p}):", "ar": "🔔 تنبيه سريع لـ {c} (الآن {p}):",
+                "en": "🔔 Quick alert for {c} (now {p}):"},
+    "qa_custom": {"fa": "✍️ عدد دلخواه", "ckb": "✍️ ژمارەی دڵخواز", "kmr": "✍️ Hejmara xwe", "ar": "✍️ رقم مخصص", "en": "✍️ Custom"},
+    "alert_pct_set": {"fa": "🔔 هشدار ثبت شد: {coin} {spec} (مبنا {now})", "ckb": "🔔 ئاگاداری تۆمارکرا: {coin} {spec} (بنەما {now})",
+                      "kmr": "🔔 Hişyarî hat danîn: {coin} {spec} (bingeh {now})", "ar": "🔔 تم ضبط التنبيه: {coin} {spec} (المرجع {now})",
+                      "en": "🔔 Alert set: {coin} {spec} (from {now})"},
+    "alert_pct_hit": {"fa": "🚨 <b>هشدار درصدی</b>\n{coin} {pct}٪ تغییر کرد ({ref} → {now})",
+                      "ckb": "🚨 <b>ئاگاداری ڕێژەیی</b>\n{coin} {pct}٪ گۆڕا ({ref} ← {now})",
+                      "kmr": "🚨 <b>Hişyariya ji sedî</b>\n{coin} {pct}% guherî ({ref} → {now})",
+                      "ar": "🚨 <b>تنبيه النسبة المئوية</b>\n{coin} تغيّر {pct}٪ ({ref} ← {now})",
+                      "en": "🚨 <b>% alert</b>\n{coin} moved {pct}% ({ref} → {now})"},
     "watch_on": {"fa": "🚨 روشن شد: اگر تتر در ۱۵ دقیقه ±۱٪ یا بیشتر تکان بخورد خبرت می‌کنم.",
                  "ckb": "🚨 هەڵکرا: ئەگەر تەتەر لە ١٥ خولەکدا ±١٪ جووڵا ئاگادارت دەکەم.",
                  "en": "🚨 On: I'll ping you if tether moves ±1% or more within 15 minutes."},
