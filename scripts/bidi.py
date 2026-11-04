@@ -35,7 +35,7 @@ FSI = "⁨"  # FIRST-STRONG ISOLATE    - direction taken from the content
 PDI = "⁩"  # POP DIRECTIONAL ISOLATE - close an isolate
 
 MINUS = "−"  # true minus sign; same width as '+', unlike a hyphen
-RTL_LANGS = ("fa", "ckb")
+RTL_LANGS = ("fa", "ckb", "ar")
 
 
 def iso(s) -> str:

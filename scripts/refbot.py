@@ -4,8 +4,14 @@ Coin_Kurd / Entekhab Telegram bot — runs inside GitHub Actions (no server).
 Brings every section of entekhab.net into Telegram (market, brain, coin cards,
 scanner, score, news, narratives, calendar, AI council, derivatives, lab,
 cycle, on-chain, flows, DNA, track record, indicators, channel archive search)
-in Persian, Sorani Kurdish and English, plus price alerts, a daily brief,
+in Persian, Sorani Kurdish, Kurmanji, Arabic and English, plus price and % alerts, a daily brief,
 the referral programme and the group join-gate.
+
+v2 adds: token check by contract address with scam/rug warnings, whale / volume / new-launch /
+indicator-signal alerts, portfolio + read-only wallets, wallet follow (copy-trade lite, nothing is
+executed), DCA reminders, a position-size calculator, lessons + local regulatory notes, and
+Iran-outage readiness (outage detection, ranked proxies with in-Iran feedback, kit + catch-up digest).
+The bot never asks for keys and never trades.
 
 Each run long-polls Telegram for RUN_SECONDS, then exits. State (users, points,
 alerts, language) lives in a JSON file that the workflow keeps on the
@@ -36,7 +42,12 @@ import bot_deep as DP  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
-from bot_i18n import KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
+import bot_proxy2 as PX2  # noqa: E402
+import bot_outage as OU  # noqa: E402
+import bot_token as TK  # noqa: E402
+import bot_watch as W  # noqa: E402
+import bot_learn as LN  # noqa: E402
+from bot_i18n import AR, KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
 CHANNEL = os.environ.get("CHANNEL", "@Coin_Kurd")
@@ -135,8 +146,18 @@ def save_state(s):
     if d:
         os.makedirs(d, exist_ok=True)
     keys = _state_keys()
+    raw = None
+    for _ in range(5):                              # a watcher thread may be mid-update; retry a moment later
+        try:
+            raw = json.dumps(s, ensure_ascii=False, separators=(",", ":"))
+            break
+        except RuntimeError:
+            time.sleep(0.2)
+    if raw is None:
+        log.warning("state busy; save skipped this round")
+        return
     if keys:
-        blob = seal(json.dumps(s, ensure_ascii=False, separators=(",", ":")).encode("utf-8"), keys)
+        blob = seal(raw.encode("utf-8"), keys)
         tmp = STATE_ENC + ".tmp"
         with open(tmp, "w", encoding="ascii") as f:
             f.write(base64.b64encode(blob).decode("ascii"))
@@ -146,7 +167,7 @@ def save_state(s):
     else:                                           # local runs without a token
         tmp = STATE + ".tmp"
         with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(s, f, ensure_ascii=False, indent=1)
+            f.write(raw)
         os.replace(tmp, STATE)
     with open(PUBLIC, "w", encoding="utf-8") as f:
         json.dump({"updated": int(time.time()), "reward_at": REWARD_AT, "users": len(s["users"]),
@@ -180,7 +201,8 @@ def upsert(s, u, referrer=None):
         if referrer is not None and str(referrer) == uid:
             referrer = None
         lc = (u.get("language_code") or "").lower()
-        lang = "en" if lc.startswith("en") else ("kmr" if lc in ("ku", "kmr") or lc.startswith("tr") else "fa")
+        lang = ("en" if lc.startswith("en") else "ar" if lc.startswith("ar")
+                else "kmr" if lc in ("ku", "kmr") or lc.startswith("tr") else "fa")
         x = s["users"][uid] = {"username": u.get("username"), "name": u.get("first_name", ""),
                                "referrer": referrer, "joined": False, "created": int(time.time()),
                                "lang": lang}
@@ -280,10 +302,16 @@ def btn(text, data=None, url=None):
     return {"text": text, "url": url} if url else {"text": text, "callback_data": data}
 
 
-def kb_main(lang):
+def kb_main(lang, s=None):
     b = lambda k, d: btn(t(k, lang), d)
-    rows = [
+    rows = []
+    if s is not None and OU.level(s) != "ok":            # Iran outage: the guide goes first
+        rows.append([b("b_outage_live", "m:outage")])
+    rows += [
         [b("b_irr", "m:irr")],
+        [b("b_token", "m:token"), b("b_pf", "m:pf")],
+        [b("b_center", "m:center"), b("b_learn", "m:learn")],
+        [b("b_proxy", "m:proxy"), b("b_outage", "m:outage")],
         [b("b_market", "m:mkt"), b("b_brain", "m:brain")],
         [b("b_coin", "m:coin"), b("b_opps", "m:opps")],
         [b("b_movers", "m:movers"), b("b_score", "m:score")],
@@ -294,8 +322,9 @@ def kb_main(lang):
         [b("b_flows", "m:flows"), b("b_week", "m:week")],
         [b("b_posts", "m:posts"), b("b_track", "m:track")],
         [b("b_ind", "m:ind"), b("b_alerts", "m:alerts")],
+        [b("b_follow", "m:follow"), b("b_dca", "m:dca")],
         [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
-        [b("b_predict", "m:predict"), b("b_proxy", "m:proxy")],
+        [b("b_predict", "m:predict")],
         [btn(t("b_site", lang), url=D.SITE)],
     ]
     return {"inline_keyboard": rows}
@@ -340,20 +369,29 @@ def alert_label(a, lang):
     return IR.L3(IR.ASSET_NAME.get(a["coin"], {"fa": a["coin"]}), lang) if a.get("iran") else a["coin"]
 
 
+def alert_spec(a, lang):
+    """'≥ 80,000' or '±5% (77,000)' for the alert list"""
+    if a.get("op") == "±":
+        return f"±{a['pct']:g}% ({fmt_alert_price(a, a['ref'])})"
+    return f"{'≥' if a['op'] == '>' else '≤'} {fmt_alert_price(a, a['price'])}"
+
+
 def fmt_alert_price(a, p):
     return IR.toman(p) if a.get("iran") and a["coin"] not in ("XAU", "XAG") else D.fp(p)
 
 
 def kb_irr(lang, live=False):
     rows = [[btn(t("b_refresh", lang), "m:irr")] + ([] if live else [btn(t("b_live", lang), "live:irr")]),
-            [btn(t("b_alerts", lang), "m:alerts"), btn(t("b_calc", lang), "calc")],
+            [btn(t("b_alerts", lang), "qa:USDT"), btn(t("b_calc", lang), "calc")],
+            [btn(t("b_lite", lang), "m:lite"), btn(t("b_proxy", lang), "m:proxy")],
             [btn(t("b_back", lang), "m:main")]]
     return {"inline_keyboard": rows}
 
 
 def kb_lang():
     return {"inline_keyboard": [[btn(LANG_NAMES["ckb"], "l:ckb"), btn(LANG_NAMES["kmr"], "l:kmr")],
-                                [btn(LANG_NAMES["fa"], "l:fa"), btn(LANG_NAMES["en"], "l:en")]]}
+                                [btn(LANG_NAMES["fa"], "l:fa"), btn(LANG_NAMES["ar"], "l:ar")],
+                                [btn(LANG_NAMES["en"], "l:en")]]}
 
 
 def kb_join(lang):
@@ -373,7 +411,9 @@ def kb_alerts(s, uid, lang):
     rows = [[btn(t("b_sub_off" if sub else "b_sub_on", lang), "brief")],
             [btn(t("b_watch_off" if x.get("watch") else "b_watch_on", lang), "watch")]]
     for i, a in enumerate(x.get("alerts", []), 1):
-        rows.append([btn(f"🗑 {i}. {alert_label(a, lang)} {'≥' if a['op'] == '>' else '≤'} {fmt_alert_price(a, a['price'])}", f"ad:{i}")])
+        rows.append([btn(f"🗑 {i}. {alert_label(a, lang)} {alert_spec(a, lang)}"[:60], f"ad:{i}")])
+    for i, a in enumerate(x.get("talerts", []), 1):
+        rows.append([btn(f"🗑 T{i}. ${a['s']} ±{a['pct']:g}%"[:60], f"td:{i}")])
     rows.append([btn(t("b_back", lang), "m:main")])
     return {"inline_keyboard": rows}
 
@@ -397,23 +437,68 @@ LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 def render(s, uid, key):
     """-> (text, keyboard) for a menu key"""
     lang = lang_of(s, uid)
+    x = user(s, uid) or {}
     if key == "main":
-        return t("menu_title", lang), kb_main(lang)
+        return t("menu_title", lang), kb_main(lang, s)
     if key == "irr":
         try:
-            return (IR.bot_board(lang) or IR.card(lang)), kb_irr(lang)
+            card = IR.bot_board(lang) or IR.card(lang)
+            try:
+                warn = OU.banner(s, lang)
+            except Exception:
+                warn = ""
+            return ((warn + "\n\n") if warn else "") + card, kb_irr(lang)
         except Exception:
             log.exception("irr card failed")
             return t("no_data", lang), kb_back(lang)
+    if key == "lite":
+        try:
+            text = OU.compact(lang, D)
+        except Exception:
+            log.exception("lite card failed")
+            text = t("no_data", lang)
+        return text, kb_back(lang, refresh="m:lite")
     if key == "proxy":
         try:
-            text, rows = PX.section(s, lang, D.e)
+            text, rows = PX2.section(s, lang, D.e, isp=x.get("isp"))
         except Exception:
-            log.exception("proxy section failed")
-            text, rows = (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), []
+            log.exception("proxy2 section failed; falling back to v1")
+            try:
+                text, rows = PX.section(s, lang, D.e)
+            except Exception:
+                log.exception("proxy section failed")
+                text, rows = (D.e(s["proxy"]) if s.get("proxy") else t("proxy_none", lang)), []
         kb = kb_back(lang, refresh="m:proxy")
         kb["inline_keyboard"] = rows + kb["inline_keyboard"]
         return text, kb
+    if key == "outage":
+        text = OU.section(s, lang)
+        kb = {"inline_keyboard": [
+            [btn(t("b_proxy", lang), "m:proxy"), btn(OU.L(OU.T["b_compact"], lang), "m:lite")],
+            [btn(OU.L(OU.T["sub_off" if x.get("kit") else "sub_on"], lang), "ot:kit")],
+            [btn(t("b_learn", lang), "m:learn"), btn(t("b_back", lang), "m:main")]]}
+        return text, kb
+    if key == "token":
+        x["await"] = "ca"
+        return TK.L(TK.H["ask"], lang), kb_back(lang)
+    if key == "pf":
+        try:
+            text = W.pf_view(x, lang, D, IR, cached_only=True)
+        except Exception:
+            log.exception("portfolio failed")
+            text = t("no_data", lang)
+        return text, kb_back(lang, refresh="m:pf")
+    if key == "center":
+        kb = {"inline_keyboard": W.center_rows(x, lang, bool(x.get("kit"))) + [[btn(t("b_back", lang), "m:main")]]}
+        return W.L(W.T["center"], lang), kb
+    if key == "follow":
+        text, rows = W.follow_view(s, x, lang)
+        return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
+    if key == "dca":
+        return W.dca_view(x, lang, D) + "\n\n" + W.L(W.T["size_help"], lang), kb_back(lang)
+    if key == "learn":
+        text, rows = LN.menu(lang)
+        return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
     if key == "predict":
         text, rows = HB.section(s, uid)
         kb = kb_back(lang, refresh="m:predict", more=D.SITE + "/predict/")
@@ -567,6 +652,9 @@ def parse_alert(args, s, uid):
     if len(parts) != 2:
         return t("alert_usage", lang)
     sym, val = parts
+    pc = W.parse_pct(val)
+    if pc:
+        return add_pct_alert(s, uid, sym, *pc)
     price = IR.num(val)
     if price is None:
         return t("alert_usage", lang)
@@ -595,6 +683,37 @@ def parse_alert(args, s, uid):
     return t("alert_set", lang, coin=c["coin"], op="≥" if op == ">" else "≤", price=D.fp(price), now=D.fp(now))
 
 
+def add_pct_alert(s, uid, sym, sign, pct):
+    """'+5%' / '-5%' / '±5%' alert relative to the price right now"""
+    lang = lang_of(s, uid)
+    x = user(s, uid)
+    if len(x["alerts"]) >= MAX_ALERTS:
+        return t("alert_max", lang)
+    key = IR.resolve_asset(sym)
+    if key:
+        now = IR.asset_price(key)
+        coin, iran = key, True
+    else:
+        c = D.find_coin(sym)
+        if not c:
+            return t("unknown_coin", lang) + D.e(sym.upper())
+        coin, iran = c["coin"], False
+        now = D.live_prices().get(coin, (c.get("price"), 0))[0]
+    if not now:
+        return t("no_data", lang)
+    a = W.pct_alert(coin, now, sign, pct, iran=iran)
+    x["alerts"].append(a)
+    spec = f"{sign}{pct:g}%" + ("" if sign == "±" else f" → {fmt_alert_price(a, a['price'])}")
+    return t("alert_pct_set", lang, coin=alert_label(a, lang), spec=spec, now=fmt_alert_price(a, now))
+
+
+def quick_alert_kb(coin, lang):
+    """one-tap alerts under a coin card / the tether board"""
+    steps = ["+1", "-1", "±2"] if coin in IR.ASSETS else ["+5", "-5", "±10"]
+    return {"inline_keyboard": [[btn(f"{p}%", f"qa:{coin}:{p}") for p in steps],
+                                [btn(t("qa_custom", lang), f"qc:{coin}"), btn(t("b_back", lang), "m:main")]]}
+
+
 _last_alert_check = [0.0]
 
 
@@ -616,12 +735,20 @@ def check_alerts(s):
                 now = IR.asset_price(a["coin"], snap)
             else:
                 now = (px.get(a["coin"]) or (None,))[0]
-            hit = now is not None and ((a["op"] == ">" and now >= a["price"]) or (a["op"] == "<" and now <= a["price"]))
+            if a.get("op") == "±":
+                hit = W.pct_hit(a, now)
+            else:
+                hit = now is not None and ((a["op"] == ">" and now >= a["price"]) or (a["op"] == "<" and now <= a["price"]))
             if hit:
                 kb = ({"inline_keyboard": [[btn(t("b_irr", lang), "m:irr")]]} if a.get("iran")
                       else {"inline_keyboard": [[btn("🪙 " + a["coin"], f"c:{a['coin']}")]]})
-                send(int(uid), t("alert_hit", lang, coin=alert_label(a, lang), price=fmt_alert_price(a, a["price"]),
-                                 now=fmt_alert_price(a, now)), kb)
+                if a.get("pct") and a.get("ref"):
+                    msg = t("alert_pct_hit", lang, coin=alert_label(a, lang), pct=f"{(now / a['ref'] - 1) * 100:+.2f}",
+                            ref=fmt_alert_price(a, a["ref"]), now=fmt_alert_price(a, now))
+                else:
+                    msg = t("alert_hit", lang, coin=alert_label(a, lang), price=fmt_alert_price(a, a["price"]),
+                            now=fmt_alert_price(a, now))
+                send(int(uid), msg, kb)
                 changed = True
             else:
                 keep.append(a)
@@ -759,6 +886,132 @@ def maybe_brief(s):
     return True
 
 
+# ================================================================== v2 helpers
+def rows_kb(rows, lang=None):
+    return {"inline_keyboard": rows} if rows else None
+
+
+def send_rows(uid, text, rows=None):
+    """used by the background watchers (bot_watch / bot_token)"""
+    r = send(uid, text, rows_kb(rows))
+    time.sleep(0.04)
+    return r
+
+
+def token_reply(chat_id, addr, lang, mid=None):
+    tg("sendChatAction", chat_id=chat_id, action="typing")
+    text, rows = TK.card(addr, lang, D.e)
+    kb = {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
+    return edit(chat_id, mid, D.cut(text, 4000), kb) if mid else send(chat_id, D.cut(text, 4000), kb)
+
+
+def launch_send(subs, addr):
+    cache = {}
+    for uid, x in subs:
+        lang = x.get("lang", "fa")
+        if lang not in cache:
+            text, rows = TK.card(addr, lang, D.e)
+            body = (TK.L(TK.LAUNCH["head"], lang) + "\n" + text + "\n\n" +
+                    TK.L(TK.LAUNCH["why"], lang, liq=TK._usd(TK.LAUNCH_MIN_LIQ)) + "\n" + TK.L(TK.LAUNCH["warn"], lang))
+            cache[lang] = (D.cut(body, 4000), rows)
+        text, rows = cache[lang]
+        send_rows(int(uid), text, rows)
+
+
+def outage_push(s, kind, level):
+    """kit when an outage starts, digest when it ends — to users who opted in (Telegram queues it if they're cut off)"""
+    targets = [(uid, x) for uid, x in list(s["users"].items()) if x.get("kit")]
+    cache = {}
+    for uid, x in targets:
+        lang = x.get("lang", "fa")
+        if lang not in cache:
+            if kind == "kit":
+                links = PX2.best_links(s, 6)
+                cache[lang] = (OU.L(OU.T["kit_push"], lang) + "\n\n" + "\n".join(links) + "\n\n" + OU.L(OU.T["kit"], lang))
+            else:
+                cache[lang] = OU.digest(s, lang, D)
+        send_rows(int(uid), D.cut(cache[lang], 4000), [[btn(t("b_proxy", lang), "m:proxy"), btn(t("b_irr", lang), "m:irr")]])
+    log.info("outage %s sent to %d users", kind, len(targets))
+
+
+def notify_admins(text):
+    for a in ADMIN_IDS:
+        send(a, text)
+
+
+def watch_loop(s):
+    """background watchers; each job keeps its own interval and never blocks the update loop"""
+    jobs = [
+        ("outage", lambda: OU.check(s, notify_admins, lambda kind, lvl: outage_push(s, kind, lvl))),
+        ("proxies", lambda: bool(PX2.refresh(s)) and False),
+        ("token_alerts", lambda: TK.check_alerts(s, send_rows)),
+        ("whales", lambda: W.scan_whales(s, D, send_rows)),
+        ("volume", lambda: W.scan_volume(s, send_rows)),
+        ("signals", lambda: W.scan_signals(s, D, send_rows)),
+        ("follows", lambda: W.scan_follows(s, D, send_rows)),
+        ("dca", lambda: W.dca_due(s, D, send_rows)),
+        ("launches", lambda: TK.scan_launches(s, launch_send)),
+    ]
+    while True:
+        for name, fn in jobs:
+            try:
+                if fn():
+                    F.DIRTY.set()
+            except Exception:
+                log.exception("watch job %s failed", name)
+        time.sleep(20)
+
+
+def admin_v2(s, chat_id, cmd, arg):
+    """admin commands added in v2; -> True if handled"""
+    if cmd == "/addproxy":
+        links = PX2.LINK.findall(arg)
+        d = PX2.px(s)
+        for u in links:
+            if u not in d["own"]:
+                d["own"].append(u)
+        d["own"] = d["own"][-8:]
+        send(chat_id, f"🛡 own proxies: {len(d['own'])}" + ("" if links else "\nusage: /addproxy https://t.me/proxy?server=…"))
+        return True
+    if cmd == "/delproxy":
+        d = PX2.px(s)
+        if arg == "all":
+            d["own"] = []
+        elif arg.isdigit() and 1 <= int(arg) <= len(d["own"]):
+            d["own"].pop(int(arg) - 1)
+        send(chat_id, "🛡 own proxies:\n" + ("\n".join(f"{i}. {u}" for i, u in enumerate(d["own"], 1)) or "—"))
+        return True
+    if cmd == "/trust":
+        tr = s.setdefault("trusted", [])
+        parts = arg.split(maxsplit=2)
+        if len(parts) >= 2 and parts[0] == "add" and W.chain_of(parts[1]):
+            tr.append({"a": parts[1], "label": (parts[2] if len(parts) > 2 else W.short(parts[1]))[:30]})
+        elif len(parts) == 2 and parts[0] == "del" and parts[1].isdigit() and 1 <= int(parts[1]) <= len(tr):
+            tr.pop(int(parts[1]) - 1)
+        send(chat_id, "⭐️ trusted wallets (users can follow them):\n" +
+             ("\n".join(f"{i}. {w['label']} <code>{w['a']}</code>" for i, w in enumerate(tr, 1)) or "—") +
+             "\n\n/trust add ADDRESS label · /trust del N")
+        return True
+    if cmd == "/outage" and arg:
+        v = OU.set_manual(s, arg.lower(), notify_admins, lambda kind, lvl: outage_push(s, kind, lvl))
+        send(chat_id, f"🛰 outage mode: {v}" if v else "usage: /outage on | degraded | off | auto")
+        return True
+    if cmd == "/outagekit":
+        everyone = arg == "all"
+        n = 0
+        for k, x2 in list(s["users"].items()):
+            if not (everyone or x2.get("kit") or x2.get("isp")):
+                continue
+            lang = x2.get("lang", "fa")
+            links = PX2.best_links(s, 6)
+            send_rows(int(k), D.cut(OU.L(OU.T["kit_push"], lang) + "\n\n" + "\n".join(links) + "\n\n" + OU.L(OU.T["kit"], lang), 4000),
+                      [[btn(t("b_proxy", lang), "m:proxy")]])
+            n += 1
+        send(chat_id, f"🧰 kit sent to {n} users" + ("" if everyone else " (opted-in / operator set; '/outagekit all' = everyone)"))
+        return True
+    return False
+
+
 # ================================================================== handlers
 def repost_video(msg):
     """admin forwards a video (e.g. one too big for the web preview) -> house-prompt caption -> channel"""
@@ -804,6 +1057,59 @@ def handle_private(s, msg):
         else:
             return send(chat_id, t("join_first", lang), kb_join(lang))
 
+    aw = x.pop("await", None)
+    if aw == "report" and text and not text.startswith("/"):
+        if time.time() - x.get("report_at", 0) < 600 and uid not in ADMIN_IDS:   # one report per 10 min
+            return send(chat_id, LN.L(LN.M["report_ok"], lang), kb_back(lang))
+        x["report_at"] = time.time()
+        who = f"@{u.get('username')}" if u.get("username") else D.e(u.get("first_name", ""))
+        for a in ADMIN_IDS:
+            send(a, f"🚩 <b>scam report</b> from {who} (<code>{uid}</code>)\n\n{D.e(text[:3000])}")
+        return send(chat_id, LN.L(LN.M["report_ok"], lang), kb_back(lang))
+    if text and not text.startswith("/"):
+        addr = TK.detect(text)
+        if addr and (aw == "ca" or len(text.split()) <= 3):
+            return token_reply(chat_id, addr, lang)
+
+    v2 = {"/token": "token", "/check": "token", "/ca": "token", "/pf": "pf", "/portfolio": "pf", "/center": "center", "/follow": "follow",
+          "/dca": "dca", "/learn": "learn", "/outage": "outage", "/lite": "lite", "/safety": "learn"}
+    if cmd in ("/check", "/ca", "/token") and arg:
+        addr = TK.detect(arg)
+        return token_reply(chat_id, addr, lang) if addr else send(chat_id, TK.L(TK.H["ask"], lang))
+    if cmd == "/pf" and arg:
+        return send(chat_id, W.pf_cmd(x, arg, lang, D) or W.pf_view(x, lang, D, IR, cached_only=True), kb_back(lang, refresh="m:pf"))
+    if cmd == "/wallet":
+        return send(chat_id, W.wallet_cmd(x, arg, lang), kb_back(lang, refresh="m:pf"))
+    if cmd in ("/follow", "/unfollow") and arg:
+        addr = arg.split()[0]
+        if cmd == "/unfollow":
+            if addr not in (x.get("follow") or []):
+                return send(chat_id, LN.L({"fa": "این آدرس را دنبال نمی‌کنی.", "ckb": "شوێنی ئەم ناونیشانە ناکەویت.",
+                                          "kmr": "Tu vê navnîşanê naşopînî.", "ar": "أنت لا تتابع هذا العنوان.",
+                                          "en": "You don't follow this address."}, lang))
+            return send(chat_id, W.unfollow(x, addr, lang), kb_back(lang))
+        return send(chat_id, W.follow(x, addr, lang), kb_back(lang))
+    if cmd == "/dca" and arg:
+        return send(chat_id, W.dca_cmd(x, arg, lang, D), kb_back(lang))
+    if cmd == "/size":
+        return send(chat_id, W.size(arg, lang, D), kb_back(lang))
+    if cmd in ("/rules", "/law"):
+        text2, rows = LN.regulation(lang)
+        return send(chat_id, text2, rows_kb(rows))
+    if cmd in ("/local", "/regional"):
+        text2, rows = LN.local_news(D, lang)
+        return send(chat_id, text2, rows_kb(rows))
+    if cmd == "/report":
+        if arg:
+            x["await"] = "report"
+            return handle_private(s, {**msg, "text": arg})
+        x["await"] = "report"
+        return send(chat_id, LN.L(LN.M["report_ask"], lang))
+    if uid in ADMIN_IDS and admin_v2(s, chat_id, cmd, arg):
+        return None
+    if cmd in v2:
+        return send(chat_id, *render(s, uid, v2[cmd]))
+
     simple = {"/menu": "main", "/market": "mkt", "/brain": "brain", "/opps": "opps", "/news": "news",
               "/score": "score", "/narratives": "narr", "/calendar": "events", "/council": "council",
               "/lab": "lab", "/derivatives": "deriv", "/cycle": "cycle", "/chain": "chain", "/flows": "flows",
@@ -828,7 +1134,7 @@ def handle_private(s, msg):
     if cmd == "/proxy":
         return send(chat_id, *render(s, uid, "proxy"))
     if cmd in ("/help", "/start_help"):
-        return send(chat_id, t("help", lang), kb_back(lang))
+        return send(chat_id, t("help", lang) + "\n\n" + t("help2", lang), kb_back(lang))
     if cmd == "/coin":
         return send(chat_id, *(coin_card(s, uid, arg) if arg else render(s, uid, "coin")))
     if cmd == "/search":
@@ -912,8 +1218,75 @@ def handle_callback(s, cb):
         else:
             ans(t("not_joined", lang), True)
             return edit(chat_id, mid, t("join_first", lang), kb_join(lang))
+    if data.startswith("pf:"):                       # proxy report from inside Iran: 👍 / 👎
+        _, pxid, good = (data.split(":") + ["", ""])[:3]
+        ok = PX2.vote(s, uid, x.get("isp"), pxid, good == "1")
+        ans(PX2.L(PX2.T["thanks" if ok else "dup"], lang), not ok)
+        if ok and not x.get("isp") and not x.get("isp_asked"):   # ask the operator once, it sharpens the ranking
+            x["isp_asked"] = True
+            return send(chat_id, PX2.L(PX2.T["isp_ask"], lang), {"inline_keyboard": PX2.isp_keyboard(lang)})
+        return None
+    if data.startswith("ta:"):
+        _, addr, pct = (data.split(":") + ["", "", "20"])[:3]
+        ans()
+        return send(chat_id, TK.add_alert(x, addr, float(pct or 20), lang))
+    if data == "noop":
+        return ans()
     ans()
     kind, _, val = data.partition(":")
+    if kind == "tk":
+        return token_reply(chat_id, val, lang, mid=mid)
+    if kind == "td" and val.isdigit():
+        i = int(val) - 1
+        if 0 <= i < len(x.get("talerts", [])):
+            x["talerts"].pop(i)
+        return edit(chat_id, mid, *render(s, uid, "alerts"))
+    if data == "px:isp":
+        return edit(chat_id, mid, PX2.L(PX2.T["isp_ask"], lang), {"inline_keyboard": PX2.isp_keyboard(lang)})
+    if data == "px:share":
+        return send(chat_id, PX2.share_text(s, lang, x.get("isp")))
+    if kind == "isp" and val in PX2.ISPS:
+        x["isp"] = val
+        return edit(chat_id, mid, *render(s, uid, "proxy"))
+    if kind == "sb":
+        W.toggle(x, val)
+        return edit(chat_id, mid, *render(s, uid, "center"))
+    if data == "ot:kit":
+        W.toggle(x, "kit")
+        return edit(chat_id, mid, *render(s, uid, "outage"))
+    if kind == "fw" and val.isdigit():
+        tr = s.get("trusted") or []
+        i = int(val) - 1
+        if 0 <= i < len(tr):
+            (W.unfollow if tr[i]["a"] in (x.get("follow") or []) else W.follow)(x, tr[i]["a"], lang)
+        return edit(chat_id, mid, *render(s, uid, "follow"))
+    if kind == "db" and val.isdigit():
+        msg = W.dca_log(x, int(val), lang, D)
+        return edit(chat_id, mid, msg or t("no_data", lang))
+    if kind == "ln" and val.isdigit():
+        text, rows = LN.lesson(int(val), lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "lg":
+        text, rows = LN.regulation(lang, val)
+        return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "lc":
+        text, rows = LN.local_news(D, lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "lr":
+        x["await"] = "report"
+        return send(chat_id, LN.L(LN.M["report_ask"], lang))
+    if kind == "qa":
+        coin, _, spec = val.partition(":")
+        if not spec:
+            key = IR.resolve_asset(coin)
+            now = IR.asset_price(key) if key else D.live_prices().get(coin, (None,))[0]
+            a = {"coin": coin, "iran": bool(key)}
+            return edit(chat_id, mid, t("qa_head", lang, c=alert_label(a, lang), p=fmt_alert_price(a, now) if now else "—"),
+                        quick_alert_kb(coin, lang))
+        pc = W.parse_pct(spec + "%")
+        return send(chat_id, add_pct_alert(s, uid, coin, *pc) if pc else t("alert_usage", lang), kb_alerts(s, uid, lang))
+    if kind == "qc":
+        return send(chat_id, t("alert_usage", lang).replace("BTC", val))
     if kind == "m":
         return edit(chat_id, mid, *render(s, uid, val))
     if kind == "l" and val in LANGS:
@@ -934,7 +1307,8 @@ def handle_callback(s, cb):
     if kind == "cd":
         return edit(chat_id, mid, D.sec_dna(lang, coin=val), back)
     if kind == "ca":
-        return send(chat_id, t("alert_usage", lang).replace("BTC", val))
+        now = D.live_prices().get(val, (None,))[0]
+        return send(chat_id, t("qa_head", lang, c=val, p=D.fp(now)), quick_alert_kb(val, lang))
     if kind == "ad" and val.isdigit():
         i = int(val) - 1
         if 0 <= i < len(x["alerts"]):
@@ -1025,7 +1399,28 @@ COMMANDS = {
            ("alert", "Price alert — /alert BTC 80000"), ("brief", "Daily brief"), ("invite", "Invite & earn"),
            ("lang", "Language"), ("help", "Help")],
 }
+V2_COMMANDS = {
+    "fa": [("check", "بررسی توکن با آدرس قرارداد"), ("center", "مرکز هشدارها"), ("pf", "پورتفولیو"),
+           ("proxy", "پروکسی اضطراری"), ("outage", "حالت قطعی اینترنت"), ("learn", "آموزش و قوانین"),
+           ("dca", "خرید پله‌ای"), ("size", "محاسبهٔ حجم معامله")],
+    "ckb": [("check", "پشکنینی تۆکن"), ("center", "ناوەندی ئاگادارییەکان"), ("pf", "پۆرتفۆلیۆ"),
+            ("proxy", "پرۆکسی فریاکەوتن"), ("outage", "دۆخی پچڕانی ئینتەرنێت"), ("learn", "فێربوون و یاساکان"),
+            ("dca", "کڕینی پلەیی"), ("size", "قەبارەی مامەڵە")],
+    "en": [("check", "Token check by contract address"), ("center", "Alert centre"), ("pf", "Portfolio"),
+           ("proxy", "Emergency proxies"), ("outage", "Internet-outage mode"), ("learn", "Lessons & local rules"),
+           ("dca", "DCA plans"), ("size", "Position size")],
+    "kmr": [("check", "Kontrola tokenê"), ("center", "Navenda hişyariyan"), ("pf", "Portfolyo"),
+            ("proxy", "Proxyên awarte"), ("outage", "Rewşa qutbûnê"), ("learn", "Perwerde û qanûn"),
+            ("dca", "DCA"), ("size", "Mezinahiya bazirganiyê")],
+    "ar": [("check", "فحص رمز بعنوان العقد"), ("center", "مركز التنبيهات"), ("pf", "المحفظة"),
+           ("proxy", "بروكسي الطوارئ"), ("outage", "وضع انقطاع الإنترنت"), ("learn", "التعلم والقوانين"),
+           ("dca", "الشراء الدوري"), ("size", "حجم الصفقة")],
+}
 COMMANDS["kmr"] = [(c, KMR.get(d, d)) for c, d in COMMANDS["en"]]
+COMMANDS["ar"] = [(c, AR.get(d, d)) for c, d in COMMANDS["en"]]
+for _lg, _extra in V2_COMMANDS.items():
+    _have = {c for c, _ in COMMANDS[_lg]}
+    COMMANDS[_lg] = COMMANDS[_lg][:3] + [e for e in _extra if e[0] not in _have] + COMMANDS[_lg][3:]
 
 
 def setup_commands():
@@ -1033,7 +1428,7 @@ def setup_commands():
         p = {"commands": [{"command": c, "description": d} for c, d in cmds]}
         if lang == "fa":
             tg("setMyCommands", **p)                       # default (also used by Sorani clients)
-        elif lang in ("kmr", "en"):
+        elif lang in ("kmr", "en", "ar"):
             tg("setMyCommands", language_code={"kmr": "ku"}.get(lang, lang), **p)
 
 
@@ -1057,6 +1452,7 @@ def main():
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
     CL.start(s, group_send, CHANNEL)
+    threading.Thread(target=watch_loop, args=(s,), name="watch-v2", daemon=True).start()
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
