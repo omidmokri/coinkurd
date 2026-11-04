@@ -1154,6 +1154,9 @@ def handle_private(s, msg):
     if cmd in ("/rules", "/law"):
         text2, rows = LN.regulation(lang)
         return send(chat_id, text2, rows_kb(rows))
+    if cmd in ("/academy", "/akademi", "/course"):
+        text2, rows = LN.academy(lang)
+        return send(chat_id, text2, rows_kb(rows))
     if cmd in ("/local", "/regional"):
         text2, rows = LN.local_news(D, lang)
         return send(chat_id, text2, rows_kb(rows))
@@ -1338,6 +1341,9 @@ def handle_callback(s, cb):
     if kind == "lc":
         text, rows = LN.local_news(D, lang)
         return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "la":
+        text, rows = LN.academy(lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "lr":
         x["await"] = "report"
         return send(chat_id, LN.L(LN.M["report_ask"], lang))
@@ -1510,19 +1516,19 @@ COMMANDS = {
 }
 V2_COMMANDS = {
     "fa": [("check", "بررسی توکن با آدرس قرارداد"), ("center", "مرکز هشدارها"), ("pf", "پورتفولیو"),
-           ("proxy", "پروکسی اضطراری"), ("outage", "حالت قطعی اینترنت"), ("learn", "آموزش و قوانین"),
+           ("proxy", "پروکسی اضطراری"), ("outage", "حالت قطعی اینترنت"), ("learn", "آموزش و قوانین"), ("academy", "آکادمی کریپتو و مسیر یادگیری"),
            ("dca", "خرید پله‌ای"), ("size", "محاسبهٔ حجم معامله")],
     "ckb": [("check", "پشکنینی تۆکن"), ("center", "ناوەندی ئاگادارییەکان"), ("pf", "پۆرتفۆلیۆ"),
-            ("proxy", "پرۆکسی فریاکەوتن"), ("outage", "دۆخی پچڕانی ئینتەرنێت"), ("learn", "فێربوون و یاساکان"),
+            ("proxy", "پرۆکسی فریاکەوتن"), ("outage", "دۆخی پچڕانی ئینتەرنێت"), ("learn", "فێربوون و یاساکان"), ("academy", "ئەکادیمیای کریپتۆ"),
             ("dca", "کڕینی پلەیی"), ("size", "قەبارەی مامەڵە")],
     "en": [("check", "Token check by contract address"), ("center", "Alert centre"), ("pf", "Portfolio"),
-           ("proxy", "Emergency proxies"), ("outage", "Internet-outage mode"), ("learn", "Lessons & local rules"),
+           ("proxy", "Emergency proxies"), ("outage", "Internet-outage mode"), ("learn", "Lessons & local rules"), ("academy", "Crypto academy & learning path"),
            ("dca", "DCA plans"), ("size", "Position size")],
     "kmr": [("check", "Kontrola tokenê"), ("center", "Navenda hişyariyan"), ("pf", "Portfolyo"),
-            ("proxy", "Proxyên awarte"), ("outage", "Rewşa qutbûnê"), ("learn", "Perwerde û qanûn"),
+            ("proxy", "Proxyên awarte"), ("outage", "Rewşa qutbûnê"), ("learn", "Perwerde û qanûn"), ("academy", "Akademiya kriptoyê"),
             ("dca", "DCA"), ("size", "Mezinahiya bazirganiyê")],
     "ar": [("check", "فحص رمز بعنوان العقد"), ("center", "مركز التنبيهات"), ("pf", "المحفظة"),
-           ("proxy", "بروكسي الطوارئ"), ("outage", "وضع انقطاع الإنترنت"), ("learn", "التعلم والقوانين"),
+           ("proxy", "بروكسي الطوارئ"), ("outage", "وضع انقطاع الإنترنت"), ("learn", "التعلم والقوانين"), ("academy", "أكاديمية الكريبتو"),
            ("dca", "الشراء الدوري"), ("size", "حجم الصفقة")],
 }
 COMMANDS["kmr"] = [(c, KMR.get(d, d)) for c, d in COMMANDS["en"]]
