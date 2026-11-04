@@ -47,6 +47,8 @@ import bot_outage as OU  # noqa: E402
 import bot_token as TK  # noqa: E402
 import bot_watch as W  # noqa: E402
 import bot_learn as LN  # noqa: E402
+import bot_menu as MN  # noqa: E402
+import bot_art as ART  # noqa: E402
 from bot_i18n import AR, KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
@@ -354,7 +356,6 @@ def kb_back(lang, refresh=None, more=None):
 def kb_coins(lang):
     pick = ["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE", "ADA", "LINK", "AVAX", "SUI", "LTC", "HYPE"]
     rows = [[btn(c, f"c:{c}") for c in pick[i:i + 4]] for i in range(0, len(pick), 4)]
-    rows.append([btn(t("b_back", lang), "m:main")])
     return {"inline_keyboard": rows}
 
 
@@ -362,7 +363,7 @@ def kb_coin(coin, lang):
     return {"inline_keyboard": [
         [btn("🎯", f"co:{coin}"), btn("📰", f"cn:{coin}"), btn("📢", f"cp:{coin}"), btn("🧬", f"cd:{coin}"),
          btn("🔔", f"ca:{coin}"), btn(t("b_refresh", lang)[:2], f"c:{coin}")],
-        [btn(t("b_more", lang), url=D.coin_url(coin)), btn(t("b_back", lang), "m:main")]]}
+        [btn(t("b_more", lang), url=D.coin_url(coin))], MN.coin_nav(lang)]}
 
 
 def alert_label(a, lang):
@@ -434,12 +435,46 @@ SECTIONS = {
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
 
+def market_age_min():
+    try:
+        iso = (D.load("market") or {}).get("updated_at")
+        dt = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return (datetime.now(timezone.utc) - dt).total_seconds() / 60
+    except Exception:
+        return None
+
+
 def render(s, uid, key):
-    """-> (text, keyboard) for a menu key"""
+    """-> (text, keyboard) for a menu key, laid out by bot_menu (8-section home, 4 sub-menus, standard nav)"""
     lang = lang_of(s, uid)
     x = user(s, uid) or {}
     if key == "main":
-        return t("menu_title", lang), kb_main(lang, s)
+        lvl = OU.level(s)
+        out_btn = btn(t("b_outage_live", lang), "m:outage") if lvl != "ok" else None
+        text, rows = MN.home(x, lang, MN.status_line(lang, market_age_min(), lvl), out_btn)
+        return text, {"inline_keyboard": rows}
+    if key in MN.GROUPS:
+        text, rows = MN.group(key, lang)
+        return text, {"inline_keyboard": rows}
+    text, kb = _render(s, uid, key)
+    if x:
+        MN.recent(x, key)
+    return MN.decorate(key, text, kb, lang, x if x else None)
+
+
+def _render(s, uid, key):
+    """section content; navigation is added by render()"""
+    lang = lang_of(s, uid)
+    x = user(s, uid) or {}
+    if key == "mkt":
+        try:
+            body = D.sec_market(lang)
+        except Exception:
+            log.exception("market failed")
+            body = t("no_data", lang)
+        return (MN.L(MN.T["intro_mkt"], lang) + "\n\n" + body,
+                {"inline_keyboard": [[btn(MN.name("irr", lang), "m:irr"), btn(MN.name("lite", lang), "m:lite")],
+                                     [btn(t("b_refresh", lang), "m:mkt"), btn(t("b_more", lang), url=D.SITE + "/dashboard/")]]})
     if key == "irr":
         try:
             card = IR.bot_board(lang) or IR.card(lang)
@@ -480,17 +515,17 @@ def render(s, uid, key):
         return text, kb
     if key == "token":
         x["await"] = "ca"
-        return TK.L(TK.H["ask"], lang), kb_back(lang)
+        return MN.L(MN.T["intro_token"], lang), kb_back(lang)
     if key == "pf":
         try:
             text = W.pf_view(x, lang, D, IR, cached_only=True)
         except Exception:
             log.exception("portfolio failed")
             text = t("no_data", lang)
-        return text, kb_back(lang, refresh="m:pf")
+        return MN.L(MN.T["intro_pf"], lang) + "\n\n" + text, kb_back(lang, refresh="m:pf")
     if key == "center":
-        kb = {"inline_keyboard": W.center_rows(x, lang, bool(x.get("kit"))) + [[btn(t("b_back", lang), "m:main")]]}
-        return W.L(W.T["center"], lang), kb
+        kb = {"inline_keyboard": W.center_rows(x, lang, bool(x.get("kit")))}
+        return MN.L(MN.T["intro_center"], lang), kb
     if key == "follow":
         text, rows = W.follow_view(s, x, lang)
         return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
@@ -537,8 +572,7 @@ def render(s, uid, key):
         if key == "posts":
             text += "\n\n" + t("search_hint", lang)
         if key in LAB:
-            return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key), btn(t("b_lab", lang), "m:lab")],
-                                              [btn(t("b_back", lang), "m:main")]]}
+            return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key)]]}
         return text, kb_back(lang, refresh="m:" + key, more=D.SITE + path)
     return t("menu_title", lang), kb_main(lang)
 
@@ -618,6 +652,26 @@ def coin_card(s, uid, sym):
 
 
 # ================================================================== referral flow
+_BANNER_ID = {}          # Telegram file_id of the uploaded banner, reused after the first upload
+
+
+def welcome(chat_id, lang):
+    """banner (drawn by bot_art from the site logo) + welcome text, once per /start; the home screen stays short"""
+    cap = MN.L(MN.T["welcome"], lang)
+    if _BANNER_ID.get("id"):
+        r = tg("sendPhoto", chat_id=chat_id, photo=_BANNER_ID["id"], caption=cap, parse_mode="HTML")
+    else:
+        img = ART.banner(BOT_USERNAME or "Kurd_kurdistan_bot")
+        r = _post_with_retry("sendPhoto", {"chat_id": chat_id, "caption": cap, "parse_mode": "HTML"},
+                             files={"photo": ("banner.jpg", img, "image/jpeg")}) if img else {"ok": False}
+        try:
+            _BANNER_ID["id"] = r["result"]["photo"][-1]["file_id"]
+        except Exception:
+            pass
+    if not r.get("ok"):
+        send(chat_id, cap)
+
+
 def after_verified(s, uid, chat_id, edit_mid=None):
     referrer = mark_joined(s, uid)
     if referrer is not None:
@@ -631,6 +685,7 @@ def after_verified(s, uid, chat_id, edit_mid=None):
             for a in ADMIN_IDS:
                 nm = f"@{r['username']}" if r.get("username") else r.get("name")
                 send(a, f"🎁 reward reached: {D.e(nm)} (id <code>{referrer}</code>) — {p} invites")
+    welcome(chat_id, lang_of(s, uid))
     text, kb = render(s, uid, "main")
     if edit_mid:
         edit(chat_id, edit_mid, text, kb)
@@ -711,7 +766,7 @@ def quick_alert_kb(coin, lang):
     """one-tap alerts under a coin card / the tether board"""
     steps = ["+1", "-1", "±2"] if coin in IR.ASSETS else ["+5", "-5", "±10"]
     return {"inline_keyboard": [[btn(f"{p}%", f"qa:{coin}:{p}") for p in steps],
-                                [btn(t("qa_custom", lang), f"qc:{coin}"), btn(t("b_back", lang), "m:main")]]}
+                                [btn(t("qa_custom", lang), f"qc:{coin}")], MN.nav_row("alerts", lang)]}
 
 
 _last_alert_check = [0.0]
@@ -901,7 +956,7 @@ def send_rows(uid, text, rows=None):
 def token_reply(chat_id, addr, lang, mid=None):
     tg("sendChatAction", chat_id=chat_id, action="typing")
     text, rows = TK.card(addr, lang, D.e)
-    kb = {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
+    kb = {"inline_keyboard": rows + [[btn(MN.name("token", lang), "m:token"), btn(MN.L(MN.T["b_home"], lang), "m:main")]]}
     return edit(chat_id, mid, D.cut(text, 4000), kb) if mid else send(chat_id, D.cut(text, 4000), kb)
 
 
@@ -1047,6 +1102,7 @@ def handle_private(s, msg):
             if is_member(uid):
                 return after_verified(s, uid, chat_id)
             return send(chat_id, t("join_first", x["lang"]), kb_join(x["lang"]))
+        welcome(chat_id, x["lang"])
         return send(chat_id, *render(s, uid, "main"))
 
     x = upsert(s, u)
@@ -1235,6 +1291,11 @@ def handle_callback(s, cb):
         return send(chat_id, TK.add_alert(x, addr, float(pct or 20), lang))
     if data == "noop":
         return ans()
+    if data.startswith("fv:"):
+        key = data[3:]
+        on = MN.toggle_fav(x, key)
+        ans(MN.L(MN.T["fav_added" if on else "fav_removed"], lang))
+        return edit(chat_id, mid, *render(s, uid, key))
     ans()
     kind, _, val = data.partition(":")
     if kind == "tk":
@@ -1300,7 +1361,7 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, *coin_card(s, uid, val))
     if kind == "nw":
         return news_open(s, chat_id, val, lang)
-    back = {"inline_keyboard": [[btn("🪙 " + val, f"c:{val}"), btn(t("b_back", lang), "m:main")]]}
+    back = {"inline_keyboard": [[btn("🪙 " + val, f"c:{val}")], MN.coin_nav(lang)]}
     if kind == "co":
         return edit(chat_id, mid, D.sec_opps(lang, coin=val), back)
     if kind == "cn":
@@ -1478,6 +1539,26 @@ def setup_commands():
             tg("setMyCommands", language_code={"kmr": "ku"}.get(lang, lang), **p)
 
 
+def setup_profile(s):
+    """name / about / description per language; sent only when the texts change (setMyName is rate-limited)"""
+    digest = hashlib.sha1(json.dumps(MN.PROFILE, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    if s.get("profile_hash") == digest:
+        return
+    ok = True
+    for code, p in MN.PROFILE.items():
+        lc = {"language_code": code} if code else {}
+        for method, field, value in (("setMyName", "name", p["name"]), ("setMyShortDescription", "short_description", p["short"]),
+                                     ("setMyDescription", "description", p["desc"])):
+            r = tg(method, **{field: value}, **lc)
+            ok &= bool(r.get("ok"))
+            if (r.get("parameters") or {}).get("retry_after"):
+                log.warning("%s rate-limited; will retry next run", method)
+                return
+    if ok:
+        s["profile_hash"] = digest
+        log.info("bot profile updated")
+
+
 # ================================================================== main loop
 def main():
     global BOT_USERNAME
@@ -1492,6 +1573,10 @@ def main():
     tg("deleteWebhook")
     setup_commands()
     s = load_state()
+    try:
+        setup_profile(s)
+    except Exception:
+        log.exception("profile setup failed")
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
     F.start(s, group_send, group_delete, GROUP, MAIN_WT)
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
