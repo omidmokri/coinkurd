@@ -1336,6 +1336,13 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         print("academy build failed:", ex)
+    try:  # Chrome extension download page (/extension/)
+        import build_extension
+        extra += build_extension.build()
+    except Exception as ex:  # noqa: BLE001
+        import traceback
+        traceback.print_exc()
+        print("extension page failed:", ex)
     print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")
