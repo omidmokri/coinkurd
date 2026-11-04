@@ -176,11 +176,11 @@ for i, lang in enumerate(LANGS):
         check(len(tx) <= 4096, f"{lang}/{key} under 4096 chars ({len(tx)})")
     for cmd in ("/help", "/check " + CA, "/check " + SCAM, "/pf add BTC 0.5", "/pf", "/wallet", "/size 77000 75500 20 80000",
                 "/dca BTC 20 weekly", "/dca", "/rules", "/local", "/learn", "/outage", "/lite", "/center", "/proxy",
-                "/alert BTC +5%", "/alert ETH ±3%", "/alert USDT -1%", "/alerts"):
+                "/alert BTC +5%", "/alert ETH ±3%", "/alert USDT -1%", "/alerts", "/academy"):
         n = len(SENT)
         R.handle_update(S, upd(uid, cmd))
         check(len(SENT) > n, f"{lang} {cmd} answers")
-    for cb in ("ln:0", "ln:4", "lg:iq", "lg:krd", "lc:0", "qa:BTC", "qa:BTC:+5", "qa:USDT", "qa:USDT:±2", "ca:ETH",
+    for cb in ("ln:0", "ln:4", "la:0", "lg:iq", "lg:krd", "lc:0", "qa:BTC", "qa:BTC:+5", "qa:USDT", "qa:USDT:±2", "ca:ETH",
                "tk:" + CA, "sb:whale", "sb:vol", "sb:launch", "sb:sig", "ot:kit", "px:isp", "isp:mci", "px:share"):
         n = len(SENT)
         R.handle_update(S, upd(uid, data=cb))
@@ -421,6 +421,14 @@ n = len(SENT)
 R.setup_profile(S)
 check(not any(m == "setMyName" for m, p in SENT[n:]), "profile not re-sent when unchanged")
 
+print("7d) academy inside the bot")
+import bot_learn as LN  # noqa: E402
+for lg in LANGS:
+    t_ac, r_ac = LN.academy(lg)
+    urls = [b.get("url", "") for row in r_ac for b in row]
+    check("/academy/" in " ".join(urls) and "/learn/" in " ".join(urls) and "/academy/lab/" in " ".join(urls), f"{lg} academy links")
+    check(len(t_ac) < 4096 and all(len(b["text"]) <= 64 for row in r_ac for b in row), f"{lg} academy sizes")
+    check(any(b.get("callback_data") == "la:0" for row in LN.menu(lg)[1] for b in row), f"{lg} learn menu has academy")
 print("8) scam report reaches admins; state saves")
 R.handle_update(S, upd(103, data="lr:0"))
 n = len(SENT)
