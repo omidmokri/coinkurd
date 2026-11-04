@@ -141,7 +141,9 @@ NAV = [
          L("داده‌های باز JSON برای ساخت ابزار", "داتای کراوەی JSON بۆ دروستکردنی ئامراز", "Open JSON data to build on")),
     ]},
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
-        ("/learn/", "cap", L("مسیر یادگیری", "ڕێڕەوی فێربوون", "Learning path"),
+        ("/academy/", "cap", L("آکادمی انتخاب", "ئەکادیمیای Entekhab", "Entekhab Academy"),
+         L("دوره‌های سبک، ریسک، RSI و بک‌تست با آزمون و گواهی", "خولی شێواز، مەترسی، RSI و باکتێست لەگەڵ تاقیکردنەوە و بڕوانامە", "Style, risk, RSI and backtesting courses with quizzes")),
+        ("/learn/", "book", L("مسیر یادگیری", "ڕێڕەوی فێربوون", "Learning path"),
          L("از مبتدی تا پیشرفته، همراه آزمون", "لە سەرەتاییەوە تا پێشکەوتوو، لەگەڵ تاقیکردنەوە", "Beginner to advanced, with quizzes")),
         ("/glossary/", "book", L("واژه‌نامه", "فەرهەنگ", "Glossary"),
          L("اصطلاحات کریپتو به زبان ساده", "زاراوەکانی کریپتۆ بە زمانی سادە", "Crypto terms in plain words")),
@@ -370,7 +372,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
     return with_csp(doc)
 
 
-STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
+STATIC = ["academy", "about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
           "privacy", "terms", "app"]
 
 
