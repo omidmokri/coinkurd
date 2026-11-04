@@ -65,6 +65,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/refbot.py
 
+      # A GitHub-side push error (HTTP 500) must never stop the bot: retry, and if it still fails,
+      # warn and carry on — the next run starts from the last saved state.
       - name: Save state
         if: always()
         working-directory: state
@@ -72,10 +74,22 @@ jobs:
           git add -A
           git diff --cached --quiet && exit 0
           git commit -q -m "refbot state $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push origin HEAD:refbot-state
+          for i in 1 2 3 4 5; do
+            git push origin HEAD:refbot-state && exit 0
+            echo "state push failed (attempt $i); retrying in $((i * 20))s"
+            sleep $((i * 20))
+          done
+          echo "::warning::state could not be pushed after 5 attempts; the next run starts from the last saved state"
 
+      # Start the next run even if saving the state failed (always()), with retries.
       - name: Start next run
-        if: steps.bot.outcome == 'success'
+        if: always() && steps.bot.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run refbot.yml --repo "${{ github.repository }}" --ref main || true
+        run: |
+          for i in 1 2 3 4 5; do
+            gh workflow run refbot.yml --repo "${{ github.repository }}" --ref main && exit 0
+            echo "dispatch failed (attempt $i); retrying in 30s"
+            sleep 30
+          done
+          echo "::warning::could not start the next run; the hourly schedule will restart the bot"
