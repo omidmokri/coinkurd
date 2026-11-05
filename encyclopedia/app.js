@@ -292,9 +292,8 @@ function wireChrome(){
     applyLang();route();
   }));
   $('#theme').addEventListener('click',()=>{
-    const cur=document.documentElement.getAttribute('data-theme');
-    const mqDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const next=cur?(cur==='dark'?'light':'dark'):(mqDark?'light':'dark');
+    // the site itself is dark-only; dark is the default here and light is opt-in
+    const next=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
     document.documentElement.setAttribute('data-theme',next);lsSet('theme',next);
   });
   const q=$('#q');
