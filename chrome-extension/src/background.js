@@ -109,19 +109,22 @@ chrome.storage.onChanged.addListener((ch, area) => { if (area === 'local' && (ch
 
 // omnibox:  "ek btc" → coin page,  "ek academy" / "ek lab" / … → section
 const PAGES = [
+  ['encyclopedia', '/encyclopedia/', 'دانشنامهٔ بازارهای مالی · Encyclopedia of financial markets'],
+  ['enc', '/encyclopedia/', 'دانشنامه · Encyclopedia'],
+  ['bot', '/trade-bot/', 'ربات معامله‌گر انتخاب · Entekhab trading bot'],
   ['academy', '/academy/', 'آکادمی کریپتو · Crypto Academy'], ['lab', '/academy/lab/', 'آزمایشگاه و شبیه‌ساز · Lab & simulator'],
   ['learn', '/learn/', 'مسیر یادگیری · Learning path'], ['glossary', '/academy/glossary/', 'اصطلاحات · Glossary'],
   ['dashboard', '/dashboard/', 'داشبورد بازار · Market dashboard'], ['tools', '/tools/', 'ابزارها · Tools'], ['battle', '/battle/', 'میدان نبرد · Battle'],
   ['safety', '/safety/', 'بررسی امنیت توکن · Token safety'], ['terminal', '/terminal/', 'ترمینال · Terminal'], ['coins', '/coins/', 'همهٔ کوین‌ها · All coins']
 ];
 function xml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c])); }
-chrome.omnibox.setDefaultSuggestion({ description: 'Entekhab: نام کوین (btc, eth…) یا academy, lab, tools, dashboard' });
+chrome.omnibox.setDefaultSuggestion({ description: 'Entekhab: نام کوین (btc, eth…) یا encyclopedia, academy, bot, lab, tools, dashboard' });
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   const q = text.trim().toLowerCase(); const { market } = await chrome.storage.local.get('market');
   const coins = ((market && market.coins) || []).map(c => c.coin.toLowerCase());
   const out = [];
   coins.filter(c => c.startsWith(q)).slice(0, 5).forEach(c => out.push({ content: `${SITE}/coins/${c}/`, description: `<match>${xml(c.toUpperCase())}</match> — <url>entekhab.net/coins/${xml(c)}/</url>` }));
-  PAGES.filter(p => p[0].startsWith(q)).slice(0, 4).forEach(p => out.push({ content: SITE + p[1], description: `<match>${xml(p[0])}</match> — ${xml(p[2])}` }));
+  PAGES.filter(p => p[0].startsWith(q)).slice(0, 5).forEach(p => out.push({ content: SITE + p[1], description: `<match>${xml(p[0])}</match> — ${xml(p[2])}` }));
   suggest(out);
 });
 chrome.omnibox.onInputEntered.addListener(text => {
