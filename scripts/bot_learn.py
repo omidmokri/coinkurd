@@ -364,6 +364,9 @@ AC = {
              "kmr": "🔒 Pêşketina te tenê di geroka te de tê tomarkirin. Perwerdeyî ye, ne şîreta darayî ye.",
              "ar": "🔒 يُحفظ تقدمك في متصفحك فقط. محتوى تعليمي وليس نصيحة مالية.",
              "en": "🔒 Your progress is stored only in your own browser. Educational, not financial advice."},
+    "b_psy": {"fa": "🧠 روان‌شناسی معامله‌گر", "ckb": "🧠 دەروونناسیی مامەڵەکار",
+              "kmr": "🧠 Psîkolojiya bazirganiyê", "ar": "🧠 سيكولوجية المتداول",
+              "en": "🧠 Trading psychology"},
     "b_study": {"fa": "📖 خواندن درس‌ها در همین ربات", "ckb": "📖 خوێندنی وانەکان لە هەمان بۆت",
                 "kmr": "📖 Dersan di vê botê de bixwîne", "ar": "📖 ادرس الدروس داخل البوت",
                 "en": "📖 Study the lessons inside the bot"},
@@ -423,6 +426,7 @@ def academy(lang):
     u = lambda k, path: {"text": L(AC[k], lang), "url": SITE + path}
     # اول درس‌های داخل ربات، بعد لینک‌های سایت: کسی که ربات را دارد نباید مجبور به باز کردن سایت باشد
     rows = [[{"text": L(AC["b_study"], lang), "callback_data": "ak:f"}],
+            [{"text": L(AC["b_psy"], lang), "callback_data": "py:m"}],
             [u("b_enter", "/academy/")]]
     fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
     rows += [fac_btns[i:i + 2] for i in range(0, len(fac_btns), 2)]

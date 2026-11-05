@@ -53,10 +53,12 @@ HTML = (
     '<section class="lab-card" id="journal"><h2>📒 ژورنال معاملاتی</h2><p class="note">معامله‌های شبیه‌ساز خودکار اینجا ثبت می‌شوند. معامله‌های فرضی دیگر را هم دستی وارد کنید، دلیل ورود و احساس خود را بنویسید و بعد آمار را بسنجید.</p>'
     '<div class="lab-form">' + f("jSym", "نماد", "BTCUSDT", "text") + sel("jSide", "جهت", [("long", "لانگ"), ("short", "شورت")])
     + f("jEn", "ورود") + f("jEx", "خروج") + f("jSl", "حد ضرر") + f("jQty", "مقدار (واحد)")
+    + f("jRisk", "ریسک این معامله (٪)") + sel("jPlan", "مطابق پلن بود؟", [("", "نامشخص"), ("1", "بله"), ("0", "خیر")])
     + sel("jEmo", "حس هنگام ورود", [("calm", "آرام و طبق برنامه"), ("fomo", "ترس از جاماندن (FOMO)"), ("revenge", "جبران ضرر قبلی"), ("unsure", "مردد")])
     + f("jNote", "دلیل ورود / درس گرفته‌شده", "", "text") + '</div>'
     '<div class="lab-bar"><button class="ac-btn" id="jAdd" type="button">افزودن به ژورنال</button><button class="ac-btn ghost" id="jCsv" type="button">⬇ CSV</button>'
-    '<button class="ac-btn ghost" id="jClr" type="button">پاک‌کردن ژورنال</button></div>'
+    '<button class="ac-btn ghost" id="jClr" type="button">پاک‌کردن ژورنال</button>'
+    '<a class="ac-btn ghost" href="/academy/psychology/#jr">🧠 تحلیل روان‌شناختی این ژورنال</a></div>'
     '<div class="lab-out" id="jStats"></div><div class="lab-scroll"><table class="lab-tbl" id="jTbl"></table></div></section>'
 
     # ---------------------------------------------------------------- backtest

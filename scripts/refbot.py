@@ -48,6 +48,7 @@ import bot_token as TK  # noqa: E402
 import bot_watch as W  # noqa: E402
 import bot_learn as LN  # noqa: E402
 import bot_academy as AK  # noqa: E402
+import bot_psych as PY_  # noqa: E402
 import bot_menu as MN  # noqa: E402
 import bot_art as ART  # noqa: E402
 import bot_fixmedia as FX  # noqa: E402
@@ -1118,6 +1119,10 @@ def handle_private(s, msg):
             return send(chat_id, t("join_first", lang), kb_join(lang))
 
     aw = x.pop("await", None)
+    if aw == "pyemo" and text and not text.startswith("/"):
+        x["await"] = None
+        x.setdefault("py", {}).setdefault("emo", []).append({"t": int(time.time()), "s": text[:160]})
+        return send(chat_id, "🌊 ثبت شد. همین ثبت ساده، خودش رفتار را تغییر می‌دهد.", kb_back(lang))
     if aw == "report" and text and not text.startswith("/"):
         if time.time() - x.get("report_at", 0) < 600 and uid not in ADMIN_IDS:   # one report per 10 min
             return send(chat_id, LN.L(LN.M["report_ok"], lang), kb_back(lang))
@@ -1348,6 +1353,9 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "ak":                                  # آکادمی داخل ربات: درس، آزمون و پیشرفت
         text, rows = AK.route(x, val, lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "py":                                  # روان‌شناسی معامله: آموزش، چک‌این و ثبت هیجان
+        text, rows = PY_.route(x, val, lang)
         return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "lr":
         x["await"] = "report"
