@@ -1,6 +1,6 @@
 # افزونهٔ گوگل کروم انتخاب (Entekhab Chrome extension)
 
-Manifest V3 · نسخهٔ ۱.۰.۰ · سازگار با Chrome، Edge، Brave و Opera
+Manifest V3 · نسخهٔ ۱.۱.۰ · سازگار با Chrome، Edge، Brave و Opera
 
 - `src/` — کد افزونه (همان چیزی که در Chrome Web Store آپلود می‌شود)
 - `store/` — تصاویر فروشگاه: سه اسکرین‌شات ۱۲۸۰×۸۰۰ و کاشی تبلیغاتی ۴۴۰×۲۸۰
@@ -8,7 +8,8 @@ Manifest V3 · نسخهٔ ۱.۰.۰ · سازگار با Chrome، Edge، Brave و
 
 ## امکانات
 قیمت زنده (داده‌های entekhab.net + قیمت لحظه‌ای Binance)، عدد قیمت روی آیکون، ترس و طمع، ارزش کل بازار، دامیننس، گزارش روزانهٔ بازار (fa/ckb/en)،
-آخرین پست‌های Coin_Kurd و اعلان پست تازه، هشدار قیمت، جست‌وجو از نوار آدرس با کلیدواژهٔ `ek`.
+آخرین پست‌های Coin_Kurd و اعلان پست تازه، هشدار قیمت، جست‌وجو از نوار آدرس با کلیدواژهٔ `ek`،
+و دسترسی یک‌کلیکی به دانشنامهٔ سه‌زبانهٔ بازارهای مالی (`ek encyclopedia`) و ربات معامله‌گر انتخاب (`ek bot`).
 
 ## انتشار نسخهٔ جدید
 1. `version` را در `src/manifest.json` بالا ببرید.
@@ -19,8 +20,8 @@ Manifest V3 · نسخهٔ ۱.۰.۰ · سازگار با Chrome، Edge، Brave و
 
 ## متن فهرست فروشگاه (Store listing)
 
-**Name (fa):** انتخاب | Entekhab — قیمت کریپتو، گزارش بازار و آکادمی
-**Name (en):** Entekhab — Crypto prices, market report & academy
+**Name (fa):** انتخاب | Entekhab — قیمت کریپتو، گزارش بازار و دانشنامه
+**Name (en):** Entekhab — Crypto prices, market report & encyclopedia
 **Category:** Tools (یا News & Weather) · **Language:** Persian (default), English
 
 **Description (fa):**
@@ -31,12 +32,12 @@ Manifest V3 · نسخهٔ ۱.۰.۰ · سازگار با Chrome، Edge، Brave و
 • گزارش هوشمند روزانهٔ بازار به فارسی، کوردی و انگلیسی
 • آخرین پست‌های کانال Coin_Kurd و اعلان پست‌های تازه (اختیاری)
 • هشدار قیمت: وقتی کوین به قیمت دلخواه شما برسد، اعلان می‌گیرید
-• جست‌وجو از نوار آدرس: «ek btc» یا «ek academy»
-• دسترسی سریع به آکادمی کریپتو، شبیه‌ساز معامله و ربات تلگرام
+• جست‌وجو از نوار آدرس: «ek btc»، «ek encyclopedia» یا «ek academy»
+• دسترسی سریع به دانشنامهٔ بازارهای مالی (۵۰۶ مدخل فارسی، کوردی و انگلیسی)، آکادمی کریپتو، شبیه‌ساز معامله و ربات تلگرام
 رایگان، بدون تبلیغ و بدون ردیابی. همهٔ تنظیمات فقط روی مرورگر شما ذخیره می‌شود. اطلاعات آموزشی است و توصیهٔ مالی نیست.
 
 **Description (en):**
-The official extension of entekhab.net and the Coin_Kurd channel: live prices for 100+ cryptocurrencies with 24h change and sparklines, your chosen coin's price on the toolbar badge, Fear & Greed, total market cap and BTC dominance, a daily AI market report (Persian, Kurdish, English), the latest Coin_Kurd posts with optional notifications, price alerts, and omnibox search ("ek btc"). Free, no ads, no tracking — settings stay in your browser. Not financial advice.
+The official extension of entekhab.net and the Coin_Kurd channel: live prices for 100+ cryptocurrencies with 24h change and sparklines, your chosen coin's price on the toolbar badge, Fear & Greed, total market cap and BTC dominance, a daily AI market report (Persian, Kurdish, English), the latest Coin_Kurd posts with optional notifications, price alerts, one-click access to the trilingual encyclopedia of financial markets, and omnibox search ("ek btc", "ek encyclopedia"). Free, no ads, no tracking — settings stay in your browser. Not financial advice.
 
 **Single purpose:** Show cryptocurrency market data and the entekhab.net market report, with optional price alerts.
 
