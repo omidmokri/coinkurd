@@ -48,6 +48,10 @@ jobs:
         run: |
           python scripts/fetch.py || (sleep 30 && python scripts/fetch.py)
 
+      - name: Archive post images in the repo (Telegram CDN links expire)
+        continue-on-error: true
+        run: python scripts/postimg.py --limit 150
+
       - name: Repair links/footers & merge stored translations
         id: repair
         continue-on-error: true
