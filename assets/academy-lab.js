@@ -250,7 +250,8 @@
       var en = num('jEn'), ex = num('jEx'), q = num('jQty'), sl = num('jSl'), side = $('#jSide').value;
       if (!(en > 0 && ex > 0 && q > 0)) { alert('ورود، خروج و مقدار را وارد کنید.'); return; }
       var pnl = (ex - en) * q * (side === 'long' ? 1 : -1), risk = sl > 0 ? Math.abs(en - sl) * q : null;
-      LAB.journal.unshift({ src: 'manual', sym: ($('#jSym').value || '').slice(0, 20), side: side, en: en, ex: ex, q: q, sl: sl > 0 ? sl : null, pnl: pnl, r: risk ? pnl / risk : null, emo: $('#jEmo').value, note: ($('#jNote').value || '').slice(0, 200), t: Date.now() });
+      LAB.journal.unshift({ src: 'manual', sym: ($('#jSym').value || '').slice(0, 20), side: side, en: en, ex: ex, q: q, sl: sl > 0 ? sl : null, pnl: pnl, r: risk ? pnl / risk : null, emo: $('#jEmo').value, note: ($('#jNote').value || '').slice(0, 200), t: Date.now(),
+        risk: num('jRisk') || null, plan: $('#jPlan').value === '' ? null : $('#jPlan').value === '1' });
       save(); journal(); used('journal');
     };
     $('#jCsv').onclick = function () {
