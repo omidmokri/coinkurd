@@ -58,7 +58,7 @@ def topbar(crumbs):
     return (f'<div class="meta">{c}</div>'
             '<div class="ac-top"><a class="ac-chip" href="/academy/">🏛 آکادمی</a><a class="ac-chip" href="/academy/me/">📊 داشبورد من</a>'
             '<a class="ac-chip" href="/academy/review/">🔁 مرور <b class="ac-due" hidden></b></a><a class="ac-chip" href="/academy/lab/">🧪 آزمایشگاه</a>'
-            '<a class="ac-chip" href="/academy/glossary/">📖 اصطلاحات</a><button class="ac-chip" id="acTheme" type="button" aria-label="تغییر حالت روشن و تاریک">🌓</button></div>')
+            '<a class="ac-chip ekg" href="/academy/psychology/">🧠 روان‌شناسی</a><a class="ac-chip" href="/academy/glossary/">📖 اصطلاحات</a><button class="ac-chip" id="acTheme" type="button" aria-label="تغییر حالت روشن و تاریک">🌓</button></div>')
 
 
 def ordered():
