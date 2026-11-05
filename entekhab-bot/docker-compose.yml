@@ -1,0 +1,27 @@
+# ربات معامله‌گر انتخاب (Entekhab trading bot)
+# A thin Entekhab distribution ON TOP OF upstream Freqtrade — the engine itself is the
+# official image, so `docker compose pull` always brings the upstream security fixes.
+#
+# Freqtrade is free software under the GNU GPL v3; see LICENSE and NOTICE.md.
+# Entekhab is not affiliated with, nor endorsed by, the Freqtrade project.
+---
+services:
+  entekhab-bot:
+    image: freqtradeorg/freqtrade:stable
+    container_name: entekhab-bot
+    restart: unless-stopped
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "./config:/freqtrade/config:ro"
+    # The REST API / web UI is bound to localhost ONLY. Never expose it to the internet
+    # without a reverse proxy, TLS and a strong jwt_secret_key — it can move real money.
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      - TZ=${TZ:-Asia/Tehran}
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/entekhab-bot.log
+      --db-url sqlite:////freqtrade/user_data/entekhab-bot.sqlite
+      --config /freqtrade/config/config.entekhab.json
+      --strategy ${ENTEKHAB_STRATEGY:-NotAnotherSMAOffsetStrategyHO}
