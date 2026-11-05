@@ -3,7 +3,7 @@
 """
 CRYPTO MASTER ACADEMY — ساخت صفحات ثابت /academy/
 
-  /academy/                       صفحهٔ اصلی: نقشهٔ راه ۱۲ دانشکده، جست‌وجو، سطح‌بندی، ادامهٔ مسیر
+  /academy/                       صفحهٔ اصلی: نقشهٔ راه دانشکده‌ها، جست‌وجو، سطح‌بندی، ادامهٔ مسیر
   /academy/<fid>/                 صفحهٔ دانشکده: دوره‌ها، درس‌ها، آزمون جامع، پروژهٔ عملی، گواهی
   /academy/<fid>/<lesson-id>/     درس: سه سطح توضیح، مثال واقعی، واژگان، تمرین، آزمون تطبیقی، پرسش تشریحی، دستیار
   /academy/me/                    داشبورد دانشجو
@@ -23,12 +23,15 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import academy_data as AD  # noqa: E402
+import academy_lab as LAB  # noqa: E402
 import build_pages as BP  # noqa: E402
 
 e = BP.e
 SITE = BP.SITE
 OUT = os.path.join(BP.ROOT, "academy")
 VER = "1"
+N_FAC = len(AD.FACULTIES)          # شمار دانشکده‌ها — از academy_data خوانده می‌شود، نه دستی
+N_LAB = len(LAB.NAV)                # شمار ابزارهای آزمایشگاه — از academy_lab.NAV
 SECS = [("beginner", "🌱 توضیح ساده"), ("intermediate", "📘 توضیح متوسط"), ("expert", "🔬 توضیح تخصصی")]
 SEC_FA = {"beginner": "توضیح ساده", "intermediate": "توضیح متوسط", "expert": "توضیح تخصصی", "example": "مثال واقعی",
           "key": "نکات کلیدی", "mistakes": "اشتباهات رایج"}
@@ -222,12 +225,12 @@ def home_page(F, M):
             + '<div id="ac" data-page="home"><section class="ac-hero"><p class="ac-kicker">CRYPTO MASTER ACADEMY</p>'
             '<h1>آکادمی کریپتو؛ از صفر تا متخصص بازار دارایی‌های دیجیتال</h1>'
             '<p class="txt">یک مسیر دانشگاهی، مرحله‌ای و ارزیابی‌محور: می‌خوانید، تمرین می‌کنید، آزمون می‌دهید، در شبیه‌ساز با پول مجازی معامله می‌کنید و تا مهارتی را واقعاً یاد نگرفته‌اید، به مرحلهٔ بعد نمی‌روید. رایگان و بدون ثبت‌نام.</p>'
-            f'<div class="ac-stats"><div><b>{fa(12)}</b><small>دانشکده</small></div><div><b>{fa(n_l)}</b><small>درس منتشرشده</small></div>'
-            f'<div><b>{fa(n_q)}</b><small>سؤال آزمون</small></div><div><b>{fa(12)}</b><small>ابزار آزمایشگاه</small></div></div>'
+            f'<div class="ac-stats"><div><b>{fa(N_FAC)}</b><small>دانشکده</small></div><div><b>{fa(n_l)}</b><small>درس منتشرشده</small></div>'
+            f'<div><b>{fa(n_q)}</b><small>سؤال آزمون</small></div><div><b>{fa(N_LAB)}</b><small>ابزار آزمایشگاه</small></div></div>'
             '<div class="ac-cta"><a class="ac-btn" id="acGo" href="/academy/f1/">شروع از درس اول</a><a class="ac-btn ghost" href="/academy/placement/">آزمون تعیین سطح</a>'
             '<a class="ac-btn ghost" href="/academy/me/">داشبورد من</a></div><p class="note" id="acHello"></p></section>'
             '<div class="ac-search"><input id="acSearch" type="search" placeholder="جست‌وجوی درس، مفهوم یا اصطلاح… (مثلاً هش، استیبل‌کوین، فیشینگ)" aria-label="جست‌وجو در درس‌ها"><div id="acSearchOut"></div></div>'
-            f'<h2>🗺 نقشهٔ راه: ۱۲ دانشکده</h2><div class="ac-facs">{rows}</div>'
+            f'<h2>🗺 نقشهٔ راه: {fa(N_FAC)} دانشکده</h2><div class="ac-facs">{rows}</div>'
             f'<h2>🔄 چرخهٔ یادگیری هر درس</h2><ol class="ac-cycle">{cycle}</ol>'
             f'<h2>🪜 سطح‌بندی</h2><p class="note">ارتقای سطح فقط با شواهد یادگیری انجام می‌شود: امتیاز آزمون‌ها و پروژه‌ها، و تعداد دانشکده‌هایی که آزمون جامعشان را قبول شده‌اید.</p><ol class="ac-levels" id="acLevels">{levels}</ol>'
             '<div class="ac-box"><h2>🔒 اصل امنیت</h2><p>در تمام تمرین‌ها استفاده از سرمایهٔ واقعی، وارد کردن عبارت بازیابی یا کلید خصوصی و اتصال کیف پول اصلی ممنوع است. '
@@ -239,7 +242,7 @@ def home_page(F, M):
           "provider": {"@type": "Organization", "name": "entekhab.net", "sameAs": "https://t.me/Coin_Kurd"}, "inLanguage": "fa", "isAccessibleForFree": True,
           "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "courseWorkload": "PT40H"}}
     return BP.page("academy/", "آکادمی کریپتو — آموزش جامع ارز دیجیتال از صفر تا حرفه‌ای با آزمون و شبیه‌ساز",
-                   "CRYPTO MASTER ACADEMY: ۱۲ دانشکده آموزش کریپتو به فارسی؛ بلاک‌چین، کیف پول و امنیت، تحلیل تکنیکال، فاندامنتال، آنچین و مدیریت ریسک با آزمون تطبیقی، تمرین عملی و شبیه‌ساز معامله",
+                   f"CRYPTO MASTER ACADEMY: {fa(N_FAC)} دانشکده آموزش کریپتو به فارسی؛ بلاک‌چین، کیف پول و امنیت، تحلیل تکنیکال، فاندامنتال، آنچین و مدیریت ریسک با آزمون تطبیقی، تمرین عملی و شبیه‌ساز معامله",
                    body, HEAD + f'<script type="application/ld+json">{BP.sj(ld)}</script>' + foot_js())
 
 
@@ -270,7 +273,6 @@ def glossary_page(F, M):
 
 
 def lab_page(M):
-    import academy_lab as LAB
     return simple_page("academy/lab/", "آزمایشگاه آکادمی کریپتو — شبیه‌ساز معامله، ماشین‌حساب‌ها، هش، امضا و بک‌تست",
                        "شبیه‌ساز معامله با پول مجازی روی کندل‌های تاریخی بدون دیدن آینده، ماشین‌حساب اندازهٔ پوزیشن، ریسک به بازده، لیکوئید، کارمزد و توکنومیکس، آزمایشگاه هش و امضای دیجیتال، بررسی تراکنش واقعی و بک‌تست آموزشی",
                        "آزمایشگاه", LAB.HTML, M, f'<script src="/assets/academy-lab.js?v={VER}" defer></script>')

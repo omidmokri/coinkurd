@@ -86,6 +86,29 @@ def aria(d, lang):
     return (f' aria-label="{e(d[lang])}" title="{e(d[lang])}"' + "".join(f' data-a{k}="{e(d[k])}"' for k in LANGS))
 
 
+# ---------------------------------------------------------------- live counts (never hard-code them in a label)
+_FA_D = "۰۱۲۳۴۵۶۷۸۹"
+_AR_D = "٠١٢٣٤٥٦٧٨٩"
+
+
+def num(n, lang="fa"):
+    """عدد با رقم‌های همان زبان: فارسی ۱۳، سۆرانی ١٣، انگلیسی 13."""
+    d = {"fa": _FA_D, "ckb": _AR_D}.get(lang)
+    return "".join(d[int(c)] for c in str(n)) if d else str(n)
+
+
+def n_fac():
+    """شمار دانشکده‌های آکادمی — از academy_data خوانده می‌شود تا برچسب‌ها هرگز کهنه نشوند."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import academy_data as AD
+        return len(AD.FACULTIES)
+    except Exception:
+        return 0
+
+
+NFAC = n_fac()
+
 def L(fa, ckb, en):
     return {"fa": fa, "ckb": ckb, "en": en}
 
@@ -148,7 +171,7 @@ NAV = [
         ("/encyclopedia/", "library", L("دانشنامهٔ بازارهای مالی", "زانستنامەی بازاڕە داراییەکان", "Encyclopedia of financial markets"),
          L("۵۰۶ مدخل به فارسی، کوردی و انگلیسی، با فرمول و منبع", "٥٠٦ خاڵ بە فارسی، کوردی و ئینگلیزی، بە فۆرموڵ و سەرچاوە", "506 entries in Persian, Kurdish and English, with formulas and sources")),
         ("/academy/", "cap", L("آکادمی کریپتو", "ئەکادیمیای کریپتۆ", "Crypto Academy"),
-         L("۱۲ دانشکده از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز", "١٢ کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە و سیمولەیتەر", "12 faculties, zero to pro, with quizzes and a simulator")),
+         L(f"{num(NFAC)} دانشکده از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز", f"{num(NFAC, 'ckb')} کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە و سیمولەیتەر", f"{NFAC} faculties, zero to pro, with quizzes and a simulator")),
         ("/academy/lab/", "flask", L("آزمایشگاه آکادمی", "تاقیگەی ئەکادیمیا", "Academy lab"),
          L("شبیه‌ساز معامله، بک‌تست و ماشین‌حساب‌ها", "سیمولەیتەری مامەڵە، باکتێست و ژمێرەرەکان", "Paper trading, backtests and calculators")),
         ("/learn/", "cap", L("مسیر یادگیری", "ڕێڕەوی فێربوون", "Learning path"),
