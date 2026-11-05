@@ -269,3 +269,7 @@ footer .dis{border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);back
 /* category accents, tuned for the near-black ground; light values under the explicit toggle */
 :root{ --c-slate:#94a3b8; --c-amber:#e0a356; --c-teal:#5bbfae; --c-violet:#b093f5; --c-blue:#8ab0f7; --c-green:#68c38a; --c-lime:#a8c95f; --c-orange:#f0956a; --c-cyan:#5fb6cf; --c-indigo:#9d9bf2; --c-red:#ef8a84; --c-brown:#c9955f; --c-purple:#c493ec; --c-pink:#ef8fb5; --c-zinc:#a1a1aa; --c-stone:#a8a29e; --c-emerald:#4fc295; --c-rose:#f090a4; }
 :root[data-theme="light"]{ --c-slate:#64748b; --c-amber:#b45309; --c-teal:#0f766e; --c-violet:#6d28d9; --c-blue:#1d4ed8; --c-green:#15803d; --c-lime:#4d7c0f; --c-orange:#c2410c; --c-cyan:#0e7490; --c-indigo:#4338ca; --c-red:#b91c1c; --c-brown:#78350f; --c-purple:#7e22ce; --c-pink:#be185d; --c-zinc:#52525b; --c-stone:#57534e; --c-emerald:#047857; --c-rose:#be123c; }
+
+/* back to entekhab.net from the encyclopedia header */
+.sitelink{display:inline-grid;place-items:center;text-decoration:none;color:inherit}
+.sitelink:hover{border-color:var(--navy);color:var(--navy)}
