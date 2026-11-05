@@ -20,17 +20,10 @@ _cache = {}
 
 
 def _rtl(text):
-    """shape Persian/Sorani text when Pillow has no raqm (same fallback bot_reel uses)"""
+    """shape Persian/Sorani text with the shared, self-tested engine (scripts/infocard.py)"""
     try:
-        from PIL import features
-        if features.check("raqm"):
-            return text
-    except Exception:
-        pass
-    try:
-        import arabic_reshaper
-        from bidi.algorithm import get_display
-        return get_display(arabic_reshaper.reshape(text))
+        import infocard as IC
+        return IC.shape(text)
     except Exception:
         return text
 

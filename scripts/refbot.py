@@ -49,6 +49,7 @@ import bot_watch as W  # noqa: E402
 import bot_learn as LN  # noqa: E402
 import bot_menu as MN  # noqa: E402
 import bot_art as ART  # noqa: E402
+import bot_fixmedia as FX  # noqa: E402
 from bot_i18n import AR, KMR, LANG_NAMES, LANGS, pick, t  # noqa: E402
 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
@@ -1592,6 +1593,8 @@ def main():
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
     CL.start(s, group_send, CHANNEL)
+    FX.start(s, _post_with_retry, fix_amp, CHANNEL, MAIN_WT, DP.push_files, sorted(ADMIN_IDS),
+             lambda chat, text: group_send(chat, text), V.SIG, F.DIRTY)   # one-time repair of broken pictures
     threading.Thread(target=watch_loop, args=(s,), name="watch-v2", daemon=True).start()
     try:
         if promote(s):

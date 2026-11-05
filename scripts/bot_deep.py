@@ -30,7 +30,8 @@ import requests
 
 import ai
 import bot_feeds as F
-import bot_reel as R
+import bot_reel as R  # noqa: F401
+import infocard as IC
 from bot_videos import SIG
 
 log = logging.getLogger("deep")
@@ -249,60 +250,20 @@ def write_post(parts):
     return None, notes
 
 
-# ------------------------------------------------------------------ 4. card (one fixed design for every dossier)
-def card(post):
-    """the same Coin_Kurd dossier frame every time: badge, headline, 3-second summary, footer (720x900, 4:5)"""
-    from PIL import Image, ImageDraw
-    lines = [re.sub(r"</?b>", "", x).strip() for x in post.split("\n")]
-    title = R.EMOJI.sub("", lines[1] if len(lines) > 1 else lines[0]).strip()
-    quick = ""
-    for i, ln in enumerate(lines):
-        if "در ۳ ثانیه" in ln and i + 1 < len(lines):
-            quick = R.EMOJI.sub("", lines[i + 1]).strip()
-            break
-    W, H = 720, 900
-    im = Image.new("RGB", (W, H), R.BG)
-    d = ImageDraw.Draw(im)
-    for y in range(H):                                   # soft vertical glow
-        c = int(18 * (1 - y / H))
-        d.line([(0, y), (W, y)], fill=(R.BG[0] + c, R.BG[1] + c, R.BG[2] + c + 4))
-    d.rectangle([0, 0, W, 12], fill=R.ACC)
+# ------------------------------------------------------------------ 4. card (owner's cyberpunk infographic prompt)
+def card(post, at=None, hist=None):
+    """1080×1350 «Cyberpunk Financial Intelligence Dashboard» for the dossier (scripts/infocard.py):
+    official logo, headline, hero number, Binance market panel, glass card, AI terminal, fixed footer.
+    Returns None when the Persian text cannot be shaped/verified — a broken picture is never published."""
     try:
-        lg = Image.open(R.LOGO).convert("RGBA")
-        lg.thumbnail((170, 110))
-        im.paste(lg, (36, 40), lg)
+        mk = IC.market(at)
+        return IC.render(IC.parse_dossier(post), hist=hist, mk=mk)
+    except IC.TextError as ex:
+        log.error("dossier card NOT made, Persian text check failed: %s", ex)
+        return None
     except Exception:
-        pass
-    fb = R.font(32)
-    s = R.shape("🧠 پروندهٔ کوین کورد".replace("🧠 ", ""))
-    bw = fb.getlength(s) + 40
-    d.rounded_rectangle([W - 36 - bw, 60, W - 36, 116], 16, fill=R.ACC)
-    d.text((W - 56 - fb.getlength(s), 64), s, font=fb, fill=R.BG)
-    y = 200
-    for size in (54, 48, 42):
-        ft = R.font(size)
-        tl = R.wrap(title, ft, W - 90)
-        if len(tl) <= 4:
-            break
-    for ln in tl[:4]:
-        sh = R.shape(ln)
-        d.text((W - 45 - ft.getlength(sh), y), sh, font=ft, fill=R.FG)
-        y += int(size * 1.45)
-    y += 20
-    d.rectangle([W - 45 - 90, y, W - 45, y + 6], fill=R.ACC)
-    y += 36
-    fq = R.font(34)
-    for ln in R.wrap(quick, fq, W - 90)[:5]:
-        sh = R.shape(ln)
-        d.text((W - 45 - fq.getlength(sh), y), sh, font=fq, fill=(200, 206, 216))
-        y += 52
-    d.rectangle([0, H - 90, W, H], fill=(20, 24, 32))
-    ff = R.font(28)
-    s = R.shape("کوین کورد") + "  ·  t.me/Coin_Kurd"
-    d.text(((W - ff.getlength(s)) / 2, H - 66), s, font=ff, fill=R.ACC)
-    buf = io.BytesIO()
-    im.save(buf, "JPEG", quality=90)
-    return buf.getvalue()
+        log.exception("dossier card failed")
+        return None
 
 
 # ------------------------------------------------------------------ 5/6. publish, site
@@ -332,22 +293,25 @@ def push_files(worktree, files, msg):
 
 def publish(st, post, notes, g, send_fn, channel, admins, worktree):
     pid = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
-    img = card(post)
+    img = card(post, hist=st.setdefault("visual", {}))
     img_path = f"data/deepimg/{pid}.jpg"
     body = post + "\n\n" + SIG
     r = {"ok": False}
-    if push_files(worktree, {img_path: img}, "chore: dossier card"):
+    if img and push_files(worktree, {img_path: img}, "chore: dossier card"):
         time.sleep(5)
         r = send_fn(channel, body, link_preview_options={
             "url": RAW + img_path, "prefer_large_media": True, "show_above_text": True})
-    if not r.get("ok"):                          # fallback: card as photo, text below
+    if not r.get("ok") and img:                  # fallback: card as photo, text below
         r = send_fn(channel, "🧠", photo=img)
         if r.get("ok"):
             r = send_fn(channel, body)
+    if not r.get("ok") and not img:              # no valid picture: text only, never a broken image
+        r = send_fn(channel, body, link_preview_options={"is_disabled": True})
     if not r.get("ok"):
         log.warning("dossier not posted: %s", r.get("description"))
         return False
-    item = {"id": pid, "at": datetime.now(timezone.utc).isoformat(), "fa": post, "img": "/" + img_path,
+    item = {"id": pid, "at": datetime.now(timezone.utc).isoformat(), "fa": post, "img": "/" + img_path if img else "",
+            "msg_id": (r.get("result") or {}).get("message_id"),
             "outlets": sorted({i["src"] for i in g})}
     st.setdefault("posts", []).insert(0, item)
     del st["posts"][60:]

@@ -23,7 +23,7 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; CoinKurdBot/1.0; +https://entekhab
 TTL = 60
 _cache = {}
 
-import bidi as B  # noqa: E402  (isolate helpers: see scripts/bidi.py)
+import rtlfmt as B  # noqa: E402  (isolate helpers: see scripts/rtlfmt.py; must NOT be named bidi.py — that shadows python-bidi)
 
 FA_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩٫", "01234567890123456789.")
 
