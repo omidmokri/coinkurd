@@ -174,7 +174,7 @@ const T = {
 const LANGS=['fa','ckb','en'];
 
 /* ---------------- state ---------------- */
-const S={lang:'fa',idx:[],meta:null,full:null,fullMap:null,route:{page:'home'},depth:'simple'};
+const S={lang:'fa',idx:[],meta:null,shards:new Map(),route:{page:'home'},depth:'simple'};
 const REPO='https://github.com/omidmokri/coinkurd';
 
 /* ---------------- utils ---------------- */
@@ -240,13 +240,23 @@ async function boot(){
   applyLang();
   window.addEventListener('hashchange',route);
   route();
-  fetch('terms.json').then(r=>r.json()).then(d=>{
-    S.full=d;S.fullMap=new Map(d.map(e=>[e.id,e]));
-    if(S.route.page==='term')route();
-  }).catch(()=>{});
   wireChrome();
 }
-const getFull=id=>S.fullMap?S.fullMap.get(id):null;
+/* Full entry text is sharded by category: terms/<cat>.json is fetched on demand and cached,
+   so opening one term downloads ~0.5MB instead of the whole 8MB corpus. */
+const getFull=id=>{
+  const l=S.idx.find(x=>x.i===id); if(!l)return null;
+  const sh=S.shards.get(l.c); return sh?sh[id]:null;
+};
+const shardPending=new Map();
+function loadShard(cat){
+  if(S.shards.has(cat))return Promise.resolve(S.shards.get(cat));
+  if(shardPending.has(cat))return shardPending.get(cat);
+  const p=fetch('terms/'+cat+'.json').then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+    .then(d=>{S.shards.set(cat,d);shardPending.delete(cat);return d})
+    .catch(e=>{shardPending.delete(cat);throw e});
+  shardPending.set(cat,p); return p;
+}
 
 /* ---------------- chrome ---------------- */
 function applyLang(){
@@ -308,6 +318,12 @@ function wireChrome(){
     }
   });
   document.addEventListener('click',e=>{if(!e.target.closest('.sbox'))$('#ac').hidden=true});
+  // warm the shard before the click lands
+  const warm=ev=>{const a=ev.target.closest&&ev.target.closest('a[href*="/term/"]');if(!a)return;
+    const m=a.getAttribute('href').match(/\/term\/([^/?#]+)/); if(!m)return;
+    const l=S.idx.find(x=>x.i===decodeURIComponent(m[1])); if(l&&!S.shards.has(l.c))loadShard(l.c).catch(()=>{});};
+  document.addEventListener('mouseover',warm,{passive:true});
+  document.addEventListener('focusin',warm,{passive:true});
   document.addEventListener('keydown',e=>{
     if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}
   });
@@ -605,7 +621,13 @@ function vTerm(V,id){
   S.route.title=light.t[S.lang];
   if(!e){
     V.innerHTML=head()+'<div class="card"><p>'+esc(light.d[S.lang])+'</p>'
-      +'<p class="xs mono muted">'+esc(L.loading)+'</p><div class="skel" style="width:80%"></div></div>';
+      +'<p class="xs mono muted">'+esc(L.loading)+'</p><div class="skel" style="width:80%"></div>'
+      +'<div class="skel" style="width:62%;margin-top:8px"></div></div>';
+    loadShard(light.c).then(()=>{
+      if(S.route.page==='term'&&S.route.arg===id){V.innerHTML='';vTerm(V,id);renderMathIn(V)}
+    }).catch(()=>{
+      V.innerHTML=head()+'<div class="notice">'+esc(L.notFound)+'</div>';
+    });
     return;
   }
   const c=catById(e.cat);
