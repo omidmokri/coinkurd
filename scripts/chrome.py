@@ -61,6 +61,8 @@ _P = {
     "group": '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2a5 5 0 0 1 5.5 5"/>',
     "download": '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
     "chat": '<path d="M4 5h16v11H9l-5 4Z"/><path d="M8 9.5h8M8 12.5h5"/>',
+    "library": '<path d="M3 20V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/><path d="M13 20V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/><path d="M3 20h18"/><path d="M6 8h2"/><path d="M16 8h2"/>',
+    "robot": '<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4"/><circle cx="12" cy="3" r="1.3"/><path d="M9 13h.01"/><path d="M15 13h.01"/><path d="M9.5 16.2h5"/>',
 }
 
 
@@ -139,8 +141,12 @@ NAV = [
          L("واچ‌لیست، هشدارها و معاملهٔ آزمایشی", "لیستی چاودێری، ئاگادارکەرەوە و مامەڵەی تاقیکاری", "Watchlist, alerts and paper trading")),
         ("/developers/", "code", L("API توسعه‌دهندگان", "API بۆ گەشەپێدەران", "Developer API"),
          L("داده‌های باز JSON برای ساخت ابزار", "داتای کراوەی JSON بۆ دروستکردنی ئامراز", "Open JSON data to build on")),
+        ("/trade-bot/", "robot", L("ربات معامله‌گر انتخاب", "بۆتی بازرگانیی ئەنتخاب", "Entekhab trading bot"),
+         L("توزیع متن‌باز Freqtrade، خودمیزبان — توصیهٔ مالی نیست", "دابەشکردنی سەرچاوەکراوەی Freqtrade، خۆمیوانداری — ئامۆژگاریی دارایی نییە", "A self-hosted, open-source Freqtrade distribution — not financial advice")),
     ]},
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
+        ("/encyclopedia/", "library", L("دانشنامهٔ بازارهای مالی", "زانستنامەی بازاڕە داراییەکان", "Encyclopedia of financial markets"),
+         L("۵۰۶ مدخل به فارسی، کوردی و انگلیسی، با فرمول و منبع", "٥٠٦ خاڵ بە فارسی، کوردی و ئینگلیزی، بە فۆرموڵ و سەرچاوە", "506 entries in Persian, Kurdish and English, with formulas and sources")),
         ("/academy/", "cap", L("آکادمی کریپتو", "ئەکادیمیای کریپتۆ", "Crypto Academy"),
          L("۱۲ دانشکده از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز", "١٢ کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە و سیمولەیتەر", "12 faculties, zero to pro, with quizzes and a simulator")),
         ("/academy/lab/", "flask", L("آزمایشگاه آکادمی", "تاقیگەی ئەکادیمیا", "Academy lab"),
@@ -377,7 +383,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "app"]
+          "privacy", "terms", "app", "trade-bot"]
 
 
 def inject_static():
