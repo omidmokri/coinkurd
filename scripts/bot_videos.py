@@ -162,7 +162,7 @@ def post_one(s, st, send_fn, channel, admins):
         if not fa:
             continue
         series, label = btc_series()
-        clip = R.make_reel(fa, series, label)
+        clip = R.make_reel(fa, series, label, hist=s.setdefault("visual", {}))
         if not clip:
             log.warning("reel render failed for %s", v["vid"])
             continue
@@ -176,7 +176,8 @@ def post_one(s, st, send_fn, channel, admins):
                     send_fn(a, "⚠️ ارسال ویدیو به کانال انجام نشد: " + html.escape(str(r.get("description"))))
             return False
         st["posted"].insert(0, {"vid": v["vid"], "cid": v["cid"], "title": v["title"], "fa": fa,
-                                "at": datetime.now(timezone.utc).isoformat()})
+                                "at": datetime.now(timezone.utc).isoformat(),
+                                "msg_id": (r.get("result") or {}).get("message_id"), "reel": 2})
         del st["posted"][40:]
         del st["seen"][:-600]
         log.info("video posted: %s (%s)", v["vid"], v["author"])

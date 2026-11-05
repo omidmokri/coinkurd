@@ -2,7 +2,7 @@
 Coin_Kurd short videos (vertical 720x1280, ~25s, MP4) made by the bot itself from a Persian summary and
 real price data — so the channel posts its own downloadable clips instead of links to other people's videos.
 
-make_reel(text, series=None, label="") -> mp4 bytes or None
+make_reel(text, series=None, label="", hist=None, mk=None) -> mp4 bytes (1080×1350) or None
 """
 import logging
 import os
@@ -20,22 +20,16 @@ W, H = 720, 1280
 BG, FG, ACC, MUTED = (11, 14, 20), (240, 242, 246), (247, 147, 26), (150, 160, 175)
 EMOJI = re.compile(r"[\U0001F000-\U0001FFFF☀-➿⬀-⯿️‍⃣]")
 
-try:
-    import arabic_reshaper
-    from bidi.algorithm import get_display
-except Exception:  # pragma: no cover
-    arabic_reshaper = None
+import infocard as IC   # shared Persian shaping + the Coin_Kurd infographic engine
 
 
 def shape(s):
-    s = s.replace(" ← ", " • ")            # the font has no arrow glyph
-    if arabic_reshaper is None:
-        return s
-    return get_display(arabic_reshaper.reshape(s))
+    """Persian text ready to draw (raqm or arabic_reshaper+python-bidi); raises IC.TextError if impossible"""
+    return IC.shape(IC.clean(s) if IC.is_rtl(s) else s)
 
 
 def font(size):
-    return ImageFont.truetype(FONT, size, layout_engine=ImageFont.Layout.BASIC)
+    return IC.font(size)
 
 
 def wrap(text, f, width):
@@ -123,24 +117,36 @@ def slides(text):
     return out[:6]
 
 
-def make_reel(text, series=None, label="", seconds=4):
-    if not os.path.exists(FONT):
+def make_reel(text, series=None, label="", seconds=4, hist=None, mk=None):
+    """house-prompt summary -> MP4 (1080×1350): slide 1 is the full infographic, then one slide per section,
+    all in the same visual identity. None when the Persian text cannot be rendered correctly."""
+    if not os.path.exists(FONT) or IC.mode() is None:
+        log.warning("reel skipped: Persian shaping unavailable")
         return None
-    sl = slides(text)
-    if len(sl) < 2:
+    content = IC.parse_summary(text)
+    secs = [(h, ps) for h, ps in content.get("sections", []) if ps][:5]
+    if not secs:
+        return None
+    theme = IC.pick_theme(hist)
+    try:
+        first = Image.open(__import__("io").BytesIO(IC.render(content, theme, mk=mk)))
+        frames = [first] + [IC.slide(theme, content, h, ps, i + 2, len(secs) + 1) for i, (h, ps) in enumerate(secs)]
+    except IC.TextError as ex:
+        log.warning("reel skipped, Persian text check failed: %s", ex)
         return None
     with tempfile.TemporaryDirectory() as td:
-        n = len(sl)
-        for i, (t, ps) in enumerate(sl):
-            frame(t, ps, i + 1, n, series if i in (0, n - 1) else None, label).save(f"{td}/f{i:02d}.png")
-        lst = "".join(f"file 'f{i:02d}.png'\nduration {seconds}\n" for i in range(n)) + f"file 'f{n - 1:02d}.png'\n"
+        n = len(frames)
+        for i, im in enumerate(frames):
+            im.convert("RGB").save(f"{td}/f{i:02d}.png")
+        lst = "".join(f"file 'f{i:02d}.png'\nduration {seconds + (2 if i == 0 else 0)}\n" for i in range(n)) + f"file 'f{n - 1:02d}.png'\n"
         open(f"{td}/l.txt", "w").write(lst)
         out = f"{td}/reel.mp4"
+        total = n * seconds + 2
         cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", f"{td}/l.txt",
-               "-f", "lavfi", "-t", str(n * seconds), "-i", "anullsrc=r=44100:cl=stereo",
-               "-vf", "fps=25,format=yuv420p", "-c:v", "libx264", "-preset", "veryfast", "-crf", "26",
+               "-f", "lavfi", "-t", str(total), "-i", "anullsrc=r=44100:cl=stereo",
+               "-vf", "fps=25,format=yuv420p", "-c:v", "libx264", "-preset", "veryfast", "-crf", "24",
                "-c:a", "aac", "-shortest", "-movflags", "+faststart", out]
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
         if r.returncode != 0 or not os.path.exists(out):
             log.warning("ffmpeg failed: %s", r.stderr[-300:])
             return None
