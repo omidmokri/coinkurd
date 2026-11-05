@@ -3,17 +3,17 @@
 const SITE = 'https://entekhab.net';
 const $ = s => document.querySelector(s);
 const T = {
-  fa: { brand: 'انتخاب', tMarket: 'بازار', tReport: 'گزارش', tPosts: 'کانال', tAlerts: 'هشدار', search: 'جست‌وجوی کوین…', above: 'بالاتر از', below: 'پایین‌تر از', add: 'افزودن',
+  fa: { tCalc: 'ماشین‌حساب', kSize: '📐 حجم پوزیشن', kRR: '⚖️ ریسک به بازده', kPnl: '💰 سود و زیان', kLiq: '💥 قیمت لیکوئید', kFee: '🧾 کارمزد', cap: 'سرمایه ($)', risk: 'ریسک ٪', entry: 'ورود', stop: 'حد ضرر', target: 'حد سود', exit: 'خروج', qty: 'مقدار (واحد)', lev: 'اهرم', feeSide: 'کارمزد هر طرف ٪', feeRT: 'کارمزد رفت و برگشت ٪', winExp: 'نرخ برد مورد انتظار ٪', mmr: 'مارجین نگهداری ٪', side: 'جهت', long: 'لانگ', short: 'شورت', amount: 'مبلغ معامله ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'معامله در ماه', oRiskAmt: 'مبلغ ریسک', oStopDist: 'فاصلهٔ حد ضرر', oQty: 'حجم (واحد)', oNotional: 'ارزش پوزیشن', oLev: 'اهرم لازم', oLoss: 'زیان روی حد ضرر', oRR: 'ریسک به بازده (با کارمزد)', oBE: 'نرخ برد سربه‌سر', oEV: 'امید ریاضی هر معامله', oVerdict: 'وضعیت با نرخ برد شما', oGross: 'سود/زیان ناخالص', oFee: 'کارمزد کل', oNet: 'سود/زیان خالص', oMargin: 'مارجین درگیر', oROE: 'بازده روی مارجین', oChg: 'تغییر قیمت', oLiq: 'قیمت تقریبی لیکوئید', oDist: 'فاصله تا لیکوئید', oWipe: 'حرکت خلافی که مارجین را می‌برد', oTT: 'ورود و خروج Taker', oMT: 'ورود Maker، خروج Taker', oMonthly: 'هزینهٔ ماهانه (Taker)', oBEmove: 'حرکت لازم برای سربه‌سر', noLev: 'بدون اهرم', posi: 'مثبت', nega: 'منفی', evenv: 'سربه‌سر', cHint: 'قیمت ورود از نرخ زندهٔ همین افزونه پر می‌شود. محاسبه‌ها تقریبی و آموزشی‌اند؛ لغزش و پلکان نرخ صرافی لحاظ نمی‌شود.', brand: 'انتخاب', tMarket: 'بازار', tReport: 'گزارش', tPosts: 'کانال', tAlerts: 'هشدار', search: 'جست‌وجوی کوین…', above: 'بالاتر از', below: 'پایین‌تر از', add: 'افزودن',
     settings: 'تنظیمات', badge: 'عدد روی آیکون', notifyPosts: 'اعلان پست‌های تازهٔ Coin_Kurd', privacy: 'همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.',
     enc: '📚 دانشنامه', academy: '🏛 آکادمی', lab: '🧪 شبیه‌ساز', dash: '📊 داشبورد', bot: '🤖 ربات', nfa: 'توصیهٔ مالی نیست', fng: 'ترس و طمع', mcap: 'ارزش کل بازار', dom: 'دامیننس BTC',
     upd: 'به‌روزرسانی', ago: 'دقیقه پیش', now: 'همین الان', off: 'خاموش', noAlerts: 'هنوز هشداری نساخته‌اید. وقتی قیمت به عدد شما برسد، اعلان می‌گیرید.', hit: 'فعال شد', loading: 'در حال بارگذاری…',
     err: 'داده در دسترس نیست؛ اتصال اینترنت را بررسی کنید.', more: 'گزارش کامل در سایت', allPosts: 'همهٔ پست‌ها', fngC: { 'Extreme Fear': 'ترس شدید', Fear: 'ترس', Neutral: 'خنثی', Greed: 'طمع', 'Extreme Greed': 'طمع شدید' } },
-  ckb: { brand: 'ئینتیخاب', tMarket: 'بازاڕ', tReport: 'ڕاپۆرت', tPosts: 'کەناڵ', tAlerts: 'ئاگاداری', search: 'گەڕان بۆ دراو…', above: 'سەرووی', below: 'خوارووی', add: 'زیادکردن',
+  ckb: { tCalc: 'ژمێرەر', kSize: '📐 قەبارەی پۆزیشن', kRR: '⚖️ مەترسی بۆ قازانج', kPnl: '💰 قازانج و زیان', kLiq: '💥 نرخی لیکوید', kFee: '🧾 کرێ', cap: 'سەرمایە ($)', risk: 'مەترسی ٪', entry: 'چوونەژوورەوە', stop: 'وەستاندنی زیان', target: 'ئامانج', exit: 'دەرچوون', qty: 'بڕ (یەکە)', lev: 'لیڤەرج', feeSide: 'کرێی هەر لایەک ٪', feeRT: 'کرێی چوون و هاتن ٪', winExp: 'ڕێژەی چاوەڕوانکراوی بردنەوە ٪', mmr: 'مارجینی پاراستن ٪', side: 'ئاڕاستە', long: 'لۆنگ', short: 'شۆرت', amount: 'بڕی مامەڵە ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'مامەڵە لە مانگێک', oRiskAmt: 'بڕی مەترسی', oStopDist: 'دووری وەستاندنی زیان', oQty: 'قەبارە (یەکە)', oNotional: 'بەهای پۆزیشن', oLev: 'لیڤەرجی پێویست', oLoss: 'زیان لەسەر وەستاندن', oRR: 'مەترسی بۆ قازانج (بە کرێ)', oBE: 'ڕێژەی بردنەوەی یەکسان', oEV: 'چاوەڕوانیی هەر مامەڵەیەک', oVerdict: 'دۆخ بە ڕێژەی بردنەوەی تۆ', oGross: 'قازانج/زیانی سەرەکی', oFee: 'کۆی کرێ', oNet: 'قازانج/زیانی خاوێن', oMargin: 'مارجینی بەکارهاتوو', oROE: 'گەڕانەوە لەسەر مارجین', oChg: 'گۆڕانی نرخ', oLiq: 'نرخی نزیکەیی لیکوید', oDist: 'دووری بۆ لیکوید', oWipe: 'جوڵەی پێچەوانە کە مارجین دەبات', oTT: 'چوونەژوورەوە و دەرچوونی Taker', oMT: 'Maker بۆ چوون، Taker بۆ دەرچوون', oMonthly: 'تێچووی مانگانە (Taker)', oBEmove: 'جوڵەی پێویست بۆ یەکسانی', noLev: 'بێ لیڤەرج', posi: 'ئەرێنی', nega: 'نەرێنی', evenv: 'یەکسان', cHint: 'نرخی چوونەژوورەوە لە نرخی زیندووی هەمین پێوەکراوە پڕدەکرێتەوە. ژمێرکارییەکان نزیکەیی و فێرکارین.', brand: 'ئینتیخاب', tMarket: 'بازاڕ', tReport: 'ڕاپۆرت', tPosts: 'کەناڵ', tAlerts: 'ئاگاداری', search: 'گەڕان بۆ دراو…', above: 'سەرووی', below: 'خوارووی', add: 'زیادکردن',
     settings: 'ڕێکخستنەکان', badge: 'ژمارە لەسەر ئایکۆن', notifyPosts: 'ئاگاداری پۆستی نوێی Coin_Kurd', privacy: 'هەموو ڕێکخستنەکان تەنها لەم وێبگەڕەدا هەڵدەگیرێن و هیچ زانیارییەک نانێردرێت.',
     enc: '📚 زانستنامە', academy: '🏛 ئەکادیمیا', lab: '🧪 سیمولەیتەر', dash: '📊 داشبۆرد', bot: '🤖 بۆت', nfa: 'ئامۆژگاریی دارایی نییە', fng: 'ترس و تەماع', mcap: 'بەهای گشتی بازاڕ', dom: 'باڵادەستیی BTC',
     upd: 'نوێکردنەوە', ago: 'خولەک لەمەوبەر', now: 'ئێستا', off: 'کوژاوە', noAlerts: 'هێشتا ئاگادارییەکت دروست نەکردووە.', hit: 'چالاک بوو', loading: 'بارکردن…',
     err: 'داتا بەردەست نییە؛ پەیوەندیی ئینتەرنێت بپشکنە.', more: 'ڕاپۆرتی تەواو لە ماڵپەڕ', allPosts: 'هەموو پۆستەکان', fngC: { 'Extreme Fear': 'ترسی زۆر', Fear: 'ترس', Neutral: 'بێلایەن', Greed: 'تەماع', 'Extreme Greed': 'تەماعی زۆر' } },
-  en: { brand: 'Entekhab', tMarket: 'Market', tReport: 'Report', tPosts: 'Channel', tAlerts: 'Alerts', search: 'Search coin…', above: 'above', below: 'below', add: 'Add',
+  en: { tCalc: 'Calculator', kSize: '📐 Position size', kRR: '⚖️ Risk / reward', kPnl: '💰 Profit & loss', kLiq: '💥 Liquidation price', kFee: '🧾 Fees', cap: 'Capital ($)', risk: 'Risk %', entry: 'Entry', stop: 'Stop loss', target: 'Take profit', exit: 'Exit', qty: 'Quantity (units)', lev: 'Leverage', feeSide: 'Fee per side %', feeRT: 'Round-trip fee %', winExp: 'Expected win rate %', mmr: 'Maintenance margin %', side: 'Side', long: 'Long', short: 'Short', amount: 'Trade size ($)', maker: 'Maker %', taker: 'Taker %', perMonth: 'Trades per month', oRiskAmt: 'Amount at risk', oStopDist: 'Stop distance', oQty: 'Size (units)', oNotional: 'Position value', oLev: 'Leverage needed', oLoss: 'Loss if stopped out', oRR: 'Risk / reward (after fees)', oBE: 'Break-even win rate', oEV: 'Expectancy per trade', oVerdict: 'Verdict at your win rate', oGross: 'Gross P&L', oFee: 'Total fees', oNet: 'Net P&L', oMargin: 'Margin used', oROE: 'Return on margin', oChg: 'Price change', oLiq: 'Approx. liquidation price', oDist: 'Distance to liquidation', oWipe: 'Adverse move that wipes margin', oTT: 'Taker in and out', oMT: 'Maker in, Taker out', oMonthly: 'Monthly cost (Taker)', oBEmove: 'Move needed to break even', noLev: 'none', posi: 'positive', nega: 'negative', evenv: 'break-even', cHint: 'Entry is filled from this extension\u2019s live price. Figures are approximate and educational; slippage and tiered rates are not modelled.', brand: 'Entekhab', tMarket: 'Market', tReport: 'Report', tPosts: 'Channel', tAlerts: 'Alerts', search: 'Search coin…', above: 'above', below: 'below', add: 'Add',
     settings: 'Settings', badge: 'Toolbar badge', notifyPosts: 'Notify new Coin_Kurd posts', privacy: 'Settings stay in this browser only; nothing about you is sent anywhere.',
     enc: '📚 Encyclopedia', academy: '🏛 Academy', lab: '🧪 Simulator', dash: '📊 Dashboard', bot: '🤖 Bot', nfa: 'Not financial advice', fng: 'Fear & Greed', mcap: 'Total market cap', dom: 'BTC dominance',
     upd: 'Updated', ago: 'min ago', now: 'just now', off: 'Off', noAlerts: 'No alerts yet. You get a notification when the price reaches your level.', hit: 'triggered', loading: 'Loading…',
@@ -47,6 +47,7 @@ function applyLang() {
 
 function render() {
   const m = S.market;
+  if ($('#cKind')) cRender();
   // KPIs
   if (m) {
     const f = m.fng || {}, g = m.global || {};
@@ -89,6 +90,100 @@ function render() {
     : `<p class="empty">${t('noAlerts')}</p>`;
 }
 
+/* ------------------------------------------------------------------ calculator
+   همان فرمول‌های /academy/lab/ ، با این تفاوت که قیمت ورود از نرخ زندهٔ افزونه پر می‌شود. */
+const CALCS = {
+  size: { t: 'kSize', f: [['zCap', 'cap', 1000], ['zRisk', 'risk', 1], ['zEn', 'entry', 100, 1], ['zSl', 'stop', 95, 2]] },
+  rr: { t: 'kRR', f: [['rEn', 'entry', 100, 1], ['rSl', 'stop', 95, 2], ['rTp', 'target', 112, 2], ['rFee', 'feeRT', 0.2], ['rWin', 'winExp', 40]] },
+  pnl: { t: 'kPnl', f: [['pSide', 'side', 'long'], ['pEn', 'entry', 100, 1], ['pEx', 'exit', 108, 2], ['pQty', 'qty', 10], ['pLev', 'lev', 1], ['pFee', 'feeSide', 0.1]] },
+  liq: { t: 'kLiq', f: [['lSide', 'side', 'long'], ['lEn', 'entry', 100, 1], ['lLev', 'lev', 10], ['lMm', 'mmr', 0.5]] },
+  fee: { t: 'kFee', f: [['fAmt', 'amount', 1000], ['fMk', 'maker', 0.1], ['fTk', 'taker', 0.1], ['fN', 'perMonth', 20]] }
+};
+let cSaveT = 0, cSig = '';
+const cNum = id => { const el = $('#' + id); return el ? parseFloat(el.value) : NaN; };
+const usd = v => (v < 0 ? '-$' : '$') + fmt(Math.abs(v));
+const pc = (v, d = 2) => !isFinite(v) ? '—' : (v >= 0 ? '+' : '') + v.toFixed(d) + '%';
+const cls = v => !isFinite(v) || v === 0 ? '' : v > 0 ? 'up' : 'dn';
+
+function cFields() {
+  const k = CALCS[(S.calcKind || 'size')] || CALCS.size, saved = S.calcVals || {};
+  $('#cForm').innerHTML = k.f.map(([id, lbl, dv]) => {
+    const v = saved[id] != null ? saved[id] : dv;
+    if (id.endsWith('Side')) return `<label>${esc(t('side'))}<select id="${id}"><option value="long"${v === 'short' ? '' : ' selected'}>${esc(t('long'))}</option><option value="short"${v === 'short' ? ' selected' : ''}>${esc(t('short'))}</option></select></label>`;
+    return `<label>${esc(t(lbl))}<input id="${id}" type="number" step="any" value="${esc(v)}"></label>`;
+  }).join('');
+  $('#cForm').querySelectorAll('input,select').forEach(el => { el.oninput = cRun; el.onchange = cRun; });
+}
+function cPrice() {                       // نرخ زندهٔ کوین انتخاب‌شده، برای پر کردن فیلد ورود
+  const c = coins().find(x => x.coin === (S.calcCoin || 'BTC'));
+  return c && isFinite(c.price) ? c.price : null;
+}
+function cUseLive() {
+  const px = cPrice(); if (px == null) return;
+  const k = CALCS[(S.calcKind || 'size')] || CALCS.size;
+  const ent = k.f.find(f => f[3] === 1);                       // فیلد ورود
+  const el = ent && $('#' + ent[0]); if (!el) return;
+  const old = parseFloat(el.value), ratio = old > 0 ? px / old : null;
+  el.value = px;
+  // بقیهٔ فیلدهای قیمتی با همان نسبت جابه‌جا می‌شوند تا فاصلهٔ درصدی حد ضرر و هدف دست‌نخورده بماند
+  if (ratio) k.f.filter(f => f[3] === 2).forEach(f => {
+    const e2 = $('#' + f[0]), v = e2 && parseFloat(e2.value);
+    if (e2 && isFinite(v)) e2.value = parseFloat((v * ratio).toPrecision(8));
+  });
+  cRun();
+}
+function cOut(rows) {
+  $('#cOut').innerHTML = rows.map(([lbl, val, c, key]) => `<div class="r${key ? ' k' : ''}"><span>${esc(lbl)}</span><b class="${c || ''}">${esc(val)}</b></div>`).join('');
+}
+function cRun() {
+  const kind = S.calcKind || 'size', vals = {};
+  (CALCS[kind] || CALCS.size).f.forEach(([id]) => { const el = $('#' + id); if (el) vals[id] = el.value; });
+  S.calcVals = Object.assign({}, S.calcVals, vals);
+  clearTimeout(cSaveT);
+  cSaveT = setTimeout(() => chrome.storage.local.set({ calcVals: S.calcVals, calcKind: kind, calcCoin: S.calcCoin || 'BTC' }), 400);
+  if (kind === 'size') {
+    const cap = cNum('zCap'), r = cNum('zRisk'), en = cNum('zEn'), sl = cNum('zSl'), d = Math.abs(en - sl), q = cap * r / 100 / d;
+    cOut([[t('oQty'), isFinite(q) ? fmt(q) : '—', '', 1], [t('oRiskAmt'), usd(cap * r / 100)], [t('oStopDist'), pc(d / en * 100)],
+      [t('oNotional'), usd(q * en)], [t('oLev'), q * en > cap ? (q * en / cap).toFixed(2) + '×' : t('noLev'), q * en > cap ? 'dn' : ''],
+      [t('oLoss'), usd(-q * d), 'dn']]);
+  } else if (kind === 'rr') {
+    const en = cNum('rEn'), sl = cNum('rSl'), tp = cNum('rTp'), fee = (cNum('rFee') || 0) / 100 * en, w = cNum('rWin') / 100;
+    const risk = Math.abs(en - sl) + fee, rew = Math.abs(tp - en) - fee, rr = rew / risk, be = 1 / (1 + rr), ev = w * rew - (1 - w) * risk;
+    cOut([[t('oRR'), isFinite(rr) ? '1 : ' + rr.toFixed(2) : '—', '', 1], [t('oBE'), pc(be * 100, 1).replace('+', '')],
+      [t('oEV'), (ev / risk).toFixed(2) + 'R', cls(ev)],
+      [t('oVerdict'), w > be ? t('posi') : w < be ? t('nega') : t('evenv'), cls(w - be)]]);
+  } else if (kind === 'pnl') {
+    const d = $('#pSide').value === 'long' ? 1 : -1, en = cNum('pEn'), ex = cNum('pEx'), q = cNum('pQty');
+    const lev = Math.max(1, cNum('pLev') || 1), fr = (cNum('pFee') || 0) / 100;
+    const g = (ex - en) * q * d, fee = (en + ex) * q * fr, n = g - fee, m = en * q / lev;
+    cOut([[t('oNet'), usd(n), cls(n), 1], [t('oGross'), usd(g), cls(g)], [t('oFee'), usd(-fee), 'dn'],
+      [t('oMargin'), usd(m)], [t('oROE'), pc(n / m * 100), cls(n)], [t('oChg'), pc((ex / en - 1) * 100), cls((ex - en) * d)]]);
+  } else if (kind === 'liq') {
+    const isL = $('#lSide').value === 'long', en = cNum('lEn'), lev = Math.max(1, cNum('lLev')), mm = (cNum('lMm') || 0) / 100;
+    const liq = isL ? en * (1 - 1 / lev + mm) : en * (1 + 1 / lev - mm);
+    cOut([[t('oLiq'), fmt(liq), 'dn', 1], [t('oDist'), pc(Math.abs(liq / en - 1) * 100).replace('+', '')],
+      [t('oWipe'), '≈ ' + (100 / lev).toFixed(2) + '%']]);
+  } else {
+    const a = cNum('fAmt'), mk = cNum('fMk') / 100, tk = cNum('fTk') / 100, n = cNum('fN');
+    cOut([[t('oTT'), usd(a * tk * 2), '', 1], [t('oMT'), usd(a * (mk + tk))],
+      [t('oMonthly'), usd(a * tk * 2 * n), 'dn'], [t('oBEmove'), pc(tk * 2 * 100, 3)]]);
+  }
+}
+function cRender() {
+  const kind = S.calcKind || 'size', cur = S.calcCoin || 'BTC', sig = kind + '|' + L;
+  const cs = coins().slice(0, 40);
+  if (sig !== cSig) {
+    $('#cKind').innerHTML = Object.keys(CALCS).map(k => `<option value="${k}"${k === kind ? ' selected' : ''}>${esc(t(CALCS[k].t))}</option>`).join('');
+    $('#cHint').textContent = t('cHint');
+  }
+  const want = cs.length ? cs.map(c => c.coin).join(',') : '—';
+  if ($('#cCoin').dataset.list !== want) {
+    $('#cCoin').dataset.list = want;
+    $('#cCoin').innerHTML = cs.length ? cs.map(c => `<option value="${esc(c.coin)}"${c.coin === cur ? ' selected' : ''}>${esc(c.coin)}</option>`).join('') : '<option>—</option>';
+  }
+  if (sig !== cSig) { cSig = sig; cFields(); cRun(); }
+}
+
 async function load() {
   S = await chrome.storage.local.get(null);
   L = S.lang || (navigator.language.startsWith('fa') ? 'fa' : navigator.language.startsWith('en') ? 'en' : 'fa');
@@ -113,6 +208,8 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
 });
 document.querySelectorAll('.lang button').forEach(b => b.onclick = async () => { L = b.dataset.l; await chrome.storage.local.set({ lang: L }); applyLang(); });
 $('#refresh').onclick = refresh;
+$('#cKind').onchange = async e => { S.calcKind = e.target.value; await chrome.storage.local.set({ calcKind: S.calcKind }); cRender(); };
+$('#cCoin').onchange = async e => { S.calcCoin = e.target.value; await chrome.storage.local.set({ calcCoin: S.calcCoin }); cUseLive(); };
 $('#q').oninput = render;
 $('#badge').onchange = async e => { S.badge = e.target.value; await chrome.storage.local.set({ badge: S.badge }); };
 $('#notifyPosts').onchange = async e => {
