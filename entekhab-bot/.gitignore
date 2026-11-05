@@ -1,0 +1,12 @@
+# never commit secrets or live state
+.env
+config/config.local.json
+user_data/logs/
+user_data/data/
+user_data/*.sqlite
+user_data/*.sqlite-shm
+user_data/*.sqlite-wal
+user_data/backtest_results/
+user_data/hyperopt_results/
+user_data/strategies_orig_updater/
+user_data/plot/
