@@ -364,6 +364,9 @@ AC = {
              "kmr": "🔒 Pêşketina te tenê di geroka te de tê tomarkirin. Perwerdeyî ye, ne şîreta darayî ye.",
              "ar": "🔒 يُحفظ تقدمك في متصفحك فقط. محتوى تعليمي وليس نصيحة مالية.",
              "en": "🔒 Your progress is stored only in your own browser. Educational, not financial advice."},
+    "b_study": {"fa": "📖 خواندن درس‌ها در همین ربات", "ckb": "📖 خوێندنی وانەکان لە هەمان بۆت",
+                "kmr": "📖 Dersan di vê botê de bixwîne", "ar": "📖 ادرس الدروس داخل البوت",
+                "en": "📖 Study the lessons inside the bot"},
     "b_enter": {"fa": "🏛 ورود به آکادمی", "ckb": "🏛 چوونە ناو ئەکادیمیا", "kmr": "🏛 Têkeve akademiyê", "ar": "🏛 ادخل الأكاديمية",
                 "en": "🏛 Open the academy"},
     "b_path": {"fa": "🎓 مسیر یادگیری", "ckb": "🎓 ڕێڕەوی فێربوون", "kmr": "🎓 Rêya fêrbûnê", "ar": "🎓 مسار التعلم", "en": "🎓 Learning path"},
@@ -418,7 +421,9 @@ def academy(lang):
             out.append(f"{mark} {f['icon']} {_num(f['n'], lang)}. {fac_title(f, lang)}{tail}")
     out += ["", L(AC["path"], lang), "", L(AC["note"], lang)]
     u = lambda k, path: {"text": L(AC[k], lang), "url": SITE + path}
-    rows = [[u("b_enter", "/academy/")]]
+    # اول درس‌های داخل ربات، بعد لینک‌های سایت: کسی که ربات را دارد نباید مجبور به باز کردن سایت باشد
+    rows = [[{"text": L(AC["b_study"], lang), "callback_data": "ak:f"}],
+            [u("b_enter", "/academy/")]]
     fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
     rows += [fac_btns[i:i + 2] for i in range(0, len(fac_btns), 2)]
     rows += [[u("b_path", "/learn/"), u("b_lab", "/academy/lab/")],

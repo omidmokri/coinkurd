@@ -83,6 +83,15 @@ def plain(t, n=160):
     return t[:n] + ("…" if len(t) > n else "")
 
 
+
+def post_img(p):
+    """تصویر پست: همیشه نسخهٔ ذخیره‌شده در مخزن، و فقط در نبودش نشانی تلگرام.
+    نشانی‌های cdn4.telesco.pe پس از چند ماه منقضی می‌شوند (scripts/postimg.py آن‌ها را محلی می‌کند)."""
+    local = p.get("img") or ""
+    if local.startswith("/data/postimg/"):
+        return local
+    return (p.get("photos") or [""])[0]
+
 def fmt_date(iso):
     try:
         return datetime.fromisoformat(iso).strftime("%Y-%m-%d %H:%M UTC")
@@ -256,12 +265,12 @@ def build_post(p):
     tr = p.get("tr") or {}
     title = p["title"]
     desc = plain(p["text"]) or title
-    img = p["photos"][0] if p.get("photos") else ""
+    img = post_img(p)
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
     body = f'<div class="meta"><span class="pill">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</span>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span></div>'
     body += f'<h1>{e(title)}</h1>'
     if img:
-        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy">'
+        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
     body += f'<div class="txt">{rich(p["text"])}</div>'
     for lg, lbl in (("ckb", "کوردی (سۆرانی)"), ("en", "English")):
         if tr.get(lg):
@@ -310,11 +319,11 @@ def build_post_lang(p, lg):
     L = LBL_L[lg]
     title = t.get("title") or p["title"]
     desc = plain(t["text"]) or title
-    img = p["photos"][0] if p.get("photos") else ""
+    img = post_img(p)
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
     body = f'<div class="meta">{coins}<time datetime="{p.get("date", "")}">{fmt_date(p.get("date", ""))}</time></div><h1>{e(title)}</h1>'
     if img:
-        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy">'
+        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
     body += f'<div class="txt">{rich(t["text"])}</div>'
     body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(su(p["url"]))}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,

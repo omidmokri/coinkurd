@@ -247,10 +247,15 @@ T = {
 FOOT_COLS = ["mkt", "ana", "tools", "learn", "arc", "more"]
 
 
+# مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
+GLOW = {"/academy/", "/academy/f13/"}
+
+
 def _item(href, ic, title, desc, lang):
     ext = href.startswith("http")
     tgt = ' target="_blank" rel="noopener noreferrer"' if ext else ""
-    return (f'<a class="ek-it" href="{href}"{tgt}><span class="ek-ic">{icon(ic)}</span>'
+    cls = "ek-it ekg" if href in GLOW else "ek-it"
+    return (f'<a class="{cls}" href="{href}"{tgt}><span class="ek-ic">{icon(ic)}</span>'
             f'<span class="ek-tx">{tri(title, lang, "ek-i ek-tt", "b")}{tri(desc, lang, "ek-i ek-ds", "small")}</span></a>')
 
 
@@ -271,7 +276,8 @@ def header(lang="fa"):
         c = cats[k]
         end = " ek-end" if i >= len(TOP_ORDER) - 2 else ""
         items = "".join(_item(h, ic, t, d, lang) for h, ic, t, d in c["items"])
-        parts.append(f'<div class="ek-mi{end}" data-k="{k}"><button class="ek-mt" type="button" aria-expanded="false" aria-haspopup="true">'
+        mt = "ek-mt ekg ekg-pill" if k == "learn" else "ek-mt"
+        parts.append(f'<div class="ek-mi{end}" data-k="{k}"><button class="{mt}" type="button" aria-expanded="false" aria-haspopup="true">'
                      f'{tri(c["t"], lang)}{icon("chev", "ek-svg ek-chev")}</button><div class="ek-mp"><div class="ek-mg">{items}</div></div></div>')
     tools = (f'<button class="ek-ib ek-sb" type="button"{aria(T["search"], lang)}>{icon("search")}</button>'
              f'<a class="ek-ib ek-tgb" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener noreferrer"{aria(T["tg"], lang)}><i class="ek-si b-telegram"></i></a>'

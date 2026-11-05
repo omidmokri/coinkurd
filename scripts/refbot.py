@@ -47,6 +47,7 @@ import bot_outage as OU  # noqa: E402
 import bot_token as TK  # noqa: E402
 import bot_watch as W  # noqa: E402
 import bot_learn as LN  # noqa: E402
+import bot_academy as AK  # noqa: E402
 import bot_menu as MN  # noqa: E402
 import bot_art as ART  # noqa: E402
 import bot_fixmedia as FX  # noqa: E402
@@ -1344,6 +1345,9 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "la":
         text, rows = LN.academy(lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "ak":                                  # آکادمی داخل ربات: درس، آزمون و پیشرفت
+        text, rows = AK.route(x, val, lang)
         return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "lr":
         x["await"] = "report"

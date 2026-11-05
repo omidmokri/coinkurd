@@ -30,6 +30,7 @@ e = BP.e
 SITE = BP.SITE
 OUT = os.path.join(BP.ROOT, "academy")
 VER = "1"
+GLOW = {"f13"}          # دانشکده‌هایی که در فهرست و در سربرگ، حاشیهٔ نور چرخان می‌گیرند (کلاس ekg)
 N_FAC = len(AD.FACULTIES)          # شمار دانشکده‌ها — از academy_data خوانده می‌شود، نه دستی
 N_LAB = len(LAB.NAV)                # شمار ابزارهای آزمایشگاه — از academy_lab.NAV
 SECS = [("beginner", "🌱 توضیح ساده"), ("intermediate", "📘 توضیح متوسط"), ("expert", "🔬 توضیح تخصصی")]
@@ -195,11 +196,13 @@ def faculty_page(f, M):
                 f'<h2>🗺 سرفصل‌های برنامه‌ریزی‌شده</h2>{pl}')
     lo, hi = f["lv"]
     body = (topbar(['<a href="/academy/">آکادمی</a>', e(f["title"])])
-            + f'<div id="ac" data-page="faculty" data-fid="{f["id"]}"><p class="ac-kicker">دانشکدهٔ {fa(f["n"])} از ۱۲</p>'
+            + f'<div id="ac" data-page="faculty" data-fid="{f["id"]}">'
+            + f'<div class="ac-head{" ekg" if f["id"] in GLOW else ""}"><p class="ac-kicker">دانشکدهٔ {fa(f["n"])} از {fa(N_FAC)}</p>'
             f'<h1>{f["icon"]} {e(f["title"])}</h1><p class="ac-en" dir="ltr">{e(f["en"])}</p>'
             f'<div class="ac-facts"><span>سطح {fa(lo)} تا {fa(hi)} · {LV_FA[lo]} تا {LV_FA[hi]}</span>'
             + (f'<span>{fa(len(f["lessons"]))} درس</span><span>{fa(sum(len(L["quiz"]) for L in f["lessons"]))} سؤال</span>' if f["mod"] else '<span>در حال تولید</span>')
-            + f'</div><div class="ac-lock" id="acLock" hidden></div><p class="txt">{e(f["summary"])}</p><div class="ac-goal"><b>🎯 خروجی دانشکده:</b> {e(f["outcome"])}</div>'
+            + '</div></div>'
+            + f'<div class="ac-lock" id="acLock" hidden></div><p class="txt">{e(f["summary"])}</p><div class="ac-goal"><b>🎯 خروجی دانشکده:</b> {e(f["outcome"])}</div>'
             f'{main}</div>{mapscript(M)}')
     return BP.page(f"academy/{f['id']}/", f"{f['title']} — آکادمی کریپتو entekhab", f["summary"], body, HEAD + foot_js())
 
@@ -212,7 +215,7 @@ def home_page(F, M):
     for f in F:
         lo, hi = f["lv"]
         st = f'{fa(len(f["lessons"]))} درس' if f["mod"] else "در حال تولید"
-        rows += (f'<a class="ac-fac{"" if f["mod"] else " wip"}" data-fid="{f["id"]}" href="/academy/{f["id"]}/"><span class="ac-n">{fa(f["n"])}</span>'
+        rows += (f'<a class="ac-fac{"" if f["mod"] else " wip"}{" ekg" if f["id"] in GLOW else ""}" data-fid="{f["id"]}" href="/academy/{f["id"]}/"><span class="ac-n">{fa(f["n"])}</span>'
                  f'<span class="ac-fi">{f["icon"]}</span><span class="ac-ft"><b>{e(f["title"])}</b><small>{e(f["outcome"])}</small></span>'
                  f'<span class="ac-fm"><small>سطح {fa(lo)} تا {fa(hi)} · {st}</small><span class="pbar"><i style="width:0"></i></span><span class="ac-fs"></span></span></a>')
     levels = "".join(f'<li data-lv="{n}"><b>{fa(n)}. {fa_}</b> <small dir="ltr">{en}</small></li>' for n, en, fa_, _ in AD.LEVELS)
