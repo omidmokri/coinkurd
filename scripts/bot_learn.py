@@ -318,14 +318,36 @@ FAC_T = {
     "f11": {"ckb": "DeFi، وێب ٣ و تەکنەلۆژیای پێشکەوتوو", "kmr": "DeFi, Web3 û teknolojiya pêşketî", "ar": "التمويل اللامركزي والويب 3 والتقنيات المتقدمة"},
     "f12": {"ckb": "توێژینەوەی پسپۆڕی و پڕۆژەی کۆتایی", "kmr": "Pisporî û projeya dawî", "ar": "التخصص والمشروع النهائي"},
 }
+# شمار دانشکده‌ها از academy_data خوانده می‌شود تا متن ربات هرگز از سایت عقب نماند.
+_FA_D, _AR_D = "۰۱۲۳۴۵۶۷۸۹", "٠١٢٣٤٥٦٧٨٩"
+
+
+def _num(n, lang="fa"):
+    d = {"fa": _FA_D, "ckb": _AR_D}.get(lang)
+    return "".join(d[int(c)] for c in str(n)) if d else str(n)
+
+
+def _n_fac():
+    try:
+        import os
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import academy_data as AD
+        return len(AD.FACULTIES)
+    except Exception:
+        return 0
+
+
+_NFAC = _n_fac()
+
 AC = {
     "title": {"fa": "🏛 <b>آکادمی کریپتو انتخاب</b>", "ckb": "🏛 <b>ئەکادیمیای کریپتۆی ئینتیخاب</b>", "kmr": "🏛 <b>Akademiya Kriptoyê ya Entekhab</b>",
               "ar": "🏛 <b>أكاديمية انتخاب للكريبتو</b>", "en": "🏛 <b>Entekhab Crypto Academy</b>"},
-    "desc": {"fa": "۱۲ دانشکده از صفر تا حرفه‌ای، با آزمون، شبیه‌ساز معامله و گواهی — رایگان در entekhab.net",
-             "ckb": "١٢ کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە، سیمولەیتەر و بڕوانامە — بەخۆڕایی لە entekhab.net",
-             "kmr": "12 fakulte ji sifirê heta profesyonel, bi ezmûn, sîmulator û sertîfîka — belaş li entekhab.net",
-             "ar": "12 كلية من الصفر حتى الاحتراف، مع اختبارات ومحاكي تداول وشهادات — مجاناً على entekhab.net",
-             "en": "12 faculties from zero to pro, with quizzes, a trading simulator and certificates — free on entekhab.net"},
+    "desc": {"fa": f"{_num(_NFAC)} دانشکده از صفر تا حرفه‌ای، با آزمون، شبیه‌ساز معامله و گواهی — رایگان در entekhab.net",
+             "ckb": f"{_num(_NFAC, 'ckb')} کۆلێژ لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە، سیمولەیتەر و بڕوانامە — بەخۆڕایی لە entekhab.net",
+             "kmr": f"{_NFAC} fakulte ji sifirê heta profesyonel, bi ezmûn, sîmulator û sertîfîka — belaş li entekhab.net",
+             "ar": f"{_num(_NFAC, 'ckb')} كلية من الصفر حتى الاحتراف، مع اختبارات ومحاكي تداول وشهادات — مجاناً على entekhab.net",
+             "en": f"{_NFAC} faculties from zero to pro, with quizzes, a trading simulator and certificates — free on entekhab.net"},
     "stat": {"fa": "✅ {p} دانشکده منتشر شده · {n} درس · بقیه به‌ترتیب اضافه می‌شوند",
              "ckb": "✅ {p} کۆلێژ بڵاوکراوەتەوە · {n} وانە · ئەوانی تر بە ڕیز زیاد دەکرێن",
              "kmr": "✅ {p} fakulte hatine weşandin · {n} ders · yên din li pey hev tên",
