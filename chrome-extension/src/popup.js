@@ -5,17 +5,17 @@ const $ = s => document.querySelector(s);
 const T = {
   fa: { brand: 'انتخاب', tMarket: 'بازار', tReport: 'گزارش', tPosts: 'کانال', tAlerts: 'هشدار', search: 'جست‌وجوی کوین…', above: 'بالاتر از', below: 'پایین‌تر از', add: 'افزودن',
     settings: 'تنظیمات', badge: 'عدد روی آیکون', notifyPosts: 'اعلان پست‌های تازهٔ Coin_Kurd', privacy: 'همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.',
-    academy: '🏛 آکادمی', lab: '🧪 شبیه‌ساز', dash: '📊 داشبورد', bot: '🤖 ربات', nfa: 'توصیهٔ مالی نیست', fng: 'ترس و طمع', mcap: 'ارزش کل بازار', dom: 'دامیننس BTC',
+    enc: '📚 دانشنامه', academy: '🏛 آکادمی', lab: '🧪 شبیه‌ساز', dash: '📊 داشبورد', bot: '🤖 ربات', nfa: 'توصیهٔ مالی نیست', fng: 'ترس و طمع', mcap: 'ارزش کل بازار', dom: 'دامیننس BTC',
     upd: 'به‌روزرسانی', ago: 'دقیقه پیش', now: 'همین الان', off: 'خاموش', noAlerts: 'هنوز هشداری نساخته‌اید. وقتی قیمت به عدد شما برسد، اعلان می‌گیرید.', hit: 'فعال شد', loading: 'در حال بارگذاری…',
     err: 'داده در دسترس نیست؛ اتصال اینترنت را بررسی کنید.', more: 'گزارش کامل در سایت', allPosts: 'همهٔ پست‌ها', fngC: { 'Extreme Fear': 'ترس شدید', Fear: 'ترس', Neutral: 'خنثی', Greed: 'طمع', 'Extreme Greed': 'طمع شدید' } },
   ckb: { brand: 'ئینتیخاب', tMarket: 'بازاڕ', tReport: 'ڕاپۆرت', tPosts: 'کەناڵ', tAlerts: 'ئاگاداری', search: 'گەڕان بۆ دراو…', above: 'سەرووی', below: 'خوارووی', add: 'زیادکردن',
     settings: 'ڕێکخستنەکان', badge: 'ژمارە لەسەر ئایکۆن', notifyPosts: 'ئاگاداری پۆستی نوێی Coin_Kurd', privacy: 'هەموو ڕێکخستنەکان تەنها لەم وێبگەڕەدا هەڵدەگیرێن و هیچ زانیارییەک نانێردرێت.',
-    academy: '🏛 ئەکادیمیا', lab: '🧪 سیمولەیتەر', dash: '📊 داشبۆرد', bot: '🤖 بۆت', nfa: 'ئامۆژگاریی دارایی نییە', fng: 'ترس و تەماع', mcap: 'بەهای گشتی بازاڕ', dom: 'باڵادەستیی BTC',
+    enc: '📚 زانستنامە', academy: '🏛 ئەکادیمیا', lab: '🧪 سیمولەیتەر', dash: '📊 داشبۆرد', bot: '🤖 بۆت', nfa: 'ئامۆژگاریی دارایی نییە', fng: 'ترس و تەماع', mcap: 'بەهای گشتی بازاڕ', dom: 'باڵادەستیی BTC',
     upd: 'نوێکردنەوە', ago: 'خولەک لەمەوبەر', now: 'ئێستا', off: 'کوژاوە', noAlerts: 'هێشتا ئاگادارییەکت دروست نەکردووە.', hit: 'چالاک بوو', loading: 'بارکردن…',
     err: 'داتا بەردەست نییە؛ پەیوەندیی ئینتەرنێت بپشکنە.', more: 'ڕاپۆرتی تەواو لە ماڵپەڕ', allPosts: 'هەموو پۆستەکان', fngC: { 'Extreme Fear': 'ترسی زۆر', Fear: 'ترس', Neutral: 'بێلایەن', Greed: 'تەماع', 'Extreme Greed': 'تەماعی زۆر' } },
   en: { brand: 'Entekhab', tMarket: 'Market', tReport: 'Report', tPosts: 'Channel', tAlerts: 'Alerts', search: 'Search coin…', above: 'above', below: 'below', add: 'Add',
     settings: 'Settings', badge: 'Toolbar badge', notifyPosts: 'Notify new Coin_Kurd posts', privacy: 'Settings stay in this browser only; nothing about you is sent anywhere.',
-    academy: '🏛 Academy', lab: '🧪 Simulator', dash: '📊 Dashboard', bot: '🤖 Bot', nfa: 'Not financial advice', fng: 'Fear & Greed', mcap: 'Total market cap', dom: 'BTC dominance',
+    enc: '📚 Encyclopedia', academy: '🏛 Academy', lab: '🧪 Simulator', dash: '📊 Dashboard', bot: '🤖 Bot', nfa: 'Not financial advice', fng: 'Fear & Greed', mcap: 'Total market cap', dom: 'BTC dominance',
     upd: 'Updated', ago: 'min ago', now: 'just now', off: 'Off', noAlerts: 'No alerts yet. You get a notification when the price reaches your level.', hit: 'triggered', loading: 'Loading…',
     err: 'Data unavailable; check your connection.', more: 'Full report on the site', allPosts: 'All posts', fngC: {} }
 };
