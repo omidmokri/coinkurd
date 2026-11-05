@@ -101,3 +101,6 @@ html[dir=rtl] .ac-msg.me{align-self:flex-start}.ac-msg small{display:block;color
 .lab-scroll{overflow-x:auto}
 .up{color:#22c55e}.down{color:#ef4444}
 @media(prefers-reduced-motion:reduce){.pbar i{transition:none}}
+.ac-head{border-radius:16px}
+.ac-head.ekg{padding:14px 16px;margin-bottom:14px;background:var(--card);border:1px solid var(--line)}
+.ac-head.ekg .ac-kicker{margin-top:0}

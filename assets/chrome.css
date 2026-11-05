@@ -197,3 +197,29 @@
 html.ek-app .ek-appb,html.ek-app .ekf-apps,html.ek-app #eka:not(.ek-upd),html.ek-app #eks .ekf-apps{display:none!important}
 @media (prefers-reduced-motion:reduce){#ekh *,#ekf *,#eks *,#ekq *,#eks .ek-sh,#ekq form{transition:none!important;animation:none!important}}
 @media print{#ekh,#ekb,#ekf,#eks,#ekq,#eka,.ek-skip{display:none!important}}
+
+/* ---------------------------------------------------------------- رقص نور
+   حاشیهٔ گرادیانی چرخان برای چند نقطهٔ کلیدی آموزشی (آموزش، آکادمی، دانشکدهٔ مهندس مکری).
+   دو لایه: هالهٔ نرم پشت عنصر، و یک حلقهٔ نازک روی لبه که با ماسک فقط حاشیه را نگه می‌دارد. */
+@property --ekg{syntax:"<angle>";initial-value:0deg;inherits:false}
+.ekg{position:relative;isolation:isolate}
+.ekg::before,.ekg::after{content:"";position:absolute;inset:-2px;border-radius:inherit;z-index:-1;pointer-events:none;
+  background:conic-gradient(from var(--ekg),#8b5cf6,#22d3ee,#34d399,#fbbf24,#f472b6,#8b5cf6);
+  animation:ekg-spin 5s linear infinite}
+/* هر دو لایه با ماسک به «حلقه» تبدیل می‌شوند، وگرنه فرزند با z-index منفی روی پس‌زمینهٔ خود عنصر
+   کشیده می‌شود و کل کادر را پر می‌کند (در کادرهای بزرگ کاملاً پیداست). */
+.ekg::before,.ekg::after{
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+.ekg::before{padding:5px;filter:blur(8px);opacity:.55}
+.ekg::after{padding:1.6px}
+.ekg:hover::before{opacity:.8}
+@keyframes ekg-spin{to{--ekg:360deg}}
+/* بدون پشتیبانی @property گرادیان نمی‌چرخد؛ حلقه می‌ماند و فقط هاله نفس می‌کشد */
+@supports not (background:conic-gradient(from var(--ekg),#000,#fff)){
+  .ekg::before,.ekg::after{background:linear-gradient(90deg,#8b5cf6,#22d3ee,#34d399,#fbbf24,#f472b6);animation:ekg-fade 3.5s ease-in-out infinite alternate}
+}
+@keyframes ekg-fade{from{opacity:.35}to{opacity:.8}}
+/* حرکت برای کسی که کاهش حرکت را خواسته، خاموش است */
+@media (prefers-reduced-motion:reduce){.ekg::before,.ekg::after{animation:none}}
+.ekg-pill{border-radius:99px}
