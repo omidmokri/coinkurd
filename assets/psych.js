@@ -590,6 +590,25 @@
         S.trades.push(t); save(); var s2 = renderAll(); snapshot(s2);
         $('#psJMsg').textContent = 'افزوده شد — ' + FA(S.trades.length) + ' معامله.';
         break;
+      case 'psFromLab':
+        var lab = {};
+        try { lab = JSON.parse(localStorage.getItem('ek_acad_lab') || '{}') || {}; } catch (e2) {}
+        var rows = (lab.journal || []).map(function (x) {
+          return { t: new Date(x.t || Date.now()).toISOString(), sym: x.sym, side: x.side,
+                   setup: x.emo === 'calm' ? 'طبق برنامه' : '', en: x.en, ex: x.ex, qty: x.q,
+                   sl0: x.sl, sl: x.sl, pnl: x.pnl, risk: x.risk != null ? x.risk : undefined,
+                   plan: x.plan != null ? x.plan : (x.emo === 'calm' ? true : (x.emo === 'fomo' || x.emo === 'revenge') ? false : null),
+                   chase: x.emo === 'fomo' ? true : undefined,
+                   note: x.note, fromLab: true };
+        });
+        if (!rows.length) { $('#psJMsg').textContent = 'ژورنال آزمایشگاه خالی است.'; break; }
+        var have = {};
+        S.trades.forEach(function (x) { if (x.fromLab) have[x.t] = 1; });
+        var add = rows.filter(function (x) { return !have[x.t]; });
+        S.trades = S.trades.concat(add); save(); renderAll();
+        $('#psJMsg').textContent = FA(add.length) + ' معامله از ژورنال آزمایشگاه آورده شد' +
+          (rows.length - add.length ? ' (' + FA(rows.length - add.length) + ' مورد تکراری رد شد)' : '') + '.';
+        break;
       case 'psJCsv':
         var cols = ['t', 'sym', 'side', 'setup', 'en', 'ex', 'sl0', 'sl', 'tgt', 'qty', 'risk', 'plan', 'emoPre', 'emoPost', 'note'];
         dl('entekhab-journal.csv', cols.join(',') + '\n' + S.trades.map(function (x) {
