@@ -73,6 +73,17 @@ table.t th{color:var(--mute);font-weight:600;font-size:.84rem;white-space:nowrap
 .more:hover{border-color:var(--o)}
 .cnt{color:var(--mute);font-size:.85rem;margin-bottom:8px}
 @media(max-width:560px){table.t th:nth-child(3),table.t td:nth-child(3){display:none}}
+.wz{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:14px 0}
+.wz label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--mute)}
+.wz label.chk{flex-direction:row;align-items:center;gap:8px}
+.wz input,.wz select{background:#0d0e11;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 10px;font:inherit;min-width:0}
+.wz input[type=checkbox]{width:18px;height:18px;accent-color:var(--o);padding:0}
+.wz label.live span{color:#f6aa3c;font-weight:700}
+.wtabs{display:flex;gap:6px;margin:12px 0 0;flex-wrap:wrap}
+.wtabs button{background:#0d0e11;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 14px;font:inherit;font-size:.85rem;cursor:pointer}
+.wtabs button.on{border-color:var(--o);color:var(--o)}
+#wOut{max-height:360px;overflow:auto;margin-top:8px}
+.wwarn{border:1px solid rgba(246,170,60,.45);background:rgba(246,170,60,.08);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.9rem;line-height:1.9}
 </style>
 <link rel="stylesheet" href="/assets/chrome.css?v=3"><meta name="referrer" content="strict-origin-when-cross-origin"></head>
 <body>
@@ -94,7 +105,25 @@ table.t th{color:var(--mute);font-weight:600;font-size:.84rem;white-space:nowrap
 
   <section class="card"><h2 data-t="whatT"></h2><div data-t="what"></div></section>
 
-  <section class="card"><h2 data-t="instT"></h2><div data-t="inst1"></div>
+  <section class="card" id="act"><h2 data-t="actT"></h2><div data-t="actLead"></div>
+<div class="wz">
+<label><span data-t="wEx"></span><select id="wEx"><option value="binance">Binance</option><option value="okx">OKX</option><option value="bybit">Bybit</option><option value="kucoin">KuCoin</option><option value="gate">Gate.io</option></select></label>
+<label><span data-t="wCur"></span><select id="wCur"><option>USDT</option><option>USDC</option></select></label>
+<label><span data-t="wStrat"></span><input id="wStrat" list="wStratL" value="NotAnotherSMAOffsetStrategyHO" autocomplete="off"><datalist id="wStratL"></datalist></label>
+<label><span data-t="wTf"></span><select id="wTf"><option value="">—</option><option>1m</option><option>5m</option><option>15m</option><option>1h</option><option>4h</option><option>1d</option></select></label>
+<label><span data-t="wMax"></span><input id="wMax" type="number" min="1" max="20" value="3"></label>
+<label><span data-t="wWallet"></span><input id="wWallet" type="number" min="10" step="10" value="1000"></label>
+<label><span data-t="wStake"></span><input id="wStake" placeholder="unlimited" value="unlimited"></label>
+<label class="chk"><input type="checkbox" id="wTg"><span data-t="wTgL"></span></label>
+<label class="chk"><input type="checkbox" id="wApi"><span data-t="wApiL"></span></label>
+<label class="chk live"><input type="checkbox" id="wLive"><span data-t="wLiveL"></span></label>
+</div>
+<div id="wWarn" class="wwarn" hidden></div>
+<div class="wtabs"><button class="on" data-w="cfg">config.json</button><button data-w="cmd" data-t="wCmd"></button><button data-w="chk" data-t="wChk"></button></div>
+<pre id="wOut"><code id="wCode"></code></pre>
+<div class="btns"><a href="#" id="wDl" class="pri" data-t="wDl"></a><a href="#" id="wCopy" data-t="wCopy"></a></div>
+<p class="note" id="wNote" data-t="wNote"></p></section>
+<section class="card"><h2 data-t="instT"></h2><div data-t="inst1"></div>
     <pre><code>git clone https://github.com/omidmokri/coinkurd.git
 cd coinkurd/entekhab-bot
 ./install.sh</code></pre>
@@ -143,6 +172,23 @@ docker compose up -d &amp;&amp; docker compose logs -f</code></pre>
 <script src="/assets/ui.js"></script>
 <script>
 Object.assign(I.fa, {
+  actT: "🚀 فعال‌سازی ربات — همین‌جا",
+  actLead: "<p>تنظیمات را اینجا انتخاب کنید تا فایل پیکربندی کامل و دستورهای اجرا همین لحظه ساخته شوند. همهٔ محاسبه در مرورگر خودتان انجام می‌شود: <b>هیچ چیزی به سرور ما فرستاده نمی‌شود</b> و این صفحه هرگز کلید API نمی‌خواهد.</p><p class=\"note\">ربات روی سرور یا رایانهٔ خودتان بالا می‌آید، نه روی entekhab.net. این صفحه فقط پیکربندی را برایتان می‌سازد.</p>",
+  wEx: "صرافی",
+  wCur: "ارز پایه",
+  wStrat: "استراتژی",
+  wTf: "تایم‌فریم (خالی = پیش‌فرض استراتژی)",
+  wMax: "حداکثر معاملهٔ هم‌زمان",
+  wWallet: "کیف پول آزمایشی (دلار)",
+  wStake: "حجم هر معامله",
+  wTgL: "اعلان تلگرام",
+  wApiL: "پنل وب روی ۱۲۷.۰.۰.۱",
+  wLiveL: "معاملهٔ واقعی (dry_run خاموش)",
+  wCmd: "دستورها",
+  wChk: "چک‌لیست پیش از راه‌اندازی",
+  wDl: "⬇️ دانلود config.json",
+  wCopy: "📋 کپی",
+  wNote: "فایل ساخته‌شده را در <code class=\"inl\">entekhab-bot/config/</code> بگذارید. کلید API را فقط در همان فایل روی دستگاه خودتان بنویسید.",
   h1: 'ربات معامله‌گر <em>انتخاب</em>',
   lead: 'توزیع فارسی و کوردی <b>Freqtrade</b> — متن‌باز، خودمیزبان، با ۴۶۵ استراتژی جامعه و مستندات کامل. سرویس میزبانی‌شده نیست و توصیهٔ مالی نمی‌دهد.',
   bRepo: '📦 مخزن گیت‌هاب', bZip: '⬇️ دانلود ZIP', bDocs: '📘 راهنمای نصب', bJson: '🧾 فهرست استراتژی‌ها (JSON)',
@@ -216,6 +262,23 @@ Object.assign(I.fa, {
 });
 
 Object.assign(I.ckb, {
+  actT: "🚀 چالاککردنی بۆت — لێرە",
+  actLead: "<p>ڕێکخستنەکان لێرە هەڵبژێرە تا فایلی ڕێکخستن و فەرمانەکانی کارپێکردن هەر ئێستا دروست بن. هەموو ژمێرکاری لە وێبگەڕی خۆتدا ئەنجام دەدرێت: <b>هیچ شتێک بۆ سێرڤەری ئێمە نانێردرێت</b> و ئەم پەڕەیە هەرگیز داوای کلیلی API ناکات.</p><p class=\"note\">بۆتەکە لەسەر سێرڤەر یان کۆمپیوتەری خۆت کار دەکات، نەک لەسەر entekhab.net.</p>",
+  wEx: "بۆرسە",
+  wCur: "دراوی بنەڕەت",
+  wStrat: "ستراتیژی",
+  wTf: "تایمفرەیم (بەتاڵ = بنەڕەتی ستراتیژی)",
+  wMax: "زۆرترین مامەڵەی هاوکات",
+  wWallet: "جزدانی تاقیکردنەوە (دۆلار)",
+  wStake: "قەبارەی هەر مامەڵەیەک",
+  wTgL: "ئاگاداریی تێلێگرام",
+  wApiL: "پانێڵی وێب لەسەر ١٢٧.٠.٠.١",
+  wLiveL: "مامەڵەی ڕاستەقینە (dry_run کوژاوە)",
+  wCmd: "فەرمانەکان",
+  wChk: "لیستی پێش دەستپێکردن",
+  wDl: "⬇️ داگرتنی config.json",
+  wCopy: "📋 لەبەرگرتنەوە",
+  wNote: "فایلە دروستکراوەکە بخە ناو <code class=\"inl\">entekhab-bot/config/</code>. کلیلی API تەنها لەو فایلەدا لەسەر ئامێری خۆت بنووسە.",
   h1: 'بۆتی بازرگانیی <em>ئەنتخاب</em>',
   lead: 'دابەشکردنی کوردی و فارسیی <b>Freqtrade</b> — سەرچاوەکراوە، خۆمیوانداری، لەگەڵ ٤٦٥ ستراتیژیی کۆمەڵگا و بەڵگەنامەی تەواو. خزمەتگوزاریی میوانداریکراو نییە و ئامۆژگاریی دارایی نادات.',
   bRepo: '📦 مەخزەنی گیتهەب', bZip: '⬇️ داگرتنی ZIP', bDocs: '📘 ڕێنمایی دامەزراندن', bJson: '🧾 لیستی ستراتیژییەکان (JSON)',
@@ -273,6 +336,23 @@ Object.assign(I.ckb, {
 });
 
 Object.assign(I.en, {
+  actT: "🚀 Activate the bot — right here",
+  actLead: "<p>Pick your settings and the full config file and run commands are generated instantly. Everything is computed in your own browser: <b>nothing is sent to our server</b>, and this page never asks for an API key.</p><p class=\"note\">The bot runs on your own server or computer, not on entekhab.net. This page only builds the configuration for you.</p>",
+  wEx: "Exchange",
+  wCur: "Stake currency",
+  wStrat: "Strategy",
+  wTf: "Timeframe (empty = strategy default)",
+  wMax: "Max open trades",
+  wWallet: "Dry-run wallet (USD)",
+  wStake: "Stake per trade",
+  wTgL: "Telegram alerts",
+  wApiL: "Web panel on 127.0.0.1",
+  wLiveL: "Live trading (dry_run off)",
+  wCmd: "Commands",
+  wChk: "Pre-flight checklist",
+  wDl: "⬇️ Download config.json",
+  wCopy: "📋 Copy",
+  wNote: "Put the generated file in <code class=\"inl\">entekhab-bot/config/</code>. Write your API key only in that file, on your own machine.",
   h1: 'The <em>Entekhab</em> trading bot',
   lead: 'A Persian/Kurdish distribution of <b>Freqtrade</b> — open source, self-hosted, with 465 community strategies and full documentation. Not a hosted service, and not financial advice.',
   bRepo: '📦 GitHub repository', bZip: '⬇️ Download ZIP', bDocs: '📘 Install guide', bJson: '🧾 Strategy index (JSON)',
@@ -415,6 +495,180 @@ Object.assign(I.en, {
   });
 })();
 
+</script>
+
+<script>
+/* ---------------------------------------------------------------- فعال‌سازی ربات
+   همه‌چیز در مرورگر خود کاربر ساخته می‌شود؛ هیچ درخواستی به بیرون نمی‌رود و هیچ کلید APIی
+   در این صفحه خواسته یا ذخیره نمی‌شود. خروجی، همان پیکربندی امنِ entekhab-bot است با انتخاب‌های کاربر. */
+(function () {
+  var $ = function (i) { return document.getElementById(i); };
+  if (!$('act')) return;
+  var F = ['wEx', 'wCur', 'wStrat', 'wTf', 'wMax', 'wWallet', 'wStake', 'wTg', 'wApi', 'wLive'];
+  var META = {}, TAB = 'cfg';
+
+  var BLACK = ['BNB/.*', '.*(3|5|7|10|15|20|25)(S|L)/.*', '.*(UP|DOWN|BEAR|BULL)/.*',
+               '(BUSD|USDC|TUSD|FDUSD|DAI|PAX|USDP|EUR|GBP|TRY|BRL|ARS|RUB)/.*'];
+
+  function v(i) { var e = $(i); return e.type === 'checkbox' ? e.checked : e.value.trim(); }
+
+  function config() {
+    var live = v('wLive'), st = v('wStrat') || 'SampleStrategy', m = META[st] || {};
+    var tf = v('wTf') || m.tf || '5m';
+    var stake = v('wStake') || 'unlimited';
+    var c = {
+      "$schema": "https://schema.freqtrade.io/schema.json",
+      "_comment": "ساخته‌شده با فعال‌ساز entekhab.net/trade-bot/ — پیش از روشن کردن معاملهٔ واقعی، docs/02-risk.fa.md را بخوانید.",
+      max_open_trades: Math.max(1, parseInt(v('wMax'), 10) || 3),
+      stake_currency: v('wCur') || 'USDT',
+      stake_amount: stake === 'unlimited' ? 'unlimited' : (parseFloat(stake) || 'unlimited'),
+      tradable_balance_ratio: 0.99,
+      fiat_display_currency: 'USD',
+      timeframe: tf,
+      dry_run: !live,
+      dry_run_wallet: parseFloat(v('wWallet')) || 1000,
+      cancel_open_orders_on_exit: true,
+      trading_mode: 'spot',
+      margin_mode: '',
+      unfilledtimeout: { entry: 10, exit: 10, exit_timeout_count: 0, unit: 'minutes' },
+      entry_pricing: { price_side: 'same', use_order_book: true, order_book_top: 1, price_last_balance: 0.0,
+                       check_depth_of_market: { enabled: false, bids_to_ask_delta: 1 } },
+      exit_pricing: { price_side: 'same', use_order_book: true, order_book_top: 1 },
+      exchange: {
+        name: v('wEx') || 'binance',
+        key: '', secret: '',
+        _comment: 'کلید و رمز را فقط روی دستگاه خودتان اینجا بنویسید. دسترسی برداشت (withdraw) را هرگز فعال نکنید.',
+        ccxt_config: {}, ccxt_async_config: {},
+        pair_whitelist: [],
+        pair_blacklist: BLACK.slice()
+      },
+      pairlists: [
+        { method: 'VolumePairList', number_assets: 40, sort_key: 'quoteVolume', min_value: 0, refresh_period: 1800 },
+        { method: 'AgeFilter', min_days_listed: 30 },
+        { method: 'PriceFilter', low_price_ratio: 0.01 },
+        { method: 'SpreadFilter', max_spread_ratio: 0.005 },
+        { method: 'RangeStabilityFilter', lookback_days: 3, min_rate_of_change: 0.03, refresh_period: 1800 },
+        { method: 'VolatilityFilter', lookback_days: 10, min_volatility: 0.02, max_volatility: 0.75, refresh_period: 86400 }
+      ],
+      telegram: { enabled: !!v('wTg'), token: '', chat_id: '',
+                  notification_settings: { status: 'on', warning: 'on', startup: 'on', entry: 'on', exit: 'on', protection_trigger: 'on' } },
+      api_server: { enabled: !!v('wApi'), listen_ip_address: '127.0.0.1', listen_port: 8080, verbosity: 'error',
+                    jwt_secret_key: 'CHANGE-ME-run-openssl-rand-hex-32', ws_token: 'CHANGE-ME-run-openssl-rand-hex-16',
+                    CORS_origins: [], username: '', password: '' },
+      bot_name: 'entekhab-bot',
+      initial_state: 'running',
+      force_entry_enable: false,
+      internals: { process_throttle_secs: 5 },
+      // بدون این دو، Freqtrade استراتژی‌های جامعه را که در زیرپوشهٔ community/ هستند پیدا نمی‌کند
+      strategy_path: 'user_data/strategies/',
+      recursive_strategy_search: true,
+      dataformat_ohlcv: 'feather',
+      dataformat_trades: 'feather'
+    };
+    return c;
+  }
+
+  function commands() {
+    var st = v('wStrat') || 'SampleStrategy', m = META[st] || {}, L = [];
+    L.push('# ۱) گرفتن کد و ساخت پوشه');
+    L.push('git clone https://github.com/omidmokri/coinkurd.git && cd coinkurd/entekhab-bot');
+    L.push('cp ~/Downloads/config.json config/config.json   # فایلی که همین الان ساختید');
+    L.push('');
+    L.push('# ۲) دادهٔ تاریخی');
+    L.push('docker compose run --rm entekhab-bot download-data --timerange 20240101- -t ' + (m.tf || '5m') + ' 1h');
+    if (m.needs_migration) {
+      L.push('');
+      L.push('# ۳) این استراتژی با رابط نسخهٔ ۲ نوشته شده و باید به نسخهٔ ۳ تبدیل شود');
+      L.push('docker compose run --rm entekhab-bot strategy-updater --strategy-list ' + st);
+    }
+    L.push('');
+    L.push('# ۴) آزمون نگاه‌به‌آینده — اگر رد شد، آن استراتژی را کنار بگذارید');
+    L.push('docker compose run --rm entekhab-bot lookahead-analysis --strategy ' + st);
+    L.push('');
+    L.push('# ۵) بک‌تست روی بازهٔ کنار گذاشته‌شده');
+    L.push('docker compose run --rm entekhab-bot backtesting --strategy ' + st + ' \\');
+    L.push('    --timerange 20250101-20251101 --breakdown month');
+    L.push('');
+    L.push('# ۶) اجرا' + (v('wLive') ? '  ⚠️ dry_run خاموش است: سفارش واقعی ثبت می‌شود' : '  (معاملهٔ کاغذی)'));
+    L.push('docker compose up -d && docker compose logs -f');
+    return L.join('\n');
+  }
+
+  function checklist() {
+    var st = v('wStrat') || '—', m = META[st] || {}, L = [];
+    L.push('# چک‌لیست راه‌اندازی — استراتژی: ' + st);
+    L.push('');
+    L.push('□ docs/02-risk.fa.md را کامل خوانده‌ام.');
+    L.push('□ می‌دانم ربات روی سرور خودم اجرا می‌شود و مسئولیت کلید API با من است.');
+    L.push('□ کلید API بدون دسترسی برداشت (withdraw) ساخته شده و IP آن محدود شده است.');
+    L.push('□ دستور lookahead-analysis را اجرا کرده‌ام و نتیجه تمیز بوده است.');
+    if (m.needs_migration) L.push('□ استراتژی را با strategy-updater به رابط نسخهٔ ۳ تبدیل کرده‌ام.');
+    if (m.hardcoded_hyperopt) L.push('□ می‌دانم پارامترهای این استراتژی روی یک دورهٔ گذشته ثابت شده‌اند و برای بازار امروز بهینه نیستند.');
+    if (!m.protections) L.push('□ می‌دانم این استراتژی محافظ (protections) ندارد؛ در صورت نیاز از config/protections.strategy-snippet.json استفاده می‌کنم.');
+    if (typeof m.stoploss === 'number' && m.stoploss <= -0.9) L.push('□ می‌دانم حد ضرر این استراتژی عملاً غیرفعال است (' + Math.round(m.stoploss * 100) + '٪).');
+    L.push('□ دست‌کم دو هفته در حالت dry_run اجرا کرده‌ام و لاگ‌ها را دیده‌ام.');
+    L.push('□ مبلغی که وارد می‌کنم، از دست رفتنش زندگی‌ام را تغییر نمی‌دهد.');
+    return L.join('\n');
+  }
+
+  function warn() {
+    var st = v('wStrat'), m = META[st], w = $('wWarn'), out = [];
+    if (st && !m && Object.keys(META).length) out.push('⚠️ «' + st + '» در فهرست ۴۶۵ استراتژی نیست. اگر فایل آن را خودتان اضافه کرده‌اید مشکلی نیست.');
+    if (m) {
+      if (m.needs_migration) out.push('• این استراتژی با رابط نسخهٔ ۲ نوشته شده؛ دستور تبدیل در بخش «دستورها» آمده است.');
+      if (m.hardcoded_hyperopt) out.push('• پارامترهای hyperopt در کد ثابت شده‌اند؛ نتیجهٔ گذشته تضمین آینده نیست.');
+      if (typeof m.stoploss === 'number' && m.stoploss <= -0.9) out.push('• حد ضرر ' + Math.round(m.stoploss * 100) + '٪ یعنی عملاً حد ضرری وجود ندارد.');
+    }
+    if (v('wLive')) out.push('🔴 <b>dry_run خاموش است.</b> با این پیکربندی سفارش واقعی ثبت می‌شود. پیش از آن چک‌لیست را کامل کنید.');
+    w.innerHTML = out.join('<br>');
+    w.hidden = !out.length;
+  }
+
+  function text() {
+    return TAB === 'cfg' ? JSON.stringify(config(), null, 2) : TAB === 'cmd' ? commands() : checklist();
+  }
+  function draw() { $('wCode').textContent = text(); warn(); }
+
+  F.forEach(function (i) { $(i).addEventListener('input', draw); $(i).addEventListener('change', draw); });
+  Array.prototype.forEach.call(document.querySelectorAll('.wtabs button'), function (b) {
+    b.addEventListener('click', function () {
+      TAB = b.dataset.w;
+      Array.prototype.forEach.call(document.querySelectorAll('.wtabs button'), function (x) { x.classList.toggle('on', x === b); });
+      draw();
+    });
+  });
+  $('wDl').addEventListener('click', function (ev) {
+    ev.preventDefault();
+    var name = TAB === 'cfg' ? 'config.json' : TAB === 'cmd' ? 'entekhab-bot-commands.sh' : 'entekhab-bot-checklist.txt';
+    var b = new Blob([text()], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b); a.download = name; a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  });
+  $('wCopy').addEventListener('click', function (ev) {
+    ev.preventDefault();
+    var t = text();
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
+      var o = $('wCopy').textContent; $('wCopy').textContent = '✓'; setTimeout(function () { $('wCopy').textContent = o; }, 1200);
+    }).catch(function () {
+      var ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    });
+  });
+
+  fetch('/trade-bot/strategies.json').then(function (r) { return r.json(); }).then(function (d) {
+    var list = (d && d.strategies) || [], dl = $('wStratL'), f = document.createDocumentFragment();
+    list.forEach(function (x) {
+      META[x.cls || x.id] = x;
+      var o = document.createElement('option'); o.value = x.cls || x.id; f.appendChild(o);
+    });
+    dl.appendChild(f);
+    draw();
+  }).catch(draw);
+  draw();
+  if (window.uiLang) uiLang(draw);
+})();
 </script>
 <script src="/assets/chrome.js?v=3" defer></script>
 </body>
