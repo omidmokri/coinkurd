@@ -329,6 +329,8 @@ def main():
                 new_count += 1
             elif existing[m["id"]].get("tr"):
                 m["tr"] = existing[m["id"]]["tr"]  # ترجمه را نگه دار
+            if existing.get(m["id"], {}).get("img"):
+                m["img"] = existing[m["id"]]["img"]  # تصویر ذخیره‌شده در مخزن را نگه دار (نشانی تلگرام منقضی می‌شود)
             existing[m["id"]] = m  # به‌روزرسانی بازدیدها/ویرایش‌ها
         oldest = min(m["id"] for m in msgs)
         print(f"page {page+1}: {len(msgs)} posts, oldest id {oldest}")
