@@ -173,6 +173,7 @@ def build():
   <div class="ps-form" id="psJForm"></div>
   <div class="ps-bar"><button class="ac-btn" id="psJAdd">افزودن</button>
     <label class="ac-btn ghost" for="psCsv">⬆ ورود CSV</label><input id="psCsv" type="file" accept=".csv,text/csv" hidden>
+    <button class="ac-btn ghost" id="psFromLab">🧪 آوردن از ژورنال آزمایشگاه</button>
     <button class="ac-btn ghost" id="psJCsv">⬇ خروجی CSV</button>
     <span id="psJMsg" class="note"></span></div>
   <div class="ps-scroll"><table class="ps-tbl" id="psJTbl"></table></div></div>
