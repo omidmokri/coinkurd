@@ -949,7 +949,14 @@ def build_api():
     for c in MK:
         w(f"coins/{c.lower()}.json", {"coin": c, "market": MK[c], "score": SC.get(c), "opportunities": [o for o in market.get("opportunities", []) if o["coin"] == c],
                                      "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})
-    for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped", "indicators", "kind", "signals"):
+    try:   # the Reality-check readings, in the same shape the bot renders — one source, every surface
+        import bot_reality as BRL
+        w("reality.json", {"note": "the six reality-check readings, as shown in the bot and the extension",
+                           **{lg: BRL.summary(lg) for lg in ("fa", "ckb", "en")}})
+    except Exception as ex:  # noqa: BLE001
+        print("reality summary skipped:", ex)
+    for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped", "indicators", "kind", "signals",
+               "ledger", "hype", "friction", "localcorr", "silent_exit", "opportunity", "sentiment", "whales"):
         dd = load(f"{nm}.json", None)
         if dd:
             w(f"{nm}.json", {"data": dd})
