@@ -60,7 +60,7 @@ jobs:
           STATE_GIT: state
           STATE_PUSH_EVERY: "600"
           MAIN_WORKTREE: mainwt
-          TOPIC_IDS: "onchain:fa=47623,onchain:ckb=219340,news:fa=42033,news:ckb=69794,fx=33986"
+          TOPIC_IDS: "onchain:fa=47623,onchain:ckb=219340,news:fa=42033,news:ckb=69794,fx=33986,econ=47540,brief=229893,ai=33973"
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GH_TOKEN: ${{ github.token }}
