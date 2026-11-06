@@ -62,6 +62,10 @@ _P = {
     "download": '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
     "chat": '<path d="M4 5h16v11H9l-5 4Z"/><path d="M8 9.5h8M8 12.5h5"/>',
     "library": '<path d="M3 20V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/><path d="M13 20V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v14"/><path d="M3 20h18"/><path d="M6 8h2"/><path d="M16 8h2"/>',
+    "eye": '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+    "hourglass": '<path d="M6 3h12M6 21h12"/><path d="M7 3c0 5 10 5 10 9s-10 4-10 9"/><path d="M17 3c0 5-10 5-10 9s10 4 10 9"/>',
+    "exit": '<path d="M14 4h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-5"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h10"/>',
+    "matrix": '<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
     "robot": '<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4"/><circle cx="12" cy="3" r="1.3"/><path d="M9 13h.01"/><path d="M15 13h.01"/><path d="M9.5 16.2h5"/>',
 }
 
@@ -155,6 +159,20 @@ NAV = [
         ("/weekly/", "news", L("مجلهٔ هفتگی", "گۆڤاری هەفتانە", "Weekly magazine"),
          L("مرور هفته و مهم‌ترین رویدادها", "پێداچوونەوەی هەفتە و گرنگترین ڕووداوەکان", "The week in review")),
     ]},
+    {"k": "reality", "t": L("واقعیت‌سنج", "ڕاستی‌پێو", "Reality check"), "items": [
+        ("/reality/", "eye", L("واقعیت‌سنج انتخاب", "ڕاستی‌پێوی Entekhab", "Entekhab reality check"),
+         L("فاصلهٔ حرف و واقعیت بازار، با دادهٔ قابل‌بازبینی", "مەودای قسە و ڕاستیی بازاڕ", "The gap between what the market says and does")),
+        ("/ledger/", "lock", L("دفتر عملکرد سیگنال‌ها", "تۆماری ئەنجامی سیگناڵەکان", "Signal ledger"),
+         L("هر پیش‌بینی با قفل زمانی؛ دقت واقعی هر منبع", "هەر پێشبینییەک بە قوفڵی کات؛ وردیی ڕاستەقینە", "Time-locked calls and each source's real accuracy")),
+        ("/iran-friction/", "gauge", L("اصطکاک محلی ایران", "لێکخشانی ناوخۆیی ئێران", "Iran friction score"),
+         L("تتر، اسپرد صرافی‌ها، اینترنت و اخبار محلی", "تەتەر، سپرێدی ئاڵوگۆڕ، ئینتەرنێت و هەواڵ", "Tether gap, exchange spread, internet, local news")),
+        ("/hype/", "hourglass", L("نیمه‌عمر هیاهو", "نیوەتەمەنی هایپ", "Hype half-life"),
+         L("عمر و اثر واقعی روایت‌های بازار", "تەمەن و کاریگەریی چیرۆکەکانی بازاڕ", "How long narratives live and what they move")),
+        ("/silent-exit/", "exit", L("خروج خاموش", "چوونەدەرەوەی بێدەنگ", "Silent exit"),
+         L("تناقض حرف و عمل نهنگ‌ها", "ناکۆکیی قسە و کرداری نەهەنگەکان", "When whales' actions contradict the talk")),
+        ("/iran-correlation/", "matrix", L("همبستگی محلی", "پەیوەندیی ناوخۆیی", "Local correlation"),
+         L("کریپتو در برابر دلار، تتر، طلا و سکه", "کریپتۆ بەرامبەر دۆلار، تەتەر، زێڕ و سکە", "Crypto vs dollar, tether, gold, coins")),
+    ]},
     {"k": "tools", "t": L("ابزارها", "ئامرازەکان", "Tools"), "items": [
         ("/tools/", "calc", L("ابزارهای معامله‌گر", "ئامرازەکانی بازرگان", "Trader tools"),
          L("حجم پوزیشن، ریسک، تبدیل و مقایسه", "قەبارەی پۆزیشن، ڕیسک، گۆڕین و بەراورد", "Position size, risk, converter, compare")),
@@ -204,7 +222,7 @@ NAV = [
 ]
 BATTLE = ("/battle/", "swords", L("میدان نبرد", "مەیدانی شەڕ", "Battlefield"))
 # the order of the top bar: Markets, Analysis, Tools, Learn, Archive, Battlefield (direct), More
-TOP_ORDER = ["mkt", "ana", "tools", "learn", "arc", "BATTLE", "more"]
+TOP_ORDER = ["mkt", "ana", "reality", "tools", "learn", "arc", "BATTLE", "more"]
 
 SOCIAL = [  # (key, url, icon file, label)  — links taken from the footer of every Coin_Kurd channel post
     ("tg", "https://t.me/Coin_Kurd", "telegram", L("کانال تلگرام", "کەناڵی تێلێگرام", "Telegram channel")),
