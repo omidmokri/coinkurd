@@ -76,6 +76,13 @@ S = {
              "kmr": "506 peyv bi sê zimanan — peyvê binivîse.",
              "ar": "506 مصطلحات بثلاث لغات — اكتب الكلمة.",
              "en": "506 entries in three languages — type a word and get the site's own definition."}),
+    "cmp": ("⚖️", {"fa": "مقایسهٔ دو ارز", "ckb": "بەراوردی دوو دراو", "kmr": "Berhevdana du diravan",
+                   "ar": "مقارنة عملتين", "en": "Compare two coins"},
+            {"fa": "ده معیار و هشت ژن، همان‌طور که در صفحهٔ مقایسهٔ سایت می‌آید.",
+             "ckb": "دە پێوەر و هەشت جین، وەک پەڕەی بەراوردی ماڵپەڕ.",
+             "kmr": "Deh pîvan û heşt jîn, wekî rûpela berhevdanê.",
+             "ar": "عشرة معايير وثمانية جينات، كما في صفحة المقارنة.",
+             "en": "Ten measures and eight genes, exactly as the site's comparison page lays them out."}),
     "sentim": ("📊", {"fa": "شاخص احساسات اخبار", "ckb": "پێوەری هەستی هەواڵ", "kmr": "Pîvana hestê nûçeyan",
                       "ar": "مؤشر مشاعر الأخبار", "en": "News sentiment"},
                {"fa": "لحن خبرهای ۲۴ ساعت گذشته، برای کل بازار و به تفکیک ارز.",
@@ -291,7 +298,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["analysis", "coin", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
+    "g_analysis": ["analysis", "coin", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["friction", "oppcost", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
