@@ -862,7 +862,7 @@ def _image_bytes(url):
     return None
 
 
-def group_send(chat_id, text, kb=None, plain=False, photo=None, video=None, **kw):
+def group_send(chat_id, text, kb=None, plain=False, photo=None, video=None, photos=None, **kw):
     """post to the group; with a picture the summary becomes its caption (summaries are ≤1024 chars, the caption limit).
     The picture is downloaded and uploaded by the bot, because Telegram cannot fetch t.me CDN links itself."""
     body = fix_amp(D.e(text) if plain else text)
@@ -872,6 +872,21 @@ def group_send(chat_id, text, kb=None, plain=False, photo=None, video=None, **kw
         if kb:
             data["reply_markup"] = json.dumps(kb)
         return _post_with_retry("sendVideo", data, files={"video": ("coin_kurd.mp4", video, "video/mp4")})
+    if photos:                                   # a carousel: one album, in order, so the set stays together
+        imgs = [p for p in photos if isinstance(p, bytes)][:10]
+        if imgs:
+            media = [{"type": "photo", "media": f"attach://p{i}"} for i in range(len(imgs))]
+            media[0]["caption"] = body[:1024]
+            media[0]["parse_mode"] = "HTML"
+            files = {f"p{i}": (f"slide{i + 1}.jpg", im) for i, im in enumerate(imgs)}
+            r = _post_with_retry("sendMediaGroup", {"chat_id": chat_id, "media": json.dumps(media)}, files=files)
+            if r.get("ok"):
+                return r
+            log.info("album not accepted (%s); sending the pictures one by one", r.get("description"))
+            for i, im in enumerate(imgs):
+                _post_with_retry("sendPhoto", {"chat_id": chat_id, "caption": body[:1024] if not i else "",
+                                               "parse_mode": "HTML"}, files={"photo": (f"slide{i + 1}.jpg", im)})
+            return {"ok": True}
     if photo:
         img = photo if isinstance(photo, bytes) else _image_bytes(photo)
         if img:

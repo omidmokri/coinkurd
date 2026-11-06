@@ -210,6 +210,16 @@ INSTA = """از یادداشت پژوهشی و پست تلگرامی زیر، ب
 🎨 پیشنهاد گرافیکی برای تصویر یا اینفوگرافیک همراه پست تلگرام
 فقط از اطلاعات یادداشت استفاده کن"""
 
+SLIDES = """از یادداشت پژوهشی و پست تلگرامی زیر، متن پنج اسلاید پست اینستاگرام کوین کورد را به پارسی بنویس.
+تصویر جلد از روی خود پست ساخته می‌شود، پس این پنج اسلاید بعد از جلد می‌آیند.
+دقیقاً پنج خط بنویس و هیچ چیز دیگری ننویس. قالب هر خط:
+تیتر کوتاه||یک یا دو جملهٔ کامل
+- چهار اسلاید اول ارزش می‌دهند و اسلاید پنجم دعوت به اقدام است
+- تیتر حداکثر چهار کلمه و بدون نقطه
+- متن هر اسلاید بین ۸۰ و ۲۴۰ کاراکتر، جملهٔ کامل، بدون کلمهٔ لاتین و بدون هشتگ
+- هیچ تگ و شماره و خط تیره‌ای ننویس
+فقط از اطلاعات یادداشت استفاده کن"""
+
 
 def check(text):
     p = []
@@ -266,6 +276,41 @@ def card(post, at=None, hist=None):
         return None
 
 
+def insta_slides(post, notes, at=None, hist=None):
+    """the carousel, drawn: cover card + five slides in one visual identity, ready to post"""
+    try:
+        raw = generate(SLIDES + "\n\nیادداشت پژوهشی:\n" + (notes or "") + "\n\nپست تلگرام:\n" + post, 1400)
+    except Exception as ex:
+        log.info("insta slides: no text (%s)", ex)
+        return []
+    items = []
+    for ln in raw.splitlines():
+        parts = [x.strip(" -–—\t") for x in ln.split("||")]
+        if len(parts) >= 2 and len(parts[0]) >= 2 and len(parts[1]) >= 40:
+            items.append((parts[0], parts[1]))
+    if len(items) < 3:
+        log.info("insta slides: only %d of 5 lines parsed", len(items))
+        return []
+    items = items[:5]
+    try:
+        content = IC.parse_dossier(post)
+        mk = IC.market(at)
+        theme = IC.pick_theme(hist)
+        out = [IC.render(content, theme=theme, mk=mk)]            # the cover is the post's own card
+        for i, (head, body) in enumerate(items, 2):
+            buf = io.BytesIO()
+            IC.slide(theme, content, head, [body], i, len(items) + 1).convert("RGB").save(
+                buf, "JPEG", quality=92, optimize=True, subsampling=0)
+            out.append(buf.getvalue())
+        return out
+    except IC.TextError as ex:
+        log.error("insta slides NOT drawn, Persian text check failed: %s", ex)
+        return []
+    except Exception:
+        log.exception("insta slides failed")
+        return []
+
+
 # ------------------------------------------------------------------ 5/6. publish, site
 def push_files(worktree, files, msg):
     """files: {repo_path: bytes|str} -> True when on origin/main"""
@@ -320,8 +365,15 @@ def publish(st, post, notes, g, send_fn, channel, admins, worktree):
     F.rebuild_site()
     try:
         pack = generate(INSTA + "\n\nیادداشت پژوهشی:\n" + (notes or "") + "\n\nپست تلگرام:\n" + post, 3000)
+        pics = insta_slides(post, notes, hist=st.setdefault("visual", {}))
         for a in admins:
-            send_fn(a, "📦 <b>بستهٔ اینستاگرام پروندهٔ امروز</b>\n\n" + html.escape(pack[:3900], quote=False))
+            if pics:
+                try:
+                    send_fn(a, f"📦 <b>بستهٔ اینستاگرام پروندهٔ امروز</b> — {len(pics)} تصویر آماده، به ترتیب اسلاید",
+                            photos=pics)
+                except Exception:
+                    log.exception("carousel not sent")
+            send_fn(a, "📝 <b>متن بستهٔ اینستاگرام</b>\n\n" + html.escape(pack[:3900], quote=False))
     except Exception as ex:
         log.info("insta pack failed: %s", ex)
     return True

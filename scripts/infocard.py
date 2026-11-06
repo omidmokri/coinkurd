@@ -308,10 +308,12 @@ def pick_theme(hist=None, seed=None):
     chart = rnd.choice([c for c in CHARTS if c != lastc])
     lasth = (hist.setdefault("huds", []) or [""])[-1]
     hud = rnd.choice([x for x in HUDS if x != lasth])
-    for k, v in (("envs", env), ("pals", pal), ("charts", chart), ("huds", hud)):
+    usedl = hist.setdefault("lays", [])[-(len(LAYOUTS) - 2):]          # the arrangement is chosen too, not just the colour
+    lay = rnd.choice([x for x in LAYOUTS if x not in usedl] or LAYOUTS)
+    for k, v in (("envs", env), ("pals", pal), ("charts", chart), ("huds", hud), ("lays", lay)):
         hist[k].append(v)
         del hist[k][:-40]
-    return {"env": env, "pal": pal, "chart": chart, "hud": hud, "seed": rnd.randrange(1 << 30),
+    return {"env": env, "pal": pal, "chart": chart, "hud": hud, "lay": lay, "seed": rnd.randrange(1 << 30),
             "light": rnd.uniform(-0.9, 0.9), "tilt": rnd.uniform(0.05, 0.11)}
 
 
@@ -1054,108 +1056,398 @@ def _header(t, im, c, sub=""):
     return 34 + lh
 
 
+# ---------------------------------------------------------------- compositions
+# The picture is the post. One fixed stack made every card look the same, so the
+# arrangement itself is part of what gets chosen: six compositions, each a different
+# piece of work rather than the same template in another colour.
+LAYOUTS = ["stack", "poster", "split", "terminal", "editorial", "band"]
+
+
+def _fitlines(items, box_w, box_h, sizes, lead=1.34, gap=8):
+    """largest size at which every item fits whole; otherwise the size that shows the most"""
+    best = None
+    for sz in sizes:
+        f, lh, out, h = font(sz), int(sz * lead), [], 0
+        for it in items:
+            ls = wrap(it, f, box_w)
+            need = len(ls) * lh + gap
+            if h + need > box_h:
+                break
+            out.append(ls)
+            h += need
+        if len(out) == len(items):
+            return f, lh, out
+        if best is None or len(out) > len(best[2]):
+            best = (f, lh, out)
+    return best or (font(sizes[-1]), int(sizes[-1] * lead), [])
+
+
+def _chart_into(t, d, box, mk, prim, sec, acc, label=True):
+    """the BTC series drawn inside an arbitrary box of a panel"""
+    x0, y0, x1, y1 = box
+    s = mk.get("series") or []
+    if label:
+        ltext(d, x0, y0 - 40, "بیت‌کوین · ۴۸ ساعت", font(24), acc + (255,))
+    if len(s) <= 5 or x1 - x0 < 40 or y1 - y0 < 30:
+        return
+    green, red = (40, 255, 150), (255, 70, 90)
+    lo, hi = min(c[2] for c in s), max(c[1] for c in s)
+    rng = (hi - lo) or 1
+
+    def Y(v):
+        return y1 - (v - lo) / rng * (y1 - y0)
+    step = (x1 - x0) / len(s)
+    if t["chart"] == "candles":
+        for i, (o, h_, l_, c) in enumerate(s):
+            x = x0 + i * step + step / 2
+            col = green if c >= o else red
+            d.line([(x, Y(h_)), (x, Y(l_))], fill=col + (255,), width=1)
+            d.rectangle([x - step * 0.32, min(Y(o), Y(c)), x + step * 0.32, max(Y(o), Y(c)) + 1], fill=col + (255,))
+    elif t["chart"] == "bars":
+        for i, (o, h_, l_, c) in enumerate(s):
+            x = x0 + i * step
+            d.rectangle([x + 1, Y(c), x + step - 2, y1], fill=_rgba(_mix(sec, prim, i / len(s)), 200))
+    else:
+        pts = [(x0 + i * step + step / 2, Y(c[3])) for i, c in enumerate(s)]
+        if t["chart"] == "area":
+            d.polygon(pts + [(pts[-1][0], y1), (pts[0][0], y1)], fill=_rgba(prim, 60))
+        d.line(pts, fill=_rgba(prim, 255), width=4, joint="curve")
+        d.ellipse([pts[-1][0] - 7, pts[-1][1] - 7, pts[-1][0] + 7, pts[-1][1] + 7], fill=_rgba(acc, 255))
+    fs = font(20)
+    d.text((x1 - d.textlength(fa_num(hi), font=fs), y0 - 26), fa_num(hi), font=fs, fill=(200, 210, 230, 220))
+    d.text((x1 - d.textlength(fa_num(lo), font=fs), y1 + 2), fa_num(lo), font=fs, fill=(200, 210, 230, 220))
+
+
+def _rows_into(t, d, box, mk, prim, sec, acc, n=5, label=True):
+    """the live market rows drawn inside an arbitrary box of a panel"""
+    x0, y0, x1, y1 = box
+    rows = (mk.get("rows") or [])[:n]
+    if not rows or x1 - x0 < 150:
+        return
+    green, red = (40, 255, 150), (255, 70, 90)
+    ry = y0
+    if label:
+        rtext(d, x1, ry - 4, "بازار لحظه‌ای", font(26), acc + (255,))
+        ry += 44
+    rh = (y1 - ry) / max(1, len(rows))
+    fh = font(24)
+    for r in rows:
+        up = r["chg"] >= 0
+        col = (green if up else red) + (255,)
+        rtext(d, x1, ry, r["fa"], fh, (235, 240, 250, 255))
+        d.text((x0, ry), _price(r["price"]) + " $", font=fh, fill=(255, 255, 255, 255))
+        ctxt = fa_num(abs(r["chg"]), 2) + "٪"
+        xm = x0 + (x1 - x0) * 0.52
+        _triangle(d, xm - 26, ry + 8, up, col)
+        d.text((xm, ry + 4), ctxt, font=font(22), fill=col)
+        ry += rh
+
+
+def _ticker_into(t, d, box, mk, prim, sec, acc, n=5):
+    """coins laid out across a short wide strip rather than stacked down a column"""
+    x0, y0, x1, y1 = box
+    rows = (mk.get("rows") or [])[:n]
+    if not rows or x1 - x0 < 300:
+        return
+    green, red = (40, 255, 150), (255, 70, 90)
+    cw = (x1 - x0) / len(rows)
+    fn, fp, fc = font(25), font(27), font(23)
+    for i, r in enumerate(rows):
+        cx = x1 - (i + 0.5) * cw                      # right to left, like the rest of the card
+        if i:
+            d.line([(x1 - i * cw, y0 + 6), (x1 - i * cw, y1 - 6)], fill=_rgba(prim, 70))
+        up = r["chg"] >= 0
+        col = (green if up else red) + (255,)
+        ctext(d, cx, y0, r["fa"], fn, _rgba(acc, 235))
+        ctext(d, cx, y0 + 34, _price(r["price"]) + " $", fp, (255, 255, 255, 255))
+        ctxt = fa_num(abs(r["chg"]), 2) + "\u066a"
+        w = textw(fc, ctxt)
+        d.text((cx - w / 2 + 14, y0 + 70), ctxt, font=fc, fill=col)
+        _triangle(d, cx - w / 2 - 12, y0 + 78, up, col)
+
+
+def _mini(t, im, box, mk, mode="rows"):
+    """a compact data panel for the column layouts — no perspective, so it stays crisp when narrow"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    x0, y0, x1, y1 = [int(v) for v in box]
+    pw, ph = x1 - x0, y1 - y0
+    if pw < 140 or ph < 110:
+        return
+    pan = Image.new("RGBA", (pw, ph), (0, 0, 0, 0))
+    d = ImageDraw.Draw(pan)
+    d.rounded_rectangle([0, 0, pw - 1, ph - 1], 18, fill=(6, 10, 20, 205), outline=_rgba(prim, 190), width=2)
+    for g in range(0, pw, 40):
+        d.line([(g, 0), (g, ph)], fill=_rgba(prim, 16))
+    for g in range(0, ph, 40):
+        d.line([(0, g), (pw, g)], fill=_rgba(prim, 16))
+    if mode == "chart":
+        _chart_into(t, d, (20, 58, pw - 20, ph - 22), mk, prim, sec, acc)
+    elif mode == "ticker":
+        rtext(d, pw - 20, 14, "\u0628\u0627\u0632\u0627\u0631 \u0644\u062d\u0638\u0647\u200c\u0627\u06cc", font(24), acc + (255,))
+        _ticker_into(t, d, (20, 52, pw - 20, ph - 12), mk, prim, sec, acc,
+                     n=max(3, min(5, (pw - 40) // 190)))
+    else:
+        fit_n = max(1, min(5, (ph - 110) // 46))
+        _rows_into(t, d, (20, 40, pw - 20, ph - 18), mk, prim, sec, acc, n=fit_n)
+    im.alpha_composite(pan, (x0, y0))
+
+
+def _card_block(t, im, box, head, bullets, sizes=(29, 27, 25, 23)):
+    """glass panel + bulleted sentences; returns the y it finished at"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    x0, y0, x1, y1 = [int(v) for v in box]
+    if not bullets or y1 - y0 < 90:
+        return y0
+    f, lh, ls = _fitlines(bullets, x1 - x0 - 72, y1 - y0 - 70, sizes)
+    if not ls:
+        return y0
+    used = 58 + sum(len(l) * lh + 8 for l in ls) + 10
+    _glass(im, (x0, y0, x1, y0 + used), tint=_mix(prim, (255, 255, 255), 0.5), alpha=22, border=prim)
+    d = ImageDraw.Draw(im)
+    if head:
+        rtext(d, x1 - 18, y0 + 14, head, font(29), _rgba(prim, 255))
+    yy = y0 + 58
+    for l in ls:
+        d.rectangle([x1 - 30, yy + lh // 2 - 6, x1 - 20, yy + lh // 2 + 4], fill=_rgba(sec, 255))
+        for ln in l:
+            rtext(d, x1 - 44, yy, ln, f, (240, 244, 252, 255))
+            yy += lh
+        yy += 8
+    return y0 + used
+
+
+def _term_block(t, im, box, lines, sizes=(24, 22, 21, 19), title="ترمینال تحلیل هوش مصنوعی"):
+    """the AI terminal panel; returns the y it finished at"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    x0, y0, x1, y1 = [int(v) for v in box]
+    if not lines or y1 - y0 < 100:
+        return y0
+    f, lh, ls = _fitlines(lines, x1 - x0 - 60, y1 - y0 - 70, sizes, gap=2)
+    if not ls:
+        return y0
+    used = 46 + sum(len(l) * lh for l in ls) + 34
+    tb = (x0, y0, x1, y0 + used)
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dl = ImageDraw.Draw(lay)
+    dl.rounded_rectangle(tb, 16, fill=(2, 6, 10, 225), outline=_rgba(sec, 200), width=2)
+    dl.rounded_rectangle((tb[0], tb[1], tb[2], tb[1] + 36), 16, fill=_rgba(sec, 60))
+    for k, col in enumerate(((255, 90, 90), (255, 200, 60), (60, 220, 120))):
+        dl.ellipse([tb[0] + 18 + k * 24, tb[1] + 11, tb[0] + 32 + k * 24, tb[1] + 25], fill=col + (255,))
+    _glow(im, lay, 8)
+    d = ImageDraw.Draw(im)
+    rtext(d, x1 - 12, y0 + 3, title, font(22), (230, 240, 255, 255))
+    yy = y0 + 46
+    for l in ls:
+        d.polygon([(x1 - 12, yy + 8), (x1 - 12, yy + 24), (x1 - 24, yy + 16)], fill=_rgba(sec, 255))
+        for ln in l:
+            rtext(d, x1 - 34, yy, ln, f, _rgba(_mix(acc, sec, 0.35), 255))
+            yy += lh
+    d.rectangle([x0 + 10, y0 + used - 26, x0 + 24, y0 + used - 8], fill=_rgba(sec, 255))
+    return y0 + used
+
+
+def _hero_block(t, im, hero, y, sizes=(100, 88, 76, 66), center=True, width=None, cap=True):
+    """the one number the post is about; returns the y it finished at"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    if not hero:
+        return y
+    wdt = width or (W - 2 * M)
+    fh, hs, hl = fit(hero[0], sizes, wdt, 1)
+    x = W / 2 if center else W - M
+    _glow_text(im, x, y, hl[0], fh, prim, center=center)
+    y += int(hs * 1.3)
+    if cap and hero[1]:
+        fq, qs, ql = fit(hero[1], (27, 24, 22), wdt - 40, 2)
+        for ln in ql:
+            _shadow(im, x, y, ln, fq, _rgba(acc, 240), center=center)
+            y += int(qs * 1.45)
+    return y + 10
+
+
+def _title_block(t, im, c, y, sizes=(58, 52, 46, 42), lines=3, center=False, width=None):
+    prim = PALETTES[t["pal"]][0]
+    wdt = width or (W - 2 * M)
+    ft, sz, tl = fit(c["title"], sizes, wdt, lines)
+    x = W / 2 if center else W - M
+    for i, ln in enumerate(tl):
+        if i == 0:
+            _glow_text(im, x, y, ln, ft, prim, center=center)
+        else:
+            _shadow(im, x, y, ln, ft, (255, 255, 255, 255), center=center)
+        y += int(sz * 1.36)
+    return y
+
+
+def _bullets_of(c, hero):
+    src = (hero or ("", ""))[1]
+    return [b for b in c["card"] if b != src] or c["card"]
+
+
+# --- the six compositions; each receives a fresh canvas with header and HUD already on it
+FOOT_TOP = H - 112
+
+
+def _lay_stack(t, im, c, mk, hero):
+    """the classic: headline, one big number, the tilted panel, analysis, terminal"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    y = _title_block(t, im, c, 204)
+    y += 8
+    _divider(t, im, y)
+    y += 34
+    y = _hero_block(t, im, hero, y)
+    dash_h = 226
+    _dashboard(t, im, (M - 10, y, W - M + 10, y + dash_h), mk)
+    y += dash_h + 26
+    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 18), c["card_head"], _bullets_of(c, hero))
+    _term_block(t, im, (M - 10, y + 14, W - M + 10, FOOT_TOP - 18), c["term"])
+
+
+def _lay_poster(t, im, c, mk, hero):
+    """the number first and very large, the headline under it — a poster, not a report"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    y = 226
+    if hero:
+        y = _hero_block(t, im, hero, y, sizes=(156, 136, 116, 98))
+        y += 6
+        _divider(t, im, y)
+        y += 30
+    y = _title_block(t, im, c, y, sizes=(62, 54, 48, 42), lines=3, center=True)
+    y += 20
+    dash_h = 200
+    _dashboard(t, im, (M - 10, y, W - M + 10, y + dash_h), mk)
+    y += dash_h + 24
+    _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 18), c["card_head"],
+                _bullets_of(c, hero), sizes=(33, 30, 27, 25))
+
+
+def _lay_split(t, im, c, mk, hero):
+    """two columns: the reading on the right, the chart on the left"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    y = _title_block(t, im, c, 204, sizes=(54, 48, 44, 40), lines=2)
+    y += 6
+    _divider(t, im, y)
+    y += 28
+    gap = 22
+    rx1, rx0 = W - M, int(M + (W - 2 * M) * 0.46 + gap / 2)      # right column (primary in RTL)
+    lx0, lx1 = M, int(M + (W - 2 * M) * 0.46 - gap / 2)
+    top = y
+    y = _hero_block(t, im, hero, top, sizes=(76, 66, 58, 50), center=False, width=rx1 - rx0)
+    _card_block(t, im, (rx0, y + 6, rx1, FOOT_TOP - 18), c["card_head"],
+                _bullets_of(c, hero), sizes=(26, 24, 22, 20))
+    mid = top + int((FOOT_TOP - 18 - top) * 0.52)
+    _mini(t, im, (lx0, top, lx1, mid - 12), mk, "chart")
+    _mini(t, im, (lx0, mid + 6, lx1, FOOT_TOP - 18), mk, "rows")
+
+
+def _lay_terminal(t, im, c, mk, hero):
+    """the terminal is the subject: it opens the card and runs long"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    y = _title_block(t, im, c, 204, sizes=(52, 46, 42, 38), lines=2)
+    y += 10
+    lines = (c["term"] or []) + _bullets_of(c, hero)
+    y = _term_block(t, im, (M - 10, y, W - M + 10, y + 430), lines)
+    y += 22
+    y = _hero_block(t, im, hero, y, sizes=(92, 80, 70, 62))
+    left = FOOT_TOP - 18 - y
+    if left > 150:
+        _dashboard(t, im, (M - 10, y, W - M + 10, y + min(226, left)), mk)
+
+
+def _lay_editorial(t, im, c, mk, hero):
+    """a magazine cover: the headline owns the top third, the data is a footnote"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    y = _title_block(t, im, c, 212, sizes=(88, 78, 68, 58), lines=4)
+    y += 10
+    d = ImageDraw.Draw(im)
+    d.rectangle([W - M - 190, y, W - M, y + 7], fill=_rgba(prim, 255))
+    y += 34
+    if hero:
+        band = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(band).rounded_rectangle([M - 10, y, W - M + 10, y + 132], 20,
+                                               fill=_rgba(_mix(prim, (6, 10, 20), 0.82), 220), outline=_rgba(prim, 150))
+        im.alpha_composite(band)
+        fh, hs, hl = fit(hero[0], (74, 64, 56, 48), (W - 2 * M) * 0.52, 1)
+        _glow_text(im, W - M - 26, y + 26, hl[0], fh, prim)
+        fq, qs, ql = fit(hero[1], (25, 23, 21), (W - 2 * M) * 0.42, 3)
+        yy = y + 26
+        for ln in ql:
+            ltext(ImageDraw.Draw(im), M + 16, yy, ln, fq, _rgba(acc, 235))
+            yy += int(qs * 1.4)
+        y += 156
+    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 188), c["card_head"],
+                    _bullets_of(c, hero), sizes=(30, 28, 26, 24))
+    _mini(t, im, (M - 10, max(y + 16, FOOT_TOP - 188), W - M + 10, FOOT_TOP - 18), mk, "ticker")
+
+
+def _lay_band(t, im, c, mk, hero):
+    """an angled colour band carries the headline; the number sits on its edge"""
+    prim, sec, acc = PALETTES[t["pal"]][:3]
+    top, bot = 196, 470
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dl = ImageDraw.Draw(lay)
+    skew = 46
+    dl.polygon([(0, top + skew), (W, top), (W, bot), (0, bot + skew)], fill=_rgba(_mix(prim, (4, 6, 14), 0.78), 232))
+    dl.line([(0, top + skew), (W, top)], fill=_rgba(prim, 255), width=4)
+    dl.line([(0, bot + skew), (W, bot)], fill=_rgba(sec, 220), width=3)
+    _glow(im, lay, 14)
+    y = _title_block(t, im, c, top + 76, sizes=(56, 50, 45, 40), lines=3)
+    y = max(y, bot + 18)
+    if hero:
+        fh, hs, hl = fit(hero[0], (104, 90, 78, 68), W - 2 * M - 80, 1)
+        cw = textw(fh, hl[0]) + 80
+        chip = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(chip).rounded_rectangle([(W - cw) / 2, y - 10, (W + cw) / 2, y + hs + 20], 28,
+                                               fill=(6, 10, 20, 230), outline=_rgba(prim, 230), width=3)
+        _glow(im, chip, 10)
+        _glow_text(im, W / 2, y, hl[0], fh, prim, center=True)
+        y += int(hs * 1.34)
+        if hero[1]:
+            fq, qs, ql = fit(hero[1], (26, 24, 22), W - 2 * M - 40, 2)
+            for ln in ql:
+                _shadow(im, W / 2, y + 14, ln, fq, _rgba(acc, 240), center=True)
+                y += int(qs * 1.45)
+        y += 26
+    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 188), c["card_head"],
+                    _bullets_of(c, hero), sizes=(28, 26, 24, 22))
+    _mini(t, im, (M - 10, max(y + 16, FOOT_TOP - 188), W - M + 10, FOOT_TOP - 18), mk, "ticker")
+
+
+LAYOUT_FN = {"stack": _lay_stack, "poster": _lay_poster, "split": _lay_split,
+             "terminal": _lay_terminal, "editorial": _lay_editorial, "band": _lay_band}
+
+
 def render(content, theme=None, hist=None, mk=None, kind="dossier"):
     """content dict (parse_dossier / parse_summary) → JPEG bytes (1080×1350). Raises TextError on bad Persian."""
     if mode() is None:
         raise TextError("Persian shaping unavailable — image not made")
     c = _check_content(content)
     t = theme or pick_theme(hist)
-    prim, sec, acc = PALETTES[t["pal"]][:3]
-    im = background(t)
-    _hud(t, im)
-    d = ImageDraw.Draw(im)
     mk = mk if mk is not None else market()
-    when = mk.get("at") or datetime.now(timezone.utc)
-    _header(t, im, c, jalali(when))
-    # headline
-    ft, sz, tl = fit(c["title"], (58, 52, 46, 42), W - 2 * M, 3)
-    y = 204
-    for i, ln in enumerate(tl):
-        _glow_text(im, W - M, y, ln, ft, prim) if i == 0 else _shadow(im, W - M, y, ln, ft, (255, 255, 255, 255))
-        y += int(sz * 1.36)
-    y += 8
-    _divider(t, im, y)
-    y += 34
-    # hero statistic
     hero = c.get("hero")
     if not hero and mk.get("rows"):
         b = mk["rows"][0]
         hero = (_price(b["price"]) + " دلار", "قیمت " + b["fa"] + " در بایننس")
-    if hero:
-        fh, hs, hl = fit(hero[0], (100, 88, 76, 66), W - 2 * M, 1)
-        _glow_text(im, W / 2, y, hl[0], fh, prim, center=True)
-        y += int(hs * 1.32)
-        fq, qs, ql = fit(hero[1], (27, 24), W - 2 * M - 40, 2)
-        for ln in ql:
-            _shadow(im, W / 2, y, ln, fq, _rgba(acc, 240), center=True)
-            y += int(qs * 1.45)
-        y += 14
-    # 3D dashboard
-    dash_h = 226
-    _dashboard(t, im, (M - 10, y, W - M + 10, y + dash_h), mk)
-    y += dash_h + 26
-    # glassmorphism analysis card + AI terminal: whole sentences only, planned to fit the space left
-    foot_top = H - 112
-    avail = foot_top - 18 - y
-    hero_src = (hero or ("", ""))[1]
-    bullets = [b_ for b_ in c["card"] if b_ != hero_src] or c["card"]
-    plan = _plan(bullets, c["term"], avail)
-    if plan:
-        (fc, lhc, card_ls, card_h), (ftm, lht, term_ls, term_h) = plan
-        if card_ls:
-            _glass(im, (M - 10, y, W - M + 10, y + card_h), tint=_mix(prim, (255, 255, 255), 0.5), alpha=22, border=prim)
-            d = ImageDraw.Draw(im)
-            rtext(d, W - M - 18, y + 14, c["card_head"], font(29), _rgba(prim, 255))
-            yy = y + 58
-            for ls in card_ls:
-                d.rectangle([W - M - 30, yy + lhc // 2 - 6, W - M - 20, yy + lhc // 2 + 4], fill=_rgba(sec, 255))
-                for ln in ls:
-                    rtext(d, W - M - 44, yy, ln, fc, (240, 244, 252, 255))
-                    yy += lhc
-                yy += 6
-            y += card_h + 14
-        if term_ls:
-            tb = (M - 10, y, W - M + 10, y + term_h)
-            lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            dl = ImageDraw.Draw(lay)
-            dl.rounded_rectangle(tb, 16, fill=(2, 6, 10, 225), outline=_rgba(sec, 200), width=2)
-            dl.rounded_rectangle((tb[0], tb[1], tb[2], tb[1] + 36), 16, fill=_rgba(sec, 60))
-            for k, col in enumerate(((255, 90, 90), (255, 200, 60), (60, 220, 120))):
-                dl.ellipse([tb[0] + 18 + k * 24, tb[1] + 11, tb[0] + 32 + k * 24, tb[1] + 25], fill=col + (255,))
-            _glow(im, lay, 8)
-            d = ImageDraw.Draw(im)
-            rtext(d, W - M - 12, y + 3, "ترمینال تحلیل هوش مصنوعی", font(22), (230, 240, 255, 255))
-            yy = y + 46
-            for ls in term_ls:
-                d.polygon([(W - M - 12, yy + 8), (W - M - 12, yy + 24), (W - M - 24, yy + 16)], fill=_rgba(sec, 255))
-                for ln in ls:
-                    rtext(d, W - M - 34, yy, ln, ftm, _rgba(_mix(acc, sec, 0.35), 255))
-                    yy += lht
-            d.rectangle([M + 10, y + term_h - 30, M + 24, y + term_h - 10], fill=_rgba(sec, 255))   # cursor
-    _footer(t, im)
+    lay = t.get("lay", "stack")
+    try:
+        im = _compose(t, c, mk, hero, lay)
+    except TextError:
+        raise
+    except Exception as ex:                       # a composition must never cost the post its picture
+        log.warning("layout %s failed (%s) \u2014 falling back to stack", lay, ex)
+        im = _compose(t, c, mk, hero, "stack")
     buf = io.BytesIO()
     im.convert("RGB").save(buf, "JPEG", quality=93, optimize=True, subsampling=0)
     return buf.getvalue()
 
 
-def _plan(bullets, term, avail):
-    """pick fonts and how many whole bullets / terminal lines fit in `avail` px (card first, then terminal)"""
-    best = None
-    for (cs, clh), (ts, tlh) in (((27, 39), (24, 32)), ((25, 36), (22, 30)), ((23, 33), (21, 28))):
-        fc, ft_ = font(cs), font(ts)
-        cw = [wrap(b, fc, W - 2 * M - 70) for b in bullets]
-        tw = [wrap(x, ft_, W - 2 * M - 90) for x in term]
-        for n in range(len(cw), -1, -1):
-            card_h = (58 + sum(len(x) for x in cw[:n]) * clh + 6 * n + 10) if n else 0
-            for k in range(len(tw), -1, -1):
-                term_h = (46 + sum(len(x) for x in tw[:k]) * tlh + 14) if k else 0
-                need = card_h + (14 if n and k else 0) + term_h
-                if need <= avail and (n or k):
-                    score = (min(n, 2) + min(k, 2), n + k, cs)
-                    if best is None or score > best[0]:
-                        best = (score, (fc, clh, cw[:n], card_h), (ft_, tlh, tw[:k], term_h))
-                    break
-    return best[1:] if best else None
+def _compose(t, c, mk, hero, lay):
+    """a whole card drawn from scratch, so a failed attempt never leaves half a picture behind"""
+    im = background(t)
+    _hud(t, im)
+    _header(t, im, c, jalali(mk.get("at") or datetime.now(timezone.utc)))
+    LAYOUT_FN.get(lay, _lay_stack)(t, im, c, mk, hero)
+    _footer(t, im)
+    return im
 
 
 def _footer(t, im):
@@ -1192,23 +1484,26 @@ def slide(theme, content, heading, paras, idx, total):
         y += int(sz * 1.4)
     y += 10
     _divider(t, im, y)
-    y += 50
+    top, foot = y + 44, H - 150
+    # the heading and its card sit as one block in the middle of what is left, set as large as it will go:
+    # a slide with one short paragraph used to leave the whole lower half empty
+    f, lh, plan = _fitlines(paras, W - 2 * M - 80, foot - top - 150, (46, 42, 38, 34), lead=1.5, gap=18)
+    need = 34 + sum(len(ls) * lh + 18 for ls in plan) + 16
+    block = 110 + max(need, 180)
+    y = top + max(0, (foot - top - block) // 2)
     _glow_text(im, W - M, y, heading, font(64), prim)
     y += 110
-    f = font(40)
-    plan = [wrap(p, f, W - 2 * M - 80) for p in paras]
-    need = 34 + sum(len(ls) * 60 + 18 for ls in plan) + 16
-    box_bottom = min(H - 150, y + max(need, 200))
+    box_bottom = min(foot, y + max(need, 180))
     _glass(im, (M - 10, y, W - M + 10, box_bottom), tint=_mix(prim, (255, 255, 255), 0.5), alpha=22, border=prim)
     d = ImageDraw.Draw(im)
     yy = y + 34
     for ls in plan:
-        if yy + len(ls) * 60 > box_bottom - 10:          # whole paragraphs only
+        if yy + len(ls) * lh > box_bottom - 10:          # whole paragraphs only
             break
-        d.rectangle([W - M - 32, yy + 22, W - M - 20, yy + 34], fill=_rgba(sec, 255))
+        d.rectangle([W - M - 32, yy + lh // 2 - 8, W - M - 20, yy + lh // 2 + 4], fill=_rgba(sec, 255))
         for ln in ls:
             rtext(d, W - M - 48, yy, ln, f, (244, 247, 252, 255))
-            yy += 60
+            yy += lh
         yy += 18
     _footer(t, im)
     return im.convert("RGB")
