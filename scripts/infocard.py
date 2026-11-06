@@ -647,8 +647,37 @@ def _bloom(t, im, rnd):
     im.alpha_composite(lay.filter(ImageFilter.GaussianBlur(150)))
 
 
+def _scrim(t, im):
+    """a painted backdrop is busy; the drawn layer has to stay readable on top of it"""
+    lay = Image.new("RGBA", (W, H), (0, 0, 0, 0))                      # a layer, composited — drawing straight
+    d = ImageDraw.Draw(lay)                                            # onto the picture would replace it
+    for y in range(H):
+        a = 38                                                         # a light overall calm; the painting survives
+        if y < 300:                                                    # darker where the header type sits
+            a = max(a, int(145 * (1 - y / 300) ** 1.5))
+        if y > H - 260:                                                # and under the footer
+            a = max(a, int(160 * ((y - (H - 260)) / 260) ** 1.4))
+        d.line([(0, y), (W, y)], fill=(2, 4, 10, a))
+    im.alpha_composite(lay)
+    v = Image.new("L", (W, H), 90)                                     # corners down, middle untouched
+    ImageDraw.Draw(v).ellipse([int(W * 0.03), int(H * 0.06), int(W * 0.97), int(H * 0.94)], fill=0)
+    im.alpha_composite(Image.merge("RGBA", (Image.new("L", (W, H), 2), Image.new("L", (W, H), 4),
+                                            Image.new("L", (W, H), 10), v.filter(ImageFilter.GaussianBlur(150)))))
+
+
 def background(t):
-    """the environment scene, without any text"""
+    """the environment scene, without any text — painted by the image model when it can, drawn when it cannot"""
+    art = None
+    if t.get("art") is not False:
+        try:
+            import aiart
+            art = aiart.scene(t)
+        except Exception as ex:                                        # art is a bonus, never a dependency
+            log.info("no painted backdrop (%s); drawing the scene", ex)
+    t["art"] = bool(art)
+    if art is not None:
+        _scrim(t, art)
+        return art
     rnd = random.Random(t["seed"])
     prim, sec, acc = PALETTES[t["pal"]][:3]
     im = Image.new("RGBA", (W, H), (0, 0, 0, 255))
@@ -1202,6 +1231,10 @@ def _card_block(t, im, box, head, bullets, sizes=(29, 27, 25, 23)):
     if not ls:
         return y0
     used = 58 + sum(len(l) * lh + 8 for l in ls) + 10
+    if t.get("art"):                       # a painted backdrop shows through frosted glass; give the words a floor
+        base = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(base).rounded_rectangle((x0, y0, x1, y0 + used), 28, fill=(5, 9, 18, 226))
+        im.alpha_composite(base)
     _glass(im, (x0, y0, x1, y0 + used), tint=_mix(prim, (255, 255, 255), 0.5), alpha=22, border=prim)
     d = ImageDraw.Draw(im)
     if head:
