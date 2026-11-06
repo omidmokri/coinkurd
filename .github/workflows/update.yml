@@ -193,6 +193,39 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/council.py
 
+      # ---------------- Reality check layer (واقعیت‌سنج): each step independent
+      - name: Iran local friction score
+        id: friction
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/friction.py
+
+      - name: Local correlation matrix (Iran dollar/tether archive backfill + Binance)
+        id: localcorr
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/localcorr.py
+
+      - name: Hype half-life (daily)
+        id: hype
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          HYPE_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python scripts/hype.py
+
+      - name: Silent exit detector (hourly)
+        id: silent
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/silent_exit.py
+
+      - name: Time-locked signal ledger (+ daily OpenTimestamps anchor)
+        id: ledger
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/ledger.py
+
       - name: Market Replay snapshot
         continue-on-error: true
         run: python scripts/snapshot.py
@@ -258,6 +291,10 @@ jobs:
 
       - name: Build static SEO pages (posts, coins, sitemap)
         run: python scripts/build_pages.py
+
+      - name: Build reality-check pages (ledger, friction, hype, silent exit, correlation)
+        continue-on-error: true
+        run: python scripts/build_reality.py
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
