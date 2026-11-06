@@ -14,3 +14,6 @@ tests/out/
 *.jks
 *.keystore
 ks_pass*
+
+# painted backdrops are a local cache; they are re-made on demand and must never reach the repo
+/data/art/
