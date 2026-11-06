@@ -41,7 +41,8 @@ import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
 import bot_onchain as OA  # noqa: E402
 import bot_reality as BRL
-import bot_encyclopedia as ENC  # noqa: E402
+import bot_encyclopedia as ENC
+import bot_compare as CMP  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
@@ -553,6 +554,10 @@ def _render(s, uid, key):
         return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
     if key == "dca":
         return W.dca_view(x, lang, D) + "\n\n" + W.L(W.T["size_help"], lang), kb_back(lang)
+    if key == "cmp":
+        body, rows = CMP.ask(lang)
+        kb = [[btn(c, cb) for c, cb in rows[i:i + 3]] for i in range(0, len(rows), 3)]
+        return body, rows_kb(kb + [[btn(t("b_back", lang), "m:main")]])
     if key == "enc":
         x = user(s, uid) or {}
         x["await"] = "wiki"                     # the next plain message is the word to look up
@@ -1321,6 +1326,15 @@ def handle_callback(s, cb):
     lang = x["lang"]
     ans = lambda text=None, alert=False: tg("answerCallbackQuery", callback_query_id=cb["id"],
                                             **({"text": text, "show_alert": alert} if text else {}))
+    if data.startswith("cm:"):                       # ⚖️ pick the first coin, then the second
+        lang = (user(s, uid) or {}).get("lang", "fa")
+        parts = data[3:].split(":")
+        if len(parts) == 1:
+            body, rows = CMP.ask(lang, first=parts[0])
+            kb = [[btn(c, cb) for c, cb in rows[i:i + 3]] for i in range(0, len(rows), 3)]
+            return send(chat_id, body, rows_kb(kb + [[btn(t("b_back", lang), "m:cmp")]]))
+        body = CMP.compare(parts[0], parts[1], lang)
+        return send(chat_id, body, rows_kb([[btn(t("b_back", lang), "m:cmp")], [btn(t("b_back", lang), "m:main")]]))
     if data.startswith("enc:"):                      # an entry chosen from the search results
         lang = (user(s, uid) or {}).get("lang", "fa")
         body = ENC.card(data[4:], lang) or ENC.NONE.get(lang, ENC.NONE["fa"])
