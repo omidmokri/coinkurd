@@ -40,6 +40,7 @@ import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
 import bot_onchain as OA  # noqa: E402
+import bot_reality as BRL  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
@@ -443,7 +444,8 @@ SECTIONS = {
     "opps": (D.sec_opps, "/dashboard/"), "movers": (D.sec_movers, "/dashboard/"),
     "score": (D.sec_score, "/coins/"), "news": (D.sec_news, "/"), "narr": (D.sec_narr, "/dashboard/"),
     "events": (D.sec_events, "/dashboard/"), "council": (D.sec_council, "/lab/"),
-    "analysis": (OA.sec_analysis, "/onchain/"), "deriv": (D.sec_deriv, "/terminal/"), "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
+    "analysis": (OA.sec_analysis, "/onchain/"), "deriv": (D.sec_deriv, "/terminal/"),
+    **BRL.SECTIONS,          # the Reality-check group, from the same files the pages read "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
     "flows": (D.sec_flows, "/terminal/"), "week": (D.sec_week, "/"), "track": (D.sec_track, "/status/"),
     "ind": (D.sec_ind, "/indicators/"), "posts": (D.sec_posts, "/"),
     "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
