@@ -54,3 +54,8 @@ html[dir=rtl] .cf select{direction:rtl;text-align:right}
 .co .r b.up{color:var(--up)}.co .r b.dn{color:var(--dn)}
 .co .r.k b{color:var(--acc);font-size:15px}
 main section[data-pane=calc]{max-height:400px}
+
+/* the market analysis pane: the same report read as the site and the bot, trimmed to a popup */
+.report ul.an{margin:8px 0;padding-inline-start:18px;list-style:disc}
+.report ul.an li{margin:4px 0;line-height:1.7}
+.report ul.an.sc li{list-style:none;margin-inline-start:-14px;padding:6px 8px;border-inline-start:3px solid var(--acc);background:#ffffff08;border-radius:6px}
