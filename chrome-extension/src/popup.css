@@ -15,8 +15,8 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
 .kpi small{display:block;color:var(--mute);font-size:10.5px;line-height:1.4}.kpi b{font-size:14px;direction:ltr;unicode-bidi:isolate;display:inline-block}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:8px}
-.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:6px 0;font:inherit;cursor:pointer}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 4px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:6px 2px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tabs button.on{color:var(--acc);border-color:var(--acc);font-weight:700}
 main section{display:none;max-height:300px;overflow-y:auto}main section.on{display:block}
 #q,.af input,.af select,.row select{width:100%;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font:inherit}
@@ -59,3 +59,6 @@ main section[data-pane=calc]{max-height:400px}
 .report ul.an{margin:8px 0;padding-inline-start:18px;list-style:disc}
 .report ul.an li{margin:4px 0;line-height:1.7}
 .report ul.an.sc li{list-style:none;margin-inline-start:-14px;padding:6px 8px;border-inline-start:3px solid var(--acc);background:#ffffff08;border-radius:6px}
+.report .rl{border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+.report .rl:first-child{border-top:0;padding-top:0;margin-top:0}
+.report .rl h4{margin:0 0 6px;font-size:13px}
