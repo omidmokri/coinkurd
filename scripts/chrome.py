@@ -221,8 +221,6 @@ NAV = [
          L("سلامت منابع داده و کارنامهٔ سیگنال‌ها", "تەندروستیی سەرچاوەکانی داتا و تۆماری سیگناڵەکان", "Data health and signal track record")),
         ("/app/", "phone", L("اپلیکیشن اندروید", "ئەپی ئەندرۆید", "Android app"),
          L("دانلود مستقیم و نصب امن", "داگرتنی ڕاستەوخۆ و دامەزراندنی سەلامەت", "Direct, verified download")),
-        ("/extension/", "download", L("افزونهٔ گوگل کروم", "زیادکراوی گووگڵ کرۆم", "Chrome extension"),
-         L("قیمت، گزارش بازار و هشدار در مرورگر", "نرخ، ڕاپۆرتی بازاڕ و ئاگاداری لە وێبگەڕدا", "Prices, market report and alerts in your browser")),
         ("/privacy/", "lock", L("حریم خصوصی", "پاراستنی تایبەتمەندی", "Privacy"),
          L("چه داده‌ای نگه می‌داریم (تقریباً هیچ)", "چ داتایەک هەڵدەگرین (نزیکەی هیچ)", "What we keep (almost nothing)")),
         ("/terms/", "file", L("شرایط استفاده", "مەرجەکانی بەکارهێنان", "Terms of use"),
@@ -341,8 +339,9 @@ def footer(lang="fa"):
     soc = "".join(_social(k, u, i, lab, lang) for k, u, i, lab in SOCIAL)
     apps = (f'<a class="ek-badge" href="/app/"><i class="ek-si b-android"></i><span>{tri(T["dl"], lang, "ek-i", "small")}{tri(T["andr"], lang, "ek-i", "b")}</span></a>'
             f'<a class="ek-badge" href="/app/#web">{icon("globe")}<span>{tri(T["anyd"], lang, "ek-i", "small")}{tri(T["pwa"], lang, "ek-i", "b")}</span></a>')
-    legal = (f'<a href="/privacy/">{tri(cats["more"]["items"][3][2], lang)}</a><a href="/terms/">{tri(cats["more"]["items"][4][2], lang)}</a>'
-             f'<a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a><a href="https://www.kurds.ir" target="_blank" rel="noopener noreferrer">kurds.ir</a>')
+    lab = {h: t for h, ic, t, d in cats["more"]["items"]}   # by address: inserting a menu item must not shift these labels
+    legal = (f'<a href="/privacy/">{tri(lab["/privacy/"], lang)}</a><a href="/terms/">{tri(lab["/terms/"], lang)}</a>'
+             f'<a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
     return (f'<!--ek:footer--><div class="ekf" id="ekf" role="contentinfo" data-lang="{lang}"><div class="ek-w">'
             f'<div class="ekf-top"><div class="ekf-brand"><a class="ek-brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="" width="64" height="40" loading="lazy"><span>entekhab<b>.net</b></span></a>'
             f'{tri(T["tagline"], lang, "ek-i ekf-tag", "p")}{tri(T["about"], lang, "ek-i ekf-ab", "p")}<div class="ekf-apps">{apps}</div></div>'
