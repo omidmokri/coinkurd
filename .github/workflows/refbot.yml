@@ -28,7 +28,15 @@ jobs:
       - run: |
           pip install requests beautifulsoup4 pillow arabic-reshaper python-bidi fonttools
           python scripts/infocard.py --check || echo "::error::Persian text shaping is broken — the bot will post text without pictures until it is fixed"
-          which ffmpeg || (sudo apt-get update -q && sudo apt-get install -y -q ffmpeg)
+          # ffmpeg serves only the occasional video post, and bot_reel already skips the video when it
+          # is missing. On run #139 installing it took the runner more than fifteen minutes with the
+          # bot not yet answering anyone, so it now installs in the background, bounded, while the bot
+          # is already up. A run without it loses a video, not the bot.
+          if ! which ffmpeg; then
+            ( timeout 600 sudo DEBIAN_FRONTEND=noninteractive apt-get update -q \
+              && timeout 600 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q ffmpeg \
+              || echo "::warning::ffmpeg is not installed; video posts are skipped this run" ) >/dev/null 2>&1 &
+          fi
 
       - name: Load state branch
         run: |
