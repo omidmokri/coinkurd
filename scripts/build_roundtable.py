@@ -57,7 +57,7 @@ S = {
     "acc": L("دقت {a} در {n} رأی تعیین‌تکلیف‌شده", "وردیی {a} لە {n} دەنگدا", "{a} accuracy over {n} decided calls"),
     "norec": L("هنوز رأی تعیین‌تکلیف‌شده‌ای ندارد", "هێشتا دەنگی یەکلابووەوەی نییە", "No decided calls yet"),
     "early": L("در حال جمع‌آوری کارنامه ({n} رأی تا حالا — زیر ۵ رأی عدد دقت معنا ندارد)",
-               "لە کۆکردنەوەی کارنامەدایە ({n} دەنگ تا ئێستا)", "Still building a record ({n} calls so far — accuracy means little under 5)"),
+               "لە کۆکردنەوەی کارنامەدایە ({n} دەنگ تا ئێستا)", "Still building a record ({n} call{s} so far — accuracy means little under 5)"),
     "how": L("چطور سؤال بپرسم؟", "چۆن پرسیار بکەم؟", "How do I ask?"),
     "how_lead": L("میزگرد وقتی خوب جواب می‌دهد که سؤال کامل باشد. این شش تکه را بدهید تا به‌جای یک جواب کلی، یک تصمیم بگیرید:",
                   "میزگرد کاتێک باش وەڵام دەداتەوە کە پرسیارەکە تەواو بێت. ئەم شەش بەشە بدە:",
@@ -179,7 +179,7 @@ def seat_card(sid, agent, led_stats, lg):
     if n >= 5:                     # same bar as the ledger: fewer decided calls and the percentage is noise
         rec = s("acc", lg, a=BR.nf(st.get("acc"), lg, 0, pct=True), n=BR.nf(n, lg))
     elif n:
-        rec = s("early", lg, n=BR.nf(n, lg))
+        rec = s("early", lg, n=BR.nf(n, lg), s="" if (n == 1 and lg == "en") else ("s" if lg == "en" else ""))
     else:
         rec = s("norec", lg)
     return (f'<div class="rt-seat"><h3>{e(tx(name, lg))} '
