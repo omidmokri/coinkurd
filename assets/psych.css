@@ -71,3 +71,10 @@
 @media (max-width:700px){.ps-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.ps-tab{font-size:.8rem;padding:7px 6px}}
 @media (max-width:460px){.ps-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:560px){.ps-kpi b{font-size:1.4rem}.ps-chain{font-size:.84rem}}
+/* ورودی صوتی ژورنال */
+.ps-voice{display:inline-flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ps-voice select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 9px;font:inherit;font-size:.82rem}
+#psVoiceBtn.rec{background:#ef4444;border-color:#ef4444;color:#fff;animation:ps-pulse 1.3s ease-in-out infinite}
+@keyframes ps-pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+.ps-voice-msg{min-width:6ch}
+.ps-voice-hint{margin:8px 0 0;font-size:.8rem;line-height:1.8}
