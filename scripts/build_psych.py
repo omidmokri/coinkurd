@@ -240,7 +240,8 @@ def build():
 </div>
 <script>window.PSY_CFG = {json.dumps(cfg, ensure_ascii=False)};</script>
 <script src="/assets/psych-core.js?v={VER}" defer></script>
-<script src="/assets/psych.js?v={VER}" defer></script>'''
+<script src="/assets/psych.js?v={VER}" defer></script>
+<script src="/assets/psych-voice.js?v={VER}" defer></script>'''
 
     return BP.page(OUT, "روان‌شناسی معامله‌گر — سنجش، تحلیل و تمرین | آکادمی انتخاب",
                    "سامانهٔ سنجش و تمرین روان‌شناسی معامله‌گری: ده بُعد رفتاری، دوازده الگوی مخرب، "
