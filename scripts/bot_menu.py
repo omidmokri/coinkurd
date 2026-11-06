@@ -69,6 +69,13 @@ S = {
               "ckb": "کریپتۆ بەرامبەر دۆلار و تەتەر و زێڕ — بە ماتریسی ڕاستەقینە.",
               "kmr": "Krîpto li hember dolar, Tether û zêr.", "ar": "العملات مقابل الدولار وتيثر والذهب.",
               "en": "Crypto against the dollar, tether and gold, as a real correlation matrix."}),
+    "enc": ("📖", {"fa": "دانشنامهٔ کریپتو", "ckb": "زانستنامەی کریپتۆ", "kmr": "Zanistnameya krîptoyê",
+                   "ar": "موسوعة الكريبتو", "en": "Crypto encyclopedia"},
+            {"fa": "۵۰۶ واژه به سه زبان — واژه را بنویس تا همان تعریفی را بدهم که در سایت آمده.",
+             "ckb": "٥٠٦ وشە بە سێ زمان — وشەکە بنووسە و هەمان پێناسەی ماڵپەڕ وەردەگریت.",
+             "kmr": "506 peyv bi sê zimanan — peyvê binivîse.",
+             "ar": "506 مصطلحات بثلاث لغات — اكتب الكلمة.",
+             "en": "506 entries in three languages — type a word and get the site's own definition."}),
     "sentim": ("📊", {"fa": "شاخص احساسات اخبار", "ckb": "پێوەری هەستی هەواڵ", "kmr": "Pîvana hestê nûçeyan",
                       "ar": "مؤشر مشاعر الأخبار", "en": "News sentiment"},
                {"fa": "لحن خبرهای ۲۴ ساعت گذشته، برای کل بازار و به تفکیک ارز.",
@@ -288,7 +295,7 @@ GROUPS = {
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["friction", "oppcost", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
-    "g_more": ["lang", "learn", "proxy", "outage", "ref", "predict"],
+    "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
 for g, items in GROUPS.items():

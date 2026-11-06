@@ -40,7 +40,8 @@ import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
 import bot_onchain as OA  # noqa: E402
-import bot_reality as BRL  # noqa: E402
+import bot_reality as BRL
+import bot_encyclopedia as ENC  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
@@ -445,7 +446,8 @@ SECTIONS = {
     "score": (D.sec_score, "/coins/"), "news": (D.sec_news, "/"), "narr": (D.sec_narr, "/dashboard/"),
     "events": (D.sec_events, "/dashboard/"), "council": (D.sec_council, "/lab/"),
     "analysis": (OA.sec_analysis, "/onchain/"), "deriv": (D.sec_deriv, "/terminal/"),
-    **BRL.SECTIONS,          # the Reality-check group, from the same files the pages read "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
+    "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
+    **BRL.SECTIONS,          # the Reality-check group, from the same files the pages read
     "flows": (D.sec_flows, "/terminal/"), "week": (D.sec_week, "/"), "track": (D.sec_track, "/status/"),
     "ind": (D.sec_ind, "/indicators/"), "posts": (D.sec_posts, "/"),
     "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
@@ -551,6 +553,10 @@ def _render(s, uid, key):
         return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
     if key == "dca":
         return W.dca_view(x, lang, D) + "\n\n" + W.L(W.T["size_help"], lang), kb_back(lang)
+    if key == "enc":
+        x = user(s, uid) or {}
+        x["await"] = "wiki"                     # the next plain message is the word to look up
+        return ENC.ask(lang), kb_back(lang, more=D.SITE + "/encyclopedia/")
     if key == "learn":
         text, rows = LN.menu(lang)
         return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
@@ -1155,6 +1161,11 @@ def handle_private(s, msg):
         x["await"] = None
         x.setdefault("py", {}).setdefault("emo", []).append({"t": int(time.time()), "s": text[:160]})
         return send(chat_id, "🌊 ثبت شد. همین ثبت ساده، خودش رفتار را تغییر می‌دهد.", kb_back(lang))
+    if aw == "wiki" and text and not text.startswith("/"):
+        body, rows = ENC.reply(text, lang)
+        if rows:                                # several entries matched — keep waiting for the pick
+            x["await"] = "wiki"
+        return send(chat_id, body, rows_kb([[btn(lb, cb)] for lb, cb in rows] + [[btn(t("b_back", lang), "m:main")]]))
     if aw == "report" and text and not text.startswith("/"):
         if time.time() - x.get("report_at", 0) < 600 and uid not in ADMIN_IDS:   # one report per 10 min
             return send(chat_id, LN.L(LN.M["report_ok"], lang), kb_back(lang))
@@ -1199,6 +1210,12 @@ def handle_private(s, msg):
     if cmd in ("/local", "/regional"):
         text2, rows = LN.local_news(D, lang)
         return send(chat_id, text2, rows_kb(rows))
+    if cmd in ("/wiki", "/term", "/enc"):
+        if arg:
+            body, rows = ENC.reply(arg, lang)
+            return send(chat_id, body, rows_kb([[btn(lb, cb)] for lb, cb in rows] + [[btn(t("b_back", lang), "m:main")]]))
+        x["await"] = "wiki"
+        return send(chat_id, ENC.ask(lang))
     if cmd == "/report":
         if arg:
             x["await"] = "report"
@@ -1304,6 +1321,10 @@ def handle_callback(s, cb):
     lang = x["lang"]
     ans = lambda text=None, alert=False: tg("answerCallbackQuery", callback_query_id=cb["id"],
                                             **({"text": text, "show_alert": alert} if text else {}))
+    if data.startswith("enc:"):                      # an entry chosen from the search results
+        lang = (user(s, uid) or {}).get("lang", "fa")
+        body = ENC.card(data[4:], lang) or ENC.NONE.get(lang, ENC.NONE["fa"])
+        return send(chat_id, body, kb_back(lang, more=D.SITE + "/encyclopedia/"))
     if data.startswith("pv:"):                       # prediction vote (bot menu or the channel post)
         _, rid, opt = data.split(":")
         ans(HB.vote(s, cb["from"], rid, opt), True)
