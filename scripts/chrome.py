@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "3"  # bump to bust caches of chrome.css / chrome.js
+VER = "4"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -271,7 +271,7 @@ T = {
     "sitemap": L("نقشهٔ سایت", "نەخشەی ماڵپەڕ", "Sitemap"),
     "skip": L("پرش به محتوا", "بازدان بۆ ناوەڕۆک", "Skip to content"),
 }
-FOOT_COLS = ["mkt", "ana", "tools", "learn", "arc", "more"]
+FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every NAV group — the footer is the full map of the site
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)

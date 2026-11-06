@@ -488,14 +488,14 @@ def card(addr, lang, esc=lambda x: x):
 
 
 # ------------------------------------------------------------------ token alerts (price ±% and liquidity pull)
-MAX_TALERTS = 5
+MAX_TALERTS = 0          # 0 = no limit
 TA = {
     "set": {"fa": "🔔 هشدار ثبت شد: ${s} اگر ±{p}٪ تکان بخورد یا نقدینگی‌اش نصف شود خبرت می‌کنم. (قیمت فعلی {now})",
             "ckb": "🔔 ئاگاداری تۆمارکرا: ${s} ئەگەر ±{p}٪ جووڵا یان لیکویدیتی نیوە بوو ئاگادارت دەکەم. (ئێستا {now})",
             "kmr": "🔔 Hişyarî hat danîn: ${s} heke ±{p}% biçe an likîdîte nîv bibe, ez ê te agahdar bikim. (niha {now})",
             "ar": "🔔 تم ضبط التنبيه: ${s} سأنبهك إذا تحرك ±{p}٪ أو انخفضت السيولة للنصف. (الآن {now})",
             "en": "🔔 Alert set: ${s} — I'll ping you on a ±{p}% move or if its liquidity halves. (now {now})"},
-    "max": {"fa": "حداکثر ۵ هشدار توکن فعال.", "ckb": "زۆرترین ٥ ئاگاداری تۆکن.", "kmr": "Herî zêde 5 hişyariyên tokenê.",
+    "max": {"fa": "حداکثر هشدار توکن پر شده است.", "ckb": "ژمارەی ئاگاداری تۆکن پڕە.", "kmr": "Herî zêde 5 hişyariyên tokenê.",
             "ar": "الحد الأقصى 5 تنبيهات للرموز.", "en": "Max 5 active token alerts."},
     "hit": {"fa": "🚨 <b>${s}</b> {d} {pct}٪ (از {a} به {b})", "ckb": "🚨 <b>${s}</b> {d} {pct}٪ ({a} ← {b})",
             "kmr": "🚨 <b>${s}</b> {d} {pct}% ({a} → {b})", "ar": "🚨 <b>${s}</b> {d} {pct}٪ (من {a} إلى {b})",
@@ -513,7 +513,7 @@ TA = {
 def add_alert(x, addr, pct, lang):
     al = x.setdefault("talerts", [])
     al[:] = [a for a in al if a["a"].lower() != addr.lower()]
-    if len(al) >= MAX_TALERTS:
+    if MAX_TALERTS and len(al) >= MAX_TALERTS:
         return L(TA["max"], lang)
     pair = best_pair(pairs_for([addr]), addr)
     if not pair:

@@ -70,7 +70,8 @@ STATE_PUSH_EVERY = int(os.environ.get("STATE_PUSH_EVERY", "600"))
 MAIN_WT = os.environ.get("MAIN_WORKTREE", "")            # checkout of main used to publish feeds to the site
 BRIEF_HOUR = int(os.environ.get("BRIEF_HOUR_UTC", "5"))   # 05:00 UTC ≈ 08:30 Tehran
 API = f"https://api.telegram.org/bot{TOKEN}/"
-MAX_ALERTS = 10
+MAX_ALERTS = 0            # 0 = no limit; the list below is paged so Telegram's row cap is never the reason to stop
+ALERT_PAGE = 18          # alert rows per keyboard page
 WATCH_PCT = float(os.environ.get("WATCH_PCT", "1.0"))
 WATCH_MIN = 15
 LIVE = {}          # (chat_id, message_id) -> {until, uid}
@@ -409,15 +410,28 @@ def kb_ref(uid, lang):
                                 [btn(t("b_top", lang), "m:top"), btn(t("b_back", lang), "m:main")]]}
 
 
-def kb_alerts(s, uid, lang):
+def kb_alerts(s, uid, lang, page=0):
+    """alerts are unlimited, so the delete buttons are paged — Telegram allows ~100 keyboard rows"""
     x = user(s, uid) or {}
     sub = x.get("brief")
     rows = [[btn(t("b_sub_off" if sub else "b_sub_on", lang), "brief")],
             [btn(t("b_watch_off" if x.get("watch") else "b_watch_on", lang), "watch")]]
-    for i, a in enumerate(x.get("alerts", []), 1):
-        rows.append([btn(f"🗑 {i}. {alert_label(a, lang)} {alert_spec(a, lang)}"[:60], f"ad:{i}")])
-    for i, a in enumerate(x.get("talerts", []), 1):
-        rows.append([btn(f"🗑 T{i}. ${a['s']} ±{a['pct']:g}%"[:60], f"td:{i}")])
+    al = list(enumerate(x.get("alerts", []), 1))
+    ta = [("T%d" % i, f"td:{i}", f"${a['s']} ±{a['pct']:g}%") for i, a in enumerate(x.get("talerts", []), 1)]
+    items = [(str(i), f"ad:{i}", f"{alert_label(a, lang)} {alert_spec(a, lang)}") for i, a in al] + ta
+    pages = max(1, -(-len(items) // ALERT_PAGE))
+    page = max(0, min(page, pages - 1))
+    for lab, cb, txt in items[page * ALERT_PAGE:(page + 1) * ALERT_PAGE]:
+        rows.append([btn(f"🗑 {lab}. {txt}"[:60], f"{cb}.{page}")])
+    if pages > 1:
+        back, fwd = ("▶", "◀") if lang in ("fa", "ckb", "ar") else ("◀", "▶")
+        nav = []
+        if page:
+            nav.append(btn(back, f"ap:{page - 1}"))
+        nav.append(btn(t("alert_page", lang, p=page + 1, n=pages), "noop"))
+        if page < pages - 1:
+            nav.append(btn(fwd, f"ap:{page + 1}"))
+        rows.append(nav)
     rows.append([btn(t("b_back", lang), "m:main")])
     return {"inline_keyboard": rows}
 
@@ -447,7 +461,7 @@ def market_age_min():
         return None
 
 
-def render(s, uid, key):
+def render(s, uid, key, page=0):
     """-> (text, keyboard) for a menu key, laid out by bot_menu (8-section home, 4 sub-menus, standard nav)"""
     lang = lang_of(s, uid)
     x = user(s, uid) or {}
@@ -557,7 +571,7 @@ def _render(s, uid, key):
         head = f"🔔 <b>{t('b_alerts', lang)[2:]}</b>"
         if not x.get("alerts"):
             head += "\n" + t("alert_none", lang)
-        return head + "\n\n" + t("alert_usage", lang), kb_alerts(s, uid, lang)
+        return head + "\n\n" + t("alert_usage", lang), kb_alerts(s, uid, lang, page)
     if key == "news":
         return news_list(s, lang)
     if key in SECTIONS:
@@ -718,7 +732,7 @@ def parse_alert(args, s, uid):
     price = IR.num(val)
     if price is None:
         return t("alert_usage", lang)
-    if len(x["alerts"]) >= MAX_ALERTS:
+    if MAX_ALERTS and len(x["alerts"]) >= MAX_ALERTS:
         return t("alert_max", lang)
     key = IR.resolve_asset(sym)
     if key:
@@ -733,7 +747,7 @@ def parse_alert(args, s, uid):
     c = D.find_coin(sym)
     if not c:
         return t("unknown_coin", lang) + D.e(sym.upper())
-    if len(x["alerts"]) >= MAX_ALERTS:
+    if MAX_ALERTS and len(x["alerts"]) >= MAX_ALERTS:
         return t("alert_max", lang)
     now = D.live_prices().get(c["coin"], (c.get("price"), 0))[0]
     if not now:
@@ -747,7 +761,7 @@ def add_pct_alert(s, uid, sym, sign, pct):
     """'+5%' / '-5%' / '±5%' alert relative to the price right now"""
     lang = lang_of(s, uid)
     x = user(s, uid)
-    if len(x["alerts"]) >= MAX_ALERTS:
+    if MAX_ALERTS and len(x["alerts"]) >= MAX_ALERTS:
         return t("alert_max", lang)
     key = IR.resolve_asset(sym)
     if key:
@@ -1312,11 +1326,12 @@ def handle_callback(s, cb):
     kind, _, val = data.partition(":")
     if kind == "tk":
         return token_reply(chat_id, val, lang, mid=mid)
-    if kind == "td" and val.isdigit():
-        i = int(val) - 1
+    if kind == "td" and val.replace(".", "", 1).isdigit():
+        n_, _, pg = val.partition(".")
+        i = int(n_) - 1
         if 0 <= i < len(x.get("talerts", [])):
             x["talerts"].pop(i)
-        return edit(chat_id, mid, *render(s, uid, "alerts"))
+        return edit(chat_id, mid, *render(s, uid, "alerts", int(pg or 0)))
     if data == "px:isp":
         return edit(chat_id, mid, PX2.L(PX2.T["isp_ask"], lang), {"inline_keyboard": PX2.isp_keyboard(lang)})
     if data == "px:share":
@@ -1394,11 +1409,16 @@ def handle_callback(s, cb):
     if kind == "ca":
         now = D.live_prices().get(val, (None,))[0]
         return send(chat_id, t("qa_head", lang, c=val, p=D.fp(now)), quick_alert_kb(val, lang))
-    if kind == "ad" and val.isdigit():
-        i = int(val) - 1
+    if kind == "ap" and val.isdigit():
+        return edit(chat_id, mid, *render(s, uid, "alerts", int(val)))
+    if data == "noop":
+        return None
+    if kind == "ad" and val.replace(".", "", 1).isdigit():
+        n_, _, pg = val.partition(".")
+        i = int(n_) - 1
         if 0 <= i < len(x["alerts"]):
             x["alerts"].pop(i)
-        return edit(chat_id, mid, *render(s, uid, "alerts"))
+        return edit(chat_id, mid, *render(s, uid, "alerts", int(pg or 0)))
     if data == "live:irr":
         LIVE[(chat_id, mid)] = {"until": time.time() + 15 * 60, "uid": uid}
         return edit(chat_id, mid, (IR.bot_board(lang) or IR.card(lang)) + "\n\n" + t("live_on", lang), kb_irr(lang, live=True))
