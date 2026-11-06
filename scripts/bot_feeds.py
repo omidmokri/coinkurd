@@ -29,7 +29,23 @@ log = logging.getLogger("feeds")
 FEEDS = {
     "onchain": ["glassnode", "cryptoquant_kr", "cryptoquant_official"],
     "news": ["cryptoslatenews"],
+    "econ": ["iamusd"],                                              # اخبار اقتصادی
+    "brief": ["newscitypro", "ForeDex", "alphractal", "MAC_DDDD"],   # خبر کوتاه
+    "ai": ["MrArtificialintelligence", "silicon_brain"],             # هوش مصنوعی
 }
+# per-kind settings. langs: which output languages go to that topic (a single topic must not get both,
+# or every item would be posted twice). max: new posts summarised per channel per check — the newer,
+# higher-volume feeds are kept small so they cannot flood the group or the AI budget.
+KINDS = {
+    "onchain": {"langs": None, "max": None},
+    "news": {"langs": None, "max": None},
+    "econ": {"langs": ["fa"], "max": 3},
+    "brief": {"langs": ["fa"], "max": 2},
+    "ai": {"langs": ["fa"], "max": 2},
+}
+KIND_ORDER = list(FEEDS)
+# topic ids in @Coin_Kurd_Group for the kinds added above; TOPIC_IDS overrides any of them
+DEFAULT_TOPICS = {"econ": 47540, "brief": 229893, "ai": 33973}
 TOPIC_HINTS = {  # words that identify each topic by its name (Persian and Sorani topics are separate)
     "onchain:ckb": ["ئانچین", "ئۆنچەین"],
     "onchain:fa": ["آنچین", "انچین"],
@@ -47,6 +63,8 @@ def env_topics():
         k, _, v = part.strip().partition("=")
         if k and v.strip().isdigit():
             out[k.strip()] = int(v)
+    for k, v in DEFAULT_TOPICS.items():
+        out.setdefault(k, v)
     return out
 CHECK_EVERY = int(os.environ.get("FEED_CHECK_EVERY", "600"))      # seconds between channel checks
 MAX_PER_CHECK = int(os.environ.get("FEED_MAX_PER_CHECK", "4"))    # new posts summarised per channel per check
@@ -187,7 +205,9 @@ def feed_state(s):
     for chs in FEEDS.values():        # all keys exist up front, so the worker thread never resizes dicts
         for ch in chs:
             f["seen"].setdefault(ch, None)
-    f.setdefault("items", {"onchain": [], "news": []})
+    items = f.setdefault("items", {})
+    for k in FEEDS:
+        items.setdefault(k, [])
     f.setdefault("last_check", 0)
     f.setdefault("last_fx", 0)
     f.setdefault("fx_msg", None)
@@ -283,9 +303,9 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
             log.info("fx post skipped: %s", ex)
 
     if now - f["last_check"] < CHECK_EVERY:
-        before = sum(1 for k in ("onchain", "news") for it in f["items"].get(k, []) if it.get("posted"))
+        before = sum(1 for k in KIND_ORDER for it in f["items"].get(k, []) if it.get("posted"))
         publish(s, f, topics, group_id, send_fn)          # keep draining the queue between channel checks
-        after = sum(1 for k in ("onchain", "news") for it in f["items"].get(k, []) if it.get("posted"))
+        after = sum(1 for k in KIND_ORDER for it in f["items"].get(k, []) if it.get("posted"))
         return changed or after != before
     f["last_check"] = now
     changed = True
@@ -305,7 +325,8 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
             if backfill and todays:
                 f["seen"][ch] = min(f["seen"][ch], todays[0][0] - 1)
             done = {it["id"] for it in f["items"].get(kind, [])}
-            new = [p for p in posts if p[0] > f["seen"][ch] and f"{ch}/{p[0]}" not in done][:MAX_PER_CHECK]
+            cap = KINDS.get(kind, {}).get("max") or MAX_PER_CHECK
+            new = [p for p in posts if p[0] > f["seen"][ch] and f"{ch}/{p[0]}" not in done][:cap]
             for pid, iso, text, links, photos in new:
                 f["seen"][ch] = max(f["seen"][ch], pid)
                 text, photo = expand(text, links, photos)
@@ -313,7 +334,7 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
                     continue
                 item = {"id": f"{ch}/{pid}", "kind": kind, "at": iso, "made": datetime.now(timezone.utc).isoformat(),
                         "photo": photo, "posted": False}
-                for lang in ("fa", "ckb"):
+                for lang in (KINDS.get(kind, {}).get("langs") or ("fa", "ckb")):
                     out = summarize(text, lang)
                     if out:
                         item[lang] = out
@@ -352,7 +373,8 @@ def publish(s, f, topics, group_id, send_fn):
                 if (it.get("at") or "")[:10] == today:
                     it["posted"] = False
     budget = PUBLISH_PER_LOOP
-    for kind in ("onchain", "news"):
+    for kind in KIND_ORDER:
+        langs = (KINDS.get(kind, {}).get("langs")) or POST_LANGS
         if not any(topics.get(k) for k in (kind, f"{kind}:fa", f"{kind}:ckb")):
             continue
         for it in sorted(f["items"].get(kind, []), key=lambda x: x.get("at") or ""):
@@ -366,7 +388,7 @@ def publish(s, f, topics, group_id, send_fn):
             if not it.get("photo"):
                 it["photo"] = find_photo(it["id"])
             ok = True
-            for lang in POST_LANGS:
+            for lang in langs:
                 th = topics.get(f"{kind}:{lang}") or topics.get(kind)
                 if it.get(lang) and th and lang not in it.get("sent", []):
                     r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
