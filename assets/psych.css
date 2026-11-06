@@ -2,8 +2,9 @@
    روی متغیرهای همان آکادمی سوار است تا تم روشن و تاریک خودبه‌خود کار کند. */
 #ps{max-width:1100px;margin:0 auto}
 .ps-warn{border:1px solid rgba(246,170,60,.45);background:rgba(246,170,60,.07);border-radius:14px;padding:12px 14px;margin:14px 0;line-height:2;font-size:.92rem}
-.ps-nav{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px;scrollbar-width:thin}
-.ps-tab{flex:0 0 auto;background:var(--card);border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:7px 14px;font:inherit;font-size:.88rem;cursor:pointer;white-space:nowrap}
+/* ۱۴ زبانه در دو سطر کامل — بدون اسکرول افقی (۷ ستون × ۲ سطر روی دسکتاپ) */
+.ps-nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:4px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.ps-tab{background:var(--card);border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:7px 10px;font:inherit;font-size:.86rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-align:center}
 .ps-tab.on{border-color:var(--acc);color:var(--acc);font-weight:700}
 .ps-pane{display:none}.ps-pane.on{display:block}
 .ps-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:0 0 14px}
@@ -66,4 +67,7 @@
 .ps-gap div{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;font-size:.88rem;padding:5px 0;border-bottom:1px solid var(--line)}
 .ps-spark{width:100%;height:120px}
 @media print{.ps-nav,.ps-bar,.ps-tab{display:none!important}.ps-pane{display:block!important}}
+@media (max-width:900px){.ps-nav{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:700px){.ps-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.ps-tab{font-size:.8rem;padding:7px 6px}}
+@media (max-width:460px){.ps-nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:560px){.ps-kpi b{font-size:1.4rem}.ps-chain{font-size:.84rem}}
