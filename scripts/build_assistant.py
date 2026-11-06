@@ -1,0 +1,232 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+نمایهٔ «پشتیبان انتخاب» — data/assistant.json
+
+جستجوگر هوشمند سایت که در صفحهٔ اصلی به‌صورت چت ظاهر می‌شود. نمایه از خود سایت ساخته می‌شود:
+  • نقشهٔ کامل سایت (همان منوی chrome.py، با عنوان و توضیح سه‌زبانه)
+  • ۵۰۶ مدخل دانشنامه (encyclopedia/index.json) با کلیدواژه‌های سه‌زبانه
+  • دانشکده‌ها و درس‌های آکادمی
+  • آخرین پست‌های کانال Coin_Kurd (عنوان، دسته، کوین)
+  • پرسش‌های پرتکرار پشتیبانی (دست‌نویس، سه‌زبانه)
+  • «پاسخ‌های زنده»: الگوهایی که ویجت با آن‌ها از فایل‌های JSON سایت عدد لحظه‌ای می‌خواند
+
+هیچ کلید API در مرورگر قرار نمی‌گیرد؛ همه‌چیز از دادهٔ عمومی خود سایت خوانده می‌شود.
+"""
+import json
+import os
+import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import reality_common as R  # noqa: E402
+
+TG_ADMIN = "Kurdistan_Coin"
+MAX_POSTS = 140
+L = R.L
+
+
+def tri(x, fa_fallback=""):
+    """normalise a 3-language dict coming from different modules"""
+    if isinstance(x, dict):
+        return {"fa": x.get("fa") or fa_fallback, "ckb": x.get("ckb") or x.get("fa") or fa_fallback, "en": x.get("en") or x.get("fa") or fa_fallback}
+    s = x or fa_fallback
+    return {"fa": s, "ckb": s, "en": s}
+
+
+def doc(url, title, desc="", kws=(), group="page"):
+    d = {"u": url, "t": tri(title), "g": group}
+    de = tri(desc) if desc else None
+    if de and any(de.values()):
+        d["d"] = de
+    k = " ".join(str(x) for x in kws if x)
+    if k:
+        d["k"] = k[:400]
+    return d
+
+
+# ------------------------------------------------------------------ sources
+def from_menu():
+    """every page the site's own menu points at — titles and descriptions already in 3 languages"""
+    import chrome as C
+    out, seen = [], set()
+    for cat in C.NAV:
+        label = tri(cat.get("t"))
+        for href, _icon, t, de in cat["items"]:
+            if not href.startswith("/") or href in seen:
+                continue
+            seen.add(href)
+            kws = [label["fa"], label["en"], tri(t)["en"], href.strip("/").replace("-", " ").replace("/", " ")]
+            out.append(doc(href, t, de, kws, "page"))
+    return out
+
+
+def from_encyclopedia():
+    p = os.path.join(R.ROOT, "encyclopedia", "index.json")
+    if not os.path.exists(p):
+        return []
+    rows = json.load(open(p, encoding="utf-8"))
+    out = []
+    for x in rows:
+        t = x.get("t") or {}
+        if not t.get("fa"):
+            continue
+        titles = " ".join(str(v) for v in t.values()).lower()
+        extra = [k for k in (x.get("k") or []) if str(k).lower() not in titles][:5]
+        out.append(doc(f"/encyclopedia/#{x['i']}", t, "", extra, "term"))
+    return out
+
+
+def from_academy():
+    try:
+        import academy_data as AD
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    for f in AD.FACULTIES:
+        out.append(doc(f"/academy/{f['id']}/", L(f["title"], f["title"], f.get("en") or f["title"]),
+                       L(f.get("summary", ""), f.get("summary", ""), ""), ["academy", "آکادمی", "دانشکده", f.get("en", "")], "academy"))
+    try:
+        content = AD.load_content()
+    except Exception:  # noqa: BLE001
+        content = {}
+    for fid, mod in (content or {}).items():
+        for course in (getattr(mod, "COURSES", None) or []):
+            for lesson in course.get("lessons", []) or []:
+                t = lesson.get("title")
+                if t:
+                    out.append(doc(f"/academy/{fid}/{course.get('id', '')}/#{lesson.get('id', '')}",
+                                   L(t, t, ""), "", ["درس", "آکادمی", course.get("title", "")], "academy"))
+    return out[:400]
+
+
+def from_posts():
+    rows = R.load("posts_lite.json", [])
+    rows = sorted([x for x in rows if x.get("date") and x.get("title")], key=lambda x: x["date"], reverse=True)[:MAX_POSTS]
+    out = []
+    for x in rows:
+        title = re.sub(r"\s+", " ", str(x["title"]))[:120]
+        out.append({"u": f"/p/{x['id']}/", "t": tri(title), "g": "post", "dt": x["date"][:10],
+                    "k": " ".join([*(x.get("coins") or []), *(x.get("hashtags") or [])[:6], x.get("category", "")])[:200]})
+    return out
+
+
+# ------------------------------------------------------------------ support FAQ (hand-written, 3 languages)
+def faq():
+    F = [
+        (["سایت انتخاب چیست", "entekhab چیست", "این سایت چیست", "about", "درباره"],
+         L("انتخاب چیست؟", "Entekhab چییە؟", "What is Entekhab?"),
+         L("entekhab.net یک مرکز تحلیل و دادهٔ کریپتو به فارسی، کوردی سورانی و انگلیسی است: داشبورد هوشمند، اسکنر تکنیکال، امتیاز اختصاصی هر کوین، رادار نهنگ‌ها، بررسی امنیت توکن، آکادمی، دانشنامه و لایهٔ واقعیت‌سنج. همهٔ داده‌ها از منابع عمومی و به‌صورت خودکار به‌روز می‌شوند.",
+           "entekhab.net ناوەندێکی شیکاری و داتای کریپتۆیە بە فارسی، کوردیی سۆرانی و ئینگلیزی: داشبۆرد، سکانەر، خاڵی تایبەت، ڕاداری نەهەنگ، ئەکادیمیا و زانستنامە.",
+           "entekhab.net is a crypto analysis and data hub in Persian, Sorani Kurdish and English: a smart dashboard, technical scanner, a per-coin score, whale radar, token safety checks, an academy, an encyclopedia and the reality-check layer."),
+         "/about/"),
+        (["امتیاز انتخاب", "entekhab score", "score چطور", "امتیاز کوین", "coin score", "how is the score", "خاڵی"],
+         L("امتیاز انتخاب چطور حساب می‌شود؟", "خاڵی Entekhab چۆن دەژمێردرێت؟", "How is the Entekhab score computed?"),
+         L("امتیاز هر کوین از ترکیب شفاف چند مؤلفهٔ تکنیکال، نقدینگی، مشتقات و احساسات بازار ساخته می‌شود و در صفحهٔ هر کوین، اجزای آن جداگانه نشان داده می‌شود.",
+           "خاڵی هەر دراوێک لە تێکەڵەی ڕوونی چەند پێکهاتەی تەکنیکی، شلەیی، مەشتەقە و هەستی بازاڕ دروست دەبێت.",
+           "Each coin's score is a transparent blend of technical, liquidity, derivatives and sentiment components; every component is shown separately on the coin's page."),
+         "/coins/"),
+        (["دفتر سیگنال", "ledger", "دقت سیگنال", "کارنامه سیگنال", "قفل زمانی", "signal accuracy", "how accurate are the signals", "track record", "وردیی سیگناڵ", "تۆماری سیگناڵ"],
+         L("دفتر عملکرد سیگنال‌ها چیست؟", "تۆماری ئەنجامی سیگناڵەکان چییە؟", "What is the signal ledger?"),
+         L("هر پیش‌بینی در لحظهٔ انتشار با قیمت مبنا، جهت و بازه قفل می‌شود و نتیجه‌اش خودکار حساب می‌شود. هر ردیف هش دارد و سرِ زنجیره روی بلاک‌چین بیت‌کوین مهر زمانی می‌خورد، پس هیچ ردیفی بعداً قابل تغییر نیست.",
+           "هەر پێشبینییەک لە ساتی بڵاوبوونەوەدا قوفڵ دەکرێت و ئەنجامەکەی خۆکارانە دەژمێردرێت؛ هەر ڕیزێک هاشی هەیە.",
+           "Every call is locked at publication with its reference price, direction and horizon, and settled automatically. Each row is hashed and the chain head is timestamped on Bitcoin, so no row can be changed later."),
+         "/ledger/"),
+        (["اصطکاک ایران", "تتر گران", "قیمت تتر", "دلار آزاد", "friction", "iran friction", "tether gap", "لێکخشانی ئێران", "تەتەر"],
+         L("شاخص اصطکاک ایران چه می‌گوید؟", "پێوەری لێکخشانی ئێران چی دەڵێت؟", "What does the Iran friction score say?"),
+         L("نشان می‌دهد قیمت جهانی چقدر با واقعیت کاربر ایرانی فاصله دارد: اختلاف نرخ تتر با دلار آزاد، فاصلهٔ قیمت بین صرافی‌های ایرانی، وضعیت دسترسی اینترنت و اخبار منفی محلی.",
+           "پیشان دەدات نرخی جیهانی چەند لە ڕاستیی بەکارهێنەری ئێرانی دوورە.",
+           "It shows how far the global price is from an Iranian user's reality: the tether gap against the free dollar, the spread between Iranian exchanges, internet access and local negative news."),
+         "/iran-friction/"),
+        (["ربات معامله گر", "freqtrade", "ربات ترید", "trade bot", "trading bot", "بۆتی مامەڵە"],
+         L("ربات معامله‌گر انتخاب چیست؟", "بۆتی مامەڵەکەری Entekhab چییە؟", "What is the Entekhab trading bot?"),
+         L("یک توزیع متن‌باز بر پایهٔ Freqtrade است که خودتان روی سرور خودتان نصب می‌کنید؛ کلید صرافی شما هرگز به سایت نمی‌آید. این توصیهٔ مالی نیست.",
+           "دابەشکردنێکی سەرچاوەکراوەیە لەسەر بنەمای Freqtrade کە خۆت دایدەمەزرێنیت.",
+           "An open-source Freqtrade distribution you install on your own server; your exchange keys never reach this site. Not financial advice."),
+         "/trade-bot/"),
+        (["آکادمی", "آموزش", "از کجا شروع کنم", "مبتدی", "یادگیری", "where do i start", "beginner", "learn", "دەست پێ بکەم", "فێربوون"],
+         L("از کجا شروع کنم؟", "لە کوێوە دەست پێ بکەم؟", "Where should I start?"),
+         L("اگر تازه‌کارید از «مسیر یادگیری» شروع کنید، بعد آکادمی را دانشکده‌به‌دانشکده جلو بروید و هر اصطلاح ناآشنا را در دانشنامه بخوانید. بخش روان‌شناسی معامله‌گر هم رفتار خودتان را می‌سنجد.",
+           "ئەگەر تازەکاریت لە «ڕێڕەوی فێربوون» دەست پێ بکە، پاشان ئەکادیمیا.",
+           "If you are new, start with the learning path, then work through the academy faculty by faculty, and look up every unfamiliar term in the encyclopedia. The trader-psychology section measures your own behaviour."),
+         "/learn/"),
+        (["روانشناسی", "روان شناسی معامله گر", "psychology", "ژورنال", "trader psychology", "mindset", "journal", "دەروونناسی"],
+         L("بخش روان‌شناسی معامله‌گر چه می‌کند؟", "بەشی دەروونناسیی بازرگان چی دەکات؟", "What does the trader-psychology section do?"),
+         L("ذهن شما را به داده تبدیل می‌کند: آزمون‌ها، ژورنال رفتاری، کیفیت تصمیم مستقل از سود و زیان و یک مغز سه‌بعدی تعاملی. همهٔ محاسبه در مرورگر خودتان انجام می‌شود و هیچ داده‌ای جایی فرستاده نمی‌شود. این ابزار تشخیص بالینی نیست.",
+           "مێشکت دەکاتە داتا: تاقیکردنەوە، ژۆرناڵ و کوالیتیی بڕیار. هەموو ژماردنەکان لە وێبگەڕی خۆتدا دەکرێن.",
+           "It turns your mind into data: assessments, a behaviour journal, decision quality independent of profit and loss, and an interactive 3D brain. Everything runs in your own browser and nothing is sent anywhere. It is not a clinical diagnosis."),
+         "/academy/psychology/"),
+        (["امنیت توکن", "هانی پات", "honeypot", "اسکم", "کلاهبرداری", "scam", "rug pull", "token safety", "فێڵ", "ئاسایشی دراو"],
+         L("چطور بفهمم یک توکن کلاهبرداری است؟", "چۆن بزانم دراوێک فێڵە؟", "How do I check whether a token is a scam?"),
+         L("آدرس قرارداد را در بخش «بررسی امنیت توکن» بگذارید: هانی‌پات بودن، مالیات خرید و فروش، قفل نقدینگی و اختیارات مالک بررسی می‌شود. نتیجه راهنماست، نه تضمین.",
+           "ناونیشانی گرێبەست لە بەشی «پشکنینی ئاسایشی دراو» دابنێ.",
+           "Put the contract address into the token-safety checker: honeypot behaviour, buy/sell tax, liquidity lock and owner privileges are checked. The result is guidance, not a guarantee."),
+         "/safety/"),
+        (["api", "توسعه دهنده", "developer", "دیتا"],
+         L("API دارید؟", "API هەیە؟", "Do you have an API?"),
+         L("بله، بخش توسعه‌دهندگان آدرس همهٔ فایل‌های JSON عمومی سایت را می‌دهد؛ همان داده‌ای که خود صفحه‌ها از آن استفاده می‌کنند.",
+           "بەڵێ، بەشی گەشەپێدەران هەموو فایلە JSONە گشتییەکان دەدات.",
+           "Yes — the developers page lists every public JSON file the site itself uses."),
+         "/developers/"),
+        (["تماس", "پشتیبانی", "ارتباط", "contact", "support", "ادمین", "admin", "help", "human", "پەیوەندی", "پشتگیری"],
+         L("چطور با شما تماس بگیرم؟", "چۆن پەیوەندیت پێوە بکەم؟", "How do I contact you?"),
+         L(f"از دکمهٔ «گفتگو با پشتیبان» همین پنجره، گفتگو در تلگرام با @{TG_ADMIN} باز می‌شود و متن پرسش‌تان هم کپی می‌شود تا فقط بچسبانید و بفرستید.",
+           f"لە دوگمەی «گفتوگۆ لەگەڵ پشتگیری» تەلەگرام لەگەڵ @{TG_ADMIN} دەکرێتەوە.",
+           f"Use the “talk to a human” button in this window: it opens a Telegram chat with @{TG_ADMIN} and copies your question so you only have to paste and send."),
+         f"https://t.me/{TG_ADMIN}"),
+        (["رایگان", "هزینه", "اشتراک", "subscription", "free", "پولی", "cost", "pricing", "بێبەرامبەر"],
+         L("استفاده از سایت رایگان است؟", "بەکارهێنانی سایتەکە بێبەرامبەرە؟", "Is the site free?"),
+         L("بله، همهٔ بخش‌های سایت رایگان و بدون ثبت‌نام است. چیزی برای فروش نداریم و هیچ سیگنال پولی نمی‌فروشیم.",
+           "بەڵێ، هەموو بەشەکان بێبەرامبەرن و بێ تۆمارکردن.",
+           "Yes — everything on the site is free and needs no sign-up. Nothing is for sale and no paid signals are sold."),
+         "/about/"),
+        (["کانال تلگرام", "گروه", "telegram", "coin kurd"],
+         L("کانال و گروه تلگرام کجاست؟", "کەناڵ و گرووپی تەلەگرام لە کوێیە؟", "Where are the Telegram channel and group?"),
+         L("کانال t.me/Coin_Kurd و گروه گفتگو t.me/Coin_Kurd_Group. آرشیو کامل پست‌های کانال با دسته‌بندی در خود سایت هم هست.",
+           "کەناڵ t.me/Coin_Kurd و گرووپ t.me/Coin_Kurd_Group.",
+           "Channel t.me/Coin_Kurd and discussion group t.me/Coin_Kurd_Group. The full categorised archive is on the site too."),
+         "/archive/"),
+        (["توصیه مالی", "مسئولیت", "ریسک", "advice"],
+         L("آیا این‌ها توصیهٔ مالی است؟", "ئایا ئەمانە ئامۆژگاریی دارایین؟", "Is any of this financial advice?"),
+         L("نه. هیچ‌کدام از مطالب این سایت توصیهٔ مالی نیست؛ ابزار و دادهٔ آموزشی است و تصمیم و ریسک با خود شماست. معامله در بازار کریپتو ریسک بالایی دارد.",
+           "نەخێر. هیچ شتێکی ئەم سایتە ئامۆژگاریی دارایی نییە.",
+           "No. Nothing here is financial advice; these are educational tools and data, and the decision and the risk are yours. Crypto trading carries high risk."),
+         "/terms/"),
+    ]
+    return [{"q": q, "t": tri(t), "a": tri(a), "u": u, "g": "faq"} for q, t, a, u in F]
+
+
+# ------------------------------------------------------------------ live answers
+def live():
+    """patterns the widget answers from the site's own live JSON files"""
+    return [
+        {"id": "price", "src": "/data/market.json", "kind": "coin_price",
+         "re": "قیمت|نرخ|چند|price|نرخی|بها|چنده", "t": tri(L("قیمت لحظه‌ای", "نرخی ئێستا", "Live price")), "u": "/coins/"},
+        {"id": "fng", "src": "/data/market.json", "kind": "fng", "re": "ترس|طمع|fear|greed|احساسات بازار",
+         "t": tri(L("شاخص ترس و طمع", "پێوەری ترس و تەماح", "Fear & Greed index")), "u": "/"},
+        {"id": "friction", "src": "/data/friction.json", "kind": "friction",
+         "re": "اصطکاک|تتر|دلار آزاد|friction|tether|حباب", "t": tri(L("اصطکاک محلی ایران", "لێکخشانی ناوخۆیی ئێران", "Iran friction")), "u": "/iran-friction/"},
+        {"id": "ledger", "src": "/data/ledger.json", "kind": "ledger",
+         "re": "دقت|کارنامه|سیگنال|ledger|accuracy|عملکرد", "t": tri(L("دقت سیگنال‌ها", "وردیی سیگناڵەکان", "Signal accuracy")), "u": "/ledger/"},
+        {"id": "silent", "src": "/data/silent_exit.json", "kind": "silent",
+         "re": "خروج خاموش|نهنگ|silent|whale", "t": tri(L("خروج خاموش", "چوونەدەرەوەی بێدەنگ", "Silent exit")), "u": "/silent-exit/"},
+    ]
+
+
+def main():
+    docs = []
+    for name, fn in (("menu", from_menu), ("encyclopedia", from_encyclopedia), ("academy", from_academy), ("posts", from_posts)):
+        try:
+            got = fn()
+            docs += got
+            print(f"  {name}: {len(got)}")
+        except Exception as ex:  # noqa: BLE001
+            print(f"  {name} failed: {ex}")
+    out = {"updated_at": R.iso(R.now()), "admin": TG_ADMIN, "docs": docs, "faq": faq(), "live": live()}
+    R.save("assistant.json", out)
+    size = os.path.getsize(os.path.join(R.D, "assistant.json"))
+    print(f"assistant index: {len(docs)} docs + {len(out['faq'])} faq ({size // 1024} KB)")
+
+
+if __name__ == "__main__":
+    main()
