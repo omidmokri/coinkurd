@@ -278,6 +278,12 @@ jobs:
         timeout-minutes: 2
         run: python scripts/indexnow.py
 
+      - name: Site assistant index (homepage help chat)
+        id: assistant
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/build_assistant.py
+
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"
