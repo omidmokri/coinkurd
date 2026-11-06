@@ -22,20 +22,45 @@ OUT = os.path.join(BP.ROOT, "extension")
 e = BP.e
 
 
-def package():
-    ver = json.load(open(os.path.join(SRC, "manifest.json"), encoding="utf-8"))["version"]
-    os.makedirs(OUT, exist_ok=True)
-    name = f"entekhab-chrome-{ver}.zip"
-    with zipfile.ZipFile(os.path.join(OUT, name), "w", zipfile.ZIP_DEFLATED) as z:
+GECKO_ID = "entekhab@entekhab.net"
+
+
+def firefox_manifest(man):
+    """the same extension for Firefox: it has no MV3 service worker, and it wants an add-on id.
+    Generated from the Chrome manifest so the two can never drift apart."""
+    m = dict(man)
+    m["background"] = {"scripts": ["background.js"]}          # Firefox MV3 uses an event page
+    m["browser_specific_settings"] = {"gecko": {"id": GECKO_ID, "strict_min_version": "128.0"}}
+    m.pop("minimum_chrome_version", None)
+    return m
+
+
+def _zip(path, extra_manifest=None):
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for dp, _, fs in os.walk(SRC):
             for f in sorted(fs):
                 full = os.path.join(dp, f)
-                z.write(full, os.path.relpath(full, SRC))
-    return ver, name, os.path.getsize(os.path.join(OUT, name))
+                rel = os.path.relpath(full, SRC)
+                if rel == "manifest.json" and extra_manifest is not None:
+                    z.writestr(rel, json.dumps(extra_manifest, ensure_ascii=False, indent=2))
+                else:
+                    z.write(full, rel)
+    return os.path.getsize(path)
+
+
+def package():
+    man = json.load(open(os.path.join(SRC, "manifest.json"), encoding="utf-8"))
+    ver = man["version"]
+    os.makedirs(OUT, exist_ok=True)
+    name = f"entekhab-chrome-{ver}.zip"
+    fx = f"entekhab-firefox-{ver}.xpi"
+    size = _zip(os.path.join(OUT, name))
+    fx_size = _zip(os.path.join(OUT, fx), firefox_manifest(man))
+    return ver, name, size, fx, fx_size
 
 
 def build():
-    ver, name, size = package()
+    ver, name, size, fx, fx_size = package()
     shots = [f for f in ("market.png", "report.png", "alerts.png") if os.path.exists(os.path.join(BP.ROOT, "chrome-extension", "store", f))]
     gallery = "".join(f'<img src="/chrome-extension/store/{f}" alt="" loading="lazy" style="width:100%;border-radius:12px;border:1px solid var(--line);margin:6px 0">' for f in shots)
     store = (f'<p><a class="wbtn on" href="{e(STORE_URL)}" rel="noopener" target="_blank">⬇ نصب از Chrome Web Store</a></p>' if STORE_URL else
@@ -56,24 +81,32 @@ def build():
         "گزینهٔ <b>Developer mode</b> را در گوشهٔ بالای صفحه روشن کنید.",
         "روی <b>Load unpacked</b> بزنید و پوشه‌ای را که از zip بیرون آوردید انتخاب کنید.",
         "آیکون انتخاب را از منوی پازل 🧩 سنجاق (Pin) کنید تا قیمت روی آن دیده شود."])
+    fx_steps = "".join(f"<li>{x}</li>" for x in [
+        f'فایل <a href="/extension/{fx}" download><b>{fx}</b></a> را دانلود کنید ({fx_size // 1024} کیلوبایت).',
+        "در نوار آدرس فایرفاکس بنویسید <code dir=\"ltr\">about:debugging#/runtime/this-firefox</code> و Enter بزنید.",
+        "روی <b>Load Temporary Add-on…</b> بزنید و همین فایل xpi را انتخاب کنید.",
+        "برای نصب دائمی، افزونه باید امضای Mozilla داشته باشد؛ نسخهٔ امضاشده پس از تأیید در addons.mozilla.org منتشر می‌شود.",
+        "در فایرفاکس اندروید، همین افزونه از طریق مجموعهٔ افزونه‌های انتخاب نصب می‌شود."])
     perms = "".join(f"<li><b>{a}</b>: {b}</li>" for a, b in [
         ("storage", "ذخیرهٔ تنظیمات، هشدارها و آخرین داده‌ها فقط روی همین مرورگر"),
         ("alarms", "به‌روزرسانی خودکار هر ۵ دقیقه"),
         ("notifications", "نمایش هشدار قیمت و پست تازه"),
         ("entekhab.net و data-api.binance.vision", "خواندن داده‌های عمومی بازار؛ افزونه هیچ صفحه‌ای از سایت‌های دیگر را نمی‌خواند")])
-    body = (f'<div class="meta"><a href="/">خانه</a> / افزونهٔ کروم</div>'
-            f'<h1>🧩 افزونهٔ گوگل کروم انتخاب</h1>'
+    body = (f'<div class="meta"><a href="/">خانه</a> / <a href="/app/">دانلود اپ</a> / افزونهٔ مرورگر</div>'
+            f'<h1>🧩 افزونهٔ مرورگر انتخاب — کروم و فایرفاکس</h1>'
             f'<p class="txt">بازار کریپتو همیشه یک کلیک با شما فاصله دارد: قیمت‌ها، ترس و طمع، گزارش روزانه، پست‌های Coin_Kurd و هشدار قیمت، بدون باز کردن سایت. '
-            f'رایگان، بدون تبلیغ و بدون ردیابی. نسخهٔ {e(ver)} · سازگار با Chrome، Edge، Brave و Opera.</p>{store}'
-            f'<p><a class="wbtn on" href="/extension/{name}" download>⬇ دانلود مستقیم ({e(name)})</a> '
+            f'رایگان، بدون تبلیغ و بدون ردیابی. نسخهٔ {e(ver)} · کروم، ادج، بریو، اپرا و فایرفاکس.</p>{store}'
+            f'<p id="chrome"><a class="wbtn on" href="/extension/{name}" download>⬇ دانلود برای کروم ({e(name)})</a> '
+            f'<a class="wbtn" id="firefox" href="/extension/{fx}" download>🦊 دانلود برای فایرفاکس ({e(fx)})</a> '
             f'<a class="wbtn" href="https://github.com/omidmokri/coinkurd/tree/main/chrome-extension/src" rel="noopener" target="_blank">کد منبع</a></p>'
             f'{gallery}<h2>امکانات</h2><ul class="list" style="list-style:disc;padding-inline-start:20px">{feats}</ul>'
-            f'<h2>نصب مستقیم (بدون Chrome Web Store)</h2><ol style="padding-inline-start:22px">{steps}</ol>'
+            f'<h2>نصب در کروم (بدون Chrome Web Store)</h2><ol style="padding-inline-start:22px">{steps}</ol>'
+            f'<h2>🦊 نصب در فایرفاکس</h2><ol style="padding-inline-start:22px">{fx_steps}</ol>'
             f'<h2>دسترسی‌ها و حریم خصوصی</h2><ul style="padding-inline-start:20px">{perms}</ul>'
             f'<p class="note">افزونه هیچ اطلاعات شخصی، تاریخچهٔ مرور یا داده‌ای از صفحه‌های دیگر جمع نمی‌کند و چیزی به سرور ما نمی‌فرستد. '
             f'<a href="/privacy/">حریم خصوصی</a> · اطلاعات آموزشی است، توصیهٔ مالی نیست.</p>')
-    ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Entekhab — Chrome extension", "applicationCategory": "BrowserApplication",
-          "operatingSystem": "Chrome, Edge, Brave, Opera", "softwareVersion": ver, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Entekhab — browser extension", "applicationCategory": "BrowserApplication",
+          "operatingSystem": "Chrome, Edge, Brave, Opera, Firefox", "softwareVersion": ver, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
           "downloadUrl": f"{BP.SITE}/extension/{name}", "inLanguage": ["fa", "ckb", "en"]}
     url = BP.page("extension/", "افزونهٔ گوگل کروم انتخاب — قیمت کریپتو، گزارش بازار و هشدار قیمت",
                   "افزونهٔ رایگان کروم entekhab.net: قیمت زندهٔ رمزارزها روی آیکون، ترس و طمع، گزارش روزانهٔ بازار، پست‌های Coin_Kurd و هشدار قیمت",
