@@ -273,3 +273,20 @@ footer .dis{border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);back
 /* back to entekhab.net from the encyclopedia header */
 .sitelink{display:inline-grid;place-items:center;text-decoration:none;color:inherit}
 .sitelink:hover{border-color:var(--navy);color:var(--navy)}
+
+/* back to entekhab.net — the encyclopedia is a whole app of its own, so it says plainly where the way out is */
+.brand{text-decoration:none}
+.brand .brandsite,.brand .brandname{display:flex;align-items:center;text-decoration:none;color:inherit;border-radius:8px}
+.brand .brandsite{padding:2px;margin:-2px}
+.brand .brandname{gap:10px}
+.brand .brandsite:hover,.brand .brandsite:focus-visible{outline:1px solid var(--navy);outline-offset:1px}
+.t3 i{display:none;font-style:normal}
+body[data-lang="fa"] .t3 i[lang="fa"],body[data-lang="ckb"] .t3 i[lang="ckb"],body[data-lang="en"] .t3 i[lang="en"]{display:inline}
+.sitemapbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.sitemapbar .sitehome{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.sitemapbar .sitehome img{height:26px;width:auto;display:block}
+.sitemapbar .sitehome:hover{color:var(--navy)}
+.sitemapbar .sitelinks{display:flex;gap:14px;flex-wrap:wrap}
+.sitemapbar .sitelinks a{color:var(--muted);text-decoration:none;font-size:13px}
+.sitemapbar .sitelinks a:hover{color:var(--navy);text-decoration:underline}
+@media(max-width:640px){.sitemapbar{gap:12px}.sitemapbar .sitelinks{gap:10px}}
