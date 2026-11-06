@@ -951,10 +951,15 @@ def build_api():
                                      "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})
     try:   # the Reality-check readings, in the same shape the bot renders — one source, every surface
         import bot_reality as BRL
-        w("reality.json", {"note": "the six reality-check readings, as shown in the bot and the extension",
+        w("reality.json", {"note": "the reality-check readings, as shown in the bot and the extension",
                            **{lg: BRL.summary(lg) for lg in ("fa", "ckb", "en")}})
     except Exception as ex:  # noqa: BLE001
         print("reality summary skipped:", ex)
+    try:   # the encyclopedia search index — the bot, the extension and the apps search the same file
+        import bot_encyclopedia as ENC
+        w("encyclopedia.json", ENC.api())
+    except Exception as ex:  # noqa: BLE001
+        print("encyclopedia index skipped:", ex)
     for nm in ("dna", "derivatives", "chain", "flows", "lab", "council", "wrapped", "indicators", "kind", "signals",
                "ledger", "hype", "friction", "localcorr", "silent_exit", "opportunity", "sentiment", "whales"):
         dd = load(f"{nm}.json", None)
