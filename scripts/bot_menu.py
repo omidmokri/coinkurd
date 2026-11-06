@@ -26,6 +26,13 @@ def L(d, lang, /, **kw):
 # ================================================================== section catalogue
 # key: (icon, {name}, {one-line description})
 S = {
+    "analysis": ("🧭", {"fa": "تحلیل بازار", "ckb": "شیکاریی بازاڕ", "kmr": "Analîza bazarê",
+                        "ar": "تحليل السوق", "en": "Market analysis"},
+                 {"fa": "رژیم بازار، سه سناریو با احتمال، و ارزیابی نهایی — بر پایهٔ دادهٔ زمان‌دار، بدون عدد ساختگی.",
+                  "ckb": "ڕژێمی بازاڕ، سێ سیناریۆ بە ڕێژەی ئەگەر، و هەڵسەنگاندنی کۆتایی.",
+                  "kmr": "Rejîma bazarê, sê senaryo bi îhtîmal, û nirxandina dawî.",
+                  "ar": "نظام السوق، ثلاثة سيناريوهات باحتمالات، والتقييم النهائي.",
+                  "en": "Market regime, three scenarios with probabilities, and a final verdict."}),
     # ---------------------------------------------------------------- home level
     "token": ("🔎", {"fa": "بررسی توکن (CA)", "ckb": "پشکنینی تۆکن (CA)", "kmr": "Kontrola tokenê (CA)", "ar": "فحص الرمز (CA)",
                     "en": "Token check (CA)"},
@@ -220,7 +227,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["coin", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
+    "g_analysis": ["analysis", "coin", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["news", "narr", "events", "week", "posts", "track"],
     "g_more": ["lang", "learn", "proxy", "outage", "ref", "predict"],
