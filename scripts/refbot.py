@@ -1655,6 +1655,22 @@ def setup_profile(s):
 
 
 # ================================================================== main loop
+def watchdog(s, deadline, grace=240):
+    """A run must end on time. One slow job — a long AI call, a git push that stalls — can hold the
+    loop past the deadline until the workflow's own timeout cancels the job; a cancelled job used to
+    skip the step that starts the next run, and the bot simply went off the air. So: wait out the
+    grace period, save what we have, and exit 0 so the next run starts normally."""
+    while time.time() < deadline + grace:
+        time.sleep(5)
+    log.error("watchdog: the run overran its deadline by %ss — saving and exiting so the next run starts", grace)
+    try:
+        save_state(s)
+        push_state()
+    except Exception:
+        log.exception("watchdog could not save the state")
+    os._exit(0)
+
+
 def main():
     global BOT_USERNAME
     if not TOKEN:
@@ -1690,6 +1706,7 @@ def main():
     for name in ("market", "brain", "posts_lite"):   # warm cache
         D.load(name)
     deadline = time.time() + RUN_SECONDS
+    threading.Thread(target=watchdog, args=(s, deadline), name="watchdog", daemon=True).start()
     last_push, handled, dirty = time.time(), 0, False
     while time.time() < deadline:
         d = tg("getUpdates", offset=s["offset"], timeout=25, allowed_updates=["message", "callback_query"])
