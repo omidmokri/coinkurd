@@ -42,6 +42,10 @@ jobs:
           fi
           git worktree add --detach mainwt origin/main
 
+      - name: Mark start
+        id: t0
+        run: echo "at=$(date +%s)" >> "$GITHUB_OUTPUT"
+
       - name: Run bot
         id: bot
         env:
@@ -82,12 +86,20 @@ jobs:
           done
           echo "::warning::state could not be pushed after 5 attempts; the next run starts from the last saved state"
 
-      # Start the next run even if saving the state failed (always()), with retries.
+      # Start the next run whatever happened to the bot step — a crash, a hang that hit the job
+      # timeout, or a cancellation must not leave the bot off the air, which is what broke the
+      # chain on run #138. The only guard is against a hot loop: a run that ended within five
+      # minutes is a broken commit, and there the hourly schedule is the safer restart.
       - name: Start next run
-        if: always() && steps.bot.outcome == 'success'
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          ran=$(( $(date +%s) - ${{ steps.t0.outputs.at }} ))
+          if [ "$ran" -lt 300 ]; then
+            echo "::warning::the run ended after ${ran}s — too soon to chain another; the hourly schedule will restart it"
+            exit 0
+          fi
           for i in 1 2 3 4 5; do
             gh workflow run refbot.yml --repo "${{ github.repository }}" --ref main && exit 0
             echo "dispatch failed (attempt $i); retrying in 30s"
