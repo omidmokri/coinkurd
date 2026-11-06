@@ -20,6 +20,7 @@
   <button data-tab="report" data-t="tReport">گزارش</button>
   <button data-tab="analysis" data-t="tAnalysis">تحلیل</button>
   <button data-tab="reality" data-t="tReality">واقعیت‌سنج</button>
+  <button data-tab="enc" data-t="tEnc">دانشنامه</button>
   <button data-tab="calc" data-t="tCalc">ماشین‌حساب</button>
   <button data-tab="posts" data-t="tPosts">کانال</button>
   <button data-tab="alerts" data-t="tAlerts">هشدار</button>
@@ -32,6 +33,10 @@
   <section data-pane="report"><div id="report" class="report"></div></section>
   <section data-pane="analysis"><div id="analysis" class="report"></div></section>
   <section data-pane="reality"><div id="reality" class="report"></div></section>
+  <section data-pane="enc">
+    <input id="encq" type="search" autocomplete="off" data-tp="encSearch">
+    <div id="enc" class="report"></div>
+  </section>
   <section data-pane="calc">
     <div class="cc">
       <select id="cKind" aria-label="calculator"></select>
