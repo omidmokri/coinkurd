@@ -3,17 +3,17 @@
 const SITE = 'https://entekhab.net';
 const $ = s => document.querySelector(s);
 const T = {
-  fa: { tEnc: 'دانشنامه', encSearch: 'واژه را بنویس…', encNone: 'چیزی پیدا نشد', encHint: 'جست‌وجو در ۵۰۶ واژه، به سه زبان', encLoad: 'در حال بارگذاری دانشنامه…', encFull: 'صفحهٔ واژه', tCalc: 'ماشین‌حساب', kSize: '📐 حجم پوزیشن', kRR: '⚖️ ریسک به بازده', kPnl: '💰 سود و زیان', kLiq: '💥 قیمت لیکوئید', kFee: '🧾 کارمزد', cap: 'سرمایه ($)', risk: 'ریسک ٪', entry: 'ورود', stop: 'حد ضرر', target: 'حد سود', exit: 'خروج', qty: 'مقدار (واحد)', lev: 'اهرم', feeSide: 'کارمزد هر طرف ٪', feeRT: 'کارمزد رفت و برگشت ٪', winExp: 'نرخ برد مورد انتظار ٪', mmr: 'مارجین نگهداری ٪', side: 'جهت', long: 'لانگ', short: 'شورت', amount: 'مبلغ معامله ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'معامله در ماه', oRiskAmt: 'مبلغ ریسک', oStopDist: 'فاصلهٔ حد ضرر', oQty: 'حجم (واحد)', oNotional: 'ارزش پوزیشن', oLev: 'اهرم لازم', oLoss: 'زیان روی حد ضرر', oRR: 'ریسک به بازده (با کارمزد)', oBE: 'نرخ برد سربه‌سر', oEV: 'امید ریاضی هر معامله', oVerdict: 'وضعیت با نرخ برد شما', oGross: 'سود/زیان ناخالص', oFee: 'کارمزد کل', oNet: 'سود/زیان خالص', oMargin: 'مارجین درگیر', oROE: 'بازده روی مارجین', oChg: 'تغییر قیمت', oLiq: 'قیمت تقریبی لیکوئید', oDist: 'فاصله تا لیکوئید', oWipe: 'حرکت خلافی که مارجین را می‌برد', oTT: 'ورود و خروج Taker', oMT: 'ورود Maker، خروج Taker', oMonthly: 'هزینهٔ ماهانه (Taker)', oBEmove: 'حرکت لازم برای سربه‌سر', noLev: 'بدون اهرم', posi: 'مثبت', nega: 'منفی', evenv: 'سربه‌سر', cHint: 'قیمت ورود از نرخ زندهٔ همین افزونه پر می‌شود. محاسبه‌ها تقریبی و آموزشی‌اند؛ لغزش و پلکان نرخ صرافی لحاظ نمی‌شود.', brand: 'انتخاب', tMarket: 'بازار', tReport: 'گزارش', tPosts: 'کانال', tAlerts: 'هشدار', search: 'جست‌وجوی کوین…', above: 'بالاتر از', below: 'پایین‌تر از', add: 'افزودن',
+  fa: { offline: 'اینترنت وصل نیست؛ چیزی هم ذخیره نشده بود.', later: 'این بخش هنوز منتشر نشده است؛ کمی بعد دوباره سر بزن.', retry: 'تلاش دوباره', loading: 'در حال دریافت…', pgMore: 'ادامه', toTop: 'برگشت به بالا', tEnc: 'دانشنامه', encSearch: 'واژه را بنویس…', encNone: 'چیزی پیدا نشد', encHint: 'جست‌وجو در ۵۰۶ واژه، به سه زبان', encLoad: 'در حال بارگذاری دانشنامه…', encFull: 'صفحهٔ واژه', tCalc: 'ماشین‌حساب', kSize: '📐 حجم پوزیشن', kRR: '⚖️ ریسک به بازده', kPnl: '💰 سود و زیان', kLiq: '💥 قیمت لیکوئید', kFee: '🧾 کارمزد', cap: 'سرمایه ($)', risk: 'ریسک ٪', entry: 'ورود', stop: 'حد ضرر', target: 'حد سود', exit: 'خروج', qty: 'مقدار (واحد)', lev: 'اهرم', feeSide: 'کارمزد هر طرف ٪', feeRT: 'کارمزد رفت و برگشت ٪', winExp: 'نرخ برد مورد انتظار ٪', mmr: 'مارجین نگهداری ٪', side: 'جهت', long: 'لانگ', short: 'شورت', amount: 'مبلغ معامله ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'معامله در ماه', oRiskAmt: 'مبلغ ریسک', oStopDist: 'فاصلهٔ حد ضرر', oQty: 'حجم (واحد)', oNotional: 'ارزش پوزیشن', oLev: 'اهرم لازم', oLoss: 'زیان روی حد ضرر', oRR: 'ریسک به بازده (با کارمزد)', oBE: 'نرخ برد سربه‌سر', oEV: 'امید ریاضی هر معامله', oVerdict: 'وضعیت با نرخ برد شما', oGross: 'سود/زیان ناخالص', oFee: 'کارمزد کل', oNet: 'سود/زیان خالص', oMargin: 'مارجین درگیر', oROE: 'بازده روی مارجین', oChg: 'تغییر قیمت', oLiq: 'قیمت تقریبی لیکوئید', oDist: 'فاصله تا لیکوئید', oWipe: 'حرکت خلافی که مارجین را می‌برد', oTT: 'ورود و خروج Taker', oMT: 'ورود Maker، خروج Taker', oMonthly: 'هزینهٔ ماهانه (Taker)', oBEmove: 'حرکت لازم برای سربه‌سر', noLev: 'بدون اهرم', posi: 'مثبت', nega: 'منفی', evenv: 'سربه‌سر', cHint: 'قیمت ورود از نرخ زندهٔ همین افزونه پر می‌شود. محاسبه‌ها تقریبی و آموزشی‌اند؛ لغزش و پلکان نرخ صرافی لحاظ نمی‌شود.', brand: 'انتخاب', tMarket: 'بازار', tReport: 'گزارش', tPosts: 'کانال', tAlerts: 'هشدار', search: 'جست‌وجوی کوین…', above: 'بالاتر از', below: 'پایین‌تر از', add: 'افزودن',
     settings: 'تنظیمات', badge: 'عدد روی آیکون', notifyPosts: 'اعلان پست‌های تازهٔ Coin_Kurd', privacy: 'همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.',
     tAnalysis: 'تحلیل', tReality: 'واقعیت‌سنج', rlFull: 'صفحهٔ کامل', rlNone: 'هنوز داده‌ای نیست', anHow: 'در هشت بخش، با دادهٔ زمان‌دار و بدون عدد ساختگی', anNone: 'هنوز تحلیلی منتشر نشده است', anFull: 'متن کامل', anMissing: 'بدون دسترسی به:', enc: '📚 دانشنامه', academy: '🏛 آکادمی', lab: '🧪 شبیه‌ساز', dash: '📊 داشبورد', reality: '🎯 واقعیت‌سنج', round: '💬 میزگرد', opp: '🧮 هزینه فرصت', ledger: '📒 دفتر سیگنال‌ها', bot: '🤖 ربات', nfa: 'توصیهٔ مالی نیست', fng: 'ترس و طمع', mcap: 'ارزش کل بازار', dom: 'دامیننس BTC',
     upd: 'به‌روزرسانی', ago: 'دقیقه پیش', now: 'همین الان', off: 'خاموش', noAlerts: 'هنوز هشداری نساخته‌اید. وقتی قیمت به عدد شما برسد، اعلان می‌گیرید.', hit: 'فعال شد', loading: 'در حال بارگذاری…',
     err: 'داده در دسترس نیست؛ اتصال اینترنت را بررسی کنید.', more: 'گزارش کامل در سایت', allPosts: 'همهٔ پست‌ها', fngC: { 'Extreme Fear': 'ترس شدید', Fear: 'ترس', Neutral: 'خنثی', Greed: 'طمع', 'Extreme Greed': 'طمع شدید' } },
-  ckb: { tEnc: 'زانستنامە', encSearch: 'وشەکە بنووسە…', encNone: 'هیچ نەدۆزرایەوە', encHint: 'گەڕان لە ٥٠٦ وشە، بە سێ زمان', encLoad: 'زانستنامە بار دەکرێت…', encFull: 'پەڕەی وشە', tCalc: 'ژمێرەر', kSize: '📐 قەبارەی پۆزیشن', kRR: '⚖️ مەترسی بۆ قازانج', kPnl: '💰 قازانج و زیان', kLiq: '💥 نرخی لیکوید', kFee: '🧾 کرێ', cap: 'سەرمایە ($)', risk: 'مەترسی ٪', entry: 'چوونەژوورەوە', stop: 'وەستاندنی زیان', target: 'ئامانج', exit: 'دەرچوون', qty: 'بڕ (یەکە)', lev: 'لیڤەرج', feeSide: 'کرێی هەر لایەک ٪', feeRT: 'کرێی چوون و هاتن ٪', winExp: 'ڕێژەی چاوەڕوانکراوی بردنەوە ٪', mmr: 'مارجینی پاراستن ٪', side: 'ئاڕاستە', long: 'لۆنگ', short: 'شۆرت', amount: 'بڕی مامەڵە ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'مامەڵە لە مانگێک', oRiskAmt: 'بڕی مەترسی', oStopDist: 'دووری وەستاندنی زیان', oQty: 'قەبارە (یەکە)', oNotional: 'بەهای پۆزیشن', oLev: 'لیڤەرجی پێویست', oLoss: 'زیان لەسەر وەستاندن', oRR: 'مەترسی بۆ قازانج (بە کرێ)', oBE: 'ڕێژەی بردنەوەی یەکسان', oEV: 'چاوەڕوانیی هەر مامەڵەیەک', oVerdict: 'دۆخ بە ڕێژەی بردنەوەی تۆ', oGross: 'قازانج/زیانی سەرەکی', oFee: 'کۆی کرێ', oNet: 'قازانج/زیانی خاوێن', oMargin: 'مارجینی بەکارهاتوو', oROE: 'گەڕانەوە لەسەر مارجین', oChg: 'گۆڕانی نرخ', oLiq: 'نرخی نزیکەیی لیکوید', oDist: 'دووری بۆ لیکوید', oWipe: 'جوڵەی پێچەوانە کە مارجین دەبات', oTT: 'چوونەژوورەوە و دەرچوونی Taker', oMT: 'Maker بۆ چوون، Taker بۆ دەرچوون', oMonthly: 'تێچووی مانگانە (Taker)', oBEmove: 'جوڵەی پێویست بۆ یەکسانی', noLev: 'بێ لیڤەرج', posi: 'ئەرێنی', nega: 'نەرێنی', evenv: 'یەکسان', cHint: 'نرخی چوونەژوورەوە لە نرخی زیندووی هەمین پێوەکراوە پڕدەکرێتەوە. ژمێرکارییەکان نزیکەیی و فێرکارین.', brand: 'ئینتیخاب', tMarket: 'بازاڕ', tReport: 'ڕاپۆرت', tPosts: 'کەناڵ', tAlerts: 'ئاگاداری', search: 'گەڕان بۆ دراو…', above: 'سەرووی', below: 'خوارووی', add: 'زیادکردن',
+  ckb: { offline: 'ئینتەرنێت نییە و هیچ کۆپییەکی پاشەکەوتکراویش نییە.', later: 'ئەم بەشە هێشتا بڵاو نەکراوەتەوە؛ کەمێک دواتر سەردانی بکەرەوە.', retry: 'دووبارە هەوڵ بدە', loading: 'وەرگرتن…', pgMore: 'بەردەوام', toTop: 'گەڕانەوە بۆ سەرەوە', tEnc: 'زانستنامە', encSearch: 'وشەکە بنووسە…', encNone: 'هیچ نەدۆزرایەوە', encHint: 'گەڕان لە ٥٠٦ وشە، بە سێ زمان', encLoad: 'زانستنامە بار دەکرێت…', encFull: 'پەڕەی وشە', tCalc: 'ژمێرەر', kSize: '📐 قەبارەی پۆزیشن', kRR: '⚖️ مەترسی بۆ قازانج', kPnl: '💰 قازانج و زیان', kLiq: '💥 نرخی لیکوید', kFee: '🧾 کرێ', cap: 'سەرمایە ($)', risk: 'مەترسی ٪', entry: 'چوونەژوورەوە', stop: 'وەستاندنی زیان', target: 'ئامانج', exit: 'دەرچوون', qty: 'بڕ (یەکە)', lev: 'لیڤەرج', feeSide: 'کرێی هەر لایەک ٪', feeRT: 'کرێی چوون و هاتن ٪', winExp: 'ڕێژەی چاوەڕوانکراوی بردنەوە ٪', mmr: 'مارجینی پاراستن ٪', side: 'ئاڕاستە', long: 'لۆنگ', short: 'شۆرت', amount: 'بڕی مامەڵە ($)', maker: 'Maker ٪', taker: 'Taker ٪', perMonth: 'مامەڵە لە مانگێک', oRiskAmt: 'بڕی مەترسی', oStopDist: 'دووری وەستاندنی زیان', oQty: 'قەبارە (یەکە)', oNotional: 'بەهای پۆزیشن', oLev: 'لیڤەرجی پێویست', oLoss: 'زیان لەسەر وەستاندن', oRR: 'مەترسی بۆ قازانج (بە کرێ)', oBE: 'ڕێژەی بردنەوەی یەکسان', oEV: 'چاوەڕوانیی هەر مامەڵەیەک', oVerdict: 'دۆخ بە ڕێژەی بردنەوەی تۆ', oGross: 'قازانج/زیانی سەرەکی', oFee: 'کۆی کرێ', oNet: 'قازانج/زیانی خاوێن', oMargin: 'مارجینی بەکارهاتوو', oROE: 'گەڕانەوە لەسەر مارجین', oChg: 'گۆڕانی نرخ', oLiq: 'نرخی نزیکەیی لیکوید', oDist: 'دووری بۆ لیکوید', oWipe: 'جوڵەی پێچەوانە کە مارجین دەبات', oTT: 'چوونەژوورەوە و دەرچوونی Taker', oMT: 'Maker بۆ چوون، Taker بۆ دەرچوون', oMonthly: 'تێچووی مانگانە (Taker)', oBEmove: 'جوڵەی پێویست بۆ یەکسانی', noLev: 'بێ لیڤەرج', posi: 'ئەرێنی', nega: 'نەرێنی', evenv: 'یەکسان', cHint: 'نرخی چوونەژوورەوە لە نرخی زیندووی هەمین پێوەکراوە پڕدەکرێتەوە. ژمێرکارییەکان نزیکەیی و فێرکارین.', brand: 'ئینتیخاب', tMarket: 'بازاڕ', tReport: 'ڕاپۆرت', tPosts: 'کەناڵ', tAlerts: 'ئاگاداری', search: 'گەڕان بۆ دراو…', above: 'سەرووی', below: 'خوارووی', add: 'زیادکردن',
     settings: 'ڕێکخستنەکان', badge: 'ژمارە لەسەر ئایکۆن', notifyPosts: 'ئاگاداری پۆستی نوێی Coin_Kurd', privacy: 'هەموو ڕێکخستنەکان تەنها لەم وێبگەڕەدا هەڵدەگیرێن و هیچ زانیارییەک نانێردرێت.',
     tAnalysis: 'شیکاری', tReality: 'ڕاستیپێو', rlFull: 'پەڕەی تەواو', rlNone: 'هێشتا داتا نییە', anHow: 'لە هەشت بەشدا، بە داتای کاتدار و بەبێ ژمارەی هەڵبەستراو', anNone: 'تا ئێستا شیکارییەک نییە', anFull: 'دەقی تەواو', anMissing: 'بێ دەستڕاگەیشتن بە:', enc: '📚 زانستنامە', academy: '🏛 ئەکادیمیا', lab: '🧪 سیمولەیتەر', dash: '📊 داشبۆرد', reality: '🎯 ڕاستیپێو', round: '💬 میزگرد', opp: '🧮 تێچووی دەرفەت', ledger: '📒 دەفتەری سیگناڵ', bot: '🤖 بۆت', nfa: 'ئامۆژگاریی دارایی نییە', fng: 'ترس و تەماع', mcap: 'بەهای گشتی بازاڕ', dom: 'باڵادەستیی BTC',
     upd: 'نوێکردنەوە', ago: 'خولەک لەمەوبەر', now: 'ئێستا', off: 'کوژاوە', noAlerts: 'هێشتا ئاگادارییەکت دروست نەکردووە.', hit: 'چالاک بوو', loading: 'بارکردن…',
     err: 'داتا بەردەست نییە؛ پەیوەندیی ئینتەرنێت بپشکنە.', more: 'ڕاپۆرتی تەواو لە ماڵپەڕ', allPosts: 'هەموو پۆستەکان', fngC: { 'Extreme Fear': 'ترسی زۆر', Fear: 'ترس', Neutral: 'بێلایەن', Greed: 'تەماع', 'Extreme Greed': 'تەماعی زۆر' } },
-  en: { tEnc: 'Encyclopedia', encSearch: 'Type a word…', encNone: 'Nothing matched', encHint: 'Search 506 entries in three languages', encLoad: 'Loading the encyclopedia…', encFull: 'Entry page', tCalc: 'Calculator', kSize: '📐 Position size', kRR: '⚖️ Risk / reward', kPnl: '💰 Profit & loss', kLiq: '💥 Liquidation price', kFee: '🧾 Fees', cap: 'Capital ($)', risk: 'Risk %', entry: 'Entry', stop: 'Stop loss', target: 'Take profit', exit: 'Exit', qty: 'Quantity (units)', lev: 'Leverage', feeSide: 'Fee per side %', feeRT: 'Round-trip fee %', winExp: 'Expected win rate %', mmr: 'Maintenance margin %', side: 'Side', long: 'Long', short: 'Short', amount: 'Trade size ($)', maker: 'Maker %', taker: 'Taker %', perMonth: 'Trades per month', oRiskAmt: 'Amount at risk', oStopDist: 'Stop distance', oQty: 'Size (units)', oNotional: 'Position value', oLev: 'Leverage needed', oLoss: 'Loss if stopped out', oRR: 'Risk / reward (after fees)', oBE: 'Break-even win rate', oEV: 'Expectancy per trade', oVerdict: 'Verdict at your win rate', oGross: 'Gross P&L', oFee: 'Total fees', oNet: 'Net P&L', oMargin: 'Margin used', oROE: 'Return on margin', oChg: 'Price change', oLiq: 'Approx. liquidation price', oDist: 'Distance to liquidation', oWipe: 'Adverse move that wipes margin', oTT: 'Taker in and out', oMT: 'Maker in, Taker out', oMonthly: 'Monthly cost (Taker)', oBEmove: 'Move needed to break even', noLev: 'none', posi: 'positive', nega: 'negative', evenv: 'break-even', cHint: 'Entry is filled from this extension\u2019s live price. Figures are approximate and educational; slippage and tiered rates are not modelled.', brand: 'Entekhab', tMarket: 'Market', tReport: 'Report', tPosts: 'Channel', tAlerts: 'Alerts', search: 'Search coin…', above: 'above', below: 'below', add: 'Add',
+  en: { offline: 'You are offline, and nothing was saved for this section.', later: 'This section has not been published yet; check back shortly.', retry: 'Try again', loading: 'Loading…', pgMore: 'More', toTop: 'Back to top', tEnc: 'Encyclopedia', encSearch: 'Type a word…', encNone: 'Nothing matched', encHint: 'Search 506 entries in three languages', encLoad: 'Loading the encyclopedia…', encFull: 'Entry page', tCalc: 'Calculator', kSize: '📐 Position size', kRR: '⚖️ Risk / reward', kPnl: '💰 Profit & loss', kLiq: '💥 Liquidation price', kFee: '🧾 Fees', cap: 'Capital ($)', risk: 'Risk %', entry: 'Entry', stop: 'Stop loss', target: 'Take profit', exit: 'Exit', qty: 'Quantity (units)', lev: 'Leverage', feeSide: 'Fee per side %', feeRT: 'Round-trip fee %', winExp: 'Expected win rate %', mmr: 'Maintenance margin %', side: 'Side', long: 'Long', short: 'Short', amount: 'Trade size ($)', maker: 'Maker %', taker: 'Taker %', perMonth: 'Trades per month', oRiskAmt: 'Amount at risk', oStopDist: 'Stop distance', oQty: 'Size (units)', oNotional: 'Position value', oLev: 'Leverage needed', oLoss: 'Loss if stopped out', oRR: 'Risk / reward (after fees)', oBE: 'Break-even win rate', oEV: 'Expectancy per trade', oVerdict: 'Verdict at your win rate', oGross: 'Gross P&L', oFee: 'Total fees', oNet: 'Net P&L', oMargin: 'Margin used', oROE: 'Return on margin', oChg: 'Price change', oLiq: 'Approx. liquidation price', oDist: 'Distance to liquidation', oWipe: 'Adverse move that wipes margin', oTT: 'Taker in and out', oMT: 'Maker in, Taker out', oMonthly: 'Monthly cost (Taker)', oBEmove: 'Move needed to break even', noLev: 'none', posi: 'positive', nega: 'negative', evenv: 'break-even', cHint: 'Entry is filled from this extension\u2019s live price. Figures are approximate and educational; slippage and tiered rates are not modelled.', brand: 'Entekhab', tMarket: 'Market', tReport: 'Report', tPosts: 'Channel', tAlerts: 'Alerts', search: 'Search coin…', above: 'above', below: 'below', add: 'Add',
     settings: 'Settings', badge: 'Toolbar badge', notifyPosts: 'Notify new Coin_Kurd posts', privacy: 'Settings stay in this browser only; nothing about you is sent anywhere.',
     tAnalysis: 'Analysis', tReality: 'Reality check', rlFull: 'Full page', rlNone: 'No data yet', anHow: 'Eight sections, timestamped data, no invented figures', anNone: 'No analysis published yet', anFull: 'Full report', anMissing: 'No access to:', enc: '📚 Encyclopedia', academy: '🏛 Academy', lab: '🧪 Simulator', dash: '📊 Dashboard', reality: '🎯 Reality check', round: '💬 Roundtable', opp: '🧮 Opportunity cost', ledger: '📒 Signal ledger', bot: '🤖 Bot', nfa: 'Not financial advice', fng: 'Fear & Greed', mcap: 'Total market cap', dom: 'BTC dominance',
     upd: 'Updated', ago: 'min ago', now: 'just now', off: 'Off', noAlerts: 'No alerts yet. You get a notification when the price reaches your level.', hit: 'triggered', loading: 'Loading…',
@@ -77,7 +77,18 @@ function render() {
     const r = REPORT[L] || REPORT.fa || {};
     $('#report').innerHTML = `<h3>${esc(r.headline || '')}</h3><p>${esc(r.body || '')}</p><p class="note"><a href="${SITE}/dashboard/" target="_blank" rel="noopener">${t('more')}</a></p>`;
     $('#report').dir = L === 'en' ? 'ltr' : 'rtl';
-};
+  }
+  // alerts + settings
+  const cs = coins().map(c => c.coin), sel = $('#aCoin'), cur = sel.value;
+  sel.innerHTML = cs.filter(c => !['USDT', 'USDC'].includes(c)).map(c => `<option>${esc(c)}</option>`).join(''); if (cur) sel.value = cur;
+  const b = $('#badge');
+  b.innerHTML = `<option value="OFF">${t('off')}</option>` + cs.filter(c => !['USDT', 'USDC', 'GOLD'].includes(c)).map(c => `<option>${esc(c)}</option>`).join('');
+  b.value = S.badge || 'BTC';
+  $('#notifyPosts').checked = !!S.notifyPosts;
+  const al = S.alerts || [];
+  $('#alerts').innerHTML = al.length ? al.map(a => `<div class="al${a.hit ? ' hit' : ''}"><span><b>${esc(a.coin)}</b> ${a.op === '>' ? t('above') : t('below')} <b dir="ltr">$${esc(a.price)}</b>${a.hit ? ' — ✅ ' + t('hit') : ''}</span><button data-del="${esc(a.id)}" aria-label="delete">✕</button></div>`).join('')
+    : `<p class="empty">${t('noAlerts')}</p>`;
+}
 const renderReality = d => {
   const box = $('#reality');
   if (!box) return;
@@ -136,18 +147,7 @@ const renderAnalysis = d => {
     + (d.missing && d.missing.length ? `<p class="note">${esc(t('anMissing'))} ${esc(d.missing.join('، '))}</p>` : '')
     + `<p class="note">${esc(t('anHow'))}</p>`
     + `<p class="note"><a href="${esc(d.url || SITE + '/onchain/')}" target="_blank" rel="noopener">${t('anFull')}</a></p>`;
-  }
-  // alerts + settings
-  const cs = coins().map(c => c.coin), sel = $('#aCoin'), cur = sel.value;
-  sel.innerHTML = cs.filter(c => !['USDT', 'USDC'].includes(c)).map(c => `<option>${esc(c)}</option>`).join(''); if (cur) sel.value = cur;
-  const b = $('#badge');
-  b.innerHTML = `<option value="OFF">${t('off')}</option>` + cs.filter(c => !['USDT', 'USDC', 'GOLD'].includes(c)).map(c => `<option>${esc(c)}</option>`).join('');
-  b.value = S.badge || 'BTC';
-  $('#notifyPosts').checked = !!S.notifyPosts;
-  const al = S.alerts || [];
-  $('#alerts').innerHTML = al.length ? al.map(a => `<div class="al${a.hit ? ' hit' : ''}"><span><b>${esc(a.coin)}</b> ${a.op === '>' ? t('above') : t('below')} <b dir="ltr">$${esc(a.price)}</b>${a.hit ? ' — ✅ ' + t('hit') : ''}</span><button data-del="${esc(a.id)}" aria-label="delete">✕</button></div>`).join('')
-    : `<p class="empty">${t('noAlerts')}</p>`;
-}
+};
 
 /* ------------------------------------------------------------------ calculator
    همان فرمول‌های /academy/lab/ ، با این تفاوت که قیمت ورود از نرخ زندهٔ افزونه پر می‌شود. */
@@ -252,10 +252,40 @@ async function load() {
     const posts = (d.posts || []).slice(0, 20); await chrome.storage.local.set({ posts, postsAt: Date.now(), lastPostId: Math.max(S.lastPostId || 0, posts[0] ? posts[0].id : 0) });
     S.posts = posts; render();
   }).catch(() => { });
-  getJSON(`${SITE}/api/v1/report.json?t=${Date.now()}`).then(d => { REPORT = d.report; render(); }).catch(() => { $('#report').innerHTML = `<p class="empty">${t('err')}</p>`; });
-  getJSON(`${SITE}/api/v1/analysis.json?t=${Date.now()}`).then(d => renderAnalysis(d)).catch(() => { $('#analysis').innerHTML = `<p class="empty">${t('err')}</p>`; });
-  getJSON(`${SITE}/api/v1/reality.json?t=${Date.now()}`).then(d => renderReality(d)).catch(() => { $('#reality').innerHTML = `<p class="empty">${t('err')}</p>`; });
+  feed('report'); feed('analysis'); feed('reality');
 }
+
+/* One place that fetches a published feed, shows the last good copy while it waits, and says
+   plainly what went wrong — the browser being offline and the file not being published yet are
+   different things, and telling the user to check a working connection is just wrong. */
+const FEED = {
+  report: { pane: '#report', draw: d => { REPORT = d.report; render(); } },
+  analysis: { pane: '#analysis', draw: d => renderAnalysis(d) },
+  reality: { pane: '#reality', draw: d => renderReality(d) }
+};
+function feedFail(name, offline) {
+  const box = $(FEED[name].pane); if (!box) return;
+  box.innerHTML = `<p class="empty">${offline ? t('offline') : t('later')}</p>`
+    + `<p><button class="retry" data-feed="${name}" type="button">${t('retry')}</button></p>`;
+}
+async function feed(name, force) {
+  const f = FEED[name], box = $(f.pane); if (!f) return;
+  const ck = 'feed_' + name;
+  if (!force && S[ck]) { try { f.draw(S[ck]); } catch (e) { /* a stale shape must not blank the pane */ } }
+  else if (box && !box.innerHTML) box.innerHTML = `<p class="empty">${t('loading')}</p>`;
+  try {
+    const d = await getJSON(`${SITE}/api/v1/${name}.json?t=${Date.now()}`);
+    f.draw(d);
+    S[ck] = d; chrome.storage.local.set({ [ck]: d });
+  } catch (e) {
+    if (S[ck]) return;                               // the cached copy is already on screen
+    feedFail(name, !navigator.onLine);
+  }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.retry');
+  if (b) feed(b.dataset.feed, true);
+});
 function refresh() {
   const b = $('#refresh'); b.classList.add('spin');
   chrome.runtime.sendMessage({ type: 'refresh' }, async () => {
@@ -269,6 +299,27 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   if (b.dataset.tab === 'enc') encLoad();
 });
 const encIn = $('#encq'); if (encIn) encIn.oninput = renderEnc;
+
+/* the small up/down nudge: shown only while the open pane actually has somewhere to go */
+const pg = $('#pg');
+function pane() { return document.querySelector('main section.on'); }
+function pgSync() {
+  const p = pane(); if (!pg || !p) return;
+  const more = p.scrollHeight - p.clientHeight - p.scrollTop;
+  if (p.scrollHeight <= p.clientHeight + 8) { pg.hidden = true; return; }
+  pg.hidden = false;
+  pg.classList.toggle('up', more < 8);
+  pg.title = more < 8 ? t('toTop') : t('pgMore');
+}
+if (pg) pg.onclick = () => {
+  const p = pane(); if (!p) return;
+  const more = p.scrollHeight - p.clientHeight - p.scrollTop;
+  p.scrollTo({ top: more < 8 ? 0 : p.scrollTop + p.clientHeight * 0.85, behavior: 'smooth' });
+  setTimeout(pgSync, 400);
+};
+document.querySelectorAll('main section').forEach(sec => sec.addEventListener('scroll', pgSync, { passive: true }));
+new MutationObserver(pgSync).observe(document.querySelector('main'), { childList: true, subtree: true });
+setTimeout(pgSync, 150);
 document.querySelectorAll('.lang button').forEach(b => b.onclick = async () => { L = b.dataset.l; await chrome.storage.local.set({ lang: L }); applyLang(); });
 $('#refresh').onclick = refresh;
 $('#cKind').onchange = async e => { S.calcKind = e.target.value; await chrome.storage.local.set({ calcKind: S.calcKind }); cRender(); };

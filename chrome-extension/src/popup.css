@@ -2,7 +2,9 @@
 @media (prefers-color-scheme:light){:root{--bg:#f7f6f2;--card:#fff;--ink:#17171a;--mute:#5d5d66;--acc:#c46a00;--line:rgba(0,0,0,.12)}}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:380px}
-body{background:var(--bg);color:var(--ink);font:13px/1.7 Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;padding:10px 12px 8px;min-height:520px}
+body{background:var(--bg);color:var(--ink);font:13px/1.7 Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;padding:10px 12px 8px;min-height:430px;overflow:hidden}
+/* one scroller only: the open pane. The window itself never scrolls, so there is no second rail. */
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0}
 html[dir=ltr] body{font-family:"Segoe UI",system-ui,sans-serif}
 a{color:var(--acc);text-decoration:none}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -18,7 +20,18 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 4px;border-bottom:1px solid var(--line);margin-bottom:8px}
 .tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:6px 2px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tabs button.on{color:var(--acc);border-color:var(--acc);font-weight:700}
-main section{display:none;max-height:300px;overflow-y:auto}main section.on{display:block}
+main{position:relative}
+/* a small nudge instead of a rail: it appears only when the pane has more to show */
+.pg{position:absolute;inset-inline-start:6px;bottom:6px;width:24px;height:24px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;opacity:.75;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:opacity .15s,transform .15s}
+.pg:hover{opacity:1}
+.pg[hidden]{display:none}
+.pg.up span{display:inline-block;transform:rotate(180deg)}
+main section{display:none;max-height:330px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-inline-end:2px}
+main section.on{display:block}
+main section::-webkit-scrollbar{width:5px}
+main section::-webkit-scrollbar-track{background:transparent}
+main section::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+main section::-webkit-scrollbar-thumb:hover{background:var(--mute)}
 #q,.af input,.af select,.row select{width:100%;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font:inherit}
 #q{margin-bottom:6px}
 .list .it{display:grid;grid-template-columns:52px 1fr 70px 60px;gap:6px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);color:var(--ink)}
@@ -38,6 +51,8 @@ h4{margin:12px 0 4px;color:var(--mute);font-size:12px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0}.row select{width:110px}
 .row input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
 .note,.empty{color:var(--mute);font-size:11.5px;padding:6px 2px}
+.retry{background:var(--card);border:1px solid var(--line);color:var(--acc);border-radius:8px;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;margin:2px}
+.retry:hover{border-color:var(--acc)}
 footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
 footer a{font-size:12px}
 .nfa{color:var(--mute);font-size:10.5px;text-align:center;margin-top:6px}
@@ -53,7 +68,7 @@ html[dir=rtl] .cf select{direction:rtl;text-align:right}
 .co .r b{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;font-size:13px}
 .co .r b.up{color:var(--up)}.co .r b.dn{color:var(--dn)}
 .co .r.k b{color:var(--acc);font-size:15px}
-main section[data-pane=calc]{max-height:400px}
+main section[data-pane=calc]{max-height:360px}
 
 /* the market analysis pane: the same report read as the site and the bot, trimmed to a popup */
 .report ul.an{margin:8px 0;padding-inline-start:18px;list-style:disc}
