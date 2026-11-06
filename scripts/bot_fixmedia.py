@@ -11,10 +11,9 @@ This job (runs once per post, remembered in state["mediafix_v1"]):
   • finds every affected post since FIX_FROM in @Coin_Kurd (public web preview t.me/s/…), matched by time
     with the bot's own records (state["deep"]["posts"] for dossiers, state["videos"]["posted"] for reels)
   • draws a NEW image in the owner's infographic design, with market data from Binance AS OF the post time
-  • EDITS the existing message in place (nothing is deleted):
-      dossier with link-preview card → editMessageText, same text, preview pointing at the new card
-      dossier fallback photo ("🧠")   → editMessageMedia with the new card
-      bot-made reel video             → editMessageMedia with the re-rendered reel, same caption
+  • POSTS THE CORRECTED MESSAGE AGAIN and then removes the old one — in that order, so a failed
+    send can never cost the channel a post (a failed delete only leaves a duplicate, which is reported).
+    Editing in place was unreliable: Telegram keeps serving the cached link preview of the old card.
   • updates data/deep.json so the site shows the fixed cards too, then reports to the admins.
 """
 import html
@@ -82,6 +81,20 @@ def _ok(r):
     return r.get("ok") or "not modified" in str(r.get("description", "")).lower()
 
 
+def _mid(r):
+    return ((r or {}).get("result") or {}).get("message_id")
+
+
+def _drop(post_fn, channel, mid, stuck):
+    """remove the old message; only ever called once its replacement is already up"""
+    if not mid:
+        return
+    r = post_fn("deleteMessage", {"chat_id": channel, "message_id": mid})
+    if not r.get("ok"):
+        log.warning("old message %s not removed: %s", mid, r.get("description"))
+        stuck.append(mid)
+
+
 def run(s, post_fn, fmt, channel, worktree, push_files, admins, notify, sig):
     """post_fn(method, data, files=None) -> Telegram JSON; fmt = the bot's fix_amp; sig = channel signature"""
     st = s.setdefault(KEY, {"done": [], "failed": []})
@@ -91,7 +104,7 @@ def run(s, post_fn, fmt, channel, worktree, push_files, admins, notify, sig):
     posts = channel_posts(channel.lstrip("@"))
     log.info("media repair: %d channel posts since %s", len(posts), FIX_FROM.date())
     hist = s.setdefault("visual", {})
-    fixed, failed, changed_site = [], [], False
+    fixed, failed, stuck, changed_site = [], [], [], False
 
     # ---- dossiers (link-preview card, or the "🧠" photo fallback)
     deep = (s.get("deep") or {}).get("posts") or []
@@ -118,32 +131,33 @@ def run(s, post_fn, fmt, channel, worktree, push_files, admins, notify, sig):
         body = fmt(item["fa"] + "\n\n" + sig)
         photo_msg = _near(posts, at, lambda x: (x.get("text") or "").strip() in ("🧠", "") and x.get("photos")
                           and x["id"] < p["id"], 120)
-        ok = False
-        if photo_msg:                              # fallback form: separate picture message above the text
-            r = post_fn("editMessageMedia", {"chat_id": channel, "message_id": photo_msg["id"],
-                                             "media": json.dumps({"type": "photo", "media": "attach://card", "caption": "🧠"})},
-                        files={"card": ("card.jpg", img, "image/jpeg")})
-            ok = _ok(r)
-        else:
-            path = f"data/deepimg/{item['id']}-v2.jpg"
-            if push_files(worktree, {path: img}, "fix: dossier card with correct Persian text"):
-                time.sleep(8)                      # let raw.githubusercontent.com serve the new file
-                r = post_fn("editMessageText", {"chat_id": channel, "message_id": p["id"], "text": body,
-                                                "parse_mode": "HTML",
-                                                "link_preview_options": {"url": RAW + path, "prefer_large_media": True,
-                                                                         "show_above_text": True}})
-                ok = _ok(r)
-                if ok:
-                    item["img"] = "/" + path
-                    changed_site = True
-            else:
-                r = {"description": "push failed"}
-        (fixed if ok else failed).append(p["id"])
-        if ok:
+        new_id, r = None, {}
+        path = f"data/deepimg/{item['id']}-v2.jpg"
+        if push_files(worktree, {path: img}, "fix: dossier card with correct Persian text"):
+            time.sleep(8)                          # let raw.githubusercontent.com serve the new file
+            r = post_fn("sendMessage", {"chat_id": channel, "text": body, "parse_mode": "HTML",
+                                        "link_preview_options": {"url": RAW + path, "prefer_large_media": True,
+                                                                 "show_above_text": True}})
+            new_id = _mid(r)
+            if new_id:
+                item["img"] = "/" + path
+                changed_site = True
+        if not new_id:                             # fallback form: the picture, then the text under it
+            r = post_fn("sendPhoto", {"chat_id": channel, "caption": "🧠"},
+                        files={"photo": ("card.jpg", img, "image/jpeg")})
+            if r.get("ok"):
+                r2 = post_fn("sendMessage", {"chat_id": channel, "text": body, "parse_mode": "HTML",
+                                             "link_preview_options": {"is_disabled": True}})
+                new_id = _mid(r2) or _mid(r)
+        if new_id:                                 # the old post goes only now that the new one is up
+            _drop(post_fn, channel, photo_msg and photo_msg["id"], stuck)
+            _drop(post_fn, channel, p["id"], stuck)
+            fixed.append(new_id)
             st["done"].append(key)
-            item["msg_id"] = p["id"]
+            item["msg_id"] = new_id
         else:
-            log.warning("dossier %s (msg %s) not edited: %s", item.get("id"), p["id"], r.get("description"))
+            failed.append(p["id"])
+            log.warning("dossier %s (msg %s) not posted again: %s", item.get("id"), p["id"], r.get("description"))
         time.sleep(4)
 
     # ---- bot-made reel videos (not the re-uploaded clips of other channels: those have no drawn text)
@@ -164,17 +178,18 @@ def run(s, post_fn, fmt, channel, worktree, push_files, admins, notify, sig):
             failed.append(p["id"])
             continue
         cap = fmt(html.escape(v["fa"], quote=False) + "\n\n" + sig)
-        r = post_fn("editMessageMedia", {"chat_id": channel, "message_id": p["id"],
-                                         "media": json.dumps({"type": "video", "media": "attach://reel", "caption": cap,
-                                                              "parse_mode": "HTML", "supports_streaming": True})},
+        r = post_fn("sendVideo", {"chat_id": channel, "caption": cap, "parse_mode": "HTML",
+                                  "supports_streaming": "true"},
                     files={"reel": ("coin_kurd.mp4", clip, "video/mp4")})
-        if _ok(r):
-            fixed.append(p["id"])
+        new_id = _mid(r)
+        if new_id:
+            _drop(post_fn, channel, p["id"], stuck)
+            fixed.append(new_id)
             st["done"].append(key)
-            v["msg_id"], v["reel"] = p["id"], 2
+            v["msg_id"], v["reel"] = new_id, 2
         else:
             failed.append(p["id"])
-            log.warning("reel msg %s not edited: %s", p["id"], r.get("description"))
+            log.warning("reel msg %s not posted again: %s", p["id"], r.get("description"))
         time.sleep(6)
 
     if changed_site:
@@ -184,9 +199,13 @@ def run(s, post_fn, fmt, channel, worktree, push_files, admins, notify, sig):
     st["failed"] = sorted(set(failed))
     st["last_run"] = datetime.now(timezone.utc).isoformat()
     if fixed or failed:
-        msg = f"🛠 اصلاح تصاویر کانال: {len(fixed)} پست ویرایش شد (بدون حذف)"
+        msg = ("🛠 اصلاح تصاویر کانال: " + (f"{len(fixed)} پست دوباره فرستاده شد و نسخهٔ قدیمی حذف شد"
+                                           if fixed else "این بار پستی اصلاح نشد"))
         if fixed:
             msg += "\n" + " ".join(f"t.me/{channel.lstrip('@')}/{i}" for i in fixed)
+        if stuck:
+            msg += ("\n⚠️ نسخهٔ قدیمی این پیام‌ها پاک نشد و باید دستی حذف شوند: "
+                    + " ".join(f"t.me/{channel.lstrip('@')}/{i}" for i in stuck))
         if failed:
             msg += f"\n⚠️ {len(failed)} پست اصلاح نشد؛ در اجرای بعدی دوباره امتحان می‌شود"
         for a in admins:
