@@ -12,6 +12,8 @@
 .b-telegram{--si:url(/assets/brands/telegram.svg)}.b-youtube{--si:url(/assets/brands/youtube.svg)}.b-x{--si:url(/assets/brands/x.svg)}
 .b-instagram{--si:url(/assets/brands/instagram.svg)}.b-discord{--si:url(/assets/brands/discord.svg)}.b-tradingview{--si:url(/assets/brands/tradingview.svg)}
 .b-android{--si:url(/assets/brands/android.svg)}
+.b-chrome{--si:url(/assets/brands/chrome.svg)}
+.b-firefox{--si:url(/assets/brands/firefox.svg)}
 
 /* ---------------- header ---------------- */
 #ekh{position:sticky;top:0;z-index:100;background:var(--ek-bg);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);
@@ -78,6 +80,8 @@
 .ek-badge:hover{border-color:var(--ek-acc);transform:translateY(-1px)}
 .ek-badge .ek-si,.ek-badge .ek-svg{width:24px;height:24px}
 .ek-badge .b-android{color:#3ddc84}
+.b-chrome{color:#f9ab00}
+.b-firefox{color:#ff7139}
 .ek-badge span{display:flex;flex-direction:column;line-height:1.3}
 .ek-badge small{font-size:.66rem;color:var(--ek-mute)}.ek-badge b{font-size:.9rem}
 #ekf .ekf-h{font-weight:800;margin:8px 0 14px;font-size:1rem}
