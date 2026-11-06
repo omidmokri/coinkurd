@@ -278,6 +278,12 @@ jobs:
         timeout-minutes: 2
         run: python scripts/indexnow.py
 
+      - name: Toman opportunity-cost data
+        id: opportunity
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/opportunity.py
+
       - name: Site assistant index (homepage help chat)
         id: assistant
         continue-on-error: true
@@ -301,6 +307,14 @@ jobs:
       - name: Build reality-check pages (ledger, friction, hype, silent exit, correlation)
         continue-on-error: true
         run: python scripts/build_reality.py
+
+      - name: Build the Roundtable page
+        continue-on-error: true
+        run: python scripts/build_roundtable.py
+
+      - name: Build the opportunity-cost calculator page
+        continue-on-error: true
+        run: python scripts/build_opportunity.py
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
