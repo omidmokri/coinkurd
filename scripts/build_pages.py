@@ -11,6 +11,7 @@
 این فایل‌ها در گیت کامیت نمی‌شوند؛ در هر اجرای ورک‌فلو از روی data/*.json ساخته می‌شوند.
 """
 import chrome  # shared header/footer (scripts/chrome.py)
+import onchain_page as OP  # /onchain/ analysis block and its compact form
 import html
 import json
 import os
@@ -765,8 +766,9 @@ def build_feeds():
                 block += f'<details style="margin-top:10px"><summary>کوردی سۆرانی</summary><div lang="ckb" dir="rtl">{ckb}</div></details>'
             block += "</article>"
             cards.append(block)
+        head = OP.analysis_block(load, e, fmt_date) if path == "onchain/" else ""
         body = (f'<div class="meta"><a href="/">خانه</a> / {e(title)}</div><h1>{e(title)}</h1>'
-                f'<p class="note">{e(desc)} · به‌روز خودکار از ربات Coin_Kurd</p>'
+                f'<p class="note">{e(desc)} · به‌روز خودکار از ربات Coin_Kurd</p>' + head
                 + ("".join(cards) or '<p class="note">هنوز موردی منتشر نشده است.</p>')
                 + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
         urls.append(page(path, title, desc, body))
@@ -937,6 +939,7 @@ def build_api():
     w("news_latest.json", {"updated_at": news.get("updated_at"), "items": news.get("items", [])[:100]})
     w("score.json", {"updated_at": score.get("updated_at"), "method": score.get("method"), "coins": SC})
     w("report.json", {"report_at": brain.get("report_at"), "engine": brain.get("report_engine"), "report": brain.get("report")})
+    w("analysis.json", OP.api(load, SITE))     # the same report, compact, for the extension and the apps
     by = {}
     for r in impact.values():
         if r.get("r24h") is not None:
