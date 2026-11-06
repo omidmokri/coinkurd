@@ -25,14 +25,19 @@ async function live(coins) {
   } catch (e) { return {}; }
 }
 
+/* Chrome squeezes the badge across the whole icon, so a long number hides the logo underneath it —
+   "75.9k" did exactly that. Nothing here is longer than four characters and most prices come out at
+   three; the exact figure is in the toolbar title, and the badge can be turned off in Settings. */
 function short(p) {
   if (!isFinite(p)) return '';
-  if (p >= 100000) return Math.round(p / 1000) + 'k';
-  if (p >= 10000) return (p / 1000).toFixed(1) + 'k';
-  if (p >= 1000) return (p / 1000).toFixed(2) + 'k';
+  if (p >= 995000) return Math.round(p / 1e6) + 'm';
+  if (p >= 1000) return Math.round(p / 1000) + 'k';
+  if (p >= 100) return p.toFixed(0);
   if (p >= 10) return p.toFixed(0);
-  if (p >= 1) return p.toFixed(2);
-  return p.toPrecision(2).replace(/^0/, '');
+  if (p >= 1) return p.toFixed(1);
+  if (p >= 0.1) return p.toFixed(2).replace(/^0/, '');
+  if (p >= 0.01) return p.toFixed(2).replace(/^0/, '');
+  return p.toPrecision(2).replace(/0\./, '').replace(/^0+/, '').slice(0, 2);   // sub-cent: the leading digits; the title carries the exact price
 }
 
 async function tick() {
