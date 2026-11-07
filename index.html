@@ -27,7 +27,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .wrap{max-width:1400px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
 .lc{text-transform:lowercase;letter-spacing:.02em;font-family:var(--mono)}
 .display{font-family:var(--fontD);text-transform:uppercase;line-height:.92;letter-spacing:-.02em}
-[dir=rtl] .display{font-family:'Vazirmatn',var(--fontD);font-weight:900;text-transform:none;line-height:1.05;letter-spacing:0}
+[dir=rtl] .display{font-family:'Vazirmatn',var(--fontD);font-weight:800;text-transform:none;line-height:1.25;letter-spacing:0}
+[dir=rtl] .sec h2{font-size:clamp(1.85rem,3.4vw,3rem)}
+[dir=rtl] .half h2{font-size:clamp(1.9rem,3.6vw,3.2rem)}
+[dir=rtl] .lc,[dir=rtl] .sec .lead,[dir=rtl] .kpi small,[dir=rtl] .shot .cap{font-family:var(--fontB);text-transform:none;letter-spacing:0}
+[dir=rtl] .kpi b{font-family:var(--fontB);letter-spacing:0}
 .hero h1.display{font-family:var(--fontD)!important;text-transform:uppercase;line-height:.92;letter-spacing:-.02em}
 
 /* nav */
@@ -84,13 +88,15 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .chartbox{height:520px;background:#121212}
 @media(max-width:700px){.chartbox{height:380px}}
 /* message */
-.msg{padding:120px 0 60px}
+.msg{padding-top:clamp(64px,8vw,120px);padding-bottom:60px}
 .msg p{font-size:clamp(1.4rem,3vw,2.4rem);line-height:1.45;max-width:1000px;font-weight:300}
 .msg p b{font-weight:900;color:var(--ink)}
 .msg p em{font-style:normal;color:var(--lime)}
-.kpis{display:flex;gap:40px;flex-wrap:wrap;margin-top:40px}
-.kpi b{font-family:var(--mono);font-size:clamp(2rem,4vw,3.4rem);font-weight:700;display:block;line-height:1}
-.kpi small{color:var(--mute);text-transform:lowercase;font-family:var(--mono)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:12px;margin-top:44px;max-width:1000px}
+.kpi{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.kpi b{font-family:var(--mono);font-size:clamp(1.7rem,2.8vw,2.5rem);font-weight:700;display:block;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi small{color:var(--mute);text-transform:lowercase;font-family:var(--mono);display:block;margin-top:6px;font-size:.82rem}
+.kpi.when b{font-size:clamp(1rem,1.5vw,1.25rem);line-height:1.5;padding-top:7px}
 
 /* photo strip */
 .strip{display:flex;gap:14px;overflow-x:auto;padding:30px clamp(16px,4vw,48px) 60px;scroll-snap-type:x mandatory;scrollbar-width:none}
@@ -346,7 +352,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
       <div class="kpi"><b id="sPosts">—</b><small data-i="posts">پست</small></div>
       <div class="kpi"><b id="sCats">—</b><small data-i="cats">دسته</small></div>
       <div class="kpi"><b id="sCoins">—</b><small data-i="coins">کوین</small></div>
-      <div class="kpi"><b id="sUpd" style="font-size:1.2rem;padding-top:14px">—</b><small data-i="updated">آخرین به‌روزرسانی</small></div>
+      <div class="kpi when"><b id="sUpd">—</b><small data-i="updated">آخرین به‌روزرسانی</small></div>
     </div>
   </section>
 
