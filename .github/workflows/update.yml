@@ -338,6 +338,10 @@ jobs:
         continue-on-error: true
         run: python scripts/build_trackrecord.py
 
+      - name: Build the daily spine page (/today/)
+        continue-on-error: true
+        run: python scripts/build_today.py
+
       - name: Build the autopilot log page
         continue-on-error: true
         run: python scripts/build_autopilot.py

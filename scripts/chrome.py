@@ -157,6 +157,8 @@ NAV = [
          L("پیش‌بینی کن، امتیاز بگیر", "پێشبینی بکە، خاڵ وەربگرە", "Predict and earn points")),
         ("/dossier/", "news", L("پرونده‌های تحلیلی", "دۆسیە شیکارییەکان", "Analysis dossiers"),
          L("تحلیل عمیق رویدادهای مهم روز", "شیکاری قووڵی ڕووداوە گرنگەکان", "Deep dives on the day's key stories")),
+        ("/today/", "calendar", L("امروز در بازار", "ئەمڕۆ لە بازاڕ", "Today in the market"),
+         L("۲۴ ساعت گذشته در یک صفحه", "٢٤ کاتژمێری ڕابردوو لە یەک پەڕەدا", "The last 24 hours on one page")),
         ("/daily/", "calendar", L("گزارش روزانه", "ڕاپۆرتی ڕۆژانە", "Daily report"),
          L("خلاصهٔ هوشمند هر روز بازار", "پوختەی زیرەکی هەر ڕۆژێکی بازاڕ", "A smart summary of every market day")),
         ("/weekly/", "news", L("مجلهٔ هفتگی", "گۆڤاری هەفتانە", "Weekly magazine"),

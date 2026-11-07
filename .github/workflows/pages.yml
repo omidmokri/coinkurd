@@ -34,6 +34,7 @@ jobs:
           python scripts/build_roundtable.py
           python scripts/build_opportunity.py
           python scripts/build_trackrecord.py
+          python scripts/build_today.py
           python scripts/build_autopilot.py
           python scripts/build_map.py
       - uses: actions/configure-pages@v5
