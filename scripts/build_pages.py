@@ -49,6 +49,38 @@ def tested_line(tr=None):
     return (f'<p class="txt">در آزمون {tr.get("n_posts", "—")} پست کانال، بیت‌کوین ۲۴ ساعت بعد از پست‌ها به‌طور میانگین '
             f'<b>{o:+.2f}%</b> و در ساعت‌های تصادفیِ هم‌تراز <b>{b:+.2f}%</b> حرکت کرد (p = {t["p"]:.2f}) — {verdict}. '
             f'میانگین خام حرکت بعد از پست‌ها بدون مقایسه با بازار گمراه‌کننده است. <a href="/track-record/">کارنامهٔ آزموده‌شدهٔ کانال</a></p>')
+CAT_TXT = {
+    "fa": {"h": "کارنامهٔ آزمودهٔ پست‌های «{c}»", "nd": "هنوز آزمونی برای این نوع پست نیست.",
+           "few": "فقط {n} پست — برای آزمون آماری کم است.", "sig": "معنادار است", "ns": "از شانس قابل‌تشخیص نیست",
+           "t": "{n} پست: بیت‌کوین ۲۴ ساعت بعد به‌طور میانگین {o} در برابر {b} در هر ساعت دلخواه (p = {p}) — {v}.", "more": "کارنامهٔ کامل"},
+    "ckb": {"h": "تۆماری تاقیکراوەی پۆستەکانی «{c}»", "nd": "هێشتا تاقیکردنەوە بۆ ئەم جۆرە پۆستە نییە.",
+            "few": "تەنها {n} پۆست — بۆ تاقیکردنەوەی ئاماری کەمە.", "sig": "واتادارە", "ns": "لە بەخت جیا ناکرێتەوە",
+            "t": "{n} پۆست: بیتکۆین ٢٤ کاتژمێر دواتر بە تێکڕا {o} بەرامبەر {b} لە هەر کاتژمێرێک (p = {p}) — {v}.", "more": "تۆماری تەواو"},
+    "en": {"h": "Tested record of “{c}” posts", "nd": "No test for this kind of post yet.",
+           "few": "Only {n} posts — too few for a statistical test.", "sig": "statistically significant", "ns": "not distinguishable from chance",
+           "t": "{n} posts: BTC 24h later averaged {o} vs {b} for any hour (p = {p}) — {v}.", "more": "Full record"},
+}
+
+
+def cat_line(cid, lg="fa", tr=None):
+    """One line on a post page: how this kind of post has tested (per-category row of trackrecord.json vs the all-hours base)."""
+    import build_trackrecord as TRK  # lazy: build_trackrecord imports this module
+    tr = trackrec if tr is None else tr
+    T = CAT_TXT[lg]
+    name = (TRK.CATS.get(cid) or {}).get(lg) or cid
+    row = next((c for c in tr.get("cats") or [] if c.get("id") == cid), None)
+    b = (tr.get("base") or {}).get("r24")
+    if not row or b is None:
+        msg = T["nd"]
+    elif row.get("small") or row.get("p") is None:
+        msg = T["few"].format(n=row.get("n"))
+    else:
+        msg = T["t"].format(n=row["n"], o=f'<bdi dir="ltr">{row["r24"]:+.2f}%</bdi>', b=f'<bdi dir="ltr">{b:+.2f}%</bdi>',
+                            p=f'{row["p"]:.2f}', v=T["sig"] if row["p"] < 0.05 else T["ns"])
+    return (f'<p class="note catrec"><b>{e(T["h"].format(c=name))}:</b> {msg} '
+            f'<a href="/track-record/">{T["more"]}</a></p>')
+
+
 news = load("news.json", {})
 score = load("score.json", {})
 SC = score.get("coins", {})
@@ -319,6 +351,8 @@ def build_post(p):
         ic = lambda u: "👾 " if "discord" in u else "🎥 " if "youtu" in u else "📸 " if "instagram" in u else "💬 " if "twitter" in u or "x.com" in u else ""  # noqa: E731
         body += '<div class="social">' + "".join(f'<a href="{e(su(f["url"]))}" rel="noopener" target="_blank">{ic(f["url"])}{e(f["label"])}</a>' for f in p["footer"]) + "</div>"
     body += impact_html(impact.get(str(p["id"])))
+    if p.get("q") != "low":
+        body += cat_line(p.get("category"))
     rel = related(p)
     if rel:
         body += "<h2>مطالب مرتبط</h2><ul class=list>" + "".join(post_li(q) for q in rel) + "</ul>"
@@ -368,6 +402,8 @@ def build_post_lang(p, lg):
     if img:
         body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
     body += f'<div class="txt">{rich(t["text"])}</div>'
+    if p.get("q") != "low":
+        body += cat_line(p.get("category"), lg)
     body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(su(p["url"]))}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
           "image": [SITE + img if img.startswith("/") else img] if img else [], "author": AUTHOR,

@@ -92,8 +92,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
    snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
 3. **The founder and the nightly class.** Home strip with countdown shipped 2026-11-07. Remaining: a `/class/` page
-   (what the class covers, schedule, the books); Person schema on `/about/` already exists — reuse it.
-4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
+   (what the class covers, schedule, the books); Person schema on `/about/` already exists — reuse it. **Blocked on
+   facts:** the repo has no book titles or class syllabus (checked `about/` on 2026-11-07) — don't invent them; build
+   only from what the channel's own posts state (search `data/posts.json` for کتاب / کلاس / Discord first).
 5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
@@ -104,6 +105,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · Accountability inline on every post page (Backlog #4)
+- **Need:** the tested record lived on a side page; a reader deciding on a post never saw how that kind of post has fared.
+- **Built:** `build_pages.cat_line(cat, lg)` — one line on `/p/<id>/` (fa) and `/en|ckb/p/<id>/`, under the impact box:
+  the post category's row from `data/trackrecord.json` (n, BTC 24h mean vs all-hours base, randomisation p, verdict
+  "significant" only if p < 0.05), "too few to test" for small categories, "no test yet" when missing; links to
+  `/track-record/`. Skipped for low-quality (promo) posts. Class `catrec`. No bot change (post pages have no bot home).
+- **Verified:** py_compile; unit tests on synthetic record (significant case, small case, non-significant, missing
+  category, empty file); full `build_pages.py` in /tmp/bld; Playwright + Chrome at 1280/390 on fa and en post pages,
+  looked at the shots, zero JS errors. Chose this over #3 because #3 needs facts (books, syllabus) the repo doesn't hold.
+- **Next:** Backlog #3 only from facts in the posts archive; else #5 or #7 (stale videos feed).
 
 ### 2026-11-07 · Nightly class strip on the home page (Backlog #3, slice 1)
 - **Need:** the human moat was invisible — nothing on the home page said there is a live class every night.
