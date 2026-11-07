@@ -495,6 +495,17 @@ KD = {
                "ar": "🧒 افتح الأكاديمية", "en": "🧒 Open the academy"},
     "b_par": {"fa": "👪 صفحهٔ والدین", "ckb": "👪 پەڕەی دایک و باوک", "kmr": "👪 Rûpela dê û bav",
               "ar": "👪 صفحة الأهل", "en": "👪 For parents"},
+    "b_studio": {"fa": "🎬 استودیوی انیمیشن و موسیقی", "ckb": "🎬 ستۆدیۆی ئەنیمەیشن و مۆسیقا",
+                 "kmr": "🎬 Studyoya anîmasyon û muzîkê", "ar": "🎬 استوديو الرسوم والموسيقى",
+                 "en": "🎬 Animation &amp; Music Studio"},
+    "film": {"fa": "🎬 چهار فیلم کوتاه و دو ترانهٔ اختصاصی — انیمیشن و موسیقی هر دو در خودِ مرورگر "
+                   "ساخته می‌شوند، پس هیچ فایل ویدئویی دانلود نمی‌شود و هیچ موسیقی‌ای از کسی قرض گرفته نشده.",
+             "ckb": "🎬 چوار فیلمی کورت و دوو گۆرانیی تایبەت — ئەنیمەیشن و مۆسیقا هەردووکیان لە خودی "
+                    "وێبگەڕدا دروست دەبن، کەواتە هیچ فایلێکی ڤیدیۆ دانالۆد ناکرێت.",
+             "kmr": "🎬 Çar fîlmên kurt û du stran — anîmasyon û muzîk di gerokê de tên çêkirin.",
+             "ar": "🎬 أربعة أفلام قصيرة وأغنيتان — الرسوم والموسيقى تُنتج داخل المتصفح نفسه.",
+             "en": "🎬 Four short films and two original songs — the animation and the music are both made "
+                   "inside the browser, so no video file is downloaded and no music is borrowed."},
     "w": [("money", "🪙", {"fa": "دنیای پول", "ckb": "جیهانی پارە", "kmr": "Cîhana pereyan",
                            "ar": "عالم المال", "en": "The World of Money"}),
           ("chain", "⛓️", {"fa": "دنیای بلاک‌چین", "ckb": "جیهانی بلۆکچەین", "kmr": "Cîhana blokzincîrê",
@@ -511,10 +522,11 @@ def kids_screen(lang):
     out = [L(KD["title"], lang), L(KD["desc"], lang), "", L(KD["safe"], lang), ""]
     for _wid, icon, t in KD["w"]:
         out.append(f"{icon} {L(t, lang)}")
-    out += ["", L(AC["note"], lang)]
+    out += ["", L(KD["film"], lang), "", L(AC["note"], lang)]
     rows = [[{"text": L(KD["b_open"], lang), "url": SITE + "/kids/"}]]
     btns = [{"text": f"{icon} {L(t, lang)}"[:64], "url": f"{SITE}/kids/{wid}/"} for wid, icon, t in KD["w"]]
     rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
+    rows += [[{"text": L(KD["b_studio"], lang), "url": SITE + "/kids/studio/"}]]
     rows += [[{"text": L(KD["b_par"], lang), "url": SITE + "/kids/parents/"}]]
     rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
               {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]

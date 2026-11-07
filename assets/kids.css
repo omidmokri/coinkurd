@@ -149,6 +149,12 @@
 .kd-badge i{font-size:1.6rem;font-style:normal;display:block;filter:grayscale(1);opacity:.35}
 .kd-badge.on i{filter:none;opacity:1}
 .kd-badge small{display:block;color:var(--mute);font-size:.72rem;margin-top:4px}
+.kd-cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.kd-castcard{min-width:0;text-align:center;padding:14px}
+.kd-castcard b{display:block;margin-top:6px;font-size:.95rem}
+.kd-castcard small{line-height:1.8;margin-top:5px}
+.kd-charsvg{display:block;width:92px;height:auto;margin:0 auto}
+.kd-chip.on{border-color:var(--k);color:var(--ink);background:rgba(247,147,26,.16)}
 .kd-conf{position:fixed;inset:0;pointer-events:none;z-index:60}
 .kd-note{color:var(--mute);font-size:.8rem;line-height:1.9;margin-top:18px}
 .kd-rest{position:fixed;inset-inline:12px;bottom:12px;z-index:50;background:#12131a;border:1px solid var(--k);
