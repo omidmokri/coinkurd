@@ -19,6 +19,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write          # the run needs this to start the next one itself
 
 concurrency:
   group: sync
