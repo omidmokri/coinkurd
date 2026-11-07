@@ -17,3 +17,6 @@ ks_pass*
 
 # painted backdrops are a local cache; they are re-made on demand and must never reach the repo
 /data/art/
+
+# the learning map is rebuilt from the academy on every run; it ships with the site, not the repo
+/data/map.json
