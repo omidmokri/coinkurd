@@ -1,20 +1,20 @@
 {
- "updated_at": "2026-11-07T14:55:19.633912+00:00",
+ "updated_at": "2026-11-07T15:10:42.350932+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
+  "BTC": {
+   "n": 98,
+   "amount": 361176.48000000004,
+   "usd": 27452513145
+  },
   "ETH": {
    "n": 113,
    "amount": 266780.92,
    "usd": 598087535
-  },
-  "BTC": {
-   "n": 96,
-   "amount": 358166.10000000003,
-   "usd": 27224021078
   },
   "USDC": {
    "n": 170,
@@ -22,15 +22,15 @@
    "usd": 5811648844
   },
   "USDT": {
-   "n": 21,
-   "amount": 673347176,
-   "usd": 673347176
+   "n": 19,
+   "amount": 457347176,
+   "usd": 457347176
   }
  },
  "hourly": [
   {
    "h": "2026-11-06T18",
-   "usd": 1171231435
+   "usd": 955231435
   },
   {
    "h": "2026-11-06T19",
@@ -111,9 +111,31 @@
   {
    "h": "2026-11-07T14",
    "usd": 2739397141
+  },
+  {
+   "h": "2026-11-07T15",
+   "usd": 228492067
   }
  ],
  "events": [
+  {
+   "asset": "BTC",
+   "amount": 2482.39,
+   "usd": 188416724,
+   "tx": "749d9fe2bb5c0c0a3a90e82a19734bacaff444925dd296990d9954e0383166d9",
+   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "at": "2026-11-07T15:06:48+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 527.99,
+   "usd": 40075343,
+   "tx": "aea1d8830a389494ed81c13dfd58ef261f3bf3be9afd360b6172e565ff82d6c4",
+   "to": "1Kr6QSydW9bFQG1mXiPNNu6WpJGmUa9i1g",
+   "from": "3KhxioHPSJwKJ57RZjeGo8fZtE5iTk2M4Q",
+   "at": "2026-11-07T15:06:48+00:00"
+  },
   {
    "asset": "ETH",
    "amount": 1722.49,
@@ -815,24 +837,6 @@
    "from": "0x690c3eebf6ee237f00fc96f9766282f096c191cc",
    "to": "0x4ab785f639d3437298d780d15fd43a228a4845b8",
    "at": "2026-11-07T09:24:11+00:00"
-  },
-  {
-   "asset": "USDT",
-   "amount": 11409323,
-   "usd": 11409323,
-   "tx": "0x72826e24f504fc3569bdc141d303ccc0917bdd55da1c96237b330ee0212c92a7",
-   "from": "0x98adef6f2ac8572ec48965509d69a8dd5e8bba9d",
-   "to": "0xcde5d48fca07f9c52300d2e65632dd71ed169b90",
-   "at": "2026-11-07T09:23:30.862350+00:00"
-  },
-  {
-   "asset": "USDT",
-   "amount": 14000000,
-   "usd": 14000000,
-   "tx": "0x5e22c1a287d40d1baf76bd5de031515fa5dd61dbcaff35af0de0259a1e7cacb4",
-   "from": "0x549d835356d92983abb76e4cae639f7857963425",
-   "to": "0x8e712469e6cb10f6a9008fdcf2ab46c3ccc08232",
-   "at": "2026-11-07T09:20:04.061267+00:00"
   }
  ]
 }
