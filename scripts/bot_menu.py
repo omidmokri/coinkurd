@@ -44,6 +44,12 @@ S = {
                  "ckb": "ئەگەر لەبریی کریپتۆ دۆلار یان زێڕت کڕیبووایە، ئەمڕۆ چەندت هەبوو؟",
                  "kmr": "Eger te dolar an zêr bikira, îro çi hebû?", "ar": "لو اشتريت دولارًا أو ذهبًا بدل العملات؟",
                  "en": "If you had held the dollar, gold or a deposit instead, what would it be worth today?"}),
+    "today": ("☀️", {"fa": "امروز در بازار", "ckb": "ئەمڕۆ لە بازاڕ", "kmr": "Îro li bazarê", "ar": "اليوم في السوق",
+                     "en": "Today in the market"},
+              {"fa": "۲۴ ساعت گذشته در یک نگاه: بازار، اصطکاک ایران، اسکنر، پست‌ها و کلاس امشب.",
+               "ckb": "٢٤ کاتژمێری ڕابردوو بە یەک نیگا: بازاڕ، گیروگرفتی ئێران، سکانەر، پۆست و وانەی ئەمشەو.",
+               "kmr": "24 saetên dawî bi nihêrînekê.", "ar": "آخر ٢٤ ساعة في لمحة: السوق، احتكاك إيران، الماسح، المنشورات ودرس الليلة.",
+               "en": "The last 24 hours at a glance: market, Iran friction, scanner, posts and tonight's class."}),
     "trackrec": ("🧾", {"fa": "کارنامهٔ واقعی کانال", "ckb": "کارنامەی ڕاستەقینەی کەناڵ", "kmr": "Qeyda rastîn a kanalê",
                         "ar": "السجل الحقيقي للقناة", "en": "Channel's real record"},
                  {"fa": "بعد از پست‌های کانال بیت‌کوین چه کرد، در برابر ساعت‌های تصادفی همان دوره — با آزمون آماری.",
@@ -307,7 +313,7 @@ HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps
 GROUPS = {
     "g_analysis": ["analysis", "coin", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
-    "g_news": ["news", "narr", "events", "week", "posts", "track"],
+    "g_news": ["today", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
 }

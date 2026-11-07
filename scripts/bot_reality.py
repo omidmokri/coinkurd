@@ -11,6 +11,7 @@ wording or a threshold can only ever be changed in one place.
 Everything here is a short chat-sized summary with the page's address for the full thing; the long
 tables, the chain verification and the charts stay on the web, where they belong.
 """
+import datetime as dt
 import logging
 
 import build_reality as BR
@@ -66,6 +67,8 @@ def summary(lg="fa"):
     """the same six readings as structured data — what the extension and the apps render"""
     out = []
     for key, (fn, url) in SECTIONS.items():
+        if key == "today":                   # a market brief, not a reality reading
+            continue
         try:
             fn(lg)
         except Exception:                    # one bad reading must not cost the other five
@@ -284,7 +287,81 @@ def sec_trackrec(lang):
     return _head("🧾 " + _tr("title", lg), lg, "/track-record/", lines, d.get("updated_at"))
 
 
-SECTIONS = {"trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
+# ------------------------------------------------------------------ 0. /today/ — the daily spine
+TD = {"title": {"fa": "امروز در بازار", "ckb": "ئەمڕۆ لە بازاڕ", "en": "Today in the market"},
+      "btc": {"fa": "بیت‌کوین ۲۴س", "ckb": "بیتکۆین ٢٤ک", "en": "Bitcoin 24h"},
+      "fng": {"fa": "ترس و طمع", "ckb": "ترس و تەماح", "en": "Fear & greed"},
+      "brd": {"fa": "کوین‌های مثبت / منفی", "ckb": "دراوە ئەرێنی / نەرێنی", "en": "Coins up / down"},
+      "mov": {"fa": "بیشترین حرکت", "ckb": "زۆرترین جووڵە", "en": "Biggest movers"},
+      "fr": {"fa": "اصطکاک ایران", "ckb": "گیروگرفتی ئێران", "en": "Iran friction"},
+      "usdt": {"fa": "تتر (تومان)", "ckb": "تەتەر (تمەن)", "en": "USDT (toman)"},
+      "sc": {"fa": "یافته‌های اسکنر ۲۴س", "ckb": "دۆزینەوەکانی سکانەر ٢٤ک", "en": "Scanner findings 24h"},
+      "po": {"fa": "پست‌های کانال ۲۴س", "ckb": "پۆستەکانی کەناڵ ٢٤ک", "en": "Channel posts 24h"},
+      "cl": {"fa": "کلاس زندهٔ امشب (دیسکورد، ۲۰:۰۰ تهران) تا", "ckb": "وانەی ڕاستەوخۆی ئەمشەو (دیسکۆرد، ٢٠:٠٠ تاران) تا",
+             "en": "Tonight's live class (Discord, 20:00 Tehran) in"},
+      "hm": {"fa": "{h} ساعت {m} دقیقه", "ckb": "{h} کاتژمێر {m} خولەک", "en": "{h}h {m}min"}}
+
+
+def _td(k, lg):
+    return TD[k].get(lg) or TD[k]["fa"]
+
+
+def count_recent(items, now, key, hours=24):
+    """how many items have a timestamp `key` in (now - hours, now]; bad or missing timestamps are skipped"""
+    lo, n = now - dt.timedelta(hours=hours), 0
+    for x in items or []:
+        try:
+            t = R.parse_iso(x.get(key))
+        except Exception:  # noqa: BLE001
+            continue
+        if t is not None and lo < t <= now:
+            n += 1
+    return n
+
+
+def class_wait(now):
+    """minutes until the next 20:00 Tehran (16:30 UTC) class"""
+    t = now.replace(hour=16, minute=30, second=0, microsecond=0)
+    if t <= now:
+        t += dt.timedelta(days=1)
+    return int((t - now).total_seconds() // 60)
+
+
+def sec_today(lang, now=None):
+    lg = _lg(lang)
+    now = now or dt.datetime.now(dt.timezone.utc)
+    brain, fr = R.load("brain.json", {}) or {}, R.load("friction.json", {}) or {}
+    rg, rf = brain.get("regime") or {}, brain.get("report_facts") or {}
+    pc = BR.PCT.get(lg, "%")
+    lines = []
+    if rg:
+        lines.append(f"• {_td('btc', lg)}: <b>{_n(rg.get('btc_chg24'), lg, 2, sign=True)}{pc}</b>")
+        if rf.get("fng") is not None:
+            lines.append(f"• {_td('fng', lg)}: {_n(rf.get('fng'), lg)}")
+        br = rg.get("breadth") or {}
+        if br.get("n"):
+            lines.append(f"• {_td('brd', lg)}: {_n(br.get('up_pct'), lg)}{pc} / {_n(br.get('down_pct'), lg)}{pc}")
+        mv = (brain.get("movers") or [])[:4]
+        if mv:
+            lines.append(f"• {_td('mov', lg)}: " + " · ".join(
+                f"{m.get('coin', '')} {_n(m.get('chg24'), lg, 1, sign=True)}{pc}" for m in mv))
+    if fr.get("score") is not None:
+        lines.append(f"• {_td('fr', lg)}: {_n(fr.get('score'), lg, 1)} — {BR.s('lvl.' + (fr.get('level') or 'green'), lg)}")
+        u = (fr.get("prices") or {}).get("usdt")
+        if u:
+            lines.append(f"• {_td('usdt', lg)}: {_n(u / 10, lg)}")
+    if not lines:
+        lines.append(BR.s("nodata", lg))
+    scan = (R.load("scanlog.json", {}) or {}).get("items") or []
+    posts = R.load("posts.json", []) or []
+    w = class_wait(now)
+    lines += ["", f"• {_td('sc', lg)}: {_n(count_recent(scan, now, 't'), lg)}",
+              f"• {_td('po', lg)}: {_n(count_recent(posts, now, 'date'), lg)}",
+              "", "🎓 " + _td("cl", lg) + " " + _td("hm", lg).format(h=_n(w // 60, lg), m=_n(w % 60, lg))]
+    return _head("☀️ " + _td("title", lg), lg, "/today/", lines, brain.get("updated_at"))
+
+
+SECTIONS = {"today": (sec_today, "/today/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/")}

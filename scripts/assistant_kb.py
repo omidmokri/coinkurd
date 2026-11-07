@@ -37,7 +37,7 @@ FEATURES = [
     ("/sentiment/", ["sentim"], "reality"),
     ("/whales/", ["whales", "follow"], "reality"),
     ("/predict/", ["predict"], None),
-    ("/today/", ["brain"], None),
+    ("/today/", ["today", "brain"], None),
     ("/weekly/", ["week"], None),
     ("/roundtable/", ["council", "brain"], None),
     ("/opportunity/", ["oppcost"], "reality"),

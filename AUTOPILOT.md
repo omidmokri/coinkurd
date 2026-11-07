@@ -89,8 +89,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
 ## Backlog (top = next)
-2. **`/today/` — rest of the spine.** Slice 1 shipped 2026-11-07. Still to do: a home-page card linking to it, a bot
-   section mirroring it, and per-day snapshots (`/daily/<date>/` already archives the market part).
+2. **`/today/` — rest of the spine.** Slice 1 + bot section shipped 2026-11-07. Still to do: a home-page card linking
+   to it, and per-day snapshots (`/daily/<date>/` already archives the market part).
 3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
    countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
 4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
@@ -104,6 +104,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/today/` in the Telegram bot (Backlog #2, slice 2)
+- **Need:** the owner's rule — every site feature mirrored in the bot; `/today/` had no bot home.
+- **Built:** `bot_reality.sec_today` (key `today`, first item of the News group, labels in fa/ckb/kmr/ar/en in `bot_menu.S`):
+  BTC 24h, fear & greed, breadth, top movers, Iran friction + USDT in toman, counts of scanner findings and channel posts
+  in the last 24h, countdown to the 20:00 Tehran class; same data files as the page, "no data yet" when empty. Kept out
+  of `summary()` (that list is the reality readings). Assistant index maps `/today/` to the new key.
+- **Verified:** py_compile; unit tests for `class_wait` (30 min before, exactly at → 1440, after → 1410) and `count_recent`
+  (exclusive/inclusive bounds, bad/missing timestamps, future item); rendered fa/ckb/en from real data; `import refbot` ok.
+  No site UI changed, so no screenshots.
+- **Next:** home-page card for `/today/`, or Backlog #3.
 
 ### 2026-11-07 · `/today/` — the daily spine, slice 1 (Backlog #2)
 - **Need:** thirty tools and no starting point; a trader opening the site wants "what happened in the last 24h" in one place.
