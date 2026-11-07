@@ -143,8 +143,12 @@ CSS = """
 .oc-tag.b{background:#22c55e;color:#04210f}.oc-tag.w{background:#ef4444;color:#2a0808}
 .oc-lead{font-size:1rem;line-height:2;margin:14px 0 2px}
 .oc-acts{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
-.oc-tg{background:#229ED9;color:#fff;border:0;border-radius:99px;padding:9px 18px;font:inherit;font-weight:700;cursor:pointer;font-size:.88rem}
-.oc-cp{background:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:8px 17px;font:inherit;cursor:pointer;font-size:.88rem}
+.oc-acts button{background:none;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:8px 17px;font:inherit;cursor:pointer;font-size:.88rem;transition:border-color .15s,color .15s}
+.oc-acts button:hover{border-color:var(--acc);color:var(--acc)}
+.oc-acts .oc-tg{background:#229ED9;color:#fff;border-color:#229ED9;font-weight:700;padding:9px 18px}
+.oc-acts .oc-tg:hover{background:#1b8cc2;color:#fff;border-color:#1b8cc2}
+.oc-acts .oc-sv{border-color:rgba(247,147,26,.45)}
+.oc-acts .oc-ok,.oc-acts .oc-ok:hover{color:#22c55e;border-color:rgba(34,197,94,.55)}
 .oc-err{color:#f87171;margin:8px 0}
 .oc-res{display:block}
 .oc-grid{display:grid;gap:18px}
