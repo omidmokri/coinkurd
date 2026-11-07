@@ -83,34 +83,40 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `ledger.json`, `scanstats.json`, `scanlog.json`, `market.json`, `score.json`, `brain.json`, `friction.json`, …
 
 ## Backlog (top = next)
-1. **One honest number everywhere.** The raw "average 24h move after posts" (no baseline) is still shown on coin pages
-   (`build_pages.py`, "کارنامهٔ پست‌ها"), in the home-page "imp" block and inside the Entekhab Score's `channel`
-   component (`score.py`: `50 + avg*8 + (hit-0.5)*40`). In a flat market that number rewards drift, not the channel.
-   Replace them with the tested figures from `data/trackrecord.json` (post vs random hours, p-value); make the Score
-   component neutral (50) unless p < 0.05, and update the wording on `/methodology/`. The first real result
-   (2026-11-07) is **not significant** (+0.43% after posts vs +0.20% at random hours, p = 0.29), so today the channel
-   component should sit at 50 and the coin pages should say "no measurable difference yet", linking to /track-record/.
-2. **Public log page `/autopilot/`.** Render this file's Log (fa/ckb/en) with links to each commit, so every autonomous
+1. **Public log page `/autopilot/`.** Render this file's Log (fa/ckb/en) with links to each commit, so every autonomous
    change is visible on the site. Link it from the footer ("روش کار و منابع داده" neighbourhood).
-3. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
+2. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
    avg −1.42%, n≈398; a bearish "negative divergence" followed by gains 70% of the time). Test each pattern against the
    random-hour baseline with the method of `trackrecord.py`, publish per-pattern verdicts, and mark (don't hide) patterns
    that are significantly worse than random as "under review" in the scanner UI and the bot.
-4. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
+3. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
    scanner findings with their tested record, today's posts, the nightly class topic; archived by date for search.
-5. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
+4. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
    countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
-6. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
-7. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
+5. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
+6. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
-8. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
-9. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
-10. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
+7. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
+8. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
+9. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · One honest number everywhere (Backlog #1)
+- **Need:** coin pages, the home/dashboard "post track record" box and the Entekhab Score still used the raw average
+  24h move after posts (no baseline) — in a drifting market that flatters the channel.
+- **Built:** `score.py` `channel_component()` — the Score's channel part is 50 (neutral) unless the tested record
+  (`data/trackrecord.json`, post hours vs matched random hours) has p < 0.05; then 50 + 8 × (post avg − random avg).
+  `build_pages.py` `tested_line()` replaces the raw sentence on every coin page and the server-rendered dashboard box;
+  the home page's client-side box (`index.html`, fa/ckb/en) now loads `trackrecord.json` and shows post vs random-hour
+  BTC move, p and the verdict, linking to /track-record/. `/methodology/` wording updated.
+- **Verified:** unit tests on synthetic inputs (empty → 50; real p=0.28 → 50; p=0.01, +1.3 gap → 60.4; clamp at 0;
+  p=0.05 boundary → 50); score + page builders run on a scratch copy (BTC/ETH channel = 50.0); screenshots home fa/en and
+  BTC coin page at 1280/390, zero JS errors. Bot "track" section already quotes the tested figure (previous run).
+- **Next:** Backlog #1 — public `/autopilot/` log page.
 
 ### 2026-11-07 · `/track-record/` — the channel's real record
 - **Need:** every reader's first question — "does following this channel help?" — had only a misleading answer: the raw
