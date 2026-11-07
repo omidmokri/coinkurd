@@ -118,9 +118,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
-8. **Home page sideways wobble.** At 390 px width the home page is 1 px wider than the screen in all three languages (`div.ek-tools` / `a.ek-appb` in the header end at 391 px; same on main before the `/kids/` change, so not caused by it). Check with Playwright (`documentElement.scrollWidth - clientWidth`) and fix in `assets/chrome.css` without breaking the other pages; `/kids/` pages measure 0.
 
 ## Log (newest first)
+
+### 2026-11-07 · Home page no longer wobbles sideways on phones (Backlog #8)
+- **Need:** on 390 px phones the home page was 1 px wider than the screen, so it slid sideways under the thumb.
+- **Cause:** the header row's contents (brand + search + language pill + app button, with 8 px gaps) summed to 1 px over
+  the width; hiding any one item fixed it (found by toggling each element and re-measuring `scrollWidth`).
+- **Built:** one rule in `assets/chrome.css` `@media (max-width:640px)`: header gap 8→6 px, tools gap 6→5 px.
+  (Tried letting the brand shrink first — it truncated the wordmark to "entekhab.…", rejected.)
+- **Verified:** Playwright + Chrome, home at 360/375/390 px in fa, en, ckb: overflow 0 (baseline on main: 1); 1280 px fa
+  unchanged; zero JS errors; looked at the shots. No bot change (CSS only).
+- **Next:** Backlog #7 (stale videos feed) — concrete and checkable from CI logs; then #3 from post facts.
 
 ### 2026-11-07 · `/kids/` replaced by the open "Bitcoin for Juniors" curriculum (asked for by the owner)
 The owner judged the home-made kids academy "very weak" and asked for My First Bitcoin's Bitcoin for Juniors in its place,
