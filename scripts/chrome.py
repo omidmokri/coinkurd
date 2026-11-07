@@ -217,6 +217,8 @@ NAV = [
     {"k": "more", "t": L("بیشتر", "زیاتر", "More"), "items": [
         ("/about/", "info", L("درباره انتخاب", "دەربارەی Entekhab", "About Entekhab"),
          L("چطور کار می‌کند و نقشهٔ راه", "چۆن کار دەکات و نەخشەی ڕێگا", "How it works and the roadmap")),
+        ("/methodology/", "file", L("روش کار و منابع داده", "ڕێگای کار و سەرچاوەی داتا", "Methodology & data sources"),
+         L("فرمول امتیاز، اسکنر و محدودیت‌ها", "فۆرموولی خاڵ، سکانەر و سنوورەکان", "Score formula, scanner, limits")),
         ("/status/", "activity", L("شفافیت و وضعیت", "ڕوونی و دۆخ", "Transparency & status"),
          L("سلامت منابع داده و کارنامهٔ سیگنال‌ها", "تەندروستیی سەرچاوەکانی داتا و تۆماری سیگناڵەکان", "Data health and signal track record")),
         ("/app/", "phone", L("اپلیکیشن اندروید", "ئەپی ئەندرۆید", "Android app"),
@@ -341,7 +343,7 @@ def footer(lang="fa"):
             f'<a class="ek-badge" href="/app/#web">{icon("globe")}<span>{tri(T["anyd"], lang, "ek-i", "small")}{tri(T["pwa"], lang, "ek-i", "b")}</span></a>')
     lab = {h: t for h, ic, t, d in cats["more"]["items"]}   # by address: inserting a menu item must not shift these labels
     legal = (f'<a href="/privacy/">{tri(lab["/privacy/"], lang)}</a><a href="/terms/">{tri(lab["/terms/"], lang)}</a>'
-             f'<a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
+             f'<a href="/methodology/">{tri(lab["/methodology/"], lang)}</a><a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
     return (f'<!--ek:footer--><div class="ekf" id="ekf" role="contentinfo" data-lang="{lang}"><div class="ek-w">'
             f'<div class="ekf-top"><div class="ekf-brand"><a class="ek-brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="" width="64" height="40" loading="lazy"><span>entekhab<b>.net</b></span></a>'
             f'{tri(T["tagline"], lang, "ek-i ekf-tag", "p")}{tri(T["about"], lang, "ek-i ekf-ab", "p")}<div class="ekf-apps">{apps}</div></div>'
