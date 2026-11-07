@@ -1435,6 +1435,9 @@ def handle_callback(s, cb):
     if kind == "lm":
         text, rows = LN.map_screen(lang)
         return edit(chat_id, mid, text, rows_kb(rows))
+    if kind == "lk":
+        text, rows = LN.kids_screen(lang)
+        return edit(chat_id, mid, text, rows_kb(rows))
     if kind == "ak":                                  # آکادمی داخل ربات: درس، آزمون و پیشرفت
         text, rows = AK.route(x, val, lang)
         return edit(chat_id, mid, text, rows_kb(rows))
