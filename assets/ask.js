@@ -4,7 +4,8 @@
    را بزند، متن در کلیپ‌بورد کپی و گفتگوی تلگرام باز می‌شود. */
 (function () {
   "use strict";
-  var IDX = null, LOAD = null, ADMIN = "Kurdistan_Coin", HIST = [];
+  if (window.__ekAsk) return; window.__ekAsk = 1;
+  var IDX = null, SYN = {}, LOAD = null, ADMIN = "Kurdistan_Coin", HIST = [];
 
   function lang() {
     var l; try { l = localStorage.getItem("ck_lang"); } catch (e) {}
@@ -33,11 +34,12 @@
     copied: { fa: "متن گفتگو کپی شد — در تلگرام فقط بچسبانید و بفرستید.", ckb: "دەقەکە کۆپی کرا — لە تەلەگرام تەنها بیلکێنە.", en: "The conversation was copied — just paste it in Telegram." },
     err: { fa: "نتوانستم نمایه را بخوانم. اینترنت را بررسی کنید یا بعداً دوباره امتحان کنید.", ckb: "نەمتوانی ئیندێکس بخوێنمەوە.", en: "I couldn't load the index. Check your connection and try again." },
     load: { fa: "یک لحظه…", ckb: "چرکەیەک…", en: "One moment…" },
+    inBot: { fa: "همین بخش در ربات تلگرام", ckb: "هەمان بەش لە بۆتی تێلێگرام", en: "The same section in the Telegram bot" },
     note: { fa: "جواب‌ها از محتوای خود سایت است، نه توصیهٔ مالی.", ckb: "وەڵامەکان لە ناوەڕۆکی سایتەوەن، نەک ئامۆژگاریی دارایی.", en: "Answers come from the site's own content — not financial advice." },
     sug: {
-      fa: ["دقت سیگنال‌ها چقدر است؟", "قیمت بیت‌کوین", "اصطکاک ایران", "از کجا شروع کنم؟", "ربات معامله‌گر چیست؟"],
-      ckb: ["وردیی سیگناڵەکان؟", "نرخی بیتکۆین", "لێکخشانی ئێران", "لە کوێوە دەست پێ بکەم؟"],
-      en: ["How accurate are the signals?", "Bitcoin price", "Iran friction", "Where do I start?"]
+      fa: ["چطور هشدار قیمت بگذارم؟", "قیمت بیت‌کوین", "اپلیکیشن و افزونه", "ربات تلگرام چه می‌کند؟", "کلاس زنده دارید؟"],
+      ckb: ["چۆن ئاگاداریی نرخ دابنێم؟", "نرخی بیتکۆین", "ئەپی ئەندرۆید", "بۆتی تێلێگرام"],
+      en: ["How do I set a price alert?", "Bitcoin price", "Is there an app?", "What does the Telegram bot do?"]
     },
     live: {
       fng: { fa: "شاخص ترس و طمع الان", ckb: "پێوەری ترس و تەماح ئێستا", en: "Fear & Greed right now" },
@@ -50,7 +52,8 @@
     g: {
       page: { fa: "صفحه", ckb: "پەڕە", en: "Page" }, term: { fa: "دانشنامه", ckb: "زانستنامە", en: "Encyclopedia" },
       post: { fa: "پست کانال", ckb: "پۆستی کەناڵ", en: "Channel post" }, academy: { fa: "آکادمی", ckb: "ئەکادیمیا", en: "Academy" },
-      faq: { fa: "راهنما", ckb: "ڕێنمایی", en: "Guide" }, live: { fa: "زنده", ckb: "زیندوو", en: "Live" }
+      faq: { fa: "راهنما", ckb: "ڕێنمایی", en: "Guide" }, live: { fa: "زنده", ckb: "زیندوو", en: "Live" },
+      feature: { fa: "امکانات", ckb: "تایبەتمەندی", en: "Feature" }, bot: { fa: "ربات", ckb: "بۆت", en: "Bot" }
     }
   };
 
@@ -74,7 +77,10 @@
     }
     return o.replace(/\s+/g, " ").trim();
   }
-  var STOP = { "چیست": 1, "چیه": 1, "است": 1, "را": 1, "به": 1, "از": 1, "در": 1, "که": 1, "با": 1, "این": 1, "برای": 1, "می": 1, "چه": 1, "چطور": 1, "چگونه": 1, "the": 1, "is": 1, "a": 1, "of": 1, "how": 1, "what": 1, "to": 1, "do": 1, "i": 1, "my": 1, "and": 1 };
+  var STOP = {};
+  ("چیست چیه است را به از در که با این برای می چه چطور چگونه بدون دارید دارین داری هست هستید هستش کنم کنیم کرد کجا کجاست یک هم آیا شما ما من چی بگم بخوام میخواهم میخوام لطفا رو و یا " +
+   "بۆ لە و چۆن چی هەیە ئایا من ئێوە بە دەکرێت " +
+   "the is a an of how what to do does i my and you your can there have are for in on with be where which").split(" ").forEach(function (w) { if (w) STOP[w] = 1; });
   function toks(s) { return norm(s).split(" ").filter(function (t) { return t.length > 1 && !STOP[t]; }); }
 
   /* ---------- index ---------- */
@@ -83,31 +89,48 @@
     LOAD = fetch("/data/assistant.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) {
       IDX = j; ADMIN = j.admin || ADMIN;
       (j.docs || []).forEach(function (d) { d._h = norm([T(d.t), d.t && d.t.fa, d.t && d.t.en, d.k || "", d.d ? T(d.d) : ""].join(" ")); });
-      (j.faq || []).forEach(function (f) { f._h = norm([(f.q || []).join(" "), T(f.t), f.t && f.t.fa, f.t && f.t.en].join(" ")); });
+      (j.faq || []).forEach(function (f) {
+        f._h = norm([(f.q || []).join(" "), T(f.t), f.t && f.t.fa, f.t && f.t.ckb, f.t && f.t.en].join(" "));
+        f._a = norm([f.a && f.a.fa, f.a && f.a.ckb, f.a && f.a.en].join(" "));
+      });
+      SYN = {};
+      (j.syn || []).forEach(function (g) {
+        var ns = g.map(norm).filter(Boolean);
+        ns.forEach(function (w) { SYN[w] = (SYN[w] || []).concat(ns.filter(function (x) { return x !== w; })); });
+      });
       return j;
     });
     return LOAD;
   }
-  var BOOST = { faq: 2.2, page: 1.5, academy: 1.1, term: 1.0, post: .65 };
-  function score(hay, tk, q) {
+  var BOOST = { faq: 2.2, feature: 2.0, page: 1.5, academy: 1.1, term: 1.0, post: .65 };
+  function hit(hay, t) {
+    var at = hay.indexOf(t);
+    if (at < 0) return 0;
+    var whole = (at === 0 || hay[at - 1] === " ") && (at + t.length === hay.length || hay[at + t.length] === " ");
+    return whole ? 3 : 1.4;
+  }
+  function score(hay, tk, q, ex) {
     var s = 0;
     for (var i = 0; i < tk.length; i++) {
-      var t = tk[i], at = hay.indexOf(t);
-      if (at < 0) continue;
-      var whole = (at === 0 || hay[at - 1] === " ") && (at + t.length === hay.length || hay[at + t.length] === " ");
-      s += whole ? 3 : 1.4;
+      var h = hit(hay, tk[i]);
+      if (!h && ex[tk[i]]) {                     /* a synonym counts, a little less than the user's own word */
+        for (var k = 0; k < ex[tk[i]].length && !h; k++) h = hit(hay, ex[tk[i]][k]) * .7;
+      }
+      s += h;
     }
     if (q.length > 3 && hay.indexOf(q) >= 0) s += 5;
     return s;
   }
   function search(qs) {
-    var tk = toks(qs), q = norm(qs), out = [];
+    var tk = toks(qs), q = norm(qs), out = [], ex = {};
     if (!tk.length || !IDX) return out;
+    tk.forEach(function (t) { if (SYN[t]) ex[t] = SYN[t]; });
     (IDX.faq || []).forEach(function (f) {
-      var s = score(f._h, tk, q); if (s > 0) out.push({ s: s * BOOST.faq, faq: f });
+      var s = score(f._h, tk, q, ex) + score(f._a || "", tk, "", {}) * .25;
+      if (s > 0) out.push({ s: s * (BOOST[f.g] || BOOST.faq), faq: f });
     });
     (IDX.docs || []).forEach(function (d) {
-      var s = score(d._h, tk, q); if (s > 0) out.push({ s: s * (BOOST[d.g] || 1), doc: d });
+      var s = score(d._h, tk, q, ex); if (s > 0) out.push({ s: s * (BOOST[d.g] || 1), doc: d });
     });
     out.sort(function (a, b) { return b.s - a.s; });
     var min = tk.length >= 2 ? 4 : 2.5;
@@ -212,8 +235,13 @@
       if (lv) html += lv.html + card(lv.u, T(S.live.more), "", T(S.g.live));
       if (hits.length) {
         if (!lv) html += esc(hits[0].weak ? T(S.maybe) : T(S.found));
+        var shown = 0;
         hits.forEach(function (h) {
-          if (h.faq) html += "<div style='margin-top:7px'>" + esc(T(h.faq.a)) + "</div>" + card(h.faq.u, T(h.faq.t), "", T(S.g.faq));
+          if (h.faq && !shown && !h.weak) {
+            shown = 1;
+            html += "<div style='margin-top:7px'>" + esc(T(h.faq.a)) + "</div>" + card(h.faq.u, T(h.faq.t), "", T(S.g[h.faq.g] || S.g.faq));
+            if (h.faq.u2) html += card(h.faq.u2, T(S.inBot), "", T(S.g.bot));
+          } else if (h.faq) html += card(h.faq.u, T(h.faq.t), "", T(S.g[h.faq.g] || S.g.faq));
           else html += card(h.doc.u, T(h.doc.t), h.doc.d ? T(h.doc.d) : (h.doc.dt || ""), T(S.g[h.doc.g] || S.g.page));
         });
       }
