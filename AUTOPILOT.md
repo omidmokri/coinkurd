@@ -17,9 +17,9 @@ traders (Iranian and Kurdish traders first), builds the best possible answer to 
 The site's strategy (agreed with the owner, 2026-11-07):
 1. **Measured honesty is the product.** The site publishes numbers that can make it look bad (signal ledger, scanner
    accuracy, the channel's own record). Make that the spine: accountability where decisions are made, not on a side page.
-2. **One spine instead of thirty islands.** Breadth without a starting point loses newcomers; build toward a daily page
+1. **One spine instead of thirty islands.** Breadth without a starting point loses newcomers; build toward a daily page
    that ties the tools together.
-3. **The human is the moat.** Seven years of daily posts, two books, university workshops, a nightly class — make them visible.
+2. **The human is the moat.** Seven years of daily posts, two books, university workshops, a nightly class — make them visible.
 
 ## How to work (every run)
 
@@ -30,18 +30,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
    existing feature beats adding a new one.
 3. **Build** inside the existing patterns (see Architecture). Trilingual (fa / ckb / en), RTL-correct, mobile-first,
    matching the design system (dark, `var(--card)`, `var(--line)`, orange `var(--acc)`, 16–18px radii, pill buttons).
-4. **Test before you publish.**
+3. **Test before you publish.**
    - `python3 -m py_compile` every changed script; run every builder you touched.
    - Numbers: unit-test any computation on synthetic data where the right answer is known (see `trackrecord.py` tests
      in the Log entry of 2026-11-07 for the standard: null case, planted effect, edge cases, a hand-checked value).
    - UI: serve the repo copy (`python3 -m http.server`), screenshot with Playwright + `/usr/bin/google-chrome` at
      1280px and 390px, in fa and en; **look at the screenshots**; zero JS errors.
-5. **Publish.** One commit per run, message starting `autopilot:` and ending with the attribution lines the session asks
+4. **Publish.** One commit per run, message starting `autopilot:` and ending with the attribution lines the session asks
    for. `git pull --rebase origin main && git push origin HEAD:main` (re-rebase and retry up to 3 times if rejected).
    The same commit adds your entry at the top of **Log**.
-6. **Check the deploy.** `gh run list -R omidmokri/coinkurd -L 6` — the "Sync Telegram → Site" run after your commit must
+5. **Check the deploy.** `gh run list -R omidmokri/coinkurd -L 6` — the "Sync Telegram → Site" run after your commit must
    succeed. If your change broke it, fix it in this run or `git revert` your commit (never force-push).
-7. **Size.** Finish within ~40 minutes. If the item is bigger, ship the first useful slice and leave the rest in Backlog.
+6. **Size.** Finish within ~40 minutes. If the item is bigger, ship the first useful slice and leave the rest in Backlog.
 
 ### Environment facts (learned the hard way)
 - From the sandbox only GitHub and package registries are reachable. **Binance, Telegram and entekhab.net are not.**
@@ -89,9 +89,6 @@ The site's strategy (agreed with the owner, 2026-11-07):
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
 ## Backlog (top = next)
-1. **Scanner audit — part 2.** Part 1 (2026-11-07) ships `data/scanaudit.json` + verdicts on coin pages and in the bot.
-   Next: check the first real `scanaudit.json` from CI and record the result here; add a verdict table to `/opportunity/`
-   (fa/ckb/en) and an "under review" badge in its client-side list; mention the test on `/methodology/`.
 2. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
    scanner findings with their tested record, today's posts, the nightly class topic; archived by date for search.
 3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
@@ -102,11 +99,25 @@ The site's strategy (agreed with the owner, 2026-11-07):
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 7. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
-8. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
+7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · Scanner audit, part 2 — real result published (Backlog #1)
+- **Real result (CI, 16:24 UTC, 196 coins, 5,258 findings, 2026-09-27 → 2026-11-06):** all findings together +0.01% vs
+  0.00% at other hours (p = 0.96, no edge). Nominally "better": RSI bearish divergence (+2.20% vs +0.53%, p = 0.018) and
+  RSI oversold (+0.70% vs −0.62%, p = 0.021); the other 7 show no edge; none "worse". With 9 tests ~0.45 false positives
+  are expected and **none survives Bonferroni (p < 0.0056)** — so the two "better" results are weak evidence.
+- **Built:** `/track-record/#scanner` table (fa/ckb/en, sorted by p, verdict chips, Bonferroni line computed by
+  `build_trackrecord.bonf()`); the home dashboard's client-side scanner list now shows each finding's tested line
+  (after vs other hours, p, n, verdict; "under review" if worse) instead of the raw win %, linking to the table;
+  `/methodology/` gained a "scanner pattern test" section. Note: the old backlog said `/opportunity/` — that page is the
+  toman opportunity-cost calculator, not the scanner, so the table went to /track-record/. Bot already mirrors (part 1).
+- **Verified:** py_compile; `bonf` unit test (empty → 0; 2 tested + 1 too_few + _all → m=2, t=0.025, 1 survives; real
+  data → 9, 0); built track-record + pages on a scratch copy with the real audit; screenshots 1280/390 fa/en, zero JS errors.
+- **Next:** Backlog #1 — `/today/`.
 
 ### 2026-11-07 · `/map/` — the learning map (asked for by the owner)
 Modelled on learn-anything.xyz: a force-directed graph of 33 topics (13 faculties + their 20 published courses) on
