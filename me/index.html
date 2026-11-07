@@ -173,7 +173,9 @@ async function renderFeed(){const f=ls.get('ek_follow',[]),TN=T('topics');
  const mb=$('#fMore');if(mb)mb.onclick=()=>{fN+=12;renderFeed()}}
 /* ---- recently viewed (recorded locally by every Entekhab page) ---- */
 function renderRecent(){const a=ls.get('ek_recent',[]).filter(x=>x&&x.p&&x.p!=='/me/').slice(0,10);
- $('#recent').innerHTML=a.length?a.map(x=>`<a class="note fd" href="${esc(su(x.p))}">${esc(x.t||x.p)}<br><small>${ago(x.at)} · <bdi dir="ltr">${esc(decodeURI(x.p))}</bdi></small></a>`).join('')+`<button class="btn" id="rcClr" style="margin-top:6px">${T('clr')}</button>`:`<p class="disc">${T('rvNo')}</p>`;
+ /* calculations saved from /opportunity/ ("save to My space") come first */
+ const oc=(ls.get('ck_oc_saved',[])||[]).filter(x=>x&&x.link&&x.c).slice(0,5).map(x=>`<a class="note fd" href="${esc(su(String(x.link).replace(/^https:\/\/entekhab\.net/,'')))}">⭐ 💰 ${esc(x.c)} · <bdi dir="ltr">${esc(x.d)}</bdi><br><small>${ago(x.at)} · <bdi dir="ltr">/opportunity/</bdi></small></a>`).join('');
+ $('#recent').innerHTML=oc+(a.length?a.map(x=>`<a class="note fd" href="${esc(su(x.p))}">${esc(x.t||x.p)}<br><small>${ago(x.at)} · <bdi dir="ltr">${esc(decodeURI(x.p))}</bdi></small></a>`).join('')+`<button class="btn" id="rcClr" style="margin-top:6px">${T('clr')}</button>`:(oc?'':`<p class="disc">${T('rvNo')}</p>`));
  const b=$('#rcClr');if(b)b.onclick=()=>{ls.set('ek_recent',[]);renderRecent()}}
 /* ---- trader DNA (made in the Lab) ---- */
 function renderTD(){const r=ls.get('ek_dna',null),el=$('#tdna');if(!r||!r.type){el.innerHTML=`<p class="disc" style="margin:0 0 10px">${T('dnNo')}</p><a class="btn p" href="/lab/#dnaS">🧬 ${T('dnMake')}</a>`;return}
