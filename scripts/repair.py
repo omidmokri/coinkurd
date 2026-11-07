@@ -7,6 +7,20 @@ P = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
 # Discord invites in older posts have expired; this permanent invite of the COIN_KURD server still works (checked 2026-11-02)
 DISCORD = "https://discord.gg/TtT2BHmZyJ"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The owner's family name is مکری (Mokri). It was misspelled موکری in older posts and the
+# channel is the source of truth on every sync, so the correction is reapplied here each run.
+NAME_FIX = [("ئومێد دەباغچی موکری", "ئومێد دەباغچی مکری"),
+            ("ڕێبازی موکری", "ڕێبازی ئەندازیار ئومێد دەباغچی مکری"),
+            ("روش موکری", "روش مهندس امید دباغچی مکری"),
+            ("موکری", "مکری")]
+
+
+def fix_name(t):
+    for a, b in NAME_FIX:
+        t = t.replace(a, b)
+    return t
+
+
 DEEPIMG_RE = re.compile(r"https://raw\.githubusercontent\.com/omidmokri/coinkurd/[^/]+/(data/deepimg/[\w.-]+\.(?:jpe?g|png|webp))")
 DISCORD_RE = re.compile(r"https?://(?:www\.)?(?:discord\.gg|discord(?:app)?\.com/invite)/[\w-]+", re.I)
 ps = json.load(open(P, encoding="utf-8"))
@@ -50,6 +64,14 @@ for p in ps:
             lg["text"] = DISCORD_RE.sub(DISCORD, lg["text"])
     if isinstance(p.get("link"), dict) and DISCORD_RE.fullmatch(p["link"].get("url") or ""):
         p["link"]["url"] = DISCORD
+    for k in ("text", "title"):
+        if p.get(k) and "موکری" in p[k]:
+            p[k], n = fix_name(p[k]), n + 1
+    for lg in (p.get("tr") or {}).values():
+        if isinstance(lg, dict):
+            for k in ("text", "title"):
+                if lg.get(k) and "موکری" in lg[k]:
+                    lg[k] = fix_name(lg[k])
 json.dump(ps, open(P, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 # the per-category counts in meta.json follow the categories just set
 MP = os.path.join(os.path.dirname(os.path.abspath(P)), "meta.json")

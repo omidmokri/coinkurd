@@ -43,6 +43,8 @@
 
 /* ---- topic page */
 .mp-top{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+.mp-top>div{flex:1 1 260px;min-width:0}
+.mp-top h1{margin:0 0 2px}
 .mp-ring{width:64px;height:64px;flex:0 0 auto}
 .mp-ring circle{fill:none;stroke-width:7}
 .mp-ring .bg{stroke:#ffffff14}

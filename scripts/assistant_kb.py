@@ -130,7 +130,7 @@ FAQ = [
     (["سازنده", "موسس", "بنیانگذار", "چه کسی", "کی ساخته", "founder", "who made", "who is behind", "دامەزرێنەر", "امید مکری", "کتاب"],
      L("چه کسی پشت انتخاب است؟", "کێ لە پشت ئینتیخابەوەیە؟", "Who is behind Entekhab?"),
      L("امید دباغچی مکری، کارشناس ارشد مهندسی کامپیوتر (هوش مصنوعی و رباتیک) از دانشگاه کردستان و نویسندهٔ کتاب «راهنمای تحلیل تکنیکال برای درک بازار رمزارزها» با همکاری دکتر فردین اخلاقیان طاب. نشانی entekhab.net از دی ۱۳۸۲ ثبت شده و کانال Coin_Kurd از بهمن ۱۳۹۸ فعال است؛ داستان کامل در صفحهٔ «درباره انتخاب» است.",
-       "ئومێد دەباغچی موکری، ماستەر لە ئەندازیاریی کۆمپیوتەر لە زانکۆی کوردستان و نووسەری کتێبی «ڕێنمایی شیکاریی تەکنیکی بۆ تێگەیشتن لە بازاڕی دراوە دیجیتاڵییەکان». چیرۆکی تەواو لە پەڕەی «دەربارە»دایە.",
+       "ئومێد دەباغچی مکری، ماستەر لە ئەندازیاریی کۆمپیوتەر لە زانکۆی کوردستان و نووسەری کتێبی «ڕێنمایی شیکاریی تەکنیکی بۆ تێگەیشتن لە بازاڕی دراوە دیجیتاڵییەکان». چیرۆکی تەواو لە پەڕەی «دەربارە»دایە.",
        "Omid Dabbaghchi Mokri — MSc in Computer Engineering (AI and Robotics) from the University of Kurdistan and author of “A Guide to Technical Analysis for Understanding Cryptocurrency Markets”, co-written with Dr Fardin Akhlaghian Tab. entekhab.net was registered in December 2003 and the Coin_Kurd channel has run since January 2020; the full story is on the About page."),
      "/about/"),
     (["آیدی تریدینگ ویو", "اندیکاتور خصوصی", "دسترسی اندیکاتور", "invite only", "tradingview access", "ابزار تیم", "روژ کردستان"],
