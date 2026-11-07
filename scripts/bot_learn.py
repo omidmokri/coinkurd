@@ -319,6 +319,9 @@ FAC_T = {
     "f10": {"ckb": "بەڕێوەبردنی سەرمایە و مەترسی", "kmr": "Rêveberiya sermaye û xeterê", "ar": "إدارة رأس المال والمخاطر"},
     "f11": {"ckb": "DeFi، وێب ٣ و تەکنەلۆژیای پێشکەوتوو", "kmr": "DeFi, Web3 û teknolojiya pêşketî", "ar": "التمويل اللامركزي والويب 3 والتقنيات المتقدمة"},
     "f12": {"ckb": "توێژینەوەی پسپۆڕی و پڕۆژەی کۆتایی", "kmr": "Pisporî û projeya dawî", "ar": "التخصص والمشروع النهائي"},
+    "f13": {"ckb": "ستراتیژی سێگۆشە و تونێل (ڕێبازی ئەندازیار ئومێد دەباغچی مکری)",
+            "kmr": "Stratejiya Sêgoşe û Tunelê (Endazyar Omîd Debaxçî Mikrî)",
+            "ar": "استراتيجية المثلثات والنفق (منهج المهندس أميد دباغتشي مكري)"},
 }
 # شمار دانشکده‌ها از academy_data خوانده می‌شود تا متن ربات هرگز از سایت عقب نماند.
 _FA_D, _AR_D = "۰۱۲۳۴۵۶۷۸۹", "٠١٢٣٤٥٦٧٨٩"
@@ -433,7 +436,7 @@ def academy(lang):
             [{"text": L(AC["b_study"], lang), "callback_data": "ak:f"}],
             [{"text": L(AC["b_psy"], lang), "callback_data": "py:m"}],
             [u("b_enter", "/academy/")]]
-    fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
+    fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:64], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
     rows += [fac_btns[i:i + 2] for i in range(0, len(fac_btns), 2)]
     rows += [[u("b_path", "/learn/"), u("b_lab", "/academy/lab/")],
              [u("b_place", "/academy/placement/"), u("b_gloss", "/glossary/")],
@@ -482,7 +485,7 @@ def map_screen(lang):
         tail = "" if n else f" <i>({L(AC['soon'], lang)})</i>"
         out.append(f"{mark} {f['icon']} {fac_title(f, lang)}{tail}")
     out += ["", L(AC["note"], lang)]
-    btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/map/{f['id']}/"} for f, _ in fs]
+    btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:64], "url": f"{SITE}/map/{f['id']}/"} for f, _ in fs]
     rows = [[{"text": L(MP["b_open"], lang), "url": SITE + "/map/"}]]
     rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
     rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},

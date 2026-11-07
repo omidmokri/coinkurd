@@ -259,8 +259,9 @@ def hub_page(F, per):
         fid = f["id"]
         ckb = MD.FAC_CKB.get(fid) or f["title"]
         ids = per.get(fid, [])
+        short = MD.FAC_SHORT.get(fid) or (f["title"], ckb, f["en"])
         nodes.append({"id": fid, "k": "f", "g": MD.CLUSTER.get(fid, "base"),
-                      "t": [f["title"], ckb, f["en"]], "u": f"/map/{fid}/",
+                      "t": list(short), "u": f"/map/{fid}/",
                       "live": bool(f["lessons"]), "rs": ids})
         find.append({"t": [f["title"], ckb, f["en"]], "u": f"/map/{fid}/",
                      "w": list(t3("fac"))})

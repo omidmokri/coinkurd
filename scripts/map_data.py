@@ -89,7 +89,14 @@ FAC_CKB = {
     "f10": "بەڕێوەبردنی سەرمایە و مەترسی",
     "f11": "دیفای، وێب ٣ و تەکنەلۆژیای پێشکەوتوو",
     "f12": "توێژینەوەی تایبەت و پڕۆژەی کۆتایی",
-    "f13": "ستراتیژی سێگۆشە و تونێل (ڕێبازی ئەندازیار موکری)",
+    "f13": "ستراتیژی سێگۆشە و تونێل (ڕێبازی ئەندازیار ئومێد دەباغچی مکری)",
+}
+
+# ---------------------------------------------------------------- short labels for the graph
+# a node on the map is a few words wide; a faculty whose title carries an attribution is drawn
+# by the method's name alone. The full title is still the page's heading and its card.
+FAC_SHORT = {
+    "f13": ("استراتژی مثلثات و تونل", "ستراتیژی سێگۆشە و تونێل", "The Triangles & Tunnel method"),
 }
 
 # ---------------------------------------------------------------- faculty summaries (ckb, en)
@@ -291,7 +298,7 @@ TOOLS = {
             ("/sectors/", "بخش‌های بازار", "بەشەکانی بازاڕ", "Market sectors")],
     "f12": [("/developers/", "API توسعه‌دهندگان", "API بۆ گەشەپێدەران", "Developer API"),
             ("/methodology/", "روش کار و منابع داده", "ڕێگای کار و سەرچاوەی داتا", "Methodology & data sources")],
-    "f13": [("/academy/f13/", "دانشکدهٔ روش موکری", "کۆلێژی ڕێبازی موکری", "The Mokri-method faculty"),
+    "f13": [("/academy/f13/", "دانشکدهٔ روش مهندس امید دباغچی مکری", "کۆلێژی ڕێبازی ئەندازیار ئومێد دەباغچی مکری", "The Mokri-method faculty"),
             ("/battle/", "میدان نبرد", "مەیدانی شەڕ", "Battlefield")],
 }
 
