@@ -34,6 +34,7 @@ jobs:
           python scripts/build_roundtable.py
           python scripts/build_opportunity.py
           python scripts/build_trackrecord.py
+          python scripts/build_autopilot.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: "." }

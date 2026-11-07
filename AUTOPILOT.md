@@ -83,27 +83,36 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `ledger.json`, `scanstats.json`, `scanlog.json`, `market.json`, `score.json`, `brain.json`, `friction.json`, …
 
 ## Backlog (top = next)
-1. **Public log page `/autopilot/`.** Render this file's Log (fa/ckb/en) with links to each commit, so every autonomous
-   change is visible on the site. Link it from the footer ("روش کار و منابع داده" neighbourhood).
-2. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
+1. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
    avg −1.42%, n≈398; a bearish "negative divergence" followed by gains 70% of the time). Test each pattern against the
    random-hour baseline with the method of `trackrecord.py`, publish per-pattern verdicts, and mark (don't hide) patterns
    that are significantly worse than random as "under review" in the scanner UI and the bot.
-3. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
+2. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
    scanner findings with their tested record, today's posts, the nightly class topic; archived by date for search.
-4. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
+3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
    countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
-5. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
-6. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
+4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
+5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
-7. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
-8. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
-9. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
+6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
+7. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
+8. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · Public `/autopilot/` log page (Backlog #1)
+- **Need:** the loop changes the site every hour; readers (and the owner) had no way to see what changed and why on the
+  site itself — accountability for the site's own changes, matching the "measured honesty" strategy.
+- **Built:** `scripts/build_autopilot.py` parses this file's Log and renders `/autopilot/` (fa/ckb/en frame, entries in
+  English, `**bold**`/`code` only, everything escaped) with links to AUTOPILOT.md's git history and a search of
+  `autopilot:` commits; footer link "Autopilot log" next to Methodology (`chrome.py`); builder added to `update.yml`
+  and `pages.yml`; sitemap entry. No bot entry: it is a meta page with no natural home in the bot.
+- **Verified:** py_compile; parser unit test on synthetic markdown (continuation lines, missing title, section end,
+  empty input, HTML escaping); built on a scratch copy; screenshots fa/en at 1280/390, zero JS errors.
+- **Next:** Backlog #1 — scanner audit.
 
 ### 2026-11-07 · One honest number everywhere (Backlog #1)
 - **Need:** coin pages, the home/dashboard "post track record" box and the Entekhab Score still used the raw average
