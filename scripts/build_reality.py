@@ -255,6 +255,10 @@ S = {
     "hb.c_t": L("همبستگی محلی", "پەیوەندیی ناوخۆیی", "Local correlation"),
     "hb.c_d": L("کریپتو در برابر دلار، تتر، طلا و سکه", "کریپتۆ بەرامبەر دۆلار، تەتەر، زێڕ و سکە", "Crypto vs dollar, tether, gold and coins"),
     "hb.c_k": L("همبستگی ۹۰ روزهٔ بیت‌کوین تومانی و دلار آزاد", "پەیوەندیی ٩٠ ڕۆژەی بیتکۆینی تمەنی و دۆلاری ئازاد", "90-day correlation, toman BTC vs free USD"),
+    "hb.t_t": L("کارنامهٔ واقعی کانال", "کارنامەی ڕاستەقینەی کەناڵ", "The channel's real record"),
+    "hb.t_d": L("بعد از پست‌ها بیت‌کوین چه کرد، در برابر ساعت‌های تصادفی", "دوای پۆستەکان بیتکۆین چی کرد، بەرامبەر کاتژمێرە هەڕەمەکییەکان",
+                "What bitcoin did after posts, against random hours"),
+    "hb.t_k": L("۲۴ ساعت بعد از پست‌ها ↔ ساعت تصادفی", "٢٤ کاتژمێر دوای پۆست ↔ کاتژمێری هەڕەمەکی", "24h after posts ↔ random hour"),
 }
 
 METH = {
@@ -1002,6 +1006,7 @@ def build_corr():
 # ================================================================== hub
 def build_hub():
     led, fr, hy, se, lc = (R.load(n, {}) for n in ("ledger.json", "friction.json", "hype.json", "silent_exit.json", "localcorr.json"))
+    tr = R.load("trackrecord.json", {})
 
     def b(lg):
         h = f"<div class='meta'><a href='/'>{s('home', lg)}</a> / {e(s('hub', lg))}</div><h1>{e(s('hb.title', lg))}</h1><p class='rc-lead'>{e(s('hb.desc', lg))}</p>"
@@ -1025,6 +1030,13 @@ def build_hub():
         r = (((lc.get("windows") or {}).get("90d") or {}).get("matrix") or {}).get("BTC_T", {}).get("USD")
         kv = (f"<span class='mut'>{s('hb.c_k', lg)}</span><br><span class='rc-big'>{nf(r, lg, 2)}</span>" if r is not None else f"<span class='mut'>{s('nodata', lg)}</span>")
         cards.append(("/iran-correlation/", "hb.c_t", "hb.c_d", kv))
+        if tr.get("obs"):
+            p = tr["test"]["r24"]["p"]
+            kv = (f"<span class='mut'>{s('hb.t_k', lg)}</span><br><span class='rc-big'><bdi dir='ltr'>{nf(tr['obs']['r24'], lg, 2, sign=True, pct=True)}</bdi></span>"
+                  f" ↔ <bdi dir='ltr'>{nf(tr['test']['r24']['mid'], lg, 2, sign=True, pct=True)}</bdi> · p {nf(p, lg, 2)}")
+        else:
+            kv = f"<span class='mut'>{s('nodata', lg)}</span>"
+        cards.insert(0, ("/track-record/", "hb.t_t", "hb.t_d", kv))
         h += "<div class='rc-grid'>" + "".join(f"<a class='rc-card' href='{u}'><h3>{e(s(t, lg))}</h3><p class='mut'>{e(s(d, lg))}</p><div>{k}</div></a>" for u, t, d, k in cards) + "</div>"
         h += sec(s("hb.why", lg), f"<p>{e(s('hb.why_t', lg))}</p>")
         h += (f"<p class='note'>JSON: <a href='/data/ledger.json'>ledger</a> · <a href='/data/friction.json'>friction</a> · <a href='/data/hype.json'>hype</a> · "

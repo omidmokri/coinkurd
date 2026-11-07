@@ -178,6 +178,11 @@ jobs:
         continue-on-error: true
         run: python scripts/impact.py
 
+      - name: Channel track record (posts vs random hours, randomisation test)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/trackrecord.py
+
       - name: Entekhab Score
         id: score
         continue-on-error: true
@@ -323,6 +328,10 @@ jobs:
       - name: Build the opportunity-cost calculator page
         continue-on-error: true
         run: python scripts/build_opportunity.py
+
+      - name: Build the channel track-record page
+        continue-on-error: true
+        run: python scripts/build_trackrecord.py
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -165,6 +165,8 @@ NAV = [
     {"k": "reality", "t": L("واقعیت‌سنج", "ڕاستی‌پێو", "Reality check"), "items": [
         ("/reality/", "eye", L("واقعیت‌سنج انتخاب", "ڕاستی‌پێوی Entekhab", "Entekhab reality check"),
          L("فاصلهٔ حرف و واقعیت بازار، با دادهٔ قابل‌بازبینی", "مەودای قسە و ڕاستیی بازاڕ", "The gap between what the market says and does")),
+        ("/track-record/", "lock", L("کارنامهٔ واقعی کانال", "کارنامەی ڕاستەقینەی کەناڵ", "The channel's real record"),
+         L("بعد از پست‌ها چه شد، در برابر ساعت‌های تصادفی", "دوای پۆستەکان چی ڕوویدا، بەرامبەر کاتژمێرە هەڕەمەکییەکان", "After the posts, against random hours")),
         ("/roundtable/", "users", L("میزگرد مشاوره", "میزگردی ئامۆژگاری", "The Roundtable"),
          L("پنج تحلیل‌گر هوش مصنوعی، شواهدشان و راهنمای پرسیدن", "پێنج شیکارکەری AI و ڕێنمایی پرسیار", "Five AI analysts, their evidence and how to ask")),
         ("/opportunity/", "calc", L("هزینه فرصت تومان", "تێچووی دەرفەتی تمەن", "Toman opportunity cost"),

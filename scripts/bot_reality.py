@@ -241,7 +241,50 @@ def sec_whales(lang):
     return _head(WH["title"].get(lg) or WH["title"]["fa"], lg, "/whales/", lines, d.get("updated_at"))
 
 
-SECTIONS = {"friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
+# ------------------------------------------------------------------ the channel's real record
+TR = {
+    "title": {"fa": "کارنامهٔ واقعی کانال", "ckb": "کارنامەی ڕاستەقینەی کەناڵ", "en": "The channel's real record"},
+    "after": {"fa": "۲۴ ساعت بعد از پست‌ها", "ckb": "٢٤ کاتژمێر دوای پۆستەکان", "en": "24h after posts"},
+    "random": {"fa": "ساعت‌های تصادفی همان دوره", "ckb": "کاتژمێرە هەڕەمەکییەکانی هەمان ماوە", "en": "Random hours, same period"},
+    "hit": {"fa": "درصد ۲۴ساعت‌های مثبت", "ckb": "ڕێژەی ٢٤ کاتژمێرە ئەرێنییەکان", "en": "Share of gaining 24h windows"},
+    "chance": {"fa": "احتمال تصادفی بودن", "ckb": "ئەگەری هەڕەمەکی بوون", "en": "Chance it is luck"},
+    "v_up": {"fa": "✅ به‌طور معناداری بهتر از ساعت‌های تصادفی.", "ckb": "✅ بە شێوەیەکی بەرچاو باشتر لە کاتژمێرە هەڕەمەکییەکان.",
+             "en": "✅ Measurably better than random hours."},
+    "v_dn": {"fa": "⚠️ به‌طور معناداری بدتر از ساعت‌های تصادفی.", "ckb": "⚠️ بە شێوەیەکی بەرچاو خراپتر لە کاتژمێرە هەڕەمەکییەکان.",
+             "en": "⚠️ Measurably worse than random hours."},
+    "v_no": {"fa": "⚖️ از نظر آماری با ساعت‌های تصادفی فرقی ندارد.", "ckb": "⚖️ لە ڕووی ئامارییەوە جیاوازییەکی نییە لەگەڵ کاتژمێرە هەڕەمەکییەکان.",
+             "en": "⚖️ Statistically no different from random hours."},
+    "n": {"fa": "{p} پست در {d} روز", "ckb": "{p} پۆست لە {d} ڕۆژدا", "en": "{p} posts over {d} days"},
+    "note": {"fa": "پست‌ها بیشتر خبرند، نه پیشنهاد خرید و فروش؛ پیش‌بینی‌های صریح در «دفتر عملکرد سیگنال‌ها» امتیاز می‌گیرند.",
+             "ckb": "زۆربەی پۆستەکان هەواڵن، نەک پێشنیاری کڕین و فرۆشتن.",
+             "en": "Most posts are news, not buy or sell calls; explicit calls are scored in the Signal ledger."},
+}
+
+
+def _tr(k, lg, **kw):
+    t = TR[k].get(lg) or TR[k]["fa"]
+    return t.format(**kw) if kw else t
+
+
+def sec_trackrec(lang):
+    lg = _lg(lang)
+    d = R.load("trackrecord.json", {})
+    if not d.get("obs"):
+        return _nodata("🧾 " + _tr("title", lg), lg, "/track-record/")
+    o, t = d["obs"], d["test"]
+    p = t["r24"]["p"]
+    verdict = "v_no" if p >= 0.05 else ("v_up" if o["r24"] > t["r24"]["mid"] else "v_dn")
+    pc = BR.PCT.get(lg, "%")
+    lines = [_tr(verdict, lg), "",
+             f"• {_tr('after', lg)}: <b>{_n(o['r24'], lg, 2, sign=True)}{pc}</b>",
+             f"• {_tr('random', lg)}: {_n(t['r24']['mid'], lg, 2, sign=True)}{pc}",
+             f"• {_tr('hit', lg)}: {_n(o['hit'], lg, 1)}{pc} ↔ {_n(t['hit']['mid'], lg, 1)}{pc}",
+             f"• {_tr('chance', lg)}: {_n(100 * p, lg, 1)}{pc}",
+             "", _tr("n", lg, p=_n(d.get("n_posts"), lg), d=_n(d.get("n_days"), lg)), "ℹ️ " + _tr("note", lg)]
+    return _head("🧾 " + _tr("title", lg), lg, "/track-record/", lines, d.get("updated_at"))
+
+
+SECTIONS = {"trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/")}

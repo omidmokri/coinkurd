@@ -44,6 +44,13 @@ S = {
                  "ckb": "ئەگەر لەبریی کریپتۆ دۆلار یان زێڕت کڕیبووایە، ئەمڕۆ چەندت هەبوو؟",
                  "kmr": "Eger te dolar an zêr bikira, îro çi hebû?", "ar": "لو اشتريت دولارًا أو ذهبًا بدل العملات؟",
                  "en": "If you had held the dollar, gold or a deposit instead, what would it be worth today?"}),
+    "trackrec": ("🧾", {"fa": "کارنامهٔ واقعی کانال", "ckb": "کارنامەی ڕاستەقینەی کەناڵ", "kmr": "Qeyda rastîn a kanalê",
+                        "ar": "السجل الحقيقي للقناة", "en": "Channel's real record"},
+                 {"fa": "بعد از پست‌های کانال بیت‌کوین چه کرد، در برابر ساعت‌های تصادفی همان دوره — با آزمون آماری.",
+                  "ckb": "دوای پۆستەکانی کەناڵ بیتکۆین چی کرد، بەرامبەر کاتژمێرە هەڕەمەکییەکان — بە تاقیکردنەوەی ئاماری.",
+                  "kmr": "Piştî postên kanalê bîtkoyn çi kir, li hember saetên tesadufî.",
+                  "ar": "ماذا فعل البيتكوين بعد منشورات القناة مقارنة بساعات عشوائية — باختبار إحصائي.",
+                  "en": "What bitcoin did after the channel's posts, against random hours of the same period — with a statistical test."}),
     "ledger": ("📒", {"fa": "دفتر عملکرد سیگنال‌ها", "ckb": "دەفتەری کارایی سیگناڵ", "kmr": "Defterê sînyalan",
                       "ar": "سجل أداء الإشارات", "en": "Signal ledger"},
                {"fa": "هر پیش‌بینی با قفل زمانی ثبت می‌شود و نتیجه‌اش بعداً خودکار بررسی می‌شود.",
@@ -301,7 +308,7 @@ GROUPS = {
     "g_analysis": ["analysis", "coin", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["news", "narr", "events", "week", "posts", "track"],
-    "g_reality": ["friction", "oppcost", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
+    "g_reality": ["friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
