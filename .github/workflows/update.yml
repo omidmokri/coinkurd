@@ -48,16 +48,21 @@ jobs:
         run: |
           python scripts/fetch.py || (sleep 30 && python scripts/fetch.py)
 
-      - name: Archive post images in the repo (Telegram CDN links expire)
-        continue-on-error: true
-        run: python scripts/postimg.py --limit 150
-
       - name: Repair links/footers & merge stored translations
         id: repair
         continue-on-error: true
         run: |
           python scripts/repair.py
           python scripts/merge_tr.py
+
+      # Every post keeps its picture in the repo: Telegram's CDN links expire after a few days (and are
+      # filtered for many readers in Iran), which left almost the whole archive without pictures.
+      # Expired links are refreshed from the channel pages; a post that never had a picture gets a
+      # card of its own headline. The first run clears the backlog; later runs only add the new posts.
+      - name: Archive post images in the repo (Telegram CDN links expire)
+        continue-on-error: true
+        timeout-minutes: 14
+        run: python scripts/postimg.py --limit 1200 --cards 80
 
       - name: Pick fastest working Gemini model
         continue-on-error: true
