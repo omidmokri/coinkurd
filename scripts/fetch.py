@@ -60,8 +60,18 @@ def contains_kw(text_n: str, kw: str) -> bool:
 
 # ---------------------------------------------------------------- classify
 
-def classify(text: str, hashtags: list) -> dict:
-    text_n = norm(text)
+# "ورود/خروج سرمایه" is money flowing into a fund, not a trade entry or exit
+CAPFLOW = re.compile(r"(ورود|خروج)\s*(?:\S+\s+){0,3}?(سرمایه|پول|نقدینگی)|(ورودی|خروجی)")
+# a post is "technical" only when it really reads a chart, and a "signal" only when it gives a trade
+TA_STRONG = re.compile(r"تحلیل\s*(?:‌)?تکنیکال|شیکاری\s*تەکنیکی|چارت|نمودار|تایم\s*(?:‌)?فریم|کندل|فیبوناچی|واگرایی|میانگین\s*(?:‌)?متحرک|\b(?:rsi|macd|ema|sma)\b|ایچیموکو|بولینگر|پرایس\s*(?:‌)?اکشن|price\s*action|بریک\s*(?:‌)?(?:آوت|داون)|breakout|خط\s*روند|ترندلاین|حمایت\s*و\s*مقاومت|اوردر\s*بلاک|الگوی\s*(?:نموداری|سر\s*و\s*شانه|مثلث|کف\s*دوقلو|سقف\s*دوقلو|فصلی)|seasonality|فصلی\s*(?:‌)?بودن|اشباع\s*(?:خرید|فروش)|oversold|overbought|میانگین\s*(?:‌)?[\d۰-۹]+|مقاومت|تحلیل\s*(?:بیت‌کوین|اتریوم|بازار)\s*[|:]", re.I)
+SIG_STRONG = re.compile(r"سیگنال\s*(?:‌)?(?:خرید|فروش|لانگ|شورت|ورود)|سیگناڵی|حد\s*ضرر|استاپ\s*(?:‌)?لاس|حد\s*سود|(?<![\u0600-\u06FF])تی\s?پی(?![\u0600-\u06FF])|نقطه\s*(?:ی\s*)?ورود|stop\s*loss|take\s*profit|\bentry\b|\b(?:tp|sl)\s*[\d۰-۹:]|تارگت|هدف\s*(?:اول|دوم)", re.I)
+
+
+def classify(text: str, hashtags: list, title: str = "") -> dict:
+    """keyword scores: hashtag 2, a word in the headline 2, in the body 1 — the headline says what a post is about"""
+    text_c = CAPFLOW.sub(" جریان سرمایه inflow ", text)
+    title_c = CAPFLOW.sub(" جریان سرمایه inflow ", title)
+    text_n, title_n = norm(text_c), norm(title_c)
     tags_n = " ".join(norm(h) for h in hashtags)
     scores = {}
     for cat in CATEGORIES:
@@ -74,8 +84,14 @@ def classify(text: str, hashtags: list) -> dict:
             seen.add(kn)
             if contains_kw(tags_n, kw):
                 s += 2
+            elif title_n and contains_kw(title_n, kw):
+                s += 2
             elif contains_kw(text_n, kw):
                 s += 1
+        if cat["id"] == "technical" and not (TA_STRONG.search(title) or len(TA_STRONG.findall(text)) >= 2):
+            s = 0
+        if cat["id"] == "signal" and not SIG_STRONG.search(text + " " + title):
+            s = 0
         if s:
             scores[cat["id"]] = round(s * cat.get("weight", 1.0), 2)
     ranked = sorted(scores.items(), key=lambda kv: -kv[1])
@@ -243,7 +259,7 @@ def parse_messages(html: str, channel: str) -> list:
             continue
 
         hashtags = extract_hashtags(text)
-        cls = classify(text, hashtags)
+        cls = classify(text, hashtags, post_title(drop_label(text)))
         text = drop_label(text)
         title = post_title(text, cls["category"])
 

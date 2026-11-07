@@ -2,7 +2,7 @@
 """ترمیم پست‌های ذخیره‌شده: حذف لینک‌های پنهان تکراری، جداکردن فوتر شبکه‌های اجتماعی و اصلاح عنوان"""
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch import split_footer, post_title, drop_label  # noqa: E402
+from fetch import split_footer, post_title, drop_label, classify  # noqa: E402
 P = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
 # Discord invites in older posts have expired; this permanent invite of the COIN_KURD server still works (checked 2026-11-02)
 DISCORD = "https://discord.gg/TtT2BHmZyJ"
@@ -27,6 +27,10 @@ for p in ps:
     title = post_title(p["text"])
     if title:
         p["title"] = title
+    # categories are read from the clean text and its headline (older posts were scored with the footer still attached)
+    cls = classify(p["text"], p.get("hashtags") or [], p.get("title") or "")
+    if cls["category"] != p.get("category"):
+        p["category"], p["tags"], n = cls["category"], cls["tags"], n + 1
     for lg in (p.get("tr") or {}).values():
         if isinstance(lg, dict) and lg.get("text"):
             lg["text"] = drop_label(lg["text"])
@@ -47,4 +51,14 @@ for p in ps:
     if isinstance(p.get("link"), dict) and DISCORD_RE.fullmatch(p["link"].get("url") or ""):
         p["link"]["url"] = DISCORD
 json.dump(ps, open(P, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+# the per-category counts in meta.json follow the categories just set
+MP = os.path.join(os.path.dirname(os.path.abspath(P)), "meta.json")
+if os.path.exists(MP):
+    meta = json.load(open(MP, encoding="utf-8"))
+    by_cat = {}
+    for p in ps:
+        by_cat[p["category"]] = by_cat.get(p["category"], 0) + 1
+    if meta.get("by_category") != by_cat:
+        meta["by_category"] = by_cat
+        json.dump(meta, open(MP, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(f"repaired {n}; with footer {sum(1 for p in ps if p.get('footer'))}")

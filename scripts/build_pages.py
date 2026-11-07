@@ -207,6 +207,8 @@ WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
+    body = body.replace("</small><b", "</small> <b")          # a label and its number stay two words for readers without CSS
+    body = body.replace('</b></div><div class="kpi"', '</b></div> <div class="kpi"')
     extra_head = extra_head + crumbs_ld(body, title, url, lang)
     doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8">{chrome.CSP_META}<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
@@ -261,6 +263,25 @@ def impact_html(im):
     return s
 
 
+FOUNDER = {"@type": "Person", "name": "Omid Dabbaghchi Mokri", "url": f"{SITE}/about/",
+           "sameAs": ["https://orcid.org/0009-0005-1289-0025", "https://www.tradingview.com/u/Coin_Kurd/", "https://x.com/omid_mokri"]}
+AUTHOR = {"@type": "Organization", "name": "Coin Kurd", "url": f"{SITE}/about/", "sameAs": ["https://t.me/Coin_Kurd"], "founder": FOUNDER}
+PUBLISHER = {"@type": "Organization", "name": "Entekhab (entekhab.net)", "url": SITE, "logo": {"@type": "ImageObject", "url": f"{SITE}/assets/apple-touch-icon.png"},
+             "founder": FOUNDER, "foundingDate": "2003-12-22"}
+NFA_FA = "این مطلب آموزشی و خبری است، نه توصیهٔ خرید و فروش؛ بازار رمزارز پرریسک است و تصمیم با خود شماست."
+
+
+def related(p, n=6):
+    """other posts on the same coins first, then the same category — newest first, never promos or repeats"""
+    mine = set(p.get("coins") or [])
+    pool = [q for q in posts if q["id"] != p["id"] and q.get("q") != "low" and q.get("title") != p.get("title")]
+    same = [q for q in pool if mine & set(q.get("coins") or [])]
+    cat = [q for q in pool if q["category"] == p["category"] and q not in same]
+    near = sorted(same, key=lambda q: abs(q["id"] - p["id"]))[:n]
+    near += sorted(cat, key=lambda q: abs(q["id"] - p["id"]))[: n - len(near)]
+    return sorted(near, key=lambda q: -q["id"])
+
+
 def build_post(p):
     cat = CATS.get(p["category"], {"name": {"fa": p["category"]}, "icon": ""})
     tr = p.get("tr") or {}
@@ -268,29 +289,34 @@ def build_post(p):
     desc = plain(p["text"]) or title
     img = post_img(p)
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
-    body = f'<div class="meta"><span class="pill">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</span>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span></div>'
+    body = f'<div class="meta"><a class="pill" href="/categories/{e(p["category"])}/">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</a>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span></div>'
     body += f'<h1>{e(title)}</h1>'
     if img:
         body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
     body += f'<div class="txt">{rich(p["text"])}</div>'
-    for lg, lbl in (("ckb", "کوردی (سۆرانی)"), ("en", "English")):
-        if tr.get(lg):
-            d = ' dir="ltr"' if lg == "en" else ""
-            body += f'<details{d} lang="{lg}"><summary>{lbl}: {e(tr[lg]["title"])}</summary><div class="txt">{rich(tr[lg]["text"])}</div></details>'
+    # each translation lives on its own page (hreflang-linked), so this page carries only the Persian text
+    langs = [(lg, lbl) for lg, lbl in (("ckb", "کوردی (سۆرانی)"), ("en", "English")) if isinstance(tr.get(lg), dict) and tr[lg].get("text")]
+    if langs:
+        body += '<p class="note">این مطلب به زبان‌های دیگر: ' + " · ".join(
+            f'<a href="/{lg}/p/{p["id"]}/" lang="{lg}" hreflang="{lg}"{" dir=ltr" if lg == "en" else ""}>{lbl}: {e(tr[lg].get("title") or "")}</a>' for lg, lbl in langs) + "</p>"
     if p.get("footer"):
         ic = lambda u: "👾 " if "discord" in u else "🎥 " if "youtu" in u else "📸 " if "instagram" in u else "💬 " if "twitter" in u or "x.com" in u else ""  # noqa: E731
         body += '<div class="social">' + "".join(f'<a href="{e(su(f["url"]))}" rel="noopener" target="_blank">{ic(f["url"])}{e(f["label"])}</a>' for f in p["footer"]) + "</div>"
     body += impact_html(impact.get(str(p["id"])))
+    rel = related(p)
+    if rel:
+        body += "<h2>مطالب مرتبط</h2><ul class=list>" + "".join(post_li(q) for q in rel) + "</ul>"
+    body += f'<p class="note">{NFA_FA} <a href="/methodology/">روش کار و منابع داده</a></p>'
     body += (f'<p class="note"><a href="{e(su(p["url"]))}">مشاهدهٔ این پست در تلگرام ↗</a> · <a href="/#p{p["id"]}">نمایش در آرشیو</a> · '
              f'<a href="{GROUP}" rel="noopener" target="_blank">💬 گفتگو در گروه تلگرام Coin_Kurd</a></p>')
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"),
-          "inLanguage": ["fa"] + [k for k in ("ckb", "en") if tr.get(k)], "image": [img] if img else [],
-          "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
-          "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE},
-          "mainEntityOfPage": f"{SITE}/p/{p['id']}/", "description": desc, "about": p.get("coins", [])}
+          "dateModified": p.get("edited") or p.get("date"), "inLanguage": "fa", "image": [SITE + img if img.startswith("/") else img] if img else [],
+          "author": AUTHOR, "publisher": PUBLISHER, "articleSection": cat["name"].get("fa", ""),
+          "mainEntityOfPage": f"{SITE}/p/{p['id']}/", "description": desc,
+          "about": [{"@type": "Thing", "name": NAMES.get(c, c), "url": f"{SITE}/coins/{c.lower()}/"} for c in p.get("coins", [])]}
     head = f'<script type="application/ld+json">{sj(ld)}</script>'
     if img:
-        head += f'<meta property="og:image" content="{e(img)}"><meta name="twitter:card" content="summary_large_image">'
+        head += f'<meta property="og:image" content="{e(SITE + img if img.startswith("/") else img)}"><meta name="twitter:card" content="summary_large_image">'
     head += alt_links(p)
     if p.get("q") == "low":
         head += '<meta name="robots" content="noindex,follow">'           # promos / repeats: keep the page, keep it out of search
@@ -328,12 +354,12 @@ def build_post_lang(p, lg):
     body += f'<div class="txt">{rich(t["text"])}</div>'
     body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(su(p["url"]))}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
-          "image": [img] if img else [], "author": {"@type": "Organization", "name": "Coin_Kurd", "url": "https://t.me/Coin_Kurd"},
-          "publisher": {"@type": "Organization", "name": "entekhab.net", "url": SITE}, "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
+          "image": [SITE + img if img.startswith("/") else img] if img else [], "author": AUTHOR,
+          "publisher": PUBLISHER, "dateModified": p.get("edited") or p.get("date"), "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
           "description": desc, "translationOfWork": {"@id": f"{SITE}/p/{p['id']}/"}}
     head = f'<script type="application/ld+json">{sj(ld)}</script>' + alt_links(p)
     if img:
-        head += f'<meta property="og:image" content="{e(img)}">'
+        head += f'<meta property="og:image" content="{e(SITE + img if img.startswith("/") else img)}"><meta name="twitter:card" content="summary_large_image">'
     if p.get("q") == "low":
         head += '<meta name="robots" content="noindex,follow">'
     return page(f"{lg}/p/{p['id']}/", title, desc, body, head, lang=lg)
@@ -446,6 +472,15 @@ def intel_profile(c, m):
     return "".join(out)
 
 
+THIN = set()                                                  # coin pages kept out of search for now (no posts, small market)
+VOL_RANK = {c["coin"]: i for i, c in enumerate(sorted(market.get("coins", []), key=lambda x: -(x.get("qvol") or 0)))}
+
+
+def fa_name(c):
+    n = NAMES.get(c, c)
+    return n.split(" · ")[-1] if " · " in n else n
+
+
 def build_coin(c, cposts):
     m = MK.get(c)
     name = NAMES.get(c, c)
@@ -468,7 +503,7 @@ def build_coin(c, cposts):
         ch = m.get("chg24")
         body += f'''<div class="grid"><div class="kpi"><small>قیمت <span class="lvl">زنده</span></small><b data-live="{c}">{fmt_price(m["price"])}</b></div>
 <div class="kpi"><small>تغییر ۲۴ ساعته</small><b class="{"up" if (ch or 0) > 0 else "down"}" data-livechg="{c}">{"—" if ch is None else f"{ch:+.2f}%"}</b></div>
-<div class="kpi"><small>RSI 14</small><b>{m["rsi"]}</b></div><div class="kpi"><small>روند (EMA20/50)</small><b>{tr}</b></div>
+<div class="kpi"><small>RSI (دورهٔ ۱۴)</small><b>{m["rsi"]}</b></div><div class="kpi"><small>روند (EMA20/50)</small><b>{tr}</b></div>
 <div class="kpi"><small>سقف ۴۸ ساعت</small><b>{fmt_price(m["hi48"])}</b></div><div class="kpi"><small>کف ۴۸ ساعت</small><b>{fmt_price(m["lo48"])}</b></div></div>
 <p class="note">به‌روزرسانی: {fmt_date(market.get("updated_at",""))} — منبع Binance. قیمت لحظه‌ای را در نمودار بالا ببینید.</p>'''
         opps = [o for o in market.get("opportunities", []) if o["coin"] == c]
@@ -499,10 +534,44 @@ def build_coin(c, cposts):
            ("آیا این صفحه توصیهٔ خرید یا فروش " + c + " است؟", "خیر. همهٔ اعداد و یافته‌ها توصیف خودکار وضعیت بازار برای آموزش‌اند و کارنامهٔ واقعی هر الگو در صفحهٔ شفافیت منتشر می‌شود. تصمیم و مدیریت ریسک با خود شماست.")]
     body += "<h2>پرسش‌های متداول</h2>" + "".join(f'<details class="faq"><summary>{e(q)}</summary><p class="txt">{e(a)}</p></details>' for q, a in faq)
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
-    desc = f"{name}: قیمت زنده، تحلیل تکنیکال، فرصت‌های اسکنر و {len(cposts)} مطلب مرتبط در entekhab.net"
+    fn = fa_name(c)
+    desc = (f"قیمت لحظه‌ای {fn} ({c})، تغییرات ۲۴ ساعته، RSI و روند EMA، امتیاز Entekhab با فرمول شفاف"
+            + (f" و {len(cposts)} تحلیل و خبر دربارهٔ {fn}" if cposts else "") + " — به‌روزرسانی هر ۱۵ دقیقه.")
+    head_x = ""
+    if not cposts and VOL_RANK.get(c, 999) >= 60:
+        THIN.add(c)
+        head_x = '<meta name="robots" content="noindex,follow">'
+        body = body.replace('<h2>وضعیت تکنیکال', '<p class="note">⚠️ دربارهٔ این دارایی هنوز مطلبی در آرشیو نیست و حجم معاملاتش کم است؛ اعداد این صفحه فقط توصیف خودکار بازارند و ریسک نقدشوندگی بالاست.</p><h2>وضعیت تکنیکال', 1)
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{name} ({c})", "about": {"@type": "Thing", "name": name}, "url": f"{SITE}/coins/{c.lower()}/"}
-    return page(f"coins/{c.lower()}/", f"{name} ({c}) — قیمت، تحلیل و اخبار", desc, body,
-                f'<script type="application/ld+json">{sj(ld)}</script><script type="application/ld+json">{sj(faq_ld)}</script><script src="/assets/live.js" defer></script>')
+    return page(f"coins/{c.lower()}/", f"قیمت {fn} ({c}) امروز — تحلیل تکنیکال و اخبار", desc, body,
+                head_x + f'<script type="application/ld+json">{sj(ld)}</script><script type="application/ld+json">{sj(faq_ld)}</script><script src="/assets/live.js" defer></script>')
+
+
+def build_methodology():
+    """/methodology/ — where every number on the site comes from, how it is computed, and what it is not"""
+    sc_w = " · ".join(f"{CMP[k]} {round(v * 100)}٪" for k, v in (("technical", .40), ("sentiment", .25), ("news", .20), ("channel", .15)))
+    secs = [
+        ("چه کسی پشت این سایت است", '<p class="txt">entekhab.net سایت کانال تلگرامی <a href="https://t.me/Coin_Kurd" rel="noopener" target="_blank">Coin_Kurd</a> است که از ۲ بهمن ۱۳۹۸ هر روز دربارهٔ بازار رمزارز می‌نویسد؛ بنیان‌گذار و مسئول محتوا امید دباغچی مکری است. داستان کامل و سوابق در <a href="/about/">صفحهٔ دربارهٔ ما</a> آمده است.</p>'),
+        ("منابع داده", '<ul class="list">'
+         '<li>پست‌ها: کانال عمومی Coin_Kurd در تلگرام؛ هر ۱۵ دقیقه خوانده و بایگانی می‌شود و پیوند هر پست به نسخهٔ تلگرامش در صفحهٔ همان پست هست.</li>'
+         '<li>قیمت، کندل‌ها و حجم: Binance (کندل‌های ۱ ساعته)؛ RSI و EMA از همین کندل‌ها محاسبه می‌شوند.</li>'
+         '<li>ارزش بازار، بخش‌ها و لوگوها: CoinGecko · شاخص ترس و طمع: alternative.me</li>'
+         '<li>شبکهٔ بیت‌کوین: mempool.space و bitnodes · بازار مشتقات: OKX · اقتصاد کلان: FRED</li>'
+         '<li>اخبار: چند خبرخوان RSS؛ هر خبر با پیوند منبع اصلی نمایش داده می‌شود.</li></ul>'),
+        ("امتیاز Entekhab", f'<p class="txt">عددی بین ۰ تا ۱۰۰ برای هر کوین، بدون هوش مصنوعی و با فرمول ثابت؛ ۵۰ یعنی خنثی. وزن اجزا: {sc_w}. جزء تکنیکال از روند EMA20/50، فاصلهٔ قیمت از EMA20، RSI، تغییر ۲۴ ساعته، جایگاه قیمت در دامنهٔ ۴۸ ساعته و یافته‌های اسکنر ساخته می‌شود؛ احساسات از شاخص ترس و طمع، اخبار از تعداد خبرهای ۴۸ ساعت اخیر و خبرهای امنیتی منفی، و کانال از میانگین حرکت قیمت ۲۴ ساعت بعد از پست‌های کانال. اگر جزئی داده نداشته باشد، وزنش بین بقیه پخش می‌شود. این عدد توصیف وضعیت فعلی است، نه پیش‌بینی.</p>'),
+        ("اسکنر و کارنامه", '<p class="txt">اسکنر روی کندل‌های ۱ ساعتهٔ Binance این الگوها را پیدا می‌کند: ' + "، ".join(OPP_FA.values()) +
+         '. هر یافته با زمان و قیمت ثبت می‌شود و نتیجهٔ واقعی‌اش پس از ۲۴ ساعت، چه خوب چه بد، در <a href="/ledger/">دفتر شفافیت</a> و <a href="/reality/">صفحهٔ واقعیت‌سنج</a> منتشر می‌شود. حرکت قیمت بعد از هر پست کانال هم زیر همان پست آمده است.</p>'),
+        ("دسته‌بندی و ترجمه", '<p class="txt">دستهٔ هر پست خودکار و از روی تیتر و متن خودِ پست تعیین می‌شود: یک پست فقط وقتی «تحلیل تکنیکال» است که واقعاً نمودار بخواند، و فقط وقتی «سیگنال» است که نقطهٔ ورود، حد ضرر یا هدف داشته باشد. ترجمه‌های کوردی سورانی و انگلیسی ماشینی‌اند و هر کدام صفحهٔ جدا دارند؛ متن اصلی همیشه فارسی است.</p>'),
+        ("هوش مصنوعی کجا به کار می‌رود", '<p class="txt">گزارش‌های «مغز بازار» و «میز گرد» با مدل زبانی نوشته می‌شوند و همیشه با برچسب هوش مصنوعی نمایش داده می‌شوند. امتیاز Entekhab، اسکنر، کارنامه‌ها و اعداد بازار با فرمول ثابت و بدون هوش مصنوعی محاسبه می‌شوند.</p>'),
+        ("محدودیت‌ها", '<p class="txt">داده‌ها ممکن است چند دقیقه تأخیر داشته باشند یا وقتی منبعی در دسترس نیست خالی بمانند؛ زمان آخرین به‌روزرسانی کنار هر بخش نوشته شده است. RSI و روند روی تایم‌فریم ۱ ساعته‌اند و برای دیدن تصویر بلندمدت کافی نیستند. دارایی‌های کم‌حجم ریسک نقدشوندگی بالایی دارند.</p>'),
+        ("توصیهٔ مالی نیست", f'<p class="txt">{NFA_FA} نتیجهٔ گذشته تضمینی برای آینده نیست.</p>'),
+        ("گزارش خطا و اصلاح", '<p class="txt">اگر عددی را نادرست دیدید، به <a href="https://t.me/Kurdistan_coin" rel="noopener" target="_blank">@Kurdistan_coin</a> در تلگرام خبر دهید؛ خطای تأییدشده در اولین به‌روزرسانی اصلاح می‌شود.</p>'),
+    ]
+    body = '<div class="meta"><a href="/">خانه</a> / روش کار و منابع داده</div><h1>روش کار، منابع داده و شفافیت</h1>' + "".join(f"<h2>{h}</h2>{t}" for h, t in secs)
+    ld = {"@context": "https://schema.org", "@type": "WebPage", "name": "روش کار، منابع داده و شفافیت entekhab.net", "url": f"{SITE}/methodology/",
+          "inLanguage": "fa", "publisher": PUBLISHER}
+    return page("methodology/", "روش کار، منابع داده و شفافیت", "اعداد entekhab.net از کجا می‌آیند: منابع داده، فرمول امتیاز Entekhab، اسکنر و کارنامهٔ واقعی آن، نقش هوش مصنوعی و محدودیت‌ها.",
+                body, f'<script type="application/ld+json">{sj(ld)}</script>')
 
 
 def main():
@@ -520,13 +589,16 @@ def main():
             if ul and p.get("q") != "low":
                 urls.append((ul, p.get("date")))
     build_rss()
+    build_methodology()
     for c in set(by_coin) | set(MK):
-        urls.append((build_coin(c, by_coin.get(c, [])), market.get("updated_at")))
+        u = build_coin(c, by_coin.get(c, []))
+        if c not in THIN:
+            urls.append((u, market.get("updated_at")))
     order = sorted(set(by_coin) | set(MK), key=lambda c: -len(by_coin.get(c, [])))
-    body = "<h1>کوین‌ها</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر و مطالب مرتبط.</p><div class=coins>" + "".join(
+    body = "<h1>قیمت و تحلیل ارزهای دیجیتال</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر، امتیاز Entekhab و مطالب مرتبط. عدد کنار هر نماد تعداد مطالب آرشیو دربارهٔ آن است. <a href=\"/methodology/\">روش محاسبه و منابع داده</a></p><div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
-    urls.append((page("coins/", "کوین‌ها — پروفایل ارزهای دیجیتال", "فهرست ارزهای دیجیتال با قیمت زنده، تحلیل و آرشیو مطالب", body), market.get("updated_at")))
-    for pth in ("bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/"):  # /me/ is personal → robots Disallow, so not in the sitemap
+    urls.append((page("coins/", "قیمت و تحلیل ارزهای دیجیتال — پروفایل کوین‌ها", f"قیمت زنده و تحلیل تکنیکال {len(order)} ارز دیجیتال، از بیت‌کوین و اتریوم تا آلت‌کوین‌ها، با امتیاز شفاف و آرشیو مطالب", body), market.get("updated_at")))
+    for pth in ("bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/"):  # /me/ is personal → robots Disallow, so not in the sitemap
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
@@ -594,6 +666,23 @@ def post_li(p):
     return f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a><small>{fmt_date(p.get("date",""))} · {e(cat)} · {" ".join(p.get("coins", [])[:4])}</small></li>'
 
 
+CAT_H1 = {"technical": "تحلیل تکنیکال ارزهای دیجیتال", "signal": "سیگنال و ستاپ‌های معاملاتی", "etf_institutional": "اخبار ETF و سرمایه‌گذاری نهادی در کریپتو",
+          "regulation": "قانون‌گذاری و سیاست‌های رمزارز", "security": "امنیت، هک و کلاهبرداری در کریپتو", "onchain": "تحلیل آن‌چین و داده‌های بازار",
+          "education": "آموزش ارز دیجیتال و بلاک‌چین", "products": "کتاب‌ها و اندیکاتورهای کوین کورد", "community": "اطلاعیه‌ها و کلاس‌های دیسکورد", "news": "اخبار بازار ارزهای دیجیتال"}
+CAT_INTRO = {
+    "technical": "پست‌هایی که واقعاً نمودار می‌خوانند: میانگین‌های متحرک، RSI، حمایت و مقاومت، الگوهای فصلی و تحلیل روند بیت‌کوین و آلت‌کوین‌ها.",
+    "signal": "ستاپ‌های معاملاتی با نقطهٔ ورود، حد ضرر و هدف؛ نتیجهٔ واقعی هر کدام با کندل‌های Binance در صفحهٔ همان پست ثبت می‌شود.",
+    "etf_institutional": "جریان ورود و خروج سرمایه به صندوق‌های ETF، خرید بیت‌کوین توسط شرکت‌ها و بانک‌ها و حرکت سرمایه‌گذاران نهادی.",
+    "regulation": "قانون‌ها، لایحه‌ها، تصمیم‌های بانک‌های مرکزی و دادگاه‌ها و سیاست دولت‌ها دربارهٔ رمزارزها.",
+    "security": "هک صرافی‌ها و پروتکل‌ها، کلاهبرداری‌ها، آسیب‌پذیری‌ها و تهدیدهایی مثل رایانهٔ کوانتومی.",
+    "onchain": "داده‌های زنجیره و بازار: نهنگ‌ها، هش‌ریت و ماینرها، دامیننس، تصفیه‌ها، فاندینگ و شاخص ترس و طمع.",
+    "education": "مفاهیم پایهٔ بلاک‌چین، بیت‌کوین و بازار، اصطلاحات معامله‌گری و راهنماهای گام‌به‌گام.",
+    "products": "کتاب‌ها، اندیکاتورها و استراتژی‌های اختصاصی کوین کورد در TradingView و راهنمای استفاده از آن‌ها.",
+    "community": "اطلاعیه‌های کانال و کلاس‌های شبانهٔ دیسکورد کوین کورد (هر شب ساعت ۸ به وقت تهران).",
+    "news": "خبرهای روز بازار رمزارز: قیمت، رکوردها، ریزش‌ها و رویدادهایی که بازار را تکان می‌دهند.",
+}
+
+
 def prerender():
     good = [p for p in posts if p.get("q") != "low"]           # promos / repeats are not shown as "latest"
     idx = os.path.join(ROOT, "index.html")
@@ -623,6 +712,7 @@ def prerender():
     miss = [k for k in reps if k not in s]
     for k, v in reps.items():
         s = s.replace(k, v, 1)
+    s = s.replace("</small><b", "</small> <b").replace('</b></div><div class="kpi"', '</b></div> <div class="kpi"')
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.tsc,.ibox{overflow-x:auto;-webkit-overflow-scrolling:touch}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
@@ -633,8 +723,9 @@ def prerender():
         ps = [p for p in posts if p["category"] == c["id"]]
         if not ps:
             continue
-        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1>{c["icon"]} {e(c["name"]["fa"])}</h1><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب</p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
-        urls.append(page(f"categories/{c['id']}/", f'{c["name"]["fa"]} — {c["name"].get("en","")}', f'آرشیو مطالب دستهٔ {c["name"]["fa"]} در entekhab.net', body))
+        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1>{c["icon"]} {e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
+        urls.append(page(f"categories/{c['id']}/", CAT_H1.get(c["id"], c["name"]["fa"]) + " — آرشیو " + c["name"]["fa"],
+                         (CAT_INTRO.get(c["id"]) or f'آرشیو مطالب دستهٔ {c["name"]["fa"]}')[:155], body))
     urls.append(build_replay())
     print(f"prerendered index (missing placeholders: {miss}); extra pages {len(urls)}")
     return urls
