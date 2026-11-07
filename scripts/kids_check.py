@@ -79,6 +79,56 @@ class Walk(HTMLParser):
             self.text.append(d)
 
 
+class Shape(HTMLParser):
+    """Counts, inside every language copy of an article, what the three languages must share: sections and
+    glossary terms, list items, tick boxes, tables, links and headings. Standard library only, so it also runs in CI."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.stack = []        # (tag, class, copy-or-None) of the elements that are open
+        self.active = []       # language copies that are open: [lang, [sections, li, ticks, tables, links, headings]]
+        self.counts = {}       # lang -> tuple, filled when a copy closes
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        cls = a.get("class") or ""
+        parent = self.stack[-1] if self.stack else None
+        copy = None
+        if tag == "div" and "data-lang" in a and parent and parent[0] == "article" and "b4j" in parent[1]:
+            copy = [a["data-lang"], [0, 0, 0, 0, 0, 0]]
+        for _lang, c in self.active:                      # descendants only: the copy itself is not counted
+            if (tag == "section" and "b4j-s" in cls) or (tag == "article" and "b4j-term" in cls):
+                c[0] += 1
+            if tag == "li":
+                c[1] += 1
+            if tag == "input" and "b4j-ck" in cls:
+                c[2] += 1
+            if tag == "table":
+                c[3] += 1
+            if tag == "a":
+                c[4] += 1
+            if tag in ("h2", "h3", "h4"):
+                c[5] += 1
+        if tag in VOID:
+            return
+        self.stack.append((tag, cls, copy))
+        if copy is not None:
+            self.active.append(copy)
+
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        for i in range(len(self.stack) - 1, -1, -1):
+            if self.stack[i][0] == tag:
+                closed = self.stack[i:]
+                del self.stack[i:]
+                for _t, _c, copy in closed:
+                    if copy is not None:
+                        self.active = [x for x in self.active if x is not copy]
+                        self.counts[copy[0]] = tuple(copy[1])
+                break
+
+
 def page_path(url):
     p = url.split("#")[0].split("?")[0]
     if p.endswith("/"):
@@ -167,16 +217,13 @@ def main():
                     print(f"ERR  {rel}: anchor {h} not found")
                     bad += 1
     # the three languages of each page must have the same shape
-    from lxml import html as LH
     for rel, (w, html) in info.items():
         if not rel.startswith("kids/") or rel in [f"{x}/index.html" for x in K.OLD_URLS]:
             continue
-        doc = LH.fromstring(html)
-        counts = {}
-        for el in doc.xpath("//article[contains(@class,'b4j')]/div[@data-lang]"):
-            counts[el.get("data-lang")] = (len(el.xpath(".//section[contains(@class,'b4j-s')]|.//article[contains(@class,'b4j-term')]")),
-                                           len(el.xpath(".//li")), len(el.xpath(".//input[contains(@class,'b4j-ck')]")),
-                                           len(el.xpath(".//table")), len(el.xpath(".//a")), len(el.xpath(".//h2|.//h3|.//h4")))
+        sh = Shape()
+        sh.feed(html)
+        sh.close()
+        counts = sh.counts
         if not counts and rel == "kids/index.html":
             continue                      # the hub: inline spans, covered by the data-lang count above
         if sorted(counts) != ["ckb", "en", "fa"]:
