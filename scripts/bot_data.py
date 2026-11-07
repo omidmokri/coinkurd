@@ -250,7 +250,11 @@ def sec_opps(lang, coin=None):
     out = [f"🎯 <b>{t('b_opps', lang)[2:]}</b>"]
     for o in ops[:12]:
         out.append(fmt_opp(o, lang))
-        s = st.get(o["type"])
+        s, au = st.get(o["type"]), (load("scanaudit") or {}).get("patterns", {}).get(o["type"]) or {}
+        if au.get("verdict") == "worse":
+            out.append("   " + pick({"fa": "⚠️ در دست بازبینی: این الگو در آزمون بدتر از ساعت‌های تصادفی بوده",
+                                     "ckb": "⚠️ لە پێداچوونەوەدایە: ئەم شێوازە لە تاقیکردنەوەدا خراپتر بووە لە کاتژمێرە هەڕەمەکییەکان",
+                                     "en": "⚠️ under review: this pattern tested worse than random hours"}, lang))
         if s and s.get("n72"):
             out.append(f"   📈 win72h {s.get('win72')}% · avg {(s.get('avg72') or 0):+.2f}% (n={s['n72']})")
     if len(out) == 1:
@@ -591,6 +595,16 @@ def sec_track(lang):
     for k, s in sorted(((k, s) for k, s in st.items() if "|" not in k), key=lambda kv: -kv[1].get("n", 0)):
         out.append(f"• {L(OPP.get(k, {'en': k}), lang)}: n={s.get('n')} · 24h win {s.get('win24')}% ({(s.get('avg24') or 0):+.2f}%)"
                    f" · 72h win {s.get('win72')}% ({(s.get('avg72') or 0):+.2f}%)")
+    au = (load("scanaudit") or {}).get("patterns", {})
+    if au:
+        out += ["", pick({"fa": "آزمون هر الگو (حرکت ۲۴ ساعته در جهت سیگنال، در برابر همان کوین‌ها در ساعت‌های دیگر):",
+                          "ckb": "تاقیکردنەوەی هەر شێوازێک (جووڵەی ٢٤ کاتژمێر بە ئاراستەی سیگناڵ، بەرامبەر هەمان دراوەکان لە کاتژمێرەکانی تر):",
+                          "en": "Each pattern tested (24h move in the signal's direction vs the same coins at other hours):"}, lang)]
+        vt = {"better": "✅", "worse": "⚠️", "no_edge": "➖", "too_few": "…"}
+        for k, a in sorted(((k, a) for k, a in au.items() if k != "_all"), key=lambda kv: kv[1]["p"]):
+            out.append(f"{vt.get(a['verdict'], '')} {L(OPP.get(k, {'en': k}), lang)}: {a['obs']:+.2f}% vs {a['mid']:+.2f}% · p={a['p']:.3f} (n={a['n']})")
+        out.append(pick({"fa": "⚠️ = در دست بازبینی (بدتر از تصادفی، p<0.05)", "ckb": "⚠️ = لە پێداچوونەوەدایە (خراپتر لە هەڕەمەکی، p<0.05)",
+                         "en": "⚠️ = under review (worse than random, p<0.05)"}, lang))
     ss = sig.get("stats", {})
     if ss:
         out += ["", pick({"fa": "اندیکاتورهای Kurdistani:", "ckb": "ئیندیکاتۆرەکانی Kurdistani:", "en": "Kurdistani indicators:"}, lang)]

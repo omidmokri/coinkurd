@@ -57,6 +57,7 @@ DNA = (load("dna.json", {}) or {}).get("coins", {})
 DERIV = {x["coin"]: x for x in (load("derivatives.json", {}) or {}).get("swaps", [])}
 KIND = load("kind.json", {})
 SCANS = (load("scanstats.json", {}) or {}).get("stats", {})
+AUDIT = (load("scanaudit.json", {}) or {}).get("patterns", {})
 CATS = {c["id"]: c for c in meta.get("categories", [])}
 MK = {c["coin"]: c for c in market.get("coins", [])}
 TV = {"BTC": "BITSTAMP:BTCUSD", "ETH": "BITSTAMP:ETHUSD", "TON": "OKX:TONUSDT", "GOLD": "OANDA:XAUUSD"}
@@ -525,6 +526,11 @@ def build_coin(c, cposts):
         if opps:
             def rec(o):
                 a = SCANS.get(o["type"]) or {}
+                au = AUDIT.get(o["type"]) or {}
+                if au.get("verdict") in ("better", "worse", "no_edge"):
+                    tag = {"better": "بهتر از ساعت‌های تصادفی", "worse": "⚠️ در دست بازبینی: بدتر از ساعت‌های تصادفی",
+                           "no_edge": "تفاوت معناداری با ساعت‌های تصادفی ندارد"}[au["verdict"]]
+                    return f' · آزمون این الگو: {au["obs"]:+.2f}٪ در ۲۴ ساعت در برابر {au["mid"]:+.2f}٪ در ساعت‌های دیگر (p={au["p"]:.3f}، n={au["n"]}) — {tag}'
                 return f' · پیشینهٔ این الگو: {a["win24"]}٪ مثبت پس از ۲۴ ساعت (n={a["n24"]})' if a.get("n24") else ""
             body += "<h2>فرصت‌های کشف‌شده توسط اسکنر</h2><ul class=list>" + "".join(
                 f'<li><b class="{"down" if o.get("dir") == "bear" else "up"}">{"▼ نزولی" if o.get("dir") == "bear" else "▲ صعودی"}</b> · {OPP_FA.get(o["type"], o["type"])} · قدرت {o["strength"]} · اطمینان {"بالا" if o["confidence"] == "high" else "متوسط"}'
