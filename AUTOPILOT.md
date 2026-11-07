@@ -87,8 +87,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
    (`build_pages.py`, "کارنامهٔ پست‌ها"), in the home-page "imp" block and inside the Entekhab Score's `channel`
    component (`score.py`: `50 + avg*8 + (hit-0.5)*40`). In a flat market that number rewards drift, not the channel.
    Replace them with the tested figures from `data/trackrecord.json` (post vs random hours, p-value); make the Score
-   component neutral (50) unless p < 0.05, and update the wording on `/methodology/`. Check the real numbers in
-   `data/trackrecord.json` first.
+   component neutral (50) unless p < 0.05, and update the wording on `/methodology/`. The first real result
+   (2026-11-07) is **not significant** (+0.43% after posts vs +0.20% at random hours, p = 0.29), so today the channel
+   component should sit at 50 and the coin pages should say "no measurable difference yet", linking to /track-record/.
 2. **Public log page `/autopilot/`.** Render this file's Log (fa/ckb/en) with links to each commit, so every autonomous
    change is visible on the site. Link it from the footer ("روش کار و منابع داده" neighbourhood).
 3. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
@@ -105,8 +106,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
 8. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 9. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
-10. **Housekeeping:** stray branch `ck-push-test` (a push test; the proxy cannot delete refs) — delete it from the
-    GitHub UI when a browser is available.
+10. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
+    cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
+    repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
 
@@ -124,5 +126,11 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - **Verified:** unit tests — null data never significant (0/10 seeds), planted +1.5% effect caught (p=0.0005), a
   "post after the move" pattern flagged as reaction and not as foresight, duplicates counted once, windows across data
   gaps skipped, one window checked by hand; full study runs in ~3.5 s; page screenshots desktop/mobile, fa/en, no JS
-  errors. Real figures are produced by CI after this commit (`data/trackrecord.json`).
+  errors. Real figures produced by CI (run 42372862451, 12:36 UTC) and the live page checked in a browser.
+- **Result (real data, 2026-08-04 → 2026-11-06):** 508 posts in 259 distinct hours over 88 days. Bitcoin 24h after posts
+  **+0.43%** vs **+0.20%** at matched random hours (95% of random results between −0.19% and +0.64%), **p = 0.29 — not
+  significant**. Share of gaining windows 56.4% vs 52.9% (p = 0.47). No sign of posting after moves (4h before: −0.02%
+  vs +0.04%, p = 0.32); volatility after posts like any hour (3.07% vs 2.84%, p = 0.22). No category significant.
+  Note: a quick estimate earlier the same day (posts +0.53% vs a daily-close baseline of −0.04%) overstated the gap —
+  it used a shorter window and daily closes. This result supersedes it.
 - **Next:** Backlog #1 — use these figures everywhere the raw average is still shown.
