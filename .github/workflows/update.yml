@@ -350,9 +350,19 @@ jobs:
         continue-on-error: true
         run: python scripts/build_map.py
 
-      - name: Build the kids & teens academy (/kids/)
+      - name: Check the Bitcoin for Juniors translations (structure, letters, digits)
+        continue-on-error: true
+        run: |
+          python -I scripts/b4j_check.py fa
+          python -I scripts/b4j_check.py ckb
+
+      - name: Build Bitcoin for Juniors (/kids/)
         continue-on-error: true
         run: python scripts/build_kids.py
+
+      - name: Check the built /kids/ pages
+        continue-on-error: true
+        run: python scripts/kids_check.py
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
