@@ -342,6 +342,10 @@ jobs:
         continue-on-error: true
         run: python scripts/build_today.py
 
+      - name: Build the nightly class page (/class/)
+        continue-on-error: true
+        run: python scripts/build_class.py
+
       - name: Build the autopilot log page
         continue-on-error: true
         run: python scripts/build_autopilot.py

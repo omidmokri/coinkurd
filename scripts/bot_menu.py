@@ -50,6 +50,11 @@ S = {
                "ckb": "٢٤ کاتژمێری ڕابردوو بە یەک نیگا: بازاڕ، گیروگرفتی ئێران، سکانەر، پۆست و وانەی ئەمشەو.",
                "kmr": "24 saetên dawî bi nihêrînekê.", "ar": "آخر ٢٤ ساعة في لمحة: السوق، احتكاك إيران، الماسح، المنشورات ودرس الليلة.",
                "en": "The last 24 hours at a glance: market, Iran friction, scanner, posts and tonight's class."}),
+    "class": ("🎓", {"fa": "کلاس شبانه", "ckb": "وانەی شەوانە", "kmr": "Dersa şevê", "ar": "الدرس الليلي", "en": "Nightly class"},
+              {"fa": "هر شب ۲۰:۰۰ تهران در دیسکورد: زمان، لینک ورود و شمارش معکوس.",
+               "ckb": "هەموو شەوێک ٢٠:٠٠ تاران لە دیسکۆرد: کات، بەستەر و ژماردنی پێچەوانە.",
+               "kmr": "Her şev 20:00 Tehran li Discordê.", "ar": "كل ليلة ٢٠:٠٠ بتوقيت طهران على ديسكورد.",
+               "en": "Every night 20:00 Tehran on Discord: time, join link and countdown."}),
     "trackrec": ("🧾", {"fa": "کارنامهٔ واقعی کانال", "ckb": "کارنامەی ڕاستەقینەی کەناڵ", "kmr": "Qeyda rastîn a kanalê",
                         "ar": "السجل الحقيقي للقناة", "en": "Channel's real record"},
                  {"fa": "بعد از پست‌های کانال بیت‌کوین چه کرد، در برابر ساعت‌های تصادفی همان دوره — با آزمون آماری.",
@@ -313,7 +318,7 @@ HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps
 GROUPS = {
     "g_analysis": ["analysis", "coin", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
-    "g_news": ["today", "news", "narr", "events", "week", "posts", "track"],
+    "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
 }

@@ -361,7 +361,30 @@ def sec_today(lang, now=None):
     return _head("☀️ " + _td("title", lg), lg, "/today/", lines, brain.get("updated_at"))
 
 
-SECTIONS = {"today": (sec_today, "/today/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
+CL = {"title": {"fa": "کلاس شبانهٔ کوین کورد", "ckb": "وانەی شەوانەی کۆین کورد", "en": "The nightly Coin Kurd class"},
+      "when": {"fa": "هر شب (به‌جز تعطیلات) ساعت ۲۰:۰۰ به وقت تهران در دیسکورد", "ckb": "هەموو شەوێک (جگە لە پشووەکان) کاتژمێر ٢٠:٠٠ بە کاتی تاران لە دیسکۆرد",
+               "en": "Every night (except holidays) at 20:00 Tehran time on Discord"},
+      "join": {"fa": "ورود", "ckb": "چوونەژوورەوە", "en": "Join"},
+      "men": {"fa": "پست‌های ارجاع‌دهنده به کلاس", "ckb": "پۆستە ئاماژەدەرەکان بە وانە", "en": "Posts referring to the class"}}
+
+
+def sec_class(lang, now=None):
+    import class_facts as CF
+    lg = _lg(lang)
+    now = now or dt.datetime.now(dt.timezone.utc)
+    f = CF.facts(R.load("posts.json", []) or [])
+    w = class_wait(now)
+    lines = ["• " + (CL["when"].get(lg) or CL["when"]["fa"]),
+             "🎓 " + _td("cl", lg) + " " + _td("hm", lg).format(h=_n(w // 60, lg), m=_n(w % 60, lg))]
+    if f["invite"]:
+        lines.append(f"• {CL['join'].get(lg) or CL['join']['fa']}: {f['invite']}")
+    else:
+        lines.append(BR.s("nodata", lg))
+    lines.append(f"• {CL['men'].get(lg) or CL['men']['fa']}: {_n(len(f['mentions']), lg)}")
+    return _head("🎓 " + (CL["title"].get(lg) or CL["title"]["fa"]), lg, "/class/", lines, (f["source"] or {}).get("date"))
+
+
+SECTIONS = {"today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/")}
