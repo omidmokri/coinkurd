@@ -13,28 +13,16 @@
   function D(id) { return document.getElementById(id); }
   function J(id) { var e = D(id); try { return e ? JSON.parse(e.textContent) : null; } catch (x) { return null; } }
 
-  /* ---------------------------------------------------------- sound */
-  var AC = null, muted = !S.snd;
-  function ctx() {
-    if (!AC && window.AudioContext) AC = new AudioContext();
-    if (AC && AC.state === "suspended") AC.resume();
-    return AC;
-  }
-  function tone(f, t0, dur, type, vol) {
-    var c = ctx(); if (!c || muted) return;
-    var o = c.createOscillator(), g = c.createGain();
-    o.type = type || "sine"; o.frequency.value = f;
-    g.gain.setValueAtTime(0.0001, c.currentTime + t0);
-    g.gain.exponentialRampToValueAtTime(vol || 0.16, c.currentTime + t0 + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + t0 + dur);
-    o.connect(g); g.connect(c.destination);
-    o.start(c.currentTime + t0); o.stop(c.currentTime + t0 + dur + 0.02);
-  }
+  /* ---------------------------------------------------------- sound
+     one engine for the whole academy: kids-sound.js synthesises everything, so
+     there is never a second audio context and the mute switch covers it all */
+  var muted = !S.snd;
+  function K() { return window.KSND; }
   var SND = {
-    tap:  function () { tone(520, 0, .07, "triangle", .07); },
-    good: function () { [659, 880].forEach(function (f, i) { tone(f, i * .09, .18, "sine", .13); }); },
-    bad:  function () { tone(200, 0, .17, "sawtooth", .07); tone(150, .08, .2, "sawtooth", .06); },
-    win:  function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * .1, .32, "sine", .14); }); }
+    tap:  function () { if (K() && !muted) K().sfx("tap"); },
+    good: function () { if (K() && !muted) K().sfx("good"); },
+    bad:  function () { if (K() && !muted) K().sfx("bad"); },
+    win:  function () { if (K() && !muted) K().sfx("win"); }
   };
 
   /* ---------------------------------------------------------- confetti (skipped if motion is reduced) */
@@ -78,7 +66,12 @@
     var sb = b.querySelector(".kd-snd");
     if (sb) {
       sb.textContent = muted ? "🔇" : "🔊";
-      sb.onclick = function () { muted = !muted; S.snd = muted ? 0 : 1; save(); sb.textContent = muted ? "🔇" : "🔊"; if (!muted) SND.tap(); };
+      sb.onclick = function () {
+        muted = !muted; S.snd = muted ? 0 : 1; save();
+        sb.textContent = muted ? "🔇" : "🔊";
+        if (K()) K().mute(muted);
+        if (!muted) SND.tap();
+      };
     }
     document.querySelectorAll(".kd").forEach(function (r) { r.dataset.age = S.age || "kid"; });
   }
@@ -372,6 +365,49 @@
     if (qh && data.quiz) quiz(qh, data.quiz, data.id, function (s) { mark(data.id, "quiz", s + 1); dots(); });
   }
 
+  /* ---------------------------------------------------------- the shorts, the songs, the cast */
+  function media() {
+    var M = J("kdMedia");
+    if (!M || !window.KFILM) return;
+    document.querySelectorAll("[data-ep]").forEach(function (h) {
+      var ep = (M.eps || {})[h.dataset.ep];
+      if (!ep || h.dataset.on) return;
+      h.dataset.on = "1";
+      new window.KFILM.Player(h, ep, {onEnd: function () {
+        if (ep.world && mark(ep.world, "film:" + ep.id, 2)) cheer();
+        var st = document.querySelector("#kdMe .kd-st");
+        if (st) st.textContent = "⭐ " + S.stars;
+        document.querySelectorAll('.kd-dot[data-k="film:' + ep.id + '"]').forEach(function (d) { d.classList.add("ok"); });
+      }});
+    });
+    document.querySelectorAll("[data-song]").forEach(function (h) {
+      var sg = (M.songs || {})[h.dataset.song];
+      if (!sg || h.dataset.on) return;
+      h.dataset.on = "1";
+      new window.KFILM.Karaoke(h, sg, sg.music);
+    });
+    var th = D("kdTheme");
+    if (th && !th.dataset.on) {
+      th.dataset.on = "1";
+      var spinning = false;
+      th.onclick = function () {
+        if (!window.KSND) return;
+        var tune = (M.music || {})[th.dataset.theme];
+        if (!tune) return;
+        if (spinning) { window.KSND.stop(); spinning = false; th.classList.remove("on"); return; }
+        window.KSND.play(tune); spinning = true; th.classList.add("on");
+      };
+    }
+    document.querySelectorAll("[data-char]").forEach(function (h) {
+      if (h.dataset.on) return;
+      h.dataset.on = "1";
+      var sv = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      sv.setAttribute("viewBox", "-10 -16 120 124"); sv.setAttribute("class", "kd-charsvg");
+      sv.appendChild(window.KFILM.charNode(h.dataset.char));
+      h.insertBefore(sv, h.firstChild);
+    });
+  }
+
   /* ---------------------------------------------------------- a reminder to look away */
   function rest() {
     var box = D("kdRest"); if (!box) return;
@@ -393,7 +429,7 @@
     UIs = J("kdUI") || {};
     phs(); addEventListener("ek-lang", phs);
     document.querySelectorAll(".kd").forEach(function (r) { r.dataset.age = S.age || "kid"; });
-    setup(); hub(); world(); rest();
+    setup(); hub(); world(); media(); rest();
     addEventListener("ek-lang", function () {
       meBar();
       /* the games and the quiz are drawn from data, so draw them again in the new language */

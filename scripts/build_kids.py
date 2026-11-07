@@ -20,13 +20,47 @@ import academy_data as AD    # noqa: E402
 import build_pages as BP     # noqa: E402
 import build_reality as BR   # noqa: E402
 import kids_data as KD       # noqa: E402
+import kids_media as KM      # noqa: E402
 
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
 VER = "1"
-HEAD = f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
-FOOT = f'<script src="/assets/kids.js?v={VER}" defer></script>'
+HEAD = (f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
+        f'<link rel="stylesheet" href="/assets/kids-film.css?v={VER}">')
+FOOT = (f'<script src="/assets/kids-sound.js?v={VER}" defer></script>'
+        f'<script src="/assets/kids-film.js?v={VER}" defer></script>'
+        f'<script src="/assets/kids.js?v={VER}" defer></script>')
+
+
+def media_payload(eps=(), songs=()):
+    """the shorts and the songs a page needs, with their music inlined"""
+    E = {}
+    for ep in eps:
+        d = {k: v for k, v in ep.items() if k != "music"}
+        d["music"] = KM.THEMES.get(ep["music"])
+        E[ep["id"]] = d
+    G = {}
+    for sg in songs:
+        d = {k: v for k, v in sg.items() if k != "music"}
+        d["music"] = KM.THEMES.get(sg["music"])
+        G[sg["id"]] = d
+    return {"eps": E, "songs": G}
+
+
+def storyboard(ep):
+    """the same episode in words — a text alternative, and a shot list to hand to a studio"""
+    rows = []
+    for n, sc in enumerate(ep["scenes"], 1):
+        who = "، ".join(KM.CAST_NAMES.get(c["who"], c["who"]) for c in sc["cast"])
+        says = " ".join(f'<i>{e(l["t"][0])}</i>' for l in sc["lines"])
+        rows.append(f'<li><b>{n}.</b> {e(sc["bg"])} · {e(who)} · '
+                    f'{"زوم" if (sc.get("cam") or [1])[0] != 1 else "ثابت"} — {says}</li>')
+    return (f'<details class="kf-sb"><summary>'
+            + tri("سناریو و استوری‌بورد (متنِ همین انیمیشن)",
+                  "سیناریۆ و ستۆریبۆرد (دەقی هەمان ئەنیمەیشن)",
+                  "Script and storyboard (this animation, in words)")
+            + f'</summary><ol>{"".join(rows)}</ol></details>')
 
 
 def tri(fa, ckb, en, tag="span"):
@@ -119,12 +153,19 @@ def page_hub():
     body = (f'<div class="kd" data-age="kid" id="kdHub">'
             f'<h1>{U("t")}</h1>{BP.LSW}<p class="lead">{U("lead")}</p>'
             f'{me_bar()}'
+            f'<div class="kd-bar" style="margin:0 0 14px">'
+            f'<button class="kd-chip" id="kdTheme" type="button" data-theme="academy">'
+            + tri("🎵 آهنگ آکادمی", "🎵 ئاوازی ئەکادیمیا", "🎵 The academy theme") + "</button>"
+            f'<a class="kd-chip" href="/kids/studio/">'
+            + tri("🎬 استودیوی انیمیشن و موسیقی", "🎬 ستۆدیۆی ئەنیمەیشن و مۆسیقا",
+                  "🎬 Animation &amp; Music Studio") + "</a></div>"
             f'<h2>{U("worlds")}</h2><div class="kd-grid">{"".join(cards)}</div>'
             f'<h2 style="margin-top:26px">{U("badges")}</h2>'
             f'<div class="kd-badges" id="kdBadges">{badges}</div>'
             f'<p class="kd-note">{U("note")}<br>{U("privacy")}</p></div>'
             f'{rest_box()}'
             f'<script type="application/json" id="kdWorlds">{BP.sj(payload)}</script>'
+            f'<script type="application/json" id="kdMedia">{BP.sj({"music": {"academy": KM.THEMES["academy"]}})}</script>'
             f'<script type="application/json" id="kdAvs">{BP.sj([[i, ic, list(n), c] for i, ic, n, c in KD.AVATARS])}</script>'
             f'<script type="application/json" id="kdUI">{BP.sj(ui_payload())}</script>')
     ld = {"@context": "https://schema.org", "@type": "Course", "name": KD.UI["t"][0],
@@ -141,7 +182,23 @@ def page_hub():
 
 def page_world(w, prev_w, next_w):
     fac = next((f for f in AD.FACULTIES if f["id"] == w["from"]), None)
+    eps = [x for x in KM.EPISODES if x["world"] == w["id"]]
+    sgs = [x for x in KM.SONGS if x["world"] == w["id"]]
     dots, secs = [], []
+    for ep in eps:
+        dots.append(f'<a class="kd-dot" data-k="film:{e(ep["id"])}" href="#{e(ep["id"])}">🎬</a>')
+        secs.append(
+            f'<section class="kd-game" id="{e(ep["id"])}">'
+            f'<h2><span>🎬</span>{t3(ep["t"])}</h2>'
+            f'<p class="how">{t3(ep["logline"])}</p>'
+            f'<div data-ep="{e(ep["id"])}"></div>{storyboard(ep)}</section>')
+    for sg in sgs:
+        dots.append(f'<a class="kd-dot" data-k="song:{e(sg["id"])}" href="#{e(sg["id"])}">🎵</a>')
+        secs.append(
+            f'<section class="kf-song" id="{e(sg["id"])}">'
+            f'<h3>{sg["icon"]} {t3(sg["t"])}</h3>'
+            f'<p class="meta">{t3(sg["goal"])}<br>{t3(sg["style"])} · {t3(sg["inst"])}</p>'
+            f'<div data-song="{e(sg["id"])}"></div></section>')
     for i, l in enumerate(w["lessons"], 1):
         dots.append(f'<a class="kd-dot" data-k="{e(l["id"])}" href="#{e(l["id"])}">{i}</a>')
         secs.append(
@@ -183,6 +240,7 @@ def page_world(w, prev_w, next_w):
             f'{"".join(secs)}{nav}{grown}'
             f'<p class="kd-note">{U("note")}</p></div>{rest_box()}'
             f'<script type="application/json" id="kdW">{BP.sj(payload)}</script>'
+            f'<script type="application/json" id="kdMedia">{BP.sj(media_payload(eps, sgs))}</script>'
             f'<script type="application/json" id="kdAvs">{BP.sj([[i, ic, list(n), c] for i, ic, n, c in KD.AVATARS])}</script>'
             f'<script type="application/json" id="kdUI">{BP.sj(ui_payload())}</script>')
     return BP.page(f"kids/{w['id']}/", f"{w['t'][0]} — آکادمی کودکان و نوجوانان entekhab",
@@ -228,8 +286,102 @@ def page_parents():
                    PARENT["secs"][1][1][0][:155], body, shell(""))
 
 
+
+STUDIO = {
+ "t": ("استودیوی انیمیشن و موسیقی", "ستۆدیۆی ئەنیمەیشن و مۆسیقا", "Animation & Music Studio"),
+ "lead": ("فیلم‌های کوتاه، ترانه‌های اختصاصی و شخصیت‌های آکادمی — همه در همین صفحه پخش می‌شوند.",
+          "فیلمە کورتەکان، گۆرانییە تایبەتەکان و کەسایەتییەکانی ئەکادیمیا — هەموویان لەم پەڕەیەدا دەخرێنە کار.",
+          "The short films, the academy's own songs and its cast — all of them play right here."),
+ "how": ("هیچ فایل ویدئویی یا صوتی روی این صفحه نیست. انیمیشن‌ها SVG هستند که مرورگر حرکتشان می‌دهد، "
+         "و موسیقی نت‌به‌نت در همان لحظه ساخته می‌شود. برای همین هر فیلم به هر سه زبان پخش می‌شود، "
+         "روی اینترنت کند هم باز می‌شود، و هیچ موسیقی‌ای از کسی قرض گرفته نشده است.",
+         "هیچ فایلێکی ڤیدیۆ یان دەنگ لەم پەڕەیەدا نییە. ئەنیمەیشنەکان SVG ن کە وێبگەڕ دەیانجوڵێنێت، "
+         "و مۆسیقا نۆتە بە نۆتە لە هەمان ساتدا دروست دەبێت. لەبەر ئەوە هەر فیلمێک بە هەر سێ زمان دەخرێتە کار، "
+         "لەسەر ئینتەرنێتی خاویش دەکرێتەوە، و هیچ مۆسیقایەک لە کەس بە قەرز وەرنەگیراوە.",
+         "There is not one video or audio file on this page. The animations are SVG that the browser moves, "
+         "and the music is synthesised note by note as it plays. That is why every film runs in all three "
+         "languages, opens on a slow connection, and borrows no music from anyone."),
+ "films": ("فیلم‌های کوتاه", "فیلمە کورتەکان", "The short films"),
+ "songs": ("ترانه‌ها", "گۆرانییەکان", "The songs"),
+ "cast": ("شخصیت‌های آکادمی", "کەسایەتییەکانی ئەکادیمیا", "The cast"),
+ "who": {
+  "roj": (("رۆژ، روباه راهنما", "ڕۆژ، ڕێوییە ڕێنوێن", "Roj, the guide fox"),
+          ("صبور و شوخ. سؤال می‌پرسد تا خودت جواب را پیدا کنی.",
+           "ئارامگر و گاڵتەجاڕ. پرسیار دەکات تا خۆت وەڵامەکە بدۆزیتەوە.",
+           "Patient and playful. Asks questions so you find the answer yourself.")),
+  "aso": (("ئاسۆ، جغد معلم", "ئاسۆ، کوندەپەپووی مامۆستا", "Aso, the teacher owl"),
+          ("دقیق و آرام. چیزهای سخت را به تکه‌های کوچک می‌شکند.",
+           "وردبین و ئارام. شتە قورسەکان دەکات بە پارچەی بچووک.",
+           "Precise and calm. Breaks hard things into small pieces.")),
+  "zip": (("زیپ، ربات کنجکاو", "زیپ، ڕۆبۆتی حەزلێکەر", "Zip, the curious robot"),
+          ("همان کسی است که سؤال‌های شما را می‌پرسد — و گاهی اشتباه می‌کند.",
+           "هەر ئەو کەسەیە کە پرسیارەکانی ئێوە دەکات — و هەندێک جار هەڵە دەکات.",
+           "The one who asks your questions — and sometimes gets it wrong.")),
+  "fel": (("فێڵباز، شیّاد داستان", "فێڵباز، فێڵبازی چیرۆک", "The Trickster"),
+          ("شخصیت منفی مهربانِ داستان: هر بار یک ترفند کلاهبرداری واقعی را نشان می‌دهد.",
+           "کەسایەتیی خراپی میهرەبانی چیرۆک: هەر جارێک فێڵێکی ڕاستەقینە نیشان دەدات.",
+           "The story's gentle villain: each time he demonstrates one real scam trick.")),
+ },
+ "prod": ("می‌خواهید نسخهٔ ویدئویی بسازید؟", "دەتانەوێت وەشانی ڤیدیۆیی دروست بکەن؟",
+          "Want to make a video version?"),
+ "prodtxt": ("زیر هر فیلم، «سناریو و استوری‌بورد» را باز کنید: صحنه‌به‌صحنه، با محیط، شخصیت‌ها، "
+             "حرکت دوربین و همهٔ دیالوگ‌ها. متن کامل ترانه‌ها هم زیر هر آهنگ هست. این‌ها دقیقاً همان "
+             "چیزی است که یک استودیو یا یک ابزار ویدئوسازی برای ساخت نسخهٔ فیلم لازم دارد.",
+             "لە ژێر هەر فیلمێکدا، «سیناریۆ و ستۆریبۆرد» بکەرەوە: دیمەن بە دیمەن، بە ژینگە، کەسایەتییەکان، "
+             "جووڵەی کامێرا و هەموو دیالۆگەکان. دەقی تەواوی گۆرانییەکانیش لە ژێر هەر ئاوازێکدایە. ئەمانە "
+             "هەر ئەو شتەن کە ستۆدیۆیەک یان ئامرازێکی ڤیدیۆسازی پێویستیەتی.",
+             "Under each film, open “Script and storyboard”: scene by scene, with the set, the cast, the "
+             "camera move and every line of dialogue. The full lyrics sit under each song. That is exactly "
+             "what a studio, or a video tool, needs to shoot a filmed version."),
+}
+
+
+def page_studio():
+    films = "".join(
+        f'<section class="kd-game" id="{e(ep["id"])}">'
+        f'<h2><span>{ep["icon"]}</span>{t3(ep["t"])}</h2>'
+        f'<p class="how">{t3(ep["logline"])}</p>'
+        f'<div data-ep="{e(ep["id"])}"></div>{storyboard(ep)}'
+        f'<p class="kd-note"><a href="/kids/{e(ep["world"])}/">{U("world_of")} {t3(wt(ep["world"]))} →</a></p>'
+        f'</section>' for ep in KM.EPISODES)
+    songs = "".join(
+        f'<section class="kf-song" id="{e(sg["id"])}">'
+        f'<h3>{sg["icon"]} {t3(sg["t"])}</h3>'
+        f'<p class="meta">{t3(sg["goal"])}<br>{t3(sg["style"])} · {t3(sg["inst"])}</p>'
+        f'<div data-song="{e(sg["id"])}"></div></section>' for sg in KM.SONGS)
+    cast = "".join(
+        f'<div class="kd-badge kd-castcard on" data-char="{e(k)}">'
+        f'{t3(v[0], "b")}<small>{t3(v[1])}</small></div>'
+        for k, v in STUDIO["who"].items())
+    body = (f'<div class="kd" data-age="kid">'
+            f'<div class="meta"><a href="/kids/">{U("t")}</a> / {t3(STUDIO["t"])}</div>'
+            f'{BP.LSW}<h1>🎬 {t3(STUDIO["t"])}</h1>'
+            f'<p class="lead">{t3(STUDIO["lead"])}</p>{me_bar()}'
+            f'<h2>{t3(STUDIO["films"])}</h2>{films}'
+            f'<h2 style="margin-top:26px">{t3(STUDIO["songs"])}</h2>{songs}'
+            f'<h2 style="margin-top:26px">{t3(STUDIO["cast"])}</h2>'
+            f'<div class="kd-badges kd-cast">{cast}</div>'
+            f'<section class="kd-les" style="margin-top:22px">{t3(STUDIO["prod"], "h2")}'
+            f'<p>{t3(STUDIO["prodtxt"])}</p></section>'
+            f'<p class="kd-note">{t3(STUDIO["how"])}</p>'
+            f'<div class="kd-nav"><a class="kd-btn" href="/kids/">{U("map")}</a></div></div>'
+            f'{rest_box()}'
+            f'<script type="application/json" id="kdMedia">{BP.sj(media_payload(KM.EPISODES, KM.SONGS))}</script>'
+            f'<script type="application/json" id="kdAvs">{BP.sj([[i, ic, list(n), c] for i, ic, n, c in KD.AVATARS])}</script>'
+            f'<script type="application/json" id="kdUI">{BP.sj(ui_payload())}</script>')
+    return BP.page("kids/studio/", "استودیوی انیمیشن و موسیقی — آکادمی کودکان entekhab",
+                   STUDIO["lead"][0], body, shell(""))
+
+
+def wt(world_id):
+    for w in KD.WORLDS:
+        if w["id"] == world_id:
+            return w["t"]
+    return ("", "", "")
+
+
 def build():
-    urls = [page_start(), page_hub(), page_parents()]
+    urls = [page_start(), page_hub(), page_parents(), page_studio()]
     for i, w in enumerate(KD.WORLDS):
         urls.append(page_world(w, KD.WORLDS[i - 1] if i else None,
                                KD.WORLDS[i + 1] if i + 1 < len(KD.WORLDS) else None))
@@ -237,8 +389,11 @@ def build():
     les = sum(len(w["lessons"]) for w in KD.WORLDS)
     gms = sum(len(w["games"]) for w in KD.WORLDS)
     qs = sum(len(w["quiz"]) for w in KD.WORLDS)
+    sc = sum(len(x["scenes"]) for x in KM.EPISODES)
+    ln = sum(len(s_["lines"]) for x in KM.EPISODES for s_ in x["scenes"])
     print(f"kids pages: {len(urls)} · worlds {len(KD.WORLDS)} · lessons {les} (×2 ages ×3 langs) "
-          f"· games {gms} · questions {qs}")
+          f"· games {gms} · questions {qs} · films {len(KM.EPISODES)} ({sc} scenes, {ln} lines) "
+          f"· songs {len(KM.SONGS)} · themes {len(KM.THEMES)}")
     return urls
 
 
