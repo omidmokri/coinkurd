@@ -924,6 +924,13 @@ def channel_poll(chat_id, question, options):
                                          "options": [{"text": o[:100]} for o in options], "is_anonymous": True})
 
 
+def group_edit_media(chat_id, mid, img, caption):
+    """swap the picture of a group post for our own card, keeping its caption"""
+    media = {"type": "photo", "media": "attach://p", "caption": fix_amp(caption)[:1024], "parse_mode": "HTML"}
+    return _post_with_retry("editMessageMedia", {"chat_id": chat_id, "message_id": mid, "media": json.dumps(media)},
+                            files={"p": ("coin_kurd.jpg", img, "image/jpeg")}, tries=2)
+
+
 def group_delete(chat_id, mid):
     return tg("deleteMessage", chat_id=chat_id, message_id=mid)
 
@@ -1695,7 +1702,7 @@ def main():
     except Exception:
         log.exception("profile setup failed")
     log.info("running as @%s for %ss, %d users", BOT_USERNAME, RUN_SECONDS, len(s["users"]))
-    F.start(s, group_send, group_delete, GROUP, MAIN_WT)
+    F.start(s, group_send, group_delete, GROUP, MAIN_WT, edit_media_fn=group_edit_media)
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     OA.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT, DP.push_files, V.SIG)

@@ -33,6 +33,8 @@ FEEDS = {
     "brief": ["newscitypro", "ForeDex", "alphractal", "MAC_DDDD"],   # خبر کوتاه
     "ai": ["MrArtificialintelligence", "silicon_brain"],             # هوش مصنوعی
 }
+from adpics import ART_ONLY, is_ad  # noqa: E402  (other channels' adverts never go into our group)
+KIND_FA = {"onchain": "آن‌چین", "news": "خبر کریپتو", "econ": "اقتصاد", "brief": "خبر کوتاه", "ai": "هوش مصنوعی"}
 # per-kind settings. langs: which output languages go to that topic (a single topic must not get both,
 # or every item would be posted twice). max: new posts summarised per channel per check — the newer,
 # higher-volume feeds are kept small so they cannot flood the group or the AI budget.
@@ -330,6 +332,8 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
             for pid, iso, text, links, photos in new:
                 f["seen"][ch] = max(f["seen"][ch], pid)
                 text, photo = expand(text, links, photos)
+                if ch.lower() in ART_ONLY:
+                    photo = None                         # their pictures are their adverts: we draw our own
                 if len(text) < 60:
                     continue
                 item = {"id": f"{ch}/{pid}", "kind": kind, "at": iso, "made": datetime.now(timezone.utc).isoformat(),
@@ -347,6 +351,99 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
                 f["seen"][ch] = posts[-1][0]
     publish(s, f, topics, group_id, send_fn)
     return changed
+
+
+def _source(item_id):
+    return item_id.partition("/")[0].lower()
+
+
+def own_card(it, lang="fa"):
+    """our own picture for a summary: its headline and first lines on the Coin_Kurd card"""
+    import infocard as IC
+    txt = it.get(lang) or it.get("fa") or ""
+    lines = [x.strip() for x in re.sub(r"</?[^>]+>", "", txt).split("\n") if x.strip()]
+    if not lines:
+        return None
+    title = re.sub(r"^[^\w\u0600-\u06FF]+|[^\w\u0600-\u06FF!?؟)]+$", "", lines[0]) or lines[0]
+    when = None
+    try:
+        when = datetime.fromisoformat((it.get("at") or "").replace("Z", "+00:00"))
+    except Exception:
+        pass
+    try:
+        return IC.title_card(title[:140], "\n".join(lines[1:]), badge=KIND_FA.get(it.get("kind"), "کوین کورد"), when=when)
+    except Exception as ex:
+        log.info("own card failed for %s: %s", it.get("id"), ex)
+        return None
+
+
+def picture(it, lang="fa"):
+    """bytes of the picture to post: the source's own photo when it is a real picture, otherwise our card"""
+    if _source(it["id"]) not in ART_ONLY and it.get("photo"):
+        try:
+            r = requests.get(it["photo"], headers=IR.UA, timeout=30)
+            if r.ok and 2000 < len(r.content) < 9_500_000 and not is_ad(r.content):
+                return r.content
+        except Exception:
+            pass
+    return own_card(it, lang)
+
+
+EDIT_MEDIA = [None]          # set by start(): fn(chat_id, message_id, jpeg_bytes, caption) -> telegram result
+
+
+def art_fix(s, f, topics, group_id, send_fn, delete_fn):
+    """once: every group post made from an advert-only channel, or with a flagged advert picture, gets our own card
+    (edited in place; a text-only message is sent again with the card and the old one removed)"""
+    if f.get("art_fix_v1") or not group_id:
+        return False
+    done = 0
+    for kind in KIND_ORDER:
+        for it in f["items"].get(kind, []):
+            if not it.get("msgs") or it.get("art_fixed"):
+                continue
+            bad = _source(it["id"]) in ART_ONLY
+            if not bad and it.get("photo"):
+                try:
+                    r = requests.get(it["photo"], headers=IR.UA, timeout=30)
+                    bad = r.ok and is_ad(r.content)
+                except Exception:
+                    bad = False
+            if not bad:
+                continue
+            new_msgs = []
+            langs = list(it.get("sent") or [])
+            for i, mid in enumerate(it["msgs"]):
+                lang = langs[i] if i < len(langs) else "fa"
+                card = own_card(it, lang)
+                if not card:
+                    new_msgs.append(mid)
+                    continue
+                cap = D_e(it.get(lang) or it.get("fa") or "")
+                r = EDIT_MEDIA[0](group_id, mid, card, cap) if EDIT_MEDIA[0] else {"ok": False}
+                if r.get("ok") or "not modified" in str(r.get("description")):
+                    new_msgs.append(mid)
+                else:
+                    th = topics.get(f"{kind}:{lang}") or topics.get(kind)
+                    r2 = send_fn(group_id, it.get(lang) or it.get("fa"), None, message_thread_id=th, plain=True, photo=card)
+                    if r2.get("ok"):
+                        new_msgs.append(r2["result"]["message_id"])
+                        delete_fn(group_id, mid)
+                    else:
+                        new_msgs.append(mid)
+                time.sleep(3.5)
+            it["msgs"] = new_msgs
+            it["art_fixed"] = True
+            it["photo"] = None
+            done += 1
+    f["art_fix_v1"] = datetime.now(timezone.utc).isoformat()
+    log.info("art fix: %d group posts got our own picture", done)
+    return True
+
+
+def D_e(t):
+    import html
+    return html.escape(t or "", quote=False)
 
 
 def find_photo(item_id):
@@ -372,6 +469,7 @@ def publish(s, f, topics, group_id, send_fn):
             for it in f["items"].get(kind, []):
                 if (it.get("at") or "")[:10] == today:
                     it["posted"] = False
+    art_fix(s, f, topics, group_id, send_fn, DELETE[0])
     budget = PUBLISH_PER_LOOP
     for kind in KIND_ORDER:
         langs = (KINDS.get(kind, {}).get("langs")) or POST_LANGS
@@ -385,13 +483,13 @@ def publish(s, f, topics, group_id, send_fn):
                 continue
             if budget <= 0:
                 return
-            if not it.get("photo"):
+            if not it.get("photo") and _source(it["id"]) not in ART_ONLY:
                 it["photo"] = find_photo(it["id"])
             ok = True
             for lang in langs:
                 th = topics.get(f"{kind}:{lang}") or topics.get(kind)
                 if it.get(lang) and th and lang not in it.get("sent", []):
-                    r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=it.get("photo"))
+                    r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=picture(it, lang))
                     if r.get("ok"):
                         it.setdefault("sent", []).append(lang)
                         it.setdefault("msgs", []).append(r["result"]["message_id"])
@@ -469,8 +567,10 @@ def save_image(url, item_id, imgdir):
     if os.path.exists(path):
         return "/data/feedimg/" + name
     try:
+        if _source(item_id) in ART_ONLY:
+            return None
         r = requests.get(url, headers=IR.UA, timeout=30)
-        if not r.ok or len(r.content) < 2000:
+        if not r.ok or len(r.content) < 2000 or is_ad(r.content):
             return None
         data = r.content
         try:
@@ -515,9 +615,14 @@ def section(s, kind, lang, n=3):
 DIRTY = threading.Event()
 
 
-def start(s, send_fn, delete_fn, group_id, worktree=""):
+DELETE = [lambda *a: {"ok": False}]
+
+
+def start(s, send_fn, delete_fn, group_id, worktree="", edit_media_fn=None):
     """run feeds + site export in a daemon thread so slow AI/HTTP calls never block the bot's replies"""
     feed_state(s)
+    EDIT_MEDIA[0] = edit_media_fn
+    DELETE[0] = delete_fn
     s.setdefault("topics", {})
 
     s["topics"].update(env_topics())
