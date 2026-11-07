@@ -271,6 +271,7 @@ T = {
              "هیچ بابەتێکی ئەم ماڵپەڕە ئامۆژگاریی دارایی نییە؛ مامەڵە لە بازاڕی کریپتۆدا ڕیسکی زۆرە.",
              "Nothing on this site is financial advice; crypto trading carries high risk."),
     "sitemap": L("نقشهٔ سایت", "نەخشەی ماڵپەڕ", "Sitemap"),
+    "autopilot": L("گزارش کار خودکار", "ڕاپۆرتی کاری خۆکار", "Autopilot log"),
     "skip": L("پرش به محتوا", "بازدان بۆ ناوەڕۆک", "Skip to content"),
 }
 FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every NAV group — the footer is the full map of the site
@@ -345,7 +346,7 @@ def footer(lang="fa"):
             f'<a class="ek-badge" href="/app/#web">{icon("globe")}<span>{tri(T["anyd"], lang, "ek-i", "small")}{tri(T["pwa"], lang, "ek-i", "b")}</span></a>')
     lab = {h: t for h, ic, t, d in cats["more"]["items"]}   # by address: inserting a menu item must not shift these labels
     legal = (f'<a href="/privacy/">{tri(lab["/privacy/"], lang)}</a><a href="/terms/">{tri(lab["/terms/"], lang)}</a>'
-             f'<a href="/methodology/">{tri(lab["/methodology/"], lang)}</a><a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
+             f'<a href="/methodology/">{tri(lab["/methodology/"], lang)}</a><a href="/autopilot/">{tri(T["autopilot"], lang)}</a><a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
     return (f'<!--ek:footer--><div class="ekf" id="ekf" role="contentinfo" data-lang="{lang}"><div class="ek-w">'
             f'<div class="ekf-top"><div class="ekf-brand"><a class="ek-brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="" width="64" height="40" loading="lazy"><span>entekhab<b>.net</b></span></a>'
             f'{tri(T["tagline"], lang, "ek-i ekf-tag", "p")}{tri(T["about"], lang, "ek-i ekf-ab", "p")}<div class="ekf-apps">{apps}</div></div>'
