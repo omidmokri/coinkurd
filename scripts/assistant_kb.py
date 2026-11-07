@@ -41,6 +41,7 @@ FEATURES = [
     ("/roundtable/", ["council", "brain"], None),
     ("/opportunity/", ["oppcost"], "reality"),
     ("/ledger/", ["ledger", "track"], "reality"),
+    ("/track-record/", ["trackrec"], "reality"),
     ("/iran-friction/", ["friction"], "reality"),
     ("/hype/", ["hype2"], "reality"),
     ("/silent-exit/", ["silent"], "reality"),

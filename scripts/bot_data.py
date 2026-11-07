@@ -596,14 +596,14 @@ def sec_track(lang):
         out += ["", pick({"fa": "اندیکاتورهای Kurdistani:", "ckb": "ئیندیکاتۆرەکانی Kurdistani:", "en": "Kurdistani indicators:"}, lang)]
         for k, s in ss.items():
             out.append(f"• {k}: {s.get('n')} sig · win {s.get('win')}% · avg {s.get('avg')}% ({s.get('h')})")
-    im = load("impact") or {}
-    done = [x for x in im.values() if x.get("complete")]
-    if done:
-        avg = sum(x.get("r24h", 0) for x in done) / len(done)
-        up = sum(1 for x in done if x.get("r24h", 0) > 0)
-        out += ["", pick({"fa": "واکنش بازار ۲۴ساعت بعد از پست‌های کانال",
-                     "ckb": "کاردانەوەی بازاڕ ٢٤ کاتژمێر دوای پۆستەکانی کەناڵ",
-                     "en": "Market 24h after channel posts"}, lang) + f": n={len(done)} · ⬆️ {up * 100 // len(done)}% · avg {avg:+.2f}%"]
+    tr = load("trackrecord") or {}
+    if tr.get("obs"):                       # tested against random hours — the raw average alone said nothing
+        o, rt = tr["obs"], tr["test"]["r24"]
+        out += ["", pick({"fa": "بیت‌کوین ۲۴ ساعت بعد از پست‌های کانال در برابر ساعت‌های تصادفی",
+                     "ckb": "بیتکۆین ٢٤ کاتژمێر دوای پۆستەکان بەرامبەر کاتژمێرە هەڕەمەکییەکان",
+                     "en": "Bitcoin 24h after channel posts vs random hours"}, lang)
+                + f": {o['r24']:+.2f}% vs {rt['mid']:+.2f}% · p={rt['p']:.2f} (n={tr.get('n_posts')})",
+                f"🔗 {SITE}/track-record/"]
     out += ["", f"🔗 {SITE}/status/"]
     return cut("\n".join(out))
 
