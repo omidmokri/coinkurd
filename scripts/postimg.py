@@ -151,6 +151,7 @@ def main():
     session = requests.Session()
     done = dead = 0
     stale = []
+    gone = set()                                       # links that no fresh page could bring back
     # 1. the stored address, while it still works — newest first, so a cut-short run saves what matters
     for p in need:
         if done >= a.limit:
@@ -178,20 +179,26 @@ def main():
                 break
             src = fresh.get(p["id"])
             if not src:
+                if fresh:                              # pages were read and this post's picture is not there
+                    gone.add(p["id"])
+                dead += 1
                 continue
             try:
                 path = store(p["id"], grab(session, src))
-            except (Dead, requests.RequestException):
+            except Dead:
+                gone.add(p["id"]); dead += 1
+                continue
+            except requests.RequestException:
                 dead += 1
                 continue
             if path:
                 p["img"], p["photos"], done = path, [src], done + 1
             time.sleep(0.1)
 
-    # 3. posts with no picture anywhere get a card of their own headline (never a market panel)
+    # 3. posts with no picture anywhere — or whose picture is gone for good — get a card of their own headline
     made = 0
     for p in need:
-        if made >= a.cards or local(p) or p.get("photos"):
+        if made >= a.cards or local(p) or (p.get("photos") and p["id"] not in gone):
             continue
         if "/data/deepimg/" in str((p.get("link") or {}).get("url") if isinstance(p.get("link"), dict) else ""):
             continue                                  # a dossier: repair.py points it at its own card
