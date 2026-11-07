@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """ادغام فایل‌های ترجمهٔ tests/out/batch_*.json در data/posts.json (با پاک‌سازی فوتر و هشتگ‌ها)"""
-import json, re, glob, sys
+import json, re, glob, sys, os
 POSTS = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
 FOOT = re.compile(r"^[\s🅲🅾️🅸🅽🅺🆄🆁🅳👾🎥📸💬]*(Discord|Youtube|YouTube|Instagram|X|[\s🅲🅾️🅸🅽🅺🆄🆁🅳👾🎥📸💬]+)?[\s]*$")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fetch import drop_label, is_label  # noqa: E402  — a stored translation must not bring the channel's label back
 def clean(t):
+    t = drop_label(t)
     lines = t.split("\n")
     while lines and (FOOT.match(lines[-1]) ):
         lines.pop()
@@ -29,9 +32,11 @@ for p in posts:
                    "en": {"title": t["en"]["title"].strip(), "text": clean(t["en"]["text"])}}
         n += 1
 def good_title(tt, text):
-    if len(re.findall(r"[\w\u0600-\u06FF]", re.sub(r"\d", "", tt or ""))) >= 3:
+    if not is_label(tt or "") and len(re.findall(r"[\w\u0600-\u06FF]", re.sub(r"\d", "", tt or ""))) >= 3:
         return tt.strip()
     for ln in (text or "").split("\n"):
+        if is_label(ln):
+            continue
         c = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
         c = re.sub(r"#\S+", "", c).strip(" :–-—|•\t")
         if len(re.findall(r"[\w\u0600-\u06FF]", c)) >= 3:

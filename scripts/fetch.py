@@ -117,6 +117,51 @@ def split_footer(text: str):
     return "\n".join(lines).strip(), footer
 
 
+# A post's first line is its title on the site — unless that line is only the channel's own label.
+# The dossier posts used to open with «🧠 پروندهٔ کوین کورد», so every one of them was titled with the
+# channel's name instead of its subject. A label line is skipped in every language it was translated to.
+LABEL_RE = re.compile(
+    r"^[^\w\u0600-\u06FF]*(?:"
+    r"پرونده\s*(?:ی\s*)?کوین\s*کورد"                                          # fa
+    r"|دۆسیە(?:ی)?\s*(?:کۆین|کوین)\s*کور(?:ی)?د"                                     # ckb
+    r"|(?:the\s+)?coin\s*kurd(?:'s)?\s+(?:dossier|case\s*file|file|case|brief)"  # en, as the translator varied it
+    r"|(?:dossier|file|case\s*file)\s+(?:of|from)\s+coin\s*kurd"
+    r")[^\w\u0600-\u06FF]*$", re.I)
+_MARKS = re.compile(r"[\u064B-\u0652\u0654\u0670\u06D4\u200c\u200d\u200e\u200f]")   # diacritics, hamza-above, ZWNJ
+
+
+def is_label(line: str) -> bool:
+    return bool(LABEL_RE.match(_MARKS.sub("", re.sub(r"</?b>|\*\*", "", line or "")).strip()))
+
+
+def drop_label(text: str) -> str:
+    """the post without a leading channel label line — the subject is what the reader should see first"""
+    lines = (text or "").split("\n")
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    if lines and is_label(lines[0]):
+        lines.pop(0)
+    return "\n".join(lines).lstrip("\n")
+
+
+def post_title(text: str, fallback: str = "") -> str:
+    """the first line with real words that is not the channel's label, trimmed to 120 characters"""
+    title = ""
+    for ln in (text or "").split("\n"):
+        if is_label(ln):
+            continue
+        cand = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
+        cand = re.sub(r"</?b>|\*\*", "", cand)
+        cand = re.sub(r"#\S+", "", cand).strip(" :–-—|•\t")
+        if len(re.findall(r"[\w\u0600-\u06FF]", cand)) >= 3:
+            title = cand
+            break
+    title = title or fallback
+    if len(title) > 120:
+        title = title[:117].rstrip() + "…"
+    return title
+
+
 def extract_hashtags(text: str) -> list:
     return list(dict.fromkeys(HASHTAG_RE.findall(text or "")))
 
@@ -170,6 +215,12 @@ def parse_messages(html: str, channel: str) -> list:
             m = re.search(r"url\('?\"?([^'\")]+)'?\"?\)", style)
             if m:
                 photos.append(m.group(1))
+        if not photos:      # e.g. the dossier cards: sent as a large preview shown above the text
+            for p in wrap.select(".link_preview_image, .link_preview_right_image"):
+                m = re.search(r"url\('?\"?([^'\")]+)'?\"?\)", p.get("style", ""))
+                if m:
+                    photos.append(m.group(1))
+                    break
         video = wrap.select_one("video.tgme_widget_message_video")
         video_src = video.get("src") if video else None
 
@@ -193,16 +244,8 @@ def parse_messages(html: str, channel: str) -> list:
 
         hashtags = extract_hashtags(text)
         cls = classify(text, hashtags)
-        title = ""
-        for ln in text.split("\n"):
-            cand = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
-            cand = re.sub(r"#\S+", "", cand).strip(" :–-—|•\t")
-            if len(re.findall(r"[\w\u0600-\u06FF]", cand)) >= 3:
-                title = cand
-                break
-        title = title or cls["category"]
-        if len(title) > 120:
-            title = title[:117].rstrip() + "…"
+        text = drop_label(text)
+        title = post_title(text, cls["category"])
 
         out.append({
             "id": mid,

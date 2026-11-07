@@ -89,7 +89,7 @@ def post_img(p):
     """تصویر پست: همیشه نسخهٔ ذخیره‌شده در مخزن، و فقط در نبودش نشانی تلگرام.
     نشانی‌های cdn4.telesco.pe پس از چند ماه منقضی می‌شوند (scripts/postimg.py آن‌ها را محلی می‌کند)."""
     local = p.get("img") or ""
-    if local.startswith("/data/postimg/"):
+    if local.startswith(("/data/postimg/", "/data/deepimg/")):   # archived photo, or the dossier's own card
         return local
     return (p.get("photos") or [""])[0]
 
@@ -776,11 +776,12 @@ def build_feeds():
     cards = []
     for it in v[:60]:
         img = it.get("img") or ""
-        body = e(it.get("fa", "")).replace("&lt;b&gt;", "<b>").replace("&lt;/b&gt;", "</b>").replace("\n", "<br>")
+        from fetch import drop_label                 # the subject opens the card, never the channel's label
+        body = e(drop_label(it.get("fa", ""))).replace("&lt;b&gt;", "<b>").replace("&lt;/b&gt;", "</b>").replace("\n", "<br>")
         cards.append('<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
                      + (f'<img class="img" src="{e(img)}" alt="" loading="lazy">' if img.startswith("/data/deepimg/") else "")
                      + f'<small class="note">{fmt_date(it.get("at", ""))}</small><div lang="fa" dir="rtl">{body}</div></article>')
-    vt, vd = "پرونده‌های کوین کورد", "تحلیل عمیق مهم‌ترین رویدادهای روز کریپتو از دل گزارش معتبرترین رسانه‌های جهان، به پارسی"
+    vt, vd = "پرونده‌های تحلیلی", "تحلیل عمیق مهم‌ترین رویدادهای روز کریپتو از دل گزارش معتبرترین رسانه‌های جهان، به پارسی"
     urls.append(page("dossier/", vt, vd, f'<div class="meta"><a href="/">خانه</a> / {vt}</div><h1>{vt}</h1><p class="note">{vd}</p>'
                      + ("".join(cards) or '<p class="note">هنوز پرونده‌ای منتشر نشده است.</p>') + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>'))
     print(f"feed pages: {len(urls)}")
@@ -825,7 +826,7 @@ def build_hub():
     items = "".join(f'<li style="margin:8px 0"><b style="color:{"#22c55e" if x["score"] >= 12 else "#ef4444" if x["score"] <= -12 else "#eab308"}">{x["score"]:+d}</b> — {e(x["title"])}</li>'
                     for x in d.get("items", [])[:20])
     body = ('<div class="meta"><a href="/">خانه</a> / شاخص احساسات اخبار</div><h1>شاخص احساسات اخبار انتخاب</h1>'
-            '<p class="note">هوش مصنوعی هر خبر، تحلیل آنچین و پروندهٔ کوین کورد را از نظر اثر بر بازار نمره می‌دهد؛ میانگین ۲۴ ساعت، حس و حال اخبار امروز بازار است</p>'
+            '<p class="note">هوش مصنوعی هر خبر، تحلیل آنچین و پروندهٔ تحلیلی را از نظر اثر بر بازار نمره می‌دهد؛ میانگین ۲۴ ساعت، حس و حال اخبار امروز بازار است</p>'
             + _box(gauge) + (f'<h2>به تفکیک ارز</h2><div class="grid">{coins}</div>' if coins else "")
             + '<h2>روند روزانهٔ شاخص</h2><div id="sentc" style="width:100%"></div>'
             + (f'<h2>خبرهای ۲۴ ساعت اخیر و نمرهٔ آن‌ها</h2><ul class="txt">{items}</ul>' if items else "")
