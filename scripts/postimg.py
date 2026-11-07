@@ -65,9 +65,13 @@ class Dead(Exception):
 
 
 def grab(session, url):
-    """the picture's bytes; Dead when the link has expired, a requests error when the network failed"""
+    """the picture's bytes; Dead when the link has expired or the picture is another channel's advert
+    (then the post gets its own headline card), a requests error when the network failed"""
+    from adpics import is_ad
     r = session.get(url, headers=UA, timeout=30)
     if not r.ok or len(r.content) < 1500 or not r.headers.get("content-type", "").startswith("image"):
+        raise Dead(url)
+    if is_ad(r.content):
         raise Dead(url)
     return r.content
 
