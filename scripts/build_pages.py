@@ -1322,7 +1322,7 @@ def build_indicators():
 # ---------------------------------------------------------------- learning hub + glossary
 LANG_JS = ("(function(){var L;try{L=localStorage.getItem('ck_lang')}catch(e){}L=L||'fa';function ap(l){L=l;try{localStorage.setItem('ck_lang',l)}catch(e){}"
            "document.documentElement.lang=l;document.documentElement.dir=l==='en'?'ltr':'rtl';"
-           "document.querySelectorAll('[data-lang]').forEach(function(e){e.hidden=e.dataset.lang!==l});"
+           "document.querySelectorAll('[data-lang]:not(#ekh):not(#ekf)').forEach(function(e){e.hidden=e.dataset.lang!==l});"
            "document.querySelectorAll('.lsw button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});"
            "window.dispatchEvent(new CustomEvent('ek-lang',{detail:l}))}window.EKL=function(){return L};"
            "document.querySelectorAll('.lsw').forEach(function(w){w.addEventListener('click',function(e){var b=e.target.closest('button');if(b)ap(b.dataset.l)})});ap(L)})();")

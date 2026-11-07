@@ -63,6 +63,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   the `refbot-state` branch or existing page URLs; don't change the visual identity.
 - **If it fails, don't ship it.** If tests or builds fail and you cannot fix them within the run, push only a Log entry
   saying what failed and what you learned.
+- **`/kids/` is somebody else's open work.** The text in `content/b4j/**` is the My First Bitcoin curriculum
+  (CC BY-SA 4.0) and our translations of it. Keep the attribution, the licence link and `/kids/about/`; never present
+  it as official or as ours; never edit a translated file without keeping the exact block structure of the English
+  file (`python3 -I scripts/b4j_check.py fa|ckb` and `python3 scripts/kids_check.py` must stay at 0 errors/problems);
+  never add images or text from elsewhere into those pages; never bring back the old games/films/songs academy
+  (the owner replaced it on purpose on 2026-11-07).
 - Owner's standing rules: verify before publishing; whatever changes on the site is mirrored in the Telegram bot and the
   app (the app is a WebView of the site, so pages appear there automatically; add a bot section/menu entry when a new
   user-facing feature has one natural home in the bot).
@@ -88,6 +94,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
   collects what already exists and checks every internal link against the built tree, so adding an academy faculty
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
+- `/kids/` — **Bitcoin for Juniors** (6 modules, 21 activities, ages 8-12; fa · ckb · en). Lesson text lives ONLY in
+  `content/b4j/{en,fa,ckb}/**.md` (see `content/b4j/README.md`, provenance in `content/b4j/SOURCE.json`);
+  `scripts/b4j_md.py` parses it and proves each translation has the English block skeleton; `scripts/build_kids.py`
+  renders the pages (output is git-ignored and rebuilt by `update.yml` / `pages.yml`); `scripts/kids_check.py` checks
+  the built pages; `scripts/b4j_check.py` checks the translations; `scripts/b4j_import.py` re-imports the English from a
+  clone of `MyFirstBitcoin/mfb-curriculum` (run with `python3 -I`; asserted repairs; writes SOURCE.json). UI strings and the
+  About page are in `build_kids.py` (`UI`, `page_about`). Bot screen: `bot_learn.kids_screen` (links only). Nav entry:
+  `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
+
 ## Backlog (top = next)
 2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
    snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
@@ -103,8 +118,20 @@ The site's strategy (agreed with the owner, 2026-11-07):
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
+8. **Home page sideways wobble.** At 390 px width the home page is 1 px wider than the screen in all three languages (`div.ek-tools` / `a.ek-appb` in the header end at 391 px; same on main before the `/kids/` change, so not caused by it). Check with Playwright (`documentElement.scrollWidth - clientWidth`) and fix in `assets/chrome.css` without breaking the other pages; `/kids/` pages measure 0.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/kids/` replaced by the open "Bitcoin for Juniors" curriculum (asked for by the owner)
+The owner judged the home-made kids academy "very weak" and asked for My First Bitcoin's Bitcoin for Juniors in its place,
+complete and accurate in three languages. Done as: English imported verbatim (release 26.10, commit 4ad423b, CC BY-SA 4.0)
+with nine asserted formatting repairs in six files; Persian and Sorani translated by AI (all 33 files each), compared block-by-block
+with the English by `b4j_check.py`, then reviewed by independent AI reviewers (Sorani also got a separate language audit).
+No human has reviewed the translations — the About page says so. Not included: the printable appendices A/B/C and the PDF
+(they are not in the open repository). The old worlds/games/films/songs/studio pages and their scripts were removed (git
+history keeps them). Mirrored in the nav/footer (`chrome.py`), assistant index, bot (`bot_learn.kids_screen`) and the
+hourly rebuild. Do not "improve" the lessons here; improve the pages around them (navigation, print, accessibility) and
+keep the checks green.
 
 ### 2026-11-07 · Accountability inline on every post page (Backlog #4)
 - **Need:** the tested record lived on a side page; a reader deciding on a post never saw how that kind of post has fared.

@@ -261,9 +261,9 @@ M = {
              "en": "📚 <b>Learn & stay safe</b>\nFor a safe start, go through “Safe start” step by step."},
     "b_map": {"fa": "🗺 نقشهٔ یادگیری", "ckb": "🗺 نەخشەی فێربوون", "kmr": "🗺 Nexşeya fêrbûnê", "ar": "🗺 خريطة التعلم",
               "en": "🗺 Learning map"},
-    "b_kids": {"fa": "🧒 آکادمی کودکان و نوجوانان", "ckb": "🧒 ئەکادیمیای منداڵان و هەرزەکاران",
-               "kmr": "🧒 Akademiya zarok û ciwanan", "ar": "🧒 أكاديمية الأطفال واليافعين",
-               "en": "🧒 Kids &amp; Teens Academy"},
+    "b_kids": {"fa": "🧒 بیت‌کوین برای کودکان", "ckb": "🧒 بیتکۆین بۆ منداڵان",
+               "kmr": "🧒 Bitcoin ji bo zarokan", "ar": "🧒 البيتكوين للأطفال",
+               "en": "🧒 Bitcoin for Juniors"},
     "b_academy": {"fa": "🏛 آکادمی کریپتو و مسیر یادگیری سایت", "ckb": "🏛 ئەکادیمیای کریپتۆ و ڕێڕەوی فێربوون",
                   "kmr": "🏛 Akademiya kriptoyê û rêya fêrbûnê", "ar": "🏛 أكاديمية الكريبتو ومسار التعلم",
                   "en": "🏛 Crypto academy & learning path"},
@@ -472,62 +472,83 @@ MP = {
 
 
 KD = {
-    "title": {"fa": "🧒 <b>آکادمی کودکان و نوجوانان</b>", "ckb": "🧒 <b>ئەکادیمیای منداڵان و هەرزەکاران</b>",
-              "kmr": "🧒 <b>Akademiya zarok û ciwanan</b>", "ar": "🧒 <b>أكاديمية الأطفال واليافعين</b>",
-              "en": "🧒 <b>Kids &amp; Teens Academy</b>"},
-    "desc": {"fa": "چهار دنیا با درس، بازی و آزمون — هر درس دو نسخه دارد: ۶ تا ۱۲ سال و ۱۳ تا ۱۸ سال. "
-                   "به فارسی، کوردی و انگلیسی.",
-             "ckb": "چوار جیهان بە وانە، یاری و تاقیکردنەوە — هەر وانەیەک دوو وەشانی هەیە: ٦ تا ١٢ ساڵ و "
-                    "١٣ تا ١٨ ساڵ. بە فارسی، کوردی و ئینگلیزی.",
-             "kmr": "Çar cîhan bi ders, lîstik û testan — her ders du guhertoyên wê hene: 6-12 û 13-18 salî.",
-             "ar": "أربعة عوالم بدروس وألعاب واختبارات — لكل درس نسختان: ٦-١٢ و ١٣-١٨ سنة.",
-             "en": "Four worlds with lessons, games and a quiz — each lesson written twice, for ages 6-12 "
-                   "and 13-18, in Persian, Kurdish and English."},
-    "safe": {"fa": "بدون حساب، بدون تبلیغ، بدون قیمت زنده و بدون هیچ‌چیز برای فروش. "
-                   "فقط گروه سنی و یک نام دلخواه، آن هم در مرورگر خود کودک.",
-             "ckb": "بەبێ هەژمار، بەبێ ڕیکلام، بەبێ نرخی زیندوو و بەبێ هیچ شتێک بۆ فرۆشتن. "
-                    "تەنها گرووپی تەمەن و ناوێکی ئارەزوومەندانە، ئەویش لە وێبگەڕی خودی منداڵەکەدا.",
-             "kmr": "Bê hesab, bê reklam, bê bihayên zindî. Tenê koma temen û navekî bijarte.",
-             "ar": "بلا حساب ولا إعلانات ولا أسعار حيّة. فقط الفئة العمرية واسم اختياري، داخل متصفح الطفل.",
-             "en": "No account, no advertising, no live prices and nothing for sale. Only the age group and "
-                   "an optional first name, kept in the child\u2019s own browser."},
-    "b_open": {"fa": "🧒 باز کردن آکادمی", "ckb": "🧒 کردنەوەی ئەکادیمیا", "kmr": "🧒 Akademiyê veke",
-               "ar": "🧒 افتح الأكاديمية", "en": "🧒 Open the academy"},
-    "b_par": {"fa": "👪 صفحهٔ والدین", "ckb": "👪 پەڕەی دایک و باوک", "kmr": "👪 Rûpela dê û bav",
-              "ar": "👪 صفحة الأهل", "en": "👪 For parents"},
-    "b_studio": {"fa": "🎬 استودیوی انیمیشن و موسیقی", "ckb": "🎬 ستۆدیۆی ئەنیمەیشن و مۆسیقا",
-                 "kmr": "🎬 Studyoya anîmasyon û muzîkê", "ar": "🎬 استوديو الرسوم والموسيقى",
-                 "en": "🎬 Animation &amp; Music Studio"},
-    "film": {"fa": "🎬 چهار فیلم کوتاه و دو ترانهٔ اختصاصی — انیمیشن و موسیقی هر دو در خودِ مرورگر "
-                   "ساخته می‌شوند، پس هیچ فایل ویدئویی دانلود نمی‌شود و هیچ موسیقی‌ای از کسی قرض گرفته نشده.",
-             "ckb": "🎬 چوار فیلمی کورت و دوو گۆرانیی تایبەت — ئەنیمەیشن و مۆسیقا هەردووکیان لە خودی "
-                    "وێبگەڕدا دروست دەبن، کەواتە هیچ فایلێکی ڤیدیۆ دانالۆد ناکرێت.",
-             "kmr": "🎬 Çar fîlmên kurt û du stran — anîmasyon û muzîk di gerokê de tên çêkirin.",
-             "ar": "🎬 أربعة أفلام قصيرة وأغنيتان — الرسوم والموسيقى تُنتج داخل المتصفح نفسه.",
-             "en": "🎬 Four short films and two original songs — the animation and the music are both made "
-                   "inside the browser, so no video file is downloaded and no music is borrowed."},
-    "w": [("money", "🪙", {"fa": "دنیای پول", "ckb": "جیهانی پارە", "kmr": "Cîhana pereyan",
-                           "ar": "عالم المال", "en": "The World of Money"}),
-          ("chain", "⛓️", {"fa": "دنیای بلاک‌چین", "ckb": "جیهانی بلۆکچەین", "kmr": "Cîhana blokzincîrê",
-                           "ar": "عالم البلوكتشين", "en": "The Blockchain World"}),
-          ("safe", "🛡️", {"fa": "دنیای نگهبان", "ckb": "جیهانی پاسەوان", "kmr": "Cîhana parêzvan",
-                          "ar": "عالم الحارس", "en": "The Guardian World"}),
-          ("chart", "📈", {"fa": "دنیای نمودار", "ckb": "جیهانی هێڵکاری", "kmr": "Cîhana xêzkirinê",
-                           "ar": "عالم الرسوم البيانية", "en": "The Chart World"})],
+    "title": {"fa": "🧒 <b>بیت‌کوین برای کودکان</b>", "ckb": "🧒 <b>بیتکۆین بۆ منداڵان</b>",
+              "kmr": "🧒 <b>Bitcoin ji bo zarokan</b>", "ar": "🧒 <b>البيتكوين للأطفال</b>",
+              "en": "🧒 <b>Bitcoin for Juniors</b>"},
+    "desc": {"fa": "برنامهٔ درسی آزاد و رایگان «Bitcoin for Juniors» از سازمان غیرانتفاعی My First Bitcoin برای کودکان ۸ تا ۱۲ ساله: "
+                   "۶ فصل و ۲۱ فعالیت با بازی، قصه و گفت‌وگو دربارهٔ ارزش، قیمت، زمان، انرژی، انصاف و حریم خصوصی — "
+                   "و در پایان خودِ بیت‌کوین. لازم نیست کودکان مستقیم از بیت‌کوین استفاده کنند. "
+                   "متن کامل به فارسی، کوردی سورانی و انگلیسی.",
+             "ckb": "پرۆگرامی وانەیی کراوە و بێبەرامبەری «Bitcoin for Juniors» لە ڕێکخراوی ناقازانجی My First Bitcoin بۆ منداڵانی ٨ بۆ ١٢ ساڵ: "
+                    "٦ بەش و ٢١ چالاکی بە یاری، چیرۆک و گفتوگۆ دەربارەی بەها، نرخ، کات، وزە، دادپەروەری و تایبەتێتی — "
+                    "لە کۆتاییدا خودی بیتکۆین. پێویست ناکات منداڵان ڕاستەوخۆ بیتکۆین بەکاربهێنن. "
+                    "دەقی تەواو بە فارسی، کوردیی سۆرانی و ئینگلیزی.",
+             "kmr": "Bernameya dersê ya vekirî û belaş «Bitcoin for Juniors» ji rêxistina ne-qezencî My First Bitcoin, ji bo zarokên 8 heta 12 salî: "
+                    "6 beş û 21 çalakî bi lîstik, çîrok û gotûbêj li ser nirx, biha, dem, enerjî, dadmendî û nehêniyê — "
+                    "û di dawiyê de Bitcoin bi xwe. Ne pêwist e zarok rasterast Bitcoin bi kar bînin. "
+                    "Nivîsa tevahî bi Farsî, Soranî û Îngilîzî ye.",
+             "ar": "منهج مفتوح ومجاني «Bitcoin for Juniors» من منظمة My First Bitcoin غير الربحية للأطفال من ٨ إلى ١٢ سنة: "
+                   "٦ فصول و٢١ نشاطًا بالألعاب والقصص والنقاش حول القيمة والسعر والوقت والطاقة والعدالة والخصوصية — "
+                   "ثم البيتكوين نفسه في النهاية. لا يُطلب من الأطفال استخدام البيتكوين مباشرةً. "
+                   "النص الكامل بالفارسية والكردية السورانية والإنجليزية.",
+             "en": "The free, open “Bitcoin for Juniors” curriculum by the non-profit My First Bitcoin, for children aged 8 to 12: "
+                   "6 modules and 21 activities of games, stories and discussion about value, price, time, energy, fairness and privacy — "
+                   "and, at the end, Bitcoin itself. Children are not required to use Bitcoin directly. "
+                   "Full text in Persian, Sorani Kurdish and English."},
+    "note": {"fa": "ترجمه‌های فارسی و کوردی سورانی با هوش مصنوعی انجام شده‌اند و رسمی نیستند؛ متن انگلیسی کنار آن است. مجوز: CC BY-SA 4.0. "
+                   "پیشرفت شما فقط در مرورگر خودتان ذخیره می‌شود. آموزشی است، توصیهٔ مالی نیست.",
+             "ckb": "وەرگێڕانی فارسی و کوردیی سۆرانی بە زیرەکیی دەستکرد کراوە و فەرمی نییە؛ دەقی ئینگلیزی لەگەڵیدایە. مۆڵەت: CC BY-SA 4.0. "
+                    "پێشکەوتنت تەنها لە وێبگەڕی خۆتدا پاشەکەوت دەکرێت. فێرکارییە، ئامۆژگاریی دارایی نییە.",
+             "kmr": "Wergera Farsî û Soranî bi AI hatiye çêkirin û ne fermî ye; nivîsa Îngilîzî li kêleka wê ye. Lîsans: CC BY-SA 4.0. "
+                    "Pêşketina te tenê di gerokê te de tê tomar kirin. Perwerdehî ye, ne şîreta darayî ye.",
+             "ar": "الترجمتان الفارسية والكردية السورانية أُنجزتا بالذكاء الاصطناعي وليستا رسميتين؛ والنص الإنجليزي بجانبهما. الترخيص: CC BY-SA 4.0. "
+                   "يُحفظ تقدمك في متصفحك فقط. المحتوى تعليمي وليس نصيحة مالية.",
+             "en": "The Persian and Sorani Kurdish translations were made with AI and are unofficial; the English text sits beside them. "
+                   "Licence: CC BY-SA 4.0. Your progress is kept only in your own browser. Educational, not financial advice."},
+    "b_open": {"fa": "🧒 باز کردن برنامهٔ درسی", "ckb": "🧒 کردنەوەی پرۆگرامی وانەیی", "kmr": "🧒 Bernameyê veke",
+               "ar": "🧒 افتح المنهج", "en": "🧒 Open the curriculum"},
+    "b_par": {"fa": "👪 راهنمای والدین", "ckb": "👪 ڕێبەری دایک و باوکان", "kmr": "👪 Rêbera dê û bavan",
+              "ar": "👪 دليل الأهل", "en": "👪 Parent guide"},
+    "b_gloss": {"fa": "📖 واژه‌نامه", "ckb": "📖 وشەنامە", "kmr": "📖 Ferheng", "ar": "📖 المسرد",
+                "en": "📖 Glossary"},
+    "b_about": {"fa": "ℹ️ دربارهٔ این برنامه، مجوز و ترجمه", "ckb": "ℹ️ دەربارەی ئەم پرۆگرامە، مۆڵەت و وەرگێڕان",
+                "kmr": "ℹ️ Der barê bernameyê, lîsans û wergerê", "ar": "ℹ️ عن المنهج والترخيص والترجمة",
+                "en": "ℹ️ About the curriculum, licence and translation"},
+    "mods": [
+        (1, "🤝", {"fa": "مبادله، ارزش و قیمت", "ckb": "ئالوگۆڕ، بەها و نرخ", "kmr": "Danûstandin, nirx û biha",
+                   "ar": "التبادل والقيمة والسعر", "en": "Exchange, Value, and Price"}),
+        (2, "⏳", {"fa": "زمان، انرژی و پاداش", "ckb": "کات، وزە و پاداش", "kmr": "Dem, enerjî û xelat",
+                   "ar": "الوقت والطاقة والمكافأة", "en": "Time, Energy, and Reward"}),
+        (3, "🖥️", {"fa": "آنالوگ در برابر دیجیتال", "ckb": "ئەنالۆگ بەرامبەر دیجیتاڵ", "kmr": "Analog li hemberî dîjîtal",
+                    "ar": "التناظري مقابل الرقمي", "en": "Analog vs. Digital"}),
+        (4, "🔐", {"fa": "ایمنی، امنیت و حریم خصوصی", "ckb": "سەلامەتی، ئاسایش و تایبەتێتی", "kmr": "Ewlehî, ewlekarî û nehênî",
+                   "ar": "السلامة والأمان والخصوصية", "en": "Safety, Security, and Privacy"}),
+        (5, "💰", {"fa": "پول مهم است", "ckb": "پارە گرنگە", "kmr": "Pere girîng e",
+                   "ar": "المال مهم", "en": "Money Matters"}),
+        (6, "₿", {"fa": "مبانی بیت‌کوین", "ckb": "بنەماکانی بیتکۆین", "kmr": "Bingehên Bitcoinê",
+                  "ar": "أساسيات البيتكوين", "en": "Bitcoin Basics"}),
+    ],
 }
 
 
+def _num(n, lang):
+    """a module number in the digits of the reader's language"""
+    d = {"fa": "۰۱۲۳۴۵۶۷۸۹", "ckb": "٠١٢٣٤٥٦٧٨٩", "ar": "٠١٢٣٤٥٦٧٨٩"}.get(lang)
+    return "".join(d[int(c)] for c in str(n)) if d else str(n)
+
+
 def kids_screen(lang):
-    """-> (text, rows): the children's academy, with a button per world"""
-    out = [L(KD["title"], lang), L(KD["desc"], lang), "", L(KD["safe"], lang), ""]
-    for _wid, icon, t in KD["w"]:
-        out.append(f"{icon} {L(t, lang)}")
-    out += ["", L(KD["film"], lang), "", L(AC["note"], lang)]
+    """-> (text, rows): the 'Bitcoin for Juniors' course (open curriculum, CC BY-SA 4.0) with a button per module"""
+    out = [L(KD["title"], lang), L(KD["desc"], lang), ""]
+    for n, icon, t in KD["mods"]:
+        out.append(f"{icon} {_num(n, lang)}. {L(t, lang)}")
+    out += ["", L(KD["note"], lang)]
     rows = [[{"text": L(KD["b_open"], lang), "url": SITE + "/kids/"}]]
-    btns = [{"text": f"{icon} {L(t, lang)}"[:64], "url": f"{SITE}/kids/{wid}/"} for wid, icon, t in KD["w"]]
+    btns = [{"text": f"{icon} {_num(n, lang)}. {L(t, lang)}"[:64], "url": f"{SITE}/kids/m{n}/"} for n, icon, t in KD["mods"]]
     rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
-    rows += [[{"text": L(KD["b_studio"], lang), "url": SITE + "/kids/studio/"}]]
-    rows += [[{"text": L(KD["b_par"], lang), "url": SITE + "/kids/parents/"}]]
+    rows += [[{"text": L(KD["b_par"], lang), "url": SITE + "/kids/parents/"},
+              {"text": L(KD["b_gloss"], lang), "url": SITE + "/kids/glossary/"}]]
+    rows += [[{"text": L(KD["b_about"], lang), "url": SITE + "/kids/about/"}]]
     rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
               {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
     return "\n".join(out), rows
