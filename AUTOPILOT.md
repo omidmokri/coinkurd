@@ -91,8 +91,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
    snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
-3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
-   countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
+3. **The founder and the nightly class.** Home strip with countdown shipped 2026-11-07. Remaining: a `/class/` page
+   (what the class covers, schedule, the books); Person schema on `/about/` already exists — reuse it.
 4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
 5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
@@ -104,6 +104,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · Nightly class strip on the home page (Backlog #3, slice 1)
+- **Need:** the human moat was invisible — nothing on the home page said there is a live class every night.
+- **Built:** `#classStrip` (class `clsS`) under the `/today/` card in `index.html`: "Tonight's live class — 20:00 Tehran
+  on Discord" with a live countdown (same UTC 16:30 rule as `/today/`), linking to the channel's existing Discord invite.
+  I18N keys `hClass`, `hClassIn`, `hClassGo`, `hClsH`, `hClsM` in fa/ckb/en; countdown re-renders on language switch.
+  Bot already shows the countdown in `sec_today`, so no bot change.
+- **Verified:** served the repo, Playwright + Chrome at 1280 (fa) and 390 (en, ckb); countdown read 19 h 56 min at 20:34
+  UTC (= 16:30 next day, correct); zero JS errors after fixing an apostrophe that broke the I18N string. Looked at the shots.
+- **Next:** `/class/` page (Backlog #3 remainder), or Backlog #4.
 
 ### 2026-11-07 · `/today/` card on the home page (Backlog #2, slice 3)
 - **Need:** the spine had no front door — the home page opened on thirty tiles with no "start here".
