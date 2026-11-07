@@ -89,8 +89,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
 ## Backlog (top = next)
-2. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
-   scanner findings with their tested record, today's posts, the nightly class topic; archived by date for search.
+2. **`/today/` — rest of the spine.** Slice 1 shipped 2026-11-07. Still to do: a home-page card linking to it, a bot
+   section mirroring it, and per-day snapshots (`/daily/<date>/` already archives the market part).
 3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
    countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
 4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
@@ -104,6 +104,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/today/` — the daily spine, slice 1 (Backlog #2)
+- **Need:** thirty tools and no starting point; a trader opening the site wants "what happened in the last 24h" in one place.
+- **Built:** `scripts/build_today.py` → `/today/` (fa/ckb/en): BTC 24h, fear & greed, breadth and biggest movers from
+  `brain.json` (+ the machine summary, collapsed, with its time); Iran friction score, USDT in toman and the BTC gap from
+  `friction.json`; scanner findings of the last 24h each with its pattern's tested verdict from `scanaudit.json`; channel
+  posts of the last 24h; nightly class 20:00 Tehran with a live countdown. Missing data → "no data yet". Menu entry
+  (markets group, before Daily report), assistant index, sitemap, `update.yml` + `pages.yml`. Archive: links to `/daily/`.
+- **Verified:** py_compile; `recent()` unit test (window boundaries exclusive/inclusive, bad/missing timestamps, order);
+  built on a scratch copy with real data; screenshots fa/en at 1280/390, zero JS errors.
+- **Next:** finish `/today/` (home card, bot section) or Backlog #3.
 
 ### 2026-11-07 · Scanner audit, part 2 — real result published (Backlog #1)
 - **Real result (CI, 16:24 UTC, 196 coins, 5,258 findings, 2026-09-27 → 2026-11-06):** all findings together +0.01% vs
