@@ -34,8 +34,7 @@ for p in ps:
     # a dossier card is sent as a large preview of the card's own file in this repository — that file is the picture
     lk = (p.get("link") or {}).get("url") or "" if isinstance(p.get("link"), dict) else ""
     m = DEEPIMG_RE.match(lk)
-    if m and not str(p.get("img") or "").startswith(("/data/postimg/", "/data/deepimg/")) \
-            and os.path.exists(os.path.join(ROOT, m.group(1))):
+    if m and os.path.exists(os.path.join(ROOT, m.group(1))):       # the real card always wins over a drawn one
         p["img"] = "/" + m.group(1)
     for f in p.get("footer") or []:
         if DISCORD_RE.fullmatch(f.get("url", "")):

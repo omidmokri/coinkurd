@@ -193,6 +193,8 @@ def main():
     for p in need:
         if made >= a.cards or local(p) or p.get("photos"):
             continue
+        if "/data/deepimg/" in str((p.get("link") or {}).get("url") if isinstance(p.get("link"), dict) else ""):
+            continue                                  # a dossier: repair.py points it at its own card
         try:
             path = store(p["id"], card_for(p))
         except Exception as ex:                       # one post's card must not stop the rest
