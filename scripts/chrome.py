@@ -199,6 +199,8 @@ NAV = [
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
         ("/map/", "map", L("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
          L("هر چیزی که باید بلد باشید، روی یک نقشه — با تیک زدن پیشرفت", "هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە — بە نیشانەکردنی پێشکەوتن", "Everything there is to learn on one map — tick your way through it")),
+        ("/kids/", "cap", L("آکادمی کودکان و نوجوانان", "ئەکادیمیای منداڵان و هەرزەکاران", "Kids & Teens Academy"),
+         L("پول، بلاک‌چین، امنیت و نمودار با بازی — برای ۶ تا ۱۸ سال", "پارە، بلۆکچەین، ئاسایش و هێڵکاری بە یاری — بۆ ٦ تا ١٨ ساڵ", "Money, blockchains, safety and charts through games — ages 6 to 18")),
         ("/encyclopedia/", "library", L("دانشنامهٔ بازارهای مالی", "زانستنامەی بازاڕە داراییەکان", "Encyclopedia of financial markets"),
          L("۵۰۶ مدخل به فارسی، کوردی و انگلیسی، با فرمول و منبع", "٥٠٦ خاڵ بە فارسی، کوردی و ئینگلیزی، بە فۆرموڵ و سەرچاوە", "506 entries in Persian, Kurdish and English, with formulas and sources")),
         ("/academy/", "cap", L("آکادمی کریپتو", "ئەکادیمیای کریپتۆ", "Crypto Academy"),
@@ -282,7 +284,7 @@ FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
-GLOW = {"/map/", "/academy/", "/academy/f13/"}
+GLOW = {"/map/", "/kids/", "/academy/", "/academy/f13/"}
 
 
 def _item(href, ic, title, desc, lang):

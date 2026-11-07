@@ -37,6 +37,7 @@ jobs:
           python scripts/build_today.py
           python scripts/build_autopilot.py
           python scripts/build_map.py
+          python scripts/build_kids.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: "." }

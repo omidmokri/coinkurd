@@ -52,6 +52,7 @@ FEATURES = [
     ("/me/", ["center", "pf"], "alerts"),
     ("/encyclopedia/", ["enc"], "enc"),
     ("/map/", ["learn"], None),
+    ("/kids/", ["learn"], None),
     ("/learn/", ["learn"], None),
     ("/#feed", ["posts"], "posts"),
 ]

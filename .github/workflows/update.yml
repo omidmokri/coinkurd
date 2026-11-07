@@ -350,6 +350,10 @@ jobs:
         continue-on-error: true
         run: python scripts/build_map.py
 
+      - name: Build the kids & teens academy (/kids/)
+        continue-on-error: true
+        run: python scripts/build_kids.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: "." }

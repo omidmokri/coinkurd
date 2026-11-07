@@ -261,6 +261,9 @@ M = {
              "en": "📚 <b>Learn & stay safe</b>\nFor a safe start, go through “Safe start” step by step."},
     "b_map": {"fa": "🗺 نقشهٔ یادگیری", "ckb": "🗺 نەخشەی فێربوون", "kmr": "🗺 Nexşeya fêrbûnê", "ar": "🗺 خريطة التعلم",
               "en": "🗺 Learning map"},
+    "b_kids": {"fa": "🧒 آکادمی کودکان و نوجوانان", "ckb": "🧒 ئەکادیمیای منداڵان و هەرزەکاران",
+               "kmr": "🧒 Akademiya zarok û ciwanan", "ar": "🧒 أكاديمية الأطفال واليافعين",
+               "en": "🧒 Kids &amp; Teens Academy"},
     "b_academy": {"fa": "🏛 آکادمی کریپتو و مسیر یادگیری سایت", "ckb": "🏛 ئەکادیمیای کریپتۆ و ڕێڕەوی فێربوون",
                   "kmr": "🏛 Akademiya kriptoyê û rêya fêrbûnê", "ar": "🏛 أكاديمية الكريبتو ومسار التعلم",
                   "en": "🏛 Crypto academy & learning path"},
@@ -298,7 +301,7 @@ M = {
 
 def menu(lang):
     b = lambda k, d: {"text": L(M[k], lang), "callback_data": d}
-    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_academy", "la:0")],
+    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_kids", "lk:0")], [b("b_academy", "la:0")],
                                 [b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
                                 [b("b_check", "m:token"), b("b_report", "lr:0")]]
 
@@ -466,6 +469,56 @@ MP = {
              "kmr": "Nexşe hê nehatiye çêkirin; paşê dîsa biceribîne.", "ar": "لم تُبنَ الخريطة بعد؛ حاول لاحقاً.",
              "en": "The map has not been built yet; try again shortly."},
 }
+
+
+KD = {
+    "title": {"fa": "🧒 <b>آکادمی کودکان و نوجوانان</b>", "ckb": "🧒 <b>ئەکادیمیای منداڵان و هەرزەکاران</b>",
+              "kmr": "🧒 <b>Akademiya zarok û ciwanan</b>", "ar": "🧒 <b>أكاديمية الأطفال واليافعين</b>",
+              "en": "🧒 <b>Kids &amp; Teens Academy</b>"},
+    "desc": {"fa": "چهار دنیا با درس، بازی و آزمون — هر درس دو نسخه دارد: ۶ تا ۱۲ سال و ۱۳ تا ۱۸ سال. "
+                   "به فارسی، کوردی و انگلیسی.",
+             "ckb": "چوار جیهان بە وانە، یاری و تاقیکردنەوە — هەر وانەیەک دوو وەشانی هەیە: ٦ تا ١٢ ساڵ و "
+                    "١٣ تا ١٨ ساڵ. بە فارسی، کوردی و ئینگلیزی.",
+             "kmr": "Çar cîhan bi ders, lîstik û testan — her ders du guhertoyên wê hene: 6-12 û 13-18 salî.",
+             "ar": "أربعة عوالم بدروس وألعاب واختبارات — لكل درس نسختان: ٦-١٢ و ١٣-١٨ سنة.",
+             "en": "Four worlds with lessons, games and a quiz — each lesson written twice, for ages 6-12 "
+                   "and 13-18, in Persian, Kurdish and English."},
+    "safe": {"fa": "بدون حساب، بدون تبلیغ، بدون قیمت زنده و بدون هیچ‌چیز برای فروش. "
+                   "فقط گروه سنی و یک نام دلخواه، آن هم در مرورگر خود کودک.",
+             "ckb": "بەبێ هەژمار، بەبێ ڕیکلام، بەبێ نرخی زیندوو و بەبێ هیچ شتێک بۆ فرۆشتن. "
+                    "تەنها گرووپی تەمەن و ناوێکی ئارەزوومەندانە، ئەویش لە وێبگەڕی خودی منداڵەکەدا.",
+             "kmr": "Bê hesab, bê reklam, bê bihayên zindî. Tenê koma temen û navekî bijarte.",
+             "ar": "بلا حساب ولا إعلانات ولا أسعار حيّة. فقط الفئة العمرية واسم اختياري، داخل متصفح الطفل.",
+             "en": "No account, no advertising, no live prices and nothing for sale. Only the age group and "
+                   "an optional first name, kept in the child\u2019s own browser."},
+    "b_open": {"fa": "🧒 باز کردن آکادمی", "ckb": "🧒 کردنەوەی ئەکادیمیا", "kmr": "🧒 Akademiyê veke",
+               "ar": "🧒 افتح الأكاديمية", "en": "🧒 Open the academy"},
+    "b_par": {"fa": "👪 صفحهٔ والدین", "ckb": "👪 پەڕەی دایک و باوک", "kmr": "👪 Rûpela dê û bav",
+              "ar": "👪 صفحة الأهل", "en": "👪 For parents"},
+    "w": [("money", "🪙", {"fa": "دنیای پول", "ckb": "جیهانی پارە", "kmr": "Cîhana pereyan",
+                           "ar": "عالم المال", "en": "The World of Money"}),
+          ("chain", "⛓️", {"fa": "دنیای بلاک‌چین", "ckb": "جیهانی بلۆکچەین", "kmr": "Cîhana blokzincîrê",
+                           "ar": "عالم البلوكتشين", "en": "The Blockchain World"}),
+          ("safe", "🛡️", {"fa": "دنیای نگهبان", "ckb": "جیهانی پاسەوان", "kmr": "Cîhana parêzvan",
+                          "ar": "عالم الحارس", "en": "The Guardian World"}),
+          ("chart", "📈", {"fa": "دنیای نمودار", "ckb": "جیهانی هێڵکاری", "kmr": "Cîhana xêzkirinê",
+                           "ar": "عالم الرسوم البيانية", "en": "The Chart World"})],
+}
+
+
+def kids_screen(lang):
+    """-> (text, rows): the children's academy, with a button per world"""
+    out = [L(KD["title"], lang), L(KD["desc"], lang), "", L(KD["safe"], lang), ""]
+    for _wid, icon, t in KD["w"]:
+        out.append(f"{icon} {L(t, lang)}")
+    out += ["", L(AC["note"], lang)]
+    rows = [[{"text": L(KD["b_open"], lang), "url": SITE + "/kids/"}]]
+    btns = [{"text": f"{icon} {L(t, lang)}"[:64], "url": f"{SITE}/kids/{wid}/"} for wid, icon, t in KD["w"]]
+    rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
+    rows += [[{"text": L(KD["b_par"], lang), "url": SITE + "/kids/parents/"}]]
+    rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
+              {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    return "\n".join(out), rows
 
 
 def map_screen(lang):
