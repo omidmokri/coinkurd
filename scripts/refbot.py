@@ -1151,6 +1151,12 @@ def handle_private(s, msg):
                 return after_verified(s, uid, chat_id)
             return send(chat_id, t("join_first", x["lang"]), kb_join(x["lang"]))
         welcome(chat_id, x["lang"])
+        # a deep link from the site's assistant (t.me/<bot>?start=s_<section>) opens that section directly
+        if arg.startswith("s_") and (arg[2:] in SECTIONS or arg[2:] in MN.S):
+            try:
+                return send(chat_id, *render(s, uid, arg[2:]))
+            except Exception:
+                log.exception("deep link %s failed", arg)
         return send(chat_id, *render(s, uid, "main"))
 
     x = upsert(s, u)

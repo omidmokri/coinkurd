@@ -1,5 +1,7 @@
 """
-«پروندهٔ کوین کورد» — 5 deep posts a day for @Coin_Kurd, researched from the world's leading crypto newsrooms.
+Dossiers — 5 deep posts a day for @Coin_Kurd, researched from the world's leading crypto newsrooms.
+Each post opens with its own headline. The channel's name is not part of the post: it used to open every
+dossier with «🧠 پروندهٔ کوین کورد», which made the site title all of them with the channel's name.
 
 Pipeline for every slot:
   1. research  — read the RSS feeds of top global outlets, group the last hours' headlines into stories, and pick
@@ -33,6 +35,7 @@ import bot_feeds as F
 import bot_reel as R  # noqa: F401
 import infocard as IC
 from bot_videos import SIG
+from fetch import is_label
 
 log = logging.getLogger("deep")
 
@@ -170,8 +173,7 @@ WRITE = """نقش تو مدیر ارشد محتوا، روان‌شناس رفت
 از یادداشت پژوهشی زیر یک پست تلگرامی فوق‌حرفه‌ای بساز که مخاطب را در نگاه اول قفل کند.
 
 قالب ثابت کانال (همیشه دقیقاً همین ترتیب و همین سرتیترها):
-خط ۱: 🧠 پروندهٔ کوین کورد
-خط ۲: قوی‌ترین قلاب ممکن به‌عنوان تیتر، داخل <b></b> (از بین پنج قلاب روان‌شناسانه‌ای که در ذهنت می‌سازی بهترین را بگذار؛ بدون اغراق دروغ)
+خط ۱: تیترِ خودِ موضوع، داخل <b></b> — قوی‌ترین قلاب ممکن (از بین پنج قلاب روان‌شناسانه‌ای که در ذهنت می‌سازی بهترین را بگذار؛ بدون اغراق دروغ). این خط عنوان پست در سایت هم هست، پس باید فقط دربارهٔ همین رویداد باشد
 ━━━━━━━━━━
 ⚡️ <b>در ۳ ثانیه</b>
 یک جملهٔ کوبنده که کل ماجرا را می‌گوید
@@ -197,6 +199,7 @@ WRITE = """نقش تو مدیر ارشد محتوا، روان‌شناس رفت
 - فقط از یادداشت پژوهشی استفاده کن؛ هیچ عدد یا رویدادی از خودت نساز
 - هیچ حرف لاتین ننویس (نام شرکت‌ها و اصطلاحات را به پارسی بنویس، مثلاً بلک‌راک، صندوق قابل معامله، کمیسیون بورس آمریکا)
 - هیچ لینک یا نام رسانه ننویس
+- نام کانال، سایت، ربات یا هر برچسب و امضای برند (مثل «کوین کورد» یا «پرونده») را در هیچ جای پست ننویس؛ امضای کانال را خود ربات اضافه می‌کند
 - فقط از تگ <b> برای برجسته کردن استفاده کن؛ هیچ تگ دیگری نه
 - آخر خط‌ها نقطه نگذار
 - کل متن بین ۹۰۰ و ۲۲۰۰ کاراکتر
@@ -232,8 +235,12 @@ def check(text):
         p.append("فقط تگ <b> مجاز است")
     if len(re.findall(r"#\S+", text)) != 4:
         p.append("دقیقاً چهار هشتگ در خط آخر")
-    if not text.startswith("🧠 پروندهٔ کوین کورد"):
-        p.append("خط اول باید دقیقاً «🧠 پروندهٔ کوین کورد» باشد")
+    first = text.split("\n", 1)[0].strip()
+    if not (first.startswith("<b>") and first.endswith("</b>")) or len(re.sub(r"</?b>", "", first)) < 12:
+        p.append("خط اول باید خودِ تیتر موضوع باشد، داخل <b></b>")
+    # the channel's name anywhere, or the old label as the opening — but a legal «پرونده» inside a story is fine
+    if is_label(first) or re.search(r"کوین\s*کورد", re.sub(r"</?b>", "", text)) or "پرونده" in first:
+        p.append("نام کانال یا برچسب «پرونده» نباید در پست بیاید؛ تیتر خودِ موضوع است")
     if text.count("<b>") != text.count("</b>"):
         p.append("تگ‌های <b> باید بسته شوند")
     return p

@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "4"  # bump to bust caches of chrome.css / chrome.js
+VER = "5"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -155,7 +155,7 @@ NAV = [
          L("انتقال‌های بزرگ روی زنجیره", "گواستنەوە گەورەکان", "Large on-chain transfers")),
         ("/predict/", "rewind", L("بازی پیش‌بینی", "یاری پێشبینی", "Prediction game"),
          L("پیش‌بینی کن، امتیاز بگیر", "پێشبینی بکە، خاڵ وەربگرە", "Predict and earn points")),
-        ("/dossier/", "news", L("پرونده‌های کوین کورد", "دۆسیەکانی کۆین کورد", "Coin Kurd dossiers"),
+        ("/dossier/", "news", L("پرونده‌های تحلیلی", "دۆسیە شیکارییەکان", "Analysis dossiers"),
          L("تحلیل عمیق رویدادهای مهم روز", "شیکاری قووڵی ڕووداوە گرنگەکان", "Deep dives on the day's key stories")),
         ("/daily/", "calendar", L("گزارش روزانه", "ڕاپۆرتی ڕۆژانە", "Daily report"),
          L("خلاصهٔ هوشمند هر روز بازار", "پوختەی زیرەکی هەر ڕۆژێکی بازاڕ", "A smart summary of every market day")),

@@ -60,79 +60,150 @@ def shrink(data):
         return (data, "jpg") if len(data) < 900_000 else (None, None)
 
 
+class Dead(Exception):
+    """the address answered, but not with a picture — an expired Telegram link, not a network fault"""
+
+
 def grab(session, url):
-    """تصویر را می‌گیرد؛ None یعنی نشانی مرده یا پاسخ بی‌اعتبار است."""
-    try:
-        r = session.get(url, headers=UA, timeout=30)
-    except Exception:
-        return None
+    """the picture's bytes; Dead when the link has expired, a requests error when the network failed"""
+    r = session.get(url, headers=UA, timeout=30)
     if not r.ok or len(r.content) < 1500 or not r.headers.get("content-type", "").startswith("image"):
-        return None
+        raise Dead(url)
     return r.content
+
+
+def fresh_urls(session, channel, ids):
+    """Fresh picture addresses for the given posts, read from the channel's public pages.
+    A stored cdn4.telesco.pe address dies after a while; the page always carries a live one. Each
+    page holds about twenty posts, so the whole archive costs a few dozen requests, not one per post."""
+    from fetch import fetch_page, parse_messages
+    want, found = set(ids), {}
+    before = max(want) + 1 if want else None
+    pages = 0
+    while want and before and pages < 120:
+        try:
+            html = fetch_page(session, channel, before)
+        except Exception as ex:                       # a failed page is skipped, the rest still count
+            print(f"postimg: page before {before} failed ({ex})")
+            break
+        pages += 1
+        msgs = parse_messages(html, channel)
+        if not msgs:
+            break
+        for m in msgs:
+            if m["id"] in want and m.get("photos"):
+                found[m["id"]] = m["photos"][0]
+        lowest = min(m["id"] for m in msgs)
+        want = {i for i in want if i < lowest}        # everything at or above this page is settled
+        before = max(want) + 1 if want else None
+        time.sleep(0.8)
+    print(f"postimg: {pages} channel pages read, {len(found)} fresh addresses")
+    return found
+
+
+CAT_FA = {"news": "خبر", "analysis": "تحلیل", "education": "آموزش", "signal": "سیگنال", "product": "ابزار",
+          "promo": "کوین کورد", "notice": "اطلاعیه"}
+
+
+def card_for(p):
+    """a picture for a post that never had one, made from its own headline and opening lines"""
+    from datetime import datetime
+    import infocard as IC
+    when = None
+    try:
+        when = datetime.fromisoformat(p.get("date") or "")
+    except Exception:
+        pass
+    return IC.title_card(p.get("title") or "", p.get("text") or "",
+                         badge=CAT_FA.get(p.get("kind") or "", "کوین کورد"), when=when)
+
+
+def store(pid, raw):
+    data, ext = shrink(raw)
+    if not data:
+        return None
+    with open(os.path.join(IMGDIR, f"{pid}.{ext}"), "wb") as fh:
+        fh.write(data)
+    return f"{WEB}{pid}.{ext}"
+
+
+def local(p):
+    return str(p.get("img") or "").startswith((WEB, "/data/deepimg/"))
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--limit", type=int, default=150, help="حداکثر تصویر در هر اجرا")
-    ap.add_argument("--refresh", type=int, default=0, help="پیش از دانلود، این تعداد صفحه را دوباره اسکرپ کن")
-    ap.add_argument("--tries", type=int, default=0, help="سقف تلاش (پیش‌فرض: سه برابر limit)")
+    ap.add_argument("--limit", type=int, default=400, help="حداکثر تصویر تازه در هر اجرا")
+    ap.add_argument("--channel", default=os.environ.get("TG_CHANNEL", "Coin_Kurd"))
+    ap.add_argument("--cards", type=int, default=60, help="حداکثر کارت ساختنی برای پست‌های بی‌تصویر")
     a = ap.parse_args()
-
-    if a.refresh:                      # نشانی‌های تازه برای پست‌هایی که لینکشان منقضی شده
-        import subprocess
-        subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "fetch.py"),
-                        "--pages", str(a.refresh), "--backfill"], check=False)
 
     doc = load()
     ps = posts_of(doc)
     os.makedirs(IMGDIR, exist_ok=True)
-    have = {f.rsplit(".", 1)[0] for f in os.listdir(IMGDIR)}
+    files = {f.rsplit(".", 1)[0]: f for f in os.listdir(IMGDIR)}
+    for p in ps:                                       # a file already here: point the post at it
+        f = files.get(str(p.get("id")))
+        if f and not local(p):
+            p["img"] = WEB + f
 
-    done = dead = kept = tried = 0
-    streak = 0                      # شکست‌های پشت‌سرهم
-    tries_cap = a.tries or a.limit * 3
+    need = sorted((p for p in ps if not local(p)), key=lambda x: x.get("id", 0), reverse=True)
     session = requests.Session()
-    # از تازه‌ترین به قدیمی‌ترین: اگر اجرا نصفه ماند، مهم‌ترین‌ها ذخیره شده‌اند
-    for p in sorted(ps, key=lambda x: x.get("id", 0), reverse=True):
-        pid = str(p.get("id"))
-        if pid in have:                                   # فایلش هست، فقط مسیر را مطمئن شو
-            if not str(p.get("img", "")).startswith(WEB):
-                ext = next((f.rsplit(".", 1)[1] for f in os.listdir(IMGDIR) if f.startswith(pid + ".")), "webp")
-                p["img"] = f"{WEB}{pid}.{ext}"
-            kept += 1
-            continue
+    done = dead = 0
+    stale = []
+    # 1. the stored address, while it still works — newest first, so a cut-short run saves what matters
+    for p in need:
+        if done >= a.limit:
+            break
         src = (p.get("photos") or [None])[0]
-        if not src:
+        if not src or src.startswith("/"):
             continue
-        if done >= a.limit or tried >= tries_cap:
+        try:
+            path = store(p["id"], grab(session, src))
+        except Dead:
+            stale.append(p)
+            continue
+        except requests.RequestException as ex:      # the network, not the link: stop and keep what we have
+            print(f"postimg: network error ({ex}) — stopping this pass")
             break
-        # بیست شکست پشت‌سرهم یعنی شبکه یا خود CDN قطع است، نه اینکه لینک‌ها منقضی شده باشند:
-        # ادامه دادن فقط وقت اجرا را می‌سوزاند، پس همان‌جا می‌ایستیم.
-        if streak >= 20:
-            print("postimg: 20 failures in a row — stopping; the CDN or the network looks down")
-            break
-        tried += 1
-        raw = grab(session, src)
-        if raw is None:
-            dead += 1
-            streak += 1
+        if path:
+            p["img"], done = path, done + 1
+        time.sleep(0.1)
+
+    # 2. expired addresses: one fresh address per post from the channel pages, then download again
+    if stale and done < a.limit:
+        fresh = fresh_urls(session, a.channel, [p["id"] for p in stale])
+        for p in stale:
+            if done >= a.limit:
+                break
+            src = fresh.get(p["id"])
+            if not src:
+                continue
+            try:
+                path = store(p["id"], grab(session, src))
+            except (Dead, requests.RequestException):
+                dead += 1
+                continue
+            if path:
+                p["img"], p["photos"], done = path, [src], done + 1
+            time.sleep(0.1)
+
+    # 3. posts with no picture anywhere get a card of their own headline (never a market panel)
+    made = 0
+    for p in need:
+        if made >= a.cards or local(p) or p.get("photos"):
             continue
-        streak = 0
-        data, ext = shrink(raw)
-        if not data:
-            dead += 1
+        try:
+            path = store(p["id"], card_for(p))
+        except Exception as ex:                       # one post's card must not stop the rest
+            print(f"postimg: no card for {p.get('id')} ({ex})")
             continue
-        with open(os.path.join(IMGDIR, f"{pid}.{ext}"), "wb") as fh:
-            fh.write(data)
-        p["img"] = f"{WEB}{pid}.{ext}"
-        done += 1
-        time.sleep(0.15)
+        if path:
+            p["img"], made = path, made + 1
 
     save(doc)
-    with_img = sum(1 for p in ps if str(p.get("img", "")).startswith(WEB))
-    want = sum(1 for p in ps if p.get("photos"))
-    print(f"postimg: saved {done}, already had {kept}, failed {dead} of {tried} tried · "
-          f"{with_img}/{want} posts now have a local image")
+    have = sum(1 for p in ps if local(p))
+    print(f"postimg: {done} downloaded, {made} cards made, {dead} still unreachable · {have}/{len(ps)} posts have a picture")
 
 
 if __name__ == "__main__":

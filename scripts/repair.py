@@ -2,10 +2,12 @@
 """ترمیم پست‌های ذخیره‌شده: حذف لینک‌های پنهان تکراری، جداکردن فوتر شبکه‌های اجتماعی و اصلاح عنوان"""
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch import split_footer  # noqa: E402
+from fetch import split_footer, post_title, drop_label  # noqa: E402
 P = sys.argv[1] if len(sys.argv) > 1 else "data/posts.json"
 # Discord invites in older posts have expired; this permanent invite of the COIN_KURD server still works (checked 2026-11-02)
 DISCORD = "https://discord.gg/TtT2BHmZyJ"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEEPIMG_RE = re.compile(r"https://raw\.githubusercontent\.com/omidmokri/coinkurd/[^/]+/(data/deepimg/[\w.-]+\.(?:jpe?g|png|webp))")
 DISCORD_RE = re.compile(r"https?://(?:www\.)?(?:discord\.gg|discord(?:app)?\.com/invite)/[\w-]+", re.I)
 ps = json.load(open(P, encoding="utf-8"))
 n = 0
@@ -18,15 +20,23 @@ for p in ps:
         p["text"], n = body, n + 1
         if footer:
             p["footer"] = footer
-    title = ""
-    for ln in p["text"].split("\n"):
-        c = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", ln)
-        c = re.sub(r"#\S+", "", c).strip(" :–-—|•\t")
-        if len(re.findall(r"[\w؀-ۿ]", c)) >= 3:
-            title = c[:117] + ("…" if len(c) > 120 else c[117:120]) if len(c) > 120 else c
-            break
+    # the channel's own label is never the subject: drop it from the text, here and in every translation
+    dropped = drop_label(p["text"])
+    if dropped != p["text"]:
+        p["text"], n = dropped, n + 1
+    title = post_title(p["text"])
     if title:
         p["title"] = title
+    for lg in (p.get("tr") or {}).values():
+        if isinstance(lg, dict) and lg.get("text"):
+            lg["text"] = drop_label(lg["text"])
+            lg["title"] = post_title(lg["text"], lg.get("title") or "")
+    # a dossier card is sent as a large preview of the card's own file in this repository — that file is the picture
+    lk = (p.get("link") or {}).get("url") or "" if isinstance(p.get("link"), dict) else ""
+    m = DEEPIMG_RE.match(lk)
+    if m and not str(p.get("img") or "").startswith(("/data/postimg/", "/data/deepimg/")) \
+            and os.path.exists(os.path.join(ROOT, m.group(1))):
+        p["img"] = "/" + m.group(1)
     for f in p.get("footer") or []:
         if DISCORD_RE.fullmatch(f.get("url", "")):
             f["url"] = DISCORD

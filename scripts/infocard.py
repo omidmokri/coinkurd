@@ -925,8 +925,9 @@ def _dashboard(t, im, box, mk):
     ry = 22
     rtext(d, rx1, ry - 4, "بازار لحظه‌ای", font(26), acc + (255,))
     ry += 44
-    rh = (ph - ry - 16) / max(1, min(5, len(rows)))
-    for r in rows[:5]:
+    n = max(1, min(5, len(rows), int((ph - ry - 12) // 31)))   # a row needs ~31px; fewer rows, never overlapping ones
+    rh = (ph - ry - 16) / n
+    for r in rows[:n]:
         up = r["chg"] >= 0
         col = green if up else red
         rtext(d, rx1, ry, r["fa"], fh, (235, 240, 250, 255))
@@ -996,11 +997,14 @@ def hero_stat(candidates):
 
 
 def parse_dossier(post):
-    """«پروندهٔ کوین کورد» post → content dict"""
+    """a dossier post → content dict (its first line is the headline; an old label line is skipped)"""
+    from fetch import is_label
     lines = [x.strip() for x in post.split("\n")]
-    title = clean(lines[1] if len(lines) > 1 else lines[0])
+    while lines and (not lines[0] or is_label(lines[0])):     # posts made before the headline came first
+        lines.pop(0)
+    title = clean(lines[0] if lines else "")
     sec, cur = {}, None
-    for ln in lines[2:]:
+    for ln in lines[1:]:
         if not ln or ln.startswith("━") or ln.startswith("#"):
             continue
         h = clean(ln)
@@ -1211,6 +1215,12 @@ def _mini(t, im, box, mk, mode="rows"):
         d.line([(0, g), (pw, g)], fill=_rgba(prim, 16))
     if mode == "chart":
         _chart_into(t, d, (20, 58, pw - 20, ph - 22), mk, prim, sec, acc)
+    elif mode == "dash":                         # the 48-hour chart beside the live prices
+        cut = int(pw * 0.50)
+        _chart_into(t, d, (16, 44, cut - 10, ph - 14), mk, prim, sec, acc)
+        d.line([(cut, 16), (cut, ph - 16)], fill=_rgba(prim, 60), width=1)
+        _rows_into(t, d, (cut + 12, 36, pw - 18, ph - 12), mk, prim, sec, acc,
+                   n=max(2, min(4, (ph - 70) // 34)))
     elif mode == "ticker":
         rtext(d, pw - 20, 14, "\u0628\u0627\u0632\u0627\u0631 \u0644\u062d\u0638\u0647\u200c\u0627\u06cc", font(24), acc + (255,))
         _ticker_into(t, d, (20, 52, pw - 20, ph - 12), mk, prim, sec, acc,
@@ -1318,6 +1328,11 @@ def _bullets_of(c, hero):
 
 # --- the six compositions; each receives a fresh canvas with header and HUD already on it
 FOOT_TOP = H - 112
+_FLOOR = [FOOT_TOP]          # where a composition must stop; _compose lowers it to make room for the terminal
+
+
+def _floor():
+    return _FLOOR[0]
 
 
 def _lay_stack(t, im, c, mk, hero):
@@ -1328,28 +1343,27 @@ def _lay_stack(t, im, c, mk, hero):
     _divider(t, im, y)
     y += 34
     y = _hero_block(t, im, hero, y)
-    dash_h = 226
+    dash_h = 196
     _dashboard(t, im, (M - 10, y, W - M + 10, y + dash_h), mk)
-    y += dash_h + 26
-    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 18), c["card_head"], _bullets_of(c, hero))
-    _term_block(t, im, (M - 10, y + 14, W - M + 10, FOOT_TOP - 18), c["term"])
+    y += dash_h + 20
+    _card_block(t, im, (M - 10, y, W - M + 10, _floor() - 18), c["card_head"], _bullets_of(c, hero))
 
 
 def _lay_poster(t, im, c, mk, hero):
     """the number first and very large, the headline under it — a poster, not a report"""
     prim, sec, acc = PALETTES[t["pal"]][:3]
-    y = 226
+    y = 212
     if hero:
-        y = _hero_block(t, im, hero, y, sizes=(156, 136, 116, 98))
+        y = _hero_block(t, im, hero, y, sizes=(122, 108, 96, 84))
         y += 6
         _divider(t, im, y)
         y += 30
-    y = _title_block(t, im, c, y, sizes=(62, 54, 48, 42), lines=3, center=True)
-    y += 20
-    dash_h = 200
+    y = _title_block(t, im, c, y, sizes=(48, 44, 40, 36), lines=3, center=True)
+    y += 10
+    dash_h = 158
     _dashboard(t, im, (M - 10, y, W - M + 10, y + dash_h), mk)
-    y += dash_h + 24
-    _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 18), c["card_head"],
+    y += dash_h + 18
+    _card_block(t, im, (M - 10, y, W - M + 10, _floor() - 18), c["card_head"],
                 _bullets_of(c, hero), sizes=(33, 30, 27, 25))
 
 
@@ -1365,11 +1379,11 @@ def _lay_split(t, im, c, mk, hero):
     lx0, lx1 = M, int(M + (W - 2 * M) * 0.46 - gap / 2)
     top = y
     y = _hero_block(t, im, hero, top, sizes=(76, 66, 58, 50), center=False, width=rx1 - rx0)
-    _card_block(t, im, (rx0, y + 6, rx1, FOOT_TOP - 18), c["card_head"],
+    _card_block(t, im, (rx0, y + 6, rx1, _floor() - 18), c["card_head"],
                 _bullets_of(c, hero), sizes=(26, 24, 22, 20))
-    mid = top + int((FOOT_TOP - 18 - top) * 0.52)
+    mid = top + int((_floor() - 18 - top) * 0.52)
     _mini(t, im, (lx0, top, lx1, mid - 12), mk, "chart")
-    _mini(t, im, (lx0, mid + 6, lx1, FOOT_TOP - 18), mk, "rows")
+    _mini(t, im, (lx0, mid + 6, lx1, _floor() - 18), mk, "rows")
 
 
 def _lay_terminal(t, im, c, mk, hero):
@@ -1381,7 +1395,7 @@ def _lay_terminal(t, im, c, mk, hero):
     y = _term_block(t, im, (M - 10, y, W - M + 10, y + 430), lines)
     y += 22
     y = _hero_block(t, im, hero, y, sizes=(92, 80, 70, 62))
-    left = FOOT_TOP - 18 - y
+    left = _floor() - 18 - y
     if left > 150:
         _dashboard(t, im, (M - 10, y, W - M + 10, y + min(226, left)), mk)
 
@@ -1389,7 +1403,7 @@ def _lay_terminal(t, im, c, mk, hero):
 def _lay_editorial(t, im, c, mk, hero):
     """a magazine cover: the headline owns the top third, the data is a footnote"""
     prim, sec, acc = PALETTES[t["pal"]][:3]
-    y = _title_block(t, im, c, 212, sizes=(88, 78, 68, 58), lines=4)
+    y = _title_block(t, im, c, 212, sizes=(76, 68, 60, 52), lines=3)
     y += 10
     d = ImageDraw.Draw(im)
     d.rectangle([W - M - 190, y, W - M, y + 7], fill=_rgba(prim, 255))
@@ -1407,9 +1421,9 @@ def _lay_editorial(t, im, c, mk, hero):
             ltext(ImageDraw.Draw(im), M + 16, yy, ln, fq, _rgba(acc, 235))
             yy += int(qs * 1.4)
         y += 156
-    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 188), c["card_head"],
+    y = _card_block(t, im, (M - 10, y, W - M + 10, _floor() - 160), c["card_head"],
                     _bullets_of(c, hero), sizes=(30, 28, 26, 24))
-    _mini(t, im, (M - 10, max(y + 16, FOOT_TOP - 188), W - M + 10, FOOT_TOP - 18), mk, "ticker")
+    _mini(t, im, (M - 10, max(y + 16, _floor() - 160), W - M + 10, _floor() - 18), mk, "dash")
 
 
 def _lay_band(t, im, c, mk, hero):
@@ -1440,9 +1454,9 @@ def _lay_band(t, im, c, mk, hero):
                 _shadow(im, W / 2, y + 14, ln, fq, _rgba(acc, 240), center=True)
                 y += int(qs * 1.45)
         y += 26
-    y = _card_block(t, im, (M - 10, y, W - M + 10, FOOT_TOP - 188), c["card_head"],
+    y = _card_block(t, im, (M - 10, y, W - M + 10, _floor() - 188), c["card_head"],
                     _bullets_of(c, hero), sizes=(28, 26, 24, 22))
-    _mini(t, im, (M - 10, max(y + 16, FOOT_TOP - 188), W - M + 10, FOOT_TOP - 18), mk, "ticker")
+    _mini(t, im, (M - 10, max(y + 16, _floor() - 188), W - M + 10, _floor() - 18), mk, "dash")
 
 
 LAYOUT_FN = {"stack": _lay_stack, "poster": _lay_poster, "split": _lay_split,
@@ -1478,7 +1492,23 @@ def _compose(t, c, mk, hero, lay):
     im = background(t)
     _hud(t, im)
     _header(t, im, c, jalali(mk.get("at") or datetime.now(timezone.utc)))
-    LAYOUT_FN.get(lay, _lay_stack)(t, im, c, mk, hero)
+    # The brief asks every card for all of it: headline, the key figure, the dashboard, the analysis
+    # card and the AI terminal. The terminal composition carries it as its centrepiece; every other one
+    # gets it as a band above the footer, sized first so the composition above knows where to stop.
+    term = c.get("term") or []
+    band = 0
+    if term and lay != "terminal":
+        # a terminal reads as one line per entry; two entries keep room for the analysis card above it
+        tf = font(21)
+        term = [fit(x, (21,), W - 2 * M - 40, 1)[2][0] for x in term[:2] if x]
+        band = _term_block(t, Image.new("RGBA", (W, H)), (M - 10, 0, W - M + 10, 250), term, sizes=(21,))
+    _FLOOR[0] = FOOT_TOP - (band + 16 if band else 0)
+    try:
+        LAYOUT_FN.get(lay, _lay_stack)(t, im, c, mk, hero)
+        if band:
+            _term_block(t, im, (M - 10, _FLOOR[0] - 2, W - M + 10, FOOT_TOP - 10), term, sizes=(21,))
+    finally:
+        _FLOOR[0] = FOOT_TOP
     _footer(t, im)
     return im
 
@@ -1495,6 +1525,58 @@ def _footer(t, im):
     im.alpha_composite(lay)
     _glow_text(im, W - M, y + 30, CHANNEL, font(40), prim)
     ltext(ImageDraw.Draw(im), M, y + 38, SLOGAN, font(32), _rgba(acc, 240))
+
+
+def _sentences(text, n=3, lo=28, hi=170):
+    """the post's own opening sentences, cleaned — never words of the card's own"""
+    t = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r"\1", text or "")
+    t = re.sub(r"https?://\S+|#\S+|@\w+|\*\*|__", " ", t)
+    out = []
+    for ln in t.split("\n"):
+        c = clean(ln)
+        if len(c) < lo or c.startswith("━"):
+            continue
+        for sent in re.split(r"(?<=[.!؟?])\s+", c):
+            sent = sent.strip()
+            if lo <= len(sent):
+                out.append(sent if len(sent) <= hi else sent[:hi].rsplit(" ", 1)[0] + " …")
+            if len(out) >= n:
+                return out
+    return out
+
+
+def title_card(title, text="", badge="کوین کورد", when=None, hist=None):
+    """A picture for a channel post that never had one: the post's own headline and opening lines on
+    the house look — logo, date, painted or drawn backdrop, the fixed footer. No market panel and no
+    figures of the card's own: an old post must not wear today's prices."""
+    if mode() is None:
+        raise TextError("Persian shaping unavailable — image not made")
+    key = lambda x: re.sub(r"[^\w\u0600-\u06FF]", "", clean(x))
+    tk = key(title)
+    lines = [x for x in _sentences(text, 4) if key(x) and key(x) not in tk and tk not in key(x)][:3]
+    c = _check_content({"badge": badge, "title": title, "quick": "", "card_head": "در این پست",
+                        "card": lines, "term": []})
+    t = pick_theme(hist)
+    im = background(t)
+    _hud(t, im)
+    _header(t, im, c, jalali(when or datetime.now(timezone.utc)))
+    top, bottom = 196, FOOT_TOP - 30
+
+    def body(canvas, y):
+        y = _title_block(t, canvas, c, y, sizes=(72, 66, 60, 54, 48, 44), lines=4)
+        y += 14
+        _divider(t, canvas, y)
+        y += 40
+        if c["card"]:
+            y = _card_block(t, canvas, (M - 10, y, W - M + 10, bottom), c["card_head"], c["card"], sizes=(32, 30, 28, 26))
+        return y
+
+    used = body(im.copy(), top) - top          # measure on a scratch copy, then draw once, centred
+    body(im, top + max(0, (bottom - top - used) // 2))
+    _footer(t, im)
+    buf = io.BytesIO()
+    im.convert("RGB").save(buf, "JPEG", quality=92, optimize=True, subsampling=0)
+    return buf.getvalue()
 
 
 # =========================================================== 5. video slides (same theme for a whole reel)

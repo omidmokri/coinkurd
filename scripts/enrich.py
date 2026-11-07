@@ -160,7 +160,7 @@ def main():
         x = {k: p.get(k) for k in ("id", "date", "title", "category", "coins", "hashtags", "tags", "views", "url", "link", "kind", "q", "dup", "dupn", "ents") if p.get(k) is not None}
         # نسخهٔ ذخیره‌شده در مخزن مقدم است؛ نشانی cdn4.telesco.pe منقضی می‌شود (scripts/postimg.py)
         local = p.get("img") or ""
-        x["photos"] = [local] if local.startswith("/data/postimg/") else (p.get("photos") or [])[:1]
+        x["photos"] = [local] if local.startswith(("/data/postimg/", "/data/deepimg/")) else (p.get("photos") or [])[:1]
         if p.get("video"):
             x["video"] = True
         x["text"] = cut(p.get("text"))

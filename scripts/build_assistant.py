@@ -20,6 +20,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reality_common as R  # noqa: E402
+import assistant_kb as KB  # noqa: E402
 
 TG_ADMIN = "Kurdistan_Coin"
 MAX_POSTS = 140
@@ -56,8 +57,77 @@ def from_menu():
             if not href.startswith("/") or href in seen:
                 continue
             seen.add(href)
-            kws = [label["fa"], label["en"], tri(t)["en"], href.strip("/").replace("-", " ").replace("/", " ")]
+            tt, dd = tri(t), tri(de)
+            kws = [label["fa"], label["ckb"], label["en"], tt["ckb"], tt["en"], dd["fa"], dd["ckb"], dd["en"],
+                   href.strip("/").replace("-", " ").replace("/", " ")]
             out.append(doc(href, t, de, kws, "page"))
+    for href, t, de, kws in EXTRA_PAGES:          # pages that live outside the mega-menu
+        if href not in seen:
+            seen.add(href)
+            out.append(doc(href, t, de, kws, "page"))
+    return out
+
+
+EXTRA_PAGES = [
+    ("/battle/", L("میدان نبرد", "مەیدانی شەڕ", "Battlefield"),
+     L("بازار زندهٔ بیت‌کوین به شکل یک نبرد سه‌بعدی", "بازاڕی زیندووی بیتکۆین وەک شەڕێکی سێ‌ڕەهەندی", "The live bitcoin market as a 3D battle"),
+     ["نبرد", "battle", "شەڕ", "سه بعدی", "3d"]),
+    ("/extension/", L("افزونهٔ کروم و فایرفاکس", "پێوەکراوی کرۆم و فایەرفۆکس", "Chrome & Firefox extension"),
+     L("قیمت، گزارش، تحلیل، واقعیت‌سنج، دانشنامه و هشدار در نوار مرورگر", "نرخ، ڕاپۆرت، شیکاری و ئاگاداری لە وێبگەڕدا", "Prices, report, analysis, reality check, encyclopedia and alerts in your browser"),
+     ["افزونه", "اکستنشن", "extension", "chrome", "firefox", "کروم", "فایرفاکس", "پێوەکراو"]),
+]
+
+
+def _nav():
+    import chrome as C
+    m = {}
+    for cat in C.NAV:
+        for href, _icon, t, de in cat["items"]:
+            m[href] = (tri(t), tri(de))
+    for href, t, de, _k in EXTRA_PAGES:
+        m.setdefault(href, (tri(t), tri(de)))
+    return m
+
+
+def features():
+    """One answer per feature that says what it does and every place it can be opened: the site page,
+    the bot section and the extension tab. The bot's own labels come from bot_menu.S, so a feature added
+    to the bot is known here without a second edit."""
+    import bot_menu as M
+    nav, out, used = _nav(), [], set()
+    langs = ("fa", "ckb", "en")
+
+    def bot_label(k, lg):
+        ic, t, d = M.S[k]
+        return (t.get(lg) or t["fa"]), ((d or {}).get(lg) or (d or {}).get("fa") or "")
+
+    for href, keys, ext in KB.FEATURES:
+        keys = [k for k in keys if k in M.S]
+        used.update(keys)
+        title, desc = nav.get(href, (None, None))
+        if not title:
+            continue
+        ans = {}
+        for lg in langs:
+            parts = [desc[lg] + "." if desc[lg] and not desc[lg].endswith((".", "؟", "!")) else desc[lg]]
+            parts.append(f"{KB.WHERE['site'][lg]}: «{title[lg]}».")
+            if keys:
+                parts.append(f"{KB.WHERE['bot'][lg]}: " + "، ".join(f"«{bot_label(k, lg)[0]}»" for k in keys)
+                             + (" — " + bot_label(keys[0], lg)[1] if bot_label(keys[0], lg)[1] else ""))
+            if ext:
+                parts.append(f"{KB.WHERE['ext'][lg]} «{KB.EXT_TAB[ext][lg]}».")
+            parts.append(KB.WHERE["app"][lg])
+            ans[lg] = " ".join(p for p in parts if p)
+        q = [title[lg] for lg in langs] + [bot_label(k, lg)[0] for k in keys for lg in langs]
+        out.append({"q": q, "t": title, "a": ans, "u": href, "g": "feature",
+                    **({"u2": KB.bot_url(keys[0])} if keys else {})})
+    for k in [x for g in M.GROUPS.values() for x in g] + [x for x in M.HOME_ITEMS if not x.startswith("g_")]:
+        if k in used or k not in M.S:
+            continue
+        used.add(k)
+        t = {lg: bot_label(k, lg)[0] for lg in langs}
+        a = {lg: (bot_label(k, lg)[1] + " " if bot_label(k, lg)[1] else "") + f"{KB.WHERE['bot'][lg]}: «{t[lg]}»." for lg in langs}
+        out.append({"q": list(t.values()) + [k], "t": t, "a": a, "u": KB.bot_url(k), "g": "feature"})
     return out
 
 
@@ -193,7 +263,10 @@ def faq():
            "No. Nothing here is financial advice; these are educational tools and data, and the decision and the risk are yours. Crypto trading carries high risk."),
          "/terms/"),
     ]
-    return [{"q": q, "t": tri(t), "a": tri(a), "u": u, "g": "faq"} for q, t, a, u in F]
+    kb = [{"q": q, "t": tri(t), "a": tri(a), "u": u, "g": "faq"} for q, t, a, u in KB.FAQ]
+    covered = {x["t"]["en"] for x in kb} | {"How do I contact you?", "Is the site free?", "Where are the Telegram channel and group?"}
+    old = [{"q": q, "t": tri(t), "a": tri(a), "u": u, "g": "faq"} for q, t, a, u in F if tri(t)["en"] not in covered]
+    return kb + old
 
 
 # ------------------------------------------------------------------ live answers
@@ -222,7 +295,14 @@ def main():
             print(f"  {name}: {len(got)}")
         except Exception as ex:  # noqa: BLE001
             print(f"  {name} failed: {ex}")
-    out = {"updated_at": R.iso(R.now()), "admin": TG_ADMIN, "docs": docs, "faq": faq(), "live": live()}
+    try:
+        feats = features()
+        print(f"  features: {len(feats)}")
+    except Exception as ex:  # noqa: BLE001
+        print(f"  features failed: {ex}")
+        feats = []
+    out = {"updated_at": R.iso(R.now()), "admin": TG_ADMIN, "docs": docs, "faq": faq() + feats, "live": live(),
+           "syn": KB.SYNONYMS, "bot": KB.BOT}
     R.save("assistant.json", out)
     size = os.path.getsize(os.path.join(R.D, "assistant.json"))
     print(f"assistant index: {len(docs)} docs + {len(out['faq'])} faq ({size // 1024} KB)")
