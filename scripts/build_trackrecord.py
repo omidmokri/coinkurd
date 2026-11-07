@@ -100,7 +100,28 @@ S = {
             "تەنها پۆستەکانی بازاڕ بە پێوانەی بیتکۆین؛ لابراو: {o} پۆست بە دراوی تر، {p} پۆستی ڕیکلام/دووبارە، {w} پۆست بێ پەنجەرەی تەواو.",
             "Market posts measured on bitcoin only; left out: {o} posts on other coins (too few), {p} promotional or repeated posts, {w} posts without a full window."),
     "code": L("کد محاسبه", "کۆدی ژماردن", "The code"), "data": L("دادهٔ خام", "داتای خاو", "Raw data"),
+    "sc": L("الگوهای اسکنر — هر الگو در برابر ساعت‌های دیگر", "نەخشەکانی سکانەر — هەر نەخشەیەک بەرامبەر کاتژمێرەکانی تر", "Scanner patterns — each tested against other hours"),
+    "sc_d": L("حرکت ۲۴ ساعتهٔ قیمت در جهت یافته، از ساعت کامل بعد از یافته؛ پایه: همان یافته‌ها جابه‌جا شده به ساعت‌های دیگر (آزمون جابه‌جایی دایره‌ای).",
+              "جووڵەی ٢٤ کاتژمێری نرخ بە ئاراستەی دۆزینەوەکە؛ بنەما: هەمان دۆزینەوەکان گوازراونەتەوە بۆ کاتژمێرەکانی تر (تاقیکردنەوەی گواستنەوەی بازنەیی).",
+              "24h move in the finding's direction from the next full hour; baseline: the same findings shifted to every other hour (circular-shift test)."),
+    "sc_p": L("الگو", "نەخش", "Pattern"), "sc_n": L("تعداد", "ژمارە", "Findings"), "sc_o": L("بعد از یافته", "دوای دۆزینەوە", "After finding"),
+    "sc_b": L("ساعت‌های دیگر", "کاتژمێرەکانی تر", "Other hours"), "sc_v": L("نتیجه", "ئەنجام", "Verdict"),
+    "sv_better": L("بهتر از تصادف", "باشتر لە ڕێکەوت", "Better than chance"), "sv_worse": L("⚠️ در دست بازبینی (بدتر)", "⚠️ لە پێداچوونەوەدا (خراپتر)", "⚠️ Under review (worse)"),
+    "sv_no_edge": L("بی‌تفاوت", "بێ جیاوازی", "No edge"), "sv_too_few": L("دادهٔ کم", "داتای کەم", "Too few"),
+    "sc_all": L("همهٔ یافته‌ها", "هەموو دۆزینەوەکان", "All findings"),
+    "sc_mc": L("{m} الگو آزموده شد؛ با این تعداد آزمون، به‌طور تصادفی حدود {x} نتیجهٔ «معنادار» انتظار می‌رود. با آستانهٔ سخت‌گیرانهٔ بونفرونی (p < {t}) {kk} الگو معنادار می‌ماند.",
+               "{m} نەخش تاقی کرانەوە؛ بە ڕێکەوت نزیکەی {x} ئەنجامی «گرنگ» چاوەڕوان دەکرێت. بە سنووری بۆنفێرۆنی (p < {t}) {kk} نەخش دەمێنێتەوە.",
+               "{m} patterns were tested; by chance alone about {x} would look \u201csignificant\u201d. At the strict Bonferroni threshold (p < {t}), {kk} remain significant."),
+    "sc_nd": L("آزمون اسکنر هنوز داده ندارد.", "تاقیکردنەوەی سکانەر هێشتا داتای نییە.", "No scanner audit data yet."),
 }
+SCN = {"rsi_oversold": L("RSI اشباع فروش", "RSI فرۆشتنی زۆر", "RSI oversold"), "rsi_overbought": L("RSI اشباع خرید", "RSI کڕینی زۆر", "RSI overbought"),
+       "ema_golden_cross": L("تقاطع طلایی EMA20/50", "یەکتربڕینی زێڕینی EMA20/50", "EMA20/50 golden cross"),
+       "ema_death_cross": L("تقاطع مرگ EMA20/50", "یەکتربڕینی مردنی EMA20/50", "EMA20/50 death cross"),
+       "breakout_up": L("شکست سقف ۴۸ ساعته", "شکاندنی بەرزترینی ٤٨ کاتژمێر", "48h high breakout"),
+       "breakdown": L("شکست کف ۴۸ ساعته", "شکاندنی نزمترینی ٤٨ کاتژمێر", "48h low breakdown"),
+       "volume_spike": L("جهش حجم معاملات", "بازدانی قەبارە", "Volume spike"),
+       "bull_divergence": L("واگرایی مثبت RSI", "لادانی ئەرێنی RSI", "RSI bullish divergence"),
+       "bear_divergence": L("واگرایی منفی RSI", "لادانی نەرێنی RSI", "RSI bearish divergence")}
 CATS = {
     "etf_institutional": L("ETF و نهادی", "ETF و دامەزراوەیی", "ETF & institutional"), "news": L("خبر بازار", "هەواڵی بازاڕ", "Market news"),
     "regulation": L("قانون‌گذاری", "یاسادانان", "Regulation"), "onchain": L("آن‌چین و داده", "ئۆنچەین و داتا", "On-chain & data"),
@@ -130,6 +151,39 @@ def side(obs, t):
     if not t or t.get("p") is None or t["p"] >= ALPHA:
         return "no"
     return "up" if obs > t["mid"] else "dn"
+
+
+def bonf(pats, alpha=ALPHA):
+    """patterns with a verdict (n >= min_n) -> (m tested, expected false positives, threshold, k surviving)"""
+    tested = [v for k, v in pats.items() if k != "_all" and v.get("verdict") in ("better", "worse", "no_edge") and v.get("p") is not None]
+    m = len(tested)
+    if not m:
+        return 0, 0.0, None, 0
+    t = alpha / m
+    return m, alpha * m, t, sum(1 for v in tested if v["p"] < t)
+
+
+def scanner(lg):
+    a = R.load("scanaudit.json", {}) or {}
+    pats = a.get("patterns") or {}
+    if not pats:
+        return BR.sec(s("sc", lg), f"<p class='note'>{e(s('sc_nd', lg))}</p>")
+    keys = sorted((k for k in pats if k != "_all"), key=lambda k: pats[k].get("p", 1)) + (["_all"] if "_all" in pats else [])
+    rows = []
+    for k in keys:
+        v = pats[k]
+        nm = s("sc_all", lg) if k == "_all" else ((SCN.get(k) or {}).get(lg) or k)
+        vd = v.get("verdict", "too_few")
+        cls = "ok" if vd == "better" else "bad" if vd == "worse" else ""
+        rows.append(f"<tr><td>{e(nm)}</td><td class='n'>{BR.nf(v.get('n'), lg)}</td><td class='n'>{pct(v.get('obs'), lg)}</td>"
+                    f"<td class='n'>{pct(v.get('mid'), lg)}</td><td class='n'>{pv(v.get('p'), lg)}</td>"
+                    f"<td><span class='tr-chip {cls}'>{e(s('sv_' + vd, lg))}</span></td></tr>")
+    h = BR.table([s("sc_p", lg), s("sc_n", lg), s("sc_o", lg), s("sc_b", lg), s("c_p", lg), s("sc_v", lg)], rows, "tr-tbl")
+    m, x, t, kk = bonf(pats)
+    if m:
+        h += f"<p class='note'>{e(s('sc_mc', lg, m=BR.nf(m, lg), x=BR.nf(x, lg, 1), t=BR.nf(t, lg, 4), kk=BR.nf(kk, lg)))}</p>"
+    h += f"<p class='note'><a href='/data/scanaudit.json'>{e(s('data', lg))}</a> · {BR.fdate(a.get('updated_at', ''), lg)}</p>"
+    return BR.sec(s("sc", lg), h, id_="scanner", lead=e(s("sc_d", lg)))
 
 
 def histo(h, lg):
@@ -211,6 +265,7 @@ def build():
             rows.append(f"<tr><td>{e(nm)}</td><td class='n'>{BR.nf(c['n'], lg)}</td><td class='n'>{pct(c['r24'], lg)}</td>"
                         f"<td class='n'>{pct(c['hit'], lg, 0, False)}</td><td class='n'>{p}</td></tr>")
         h += BR.sec(s("cats", lg), BR.table([s("c_cat", lg), s("c_n", lg), s("c_r", lg), s("c_hit", lg), s("c_p", lg)], rows, "tr-tbl"))
+        h += scanner(lg)
         h += (f"<div class='tr-says'><b>{e(s('says', lg))}</b><ul><li>{e(s('says_1', lg))}</li>"
               f"<li>{e(s('says_2', lg))} <a href='/ledger/'>{e(s('ledger', lg))} ←</a></li><li>{e(s('says_3', lg))}</li></ul></div>")
         m, x = d.get("method", {}), d.get("excluded", {})
