@@ -106,20 +106,30 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
    snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
-3. **The founder and the nightly class.** Home strip with countdown shipped 2026-11-07. Remaining: a `/class/` page
-   (what the class covers, schedule, the books); Person schema on `/about/` already exists — reuse it. **Blocked on
-   facts:** the repo has no book titles or class syllabus (checked `about/` on 2026-11-07) — don't invent them; build
-   only from what the channel's own posts state (search `data/posts.json` for کتاب / کلاس / Discord first).
+3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
+   Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
 5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
-7. **Videos feed stale since 2026-11-02** (`scripts/bot_videos.py` finds no candidates) — investigate.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/class/` — the nightly class page, from the channel's own posts (Backlog #3 slice 2; closed #7)
+- **Need:** newcomers had no single place saying when/where the nightly class is and how to join.
+- **Built:** `scripts/class_facts.py` (invite, schedule quote, announcement count, posts referring back to the class —
+  all extracted from `data/posts.json`); `scripts/build_class.py` → `/class/` (fa/ckb/en, live countdown + viewer's local
+  time, join button, quoted announcement with source link, not-financial-advice line); nav entry (`chrome.py`), assistant
+  KB, `update.yml` + `pages.yml`; bot section `class` (`bot_reality.sec_class`, `bot_menu` label, in `g_news`).
+- **#7 closed:** videos feed is not broken — `VIDEOS_PER_DAY` defaults to 0 because the owner turned auto-videos off, and
+  no page reads `data/videos.json`. No action.
+- **Verified:** py_compile; unit test of `class_facts` on synthetic posts (newest invite wins, counts, mention filter,
+  empty input); built in /tmp/bld; Playwright + Chrome 1280 fa/en, 390 fa/ckb: overflow 0, zero JS errors, looked at shots;
+  bot section rendered in fa/ckb/en/kmr (countdown 16:00 UTC → 30 min, correct).
+- **Next:** #5 (directional study with Gemini in CI) — first slice: labelling script + data/stance.json, no page yet.
 
 ### 2026-11-07 · Home page no longer wobbles sideways on phones (Backlog #8)
 - **Need:** on 390 px phones the home page was 1 px wider than the screen, so it slid sideways under the thumb.

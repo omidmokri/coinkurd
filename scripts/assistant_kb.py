@@ -38,6 +38,7 @@ FEATURES = [
     ("/whales/", ["whales", "follow"], "reality"),
     ("/predict/", ["predict"], None),
     ("/today/", ["today", "brain"], None),
+    ("/class/", ["class"], None),
     ("/weekly/", ["week"], None),
     ("/roundtable/", ["council", "brain"], None),
     ("/opportunity/", ["oppcost"], "reality"),
