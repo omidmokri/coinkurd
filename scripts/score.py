@@ -53,9 +53,20 @@ def technical(c, opps):
     return clamp(s)
 
 
+def channel_component(tr):
+    """Channel part of the Score from the tested record (data/trackrecord.json): neutral 50 unless the
+    post-vs-random-hours test is significant (p < 0.05); then 50 + 8 x (post avg - random-hour avg), clamped."""
+    t = ((tr or {}).get("test") or {}).get("r24") or {}
+    o, b = ((tr or {}).get("obs") or {}).get("r24"), ((tr or {}).get("base") or {}).get("r24")
+    if t.get("p") is None or o is None or b is None or t["p"] >= 0.05:
+        return 50.0
+    return round(clamp(50 + (o - b) * 8), 1)
+
+
 def main():
     m, news, imp = load("market.json", {}), load("news.json", {}), load("impact.json", {})
     prev = load("score.json", {})
+    chan = channel_component(load("trackrecord.json", {}))
     now = datetime.now(timezone.utc)
     fng = (m.get("fng") or {}).get("value")
     cut = now - timedelta(hours=48)
@@ -85,9 +96,7 @@ def main():
             comp["news"] = round(clamp(att - 15 * nneg.get(sym, 0)), 1)
         a = by.get(sym, [])
         if len(a) >= 3:
-            avg = sum(a) / len(a)
-            hit = sum(1 for x in a if x > 0) / len(a)
-            comp["channel"] = round(clamp(50 + avg * 8 + (hit - 0.5) * 40), 1)
+            comp["channel"] = chan
         wsum = sum(W[k] for k in comp)
         score = sum(comp[k] * W[k] for k in comp) / wsum
         label = "strong" if score >= 65 else "positive" if score >= 55 else "neutral" if score > 45 else "weak" if score > 35 else "very_weak"

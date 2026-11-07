@@ -34,6 +34,21 @@ posts = load("posts.json", [])
 meta = load("meta.json", {})
 market = load("market.json", {})
 impact = load("impact.json", {})
+trackrec = load("trackrecord.json", {})
+
+
+def tested_line(tr=None):
+    """One honest sentence from the tested record (post hours vs matched random hours); never the raw average."""
+    tr = trackrec if tr is None else tr
+    t = ((tr.get("test") or {}).get("r24") or {})
+    o, b = (tr.get("obs") or {}).get("r24"), (tr.get("base") or {}).get("r24")
+    if t.get("p") is None or o is None or b is None:
+        return '<p class="txt">آزمون کارنامهٔ کانال هنوز داده ندارد. <a href="/track-record/">کارنامهٔ آزموده‌شده</a></p>'
+    sig = t["p"] < 0.05
+    verdict = ("تفاوت از نظر آماری معنادار است" if sig else "هنوز تفاوت قابل‌اندازه‌گیری‌ای با ساعت‌های تصادفی دیده نمی‌شود")
+    return (f'<p class="txt">در آزمون {tr.get("n_posts", "—")} پست کانال، بیت‌کوین ۲۴ ساعت بعد از پست‌ها به‌طور میانگین '
+            f'<b>{o:+.2f}%</b> و در ساعت‌های تصادفیِ هم‌تراز <b>{b:+.2f}%</b> حرکت کرد (p = {t["p"]:.2f}) — {verdict}. '
+            f'میانگین خام حرکت بعد از پست‌ها بدون مقایسه با بازار گمراه‌کننده است. <a href="/track-record/">کارنامهٔ آزموده‌شدهٔ کانال</a></p>')
 news = load("news.json", {})
 score = load("score.json", {})
 SC = score.get("coins", {})
@@ -524,9 +539,7 @@ def build_coin(c, cposts):
     ims = [impact[str(p["id"])] for p in cposts if str(p["id"]) in impact and impact[str(p["id"])].get("r24h") is not None]
     body += f'<h2>حضور در کانال</h2><div class="grid"><div class="kpi"><small>۲۴ ساعت</small><b>{n24}</b></div><div class="kpi"><small>۷ روز</small><b>{n7}</b></div><div class="kpi"><small>۳۰ روز</small><b>{n30}</b></div><div class="kpi"><small>کل آرشیو</small><b>{len(cposts)}</b></div></div>'
     if ims:
-        avg = sum(x["r24h"] for x in ims) / len(ims)
-        upn = sum(1 for x in ims if x["r24h"] > 0)
-        body += f'<h2>کارنامهٔ پست‌ها</h2><p class="txt">در {len(ims)} پست اخیر دربارهٔ {c}، قیمت ۲۴ ساعت بعد از انتشار به‌طور میانگین <b class="{"up" if avg > 0 else "down"}">{avg:+.2f}%</b> حرکت کرد و در {upn} مورد ({upn*100//len(ims)}٪) بالاتر بود.</p>'
+        body += f'<h2>کارنامهٔ پست‌ها</h2><p class="note">{len(ims)} پست اخیر دربارهٔ {c} در آرشیو.</p>' + tested_line()
     body += "<h2>آخرین مطالب</h2><ul class=list>" + "".join(
         f'<li><a href="/p/{p["id"]}/">{e(p["title"])}</a><small>{fmt_date(p.get("date",""))} · {e(CATS.get(p["category"],{}).get("name",{}).get("fa",""))}</small></li>' for p in cposts[:60]) + "</ul>"
     faq = [("امتیاز Entekhab برای " + c + " چطور محاسبه می‌شود؟", "امتیاز (۰ تا ۱۰۰) جمع وزنی چهار جزء است: تکنیکال (RSI، روند و فاصله از سقف و کف ۴۸ ساعته)، احساسات بازار (شاخص ترس و طمع)، اخبار ۴۸ ساعت اخیر و کارنامهٔ پست‌های کانال. وزن‌ها و سهم هر جزء در همین صفحه نمایش داده می‌شود. امتیاز توصیف وضعیت فعلی است، نه پیش‌بینی."),
@@ -558,7 +571,7 @@ def build_methodology():
          '<li>ارزش بازار، بخش‌ها و لوگوها: CoinGecko · شاخص ترس و طمع: alternative.me</li>'
          '<li>شبکهٔ بیت‌کوین: mempool.space و bitnodes · بازار مشتقات: OKX · اقتصاد کلان: FRED</li>'
          '<li>اخبار: چند خبرخوان RSS؛ هر خبر با پیوند منبع اصلی نمایش داده می‌شود.</li></ul>'),
-        ("امتیاز Entekhab", f'<p class="txt">عددی بین ۰ تا ۱۰۰ برای هر کوین، بدون هوش مصنوعی و با فرمول ثابت؛ ۵۰ یعنی خنثی. وزن اجزا: {sc_w}. جزء تکنیکال از روند EMA20/50، فاصلهٔ قیمت از EMA20، RSI، تغییر ۲۴ ساعته، جایگاه قیمت در دامنهٔ ۴۸ ساعته و یافته‌های اسکنر ساخته می‌شود؛ احساسات از شاخص ترس و طمع، اخبار از تعداد خبرهای ۴۸ ساعت اخیر و خبرهای امنیتی منفی، و کانال از میانگین حرکت قیمت ۲۴ ساعت بعد از پست‌های کانال. اگر جزئی داده نداشته باشد، وزنش بین بقیه پخش می‌شود. این عدد توصیف وضعیت فعلی است، نه پیش‌بینی.</p>'),
+        ("امتیاز Entekhab", f'<p class="txt">عددی بین ۰ تا ۱۰۰ برای هر کوین، بدون هوش مصنوعی و با فرمول ثابت؛ ۵۰ یعنی خنثی. وزن اجزا: {sc_w}. جزء تکنیکال از روند EMA20/50، فاصلهٔ قیمت از EMA20، RSI، تغییر ۲۴ ساعته، جایگاه قیمت در دامنهٔ ۴۸ ساعته و یافته‌های اسکنر ساخته می‌شود؛ احساسات از شاخص ترس و طمع، اخبار از تعداد خبرهای ۴۸ ساعت اخیر و خبرهای امنیتی منفی، و جزء کانال از <a href=\"/track-record/\">کارنامهٔ آزموده‌شده</a>: تا وقتی حرکت بعد از پست‌ها با ساعت‌های تصادفیِ هم‌تراز تفاوت معنادار (p &lt; 0.05) نداشته باشد، روی ۵۰ (خنثی) می‌ماند. اگر جزئی داده نداشته باشد، وزنش بین بقیه پخش می‌شود. این عدد توصیف وضعیت فعلی است، نه پیش‌بینی.</p>'),
         ("اسکنر و کارنامه", '<p class="txt">اسکنر روی کندل‌های ۱ ساعتهٔ Binance این الگوها را پیدا می‌کند: ' + "، ".join(OPP_FA.values()) +
          '. هر یافته با زمان و قیمت ثبت می‌شود و نتیجهٔ واقعی‌اش پس از ۲۴ ساعت، چه خوب چه بد، در <a href="/ledger/">دفتر شفافیت</a> و <a href="/reality/">صفحهٔ واقعیت‌سنج</a> منتشر می‌شود. حرکت قیمت بعد از هر پست کانال هم زیر همان پست آمده است.</p>'),
         ("دسته‌بندی و ترجمه", '<p class="txt">دستهٔ هر پست خودکار و از روی تیتر و متن خودِ پست تعیین می‌شود: یک پست فقط وقتی «تحلیل تکنیکال» است که واقعاً نمودار بخواند، و فقط وقتی «سیگنال» است که نقطهٔ ورود، حد ضرر یا هدف داشته باشد. ترجمه‌های کوردی سورانی و انگلیسی ماشینی‌اند و هر کدام صفحهٔ جدا دارند؛ متن اصلی همیشه فارسی است.</p>'),
@@ -633,17 +646,7 @@ def intel_html():
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
     out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
                   + f'<div class="tsc"><table class="otab"><tr>{coins}</tr></table></div><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
-    by = {}
-    for r in impact.values():
-        if r.get("r24h") is not None:
-            by.setdefault(r["coin"], []).append(r["r24h"])
-    rws = ""
-    for c, a in sorted(by.items(), key=lambda kv: -len(kv[1]))[:10]:
-        if len(a) < 2:
-            continue
-        av = sum(a) / len(a)
-        rws += f'<tr><td><a href="/coins/{c.lower()}/">{c}</a></td><td class="num">{len(a)}</td><td class="num">{av:+.2f}%</td><td class="num">{sum(1 for x in a if x > 0)*100//len(a)}%</td></tr>'
-    out["imp"] = '<h3>کارنامهٔ پست‌ها: حرکت قیمت ۲۴ ساعت بعد از انتشار</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>پست</th><th>میانگین ۲۴h</th><th>درصد مثبت</th></tr>{rws}</table>' if rws else '<p class="disc">داده هنوز کافی نیست.</p>') + '<p class="disc">Binance 1h</p>'
+    out["imp"] = '<h3>کارنامهٔ کانال: آزمون در برابر ساعت‌های تصادفی</h3>' + tested_line() + '<p class="disc">Binance 1h · آزمون تصادفی‌سازی</p>'
     if brain.get("regime"):
         RG = {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"}
         r, b = brain["regime"], brain["regime"]["breadth"]
