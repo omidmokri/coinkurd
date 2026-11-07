@@ -89,8 +89,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
 ## Backlog (top = next)
-2. **`/today/` — rest of the spine.** Slice 1 + bot section shipped 2026-11-07. Still to do: a home-page card linking
-   to it, and per-day snapshots (`/daily/<date>/` already archives the market part).
+2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
+   snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
 3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
    countdown, a `/class/` page, the books; Person schema on `/about/` already exists — reuse it.
 4. **Accountability inline.** On each post page: the tested record of that kind of post, one line, linking to /track-record/.
@@ -104,6 +104,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/today/` card on the home page (Backlog #2, slice 3)
+- **Need:** the spine had no front door — the home page opened on thirty tiles with no "start here".
+- **Built:** a full-width orange-bordered card at the top of the command center (`#todayCard`, class `todayC`, outside
+  the draggable `.ccT` tiles) linking to `/today/`; text in fa/ckb/en via `I18N` keys `hToday`/`hTodayd`. Static
+  index.html edit; `prerender()` untouched.
+- **Verified:** served the repo, Playwright + Chrome at 1280/390 in fa and en, looked at the screenshots (RTL arrow
+  correct, mirrored in LTR), card text switches language, zero JS errors. No numbers, so no unit tests.
+- **Next:** Backlog #3 (nightly class strip + `/class/`).
 
 ### 2026-11-07 · `/today/` in the Telegram bot (Backlog #2, slice 2)
 - **Need:** the owner's rule — every site feature mirrored in the bot; `/today/` had no bot home.
