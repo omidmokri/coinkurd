@@ -195,6 +195,8 @@ NAV = [
          L("توزیع متن‌باز Freqtrade، خودمیزبان — توصیهٔ مالی نیست", "دابەشکردنی سەرچاوەکراوەی Freqtrade، خۆمیوانداری — ئامۆژگاریی دارایی نییە", "A self-hosted, open-source Freqtrade distribution — not financial advice")),
     ]},
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
+        ("/map/", "map", L("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
+         L("هر چیزی که باید بلد باشید، روی یک نقشه — با تیک زدن پیشرفت", "هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە — بە نیشانەکردنی پێشکەوتن", "Everything there is to learn on one map — tick your way through it")),
         ("/encyclopedia/", "library", L("دانشنامهٔ بازارهای مالی", "زانستنامەی بازاڕە داراییەکان", "Encyclopedia of financial markets"),
          L("۵۰۶ مدخل به فارسی، کوردی و انگلیسی، با فرمول و منبع", "٥٠٦ خاڵ بە فارسی، کوردی و ئینگلیزی، بە فۆرموڵ و سەرچاوە", "506 entries in Persian, Kurdish and English, with formulas and sources")),
         ("/academy/", "cap", L("آکادمی کریپتو", "ئەکادیمیای کریپتۆ", "Crypto Academy"),
@@ -278,7 +280,7 @@ FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
-GLOW = {"/academy/", "/academy/f13/"}
+GLOW = {"/map/", "/academy/", "/academy/f13/"}
 
 
 def _item(href, ic, title, desc, lang):
@@ -324,7 +326,7 @@ def header(lang="fa"):
 
 def bottom(lang="fa"):
     tabs = [("/", "home", T["home"], ""), ("/dashboard/", "gauge", T["mkt"], ""), ("/battle/", "swords", T["battle"], " ek-hot"),
-            ("/learn/", "cap", T["learn"], ""), ("#ekf", "grid", T["all"], " ek-all")]
+            ("/map/", "map", T["learn"], ""), ("#ekf", "grid", T["all"], " ek-all")]
     a = "".join(f'<a class="ek-tab{c}" href="{h}">{icon(ic)}{tri(t, lang)}</a>' for h, ic, t, c in tabs)
     return f'<!--ek:bottom--><div class="ekb" id="ekb" role="navigation" aria-label="tabs">{a}</div><!--/ek:bottom-->'
 

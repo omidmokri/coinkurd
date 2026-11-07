@@ -259,6 +259,8 @@ M = {
              "kmr": "📚 <b>Perwerde û ewlehî</b>\nJi bo destpêkeke ewle, gav bi gav «Destpêka ewle» bişopîne.",
              "ar": "📚 <b>التعلم والأمان</b>\nللبداية الآمنة، تابع «البداية الآمنة» خطوة بخطوة.",
              "en": "📚 <b>Learn & stay safe</b>\nFor a safe start, go through “Safe start” step by step."},
+    "b_map": {"fa": "🗺 نقشهٔ یادگیری", "ckb": "🗺 نەخشەی فێربوون", "kmr": "🗺 Nexşeya fêrbûnê", "ar": "🗺 خريطة التعلم",
+              "en": "🗺 Learning map"},
     "b_academy": {"fa": "🏛 آکادمی کریپتو و مسیر یادگیری سایت", "ckb": "🏛 ئەکادیمیای کریپتۆ و ڕێڕەوی فێربوون",
                   "kmr": "🏛 Akademiya kriptoyê û rêya fêrbûnê", "ar": "🏛 أكاديمية الكريبتو ومسار التعلم",
                   "en": "🏛 Crypto academy & learning path"},
@@ -296,7 +298,7 @@ M = {
 
 def menu(lang):
     b = lambda k, d: {"text": L(M[k], lang), "callback_data": d}
-    return L(M["head"], lang), [[b("b_academy", "la:0")],
+    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_academy", "la:0")],
                                 [b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
                                 [b("b_check", "m:token"), b("b_report", "lr:0")]]
 
@@ -383,6 +385,8 @@ AC = {
                "en": "📚 Learning & safety"},
     "b_home": {"fa": "🏠 خانه", "ckb": "🏠 سەرەکی", "kmr": "🏠 Mal", "ar": "🏠 الرئيسية", "en": "🏠 Home"},
 }
+
+# ================================================================== the learning map, inside the bot
 _FA_DIG = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 _CKB_DIG = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
 
@@ -425,7 +429,8 @@ def academy(lang):
     out += ["", L(AC["path"], lang), "", L(AC["note"], lang)]
     u = lambda k, path: {"text": L(AC[k], lang), "url": SITE + path}
     # اول درس‌های داخل ربات، بعد لینک‌های سایت: کسی که ربات را دارد نباید مجبور به باز کردن سایت باشد
-    rows = [[{"text": L(AC["b_study"], lang), "callback_data": "ak:f"}],
+    rows = [[{"text": L(M["b_map"], lang), "callback_data": "lm:0"}],
+            [{"text": L(AC["b_study"], lang), "callback_data": "ak:f"}],
             [{"text": L(AC["b_psy"], lang), "callback_data": "py:m"}],
             [u("b_enter", "/academy/")]]
     fac_btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/academy/{f['id']}/"} for f, _ in pub]
@@ -434,6 +439,54 @@ def academy(lang):
              [u("b_place", "/academy/placement/"), u("b_gloss", "/glossary/")],
              [u("b_me", "/academy/me/")],
              [{"text": L(AC["b_back"], lang), "callback_data": "m:learn"}, {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    return "\n".join(out), rows
+
+
+MP = {
+    "title": {"fa": "🗺 <b>نقشهٔ یادگیری</b>", "ckb": "🗺 <b>نەخشەی فێربوون</b>", "kmr": "🗺 <b>Nexşeya fêrbûnê</b>",
+              "ar": "🗺 <b>خريطة التعلم</b>", "en": "🗺 <b>The learning map</b>"},
+    "desc": {"fa": "هر چیزی که این سایت یاد می‌دهد، روی یک نقشه. داخل هر موضوع فهرستی از درس‌ها، اصطلاح‌ها، "
+                   "ابزارها و منابعی است که همان درس‌ها به آن‌ها ارجاع می‌دهند — و می‌توانید تیک بزنید.",
+             "ckb": "هەر شتێک ئەم ماڵپەڕە فێری دەکات، لەسەر یەک نەخشە. لە ناو هەر بابەتێکدا لیستێکە لە وانە، زاراوە، "
+                    "ئامراز و ئەو سەرچاوانەی هەمان وانەکان ئاماژەیان پێ دەکەن — و دەتوانیت نیشانەیان بکەیت.",
+             "kmr": "Her tiştê ev malper hîn dike, li ser nexşeyekê. Di nav her mijarê de lîsteyek ji ders, "
+                    "peyv, amûr û çavkaniyan heye.",
+             "ar": "كل ما يعلّمه هذا الموقع على خريطة واحدة. داخل كل موضوع قائمة من الدروس والمصطلحات والأدوات والمصادر.",
+             "en": "Everything this site teaches, on one map. Inside each topic is a checklist of lessons, terms, "
+                   "tools and the sources those lessons cite."},
+    "stat": {"fa": "🧭 {t} موضوع — هر کدام با فهرست قابل تیک‌زدن خودش", "ckb": "🧭 {t} بابەت — هەریەکە بە لیستی نیشانەکردنی خۆی",
+             "kmr": "🧭 {t} mijar — her yek bi lîsteya xwe", "ar": "🧭 {t} موضوعاً — لكلٍّ قائمته القابلة للتعليم",
+             "en": "🧭 {t} topics — each with its own checklist"},
+    "b_open": {"fa": "🗺 باز کردن نقشه", "ckb": "🗺 کردنەوەی نەخشە", "kmr": "🗺 Nexşeyê veke", "ar": "🗺 افتح الخريطة",
+               "en": "🗺 Open the map"},
+    "none": {"fa": "نقشه هنوز ساخته نشده است؛ کمی بعد دوباره امتحان کن.", "ckb": "نەخشەکە هێشتا دروست نەکراوە؛ دواتر هەوڵ بدەرەوە.",
+             "kmr": "Nexşe hê nehatiye çêkirin; paşê dîsa biceribîne.", "ar": "لم تُبنَ الخريطة بعد؛ حاول لاحقاً.",
+             "en": "The map has not been built yet; try again shortly."},
+}
+
+
+def map_screen(lang):
+    """-> (text, rows): the site's learning map, listed inside the bot with a link per topic.
+
+    The list comes from the same academy data the academy screen reads, so it can never drift from
+    the site; the counts in each topic's checklist live on the page itself.
+    """
+    fs = faculties()
+    if not fs:
+        return L(MP["none"], lang), [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
+                                      {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    out = [L(MP["title"], lang), L(MP["desc"], lang), "",
+           L(MP["stat"], lang, t=_num(len(fs), lang)), ""]
+    for f, n in fs:
+        mark = "✅" if n else "⏳"
+        tail = "" if n else f" <i>({L(AC['soon'], lang)})</i>"
+        out.append(f"{mark} {f['icon']} {fac_title(f, lang)}{tail}")
+    out += ["", L(AC["note"], lang)]
+    btns = [{"text": f"{f['icon']} {fac_title(f, lang)}"[:40], "url": f"{SITE}/map/{f['id']}/"} for f, _ in fs]
+    rows = [[{"text": L(MP["b_open"], lang), "url": SITE + "/map/"}]]
+    rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
+    rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
+              {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
     return "\n".join(out), rows
 
 

@@ -81,6 +81,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   near the end), `pages.yml` (light rebuild, dispatched by the bot).
 - Data: `data/posts.json` (archive), `impact.json` (post outcomes), `trackrecord.json` (tested channel record),
   `ledger.json`, `scanstats.json`, `scanlog.json`, `market.json`, `score.json`, `brain.json`, `friction.json`, …
+- Learning: the academy's content is `scripts/academy_content/f<n>.py` (65 lessons, 195 cited sources in f1–f4 and f13);
+  `/learn/` and `/glossary/` come from `scripts/learn_data.py` inside `build_pages.build_learn()`. **`/map/` is the view
+  over all of it** — `scripts/build_map.py` + `scripts/map_data.py` (Kurdish titles and the map's own strings) +
+  `assets/map.{css,js}`, and it writes `data/map.json` for the bot. The map holds no teaching content of its own: it
+  collects what already exists and checks every internal link against the built tree, so adding an academy faculty
+  grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
 ## Backlog (top = next)
 1. **Scanner audit — part 2.** Part 1 (2026-11-07) ships `data/scanaudit.json` + verdicts on coin pages and in the bot.
@@ -101,6 +107,22 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · `/map/` — the learning map (asked for by the owner)
+Modelled on learn-anything.xyz: a force-directed graph of 33 topics (13 faculties + their 20 published courses) on
+`/map/`, and under each faculty a `/map/<fid>/` checklist of 411 things you can actually do right now — the academy's
+own lessons, the 195 outside sources those lessons cite, the matching glossary terms, the lab tools and the learning
+path. Ticking is kept in `localStorage.ck_map` and shared by every page, so the hub's cards and the graph nodes show
+each topic's progress ring. Trilingual throughout: `map_data.py` adds the Kurdish titles the academy lacks (13
+faculties, 20 courses, 65 lessons, 13 summaries) and the page follows the site's active language. Every internal link
+is verified against the built tree at build time; `/track-record/` was caught missing this way, which is why the build
+step sits after `build_trackrecord.py`. `data/map.json` ships with the site as open data (git-ignored, never committed, so it cannot go stale). Mirrored into the bot (`bot_learn.map_screen`, callback `lm:`, a button in
+both the Learn menu and the academy screen, titles in all five bot languages, from the academy data the bot already reads), the header and
+bottom nav (`chrome.py`), the home page, the assistant index and the sitemap.
+Also on the home page: `.msg` was overriding `.wrap`'s horizontal padding, which pushed the text and the stats block
+against the right edge (20px gap instead of 68px), and the Latin display/mono faces were being applied to Persian
+(section headings at 86px, broken letter joining in the counters and buttons). Both fixed under `[dir=rtl]`; English
+is untouched.
 
 ### 2026-11-07 · Scanner audit, part 1 — each pattern tested against other hours (Backlog #1)
 - **Need:** the scanner's raw win rates ("RSI overbought wins 70%") mean nothing without a baseline — in a falling market
