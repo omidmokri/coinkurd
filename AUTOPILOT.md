@@ -83,10 +83,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `ledger.json`, `scanstats.json`, `scanlog.json`, `market.json`, `score.json`, `brain.json`, `friction.json`, …
 
 ## Backlog (top = next)
-1. **Scanner audit.** `data/scanstats.json` shows patterns that do worse than chance (e.g. "breakout" 24h win 33%,
-   avg −1.42%, n≈398; a bearish "negative divergence" followed by gains 70% of the time). Test each pattern against the
-   random-hour baseline with the method of `trackrecord.py`, publish per-pattern verdicts, and mark (don't hide) patterns
-   that are significantly worse than random as "under review" in the scanner UI and the bot.
+1. **Scanner audit — part 2.** Part 1 (2026-11-07) ships `data/scanaudit.json` + verdicts on coin pages and in the bot.
+   Next: check the first real `scanaudit.json` from CI and record the result here; add a verdict table to `/opportunity/`
+   (fa/ckb/en) and an "under review" badge in its client-side list; mention the test on `/methodology/`.
 2. **`/today/` — the spine.** One page built every day: what moved and why (`brain.json`), Iran friction today, open
    scanner findings with their tested record, today's posts, the nightly class topic; archived by date for search.
 3. **The founder and the nightly class.** A "tonight 20:00 Tehran — Discord class" strip on the home page with a
@@ -102,6 +101,22 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-07 · Scanner audit, part 1 — each pattern tested against other hours (Backlog #1)
+- **Need:** the scanner's raw win rates ("RSI overbought wins 70%") mean nothing without a baseline — in a falling market
+  every bearish finding "wins" — and some patterns looked worse than chance. Traders see these findings on coin pages
+  and in the bot with no warning.
+- **Built:** `scripts/scanaudit.py` (CI step after scanlog): for every finding in `scanlog.json`, the 24h move in the
+  signal's direction from the next full-hour open; baseline = all findings of a pattern shifted together by every k hours
+  (circular, exact test over all shifts — keeps the cross-coin clustering); two-sided p around the shifts' median;
+  verdict better / worse ("under review") / no_edge / too_few (n<30) at p<0.05. Writes `data/scanaudit.json`.
+  Coin pages show the tested line instead of the raw win % when a verdict exists; the bot marks "under review" under
+  each finding in Opportunities and lists every pattern's test in the Track section (fa/ckb/en). Nothing hidden.
+- **Verified:** py_compile; unit tests on synthetic random walks — null findings significant 0/10 seeds, planted +4%
+  move caught (bull "better" p=0.0012, its bear mirror "worse" p=0.0012), one move hand-checked (+21.82%); coin pages and
+  bot sections rendered on a scratch copy with fake audit data; screenshots 1280/390, zero JS errors. Real figures come
+  from the next CI run — not yet seen.
+- **Next:** Backlog #1 — read the real audit, then the `/opportunity/` table.
 
 ### 2026-11-07 · Public `/autopilot/` log page (Backlog #1)
 - **Need:** the loop changes the site every hour; readers (and the owner) had no way to see what changed and why on the

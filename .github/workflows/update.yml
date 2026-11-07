@@ -86,6 +86,11 @@ jobs:
         timeout-minutes: 6
         run: python scripts/scanlog.py
 
+      - name: Scanner audit (each pattern vs the same coins at other hours, exact shift test)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/scanaudit.py
+
       - name: Bitcoin network snapshot (mempool.space blocks, bitnodes nodes)
         id: chain
         continue-on-error: true
