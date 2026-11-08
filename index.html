@@ -616,8 +616,8 @@ async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="cl
   $('#sheet').querySelectorAll('[data-open]').forEach(a=>a.onclick=ev=>{ev.preventDefault();openPost(+a.dataset.open)})}
 /* ---------- library ---------- */
 let LIB=null,libCat='all';
-const LIBIC={film:'🎬',doc:'🎥',book:'📚',tool:'🧰',free:'🎓',bio:'🧭'};
-const LIBC={film:'#f472b6',doc:'#22d3ee',book:'#f7931a',tool:'#a78bfa',free:'#4ade80',bio:'#fbbf24'};
+const LIBIC={film:'🎬',doc:'🎥',book:'📚',tool:'🧰',free:'🎓',bio:'🧭',song:'🎵'};
+const LIBC={film:'#f472b6',doc:'#22d3ee',book:'#f7931a',tool:'#a78bfa',free:'#4ade80',bio:'#fbbf24',song:'#f87171'};
 const libTxt=o=>o?(o[lang]||o.fa||''):'';
 const libSep=()=>lang==='ckb'?' — ':' · ';
 const fmtY=y=>{try{return new Intl.NumberFormat(T('locale'),{useGrouping:false}).format(y)}catch(e){return String(y)}};
@@ -627,7 +627,7 @@ function renderLib(){
   const g=$('#libGrid');if(!g||!LIB)return;
   const cs=$('#libCats');
   if(cs){cs.innerHTML=`<button class="chip${libCat==='all'?' on':''}" data-c="all">${esc(T('all'))}</button>`+
-      LIB.cats.map(c=>`<button class="chip${libCat===c.k?' on':''}" data-c="${esc(c.k)}" style="--c:${LIBC[c.k]||'var(--lime)'}">${LIBIC[c.k]||''} ${esc(libTxt(c.t))}</button>`).join('');
+      LIB.cats.filter(c=>LIB.items.some(i=>i.cat===c.k)).map(c=>`<button class="chip${libCat===c.k?' on':''}" data-c="${esc(c.k)}" style="--c:${LIBC[c.k]||'var(--lime)'}">${LIBIC[c.k]||''} ${esc(libTxt(c.t))}</button>`).join('');
     cs.querySelectorAll('button').forEach(b=>b.onclick=()=>{libCat=b.dataset.c;renderLib()});}
   const q=(($('#libQ')||{}).value||'').trim().toLowerCase();
   const items=LIB.items.filter(it=>(libCat==='all'||it.cat===libCat)&&
@@ -647,7 +647,7 @@ function openLib(id){const it=(LIB&&LIB.items||[]).find(x=>x.id===id);if(!it)ret
     `<p>${esc(libTxt(it.d))}</p>`+
     (it.l?`<p class="lsn"><b>${esc(T('libLesson'))}</b> ${esc(libTxt(it.l))}</p>`:'')+
     (it.note?`<p class="hlp">⚠ ${esc(libTxt(it.note))}</p>`:'')+
-    `<p>${it.url?`<a class="ent" href="${esc(su(it.url))}" target="_blank" rel="noopener noreferrer nofollow">${esc(T('libOpen'))} ↗</a>`:''}</p></div>`;
+    `<p>${it.url?`<a class="ent" href="${esc(su(it.url))}" target="_blank" rel="noopener noreferrer nofollow">${esc(it.cta?libTxt(it.cta):T('libOpen'))} ↗</a>`:''}</p></div>`;
   $('#modal').classList.add('open');document.body.style.overflow='hidden';
   const c=$('#close');if(c)c.onclick=closeModal;
 }

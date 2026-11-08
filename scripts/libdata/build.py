@@ -2,7 +2,7 @@
 """Assembles data/library.json from the verified parts. Run: python3 -I scripts/libdata/build.py"""
 import datetime, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import part_film, part_doc, part_book, part_bio, part_tool, part_free
+import part_film, part_doc, part_book, part_bio, part_tool, part_free, part_song
 
 CATS = [
  {"k":"film","t":{"fa":"فیلم‌های سینمایی","ckb":"فیلمە سینەماییەکان","en":"Feature films"}},
@@ -11,9 +11,10 @@ CATS = [
  {"k":"tool","t":{"fa":"ابزارها و پلتفرم‌ها","ckb":"ئامراز و پلاتفۆرمەکان","en":"Tools & platforms"}},
  {"k":"free","t":{"fa":"آموزش رایگان","ckb":"فێرکاریی بێبەرامبەر","en":"Free learning"}},
  {"k":"bio","t":{"fa":"زندگی‌نامه‌ها","ckb":"ژیاننامەکان","en":"Lives & stories"}},
+ {"k":"song","t":{"fa":"آهنگ ترید","ckb":"گۆرانیی بازرگانی","en":"Trading songs"}},
 ]
 items = (part_film.ITEMS + part_doc.ITEMS + part_book.ITEMS
-         + part_tool.ITEMS + part_free.ITEMS + part_bio.ITEMS)
+         + part_tool.ITEMS + part_free.ITEMS + part_bio.ITEMS + part_song.ITEMS)
 
 # ---- checks: every entry must be complete and sane before it is written out
 ids, errs = set(), []
@@ -29,6 +30,7 @@ for it in items:
         for lg, v in it.get(f, {}).items():
             if not v.strip(): errs.append(f"{i}: {f}.{lg} is empty")
     if "note" in it and set(it["note"]) != {"fa", "ckb", "en"}: errs.append(f"{i}: note is not in three languages")
+    if "cta" in it and set(it["cta"]) != {"fa", "ckb", "en"}: errs.append(f"{i}: cta is not in three languages")
     if it.get("lvl") not in ("beg", "mid", "adv"): errs.append(f"{i}: bad level {it.get('lvl')}")
     u = it.get("url", "")
     if u and not u.startswith("https://"): errs.append(f"{i}: url is not https")
