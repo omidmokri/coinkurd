@@ -50,6 +50,11 @@ S = {
                "ckb": "٢٤ کاتژمێری ڕابردوو بە یەک نیگا: بازاڕ، گیروگرفتی ئێران، سکانەر، پۆست و وانەی ئەمشەو.",
                "kmr": "24 saetên dawî bi nihêrînekê.", "ar": "آخر ٢٤ ساعة في لمحة: السوق، احتكاك إيران، الماسح، المنشورات ودرس الليلة.",
                "en": "The last 24 hours at a glance: market, Iran friction, scanner, posts and tonight's class."}),
+    "tools": ("🧮", {"fa": "ماشین‌حساب‌ها", "ckb": "ژمێرەرەکان", "kmr": "Hesabker", "ar": "الحاسبات", "en": "Calculators"},
+              {"fa": "حجم پوزیشن، پله‌های سود، میانگین خرید، فاندینگ، جبران ضرر و بیشتر.",
+               "ckb": "قەبارەی پۆزیشن، پلەکانی قازانج، تێکڕای کڕین، فاندینگ، قەرەبووی زیان و زیاتر.",
+               "kmr": "Mezinahiya pozîsyonê, TP, navînî, funding û bêtir.", "ar": "حجم الصفقة، مستويات الربح، متوسط الشراء، التمويل والمزيد.",
+               "en": "Position size, take-profit ladder, average entry, funding, loss recovery and more."}),
     "class": ("🎓", {"fa": "کلاس شبانه", "ckb": "وانەی شەوانە", "kmr": "Dersa şevê", "ar": "الدرس الليلي", "en": "Nightly class"},
               {"fa": "هر شب ۲۰:۰۰ تهران در دیسکورد: زمان، لینک ورود و شمارش معکوس.",
                "ckb": "هەموو شەوێک ٢٠:٠٠ تاران لە دیسکۆرد: کات، بەستەر و ژماردنی پێچەوانە.",
@@ -316,7 +321,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["analysis", "coin", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
+    "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],

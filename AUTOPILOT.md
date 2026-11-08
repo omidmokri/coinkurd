@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Bot section "Calculators" linking every /tools/ card (new need, Backlog had nothing open)
+- **Need:** nine trader calculators shipped on `/tools/` in the last runs, but the bot had no way to reach them (owner's
+  mirror rule). #5 still waits (8 bearish of 85 days).
+- **Built:** `bot_reality.sec_tools` (key `tools`, in the Analysis & tools group after Coin analysis; labels fa/ckb/kmr/ar/en
+  in `bot_menu.S`): one line per calculator with its `/tools/#<id>` deep link (fa/ckb/en) and the not-financial-advice line.
+  Links only, no numbers. Assistant index maps `/tools/` to the new key too.
+- **Verified:** py_compile; every listed id asserted to exist as a `<section id>` in `tools/index.html`; rendered in all 5
+  bot languages (9 links each); `import refbot` sees the key; `build_assistant.py` runs. Bot text only, so no screenshots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need. When a new /tools/ card is added, add it to `bot_reality.TOOLS`.
 ### 2026-11-08 · Take-profit ladder calculator (/tools/#ladder; new need, Backlog had nothing open)
 - **Need:** traders who close in 2–3 targets (common in the channel's setups) could not see their real average exit, total
   profit, true R:R, or what happens if the stop hits after TP1; the risk calculator only takes one target.
