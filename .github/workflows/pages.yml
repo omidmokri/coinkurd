@@ -39,6 +39,14 @@ jobs:
           python scripts/build_autopilot.py
           python scripts/build_map.py
           python scripts/build_kids.py
+      - name: Cache the read-aloud voices
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/entekhab-tts
+          key: tts-${{ hashFiles('scripts/fetch_tts.py') }}
+      - name: Fetch the read-aloud voices (Persian, Sorani) into tts/
+        continue-on-error: true
+        run: python scripts/fetch_tts.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: "." }
