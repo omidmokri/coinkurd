@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "5"  # bump to bust caches of chrome.css / chrome.js
+VER = "6"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -57,6 +57,7 @@ _P = {
     "file": '<path d="M14 3H6.2A1.2 1.2 0 0 0 5 4.2v15.6A1.2 1.2 0 0 0 6.2 21h11.6a1.2 1.2 0 0 0 1.2-1.2V8Z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h5"/>',
     "grid": '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>',
     "search": '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/>',
+    "speaker": '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>',
     "chev": '<path d="m6 9 6 6 6-6"/>',
     "close": '<path d="M6 6l12 12M18 6 6 18"/>',
     "globe": '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/>',
@@ -261,6 +262,7 @@ SOCIAL = [  # (key, url, icon file, label)  — links taken from the footer of e
 
 T = {
     "search": L("جستجو", "گەڕان", "Search"),
+    "read": L("خواندن با صدا", "خوێندنەوە بە دەنگ", "Read aloud"),
     "app": L("دانلود اپ", "داگرتنی ئەپ", "Get the app"),
     "me": L("فضای من", "بۆشاییی من", "My space"),
     "tg": L("تلگرام", "تێلێگرام", "Telegram"),
@@ -324,6 +326,7 @@ def header(lang="fa"):
         parts.append(f'<div class="ek-mi{end}" data-k="{k}"><button class="{mt}" type="button" aria-expanded="false" aria-haspopup="true">'
                      f'{tri(c["t"], lang)}{icon("chev", "ek-svg ek-chev")}</button><div class="ek-mp"><div class="ek-mg">{items}</div></div></div>')
     tools = (f'<button class="ek-ib ek-sb" type="button"{aria(T["search"], lang)}>{icon("search")}</button>'
+             f'<button class="ek-ib ek-rdb" type="button" aria-haspopup="menu"{aria(T["read"], lang)}>{icon("speaker")}</button>'
              f'<a class="ek-ib ek-tgb" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener noreferrer"{aria(T["tg"], lang)}><i class="ek-si b-telegram"></i></a>'
              f'<div class="ek-lang" id="langs" role="group" aria-label="language"><button type="button" data-l="fa" lang="fa">فا</button>'
              f'<button type="button" data-l="ckb" lang="ckb">کو</button><button type="button" data-l="en" lang="en">EN</button></div>'

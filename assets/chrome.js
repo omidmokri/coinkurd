@@ -143,6 +143,88 @@
   var sb = H.querySelector('.ek-sb'); if (sb) sb.addEventListener('click', openSearch);
   window.ekChrome = { openSearch: openSearch, openSheet: openSheet, label: label };
 
+  /* ---------- read aloud: everything happens on the visitor's command ----------
+     header button -> menu (whole page / pick a section), selecting text -> a speaker bubble,
+     Alt+R reads the selection or the page (or pauses), Esc stops. The engine (assets/reader.js)
+     and its voices load only on first use. The AudioContext is created here, inside the click or
+     key press, because browsers only let audio start from a user gesture. */
+  var RDV = '6', rdP = null, SPK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var RDT = {
+    fa: { page: 'خواندن کل صفحه', pick: 'انتخاب یک بخش برای خواندن', stop: 'توقف خواندن', sel: 'خواندن متن انتخاب‌شده', tip: 'یا هر متنی را انتخاب کنید و دکمهٔ بلندگو را بزنید. میان‌بُر: Alt+R، توقف: Esc' },
+    ckb: { page: 'خوێندنەوەی هەموو پەڕەکە', pick: 'هەڵبژاردنی بەشێک بۆ خوێندنەوە', stop: 'ڕاگرتنی خوێندنەوە', sel: 'خوێندنەوەی دەقی هەڵبژێردراو', tip: 'یان هەر دەقێک هەڵبژێرە و دوگمەی بڵندگۆ دابگرە. کورتەڕێ: Alt+R، ڕاگرتن: Esc' },
+    en: { page: 'Read the whole page', pick: 'Pick a section to read', stop: 'Stop reading', sel: 'Read the selected text', tip: 'Or select any text and tap the speaker. Shortcut: Alt+R, stop: Esc' }
+  };
+  function rdt() { return RDT[chromeLang || cur()] || RDT.fa; }
+  function gesture() { try { var A = window.AudioContext || window.webkitAudioContext; if (!window.__ekAC && A) window.__ekAC = new A(); if (window.__ekAC) window.__ekAC.resume(); } catch (e) { } }
+  function reader() { gesture(); return rdP || (rdP = import('/assets/reader.js?v=' + RDV).then(function (m) { return m.default; }, function (e) { rdP = null; throw e; })); }
+  function selRange() {
+    var s = window.getSelection && getSelection(); if (!s || s.isCollapsed || !s.rangeCount) return null;
+    if (String(s).trim().length < 2) return null;
+    var r = s.getRangeAt(0), a = r.commonAncestorContainer; a = a.nodeType === 1 ? a : a.parentNode;
+    if (!a || a.closest('input,textarea,[contenteditable="true"],#ekh,.ek-rd,.ek-rd-menu')) return null;
+    return r;
+  }
+  var rdMenu = null, rdb = H.querySelector('.ek-rdb');
+  /* TEMP staged rollout: on only for ?reader=1 or localStorage ek-rd-beta=1 until verified live */
+  var RD_ON = ls.get('ek-rd-beta') === '1' || /[?&]reader=1/.test(location.search);
+  if (/[?&]reader=1/.test(location.search)) ls.set('ek-rd-beta', '1');
+  if (!RD_ON && rdb) rdb.style.display = 'none';
+  function closeRdMenu() { if (rdMenu) rdMenu.classList.remove('on'); if (rdb) rdb.setAttribute('aria-expanded', 'false'); }
+  function openRdMenu() {
+    var T = rdt();
+    if (!rdMenu) {
+      rdMenu = d.createElement('div'); rdMenu.className = 'ek-rd-menu'; rdMenu.setAttribute('role', 'menu');
+      d.body.appendChild(rdMenu);
+      d.addEventListener('click', function (e) { if (rdMenu.classList.contains('on') && !rdMenu.contains(e.target) && !(rdb && rdb.contains(e.target))) closeRdMenu(); });
+    }
+    var sel = selRange(), items = [];
+    if (sel) items.push(['sel', T.sel]);
+    items.push(['page', T.page], ['pick', T.pick]);
+    var stopBtn = d.querySelector('.ek-rd.on') ? '<button type="button" role="menuitem" data-a="stop">' + T.stop + '</button>' : '';
+    rdMenu.innerHTML = stopBtn + items.map(function (x) { return '<button type="button" role="menuitem" data-a="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '<p>' + T.tip + '</p>';
+    rdMenu.setAttribute('dir', (chromeLang || cur()) === 'en' ? 'ltr' : 'rtl');
+    var keep = sel ? sel.cloneRange() : null;
+    [].forEach.call(rdMenu.querySelectorAll('button'), function (b) {
+      b.addEventListener('click', function () {
+        var a = b.getAttribute('data-a'); closeRdMenu();
+        reader().then(function (R) { if (a === 'stop') R.stop(); else if (a === 'page') R.page(); else if (a === 'pick') R.pick(); else if (a === 'sel' && keep) R.range(keep); });
+      });
+    });
+    var r = rdb.getBoundingClientRect(), w = 250;
+    rdMenu.style.top = Math.round(r.bottom + 8) + 'px';
+    rdMenu.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2))) + 'px';
+    rdMenu.classList.add('on'); rdb.setAttribute('aria-expanded', 'true');
+    var f = rdMenu.querySelector('button'); if (f) f.focus();
+  }
+  if (RD_ON && rdb) rdb.addEventListener('click', function (e) { e.stopPropagation(); gesture(); if (rdMenu && rdMenu.classList.contains('on')) closeRdMenu(); else openRdMenu(); });
+  var bub = null, bubT = 0;
+  function placeBub() {
+    var r = selRange();
+    if (!r) { if (bub) bub.classList.remove('on'); return; }
+    if (!bub) {
+      bub = d.createElement('button'); bub.type = 'button'; bub.className = 'ek-rd-bub'; bub.innerHTML = SPK;
+      bub.addEventListener('mousedown', function (e) { e.preventDefault(); });          /* keep the selection */
+      bub.addEventListener('click', function () { var s = selRange(); bub.classList.remove('on'); if (s) { var k = s.cloneRange(); reader().then(function (R) { R.range(k); }); } });
+      d.body.appendChild(bub);
+    }
+    bub.setAttribute('aria-label', rdt().sel); bub.title = rdt().sel;
+    var rs = r.getClientRects(), b = rs.length ? rs[rs.length - 1] : r.getBoundingClientRect();
+    var x = ((chromeLang || cur()) === 'en' ? b.right : b.left) - 19;
+    bub.style.left = Math.round(Math.max(8, Math.min(innerWidth - 46, x)) + scrollX) + 'px';
+    bub.style.top = Math.round(b.bottom + 10 + scrollY) + 'px';
+    bub.classList.add('on');
+  }
+  if (RD_ON) d.addEventListener('selectionchange', function () { clearTimeout(bubT); bubT = setTimeout(placeBub, 260); });
+  if (RD_ON) d.addEventListener('keydown', function (e) {
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyR') {
+      e.preventDefault(); var s = selRange(), k = s ? s.cloneRange() : null;
+      reader().then(function (R) { if (k) R.range(k); else if (R.playing) R.toggle(); else R.page(); });
+    } else if (e.key === 'Escape') {
+      closeRdMenu();
+      if (rdP) rdP.then(function (R) { if (R.playing) R.stop(); });
+    }
+  });
+
   /* ---------- footer ---------- */
   if (F) {
     var yr = F.querySelector('.ek-yr'); if (yr) yr.textContent = new Date().getFullYear();
