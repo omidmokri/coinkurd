@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Liquidation-price calculator (/tools/#liq; new need, Backlog had nothing open)
+- **Need:** futures traders using leverage often do not know where they get liquidated, or set a stop that sits beyond the
+  liquidation price (so the stop never protects them). No site tool showed it. #5 still waits (8 bearish of 85 days).
+- **Built:** new `/tools/` card (fa/ckb/en): side, entry, leverage, maintenance-margin %, optional stop → approx. liquidation
+  price, distance %, and a warning if the stop is beyond liquidation. Pure `liqCalc()` (linear USDT-M isolated, no fees:
+  long E(1−1/L)/(1−MMR), short E(1+1/L)/(1+MMR); tiers/fees stated as not modelled). Bot: added to `bot_reality.TOOLS`.
+- **Verified:** in-page tests: long 100/10x/0.5% → 90.452 (=90/0.995), short → 109.453 (=110/1.005), 1x long → 0, entry 0
+  or lev <1 → null; stop 85 on long flagged; Playwright + Chrome 1280 fa / 390 fa+en, overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-08 · Bot section "Calculators" linking every /tools/ card (new need, Backlog had nothing open)
 - **Need:** nine trader calculators shipped on `/tools/` in the last runs, but the bot had no way to reach them (owner's
   mirror rule). #5 still waits (8 bearish of 85 days).
