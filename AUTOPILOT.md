@@ -131,6 +131,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Take-profit ladder calculator (/tools/#ladder; new need, Backlog had nothing open)
+- **Need:** traders who close in 2–3 targets (common in the channel's setups) could not see their real average exit, total
+  profit, true R:R, or what happens if the stop hits after TP1; the risk calculator only takes one target.
+- **Built:** new `/tools/` card (fa/ckb/en): side, size, entry, stop, up to 3 targets with % closed each → loss at stop,
+  profit if all hit, average exit, real R:R, result if stopped after TP1, % left open. Pure `tpCalc()`; validates sides
+  and Σ% ≤ 100. Fees/funding excluded (stated). No bot change (bot has no calculators).
+- **Verified:** node tests on `tpCalc` (long 100/95, 1000$, 105×50/110×30/120×20 → risk 50, profit 95, avg 109.5, R 1.9,
+  after-TP1 0 — hand-checked; short 100→90 R 2; stop/target on wrong side, Σ>100, no levels → null; 40% filled → left 60,
+  after-TP1 +10); Playwright + Chrome 1280/390 fa/en: same numbers, overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need (the bot could get a link list to /tools/ cards).
 ### 2026-11-08 · Loss-recovery calculator (/tools/#recovery; new need, Backlog had nothing open)
 - **Need:** traders after a drawdown underestimate the gain needed to get back (−50% needs +100%); no tool showed it.
   #5 still waits (8 bearish of 85 days).
