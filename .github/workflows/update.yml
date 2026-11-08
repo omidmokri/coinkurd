@@ -321,6 +321,11 @@ jobs:
         timeout-minutes: 3
         run: python scripts/build_assistant.py
 
+      - name: Freeze today's /today/ snapshot (data/today_days.json)
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/build_today.py --snapshot
+
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"
