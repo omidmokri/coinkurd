@@ -117,6 +117,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · The markets library in the home-page archive (asked for by the owner)
+The owner asked for a library of films, documentaries, books, tools, free courses and lives,
+inside the existing archive on the home page, in all three languages. `#library` in `index.html`
+renders it from `data/library.json`; the entries live in `scripts/libdata/*.py` and are rebuilt by
+`scripts/libdata/build.py`, which refuses to write an entry that is missing a language, has a bad
+level, a non-https link or the wrong digit set. 62 entries; every fact was checked against the page
+in its `url` before it was written, and four entries carry no link because no page could be verified.
+Covers are drawn in CSS — never copy a poster or a book cover. Every entry carries its caveat in
+`note` (dramatised, dated, ideological, exchange-owned, broker-dependent, self-reported data).
+Mirrored in the nav (`chrome.py`, under Archive), the assistant index and the bot
+(`bot_learn.library_screen`, five languages). Note for later: the home page's own click handler opens
+a post for any `[data-id]`, so the library cards use `data-lib`.
+
 
 ### 2026-11-08 · Stance labels: a greeting line is no longer evidence of a direction (Backlog #5)
 - **Need:** the directional study is only as honest as its labels; a bullish/bearish label whose verbatim "evidence" is
