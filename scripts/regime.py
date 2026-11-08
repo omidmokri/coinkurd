@@ -30,6 +30,7 @@ from datetime import datetime, timedelta, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reality_common as R  # noqa: E402
 
+VERSION = 2          # bump to force a refit when the model or the naming changes
 COIN = "BTC"
 K = 4
 LABELS = ["bull", "bear", "sideways", "high_vol"]
@@ -172,12 +173,13 @@ def fit(X, iters, warm=None):
 
 
 def name_states(P, sd, mu0):
-    """map hidden states to labels from what they are: most volatile -> high_vol, the rest by momentum"""
+    """map hidden states to labels from what they are: lowest 20-day momentum -> bear, highest -> bull;
+    of the two in between, the more volatile is high_vol (volatile, no trend) and the calmer is sideways"""
     vol = [P["mu"][k][1] for k in range(K)]
     mom = [P["mu"][k][2] for k in range(K)]
-    hv = max(range(K), key=lambda k: vol[k])
-    rest = sorted((k for k in range(K) if k != hv), key=lambda k: mom[k])
-    names = {hv: "high_vol", rest[0]: "bear", rest[1]: "sideways", rest[2]: "bull"}
+    by_mom = sorted(range(K), key=lambda k: mom[k])
+    mid = sorted(by_mom[1:3], key=lambda k: vol[k])
+    names = {by_mom[0]: "bear", by_mom[3]: "bull", mid[0]: "sideways", mid[1]: "high_vol"}
     real = {names[k]: {"mom20_pct": round(100 * (math.exp(P["mu"][k][2] * sd[2] + mu0[2]) - 1), 2),
                        "vol10_pct": round(100 * math.exp(P["mu"][k][1] * sd[1] + mu0[1]), 2),
                        "stay": round(P["A"][k][k], 4),
@@ -198,7 +200,7 @@ def main():
     bars = daily_bars()
     rows = features(bars)
     last_day = rows[-1][0]
-    if prev.get("now", {}).get("date") == last_day and not os.environ.get("FORCE"):
+    if prev.get("now", {}).get("date") == last_day and prev.get("version") == VERSION and not os.environ.get("FORCE"):
         print(f"regime: {last_day} already done")
         return
     dates = [r[0] for r in rows]
@@ -275,7 +277,7 @@ def main():
     # overlapping 30-day windows: effective sample is about n/30 per regime, said on the page
 
     out = {
-        "version": 1, "updated_at": R.iso(datetime.now(timezone.utc)), "coin": COIN,
+        "version": VERSION, "updated_at": R.iso(datetime.now(timezone.utc)), "coin": COIN,
         "model": {"kind": "gaussian_hmm_diag", "K": K, "features": ["r1", "log_vol10", "mom20"], "fit_days": len(X),
                   "loglik": round(ll, 1), "first_day": dates[0], "oos_from": f"{OOS_FROM}-01-01"},
         "now": {"date": last_day, "price": round(closes[-1], 2), "probs": {k: round(v, 4) for k, v in p_now.items()},

@@ -46,7 +46,7 @@ S = {
     "hb.an_d": L("حجم، قیمت، OI و فاندینگ غیرعادی امروز", "قەبارە، نرخ، OI و فاندینگی نائاسایی ئەمڕۆ", "Today's unusual volume, price, OI and funding"),
     "hb.an_k": L("ارز با پرچم ناهنجاری", "دراو بە ئاڵای نائاسایی", "coins flagged"),
     "rg.bull": L("صعودی", "بەرزبوونەوە", "Bull"), "rg.bear": L("نزولی", "دابەزین", "Bear"),
-    "rg.sideways": L("خنثی", "مامناوەند", "Sideways"), "rg.high_vol": L("پرنوسان", "هەڵاوسانی زۆر", "High volatility"),
+    "rg.sideways": L("خنثی", "مامناوەند", "Sideways"), "rg.high_vol": L("پرنوسانِ بی‌جهت", "هەڵاوسانی بێ ئاڕاستە", "Volatile, no trend"),
     "home": L("خانه", "ماڵەوە", "Home"),
     "hub": L("واقعیت‌سنج", "ڕاستی‌پێو", "Reality Check"),
     "upd": L("به‌روزرسانی", "نوێکردنەوە", "Updated"),

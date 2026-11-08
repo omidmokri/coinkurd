@@ -81,7 +81,7 @@ S = {
                "en": "Every signal net of costs, out-of-sample, corrected for multiple tests — negative results too."}),
     "regime": ("🧭", {"fa": "رادار رژیم بازار", "ckb": "ڕاداری دۆخی بازاڕ", "kmr": "Radara rewşa bazarê",
                      "ar": "رادار حالة السوق", "en": "Market-regime radar"},
-               {"fa": "احتمال صعودی، نزولی، خنثی یا پرنوسان بودن بازار بیت‌کوین و احتمال تغییر آن.",
+               {"fa": "احتمال صعودی، نزولی، خنثی یا پرنوسانِ بی‌جهت بودن بازار بیت‌کوین و احتمال تغییر آن.",
                 "ckb": "ئەگەری بەرزبوونەوە، دابەزین، مامناوەند یان هەڵاوسانی بازاڕی بیتکۆین و ئەگەری گۆڕانی.",
                 "kmr": "Îhtîmala rewşên bazara bîtkoynê.", "ar": "احتمال كل حالة لسوق البيتكوين واحتمال تغيرها.",
                 "en": "How likely Bitcoin is in a bull, bear, sideways or high-volatility regime, and the chance of a switch."}),

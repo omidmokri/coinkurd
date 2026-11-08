@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reality_common as R  # noqa: E402
 
+VERSION = 2          # bump to force today's daily part to rerun after a change
 MAX_COINS = 60
 WIN = 30
 Z = 3.0
@@ -141,6 +142,8 @@ def analyse(coin, bars, oi, fund):
     if not hist:
         return None, []
     d, fl, _, ret, zv, zm, zt = hist[-1]
+    oi = {k: v for k, v in oi.items() if k <= d}          # closed days only, like the spot bars
+    fund = {k: v for k, v in fund.items() if k <= d}
     row = {"coin": coin, "d": d, "price": c[-1], "ret": round(ret, 2), "vol_usd": round(bars[-1]["v"]),
            "z": {"vol": r2(zv), "move": r2(zm), "taker": r2(zt)}, "flags": sorted(fl)}
     # derivatives (latest day that both the series and its window cover)
@@ -236,7 +239,7 @@ def main():
     now = datetime.now(timezone.utc)
     today0 = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
     last_closed = R.day(R.from_ms(R.ms(today0) - 86_400_000))
-    if prev.get("day") == last_closed and not os.environ.get("FORCE"):
+    if prev.get("day") == last_closed and prev.get("version") == VERSION and not os.environ.get("FORCE"):
         prev["now"] = now_view(prev)
         R.save("anomaly.json", prev)
         print(f"anomaly: {last_closed} done; now view refreshed ({len(prev['now']['hot'])} hot)")
@@ -268,7 +271,7 @@ def main():
     bt = backtest(all_hist)
     days_cov = sorted({d for h in all_hist.values() for d, *_ in h})
     out = {
-        "version": 1, "updated_at": R.iso(now), "day": last_closed, "window": WIN, "z": Z,
+        "version": VERSION, "updated_at": R.iso(now), "day": last_closed, "window": WIN, "z": Z,
         "coins": len(today), "okx_coins": okx_ok, "errors": errors,
         "today": sorted(today, key=lambda r: -r["score"]),
         "counts": {f: sum(1 for r in today if f in r["flags"]) for f in FLAGS},
