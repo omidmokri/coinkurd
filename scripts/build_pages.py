@@ -879,6 +879,27 @@ SECTOR_FA = {"layer-1": "لایهٔ یک (L1)", "exchange-based-tokens": "توک
 
 
 
+# /onchain/ and /crypto-news/ carry a Persian and a Sorani copy of every summary. Before 2026-11-08 the
+# Sorani one sat in a collapsed <details> that the language switch never touched. Now «کو» shows the
+# Sorani text in place of the Persian (no copy -> the Persian stays), «EN» keeps Persian/Sorani with a
+# note saying so; the header buttons are answered the same way as LANG_JS / build_reality.LANG_JS.
+FEED_UI = {
+    "onchain/": ("پوختەی شیکارییە ئانچینەکانی بیتکۆین و بازاڕی کریپتۆ بە فارسی و کوردیی سۆرانی · خۆکار لە بۆتی Coin_Kurd",
+                 "On-chain analysis summaries for Bitcoin and the crypto market, in Persian and Sorani Kurdish · updated by the Coin_Kurd bot"),
+    "crypto-news/": ("پوختەی هەواڵەکانی ڕۆژانەی بازاڕی کریپتۆ بە فارسی و کوردیی سۆرانی · خۆکار لە بۆتی Coin_Kurd",
+                     "Daily crypto news summaries in Persian and Sorani Kurdish · updated by the Coin_Kurd bot"),
+}
+FEED_LANG_JS = ("(function(){var K='ck_lang',L;try{L=localStorage.getItem(K)}catch(e){}if(['fa','ckb','en'].indexOf(L)<0)L='fa';window.I18N=1;"
+                "function ap(l){L=l;try{localStorage.setItem(K,l)}catch(e){}var de=document.documentElement;de.lang=l;de.dir=l==='en'?'ltr':'rtl';"
+                "document.querySelectorAll('[data-fl]').forEach(function(x){x.hidden=x.getAttribute('data-fl')!==l});"
+                "document.querySelectorAll('.fd-ck').forEach(function(d){d.open=l==='ckb';var f=d.previousElementSibling;if(f&&f.classList.contains('fd-fa'))f.hidden=l==='ckb'});"
+                "document.querySelectorAll('#langs button,.ek-lang button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l)});"
+                "window.dispatchEvent(new CustomEvent('ek-lang',{detail:l}))}"
+                "window.EKL=function(){return L};window.EKSET=ap;"
+                "document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#langs button[data-l],.ek-lang button[data-l]');if(b){ev.preventDefault();ev.stopPropagation();ap(b.getAttribute('data-l'))}},true);"
+                "ap(L)})();")
+
+
 def build_feeds():
     """/onchain/ and /crypto-news/ — Persian and Sorani summaries written by the Telegram bot (data/onchain.json, data/cryptonews.json)"""
     urls = []
@@ -898,16 +919,24 @@ def build_feeds():
             ph = it.get("img") or it.get("photo") or ""
             if ph.startswith(("https://", "/data/feedimg/")):
                 block += f'<img class="img" src="{e(ph)}" alt="" loading="lazy" referrerpolicy="no-referrer">'
-            block += f'<small class="note">{when}</small><div lang="fa" dir="rtl">{fa}</div>'
+            block += f'<small class="note">{when}</small><div class="fd-fa" lang="fa" dir="rtl">{fa}</div>'
             if ckb:
-                block += f'<details style="margin-top:10px"><summary>کوردی سۆرانی</summary><div lang="ckb" dir="rtl">{ckb}</div></details>'
+                block += f'<details class="fd-ck" style="margin-top:10px"><summary>کوردی سۆرانی</summary><div lang="ckb" dir="rtl">{ckb}</div></details>'
             block += "</article>"
             cards.append(block)
         head = OP.analysis_block(load, e, fmt_date) if path == "onchain/" else ""
-        body = (f'<div class="meta"><a href="/">خانه</a> / {e(title)}</div><h1>{e(title)}</h1>'
-                f'<p class="note">{e(desc)} · به‌روز خودکار از ربات Coin_Kurd</p>' + head
-                + ("".join(cards) or '<p class="note">هنوز موردی منتشر نشده است.</p>')
-                + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
+        def fl(fa_, ckb_, en_, tag="span", cls=""):
+            c = f' class="{cls}"' if cls else ""
+            return (f'<{tag}{c} data-fl="fa">{fa_}</{tag}><{tag}{c} data-fl="ckb" hidden>{ckb_}</{tag}>'
+                    f'<{tag}{c} data-fl="en" hidden dir="ltr">{en_}</{tag}>')
+        ui = FEED_UI[path]
+        body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
+                + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note")
+                + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note")
+                + head
+                + ("".join(cards) or fl("هنوز موردی منتشر نشده است.", "هێشتا هیچ بابەتێک بڵاو نەکراوەتەوە.", "Nothing published yet.", "p", "note"))
+                + fl("آموزشی است، توصیهٔ مالی نیست.", "فێرکارییە، ئامۆژگاریی دارایی نییە.", "Educational, not financial advice.", "p", "note")
+                + f"<style>html[lang=ckb] .fd-ck>summary{{display:none}}</style><script>{FEED_LANG_JS}</script>")
         urls.append(page(path, title, desc, body))
     v = load("deep.json", {}).get("items", [])
     cards = []
