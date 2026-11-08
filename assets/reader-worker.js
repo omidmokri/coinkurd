@@ -2,8 +2,9 @@
    Runs the neural voices off the main thread so the page never freezes while a sentence renders:
      fa  : Piper fa_IR "amir" (VITS) — espeak-ng phonemes from piper_phonemize (WASM)
      ckb : Vekol-TTS Sorani edge (VITS) — character input, no phonemizer
-   Everything is served by entekhab.net under /tts/ (see scripts/fetch_tts.py) and kept in the
-   Cache Storage bucket "ek-tts-v1", so a voice downloads once and then works offline.
+   Everything is served by entekhab.net under /tts/ (see scripts/fetch_tts.py; both voices are int8,
+   ~18-20 MB to download) and kept in the Cache Storage bucket "ek-tts-v1", so a voice downloads once
+   and then works offline.
    Text never leaves the device.
 
    Messages in : {id, op:'load', lang} | {id, op:'synth', lang, text, rate}
@@ -15,13 +16,26 @@ const S = {};                 // lang -> {session, cfg}
 let phon = null, phonOut = null;
 
 async function manifest() {
-  if (!M) M = await (await fetch('/tts/manifest.json', { cache: 'no-cache' })).json();
+  if (!M) { M = await (await fetch('/tts/manifest.json', { cache: 'no-cache' })).json(); sweep(); }
   return M;
 }
+/* cache keys carry the file's exact byte size (manifest.sizes), so a replaced voice is fetched again;
+   anything in the bucket that no longer matches a served file is deleted (frees the old ~75 MB
+   full-size voices on devices that downloaded them before the int8 switch) */
+async function sweep() {
+  try {
+    const c = await caches.open(CACHE);
+    for (const req of await c.keys()) {
+      const u = new URL(req.url), sz = M.sizes && M.sizes[u.pathname];
+      if (sz === undefined || u.search !== '?s=' + sz) await c.delete(req);
+    }
+  } catch (e) { }
+}
+const keyOf = url => url + '?s=' + ((M && M.sizes && M.sizes[url]) || 0);
 
 /* fetch through our own cache, reporting progress; `tag` groups several files under one bar */
-async function grab(url, size, tag, acc) {
-  const key = url + '?s=' + (size || 0);
+async function grab(url, tag, acc) {
+  const key = keyOf(url), size = (M.sizes && M.sizes[url]) || 0;
   let c = null;
   try { c = await caches.open(CACHE); const hit = await c.match(key); if (hit) { const b = await hit.arrayBuffer(); acc.loaded += b.byteLength; post(tag, acc); return b; } } catch (e) { c = null; }
   const res = await fetch(url);
@@ -45,7 +59,7 @@ function post(lang, acc) { const t = Date.now(); if (t - lastPost < 120 && acc.l
 async function getOrt(acc, lang) {
   if (ort) return ort;
   const m = await manifest();
-  if (!ortBin) ortBin = await grab(m.ort.base + 'ort-wasm-simd-threaded.wasm', 0, lang, acc);
+  if (!ortBin) ortBin = await grab(m.ort.wasm, lang, acc);
   ort = await import(m.ort.base + 'ort.wasm.min.mjs');
   ort.env.wasm.wasmPaths = m.ort.base;
   ort.env.wasm.wasmBinary = ortBin;
@@ -56,7 +70,7 @@ async function getOrt(acc, lang) {
 async function getPhon(acc) {
   if (phon) return phon;
   const m = await manifest();
-  const wasm = await grab(m.piper.wasm, 0, 'fa', acc), data = await grab(m.piper.data, 0, 'fa', acc);
+  const wasm = await grab(m.piper.wasm, 'fa', acc), data = await grab(m.piper.data, 'fa', acc);
   const create = (await import(m.piper.js)).default;
   phon = await create({
     noInitialRun: true, wasmBinary: wasm,
@@ -71,11 +85,11 @@ async function load(lang) {
   if (S[lang]) return S[lang];
   const m = await manifest(), v = m[lang];
   if (!v) throw new Error('no voice ' + lang);
-  const acc = { loaded: 0, total: v.bytes + (ort ? 0 : m.ort.bytes) };
+  const S_ = m.sizes, acc = { loaded: 0, total: S_[v.model] + (ort ? 0 : S_[m.ort.wasm]) + (lang === 'fa' && !phon ? S_[m.piper.wasm] + S_[m.piper.data] : 0) };
   const o = await getOrt(acc, lang);
   if (lang === 'fa') await getPhon(acc);
   const cfg = await (await fetch(v.config)).json();
-  const model = await grab(v.model, 0, lang, acc);
+  const model = await grab(v.model, lang, acc);
   /* one neural voice in memory at a time: two VITS graphs can exhaust a phone's tab memory */
   for (const k of Object.keys(S)) { try { await S[k].session.release(); } catch (e) { } delete S[k]; }
   const session = await o.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
@@ -160,9 +174,10 @@ async function handle({ id, op, lang, text, rate }) {
     if (op === 'cached') {
       /* has this voice been downloaded before? (decides whether to ask before downloading) */
       const m = await manifest(), c = await caches.open(CACHE);
-      const hit = !!(await c.match(m[lang].model + '?s=0'));
-      const ortHit = !!(await c.match(m.ort.base + 'ort-wasm-simd-threaded.wasm?s=0'));
-      self.postMessage({ id, ok: true, cached: hit, bytes: (hit ? 0 : m[lang].bytes) + (ortHit ? 0 : m.ort.bytes) });
+      const hit = !!(await c.match(keyOf(m[lang].model)));
+      const ortHit = !!(await c.match(keyOf(m.ort.wasm)));
+      /* what the visitor will actually download: gzip size as Pages sends it */
+      self.postMessage({ id, ok: true, cached: hit, bytes: (hit ? 0 : m.wire[lang]) + (ortHit ? 0 : m.wire.ort) });
       return;
     }
     throw new Error('unknown op ' + op);

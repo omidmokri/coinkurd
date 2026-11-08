@@ -8,8 +8,18 @@ carries its own:
 
     tts/ort/    onnxruntime-web, the WASM engine that runs the voice models   (npm, MIT)
     tts/piper/  piper_phonemize: espeak-ng in WASM, turns Persian into phonemes (npm, MIT)
-    tts/fa/     Piper fa_IR "amir" medium voice                               (rhasspy/piper-voices)
-    tts/ckb/    Vekol-TTS Sorani edge voice — CC-BY-NC 4.0, credited in the UI (RevgeAI/vekol-tts-ckb-edge)
+    tts/fa/     Piper fa_IR "amir" medium voice, int8                         (rhasspy/piper-voices)
+    tts/ckb/    Vekol-TTS Sorani edge voice, int8 — CC-BY-NC 4.0, credited in the UI (RevgeAI/vekol-tts-ckb-edge)
+
+Shrunk for Iranian connections (what a visitor downloads, gzip as Pages sends it):
+    Persian  ~72 MB -> ~18 MB   Kurdish  ~75 MB -> ~20 MB
+  - both voices are dynamically quantised to int8 (scripts/tts_quant.py, QUInt8 per-tensor). Measured
+    on 2026-11-08 with DTW-aligned log-mel distance: int8 vs original 3.1-3.6 dB (fa) and 1.8-2.2 dB
+    (ckb), below the 4.0-4.7 / 3.5-3.8 dB between two renders of the ORIGINAL voice itself.
+  - piper_phonemize's espeak-ng data ships 113 language dictionaries (17 MB); only fa_dict is kept
+    (18.1 MB -> ~1.1 MB). The Emscripten package metadata inside the loader is rewritten to match.
+Every served file's byte size goes into manifest.json; the reader keys its cache on it, so a
+changed file is fetched again and the stale copy is dropped from the visitor's device.
 
 Why the site hosts them: the CSP pins connect-src to 'self', and a CDN or Hugging Face may be
 unreachable for part of the audience; GitHub Pages already is reachable for them.
@@ -22,9 +32,11 @@ its digest is printed, and it should be pinned from that log.
 
 Run:  python3 scripts/fetch_tts.py
 """
+import gzip
 import hashlib
 import io
 import json
+import re
 import os
 import shutil
 import sys
@@ -71,12 +83,16 @@ FILES = [
 
 # what ends up served, as (cache name or tgz member, served path)
 PLACE = {
-    "fa_IR-amir-medium.onnx": "fa/amir.onnx",
     "fa_IR-amir-medium.onnx.json": "fa/amir.onnx.json",
     "fa_IR-amir-medium.MODEL_CARD": "fa/MODEL_CARD.txt",
-    "vekol.onnx": "ckb/vekol.onnx",
     "vekol.onnx.json": "ckb/vekol.onnx.json",
 }
+# int8 voices: (source in the download cache, served path). Quantised once, cached next to the source.
+QUANT = {
+    "fa_IR-amir-medium.onnx": "fa/amir.int8.onnx",
+    "vekol.onnx": "ckb/vekol.int8.onnx",
+}
+ORT_PIN = "1.31.1"   # onnxruntime used to quantise (deploy workflows install exactly this); same as the web runtime
 TGZ = {
     f"onnxruntime-web-{ORT_VER}.tgz": {
         "package/dist/ort.wasm.min.mjs": "ort/ort.wasm.min.mjs",
@@ -156,14 +172,56 @@ def main():
                 with open(dst, "wb") as f:
                     shutil.copyfileobj(src, f)
 
-    # piper_phonemize ships as a classic Emscripten script; the reader's module worker imports it,
-    # so serve an ES-module copy that exports the factory (the original stays for reference)
+    # ---- int8 voices (see tts_quant.py for the measurements behind this choice) ----
+    for src, rel in QUANT.items():
+        q = os.path.join(DL, src.replace(".onnx", f".u8-ort{ORT_PIN}.onnx"))
+        if not os.path.exists(q):
+            import onnxruntime
+            if onnxruntime.__version__ != ORT_PIN:
+                sys.exit(f"quantise with onnxruntime {ORT_PIN}, found {onnxruntime.__version__}")
+            from onnxruntime.quantization import QuantType, quantize_dynamic
+            print(f"  quantise {src} -> int8")
+            quantize_dynamic(os.path.join(DL, src), q + ".part", weight_type=QuantType.QUInt8, per_channel=False)
+            os.replace(q + ".part", q)
+        dst = os.path.join(OUT, rel)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copyfile(q, dst)
+        print(f"  int8    {rel}: {os.path.getsize(dst) / 1e6:.1f} MB (from {os.path.getsize(os.path.join(DL, src)) / 1e6:.1f} MB)")
+
+    # ---- piper_phonemize: Persian-only espeak data, ES-module loader ----
+    # The reader's module worker imports the loader, so it is served as an ES module that exports the
+    # factory. Its Emscripten metadata (file offsets inside the .data package) is rewritten for the
+    # subset. New names (.fa.*) so no visitor pairs a cached full package with the new offsets.
     pj = os.path.join(OUT, "piper/piper_phonemize.js")
+    pd = os.path.join(OUT, "piper/piper_phonemize.data")
     with open(pj, encoding="utf-8") as f:
         src = f.read()
+    with open(pd, "rb") as f:
+        data = f.read()
     assert "var createPiperPhonemize" in src
-    with open(os.path.join(OUT, "piper/piper_phonemize.mjs"), "w", encoding="utf-8") as f:
+    m = re.search(r'loadPackage\((\{"files":.*?\})\)', src, re.S)
+    meta = json.loads(m.group(1))
+    assert meta["remote_package_size"] == len(data), "piper package metadata does not match its data"
+    keep = [f for f in meta["files"] if not f["filename"].endswith("_dict") or f["filename"].endswith("/fa_dict")]
+    assert any(f["filename"].endswith("/fa_dict") for f in keep), "fa_dict missing from piper package"
+    out, files = bytearray(), []
+    for f in keep:
+        g = dict(f); g["start"] = len(out); out += data[f["start"]:f["end"]]; g["end"] = len(out); files.append(g)
+    meta2 = dict(meta, files=files, remote_package_size=len(out))
+    src2 = src[:m.start(1)] + json.dumps(meta2, separators=(",", ":")) + src[m.end(1):]
+    with open(os.path.join(OUT, "piper/piper_phonemize.fa.mjs"), "w", encoding="utf-8") as f:
+        f.write(src2 + "\nexport default createPiperPhonemize;\n")
+    with open(os.path.join(OUT, "piper/piper_phonemize.fa.data"), "wb") as f:
+        f.write(out)
+    # TEMP (verification): the full build stays at piper/full/ so the subset can be compared against it
+    # in a browser (identical phoneme ids for the same text). Not referenced by the manifest; remove
+    # once checked.
+    os.makedirs(os.path.join(OUT, "piper/full"), exist_ok=True)
+    with open(os.path.join(OUT, "piper/full/piper_phonemize.mjs"), "w", encoding="utf-8") as f:
         f.write(src + "\nexport default createPiperPhonemize;\n")
+    os.replace(pd, os.path.join(OUT, "piper/full/piper_phonemize.data"))
+    os.remove(pj)
+    print(f"  piper   {len(meta['files'])} -> {len(files)} files, {len(data) / 1e6:.1f} MB -> {len(out) / 1e6:.2f} MB")
 
     # sanity: the two voice configs must be the shapes reader.js expects
     fa = json.load(open(os.path.join(OUT, "fa/amir.onnx.json"), encoding="utf-8"))
@@ -171,28 +229,40 @@ def main():
     assert fa["espeak"]["voice"] == "fa", fa["espeak"]
     assert ck.get("phoneme_type") == "text" and "phoneme_id_map" in ck, "vekol config changed shape"
 
-    # the manifest reader.js reads for sizes (shown in the one-time download prompt) and versions
-    def sz(rel):
-        return os.path.getsize(os.path.join(OUT, rel))
+    # ---- manifest: paths, exact byte sizes (cache keys) and what each voice costs on the wire ----
+    def rel(p):
+        return "/tts/" + p
+    def size(p):
+        return os.path.getsize(os.path.join(OUT, p))
+    def wire(p):                          # gzip, as GitHub Pages sends these files
+        with open(os.path.join(OUT, p), "rb") as f:
+            return len(gzip.compress(f.read(), 6))
+    served = ["ort/ort-wasm-simd-threaded.wasm", "ort/ort.wasm.min.mjs", "ort/ort-wasm-simd-threaded.mjs",
+              "piper/piper_phonemize.fa.mjs", "piper/piper_phonemize.wasm", "piper/piper_phonemize.fa.data",
+              "fa/amir.int8.onnx", "fa/amir.onnx.json", "ckb/vekol.int8.onnx", "ckb/vekol.onnx.json"]
     manifest = {
-        "ort": {"base": "/tts/ort/", "bytes": sz("ort/ort-wasm-simd-threaded.wasm") + sz("ort/ort.wasm.min.mjs")
-                + sz("ort/ort-wasm-simd-threaded.mjs"), "version": ORT_VER},
-        "fa": {"model": "/tts/fa/amir.onnx", "config": "/tts/fa/amir.onnx.json",
-               "bytes": sz("fa/amir.onnx") + sz("piper/piper_phonemize.data") + sz("piper/piper_phonemize.wasm"),
-               "voice": "Piper fa_IR amir (medium)"},
-        "ckb": {"model": "/tts/ckb/vekol.onnx", "config": "/tts/ckb/vekol.onnx.json",
-                "bytes": sz("ckb/vekol.onnx"), "voice": "Vekol-TTS by Revge (CC BY-NC 4.0)"},
-        "piper": {"js": "/tts/piper/piper_phonemize.mjs", "wasm": "/tts/piper/piper_phonemize.wasm",
-                  "data": "/tts/piper/piper_phonemize.data"},
+        "v": 2,
+        "ort": {"base": "/tts/ort/", "wasm": rel("ort/ort-wasm-simd-threaded.wasm"), "version": ORT_VER},
+        "piper": {"js": rel("piper/piper_phonemize.fa.mjs"), "wasm": rel("piper/piper_phonemize.wasm"),
+                  "data": rel("piper/piper_phonemize.fa.data")},
+        "fa": {"model": rel("fa/amir.int8.onnx"), "config": rel("fa/amir.onnx.json"), "voice": "Piper fa_IR amir (medium, int8)"},
+        "ckb": {"model": rel("ckb/vekol.int8.onnx"), "config": rel("ckb/vekol.onnx.json"), "voice": "Vekol-TTS by Revge (CC BY-NC 4.0, int8)"},
+        "sizes": {rel(p): size(p) for p in served},
+        "wire": {
+            "ort": wire("ort/ort-wasm-simd-threaded.wasm"),
+            "fa": wire("fa/amir.int8.onnx") + wire("piper/piper_phonemize.fa.data") + wire("piper/piper_phonemize.wasm"),
+            "ckb": wire("ckb/vekol.int8.onnx"),
+        },
     }
     with open(os.path.join(OUT, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=1)
+    w = manifest["wire"]
+    print(f"tts: a visitor downloads Persian {(w['fa'] + w['ort']) / 1e6:.1f} MB, Kurdish {(w['ckb'] + w['ort']) / 1e6:.1f} MB (gzip)")
 
     print("tts: model card for the Persian voice:")
     print(open(os.path.join(OUT, "fa/MODEL_CARD.txt"), encoding="utf-8", errors="replace").read())
     total = sum(os.path.getsize(os.path.join(dp, fn)) for dp, _, fns in os.walk(OUT) for fn in fns)
     print(f"tts: served total {total / 1e6:.1f} MB")
-    print("tts: manifest", json.dumps(manifest, ensure_ascii=False))
 
 
 if __name__ == "__main__":
