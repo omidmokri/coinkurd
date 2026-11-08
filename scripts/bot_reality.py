@@ -261,6 +261,9 @@ TR = {
     "note": {"fa": "پست‌ها بیشتر خبرند، نه پیشنهاد خرید و فروش؛ پیش‌بینی‌های صریح در «دفتر عملکرد سیگنال‌ها» امتیاز می‌گیرند.",
              "ckb": "زۆربەی پۆستەکان هەواڵن، نەک پێشنیاری کڕین و فرۆشتن.",
              "en": "Most posts are news, not buy or sell calls; explicit calls are scored in the Signal ledger."},
+    "dir": {"fa": "جهت پست‌ها درست بود (روزها): {h}{pc} ↔ شانس {x}{pc} · احتمال تصادف {p}{pc}",
+            "ckb": "ئاڕاستەی پۆستەکان ڕاست بوو (ڕۆژ): {h}{pc} ↔ بەخت {x}{pc} · ئەگەری ڕێکەوت {p}{pc}",
+            "en": "Direction right (days): {h}{pc} vs chance {x}{pc} · chance of luck {p}{pc}"},
 }
 
 
@@ -284,6 +287,9 @@ def sec_trackrec(lang):
              f"• {_tr('hit', lg)}: {_n(o['hit'], lg, 1)}{pc} ↔ {_n(t['hit']['mid'], lg, 1)}{pc}",
              f"• {_tr('chance', lg)}: {_n(100 * p, lg, 1)}{pc}",
              "", _tr("n", lg, p=_n(d.get("n_posts"), lg), d=_n(d.get("n_days"), lg)), "ℹ️ " + _tr("note", lg)]
+    dr = R.load("direction.json", {})
+    if dr.get("enough"):
+        lines[-2:-2] = [f"• {_tr('dir', lg, h=_n(dr['hit_rate'], lg, 1), x=_n(dr['expected_rate'], lg, 1), p=_n(100 * dr['p'], lg, 1), pc=pc)}"]
     return _head("🧾 " + _tr("title", lg), lg, "/track-record/", lines, d.get("updated_at"))
 
 

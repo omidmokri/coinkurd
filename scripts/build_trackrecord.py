@@ -205,6 +205,52 @@ def histo(h, lg):
     return f"<svg viewBox='0 0 {W} {Hh}' class='tr-svg' role='img' aria-label='{e(s('hist', lg))}' style='direction:ltr'>{zl}{''.join(bars)}</svg>"
 
 
+DIR = {
+    "h": L("آیا جهت پست‌ها درست بود؟", "ئاڕاستەی پۆستەکان ڕاست بوو؟", "Was the posts' direction right?"),
+    "lead": L("هر پست با هوش مصنوعی برچسب صعودی/نزولی/خنثی خورده و برای هر برچسب جملهٔ عینی خود پست به‌عنوان مدرک نگه داشته شده. واحد شمارش «روز» است: جهت غالب پست‌های هر روز در برابر حرکت ۲۴ ساعتهٔ بیت‌کوین.",
+              "هەر پۆستێک بە زیرەکی دەستکرد نیشانەی بەرزبوونەوە/دابەزین/بێلایەن دراوە و ڕستەی خودی پۆستەکە وەک بەڵگە هەڵگیراوە. یەکەی ژماردن «ڕۆژ»ە: ئاڕاستەی زاڵی پۆستەکانی هەر ڕۆژ بەرامبەر جووڵەی ٢٤ کاتژمێرەی بیتکۆین.",
+              "Each post is labelled bullish / bearish / neutral by AI, with the post's own sentence kept as evidence. The unit is the day: the dominant direction of that day's posts against bitcoin's next 24 hours."),
+    "hit": L("روزهایی که جهت درست بود", "ڕۆژانێک ئاڕاستە ڕاست بوو", "Days the direction was right"),
+    "exp": L("انتظار از شانس (جابه‌جایی تصادفی برچسب روزها)", "چاوەڕوانی لە بەخت (تێکەڵکردنی هەڕەمەکی)", "Expected by chance (labels shuffled across days)"),
+    "n": L("{d} روز ({b} صعودی، {r} نزولی) · {p} پست برچسب‌خورده · {f} تا {t}", "{d} ڕۆژ ({b} بەرزبوونەوە، {r} دابەزین) · {p} پۆست · {f} تا {t}",
+           "{d} days ({b} bullish, {r} bearish) · {p} labelled posts · {f} to {t}"),
+    "v_no": L("جهت پست‌ها بهتر از شانس نبوده است (تفاوت معنادار نیست).", "ئاڕاستەی پۆستەکان لە بەخت باشتر نەبووە (جیاوازی واتادار نییە).",
+              "The posts' direction has not been better than chance (no significant difference)."),
+    "v_yes": L("جهت پست‌ها به‌طور معنادار بهتر از شانس بوده است.", "ئاڕاستەی پۆستەکان بە شێوەیەکی واتادار لە بەخت باشتر بووە.",
+               "The posts' direction has been significantly better than chance."),
+    "few": L("هنوز روز کافی برای داوری نیست ({d} از {m}).", "هێشتا ڕۆژی پێویست نییە ({d} لە {m}).", "Not enough days to judge yet ({d} of {m})."),
+    "none": L("هنوز داده‌ای نیست.", "هێشتا داتا نییە.", "No data yet."),
+    "m": L("آزمون: برچسب روزها {n} بار بین همان روزها جابه‌جا شد (seed {s})؛ p یک‌طرفه = سهم جابه‌جایی‌هایی که حداقل همین تعداد روز درست داشتند. روزهای مساوی و فقط‌خنثی کنار گذاشته شده‌اند. این توصیهٔ مالی نیست.",
+           "تاقیکردنەوە: نیشانەی ڕۆژەکان {n} جار تێکەڵ کران (seed {s})؛ p ی یەکلایەنە. ڕۆژە یەکسان و بێلایەنەکان دەرهێنران. ئەمە ئامۆژگاری دارایی نییە.",
+           "Test: day labels shuffled {n} times across the same days (seed {s}); one-sided p = share of shuffles with at least as many right days. Tied and neutral-only days are left out. Not financial advice."),
+}
+
+
+def direction(lg):
+    d = R.load("direction.json", {})
+    if not d.get("n_days"):
+        return BR.sec(s2("h", lg), f"<p class='note'>{e(s2('none', lg))}</p>", lead=e(s2("lead", lg)))
+    if not d.get("enough"):
+        v = s2("few", lg, d=BR.nf(d["n_days"], lg), m=BR.nf(d.get("min_days"), lg))
+    else:
+        v = s2("v_yes" if d["p"] < ALPHA and d["hit_rate"] > d["expected_rate"] else "v_no", lg)
+    w = d.get("window") or {}
+    ps = d.get("posts") or {}
+    h = (f"<p class='tr-verdict'>{e(v)}</p><div class='tr-grid'>"
+         f"<div class='tr-card'><h3>{e(s2('hit', lg))}</h3><div class='tr-row'><span class='v'>{pct(d['hit_rate'], lg, 1, False)}</span>"
+         f"<span class='vs'>{e(s2('exp', lg))}: {pct(d['expected_rate'], lg, 1, False)}</span></div>"
+         f"<div><span class='tr-chip'>{e(s('pval', lg))}: {pv(d['p'], lg)}</span></div></div></div>"
+         f"<p class='note'>{e(s2('n', lg, d=BR.nf(d['n_days'], lg), b=BR.nf(d['bull_days'], lg), r=BR.nf(d['bear_days'], lg), p=BR.nf(sum(ps.values()), lg), f=BR.fdate(w.get('from'), lg), t=BR.fdate(w.get('to'), lg)))}</p>"
+         f"<p class='note'>{e(s2('m', lg, n=BR.nf(d['method']['draws'], lg), s=d['method']['seed']))} "
+         f"<a href='/data/direction.json'>{e(s('data', lg))}</a> · <a href='/data/stance.json'>stance.json</a></p>")
+    return BR.sec(s2("h", lg), h, lead=e(s2("lead", lg)))
+
+
+def s2(k, lg, **kw):
+    t = DIR[k][lg]
+    return t.format(**kw) if kw else t
+
+
 CSS = """
 .tr-hero{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:16px 0}
 .tr-hero.up{border-color:rgba(34,197,94,.5);background:linear-gradient(180deg,rgba(34,197,94,.07),transparent 70%),var(--card)}
@@ -265,6 +311,7 @@ def build():
             rows.append(f"<tr><td>{e(nm)}</td><td class='n'>{BR.nf(c['n'], lg)}</td><td class='n'>{pct(c['r24'], lg)}</td>"
                         f"<td class='n'>{pct(c['hit'], lg, 0, False)}</td><td class='n'>{p}</td></tr>")
         h += BR.sec(s("cats", lg), BR.table([s("c_cat", lg), s("c_n", lg), s("c_r", lg), s("c_hit", lg), s("c_p", lg)], rows, "tr-tbl"))
+        h += direction(lg)
         h += scanner(lg)
         h += (f"<div class='tr-says'><b>{e(s('says', lg))}</b><ul><li>{e(s('says_1', lg))}</li>"
               f"<li>{e(s('says_2', lg))} <a href='/ledger/'>{e(s('ledger', lg))} ←</a></li><li>{e(s('says_3', lg))}</li></ul></div>")
