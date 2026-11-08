@@ -37,6 +37,16 @@ COLORS = {"green": "#22c55e", "yellow": "#eab308", "orange": "#f97316", "red": "
 
 # ------------------------------------------------------------------ strings (fa / ckb / en)
 S = {
+    "hb.tr_t": L("آزمایشگاه حقیقت سیگنال‌ها", "تاقیگەی ڕاستیی سیگناڵەکان", "Signal Truth Lab"),
+    "hb.tr_d": L("همهٔ سیگنال‌ها پس از کارمزد، برون‌نمونه و با اصلاح آزمون چندگانه", "هەموو سیگناڵەکان دوای کرێ، دەرەوەی نموونە", "Every signal net of costs, out-of-sample, corrected for multiple tests"),
+    "hb.tr_k": L("الگوهای دارای لبه پس از اصلاح", "شێوازەکانی خاوەن لێوار دوای ڕاستکردنەوە", "patterns with an edge after correction"),
+    "hb.rg_t": L("رادار رژیم بازار", "ڕاداری دۆخی بازاڕ", "Market-regime radar"),
+    "hb.rg_d": L("احتمال هر رژیم برای بیت‌کوین، با مدل مارکوف پنهان", "ئەگەری هەر دۆخێک بۆ بیتکۆین", "Probability of each Bitcoin regime from a hidden Markov model"),
+    "hb.an_t": L("شکارچی ناهنجاری", "ڕاوکەری نائاسایی", "Anomaly hunter"),
+    "hb.an_d": L("حجم، قیمت، OI و فاندینگ غیرعادی امروز", "قەبارە، نرخ، OI و فاندینگی نائاسایی ئەمڕۆ", "Today's unusual volume, price, OI and funding"),
+    "hb.an_k": L("ارز با پرچم ناهنجاری", "دراو بە ئاڵای نائاسایی", "coins flagged"),
+    "rg.bull": L("صعودی", "بەرزبوونەوە", "Bull"), "rg.bear": L("نزولی", "دابەزین", "Bear"),
+    "rg.sideways": L("خنثی", "مامناوەند", "Sideways"), "rg.high_vol": L("پرنوسان", "هەڵاوسانی زۆر", "High volatility"),
     "home": L("خانه", "ماڵەوە", "Home"),
     "hub": L("واقعیت‌سنج", "ڕاستی‌پێو", "Reality Check"),
     "upd": L("به‌روزرسانی", "نوێکردنەوە", "Updated"),
@@ -1037,10 +1047,23 @@ def build_hub():
         else:
             kv = f"<span class='mut'>{s('nodata', lg)}</span>"
         cards.insert(0, ("/track-record/", "hb.t_t", "hb.t_d", kv))
+        trj, rgj, anj = R.load("truth.json", {}), R.load("regime.json", {}), R.load("anomaly.json", {})
+        sm = trj.get("summary") or {}
+        kv = (f"<span class='rc-big'>{nf(sm.get('edge_strong', 0) + sm.get('edge', 0), lg)}</span> / {nf(sum(sm.values()), lg)} <span class='mut'>{s('hb.tr_k', lg)}</span>"
+              if sm else f"<span class='mut'>{s('nodata', lg)}</span>")
+        cards.append(("/truth/", "hb.tr_t", "hb.tr_d", kv))
+        rn = rgj.get("now") or {}
+        kv = (f"<span class='rc-big'>{e(s('rg.' + rn['top'], lg))}</span> <span class='mut'>{nf(100 * rn['confidence'], lg, 0, pct=True)}</span>"
+              if rn.get("top") else f"<span class='mut'>{s('nodata', lg)}</span>")
+        cards.append(("/regime/", "hb.rg_t", "hb.rg_d", kv))
+        fl = [r for r in anj.get("today") or [] if r.get("flags")]
+        kv = (f"<span class='rc-big'>{nf(len(fl), lg)}</span> <span class='mut'>{s('hb.an_k', lg)}</span> " + " ".join(f"<span class='rc-pill'>{e(r['coin'])}</span>" for r in fl[:5])
+              if anj.get("today") else f"<span class='mut'>{s('nodata', lg)}</span>")
+        cards.append(("/anomalies/", "hb.an_t", "hb.an_d", kv))
         h += "<div class='rc-grid'>" + "".join(f"<a class='rc-card' href='{u}'><h3>{e(s(t, lg))}</h3><p class='mut'>{e(s(d, lg))}</p><div>{k}</div></a>" for u, t, d, k in cards) + "</div>"
         h += sec(s("hb.why", lg), f"<p>{e(s('hb.why_t', lg))}</p>")
         h += (f"<p class='note'>JSON: <a href='/data/ledger.json'>ledger</a> · <a href='/data/friction.json'>friction</a> · <a href='/data/hype.json'>hype</a> · "
-              f"<a href='/data/silent_exit.json'>silent_exit</a> · <a href='/data/localcorr.json'>localcorr</a> · {s('nfa', lg)}</p>")
+              f"<a href='/data/silent_exit.json'>silent_exit</a> · <a href='/data/localcorr.json'>localcorr</a> · <a href='/data/truth.json'>truth</a> · <a href='/data/regime.json'>regime</a> · <a href='/data/anomaly.json'>anomaly</a> · {s('nfa', lg)}</p>")
         return h
 
     return [write("reality/", s("hb.title", "fa"), s("hb.desc", "fa"), finish("", tri(b)))]
