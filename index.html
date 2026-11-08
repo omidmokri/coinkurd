@@ -288,7 +288,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
 .reveal{opacity:0;transform:translateY(30px);transition:.8s cubic-bezier(.2,.8,.2,1)}
 .reveal.v{opacity:1;transform:none}
 .marquee{overflow:hidden;border-block:1px solid var(--line);padding:14px 0;font-family:var(--mono);text-transform:lowercase;color:var(--mute);white-space:nowrap}
-.marquee div{display:inline-block;animation:mq 40s linear infinite}
+.marquee div{display:inline-block;animation:mq 150s linear infinite}.marquee:hover div,.marquee:focus-within div{animation-play-state:paused}
 .marquee span{margin:0 28px}.marquee span b{color:var(--lime);font-weight:500}
 @keyframes mq{to{transform:translateX(calc(var(--dir) * 50%))}}
 /* cinematic hero */
@@ -528,7 +528,7 @@ function applyLang(){
   const latest=VP()[0];if(latest){$('#nextTitle').textContent=PT(latest).title;$('#nextTime').textContent=latest.date?ago(latest.date)+' · '+fmtDate(latest.date,{dateStyle:'medium'}):'';$('#next').onclick=e=>{e.preventDefault();openPost(latest.id)}}
   $('#halfAn').textContent=`${fmtN(S.meta.by_category.technical||0)} ${T('posts')}`;$('#halfBn').textContent=`${fmtN(S.meta.by_category.news||0)} ${T('posts')}`;
   // marquee
-  const mq=[...VP().slice(0,12)].map(p=>`<span><b>${esc(catOf(p.category).icon)}</b> ${esc(PT(p).title)}</span>`).join('');$('#mq').innerHTML=mq+mq;
+  const mq=[...VP().slice(0,12)].map(p=>`<span><b>${esc(catOf(p.category).icon)}</b> ${esc(PT(p).title)}</span>`).join('');$('#mq').innerHTML=mq+mq;mqPace();
 }
 function buildStatic(){
   const ph=withPhoto();
@@ -735,6 +735,8 @@ function emojify(root){
   nodes.forEach(n=>{const f=document.createDocumentFragment();let last=0;    const t=n.nodeValue;let mm;EMO_RE.lastIndex=0;while((mm=EMO_RE.exec(t))){if(/^[0-9#*]$/.test(mm[0]))continue;f.append(t.slice(last,mm.index));const img=document.createElement('img');img.className='tge';img.alt=mm[0];img.draggable=false;img.src='https://telegram.org/img/emoji/40/'+emoHex(mm[0])+'.png';img.onerror=function(){this.replaceWith(this.alt)};f.append(img);last=mm.index+mm[0].length}
     f.append(t.slice(last));n.replaceWith(f)});
 }
+/* ticker pace: duration follows content width so the speed stays ~48px/s (one copy scrolls per cycle) — a fixed 40s made long headline sets race past */
+function mqPace(){const m=document.querySelector('#mq');if(!m)return;const set=()=>{const w=m.scrollWidth/2;if(w>0)m.style.animationDuration=Math.max(60,Math.round(w/48))+'s'};requestAnimationFrame(set);document.fonts&&document.fonts.ready.then(set)}
 function emojifyAll(){['#out','#sheet','#strip','#mq','#next','#hallGrid','#catChips'].forEach(s=>emojify(document.querySelector(s)))}
 /* ---- smart dashboard (market.json / impact.json / health.json) ---- */
 const X={market:null,impact:null,health:null,news:null,score:null,brain:null,narr:null,events:null};
