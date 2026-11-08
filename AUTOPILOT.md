@@ -114,6 +114,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
    - Facts: the site's watchlist is `localStorage['ek_watch']` (JSON list of symbols, star buttons from
      `build_pages.WATCH_JS`; read by `assets/news.js`). The bot already routes `?start=s_<section>` (refbot.py ~1161)
      and has per-user alert state (`bot_watch.py`, `refbot.watch_loop`). No server, no accounts: the link is the identity.
+   - **Slice A shipped 2026-11-08 (read-only variant):** the bot has no per-user coin list (`x["watch"]` is the tether
+     alert), and the guardrail limits the bot to read-only sections, so `w_` shows a market.json snapshot of the coins
+     (`scripts/bot_wlink.py`, self-test `python3 scripts/bot_wlink.py`) instead of storing them. Original plan below.
    - Slice A (site→bot, one-way, user-initiated): a "send my watchlist to the bot" pill wherever stars appear →
      `t.me/<bot>?start=w_BTC-ETH-SOL` (Telegram limit: 64 chars of `[A-Za-z0-9_-]`, so ≤ ~12 symbols; longer lists
      are cut with a visible note). Bot: on `w_` show the parsed list and an "add these to my watchlist" button — the
@@ -127,6 +130,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · "Send my list to the bot" (Backlog #6, slice A)
+- **Need:** coins starred on the site were invisible in the bot; traders re-typed them.
+- **Built:** on coin pages, next to the ⭐ button, a pill (fa/ckb/en by page lang) opening
+  `t.me/Kurd_kurdistan_bot?start=w_BTC-ETH-…` (≤64 chars; longer lists cut with a visible "first N only" note).
+  `refbot` `/start w_…` → `bot_wlink.screen`: price + 24h change per coin from data/market.json, "no data yet" for unknown
+  coins, data time, site link, not-financial-advice line. Read-only: nothing stored, nothing posted.
+- **Verified:** py_compile; `bot_wlink` self-test (empty/junk/dupes/lower-case/>64 chars, rendered values vs input);
+  built pages in /tmp/bld; Playwright + Chrome 1280/390: link = `w_BTC-ETH-SOL`, 20-symbol list → 61-char payload with
+  "first 10" note, overflow 0, zero JS errors, looked at shots. Bot not live-tested (Telegram unreachable).
+- **Next:** #6 slice B (bot→site `?w=` with explicit save), or #5 bearish split when ≥30 bearish days.
+
 ### 2026-11-08 · Design for site ↔ bot watchlist hand-off (Backlog #6, design slice)
 - **Need:** a trader stars coins on the site, then has to re-type them in the bot; the two halves of the product don't
   know each other. #5's bearish split still waits (8 bearish days of 85).
