@@ -30,7 +30,7 @@ import build_reality as BR   # noqa: E402
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
-VER = "4"
+VER = "5"
 CONTENT = os.environ.get("B4J_CONTENT") or os.path.join(ROOT, "content", "b4j")      # the env var is for tests only
 LANGS = ("fa", "ckb", "en")
 HEAD = f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
@@ -141,7 +141,6 @@ UI = {
     "allact": ("فعالیت‌های این فصل", "چالاکییەکانی ئەم بەشە", "Activities in this module"),
     "overview": ("نگاه کلی به این فصل", "ڕوانینێکی گشتی بۆ ئەم بەشە", "Module overview"),
     "on_page": ("در این صفحه", "لەم پەڕەیەدا", "On this page"),
-    "orig_en": ("متن انگلیسی اصلی", "دەقی ئینگلیزیی ئەسڵی", "Original English text"),
     "lex": ("فرهنگ‌نامهٔ رسمی", "فەرهەنگی فەرمی", "Official lexicon"),
     "apx": ("ضمیمه‌های چاپی در متنِ بازِ منبع نیستند و در این ترجمه هم نیامده‌اند؛ برای آن‌ها به سایت رسمی My First Bitcoin مراجعه کنید.",
             "پاشکۆ چاپکراوەکان لە دەقی کراوەی سەرچاوەدا نین و لەم وەرگێڕانەشدا نەهاتوون؛ بۆ ئەوانە سەیری ماڵپەڕی فەرمیی My First Bitcoin بکەن.",
@@ -151,10 +150,6 @@ UI = {
     "timer_reset": ("از نو", "دووبارە", "Reset"),
     "timer_min": ("دقیقه", "خولەک", "min"),
     "timer_up": ("وقت تمام شد!", "کات تەواو بوو!", "Time is up!"),
-    "lesson_credit": (
-        "برگرفته از «Bitcoin for Juniors» — ترجمهٔ غیررسمی",
-        "وەرگیراو لە «Bitcoin for Juniors» — وەرگێڕانی نافەرمی",
-        "Adapted from “Bitcoin for Juniors” — unofficial translation"),
     "moved_h": ("این بخش اکنون «بیت‌کوین برای کودکان» است", "ئەم بەشە گۆڕدرا بۆ «بیتکۆین بۆ منداڵان»", "This section has become “Bitcoin for Juniors”"),
     "moved": ("به‌جای بازی‌ها و فیلم‌های قبلی، حالا برنامهٔ درسی کامل و باز «بیت‌کوین برای کودکان» را به فارسی، کردی سورانی و انگلیسی داریم.",
               "لە جیاتی یاری و فیلمە پێشووەکان، ئێستا پرۆگرامی وانەیی تەواو و کراوەی «بیتکۆین بۆ منداڵان» بە فارسی، کوردیی سۆرانی و ئینگلیزی بەردەستە.",
@@ -399,21 +394,6 @@ def ldjson(*objs):
     return "".join(f'<script type="application/ld+json">{BP.sj(o)}</script>' for o in objs)
 
 
-def credit_box(rel=None):
-    """the attribution CC BY-SA asks for, kept to one line: the licence itself allows a link to a page that
-    carries the full notice, and /kids/about/ carries it (section 3(a)(2) of the licence)."""
-    commit = SRC.get("commit", "main")
-    links = [f'<a href="{SRC_REPO}" target="_blank" rel="noopener noreferrer">GitHub</a>',
-             f'<a href="{ORG_URL}" target="_blank" rel="noopener noreferrer">My First Bitcoin</a>',
-             f'<a href="{LICENCE_URL}" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>']
-    if rel and rel in SRC.get("files", {}):
-        links.insert(0, f'<a href="{SRC_REPO}/blob/{commit}/{FOLDER}/{SRC["files"][rel]["src"]}" '
-                        f'target="_blank" rel="noopener noreferrer">{t3(UI["orig_en"])}</a>')
-    return (f'<aside class="b4j-credit b4j-credit-s"><p class="lk">{t3(UI["lesson_credit"])} · '
-            f'<span dir="ltr">{" · ".join(links)}</span> · '
-            f'<a href="/kids/about/">{t3(UI["about"])}</a></p></aside>')
-
-
 def meta_line(rel, lg):
     return next((b["t"] for b in load(rel)[lg] if b["k"] == "pi"), "")
 
@@ -550,7 +530,7 @@ def page_module(M, fix, m):
     body = (f'{nav}<article class="b4j" style="--c:{m["color"]}">{BP.LSW}{wrap(per)}'
             f'<section class="b4j-s" id="acts"><h2><i class="ic" aria-hidden="true">🧩</i>{t3(UI["allact"])}</h2>'
             f'<div class="b4j-list">{cards}</div></section>'
-            f'{pn_nav(M, m["url"])}{credit_box(m["ov"])}</article>' + hub_data(M))
+            f'{pn_nav(M, m["url"])}</article>' + hub_data(M))
     ld = {"@context": "https://schema.org", "@type": "Course", "name": bare(m["title"]["fa"]), "url": url,
           "inLanguage": ["fa", "ckb", "en"], "isAccessibleForFree": True, "license": LICENCE_URL,
           "isPartOf": {"@type": "Course", "name": UI["prog"][0], "url": SITE + "/kids/"},
@@ -583,7 +563,7 @@ def page_activity(M, fix, m, a):
     body = (f'{nav}<article class="b4j b4j-act" data-act="{a["num"]}" style="--c:{m["color"]}">{bar}{timer_box()}'
             f'{wrap(per)}'
             + (f'<p class="b4j-note">{t3(UI["apx"])}</p>' if apx else "")
-            + f'{done}{pn_nav(M, a["url"])}{credit_box(a["rel"])}</article>' + hub_data(M))
+            + f'{done}{pn_nav(M, a["url"])}</article>' + hub_data(M))
     src = SRC.get("files", {}).get(a["rel"], {}).get("src", "")
     ld = {"@context": "https://schema.org", "@type": "LearningResource", "name": bare(a["title"]["fa"]), "url": url,
           "description": desc, "inLanguage": ["fa", "ckb", "en"], "learningResourceType": "lesson plan",
@@ -605,7 +585,7 @@ def page_doc(M, fix, path, rel, kick_key):
     url = f"{SITE}/{path}/"
     nav, bld = crumbs([("/kids/", UI["prog"]), (None, UI[kick_key])], url)
     body = (f'{nav}<article class="b4j">{BP.LSW}{wrap(per)}<div class="b4j-np"><p class="b4j-back">'
-            f'<a href="/kids/">{t3(UI["all_mods"])}</a></p></div>{credit_box(rel)}</article>' + hub_data(M))
+            f'<a href="/kids/">{t3(UI["all_mods"])}</a></p></div></article>' + hub_data(M))
     fa = render_doc("fa", rel, fix)
     desc = trim(fa["plain_lead"] or next((MD.plain(b["t"]) for b in load(rel)["fa"] if b["k"] == "p"), UI["tag"][0]))
     return BP.page(path, f'{UI[kick_key][0]} — {UI["prog"][0]}', desc, body, shell(ldjson(bld)))
@@ -636,7 +616,7 @@ def page_glossary(M, fix):
     nav, bld = crumbs([("/kids/", UI["prog"]), (None, UI["glossary"])], url)
     lex = (f'<p class="b4j-back" dir="ltr"><a href="https://curriculum.myfirstbitcoin.org/lexicon/en/" target="_blank" '
            f'rel="noopener noreferrer">Bitcoin Lexicon — My First Bitcoin</a></p>')
-    body = (f'{nav}<article class="b4j">{BP.LSW}{wrap(per)}{lex}{credit_box("front/glossary.md")}</article>' + hub_data(M))
+    body = (f'{nav}<article class="b4j">{BP.LSW}{wrap(per)}{lex}</article>' + hub_data(M))
     return BP.page("kids/glossary", f'{UI["glossary"][0]} — {UI["prog"][0]}',
                    fill(UI["glossary_d"], n=len(glossary_terms()))[0], body, shell(ldjson(bld)))
 

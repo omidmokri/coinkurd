@@ -191,8 +191,12 @@ def main():
         if rel.startswith("kids/") and "/index.html" in rel and rel.count("/") >= 3 and rel.split("/")[1] in {m_["dir"] for m_ in M}:
             if "lexicon/en/#" in html:
                 errs.append("a glossary link still points to the official lexicon")
+            # the licence notice lives on the hub and on /kids/about/; every lesson page must link to the hub
+            if 'href="/kids/"' not in html:
+                errs.append("no link back to the course hub, which carries the licence notice")
+        if rel in ("kids/index.html", "kids/about/index.html"):
             if "CC BY-SA 4.0" not in html or "My First Bitcoin" not in html:
-                errs.append("attribution missing")
+                errs.append("the licence notice is missing from this page")
         info[rel] = (w, html)
         if errs:
             bad += 1
