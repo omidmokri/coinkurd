@@ -230,6 +230,7 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .wall button small{display:block;font-size:.7rem;font-weight:400}
 
 /* library */
+#library{scroll-margin-top:84px}
 .libBar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 18px}
 .libGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:10px}
 .libCard{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:start;text-align:start;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:border-color .18s,transform .18s;color:var(--ink);width:100%;font:inherit}
@@ -412,6 +413,18 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <div class="hall" id="hallGrid"><a class="tile" href="/categories/technical/" style="--c:#22d3ee"><span class="ic">📈</span><div><b>تحلیل تکنیکال</b><small>23</small></div></a><a class="tile" href="/categories/signal/" style="--c:#f472b6"><span class="ic">🎯</span><div><b>سیگنال و معامله</b><small>11</small></div></a><a class="tile" href="/categories/etf_institutional/" style="--c:#a78bfa"><span class="ic">🏦</span><div><b>ETF و نهادی</b><small>280</small></div></a><a class="tile" href="/categories/regulation/" style="--c:#fbbf24"><span class="ic">⚖️</span><div><b>قانون‌گذاری و سیاست</b><small>183</small></div></a><a class="tile" href="/categories/security/" style="--c:#f87171"><span class="ic">🛡️</span><div><b>امنیت و هک</b><small>59</small></div></a><a class="tile" href="/categories/onchain/" style="--c:#34d399"><span class="ic">🔗</span><div><b>آن‌چین و داده</b><small>98</small></div></a><a class="tile" href="/categories/education/" style="--c:#60a5fa"><span class="ic">🎓</span><div><b>آموزش</b><small>54</small></div></a><a class="tile" href="/categories/products/" style="--c:#fb923c"><span class="ic">📚</span><div><b>کتاب و اندیکاتور</b><small>35</small></div></a><a class="tile" href="/categories/community/" style="--c:#e879f9"><span class="ic">📣</span><div><b>اطلاعیه و جامعه</b><small>85</small></div></a><a class="tile" href="/categories/news/" style="--c:#94a3b8"><span class="ic">📰</span><div><b>خبر بازار</b><small>278</small></div></a></div>
   </section>
 
+  <section class="sec wrap reveal" id="library">
+    <h2 class="display" data-i="libT">کتابخانهٔ بازارهای مالی</h2>
+    <p class="lead" data-i="libL">فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد</p>
+    <div class="libBar">
+      <div class="chips" id="libCats"></div>
+      <label class="search">🔎 <input id="libQ" data-ph="libSearch" placeholder="جستجو در کتابخانه…"></label>
+      <span class="count" id="libCount"></span>
+    </div>
+    <div class="libGrid" id="libGrid"></div>
+    <p class="libNote" data-i="libNote"></p>
+  </section>
+
   <section id="feed">
     <div class="dims"><div class="wrap">
       <div class="row"><span class="lbl" data-i="dCat">دسته</span><div class="chips" id="catChips"></div></div>
@@ -425,18 +438,6 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
       </div>
     </div></div>
     <div class="wrap" id="out"><ul class="list"><li><a href="/p/50857/">فروپاشی دومینووار بانک دیجیتال اونو در پاراگوئه و بحران مسدود شدن حساب نیمی از جمعیت کشور</a><small>2026-11-07 14:30 UTC · ETF و نهادی · </small></li><li><a href="/p/50856/">نبرد برای آزادی مالی و هوش مصنوعی 🟠</a><small>2026-11-07 14:13 UTC · آموزش · BTC</small></li><li><a href="/p/50855/">₿ بیت‌کوین: ۷۶٬۰۰۷ دلار | تغییر ۲۴ ساعته: −۰٫۰۴ درصد | نوسان ۲۴ ساعته: ۰٫۸۶ درصد</a><small>2026-11-07 13:17 UTC · خبر بازار · BTC</small></li><li><a href="/p/50854/">خروج از مرزهای حیاتی بازار رمزارزها؛ آیا ریزش عمیق‌تری در راه است یا فرصت طلایی بازگشت؟</a><small>2026-11-07 11:38 UTC · خبر بازار · BTC ETH XRP GOLD</small></li><li><a href="/p/50852/">چرا پای‌نتورک با وجود ارزش بازار ۸۵۰ میلیون دلاری همچنان ۹۷ درصد پایین‌تر از سقف تاریخی خود دست‌وپا می‌زند</a><small>2026-11-07 08:51 UTC · خبر بازار · USDT</small></li><li><a href="/p/50850/">تحریم سنگین وزارت خزانه‌داری آمریکا علیه صرافی مکس‌سی و قطع دسترسی از سیستم مالی ایالات متحده</a><small>2026-11-07 06:04 UTC · ETF و نهادی · BTC</small></li><li><a href="/p/50848/">افزایش چشمگیر نمایندگان موافق رمزارز در کنگره جدید آمریکا 🇺🇸</a><small>2026-11-06 23:46 UTC · قانون‌گذاری و سیاست · </small></li><li><a href="/p/50847/">نگاه نامتقارن به بازار رمزارز برتر 🧐</a><small>2026-11-06 22:33 UTC · آن‌چین و داده · BTC</small></li><li><a href="/p/50846/">نقش کلیدی کلیدهای خصوصی در حاکمیت فردی بیت‌کوین 🧐</a><small>2026-11-06 21:41 UTC · آموزش · BTC</small></li><li><a href="/p/50845/">افزودن بیت‌کوین به سبد سرمایه‌گذاری صندوق چهارصدمیلیون دلاری 🚀</a><small>2026-11-06 19:55 UTC · ETF و نهادی · BTC</small></li><li><a href="/p/50844/">شوک ۶ میلیارد دلاری هک بایننس در سایه سنگین سیاست‌های آمریکا؛ چرا فریب اخبار درون‌زنجیره‌ای را خوردیم؟</a><small>2026-11-06 17:34 UTC · قانون‌گذاری و سیاست · BTC</small></li><li><a href="/p/50842/">تبدیل پنهانی ۵۰ میلیون دلار دارایی مسروقه به بیت‌کوین توسط هکرها</a><small>2026-11-06 14:31 UTC · امنیت و هک · BTC ETH XRP</small></li><li><a href="/p/50841/">سقوط ۲.۵ تریلیون دلاری وال‌استریت و زلزله در بازار رمزارزها</a><small>2026-11-06 08:31 UTC · خبر بازار · BTC</small></li><li><a href="/p/50840/">بزرگ‌ترین ماینر بیت‌کوین، دستگاه‌ها را خاموش کرد؛ زیرساخت انرژی به هوش مصنوعی باخت</a><small>2026-11-06 05:31 UTC · آن‌چین و داده · BTC</small></li><li><a href="/p/50839/">بزرگترین حفره امنیتی سال: چرا کلیدهای دسترسی شما به صرافی‌ها دیگر امن نیست؟</a><small>2026-11-05 17:31 UTC · آن‌چین و داده · BTC</small></li><li><a href="/p/50838/">پیش‌بینی صعودی برای آینده بیت‌کوین 🚀</a><small>2026-11-05 17:14 UTC · خبر بازار · BTC</small></li><li><a href="/p/50836/">استخراج‌کننده بزرگ بیت‌کوین، هویتش را برای هوش مصنوعی حراج کرد</a><small>2026-11-05 14:30 UTC · آن‌چین و داده · BTC</small></li><li><a href="/p/50835/">بازی دوگانه خانواده ترامپ با بیت‌کوین؛ سود واقعی یا سراب حسابداری؟</a><small>2026-11-05 11:30 UTC · آن‌چین و داده · BTC</small></li><li><a href="/p/50834/">تخلیه ناگهانی خزانه ترامپ؛ نقشه نقد کردن ۳۴۳ میلیون دلار بیت‌کوین؟</a><small>2026-11-05 08:34 UTC · ETF و نهادی · BTC</small></li><li><a href="/p/50833/">کشتار ۵۶۰ میلیون دلاری شورت‌ها در ۱۲ ساعت؛ چرا صعود بیت‌کوین تله است یا فرصت؟</a><small>2026-11-05 05:31 UTC · خبر بازار · BTC</small></li><li><a href="/p/50832/">تحول بزرگ در بازار مالی روسیه 🚀</a><small>2026-11-04 21:04 UTC · قانون‌گذاری و سیاست · BTC</small></li><li><a href="/p/50831/">شوک سیاسی واشنگتن به رمزارز و بازیابی سریع بیت‌کوین از مرز ۷۵ هزار دلار</a><small>2026-11-04 17:31 UTC · خبر بازار · BTC</small></li><li><a href="/p/50830/">پیروزی حامیان بیت‌کوین در انتخابات فلوریدا و تگزاس 🚀</a><small>2026-11-04 17:09 UTC · قانون‌گذاری و سیاست · BTC</small></li><li><a href="/p/50829/">وقتی غول وال‌استریت دارایی‌ها را روی بلاک‌چین می‌برد، بازی سنتی پول برای همیشه تغییر می‌کند</a><small>2026-11-04 14:31 UTC · ETF و نهادی · </small></li><li><a href="/p/50827/">🤖 ربات رسمی Coin_Kurd فعال شد: @Kurd_kurdistan_bot</a><small>2026-11-04 11:45 UTC · آن‌چین و داده · USDT GOLD</small></li><li><a href="/p/50826/">سرقت ۱۳۳ میلیون دلاری از بانک غول‌پیکر اروپایی و سکوت مرگباری که میلیون‌ها دلار را به باد داد</a><small>2026-11-04 11:31 UTC · امنیت و هک · ETH GOLD</small></li><li><a href="/p/50825/">شوک انتخابات آمریکا به بازارها؛ وقتی پیروزی دموکرات‌ها و سقوط بیت‌کوین به ۷۵ هزار دلار زنگ خطر را به صدا درمی‌آورد</a><small>2026-11-04 08:31 UTC · خبر بازار · BTC</small></li><li><a href="/p/50824/">وقتی پروژهٔ خانوادگی ترامپ در دادگاه فدرال آمریکا پشت سرمایه‌گذاران اماراتی پنهان می‌شود</a><small>2026-11-04 05:31 UTC · قانون‌گذاری و سیاست · </small></li><li><a href="/p/50823/">بزرگ‌ترین سرقت تاریخ کریپتو؛ وقتی هوش مصنوعی داخلی بایننس علیه خودش استفاده شد!</a><small>2026-11-03 17:33 UTC · امنیت و هک · </small></li><li><a href="/p/50822/">مجوز بانک مرکزی بوتان برای نگهداری بیت‌کوین و رمزارزها 🚀</a><small>2026-11-03 17:06 UTC · قانون‌گذاری و سیاست · BTC GOLD</small></li><li><a href="/p/50820/">بزرگ‌ترین اشتباه امنیتی سرمایه‌گذاران کریپتو روی بلاک‌چین اتفاق نمی‌افتد</a><small>2026-11-03 14:31 UTC · امنیت و هک · </small></li><li><a href="/p/50819/">عقب‌نشینی ۵ میلیون دلاری رگولاتور؛ استیکینگ کوین‌بیس دوباره متولد شد</a><small>2026-11-03 08:31 UTC · قانون‌گذاری و سیاست · </small></li><li><a href="/p/50818/">جنگ ۶.۳ میلیارد دلاری اف‌بی‌آی و کره شمالی بر سر بایننس</a><small>2026-11-03 05:31 UTC · امنیت و هک · </small></li><li><a href="/p/50817/">مرگ چرخه چهارساله و رشد قطعی بیت‌کوین 🚀</a><small>2026-11-03 04:34 UTC · خبر بازار · BTC</small></li><li><a href="/p/50816/">🎯 پیش‌بینی هفتگی انتخاب</a><small>2026-11-02 20:28 UTC · ETF و نهادی · BTC</small></li><li><a href="/p/50815/">وقتی غول‌های نهادی از بازار فرار می‌کنند و فاصلهٔ قیمت تا پرتگاه خرید هولدرها فقط چند دلار است</a><small>2026-11-02 20:11 UTC · خبر بازار · BTC ETH</small></li><li><a href="/p/50814/">هک بزرگِ بزرگ‌ترین صرافی برزیل؛ استیبل‌کوین‌ها چطور در کسری از ثانیه دارایی‌ها را قفل کردند؟</a><small>2026-11-02 20:10 UTC · امنیت و هک · BTC ETH USDT MATIC</small></li><li><a href="/p/50798/">بازگشایی مرحله‌ای برداشت‌ها در بایننس پس از هک ۶٫۳ میلیارد دلاری 🚨</a><small>2026-11-01 10:11 UTC · امنیت و هک · BTC ETH USDT USDC</small></li><li><a href="/p/50797/">بسته شدن دومین اکتبر نزولی پیاپی برای بیت‌کوین 🪙</a><small>2026-11-01 10:09 UTC · خبر بازار · BTC</small></li><li><a href="/p/50796/">خروج ۵۱۵ میلیون دلاری از ETFهای بیت‌کوین در ماه اکتبر 🏛</a><small>2026-11-01 10:07 UTC · ETF و نهادی · BTC</small></li></ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>
-  </section>
-
-  <section class="sec wrap reveal" id="library">
-    <h2 class="display" data-i="libT">کتابخانهٔ بازارهای مالی</h2>
-    <p class="lead" data-i="libL">فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد</p>
-    <div class="libBar">
-      <div class="chips" id="libCats"></div>
-      <label class="search">🔎 <input id="libQ" data-ph="libSearch" placeholder="جستجو در کتابخانه…"></label>
-      <span class="count" id="libCount"></span>
-    </div>
-    <div class="libGrid" id="libGrid"></div>
-    <p class="libNote" data-i="libNote"></p>
   </section>
 
   <section class="sec wrap reveal" id="coinswall">
@@ -650,6 +651,30 @@ function openLib(id){const it=(LIB&&LIB.items||[]).find(x=>x.id===id);if(!it)ret
   $('#modal').classList.add('open');document.body.style.overflow='hidden';
   const c=$('#close');if(c)c.onclick=closeModal;
 }
+/* The feed keeps growing for a few seconds after load, which pushes every section below it
+   down the page, so the browser's own jump to an anchor lands short. Hold the anchor in place
+   until the page stops moving, and give up the moment the reader scrolls themselves. */
+let hashHold=null;
+function goHash(){
+  const h=location.hash;
+  if(!h||h.length<2||/^#p\d+/.test(h))return;
+  let el=null;try{el=document.querySelector(h)}catch(e){return}
+  if(!el)return;
+  if(hashHold){clearInterval(hashHold.id);hashHold.off()}
+  el.scrollIntoView({block:'start'});
+  let stop=false;
+  const off=()=>{['wheel','touchstart','keydown','mousedown'].forEach(n=>window.removeEventListener(n,user))};
+  const user=()=>{stop=true};
+  ['wheel','touchstart','keydown','mousedown'].forEach(n=>window.addEventListener(n,user,{passive:true}));
+  const t0=Date.now();
+  const id=setInterval(()=>{
+    if(stop||Date.now()-t0>9000||!document.body.contains(el)){clearInterval(id);off();hashHold=null;return}
+    const top=el.getBoundingClientRect().top;
+    if(Math.abs(top-84)>6)el.scrollIntoView({block:'start'});
+  },200);
+  hashHold={id,off};
+}
+window.addEventListener('hashchange',()=>setTimeout(goHash,60));
 function closeModal(){$('#modal').classList.remove('open');document.body.style.overflow='';history.replaceState(null,'',location.pathname)}
 function reveal(){window.__rv=1;const els=document.querySelectorAll('.reveal');if(!('IntersectionObserver' in window)){els.forEach(el=>el.classList.add('v'));return}const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('v');io.unobserve(e.target)}}),{threshold:0,rootMargin:'0px 0px -8% 0px'});els.forEach(el=>io.observe(el))}
 
@@ -834,7 +859,7 @@ function _renderIntel(){
 let lastY=0;addEventListener('scroll',()=>{const y=scrollY;const h=y>lastY&&y>400;$('#tape').classList.toggle('hide',h);document.documentElement.style.setProperty('--top',h?'var(--ekh,60px)':'calc(var(--ekh,60px) + 46px)');lastY=y},{passive:true});
 window.__cineFail=()=>{window.__cineFail=null;coin3d()};(function(){const add=(src,ok,bad)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=bad;document.body.appendChild(s)};const cine=()=>add('assets/cinema.js?v=4',null,()=>window.__cineFail&&window.__cineFail());add('assets/land.js',cine,cine)})();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
-initMode();tilesInit();loadLib().catch(()=>{});(function(){const q=$('#libQ');if(q)q.addEventListener('input',()=>{try{renderLib()}catch(e){}})})();load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1])}).catch(e=>{try{reveal()}catch(_){}$('#out').innerHTML=`<div class="empty">⚠ ${esc(e.message)}</div>`});
+initMode();tilesInit();loadLib().catch(()=>{});(function(){const q=$('#libQ');if(q)q.addEventListener('input',()=>{try{renderLib()}catch(e){}})})();load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1]);else goHash()}).catch(e=>{try{reveal()}catch(_){}$('#out').innerHTML=`<div class="empty">⚠ ${esc(e.message)}</div>`});
 </script>
 <script>setTimeout(function(){if(!window.__rv)document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('v')})},4000)</script>
 <script src="/assets/news.js?v=1" defer></script>

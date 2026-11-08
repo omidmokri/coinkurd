@@ -30,7 +30,7 @@ import build_reality as BR   # noqa: E402
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
-VER = "5"
+VER = "6"
 CONTENT = os.environ.get("B4J_CONTENT") or os.path.join(ROOT, "content", "b4j")      # the env var is for tests only
 LANGS = ("fa", "ckb", "en")
 HEAD = f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
@@ -496,11 +496,7 @@ def page_hub(M, docs):
         f'<section><h2>{t3(UI["who_h"])}</h2><p class="b4j-who">{t3(UI["who"])}</p></section>'
         f'<section><h2>{t3(UI["modules"])}</h2><div class="b4j-grid">{"".join(cards)}</div></section>'
         f'<section><h2>{t3(UI["start_h"])}</h2><div class="b4j-grid sm">{start}</div></section>'
-        f'<aside class="b4j-credit"><p>{t3(UI["hub_credit"])}</p>'
-        f'<p class="lk" dir="ltr"><a href="{SRC_REPO}" target="_blank" rel="noopener noreferrer">GitHub</a> · '
-        f'<a href="{ORG_URL}" target="_blank" rel="noopener noreferrer">My First Bitcoin</a> · '
-        f'<a href="{LICENCE_URL}" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> · '
-        f'<a href="/kids/about/">{t3(UI["about"])}</a></p></aside></article>' + hub_data(M))
+        f'<aside class="b4j-credit"><p>{t3(UI["hub_credit"])}</p></aside></article>' + hub_data(M))
     url = f"{SITE}/kids/"
     ld = {"@context": "https://schema.org", "@type": "Course", "name": UI["prog"][0], "description": UI["tag"][0],
           "url": url, "inLanguage": ["fa", "ckb", "en"], "isAccessibleForFree": True,
