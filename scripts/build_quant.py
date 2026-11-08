@@ -30,7 +30,7 @@ T = {
     "method": L("روش و محدودیت‌ها", "ڕێباز و سنوورەکان", "Method and limits"),
     # ---- labels
     "bull": L("صعودی", "بەرزبوونەوە", "Bull"), "bear": L("نزولی", "دابەزین", "Bear"),
-    "sideways": L("خنثی / رِنج", "مامناوەند / ڕەینج", "Sideways"), "high_vol": L("پرنوسان", "هەڵاوسانی زۆر", "High volatility"),
+    "sideways": L("خنثی / رِنج", "مامناوەند / ڕەینج", "Sideways"), "high_vol": L("پرنوسانِ بی‌جهت", "هەڵاوسانی بێ ئاڕاستە", "Volatile, no trend"),
     # ---- regime
     "rg.title": L("رادار احتمالی رژیم بازار", "ڕاداری ئەگەری دۆخی بازاڕ", "Probabilistic market-regime radar"),
     "rg.desc": L("به‌جای یک برچسب قطعی، می‌گوید امروز بازار بیت‌کوین با چه احتمالی در هر رژیم است، مدل چقدر مطمئن است و احتمال تغییر رژیم چقدر است.",
@@ -134,21 +134,21 @@ T = {
 METH = {
     "regime": L([
         "مدل: زنجیرهٔ مارکوف پنهان گاوسی با ۴ حالت، روی سه ویژگی روزانهٔ بیت‌کوین (بازده روز، لگاریتم نوسان ۱۰ روزه، بازده ۲۰ روزه) که روی بازهٔ آموزش استاندارد شده‌اند. کاملاً با پایتون ساده و بدون کتابخانهٔ آماده نوشته شده است.",
-        "نام رژیم‌ها از خود داده می‌آید: پرنوسان‌ترین حالت «پرنوسان» است و بقیه بر اساس بازده ۲۰ روزه «نزولی»، «خنثی» و «صعودی» نام می‌گیرند.",
+        "نام رژیم‌ها از خود داده می‌آید: حالتی با کمترین بازده ۲۰ روزه «نزولی» و با بیشترین «صعودی» است؛ از دو حالت میانی، پرنوسان‌تر «پرنوسانِ بی‌جهت» و آرام‌تر «خنثی» نام می‌گیرد.",
         "فقط کندل‌های روزانهٔ بسته‌شده؛ احتمال هر روز فقط از داده‌های همان روز و قبل از آن ساخته می‌شود (فیلتر رو به جلو، بدون نگاه به آینده).",
         "تاریخچه برون‌نمونه است: برای هر سال از ۲۰۱۹ به بعد، مدل فقط روی روزهای قبل از آن سال آموزش دیده و سپس روی آن سال اجرا شده است.",
         "احتمال‌های مدل‌های مارکوف معمولاً بیش از حد مطمئن‌اند (نزدیک ۰ یا ۱۰۰٪)؛ «احتمال تغییر» و جدول ارزیابی را جدی‌تر از عدد اطمینان بگیرید.",
         "رژیم توصیف وضعیت است، نه پیش‌بینی قیمت. این صفحه توصیهٔ مالی نیست."],
         [
         "مۆدێل: زنجیرەی مارکۆڤی شاراوەی گاوسی بە ٤ دۆخ، لەسەر سێ تایبەتمەندیی ڕۆژانەی بیتکۆین (قازانجی ڕۆژ، لۆگاریتمی هەڵاوسانی ١٠ ڕۆژە، قازانجی ٢٠ ڕۆژە). تەواو بە پایتۆنی سادە نووسراوە.",
-        "ناوی دۆخەکان لە خودی داتاکەوە دێت: هەڵاوساوترین دۆخ «هەڵاوسانی زۆر»ە و ئەوانی تر بەپێی قازانجی ٢٠ ڕۆژە ناو دەنرێن.",
+        "ناوی دۆخەکان لە خودی داتاکەوە دێت: کەمترین قازانجی ٢٠ ڕۆژە «دابەزین» و زۆرترین «بەرزبوونەوە»یە؛ لە دوو دۆخی ناوەڕاست، هەڵاوساوتر «هەڵاوسانی بێ ئاڕاستە» و ئارامتر «مامناوەند»ە.",
         "تەنها مۆمی ڕۆژانەی داخراو؛ ئەگەری هەر ڕۆژێک تەنها لە داتای ئەو ڕۆژە و پێشتر دروست دەکرێت.",
         "مێژووەکە دەرەوەی نموونەیە: بۆ هەر ساڵێک لە ٢٠١٩ بەدواوە، مۆدێل تەنها لەسەر ڕۆژەکانی پێش ئەو ساڵە ڕاهێنراوە.",
         "ئەگەرەکانی مۆدێلی مارکۆڤ زۆرجار زیادە دڵنیان؛ «ئەگەری گۆڕان» و خشتەی هەڵسەنگاندن گرنگترن.",
         "دۆخ وەسفی بارودۆخە، نەک پێشبینیی نرخ. ئامۆژگاریی دارایی نییە."],
         [
         "Model: a 4-state Gaussian hidden Markov model on three daily Bitcoin features (day return, log 10-day volatility, 20-day return), standardised on the training window. Written in plain Python.",
-        "Regime names come from the data: the most volatile state is 'high volatility'; the rest are named bear, sideways and bull by their 20-day return.",
+        "Regime names come from the data: the state with the lowest 20-day return is bear and the highest is bull; of the two in between, the more volatile is 'volatile, no trend' and the calmer is sideways.",
         "Closed daily candles only; each day's probability uses that day and earlier only (forward filtering, no look-ahead).",
         "The history is out-of-sample: for each year from 2019 the model was trained only on the days before that year, then run through it.",
         "Hidden-Markov probabilities tend to be over-confident (near 0 or 100%); weigh the switch risk and the evaluation table more than the confidence number.",
