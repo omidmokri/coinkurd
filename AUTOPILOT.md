@@ -112,7 +112,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
    **Slice 1 shipped 2026-11-08:** `scripts/stance.py` labels 48 posts/run in CI → `data/stance.json`. Next: check the
-   file fills (counts, model, sane quotes), spot-check ~20 labels by reading the posts, then build the hit-rate study
+   file fills (counts, model, sane quotes) — **done 2026-11-08: 46 labels, 12/14/20, quotes sane** — then build the hit-rate study
    (stance vs `impact.json` r24h, base rate = same-hour unconditional up-rate, binomial/permutation test) once ≥100.
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
@@ -120,6 +120,20 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-08 · The sync chain no longer dies when a commit lands (found while checking Backlog #5)
+- **Need:** prices, ledger, stance labels etc. must stay fresh. `data/stance.json` had not changed for an hour: the last
+  sync run was 00:33 UTC. Cause: a push queues a sync run that *replaces* the chain's pending dispatched run (GitHub keeps
+  one pending run per concurrency group), and push runs never chained — so every code push ended the chain until the
+  unreliable cron revived it.
+- **Built:** `update.yml` "Start next run" now also runs on push, but only when no other sync run is queued/running
+  (`gh run list --json … | length`), so a burst of pushes still gives one chain.
+- **Verified:** YAML parses; the jq filter run here against the live run list returns 0 as expected. The push of this
+  commit is itself the live test: its run must end by dispatching a new "Sync Telegram → Site" run.
+- **#5 check:** stance.json has 46 labels (bullish 12 / bearish 14 / neutral 20, gemini-3.5-flash-lite); read all 46
+  headlines-as-quotes — stances plausible; a few quotes are greetings ("با سلام…") which pass the verbatim check but are
+  weak evidence; consider requiring the quote to be outside the first greeting line.
+- **Next:** confirm the chain ran on after this push; once ≥100 labels, build the hit-rate study (#5).
 
 ### 2026-11-08 · Directional study, slice 1: quote-verified stance labels in CI (Backlog #5)
 - **Need:** the channel's record says how posts moved price, not whether the channel's *direction* was right — the

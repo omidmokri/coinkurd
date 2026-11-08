@@ -385,9 +385,12 @@ jobs:
       # silent-exit detector and the ledger all sat hours out of date. So each run starts the next
       # one itself, the way the bot does, and the cron is only the watchdog that restarts a broken
       # chain. Guards: a run that ended within five minutes is broken (the schedule restarts it),
-      # and only scheduled or dispatched runs chain — a burst of pushes must not start a chain each.
+      # A push run chains too, but only when no other sync run is queued or running: a push that
+      # arrives while the chain's next run is pending replaces (cancels) that pending run, and on
+      # 2026-11-08 that silently ended the chain for over an hour. A burst of pushes still yields
+      # one chain, because GitHub keeps only the newest pending run of the group.
       - name: Start next run
-        if: always() && github.event_name != 'push'
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -395,6 +398,11 @@ jobs:
           if [ "$ran" -lt 300 ]; then
             echo "::warning::the run ended after ${ran}s — too soon to chain another; the schedule will restart it"
             exit 0
+          fi
+          if [ "${{ github.event_name }}" = "push" ]; then
+            others=$(gh run list --repo "${{ github.repository }}" --workflow update.yml -L 20 \
+              --json databaseId,status --jq '[.[] | select(.databaseId != ${{ github.run_id }}) | select(.status != "completed")] | length' || echo 1)
+            if [ "$others" != "0" ]; then echo "another sync run is pending ($others) — it keeps the chain"; exit 0; fi
           fi
           for i in 1 2 3; do
             gh workflow run update.yml --repo "${{ github.repository }}" --ref main && exit 0
