@@ -37,6 +37,30 @@ def norm(s):
     return re.sub(r"\s+", " ", s).strip().lower()
 
 
+GREET = ("با سلام", "سلام", "درود", "صبح بخیر", "صبحتون بخیر", "روز بخیر", "شب بخیر", "عصر بخیر",
+         "سڵاو", "بەیانی باش", "ڕۆژ باش", "شەو باش", "hello", "hi ", "good morning")
+
+
+def greeting_line(text):
+    """Normalised first non-empty line if it is a greeting, else ''. Pure; unit-tested."""
+    for ln in (text or "").splitlines():
+        n = norm(ln)
+        if n:
+            return n if any(n.startswith(norm(g)) for g in GREET) else ""
+    return ""
+
+
+def weak_quote(quote, text):
+    """True when the quote sits only inside the greeting line: no evidence of a direction."""
+    g, q = greeting_line(text), norm(quote)
+    if not g or q not in g:
+        return False
+    lines = (text or "").splitlines()
+    first = next(i for i, ln in enumerate(lines) if norm(ln))
+    rest = norm("\n".join(lines[first + 1:]))
+    return q not in rest
+
+
 def validate(item, posts_by_id):
     """Return a clean label dict or None. Pure; unit-tested."""
     try:
@@ -51,6 +75,8 @@ def validate(item, posts_by_id):
         return None
     q = str(item.get("quote", "")).strip()
     if len(norm(q)) < 6 or norm(q) not in norm(p.get("text", "")):
+        return None
+    if st != "neutral" and weak_quote(q, p.get("text", "")):
         return None
     coin = re.sub(r"[^A-Z0-9]", "", str(item.get("coin") or "BTC").upper())[:10] or "BTC"
     return {"stance": st, "coin": coin, "quote": q[:300], "date": p.get("date")}
@@ -76,6 +102,7 @@ For each post decide what it implies for the price of the main coin it discusses
 unless the post itself draws a direction. "coin" = ticker (BTC if general market).
 "quote" = a SHORT phrase copied EXACTLY, character for character, from the post that shows the stance
 (for neutral, copy the headline phrase). Do not translate or paraphrase the quote.
+Never quote the greeting line (e.g. "با سلام ..."): quote the sentence that carries the direction.
 Return a JSON array: [{{"id": <id>, "stance": "...", "coin": "...", "quote": "..."}}]
 
 POSTS:
@@ -91,6 +118,15 @@ def load_state():
         return {"labels": {}, "tries": {}}
 
 
+def drop_weak(state, by_id):
+    """Remove directional labels whose only evidence is the greeting line, so they get relabelled."""
+    bad = [pid for pid, l in state["labels"].items() if l.get("stance") != "neutral" and pid in by_id
+           and weak_quote(l.get("quote", ""), by_id[pid].get("text", ""))]
+    for pid in bad:
+        state["labels"].pop(pid); state["tries"].pop(pid, None)
+    return bad
+
+
 def main():
     limit = int(sys.argv[1]) if len(sys.argv) > 1 else 48
     sys.path.insert(0, HERE)
@@ -100,6 +136,9 @@ def main():
     posts = json.load(open(POSTS, encoding="utf-8"))
     by_id = {str(p.get("id")): p for p in posts}
     state = load_state()
+    dropped = drop_weak(state, by_id)
+    if dropped:
+        print(f"stance: dropped {len(dropped)} greeting-only labels for relabelling")
     work = todo(posts, state, limit)
     kept = 0
     t_end = time.time() + 240
