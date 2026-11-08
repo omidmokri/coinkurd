@@ -402,7 +402,31 @@ def sec_class(lang, now=None):
     return _head("🎓 " + (CL["title"].get(lg) or CL["title"]["fa"]), lg, "/class/", lines, (f["source"] or {}).get("date"))
 
 
-SECTIONS = {"today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
+# /tools/ calculators — a link list only (the bot has no calculators); ids are the cards' anchors on /tools/
+TOOLS = [
+    ("risk", {"fa": "حجم پوزیشن با کارمزد", "ckb": "قەبارەی پۆزیشن بە کرێ", "en": "Position size incl. fees"}),
+    ("ladder", {"fa": "پله‌های حد سود (TP1-3)", "ckb": "پلەکانی قازانج (TP1-3)", "en": "Take-profit ladder (TP1-3)"}),
+    ("average", {"fa": "میانگین قیمت خرید پله‌ای", "ckb": "تێکڕای نرخی کڕینی پلە بە پلە", "en": "Average entry of scaled buys"}),
+    ("funding", {"fa": "هزینهٔ فاندینگ فیوچرز", "ckb": "تێچووی فاندینگی فیوچەرز", "en": "Futures funding cost"}),
+    ("recovery", {"fa": "سود لازم برای جبران ضرر", "ckb": "قازانجی پێویست بۆ قەرەبووی زیان", "en": "Gain needed to recover a loss"}),
+    ("streaks", {"fa": "شبیه‌ساز زنجیرهٔ ضرر و افت سرمایه", "ckb": "هاوشێوەکەری زنجیرەی زیان و دابەزین", "en": "Losing-streak & drawdown simulator"}),
+    ("compare", {"fa": "مقایسهٔ بازده کوین‌ها", "ckb": "بەراوردی گەڕانەوەی دراوەکان", "en": "Compare coin returns"}),
+    ("whatif", {"fa": "اگر آن روز خریده بودم", "ckb": "ئەگەر ئەو ڕۆژە کڕیبام", "en": "What if I had bought"}),
+    ("fx", {"fa": "تبدیل ارز", "ckb": "گۆڕینی دراو", "en": "Currency converter"}),
+]
+TOOLS_T = {"fa": "ماشین‌حساب‌های معامله‌گر", "ckb": "ژمێرەرەکانی بازرگان", "en": "Trader calculators"}
+TOOLS_N = {"fa": "محاسبه روی سایت و در مرورگر خودتان انجام می‌شود؛ توصیهٔ مالی نیست.",
+           "ckb": "ژماردن لە ماڵپەڕ و لە وێبگەڕی خۆت دەکرێت؛ ئامۆژگاری دارایی نییە.",
+           "en": "Runs on the site, in your own browser; not financial advice."}
+
+
+def sec_tools(lang):
+    lg = lang if lang in ("fa", "ckb", "en") else ("en" if _lg(lang) == "en" else "fa")
+    lines = [f"• {t.get(lg) or t['fa']}: {SITE}/tools/#{k}" for k, t in TOOLS] + ["", TOOLS_N[lg]]
+    return _head("🧮 " + TOOLS_T[lg], lg, "/tools/", lines)
+
+
+SECTIONS = {"tools": (sec_tools, "/tools/"), "today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/")}
