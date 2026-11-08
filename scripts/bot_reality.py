@@ -305,6 +305,8 @@ TD = {"title": {"fa": "امروز در بازار", "ckb": "ئەمڕۆ لە با
       "po": {"fa": "پست‌های کانال ۲۴س", "ckb": "پۆستەکانی کەناڵ ٢٤ک", "en": "Channel posts 24h"},
       "cl": {"fa": "کلاس زندهٔ امشب (دیسکورد، ۲۰:۰۰ تهران) تا", "ckb": "وانەی ڕاستەوخۆی ئەمشەو (دیسکۆرد، ٢٠:٠٠ تاران) تا",
              "en": "Tonight's live class (Discord, 20:00 Tehran) in"},
+      "pd": {"fa": "روزهای گذشته ({n} روز ثبت‌شده)", "ckb": "ڕۆژانی ڕابردوو ({n} ڕۆژی تۆمارکراو)",
+             "en": "Past days ({n} recorded)"},
       "hm": {"fa": "{h} ساعت {m} دقیقه", "ckb": "{h} کاتژمێر {m} خولەک", "en": "{h}h {m}min"}}
 
 
@@ -323,6 +325,13 @@ def count_recent(items, now, key, hours=24):
         if t is not None and lo < t <= now:
             n += 1
     return n
+
+
+def past_days(d):
+    """number of recorded /today/ snapshots (keys YYYY-MM-DD); anything else counts as none"""
+    if not isinstance(d, dict):
+        return 0
+    return sum(1 for k in d if isinstance(k, str) and len(k) == 10 and k[4] == "-" and k[7] == "-")
 
 
 def class_wait(now):
@@ -364,6 +373,9 @@ def sec_today(lang, now=None):
     lines += ["", f"• {_td('sc', lg)}: {_n(count_recent(scan, now, 't'), lg)}",
               f"• {_td('po', lg)}: {_n(count_recent(posts, now, 'date'), lg)}",
               "", "🎓 " + _td("cl", lg) + " " + _td("hm", lg).format(h=_n(w // 60, lg), m=_n(w % 60, lg))]
+    nd = past_days(R.load("today_days.json", {}))
+    if nd >= 2:                          # one recorded day is just today: link the archive once there is a past
+        lines += ["📅 " + _td("pd", lg).format(n=_n(nd, lg)) + ": " + SITE + "/today/days/"]
     return _head("☀️ " + _td("title", lg), lg, "/today/", lines, brain.get("updated_at"))
 
 

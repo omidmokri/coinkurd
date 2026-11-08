@@ -104,8 +104,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
-2. **`/today/` — per-day snapshots.** Shipped 2026-11-08 (`/today/<date>/`, `/today/days/`). Remaining (small): a "past
-   days" link in the bot's today section once a few real days exist.
+2. **`/today/` — per-day snapshots.** Done 2026-11-08 (pages + bot link, which appears by itself from the 2nd recorded day).
 3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
    Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
 5. **Directional study.** Slices 1–2 shipped 2026-11-08 (`stance.py` → `stance.json`; `direction.py` → `direction.json`,
@@ -117,6 +116,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Bot's "today" section links the recorded past days (Backlog #2, finished)
+- **Need:** bot users had no way to reach `/today/days/`, the frozen daily record.
+- **Built:** `bot_reality.past_days()` counts dated keys in `data/today_days.json`; `sec_today` adds
+  "📅 Past days (N recorded): …/today/days/" (fa/ckb/en) only when N ≥ 2, so it appears by itself tomorrow (1 day now).
+- **Verified:** py_compile; unit tests (None/{}/1 day → hidden, 2 days + junk key → 2); rendered fa/ckb/en with 1 and
+  2 days. Bot text only, no site UI change, so no screenshots.
+- **Next:** #6 design (site ↔ bot identity), or #5 bearish split when ≥30 bearish days.
+
 ### 2026-11-08 · /today/ now keeps a recorded copy of every day (Backlog #2)
 - **Need:** the daily spine vanished every 24 h; traders (and the strategy's "measured honesty") need to look back at what
   the page said on a given day, frozen, not rebuilt with hindsight.
