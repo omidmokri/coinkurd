@@ -30,7 +30,7 @@ import build_reality as BR   # noqa: E402
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
-VER = "6"
+VER = "7"
 CONTENT = os.environ.get("B4J_CONTENT") or os.path.join(ROOT, "content", "b4j")      # the env var is for tests only
 LANGS = ("fa", "ckb", "en")
 HEAD = f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
@@ -491,10 +491,12 @@ def page_hub(M, docs):
         f'<h1>{t3(UI["prog"])}</h1><p class="lead">{t3(UI["tag"])}</p>'
         f'<ul class="b4j-facts">{"".join("<li>" + t3(f) + "</li>" for f in facts)}</ul>'
         f'<div class="b4j-cta"><a class="go" href="{M[0]["url"]}">{t3(UI["start"])}</a>'
+        f'<a class="alt" href="/kids/play/">🎮 {t3(PLAY_UI["play"])}</a>'
         f'<a class="alt" href="/kids/parents/">{t3(UI["parents"])}</a></div>'
         f'<p class="b4j-all" id="b4jAll" hidden></p></div>'
         f'<section><h2>{t3(UI["who_h"])}</h2><p class="b4j-who">{t3(UI["who"])}</p></section>'
         f'<section><h2>{t3(UI["modules"])}</h2><div class="b4j-grid">{"".join(cards)}</div></section>'
+        f'<section><h2>🎮 {t3(PLAY_UI["play"])}</h2><div class="kp-hub">{"".join(play_card(g) for g in PLAY)}</div></section>'
         f'<section><h2>{t3(UI["start_h"])}</h2><div class="b4j-grid sm">{start}</div></section>'
         f'<aside class="b4j-credit"><p>{t3(UI["hub_credit"])}</p></aside></article>' + hub_data(M))
     url = f"{SITE}/kids/"
@@ -506,7 +508,7 @@ def page_hub(M, docs):
           "hasPart": [{"@type": "Course", "name": bare(m["title"]["fa"]), "url": SITE + m["url"],
                        "provider": {"@type": "Organization", "name": "entekhab.net"}} for m in M]}
     return BP.page("kids/", UI["prog"][0] + " — برنامهٔ درسی باز برای کودکان ۸ تا ۱۲ ساله", UI["tag"][0], body,
-                   shell(ldjson(ld)))
+                   shell(ldjson(ld) + PLAY_ASSETS))
 
 
 def head_block(lg, kick, title, en_title="", meta=""):
@@ -523,7 +525,10 @@ def page_module(M, fix, m):
     cards = "".join(act_card(a) for a in m["acts"])
     url = SITE + m["url"]
     nav, bld = crumbs([("/kids/", UI["prog"]), (None, tuple(f"{mod_label(m)[i]} — {bare(m['title'][lg])}" for i, lg in enumerate(LANGS)))], url)
-    body = (f'{nav}<article class="b4j" style="--c:{m["color"]}">{BP.LSW}{wrap(per)}'
+    pg = next(g for g in PLAY if g[0] == PLAY_BY_MOD.get(m["dir"], "market"))
+    play = (f'<a class="b4j-play" href="/kids/play/{pg[0]}/"><span class="kp-emo" aria-hidden="true">{pg[1]}</span>'
+            f'<span><small>{t3(PLAY_UI["this"])}</small><b>{t3(pg[3])}</b>{t3(pg[4])}</span></a>')
+    body = (f'{nav}<article class="b4j" style="--c:{m["color"]}">{BP.LSW}{wrap(per)}{play}'
             f'<section class="b4j-s" id="acts"><h2><i class="ic" aria-hidden="true">🧩</i>{t3(UI["allact"])}</h2>'
             f'<div class="b4j-list">{cards}</div></section>'
             f'{pn_nav(M, m["url"])}</article>' + hub_data(M))
@@ -535,7 +540,7 @@ def page_module(M, fix, m):
     desc = trim(render_doc("fa", m["ov"], fix)["plain_lead"] or " ".join(
         MD.plain(b["t"]) for b in load(m["ov"])["fa"] if b["k"] == "p")[:400])
     return BP.page(m["url"].strip("/"), f'{bare(m["title"]["fa"])} — {UI["prog"][0]}', desc, body,
-                   shell(ldjson(bld, ld)))
+                   shell(ldjson(bld, ld) + f'<link rel="stylesheet" href="/assets/kids-play.css?v={VER}">'))
 
 
 def page_activity(M, fix, m, a):
@@ -742,6 +747,77 @@ def page_moved(path):
 
 
 # ------------------------------------------------------------------ build
+# ------------------------------------------------------------------ games (/kids/play/)
+# Four short browser games hosted by Seko the coin (assets/kids-play.js). Concepts only: no real money,
+# no trading, nothing leaves the device (stars are kept in localStorage "ck_b4j_play").
+PLAY = [
+    ("market", "🏪", "#f7931a", ("بازارچهٔ مبادله", "بازاڕۆچکەی ئاڵوگۆڕ", "Swap market"),
+     ("از معاوضه تا پول، و اینکه چرا قیمت‌ها بالا و پایین می‌روند.", "لە ئاڵوگۆڕەوە بۆ پارە، و بۆچی نرخەکان بەرز و نزم دەبنەوە.",
+      "From swapping to money, and why prices go up and down.")),
+    ("piggy", "🐷", "#f472b6", ("قلک و هدف", "قوتووی پاشەکەوت و ئامانج", "Piggy jar & goal"),
+     ("نیاز یا خواسته؟ برای یک هدف پس‌انداز کن، حتی وقتی قیمت‌ها بالا می‌رود.", "پێویستی یان ئارەزوو؟ بۆ ئامانجێک پاشەکەوت بکە، تەنانەت کاتێک نرخەکان بەرز دەبنەوە.",
+      "Need or want? Save for a goal, even when prices rise.")),
+    ("chain", "⛓️", "#facc15", ("زنجیرهٔ بلوک‌ها", "زنجیرەی بلۆکەکان", "Block chain"),
+     ("اثر انگشت دیجیتال بساز، دستکاری را بگیر و یک عدد خوش‌شانس پیدا کن.", "پەنجەمۆری دیجیتاڵ دروست بکە، دەستکاری بگرە و ژمارەیەکی بەختدار بدۆزەوە.",
+      "Make digital fingerprints, catch tampering and find a lucky number.")),
+    ("scam", "🕵️", "#a78bfa", ("شکارچی کلاهبرداری", "ڕاوچیی فێڵ", "Scam hunter"),
+     ("پیام‌های فریبنده را بشناس، کلمه‌های مخفی را امن نگه دار و رمز قوی بساز.", "نامە فریودەرەکان بناسە، وشە نهێنییەکان بپارێزە و وشەی نهێنیی بەهێز دروست بکە.",
+      "Spot tricky messages, keep secret words safe and build a strong passphrase.")),
+]
+PLAY_BY_MOD = {"m1": "market", "m2": "chain", "m3": "chain", "m4": "scam", "m5": "piggy", "m6": "chain"}
+BADGE = {"market": ("تاجر کوچک", "بازرگانی بچووک", "Little trader"), "piggy": ("قهرمان پس‌انداز", "پاڵەوانی پاشەکەوت", "Saving hero"),
+         "chain": ("نگهبان زنجیره", "پاسەوانی زنجیرە", "Chain guardian"), "scam": ("شکارچی کلاهبرداری", "ڕاوچیی فێڵ", "Scam hunter")}
+PLAY_UI = {
+    "play": ("بازی کن با سِکو", "لەگەڵ سکۆ یاری بکە", "Play with Seko"),
+    "lead": ("چهار بازی کوتاه برای بچه‌های ۸ تا ۱۲ سال، هر کدام دربارهٔ یک فصل از همین برنامهٔ درسی. پول واقعی در کار نیست و هیچ چیزی از دستگاهت بیرون نمی‌رود؛ ستاره‌ها فقط روی همین دستگاه می‌مانند.",
+             "چوار یاریی کورت بۆ منداڵانی ٨ تا ١٢ ساڵ، هەریەکەیان دەربارەی بەشێکی ئەم بەرنامە وانەییە. پارەی ڕاستەقینە نییە و هیچ شتێک لە ئامێرەکەت دەرناچێت؛ ئەستێرەکان تەنها لەسەر ئەم ئامێرە دەمێننەوە.",
+             "Four short games for 8 to 12 year olds, each about one chapter of this curriculum. No real money, and nothing leaves your device; your stars stay on this device only."),
+    "games": ("بازی‌ها", "یارییەکان", "Games"),
+    "badges": ("نشان‌های تو", "نیشانەکانت", "Your badges"),
+    "parents": ("برای پدر و مادرها: این بازی‌ها مفهوم‌ها را آموزش می‌دهند، نه خرید و فروش. هیچ جا کودک به معامله یا سرمایه‌گذاری واقعی تشویق نمی‌شود، و در بازی «شکارچی کلاهبرداری» یاد می‌گیرد در هر شکی از یک بزرگ‌تر بپرسد.",
+                "بۆ دایک و باوکان: ئەم یارییانە چەمکەکان فێر دەکەن، نەک کڕین و فرۆشتن. لە هیچ شوێنێکدا منداڵ هان نادرێت بۆ مامەڵە یان وەبەرهێنانی ڕاستەقینە، و لە یاریی «ڕاوچیی فێڵ»دا فێر دەبێت لە هەر دوودڵییەکدا لە کەسێکی گەورە بپرسێت.",
+                "For parents: these games teach ideas, not buying and selling. Nowhere is a child encouraged to trade or invest for real, and in “Scam hunter” they learn to ask a grown-up whenever in doubt."),
+    "this": ("بازی این فصل", "یاریی ئەم بەشە", "This chapter's game"),
+    "nojs": ("برای بازی، جاوااسکریپت مرورگر باید روشن باشد.", "بۆ یاریکردن، دەبێت جاڤاسکریپتی وێبگەڕ چالاک بێت.", "To play, JavaScript must be switched on in your browser."),
+}
+PLAY_ASSETS = (f'<link rel="stylesheet" href="/assets/kids-play.css?v={VER}">'
+               f'<script src="/assets/kids-play.js?v={VER}" defer></script>')
+
+
+def play_card(g):
+    k, ic, col, title, desc = g
+    return (f'<a class="kp-tile" href="/kids/play/{k}/" style="--tc:{col}"><span class="kp-emo" aria-hidden="true">{ic}</span>'
+            f'{t3(title, "h3")}<p>{t3(desc)}</p><span class="kp-stars" data-stars="{k}"></span></a>')
+
+
+def page_play_hub(M):
+    url = f"{SITE}/kids/play/"
+    nav, bld = crumbs([("/kids/", UI["prog"]), (None, PLAY_UI["play"])], url)
+    badges = "".join(f'<span class="kp-badge" data-badge="{k}">🏅 {t3(BADGE[k])}</span>' for k, *_ in PLAY)
+    body = (f'{nav}<article class="b4j" id="kp-hub">{BP.LSW}'
+            f'<div class="kp-top"><div class="kp-seko" id="kpHubSeko"></div><div><h1 style="margin:0">{t3(PLAY_UI["play"])}</h1>'
+            f'<p class="lead" style="margin:6px 0 0">{t3(PLAY_UI["lead"])}</p></div></div>'
+            f'<section><h2>{t3(PLAY_UI["games"])}</h2><div class="kp-hub">{"".join(play_card(g) for g in PLAY)}</div></section>'
+            f'<section><h2>{t3(PLAY_UI["badges"])}</h2><div class="kp-badges">{badges}</div></section>'
+            f'<aside class="b4j-credit"><p>{t3(PLAY_UI["parents"])}</p></aside></article>')
+    ld = {"@context": "https://schema.org", "@type": "ItemList", "name": PLAY_UI["play"][0], "url": url,
+          "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": f"{SITE}/kids/play/{g[0]}/", "name": g[3][0]} for i, g in enumerate(PLAY)]}
+    return BP.page("kids/play", f'{PLAY_UI["play"][0]} — {UI["prog"][0]}', PLAY_UI["lead"][0], body, shell(ldjson(bld, ld) + PLAY_ASSETS))
+
+
+def page_game(M, g):
+    k, ic, col, title, desc = g
+    url = f"{SITE}/kids/play/{k}/"
+    nav, bld = crumbs([("/kids/", UI["prog"]), ("/kids/play/", PLAY_UI["play"]), (None, title)], url)
+    body = (f'{nav}<article class="b4j" style="--c:{col}">{BP.LSW}'
+            f'<div class="b4j-h"><p class="kick">{ic} {t3(PLAY_UI["play"])}</p><h1>{t3(title)}</h1><p class="lead">{t3(desc)}</p></div>'
+            f'<div id="kp-app" data-game="{k}"><noscript><p>{PLAY_UI["nojs"][0]}</p></noscript></div></article>')
+    ld = {"@context": "https://schema.org", "@type": "LearningResource", "name": title[0], "description": desc[0], "url": url,
+          "inLanguage": ["fa", "ckb", "en"], "isAccessibleForFree": True, "typicalAgeRange": "8-12", "learningResourceType": "game",
+          "isPartOf": {"@type": "Course", "name": UI["prog"][0], "url": SITE + "/kids/"}}
+    return BP.page(f"kids/play/{k}", f'{title[0]} — {UI["prog"][0]}', desc[0], body, shell(ldjson(bld, ld) + PLAY_ASSETS))
+
+
 def build():
     M = catalog()
     terms = glossary_terms()
@@ -760,6 +836,9 @@ def build():
     urls.append(page_doc(M, fix, "kids/faq", "front/faq.md", "faq"))
     urls.append(page_glossary(M, fix))
     urls.append(page_about(M))
+    urls.append(page_play_hub(M))
+    for g in PLAY:
+        urls.append(page_game(M, g))
     BR.add_to_sitemap(urls)
     for p in OLD_URLS:                       # old links keep working, but are not listed in the sitemap
         page_moved(p)
