@@ -416,6 +416,7 @@ TOOLS = [
     ("streaks", {"fa": "شبیه‌ساز زنجیرهٔ ضرر و افت سرمایه", "ckb": "هاوشێوەکەری زنجیرەی زیان و دابەزین", "en": "Losing-streak & drawdown simulator"}),
     ("compare", {"fa": "مقایسهٔ بازده کوین‌ها", "ckb": "بەراوردی گەڕانەوەی دراوەکان", "en": "Compare coin returns"}),
     ("whatif", {"fa": "اگر آن روز خریده بودم", "ckb": "ئەگەر ئەو ڕۆژە کڕیبام", "en": "What if I had bought"}),
+    ("sessions", {"fa": "ساعت بازارهای جهانی و فاندینگ", "ckb": "کاتژمێری بازاڕە جیهانییەکان و فاندینگ", "en": "World market hours & funding"}),
     ("fx", {"fa": "تبدیل ارز", "ckb": "گۆڕینی دراو", "en": "Currency converter"}),
 ]
 TOOLS_T = {"fa": "ماشین‌حساب‌های معامله‌گر", "ckb": "ژمێرەرەکانی بازرگان", "en": "Trader calculators"}
