@@ -135,6 +135,11 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: timeout 280 python scripts/stance.py 48
 
+      - name: Directional study (stance vs next-24h move, day-level permutation test)
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/direction.py
+
       - name: Narrative Radar
         id: narr
         continue-on-error: true

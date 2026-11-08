@@ -108,18 +108,29 @@ The site's strategy (agreed with the owner, 2026-11-07):
    snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
 3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
    Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
-5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
-   quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
-   labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
-   **Slice 1 shipped 2026-11-08:** `scripts/stance.py` labels 48 posts/run in CI → `data/stance.json`. Next: check the
-   file fills (counts, model, sane quotes) — **done 2026-11-08: 46 labels, 12/14/20, quotes sane** — then build the hit-rate study
-   (stance vs `impact.json` r24h, base rate = same-hour unconditional up-rate, binomial/permutation test) once ≥100.
+5. **Directional study.** Slices 1–2 shipped 2026-11-08 (`stance.py` → `stance.json`; `direction.py` → `direction.json`,
+   section on `/track-record/` + bot line). Remaining: drop greeting-line quotes ("با سلام…") as evidence in `stance.py`;
+   once ≥30 *bearish* days exist, report bullish/bearish days separately (now 34/4, so the test mostly measures bullish days).
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-08 · Directional study, slice 2: "was the direction right?" on /track-record/ + bot (Backlog #5)
+- **Need:** traders ask whether the channel's bullish/bearish calls were right, not just how price moved after posts.
+- **Built:** `scripts/direction.py` → `data/direction.json` (CI step after stance). Unit = UTC day (posts of one day share
+  one 24 h window): day stance = sign(#bull−#bear) of BTC posts with complete r24h, outcome = mean r24h; hit = sign match.
+  Baseline = day stances shuffled across the same days (20 000 draws, seed 20261108), one-sided add-one p; no verdict
+  below 30 days. New trilingual section on `/track-record/` (with not-financial-advice line, links to both JSONs) and one
+  line in the bot's track-record section (only when ≥30 days).
+- **Result on current data:** 38 days (34 bullish, 4 bearish), 50.0% right vs 50.0% expected, p ≈ 0.70 → not better
+  than chance. Published as is.
+- **Verified:** py_compile; unit tests (null skill → p 0.76; planted 90% skill → p 0.0002; hand-checked 2-day case incl.
+  tie day, neutral and ETH exclusion; empty input); built in /tmp/bld; Playwright + Chrome 1280/390 fa/en: section
+  found, overflow 0, zero JS errors, looked at shots; bot rendered fa/ckb/en.
+- **Next:** confirm `data/direction.json` is committed by the next sync run.
 
 ### 2026-11-08 · The sync chain no longer dies when a commit lands (found while checking Backlog #5)
 - **Need:** prices, ledger, stance labels etc. must stay fresh. `data/stance.json` had not changed for an hour: the last
