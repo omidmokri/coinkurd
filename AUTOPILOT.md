@@ -122,7 +122,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
      are cut with a visible note). Bot: on `w_` show the parsed list and an "add these to my watchlist" button — the
      user confirms, nothing is posted anywhere. Validate symbols against the bot's known coin list; unit-test parsing
      (empty, junk, >64 chars, duplicates, lower-case).
-   - Slice B (bot→site): bot "open my list on the site" button → `https://entekhab.net/news/?w=BTC,ETH`; the site merges
+   - **Slice B shipped 2026-11-08** (home `/?w=` + `assets/wimport.js`, not `/news/`, which does not exist). Original plan:
+     Slice B (bot→site): bot "open my list on the site" button → `https://entekhab.net/news/?w=BTC,ETH`; the site merges
      `?w=` into `ek_watch` only after a click on "save to this browser" (no silent overwrite).
    - Not planned: secrets/tokens in URLs, cross-device sync server, any change to broadcasting.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
@@ -130,6 +131,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · "Your list from the bot" on the site (Backlog #6, slice B — #6 done)
+- **Need:** the bot's watchlist screen linked `entekhab.net/news/`, a page that does not exist, and coins seen in the bot
+  could not get back into the site's ⭐ list (`ek_watch`, used by the home news "My list" filter).
+- **Built:** `assets/wimport.js` (loaded by `index.html`): `/?w=BTC,ETH` shows a fa/ckb/en card listing only coins not
+  already saved; nothing is stored until "Save to this browser" (merge, dedupe, max 20), then the URL is cleaned and the
+  page reloads at `#newsBox`. Bot `bot_wlink.site_link()` now links `https://entekhab.net/?w=…#newsBox`.
+- **Verified:** py_compile + `bot_wlink` self-test (link asserted); node tests of `EKW.parse/merge` (junk, dupes, case,
+  `<script>`, >20 cap, merge order); Playwright + Chrome 1280/390 fa/en: card shows ETH·SOL when BTC already saved,
+  save → `["BTC","ETH","SOL"]`, URL cleaned, overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise pick a fresh trader need.
+
 ### 2026-11-08 · "Send my list to the bot" (Backlog #6, slice A)
 - **Need:** coins starred on the site were invisible in the bot; traders re-typed them.
 - **Built:** on coin pages, next to the ⭐ button, a pill (fa/ckb/en by page lang) opening

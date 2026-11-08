@@ -57,6 +57,11 @@ def _price(p):
     return f"{p:.6g}"
 
 
+def site_link(syms):
+    """Home page with ?w= — the site asks before saving the coins into this browser's watchlist."""
+    return f"{SITE}/?w={','.join(syms[:20])}#newsBox"
+
+
 def screen(syms, lang, market=None, root=None):
     """Return the message text (HTML) for the hand-off."""
     if market is None:
@@ -75,7 +80,7 @@ def screen(syms, lang, market=None, root=None):
             lines.append(f"{s}: {_l('none', lang)}")
     if market.get("updated_at"):
         lines += ["", f"{_l('upd', lang)}: {str(market['updated_at'])[:16].replace('T', ' ')} UTC"]
-    lines += [f"{_l('site', lang)}: {SITE}/news/", "", _l("nfa", lang)]
+    lines += [f'{_l("site", lang)}: <a href="{site_link(syms)}">{SITE}</a>', "", _l("nfa", lang)]
     return "\n".join(lines)
 
 
@@ -88,5 +93,6 @@ if __name__ == "__main__":       # self-test
     m = {"updated_at": "2026-11-08T09:22:20", "coins": [{"coin": "BTC", "price": 75897.82, "chg24": -0.2}]}
     t = screen(["BTC", "ZZZ"], "en", m)
     assert "$75,898" in t and "-0.2%" in t and "ZZZ: no data yet" in t and "Not financial advice" in t
+    assert site_link(["BTC", "ETH"]) == "https://entekhab.net/?w=BTC,ETH#newsBox" and site_link(["BTC", "ZZZ"]) in t
     assert screen([], "ckb", m) == S["empty"]["ckb"]
     print("ok")
