@@ -131,6 +131,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Exchange fees in the position-size calculator (new need; Backlog had nothing open)
+- **Need:** `/tools/#risk` ignored fees, so with leverage the real loss at the stop was larger than the chosen risk and the
+  shown R:R/break-even were too rosy. #5's bearish split still waits (8 bearish of 85 days).
+- **Built:** optional "fee per side (%)" input (empty = 0, old behaviour unchanged) in fa/ckb/en; position is sized so the
+  loss *including* open+close fees equals the risk; new "fees if stopped" cell; profit, R:R and break-even are net of
+  fees; warning when fees eat the whole target. Pure `riskCalc()` function. No bot change (the bot has no calculator).
+- **Verified:** node unit tests on `riskCalc` (fee 0 = old numbers, loss incl. fees = risk for long and short, liquidation
+  110 for 10x short, fee-kills-profit case); hand-check 1000/1%/100/95/110/0.1% → size $192.49, net profit $18.85
+  = shown; Playwright + Chrome 1280/390 fa/en: overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need (e.g. funding cost for held futures).
 ### 2026-11-08 · "Your list from the bot" on the site (Backlog #6, slice B — #6 done)
 - **Need:** the bot's watchlist screen linked `entekhab.net/news/`, a page that does not exist, and coins seen in the bot
   could not get back into the site's ⭐ list (`ek_watch`, used by the home news "My list" filter).
