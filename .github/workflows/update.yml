@@ -315,6 +315,21 @@ jobs:
         timeout-minutes: 4
         run: python scripts/opportunity.py
 
+      - name: Regime radar (HMM, once per closed day)
+        continue-on-error: true
+        timeout-minutes: 6
+        run: python scripts/regime.py
+
+      - name: Anomaly hunter (daily scan + light now-view)
+        continue-on-error: true
+        timeout-minutes: 6
+        run: python scripts/anomaly.py
+
+      - name: Signal Truth Lab
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/truth.py
+
       - name: Site assistant index (homepage help chat)
         id: assistant
         continue-on-error: true
@@ -343,6 +358,10 @@ jobs:
       - name: Build reality-check pages (ledger, friction, hype, silent exit, correlation)
         continue-on-error: true
         run: python scripts/build_reality.py
+
+      - name: Build the quant pages (regime, truth lab, anomalies)
+        continue-on-error: true
+        run: python scripts/build_quant.py
 
       - name: Build the Roundtable page
         continue-on-error: true

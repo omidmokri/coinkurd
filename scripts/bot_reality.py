@@ -429,7 +429,72 @@ def sec_tools(lang):
     return _head("🧮 " + TOOLS_T[lg], lg, "/tools/", lines)
 
 
+# ------------------------------------------------------------------ quant: regime radar, truth lab, anomalies
+def _q(k, lg, **kw):
+    import build_quant as BQ
+    return BQ.t(k, lg, **kw)
+
+
+def sec_regime(lang):
+    lg = _lg(lang)
+    d = R.load("regime.json", {})
+    now = d.get("now") or {}
+    if not now:
+        return _nodata("🧭 " + _q("rg.title", lg), lg, "/regime/")
+    pr = now.get("probs") or {}
+    lines = [f"• <b>{_q(now['top'], lg)}</b> — {_q('rg.conf', lg)} {_n(100 * now['confidence'], lg, 1, pct=True)}",
+             f"• {_q('rg.switch', lg)}: {_n(100 * now['switch_risk'], lg, 1, pct=True)}",
+             f"• {_n(now.get('days_in'), lg)} {_q('rg.days', lg)}", ""]
+    for k in ("bull", "bear", "sideways", "high_vol"):
+        lines.append(f"  {_q(k, lg)}: {_n(100 * pr.get(k, 0), lg, 1, pct=True)}")
+    return _head("🧭 " + _q("rg.title", lg), lg, "/regime/", lines, d.get("updated_at"))
+
+
+def sec_truth(lang):
+    lg = _lg(lang)
+    d = R.load("truth.json", {})
+    pats = ((d.get("scanner") or {}).get("patterns")) or {}
+    if not pats:
+        return _nodata("⚖️ " + _q("tr.title", lg), lg, "/truth/")
+    import build_quant as BQ
+    c = d.get("cost") or {}
+    lines = [_q("tr.cost", lg, f=_n(c.get("fee_side"), lg, 2), s=_n(c.get("slip_side"), lg, 2), c=_n(c.get("round_trip"), lg, 2)), ""]
+    mark = {"edge_strong": "✅", "edge": "✅", "maybe": "🟡", "no_edge": "⚪️", "loses": "❌", "too_few": "⏳"}
+    mh = (d.get("rules") or {}).get("main_h", "24h")
+    for k, r in sorted(((k, r) for k, r in pats.items() if k != "_all"),
+                       key=lambda kv: -((kv[1]["bt"].get(mh) or {}).get("net") or -99)):
+        cell = (r["live"] if r.get("basis") == "live" else r["bt"]).get(mh) or {}
+        lines.append(f"{mark.get(r['verdict'], '•')} {BQ.pname(k, lg)}: {_q('v.' + r['verdict'], lg)} "
+                     f"({_n(cell.get('net'), lg, 2, sign=True, pct=True)})")
+    cal = (d.get("calibration") or {}).get("scanner") or {}
+    if cal:
+        lines += ["", f"• Brier {_n(cal.get('brier'), lg, 3)} / {_n(cal.get('brier_base'), lg, 3)} · "
+                      f"{_q('tr.skill', lg)} {_n(100 * (cal.get('skill') or 0), lg, 1, sign=True, pct=True)}"]
+    return _head("⚖️ " + _q("tr.title", lg), lg, "/truth/", lines, d.get("updated_at"))
+
+
+def sec_anomaly(lang):
+    lg = _lg(lang)
+    d = R.load("anomaly.json", {})
+    today = d.get("today") or []
+    if not today:
+        return _nodata("🔎 " + _q("an.title", lg), lg, "/anomalies/")
+    fl = [r for r in today if r.get("flags")]
+    lines = [f"• {_q('an.today', lg)} · {BR.fdate(d.get('day'), lg)}"]
+    if fl:
+        for r in fl[:8]:
+            lines.append(f"  <b>{r['coin']}</b> ({_n(r.get('ret'), lg, 2, sign=True, pct=True)}): "
+                         + (", " if lg == "en" else "، ").join(_q('f.' + f, lg) for f in r["flags"]))
+    else:
+        lines.append("  " + _q("an.none", lg))
+    hot = (d.get("now") or {}).get("hot") or []
+    if hot:
+        lines += ["", f"• {_q('an.now', lg)}: " + " · ".join(f"{x['coin']} z {_n(x.get('vol_z'), lg, 1)}" for x in hot[:6])]
+    return _head("🔎 " + _q("an.title", lg), lg, "/anomalies/", lines, d.get("updated_at"))
+
+
 SECTIONS = {"tools": (sec_tools, "/tools/"), "today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
-            "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/")}
+            "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/"),
+            "truth": (sec_truth, "/truth/"), "regime": (sec_regime, "/regime/"), "anomaly": (sec_anomaly, "/anomalies/")}
