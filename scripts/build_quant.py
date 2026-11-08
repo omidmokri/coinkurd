@@ -414,11 +414,11 @@ def build_anomalies():
     def flags_html(fl, lg):
         return " ".join(f"<span class='rc-pill'>{e(t('f.' + f, lg))}</span>" for f in fl) or "<span class='mut'>—</span>"
 
-    def zc(z):
+    def zc(z, lg="en"):
         if z is None:
             return "<span class='mut'>—</span>"
         st = " style='color:#f97316;font-weight:800'" if abs(z) >= an.get("z", 3) else ""
-        return f"<span class='rc-num'{st}>{z:+.1f}</span>"
+        return f"<span class='rc-num'{st}>{nf(z, lg, 1, True)}</span>"
 
     def b(lg):
         h = head(lg, "an.title", "an.desc")
@@ -430,7 +430,7 @@ def build_anomalies():
         nw = (an.get("now") or {})
         if nw.get("hot"):
             rows = [f"<tr><td><a href='/coins/{e(x['coin'].lower())}/'><b>{e(x['coin'])}</b></a></td><td class='rc-num'>${BR.money(x.get('vol24'), lg)}</td>"
-                    f"<td>{zc(x.get('vol_z'))}</td><td class='{cls(x.get('chg24'))}'>{pct(x.get('chg24'), lg, 2, True)}</td>"
+                    f"<td>{zc(x.get('vol_z'), lg)}</td><td class='{cls(x.get('chg24'))}'>{pct(x.get('chg24'), lg, 2, True)}</td>"
                     f"<td class='rc-num'>{nf(x.get('fund_now'), lg, 4) if x.get('fund_now') is not None else '—'} / {nf(x.get('fund_base'), lg, 4) if x.get('fund_base') is not None else '—'}</td></tr>"
                     for x in nw["hot"]]
             inner = table(cols("an.now_th", lg), rows)
@@ -443,9 +443,9 @@ def build_anomalies():
             oi = r.get("oi") or {}
             fd = r.get("fund") or {}
             rows.append(f"<tr><td><a href='/coins/{e(r['coin'].lower())}/'><b>{e(r['coin'])}</b></a></td><td class='{cls(r['ret'])}'>{pct(r['ret'], lg, 2, True)}</td>"
-                        f"<td>{zc(r['z'].get('vol'))}</td><td>{zc(r['z'].get('move'))}</td><td>{zc(r['z'].get('taker'))}</td>"
-                        f"<td>{pct(oi.get('chg'), lg, 1, True) if oi.get('chg') is not None else '—'} {zc(oi.get('z')) if oi else ''}</td>"
-                        f"<td>{zc(fd.get('z'))}</td><td>{flags_html(r['flags'], lg)}</td></tr>")
+                        f"<td>{zc(r['z'].get('vol'), lg)}</td><td>{zc(r['z'].get('move'), lg)}</td><td>{zc(r['z'].get('taker'), lg)}</td>"
+                        f"<td>{pct(oi.get('chg'), lg, 1, True) if oi.get('chg') is not None else '—'} {zc(oi.get('z'), lg) if oi else ''}</td>"
+                        f"<td>{zc(fd.get('z'), lg)}</td><td>{flags_html(r['flags'], lg)}</td></tr>")
         note = "" if flagged else f"<p class='note'>{t('an.none', lg)}</p>"
         h += sec(f"{t('an.today', lg)} · {fdate(an.get('day'), lg)}", note + table(cols("an.th", lg), rows)
                  + f"<p class='note'>{t('an.cover', lg, n=nf(an.get('coins'), lg), k=nf(an.get('okx_coins'), lg))}</p>", "today")
