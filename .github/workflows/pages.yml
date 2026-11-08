@@ -40,10 +40,15 @@ jobs:
           python scripts/build_map.py
           python scripts/build_kids.py
       - name: Cache the read-aloud voices
+        id: ttscache
         uses: actions/cache@v4
         with:
           path: ~/.cache/entekhab-tts
           key: tts-${{ hashFiles('scripts/fetch_tts.py') }}
+      - name: Install the int8 quantiser (only when the voice cache is cold)
+        if: steps.ttscache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: pip install onnxruntime==1.31.1 onnx==1.23.2
       - name: Fetch the read-aloud voices (Persian, Sorani) into tts/
         continue-on-error: true
         run: python scripts/fetch_tts.py

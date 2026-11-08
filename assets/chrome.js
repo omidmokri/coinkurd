@@ -148,7 +148,7 @@
      Alt+R reads the selection or the page (or pauses), Esc stops. The engine (assets/reader.js)
      and its voices load only on first use. The AudioContext is created here, inside the click or
      key press, because browsers only let audio start from a user gesture. */
-  var RDV = '8', rdP = null, SPK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var RDV = '9', rdP = null, SPK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   var RDT = {
     fa: { page: 'خواندن کل صفحه', pick: 'انتخاب یک بخش برای خواندن', stop: 'توقف خواندن', sel: 'خواندن متن انتخاب‌شده', tip: 'یا هر متنی را انتخاب کنید و دکمهٔ بلندگو را بزنید. میان‌بُر: Alt+R، توقف: Esc' },
     ckb: { page: 'خوێندنەوەی هەموو پەڕەکە', pick: 'هەڵبژاردنی بەشێک بۆ خوێندنەوە', stop: 'ڕاگرتنی خوێندنەوە', sel: 'خوێندنەوەی دەقی هەڵبژێردراو', tip: 'یان هەر دەقێک هەڵبژێرە و دوگمەی بڵندگۆ دابگرە. کورتەڕێ: Alt+R، ڕاگرتن: Esc' },
