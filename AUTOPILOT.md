@@ -131,6 +131,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Stop-vs-noise card (/tools/#noise; new need, Backlog had nothing open)
+- **Need:** traders set stops tighter than a coin's normal hourly swing and get stopped by noise; no tool related a stop
+  distance to the coin's real volatility. #5 still waits (bearish days < 30).
+- **Built:** `/tools/` card (fa/ckb/en): coin (from `market.json`, 48 hourly Binance closes), stop %, holding hours →
+  hourly σ of log returns, σ×√h, stop in σ units, hit chance under a driftless random walk (2×(1−Φ(k)), labelled as a
+  model, not a forecast), warning when k<1. Pure `nzCalc()`/`nzPhi()`. Bot: added to `bot_reality.TOOLS`.
+- **Verified:** in-page tests: alternating ±1% closes → σ 2.021% (=0.02·√(48/47)), stop 1%/1h → k 0.497, p 61.9% (hand-checked),
+  4%/4h → k 1.01; Φ(0)=0.5, Φ(1.96)=0.975; <10 closes → "no data yet"; stop 0 → error. Playwright + Chrome 1280 fa / 390 fa+en,
+  overflow 0, zero JS errors, looked at shots. py_compile + `sec_tools` render.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-08 · Liquidation-price calculator (/tools/#liq; new need, Backlog had nothing open)
 - **Need:** futures traders using leverage often do not know where they get liquidated, or set a stop that sits beyond the
   liquidation price (so the stop never protects them). No site tool showed it. #5 still waits (8 bearish of 85 days).
