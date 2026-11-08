@@ -334,9 +334,10 @@ const R = {
     if (start) r.setStartAfter(start); else r.setStart(document.body, 0);
     if (foot) r.setEndBefore(foot); else r.setEnd(document.body, document.body.childNodes.length);
     /* "the whole page" means its prose: drop live-data chips like "₿ $75,946 +0.19%" or "⛽ 3 sat/vB"
-       (fewer than two real words). A selection or a picked section is read exactly as chosen. */
-    const words = s => (s.match(/[\p{L}]{3,}/gu) || []).length;
-    return this.run(sentences(textNodes(document.body, r), null, UI()).filter(it => words(it.raw) >= 2));
+       (fewer than two real words AND carrying a symbol). A bare stat like "۶۵" before its label
+       "درس منتشرشده" stays. A selection or a picked section is read exactly as chosen. */
+    const chip = s => (s.match(/[\p{L}]{3,}/gu) || []).length < 2 && /[^\p{L}\p{N}\s،,.٫٬]/u.test(s);
+    return this.run(sentences(textNodes(document.body, r), null, UI()).filter(it => !chip(it.raw)));
   },
   async range(r) {
     const root = r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentNode;
@@ -394,7 +395,9 @@ const R = {
       status(t().of(nd(this.i + 1), nd(n)), it.neural ? this.creditFor(it.lang) : '');
       progress(this.i, n); mark(it.range);
       if (it.neural) {
-        progressCb.fn = m => { if (gen === this.gen && m.lang === it.lang && m.loaded < m.total) status(t().dl(t().L[m.lang], nd(Math.floor(100 * m.loaded / m.total)))); };
+        /* a voice already in the cache streams in within a second and then compiles for a few:
+           show "preparing" for that part rather than a download stuck at 99% */
+        progressCb.fn = m => { if (gen !== this.gen || m.lang !== it.lang) return; const f = m.loaded / m.total; status(f < 0.99 ? t().dl(t().L[m.lang], nd(Math.floor(100 * f))) : t().prep); };
         for (let k = this.i + 1, got = 0; k < n && got < 2; k++) if (this.items[k].neural) { this.pcm(k); got++; }
         const { pcm, sr } = await this.pcm(this.i);
         if (gen !== this.gen) return;
