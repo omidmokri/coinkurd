@@ -379,8 +379,10 @@ BODY_TAGS = f'<script src="/assets/chrome.js?v={VER}" defer></script>'
 # Inline scripts stay allowed because every page ships its app code inline; everything else is pinned
 # to the hosts the site really talks to. three.js is self-hosted (assets/vendor), so the only
 # third-party script host is TradingView's widget loader.
+# 'wasm-unsafe-eval' lets the read-aloud engine compile its self-hosted WebAssembly (tts/); it
+# allows WebAssembly compilation only, not JavaScript eval.
 CSP = ("default-src 'self'; "
-       "script-src 'self' 'unsafe-inline' https://s3.tradingview.com; "
+       "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://s3.tradingview.com; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src 'self' https://fonts.gstatic.com data:; "
        "img-src 'self' data: blob: https:; "
