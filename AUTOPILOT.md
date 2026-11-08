@@ -116,6 +116,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Direction study shows the "always bullish" baseline (Backlog #5, small slice)
+- **Need:** with 77 of 85 days labelled bullish, a 56.5% hit rate means little unless the reader sees that simply saying
+  "bullish" every day scored the same; the shuffle baseline alone hides that.
+- **Built:** `/track-record/` direction section: second card "If every day had simply said bullish" (`up_rate` from
+  direction.json) and, while bearish days < 30, a fa/ckb/en note that the test mostly measures bullish days.
+- **Verified:** py_compile; built in /tmp/bld; up_rate hand-recomputed from `days` (85 days, r24>0 → 56.5%) = shown;
+  Playwright + Chrome 1280/390 fa/en: overflow 0, zero JS errors, looked at shots.
+- **Next:** #6 design, or #5 bearish split when ≥30 bearish days (8 now).
+
 ### 2026-11-08 · /tools/#streaks — losing-streak & drawdown simulator (new need, ahead of #6)
 - **Need:** traders quit working methods after a normal run of losses, or size too big for the streaks to come; the
   position-size calculator says what one loss costs, nothing said what 100 trades can do. (#5 still waits: 8 bearish days.)

@@ -212,6 +212,10 @@ DIR = {
               "Each post is labelled bullish / bearish / neutral by AI, with the post's own sentence kept as evidence. The unit is the day: the dominant direction of that day's posts against bitcoin's next 24 hours."),
     "hit": L("روزهایی که جهت درست بود", "ڕۆژانێک ئاڕاستە ڕاست بوو", "Days the direction was right"),
     "exp": L("انتظار از شانس (جابه‌جایی تصادفی برچسب روزها)", "چاوەڕوانی لە بەخت (تێکەڵکردنی هەڕەمەکی)", "Expected by chance (labels shuffled across days)"),
+    "always": L("اگر هر روز فقط «صعودی» گفته می‌شد", "ئەگەر هەموو ڕۆژێک تەنها «بەرزبوونەوە» بگوترایە", "If every day had simply said \"bullish\""),
+    "skew": L("بیشتر روزها صعودی برچسب خورده‌اند، پس این آزمون عمدتاً روزهای صعودی را می‌سنجد؛ گزارش جداگانهٔ روزهای نزولی از {m} روز نزولی به بعد.",
+              "زۆربەی ڕۆژەکان بەرزبوونەوەن، بۆیە ئەم تاقیکردنەوەیە زیاتر ڕۆژانی بەرزبوونەوە دەپێوێت؛ ڕاپۆرتی جیای ڕۆژانی دابەزین لە {m} ڕۆژی دابەزینەوە.",
+              "Most days are labelled bullish, so this test mostly measures bullish days; a separate bearish-day report starts at {m} bearish days."),
     "n": L("{d} روز ({b} صعودی، {r} نزولی) · {p} پست برچسب‌خورده · {f} تا {t}", "{d} ڕۆژ ({b} بەرزبوونەوە، {r} دابەزین) · {p} پۆست · {f} تا {t}",
            "{d} days ({b} bullish, {r} bearish) · {p} labelled posts · {f} to {t}"),
     "v_no": L("جهت پست‌ها بهتر از شانس نبوده است (تفاوت معنادار نیست).", "ئاڕاستەی پۆستەکان لە بەخت باشتر نەبووە (جیاوازی واتادار نییە).",
@@ -239,7 +243,11 @@ def direction(lg):
     h = (f"<p class='tr-verdict'>{e(v)}</p><div class='tr-grid'>"
          f"<div class='tr-card'><h3>{e(s2('hit', lg))}</h3><div class='tr-row'><span class='v'>{pct(d['hit_rate'], lg, 1, False)}</span>"
          f"<span class='vs'>{e(s2('exp', lg))}: {pct(d['expected_rate'], lg, 1, False)}</span></div>"
-         f"<div><span class='tr-chip'>{e(s('pval', lg))}: {pv(d['p'], lg)}</span></div></div></div>"
+         f"<div><span class='tr-chip'>{e(s('pval', lg))}: {pv(d['p'], lg)}</span></div></div>"
+         + (f"<div class='tr-card'><h3>{e(s2('always', lg))}</h3><div class='tr-row'><span class='v'>{pct(d['up_rate'], lg, 1, False)}</span></div></div>" if d.get("up_rate") is not None else "")
+         + "</div>"
+         + (f"<p class='note'>{e(s2('skew', lg, m=BR.nf(30, lg)))}</p>" if d.get("bear_days", 0) < 30 else "")
+         + f""
          f"<p class='note'>{e(s2('n', lg, d=BR.nf(d['n_days'], lg), b=BR.nf(d['bull_days'], lg), r=BR.nf(d['bear_days'], lg), p=BR.nf(sum(ps.values()), lg), f=BR.fdate(w.get('from'), lg), t=BR.fdate(w.get('to'), lg)))}</p>"
          f"<p class='note'>{e(s2('m', lg, n=BR.nf(d['method']['draws'], lg), s=d['method']['seed']))} "
          f"<a href='/data/direction.json'>{e(s('data', lg))}</a> · <a href='/data/stance.json'>stance.json</a></p>")
