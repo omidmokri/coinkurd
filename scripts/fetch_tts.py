@@ -43,6 +43,7 @@ ORT_VER = "1.31.1"
 PIPER_WASM_VER = "1.0.0"
 
 # (cache name, url, size in bytes or None, (algo, digest) or None)
+# Hugging Face pins (MODEL_CARD, Vekol) were taken from the first CI fetch on 2026-11-08.
 # npm pins were cross-checked against the registry's own sha512 integrity on 2026-11-08.
 FILES = [
     ("fa_IR-amir-medium.onnx",
@@ -53,13 +54,13 @@ FILES = [
      4958, ("md5", "48c5e81f5aa4e1c5eba3dda0be403b58")),
     ("fa_IR-amir-medium.MODEL_CARD",
      f"{HF}/rhasspy/piper-voices/resolve/main/fa/fa_IR/amir/medium/MODEL_CARD",
-     None, None),
+     264, ("sha256", "0d7d315699945ac830162f82d485d79af51a33081a7649e8992726bd4bba2384")),
     ("vekol.onnx",
      f"{HF}/RevgeAI/vekol-tts-ckb-edge/resolve/main/model.onnx",
-     None, None),
+     77071526, ("sha256", "92a30317e6e9a5bf7f61cca4e6f37d7ecff495677169e83e085757760c033f39")),
     ("vekol.onnx.json",
      f"{HF}/RevgeAI/vekol-tts-ckb-edge/resolve/main/model.onnx.json",
-     None, None),
+     1690, ("sha256", "fb13ff182624e8519979b44dcc178634a29ef6bb55bb718368b1fc678601cba1")),
     (f"onnxruntime-web-{ORT_VER}.tgz",
      f"{NPM}/onnxruntime-web/-/onnxruntime-web-{ORT_VER}.tgz",
      34586352, ("sha256", "bdccdb9fbb9ab537247c0c734e9b1d2b1b338b4f2a09faa58f0dc1cfa27c312c")),
@@ -155,6 +156,15 @@ def main():
                 with open(dst, "wb") as f:
                     shutil.copyfileobj(src, f)
 
+    # piper_phonemize ships as a classic Emscripten script; the reader's module worker imports it,
+    # so serve an ES-module copy that exports the factory (the original stays for reference)
+    pj = os.path.join(OUT, "piper/piper_phonemize.js")
+    with open(pj, encoding="utf-8") as f:
+        src = f.read()
+    assert "var createPiperPhonemize" in src
+    with open(os.path.join(OUT, "piper/piper_phonemize.mjs"), "w", encoding="utf-8") as f:
+        f.write(src + "\nexport default createPiperPhonemize;\n")
+
     # sanity: the two voice configs must be the shapes reader.js expects
     fa = json.load(open(os.path.join(OUT, "fa/amir.onnx.json"), encoding="utf-8"))
     ck = json.load(open(os.path.join(OUT, "ckb/vekol.onnx.json"), encoding="utf-8"))
@@ -172,7 +182,7 @@ def main():
                "voice": "Piper fa_IR amir (medium)"},
         "ckb": {"model": "/tts/ckb/vekol.onnx", "config": "/tts/ckb/vekol.onnx.json",
                 "bytes": sz("ckb/vekol.onnx"), "voice": "Vekol-TTS by Revge (CC BY-NC 4.0)"},
-        "piper": {"js": "/tts/piper/piper_phonemize.js", "wasm": "/tts/piper/piper_phonemize.wasm",
+        "piper": {"js": "/tts/piper/piper_phonemize.mjs", "wasm": "/tts/piper/piper_phonemize.wasm",
                   "data": "/tts/piper/piper_phonemize.data"},
     }
     with open(os.path.join(OUT, "manifest.json"), "w", encoding="utf-8") as f:

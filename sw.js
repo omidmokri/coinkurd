@@ -5,7 +5,7 @@ const V = 'ek-v1', STATIC = V + '-static', PAGES = V + '-pages', DATA = V + '-da
 const CORE = ['/', '/offline.html', '/assets/ui.css', '/assets/ui.js', '/assets/logo-h.webp', '/assets/favicon-32.png', '/assets/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(STATIC).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => !k.startsWith(V + '-')).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => !k.startsWith(V + '-') && !k.startsWith('ek-tts-'))   /* voices (~90 MB each) survive site updates */.map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 async function trim(name, max) { const c = await caches.open(name), ks = await c.keys(); for (let i = 0; i < ks.length - max; i++) await c.delete(ks[i]); }
 async function netFirst(req, name, key, max) {
