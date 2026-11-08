@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Average-entry calculator for scaled-in buys (/tools/#average; new need, Backlog had nothing open)
+- **Need:** traders who buy in steps / average down did not know their true average entry, break-even and P/L; no tool did it.
+- **Built:** new `/tools/` card (fa/ckb/en): up to 4 buys (price, $ amount), optional fee per buy, current price → total
+  invested, units, average entry incl. fees, P/L ($ and %), move to break-even. Pure `avgCalc()`; warning line that averaging
+  down does not reduce risk + not-financial-advice. No bot change (the bot has no calculators).
+- **Verified:** node tests on `avgCalc` (100/$500 + 80/$500 → 11.25 units, avg 88.889, P/L +$12.5 at 90; single buy at
+  current = 0; 1% fee → avg 101.01, P/L −$10; invalid rows → null; no current price → P/L null); Playwright + Chrome
+  1280/390 fa/en: same numbers shown, overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-08 · Funding-cost calculator for held futures (/tools/#funding; new need, Backlog had nothing open)
 - **Need:** traders hold perpetual positions for days without knowing funding (paid every 8h) can eat a large share of
   their margin with leverage; the fee-aware size calculator says "funding not included". #5 still waits (8 bearish of 85 days).
