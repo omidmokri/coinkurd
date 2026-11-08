@@ -111,12 +111,27 @@ The site's strategy (agreed with the owner, 2026-11-07):
 5. **Directional study.** Label each post's stance (bullish / bearish / neutral news) with the Gemini key in CI, keep the
    quoted phrase as evidence in `data/stance.json`, and publish directional hit rates against base rates once ≥100 are
    labelled. Keyword rules were tried on 2026-11-07 and are too noisy ("ETF outflow" read as bullish) — don't use them.
+   **Slice 1 shipped 2026-11-08:** `scripts/stance.py` labels 48 posts/run in CI → `data/stance.json`. Next: check the
+   file fills (counts, model, sane quotes), spot-check ~20 labels by reading the posts, then build the hit-rate study
+   (stance vs `impact.json` r24h, base rate = same-hour unconditional up-rate, binomial/permutation test) once ≥100.
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-08 · Directional study, slice 1: quote-verified stance labels in CI (Backlog #5)
+- **Need:** the channel's record says how posts moved price, not whether the channel's *direction* was right — the
+  honest question traders ask. Needs a stance per post first.
+- **Built:** `scripts/stance.py` (Gemini via `ai.py`, batches of 8, ≤48 posts and ≤240 s per run, newest first); a label
+  is kept only if its evidence quote appears verbatim in the post (ZWNJ/space/Arabic-letter normalised), else retried up
+  to 3 times; writes `data/stance.json` (labels, tries, counts, model). New `update.yml` step with continue-on-error.
+  No page or bot section yet — nothing to show until ≥100 labels and a tested baseline.
+- **Verified:** py_compile; YAML parses; unit test on synthetic posts (normalised quote accepted, invented quote / bad
+  stance / unknown id / too-short quote rejected, coin cleaned, todo skips labelled and exhausted posts). Live labelling
+  only runnable in CI — next run must check `data/stance.json`.
+- **Next:** verify stance.json after a sync run; spot-check labels; then the hit-rate study slice.
 
 ### 2026-11-07 · `/class/` — the nightly class page, from the channel's own posts (Backlog #3 slice 2; closed #7)
 - **Need:** newcomers had no single place saying when/where the nightly class is and how to join.

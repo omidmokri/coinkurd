@@ -127,6 +127,14 @@ jobs:
         timeout-minutes: 3
         run: python scripts/flows.py
 
+      - name: Post stance labels for the directional study (Gemini, quote-verified; no page yet)
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: timeout 280 python scripts/stance.py 48
+
       - name: Narrative Radar
         id: narr
         continue-on-error: true
