@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · "Jump to" chip row on /tools/ (new need, Backlog had nothing open)
+- **Need:** /tools/ now holds 13 calculators; on a phone the one you want is many screens down with no way to reach it.
+  #5 still waits (bear days 8 of 85 < 30).
+- **Built:** `tools/index.html` — a horizontally scrolling pill row under the hero ("پرش به / بچۆ بۆ / Jump to"), generated
+  from every `section.card[id]` h2 (so new cards appear by themselves, in the current language); `scroll-margin-top` so
+  anchors don't hide under the header. No bot change (bot already has the Calculators section with per-card links).
+- **Verified:** Playwright + Chrome 1280 fa / 390 fa+en (switched via header buttons): 13 chips, labels follow language,
+  click scrolls to #pnl, overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 when ≥30 bearish days; otherwise a fresh non-calculator trader need.
 ### 2026-11-08 · Futures PnL & ROE calculator (/tools/#pnl; new need, Backlog had nothing open)
 - **Need:** leveraged traders ask "at 10x, what do I make/lose if I close here?" — no tool gave $ PnL and ROE on margin
   with fees. #5 still waits (bearish days 13 of 85 < 30).
