@@ -292,7 +292,7 @@ FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
-GLOW = {"/map/", "/kids/", "/academy/", "/academy/f13/"}
+GLOW = {"/academy/", "/academy/f13/"}
 
 
 def _item(href, ic, title, desc, lang):
