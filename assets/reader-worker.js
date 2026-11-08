@@ -33,7 +33,9 @@ async function grab(url, size, tag, acc) {
     parts.push(value); n += value.byteLength; acc.loaded += value.byteLength; post(tag, acc);
   }
   const buf = new Uint8Array(n); let o = 0; for (const p of parts) { buf.set(p, o); o += p.byteLength; }
-  if (total && n !== total) throw new Error('short download ' + url);
+  /* content-length is the compressed size when Pages gzips (it does for .wasm): only a
+     shortfall on an uncompressed response means a cut-off download */
+  if (total && n < total && !res.headers.get('content-encoding')) throw new Error('short download ' + url);
   try { if (c) await c.put(key, new Response(buf.slice().buffer)); } catch (e) { /* quota: still works this session */ }
   return buf.buffer;
 }
