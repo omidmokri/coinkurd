@@ -126,11 +126,22 @@ The site's strategy (agreed with the owner, 2026-11-07):
      Slice B (bot→site): bot "open my list on the site" button → `https://entekhab.net/news/?w=BTC,ETH`; the site merges
      `?w=` into `ek_watch` only after a click on "save to this browser" (no silent overwrite).
    - Not planned: secrets/tokens in URLs, cross-device sync server, any change to broadcasting.
+1. **390px header overflow** (found 2026-11-08): on /tools/ at 390px `.ek-tools` / `.ek-appb` sit 40px off-screen → horizontal scroll. Fix in `scripts/chrome.py` CSS, check several pages.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Break-even win-rate card (/tools/#breakeven; new need, Backlog had nothing open)
+- **Need:** traders judge a setup by R:R alone and forget fees; nothing showed the win rate a stop/target pair needs to
+  break even, or whether their own win rate makes the system profitable. #5 still waits (bearish days < 30).
+- **Built:** `/tools/` card (fa/ckb/en): stop %, target %, fee per side %, optional win rate → net R:R, break-even win rate,
+  expectancy per trade (% of size and in R), warning if negative. Pure `beCalc()` (net win t−2f, net loss s+2f). Bot: `bot_reality.TOOLS`.
+- **Verified:** in-page tests: 2/4/0.1 fee, 40% → R 1.727, BE 36.67%, E +0.20%, 0.091R (hand-checked); 1/1/0 → 50%;
+  fee eats target or stop 0 → error; empty win rate → no expectancy (fixed a `null>=0` bug found by the test). Playwright +
+  Chrome 1280 fa / 390 fa+en, zero JS errors, looked at shots. Note: pre-existing 40px horizontal overflow at 390px from
+  the header's `.ek-tools`/`.ek-appb` (chrome.py), not from this card — worth a fix.
+- **Next:** fix the 390px header overflow (chrome.py `.ek-appb`); #5 bearish split when ≥30 bearish days.
 ### 2026-11-08 · Stop-vs-noise card (/tools/#noise; new need, Backlog had nothing open)
 - **Need:** traders set stops tighter than a coin's normal hourly swing and get stopped by noise; no tool related a stop
   distance to the coin's real volatility. #5 still waits (bearish days < 30).
