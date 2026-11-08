@@ -131,6 +131,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Loss-recovery calculator (/tools/#recovery; new need, Backlog had nothing open)
+- **Need:** traders after a drawdown underestimate the gain needed to get back (−50% needs +100%); no tool showed it.
+  #5 still waits (8 bearish of 85 days).
+- **Built:** new `/tools/` card (fa/ckb/en): loss % → gain needed; optional user-entered monthly gain → months needed
+  (labelled as the user's assumption, not a forecast); reference row for −10/20/30/50/75/90%. Pure `recCalc()`.
+  Ids are `rc*` (first try reused `#rOut`, which belongs to the risk calculator — caught in the screenshot). No bot change.
+- **Verified:** in-page tests of `recCalc` (50→100, 0→0, 20%@10%/mo→2.34 months, 100 and −1 → null; 30%→42.86 and
+  7.3 months at 5% hand-checked: ln(1.4286)/ln(1.05)=7.31); Playwright + Chrome 1280/390 fa/en: overflow 0, zero JS
+  errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-08 · Average-entry calculator for scaled-in buys (/tools/#average; new need, Backlog had nothing open)
 - **Need:** traders who buy in steps / average down did not know their true average entry, break-even and P/L; no tool did it.
 - **Built:** new `/tools/` card (fa/ckb/en): up to 4 buys (price, $ amount), optional fee per buy, current price → total
