@@ -173,6 +173,7 @@
   function rdt() { return RDT[chromeLang || cur()] || RDT.fa; }
   function gesture() { try { var A = window.AudioContext || window.webkitAudioContext; if (!window.__ekAC && A) window.__ekAC = new A(); if (window.__ekAC) window.__ekAC.resume(); } catch (e) { } }
   function reader() { gesture(); return rdP || (rdP = import('/assets/reader.js?v=' + RDV).then(function (m) { return m.default; }, function (e) { rdP = null; throw e; })); }
+  window.ekReader = reader;   /* other page scripts (e.g. /kids/play/) read text through the same reader instance */
   function selRange() {
     var s = window.getSelection && getSelection(); if (!s || s.isCollapsed || !s.rangeCount) return null;
     if (String(s).trim().length < 2) return null;

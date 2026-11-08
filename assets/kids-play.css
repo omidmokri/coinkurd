@@ -1,0 +1,118 @@
+/* /kids/play/ — four small browser games for "Bitcoin for Juniors" (ages 8–12), with Seko the coin.
+   Light on purpose: SVG + CSS animation, no libraries, works offline once loaded. */
+.kp{--c:#f7931a;max-width:900px;margin:0 auto 26px;font-size:1.02rem}
+.kp *{box-sizing:border-box}
+.kp button{font:inherit;cursor:pointer}
+.kp-top{display:flex;gap:14px;align-items:flex-end;margin:6px 0 14px}
+.kp-seko{flex:none;width:112px;height:112px}
+.kp-seko svg{width:100%;height:100%;overflow:visible}
+.kp-bubble{position:relative;flex:1;min-height:72px;border:2px solid var(--c);border-radius:22px;padding:12px 16px 12px 46px;
+  background:color-mix(in srgb,var(--c) 10%,var(--card,#111));line-height:1.9;font-weight:600}
+[dir=rtl] .kp-bubble{padding:12px 16px 12px 46px}
+.kp-bubble:before{content:"";position:absolute;bottom:18px;inset-inline-start:-11px;width:18px;height:18px;
+  background:inherit;border-inline-start:2px solid var(--c);border-bottom:2px solid var(--c);transform:rotate(45deg)}
+[dir=ltr] .kp-bubble:before{transform:rotate(45deg)}
+[dir=rtl] .kp-bubble:before{transform:rotate(-45deg)}
+.kp-say{position:absolute;inset-inline-end:8px;top:8px;width:32px;height:32px;border-radius:50%;border:0;background:var(--c);color:#111;
+  display:grid;place-items:center}
+.kp-say svg{width:17px;height:17px}
+.kp-stage{border:1px solid var(--line);border-radius:22px;padding:16px;background:var(--card,#111);min-height:240px}
+.kp-stage h2{margin:0 0 6px;font-size:1.15rem}
+.kp-hint{color:var(--mute);font-size:.88rem;margin:0 0 12px}
+.kp-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+.kp-stars{font-size:1.5rem;letter-spacing:2px}
+.kp-stars i{font-style:normal;opacity:.22;transition:opacity .3s,transform .3s}
+.kp-stars i.on{opacity:1;transform:scale(1.15)}
+.kp-dots{display:flex;gap:6px}
+.kp-dots b{width:10px;height:10px;border-radius:50%;background:#ffffff22}
+.kp-dots b.on{background:var(--c)}
+.kp-btn{border:0;border-radius:99px;padding:10px 22px;background:var(--c);color:#111;font-weight:800;min-height:44px}
+.kp-btn.alt{background:none;border:2px solid var(--line);color:var(--ink)}
+.kp-btn:disabled{opacity:.4;cursor:default}
+.kp-row{display:flex;flex-wrap:wrap;gap:10px}
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kp-card{border:2px solid var(--line);border-radius:18px;padding:12px;background:#ffffff08;text-align:center;line-height:1.7;
+  transition:transform .15s,border-color .15s}
+button.kp-card{color:var(--ink);width:100%}
+button.kp-card:hover:not(:disabled){transform:translateY(-2px);border-color:var(--c)}
+.kp-card.good{border-color:#4ade80;background:#4ade8014}
+.kp-card.bad{border-color:#f87171;background:#f8717114}
+.kp-emo{font-size:2.3rem;line-height:1.2;display:block}
+.kp-big{font-size:3rem;line-height:1.1}
+.kp-inv{display:inline-flex;align-items:center;gap:8px;border:2px dashed var(--c);border-radius:16px;padding:6px 14px;font-weight:700}
+.kp-note{border-inline-start:4px solid var(--c);padding:8px 12px;margin:12px 0 0;background:#ffffff08;border-radius:10px;line-height:1.9}
+.kp-shake{animation:kpshake .35s}
+.kp-pop{animation:kppop .35s}
+@keyframes kpshake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes kppop{50%{transform:scale(1.08)}}
+
+/* ---- market */
+.kp-price{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.kp-price button{border:2px solid var(--line);background:none;color:var(--ink);border-radius:14px;padding:8px 16px;font-weight:800;min-width:72px}
+.kp-price button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,transparent)}
+.kp-queue{min-height:46px;font-size:1.7rem;letter-spacing:3px;margin:8px 0}
+.kp-queue span{display:inline-block;animation:kpwalk .5s both}
+@keyframes kpwalk{from{opacity:0;transform:translateY(8px)}}
+.kp-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.92rem}
+.kp-table td,.kp-table th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:center}
+
+/* ---- piggy */
+.kp-jar{position:relative;width:120px;height:140px;margin:0 auto}
+.kp-jar svg{width:100%;height:100%}
+.kp-meter{height:16px;border-radius:99px;background:#ffffff14;overflow:hidden;margin:8px 0}
+.kp-meter i{display:block;height:100%;background:linear-gradient(90deg,var(--c),#facc15);transition:width .5s}
+
+/* ---- chain */
+.kp-fp{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0}
+.kp-fp i{width:22px;height:22px;border-radius:6px;display:inline-block}
+.kp-hex{font-family:ui-monospace,Consolas,monospace;font-size:.78rem;color:var(--mute);direction:ltr;unicode-bidi:isolate;word-break:break-all}
+.kp-chain{display:flex;flex-wrap:wrap;gap:0;align-items:stretch}
+.kp-blk{flex:1 1 210px;border:2px solid var(--c);border-radius:16px;padding:10px;background:#ffffff08;position:relative}
+.kp-blk.broken{border-color:#f87171;background:#f8717112}
+.kp-link{flex:0 0 34px;display:grid;place-items:center;font-size:1.4rem}
+.kp-link.broken{filter:grayscale(1) opacity(.5)}
+.kp-blk select,.kp-in{background:#000;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font:inherit;max-width:100%}
+.kp-in{width:100%;font-size:1.05rem}
+@media (max-width:640px){.kp-link{flex-basis:100%;transform:rotate(90deg);height:26px}.kp-seko{width:84px;height:84px}}
+
+/* ---- scam */
+.kp-msg{max-width:520px;margin:6px auto;border-radius:18px;padding:12px 14px;background:#ffffff10;border:1px solid var(--line);line-height:1.9}
+.kp-msg small{display:block;color:var(--mute);font-size:.78rem}
+.kp-yn{display:flex;gap:10px;justify-content:center;margin:12px 0}
+.kp-yn button{border:0;border-radius:16px;padding:12px 22px;font-weight:800;font-size:1.02rem;min-width:130px}
+.kp-yn .safe{background:#4ade80;color:#06240f}
+.kp-yn .scam{background:#f87171;color:#2a0606}
+.kp-words{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.kp-words button{border:2px solid var(--line);background:none;color:var(--ink);border-radius:12px;padding:6px 12px}
+.kp-words button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,transparent)}
+
+/* ---- hub */
+.kp-hub{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px;margin:14px 0}
+.kp-tile{display:block;border:2px solid var(--line);border-radius:22px;padding:16px;text-decoration:none;color:var(--ink);background:var(--card,#111);
+  transition:transform .15s,border-color .15s}
+.kp-tile:hover{transform:translateY(-3px);border-color:var(--tc,#f7931a)}
+.kp-tile .kp-emo{font-size:2.6rem}
+.kp-tile h3{margin:6px 0 4px}
+.kp-tile p{margin:0;color:var(--mute);font-size:.9rem;line-height:1.8}
+.kp-tile .kp-stars{font-size:1.1rem;margin-top:6px}
+.kp-badges{display:flex;flex-wrap:wrap;gap:8px}
+.kp-badge{border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:.85rem;opacity:.35}
+.kp-badge.on{opacity:1;border-color:var(--acc,#f7931a)}
+.b4j-play{display:flex;gap:12px;align-items:center;border:2px dashed var(--c,#f7931a);border-radius:18px;padding:12px 16px;margin:16px 0;
+  text-decoration:none;color:var(--ink)}
+.b4j-play .kp-emo{font-size:2rem}
+.b4j-play b{display:block}
+
+/* ---- Seko's animations */
+.kp-seko .bob{animation:kpbob 3.2s ease-in-out infinite;transform-origin:60px 100px}
+.kp-seko .eyes{animation:kpblink 4.6s infinite;transform-origin:60px 56px}
+.kp-seko .arm-r{animation:kpwave 2.4s ease-in-out infinite;transform-origin:96px 66px}
+.kp-seko.cheer .bob{animation:kpjump .5s 3}
+@keyframes kpbob{50%{transform:translateY(-5px)}}
+@keyframes kpblink{0%,46%,50%,100%{transform:scaleY(1)}48%{transform:scaleY(.1)}}
+@keyframes kpwave{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-24deg)}80%{transform:rotate(8deg)}90%{transform:rotate(-18deg)}}
+@keyframes kpjump{50%{transform:translateY(-16px)}}
+.kp-confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.kp-confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:3px;animation:kpfall 1.8s ease-in forwards}
+@keyframes kpfall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){.kp-seko *,.kp-confetti i,.kp-queue span,.kp-shake,.kp-pop{animation:none!important}}
