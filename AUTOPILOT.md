@@ -131,6 +131,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · World market hours & funding clock (/tools/#sessions; new need, Backlog had nothing open)
+- **Need:** Iranian/Kurdish traders constantly convert Tokyo/London/New York session times and Binance funding times
+  (UTC) into local time by hand, and get DST wrong. #5 still waits (bear days 8 of 85 < 30).
+- **Built:** `/tools/` card (fa/ckb/en): zone picker (Tehran default fa, Erbil/Baghdad default ckb, Istanbul, device default en),
+  time now, each exchange's regular hours in that zone with open/closed now (weekdays, holidays not modelled — stated),
+  next 8-hourly Binance funding (00/08/16 UTC) with countdown; refreshes every 30s. Pure `ssCalc()` via Intl time zones
+  (DST-correct). Bot: added to `bot_reality.TOOLS`. Jump-to chip appears by itself.
+- **Verified:** node tests: Mon 2026-11-09 12:00Z → Tehran TYO 03:30–10:00, LON 11:30–20:00 open, NY 18:00–00:30, next
+  funding 16:00Z in 240 min; July (DST) LON 07:00Z, NY 13:30Z; Sunday all closed. Playwright + Chrome 1280 fa / 390 fa+en+ckb,
+  overflow 0, zero JS errors, looked at shots. py_compile bot_reality.
+- **Next:** #5 when ≥30 bearish days; otherwise a fresh non-calculator trader need.
 ### 2026-11-08 · "Jump to" chip row on /tools/ (new need, Backlog had nothing open)
 - **Need:** /tools/ now holds 13 calculators; on a phone the one you want is many screens down with no way to reach it.
   #5 still waits (bear days 8 of 85 < 30).
