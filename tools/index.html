@@ -56,6 +56,9 @@
       <label><span data-t="avFee"></span><input id="aFee" type="number" min="0" max="10" step="any" placeholder="0"></label><label><span data-t="avNow"></span><input id="aNow" type="number" min="0" step="any" value="90"></label></div>
     <div class="out" id="aOut"></div><p class="disc" data-t="avNote"></p></section>
 
+  <section class="card" id="recovery"><h2 data-t="rcT"></h2><p class="lead" data-t="rcL"></p>
+    <div class="f"><label><span data-t="rcLoss"></span><input id="rcLossI" type="number" min="0" max="99.99" step="any" value="30"></label><label><span data-t="rcMo"></span><input id="rcMoI" type="number" min="0" step="any" placeholder="0"></label></div>
+    <div class="out" id="rcOut"></div><p class="disc" data-t="rcNote"></p></section>
   <section class="card" id="whatif"><h2 data-t="wiT"></h2><p class="lead" data-t="wiL"></p>
     <div class="f"><label><span data-t="coin"></span><select id="wCoin"></select></label><label><span data-t="date"></span><input id="wDate" type="date"></label>
       <label><span data-t="amt"></span><input id="wAmt" type="number" min="0" step="any" value="100"></label><label><span data-t="mode"></span><select id="wMode"></select></label></div>
@@ -189,6 +192,14 @@ function renderAvg(){const b=[1,2,3,4].map(i=>({p:+$('#aP'+i).value,a:+$('#aA'+i
  if(!r){o.innerHTML=`<p class="err">${T('avBad')}</p>`;return}const sg=v=>(v>0?'+':v<0?'−':'')+'$'+fm(Math.abs(v),2),pc=v=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(2)+'%',px=v=>fm(v,v<1?6:v<100?4:2);
  o.innerHTML=[[T('avInv'),'$'+fm(r.inv,2)],[T('avQty'),fm(r.q,6)],[T('avAvg'),px(r.avg)],[T('avPnl'),r.pnl==null?'—':sg(r.pnl)+' ('+pc(r.pnlP)+')'],[T('avBe'),r.be==null?'—':pc(r.be)]].map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}
 [1,2,3,4].forEach(i=>['#aP'+i,'#aA'+i].forEach(s=>$(s).addEventListener('input',renderAvg)));['#aFee','#aNow'].forEach(s=>$(s).addEventListener('input',renderAvg));
+Object.assign(I.fa,{rcT:'🩹 جبران ضرر: چقدر سود لازم است؟',rcL:'بعد از هر درصد ضرر، برای برگشت به سرمایهٔ اول به سود بزرگ‌تری نیاز است. درصد ضرر را بنویسید.',rcLoss:'ضرر (٪)',rcMo:'سود ماهانهٔ فرضی (٪، اختیاری)',rcNeed:'سود لازم برای جبران',rcMonths:'ماه لازم با این سود ماهانه',rcBad:'ضرر باید بین ۰ و کمتر از ۱۰۰ درصد باشد.',rcNote:'فرمول: سود لازم = ۱/(۱−ضرر)−۱. سود ماهانه فقط عددی است که خودتان وارد می‌کنید، نه پیش‌بینی بازار. توصیهٔ مالی نیست.'});
+Object.assign(I.ckb,{rcT:'🩹 قەرەبووی زیان: چەند قازانج پێویستە؟',rcL:'دوای هەر ڕێژەیەکی زیان، بۆ گەڕانەوە بۆ سەرمایەی سەرەتا قازانجێکی گەورەتر پێویستە. ڕێژەی زیان بنووسە.',rcLoss:'زیان (٪)',rcMo:'قازانجی مانگانەی گریمانەیی (٪، ئارەزوومەندانە)',rcNeed:'قازانجی پێویست بۆ قەرەبوو',rcMonths:'مانگی پێویست بەم قازانجە مانگانەیە',rcBad:'زیان دەبێت لە نێوان ٠ و کەمتر لە ١٠٠٪ بێت.',rcNote:'هاوکێشە: قازانجی پێویست = ١/(١−زیان)−١. قازانجی مانگانە تەنها ژمارەیەکە کە خۆت دەینووسیت، پێشبینی بازاڕ نییە. ئامۆژگاری دارایی نییە.'});
+Object.assign(I.en,{rcT:'🩹 Loss recovery: how much gain do you need?',rcL:'After any loss you need a bigger gain just to get back to where you started. Enter your loss.',rcLoss:'Loss (%)',rcMo:'Assumed monthly gain (%, optional)',rcNeed:'Gain needed to recover',rcMonths:'Months needed at that monthly gain',rcBad:'The loss must be from 0 to below 100%.',rcNote:'Formula: needed gain = 1/(1−loss)−1. The monthly gain is only a number you enter, not a market forecast. Not financial advice.'});
+function recCalc(loss,mo){if(!(loss>=0&&loss<100))return null;const need=(1/(1-loss/100)-1)*100;let months=null;if(mo>0)months=need===0?0:Math.log(1+need/100)/Math.log(1+mo/100);return{need,months}}
+function renderRec(){const r=recCalc(parseFloat($('#rcLossI').value),+$('#rcMoI').value),o=$('#rcOut');if(!r){o.innerHTML=`<p class="err">${T('rcBad')}</p>`;return}
+ const tb=[10,20,30,50,75,90].map(l=>`<div><small><bdi dir="ltr">−${fm(l,0)}%</bdi></small><b>+${fm(recCalc(l).need,1)}%</b></div>`).join('');
+ o.innerHTML=[[T('rcNeed'),'+'+fm(r.need,2)+'%'],[T('rcMonths'),r.months==null?'—':fm(r.months,1)]].map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')+tb}
+['#rcLossI','#rcMoI'].forEach(s=>$(s).addEventListener('input',renderRec));
 /* ---- what if ---- */
 async function whatIf(){const c=$('#wCoin').value,amt=+$('#wAmt').value,mode=$('#wMode').value,d=$('#wDate').value,o=$('#wOut');if(!(amt>0)||!d)return;o.innerHTML='…';
  const start=Date.parse(d+'T00:00:00Z');if(!(start<Date.now())){o.innerHTML=`<p class="err">${T('noData')}</p>`;return}
@@ -211,7 +222,7 @@ function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).v
  const fc=$('#fCur').value||'IQD';$('#fCur').innerHTML=Object.entries(T('curs')).map(([k,v])=>`<option value="${k}"${k===fc?' selected':''}>${v} (${k})</option>`).join('');
  if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
  $('#tlinks').innerHTML=T('links').map(([h,a,b])=>`<a href="${h}"><b>${a}</b><small>${b}</small></a>`).join('')}
-function render(){forms();renderCmp();renderRisk();renderMc();renderFund();renderAvg();renderFx()}
+function render(){forms();renderCmp();renderRisk();renderMc();renderFund();renderAvg();renderRec();renderFx()}
 (async()=>{const qc=new URLSearchParams(location.search).get('cmp');if(qc){const a=qc.split(',').map(x=>x.trim().toUpperCase()).filter(x=>/^[A-Z0-9]{2,10}$/.test(x)).slice(0,6);if(a.length)cmp=[...new Set(a)]}
  const [m,s,fx,mc,dv]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V()),j('/data/derivatives.json'+V())]);DV=dv;M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
  if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();
