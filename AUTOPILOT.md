@@ -109,14 +109,26 @@ The site's strategy (agreed with the owner, 2026-11-07):
 3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
    Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
 5. **Directional study.** Slices 1–2 shipped 2026-11-08 (`stance.py` → `stance.json`; `direction.py` → `direction.json`,
-   section on `/track-record/` + bot line). Remaining: drop greeting-line quotes ("با سلام…") as evidence in `stance.py`;
-   once ≥30 *bearish* days exist, report bullish/bearish days separately (now 34/4, so the test mostly measures bullish days).
+   section on `/track-record/` + bot line). Greeting-quote guard shipped 2026-11-08. Remaining:
+   once ≥30 *bearish* days exist, report bullish/bearish days separately (now 65/6 of 71 days, so the test mostly measures bullish days).
 6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-08 · Stance labels: a greeting line is no longer evidence of a direction (Backlog #5)
+- **Need:** the directional study is only as honest as its labels; a bullish/bearish label whose verbatim "evidence" is
+  just "با سلام…" proves nothing.
+- **Built:** `stance.py` `greeting_line`/`weak_quote`: a non-neutral label is rejected when its quote lies only inside the
+  post's first line and that line is a greeting (fa/ckb/en list `GREET`); `drop_weak` removes such stored labels each run
+  so they are relabelled; the prompt now says not to quote the greeting.
+- **Verified:** py_compile; unit tests (greeting-only quote rejected for bullish/bearish, kept for neutral; Sorani greeting
+  after a blank line; "سلام" mid-line not treated as greeting; quote repeated in body kept; empty text; drop_weak removes
+  only the weak label and its tries). On the live 555 labels: 0 weak directional labels — a guard, results unchanged.
+- **Data now:** direction.json 71 days (65 bullish / 6 bearish), 50.7% vs 52.9% expected, p 0.87.
+- **Next:** bearish-split waits for ≥30 bearish days; consider #6 design or #2 snapshots.
 
 ### 2026-11-08 · Directional study, slice 2: "was the direction right?" on /track-record/ + bot (Backlog #5)
 - **Need:** traders ask whether the channel's bullish/bearish calls were right, not just how price moved after posts.
