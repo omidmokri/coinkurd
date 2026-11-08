@@ -213,14 +213,9 @@ def main():
         f.write(src2 + "\nexport default createPiperPhonemize;\n")
     with open(os.path.join(OUT, "piper/piper_phonemize.fa.data"), "wb") as f:
         f.write(out)
-    # TEMP (verification): the full build stays at piper/full/ so the subset can be compared against it
-    # in a browser (identical phoneme ids for the same text). Not referenced by the manifest; remove
-    # once checked.
-    os.makedirs(os.path.join(OUT, "piper/full"), exist_ok=True)
-    with open(os.path.join(OUT, "piper/full/piper_phonemize.mjs"), "w", encoding="utf-8") as f:
-        f.write(src + "\nexport default createPiperPhonemize;\n")
-    os.replace(pd, os.path.join(OUT, "piper/full/piper_phonemize.data"))
-    os.remove(pj)
+    # Checked 2026-11-08 in Chrome: the subset gives phoneme ids identical to the full package
+    # on five Persian sentences (149-257 ids each), so only the Persian build is served.
+    os.remove(pj); os.remove(pd)
     print(f"  piper   {len(meta['files'])} -> {len(files)} files, {len(data) / 1e6:.1f} MB -> {len(out) / 1e6:.2f} MB")
 
     # sanity: the two voice configs must be the shapes reader.js expects
