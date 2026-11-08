@@ -61,7 +61,17 @@ S = {
     "cl_in": L("شروع تا", "دەستپێک تا", "Starts in"), "h": L("ساعت", "کاتژمێر", "h"), "m": L("دقیقه", "خولەک", "min"),
     "nd": L("هنوز داده‌ای نیست.", "هێشتا داتا نییە.", "No data yet."),
     "at": L("به‌روز شده", "نوێکراوە", "updated"),
+    "ar_t": L("امروز در بازار — {d}", "ئەمڕۆ لە بازاڕ — {d}", "Today in the market — {d}"),
+    "ar_l": L("نسخهٔ ثبت‌شدهٔ همین صفحه در این روز (UTC). عکس فوری در {at} گرفته شده و ۲۴ ساعت پیش از آن را نشان می‌دهد؛ هیچ عددی بعداً بازسازی یا تخمین زده نشده.",
+              "وەشانی تۆمارکراوی ئەم پەڕەیە لەم ڕۆژەدا (UTC). وێنەکە لە {at} گیراوە و ٢٤ کاتژمێری پێشتر پیشان دەدات؛ هیچ ژمارەیەک دواتر دروست یان خەمڵێنراو نەکراوە.",
+              "The recorded copy of this page for this day (UTC). The snapshot was taken at {at} and covers the 24 hours before it; nothing was rebuilt or estimated later."),
+    "ar_all": L("روزهای گذشته", "ڕۆژانی ڕابردوو", "Past days"),
+    "ar_hub": L("امروز در بازار — آرشیو روزها", "ئەمڕۆ لە بازاڕ — ئەرشیفی ڕۆژەکان", "Today in the market — archive of days"),
+    "ar_hl": L("هر روز، آخرین نسخهٔ صفحهٔ «امروز در بازار» در آن روز (UTC) نگه داشته می‌شود. ثبت از روزی شروع شده که این آرشیو ساخته شد؛ روزهای قبل از آن وجود ندارند.",
+               "هەموو ڕۆژێک، دوایین وەشانی پەڕەی «ئەمڕۆ لە بازاڕ» لەو ڕۆژەدا (UTC) هەڵدەگیرێت. تۆمارکردن لەو ڕۆژەوە دەستی پێکرد کە ئەم ئەرشیفە دروست کرا.",
+               "Every day the last version of the Today page for that UTC day is kept. Recording began on the day this archive was built; earlier days do not exist."),
 }
+SNAP = "today_days.json"
 
 
 def s(k, lg, **kw):
@@ -106,8 +116,8 @@ def kpi(label, val):
     return f"<div class='td-k'><small>{label}</small><b>{val}</b></div>"
 
 
-def build(now=None):
-    now = now or dt.datetime.now(dt.timezone.utc)
+def inputs(now):
+    """everything the page shows, from the live data files"""
     brain = R.load("brain.json", {}) or {}
     fr = R.load("friction.json", {}) or {}
     scan = (R.load("scanlog.json", {}) or {}).get("items") or []
@@ -116,11 +126,51 @@ def build(now=None):
     excl = set(str(x) for x in (R.load("exclude_posts.json", []) or []) if not isinstance(x, dict))
     finds = recent(scan, now, "t")
     todays = [p for p in recent(posts, now, "date") if str(p.get("id")) not in excl]
+    return brain, fr, finds, todays, audit
+
+
+def snapshot(now, brain, fr, finds, todays, audit):
+    """the compact, frozen form of one day's page (only fields the page renders)"""
+    rg, rf = brain.get("regime") or {}, brain.get("report_facts") or {}
+    pats = sorted({f.get("type") for f in finds[:MAX_FIND] if f.get("type")})
+    return {
+        "at": now.isoformat(timespec="seconds"),
+        "brain": ({"regime": {"btc_chg24": rg.get("btc_chg24"), "breadth": rg.get("breadth") or {}},
+                   "report_facts": {"fng": rf.get("fng")}, "movers": (brain.get("movers") or [])[:6],
+                   "report": brain.get("report") or {}, "report_at": brain.get("report_at"),
+                   "updated_at": brain.get("updated_at")} if rg else {}),
+        "fr": ({"score": fr.get("score"), "level": fr.get("level"), "prices": {"usdt": (fr.get("prices") or {}).get("usdt")},
+                "paper": {"gap_pct": (fr.get("paper") or {}).get("gap_pct")}} if fr.get("score") is not None else {}),
+        "finds": [{k: f.get(k) for k in ("coin", "type", "dir", "t")} for f in finds[:MAX_FIND]],
+        "n_finds": len(finds),
+        "audit": {"patterns": {p: (audit.get("patterns") or {})[p] for p in pats if p in (audit.get("patterns") or {})}},
+        "posts": [{k: p.get(k) for k in ("id", "url", "title", "date")} for p in todays[:MAX_POSTS]],
+    }
+
+
+def save_snapshot(now=None):
+    """store today's snapshot under its UTC date (overwritten every run, so the last run of the day stays)"""
+    now = now or dt.datetime.now(dt.timezone.utc)
+    days = R.load(SNAP, {}) or {}
+    days[now.strftime("%Y-%m-%d")] = snapshot(now, *inputs(now))
+    R.save(SNAP, dict(sorted(days.items())))
+    return len(days)
+
+
+def render(now, brain, fr, finds, todays, audit, path, day=None, n_finds=None, nav=""):
+    n_finds = len(finds) if n_finds is None else n_finds
 
     def b(lg):
-        h = (f"<div class='meta'><a href='/'>{e(BR.s('home', lg))}</a> / {e(s('title', lg))}</div>"
-             f"<h1>{e(s('title', lg))}</h1><p class='rc-lead'>{e(s('lead', lg))}</p>"
-             f"<p class='note'>{BR.fdate(now.isoformat(), lg, True)}</p>")
+        if day:
+            ttl = s("ar_t", lg, d=day)
+            h = (f"<div class='meta'><a href='/'>{e(BR.s('home', lg))}</a> / <a href='/today/'>{e(s('title', lg))}</a> / "
+                 f"<a href='/today/days/'>{e(s('ar_all', lg))}</a> / {e(day)}</div>"
+                 f"<h1>{e(ttl)}</h1><p class='rc-lead'>"
+                 + e(s('ar_l', lg, at='\x00')).replace('\x00', BR.fdate(now.isoformat(), lg, True)) + f"</p>{nav}")
+        else:
+            h = (f"<div class='meta'><a href='/'>{e(BR.s('home', lg))}</a> / {e(s('title', lg))}</div>"
+                 f"<h1>{e(s('title', lg))}</h1><p class='rc-lead'>{e(s('lead', lg))}</p>"
+                 f"<p class='note'>{BR.fdate(now.isoformat(), lg, True)} · <a href='/today/days/'>{e(s('ar_all', lg))}</a></p>")
         # market
         rg, rf = brain.get("regime") or {}, brain.get("report_facts") or {}
         if rg:
@@ -163,8 +213,8 @@ def build(now=None):
                 rows.append(f"<tr><td><a href='/coins/{e(str(f.get('coin', '')).lower())}/'>{e(f.get('coin', ''))}</a></td><td>{e(nm)}</td>"
                             f"<td>{e(s(f.get('dir') if f.get('dir') in ('bull', 'bear') else 'bull', lg))}</td><td>{tested(f.get('type'), audit, lg)}</td></tr>")
             inner = BR.table([e(s("c_coin", lg)), e(s("c_pat", lg)), e(s("c_dir", lg)), e(s("c_rec", lg))], rows, "tr-tbl")
-            if len(finds) > MAX_FIND:
-                inner += f"<p class='note'>{e(s('sc_more', lg, n=BR.nf(len(finds) - MAX_FIND, lg)))}</p>"
+            if n_finds > MAX_FIND:
+                inner += f"<p class='note'>{e(s('sc_more', lg, n=BR.nf(n_finds - MAX_FIND, lg)))}</p>"
         else:
             inner = f"<p class='note'>{e(s('sc_none', lg))}</p>"
         h += BR.sec(e(s("sc", lg)), inner + more("/track-record/#scanner", "more_sc", lg), lead=e(s("sc_l", lg)))
@@ -176,9 +226,10 @@ def build(now=None):
         else:
             inner = f"<p class='note'>{e(s('po_none', lg))}</p>"
         h += BR.sec(e(s("po", lg)), inner + more("/track-record/", "po_rec", lg))
-        # class
-        h += BR.sec(e(s("cl", lg)), f"<p>{e(s('cl_t', lg))}</p><p class='td-cd' data-h='{e(s('h', lg))}' data-m='{e(s('m', lg))}'>"
-                    f"{e(s('cl_in', lg))}: <b class='td-cdv'>—</b></p>")
+        # class (live page only: a countdown means nothing on a past day)
+        if not day:
+            h += BR.sec(e(s("cl", lg)), f"<p>{e(s('cl_t', lg))}</p><p class='td-cd' data-h='{e(s('h', lg))}' data-m='{e(s('m', lg))}'>"
+                        f"{e(s('cl_in', lg))}: <b class='td-cdv'>—</b></p>")
         h += BR.updated(lg, brain.get("updated_at"))
         return h
 
@@ -186,18 +237,53 @@ def build(now=None):
           "t.setUTCHours(16,30,0,0);if(t<=n)t.setUTCDate(t.getUTCDate()+1);var d=Math.round((t-n)/60000);"
           "document.querySelectorAll('.td-cd').forEach(function(p){var v=p.querySelector('.td-cdv');"
           "v.textContent=Math.floor(d/60)+' '+p.dataset.h+' '+(d%60)+' '+p.dataset.m;});}u();setInterval(u,30000);})();")
-    body = BR.finish("", BR.tri(b)) + f"<script>{js}</script>"
+    body = BR.finish("", BR.tri(b)) + ("" if day else f"<script>{js}</script>")
     css = (".td-ks{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}.td-k{flex:1 1 140px;background:var(--card);border:1px solid var(--line);"
            "border-radius:16px;padding:12px 14px}.td-k small{display:block;opacity:.75}.td-k b{font-size:1.35em}"
            ".td-ai{margin-top:8px}.td-ai summary{cursor:pointer;color:var(--acc)}.td-po li{margin:6px 0}.td-cd b{color:var(--acc)}")
     extra = f"<style>{BR.RCSS}{TR.CSS}{css}</style>"
-    return BP.page("today/", s("title", "fa") + " — " + s("desc", "fa"), s("desc", "fa"), body, extra)
+    ttl = s("ar_t", "fa", d=day) if day else s("title", "fa") + " — " + s("desc", "fa")
+    return BP.page(path, ttl, s("desc", "fa"), body, extra)
+
+
+def build(now=None):
+    now = now or dt.datetime.now(dt.timezone.utc)
+    return render(now, *inputs(now), "today/")
+
+
+def day_nav(days, i):
+    prv = f"<a href='/today/{days[i - 1]}/'>← {e(days[i - 1])}</a>" if i else ""
+    nxt = f"<a href='/today/{days[i + 1]}/'>{e(days[i + 1])} →</a>" if i + 1 < len(days) else ""
+    return f"<p class='note'>{' · '.join(x for x in (prv, nxt) if x)}</p>" if (prv or nxt) else ""
+
+
+def build_days():
+    """/today/<YYYY-MM-DD>/ from the frozen snapshots, plus the /today/days/ hub"""
+    snaps = R.load(SNAP, {}) or {}
+    days = sorted(d for d in snaps if len(d) == 10)
+    urls = []
+    for i, d in enumerate(days):
+        sn = snaps[d]
+        now = R.parse_iso(sn["at"])
+        urls.append(render(now, sn.get("brain") or {}, sn.get("fr") or {}, sn.get("finds") or [], sn.get("posts") or [],
+                           sn.get("audit") or {}, f"today/{d}/", day=d, n_finds=sn.get("n_finds"), nav=day_nav(days, i)))
+
+    def hub(lg):
+        li = "".join(f"<li><a href='/today/{d}/'>{e(d)}</a></li>" for d in reversed(days))
+        return (f"<div class='meta'><a href='/'>{e(BR.s('home', lg))}</a> / <a href='/today/'>{e(s('title', lg))}</a> / {e(s('ar_all', lg))}</div>"
+                f"<h1>{e(s('ar_hub', lg))}</h1><p class='rc-lead'>{e(s('ar_hl', lg))}</p>"
+                + (f"<ul class='td-po'>{li}</ul>" if days else f"<p class='note'>{e(s('nd', lg))}</p>"))
+    urls.append(BP.page("today/days/", s("ar_hub", "fa"), s("ar_hl", "fa"), BR.finish("", BR.tri(hub)), f"<style>{BR.RCSS}</style>"))
+    return urls
 
 
 def main():
-    url = build()
-    BR.add_to_sitemap([url])
-    print("today page:", url)
+    if "--snapshot" in sys.argv:
+        print("today snapshots:", save_snapshot())
+        return
+    urls = [build()] + build_days()
+    BR.add_to_sitemap(urls)
+    print("today pages:", len(urls))
 
 
 if __name__ == "__main__":

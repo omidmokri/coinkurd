@@ -104,8 +104,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
-2. **`/today/` — per-day snapshots.** Page, bot section and home card shipped 2026-11-07. Remaining: per-day
-   snapshots (`/daily/<date>/` already archives the market part). Lower value than #3.
+2. **`/today/` — per-day snapshots.** Shipped 2026-11-08 (`/today/<date>/`, `/today/days/`). Remaining (small): a "past
+   days" link in the bot's today section once a few real days exist.
 3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
    Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
 5. **Directional study.** Slices 1–2 shipped 2026-11-08 (`stance.py` → `stance.json`; `direction.py` → `direction.json`,
@@ -117,6 +117,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · /today/ now keeps a recorded copy of every day (Backlog #2)
+- **Need:** the daily spine vanished every 24 h; traders (and the strategy's "measured honesty") need to look back at what
+  the page said on a given day, frozen, not rebuilt with hindsight.
+- **Built:** `build_today.py --snapshot` (new CI step right before "Commit data") stores the page's inputs — only the fields
+  it renders — under the UTC date in `data/today_days.json`, overwritten each run so the day's last run stays. The builder
+  renders `/today/<YYYY-MM-DD>/` (prev/next links, "snapshot taken at … covers the 24 h before it", no class countdown)
+  and the hub `/today/days/`; `/today/` links to it. Recording starts today; no earlier day is reconstructed.
+- **Verified:** py_compile; YAML parses; in /tmp/bld: snapshot of the live inputs equals them (post ids, finding count),
+  same-day overwrite keeps one entry with the later time; built 3 days + hub; Playwright + Chrome 1280/390 fa/en on day page,
+  hub and live page: overflow 0, zero JS errors, looked at shots. ~8 KB per day.
+- **Next:** after the next sync run confirm `data/today_days.json` is committed; then a bot link, or #6 design.
+
 ### 2026-11-08 · The markets library in the home-page archive (asked for by the owner)
 The owner asked for a library of films, documentaries, books, tools, free courses and lives,
 inside the existing archive on the home page, in all three languages. `#library` in `index.html`
