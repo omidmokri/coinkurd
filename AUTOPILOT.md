@@ -110,12 +110,32 @@ The site's strategy (agreed with the owner, 2026-11-07):
 5. **Directional study.** Slices 1–2 shipped 2026-11-08 (`stance.py` → `stance.json`; `direction.py` → `direction.json`,
    section on `/track-record/` + bot line). Greeting-quote guard shipped 2026-11-08. Remaining:
    once ≥30 *bearish* days exist, report bullish/bearish days separately (now 65/6 of 71 days, so the test mostly measures bullish days).
-6. **Site ↔ bot identity** (watchlist and alerts follow the person via the bot deep link). Design first; larger.
+6. **Site ↔ bot identity** — design done 2026-11-08; build in slices:
+   - Facts: the site's watchlist is `localStorage['ek_watch']` (JSON list of symbols, star buttons from
+     `build_pages.WATCH_JS`; read by `assets/news.js`). The bot already routes `?start=s_<section>` (refbot.py ~1161)
+     and has per-user alert state (`bot_watch.py`, `refbot.watch_loop`). No server, no accounts: the link is the identity.
+   - Slice A (site→bot, one-way, user-initiated): a "send my watchlist to the bot" pill wherever stars appear →
+     `t.me/<bot>?start=w_BTC-ETH-SOL` (Telegram limit: 64 chars of `[A-Za-z0-9_-]`, so ≤ ~12 symbols; longer lists
+     are cut with a visible note). Bot: on `w_` show the parsed list and an "add these to my watchlist" button — the
+     user confirms, nothing is posted anywhere. Validate symbols against the bot's known coin list; unit-test parsing
+     (empty, junk, >64 chars, duplicates, lower-case).
+   - Slice B (bot→site): bot "open my list on the site" button → `https://entekhab.net/news/?w=BTC,ETH`; the site merges
+     `?w=` into `ek_watch` only after a click on "save to this browser" (no silent overwrite).
+   - Not planned: secrets/tokens in URLs, cross-device sync server, any change to broadcasting.
 7. **Owner action, not for the loop:** stray branch `ck-push-test` (left by a push test on 2026-11-07). The proxy
     cannot delete refs and the safety gate refused deleting it from the GitHub UI; the owner can delete it from the
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Design for site ↔ bot watchlist hand-off (Backlog #6, design slice)
+- **Need:** a trader stars coins on the site, then has to re-type them in the bot; the two halves of the product don't
+  know each other. #5's bearish split still waits (8 bearish days of 85).
+- **Built:** no code — a concrete two-slice design in Backlog #6 (deep link `?start=w_…` with user confirmation in the bot;
+  `?w=` back to the site with an explicit save), grounded in the existing `ek_watch` storage and `s_` deep-link router.
+- **Verified:** read `build_pages.WATCH_JS`, `assets/news.js`, `refbot.py` deep-link handler and `bot_watch.py`; checked
+  Telegram's 64-char `start` limit is the binding constraint. Docs-only commit, so no build or screenshots.
+- **Next:** build #6 slice A (site pill + bot `w_` handler with tests).
+
 ### 2026-11-08 · Direction study shows the "always bullish" baseline (Backlog #5, small slice)
 - **Need:** with 77 of 85 days labelled bullish, a 56.5% hit rate means little unless the reader sees that simply saying
   "bullish" every day scored the same; the shuffle baseline alone hides that.
