@@ -100,11 +100,24 @@ def logmel(a, sr, n_fft=1024, hop=256, n_mels=80):
 
 
 def mel_distance_db(a, b, sr):
+    """RMS log-mel difference after DTW alignment. Without alignment a 2 % duration change shifts
+    late frames by several hops and the 'distance' measures timing, not timbre."""
     A, B = logmel(a, sr), logmel(b, sr)
-    n = min(len(A), len(B))
-    A, B = A[:n], B[:n]
-    loud = A.max(axis=1) > A.max() - 50          # ignore silent frames
-    return float(np.sqrt(np.mean((A[loud] - B[loud]) ** 2)))
+    floor = max(A.max(), B.max()) - 60
+    A, B = np.maximum(A, floor), np.maximum(B, floor)
+    D = np.sqrt(((A[:, None, :] - B[None, :, :]) ** 2).mean(axis=2))
+    n, m = D.shape
+    C = np.full((n + 1, m + 1), np.inf); C[0, 0] = 0
+    for i in range(1, n + 1):
+        Ci, Cp, Di = C[i], C[i - 1], D[i - 1]
+        for j in range(1, m + 1):
+            Ci[j] = Di[j - 1] + min(Cp[j], Ci[j - 1], Cp[j - 1])
+    i, j, path = n, m, []
+    while i > 0 and j > 0:
+        path.append(D[i - 1, j - 1])
+        k = int(np.argmin([C[i - 1, j - 1], C[i - 1, j], C[i, j - 1]]))
+        i, j = (i - 1, j - 1) if k == 0 else (i - 1, j) if k == 1 else (i, j - 1)
+    return float(np.mean(path))
 
 
 def save_wav(path, a, sr):
@@ -139,6 +152,18 @@ def check():
             ref_det.append(run(base, ids, cfg, False))
             a = run(base, ids, cfg, True); ref_nat.append(a)
             save_wav(os.path.join(OUT, f"{lang}_{i + 1}_original.wav"), a, sr)
+        # baseline: two natural renders of the ORIGINAL (different sampler seeds) differ by this much
+        # already, and listeners hear both as "the same voice"
+        def nat(seed, ids):
+            np.random.seed(seed)
+            inf = cfg.get("inference", {})
+            feeds = {"input": np.array([ids], dtype=np.int64), "input_lengths": np.array([len(ids)], dtype=np.int64),
+                     "scales": np.array([inf.get("noise_scale", .667), inf.get("length_scale", 1.0), inf.get("noise_w", .8)], dtype=np.float32)}
+            if cfg.get("num_speakers", 1) > 1:
+                feeds["sid"] = np.array([0], dtype=np.int64)
+            return base.run(None, feeds)[0].squeeze().astype(np.float32)
+        r["baseline_two_original_renders_db"] = [round(mel_distance_db(nat(1, idf(t, cfg)), nat(2, idf(t, cfg)), sr), 2) for t in texts]
+        r["original_det_vs_natural_db"] = [round(mel_distance_db(ref_det[i], ref_nat[i], sr), 2) for i in range(len(texts))]
         for name, kw in VARIANTS.items():
             dst = os.path.join(OUT, f"{lang}_{name}.onnx")
             quantize(src, dst, **kw)
