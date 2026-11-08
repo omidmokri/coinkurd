@@ -1320,12 +1320,19 @@ def build_indicators():
 
 
 # ---------------------------------------------------------------- learning hub + glossary
-LANG_JS = ("(function(){var L;try{L=localStorage.getItem('ck_lang')}catch(e){}L=L||'fa';function ap(l){L=l;try{localStorage.setItem('ck_lang',l)}catch(e){}"
+# Static-page language runtime (learn, glossary, kids, map). It must answer the HEADER's language
+# buttons too, not only the page's own .lsw switch: before 2026-11-08 it did not, so on these pages the
+# header flipped language while the text stayed put. Same contract as build_reality.LANG_JS: claim the
+# click in the capture phase (chrome.js then only relabels the header, via its <html lang> observer)
+# and set window.I18N so chrome.js knows the page translates itself.
+LANG_JS = ("(function(){var L;try{L=localStorage.getItem('ck_lang')}catch(e){}if(['fa','ckb','en'].indexOf(L)<0)L='fa';window.I18N=1;function ap(l){L=l;try{localStorage.setItem('ck_lang',l)}catch(e){}"
            "document.documentElement.lang=l;document.documentElement.dir=l==='en'?'ltr':'rtl';"
            "document.querySelectorAll('[data-lang]:not(#ekh):not(#ekf)').forEach(function(e){e.hidden=e.dataset.lang!==l});"
            "document.querySelectorAll('.lsw button').forEach(function(b){b.classList.toggle('on',b.dataset.l===l)});"
            "window.dispatchEvent(new CustomEvent('ek-lang',{detail:l}))}window.EKL=function(){return L};"
-           "document.querySelectorAll('.lsw').forEach(function(w){w.addEventListener('click',function(e){var b=e.target.closest('button');if(b)ap(b.dataset.l)})});ap(L)})();")
+           "document.querySelectorAll('.lsw').forEach(function(w){w.addEventListener('click',function(e){var b=e.target.closest('button');if(b)ap(b.dataset.l)})});"
+           "document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#langs button[data-l],.ek-lang button[data-l]');if(b){ev.preventDefault();ev.stopPropagation();ap(b.getAttribute('data-l'))}},true);"
+           "window.EKSET=ap;ap(L)})();")
 LSW = '<div class="lsw"><button data-l="fa">فارسی</button><button data-l="ckb">کوردی</button><button data-l="en">English</button></div>'
 LEARN_CSS = (".lsw{display:flex;gap:6px;margin:6px 0 14px}.lsw button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 12px;cursor:pointer;font:inherit;font-size:.82rem}"
              ".lsw button.on{background:var(--acc);border-color:var(--acc);color:#000;font-weight:800}"
