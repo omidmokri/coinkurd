@@ -148,7 +148,7 @@
      Alt+R reads the selection or the page (or pauses), Esc stops. The engine (assets/reader.js)
      and its voices load only on first use. The AudioContext is created here, inside the click or
      key press, because browsers only let audio start from a user gesture. */
-  var RDV = '6', rdP = null, SPK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  var RDV = '7', rdP = null, SPK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   var RDT = {
     fa: { page: 'خواندن کل صفحه', pick: 'انتخاب یک بخش برای خواندن', stop: 'توقف خواندن', sel: 'خواندن متن انتخاب‌شده', tip: 'یا هر متنی را انتخاب کنید و دکمهٔ بلندگو را بزنید. میان‌بُر: Alt+R، توقف: Esc' },
     ckb: { page: 'خوێندنەوەی هەموو پەڕەکە', pick: 'هەڵبژاردنی بەشێک بۆ خوێندنەوە', stop: 'ڕاگرتنی خوێندنەوە', sel: 'خوێندنەوەی دەقی هەڵبژێردراو', tip: 'یان هەر دەقێک هەڵبژێرە و دوگمەی بڵندگۆ دابگرە. کورتەڕێ: Alt+R، ڕاگرتن: Esc' },
@@ -165,10 +165,6 @@
     return r;
   }
   var rdMenu = null, rdb = H.querySelector('.ek-rdb');
-  /* TEMP staged rollout: on only for ?reader=1 or localStorage ek-rd-beta=1 until verified live */
-  var RD_ON = ls.get('ek-rd-beta') === '1' || /[?&]reader=1/.test(location.search);
-  if (/[?&]reader=1/.test(location.search)) ls.set('ek-rd-beta', '1');
-  if (!RD_ON && rdb) rdb.style.display = 'none';
   function closeRdMenu() { if (rdMenu) rdMenu.classList.remove('on'); if (rdb) rdb.setAttribute('aria-expanded', 'false'); }
   function openRdMenu() {
     var T = rdt();
@@ -196,7 +192,7 @@
     rdMenu.classList.add('on'); rdb.setAttribute('aria-expanded', 'true');
     var f = rdMenu.querySelector('button'); if (f) f.focus();
   }
-  if (RD_ON && rdb) rdb.addEventListener('click', function (e) { e.stopPropagation(); gesture(); if (rdMenu && rdMenu.classList.contains('on')) closeRdMenu(); else openRdMenu(); });
+  if (rdb) rdb.addEventListener('click', function (e) { e.stopPropagation(); gesture(); if (rdMenu && rdMenu.classList.contains('on')) closeRdMenu(); else openRdMenu(); });
   var bub = null, bubT = 0;
   function placeBub() {
     var r = selRange();
@@ -214,8 +210,8 @@
     bub.style.top = Math.round(b.bottom + 10 + scrollY) + 'px';
     bub.classList.add('on');
   }
-  if (RD_ON) d.addEventListener('selectionchange', function () { clearTimeout(bubT); bubT = setTimeout(placeBub, 260); });
-  if (RD_ON) d.addEventListener('keydown', function (e) {
+  d.addEventListener('selectionchange', function () { clearTimeout(bubT); bubT = setTimeout(placeBub, 260); });
+  d.addEventListener('keydown', function (e) {
     if (e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyR') {
       e.preventDefault(); var s = selRange(), k = s ? s.cloneRange() : null;
       reader().then(function (R) { if (k) R.range(k); else if (R.playing) R.toggle(); else R.page(); });

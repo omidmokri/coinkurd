@@ -333,7 +333,10 @@ const R = {
     const r = document.createRange();
     if (start) r.setStartAfter(start); else r.setStart(document.body, 0);
     if (foot) r.setEndBefore(foot); else r.setEnd(document.body, document.body.childNodes.length);
-    return this.run(sentences(textNodes(document.body, r), null, UI()));
+    /* "the whole page" means its prose: drop live-data chips like "₿ $75,946 +0.19%" or "⛽ 3 sat/vB"
+       (fewer than two real words). A selection or a picked section is read exactly as chosen. */
+    const words = s => (s.match(/[\p{L}]{3,}/gu) || []).length;
+    return this.run(sentences(textNodes(document.body, r), null, UI()).filter(it => words(it.raw) >= 2));
   },
   async range(r) {
     const root = r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentNode;
@@ -457,11 +460,15 @@ const R = {
     const T = t(); let hov = null;
     const tip = toast(T.pick, 0);
     de.classList.add('ek-rd-picking');
+    /* the smallest block under the pointer that holds real text: a paragraph, a heading, a card —
+       not the whole section around it (pointing at a card's padding still picks the card) */
     const blockAt = el => {
       if (!el || el.closest(SKIP)) return null;
-      let b = el.closest('p,li,h1,h2,h3,h4,h5,h6,blockquote,td,th,dd,dt,figcaption,pre,article,section,[class*="card"]');
-      if (!b) for (b = el; b && b !== document.body; b = b.parentElement) if ((b.innerText || '').trim().length >= 20) break;
-      return b && b !== document.body ? b : null;
+      for (let b = el; b && b !== document.body && b !== de; b = b.parentElement) {
+        if (INLINE.has(getComputedStyle(b).display)) continue;
+        if ((b.innerText || '').trim().length >= 12) return b;
+      }
+      return null;
     };
     const over = e => { const b = blockAt(e.target); if (b === hov) return; hov && hov.classList.remove('ek-rd-hov'); hov = b; hov && hov.classList.add('ek-rd-hov'); };
     const end = () => { de.classList.remove('ek-rd-picking'); hov && hov.classList.remove('ek-rd-hov'); tip.classList.remove('on'); removeEventListener('mouseover', over, true); removeEventListener('click', click, true); removeEventListener('keydown', key, true); };
