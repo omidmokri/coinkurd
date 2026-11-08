@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Funding-cost calculator for held futures (/tools/#funding; new need, Backlog had nothing open)
+- **Need:** traders hold perpetual positions for days without knowing funding (paid every 8h) can eat a large share of
+  their margin with leverage; the fee-aware size calculator says "funding not included". #5 still waits (8 bearish of 85 days).
+- **Built:** new `/tools/` card (fa/ckb/en): size, side, funding %/8h, days, leverage → payments, total funding (signed:
+  negative = received), per day, % of size, % of margin, annualised. Coin picker fills the current rate from
+  `data/derivatives.json` (OKX, time shown; "no data yet" if missing). Pure `fundCalc()`. No bot change (bot has no calculators).
+- **Verified:** node tests on `fundCalc` (1000/0.01%/30d → 90 payments, $9, 0.9%, ann 10.95%; short sign flips; 10x margin
+  −9%; negative rate; 0 days; 8h boundary); Playwright + Chrome 1280/390 fa/en: overflow 0, zero JS errors, looked at shots.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-08 · Exchange fees in the position-size calculator (new need; Backlog had nothing open)
 - **Need:** `/tools/#risk` ignored fees, so with leverage the real loss at the stop was larger than the chosen risk and the
   shown R:R/break-even were too rosy. #5's bearish split still waits (8 bearish of 85 days).

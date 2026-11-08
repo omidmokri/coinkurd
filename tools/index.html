@@ -45,6 +45,12 @@
       <label><span data-t="riskP"></span><input id="mRisk" type="number" min="0" max="99" step="any" value="1"></label><label><span data-t="mNL"></span><input id="mN" type="number" min="1" max="2000" step="1" value="100"></label></div>
     <div class="out" id="mOut"></div><p class="disc" data-t="mNote"></p></section>
 
+  <section class="card" id="funding"><h2 data-t="fuT"></h2><p class="lead" data-t="fuL"></p>
+    <div class="f"><label><span data-t="fuSize"></span><input id="uSize" type="number" min="0" step="any" value="1000"></label><label><span data-t="side"></span><select id="uSide"></select></label>
+      <label><span data-t="fuCoin"></span><select id="uCoin"></select></label><label><span data-t="fuRate"></span><input id="uRate" type="number" step="any" value="0.01"></label>
+      <label><span data-t="fuDays"></span><input id="uDays" type="number" min="0" max="3650" step="any" value="30"></label><label><span data-t="lev"></span><input id="uLev" type="number" min="1" max="125" step="1" value="1"></label></div>
+    <div class="out" id="uOut"></div><p class="disc" id="uNote"></p></section>
+
   <section class="card" id="whatif"><h2 data-t="wiT"></h2><p class="lead" data-t="wiL"></p>
     <div class="f"><label><span data-t="coin"></span><select id="wCoin"></select></label><label><span data-t="date"></span><input id="wDate" type="date"></label>
       <label><span data-t="amt"></span><input id="wAmt" type="number" min="0" step="any" value="100"></label><label><span data-t="mode"></span><select id="wMode"></select></label></div>
@@ -156,6 +162,19 @@ function renderMc(){const p=+$('#mWin').value/100,R=+$('#mRR').value,rp=+$('#mRi
  const r=mcSim(p,R,rp,n,5000,20261108),P=v=>(v*100).toFixed(1)+'%',ch=v=>pct((v-1)*100,1);
  o.innerHTML=[[T('mExp'),(r.exp>=0?'+':'')+r.exp.toFixed(2)+' R'],[T('mBe'),(100/(1+R)).toFixed(1)+'%'],[T('mMed'),ch(r.medFin)],[T('mBad5'),ch(r.p05Fin)],[T('mLoss'),P(r.lossShare)],[T('mSt'),r.medSt+' · '+r.p95St],[T('mDD'),P(r.medDD)+' · '+P(r.p95DD)],[T('mDD20'),P(r.dd20)],[T('mDD50'),P(r.dd50)]].map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}
 ['#mWin','#mRR','#mRisk','#mN'].forEach(s=>$(s).addEventListener('input',renderMc));
+Object.assign(I.fa,{fuCoin:'نرخ فعلی کوین (OKX)',fuT:'⏳ هزینهٔ فاندینگ نگه‌داشتن فیوچرز',fuL:'در قراردادهای دائمی هر ۸ ساعت فاندینگ بین لانگ‌ها و شورت‌ها جابه‌جا می‌شود. اگر نرخ مثبت باشد لانگ می‌پردازد و شورت می‌گیرد؛ اگر منفی باشد برعکس. ببینید نگه‌داشتن پوزیشن چند روز چقدر خرج دارد.',fuSize:'حجم پوزیشن ($)',fuRate:'نرخ فاندینگ هر ۸ ساعت (٪)',fuDays:'مدت نگه‌داری (روز)',fuN:'تعداد پرداخت',fuCost:'فاندینگ کل (منفی = دریافتی)',fuPos:'نسبت به حجم',fuMar:'نسبت به مارجین',fuAnn:'معادل سالانه',fuDay:'هر روز',fuSrc:'نرخ فعلی از OKX، به‌روزرسانی ',fuNo:'هنوز داده‌ای از نرخ فعلی نیست؛ نرخ را خودتان وارد کنید.',fuAs:'فرض: نرخ در کل مدت ثابت بماند؛ در واقع هر ۸ ساعت عوض می‌شود. کارمزد معامله جداست. توصیهٔ مالی نیست.'});
+Object.assign(I.ckb,{fuCoin:'ڕێژەی ئێستای کۆین (OKX)',fuT:'⏳ تێچووی فاندینگی ڕاگرتنی فیوچەرز',fuL:'لە گرێبەستە هەمیشەییەکاندا هەر ٨ کاتژمێر فاندینگ لە نێوان لۆنگ و شۆرتدا دەگوازرێتەوە. ئەگەر ڕێژە پۆزەتیڤ بێت لۆنگ دەدات و شۆرت وەردەگرێت؛ ئەگەر نێگەتیڤ بێت بە پێچەوانەوە. ببینە ڕاگرتنی پۆزیشن بۆ چەند ڕۆژێک چەندی تێدەچێت.',fuSize:'قەبارەی پۆزیشن ($)',fuRate:'ڕێژەی فاندینگ بۆ هەر ٨ کاتژمێر (٪)',fuDays:'ماوەی ڕاگرتن (ڕۆژ)',fuN:'ژمارەی پارەدان',fuCost:'کۆی فاندینگ (نێگەتیڤ = وەرگیراو)',fuPos:'بەراورد بە قەبارە',fuMar:'بەراورد بە مارجین',fuAnn:'هاوتای ساڵانە',fuDay:'هەر ڕۆژێک',fuSrc:'ڕێژەی ئێستا لە OKX، نوێکراوەتەوە ',fuNo:'هێشتا داتای ڕێژەی ئێستا نییە؛ ڕێژەکە خۆت بنووسە.',fuAs:'گریمانە: ڕێژە لە هەموو ماوەکەدا جێگیر بمێنێت؛ لە ڕاستیدا هەر ٨ کاتژمێر دەگۆڕێت. کرێی مامەڵە جیایە. ئامۆژگاریی دارایی نییە.'});
+Object.assign(I.en,{fuCoin:'Current rate of coin (OKX)',fuT:'⏳ Funding cost of holding a futures position',fuL:'On perpetual futures, funding moves between longs and shorts every 8 hours. When the rate is positive longs pay and shorts receive; when negative, the reverse. See what holding a position for some days costs.',fuSize:'Position size ($)',fuRate:'Funding rate per 8h (%)',fuDays:'Holding time (days)',fuN:'Payments',fuCost:'Total funding (negative = received)',fuPos:'Of position size',fuMar:'Of margin',fuAnn:'Annualised',fuDay:'Per day',fuSrc:'Current rate from OKX, updated ',fuNo:'No data yet for the current rate; enter it yourself.',fuAs:'Assumes the rate stays constant the whole time; in reality it changes every 8 hours. Trading fees are separate. Not financial advice.'});
+function fundCalc(o){const n=Math.floor(Math.max(0,o.days)*3+1e-9),per=o.size*o.rate/100*(o.long?1:-1),cost=per*n,lev=Math.max(1,o.lev||1);
+ return{n,cost,day:per*3,pos:o.size>0?cost/o.size*100:null,mar:o.size>0?cost/(o.size/lev)*100:null,ann:o.rate*3*365}}
+let DV=null;
+function renderFund(){const size=+$('#uSize').value,rate=+$('#uRate').value,days=+$('#uDays').value,lev=Math.max(1,+$('#uLev').value||1),long=$('#uSide').value!=='short',o=$('#uOut');
+ if(!(size>0)||!isFinite(rate)||!(days>=0)){o.innerHTML='';return}
+ const r=fundCalc({size,rate,days,lev,long}),sg=v=>(v>0?'+':v<0?'−':'')+'$'+fm(Math.abs(v),2),pc=v=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(2)+'%';
+ o.innerHTML=[[T('fuN'),r.n],[T('fuCost'),sg(r.cost)],[T('fuDay'),sg(r.day)],[T('fuPos'),pc(r.pos)],[T('fuMar'),pc(r.mar)],[T('fuAnn'),pc(r.ann*(long?1:-1))]].map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('');
+ $('#uNote').textContent=(DV&&DV.updated_at?T('fuSrc')+DV.updated_at.slice(0,16).replace('T',' ')+' UTC. ':T('fuNo')+' ')+T('fuAs')}
+['#uSize','#uRate','#uDays','#uLev','#uSide'].forEach(s=>$(s).addEventListener('input',renderFund));
+$('#uCoin').onchange=()=>{const c=$('#uCoin').value,w=(DV?.swaps||[]).find(x=>x.coin===c);if(w&&w.funding!=null){$('#uRate').value=w.funding;renderFund()}};
 /* ---- what if ---- */
 async function whatIf(){const c=$('#wCoin').value,amt=+$('#wAmt').value,mode=$('#wMode').value,d=$('#wDate').value,o=$('#wOut');if(!(amt>0)||!d)return;o.innerHTML='…';
  const start=Date.parse(d+'T00:00:00Z');if(!(start<Date.now())){o.innerHTML=`<p class="err">${T('noData')}</p>`;return}
@@ -173,14 +192,14 @@ async function renderFx(){const c=$('#fCoin').value,q=+$('#fQty').value||0,cur=$
  $('#fNote').innerHTML=(FX?.time_last_update_utc?T('fxSrc')+esc(FX.time_last_update_utc.slice(5,22))+'. ':'')+(mkt&&!mine?T('mktSrc'):['IRT','IQD'].includes(cur)?T('fxWarn'):'')}
 $('#fRate').addEventListener('change',()=>{const R=ls.get('ek_fx',{}),v=+$('#fRate').value;if(v>0)R[$('#fCur').value]=v;else delete R[$('#fCur').value];ls.set('ek_fx',R);renderFx()});
 ['#fCoin','#fQty'].forEach(s=>$(s).addEventListener('input',renderFx));$('#fCur').addEventListener('change',()=>{$('#fRate').value='';renderFx()});
-function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).value||'BTC';$(s).innerHTML=opt(cs,v)});$('#rCoin').innerHTML='<option value="">—</option>'+opt(cs);
+function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).value||'BTC';$(s).innerHTML=opt(cs,v)});$('#rCoin').innerHTML='<option value="">—</option>'+opt(cs);{const uv=$('#uSide').value||'long',uc=$('#uCoin').value;$('#uSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}"${k===uv?' selected':''}>${v}</option>`).join('');$('#uCoin').innerHTML='<option value="">—</option>'+((DV?.swaps)||[]).filter(x=>x.funding!=null&&/^[A-Z0-9]{1,12}$/.test(x.coin)).map(x=>`<option${x.coin===uc?' selected':''}>${x.coin}</option>`).join('')}
  $('#rSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');$('#wMode').innerHTML=Object.entries(T('modes')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
  const fc=$('#fCur').value||'IQD';$('#fCur').innerHTML=Object.entries(T('curs')).map(([k,v])=>`<option value="${k}"${k===fc?' selected':''}>${v} (${k})</option>`).join('');
  if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
  $('#tlinks').innerHTML=T('links').map(([h,a,b])=>`<a href="${h}"><b>${a}</b><small>${b}</small></a>`).join('')}
-function render(){forms();renderCmp();renderRisk();renderMc();renderFx()}
+function render(){forms();renderCmp();renderRisk();renderMc();renderFund();renderFx()}
 (async()=>{const qc=new URLSearchParams(location.search).get('cmp');if(qc){const a=qc.split(',').map(x=>x.trim().toUpperCase()).filter(x=>/^[A-Z0-9]{2,10}$/.test(x)).slice(0,6);if(a.length)cmp=[...new Set(a)]}
- const [m,s,fx,mc]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V())]);M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
+ const [m,s,fx,mc,dv]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V()),j('/data/derivatives.json'+V())]);DV=dv;M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
  if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();
 </script>
 <script src="/assets/chrome.js?v=5" defer></script></body>
