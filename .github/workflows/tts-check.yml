@@ -1,0 +1,32 @@
+name: Read-aloud voice size check
+
+# Manual experiment: shrink the read-aloud voices to int8 and measure what it costs in sound
+# (scripts/tts_quant.py). Uploads the WAVs (original vs each int8 variant) for listening.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Cache the read-aloud voices
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/entekhab-tts
+          key: tts-${{ hashFiles('scripts/fetch_tts.py') }}
+      - run: pip install onnx onnxruntime numpy piper-phonemize
+      - run: python scripts/fetch_tts.py
+      - run: python scripts/tts_quant.py check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tts-check
+          path: |
+            tts_check/*.wav
+            tts_check/report.json
