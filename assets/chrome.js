@@ -31,14 +31,30 @@
   }
   var PH = { fa: 'جستجو در مطالب، کوین‌ها و اصطلاحات…', ckb: 'گەڕان لە بابەت، دراو و زاراوەکان…', en: 'Search posts, coins and terms…' };
   /* pages with their own i18n (homepage, tool pages) switch <html lang>; we follow it */
-  var pageI18n = !!(window.uiLang || window.I18N || d.querySelector('[data-t],[data-i]'));
+  /* decided at click time, not at load: a page's own runtime may register after this deferred script */
+  function pageI18nNow() { return !!(window.uiLang || window.I18N || d.querySelector('[data-t],[data-i]')); }
   try { new MutationObserver(function () { label(cur()); }).observe(de, { attributes: true, attributeFilter: ['lang'] }); } catch (e) { }
   function setLang(l) {
-    if (pageI18n) return; // the page's own handler on #langs does the work and changes <html lang>
+    if (pageI18nNow()) return; // the page's own handler on #langs does the work and changes <html lang>
+    if (typeof window.EKSET === 'function') { window.EKSET(l); return; }  // static-page runtime missed the click
     var alt = d.querySelector('link[rel="alternate"][hreflang="' + l + '"]'), href = alt && alt.getAttribute('href');
     ls.set('ck_lang', l);
     if (href) { try { var u = new URL(href, location.href); if (u.pathname !== location.pathname) { location.href = u.href; return; } } catch (e) { } }
     label(l);
+    /* nothing on this page follows the language (Persian-only content, e.g. the academy lessons):
+       say so instead of leaving a translated menu over untranslated text */
+    if (l !== 'fa') setTimeout(function () {
+      /* a page handler registered after ours has had its turn by now; only if <html lang> did not move
+         and the page carries no per-language copies is it really untranslated */
+      if (cur() !== l && !d.querySelector('[data-lang]:not(#ekh):not(#ekf):not(#ekb)')) noCopy(l);
+    }, 700);
+  }
+  function noCopy(l) {
+    var m = { ckb: 'ئەم پەڕەیە هێشتا تەنها بە فارسییە؛ مێنوو و بەشە گشتییەکان گۆڕدران.', en: 'This page is only in Persian for now; the menus and shared parts switched to English.' }[l];
+    var t = d.getElementById('ek-nocopy');
+    if (!t) { t = d.createElement('div'); t.id = 'ek-nocopy'; t.className = 'ek-rd-toast'; t.setAttribute('role', 'status'); d.body.appendChild(t); }
+    t.setAttribute('dir', l === 'en' ? 'ltr' : 'rtl'); t.textContent = m; t.classList.add('on');
+    clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('on'); }, 5000);
   }
   var LG = d.getElementById('langs');
   if (LG) LG.addEventListener('click', function (e) { var b = e.target.closest('button[data-l]'); if (b) setLang(b.getAttribute('data-l')); });
@@ -269,5 +285,5 @@
     var as = d.createElement('script'); as.src = '/assets/ask.js?v=2'; as.defer = true; d.body.appendChild(as);
   }
 
-  label(pageI18n ? cur() : (de.getAttribute('lang') ? cur() : (ls.get('ck_lang') || 'fa')));
+  label(pageI18nNow() ? cur() : (de.getAttribute('lang') ? cur() : (ls.get('ck_lang') || 'fa')));
 })();

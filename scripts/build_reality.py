@@ -524,7 +524,7 @@ document.querySelectorAll('.ek-i').forEach(function(x){var v=x.getAttribute('dat
 document.querySelectorAll('#langs button,.ek-lang button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l)});
 var blk=document.querySelector('[data-rl="'+l+'"]');if(blk)blk.querySelectorAll('.rc-slot[data-c]').forEach(function(s){var c=document.getElementById(s.getAttribute('data-c'));if(c&&c.parentNode!==s)s.appendChild(c)});
 window.dispatchEvent(new CustomEvent('ek-lang',{detail:l}))}
-window.EKL=function(){return L};
+window.EKL=function(){return L};window.EKSET=ap;
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#langs button[data-l],.ek-lang button[data-l]');if(b){ev.preventDefault();ev.stopPropagation();ap(b.getAttribute('data-l'))}},true);
 ap(L)})();"""
 
