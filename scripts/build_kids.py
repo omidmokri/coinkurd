@@ -30,7 +30,7 @@ import build_reality as BR   # noqa: E402
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
-VER = "3"
+VER = "4"
 CONTENT = os.environ.get("B4J_CONTENT") or os.path.join(ROOT, "content", "b4j")      # the env var is for tests only
 LANGS = ("fa", "ckb", "en")
 HEAD = f'<link rel="stylesheet" href="/assets/kids.css?v={VER}">'
@@ -152,9 +152,9 @@ UI = {
     "timer_min": ("دقیقه", "خولەک", "min"),
     "timer_up": ("وقت تمام شد!", "کات تەواو بوو!", "Time is up!"),
     "lesson_credit": (
-        "این صفحه برگرفته از «Bitcoin for Juniors» (راهنمای مربی) اثر My First Bitcoin است و مانند اثر اصلی با مجوز CC BY-SA 4.0 منتشر می‌شود. ترجمه و قالب‌بندی: entekhab.net. تغییرات و محدودیت‌ها در صفحهٔ «دربارهٔ این برنامه» آمده است. این ترجمه غیررسمی است و My First Bitcoin آن را تأیید نکرده است.",
-        "ئەم پەڕەیە لە «Bitcoin for Juniors» (ڕێبەری پەروەردەکار)، بەرهەمی My First Bitcoin، وەرگیراوە و وەک بەرهەمە ئەسڵییەکە بە مۆڵەتی CC BY-SA 4.0 بڵاو دەکرێتەوە. وەرگێڕان و ڕێکخستن: entekhab.net. گۆڕانکارییەکان و سنوورەکان لە پەڕەی «دەربارەی ئەم پرۆگرامە» هاتوون. ئەم وەرگێڕانە فەرمی نییە و My First Bitcoin پەسەندی نەکردووە.",
-        "This page is adapted from “Bitcoin for Juniors” (Educator Guide) by My First Bitcoin and, like the original, is shared under CC BY-SA 4.0. Translation and layout: entekhab.net. Changes and limits are listed on the “About this course” page. This translation is unofficial and is not endorsed by My First Bitcoin."),
+        "برگرفته از «Bitcoin for Juniors» — ترجمهٔ غیررسمی",
+        "وەرگیراو لە «Bitcoin for Juniors» — وەرگێڕانی نافەرمی",
+        "Adapted from “Bitcoin for Juniors” — unofficial translation"),
     "moved_h": ("این بخش اکنون «بیت‌کوین برای کودکان» است", "ئەم بەشە گۆڕدرا بۆ «بیتکۆین بۆ منداڵان»", "This section has become “Bitcoin for Juniors”"),
     "moved": ("به‌جای بازی‌ها و فیلم‌های قبلی، حالا برنامهٔ درسی کامل و باز «بیت‌کوین برای کودکان» را به فارسی، کردی سورانی و انگلیسی داریم.",
               "لە جیاتی یاری و فیلمە پێشووەکان، ئێستا پرۆگرامی وانەیی تەواو و کراوەی «بیتکۆین بۆ منداڵان» بە فارسی، کوردیی سۆرانی و ئینگلیزی بەردەستە.",
@@ -400,7 +400,8 @@ def ldjson(*objs):
 
 
 def credit_box(rel=None):
-    """the attribution that CC BY-SA asks for, on every page that shows the curriculum"""
+    """the attribution CC BY-SA asks for, kept to one line: the licence itself allows a link to a page that
+    carries the full notice, and /kids/about/ carries it (section 3(a)(2) of the licence)."""
     commit = SRC.get("commit", "main")
     links = [f'<a href="{SRC_REPO}" target="_blank" rel="noopener noreferrer">GitHub</a>',
              f'<a href="{ORG_URL}" target="_blank" rel="noopener noreferrer">My First Bitcoin</a>',
@@ -408,8 +409,9 @@ def credit_box(rel=None):
     if rel and rel in SRC.get("files", {}):
         links.insert(0, f'<a href="{SRC_REPO}/blob/{commit}/{FOLDER}/{SRC["files"][rel]["src"]}" '
                         f'target="_blank" rel="noopener noreferrer">{t3(UI["orig_en"])}</a>')
-    return (f'<aside class="b4j-credit"><p>{t3(UI["lesson_credit"])}</p>'
-            f'<p class="lk" dir="ltr">{" · ".join(links)} · <a href="/kids/about/">{t3(UI["about"])}</a></p></aside>')
+    return (f'<aside class="b4j-credit b4j-credit-s"><p class="lk">{t3(UI["lesson_credit"])} · '
+            f'<span dir="ltr">{" · ".join(links)}</span> · '
+            f'<a href="/kids/about/">{t3(UI["about"])}</a></p></aside>')
 
 
 def meta_line(rel, lg):
