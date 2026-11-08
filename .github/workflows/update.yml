@@ -367,6 +367,10 @@ jobs:
         continue-on-error: true
         run: python scripts/build_map.py
 
+      - name: Rebuild the markets library (data/library.json)
+        continue-on-error: true
+        run: python -I scripts/libdata/build.py
+
       - name: Check the Bitcoin for Juniors translations (structure, letters, digits)
         continue-on-error: true
         run: |

@@ -264,6 +264,9 @@ M = {
     "b_kids": {"fa": "🧒 بیت‌کوین برای کودکان", "ckb": "🧒 بیتکۆین بۆ منداڵان",
                "kmr": "🧒 Bitcoin ji bo zarokan", "ar": "🧒 البيتكوين للأطفال",
                "en": "🧒 Bitcoin for Juniors"},
+    "b_lib": {"fa": "🎬 کتابخانهٔ فیلم، کتاب و ابزار", "ckb": "🎬 کتێبخانەی فیلم، کتێب و ئامراز",
+              "kmr": "🎬 Pirtûkxaneya fîlm, pirtûk û amûran", "ar": "🎬 مكتبة الأفلام والكتب والأدوات",
+              "en": "🎬 Library of films, books and tools"},
     "b_academy": {"fa": "🏛 آکادمی کریپتو و مسیر یادگیری سایت", "ckb": "🏛 ئەکادیمیای کریپتۆ و ڕێڕەوی فێربوون",
                   "kmr": "🏛 Akademiya kriptoyê û rêya fêrbûnê", "ar": "🏛 أكاديمية الكريبتو ومسار التعلم",
                   "en": "🏛 Crypto academy & learning path"},
@@ -301,7 +304,8 @@ M = {
 
 def menu(lang):
     b = lambda k, d: {"text": L(M[k], lang), "callback_data": d}
-    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_kids", "lk:0")], [b("b_academy", "la:0")],
+    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_kids", "lk:0")], [b("b_lib", "ll:0")],
+                                [b("b_academy", "la:0")],
                                 [b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
                                 [b("b_check", "m:token"), b("b_report", "lr:0")]]
 
@@ -549,6 +553,76 @@ def kids_screen(lang):
     rows += [[{"text": L(KD["b_par"], lang), "url": SITE + "/kids/parents/"},
               {"text": L(KD["b_gloss"], lang), "url": SITE + "/kids/glossary/"}]]
     rows += [[{"text": L(KD["b_about"], lang), "url": SITE + "/kids/about/"}]]
+    rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
+              {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    return "\n".join(out), rows
+
+
+# ================================================================== the markets library (mirrors the site's /#library)
+LB = {
+    "title": {"fa": "🎬 <b>کتابخانهٔ بازارهای مالی</b>", "ckb": "🎬 <b>کتێبخانەی بازاڕە داراییەکان</b>",
+              "kmr": "🎬 <b>Pirtûkxaneya bazarên darayî</b>", "ar": "🎬 <b>مكتبة الأسواق المالية</b>",
+              "en": "🎬 <b>Financial markets library</b>"},
+    "desc": {"fa": "فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد، به فارسی، کوردی سورانی و انگلیسی.",
+             "ckb": "فیلم، دۆکیۆمێنتاری، کتێب، ئامراز و سەرچاوەی فێرکاریی بێبەرامبەر — هەر یەکەیان بە ناساندن و ئەو وانەیەی بۆ بازرگان هەیەتی، بە فارسی، کوردیی سۆرانی و ئینگلیزی.",
+             "kmr": "Fîlm, dokumenter, pirtûk, amûr û çavkaniyên fêrbûnê yên belaş — her yek bi danasîn û wê dersa ku ji bo bazirganekî heye, bi farisî, kurdiya soranî û îngilîzî.",
+             "ar": "أفلام ووثائقيات وكتب وأدوات ومصادر تعلم مجانية — لكل منها تعريف والدرس الذي يقدمه للمتداول، بالفارسية والكردية السورانية والإنجليزية.",
+             "en": "Films, documentaries, books, tools and free courses — each with what it is and what a trader can take from it, in Persian, Sorani Kurdish and English."},
+    "note": {"fa": "هیچ فیلم، کتاب یا فایلی روی سایت گذاشته نشده؛ فقط معرفی و پیوند به صفحهٔ اطلاعات، سایت رسمی یا ناشر. هیچ‌کدام تضمین سود نیست.",
+             "ckb": "هیچ فیلم، کتێب یان فایلێک لەسەر ماڵپەڕەکە دانەنراوە؛ تەنیا ناساندن و بەستەر بۆ پەڕەی زانیاری، ماڵپەڕی فەرمی یان بڵاوکەرەوە. هیچ کامیان دڵنیایی قازانج نین.",
+             "kmr": "Li ser malperê fîlm, pirtûk an dosyeyek nehatiye danîn; tenê danasîn û girêdana rûpela zanyariyê, malpera fermî an weşanger. Yek jî garantiya qezencê nîne.",
+             "ar": "لا يُستضاف أي فيلم أو كتاب أو ملف على الموقع؛ فقط تعريف ورابط إلى صفحة معلومات أو الموقع الرسمي أو الناشر. لا شيء منها يضمن ربحاً.",
+             "en": "No film, book or file is hosted on the site — only a description and a link to an information page, official site or publisher. None of it guarantees a profit."},
+    "b_open": {"fa": "📖 باز کردن کتابخانه", "ckb": "📖 کردنەوەی کتێبخانە", "kmr": "📖 Pirtûkxaneyê veke",
+               "ar": "📖 افتح المكتبة", "en": "📖 Open the library"},
+    "none": {"fa": "کتابخانه هنوز آماده نیست.", "ckb": "کتێبخانە هێشتا ئامادە نییە.",
+             "kmr": "Pirtûkxane hîn ne amade ye.", "ar": "المكتبة ليست جاهزة بعد.", "en": "The library is not ready yet."},
+}
+LB_IC = {"film": "🎬", "doc": "🎥", "book": "📚", "tool": "🧰", "free": "🎓", "bio": "🧭"}
+# the data file is trilingual like the site; the bot's other two languages get their names here
+LB_CAT = {
+    "film": {"kmr": "Fîlmên sînemayî", "ar": "أفلام روائية"},
+    "doc":  {"kmr": "Dokumenter", "ar": "أفلام وثائقية"},
+    "book": {"kmr": "Pirtûk", "ar": "كتب"},
+    "tool": {"kmr": "Amûr û platform", "ar": "أدوات ومنصات"},
+    "free": {"kmr": "Fêrbûna belaş", "ar": "تعلم مجاني"},
+    "bio":  {"kmr": "Jiyannameyên bazirganan", "ar": "سير المتداولين"},
+}
+
+
+def _lib():
+    """the same data file the site's library section reads; () when it is missing"""
+    import json
+    import os
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "library.json")
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+        return d.get("cats") or [], d.get("items") or []
+    except Exception:
+        return [], []
+
+
+def library_screen(lang):
+    """-> (text, rows): the categories of the site library, with how many entries each holds"""
+    cats, items = _lib()
+    if not cats or not items:
+        return L(LB["none"], lang), [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
+                                      {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
+    lg = lang if lang in ("fa", "ckb", "en") else "en"
+    pick_t = lambda d: (d or {}).get(lg) or (d or {}).get("en") or (d or {}).get("fa") or ""
+    out = [L(LB["title"], lang), L(LB["desc"], lang), ""]
+    rows = [[{"text": L(LB["b_open"], lang), "url": SITE + "/#library"}]]
+    btns = []
+    for c in cats:
+        n = sum(1 for it in items if it.get("cat") == c["k"])
+        if not n:
+            continue
+        ic = LB_IC.get(c["k"], "•")
+        name = LB_CAT.get(c["k"], {}).get(lang) or pick_t(c.get("t"))
+        out.append(f"{ic} {name} — {_num(n, lang)}")
+        btns.append({"text": f"{ic} {name}"[:64], "url": f"{SITE}/#library"})
+    out += ["", L(LB["note"], lang)]
+    rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
     rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},
               {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
     return "\n".join(out), rows
