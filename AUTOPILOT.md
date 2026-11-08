@@ -131,6 +131,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · Futures PnL & ROE calculator (/tools/#pnl; new need, Backlog had nothing open)
+- **Need:** leveraged traders ask "at 10x, what do I make/lose if I close here?" — no tool gave $ PnL and ROE on margin
+  with fees. #5 still waits (bearish days 13 of 85 < 30).
+- **Built:** `/tools/` card (fa/ckb/en): side, entry, exit, leverage, margin, fee/side → position value, qty, move %, gross,
+  fees, net, ROE; warning when ROE ≤ −100% (liquidated first). Pure `pnlCalc()`. Bot: added to `bot_reality.TOOLS`.
+- **Verified:** in-page tests: long 100→110 10x $100 0.05% → fee 1.05, net 98.95, ROE 98.95% (hand-checked); short
+  100→90 5x $200 → +100, ROE 50%; long →85 10x → −150% + warning; entry 0 / lev <1 → null. Playwright + Chrome
+  1280 fa / 390 fa+en, overflow 0, zero JS errors, looked at shots. py_compile bot_reality.
+- **Next:** #5 bearish split when ≥30 bearish days; otherwise a fresh trader need (not another calculator unless clearly needed).
 ### 2026-11-08 · Fix 390px header overflow (Backlog #1)
 - **Need:** on phones 381–440px wide (most iPhones/Androids) the header's brand text pushed `.ek-tools`/`.ek-appb` 40px
   off-screen → sideways scroll on every page with the shared header.

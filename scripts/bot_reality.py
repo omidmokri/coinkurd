@@ -408,6 +408,7 @@ TOOLS = [
     ("ladder", {"fa": "پله‌های حد سود (TP1-3)", "ckb": "پلەکانی قازانج (TP1-3)", "en": "Take-profit ladder (TP1-3)"}),
     ("average", {"fa": "میانگین قیمت خرید پله‌ای", "ckb": "تێکڕای نرخی کڕینی پلە بە پلە", "en": "Average entry of scaled buys"}),
     ("funding", {"fa": "هزینهٔ فاندینگ فیوچرز", "ckb": "تێچووی فاندینگی فیوچەرز", "en": "Futures funding cost"}),
+    ("pnl", {"fa": "سود و ضرر فیوچرز (ROE)", "ckb": "قازانج و زیانی فیوچەرز (ROE)", "en": "Futures PnL & ROE"}),
     ("breakeven", {"fa": "درصد برد لازم برای سربه‌سر", "ckb": "ڕێژەی بردنەوەی پێویست بۆ یەکسانبوون", "en": "Break-even win rate"}),
     ("noise", {"fa": "حد ضرر در برابر نوسان عادی", "ckb": "ستۆپ بەرامبەر جووڵەی ئاسایی", "en": "Stop vs normal volatility"}),
     ("liq", {"fa": "قیمت لیکویید شدن فیوچرز", "ckb": "نرخی لیکویدبوونی فیوچەرز", "en": "Futures liquidation price"}),
