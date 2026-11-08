@@ -39,6 +39,11 @@
       <label><span data-t="lev"></span><input id="rLev" type="number" min="1" max="125" step="1" value="1"></label><label><span data-t="coinOpt"></span><select id="rCoin"></select></label></div>
     <div class="out" id="rOut"></div><div id="rWarn"></div></section>
 
+  <section class="card" id="streaks"><h2 data-t="mT"></h2><p class="lead" data-t="mL"></p>
+    <div class="f"><label><span data-t="mWinL"></span><input id="mWin" type="number" min="0" max="100" step="any" value="45"></label><label><span data-t="mRRL"></span><input id="mRR" type="number" min="0" step="any" value="2"></label>
+      <label><span data-t="riskP"></span><input id="mRisk" type="number" min="0" max="99" step="any" value="1"></label><label><span data-t="mNL"></span><input id="mN" type="number" min="1" max="2000" step="1" value="100"></label></div>
+    <div class="out" id="mOut"></div><p class="disc" data-t="mNote"></p></section>
+
   <section class="card" id="whatif"><h2 data-t="wiT"></h2><p class="lead" data-t="wiL"></p>
     <div class="f"><label><span data-t="coin"></span><select id="wCoin"></select></label><label><span data-t="date"></span><input id="wDate" type="date"></label>
       <label><span data-t="amt"></span><input id="wAmt" type="number" min="0" step="any" value="100"></label><label><span data-t="mode"></span><select id="wMode"></select></label></div>
@@ -93,6 +98,9 @@ Object.assign(I.en,{mkt:'Market rate (Nobitex, USDT)',mktSrc:'For the toman, the
  val:'Value',rateUsed:'Rate used',official:'Reference rate (exchangerate-api)',custom:'Your rate',fxSrc:'Reference rates from exchangerate-api.com, updated ',fxWarn:'⚠️ For the toman and dinar the reference rate can differ a lot from the local market (exchange shops, free market) — enter your market rate for a realistic number (saved only in your browser).',
  curs:{IQD:'Iraqi dinar',IRT:'Iranian toman',TRY:'Turkish lira',AED:'UAE dirham',EUR:'Euro',GBP:'Pound'},
  honest:'<b>Transparency:</b> every calculation runs in your browser with public Binance and exchangerate-api data; nothing is sent to us. These tools are educational, not financial advice.',nfa:'Educational, not financial advice'});
+Object.assign(I.fa,{"mT": "🎲 شبیه‌ساز رشتهٔ ضررها و افت سرمایه", "mL": "حتی یک روش سودده هم رشته‌های ضرر پشت‌سرهم دارد. نرخ برد، نسبت سود به ضرر و ریسک هر معامله را بدهید تا ببینید در ۵٬۰۰۰ مسیر تصادفی چه افتی طبیعی است.", "mWinL": "نرخ برد (٪)", "mRRL": "سود هر برد به R (مثلاً ۲)", "mNL": "تعداد معامله", "mExp": "امید ریاضی هر معامله", "mBe": "نرخ برد لازم برای سربه‌سر", "mMed": "تغییر سرمایه (میانه)", "mBad5": "تغییر سرمایه (۵٪ بدترین مسیرها)", "mLoss": "سهم مسیرهای زیان‌ده", "mSt": "طولانی‌ترین رشتهٔ ضرر (میانه · ۹۵٪)", "mDD": "بیشترین افت (میانه · ۹۵٪)", "mDD20": "احتمال افت ۲۰٪ یا بیشتر", "mDD50": "احتمال افت ۵۰٪ یا بیشتر", "mBad": "ورودی‌ها را بررسی کنید (نرخ برد ۰ تا ۱۰۰، ریسک کمتر از ۱۰۰٪، ۱ تا ۲۰۰۰ معامله).", "mNote": "شبیه‌سازی مونت‌کارلو در مرورگر شما: هر معامله مستقل است، برد = +R برابر ریسک، باخت = −۱ برابر ریسک، ریسک درصدی از سرمایهٔ فعلی، بدون کارمزد. نتیجه به ورودی‌های شما بستگی دارد و پیش‌بینی بازار نیست؛ آموزشی است، توصیهٔ مالی نیست."});
+Object.assign(I.ckb,{"mT": "🎲 هاوشێوەکەری زنجیرەی زیان و دابەزینی سەرمایە", "mL": "تەنانەت ڕێگەیەکی قازانجبەخشیش زنجیرەی زیانی لەدوای یەکی هەیە. ڕێژەی بردنەوە، قازانج بە R و مەترسیی هەر مامەڵە بنووسە بۆ ئەوەی لە ٥٬٠٠٠ ڕێڕەوی هەڕەمەکیدا ببینیت چ دابەزینێک ئاساییە.", "mWinL": "ڕێژەی بردنەوە (٪)", "mRRL": "قازانجی هەر بردنەوە بە R (بۆ نموونە ٢)", "mNL": "ژمارەی مامەڵە", "mExp": "چاوەڕوانیی هەر مامەڵە", "mBe": "ڕێژەی بردنەوەی پێویست", "mMed": "گۆڕانی سەرمایە (ناوەند)", "mBad5": "گۆڕانی سەرمایە (٥٪ خراپترین ڕێڕەو)", "mLoss": "بەشی ڕێڕەوە زیانبەخشەکان", "mSt": "درێژترین زنجیرەی زیان (ناوەند · ٩٥٪)", "mDD": "گەورەترین دابەزین (ناوەند · ٩٥٪)", "mDD20": "ئەگەری دابەزینی ٢٠٪ یان زیاتر", "mDD50": "ئەگەری دابەزینی ٥٠٪ یان زیاتر", "mBad": "داتاکان بپشکنە (بردنەوە ٠ تا ١٠٠، مەترسی کەمتر لە ١٠٠٪، ١ تا ٢٠٠٠ مامەڵە).", "mNote": "هاوشێوەکردنی مۆنتێ کارلۆ لە وێبگەڕەکەتدا: هەر مامەڵەیەک سەربەخۆیە، بردنەوە = +R جار مەترسی، دۆڕان = −١ جار مەترسی، مەترسی بەشێکە لە سەرمایەی ئێستا، بێ کرێ. ئەنجام پشت بە داتاکانی تۆ دەبەستێت و پێشبینیی بازاڕ نییە؛ فێرکارییە، ئامۆژگاریی دارایی نییە."});
+Object.assign(I.en,{"mT": "🎲 Losing-streak & drawdown simulator", "mL": "Even a profitable method has runs of losses in a row. Enter your win rate, reward in R and risk per trade to see what drawdowns are normal across 5,000 random paths.", "mWinL": "Win rate (%)", "mRRL": "Win size in R (e.g. 2)", "mNL": "Number of trades", "mExp": "Expectancy per trade", "mBe": "Break-even win rate", "mMed": "Capital change (median)", "mBad5": "Capital change (worst 5% of paths)", "mLoss": "Share of losing paths", "mSt": "Longest losing streak (median · 95%)", "mDD": "Max drawdown (median · 95%)", "mDD20": "Chance of a 20%+ drawdown", "mDD50": "Chance of a 50%+ drawdown", "mBad": "Check the inputs (win rate 0–100, risk under 100%, 1–2000 trades).", "mNote": "Monte Carlo simulation in your browser: trades are independent, a win = +R × risk, a loss = −1 × risk, risk is a share of current capital, no fees. The result depends only on your inputs and is not a market forecast; educational, not financial advice."});
 const PAL=['#f7931a','#38bdf8','#22c55e','#a78bfa','#f472b6','#facc15'];let M=null,SC=null,FX=null,MAC=null,cmpD=90,cmp=ls.get('ek_cmp',['BTC','ETH','SOL']);
 const KL={};async function daily(c,limit){const k=c+limit;if(KL[k])return KL[k];const r=await j(`https://data-api.binance.vision/api/v3/klines?symbol=${c}USDT&interval=1d&limit=${limit}`);KL[k]=(r||[]).map(x=>({t:x[0],c:+x[4]}));return KL[k]}
 const coins=()=>[...new Set(['BTC','ETH','SOL','BNB','XRP',...(M?.coins||[]).map(c=>c.coin)])].filter(c=>!['USDT','USDC','FDUSD','DAI'].includes(c));
@@ -129,6 +137,16 @@ function renderRisk(){const cap=+$('#rCap').value,rp=+$('#rPct').value,en=+$('#r
  const w=[];if(liq&&(long?liq>=sl:liq<=sl))w.push(T('wLiq'));if(size/lev>cap)w.push(T('wBig'));$('#rWarn').innerHTML=w.map(x=>`<p class="warn">${x}</p>`).join('')}
 ['#rCap','#rPct','#rEn','#rSl','#rTp','#rLev','#rSide'].forEach(s=>$(s).addEventListener('input',renderRisk));
 $('#rCoin').onchange=async()=>{const c=$('#rCoin').value;if(!c)return;const d=await j(`https://data-api.binance.vision/api/v3/ticker/price?symbol=${c}USDT`);if(d&&d.price){$('#rEn').value=+d.price;renderRisk()}};
+/* ---- streaks & drawdown ---- */
+function mcSim(p,R,rp,n,runs,seed){let s=seed>>>0||1;const rnd=()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296};
+ const f=rp/100,fin=[],dd=[],st=[];for(let k=0;k<runs;k++){let e=1,pk=1,md=0,cur=0,mx=0;for(let i=0;i<n;i++){if(rnd()<p){e*=1+f*R;cur=0}else{e*=1-f;cur++;if(cur>mx)mx=cur}if(e>pk)pk=e;const d=1-e/pk;if(d>md)md=d}fin.push(e);dd.push(md);st.push(mx)}
+ const q=(a,x)=>{const b=a.slice().sort((u,v)=>u-v);return b[Math.min(b.length-1,Math.floor(x*b.length))]},share=(a,t)=>a.filter(v=>v>=t).length/a.length;
+ return{exp:p*R-(1-p),medFin:q(fin,.5),p05Fin:q(fin,.05),lossShare:fin.filter(v=>v<1).length/runs,medDD:q(dd,.5),p95DD:q(dd,.95),dd20:share(dd,.2),dd50:share(dd,.5),medSt:q(st,.5),p95St:q(st,.95)}}
+function renderMc(){const p=+$('#mWin').value/100,R=+$('#mRR').value,rp=+$('#mRisk').value,n=Math.round(+$('#mN').value),o=$('#mOut');
+ if(!(p>=0&&p<=1&&R>0&&rp>0&&rp<100&&n>=1&&n<=2000)){o.innerHTML=`<p class="err">${T('mBad')}</p>`;return}
+ const r=mcSim(p,R,rp,n,5000,20261108),P=v=>(v*100).toFixed(1)+'%',ch=v=>pct((v-1)*100,1);
+ o.innerHTML=[[T('mExp'),(r.exp>=0?'+':'')+r.exp.toFixed(2)+' R'],[T('mBe'),(100/(1+R)).toFixed(1)+'%'],[T('mMed'),ch(r.medFin)],[T('mBad5'),ch(r.p05Fin)],[T('mLoss'),P(r.lossShare)],[T('mSt'),r.medSt+' · '+r.p95St],[T('mDD'),P(r.medDD)+' · '+P(r.p95DD)],[T('mDD20'),P(r.dd20)],[T('mDD50'),P(r.dd50)]].map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join('')}
+['#mWin','#mRR','#mRisk','#mN'].forEach(s=>$(s).addEventListener('input',renderMc));
 /* ---- what if ---- */
 async function whatIf(){const c=$('#wCoin').value,amt=+$('#wAmt').value,mode=$('#wMode').value,d=$('#wDate').value,o=$('#wOut');if(!(amt>0)||!d)return;o.innerHTML='…';
  const start=Date.parse(d+'T00:00:00Z');if(!(start<Date.now())){o.innerHTML=`<p class="err">${T('noData')}</p>`;return}
@@ -151,7 +169,7 @@ function forms(){const cs=coins();['#wCoin','#fCoin'].forEach(s=>{const v=$(s).v
  const fc=$('#fCur').value||'IQD';$('#fCur').innerHTML=Object.entries(T('curs')).map(([k,v])=>`<option value="${k}"${k===fc?' selected':''}>${v} (${k})</option>`).join('');
  if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
  $('#tlinks').innerHTML=T('links').map(([h,a,b])=>`<a href="${h}"><b>${a}</b><small>${b}</small></a>`).join('')}
-function render(){forms();renderCmp();renderRisk();renderFx()}
+function render(){forms();renderCmp();renderRisk();renderMc();renderFx()}
 (async()=>{const qc=new URLSearchParams(location.search).get('cmp');if(qc){const a=qc.split(',').map(x=>x.trim().toUpperCase()).filter(x=>/^[A-Z0-9]{2,10}$/.test(x)).slice(0,6);if(a.length)cmp=[...new Set(a)]}
  const [m,s,fx,mc]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V())]);M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
  if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();

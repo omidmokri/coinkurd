@@ -116,6 +116,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-08 · /tools/#streaks — losing-streak & drawdown simulator (new need, ahead of #6)
+- **Need:** traders quit working methods after a normal run of losses, or size too big for the streaks to come; the
+  position-size calculator says what one loss costs, nothing said what 100 trades can do. (#5 still waits: 8 bearish days.)
+- **Built:** new card on `/tools/` (fa/ckb/en): win rate, win size in R, risk %, trades → 5,000 seeded Monte Carlo paths
+  (fixed-fraction compounding, no fees): expectancy, break-even win rate, median / worst-5% capital change, share of losing
+  paths, longest losing streak and max drawdown (median · 95th pct), P(DD ≥ 20%/50%). Inputs only — no market numbers.
+  Bot: `/tools/` link already exists, no new section.
+- **Verified:** node unit tests (always-win/always-lose exact values, zero expectancy, p=.5 N=100 median streak 6 and p95 9
+  as theory, single-trade loss share .600, determinism); default case hand-checked (exp +0.35 R, median e^{100·E ln}=+40.3%);
+  Playwright + Chrome 1280/390 fa/en: overflow 0, zero JS errors, looked at shots.
+- **Next:** #6 design, or #5 bearish split when ≥30 bearish days.
+
 ### 2026-11-08 · Bot's "today" section links the recorded past days (Backlog #2, finished)
 - **Need:** bot users had no way to reach `/today/days/`, the frozen daily record.
 - **Built:** `bot_reality.past_days()` counts dated keys in `data/today_days.json`; `sec_today` adds
