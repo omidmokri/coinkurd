@@ -1164,6 +1164,14 @@ def handle_private(s, msg):
                 return send(chat_id, *render(s, uid, arg[2:]))
             except Exception:
                 log.exception("deep link %s failed", arg)
+        # the site's "send my list to the bot" pill (t.me/<bot>?start=w_BTC-ETH): a read-only snapshot, nothing stored
+        if arg.startswith("w_"):
+            try:
+                import bot_wlink
+                return send(chat_id, bot_wlink.screen(bot_wlink.parse(arg), x["lang"]),
+                            rows_kb([[btn(t("b_back", x["lang"]), "m:main")]]))
+            except Exception:
+                log.exception("watchlist link %s failed", arg)
         return send(chat_id, *render(s, uid, "main"))
 
     x = upsert(s, u)

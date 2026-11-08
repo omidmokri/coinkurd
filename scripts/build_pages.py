@@ -249,7 +249,7 @@ def crumbs_ld(body, title, url, lang="fa"):
 
 WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c=b.dataset.watch,K='ek_watch';function g(){try{return JSON.parse(localStorage.getItem(K)||'[]')}catch(e){return []}}"
             "function d(){var on=g().indexOf(c)>=0;b.classList.toggle('on',on);b.querySelector('span').textContent=on?'در لیست مراقبت ✓':'افزودن به لیست مراقبت'}"
-            "b.onclick=function(){var a=g();if(a.indexOf(c)>=0)a=a.filter(function(x){return x!==c});else a.push(c);try{localStorage.setItem(K,JSON.stringify(a.slice(0,20)))}catch(e){}d()};d()});")
+            "b.onclick=function(){var a=g();if(a.indexOf(c)>=0)a=a.filter(function(x){return x!==c});else a.push(c);try{localStorage.setItem(K,JSON.stringify(a.slice(0,20)))}catch(e){}d();w()};var l=document.createElement('a');l.className='wbtn';l.target='_blank';l.rel='noopener';b.after(l);function w(){var a=g().filter(function(x){return /^[A-Z0-9]{2,12}$/.test(x)}),q='w_',n=0;for(var i=0;i<a.length;i++){if((q+(n?'-':'')+a[i]).length>64)break;q+=(n?'-':'')+a[i];n++}l.hidden=!n;l.href='https://t.me/Kurd_kurdistan_bot?start='+q;var T={fa:['📨 فرستادن لیست به ربات',' (فقط ',' نماد اول)'],ckb:['📨 ناردنی لیست بۆ بۆت',' (تەنها ',' هێمای یەکەم)'],en:['📨 Send my list to the bot',' (first ',' only)']}[document.documentElement.lang]||['📨 فرستادن لیست به ربات',' (فقط ',' نماد اول)'];l.textContent=T[0]+(n<a.length?T[1]+n+T[2]:'')}w();d()});")
 
 
 def page(path, title, desc, body, extra_head="", lang="fa"):
