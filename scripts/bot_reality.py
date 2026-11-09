@@ -413,6 +413,7 @@ TOOLS = [
     ("noise", {"fa": "حد ضرر در برابر نوسان عادی", "ckb": "ستۆپ بەرامبەر جووڵەی ئاسایی", "en": "Stop vs normal volatility"}),
     ("mcap", {"fa": "واقعیت‌سنجی قیمت هدف (مارکت‌کپ)", "ckb": "پشکنینی ڕاستیی نرخی ئامانج", "en": "Target-price reality check (market cap)"}),
     ("slip", {"fa": "لغزش سفارش مارکت (عمق دفتر)", "ckb": "خزانی فەرمانی مارکێت (قووڵیی دەفتەر)", "en": "Market-order slippage (book depth)"}),
+    ("peg", {"fa": "پایداری استیبل‌کوین‌ها (پگ)", "ckb": "جێگیریی ستەیبڵکۆینەکان (پێگ)", "en": "Stablecoin peg check"}),
     ("liq", {"fa": "قیمت لیکویید شدن فیوچرز", "ckb": "نرخی لیکویدبوونی فیوچەرز", "en": "Futures liquidation price"}),
     ("recovery", {"fa": "سود لازم برای جبران ضرر", "ckb": "قازانجی پێویست بۆ قەرەبووی زیان", "en": "Gain needed to recover a loss"}),
     ("streaks", {"fa": "شبیه‌ساز زنجیرهٔ ضرر و افت سرمایه", "ckb": "هاوشێوەکەری زنجیرەی زیان و دابەزین", "en": "Losing-streak & drawdown simulator"}),
