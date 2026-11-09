@@ -8,9 +8,10 @@ from io import BytesIO
 BLOCKED = (
     0x002A3B3F27370304,   # iamUSD logo (@iamusd)
     0x967071F1E4C4F033,   # NewsCity red cube (@newscitypro)
+    0xF0F4F0E864E8F8E0,   # SiliconBrain blue brain logo (@silicon_brain)
 )
 # channels whose every picture (and every linked page's preview) is their own advert: always draw our own card
-ART_ONLY = {"newscitypro", "iamusd"}
+ART_ONLY = {"newscitypro", "iamusd", "silicon_brain", "mrartificialintelligence"}
 
 
 def dhash(data, n=8):
