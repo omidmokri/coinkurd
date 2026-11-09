@@ -131,6 +131,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Address & network check before sending (/tools/#addr; new need, Backlog had nothing open)
+- **Need:** Iranian/Kurdish traders move USDT between exchanges and wallets daily; a mistyped address or the wrong network
+  (TRC20 vs BEP20/ERC20) loses the money for good, and nothing on the site checked it. #5 still waits (bear days 8/85).
+  Confirmed last run's work: committed events.json has `reaction_stats._all` (n 10, 5 wider, p 1.0).
+- **Built:** `/tools/` card (fa/ckb/en): paste an address → network (Tron / Ethereum-style, stating it cannot tell ERC20 from
+  BEP20 / Bitcoin / Solana) with real checksum checks (Tron & BTC base58check via SubtleCrypto SHA-256, bech32/bech32m for
+  bc1), first/last 6 characters to compare, EIP-55 mixed-case note (not verified — stated). Runs only in the browser.
+  Bot: added to `bot_reality.TOOLS`.
+- **Verified:** node tests on 13 known addresses (USDT-TRC20 contract, USDT-ERC20, genesis 1A1z…, 3J98…, bc1q…, bc1p…,
+  USDC mint on Solana valid; one-char changes, short 0x, junk, empty rejected) → 0 fails. Playwright + Chrome 1280 fa /
+  390 fa+en+ckb, overflow 0, zero JS errors, looked at shots (fixed monospace wrapping of the network line). py_compile.
+- **Next:** #5 when ≥30 bearish days; otherwise a fresh trader need.
 ### 2026-11-09 · Baseline + significance test for "BTC reaction to economic events" (home calendar + bot; new need)
 - **Need:** the home calendar showed "avg 4h range after this event type" (n=1–2) with no baseline, implying that CPI/NFP
   etc. move BTC more — an untested claim, against the guardrails. Traders plan around these releases. #5 still waits (bear 8/85).

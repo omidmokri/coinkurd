@@ -417,6 +417,7 @@ TOOLS = [
     ("compare", {"fa": "مقایسهٔ بازده کوین‌ها", "ckb": "بەراوردی گەڕانەوەی دراوەکان", "en": "Compare coin returns"}),
     ("whatif", {"fa": "اگر آن روز خریده بودم", "ckb": "ئەگەر ئەو ڕۆژە کڕیبام", "en": "What if I had bought"}),
     ("sessions", {"fa": "ساعت بازارهای جهانی و فاندینگ", "ckb": "کاتژمێری بازاڕە جیهانییەکان و فاندینگ", "en": "World market hours & funding"}),
+    ("addr", {"fa": "بررسی آدرس و شبکه قبل از ارسال", "ckb": "پشکنینی ناونیشان و تۆڕ پێش ناردن", "en": "Check address & network before sending"}),
     ("fx", {"fa": "تبدیل ارز", "ckb": "گۆڕینی دراو", "en": "Currency converter"}),
 ]
 TOOLS_T = {"fa": "ماشین‌حساب‌های معامله‌گر", "ckb": "ژمێرەرەکانی بازرگان", "en": "Trader calculators"}
