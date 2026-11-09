@@ -14,7 +14,7 @@ import json
 import os
 import re
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = os.path.join(ROOT, "data")
@@ -81,6 +81,10 @@ def entities(p):
 def shingles(t):
     w = t.split()
     return {" ".join(w[i:i + 3]) for i in range(max(1, len(w) - 2))} if w else set()
+
+
+FEED_DAYS = 7      # how much of the archive the home page opens with
+FEED_MIN = 40      # ...but never a nearly empty page
 
 
 def main():
@@ -172,6 +176,14 @@ def main():
             x["tr"] = tr
         lite.append(x)
     json.dump(lite, open(os.path.join(D, "posts_lite.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    # The home page opens with one week, so it can paint before the whole archive arrives.
+    # A quiet week would leave the page nearly empty, so never fewer than FEED_MIN posts.
+    cut_day = (datetime.now(timezone.utc) - timedelta(days=FEED_DAYS)).strftime("%Y-%m-%d")
+    week = [x for x in lite if (x.get("date") or "") >= cut_day]
+    if len(week) < FEED_MIN:
+        week = sorted(lite, key=lambda x: x.get("date") or "", reverse=True)[:FEED_MIN]
+    json.dump(week, open(os.path.join(D, "posts_week.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    print(f"posts_week.json: {len(week)} of {len(lite)} posts")
     print(f"enriched {len(posts)} posts at {datetime.now(timezone.utc):%H:%M} | " + ", ".join(f"{k}: {v}" for k, v in sorted(stats.items())))
 
 
