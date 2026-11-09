@@ -40,6 +40,7 @@ jobs:
           python scripts/build_map.py
           python scripts/build_kids.py
           python scripts/build_quant.py
+          python scripts/build_strategy_lab.py
       - name: Cache the read-aloud voices
         id: ttscache
         uses: actions/cache@v4
