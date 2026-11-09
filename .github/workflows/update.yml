@@ -401,6 +401,10 @@ jobs:
         continue-on-error: true
         run: python scripts/build_map.py
 
+      - name: Make the WebP copies of new pictures
+        continue-on-error: true
+        run: python -I scripts/webp.py
+
       - name: Rebuild the markets library (data/library.json)
         continue-on-error: true
         run: python -I scripts/libdata/build.py

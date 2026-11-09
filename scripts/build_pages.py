@@ -753,7 +753,7 @@ def prerender():
         '<div class="ibox wide" id="newsBox"></div>': f'<div class="ibox wide" id="newsBox">{it.get("news","")}</div>',
         '<div class="ibox wide" id="impBox"></div>': f'<div class="ibox wide" id="impBox">{it["imp"]}</div>',
         '<div class="hall" id="hallGrid"></div>': '<div class="hall" id="hallGrid">' + "".join(
-            f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic ic3"><img class="eki ek3 eki-l a3-{c["id"]}" src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="150" height="150"></span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
+            f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic ic3"><picture><source srcset="/assets/ic3d/{c["id"]}.webp?v=2" type="image/webp"><img class="eki ek3 eki-l a3-{c["id"]}" src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="150" height="150"></picture></span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
             for c in meta.get("categories", []) if meta.get("by_category", {}).get(c["id"])) + "</div>",
         '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in good[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
     }
@@ -771,7 +771,7 @@ def prerender():
         ps = [p for p in posts if p["category"] == c["id"]]
         if not ps:
             continue
-        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1><img src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="56" height="56" style="vertical-align:-14px;margin-inline-end:10px;object-fit:contain">{e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
+        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1><picture><source srcset="/assets/ic3d/{c["id"]}.webp?v=2" type="image/webp"><img src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="56" height="56" style="vertical-align:-14px;margin-inline-end:10px;object-fit:contain"></picture>{e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
         urls.append(page(f"categories/{c['id']}/", CAT_H1.get(c["id"], c["name"]["fa"]) + " — آرشیو " + c["name"]["fa"],
                          (CAT_INTRO.get(c["id"]) or f'آرشیو مطالب دستهٔ {c["name"]["fa"]}')[:155], body))
     urls.append(build_replay())
@@ -951,7 +951,9 @@ def build_feeds():
         # are not fetched until the reader asks for them
         cards.append(f'<article class="txt dsr{"" if n < lim else " more"}"{"" if n < lim else " hidden"} '
                      'style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
-                     + (f'<img class="img" src="{e(img)}" alt="" loading="lazy">' if img.startswith("/data/deepimg/") else "")
+                     + (f'<picture><source srcset="{e(img[:-4])}.webp" type="image/webp">'
+                        f'<img class="img" src="{e(img)}" alt="" loading="lazy" decoding="async"></picture>'
+                        if img.startswith("/data/deepimg/") and img.endswith(".jpg") else "")
                      + f'<small class="note">{fmt_date(it.get("at", ""))}</small><div lang="fa" dir="rtl">{body}</div></article>')
     vt, vd = "پرونده‌های تحلیلی", "تحلیل عمیق مهم‌ترین رویدادهای روز کریپتو از دل گزارش معتبرترین رسانه‌های جهان، به پارسی"
     urls.append(page("dossier/", vt, vd, f'<div class="meta"><a href="/">خانه</a> / {vt}</div><h1>{vt}</h1><p class="note">{vd}</p>'
