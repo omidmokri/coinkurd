@@ -448,7 +448,17 @@ def sec_regime(lang):
     if not now:
         return _nodata("🧭 " + _q("rg.title", lg), lg, "/regime/")
     pr = now.get("probs") or {}
-    lines = [f"• <b>{_q(now['top'], lg)}</b> — {_q('rg.conf', lg)} {_n(100 * now['confidence'], lg, 1, pct=True)}",
+    rn = ((d.get("rule") or {}).get("now")) or {}
+    lines = []
+    if rn.get("label"):
+        lines += [f"📐 <b>{_q('rr.title', lg)}</b>", f"• <b>{_q(rn['label'], lg)}</b> — {_q('rr.score', lg)} {_n(rn.get('score'), lg, 2, sign=bool(rn.get('score')))}"]
+        pe = rn.get("pending") or {}
+        if pe.get("to"):
+            lines.append("• ⏳ " + _q("rr.pend", lg, to=_q(pe["to"], lg), d=_n(pe["days"], lg), n=_n(pe["need"], lg)))
+        lines += [f"  {_q('rr.' + x['k'], lg)}: {'—' if x['v'] is None else _n(x['v'], lg, 3 if x['k'] == 'mayer' else 1)}"
+                  f" ({'+1' if x['vote'] == 1 else '−1' if x['vote'] == -1 else '0' if x['vote'] == 0 else '—'})" for x in rn.get("dims") or []]
+        lines += ["", f"🎲 <b>{_q('rf.hmm', lg)}</b>"]
+    lines += [f"• <b>{_q(now['top'], lg)}</b> — {_q('rg.conf', lg)} {_n(100 * now['confidence'], lg, 1, pct=True)}",
              f"• {_q('rg.switch', lg)}: {_n(100 * now['switch_risk'], lg, 1, pct=True)}",
              f"• {_n(now.get('days_in'), lg)} {_q('rg.days', lg)}", ""]
     for k in ("bull", "bear", "sideways", "high_vol"):

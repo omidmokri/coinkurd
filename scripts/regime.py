@@ -29,8 +29,9 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reality_common as R  # noqa: E402
+import regime_rules as RR  # noqa: E402
 
-VERSION = 2          # bump to force a refit when the model or the naming changes
+VERSION = 3          # bump to force a refit when the model or the naming changes
 COIN = "BTC"
 K = 4
 LABELS = ["bull", "bear", "sideways", "high_vol"]
@@ -194,6 +195,70 @@ def by_label(probs, names):
     return out
 
 
+def fng_history():
+    """{date: Fear & Greed} — full history from alternative.me, else the strategy-lab copy"""
+    try:
+        j = R.http_json("https://api.alternative.me/fng/", {"limit": 0, "format": "json"})
+        out = {R.day(R.from_ms(int(x["timestamp"]) * 1000)): int(x["value"]) for x in j.get("data") or []}
+        if out:
+            return out
+    except Exception as ex:  # noqa: BLE001
+        print("regime: fng history failed:", ex)
+    lc = R.load("lab_context.json", {})
+    if lc.get("fng"):
+        d0 = datetime.strptime(lc["from"], "%Y-%m-%d")
+        return {(d0 + timedelta(days=i)).strftime("%Y-%m-%d"): v for i, v in enumerate(lc["fng"]) if v is not None}
+    return {}
+
+
+def rule_layer(dates, closes, idx, _labels, summ, fwd, od, tops):
+    try:
+        st = (R.load("silent_exit_store.json", {}).get("daily") or {}).get("BTC") or {}
+        fund = {d: v["f"] for d, v in st.items() if v.get("f") is not None}
+        _, raw, conf, rows = RR.compute(dates, closes, fng_history(), fund)
+    except Exception as ex:  # noqa: BLE001
+        print("regime: rule layer failed:", ex)
+        return None
+    i = len(dates) - 1
+    r = rows[i]
+    if not r:
+        return None
+    pend_lab, pend_n = r["pending"]
+    dims = [{"k": k, "v": None if v is None else round(v, 4), "vote": r["votes"][k], "th": RR.TH[k]} for k, v in r["dims"].items()]
+    daily = {dates[j]: LABELS.index(conf[j]) for j in range(len(dates)) if conf[j]}
+    rawd = {dates[j]: raw[j] for j in range(len(dates)) if raw[j]}
+    oos = [d for d in sorted(daily) if d >= f"{OOS_FROM}-01-01"]
+    groups = {lb: [] for lb in LABELS}
+    allv = []
+    for d in oos:
+        f = fwd(idx[d])
+        if f:
+            groups[LABELS[daily[d]]].append(f)
+            allv.append(f)
+    ev = {lb: summ(groups[lb]) for lb in LABELS}
+    ev["all"] = summ(allv)
+    ch = [{"d": oos[j], "from": LABELS[daily[oos[j - 1]]], "to": LABELS[daily[oos[j]]]}
+          for j in range(1, len(oos)) if daily[oos[j]] != daily[oos[j - 1]]]
+    run = 1
+    for j in range(len(oos) - 1, 0, -1):
+        if daily[oos[j - 1]] != daily[oos[-1]]:
+            break
+        run += 1
+    hmm_daily = {d: t for d, t in zip(od, tops)}
+    return {
+        "confirm_days": RR.CONFIRM,
+        "now": {"date": dates[i], "label": conf[i], "raw": raw[i], "score": round(r["score"], 3),
+                "vol_pct": None if r["vpct"] is None else round(r["vpct"], 3), "dims": dims, "days_in": run,
+                "pending": {"to": pend_lab, "days": pend_n, "need": RR.CONFIRM} if pend_lab else None},
+        "daily": daily,
+        "history": [{"d": d, "l": daily[d], "h": LABELS.index(hmm_daily[d]) if d in hmm_daily else None} for d in oos[-420:]],
+        "changes": ch[-30:],
+        "flips": {"rule": RR.flips_per_year({d: daily[d] for d in oos}), "raw": RR.flips_per_year({d: rawd[d] for d in oos if d in rawd}),
+                  "hmm": RR.flips_per_year(hmm_daily)},
+        "eval": ev,
+    }
+
+
 # ------------------------------------------------------------------ main
 def main():
     prev = R.load("regime.json", {})
@@ -276,6 +341,9 @@ def main():
     evaluation["all"] = summ(allv)
     # overlapping 30-day windows: effective sample is about n/30 per regime, said on the page
 
+    # ---- explainable rule-based layer with hysteresis (regime_rules.py)
+    rule = rule_layer(dates, closes, idx, groups.keys(), summ, fwd, od, tops)
+
     out = {
         "version": VERSION, "updated_at": R.iso(datetime.now(timezone.utc)), "coin": COIN,
         "model": {"kind": "gaussian_hmm_diag", "K": K, "features": ["r1", "log_vol10", "mom20"], "fit_days": len(X),
@@ -291,8 +359,12 @@ def main():
         "eval": evaluation,
         # daily closes (from the first feature day, consecutive) so other scripts can build baselines
         "px": {"from": dates[0], "c": [round(x, 2) for x in closes]},
+        "rule": rule,
     }
     R.save("regime.json", out)
+    if rule:
+        print(f"regime rules: {rule['now']['label']} (raw {rule['now']['raw']}, score {rule['now']['score']}), "
+              f"switches/yr rules {rule['flips']['rule']} raw {rule['flips']['raw']} hmm {rule['flips']['hmm']}")
     print(f"regime: {last_day} top={top} {p_now[top]:.2f} switch={switch:.2f} days_in={run} "
           f"eval={{{', '.join(f'{k}:{v.get(chr(110))}' for k, v in evaluation.items())}}}")
 
