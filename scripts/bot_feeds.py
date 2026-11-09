@@ -392,16 +392,20 @@ def picture(it, lang="fa"):
 EDIT_MEDIA = [None]          # set by start(): fn(chat_id, message_id, jpeg_bytes, caption) -> telegram result
 
 
+ART_FIX = 2          # bump whenever ART_ONLY or BLOCKED grows, so posts already in the group are fixed too
+
+
 def art_fix(s, f, topics, group_id, send_fn, delete_fn):
-    """once: every group post made from an advert-only channel, or with a flagged advert picture, gets our own card
-    (edited in place; a text-only message is sent again with the card and the old one removed)"""
-    if f.get("art_fix_v1") or not group_id:
+    """every group post made from an advert-only channel, or with a flagged advert picture, gets our own card
+    (edited in place; a text-only message is sent again with the card and the old one removed).
+    Runs once per ART_FIX version: raising that constant re-checks posts against the newly blocked pictures."""
+    if f.get("art_fix_n", 1 if f.get("art_fix_v1") else 0) >= ART_FIX or not group_id:
         return False
     done = 0
     for kind in KIND_ORDER:
         for it in f["items"].get(kind, []):
             if not it.get("msgs") or it.get("art_fixed"):
-                continue
+                continue          # already shows our own card, whatever the version
             bad = _source(it["id"]) in ART_ONLY
             if not bad and it.get("photo"):
                 try:
@@ -437,7 +441,8 @@ def art_fix(s, f, topics, group_id, send_fn, delete_fn):
             it["photo"] = None
             done += 1
     f["art_fix_v1"] = datetime.now(timezone.utc).isoformat()
-    log.info("art fix: %d group posts got our own picture", done)
+    f["art_fix_n"] = ART_FIX
+    log.info("art fix v%d: %d group posts got our own picture", ART_FIX, done)
     return True
 
 
