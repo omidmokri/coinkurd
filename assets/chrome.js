@@ -1,5 +1,25 @@
 /* entekhab.net — site chrome runtime (no dependencies).
    Language labels for header/footer, mega menus, mobile "all sections" sheet, search, active links, app prompts. */
+/* Broken images: an image whose source is gone (expired news CDN, missing archive file) is hidden instead of
+   showing a broken icon; if it was the only thing inside a link/figure "thumb" wrapper, the wrapper is hidden too.
+   Capture-phase listener catches lazy images that fail later; the scan catches ones that failed before this ran. */
+(function () {
+  function gone(im) {
+    if (!im || im.tagName !== 'IMG' || im.dataset.ekBroken) return;
+    im.dataset.ekBroken = '1';
+    im.style.display = 'none';
+    var p = im.parentElement;
+    if (p && p !== document.body && p.children.length === 1 && !(p.textContent || '').trim() &&
+        /(^|\s)(img|thumb|pic|photo|media|cover)\b|FIGURE|PICTURE/i.test((p.className || '') + ' ' + p.tagName)) p.style.display = 'none';
+  }
+  window.__ekImgGone = gone;
+  document.addEventListener('error', function (ev) { gone(ev.target); }, true);
+  function scan() {
+    var a = document.images;
+    for (var i = 0; i < a.length; i++) { var im = a[i]; if (im.complete && im.getAttribute('src') && im.naturalWidth === 0) gone(im); }
+  }
+  scan(); window.addEventListener('load', scan);
+})();
 (function () {
   'use strict';
   var d = document, de = d.documentElement, H = d.getElementById('ekh'), F = d.getElementById('ekf'), B = d.getElementById('ekb');
