@@ -17,6 +17,7 @@ import reality_common as R  # noqa: E402
 e, L, nf, fdate = BP.e, R.L, BR.nf, BR.fdate
 sec, table, tri, finish, write, slot, badge, pts = BR.sec, BR.table, BR.tri, BR.finish, BR.write, BR.slot, BR.badge, BR.pts
 
+LABELS = ["bull", "bear", "sideways", "high_vol"]
 RC = {"bull": "#22c55e", "bear": "#ef4444", "sideways": "#eab308", "high_vol": "#a855f7"}
 LEVEL = {"bull": "green", "bear": "red", "sideways": "yellow", "high_vol": "orange"}
 
@@ -40,6 +41,32 @@ T = {
     "rg.conf": L("اطمینان مدل", "دڵنیایی مۆدێل", "Model confidence"),
     "rg.switch": L("احتمال تغییر رژیم تا فردا", "ئەگەری گۆڕانی دۆخ تا سبەی", "Chance of a switch by tomorrow"),
     "rg.days": L("روز در همین رژیم (تاریخچهٔ برون‌نمونه)", "ڕۆژ لەم دۆخەدا (مێژووی دەرەوەی نموونە)", "days in this regime (out-of-sample history)"),
+    "rr.title": L("رژیم قاعده‌محور و قابل توضیح (با تأیید چندروزه)", "دۆخی یاسایی و ڕوونکراوە (بە پشتڕاستکردنەوەی چەند ڕۆژە)", "Explainable rule-based regime (multi-day confirmation)"),
+    "rr.lead": L("پنج سنجهٔ شفاف با آستانه‌های ثابت رأی می‌دهند. برچسب منتشرشده فقط وقتی عوض می‌شود که رأی تازه {n} روز پشت‌سرهم تکرار شود؛ این جلوی پرش‌های بی‌دلیل را می‌گیرد.",
+                 "پێنج پێوەری ڕوون بە سنووری جێگیر دەنگ دەدەن. ناوی بڵاوکراوە تەنها کاتێک دەگۆڕێت کە دەنگی نوێ {n} ڕۆژ لە دوای یەک دووبارە ببێتەوە.",
+                 "Five transparent measures vote with fixed thresholds. The published label only changes once a new reading repeats for {n} days in a row, which stops pointless flip-flopping."),
+    "rr.score": L("امتیاز (−۱ تا +۱)", "خاڵ (−١ تا +١)", "Score (−1 to +1)"),
+    "rr.raw": L("خوانش امروز (پیش از تأیید)", "خوێندنەوەی ئەمڕۆ (پێش پشتڕاستکردنەوە)", "Today's reading (before confirmation)"),
+    "rr.pend": L("در انتظار تأیید: {to} — {d} از {n} روز", "چاوەڕێی پشتڕاستکردنەوە: {to} — {d} لە {n} ڕۆژ", "Awaiting confirmation: {to} — {d} of {n} days"),
+    "rr.th": L("سنجه|مقدار امروز|آستانهٔ صعودی|آستانهٔ نزولی|رأی", "پێوەر|بەهای ئەمڕۆ|سنووری بەرزبوونەوە|سنووری دابەزین|دەنگ", "Measure|Today|Bullish above|Bearish below|Vote"),
+    "rr.mayer": L("ضریب مایر (قیمت ÷ میانگین ۲۰۰ روزه)", "هۆکاری مەیەر (نرخ ÷ ناوەندی ٢٠٠ ڕۆژ)", "Mayer multiple (price ÷ 200-day SMA)"),
+    "rr.slope": L("شیب میانگین ۲۰۰ روزه در ۲۰ روز (٪)", "لێژیی ناوەندی ٢٠٠ ڕۆژ لە ٢٠ ڕۆژدا (٪)", "200-day SMA slope over 20 days (%)"),
+    "rr.wrsi": L("RSI هفتگی (۱۴)", "RSI هەفتانە (١٤)", "Weekly RSI (14)"),
+    "rr.fng": L("شاخص ترس و طمع", "پێوەری ترس و تەماح", "Fear & Greed index"),
+    "rr.fund": L("z فاندینگ نسبت به ۳۰ روز قبل", "z ی فاندینگ بەراورد بە ٣٠ ڕۆژی پێشوو", "Funding z-score vs previous 30 days"),
+    "rr.vol": L("نوسان ۲۰ روزه در صدک {p} سال اخیر است؛ وقتی امتیاز قاطع نباشد و نوسان بالای صدک ۸۰ باشد، برچسب «پرنوسانِ بی‌جهت» است.",
+                "هەڵاوسانی ٢٠ ڕۆژە لە سەدیکی {p}ی ساڵی ڕابردوودایە؛ کاتێک خاڵ یەکلاکەرەوە نەبێت و هەڵاوسان سەرووی سەدیکی ٨٠ بێت، ناوەکە «هەڵاوسانی بێ ئاڕاستە»یە.",
+                "20-day volatility sits at the {p} percentile of the past year; when the score is not decisive and volatility is above the 80th percentile the label is 'volatile, no trend'."),
+    "rr.stab": L("پایداری: تعداد تغییر رژیم در سال (از ۲۰۱۹)", "سەقامگیری: ژمارەی گۆڕانی دۆخ لە ساڵێکدا (لە ٢٠١٩ەوە)", "Stability: regime switches per year (since 2019)"),
+    "rr.f_rule": L("قاعده‌محور با تأیید", "یاسایی بە پشتڕاستکردنەوە", "Rules, confirmed"),
+    "rr.f_raw": L("قاعده‌محور بدون تأیید", "یاسایی بێ پشتڕاستکردنەوە", "Rules, unconfirmed"),
+    "rr.f_hmm": L("مدل احتمالی (مارکوف)", "مۆدێلی ئەگەری (مارکۆڤ)", "Probabilistic model (HMM)"),
+    "rr.strip": L("۱۴ ماه اخیر: ردیف بالا قاعده‌محور، ردیف پایین مدل احتمالی", "١٤ مانگی ڕابردوو: ڕیزی سەرەوە یاسایی، ڕیزی خوارەوە مۆدێلی ئەگەری",
+                  "Last 14 months: top row rules, bottom row probabilistic model"),
+    "rr.eval": L("بعد از هر برچسب قاعده‌محور چه شد؟ (۳۰ روز بعد، از ۲۰۱۹)", "دوای هەر ناوێکی یاسایی چی ڕوویدا؟ (٣٠ ڕۆژ دواتر، لە ٢٠١٩ەوە)",
+                 "What followed each rule-based label? (next 30 days, since 2019)"),
+    "rf.hmm": L("مدل احتمالی (مارکوف پنهان)", "مۆدێلی ئەگەری (مارکۆڤی شاراوە)", "Probabilistic model (hidden Markov)"),
+    "rr.na": L("داده ندارد", "داتا نییە", "no data"),
     "rg.next": L("احتمال‌های فردا", "ئەگەرەکانی سبەی", "Tomorrow's probabilities"),
     "rg.hist": L("احتمال هر رژیم در ۱۴ ماه گذشته (برون‌نمونه)", "ئەگەری هەر دۆخێک لە ١٤ مانگی ڕابردوودا (دەرەوەی نموونە)",
                  "Probability of each regime over the last 14 months (out-of-sample)"),
@@ -138,6 +165,7 @@ METH = {
         "فقط کندل‌های روزانهٔ بسته‌شده؛ احتمال هر روز فقط از داده‌های همان روز و قبل از آن ساخته می‌شود (فیلتر رو به جلو، بدون نگاه به آینده).",
         "تاریخچه برون‌نمونه است: برای هر سال از ۲۰۱۹ به بعد، مدل فقط روی روزهای قبل از آن سال آموزش دیده و سپس روی آن سال اجرا شده است.",
         "احتمال‌های مدل‌های مارکوف معمولاً بیش از حد مطمئن‌اند (نزدیک ۰ یا ۱۰۰٪)؛ «احتمال تغییر» و جدول ارزیابی را جدی‌تر از عدد اطمینان بگیرید.",
+        "لایهٔ قاعده‌محور هیچ پارامتری از داده یاد نمی‌گیرد: آستانه‌ها ثابت و منتشرشده‌اند، هر روز فقط از داده‌های همان روز و قبل استفاده می‌کند، و برچسب فقط پس از ۵ روز تأیید پشت‌سرهم عوض می‌شود. فاندینگ فقط برای ماه‌های اخیر موجود است.",
         "رژیم توصیف وضعیت است، نه پیش‌بینی قیمت. این صفحه توصیهٔ مالی نیست."],
         [
         "مۆدێل: زنجیرەی مارکۆڤی شاراوەی گاوسی بە ٤ دۆخ، لەسەر سێ تایبەتمەندیی ڕۆژانەی بیتکۆین (قازانجی ڕۆژ، لۆگاریتمی هەڵاوسانی ١٠ ڕۆژە، قازانجی ٢٠ ڕۆژە). تەواو بە پایتۆنی سادە نووسراوە.",
@@ -145,6 +173,7 @@ METH = {
         "تەنها مۆمی ڕۆژانەی داخراو؛ ئەگەری هەر ڕۆژێک تەنها لە داتای ئەو ڕۆژە و پێشتر دروست دەکرێت.",
         "مێژووەکە دەرەوەی نموونەیە: بۆ هەر ساڵێک لە ٢٠١٩ بەدواوە، مۆدێل تەنها لەسەر ڕۆژەکانی پێش ئەو ساڵە ڕاهێنراوە.",
         "ئەگەرەکانی مۆدێلی مارکۆڤ زۆرجار زیادە دڵنیان؛ «ئەگەری گۆڕان» و خشتەی هەڵسەنگاندن گرنگترن.",
+        "چینی یاسایی هیچ پارامەتەرێک لە داتا فێر نابێت: سنوورەکان جێگیر و بڵاوکراون، و ناوەکە تەنها دوای ٥ ڕۆژ پشتڕاستکردنەوەی لە دوای یەک دەگۆڕێت.",
         "دۆخ وەسفی بارودۆخە، نەک پێشبینیی نرخ. ئامۆژگاریی دارایی نییە."],
         [
         "Model: a 4-state Gaussian hidden Markov model on three daily Bitcoin features (day return, log 10-day volatility, 20-day return), standardised on the training window. Written in plain Python.",
@@ -152,6 +181,7 @@ METH = {
         "Closed daily candles only; each day's probability uses that day and earlier only (forward filtering, no look-ahead).",
         "The history is out-of-sample: for each year from 2019 the model was trained only on the days before that year, then run through it.",
         "Hidden-Markov probabilities tend to be over-confident (near 0 or 100%); weigh the switch risk and the evaluation table more than the confidence number.",
+        "The rule-based layer learns nothing from the data: thresholds are fixed and published, each day uses that day and earlier only, and the label changes only after 5 confirming days in a row. Funding exists only for recent months.",
         "A regime describes the present, it does not forecast price. Not financial advice."]),
     "truth": L([
         "نتیجهٔ هر یافته پس از کسر هزینهٔ رفت‌وبرگشت محاسبه می‌شود.",
@@ -245,6 +275,63 @@ def cls(x):
     return "up" if (x or 0) > 0 else "down" if (x or 0) < 0 else "mut"
 
 
+def rule_html(g, lg):
+    rl = g.get("rule") or {}
+    rn = rl.get("now") or {}
+    if not rn:
+        return ""
+    n = rl.get("confirm_days", 5)
+    lab = rn["label"]
+    h = (f"<div class='rc-card'><p class='mut'>{fdate(rn['date'], lg)}</p><p><span class='rc-big' style='color:{RC[lab]}'>{e(t(lab, lg))}</span></p>"
+         f"<p>{t('rr.score', lg)}: <b class='rc-num {cls(rn['score'])}'>{nf(rn['score'], lg, 2, rn['score'] != 0)}</b> · {t('rr.raw', lg)}: <b style='color:{RC[rn['raw']]}'>{e(t(rn['raw'], lg))}</b></p>")
+    pe = rn.get("pending")
+    if pe and pe.get("to"):
+        h += f"<p class='note'>⏳ {t('rr.pend', lg, to=e(t(pe['to'], lg)), d=nf(pe['days'], lg), n=nf(pe['need'], lg))}</p>"
+    h += "</div>"
+    rows = []
+    for d in rn.get("dims") or []:
+        v, vote, th = d["v"], d["vote"], d["th"]
+        dec = 3 if d["k"] == "mayer" else 1 if d["k"] in ("slope", "wrsi", "fund") else 0
+        vtxt = "—" if vote is None else (f"<b class='up'>{nf(1, lg, 0, True)}</b>" if vote > 0 else f"<b class='down'>{nf(-1, lg)}</b>" if vote < 0 else f"<span class='mut'>{nf(0, lg)}</span>")
+        rows.append(f"<tr><td class='wrap'>{e(t('rr.' + d['k'], lg))}</td><td>{'<span class=mut>' + t('rr.na', lg) + '</span>' if v is None else '<span class=rc-num>' + nf(v, lg, dec) + '</span>'}</td>"
+                    f"<td><span class='rc-num'>{nf(th[0], lg, 2 if d['k'] == 'mayer' else 0)}</span></td><td><span class='rc-num'>{nf(th[1], lg, 2 if d['k'] == 'mayer' else 0)}</span></td><td>{vtxt}</td></tr>")
+    h += table(cols("rr.th", lg), rows)
+    if rn.get("vol_pct") is not None:
+        h += f"<p class='note'>{t('rr.vol', lg, p=nf(100 * rn['vol_pct'], lg, 0))}</p>"
+    fl = rl.get("flips") or {}
+    if fl:
+        h += f"<h3>{t('rr.stab', lg)}</h3><div class='rc-kpis'>" + "".join(
+            f"<div class='rc-kpi'><small>{t(k, lg)}</small><b>{nf(fl.get(v), lg, 1)}</b></div>" for k, v in (("rr.f_rule", "rule"), ("rr.f_raw", "raw"), ("rr.f_hmm", "hmm"))) + "</div>"
+    hist = rl.get("history") or []
+    if len(hist) > 30:
+        W, H = 840, 46
+        bw = W / len(hist)
+        rects = []
+        for i, x in enumerate(hist):
+            rects.append(f"<rect x='{i * bw:.2f}' y='0' width='{bw + .3:.2f}' height='20' fill='{RC[LABELS[x['l']]]}'/>")
+            if x.get("h") is not None:
+                rects.append(f"<rect x='{i * bw:.2f}' y='26' width='{bw + .3:.2f}' height='20' fill='{RC[LABELS[x['h']]]}'/>")
+        leg = "".join(f"<span><i style='background:{RC[k]}'></i>{e(t(k, lg))}</span>" for k in RC)
+        # time runs left to right in every language (like the charts); dates sit inside the picture so page direction cannot swap them
+        h += (f"<h3>{t('rr.strip', lg)}</h3><div class='rc-legend'>{leg}</div><svg viewBox='0 0 {W} {H + 20}' "
+              f"style='width:100%;direction:ltr;border-radius:8px' role='img'>{''.join(rects)}"
+              f"<text x='90' y='{H + 16}' fill='#9a9a94' font-size='13' text-anchor='middle'>{fdate(hist[0]['d'], lg)}</text>"
+              f"<text x='{W - 90}' y='{H + 16}' fill='#9a9a94' font-size='13' text-anchor='middle'>{fdate(hist[-1]['d'], lg)}</text></svg>")
+    ev = rl.get("eval") or {}
+    if ev:
+        rows = []
+        for k in list(RC) + ["all"]:
+            x = ev.get(k) or {}
+            name = badge(LEVEL[k], t(k, lg)) if k in RC else f"<b>{t('rg.all', lg)}</b>"
+            if not x.get("n"):
+                rows.append(f"<tr><td>{name}</td><td>{nf(0, lg)}</td><td colspan='4' class='mut'>—</td></tr>")
+                continue
+            rows.append(f"<tr><td>{name}</td><td>{nf(x['n'], lg)}</td><td class='{cls(x['fwd30_mean'])}'>{pct(x['fwd30_mean'], lg, 2, True)}</td>"
+                        f"<td>{pct(x['fwd30_median'], lg, 2, True)}</td><td>{pct(x['fwd30_up'], lg, 1)}</td><td>{pct(x['fwd30_vol'], lg, 1)}</td></tr>")
+        h += f"<h3>{t('rr.eval', lg)}</h3>" + table(cols("rg.ev_th", lg), rows) + f"<p class='note'>{t('rg.ovl', lg)}</p>"
+    return sec(t("rr.title", lg), h, "rules", lead=e(t("rr.lead", lg, n=nf(n, lg))))
+
+
 # ================================================================== /regime/
 def build_regime():
     g = R.load("regime.json", {})
@@ -267,6 +354,7 @@ def build_regime():
               f"<div class='rc-kpi'><small>{t('rg.switch', lg)}</small><b>{pct(100 * now['switch_risk'], lg, 1)}</b></div>"
               f"<div class='rc-kpi'><small>{t('rg.days', lg)}</small><b>{nf(now.get('days_in'), lg)}</b></div></div>")
         nx = now.get("next") or {}
+        h += rule_html(g, lg)
         h += sec(t("rg.next", lg), " ".join(f"<span class='rc-pill'><b style='color:{RC[k]}'>{e(t(k, lg))}</b> {pct(100 * nx.get(k, 0), lg, 1)}</span>" for k in RC))
         if len(hist) > 20:
             leg = "".join(f"<span><i style='background:{RC[k]}'></i>{e(t(k, lg))}</span>" for k in RC)

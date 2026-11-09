@@ -166,6 +166,12 @@ def main():
            "gainers": facts["top_gainers"], "losers": facts["top_losers"],
            "report": prev.get("report"), "report_at": prev.get("report_at"), "report_engine": prev.get("report_engine"),
            "report_facts": prev.get("report_facts")}
+    # the daily BTC regime radar (regime.py): explainable rules with 5-day confirmation, and the probabilistic model
+    rg = load("regime.json", {})
+    rr = ((rg.get("rule") or {}).get("now")) or {}
+    if rr.get("label"):
+        out["radar"] = {"rule": rr["label"], "score": rr.get("score"), "pending": (rr.get("pending") or {}).get("to"),
+                        "hmm": (rg.get("now") or {}).get("top"), "date": rr.get("date")}
     stamps = [prev.get("report_at")] + [x.get("at") for x in load("brain_log.json", [])[-3:]]
     stamps = [datetime.fromisoformat(t) for t in stamps if t]
     last = max(stamps) if stamps else None
