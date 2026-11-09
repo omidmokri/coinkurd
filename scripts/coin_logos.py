@@ -95,6 +95,25 @@ def main_colour(img):
     return tuple(int(sum(p[i] for p in pick) / n) for i in range(3))
 
 
+ALIAS = {"MATIC": "POL"}          # renamed coins: the channel still says MATIC
+
+
+def search_logo(sym):
+    """CoinGecko search for tickers outside the top 750 (exact symbol, best ranked)"""
+    if os.environ.get("NO_NET"):
+        return None
+    try:
+        r = requests.get("https://api.coingecko.com/api/v3/search", params={"query": sym}, headers=UA, timeout=30)
+        r.raise_for_status()
+        hits = [c for c in r.json().get("coins", []) if (c.get("symbol") or "").upper() == sym and c.get("large")]
+        hits.sort(key=lambda c: c.get("market_cap_rank") or 10 ** 9)
+        time.sleep(2)
+        return hits[0]["large"] if hits else None
+    except Exception as ex:  # noqa: BLE001
+        print("coin_logos: search", sym, ex)
+        return None
+
+
 def gecko_index():
     """ticker -> large image URL, keeping the largest market cap for each ticker"""
     out = {}
@@ -123,7 +142,7 @@ def main():
     if need:
         idx = gecko_index() if not os.environ.get("NO_NET") else {}
         for k in need:
-            url = idx.get(k)
+            url = idx.get(ALIAS.get(k, k)) or search_logo(ALIAS.get(k, k))
             small = os.path.join(ROOT, "data", "logos", k + ".png")      # the site's own 50 px copy (scripts/logos.py)
             if not url and not os.path.exists(small):
                 print("coin_logos: no logo found for", k)
