@@ -45,6 +45,7 @@ FEATURES = [
     ("/ledger/", ["ledger", "track"], "reality"),
     ("/track-record/", ["trackrec"], "reality"),
     ("/truth/", ["truth"], "reality"),
+    ("/strategy-lab/", ["stratlab"], "analysis"),
     ("/regime/", ["regime"], "reality"),
     ("/anomalies/", ["anomaly"], "reality"),
     ("/iran-friction/", ["friction"], "reality"),

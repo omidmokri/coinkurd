@@ -273,6 +273,15 @@ def main():
         out = prev
     out["opportunities"].sort(key=lambda o: (o.get("confidence") != "high", -o["strength"]))
     add_mtf(out)
+    try:  # one plain-language sentence per finding (fa / ckb / en), with the Truth Lab's verdict on the pattern
+        import scanwhy
+        vd = scanwhy.verdicts()
+        for o in out.get("opportunities", []):
+            w = scanwhy.why(o, vd)
+            if w:
+                o["why"] = w
+    except Exception as e:  # noqa: BLE001
+        out["errors"].append(f"why: {e}")
     out["scanned"] = len(out["coins"])
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 

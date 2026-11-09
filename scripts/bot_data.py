@@ -237,6 +237,10 @@ def fmt_opp(o, lang):
         extra.append(f"MTF {o['mtf_align']}/2")
     if extra:
         s += "\n   " + " · ".join(extra)
+    w = o.get("why") or {}
+    wl = w.get(lang) or w.get("en" if lang == "kmr" else "fa")
+    if wl:
+        s += "\n   💡 " + e(wl)
     return s
 
 

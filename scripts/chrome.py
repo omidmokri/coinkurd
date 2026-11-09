@@ -142,6 +142,8 @@ NAV = [
          L("سیگنال‌های اندیکاتورهای Coin_Kurd در TradingView", "سیگناڵی ئیندیکاتۆرەکانی Coin_Kurd لە TradingView", "Signals from Coin_Kurd's TradingView indicators")),
         ("/lab/", "flask", L("آزمایشگاه بازار", "تاقیگەی بازاڕ", "Market lab"),
          L("حافظهٔ بازار، مونت‌کارلو و بک‌تست", "بیرەوەریی بازاڕ، مۆنتی‌کارلۆ و باک‌تێست", "Market memory, Monte Carlo, backtests")),
+        ("/strategy-lab/", "flask", L("آزمایشگاه استراتژی", "تاقیگەی ستراتیژ", "Strategy lab"),
+         L("قانون خودت را بک‌تست کن: آزمون جایگشت و واک-فوروارد", "یاسای خۆت باکتێست بکە: جێگۆڕکێ و واک-فۆروارد", "Back-test your own rule: permutation test and walk-forward")),
         ("/dna/", "dna", L("DNA بازار", "DNAی بازاڕ", "Market DNA"),
          L("ژن‌های هر ارز و ارزهای مشابه", "جینەکانی هەر دراو و دراوە هاوشێوەکان", "Each coin's genes and look-alikes")),
         ("/replay/", "rewind", L("بازپخش بازار", "دووبارە پەخشی بازاڕ", "Market replay"),

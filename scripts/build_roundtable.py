@@ -163,6 +163,8 @@ document.querySelectorAll('.rt-builder').forEach(function(b){
    try{navigator.clipboard.writeText(b.__txt||'')}catch(e){}
    var a=document.createElement('a');a.href='https://t.me/__GROUP__';a.target='_blank';a.rel='noopener';
    document.body.appendChild(a);a.click();a.remove();};
+ try{var m=location.hash.match(/^#ask=(.+)$/);if(m){var a=JSON.parse(decodeURIComponent(m[1]));if(Array.isArray(a))a.slice(0,tas.length).forEach(function(v,i){if(typeof v==='string'){tas[i].value=v.slice(0,600);tas[i].rows=Math.min(7,Math.max(1,Math.ceil(v.length/60)))}});
+   if(!window.__rtScrolled){window.__rtScrolled=1;setTimeout(function(){var v=document.querySelector('[data-rl]:not([hidden]) .rt-builder')||b;v.scrollIntoView({behavior:'smooth',block:'start'})},300)}}}catch(e){}
  build();
 });"""
 

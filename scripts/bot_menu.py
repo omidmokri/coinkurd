@@ -73,6 +73,11 @@ S = {
                 "ckb": "هەر پێشبینییەک بە قوفڵی کاتی تۆمار دەکرێت و دواتر هەڵدەسەنگێنرێت.",
                 "kmr": "Her pêşbînî bi kilîta demê tê tomarkirin.", "ar": "كل توقع يُسجل بقفل زمني ويُقيَّم لاحقًا.",
                 "en": "Every call is time-locked when made and settled automatically later."}),
+    "stratlab": ("🧪", {"fa": "آزمایشگاه استراتژی", "ckb": "تاقیگەی ستراتیژ", "kmr": "Laboratuwara stratejiyê", "ar": "مختبر الاستراتيجيات", "en": "Strategy lab"},
+                 {"fa": "قانون معاملهٔ خودت را بنویس و پس از کارمزد بک‌تست کن؛ آزمون جایگشت می‌گوید لبه واقعی است یا شانس و واک-فوروارد پایداری را روی دادهٔ دیده‌نشده می‌سنجد.",
+                  "ckb": "یاسای مامەڵەی خۆت بنووسە و دوای کرێ باکتێستی بکە؛ جێگۆڕکێ و واک-فۆروارد ڕاستیی لێوارەکە دەپێون.",
+                  "kmr": "Qaîdeya xwe binivîse û piştî lêçûnan biceribîne.", "ar": "اكتب قاعدتك واختبرها بعد الرسوم مع اختبار التبديل والتحقق الأمامي.",
+                  "en": "Write your own trading rule and back-test it after costs; a permutation test tells a real edge from luck and walk-forward checks it on unseen data."}),
     "truth": ("⚖️", {"fa": "آزمایشگاه حقیقت سیگنال‌ها", "ckb": "تاقیگەی ڕاستیی سیگناڵەکان", "kmr": "Laboratuwara rastiya sînyalan",
                     "ar": "مختبر حقيقة الإشارات", "en": "Signal Truth Lab"},
               {"fa": "همهٔ سیگنال‌ها پس از کارمزد، برون‌نمونه و با اصلاح آزمون چندگانه — نتیجه‌های منفی هم.",
@@ -342,7 +347,7 @@ GROUPS = {
     "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
-    "g_reality": ["truth", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
+    "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
