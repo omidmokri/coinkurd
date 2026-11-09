@@ -320,6 +320,11 @@ jobs:
         timeout-minutes: 6
         run: python scripts/regime.py
 
+      - name: Coin logos for the coins wall (every coin shows its own logo)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/coin_logos.py
+
       - name: Strategy-lab context (Fear & Greed, BTC regime, funding)
         continue-on-error: true
         timeout-minutes: 3
