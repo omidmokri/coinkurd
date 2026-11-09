@@ -104,6 +104,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
+1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
+   - **Broken images:** ~40 images fail on home/news/archive — external Iranian CDNs (cdn.eghtesadnews.com,
+     cdn.donya-e-eqtesad.com) and some local `/data/deepimg/`, `/data/postimg/` files. Fix: onerror fallback/hide,
+     drop dead locals from the data builders, consider caching allowed images in CI. (High value, visible on every visit.)
+   - **Regime radar stability:** the HMM flips regimes too fast. Add an explainable rule layer (Mayer Multiple, MA200
+     slope, weekly RSI, funding z-score) + multi-day hysteresis. Needs the trackrecord.py-style synthetic tests.
+   - **Scanner plain-language "why this coin?"** per finding + a "send to roundtable" button.
+   - **User strategy lab:** personal rule backtest + permutation test + walk-forward (big; slice it).
+   - **/predict/ engagement:** 0 participants on site; show results/leaderboard on the site itself.
+   - Medium/low from the review: home-page weight (lazy-load, lighter star animation on mobile), roundtable seat
+     history once ≥5 votes, archive search/filter, mobile layout of terminal/lab, onchain/whale caching, a11y
+     (alt/contrast/keyboard), mixed UTC/Jalali dates.
 2. **`/today/` — per-day snapshots.** Done 2026-11-08 (pages + bot link, which appears by itself from the 2nd recorded day).
 3. **The founder and the nightly class.** Home strip (2026-11-07) and `/class/` page + bot section (2026-11-07) shipped.
    Remaining: books/workshops — **blocked on facts** (posts.json has no book titles or syllabus; don't invent them).
@@ -131,6 +143,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Stablecoin peg check (/tools/#peg) + owner's site review filed into Backlog
+- **Need:** Iranian/Kurdish traders hold savings in stablecoins and route transfers through USDC/FDUSD/DAI; a depeg
+  (even 1–2%) costs them real money and nothing on the site watched it. #5 still waits (bear days 8/85).
+- **Built:** `/tools/` card (fa/ckb/en): live Binance spot `ticker/24hr` for USDC, FDUSD, TUSD, USDP, DAI, USDE, USD1 vs
+  USDT — price, deviation from 1, largest 24h deviation (high/low), status at a stated 0.5% rule; per-coin "no data yet"
+  when a pair is missing; "implied USDT in USD" = 1/median of the others (n shown), since everything is USDT-quoted and
+  USDT itself can't be measured directly — stated on the card. Browser-only. Bot: `bot_reality.TOOLS` entry.
+- **Verified:** node tests on pegCalc/pegImplied (on-peg 1.0000→0% !off; 0.99 hi 1.0001 lo 0.98→dev −1%, max 2%, off;
+  null/zero→null; median of 3 with a null skipped → 1/1.02; <2 valid → null). Playwright + Chrome, ticker calls mocked
+  (incl. one 400 → "no data yet" row): 1280 fa / 390 fa+en, overflow 0, zero JS errors, looked at shots. py_compile.
+- **Also:** the owner sent a full site review mid-run; filed it as Backlog #1 (broken images first) — next runs start there.
+- **Next:** Backlog #1: broken images (onerror fallback + prune dead deepimg/postimg refs in the builders).
 ### 2026-11-09 · Market-order slippage from live order-book depth (/tools/#slip; new need, Backlog had nothing open)
 - **Need:** traders market-buy thin altcoins with $500–5k and are surprised by the fill; nothing showed what the real book
   would cost them. #5 still waits (bear days 8/85). Not a pure calculator: it reads Binance spot depth (limit 1000) in the browser.
