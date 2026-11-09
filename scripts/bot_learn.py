@@ -611,7 +611,7 @@ def library_screen(lang):
     lg = lang if lang in ("fa", "ckb", "en") else "en"
     pick_t = lambda d: (d or {}).get(lg) or (d or {}).get("en") or (d or {}).get("fa") or ""
     out = [L(LB["title"], lang), L(LB["desc"], lang), ""]
-    rows = [[{"text": L(LB["b_open"], lang), "url": SITE + "/#library"}]]
+    rows = [[{"text": L(LB["b_open"], lang), "url": SITE + "/library/"}]]
     btns = []
     for c in cats:
         n = sum(1 for it in items if it.get("cat") == c["k"])
@@ -620,7 +620,7 @@ def library_screen(lang):
         ic = LB_IC.get(c["k"], "•")
         name = LB_CAT.get(c["k"], {}).get(lang) or pick_t(c.get("t"))
         out.append(f"{ic} {name} — {_num(n, lang)}")
-        btns.append({"text": f"{ic} {name}"[:64], "url": f"{SITE}/#library"})
+        btns.append({"text": f"{ic} {name}"[:64], "url": f"{SITE}/library/"})
     out += ["", L(LB["note"], lang)]
     rows += [btns[i:i + 2] for i in range(0, len(btns), 2)]
     rows += [[{"text": L(AC["b_back"], lang), "callback_data": "m:learn"},

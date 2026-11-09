@@ -230,7 +230,7 @@ NAV = [
     {"k": "arc", "t": L("آرشیو", "ئەرشیڤ", "Archive"), "items": [
         ("/#feed", "archive", L("آرشیو مطالب", "ئەرشیڤی بابەتەکان", "Post archive"),
          L("همهٔ تحلیل‌های کانال Coin_Kurd", "هەموو شیکارییەکانی کەناڵی Coin_Kurd", "Every analysis from the Coin_Kurd channel")),
-        ("/#library", "library", L("کتابخانهٔ بازارهای مالی", "کتێبخانەی بازاڕە داراییەکان", "Financial markets library"),
+        ("/library/", "library", L("کتابخانهٔ بازارهای مالی", "کتێبخانەی بازاڕە داراییەکان", "Financial markets library"),
          L("فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — با معرفی فارسی، کوردی و انگلیسی",
            "فیلم، دۆکیۆمێنتاری، کتێب، ئامراز و سەرچاوەی فێرکاریی بێبەرامبەر — بە فارسی، کوردی و ئینگلیزی",
            "Films, documentaries, books, tools and free courses — described in Persian, Kurdish and English")),
