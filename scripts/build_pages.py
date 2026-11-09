@@ -942,16 +942,24 @@ def build_feeds():
         urls.append(page(path, title, desc, body))
     v = load("deep.json", {}).get("items", [])
     cards = []
-    for it in v[:60]:
+    lim = max(6, (len(v[:60]) + 2) // 3)          # a third of them to begin with, the rest on request
+    for n, it in enumerate(v[:60]):
         img = it.get("img") or ""
         from fetch import drop_label                 # the subject opens the card, never the channel's label
         body = e(drop_label(it.get("fa", ""))).replace("&lt;b&gt;", "<b>").replace("&lt;/b&gt;", "</b>").replace("\n", "<br>")
-        cards.append('<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
+        # only the newest third is open; the rest are behind the button, and their pictures
+        # are not fetched until the reader asks for them
+        cards.append(f'<article class="txt dsr{"" if n < lim else " more"}"{"" if n < lim else " hidden"} '
+                     'style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
                      + (f'<img class="img" src="{e(img)}" alt="" loading="lazy">' if img.startswith("/data/deepimg/") else "")
                      + f'<small class="note">{fmt_date(it.get("at", ""))}</small><div lang="fa" dir="rtl">{body}</div></article>')
     vt, vd = "پرونده‌های تحلیلی", "تحلیل عمیق مهم‌ترین رویدادهای روز کریپتو از دل گزارش معتبرترین رسانه‌های جهان، به پارسی"
     urls.append(page("dossier/", vt, vd, f'<div class="meta"><a href="/">خانه</a> / {vt}</div><h1>{vt}</h1><p class="note">{vd}</p>'
-                     + ("".join(cards) or '<p class="note">هنوز پرونده‌ای منتشر نشده است.</p>') + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>'))
+                     + ("".join(cards) or '<p class="note">هنوز پرونده‌ای منتشر نشده است.</p>')
+                     + ('<p><button class="btn2" id="dsrMore">نمایش پرونده‌های قدیمی‌تر</button></p>'
+                        '<script>(function(){var b=document.getElementById("dsrMore");if(!b)return;'
+                        'b.onclick=function(){document.querySelectorAll(".dsr.more").forEach(function(x){x.hidden=false});b.remove()}})();</script>'
+                        if len(cards) > lim else "") + '<p class="note">آموزشی است، توصیهٔ مالی نیست.</p>'))
     print(f"feed pages: {len(urls)}")
     return urls
 
@@ -1411,6 +1419,139 @@ def channel_examples(kws, n=5):
     return out
 
 
+LIB_CSS = """
+.lbbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 6px}
+.lbbar input{flex:1 1 220px;min-width:0;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:99px;padding:9px 14px;color:inherit;font:inherit}
+.lbch{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 16px}
+.lbch button{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 12px;font:inherit;font-size:.82rem;cursor:pointer}
+.lbch button.on{color:var(--c,#f7931a);border-color:var(--c,#f7931a)}
+.lbg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:10px;align-items:start}
+.lbc{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);overflow:hidden}
+.lbc[open]{border-color:var(--c,#f7931a)}
+.lbc>summary{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:12px;cursor:pointer;list-style:none;align-items:start}
+.lbc>summary::-webkit-details-marker{display:none}
+.lbcov{width:62px;height:86px;border-radius:8px;display:grid;place-items:center;font-size:1.7rem;background:linear-gradient(150deg,color-mix(in srgb,var(--c) 45%,#000),#0d0d0d);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.lbc b{display:block;font-size:.98rem;line-height:1.45;overflow-wrap:anywhere}
+.lbc summary small{display:block;color:var(--mute);font-size:.76rem;margin-top:4px;line-height:1.6;overflow-wrap:anywhere}
+.lbm{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.lbt{font-size:.68rem;font-weight:700;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.lbt.lv{color:var(--c,#f7931a);border-color:color-mix(in srgb,var(--c) 45%,transparent)}
+.lbd{padding:0 14px 14px;line-height:2}
+.lbd p{margin:0 0 8px}
+.lbd .lsn{background:rgba(255,255,255,.04);border-radius:10px;padding:9px 12px}
+.lbd .wrn{color:var(--mute);font-size:.86rem}
+@media(max-width:560px){.lbc>summary{grid-template-columns:52px 1fr}.lbcov{width:52px;height:72px;font-size:1.4rem}}
+"""
+
+LIB_JS = ("(function(){var q=document.getElementById('lbq'),C='';"
+          "function nz(t){return (t||'').replace(/[\\u200c-\\u200f]/g,'').replace(/ي/g,'ی').replace(/ك/g,'ک').toLowerCase()}"
+          "function f(){var s=nz(q&&q.value),n=0;document.querySelectorAll('.lbc').forEach(function(c){"
+          "var v=(!C||c.dataset.c===C)&&(!s||c.dataset.s.indexOf(s)>=0);c.hidden=!v;if(v)n++});"
+          "var el=document.getElementById('lbn');if(el)el.textContent=n;}"
+          "if(q)q.addEventListener('input',f);"
+          "var ch=document.getElementById('lbch');if(ch)ch.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;"
+          "C=b.dataset.c;ch.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});f()});f()})();")
+
+
+def build_library():
+    """/library/ — the markets library. Rendered here, not fetched: the page carries its own
+    text in three languages, so it needs no JSON and works with JavaScript switched off."""
+    d = load("library.json", {})
+    cats, items = d.get("cats", []), d.get("items", [])
+    if not items:
+        return []
+    IC = {"film": "\U0001F3AC", "doc": "\U0001F3A5", "book": "\U0001F4DA", "tool": "\U0001F9F0",
+          "free": "\U0001F393", "bio": "\U0001F9ED", "song": "\U0001F3B5"}
+    CO = {"film": "#f472b6", "doc": "#22d3ee", "book": "#f7931a", "tool": "#a78bfa",
+          "free": "#4ade80", "bio": "#fbbf24", "song": "#f87171"}
+    LV = {"beg": ("مبتدی", "سەرەتایی", "beginner"), "mid": ("متوسط", "ناوەند", "intermediate"),
+          "adv": ("حرفه‌ای", "پرۆفیشناڵ", "advanced")}
+    FA = "۰۱۲۳۴۵۶۷۸۹"
+    AR = "٠١٢٣٤٥٦٧٨٩"
+
+    def tri(fa, ckb, en, tag="span", cls=""):
+        c = f' class="{cls}"' if cls else ""
+        return (f'<{tag}{c} data-lang="fa">{fa}</{tag}><{tag}{c} data-lang="ckb" hidden>{ckb}</{tag}>'
+                f'<{tag}{c} data-lang="en" hidden dir="ltr">{en}</{tag}>')
+
+    def t3(o, tag="span", cls=""):
+        o = o or {}
+        return tri(e(o.get("fa", "")), e(o.get("ckb", "")), e(o.get("en", "")), tag, cls)
+
+    def digits(n, table):
+        return "".join(table[int(ch)] if ch.isdigit() else ch for ch in str(n))
+
+    def sub(it, lg, sep):
+        """the small grey line: the work's own name, its year and who made it"""
+        parts = []
+        own = it.get("title", "")
+        if own and own != (it.get("t") or {}).get(lg, ""):
+            parts.append(e(own))
+        if it.get("year"):
+            parts.append(digits(it["year"], FA if lg == "fa" else AR if lg == "ckb" else "0123456789"))
+        if it.get("by"):
+            parts.append(e(it["by"]))
+        return sep.join(parts)
+
+    def norm(t):
+        return (t or "").replace("‌", "").replace("ي", "ی").replace("ك", "ک").lower()
+
+    cards = []
+    for it in items:
+        k = it.get("cat", "")
+        col = CO.get(k, "#f7931a")
+        hay = norm(" ".join([it.get("title", ""), it.get("by", "")]
+                            + [(it.get(f) or {}).get(lg, "") for f in ("t", "d", "l") for lg in ("fa", "ckb", "en")]))
+        tags = ""
+        if it.get("lvl") in LV:
+            tags += '<span class="lbt lv">' + tri(*LV[it["lvl"]]) + "</span>"
+        if it.get("free"):
+            tags += '<span class="lbt">' + tri("رایگان", "بێبەرامبەر", "free") + "</span>"
+        link = ""
+        if it.get("url"):
+            cta = it.get("cta") or {"fa": "اطلاعات بیشتر", "ckb": "زانیاریی زیاتر", "en": "More information"}
+            link = (f'<p><a class="btn2" href="{e(it["url"])}" target="_blank" rel="noopener noreferrer nofollow">'
+                    + t3(cta) + " ↗</a></p>")
+        lesson = ""
+        if it.get("l"):
+            lesson = ('<p class="lsn"><b>' + tri("برای معامله‌گر:", "بۆ بازرگان:", "For a trader:") + "</b> "
+                      + t3(it["l"]) + "</p>")
+        note = '<p class="wrn">⚠ ' + t3(it["note"]) + "</p>" if it.get("note") else ""
+        cards.append(
+            f'<details class="lbc" data-c="{e(k)}" data-s="{e(hay)}" style="--c:{col}">'
+            f'<summary><span class="lbcov">{IC.get(k, "•")}</span><span><b>{t3(it.get("t"))}</b>'
+            f'<small>{tri(sub(it, "fa", " · "), sub(it, "ckb", " — "), sub(it, "en", " · "))}</small>'
+            f'<span class="lbm">{tags}</span></span></summary>'
+            f'<div class="lbd"><p>{t3(it.get("d"))}</p>{lesson}{note}{link}</div></details>')
+
+    chips = ('<button class="on" data-c="">' + tri("همه", "هەموو", "All") + "</button>"
+             + "".join(f'<button data-c="{e(c["k"])}" style="--c:{CO.get(c["k"], "#f7931a")}">'
+                       f'{IC.get(c["k"], "")} {t3(c.get("t"))}</button>'
+                       for c in cats if any(i.get("cat") == c["k"] for i in items)))
+    n = digits(len(items), FA), digits(len(items), AR), str(len(items))
+    body = (f'<div class="meta"><a href="/">{tri("خانه", "ماڵەوە", "Home")}</a> / '
+            + tri("کتابخانهٔ بازارهای مالی", "کتێبخانەی بازاڕە داراییەکان", "Financial markets library") + "</div>"
+            + "<h1>" + tri("کتابخانهٔ بازارهای مالی", "کتێبخانەی بازاڕە داراییەکان", "Financial markets library") + "</h1>" + LSW
+            + '<p class="txt">' + tri(
+                f"{n[0]} فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد.",
+                f"{n[1]} فیلم، دۆکیۆمێنتاری، کتێب، ئامراز و سەرچاوەی فێرکاریی بێبەرامبەر — هەر یەکەیان بە ناساندن و ئەو وانەیەی بۆ بازرگان هەیەتی.",
+                f"{n[2]} films, documentaries, books, tools and free courses — each with what it is and what a trader can take from it.") + "</p>"
+            + '<div class="lbbar"><input id="lbq" type="search" placeholder="🔎 جستجو… / Search…" autocomplete="off">'
+            + '<span class="note"><b id="lbn"></b></span></div>'
+            + f'<div class="lbch" id="lbch">{chips}</div>'
+            + f'<div class="lbg">{"".join(cards)}</div>'
+            + '<p class="note">' + tri(
+                "هیچ فیلم، کتاب یا فایلی روی این سایت گذاشته نشده؛ فقط معرفی و پیوند به صفحهٔ اطلاعات، سایت رسمی یا ناشر است. جلدها را خودمان ساخته‌ایم و پوستر یا جلد اصلی کپی نشده. هیچ‌کدام تضمین سود نیست و معرفی‌شان توصیهٔ مالی نیست.",
+                "هیچ فیلم، کتێب یان فایلێک لەسەر ئەم ماڵپەڕە دانەنراوە؛ تەنیا ناساندن و بەستەرە بۆ پەڕەی زانیاری، ماڵپەڕی فەرمی یان بڵاوکەرەوە. بەرگەکان خۆمان دروستمان کردوون و بەرگ یان پۆستەری ئەسڵی کۆپی نەکراوە. هیچ کامیان دڵنیایی قازانج نین و ناساندنیان ئامۆژگاریی دارایی نییە.",
+                "No film, book or file is hosted here — only a description and a link to an information page, official site or publisher. The covers are our own; no original cover or poster has been copied. None of these guarantees a profit, and listing them is not financial advice.") + "</p>")
+    url = page("library/", "کتابخانهٔ بازارهای مالی — فیلم، مستند، کتاب و ابزار",
+               "فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان برای بازارهای مالی، به فارسی، کوردی سورانی و انگلیسی.",
+               body, extra_head=f"<style>{LIB_CSS}</style>"
+               f"<script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}{LIB_JS}}})</script>")
+    print(f"library page: {len(items)} entries")
+    return [url]
+
+
 def build_learn():
     """/glossary/, /glossary/<term>/ and /learn/ (learning path with quizzes and a local certificate)"""
     import learn_data as LD
@@ -1529,6 +1670,7 @@ if __name__ == "__main__":
     extra += build_hub()
     extra += build_seo_extra()
     extra += build_learn()
+    extra += build_library()
     try:  # CRYPTO MASTER ACADEMY (/academy/) — never allowed to break the rest of the site build
         import build_academy
         extra += build_academy.build()
