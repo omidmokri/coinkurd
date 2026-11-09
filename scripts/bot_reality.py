@@ -411,6 +411,7 @@ TOOLS = [
     ("pnl", {"fa": "سود و ضرر فیوچرز (ROE)", "ckb": "قازانج و زیانی فیوچەرز (ROE)", "en": "Futures PnL & ROE"}),
     ("breakeven", {"fa": "درصد برد لازم برای سربه‌سر", "ckb": "ڕێژەی بردنەوەی پێویست بۆ یەکسانبوون", "en": "Break-even win rate"}),
     ("noise", {"fa": "حد ضرر در برابر نوسان عادی", "ckb": "ستۆپ بەرامبەر جووڵەی ئاسایی", "en": "Stop vs normal volatility"}),
+    ("mcap", {"fa": "واقعیت‌سنجی قیمت هدف (مارکت‌کپ)", "ckb": "پشکنینی ڕاستیی نرخی ئامانج", "en": "Target-price reality check (market cap)"}),
     ("liq", {"fa": "قیمت لیکویید شدن فیوچرز", "ckb": "نرخی لیکویدبوونی فیوچەرز", "en": "Futures liquidation price"}),
     ("recovery", {"fa": "سود لازم برای جبران ضرر", "ckb": "قازانجی پێویست بۆ قەرەبووی زیان", "en": "Gain needed to recover a loss"}),
     ("streaks", {"fa": "شبیه‌ساز زنجیرهٔ ضرر و افت سرمایه", "ckb": "هاوشێوەکەری زنجیرەی زیان و دابەزین", "en": "Losing-streak & drawdown simulator"}),
