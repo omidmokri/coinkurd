@@ -131,6 +131,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Target-price reality check (/tools/#mcap; new need, Backlog had nothing open)
+- **Need:** channel/group members keep asking "can coin X reach $1?"; nobody shows them the market cap that price implies.
+  #5 still waits (bear days 8/85). market.json has no supply data, so the card uses only the user's own inputs.
+- **Built:** `/tools/` card (fa/ckb/en): current price + current market cap + target → derived circulating supply, market cap
+  needed at target, multiple of today; states it assumes constant supply (unlocks make it worse). Bot: `bot_reality.TOOLS`.
+- **Verified:** node tests (0.00001/6e9/1 → supply 6e14, need 6e14, ×100000; 2/100/4 → 50/200/×2; zero/negative/NaN → null).
+  Playwright + Chrome 1280 fa / 390 fa+en, overflow 0, zero JS errors, looked at shot. py_compile bot_reality.
+- **Next:** #5 when ≥30 bearish days; otherwise a fresh non-calculator trader need (tools/ now has 16 cards).
 ### 2026-11-09 · Address & network check before sending (/tools/#addr; new need, Backlog had nothing open)
 - **Need:** Iranian/Kurdish traders move USDT between exchanges and wallets daily; a mistyped address or the wrong network
   (TRC20 vs BEP20/ERC20) loses the money for good, and nothing on the site checked it. #5 still waits (bear days 8/85).
