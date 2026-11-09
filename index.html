@@ -131,7 +131,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 .hall{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px}
 .hall{perspective:1200px}
 .tile{position:relative;aspect-ratio:1;background:#141414;display:grid;align-content:space-between;padding:22px;cursor:pointer;overflow:hidden;transition:background .3s,transform .15s ease-out}
-/* 3D category icons (assets/ic3d, the owner's artwork, shown unscaled-up and centred) */.ek3{object-fit:contain}.tile .ic.ic3{justify-self:center;align-self:center;display:grid;place-items:center;width:100%;margin-top:6px}.eki-l.ek3{width:min(150px,62%);height:auto;aspect-ratio:1;margin:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.55));animation:e3f 7s ease-in-out infinite;will-change:transform}.tile:nth-child(2n) .ek3{animation-delay:-2.3s}.tile:nth-child(3n) .ek3{animation-delay:-4.6s}@keyframes e3f{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.tile:hover .ic.ic3{transform:none}.tile .ic.ic3 .ek3{transition:transform .35s ease}.tile:hover .ic.ic3 .ek3{animation-play-state:paused;transform:translateY(-6px)}@media(prefers-reduced-motion:reduce){.ek3{animation:none!important}}.eki{width:1.3em;height:1.3em;vertical-align:-.32em;margin-inline-end:.38em;display:inline-block;flex:none}.cat.ico .eki{margin:0}.eki-l{width:64px;height:64px;margin:0;vertical-align:middle;filter:drop-shadow(0 8px 18px color-mix(in srgb,var(--c,#000) 35%,transparent))}.eki-c{width:40px;height:40px;margin:0}.tile .ic{font-size:2.6rem;line-height:1}.tile .ic{font-size:2.6rem;transition:.4s}
+/* 3D category icons (assets/ic3d, the owner's artwork, shown unscaled-up and centred) */.ek3{object-fit:contain}.tile .ic.ic3{justify-self:center;align-self:center;display:grid;place-items:center;width:100%;margin-top:6px}.eki-l.ek3{width:min(150px,62%);height:auto;aspect-ratio:1;margin:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.55));animation:e3f 7s ease-in-out infinite;will-change:transform}.tile:nth-child(2n) .ek3{animation-delay:-2.3s}.tile:nth-child(3n) .ek3{animation-delay:-4.6s}@keyframes e3f{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}.tile:hover .ic.ic3{transform:none}.tile .ic.ic3 .ek3{transition:transform .35s ease}.tile:hover .ic.ic3 .ek3{animation-play-state:paused;transform:translateY(-6px)}@media(prefers-reduced-motion:reduce){.ek3{animation:none!important}}.eki{width:1.3em;height:1.3em;vertical-align:-.32em;margin-inline-end:.38em;display:inline-block;flex:none}.cat.ico .eki{margin:0}.eki-l{width:64px;height:64px;margin:0;vertical-align:middle;filter:drop-shadow(0 8px 18px color-mix(in srgb,var(--c,#000) 35%,transparent))}.eki-c{width:40px;height:40px;margin:0}.libCov .eki-c.ek3{width:46px;height:46px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}#libCats .ek3{width:1.6em;height:1.6em;vertical-align:-.45em}.tile .ic{font-size:2.6rem;line-height:1}.tile .ic{font-size:2.6rem;transition:.4s}
 .tile:hover{background:var(--c)}
 .tile:hover .ic{transform:scale(1.25) rotate(-8deg)}
 .tile:hover b,.tile:hover small{color:#000}
@@ -413,17 +413,7 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <div class="hall" id="hallGrid"><a class="tile" href="/categories/technical/" style="--c:#22d3ee"><span class="ic ic3"><img class="eki ek3 eki-l a3-technical" src="/assets/ic3d/technical.png?v=2" alt="" width="150" height="150"></span><div><b>تحلیل تکنیکال</b><small>23</small></div></a><a class="tile" href="/categories/signal/" style="--c:#f472b6"><span class="ic ic3"><img class="eki ek3 eki-l a3-signal" src="/assets/ic3d/signal.png?v=2" alt="" width="150" height="150"></span><div><b>سیگنال و معامله</b><small>11</small></div></a><a class="tile" href="/categories/etf_institutional/" style="--c:#a78bfa"><span class="ic ic3"><img class="eki ek3 eki-l a3-etf_institutional" src="/assets/ic3d/etf_institutional.png?v=2" alt="" width="150" height="150"></span><div><b>ETF و نهادی</b><small>280</small></div></a><a class="tile" href="/categories/regulation/" style="--c:#fbbf24"><span class="ic ic3"><img class="eki ek3 eki-l a3-regulation" src="/assets/ic3d/regulation.png?v=2" alt="" width="150" height="150"></span><div><b>قانون‌گذاری و سیاست</b><small>183</small></div></a><a class="tile" href="/categories/security/" style="--c:#f87171"><span class="ic ic3"><img class="eki ek3 eki-l a3-security" src="/assets/ic3d/security.png?v=2" alt="" width="150" height="150"></span><div><b>امنیت و هک</b><small>59</small></div></a><a class="tile" href="/categories/onchain/" style="--c:#34d399"><span class="ic ic3"><img class="eki ek3 eki-l a3-onchain" src="/assets/ic3d/onchain.png?v=2" alt="" width="150" height="150"></span><div><b>آن‌چین و داده</b><small>98</small></div></a><a class="tile" href="/categories/education/" style="--c:#60a5fa"><span class="ic ic3"><img class="eki ek3 eki-l a3-education" src="/assets/ic3d/education.png?v=2" alt="" width="150" height="150"></span><div><b>آموزش</b><small>54</small></div></a><a class="tile" href="/categories/products/" style="--c:#fb923c"><span class="ic ic3"><img class="eki ek3 eki-l a3-products" src="/assets/ic3d/products.png?v=2" alt="" width="150" height="150"></span><div><b>کتاب و اندیکاتور</b><small>35</small></div></a><a class="tile" href="/categories/community/" style="--c:#e879f9"><span class="ic ic3"><img class="eki ek3 eki-l a3-community" src="/assets/ic3d/community.png?v=2" alt="" width="150" height="150"></span><div><b>اطلاعیه و جامعه</b><small>85</small></div></a><a class="tile" href="/categories/news/" style="--c:#94a3b8"><span class="ic ic3"><img class="eki ek3 eki-l a3-news" src="/assets/ic3d/news.png?v=2" alt="" width="150" height="150"></span><div><b>خبر بازار</b><small>278</small></div></a></div>
   </section>
 
-  <section class="sec wrap reveal" id="library">
-    <h2 class="display" data-i="libT">کتابخانهٔ بازارهای مالی</h2>
-    <p class="lead" data-i="libL">فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد</p>
-    <div class="libBar">
-      <div class="chips" id="libCats"></div>
-      <label class="search">🔎 <input id="libQ" data-ph="libSearch" placeholder="جستجو در کتابخانه…"></label>
-      <span class="count" id="libCount"></span>
-    </div>
-    <div class="libGrid" id="libGrid"></div>
-    <p class="libNote" data-i="libNote"></p>
-  </section>
+  
 
   <section id="feed">
     <div class="dims"><div class="wrap">
@@ -444,6 +434,18 @@ footer .fblob{position:absolute;width:40vw;height:40vw;border-radius:50% 40% 60%
     <h2 class="display" data-i="wallT">کوین‌ها</h2>
     <p class="lead" data-i="wallL">کوین‌هایی که بیشتر از همه در کانال درباره‌شان صحبت شده</p>
     <div class="wall" id="wall"></div>
+  </section>
+
+  <section class="sec wrap reveal" id="library">
+    <h2 class="display" data-i="libT">کتابخانهٔ بازارهای مالی</h2>
+    <p class="lead" data-i="libL">فیلم، مستند، کتاب، ابزار و منبع آموزشی رایگان — هر کدام با معرفی و درسی که برای معامله‌گر دارد</p>
+    <div class="libBar">
+      <div class="chips" id="libCats"></div>
+      <label class="search">🔎 <input id="libQ" data-ph="libSearch" placeholder="جستجو در کتابخانه…"></label>
+      <span class="count" id="libCount"></span>
+    </div>
+    <div class="libGrid" id="libGrid"></div>
+    <p class="libNote" data-i="libNote"></p>
   </section>
 
   
@@ -482,7 +484,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const su=u=>{u=String(u??'').trim();return /^(https?:)?\/\//i.test(u)||/^\/(?!\/)/.test(u)||/^#/.test(u)?u:'#'};
 const parseViews=v=>{if(!v)return 0;const m=String(v).replace(',','').match(/([\d.]+)\s*([KM]?)/i);if(!m)return 0;return parseFloat(m[1])*({K:1e3,M:1e6}[(m[2]||'').toUpperCase()]||1)};
 const catOf=id=>(S.meta.categories.find(c=>c.id===id))||{id,name:{fa:id,ckb:id,en:id},icon:'•',color:'#9a9a94'};
-const cname=c=>c.name[lang]||c.name.fa;const ICO=(k,cl)=>`<img class="eki${cl?' '+cl:''}" src="/assets/ic/${k}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;const CATS_IC=['technical','signal','etf_institutional','regulation','security','onchain','education','products','community','news'];const CI=(c,cl)=>CATS_IC.includes(c.id)?`<img class="eki ek3${cl?' '+cl:''} a3-${c.id}" src="/assets/ic3d/${c.id}.png?v=2" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:(c.icon||'');
+const cname=c=>c.name[lang]||c.name.fa;const ICO=(k,cl)=>`<img class="eki${cl?' '+cl:''}" src="/assets/ic/${k}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;const LIB3=['film','doc','book','tool','free','song'];const LIC=(k,cl)=>LIB3.includes(k)?`<img class="eki ek3${cl?' '+cl:''}" src="/assets/ic3d/lib-${k}.png?v=1" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:ICO('lib-'+k,cl);const CATS_IC=['technical','signal','etf_institutional','regulation','security','onchain','education','products','community','news'];const CI=(c,cl)=>CATS_IC.includes(c.id)?`<img class="eki ek3${cl?' '+cl:''} a3-${c.id}" src="/assets/ic3d/${c.id}.png?v=2" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:(c.icon||'');
 const fmtDate=(d,o)=>{try{return new Intl.DateTimeFormat(T('locale'),o).format(new Date(d))}catch(e){return new Date(d).toLocaleString()}};
 const fmtN=n=>{try{return new Intl.NumberFormat(T('locale')).format(n)}catch(e){return n}};
 const PT=p=>(lang!=='fa'&&p.tr&&p.tr[lang])?p.tr[lang]:{title:p.title,text:p.text};
@@ -627,14 +629,14 @@ function renderLib(){
   const g=$('#libGrid');if(!g||!LIB)return;
   const cs=$('#libCats');
   if(cs){cs.innerHTML=`<button class="chip${libCat==='all'?' on':''}" data-c="all">${esc(T('all'))}</button>`+
-      LIB.cats.filter(c=>LIB.items.some(i=>i.cat===c.k)).map(c=>`<button class="chip${libCat===c.k?' on':''}" data-c="${esc(c.k)}" style="--c:${LIBC[c.k]||'var(--lime)'}">${LIBIC[c.k]?ICO('lib-'+c.k):''}${esc(libTxt(c.t))}</button>`).join('');
+      LIB.cats.filter(c=>LIB.items.some(i=>i.cat===c.k)).map(c=>`<button class="chip${libCat===c.k?' on':''}" data-c="${esc(c.k)}" style="--c:${LIBC[c.k]||'var(--lime)'}">${LIBIC[c.k]?LIC(c.k):''}${esc(libTxt(c.t))}</button>`).join('');
     cs.querySelectorAll('button').forEach(b=>b.onclick=()=>{libCat=b.dataset.c;renderLib()});}
   const q=(($('#libQ')||{}).value||'').trim().toLowerCase();
   const items=LIB.items.filter(it=>(libCat==='all'||it.cat===libCat)&&
     (!q||(it.title+' '+libTxt(it.t)+' '+libTxt(it.d)+' '+(it.by||'')).toLowerCase().includes(q)));
   const cnt=$('#libCount');if(cnt)cnt.textContent=fmtN(items.length);
   g.innerHTML=items.map(it=>`<button class="libCard" data-lib="${esc(it.id)}" style="--c:${LIBC[it.cat]||'var(--lime)'}">`+
-      `<span class="libCov">${LIBIC[it.cat]?ICO('lib-'+it.cat,'eki-c'):'•'}</span><span><b>${esc(libTxt(it.t)||it.title)}</b>`+
+      `<span class="libCov">${LIBIC[it.cat]?LIC(it.cat,'eki-c'):'•'}</span><span><b>${esc(libTxt(it.t)||it.title)}</b>`+
       `<small>${esc(libSub(it))}</small><span class="libMeta">`+
       `${it.lvl?`<span class="libTag lv">${esc(T('lv_'+it.lvl))}</span>`:''}`+
       `${it.free?`<span class="libTag">${esc(T('libFree'))}</span>`:''}</span></span></button>`).join('')||
