@@ -320,6 +320,11 @@ jobs:
         timeout-minutes: 6
         run: python scripts/regime.py
 
+      - name: Strategy-lab context (Fear & Greed, BTC regime, funding)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/lab_context.py
+
       - name: Anomaly hunter (daily scan + light now-view)
         continue-on-error: true
         timeout-minutes: 6
@@ -361,7 +366,7 @@ jobs:
 
       - name: Build the quant pages (regime, truth lab, anomalies)
         continue-on-error: true
-        run: python scripts/build_quant.py
+        run: python scripts/build_quant.py && python scripts/build_strategy_lab.py
 
       - name: Build the Roundtable page
         continue-on-error: true
