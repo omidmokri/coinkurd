@@ -131,6 +131,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Market-order slippage from live order-book depth (/tools/#slip; new need, Backlog had nothing open)
+- **Need:** traders market-buy thin altcoins with $500–5k and are surprised by the fill; nothing showed what the real book
+  would cost them. #5 still waits (bear days 8/85). Not a pure calculator: it reads Binance spot depth (limit 1000) in the browser.
+- **Built:** `/tools/` card (fa/ckb/en): coin + buy/sell + USDT size → best price, average fill, slippage %, slippage $, levels
+  used, bid/ask spread, snapshot time; "book not deep enough, only $X fills" when 1000 levels run out; error text when no
+  USDT pair. Fees excluded (stated). Bot: `bot_reality.TOOLS` entry.
+- **Verified:** node tests on a synthetic book (buy 100 → 0%; buy 201 → avg 100.5, 0.5%, $1, 2 levels; sell 296 → $1;
+  sell 1e6 → short, filled 688; zero/null/empty → null). Playwright + Chrome with the depth call mocked: 1280 fa / 390 fa+en,
+  overflow 0, zero JS errors, looked at shots. py_compile bot_reality.
+- **Next:** #5 when ≥30 bearish days; otherwise a fresh non-calculator trader need.
 ### 2026-11-09 · Target-price reality check (/tools/#mcap; new need, Backlog had nothing open)
 - **Need:** channel/group members keep asking "can coin X reach $1?"; nobody shows them the market cap that price implies.
   #5 still waits (bear days 8/85). market.json has no supply data, so the card uses only the user's own inputs.
