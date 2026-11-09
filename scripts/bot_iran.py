@@ -398,7 +398,7 @@ def card(lang, focus=None):
                 chs = f" ({B.pct(ch)})" if ch else ""
                 val = B.usd(p) if k in ("XAU", "XAG") else toman(p)
                 out.append(f"• {L3(ASSET_NAME[k], lang)}: {val}{chs}")
-    return "\n".join(out)
+    return rtl_lines("\n".join(out), lang)
 
 
 def calc(lang, amount, unit):
@@ -471,6 +471,14 @@ def bl(k, lang, **kw):
     return BL[k][i].format(**kw) if kw else BL[k][i]
 
 
+def rtl_lines(text, lang):
+    """Pin every line's direction: Telegram picks each line's direction from its first strong character, and a
+    flag emoji (🇺🇸 🇪🇺 …, regional-indicator letters, bidi class L) or a Latin/number start turns a Persian line
+    left-to-right, so the board came out half right-aligned, half left-aligned. An RLM at the head of each line
+    fixes it for fa / ckb / ar; en and kmr are left unchanged."""
+    return "\n".join(B.rtl(x, lang) if x.strip() else x for x in text.split("\n"))
+
+
 def board(prev=None, lang="fa", footer=True):
     """-> (html, values) — price board (group FX topic and the bot); prev = values of the previous board"""
     prev = prev or {}
@@ -527,7 +535,7 @@ def board(prev=None, lang="fa", footer=True):
     out += ["━━━━━━━━━━━━━━", bl("legend", lang)]
     if footer:
         out.append(bl("bot", lang))
-    return "\n".join(out), vals
+    return rtl_lines("\n".join(out), lang), vals
 
 
 def bot_board(lang):
