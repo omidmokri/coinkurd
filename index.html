@@ -225,7 +225,7 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 
 /* coins wall */
 .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;margin-bottom:100px}
-.wall button{aspect-ratio:1.6;background:#121212;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:1.15rem;color:var(--mute);transition:.25s}
+.wall button{aspect-ratio:1.05;background:radial-gradient(90% 70% at 50% 35%,#1b1b1b,#101010);display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;gap:2px;padding:14px 8px 12px;font-family:var(--mono);font-weight:700;font-size:1.05rem;color:var(--mute);transition:.25s;border-radius:6px}.wall button b{color:var(--ink);font-weight:700}.wall .c3{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 10px 14px rgba(0,0,0,.6));transition:transform .35s ease}.wall button:hover .c3{transform:translateY(-5px) scale(1.04)}.wall .c3t{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(160deg,#2a2a2a,#151515);border:1px solid #333;color:#cfcfc8;font-size:.95rem}.wall button:hover b,.wall button.on b{color:#000}
 .wall button:hover,.wall button.on{background:var(--gold);color:#000}
 .wall button small{display:block;font-size:.7rem;font-weight:400}
 
@@ -484,7 +484,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const su=u=>{u=String(u??'').trim();return /^(https?:)?\/\//i.test(u)||/^\/(?!\/)/.test(u)||/^#/.test(u)?u:'#'};
 const parseViews=v=>{if(!v)return 0;const m=String(v).replace(',','').match(/([\d.]+)\s*([KM]?)/i);if(!m)return 0;return parseFloat(m[1])*({K:1e3,M:1e6}[(m[2]||'').toUpperCase()]||1)};
 const catOf=id=>(S.meta.categories.find(c=>c.id===id))||{id,name:{fa:id,ckb:id,en:id},icon:'•',color:'#9a9a94'};
-const cname=c=>c.name[lang]||c.name.fa;const ICO=(k,cl)=>`<img class="eki${cl?' '+cl:''}" src="/assets/ic/${k}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;const LIB3=['film','doc','book','tool','free','song'];const LIC=(k,cl)=>LIB3.includes(k)?`<img class="eki ek3${cl?' '+cl:''}" src="/assets/ic3d/lib-${k}.png?v=1" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:ICO('lib-'+k,cl);const CATS_IC=['technical','signal','etf_institutional','regulation','security','onchain','education','products','community','news'];const CI=(c,cl)=>CATS_IC.includes(c.id)?`<img class="eki ek3${cl?' '+cl:''} a3-${c.id}" src="/assets/ic3d/${c.id}.png?v=2" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:(c.icon||'');
+const cname=c=>c.name[lang]||c.name.fa;const ICO=(k,cl)=>`<img class="eki${cl?' '+cl:''}" src="/assets/ic/${k}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;const LIB3=['film','doc','book','tool','free','song'];const LIC=(k,cl)=>LIB3.includes(k)?`<img class="eki ek3${cl?' '+cl:''}" src="/assets/ic3d/lib-${k}.png?v=1" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:ICO('lib-'+k,cl);const CATS_IC=['technical','signal','etf_institutional','regulation','security','onchain','education','products','community','news'];const COIN3D=['BTC','ETH','GOLD','SOL','XRP','DOGE','HYPE','AVAX','DOT','USDC','LTC','TRX','UNI'];const CI=(c,cl)=>CATS_IC.includes(c.id)?`<img class="eki ek3${cl?' '+cl:''} a3-${c.id}" src="/assets/ic3d/${c.id}.png?v=2" alt="" loading="lazy" decoding="async" onerror="this.remove()">`:(c.icon||'');
 const fmtDate=(d,o)=>{try{return new Intl.DateTimeFormat(T('locale'),o).format(new Date(d))}catch(e){return new Date(d).toLocaleString()}};
 const fmtN=n=>{try{return new Intl.NumberFormat(T('locale')).format(n)}catch(e){return n}};
 const PT=p=>(lang!=='fa'&&p.tr&&p.tr[lang])?p.tr[lang]:{title:p.title,text:p.text};
@@ -543,7 +543,7 @@ function buildStatic(){
   const cats=S.meta.categories.filter(c=>S.meta.by_category[c.id]).sort((a,b)=>S.meta.by_category[b.id]-S.meta.by_category[a.id]);
   $('#hallGrid').innerHTML=cats.map(c=>`<div class="tile" data-cat="${c.id}" style="--c:${c.color}"><span class="n">${fmtN(S.meta.by_category[c.id])}</span><span class="ic ic3">${CI(c,'eki-l')}</span><div><b>${esc(cname(c))}</b><small>${esc(c.name.en)}</small></div></div>`).join('');
   $('#hallGrid').querySelectorAll('.tile').forEach(t=>t.onclick=()=>goFilter(t.dataset.cat));tilt($('#hallGrid'));
-  $('#wall').innerHTML=Object.entries(S.meta.by_coin).slice(0,18).map(([k,n])=>`<button data-coin="${k}" class="${S.coin===k?'on':''}">${k}<small>${fmtN(n)} ${T('posts')}</small></button>`).join('');
+  $('#wall').innerHTML=Object.entries(S.meta.by_coin).slice(0,18).map(([k,n])=>`<button data-coin="${k}" class="${S.coin===k?'on':''}${COIN3D.includes(k)?' has3':''}">${COIN3D.includes(k)?`<img class="c3" src="/assets/coin3d/${k}.png?v=1" alt="" width="64" height="64" loading="lazy" decoding="async">`:`<span class="c3t">${k.slice(0,4)}</span>`}<b>${k}</b><small>${fmtN(n)} ${T('posts')}</small></button>`).join('');
   $('#wall').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.coin=S.coin===b.dataset.coin?null:b.dataset.coin;S.cat=null;render();scrollFeed()});
 }
 function goFilter(cat){S.cat=cat;S.coin=null;S.view='grid';render();scrollFeed()}
