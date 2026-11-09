@@ -138,7 +138,9 @@ def post_img(p):
     نشانی‌های cdn4.telesco.pe پس از چند ماه منقضی می‌شوند (scripts/postimg.py آن‌ها را محلی می‌کند)."""
     local = p.get("img") or ""
     if local.startswith(("/data/postimg/", "/data/deepimg/")):   # archived photo, or the dossier's own card
-        return local
+        if os.path.isfile(os.path.join(ROOT, local.lstrip("/"))):
+            return local
+        local = ""   # file missing from the repo: never point at a dead local path
     return (p.get("photos") or [""])[0]
 
 def fmt_date(iso):

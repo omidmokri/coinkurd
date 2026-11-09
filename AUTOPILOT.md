@@ -105,7 +105,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 
 ## Backlog (top = next)
 1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
-   - **Broken images:** ~40 images fail on home/news/archive — external Iranian CDNs (cdn.eghtesadnews.com,
+   - **Broken images — slice 1 shipped 2026-11-09** (site-wide hide-on-error in chrome.js + dead-local guard). Remaining:
+     cache allowed news images in CI so they show instead of disappearing. Original note:
+     ~40 images fail on home/news/archive — external Iranian CDNs (cdn.eghtesadnews.com,
      cdn.donya-e-eqtesad.com) and some local `/data/deepimg/`, `/data/postimg/` files. Fix: onerror fallback/hide,
      drop dead locals from the data builders, consider caching allowed images in CI. (High value, visible on every visit.)
    - **Regime radar stability:** the HMM flips regimes too fast. Add an explainable rule layer (Mayer Multiple, MA200
@@ -143,6 +145,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Broken images hidden site-wide (owner review, Backlog #1 first item, slice 1)
+- **Need:** the owner's review counted ~40 broken-image icons on home/news/archive (dead Iranian news CDNs, missing local
+  files) — visible on every visit, makes the site look abandoned.
+- **Built:** `assets/chrome.js` (loaded on every page) now starts with a capture-phase `error` listener + a scan of already-failed
+  images: a broken `<img>` is hidden, and its wrapper too when it is an otherwise empty thumb/img/figure/picture box.
+  `build_pages.post_img` no longer returns a `/data/postimg|deepimg/` path whose file is missing (falls back to the post's
+  photo; currently 0 of 1122 posts affected). `chrome.VER` 10→11 to bust caches (builders rewrite `?v=` in all pages).
+- **Verified:** py_compile; build_pages on a /tmp/bld copy; Playwright + Chrome, all external requests aborted, an injected
+  `/data/postimg/nope.webp` inside `a.thumb` on /, /crypto-news/, /daily/, /tools/ at 1280 fa / 390 fa+en → 0 visible broken
+  images, wrapper hidden, zero JS errors; looked at shot.
+- **Next:** Backlog #1 broken images slice 2 (cache allowed news images in CI), then regime radar stability.
 ### 2026-11-09 · Stablecoin peg check (/tools/#peg) + owner's site review filed into Backlog
 - **Need:** Iranian/Kurdish traders hold savings in stablecoins and route transfers through USDC/FDUSD/DAI; a depeg
   (even 1–2%) costs them real money and nothing on the site watched it. #5 still waits (bear days 8/85).
