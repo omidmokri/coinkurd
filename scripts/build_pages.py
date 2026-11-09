@@ -753,7 +753,7 @@ def prerender():
         '<div class="ibox wide" id="newsBox"></div>': f'<div class="ibox wide" id="newsBox">{it.get("news","")}</div>',
         '<div class="ibox wide" id="impBox"></div>': f'<div class="ibox wide" id="impBox">{it["imp"]}</div>',
         '<div class="hall" id="hallGrid"></div>': '<div class="hall" id="hallGrid">' + "".join(
-            f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic"><img class="eki eki-l" src="/assets/ic/cat-{c["id"]}.svg" alt="" width="64" height="64"></span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
+            f'<a class="tile" href="/categories/{c["id"]}/" style="--c:{c["color"]}"><span class="ic"><img class="eki ek3 eki-l a3-{c["id"]}" src="/assets/ic3d/{c["id"]}.webp?v=1" alt="" width="104" height="104"></span><div><b>{e(c["name"]["fa"])}</b><small>{meta["by_category"].get(c["id"],0)}</small></div></a>'
             for c in meta.get("categories", []) if meta.get("by_category", {}).get(c["id"])) + "</div>",
         '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in good[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
     }
@@ -771,7 +771,7 @@ def prerender():
         ps = [p for p in posts if p["category"] == c["id"]]
         if not ps:
             continue
-        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1><img src="/assets/ic/cat-{c["id"]}.svg" alt="" width="44" height="44" style="vertical-align:-10px;margin-inline-end:10px">{e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
+        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1><img src="/assets/ic3d/{c["id"]}.webp?v=1" alt="" width="56" height="56" style="vertical-align:-14px;margin-inline-end:10px;object-fit:contain">{e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
         urls.append(page(f"categories/{c['id']}/", CAT_H1.get(c["id"], c["name"]["fa"]) + " — آرشیو " + c["name"]["fa"],
                          (CAT_INTRO.get(c["id"]) or f'آرشیو مطالب دستهٔ {c["name"]["fa"]}')[:155], body))
     urls.append(build_replay())
