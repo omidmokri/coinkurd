@@ -45,16 +45,13 @@
       w_rates: 'Rates & inflation', w_stocks: 'Stocks', w_commod: 'Gold & oil', w_fx: 'Currencies', w_trade: 'Trade & tariffs', w_macro: 'Macro'
     }
   };
-  // topic icons are glossy SVG tiles (assets/ic/nw-*.svg, made by scripts/make_icons.py) instead of emoji
-  const ICON = { sec_coinkurd: 1, sec_crypto: 1, sec_economy: 1, f_gold: 1, f_fx: 1, f_stock: 1, f_oil: 1, f_crypto: 1, f_news: 1,
-    security: 1, regulation: 1, etf_institutional: 1, onchain: 1, technical: 1, news: 1,
-    w_rates: 1, w_stocks: 1, w_commod: 1, w_fx: 1, w_trade: 1, w_macro: 1 };
-  const IC = (k, cl) => `<img class="nw-ic${cl ? ' ' + cl : ''}" src="/assets/ic/${k}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
-  const icOf = it => ICON[it.category] ? 'nw-' + it.category : ICON['sec_' + it.sec] ? 'nw-sec_' + it.sec : 'nw-f_news';
+  const ICON = { sec_coinkurd: '⭐', sec_crypto: '🪙', sec_economy: '🏛️', f_gold: '🥇', f_fx: '💵', f_stock: '📊', f_oil: '🛢️', f_crypto: '🪙', f_news: '📰',
+    security: '🛡️', regulation: '⚖️', etf_institutional: '🏦', onchain: '⛓️', technical: '📈', news: '📰',
+    w_rates: '💹', w_stocks: '📊', w_commod: '🛢️', w_fx: '💱', w_trade: '🚢', w_macro: '🌐' };
   const L = k => (NT[lang] || NT.fa)[k] || NT.fa[k] || k;
   const LS = { get(k, d) { try { const v = localStorage.getItem('ekn_' + k); return v == null ? d : JSON.parse(v) } catch (e) { return d } },
     set(k, v) { try { localStorage.setItem('ekn_' + k, JSON.stringify(v)) } catch (e) { } } };
-  const st = { tab: LS.get('tab', 'fa'), f: 'all', src: '', q: '', n: 13, tr: LS.get('tr', true), mounted: '', open: null, orig: false };
+  const st = { tab: LS.get('tab2', 'en'), f: 'all', src: '', q: '', n: 13, tr: LS.get('tr', true), mounted: '', open: null, orig: false };
   const H = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.codePointAt(0)) >>> 0; return h % 360 };
   const isFaTab = () => st.tab === 'fa';
   const lists = () => { const n = X.news || {}; return { fa: (n.regional && n.regional.items) || [], en: n.items || [], w: (n.world && n.world.items) || [] } };
@@ -105,20 +102,20 @@
   function chips() {
     const a = cur(), cnt = f => a.filter(f).length, out = [['all', L('all'), a.length]];
     if (isFaTab()) {
-      ['coinkurd', 'crypto', 'economy'].forEach(s => { const n = cnt(i => i.sec === s); if (n) out.push(['sec:' + s, L('sec_' + s), n, 'nw-sec_' + s]) });
-      ['f_gold', 'f_fx', 'f_stock', 'f_oil'].forEach(c => { const n = cnt(i => i.category === c); if (n) out.push(['cat:' + c, L(c), n, 'nw-' + c]) });
+      ['coinkurd', 'crypto', 'economy'].forEach(s => { const n = cnt(i => i.sec === s); if (n) out.push(['sec:' + s, ICON['sec_' + s] + ' ' + L('sec_' + s), n]) });
+      ['f_gold', 'f_fx', 'f_stock', 'f_oil'].forEach(c => { const n = cnt(i => i.category === c); if (n) out.push(['cat:' + c, ICON[c] + ' ' + L(c), n]) });
     } else {
       const cats = st.tab === 'en' ? ['security', 'regulation', 'etf_institutional', 'onchain', 'technical', 'news'] : ['w_rates', 'w_stocks', 'w_commod', 'w_fx', 'w_trade', 'w_macro'];
-      cats.forEach(c => { const n = cnt(i => i.category === c); if (n) out.push(['cat:' + c, L(c), n, 'nw-' + c]) });
+      cats.forEach(c => { const n = cnt(i => i.category === c); if (n) out.push(['cat:' + c, ICON[c] + ' ' + L(c), n]) });
     }
     let WL = []; try { WL = JSON.parse(localStorage.getItem('ek_watch') || '[]') } catch (e) { }
-    if (WL.length) { const n = cnt(i => (i.coins || []).some(c => WL.includes(c))); if (n) out.push(['watch', L('watch'), n, 'ui-star']) }
-    return out.map(([k, t, n, ic]) => `<button class="nw-chip${st.f === k ? ' on' : ''}" data-nwf="${esc(k)}">${ic ? IC(ic) : ''}${esc(t)} <small>${fmtN(n)}</small></button>`).join('');
+    if (WL.length) { const n = cnt(i => (i.coins || []).some(c => WL.includes(c))); if (n) out.push(['watch', '⭐ ' + L('watch'), n]) }
+    return out.map(([k, t, n]) => `<button class="nw-chip${st.f === k ? ' on' : ''}" data-nwf="${esc(k)}">${esc(t)} <small>${fmtN(n)}</small></button>`).join('');
   }
-  function thumb(it, cls, noTitle) {
-    // no picture: a title card (topic icon, the headline itself, the publisher) instead of a lone emoji
-    const h = H(it.source), t = shownTitle(it);
-    const ph = `<div class="nw-ph${noTitle ? ' nw-ph-src' : ''}" style="--h:${h}">${IC(icOf(it), 'nw-phi')}${noTitle ? '' : `<b class="nw-pt" dir="${dirOf(t)}">${esc(t)}</b>`}<small>${esc(it.source)}</small></div>`;
+  const noPic = it => !!it._fa;                 // Persian news is shown as text only (owner's choice)
+  function thumb(it, cls) {
+    const h = H(it.source), ic = ICON[it.category] || ICON['sec_' + it.sec] || '📰';
+    const ph = `<div class="nw-ph" style="--h:${h}"><span>${ic}</span><b>${esc(it.source)}</b></div>`;
     if (!it.img) return `<div class="${cls}">${ph}</div>`;
     return `<div class="${cls}">${ph}<img class="nw-im" src="${esc(su(it.img))}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>`;
   }
@@ -132,17 +129,16 @@
     return `<span class="nw-tt" dir="${dirOf(t || it.title)}"${need ? ` data-ctr="${esc(it.id)}"` : ''}>${esc(t || it.title)}</span>${t ? `<span class="nw-ot" dir="${dirOf(it.title)}">${esc(it.title)}</span>` : ''}`;
   }
   function card(it, read) {
-    const tc = !it.img && !(wantTr(it) && !trTitle(it));     // the cover carries the headline, so the body does not repeat it
-    return `<button class="nw-card${read ? ' rd' : ''}${it.own ? ' own' : ''}${tc ? ' tcard' : ''}" data-nwo="${esc(it.id)}">${thumb(it, 'nw-th')}<div class="nw-cb"><div class="nw-meta">${meta(it)}</div><div class="nw-t">${titleHTML(it)}</div>${(it.coins || []).length ? `<div class="nw-coins">${it.coins.slice(0, 4).map(c => `<span class="coin">${esc(c)}</span>`).join('')}</div>` : ''}</div></button>`;
+    return `<button class="nw-card${read ? ' rd' : ''}${it.own ? ' own' : ''}${noPic(it) ? ' nw-txt' : ''}" data-nwo="${esc(it.id)}">${noPic(it) ? '' : thumb(it, 'nw-th')}<div class="nw-cb"><div class="nw-meta">${meta(it)}</div><div class="nw-t">${titleHTML(it)}</div>${(it.coins || []).length ? `<div class="nw-coins">${it.coins.slice(0, 4).map(c => `<span class="coin">${esc(c)}</span>`).join('')}</div>` : ''}</div></button>`;
   }
   function hero(it, read) {
-    return `<button class="nw-hero${read ? ' rd' : ''}" data-nwo="${esc(it.id)}">${thumb(it, 'nw-hth', true)}<div class="nw-hb"><div class="nw-meta">${it.own ? `<span class="nw-own">${IC('ui-star')}${L('own')}</span>` : ''}${meta(it)}</div><div class="nw-ht">${titleHTML(it)}</div><span class="nw-cta">${L('read')} ${AR()[1]}</span></div></button>`;
+    return `<button class="nw-hero${read ? ' rd' : ''}${noPic(it) ? ' nw-txt' : ''}" data-nwo="${esc(it.id)}">${noPic(it) ? '' : thumb(it, 'nw-hth')}<div class="nw-hb"><div class="nw-meta">${it.own ? `<span class="nw-own">⭐ ${L('own')}</span>` : ''}${meta(it)}</div><div class="nw-ht">${titleHTML(it)}</div><span class="nw-cta">${L('read')} ${AR()[1]}</span></div></button>`;
   }
   function ticker() {
-    const l = lists(), all = [...l.fa.slice(0, 6).map(i => [i, 'nw-tab-fa']), ...l.en.slice(0, 5).map(i => [i, 'nw-tab-en']), ...l.w.slice(0, 3).map(i => [i, 'nw-tab-w'])]
+    const l = lists(), all = [...l.fa.slice(0, 6).map(i => [i, '📰']), ...l.en.slice(0, 5).map(i => [i, '🌍']), ...l.w.slice(0, 3).map(i => [i, '🏦'])]
       .sort((a, b) => a[0].date < b[0].date ? 1 : -1).slice(0, 12);
     if (!all.length) return '';
-    const row = all.map(([i, e]) => `<button data-nwo="${esc(i.id)}">${IC(e)}${esc(shownTitle(i))} <small>· ${esc(i.source)}</small></button>`).join('<i>◆</i>');
+    const row = all.map(([i, e]) => `<button data-nwo="${esc(i.id)}">${e} ${esc(shownTitle(i))} <small>· ${esc(i.source)}</small></button>`).join('<i>◆</i>');
     return `<div class="nw-tick"><span class="nw-tl"><span class="nw-dot"></span>${L('breaking')}</span><div class="nw-tw"><div class="nw-tr">${row}<i>◆</i>${row}</div></div></div>`;
   }
 
@@ -152,11 +148,11 @@
     const feeds = Object.assign({}, n.feeds || {}, (n.regional || {}).feeds || {}, (n.world || {}).feeds || {});
     const ok = Object.values(feeds).filter(f => f.ok).length;
     const srcs = [...new Set(cur().flatMap(i => srcList(i).map(s => s.source)))].sort();
-    const tab = (k, ic, lab, c) => `<button class="${st.tab === k ? 'on' : ''}" data-nwt="${k}">${IC(ic)}${lab} <small>${fmtN(c)}</small></button>`;
+    const tab = (k, ic, lab, c) => `<button class="${st.tab === k ? 'on' : ''}" data-nwt="${k}">${ic} ${lab} <small>${fmtN(c)}</small></button>`;
     return `<h3>${T('newsT')}</h3>
       <div class="nw-top"><span class="nw-live"><span class="nw-dot"></span>${L('live')}</span><span>${fmtN(ok)} ${L('srcOn')}</span><span>· ${L('upd')} ${ago(n.updated_at)}</span></div>
       ${ticker()}
-      <div class="nw-tabs" role="tablist">${tab('fa', 'nw-tab-fa', L('tFa'), l.fa.length)}${tab('en', 'nw-tab-en', L('tEn'), l.en.length)}${l.w.length ? tab('w', 'nw-tab-w', L('tW'), l.w.length) : ''}</div>
+      <div class="nw-tabs" role="tablist">${tab('en', '🌍', L('tEn'), l.en.length)}${l.w.length ? tab('w', '🏦', L('tW'), l.w.length) : ''}${tab('fa', '📰', L('tFa'), l.fa.length)}</div>
       <div class="nw-bar"><input id="nwQ" type="search" placeholder="${esc(L('q'))}" value="${esc(st.q)}" autocomplete="off">
         <select id="nwS" aria-label="${esc(L('allSrc'))}"><option value="">${esc(L('allSrc'))} (${fmtN(srcs.length)})</option>${srcs.map(s => `<option${s === st.src ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select>
         ${(st.tab !== 'fa' ? lang !== 'en' : lang !== 'fa') ? '' : '<!--'}<button id="nwTr" class="nw-trb${st.tr ? ' on' : ''}" type="button" aria-pressed="${st.tr}">🌐 ${L('tr')}: <b>${st.tr ? L('trOn') : L('trOff')}</b></button>${(st.tab !== 'fa' ? lang !== 'en' : lang !== 'fa') ? '' : '-->'}</div>
@@ -187,7 +183,7 @@
     if (!X.news || !X.news.items) { box.innerHTML = `<h3>${T('newsT')}</h3><p class="disc">${T('noData')}</p>`; return }
     const L3 = lists(); L3.fa.forEach(i => i._fa = 1);
     [L3.fa, L3.en, L3.w].forEach(a => a.forEach(i => { if (!i.id) { let h = 5381; for (const c of i.url) h = ((h << 5) + h + c.charCodeAt(0)) >>> 0; i.id = 'u' + h.toString(36) } }));
-    if (!lists()[st.tab] || !lists()[st.tab].length) st.tab = lists().fa.length ? 'fa' : 'en';
+    if (!lists()[st.tab] || !lists()[st.tab].length) st.tab = lists().en.length ? 'en' : 'fa';
     box.classList.add('nw-box');
     const sig = lang + '|' + X.news.updated_at + '|' + st.tab + '|' + st.tr;
     if (st.mounted === sig && box.querySelector('#nwL')) { return }
@@ -233,9 +229,9 @@
     const engine = tr && (tT || sTr) ? `<span class="nw-eng">🤖 ${L('aiTr')}</span>` : '';
     return `<header class="nw-rh"><button class="nw-x" data-nwx aria-label="${esc(L('close'))}">✕</button><div class="nw-rnav">
         <button ${prv ? `data-nwo="${esc(prv.id)}"` : 'disabled'} aria-label="${esc(L('prev'))}">${AR()[0]} ${L('prev')}</button><button ${nxt ? `data-nwo="${esc(nxt.id)}"` : 'disabled'} aria-label="${esc(L('next'))}">${L('next')} ${AR()[1]}</button></div></header>
-      ${it.img ? `<div class="nw-rim">${thumb(it, 'nw-rth')}</div>` : ''}
+      ${it.img && !noPic(it) ? `<div class="nw-rim">${thumb(it, 'nw-rth')}</div>` : ''}
       <div class="nw-rc">
-        <div class="nw-meta">${it.own ? `<span class="nw-own">${IC('ui-star')}${L('own')}</span>` : ''}${meta(it)}${ICON[it.category] ? `<span class="nw-cat">${IC('nw-' + it.category)}${L(it.category)}</span>` : ''}</div>
+        <div class="nw-meta">${it.own ? `<span class="nw-own">⭐ ${L('own')}</span>` : ''}${meta(it)}${ICON[it.category] ? `<span class="nw-cat">${ICON[it.category]} ${L(it.category)}</span>` : ''}</div>
         <h2 class="nw-rt" dir="${dirOf(tT || it.title)}"${tr && !tT && hasTR() ? ' data-ctrx data-src="t"' : ''}>${esc(tT || it.title)}</h2>
         ${tT ? `<p class="nw-rot" dir="${dirOf(it.title)}">${esc(it.title)}</p>` : ''}
         ${wantTr(it) ? `<div class="nw-rtg"><button class="${!st.orig ? 'on' : ''}" data-nwor="0">🌐 ${L('trd')}</button><button class="${st.orig ? 'on' : ''}" data-nwor="1">${L('orig')}</button>${engine}</div>` : ''}
@@ -246,7 +242,7 @@
         <div class="nw-ract"><button data-nwsh="${esc(it.id)}">🔗 ${L('share')}</button>${'speechSynthesis' in window ? `<button data-nwsp>🔊 ${L('listen')}</button>` : ''}</div>
         <div class="nw-rsrc"><small>${L('srcs')}:</small> ${srcList(it).map(s => `<span class="nw-src" style="--h:${H(s.source)}">${esc(s.source)}</span>`).join(' ')}
           ${it.own ? '' : `<a class="nw-att" href="${esc(su(it.url))}" target="_blank" rel="noopener nofollow">${L('attrib')} ↗</a>`}</div>
-        ${rel.length ? `<h4 class="nw-relh">${L('related')}</h4><div class="nw-rel">${rel.map(x => `<button data-nwo="${esc(x.id)}">${thumb(x, 'nw-relth')}<span><b dir="${dirOf(shownTitle(x))}">${esc(shownTitle(x))}</b><small>${esc(x.source)} · ${ago(x.date)}</small></span></button>`).join('')}</div>` : ''}
+        ${rel.length ? `<h4 class="nw-relh">${L('related')}</h4><div class="nw-rel">${rel.map(x => `<button data-nwo="${esc(x.id)}">${noPic(x) ? '' : thumb(x, 'nw-relth')}<span><b dir="${dirOf(shownTitle(x))}">${esc(shownTitle(x))}</b><small>${esc(x.source)} · ${ago(x.date)}</small></span></button>`).join('')}</div>` : ''}
       </div>`;
   }
   function close(fromPop) {
@@ -261,7 +257,7 @@
     const t = e.target;
     const o = t.closest('[data-nwo]'); if (o) { e.preventDefault(); open(o.dataset.nwo); return }
     if (t.closest('[data-nwx]')) { close(); return }
-    const tb = t.closest('[data-nwt]'); if (tb) { st.tab = tb.dataset.nwt; st.f = 'all'; st.src = ''; st.n = 13; LS.set('tab', st.tab); remount(); return }
+    const tb = t.closest('[data-nwt]'); if (tb) { st.tab = tb.dataset.nwt; st.f = 'all'; st.src = ''; st.n = 13; LS.set('tab2', st.tab); remount(); return }
     const f = t.closest('[data-nwf]'); if (f) { st.f = f.dataset.nwf; st.n = 13; document.getElementById('nwC').innerHTML = chips(); list(); return }
     if (t.closest('#nwM')) { st.n += 12; list(); return }
     if (t.closest('#nwTr')) { st.tr = !st.tr; LS.set('tr', st.tr); if (st.tr) translator('en', 'fa'); remount(); return }
@@ -322,6 +318,7 @@
 .nw-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:0 0 12px;scrollbar-width:thin}
 .nw-chip{flex:0 0 auto;font:inherit;font-size:.76rem;padding:5px 12px;border-radius:99px;border:1px solid var(--line);color:var(--mute);background:none;cursor:pointer}
 .nw-chip small{opacity:.65}.nw-chip.on{border-color:var(--lime);color:var(--ink);background:rgba(247,147,26,.14)}
+.nw-hero.nw-txt{grid-template-columns:1fr}.nw-hero.nw-txt .nw-hb{padding:20px 22px}.nw-card.nw-txt .nw-cb{padding-top:14px}
 .nw-hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0;width:100%;text-align:start;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#171717;color:var(--ink);cursor:pointer;padding:0;font:inherit;margin:0 0 12px;transition:.25s}
 .nw-hero:hover{border-color:var(--lime);transform:translateY(-2px);box-shadow:0 14px 40px -18px rgba(247,147,26,.45)}
 .nw-hth{position:relative;min-height:210px;overflow:hidden}
@@ -336,14 +333,8 @@
 .nw-th{position:relative;aspect-ratio:16/9;overflow:hidden;background:#1d1d1d}
 .nw-th img,.nw-hth img,.nw-rth img,.nw-relth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
 .nw-card:hover .nw-th img,.nw-hero:hover .nw-hth img{transform:scale(1.05)}
-.nw-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:6px;padding:12px 14px;overflow:hidden;color:#fff;
-background:radial-gradient(130% 110% at 85% 0%,hsla(var(--h),75%,48%,.55),transparent 60%),linear-gradient(160deg,hsla(var(--h),45%,22%,1),hsla(calc(var(--h) + 30),40%,9%,1))}
-.nw-ph::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 2px,transparent 2px 9px);pointer-events:none}
-.nw-ph .nw-phi{position:absolute;top:10px;inset-inline-end:10px;width:30px;height:30px;margin:0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
-.nw-pt{position:relative;font-size:.95rem;font-weight:800;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 2px 12px rgba(0,0,0,.5);width:100%;text-align:start}
-.nw-ph small{position:relative;font-size:.7rem;opacity:.75;font-weight:600;letter-spacing:.02em}
-.nw-card.tcard .nw-t{display:none}.nw-ph-src{justify-content:center;align-items:center;text-align:center}.nw-ph-src .nw-phi{position:relative;top:auto;inset-inline-end:auto;width:64px;height:64px}.nw-ph-src small{font-size:.9rem;opacity:.9}
-.nw-ic{width:1.25em;height:1.25em;vertical-align:-.3em;margin-inline-end:.35em;display:inline-block}
+.nw-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:radial-gradient(120% 120% at 20% 10%,hsla(var(--h),70%,45%,.55),hsla(calc(var(--h) + 40),60%,20%,.9));color:#fff}
+.nw-ph span{font-size:1.9rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}.nw-ph b{font-size:.72rem;opacity:.85}
 .nw-cb{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
 .nw-t .nw-tt{font-size:.86rem;font-weight:700;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .nw-ot{display:block;font-size:.7rem;color:var(--mute);margin-top:3px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
@@ -387,11 +378,11 @@ html.nw-lock,html.nw-lock body{overflow:hidden}
 .nw-rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
 .nw-rel button{display:flex;gap:10px;align-items:center;text-align:start;padding:6px;border:1px solid var(--line);border-radius:12px;background:#161616;color:var(--ink);font:inherit;cursor:pointer;min-width:0}
 .nw-rel button:hover{border-color:var(--lime)}
-.nw-relth{position:relative;flex:0 0 72px;height:52px;border-radius:8px;overflow:hidden}.nw-relth .nw-ph{padding:6px}.nw-relth .nw-pt,.nw-relth .nw-ph small{display:none}.nw-relth .nw-phi{inset:0;margin:auto;width:24px;height:24px}
+.nw-relth{position:relative;flex:0 0 72px;height:52px;border-radius:8px;overflow:hidden}.nw-relth .nw-ph span{font-size:1.1rem}.nw-relth .nw-ph b{display:none}
 .nw-rel span{display:flex;flex-direction:column;min-width:0}.nw-rel b{font-size:.76rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.nw-rel small{font-size:.66rem;color:var(--mute)}
 @media(max-width:700px){.nw-hero{grid-template-columns:1fr}.nw-hth{min-height:0;aspect-ratio:16/9}.nw-grid{grid-template-columns:1fr 1fr}.nw-t .nw-tt{font-size:.8rem}
  .nw-ov{padding:0;align-items:flex-end}.nw-rd{max-height:94vh;border-radius:18px 18px 0 0}.nw-rt{font-size:1.15rem}.nw-rc{padding:14px 16px 26px}.nw-bar select{flex:1 1 140px}}
-@media(max-width:420px){.nw-grid{grid-template-columns:1fr}.nw-card{flex-direction:row}.nw-th{flex:0 0 112px;aspect-ratio:auto;min-height:92px}.nw-th .nw-pt{font-size:.78rem;-webkit-line-clamp:4}.nw-th .nw-ph small{display:none}.nw-th .nw-phi{width:22px;height:22px}}
+@media(max-width:420px){.nw-grid{grid-template-columns:1fr}.nw-card{flex-direction:row}.nw-th{flex:0 0 112px;aspect-ratio:auto;min-height:92px}.nw-th .nw-ph b{display:none}}
 `;
     const s = document.createElement('style'); s.id = 'nwCSS'; s.textContent = css; document.head.appendChild(s);
   }
