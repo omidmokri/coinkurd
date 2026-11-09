@@ -76,7 +76,7 @@ void main(){vec2 d=gl_PointCoord-.5;float r=length(d);if(r>.5)discard;float a=sm
   const coin = new THREE.Group(); scene.add(coin);
   const ld = new THREE.TextureLoader(); let texReady = 0;
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  const T = f => { const t = ld.load('assets/' + f, () => { texReady++; }); t.anisotropy = aniso; return t; };
+  const T = f => { const t = ld.load('assets/' + (window.EKWEBP ? f.replace('.png', '.webp') : f), () => { texReady++; }); t.anisotropy = aniso; return t; };
   const mF = new THREE.MeshStandardMaterial({ map: T('coin-front.png'), bumpMap: T('coin-front-bump.png'), bumpScale: 0.025, metalness: 0.85, roughness: 0.32, transparent: true, opacity: 0 });
   const mB = new THREE.MeshStandardMaterial({ map: T('coin-back.png'), bumpMap: T('coin-back-bump.png'), bumpScale: 0.025, metalness: 0.85, roughness: 0.32, transparent: true, opacity: 0 });
   const ec = document.createElement('canvas'); ec.width = 1024; ec.height = 64; const eg = ec.getContext('2d');
@@ -158,7 +158,7 @@ void main(){
   }
   const coinImg = new Image();
   coinImg.onload = () => buildDust(coinImg);
-  coinImg.src = 'assets/coin-front.png';
+  coinImg.src = window.EKWEBP ? 'assets/coin-front.webp' : 'assets/coin-front.png';
 
   /* ---------------- tunnel of real blocks ---------------- */
   const tunnel = new THREE.Group(); tunnel.visible = false; scene.add(tunnel);
