@@ -66,6 +66,74 @@ def fetch():
     raise RuntimeError(last)
 
 
+BASE_DAYS = 14
+MIN_TEST = 10
+
+
+def _rng(c):
+    return (max(b["h"] for b in c) / min(b["l"] for b in c) - 1) * 100
+
+
+def measure(k, t0):
+    """k: 1h candles (sorted). t0: event time in ms. Returns btc_1h/btc_4h/btc_range_4h for the event hour and
+    base_range_4h = mean 4h range of the same clock window on each of the previous BASE_DAYS days."""
+    idx = {b["t"]: i for i, b in enumerate(k)}
+    h0 = int(t0 // 3600_000 * 3600_000)
+    out = {}
+    i = idx.get(h0)
+    if i is None:
+        return out
+    p0 = k[i]["o"]
+    if len(k) > i + 1:
+        out["btc_1h"] = round((k[i]["c"] / p0 - 1) * 100, 2)
+    if len(k) > i + 4:
+        out["btc_4h"] = round((k[i + 3]["c"] / p0 - 1) * 100, 2)
+        out["btc_range_4h"] = round(_rng(k[i:i + 4]), 2)
+    base = []
+    for j in range(1, BASE_DAYS + 1):
+        b = idx.get(h0 - j * 86400_000)
+        if b is not None and b + 4 <= len(k) and k[b + 3]["t"] == k[b]["t"] + 3 * 3600_000:
+            base.append(_rng(k[b:b + 4]))
+    if len(base) >= BASE_DAYS // 2:
+        out["base_range_4h"] = round(sum(base) / len(base), 2)
+    return out
+
+
+def sign_p(k, n):
+    """Exact two-sided binomial (sign) test, H0 p=0.5."""
+    from math import comb
+    if n == 0:
+        return None
+    tail = sum(comb(n, i) for i in range(0, min(k, n - k) + 1)) / 2 ** n
+    return round(min(1.0, 2 * tail), 4)
+
+
+def reaction_stats(evs):
+    stats, pairs = {}, []
+    for e in evs:
+        if "btc_range_4h" in e:
+            s = stats.setdefault(e["kind"], {"r": [], "b": []})
+            s["r"].append(e["btc_range_4h"])
+            if "base_range_4h" in e:
+                s["b"].append(e["base_range_4h"])
+                pairs.append((e["btc_range_4h"], e["base_range_4h"]))
+    out = {}
+    for k, v in stats.items():
+        o = {"n": len(v["r"]), "avg_range_4h": round(sum(v["r"]) / len(v["r"]), 2)}
+        if v["b"]:
+            o["avg_base_4h"] = round(sum(v["b"]) / len(v["b"]), 2)
+            o["n_base"] = len(v["b"])
+        out[k] = o
+    n = len([p for p in pairs if p[0] != p[1]])
+    up = sum(1 for r, b in pairs if r > b)
+    out["_all"] = {"n": len(pairs), "wider": up, "min_n": MIN_TEST, "base_days": BASE_DAYS,
+                   "avg_range_4h": round(sum(r for r, _ in pairs) / len(pairs), 2) if pairs else None,
+                   "avg_base_4h": round(sum(b for _, b in pairs) / len(pairs), 2) if pairs else None,
+                   "p": sign_p(up, n) if len(pairs) >= MIN_TEST else None,
+                   "test": "two-sided exact sign test: event 4h range vs the mean range of the same UTC window on the previous 14 days"}
+    return out
+
+
 def main():
     old = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {"events": []}
     store = {f'{e["date"]}|{e["title"]}': e for e in old.get("events", [])}
@@ -88,31 +156,19 @@ def main():
         print("calendar fetch failed:", err)
     now = datetime.now(timezone.utc)
     calls = 0
-    for e in store.values():   # واکنش BTC بعد از رویداد
+    for e in store.values():   # واکنش BTC بعد از رویداد + دامنهٔ «عادی» همان ساعت در ۱۴ روز قبل (خط پایه)
         d = datetime.fromisoformat(e["date"])
-        if d < now - timedelta(hours=4, minutes=5) and "btc_4h" not in e and calls < 20 and d > now - timedelta(days=30):
+        need = "btc_4h" not in e or "base_range_4h" not in e
+        if d < now - timedelta(hours=4, minutes=5) and need and calls < 20 and d > now - timedelta(days=30):
             try:
-                k = klines("BTC", "1h", 6, start=(d - timedelta(hours=1)).timestamp() * 1000)
+                k = klines("BTC", "1h", BASE_DAYS * 24 + 6, start=(d - timedelta(days=BASE_DAYS, hours=1)).timestamp() * 1000)
                 calls += 1
-                base = next((b for b in k if b["t"] <= d.timestamp() * 1000 < b["t"] + 3600_000), None)
-                if base:
-                    i = k.index(base)
-                    p0 = base["o"]
-                    if len(k) > i + 1:
-                        e["btc_1h"] = round((k[i]["c"] / p0 - 1) * 100, 2)
-                    if len(k) > i + 4:
-                        e["btc_4h"] = round((k[i + 3]["c"] / p0 - 1) * 100, 2)
-                        e["btc_range_4h"] = round((max(b["h"] for b in k[i:i + 4]) / min(b["l"] for b in k[i:i + 4]) - 1) * 100, 2)
+                e.update(measure(k, d.timestamp() * 1000))
             except Exception as ex:  # noqa: BLE001
                 print("klines:", ex)
     evs = sorted(store.values(), key=lambda e: e["date"])
     evs = [e for e in evs if datetime.fromisoformat(e["date"]) > now - timedelta(days=120)]
-    stats = {}
-    for e in evs:
-        if "btc_range_4h" in e:
-            s = stats.setdefault(e["kind"], [])
-            s.append(e["btc_range_4h"])
-    stats = {k: {"n": len(v), "avg_range_4h": round(sum(v) / len(v), 2)} for k, v in stats.items()}
+    stats = reaction_stats(evs)
     json.dump({"updated_at": now.isoformat(), "source": "ForexFactory weekly calendar", "error": err,
                "events": evs, "reaction_stats": stats}, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     up = [e for e in evs if datetime.fromisoformat(e["date"]) >= now]
