@@ -509,8 +509,18 @@ def sec_anomaly(lang):
     return _head("🔎 " + _q("an.title", lg), lg, "/anomalies/", lines, d.get("updated_at"))
 
 
+
+def sec_stratlab(lang):
+    lg = _lg(lang)
+    import build_strategy_lab as SL
+    lines = [SL.T["desc"][lg], "", SL.T["local"][lg], "",
+             {"fa": "نمونه‌های آماده: خرید اصلاح در روند صعودی · تقاطع طلایی ۵۰/۲۰۰ · شکست سقف ۲۰ روزه با حجم · خرید در ترس شدید · روند فقط در رژیم صعودی · شورت اشباع خرید ۴ ساعته",
+              "ckb": "نموونە ئامادەکان: کڕینی داکەوتن لە ڕەوتی بەرزدا · یەکتربڕینی زێڕین ٥٠/٢٠٠ · شکاندنی لوتکەی ٢٠ ڕۆژە · کڕین لە ترسی زۆردا",
+              "en": "Ready-made examples: buy the dip in an uptrend · golden cross 50/200 · 20-day breakout with volume · buy extreme fear · trend only in a bull regime · 4h overbought short"}[lg]]
+    return _head("🧪 " + SL.T["title"][lg], lg, "/strategy-lab/", lines, None)
+
 SECTIONS = {"tools": (sec_tools, "/tools/"), "today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/"),
-            "truth": (sec_truth, "/truth/"), "regime": (sec_regime, "/regime/"), "anomaly": (sec_anomaly, "/anomalies/")}
+            "truth": (sec_truth, "/truth/"), "stratlab": (sec_stratlab, "/strategy-lab/"), "regime": (sec_regime, "/regime/"), "anomaly": (sec_anomaly, "/anomalies/")}
