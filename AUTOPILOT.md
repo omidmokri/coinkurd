@@ -105,11 +105,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 
 ## Backlog (top = next)
 1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
-   - **Broken images — slice 1 shipped 2026-11-09** (site-wide hide-on-error in chrome.js + dead-local guard). Remaining:
-     cache allowed news images in CI so they show instead of disappearing. Original note:
-     ~40 images fail on home/news/archive — external Iranian CDNs (cdn.eghtesadnews.com,
-     cdn.donya-e-eqtesad.com) and some local `/data/deepimg/`, `/data/postimg/` files. Fix: onerror fallback/hide,
-     drop dead locals from the data builders, consider caching allowed images in CI. (High value, visible on every visit.)
+   - **Broken images — done 2026-11-09** (slice 1: site-wide hide-on-error; slice 2 dropped: no page renders the
+     Persian-feed images — `news.js` `noPic` shows Persian news text-only by the owner's choice, and a full build has no
+     Iranian-CDN `<img>` anywhere — so caching them in CI would buy nothing). Re-open only if a page starts showing them.
    - **Regime radar stability:** the HMM flips regimes too fast. Add an explainable rule layer (Mayer Multiple, MA200
      slope, weekly RSI, funding z-score) + multi-day hysteresis. Needs the trackrecord.py-style synthetic tests.
    - **Scanner plain-language "why this coin?"** per finding + a "send to roundtable" button.
@@ -145,6 +143,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Broken images slice 2 investigated and closed without code (Backlog #1)
+- **Need checked:** cache the Iranian news-CDN images (donya-e-eqtesad, eghtesadnews, isna, ecoiran) in CI.
+- **Found:** those images live only in `data/news.json` → `regional.items[].img`, and nothing displays them: `assets/news.js`
+  has `noPic` (Persian news is text-only, owner's choice), no builder or bot section reads regional `img`, and a full
+  `build_pages.py` run on a /tmp/bld copy left zero `<img>` pointing at those CDNs (only article links in friction.json).
+  Slice 1's hide-on-error already covers any other broken image.
+- **Built then discarded:** `scripts/newsimg.py` (download → ≤480px WebP cache, drop on failure; self-test passed) — not
+  shipped, because it would add repo weight for images no page shows. Recreate from this note if the owner turns Persian
+  news thumbnails on.
+- **Next:** Backlog #1 regime radar stability (rule layer + hysteresis, with trackrecord-style synthetic tests).
 ### 2026-11-09 · Broken images hidden site-wide (owner review, Backlog #1 first item, slice 1)
 - **Need:** the owner's review counted ~40 broken-image icons on home/news/archive (dead Iranian news CDNs, missing local
   files) — visible on every visit, makes the site look abandoned.
