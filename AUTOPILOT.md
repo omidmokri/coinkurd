@@ -7,6 +7,17 @@
 Every hour a fresh Claude session with no memory of earlier runs opens this file. It is the only memory the loop has:
 the mission, the rules, how to work, the backlog and the log. **Read all of it before doing anything.**
 
+## 1404/08/19 — فید یک‌هفته‌ای و three.js از مسیر بحرانی بیرون آمد
+صفحهٔ اصلی از `data/posts_week.json` باز می‌شود (۶۴ پست، ۲۶ KB روی سیم) به جای
+`posts_lite.json` (۱۱۲۹ پست، ۴۴۸ KB). آرشیو کامل فقط با جست‌وجو، فیلتر یا دکمهٔ
+«نمایش مطالب قدیمی‌تر» (`#archBtn`) گرفته می‌شود؛ `scripts/enrich.py` با
+`FEED_DAYS=7` و `FEED_MIN=40` این فایل را می‌سازد.
+`three.min.js` از `<head>` برداشته شد و پس از رویداد `load` و پیش از
+`land.js`/`cinema.js` بار می‌شود.
+اندازه‌گیری (۳ Mbps، ۳۹۰px): اولین کارت ۸٫۳s ← ۲٫۶s؛ first paint ۰٫۷۵s؛
+صفحهٔ اول ۱٫۰۸ MB / ۶۴ درخواست. آزمون سه‌زبانه بدون خطا؛ `build_pages.py`
+فایل `index.html` را دست‌نخورده گذاشت.
+
 ## Mission
 
 entekhab.net (repo `omidmokri/coinkurd`, GitHub Pages) is the site of the Persian/Kurdish crypto channel Coin_Kurd
