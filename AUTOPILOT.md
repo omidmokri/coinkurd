@@ -131,6 +131,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-09 · Baseline + significance test for "BTC reaction to economic events" (home calendar + bot; new need)
+- **Need:** the home calendar showed "avg 4h range after this event type" (n=1–2) with no baseline, implying that CPI/NFP
+  etc. move BTC more — an untested claim, against the guardrails. Traders plan around these releases. #5 still waits (bear 8/85).
+- **Built:** `scripts/events.py` — pure `measure()` now also computes `base_range_4h` (mean 4h range of the same UTC window on
+  each of the previous 14 days, one 342-candle Binance call per event, re-measures events ≤30 days old that lack it);
+  `reaction_stats()` adds `avg_base_4h` per type and `_all` = wider-than-normal count, means, exact two-sided sign test
+  (p only when n≥10, else "not enough events"). Home `#eventsBox` (index.html, fa/ckb/en) shows "normal for that hour" next to
+  each type's average and the overall test line; bot `bot_data.sec_events` adds the same line (read-only).
+- **Verified:** synthetic candles with a planted 3% event window vs 1% normal → range 3.0, base 1.0, 1h +2.0; missing hour → {};
+  sign_p(1,10)=22/1024, (0,10)=(10,10)≈0.002, (5,10)=1; 12 planted events p=0.0005; n<10 → p None; empty → n 0. Playwright +
+  Chrome on a /tmp/bld copy with fake data: 1280 fa / 390 fa+en+ckb, overflow 0, zero JS errors, looked at shots; bot text in
+  fa/ckb/en/ar. py_compile. Real numbers appear after the next CI sync (check `reaction_stats._all` in data/events.json).
+- **Next:** confirm `_all` and `base_range_4h` in committed events.json; #5 when ≥30 bearish days; otherwise a fresh need.
 ### 2026-11-08 · World market hours & funding clock (/tools/#sessions; new need, Backlog had nothing open)
 - **Need:** Iranian/Kurdish traders constantly convert Tokyo/London/New York session times and Binance funding times
   (UTC) into local time by hand, and get DST wrong. #5 still waits (bear days 8 of 85 < 30).

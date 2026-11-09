@@ -328,6 +328,14 @@ def sec_events(lang):
         fc = f" · F {x['forecast']}" if x.get("forecast") else ""
         pv = f" · P {x['previous']}" if x.get("previous") else ""
         out.append(f"{past}{imp.get(x.get('impact'), '⚪️')} {dt:%a %d %b %H:%M} — <b>{e(title)}</b>{fc}{pv}")
+    a = (ev.get("reaction_stats") or {}).get("_all") or {}
+    if a.get("n"):
+        L = {"fa": "دامنهٔ ۴h بعد از رویداد در {w} از {n} رویداد بیشتر از معمولِ همان ساعت (۱۴ روز قبل) بود: {r}% در برابر {b}%",
+             "ckb": "مەودای ٤h دوای ڕووداو لە {w} لە {n} ڕووداودا زیاتر بوو لە ئاسایی هەمان کاتژمێر (١٤ ڕۆژی پێشوو): {r}% بەرامبەر {b}%",
+             "en": "4h range after the event was wider than normal for that hour (prev. 14 days) in {w} of {n} events: {r}% vs {b}%"}
+        line = L.get(lang, L["en"]).format(w=a["wider"], n=a["n"], r=a["avg_range_4h"], b=a["avg_base_4h"])
+        line += f" · sign test p={a['p']}" if a.get("p") is not None else f" · n<{a.get('min_n', 10)}: no test yet"
+        out.append("\n📏 " + e(line))
     if len(out) == 1:
         out.append("—")
     out += ["", age(ev.get("updated_at"), lang)]
