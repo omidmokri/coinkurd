@@ -17,13 +17,18 @@ import time
 from datetime import datetime, timezone
 
 import requests
-from PIL import Image, ImageChops, ImageDraw, ImageFilter
-import numpy as np
+from PIL import Image, ImageChops, ImageDraw, ImageFilter      # Pillow only: the CI has no numpy
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "coinlogo")
 HAS3D = os.path.join(ROOT, "assets", "coin3d")
 UA = {"User-Agent": "entekhab.net coin logos"}
+
+
+def _vgrad(w, h, top, bottom):
+    """vertical colour gradient image (RGBA)"""
+    m = Image.linear_gradient("L").resize((w, h))
+    return Image.composite(Image.new("RGBA", (w, h), bottom + (255,)), Image.new("RGBA", (w, h), top + (255,)), m)
 
 
 def coin_frame(logo, rim=(247, 147, 26), white_glyph=False):
@@ -38,29 +43,28 @@ def coin_frame(logo, rim=(247, 147, 26), white_glyph=False):
     im.paste((0, 0, 0, 255), (0, 0), sh.filter(ImageFilter.GaussianBlur(10 * S)))
     dark = tuple(int(v * 0.35) for v in rim)
     ImageDraw.Draw(im).ellipse((c - R // 2, c - R // 2 + 8 * S, c + R // 2, c + R // 2 + 8 * S), fill=dark + (255,))
-    y, x = np.mgrid[0:W, 0:W]
-    d = np.hypot(x - (c - R * 0.18), y - (c - R * 0.22)) / (R * 0.9)
-    base, hi = np.array([14, 16, 18]), np.array([66, 74, 76])
-    t = np.clip(1 - d, 0, 1)[..., None]
-    face = np.dstack([base + (hi - base) * t, np.full((W, W, 1), 255)]).astype(np.uint8)
+    # face: radial light from the upper left
+    rg = Image.radial_gradient("L").resize((int(R * 1.8), int(R * 1.8)))          # 0 centre -> 255 edge
+    lightmask = Image.new("L", (W, W), 255)
+    lightmask.paste(rg, (int(c - R * 0.18 - R * 0.9), int(c - R * 0.22 - R * 0.9)))
+    face = Image.composite(Image.new("RGBA", (W, W), (14, 16, 18, 255)), Image.new("RGBA", (W, W), (66, 74, 76, 255)), lightmask)
     fm = Image.new("L", (W, W), 0)
     ImageDraw.Draw(fm).ellipse((c - R // 2, c - R // 2, c + R // 2, c + R // 2), fill=255)
-    im.paste(Image.fromarray(face, "RGBA"), (0, 0), fm)
+    im.paste(face, (0, 0), fm)
     ring = Image.new("L", (W, W), 0)
     dr = ImageDraw.Draw(ring)
     dr.ellipse((c - R // 2, c - R // 2, c + R // 2, c + R // 2), fill=255)
     dr.ellipse((c - R // 2 + 9 * S, c - R // 2 + 9 * S, c + R // 2 - 9 * S, c + R // 2 - 9 * S), fill=0)
-    g = np.clip(1 - (y - (c - R / 2)) / R, 0.35, 1.0)
-    rc = np.dstack([rim[0] * g, rim[1] * g, rim[2] * g, np.full_like(g, 255)]).astype(np.uint8)
-    im.paste(Image.fromarray(rc, "RGBA"), (0, 0), ring)
+    rimimg = Image.new("RGBA", (W, W), rim + (255,))
+    rimimg.paste(_vgrad(W, R, rim, tuple(int(v * 0.35) for v in rim)), (0, c - R // 2))
+    im.paste(rimimg, (0, 0), ring)
     if white_glyph:
         m = logo.split()[3]
         m = m.crop(m.getbbox())
         gw = int(R * 0.46)
         gm = m.resize((gw, int(m.size[1] * gw / m.size[0])), Image.LANCZOS)
-        art = Image.new("RGBA", gm.size, (0, 0, 0, 0))
-        col = (np.linspace(255, 200, gm.size[1])[:, None] * np.ones((1, gm.size[0])))
-        art = Image.fromarray(np.dstack([col, col, col, np.asarray(gm)]).astype(np.uint8), "RGBA")
+        art = _vgrad(gm.size[0], gm.size[1], (255, 255, 255), (200, 200, 200))
+        art.putalpha(gm)
     else:
         lg = logo.crop(logo.getbbox() or (0, 0, logo.size[0], logo.size[1]))
         gw = int(R * 0.66)
@@ -82,14 +86,13 @@ def coin_frame(logo, rim=(247, 147, 26), white_glyph=False):
 
 
 def main_colour(img):
-    a = np.asarray(img.convert("RGBA").resize((48, 48))).reshape(-1, 4).astype(float)
-    a = a[a[:, 3] > 200][:, :3]
-    if not len(a):
+    px = [p for p in img.convert("RGBA").resize((48, 48)).getdata() if p[3] > 200]
+    if not px:
         return (247, 147, 26)
-    sat = a.max(1) - a.min(1)
-    pick = a[sat > 40] if (sat > 40).sum() > 20 else a
-    r, g, b = pick.mean(0)
-    return (int(r), int(g), int(b))
+    vivid = [p for p in px if max(p[:3]) - min(p[:3]) > 40]
+    pick = vivid if len(vivid) > 20 else px
+    n = len(pick)
+    return tuple(int(sum(p[i] for p in pick) / n) for i in range(3))
 
 
 def gecko_index():
