@@ -359,11 +359,6 @@ jobs:
       - name: Leak guard (no indicator source may ever reach the public repo or site)
         run: python scripts/leak_guard.py
 
-      - name: IndexNow (tell Bing about new post pages)
-        continue-on-error: true
-        timeout-minutes: 2
-        run: python scripts/indexnow.py
-
       - name: Commit data
         run: |
           git config user.name  "coinkurd-bot"

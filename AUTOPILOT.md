@@ -158,8 +158,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - build_pages.seo_title / seo_desc (decoration such as ━━━ and emoji removed, cut at a word boundary, "…") in page();
   scripts/seo_tidy.py as the last build step catches the pages with their own templates. og:* tags keep full text.
   Build check: 0 of 5,498 pages over the limits; second run changes nothing. Home title/description shortened.
-- IndexNow: key file at the root (key from the owner's OpenSEO project), scripts/indexnow.py submits new post pages
-  once (state data/indexnow.json, before "Commit data"). The OpenSEO project itself is set to the misspelt domain
+- IndexNow already ran (scripts/indexnow.py, key 197870bb…, step at update.yml ~315); only OpenSEO's own key file
+  79b8346b….txt was added at the root so OpenSEO can verify. (A first version of this change overwrote indexnow.py by
+  mistake; it was restored from fe570afc in the next commit.) The OpenSEO project is set to the misspelt domain
   entekhb.net — only the owner can change that in its settings.
 
 ### 2026-11-10 · Paper trading in the bot + /leaderboard/ (owner chose "record trades in the bot")
