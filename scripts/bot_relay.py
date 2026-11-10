@@ -114,6 +114,8 @@ def tick(s, tg):
     codes, names = maps()
     if not codes:
         return False
+    if st.get("v") != 2:                      # posts skipped by an older version get a second chance
+        st["v"], st["done"] = 2, []
     done = st.setdefault("done", [])
     first = not done
     limit = 3 if first else 8                 # on the very first run only the newest posts get an answer
