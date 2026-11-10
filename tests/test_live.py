@@ -81,4 +81,13 @@ check(set(bad) == {"ind", "tv_sym", "sym", "tf", "price", "t", "src", "f"} and "
 check(bad["f"] == {"dir": "long", "src": "x" * 48, "score": 5.0} and bad["tf"] == "1h", "engine: only short scalars kept")
 check(S.clean_engine({"ind": "x", "t": "not a time"}) is None, "engine: bad time rejected")
 
+L2 = S.build_live({}, [], {}, sg, IDS, now=NOW)["kurdistan-roj"]["states"]
+by = {(x["tv_sym"]): x for x in L2}
+check(by["BINANCE:BTCUSDT"]["f"]["dir"] == "long" and by["BINANCE:BTCUSDT"]["from"] == "signal", "strategy entry becomes live state")
+check(by["BINANCE:SOLUSDT"]["f"] == {"dir": "flat"}, "strategy exit -> flat state")
+check(by["BINANCE:ETHUSDT"]["f"] == {"dir": "flat", "note": "SL hit"}, "stopped-out entry -> flat with note")
+newer = [{"ind": "kurdistan-roj", "tv_sym": "BINANCE:BTCUSDT", "tf": "1h", "t": t(1), "f": {"dir": "short"}}]
+L3 = S.build_live({}, newer, {}, sg, IDS, now=NOW)["kurdistan-roj"]["states"]
+check([x["f"]["dir"] for x in L3 if x["tv_sym"] == "BINANCE:BTCUSDT"] == ["short"], "newer #ESTATE wins over older signal")
+
 print(f"live relay: {ok} checks passed")

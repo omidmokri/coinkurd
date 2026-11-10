@@ -265,6 +265,26 @@ def build_live(prev, new_states, engine, sigs, ids, now=None):
             it["pos"].append({k: s.get(k) for k in ("id", "t", "side", "price", "sym", "tv_sym", "tf", "sl", "tp", "tp2", "order")})
         elif s.get("kind") == "exit":
             it["pos"] = [p for p in it["pos"] if (p["tv_sym"], p["tf"], p["side"]) != (s.get("tv_sym"), s.get("tf"), s.get("side"))]
+    # strategies need no code change: their order alerts (#ESIG) become the live state of that symbol/timeframe
+    # whenever no newer #ESTATE line exists for it
+    lastsig = {}
+    for s in sorted(sigs, key=lambda x: x["t"]):
+        if s.get("src") == "tv" and s.get("ind") in ids and now - datetime.fromisoformat(s["t"]) <= timedelta(days=30):
+            lastsig[(s["ind"], s.get("tv_sym"), s.get("tf"))] = s
+    for k, s in lastsig.items():
+        cur = next((x for x in items.get(k[0], {}).get("states", []) if (x["ind"], x.get("tv_sym"), x.get("tf")) == k), None)
+        if cur and cur["t"] >= s["t"]:
+            continue
+        hit = (s.get("out") or {}).get("hit")
+        f = {"dir": "flat" if s.get("kind") == "exit" or hit else s.get("side")}
+        if hit:
+            f["note"] = f"{hit.upper()} hit"
+        elif s.get("kind") != "exit":
+            f.update({k2: v for k2, v in (("entry", s.get("price")), ("sl", s.get("sl")), ("tp1", s.get("tp")), ("tp2", s.get("tp2"))) if v})
+        st = {"ind": k[0], "tv_sym": k[1], "sym": s.get("sym"), "tf": k[2], "price": s.get("price"), "t": s["t"], "src": "tv",
+              "from": "signal", "msg": s.get("msg"), "f": f}
+        it = items.setdefault(k[0], {"states": [], "pos": [], "last": None})
+        it["states"] = [x for x in it["states"] if (x["ind"], x.get("tv_sym"), x.get("tf")) != k] + [st]
     for it in items.values():
         it["states"].sort(key=lambda x: x["t"], reverse=True)
         it["states"] = it["states"][:60]
