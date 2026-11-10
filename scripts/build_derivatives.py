@@ -11,7 +11,7 @@ import build_reality as BR  # noqa: E402
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "1"
+VER = "2"
 T = {
     "title": L("داشبورد مشتقات: فاندینگ، اوپن اینترست، لیکوییدیشن", "داشبۆردی دەرهاتەکان: فەندینگ، ئۆپن ئینتەرێست، لیکویدکردن",
                "Derivatives dashboard: funding, open interest, liquidations"),
