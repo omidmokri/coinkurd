@@ -265,7 +265,7 @@
 
   function build() {
     fab = document.createElement("button");
-    fab.id = "ask-fab"; fab.type = "button";
+    fab.id = "ask-fab"; fab.type = "button"; fab.setAttribute("aria-label", "Entekhab assistant");
     fab.innerHTML = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l2-5.2A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'/></svg><span class='ask-lbl'>" + esc(T(S.fab)) + "</span>";
     document.body.appendChild(fab);
 
@@ -295,7 +295,7 @@
   }
   function relabel() {
     if (!panel) return;
-    fab.querySelector(".ask-lbl").textContent = T(S.fab);
+    fab.querySelector(".ask-lbl").textContent = T(S.fab); fab.setAttribute("aria-label", T(S.fab));
     panel.querySelector(".ask-hd b").textContent = T(S.title);
     panel.querySelector(".ask-hd small").textContent = T(S.sub);
     panel.querySelector(".ask-note").textContent = T(S.note);

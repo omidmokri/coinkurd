@@ -148,7 +148,7 @@
     const feeds = Object.assign({}, n.feeds || {}, (n.regional || {}).feeds || {}, (n.world || {}).feeds || {});
     const ok = Object.values(feeds).filter(f => f.ok).length;
     const srcs = [...new Set(cur().flatMap(i => srcList(i).map(s => s.source)))].sort();
-    const tab = (k, ic, lab, c) => `<button class="${st.tab === k ? 'on' : ''}" data-nwt="${k}">${ic} ${lab} <small>${fmtN(c)}</small></button>`;
+    const tab = (k, ic, lab, c) => `<button class="${st.tab === k ? 'on' : ''}" data-nwt="${k}" role="tab" type="button" aria-selected="${st.tab === k}">${ic} ${lab} <small>${fmtN(c)}</small></button>`;
     return `<h3>${T('newsT')}</h3>
       <div class="nw-top"><span class="nw-live"><span class="nw-dot"></span>${L('live')}</span><span>${fmtN(ok)} ${L('srcOn')}</span><span>· ${L('upd')} ${ago(n.updated_at)}</span></div>
       ${ticker()}

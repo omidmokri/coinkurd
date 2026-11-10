@@ -273,7 +273,7 @@
   if (!APP && /Android/i.test(UA) && path.indexOf('/app/') !== 0 && !/[?&]noapp/.test(location.search)) {
     var t0 = +ls.get('ek_app_dismiss') || 0;
     if (Date.now() - t0 > 14 * 864e5) setTimeout(function () {
-      var a = d.createElement('div'); a.id = 'eka'; a.setAttribute('role', 'dialog');
+      var a = d.createElement('div'); a.id = 'eka'; a.setAttribute('role', 'dialog'); a.setAttribute('aria-label', 'Entekhab Android app');
       a.innerHTML = '<img src="/assets/icon-192.png" alt="" width="42" height="42"><p>' + tri('اپ اندروید انتخاب', 'ئەپی ئەندرۆیدی Entekhab', 'Entekhab for Android', 'b') +
         tri('سریع‌تر، تمام‌صفحه و بدون نوار مرورگر', 'خێراتر، پڕشاشە و بێ شریتی وێبگەڕ', 'Faster, full screen, no browser bar') + '</p><a href="/app/">' + tri('دانلود', 'داگرتن', 'Get it') +
         '</a><button type="button" aria-label="close">' + X('close') + '</button>';
@@ -290,7 +290,7 @@
       if (!j || !/^\d+(\.\d+)*$/.test(j.version || '') || !/^[\w.-]+\.apk$/.test(j.file || '') || cmpV(j.version, mv[1]) <= 0) return;
       var seen = String(ls.get('ek_upd_seen') || '').split('|');
       if (seen[0] === j.version && Date.now() - (+seen[1] || 0) < 3 * 864e5) return;
-      var a = d.createElement('div'); a.id = 'eka'; a.className = 'ek-upd'; a.setAttribute('role', 'dialog');
+      var a = d.createElement('div'); a.id = 'eka'; a.className = 'ek-upd'; a.setAttribute('role', 'dialog'); a.setAttribute('aria-label', 'Entekhab app update');
       a.innerHTML = '<img src="/assets/icon-192.png" alt="" width="42" height="42"><p>' + tri('نسخهٔ تازهٔ اپ آماده است', 'وەشانی نوێی ئەپ ئامادەیە', 'App update available', 'b') +
         tri('نسخهٔ ' + j.version + ' — روی نسخهٔ فعلی نصب می‌شود', 'وەشانی ' + j.version + ' — لەسەر وەشانی ئێستا دادەمەزرێت', 'Version ' + j.version + ' installs over this one') + '</p><a href="/app/' + j.file + '">' +
         tri('به‌روزرسانی', 'نوێکردنەوە', 'Update') + '</a><button type="button" aria-label="close">' + X('close') + '</button>';

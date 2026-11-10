@@ -159,7 +159,7 @@
 #eka p b{display:block;font-size:.88rem}
 #eka a{background:var(--ek-acc);color:#000;font-weight:800;padding:9px 14px;border-radius:11px;font-size:.82rem;white-space:nowrap;text-decoration:none}
 #eka button{background:none;border:0;color:var(--ek-mute);width:30px;height:30px;cursor:pointer;display:grid;place-items:center;padding:0}
-@keyframes ekUp{from{transform:translateY(20px);opacity:0}}
+@keyframes ekUp{from{transform:translateY(calc(100% + 100px))}}
 
 /* ---------------- responsive ---------------- */
 @media (max-width:1320px){#ekh .ek-mt,#ekh .ek-ml{padding:0 9px;font-size:.87rem}#ekh .ek-brand span{display:none}}
