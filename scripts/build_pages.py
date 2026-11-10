@@ -261,21 +261,37 @@ _RULE = re.compile("\\s*[\u2500-\u257F]{2,}\\s*")          # ━━━━ sectio
 _DECOR = re.compile("[\u2300-\u23FF\u2500-\u257F\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\U0001F000-\U0001FAFF]+")
 
 
+def jlen(t):
+    """Length as search tools count it (JavaScript string length: an emoji or other astral character is 2)."""
+    return len(t.encode("utf-16-le")) // 2
+
+
 def _cut(t, n):
-    """t if it fits in n characters, else cut at the last word boundary before n-1 and end with …"""
-    if len(t) <= n:
+    """t if it fits in n characters (JS length), else cut at the last word boundary before n-1 and end with …"""
+    if jlen(t) <= n:
         return t
     c = t[:n - 1]
+    while c and jlen(c) > n - 1:
+        c = c[:-1]
     sp = c.rfind(" ")
-    if sp > n * 0.6:
+    if sp > len(c) * 0.6:
         c = c[:sp]
     return c.rstrip(" ،,؛;:|—-") + "…"
 
 
 def seo_title(title, suffix=" | entekhab.net", n=60):
     t = re.sub(r"\s+", " ", _DECOR.sub(" ", title or "")).strip(" |—-")
-    if len(t) + len(suffix) <= n:
+    if jlen(t) + jlen(suffix) <= n:
         return t + suffix
+    # too long: drop trailing " — section" / " | site" parts first, so the title stays a whole phrase
+    parts = re.split(r"\s+[—|]\s+", t)
+    while len(parts) > 1:
+        parts.pop()
+        head = " — ".join(parts)
+        if jlen(head) + jlen(suffix) <= n:
+            return head + suffix
+        if jlen(head) <= n:
+            return head
     return _cut(t, n)
 
 
