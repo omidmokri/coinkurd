@@ -44,6 +44,7 @@ import bot_reality as BRL
 import bot_encyclopedia as ENC
 import bot_compare as CMP  # noqa: E402
 import bot_hub as HB  # noqa: E402
+import bot_paper as PAPER  # noqa: E402  (paper trading + public leaderboard)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 import bot_proxy2 as PX2  # noqa: E402
@@ -565,6 +566,9 @@ def _render(s, uid, key):
     if key == "learn":
         text, rows = LN.menu(lang)
         return text, {"inline_keyboard": rows + [[btn(t("b_back", lang), "m:main")]]}
+    if key == "paper":
+        text, rows = PAPER.screen(s, uid, lang)
+        return text, {"inline_keyboard": rows + kb_back(lang, refresh="m:paper")["inline_keyboard"]}
     if key == "predict":
         text, rows = HB.section(s, uid)
         kb = kb_back(lang, refresh="m:predict", more=D.SITE + "/predict/")
@@ -1187,6 +1191,13 @@ def handle_private(s, msg):
         x["await"] = None
         x.setdefault("py", {}).setdefault("emo", []).append({"t": int(time.time()), "s": text[:160]})
         return send(chat_id, "🌊 ثبت شد. همین ثبت ساده، خودش رفتار را تغییر می‌دهد.", kb_back(lang))
+    if aw == "paper_nick" and text and not text.startswith("/"):
+        n = PAPER.set_nick(s, uid, text)
+        if not n:
+            x["await"] = "paper_nick"
+            return send(chat_id, PAPER.L("bad_nick", lang), kb_back(lang))
+        body, rows = PAPER.screen(s, uid, lang)
+        return send(chat_id, PAPER.L("nick_ok", lang, n=D.e(n)) + "\n\n" + body, {"inline_keyboard": rows + kb_back(lang)["inline_keyboard"]})
     if aw == "wiki" and text and not text.startswith("/"):
         body, rows = ENC.reply(text, lang)
         if rows:                                # several entries matched — keep waiting for the pick
@@ -1257,7 +1268,7 @@ def handle_private(s, msg):
               "/score": "score", "/narratives": "narr", "/calendar": "events", "/council": "council",
               "/lab": "lab", "/derivatives": "deriv", "/cycle": "cycle", "/chain": "chain", "/flows": "flows",
               "/week": "week", "/posts": "posts", "/track": "track", "/indicators": "ind", "/invite": "ref",
-              "/top": "top", "/lang": "lang", "/alerts": "alerts", "/dna": "dna"}
+              "/top": "top", "/lang": "lang", "/alerts": "alerts", "/dna": "dna", "/paper": "paper"}
     if cmd in simple:
         if cmd == "/dna" and arg:
             return send(chat_id, D.sec_dna(lang, arg.upper()), kb_back(lang, more=D.SITE + "/dna/"))
@@ -1360,6 +1371,14 @@ def handle_callback(s, cb):
         lang = (user(s, uid) or {}).get("lang", "fa")
         body = ENC.card(data[4:], lang) or ENC.NONE.get(lang, ENC.NONE["fa"])
         return send(chat_id, body, kb_back(lang, more=D.SITE + "/encyclopedia/"))
+    if data.startswith("pp:"):                       # paper trading: open / close / opt in / nickname / delete
+        if cb["message"]["chat"].get("type") != "private":
+            return ans()
+        ans()
+        text, rows, wait = PAPER.callback(s, uid, data, lang)
+        if wait:
+            x["await"] = "paper_nick"
+        return edit(chat_id, mid, text, {"inline_keyboard": rows})
     if data.startswith("pv:"):                       # prediction vote (bot menu or the channel post)
         _, rid, opt = data.split(":")
         ans(HB.vote(s, cb["from"], rid, opt), True)

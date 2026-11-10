@@ -126,6 +126,8 @@ NAV = [
     {"k": "mkt", "t": L("بازار", "بازاڕ", "Markets"), "items": [
         ("/dashboard/", "gauge", L("داشبورد هوشمند", "داشبۆردی زیرەک", "Smart dashboard"),
          L("رژیم بازار، اسکنر فرصت‌ها و امتیاز انتخاب", "ڕژێمی بازاڕ، سکانەری دەرفەت و خاڵی Entekhab", "Market regime, opportunity scanner, Entekhab score")),
+        ("/leaderboard/", "users", L("جدول برترین‌های معاملهٔ آزمایشی", "خشتەی باشترینەکانی مامەڵەی تاقیکاری", "Paper-trading leaderboard"),
+         L("معامله با پول مجازی در ربات، با قیمت ثبت‌شدهٔ بایننس", "مامەڵە بە پارەی مەجازی لە بۆت، بە نرخی تۆمارکراوی بایننس", "Virtual-money trades in the bot, Binance-priced")),
         ("/derivatives/", "terminal", L("داشبورد مشتقات", "داشبۆردی دەرهاتەکان", "Derivatives"),
          L("فاندینگ، اوپن اینترست، لیکوییدیشن و لانگ/شورت", "فەندینگ، ئۆپن ئینتەرێست، لیکوید و لۆنگ/شۆرت", "Funding, open interest, liquidations, long/short")),
         ("/terminal/", "terminal", L("ترمینال", "تێرمیناڵ", "Terminal"),

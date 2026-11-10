@@ -115,10 +115,6 @@ The site's strategy (agreed with the owner, 2026-11-07):
   say on the page whether K = 4 is the BIC choice. Check the CI run time first: today's fit is 4 seeds × 120 iterations.
 - **Combined alerts in /me/ and the bot** (owner's comparison file, 2026-11-10): one alert that fires on price AND
   regime AND a scanner finding on a watched coin (e.g. "SOL scanner bullish while the confirmed regime is not bear").
-- **Shared paper-trading leaderboard** (owner's priority list, 2026-11-10) — WAITING FOR THE OWNER'S CHOICE, do not
-  build before: self-reported results from /me/ can be forged in the browser, so the proposed design records paper
-  trades in the bot (server time, server price from Binance), opt-in, nickname only, min 10 closed trades, ranked
-  after fees by return with drawdown/Sortino shown, user can delete. Owner was asked on 2026-11-10.
 1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
    - **Broken images — done 2026-11-09** (slice 1: site-wide hide-on-error; slice 2 dropped: no page renders the
      Persian-feed images — `news.js` `noPic` shows Persian news text-only by the owner's choice, and a full build has no
@@ -158,6 +154,18 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · Paper trading in the bot + /leaderboard/ (owner chose "record trades in the bot")
+- scripts/bot_paper.py: $10,000 virtual, 12 coins, long/short, 10/25/50% of free cash, 0.1% fee each side, max 5 open,
+  no leverage (a short is capped at −100% of its stake). Every open/close is priced by the bot from Binance
+  (data-api.binance.vision ticker) at the tap; if no price comes back nothing is recorded. Opt-in with a nickname
+  (2–20 chars, no links/@, unique), ranked from 10 closed trades, realised results only; "delete account" removes
+  everything. State in s["paper"] (refbot-state); bot_hub.export writes data/leaderboard.json (7/30/90/all).
+- Bot: menu "paper" (More group), /paper, deep link t.me/Kurd_kurdistan_bot?start=s_paper, pp:* callbacks,
+  "paper_nick" await. Site: /leaderboard/ (build_leaderboard.py + assets/leaderboard.js), home toolbox card, nav.
+- Checked: P/L formulas against hand calculation (long +10% → $489.01, short −10% → $257.24, short capped at stake),
+  max-open and no-price refusals, nickname rules, opt-in/delete through refbot.handle_callback/handle_private with a
+  fake Telegram, board ordering, the page in 3 languages.
+
 ### 2026-11-10 · Strategy lab: PBO (CSCV) and Deflated Sharpe on the walk-forward parameter sweep
 - When a parameter is optimised, the lab now also reports the Probability of Backtest Overfitting (8 blocks, 70
   combinations, Bailey/Borwein/López de Prado/Zhu 2014) and the Deflated Sharpe Ratio of the best value (Bailey &

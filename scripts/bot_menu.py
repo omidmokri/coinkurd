@@ -327,6 +327,12 @@ S = {
             {"fa": "با لینک خودت دوستانت را دعوت کن و امتیاز بگیر.", "ckb": "بە بەستەرەکەت هاوڕێکانت بانگهێشت بکە و خاڵ وەربگرە.",
              "kmr": "Bi girêdana xwe hevalan vexwîne û pûan bistîne.", "ar": "ادعُ أصدقاءك برابطك واجمع النقاط.",
              "en": "Invite friends with your link and earn points."}),
+    "paper": ("📒", {"fa": "معاملهٔ آزمایشی و جدول برترین‌ها", "ckb": "مامەڵەی تاقیکاری و خشتەی باشترینەکان", "kmr": "Bazirganiya ceribandinê",
+                    "ar": "التداول التجريبي والمتصدرون", "en": "Paper trading & leaderboard"},
+              {"fa": "با ۱۰٬۰۰۰ دلار مجازی و قیمت واقعی بایننس معامله کن و اگر خواستی در جدول برترین‌ها رقابت کن.",
+               "ckb": "بە ١٠٬٠٠٠ دۆلاری مەجازی و نرخی ڕاستەقینەی بایننس مامەڵە بکە و ئەگەر ویستت لە خشتەکەدا ڕکابەری بکە.",
+               "kmr": "Bi 10,000 dolarên virtual û bihayên rastîn ên Binance bazirganî bike.", "ar": "تداول بـ 10,000 دولار افتراضي وأسعار Binance الحقيقية.",
+               "en": "Trade $10,000 of virtual money on real Binance prices, and compete on the leaderboard if you like."}),
     "predict": ("🎲", {"fa": "بازی پیش‌بینی بازار", "ckb": "یاری پێشبینی بازاڕ", "kmr": "Lîstika pêşbîniya bazarê",
                       "ar": "لعبة توقع السوق", "en": "Market prediction game"},
                 {"fa": "پیش‌بینی کن و با بقیه رقابت کن.", "ckb": "پێشبینی بکە و ڕکابەری بکە.", "kmr": "Pêşbînî bike û pêşbaziyê bike.",
@@ -348,7 +354,7 @@ GROUPS = {
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
-    "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict"],
+    "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
 for g, items in GROUPS.items():
