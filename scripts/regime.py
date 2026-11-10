@@ -353,6 +353,8 @@ def main():
                 "next": {k: round(v, 4) for k, v in p_next.items()},
                 "oos_top": tops[-1] if tops else None, "days_in": run},
         "states": states,
+        # full one-day transition matrix of the fitted model, by label: trans[from][to]
+        "trans": {names[i]: {names[j]: round(P["A"][i][j], 4) for j in range(K)} for i in range(K)},
         "history": [{"d": d, "p": [round(hist[d][lb], 3) for lb in LABELS]} for d in od[-420:]],
         "daily": {d: LABELS.index(t) for d, t in zip(od, tops)},
         "changes": changes[-30:],
