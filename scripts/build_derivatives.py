@@ -11,7 +11,7 @@ import build_reality as BR  # noqa: E402
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "2"
+VER = "3"
 T = {
     "title": L("داشبورد مشتقات: فاندینگ، اوپن اینترست، لیکوییدیشن", "داشبۆردی دەرهاتەکان: فەندینگ، ئۆپن ئینتەرێست، لیکویدکردن",
                "Derivatives dashboard: funding, open interest, liquidations"),
@@ -24,7 +24,7 @@ T = {
 CSS = """
 #dv{margin:14px 0}.dv-tabs{display:flex;gap:8px;margin:6px 0 14px}.dv-tabs button{background:#000;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:7px 18px;font:inherit;font-weight:800;cursor:pointer}
 .dv-tabs button.on{background:var(--acc);color:#000;border-color:var(--acc)}
-.dv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.dv-rg{border:1px solid var(--line);border-inline-start:4px solid #f7931a;border-radius:12px;padding:12px 14px;margin:12px 0;background:rgba(247,147,26,.06)}.dv-rg h3{margin:0 0 6px;font-size:.95rem}.dv-rg p{margin:0 0 6px;line-height:1.9}.dv-rg a{font-size:.85rem}.dv-rg-bear{border-inline-start-color:#ef4444}.dv-rg-bull{border-inline-start-color:#22c55e}.dv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 .dv-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
 .dv-c small{color:var(--mute);font-size:.8rem}.dv-c>b{font-size:1.6rem;font-family:'Space Grotesk',Vazirmatn,monospace}.dv-c em{font-style:normal;color:var(--mute);font-size:.8rem}
 .dv-c p{margin:8px 0 0;font-size:.8rem;line-height:1.8;color:#c9c9c2}.dv-row{display:flex;justify-content:space-between;gap:8px;font-size:.82rem;flex-wrap:wrap}

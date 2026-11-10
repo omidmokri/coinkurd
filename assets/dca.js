@@ -45,6 +45,14 @@
       'ماوەکان یەکتر دەگرنەوە (هەر ڕۆژێک دەستپێکێکی نوێ)، بۆیە سەربەخۆ نین؛ ژمارەکە «چەند جار لە مێژوودا» بخوێنەوە، نەک ئەگەری داهاتوو.',
       'The periods overlap (a new start every day), so they are not independent: read the number as "how often in history", not as a chance for the future.'],
     share: ['اشتراک نتیجه در تلگرام', 'بڵاوکردنەوەی ئەنجام لە تێلێگرام', 'Share the result on Telegram'],
+    img: ['🖼 ساخت تصویر نتیجه', '🖼 دروستکردنی وێنەی ئەنجام', '🖼 Make a result image'],
+    img_dl: ['⬇ دانلود تصویر', '⬇ داگرتنی وێنە', '⬇ Download image'], img_sh: ['📤 اشتراک تصویر', '📤 هاوبەشکردنی وێنە', '📤 Share image'],
+    link: ['🔗 کپی لینک همین مقایسه', '🔗 کۆپیی بەستەری ئەم بەراوردە', '🔗 Copy link to this comparison'],
+    copied: ['لینک کپی شد ✓', 'بەستەر کۆپی کرا ✓', 'Link copied ✓'],
+    c_title: ['خرید یکجا یا پلکانی؟', 'کڕینی یەکجار یان پلەپلە؟', 'Lump sum or DCA?'],
+    c_set: ['بودجه {b} · {f} · کارمزد {fee}', 'بودجە {b} · {f} · کرێ {fee}', 'Budget {b} · {f} · fee {fee}'],
+    c_note: ['دادهٔ واقعی بایننس · گذشته تضمین آینده نیست', 'داتای ڕاستەقینەی بایننس · ڕابردوو گەرەنتیی داهاتوو نییە', 'Real Binance data · the past does not guarantee the future'],
+    c_try: ['خودت امتحان کن:', 'خۆت تاقی بکەرەوە:', 'Try it yourself:'],
     days: ['روز', 'ڕۆژ', 'days'],
     gn: ['پله‌های خرید زیر قیمت (۰ = خاموش)', 'پلەکانی کڕین لە خوار نرخ (٠ = کوژاوە)', 'Buy levels below price (0 = off)'],
     gs: ['فاصلهٔ پله‌ها ٪', 'دووریی پلەکان ٪', 'Level spacing %'],
@@ -214,7 +222,8 @@
     h += '</div>';
     h += '<h3>' + t('chart') + '</h3><div class="rc-legend"><span><i style="background:#64748b"></i>' + t('lump') + '</span><span><i style="background:#f59e0b"></i>' + t('dca') + '</span>' + (X.g ? '<span><i style="background:#a855f7"></i>' + t('grid') + '</span>' : '') + '<span><i style="background:#ffffff40"></i>' + t('budgetL') + '</span></div><div id="dc-chart" class="rc-chart" style="height:300px"></div>';
     var txt = st.coin + ' · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + '\n' + t('lump') + ': ' + pc(rL, 1, true) + ' · ' + t('dca') + ' (' + t(st.freq) + '): ' + pc(rD, 1, true) + '\n— entekhab.net';
-    h += '<p><a class="rc-btn2" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent(txt) + '">📤 ' + t('share') + '</a></p></section>';
+    h += '<p class="dc-share"><a class="rc-btn2" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent(txt) + '">📤 ' + t('share') + '</a> ' +
+      '<button class="rc-btn2" type="button" id="dc-img">' + t('img') + '</button> <button class="rc-btn2" type="button" id="dc-link">' + t('link') + '</button> <span id="dc-cp" class="mut"></span></p><div id="dc-card"></div></section>';
     // every possible start date
     h += '<section class="rc-sec"><h2>' + t('roll') + '</h2><p class="rc-lead">' + t('roll_lead') + '</p>';
     var R = X.roll;
@@ -227,6 +236,74 @@
     h += '</section>';
     out.innerHTML = h;
     draw(X);
+    var bi = out.querySelector('#dc-img'); if (bi) bi.onclick = function () { card(X); };
+    var bl = out.querySelector('#dc-link'); if (bl) bl.onclick = function () {
+      var u = location.href, ok = function () { var m = out.querySelector('#dc-cp'); if (m) m.textContent = t('copied'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(ok, function () { prompt('', u); });
+      else prompt('', u);
+    };
+  }
+  /* the shareable result card: 1080×1350 (fits Instagram and Telegram), drawn from the same numbers as the page */
+  function card(X) {
+    var box = root.querySelector('#dc-card'); if (!box) return;
+    var L = lang(), rtl = L !== 'en', W = 1080, H = 1350, P = 70;
+    var FF = rtl ? 'Vazirmatn,Tahoma,sans-serif' : '"Space Grotesk",Vazirmatn,sans-serif', NUM = '"Space Grotesk",Vazirmatn,sans-serif';
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H; var x = cv.getContext('2d');
+    var r = X.r, st = X.st, D = X.D, B = st.budget;
+    var rows = [[t('lump'), r.lump, '#94a3b8', r.curve.map(function (p) { return p[1]; })], [t('dca') + ' · ' + t(st.freq), r.dca, '#f59e0b', r.curve.map(function (p) { return p[2]; })]];
+    if (X.g) rows.push([t('grid'), X.g.val, '#a855f7', X.g.curve]);
+    var best = rows.reduce(function (a, b) { return b[1] > a[1] ? b : a; });
+    function txt(s, X0, y, font, col, align, dir) { x.font = font; x.fillStyle = col; x.direction = dir || (rtl ? 'rtl' : 'ltr'); x.textAlign = align || (rtl ? 'right' : 'left'); x.fillText(s, X0, y); }
+    var S0 = rtl ? W - P : P, E0 = rtl ? P : W - P;
+    function go(logo) {
+      var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#1a1006'); g.addColorStop(.55, '#0b0c0f'); g.addColorStop(1, '#071018');
+      x.fillStyle = g; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(247,147,26,.55)'; x.lineWidth = 4; x.strokeRect(24, 24, W - 48, H - 48);
+      if (logo) { var lh = 96, lw = logo.width * lh / logo.height; x.drawImage(logo, rtl ? W - P - lw : P, 58, lw, lh); }
+      txt('entekhab.net/dca', E0, 118, '700 30px ' + NUM, '#f7931a', rtl ? 'left' : 'right', 'ltr');
+      txt(t('c_title'), S0, 232, '800 58px ' + FF, '#ffffff');
+      txt(st.coin + '  ·  ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]), S0, 292, '500 32px ' + FF, '#cfcfcf');
+      txt('🏆 ' + best[0], S0, 372, '800 40px ' + FF, best[2]);
+      // result rows
+      var y = 430, maxV = Math.max.apply(null, rows.map(function (q) { return q[1]; }).concat([B]));
+      rows.forEach(function (q) {
+        var ret = q[1] / B - 1;
+        x.fillStyle = 'rgba(255,255,255,.05)'; x.fillRect(P, y, W - 2 * P, 112);
+        x.fillStyle = q[2]; x.fillRect(rtl ? W - P - 10 : P, y, 10, 112);
+        txt(q[0], rtl ? W - P - 34 : P + 34, y + 48, '700 34px ' + FF, '#ffffff');
+        txt(usd(q[1]), rtl ? W - P - 34 : P + 34, y + 92, '500 28px ' + NUM, '#bdbdbd');
+        txt(pc(ret, 1, true), rtl ? P + 30 : W - P - 30, y + 74, '800 52px ' + NUM, ret >= 0 ? '#22c55e' : '#ef4444', rtl ? 'left' : 'right');
+        var bw = (W - 2 * P - 68) * Math.max(0, q[1]) / maxV; x.fillStyle = q[2] + '55'; x.fillRect(rtl ? W - P - 34 - bw : P + 34, y + 102, bw, 5);
+        y += 130;
+      });
+      // value chart
+      var cy = y + 20, ch = 1150 - cy, all = [];
+      rows.forEach(function (q) { all = all.concat(q[3]); }); all.push(B);
+      var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all), n = rows[0][3].length;
+      if (hi - lo < 1e-9) hi = lo + 1;
+      var X0 = P, Wc = W - 2 * P, Y = function (v) { return cy + ch - (v - lo) / (hi - lo) * ch; };
+      x.strokeStyle = 'rgba(255,255,255,.25)'; x.setLineDash([8, 8]); x.lineWidth = 2; x.beginPath(); x.moveTo(X0, Y(B)); x.lineTo(X0 + Wc, Y(B)); x.stroke(); x.setLineDash([]);
+      rows.forEach(function (q) {
+        x.strokeStyle = q[2]; x.lineWidth = 4; x.beginPath();
+        q[3].forEach(function (v, i) { var px_ = X0 + Wc * (n > 1 ? i / (n - 1) : 0); if (i) x.lineTo(px_, Y(v)); else x.moveTo(px_, Y(v)); }); x.stroke();
+      });
+      txt(t('budgetL') + ' ' + usd(B), S0, Y(B) - 12, '500 24px ' + FF, 'rgba(255,255,255,.55)');
+      txt(t('c_set').replace('{b}', usd(B)).replace('{f}', t(st.freq)).replace('{fee}', pc(st.fee / 100, 2)), S0, 1215, '500 28px ' + FF, '#cfcfcf');
+      txt(t('c_note'), S0, 1262, '400 24px ' + FF, '#8a8a85');
+      txt(t('c_try') + ' entekhab.net/dca', S0, 1302, '700 26px ' + FF, '#f7931a');
+      cv.style.cssText = 'width:100%;max-width:420px;height:auto;border-radius:12px;margin-top:10px;display:block';
+      box.innerHTML = ''; box.appendChild(cv);
+      var name = 'entekhab-dca-' + st.coin + '.png', p = document.createElement('p');
+      var a = document.createElement('a'); a.className = 'rc-btn2'; a.download = name; a.href = cv.toDataURL('image/png'); a.textContent = t('img_dl'); p.appendChild(a);
+      if (navigator.canShare && window.File && cv.toBlob) cv.toBlob(function (bl) {
+        try { var f = new File([bl], name, { type: 'image/png' }); if (!navigator.canShare({ files: [f] })) return;
+          var b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'rc-btn2'; b2.textContent = t('img_sh'); b2.style.marginInlineStart = '8px';
+          b2.onclick = function () { navigator.share({ files: [f], text: t('c_try') + ' ' + location.href }).catch(function () { }); }; p.appendChild(b2);
+        } catch (e) { }
+      });
+      box.appendChild(p);
+    }
+    var ready = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 40px Vazirmatn'), document.fonts.load('700 30px "Space Grotesk"')]).catch(function () { }) : Promise.resolve();
+    ready.then(function () { var im = new Image(); im.onload = function () { go(im); }; im.onerror = function () { go(null); }; im.src = '/assets/logo-hero.webp'; });
   }
   function draw(X) {
     var el = document.getElementById('dc-chart'); if (!el || !window.LightweightCharts) return;

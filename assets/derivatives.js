@@ -44,6 +44,8 @@
     rtO: ['لانگ‌ها / شورت‌ها / هیچ‌کدام', 'لۆنگەکان / شۆرتەکان / هیچیان', 'Longs / shorts / neither'],
     src: ['منبع: API عمومی OKX، هر حدود ۱۵ دقیقه', 'سەرچاوە: API گشتیی OKX، نزیکەی هەر ١٥ خولەک', 'Source: OKX public API, about every 15 minutes'],
     upd: ['به‌روزرسانی', 'نوێکردنەوە', 'updated'], ago: ['پیش', 'لەمەوبەر', 'ago'], min: ['دقیقه', 'خولەک', 'min'], hr: ['ساعت', 'کاتژمێر', 'h'],
+    rg_t: ['🧭 در رژیم فعلی بازار یعنی چه؟', '🧭 لە دۆخی ئێستای بازاڕدا واتای چییە؟', '🧭 What it means in the current regime'],
+    rg_more: ['رادار رژیم ←', 'ڕاداری دۆخ ←', 'Regime radar →'],
     stale: ['⚠️ این داده بیش از ۳ ساعت است تازه نشده.', '⚠️ ئەم داتایە زیاتر لە ٣ کاتژمێرە نوێ نەکراوەتەوە.', '⚠️ This data has not been refreshed for over 3 hours.'],
     nfa: ['این صفحه وضعیت را توصیف می‌کند، پیش‌بینی نمی‌کند و توصیهٔ مالی نیست.', 'ئەم پەڕەیە دۆخەکە وەسف دەکات، پێشبینی ناکات و ئامۆژگاریی دارایی نییە.', 'This page describes the state of the market; it is not a forecast and not financial advice.']
   };
@@ -84,6 +86,8 @@
     var x = D[CUR] || {}, k = CUR.toLowerCase(), hist = (D.history || []).filter(function (r) { return r.t >= Date.now() / 1000 - 7 * 86400; });
     var h = '<div class="dv-tabs" role="tablist">' + COINS.map(function (c) { return '<button type="button" role="tab" aria-selected="' + (c === CUR) + '" data-c="' + c + '" class="' + (c === CUR ? 'on' : '') + '">' + c + '</button>'; }).join('') + '</div>';
     if ((Date.now() - Date.parse(D.updated_at)) / 36e5 > 3) h += '<p class="note">' + t('stale') + '</p>';
+    var rr = (D.regime_read || {})[CUR];
+    if (rr && rr[lang()]) h += '<div class="dv-rg dv-rg-' + esc(rr.regime) + '"><h3>' + t('rg_t') + '</h3><p>' + esc(rr[lang()]) + '</p><a href="/regime/">' + t('rg_more') + '</a></div>';
     // funding
     var f = x.funding, lab = f == null ? '' : f < 0 ? 'f_neg' : f >= EXT ? 'f_ext' : f >= HIGH ? 'f_high' : 'f_norm', f7 = mean7(hist, k + '_f');
     var fcls = f == null ? '' : f >= EXT ? 'down' : f < 0 ? 'up' : '';

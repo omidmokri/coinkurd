@@ -320,9 +320,9 @@ jobs:
         timeout-minutes: 4
         run: python scripts/opportunity.py
 
-      - name: Regime radar (HMM, once per closed day)
+      - name: Regime radar (HMM, once per closed day; number of states re-chosen every 28 days)
         continue-on-error: true
-        timeout-minutes: 6
+        timeout-minutes: 12
         run: python scripts/regime.py
 
       - name: Coin logos for the coins wall (every coin shows its own logo)
@@ -344,6 +344,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 3
         run: python scripts/truth.py
+
+      - name: Strategies per regime (which strategy family worked in each rule-layer regime)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/regime_strats.py
 
       - name: Site assistant index (homepage help chat)
         id: assistant

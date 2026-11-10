@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reality_common as R  # noqa: E402
 import regime_rules as RR  # noqa: E402
 
-VERSION = 3          # bump to force a refit when the model or the naming changes
+VERSION = 4          # bump to force a refit when the model or the naming changes
 COIN = "BTC"
 K = 4
 LABELS = ["bull", "bear", "sideways", "high_vol"]
@@ -173,19 +173,60 @@ def fit(X, iters, warm=None):
     return best
 
 
+def stationary(A):
+    """long-run share of days in each hidden state (power iteration on the transition matrix)"""
+    k = len(A)
+    w = [1.0 / k] * k
+    for _ in range(500):
+        w2 = [sum(w[i] * A[i][j] for i in range(k)) for j in range(k)]
+        if max(abs(x - y) for x, y in zip(w, w2)) < 1e-12:
+            break
+        w = w2
+    return w
+
+
 def name_states(P, sd, mu0):
     """map hidden states to labels from what they are: lowest 20-day momentum -> bear, highest -> bull;
-    of the two in between, the more volatile is high_vol (volatile, no trend) and the calmer is sideways"""
-    vol = [P["mu"][k][1] for k in range(K)]
-    mom = [P["mu"][k][2] for k in range(K)]
-    by_mom = sorted(range(K), key=lambda k: mom[k])
-    mid = sorted(by_mom[1:3], key=lambda k: vol[k])
-    names = {by_mom[0]: "bear", by_mom[3]: "bull", mid[0]: "sideways", mid[1]: "high_vol"}
-    real = {names[k]: {"mom20_pct": round(100 * (math.exp(P["mu"][k][2] * sd[2] + mu0[2]) - 1), 2),
-                       "vol10_pct": round(100 * math.exp(P["mu"][k][1] * sd[1] + mu0[1]), 2),
-                       "stay": round(P["A"][k][k], 4),
-                       "mean_days": round(1 / max(1e-6, 1 - P["A"][k][k]), 1)} for k in range(K)}
+    the states in between are split by volatility: the calmer half sideways, the more volatile half high_vol.
+    With K = 4 that is one state each; with more states a label gathers several (their probabilities add up)."""
+    k = len(P["A"])
+    vol = [P["mu"][j][1] for j in range(k)]
+    mom = [P["mu"][j][2] for j in range(k)]
+    by_mom = sorted(range(k), key=lambda j: mom[j])
+    mid = sorted(by_mom[1:-1], key=lambda j: vol[j])
+    half = (len(mid) + 1) // 2
+    names = {by_mom[0]: "bear", by_mom[-1]: "bull"}
+    names.update({j: "sideways" for j in mid[:half]})
+    names.update({j: "high_vol" for j in mid[half:]})
+    w = stationary(P["A"])
+    tr = trans_by_label(P, names, w)
+    real = {}
+    for lb in LABELS:
+        js = [j for j in range(k) if names[j] == lb]
+        if not js:
+            continue
+        ws = sum(w[j] for j in js) or 1e-12
+        avg = lambda f: sum(w[j] * f(j) for j in js) / ws  # noqa: E731
+        stay = tr[lb][lb]
+        real[lb] = {"mom20_pct": round(100 * (math.exp(avg(lambda j: P["mu"][j][2]) * sd[2] + mu0[2]) - 1), 2),
+                    "vol10_pct": round(100 * math.exp(avg(lambda j: P["mu"][j][1]) * sd[1] + mu0[1]), 2),
+                    "stay": round(stay, 4), "mean_days": round(1 / max(1e-6, 1 - stay), 1), "states": len(js)}
     return names, real
+
+
+def trans_by_label(P, names, w=None):
+    """one-day transition probabilities between labels: states of a label are weighted by their long-run share"""
+    k = len(P["A"])
+    w = w or stationary(P["A"])
+    out = {}
+    for a in LABELS:
+        ia = [i for i in range(k) if names[i] == a]
+        wa = sum(w[i] for i in ia)
+        if not ia or wa <= 0:
+            continue
+        out[a] = {b: sum(w[i] * sum(P["A"][i][j] for j in range(k) if names[j] == b) for i in ia) / wa
+                  for b in LABELS if any(names[j] == b for j in range(k))}
+    return out
 
 
 def by_label(probs, names):
@@ -260,6 +301,115 @@ def rule_layer(dates, closes, idx, _labels, summ, fwd, od, tops):
 
 
 # ------------------------------------------------------------------ main
+# ------------------------------------------------------------------ how many hidden states?
+K_TRY = (3, 4, 5, 6)
+K_USE = (4, 5, 6)          # the site names four regime types, so the live model needs at least four states
+GAIN_MIN = 0.05            # a state is worth adding only if it raises the out-of-sample information by 5 % or more
+SELECT_EVERY = 28          # days between re-runs (the answer moves slowly; it costs a few minutes)
+
+
+NULL_REPS = 200
+
+
+def eta2(groups):
+    """share of the variance of the next 30-day return explained by the regime label, pooled over year-fits"""
+    allf = [f for _, fw in groups for f in fw]
+    if not allf:
+        return 0.0
+    m = sum(allf) / len(allf)
+    sst = sum((f - m) ** 2 for f in allf) or 1e-12
+    ssb = 0.0
+    for tops, fw in groups:
+        acc = {}
+        for st, f in zip(tops, fw):
+            a = acc.setdefault(st, [0.0, 0])
+            a[0] += f
+            a[1] += 1
+        ssb += sum(n * (sm / n - m) ** 2 for sm, n in acc.values())
+    return ssb / sst
+
+
+def select_k(dates, closes, raw):
+    """BIC, out-of-sample log-likelihood, out-of-sample information and stability for K = 3..6.
+    BIC and likelihood keep improving with every extra state on this data (fat tails and overlapping windows
+    reward more Gaussian pieces), so they cannot choose on their own. The choice is the smallest K (of 4..6)
+    after which one more state adds under 5 % of information: how much of the next 30-day return the
+    out-of-sample regime explains (eta squared, by year-fit) above chance — chance being the same label streaks
+    shifted in time, since more labels explain more by luck alone — shown next to how often the regime flips."""
+    global K
+    keep = K
+    T = len(raw)
+    years = sorted({int(d[:4]) for d in dates if int(d[:4]) >= OOS_FROM})
+    rows = []
+    for k in K_TRY:
+        K = k
+        X, _, _ = standardise(raw)
+        _, ll = fit(X, ITERS_FULL)
+        npar = (k - 1) + k * (k - 1) + 2 * k * len(raw[0])
+        oos_ll = oos_n = 0
+        groups, runs = [], []
+        warm = None
+        for y in years:
+            cut = next(i for i, d in enumerate(dates) if int(d[:4]) >= y)
+            end = next((i for i, d in enumerate(dates) if int(d[:4]) > y), len(dates))
+            tr, mu0, sd0 = standardise(raw[:cut])
+            P, _ = fit(tr, ITERS_WF if warm else ITERS_FULL, warm)
+            warm = P
+            Xa, _, _ = standardise(raw[:end], mu0, sd0)
+            al, _, lla, _ = forward(Xa, P)
+            _, _, llb, _ = forward(Xa[:cut], P)
+            oos_ll += lla - llb
+            oos_n += end - cut
+            tops = [max(range(k), key=lambda j: al[t][j]) for t in range(cut, end)]
+            fw = [closes[t + 30] / closes[t] - 1 for t in range(cut, end) if t + 30 < len(closes)]
+            groups.append((tops[:len(fw)], fw))
+            r = 1
+            for a_, b_ in zip(tops, tops[1:]):
+                if a_ == b_:
+                    r += 1
+                else:
+                    runs.append(r)
+                    r = 1
+            runs.append(r)
+        obs = eta2(groups)
+        # chance level: the same label sequences shifted in time against the returns (keeps both streaks intact)
+        rng = random.Random(5)
+        null = []
+        for _ in range(NULL_REPS):
+            sh = []
+            for tops, fw in groups:
+                n = len(tops)
+                if n < 90:
+                    sh.append((tops, fw))
+                    continue
+                o = rng.randrange(45, n - 45)
+                sh.append((tops[o:] + tops[:o], fw))
+            null.append(eta2(sh))
+        chance = sum(null) / len(null)
+        rows.append({"k": k, "bic": round(-2 * ll + npar * math.log(T), 1), "loglik": round(ll, 1), "params": npar,
+                     "oos_ll_day": round(oos_ll / max(1, oos_n), 4), "info_raw": round(obs, 4), "info_chance": round(chance, 4),
+                     "info": round(obs - chance, 4),
+                     "median_run": sorted(runs)[len(runs) // 2], "flips_year": round(len(runs) / max(1, len(years)), 1)})
+        print(f"regime select: K={k} bic={rows[-1]['bic']} oos={rows[-1]['oos_ll_day']} info={rows[-1]['info']} "
+              f"(raw {rows[-1]['info_raw']} chance {rows[-1]['info_chance']}) "
+              f"run={rows[-1]['median_run']} flips/yr={rows[-1]['flips_year']}")
+    K = keep
+    info = {r["k"]: r["info"] for r in rows}
+    if max(info[k] for k in K_USE) <= 0:
+        # no number of states explains the coming month better than chance: take the simplest model
+        chosen, reason = K_USE[0], "no_info"
+    else:
+        chosen, reason = K_USE[-1], "info_gain"
+        for k in K_USE:
+            nxt = info.get(k + 1)
+            if nxt is None or nxt - info[k] < GAIN_MIN * max(info[k], 1e-9):
+                chosen = k
+                break
+    bic_best = min(rows, key=lambda r: r["bic"])["k"]
+    return {"date": dates[-1], "rows": rows, "chosen": chosen, "bic_best": bic_best, "rule": reason,
+            "gain_min": GAIN_MIN, "k_use": list(K_USE)}
+
+
 def main():
     prev = R.load("regime.json", {})
     bars = daily_bars()
@@ -271,6 +421,18 @@ def main():
     dates = [r[0] for r in rows]
     closes = [r[1] for r in rows]
     raw = [r[2] for r in rows]
+
+    # ---- number of hidden states: re-chosen every SELECT_EVERY days (select_k)
+    global K
+    sel = prev.get("select") if prev.get("version") == VERSION else None
+    if not sel or (datetime.strptime(last_day, "%Y-%m-%d") - datetime.strptime(sel["date"], "%Y-%m-%d")).days >= SELECT_EVERY \
+            or os.environ.get("RESELECT"):
+        try:
+            sel = select_k(dates, closes, raw)
+        except Exception as ex:  # noqa: BLE001
+            print("regime select failed:", ex)
+            sel = sel or {"chosen": 4, "rows": [], "date": last_day}
+    K = sel.get("chosen") or 4
 
     # ---- walk-forward, out-of-sample history
     hist = {}
@@ -297,7 +459,8 @@ def main():
     p_now = by_label(alpha[-1], names)
     nxt_raw = [sum(alpha[-1][i] * P["A"][i][j] for i in range(K)) for j in range(K)]
     p_next = by_label(nxt_raw, names)
-    switch = sum(alpha[-1][k] * (1 - P["A"][k][k]) for k in range(K))
+    # chance of a different label tomorrow (moving between two states of the same label is not a switch)
+    switch = sum(alpha[-1][i] * sum(P["A"][i][j] for j in range(K) if names[j] != names[i]) for i in range(K))
     top = max(p_now, key=p_now.get)
 
     # ---- run lengths and changes on the out-of-sample history
@@ -346,7 +509,7 @@ def main():
 
     out = {
         "version": VERSION, "updated_at": R.iso(datetime.now(timezone.utc)), "coin": COIN,
-        "model": {"kind": "gaussian_hmm_diag", "K": K, "features": ["r1", "log_vol10", "mom20"], "fit_days": len(X),
+        "model": {"kind": "gaussian_hmm_diag", "K": K, "k_rule": (sel or {}).get("rule"), "features": ["r1", "log_vol10", "mom20"], "fit_days": len(X),
                   "loglik": round(ll, 1), "first_day": dates[0], "oos_from": f"{OOS_FROM}-01-01"},
         "now": {"date": last_day, "price": round(closes[-1], 2), "probs": {k: round(v, 4) for k, v in p_now.items()},
                 "top": top, "confidence": round(p_now[top], 4), "switch_risk": round(switch, 4),
@@ -354,7 +517,8 @@ def main():
                 "oos_top": tops[-1] if tops else None, "days_in": run},
         "states": states,
         # full one-day transition matrix of the fitted model, by label: trans[from][to]
-        "trans": {names[i]: {names[j]: round(P["A"][i][j], 4) for j in range(K)} for i in range(K)},
+        "trans": {a: {b: round(v, 4) for b, v in row.items()} for a, row in trans_by_label(P, names).items()},
+        "select": sel,
         "history": [{"d": d, "p": [round(hist[d][lb], 3) for lb in LABELS]} for d in od[-420:]],
         "daily": {d: LABELS.index(t) for d, t in zip(od, tops)},
         "changes": changes[-30:],
