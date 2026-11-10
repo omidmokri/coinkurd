@@ -134,6 +134,13 @@ def main():
                      "sol_f": (out.get("SOL") or {}).get("funding")})
     cut = NOW.timestamp() - 14 * 86400
     out["history"] = [h for h in hist if h["t"] >= cut]
+    # the same numbers read in the light of the market regime (scripts/regime_lev.py), for the page and the bot
+    try:
+        import regime_lev
+        rg = json.load(open(os.path.join(ROOT, "data", "regime.json"), encoding="utf-8"))
+        out["regime_read"] = {c: regime_lev.read(rg, out.get(c)) for c in ("BTC", "ETH", "SOL") if out.get(c)}
+    except Exception as ex:  # noqa: BLE001
+        out["errors"]["regime_read"] = str(ex)[:120]
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     json.dump({"updated_at": NOW.isoformat(), "rows": LIQ}, open(LIQ_OUT, "w", encoding="utf-8"), separators=(",", ":"))
     b = out.get("BTC") or {}

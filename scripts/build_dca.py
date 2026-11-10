@@ -11,7 +11,7 @@ import build_strategy_lab as SL  # noqa: E402  (same form styles)
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "2"
+VER = "3"
 T = {
     "title": L("شبیه‌ساز خرید پلکانی (DCA) در برابر خرید یکجا", "هاوشێوەکەری کڕینی پلەپلە (DCA) بەرامبەر کڕینی یەکجار",
                "DCA vs lump sum simulator"),

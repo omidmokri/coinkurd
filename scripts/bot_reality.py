@@ -462,6 +462,20 @@ def sec_regime(lang):
             lines.append("• ⏳ " + _q("rr.pend", lg, to=_q(pe["to"], lg), d=_n(pe["days"], lg), n=_n(pe["need"], lg)))
         lines += [f"  {_q('rr.' + x['k'], lg)}: {'—' if x['v'] is None else _n(x['v'], lg, 3 if x['k'] == 'mayer' else 1)}"
                   f" ({'+1' if x['vote'] == 1 else '−1' if x['vote'] == -1 else '0' if x['vote'] == 0 else '—'})" for x in rn.get("dims") or []]
+        rs = (R.load("regime_strats.json", {}).get("by") or {}).get(rn["label"]) or {}
+        if rs.get("fam"):
+            fams = R.load("regime_strats.json", {}).get("families") or {}
+            ix = {"fa": 0, "ckb": 1, "en": 2}.get(lg, 2)
+            ic = {"works": "✅", "hurts": "❌", "unclear": "⚪️"}
+            lines += ["", f"🧪 <b>{_q('rs.title', lg)}</b> ({_q(rn['label'], lg)}{'، ' if lg in ('fa', 'ckb') else ', '}{_q('rs.days', lg, n=_n(rs.get('days'), lg))})"]
+            for k in ("trend", "dip", "short", "hold"):
+                x = rs["fam"].get(k)
+                if x:
+                    a = 0 if abs(x["ann"]) < 0.5 else x["ann"]
+                    lines.append(f"{ic.get(x['verdict'], '⚪️')} {((fams.get(k) or {}).get('n') or [k] * 3)[ix]}: "
+                                 f"{_n(a, lg, 0, sign=a != 0, pct=True)}{ {'fa': ' سالانه', 'ckb': ' ساڵانە'}.get(lg, '/yr')} — {_q('rs.' + x['verdict'], lg)}")
+            lines.append("🔗 entekhab.net/regime/#strategies")
+            lines.append("")
         lines += ["", f"🎲 <b>{_q('rf.hmm', lg)}</b>"]
     lines += [f"• <b>{_q(now['top'], lg)}</b> — {_q('rg.conf', lg)} {_n(100 * now['confidence'], lg, 1, pct=True)}",
              f"• {_q('rg.switch', lg)}: {_n(100 * now['switch_risk'], lg, 1, pct=True)}",
@@ -476,6 +490,13 @@ def sec_regime(lang):
     lines.append("")
     for k in ("bull", "bear", "sideways", "high_vol"):
         lines.append(f"  {_q(k, lg)}: {_n(100 * pr.get(k, 0), lg, 1, pct=True)}")
+    sel = d.get("select") or {}
+    if sel.get("rule") == "no_info":
+        lines += ["", "🔢 " + {"fa": f"مدل {_n(sel.get('chosen'), lg)} حالته؛ با هیچ تعداد حالتی، رژیم HMM بازده ماه بعد را بیش از شانس توضیح نمی‌دهد (توصیف حال است، نه پیش‌بینی).",
+                                "ckb": f"مۆدێلەکە {_n(sel.get('chosen'), lg)} حاڵەتییە؛ بە هیچ ژمارەیەکی حاڵەت دۆخی HMM قازانجی مانگی داهاتوو زیاتر لە هەڵکەوت ڕوون ناکاتەوە (وەسفی ئێستایە، نەک پێشبینی).",
+                                "en": f"The model uses {sel.get('chosen')} states; with no number of states does the HMM regime explain next month's return beyond chance (it describes the present, not the future)."}.get(lg, "")]
+    elif sel.get("chosen"):
+        lines += ["", "🔢 " + _q("ks.gain", lg, k=_n(sel.get("chosen"), lg))]
     return _head("🧭 " + _q("rg.title", lg), lg, "/regime/", lines, d.get("updated_at"))
 
 

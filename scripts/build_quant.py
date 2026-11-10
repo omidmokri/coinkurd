@@ -45,6 +45,33 @@ T = {
     "rr.lead": L("پنج سنجهٔ شفاف با آستانه‌های ثابت رأی می‌دهند. برچسب منتشرشده فقط وقتی عوض می‌شود که رأی تازه {n} روز پشت‌سرهم تکرار شود؛ این جلوی پرش‌های بی‌دلیل را می‌گیرد.",
                  "پێنج پێوەری ڕوون بە سنووری جێگیر دەنگ دەدەن. ناوی بڵاوکراوە تەنها کاتێک دەگۆڕێت کە دەنگی نوێ {n} ڕۆژ لە دوای یەک دووبارە ببێتەوە.",
                  "Five transparent measures vote with fixed thresholds. The published label only changes once a new reading repeats for {n} days in a row, which stops pointless flip-flopping."),
+    # ---- strategies per regime (scripts/regime_strats.py)
+    "rs.title": L("کدام نوع استراتژی در هر رژیم جواب داده؟", "کام جۆرە ستراتیژی لە هەر دۆخێکدا سەرکەوتوو بووە؟", "Which kind of strategy worked in each regime?"),
+    "rs.lead": L("چهار استراتژی ساده روی قیمت روزانهٔ بیت‌کوین از {a} تا {b}، جداگانه برای روزهای هر رژیمِ لایهٔ قاعده‌محور، با کارمزد رفت‌وبرگشت {c}. عدد، بازده خالص سالانه‌شده در روزهای همان رژیم است و بازه، اطمینان ۹۵٪ با بوت‌استرپ بلوکی ۱۰ روزه.",
+                 "چوار ستراتیژیی سادە لەسەر نرخی ڕۆژانەی بیتکۆین لە {a} تا {b}، جیاجیا بۆ ڕۆژەکانی هەر دۆخێکی چینی یاسایی، بە کرێی چوون‌وهاتنی {c}. ژمارەکە قازانجی پوختی ساڵانەکراوە لە ڕۆژەکانی هەمان دۆخدا و ماوەکە متمانەی ٩٥٪ە بە بووتستراپی بلۆکیی ١٠ ڕۆژە.",
+                 "Four plain strategies on Bitcoin's daily price from {a} to {b}, measured separately on the days of each rule-layer regime, with {c} round-trip costs. The number is the annualised net return on that regime's days; the range is a 95% interval from a 10-day block bootstrap."),
+    "rs.th": L("استراتژی|بازده سالانه|بازهٔ ۹۵٪|روزهای در بازار|نتیجه|", "ستراتیژی|قازانجی ساڵانە|ماوەی ٩٥٪|ڕۆژانی ناو بازاڕ|ئەنجام|", "Strategy|Annualised|95% range|Days in market|Verdict|"),
+    "rs.days": L("{n} روز در این رژیم", "{n} ڕۆژ لەم دۆخەدا", "{n} days in this regime"),
+    "rs.now": L("رژیم فعلی", "دۆخی ئێستا", "current regime"),
+    "rs.works": L("جواب داده", "سەرکەوتوو", "worked"), "rs.hurts": L("ضرر داده", "زیانی داوە", "hurt"), "rs.unclear": L("روشن نیست", "ڕوون نییە", "unclear"),
+    "rs.lab": L("در آزمایشگاه", "لە تاقیگە", "In the lab"),
+    "rs.none": L("در این رژیم هیچ استراتژی‌ای از نظر آماری روشن نیست؛ تفاوت‌ها می‌توانند تصادفی باشند.", "لەم دۆخەدا هیچ ستراتیژییەک لە ڕووی ئامارییەوە ڕوون نییە؛ جیاوازییەکان دەکرێت هەڵکەوت بن.", "No strategy is statistically clear in this regime; the differences may be luck."),
+    "rs.best": L("بهترین عدد: {b} · بدترین: {w}", "باشترین ژمارە: {b} · خراپترین: {w}", "Best number: {b} · worst: {w}"),
+    "rs.note": L("«جواب داده» یعنی کل بازهٔ ۹۵٪ بالای صفر است و «ضرر داده» یعنی کل آن زیر صفر. دکمهٔ آزمایشگاه همان استراتژی را با ورود فقط در این رژیم باز می‌کند تا خودتان با کارمزد، لغزش و آزمون جایگشت بسنجید. گذشته تضمین آینده نیست.",
+                 "«سەرکەوتوو» واتە هەموو ماوەی ٩٥٪ لە سەرووی سفرە و «زیانی داوە» واتە هەمووی لە خوار سفر. دوگمەی تاقیگە هەمان ستراتیژی بە چوونەژوورەوە تەنها لەم دۆخەدا دەکاتەوە. ڕابردوو گەرەنتیی داهاتوو نییە.",
+                 "\"Worked\" means the whole 95% range is above zero and \"hurt\" that it is all below. The lab button opens the same strategy with entries only in this regime, so you can test it yourself with fees, slippage and the permutation test. The past does not guarantee the future."),
+    # ---- model selection (regime.py select_k)
+    "ks.title": L("چند رژیم؟ انتخاب تعداد حالت‌های مدل", "چەند دۆخ؟ هەڵبژاردنی ژمارەی حاڵەتەکانی مۆدێل", "How many regimes? Choosing the number of model states"),
+    "ks.lead": L("مدل با ۳ تا ۶ حالت پنهان آزموده شد. BIC و درست‌نمایی برون‌نمونه با هر حالت اضافه بهتر می‌شوند (دم‌های پهن قیمت با تکه‌های بیشتر بهتر جفت می‌شوند)، پس به‌تنهایی نمی‌توانند انتخاب کنند. معیار انتخاب این است که رژیم برون‌نمونه چقدر از بازده ۳۰ روز بعد را بیش از شانس توضیح می‌دهد؛ شانس با جابه‌جا کردن زمانی همان برچسب‌ها اندازه گرفته می‌شود.",
+                 "مۆدێلەکە بە ٣ تا ٦ حاڵەتی شاراوە تاقیکرایەوە. BIC و ئەگەرپێدانی دەرەوەی نموونە بە هەر حاڵەتێکی زیادە باشتر دەبن، بۆیە بە تەنها ناتوانن هەڵبژێرن. پێوەری هەڵبژاردن ئەوەیە کە دۆخی دەرەوەی نموونە چەندە لە قازانجی ٣٠ ڕۆژی دواتر زیاتر لە هەڵکەوت ڕوون دەکاتەوە.",
+                 "The model was tried with 3 to 6 hidden states. BIC and out-of-sample likelihood improve with every extra state (more pieces fit the fat tails better), so they cannot choose on their own. The criterion is how much of the next 30-day return the out-of-sample regime explains beyond chance; chance is measured by shifting the same labels in time."),
+    "ks.th": L("حالت‌ها|BIC (کمتر بهتر)|درست‌نمایی برون‌نمونه در روز|توضیح بازده ۳۰ روزه بیش از شانس|میانهٔ ماندگاری|تغییر در سال", "حاڵەت|BIC (کەمتر باشتر)|ئەگەرپێدانی دەرەوەی نموونە بۆ ڕۆژ|ڕوونکردنەوەی قازانجی ٣٠ ڕۆژە زیاتر لە هەڵکەوت|ناوەندی مانەوە|گۆڕان لە ساڵدا", "States|BIC (lower is better)|Out-of-sample log-lik per day|30-day return explained beyond chance|Median run|Switches per year"),
+    "ks.no_info": L("نتیجه: با هیچ تعداد حالتی، رژیم HMM بازده ماه بعد را بیش از شانس توضیح نمی‌دهد. پس ساده‌ترین مدلی که چهار نوع رژیم را نام می‌برد ({k} حالت) نگه داشته شد: این مدل وضعیت فعلی بازار (روند و نوسان) را توصیف می‌کند، نه آینده را.",
+                    "ئەنجام: بە هیچ ژمارەیەکی حاڵەت، دۆخی HMM قازانجی مانگی داهاتوو زیاتر لە هەڵکەوت ڕوون ناکاتەوە. بۆیە سادەترین مۆدێل کە چوار جۆر دۆخ ناو دەبات ({k} حاڵەت) هێڵرایەوە: ئەم مۆدێلە بارودۆخی ئێستای بازاڕ وەسف دەکات، نەک داهاتوو.",
+                    "Result: with no number of states does the HMM regime explain next month's return beyond chance. So the simplest model that names the four regime types ({k} states) is kept: it describes the market's present state (trend and volatility), not the future."),
+    "ks.gain": L("نتیجه: {k} حالت انتخاب شد؛ حالت بعدی کمتر از ۵٪ اطلاعات اضافه می‌کرد.", "ئەنجام: {k} حاڵەت هەڵبژێردرا؛ حاڵەتی دواتر کەمتر لە ٥٪ زانیاریی زیاد دەکرد.", "Result: {k} states chosen; one more added under 5% information."),
+    "ks.bic": L("BIC به‌تنهایی {k} حالت را انتخاب می‌کرد (در بازهٔ آزمودهٔ ۳ تا ۶).", "BIC بە تەنها {k} حاڵەتی هەڵدەبژارد (لە ماوەی تاقیکراوەی ٣ تا ٦).", "BIC alone would pick {k} states (of the 3 to 6 tried)."),
+    "ks.used": L("در حال استفاده", "بەکاردێت", "in use"),
     "rr.score": L("امتیاز (−۱ تا +۱)", "خاڵ (−١ تا +١)", "Score (−1 to +1)"),
     "rr.raw": L("خوانش امروز (پیش از تأیید)", "خوێندنەوەی ئەمڕۆ (پێش پشتڕاستکردنەوە)", "Today's reading (before confirmation)"),
     "rr.pend": L("در انتظار تأیید: {to} — {d} از {n} روز", "چاوەڕێی پشتڕاستکردنەوە: {to} — {d} لە {n} ڕۆژ", "Awaiting confirmation: {to} — {d} of {n} days"),
@@ -342,6 +369,61 @@ def rule_html(g, lg):
 
 
 # ================================================================== /regime/
+def strats_html(lg):
+    d = R.load("regime_strats.json", {})
+    by = d.get("by") or {}
+    if not by:
+        return ""
+    fams = d.get("families") or {}
+    cur = d.get("now")
+    cost = nf(d.get("cost_round_trip_pct") or 0.3, lg, 1, pct=True)
+    out = ""
+    for lb in ("bull", "bear", "sideways"):
+        b = by.get(lb)
+        if not b or not b.get("fam"):
+            continue
+        rows = []
+        for k in ("trend", "dip", "short", "hold"):
+            x = b["fam"].get(k)
+            if not x:
+                continue
+            vt = x["verdict"]
+            tag = badge({"works": "green", "hurts": "red"}.get(vt, "none"), t("rs." + vt, lg))
+            z = lambda v: 0 if abs(v) < 0.5 else v  # noqa: E731  (no "−0%")
+            rng_ = "—" if x["lo"] is None else f"{pct(z(x['lo']), lg, 0, z(x['lo']) != 0)} … {pct(z(x['hi']), lg, 0, z(x['hi']) != 0)}"
+            btn = f"<a class='rc-btn2' href='{e(x['lab'])}'>🧪 {t('rs.lab', lg)}</a>" if x.get("lab") else ""
+            name = (fams.get(k) or {}).get("n") or [k, k, k]
+            rows.append(f"<tr><td>{e(name[{'fa': 0, 'ckb': 1, 'en': 2}[lg]])}</td><td class='{cls(z(x['ann']))}'>{pct(z(x['ann']), lg, 0, z(x['ann']) != 0)}</td>"
+                        f"<td>{rng_}</td><td>{pct(x['in_mkt'], lg, 0)}</td><td>{tag}</td><td>{btn}</td></tr>")
+        clear = [k for k, x in b["fam"].items() if k != "hold" and x["verdict"] != "unclear"]
+        nm = lambda k: e(((fams.get(k) or {}).get("n") or [k, k, k])[{"fa": 0, "ckb": 1, "en": 2}[lg]])  # noqa: E731
+        foot = (f"<p class='note'>{t('rs.none', lg)}</p>" if not clear else
+                f"<p class='note'>{t('rs.best', lg, b=nm(b['best']), w=nm(b['worst']))}</p>")
+        now_tag = f" <span class='rc-pill'>📍 {t('rs.now', lg)}</span>" if lb == cur else ""
+        out += (f"<div class='rc-card' style='border-inline-start:4px solid {RC[lb]}'><h3>{badge(LEVEL[lb], t(lb, lg))}{now_tag} "
+                f"<small class='mut'>{t('rs.days', lg, n=nf(b['days'], lg))}</small></h3>"
+                f"{table(cols('rs.th', lg), rows)}{foot}</div>")
+    lead = e(t("rs.lead", lg, a=fdate(d.get("from"), lg), b=fdate(d.get("to"), lg), c=cost))
+    return sec(t("rs.title", lg), out + f"<p class='note'>{t('rs.note', lg)}</p>", id_="strategies", lead=lead)
+
+
+def select_html(g, lg):
+    sel = g.get("select") or {}
+    rows_ = sel.get("rows") or []
+    if not rows_:
+        return ""
+    k_now = (g.get("model") or {}).get("K")
+    rows = []
+    for r in rows_:
+        mark = f" {badge('green', t('ks.used', lg))}" if r["k"] == k_now else ""
+        rows.append(f"<tr><td><b>{nf(r['k'], lg)}</b>{mark}</td><td>{nf(r['bic'], lg, 0)}</td><td>{nf(r['oos_ll_day'], lg, 3)}</td>"
+                    f"<td class='{cls(r['info'])}'>{pct(100 * r['info'], lg, 1, True)}</td><td>{t('days', lg, n=nf(r['median_run'], lg))}</td>"
+                    f"<td>{nf(r['flips_year'], lg, 1)}</td></tr>")
+    res = t("ks.no_info", lg, k=nf(sel.get("chosen"), lg)) if sel.get("rule") == "no_info" else t("ks.gain", lg, k=nf(sel.get("chosen"), lg))
+    foot = f"<p><b>{e(res)}</b></p><p class='note'>{t('ks.bic', lg, k=nf(sel.get('bic_best'), lg))}</p>"
+    return sec(t("ks.title", lg), table(cols("ks.th", lg), rows) + foot, id_="states", lead=e(t("ks.lead", lg)))
+
+
 def build_regime():
     g = R.load("regime.json", {})
     now = g.get("now") or {}
@@ -364,13 +446,14 @@ def build_regime():
               f"<div class='rc-kpi'><small>{t('rg.days', lg)}</small><b>{nf(now.get('days_in'), lg)}</b></div></div>")
         nx = now.get("next") or {}
         h += rule_html(g, lg)
+        h += strats_html(lg)
         h += sec(t("rg.next", lg), " ".join(f"<span class='rc-pill'><b style='color:{RC[k]}'>{e(t(k, lg))}</b> {pct(100 * nx.get(k, 0), lg, 1)}</span>" for k in RC))
         if len(hist) > 20:
             leg = "".join(f"<span><i style='background:{RC[k]}'></i>{e(t(k, lg))}</span>" for k in RC)
             h += sec(t("rg.hist", lg), f"<div class='rc-legend'>{leg}</div>" + slot("rg-hist"))
         st = g.get("states") or {}
         if st:
-            rows = [f"<tr><td>{badge(LEVEL[k], t(k, lg))}</td><td>{pct(st[k]['mom20_pct'], lg, 1, True)}</td><td>{pct(st[k]['vol10_pct'], lg, 2)}</td>"
+            rows = [f"<tr><td>{badge(LEVEL[k], t(k, lg))}{' ×' + nf(st[k]['states'], lg) if st[k].get('states', 1) > 1 else ''}</td><td>{pct(st[k]['mom20_pct'], lg, 1, True)}</td><td>{pct(st[k]['vol10_pct'], lg, 2)}</td>"
                     f"<td>{pct(100 * st[k]['stay'], lg, 1)}</td><td>{t('days', lg, n=nf(st[k]['mean_days'], lg, 1))}</td></tr>" for k in RC if k in st]
             h += sec(t("rg.states", lg), table(cols("rg.st_th", lg), rows))
         tr = g.get("trans") or {}
@@ -398,6 +481,7 @@ def build_regime():
             lis = "".join(f"<li>{fdate(c['d'], lg)}: {e(t(c['from'], lg))} ← {e(t(c['to'], lg))}</li>" if lg != "en"
                           else f"<li>{fdate(c['d'], lg)}: {e(t(c['from'], lg))} → {e(t(c['to'], lg))}</li>" for c in reversed(ch[-10:]))
             h += sec(t("rg.changes", lg), f"<ul class='txt'>{lis}</ul>")
+        h += select_html(g, lg)
         return h + meth("regime", lg) + updated(lg, g.get("updated_at"))
 
     pool = js = ""

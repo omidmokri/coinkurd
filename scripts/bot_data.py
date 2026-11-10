@@ -426,6 +426,10 @@ def sec_deriv(lang):
             out.append(f"   {h('liq', lang)} {span}: 🔴L {fbig(liq.get('long_usd_24h'))} · 🟢S {fbig(liq.get('short_usd_24h'))}")
         else:
             out.append(f"   {h('liq', lang)} 1h: 🔴L {fbig(liq.get('long_usd_1h'))} · 🟢S {fbig(liq.get('short_usd_1h'))}")
+    rr = (d.get("regime_read") or {}).get("BTC") or {}
+    if rr.get("fa"):
+        out += ["", "🧭 <b>" + pick({"fa": "در رژیم فعلی بازار", "ckb": "لە دۆخی ئێستای بازاڕدا", "en": "In the current regime"}, lang) + "</b>",
+                html.escape(rr.get(lang) or rr.get("fa") if lang in ("fa", "ckb") else rr.get("en") or rr.get("fa"))]
     out += ["", "🔥 " + pick({"fa": "فاندینگ داغ", "ckb": "فاندینگی گەرم", "en": "Hot funding"}, lang)]
     out += [f"  {x['coin']} {(x.get('funding') or 0):+.4f}% ({(x.get('funding_ann') or 0):+.0f}%/y)" for x in d.get("funding_hot", [])[:5]]
     out += ["🧊 " + pick({"fa": "فاندینگ منفی", "ckb": "فاندینگی نەرێنی", "en": "Negative funding"}, lang)]
