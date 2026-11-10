@@ -252,8 +252,28 @@ def sec_opps(lang, coin=None):
     ops = sorted(ops, key=lambda o: (o.get("confidence") != "high", -(o.get("mtf_align") or 0), -(o.get("rr") or 0)))
     st = (load("scanstats") or {}).get("stats", {})
     out = [f"🎯 <b>{t('b_opps', lang)[2:]}</b>"]
-    for o in ops[:12]:
+    # one entry per coin, as on the site: the strongest finding leads, the coin's other findings follow with a
+    # same-direction / conflicting verdict (a coin often trips several detectors in the same hour)
+    grp = {}
+    for o in ops:
+        grp.setdefault(o["coin"], []).append(o)
+    lead = []
+    for o in ops:
+        if grp.get(o["coin"]) and grp[o["coin"]][0] is o:
+            o = dict(o, also=[x for x in grp[o["coin"]][1:] if x["type"] not in (o.get("confirms") or [])])
+            lead.append(o)
+    for o in lead[:12]:
         out.append(fmt_opp(o, lang))
+        if o["also"]:
+            names = ", ".join(("▼ " if x.get("dir") == "bear" else "▲ ") + L(OPP.get(x["type"], {"en": x["type"]}), lang) for x in o["also"])
+            same = all(x.get("dir") == o.get("dir") for x in o["also"])
+            verdict = pick({"fa": "✅ همه هم‌جهت", "ckb": "✅ هەموو هاوئاراستەن", "en": "✅ all point the same way",
+                            "kmr": "✅ hemû di heman alî de ne", "ar": "✅ جميعها في الاتجاه نفسه"} if same else
+                           {"fa": "⚠️ یافته‌های متضاد؛ با احتیاط", "ckb": "⚠️ دۆزینەوەی دژبەیەک؛ بە وریاییەوە",
+                            "en": "⚠️ conflicting findings; be careful", "kmr": "⚠️ encamên dijber; bi hişyarî",
+                            "ar": "⚠️ نتائج متعارضة؛ بحذر"}, lang)
+            also = pick({"fa": "هم‌زمان", "ckb": "هاوکات", "en": "also", "kmr": "herwiha", "ar": "أيضاً"}, lang)
+            out.append(f"   ➕ {also}: {names} — {verdict}")
         s, au = st.get(o["type"]), (load("scanaudit") or {}).get("patterns", {}).get(o["type"]) or {}
         if au.get("verdict") == "worse":
             out.append("   " + pick({"fa": "⚠️ در دست بازبینی: این الگو در آزمون بدتر از ساعت‌های تصادفی بوده",

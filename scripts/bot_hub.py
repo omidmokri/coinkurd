@@ -150,6 +150,10 @@ def sentiment_data(s):
 
 # ================================================================== 2. prediction game
 DAILY_PTS, WEEKLY_PTS = 3, 10
+# The daily question used to live only inside the bot menu, so almost nobody saw it (0 votes most days, while the
+# weekly one, posted in the channel, drew 3-8). It is now also posted in the discussion group, where it is one
+# message a day and does not crowd the channel. Set by start(); None keeps the old behaviour.
+GROUP = None
 
 
 def btc_price():
@@ -184,6 +188,11 @@ def new_rounds(s, post_fn, channel):
                 "q": f"بیت‌کوین فردا همین ساعت بالاتر از {fmt(price)} دلار است یا پایین‌تر؟",
                 "opts": ["📈 بالاتر", "📉 پایین‌تر"], "close": (now + timedelta(hours=12)).isoformat(),
                 "settle": (now + timedelta(hours=24)).isoformat(), "votes": {}, "result": None})
+            if GROUP:
+                r = p["rounds"][-1]
+                res = post_fn(GROUP, round_text(r), kb=round_kb(r))
+                if res.get("ok"):
+                    r["msg"], r["chat"] = res["result"]["message_id"], GROUP
             made = True
     monday = (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d")
     if not any(r["id"] == f"w{monday}" for r in p["rounds"]):
@@ -268,9 +277,13 @@ def settle(s, edit_fn, channel):
                 me["pts"] += pts
                 me["ok"] += 1
         if r.get("msg"):
-            edit_fn(channel, r["msg"], round_text(r), {"inline_keyboard": []})
+            edit_fn(r.get("chat") or channel, r["msg"], round_text(r), {"inline_keyboard": []})
         done = True
     return done
+
+
+def round_by_id(s, rid):
+    return next((x for x in hub(s)["pred"]["rounds"] if x["id"] == rid), None)
 
 
 def leaderboard(s, n=10):
@@ -440,7 +453,9 @@ def tick(s, send_fn, edit_fn, channel, worktree, push):
     return changed
 
 
-def start(s, send_fn, edit_fn, channel, worktree, push):
+def start(s, send_fn, edit_fn, channel, worktree, push, group=None):
+    global GROUP
+    GROUP = group or None
     hub(s)
 
     def loop():

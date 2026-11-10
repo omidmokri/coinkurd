@@ -171,7 +171,11 @@ def main():
     rr = ((rg.get("rule") or {}).get("now")) or {}
     if rr.get("label"):
         out["radar"] = {"rule": rr["label"], "score": rr.get("score"), "pending": (rr.get("pending") or {}).get("to"),
-                        "hmm": (rg.get("now") or {}).get("top"), "date": rr.get("date")}
+                        "hmm": (rg.get("now") or {}).get("top"), "date": rr.get("date"),
+                        # how long the confirmed label has held, and the model's typical stay in that state,
+                        # so a reader can tell a settled regime from one that has just turned
+                        "days_in": rr.get("days_in"),
+                        "mean_days": ((rg.get("states") or {}).get("high_vol" if rr["label"] == "high_vol" else rr["label"]) or {}).get("mean_days")}
     stamps = [prev.get("report_at")] + [x.get("at") for x in load("brain_log.json", [])[-3:]]
     stamps = [datetime.fromisoformat(t) for t in stamps if t]
     last = max(stamps) if stamps else None
