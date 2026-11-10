@@ -694,7 +694,9 @@ def intel_html():
     groups = [sorted(g, key=lambda o: (o["confidence"] != "high", -(o.get("strength") or 0))) for g in by_coin.values()]
     groups.sort(key=lambda g: (g[0]["confidence"] != "high", -(g[0].get("strength") or 0)))
     rows = "".join(f'<tr><td><a href="/coins/{g[0]["coin"].lower()}/">{g[0]["coin"]}</a></td><td>{OPP_FA.get(g[0]["type"], g[0]["type"])}'
-                   + (f'<small> + {"، ".join(OPP_FA.get(x["type"], x["type"]) for x in g[1:])}</small>' if len(g) > 1 else "")  # here a repeat is harmless: confirmations are not shown in this table
+                   + (f'<small> + {"، ".join(OPP_FA.get(x["type"], x["type"]) for x in g[1:])} — '
+                      + ("✅ همه هم‌جهت" if all(x.get("dir") == g[0].get("dir") for x in g[1:]) else "⚠️ یافته‌های متضاد؛ با احتیاط")
+                      + '</small>' if len(g) > 1 else "")  # confirmations are not shown in this table, so nothing repeats
                    + f'</td><td class="num">{g[0]["strength"]}</td><td>{"بالا" if g[0]["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(g[0]["price"])}</td></tr>' for g in groups[:14])
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
     out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
