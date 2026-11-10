@@ -104,6 +104,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
+- **DCA vs lump-sum simulator** (owner's GitHub-ideas file, 2026-11-10): pick coin, amount, period and frequency;
+  show DCA vs buying once vs a simple grid, after fees, on real Binance history, with the same honesty notes as
+  /strategy-lab/. Site (/tools/ or a lab preset tab) + bot calculators section.
+- **Shared paper-trading leaderboard** (same file): /me/ paper trades are per-device today. A leaderboard needs a
+  server-side record — the bot (refbot-state) could store opt-in results submitted from the site with a signed
+  link, ranked after fees, minimum trade count, no deletions. Design first; nothing personal stored without opt-in.
 1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
    - **Broken images — done 2026-11-09** (slice 1: site-wide hide-on-error; slice 2 dropped: no page renders the
      Persian-feed images — `news.js` `noPic` shows Persian news text-only by the owner's choice, and a full build has no

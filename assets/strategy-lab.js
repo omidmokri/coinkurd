@@ -53,6 +53,17 @@
     k_dd: ['حداکثر افت', 'زۆرترین داکەوتن', 'Max drawdown'], k_n: ['معامله', 'مامەڵە', 'Trades'], k_win: ['نرخ برد', 'ڕێژەی بردنەوە', 'Win rate'],
     k_pf: ['ضریب سود', 'هۆکاری قازانج', 'Profit factor'], k_avg: ['میانگین هر معامله', 'ناوەندی هەر مامەڵە', 'Avg trade'],
     k_exp: ['زمان در بازار', 'کات لە بازاڕ', 'Time in market'], k_sh: ['شارپ', 'شارپ', 'Sharpe'],
+    k_so: ['سورتینو', 'سۆرتینۆ', 'Sortino'],
+    mc: ['مونت‌کارلو: اگر ترتیب و ترکیب معامله‌ها فرق می‌کرد؟', 'مۆنت کارلۆ: ئەگەر ڕیز و تێکەڵەی مامەڵەکان جیاواز بوایە؟', 'Monte Carlo: what if the trades had come in another order and mix?'],
+    mc_lead: ['همین معامله‌ها ۲٬۰۰۰ بار با جایگذاری بازنمونه‌گیری می‌شوند (هر بار همان تعداد معامله، با ترتیب تصادفی). این آزمون لبه را ثابت نمی‌کند — کار آزمون جایگشت است — بلکه نشان می‌دهد با همین نوع معامله‌ها، چه بازه‌ای از بازده و افت سرمایه را باید انتظار داشت.',
+      'هەمان مامەڵەکان ٢٬٠٠٠ جار بە گەڕاندنەوە دووبارە نموونە دەگیرێن (هەر جارێک هەمان ژمارەی مامەڵە، بە ڕیزی هەڕەمەکی). ئەمە لێوار ناسەلمێنێت — ئەوە کاری تاقیکردنەوەی جێگۆڕکێیە — بەڵکو نیشان دەدات بە هەمان جۆری مامەڵە، چ مەودایەکی قازانج و داکەوتن چاوەڕوان دەکرێت.',
+      'The same trades are resampled 2,000 times with replacement (same number of trades each time, random order). This does not prove an edge — that is the permutation test\'s job — it shows the range of returns and drawdowns to expect from trades like these.'],
+    mc_p5: ['بازده بد (صدک ۵)', 'قازانجی خراپ (سەدەکی ٥)', 'Bad case return (5th pct)'], mc_p50: ['بازده میانه', 'قازانجی ناوەند', 'Median return'],
+    mc_p95: ['بازده خوب (صدک ۹۵)', 'قازانجی باش (سەدەکی ٩٥)', 'Good case return (95th pct)'],
+    mc_dd50: ['افت معمول (میانه)', 'داکەوتنی ئاسایی (ناوەند)', 'Typical drawdown (median)'], mc_dd95: ['افت بد (صدک ۹۵)', 'داکەوتنی خراپ (سەدەکی ٩٥)', 'Bad drawdown (95th pct)'],
+    mc_loss: ['احتمال زیان کل', 'ئەگەری زیانی گشتی', 'Chance of a net loss'],
+    mc_few: ['برای مونت‌کارلو دست‌کم ۱۰ معامله لازم است.', 'بۆ مۆنت کارلۆ لانیکەم ١٠ مامەڵە پێویستە.', 'Monte Carlo needs at least 10 trades.'],
+    mc_dd_note: ['افت این‌جا بین معامله‌ها حساب می‌شود (نه داخل هر معامله)، پس افت واقعی می‌تواند کمی بیشتر باشد.', 'داکەوتن لێرە لە نێوان مامەڵەکاندا دەژمێردرێت (نەک لەناو هەر مامەڵەیەک)، بۆیە داکەوتنی ڕاستەقینە دەکرێت کەمێک زیاتر بێت.', 'Drawdown here is measured between trades (not inside each one), so the real drawdown can be somewhat larger.'],
     k_bh: ['خرید و نگهداری', 'کڕین و ڕاگرتن', 'Buy & hold'], k_bhdd: ['افت خرید و نگهداری', 'داکەوتنی کڕین و ڕاگرتن', 'Buy & hold drawdown'],
     eq: ['منحنی سرمایه (لگاریتمی)', 'هێڵی سەرمایە (لۆگاریتمی)', 'Equity curve (log)'], strat: ['استراتژی', 'ستراتیژ', 'strategy'],
     trades: ['آخرین معامله‌ها', 'دوایین مامەڵەکان', 'Latest trades'],
@@ -240,13 +251,14 @@
     var m = R.rets.reduce(function (s, x) { return s + x; }, 0) / (R.rets.length || 1);
     var sd = Math.sqrt(R.rets.reduce(function (s, x) { return s + (x - m) * (x - m); }, 0) / Math.max(1, R.rets.length - 1));
     var perYear = R.rets.length / yrs;
+    var dsd = Math.sqrt(R.rets.reduce(function (s, x) { return s + (x < 0 ? x * x : 0); }, 0) / Math.max(1, R.rets.length));   // downside deviation (target 0)
     // buy & hold over the same bars (no costs)
     var bh = D.c[b - 1] / D.o[a] - 1, pk = D.o[a], bdd = 0;
     for (var i = a; i < b; i++) { if (D.c[i] > pk) pk = D.c[i]; var dd = D.c[i] / pk - 1; if (dd < bdd) bdd = dd; }
     return {
       ret: R.eq - 1, cagr: R.eq > 0 ? Math.pow(R.eq, 1 / yrs) - 1 : -1, mdd: R.mdd, n: tr.length, win: tr.length ? w.length / tr.length : null,
       pf: gl > 0 ? gw / gl : (gw > 0 ? Infinity : null), avg: tr.length ? tr.reduce(function (s, x) { return s + x.r; }, 0) / tr.length : null,
-      exp: R.inBars / R.bars, sharpe: sd > 0 ? m / sd * Math.sqrt(perYear) : null, bh: bh, bhdd: bdd, yrs: yrs
+      exp: R.inBars / R.bars, sharpe: sd > 0 ? m / sd * Math.sqrt(perYear) : null, sortino: dsd > 0 ? m / dsd * Math.sqrt(perYear) : null, bh: bh, bhdd: bdd, yrs: yrs
     };
   }
 
@@ -455,7 +467,7 @@
     if (!R.trades.length) h += '<p class="note">' + t('no_tr') + '</p>';
     h += '<div class="rc-kpis">' + kpi('k_ret', pc(s.ret, 1, true), cl(s.ret)) + kpi('k_cagr', pc(s.cagr, 1, true), cl(s.cagr)) + kpi('k_dd', pc(s.mdd, 1), 'down') +
       kpi('k_n', nf(s.n)) + kpi('k_win', pc(s.win, 1)) + kpi('k_pf', s.pf === Infinity ? '∞' : nf(s.pf, 2)) + kpi('k_avg', pc(s.avg, 2, true), cl(s.avg)) +
-      kpi('k_exp', pc(s.exp, 0)) + kpi('k_sh', nf(s.sharpe, 2)) + kpi('k_bh', pc(s.bh, 1, true), cl(s.bh)) + kpi('k_bhdd', pc(s.bhdd, 1), 'down') + '</div>';
+      kpi('k_exp', pc(s.exp, 0)) + kpi('k_sh', nf(s.sharpe, 2)) + kpi('k_so', nf(s.sortino, 2)) + kpi('k_bh', pc(s.bh, 1, true), cl(s.bh)) + kpi('k_bhdd', pc(s.bhdd, 1), 'down') + '</div>';
     h += '<h3>' + t('eq') + '</h3><div class="rc-legend"><span><i style="background:#f59e0b"></i>' + t('strat') + '</span><span><i style="background:#64748b"></i>' + t('k_bh') + '</span></div><div id="sl-eq" class="rc-chart" style="height:300px"></div>';
     if (R.trades.length) {
       var cols = t('th_tr').split('|'), rows = R.trades.slice(-40).reverse().map(function (x) {
@@ -465,6 +477,7 @@
       h += '<h3>' + t('trades') + '</h3><div class="rc-tbl"><table><thead><tr>' + cols.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
     }
     h += '</section>';
+    h += mcHTML(R.trades);
     // permutation
     h += '<section class="rc-sec"><h2>' + t('perm') + '</h2><p class="rc-lead">' + t('perm_lead') + '</p><div class="sl-row"><label>' + t('perm_n') +
       sel('pm-n', [['100', loc(100)], ['200', loc(200)], ['500', loc(500)]], X.permN || 200) + '</label><button type="button" class="sl-run pm-run"' + (R.trades.length ? '' : ' disabled') + '>' + t('perm_run') + '</button><span class="pm-msg mut"></span></div><div class="pm-out">' + (X.perm ? permHTML(X.perm) : '') + '</div></section>';
@@ -502,6 +515,28 @@
       '<line x1="' + ((P.real - lo) / (hi - lo || 1) * W) + '" x2="' + ((P.real - lo) / (hi - lo || 1) * W) + '" y1="0" y2="' + H + '" stroke="#f59e0b" stroke-width="3"/>' +
       '<text x="' + Math.min(W - 60, Math.max(2, (P.real - lo) / (hi - lo || 1) * W + 4)) + '" y="' + (H + 14) + '" fill="#f59e0b" font-size="12">' + esc(t('strat')) + '</text></svg>';
     return '<div class="rc-kpis">' + kpi('perm_p', '<span class="' + col + '">' + nf(P.p, 3) + '</span>') + kpi('perm_beat', nf(P.beat) + ' / ' + nf(P.n)) + '</div><p class="' + col + '"><b>' + t(v) + '</b></p>' + svg;
+  }
+  /* Monte Carlo resampling of the realised trades: the spread of outcomes from trades like these */
+  function monteCarlo(trades, N) {
+    var r = rng(777), n = trades.length, fin = [], dds = [], loss = 0;
+    for (var k = 0; k < N; k++) {
+      var eq = 1, pk = 1, mdd = 0;
+      for (var j = 0; j < n; j++) {
+        eq *= 1 + trades[Math.floor(r() * n)].r;
+        if (eq > pk) pk = eq; var dd = eq / pk - 1; if (dd < mdd) mdd = dd;
+      }
+      fin.push(eq - 1); dds.push(mdd); if (eq < 1) loss++;
+    }
+    fin.sort(function (x, y) { return x - y; }); dds.sort(function (x, y) { return y - x; });   // drawdowns: mildest first
+    var q = function (a, p) { return a[Math.min(a.length - 1, Math.max(0, Math.round(p * (a.length - 1))))]; };
+    return { n: N, p5: q(fin, 0.05), p50: q(fin, 0.5), p95: q(fin, 0.95), dd50: q(dds, 0.5), dd95: q(dds, 0.95), loss: loss / N };
+  }
+  function mcHTML(trades) {
+    var h = '<section class="rc-sec"><h2>' + t('mc') + '</h2><p class="rc-lead">' + t('mc_lead') + '</p>';
+    if (trades.length < 10) return h + '<p class="note">' + t('mc_few') + '</p></section>';
+    var M = monteCarlo(trades, 2000);
+    return h + '<div class="rc-kpis">' + kpi('mc_p5', pc(M.p5, 1, true), cl(M.p5)) + kpi('mc_p50', pc(M.p50, 1, true), cl(M.p50)) + kpi('mc_p95', pc(M.p95, 1, true), cl(M.p95)) +
+      kpi('mc_dd50', pc(M.dd50, 1), 'down') + kpi('mc_dd95', pc(M.dd95, 1), 'down') + kpi('mc_loss', pc(M.loss, 1), M.loss > 0.2 ? 'down' : '') + '</div><p class="mut">' + t('mc_dd_note') + '</p></section>';
   }
   function runPerm(N) {
     if (!LAST || BUSY) return; BUSY = true; LAST.permN = N;

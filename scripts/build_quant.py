@@ -70,6 +70,15 @@ T = {
     "rg.next": L("احتمال‌های فردا", "ئەگەرەکانی سبەی", "Tomorrow's probabilities"),
     "rg.hist": L("احتمال هر رژیم در ۱۴ ماه گذشته (برون‌نمونه)", "ئەگەری هەر دۆخێک لە ١٤ مانگی ڕابردوودا (دەرەوەی نموونە)",
                  "Probability of each regime over the last 14 months (out-of-sample)"),
+    "rg.typ": L("میانگین ماندگاری این رژیم: {n} روز", "تێکڕای مانەوەی ئەم دۆخە: {n} ڕۆژ", "this regime usually lasts {n} days"),
+    "rg.goes": L("اگر عوض شود، محتمل‌ترین مقصد: {to} ({p} برای فردا)", "ئەگەر بگۆڕێت، ئەگەریترین ئامانج: {to} ({p} بۆ سبەی)",
+                 "if it changes, most likely next: {to} ({p} for tomorrow)"),
+    "rg.trans": L("ماتریس انتقال: اگر امروز در این رژیم باشیم، فردا کجا هستیم؟", "ماتریکسی گواستنەوە: ئەگەر ئەمڕۆ لەم دۆخەدا بین، سبەی لە کوێین؟",
+                  "Transition matrix: if today is in this regime, where is tomorrow?"),
+    "rg.tr_lead": L("هر سطر جمعش ۱۰۰٪ است. قطر اصلی احتمال ماندن است؛ بقیهٔ خانه‌ها می‌گویند رژیم معمولاً به کجا می‌رود. این احتمال‌ها از کل دادهٔ تاریخی برآورد شده‌اند، نه پیش‌بینی قطعی.",
+                    "کۆی هەر ڕیزێک ١٠٠٪ە. هێڵی سەرەکی ئەگەری مانەوەیە؛ خانەکانی تر دەڵێن دۆخەکە زۆرجار بەرەو کوێ دەچێت. ئەم ئەگەرانە لە هەموو داتای مێژوویی خەمڵێنراون، نەک پێشبینیی بڕاوە.",
+                    "Each row sums to 100%. The diagonal is the chance of staying; the other cells show where the regime usually goes next. Estimated from all history, not a firm forecast."),
+    "rg.tr_from": L("امروز ↓ / فردا →", "ئەمڕۆ ↓ / سبەی →", "today ↓ / tomorrow →"),
     "rg.states": L("هر رژیم در عمل یعنی چه؟", "هەر دۆخێک لە کرداردا واتای چییە؟", "What each regime actually looks like"),
     "rg.st_th": L("رژیم|بازده ۲۰ روزه|نوسان روزانه|ماندگاری|میانگین طول", "دۆخ|قازانجی ٢٠ ڕۆژ|هەڵاوسانی ڕۆژانە|مانەوە|درێژیی ناوەند",
                   "Regime|20-day return|Daily volatility|Stays next day|Average run"),
@@ -364,6 +373,14 @@ def build_regime():
             rows = [f"<tr><td>{badge(LEVEL[k], t(k, lg))}</td><td>{pct(st[k]['mom20_pct'], lg, 1, True)}</td><td>{pct(st[k]['vol10_pct'], lg, 2)}</td>"
                     f"<td>{pct(100 * st[k]['stay'], lg, 1)}</td><td>{t('days', lg, n=nf(st[k]['mean_days'], lg, 1))}</td></tr>" for k in RC if k in st]
             h += sec(t("rg.states", lg), table(cols("rg.st_th", lg), rows))
+        tr = g.get("trans") or {}
+        if tr:
+            ks = [k for k in RC if k in tr]
+            head_row = [e(t("rg.tr_from", lg))] + [badge(LEVEL[k], t(k, lg)) for k in ks]
+            rows = [f"<tr><td>{badge(LEVEL[a], t(a, lg))}</td>" + "".join(
+                        f"<td style='background:rgba(247,147,26,{min(0.55, tr[a].get(b, 0) * 0.6):.2f})'>"
+                        f"{'<b>' if a == b else ''}{pct(100 * tr[a].get(b, 0), lg, 1)}{'</b>' if a == b else ''}</td>" for b in ks) + "</tr>" for a in ks]
+            h += sec(t("rg.trans", lg), table(head_row, rows), lead=e(t("rg.tr_lead", lg)))
         ev = g.get("eval") or {}
         if ev:
             rows = []

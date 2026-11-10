@@ -460,7 +460,15 @@ def sec_regime(lang):
         lines += ["", f"🎲 <b>{_q('rf.hmm', lg)}</b>"]
     lines += [f"• <b>{_q(now['top'], lg)}</b> — {_q('rg.conf', lg)} {_n(100 * now['confidence'], lg, 1, pct=True)}",
              f"• {_q('rg.switch', lg)}: {_n(100 * now['switch_risk'], lg, 1, pct=True)}",
-             f"• {_n(now.get('days_in'), lg)} {_q('rg.days', lg)}", ""]
+             f"• {_n(now.get('days_in'), lg)} {_q('rg.days', lg)}"]
+    st = (d.get("states") or {}).get(now["top"]) or {}
+    if st.get("mean_days"):
+        lines.append("• " + _q("rg.typ", lg, n=_n(st["mean_days"], lg, 1)))
+    row = (d.get("trans") or {}).get(now["top"]) or {}
+    oth = sorted(((k, v) for k, v in row.items() if k != now["top"]), key=lambda kv: -kv[1])
+    if oth:
+        lines.append("• " + _q("rg.goes", lg, to=_q(oth[0][0], lg), p=_n(100 * oth[0][1], lg, 1, pct=True)))
+    lines.append("")
     for k in ("bull", "bear", "sideways", "high_vol"):
         lines.append(f"  {_q(k, lg)}: {_n(100 * pr.get(k, 0), lg, 1, pct=True)}")
     return _head("🧭 " + _q("rg.title", lg), lg, "/regime/", lines, d.get("updated_at"))
