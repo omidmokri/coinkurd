@@ -154,6 +154,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · SEO audit (OpenSEO): titles ≤ 60, descriptions ≤ 160 on all 5,498 pages; IndexNow
+- build_pages.seo_title / seo_desc (decoration such as ━━━ and emoji removed, cut at a word boundary, "…") in page();
+  scripts/seo_tidy.py as the last build step catches the pages with their own templates. og:* tags keep full text.
+  Build check: 0 of 5,498 pages over the limits; second run changes nothing. Home title/description shortened.
+- IndexNow: key file at the root (key from the owner's OpenSEO project), scripts/indexnow.py submits new post pages
+  once (state data/indexnow.json, before "Commit data"). The OpenSEO project itself is set to the misspelt domain
+  entekhb.net — only the owner can change that in its settings.
+
 ### 2026-11-10 · Paper trading in the bot + /leaderboard/ (owner chose "record trades in the bot")
 - scripts/bot_paper.py: $10,000 virtual, 12 coins, long/short, 10/25/50% of free cash, 0.1% fee each side, max 5 open,
   no leverage (a short is capped at −100% of its stake). Every open/close is priced by the bot from Binance

@@ -254,6 +254,38 @@ WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c
             "b.onclick=function(){var a=g();if(a.indexOf(c)>=0)a=a.filter(function(x){return x!==c});else a.push(c);try{localStorage.setItem(K,JSON.stringify(a.slice(0,20)))}catch(e){}d();w()};var l=document.createElement('a');l.className='wbtn';l.target='_blank';l.rel='noopener';b.after(l);function w(){var a=g().filter(function(x){return /^[A-Z0-9]{2,12}$/.test(x)}),q='w_',n=0;for(var i=0;i<a.length;i++){if((q+(n?'-':'')+a[i]).length>64)break;q+=(n?'-':'')+a[i];n++}l.hidden=!n;l.href='https://t.me/Kurd_kurdistan_bot?start='+q;var T={fa:['📨 فرستادن لیست به ربات',' (فقط ',' نماد اول)'],ckb:['📨 ناردنی لیست بۆ بۆت',' (تەنها ',' هێمای یەکەم)'],en:['📨 Send my list to the bot',' (first ',' only)']}[document.documentElement.lang]||['📨 فرستادن لیست به ربات',' (فقط ',' نماد اول)'];l.textContent=T[0]+(n<a.length?T[1]+n+T[2]:'')}w();d()});")
 
 
+# Search snippets: Google shows about 60 characters of a <title> and about 155-160 of a description. Telegram post
+# titles and texts are longer and carry decoration (━━━ rules, ⚡️🚀💡 markers); the SEO audit of 2026-11-10 flagged
+# 50+ pages for it. og:title / og:description keep the full text for link previews; only the search tags are tidied.
+_RULE = re.compile("\\s*[\u2500-\u257F]{2,}\\s*")          # ━━━━ section rules become a separator
+_DECOR = re.compile("[\u2300-\u23FF\u2500-\u257F\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\U0001F000-\U0001FAFF]+")
+
+
+def _cut(t, n):
+    """t if it fits in n characters, else cut at the last word boundary before n-1 and end with …"""
+    if len(t) <= n:
+        return t
+    c = t[:n - 1]
+    sp = c.rfind(" ")
+    if sp > n * 0.6:
+        c = c[:sp]
+    return c.rstrip(" ،,؛;:|—-") + "…"
+
+
+def seo_title(title, suffix=" | entekhab.net", n=60):
+    t = re.sub(r"\s+", " ", _DECOR.sub(" ", title or "")).strip(" |—-")
+    if len(t) + len(suffix) <= n:
+        return t + suffix
+    return _cut(t, n)
+
+
+def seo_desc(desc, n=158):
+    t = re.sub(r"\s+", " ", _DECOR.sub(" ", _RULE.sub(" — ", desc or ""))).strip(" —")
+    t = re.sub(r"(\s*—\s*){2,}", " — ", t)
+    t = re.sub(r"(\s*[|·•]\s*){2,}", " · ", t)
+    return _cut(t, n)
+
+
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
@@ -261,7 +293,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
     body = body.replace('</b></div><div class="kpi"', '</b></div> <div class="kpi"')
     extra_head = extra_head + crumbs_ld(body, title, url, lang)
     doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8">{chrome.CSP_META}<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{e(title)} | entekhab.net</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{url}">
+<title>{e(seo_title(title))}</title><meta name="description" content="{e(seo_desc(desc))}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 {ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}
@@ -1221,7 +1253,7 @@ def build_dna():
                + f' · به‌روزرسانی {e(dna.get("updated_at", "")[:16])} UTC</p>'
                + "<p>" + " · ".join(f'<a href="/dna/{o.lower()}/">{e(o)}</a>' for o in [x for x, _ in d.get("similar", [])]) + "</p>")
         url = f"{SITE}/dna/{c.lower()}/"
-        doc = (tpl.replace("<title>Market DNA — DNA بازار ارزهای دیجیتال | entekhab.net</title>", f"<title>{e(title)} | entekhab.net</title>")
+        doc = (tpl.replace("<title>Market DNA — DNA بازار ارزهای دیجیتال | entekhab.net</title>", f"<title>{e(seo_title(title))}</title>")
                .replace('<link rel="canonical" href="https://entekhab.net/dna/">', f'<link rel="canonical" href="{url}">')
                .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc[:300])} — ', 1)
                .replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{seo}</div>')
@@ -1382,7 +1414,7 @@ def build_indicators():
               "author": {"@type": "Person", "name": "Omid Dabbaghchi Mokri (Coin_Kurd)", "url": "https://www.tradingview.com/u/Coin_Kurd/"},
               "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"} if it["access"] == "open-source" else None}
         ld = {k: v for k, v in ld.items() if v is not None}
-        doc = (tpl.replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", f"<title>{e(title)} | entekhab.net</title>")
+        doc = (tpl.replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", f"<title>{e(seo_title(title))}</title>")
                .replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{url}"><script type="application/ld+json">{sj(ld)}</script>')
                .replace('<meta name="description" content="', f'<meta name="description" content="{e(desc)} — ', 1)
                .replace('<meta property="og:title" content="اندیکاتورهای اختصاصی Coin_Kurd | entekhab.net">', f'<meta property="og:title" content="{e(it["name"])} | entekhab.net">')

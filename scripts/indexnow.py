@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-IndexNow: tell Bing, Yandex, Seznam, Naver (and others on the protocol) about new or changed pages right after each run.
-The key file /<KEY>.txt is served from the repository root. State (last submitted post id / day) lives in data/indexnow.json
-so it is committed with the rest of the data. Never fails the workflow.
+"""Tell Bing (and through it DuckDuckGo and Yahoo) about new post pages right away, via IndexNow.
+
+The key file /79b8346b44b1444b9911efe52e98cfc0.txt sits at the site root (the key comes from the owner's OpenSEO
+project). Each run submits the post pages not sent before: /p/<id>/ plus /en/p/<id>/ and /ckb/p/<id>/ when that
+translation exists. data/indexnow.json keeps the ids already sent, so nothing is submitted twice. The first run sends
+the newest 1,000 posts and the main pages. Google does not use IndexNow; it reads the sitemap.
+
+Runs in update.yml before "Commit data", so the state file is committed with the rest of data/.
 """
 import json
 import os
@@ -12,45 +15,45 @@ from datetime import datetime, timezone
 import requests
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE = os.environ.get("SITE_URL", "https://entekhab.net").rstrip("/")
-HOST = SITE.split("//", 1)[-1]
-KEY = "197870bb53d43dc52a81b786cd3a140e"
+KEY = "79b8346b44b1444b9911efe52e98cfc0"
+HOST = "entekhab.net"
 STATE = os.path.join(ROOT, "data", "indexnow.json")
+HUBS = ["/", "/dashboard/", "/derivatives/", "/dca/", "/strategy-lab/", "/regime/", "/leaderboard/", "/terminal/",
+        "/library/", "/learn/", "/academy/", "/encyclopedia/", "/tools/", "/whales/", "/track-record/"]
 
 
 def main():
     try:
-        posts = json.load(open(os.path.join(ROOT, "data", "posts.json"), encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
-        print(f"indexnow: no posts ({e})")
-        return
-    st = json.load(open(STATE, encoding="utf-8")) if os.path.exists(STATE) else {}
-    last_id = int(st.get("last_id") or 0)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    urls = []
-    new = sorted((p for p in posts if int(p.get("id") or 0) > last_id and p.get("q") != "low"), key=lambda p: int(p["id"]))
-    for p in new[-200:]:
-        urls.append(f"{SITE}/p/{p['id']}/")
-        tr = p.get("tr") or {}
+        st = json.load(open(STATE, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        st = {"sent": []}
+    sent = set(st.get("sent") or [])
+    posts = json.load(open(os.path.join(ROOT, "data", "posts.json"), encoding="utf-8"))
+    posts.sort(key=lambda p: p.get("date") or "", reverse=True)
+    first = not sent
+    todo = [p for p in posts[:1000 if first else 300] if str(p["id"]) not in sent]
+    urls = [f"https://{HOST}{u}" for u in HUBS] if first else []
+    for p in todo:
+        urls.append(f"https://{HOST}/p/{p['id']}/")
         for lg in ("en", "ckb"):
-            if isinstance(tr.get(lg), dict) and tr[lg].get("text"):
-                urls.append(f"{SITE}/{lg}/p/{p['id']}/")
-    if st.get("last_day") != today:
-        urls += [f"{SITE}/", f"{SITE}/daily/{today}/", f"{SITE}/daily/", f"{SITE}/fear-greed/", f"{SITE}/sitemap.xml"]
+            t = (p.get("tr") or {}).get(lg)
+            if isinstance(t, dict) and t.get("text"):
+                urls.append(f"https://{HOST}/{lg}/p/{p['id']}/")
     if not urls:
         print("indexnow: nothing new")
         return
     try:
-        r = requests.post("https://api.indexnow.org/indexnow", json={"host": HOST, "key": KEY, "keyLocation": f"{SITE}/{KEY}.txt", "urlList": urls[:1000]},
-                          headers={"Content-Type": "application/json; charset=utf-8"}, timeout=20)
+        r = requests.post("https://api.indexnow.org/indexnow", timeout=30,
+                          json={"host": HOST, "key": KEY, "keyLocation": f"https://{HOST}/{KEY}.txt", "urlList": urls[:10000]})
         ok = r.status_code in (200, 202)
-        print(f"indexnow: {len(urls)} urls -> HTTP {r.status_code}")
+        print(f"indexnow: {len(urls)} URLs → HTTP {r.status_code}")
     except Exception as e:  # noqa: BLE001
+        print("indexnow: request failed:", str(e)[:120])
         ok = False
-        print(f"indexnow: failed ({e})")
-    if ok:
-        st = {"last_id": max([last_id] + [int(p["id"]) for p in new]), "last_day": today, "at": datetime.now(timezone.utc).isoformat(), "n": len(urls)}
-        json.dump(st, open(STATE, "w", encoding="utf-8"), ensure_ascii=False)
+    if ok:   # only remember what was accepted; a failed run is retried next time
+        sent |= {str(p["id"]) for p in todo}
+        keep = [str(p["id"]) for p in posts if str(p["id"]) in sent][:3000]
+        json.dump({"updated_at": datetime.now(timezone.utc).isoformat(), "sent": keep}, open(STATE, "w", encoding="utf-8"))
 
 
 if __name__ == "__main__":
