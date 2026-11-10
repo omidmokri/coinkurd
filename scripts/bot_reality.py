@@ -423,6 +423,9 @@ TOOLS = [
     ("addr", {"fa": "بررسی آدرس و شبکه قبل از ارسال", "ckb": "پشکنینی ناونیشان و تۆڕ پێش ناردن", "en": "Check address & network before sending"}),
     ("fx", {"fa": "تبدیل ارز", "ckb": "گۆڕینی دراو", "en": "Currency converter"}),
 ]
+DCA_T = {"fa": "شبیه‌ساز DCA در برابر خرید یکجا (قیمت واقعی، همهٔ تاریخ‌های شروع)",
+         "ckb": "هاوشێوەکەری DCA بەرامبەر کڕینی یەکجار (نرخی ڕاستەقینە، هەموو بەروارەکانی دەستپێک)",
+         "en": "DCA vs lump sum simulator (real prices, every start date)"}
 TOOLS_T = {"fa": "ماشین‌حساب‌های معامله‌گر", "ckb": "ژمێرەرەکانی بازرگان", "en": "Trader calculators"}
 TOOLS_N = {"fa": "محاسبه روی سایت و در مرورگر خودتان انجام می‌شود؛ توصیهٔ مالی نیست.",
            "ckb": "ژماردن لە ماڵپەڕ و لە وێبگەڕی خۆت دەکرێت؛ ئامۆژگاری دارایی نییە.",
@@ -431,7 +434,9 @@ TOOLS_N = {"fa": "محاسبه روی سایت و در مرورگر خودتان
 
 def sec_tools(lang):
     lg = lang if lang in ("fa", "ckb", "en") else ("en" if _lg(lang) == "en" else "fa")
-    lines = [f"• {t.get(lg) or t['fa']}: {SITE}/tools/#{k}" for k, t in TOOLS] + ["", TOOLS_N[lg]]
+    lines = [f"• {t.get(lg) or t['fa']}: {SITE}/tools/#{k}" for k, t in TOOLS]
+    lines.append(f"• {DCA_T[lg]}: {SITE}/dca/")
+    lines += ["", TOOLS_N[lg]]
     return _head("🧮 " + TOOLS_T[lg], lg, "/tools/", lines)
 
 

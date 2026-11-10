@@ -376,7 +376,7 @@ jobs:
 
       - name: Build the quant pages (regime, truth lab, anomalies)
         continue-on-error: true
-        run: python scripts/build_quant.py && python scripts/build_strategy_lab.py
+        run: python scripts/build_quant.py && python scripts/build_strategy_lab.py && python scripts/build_dca.py
 
       - name: Build the Roundtable page
         continue-on-error: true

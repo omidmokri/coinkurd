@@ -144,6 +144,8 @@ NAV = [
          L("حافظهٔ بازار، مونت‌کارلو و بک‌تست", "بیرەوەریی بازاڕ، مۆنتی‌کارلۆ و باک‌تێست", "Market memory, Monte Carlo, backtests")),
         ("/strategy-lab/", "flask", L("آزمایشگاه استراتژی", "تاقیگەی ستراتیژ", "Strategy lab"),
          L("قانون خودت را بک‌تست کن: آزمون جایگشت و واک-فوروارد", "یاسای خۆت باکتێست بکە: جێگۆڕکێ و واک-فۆروارد", "Back-test your own rule: permutation test and walk-forward")),
+        ("/dca/", "calc", L("DCA یا خرید یکجا؟", "DCA یان کڕینی یەکجار؟", "DCA or lump sum?"),
+         L("شبیه‌ساز با قیمت واقعی و همهٔ تاریخ‌های شروع", "هاوشێوەکەر بە نرخی ڕاستەقینە و هەموو بەروارەکانی دەستپێک", "Simulator on real prices, every start date")),
         ("/dna/", "dna", L("DNA بازار", "DNAی بازاڕ", "Market DNA"),
          L("ژن‌های هر ارز و ارزهای مشابه", "جینەکانی هەر دراو و دراوە هاوشێوەکان", "Each coin's genes and look-alikes")),
         ("/replay/", "rewind", L("بازپخش بازار", "دووبارە پەخشی بازاڕ", "Market replay"),
