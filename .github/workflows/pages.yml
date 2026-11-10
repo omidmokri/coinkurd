@@ -46,6 +46,7 @@ jobs:
           python scripts/build_strategy_lab.py
           python scripts/build_dca.py
           python scripts/build_derivatives.py
+          python scripts/build_leaderboard.py
       - name: Cache the read-aloud voices
         id: ttscache
         uses: actions/cache@v4

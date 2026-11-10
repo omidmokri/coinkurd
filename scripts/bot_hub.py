@@ -424,7 +424,9 @@ _last = {"score": 0, "export": 0, "pred": 0, "whale": 0}
 
 
 def export(s, worktree, push):
-    files = {"data/sentiment.json": sentiment_data(s), "data/predict.json": predict_data(s), "data/whales.json": whales_data(s)}
+    import bot_paper
+    files = {"data/sentiment.json": sentiment_data(s), "data/predict.json": predict_data(s), "data/whales.json": whales_data(s),
+             "data/leaderboard.json": bot_paper.board(s)}
     ok = push(worktree, {k: json.dumps(v, ensure_ascii=False, indent=1) for k, v in files.items()},
               "chore: sentiment, predictions, whale radar")
     if ok:
