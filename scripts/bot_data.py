@@ -21,7 +21,7 @@ LOCAL = os.environ.get("DATA_DIR", "data")
 SITE = "https://entekhab.net"
 BINANCE = ["https://data-api.binance.vision", "https://api.binance.com"]
 
-TTL = {"posts_lite": 900, "translations": 900, "dna": 900, "kind": 1800, "indicators": 3600,
+TTL = {"posts_lite": 900, "translations": 900, "dna": 900, "kind": 1800, "indicators": 3600, "live": 300,
        "wrapped": 3600, "macro": 1800, "flows": 900}
 _cache = {}
 
@@ -679,11 +679,45 @@ def sec_ind(lang):
         bt = it.get("bt") or {}
         perf = f" · PnL {bt['pnl']} · WR {bt['win']}" if bt.get("pnl") else ""
         out.append(f"{lock} <a href=\"{e(it.get('url'))}\">{e(it['name'])}</a>{perf}")
+    out += _ind_live(d, lang)
     out += ["", pick({"fa": "🔒 = دعوتی؛ با «دعوت و پاداش» می‌توانی هدیه بگیری.",
                  "ckb": "🔒 = بە بانگهێشت؛ بە «بانگهێشت و خەڵات» دەتوانیت وەک دیاری وەریبگریت.",
                  "en": "🔒 = invite-only; earn one through “Invite & earn”."}, lang),
             f"🔗 {SITE}/indicators/"]
     return cut("\n".join(out))
+
+
+LV_DIR = {"long": ("▲", {"fa": "صعودی", "ckb": "بەرزبوونەوە", "en": "Long"}), "short": ("▼", {"fa": "نزولی", "ckb": "دابەزین", "en": "Short"}),
+          "flat": ("•", {"fa": "خنثی / صبر", "ckb": "بێلایەن / چاوەڕێ", "en": "Neutral / wait"})}
+
+
+def _ind_live(d, lang, n=10):
+    """live analysis block: latest OUTPUT of each indicator (the scripts' code never leaves TradingView / the private engine)"""
+    lv = (load("live") or {}).get("items") or {}
+    names = {it["id"]: it["name"] for it in d.get("items", [])}
+    now, rows = datetime.now(timezone.utc), []
+    for ind, it in lv.items():
+        for s in (it.get("states") or [])[:2]:
+            try:
+                age = (now - datetime.fromisoformat(s["t"])).total_seconds() / 60
+            except Exception:
+                continue
+            if age > 60 * 24 or ind not in names:
+                continue
+            f = s.get("f") or {}
+            dv = str(f.get("dir") or f.get("side") or "").lower()
+            dk = "long" if dv in ("long", "buy", "up", "bull") else "short" if dv in ("short", "sell", "down", "bear") else "flat" if dv else ""
+            sym = str(s.get("tv_sym") or s.get("sym") or "").split(":")[-1]
+            extra = "".join(f" · {k} {f[k]:g}" if isinstance(f.get(k), (int, float)) else "" for k in ("score", "conf"))
+            dec = f" · {e(str(f['decision']))[:20]}" if isinstance(f.get("decision"), str) else ""
+            arrow = f" {LV_DIR[dk][0]} {pick(LV_DIR[dk][1], lang)}" if dk else ""
+            rows.append((age, f"• <b>{e(names[ind])}</b>: {e(sym)} {e(s.get('tf', ''))}{arrow}{dec}{extra} · {int(age)}′"))
+    if not rows:
+        return []
+    rows.sort(key=lambda r: r[0])
+    head = pick({"fa": "📊 <b>تحلیل زندهٔ اندیکاتورها</b> (فقط خروجی؛ کد قفل است)", "ckb": "📊 <b>شیکاریی زیندووی ئیندیکاتۆرەکان</b> (تەنها دەرچوو؛ کۆد قوفڵە)",
+                 "en": "📊 <b>Live indicator analysis</b> (outputs only; code stays locked)"}, lang)
+    return ["", head] + [r[1] for r in rows[:n]]
 
 
 # ---------------------------------------------------------------- posts
