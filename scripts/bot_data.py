@@ -407,20 +407,30 @@ def sec_deriv(lang):
         return t("no_data", lang)
     out = [f"⚖️ <b>{t('b_deriv', lang)[2:]}</b>",
            f"{h('oi', lang)}: {fbig(d.get('total_oi_usd'))} · {h('funding', lang)} avg {(d.get('avg_funding') or 0):.4f}%", ""]
-    for c in ("BTC", "ETH"):
+    ext = pick({"fa": "افراطی", "ckb": "زۆر توند", "en": "extreme", "kmr": "zêde", "ar": "مفرط"}, lang)
+    for c in ("BTC", "ETH", "SOL"):
         x = d.get(c) or {}
         if not x:
             continue
         ls = (x.get("long_short") or [[0, None]])[-1][1]
         liq = x.get("liq", {})
-        out.append(f"<b>{c}</b> OI {fbig(x.get('oi_usd'))} · {h('funding', lang)} {(x.get('funding') or 0):.4f}% "
-                   f"({(x.get('funding_ann') or 0):+.1f}%/y) · L/S {ls}")
-        out.append(f"   {h('liq', lang)} 1h: 🟢L {fbig(liq.get('long_usd_1h'))} · 🔴S {fbig(liq.get('short_usd_1h'))}")
+        f = x.get("funding") or 0
+        oh = x.get("oi_hist") or []
+        ch = f" ({100 * (oh[-1][1] / oh[-25][1] - 1):+.1f}% 24h)" if len(oh) >= 25 and oh[-25][1] else ""
+        out.append(f"<b>{c}</b> OI {fbig(x.get('oi_usd'))}{ch} · {h('funding', lang)} {f:.4f}%"
+                   f"{' ⚠️' + ext if abs(f) >= 0.05 else ''} ({(x.get('funding_ann') or 0):+.1f}%/y) · L/S {ls}")
+        # long liquidations are red (a drop flushed longs), short liquidations green, as on the site
+        if liq.get("long_usd_24h") is not None and liq.get("since"):
+            hrs = max(1, round((time.time() * 1000 - liq["since"]) / 3.6e6))
+            span = "24h" if hrs >= 23 else f"{hrs}h"
+            out.append(f"   {h('liq', lang)} {span}: 🔴L {fbig(liq.get('long_usd_24h'))} · 🟢S {fbig(liq.get('short_usd_24h'))}")
+        else:
+            out.append(f"   {h('liq', lang)} 1h: 🔴L {fbig(liq.get('long_usd_1h'))} · 🟢S {fbig(liq.get('short_usd_1h'))}")
     out += ["", "🔥 " + pick({"fa": "فاندینگ داغ", "ckb": "فاندینگی گەرم", "en": "Hot funding"}, lang)]
     out += [f"  {x['coin']} {(x.get('funding') or 0):+.4f}% ({(x.get('funding_ann') or 0):+.0f}%/y)" for x in d.get("funding_hot", [])[:5]]
     out += ["🧊 " + pick({"fa": "فاندینگ منفی", "ckb": "فاندینگی نەرێنی", "en": "Negative funding"}, lang)]
     out += [f"  {x['coin']} {(x.get('funding') or 0):+.4f}% ({(x.get('funding_ann') or 0):+.0f}%/y)" for x in d.get("funding_cold", [])[:5]]
-    out += ["", age(d.get("updated_at"), lang)]
+    out += ["", "📊 entekhab.net/derivatives/", age(d.get("updated_at"), lang)]
     return "\n".join(out)
 
 

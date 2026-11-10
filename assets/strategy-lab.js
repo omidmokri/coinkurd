@@ -53,7 +53,7 @@
     k_dd: ['حداکثر افت', 'زۆرترین داکەوتن', 'Max drawdown'], k_n: ['معامله', 'مامەڵە', 'Trades'], k_win: ['نرخ برد', 'ڕێژەی بردنەوە', 'Win rate'],
     k_pf: ['ضریب سود', 'هۆکاری قازانج', 'Profit factor'], k_avg: ['میانگین هر معامله', 'ناوەندی هەر مامەڵە', 'Avg trade'],
     k_exp: ['زمان در بازار', 'کات لە بازاڕ', 'Time in market'], k_sh: ['شارپ', 'شارپ', 'Sharpe'],
-    k_so: ['سورتینو', 'سۆرتینۆ', 'Sortino'],
+    k_so: ['سورتینو', 'سۆرتینۆ', 'Sortino'], k_ca: ['کالمار (بازده سالانه ÷ افت)', 'کالمار', 'Calmar (CAGR ÷ drawdown)'],
     mc: ['مونت‌کارلو: اگر ترتیب و ترکیب معامله‌ها فرق می‌کرد؟', 'مۆنت کارلۆ: ئەگەر ڕیز و تێکەڵەی مامەڵەکان جیاواز بوایە؟', 'Monte Carlo: what if the trades had come in another order and mix?'],
     mc_lead: ['همین معامله‌ها ۲٬۰۰۰ بار با جایگذاری بازنمونه‌گیری می‌شوند (هر بار همان تعداد معامله، با ترتیب تصادفی). این آزمون لبه را ثابت نمی‌کند — کار آزمون جایگشت است — بلکه نشان می‌دهد با همین نوع معامله‌ها، چه بازه‌ای از بازده و افت سرمایه را باید انتظار داشت.',
       'هەمان مامەڵەکان ٢٬٠٠٠ جار بە گەڕاندنەوە دووبارە نموونە دەگیرێن (هەر جارێک هەمان ژمارەی مامەڵە، بە ڕیزی هەڕەمەکی). ئەمە لێوار ناسەلمێنێت — ئەوە کاری تاقیکردنەوەی جێگۆڕکێیە — بەڵکو نیشان دەدات بە هەمان جۆری مامەڵە، چ مەودایەکی قازانج و داکەوتن چاوەڕوان دەکرێت.',
@@ -258,7 +258,7 @@
     return {
       ret: R.eq - 1, cagr: R.eq > 0 ? Math.pow(R.eq, 1 / yrs) - 1 : -1, mdd: R.mdd, n: tr.length, win: tr.length ? w.length / tr.length : null,
       pf: gl > 0 ? gw / gl : (gw > 0 ? Infinity : null), avg: tr.length ? tr.reduce(function (s, x) { return s + x.r; }, 0) / tr.length : null,
-      exp: R.inBars / R.bars, sharpe: sd > 0 ? m / sd * Math.sqrt(perYear) : null, sortino: dsd > 0 ? m / dsd * Math.sqrt(perYear) : null, bh: bh, bhdd: bdd, yrs: yrs
+      exp: R.inBars / R.bars, sharpe: sd > 0 ? m / sd * Math.sqrt(perYear) : null, sortino: dsd > 0 ? m / dsd * Math.sqrt(perYear) : null, calmar: R.mdd < 0 && R.eq > 0 ? (Math.pow(R.eq, 1 / yrs) - 1) / -R.mdd : null, bh: bh, bhdd: bdd, yrs: yrs
     };
   }
 
@@ -467,7 +467,7 @@
     if (!R.trades.length) h += '<p class="note">' + t('no_tr') + '</p>';
     h += '<div class="rc-kpis">' + kpi('k_ret', pc(s.ret, 1, true), cl(s.ret)) + kpi('k_cagr', pc(s.cagr, 1, true), cl(s.cagr)) + kpi('k_dd', pc(s.mdd, 1), 'down') +
       kpi('k_n', nf(s.n)) + kpi('k_win', pc(s.win, 1)) + kpi('k_pf', s.pf === Infinity ? '∞' : nf(s.pf, 2)) + kpi('k_avg', pc(s.avg, 2, true), cl(s.avg)) +
-      kpi('k_exp', pc(s.exp, 0)) + kpi('k_sh', nf(s.sharpe, 2)) + kpi('k_so', nf(s.sortino, 2)) + kpi('k_bh', pc(s.bh, 1, true), cl(s.bh)) + kpi('k_bhdd', pc(s.bhdd, 1), 'down') + '</div>';
+      kpi('k_exp', pc(s.exp, 0)) + kpi('k_sh', nf(s.sharpe, 2)) + kpi('k_so', nf(s.sortino, 2)) + kpi('k_ca', nf(s.calmar, 2)) + kpi('k_bh', pc(s.bh, 1, true), cl(s.bh)) + kpi('k_bhdd', pc(s.bhdd, 1), 'down') + '</div>';
     h += '<h3>' + t('eq') + '</h3><div class="rc-legend"><span><i style="background:#f59e0b"></i>' + t('strat') + '</span><span><i style="background:#64748b"></i>' + t('k_bh') + '</span></div><div id="sl-eq" class="rc-chart" style="height:300px"></div>';
     if (R.trades.length) {
       var cols = t('th_tr').split('|'), rows = R.trades.slice(-40).reverse().map(function (x) {
