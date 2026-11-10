@@ -110,6 +110,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
+- **Why four regimes? BIC model selection on /regime/** (owner's repo list 2026-11-10, idea from DaruFinance/strategy-regime):
+  fit K = 2..6 in regime.py (same features, same seeds), publish log-likelihood, parameter count and BIC per K, and
+  say on the page whether K = 4 is the BIC choice. Check the CI run time first: today's fit is 4 seeds × 120 iterations.
 - **Combined alerts in /me/ and the bot** (owner's comparison file, 2026-11-10): one alert that fires on price AND
   regime AND a scanner finding on a watched coin (e.g. "SOL scanner bullish while the confirmed regime is not bear").
 - **Shared paper-trading leaderboard** (owner's priority list, 2026-11-10) — WAITING FOR THE OWNER'S CHOICE, do not
@@ -155,6 +158,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · Strategy lab: PBO (CSCV) and Deflated Sharpe on the walk-forward parameter sweep
+- When a parameter is optimised, the lab now also reports the Probability of Backtest Overfitting (8 blocks, 70
+  combinations, Bailey/Borwein/López de Prado/Zhu 2014) and the Deflated Sharpe Ratio of the best value (Bailey &
+  López de Prado 2014), with verdicts. Both match an independent SciPy implementation exactly on fixed data
+  (PBO 0.6714, DSR 0.54335 on a random walk — correctly flagged as overfit).
+
 ### 2026-11-10 · Owner's priority list: /derivatives/, /dca/ (+ buy-only grid), Calmar, Altcoin Season
 - /derivatives/ (build_derivatives.py + assets/derivatives.js, live from data/derivatives.json): BTC/ETH/SOL tabs, four
   cards (funding 8h + APR + extreme tag ≥0.05%/8h + 7-day avg once recorded, OI + 24h change + vs 7-day avg,
