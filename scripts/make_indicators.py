@@ -202,7 +202,7 @@ GROUPS = {
 }
 
 doc = {"updated": "2026-11-02", "author": "Coin_Kurd", "profile": "https://www.tradingview.com/u/Coin_Kurd/#published-scripts",
-       "relay": {"channel": "", "note": "public Telegram channel that receives the TradingView webhook alerts; empty = not set up yet"},
+       "relay": {"channel": "Entekhab_Live_Relay", "note": "public Telegram channel that receives the TradingView webhook alerts (bot @Kurd_kurdistan_bot posts, owner-created 2026-11-10)"},
        "groups": GROUPS, "items": ITEMS}
 json.dump(doc, open(os.path.join(ROOT, "data", "indicators.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("items", len(ITEMS))
