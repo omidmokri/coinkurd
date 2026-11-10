@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "12"  # bump to bust caches of chrome.css / chrome.js
+VER = "13"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -388,6 +388,21 @@ def footer(lang="fa"):
             f'</div></div><!--/ek:footer-->')
 
 
+# Interface v2 is a preview for now: it loads only for a visitor who opened any page with ?ui=2 (remembered in
+# localStorage; ?ui=1 goes back). The check runs in <head> before first paint, so the preview never flashes the
+# current design; for everyone else it costs these few bytes and nothing is downloaded. See assets/ui2.css / ui2.js.
+# It rides with the CSP meta at the very top of <head> (CSP_META below): an inline script waits for every stylesheet
+# before it, so placed lower the preview's own stylesheet would start a second later.
+# The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
+# already known while <head> is parsed, not when it arrives with the stylesheet.
+UI2_VER = "1"
+UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([12])(?:&|$)/.exec(location.search);'
+           "if(m){L.setItem('ek_ui',m[1]);try{var u=new URL(location.href);u.searchParams.delete('ui');"
+           "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}"
+           "if(L.getItem('ek_ui')==='2'){var c=document.documentElement.classList;c.add('ek-v2');"
+           "if(/^\\/(index\\.html)?$/.test(location.pathname)){c.add('ek-deck');setTimeout(function(){if(!window.ekUI2)c.remove('ek-deck')},7000)}"
+           f"document.write('<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\"><script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>')"
+           "}}catch(e){}})()</script>")
 HEAD_TAGS = (f'<link rel="stylesheet" href="/assets/chrome.css?v={VER}">'
              f'<meta name="referrer" content="strict-origin-when-cross-origin">')
 BODY_TAGS = f'<script src="/assets/chrome.js?v={VER}" defer></script>'
@@ -410,12 +425,13 @@ CSP = ("default-src 'self'; "
        "frame-src https://*.tradingview.com https://*.tradingview-widget.com; "
        "worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; "
        "upgrade-insecure-requests")
-CSP_META = f'<meta http-equiv="Content-Security-Policy" content="{CSP}">'
+CSP_META = f'<meta http-equiv="Content-Security-Policy" content="{CSP}">' + UI2_TAG
 
 
 def with_csp(doc):
     """Put (or refresh) the CSP meta right after <meta charset>, before any script or stylesheet."""
     doc = re.sub(r'<meta http-equiv="Content-Security-Policy" content="[^"]*">', "", doc)
+    doc = re.sub(r'<script id="ek-ui">.*?</script>', "", doc, flags=re.S)       # the preview switch travels with it
     m = re.search(r'<meta charset="?utf-8"?\s*/?>', doc, re.I)
     if not m:
         return doc.replace("<head>", "<head>" + CSP_META, 1)

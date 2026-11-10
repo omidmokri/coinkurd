@@ -36,3 +36,8 @@
 .ask-tg{display:flex;align-items:center;justify-content:center;gap:7px;background:#229ED9;color:#fff;border:0;border-radius:10px;padding:9px;font:inherit;font-weight:700;font-size:.86rem;cursor:pointer;width:100%;margin-top:8px}
 .ask-tg:hover{filter:brightness(1.1)}
 .ask-note{font-size:.72rem;color:#8d8d86;text-align:center;padding:0 10px 9px;line-height:1.7}
+
+/* phones and tablets have the tab bar at the bottom: the button sits above it instead of covering the last tab */
+@media (max-width:1180px){#ask-fab{bottom:calc(76px + env(safe-area-inset-bottom))}#ask-panel{bottom:calc(134px + env(safe-area-inset-bottom));height:min(560px,calc(100vh - 160px))}}
+/* the "install the app" note sits in the same corner: while it is shown the button moves above it */
+body:has(#eka) #ask-fab{translate:0 -86px}

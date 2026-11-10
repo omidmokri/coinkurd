@@ -302,8 +302,8 @@
 
   /* the support assistant on every page — it used to live on the homepage alone */
   if (!window.__ekAsk && !d.querySelector('script[src*="/assets/ask.js"]')) {
-    var ac = d.createElement('link'); ac.rel = 'stylesheet'; ac.href = '/assets/ask.css?v=2'; d.head.appendChild(ac);
-    var as = d.createElement('script'); as.src = '/assets/ask.js?v=2'; as.defer = true; d.body.appendChild(as);
+    var ac = d.createElement('link'); ac.rel = 'stylesheet'; ac.href = '/assets/ask.css?v=3'; d.head.appendChild(ac);
+    var as = d.createElement('script'); as.src = '/assets/ask.js?v=3'; as.defer = true; d.body.appendChild(as);
   }
 
   label(pageI18nNow() ? cur() : (de.getAttribute('lang') ? cur() : (ls.get('ck_lang') || 'fa')));
