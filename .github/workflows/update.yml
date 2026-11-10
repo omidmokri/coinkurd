@@ -474,9 +474,17 @@ jobs:
   deploy:
     needs: sync
     runs-on: ubuntu-latest
+    # Pages takes one deployment at a time. The light rebuild and the sync used to deploy in parallel and the
+    # loser waited out deploy-pages' 10-minute limit ("Timeout reached, aborting!", runs #702, #706-#709).
+    # One shared queue for both workflows; a newer queued deploy replaces an older queued one.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000          # 20 min; the site artifact is ~210 MB
