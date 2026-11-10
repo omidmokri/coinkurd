@@ -103,6 +103,11 @@ jobs:
         timeout-minutes: 3
         run: python scripts/derivatives.py
 
+      - name: Altcoin Season Index (CoinGecko top 50, Binance daily closes; every 6 h)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/altseason.py
+
       - name: Coin logos (CoinGecko, only new ones)
         continue-on-error: true
         timeout-minutes: 3
