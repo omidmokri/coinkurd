@@ -1365,6 +1365,10 @@ def handle_callback(s, cb):
         ans(HB.vote(s, cb["from"], rid, opt), True)
         if cb["message"]["chat"].get("type") == "private":
             return edit(chat_id, mid, *render(s, uid, "predict"))
+        r = HB.round_by_id(s, rid)                   # channel/group post: refresh the tally in place.
+        if r:                                        # editMessageText directly, never edit(): its fallback would
+            tg("editMessageText", chat_id=chat_id, message_id=mid, text=fix_amp(HB.round_text(r)),   # re-post
+               parse_mode="HTML", reply_markup=HB.round_kb(r) or {"inline_keyboard": []})
         return None
     if data == "check":
         if is_member(uid):
@@ -1723,7 +1727,7 @@ def main():
     V.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     DP.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT)
     OA.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT, DP.push_files, V.SIG)
-    HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files)
+    HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files, group=GROUP)
     CL.start(s, group_send, CHANNEL)
     FX.start(s, _post_with_retry, fix_amp, CHANNEL, MAIN_WT, DP.push_files, sorted(ADMIN_IDS),
              lambda chat, text: group_send(chat, text), V.SIG, F.DIRTY)   # one-time repair of broken pictures

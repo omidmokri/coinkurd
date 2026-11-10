@@ -687,7 +687,15 @@ def intel_html():
                        f'<tr><td>حجم ۲۴ ساعته</td><td class="num">${g["vol"]/1e9:.1f}B</td></tr>'
                        f'<tr><td>دامیننس BTC</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>دامیننس ETH</td><td class="num">{g["eth_d"]}%</td></tr></table><p class="disc">CoinGecko</p>')
     ops = m.get("opportunities", [])
-    rows = "".join(f'<tr><td><a href="/coins/{o["coin"].lower()}/">{o["coin"]}</a></td><td>{OPP_FA.get(o["type"], o["type"])}</td><td class="num">{o["strength"]}</td><td>{"بالا" if o["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(o["price"])}</td></tr>' for o in ops[:14])
+    # one row per coin (a coin often trips several detectors at once); the strongest finding leads, the rest follow
+    by_coin = {}
+    for o in ops:
+        by_coin.setdefault(o["coin"], []).append(o)
+    groups = [sorted(g, key=lambda o: (o["confidence"] != "high", -(o.get("strength") or 0))) for g in by_coin.values()]
+    groups.sort(key=lambda g: (g[0]["confidence"] != "high", -(g[0].get("strength") or 0)))
+    rows = "".join(f'<tr><td><a href="/coins/{g[0]["coin"].lower()}/">{g[0]["coin"]}</a></td><td>{OPP_FA.get(g[0]["type"], g[0]["type"])}'
+                   + (f'<small> + {"، ".join(OPP_FA.get(x["type"], x["type"]) for x in g[1:])}</small>' if len(g) > 1 else "")  # here a repeat is harmless: confirmations are not shown in this table
+                   + f'</td><td class="num">{g[0]["strength"]}</td><td>{"بالا" if g[0]["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(g[0]["price"])}</td></tr>' for g in groups[:14])
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
     out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
                   + f'<div class="tsc"><table class="otab"><tr>{coins}</tr></table></div><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
@@ -696,7 +704,12 @@ def intel_html():
         RG = {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"}
         r, b = brain["regime"], brain["regime"]["breadth"]
         rp = (brain.get("report") or {}).get("fa")
-        out["brain"] = (f'<h3>مغز بازار Entekhab</h3><p><b>رژیم بازار: {RG[r["regime"]]}</b> · پهنای بازار: {b["up_pct"]}% صعودی، {b["down_pct"]}% نزولی، میانگین تغییر ۲۴h {b["avg_chg24"]}% (n={b["n"]})</p>'
+        RR = {"bull": "صعودی", "bear": "نزولی", "sideways": "خنثی", "high_vol": "پرنوسانِ بی‌جهت"}
+        rad = brain.get("radar") or {}
+        lead = (f'<p><b>رژیم تأییدشدهٔ BTC (۵ روز تأیید): {RR.get(rad["rule"], rad["rule"])}</b>'
+                + (f' · {rad["days_in"]} روز در این رژیم' if rad.get("days_in") else "")
+                + (f'؛ میانگین ماندگاری ~{round(rad["mean_days"])} روز' if rad.get("mean_days") else "") + '</p>') if rad.get("rule") else ""
+        out["brain"] = (f'<h3>مغز بازار Entekhab</h3>{lead}<p>حال‌وهوای ۲۴ ساعتهٔ بازار: <b>{RG[r["regime"]]}</b> · پهنای بازار: {b["up_pct"]}% صعودی، {b["down_pct"]}% نزولی، میانگین تغییر ۲۴h {b["avg_chg24"]}% (n={b["n"]}؛ ارزهای اصلی و پرحجم‌ترین جفت‌های USDT بایننس، بدون استیبل‌کوین)</p>'
                         + (f'<div><b>{e(big(rp["headline"]))}</b><p style="white-space:pre-wrap">{e(big(rp["body"]))}</p><p class="disc">گزارش هوش مصنوعی ({e(brain.get("report_engine",""))}) — {fmt_date(brain.get("report_at",""))}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.</p></div>' if rp else ""))
     arr = sorted(SC.items(), key=lambda kv: -kv[1]["score"])
     if arr:
@@ -731,6 +744,30 @@ CAT_INTRO = {
 }
 
 
+def refill(s, placeholder, filled):
+    """Fill the element that `placeholder` stands for, found by its id, whether it is empty or already holds an
+    older snapshot. The page's own opening tag is kept (index.html may carry extra classes such as "pro"), and
+    only the inside is replaced. -> (s, found)"""
+    m = re.match(r'<([a-zA-Z0-9]+)\b[^>]*\bid="([^"]+)"[^>]*>', placeholder)
+    f = re.match(r"<[a-zA-Z0-9]+\b[^>]*>", filled)
+    if not m or not f or not filled.endswith(f"</{m.group(1)}>"):
+        return s, False
+    tag, eid = m.group(1), m.group(2)
+    inner = filled[f.end():len(filled) - len(f"</{tag}>")]
+    h = re.search(rf'<{tag}\b[^>]*\bid="{re.escape(eid)}"[^>]*>', s)
+    if not h:
+        return s, False
+    j, depth = h.end(), 1
+    pat = re.compile(rf"<(/?){tag}\b[^>]*>")
+    while depth:
+        t = pat.search(s, j)
+        if not t:
+            return s, False
+        depth += -1 if t.group(1) else 1
+        last, j = t.start(), t.end()
+    return s[:h.end()] + inner + s[last:], True
+
+
 def prerender():
     good = [p for p in posts if p.get("q") != "low"]           # promos / repeats are not shown as "latest"
     idx = os.path.join(ROOT, "index.html")
@@ -757,9 +794,16 @@ def prerender():
             for c in meta.get("categories", []) if meta.get("by_category", {}).get(c["id"])) + "</div>",
         '<div class="wrap" id="out"></div>': '<div class="wrap" id="out"><ul class="list">' + "".join(post_li(p) for p in good[:40]) + '</ul><p><a href="/sitemap.xml">همهٔ مطالب</a></p></div>',
     }
-    miss = [k for k in reps if k not in s]
+    # Each placeholder is "<tag ...>default</tag>". The committed index.html once kept a filled copy, so a plain
+    # string replace found nothing and the no-JS snapshot (what crawlers, link previews and reviewers read) froze
+    # on 2026-11-07. Now the region between the opening tag and its matching close is replaced every build.
+    miss = []
     for k, v in reps.items():
-        s = s.replace(k, v, 1)
+        s, ok = refill(s, k, v)
+        if not ok:
+            miss.append(k)
+    if miss:
+        print("prerender: placeholders not found:", [m[:40] for m in miss])
     s = s.replace("</small><b", "</small> <b").replace('</b></div><div class="kpi"', '</b></div> <div class="kpi"')
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
