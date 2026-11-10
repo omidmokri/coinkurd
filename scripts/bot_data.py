@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 
 import requests
 
+import statefmt as SF
 from bot_i18n import H, OPP, WHY, h, pick, t, v
 
 REPO_RAW = os.environ.get("DATA_RAW", "https://raw.githubusercontent.com/omidmokri/coinkurd/main/data/")
@@ -722,8 +723,8 @@ def _ind_live(d, lang, n=10):
             dv = str(f.get("dir") or f.get("side") or "").lower()
             dk = "long" if dv in ("long", "buy", "up", "bull") else "short" if dv in ("short", "sell", "down", "bear") else "flat" if dv else ""
             sym = str(s.get("tv_sym") or s.get("sym") or "").split(":")[-1]
-            extra = "".join(f" · {k} {f[k]:g}" if isinstance(f.get(k), (int, float)) else "" for k in ("score", "conf"))
-            dec = f" · {e(str(f['decision']))[:20]}" if isinstance(f.get("decision"), str) else ""
+            extra = "".join(f" · {SF.lab(k, lang)} {f[k]:g}" if isinstance(f.get(k), (int, float)) else "" for k in ("score", "conf"))
+            dec = f" · {e(SF.val('decision', f['decision'], lang))[:24]}" if isinstance(f.get("decision"), str) else ""
             arrow = f" {LV_DIR[dk][0]} {pick(LV_DIR[dk][1], lang)}" if dk else ""
             rows.append((age, f"• <b>{e(names[ind])}</b>: {e(sym)} {e(s.get('tf', ''))}{arrow}{dec}{extra} · {int(age)}′"))
     if not rows:
@@ -732,6 +733,30 @@ def _ind_live(d, lang, n=10):
     head = pick({"fa": "📊 <b>تحلیل زندهٔ اندیکاتورها</b> (فقط خروجی؛ کد قفل است)", "ckb": "📊 <b>شیکاریی زیندووی ئیندیکاتۆرەکان</b> (تەنها دەرچوو؛ کۆد قوفڵە)",
                  "en": "📊 <b>Live indicator analysis</b> (outputs only; code stays locked)"}, lang)
     return ["", head] + [r[1] for r in rows[:n]]
+
+
+def sec_live(lang, n=4):
+    """full readable card of every indicator's latest live output (no raw machine lines)"""
+    d = load("indicators") or {}
+    names = {it["id"]: it["name"] for it in d.get("items", [])}
+    lv = (load("live") or {}).get("items") or {}
+    now, rows = datetime.now(timezone.utc), []
+    for ind, it in lv.items():
+        for st in (it.get("states") or [])[:1]:
+            try:
+                age = (now - datetime.fromisoformat(st["t"])).total_seconds() / 60
+            except Exception:
+                continue
+            if age <= 60 * 24 and ind in names and (st.get("f") or {}):
+                rows.append((age, SF.estate_card(st, lang, name=e(names[ind]), head=False)))
+    rows.sort(key=lambda r: r[0])
+    head = pick({"fa": "📊 <b>تحلیل زندهٔ اندیکاتورها</b>\nخروجی لحظه‌ای اندیکاتورهای اختصاصی، به زبان ساده",
+                 "ckb": "📊 <b>شیکاریی زیندووی ئیندیکاتۆرەکان</b>\nدەرچووی ساتییان بە زمانێکی ئاسان",
+                 "en": "📊 <b>Live indicator analysis</b>\nEach indicator's latest output in plain words"}, lang)
+    if not rows:
+        return head + "\n\n" + t("no_data", lang)
+    sep = "\n\n━━━━━━━━━━━━━━\n\n"
+    return cut(head + "\n\n" + sep.join(r[1] for r in rows[:n]) + f"\n\n🔗 {SITE}/indicators/")
 
 
 # ---------------------------------------------------------------- posts
