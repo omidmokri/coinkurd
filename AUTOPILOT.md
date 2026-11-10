@@ -104,6 +104,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
+- **Combined alerts in /me/ and the bot** (owner's comparison file, 2026-11-10): one alert that fires on price AND
+  regime AND a scanner finding on a watched coin (e.g. "SOL scanner bullish while the confirmed regime is not bear").
+- **SOL in the derivatives terminal** (same file): derivatives.py has long/short, taker and liquidations for BTC/ETH only.
 - **DCA vs lump-sum simulator** (owner's GitHub-ideas file, 2026-11-10): pick coin, amount, period and frequency;
   show DCA vs buying once vs a simple grid, after fees, on real Binance history, with the same honesty notes as
   /strategy-lab/. Site (/tools/ or a lab preset tab) + bot calculators section.

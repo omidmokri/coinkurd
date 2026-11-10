@@ -181,6 +181,17 @@ def sec_market(lang):
     lines.append(f"👑 {h('dom', lang)}: BTC {(g.get('btc_d') or 0):.1f}% · ETH {(g.get('eth_d') or 0):.1f}%")
     fng_name = pick({"fa": "ترس و طمع", "ckb": "ترس و تەماع", "en": "Fear &amp; Greed"}, lang)
     lines.append(f"😱 {fng_name}: <b>{f.get('value', '—')}</b> ({e(f.get('class', ''))})")
+    al = load("altseason") or {}
+    if al.get("value") is not None:
+        nm = pick({"fa": "شاخص فصل آلت‌کوین", "ckb": "پێوەری وەرزی ئاڵتکۆین", "en": "Altcoin Season Index",
+                   "kmr": "Indeksa demsala altcoinan", "ar": "مؤشر موسم العملات البديلة"}, lang)
+        lb = pick({"alt": {"fa": "فصل آلت‌کوین", "ckb": "وەرزی ئاڵتکۆین", "en": "altcoin season", "kmr": "demsala altcoinan", "ar": "موسم العملات البديلة"},
+                   "btc": {"fa": "فصل بیت‌کوین", "ckb": "وەرزی بیتکۆین", "en": "Bitcoin season", "kmr": "demsala Bitcoin", "ar": "موسم البيتكوين"},
+                   "neutral": {"fa": "نه این، نه آن", "ckb": "نە ئەم نە ئەو", "en": "neither", "kmr": "ne yek ji wan", "ar": "لا هذا ولا ذاك"}}.get(al.get("label"), {}), lang)
+        sub = pick({"fa": "از ۵۰ ارز برتر در ۹۰ روز بهتر از BTC", "ckb": "لە ٥٠ دراوی سەرەوە لە ٩٠ ڕۆژدا باشتر لە BTC",
+                    "en": "of the top 50 beat BTC over 90 days", "kmr": "ji 50 coinên jorîn di 90 rojan de ji BTC baştir",
+                    "ar": "من أفضل 50 عملة تفوقت على BTC خلال 90 يوماً"}, lang)
+        lines.append(f"🌗 {nm}: <b>{al['value']}</b>/100 ({lb}) · {al.get('beat')}/{al.get('n')} {sub}")
     if b and b.get("regime"):
         r = b["regime"]
         br = r.get("breadth", {})
