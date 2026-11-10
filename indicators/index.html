@@ -44,6 +44,15 @@
 .x{position:sticky;top:0;float:inline-end;font-size:1.6rem;line-height:1;width:36px;height:36px;border-radius:50%;background:#ffffff14;margin-bottom:6px}
 .empty{border:1px dashed var(--line);border-radius:14px;padding:18px;color:var(--mute);font-size:.9rem;line-height:1.9}
 .scroll{overflow-x:auto}
+.lw{background:#ffffff06;border:1px solid var(--line);border-radius:16px;padding:14px}
+.lw canvas{width:100%;display:block;border-radius:10px;background:#04060a;margin-top:10px}
+.lw .lh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}.lw .lh h3{font-size:1rem;margin:0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--g);display:inline-block;box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pl 1.8s infinite}.dot.st{background:#6b6f76;animation:none;box-shadow:none}
+@keyframes pl{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.chs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}.chs button{padding:5px 11px;border-radius:99px;border:1px solid var(--line);font-size:.78rem;color:var(--mute);font-family:var(--mono)}.chs button.on{background:var(--o);color:#000;border-color:var(--o)}
+.dec{display:inline-block;padding:4px 14px;border-radius:99px;font-weight:900;font-size:.95rem}.dec.long{background:rgba(34,197,94,.18);color:var(--g)}.dec.short{background:rgba(239,68,68,.18);color:var(--r)}.dec.flat{background:#ffffff14;color:#ddd}
+.lsum{font-size:.76rem;font-family:var(--mono);color:var(--mute);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lock{font-size:.75rem;color:var(--mute);margin-top:10px;line-height:1.8}
 </style>
 <link rel="stylesheet" href="/assets/chrome.css?v=11"><meta name="referrer" content="strict-origin-when-cross-origin"></head>
 <body>
@@ -124,9 +133,27 @@ Object.assign(I.en,{h1:'Coin_Kurd’s <em>exclusive</em> indicators',lead:'Every
  ph_0:'Extreme Bear',ph_1:'Bear',ph_2:'Early Bull',ph_3:'Bull',ph_4:'Overheated Bull',chk:'Verification',chkPL:'Fair value on 19 Jul 2026 in this engine: ${v} — on the TradingView publication chart: $60,214.',
  mini:'Signal chart on real Binance candles',more:'Show more',fut:'Model projection',tch:'Yearly touch floor'});
 
+Object.assign(I.fa,{lv:'📊 تحلیل زنده',lvT:'پنجرهٔ تحلیل زندهٔ بازار',lvNone:'خروجی زندهٔ این اسکریپت هنوز به سایت وصل نشده است. به‌محض فعال‌شدن هشدار TradingView یا موتور خصوصی آن، وضعیت لحظه‌ای بازار همین‌جا نمایش داده می‌شود.',
+ lvLock:'🔒 فقط خروجی اندیکاتور (جهت، امتیاز، ورود، اهداف و حد ضرر) اینجا نمایش داده می‌شود؛ کد آن روی TradingView یا موتور خصوصی قفل است و هرگز به این سایت، مرورگر شما یا اپ نمی‌آید.',
+ lvAgo:'به‌روزرسانی',lvStale:'قدیمی — منتظر کندل بعدی',lvFresh:'زنده',lvSrcTv:'هشدار TradingView',lvSrcEng:'موتور خصوصی entekhab',lvPos:'پوزیشن باز',lvLast:'آخرین سیگنال',lvNow:'قیمت لحظه‌ای',lvNoChart:'نمودار زنده فقط برای نمادهای Binance نمایش داده می‌شود.',
+ lvMin:'دقیقه پیش',lvHr:'ساعت پیش',lvDay:'روز پیش',lvSrv:'این اندیکاتور متن‌باز است و مستقیم روی سرور entekhab.net اجرا می‌شود.',
+ f_dir:'جهت',f_decision:'تصمیم',f_score:'امتیاز',f_conf:'اطمینان',f_prob:'احتمال',f_trend:'روند',f_regime:'رژیم بازار',f_phase:'فاز',f_risk:'ریسک',f_rsi:'RSI',f_entry:'ورود',f_sl:'حد ضرر',f_stop:'حد ضرر',f_target:'هدف',f_quality:'کیفیت',f_pattern:'الگو',f_zone:'ناحیه',f_note:'یادداشت',f_bodyway:'Body Way',
+ d_long:'صعودی',d_short:'نزولی',d_flat:'بدون پوزیشن',d_neutral:'خنثی',d_buy:'خرید',d_sell:'فروش',d_up:'صعودی',d_down:'نزولی',d_wait:'صبر'});
+Object.assign(I.ckb,{lv:'📊 شیکاریی زیندوو',lvT:'پەنجەرەی شیکاریی زیندووی بازاڕ',lvNone:'دەرچووی زیندووی ئەم سکریپتە هێشتا بە ماڵپەڕەکە نەبەستراوە. هەر کە ئاگادارکردنەوەی TradingView یان بزوێنەری تایبەتی چالاک بوو، دۆخی ساتیی بازاڕ لێرە دەردەکەوێت.',
+ lvLock:'🔒 تەنها دەرچووی ئیندیکاتۆرەکە (ئاراستە، خاڵ، چوونەژوورەوە، ئامانج و وەستاندنی زیان) لێرە نیشان دەدرێت؛ کۆدەکەی لەسەر TradingView یان بزوێنەری تایبەت قوفڵە و هەرگیز نایەتە ئەم ماڵپەڕە، وێبگەڕەکەت یان ئەپەکە.',
+ lvAgo:'نوێکردنەوە',lvStale:'کۆن — چاوەڕێی مۆمی داهاتوو',lvFresh:'زیندوو',lvSrcTv:'ئاگادارکردنەوەی TradingView',lvSrcEng:'بزوێنەری تایبەتی entekhab',lvPos:'پۆزیشنی کراوە',lvLast:'دوایین سیگناڵ',lvNow:'نرخی ساتی',lvNoChart:'چارتی زیندوو تەنها بۆ هێماکانی Binance نیشان دەدرێت.',
+ lvMin:'خولەک لەمەوبەر',lvHr:'کاتژمێر لەمەوبەر',lvDay:'ڕۆژ لەمەوبەر',lvSrv:'ئەم ئیندیکاتۆرە سەرچاوە-کراوەیە و ڕاستەوخۆ لەسەر سێرڤەری entekhab.net کار دەکات.',
+ f_dir:'ئاراستە',f_decision:'بڕیار',f_score:'خاڵ',f_conf:'دڵنیایی',f_prob:'ئەگەر',f_trend:'ڕەوت',f_regime:'دۆخی بازاڕ',f_phase:'قۆناغ',f_risk:'مەترسی',f_rsi:'RSI',f_entry:'چوونەژوورەوە',f_sl:'وەستاندنی زیان',f_stop:'وەستاندنی زیان',f_target:'ئامانج',f_quality:'کوالیتی',f_pattern:'نەخشە',f_zone:'ناوچە',f_note:'تێبینی',f_bodyway:'Body Way',
+ d_long:'بەرزبوونەوە',d_short:'دابەزین',d_flat:'بێ پۆزیشن',d_neutral:'بێلایەن',d_buy:'کڕین',d_sell:'فرۆشتن',d_up:'بەرزبوونەوە',d_down:'دابەزین',d_wait:'چاوەڕێ'});
+Object.assign(I.en,{lv:'📊 Live analysis',lvT:'Live market-analysis window',lvNone:'This script’s live output is not connected to the site yet. As soon as its TradingView alert or private engine is on, the market’s current state appears right here.',
+ lvLock:'🔒 Only the indicator’s output (direction, score, entry, targets, stop) is shown here; its code stays locked on TradingView or in the private engine and never reaches this site, your browser or the app.',
+ lvAgo:'Updated',lvStale:'stale — waiting for the next candle',lvFresh:'live',lvSrcTv:'TradingView alert',lvSrcEng:'entekhab private engine',lvPos:'Open position',lvLast:'Last signal',lvNow:'Live price',lvNoChart:'The live chart is shown for Binance symbols only.',
+ lvMin:'min ago',lvHr:'h ago',lvDay:'d ago',lvSrv:'This indicator is open-source and runs directly on entekhab.net’s server.',
+ f_dir:'Direction',f_decision:'Decision',f_score:'Score',f_conf:'Confidence',f_prob:'Probability',f_trend:'Trend',f_regime:'Regime',f_phase:'Phase',f_risk:'Risk',f_rsi:'RSI',f_entry:'Entry',f_sl:'Stop',f_stop:'Stop',f_target:'Target',f_quality:'Quality',f_pattern:'Pattern',f_zone:'Zone',f_note:'Note',f_bodyway:'Body Way',
+ d_long:'Long',d_short:'Short',d_flat:'Flat',d_neutral:'Neutral',d_buy:'Buy',d_sell:'Sell',d_up:'Up',d_down:'Down',d_wait:'Wait'});
 const PHC = ['#1565C0', '#00BCD4', '#00C853', '#FF8C00', '#FF0000'], PHN = ['Extreme Bear', 'Bear', 'Early Bull', 'Bull', 'Overheated Bull'];
 const IND_ID = window.IND_ID || null;
-let IND = null, KIND = null, SIG = null, grp = '', sLim = 40;
+let IND = null, KIND = null, SIG = null, LIVE = null, grp = '', sLim = 40;
 const tl = it => (it.t[lang] || it.t.en);
 const nm = id => (IND && IND.items.find(x => x.id === id) || {}).name || id;
 const dt = s => { try { return new Date(s).toLocaleString(lang === 'en' ? 'en-GB' : lang === 'ckb' ? 'ckb-IQ' : 'fa-IR', { year: '2-digit', month: 'short', day: 'numeric', hour: s.includes('T00:00:00') ? undefined : '2-digit', minute: s.includes('T00:00:00') ? undefined : '2-digit' }); } catch (e) { return s.slice(0, 10); } };
@@ -194,10 +221,10 @@ function liveCards(only) {
     <div class="row" style="margin-top:6px;font-size:.75rem;color:var(--mute)"><span style="color:#3b6cff">● ATH</span><span style="color:#e11d48">◆ bottom</span><span style="color:#86efac">○ halving</span><span style="color:#f7931a">▲ now</span></div>${upd}</div>`);
   return out.join('');
 }
-function paintLive() { const pl = KIND && KIND.power_law, sc = KIND && KIND.style_cycle, sp = KIND && KIND.spiral; const big = !!IND_ID;
-  const a = document.getElementById('cPL'); if (a && pl) drawPL(a, pl, big ? 320 : 230);
-  const b = document.getElementById('cSC'); if (b && sc) drawSC(b, sc, big ? 300 : 230);
-  const c = document.getElementById('cSP'); if (c && sp) drawSpiral(c, sp, big ? 520 : 330); }
+function paintLive(root = document) { const pl = KIND && KIND.power_law, sc = KIND && KIND.style_cycle, sp = KIND && KIND.spiral; const big = !!IND_ID || root !== document;
+  const a = root.querySelector('#cPL'); if (a && pl) drawPL(a, pl, big ? 320 : 230);
+  const b = root.querySelector('#cSC'); if (b && sc) drawSC(b, sc, big ? 300 : 230);
+  const c = root.querySelector('#cSP'); if (c && sp) drawSpiral(c, sp, big ? 520 : 330); }
 
 /* ---------- library ---------- */
 function card(it) {
@@ -208,7 +235,8 @@ function card(it) {
    <h3>${esc(it.name)}</h3><p>${esc(t.sum)}</p>
    ${it.bt ? `<div class="bt"><span>${T('pnl')} <b class="pos">${it.bt.pnl}</b></span><span>${T('win')} <b>${it.bt.win}</b></span><span>PF <b>${it.bt.pf}</b></span><span>DD <b class="neg">${it.bt.dd}</b></span></div>` : ''}
    ${st.n ? `<div class="bt"><span>📡 ${st.n} · ${T('n30')} ${st.n30}</span>${st.win != null ? `<span>${T('statW')} ${st.h}: <b>${st.win}%</b></span>` : ''}</div>` : ''}
-   <div class="act"><a class="btn p" href="/indicators/${it.id}/">${T('det')}</a><a class="btn" href="${esc(su(it.url))}" target="_blank" rel="noopener">${T('tv')}</a></div></div></div>`;
+   ${liveSum(it)}
+   <div class="act"><button class="btn p" data-live="${it.id}">${T('lv')}</button><a class="btn" href="/indicators/${it.id}/">${T('det')}</a><a class="btn" href="${esc(su(it.url))}" target="_blank" rel="noopener">${T('tv')}</a></div></div></div>`;
 }
 function renderLib() {
   const g = IND.groups; $('#flt').innerHTML = `<button data-g="" class="${grp ? '' : 'on'}">${T('all')} · ${IND.items.length}</button>` + Object.keys(g).map(k => `<button data-g="${k}" class="${grp === k ? 'on' : ''}">${esc(g[k][lang] || g[k].en)} · ${IND.items.filter(i => i.group === k).length}</button>`).join('');
@@ -254,6 +282,64 @@ async function miniChart(s) {
   x.beginPath(); if (s.side === 'short') { x.moveTo(px, py - 14); x.lineTo(px - 7, py - 26); x.lineTo(px + 7, py - 26); } else { x.moveTo(px, py + 14); x.lineTo(px - 7, py + 26); x.lineTo(px + 7, py + 26); } x.closePath(); x.fill();
 }
 
+/* ---------- live analysis window (outputs only — no indicator code ever reaches the browser) ---------- */
+const TFMS = { '1m': 6e4, '3m': 18e4, '5m': 3e5, '15m': 9e5, '30m': 18e5, '1h': 36e5, '2h': 72e5, '4h': 144e5, '6h': 216e5, '8h': 288e5, '12h': 432e5, '1D': 864e5, '1W': 6048e5 };
+const BIV = tf => ({ '1D': '1d', '1W': '1w', '1M': '1M' }[tf] || (TFMS[tf] ? tf : null));
+const ago = t => { const m = Math.max(0, (Date.now() - Date.parse(t)) / 6e4); return m < 60 ? `${Math.round(m)} ${T('lvMin')}` : m < 1440 ? `${Math.round(m / 60)} ${T('lvHr')}` : `${Math.round(m / 1440)} ${T('lvDay')}`; };
+const stale = s => Date.now() - Date.parse(s.t) > Math.max(3 * (TFMS[s.tf] || 36e5), 54e5);
+const dirOf = f => { const d = String(f.dir ?? f.side ?? f.signal ?? '').toLowerCase(); return ['long', 'buy', 'up', 'bull', 'bullish'].includes(d) ? 'long' : ['short', 'sell', 'down', 'bear', 'bearish'].includes(d) ? 'short' : d ? 'flat' : ''; };
+const fLab = k => { const v = T('f_' + k); if (v) return v; const m = /^tp(\d)$/.exec(k); return m ? 'TP' + m[1] : k; };
+const fVal = (k, v) => typeof v === 'number' ? fm(v, Math.abs(v) >= 100 ? 2 : 6) : (k === 'dir' || k === 'decision' ? (T('d_' + String(v).toLowerCase()) || v) : v);
+const symOf = s => (s.tv_sym || s.sym || '').replace(/^.*:/, '');
+const lvItem = id => (LIVE && LIVE.items && LIVE.items[id]) || null;
+let LW = { id: null, k: 0, box: null, tm: [] };
+
+function liveSum(it) {
+  const L = lvItem(it.id), s = L && L.states && L.states[0];
+  if (it.engine === 'server') return `<div class="lsum"><span class="dot"></span>${T('lvFresh')} · entekhab.net</div>`;
+  if (!s) return '';
+  const d = dirOf(s.f || {});
+  return `<div class="lsum"><span class="dot ${stale(s) ? 'st' : ''}"></span>${esc(symOf(s))} · ${esc(s.tf)}${d ? ` · <span class="sd ${d === 'flat' ? 'info' : d}">${T('d_' + d)}</span>` : ''}${s.f && s.f.score != null ? ` · ${fm(s.f.score, 1)}` : ''} · ${ago(s.t)}</div>`;
+}
+function liveWin(id, box) {
+  LW.tm.forEach(clearInterval); LW = { id, k: LW.id === id ? LW.k : 0, box, tm: [] };
+  const it = IND.items.find(x => x.id === id); if (!it || !box) return;
+  if (it.engine === 'server') { box.innerHTML = `<div class="lw"><div class="lh"><span class="dot"></span><h3>${T('lvT')} · ${esc(it.name)}</h3></div><p class="disc" style="margin:0 0 8px">${T('lvSrv')}</p>${liveCards(it.id)}</div>`; paintLive(box); return; }
+  const L = lvItem(id), st = (L && L.states) || [];
+  if (!st.length) { box.innerHTML = `<div class="lw"><div class="lh"><span class="dot st"></span><h3>${T('lvT')} · ${esc(it.name)}</h3></div><div class="empty">📡 ${T('lvNone')}</div>${lastSig(L)}<p class="lock">${T('lvLock')}</p></div>`; return; }
+  if (LW.k >= st.length) LW.k = 0;
+  const s = st[LW.k], f = s.f || {}, d = dirOf(f), old = stale(s);
+  const pos = ((L && L.pos) || []).find(p => p.tv_sym === s.tv_sym && p.tf === s.tf);
+  const keys = Object.keys(f).filter(k => k !== 'dir' && k !== 'decision');
+  box.innerHTML = `<div class="lw"><div class="lh"><span class="dot ${old ? 'st' : ''}"></span><h3>${T('lvT')} · ${esc(it.name)}</h3><span class="bdg">${s.src === 'engine' ? T('lvSrcEng') : T('lvSrcTv')}</span></div>
+   ${st.length > 1 ? `<div class="chs">${st.map((x, i) => `<button data-lk="${i}" class="${i === LW.k ? 'on' : ''}">${esc(symOf(x))} · ${esc(x.tf)}</button>`).join('')}</div>` : ''}
+   <div class="row" style="align-items:center;gap:10px">${d ? `<span class="dec ${d}">${d === 'long' ? '▲ ' : d === 'short' ? '▼ ' : ''}${esc(f.decision != null ? fVal('decision', f.decision) : T('d_' + d))}</span>` : f.decision != null ? `<span class="dec flat">${esc(fVal('decision', f.decision))}</span>` : ''}
+    <span class="num" style="font-size:1rem">${esc(symOf(s))} · ${esc(s.tf)}</span><span class="disc" style="margin:0">${T('lvAgo')}: ${ago(s.t)} · ${old ? T('lvStale') : T('lvFresh')}</span></div>
+   <div class="kv"><div><small>${T('lvNow')}</small><b id="lvP">${fm(s.price, s.price > 100 ? 2 : 6)}</b></div>${keys.map(k => `<div><small>${esc(fLab(k))}</small><b style="${typeof f[k] === 'number' ? '' : 'font-family:inherit;font-size:.88rem'}">${esc(fVal(k, f[k]))}</b></div>`).join('')}</div>
+   ${pos ? `<div class="kv"><div><small>${T('lvPos')}</small><b><span class="sd ${pos.side}">${T(pos.side)}</span> ${fm(pos.price, pos.price > 100 ? 2 : 6)}</b></div>${pos.sl ? `<div><small>SL</small><b class="neg">${fm(pos.sl, 6)}</b></div>` : ''}${pos.tp ? `<div><small>TP</small><b class="pos">${fm(pos.tp, 6)}</b></div>` : ''}<div><small>${T('when')}</small><b style="font-size:.8rem">${dt(pos.t)}</b></div></div>` : ''}
+   ${s.sym && BIV(s.tf) ? '<canvas id="lvC"></canvas>' : `<p class="disc">${T('lvNoChart')}</p>`}${lastSig(L)}<p class="lock">${T('lvLock')}</p></div>`;
+  if (s.sym && BIV(s.tf)) { const go = () => lvChart(s, pos); go(); LW.tm.push(setInterval(go, 20000)); }
+}
+function lastSig(L) { const x = L && L.last; return x ? `<p class="disc" style="margin-top:8px">${T('lvLast')}: <span class="sd ${x.side || 'info'}">${T(x.side || 'info')}</span> ${esc(T(x.kind) || x.kind || '')} · ${esc(symOf(x))} · ${esc(x.tf || '')} · ${fm(x.price, x.price > 100 ? 2 : 6)} · ${dt(x.t)}</p>` : ''; }
+async function lvChart(s, pos) {
+  const iv = BIV(s.tf), k = await j(`https://data-api.binance.vision/api/v3/klines?symbol=${encodeURIComponent(s.sym)}&interval=${iv}&limit=120`);
+  const c = document.getElementById('lvC'); if (!k || !k.length || !c) return;
+  const f = s.f || {}, lines = [];
+  const add = (v, col, lab) => { v = typeof v === 'number' ? v : null; if (!v) return; const d = lines.find(l => l[0] === v); if (d) d[2] += ' · ' + lab; else lines.push([v, col, lab]); };
+  add(f.entry ?? (pos && pos.price), '#f7931a', T('f_entry')); add(f.sl ?? f.stop ?? (pos && pos.sl), '#ef4444', 'SL');
+  for (let i = 1; i <= 8; i++) add(f['tp' + i], '#22c55e', 'TP' + i); add(f.target ?? (pos && pos.tp), '#22c55e', 'TP'); add(f.bodyway, '#38bdf8', 'Body Way');
+  const last = +k[k.length - 1][4], p = document.getElementById('lvP'); if (p) p.textContent = fm(last, last > 100 ? 2 : 6);
+  const hiK = Math.max(...k.map(q => +q[2])), loK = Math.min(...k.map(q => +q[3])), span = hiK - loK;
+  const vis = lines.filter(l => l[0] < hiK + span * 1.5 && l[0] > loK - span * 1.5);
+  const hi = Math.max(hiK, ...vis.map(l => l[0])), lo = Math.min(loK, ...vis.map(l => l[0]));
+  const [x, W, H] = cnv(c, IND_ID ? 380 : 320), bw = (W - 60) / k.length, Y = v => 10 + (hi - v) / (hi - lo || 1) * (H - 30), X = i => 4 + i * bw;
+  x.direction = 'ltr'; x.textAlign = 'left'; x.font = '10px Space Grotesk'; x.fillStyle = '#6b6f76'; for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4; x.fillText(fm(v, v > 100 ? 0 : 4), W - 54, Y(v) + 3); x.strokeStyle = '#ffffff0d'; x.beginPath(); x.moveTo(0, Y(v)); x.lineTo(W - 58, Y(v)); x.stroke(); }
+  k.forEach((q, i) => { const o = +q[1], h = +q[2], l = +q[3], cl = +q[4], up = cl >= o; x.strokeStyle = x.fillStyle = up ? '#22c55e' : '#ef4444'; x.beginPath(); x.moveTo(X(i) + bw / 2, Y(h)); x.lineTo(X(i) + bw / 2, Y(l)); x.stroke(); x.fillRect(X(i) + bw * .15, Math.min(Y(o), Y(cl)), bw * .7, Math.max(1, Math.abs(Y(o) - Y(cl)))); });
+  vis.forEach(([v, col, lab]) => { x.strokeStyle = col; x.setLineDash([5, 4]); x.beginPath(); x.moveTo(0, Y(v)); x.lineTo(W - 58, Y(v)); x.stroke(); x.setLineDash([]); x.fillStyle = col; x.fillText(`${lab} ${fm(v, v > 100 ? 0 : 4)}`, 6, Y(v) - 3); });
+  x.fillStyle = '#f7931a'; x.fillRect(W - 58, Y(last) - 7, 56, 14); x.fillStyle = '#000'; x.fillText(fm(last, last > 100 ? 0 : 4), W - 55, Y(last) + 3);
+}
+async function lvReload() { const n = await j('/data/live.json' + V()); if (n) { LIVE = n; if (LW.box && document.body.contains(LW.box)) liveWin(LW.id, LW.box); } }
+
 /* ---------- detail ---------- */
 function renderDetail() {
   const it = IND.items.find(x => x.id === IND_ID), D = $('#detail'); if (!it) { D.hidden = true; return; }
@@ -266,7 +352,8 @@ function renderDetail() {
    ${it.bt ? `<div class="card" style="margin-top:12px"><h3>${T('bt')} · <span class="num" style="font-size:.85rem">${esc(it.chart)}</span></h3><div class="kv"><div><small>${T('pnl')}</small><b class="pos">${it.bt.pnl}</b></div><div><small>${T('dd')}</small><b class="neg">${it.bt.dd}</b></div><div><small>${T('win')}</small><b>${it.bt.win}</b><small>${it.bt.trades}</small></div><div><small>${T('pf')}</small><b>${it.bt.pf}</b></div></div><p class="disc">${T('src')}</p></div>` : ''}
    <p class="disc" style="margin-top:10px"><b>${T('acc')}:</b> ${it.access === 'open-source' ? T('accOpen') : T('accInv')}</p>
    <div class="row" style="margin-top:10px"><a class="btn p" href="${esc(su(it.url))}" target="_blank" rel="noopener">${T('tv')}</a><a class="btn" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">Telegram</a><button class="btn" id="shr">↗ share</button></div></div></div>
-   ${it.engine === 'server' ? `<div style="margin-top:16px">${liveCards(it.id)}</div>` : ''}`;
+   <div style="margin-top:16px" id="lvD"></div>`;
+  liveWin(it.id, $('#lvD'));
   const b = $('#shr'); if (b) b.onclick = () => share(`${it.name} — ${t.sum.slice(0, 120)}…`, location.href);
   $('#sigS h2 b').textContent = T('sigsOf');
 }
@@ -280,17 +367,20 @@ function render() {
 }
 document.addEventListener('click', e => {
   const z = e.target.closest('[data-zoom]'); if (z && IND) { e.preventDefault(); const it = IND.items.find(x => x.id === z.dataset.zoom); $('#mbody').innerHTML = `<h3 style="margin-bottom:8px">${esc(it.name)}</h3><img src="${img(it, true)}" alt="${esc(it.name)}"><p class="disc">${esc(it.chart)} · © Coin_Kurd / TradingView</p>`; $('#mod').hidden = false; return; }
+  const lv = e.target.closest('[data-live]'); if (lv && IND) { e.preventDefault(); $('#mbody').innerHTML = '<div id="lvM"></div>'; $('#mod').hidden = false; LW.id = null; liveWin(lv.dataset.live, $('#lvM')); return; }
+  const lk = e.target.closest('[data-lk]'); if (lk && LW.id) { LW.k = +lk.dataset.lk; liveWin(LW.id, LW.box); return; }
   const g = e.target.closest('#flt button'); if (g) { grp = g.dataset.g; renderLib(); return; }
   const r = e.target.closest('tr[data-s]'); if (r && SIG) { const s = SIG.signals.find(x => x.id === r.dataset.s); if (s) miniChart(s); return; }
   if (e.target.id === 'sMore') { sLim += 60; renderSigs(); return; }
-  if (e.target.id === 'mx' || e.target.id === 'mod') $('#mod').hidden = true;
+  if (e.target.id === 'mx' || e.target.id === 'mod') { $('#mod').hidden = true; if (LW.box && LW.box.id === 'lvM') { LW.tm.forEach(clearInterval); LW.box = null; } }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#mod').hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#mod').hidden = true; if (LW.box && LW.box.id === 'lvM') { LW.tm.forEach(clearInterval); LW.box = null; } } });
 $('#sInd').onchange = () => { sLim = 40; renderSigs(); }; $('#sSide').onchange = () => { sLim = 40; renderSigs(); };
-let rT = 0; addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(paintLive, 200); });
+let rT = 0; addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => paintLive(), 200); });
 uiLang(render);
 (async () => {
-  [IND, KIND, SIG] = await Promise.all([j('/data/indicators.json' + V()), j('/data/kind.json' + V()), j('/data/signals.json' + V())]);
+  [IND, KIND, SIG, LIVE] = await Promise.all([j('/data/indicators.json' + V()), j('/data/kind.json' + V()), j('/data/signals.json' + V()), j('/data/live.json' + V())]);
+  setInterval(lvReload, 60000);
   if (!IND) { $('#lib').innerHTML = '<p class="disc">—</p>'; return; }
   render();
   if (location.hash === '#signals' || window.IND_TAB === 'signals') document.getElementById('sigS').scrollIntoView();

@@ -69,6 +69,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   file (`python3 -I scripts/b4j_check.py fa|ckb` and `python3 scripts/kids_check.py` must stay at 0 errors/problems);
   never add images or text from elsewhere into those pages; never bring back the old games/films/songs academy
   (the owner replaced it on purpose on 2026-11-07).
+- **Indicator code never enters this repo (owner, 2026-11-10, absolute).** This repository is public. The closed
+  (invite-only) indicators' source exists only on TradingView (protected) and in the owner's PRIVATE engine repository.
+  Never add Pine Script (`*.pine`, `//@version=`), ports of closed indicators, or `engine/indicators/` here — only their
+  OUTPUTS travel to the site (`#ESTATE`/`#ESIG` relay lines → `data/live.json`; `data/engine.json` from the private
+  engine, whitelisted by `clean_engine()` in `scripts/signals.py`). `scripts/leak_guard.py` runs before every commit of
+  data and every deploy and stops them on a leak; never weaken or bypass it.
 - Owner's standing rules: verify before publishing; whatever changes on the site is mirrored in the Telegram bot and the
   app (the app is a WebView of the site, so pages appear there automatically; add a bot section/menu entry when a new
   user-facing feature has one natural home in the bot).
@@ -148,6 +154,20 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · Live analysis window on every indicator, outputs only (asked for by the owner)
+- **Need:** traders tap any indicator and see the live market analysis it produces, while the closed indicators' code
+  can never leak (owner: "under no circumstances").
+- **Built:** `#ESTATE` relay line (TradingView `alert()` → webhook → Telegram relay channel → `scripts/signals.py`) and
+  `data/engine.json` from the owner's private engine, merged into `data/live.json` (latest state per indicator/symbol/
+  timeframe, open positions, last signal). `/indicators/`: every card has «📊 تحلیل زنده» with a status line; the modal
+  and the detail page show the live window (decision, fields, live Binance chart with entry/SL/TP/Body Way, freshness,
+  20 s price refresh, 60 s data refresh). Bot: live block in the Indicators section. Leak guard added to both workflows.
+- **Not on yet:** needs the relay channel name in `scripts/make_indicators.py` → `relay.channel`, the owner's alerts,
+  and the private engine repo (kit delivered to the owner, not stored here).
+- **Checks:** `tests/test_live.py` (23 checks: parsing, paging stop, merge order, engine whitelist); Playwright at
+  1280/390 fa+en with synthetic data (not committed), 0 JS errors; leak guard fires on a planted `//@version=6`.
+  `tests/test_bot_v2.py` already failed before this change (NameError `page` in the alerts section) — not fixed here.
+
 ### 2026-11-10 · Owner's two review files: frozen no-JS snapshot fixed, scanner grouped per coin, daily prediction in the group
 - **Root cause of most "critical" items:** the home page's prerendered (no-JS) snapshot — what crawlers, link
   previews and AI reviewers read — had been frozen since 2026-11-07 15:09 UTC. The committed index.html held a

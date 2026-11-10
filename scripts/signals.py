@@ -13,6 +13,17 @@ Signals hub — exclusive signals of Coin_Kurd's TradingView indicators on entek
     indicator alerts use "-" there and a fixed action buy / sell)
    The channel is set in data/indicators.json → "relay.channel" (or env SIGNALS_CHANNEL). Empty = relay off.
 
+   Live analysis (the "live window" of every indicator) uses a second line type in the same channel:
+
+     #ESTATE <indicator-code>|<EXCHANGE:TICKER>|<interval>|<price>|<time>|key=value|key=value|...
+
+   (keys: dir, decision, score, conf, trend, regime, phase, risk, rsi, entry, sl, tp1…tp8, note — or any short key;
+    only OUTPUTS travel here — the script's code never leaves TradingView)
+
+   The private engine (a separate PRIVATE repository that runs closed indicators ported to Python) never publishes code
+   either: it only commits data/engine.json  {"updated_at", "states": [{ind, tv_sym, tf, price, t, f:{...}}]}.
+   Everything is merged into data/live.json  {items: {indicator: {states, pos, last}}}.
+
 2) Outcomes for every signal (relay + server-computed ones from scripts/kind.py), measured on real Binance candles:
    intraday signals → +6h / +24h / +72h, daily signals → +7d / +30d / +90d, max favourable / adverse move,
    SL / TP hit order when the alert carries them, and realized result when a strategy exit follows its entry.
@@ -122,8 +133,34 @@ def parse_esig(line, codes):
             "order": oid, "sl": kv.get("sl"), "tp": kv.get("tp"), "tp2": kv.get("tp2"), "ts": ts}
 
 
-def read_channel(ch, codes, pages=3):
-    found, before = [], None
+EST_KEY = re.compile(r"^[a-z][a-z0-9_]{0,23}$")
+EST_NUM = re.compile(r"^[-+]?(\d[\d,]*\.?\d*|\.\d+)([eE][-+]?\d+)?$")
+
+
+def parse_estate(line, codes):
+    """#ESTATE code|EXCHANGE:TICKER|tf|price|time|k=v|... → live state (only indicators listed in indicators.json)"""
+    f = [x.strip() for x in line.split("|")]
+    f[0] = re.sub(r"^#?ESTATE\s*", "", f[0], flags=re.I).strip()
+    if len(f) < 4 or f[0].lower() not in codes or not f[1]:
+        return None
+    fields, ts = {}, None
+    for i, x in enumerate(f[4:]):
+        if "=" not in x:
+            if i == 0 and x not in ("", "-"):
+                ts = x[:40]
+            continue
+        k, v = x.split("=", 1)
+        k, v = k.strip().lower(), re.sub(r"[<>\x00-\x1f]", "", v.strip())[:48]
+        if not EST_KEY.match(k) or v in ("", "-", "NaN", "na") or len(fields) >= 24:
+            continue
+        fields[k] = fnum(v) if EST_NUM.match(v) else v
+    return {"ind": codes[f[0].lower()], "tv_sym": f[1][:40], "sym": binance_symbol(f[1]), "tf": norm_tf(f[2]),
+            "price": fnum(f[3]), "ts": ts, "f": fields}
+
+
+def read_channel(ch, codes, pages=10, stop_at=0):
+    """returns (signals, live states, highest message id); paging stops at messages already read in an earlier run"""
+    found, states, top, before = [], [], 0, None
     for _ in range(pages):
         html = get(f"https://t.me/s/{ch}" + (f"?before={before}" if before else ""), js=False)
         if not html:
@@ -140,6 +177,7 @@ def read_channel(ch, codes, pages=3):
             except ValueError:
                 continue
             ids.append(mid)
+            top = max(top, mid)
             te = w.select_one(".tgme_widget_message_text")
             tm = w.select_one(".tgme_widget_message_date time")
             if not te:
@@ -148,6 +186,13 @@ def read_channel(ch, codes, pages=3):
                 br.replace_with("\n")
             text = te.get_text()                                   # inline tags (hashtag links) stay on the same line
             for line in text.splitlines():
+                if "ESTATE" in line.upper() and "|" in line:
+                    s = parse_estate(line.strip(), codes)
+                    if s:
+                        t = datetime.fromisoformat(tm["datetime"].replace("Z", "+00:00")).astimezone(timezone.utc) if tm and tm.get("datetime") else NOW
+                        s.update({"t": t.isoformat(), "src": "tv", "mid": mid, "msg": f"https://t.me/{ch}/{mid}"})
+                        states.append(s)
+                    break
                 if "ESIG" in line.upper() and "|" in line:
                     s = parse_esig(line.strip(), codes)
                     if s:
@@ -158,10 +203,72 @@ def read_channel(ch, codes, pages=3):
                         s.update({"id": f"tv-{ch}-{mid}", "src": "tv", "t": (t or NOW).isoformat(), "msg": f"https://t.me/{ch}/{mid}"})
                         found.append(s)
                     break
-        if not ids or min(ids) <= 1:
+        if not ids or min(ids) <= 1 or min(ids) <= stop_at:
             break
         before = min(ids)
-    return found
+    return found, states, top
+
+
+# ------------------------------------------------------------------ live window data
+def clean_engine(s):
+    """private-engine state → only whitelisted output fields survive (short scalars), whatever the file contains"""
+    if not isinstance(s, dict) or not isinstance(s.get("ind"), str) or not isinstance(s.get("t"), str):
+        return None
+    try:
+        t = datetime.fromisoformat(s["t"].replace("Z", "+00:00")).astimezone(timezone.utc).isoformat()
+    except ValueError:
+        return None
+    f = {}
+    for k, v in (s.get("f") or {}).items() if isinstance(s.get("f"), dict) else []:
+        k = str(k).lower()
+        if not EST_KEY.match(k) or len(f) >= 24 or isinstance(v, bool):
+            continue
+        if isinstance(v, (int, float)) and v == v:
+            f[k] = float(v)
+        elif isinstance(v, str) and v.strip():
+            f[k] = re.sub(r"[<>\x00-\x1f]", "", v.strip())[:48]
+    tv = str(s.get("tv_sym") or "")[:40]
+    return {"ind": s["ind"][:60], "tv_sym": tv, "sym": binance_symbol(tv), "tf": norm_tf(str(s.get("tf") or "")), "price": fnum(s.get("price")),
+            "t": t, "src": "engine", "f": f}
+
+
+LIVE = os.path.join(D, "live.json")
+ENGINE = os.path.join(D, "engine.json")
+
+
+def build_live(prev, new_states, engine, sigs, ids, now=None):
+    """latest state per (indicator, symbol, timeframe) + open positions + last signal, per indicator"""
+    now = now or NOW
+    keep = {}
+    for it in (prev.get("items") or {}).values():
+        for s in it.get("states", []):
+            keep[(s["ind"], s.get("tv_sym"), s.get("tf"))] = s
+    eng = [x for x in (clean_engine(s) for s in (engine.get("states") or [])[:2000]) if x and x["ind"] in ids]
+    for s in list(new_states) + eng:
+        s = {k: v for k, v in s.items() if k != "ts"}
+        k = (s["ind"], s.get("tv_sym"), s.get("tf"))
+        if k not in keep or s["t"] >= keep[k]["t"]:
+            keep[k] = s
+    items = {}
+    for s in keep.values():
+        if s["ind"] in ids and now - datetime.fromisoformat(s["t"]) <= timedelta(days=30):
+            items.setdefault(s["ind"], {"states": [], "pos": [], "last": None})["states"].append(s)
+    for s in sorted(sigs, key=lambda x: x["t"]):
+        if s.get("ind") not in ids:
+            continue
+        it = items.setdefault(s["ind"], {"states": [], "pos": [], "last": None})
+        it["last"] = {k: s.get(k) for k in ("id", "t", "side", "kind", "price", "sym", "tv_sym", "tf", "sl", "tp", "tp2")}
+        o = s.get("out") or {}
+        if (s.get("src") == "tv" and s.get("kind") == "entry" and not o.get("trade") and not o.get("hit")
+                and now - datetime.fromisoformat(s["t"]) <= timedelta(days=21)):
+            it["pos"] = [p for p in it["pos"] if (p["tv_sym"], p["tf"]) != (s.get("tv_sym"), s.get("tf"))]
+            it["pos"].append({k: s.get(k) for k in ("id", "t", "side", "price", "sym", "tv_sym", "tf", "sl", "tp", "tp2", "order")})
+        elif s.get("kind") == "exit":
+            it["pos"] = [p for p in it["pos"] if (p["tv_sym"], p["tf"], p["side"]) != (s.get("tv_sym"), s.get("tf"), s.get("side"))]
+    for it in items.values():
+        it["states"].sort(key=lambda x: x["t"], reverse=True)
+        it["states"] = it["states"][:60]
+    return items
 
 
 # ------------------------------------------------------------------ outcomes
@@ -289,13 +396,18 @@ def main():
             codes[it["esig"].lower()] = it["id"]
         codes[it["id"].lower()] = it["id"]
     have = {s["id"]: s for s in sig.get("signals", [])}
-    new = 0
+    live = load(LIVE, {})
+    lr = live.get("relay") or {}
+    new, states = 0, []
     if ch:
-        for s in read_channel(ch, codes):
+        last_id = lr.get("last_id", 0) if lr.get("channel") == ch else 0
+        found, states, top = read_channel(ch, codes, stop_at=last_id)
+        for s in found:
             if s["id"] not in have:
                 have[s["id"]] = s
                 new += 1
         sig["relay"] = {"channel": ch, "checked_at": NOW.isoformat(), "new": new}
+        lr = {"channel": ch, "checked_at": NOW.isoformat(), "last_id": max(top, last_id), "states_new": len(states)}
     else:
         sig["relay"] = {"channel": None, "checked_at": NOW.isoformat(), "note": "relay not configured yet"}
     sigs = sorted(have.values(), key=lambda s: s["t"], reverse=True)
@@ -320,6 +432,13 @@ def main():
     sig["stats"] = stats(sigs)
     sig["updated_at"] = NOW.isoformat()
     json.dump(sig, open(SIG, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    engine = load(ENGINE, {})
+    ids = {it["id"] for it in ind.get("items", [])}
+    live = {"updated_at": NOW.isoformat(), "relay": lr if ch else {"channel": None},
+            "engine": {"updated_at": engine.get("updated_at"), "n": len(engine.get("states") or [])},
+            "items": build_live(live, states, engine, sigs, ids)}
+    json.dump(live, open(LIVE, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    print(f"live: {sum(len(v['states']) for v in live['items'].values())} states · {sum(len(v['pos']) for v in live['items'].values())} open positions")
     print(f"relay channel: {ch or '-'} | new: {new} | signals: {len(sigs)} | outcomes updated: {calc} | stats: {json.dumps(sig['stats'], ensure_ascii=False)[:400]}")
 
 
