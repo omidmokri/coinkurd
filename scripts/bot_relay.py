@@ -115,8 +115,10 @@ def tick(s, tg):
     if not codes:
         return False
     done = st.setdefault("done", [])
-    changed = False
-    for mid, text in posts(ch):
+    first = not done
+    limit = 3 if first else 8                 # on the very first run only the newest posts get an answer
+    replies, changed = 0, False
+    for mid, text in sorted(posts(ch), reverse=True)[: 12 if first else 40]:
         if mid in done or MARK in text:
             continue
         card = card_for(text, codes, names)
@@ -124,16 +126,18 @@ def tick(s, tg):
             done.append(mid)                  # nothing to explain in this post
             continue
         raw = D.e(re.sub(r"\n{3,}", "\n\n", text.strip()))     # the machine line stays, escaped so HTML mode is safe
-        body = raw + "\n\n" + card
-        r = tg("editMessageText", chat_id=f"@{ch}", message_id=mid, text=body[:MAXLEN],
+        r = tg("editMessageText", chat_id=f"@{ch}", message_id=mid, text=(raw + "\n\n" + card)[:MAXLEN],
                parse_mode="HTML", link_preview_options={"is_disabled": True})
         ok = r.get("ok") or "not modified" in str(r.get("description", ""))
-        if ok:
-            done.append(mid)
-            changed = True
-        else:
-            log.info("relay edit %s failed: %s", mid, r.get("description"))
-            done.append(mid)                  # do not hammer a post we may not edit
-        time.sleep(1.5)
+        if not ok and replies < limit:        # a post of another bot cannot be edited: answer it instead
+            replies += 1
+            r = tg("sendMessage", chat_id=f"@{ch}", text=card[:MAXLEN], parse_mode="HTML",
+                   reply_to_message_id=mid, link_preview_options={"is_disabled": True})
+            ok = r.get("ok")
+        if not ok:
+            log.info("relay %s not explained: %s", mid, r.get("description"))
+        changed = changed or bool(ok)
+        done.append(mid)                      # never hammer the same post twice
+        time.sleep(2)
     del done[:-500]
     return changed
