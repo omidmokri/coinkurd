@@ -56,6 +56,13 @@
   function usd(v) { if (v == null || !isFinite(v)) return '—'; var a = Math.abs(v); return (v < 0 ? '-' : '') + '$' + (a >= 1e9 ? nf(a / 1e9, 2) + 'B' : a >= 1e6 ? nf(a / 1e6, 1) + 'M' : a >= 1e3 ? nf(a / 1e3, 0) + 'K' : nf(a, 0)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function ago(iso) { var m = Math.max(0, (Date.now() - Date.parse(iso)) / 6e4); return m < 90 ? nf(m) + ' ' + t('min') + ' ' + t('ago') : nf(m / 60) + ' ' + t('hr') + ' ' + t('ago'); }
+  // a "7-day average" only when the hourly history really reaches back about a week for this field; per-coin funding
+  // and SOL OI started being recorded on 2026-11-10, so for a while there is less than that and nothing is shown
+  function mean7(hist, key) {
+    var have = hist.filter(function (r) { return r[key] != null && isFinite(r[key]); });
+    if (!have.length || Date.now() / 1000 - have[0].t < 6.5 * 86400) return null;
+    return mean(have.map(function (r) { return r[key]; }));
+  }
   function mean(a) { a = a.filter(function (x) { return x != null && isFinite(x); }); return a.length ? a.reduce(function (s, x) { return s + x; }, 0) / a.length : null; }
   function spark(vals, W, H, col, fill) {
     vals = vals.filter(function (v) { return v != null && isFinite(v); }); if (vals.length < 2) return '';
@@ -78,7 +85,7 @@
     var h = '<div class="dv-tabs" role="tablist">' + COINS.map(function (c) { return '<button type="button" role="tab" aria-selected="' + (c === CUR) + '" data-c="' + c + '" class="' + (c === CUR ? 'on' : '') + '">' + c + '</button>'; }).join('') + '</div>';
     if ((Date.now() - Date.parse(D.updated_at)) / 36e5 > 3) h += '<p class="note">' + t('stale') + '</p>';
     // funding
-    var f = x.funding, lab = f == null ? '' : f < 0 ? 'f_neg' : f >= EXT ? 'f_ext' : f >= HIGH ? 'f_high' : 'f_norm', f7 = mean(hist.map(function (r) { return r[k + '_f']; }));
+    var f = x.funding, lab = f == null ? '' : f < 0 ? 'f_neg' : f >= EXT ? 'f_ext' : f >= HIGH ? 'f_high' : 'f_norm', f7 = mean7(hist, k + '_f');
     var fcls = f == null ? '' : f >= EXT ? 'down' : f < 0 ? 'up' : '';
     h += '<div class="dv-grid">' + card(t('fund'), pct(f, 4, true) + (lab ? ' <span class="dv-tag ' + lab + '">' + t(lab) + '</span>' : ''),
       t('per8') + ' · ' + pct(x.funding_ann, 1, true) + ' ' + t('apr') + (f7 != null ? ' · ' + t('avg7') + ' ' + pct(f7, 4, true) : ''),
@@ -86,7 +93,7 @@
     // open interest
     var oh = x.oi_hist || [], ch = null, chAbs = null;
     if (oh.length >= 25) { var a = oh[oh.length - 25][1], b = oh[oh.length - 1][1]; if (a) { ch = (b / a - 1) * 100; chAbs = b - a; } }
-    var o7 = mean(hist.map(function (r) { return r[k + '_oi']; })), vs = o7 && x.oi_usd ? (x.oi_usd / o7 - 1) * 100 : null;
+    var o7 = mean7(hist, k + '_oi'), vs = o7 && x.oi_usd ? (x.oi_usd / o7 - 1) * 100 : null;
     h += card(t('oi'), usd(x.oi_usd), t('oi_sw'),
       '<div class="dv-row"><span>' + t('ch24') + '</span><b class="' + (ch == null ? '' : ch >= 0 ? 'up' : 'down') + '">' + (ch == null ? '—' : (ch >= 0 ? '▲ ' : '▼ ') + pct(ch, 1, true) + ' (' + (chAbs >= 0 ? '+' : '') + usd(chAbs) + ')') + '</b></div>' +
       (vs != null ? '<div class="dv-row"><span>' + t('vs7') + '</span><b>' + pct(vs, 1, true) + '</b></div>' : ''), t('oi_x'));
