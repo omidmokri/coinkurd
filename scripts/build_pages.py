@@ -164,7 +164,7 @@ header .w{display:flex;justify-content:space-between;align-items:center;gap:12px
 nav a{color:var(--mute);margin-inline-start:16px;font-size:.9rem}header nav{min-width:0}@media(max-width:760px){header .w{gap:10px}header nav{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}header nav::-webkit-scrollbar{display:none}nav a{margin-inline-start:12px;flex:none}}main{padding:32px 0 60px}
 h1{font-size:clamp(1.5rem,4vw,2.3rem);line-height:1.45;margin:10px 0 12px}h2{font-size:1.15rem;margin:34px 0 12px;color:var(--acc)}
 .meta{color:var(--mute);font-size:.85rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--ink)}
-.img{width:100%;border-radius:10px;margin:18px 0;display:block}.txt{font-size:1.02rem;margin:18px 0}
+.img{width:100%;height:auto;border-radius:10px;margin:18px 0;display:block}.note a:not(.pill):not(.btn),.txt p a,.txt>a{text-decoration:underline;text-underline-offset:3px}.txt{font-size:1.02rem;margin:18px 0}
 details{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0;background:var(--card)}summary{cursor:pointer;font-weight:700}
 .social{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding:12px 0;border-top:1px solid var(--line);margin-top:16px}.social a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap;color:var(--ink);font-size:.85rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}.kpi small{color:var(--mute);display:block;font-size:.75rem}.kpi b{font-family:'Space Grotesk',monospace;font-size:1.2rem;direction:ltr;unicode-bidi:isolate;display:inline-block}
@@ -259,6 +259,41 @@ WATCH_JS = ("document.querySelectorAll('[data-watch]').forEach(function(b){var c
 # 50+ pages for it. og:title / og:description keep the full text for link previews; only the search tags are tidied.
 _RULE = re.compile("\\s*[\u2500-\u257F]{2,}\\s*")          # ━━━━ section rules become a separator
 _DECOR = re.compile("[\u2300-\u23FF\u2500-\u257F\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\U0001F000-\U0001FAFF]+")
+
+
+_DIMS = {}
+
+
+def img_dims(src):
+    """(w, h) of a site image (read from its header, cached), or None for remote/missing files."""
+    if src in _DIMS:
+        return _DIMS[src]
+    wh = None
+    if src.startswith("/") and not src.startswith("//"):
+        fp = os.path.join(ROOT, src.split("?")[0].lstrip("/"))
+        try:
+            from PIL import Image
+            with Image.open(fp) as im:
+                wh = im.size
+        except Exception:
+            wh = None
+    _DIMS[src] = wh
+    return wh
+
+
+def hero_img(src, alt):
+    """The post's lead image: above the fold, so it loads first (LCP), and its box is reserved (no layout shift)."""
+    wh = img_dims(src)
+    size = f' width="{wh[0]}" height="{wh[1]}"' if wh else ' style="aspect-ratio:16/9;object-fit:contain"'
+    tag = f'<img class="img" src="{e(src)}" alt="{e(alt)}"{size} fetchpriority="high" decoding="async" referrerpolicy="no-referrer">'
+    base, ext = os.path.splitext(src.split("?")[0])
+    if wh and ext.lower() in (".jpg", ".jpeg", ".png"):
+        full, half = base + ".webp", base + "-540.webp"
+        have = lambda u: os.path.exists(os.path.join(ROOT, u.lstrip("/")))  # noqa: E731
+        if have(full):
+            srcset = (f"{half} 540w, " if have(half) else "") + f"{full} {wh[0]}w"
+            return f'<picture><source type="image/webp" srcset="{e(srcset)}" sizes="(max-width:960px) 100vw, 928px">{tag}</picture>'
+    return tag
 
 
 def jlen(t):
@@ -390,7 +425,7 @@ def build_post(p):
     body = f'<div class="meta"><a class="pill" href="/categories/{e(p["category"])}/">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</a>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span></div>'
     body += f'<h1>{e(title)}</h1>'
     if img:
-        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
+        body += hero_img(img, title)
     body += f'<div class="txt">{rich(p["text"])}</div>'
     # each translation lives on its own page (hreflang-linked), so this page carries only the Persian text
     langs = [(lg, lbl) for lg, lbl in (("ckb", "کوردی (سۆرانی)"), ("en", "English")) if isinstance(tr.get(lg), dict) and tr[lg].get("text")]
@@ -450,7 +485,7 @@ def build_post_lang(p, lg):
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
     body = f'<div class="meta">{coins}<time datetime="{p.get("date", "")}">{fmt_date(p.get("date", ""))}</time></div><h1>{e(title)}</h1>'
     if img:
-        body += f'<img class="img" src="{e(img)}" alt="{e(title)}" loading="lazy" referrerpolicy="no-referrer">'
+        body += hero_img(img, title)
     body += f'<div class="txt">{rich(t["text"])}</div>'
     if p.get("q") != "low":
         body += cat_line(p.get("category"), lg)
@@ -1014,7 +1049,8 @@ def build_feeds():
             block = f'<article class="txt" style="border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0">'
             ph = it.get("img") or it.get("photo") or ""
             if ph.startswith(("https://", "/data/feedimg/")):
-                block += f'<img class="img" src="{e(ph)}" alt="" loading="lazy" referrerpolicy="no-referrer">'
+                wh = img_dims(ph)
+                block += f'<img class="img" src="{e(ph)}" alt=""' + (f' width="{wh[0]}" height="{wh[1]}"' if wh else '') + ' loading="lazy" decoding="async" referrerpolicy="no-referrer">'
             block += f'<small class="note">{when}</small><div class="fd-fa" lang="fa" dir="rtl">{fa}</div>'
             if ckb:
                 block += f'<details class="fd-ck" style="margin-top:10px"><summary>کوردی سۆرانی</summary><div lang="ckb" dir="rtl">{ckb}</div></details>'

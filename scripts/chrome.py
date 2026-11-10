@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "11"  # bump to bust caches of chrome.css / chrome.js
+VER = "12"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -344,7 +344,7 @@ def header(lang="fa"):
              f'<a class="ek-ib ek-tgb" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener noreferrer"{aria(T["tg"], lang)}><i class="ek-si b-telegram"></i></a>'
              f'<div class="ek-lang" id="langs" role="group" aria-label="language"><button type="button" data-l="fa" lang="fa">فا</button>'
              f'<button type="button" data-l="ckb" lang="ckb">کو</button><button type="button" data-l="en" lang="en">EN</button></div>'
-             f'<a class="ek-appb" href="/app/"><i class="ek-si b-android"></i>{tri(T["app"], lang)}</a>'
+             f'<a class="ek-appb" href="/app/" aria-label="{e(T["app"][lang])}"><i class="ek-si b-android"></i>{tri(T["app"], lang)}</a>'
              f'<a class="ek-ib ek-meb" href="/me/"{aria(T["me"], lang)}>{icon("user")}</a>')
     return (f'<!--ek:header--><a class="ek-skip" href="#ek-main">{e(T["skip"][lang])}</a>'
             f'<div class="ekh" id="ekh" role="banner" data-lang="{lang}"><div class="ek-w">'
