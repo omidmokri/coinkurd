@@ -33,6 +33,7 @@ T = {
         "ckb": "📡 <b>ئینتیخاب · Coin_Kurd</b>\nهەموو ئامرازەکانی ماڵپەڕی entekhab.net لەناو تێلێگرام. بەشێک هەڵبژێرە 👇",
         "en": "📡 <b>Entekhab · Coin_Kurd</b>\nEvery tool from entekhab.net, inside Telegram. Pick a section 👇"},
     "b_irr": {"fa": "💵 دلار و تتر (تومان)", "ckb": "💵 دۆلار و تەتەر (تمەن)", "en": "💵 Dollar & tether (IRR)"},
+    "b_indlive": {"fa": "📊 تحلیل زندهٔ اندیکاتورها", "ckb": "📊 شیکاریی زیندووی ئیندیکاتۆرەکان", "en": "📊 Live indicator analysis"},
     "b_live": {"fa": "📡 زنده (۱۵ دقیقه)", "ckb": "📡 ڕاستەوخۆ (١٥ خولەک)", "en": "📡 Live (15 min)"},
     "b_calc": {"fa": "🧮 ماشین‌حساب", "ckb": "🧮 ژمێرەر", "en": "🧮 Calculator"},
     "b_watch_on": {"fa": "🚨 هشدار جهش تتر: روشن کن", "ckb": "🚨 ئاگاداری تەتەر: هەڵیبکە", "en": "🚨 Tether spike alert: on"},

@@ -35,6 +35,7 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bot_data as D  # noqa: E402
+import bot_relay as RL  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
@@ -451,7 +452,7 @@ SECTIONS = {
     "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
     **BRL.SECTIONS,          # the Reality-check group, from the same files the pages read
     "flows": (D.sec_flows, "/terminal/"), "week": (D.sec_week, "/"), "track": (D.sec_track, "/status/"),
-    "ind": (D.sec_ind, "/indicators/"), "posts": (D.sec_posts, "/"),
+    "ind": (D.sec_ind, "/indicators/"), "live": (D.sec_live, "/indicators/"), "posts": (D.sec_posts, "/"),
     "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
     "opt": (D.sec_opt, "/lab/"), "xex": (D.sec_xex, "/lab/"), "dev": (D.sec_dev, "/lab/"),
     "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
@@ -608,7 +609,11 @@ def _render(s, uid, key):
             text += "\n\n" + t("search_hint", lang)
         if key in LAB:
             return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key)]]}
-        return text, kb_back(lang, refresh="m:" + key, more=D.SITE + path)
+        kb = kb_back(lang, refresh="m:" + key, more=D.SITE + path)
+        if key in ("ind", "live"):                      # readable live-analysis card <-> indicator list
+            other = "live" if key == "ind" else "ind"
+            kb["inline_keyboard"].insert(0, [btn(t("b_indlive" if key == "ind" else "b_ind", lang), "m:" + other)])
+        return text, kb
     return t("menu_title", lang), kb_main(lang)
 
 
@@ -1781,6 +1786,7 @@ def main():
                 F.DIRTY.clear()
                 dirty = True
             dirty |= maybe_brief(s)
+            dirty |= RL.tick(s, tg)                 # relay channel: machine line -> readable Persian card
         except Exception:
             log.exception("periodic job failed")
         if dirty:
