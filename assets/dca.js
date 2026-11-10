@@ -45,7 +45,14 @@
       'ماوەکان یەکتر دەگرنەوە (هەر ڕۆژێک دەستپێکێکی نوێ)، بۆیە سەربەخۆ نین؛ ژمارەکە «چەند جار لە مێژوودا» بخوێنەوە، نەک ئەگەری داهاتوو.',
       'The periods overlap (a new start every day), so they are not independent: read the number as "how often in history", not as a chance for the future.'],
     share: ['اشتراک نتیجه در تلگرام', 'بڵاوکردنەوەی ئەنجام لە تێلێگرام', 'Share the result on Telegram'],
-    days: ['روز', 'ڕۆژ', 'days']
+    days: ['روز', 'ڕۆژ', 'days'],
+    gn: ['پله‌های خرید زیر قیمت (۰ = خاموش)', 'پلەکانی کڕین لە خوار نرخ (٠ = کوژاوە)', 'Buy levels below price (0 = off)'],
+    gs: ['فاصلهٔ پله‌ها ٪', 'دووریی پلەکان ٪', 'Level spacing %'],
+    grid: ['گرید فقط خرید', 'گریدی تەنها کڕین', 'Buy-only grid'], g_fill: ['پله‌های پرشده', 'پلە پڕبووەکان', 'Levels filled'],
+    g_cash: ['پول خرج‌نشده', 'پارەی خەرجنەکراو', 'Unspent cash'],
+    g_note: ['بودجه بین پله‌ها مساوی تقسیم شد: اولی با قیمت باز شدن روز اول، بقیه هر کدام همین درصد پایین‌تر؛ پله وقتی پر می‌شود که کف روز به آن برسد (یا روز زیر آن باز شود). فروشی در کار نیست. پایین‌ترین پله:',
+      'بودجە بە یەکسانی دابەشکرا: یەکەم بە نرخی کردنەوەی ڕۆژی یەکەم، هەر پلەیەکی تر ئەم ڕێژەیە نزمتر؛ پلە پڕ دەبێت کاتێک نزمیی ڕۆژ پێی بگات. فرۆشتن نییە. نزمترین پلە:',
+      'The budget is split equally: the first level at the first day\'s open, each next one this much lower; a level fills when the day\'s low reaches it (or the day opens below it). Nothing is sold. Lowest level:']
   };
   function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
   function t(k) { var v = S[k]; return v ? v[{ fa: 0, ckb: 1, en: 2 }[lang()]] : k; }
@@ -84,8 +91,8 @@
       });
     }
     return step().then(function () {
-      var now = Date.now(), D = { t: [], o: [], c: [] };
-      out.forEach(function (k) { if (k[6] < now) { D.t.push(k[0]); D.o.push(+k[1]); D.c.push(+k[4]); } });
+      var now = Date.now(), D = { t: [], o: [], l: [], c: [] };
+      out.forEach(function (k) { if (k[6] < now) { D.t.push(k[0]); D.o.push(+k[1]); D.l.push(+k[3]); D.c.push(+k[4]); } });
       KL[sym] = D; return D;
     });
   }
@@ -118,6 +125,23 @@
     }
     return { lump: lc * D.c[b], dca: cash + dc * D.c[b], ddL: ddL, ddD: ddD, coinsL: lc, coinsD: dc, amt: amt, n: buys.length, curve: curve };
   }
+  /* buy-only grid: the budget is split equally over `n` buy limits, the first at the start day's open and each next one
+     `gap`% lower. A level fills at its price when the day's low reaches it, or at the open if the day opens below it.
+     Daily candles can measure this honestly (a buy limit only needs the low); a grid that also sells could not be. */
+  function grid(D, a, b, budget, fee, n, gap) {
+    var f = 1 - fee / 100, amt = budget / n, p0 = D.o[a], lv = [], i, j, coins = 0, cash = budget, pk = 0, dd = 0, filled = 0, curve = [];
+    for (j = 0; j < n; j++) lv.push(p0 * Math.pow(1 - gap / 100, j));
+    var done = lv.map(function () { return false; });
+    for (i = a; i <= b; i++) {
+      for (j = 0; j < n; j++) {
+        if (done[j]) continue;
+        var fillPx = D.o[i] <= lv[j] ? D.o[i] : D.l[i] <= lv[j] ? lv[j] : null;
+        if (fillPx) { coins += amt * f / fillPx; cash -= amt; done[j] = true; filled++; }
+      }
+      var v = cash + coins * D.c[i]; if (v > pk) pk = v; dd = Math.min(dd, v / pk - 1); curve.push(v);
+    }
+    return { val: cash + coins * D.c[b], dd: dd, coins: coins, filled: filled, n: n, spent: budget - cash, cash: cash, curve: curve, low: lv[n - 1] };
+  }
   function rolling(D, len, freq, budget, fee) {
     var n = D.t.length, res = [];
     for (var s = 0; s + len < n; s++) {
@@ -129,8 +153,8 @@
   function med(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
 
   /* ------------------------------------------------------------------ UI */
-  var ST = { coin: 'BTC', budget: 1000, from: '2022-01-01', to: '', freq: 'w', fee: 0.1 };
-  try { var q = new URLSearchParams(location.search); ['coin', 'from', 'to', 'freq'].forEach(function (k) { if (q.get(k)) ST[k] = q.get(k); }); ['budget', 'fee'].forEach(function (k) { if (q.get(k) && isFinite(+q.get(k))) ST[k] = +q.get(k); }); } catch (e) { }
+  var ST = { coin: 'BTC', budget: 1000, from: '2022-01-01', to: '', freq: 'w', fee: 0.1, gn: 5, gs: 5 };
+  try { var q = new URLSearchParams(location.search); ['coin', 'from', 'to', 'freq'].forEach(function (k) { if (q.get(k)) ST[k] = q.get(k); }); ['budget', 'fee', 'gn', 'gs'].forEach(function (k) { if (q.get(k) && isFinite(+q.get(k))) ST[k] = +q.get(k); }); } catch (e) { }
   if (COINS.indexOf(ST.coin) < 0) ST.coin = 'BTC'; if (!{ d: 1, w: 1, w2: 1, m: 1 }[ST.freq]) ST.freq = 'w';
   var LAST = null, BUSY = false;
   function sel(id, opts, v) { return '<select id="' + id + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(o[0]) === String(v) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>'; }
@@ -143,6 +167,8 @@
       '<label>' + t('to') + '<input id="dc-to" type="date" value="' + esc(ST.to) + '"></label>' +
       '<label>' + t('freq') + sel('dc-freq', [['d', t('d')], ['w', t('w')], ['w2', t('w2')], ['m', t('m')]], ST.freq) + '</label>' +
       '<label>' + t('fee') + '<input id="dc-fee" type="number" min="0" max="5" step="any" value="' + ST.fee + '" style="width:80px"></label>' +
+      '<label>' + t('gn') + '<input id="dc-gn" type="number" min="0" max="30" step="1" value="' + ST.gn + '" style="width:70px"></label>' +
+      '<label>' + t('gs') + '<input id="dc-gs" type="number" min="0.5" max="50" step="any" value="' + ST.gs + '" style="width:70px"></label>' +
       '<button type="button" class="sl-run" id="dc-run">' + t('run') + '</button><span class="mut" id="dc-msg"></span></div><div id="dc-out"></div>';
     root.innerHTML = h;
     root.querySelector('#dc-run').onclick = run;
@@ -153,6 +179,7 @@
     ST.coin = root.querySelector('#dc-coin').value; ST.budget = Math.max(10, +root.querySelector('#dc-budget').value || 1000);
     ST.from = root.querySelector('#dc-from').value || '2022-01-01'; ST.to = root.querySelector('#dc-to').value || '';
     ST.freq = root.querySelector('#dc-freq').value; ST.fee = Math.min(5, Math.max(0, +root.querySelector('#dc-fee').value || 0));
+    ST.gn = Math.min(30, Math.max(0, Math.round(+root.querySelector('#dc-gn').value || 0))); ST.gs = Math.min(50, Math.max(0.5, +root.querySelector('#dc-gs').value || 5));
   }
   function run() {
     if (BUSY) return; read(); BUSY = true; msg(t('load'));
@@ -163,9 +190,9 @@
       while (b > a && D.t[b] > to) b--;
       if (b - a < 14) { msg(t('err_few')); return; }
       var r = simulate(D, a, b, schedule(D, a, b, st.freq, false), st.budget, st.fee, true);
-      var R = rolling(D, b - a, st.freq, st.budget, st.fee);
-      LAST = { st: st, D: D, a: a, b: b, r: r, roll: R };
-      try { history.replaceState(null, '', '?' + new URLSearchParams({ coin: st.coin, budget: st.budget, from: st.from, to: st.to, freq: st.freq, fee: st.fee }).toString()); } catch (e) { }
+      var R = rolling(D, b - a, st.freq, st.budget, st.fee), G = st.gn > 0 ? grid(D, a, b, st.budget, st.fee, st.gn, st.gs) : null;
+      LAST = { st: st, D: D, a: a, b: b, r: r, roll: R, g: G };
+      try { history.replaceState(null, '', '?' + new URLSearchParams({ coin: st.coin, budget: st.budget, from: st.from, to: st.to, freq: st.freq, fee: st.fee, gn: st.gn, gs: st.gs }).toString()); } catch (e) { }
       msg(''); show(LAST);
     }).catch(function (e) { msg(e && e.status === 400 ? t('err_few') : t('err_net')); }).then(function () { BUSY = false; });
   }
@@ -180,8 +207,12 @@
     h += '<div class="dc-cols"><div><h3>' + t('lump') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(r.lump)) + kpi(t('ret'), pc(rL, 1, true), cl(rL)) + kpi(t('mdd'), pc(r.ddL, 1), 'down') +
       kpi(t('avg'), px(B / r.coinsL)) + kpi(t('n'), nf(1)) + kpi(t('fees'), usd(B * f)) + '</div></div>';
     h += '<div><h3>' + t('dca') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(r.dca)) + kpi(t('ret'), pc(rD, 1, true), cl(rD)) + kpi(t('mdd'), pc(r.ddD, 1), 'down') +
-      kpi(t('avg'), px(B / r.coinsD)) + kpi(t('n'), nf(r.n)) + kpi(t('each'), usd(r.amt)) + '</div></div></div>';
-    h += '<h3>' + t('chart') + '</h3><div class="rc-legend"><span><i style="background:#64748b"></i>' + t('lump') + '</span><span><i style="background:#f59e0b"></i>' + t('dca') + '</span><span><i style="background:#ffffff40"></i>' + t('budgetL') + '</span></div><div id="dc-chart" class="rc-chart" style="height:300px"></div>';
+      kpi(t('avg'), px(B / r.coinsD)) + kpi(t('n'), nf(r.n)) + kpi(t('each'), usd(r.amt)) + '</div></div>';
+    if (X.g) { var G = X.g, rG = G.val / B - 1;
+      h += '<div><h3>' + t('grid') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(G.val)) + kpi(t('ret'), pc(rG, 1, true), cl(rG)) + kpi(t('mdd'), pc(G.dd, 1), 'down') +
+        kpi(t('avg'), G.coins ? px(G.spent / G.coins) : '—') + kpi(t('g_fill'), nf(G.filled) + ' / ' + nf(G.n)) + kpi(t('g_cash'), usd(G.cash)) + '</div><p class="mut">' + t('g_note') + ' ' + px(G.low) + '.</p></div>'; }
+    h += '</div>';
+    h += '<h3>' + t('chart') + '</h3><div class="rc-legend"><span><i style="background:#64748b"></i>' + t('lump') + '</span><span><i style="background:#f59e0b"></i>' + t('dca') + '</span>' + (X.g ? '<span><i style="background:#a855f7"></i>' + t('grid') + '</span>' : '') + '<span><i style="background:#ffffff40"></i>' + t('budgetL') + '</span></div><div id="dc-chart" class="rc-chart" style="height:300px"></div>';
     var txt = st.coin + ' · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + '\n' + t('lump') + ': ' + pc(rL, 1, true) + ' · ' + t('dca') + ' (' + t(st.freq) + '): ' + pc(rD, 1, true) + '\n— entekhab.net';
     h += '<p><a class="rc-btn2" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent(txt) + '">📤 ' + t('share') + '</a></p></section>';
     // every possible start date
@@ -209,6 +240,7 @@
     bud.setData(cv.map(function (p) { return { time: sec(p[0]), value: X.st.budget }; }));
     l.setData(cv.map(function (p) { return { time: sec(p[0]), value: p[1] }; }));
     d.setData(cv.map(function (p) { return { time: sec(p[0]), value: p[2] }; }));
+    if (X.g) { var g = c.addLineSeries({ color: '#a855f7', lineWidth: 2, priceLineVisible: false }); g.setData(cv.map(function (p, i) { return { time: sec(p[0]), value: X.g.curve[i] }; })); }
     c.timeScale().fitContent();
     new ResizeObserver(function () { c.applyOptions({ width: el.clientWidth }); }).observe(el);
   }

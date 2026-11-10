@@ -112,9 +112,10 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 - **Combined alerts in /me/ and the bot** (owner's comparison file, 2026-11-10): one alert that fires on price AND
   regime AND a scanner finding on a watched coin (e.g. "SOL scanner bullish while the confirmed regime is not bear").
-- **Shared paper-trading leaderboard** (same file): /me/ paper trades are per-device today. A leaderboard needs a
-  server-side record — the bot (refbot-state) could store opt-in results submitted from the site with a signed
-  link, ranked after fees, minimum trade count, no deletions. Design first; nothing personal stored without opt-in.
+- **Shared paper-trading leaderboard** (owner's priority list, 2026-11-10) — WAITING FOR THE OWNER'S CHOICE, do not
+  build before: self-reported results from /me/ can be forged in the browser, so the proposed design records paper
+  trades in the bot (server time, server price from Binance), opt-in, nickname only, min 10 closed trades, ranked
+  after fees by return with drawdown/Sortino shown, user can delete. Owner was asked on 2026-11-10.
 1. **Owner's site review (2026-11-09, received as a document mid-run) — work top-down:**
    - **Broken images — done 2026-11-09** (slice 1: site-wide hide-on-error; slice 2 dropped: no page renders the
      Persian-feed images — `news.js` `noPic` shows Persian news text-only by the owner's choice, and a full build has no
@@ -154,6 +155,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · Owner's priority list: /derivatives/, /dca/ (+ buy-only grid), Calmar, Altcoin Season
+- /derivatives/ (build_derivatives.py + assets/derivatives.js, live from data/derivatives.json): BTC/ETH/SOL tabs, four
+  cards (funding 8h + APR + extreme tag ≥0.05%/8h + 7-day avg once recorded, OI + 24h change + vs 7-day avg,
+  liquidations long/short over a real 24 h from data/liq_store.json — OKX only returns the latest ~100 orders, so
+  derivatives.py now keeps every order for 24 h, deduplicated —, long/short accounts) with plain explanations,
+  72 h / 48 h charts, hottest/coldest funding, roundtable link. Bot section: SOL, OI 24h, 24 h liquidations.
+- /dca/: lump sum vs DCA vs buy-only grid (limits checked against the daily low); every-start-date test.
+  Checked against an independent Python implementation on fixed data, and live on real Binance data.
+- Lab: Calmar. Deploy: one retry when deploy-pages hits its hard 10-minute cap.
+
 ### 2026-11-10 · Live analysis window on every indicator, outputs only (asked for by the owner)
 - **Need:** traders tap any indicator and see the live market analysis it produces, while the closed indicators' code
   can never leak (owner: "under no circumstances").

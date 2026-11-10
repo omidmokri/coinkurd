@@ -16,6 +16,8 @@ import requests
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "derivatives.json")
+LIQ_OUT = os.path.join(ROOT, "data", "liq_store.json")   # [ts_ms, 0=long/1=short, usd] per coin, last 24 h
+LIQ = {}
 B = "https://www.okx.com/api/v5/"
 NOW = datetime.now(timezone.utc)
 STABLE = {"USDC", "USDT", "DAI", "FDUSD", "TUSD", "USDE", "PYUSD", "USD1"}
@@ -51,6 +53,10 @@ def main():
     except Exception:  # noqa: BLE001
         prev = {}
     out = {"updated_at": NOW.isoformat(), "source": "OKX public API", "errors": {}}
+    try:
+        LIQ.update(json.load(open(LIQ_OUT, encoding="utf-8")).get("rows") or {})
+    except Exception:  # noqa: BLE001
+        pass
 
     fund = {x["instId"]: x for x in (get("public/funding-rate", {"instId": "ANY"}) or [])}
     ois = {x["instId"]: x for x in (get("public/open-interest", {"instType": "SWAP"}) or [])}
@@ -99,12 +105,21 @@ def main():
                     continue
                 rows.append({"ts": ts, "side": "short" if x.get("posSide") == "short" or x.get("side") == "buy" else "long", "usd": round(px * sz * ct)})
             rows.sort(key=lambda r: -r["ts"])
+            # keep every order seen in the last 24 h across runs (deduplicated), so a true 24-hour total exists
+            day_ago = int((NOW - timedelta(hours=24)).timestamp() * 1000)
+            st = {(r[0], r[1], r[2]) for r in (LIQ.get(ccy) or []) if r[0] >= day_ago}
+            st |= {(r["ts"], 0 if r["side"] == "long" else 1, r["usd"]) for r in rows if r["ts"] >= day_ago}
+            LIQ[ccy] = sorted(st)
+            cover = min((r[0] for r in LIQ[ccy]), default=None)
             hr = int((NOW - timedelta(hours=1)).timestamp() * 1000)
             d["liq"] = {"n": len(rows), "from": rows[-1]["ts"] if rows else None, "to": rows[0]["ts"] if rows else None,
                         "long_usd": sum(r["usd"] for r in rows if r["side"] == "long"), "short_usd": sum(r["usd"] for r in rows if r["side"] == "short"),
                         "long_usd_1h": sum(r["usd"] for r in rows if r["side"] == "long" and r["ts"] >= hr),
                         "short_usd_1h": sum(r["usd"] for r in rows if r["side"] == "short" and r["ts"] >= hr),
-                        "biggest": sorted(rows, key=lambda r: -r["usd"])[:5]}
+                        "biggest": sorted(rows, key=lambda r: -r["usd"])[:5],
+                        # 24-hour totals from the store; "since" says how far back the store really reaches
+                        "long_usd_24h": sum(r[2] for r in LIQ[ccy] if r[1] == 0), "short_usd_24h": sum(r[2] for r in LIQ[ccy] if r[1] == 1),
+                        "n_24h": len(LIQ[ccy]), "since": cover}
         sw = next((c for c in coins if c["coin"] == ccy), None)
         if sw:
             d.update({"oi_usd": sw["oi_usd"], "funding": sw["funding"], "funding_ann": sw["funding_ann"]})
@@ -114,10 +129,13 @@ def main():
     if coins and (not hist or NOW.timestamp() - hist[-1]["t"] >= 55 * 60):
         hist.append({"t": int(NOW.timestamp()), "oi": round(tot), "f": out["avg_funding"],
                      "btc_oi": (out.get("BTC") or {}).get("oi_usd"), "eth_oi": (out.get("ETH") or {}).get("oi_usd"),
-                     "sol_oi": (out.get("SOL") or {}).get("oi_usd")})
+                     "sol_oi": (out.get("SOL") or {}).get("oi_usd"),
+                     "btc_f": (out.get("BTC") or {}).get("funding"), "eth_f": (out.get("ETH") or {}).get("funding"),
+                     "sol_f": (out.get("SOL") or {}).get("funding")})
     cut = NOW.timestamp() - 14 * 86400
     out["history"] = [h for h in hist if h["t"] >= cut]
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    json.dump({"updated_at": NOW.isoformat(), "rows": LIQ}, open(LIQ_OUT, "w", encoding="utf-8"), separators=(",", ":"))
     b = out.get("BTC") or {}
     print("swaps:", len(coins), "| total OI $%.2fB" % (tot / 1e9), "| avg funding", out["avg_funding"], "| BTC funding", b.get("funding"),
           "| L/S", (b.get("long_short") or [[0, None]])[-1][1], "| liq", {k: (b.get("liq") or {}).get(k) for k in ("n", "long_usd", "short_usd")},
