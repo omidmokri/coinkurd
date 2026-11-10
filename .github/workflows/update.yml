@@ -356,6 +356,11 @@ jobs:
         timeout-minutes: 2
         run: python scripts/build_today.py --snapshot
 
+      - name: Indicator preview images (TradingView publication charts)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/tv_images.py
+
       - name: Leak guard (no indicator source may ever reach the public repo or site)
         run: python scripts/leak_guard.py
 
@@ -363,7 +368,7 @@ jobs:
         run: |
           git config user.name  "coinkurd-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/
+          git add data/ assets/tv-*.webp
           git diff --cached --quiet || git commit -m "chore: sync data $(date -u +'%Y-%m-%d %H:%M UTC')"
           for i in 1 2 3; do
             git pull --rebase -X theirs origin main && git push && break
