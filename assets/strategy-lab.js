@@ -53,7 +53,19 @@
     k_dd: ['حداکثر افت', 'زۆرترین داکەوتن', 'Max drawdown'], k_n: ['معامله', 'مامەڵە', 'Trades'], k_win: ['نرخ برد', 'ڕێژەی بردنەوە', 'Win rate'],
     k_pf: ['ضریب سود', 'هۆکاری قازانج', 'Profit factor'], k_avg: ['میانگین هر معامله', 'ناوەندی هەر مامەڵە', 'Avg trade'],
     k_exp: ['زمان در بازار', 'کات لە بازاڕ', 'Time in market'], k_sh: ['شارپ', 'شارپ', 'Sharpe'],
-    k_so: ['سورتینو', 'سۆرتینۆ', 'Sortino'], k_ca: ['کالمار (بازده سالانه ÷ افت)', 'کالمار', 'Calmar (CAGR ÷ drawdown)'],
+    k_so: ['سورتینو', 'سۆرتینۆ', 'Sortino'],
+    of: ['آیا بهینه‌سازی فریبنده است؟ (PBO و شارپ تعدیل‌شده)', 'ئایا باشترکردن فریودەرە؟ (PBO و شارپی ڕاستکراوە)', 'Is the optimisation fooling you? (PBO and deflated Sharpe)'],
+    of_lead: ['وقتی چندین مقدار پارامتر امتحان می‌شود، بهترینشان تا حدی فقط از شانس بهترین است. دو آزمون استاندارد این را می‌سنجند: احتمال بیش‌برازش بک‌تست (PBO، روش CSCV با ۸ بخش و ۷۰ ترکیب) و نسبت شارپ تعدیل‌شده (DSR) که شارپ بهترین مقدار را با تعداد آزمون‌ها، چولگی و کشیدگی بازده‌ها می‌سنجد.',
+      'کاتێک چەندین بەهای پارامەتەر تاقی دەکرێتەوە، باشترینیان تا ڕادەیەک تەنها بە هەڵکەوت باشترینە. دوو تاقیکردنەوەی ستاندارد ئەمە دەپێون: ئەگەری زیادەگونجاندنی باکتێست (PBO، ڕێبازی CSCV بە ٨ بەش و ٧٠ تێکەڵە) و ڕێژەی شارپی ڕاستکراوە (DSR).',
+      'When many parameter values are tried, the best one is partly best by luck. Two standard tests measure this: the Probability of Backtest Overfitting (PBO, CSCV with 8 blocks and 70 combinations) and the Deflated Sharpe Ratio (DSR), which judges the best value\'s Sharpe against the number of trials and the skew and kurtosis of its returns.'],
+    of_pbo: ['احتمال بیش‌برازش (PBO)', 'ئەگەری زیادەگونجاندن (PBO)', 'Probability of overfitting (PBO)'],
+    of_dsr: ['شارپ تعدیل‌شده (DSR)', 'شارپی ڕاستکراوە (DSR)', 'Deflated Sharpe (DSR)'], of_n: ['مقدارهای آزموده', 'بەها تاقیکراوەکان', 'Values tried'],
+    of_p_ok: ['PBO پایین: مقداری که در گذشته بهترین بود، معمولاً روی دادهٔ دیده‌نشده هم بالای میانه ماند.', 'PBO نزم: باشترین بەهای ڕابردوو زۆرجار لەسەر داتای نەبینراویش سەرووی ناوەند مایەوە.', 'Low PBO: the value that was best in-sample usually stayed above the median out of sample.'],
+    of_p_mid: ['PBO متوسط: انتخاب بهترین مقدار تا حدی به شانس وابسته است.', 'PBO مامناوەند: هەڵبژاردنی باشترین بەها تا ڕادەیەک بە هەڵکەوتە.', 'Moderate PBO: picking the best value depends partly on luck.'],
+    of_p_bad: ['PBO بالا: بهترین مقدار گذشته در بیشتر ترکیب‌ها روی دادهٔ دیده‌نشده زیر میانه رفت؛ نشانهٔ بیش‌برازش.', 'PBO بەرز: باشترین بەهای ڕابردوو لە زۆربەی تێکەڵەکاندا لەسەر داتای نەبینراو چووە خوار ناوەند؛ نیشانەی زیادەگونجاندن.', 'High PBO: the in-sample best fell below the median out of sample in most combinations — a sign of overfitting.'],
+    of_d_ok: ['DSR بالای ۹۵٪: شارپ بهترین مقدار حتی با حساب تعداد آزمون‌ها معنادار است.', 'DSR سەرووی ٩٥٪: شارپی باشترین بەها تەنانەت بە ژماردنی تاقیکردنەوەکانیش واتادارە.', 'DSR above 95%: the best value\'s Sharpe is significant even after counting the trials.'],
+    of_d_no: ['DSR زیر ۹۵٪: با این تعداد آزمون، شارپ بهترین مقدار از شانس قابل تشخیص نیست.', 'DSR خوار ٩٥٪: بەم ژمارەیە تاقیکردنەوە، شارپی باشترین بەها لە هەڵکەوت جیا ناکرێتەوە.', 'DSR below 95%: with this many trials, the best value\'s Sharpe cannot be told apart from luck.'],
+    of_few: ['برای این آزمون دست‌کم ۳ مقدار پارامتر و ۸۰ کندل لازم است.', 'بۆ ئەم تاقیکردنەوەیە لانیکەم ٣ بەها و ٨٠ مۆم پێویستە.', 'This test needs at least 3 parameter values and 80 bars.'], k_ca: ['کالمار (بازده سالانه ÷ افت)', 'کالمار', 'Calmar (CAGR ÷ drawdown)'],
     mc: ['مونت‌کارلو: اگر ترتیب و ترکیب معامله‌ها فرق می‌کرد؟', 'مۆنت کارلۆ: ئەگەر ڕیز و تێکەڵەی مامەڵەکان جیاواز بوایە؟', 'Monte Carlo: what if the trades had come in another order and mix?'],
     mc_lead: ['همین معامله‌ها ۲٬۰۰۰ بار با جایگذاری بازنمونه‌گیری می‌شوند (هر بار همان تعداد معامله، با ترتیب تصادفی). این آزمون لبه را ثابت نمی‌کند — کار آزمون جایگشت است — بلکه نشان می‌دهد با همین نوع معامله‌ها، چه بازه‌ای از بازده و افت سرمایه را باید انتظار داشت.',
       'هەمان مامەڵەکان ٢٬٠٠٠ جار بە گەڕاندنەوە دووبارە نموونە دەگیرێن (هەر جارێک هەمان ژمارەی مامەڵە، بە ڕیزی هەڕەمەکی). ئەمە لێوار ناسەلمێنێت — ئەوە کاری تاقیکردنەوەی جێگۆڕکێیە — بەڵکو نیشان دەدات بە هەمان جۆری مامەڵە، چ مەودایەکی قازانج و داکەوتن چاوەڕوان دەکرێت.',
@@ -484,7 +496,7 @@
     // walk-forward
     h += '<section class="rc-sec"><h2>' + t('wf') + '</h2><p class="rc-lead">' + t('wf_lead') + '</p><div class="sl-row"><label>' + t('wf_par') +
       sel('wf-par', numParams(), OPT.par) + '</label><label>' + t('wf_min') + inp('wf-n', OPT.min, ' data-o="min"', 70) + '</label><label>' + t('wf_max') + inp('wf-n', OPT.max, ' data-o="max"', 70) +
-      '</label><label>' + t('wf_step') + inp('wf-n', OPT.step, ' data-o="step"', 64) + '</label><button type="button" class="sl-run wf-run">' + t('wf_run') + '</button><span class="wf-msg mut"></span></div><div class="wf-out">' + (X.wf ? wfHTML(X.wf) : '') + '</div></section>';
+      '</label><label>' + t('wf_step') + inp('wf-n', OPT.step, ' data-o="step"', 64) + '</label><button type="button" class="sl-run wf-run">' + t('wf_run') + '</button><span class="wf-msg mut"></span></div><div class="wf-out">' + (X.wf ? wfHTML(X.wf) : '') + (X.wf && X.of !== undefined ? '<p class="note">' + t('warn_opt') + '</p><h3>' + t('of') + '</h3><p class="rc-lead">' + t('of_lead') + '</p>' + ofHTML(X.of) : '') + '</div></section>';
     out.innerHTML = h;
     drawEq(X);
   }
@@ -573,6 +585,50 @@
     if (W.eff != null) h += '<p class="note">' + t('wf_effnote') + '</p>';
     return h;
   }
+  /* ---------------- overfitting statistics for a parameter sweep (Bailey, Borwein, López de Prado & Zhu 2014; Bailey & López de Prado 2014) */
+  function ncdf(x) { var t = 1 / (1 + 0.2316419 * Math.abs(x)), d = 0.3989422804 * Math.exp(-x * x / 2), p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; }
+  function ninv(p) { // Acklam's rational approximation
+    var a = [-39.6968302866538, 220.946098424521, -275.928510446969, 138.357751867269, -30.6647980661472, 2.50662827745924], b = [-54.4760987982241, 161.585836858041, -155.698979859887, 66.8013118877197, -13.2806815528857],
+      c = [-0.00778489400243029, -0.322396458041136, -2.40075827716184, -2.54973253934373, 4.37466414146497, 2.93816398269878], d = [0.00778469570904146, 0.32246712907004, 2.445134137143, 3.75440866190742], q, r;
+    if (p < 0.02425) { q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+    if (p > 1 - 0.02425) { q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+    q = p - 0.5; r = q * q; return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+  }
+  function combos(n, k) { var out = [], cur = []; (function go(i) { if (cur.length === k) { out.push(cur.slice()); return; } for (var j = i; j < n; j++) { cur.push(j); go(j + 1); cur.pop(); } })(0); return out; }
+  function overfit(D, st0, a, par, vals) {
+    var n = D.c.length, S = 8;
+    if (vals.length < 3 || n - a < 80) return null;
+    var M = [], SR = [], RR = [];
+    vals.forEach(function (val) {
+      var st = clone(st0); setPath(st, par, val);
+      var R = backtest(D, st, a, n, false), r = R.rets, L = r.length, blk = [];
+      for (var k = 0; k < S; k++) { var s = 0, i0 = Math.floor(k * L / S), i1 = Math.floor((k + 1) * L / S); for (var i = i0; i < i1; i++) s += Math.log(Math.max(1e-9, 1 + r[i])); blk.push(s); }
+      var m = r.reduce(function (p, x) { return p + x; }, 0) / (L || 1), sd = Math.sqrt(r.reduce(function (p, x) { return p + (x - m) * (x - m); }, 0) / Math.max(1, L - 1));
+      M.push(blk); SR.push(sd > 0 ? m / sd : 0); RR.push(r);
+    });
+    // PBO by combinatorially symmetric cross-validation
+    var N = vals.length, cs = combos(S, S / 2), bad = 0;
+    cs.forEach(function (isB) {
+      var inS = {}; isB.forEach(function (k) { inS[k] = 1; });
+      var isP = M.map(function (b) { return b.reduce(function (p, x, k) { return p + (inS[k] ? x : 0); }, 0); }), oosP = M.map(function (b) { return b.reduce(function (p, x, k) { return p + (inS[k] ? 0 : x); }, 0); });
+      var best = isP.indexOf(Math.max.apply(null, isP)), rank = oosP.filter(function (x) { return x < oosP[best]; }).length + 1, w = rank / (N + 1);
+      if (Math.log(w / (1 - w)) <= 0) bad++;
+    });
+    // Deflated Sharpe of the best value over the whole period
+    var bi = SR.indexOf(Math.max.apply(null, SR)), r = RR[bi], T = r.length, sr = SR[bi];
+    var mSR = SR.reduce(function (p, x) { return p + x; }, 0) / N, vSR = SR.reduce(function (p, x) { return p + (x - mSR) * (x - mSR); }, 0) / Math.max(1, N - 1), g = 0.5772156649;
+    var sr0 = Math.sqrt(vSR) * ((1 - g) * ninv(1 - 1 / N) + g * ninv(1 - 1 / (N * Math.E)));
+    var m = r.reduce(function (p, x) { return p + x; }, 0) / T, sd = Math.sqrt(r.reduce(function (p, x) { return p + (x - m) * (x - m); }, 0) / T) || 1e-12;
+    var sk = r.reduce(function (p, x) { return p + Math.pow((x - m) / sd, 3); }, 0) / T, ku = r.reduce(function (p, x) { return p + Math.pow((x - m) / sd, 4); }, 0) / T;
+    var den = 1 - sk * sr + (ku - 1) / 4 * sr * sr, dsr = den > 0 ? ncdf((sr - sr0) * Math.sqrt(T - 1) / Math.sqrt(den)) : null;
+    return { pbo: bad / cs.length, dsr: dsr, n: N, best: vals[bi] };
+  }
+  function ofHTML(O) {
+    if (!O) return '<p class="note">' + t('of_few') + '</p>';
+    var pv = O.pbo < 0.1 ? 'of_p_ok' : O.pbo <= 0.5 ? 'of_p_mid' : 'of_p_bad', dv = O.dsr != null && O.dsr >= 0.95 ? 'of_d_ok' : 'of_d_no';
+    return '<div class="rc-kpis">' + kpi('of_n', nf(O.n)) + kpi('of_pbo', '<span class="' + (O.pbo < 0.1 ? 'up' : O.pbo > 0.5 ? 'down' : '') + '">' + pc(O.pbo, 0) + '</span>') +
+      kpi('of_dsr', '<span class="' + (O.dsr >= 0.95 ? 'up' : 'down') + '">' + pc(O.dsr, 0) + '</span>') + '</div><p>' + t(pv) + '</p><p>' + t(dv) + '</p>';
+  }
   function runWF() {
     if (!LAST || BUSY) return; BUSY = true;
     var X = LAST, D = X.D, n = D.c.length, a = X.a, m = root.querySelector('.wf-msg');
@@ -605,12 +661,13 @@
         var eff = par && IS ? (OOSy / K) / (ISy / IS) : null;
         if (eff != null && !(ISy > 0)) eff = null;
         X.wf = { folds: folds, total: total, pos: folds.filter(function (f) { return f.oos > 0; }).length, beat: folds.filter(function (f) { return f.oos > f.bh; }).length, eff: eff };
-        var o = root.querySelector('.wf-out'); if (o) o.innerHTML = wfHTML(X.wf) + (par ? '<p class="note">' + t('warn_opt') + '</p>' : '');
+        X.of = par ? overfit(D, X.st, a, par, vals) : undefined;
+        var o = root.querySelector('.wf-out'); if (o) o.innerHTML = wfHTML(X.wf) + (par ? '<p class="note">' + t('warn_opt') + '</p><h3>' + t('of') + '</h3><p class="rc-lead">' + t('of_lead') + '</p>' + ofHTML(X.of) : '');
       } finally { if (m) m.textContent = ''; BUSY = false; }
     }, 20);
   }
 
   // test hook (used by the site's own checks; harmless for visitors)
-  window.__slab = { backtest: backtest, stats: stats, permute: permute, rng: rng, rsi: rsi, sma: sma };
+  window.__slab = { backtest: backtest, stats: stats, permute: permute, rng: rng, rsi: rsi, sma: sma, overfit: overfit, ncdf: ncdf, ninv: ninv };
   render();
 })();
