@@ -3,8 +3,8 @@
 """
 Derivatives command room — OKX public API (free, no key) → data/derivatives.json
   - funding rate of every USDT perpetual (8h) + annualised, open interest (USD) of every swap
-  - BTC/ETH: long/short account ratio, taker buy/sell volume, open-interest history (hourly)
-  - recent liquidations (BTC, ETH perpetuals): long vs short notional in the last hour / 24h window returned by OKX
+  - BTC/ETH/SOL: long/short account ratio, taker buy/sell volume, open-interest history (hourly)
+  - recent liquidations (BTC, ETH, SOL perpetuals): long vs short notional in the last hour / 24h window returned by OKX
   - hourly history of total OI and OI-weighted funding (kept 14 days)
 """
 import json
@@ -76,7 +76,7 @@ def main():
     out["funding_hot"] = sorted(top, key=lambda c: -c["funding"])[:8]
     out["funding_cold"] = sorted(top, key=lambda c: c["funding"])[:8]
 
-    for ccy in ("BTC", "ETH"):
+    for ccy in ("BTC", "ETH", "SOL"):
         d = {}
         ls = get("rubik/stat/contracts/long-short-account-ratio", {"ccy": ccy, "period": "1H"})
         if ls:
@@ -88,7 +88,7 @@ def main():
         if oh:
             d["oi_hist"] = [[int(x[0]), f(x[1]), f(x[2])] for x in oh[:72]][::-1]   # ts, oi usd, volume usd
         inst = (get("public/instruments", {"instType": "SWAP", "instId": f"{ccy}-USDT-SWAP"}) or [{}])[0]
-        ct = f(inst.get("ctVal")) or (0.01 if ccy == "BTC" else 0.1)
+        ct = f(inst.get("ctVal")) or {"BTC": 0.01, "ETH": 0.1, "SOL": 1}.get(ccy, 1)
         lq = get("public/liquidation-orders", {"instType": "SWAP", "uly": f"{ccy}-USDT", "state": "filled"})
         if lq:
             det = [x for blk in lq for x in (blk.get("details") or [])]
@@ -113,7 +113,8 @@ def main():
     hist = prev.get("history", [])
     if coins and (not hist or NOW.timestamp() - hist[-1]["t"] >= 55 * 60):
         hist.append({"t": int(NOW.timestamp()), "oi": round(tot), "f": out["avg_funding"],
-                     "btc_oi": (out.get("BTC") or {}).get("oi_usd"), "eth_oi": (out.get("ETH") or {}).get("oi_usd")})
+                     "btc_oi": (out.get("BTC") or {}).get("oi_usd"), "eth_oi": (out.get("ETH") or {}).get("oi_usd"),
+                     "sol_oi": (out.get("SOL") or {}).get("oi_usd")})
     cut = NOW.timestamp() - 14 * 86400
     out["history"] = [h for h in hist if h["t"] >= cut]
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
