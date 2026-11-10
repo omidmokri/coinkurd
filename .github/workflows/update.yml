@@ -487,9 +487,13 @@ jobs:
       cancel-in-progress: false
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deploy1.outputs.page_url }}
     steps:
-      - id: deployment
+      # deploy-pages caps its wait at 10 minutes, and Pages sometimes takes longer to process the ~210 MB site
+      # ("Timeout reached, aborting!"). The artifact is already uploaded, so a second try simply deploys it again.
+      - id: deploy1
+        continue-on-error: true
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 1200000          # 20 min; the site artifact is ~210 MB
+      - id: deployment
+        if: steps.deploy1.outcome == 'failure'
+        uses: actions/deploy-pages@v4
