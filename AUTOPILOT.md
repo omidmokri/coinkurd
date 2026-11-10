@@ -7,17 +7,6 @@
 Every hour a fresh Claude session with no memory of earlier runs opens this file. It is the only memory the loop has:
 the mission, the rules, how to work, the backlog and the log. **Read all of it before doing anything.**
 
-## 1404/08/19 — فید یک‌هفته‌ای و three.js از مسیر بحرانی بیرون آمد
-صفحهٔ اصلی از `data/posts_week.json` باز می‌شود (۶۴ پست، ۲۶ KB روی سیم) به جای
-`posts_lite.json` (۱۱۲۹ پست، ۴۴۸ KB). آرشیو کامل فقط با جست‌وجو، فیلتر یا دکمهٔ
-«نمایش مطالب قدیمی‌تر» (`#archBtn`) گرفته می‌شود؛ `scripts/enrich.py` با
-`FEED_DAYS=7` و `FEED_MIN=40` این فایل را می‌سازد.
-`three.min.js` از `<head>` برداشته شد و پس از رویداد `load` و پیش از
-`land.js`/`cinema.js` بار می‌شود.
-اندازه‌گیری (۳ Mbps، ۳۹۰px): اولین کارت ۸٫۳s ← ۲٫۶s؛ first paint ۰٫۷۵s؛
-صفحهٔ اول ۱٫۰۸ MB / ۶۴ درخواست. آزمون سه‌زبانه بدون خطا؛ `build_pages.py`
-فایل `index.html` را دست‌نخورده گذاشت.
-
 ## Mission
 
 entekhab.net (repo `omidmokri/coinkurd`, GitHub Pages) is the site of the Persian/Kurdish crypto channel Coin_Kurd
@@ -154,6 +143,36 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-10 · Owner's two review files: frozen no-JS snapshot fixed, scanner grouped per coin, daily prediction in the group
+- **Root cause of most "critical" items:** the home page's prerendered (no-JS) snapshot — what crawlers, link
+  previews and AI reviewers read — had been frozen since 2026-11-07 15:09 UTC. The committed index.html held a
+  filled copy and `prerender()` only replaced empty placeholders. `refill()` in build_pages.py now finds each region
+  by id (empty or filled, keeping the page's own classes) and refreshes it every build; the committed template was
+  emptied again. Two builds in a row give identical output. **Never commit build output over index.html.**
+- Scanner: one card per coin (strongest finding first; the rest listed with "all agree" / "conflicting"); same in
+  the bot (5 languages) and the snapshot. A finding already shown as a confirmation is not repeated. Telegram share
+  link on every card.
+- Regime: the hourly label is renamed "24-hour market mood" so it is not read as the confirmed regime flipping; the
+  radar shows days in the regime and the model's typical stay (brain.py `radar.days_in`, `radar.mean_days`). The scan
+  universe is stated on the page.
+- Live class line: no more "starts in —" (hidden until the script runs), local digits, "live now" during class.
+- Prediction game: the daily question only lived inside the bot menu (0 votes most days); bot_hub now also posts it
+  in the group (`GROUP`) and refreshes the tally on each vote with a direct editMessageText (never `edit()`, whose
+  fallback re-posts).
+- Data older than 3 h shows ⚠️ next to its age. New home strip "Your own research tools" (lab, regime, track
+  record, my space, prediction, roundtable).
+- Claims in the review that were already wrong: rule layer + 5-day confirmation + typical stay (/regime/), strategy
+  lab with permutation and walk-forward (/strategy-lab/), watchlist/alerts/paper/badges (/me/), learning-map
+  progress saved (ck_map), plain-language "why" on each finding.
+- Checked: 3 languages, no JS errors, 12 scanner cards with no repeated coin, archive button, bot in 5 languages,
+  `new_rounds` with a fake poster (group once, no repeat, GROUP=None unchanged).
+
+### 2026-11-09 · Home feed opens on one week; three.js off the critical path (asked for by the owner)
+- Feed opens from `data/posts_week.json` (64 posts, 26 KB on the wire) instead of the whole archive (1129, 448 KB);
+  the archive loads on search, filters or "Show older posts". `scripts/enrich.py` writes it (`FEED_DAYS=7`,
+  `FEED_MIN=40`). three.min.js is fetched after `load`, before land.js/cinema.js.
+- 3 Mbps, 390 px: first card 8.3 s → 2.6 s; first screen 1.08 MB / 64 requests.
+
 ### 2026-11-09 · Broken images slice 2 investigated and closed without code (Backlog #1)
 - **Need checked:** cache the Iranian news-CDN images (donya-e-eqtesad, eghtesadnews, isna, ecoiran) in CI.
 - **Found:** those images live only in `data/news.json` → `regional.items[].img`, and nothing displays them: `assets/news.js`
