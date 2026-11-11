@@ -283,6 +283,7 @@ html.nx-room .nx{visibility:hidden;transition:visibility 0s .66s}
    the same room with solid glass and a flat wall — blur and perspective are what a software renderer cannot afford */
 html.nx-lite .nx-p,html.nx-lite #nxr,html.nx-lite #ekh .ek-brand,html.nx-lite #ekh .ek-nav,html.nx-lite #ekh .ek-tools,html.nx-lite #ekb,html.nx-lite .ekm-top{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.nx-lite .nx{perspective:none}
+html.nx-lite .nx-bgc{-webkit-mask-image:none;mask-image:none;inset-inline:24%;height:38%;opacity:.09}
 html.nx-lite .nx-col{transform:none}
 html.nx-lite .nx-p{background:var(--nx-glass),#0a0a0c;box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
 html.nx-lite .nx-p:hover,html.nx-lite .nx-p:focus-visible,html.nx-lite .nx-p.go{transform:translateY(-3px)}

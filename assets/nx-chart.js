@@ -91,7 +91,7 @@
 
   function nxChart(box, o) {
     o = o || {};
-    var mini = !!o.mini, sym = o.sym || 'BTC', tf = o.tf || '1h', F = null, dead = false;
+    var mini = !!o.mini, sym = o.sym || 'BTC', tf = o.tf || '1h', F = null, dead = false, frozen = null;
     var cv = document.createElement('canvas'), g = cv.getContext('2d');
     cv.className = 'nxc-cv'; cv.setAttribute('role', 'img'); if (!mini) cv.tabIndex = 0;
     box.appendChild(cv); box.setAttribute('dir', 'ltr');
@@ -99,7 +99,7 @@
     var AX = mini ? 0 : 64, AY = mini ? 0 : 22, PADT = mini ? 4 : 10;
     function size() { var r = box.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2); W = Math.max(40, Math.floor(r.width)); H = Math.max(30, Math.floor(r.height)); cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
     function view() {
-      var d = F ? F.d : [], len = d.length; n = Math.max(mini ? 12 : 20, Math.min(n, Math.max(20, len)));
+      var d = F ? F.d : (frozen || []), len = d.length; n = Math.max(mini ? 12 : 20, Math.min(n, Math.max(20, len)));
       off = Math.max(0, Math.min(off, Math.max(0, len - Math.floor(n / 2))));
       var end = len - Math.round(off), start = Math.max(0, end - n);
       return { d: d, start: start, end: end, pw: W - AX, ph: H - AY - PADT, cw: (W - AX - (mini ? 2 : 10)) / n };
@@ -166,6 +166,8 @@
       if (o.onData && l) o.onData(l, d.length > 1 ? d[d.length - 2] : null, f);
       if (hover == null && o.onHover && l) o.onHover(l, d.length > 1 ? d[d.length - 2] : null);
       ask();
+      /* a still picture (the stage backdrop): once the candles are in, let go of the feed so nothing redraws it */
+      if (o.once && d.length && F) { var G = F; F = null; setTimeout(function () { G.subs = G.subs.filter(function (x) { return x !== onFeed; }); if (!G.subs.length) G.stop(); }, 0); frozen = d; }
     }
     function attach() {
       if (F) { F.subs = F.subs.filter(function (x) { return x !== onFeed; }); if (!F.subs.length) F.stop(); }
