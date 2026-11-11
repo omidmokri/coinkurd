@@ -1,8 +1,8 @@
 {
- "updated_at": "2026-11-11T13:56:11.472242+00:00",
+ "updated_at": "2026-11-11T14:10:07.793369+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
-  "2026-11-10T13:00:00+00:00"
+  "2026-11-10T14:00:00+00:00"
  ],
  "hold_h": 24,
  "alpha": 0.05,
@@ -11,70 +11,103 @@
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
-  "breakout_up": {
-   "n": 500,
-   "obs": -1.12,
-   "win": 35.2,
-   "mid": -0.52,
-   "lo": -1.55,
-   "hi": 0.48,
-   "p": 0.2046,
-   "shifts": 1002,
-   "verdict": "no_edge"
+  "volume_spike": {
+   "n": 1558,
+   "obs": -0.43,
+   "win": 44.7,
+   "mid": 0.12,
+   "lo": -0.42,
+   "hi": 0.6,
+   "p": 0.0389,
+   "shifts": 1003,
+   "verdict": "worse"
   },
   "_all": {
-   "n": 6304,
+   "n": 6313,
    "obs": -0.11,
-   "win": 48.5,
-   "mid": -0.0,
-   "lo": -0.32,
-   "hi": 0.22,
-   "p": 0.3154,
-   "shifts": 1002,
+   "win": 48.4,
+   "mid": 0.0,
+   "lo": -0.33,
+   "hi": 0.21,
+   "p": 0.3141,
+   "shifts": 1003,
    "verdict": "no_edge"
   },
-  "rsi_overbought": {
-   "n": 427,
-   "obs": 1.55,
-   "win": 68.1,
-   "mid": 0.52,
+  "breakdown": {
+   "n": 877,
+   "obs": -0.8,
+   "win": 42.4,
+   "mid": 0.57,
    "lo": -0.4,
-   "hi": 1.37,
-   "p": 0.025,
-   "shifts": 1002,
+   "hi": 1.8,
+   "p": 0.0209,
+   "shifts": 1003,
+   "verdict": "worse"
+  },
+  "rsi_overbought": {
+   "n": 428,
+   "obs": 1.58,
+   "win": 68.2,
+   "mid": 0.52,
+   "lo": -0.34,
+   "hi": 1.36,
+   "p": 0.0199,
+   "shifts": 1003,
    "verdict": "better"
   },
-  "volume_spike": {
-   "n": 1551,
-   "obs": -0.41,
-   "win": 44.8,
-   "mid": 0.12,
-   "lo": -0.43,
-   "hi": 0.6,
-   "p": 0.0499,
-   "shifts": 1002,
-   "verdict": "worse"
+  "breakout_up": {
+   "n": 501,
+   "obs": -1.12,
+   "win": 35.1,
+   "mid": -0.52,
+   "lo": -1.6,
+   "hi": 0.45,
+   "p": 0.2034,
+   "shifts": 1003,
+   "verdict": "no_edge"
   },
-  "breakdown": {
-   "n": 878,
-   "obs": -0.81,
-   "win": 42.4,
-   "mid": 0.59,
-   "lo": -0.42,
-   "hi": 1.79,
-   "p": 0.019,
-   "shifts": 1002,
-   "verdict": "worse"
+  "ema_golden_cross": {
+   "n": 549,
+   "obs": -1.09,
+   "win": 36.1,
+   "mid": -0.6,
+   "lo": -1.49,
+   "hi": 0.28,
+   "p": 0.2752,
+   "shifts": 1003,
+   "verdict": "no_edge"
+  },
+  "bear_divergence": {
+   "n": 429,
+   "obs": 1.43,
+   "win": 64.1,
+   "mid": 0.53,
+   "lo": -0.31,
+   "hi": 1.26,
+   "p": 0.0259,
+   "shifts": 1003,
+   "verdict": "better"
+  },
+  "bull_divergence": {
+   "n": 528,
+   "obs": -0.65,
+   "win": 48.5,
+   "mid": -0.55,
+   "lo": -1.62,
+   "hi": 0.31,
+   "p": 0.8215,
+   "shifts": 1003,
+   "verdict": "no_edge"
   },
   "rsi_oversold": {
-   "n": 875,
+   "n": 873,
    "obs": 0.94,
    "win": 58.2,
-   "mid": -0.61,
-   "lo": -1.86,
-   "hi": 0.42,
-   "p": 0.015,
-   "shifts": 1002,
+   "mid": -0.6,
+   "lo": -1.91,
+   "hi": 0.41,
+   "p": 0.013,
+   "shifts": 1003,
    "verdict": "better"
   },
   "ema_death_cross": {
@@ -83,42 +116,9 @@
    "win": 50.0,
    "mid": 0.53,
    "lo": -1.1,
-   "hi": 1.54,
-   "p": 0.4431,
-   "shifts": 1002,
-   "verdict": "no_edge"
-  },
-  "bear_divergence": {
-   "n": 428,
-   "obs": 1.45,
-   "win": 64.3,
-   "mid": 0.52,
-   "lo": -0.29,
-   "hi": 1.27,
-   "p": 0.024,
-   "shifts": 1002,
-   "verdict": "better"
-  },
-  "ema_golden_cross": {
-   "n": 548,
-   "obs": -1.09,
-   "win": 36.1,
-   "mid": -0.6,
-   "lo": -1.5,
-   "hi": 0.28,
-   "p": 0.2764,
-   "shifts": 1002,
-   "verdict": "no_edge"
-  },
-  "bull_divergence": {
-   "n": 527,
-   "obs": -0.65,
-   "win": 48.6,
-   "mid": -0.54,
-   "lo": -1.66,
-   "hi": 0.31,
-   "p": 0.8114,
-   "shifts": 1002,
+   "hi": 1.53,
+   "p": 0.4247,
+   "shifts": 1003,
    "verdict": "no_edge"
   }
  }
