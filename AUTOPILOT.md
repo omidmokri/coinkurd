@@ -154,6 +154,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-11 · /satoshi/: real 3D block cubes + the way back to block zero (owner's request, done in chat, not by the loop)
+- assets/btc-live.js + CSS in scripts/build_satoshi.py (VER 4). Each block is a CSS-3D cube (front/side/top faces, no
+  WebGL, no new download); its faces are painted as high as the block was full (weight / 4,000,000). Block 0 is gold.
+- New bar above the belt: search by height, block hash or date (Gregorian or Solar Hijri; a date opens its last block,
+  UTC), a slider from now to block 0, milestone chips (0, 170, 57,043, 74,638, the four halvings) and an "older blocks"
+  cube at the end of the belt that keeps loading 15 more. All from mempool.space in the browser: `/v1/blocks/<h>`,
+  `/v1/block/<hash>`, `/v1/mining/blocks/timestamp/<ts>`. Nothing is stored or invented; errors say so in words.
+- Checked with Playwright against a mocked API at 1280/390 px, fa + en (height, Persian digits, hash, dates, bad input,
+  older ×2 contiguous, slider, chips, back to live; no JS errors) and against the real API in the owner's browser.
+
 ### 2026-11-10 · SEO audit (OpenSEO): titles ≤ 60, descriptions ≤ 160 on all 5,498 pages; IndexNow
 - build_pages.seo_title / seo_desc (decoration such as ━━━ and emoji removed, cut at a word boundary, "…") in page();
   scripts/seo_tidy.py as the last build step catches the pages with their own templates. og:* tags keep full text.
