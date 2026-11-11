@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-11T09:25:00.651622+00:00",
+ "updated_at": "2026-11-11T09:38:50.916208+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-10T09:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1551,
+   "n": 1549,
    "obs": -0.39,
    "win": 44.9,
    "mid": 0.12,
    "lo": -0.43,
    "hi": 0.61,
-   "p": 0.0541,
+   "p": 0.0531,
    "shifts": 998,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6333,
+   "n": 6330,
    "obs": -0.1,
    "win": 48.6,
    "mid": 0.0,
    "lo": -0.31,
    "hi": 0.23,
-   "p": 0.3477,
+   "p": 0.3467,
    "shifts": 998,
    "verdict": "no_edge"
   },
@@ -78,13 +78,13 @@
    "verdict": "better"
   },
   "bull_divergence": {
-   "n": 533,
+   "n": 532,
    "obs": -0.66,
-   "win": 48.6,
+   "win": 48.5,
    "mid": -0.54,
    "lo": -1.65,
-   "hi": 0.27,
-   "p": 0.8056,
+   "hi": 0.28,
+   "p": 0.7996,
    "shifts": 998,
    "verdict": "no_edge"
   },
