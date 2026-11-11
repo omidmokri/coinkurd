@@ -254,8 +254,8 @@
       '<div class="nxm-seg" role="group" data-g="tf">' + TFS.map(function (t) { return '<button type="button" data-v="' + t[0] + '" aria-pressed="' + (t[0] === '1h' ? 'true' : 'false') + '">' + tri(t[1], t[2], t[3]) + '</button>'; }).join('') + '</div>' +
       '<div class="nxm-seg" role="group" data-g="zoom"><button type="button" data-v="in" data-afa="بزرگ‌نمایی" data-ackb="گەورەکردن" data-aen="Zoom in">+</button><button type="button" data-v="out" data-afa="کوچک‌نمایی" data-ackb="بچووککردن" data-aen="Zoom out">−</button></div>' +
       '<span class="nxm-st" role="status"><i></i><span></span></span></div>' +
-      '<div class="nxm-leg"><span class="px">—</span><span class="ch"></span><span>O <b data-o></b></span><span>H <b data-h></b></span><span>L <b data-l></b></span><span>C <b data-c></b></span><span>Vol <b data-v></b></span><span data-t></span></div>' +
-      '<div class="nxm-cv"></div><div class="nxm-k" data-k></div>' +
+      '<div class="nxm-leg"><b data-sy>BTC/USDT</b><span class="px">—</span><span class="ch"></span><span>O <b data-o></b></span><span>H <b data-h></b></span><span>L <b data-l></b></span><span>C <b data-c></b></span><span>Vol <b data-v></b></span><span data-t></span></div>' +
+      '<div class="nxm-cv"></div><div class="nxm-k" data-k></div><div class="nxm-r" data-r></div>' +
       '<p class="nxm-note">' + tri('کندل‌ها مستقیم از دادهٔ عمومی بایننس (جفت‌ارز با تتر) خوانده می‌شوند؛ اگر اتصال برقرار نشود، نمودار همین را می‌گوید و عددی ساخته نمی‌شود. با کشیدن جابه‌جا کنید؛ برای بزرگ‌نمایی با چرخ ماوس، اول روی نمودار کلیک کنید.',
         'مۆمەکان ڕاستەوخۆ لە داتای گشتیی بایننس (جووت لەگەڵ تەتەر) دەخوێنرێنەوە؛ ئەگەر پەیوەندی نەکرێت، هێڵکاری هەمان شت دەڵێت و هیچ ژمارەیەک دروست ناکرێت. بە ڕاکێشان بیجووڵێنە؛ بۆ گەورەکردن بە چەرخی ماوس، سەرەتا کرتە لە هێڵکاری بکە.',
         'Candles are read straight from Binance public market data (USDT pairs); if the connection fails the chart says so and no number is made up. Drag to pan; click the chart first to zoom with the wheel.') + '</p>';
@@ -280,8 +280,38 @@
       var b = e.target.closest && e.target.closest('button[data-v]'); if (!b) return; var g = b.parentNode.getAttribute('data-g'), v = b.getAttribute('data-v');
       if (g === 'zoom') { mk.zoom(v === 'in' ? 1 / 1.3 : 1.3); return; }
       [].forEach.call(b.parentNode.children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      if (g === 'sym') mk.setSym(v); else mk.setTF(v);
+      if (g === 'sym') pickSym(v); else mk.setTF(v);
     });
+    function pickSym(s) {
+      mk.setSym(s); q('[data-sy]').textContent = s + '/USDT';
+      [].forEach.call(box.querySelectorAll('[data-g=sym] button'), function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-v') === s ? 'true' : 'false'); });
+      [].forEach.call(box.querySelectorAll('.nxm-rank tr[data-sym]'), function (x) { x.classList.toggle('on', x.getAttribute('data-sym') === s); });
+    }
+    /* the most traded coins of the last 24 hours, from the site's own scan of Binance; prices and changes tick live.
+       A coin is listed only with its own logo. Choosing one puts it on the chart above. */
+    var STB = ['USDT', 'USDC', 'DAI', 'FDUSD', 'TUSD', 'USDE', 'USD1', 'BFUSD', 'XUSD', 'EUR', 'EURI', 'AEUR', 'RLUSD', 'PYUSD', 'USDP'], rt = 0;
+    function rank() {
+      var host = box.querySelector('[data-r]'), cs, at = ''; if (!host || host.firstChild) return;
+      try { cs = X.market.coins.filter(function (c) { return c && c.qvol > 0 && c.price > 0 && STB.indexOf(c.coin) < 0 && /^[A-Z0-9]{2,10}$/.test(c.coin); }).sort(function (a, b) { return b.qvol - a.qvol; }).slice(0, 12); at = X.market.updated_at; } catch (e) { cs = null; }
+      if (!cs || !cs.length) { if (++rt < 6) setTimeout(rank, 2000); return; }
+      var h = '<h3>' + tri('پرمعامله‌ترین‌های ۲۴ ساعت گذشته در بایننس', 'زۆرترین مامەڵەکراوەکانی ٢٤ کاتژمێری ڕابردوو لە بایننس', 'Most traded on Binance in the last 24 hours') +
+        ' <small>' + tri('قیمت و تغییر زنده‌اند؛ برای دیدن نمودار، ارز را انتخاب کنید', 'نرخ و گۆڕان ڕاستەوخۆن؛ بۆ بینینی هێڵکاری دراوەکە هەڵبژێرە', 'price and change are live; choose a coin to chart it') + '</small></h3>' +
+        '<table class="nxm-rank"><thead><tr><th scope="col" class="n">#</th><th scope="col">' + tri('ارز', 'دراو', 'Coin') + '</th><th scope="col">' + tri('قیمت', 'نرخ', 'Price') + '</th><th scope="col">' + tri('۲۴ ساعت', '٢٤ کاتژمێر', '24h') +
+        '</th><th scope="col" class="hm">' + tri('۴۸ ساعت اخیر', '٤٨ کاتژمێری دوایی', 'Last 48h') + '</th><th scope="col" class="hm">' + tri('حجم ۲۴ ساعته', 'قەبارەی ٢٤ کاتژمێر', '24h volume') + '</th></tr></thead><tbody>';
+      cs.forEach(function (c, i) {
+        var sp = c.spark || [], lo = Math.min.apply(null, sp), hi = Math.max.apply(null, sp), pts = '', up = sp.length > 1 && sp[sp.length - 1] >= sp[0];
+        sp.forEach(function (v, k) { pts += (k / (sp.length - 1) * 90 + 1).toFixed(1) + ',' + (24 - (hi > lo ? (v - lo) / (hi - lo) : .5) * 22).toFixed(1) + ' '; });
+        h += '<tr data-sym="' + c.coin + '"' + (c.coin === 'BTC' ? ' class="on"' : '') + '><td class="n">' + (i + 1) + '</td><td><button type="button" data-sym="' + c.coin + '"><img src="/data/logos/' + c.coin + '.png" alt="" width="24" height="24" loading="lazy" decoding="async">' + c.coin + '</button></td>' +
+          '<td class="num"><b data-live="' + c.coin + '">' + U.fmtUsd(c.price) + '</b></td><td class="num"><span data-livechg="' + c.coin + '" class="' + (c.chg24 >= 0 ? 'up' : 'down') + '">' + (c.chg24 == null ? '' : (c.chg24 >= 0 ? '+' : '') + c.chg24.toFixed(2) + '%') + '</span></td>' +
+          '<td class="hm">' + (pts ? '<svg viewBox="0 0 92 26" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="' + (up ? '#34d399' : '#ff5a4d') + '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>' : '') + '</td>' +
+          '<td class="num hm">$' + w.nxChart.fmtV(c.qvol) + '</td></tr>';
+      });
+      host.innerHTML = h + '</tbody></table>'; host.title = pick('اسکن بایننس در ', 'سکانی بایننس لە ', 'Binance scan of ') + U.hhmm(at);
+      [].forEach.call(host.querySelectorAll('img'), function (im) { im.addEventListener('error', function () { var tr = im.closest('tr'); if (tr) tr.remove(); }); });   /* no logo, no row */
+      host.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('button[data-sym]'); if (!b) return; pickSym(b.getAttribute('data-sym')); try { box.scrollIntoView({ block: 'start', behavior: RM ? 'auto' : 'smooth' }); } catch (x) { } });
+      if (w.liveRefresh) w.liveRefresh();
+    }
+    rank();
     function kp(j) {
       var k = box.querySelector('[data-k]'), g = j && j.g, h = ''; if (!k || !j) return;
       function cell(lab, val) { h += '<div><small>' + lab + '</small><b>' + val + '</b></div>'; }
