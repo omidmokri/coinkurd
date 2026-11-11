@@ -262,6 +262,21 @@ html.nx-room .nx{visibility:hidden;transition:visibility 0s .66s}
 .nxm-k div{padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
 .nxm-k small{display:block;font-size:.7rem;color:rgba(255,255,255,.52)}
 .nxm-k b{display:block;margin-top:2px;font:700 1.02rem 'Space Grotesk',var(--ek-font);font-variant-numeric:tabular-nums;direction:ltr;text-align:start}
+.nxm-r{margin-top:18px}
+.nxm-r h3{margin:0 0 8px;font:800 .98rem/1.6 var(--ek-font);color:#fff}
+.nxm-r h3 small{display:block;font-weight:400;font-size:.72rem;color:rgba(255,255,255,.5)}
+.nxm-rank{width:100%;border-collapse:collapse;font-size:.86rem;color:#fff}
+.nxm-rank th{padding:6px 8px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.5);text-align:start;border-bottom:1px solid rgba(255,255,255,.12);background:none}
+.nxm-rank td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle;background:none}
+.nxm-rank tr.on td{background:rgba(247,147,26,.08)}
+.nxm-rank .n{width:2.4em;font-family:'Space Grotesk',var(--ek-font);color:rgba(255,255,255,.45)}
+.nxm-rank button{display:flex;align-items:center;gap:9px;min-height:36px;padding:3px 8px;border:0;border-radius:10px;background:none;color:#fff;font:700 .88rem 'Space Grotesk',var(--ek-font);cursor:pointer}
+.nxm-rank button:hover{background:rgba(247,147,26,.16)}
+.nxm-rank img{width:24px;height:24px;border-radius:50%;background:#111}
+.nxm-rank .num{font-family:'Space Grotesk',var(--ek-font);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;text-align:start;white-space:nowrap}
+.nxm-rank svg{display:block;width:92px;height:26px}
+@media (max-width:560px){.nxm-rank .hm{display:none}}
+.nxm-leg [data-sy]{color:var(--nx-or)}
 .nxm-note{margin:10px 2px 0;font-size:.7rem;line-height:1.7;color:rgba(255,255,255,.42)}
 
 /* ------------------------------------------------------------------ no graphics chip (class set by nx.js), or the visitor asked for less transparency:

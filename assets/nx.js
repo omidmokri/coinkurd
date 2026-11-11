@@ -41,7 +41,7 @@
   var tick = null, tickP = null;
   function ticker() { return tickP || (tickP = fetch('/data/ticker.json?v=' + Math.floor(Date.now() / 3e5)).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) { tick = j; return j; })); }
   function live() { if (w.liveRefresh) { w.liveRefresh(); return; } if (d.querySelector('script[data-nx-live]')) return; var s = d.createElement('script'); s.src = '/assets/live.js'; s.setAttribute('data-nx-live', '1'); d.body.appendChild(s); }
-  function fmtUsd(p) { return '$' + p.toLocaleString('en-US', { maximumFractionDigits: p >= 1000 ? 0 : 2 }); }
+  function fmtUsd(p) { return '$' + p.toLocaleString('en-US', { maximumFractionDigits: p >= 1000 ? 0 : p >= 1 ? 2 : p >= .01 ? 5 : 8 }); }
   function hhmm(iso) { try { var t = new Date(iso); return ('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2); } catch (e) { return ''; } }
 
   /* until the socket speaks, every live price on the page shows the site's last recorded one (data/ticker.json) */
