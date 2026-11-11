@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-11T18:16:01.134905+00:00",
+ "updated_at": "2026-11-11T18:30:40.026870+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-10T18:00:00+00:00"
@@ -12,9 +12,9 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "breakdown": {
-   "n": 840,
-   "obs": -0.84,
-   "win": 42.5,
+   "n": 839,
+   "obs": -0.83,
+   "win": 42.6,
    "mid": 0.55,
    "lo": -0.37,
    "hi": 1.77,
@@ -23,20 +23,20 @@
    "verdict": "worse"
   },
   "_all": {
-   "n": 6326,
+   "n": 6324,
    "obs": -0.14,
    "win": 48.2,
    "mid": 0.01,
-   "lo": -0.34,
+   "lo": -0.35,
    "hi": 0.22,
-   "p": 0.1787,
+   "p": 0.1807,
    "shifts": 1007,
    "verdict": "no_edge"
   },
   "rsi_oversold": {
-   "n": 850,
+   "n": 849,
    "obs": 0.97,
-   "win": 57.9,
+   "win": 58.0,
    "mid": -0.59,
    "lo": -1.86,
    "hi": 0.39,
