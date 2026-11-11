@@ -1,8 +1,8 @@
 {
- "updated_at": "2026-11-11T06:58:08.811668+00:00",
+ "updated_at": "2026-11-11T07:11:20.807306+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
-  "2026-11-10T06:00:00+00:00"
+  "2026-11-10T07:00:00+00:00"
  ],
  "hold_h": 24,
  "alpha": 0.05,
@@ -11,37 +11,59 @@
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
+  "ema_golden_cross": {
+   "n": 546,
+   "obs": -1.04,
+   "win": 36.8,
+   "mid": -0.6,
+   "lo": -1.54,
+   "hi": 0.32,
+   "p": 0.3072,
+   "shifts": 996,
+   "verdict": "no_edge"
+  },
+  "_all": {
+   "n": 6354,
+   "obs": -0.08,
+   "win": 48.8,
+   "mid": 0.0,
+   "lo": -0.32,
+   "hi": 0.22,
+   "p": 0.3936,
+   "shifts": 996,
+   "verdict": "no_edge"
+  },
   "volume_spike": {
    "n": 1561,
    "obs": -0.36,
    "win": 45.2,
-   "mid": 0.13,
-   "lo": -0.39,
+   "mid": 0.12,
+   "lo": -0.4,
    "hi": 0.62,
-   "p": 0.0593,
-   "shifts": 995,
+   "p": 0.0622,
+   "shifts": 996,
    "verdict": "no_edge"
   },
-  "_all": {
-   "n": 6350,
-   "obs": -0.09,
-   "win": 48.8,
-   "mid": 0.01,
-   "lo": -0.31,
-   "hi": 0.21,
-   "p": 0.3729,
-   "shifts": 995,
-   "verdict": "no_edge"
+  "rsi_overbought": {
+   "n": 427,
+   "obs": 1.43,
+   "win": 67.4,
+   "mid": 0.49,
+   "lo": -0.49,
+   "hi": 1.4,
+   "p": 0.0482,
+   "shifts": 996,
+   "verdict": "better"
   },
   "ema_death_cross": {
-   "n": 581,
+   "n": 580,
    "obs": 0.13,
-   "win": 50.3,
-   "mid": 0.49,
-   "lo": -1.17,
-   "hi": 1.39,
-   "p": 0.5216,
-   "shifts": 995,
+   "win": 50.2,
+   "mid": 0.48,
+   "lo": -1.16,
+   "hi": 1.41,
+   "p": 0.5412,
+   "shifts": 996,
    "verdict": "no_edge"
   },
   "breakout_up": {
@@ -49,54 +71,43 @@
    "obs": -1.05,
    "win": 35.7,
    "mid": -0.49,
-   "lo": -1.53,
-   "hi": 0.43,
-   "p": 0.2603,
-   "shifts": 995,
+   "lo": -1.55,
+   "hi": 0.4,
+   "p": 0.255,
+   "shifts": 996,
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 890,
+   "n": 889,
    "obs": -0.81,
-   "win": 42.7,
-   "mid": 0.63,
-   "lo": -0.47,
-   "hi": 1.82,
-   "p": 0.0211,
-   "shifts": 995,
+   "win": 42.6,
+   "mid": 0.62,
+   "lo": -0.46,
+   "hi": 1.85,
+   "p": 0.0191,
+   "shifts": 996,
    "verdict": "worse"
   },
   "rsi_oversold": {
    "n": 883,
    "obs": 0.95,
    "win": 58.3,
-   "mid": -0.64,
-   "lo": -2.0,
-   "hi": 0.56,
-   "p": 0.0191,
-   "shifts": 995,
+   "mid": -0.65,
+   "lo": -2.01,
+   "hi": 0.52,
+   "p": 0.0171,
+   "shifts": 996,
    "verdict": "better"
-  },
-  "rsi_overbought": {
-   "n": 424,
-   "obs": 1.41,
-   "win": 67.5,
-   "mid": 0.49,
-   "lo": -0.49,
-   "hi": 1.34,
-   "p": 0.0513,
-   "shifts": 995,
-   "verdict": "no_edge"
   },
   "bull_divergence": {
    "n": 534,
    "obs": -0.66,
    "win": 48.5,
-   "mid": -0.55,
-   "lo": -1.68,
-   "hi": 0.29,
-   "p": 0.798,
-   "shifts": 995,
+   "mid": -0.53,
+   "lo": -1.66,
+   "hi": 0.28,
+   "p": 0.7811,
+   "shifts": 996,
    "verdict": "no_edge"
   },
   "bear_divergence": {
@@ -104,22 +115,11 @@
    "obs": 1.55,
    "win": 64.8,
    "mid": 0.52,
-   "lo": -0.48,
+   "lo": -0.47,
    "hi": 1.44,
-   "p": 0.0322,
-   "shifts": 995,
+   "p": 0.0321,
+   "shifts": 996,
    "verdict": "better"
-  },
-  "ema_golden_cross": {
-   "n": 543,
-   "obs": -1.06,
-   "win": 36.6,
-   "mid": -0.58,
-   "lo": -1.56,
-   "hi": 0.31,
-   "p": 0.2693,
-   "shifts": 995,
-   "verdict": "no_edge"
   }
  }
 }
