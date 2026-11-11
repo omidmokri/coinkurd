@@ -60,10 +60,11 @@
     var gl = null, at = { alpha: true, antialias: true, premultipliedAlpha: true, powerPreference: 'high-performance' };
     try { gl = cv.getContext('webgl', at) || cv.getContext('experimental-webgl', at); } catch (e) { }
     if (!gl) return null;
-    /* no graphics chip (software rendering): a spinning WebGL coin would freeze the page — the caller keeps its still coin */
+    /* headless and Linux software renderers draw this at a few frames a second: there the caller keeps its still coin.
+       (Windows' software driver is fast enough — measured ~3 ms a frame — and stays under the frame-rate watchdog below.) */
     try {
       var dbg = gl.getExtension('WEBGL_debug_renderer_info'), rend = String((dbg && gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) || gl.getParameter(gl.RENDERER) || '');
-      if (/swiftshader|llvmpipe|software|basic render/i.test(rend) && !window.NX_FORCE_GL) return null;
+      if (/swiftshader|llvmpipe/i.test(rend) && !window.NX_FORCE_GL) return null;
     } catch (e) { }
     var P1, P2, P3;
     try { P1 = prog(gl, VS, FS); P2 = prog(gl, VS2, FS2); P3 = prog(gl, VS3, FS3); } catch (e) { if (window.console) console.warn('nxCoin', e); return null; }
