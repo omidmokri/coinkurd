@@ -390,6 +390,7 @@ AC = {
     "b_place": {"fa": "🧭 آزمون تعیین سطح", "ckb": "🧭 تاقیکردنەوەی ئاست", "kmr": "🧭 Ezmûna astê", "ar": "🧭 اختبار تحديد المستوى",
                 "en": "🧭 Placement test"},
     "b_gloss": {"fa": "📖 واژه‌نامه", "ckb": "📖 فەرهەنگ", "kmr": "📖 Ferheng", "ar": "📖 المسرد", "en": "📖 Glossary"},
+    "b_sat": {"fa": "🕯 داستان ساتوشی", "ckb": "🕯 چیرۆکی ساتۆشی", "kmr": "🕯 Çîroka Satoshi", "ar": "🕯 قصة ساتوشي", "en": "🕯 Satoshi's story"},
     "b_me": {"fa": "📊 داشبورد من", "ckb": "📊 داشبۆردەکەم", "kmr": "📊 Panela min", "ar": "📊 لوحتي", "en": "📊 My dashboard"},
     "b_back": {"fa": "📚 آموزش و امنیت", "ckb": "📚 فێربوون و ئاسایش", "kmr": "📚 Perwerde û ewlehî", "ar": "📚 التعلم والأمان",
                "en": "📚 Learning & safety"},
@@ -447,7 +448,7 @@ def academy(lang):
     rows += [fac_btns[i:i + 2] for i in range(0, len(fac_btns), 2)]
     rows += [[u("b_path", "/learn/"), u("b_lab", "/academy/lab/")],
              [u("b_place", "/academy/placement/"), u("b_gloss", "/glossary/")],
-             [u("b_me", "/academy/me/")],
+             [u("b_me", "/academy/me/"), u("b_sat", "/satoshi/")],
              [{"text": L(AC["b_back"], lang), "callback_data": "m:learn"}, {"text": L(AC["b_home"], lang), "callback_data": "m:main"}]]
     return "\n".join(out), rows
 

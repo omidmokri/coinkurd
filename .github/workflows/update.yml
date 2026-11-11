@@ -80,6 +80,11 @@ jobs:
         continue-on-error: true
         run: python scripts/market.py
 
+      - name: Chart snapshot and header ticker (fallback for visitors who cannot reach an exchange)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/candles.py
+
       - name: Scanner track record (one-time 40-day backtest + live log of every finding)
         id: scanlog
         continue-on-error: true
@@ -389,7 +394,7 @@ jobs:
 
       - name: Build the quant pages (regime, truth lab, anomalies)
         continue-on-error: true
-        run: python scripts/build_quant.py && python scripts/build_strategy_lab.py && python scripts/build_dca.py && python scripts/build_derivatives.py && python scripts/build_leaderboard.py
+        run: python scripts/build_quant.py && python scripts/build_strategy_lab.py && python scripts/build_dca.py && python scripts/build_satoshi.py && python scripts/build_derivatives.py && python scripts/build_leaderboard.py
 
       - name: Build the Roundtable page
         continue-on-error: true

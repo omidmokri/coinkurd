@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "13"  # bump to bust caches of chrome.css / chrome.js
+VER = "14"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -216,6 +216,9 @@ NAV = [
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
         ("/map/", "map", L("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
          L("هر چیزی که باید بلد باشید، روی یک نقشه — با تیک زدن پیشرفت", "هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە — بە نیشانەکردنی پێشکەوتن", "Everything there is to learn on one map — tick your way through it")),
+        ("/satoshi/", "eye", L("داستان ساتوشی", "چیرۆکی ساتۆشی", "Satoshi's story"),
+         L("از مقالهٔ ۹ صفحه‌ای تا سکوت، در ۱۲ بلاک؛ با تاریخ دقیق و بدون حدس دربارهٔ هویت", "لە توێژینەوەی ٩ لاپەڕەییەوە تا بێدەنگی، لە ١٢ بلۆکدا؛ بە بەرواری ورد و بێ مەزەندە دەربارەی ناسنامە",
+           "From a nine-page paper to silence, in twelve blocks; exact dates, no guessing about identity")),
         ("/kids/", "cap", L("بیت‌کوین برای کودکان", "بیتکۆین بۆ منداڵان", "Bitcoin for Juniors"),
          L("برنامهٔ درسی آزاد و رایگان برای ۸ تا ۱۲ سال: ۶ فصل و ۲۱ فعالیت با بازی، قصه و کاردستی — به فارسی، کوردی و انگلیسی",
            "بەرنامەی وانەیی کراوە و بێبەرامبەر بۆ ٨ تا ١٢ ساڵ: ٦ بەش و ٢١ چالاکی بە یاری، چیرۆک و دەستکاری — بە فارسی، کوردی و ئینگلیزی",
@@ -395,14 +398,21 @@ def footer(lang="fa"):
 # before it, so placed lower the preview's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "1"
-UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([12])(?:&|$)/.exec(location.search);'
+UI2_VER = "2"
+NX_VER = "1"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
+UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "if(m){L.setItem('ek_ui',m[1]);try{var u=new URL(location.href);u.searchParams.delete('ui');"
            "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}"
-           "if(L.getItem('ek_ui')==='2'){var c=document.documentElement.classList;c.add('ek-v2');"
-           "if(/^\\/(index\\.html)?$/.test(location.pathname)){c.add('ek-deck');setTimeout(function(){if(!window.ekUI2)c.remove('ek-deck')},7000)}"
-           f"document.write('<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\"><script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>')"
-           "}}catch(e){}})()</script>")
+           "var v=L.getItem('ek_ui');if(v==='2'||v==='3'){var c=document.documentElement.classList,n=v==='3',"
+           "h=/^\\/(index\\.html)?$/.test(location.pathname);c.add('ek-v2');if(n)c.add('ek-v3');"
+           "if(h)c.add('ek-deck');setTimeout(function(){if(h&&!window.ekUI2)c.remove('ek-deck');if(n&&h&&!window.ekNX)c.remove('ek-v3')},7000);"
+           f"var s='<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\">';"
+           f"if(n)s+='<link rel=\"stylesheet\" href=\"/assets/nx.css?v={NX_VER}\">';"
+           f"s+='<script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>';"
+           f"if(n){{if(h)s+='<link rel=\"preload\" as=\"image\" href=\"/assets/coin-front.webp\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
+           f"if(h)s+='<script src=\"/assets/nx-coin.js?v={NX_VER}\" defer><\\/script><script src=\"/assets/nx-chart.js?v={NX_VER}\" defer><\\/script>"
+           f"<script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
+           "document.write(s)}}catch(e){}})()</script>")
 HEAD_TAGS = (f'<link rel="stylesheet" href="/assets/chrome.css?v={VER}">'
              f'<meta name="referrer" content="strict-origin-when-cross-origin">')
 BODY_TAGS = f'<script src="/assets/chrome.js?v={VER}" defer></script>'
