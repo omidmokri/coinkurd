@@ -112,13 +112,13 @@
         row(L('سهم استخراج‌شده از سقف', 'ڕێژەی کانکراو لە سنوور', 'Share of the cap mined'), (sup / 21e6 * 100).toFixed(3) + '%') + row(L('قیمت', 'نرخ', 'Price'), p ? '$' + N(p) : null) +
         row(L('ارزش بازار', 'بەهای بازاڕ', 'Market value'), p ? usd(p * sup) : null) + row(L('پاداش هر بلاک', 'پاداشتی هەر بلۆک', 'Reward per block'), sub + ' BTC') +
         row(L('انتشار سالانهٔ سکهٔ تازه', 'دەرچوونی ساڵانەی دراوی نوێ', 'New coins per year'), (sub * 52560 / sup * 100).toFixed(2) + '%', N(sub * 52560) + ' BTC'));
-      var span = day.span || 86400, rev = day.reward != null ? day.reward / 1e8 : null, fee = day.fee != null ? day.fee / 1e8 : null;
+      var span = day.span || (a.timeAvg ? 144 * a.timeAvg / 1000 : 86400), rev = day.reward != null ? day.reward / 1e8 : null, fee = day.fee != null ? day.fee / 1e8 : null;
       card(L('۱۴۴ بلاک اخیر (حدود یک روز)', '١٤٤ بلۆکی دوایی (نزیکەی ڕۆژێک)', 'Last 144 blocks (about a day)'),
         row(L('تراکنش‌ها', 'مامەڵەکان', 'Transactions'), day.tx != null ? N(day.tx) : null, day.tx != null ? (day.tx / span).toFixed(1) + L(' در ثانیه', ' لە چرکەیەکدا', ' a second') : '') +
         row(L('درآمد ماینرها', 'داهاتی ماینەرەکان', 'Miner revenue'), rev != null ? N(rev, 2) + ' BTC' : null, rev != null && p ? usd(rev * p) : '') +
         row(L('از آن، کارمزد', 'لەوە، کرێ', 'Of which fees'), fee != null ? N(fee, 2) + ' BTC' : null, fee != null && rev ? (fee / rev * 100).toFixed(1) + '%' : '') +
         row(L('میانگین کارمزد هر تراکنش', 'تێکڕای کرێی هەر مامەڵە', 'Average fee per transaction'), day.fee != null && day.tx ? N(day.fee / day.tx) + ' sat' : null, day.fee != null && day.tx && p ? usd(day.fee / day.tx * p / 1e8) : '') +
-        row(L('میانگین فاصلهٔ بلاک‌ها', 'تێکڕای ماوەی نێوان بلۆکەکان', 'Average time between blocks'), day.span ? (day.span / 144 / 60).toFixed(1) + L(' دقیقه', ' خولەک', ' min') : null) +
+        row(L('میانگین فاصلهٔ بلاک‌ها', 'تێکڕای ماوەی نێوان بلۆکەکان', 'Average time between blocks'), day.span ? (day.span / 144 / 60).toFixed(1) + L(' دقیقه', ' خولەک', ' min') : a.timeAvg ? (a.timeAvg / 60000).toFixed(1) + L(' دقیقه', ' خولەک', ' min') : null, day.span ? '' : (a.timeAvg ? L('در این دورهٔ سختی', 'لەم خولی سەختییەدا', 'this difficulty period') : '')) +
         row(L('حجم جابه‌جاشده', 'قەبارەی گواستراوە', 'Volume moved'), bc.vol_24h ? N(bc.vol_24h / 1e8) + ' BTC' : null, bc.vol_24h && p ? usd(bc.vol_24h / 1e8 * p) : '') +
         row(L('بزرگ‌ترین تراکنش', 'گەورەترین مامەڵە', 'Largest transaction'), bc.largest_usd ? usd(bc.largest_usd) : null));
       card(L('کارمزد و صف انتظار', 'کرێ و ڕیزی چاوەڕوانی', 'Fees and the queue'),
@@ -174,6 +174,19 @@
         setState('live'); render();
       }).catch(function () { if (alive && state !== 'live') setState(D.blocks ? 'snap' : 'fail'); });
     }
+    /* the slower numbers (a day of blocks, pools, a year of hashrate, Lightning): asked from the network itself once, then every 10 minutes */
+    function slow() {
+      if (!alive || d.hidden) return;
+      var done = function () { if (alive) grid(); };
+      getJSON(MP + '/v1/mining/reward-stats/144').then(function (r) { if (r && r.totalTx) { var sp = D.day && D.day.end === r.endBlock ? D.day.span : null; D.day = { blocks: 144, reward: +r.totalReward, fee: +r.totalFee, tx: +r.totalTx, start: r.startBlock, end: r.endBlock, span: sp }; done(); } }).catch(function () { });
+      getJSON(MP + '/v1/mining/pools/1w').then(function (r) { if (r && r.pools && r.pools.length) { D.pools = { total: r.blockCount, list: r.pools.slice(0, 8).map(function (p) { return [p.name, p.blockCount]; }) }; done(); } }).catch(function () { });
+      getJSON(MP + '/v1/mining/hashrate/1y', 12000).then(function (r) {
+        if (!r || !r.hashrates || !r.hashrates.length) return; var hs = r.hashrates, st = Math.max(1, Math.floor(hs.length / 60));
+        D.hr = hs.filter(function (x, i) { return i % st === 0; }).map(function (x) { return [x.timestamp, Math.round(x.avgHashrate / 1e17) / 10]; }); D.hashrate = r.currentHashrate; D.difficulty = r.currentDifficulty; if (alive) { hudFill(); grid(); }
+      }).catch(function () { });
+      getJSON(MP + '/v1/lightning/statistics/latest').then(function (r) { var l = r && r.latest; if (l && l.channel_count) { D.ln = { channels: l.channel_count, nodes: l.node_count, capacity: l.total_capacity, at: l.added }; done(); } }).catch(function () { });
+      getJSON(MP + '/v1/prices').then(function (r) { if (r && r.USD) { D.price = r.USD; if (alive) { hudFill(); grid(); } } }).catch(function () { });
+    }
     Promise.all([getJSON('/data/btcinfo.json?v=' + Math.floor(Date.now() / 3e5)).catch(function () { return null; }), getJSON('/data/chain.json?v=' + Math.floor(Date.now() / 3e5)).catch(function () { return null; })]).then(function (r) {
       if (!alive) return; var a = r[0] || {}, c = r[1] || {};
       Object.keys(a).forEach(function (k) { D[k] = a[k]; });
@@ -181,10 +194,10 @@
       if (!D.fees && c.fees) D.fees = c.fees; if (!D.hashrate && c.hashrate) { D.hashrate = c.hashrate; D.difficulty = c.difficulty; } if (!D.adj && c.adjustment) D.adj = c.adjustment;
       if (c.nodes) D.nodes = c.nodes; if (!D.t) D.t = c.updated_at;
       if (D.blocks) { setState('snap'); render(); } else setState('load');
-      live();
+      live(); slow();
     });
     setState('load');
-    timers.push(setInterval(live, 30000));
+    timers.push(setInterval(live, 30000)); timers.push(setInterval(slow, 600000));
     timers.push(setInterval(function () {   /* clocks and "ago" labels tick without re-rendering */
       [].forEach.call(root.querySelectorAll('[data-clock]'), function (e) { e.textContent = clock(+e.getAttribute('data-clock')); });
       if (Date.now() % 15000 < 1000) [].forEach.call(root.querySelectorAll('[data-ago]'), function (e) { e.textContent = ago(+e.getAttribute('data-ago')); });
