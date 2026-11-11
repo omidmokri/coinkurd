@@ -211,7 +211,7 @@
     /* archive: the newest posts and how many there are in all */
     try {
       var ps = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 4); h = '';
-      ps.forEach(function (p) { h += '<li><span dir="auto">' + esc(PT(p).title || '') + '</span><small>' + esc(ago(p.date)) + '</small></li>'; });
+      ps.forEach(function (p) { h += '<li><span dir="auto">' + esc(PT(p).title || '') + '</span><small>' + esc(when(p.date)) + '</small></li>'; });
       e = nx.querySelector('[data-c=feed]'); if (e && h && e.innerHTML !== h) e.innerHTML = h;
       e = nx.querySelector('[data-s=feed]'); var c = S.meta && S.meta.count; if (e && c) e.textContent = nfmt(c) + ' ' + pick('پست', 'پۆست', 'posts');
     } catch (x) { }
@@ -231,13 +231,52 @@
     if (j.fng && !nx.querySelector('[data-fg] svg')) gauge(+j.fng.v, j.fng.k);
     if (j.g && j.g.btc_d != null && !nx.querySelector('[data-s=intel]').textContent) dom(j.g.btc_d);
   }
+  /* ------------------------------------------------------------------ under the stage: the channel, as a wire
+     (replaces the photo strip and the two picture halves of the old page: titles you can read, not pictures of text) */
+  var wire = d.createElement('section'); wire.className = 'nxw'; wire.id = 'nxw'; wire.setAttribute('aria-labelledby', 'nxw-h');
+  wire.innerHTML = '<div class="nxw-top"><div>' + tri('از کانال، همین حالا', 'لە کەناڵەوە، هەر ئێستا', 'From the channel, right now', 'h2', 'nxw-h').replace('<h2 ', '<h2 id="nxw-h" ') +
+    tri('هر پستِ Coin_Kurd ظرف ۱۵ دقیقه این‌جاست: خوانده‌شده، دسته‌بندی‌شده بر اساس موضوع، کوین و زمان، و قابل جستجو.', 'هەر پۆستێکی Coin_Kurd لە ماوەی ١٥ خولەکدا لێرەیە: خوێنراوە، بەپێی بابەت، دراو و کات پۆلێنکراوە، و دەتوانیت بەدوایدا بگەڕێیت.', 'Every Coin_Kurd post is here within 15 minutes: read, sorted by topic, coin and time, and searchable.', 'p', 'nxw-l') +
+    '</div><ul class="nxw-k" data-wk></ul></div><div class="nxw-cols">' +
+    [['news,etf_institutional,regulation', 'خبر و نهادها', 'هەواڵ و دامەزراوەکان', 'News and institutions'], ['technical,onchain,signal', 'تحلیل و آن‌چین', 'شیکاری و ئۆن‌چەین', 'Analysis and on-chain'], ['education,security,products,community', 'آموزش و امنیت', 'فێرکاری و ئاسایش', 'Learning and security']].map(function (g) {
+      return '<div class="nxw-col" data-cat="' + g[0] + '"><div class="nxw-hd"><h3>' + tri(g[1], g[2], g[3]) + '</h3><span class="nxw-n" data-wn></span>' +
+        '<button type="button" class="nxw-all" data-wall="' + g[0].split(',')[0] + '">' + tri('همه', 'هەموو', 'All') + '</button></div><ol class="nxw-list" data-wl></ol></div>';
+    }).join('') + '</div>';
+  nx.parentNode.insertBefore(wire, nx.nextSibling);
+  function when(iso) { try { return String(ago(iso)).replace(/^[^\d\u06F0-\u06F9\u0660-\u0669A-Za-z]+/, ''); } catch (e) { return ''; } }   /* the page's own "ago" marks stale data with a warning sign; a post's age is not a warning */
+  function wireFill() {
+    var ps; try { ps = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }); } catch (e) { return; }
+    [].forEach.call(wire.querySelectorAll('.nxw-col'), function (col) {
+      var cats = col.getAttribute('data-cat').split(','), h = '';
+      ps.filter(function (p) { return cats.indexOf(p.category) >= 0; }).slice(0, 4).forEach(function (p) {
+        var t = {}; try { t = PT(p) || {}; } catch (e) { }
+        var body = String(t.text || '').replace(/[\u2500-\u257F_=~*]{3,}/g, ' ').replace(/\s+/g, ' ').trim(), ttl = String(t.title || '').trim(); if (body.indexOf(ttl) === 0) body = body.slice(ttl.length).trim();
+        var coins = Array.isArray(p.coins) ? p.coins.slice(0, 3) : [], lg = '';
+        coins.forEach(function (c) { if (/^[A-Z0-9]{2,10}$/.test(c)) lg += '<img src="/data/logos/' + c + '.png" alt="' + c + '" title="' + c + '" width="20" height="20" loading="lazy" decoding="async" onerror="this.remove()">'; });
+        var cn = '', cc = '', wh = when(p.date);
+        try { var co = catOf(p.category); cn = cname(co); cc = co.color || ''; } catch (e) { }
+        h += '<li><button type="button" data-post="' + esc(p.id) + '"' + (/^#[0-9a-f]{3,8}$/i.test(cc) ? ' style="--cc:' + cc + '"' : '') + '><span class="nxw-m">' + (cn ? '<i>' + esc(cn) + '</i>' : '') + '<time>' + esc(wh) + '</time>' + lg + '</span><b dir="auto">' + esc(ttl) + '</b>' + (body ? '<span class="nxw-x" dir="auto">' + esc(body.slice(0, 150)) + '</span>' : '') + '</button></li>';
+      });
+      var ol = col.querySelector('[data-wl]'); if (h && ol.innerHTML !== h) ol.innerHTML = h;
+      var n = 0; try { cats.forEach(function (c) { n += S.meta.by_category[c] || 0; }); } catch (e) { }
+      col.querySelector('[data-wn]').textContent = n ? nfmt(n) + ' ' + pick('پست', 'پۆست', 'posts') : '';
+    });
+    var k = wire.querySelector('[data-wk]'), kh = '';
+    [['#sPosts', 'پست', 'پۆست', 'posts'], ['#sCats', 'دسته', 'پۆل', 'categories'], ['#sCoins', 'کوین', 'دراو', 'coins']].forEach(function (x) { var e = d.querySelector(x[0]), v = e && e.textContent.trim(); if (v) kh += '<li><b>' + esc(v) + '</b>' + pick(x[1], x[2], x[3]) + '</li>'; });
+    var up = d.querySelector('#sUpd'), uv = up && up.textContent.trim(); if (uv) kh += '<li><b>' + esc(uv.replace(/^\d{4}-\d{2}-\d{2}\s*/, '')) + '</b>' + pick('آخرین به‌روزرسانی', 'دوایین نوێکردنەوە', 'last update') + '</li>';
+    if (k.innerHTML !== kh) k.innerHTML = kh;
+  }
+  wire.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-post]'); if (b) { try { openPost(b.getAttribute('data-post')); } catch (x) { } return; }
+    var a = e.target.closest && e.target.closest('[data-wall]'); if (a) { open('feed'); }
+  });
+
   var tk = null;
   U.ticker().then(function (j) { tk = j; net(j); U.seed(); }, function () { });
-  fill(); charts(); U.seed(); U.live();
-  [900, 2200, 5000, 10000].forEach(function (ms) { setTimeout(function () { fill(); links(); }, ms); });
+  fill(); wireFill(); charts(); U.seed(); U.live();
+  [900, 2200, 5000, 10000].forEach(function (ms) { setTimeout(function () { fill(); wireFill(); links(); }, ms); });
   new MutationObserver(function () {
     setTimeout(function () {
-      railLabel(); fill(); if (tk) net(tk);
+      railLabel(); fill(); wireFill(); if (tk) net(tk);
       [].forEach.call(d.querySelectorAll('.nx-st,.nxm-st'), function (el) { if (el._s) stSet(el, el._s[0], el._s[1]); });
       if (w.ekChrome && w.ekChrome.label) w.ekChrome.label(U.lang());
       linksSoon();
