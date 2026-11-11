@@ -185,7 +185,7 @@
     var mc = nx.querySelector('.nx-mc'), st = nx.querySelector('[data-st=mini]');
     if (mc && !mini) mini = w.nxChart(mc, { sym: 'BTC', tf: '1h', mini: true, n: 40, onState: function (s, f) { stSet(st, s, f); } });
     var bg = nx.querySelector('.nx-bgc');
-    if (bg && !bgc && w.innerWidth >= 821) bgc = w.nxChart(bg, { sym: 'BTC', tf: '1d', mini: true, n: 150 });
+    if (bg && !bgc && w.innerWidth >= 821) bgc = w.nxChart(bg, { sym: 'BTC', tf: '1d', mini: true, n: 150, once: true });
   }
   function gauge(v, k) {
     var box = nx.querySelector('[data-fg]'); if (!box || !(v >= 0)) return;
