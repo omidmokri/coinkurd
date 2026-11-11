@@ -293,7 +293,13 @@
     (mq || hero).parentNode.insertBefore(nav, (mq || hero).nextSibling);
     function stats() { [].forEach.call(nav.querySelectorAll('.ekd-s'), function (s) { var f = STAT[s.getAttribute('data-s')], v = f ? f() : ''; if (s.innerHTML !== v) s.innerHTML = v; }); }
     stats(); [1500, 4000, 9000].forEach(function (ms) { setTimeout(stats, ms); });
-    function rowOf(id) { return nav.querySelector('[data-d="' + id + '"]'); }
+    function rowOf(id) { var x = w.ekNX && w.ekNX.door && w.ekNX.door(id); return x || nav.querySelector('[data-d="' + id + '"]'); }
+    function tell(id, from) { try { w.dispatchEvent(new CustomEvent('ek:room', { detail: { id: id, from: from || null } })); } catch (e) { } }
+    function edges(b) {   /* the layer grows out of, and shrinks back into, the box it was opened from */
+      var W = w.innerWidth, Hh = w.innerHeight, c = function (v, m) { return Math.max(0, Math.min(m, v)) + 'px'; };
+      P.style.setProperty('--pt', b ? c(b.top, Hh) : '45%'); P.style.setProperty('--pb', b ? c(Hh - b.bottom, Hh) : '45%');
+      P.style.setProperty('--pl', b ? c(b.left, W) : '0px'); P.style.setProperty('--pr', b ? c(W - b.right, W) : '0px');
+    }
 
     var P = null, body = null, title = null, cur = null, ph = {}, pushed = false, tClose = null, last = null;
     function buildPanel() {
@@ -332,19 +338,18 @@
       sec.classList.add('v'); [].forEach.call(sec.querySelectorAll('.reveal'), function (x) { x.classList.add('v'); });
       if (!P.classList.contains('open')) {
         last = d.activeElement;
-        var b = from && from.getBoundingClientRect ? from.getBoundingClientRect() : null;
-        P.style.setProperty('--pt', b ? Math.max(0, Math.min(w.innerHeight, b.top)) + 'px' : '45%');
-        P.style.setProperty('--pb', b ? Math.max(0, Math.min(w.innerHeight, w.innerHeight - b.bottom)) + 'px' : '45%');
+        edges(from && from.getBoundingClientRect ? from.getBoundingClientRect() : null);
         void P.offsetWidth; P.classList.add('open'); lock(true); base(true);
         setTimeout(function () { try { body.focus({ preventScroll: true }); } catch (e) { } }, RM ? 0 : 200);
       } else if (!P.contains(d.activeElement)) { try { body.focus({ preventScroll: true }); } catch (e) { } }
       setTimeout(function () { try { w.dispatchEvent(new Event('resize')); } catch (e) { } }, 80);
+      tell(id);
     }
     function hide() {
       if (!P || !P.classList.contains('open')) return;
       var r = cur && rowOf(cur), b = r ? r.getBoundingClientRect() : null, id = cur;
-      if (b) { P.style.setProperty('--pt', Math.max(0, Math.min(w.innerHeight, b.top)) + 'px'); P.style.setProperty('--pb', Math.max(0, Math.min(w.innerHeight, w.innerHeight - b.bottom)) + 'px'); }
-      P.classList.remove('open'); lock(false); base(false);
+      if (b && (b.width || b.height)) edges(b);
+      P.classList.remove('open'); lock(false); base(false); tell(null, id);
       [].forEach.call(nav.querySelectorAll('.ekd-row.go'), function (x) { x.classList.remove('go'); });
       clearTimeout(tClose);
       tClose = setTimeout(function () { restore(id); if (cur === id) cur = null; }, RM ? 0 : 520);
@@ -388,6 +393,7 @@
     }
     new MutationObserver(function () { setTimeout(function () { stats(); navLabel(); if (cur && title) { var r = rowOf(cur), rt = r && r.querySelector('.ekd-t'); if (rt) title.textContent = rt.textContent; } }, 60); })
       .observe(de, { attributes: true, attributeFilter: ['lang'] });
+    w.ekDeck = { open: openDoor, close: closeDoor, swap: swap, ids: ids, cur: function () { return cur; } };
     deckSync();
     /* a search link (/?q=…) lands in the archive: the page's own jump may have been taken before this script ran */
     if (/[?&]q=[^&]/.test(location.search)) setTimeout(function () { if (cur !== 'feed') openDoor('feed', rowOf('feed')); }, 900);
