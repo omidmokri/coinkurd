@@ -102,6 +102,11 @@ jobs:
         timeout-minutes: 4
         run: python scripts/chain.py
 
+      - name: Bitcoin right now for /satoshi/ (mempool.space, blockchair)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/btcinfo.py
+
       - name: Derivatives command room (OKX funding, OI, long/short, liquidations)
         id: deriv
         continue-on-error: true

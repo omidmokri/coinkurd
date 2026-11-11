@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "14"  # bump to bust caches of chrome.css / chrome.js
+VER = "15"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
@@ -263,7 +263,7 @@ NAV = [
          L("سلب مسئولیت و قوانین استفاده", "ڕاگەیاندنی بەرپرسیارێتی و یاساکان", "Disclaimer and rules of use")),
     ]},
 ]
-BATTLE = ("/battle/", "swords", L("میدان نبرد", "مەیدانی شەڕ", "Battlefield"))
+BATTLE = ("/battle/", "swords", L("نبرد کن", "شەڕ بکە", "Fight"))
 # the order of the top bar: Markets, Analysis, Tools, Learn, Archive, Battlefield (direct), More
 TOP_ORDER = ["mkt", "ana", "reality", "tools", "learn", "arc", "BATTLE", "more"]
 
@@ -399,7 +399,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "2"
-NX_VER = "4"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
+NX_VER = "5"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "if(m){L.setItem('ek_ui',m[1]);try{var u=new URL(location.href);u.searchParams.delete('ui');"
            "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}"

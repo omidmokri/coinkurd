@@ -9,7 +9,8 @@ html.ek-v3{--nx-or:#f7931a;--nx-hot:#ff7a00;--nx-gold:#ffd27a;--nx-up:#34d399;--
   --nx-foil:linear-gradient(var(--u-ang,100deg),#fff1c9 0%,#ffd27a 24%,#f7931a 60%,#a65a07 100%);
   --nx-glass:linear-gradient(155deg,rgba(255,255,255,.085),rgba(255,255,255,.018) 46%,rgba(255,255,255,.045));
   --nx-e:cubic-bezier(.2,.8,.2,1);--nx-io:cubic-bezier(.7,0,.2,1);
-  --bg:#000;--card:#0e0e11;--panel:#0e0e11;--ek-panel:#0b0b0d;--ekh:76px;color-scheme:dark;scrollbar-color:#2c2c31 #000}
+  --bg:#000;--card:#0e0e11;--panel:#0e0e11;--ek-panel:#0b0b0d;--ekh:76px;scrollbar-color:#2c2c31 #000}
+/* no color-scheme here: a page that declares one makes the browser paint an opaque white sheet behind embedded frames of another scheme (the TradingView widgets) */
 html.ek-v3 body{background:#000}
 html.ek-v3 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:radial-gradient(60vw 44vh at 50% -14vh,rgba(247,147,26,.14),transparent 70%),radial-gradient(52vw 52vh at 106% 110%,rgba(13,74,82,.3),transparent 70%),radial-gradient(40vw 40vh at -8% 104%,rgba(247,147,26,.07),transparent 70%)}
@@ -98,7 +99,7 @@ html.ek-v3 .ekm-lang button.on{background:#fff;color:#000}
 html.ek-v3 .ekm-q input{background:rgba(255,255,255,.04)}
 
 /* ------------------------------------------------------------------ homepage: the Nexus stage */
-html.ek-v3.ek-deck .hero,html.ek-v3.ek-deck #tape,html.ek-v3.ek-deck .ekd,html.ek-v3.ek-deck .marquee{display:none}
+html.ek-v3.ek-deck .hero,html.ek-v3.ek-deck #tape,html.ek-v3.ek-deck .ekd,html.ek-v3.ek-deck .marquee,html.ek-v3.ek-deck .msg,html.ek-v3.ek-deck #strip,html.ek-v3.ek-deck .split{display:none}
 html.ek-v3.ek-deck{--top:var(--ekh,60px)!important}
 .nx{position:relative;isolation:isolate;display:grid;grid-template-columns:var(--pw) minmax(0,1fr) var(--pw);min-height:calc(100svh - var(--ekh));padding:6px clamp(14px,1.8vw,30px) 76px;
   --pw:clamp(250px,23vw,344px);perspective:1400px;overflow:hidden;font-family:var(--ek-font);color:#fff}
@@ -208,6 +209,40 @@ html[lang=en] .nx .ekd-t{font:700 .95rem/1.5 'Space Grotesk',var(--ek-font);lett
 @keyframes nx-coin{from{scale:.86;translate:0 16px}}
 @keyframes nx-up{from{opacity:0;translate:0 22px}}
 @keyframes nx-side{from{opacity:0;translate:var(--ex,0px) 0}}
+/* under the stage: the channel as a wire — two columns of headlines you can read */
+.nxw{position:relative;max-width:1320px;margin:0 auto;padding:44px clamp(16px,2.4vw,34px) 96px;font-family:var(--ek-font);color:#fff}
+.nxw *{box-sizing:border-box}
+.nxw-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 30px}
+.nxw-h{margin:0;font:900 clamp(1.5rem,3vw,2.4rem)/1.3 'Vazirmatn','Space Grotesk',sans-serif;color:#fff}
+html[lang=en] .nxw-h{font-family:'Archivo Black','Space Grotesk',sans-serif;font-weight:400;letter-spacing:-.02em}
+.nxw-l{margin:6px 0 0;max-width:62ch;font-size:.92rem;line-height:1.9;color:rgba(255,255,255,.62)}
+.nxw-k{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.nxw-k li{display:flex;flex-direction:column;min-width:92px;padding:9px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:.74rem;color:rgba(255,255,255,.58)}
+.nxw-k b{font:700 1.08rem 'Space Grotesk',var(--ek-font);color:var(--nx-gold);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;text-align:start}
+[dir=rtl] .nxw-k b{text-align:right}
+.nxw-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+.nxw-col{padding:16px 18px 8px;border-radius:24px;border:1px solid rgba(255,255,255,.1);background:var(--nx-glass),#060607;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.nxw-hd{display:flex;align-items:center;gap:12px;padding-bottom:10px}
+.nxw-hd h3{margin:0;font:800 1.12rem/1.4 var(--ek-font);color:#fff}
+.nxw-n{font:600 .78rem 'Space Grotesk',var(--ek-font);color:var(--nx-gold)}
+.nxw-all{margin-inline-start:auto;height:34px;padding:0 14px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#fff;font:700 .78rem var(--ek-font);cursor:pointer;transition:border-color .2s,background .2s}
+.nxw-all:hover{border-color:var(--nx-or);background:rgba(247,147,26,.12)}
+.nxw-list{margin:0;padding:0;list-style:none}
+.nxw-list li{border-top:1px solid rgba(255,255,255,.08)}
+.nxw-list button{position:relative;display:block;width:100%;padding:13px 4px 13px;padding-inline-start:16px;border:0;background:none;color:#fff;text-align:start;font-family:var(--ek-font);cursor:pointer}
+.nxw-list button::before{content:"";position:absolute;inset-inline-start:0;top:16px;bottom:16px;width:4px;border-radius:2px;background:var(--cc,rgba(255,255,255,.2));opacity:.55;transition:opacity .2s,box-shadow .2s}
+.nxw-list button:hover::before,.nxw-list button:focus-visible::before{opacity:1;box-shadow:0 0 14px var(--cc,rgba(247,147,26,.8))}
+.nxw-m{display:flex;align-items:center;gap:6px;min-height:22px;font-size:.72rem;color:rgba(255,255,255,.5)}
+.nxw-m time{margin-inline-end:4px}
+.nxw-m i{font-style:normal;font-weight:700;color:var(--cc,var(--nx-gold))}
+.nxw-m i::after{content:"";display:inline-block;width:3px;height:3px;margin-inline:7px 1px;border-radius:50%;background:rgba(255,255,255,.3);vertical-align:middle}
+.nxw-m img{width:20px;height:20px;border-radius:50%;background:#111}
+.nxw-list b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;font-size:1rem;font-weight:700;line-height:1.75}
+.nxw-x{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px;font-size:.82rem;line-height:1.8;color:rgba(255,255,255,.55)}
+.nxw-list button:focus-visible,.nxw-all:focus-visible{outline:2px solid var(--nx-gold);outline-offset:2px;border-radius:10px}
+@media (max-width:1099px){.nxw-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.nxw{padding:30px 14px 26px}.nxw-cols{grid-template-columns:minmax(0,1fr);gap:12px}.nxw-col{padding:14px 14px 6px;border-radius:20px}.nxw-k li{min-width:0;flex:1 1 40%}}
+
 /* the rail: every room of the homepage, always within reach */
 #nxr{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:156;display:flex;align-items:center;gap:2px;max-width:calc(100vw - 24px);padding:5px;border-radius:18px;overflow-x:auto;scrollbar-width:none;
   background:rgba(10,10,12,.78);border:1px solid rgba(255,255,255,.11);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 18px 50px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);
