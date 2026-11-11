@@ -35,6 +35,9 @@
     root.innerHTML = '<span class="bx-st" role="status"><i></i><span></span></span>' +
       '<div class="bx-hud"><div class="bx-core"><img src="/assets/coin-front.webp" alt="" width="512" height="512" loading="lazy" decoding="async"><canvas aria-hidden="true"></canvas></div><svg class="bx-ln" aria-hidden="true"></svg>' +
       ['l y1', 'l y2', 'l y3', 'r y1', 'r y2', 'r y3'].map(function (c, i) { return '<div class="bx-co ' + c + '" data-c="' + i + '"><span class="bx-lb"></span><b>—</b><small></small></div>'; }).join('') + '</div>' +
+      '<div class="bx-tm"><form class="bx-find" role="search"><input type="search" name="q" autocomplete="off" spellcheck="false" enterkeyhint="search"><button type="submit"></button></form>' +
+      '<div class="bx-sl"><button type="button" data-go="live"></button><div class="bx-rg"><output class="bx-rd"></output><input type="range" min="0" max="0" step="1" value="0" dir="rtl"></div><button type="button" data-go="0"></button></div>' +
+      '<div class="bx-marks"></div><p class="bx-msg" role="status" aria-live="polite"></p></div>' +
       '<div class="bx-belt" tabindex="0"><div class="bx-q"></div><div class="bx-now"><span></span></div><div class="bx-m"></div></div><div class="bx-det" hidden></div>' +
       '<div class="bx-grid"></div><p class="bx-foot"></p>';
     var $ = function (s) { return root.querySelector(s); }, hud = $('.bx-hud'), core = $('.bx-core');
@@ -69,35 +72,124 @@
       svg.innerHTML = h;
     }
 
-    /* ---- blocks: the queue on one side of "now", the chain on the other */
+    /* ---- blocks: the queue on one side of "now", the chain on the other. Every block is a real cube (three faces in
+       3D); how full its faces are painted is how full the block was (weight of 4,000,000, or size of 1 MB for old data). */
+    var GEN = 1231006505, placed = false, view = null, tip = 0, rq = 0, drag = false;
+    var MARKS = [[0, 'بلاک صفر', 'بلۆکی سفر', 'Genesis'], [170, 'اولین تراکنش', 'یەکەم مامەڵە', 'First transaction'], [57043, 'دو پیتزا', 'دوو پیتزا', 'Two pizzas'], [74638, 'خطای ۱۸۴ میلیاردی', 'هەڵەی ١٨٤ ملیاردی', '184-billion bug'],
+      [210000, 'هاوینگ ۱', 'هاڵڤینگی ١', 'Halving 1'], [420000, 'هاوینگ ۲', 'هاڵڤینگی ٢', 'Halving 2'], [630000, 'هاوینگ ۳', 'هاڵڤینگی ٣', 'Halving 3'], [840000, 'هاوینگ ۴', 'هاڵڤینگی ٤', 'Halving 4']];
+    function norm(b) { var x = b.extras || {}, fr = x.feeRange || []; return { id: b.id, height: b.height, timestamp: b.timestamp, tx_count: b.tx_count, size: b.size, weight: b.weight, reward: x.reward, totalFees: x.totalFees, medianFee: x.medianFee, feeRange: fr.length ? [fr[0], fr[fr.length - 1]] : null, pool: (x.pool || {}).name }; }
+    function sz(n) { return n >= 1e6 ? (n / 1e6).toFixed(2) + ' MB' : n >= 1e3 ? (n / 1e3).toFixed(1) + ' kB' : N(n) + ' B'; }
+    function day(ts) { try { return new Date(ts * 1000).toLocaleDateString(lang() === 'en' ? 'en-GB' : lang() === 'ckb' ? 'ckb-IQ' : 'fa-IR-u-ca-gregory-nu-latn', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return new Date(ts * 1000).toISOString().slice(0, 10); } }
+    function shown() { return view ? view.list : (D.blocks || []).slice(0, 8); }
+    function faces(inner) { return '<span class="bx-c"><i class="tp"></i><i class="sd"></i><span class="ft">' + inner + '</span></span>'; }
     function cube(o, mined, i) {
-      var fr = o.feeRange, mb = (mined ? o.size : o.vsize) / 1e6;
+      var fr = o.feeRange, bytes = mined ? o.size : o.vsize, fill = Math.max(0, Math.min(100, mined ? (o.weight ? o.weight / 4e4 : bytes / 1e4) : bytes / 1e4));
       var inner = '<span class="f">~' + N(o.medianFee, o.medianFee < 10 ? 1 : 0) + ' <small>sat/vB</small></span>' + (fr ? '<span class="r">' + N(fr[0], fr[0] < 10 ? 1 : 0) + ' – ' + N(fr[1]) + '</span>' : '') +
-        '<b>' + mb.toFixed(2) + ' MB</b><span class="x">' + N(mined ? o.tx_count : o.nTx) + ' tx</span>';
-      if (mined) return '<button type="button" class="bx-b' + (sel === o.id ? ' sel' : '') + '" data-id="' + o.id + '" aria-label="' + L('بلاک ', 'بلۆکی ', 'Block ') + o.height + '">' + inner + '<span class="a" dir="auto" data-ago="' + o.timestamp + '">' + esc(ago(o.timestamp)) + '</span><em>' + N(o.height) + '</em>' + (o.pool ? '<cite>' + esc(o.pool) + '</cite>' : '') + '</button>';
-      return '<div class="bx-b q" style="--fill:' + Math.min(100, mb * 100).toFixed(0) + '%">' + inner + '<span class="a" dir="auto">' + L('حدود ' + (i + 1) * 10 + ' دقیقهٔ دیگر', 'نزیکەی ' + (i + 1) * 10 + ' خولەکی تر', 'in ~' + (i + 1) * 10 + ' min') + '</span></div>';
+        '<b>' + sz(bytes) + '</b><span class="x">' + N(mined ? o.tx_count : o.nTx) + ' tx</span>', st = ' style="--fill:' + fill.toFixed(0) + '%"';
+      if (!mined) return '<div class="bx-b q"' + st + '>' + faces(inner + '<span class="a" dir="auto">' + L('حدود ' + (i + 1) * 10 + ' دقیقهٔ دیگر', 'نزیکەی ' + (i + 1) * 10 + ' خولەکی تر', 'in ~' + (i + 1) * 10 + ' min') + '</span>') + '</div>';
+      var old = Date.now() / 1000 - o.timestamp > 129600;
+      return '<button type="button" class="bx-b' + (sel === o.id ? ' sel' : '') + (o.height === 0 ? ' gen' : '') + (fill < 55 ? ' lo' : '') + '" data-id="' + o.id + '"' + st + ' aria-label="' + L('بلاک ', 'بلۆکی ', 'Block ') + o.height + '">' +
+        faces(inner + (old ? '<span class="a" dir="auto">' + esc(day(o.timestamp)) + '</span>' : '<span class="a" dir="auto" data-ago="' + o.timestamp + '">' + esc(ago(o.timestamp)) + '</span>')) +
+        '<em>' + N(o.height) + '</em>' + (o.pool && o.pool !== 'Unknown' ? '<cite>' + esc(o.pool) + '</cite>' : '') + '</button>';
     }
     function belt() {
-      var bl = (D.blocks || []).slice(0, 8), nx = (D.next || []).slice(0, 3); if (!bl.length) return;
+      var all = D.blocks || []; if (!all.length) return;
+      if (all[0].height > tip) tip = all[0].height;
+      var bl = shown(), nx = view ? [] : (D.next || []).slice(0, 3), low = bl[bl.length - 1].height;
+      $('.bx-belt').classList.toggle('hist', !!view);
       $('.bx-now span').textContent = L('اکنون', 'ئێستا', 'now');
       $('.bx-q').innerHTML = nx.map(function (o, i) { return cube(o, false, i); }).join('');
-      $('.bx-m').innerHTML = bl.map(function (o, i) { return cube(o, true, i); }).join('');
-      if (lastTip && bl[0].height > lastTip && !RM) { var f = $('.bx-m .bx-b'); if (f) f.classList.add('new'); if (coin) coin.pulse(); }
-      lastTip = bl[0].height; detail();
+      $('.bx-m').innerHTML = bl.map(function (o, i) { return cube(o, true, i); }).join('') +
+        (low > 0 ? '<button type="button" class="bx-b more" data-go="older">' + faces('<b>+</b><span class="a">' + L('بلاک‌های قدیمی‌تر', 'بلۆکە کۆنترەکان', 'Older blocks') + '</span>') + '<em>' + N(Math.max(0, low - 15)) + ' … ' + N(low - 1) + '</em></button>' : '');
+      if (!view) { if (lastTip && bl[0].height > lastTip && !RM) { var f = $('.bx-m .bx-b'); if (f) f.classList.add('new'); if (coin) coin.pulse(); } lastTip = bl[0].height; }
+      detail(); tmFill();
+      if (!placed) { placed = true; var bt = $('.bx-belt'); bt.scrollLeft = Math.max(0, $('.bx-now').offsetLeft - bt.clientWidth * .45); }
     }
     function detail() {
-      var box = $('.bx-det'), b = sel && (D.blocks || []).filter(function (x) { return x.id === sel; })[0];
+      var box = $('.bx-det'), b = sel && shown().filter(function (x) { return x.id === sel; })[0];
       if (!b) { box.hidden = true; return; }
       var p = px(), fees = b.totalFees != null ? b.totalFees / 1e8 : null, rw = b.reward != null ? b.reward / 1e8 : null;
       function f(lab, val) { return val == null ? '' : '<div><small>' + lab + '</small><b>' + val + '</b></div>'; }
       box.hidden = false;
       box.innerHTML = '<h4>' + L('بلاک ', 'بلۆکی ', 'Block ') + N(b.height) + '</h4><a href="https://mempool.space/block/' + b.id + '" target="_blank" rel="noopener">' + b.id + '</a><div class="bx-dl">' +
-        f(L('زمان ثبت', 'کاتی تۆمارکردن', 'Mined at'), esc(new Date(b.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' }))) +
-        f(L('تراکنش', 'مامەڵە', 'Transactions'), N(b.tx_count)) + f(L('حجم', 'قەبارە', 'Size'), (b.size / 1e6).toFixed(2) + ' MB' + (b.weight ? ' · ' + (b.weight / 1e6).toFixed(2) + ' MWU' : '')) +
-        f(L('پاداش ماینر', 'پاداشتی ماینەر', 'Miner reward'), rw != null ? rw.toFixed(4) + ' BTC' + (p ? ' · ' + usd(rw * p) : '') : null) +
+        f(L('زمان ثبت', 'کاتی تۆمارکردن', 'Mined at'), esc(new Date(b.timestamp * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }))) +
+        f(L('تراکنش', 'مامەڵە', 'Transactions'), N(b.tx_count)) + f(L('حجم', 'قەبارە', 'Size'), sz(b.size) + (b.weight ? ' · ' + (b.weight >= 1e4 ? (b.weight / 1e6).toFixed(2) + ' MWU' : N(b.weight) + ' WU') : '')) +
+        f(L('پاداش ماینر', 'پاداشتی ماینەر', 'Miner reward'), rw != null ? rw.toFixed(4) + ' BTC' + (p ? ' · ' + usd(rw * p) + L(' به قیمت امروز', ' بە نرخی ئەمڕۆ', ' at today’s price') : '') : null) +
         f(L('مجموع کارمزدها', 'کۆی کرێکان', 'Total fees'), fees != null ? fees.toFixed(4) + ' BTC' + (rw ? ' · ' + (fees / rw * 100).toFixed(1) + '%' : '') : null) +
         f(L('کارمزد میانه', 'کرێی ناوەند', 'Median fee'), b.medianFee != null ? N(b.medianFee, 1) + ' sat/vB' : null) + f(L('بازهٔ کارمزد', 'مەودای کرێ', 'Fee range'), b.feeRange ? N(b.feeRange[0], 1) + ' – ' + N(b.feeRange[1]) + ' sat/vB' : null) +
-        f(L('استخر', 'حەوز', 'Pool'), b.pool ? esc(b.pool) : null) + '</div>';
+        f(L('استخر', 'حەوز', 'Pool'), b.pool && b.pool !== 'Unknown' ? esc(b.pool) : null) + '</div>';
+    }
+
+    /* ---- the way back: from the newest block to block zero, by height, hash or date, by the slider, or cube by cube */
+    function msg(t) { $('.bx-msg').textContent = t || ''; }
+    function busy(on) { $('.bx-tm').classList.toggle('busy', !!on); }
+    function fail() { msg(L('اتصال به شبکه برقرار نشد؛ کمی بعد دوباره امتحان کنید.', 'پەیوەندی بە تۆڕەکەوە نەکرا؛ دواتر هەوڵ بدەرەوە.', 'Could not reach the network; try again in a moment.')); }
+    function pos() { var l = shown(), b = sel && l.filter(function (x) { return x.id === sel; })[0]; return b || (view ? l.filter(function (x) { return x.height === view.at; })[0] || l[0] : null); }
+    function tmFill() {
+      var tm = $('.bx-tm'), inp = tm.querySelector('.bx-find input'), rg = tm.querySelector('input[type=range]'), b = pos();
+      inp.placeholder = L('شمارهٔ بلاک، هش بلاک یا تاریخ (مثل 2010-05-22 یا 1389/03/01)', 'ژمارەی بلۆک، هاشی بلۆک یان بەروار (وەک 2010-05-22)', 'Block height, block hash or a date (e.g. 2010-05-22)');
+      inp.setAttribute('aria-label', L('جست‌وجوی بلاک', 'گەڕان بەدوای بلۆکدا', 'Find a block'));
+      tm.querySelector('.bx-find button').textContent = L('برو', 'بڕۆ', 'Go');
+      tm.querySelector('[data-go=live]').textContent = L('اکنون', 'ئێستا', 'Now');
+      tm.querySelector('[data-go="0"]').textContent = L('بلاک صفر · ۲۰۰۹', 'بلۆکی سفر · ٢٠٠٩', 'Block 0 · 2009');
+      tm.querySelector('[data-go=live]').classList.toggle('on', !view);
+      rg.max = tip; rg.setAttribute('aria-label', L('حرکت در تاریخ زنجیره', 'گەڕان بە مێژووی زنجیرەکەدا', 'Travel through the chain'));
+      if (!drag) { rg.value = b ? b.height : tip; read(b ? b.height : tip, b ? b.timestamp : null); }
+      var mk = $('.bx-marks'), h = MARKS.filter(function (m) { return m[0] <= tip; }).map(function (m) { return '<button type="button" data-go="' + m[0] + '"' + (b && b.height === m[0] ? ' class="on"' : '') + '><b>' + N(m[0]) + '</b><span dir="auto">' + esc(L(m[1], m[2], m[3])) + '</span></button>'; }).join('');
+      if (mk.innerHTML !== h) mk.innerHTML = h;
+    }
+    function read(h, ts) { $('.bx-rd').innerHTML = (!view && h === tip ? L('اکنون', 'ئێستا', 'Now') + ' · ' : '') + L('بلاک ', 'بلۆکی ', 'Block ') + '<bdi>' + N(h) + '</bdi>' + (ts ? ' · ' + esc(day(ts)) : ''); }
+    function center(id) {
+      var bt = $('.bx-belt'), el = id && bt.querySelector('.bx-b[data-id="' + id + '"]'); if (!el) { bt.scrollLeft = 0; return; }
+      var x = el.getBoundingClientRect().left - bt.getBoundingClientRect().left + bt.scrollLeft - (bt.clientWidth - el.offsetWidth) / 2;
+      if (bt.scrollTo && !RM) bt.scrollTo({ left: x, behavior: 'smooth' }); else bt.scrollLeft = x;
+    }
+    function show(h, id) {   /* open the chain at one height: three newer blocks, the block itself, the ones before it */
+      if (!tip) return fail(); h = Math.max(0, Math.min(tip, h)); var me = ++rq; busy(true); msg('');
+      return getJSON(MP + '/v1/blocks/' + Math.min(tip, h + 3), 12000).then(function (a) {
+        if (me !== rq || !alive) return; if (!a || !a.length) throw 0;
+        var l = a.map(norm), t = l.filter(function (x) { return id ? x.id === id : x.height === h; })[0] || l[0];
+        view = { list: l }; sel = t.id; busy(false); belt(); center(sel); return true;
+      }).catch(function () { if (me === rq && alive) { busy(false); fail(); } });
+    }
+    function goLive() { rq++; busy(false); msg(''); view = null; sel = null; belt(); center(null); }
+    function older() {
+      var l = shown(), low = l[l.length - 1].height; if (low <= 0 || !tip) return; var me = ++rq; busy(true); msg('');
+      getJSON(MP + '/v1/blocks/' + (low - 1), 12000).then(function (a) {
+        if (me !== rq || !alive) return; if (!a || !a.length) throw 0; var add = a.map(norm).filter(function (x) { return x.height < low; }); if (!add.length) throw 0;
+        var base = view ? view.list : (D.blocks || []).filter(function (x) { return x.height >= low; });
+        view = { list: base.concat(add).slice(-240), at: add[0].height }; sel = null; busy(false); belt(); center(add[Math.min(2, add.length - 1)].id);
+      }).catch(function () { if (me === rq && alive) { busy(false); fail(); } });
+    }
+    function j2g(jy, jm, jd) {   /* a Solar Hijri date to the Gregorian one */
+      jy += 1595; var days = -355668 + 365 * jy + Math.floor(jy / 33) * 8 + Math.floor((jy % 33 + 3) / 4) + jd + (jm < 7 ? (jm - 1) * 31 : (jm - 7) * 30 + 186), gy = 400 * Math.floor(days / 146097); days %= 146097;
+      if (days > 36524) { gy += 100 * Math.floor(--days / 36524); days %= 36524; if (days >= 365) days++; }
+      gy += 4 * Math.floor(days / 1461); days %= 1461; if (days > 365) { gy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+      var gd = days + 1, ml = [0, 31, (gy % 4 === 0 && gy % 100 !== 0) || gy % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], gm = 1;
+      for (; gm <= 12 && gd > ml[gm]; gm++) gd -= ml[gm]; return [gy, gm, gd];
+    }
+    function find(q) {
+      q = String(q || '').replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 1776; }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 1632; }).trim();
+      var n = q.replace(/[,٬،\s#]/g, ''), m;
+      if (!q) return; if (!tip) return fail();
+      if (/^\d{1,8}$/.test(n)) { if (+n > tip) return msg(L('هنوز چنین بلاکی ساخته نشده؛ آخرین بلاک ' + N(tip) + ' است.', 'ئەم بلۆکە هێشتا دروست نەکراوە؛ دوایین بلۆک ' + N(tip) + 'ە.', 'That block does not exist yet; the latest one is ' + N(tip) + '.')); return show(+n); }
+      if (/^[0-9a-f]{64}$/i.test(n)) {
+        var me = ++rq; busy(true); msg('');
+        return getJSON(MP + '/v1/block/' + n.toLowerCase(), 12000).then(function (b) { if (me !== rq || !alive) return; if (!b || b.height == null) throw 0; show(b.height, b.id); })
+          .catch(function () { if (me === rq && alive) { busy(false); msg(L('بلاکی با این هش پیدا نشد. (شناسهٔ تراکنش این‌جا جست‌وجو نمی‌شود.)', 'هیچ بلۆکێک بەم هاشە نەدۆزرایەوە. (ناسنامەی مامەڵە لێرە ناگەڕێندرێت.)', 'No block with this hash. (Transaction ids are not searched here.)')); } });
+      }
+      if ((m = /^(\d{4})[-\/.](\d{1,2})(?:[-\/.](\d{1,2}))?$/.exec(q))) {
+        var y = +m[1], mo = +m[2], dd = +(m[3] || 1), g = y < 1700 ? (mo >= 1 && mo <= 12 && dd >= 1 && dd <= 31 ? j2g(y, mo, dd) : null) : [y, mo, dd], t0 = g ? Date.UTC(g[0], g[1] - 1, g[2]) / 1000 : NaN, chk = g && new Date(t0 * 1000);
+        if (!g || isNaN(t0) || chk.getUTCMonth() !== g[1] - 1 || chk.getUTCDate() !== g[2]) return msg(L('این تاریخ درست نیست.', 'ئەم بەروارە دروست نییە.', 'That is not a valid date.'));
+        if (t0 > Date.now() / 1000) return msg(L('این تاریخ هنوز نرسیده است.', 'ئەم بەروارە هێشتا نەهاتووە.', 'That date is still in the future.'));
+        if (t0 + 86399 < GEN) { show(0); return msg(L('پیش از ۳ ژانویهٔ ۲۰۰۹ بلاکی وجود ندارد؛ این بلاک صفر است.', 'پێش ٣ی کانوونی دووەمی ٢٠٠٩ هیچ بلۆکێک نییە؛ ئەمە بلۆکی سفرە.', 'There is no block before 3 January 2009; this is block zero.')); }
+        var me2 = ++rq; busy(true); msg('');
+        return getJSON(MP + '/v1/mining/blocks/timestamp/' + Math.min(Math.floor(Date.now() / 1000), t0 + 86399), 12000).then(function (b) {
+          if (me2 !== rq || !alive) return; if (!b || b.height == null) throw 0;
+          show(b.height).then(function (ok) { if (ok && me2 + 1 === rq) msg(L('آخرین بلاکِ روز ' + day(t0) + ' (به وقت جهانی)؛ بلاک‌های پیش از آن در ادامه‌اند.', 'دوایین بلۆکی ڕۆژی ' + day(t0) + ' (بە کاتی جیهانی)؛ بلۆکەکانی پێشتر لە دوایدان.', 'The last block of ' + day(t0) + ' (UTC); the blocks before it follow.')); });
+        }).catch(function () { if (me2 === rq && alive) { busy(false); fail(); } });
+      }
+      msg(L('شمارهٔ بلاک (مثل 170)، هش ۶۴ کاراکتری بلاک، یا تاریخ به شکل 2010-05-22 یا 1389/03/01 بنویسید.', 'ژمارەی بلۆک (وەک 170)، هاشی ٦٤ پیتیی بلۆک، یان بەروار بە شێوەی 2010-05-22 بنووسە.', 'Type a block height (e.g. 170), a 64-character block hash, or a date as 2010-05-22.'));
     }
 
     /* ---- the tables */
@@ -166,7 +258,7 @@
       if (!alive || d.hidden) return;
       Promise.all([getJSON(MP + '/v1/blocks'), getJSON(MP + '/mempool'), getJSON(MP + '/v1/fees/mempool-blocks'), getJSON(MP + '/v1/fees/recommended'), getJSON(MP + '/v1/difficulty-adjustment')]).then(function (r) {
         if (!alive || !Array.isArray(r[0]) || !r[0].length) throw new Error('shape');
-        D.blocks = r[0].slice(0, 12).map(function (b) { var x = b.extras || {}, fr = x.feeRange || []; return { id: b.id, height: b.height, timestamp: b.timestamp, tx_count: b.tx_count, size: b.size, weight: b.weight, reward: x.reward, totalFees: x.totalFees, medianFee: x.medianFee, feeRange: fr.length ? [fr[0], fr[fr.length - 1]] : null, pool: (x.pool || {}).name }; });
+        D.blocks = r[0].slice(0, 15).map(norm);
         if (r[0][0].extras && r[0][0].extras.utxoSetSize) D.utxo = r[0][0].extras.utxoSetSize;
         D.mempool = { count: r[1].count, vsize: r[1].vsize, total_fee: r[1].total_fee };
         D.next = (r[2] || []).slice(0, 4).map(function (m) { var fr = m.feeRange || []; return { nTx: m.nTx, vsize: m.blockVSize, totalFees: m.totalFees, medianFee: m.medianFee, feeRange: fr.length ? [fr[0], fr[fr.length - 1]] : null }; });
@@ -205,7 +297,14 @@
     timers.push(setInterval(function () { var v = px(); if (v && v !== price) { price = v; hudFill(); grid(); } }, 5000));
     probe = d.querySelector('b[data-btc-probe]');
     if (!probe) { probe = d.createElement('b'); probe.setAttribute('data-live', 'BTC'); probe.setAttribute('data-btc-probe', ''); probe.hidden = true; d.body.appendChild(probe); if (w.liveRefresh) w.liveRefresh(); }
-    root.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.bx-b[data-id]'); if (!b) return; sel = sel === b.getAttribute('data-id') ? null : b.getAttribute('data-id'); belt(); });
+    root.addEventListener('click', function (e) {
+      var g = e.target.closest && e.target.closest('[data-go]'), b = !g && e.target.closest && e.target.closest('.bx-b[data-id]');
+      if (g) { var v = g.getAttribute('data-go'); if (v === 'live') goLive(); else if (v === 'older') older(); else show(+v); return; }
+      if (!b) return; sel = sel === b.getAttribute('data-id') ? null : b.getAttribute('data-id'); belt();
+    });
+    root.addEventListener('submit', function (e) { e.preventDefault(); var i = e.target.querySelector('input'); if (i) find(i.value); });
+    root.addEventListener('input', function (e) { if (e.target.type === 'range') { drag = true; read(+e.target.value, null); } });
+    root.addEventListener('change', function (e) { if (e.target.type === 'range') { drag = false; var v = +e.target.value; if (v >= tip) goLive(); else show(v); } });
     var rs = 0, onRs = function () { clearTimeout(rs); rs = setTimeout(lines, 120); }; w.addEventListener('resize', onRs);
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(lines);
     /* the coin in the middle: the real one where the browser can draw it, the still one otherwise */
