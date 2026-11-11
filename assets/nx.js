@@ -20,6 +20,24 @@
     el.addEventListener('pointermove', function (e) { var r = el.getBoundingClientRect(); el.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * (k || .22)).toFixed(1) + 'px,' + ((e.clientY - r.top - r.height / 2) * (k || .22)).toFixed(1) + 'px)'; });
     el.addEventListener('pointerleave', function () { el.style.transform = ''; });
   }
+  /* a browser that draws without a graphics chip (hardware acceleration off, remote desktop, no driver) pays ~20 ms a frame
+     for blurred glass and ~7 ms for the 3D wall — measured on such a machine. It gets the same layout with flat, solid glass. */
+  function gpu() {
+    var v = null, m; try { v = localStorage.getItem('ek_gpu'); } catch (e) { }
+    m = /^(sw|hw):(\d+)$/.exec(v || ''); if (m && Date.now() - (+m[2]) < 864e5) return m[1];
+    var r = 'hw';
+    try {
+      var c = d.createElement('canvas'), g = c.getContext('webgl') || c.getContext('experimental-webgl');
+      if (!g) r = 'sw'; else {
+        var x = g.getExtension('WEBGL_debug_renderer_info'), s = String((x && g.getParameter(x.UNMASKED_RENDERER_WEBGL)) || g.getParameter(g.RENDERER) || '');
+        if (/swiftshader|llvmpipe|software|basic render/i.test(s)) r = 'sw';
+        var l = g.getExtension('WEBGL_lose_context'); if (l) l.loseContext();
+      }
+    } catch (e) { }
+    try { localStorage.setItem('ek_gpu', r + ':' + Date.now()); } catch (e) { }
+    return r;
+  }
+  de.classList.toggle('nx-lite', gpu() === 'sw');
   var tick = null, tickP = null;
   function ticker() { return tickP || (tickP = fetch('/data/ticker.json?v=' + Math.floor(Date.now() / 3e5)).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) { tick = j; return j; })); }
   function live() { if (w.liveRefresh) { w.liveRefresh(); return; } if (d.querySelector('script[data-nx-live]')) return; var s = d.createElement('script'); s.src = '/assets/live.js'; s.setAttribute('data-nx-live', '1'); d.body.appendChild(s); }

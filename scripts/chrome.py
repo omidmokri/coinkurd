@@ -399,12 +399,12 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "2"
-NX_VER = "1"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
+NX_VER = "2"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "if(m){L.setItem('ek_ui',m[1]);try{var u=new URL(location.href);u.searchParams.delete('ui');"
            "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}"
            "var v=L.getItem('ek_ui');if(v==='2'||v==='3'){var c=document.documentElement.classList,n=v==='3',"
-           "h=/^\\/(index\\.html)?$/.test(location.pathname);c.add('ek-v2');if(n)c.add('ek-v3');"
+           "h=/^\\/(index\\.html)?$/.test(location.pathname);c.add('ek-v2');if(n){c.add('ek-v3');if(/^sw:/.test(L.getItem('ek_gpu')||''))c.add('nx-lite')}"
            "if(h)c.add('ek-deck');setTimeout(function(){if(h&&!window.ekUI2)c.remove('ek-deck');if(n&&h&&!window.ekNX)c.remove('ek-v3')},7000);"
            f"var s='<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\">';"
            f"if(n)s+='<link rel=\"stylesheet\" href=\"/assets/nx.css?v={NX_VER}\">';"
