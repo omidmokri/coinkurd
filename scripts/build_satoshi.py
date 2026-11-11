@@ -14,7 +14,7 @@ import build_reality as BR  # noqa: E402
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "2"
+VER = "3"
 GENESIS_MSG = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
 GENESIS_HASH = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
 MON = {
