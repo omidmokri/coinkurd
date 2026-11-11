@@ -354,7 +354,7 @@ html[lang=en] .sx-b h3{font-family:'Space Grotesk',Vazirmatn,sans-serif;font-wei
 .bx-co small{display:block;margin-top:4px;font-size:.78rem;line-height:1.6;color:rgba(255,255,255,.55)}
 .bx-co small bdi{color:var(--gold);font-family:'Space Grotesk',Vazirmatn,sans-serif}
 /* blocks: waiting on one side of "now", mined on the other */
-.bx-belt{position:relative;display:flex;align-items:flex-end;gap:0;margin-top:26px;padding:26px 0 8px;overflow-x:auto;scrollbar-width:thin;direction:ltr}
+.bx-belt{position:relative;display:flex;align-items:flex-end;gap:0;margin-top:26px;padding:26px 0 8px;overflow-x:auto;scrollbar-width:thin;direction:ltr;scrollbar-color:#3a3a40 transparent}
 .bx-q,.bx-m{display:flex;gap:16px;padding-inline:14px}
 .bx-q{flex-direction:row-reverse;margin-inline-start:auto}
 .bx-now{flex:0 0 auto;align-self:stretch;position:relative;width:2px;margin-inline:6px;background:repeating-linear-gradient(var(--gold) 0 6px,transparent 6px 12px)}
