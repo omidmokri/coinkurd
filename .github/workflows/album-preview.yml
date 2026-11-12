@@ -1,0 +1,43 @@
+name: Album preview
+
+# پیش‌نمایش «گزارش تصویری» روی همان ماشین ربات، بدون ارسال به کانال.
+# تصویرها و پاسخ‌های بایننس به‌صورت artifact ذخیره می‌شوند تا پیش از انتشار بررسی شوند.
+on:
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "m = صبح، e = عصر"
+        default: "m"
+      ai:
+        description: "متن‌های هوش مصنوعی (1) یا فقط قالب‌های ثابت (0)"
+        default: "1"
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: |
+          pip install requests pillow arabic-reshaper python-bidi fonttools
+          python scripts/infocard.py --check
+      - name: Record Binance answers
+        env: { ALBUM_RECORD: out/replay }
+        run: python scripts/album.py --record-only
+      - name: Render the album (nothing is posted)
+        continue-on-error: true
+        env:
+          ALBUM_RECORD: out/replay
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+        run: python scripts/album.py --render out/album --slot "${{ inputs.slot }}" ${{ inputs.ai == '0' && '--no-ai' || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: album-preview
+          path: out
+          retention-days: 3
