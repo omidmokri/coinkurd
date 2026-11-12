@@ -243,7 +243,7 @@ S = {
               {"fa": "جمع‌بندی هوشمند شرایط کلان بازار.", "ckb": "کورتەی زیرەکی دۆخی گشتی بازاڕ.",
                "kmr": "Kurteya jîr a rewşa giştî ya bazarê.", "ar": "خلاصة ذكية لظروف السوق العامة.",
                "en": "Smart summary of the overall market regime."}),
-    "battle": ("⚔️", {"fa": "نبرد کن", "ckb": "شەڕ بکە", "kmr": "Şer bike", "ar": "المعركة الحية", "en": "Fight"},
+    "battle": ("⚔️", {"fa": "نبرد من", "ckb": "شەڕی من", "kmr": "Şerê min", "ar": "معركتي", "en": "My Battle"},
                {"fa": "بازار زندهٔ بیت‌کوین به شکل یک جبههٔ سه‌بعدی روی سایت.", "ckb": "بازاڕی زیندووی بیتکۆین وەک بەرەیەکی سێ‌ڕەهەندی لەسەر ماڵپەڕ.",
                 "kmr": "Bazara zindî ya Bitcoin wek eniyeke sêalî li ser malperê.", "ar": "سوق البيتكوين الحي على شكل جبهة ثلاثية الأبعاد على الموقع.",
                 "en": "The live Bitcoin market as a 3D front on the site."}),

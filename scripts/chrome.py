@@ -263,7 +263,7 @@ NAV = [
          L("سلب مسئولیت و قوانین استفاده", "ڕاگەیاندنی بەرپرسیارێتی و یاساکان", "Disclaimer and rules of use")),
     ]},
 ]
-BATTLE = ("/battle/", "swords", L("نبرد کن", "شەڕ بکە", "Fight"))
+BATTLE = ("/battle/", "swords", L("نبرد من", "شەڕی من", "My Battle"))
 # the order of the top bar: Markets, Analysis, Tools, Learn, Archive, Battlefield (direct), More
 TOP_ORDER = ["mkt", "ana", "reality", "tools", "learn", "arc", "BATTLE", "more"]
 
