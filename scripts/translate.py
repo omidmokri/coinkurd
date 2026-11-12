@@ -226,6 +226,58 @@ def main():
     _save(posts)
     json.dump(store, open(TR_FILE, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     print(f"translated {done}")
+    arabic(posts, store, engine, api_key)
+
+
+AR_DAYS = 30            # the owner's choice (2026-11-12): posts of the last month and every new one get Arabic
+AR_PROMPT = ("Translate the following Persian (Farsi) crypto-channel post into Modern Standard Arabic (فصحى). "
+             "Keep the meaning exact; keep numbers, tickers (BTC, ETH…), hashtags, emojis, URLs, markdown links and line "
+             "breaks unchanged. Use standard Arabic crypto terms. Return JSON exactly: {\"title\":\"…\",\"text\":\"…\"}\n\n")
+
+
+def arabic(posts, store, engine, api_key):
+    """/ar/p/<id>/: an Arabic translation for each post of the last AR_DAYS days, AR_LIMIT a run"""
+    import datetime as dt
+    cut = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=AR_DAYS)).isoformat()
+    lim = int(os.environ.get("AR_POST_LIMIT", "30"))
+    todo = [p for p in posts if (p.get("date") or "") >= cut and has_persian(p.get("text", "")) and isinstance(p.get("tr"), dict)
+            and not ((p["tr"].get("ar") or {}).get("text"))][:lim]
+    print(f"arabic: {len(todo)} posts to translate (last {AR_DAYS} days)")
+    done = fails = 0
+    for p in todo:
+        if fails >= 3:
+            break
+        try:
+            body = "TITLE: " + (p.get("title") or "") + "\n\nTEXT:\n" + p["text"]
+            if engine == "gemini":
+                r = ai.generate(AR_PROMPT + body, as_json=True, temperature=0.1, max_tokens=8192)
+            elif engine == "claude":
+                import requests
+                q = requests.post("https://api.anthropic.com/v1/messages", timeout=120,
+                                  headers={"x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+                                  json={"model": claude_model(api_key), "max_tokens": 4000, "messages": [{"role": "user", "content": AR_PROMPT + body}]})
+                q.raise_for_status()
+                r = json.loads(re.search(r"\{.*\}", "".join(b.get("text", "") for b in q.json()["content"]), re.S).group(0))
+            else:
+                return
+            if isinstance(r, str):
+                r = json.loads(re.search(r"\{.*\}", r, re.S).group(0))
+            t, x = (r.get("title") or "").strip(), (r.get("text") or "").strip()
+            if not x or not re.search(r"[\u0600-\u06FF]", x) or re.search(r"[پچژگ]", x.replace("پ", "", 0)) and len(re.findall(r"[پچژگ]", x)) > 6:
+                raise RuntimeError("not Arabic")
+            p["tr"]["ar"] = {"title": t or p.get("title", ""), "text": x}
+            store.setdefault(str(p["id"]), {})["ar"] = p["tr"]["ar"]
+            done += 1
+            fails = 0
+        except Exception as e:  # noqa: BLE001
+            print(f"  ar {p.get('id')} FAILED: {str(e)[:160]}", file=sys.stderr)
+            fails += 1
+            if isinstance(e, ai.QuotaError) or "429" in str(e):
+                break
+    if done:
+        _save(posts)
+        json.dump(store, open(TR_FILE, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    print(f"arabic: translated {done}")
 
 
 def _save(posts):

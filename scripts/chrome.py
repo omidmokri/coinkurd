@@ -19,8 +19,11 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "15"  # bump to bust caches of chrome.css / chrome.js
+VER = "16"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
+# Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
+# turns it on (the file data/ar_on), after the dictionaries are filled and checked.
+AR_ON = os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "ar_on"))
 
 # ---------------------------------------------------------------- icons (generic line glyphs, 24x24)
 _P = {
@@ -346,7 +349,8 @@ def header(lang="fa"):
              f'<button class="ek-ib ek-rdb" type="button" aria-haspopup="menu"{aria(T["read"], lang)}>{icon("speaker")}</button>'
              f'<a class="ek-ib ek-tgb" href="https://t.me/Coin_Kurd" target="_blank" rel="noopener noreferrer"{aria(T["tg"], lang)}><i class="ek-si b-telegram"></i></a>'
              f'<div class="ek-lang" id="langs" role="group" aria-label="language"><button type="button" data-l="fa" lang="fa">فا</button>'
-             f'<button type="button" data-l="ckb" lang="ckb">کو</button><button type="button" data-l="en" lang="en">EN</button></div>'
+             f'<button type="button" data-l="ckb" lang="ckb">کو</button><button type="button" data-l="en" lang="en">EN</button>'
+             f'<button type="button" data-l="ar" lang="ar"{"" if AR_ON else " hidden"}>ع</button></div>'
              f'<a class="ek-appb" href="/app/" aria-label="{e(T["app"][lang])}"><i class="ek-si b-android"></i>{tri(T["app"], lang)}</a>'
              f'<a class="ek-ib ek-meb" href="/me/"{aria(T["me"], lang)}>{icon("user")}</a>')
     return (f'<!--ek:header--><a class="ek-skip" href="#ek-main">{e(T["skip"][lang])}</a>'
@@ -405,8 +409,8 @@ def footer(lang="fa"):
 # before it, so placed lower the interface's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "3"
-NX_VER = "7"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+UI2_VER = "4"
+NX_VER = "8"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
            "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"

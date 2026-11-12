@@ -781,3 +781,16 @@ is untouched.
   Note: a quick estimate earlier the same day (posts +0.53% vs a daily-close baseline of −0.04%) overstated the gap —
   it used a shorter window and daily closes. This result supersedes it.
 - **Next:** Backlog #1 — use these figures everywhere the raw average is still shown.
+
+### 2026-11-12 · Arabic (MSA) as a fourth language (asked for by the owner)
+- **Scope (owner's choice):** the whole site except the encyclopedia (stays fa/ckb/en); posts from the last 30 days and
+  every new one get real Arabic pages; older posts are not translated. Modern Standard Arabic, everything at once.
+- **How:** `scripts/i18n_ar.py` (CI, after all builds) extracts the English of every page and of the JS string tables,
+  translates only new strings (capped per run) into `data/i18n_ar.json`, writes dictionaries to `i18n/ar/` and adds
+  `assets/ar.js` to every page; `ar.js` overlays Arabic on the English page (RTL, numbers/dates kept, later text via
+  MutationObserver). Posts: `translate.py` arabic pass (30/run) → `tr.ar` → `/ar/p/<id>/` by `build_pages.py`.
+- **Gate:** the «ع» button stays hidden until `data/ar_on` exists, so the cache fills before visitors see it
+  (`localStorage.ek_ar_test=1` shows it for checking). App = WebView, follows automatically; bot already has `ar`.
+- **Verified locally:** home/satoshi/post desktop+mobile, switch in and out, post `/p/<id>/` → `/ar/p/<id>/`, no JS
+  errors; fixed `nx.js`/`ui2.js` reading the «ع» button as Persian.
+- **Next:** CI fills translations; check quality, then owner approves and `data/ar_on` is created.

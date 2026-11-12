@@ -340,6 +340,7 @@ def seo_desc(desc, n=158):
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
+    cl = "en" if lang == "ar" else lang          # Arabic pages: the menus are built in English and assets/ar.js translates them
     body = body.replace("</small><b", "</small> <b")          # a label and its number stay two words for readers without CSS
     body = body.replace('</b></div><div class="kpi"', '</b></div> <div class="kpi"')
     extra_head = extra_head + crumbs_ld(body, title, url, lang)
@@ -349,9 +350,9 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 {ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}
 <style>{CSS}</style>{chrome.HEAD_TAGS}{extra_head}</head><body>
-{chrome.header(lang)}
+{chrome.header(cl)}
 <main class="w">{body}</main>
-<p class="ek-credit">{CREDIT.get(lang, CREDIT["fa"])}</p>{chrome.bottom(lang)}{chrome.footer(lang)}<script>{RECENT_JS}{WATCH_JS}</script>{chrome.BODY_TAGS}</body></html>"""
+<p class="ek-credit">{CREDIT.get(cl, CREDIT["fa"])}</p>{chrome.bottom(cl)}{chrome.footer(cl)}<script>{RECENT_JS}{WATCH_JS}</script>{chrome.BODY_TAGS}</body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
@@ -460,7 +461,7 @@ def build_post(p):
 
 def alt_links(p):
     tr = p.get("tr") or {}
-    alts = [("fa", f"{SITE}/p/{p['id']}/")] + [(lg, f"{SITE}/{lg}/p/{p['id']}/") for lg in ("ckb", "en") if isinstance(tr.get(lg), dict) and tr[lg].get("text")]
+    alts = [("fa", f"{SITE}/p/{p['id']}/")] + [(lg, f"{SITE}/{lg}/p/{p['id']}/") for lg in ("ckb", "en", "ar") if isinstance(tr.get(lg), dict) and tr[lg].get("text")]
     if len(alts) == 1:
         return ""
     return "".join(f'<link rel="alternate" hreflang="{lg}" href="{u}">' for lg, u in alts) + f'<link rel="alternate" hreflang="x-default" href="{alts[0][1]}">'
@@ -470,7 +471,9 @@ GROUP = "https://t.me/Coin_Kurd_Group"
 LBL_L = {"en": {"tg": "View this post on Telegram ↗", "fa": "Persian original", "arch": "Open in the archive", "nfa": "Educational, not financial advice.",
                 "grp": "💬 Discuss in the Coin_Kurd Telegram group"},
          "ckb": {"tg": "بینینی ئەم پۆستە لە تێلێگرام ↗", "fa": "دەقی ئەسڵی فارسی", "arch": "کردنەوە لە ئەرشیڤ", "nfa": "فێرکارییە، ئامۆژگاریی دارایی نییە.",
-                 "grp": "💬 گفتوگۆ لە گرووپی تێلێگرامی Coin_Kurd"}}
+                 "grp": "💬 گفتوگۆ لە گرووپی تێلێگرامی Coin_Kurd"},
+         "ar": {"tg": "عرض هذا المنشور على تيليغرام ↗", "fa": "النص الفارسي الأصلي", "arch": "فتح في الأرشيف", "nfa": "محتوى تعليمي، وليس نصيحة مالية.",
+                "grp": "💬 النقاش في مجموعة Coin_Kurd على تيليغرام"}}
 
 
 def build_post_lang(p, lg):
@@ -487,7 +490,7 @@ def build_post_lang(p, lg):
     if img:
         body += hero_img(img, title)
     body += f'<div class="txt">{rich(t["text"])}</div>'
-    if p.get("q") != "low":
+    if p.get("q") != "low" and lg != "ar":
         body += cat_line(p.get("category"), lg)
     body += f'<p class="note"><a href="/p/{p["id"]}/" lang="fa">{L["fa"]}</a> · <a href="{e(su(p["url"]))}">{L["tg"]}</a> · <a href="/#p{p["id"]}">{L["arch"]}</a> · <a href="{GROUP}" rel="noopener" target="_blank">{L["grp"]}</a> · {L["nfa"]}</p>'
     ld = {"@context": "https://schema.org", "@type": "NewsArticle", "headline": title[:110], "datePublished": p.get("date"), "inLanguage": lg,
@@ -725,7 +728,7 @@ def main():
         u = build_post(p)
         if p.get("q") != "low":
             urls.append((u, p.get("date")))
-        for lg in ("en", "ckb"):
+        for lg in ("en", "ckb", "ar"):
             ul = build_post_lang(p, lg)
             if ul and p.get("q") != "low":
                 urls.append((ul, p.get("date")))
