@@ -1,4 +1,4 @@
-/* entekhab.net — interface v3 "Nexus" (preview, ?ui=3). Loaded after ui2.css and only when <html> carries .ek-v3
+/* entekhab.net — interface v3 "Nexus". Loaded after ui2.css and only when <html> carries .ek-v3
    (the switch is in scripts/chrome.py). It keeps the v2 engine — the full-screen menu and the homepage rooms with their
    history — and replaces what is seen:
 
@@ -134,6 +134,8 @@ html[lang=en] .nx-h1{font-family:'Archivo Black','Space Grotesk',sans-serif;font
 .nx-role{margin:6px 0 0;max-width:46ch;font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.62)}
 .nx-net{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;margin:8px 0 0;padding:0;list-style:none;font-size:.78rem;color:rgba(255,255,255,.5)}
 .nx-net b{font:700 .84rem 'Space Grotesk',var(--ek-font);color:var(--nx-gold);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.nx-net:empty{min-height:1.7em}   /* the line is filled by script: its room is kept so the buttons below do not move */
+@media (max-width:480px){.nx-net:empty{min-height:calc(3.4em + 4px)}}
 .nx-cta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:14px}
 .nx-btn{position:relative;display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 20px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#fff;
   font:800 .9rem var(--ek-font);text-decoration:none;cursor:pointer;transition:border-color .2s,background .2s,transform .2s var(--nx-e);will-change:transform}
@@ -381,4 +383,7 @@ html.nx-lite #ekb{background:#08080a}
   .nx-links path.on,html.live-on .nx-tick i,.nx-st.live i,.nxm-st.live i,.nx-coin.css .nx-c3,.lv-up,.lv-dn{animation:none!important}
   html.ek-v3 .ekm-bg{clip-path:none}html.ek-v3 #ekp{clip-path:none}
 }
+/* the stage is in the page's own markup; when the script has to rebuild it in place (another language, or a newer
+   template than the one written into the page) the entrance is not played a second time */
+.nx.nx-re .nx-coin,.nx.nx-re .nx-mid>*,.nx.nx-re .nx-p{animation:none!important}
 @media print{#nxr,.nx-links,.nx-bg,.nx-coin{display:none!important}}

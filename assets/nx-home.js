@@ -1,4 +1,4 @@
-/* entekhab.net — interface v3 "Nexus": the homepage stage (preview, ?ui=3).
+/* entekhab.net — interface v3 "Nexus": the homepage stage.
    The first screen is one room: the coin in the middle (assets/nx-coin.js), the sections of the page around it as glass panels
    with a live preview each, and a rail at the bottom that reaches every one of them. A panel opens into its full-screen room
    (the v2 engine in assets/ui2.js keeps the history, the address and the focus). Every number shown is real: the exchange's
@@ -27,7 +27,11 @@
   function nfmt(n) { return dg(Number(n).toLocaleString('en-US')).replace(/,/g, U.lang() === 'en' ? ',' : '٬'); }
 
   /* ------------------------------------------------------------------ build */
-  var nx = d.createElement('section'); nx.className = 'nx'; nx.id = 'nx'; nx.setAttribute('aria-labelledby', 'nx-h');
+  /* index.html already carries this stage as plain markup (the output of the template below, written there by
+     scripts/nx_prerender.py), so a visitor on a slow connection sees it before this script arrives. If what is on the
+     page is exactly what the template gives now, it is used as it stands; otherwise it is rebuilt in place. */
+  var nx = d.getElementById('nx'), pre = !!nx;
+  if (!nx) { nx = d.createElement('section'); nx.className = 'nx'; nx.id = 'nx'; nx.setAttribute('aria-labelledby', 'nx-h'); }
   var cols = { a: '', b: '' }, rail = '', doors = {}, order = [];
   DEF.forEach(function (D) {
     var sec = d.getElementById(D.id); if (!sec) return;
@@ -49,7 +53,7 @@
     if (!link) order.push(D.id);
   });
   var role = hero.querySelector('.role[data-i]');
-  nx.innerHTML = '<div class="nx-bg" aria-hidden="true"><div class="nx-bgc"></div></div><svg class="nx-links" aria-hidden="true"></svg>' +
+  var tpl = '<div class="nx-bg" aria-hidden="true"><div class="nx-bgc"></div></div><svg class="nx-links" aria-hidden="true"></svg>' +
     '<div class="nx-mid"><div class="nx-coin"><span class="nx-c3" aria-hidden="true"><img src="/assets/coin-front.webp" alt="" width="512" height="512" fetchpriority="high" decoding="async"><img src="/assets/coin-back.webp" alt="" width="512" height="512" decoding="async"></span>' +
     '<canvas aria-hidden="true"></canvas><i class="nx-hit" aria-hidden="true"></i>' +
     '<div class="nx-ped" aria-hidden="true"><svg viewBox="0 0 460 110"><defs><radialGradient id="nxpg"><stop offset="0" stop-color="#ffb347" stop-opacity=".95"/><stop offset=".45" stop-color="#f7931a" stop-opacity=".42"/><stop offset="1" stop-color="#f7931a" stop-opacity="0"/></radialGradient>' +
@@ -63,7 +67,9 @@
     '<div class="nx-cta"><a class="nx-btn p" href="#market" data-d="market">' + tri('ورود به بازار زنده', 'چوونە ناو بازاڕی زیندوو', 'Enter the live market') + '</a>' +
     '<a class="nx-btn" href="/satoshi/">' + HOME + tri('داستان ساتوشی', 'چیرۆکی ساتۆشی', 'Satoshi’s story') + '</a></div></div>' +
     '<div class="nx-ps"><div class="nx-col nx-a">' + cols.a + '</div><div class="nx-col nx-b">' + cols.b + '</div></div>';
-  main.insertBefore(nx, main.firstChild);
+  if (pre) { var t0 = d.createElement('div'); t0.innerHTML = tpl; if (t0.innerHTML !== nx.innerHTML) { nx.classList.add('nx-re'); nx.innerHTML = tpl; } }
+  else nx.innerHTML = tpl;
+  if (main.firstElementChild !== nx) main.insertBefore(nx, main.firstChild);
   var mid = nx.querySelector('.nx-mid'), nxt = d.getElementById('next'); if (nxt) mid.appendChild(nxt);
   var R = d.createElement('div'); R.id = 'nxr'; R.setAttribute('role', 'navigation');   /* not <nav>: the homepage styles bare nav elements */
   R.innerHTML = '<a class="nxr-home" href="#" data-home>' + HOME + tri('خانه', 'ماڵەوە', 'Home') + '</a>' + rail + '<i class="nxr-sep" aria-hidden="true"></i><a class="nxr-sat" href="/satoshi/">' + tri('ساتوشی', 'ساتۆشی', 'Satoshi') + '</a>';
