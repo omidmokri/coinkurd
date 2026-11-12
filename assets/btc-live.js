@@ -167,8 +167,8 @@
     }
     function lgFill() {   /* the legend: this block's lowest and highest rates and a few round numbers between */
       var box = $('.mp-lgb'); if (!box || !M || !M.sc) return;
-      var sc = M.sc, nice = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000, 2000], mid = nice.filter(function (v) { return v > sc.lo * 1.3 && v < sc.hi / 1.3; });
-      if (mid.length > 3) mid = [mid[0], mid[Math.floor(mid.length / 2)], mid[mid.length - 1]];
+      var sc = M.sc, nice = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000, 2000], mid = [], last = 0;
+      nice.forEach(function (v) { var t = tOf(v, sc); if (t >= last + 0.18 && t <= 0.84 && t >= 0.16) { mid.push(v); last = t; } });   /* labels never touch */
       var h = '<i></i><span style="left:0%">' + rt(sc.lo) + '</span>' + mid.map(function (v) { return '<span style="left:' + (tOf(v, sc) * 100).toFixed(1) + '%">' + v + '</span>'; }).join('') + '<span style="left:100%">' + rt(sc.hi) + '+</span>';
       if (box._h !== h) { box.innerHTML = h; box._h = h; }
     }
