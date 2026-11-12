@@ -318,7 +318,27 @@ def sec_score(lang):
     return "\n".join(out)
 
 
+def _reel_title(x, lang):
+    """تیتر ریل خبری به زبان کاربر؛ کورمانجی مثل بقیهٔ ربات به انگلیسی برمی‌گردد"""
+    tt = x.get("t") or {}
+    return tt.get(lang) or tt.get("en") or ""
+
+
 def sec_news(lang, coin=None):
+    # ریل خبری چهارزبانه (data/newsreel.json) تیتر را به زبان خود کاربر می‌دهد؛ اگر نبود، خبرخوان انگلیسی
+    r = load("newsreel") or {}
+    ritems = [x for x in (r.get("items") or []) if _reel_title(x, lang) and x.get("url")]
+    if coin:
+        ritems = [x for x in ritems if coin in (x.get("coins") or [])]
+    if ritems:
+        out = [f"📰 <b>{h('news', lang)}{(' · ' + coin) if coin else ''}</b>"]
+        for x in ritems[:10]:
+            tags = " ".join(f"#{c}" for c in (x.get("coins") or [])[:2])
+            out.append(f"• <a href=\"{e(x['url'])}\">{e(_reel_title(x, lang))}</a> <i>({e(x.get('source'))})</i>"
+                       + (f" {e(tags)}" if tags else ""))
+        out += ["", age(r.get("updated_at"), lang)]
+        return cut("\n".join(out))
+
     n = load("news") or {}
     items = n.get("items", [])
     if coin:
@@ -327,7 +347,8 @@ def sec_news(lang, coin=None):
     for x in items[:10]:
         src = len(x.get("sources") or []) or 1
         multi = f" ×{src}" if src > 1 else ""
-        out.append(f"• <a href=\"{e(x['url'])}\">{e(x['title'])}</a> <i>({e(x.get('source'))}{multi})</i>")
+        title = x.get("tfa") if lang == "fa" and x.get("tfa") else (x.get("tckb") if lang == "ckb" and x.get("tckb") else x["title"])
+        out.append(f"• <a href=\"{e(x['url'])}\">{e(title)}</a> <i>({e(x.get('source'))}{multi})</i>")
     if len(out) == 1:
         out.append("—")
     out += ["", age(n.get("updated_at"), lang)]

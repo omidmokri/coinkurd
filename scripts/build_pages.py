@@ -12,6 +12,7 @@
 """
 import chrome  # shared header/footer (scripts/chrome.py)
 import onchain_page as OP  # /onchain/ analysis block and its compact form
+import newsreel_ui as NR  # the four-language news reel on /crypto-news/
 import html
 import json
 import os
@@ -1019,11 +1020,13 @@ SECTOR_FA = {"layer-1": "لایهٔ یک (L1)", "exchange-based-tokens": "توک
 # note saying so; the header buttons are answered the same way as LANG_JS / build_reality.LANG_JS.
 FEED_UI = {
     "onchain/": ("پوختەی شیکارییە ئانچینەکانی بیتکۆین و بازاڕی کریپتۆ بە فارسی و کوردیی سۆرانی · خۆکار لە بۆتی Coin_Kurd",
-                 "On-chain analysis summaries for Bitcoin and the crypto market, in Persian and Sorani Kurdish · updated by the Coin_Kurd bot"),
+                 "On-chain analysis summaries for Bitcoin and the crypto market, in Persian and Sorani Kurdish · updated by the Coin_Kurd bot",
+                 "ملخصات تحليلات أون-تشين للبيتكوين وسوق الكريبتو بالفارسية والكردية السورانية · تحديث تلقائي من بوت Coin_Kurd"),
     "crypto-news/": ("پوختەی هەواڵەکانی ڕۆژانەی بازاڕی کریپتۆ بە فارسی و کوردیی سۆرانی · خۆکار لە بۆتی Coin_Kurd",
-                     "Daily crypto news summaries in Persian and Sorani Kurdish · updated by the Coin_Kurd bot"),
+                     "Daily crypto news summaries in Persian and Sorani Kurdish · updated by the Coin_Kurd bot",
+                     "ملخصات أخبار سوق الكريبتو اليومية بالفارسية والكردية السورانية · تحديث تلقائي من بوت Coin_Kurd"),
 }
-FEED_LANG_JS = ("(function(){var K='ck_lang',L;try{L=localStorage.getItem(K)}catch(e){}if(['fa','ckb','en'].indexOf(L)<0)L='fa';window.I18N=1;"
+FEED_LANG_JS = ("(function(){var K='ck_lang',L;try{L=localStorage.getItem(K)}catch(e){}if(['fa','ckb','ar','en'].indexOf(L)<0)L='fa';window.I18N=1;"
                 "function ap(l){L=l;try{localStorage.setItem(K,l)}catch(e){}var de=document.documentElement;de.lang=l;de.dir=l==='en'?'ltr':'rtl';"
                 "document.querySelectorAll('[data-fl]').forEach(function(x){x.hidden=x.getAttribute('data-fl')!==l});"
                 "document.querySelectorAll('.fd-ck').forEach(function(d){d.open=l==='ckb';var f=d.previousElementSibling;if(f&&f.classList.contains('fd-fa'))f.hidden=l==='ckb'});"
@@ -1060,17 +1063,23 @@ def build_feeds():
             block += "</article>"
             cards.append(block)
         head = OP.analysis_block(load, e, fmt_date) if path == "onchain/" else ""
-        def fl(fa_, ckb_, en_, tag="span", cls=""):
+        def fl(fa_, ckb_, en_, tag="span", cls="", ar_=None):
             c = f' class="{cls}"' if cls else ""
-            return (f'<{tag}{c} data-fl="fa">{fa_}</{tag}><{tag}{c} data-fl="ckb" hidden>{ckb_}</{tag}>'
-                    f'<{tag}{c} data-fl="en" hidden dir="ltr">{en_}</{tag}>')
+            return (f'<{tag}{c} data-fl="fa" lang="fa">{fa_}</{tag}><{tag}{c} data-fl="ckb" lang="ckb" hidden>{ckb_}</{tag}>'
+                    f'<{tag}{c} data-fl="ar" lang="ar" hidden>{ar_ if ar_ is not None else fa_}</{tag}>'
+                    f'<{tag}{c} data-fl="en" lang="en" hidden dir="ltr">{en_}</{tag}>')
         ui = FEED_UI[path]
-        body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
-                + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note")
-                + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note")
+        reel = NR.block(load("newsreel.json", {}), e, fmt_date) if path == "crypto-news/" else ""
+        body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home", ar_="الرئيسية")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
+                + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note", ar_=e(ui[2]))
+                + reel
+                + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note",
+                     ar_="الملخصات أدناه مكتوبة بالفارسية والكردية السورانية؛ عناوين الشريط أعلاه متوفرة بالعربية.")
                 + head
-                + ("".join(cards) or fl("هنوز موردی منتشر نشده است.", "هێشتا هیچ بابەتێک بڵاو نەکراوەتەوە.", "Nothing published yet.", "p", "note"))
-                + fl("آموزشی است، توصیهٔ مالی نیست.", "فێرکارییە، ئامۆژگاریی دارایی نییە.", "Educational, not financial advice.", "p", "note")
+                + ("".join(cards) or fl("هنوز موردی منتشر نشده است.", "هێشتا هیچ بابەتێک بڵاو نەکراوەتەوە.", "Nothing published yet.", "p", "note",
+                                        ar_="لم يُنشر أي شيء بعد."))
+                + fl("آموزشی است، توصیهٔ مالی نیست.", "فێرکارییە، ئامۆژگاریی دارایی نییە.", "Educational, not financial advice.", "p", "note",
+                     ar_="لأغراض تعليمية، وليست نصيحة مالية.")
                 + f"<style>html[lang=ckb] .fd-ck>summary{{display:none}}</style><script>{FEED_LANG_JS}</script>")
         urls.append(page(path, title, desc, body))
     v = load("deep.json", {}).get("items", [])

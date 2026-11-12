@@ -136,6 +136,16 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: timeout 330 python scripts/news_tr.py
 
+      - name: Four-language news reel (CryptoPanic when a token is set, else our own feed)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CRYPTOPANIC_TOKEN: ${{ secrets.CRYPTOPANIC_TOKEN }}
+          CRYPTOPANIC_PLAN: ${{ vars.CRYPTOPANIC_PLAN || 'developer' }}
+        run: timeout 330 python scripts/newsreel.py
+
       - name: Capital flow by sector + exchanges globe (CoinGecko)
         id: flows
         continue-on-error: true
