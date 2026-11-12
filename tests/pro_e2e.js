@@ -263,6 +263,15 @@ async function mockNet(page, stats) {
     await shot(page, `22_${lang}_390_fresh`); await ctx.close();
   }
 
+  /* ---------- opening the page stars nothing across the site; «My watchlist» shows the default coins until edited */
+  if (!ONLY || ONLY === 'watch') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    const w = await page.evaluate(() => ({ stored: localStorage.getItem('ek_watch'), rows: [...document.querySelectorAll('.pm-wr[data-s]')].map(e => e.getAttribute('data-s')).join(),
+      dur: PRO.durText ? PRO.durText(19 * 3600 + 22 * 60) : null }));
+    ok('the default «My watchlist» is shown without writing site-wide stars; countdown in words', w.stored === null && w.rows === 'BTC,ETH,SOL,BNB,XRP,DOGE,XAUT' && w.dur === '19 ساعت و 22 دقیقه', JSON.stringify(w));
+    await ctx.close();
+  }
+
   /* ---------- the site rule: a coin is never shown without its own logo, even from old storage, a file or a link */
   if (!ONLY || ONLY === 'logo') {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: 'en-US', timezoneId: 'Asia/Tehran', serviceWorkers: 'block' });
