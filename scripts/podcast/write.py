@@ -43,8 +43,8 @@ Use only Sorani letters: never the Arabic-only letters ص ض ط ظ ث ذ ة ي �
 separators; write "percent" as a word. Clock times are given in UTC, with Tehran time where the master gives it.""",
     "ar": """Modern Standard Arabic, for Arab traders. FULLY vowelled text (tashkeel on every word, as the style
 example does) — it is stripped from the displayed text and only guides the voice. Digits are ASCII with comma
-thousands separators; percent is «بِالْمِئَةِ». Clock times are given in Mecca time (UTC+3) and UTC — never in Tehran time: convert the
-master's Tehran times with the table below (Tehran is 30 minutes ahead of Mecca).""",
+thousands separators; percent is «بِالْمِئَةِ». Clock times are given in Mecca time (UTC+3) or UTC, converted from the master's Tehran
+times with the table below (Tehran is 30 minutes ahead of Mecca); if you keep a Tehran time, say «بتوقيت طهران».""",
 }
 
 COMMON = """You write one daily episode of the crypto-market podcast «{show}», published on entekhab.net and the Telegram
@@ -56,7 +56,9 @@ ABSOLUTE RULES
    Never invent a price, level, percentage, date, count or quote. If a fact is missing, leave the point out.
 2. News: report only items from INPUTS. Name the outlet(s) that reported each. Prefer items several outlets report,
    and the channel's own posts. Never present an old item as new. Never write anything you cannot attribute.
-3. Every figure is written with digits (never spelled in words), so it can be checked automatically.
+3. Every figure is written with digits (never spelled in words), so it can be checked automatically. Round for the
+   ear: no cents on prices above 100 dollars (BTC to the nearest 10 or 100 dollars, e.g. 71,997.91 -> 72,000), at most
+   two decimals on percentages. Round, never truncate.
 4. Calendar dates are written as ⟦shown|spoken⟧ markup: the shown side with digits, the spoken side in words,
    e.g. ⟦12 November|the twelfth of November⟧. Acronyms and Latin names in fa/ckb/ar text are written the same way:
    ⟦MSCI|<letters spelled in the language>⟧. Nothing else uses the markup.
@@ -290,7 +292,8 @@ class Writer:
         self.log = []
 
     def common(self, lang, ctx):
-        zones = {"fa": (("Tehran", 210),), "ckb": (("Tehran", 210),), "en": (("Tehran", 210),), "ar": (("Mecca", 180),)}[lang]
+        zones = {"fa": (("Tehran", 210),), "ckb": (("Tehran", 210),), "en": (("Tehran", 210),),
+                 "ar": (("Mecca", 180), ("Tehran", 210))}[lang]
         rows = []
         for u in sorted(ctx["allowed_utc"]):
             parts = [f"{u // 60:02d}:{u % 60:02d} UTC"] + [f"{((u + o) % 1440) // 60:02d}:{(u + o) % 60:02d} {z} time"

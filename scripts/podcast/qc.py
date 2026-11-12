@@ -31,7 +31,7 @@ def numbers(text, lang):
     return [float(x) for x in re.findall(r"\d+(?:\.\d+)?", t)]
 
 
-OFFSETS = {"fa": (0, 210), "en": (0, 210), "ar": (0, 180), "ckb": (0, 210), "tr": (0, 180)}  # minutes: UTC, Tehran (+3:30), Mecca/TSİ (+3)
+OFFSETS = {"fa": (0, 210), "en": (0, 210), "ar": (0, 180, 210), "ckb": (0, 210), "tr": (0, 180)}  # minutes: UTC, Tehran (+3:30), Mecca/TSİ (+3)
 
 
 def times(text, lang, allowed_utc):
