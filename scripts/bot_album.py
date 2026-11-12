@@ -13,6 +13,7 @@ Also here: /album (admins) draws a preview into the admin's own chat without tou
 """
 import json
 import logging
+import os
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -30,6 +31,10 @@ RETRY = 4 * 60                                # a failed build is tried again af
 MAX_TRIES = 3                                 # … three times at most
 START = datetime(2026, 11, 12, 16, 0, tzinfo=timezone.utc)      # the first live edition (19:30 Tehran, 21 Aban)
 KEEP = 30
+
+REQ_URL = ("https://raw.githubusercontent.com/" + os.environ.get("GITHUB_REPOSITORY", "omidmokri/coinkurd")
+           + "/main/data/album_request.json")    # an extra edition asked for outside the timetable
+_req = {"t": 0.0}
 
 LOCK = threading.Lock()                       # held while an album is being sent and recorded
 CLOSING = threading.Event()                   # the run is ending: no new send may start
@@ -164,7 +169,7 @@ def site_record(st):
         log.exception("album record not pushed")
 
 
-def run_slot(s, key, ed, t):
+def run_slot(s, key, ed, t, extra=False):
     st = state(s)
     rec = st["done"].setdefault(key, {"state": "pending", "tries": 0})
     if rec.get("next") and time.time() < rec["next"]:
@@ -174,7 +179,7 @@ def run_slot(s, key, ed, t):
     if problems:
         log.warning("album %s try %s not ready: %s", key, rec["tries"], problems)
         late = datetime.now(timezone.utc) + timedelta(seconds=RETRY) > t + timedelta(seconds=LATE)
-        if rec["tries"] < MAX_TRIES and not late:
+        if rec["tries"] < MAX_TRIES and not late and not extra:
             rec.update(next=time.time() + RETRY, problems=problems[:6])
             return True
         rec.update(state="failed", problems=problems[:6], at=datetime.now(timezone.utc).isoformat())
@@ -243,13 +248,6 @@ def run_slot(s, key, ed, t):
     return True
 
 
-def slot_time(key):
-    day, ed = key.split(":")
-    h, m = next((h, m) for e, h, m in SLOTS if e == ed)
-    y, mo, d = map(int, day.split("-"))
-    return datetime(y, mo, d, h, m, tzinfo=timezone.utc), ed
-
-
 def expire(s):
     """a slot whose window closed without a post is reported once — also when the bot was not running at all"""
     st = state(s)
@@ -269,12 +267,66 @@ def expire(s):
             CFG["persist"]()
 
 
+def pending_request(s):
+    """an extra edition: queued by an admin (/album post) or asked for in data/album_request.json on the site
+    ({"id": "...", "requested_at": ISO}); a request older than two hours is ignored, each id is served once"""
+    st = state(s)
+    q = st.setdefault("queue", [])
+    if q:
+        return q[0]
+    if time.time() - _req["t"] < 120:
+        return None
+    _req["t"] = time.time()
+    try:
+        r = requests.get(REQ_URL, params={"t": int(time.time())}, timeout=20)
+        j = r.json() if r.ok else None
+    except Exception:
+        j = None
+    if not isinstance(j, dict) or not j.get("id"):
+        return None
+    rid = str(j["id"])[:40]
+    served = st.setdefault("requests", [])
+    if rid in served:
+        return None
+    at = A.parse_dt(j.get("requested_at"))
+    last = A.parse_dt((st.get("latest") or {}).get("at"))
+    if not at or datetime.now(timezone.utc) - at > timedelta(hours=2) or (last and last >= at):
+        served.append(rid)                           # stale, or a timetable edition has already answered it
+        return None
+    q.append({"id": rid, "at": at.isoformat(), "by": "site"})
+    return q[0]
+
+
+def request_now(s, chat_id):
+    """/album post — an admin asks for an extra edition now; it goes through the same checks"""
+    st = state(s)
+    rid = f"admin{int(time.time())}"
+    st.setdefault("queue", []).append({"id": rid, "at": datetime.now(timezone.utc).isoformat(), "by": chat_id})
+    say(chat_id, "📸 درخواست ثبت شد: یک گزارش تصویری تازه ساخته می‌شود و اگر همهٔ موارد فهرست کنترل را بگذراند، "
+                 "تا حدود دو دقیقهٔ دیگر در کانال منتشر می‌شود. نتیجه و لینک همین‌جا گزارش می‌شود.")
+
+
 def tick(s):
     expire(s)
-    d = due(datetime.now(timezone.utc), state(s))
-    if not d:
-        return False
-    return run_slot(s, *d)
+    st = state(s)
+    now = datetime.now(timezone.utc)
+    d = due(now, st)
+    if d:
+        return run_slot(s, *d)
+    if d is None and not any(t - timedelta(seconds=LEAD + 600) <= now <= t for t in upcoming(now)):
+        req = pending_request(s)                     # never right before a timetable slot
+        if req:
+            st["queue"].pop(0)
+            st.setdefault("requests", []).append(req["id"])     # served once, even if this run dies midway
+            del st["requests"][:-50]
+            key = f"{now:%Y-%m-%d}:x{req['id']}"
+            return run_slot(s, key, "m" if A.teh(now).hour < 13 else "e", now, extra=True)
+    return False
+
+
+def upcoming(now):
+    return [datetime(d.year, d.month, d.day, h, m, tzinfo=timezone.utc)
+            for d in (now.date(), now.date() + timedelta(days=1)) for _, h, m in SLOTS]
 
 
 def wait_idle(timeout=150):
