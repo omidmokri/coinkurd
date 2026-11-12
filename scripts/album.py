@@ -425,8 +425,8 @@ def news_pool(now, since, used=()):
         if CLICKBAIT.search(title):
             continue
         t = tr.get(it.get("id")) or {}
-        fa_t = IC.clean(t.get("fa_t") or it.get("tfa") or "")
-        fa_s = IC.clean(t.get("fa_s") or "")
+        fa_t = nim(IC.clean(t.get("fa_t") or it.get("tfa") or ""))
+        fa_s = nim(IC.clean(t.get("fa_s") or ""))
         if len(fa_t) < 12 or re.search(r"(\b\w+\b)(\s+\1){1,}", fa_t):       # «آگهی آگهی» style translator slips
             continue
         srcs = it.get("sources") or [{"source": it.get("source")}]
@@ -752,6 +752,24 @@ BANNED = re.compile("|".join([_word("قطعا"), _word("قطعاً"), _word("ح�
                               r"صد ?در ?صد", "۱۰۰ ?٪", _word("بخرید"), _word("بفروشید"), "سیگنال خرید", "سیگنال فروش",
                               "فرصت طلایی", "سود قطعی", "ضرر نمی", "پولدار", "ماه می‌رود"]))
 JOINED = re.compile(r"[آ-یءؤئ]{12,}")                 # «افزایشجذابیت»: two words run together by the model
+NUMWORDS = re.compile("|".join(_word(w) for w in (
+    "بیست", "سی", "چهل", "پنجاه", "شصت", "هفتاد", "هشتاد", "نود", "دویست", "سیصد", "چهارصد", "پانصد", "ششصد",
+    "هفتصد", "هشتصد", "نهصد", "یازده", "دوازده", "سیزده", "چهارده", "پانزده", "شانزده", "هفده", "هجده", "نوزده",
+    "صدم", "دهم", "هزارم")))                          # a number spelled out cannot be checked against the sources
+COMPOUNDS = {"سرمایه گذار": "سرمایه‌گذار", "راه اندازی": "راه‌اندازی", "رأی گیری": "رأی‌گیری", "پیش بینی": "پیش‌بینی",
+             "قانون گذار": "قانون‌گذار", "تصمیم گیری": "تصمیم‌گیری", "شکل گیری": "شکل‌گیری", "بهره گیری": "بهره‌گیری",
+             "به روز": "به‌روز", "به طور": "به‌طور", "بین المللی": "بین‌المللی", "نقل و انتقال": "نقل‌وانتقال",
+             "دست یابی": "دست‌یابی", "بازی گردان": "بازی‌گردان", "زیر ساخت": "زیرساخت", "کم رنگ": "کم‌رنگ",
+             "پر رنگ": "پررنگ", "رمز ارز": "رمزارز", "ارز های": "ارزهای"}
+
+
+def nim(s):
+    """the half-space (نیم‌فاصله) the owner asks for: می‌/نمی‌ prefixes, ‌ها/‌های/‌تر/‌ترین suffixes, common compounds"""
+    s = re.sub(rf"(?<![{FA_LETTERS}])(ن?می) (?=[آ-ی])", "\\1\u200c", s)
+    s = re.sub(r"(?<=[آ-ی]) (ها|های|هایی|هایش|هایشان|تر|ترین|ای)(?![آ-ی])", "\u200c\\1", s)
+    for a, b in COMPOUNDS.items():
+        s = s.replace(a, b)
+    return s
 
 
 def fng_fa(f):
@@ -998,6 +1016,8 @@ def check_text(s, allowed, max_len, min_len=8):
         p.append("promise/advice words")
     if JOINED.search(s):
         p.append("words run together: " + JOINED.search(s).group(0))
+    if NUMWORDS.search(s):
+        p.append("a number spelled out in words: " + NUMWORDS.search(s).group(0))
     extra = numbers_in(s) - allowed
     if extra:
         p.append("numbers not in the sources: " + ", ".join(sorted(extra)))
@@ -1031,7 +1051,7 @@ why: چرا برای بازار رمزارز مهم است (حداکثر ۹۰ ن
 effect: اثر احتمالی بر بازار، با زبان احتمال مثل «ممکن است» یا «می‌تواند» (حداکثر ۹۰ نویسه)
 watch: چه چیزی را باید دنبال کرد (حداکثر ۷۰ نویسه)
 قواعد سخت: هیچ حرف لاتین ننویس (نام‌ها را فارسی بنویس، مثلاً «صندوق‌های قابل معامله» به جای ETF)؛ هیچ عددی ننویس که در متن خبر نیامده؛
-هیچ پیش‌بینی قطعی، تضمین یا توصیهٔ خرید و فروش ننویس؛ اعداد را با ارقام فارسی بنویس.
+هیچ پیش‌بینی قطعی، تضمین یا توصیهٔ خرید و فروش ننویس؛ اعداد را فقط با رقم فارسی بنویس، هرگز با حروف؛ نیم‌فاصله‌ها را درست بگذار (می‌تواند، سرمایه‌گذاری، صندوق‌ها).
 خروجی فقط JSON به این شکل: {"items":[{"id":"...","what":"...","why":"...","effect":"...","watch":"..."}]}
 
 خبرها:
@@ -1058,7 +1078,7 @@ def ai_news(items):
         allowed = allowed_numbers(x["fa_t"], x["fa_s"], x["title"])
         parts, bad = {}, []
         for k, lim in (("what", 125), ("why", 100), ("effect", 100), ("watch", 80)):
-            s = IC.clean(it.get(k) or "")
+            s = nim(IC.clean(it.get(k) or ""))
             pr = check_text(s, allowed, lim, 12)
             if pr:
                 bad.append(f"{k}: {pr[0]}")
@@ -1077,7 +1097,7 @@ headline: پیام اصلی بازار برای جلد گزارش؛ یک ادع�
 summary: جمع‌بندی دو جمله‌ای برای اسلاید آخر: وضعیت فعلی و آنچه جهت بعدی را روشن می‌کند، با زبان احتمال، حداکثر ۲۴۰ نویسه
 lead: یک جمله برای متن همراه آلبوم تلگرام که مهم‌ترین تحول این نوبت را بگوید (نه «نگاهی به …»)، حداکثر ۱۷۰ نویسه
 قواعد سخت: هیچ حرف لاتین ننویس؛ فقط عددهایی را بنویس که در داده‌ها آمده؛ تحلیل را واقعیت قطعی جلوه نده؛
-هیچ سودی را تضمین نکن و توصیهٔ خرید یا فروش نکن؛ اعداد را با ارقام فارسی بنویس؛ میان واژه‌ها فاصله یا نیم‌فاصلهٔ درست بگذار.
+هیچ سودی را تضمین نکن و توصیهٔ خرید یا فروش نکن؛ اعداد را فقط با رقم فارسی بنویس، هرگز با حروف؛ میان واژه‌ها فاصله یا نیم‌فاصلهٔ درست بگذار.
 خروجی فقط JSON: {"headline":"...","summary":"...","lead":"..."}
 
 داده‌ها:
@@ -1122,7 +1142,7 @@ def ai_edition(f):
     out = {}
     day = IC.jalali(teh(f["now"])).split(" ")
     for k, lim, lo in (("headline", 74, 16), ("summary", 250, 60), ("lead", 180, 30)):
-        s = IC.clean(data.get(k) or "")
+        s = nim(IC.clean(data.get(k) or ""))
         pr = check_text(s, allowed, lim, lo)
         if re.search(r"نوبت|نگاهی به|وضعیت بازار در|" + "|".join(WEEKDAYS), s) or (len(day) == 3 and day[1] in s):
             pr.append("a title about the report instead of the market")
