@@ -126,6 +126,8 @@ T = {
     "b_ref": {"fa": "🎁 دعوت و پاداش", "ckb": "🎁 بانگهێشت و خەڵات", "en": "🎁 Invite & earn"},
     "b_lang": {"fa": "🌐 زبان", "ckb": "🌐 زمان", "en": "🌐 Language"},
     "b_site": {"fa": "🌍 سایت entekhab.net", "ckb": "🌍 ماڵپەڕی entekhab.net", "en": "🌍 entekhab.net"},
+    "b_album": {"fa": "📸 گزارش تصویری", "ckb": "📸 ڕاپۆرتی وێنەیی", "kmr": "📸 Rapora wêneyî", "ar": "📸 التقرير المصور",
+                "en": "📸 Picture report"},
     "b_battle": {"fa": "⚔️ نبرد من: بازار زنده سه‌بعدی", "ckb": "⚔️ شەڕی من: بازاڕی زیندووی سێ‌ڕەهەندی", "kmr": "⚔️ Şerê min: bazara zindî ya 3D",
                  "ar": "⚔️ معركتي: السوق الحي ثلاثي الأبعاد", "en": "⚔️ My Battle: the live market in 3D"},
     "battle_text": {
