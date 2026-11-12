@@ -192,6 +192,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   the real Binance/OKX endpoints and socket checked from the owner's browser on entekhab.net (formats, 1 s klines); leak guard clean.
 - Limits: alerts on the site sound while the page is open (the bot carries them otherwise); calendar history starts with
   the first CI run (seeded with the USD history of events.json).
+- Live check after publishing (owner's built-in browser, real data): 1 s / 5 s bars live, one socket, 4 charts, Arabic via
+  ar.js, phone layout. Three fixes followed the same evening: (1) the workspace started from a `setTimeout` that could
+  fire between two deferred scripts on a slow connection, leaving the side panel empty and the calendar/alerts unstarted —
+  it now starts on DOMContentLoaded (lesson: never boot from a timer in a deferred script; `ONLY=slow` reproduces it);
+  (2) opening the page wrote default stars into the site-wide `ek_watch` — now shown, saved only when edited;
+  (3) the first real calendar run left 22 of 116 titles in English — dictionary extended (self-test 22 checks).
 
 ### 2026-11-12 · All apps updated and presented on one page; iPhone and Windows added (asked for by the owner)
 - **Download center `/app/`** (`scripts/build_apps.py`, built in CI; the old hand-made Android page is gone): one page
