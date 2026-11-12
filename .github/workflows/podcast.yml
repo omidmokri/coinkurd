@@ -1,0 +1,87 @@
+name: Daily podcast (نبض کریپتو)
+
+# پادکست روزانهٔ بازار به چهار زبان (فارسی، کوردی سورانی، انگلیسی، عربی) — به درخواست مالک سایت، ۲۱ آبان ۱۴۰۵.
+# هر روز از داده‌های همین مخزن ساخته می‌شود، کنترل کیفیت می‌شود و ساعت ۱۹:۰۰ به وقت تهران (۱۵:۳۰ UTC) یک پست
+# آلبومی با چهار فایل صوتی در کانال Coin_Kurd می‌گذارد. هر زبانی که از کنترل کیفیت رد شود منتشر نمی‌شود.
+# The owner asked for this daily post on 2026-11-12 (session chat); it is the one bot post the autopilot must keep.
+on:
+  schedule:
+    - cron: "50 13 * * *"     # start 17:20 Tehran; making the episode takes ~45-70 min; posting waits for 19:00 Tehran
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run = make + check, publish nothing · publish = release + site + Telegram (at 19:00 Tehran, or now if later)"
+        default: dry-run
+        type: choice
+        options: [dry-run, publish]
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: podcast
+  cancel-in-progress: false
+
+jobs:
+  episode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      PODCAST_MODELS: ${{ github.workspace }}/../podcast-models
+      PODCAST_FONTS: ${{ github.workspace }}/../podcast-fonts
+      EP: ${{ github.workspace }}/_episode
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Python packages
+        run: pip install numpy scipy soundfile soxr pyloudnorm num2words "sherpa-onnx<2" onnxruntime pillow requests
+      - name: ffmpeg (static build from GitHub; apt is too slow on these runners)
+        run: |
+          curl -sSfL --retry 4 -o /tmp/ff.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
+          mkdir -p /tmp/ff && tar xJf /tmp/ff.tar.xz -C /tmp/ff --strip-components=1
+          echo "/tmp/ff/bin" >> "$GITHUB_PATH"
+      - name: Fonts for the covers
+        run: |
+          mkdir -p "$PODCAST_FONTS"
+          for p in vazirmatn space-grotesk archivo-black; do
+            d="$PODCAST_FONTS/fontsource-$p-5.3.0"; mkdir -p "$d"
+            curl -sSfL --retry 4 "https://registry.npmjs.org/@fontsource/$p/-/$p-5.3.0.tgz" | tar xz -C "$d"
+          done
+      - name: Voice models (cached)
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PODCAST_MODELS }}
+          key: podcast-models-v1
+      - run: python scripts/podcast/models.py
+      - name: Make the episode
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+        run: python scripts/podcast/run.py --out "$EP"
+      - name: Keep the episode files for review (14 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: episode
+          retention-days: 14
+          if-no-files-found: ignore
+          path: |
+            ${{ env.EP }}/*.mp3
+            ${{ env.EP }}/*.srt
+            ${{ env.EP }}/*.jpg
+            ${{ env.EP }}/*.json
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_BOT_TOKEN: ${{ secrets.REF_BOT_TOKEN }}
+        run: |
+          git config user.name "coinkurd-bot"
+          git config user.email "bot@users.noreply.github.com"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.mode }}" = "publish" ]; then
+            python scripts/podcast/publish.py --ep "$EP"
+          else
+            python scripts/podcast/publish.py --ep "$EP" --dry-run
+          fi

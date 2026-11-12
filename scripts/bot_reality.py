@@ -12,6 +12,7 @@ Everything here is a short chat-sized summary with the page's address for the fu
 tables, the chain verification and the charts stay on the web, where they belong.
 """
 import datetime as dt
+import html
 import logging
 
 import build_reality as BR
@@ -67,7 +68,7 @@ def summary(lg="fa"):
     """the same six readings as structured data — what the extension and the apps render"""
     out = []
     for key, (fn, url) in SECTIONS.items():
-        if key == "today":                   # a market brief, not a reality reading
+        if key in ("today", "podcast"):      # a market brief / the podcast, not a reality reading
             continue
         try:
             fn(lg)
@@ -402,6 +403,27 @@ def sec_class(lang, now=None):
     return _head("🎓 " + (CL["title"].get(lg) or CL["title"]["fa"]), lg, "/class/", lines, (f["source"] or {}).get("date"))
 
 
+PC = {"title": {"fa": "پادکست روزانه بازار کریپتو", "ckb": "پۆدکاستی ڕۆژانەی بازاڕی کریپتۆ", "en": "Daily crypto podcast"},
+      "when": {"fa": "هر روز ۱۹:۰۰ تهران در کانال، به فارسی، کوردی، انگلیسی و عربی", "ckb": "هەموو ڕۆژێک ١٩:٠٠ی تاران لە کەناڵ، بە فارسی، کوردی، ئینگلیزی و عەرەبی",
+               "en": "Every day 19:00 Tehran on the channel, in Persian, Kurdish, English and Arabic"},
+      "last": {"fa": "تازه‌ترین قسمت", "ckb": "نوێترین ئەڵقە", "en": "Latest episode"}}
+
+
+def sec_podcast(lang, now=None):
+    """the latest episode of the daily podcast (data/podcast/index.json, written by podcast.yml): title + link only"""
+    lg = _lg(lang)
+    eps = (R.load("podcast/index.json", {}) or {}).get("episodes") or []
+    lines = ["• " + PC["when"][lg]]
+    if eps:
+        x = eps[0]
+        t = x["titles"].get(lang) or x["titles"].get(lg) or x["titles"].get("fa") or next(iter(x["titles"].values()))
+        lines.append(f"🎧 {PC['last'][lg]} ({_n(x['n'], lg)}): {html.escape(t)}")
+        lines.append(f"{SITE}/podcast/{x['date']}/#{lang if lang in x['langs'] else 'fa'}")
+    else:
+        lines.append(BR.s("nodata", lg))
+    return _head("🎙 " + PC["title"][lg], lg, "/podcast/", lines, eps[0]["date"] if eps else None)
+
+
 # /tools/ calculators — a link list only (the bot has no calculators); ids are the cards' anchors on /tools/
 TOOLS = [
     ("risk", {"fa": "حجم پوزیشن با کارمزد", "ckb": "قەبارەی پۆزیشن بە کرێ", "en": "Position size incl. fees"}),
@@ -553,7 +575,7 @@ def sec_stratlab(lang):
               "en": "Ready-made examples: buy the dip in an uptrend · golden cross 50/200 · 20-day breakout with volume · buy extreme fear · trend only in a bull regime · 4h overbought short"}[lg]]
     return _head("🧪 " + SL.T["title"][lg], lg, "/strategy-lab/", lines, None)
 
-SECTIONS = {"tools": (sec_tools, "/tools/"), "today": (sec_today, "/today/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
+SECTIONS = {"tools": (sec_tools, "/tools/"), "today": (sec_today, "/today/"), "podcast": (sec_podcast, "/podcast/"), "class": (sec_class, "/class/"), "trackrec": (sec_trackrec, "/track-record/"), "friction": (sec_friction, "/iran-friction/"), "hype2": (sec_hype, "/hype/"),
             "sentim": (sec_sentiment, "/sentiment/"), "whales": (sec_whales, "/whales/"),
             "silent": (sec_silent, "/silent-exit/"), "corr": (sec_corr, "/iran-correlation/"),
             "ledger": (sec_ledger, "/ledger/"), "oppcost": (sec_opportunity, "/opportunity/"),

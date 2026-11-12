@@ -432,6 +432,9 @@ jobs:
       - name: Build the daily spine page (/today/)
         continue-on-error: true
         run: python scripts/build_today.py
+      - name: Build the podcast pages
+        continue-on-error: true
+        run: python scripts/build_podcast.py
 
       - name: Build the nightly class page (/class/)
         continue-on-error: true
