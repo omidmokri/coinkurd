@@ -104,6 +104,7 @@ VAL = {
     "distrib": ("توزیع (فروش آرام)", "دابەشکردن", "Distribution"),
     "fire_sale": ("حراج (قیمت خیلی ارزان)", "هەراج (زۆر هەرزان)", "Fire sale"),
     "expensive_zone": ("ناحیهٔ گران", "ناوچەی گران", "Expensive zone"),
+    "manipulation": ("دستکاری (حرکت فریبنده)", "دەستکاری (جووڵەی فریودەر)", "Manipulation"),
     "exhaustion": ("خستگی روند (احتمال برگشت)", "ماندووبوونی ڕەوت", "Exhaustion"),
     "capitulation": ("تسلیم (فروش هیجانی)", "خۆبەدەستەوەدان", "Capitulation"),
     "euphoria": ("سرخوشی (هیجان خرید)", "سەرخۆشی", "Euphoria"),
