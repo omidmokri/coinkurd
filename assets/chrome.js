@@ -294,21 +294,29 @@
     meta('apple-mobile-web-app-capable', 'yes'); meta('mobile-web-app-capable', 'yes');
     meta('apple-mobile-web-app-status-bar-style', 'black'); meta('apple-mobile-web-app-title', 'انتخاب');
     if (!STANDALONE) {
-      var sp = new Image();
-      sp.onload = function () {
-        try {
-          var r = window.devicePixelRatio || 1, w = Math.round(screen.width * r), h = Math.round(screen.height * r);
-          var cv = d.createElement('canvas'); cv.width = w; cv.height = h; var g = cv.getContext('2d');
-          g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, w, h);
-          var gl = g.createRadialGradient(w / 2, h / 2 - w * 0.05, 0, w / 2, h / 2 - w * 0.05, w * 0.45);
-          gl.addColorStop(0, 'rgba(247,147,26,.22)'); gl.addColorStop(1, 'rgba(247,147,26,0)'); g.fillStyle = gl; g.fillRect(0, 0, w, h);
-          var s = Math.round(Math.min(w, h) * 0.34); g.drawImage(sp, (w - s) / 2, (h - s) / 2 - s * 0.15, s, s);
-          g.fillStyle = '#a8a49c'; g.font = Math.round(s * 0.11) + 'px -apple-system, Helvetica, sans-serif'; g.textAlign = 'center';
-          g.fillText('entekhab.net', w / 2, (h + s) / 2 + s * 0.12);
-          var l = d.createElement('link'); l.rel = 'apple-touch-startup-image'; l.href = cv.toDataURL('image/png'); d.head.appendChild(l);
-        } catch (e) { }
-      };
-      sp.src = '/assets/icon-512.png';
+      var r0 = window.devicePixelRatio || 1, W = Math.round(screen.width * r0), H = Math.round(screen.height * r0), SK = 'ek_splash_' + W + 'x' + H;
+      var putSplash = function (href) { var l = d.createElement('link'); l.rel = 'apple-touch-startup-image'; l.href = href; d.head.appendChild(l); };
+      var kept = null; try { kept = sessionStorage.getItem(SK); } catch (e) { }
+      if (kept) putSplash(kept);
+      else setTimeout(function () {               // drawn once a session, after the page has settled
+        var sp = new Image();
+        sp.onload = function () {
+          try {
+            var cv = d.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d');
+            g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, W, H);
+            var gl = g.createRadialGradient(W / 2, H / 2 - W * 0.05, 0, W / 2, H / 2 - W * 0.05, W * 0.45);
+            gl.addColorStop(0, 'rgba(247,147,26,.22)'); gl.addColorStop(1, 'rgba(247,147,26,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H);
+            var s = Math.round(Math.min(W, H) * 0.34), x0 = (W - s) / 2, y0 = (H - s) / 2 - s * 0.15;
+            g.save(); if (g.roundRect) { g.beginPath(); g.roundRect(x0, y0, s, s, s * 0.22); g.clip(); }
+            g.drawImage(sp, x0, y0, s, s); g.restore();
+            g.fillStyle = '#a8a49c'; g.font = Math.round(s * 0.11) + 'px -apple-system, Helvetica, sans-serif'; g.textAlign = 'center';
+            g.fillText('entekhab.net', W / 2, (H + s) / 2 + s * 0.12);
+            var href = cv.toDataURL('image/jpeg', 0.86);
+            putSplash(href); try { sessionStorage.setItem(SK, href); } catch (e) { }
+          } catch (e) { }
+        };
+        sp.src = '/assets/icon-512.png';
+      }, 1500);
     }
   }
   if (IOS && !STANDALONE && path.indexOf('/app/') !== 0 && !/[?&]noapp/.test(location.search)) {

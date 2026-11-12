@@ -160,6 +160,26 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-12 · All apps updated and presented on one page; iPhone and Windows added (asked for by the owner)
+- **Download center `/app/`** (`scripts/build_apps.py`, built in CI; the old hand-made Android page is gone): one page
+  for Android, iPhone & iPad, Windows, the browser extension, the Telegram bot and the trading bot, fa/ckb/en (+ar via
+  overlay). The visitor's own platform is detected and its download comes first ("for your device"). Versions, sizes
+  and SHA-256 come only from the published files (`app/app.json`, `app/windows.json`, `extension/latest.json`).
+- **Windows 64-bit** (`windows/`, C# .NET Framework 4.8 + WebView2, ~0.5 MB installer, NSIS fa/ar/en, per-user):
+  `.github/workflows/windows-app.yml` builds on a real Windows runner, runs the app's `--selftest` (site loads, the app
+  identifies itself, outside links leave the window, a foreign page is refused), installs silently, runs the installed
+  copy, screenshots it, checks a second launch opens no second app, uninstalls (must leave nothing), then publishes
+  `app/windows/` + `app/windows.json`. Pictures of every run: branch `ci-windows`. Release = raise both versions.
+- **iPhone & iPad:** a web app installed from Safari (the App Store is closed to Iran). `assets/chrome.js` adds the
+  iOS tags and draws a splash at the device's exact size (JPEG, once a session) only on iOS; a gentle 14-day prompt
+  links to the illustrated guide (`/app/#iphone`, iOS 26 "•••" → Share flow and the older Share button).
+- **Extension 1.6.1:** THE LOGO RULE (see Guardrails) — badge removed for good, price in the icon tooltip, old badges
+  cleared and the old setting migrated (tested by installing 1.5.2 then upgrading in a real Chromium); four languages
+  in the order ckb · fa · ar · en; in-popup update notice (`/extension/latest.json`); popup height adapts to any font.
+- **Bot:** new "📲 Apps" section in "Settings & more", five languages. **Android:** the shell is unchanged — its
+  signing key is not available in this environment, and a differently signed APK cannot update installed copies; the
+  app already shows every site change because it loads the site.
 ### 2026-11-12 · /satoshi/: the live mempool, as on mempool.space (owner's request in chat, not by the loop)
 - assets/btc-live.js (+ CSS in scripts/build_satoshi.py, VER 5). Tapping a waiting cube opens its panel: median fee,
   fee span, total fees, tx count, size, a fee-rate-by-weight curve, and a canvas map of every transaction in that
