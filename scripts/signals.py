@@ -178,7 +178,8 @@ def read_channel(ch, codes, pages=10, stop_at=0):
                 continue
             ids.append(mid)
             top = max(top, mid)
-            te = w.select_one(".tgme_widget_message_text")
+            # the post's own text only: a reply also carries the quoted post, which must not be read twice
+            te = w.select_one(".js-message_text") or w.select_one(".tgme_widget_message_text:not(.js-message_reply_text)")
             tm = w.select_one(".tgme_widget_message_date time")
             if not te:
                 continue
