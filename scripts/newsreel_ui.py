@@ -35,13 +35,12 @@ background:linear-gradient(180deg,rgba(247,147,26,.07),rgba(247,147,26,0) 42%),v
 font-size:.8rem;font-weight:700;flex:none}
 .nrs-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex:none;animation:nrsp 2.4s infinite}
 @keyframes nrsp{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
-.nrs-win{flex:1;overflow:hidden;position:relative;
+.nrs-win{flex:1;overflow-x:hidden;overflow-y:auto;position:relative;overscroll-behavior:contain;
+scrollbar-width:thin;scrollbar-color:rgba(247,147,26,.35) transparent;
 -webkit-mask-image:linear-gradient(180deg,transparent,#000 26px,#000 calc(100% - 26px),transparent);
 mask-image:linear-gradient(180deg,transparent,#000 26px,#000 calc(100% - 26px),transparent)}
+.nrs-win::-webkit-scrollbar{width:5px}.nrs-win::-webkit-scrollbar-thumb{background:rgba(247,147,26,.35);border-radius:4px}
 .nrs-run{display:flex;flex-direction:column}
-.nrs.on .nrs-run{animation:nrsm var(--sp,150s) linear infinite}
-.nrs-win:hover .nrs-run{animation-play-state:paused}
-@keyframes nrsm{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .nrs-i{display:block;padding:11px 12px;border-bottom:1px solid var(--line);color:var(--ink)}
 .nrs-i:last-child{border-bottom:0}
 .nrs-i .s{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:.68rem;margin-bottom:5px}
@@ -55,8 +54,7 @@ background:rgba(247,147,26,.15);color:var(--acc);font:700 .58rem/1 'Space Grotes
 .nrs-i time{unicode-bidi:isolate;white-space:nowrap}
 .nrs-chip{border:1px solid var(--line);border-radius:999px;padding:0 6px;font:600 .62rem/1.7 'Space Grotesk',monospace;color:var(--acc)}
 .nrs-f{flex:none;padding:7px 12px;border-top:1px solid var(--line);color:var(--mute);font-size:.66rem;line-height:1.6}
-@media(prefers-reduced-motion:reduce){.nrs.on .nrs-run{animation:none}.nrs-dot{animation:none}
-.nrs-win{overflow-y:auto;scrollbar-width:thin}}"""
+@media(prefers-reduced-motion:reduce){.nrs-dot{animation:none}}"""
 
 JS = """(function(){var R=[].slice.call(document.querySelectorAll('.nrs'));if(!R.length)return;
 var D={fa:'\u06f0\u06f1\u06f2\u06f3\u06f4\u06f5\u06f6\u06f7\u06f8\u06f9',
@@ -78,7 +76,23 @@ R.forEach(function(r){r.querySelectorAll('[data-fl]').forEach(function(x){x.hidd
 r.querySelectorAll('time[data-at]').forEach(function(t){t.textContent=ago(t.getAttribute('data-at'),l);t.setAttribute('dir',l==='en'?'ltr':'rtl')})})}
 R.forEach(function(r){var run=r.querySelector('.nrs-run');if(!run||run.dataset.dup)return;run.dataset.dup='1';
 [].slice.call(run.children).forEach(function(k){var c=k.cloneNode(true);c.setAttribute('aria-hidden','true');c.tabIndex=-1;run.appendChild(c)});
-r.style.setProperty('--sp',Math.max(70,run.children.length*9)+'s');r.classList.add('on')});
+r.classList.add('on');
+/* the column moves on its own and the reader can scroll it up and down at any time (wheel, touch, keys, scrollbar);
+   it stops under the pointer and resumes a few seconds after the reader lets go. Items are doubled, so it loops. */
+var w=r.querySelector('.nrs-win');if(!w)return;
+var still=matchMedia('(prefers-reduced-motion: reduce)').matches,over=false,hold=0,pos=0,last=0,
+sp=Math.max(70,run.children.length/2*9)*1000;
+function half(){return run.scrollHeight/2}
+function touch(){hold=Date.now()+4000}
+w.addEventListener('mouseenter',function(){over=true});w.addEventListener('mouseleave',function(){over=false;touch()});
+['wheel','touchstart','touchmove','keydown','pointerdown'].forEach(function(t){w.addEventListener(t,touch,{passive:true})});
+w.addEventListener('scroll',function(){var h=half();
+if(Math.abs(w.scrollTop-pos)>2){touch();pos=w.scrollTop}
+if(h>0&&w.scrollTop>=h){pos=w.scrollTop-h;w.scrollTop=pos}},{passive:true});
+function step(t){var dt=last?Math.min(t-last,100):0;last=t;var h=half();
+if(!still&&!over&&Date.now()>hold&&h>w.clientHeight){pos+=dt*h/sp;if(pos>=h)pos-=h;w.scrollTop=pos}
+requestAnimationFrame(step)}
+requestAnimationFrame(step)});
 apply();addEventListener('ek-lang',apply);setTimeout(apply,0);setTimeout(apply,600);setInterval(apply,60000)})();"""
 
 
