@@ -5,6 +5,8 @@ name: Daily podcast (نبض کریپتو)
 # آلبومی با چهار فایل صوتی در کانال Coin_Kurd می‌گذارد. هر زبانی که از کنترل کیفیت رد شود منتشر نمی‌شود.
 # The owner asked for this daily post on 2026-11-12 (session chat); it is the one bot post the autopilot must keep.
 on:
+  push:                      # TEMPORARY: dry-run test of the branch, removed before merge
+    branches: [podcast-daily]
   schedule:
     - cron: "50 13 * * *"     # start 17:20 Tehran; making the episode takes ~45-70 min; posting waits for 19:00 Tehran
   workflow_dispatch:
