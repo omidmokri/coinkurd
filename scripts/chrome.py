@@ -175,6 +175,8 @@ NAV = [
          L("تحلیل عمیق رویدادهای مهم روز", "شیکاری قووڵی ڕووداوە گرنگەکان", "Deep dives on the day's key stories")),
         ("/today/", "calendar", L("امروز در بازار", "ئەمڕۆ لە بازاڕ", "Today in the market"),
          L("۲۴ ساعت گذشته در یک صفحه", "٢٤ کاتژمێری ڕابردوو لە یەک پەڕەدا", "The last 24 hours on one page")),
+        ("/podcast/", "news", L("پادکست روزانه بازار کریپتو", "پۆدکاستی ڕۆژانەی بازاڕی کریپتۆ", "Daily crypto podcast"),
+         L("هر روز ۱۹:۰۰ تهران، به چهار زبان", "هەموو ڕۆژێک ١٩:٠٠ تاران، بە چوار زمان", "Every day 19:00 Tehran, in four languages")),
         ("/class/", "calendar", L("کلاس شبانه", "وانەی شەوانە", "Nightly class"),
          L("هر شب ۲۰:۰۰ تهران در دیسکورد", "هەموو شەوێک ٢٠:٠٠ تاران لە دیسکۆرد", "Every night 20:00 Tehran on Discord")),
         ("/daily/", "calendar", L("گزارش روزانه", "ڕاپۆرتی ڕۆژانە", "Daily report"),
@@ -449,7 +451,7 @@ CSP = ("default-src 'self'; "
        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
        "font-src 'self' https://fonts.gstatic.com data:; "
        "img-src 'self' data: blob: https:; "
-       "media-src 'self' data: blob:; "
+       "media-src 'self' data: blob: https://github.com https://objects.githubusercontent.com https://release-assets.githubusercontent.com; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "
        "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com; "
