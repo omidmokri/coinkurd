@@ -1044,6 +1044,9 @@ def build_feeds():
              "خلاصهٔ تحلیل‌های آنچین بیت‌کوین و بازار کریپتو به فارسی و کوردی سورانی"),
             ("cryptonews.json", "crypto-news/", "اخبار کریپتو — هەواڵی کریپتۆ",
              "خلاصهٔ اخبار روز بازار کریپتو به فارسی و کوردی سورانی")]
+    # the visible heading shows the reader's language only (the <title> keeps both for search engines)
+    HEAD = {"onchain/": ("تحلیل آنچین", "ئاناڵیزی ئانچین", "On-chain analysis", "تحليل البيانات على السلسلة"),
+            "crypto-news/": ("اخبار کریپتو", "هەواڵی کریپتۆ", "Crypto news", "أخبار الكريبتو")}
     for fn, path, title, desc in spec:
         d = load(fn, {})
         items = d.get("items", [])
@@ -1072,7 +1075,7 @@ def build_feeds():
         rdata = load("newsreel.json", {})
         sides = (NR.block(rdata, e, fmt_date) if path == "crypto-news/"
                  else NR.block(rdata, e, fmt_date, onchain=True) if path == "onchain/" else "")
-        body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home", ar_="الرئيسية")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
+        body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home", ar_="الرئيسية")}</a> / {fl(*HEAD[path][:3], ar_=HEAD[path][3])}</div><h1>{fl(*HEAD[path][:3], ar_=HEAD[path][3])}</h1>'
                 + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note", ar_=e(ui[2]))
                 + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note",
                      ar_="الملخصات أدناه مكتوبة بالفارسية والكردية السورانية؛ عناوين العمودين الجانبيين متوفرة بالعربية.")
