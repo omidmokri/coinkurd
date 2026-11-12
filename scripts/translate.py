@@ -229,10 +229,28 @@ def main():
     arabic(posts, store, engine, api_key)
 
 
+
+FA_ONLY = re.compile(r"[پچژگیکۀ‌]")      # letters/marks Persian uses and Arabic does not
+AR_ONLY = re.compile(r"[يكةىإأؤئ]")
+
+
+def arabic_ok(s):
+    """Arabic, not Persian echoed back: Persian-only marks must be rare next to Arabic-only ones."""
+    f, a = len(FA_ONLY.findall(s or "")), len(AR_ONLY.findall(s or ""))
+    return a >= 2 and f <= max(2, a // 12)
+
+
+def ar_fix(s):
+    """Arabic spelling for the few Persian letters a model leaves behind (ی→ي, ک→ك, ۀ→ة, no ZWNJ)."""
+    return (s or "").replace("ی", "ي").replace("ک", "ك").replace("ۀ", "ة").replace("‌", " ")
+
+
 AR_DAYS = 30            # the owner's choice (2026-11-12): posts of the last month and every new one get Arabic
 AR_PROMPT = ("Translate the following Persian (Farsi) crypto-channel post into Modern Standard Arabic (فصحى). "
              "Keep the meaning exact; keep numbers, tickers (BTC, ETH…), hashtags, emojis, URLs, markdown links and line "
-             "breaks unchanged. Use standard Arabic crypto terms. Return JSON exactly: {\"title\":\"…\",\"text\":\"…\"}\n\n")
+             "breaks unchanged. Use standard Arabic crypto terms. The output must be Arabic, never Persian: no Persian words or "
+             "letters (پ چ ژ گ ی ک), Arabic spelling (ي ك ة), Persian digits written as Western digits (۱۲ → 12). Translate the "
+             "title too. Return JSON exactly: {\"title\":\"…\",\"text\":\"…\"}\n\n")
 
 
 def arabic(posts, store, engine, api_key):
@@ -263,9 +281,9 @@ def arabic(posts, store, engine, api_key):
             if isinstance(r, str):
                 r = json.loads(re.search(r"\{.*\}", r, re.S).group(0))
             t, x = (r.get("title") or "").strip(), (r.get("text") or "").strip()
-            if not x or not re.search(r"[\u0600-\u06FF]", x) or re.search(r"[پچژگ]", x.replace("پ", "", 0)) and len(re.findall(r"[پچژگ]", x)) > 6:
+            if not x or not arabic_ok(x) or (t and not arabic_ok(t + " " + x[:400])):
                 raise RuntimeError("not Arabic")
-            p["tr"]["ar"] = {"title": t or p.get("title", ""), "text": x}
+            p["tr"]["ar"] = {"title": ar_fix(t) or p.get("title", ""), "text": ar_fix(x)}
             store.setdefault(str(p["id"]), {})["ar"] = p["tr"]["ar"]
             done += 1
             fails = 0
