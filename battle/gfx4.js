@@ -438,11 +438,11 @@ K.build = function (scene, hgt, tier) {
     const m = new THREE.MeshBasicMaterial({ color: 0xffffff, alphaMap: new THREE.CanvasTexture(c), transparent: true, opacity: a, depthWrite: false, side: THREE.BackSide, fog: false });
     const me = new THREE.Mesh(g, m); me.renderOrder = -1; scene.add(me); E.haze.push({ m: me, a });
   };
-  hz(250, 70, .32); if (!lite) hz(320, 90, .42);
+  if (!lite) { hz(250, 70, .32); hz(320, 90, .42); }          // software renderers: fog alone carries the distance
   /* light shafts + beams */
   E.shaftMat = K.beamMaterial(0xfff1d6, true); E.searchMat = K.beamMaterial(0xdfe9ff, false); E.lampMat = K.beamMaterial(0xffd29a, false);
   E.shafts = [];
-  const nSh = lite ? 2 : 6;
+  const nSh = lite ? 0 : 6;
   for (let i = 0; i < nSh; i++) {
     const g = new THREE.CylinderGeometry(2.2 + srand() * 2, 9 + srand() * 6, 120, 16, 1, true);
     const me = new THREE.Mesh(g, E.shaftMat); me.renderOrder = 5; me.frustumCulled = false; scene.add(me);
@@ -628,7 +628,7 @@ A4.posAt = function (m, s, out) {
   else if (m.kind === 'C') {
     const x = mix(m.p0.x, m.p1.x, s), z = mix(m.p0.z, m.p1.z, s) + Math.sin(s * Math.PI * 2.5 + m.ph) * 5 * (1 - s);
     const g = ARMY.gy(x, z), cruiseY = Math.max(g + 12, mix(m.p0.y, g + 12, sm(0, .2, s))) + 9 * sm(.74, .88, s);
-    out.set(x, mix(cruiseY, m.p1.y, sm(.88, 1, s)), z);
+    out.set(x, mix(cruiseY, m.p1.y, sm(.88, 1, s)) + (m.boost ? 20 * sm(0, .05, s) * (1 - sm(.05, .22, s)) : 0), z);   // boost: launched straight up from a ship's cells
   } else out.set(mix(m.p0.x, m.p1.x, s), mix(m.p0.y, m.p1.y, s) + 7 * Math.sin(Math.PI * s), mix(m.p0.z, m.p1.z, s));
   return out;
 };

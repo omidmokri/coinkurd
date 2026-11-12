@@ -243,6 +243,10 @@ S = {
               {"fa": "جمع‌بندی هوشمند شرایط کلان بازار.", "ckb": "کورتەی زیرەکی دۆخی گشتی بازاڕ.",
                "kmr": "Kurteya jîr a rewşa giştî ya bazarê.", "ar": "خلاصة ذكية لظروف السوق العامة.",
                "en": "Smart summary of the overall market regime."}),
+    "battle": ("⚔️", {"fa": "نبرد کن", "ckb": "شەڕ بکە", "kmr": "Şer bike", "ar": "المعركة الحية", "en": "Fight"},
+               {"fa": "بازار زندهٔ بیت‌کوین به شکل یک جبههٔ سه‌بعدی روی سایت.", "ckb": "بازاڕی زیندووی بیتکۆین وەک بەرەیەکی سێ‌ڕەهەندی لەسەر ماڵپەڕ.",
+                "kmr": "Bazara zindî ya Bitcoin wek eniyeke sêalî li ser malperê.", "ar": "سوق البيتكوين الحي على شكل جبهة ثلاثية الأبعاد على الموقع.",
+                "en": "The live Bitcoin market as a 3D front on the site."}),
     "flows": ("💧", {"fa": "جریان سکتورها", "ckb": "ڕەوتی سێکتەرەکان", "kmr": "Herikîna sektoran", "ar": "تدفقات القطاعات",
                     "en": "Sector flows"},
               {"fa": "پول به کدام بخش‌های بازار می‌رود.", "ckb": "پارە بەرەو کام بەشی بازاڕ دەچێت.",
@@ -350,7 +354,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows"],
+    "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
