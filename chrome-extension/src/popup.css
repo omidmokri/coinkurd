@@ -34,7 +34,7 @@ main{position:relative}
 .pg:hover{opacity:1}
 .pg[hidden]{display:none}
 .pg.up span{display:inline-block;transform:rotate(180deg)}
-main section{display:none;max-height:300px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-inline-end:2px}
+main section{display:none;max-height:var(--pane,300px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-inline-end:2px}
 main section.on{display:block}
 main section::-webkit-scrollbar{width:5px}
 main section::-webkit-scrollbar-track{background:transparent}
@@ -76,8 +76,7 @@ html[dir=rtl] .cf select{direction:rtl;text-align:right}
 .co .r b{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;font-size:13px}
 .co .r b.up{color:var(--up)}.co .r b.dn{color:var(--dn)}
 .co .r.k b{color:var(--acc);font-size:15px}
-main section[data-pane=calc]{max-height:300px}
-body.has-nv main section,body.has-nv main section[data-pane=calc]{max-height:262px}
+/* the pane gives way when the header wraps (fonts differ) or the new-version line shows: popup.js fitHeight() */
 
 /* the market analysis pane: the same report read as the site and the bot, trimmed to a popup */
 .report ul.an{margin:8px 0;padding-inline-start:18px;list-style:disc}

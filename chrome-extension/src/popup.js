@@ -49,6 +49,15 @@ function coins() {
   return m.map(c => ({ ...c, price: (lv[c.coin] && lv[c.coin].price) || c.price, chg24: lv[c.coin] && lv[c.coin].chg24 != null ? lv[c.coin].chg24 : c.chg24 }));
 }
 
+/* Chrome stops a popup at 600px. The header may wrap to a second line (that is how the logo stays uncovered with
+   wide fonts), and the new-version line may show: whatever they take, the open pane gives back. */
+function fitHeight() {
+  const b = document.body; if (!b) return;
+  b.style.setProperty('--pane', '300px');
+  const over = document.documentElement.scrollHeight - 596;
+  if (over > 0) b.style.setProperty('--pane', Math.max(170, 300 - over) + 'px');
+}
+
 function applyLang() {
   document.documentElement.lang = L; document.documentElement.dir = L === 'en' ? 'ltr' : 'rtl';
   document.title = t('brand') === 'Entekhab' ? 'Entekhab' : t('brand') + ' — Entekhab';
@@ -56,6 +65,7 @@ function applyLang() {
   document.querySelectorAll('[data-tp]').forEach(e => { e.placeholder = t(e.dataset.tp); });
   document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.l === L));
   render();
+  fitHeight();
 }
 
 function render() {
@@ -283,6 +293,7 @@ async function checkUpdate() {
     const nv = $('#nv'); if (!nv) return;
     nv.hidden = !(v && newer(v, chrome.runtime.getManifest().version));
     document.body.classList.toggle('has-nv', !nv.hidden);
+    fitHeight();
   } catch (e) { }
 }
 
@@ -374,3 +385,5 @@ $('#alerts').onclick = async e => {
 };
 chrome.storage.onChanged.addListener(async (ch, area) => { if (area === 'local' && (ch.market || ch.live || ch.alerts)) { S = await chrome.storage.local.get(null); render(); } });
 load();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHeight);
+addEventListener('resize', fitHeight);

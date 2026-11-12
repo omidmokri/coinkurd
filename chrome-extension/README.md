@@ -8,7 +8,7 @@
 > **THE LOGO RULE (the owner's, repeated): the extension's logo is NEVER covered** — no badge text, no badge colour, no repainted icon,
 > nothing over the logo in the popup. Guarded by `logo_guard()` in the build and by `tests/test_extension_logo.py` in CI.
 
-Manifest V3 · نسخهٔ ۱.۶.۰ · سازگار با Chrome، Edge، Brave، Opera و Firefox · کوردی · فارسی · العربية · English
+Manifest V3 · نسخهٔ ۱.۶.۱ · سازگار با Chrome، Edge، Brave، Opera و Firefox · کوردی · فارسی · العربية · English
 
 - `src/` — کد افزونه (همان چیزی که در Chrome Web Store آپلود می‌شود)
 - `store/` — تصاویر فروشگاه: سه اسکرین‌شات ۱۲۸۰×۸۰۰ و کاشی تبلیغاتی ۴۴۰×۲۸۰

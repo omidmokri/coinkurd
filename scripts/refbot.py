@@ -534,6 +534,13 @@ def _render(s, uid, key, page=0):
         kb = kb_back(lang, refresh="m:proxy")
         kb["inline_keyboard"] = rows + kb["inline_keyboard"]
         return text, kb
+    if key == "apps":                                   # every platform; the downloads themselves are on the site's /app/ page
+        A = D.SITE + "/app/"
+        return t("apps_text", lang), {"inline_keyboard": [
+            [btn(t("b_app_android", lang), url=A + "#android"), btn(t("b_app_iphone", lang), url=A + "#iphone")],
+            [btn(t("b_app_windows", lang), url=A + "#windows"), btn(t("b_app_ext", lang), url=D.SITE + "/extension/")],
+            [btn(t("b_app_all", lang), url=A)],
+            [btn(t("b_back", lang), "m:main")]]}
     if key == "outage":
         text = OU.section(s, lang)
         kb = {"inline_keyboard": [
