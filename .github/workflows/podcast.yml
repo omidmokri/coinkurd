@@ -32,7 +32,7 @@ jobs:
     env:
       PODCAST_MODELS: ${{ github.workspace }}/../podcast-models
       PODCAST_FONTS: ${{ github.workspace }}/../podcast-fonts
-      EP: ${{ github.workspace }}/../episode
+      EP: ${{ github.workspace }}/_episode
       PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4

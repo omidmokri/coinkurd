@@ -291,7 +291,7 @@ class Writer:
 
     def ask(self, prompt, check, what):
         sc, problems = None, None
-        for attempt in (1, 2):
+        for attempt in (1, 2, 3):
             p = prompt + (FIX.format(problems="\n".join(f"- {x}" for x in problems)) if problems else "")
             try:
                 sc = self.gen(p)
