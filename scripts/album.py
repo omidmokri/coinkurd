@@ -785,13 +785,22 @@ def long_share(ls):
     return 100 * ls / (1 + ls) if ls else None
 
 
+def prev_label(f):
+    """«گزارش ساعت ۰۷:۳۰» / «گزارش دیروز ساعت ۱۹:۳۰» — the edition the numbers are compared with"""
+    pv = f.get("prev") or {}
+    t = parse_dt(pv.get("pub") or pv.get("at"))
+    if not t:
+        return "گزارش قبلی"
+    same = teh(t).date() == teh(f["now"]).date()
+    return "گزارش " + ("" if same else "دیروز ") + "ساعت " + hm(t)
+
+
 def headline(f):
     b = f["btc"]
     c = b["chg"]
     p = f.get("prev_delta")
-    if p and abs(p["btc"]) >= 0.5 and abs(c) < 3:          # the second edition of the day leads with what changed
-        since = "از صبح" if f["edition"] == "e" else "از عصر دیروز"
-        return f"{since} تاکنون بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])} داشته؛ بازار در فاز {mood(f)}"
+    if p and abs(p["btc"]) >= 0.5 and abs(c) < 3:          # a later edition leads with what changed since the last one
+        return f"از {prev_label(f)} تاکنون بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])} داشته؛ بازار در فاز {mood(f)}"
     if c <= -3:
         return f"فشار فروش؛ بیت‌کوین در ۲۴ ساعت {fpct(c)} افت کرد"
     if c >= 3:
@@ -1125,7 +1134,7 @@ def facts_text(f):
         lines.append(f"رویداد پیش رو: {ev['name']} ({stamp_future(ev['date'], f['now'])})")
     p = f.get("prev_delta")
     if p:
-        lines.append(f"از {EDITION[f['edition']]['other']} تاکنون: بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])}")
+        lines.append(f"از {prev_label(f)} تاکنون: بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])}")
     return "\n".join(lines)
 
 
@@ -1601,9 +1610,9 @@ def s_cover(base, f, tx):
     y += tile_h + 18
     if p:
         d = DR(im)
-        x = W - M - rt(d, W - M, y, f"از {EDITION[ed]['other']}:", 25, "m", MUTED) - 14
+        x = W - M - rt(d, W - M, y, f"از {prev_label(f)}:", 25, "m", MUTED) - 14
         for name, v in (("بیت‌کوین", p["btc"]), ("اتریوم", p.get("eth")), ("ارزش بازار", p.get("mcap"))):
-            if v is None:
+            if v is None or x - tw(name, 25, "b") - numw(fpct(v), 25) - 40 < M:     # never past the left margin
                 continue
             x -= rt(d, x, y, name, 25, "b", INK) + 10
             x -= change(d, x, y + 1, v, 25) + 24
@@ -2516,7 +2525,7 @@ def caption(f, tx, sig=""):
            f"{fnum(f['fng']['v'] or 0)} ({fng_fa(f)})"]
     p = f.get("prev_delta")
     if p:
-        pts.append(f"🔁 از {EDITION[ed]['other']} تاکنون: بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])}")
+        pts.append(f"🔁 از {prev_label(f)} تاکنون: بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])}")
     n_news = 0
     for x in f["news"]:
         t = persian_only(x["fa_t"])
@@ -2669,7 +2678,7 @@ def build(now=None, edition=None, prev=None, use_ai=True, sig="", pub=None):
 def snapshot(album, slot_key):
     """what the next edition needs from this one"""
     f = album["f"]
-    return {"slot": slot_key, "at": f["now"].isoformat(), "btc": f["btc"]["price"],
+    return {"slot": slot_key, "at": f["now"].isoformat(), "pub": f["pub"].isoformat(), "btc": f["btc"]["price"],
             "eth": f["eth"]["price"] if f["eth"] else None, "mcap": f["global"]["mcap"],
             "fng": f["fng"]["v"], "news_ids": [x["id"] for x in f["news"]] + ([f["etf"]["id"]] if f["etf"] else [])}
 

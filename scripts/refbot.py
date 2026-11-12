@@ -1088,8 +1088,11 @@ def watch_loop(s):
 
 def admin_v2(s, chat_id, cmd, arg):
     """admin commands added in v2; -> True if handled"""
-    if cmd == "/album":                      # picture report preview, into this chat only (the channel is not touched)
-        AL.preview_to(chat_id)
+    if cmd == "/album":                      # preview into this chat only; «/album post» publishes an extra edition now
+        if arg.strip().lower() in ("post", "now", "publish", "انتشار", "ارسال"):
+            AL.request_now(s, chat_id)
+        else:
+            AL.preview_to(chat_id)
         return True
     if cmd == "/addproxy":
         links = PX2.LINK.findall(arg)
