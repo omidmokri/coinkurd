@@ -69,9 +69,9 @@ def from_menu():
 
 
 EXTRA_PAGES = [
-    ("/battle/", L("نبرد کن", "شەڕ بکە", "Fight"),
+    ("/battle/", L("نبرد من", "شەڕی من", "My Battle"),
      L("بازار زندهٔ بیت‌کوین به شکل یک جبههٔ سه‌بعدی در خشکی، دریا، هوا و فضا", "بازاڕی زیندووی بیتکۆین وەک بەرەیەکی سێ‌ڕەهەندی لە وشکانی، دەریا، ئاسمان و بۆشایی", "The live bitcoin market as a 3D front on land, at sea, in the air and from orbit"),
-     ["نبرد", "نبرد کن", "میدان نبرد", "battle", "fight", "شەڕ", "سه بعدی", "3d"]),
+     ["نبرد", "نبرد من", "نبرد کن", "میدان نبرد", "battle", "my battle", "fight", "شەڕ", "شەڕی من", "سه بعدی", "3d"]),
     ("/extension/", L("افزونهٔ کروم و فایرفاکس", "پێوەکراوی کرۆم و فایەرفۆکس", "Chrome & Firefox extension"),
      L("قیمت، گزارش، تحلیل، واقعیت‌سنج، دانشنامه و هشدار در نوار مرورگر", "نرخ، ڕاپۆرت، شیکاری و ئاگاداری لە وێبگەڕدا", "Prices, report, analysis, reality check, encyclopedia and alerts in your browser"),
      ["افزونه", "اکستنشن", "extension", "chrome", "firefox", "کروم", "فایرفاکس", "پێوەکراو"]),
