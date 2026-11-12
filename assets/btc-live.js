@@ -178,43 +178,38 @@
     function short(id) { id = String(id || ''); return id.length > 20 ? id.slice(0, 8) + '…' + id.slice(-8) : id; }
     function byRate(a, b) { return b.r - a.r || b.vs - a.vs; }
 
-    /* squares on a grid, side ∝ √vsize, highest fee rate first, each in the first free place (rows, then columns);
-       the grid grows if many small transactions would not fit. Returns where each one sits, and who owns each cell. */
+    /* squares on a grid, side ∝ √vsize, highest fee rate first, each in the first free place (rows, then columns).
+       The grid is as wide as a full block needs; if a large transaction comes late and finds no room, the grid grows
+       downwards rather than leaving it out, so every transaction is drawn at its true size. */
     function pack(items, cap) {
-      var G = 75, U, i, k, s, need, tries;
+      var G = 75, U, i, k, s, need;
       for (k = 0; k < 6; k++) {
         U = cap / (G * G); need = 0;
         for (i = 0; i < items.length; i++) { s = Math.max(1, Math.round(Math.sqrt(items[i].vs / U))); need += s * s; }
         if (need <= G * G * 0.94) break;
         G = Math.min(240, Math.ceil(G * Math.sqrt(need / (G * G * 0.9))));
       }
-      for (tries = 0; ; tries++) {   /* if a big square found no room, a slightly finer grid usually fixes it */
-        var r = place(items, G, cap / (G * G));
-        if (!r.miss || tries >= 3 || G >= 240) return r;
-        G = Math.min(240, Math.ceil(G * 1.05));
-      }
-    }
-    function place(items, G, U) {
-      var GG2 = G * G, occ = new Uint8Array(GG2), own = new Int32Array(GG2), at = new Int32Array(items.length * 3), first = 0, miss = 0, i, s;
-      for (i = 0; i < GG2; i++) own[i] = -1;
+      U = cap / (G * G);
+      var H = G * 3, GH = G * H, occ = new Uint8Array(GH), own = new Int32Array(GH), at = new Int32Array(items.length * 3), first = 0, rows = 0, miss = 0;
+      for (i = 0; i < GH; i++) own[i] = -1;
       function free(x, y, s) { for (var yy = y; yy < y + s; yy++) for (var xx = x; xx < x + s; xx++) if (occ[yy * G + xx]) return false; return true; }
       for (i = 0; i < items.length; i++) {
         s = Math.min(G, Math.max(1, Math.round(Math.sqrt(items[i].vs / U))));
         var p = first, found = -1, x = 0, y = 0;
-        while (p < GG2) {
+        while (p < GH) {
           if (occ[p]) { p++; continue; }
           x = p % G; y = (p - x) / G;
-          if (y + s > G) break;
+          if (y + s > H) break;
           if (x + s > G) { p = (y + 1) * G; continue; }
           if (free(x, y, s)) { found = p; break; }
           p++;
         }
         if (found < 0) { at[i * 3] = -1; miss++; continue; }
         for (var yy = y; yy < y + s; yy++) for (var xx = x; xx < x + s; xx++) { occ[yy * G + xx] = 1; own[yy * G + xx] = i; }
-        at[i * 3] = x; at[i * 3 + 1] = y; at[i * 3 + 2] = s;
-        while (first < GG2 && occ[first]) first++;
+        at[i * 3] = x; at[i * 3 + 1] = y; at[i * 3 + 2] = s; if (y + s > rows) rows = y + s;
+        while (first < GH && occ[first]) first++;
       }
-      return { G: G, at: at, own: own, miss: miss };
+      return { G: G, H: Math.max(G, rows), at: at, own: own, miss: miss };
     }
     /* the fee rate at each percent of the block's weight, cheapest first (the coinbase left out) */
     function curve(items) {
@@ -258,6 +253,8 @@
         for (i = 0; i < old.length; i++) if (!keep[old[i].id] && cur[i * 3] >= 0) gone.push({ x: cur[i * 3], y: cur[i * 3 + 1], s: cur[i * 3 + 2], c: old[i].cb ? '#ffd27a' : col(old[i].r) });
         M.from = from; M.gone = gone.length > 4000 ? [] : gone; M.t0 = now;
       } else { M.from = null; M.gone = []; }
+      M.rows = Math.max(M.rows || 0, lay.H / lay.G);   /* the canvas only grows within one panel, so it does not jitter */
+      M.host.style.aspectRatio = '1 / ' + M.rows.toFixed(4);
       var sc = scaleOf(items);   /* keep the colours still unless the block's spread really moved */
       if (!M.sc || sc.lo / M.sc.lo > 1.25 || M.sc.lo / sc.lo > 1.25 || sc.hi / M.sc.hi > 1.25 || M.sc.hi / sc.hi > 1.25) { M.sc = sc; CC = {}; }
       M.items = items; M.lay = lay; M.ix = {};
@@ -269,10 +266,10 @@
     function mapFrame(now) {
       if (!M) return; M.raf = 0;
       var cv = M.cv, W = cv.clientWidth; if (!W || !M.lay) return;
-      var dpr = Math.min(2, w.devicePixelRatio || 1), S = Math.round(W * dpr);
-      if (cv.width !== S) { cv.width = S; cv.height = S; }
+      var dpr = Math.min(2, w.devicePixelRatio || 1), S = Math.round(W * dpr), SH = Math.round(S * (M.rows || 1));
+      if (cv.width !== S || cv.height !== SH) { cv.width = S; cv.height = SH; }
       var g = M.cx, it = M.items, pos = curPos(now), cell = S / M.lay.G, gap = Math.max(dpr * 0.6, Math.min(dpr * 1.5, cell * 0.16)), on = ggOn(), wall = Date.now(), more = !!(M.from && now - M.t0 < DUR), fadeIn = more ? ease((now - M.t0) / DUR) : 1;
-      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
+      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, SH);
       for (var i = 0; i < it.length; i++) {
         var j = i * 3, x = pos[j]; if (x < 0) continue;
         var t = it[i], sz2 = Math.max(dpr * 0.7, pos[j + 2] * S - gap), x0 = x * S + gap / 2, y0 = pos[j + 1] * S + gap / 2;
@@ -289,8 +286,8 @@
     }
     function mapAt(e) {
       if (!M || !M.lay) return -1;
-      var r = M.cv.getBoundingClientRect(), G = M.lay.G, cx = Math.floor((e.clientX - r.left) / r.width * G), cy = Math.floor((e.clientY - r.top) / r.height * G);
-      return cx < 0 || cy < 0 || cx >= G || cy >= G ? -1 : M.lay.own[cy * G + cx];
+      var r = M.cv.getBoundingClientRect(), G = M.lay.G, cx = Math.floor((e.clientX - r.left) / r.width * G), cy = Math.floor((e.clientY - r.top) / r.width * G);
+      return cx < 0 || cy < 0 || cx >= G || cy >= M.lay.H ? -1 : M.lay.own[cy * G + cx];
     }
     function mapMove(e) {
       if (!M || e.currentTarget !== M.cv || e.pointerType === 'touch') return;
@@ -497,7 +494,7 @@
       var n = 0, v = 0, tv = 0;
       M.items.forEach(function (t) { tv += t.vs; if (on.length && !t.cb && hit(t.f, on)) { n++; v += t.vs; } });
       if (r) r.textContent = on.length ? L(N(n) + ' تراکنش · ' + (tv ? (v / tv * 100).toFixed(1) : '0') + '٪ از وزن این بلاک', N(n) + ' مامەڵە · ' + (tv ? (v / tv * 100).toFixed(1) : '0') + '٪ی کێشی ئەم بلۆکە', N(n) + ' transactions · ' + (tv ? (v / tv * 100).toFixed(1) : '0') + '% of this block’s weight') : '';
-      if (c) c.textContent = L(N(M.items.length) + ' تراکنش روی نقشه', N(M.items.length) + ' مامەڵە لەسەر نەخشە', N(M.items.length) + ' transactions on the map') + (M.lay && M.lay.miss ? ' · ' + L(N(M.lay.miss) + ' تا جا نشد', N(M.lay.miss) + 'ی جێ نەبووەوە', N(M.lay.miss) + ' did not fit') : '') + '.';
+      if (c) c.textContent = L(N(M.items.length - (M.lay ? M.lay.miss : 0)) + ' تراکنش روی نقشه', N(M.items.length - (M.lay ? M.lay.miss : 0)) + ' مامەڵە لەسەر نەخشە', N(M.items.length - (M.lay ? M.lay.miss : 0)) + ' transactions on the map') + (M.lay && M.lay.miss ? ' · ' + L(N(M.lay.miss) + ' تا جا نشد', N(M.lay.miss) + 'ی جێ نەبووەوە', N(M.lay.miss) + ' did not fit') : '') + '.';
     }
 
     /* the socket: open while it is wanted, closed when it is not */
