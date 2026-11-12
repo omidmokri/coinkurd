@@ -100,6 +100,14 @@ VAL = {
     "range": ("محدودهٔ نوسان", "ناوچەی جووڵە", "Range"),
     "trend": ("روند‌دار", "ڕەوتدار", "Trend"),
     "neutral_setup": ("بدون ستاپ مشخص", "بێ ستاپی دیار", "Neutral setup"),
+    "accum": ("انباشت (جمع‌آوری آرام)", "کۆکردنەوە", "Accumulation"),
+    "distrib": ("توزیع (فروش آرام)", "دابەشکردن", "Distribution"),
+    "fire_sale": ("حراج (قیمت خیلی ارزان)", "هەراج (زۆر هەرزان)", "Fire sale"),
+    "expensive_zone": ("ناحیهٔ گران", "ناوچەی گران", "Expensive zone"),
+    "exhaustion": ("خستگی روند (احتمال برگشت)", "ماندووبوونی ڕەوت", "Exhaustion"),
+    "capitulation": ("تسلیم (فروش هیجانی)", "خۆبەدەستەوەدان", "Capitulation"),
+    "euphoria": ("سرخوشی (هیجان خرید)", "سەرخۆشی", "Euphoria"),
+    "bearish_alignment": ("هم‌راستایی نزولی", "هاوئاراستەیی دابەزین", "Bearish alignment"),
     "overbought": ("اشباع خرید", "زۆر کڕدراو", "Overbought"),
     "oversold": ("اشباع فروش", "زۆر فرۆشراو", "Oversold"),
 }
@@ -211,22 +219,54 @@ ORDER = ["dir", "decision", "score", "conf", "prob", "trend", "regime", "phase",
          "quality", "valuation", "cycle", "entry", "sl", "stop", "tp1", "tp2", "tp3"]
 
 
-def estate_card(st, lang="fa", name=None, head=True):
-    """st: {ind|name, tv_sym|sym, tf, price, t, f:{...}} -> html card"""
-    f = st.get("f") or {}
-    out = []
-    if head:
-        out += [pick(HEAD, lang) + (f" — {name}" if name else ""), ""]
-    elif name:
-        out += [f"📊 <b>{name}</b>", ""]
-    when = ago(st.get("t") or st.get("ts"), lang)
+BAR = {"conf", "prob", "quality", "score"}           # 0..100 values that also get a bar
+
+
+def bar(v, n=10):
+    try:
+        v = max(0.0, min(100.0, float(v)))
+    except (TypeError, ValueError):
+        return ""
+    k = int(round(v / 100 * n))
+    return "▰" * k + "▱" * (n - k)
+
+
+def clock(iso, lang):
+    """Tehran wall-clock time of the state (stays right in a channel post, unlike 'x minutes ago')"""
+    try:
+        from datetime import timedelta
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00")) + timedelta(hours=3, minutes=30)
+    except Exception:
+        return ""
+    return pick((f"{t:%H:%M} تهران", f"{t:%H:%M} تاران", f"{t:%H:%M} Tehran"), lang)
+
+
+def side_dot(f):
+    d = norm(f.get("dir") or f.get("side") or "")
+    return "🟢" if d in ("long", "buy", "up", "bull") else "🔴" if d in ("short", "sell", "down", "bear") else "⚪️"
+
+
+def estate_card(st, lang="fa", name=None, head=True, rel=True):
+    """st: {ind|name, tv_sym|sym, tf, price, t, f:{...}} -> html card (rel=False: clock time instead of 'x ago')"""
+    f = dict(st.get("f") or {})
+    dot = side_dot(f)
+    title = name or pick(HEAD, lang)
+    out = [f"{dot} <b>{title}</b>"]
+    when = ago(st.get("t") or st.get("ts"), lang) if rel else clock(st.get("t") or st.get("ts"), lang)
     out.append(f"🪙 {coinname(st.get('tv_sym') or st.get('sym'), lang)} · ⏱ {tfname(st.get('tf'), lang)} · "
                f"💵 {price(st.get('price'))}" + (f" · 🕒 {when}" if when else ""))
     out.append("━━━━━━━━━━━━━━")
+    bull, bear = f.pop("bull", None), f.pop("bear", None)
     keys = [k for k in ORDER if k in f] + [k for k in f if k not in ORDER]
-    for k in keys[:16]:
-        out.append(f"{ICON.get(k, '•')} {lab(k, lang)}: <b>{val(k, f[k], lang)}</b>")
-    out += ["━━━━━━━━━━━━━━", pick(MEAN, lang), verdict(f, lang), "", pick(DISC, lang)]
+    for k in keys[:14]:
+        line = f"{ICON.get(k, '•')} {lab(k, lang)}: <b>{val(k, f[k], lang)}</b>"
+        if k in BAR and isinstance(f[k], (int, float)) and 0 <= f[k] <= 100:
+            line += f"  {bar(f[k])}"
+        out.append(line)
+    if isinstance(bull, (int, float)) and isinstance(bear, (int, float)):
+        out.append(f"🐂 {lab('bull', lang)} <b>{bull:g}</b>  ⚔️  <b>{bear:g}</b> {lab('bear', lang)} 🐻")
+    out += ["━━━━━━━━━━━━━━", f"{pick(MEAN, lang)} {verdict(f | ({'dir': st.get('f', {}).get('dir')}), lang)}", "",
+            f"<i>{pick(DISC, lang)}</i>"]
     return "\n".join(out)
 
 

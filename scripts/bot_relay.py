@@ -67,16 +67,43 @@ def posts(ch, pages=2):
             except ValueError:
                 continue
             ids.append(mid)
-            te = w.select_one(".tgme_widget_message_text")
+            te = w.select_one(".js-message_text") or w.select_one(".tgme_widget_message_text:not(.js-message_reply_text)")
             if not te:
                 continue
             for br in te.find_all("br"):
                 br.replace_with("\n")
-            out.append((mid, te.get_text()))
+            rep = w.select_one(".tgme_widget_message_reply")
+            target = 0
+            if rep:
+                try:
+                    target = int((rep.get("href") or "").rstrip("/").rsplit("/", 1)[-1])
+                except ValueError:
+                    target = -1
+            out.append((mid, te.get_text(), target))
         if not ids or min(ids) <= 1:
             break
         before = min(ids)
     return out
+
+
+def tokens():
+    """None = the bot's own token (tg); then the second bot that may be the author of the webhook posts"""
+    out = [None]
+    second = os.environ.get("TG_BOT_TOKEN", "").strip()
+    if second and second != os.environ.get("REF_BOT_TOKEN", "").strip():
+        out.append(second)
+    return out
+
+
+def edit_with(tok, tg, ch, mid, body):
+    params = dict(chat_id=f"@{ch}", message_id=mid, text=body, parse_mode="HTML",
+                  link_preview_options={"is_disabled": True})
+    if tok is None:
+        return tg("editMessageText", **params)
+    try:
+        return requests.post(f"https://api.telegram.org/bot{tok}/editMessageText", json=params, timeout=30).json()
+    except Exception as ex:
+        return {"ok": False, "description": str(ex)}
 
 
 def card_for(text, codes, names, lang="fa"):
@@ -93,7 +120,7 @@ def card_for(text, codes, names, lang="fa"):
         if "ESTATE" in up:
             st = parse_estate(line, codes)
             if st and (st.get("f") or {}):
-                return SF.estate_card(st, lang, name=names.get(st["ind"]), head=False)
+                return SF.estate_card(st, lang, name=names.get(st["ind"]), head=False, rel=False)
             return None
         if "ESIG" in up:
             sg = parse_esig(line, codes)
@@ -114,24 +141,30 @@ def tick(s, tg):
     codes, names = maps()
     if not codes:
         return False
-    if st.get("v") != 2:                      # posts skipped by an older version get a second chance
-        st["v"], st["done"] = 2, []
+    if st.get("v") != 3:                      # posts skipped by an older version get a second chance
+        st["v"], st["done"] = 3, []
     done = st.setdefault("done", [])
     first = not done
-    limit = 3 if first else 8                 # on the very first run only the newest posts get an answer
+    limit = 6 if first else 20                # on the very first run only the newest posts get an answer
     replies, changed = 0, False
-    for mid, text in sorted(posts(ch), reverse=True)[: 12 if first else 40]:
-        if mid in done or MARK in text:
+    items = posts(ch)
+    answered = {tg_ for _, _, tg_ in items if tg_}
+    for mid, text, target in sorted(items, reverse=True)[: 12 if first else 40]:
+        if mid in done or MARK in text or target or mid in answered:   # our cards, or posts that already have one
             continue
         card = card_for(text, codes, names)
         if not card:
             done.append(mid)                  # nothing to explain in this post
             continue
-        raw = D.e(re.sub(r"\n{3,}", "\n\n", text.strip()))     # the machine line stays, escaped so HTML mode is safe
-        r = tg("editMessageText", chat_id=f"@{ch}", message_id=mid, text=(raw + "\n\n" + card)[:MAXLEN],
-               parse_mode="HTML", link_preview_options={"is_disabled": True})
-        ok = r.get("ok") or "not modified" in str(r.get("description", ""))
-        if not ok and replies < limit:        # a post of another bot cannot be edited: answer it instead
+        raw = D.e(re.sub(r"\n{3,}", "\n\n", text.strip()))     # kept for scripts/signals.py, folded away
+        body = (card + "\n\n<tg-spoiler>" + raw + "</tg-spoiler>")[:MAXLEN]
+        ok = False
+        for tok in tokens():
+            r = edit_with(tok, tg, ch, mid, body)
+            if r.get("ok") or "not modified" in str(r.get("description", "")):
+                ok = True
+                break
+        if not ok and replies < limit:        # nobody may edit it: answer it right underneath instead
             replies += 1
             r = tg("sendMessage", chat_id=f"@{ch}", text=card[:MAXLEN], parse_mode="HTML",
                    reply_to_message_id=mid, link_preview_options={"is_disabled": True})
