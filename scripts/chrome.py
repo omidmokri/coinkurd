@@ -406,7 +406,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "3"
-NX_VER = "6"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+NX_VER = "7"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
            "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"
