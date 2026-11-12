@@ -391,30 +391,40 @@ def footer(lang="fa"):
             f'</div></div><!--/ek:footer-->')
 
 
-# Interface v2 is a preview for now: it loads only for a visitor who opened any page with ?ui=2 (remembered in
-# localStorage; ?ui=1 goes back). The check runs in <head> before first paint, so the preview never flashes the
-# current design; for everyone else it costs these few bytes and nothing is downloaded. See assets/ui2.css / ui2.js.
-# It rides with the CSP meta at the very top of <head> (CSP_META below): an inline script waits for every stylesheet
-# before it, so placed lower the preview's own stylesheet would start a second later.
+# Interface v3 "Nexus" is the site's interface (approved 2026-11-12). It is the v2 engine (assets/ui2.{css,js}: floating
+# header, full-screen menu, homepage sections as rooms) plus assets/nx*.{css,js}. The switch below runs in <head> before
+# first paint and writes the stylesheets and scripts into the document, so nothing of the older design flashes.
+# The older designs stay reachable for comparison and as a way out: ?ui=1 (classic) or ?ui=2 on any address is remembered
+# in localStorage (ek_uic), ?ui=3 forgets it. The key used while v3 was a preview (ek_ui) is ignored and cleaned up, so
+# nobody is left on an old design by a choice made back then. A browser that refuses storage simply gets v3.
+# On the homepage the stage is in the page's own markup (see scripts/nx_prerender.py), so it is on screen as soon as the
+# stylesheet arrives. If the scripts cannot be loaded at all, the check at DOMContentLoaded (deferred scripts have run
+# or failed by then) takes the classes off again and the page falls back to its plain sections; a slow connection no
+# longer triggers that fallback, which the earlier fixed 7-second timer did.
+# The tag rides with the CSP meta at the very top of <head> (CSP_META below): an inline script waits for every stylesheet
+# before it, so placed lower the interface's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "2"
-NX_VER = "5"   # interface v3 "Nexus" (preview, ?ui=3): the v2 engine plus assets/nx*.{css,js}
-UI2_TAG = ('<script id="ek-ui">(function(){try{var L=localStorage,m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
-           "if(m){L.setItem('ek_ui',m[1]);try{var u=new URL(location.href);u.searchParams.delete('ui');"
-           "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}"
-           "var v=L.getItem('ek_ui');if(v==='2'||v==='3'){var c=document.documentElement.classList,n=v==='3',"
+UI2_VER = "3"
+NX_VER = "6"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
+           "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
+           "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"
+           "if(m)try{var u=new URL(location.href);u.searchParams.delete('ui');"
+           "history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}"
+           "if(v!=='2'&&v!=='3')return;try{var c=document.documentElement.classList,n=v==='3',"
            "h=/^\\/(index\\.html)?$/.test(location.pathname);"
            "addEventListener('pagereveal',function(e){var t=e.viewTransition;if(t)['ready','finished'].forEach(function(k){if(t[k]&&t[k].catch)t[k].catch(function(){})})});"
-           "c.add('ek-v2');if(n){c.add('ek-v3');if(/^sw:/.test(L.getItem('ek_gpu')||''))c.add('nx-lite')}"
-           "if(h)c.add('ek-deck');setTimeout(function(){if(h&&!window.ekUI2)c.remove('ek-deck');if(n&&h&&!window.ekNX)c.remove('ek-v3')},7000);"
+           "c.add('ek-v2');if(n){c.add('ek-v3');if(/^sw:/.test(g))c.add('nx-lite')}"
+           "if(h){c.add('ek-deck');addEventListener('DOMContentLoaded',function(){setTimeout(function(){"
+           "if(!window.ekUI2)c.remove('ek-deck');if(n&&!window.ekNX)c.remove('ek-v3')},80)})}"
            f"var s='<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\">';"
            f"if(n)s+='<link rel=\"stylesheet\" href=\"/assets/nx.css?v={NX_VER}\">';"
            f"s+='<script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>';"
            f"if(n){{if(h)s+='<link rel=\"preload\" as=\"image\" href=\"/assets/coin-front.webp\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
            f"if(h)s+='<script src=\"/assets/nx-coin.js?v={NX_VER}\" defer><\\/script><script src=\"/assets/nx-chart.js?v={NX_VER}\" defer><\\/script>"
            f"<script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
-           "document.write(s)}}catch(e){}})()</script>")
+           "document.write(s)}catch(e){}})()</script>")
 HEAD_TAGS = (f'<link rel="stylesheet" href="/assets/chrome.css?v={VER}">'
              f'<meta name="referrer" content="strict-origin-when-cross-origin">')
 BODY_TAGS = f'<script src="/assets/chrome.js?v={VER}" defer></script>'

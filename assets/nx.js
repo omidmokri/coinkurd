@@ -1,4 +1,4 @@
-/* entekhab.net — interface v3 "Nexus" (preview, ?ui=3): what every page gets on top of the v2 engine.
+/* entekhab.net — interface v3 "Nexus": what every page gets on top of the v2 engine.
    The live Bitcoin price in the header (one Binance market-data socket through assets/live.js, with the site's own
    last recorded price shown until it connects — and labelled as such if it never does), and buttons that lean towards the pointer. */
 (function () {

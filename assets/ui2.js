@@ -1,4 +1,4 @@
-/* entekhab.net — interface v2 (preview): floating header island, full-screen menu, homepage sections as full-screen panels.
+/* entekhab.net — interface v2, the engine under interface v3: floating header island, full-screen menu, homepage sections as full-screen panels.
    Runs only when <html> carries .ek-v2 (set before first paint by the switch in scripts/chrome.py, UI2).
    It builds on the shared chrome that is already in the page (#ekh header, #ekb tab bar, #ekf footer): the menu is made
    from the header's own links, so every address stays where it was and nothing is fetched to open it.
@@ -31,7 +31,7 @@
   /* everything except the open layer is taken out of reach of keyboard and screen readers */
   function setInert(keep, on, only) {
     [].forEach.call(only || d.body.children, function (c) {
-      if (c === keep || c.tagName === 'SCRIPT' || c.id === 'ekpv') return;
+      if (c === keep || c.tagName === 'SCRIPT') return;
       if (on) { if (!c.inert) { c.inert = true; c.setAttribute('data-eki', ''); } }
       else if (c.hasAttribute('data-eki')) { c.inert = false; c.removeAttribute('data-eki'); }
     });
@@ -399,17 +399,7 @@
     if (/[?&]q=[^&]/.test(location.search)) setTimeout(function () { if (cur !== 'feed') openDoor('feed', rowOf('feed')); }, 900);
   }
 
-  /* ================================================================== preview note, prefetch, start */
-  function note() {
-    try { if (sessionStorage.getItem('ek_pv_x')) return; } catch (e) { }
-    var n = d.createElement('div'); n.id = 'ekpv';
-    n.innerHTML = '<div role="status">' + tri('پیش‌نمایش طراحی جدید', 'پێشبینینی دیزاینی نوێ', 'New design preview') +
-      '<a href="?ui=1">' + tri('بازگشت به طراحی فعلی', 'گەڕانەوە بۆ دیزاینی ئێستا', 'Back to current design') + '</a>' +
-      '<button type="button" data-afa="بستن این یادداشت" data-ackb="داخستنی ئەم تێبینییە" data-aen="Hide this note">' + IC.x + '</button></div>';
-    d.body.appendChild(n);
-    n.querySelector('a').addEventListener('click', function (e) { e.preventDefault(); var u = new URL(location.href); u.searchParams.set('ui', '1'); u.hash = ''; location.href = u.href; });
-    n.querySelector('button').addEventListener('click', function () { try { sessionStorage.setItem('ek_pv_x', '1'); } catch (e) { } n.remove(); });
-  }
+  /* ================================================================== prefetch, start */
   function prefetch() {   /* the next page starts loading when the finger or mouse button goes down; skipped on data-saver and slow links */
     var c = navigator.connection || {};
     if (c.saveData || /2g/.test(c.effectiveType || '')) return;
@@ -447,7 +437,7 @@
     });
     try { deck(); } catch (e) { de.classList.remove('ek-deck'); if (w.console) console.error(e); }
     if (w.ekChrome && w.ekChrome.label) w.ekChrome.label(lang());
-    note(); prefetch();
+    prefetch();
     w.ekUI2 = { openMenu: openMenu, closeMenu: closeMenu };
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', init); else init();

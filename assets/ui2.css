@@ -1,4 +1,4 @@
-/* entekhab.net — interface v2 (preview). Loaded only when <html> carries .ek-v2 (the switch is in scripts/chrome.py, UI2).
+/* entekhab.net — interface v2, the engine under interface v3. Loaded only when <html> carries .ek-v2 (the switch is in scripts/chrome.py, UI2).
    It restyles the shared chrome (#ekh header, #ekb tab bar) and adds the full-screen menu (#ekm) and, on the homepage,
    the section index (.ekd) with its full-screen panel (#ekp). Nothing here removes content: every link and section stays in the page.
 
@@ -237,17 +237,6 @@ html.ek-deck #ekp .ekp-body>section{display:block}
 .ekp-body .reveal{opacity:1!important;transform:none!important}
 .ekp-body .dims{top:0}
 .ekp-body>#feed{padding-bottom:56px}
-
-/* ------------------------------------------------------------------ preview note */
-#ekpv{position:fixed;inset-inline:0;bottom:14px;z-index:390;display:flex;justify-content:center;pointer-events:none;font-family:var(--ek-font)}
-#ekpv>div{pointer-events:auto;display:flex;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:6px 6px 6px 14px;padding-inline:14px 6px;border-radius:99px;background:rgba(16,17,21,.94);
-  border:1px solid rgba(248,197,85,.5);box-shadow:0 10px 30px rgba(0,0,0,.5);color:#ecebe6;font-size:.76rem}
-#ekpv a{color:#0b0c0f;background:#f8c555;border-radius:99px;padding:5px 12px;font-weight:800;text-decoration:none;white-space:nowrap}
-#ekpv button{width:28px;height:28px;border:0;border-radius:50%;background:none;color:#9b9a94;cursor:pointer;display:grid;place-items:center;padding:0}
-#ekpv button svg{width:14px;height:14px}
-@media (max-width:1180px){#ekpv{bottom:calc(96px + env(safe-area-inset-bottom));justify-content:flex-start;padding-inline-start:12px}#ekpv>div{font-size:.7rem}}
-html.ek-lock #ekpv{display:none}
-
 @media (prefers-reduced-motion:reduce){
   @view-transition{navigation:none}
   html.ek-v2 #ekh .ek-w,html.ek-v2 #ekh .ek-brand img,.ek-ink,.ekm-bg,.ekm-in,.ekm-cat,#ekm.open .ekm-cat,.ekm-pane,.ekd-row,.ekd-row::before,#ekp,#ekp.open{transition:none!important}
@@ -255,4 +244,4 @@ html.ek-lock #ekpv{display:none}
   .ekm-bg{clip-path:none;opacity:0}#ekm.open .ekm-bg{clip-path:none;opacity:1}
   #ekp{clip-path:none}
 }
-@media print{#ekm,#ekp,#ekpv,.ekd{display:none!important}}
+@media print{#ekm,#ekp,.ekd{display:none!important}}
