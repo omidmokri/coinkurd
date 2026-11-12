@@ -1507,7 +1507,7 @@ LANG_JS = ("(function(){var L;try{L=localStorage.getItem('ck_lang')}catch(e){}if
            "document.querySelectorAll('.lsw').forEach(function(w){w.addEventListener('click',function(e){var b=e.target.closest('button');if(b)ap(b.dataset.l)})});"
            "document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#langs button[data-l],.ek-lang button[data-l]');if(b){ev.preventDefault();ev.stopPropagation();ap(b.getAttribute('data-l'))}},true);"
            "window.EKSET=ap;ap(L)})();")
-LSW = '<div class="lsw"><button data-l="fa">فارسی</button><button data-l="ckb">کوردی</button><button data-l="en">English</button></div>'
+LSW = '<div class="lsw"><button data-l="ckb">کوردی</button><button data-l="fa">فارسی</button><button data-l="en">English</button></div>'
 LEARN_CSS = (".lsw{display:flex;gap:6px;margin:6px 0 14px}.lsw button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;padding:5px 12px;cursor:pointer;font:inherit;font-size:.82rem}"
              ".lsw button.on{background:var(--acc);border-color:var(--acc);color:#000;font-weight:800}"
              ".gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin-top:12px}.gt{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--card)}"
