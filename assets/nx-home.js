@@ -28,8 +28,11 @@
 
   /* ------------------------------------------------------------------ build */
   /* index.html already carries this stage as plain markup (the output of the template below, written there by
-     scripts/nx_prerender.py), so a visitor on a slow connection sees it before this script arrives. If what is on the
-     page is exactly what the template gives now, it is used as it stands; otherwise it is rebuilt in place. */
+     scripts/nx_prerender.py together with a hash of it in data-tpl), so a visitor on a slow connection sees it before
+     this script arrives. If the template gives the same markup now (same hash), what is on the page is used as it
+     stands, including anything other scripts have already filled in (the live price); if not (another language, or
+     a newer template than the page was written with), it is rebuilt in place. */
+  function h32(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0; return h.toString(36); }
   var nx = d.getElementById('nx'), pre = !!nx;
   if (!nx) { nx = d.createElement('section'); nx.className = 'nx'; nx.id = 'nx'; nx.setAttribute('aria-labelledby', 'nx-h'); }
   var cols = { a: '', b: '' }, rail = '', doors = {}, order = [];
@@ -67,7 +70,7 @@
     '<div class="nx-cta"><a class="nx-btn p" href="#market" data-d="market">' + tri('ورود به بازار زنده', 'چوونە ناو بازاڕی زیندوو', 'Enter the live market') + '</a>' +
     '<a class="nx-btn" href="/satoshi/">' + HOME + tri('داستان ساتوشی', 'چیرۆکی ساتۆشی', 'Satoshi’s story') + '</a></div></div>' +
     '<div class="nx-ps"><div class="nx-col nx-a">' + cols.a + '</div><div class="nx-col nx-b">' + cols.b + '</div></div>';
-  if (pre) { var t0 = d.createElement('div'); t0.innerHTML = tpl; if (t0.innerHTML !== nx.innerHTML) { nx.classList.add('nx-re'); nx.innerHTML = tpl; } }
+  if (pre) { var t0 = d.createElement('div'); t0.innerHTML = tpl; if (h32(t0.innerHTML) !== nx.getAttribute('data-tpl')) { nx.classList.add('nx-re'); nx.innerHTML = tpl; } }
   else nx.innerHTML = tpl;
   if (main.firstElementChild !== nx) main.insertBefore(nx, main.firstChild);
   var mid = nx.querySelector('.nx-mid'), nxt = d.getElementById('next'); if (nxt) mid.appendChild(nxt);

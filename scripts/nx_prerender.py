@@ -4,9 +4,10 @@ Write the homepage stage of interface v3 into index.html, so it is on screen bef
 The stage (#nx: the coin, the headline, the two buttons and the eight panels) is built by assets/nx-home.js from a
 template. On a slow connection that script can take seconds, and until then the first screen would be empty. This tool
 runs that same template once in a browser and writes its output between <!--nx:stage--> and <!--/nx:stage--> in
-index.html. assets/nx-home.js then finds the section already there: if it is exactly what the template gives, it is used
-as it stands; if not (another language, or the template was changed and this tool has not been run since), the script
-rebuilds it in place — so a stale copy never breaks the page, it only costs the early paint.
+index.html, with a hash of that output in data-tpl. assets/nx-home.js then finds the section already there: if its
+template gives the same hash now, the section is used as it stands; if not (another language, or the template was
+changed and this tool has not been run since), the script rebuilds it in place — so a stale copy never breaks the
+page, it only costs the early paint.
 
 Run it after changing the template in assets/nx-home.js or the section titles on the homepage:
 
@@ -27,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(ROOT, "index.html")
 A, B = "<!--nx:stage-->", "<!--/nx:stage-->"
 HOOK = "  if (pre) {"
-PROBE = "  w.__nxTpl = (function () { var t = d.createElement('div'); t.innerHTML = tpl; return t.innerHTML; })();\n"
+PROBE = "  w.__nxTpl = (function () { var t = d.createElement('div'); t.innerHTML = tpl; return t.innerHTML; })(); w.__nxHash = h32(w.__nxTpl);\n"
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -61,12 +62,15 @@ def template_output():
             pg.goto(base + "/", wait_until="domcontentloaded")
             pg.wait_for_function("typeof window.__nxTpl === 'string'", timeout=20000)
             out = pg.evaluate("window.__nxTpl")
+            sig = pg.evaluate("window.__nxHash")
             b.close()
     finally:
         srv.shutdown()
     if not out or 'class="nx-mid"' not in out or out.count('class="nx-p"') < 4:
         raise SystemExit("nx_prerender: the template gave an unexpected result; index.html was left alone")
-    return '<section class="nx" id="nx" aria-labelledby="nx-h">' + out + "</section>"
+    if not sig or not re.fullmatch(r"[0-9a-z]{1,8}", sig):
+        raise SystemExit("nx_prerender: no template hash; index.html was left alone")
+    return '<section class="nx" id="nx" aria-labelledby="nx-h" data-tpl="' + sig + '">' + out + "</section>"
 
 
 def main():
