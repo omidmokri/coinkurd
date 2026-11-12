@@ -306,7 +306,7 @@
     var ids = [], h = '';
     DEF.forEach(function (id) {
       var sec = d.getElementById(id); if (!sec) return;
-      var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), own = OWN[id], link = id === 'library' && sec.querySelector('a[href]');
+      var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), own = OWN[id], link = id === 'library' ? sec.querySelector('a[href]') : id === 'learnmap' ? sec.querySelector('a[href="/map/"]') : null;
       if (!t && !own) return;
       var title = t ? '<b class="ekd-t" data-i="' + esc(t.getAttribute('data-i')) + '">' + t.innerHTML + '</b>' : tri(own[0][0], own[0][1], own[0][2], 'b', 'ekd-t');
       var lead = l ? '<span class="ekd-l" data-i="' + esc(l.getAttribute('data-i')) + '">' + l.innerHTML + '</span>' : own ? tri(own[1][0], own[1][1], own[1][2], 'span', 'ekd-l') : '';
