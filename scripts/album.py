@@ -740,8 +740,18 @@ PATTERN_FA = {"breakout_up": "شکست سقف", "breakdown": "شکست کف", "e
               "rsi_overbought": "اشباع خرید RSI", "bull_divergence": "واگرایی مثبت RSI", "bear_divergence": "واگرایی منفی RSI",
               "squeeze": "فشردگی نوسان"}
 TF_FA = {"1h": "ساعتی", "4h": "۴ ساعته", "1d": "روزانه"}
-BANNED = re.compile(r"قطعا|قطعاً|حتما|حتماً|تضمین|بدون ریسک|صد ?در ?صد|۱۰۰ ?٪|بخرید|بفروشید|سیگنال خرید|سیگنال فروش|"
-                    r"فرصت طلایی|سود قطعی|ضرر نمی|پولدار|موشک|ماه می‌رود|به ماه")
+FA_LETTERS = "آ-یءؤئإأةۀ\u200c"
+
+
+def _word(w):
+    """a whole Persian word: «حتما» must not match inside «احتمال», nor «قطعا» inside «قطعات»"""
+    return rf"(?<![{FA_LETTERS}]){w}(?![{FA_LETTERS}])"
+
+
+BANNED = re.compile("|".join([_word("قطعا"), _word("قطعاً"), _word("حتما"), _word("حتماً"), "تضمین", "بدون ریسک",
+                              r"صد ?در ?صد", "۱۰۰ ?٪", _word("بخرید"), _word("بفروشید"), "سیگنال خرید", "سیگنال فروش",
+                              "فرصت طلایی", "سود قطعی", "ضرر نمی", "پولدار", "ماه می‌رود"]))
+JOINED = re.compile(r"[آ-یءؤئ]{12,}")                 # «افزایشجذابیت»: two words run together by the model
 
 
 def fng_fa(f):
@@ -760,6 +770,10 @@ def long_share(ls):
 def headline(f):
     b = f["btc"]
     c = b["chg"]
+    p = f.get("prev_delta")
+    if p and abs(p["btc"]) >= 0.5 and abs(c) < 3:          # the second edition of the day leads with what changed
+        since = "از صبح" if f["edition"] == "e" else "از عصر دیروز"
+        return f"{since} تاکنون بیت‌کوین {fpct(p['btc'])} {updown(p['btc'])} داشته؛ بازار در فاز {mood(f)}"
     if c <= -3:
         return f"فشار فروش؛ بیت‌کوین در ۲۴ ساعت {fpct(c)} افت کرد"
     if c >= 3:
@@ -982,6 +996,8 @@ def check_text(s, allowed, max_len, min_len=8):
         p.append("latin letters")
     if BANNED.search(s):
         p.append("promise/advice words")
+    if JOINED.search(s):
+        p.append("words run together: " + JOINED.search(s).group(0))
     extra = numbers_in(s) - allowed
     if extra:
         p.append("numbers not in the sources: " + ", ".join(sorted(extra)))
@@ -1055,11 +1071,13 @@ def ai_news(items):
 
 
 EDITION_PROMPT = """تو سردبیر گزارش تصویری «کوین کورد» هستی. از داده‌های زیر (و فقط همین داده‌ها) سه متن کوتاه فارسی بنویس:
-headline: پیام اصلی بازار برای جلد گزارش، گیرا و دقیق، حداکثر ۷۰ نویسه
-summary: جمع‌بندی دو جمله‌ای برای اسلاید آخر، با زبان احتمال و بدون قطعیت، حداکثر ۲۴۰ نویسه
-lead: یک جملهٔ خلاصه برای متن همراه آلبوم تلگرام، حداکثر ۱۷۰ نویسه
+headline: پیام اصلی بازار برای جلد گزارش؛ یک ادعای مشخص دربارهٔ جهت بازار و مهم‌ترین عامل آن، حداکثر ۷۰ نویسه.
+  نمونهٔ خوب: «فشار فروش ادامه دارد؛ بیت‌کوین زیر میانگین‌ها و ترس در بازار». نمونهٔ بد: «وضعیت بازار در نوبت عصر».
+  تاریخ، روز هفته و واژهٔ «نوبت» را در تیتر نیاور.
+summary: جمع‌بندی دو جمله‌ای برای اسلاید آخر: وضعیت فعلی و آنچه جهت بعدی را روشن می‌کند، با زبان احتمال، حداکثر ۲۴۰ نویسه
+lead: یک جمله برای متن همراه آلبوم تلگرام که مهم‌ترین تحول این نوبت را بگوید (نه «نگاهی به …»)، حداکثر ۱۷۰ نویسه
 قواعد سخت: هیچ حرف لاتین ننویس؛ فقط عددهایی را بنویس که در داده‌ها آمده؛ تحلیل را واقعیت قطعی جلوه نده؛
-هیچ سودی را تضمین نکن و توصیهٔ خرید یا فروش نکن؛ اعداد را با ارقام فارسی بنویس.
+هیچ سودی را تضمین نکن و توصیهٔ خرید یا فروش نکن؛ اعداد را با ارقام فارسی بنویس؛ میان واژه‌ها فاصله یا نیم‌فاصلهٔ درست بگذار.
 خروجی فقط JSON: {"headline":"...","summary":"...","lead":"..."}
 
 داده‌ها:
@@ -1069,7 +1087,7 @@ lead: یک جملهٔ خلاصه برای متن همراه آلبوم تلگر�
 def facts_text(f):
     b, g = f["btc"], f["global"]
     L = lv(f)
-    lines = [f"نوبت: {EDITION[f['edition']]['slot']}، {jdate(f['now'])} ساعت {hm(f['now'])} به وقت تهران",
+    lines = [f"زمان داده‌ها: {hm(f['now'])} به وقت تهران ({'صبح' if f['edition'] == 'm' else 'عصر'})",
              f"بیت‌کوین: {fprice(b['price'])} دلار، {fpct(b['chg'])} {updown(b['chg'])} در ۲۴ ساعت؛ روند کوتاه‌مدت {TREND_FA[b['trend_s']]}، "
              f"میان‌مدت {TREND_FA[b['trend_m']]}" + (f"؛ ۳۰ روز اخیر {fpct(b['chg30'])} {updown(b['chg30'])}" if b.get("chg30") is not None else ""),
              f"حمایت‌های بیت‌کوین: {L['s1']} و {L['s2']} دلار؛ مقاومت‌ها: {L['r1']} و {L['r2']} دلار"]
@@ -1102,9 +1120,12 @@ def ai_edition(f):
         return {}
     allowed = allowed_numbers(ft)
     out = {}
+    day = IC.jalali(teh(f["now"])).split(" ")
     for k, lim, lo in (("headline", 74, 16), ("summary", 250, 60), ("lead", 180, 30)):
         s = IC.clean(data.get(k) or "")
         pr = check_text(s, allowed, lim, lo)
+        if re.search(r"نوبت|نگاهی به|وضعیت بازار در|" + "|".join(WEEKDAYS), s) or (len(day) == 3 and day[1] in s):
+            pr.append("a title about the report instead of the market")
         if pr:
             log.info("AI %s rejected: %s (%s)", k, pr[0], s[:80])
             continue
@@ -1651,9 +1672,10 @@ def s_market(base, f, tx):
             num(d, xr, yy + 34, val, 38, "k", INK)
         if ch is not None:
             change(d, xr, yy + 84, ch, 22)
-    p = f.get("prev_delta")
-    if p and p.get("mcap") is not None:
-        rt(d, W - M - 18, CB - 44, f"از {EDITION[ed]['other']}: ارزش کل بازار", 21, "r", DIM)
+    gap = f.get("btc_gap")
+    if gap is not None and gap >= 1:                        # the owner's rule: a disagreement is said, not hidden
+        rt(d, W - M - 18, CB - 40, f"قیمت لحظه‌ای بایننس با دادهٔ ساعت {hm(f['market_at'] or f['now'])} سایت "
+           f"{fnum(gap, 1)}٪ تفاوت دارد؛ عددهای جدول بالا لحظه‌ای‌اند.", 19, "r", TAGC["هشدار"])
     footer(im, ed)
     return im
 
@@ -2587,8 +2609,8 @@ def build(now=None, edition=None, prev=None, use_ai=True, sig="", pub=None):
     """gather → write → draw → caption → check. Returns {"pics", "f", "tx", "caption", "problems"}"""
     now = now or datetime.now(timezone.utc)
     edition = edition or ("m" if teh(now).hour < 13 else "e")
-    if IC.mode() is None:
-        raise AlbumError("موتور شکل‌دهی حروف فارسی در دسترس نیست")
+    if IC.mode() != "raqm":         # the fallback shaper mirrors brackets and drops «ٔ»: never publish with it
+        raise AlbumError("موتور کامل چیدمان متن فارسی (raqm) در دسترس نیست؛ تصویرها ساخته نشد")
     f = gather(now, edition, prev)
     f["pub"] = pub or now
     pt = parse_dt((prev or {}).get("at"))

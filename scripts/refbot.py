@@ -40,6 +40,7 @@ import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
+import bot_album as AL  # noqa: E402
 import bot_onchain as OA  # noqa: E402
 import bot_reality as BRL
 import bot_encyclopedia as ENC
@@ -336,7 +337,7 @@ def kb_main(lang, s=None):
         [b("b_ind", "m:ind"), b("b_alerts", "m:alerts")],
         [b("b_follow", "m:follow"), b("b_dca", "m:dca")],
         [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
-        [b("b_predict", "m:predict")],
+        [b("b_predict", "m:predict"), b("b_album", "m:album")],
         [btn(t("b_battle", lang), url=D.SITE + "/battle/")],
         [btn(t("b_site", lang), url=D.SITE)],
     ]
@@ -1087,6 +1088,9 @@ def watch_loop(s):
 
 def admin_v2(s, chat_id, cmd, arg):
     """admin commands added in v2; -> True if handled"""
+    if cmd == "/album":                      # picture report preview, into this chat only (the channel is not touched)
+        AL.preview_to(chat_id)
+        return True
     if cmd == "/addproxy":
         links = PX2.LINK.findall(arg)
         d = PX2.px(s)
@@ -1270,6 +1274,10 @@ def handle_private(s, msg):
         return send(chat_id, LN.L(LN.M["report_ask"], lang))
     if uid in ADMIN_IDS and admin_v2(s, chat_id, cmd, arg):
         return None
+    if cmd == "/album":                      # members: the latest picture report (admins get a fresh preview above)
+        note = AL.latest_text(s, chat_id, lang, tg)
+        return send(chat_id, f"📸 <b>{MN.name('album', lang, icon=False)}</b>\n<i>{MN.desc('album', lang)}</i>"
+                    + ("\n\n" + note if note else ""), {"inline_keyboard": [MN.nav_row("album", lang, x)]})
     if cmd in v2:
         return send(chat_id, *render(s, uid, v2[cmd]))
 
@@ -1502,6 +1510,10 @@ def handle_callback(s, cb):
         return send(chat_id, add_pct_alert(s, uid, coin, *pc) if pc else t("alert_usage", lang), kb_alerts(s, uid, lang))
     if kind == "qc":
         return send(chat_id, t("alert_usage", lang).replace("BTC", val))
+    if data == "m:album":                    # the latest picture report, copied from the channel
+        note = AL.latest_text(s, chat_id, lang, tg)
+        head = f"📸 <b>{MN.name('album', lang, icon=False)}</b>\n<i>{MN.desc('album', lang)}</i>"
+        return send(chat_id, head + ("\n\n" + note if note else ""), {"inline_keyboard": [MN.nav_row("album", lang, x)]})
     if kind == "m":
         return edit(chat_id, mid, *render(s, uid, val))
     if kind == "l" and val in LANGS:
@@ -1757,6 +1769,8 @@ def main():
     OA.start(s, group_send, CHANNEL, sorted(ADMIN_IDS), MAIN_WT, DP.push_files, V.SIG)
     HB.start(s, group_send, edit, CHANNEL, MAIN_WT, DP.push_files, group=GROUP)
     CL.start(s, group_send, CHANNEL)
+    AL.start(s, API, CHANNEL, sorted(ADMIN_IDS), V.SIG, lambda: (save_state(s), push_state()),
+             DP.push_files, MAIN_WT)          # picture report: 07:30 and 19:30 Tehran
     FX.start(s, _post_with_retry, fix_amp, CHANNEL, MAIN_WT, DP.push_files, sorted(ADMIN_IDS),
              lambda chat, text: group_send(chat, text), V.SIG, F.DIRTY)   # one-time repair of broken pictures
     threading.Thread(target=watch_loop, args=(s,), name="watch-v2", daemon=True).start()
@@ -1799,6 +1813,7 @@ def main():
         if time.time() - last_push > STATE_PUSH_EVERY:
             push_state()
             last_push = time.time()
+    AL.wait_idle(150)                       # an album being sent is allowed to finish and be recorded
     save_state(s)
     log.info("done: %d updates handled", handled)
     return 0

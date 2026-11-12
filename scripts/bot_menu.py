@@ -44,6 +44,13 @@ S = {
                  "ckb": "ئەگەر لەبریی کریپتۆ دۆلار یان زێڕت کڕیبووایە، ئەمڕۆ چەندت هەبوو؟",
                  "kmr": "Eger te dolar an zêr bikira, îro çi hebû?", "ar": "لو اشتريت دولارًا أو ذهبًا بدل العملات؟",
                  "en": "If you had held the dollar, gold or a deposit instead, what would it be worth today?"}),
+    "album": ("📸", {"fa": "گزارش تصویری روزانه", "ckb": "ڕاپۆرتی وێنەیی ڕۆژانە", "kmr": "Rapora wêneyî ya rojane",
+                     "ar": "التقرير المصور اليومي", "en": "Daily picture report"},
+              {"fa": "۱۰ تصویر از وضعیت بازار، اخبار، تحلیل بیت‌کوین، جریان سرمایه و نقشهٔ راه؛ هر روز ساعت ۷:۳۰ و ۱۹:۳۰ تهران.",
+               "ckb": "١٠ وێنە لە دۆخی بازاڕ، هەواڵ، شیکاری بیتکۆین، ڕەوتی سەرمایە و نەخشەی ڕێگا؛ ڕۆژانە ٧:٣٠ و ١٩:٣٠ی تاران.",
+               "kmr": "10 wêne: bazar, nûçe, analîza Bitcoin, herikîna sermayeyê û nexşeya rê; her roj 07:30 û 19:30 (Tehran).",
+               "ar": "١٠ صور عن حالة السوق والأخبار وتحليل البيتكوين وتدفق رأس المال وخريطة الطريق؛ يومياً ٧:٣٠ و١٩:٣٠ بتوقيت طهران.",
+               "en": "10 pictures on the market, news, Bitcoin analysis, capital flows and the road map; daily at 07:30 and 19:30 Tehran."}),
     "today": ("☀️", {"fa": "امروز در بازار", "ckb": "ئەمڕۆ لە بازاڕ", "kmr": "Îro li bazarê", "ar": "اليوم في السوق",
                      "en": "Today in the market"},
               {"fa": "۲۴ ساعت گذشته در یک نگاه: بازار، اصطکاک ایران، اسکنر، پست‌ها و کلاس امشب.",
@@ -356,7 +363,7 @@ HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps
 GROUPS = {
     "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
-    "g_news": ["today", "class", "news", "narr", "events", "week", "posts", "track"],
+    "g_news": ["today", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
 }
