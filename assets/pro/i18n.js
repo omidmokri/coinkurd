@@ -6,7 +6,7 @@
   var P = window.PRO = window.PRO || {};
   var S = {};
   S.en = {
-    loading: 'Loading…', badTf: 'This timeframe is not available', noLogo: 'That coin is not available here, so the chart shows BTC.', noData: 'No data for {s} right now — Binance, OKX and the site snapshot all failed; trying again shortly.',
+    loading: 'Loading…', badTf: 'This timeframe is not available', dur_d: '{n} d', dur_h: '{n} h', dur_m: '{n} min', dur_sep: ', ', noLogo: 'That coin is not available here, so the chart shows BTC.', noData: 'No data for {s} right now — Binance, OKX and the site snapshot all failed; trying again shortly.',
     st_live: 'Live (Binance WebSocket)', st_poll: 'Refreshed every few seconds', st_snap: 'Site snapshot (delayed)', st_err: 'No data', st_load: 'Connecting…', st_rep: 'Replay',
     u_s: 's', u_m: 'm', u_h: 'h', u_d: 'D', u_w: 'W', u_mo: 'M',
     tfg_s: 'Seconds', tfg_m: 'Minutes', tfg_h: 'Hours', tfg_d: 'Days and longer', customTf: 'Custom timeframe (e.g. 7s, 45m, 3h, 2d)', favTf: 'Pin to the toolbar', moreTf: 'All timeframes',
@@ -67,7 +67,7 @@
     repStats: '{n} practice trades · {w}% won · average win {aw}% · average loss {al}% · result {s}$ on 1,000$ per trade', repNote: 'Practice only: no fees, no slippage, price = the close of the replay bar.'
   };
   S.fa = {
-    loading: 'در حال بارگذاری…', badTf: 'این تایم‌فریم در دسترس نیست', noLogo: 'آن ارز اینجا در دسترس نیست؛ نمودار BTC را نشان می‌دهد.', noData: 'فعلاً داده‌ای برای {s} نیست — بایننس، OKX و نسخهٔ پشتیبان سایت هر سه جواب ندادند؛ کمی بعد دوباره تلاش می‌شود.',
+    loading: 'در حال بارگذاری…', badTf: 'این تایم‌فریم در دسترس نیست', dur_d: '{n} روز', dur_h: '{n} ساعت', dur_m: '{n} دقیقه', dur_sep: ' و ', noLogo: 'آن ارز اینجا در دسترس نیست؛ نمودار BTC را نشان می‌دهد.', noData: 'فعلاً داده‌ای برای {s} نیست — بایننس، OKX و نسخهٔ پشتیبان سایت هر سه جواب ندادند؛ کمی بعد دوباره تلاش می‌شود.',
     st_live: 'زنده (وب‌سوکت بایننس)', st_poll: 'هر چند ثانیه به‌روز می‌شود', st_snap: 'نسخهٔ پشتیبان سایت (با تأخیر)', st_err: 'بدون داده', st_load: 'در حال اتصال…', st_rep: 'بازپخش',
     u_s: 's', u_m: 'm', u_h: 'h', u_d: 'D', u_w: 'W', u_mo: 'M',
     tfg_s: 'ثانیه‌ای', tfg_m: 'دقیقه‌ای', tfg_h: 'ساعتی', tfg_d: 'روزانه و بلندتر', customTf: 'تایم‌فریم دلخواه (مثلاً 7s، 45m، 3h، 2d)', favTf: 'سنجاق به نوار ابزار', moreTf: 'همهٔ تایم‌فریم‌ها',
@@ -128,7 +128,7 @@
     repStats: '{n} معاملهٔ تمرینی · {w}٪ سودده · میانگین سود {aw}٪ · میانگین زیان {al}٪ · نتیجه {s}$ با ۱٬۰۰۰$ در هر معامله', repNote: 'فقط تمرین: بدون کارمزد و لغزش؛ قیمت = بسته شدن کندل بازپخش.'
   };
   S.ckb = {
-    loading: 'باردەکرێت…', badTf: 'ئەم تایمفرەیمە بەردەست نییە', noLogo: 'ئەو دراوە لێرە بەردەست نییە، بۆیە چارتەکە BTC پیشان دەدات.', noData: 'ئێستا داتا بۆ {s} نییە — بایننس، OKX و پاشەکەوتی ماڵپەڕ هیچیان وەڵامیان نەدایەوە؛ کەمێکی تر دووبارە هەوڵ دەدرێتەوە.',
+    loading: 'باردەکرێت…', badTf: 'ئەم تایمفرەیمە بەردەست نییە', dur_d: '{n} ڕۆژ', dur_h: '{n} کاتژمێر', dur_m: '{n} خولەک', dur_sep: ' و ', noLogo: 'ئەو دراوە لێرە بەردەست نییە، بۆیە چارتەکە BTC پیشان دەدات.', noData: 'ئێستا داتا بۆ {s} نییە — بایننس، OKX و پاشەکەوتی ماڵپەڕ هیچیان وەڵامیان نەدایەوە؛ کەمێکی تر دووبارە هەوڵ دەدرێتەوە.',
     st_live: 'زیندوو (وێب‌سۆکێتی بایننس)', st_poll: 'هەر چەند چرکەیەک نوێ دەبێتەوە', st_snap: 'پاشەکەوتی ماڵپەڕ (بە دواکەوتن)', st_err: 'داتا نییە', st_load: 'پەیوەندی دەگرێت…', st_rep: 'دووبارە پەخش',
     u_s: 's', u_m: 'm', u_h: 'h', u_d: 'D', u_w: 'W', u_mo: 'M',
     tfg_s: 'چرکەیی', tfg_m: 'خولەکی', tfg_h: 'کاتژمێری', tfg_d: 'ڕۆژانە و درێژتر', customTf: 'تایمفرەیمی دڵخواز (بۆ نموونە 7s، 45m، 3h، 2d)', favTf: 'هەڵواسین لە شریتی ئامراز', moreTf: 'هەموو تایمفرەیمەکان',
@@ -189,7 +189,7 @@
     repStats: '{n} مامەڵەی ڕاهێنان · {w}٪ قازانج · ناوەندی قازانج {aw}٪ · ناوەندی زیان {al}٪ · ئەنجام {s}$ بە ١٬٠٠٠$ بۆ هەر مامەڵەیەک', repNote: 'تەنها ڕاهێنان: بێ کرێ و خلیسکان؛ نرخ = داخستنی مۆمی دووبارە پەخش.'
   };
   S.ar = {
-    loading: 'جارٍ التحميل…', badTf: 'هذا الإطار الزمني غير متاح', noLogo: 'هذه العملة غير متاحة هنا، لذا يعرض الرسم BTC.', noData: 'لا توجد بيانات لـ {s} الآن — لم تستجب Binance ولا OKX ولا النسخة الاحتياطية للموقع؛ سنحاول مجددًا بعد قليل.',
+    loading: 'جارٍ التحميل…', badTf: 'هذا الإطار الزمني غير متاح', dur_d: '{n} يوم', dur_h: '{n} ساعة', dur_m: '{n} دقيقة', dur_sep: ' و', noLogo: 'هذه العملة غير متاحة هنا، لذا يعرض الرسم BTC.', noData: 'لا توجد بيانات لـ {s} الآن — لم تستجب Binance ولا OKX ولا النسخة الاحتياطية للموقع؛ سنحاول مجددًا بعد قليل.',
     st_live: 'مباشر (WebSocket من Binance)', st_poll: 'يتحدّث كل بضع ثوانٍ', st_snap: 'نسخة الموقع الاحتياطية (متأخرة)', st_err: 'لا بيانات', st_load: 'جارٍ الاتصال…', st_rep: 'إعادة التشغيل',
     u_s: 's', u_m: 'm', u_h: 'h', u_d: 'D', u_w: 'W', u_mo: 'M',
     tfg_s: 'بالثواني', tfg_m: 'بالدقائق', tfg_h: 'بالساعات', tfg_d: 'يومي وأطول', customTf: 'إطار زمني مخصّص (مثل 7s أو 45m أو 3h أو 2d)', favTf: 'تثبيت في شريط الأدوات', moreTf: 'كل الأطر الزمنية',

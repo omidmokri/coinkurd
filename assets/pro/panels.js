@@ -10,12 +10,24 @@
   var demand = {};
   function want(src, syms) { demand[src] = syms || []; var all = {}; Object.keys(demand).forEach(function (k) { demand[k].forEach(function (s) { all[s] = 1; }); }); P.tickers.watch(Object.keys(all).slice(0, 150)); }
 
+  /* a time span in words: «19 ساعت و 22 دقیقه», «2 days 5 h» … (two units at most) */
+  function durText(sec) {
+    sec = Math.max(0, sec); var dd = Math.floor(sec / 86400), hh = Math.floor(sec % 86400 / 3600), mm = Math.floor(sec % 3600 / 60), parts = [];
+    if (dd) { parts.push(T('dur_d', { n: dd })); if (hh) parts.push(T('dur_h', { n: hh })); }
+    else if (hh) { parts.push(T('dur_h', { n: hh })); if (mm) parts.push(T('dur_m', { n: mm })); }
+    else parts.push(T('dur_m', { n: Math.max(1, mm) }));
+    return parts.join(T('dur_sep'));
+  }
+  P.durText = durText;
+
   /* ================================================================ WATCHLIST */
   var W = S.get('ek_pro_watch', null);
-  function siteList() { var a = S.get('ek_watch', []); return Array.isArray(a) ? a.filter(function (x) { return A.SYM_RE.test(x); }) : []; }
-  function setSiteList(a) { S.set('ek_watch', a.slice(0, 60)); }
+  /* «My watchlist» is the site-wide star list (ek_watch). Until the visitor stars or edits anything it shows these
+     coins, without writing them: opening this page must not star coins across the site */
+  var SITE_DEF = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'XAUT'];
+  function siteList() { var a = S.get('ek_watch', []); a = Array.isArray(a) ? a.filter(function (x) { return A.SYM_RE.test(x); }) : []; return a.length || W.siteEdited ? a : SITE_DEF.slice(); }
+  function setSiteList(a) { S.set('ek_watch', a.slice(0, 60)); W.siteEdited = 1; saveW(); }
   if (!W || typeof W !== 'object' || !Array.isArray(W.lists)) W = { lists: [], cur: 'site', flags: {}, sort: null, ff: null };
-  if (!siteList().length) setSiteList(['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'XAUT']);
   W.flags = W.flags && typeof W.flags === 'object' ? W.flags : {};
   function saveW() { S.set('ek_pro_watch', W); }
   var FLAGS = { r: '#ff5a4d', o: '#f7931a', y: '#facc15', g: '#34d399', b: '#38bdf8', p: '#a78bfa' };
@@ -397,7 +409,7 @@
     list.innerHTML = html || '<p class="pm-empty">' + esc(T('noEvents')) + '</p>';
     $$('.pm-cr', list).forEach(function (b) { b.onclick = function () { var t = +b.getAttribute('data-t'); A.goDate(A.active(), t); }; });
     var nx = CAL.filter(function (e) { return e.t > now && e.i === 'H' && (!st.ev.cur.length || st.ev.cur.indexOf(e.c) >= 0); })[0], ne = $('.pm-next', box);
-    if (ne) ne.innerHTML = nx ? '⏳ ' + esc(T('nextHigh')) + ': <b>' + esc(nx.c + ' · ' + evTitle(nx)) + '</b> — ' + esc(P.dur(nx.t - now)) : '';
+    if (ne) ne.innerHTML = nx ? '⏳ ' + esc(T('nextHigh')) + ': <b>' + esc(nx.c + ' · ' + evTitle(nx)) + '</b> — ' + esc(durText(nx.t - now)) : '';
     var sc = $('.pm-calsrc', box); if (sc) sc.textContent = T('calSource', { s: CALMETA.src || 'ForexFactory', t: CALMETA.at ? A.fmtD(Math.floor(Date.parse(CALMETA.at) / 1000)) : '—' }) + (CALMETA.partial ? ' ' + T('calPartial') : '');
     var cn = $('#pm-cnow', list); if (cn && !box._scrolled) { box._scrolled = true; setTimeout(function () { list.scrollTop = Math.max(0, cn.offsetTop - list.offsetTop - 60); }, 0); }
   }
