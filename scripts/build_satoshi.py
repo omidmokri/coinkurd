@@ -200,7 +200,7 @@ html[lang=en] .sx h2.sx-h,html[lang=en] .sx h1{font-family:'Space Grotesk',Vazir
 /* ---- the picture: the user's own artwork, alive but never explicit */
 .sx-art0{position:relative;overflow:hidden;height:clamp(280px,74vh,820px);background:#000}
 .sx-pic{position:absolute;top:0;left:50%;height:100%;aspect-ratio:16/9;translate:-50% 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
-.sx-pic img{position:absolute;inset:0;width:100%;height:100%;display:block;scale:1.04;translate:calc(var(--px,0)*-14px) calc(var(--py,0)*-9px);transition:translate .6s cubic-bezier(.2,.8,.2,1);animation:sx-breathe 18s ease-in-out infinite alternate}
+.sx-pic img,.sx-pic .sx-fx{position:absolute;inset:0;width:100%;height:100%;display:block;scale:1.04;translate:calc(var(--px,0)*-14px) calc(var(--py,0)*-9px);transition:translate .6s cubic-bezier(.2,.8,.2,1);animation:sx-breathe 18s ease-in-out infinite alternate}
 @keyframes sx-breathe{to{scale:1.09}}
 .sx-g{position:absolute;border-radius:50%;pointer-events:none;mix-blend-mode:screen;translate:-50% -50%}
 .sx-g.e1,.sx-g.e2{top:28.9%;width:5.2%;aspect-ratio:1.5;background:radial-gradient(closest-side,rgba(255,196,84,.95),rgba(247,147,26,.4) 55%,transparent);animation:sx-eye 7s steps(1,end) infinite}
@@ -579,7 +579,7 @@ html[lang=en] .sx-b h3{font-family:'Space Grotesk',Vazirmatn,sans-serif;font-wei
   .mp-io{grid-template-columns:minmax(0,1fr)}.mp-arr::before,[dir=rtl] .mp-arr::before{content:"↓"}.mp-sx{padding:14px 12px 10px}
   .mp-fh,.mp-feed button{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr)}.mp-fh span:nth-child(3),.mp-feed .z{display:none}
 }
-@media (prefers-reduced-motion:reduce){.sx-pic img,.sx-g,.sx h1,.ex *,.bx-b.new,.bx-c,.bx-b.q .bx-c,.bx-rd::after,.mp-feed li.n button,.mp-pill.live i,.mp-ld::before,.bx-st.live i,.sx-js .sx-b,.sx-js .sx-b.on{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){.sx-pic img,.sx-pic .sx-fx,.sx-g,.sx h1,.ex *,.bx-b.new,.bx-c,.bx-b.q .bx-c,.bx-rd::after,.mp-feed li.n button,.mp-pill.live i,.mp-ld::before,.bx-st.live i,.sx-js .sx-b,.sx-js .sx-b.on{animation:none!important;transition:none!important}}
 """
 
 
@@ -595,7 +595,7 @@ def page():
         facts = "".join(f"<li><b>{e(k)}</b>{e(v)}</li>" for k, v in KNOWN[lg])
         chips = "".join(f"<li><b>{e(a)}</b>{e(b)}</li>" for a, b in CHIPS[lg])
         return (f"<article class='sx' data-sx><header class='sx-hero'><div class='sx-art0'><div class='sx-pic'>"
-                f"<picture><source media='(max-width:700px)' srcset='/assets/satoshi-hero-900.webp'><img src='/assets/satoshi-hero.webp' alt='{e(T['alt'][lg])}' width='1600' height='900' fetchpriority='high' decoding='async'></picture>"
+                f"<picture><source media='(max-width:700px)' srcset='/assets/satoshi-hero-900.webp?v=2'><img src='/assets/satoshi-hero.webp?v=2' alt='{e(T['alt'][lg])}' width='1600' height='900' fetchpriority='high' decoding='async'></picture><canvas class='sx-fx' aria-hidden='true'></canvas>"
                 f"<i class='sx-g h'></i><i class='sx-g e1'></i><i class='sx-g e2'></i><i class='sx-g c'></i><canvas class='sx-emb' aria-hidden='true'></canvas></div></div>"
                 f"<div class='sx-head sx-w'><div class='sx-hc'><div class='meta'><a href='/'>{T['home'][lg]}</a> / {e(T['crumb'][lg])}</div>"
                 f"<h1>{e(T['h1'][lg])}</h1><p class='sx-lead'>{e(T['lead'][lg])}</p><ul class='sx-chips'>{chips}</ul></div></div></header>"
