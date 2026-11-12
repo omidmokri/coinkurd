@@ -32,6 +32,8 @@ import sys
 import time
 from html.parser import HTMLParser
 
+FA = re.compile(r"[پچژگیکۀ\u200c]")   # Persian-only letters: never in an Arabic translation
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, "data", "i18n_ar.json")
 OUT = os.path.join(ROOT, "i18n", "ar")
@@ -398,6 +400,9 @@ def translate_batch(batch, engine):
             res = {}
             for src, ar in zip(batch, out):
                 ar = norm(str(ar))
+                if FA.search(ar) and len(FA.findall(ar)) > max(1, len(re.findall(r"[يكةىإأؤئ]", ar)) // 12):
+                    continue                                    # Persian echoed back, not Arabic: next run retries it
+                ar = ar.replace("ی", "ي").replace("ک", "ك").replace("ۀ", "ة").replace("\u200c", " ")
                 if not ar or set(re.findall(r"\{\d+\}", src)) != set(re.findall(r"\{\d+\}", ar)):
                     continue                                    # a placeholder lost: leave this one for the next run
                 if not AR.search(ar) and AR.search(ar) is None and re.search(r"[A-Za-z]{4,}", src) and src.lower() == ar.lower():
