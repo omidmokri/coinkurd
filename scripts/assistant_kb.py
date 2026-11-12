@@ -25,6 +25,11 @@ def bot_url(key=None):
 # site page ↔ bot section ↔ extension tab — one feature, every door it can be opened from
 FEATURES = [
     ("/market/", ["pro"], None),
+    ("/heatmap/", ["mmap"], None),
+    ("/bubbles/", ["mmap"], None),
+    ("/money-flow/", ["mmap", "flows"], None),
+    ("/liquidity/", ["mmap"], None),
+    ("/etf/", ["mmap"], None),
     ("/dashboard/", ["score", "opps", "movers"], None),
     ("/coins/", ["coin"], "market"),
     ("/compare/", ["cmp"], None),

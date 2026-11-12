@@ -277,6 +277,7 @@ class Page(HTMLParser):
         if tag == "html":
             self.base = a.get("lang", "") in ("en", "ar")
             return
+        no = a.get("translate") == "no"       # ar.js never touches translate="no" (a page that has its own Arabic): nothing to collect
         e = None
         for k in ("lang", "data-lang", "data-rl"):
             if a.get(k):
@@ -284,9 +285,9 @@ class Page(HTMLParser):
         if tag == "script" and a.get("src"):
             self.scripts.append(a["src"].split("?")[0])
         for k in ("data-en", "data-aen"):
-            if worth(norm(a.get(k, ""))):
+            if not (self.skip or no) and worth(norm(a.get(k, ""))):
                 self.out.add(numkey(norm(a[k])))
-        if (e if e is not None else self.en()):
+        if not (self.skip or no) and (e if e is not None else self.en()):
             for k in ("placeholder", "title", "aria-label", "alt"):
                 v = norm(a.get(k, ""))
                 if worth(v):
@@ -295,7 +296,7 @@ class Page(HTMLParser):
             self._t = True
         if tag in VOID:
             return
-        sk = tag in ("script", "style", "code", "pre", "svg", "noscript", "textarea", "kbd")
+        sk = no or tag in ("script", "style", "code", "pre", "svg", "noscript", "textarea", "kbd")
         self.st.append((tag, e, sk))
         if sk:
             self.skip += 1

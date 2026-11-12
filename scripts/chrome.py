@@ -131,6 +131,17 @@ NAV = [
         ("/market/", "candles", L("بازار زنده", "بازاڕی زیندوو", "Live market"),
          L("مولتی‌چارت، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت", "چەند چارت پێکەوە، تایمفرەیمی چرکەیی، دووبارە پەخش، ئاگادارکەرەوە و ڕۆژژمێری ئابووری",
            "Multi-chart, seconds timeframes, replay, alerts and the economic calendar on the chart")),
+        ("/heatmap/", "grid", L("نقشهٔ حرارتی بازار", "نەخشەی گەرمیی بازاڕ", "Market heatmap"),
+         L("۲۵۰ ارز به اندازهٔ ارزش بازار و رنگ حرکتشان، ۵ دقیقه تا ۱ سال، دوبعدی و سه‌بعدی", "٢٥٠ دراو بە قەبارەی بەهای بازاڕ و ڕەنگی جووڵەیان، ٥ خولەک تا ١ ساڵ، دوو و سێ ڕەهەندی",
+           "250 coins sized by market cap and coloured by their move, 5 minutes to a year, in 2D and 3D")),
+        ("/bubbles/", "coins", L("حباب‌های بازار", "بڵقەکانی بازاڕ", "Crypto bubbles"),
+         L("بازار به شکل حباب‌های زنده: اندازه = شدت حرکت، رنگ = جهت آن", "بازاڕ وەک بڵقی زیندوو: قەبارە = هێزی جووڵە، ڕەنگ = ئاراستە", "The market as living bubbles: size = the move, colour = its direction")),
+        ("/money-flow/", "activity", L("جریان پول بازار", "ڕەوتی پارەی بازاڕ", "Money flow"),
+         L("ورود و خروج پول هر ارز و بخش، استیبل‌کوین، دامیننس و اهرم", "هاتن و ڕۆیشتنی پارەی هەر دراو و بەشێک، ستەیبڵکۆین، باڵادەستی و لێڤەرێج", "Money in and out of every coin and sector, stablecoins, dominance, leverage")),
+        ("/liquidity/", "candles", L("نقدینگی و دفتر سفارش", "نەختینەیی و دەفتەری داواکاری", "Liquidity & order books"),
+         L("نقشهٔ حرارتی زندهٔ دفتر سفارش، عمق بازار و لیکوییدیشن‌های همان لحظه", "نەخشەی گەرمیی زیندووی دەفتەری داواکاری، قووڵایی و لیکویدەکان", "Live order-book heatmap, market depth and liquidations as they happen")),
+        ("/etf/", "pie", L("ETF و نهادها", "ETF و دامەزراوەکان", "ETFs & institutions"),
+         L("جریان روزانهٔ ETFهای بیت‌کوین و اتریوم و خزانهٔ شرکت‌ها", "ڕەوتی ڕۆژانەی ETFی بیتکۆین و ئیسیریۆم و گەنجینەی کۆمپانیاکان", "Daily Bitcoin and Ether ETF flows and company treasuries")),
         ("/dashboard/", "gauge", L("داشبورد هوشمند", "داشبۆردی زیرەک", "Smart dashboard"),
          L("رژیم بازار، اسکنر فرصت‌ها و امتیاز انتخاب", "ڕژێمی بازاڕ، سکانەری دەرفەت و خاڵی Entekhab", "Market regime, opportunity scanner, Entekhab score")),
         ("/leaderboard/", "users", L("جدول برترین‌های معاملهٔ آزمایشی", "خشتەی باشترینەکانی مامەڵەی تاقیکاری", "Paper-trading leaderboard"),
@@ -525,7 +536,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "trade-bot", "market"]          # /app/ is built by scripts/build_apps.py
+          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
 
 
 def inject_static():

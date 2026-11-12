@@ -313,6 +313,12 @@
         'تا ١٦ چارت پێکەوە · تایمفرەیمی چرکەیی · دووبارە پەخش · ئامرازی کێشان و ٢٢ ئیندیکاتۆر · ئاگادارکەرەوەی نرخ · چاودێری · ڕۆژژمێری ئابووری لەسەر چارت',
         'Up to 16 charts · seconds timeframes · replay · drawing tools and 22 indicators · price alerts · watchlists · economic calendar on the chart') + '</span><i aria-hidden="true">→</i>';
     box.insertBefore(pro, box.firstChild);
+    var map = d.createElement('a'); map.className = 'nxm-pro'; map.href = '/heatmap/';      /* the market map, next to the live market */
+    map.innerHTML = '<b>' + tri('نقشهٔ بازار', 'نەخشەی بازاڕ', 'The market map') + '</b><span>' +
+      tri('نقشهٔ حرارتی و حباب‌های ۲۵۰ ارز در ۹ تایم‌فریم، دوبعدی و سه‌بعدی · جریان پول · نقدینگی و دفتر سفارش · ETFها',
+        'نەخشەی گەرمی و بڵقی ٢٥٠ دراو لە ٩ تایمفرەیمدا، دوو و سێ ڕەهەندی · ڕەوتی پارە · نەختینەیی و دەفتەری داواکاری · ETFەکان',
+        'Heatmap and bubbles of 250 coins on nine timeframes, in 2D and 3D · money flow · liquidity and order books · ETFs') + '</span><i aria-hidden="true">→</i>';
+    box.insertBefore(map, pro.nextSibling);
     var h2 = sec.querySelector('h2'), before = (h2 && h2.nextSibling) || sec.querySelector('#mini'); if (before) sec.insertBefore(box, before); else sec.appendChild(box);   /* right under the title; the section's own TradingView widgets follow */
     var leg = box.querySelector('.nxm-leg'), st = box.querySelector('.nxm-st'), F = w.nxChart.fmtP;
     function q(a) { return leg.querySelector(a); }

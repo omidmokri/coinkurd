@@ -356,6 +356,20 @@ jobs:
         timeout-minutes: 4
         run: python scripts/coin_logos.py
 
+      # /heatmap/, /bubbles/, /money-flow/, /liquidity/: the top 250 with nine timeframes, sectors, Binance taker flow
+      # per window, depth bands, stablecoin supply and one WebP sheet of the logos (scripts/mm_data.py)
+      - name: Market map data (heatmap, bubbles, money flow; CoinGecko + Binance + DefiLlama)
+        id: mm
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python scripts/mm_data.py
+
+      # /etf/: daily US spot BTC/ETH ETF flows (Farside Investors, at most hourly) and company treasuries (CoinGecko, 6 h)
+      - name: ETF flows and corporate treasuries
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/etf.py
+
       - name: Strategy-lab context (Fear & Greed, BTC regime, funding)
         continue-on-error: true
         timeout-minutes: 3

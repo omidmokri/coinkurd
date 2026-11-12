@@ -33,6 +33,14 @@ S = {
              "kmr": "Heta 16 grafîk, demên saniyeyî, dubarelîstin, hişyarî û salnameya aborî li ser grafîkê.",
              "ar": "حتى ١٦ رسمًا، أطر بالثواني، إعادة تشغيل، تنبيهات والتقويم الاقتصادي على الرسم.",
              "en": "Up to 16 charts, seconds timeframes, replay, alerts and the economic calendar on the chart."}),
+    "mmap": ("🗺", {"fa": "نقشهٔ بازار (حرارتی، حباب، جریان پول)", "ckb": "نەخشەی بازاڕ (گەرمی، بڵق، ڕەوتی پارە)",
+                   "kmr": "Nexşeya bazarê (germî, bilbil, herikîn)", "ar": "خريطة السوق (حرارية، فقاعات، تدفق)",
+                   "en": "Market map (heatmap, bubbles, flow)"},
+             {"fa": "۲۵۰ ارز در ۹ تایم‌فریم، دوبعدی و سه‌بعدی؛ جریان پول، نقدینگی و ETFها — در تلگرام یا مرورگر.",
+              "ckb": "٢٥٠ دراو لە ٩ تایمفرەیمدا، دوو و سێ ڕەهەند؛ ڕەوتی پارە، نەختینەیی و ETFەکان — لە تێلێگرام یان وێبگەڕ.",
+              "kmr": "250 coin di 9 deman de, 2D û 3D; herikîna pereyan, likîdîte û ETF — di Telegramê an gerokê de.",
+              "ar": "٢٥٠ عملة على ٩ أطر زمنية، ثنائية وثلاثية الأبعاد؛ تدفق الأموال والسيولة وصناديق ETF — في تيليغرام أو المتصفح.",
+              "en": "250 coins on nine timeframes, 2D and 3D; money flow, liquidity and ETFs — in Telegram or the browser."}),
     "g_reality": ("🎯", {"fa": "واقعیت‌سنج", "ckb": "ڕاستیپێو", "kmr": "Pîvana rastiyê", "ar": "مقياس الواقع",
                          "en": "Reality check"},
                   {"fa": "فاصلهٔ حرف بازار با واقعیتِ قابل‌بازبینی — اصطکاک محلی، هزینه فرصت، کارنامهٔ سیگنال‌ها.",
@@ -378,7 +386,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["pro", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
+    "g_analysis": ["pro", "mmap", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "podcast", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
