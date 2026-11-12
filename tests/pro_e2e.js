@@ -263,6 +263,22 @@ async function mockNet(page, stats) {
     await shot(page, `22_${lang}_390_fresh`); await ctx.close();
   }
 
+  /* ---------- a slow connection: panels.js and replay.js arrive late; the panels, calendar flags and alert checks still start */
+  if (!ONLY || ONLY === 'slow') {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: 'en-US', timezoneId: 'Asia/Tehran', serviceWorkers: 'block' });
+    const page = await ctx.newPage(), stats = { rest: 0, ws: 0, msgs: 0 };
+    page.on('pageerror', e => errors.push('[slow] ' + e.message));
+    await mockNet(page, stats);
+    await page.route(/\/assets\/pro\/(panels|replay)\.js/, async r => { await new Promise(z => setTimeout(z, 1800)); await r.continue(); });
+    await page.goto(`${base}/market/?lang=fa`, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 20000 }).catch(() => { });
+    await page.waitForTimeout(2500);
+    const sl = await page.evaluate(() => ({ side: PRO.app.st().side, rows: document.querySelectorAll('.pm-spanel .pm-wr').length, pin: document.querySelectorAll('.pm-spanel .pm-pin').length,
+      cal: !!(PRO.calEvents && PRO.calEvents().length), replay: typeof PRO.replayToggle }));
+    ok('on a slow connection (side scripts late) the watchlist, the calendar and replay still start', sl.side === 'watch' && sl.rows >= 5 && sl.pin === 1 && sl.cal && sl.replay === 'function', JSON.stringify(sl));
+    await ctx.close();
+  }
+
   /* ---------- opening the page stars nothing across the site; «My watchlist» shows the default coins until edited */
   if (!ONLY || ONLY === 'watch') {
     const { page, ctx } = await newPage(1280, 860, 'fa');

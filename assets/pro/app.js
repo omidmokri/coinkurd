@@ -1232,5 +1232,10 @@
     emit('ready');
     var ld = $('.pm-loading'); if (ld) ld.remove();
   }
-  if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot); else setTimeout(boot, 0);
+  /* start after every deferred script (panels.js, replay.js) has run: DOMContentLoaded only fires after them. A timer
+     set from here could fire between two deferred scripts on a slow connection and start without their panels */
+  var started = false;
+  function start() { if (started) return; started = true; boot(); }
+  if (d.readyState === 'complete') setTimeout(start, 0);
+  else { d.addEventListener('DOMContentLoaded', start); addEventListener('load', start); }
 })();
