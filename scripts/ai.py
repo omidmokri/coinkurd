@@ -86,12 +86,12 @@ def fallbacks():
         return [m for m in ("gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-flash-lite-latest") if m not in _exhausted]
 
 
-def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
+def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90):
     """اگر سهمیهٔ روزانهٔ مدل فعلی تمام شد، خودکار به مدل بعدی می‌رود"""
     global _model
     while True:
         try:
-            return _generate(prompt, as_json, temperature, max_tokens, tries)
+            return _generate(prompt, as_json, temperature, max_tokens, tries, timeout)
         except QuotaError:
             _exhausted.add(model())
             nxt = fallbacks()
@@ -101,7 +101,7 @@ def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
             _model = nxt[0]
 
 
-def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
+def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90):
     global _last
     k = key()
     if not k:
@@ -120,7 +120,7 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3):
             time.sleep(wait)
         _last = time.time()
         try:
-            r = requests.post(f"{BASE}/models/{mname}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=90)
+            r = requests.post(f"{BASE}/models/{mname}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=timeout)
         except requests.exceptions.Timeout:
             if i == tries - 1:
                 raise

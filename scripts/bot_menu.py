@@ -57,6 +57,12 @@ S = {
                "ckb": "٢٤ کاتژمێری ڕابردوو بە یەک نیگا: بازاڕ، گیروگرفتی ئێران، سکانەر، پۆست و وانەی ئەمشەو.",
                "kmr": "24 saetên dawî bi nihêrînekê.", "ar": "آخر ٢٤ ساعة في لمحة: السوق، احتكاك إيران، الماسح، المنشورات ودرس الليلة.",
                "en": "The last 24 hours at a glance: market, Iran friction, scanner, posts and tonight's class."}),
+    "podcast": ("🎙", {"fa": "پادکست روزانه", "ckb": "پۆدکاستی ڕۆژانە", "kmr": "Podkasta rojane", "ar": "البودكاست اليومي",
+                       "en": "Daily podcast"},
+                {"fa": "«نبض کریپتو»: هر روز ۱۹:۰۰ تهران به فارسی، کوردی، انگلیسی و عربی.",
+                 "ckb": "«نەبزی کریپتۆ»: هەموو ڕۆژێک ١٩:٠٠ی تاران بە فارسی، کوردی، ئینگلیزی و عەرەبی.",
+                 "kmr": "Her roj 19:00 (Tehran), bi çar zimanan.", "ar": "«نبض الكريبتو»: يومياً ١٩:٠٠ بتوقيت طهران بأربع لغات.",
+                 "en": "“Crypto Intelligence Daily”: every day 19:00 Tehran, in four languages."}),
     "tools": ("🧮", {"fa": "ماشین‌حساب‌ها", "ckb": "ژمێرەرەکان", "kmr": "Hesabker", "ar": "الحاسبات", "en": "Calculators"},
               {"fa": "حجم پوزیشن، پله‌های سود، میانگین خرید، فاندینگ، جبران ضرر و بیشتر.",
                "ckb": "قەبارەی پۆزیشن، پلەکانی قازانج، تێکڕای کڕین، فاندینگ، قەرەبووی زیان و زیاتر.",
@@ -367,7 +373,7 @@ HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps
 GROUPS = {
     "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
-    "g_news": ["today", "album", "class", "news", "narr", "events", "week", "posts", "track"],
+    "g_news": ["today", "podcast", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
     "g_more": ["lang", "apps", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
 }

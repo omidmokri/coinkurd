@@ -65,6 +65,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - **No third-party adverts, logos or images** (`scripts/adpics.py` lists flagged ones).
 - **No messages.** Never send Telegram messages to users, the channel or the group, and never change how the bot posts or
   broadcasts. Bot changes are limited to read-only sections and menu entries that mirror site pages.
+  **One exception, set by the owner on 2026-11-12: the daily podcast album.** `.github/workflows/podcast.yml` posts
+  one album (four audios) in @Coin_Kurd every day at 19:00 Tehran. Keep it running; don't change its schedule, its
+  captions or its gates without the owner, and never post from anywhere else.
 - **Nothing destructive.** Don't delete pages, data or history; no force-push or history rewriting; don't touch secrets,
   the `refbot-state` branch or existing page URLs; don't change the visual identity.
 - **If it fails, don't ship it.** If tests or builds fail and you cannot fix them within the run, push only a Log entry
@@ -160,6 +163,25 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+
+### 2026-11-12 · Daily podcast «نبض کریپتو» in four languages, posted to the channel at 19:00 Tehran (asked for by the owner)
+- **What:** every day `podcast.yml` (13:50 UTC) collects the day's facts from `data/` (`scripts/podcast/collect.py`),
+  has Gemini write a Persian master and native Sorani, English and Arabic versions (`write.py`), voices them (Piper
+  fa ganji_adabi / ar kareem, Kokoro en, Vekol for Sorani — the site reader's voice), adds original code-made music,
+  masters to −16 LUFS MP3 with chapters, cover and SRT (`produce.py`, `mix.py`, `finalize.py`, `covers.py`), checks it
+  (`qc.py`, `run.py`) and publishes (`publish.py`): GitHub Release `podcast-<date>` (audio + FLAC archive), then
+  `data/podcast/<date>.json` + `index.json`, `/podcast/` pages (`scripts/build_podcast.py`), a menu entry, a bot section
+  (`bot_reality.sec_podcast`, key `podcast`), and ONE Telegram album with the four audios, each captioned in its own
+  language and tagged (🟢 فارسی · ☀️ کوردی · 🔵 English · 🟠 العربية), four hashtags at the end.
+- **Gates:** every figure of the Persian master must trace to facts.json/inputs.json (rounding allowed), the other
+  versions must carry the same figures section by section, clock times must be real instants, no Latin left in the
+  spoken fa/ckb/ar text, Sorani numbers are read back by an independent parser, audio health (loudness, clipping,
+  silences, chapters, cover) and a Whisper listening sample (not Sorani: Whisper has no Kurdish). A failing language
+  is held and named on the page; a failing Persian master holds the episode. The Telegram ledger is the `telegram`
+  field of `data/podcast/<date>.json`: never posted twice.
+- **Voices' licences (told to the owner):** the fa/ar Piper voices derive from a research-only dataset and Vekol is
+  CC BY-NC; English (Kokoro) is Apache-2.0. The owner chose to go ahead; a permissive voice would replace them.
+- Manual run: Actions → "Daily podcast" → mode `dry-run` (makes and checks, publishes nothing) or `publish`.
 
 ### 2026-11-12 · All apps updated and presented on one page; iPhone and Windows added (asked for by the owner)
 - **Download center `/app/`** (`scripts/build_apps.py`, built in CI; the old hand-made Android page is gone): one page
