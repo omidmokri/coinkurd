@@ -628,7 +628,7 @@ A4.posAt = function (m, s, out) {
   else if (m.kind === 'C') {
     const x = mix(m.p0.x, m.p1.x, s), z = mix(m.p0.z, m.p1.z, s) + Math.sin(s * Math.PI * 2.5 + m.ph) * 5 * (1 - s);
     const g = ARMY.gy(x, z), cruiseY = Math.max(g + 12, mix(m.p0.y, g + 12, sm(0, .2, s))) + 9 * sm(.74, .88, s);
-    out.set(x, mix(cruiseY, m.p1.y, sm(.88, 1, s)), z);
+    out.set(x, mix(cruiseY, m.p1.y, sm(.88, 1, s)) + (m.boost ? 20 * sm(0, .05, s) * (1 - sm(.05, .22, s)) : 0), z);   // boost: launched straight up from a ship's cells
   } else out.set(mix(m.p0.x, m.p1.x, s), mix(m.p0.y, m.p1.y, s) + 7 * Math.sin(Math.PI * s), mix(m.p0.z, m.p1.z, s));
   return out;
 };

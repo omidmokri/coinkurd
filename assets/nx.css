@@ -149,6 +149,7 @@ html.ek-v3 .nx .next{all:unset;box-sizing:border-box;display:flex;align-items:ce
   background:rgba(255,255,255,.03);cursor:pointer;font-family:var(--ek-font);transition:border-color .2s}
 html.ek-v3 .nx .next:hover{border-color:rgba(247,147,26,.6)}
 html.ek-v3 .nx .next *{all:unset}
+html.ek-v3 .nx .next img{width:1.2em;height:1.2em;vertical-align:-.25em;display:inline-block;margin:0 .05em}   /* Telegram emoji pictures: without this the reset above lets them grow to their own 40px */
 html.ek-v3 .nx .next .lc{flex:0 0 auto;font-size:.72rem;font-weight:700;color:var(--nx-or)}
 html.ek-v3 .nx .next b{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.84rem;font-weight:600;color:#fff}
 html.ek-v3 .nx .next small{flex:0 0 auto;font-size:.7rem;color:rgba(255,255,255,.45);white-space:nowrap}

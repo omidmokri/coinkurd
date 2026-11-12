@@ -106,7 +106,7 @@ K.infantryGeo = function (role, lod) {
   add(tube(.05, .057, 1.6, 1.5, hi ? 8 : 5, .005, 0), 2, SKIN);
   if (hi) add(loft([[1.5, .078, .088, .004], [1.55, .07, .08, .008]], 8), 2, CAMO);
   add(ball(.098, hi ? 10 : 7, hi ? 7 : 4, .014, 1.665, 0, 1.04, 1.16, .92), 2, SKIN);
-  if (hi) add(sbox(.034, .04, .032, .116, 1.648, 0), 2, SKIN);                      // nose
+  add(sbox(.034, .04, .032, .116, 1.648, 0), 2, SKIN);                              // nose
   add(sbox(.03, .038, .152, .106, 1.683, 0), 2, LENS);
   add(loft(hi ? [[1.668, .133, .119, -.004], [1.7, .139, .125, -.006], [1.752, .129, .117, -.008], [1.797, .099, .091, -.008], [1.826, .052, .047, -.006]]
               : [[1.668, .134, .12, -.004], [1.712, .139, .125, -.006], [1.775, .116, .106, -.008], [1.824, .056, .05, -.006]], hi ? 10 : 7, true), 2, CAMO);
@@ -328,5 +328,426 @@ K.pose = function (s, tms, dt, A, o) {
 };
 /* where the muzzle is (soldier-local x forward, y up), for flashes and tracers */
 K.muzzle = function (s) { const stn = s.stn | 0; return s.role === 2 ? [.75, s.stn === 1 ? 1.12 : 1.55] : stn === 3 ? [1.55, .34] : stn === 1 ? [.95, 1.04] : [.95, 1.45]; };
+
+
+/* ================================================================== coast and sea
+   North of the missile sites the old hills become dunes and a beach that falls into a bay (headlands stay at the far corners).
+   gfx4 has already installed its terrain modifier (pads, lakes); this one wraps it. */
+const SEA = K.SEA = G.seaY = -1.15;
+const shoreWob = x => 5 * G.fbmW(x * .028 + 9.1, 4.3, 2);
+{
+  const prev = G.terrainMod;
+  G.terrainMod = function (raw) {
+    const f = prev ? prev(raw) : raw;
+    return function (x, z) {
+      let h = f(x, z);
+      if (z < -44) {
+        const ax = Math.abs(x), keep = sm(150, 195, ax);
+        h = mix(h, Math.min(h, 2.4), (1 - sm(22, 70, ax)) * sm(-44, -62, z));          // a gap in the ridge: the bay shows from the field
+        if (z < -70) {
+          const low = Math.min(h, 1.5 + .9 * G.fbmW(x * .05 + 2, z * .05 - 3, 2));
+          h = mix(h, mix(low, h, keep), sm(-70, -90, z));
+          const w = shoreWob(x); h = mix(h, -6.5, sm(-98 - w, -126 - w, z) * (1 - keep));
+        }
+      }
+      return h;
+    };
+  };
+  const K4 = window.GFX4;
+  if (K4 && K4.blocked) { const pb = K4.blocked; K4.blocked = function (x, z, pad) { return (z < -96 - shoreWob(x) && Math.abs(x) < 172) || (Math.abs(Math.abs(x) - 80) < 20 && Math.abs(z) < 31) || pb(x, z, pad); }; }
+}
+/* coloured primitives (non-indexed: position, normal, colour) for static props, the way gfx4 builds its structures */
+function prim(g, hex, k) { const gg = g.index ? g.toNonIndexed() : g, c = L3(hex), kk = k || 1; G.paint(gg, () => [c[0] * kk, c[1] * kk, c[2] * kk]); return gg; }
+const B = (w, h, d, x, y, z, hex, k) => prim(G.T(new THREE.BoxGeometry(w, h, d), x, y, z), hex, k);
+const CY = (r0, r1, h, seg, x, y, z, hex, open) => prim(G.T(new THREE.CylinderGeometry(r0, r1, h, seg, 1, !!open), x, y, z), hex);
+const RB = (w, h, d, r, x, y, z, hex) => prim(G.T(G.rbox(w, h, d, r, 1), x, y, z), hex);
+function moved(list, x, y, z, rot) { for (const g of list) { if (rot) g.rotateY(rot); g.translate(x, y, z); } return list; }
+let _noise = null;
+K.noiseTex = function () {                     // one tileable fbm tile, shared by the sea and the wakes
+  if (_noise) return _noise;
+  const N = 256, c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'), im = x.createImageData(N, N);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const v = cl(G.fbm(i / N, j / N, 4, 5, 77) * 255, 0, 255), k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = v; im.data[k + 3] = 255; }
+  x.putImageData(im, 0, 0); _noise = new THREE.CanvasTexture(c); _noise.wrapS = _noise.wrapT = THREE.RepeatWrapping; return _noise;
+};
+const TAIL = '\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}';
+/* the sea for software renderers: two lookups of the noise tile, a grazing-angle blend to the sky colour, a sun streak */
+K.seaMaterial = function () {
+  const u = Object.assign(THREE.UniformsUtils.merge([THREE.UniformsLib.fog]), {
+    uT: { value: K.noiseTex() }, uTime: { value: 0 }, uDeep: { value: G.lin(0x14323a) }, uSky: { value: new THREE.Color(.2, .35, .6) }, uHor: { value: new THREE.Color(.6, .7, .8) },
+    uSunCol: { value: new THREE.Color(1, .95, .85) }, uSunXZ: { value: new THREE.Vector2(0, -1) }, uGlint: { value: 1 }
+  });
+  return new THREE.ShaderMaterial({
+    uniforms: u, fog: true,
+    vertexShader: 'varying vec3 vW;varying float vD;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vD=-mv.z;gl_Position=projectionMatrix*mv;}',
+    fragmentShader: 'uniform sampler2D uT;uniform float uTime,uGlint,fogNear,fogFar;uniform vec3 fogColor,uDeep,uSky,uHor,uSunCol;uniform vec2 uSunXZ;varying vec3 vW;varying float vD;' +
+      'void main(){vec2 p=vW.xz*.021;float t=uTime*.02;float n=texture2D(uT,p+vec2(t,t*.6)).r*.6+texture2D(uT,p*2.9-vec2(t*1.3,t*.5)).r*.4;' +
+      'vec3 V=cameraPosition-vW;float d=length(V);float gr=1.-clamp(V.y/d,0.,1.);gr*=gr;gr*=gr;vec3 col=mix(uDeep,mix(uHor,uSky,.35),clamp(gr*.85+(n-.5)*.24,0.,1.));' +
+      'float s=max(dot(normalize(-V.xz),uSunXZ),0.);s*=s;s*=s;col+=uSunCol*smoothstep(.6,.8,n)*s*s*uGlint*.55;' +
+      'col=mix(col,fogColor,smoothstep(fogNear,fogFar,vD));gl_FragColor=vec4(col,1.);' + TAIL
+  });
+};
+
+/* ------------------------------------------------------------------ ships
+   Local frame: bow towards +x, y up from the waterline. A hull is lofted through stations [x, half beam at deck, half beam at the waterline, deck height]. */
+function hullGeo(st, cTop, cBoot, cDeck) {
+  const P = [], C = [], yW = -1.4, yM = .55, a = L3(cTop), b = L3(cBoot), d = L3(cDeck);
+  const tri = (p, q, r, c) => { P.push(p[0], p[1], p[2], q[0], q[1], q[2], r[0], r[1], r[2]); for (let i = 0; i < 3; i++) C.push(c[0], c[1], c[2]); };
+  const quad = (p, q, r, s, c) => { tri(p, q, r, c); tri(p, r, s, c); };
+  const mid = s => s[2] + (s[1] - s[2]) * (yM - yW) / (s[3] - yW);
+  for (let i = 0; i < st.length - 1; i++) {
+    const s0 = st[i], s1 = st[i + 1], m0 = mid(s0), m1 = mid(s1);
+    for (const sg of [1, -1]) {
+      const A = [s0[0], s0[3], sg * s0[1]], Bq = [s1[0], s1[3], sg * s1[1]], Cq = [s1[0], yM, sg * m1], D = [s0[0], yM, sg * m0], E = [s1[0], yW, sg * s1[2]], F = [s0[0], yW, sg * s0[2]];
+      if (sg > 0) { quad(A, D, Cq, Bq, a); quad(D, F, E, Cq, b); } else { quad(A, Bq, Cq, D, a); quad(D, Cq, E, F, b); }
+    }
+    quad([s0[0], s0[3], s0[1]], [s1[0], s1[3], s1[1]], [s1[0], s1[3], -s1[1]], [s0[0], s0[3], -s0[1]], d);
+  }
+  const s = st[0]; quad([s[0], s[3], s[1]], [s[0], s[3], -s[1]], [s[0], yW, -s[2]], [s[0], yW, s[2]], a);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); g.computeVertexNormals(); return g;
+}
+const NAVY = {
+  bull: { hull: 0x65706f, boot: 0x3c1917, deck: 0x3d4547, sup: 0x7b8684, dark: 0x2b3033, band: 0x22c55e },
+  bear: { hull: 0x7d766a, boot: 0x3c1917, deck: 0x4a4640, sup: 0x928a7b, dark: 0x33302b, band: 0xef4444 }
+};
+let _shipMat = null;
+const shipMat = () => _shipMat || (_shipMat = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .62, metalness: .25, side: THREE.DoubleSide }) : new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+/* surface combatant: big = destroyer (56 m), otherwise frigate (40 m) */
+K.warship = function (side, big) {
+  const P = NAVY[side], k = big ? 1 : .72, L = [], g = new THREE.Group();
+  const st = [[-28, 2.6, 2.3, 2.6], [-24, 3.4, 3.0, 2.6], [-10, 3.7, 3.4, 2.7], [6, 3.6, 3.3, 2.9], [16, 3.0, 2.3, 3.3], [23, 1.8, 1.0, 3.8], [28, .12, .05, 4.3]].map(s => [s[0] * k, s[1] * k, s[2] * k, s[3] * (big ? 1 : .86)]);
+  L.push(hullGeo(st, P.hull, P.boot, P.deck));
+  const dk = big ? 2.75 : 2.4;                                                                    // deck height amidships
+  /* bridge, deckhouse, funnel(s), mast */
+  L.push(B(8 * k, 3.2, 6.2 * k, 4 * k, dk + 1.6, 0, P.sup), B(5.4 * k, 2.1, 5.2 * k, 3.6 * k, dk + 4.25, 0, P.sup), B(5.5 * k, .55, 5.3 * k, 3.6 * k, dk + 4.55, 0, 0x10161b));
+  L.push(B(9 * k, 2.6, 5.6 * k, -5.5 * k, dk + 1.3, 0, P.sup));
+  const fun = (x, r, h) => { const f = new THREE.CylinderGeometry(r * .72, r, h, 4); f.rotateY(Math.PI / 4); f.scale(1.35, 1, 1); f.translate(x, dk + 2.6 + h / 2, 0); L.push(prim(f, P.sup)); const c = new THREE.CylinderGeometry(r * .75, r * .75, .35, 4); c.rotateY(Math.PI / 4); c.scale(1.35, 1, 1); c.translate(x, dk + 2.6 + h + .1, 0); L.push(prim(c, 0x16181a)); const bd = new THREE.CylinderGeometry(r * .88, r * .93, .7, 4, 1, true); bd.rotateY(Math.PI / 4); bd.scale(1.36, 1, 1); bd.translate(x, dk + 2.6 + h * .62, 0); L.push(prim(bd, P.band)); };
+  fun(-3.2 * k, 1.5 * k, 3.3); if (big) fun(-9 * k, 1.25, 2.6);
+  { const m = new THREE.CylinderGeometry(.34, .95 * k, 6.4, 4); m.rotateY(Math.PI / 4); m.translate(2.6 * k, dk + 5.3 + 3.2, 0); L.push(prim(m, P.sup)); L.push(B(.16, .16, 4.4 * k, 2.6 * k, dk + 9.6, 0, P.dark), CY(.05, .05, 3.2, 4, 2.6 * k, dk + 13.2, 0, P.dark)); }
+  [[6.9 * k, 1], [6.9 * k, -1]].forEach(([x, sg]) => { const a = new THREE.BoxGeometry(.12, 1.7, 1.7); a.rotateY(sg * .7); a.translate(x, dk + 4.1, sg * 2.5 * k); L.push(prim(a, P.dark)); });   // fixed array faces
+  /* missile cells, close-in gun, boats, flight deck */
+  const cells = (x, n) => { L.push(B(n * .95 + .5, .3, 3.5 * k, x, dk + .6, 0, P.dark)); for (let i = 0; i < n; i++) for (const z of [-1.05, -.35, .35, 1.05]) L.push(B(.7, .08, .55 * k, x - (n - 1) * .475 + i * .95, dk + .79, z * k, 0x6b7376)); };
+  cells(11.6 * k, big ? 4 : 3); if (big) cells(-15.5, 3);
+  L.push(CY(.55, .7, 1.1, 8, -11.5 * k, dk + 3.2, 0, 0xdadcd8), prim(G.T(new THREE.SphereGeometry(.6, 8, 5, 0, TAU, 0, Math.PI / 2), -11.5 * k, dk + 3.7, 0), 0xe6e7e2));
+  [1, -1].forEach(sg => L.push(RB(2.6 * k, .7, .9, .25, -6 * k, dk + .8, sg * 3.3 * k, 0xd2641c)));
+  L.push(B(1.9, .05, .28, -23 * k, dk + (big ? -.08 : -.3), .7, 0xe9e7df), B(1.9, .05, .28, -23 * k, dk + (big ? -.08 : -.3), -.7, 0xe9e7df), B(.28, .05, 1.4, -23 * k, dk + (big ? -.08 : -.3), 0, 0xe9e7df));
+  L.push(CY(.04, .04, 2.6, 4, -27.4 * k, dk + 1.2, 0, 0xcfd2d0), prim(G.T(new THREE.PlaneGeometry(1.9, 1.15), -26.4 * k, dk + 1.85, 0), P.band));
+  const body = new THREE.Mesh(G.merge(L), shipMat()); body.castShadow = !!G.std; g.add(body);
+  /* gun turret (turns), radar bar (spins) */
+  const tur = new THREE.Group(); tur.position.set(17.4 * k, (big ? 3.35 : 2.95), 0);
+  const brl = new THREE.CylinderGeometry(.13, .17, 3.6 * k, 8); brl.rotateZ(-Math.PI / 2 + .28); brl.translate(1.9 * k, .95, 0);
+  tur.add(new THREE.Mesh(G.merge([CY(1.25 * k, 1.35 * k, .45, 10, 0, .22, 0, P.dark), RB(2.5 * k, 1.35, 2.1 * k, .3, 0, 1.1, 0, P.sup), prim(brl, P.dark)]), shipMat())); g.add(tur);
+  const rad = new THREE.Mesh(G.merge([B(3.3 * k, .34, .45, 0, 0, 0, P.dark), CY(.16, .2, .5, 6, 0, -.3, 0, P.dark)]), shipMat()); rad.position.set(2.6 * k, dk + 12.1, 0); g.add(rad);
+  /* wake */
+  const wk = new THREE.Mesh(new THREE.PlaneGeometry(44 * k, 12 * k, 1, 1), K.wakeMat()); wk.rotation.x = -Math.PI / 2; wk.position.set(-47 * k, .06, 0); wk.renderOrder = 3; g.add(wk);
+  g.userData = { side, big, tur, rad, wk, len: 56 * k, gunTip: new THREE.Vector3(3.6 * k, 1.5, 0), vls: new THREE.Vector3(11.6 * k, dk + 1.2, 0) };
+  return g;
+};
+let _wake = null;
+K.wakeMat = function () {
+  if (_wake) return _wake;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64; const x = c.getContext('2d'), im = x.createImageData(256, 64);
+  for (let j = 0; j < 64; j++) for (let i = 0; i < 256; i++) { const u = i / 255, v = Math.abs(j / 63 - .5) * 2, w = .16 + (1 - u) * .84, e = cl(1 - v / w, 0, 1), n = G.fbm(i / 256, j / 64 * .25, 8, 4, 31), a = e * (.25 + .75 * cl(v / w * 1.6, 0, 1)) * Math.pow(u, 1.7) * cl((n - .3) * 2.6, 0, 1.2), k = (j * 256 + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = 255; im.data[k + 3] = cl(a * 235, 0, 255); }
+  x.putImageData(im, 0, 0);
+  _wake = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, opacity: .5, fog: true }); return _wake;
+};
+/* attack submarine: local origin on the waterline when surfaced */
+K.submarine = function (side) {
+  const P = NAVY[side], L = [], g = new THREE.Group(), blk = 0x16191c, r = 2.5, y = -1.35;
+  const body = new THREE.CylinderGeometry(r, r, 26, 12, 1, true); body.rotateZ(Math.PI / 2); body.translate(-1, y, 0); L.push(prim(body, blk));
+  const bow = new THREE.SphereGeometry(r, 12, 6, 0, TAU, 0, Math.PI / 2); bow.rotateZ(-Math.PI / 2); bow.scale(1.5, 1, 1); bow.translate(12, y, 0); L.push(prim(bow, blk));
+  const aft = new THREE.CylinderGeometry(.35, r, 9, 12, 1, true); aft.rotateZ(Math.PI / 2); aft.translate(-18.5, y, 0); L.push(prim(aft, blk));
+  L.push(RB(6.4, 3.5, 1.5, .6, 3.2, y + r + 1.4, 0, blk), B(6.5, .3, 1.56, 3.2, y + r + 2.95, 0, P.band), B(1.4, .14, 4.6, 4.2, y + r + 1.9, 0, blk));
+  L.push(CY(.07, .07, 2.6, 5, 4.6, y + r + 4.3, .2, 0x8b9091), CY(.1, .1, 1.6, 5, 2.4, y + r + 3.8, -.25, 0x8b9091));
+  L.push(B(2.4, 3.6, .18, -21.4, y + .9, 0, blk), B(2.2, .16, 5.2, -21.4, y, 0, blk));
+  for (let i = 0; i < 6; i++) L.push(CY(.62, .62, .06, 10, -2.4 - i * 1.8, y + r + .01, 0, 0x2c3236));
+  const m = new THREE.Mesh(G.merge(L), shipMat()); g.add(m);
+  g.userData = { side, sub: true, len: 44, tubes: new THREE.Vector3(-6, y + r + .3, 0), depth: -7.5, want: -7.5 };
+  return g;
+};
+/* naval base on the shore: quay, pier on piles, sheds, fuel tanks, a crane, lamp posts */
+function harbour(side, hgt) {
+  const m = side === 'bull' ? -1 : 1, x0 = 86 * m, L = [], PW = side === 'bull' ? { wall: 0x8c8b83, roof: 0x4a5541, steel: 0x58624b } : { wall: 0xa68e69, roof: 0x8a7353, steel: 0x86704f };
+  let zs = -96; for (let z = -92; z > -135; z -= .5) if (hgt(x0, z) < SEA + .35) { zs = z; break; }                 // where this meridian meets the water
+  const top = SEA + 1.5;
+  L.push(B(22, 2.6, 12, x0, top - 1.3, zs + 5, 0x77756f), B(22.4, .25, 12.4, x0, top + .05, zs + 5, 0x8d8b84));           // quay
+  L.push(B(5, .45, 34, x0 - 5 * m, top - .1, zs - 17, 0x6f6d67));                                                          // pier
+  for (let i = 0; i < 6; i++) for (const sx of [-2, 2]) L.push(CY(.3, .3, 6, 6, x0 - 5 * m + sx, top - 3.2, zs - 4 - i * 6, 0x4a4944));
+  for (let i = 0; i < 5; i++) L.push(CY(.22, .26, .5, 6, x0 - 5 * m + 2.1 * m, top + .35, zs - 6 - i * 7, 0x24272a));       // bollards
+  [[5.5, 3], [-.5, 3]].forEach(([dx, dz]) => { const bx = x0 + dx * m; L.push(B(5, 3.4, 8, bx, top + 1.85, zs + dz + 4, PW.wall)); const rf = new THREE.CylinderGeometry(2.9, 2.9, 8.3, 3, 1); rf.rotateX(Math.PI / 2); rf.scale(1, .5, 1); rf.translate(bx, top + 4.25, zs + dz + 4); L.push(prim(rf, PW.roof)); L.push(B(.1, 2.2, 2.6, bx - 2.52 * m, top + 1.25, zs + dz + 4, 0x23282b)); });
+  [[-8, 7], [-8, 3.2]].forEach(([dx, dz]) => { L.push(CY(1.55, 1.55, 3.6, 12, x0 + dx * m, top + 1.95, zs + dz, 0xcfd1cc), CY(1.58, 1.58, .3, 12, x0 + dx * m, top + 3.3, zs + dz, PW.steel)); });
+  /* crane: tower, cab, jib */
+  const cx = x0 + 2 * m, cz = zs - 1;
+  for (const [ax, az] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) L.push(B(.26, 9, .26, cx + ax * 1.1, top + 4.6, cz + az * 1.1, 0xc9a227));
+  L.push(B(2.8, .3, 2.8, cx, top + 4.6, cz, 0xc9a227), B(2.8, .3, 2.8, cx, top + 9.2, cz, 0xc9a227), B(2.4, 1.8, 2.6, cx, top + 10.2, cz, 0xd8d5c8));
+  { const j = new THREE.BoxGeometry(.32, .32, 14); j.rotateX(-.36); j.translate(cx, top + 13, cz - 6.2); L.push(prim(j, 0xc9a227)); L.push(CY(.03, .03, 9, 3, cx, top + 10.9, cz - 12.4, 0x1c1c1c)); }
+  for (const dz of [-8, -22]) L.push(CY(.07, .09, 5, 5, x0 - 7.2 * m, top + 2.6, zs + dz, 0x3b3d3f), B(.5, .12, .22, x0 - 6.9 * m, top + 5.1, zs + dz, 0x2b2c2e));
+  return { L, x0, zs, lamps: [-8, -22].map(dz => new THREE.Vector3(x0 - 6.7 * m, top + 5, zs + dz)) };
+}
+
+
+/* ================================================================== space and air: reconnaissance satellites, FPV drones, radar stations */
+K.satellite = function (side) {
+  const P = NAVY[side], L = [], g = new THREE.Group();
+  L.push(B(1.5, 2.2, 1.5, 0, 0, 0, 0xc8a240), B(1.56, .3, 1.56, 0, .5, 0, P.band), B(1.56, .1, 1.56, 0, -.6, 0, 0x8a6f2a));
+  for (const sg of [1, -1]) { L.push(B(.12, .12, 1.0, 0, .2, sg * 1.2, 0x9a9da0)); L.push(B(.05, 1.9, 4.6, 0, .2, sg * 4.0, 0x15245a)); for (let i = 0; i < 4; i++) L.push(B(.07, 1.94, .05, 0, .2, sg * (2.0 + i * 1.33), 0x8f9aa8)); }
+  L.push(CY(.42, .5, 1.5, 10, 0, -1.8, 0, 0x2b2e33), CY(.44, .44, .08, 10, 0, -2.58, 0, 0x10161b));
+  const dish = new THREE.LatheGeometry([[0, 0], [.35, .04], [.7, .2], [.95, .45]].map(p => new THREE.Vector2(p[0], p[1])), 10); dish.rotateX(Math.PI / 2 + .5); dish.translate(.2, 1.5, .5); L.push(prim(dish, 0xe7e7e2));
+  L.push(CY(.03, .03, .9, 4, .2, 1.3, .2, 0x9a9da0));
+  g.add(new THREE.Mesh(G.merge(L), shipMat())); g.scale.setScalar(1.15);
+  return g;
+};
+K.fpvGeo = function () {
+  const L = [B(.5, .08, .08, 0, 0, 0, 0x1a1c1e), B(.08, .08, .5, 0, 0, 0, 0x1a1c1e), B(.2, .1, .14, 0, .02, 0, 0x30343a), B(.16, .09, .1, .1, -.08, 0, 0xb5542a)];
+  for (const [x, z] of [[.25, 0], [-.25, 0], [0, .25], [0, -.25]]) L.push(CY(.15, .15, .015, 8, x, .06, z, 0x555a60));
+  return G.merge(L);
+};
+/* a rotating air-search radar on a platform; the 4.0 layout gets a flat pad for it (pads are read when the terrain is built) */
+const RADAR_AT = { bull: [-47, -49], bear: [47, -49] };
+if (window.GFX4 && GFX4.LAY) for (const k in RADAR_AT) GFX4.LAY.pads.push({ x: RADAR_AT[k][0], z: RADAR_AT[k][1], r: 4.2, h: null });
+function radarStation(side) {
+  const st = side === 'bull' ? 0x58624b : 0x86704f, L = [B(5, .5, 3.4, 0, .25, 0, 0x6f6d67), B(2.2, 1.9, 2.2, -1.2, 1.45, 0, st), B(.9, .5, .06, -1.2, 1.7, 1.12, 0x10161b), CY(.32, .42, 2.4, 8, 1.2, 1.7, 0, 0x4b4f52), B(1.3, 1.0, 1.0, 1.4, 1.0, -1.1, 0x3d4144)];
+  const A = [B(.22, 3.3, 6.2, 0, 1.9, 0, st)]; for (let i = 0; i < 6; i++) A.push(B(.26, 3.3, .08, 0, 1.9, -2.9 + i * 1.16, 0x23272a)); for (let i = 0; i < 4; i++) A.push(B(.26, .08, 6.2, 0, .35 + i * 1.03, 0, 0x23272a));
+  A.push(B(1.2, .1, .1, .6, 1.9, 0, 0x23272a), B(.3, .4, .4, 1.2, 1.9, 0, 0xd8d5c8), CY(.14, .14, .5, 6, 0, .1, 0, 0x4b4f52));
+  return { base: L, ant: A };
+}
+/* ================================================================== forward operating base around each headquarters, and earth revetments for the guns */
+const FOB = { hx: 17, hz: 28, cx: 80 };
+function fob(side, hgt) {
+  const m = side === 'bull' ? -1 : 1, e = -m, bx = FOB.cx * m, L = [], Lt = [], fab = side === 'bull' ? 0x7d7a62 : 0x938466, fill = 0x54493a, con = 0x8d8b84;
+  const roadZ = x => 2 * Math.sin(x * .035);
+  const block = (x, z, rot) => { const y = hgt(x, z) - .08, a = RB(1.35, 1.9, 2.4, .12, 0, .95, 0, fab), b = B(1.1, .12, 2.1, 0, 1.92, 0, fill); moved([a, b], x, y, z, rot); L.push(a, b); };
+  for (const sx of [1, -1]) { const x = bx + sx * FOB.hx; for (let z = -FOB.hz + 1.2; z <= FOB.hz - 1.2; z += 2.45) { if (Math.abs(z - roadZ(x)) < 5) continue; block(x, z, 0); } }
+  for (const sz of [1, -1]) { const z = sz * FOB.hz; for (let x = bx - FOB.hx; x <= bx + FOB.hx; x += 2.45) block(x, z, Math.PI / 2); }
+  /* gates on the road: concrete posts, a striped boom on the front one, a guard hut */
+  for (const sx of [1, -1]) {
+    const x = bx + sx * FOB.hx, zc = roadZ(x), y = hgt(x, zc);
+    for (const sz of [1, -1]) L.push(B(1.3, 3.8, 1.3, x, y + 1.9, zc + sz * 5, con), B(1.5, .25, 1.5, x, y + 3.9, zc + sz * 5, 0x6f6d67));
+    if (sx === e) { for (let i = 0; i < 8; i++) L.push(B(.16, .16, 1.05, x + e * .9, y + 1.5, zc - 3.7 + i * 1.05, i % 2 ? 0xe7e5df : 0xc0392b)); L.push(B(.3, 1.5, .3, x + e * .9, y + .75, zc - 4.3, 0x3b3d3f)); Lt.push(B(.2, .2, .2, x, y + 4.15, zc + 5, 0xffd9a0), B(.2, .2, .2, x, y + 4.15, zc - 5, 0xffd9a0)); }
+    const hx2 = x - sx * 2.4, hz2 = zc + 8.2; L.push(B(2.4, 2.5, 2.4, hx2, hgt(hx2, hz2) + 1.25, hz2, 0x6b705c), B(2.9, .2, 2.9, hx2, hgt(hx2, hz2) + 2.6, hz2, 0x3d4135), B(.08, .9, 1.4, hx2 + sx * 1.22, hgt(hx2, hz2) + 1.6, hz2, 0x10161b));
+  }
+  /* corner towers */
+  for (const sx of [1, -1]) for (const sz of [1, -1]) {
+    const x = bx + sx * (FOB.hx - 2.6), z = sz * (FOB.hz - 2.6), y = hgt(x, z);
+    for (const ax of [-1, 1]) for (const az of [-1, 1]) L.push(B(.22, 5.2, .22, x + ax * 1.3, y + 2.6, z + az * 1.3, 0x4f5346));
+    L.push(B(3.3, .22, 3.3, x, y + 5.2, z, 0x5d5a4a), B(3.3, 1.0, .14, x, y + 5.8, z + 1.6, 0x6b705c), B(3.3, 1.0, .14, x, y + 5.8, z - 1.6, 0x6b705c), B(.14, 1.0, 3.3, x + 1.6, y + 5.8, z, 0x6b705c), B(.14, 1.0, 3.3, x - 1.6, y + 5.8, z, 0x6b705c), B(3.9, .18, 3.9, x, y + 7.6, z, 0x3d4135));
+    for (const ax of [-1, 1]) for (const az of [-1, 1]) L.push(B(.12, 2.3, .12, x + ax * 1.5, y + 6.45, z + az * 1.5, 0x4f5346));
+    Lt.push(B(.3, .16, .3, x - sx * 1.2, y + 7.42, z - sz * 1.2, 0xffe2b0));
+  }
+  /* tents, containers, crates and drums, floodlights */
+  [[-12.5, -22], [-7, -22], [-12.5, -16.5], [-7, -16.5]].forEach(([dx, dz]) => { const x = bx + e * dx, z = dz, y = hgt(x, z), t = new THREE.CylinderGeometry(1.75, 1.75, 4.4, 3, 1); t.rotateZ(Math.PI / 2); t.rotateY(Math.PI / 2); t.rotateX(Math.PI); t.scale(1, .82, 1); t.translate(x, y + .72, z); L.push(prim(t, side === 'bull' ? 0x5b6647 : 0x9a8763)); });
+  [[-13, 21.5, 0x45627f, 0], [-9.6, 21.5, 0x874a3a, 0], [-11.3, 21.5, 0x596648, 2.62]].forEach(([dx, dz, c, up]) => { const x = bx + e * dx, y = hgt(x, dz); L.push(B(2.5, 2.6, 6.1, x, y + 1.3 + up, dz, c), B(2.56, .1, 6.16, x, y + 2.62 + up, dz, 0x2f3438)); });
+  for (let i = 0; i < 7; i++) { const x = bx + e * (-4.5 + (i % 4) * 1.15), z = 22 + Math.floor(i / 4) * 1.2, y = hgt(x, z); L.push(i < 4 ? CY(.42, .42, 1.1, 8, x, y + .55, z, i % 2 ? 0x8b2e22 : 0x2d4a6b) : B(1, .8, 1, x, y + .4, z, 0x6d5a3c)); }
+  for (const [dx, dz] of [[12, 19], [12, -19], [-13, 9], [-13, -9]]) { const x = bx + e * dx, y = hgt(x, dz); L.push(CY(.09, .12, 7, 5, x, y + 3.5, dz, 0x3b3d3f), B(.9, .22, .5, x, y + 7, dz, 0x2b2c2e)); Lt.push(B(.7, .08, .36, x, y + 6.87, dz, 0xfff0cc)); }
+  return { L, Lt };
+}
+/* a U of earth in front of and beside a gun position, open to the rear */
+function revetment(x, z, e, hgt) {
+  const L = [], c = 0x5b5a3d, mk = (len, px, pz, rot) => { const g = G.profile([[-1.7, 0], [1.7, 0], [.25, 1.45], [-.25, 1.45]], len, .05); if (rot) g.rotateY(Math.PI / 2); g.translate(px, hgt(px, pz) - .05, pz); L.push(prim(g, c, .9 + Math.random() * .2)); };
+  mk(11, x + e * 6.6, z, 0); mk(11.5, x + e * 1.2, z + 5.8, 1); mk(11.5, x + e * 1.2, z - 5.8, 1);
+  return L;
+}
+/* ================================================================== 5.0 environment: build + run
+   battle.js calls K.build(scene, hgt, tier) after the 4.0 environment, then env.tick(dt, t) every frame and env.mood(p, storm) when the sky changes. */
+const Q = [];                                   // deferred actions on the scene clock (vt() is battle.js's clock in ms)
+const _d = new THREE.Vector3(), _down = new THREE.Vector3(0, -1, 0);
+K.after = function (ms, fn) { Q.push({ t: vt() + ms, fn }); };
+K.build = function (scene, hgt, tier) {
+  const lite = !G.std, K4 = window.GFX4, E = K.env = { scene, hgt, lite, t: 0, ships: [], subs: {}, night: 0 };
+  /* sea: a single big plane; the shore is wherever the terrain dips under it */
+  if (lite || !K4) E.seaMat = K.seaMaterial(); else { E.seaMat = K4.waterMaterial(); E.seaMat.fragmentShader = E.seaMat.fragmentShader.replace('vW.xz*.32', 'vW.xz*.1'); }
+  const sg = new THREE.PlaneGeometry(1500, 640, 1, 1); sg.rotateX(-Math.PI / 2);
+  const sea = new THREE.Mesh(sg, E.seaMat); sea.position.set(0, SEA, -412); sea.renderOrder = 6; sea.frustumCulled = false; scene.add(sea); E.sea = sea;
+  /* surf: a pale ribbon along the waterline that breathes with the swell */
+  {
+    const P = [], UV = [], I = []; let last = -1, n = 0;
+    for (let x = -174; x <= 174; x += 3) {
+      if (hgt(x, -141) > SEA) { last = -1; continue; }
+      let lo = -141, hi = -88; for (let k = 0; k < 14; k++) { const m = (lo + hi) / 2; if (hgt(x, m) < SEA) lo = m; else hi = m; }
+      const zs = (lo + hi) / 2; P.push(x, SEA + .05, zs + .7, x, SEA + .05, zs - 2.6); UV.push(0, 0, 0, 1);
+      if (last >= 0) I.push(last, n, last + 1, last + 1, n, n + 1); last = n; n += 2;
+    }
+    const c = document.createElement('canvas'); c.width = 4; c.height = 32; const cx = c.getContext('2d'), gr = cx.createLinearGradient(0, 0, 0, 32); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.25, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); cx.fillStyle = gr; cx.fillRect(0, 0, 4, 32);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2)); g.setIndex(I);
+    E.surfM = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, opacity: .5 });
+    E.surf = new THREE.Mesh(g, E.surfM); E.surf.renderOrder = 7; E.surf.frustumCulled = false; scene.add(E.surf);
+  }
+  /* harbours */
+  const pm = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .86, metalness: .04 }) : new THREE.MeshLambertMaterial({ vertexColors: true }); pm.userData.envK = .55; E.propMat = pm;
+  const HL = []; E.port = {};
+  for (const side of ['bull', 'bear']) { const h = harbour(side, hgt); HL.push(...h.L); E.port[side] = h; }
+  /* forward operating bases round the two headquarters; revetments at every gun position (the same coordinates battle.js gives its artillery) */
+  const LT = [];
+  for (const side of ['bull', 'bear']) { const f = fob(side, hgt); HL.push(...f.L); LT.push(...f.Lt); const m = side === 'bull' ? -1 : 1; for (const [gx, gz] of [[62, -45], [63, 45], [68, -17], [67, 23], [63, 35]]) HL.push(...revetment(gx * m, gz, -m, hgt)); }
+  const hm = new THREE.Mesh(G.merge(HL), pm); hm.castShadow = !lite; hm.receiveShadow = !!G.std; scene.add(hm);
+  E.lmat = new THREE.MeshBasicMaterial({ vertexColors: true }); scene.add(new THREE.Mesh(G.merge(LT), E.lmat));
+  /* fleets: a destroyer on patrol off shore, a frigate near the harbour mouth, a submarine further out */
+  for (const side of ['bull', 'bear']) {
+    const m = side === 'bull' ? -1 : 1, d = K.warship(side, true), f = K.warship(side, false), s = K.submarine(side);
+    [d, f, s].forEach(o => scene.add(o));
+    E.ships.push({ g: d, side, kind: 'dd', cx: 100 * m, cz: -188, rx: 44, rz: 19, w: -.043 * m, ph: m < 0 ? .6 : 2.6, bob: 1.7 * m, aim: null, ta: 0 });
+    E.ships.push({ g: f, side, kind: 'ff', cx: 40 * m, cz: -146, rx: 22, rz: 6, w: .05 * m, ph: m < 0 ? 3.4 : 5.9, bob: 4.1 * m, aim: null, ta: 0 });
+    const pb = K.warship(side, false); pb.scale.setScalar(.44); scene.add(pb); E.ships.push({ g: pb, side, kind: 'pb', cx: 125 * m, cz: -150, rx: 32, rz: 10, w: -.12 * m, ph: m < 0 ? 1.2 : 4.6, bob: 2.9 * m, aim: null, ta: 0 });
+    s.position.set(150 * m, SEA - 7.5, -236); s.rotation.y = m < 0 ? -.35 : Math.PI + .35;
+    E.subs[side] = { g: s, side, depth: -7.5, want: -7.5, until: 0, peek: 30 + Math.random() * 60 };
+  }
+  /* radar stations */
+  E.radars = [];
+  for (const side of ['bull', 'bear']) {
+    const [x, z] = RADAR_AT[side], r = radarStation(side), y = hgt(x, z) - .02, rot = side === 'bull' ? 0 : Math.PI;
+    const base = new THREE.Mesh(G.merge(moved(r.base, x, y, z, rot)), pm); base.castShadow = !lite; scene.add(base);
+    const ant = new THREE.Mesh(G.merge(r.ant), pm); ant.position.set(x + (side === 'bull' ? 1.2 : -1.2), y + 2.9, z); ant.castShadow = !lite; scene.add(ant); E.radars.push(ant);
+  }
+  /* satellites: one per army on a slow circle high above; a scan beam and a scanner bar on the ground while one of them is taking pictures */
+  E.sats = {};
+  for (const side of ['bull', 'bear']) { const g = K.satellite(side); scene.add(g); E.sats[side] = { g, side, ph: side === 'bull' ? 2.4 : -.6, w: side === 'bull' ? .017 : -.017 }; }
+  const bm = K4 && K4.beamMaterial ? K4.beamMaterial(0xbfe9ff, false) : new THREE.MeshBasicMaterial({ color: 0xbfe9ff, transparent: true, opacity: .12, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const bg = new THREE.CylinderGeometry(.5, 9, 1, 16, 1, true); bg.translate(0, -.5, 0);
+  E.beam = new THREE.Mesh(bg, bm); E.beam.frustumCulled = false; E.beam.renderOrder = 6; E.beam.visible = false; scene.add(E.beam); E.beamMat = bm;
+  { const c = document.createElement('canvas'); c.width = 64; c.height = 4; const x = c.getContext('2d'), gr = x.createLinearGradient(0, 0, 64, 0); gr.addColorStop(0, 'rgba(150,225,255,0)'); gr.addColorStop(.5, 'rgba(210,245,255,.95)'); gr.addColorStop(1, 'rgba(150,225,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 64, 4);
+    E.bar = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 92), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); E.bar.rotation.x = -Math.PI / 2; E.bar.position.y = .5; E.bar.renderOrder = 4; E.bar.visible = false; scene.add(E.bar); }
+  E.scan = null; E.marks = [];
+  for (let i = 0; i < 4; i++) { const ring = new THREE.Mesh(new THREE.RingGeometry(2.6, 3.3, 28), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false })); ring.rotation.x = -Math.PI / 2; ring.visible = false; ring.renderOrder = 4; scene.add(ring);
+    const pole = new THREE.Mesh(new THREE.PlaneGeometry(.16, 8), ring.material); pole.visible = false; pole.renderOrder = 4; scene.add(pole); E.marks.push({ ring, pole, lbl: null, until: 0 }); }
+  /* FPV drones */
+  E.fpv = []; const fg = K.fpvGeo(); for (let i = 0; i < 8; i++) { const m = new THREE.Mesh(fg, pm); m.scale.setScalar(2.4); m.visible = false; scene.add(m); E.fpv.push({ m, on: false }); }
+  E.lorry = { bull: { ph: 20, st: 0 }, bear: { ph: 55, st: 0 } };
+  E.tick = envTick; E.mood = envMood;
+  envTick.call(E, 0, 0);
+  return E;
+};
+function envTick(dt, t) {
+  const E = this; E.t = t;
+  if (E.seaMat.uniforms.uTime) E.seaMat.uniforms.uTime.value = t;
+  E.surf.position.z = Math.sin(t * .55) * .45; E.surfM.opacity = (.34 + .16 * Math.sin(t * .55 + 1.2)) * (1 - E.night * .5);
+  const now = typeof vt === 'function' ? vt() : 0;
+  for (let i = Q.length - 1; i >= 0; i--) if (Q[i].t <= now) { const q = Q.splice(i, 1)[0]; try { q.fn(); } catch (e) { console.error(e); } }
+  for (const s of E.ships) {
+    s.ph += s.w * dt; const c = Math.cos(s.ph), n = Math.sin(s.ph), vx = -n * s.rx * s.w, vz = c * s.rz * s.w, hd = Math.atan2(-vz, vx);
+    s.g.position.set(s.cx + c * s.rx, SEA + Math.sin(t * .9 + s.bob) * .1, s.cz + n * s.rz);
+    s.g.rotation.set(Math.sin(t * .55 + s.bob) * .014, hd, Math.sin(t * .8 + s.bob * 2) * .01); s.hd = hd;
+    const U = s.g.userData; U.rad.rotation.y += dt * 1.7;
+    let want = 0; if (s.aim && t < s.aim.until) { want = Math.atan2(-(s.aim.z - s.g.position.z), s.aim.x - s.g.position.x) - hd; while (want > Math.PI) want -= TAU; while (want < -Math.PI) want += TAU; }
+    let dA = want - s.ta; while (dA > Math.PI) dA -= TAU; while (dA < -Math.PI) dA += TAU; s.ta += dA * Math.min(1, dt * 2.2); U.tur.rotation.y = s.ta;
+  }
+  for (const r of E.radars) r.rotation.y += dt * 1.6;
+  /* a supply lorry shuttles between the rear road and each base's back gate */
+  if (typeof ARMY !== 'undefined' && ARMY.vmat) for (const k in E.lorry) {
+    const l = E.lorry[k], m = k === 'bull' ? -1 : 1;
+    if (!l.g) { l.g = G.truck(ARMY.vmat[k]); l.g.scale.setScalar(1.4); E.scene.add(l.g); l.x = 118 * m; }
+    l.ph -= dt;
+    if (l.st === 0 && l.ph <= 0) { l.st = 1; } else if (l.st === 2 && l.ph <= 0) { l.st = 3; }
+    const tgt = l.st === 1 ? 100.5 * m : l.st === 3 ? 122 * m : l.x, d = tgt - l.x;
+    if (Math.abs(d) > .1) { l.x += Math.sign(d) * Math.min(Math.abs(d), dt * 6.5); l.g.rotation.y = d * m < 0 ? (m < 0 ? 0 : Math.PI) : (m < 0 ? Math.PI : 0); }
+    else if (l.st === 1) { l.st = 2; l.ph = 14 + Math.random() * 10; } else if (l.st === 3) { l.st = 0; l.ph = 45 + Math.random() * 50; }
+    const x = cl(l.x, -91.5, 91.5), z = 2 * Math.sin(x * .035) + (Math.abs(l.x) > 91.5 ? (Math.abs(l.x) - 91.5) * .15 : 0); l.g.position.set(l.x, E.hgt(l.x, z) + .05, z);
+  }
+  for (const k in E.sats) { const s = E.sats[k]; s.ph += s.w * dt; s.g.position.set(Math.cos(s.ph) * 210, 150 + Math.sin(s.ph * 3) * 4, -30 + Math.sin(s.ph) * 150); s.g.rotation.y = -s.ph + (s.w > 0 ? Math.PI : 0); }
+  if (E.scan) {
+    const sc = E.scan, f = (t - sc.t0) / sc.dur;
+    if (f >= 1) { E.scan = null; E.beam.visible = E.bar.visible = false; if (sc.done) try { sc.done(); } catch (e) { console.error(e); } }
+    else {
+      const x = mix(sc.x0, sc.x1, f), a = Math.min(1, f * 8) * Math.min(1, (1 - f) * 8), sp = E.sats[sc.side].g.position;
+      E.bar.visible = true; E.bar.position.x = x; E.bar.position.z = -2; E.bar.material.opacity = a;
+      E.beam.visible = true; E.beam.position.copy(sp); _d.set(x - sp.x, .5 - sp.y, -2 - sp.z); const len = _d.length(); E.beam.scale.set(1, len, 1); E.beam.quaternion.setFromUnitVectors(_down, _d.normalize());
+      if (E.beamMat.uniforms) { E.beamMat.uniforms.uInt.value = .5 * a; E.beamMat.uniforms.uTime.value = t; }
+      for (const tg of sc.targets) if (!tg.hit && (sc.x1 > sc.x0 ? x >= tg.x : x <= tg.x)) { tg.hit = true; K.mark(tg.x, tg.z || 0, tg.col, tg.txt); if (sc.onTarget) try { sc.onTarget(tg); } catch (e) { console.error(e); } }
+    }
+  }
+  for (const mk of E.marks) { if (!mk.until) continue; const r = mk.until - t; if (r <= 0) { mk.until = 0; mk.ring.visible = mk.pole.visible = false; if (mk.lbl) mk.lbl.visible = false; continue; }
+    const a = Math.min(1, r / 1.5) * Math.min(1, (mk.life - r) * 3); mk.ring.material.opacity = a * (.55 + .3 * Math.sin(t * 5)); mk.ring.scale.setScalar(1 + .12 * Math.sin(t * 3)); if (mk.lbl) mk.lbl.material.opacity = a; if (typeof cam !== 'undefined') mk.pole.quaternion.copy(cam.quaternion); }
+  for (const d of E.fpv) { if (!d.on) continue; const f = (t - d.t0) / d.dur;
+    if (f >= 1) { d.on = false; d.m.visible = false; if (typeof FX !== 'undefined') FX.explode(d.x1, d.z1, .75, 0xffc070); continue; }
+    const e = f * f * (3 - 2 * f), w = (1 - f) * 2.2, x = mix(d.x0, d.x1, e) + Math.sin(t * 5 + d.ph) * w * .4, z = mix(d.z0, d.z1, e) + Math.sin(t * 3.3 + d.ph * 2) * w, gy = typeof ARMY !== 'undefined' ? ARMY.gy(x, z) : 0;
+    const y = gy + mix(d.y0, 1.2, sm(.72, 1, f)) + Math.sin(t * 7 + d.ph) * .5 * (1 - f);
+    d.m.position.set(x, y, z); d.m.rotation.set(Math.sin(t * 6 + d.ph) * .2, Math.atan2(-(d.z1 - d.z0), d.x1 - d.x0), -.35 - .5 * sm(.72, 1, f)); }
+  for (const k in E.subs) {
+    const s = E.subs[k];
+    if (s.until && t > s.until) { s.until = 0; s.want = -7.5; }
+    if (!s.until) { s.peek -= dt; if (s.peek <= 0) { if (s.want < -5) { s.want = -3.4; s.peek = 14 + Math.random() * 10; } else { s.want = -7.5; s.peek = 70 + Math.random() * 90; } } }   // now and then the sail breaks the surface for a look round
+    const d0 = s.depth; s.depth += cl(s.want - s.depth, -dt * 1.5, dt * 2.4);
+    s.g.position.y = SEA + s.depth + Math.sin(t * .7 + (k === 'bull' ? 0 : 2)) * .06; s.g.rotation.z = cl((s.depth - d0) / Math.max(dt, .001) * .035, -.12, .12) * (k === 'bull' ? 1 : 1);
+    if (Math.abs(s.depth - d0) > .002 && s.depth > -5.5 && typeof FX !== 'undefined' && FX.spawn && PREF.layers.fx && Math.random() < .5) { const p = s.g.position; FX.spawn(4, p.x + rr(-14, 14), SEA + .2, p.z + rr(-3, 3), rr(-1, 1), rr(.6, 2), rr(-1, 1), 1.4 + Math.random(), 4); }
+  }
+}
+function envMood(p, storm) {
+  const E = this, Lc = h => G.lin(h), u = E.seaMat.uniforms;
+  const night = cl(p.stars * 1.1 + storm * .55 + (p.el < 10 ? .25 : 0), 0, 1); E.night = night;
+  u.uSky.value.copy(Lc(p.top)); u.uHor.value.copy(Lc(p.hor)).lerp(Lc(0x6b7381), storm * .7); u.uSunCol.value.copy(Lc(p.sun)).multiplyScalar(p.si * .55 * (1 - storm * .7)); u.uGlint.value = 1 - storm * .8;
+  u.uDeep.value.copy(Lc(0x14323a)).lerp(Lc(p.hgnd), .3).multiplyScalar(mix(1, .3, night));
+  const sd = typeof WORLD !== 'undefined' && WORLD.sunDir; if (sd) { if (u.uSunDir) u.uSunDir.value.copy(sd); if (u.uSunXZ) u.uSunXZ.value.set(sd.x, sd.z).normalize(); }
+  if (_wake) _wake.opacity = mix(.5, .25, night);
+  if (E.lmat) E.lmat.color.setScalar(mix(.16, 2.4, night));
+}
+/* two more synthesised sounds on battle.js's audio buses */
+if (window.GFX4 && GFX4.SFX) {
+  const rel = (A, end) => setTimeout(() => { A.voices = Math.max(0, A.voices - 1); }, Math.max(0, (end - A.ctx.currentTime) * 1000) + 60);
+  GFX4.SFX.scan = function (A, o) {            // short data chirps
+    const C = A.ctx, t0 = C.currentTime, v = o.vol == null ? .5 : o.vol, g = A.out(o, 'voice');
+    for (let i = 0; i < 6; i++) { const s = C.createOscillator(), k = C.createGain(), tt = t0 + i * .11; s.type = 'square'; s.frequency.value = [1900, 2500, 2100, 2900, 2300, 3100][i]; s.connect(k).connect(g); k.gain.setValueAtTime(.0001, tt); k.gain.linearRampToValueAtTime(v * .12, tt + .008); k.gain.exponentialRampToValueAtTime(.0001, tt + .07); s.start(tt); s.stop(tt + .08); }
+    rel(A, t0 + .9);
+  };
+  GFX4.SFX.sonar = function (A, o) {           // a ping with a long tail
+    const C = A.ctx, t0 = C.currentTime, v = o.vol == null ? .5 : o.vol, g = A.out(o, 'sfx'), s = C.createOscillator();
+    s.type = 'sine'; s.frequency.setValueAtTime(1180, t0); s.frequency.exponentialRampToValueAtTime(1120, t0 + 1.6); s.connect(g); A.env(g, t0, .01, v * .5, 1.5, null, 0, t0 + 1.8); s.start(t0); s.stop(t0 + 1.85); rel(A, t0 + 1.9);
+  };
+}
+/* ------------------------------------------------------------------ reconnaissance pass: the side's satellite sweeps a scanner bar across the field; every target it crosses gets a marker */
+K.scan = function (side, targets, done, onTarget) {
+  const E = K.env; if (!E || E.scan) return false;
+  const dir = side === 'bull' ? 1 : -1;
+  E.scan = { side, t0: E.t, dur: 7.5, x0: -78 * dir, x1: 78 * dir, targets: (targets || []).map(t => Object.assign({}, t)), done, onTarget };
+  return true;
+};
+K.mark = function (x, z, col, txt) {
+  const E = K.env; if (!E) return; const mk = E.marks.find(m => !m.until) || E.marks[0], y = (typeof ARMY !== 'undefined' ? ARMY.gy(x, z) : 0);
+  mk.life = 15; mk.until = E.t + mk.life; mk.ring.visible = mk.pole.visible = true; mk.ring.position.set(x, y + .5, z); mk.ring.material.color.set(col); mk.pole.material = mk.ring.material; mk.pole.position.set(x, y + 4.5, z);
+  if (typeof makeLabel === 'function') { if (!mk.lbl) { mk.lbl = makeLabel(txt, '#ffffff', 3.4); E.scene.add(mk.lbl); } else relabel(mk.lbl, txt, '#ffffff'); mk.lbl.visible = true; mk.lbl.position.set(x, y + 10.2, z); mk.lbl.renderOrder = 11; }
+};
+/* a small attack drone flies in low from its army's rear and dives on the point */
+K.fpv = function (att, tx, tz) {
+  const E = K.env; if (!E) return false; const d = E.fpv.find(d => !d.on); if (!d) return false;
+  const dir = att === 'bull' ? -1 : 1; d.on = true; d.t0 = E.t; d.dur = 2.6 + Math.random() * .8; d.x0 = dir * (52 + Math.random() * 16); d.z0 = cl(tz + rr(-22, 22), -40, 40); d.y0 = 7 + Math.random() * 5; d.x1 = tx; d.z1 = tz; d.ph = Math.random() * 6.28; d.m.visible = true;
+  return true;
+};
+/* ------------------------------------------------------------------ naval actions (each one is called by a real market event, never on a timer) */
+K.naval = {
+  ship(side, kind) { return K.env ? K.env.ships.find(s => s.side === side && s.kind === kind) : null; },
+  /* deck-gun salvo from the destroyer: shells that arc in from the sea */
+  fire(side, tx, tz, usd, n) {
+    const E = K.env, s = this.ship(side, 'dd'); if (!E || !s || typeof FX === 'undefined') return false;
+    s.aim = { x: tx, z: tz, until: E.t + 7 };
+    for (let i = 0; i < (n || 2); i++) K.after(900 + i * 520, () => {
+      const U = s.g.userData, tip = U.gunTip.clone(); s.g.updateMatrixWorld(true); U.tur.localToWorld(tip);
+      FX.shoot({ x0: tip.x, y0: tip.y, z0: tip.z, x1: tx + rr(-7, 7), z1: tz + rr(-7, 7), h: 30 + Math.random() * 8, dur: 2300 + Math.random() * 400, sz: 1.9, col: 0xffd27a, kind: 'shell', usd, side, trail: 1 });
+      FX.muzzle(tip.x, tip.y, tip.z, 6); FX.smoke(tip.x, tip.y, tip.z, E.lite ? 4 : 8, 4.5); AUDIO.play('cannon', { x: s.g.position.x, z: s.g.position.z, vol: 1 });
+    });
+    return true;
+  },
+  /* cruise missiles out of the destroyer's vertical cells: up, over, then low across the water and the land */
+  cruise(side, tx, tz, n) {
+    const E = K.env, s = this.ship(side, 'dd'), A4 = window.GFX4 && GFX4.air; if (!E || !s || !A4 || !A4.ready) return false;
+    for (let i = 0; i < n; i++) K.after(i * 430, () => {
+      const p0 = s.g.userData.vls.clone(); p0.z += i % 2 ? .7 : -.7; p0.x += ((i >> 1) % 2 ? .9 : -.9); s.g.updateMatrixWorld(true); s.g.localToWorld(p0);
+      const p1 = new THREE.Vector3(cl(tx + rr(-10, 10), -72, 72), 0, cl(tz + rr(-16, 16), -36, 36)); p1.y = ARMY.gy(p1.x, p1.z);
+      const m = A4.spawn('C', side, p0, p1, Math.hypot(p1.x - p0.x, p1.z - p0.z) / 78, 0); if (!m) return; m.boost = 1;
+      FX.smoke(p0.x, p0.y, p0.z, E.lite ? 5 : 10, 5, 0); FX.muzzle(p0.x, p0.y + 1, p0.z, 4.5); AUDIO.play('missile', { x: p0.x, z: p0.z, vol: .8, small: true });
+    });
+    return true;
+  },
+  /* the submarine surfaces, fires from its tubes and goes down again */
+  sub(side, tx, tz, n, usd) {
+    const E = K.env, s = E && E.subs[side], A4 = window.GFX4 && GFX4.air; if (!s || !A4 || !A4.ready) return false;
+    s.want = 0; s.until = E.t + 15 + n;
+    for (let i = 0; i < n; i++) K.after(4200 + i * 950, () => {
+      const p0 = s.g.userData.tubes.clone(); p0.x -= i * 1.8; s.g.updateMatrixWorld(true); s.g.localToWorld(p0);
+      const p1 = new THREE.Vector3(cl(tx + rr(-9, 9), -72, 72), 0, cl(tz + rr(-14, 14), -36, 36)); p1.y = ARMY.gy(p1.x, p1.z);
+      const m = A4.spawn('B', side, p0, p1, 6.2 + Math.random() * .6, 130 + Math.random() * 30); if (!m) return;
+      FX.smoke(p0.x, p0.y, p0.z, E.lite ? 8 : 18, 7, 0); FX.muzzle(p0.x, p0.y + 2, p0.z, 6);
+      for (let k = 0; k < (E.lite ? 10 : 24); k++) FX.spawn(4, p0.x + rr(-2.5, 2.5), SEA + .3, p0.z + rr(-2.5, 2.5), rr(-3, 3), rr(5, 11), rr(-3, 3), 1.2 + Math.random(), 3.2);
+      AUDIO.play('missile', { x: p0.x, z: p0.z, vol: 1 });
+    });
+    return true;
+  }
+};
 
 })();
