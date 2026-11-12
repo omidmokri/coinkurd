@@ -1003,6 +1003,8 @@ def ai_ok():
 def ai_json(prompt, tokens=1600):
     import ai
     raw = ai.generate(prompt, as_json=True, temperature=0.35, max_tokens=tokens)
+    if isinstance(raw, (dict, list)):                    # ai.generate already parses a JSON answer
+        return raw
     raw = re.sub(r"^```\w*|```$", "", (raw or "").strip()).strip()
     return json.loads(raw)
 
@@ -1351,17 +1353,49 @@ def footer(im, ed):
 _LOGO = {}
 
 
+_URLS = {}                                     # CoinGecko id → official image URL
+
+
+def prefetch_logos(syms):
+    """one /coins/markets call for every coin that may be drawn — the free API allows only a few calls a minute"""
+    if os.environ.get("ALBUM_LOCAL") or os.environ.get("ALBUM_REPLAY"):
+        return
+    m = gecko_map()
+    need = []
+    for s_ in dict.fromkeys(syms):
+        gid = m.get(s_)
+        if (gid and gid not in _URLS and not os.path.exists(os.path.join(ROOT, "assets", "coin3d", s_ + ".png"))
+                and not os.path.exists(os.path.join("/tmp", "album_logos", s_ + ".png"))):
+            need.append(gid)
+    for i in range(0, len(need), 100):
+        ids = ",".join(need[i:i + 100])
+        for attempt in (0, 1):
+            try:
+                r = requests.get(GECKO + "/coins/markets", headers=UA, timeout=30,
+                                 params={"vs_currency": "usd", "ids": ids, "per_page": 250})
+                if r.status_code == 429 and not attempt:
+                    time.sleep(25)
+                    continue
+                if r.ok:
+                    for c in r.json():
+                        if c.get("id") and c.get("image"):
+                            _URLS[c["id"]] = c["image"]
+                break
+            except Exception as ex:
+                log.info("logo prefetch: %s", ex)
+                break
+
+
 def _verified_logo(sym):
     """the coin's official image, found through CoinGecko's mapping of Binance's own ticker"""
     gid = gecko_map().get(sym)
     if not gid:
         return None
     try:
-        r = requests.get(GECKO + "/coins/markets", params={"vs_currency": "usd", "ids": gid}, headers=UA, timeout=25)
-        if r.status_code == 429:
-            time.sleep(20)
-            r = requests.get(GECKO + "/coins/markets", params={"vs_currency": "usd", "ids": gid}, headers=UA, timeout=25)
-        url = (r.json() or [{}])[0].get("image") if r.ok else None
+        url = _URLS.get(gid)
+        if not url:
+            prefetch_logos([sym])
+            url = _URLS.get(gid)
         if not url:
             return None
         g = requests.get(url.replace("/small/", "/large/").replace("/thumb/", "/large/"), headers=UA, timeout=25)
@@ -2562,6 +2596,8 @@ def build(now=None, edition=None, prev=None, use_ai=True, sig="", pub=None):
         f["prev_delta"] = {"btc": (f["btc"]["price"] / prev["btc"] - 1) * 100,
                            "eth": (f["eth"]["price"] / prev["eth"] - 1) * 100 if prev.get("eth") and f["eth"] else None,
                            "mcap": (f["global"]["mcap"] / prev["mcap"] - 1) * 100 if prev.get("mcap") else None}
+    big = sorted([u for u in f["universe"] if u["qv"] >= 5e6], key=lambda u: u["chg"])
+    prefetch_logos([u["sym"] for u in big[:10] + big[-10:]] + [o["coin"] for o in f["opps"][:10]])
     f["movers"] = movers(f)
     tx = write(f, use_ai)
     base = backdrop(edition)
