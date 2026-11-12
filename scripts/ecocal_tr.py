@@ -153,6 +153,20 @@ IND = {
     "Unemployment Change": ("تغییر شمار بیکاران", "گۆڕانی ژمارەی بێکاران", "التغير في عدد العاطلين"),
     "Annual Budget Release": ("انتشار بودجهٔ سالانه", "بڵاوکردنەوەی بودجەی ساڵانە", "إصدار الميزانية السنوية"),
     "Budget Release": ("انتشار بودجه", "بڵاوکردنەوەی بودجە", "إصدار الميزانية"),
+    "WPI": ("شاخص قیمت عمده‌فروشی (WPI)", "پێوەری نرخی کۆفرۆشی (WPI)", "مؤشر أسعار الجملة (WPI)"),
+    "Index of Services": ("شاخص خدمات", "پێوەری خزمەتگوزارییەکان", "مؤشر الخدمات"),
+    "Leading Indicators": ("شاخص‌های پیشرو", "پێوەرە پێشەنگەکان", "المؤشرات الرائدة"),
+    "M2 Money Stock": ("حجم نقدینگی (M2)", "بڕی پارە (M2)", "المعروض النقدي (M2)"),
+    "MI Inflation Expectations": ("انتظارات تورمی (MI)", "چاوەڕوانیی هەڵاوسان (MI)", "توقعات التضخم (MI)"),
+    "Manufacturing Sales": ("فروش بخش تولید", "فرۆشی کەرتی بەرهەمهێنان", "مبيعات التصنيع"),
+    "NAB Business Confidence": ("اعتماد کسب‌وکار (NAB)", "متمانەی بازرگانی (NAB)", "ثقة الأعمال (NAB)"),
+    "NFIB Small Business Index": ("شاخص کسب‌وکارهای کوچک (NFIB)", "پێوەری بازرگانییە بچووکەکان (NFIB)", "مؤشر الأعمال الصغيرة (NFIB)"),
+    "Business Investment": ("سرمایه‌گذاری کسب‌وکار", "وەبەرهێنانی بازرگانی", "استثمار الأعمال"),
+    "Machine Tool Orders": ("سفارش‌های ماشین‌ابزار", "داواکارییەکانی ئامێری پیشەسازی", "طلبيات الأدوات الآلية"),
+    "RICS House Price Balance": ("تراز قیمت مسکن (RICS)", "هاوسەنگیی نرخی خانوو (RICS)", "ميزان أسعار المنازل (RICS)"),
+    "USD-Denominated Trade Balance": ("تراز تجاری دلاری", "هاوسەنگیی بازرگانیی دۆلاری", "الميزان التجاري المقوّم بالدولار"),
+    "Visitor Arrivals": ("ورود گردشگران", "هاتنی گەشتیاران", "وصول الزوار"),
+    "Westpac Consumer Sentiment": ("احساسات مصرف‌کننده (Westpac)", "هەستی بەکاربەر (Westpac)", "معنويات المستهلك (Westpac)"),
     "ECOFIN Meetings": ("نشست وزیران دارایی اروپا (ECOFIN)", "کۆبوونەوەی وەزیرانی دارایی ئەورووپا (ECOFIN)", "اجتماعات وزراء المالية الأوروبيين"),
     "Eurogroup Meetings": ("نشست یوروگروپ", "کۆبوونەوەی یۆرۆگروپ", "اجتماعات مجموعة اليورو"),
     "EU Economic Forecasts": ("پیش‌بینی‌های اقتصادی اتحادیهٔ اروپا", "پێشبینییە ئابوورییەکانی یەکێتیی ئەورووپا", "التوقعات الاقتصادية للاتحاد الأوروبي"),
@@ -195,6 +209,8 @@ ORG = {
     "RBA": ("بانک مرکزی استرالیا", "بانکی ناوەندیی ئوسترالیا", "الاحتياطي الأسترالي"), "RBNZ": ("بانک مرکزی نیوزیلند", "بانکی ناوەندیی نیوزیلەندا", "الاحتياطي النيوزيلندي"),
     "SNB": ("بانک مرکزی سوئیس", "بانکی ناوەندیی سویسرا", "البنك الوطني السويسري"), "PBOC": ("بانک مرکزی چین", "بانکی ناوەندیی چین", "بنك الشعب الصيني"),
     "BOE MPC Member": ("کمیتهٔ سیاست پولی بانک انگلستان", "لیژنەی سیاسەتی دراوی بانکی ئینگلتەرا", "لجنة السياسة النقدية لبنك إنجلترا"),
+    "MPC": ("کمیتهٔ سیاست پولی بانک انگلستان", "لیژنەی سیاسەتی دراوی بانکی ئینگلتەرا", "لجنة السياسة النقدية لبنك إنجلترا"),
+    "Buba": ("بانک مرکزی آلمان", "بانکی ناوەندیی ئەڵمانیا", "البنك المركزي الألماني"),
     "Treasury": ("خزانه‌داری آمریکا", "گەنجینەی ئەمریکا", "وزارة الخزانة"), "IMF": ("صندوق بین‌المللی پول", "سندووقی نێودەوڵەتیی دراو", "صندوق النقد الدولي"),
 }
 ROLE = {      # Sorani: the ezafe form, because a bank always follows ("سەرۆکی بانکی …")
@@ -205,8 +221,13 @@ ROLE = {      # Sorani: the ezafe form, because a bank always follows ("سەرۆ
     "Secretary": ("وزیر", "وەزیری", "وزير"), "Vice Chair": ("نایب‌رئیس", "جێگری سەرۆکی", "نائب رئيس"),
 }
 SPEECH = ("سخنرانی", "وتاری", "كلمة")
-AUCTION = {"Bond": ("حراج اوراق قرضهٔ {n} ساله", "مزایەدەی بۆندی {n} ساڵە", "مزاد سندات {n} سنوات"),
-           "Note": ("حراج اسناد خزانهٔ {n} ساله", "مزایەدەی بەڵگەی گەنجینەی {n} ساڵە", "مزاد أذون {n} سنوات")}
+AUCTION = {"Bond": ("حراج اوراق قرضهٔ {n} ساله", "مزایەدەی بۆندی {n} ساڵە", "مزاد سندات لأجل {n}"),
+           "Note": ("حراج اسناد خزانهٔ {n} ساله", "مزایەدەی بەڵگەی گەنجینەی {n} ساڵە", "مزاد أذون لأجل {n}")}
+
+
+def _ar_years(n):
+    """Arabic counted noun: سنتين / 3–10 سنوات / 11+ سنة"""
+    return "سنتين" if n == 2 else ("سنة واحدة" if n == 1 else f"{n} سنوات" if 3 <= n <= 10 else f"{n} سنة")
 FA_D = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 AR_D = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
 
@@ -222,18 +243,22 @@ def translate(title):
         return None
     if t in IND:
         return dict(zip(L3, IND[t]))
-    m = re.fullmatch(r"(\d{1,2})-y (Bond|Note) Auction", t)
-    if m:
-        return {lg: AUCTION[m.group(2)][i].format(n=_digits(m.group(1), i)) for i, lg in enumerate(L3)}
+    m = re.fullmatch(r"(?:([A-Z][a-z]+) )?(\d{1,2})-y (Bond|Note) Auction", t)          # "30-y Bond Auction", "German 30-y Bond Auction"
+    if m and (not m.group(1) or m.group(1) in COUNTRY):
+        return {lg: AUCTION[m.group(3)][i].format(n=_ar_years(int(m.group(2))) if i == 2 else _digits(m.group(2), i))
+                + (" " + COUNTRY[m.group(1)][i] if m.group(1) else "") for i, lg in enumerate(L3)}
     m = re.fullmatch(r"(.+?) Speaks", t)
     if m:
-        words = m.group(1).split(" ")
+        who_txt = m.group(1)
+        head, _, tail = who_txt.partition(" ")
+        if head in COUNTRY and tail:                     # "German Buba President Nagel": the bank already says where
+            who_txt = tail
         org = None
         for k in sorted(ORG, key=len, reverse=True):
-            if m.group(1).startswith(k + " ") or m.group(1) == k:
+            if who_txt.startswith(k + " ") or who_txt == k:
                 org = k
                 break
-        rest = m.group(1)[len(org):].strip() if org else m.group(1)
+        rest = who_txt[len(org):].strip() if org else who_txt
         role = None
         for k in sorted(ROLE, key=len, reverse=True):
             if rest.startswith(k + " "):
@@ -284,6 +309,11 @@ if __name__ == "__main__":
         "Bank Holiday": "تعطیلی بانکی",
         "French Bank Holiday": "تعطیلی بانکی فرانسه",
         "Spanish Unemployment Change": "تغییر شمار بیکاران اسپانیا",
+        "German 30-y Bond Auction": "حراج اوراق قرضهٔ ۳۰ ساله آلمان",
+        "German Buba President Nagel Speaks": "سخنرانی Nagel (رئیس بانک مرکزی آلمان)",
+        "MPC Member Pill Speaks": "سخنرانی Pill (عضو کمیتهٔ سیاست پولی بانک انگلستان)",
+        "Prelim Business Investment q/q": "سرمایه‌گذاری کسب‌وکار فصلی (مقدماتی)",
+        "Index of Services 3m/3m": "شاخص خدمات سه‌ماهه",
         "Prelim GDP q/q": "تولید ناخالص داخلی (GDP) فصلی (مقدماتی)",
         "Unemployment Claims": "مدعیان بیمهٔ بیکاری",
     }
