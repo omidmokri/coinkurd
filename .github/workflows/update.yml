@@ -175,6 +175,12 @@ jobs:
         continue-on-error: true
         run: python scripts/events.py
 
+      - name: Full economic calendar for /market/ (every currency, kept as history, titles in fa/ckb/ar)
+        id: ecocal
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/ecocal.py
+
       - name: Lab (memory, Monte Carlo, volatility, options, exchanges, dev activity, macro)
         id: lab
         continue-on-error: true

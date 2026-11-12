@@ -73,6 +73,7 @@ _P = {
     "hourglass": '<path d="M6 3h12M6 21h12"/><path d="M7 3c0 5 10 5 10 9s-10 4-10 9"/><path d="M17 3c0 5-10 5-10 9s10 4 10 9"/>',
     "exit": '<path d="M14 4h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-5"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h10"/>',
     "matrix": '<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+    "candles": '<path d="M7 3v18M17 3v18"/><rect x="4.5" y="7" width="5" height="9" rx="1"/><rect x="14.5" y="6" width="5" height="7" rx="1"/>',
     "robot": '<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4"/><circle cx="12" cy="3" r="1.3"/><path d="M9 13h.01"/><path d="M15 13h.01"/><path d="M9.5 16.2h5"/>',
 }
 
@@ -127,6 +128,9 @@ def L(fa, ckb, en):
 # ---------------------------------------------------------------- navigation (single source of truth)
 NAV = [
     {"k": "mkt", "t": L("بازار", "بازاڕ", "Markets"), "items": [
+        ("/market/", "candles", L("بازار زنده", "بازاڕی زیندوو", "Live market"),
+         L("مولتی‌چارت، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت", "چەند چارت پێکەوە، تایمفرەیمی چرکەیی، دووبارە پەخش، ئاگادارکەرەوە و ڕۆژژمێری ئابووری",
+           "Multi-chart, seconds timeframes, replay, alerts and the economic calendar on the chart")),
         ("/dashboard/", "gauge", L("داشبورد هوشمند", "داشبۆردی زیرەک", "Smart dashboard"),
          L("رژیم بازار، اسکنر فرصت‌ها و امتیاز انتخاب", "ڕژێمی بازاڕ، سکانەری دەرفەت و خاڵی Entekhab", "Market regime, opportunity scanner, Entekhab score")),
         ("/leaderboard/", "users", L("جدول برترین‌های معاملهٔ آزمایشی", "خشتەی باشترینەکانی مامەڵەی تاقیکاری", "Paper-trading leaderboard"),
@@ -411,7 +415,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "6"
-NX_VER = "9"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+NX_VER = "10"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
            "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"
@@ -519,7 +523,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "trade-bot"]          # /app/ is built by scripts/build_apps.py
+          "privacy", "terms", "trade-bot", "market"]          # /app/ is built by scripts/build_apps.py
 
 
 def inject_static():

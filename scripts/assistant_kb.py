@@ -24,6 +24,7 @@ def bot_url(key=None):
 
 # site page ↔ bot section ↔ extension tab — one feature, every door it can be opened from
 FEATURES = [
+    ("/market/", ["pro"], None),
     ("/dashboard/", ["score", "opps", "movers"], None),
     ("/coins/", ["coin"], "market"),
     ("/compare/", ["cmp"], None),
@@ -190,4 +191,25 @@ FAQ = [
        "نرخەکان زیندوون؛ ئەرشیڤ و زۆربەی داتا هەر ١٥ خولەک نوێ دەبنەوە.",
        "Prices on the pages are live; the channel archive and most data refresh every 15 minutes, and each source's freshness is shown on the Status page."),
      "/status/"),
+    (["مولتی چارت", "مولتی‌چارت", "چند چارت", "چند نمودار", "بازپخش نمودار", "بازپخش کندل", "بار ریپلی", "تایم فریم ثانیه",
+      "تایم‌فریم ثانیه‌ای", "تقویم اقتصادی", "بازار زنده", "multi chart", "multichart", "bar replay", "chart replay",
+      "seconds timeframe", "economic calendar", "live market", "چەند چارت", "دووبارە پەخشی چارت", "دووبارە پەخشی مۆم",
+      "تایمفرەیمی چرکەیی", "ڕۆژژمێری ئابووری", "بازاڕی زیندوو"],
+     L("مولتی‌چارت، بازپخش نمودار و تقویم اقتصادی دارید؟", "چەند چارت، دووبارە پەخشی چارت و ڕۆژژمێری ئابووریتان هەیە؟",
+       "Do you have multi-chart, bar replay and an economic calendar?"),
+     L("بله، در صفحهٔ «بازار زنده»: تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم و خط‌نشانگر؛ تایم‌فریم ثانیه‌ای (۱ تا ۳۰ ثانیه) "
+       "و هر تایم‌فریم دلخواه؛ بازپخش کندل‌ها با ۹ سرعت و معاملهٔ تمرینی؛ ۲۲ اندیکاتور و ابزارهای فیبوناچی، گن و چنگال اندروز؛ "
+       "دیده‌بان با پرچم رنگی؛ هشدار قیمت و اندیکاتور؛ و تقویم اقتصادی با پرچم رویدادها روی چارت. همه‌چیز خودکار در مرورگر شما ذخیره "
+       "می‌شود و با لینک یا فایل منتقل می‌شود. در ربات هم بخش «بازار زنده» آن را داخل تلگرام باز می‌کند.",
+       "بەڵێ، لە پەڕەی «بازاڕی زیندوو»: تا ١٦ چارت پێکەوە بە هاوکاتکردنی دراو، تایمفرەیم و هێڵی نیشاندەر؛ تایمفرەیمی چرکەیی (١ تا ٣٠ "
+       "چرکە) و هەر تایمفرەیمێکی دڵخواز؛ دووبارە پەخشی مۆمەکان بە ٩ خێرایی و مامەڵەی ڕاهێنان؛ ٢٢ ئیندیکاتۆر و ئامرازەکانی فیبۆناچی، "
+       "گان و چنگاڵی ئەندرووز؛ لیستی چاودێری بە ئاڵای ڕەنگی؛ ئاگادارکەرەوەی نرخ و ئیندیکاتۆر؛ و ڕۆژژمێری ئابووری بە ئاڵای ڕووداوەکان "
+       "لەسەر چارت. هەموو شتێک بە خۆکاری لە وێبگەڕەکەتدا پاشەکەوت دەکرێت و بە لینک یان فایل دەگوازرێتەوە. لە بۆتیشدا بەشی «بازاڕی "
+       "زیندوو» لە ناو تێلێگرام دەیکاتەوە.",
+       "Yes — on the Live market page: up to 16 charts at once with synced symbol, timeframe and crosshair; seconds timeframes (1–30 s) "
+       "and any custom timeframe; bar replay at nine speeds with practice trades; 22 indicators plus Fibonacci, Gann and Andrews' "
+       "pitchfork tools; watchlists with colour flags; price and indicator alerts; and the economic calendar with event flags on the "
+       "chart. Everything is saved automatically in your browser and can be moved with a link or a file. In the Telegram bot, "
+       "“Live market” opens it inside Telegram."),
+     "/market/"),
 ]
