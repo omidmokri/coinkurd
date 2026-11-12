@@ -503,16 +503,9 @@ G.wireGeo = function () {              // a coil of barbed wire between two post
   [-2.2, 2.2].forEach(z => { const p = new THREE.CylinderGeometry(.04, .05, 1.1, 4); T(p, 0, .55, z); parts.push(solid(p, [.25, .19, .13])); });
   return merge(parts);
 };
-G.sandbagGeo = function () {
-  const g = G.rbox(.92, .36, .5, .14, 1); T(g, 0, .18, 0);
-  return solid(g, [.55, .49, .36]);
-};
 
-/* ------------------------------------------------------------------ soldiers
-   One shared geometry for both armies (team colours come from the material). Faces +X, Y up, left = +Z.
-   aPart = bone id for the vertex-shader skeleton, aMat = surface (0 camo cloth, 1 skin, 2 metal, 3 gear, 4 team accent).
-   Bones: 0 pelvis · 1 torso · 2 head · 3/4 left thigh/shin · 5/6 right thigh/shin · 7/8 left arm · 9/10 right arm ·
-          11 rifle · 12 heavy armour · 13 machine gun · 14 radio/rank kit */
+/* ------------------------------------------------------------------ per-vertex part/material attributes
+   (the infantry itself now lives in gfx5.js: per-role meshes, a bone texture and CPU posing) */
 function sp(g, part, mat, col) {
   const gg = g.index ? g.toNonIndexed() : g, n = gg.attributes.position.count, c = G.lin3(col || [1, 1, 1]);
   paint(gg, () => c);
@@ -526,138 +519,6 @@ function mergeMat(list) {
   list.forEach(g => { const a = g.attributes.aMat, c = g.attributes.position.count; for (let i = 0; i < c; i++) M[o + i] = a ? a.getX(i) : 0; o += c; });
   out.setAttribute('aMat', new THREE.BufferAttribute(M, 1)); return out;
 }
-function cyl(r0, r1, len, seg, open) { const g = new THREE.CylinderGeometry(r0, r1, len, seg, 1, !!open); g.translate(0, -len / 2, 0); return g; }
-function bx(w, h, d, x, y, z) { const g = new THREE.BoxGeometry(w, h, d); g.translate(x, y, z); return g; }
-/* ~620 triangles (full) / ~200 (lite): crowds of thousands stay cheap */
-G.soldierGeo = function (lite) {
-  const L = [], SK = [.86, .66, .52], MT = [.16, .17, .18], GR = [.3, .29, .24], BT = [.12, .11, .1];
-  const add = (g, part, mat, col) => L.push(sp(g, part, mat, col));
-  if (lite) {
-    [[.1, 3, 4], [-.1, 5, 6]].forEach(([z, th, sh]) => { add(bx(.15, .44, .16, 0, .73, z), th, 0); add(bx(.13, .44, .14, .01, .3, z), sh, 0); add(bx(.25, .1, .13, .05, .05, z), sh, 3, BT); });
-    add(bx(.26, .62, .4, 0, 1.2, 0), 1, 0); add(bx(.2, .34, .3, -.22, 1.27, 0), 1, 3, [.33, .31, .24]);
-    const head = new THREE.SphereGeometry(.11, 6, 4); head.translate(.01, 1.62, 0); add(head, 2, 1, SK);
-    const helm = new THREE.SphereGeometry(.14, 7, 2, 0, Math.PI * 2, 0, Math.PI / 2); helm.translate(0, 1.645, 0); add(helm, 2, 0);
-    const band = new THREE.CylinderGeometry(.141, .141, .04, 7, 1, true); band.translate(0, 1.67, 0); add(band, 2, 4);
-    [[.22, 7, 8], [-.22, 9, 10]].forEach(([z, up, fo]) => { add(bx(.11, .3, .12, 0, 1.28, z), up, z > 0 ? 4 : 0); add(bx(.1, .3, .1, 0, 1.0, z), fo, 0); });
-    add(bx(.7, .08, .06, .24, 1.22, -.06), 11, 2, MT); add(bx(.06, .12, .04, .14, 1.15, -.06), 11, 2, MT);
-  } else {
-    [[.1, 3, 4], [-.1, 5, 6]].forEach(([z, th, sh]) => {
-      const t = cyl(.088, .07, .44, 6); t.translate(0, .95, z); add(t, th, 0);
-      const k = cyl(.068, .056, .42, 6); k.translate(.01, .52, z); add(k, sh, 0);
-      add(bx(.27, .12, .13, .05, .06, z), sh, 3, BT);
-      add(bx(.1, .12, .15, .07, .52, z), sh, 3, GR);                        // knee pad
-    });
-    add(bx(.24, .2, .34, 0, .98, 0), 0, 0);
-    const torso = new THREE.CylinderGeometry(.17, .15, .5, 7, 1); torso.scale(1, 1, 1.28); torso.translate(0, 1.25, 0); add(torso, 1, 0);
-    add(bx(.3, .36, .42, .015, 1.27, 0), 1, 3, GR);
-    [[.17, 1.2, .1], [.17, 1.2, -.04], [.16, 1.34, .12]].forEach(([x, y, z]) => add(bx(.07, .1, .09, x, y, z), 1, 3, [.26, .25, .2]));
-    const belt = new THREE.CylinderGeometry(.166, .166, .05, 7, 1, true); belt.scale(1, 1, 1.28); belt.translate(0, 1.02, 0); add(belt, 0, 3, [.18, .16, .12]);
-    add(bx(.2, .36, .3, -.21, 1.27, 0), 1, 3, [.33, .31, .24]);
-    const roll = new THREE.CylinderGeometry(.06, .06, .3, 6); roll.rotateX(Math.PI / 2); roll.translate(-.22, 1.48, 0); add(roll, 1, 0);
-    const neck = new THREE.CylinderGeometry(.05, .055, .08, 6, 1, true); neck.translate(0, 1.52, 0); add(neck, 2, 1, SK);
-    const head = new THREE.SphereGeometry(.105, 8, 5); head.scale(1.05, 1.1, 1); head.translate(.01, 1.62, 0); add(head, 2, 1, SK);
-    const helm = new THREE.SphereGeometry(.135, 9, 3, 0, Math.PI * 2, 0, Math.PI / 2); helm.scale(1.08, .92, 1.04); helm.translate(0, 1.645, 0); add(helm, 2, 0);
-    const rim = new THREE.CylinderGeometry(.152, .156, .025, 9, 1, true); rim.translate(0, 1.645, 0); add(rim, 2, 0);
-    const band = new THREE.CylinderGeometry(.139, .141, .03, 9, 1, true); band.scale(1.08, 1, 1.04); band.translate(0, 1.68, 0); add(band, 2, 4);
-    add(bx(.04, .045, .16, .11, 1.72, 0), 2, 2, [.1, .1, .12]);
-    [[.22, 7, 8], [-.22, 9, 10]].forEach(([z, up, fo]) => {
-      const u = cyl(.062, .052, .29, 6); u.translate(0, 1.43, z); add(u, up, 0);
-      const f = cyl(.05, .044, .27, 6); f.translate(0, 1.14, z); add(f, fo, 0);
-      add(bx(.08, .09, .08, 0, .85, z), fo, 1, [.2, .19, .16]);
-      add(bx(.13, .07, .1, 0, 1.42, z * 1.02), up, z > 0 ? 4 : 0);
-    });
-    add(bx(.46, .075, .05, .2, 1.22, -.06), 11, 2, MT);
-    const brl = new THREE.CylinderGeometry(.014, .014, .34, 4, 1, true); brl.rotateZ(Math.PI / 2); brl.translate(.58, 1.235, -.06); add(brl, 11, 2, MT);
-    add(bx(.05, .12, .035, .14, 1.15, -.06), 11, 2, MT); add(bx(.2, .07, .045, -.18, 1.2, -.06), 11, 2, MT); add(bx(.14, .035, .04, .2, 1.275, -.06), 11, 2, MT);
-    add(bx(.34, .42, .48, .02, 1.27, 0), 12, 3, [.24, .25, .22]);
-    const col = new THREE.CylinderGeometry(.18, .2, .09, 8, 1, true); col.translate(0, 1.5, 0); add(col, 12, 3, [.24, .25, .22]);
-    [.24, -.24].forEach(z => add(bx(.18, .1, .14, 0, 1.45, z), 12, 3, [.24, .25, .22]));
-    add(bx(.62, .1, .07, .24, 1.22, -.07), 13, 2, MT);
-    const mgb = new THREE.CylinderGeometry(.022, .022, .42, 5, 1, true); mgb.rotateZ(Math.PI / 2); mgb.translate(.72, 1.24, -.07); add(mgb, 13, 2, MT);
-    add(bx(.13, .13, .09, .14, 1.12, -.07), 13, 2, MT); add(bx(.22, .08, .05, -.2, 1.2, -.07), 13, 2, MT);
-    const ant = new THREE.CylinderGeometry(.006, .006, .55, 3, 1, true); ant.translate(-.27, 1.66, .1); add(ant, 14, 2, MT);
-    add(bx(.12, .16, .12, -.3, 1.36, .08), 14, 3, [.2, .22, .18]);
-  }
-  const g = mergeMat(L);
-  g.computeBoundingSphere(); g.boundingSphere.radius = 3;
-  return g;
-};
-/* the vertex-shader skeleton: pose by state (0 idle 1 run 2 fire 3 die 4 cheer 5 rest 6 stagger 7 walk) */
-const SOLDIER_VS = `
-attribute float aPart;attribute float aMat;attribute vec4 aAnim;uniform float uTime;varying float vMat;varying vec3 vObj;varying float vRank;
-vec3 rz(vec3 p,vec2 c,float a){float s=sin(a),k=cos(a);vec2 q=p.xy-c;return vec3(k*q.x-s*q.y+c.x,s*q.x+k*q.y+c.y,p.z);}
-vec3 rzn(vec3 n,float a){float s=sin(a),k=cos(a);return vec3(k*n.x-s*n.y,s*n.x+k*n.y,n.z);}
-vec3 ryp(vec3 p,vec2 c,float a){float s=sin(a),k=cos(a);vec2 q=p.xz-c;return vec3(k*q.x+s*q.y+c.x,p.y,-s*q.x+k*q.y+c.y);}
-vec3 ryn(vec3 n,float a){float s=sin(a),k=cos(a);return vec3(k*n.x+s*n.z,n.y,-s*n.x+k*n.z);}
-float eo(float x){x=clamp(x,0.,1.);return 1.-(1.-x)*(1.-x)*(1.-x);}
-`;
-const SOLDIER_POSE = `
-float st=aAnim.x,tt=max(0.,uTime-aAnim.y),sd=aAnim.z,fl=aAnim.w;float rank=mod(fl,10.),heavy=step(9.5,fl);vRank=rank+heavy*10.;
-float ph=uTime*(st==7.?6.:10.5)+sd*6.2831;
-float hL=0.,kL=-.04,hR=0.,kR=-.04,shL=.62,elL=.72,shR=.48,elR=.86,lean=0.,dy=0.,fall=0.,rA=.72,rY=-.1,rX=0.,hy=0.,hp=0.;
-if(st==0.){hy=sin(uTime*.35+sd*40.)*.55*step(.4,fract(sd*7.));dy=sin(uTime*1.7+sd*6.2831)*.006;}
-if(st==1.||st==7.){float a=st==1.?.82:.42;hL=sin(ph)*a;hR=sin(ph+3.1416)*a;kL=-(.2+(st==1.?.95:.55)*max(0.,sin(ph+1.35)));kR=-(.2+(st==1.?.95:.55)*max(0.,sin(ph+4.49)));
- lean=st==1.?-.3:-.1;dy=abs(sin(ph))*(st==1.?.07:.03)-(st==1.?.05:.01);shL+=sin(ph)*.12;shR+=sin(ph)*.1;}
-else if(st==2.){float r=exp(-tt*16.);hL=.28;kL=-.18;hR=-.16;kR=-.1;lean=-.08+r*.06;shR=1.12;elR=.55;shL=1.38;elL=.18;rA=0.;rY=.13;rX=.04-r*.06;}
-else if(st==4.){dy=abs(sin(uTime*5.5+sd*6.2831))*.32;kL=kR=-dy*1.6;hL=hR=dy*.9;shL=2.75+sin(uTime*7.+sd)*.15;elL=.25;shR=2.6;elR=.3;rA=1.45;rY=.5;rX=-.05;lean=.08;hp=.25;}
-else if(st==5.){hL=1.05;kL=-1.65;hR=.35;kR=-1.4;dy=-.3;lean=-.1;rA=-.15;rY=-.22;shL=.75;elL=.55;shR=.55;elR=.7;hy=sin(uTime*.3+sd*30.)*.4;}
-else if(st==6.){float a=sin(clamp(tt/1.6,0.,1.)*3.1416);lean=.45*a*(sd>.5?1.:-1.);shL=.62+a*1.1;shR=.48+a*1.4;elL=elR=.3;kL=kR=-.3*a;hL=hR=.2*a;dy=-.08*a;}
-else if(st==3.){float b=eo(tt/.45),f=eo((tt-.25)/.75);float dir=sd>.5?1.:-1.;
- kL=-1.25*b;kR=-1.05*b;hL=.75*b;hR=.55*b;dy=-.3*b*(1.-f);
- shL=mix(.62,dir>0.?2.1:-.4,f)+sin(sd*91.)*.4;shR=mix(.48,dir>0.?1.7:.9,f)+sin(sd*57.)*.5;elL=.2+fract(sd*13.)*.8;elR=.3+fract(sd*29.)*.7;
- fall=1.48*dir*f+.08*dir*sin(min(1.,max(0.,tt-.9)*4.)*3.1416)*exp(-max(0.,tt-.9)*3.);dy+=f*.1-max(0.,tt-3.)*.22;rA=.6+f*.9;}
-vec3 P0=position;vec3 N0=normal;float bone=aPart;
-if((bone==11.&&heavy>.5)||((bone==12.||bone==13.)&&heavy<.5)||(bone==14.&&rank<1.5)){P0=vec3(0.,1.,0.);}
-if(bone==3.){P0=rz(P0,vec2(0.,.95),hL);N0=rzn(N0,hL);}
-else if(bone==4.){P0=rz(P0,vec2(.01,.52),kL);P0=rz(P0,vec2(0.,.95),hL);N0=rzn(rzn(N0,kL),hL);}
-else if(bone==5.){P0=rz(P0,vec2(0.,.95),hR);N0=rzn(N0,hR);}
-else if(bone==6.){P0=rz(P0,vec2(.01,.52),kR);P0=rz(P0,vec2(0.,.95),hR);N0=rzn(rzn(N0,kR),hR);}
-else if(bone>=1.){
- if(bone==7.){P0=rz(P0,vec2(0.,1.43),shL);N0=rzn(N0,shL);}
- else if(bone==8.){P0=rz(P0,vec2(0.,1.14),elL);P0=rz(P0,vec2(0.,1.43),shL);N0=rzn(rzn(N0,elL),shL);}
- else if(bone==9.){P0=rz(P0,vec2(0.,1.43),shR);N0=rzn(N0,shR);}
- else if(bone==10.){P0=rz(P0,vec2(0.,1.14),elR);P0=rz(P0,vec2(0.,1.43),shR);N0=rzn(rzn(N0,elR),shR);}
- else if(bone==11.||bone==13.){P0=rz(P0,vec2(.06,1.22),rA);P0.y+=rY;P0.x+=rX;N0=rzn(N0,rA);}
- else if(bone==2.){P0=ryp(P0,vec2(0.,0.),hy);N0=ryn(N0,hy);P0=rz(P0,vec2(0.,1.5),hp);N0=rzn(N0,hp);}
- P0=rz(P0,vec2(0.,1.0),lean);N0=rzn(N0,lean);}
-if(bone==14.||bone==12.){}
-P0.y+=dy;if(fall!=0.){P0=rz(P0,vec2(0.,0.),fall);N0=rzn(N0,fall);P0.y+=abs(sin(fall))*.12;}
-vMat=aMat;vObj=position*3.2+vec3(sd*17.,0.,sd*31.);
-`;
-G.soldierMaterial = function (team, std, U) {
-  const m = std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .85, metalness: 0 }) : new THREE.MeshLambertMaterial({ vertexColors: true });
-  m.userData.envK = .6;
-  const TU = {
-    uC1: { value: G.lin(team.c1) }, uC2: { value: G.lin(team.c2) }, uC3: { value: G.lin(team.c3) }, uAcc: { value: G.lin(team.acc) },
-    uAccE: { value: team.accE || .55 }
-  };
-  m.onBeforeCompile = sh => {
-    sh.uniforms.uTime = U.uTime; Object.assign(sh.uniforms, TU);
-    sh.vertexShader = SOLDIER_VS + sh.vertexShader
-      .replace('#include <beginnormal_vertex>', SOLDIER_POSE + 'vec3 objectNormal=N0;')
-      .replace('#include <begin_vertex>', 'vec3 transformed=P0;');
-    sh.fragmentShader = `uniform vec3 uC1,uC2,uC3,uAcc;uniform float uAccE;varying float vMat;varying vec3 vObj;varying float vRank;float SR=.85,SM=0.;vec3 SE=vec3(0.);
-float hh(vec3 p){p=fract(p*.3183+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
-float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}
-` + sh.fragmentShader.replace('#include <color_fragment>', `
-vec3 base=vColor;
-if(vMat<.5){float n=n3(vObj)*.65+n3(vObj*2.3)*.35;vec3 cam=n<.42?uC1:n<.62?uC2:uC3;base=cam;SR=.92;}
-else if(vMat<1.5){SR=.62;}
-else if(vMat<2.5){SR=.42;SM=.55;}
-else if(vMat<3.5){float n=n3(vObj*1.7);base*=mix(.85,1.12,n);base=mix(base,uC1*.9,.25);SR=.8;}
-else{base=uAcc*(1.+step(1.5,mod(vRank,10.))*.35);SE=uAcc*uAccE*(1.+step(.5,mod(vRank,10.))*.6);SR=.5;}
-diffuseColor.rgb=base;`)
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance+=SE;');
-    if (std) sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor=SR;').replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor=SM;');
-  };
-  /* shadow pass uses the same skeleton */
-  const dm = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
-  dm.onBeforeCompile = sh => {
-    sh.uniforms.uTime = U.uTime;
-    sh.vertexShader = SOLDIER_VS + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 normal=vec3(0.,1.,0.);' + SOLDIER_POSE + 'vec3 transformed=P0;');
-  };
-  return { mat: m, depth: dm };
-};
 
 /* ------------------------------------------------------------------ vehicles & aircraft
    aMat: 0 camo paint · 2 dark metal · 3 rubber/tracks · 4 team markings (emissive) · 5 glass · 6 lamp / afterburner */
@@ -887,13 +748,6 @@ G.hq = function (team, mat, dir) {
   });
   /* fuel tanks */
   [[3.4, -6.2], [4.8, -6.2]].forEach(([x, z]) => { const c = new THREE.CylinderGeometry(.7, .7, 2.4, 12); c.rotateX(Math.PI / 2); c.translate(x * (dir < 0 ? 1 : -1), .75, z); L.push(V(c, 0)); });
-  /* sandbag perimeter */
-  for (let i = 0; i < 44; i++) {
-    const a = i / 44 * Math.PI * 2, r = 10.5 + (i % 2) * .15;
-    if (Math.abs(Math.cos(a)) > .93 && Math.cos(a) * -dir > 0) continue;   // opening toward the battlefield
-    const b = G.rbox(1.0, .38, .52, .14, 1); b.rotateY(-a); b.translate(Math.cos(a) * r, .2, Math.sin(a) * r); L.push(V(b, 3, 0, [.55, .49, .36]));
-    const b2 = G.rbox(1.0, .38, .52, .14, 1); b2.rotateY(-a + .1); b2.translate(Math.cos(a + .06) * r, .58, Math.sin(a + .06) * r); L.push(V(b2, 3, 0, [.52, .47, .35]));
-  }
   const body = new THREE.Mesh(mergeMat(L), mat); body.castShadow = body.receiveShadow = true; g.add(body);
   /* radar dish (rotates) */
   const rad = new THREE.Group(); rad.position.set(2.4, 3.3, -2.2);
@@ -1007,9 +861,5 @@ G.post = function (ren, scene, cam, tier) {
     render(c, dt) { rp.camera = c; C.render(dt); }
   };
   return P;
-};
-/* load extra vendor scripts (self-hosted) on demand */
-G.load = function (files) {
-  return files.reduce((p, f) => p.then(() => new Promise(res => { const s = document.createElement('script'); s.src = '/assets/vendor/three/' + f; s.onload = res; s.onerror = res; document.head.appendChild(s); })), Promise.resolve());
 };
 })();
