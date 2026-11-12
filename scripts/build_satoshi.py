@@ -222,7 +222,7 @@ html[lang=en] .sx h2.sx-h,html[lang=en] .sx h1{font-family:'Space Grotesk',Vazir
 .sx-chips li{display:flex;align-items:baseline;gap:8px;padding:7px 14px;border-radius:13px;border:1px solid var(--ln);background:rgba(255,255,255,.035);font-size:.82rem;color:rgba(255,255,255,.7)}
 .sx-chips b{font:700 1rem 'Space Grotesk',Vazirmatn,sans-serif;color:var(--gold)}
 /* ---- the story */
-.sx-story{margin-top:46px}
+.sx-story{margin-top:54px}
 .sx-chain{list-style:none;margin:20px 0 0;padding:0;min-width:0}
 .sx-b{position:relative;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;align-items:stretch;margin:0 0 18px;padding:18px;border-radius:26px;border:1px solid var(--ln);
   background:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.012) 48%,rgba(255,255,255,.035)),#050506;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
@@ -298,7 +298,9 @@ html[lang=en] .sx-b h3{font-family:'Space Grotesk',Vazirmatn,sans-serif;font-wei
 @keyframes sx-shim{50%{opacity:.5}}
 .ex-vault b{font-size:clamp(1.4rem,3vw,2.2rem);color:var(--gold)}
 .sx-nav{display:none}
-.sx-facts{margin-top:40px}
+.sx-facts{margin-top:34px;padding-top:26px;border-top:1px solid var(--ln)}
+.sx h3.sx-h3{margin:0;font:800 clamp(1.15rem,2.2vw,1.55rem)/1.4 Vazirmatn,'Space Grotesk',sans-serif;color:#fff}
+html[lang=en] .sx h3.sx-h3{font-family:'Space Grotesk',Vazirmatn,sans-serif;font-weight:700}
 .sx-fl{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .sx-fl li{padding:16px 18px;border-radius:18px;border:1px solid var(--ln);background:rgba(255,255,255,.03);font-size:.94rem;line-height:1.95;color:rgba(255,255,255,.82)}
 .sx-fl b{display:block;margin-bottom:4px;font-size:.78rem;color:var(--or)}
@@ -330,7 +332,7 @@ html[lang=en] .sx-b h3{font-family:'Space Grotesk',Vazirmatn,sans-serif;font-wei
   .sx-tx{padding:4px 6px 8px}
 }
 /* ---- Bitcoin, right now */
-.bx{margin-top:54px}
+.bx{margin-top:46px}
 .bx-st{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:5px 12px;border-radius:99px;border:1px solid var(--ln);font-size:.76rem;color:rgba(255,255,255,.65)}
 .bx-st i{width:7px;height:7px;border-radius:50%;background:#77777d}.bx-st.live i{background:#34d399;animation:bx-ping 2.2s infinite}.bx-st.snap i{background:var(--gold)}
 @keyframes bx-ping{0%{box-shadow:0 0 0 0 rgba(52,211,153,.55)}70%,100%{box-shadow:0 0 0 7px rgba(52,211,153,0)}}
@@ -599,10 +601,11 @@ def page():
                 f"<i class='sx-g h'></i><i class='sx-g e1'></i><i class='sx-g e2'></i><i class='sx-g c'></i><canvas class='sx-emb' aria-hidden='true'></canvas></div></div>"
                 f"<div class='sx-head sx-w'><div class='sx-hc'><div class='meta'><a href='/'>{T['home'][lg]}</a> / {e(T['crumb'][lg])}</div>"
                 f"<h1>{e(T['h1'][lg])}</h1><p class='sx-lead'>{e(T['lead'][lg])}</p><ul class='sx-chips'>{chips}</ul></div></div></header>"
-                f"<section class='sx-story sx-w'><h2 class='sx-h'>{e(T['story'][lg])}</h2><p class='sx-sub'>{e(T['hint'][lg])}</p>"
-                f"<ol class='sx-chain'>{''.join(items)}</ol><div class='sx-nav' data-prev='{e(T['prev'][lg])}' data-next='{e(T['next'][lg])}'></div></section>"
                 f"<section class='bx sx-w' data-bx><h2 class='sx-h'>{e(T['now'][lg])}</h2><p class='sx-sub'>{e(T['nowl'][lg])}</p><div data-bx-root></div></section>"
-                f"<section class='sx-facts sx-w'><h2 class='sx-h'>{e(T['known'][lg])}</h2><ul class='sx-fl'>{facts}</ul></section>"
+                # the owner's choice (2026-11-12): the twelve blocks below the live section, one section with what we know
+                f"<section class='sx-story sx-w'><h2 class='sx-h'>{e(T['story'][lg])}</h2><p class='sx-sub'>{e(T['hint'][lg])}</p>"
+                f"<ol class='sx-chain'>{''.join(items)}</ol><div class='sx-nav' data-prev='{e(T['prev'][lg])}' data-next='{e(T['next'][lg])}'></div>"
+                f"<div class='sx-facts'><h3 class='sx-h3'>{e(T['known'][lg])}</h3><ul class='sx-fl'>{facts}</ul></div></section>"
                 f"<p class='sx-note sx-w'>{e(T['src'][lg])}</p></article>")
 
     body = (BR.tri(block) + f"<script>{BR.LANG_JS}</script><script src='/assets/nx-coin.js?v={chrome.NX_VER}' defer></script>"
