@@ -29,8 +29,9 @@ OUT = os.path.join(ROOT, "data", "newsreel.json")
 TR = os.path.join(ROOT, "data", "newsreel_tr.json")
 NEWS = os.path.join(ROOT, "data", "news.json")
 
-KEEP = int(os.environ.get("REEL_KEEP", "30"))        # چند خبر در ریل بماند
-TR_MAX = int(os.environ.get("REEL_TR_MAX", "30"))    # سقف ترجمهٔ هر اجرا
+KEEP = int(os.environ.get("REEL_KEEP", "30"))        # چند خبر در ستون‌های صفحهٔ اخبار
+OC_KEEP = int(os.environ.get("REEL_OC_KEEP", "12"))  # دست‌کم چند خبر آنچینی برای صفحهٔ /onchain/
+TR_MAX = int(os.environ.get("REEL_TR_MAX", "44"))    # سقف ترجمهٔ هر اجرا
 BATCH = 10
 PLAN = os.environ.get("CRYPTOPANIC_PLAN", "developer").strip() or "developer"
 TOKEN = os.environ.get("CRYPTOPANIC_TOKEN", "").strip()
@@ -98,13 +99,11 @@ def from_cryptopanic():
     return out
 
 
-def from_house():
+def from_house(limit=120):
     """خبرخوان خودمان: تیتر انگلیسی + ترجمه‌های آمادهٔ فارسی و سورانی"""
     items = (load(NEWS, {}) or {}).get("items", [])
     out = []
-    for x in items[:120]:
-        if x.get("category") not in (None, "news", "world"):
-            continue
+    for x in items[:limit]:
         title = (x.get("title") or "").strip()
         if not title:
             continue
@@ -120,6 +119,7 @@ def from_house():
             "source": (x.get("source") or "").strip(),
             "img": x.get("img") or "",
             "coins": (x.get("coins") or [])[:3],
+            "cat": x.get("category") or "",
             "t": t,
         })
     print(f"house feed: {len(out)} items")
@@ -140,6 +140,30 @@ def merge(*lists):
             seen_u.add(u)
         out.append(x)
     return out
+
+
+# واژگان آنچین — برای ستون‌های کنار صفحهٔ /onchain/ (با norm() یکسان‌سازی می‌شوند)
+OC = ("on chain", "onchain", "whale", "whales", "netflow", "net flow", "exchange reserve",
+      "exchange reserves", "exchange inflow", "exchange inflows", "exchange outflow", "exchange outflows",
+      "exchange balance", "exchange balances", "hashrate", "hash rate", "mining difficulty", "miner", "miners",
+      "circulating supply", "supply held", "dormant", "realized cap", "realized price", "sopr", "mvrv", "nupl",
+      "utxo", "utxos", "active addresses", "addresses", "wallets", "holders", "long term holders",
+      "staking", "staked", "unstaked", "burned", "minted", "accumulation", "accumulating",
+      "etf inflow", "etf inflows", "etf outflow", "etf outflows", "etf flows", "open interest",
+      "stablecoin supply", "mempool", "block reward", "halving", "transaction fees", "on-chain")
+OCN = tuple(" " + norm(k) + " " for k in OC if norm(k))
+# خبرهایی که گاهی اشتباهی «آنچین» دسته‌بندی می‌شوند ولی دربارهٔ دادهٔ زنجیره نیستند
+NOT_OC = tuple(" " + norm(k) + " " for k in
+               ("ipo", "valuation", "funding round", "raises", "funding", "resigns", "appoints",
+                "hires", "lawsuit", "sues", "acquires", "acquisition"))
+
+
+def is_oc(x):
+    """آیا خبر آنچینی است؟ اول دستهٔ خودِ خوراک، بعد واژگان بالا (ستون‌های /onchain/ فقط همین‌ها را می‌گیرند)"""
+    t = " " + norm(x["t"]["en"]) + " "
+    if any(k in t for k in OCN):
+        return True
+    return (x.get("cat") or "") == "onchain" and not any(k in t for k in NOT_OC)
 
 
 def spread(rows):
@@ -257,13 +281,20 @@ def translate(items):
 
 def main():
     cp = from_cryptopanic()
-    items = spread(merge(cp, from_house()))[:KEEP]
-    if not items:
-        print("no items — keeping the previous reel")
-        return 0
+    rows = merge(cp, from_house(400))          # کل خوراک، تازه‌ترین اول
+    items = spread([x for x in rows[:140]])[:KEEP]
+    have = {x["id"] for x in items}
+    for x in [y for y in rows if is_oc(y)]:    # ستون‌های /onchain/ خوراک آنچینی جدا می‌خواهند
+        if sum(1 for y in items if is_oc(y)) >= OC_KEEP:
+            break
+        if x["id"] not in have:
+            items.append(x)
+            have.add(x["id"])
+    for x in items:
+        x["oc"] = 1 if is_oc(x) else 0
     items = translate(items)
     full = [x for x in items if all(x["t"].get(g) for g in ("fa", "ckb", "ar", "en"))]
-    if len(full) >= 12:                      # خبری که هنوز ترجمه نشده در ریل نیاید
+    if len(full) >= 12:                      # خبری که هنوز ترجمه نشده نمایش داده نمی‌شود
         items = full
     out = {
         "updated_at": datetime.now(timezone.utc).isoformat(),

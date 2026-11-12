@@ -16,6 +16,7 @@ SIDE = 9           # چند تیتر در هر ستون کناری (راست و 
 
 UI = {
     "title": {"fa": "آخرین خبرها", "ckb": "دوایین هەواڵەکان", "ar": "آخر الأخبار", "en": "Latest headlines"},
+    "title_oc": {"fa": "خبرهای آنچین", "ckb": "هەواڵی ئۆنچەین", "ar": "أخبار أون-تشين", "en": "On-chain headlines"},
     "aria_r": {"fa": "آخرین خبرها — ستون راست", "ckb": "دوایین هەواڵەکان — ستوونی ڕاست",
                "ar": "آخر الأخبار — العمود الأيمن", "en": "Latest headlines — right column"},
     "aria_l": {"fa": "آخرین خبرها — ستون چپ", "ckb": "دوایین هەواڵەکان — ستوونی چەپ",
@@ -39,10 +40,10 @@ font-size:.8rem;font-weight:700;flex:none}
 mask-image:linear-gradient(180deg,transparent,#000 26px,#000 calc(100% - 26px),transparent)}
 .nrs-run{display:flex;flex-direction:column}
 .nrs.on .nrs-run{animation:nrsm var(--sp,150s) linear infinite}
-.nrs-win:hover .nrs-run,.nrs-win:focus-within .nrs-run{animation-play-state:paused}
+.nrs-win:hover .nrs-run{animation-play-state:paused}
 @keyframes nrsm{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 .nrs-i{display:block;padding:11px 12px;border-bottom:1px solid var(--line);color:var(--ink)}
-.nrs-i:hover{background:rgba(247,147,26,.07);text-decoration:none}
+.nrs-i:last-child{border-bottom:0}
 .nrs-i .s{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:.68rem;margin-bottom:5px}
 .nrs-i .s b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
 .nrs-mono{width:17px;height:17px;border-radius:5px;flex:none;display:grid;place-items:center;
@@ -98,9 +99,12 @@ def _mono(src):
     return first.upper()
 
 
-def block(data, e, fmt_date):
-    """دو ستون خبری در حاشیهٔ راست و چپ صفحه؛ data = محتوای data/newsreel.json"""
-    items = [x for x in (data.get("items") or []) if (x.get("t") or {}).get("en") and x.get("url")]
+def block(data, e, fmt_date, onchain=False):
+    """دو ستون خبری در حاشیهٔ راست و چپ صفحه؛ data = محتوای data/newsreel.json
+    onchain=True یعنی فقط خبرهای آنچینی (برای صفحهٔ /onchain/)"""
+    items = [x for x in (data.get("items") or []) if (x.get("t") or {}).get("en")]
+    if onchain:
+        items = [x for x in items if x.get("oc")]
     if len(items) < 4:
         return ""
     items = items[:SIDE * 2]
@@ -111,17 +115,18 @@ def block(data, e, fmt_date):
         t4 = {lg: e(tt.get(lg) or tt.get("en") or "") for lg in LANGS}
         at = e(x.get("at") or "")
         chip = (x.get("coins") or [None])[0]
-        return (f'<a class="nrs-i" href="{e(x["url"])}" rel="noopener nofollow" target="_blank">'
+        # بدون لینک بیرونی: خبر همین‌جا ترجمه‌شده خوانده می‌شود و فقط نام ناشر به‌عنوان رفرنس می‌آید
+        return ('<article class="nrs-i">'
                 f'<span class="s"><span class="nrs-mono" aria-hidden="true">{_mono(x.get("source"))}</span>'
                 f'<b>{e(x.get("source") or "")}</b></span>'
                 f'<h3>{_fl(t4)}</h3>'
                 f'<span class="m"><time data-at="{at}" datetime="{at}">{e(fmt_date(x.get("at") or ""))}</time>'
                 + (f'<span class="nrs-chip">{e(chip)}</span>' if chip else "")
-                + "</span></a>")
+                + "</span></article>")
 
     def col(rows, side):
         return ('<aside class="nrs nrs-' + side + '" aria-label="' + e(UI["aria_r" if side == "r" else "aria_l"]["fa"]) + '">'
-                '<div class="nrs-h"><span class="nrs-dot" aria-hidden="true"></span>' + _fl(UI["title"]) + '</div>'
+                '<div class="nrs-h"><span class="nrs-dot" aria-hidden="true"></span>' + _fl(UI["title_oc" if onchain else "title"]) + '</div>'
                 '<div class="nrs-win"><div class="nrs-run">' + "".join(one(x) for x in rows) + '</div></div>'
                 '<div class="nrs-f">' + _fl(UI["foot"]) + '</div></aside>')
 
