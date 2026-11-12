@@ -47,6 +47,7 @@ import bot_encyclopedia as ENC
 import bot_compare as CMP  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_paper as PAPER  # noqa: E402  (paper trading + public leaderboard)
+import bot_pro as PRO  # noqa: E402  (the site's live market /market/ + its price-alert hand-off)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 import bot_proxy2 as PX2  # noqa: E402
@@ -459,6 +460,7 @@ SECTIONS = {
     "opt": (D.sec_opt, "/lab/"), "xex": (D.sec_xex, "/lab/"), "dev": (D.sec_dev, "/lab/"),
     "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
     "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
+    "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
@@ -502,6 +504,7 @@ def _render(s, uid, key, page=0):
             body = t("no_data", lang)
         return (MN.L(MN.T["intro_mkt"], lang) + "\n\n" + body,
                 {"inline_keyboard": [[btn(MN.name("irr", lang), "m:irr"), btn(MN.name("lite", lang), "m:lite")],
+                                     [btn(MN.name("pro", lang), "m:pro")],
                                      [btn(t("b_refresh", lang), "m:mkt"), btn(t("b_more", lang), url=D.SITE + "/dashboard/")]]})
     if key == "irr":
         try:
@@ -620,6 +623,8 @@ def _render(s, uid, key, page=0):
         if key in LAB:
             return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key)]]}
         kb = kb_back(lang, refresh="m:" + key, more=D.SITE + path)
+        if key == "pro":                                # inside Telegram (Web App) or in the browser, in place of «more»
+            kb["inline_keyboard"][0:1] = PRO.open_rows(lang)
         if key == "chain":                              # the live mempool map on /satoshi/ (a site page; nothing is sent)
             kb["inline_keyboard"].insert(0, [btn(t("b_mempool", lang), url=D.SITE + "/satoshi/#mempool")])
         if key in ("ind", "live"):                      # readable live-analysis card <-> indicator list
@@ -748,7 +753,8 @@ def after_verified(s, uid, chat_id, edit_mid=None):
 
 
 # ================================================================== alerts & brief
-def parse_alert(args, s, uid):
+def parse_alert(args, s, uid, crypto=False):
+    """crypto=True: the symbol is a coin quoted in dollars (links from the site's live market), never a toman asset"""
     lang = lang_of(s, uid)
     x = user(s, uid)
     parts = args.split()
@@ -769,7 +775,7 @@ def parse_alert(args, s, uid):
         return t("alert_usage", lang)
     if MAX_ALERTS and len(x["alerts"]) >= MAX_ALERTS:
         return t("alert_max", lang)
-    key = IR.resolve_asset(sym)
+    key = None if crypto else IR.resolve_asset(sym)
     if key:
         now = IR.asset_price(key)
         if not now:
@@ -1191,6 +1197,15 @@ def handle_private(s, msg):
                 return send(chat_id, *render(s, uid, arg[2:]))
             except Exception:
                 log.exception("deep link %s failed", arg)
+        # the live market's ✈ button (t.me/<bot>?start=a_BTC_72155d5): the alert is only OFFERED; it is stored on «add»
+        if arg.startswith("a_"):
+            try:
+                o = PRO.offer(arg, x["lang"])
+                if o:
+                    return send(chat_id, o[0], {"inline_keyboard": o[1]})
+                return send(chat_id, PRO.L("bad", x["lang"]), rows_kb([[btn(t("b_back", x["lang"]), "m:main")]]))
+            except Exception:
+                log.exception("alert link %s failed", arg)
         # the site's "send my list to the bot" pill (t.me/<bot>?start=w_BTC-ETH): a read-only snapshot, nothing stored
         if arg.startswith("w_"):
             try:
@@ -1398,6 +1413,12 @@ def handle_callback(s, cb):
         lang = (user(s, uid) or {}).get("lang", "fa")
         body = ENC.card(data[4:], lang) or ENC.NONE.get(lang, ENC.NONE["fa"])
         return send(chat_id, body, kb_back(lang, more=D.SITE + "/encyclopedia/"))
+    if data.startswith("pa:"):                       # «add» under an alert offered by the live market's ✈ link
+        got = PRO.parse_callback(data)
+        ans()
+        if not got:
+            return send(chat_id, PRO.L("bad", lang), kb_alerts(s, uid, lang))
+        return send(chat_id, parse_alert(f"{got[0]} {got[1]}", s, uid, crypto=True), kb_alerts(s, uid, lang))
     if data.startswith("pp:"):                       # paper trading: open / close / opt in / nickname / delete
         if cb["message"]["chat"].get("type") != "private":
             return ans()

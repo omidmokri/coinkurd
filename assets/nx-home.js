@@ -307,6 +307,12 @@
       '<p class="nxm-note">' + tri('کندل‌ها مستقیم از دادهٔ عمومی بایننس (جفت‌ارز با تتر) خوانده می‌شوند؛ اگر اتصال برقرار نشود، نمودار همین را می‌گوید و عددی ساخته نمی‌شود. با کشیدن جابه‌جا کنید؛ برای بزرگ‌نمایی با چرخ ماوس، اول روی نمودار کلیک کنید.',
         'مۆمەکان ڕاستەوخۆ لە داتای گشتیی بایننس (جووت لەگەڵ تەتەر) دەخوێنرێنەوە؛ ئەگەر پەیوەندی نەکرێت، هێڵکاری هەمان شت دەڵێت و هیچ ژمارەیەک دروست ناکرێت. بە ڕاکێشان بیجووڵێنە؛ بۆ گەورەکردن بە چەرخی ماوس، سەرەتا کرتە لە هێڵکاری بکە.',
         'Candles are read straight from Binance public market data (USDT pairs); if the connection fails the chart says so and no number is made up. Drag to pan; click the chart first to zoom with the wheel.') + '</p>';
+    var pro = d.createElement('a'); pro.className = 'nxm-pro'; pro.href = '/market/';
+    pro.innerHTML = '<b>' + tri('بازار زندهٔ کامل', 'بازاڕی زیندووی تەواو', 'The full live market') + '</b><span>' +
+      tri('مولتی‌چارت تا ۱۶ نمودار · تایم‌فریم ثانیه‌ای · بازپخش · ابزار ترسیم و ۲۲ اندیکاتور · هشدار قیمت · دیده‌بان · تقویم اقتصادی روی چارت',
+        'تا ١٦ چارت پێکەوە · تایمفرەیمی چرکەیی · دووبارە پەخش · ئامرازی کێشان و ٢٢ ئیندیکاتۆر · ئاگادارکەرەوەی نرخ · چاودێری · ڕۆژژمێری ئابووری لەسەر چارت',
+        'Up to 16 charts · seconds timeframes · replay · drawing tools and 22 indicators · price alerts · watchlists · economic calendar on the chart') + '</span><i aria-hidden="true">→</i>';
+    box.insertBefore(pro, box.firstChild);
     var h2 = sec.querySelector('h2'), before = (h2 && h2.nextSibling) || sec.querySelector('#mini'); if (before) sec.insertBefore(box, before); else sec.appendChild(box);   /* right under the title; the section's own TradingView widgets follow */
     var leg = box.querySelector('.nxm-leg'), st = box.querySelector('.nxm-st'), F = w.nxChart.fmtP;
     function q(a) { return leg.querySelector(a); }

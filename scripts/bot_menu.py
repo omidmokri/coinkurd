@@ -26,6 +26,13 @@ def L(d, lang, /, **kw):
 # ================================================================== section catalogue
 # key: (icon, {name}, {one-line description})
 S = {
+    "pro": ("📈", {"fa": "بازار زنده (مولتی‌چارت)", "ckb": "بازاڕی زیندوو (چەند چارت)", "kmr": "Bazara zindî (pir-grafîk)",
+                  "ar": "السوق المباشر (رسوم متعددة)", "en": "Live market (multi-chart)"},
+            {"fa": "تا ۱۶ نمودار، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت — در تلگرام یا مرورگر.",
+             "ckb": "تا ١٦ چارت، تایمفرەیمی چرکەیی، دووبارە پەخش، ئاگادارکەرەوە و ڕۆژژمێری ئابووری لەسەر چارت.",
+             "kmr": "Heta 16 grafîk, demên saniyeyî, dubarelîstin, hişyarî û salnameya aborî li ser grafîkê.",
+             "ar": "حتى ١٦ رسمًا، أطر بالثواني، إعادة تشغيل، تنبيهات والتقويم الاقتصادي على الرسم.",
+             "en": "Up to 16 charts, seconds timeframes, replay, alerts and the economic calendar on the chart."}),
     "g_reality": ("🎯", {"fa": "واقعیت‌سنج", "ckb": "ڕاستیپێو", "kmr": "Pîvana rastiyê", "ar": "مقياس الواقع",
                          "en": "Reality check"},
                   {"fa": "فاصلهٔ حرف بازار با واقعیتِ قابل‌بازبینی — اصطکاک محلی، هزینه فرصت، کارنامهٔ سیگنال‌ها.",
@@ -365,7 +372,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
+    "g_analysis": ["pro", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],

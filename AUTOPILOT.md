@@ -92,6 +92,10 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `scripts/build_trackrecord.py`, `scripts/build_opportunity.py`.
 - Menu (header + footer of every page): `scripts/chrome.py`, groups of `(path, icon, title L(), description L())`.
 - Site assistant knowledge: `scripts/assistant_kb.py` `FEATURES` (path, bot keys, extension tab) → `build_assistant.py`.
+- `/market/` (live market workspace): static `market/index.html` + `assets/pro/*.js|css` + `assets/vendor/lwc5.js`;
+  strings in `assets/pro/i18n.js` (fa, ckb, ar, en; `tests/test_pro_i18n.py` checks them); calendar data
+  `data/ecocal.json` from `scripts/ecocal.py` + `ecocal_tr.py`; bot side `scripts/bot_pro.py`. Tests: `tests/test_pro_ind.py`,
+  `test_pro_i18n.py`, `test_ecocal.py`, `test_bot_pro.py`, `pro_e2e.js` (`ONLY=phones|ar` runs one block).
 - Telegram bot: labels in `scripts/bot_menu.py` `S` (fa, ckb, kmr, ar, en) and `GROUPS`; reality sections in
   `scripts/bot_reality.py` `SECTIONS`; other sections in `scripts/refbot.py` `SECTIONS` via `scripts/bot_data.py`.
   The bot restarts from main about hourly, so menu changes go live on their own.
@@ -160,6 +164,34 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-12 · /market/: the live market — faraz.io's advanced features for every visitor (owner's request in chat, not by the loop)
+- New static page `market/index.html` (chrome.py STATIC, first item of the «بازار» menu, sitemap, home CTA in the live
+  market box) running `assets/pro/{i18n,ind,data,draw,app,panels,replay}.js` + `pro.css` on a vendored
+  `assets/vendor/lwc5.js` (TradingView Lightweight Charts 5.3.0, Apache-2.0, attribution on the page). fa · ckb · ar · en.
+- Faraz's list, one by one: 10 chart types (incl. hollow candles, Heikin-Ashi); 1–16 synced charts (symbol, timeframe,
+  crosshair, time); seconds timeframes 1/5/10/15/30 s and any custom one (built by aggregation, 00:00 UTC aligned);
+  bar replay at 9 speeds with practice trades; 22 indicators matching TradingView's definitions; 19 drawing tools
+  (Fibonacci, Gann fan, Andrews pitchfork, long/short positions…); watchlists with six colour flags; price alerts and
+  indicator alerts (RSI/MA/MACD/BB on bar close); the economic calendar as a panel and as flags on the chart; templates;
+  CSV/JSON export; automatic saving, named layouts and a share link. Entekhab's own layers (posts with outcomes,
+  Kurdistani signals, live states) are drawn from their OUTPUT files only. TSE adjusted charts do not apply to crypto
+  (said on the page).
+- Data: Binance public data in the browser (REST + one shared WebSocket for every chart), OKX REST fallback, then the
+  site's own `/data/candles/` snapshot (says so). Data saver for slow Iranian connections. Personal state only in
+  localStorage (`ek_pro*`); nothing leaves the browser except the share link the user makes.
+- Calendar: `scripts/ecocal.py` (update.yml step, continue-on-error) keeps every currency's events as history in
+  `data/ecocal.json` (26 weeks), titles translated deterministically by `scripts/ecocal_tr.py` (fa/ckb/ar), BTC's 1 h and
+  4 h move measured from the open of the event's hour. ForexFactory's feed has no "actual" values, so none are shown.
+- Bot: section «📈 بازار زنده» (`scripts/bot_pro.py`, first item of «تحلیل») with a Web App button and a browser button;
+  the site's ✈ on a price alert opens `t.me/<bot>?start=a_<COIN>_<PRICE>` — the bot only OFFERS it, stores it on «add»
+  through the usual `parse_alert` (crypto only, exact price kept). Site assistant: FEATURES + one FAQ entry.
+- Verified: indicator maths against an independent Python reference (51,665 values, 0 failures); i18n keys in 4 languages
+  (`tests/test_pro_i18n.py`); calendar (`tests/test_ecocal.py`); bot flows in 5 languages through refbot's real handlers
+  (`tests/test_bot_pro.py`); Playwright with Binance mocked in its real formats (`tests/pro_e2e.js`, 53 checks: desktop tour,
+  4 languages at 1280/390, phones as first opened, Arabic as CI deploys it with ar.js, the logo rule, offline fallback);
+  the real Binance/OKX endpoints and socket checked from the owner's browser on entekhab.net (formats, 1 s klines); leak guard clean.
+- Limits: alerts on the site sound while the page is open (the bot carries them otherwise); calendar history starts with
+  the first CI run (seeded with the USD history of events.json).
 
 ### 2026-11-12 · All apps updated and presented on one page; iPhone and Windows added (asked for by the owner)
 - **Download center `/app/`** (`scripts/build_apps.py`, built in CI; the old hand-made Android page is gone): one page
@@ -180,6 +212,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - **Bot:** new "📲 Apps" section in "Settings & more", five languages. **Android:** the shell is unchanged — its
   signing key is not available in this environment, and a differently signed APK cannot update installed copies; the
   app already shows every site change because it loads the site.
+
 ### 2026-11-12 · /satoshi/: the live mempool, as on mempool.space (owner's request in chat, not by the loop)
 - assets/btc-live.js (+ CSS in scripts/build_satoshi.py, VER 5). Tapping a waiting cube opens its panel: median fee,
   fee span, total fees, tx count, size, a fee-rate-by-weight curve, and a canvas map of every transaction in that
