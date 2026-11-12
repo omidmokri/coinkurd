@@ -98,6 +98,27 @@ def fa_words_to_numbers(text):
     return sorted(vals)
 
 
+def _same(x, y):
+    """72 and 72,000 are the same figure when one side says «72 هزار» / «72 thousand»: scale words are not digits."""
+    return any(abs(x * k - y) < 1e-6 * max(1, abs(y)) or abs(y * k - x) < 1e-6 * max(1, abs(x)) for k in (1, 1e3, 1e6, 1e9, 1e12))
+
+
+def _unmatched(a, b):
+    """Multiset match with scale tolerance; small whole numbers (1-5) are ignored: one language writes them as words
+    («one-hour», «یک‌ساعته»), and every figure the master carries is traced to the data separately."""
+    a = [x for x in a if not (x == int(x) and 0 < x <= 5)]
+    b = [y for y in b if not (y == int(y) and 0 < y <= 5)]
+    left = list(b)
+    ma = []
+    for x in a:
+        j = next((i for i, y in enumerate(left) if _same(x, y)), None)
+        if j is None:
+            ma.append(x)
+        else:
+            left.pop(j)
+    return ma, left
+
+
 def compare_sections(scripts, master="fa"):
     """Same numbers, in every section, in every language (times may differ only by time zone)."""
     out = []
@@ -108,9 +129,8 @@ def compare_sections(scripts, master="fa"):
         for s in sc["sections"]:
             a = sorted(numbers(" ".join(base[s["id"]]["paras"]), master))
             b = sorted(numbers(" ".join(s["paras"]), lang))
-            if a != b:
-                ma = [x for x in a if x not in b]
-                mb = [x for x in b if x not in a]
+            ma, mb = _unmatched(a, b)
+            if ma or mb:
                 out.append({"lang": lang, "section": s["id"], "only_in_master": ma, "only_in_this": mb})
     return out
 
