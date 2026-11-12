@@ -83,6 +83,7 @@ namespace Entekhab
         }
 
         protected override void OnHandleCreated(EventArgs e) { base.OnHandleCreated(e); Native.DarkFrame(Handle); }
+        protected override void OnShown(EventArgs e) { base.OnShown(e); Native.DarkFrame(Handle); }      // some Windows builds only take it once the window is on screen
 
         protected override void WndProc(ref Message m)
         {
