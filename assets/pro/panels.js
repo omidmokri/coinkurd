@@ -449,4 +449,6 @@
   }
   A.panels.obj = drawObj;
   ['draws', 'active', 'sym', 'drawsel'].forEach(function (n) { A.on(n, function () { if (objBox && objBox.isConnected) drawObj(objBox); }); });
+  /* if the workspace somehow started before this file ran, catch up: open the side panel and start what 'ready' starts */
+  if (A.cells().length) { syncIndSubs(); if (A.st().ev.on) loadCal(); if (A.st().side) A.setSide(A.st().side, true); }
 })();
