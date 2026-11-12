@@ -612,6 +612,8 @@ def _render(s, uid, key, page=0):
         if key in LAB:
             return text, {"inline_keyboard": [[btn(t("b_refresh", lang), "m:" + key)]]}
         kb = kb_back(lang, refresh="m:" + key, more=D.SITE + path)
+        if key == "chain":                              # the live mempool map on /satoshi/ (a site page; nothing is sent)
+            kb["inline_keyboard"].insert(0, [btn(t("b_mempool", lang), url=D.SITE + "/satoshi/#mempool")])
         if key in ("ind", "live"):                      # readable live-analysis card <-> indicator list
             other = "live" if key == "ind" else "ind"
             kb["inline_keyboard"].insert(0, [btn(t("b_indlive" if key == "ind" else "b_ind", lang), "m:" + other)])

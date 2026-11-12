@@ -137,6 +137,7 @@ T = {
     },
     "b_back": {"fa": "⬅️ منو", "ckb": "⬅️ لیست", "en": "⬅️ Menu"},
     "b_more": {"fa": "بیشتر در سایت ↗", "ckb": "زیاتر لە ماڵپەڕ ↗", "en": "More on site ↗"},
+    "b_mempool": {"fa": "🔴 مم‌پول زنده: هر تراکنش روی نقشه ↗", "ckb": "🔴 مێمپووڵی زیندوو: هەموو مامەڵەکان لەسەر نەخشە ↗", "kmr": "🔴 Mempoola zindî: her danûstandin li ser nexşeyê ↗", "ar": "🔴 الميمبول مباشرة: كل معاملة على الخريطة ↗", "en": "🔴 Live mempool: every transaction on a map ↗"},
     "b_refresh": {"fa": "🔄 به‌روزرسانی", "ckb": "🔄 نوێکردنەوە", "en": "🔄 Refresh"},
     "b_sub_on": {"fa": "🔔 گزارش روزانه: روشن کن", "ckb": "🔔 ڕاپۆرتی ڕۆژانە: هەڵیبکە", "en": "🔔 Daily brief: turn on"},
     "b_sub_off": {"fa": "🔕 گزارش روزانه: خاموش کن", "ckb": "🔕 ڕاپۆرتی ڕۆژانە: بیکوژێنەوە", "en": "🔕 Daily brief: turn off"},

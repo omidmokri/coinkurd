@@ -611,8 +611,16 @@ def sec_chain(lang):
            f"⛏ hashrate {c.get('hashrate', 0) / 1e18:.0f} EH/s · difficulty {c.get('difficulty', 0) / 1e12:.1f} T",
            f"🎯 retarget {(adj.get('progressPercent') or 0):.0f}% · est {(adj.get('difficultyChange') or 0):+.2f}% · {adj.get('remainingBlocks')} blocks",
            f"💸 fees sat/vB: fast {fe.get('fastestFee')} · 30m {fe.get('halfHourFee')} · 1h {fe.get('hourFee')}",
-           f"🌐 nodes {c.get('nodes', {}).get('total')}",
-           "", age(c.get("updated_at"), lang)]
+           f"🌐 nodes {c.get('nodes', {}).get('total')}"]
+    bi = load("btcinfo") or {}                 # the same file /satoshi/ falls back on (CI, every 15 min)
+    nx, mp = (bi.get("next") or [{}])[0] or {}, bi.get("mempool") or {}
+    if nx.get("nTx"):
+        fr = nx.get("feeRange") or []
+        out.append(f"🧊 next block ~{(nx.get('medianFee') or 0):.1f} sat/vB" + (f" ({fr[0]:.2f}–{fr[-1]:.0f})" if len(fr) >= 2 else "")
+                   + f" · {nx['nTx']:,} tx · {(nx.get('totalFees') or 0) / 1e8:.3f} BTC fees")
+    if mp.get("count"):
+        out.append(f"⏳ mempool {mp['count']:,} tx · {(mp.get('vsize') or 0) / 1e6:.1f} MvB")
+    out += ["", age(c.get("updated_at"), lang)]
     return "\n".join(out)
 
 

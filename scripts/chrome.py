@@ -217,8 +217,8 @@ NAV = [
         ("/map/", "map", L("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
          L("هر چیزی که باید بلد باشید، روی یک نقشه — با تیک زدن پیشرفت", "هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە — بە نیشانەکردنی پێشکەوتن", "Everything there is to learn on one map — tick your way through it")),
         ("/satoshi/", "eye", L("داستان ساتوشی", "چیرۆکی ساتۆشی", "Satoshi's story"),
-         L("از مقالهٔ ۹ صفحه‌ای تا سکوت، در ۱۲ بلاک؛ با تاریخ دقیق و بدون حدس دربارهٔ هویت", "لە توێژینەوەی ٩ لاپەڕەییەوە تا بێدەنگی، لە ١٢ بلۆکدا؛ بە بەرواری ورد و بێ مەزەندە دەربارەی ناسنامە",
-           "From a nine-page paper to silence, in twelve blocks; exact dates, no guessing about identity")),
+         L("از مقالهٔ ۹ صفحه‌ای تا سکوت، در ۱۲ بلاک؛ و شبکهٔ زندهٔ امروز: نقشهٔ تک‌تک تراکنش‌ها و جست‌وجوی هر تراکنش یا آدرس", "لە توێژینەوەی ٩ لاپەڕەییەوە تا بێدەنگی، لە ١٢ بلۆکدا؛ و تۆڕی زیندووی ئەمڕۆ: نەخشەی هەموو مامەڵەکان و گەڕان بەدوای هەر مامەڵە یان ناونیشانێکدا",
+           "From a nine-page paper to silence, in twelve blocks; and today's live network: every transaction on a map, any transaction or address looked up")),
         ("/kids/", "cap", L("بیت‌کوین برای کودکان", "بیتکۆین بۆ منداڵان", "Bitcoin for Juniors"),
          L("برنامهٔ درسی آزاد و رایگان برای ۸ تا ۱۲ سال: ۶ فصل و ۲۱ فعالیت با بازی، قصه و کاردستی — به فارسی، کوردی و انگلیسی",
            "بەرنامەی وانەیی کراوە و بێبەرامبەر بۆ ٨ تا ١٢ ساڵ: ٦ بەش و ٢١ چالاکی بە یاری، چیرۆک و دەستکاری — بە فارسی، کوردی و ئینگلیزی",
@@ -442,7 +442,7 @@ CSP = ("default-src 'self'; "
        "img-src 'self' data: blob: https:; "
        "media-src 'self' data: blob:; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "
-       "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space "
+       "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com; "
        "frame-src https://*.tradingview.com https://*.tradingview-widget.com; "
        "worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; "

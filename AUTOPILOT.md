@@ -154,6 +154,27 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-12 · /satoshi/: the live mempool, as on mempool.space (owner's request in chat, not by the loop)
+- assets/btc-live.js (+ CSS in scripts/build_satoshi.py, VER 5). Tapping a waiting cube opens its panel: median fee,
+  fee span, total fees, tx count, size, a fee-rate-by-weight curve, and a canvas map of every transaction in that
+  projected block (square side ∝ √vsize, packed by fee rate; the grid grows downward rather than drop one). It moves
+  live from mempool.space's websocket (`want blocks/stats/mempool-blocks`, `track-mempool-block`, deltas with a
+  sequence check that re-asks for the block on a gap). 11 filter chips from mempool's flag bits
+  (frontend/src/app/shared/filters.utils.ts; bits past 32 tested arithmetically). Mined blocks get the same map
+  from `/v1/block/<hash>/summary` (behind a button for full blocks: ~600 kB). Colour = one orange ramp over the
+  block's own 2nd–98th percentile of rates (OKLab L monotonic 0.32→0.95), legend shows the numbers.
+- Below it: a live stream of new transactions (ws `transactions`, REST `/mempool/recent` fallback), queue KPIs and
+  recent RBF bumps (`track-rbf-summary`). Search now also takes a txid (panel with inputs/outputs, RBF signal,
+  CPFP effective rate, rough ETA) and an address (balance, history unless >2,000 txs).
+- Data: the socket runs only while the section is on screen and the tab visible, never starts by itself under Data
+  Saver / 2g, pauses after 6 quiet minutes (≈300 kB to open the map, then ≈3 kB/s), REST polling is skipped while the
+  socket is healthy. CSP: wss://mempool.space added in chrome.py. Bot: next-block + mempool lines in sec_chain and a
+  «🔴 live mempool» button to /satoshi/#mempool.
+- Verified: message formats against mempool's source and the live socket; unit tests (packing, curve, flags vs
+  BigInt, address regexes, scales, ETA); Playwright with a fake socket in the real formats (fa/en/ckb, 1280/390,
+  Data Saver); and the exact code against the real network in the owner's browser (map count = nTx, mined block
+  2,191/2,191, real tx and address lookups).
+
 ### 2026-11-11 · /satoshi/: real 3D block cubes + the way back to block zero (owner's request, done in chat, not by the loop)
 - assets/btc-live.js + CSS in scripts/build_satoshi.py (VER 4). Each block is a CSS-3D cube (front/side/top faces, no
   WebGL, no new download); its faces are painted as high as the block was full (weight / 4,000,000). Block 0 is gold.
