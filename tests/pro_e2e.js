@@ -263,6 +263,22 @@ async function mockNet(page, stats) {
     await shot(page, `22_${lang}_390_fresh`); await ctx.close();
   }
 
+  /* ---------- a background tab stops streaming (metered connections), and picks up where it left when seen again */
+  if (!ONLY || ONLY === 'hide') {
+    const { page, ctx, stats } = await newPage(1280, 860, 'en');
+    const setHidden = h => page.evaluate(h => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => h }); Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => h ? 'hidden' : 'visible' }); document.dispatchEvent(new Event('visibilitychange')); }, h);
+    const ws0 = stats.ws;
+    await setHidden(true); await page.evaluate(() => PRO._wsPause());           /* the one-minute timer, without the wait */
+    await page.waitForTimeout(600); const m0 = stats.msgs; await page.waitForTimeout(3000);
+    const hidden = { up: await page.evaluate(() => PRO.wsState()), msgs: stats.msgs - m0 };
+    await setHidden(false);
+    await page.waitForFunction(() => PRO.wsState(), null, { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(2500);
+    const back = await page.evaluate(() => ({ up: PRO.wsState(), st: PRO.app.cells().map(c => c.feed && c.feed.state).join() }));
+    ok('a hidden tab closes its socket (no data), and reopens it live when seen again', hidden.up === false && hidden.msgs === 0 && back.up === true && stats.ws === ws0 + 1 && /^live/.test(back.st), JSON.stringify({ hidden, back, sockets: stats.ws - ws0 }));
+    await ctx.close();
+  }
+
   /* ---------- a slow connection: panels.js and replay.js arrive late; the panels, calendar flags and alert checks still start */
   if (!ONLY || ONLY === 'slow') {
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: 'en-US', timezoneId: 'Asia/Tehran', serviceWorkers: 'block' });

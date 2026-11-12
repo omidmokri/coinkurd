@@ -78,7 +78,7 @@
   function wsFlush() {
     clearTimeout(W.timer);
     W.timer = setTimeout(function () {
-      if (P.saver || !('WebSocket' in window)) return;
+      if (P.saver || W.paused || !('WebSocket' in window)) return;
       var keys = Object.keys(W.want);
       if (!W.ws) { if (keys.length) wsOpen(); return; }
       if (W.ws.readyState !== 1) return;
@@ -102,7 +102,7 @@
       if (W.ws !== ws) return;
       W.ws = null; W.live = {}; var was = W.up; W.up = false;
       if (was) W.on.forEach(function (f) { try { f('close'); } catch (e) { } });
-      if (!Object.keys(W.want).length || P.saver) return;
+      if (!Object.keys(W.want).length || P.saver || W.paused) return;
       var d = Math.min(30000, 1000 * Math.pow(2, W.retry++));
       setTimeout(function () { if (!W.ws && Object.keys(W.want).length) wsOpen(); }, d);
     };
@@ -358,8 +358,21 @@
     P.tickers.watch(Object.keys(TK.want));
   };
   var hiddenAt = 0;
+  /* a tab left in the background stops streaming after a minute (visitors on metered Iranian connections pay for every
+     byte); seen again, the socket reopens and every chart fills the gap from REST */
+  var pauseT = 0;
+  function wsPause() {
+    if (!document.hidden) return;
+    W.paused = true; var ws = W.ws; if (!ws) return;
+    W.ws = null; W.live = {}; var was = W.up; W.up = false;
+    try { ws.close(); } catch (e) { }
+    if (was) W.on.forEach(function (f) { try { f('close'); } catch (e) { } });
+  }
+  P._wsPause = wsPause;
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { hiddenAt = Date.now(); return; }
+    if (document.hidden) { hiddenAt = Date.now(); clearTimeout(pauseT); pauseT = setTimeout(wsPause, 60000); return; }
+    clearTimeout(pauseT);
+    if (W.paused) { W.paused = false; Object.keys(feeds).forEach(function (k) { feeds[k].streamAt = Date.now(); }); wsFlush(); }
     if (hiddenAt && Date.now() - hiddenAt > 60000) Object.keys(feeds).forEach(function (k) { feeds[k].catchup(); });
     hiddenAt = 0;
   });
