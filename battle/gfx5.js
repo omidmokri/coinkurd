@@ -1,4 +1,4 @@
-/* entekhab.net — «نبرد کن» 5.0 kit (three.js r128; loaded after gfx4.js and before battle.js)
+/* entekhab.net — «نبرد من» kit (three.js r128; loaded after gfx4.js and before battle.js)
    Infantry: one detailed soldier (rifleman, machine-gunner, anti-tank gunner, squad leader) posed per soldier on the CPU
    (two-bone arm IK, smooth blending between stances) and drawn instanced.
    Theatre: a northern coast and sea, a destroyer, a frigate and a submarine per army, harbour, radar stations.
@@ -64,6 +64,7 @@ K.loft = loft; K.sbox = sbox; K.tube = tube; K.ball = ball; K.rodX = rodX;
    One geometry per role (0 rifle, 1 machine gun, 2 anti-tank, 3 leader) at two levels of detail; aPM = bone + 32 × surface.
    Bones: 0 pelvis · 1 torso · 2 head · 3/4 left thigh/shin · 5/6 right thigh/shin · 7/8 left arm · 9/10 right arm · 11 weapon
    Surfaces: 0 camouflage cloth · 1 skin · 2 gun metal · 3 webbing · 4 team accent · 5 boots and gloves · 6 dark kit · 7 lens · 8 olive tube / furniture
+             · 9 armour plate and 10 lit sensor (the machines in gfx6.js: humanoid robots and robot dogs, which share this material and bone texture)
    Skinning: the CPU writes twelve 3×4 bone matrices per soldier into one float texture (37 texels a row); the vertex shader reads its bone's
    three texels. A vertex therefore costs a few dot products on any GPU, and a software rasteriser can afford the squads. */
 const HIP = .93, SHO = 1.46, ELB = 1.17, KNEE = .5, UA = .29, FA = .3;
@@ -174,7 +175,7 @@ vMat=mt;vObj=position*3.2+vec3(me.x*17.,0.,me.x*31.);vRank=me.y;
 `;
 const SK = L3(0xdcab85), GM = L3(0x2a2c2f), BT = L3(0x231f1b), LN = L3(0x0d1014);
 const v3s = a => `vec3(${a.map(x => x.toFixed(4)).join(',')})`;
-const INF_FS_HEAD = `uniform vec3 uC1,uC2,uC3,uAcc,uWeb,uOlv;uniform float uAccE;varying float vMat;varying vec3 vObj;varying float vRank;float SR=.85,SM=0.;vec3 SE=vec3(0.);
+const INF_FS_HEAD = `uniform vec3 uC1,uC2,uC3,uAcc,uWeb,uOlv,uPlt;uniform float uAccE;varying float vMat;varying vec3 vObj;varying float vRank;float SR=.85,SM=0.;vec3 SE=vec3(0.);
 float hh(vec3 p){p=fract(p*.3183+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hh(i),hh(i+vec3(1,0,0)),f.x),mix(hh(i+vec3(0,1,0)),hh(i+vec3(1,1,0)),f.x),f.y),mix(mix(hh(i+vec3(0,0,1)),hh(i+vec3(1,0,1)),f.x),mix(hh(i+vec3(0,1,1)),hh(i+vec3(1,1,1)),f.x),f.y),f.z);}
 `;
@@ -188,7 +189,9 @@ else if(vMat<4.5){base=uAcc*(1.+step(1.5,rk)*.25);SE=uAcc*uAccE*(1.+step(.5,rk)*
 else if(vMat<5.5){base=${v3s(BT)};SR=.72;}
 else if(vMat<6.5){base=mix(uC3,${v3s(BT)},.45);SR=.86;}
 else if(vMat<7.5){base=${v3s(LN)};SR=.12;SM=.5;}
-else{base=uOlv;SR=.62;}
+else if(vMat<8.5){base=uOlv;SR=.62;}
+else if(vMat<9.5){float n=n3(vObj*1.3);base=uPlt*(.88+.2*n);SR=.44;SM=.6;}
+else{base=uAcc*1.25;SE=uAcc*uAccE*4.4;SR=.3;}
 diffuseColor.rgb=base;`;
 K.infantryMaterial = function (team, std, tex, rows, skin) {
   const m = std ? new THREE.MeshStandardMaterial({ roughness: .85, metalness: 0 }) : new THREE.MeshLambertMaterial({});
@@ -196,6 +199,7 @@ K.infantryMaterial = function (team, std, tex, rows, skin) {
   const TU = {
     uC1: { value: G.lin(team.c1) }, uC2: { value: G.lin(team.c2) }, uC3: { value: G.lin(team.c3) }, uAcc: { value: G.lin(team.acc) }, uAccE: { value: .5 },
     uWeb: { value: G.lin(team.c1).lerp(G.lin(0x6b5d43), .5) }, uOlv: { value: G.lin(team.c3).lerp(G.lin(0x4d5136), .6) },
+    uPlt: { value: G.lin(team.c2).lerp(G.lin(0x8b9196), .62) },                 // machines: armour plate in the army's tone
     uBones: { value: tex }, uBS: { value: new THREE.Vector2(1 / ROWT, 1 / rows) }
   };
   m.onBeforeCompile = sh => {
@@ -249,7 +253,7 @@ function armIK(tx, ty) {                    // hand target in the torso frame �
 }
 const C = new Float32Array(18);             // target controls of the soldier being posed
 /* controls: 0 hL 1 kL 2 hR 3 kR · 4 aL0 5 aL1 6 aR0 7 aR1 (free arm angles) · 8 lean 9 rA 10 rX 11 rY · 12 F 13 bx 14 by 15 grip · 16 hy 17 hp */
-K.stance = function (role, sd) { const v = (sd * 7.13) % 1; return role === 1 ? (v < .6 ? 3 : 1) : role === 2 ? (v < .65 ? 1 : 0) : role === 3 ? (v < .7 ? 0 : 1) : (v < .38 ? 0 : v < .76 ? 1 : 2); };
+K.stance = function (role, sd) { const v = (sd * 7.13) % 1; return role === 4 ? (v < .5 ? 2 : 0) : role === 1 ? (v < .6 ? 3 : 1) : role === 2 ? (v < .65 ? 1 : 0) : role === 3 ? (v < .7 ? 0 : 1) : (v < .38 ? 0 : v < .76 ? 1 : 2); };
 K.pose = function (s, tms, dt, A, o) {
   const st = s.st, t = tms / 1000, tt = Math.max(0, (tms - s.t0) / 1000), sd = s.sd, role = s.role | 0, at = role === 2, stn = s.stn | 0;
   const P = at ? AP : WP, GR = at ? AG_R : WG_R, GL = at ? AG_L : WG_L;
@@ -264,7 +268,7 @@ K.pose = function (s, tms, dt, A, o) {
     C[0] = 0; C[1] = -.2; C[2] = 0; C[3] = -.2; C[8] = run ? -.27 : -.09; C[9] = at ? .28 : .95; C[10] = at ? 0 : .02; C[11] = at ? 0 : -.02; C[14] = run ? -.05 : -.012; k = 14;
   } else if (still) {
     const fire = st === ST.FIRE, rest = st === ST.REST;
-    const look = Math.sin(t * .35 + sd * 40) * (((sd * 7) % 1) > .4 ? .55 : .15);
+    const look = role === 4 ? Math.sin(t * .6 + sd * 40) * .62 : Math.sin(t * .35 + sd * 40) * (((sd * 7) % 1) > .4 ? .55 : .15);
     if (stn === 3) {                        // prone behind the gun
       C[0] = .04; C[1] = -.06; C[2] = -.07; C[3] = -.1; C[8] = rest ? .1 : .22; C[12] = -1.47; C[14] = -.73; C[13] = -.12;
       C[9] = 1.47 - C[8] + .03; C[10] = .075; C[11] = .576; C[17] = rest ? .55 : 1.0; C[16] = rest ? look : look * .3;
@@ -308,8 +312,8 @@ K.pose = function (s, tms, dt, A, o) {
   if (amp) {                                 // stride
     const run = amp === 1, sw = run ? .82 : .42, kn = run ? .95 : .55;
     hL += Math.sin(cyc) * sw; hR += Math.sin(cyc + Math.PI) * sw; kL -= kn * Math.max(0, Math.sin(cyc + 1.35)); kR -= kn * Math.max(0, Math.sin(cyc + 4.49));
-    by += Math.abs(Math.sin(cyc)) * (run ? .07 : .03); rY += Math.sin(cyc * 2) * .012; lean += Math.sin(cyc * 2) * .015;
-  } else if (still && stn !== 3) { by += Math.sin(t * 1.7 + sd * TAU) * .004; rA += Math.sin(t * .6 + sd * 9) * .012; }
+    by += Math.abs(Math.sin(cyc)) * (run ? .07 : .03) * (role === 4 ? .45 : 1); rY += Math.sin(cyc * 2) * .012; lean += Math.sin(cyc * 2) * .015;
+  } else if (still && stn !== 3 && role !== 4) { by += Math.sin(t * 1.7 + sd * TAU) * .004; rA += Math.sin(t * .6 + sd * 9) * .012; }
   if (rec > .01) { rX -= .035 * rec; rA += .05 * rec; lean += .025 * rec; }
   /* hands: IK to the two grips, blended with the free arm angles by "grip" */
   const g = q[15], cs = Math.cos(rA), sn = Math.sin(rA);
@@ -326,6 +330,7 @@ K.pose = function (s, tms, dt, A, o) {
   A[o + 8] = lean; A[o + 9] = rA; A[o + 10] = rX; A[o + 11] = rY; A[o + 12] = q[12]; A[o + 13] = q[13]; A[o + 14] = by; A[o + 15] = g;
   A[o + 16] = sd; A[o + 17] = (s.rank | 0) + 10 * role; A[o + 18] = q[16]; A[o + 19] = q[17];
 };
+K.rig = { HIP, SHO, ELB, KNEE, UA, FA, WP, ROWT, rot, mul, put };              // the skeleton's measures and the bone writers, for gfx6.js
 /* where the muzzle is (soldier-local x forward, y up), for flashes and tracers */
 K.muzzle = function (s) { const stn = s.stn | 0; return s.role === 2 ? [.75, s.stn === 1 ? 1.12 : 1.55] : stn === 3 ? [1.55, .34] : stn === 1 ? [.95, 1.04] : [.95, 1.45]; };
 
@@ -362,6 +367,7 @@ const B = (w, h, d, x, y, z, hex, k) => prim(G.T(new THREE.BoxGeometry(w, h, d),
 const CY = (r0, r1, h, seg, x, y, z, hex, open) => prim(G.T(new THREE.CylinderGeometry(r0, r1, h, seg, 1, !!open), x, y, z), hex);
 const RB = (w, h, d, r, x, y, z, hex) => prim(G.T(G.rbox(w, h, d, r, 1), x, y, z), hex);
 function moved(list, x, y, z, rot) { for (const g of list) { if (rot) g.rotateY(rot); g.translate(x, y, z); } return list; }
+K.kit = { prim, B, CY, RB, moved, L3 };
 let _noise = null;
 K.noiseTex = function () {                     // one tileable fbm tile, shared by the sea and the wakes
   if (_noise) return _noise;
@@ -411,6 +417,7 @@ const NAVY = {
 };
 let _shipMat = null;
 const shipMat = () => _shipMat || (_shipMat = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .62, metalness: .25, side: THREE.DoubleSide }) : new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+K.ship = { hullGeo, NAVY, shipMat };
 /* surface combatant: big = destroyer (56 m), otherwise frigate (40 m) */
 K.warship = function (side, big) {
   const P = NAVY[side], k = big ? 1 : .72, L = [], g = new THREE.Group();
@@ -712,14 +719,14 @@ K.fpv = function (att, tx, tz) {
 /* ------------------------------------------------------------------ naval actions (each one is called by a real market event, never on a timer) */
 K.naval = {
   ship(side, kind) { return K.env ? K.env.ships.find(s => s.side === side && s.kind === kind) : null; },
-  /* deck-gun salvo from the destroyer: shells that arc in from the sea */
-  fire(side, tx, tz, usd, n) {
-    const E = K.env, s = this.ship(side, 'dd'); if (!E || !s || typeof FX === 'undefined') return false;
+  /* deck-gun salvo: shells that arc in from the sea. The destroyer's gun by default; kind 'ff' is the frigate's lighter one */
+  fire(side, tx, tz, usd, n, kind) {
+    const E = K.env, ff = kind === 'ff', s = this.ship(side, ff ? 'ff' : 'dd'); if (!E || !s || typeof FX === 'undefined') return false;
     s.aim = { x: tx, z: tz, until: E.t + 7 };
-    for (let i = 0; i < (n || 2); i++) K.after(900 + i * 520, () => {
+    for (let i = 0; i < (n || 2); i++) K.after(900 + i * (ff ? 430 : 520), () => {
       const U = s.g.userData, tip = U.gunTip.clone(); s.g.updateMatrixWorld(true); U.tur.localToWorld(tip);
-      FX.shoot({ x0: tip.x, y0: tip.y, z0: tip.z, x1: tx + rr(-7, 7), z1: tz + rr(-7, 7), h: 30 + Math.random() * 8, dur: 2300 + Math.random() * 400, sz: 1.9, col: 0xffd27a, kind: 'shell', usd, side, trail: 1 });
-      FX.muzzle(tip.x, tip.y, tip.z, 6); FX.smoke(tip.x, tip.y, tip.z, E.lite ? 4 : 8, 4.5); AUDIO.play('cannon', { x: s.g.position.x, z: s.g.position.z, vol: 1 });
+      FX.shoot({ x0: tip.x, y0: tip.y, z0: tip.z, x1: tx + rr(-7, 7), z1: tz + rr(-7, 7), h: (ff ? 24 : 30) + Math.random() * 8, dur: (ff ? 2000 : 2300) + Math.random() * 400, sz: ff ? 1.45 : 1.9, col: 0xffd27a, kind: 'shell', usd, side, trail: 1 });
+      FX.muzzle(tip.x, tip.y, tip.z, ff ? 4.4 : 6); FX.smoke(tip.x, tip.y, tip.z, E.lite ? 3 : (ff ? 6 : 8), ff ? 3.6 : 4.5); AUDIO.play('navgun', { x: s.g.position.x, z: s.g.position.z, vol: ff ? .8 : 1, big: !ff });
     });
     return true;
   },

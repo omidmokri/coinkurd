@@ -693,7 +693,8 @@ A4.launchB = function (att, tel, tx, tz, i) {
 };
 A4.launchI = function (def, target) {
   if (!target || !target.on) return;
-  const sam = K.env.sams[def][0], p0 = sam.tip.clone(), tm = 1.8;
+  /* most interceptors leave the battery ashore; now and then the defender's frigate answers from its cells */
+  const sam = K.env.sams[def][0], sea = window.GFX6 && Math.random() < .4 ? GFX6.shipSAM(def) : null, p0 = sea || sam.tip.clone(), tm = sea ? 2.5 : 1.8;
   const sT = ((vt() - target.t0) / 1000 + tm) / target.dur; if (sT >= .9) return;
   const pm = this.posAt(target, sT);
   const m = this.spawn('I', def, p0, pm, tm, 0); if (!m) return; m.target = target;
