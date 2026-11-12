@@ -803,3 +803,4 @@ is untouched.
   one «language» button only while the menu and the tools actually collide; scanned 1180–1940 px in fa/ckb/en/ar, no
   overlap left (before: up to 154 px in English). Arabic mode now also turns `<body dir="ltr">` to rtl.
 - «العربية» stays hidden for visitors until `data/ar_on` (owner's approval).
+- **2026-11-12:** owner approved → `data/ar_on` created; «العربية» is public in every switcher.
