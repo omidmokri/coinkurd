@@ -7,13 +7,16 @@
 <link rel="stylesheet" href="popup.css">
 </head>
 <body>
+<!-- ⚠️ THE LOGO RULE (the site owner's, repeated): the logo is NEVER covered. The header wraps to a second line
+     before anything can sit on the logo; nothing is positioned over it. tests/test_extension_logo.py checks this. -->
 <header>
-  <a class="brand" href="https://entekhab.net/" target="_blank" rel="noopener"><img src="icons/icon48.png" alt="" width="28" height="28"><b data-t="brand">انتخاب</b></a>
+  <a class="brand" href="https://entekhab.net/" target="_blank" rel="noopener"><img id="logo" src="icons/icon128.png" alt="Entekhab" width="28" height="28"><b data-t="brand">انتخاب</b></a>
   <div class="hr">
-    <div class="lang" role="group" aria-label="language"><button data-l="fa">فا</button><button data-l="ckb">کو</button><button data-l="en">EN</button></div>
+    <div class="lang" role="group" aria-label="language"><button data-l="ckb" lang="ckb">کوردی</button><button data-l="fa" lang="fa">فارسی</button><button data-l="ar" lang="ar">العربية</button><button data-l="en" lang="en">English</button></div>
     <button id="refresh" class="ib" title="refresh" aria-label="refresh">↻</button>
   </div>
 </header>
+<a id="nv" class="nv" href="https://entekhab.net/extension/" target="_blank" rel="noopener" hidden><span data-t="newVer">نسخهٔ تازهٔ افزونه آماده است</span><b data-t="getIt">دریافت</b></a>
 <section class="kpis" id="kpis"></section>
 <nav class="tabs" role="tablist">
   <button data-tab="market" class="on" data-t="tMarket">بازار</button>
@@ -56,21 +59,20 @@
     </form>
     <div id="alerts" class="list"></div>
     <h4 data-t="settings">تنظیمات</h4>
-    <label class="row"><span data-t="badge">عدد روی آیکون</span><select id="badge"></select></label>
+    <label class="row"><span data-t="tip">قیمت در راهنمای آیکون</span><select id="tip"></select></label>
+    <p class="note" data-t="tipNote">روی خود آیکون هیچ عددی نوشته نمی‌شود تا لوگو همیشه کامل دیده شود؛ قیمت با نگه‌داشتن ماوس روی آیکون دیده می‌شود.</p>
     <label class="row"><span data-t="notifyPosts">اعلان پست‌های تازهٔ Coin_Kurd</span><input type="checkbox" id="notifyPosts"></label>
     <p class="note" data-t="privacy">همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.</p>
   </section>
   <button id="pg" class="pg" type="button" hidden aria-label="scroll"><span>⌄</span></button>
 </main>
 <footer>
+  <a href="https://entekhab.net/satoshi/" target="_blank" rel="noopener" data-t="satoshi">₿ ساتوشی</a>
+  <a href="https://entekhab.net/map/" target="_blank" rel="noopener" data-t="map">🗺 نقشهٔ یادگیری</a>
+  <a href="https://entekhab.net/battle/" target="_blank" rel="noopener" data-t="battle">⚔️ نبرد من</a>
   <a href="https://entekhab.net/encyclopedia/" target="_blank" rel="noopener" data-t="enc">📚 دانشنامه</a>
   <a href="https://entekhab.net/academy/" target="_blank" rel="noopener" data-t="academy">🏛 آکادمی</a>
-  <a href="https://entekhab.net/academy/lab/" target="_blank" rel="noopener" data-t="lab">🧪 آزمایشگاه</a>
-  <a href="https://entekhab.net/dashboard/" target="_blank" rel="noopener" data-t="dash">📊 داشبورد</a>
-  <a href="https://entekhab.net/reality/" target="_blank" rel="noopener" data-t="reality">🎯 واقعیت‌سنج</a>
-  <a href="https://entekhab.net/roundtable/" target="_blank" rel="noopener" data-t="round">💬 میزگرد</a>
-  <a href="https://entekhab.net/opportunity/" target="_blank" rel="noopener" data-t="opp">🧮 هزینه فرصت</a>
-  <a href="https://entekhab.net/ledger/" target="_blank" rel="noopener" data-t="ledger">📒 دفتر سیگنال‌ها</a>
+  <a href="https://entekhab.net/app/" target="_blank" rel="noopener" data-t="apps">📲 اپلیکیشن‌ها</a>
   <a href="https://t.me/Kurd_kurdistan_bot" target="_blank" rel="noopener" data-t="bot">🤖 ربات</a>
   <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">✈️ Coin_Kurd</a>
 </footer>

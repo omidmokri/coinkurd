@@ -7,16 +7,24 @@ body{background:var(--bg);color:var(--ink);font:13px/1.7 Vazirmatn,"Segoe UI",Ta
 html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0}
 html[dir=ltr] body{font-family:"Segoe UI",system-ui,sans-serif}
 a{color:var(--acc);text-decoration:none}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.brand{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px}.brand img{border-radius:6px}
-.hr{display:flex;gap:6px;align-items:center}
+/* ⚠️ THE LOGO RULE (the site owner's, repeated): the logo is NEVER covered. The brand never shrinks, the header
+   wraps to a second line rather than squeeze, and nothing in the popup is positioned over the logo.
+   tests/test_extension_logo.py fails if any element overlaps it, in any language. */
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 8px;margin-bottom:8px;position:relative;z-index:3}
+.brand{flex:none;display:flex;align-items:center;gap:8px;color:var(--ink);font-size:15px;position:relative;z-index:4}
+.brand img{flex:none;display:block;width:28px;height:28px;border-radius:6px;opacity:1;visibility:visible;position:relative;z-index:5}
+.hr{display:flex;gap:6px;align-items:center;margin-inline-start:auto;min-width:0}
 .lang{display:flex;border:1px solid var(--line);border-radius:99px;overflow:hidden}
-.lang button{background:none;border:0;color:var(--mute);padding:3px 9px;font:inherit;font-size:11px;cursor:pointer}.lang button.on{background:var(--acc);color:#000;font-weight:700}
+.lang button{background:none;border:0;color:var(--mute);padding:3px 8px;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}.lang button.on{background:var(--acc);color:#000;font-weight:700}
+.lang button[lang=en]{font-family:"Segoe UI",system-ui,sans-serif}
+/* a newer version is published: one line under the header, in the normal flow */
+.nv{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px;padding:5px 10px;border:1px solid var(--acc);border-radius:10px;background:rgba(247,147,26,.09);color:var(--ink);font-size:11.5px}
+.nv[hidden]{display:none}.nv b{color:var(--acc);white-space:nowrap}
 .ib{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:99px;width:28px;height:28px;cursor:pointer;font-size:15px}
 .ib.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 8px}
-.kpi small{display:block;color:var(--mute);font-size:10.5px;line-height:1.4}.kpi b{font-size:14px;direction:ltr;unicode-bidi:isolate;display:inline-block}
+.kpi small{display:block;color:var(--mute);font-size:10.5px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kpi b{font-size:14px;direction:ltr;unicode-bidi:isolate;display:inline-block}
 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px 4px;border-bottom:1px solid var(--line);margin-bottom:8px}
 .tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:6px 2px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tabs button.on{color:var(--acc);border-color:var(--acc);font-weight:700}
@@ -26,7 +34,7 @@ main{position:relative}
 .pg:hover{opacity:1}
 .pg[hidden]{display:none}
 .pg.up span{display:inline-block;transform:rotate(180deg)}
-main section{display:none;max-height:330px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-inline-end:2px}
+main section{display:none;max-height:300px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-inline-end:2px}
 main section.on{display:block}
 main section::-webkit-scrollbar{width:5px}
 main section::-webkit-scrollbar-track{background:transparent}
@@ -53,8 +61,8 @@ h4{margin:12px 0 4px;color:var(--mute);font-size:12px}
 .note,.empty{color:var(--mute);font-size:11.5px;padding:6px 2px}
 .retry{background:var(--card);border:1px solid var(--line);color:var(--acc);border-radius:8px;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;margin:2px}
 .retry:hover{border-color:var(--acc)}
-footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
-footer a{font-size:12px}
+footer{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:1px 6px;border-top:1px solid var(--line);margin-top:8px;padding-top:7px}
+footer a{font-size:11px;line-height:1.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nfa{color:var(--mute);font-size:10.5px;text-align:center;margin-top:6px}
 .cc{display:grid;grid-template-columns:1fr 92px;gap:5px;margin-bottom:7px}
 .cc select{width:100%;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font:inherit}
@@ -68,7 +76,8 @@ html[dir=rtl] .cf select{direction:rtl;text-align:right}
 .co .r b{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;font-size:13px}
 .co .r b.up{color:var(--up)}.co .r b.dn{color:var(--dn)}
 .co .r.k b{color:var(--acc);font-size:15px}
-main section[data-pane=calc]{max-height:360px}
+main section[data-pane=calc]{max-height:300px}
+body.has-nv main section,body.has-nv main section[data-pane=calc]{max-height:262px}
 
 /* the market analysis pane: the same report read as the site and the bot, trimmed to a popup */
 .report ul.an{margin:8px 0;padding-inline-start:18px;list-style:disc}

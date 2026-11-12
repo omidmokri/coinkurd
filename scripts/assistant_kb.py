@@ -100,9 +100,9 @@ SYNONYMS = [
 FAQ = [
     (["افزونه", "اکستنشن", "افزونه کروم", "افزونه فایرفاکس", "extension", "chrome extension", "firefox", "پێوەکراو"],
      L("افزونهٔ مرورگر دارید؟", "پێوەکراوی وێبگەڕتان هەیە؟", "Is there a browser extension?"),
-     L("بله، برای کروم و فایرفاکس. با یک کلیک قیمت زنده، گزارش روز، تحلیل آنچین، واقعیت‌سنج، دانشنامه، ماشین‌حساب، پست‌های کانال و هشدار قیمت را می‌بینید. نشانک قیمت بیت‌کوین روی آیکون است و از تنظیمات تب «هشدار» خاموش می‌شود. فایل نصب و راهنمای قدم‌به‌قدم در صفحهٔ افزونه است.",
-       "بەڵێ، بۆ کرۆم و فایەرفۆکس. بە یەک کلیک نرخی زیندوو، ڕاپۆرتی ڕۆژ، شیکاریی ئانچین، ڕاستیپێو، زانستنامە، ژمێرەر، پۆستەکانی کەناڵ و ئاگاداریی نرخ دەبینیت. فایلی دامەزراندن و ڕێنمایی لە پەڕەی پێوەکراوەکەدایە.",
-       "Yes, for Chrome and Firefox. One click shows live prices, the daily report, the on-chain analysis, the reality check, the encyclopedia, a calculator, channel posts and price alerts. The bitcoin price badge on the icon can be switched off in the Alerts tab. The install file and step-by-step guide are on the extension page."),
+     L("بله، برای کروم و فایرفاکس. با یک کلیک قیمت زنده، گزارش روز، تحلیل آنچین، واقعیت‌سنج، دانشنامه، ماشین‌حساب، پست‌های کانال و هشدار قیمت را می‌بینید. قیمت کوین دلخواه با نگه‌داشتن ماوس روی آیکون دیده می‌شود و هیچ عددی روی لوگو نمی‌نشیند. به کوردی، فارسی، عربی و انگلیسی است. فایل نصب و راهنمای قدم‌به‌قدم در صفحهٔ افزونه است.",
+       "بەڵێ، بۆ کرۆم و فایەرفۆکس. بە یەک کلیک نرخی زیندوو، ڕاپۆرتی ڕۆژ، شیکاریی ئانچین، ڕاستیپێو، زانستنامە، ژمێرەر، پۆستەکانی کەناڵ و ئاگاداریی نرخ دەبینیت. نرخ بە ڕاگرتنی ماوس لەسەر ئایکۆن دەردەکەوێت و هیچ شتێک لەسەر لۆگۆ نانیشێت. فایلی دامەزراندن و ڕێنمایی لە پەڕەی پێوەکراوەکەدایە.",
+       "Yes, for Chrome and Firefox. One click shows live prices, the daily report, the on-chain analysis, the reality check, the encyclopedia, a calculator, channel posts and price alerts. Hover over the icon to see your coin's price — nothing is ever drawn over the logo. It speaks Kurdish, Persian, Arabic and English. The install file and step-by-step guide are on the extension page."),
      "/extension/"),
     (["اپلیکیشن", "اپ اندروید", "برنامه موبایل", "دانلود اپ", "apk", "android app", "ئەپی ئەندرۆید", "نصب روی گوشی"],
      L("اپلیکیشن اندروید دارید؟", "ئەپی ئەندرۆیدتان هەیە؟", "Is there an Android app?"),

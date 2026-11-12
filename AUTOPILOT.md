@@ -53,6 +53,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   never hand-edit `data/*.json` in the repo (use a scratch copy such as `/tmp/bld` for render tests with fake data).
 
 ## Guardrails (non-negotiable)
+- **⚠️ THE EXTENSION LOGO RULE — the owner's, stated more than once ("بارهای بار تأکید کن که غفلت نشه"): the browser
+  extension's logo is NEVER covered.** No badge text, no badge colour, no repainted toolbar icon, nothing positioned
+  over the logo in the popup — not shorter, not smaller, not as an option. The price lives in the icon's tooltip.
+  `scripts/build_extension.py` (`logo_guard`) stops the site build if this breaks; `tests/test_extension_logo.py`
+  (CI: `extension-guard.yml`) renders the popup in every language and fails if anything overlaps the logo. Run that
+  test before any change to `chrome-extension/`.
 - **No invented numbers.** Every figure shown as data is computed by code from a real source. Missing data shows
   "no data yet", never a placeholder value. Claims of an edge need a proper baseline and a stated significance test.
 - **Not financial advice.** No buy/sell recommendations; keep the not-financial-advice line on finance pages.
