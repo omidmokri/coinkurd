@@ -99,6 +99,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
   strings in `assets/pro/i18n.js` (fa, ckb, ar, en; `tests/test_pro_i18n.py` checks them); calendar data
   `data/ecocal.json` from `scripts/ecocal.py` + `ecocal_tr.py`; bot side `scripts/bot_pro.py`. Tests: `tests/test_pro_ind.py`,
   `test_pro_i18n.py`, `test_ecocal.py`, `test_bot_pro.py`, `pro_e2e.js` (`ONLY=phones|ar` runs one block).
+- Market map — `/heatmap/` `/bubbles/` `/money-flow/` `/liquidity/` `/etf/` (one app, five addresses): static pages
+  from `scripts/build_mm.py` (then `chrome.py`), engine `assets/mm/{i18n,core,heat,bubbles,space3d,panel,flow,liq,etf}.js`
+  + `mm.css`, three.js only when 3D is asked for. Data: `scripts/mm_data.py` → `data/mm.json` (top 250, 9 timeframes,
+  sectors), `data/mm_flow.json` (Binance taker flow per window, depth bands, stablecoins), `data/logos/atlas-<hash>.webp`
+  + `atlas.json` (the name changes with the content: the service worker keeps pictures by path); `scripts/etf.py` →
+  `data/etf.json` (Farside ETF flows, CoinGecko treasuries). Strings `assets/mm/i18n.js` (fa, ckb, ar, en). Bot side
+  `scripts/bot_mm.py` (section `mmap`). Tests: `tests/test_mm_data.py`, `test_etf.py`, `test_mm_i18n.py`, `test_bot_mm.py`,
+  `mm_e2e.py` (`python3 tests/mm_fixture.py /tmp/mmfx` first; `ONLY=heatmap|bubbles|flow|liq|etf|arlayer|langs`).
 - Telegram bot: labels in `scripts/bot_menu.py` `S` (fa, ckb, kmr, ar, en) and `GROUPS`; reality sections in
   `scripts/bot_reality.py` `SECTIONS`; other sections in `scripts/refbot.py` `SECTIONS` via `scripts/bot_data.py`.
   The bot restarts from main about hourly, so menu changes go live on their own.
@@ -167,6 +175,35 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-12 · The market map: coin360-style heatmap, cryptobubbles-style bubbles, money flow, liquidity, ETFs (owner's request in chat, not by the loop)
+- Five addresses, one app (tabs switch in place): `/heatmap/` (squarified treemap by sector, sizes by market cap /
+  volume / move / flow / equal, zoom into a sector, search, filters, PNG; **3D "market city"**: a tower per coin on its
+  sector's platform, height = move, logo on the roof), `/bubbles/` (physics, drag and throw, ranges of 100, **3D** glass
+  spheres), `/money-flow/` (taker-flow river between sectors, leaders, flow-vs-price quadrants, stablecoin supply,
+  dominance, leverage), `/liquidity/` (Bookmap-style live order-book heatmap kept by Binance's documented
+  snapshot + diff-stream sync, depth, live liquidations, liquidity table), `/etf/` (SoSoValue-style: daily US spot BTC/ETH
+  ETF flows per fund, cumulative, streaks; company treasuries; sector movers; distribution). Nine timeframes everywhere:
+  5m 15m 1h 2h 4h 1D 1W 1M 1Y. fa · ckb · ar · en; RTL-correct charts (labels mirrored, numbers isolated).
+- Tap a coin anywhere: one panel with overview (market, supply, ATH/ATL, toman converter, peers), candles
+  (Lightweight Charts), money flow (window table, minute CVD, large trades live), order book (depth, walls), derivatives
+  (OKX funding/OI live, long/short, liquidations), and Entekhab's own data (scanner, news, coin/DNA links, price alert
+  handed to the bot exactly as `/market/` does).
+- Data (update.yml, both `continue-on-error`): `scripts/mm_data.py` (CoinGecko top 250 + categories a few per run,
+  Binance klines for 5m–1D and taker flow, depth bands, DefiLlama stablecoins; a Binance pair is used only when its
+  price is within 15 % of CoinGecko's) and `scripts/etf.py` (Farside at most hourly; a day not reported yet is not a
+  zero). Logos: every coin on the map has its own (placeholders refused), packed in one hashed WebP sheet.
+- Bot: section «🗺 نقشهٔ بازار» (`scripts/bot_mm.py`, second item of «تحلیل», also linked from «بازار»): live summary from
+  the same files + the five pages as Web App buttons. Assistant: FEATURES for the five pages.
+- `scripts/i18n_ar.py` now skips `translate="no"` (as `assets/ar.js` always did): the map has its own Arabic.
+- Fixed on the way: in Arabic the map leaves `<html lang>` alone — ar.js reads `lang="ar"` as "a real /ar/p/ page" and
+  would send a reader leaving Arabic to `/p/undefined/`.
+- Verified: unit tests for both data scripts with fixtures in the real API formats; i18n parity/digits; bot flows in 5
+  languages through refbot's real handlers; Playwright (mm_e2e.py) with Binance/OKX REST and both WebSockets mocked:
+  every view and the panel, 3D in SwiftShader, 4 languages × 1280/390 (no sideways scroll, labels inside charts and
+  nodes, text at real size), Arabic with ar.js as CI deploys it, language switches both ways.
+- Limits: the order-book heatmap builds up while the page is open (no public history of the book); ETF days come from
+  Farside's public tables; Binance flow counts Binance only.
+
 ### 2026-11-12 · /market/: the live market — faraz.io's advanced features for every visitor (owner's request in chat, not by the loop)
 - New static page `market/index.html` (chrome.py STATIC, first item of the «بازار» menu, sitemap, home CTA in the live
   market box) running `assets/pro/{i18n,ind,data,draw,app,panels,replay}.js` + `pro.css` on a vendored

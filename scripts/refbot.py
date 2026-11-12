@@ -48,6 +48,7 @@ import bot_compare as CMP  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_paper as PAPER  # noqa: E402  (paper trading + public leaderboard)
 import bot_pro as PRO  # noqa: E402  (the site's live market /market/ + its price-alert hand-off)
+import bot_mm as MMB  # noqa: E402  (the market map: /heatmap/, /bubbles/, /money-flow/, /liquidity/, /etf/)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 import bot_proxy2 as PX2  # noqa: E402
@@ -461,6 +462,7 @@ SECTIONS = {
     "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
     "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
     "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
+    "mmap": (lambda lang: MMB.section(lang, D.load), "/heatmap/"),   # the market map: heatmap, bubbles, money flow, liquidity, ETFs
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
@@ -504,7 +506,7 @@ def _render(s, uid, key, page=0):
             body = t("no_data", lang)
         return (MN.L(MN.T["intro_mkt"], lang) + "\n\n" + body,
                 {"inline_keyboard": [[btn(MN.name("irr", lang), "m:irr"), btn(MN.name("lite", lang), "m:lite")],
-                                     [btn(MN.name("pro", lang), "m:pro")],
+                                     [btn(MN.name("pro", lang), "m:pro")], [btn(MN.name("mmap", lang), "m:mmap")],
                                      [btn(t("b_refresh", lang), "m:mkt"), btn(t("b_more", lang), url=D.SITE + "/dashboard/")]]})
     if key == "irr":
         try:
@@ -625,6 +627,8 @@ def _render(s, uid, key, page=0):
         kb = kb_back(lang, refresh="m:" + key, more=D.SITE + path)
         if key == "pro":                                # inside Telegram (Web App) or in the browser, in place of «more»
             kb["inline_keyboard"][0:1] = PRO.open_rows(lang)
+        if key == "mmap":                               # the five pages inside Telegram, the heatmap in the browser
+            kb["inline_keyboard"][0:1] = MMB.open_rows(lang)
         if key == "chain":                              # the live mempool map on /satoshi/ (a site page; nothing is sent)
             kb["inline_keyboard"].insert(0, [btn(t("b_mempool", lang), url=D.SITE + "/satoshi/#mempool")])
         if key in ("ind", "live"):                      # readable live-analysis card <-> indicator list
