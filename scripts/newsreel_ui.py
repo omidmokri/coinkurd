@@ -102,9 +102,13 @@ def _mono(src):
 def block(data, e, fmt_date, onchain=False):
     """دو ستون خبری در حاشیهٔ راست و چپ صفحه؛ data = محتوای data/newsreel.json
     onchain=True یعنی فقط خبرهای آنچینی (برای صفحهٔ /onchain/)"""
-    items = [x for x in (data.get("items") or []) if (x.get("t") or {}).get("en")]
     if onchain:
-        items = [x for x in items if x.get("oc")]
+        items = [x for x in (data.get("oc") or []) if (x.get("t") or {}).get("en")]
+        if not items:                      # فایل دادهٔ قدیمی: از همان فهرست اصلی جدا کن
+            items = [x for x in (data.get("items") or [])
+                     if (x.get("t") or {}).get("en") and x.get("oc")]
+    else:
+        items = [x for x in (data.get("items") or []) if (x.get("t") or {}).get("en")]
     if len(items) < 4:
         return ""
     items = items[:SIDE * 2]

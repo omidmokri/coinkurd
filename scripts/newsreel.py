@@ -240,6 +240,7 @@ def translate(items):
         mem[x["id"]] = have
         if not all(have.get(g) for g in ("fa", "ckb", "ar")):
             todo.append(x)
+    todo.sort(key=lambda x: 0 if x.get("oc") else 1)   # آنچین اول، چون ستون جدا دارد
     todo = todo[:TR_MAX]
     if todo:
         eng = "gemini" if ai.available() else "google"
@@ -281,30 +282,36 @@ def translate(items):
 
 def main():
     cp = from_cryptopanic()
-    rows = merge(cp, from_house(400))          # کل خوراک، تازه‌ترین اول
-    items = spread([x for x in rows[:140]])[:KEEP]
-    have = {x["id"] for x in items}
-    for x in [y for y in rows if is_oc(y)]:    # ستون‌های /onchain/ خوراک آنچینی جدا می‌خواهند
-        if sum(1 for y in items if is_oc(y)) >= OC_KEEP:
-            break
-        if x["id"] not in have:
-            items.append(x)
-            have.add(x["id"])
-    for x in items:
+    rows = merge(cp, from_house(400))              # کل خوراک، تازه‌ترین اول
+    general = spread(rows[:140])[:KEEP]            # ستون‌های صفحهٔ اخبار
+    seen = {x["id"] for x in general}
+    ocpool = [x for x in rows if is_oc(x)][:OC_KEEP]   # ستون‌های صفحهٔ آنچین
+    allit = general + [x for x in ocpool if x["id"] not in seen]
+    if not allit:
+        print("no items — keeping the previous reel")
+        return 0
+    for x in allit:
         x["oc"] = 1 if is_oc(x) else 0
-    items = translate(items)
-    full = [x for x in items if all(x["t"].get(g) for g in ("fa", "ckb", "ar", "en"))]
-    if len(full) >= 12:                      # خبری که هنوز ترجمه نشده نمایش داده نمی‌شود
-        items = full
+    allit = translate(allit)
+
+    def ok(x):
+        return all(x["t"].get(g) for g in ("fa", "ckb", "ar", "en"))
+
+    gen = [x for x in general if ok(x)]
+    if len(gen) < 12:                              # ترجمه هنوز نرسیده: هرچه هست نشان بده
+        gen = general
+    oc = [x for x in ocpool if ok(x)]
+    if len(oc) < 4:
+        oc = ocpool
     out = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "sources": (["CryptoPanic"] if cp else []) + ["entekhab.net"],
-        "items": items,
+        "items": gen,
+        "oc": oc,
     }
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=1)
-    done = sum(1 for x in items if all(x["t"].get(g) for g in ("fa", "ckb", "ar", "en")))
-    print(f"newsreel.json: {len(items)} items ({done} fully translated), {os.path.getsize(OUT)} bytes")
+    print(f"newsreel.json: {len(gen)} items + {len(oc)} on-chain, {os.path.getsize(OUT)} bytes")
     return 0
 
 
