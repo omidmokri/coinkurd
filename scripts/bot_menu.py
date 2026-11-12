@@ -206,11 +206,11 @@ S = {
                 "en": "Latest news, hot narratives, events and analytical reports."}),
     "g_more": ("⚙️", {"fa": "تنظیمات و بیشتر", "ckb": "ڕێکخستن و زیاتر", "kmr": "Mîheng û bêtir", "ar": "الإعدادات والمزيد",
                      "en": "Settings & more"},
-               {"fa": "زبان، آموزش و امنیت، پروکسی، شرایط قطعی اینترنت و امکانات تکمیلی.",
-                "ckb": "زمان، فێربوون و ئاسایش، پرۆکسی، پچڕانی ئینتەرنێت و زیاتر.",
-                "kmr": "Ziman, perwerde û ewlehî, proxy, qutbûna înternetê û bêtir.",
-                "ar": "اللغة والتعلم والأمان والبروكسي وانقطاع الإنترنت وميزات إضافية.",
-                "en": "Language, learning & safety, proxies, internet outages and extras."}),
+               {"fa": "زبان، اپلیکیشن‌ها، آموزش و امنیت، پروکسی، شرایط قطعی اینترنت و امکانات تکمیلی.",
+                "ckb": "زمان، ئەپەکان، فێربوون و ئاسایش، پرۆکسی، پچڕانی ئینتەرنێت و زیاتر.",
+                "kmr": "Ziman, sepan, perwerde û ewlehî, proxy, qutbûna înternetê û bêtir.",
+                "ar": "اللغة والتطبيقات والتعلم والأمان والبروكسي وانقطاع الإنترنت وميزات إضافية.",
+                "en": "Language, apps, learning & safety, proxies, internet outages and extras."}),
     # ---------------------------------------------------------------- analysis & tools
     "coin": ("🪙", {"fa": "تحلیل کوین", "ckb": "شیکاری دراو", "kmr": "Analîza coinê", "ar": "تحليل عملة", "en": "Coin analysis"},
              {"fa": "تحلیل تکنیکال و بنیادی هر ارز دیجیتال.", "ckb": "شیکاری تەکنیکی و بنەڕەتی هەر دراوێک.",
@@ -316,6 +316,10 @@ S = {
              {"fa": "کوردی سورانی، کرمانجی، فارسی، عربی یا انگلیسی.", "ckb": "کوردی سۆرانی، کورمانجی، فارسی، عەرەبی یان ئینگلیزی.",
               "kmr": "Soranî, Kurmancî, Farisî, Erebî an Îngilîzî.", "ar": "الكردية السورانية أو الكرمانجية أو الفارسية أو العربية أو الإنجليزية.",
               "en": "Sorani Kurdish, Kurmanji, Persian, Arabic or English."}),
+    "apps": ("📲", {"fa": "اپلیکیشن‌ها", "ckb": "ئەپەکان", "kmr": "Sepan", "ar": "التطبيقات", "en": "Apps"},
+             {"fa": "اندروید، آیفون، ویندوز و افزونهٔ مرورگر — رایگان.", "ckb": "ئەندرۆید، ئایفۆن، ویندۆز و پێوەکراوی وێبگەڕ — بێبەرامبەر.",
+              "kmr": "Android, iPhone, Windows û pêveka gerokê — belaş.", "ar": "أندرويد وآيفون وويندوز وإضافة المتصفح — مجانًا.",
+              "en": "Android, iPhone, Windows and the browser extension — free."}),
     "learn": ("📚", {"fa": "آموزش و امنیت", "ckb": "فێربوون و ئاسایش", "kmr": "Perwerde û ewlehî", "ar": "التعلم والأمان",
                     "en": "Learning & safety"},
               {"fa": "آکادمی کریپتو و مسیر یادگیری سایت، شروع امن، قوانین منطقه و گزارش کلاهبرداری.",
@@ -365,7 +369,7 @@ GROUPS = {
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
-    "g_more": ["lang", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
+    "g_more": ["lang", "apps", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
 for g, items in GROUPS.items():

@@ -1824,6 +1824,13 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         print("extension page failed:", ex)
+    try:  # /app/ — every platform on one page (after the extension, whose package sizes it shows)
+        import build_apps
+        extra += build_apps.build()
+    except Exception as ex:  # noqa: BLE001
+        import traceback
+        traceback.print_exc()
+        print("apps page failed:", ex)
     try:
         import build_psych
         build_psych.build()

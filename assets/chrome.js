@@ -30,7 +30,8 @@
   };
   /* clickjacking protection: GitHub Pages cannot send X-Frame-Options / frame-ancestors */
   if (window.top !== window.self) { try { window.top.location.href = location.href; } catch (e) { d.body && (d.body.style.display = 'none'); } }
-  var UA = navigator.userAgent || '', APP = /EntekhabApp/i.test(UA);
+  /* inside one of the apps (Android, Windows, or the iPhone/desktop web app): no "get the app" prompts */
+  var UA = navigator.userAgent || '', APP = /EntekhabApp|EntekhabWin/i.test(UA) || navigator.standalone === true || !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
   if (APP) de.classList.add('ek-app');
   var X = function (n) { var m = { close: '<path d="M6 6l12 12M18 6 6 18"/>', search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/>', swords: '<path d="M3 3h4l10 10"/><path d="m14.5 15.5 2.5 2.5"/><path d="M21 3h-4L7 13"/><path d="m9.5 15.5-2.5 2.5"/><path d="m5 15 4 4"/><path d="m19 15-4 4"/><path d="m3.5 20.5 2-2"/><path d="m20.5 20.5-2-2"/>', down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>' }; return '<svg class="ek-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + m[n] + '</svg>'; };
   var tri = function (fa, ckb, en, tag, cls) { tag = tag || 'span'; return '<' + tag + ' class="ek-i' + (cls ? ' ' + cls : '') + '" data-fa="' + fa + '" data-ckb="' + ckb + '" data-en="' + en + '">' + fa + '</' + tag + '>'; };
@@ -279,6 +280,47 @@
         '</a><button type="button" aria-label="close">' + X('close') + '</button>';
       d.body.appendChild(a); label(chromeLang || cur());
       a.querySelector('button').addEventListener('click', function () { ls.set('ek_app_dismiss', String(Date.now())); a.remove(); });
+    }, 2600);
+  }
+
+  /* ---------- iPhone / iPad: the home-screen app ----------
+     Apple allows no app files from outside its store (and its store removes apps for Iranian users), so on iOS
+     Entekhab installs from Safari as a web app: full screen, its own icon, no browser bar. Only iOS gets these
+     tags and the splash picture — drawn here at the device's exact size, so no other visitor downloads a byte. */
+  var IOS = /iP(hone|od|ad)/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+  var STANDALONE = navigator.standalone === true || !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  if (IOS) {
+    var meta = function (n, c) { if (d.querySelector('meta[name="' + n + '"]')) return; var m = d.createElement('meta'); m.name = n; m.content = c; d.head.appendChild(m); };
+    meta('apple-mobile-web-app-capable', 'yes'); meta('mobile-web-app-capable', 'yes');
+    meta('apple-mobile-web-app-status-bar-style', 'black'); meta('apple-mobile-web-app-title', 'انتخاب');
+    if (!STANDALONE) {
+      var sp = new Image();
+      sp.onload = function () {
+        try {
+          var r = window.devicePixelRatio || 1, w = Math.round(screen.width * r), h = Math.round(screen.height * r);
+          var cv = d.createElement('canvas'); cv.width = w; cv.height = h; var g = cv.getContext('2d');
+          g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, w, h);
+          var gl = g.createRadialGradient(w / 2, h / 2 - w * 0.05, 0, w / 2, h / 2 - w * 0.05, w * 0.45);
+          gl.addColorStop(0, 'rgba(247,147,26,.22)'); gl.addColorStop(1, 'rgba(247,147,26,0)'); g.fillStyle = gl; g.fillRect(0, 0, w, h);
+          var s = Math.round(Math.min(w, h) * 0.34); g.drawImage(sp, (w - s) / 2, (h - s) / 2 - s * 0.15, s, s);
+          g.fillStyle = '#a8a49c'; g.font = Math.round(s * 0.11) + 'px -apple-system, Helvetica, sans-serif'; g.textAlign = 'center';
+          g.fillText('entekhab.net', w / 2, (h + s) / 2 + s * 0.12);
+          var l = d.createElement('link'); l.rel = 'apple-touch-startup-image'; l.href = cv.toDataURL('image/png'); d.head.appendChild(l);
+        } catch (e) { }
+      };
+      sp.src = '/assets/icon-512.png';
+    }
+  }
+  if (IOS && !STANDALONE && path.indexOf('/app/') !== 0 && !/[?&]noapp/.test(location.search)) {
+    var t2 = +ls.get('ek_ios_dismiss') || 0;
+    if (Date.now() - t2 > 14 * 864e5) setTimeout(function () {
+      var a = d.createElement('div'); a.id = 'eka'; a.setAttribute('role', 'dialog'); a.setAttribute('aria-label', 'Entekhab for iPhone');
+      a.innerHTML = '<img src="/assets/apple-touch-icon.png" alt="" width="42" height="42"><p>' + tri('انتخاب روی آیفون', 'ئینتیخاب لەسەر ئایفۆن', 'Entekhab on your iPhone', 'b') +
+        tri('تمام‌صفحه و با آیکون خودش، با سه لمس', 'پڕشاشە و بە ئایکۆنی خۆی، بە سێ دەستلێدان', 'Full screen with its own icon, in three taps') + '</p><a href="/app/#iphone">' + tri('نصب', 'دامەزراندن', 'Install') +
+        '</a><button type="button" aria-label="close">' + X('close') + '</button>';
+      d.body.appendChild(a); label(chromeLang || cur());
+      a.querySelector('button').addEventListener('click', function () { ls.set('ek_ios_dismiss', String(Date.now())); a.remove(); });
+      a.querySelector('a').addEventListener('click', function () { ls.set('ek_ios_dismiss', String(Date.now())); });
     }, 2600);
   }
 

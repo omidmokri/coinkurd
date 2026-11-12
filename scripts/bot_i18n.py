@@ -137,6 +137,48 @@ T = {
         "ar": "⚔️ <b>معركتي</b>\n\n• أوامر الشراء هي جيش الثيران الأخضر وأوامر البيع هي جيش الدببة الأحمر؛ والسعر اللحظي هو خط الجبهة.\n• كل صفقة طلقة حقيقية: الصفقة الصغيرة رصاصة بندقية، والأكبر صاروخ مضاد للدروع وقذيفة دبابة، والكبيرة جدًا نيران مدفعية، ومن 500 ألف دولار فأكثر مدفع الفرقاطة والمدمّرة.\n• روبوتات بشرية الشكل وكلاب آلية: عندما يكتسح أمرٌ واحد عدة مستويات من دفتر الأوامر دفعةً واحدة، يخرج فريق الرد السريع لذلك الجانب من القاعدة ويطلق النار.\n• التصفيات تتحول إلى هجمات: من المسيّرات والمدفعية والمروحيات التي تقلع من سطح حاملة الطائرات إلى المقاتلات التي يطلقها منجنيق الحاملة، وصواريخ كروز من المدمّرة وصواريخ الغواصة.\n• القمر الصناعي يقدّم كل بضع دقائق تقريرًا عن الجيشين: أكبر موقع شراء وبيع، وتدفق الصفقات والتصفيات.\n• ست كاميرات: حرّة، متابعة الخط، سينمائية، تكتيكية، الأسطول والقمر الصناعي.\n\nبيانات حية من Binance وOKX وBybit، بلا تسجيل. هذه صورة لبنية السوق الحالية، وليست توقعًا للسعر.",
         "en": "⚔️ <b>My Battle</b>\n\n• Buy orders are the bulls' green army and sell orders the bears' red army; the live price is the front line.\n• Every trade is a real shot: a small trade is rifle fire, a larger one an anti-tank missile or a tank round, a very large one artillery, and from $500k up the frigate's and the destroyer's guns.\n• Humanoid robots and robot dogs: when one order sweeps several levels of the book at once, that side's quick-reaction team comes out of its base and opens fire.\n• Liquidations become strikes: from drones, artillery and helicopters that lift off the carrier's deck to jets shot off its catapults, a destroyer's cruise missiles and submarine-launched missiles.\n• A satellite reports on both armies every few minutes: the largest buy and sell positions, trade flow and liquidations.\n• Six cameras: free, follow the line, cinematic, tactical, fleet and satellite.\n\nLive data from Binance, OKX and Bybit, no sign-up. It is a picture of current market structure, not a price prediction.",
     },
+    "apps_text": {
+        "fa": ("📲 <b>اپلیکیشن‌های انتخاب</b>\nانتخاب روی هر صفحه‌ای — رایگان، بدون تبلیغ و بدون ردیابی:\n\n"
+               "🤖 <b>اندروید</b> — اپ سبک و امن، دانلود مستقیم (بدون گوگل‌پلی)\n"
+               "📱 <b>آیفون و آیپد</b> — از سافاری نصب می‌شود؛ تمام‌صفحه و همیشه به‌روز\n"
+               "💻 <b>ویندوز ۶۴ بیتی</b> — برنامهٔ دسکتاپ با قیمت زندهٔ بیت‌کوین روی آیکون سینی\n"
+               "🧩 <b>افزونهٔ مرورگر</b> — کروم، اج، بریو، اپرا و فایرفاکس\n"
+               "✈️ <b>همین ربات</b> — قیمت، هشدار و گزارش روزانه داخل تلگرام\n\n"
+               "نصب هر کدام را از دکمه‌های زیر شروع کنید."),
+        "ckb": ("📲 <b>ئەپەکانی ئینتیخاب</b>\nئینتیخاب لەسەر هەر شاشەیەک — بێبەرامبەر، بێ ڕیکلام و بێ شوێنکەوتن:\n\n"
+                "🤖 <b>ئەندرۆید</b> — ئەپێکی سووک و سەلامەت، داگرتنی ڕاستەوخۆ (بێ گووگڵ پلەی)\n"
+                "📱 <b>ئایفۆن و ئایپاد</b> — لە سافارییەوە دادەمەزرێت؛ پڕشاشە و هەمیشە نوێ\n"
+                "💻 <b>ویندۆزی ٦٤ بیت</b> — بەرنامەی دێسکتۆپ بە نرخی زیندووی بیتکۆین لەسەر ئایکۆنی سینی\n"
+                "🧩 <b>پێوەکراوی وێبگەڕ</b> — کرۆم، ئێج، بڕەیڤ، ئۆپێرا و فایەرفۆکس\n"
+                "✈️ <b>هەر ئەم بۆتە</b> — نرخ، ئاگاداری و ڕاپۆرتی ڕۆژانە لە ناو تێلێگرامدا\n\n"
+                "دامەزراندنی هەر یەکێک لە دوگمەکانی خوارەوە دەست پێبکە."),
+        "kmr": ("📲 <b>Sepanên Entekhab</b>\nEntekhab li ser her ekranê — belaş, bê reklam û bê şopandin:\n\n"
+                "🤖 <b>Android</b> — sepaneke sivik û ewle, daxistina rasterast (bê Google Play)\n"
+                "📱 <b>iPhone û iPad</b> — ji Safariyê tê sazkirin; ekrana tijî û her dem nû\n"
+                "💻 <b>Windows 64-bit</b> — bernameya sermaseyê bi bihayê zindî yê bitcoinê li ser îkona tepsiyê\n"
+                "🧩 <b>Pêveka gerokê</b> — Chrome, Edge, Brave, Opera û Firefox\n"
+                "✈️ <b>Ev bot</b> — biha, hişyarî û rapora rojane di nav Telegramê de\n\n"
+                "Sazkirina her yekê ji bişkokên jêrîn dest pê bike."),
+        "ar": ("📲 <b>تطبيقات انتخاب</b>\nانتخاب على كل شاشة — مجانًا، بلا إعلانات وبلا تتبّع:\n\n"
+               "🤖 <b>أندرويد</b> — تطبيق خفيف وآمن، تنزيل مباشر (دون Google Play)\n"
+               "📱 <b>آيفون وآيباد</b> — يُثبَّت من Safari؛ بملء الشاشة ومحدَّث دائمًا\n"
+               "💻 <b>ويندوز 64 بت</b> — برنامج سطح مكتب مع سعر البيتكوين المباشر على أيقونة شريط المهام\n"
+               "🧩 <b>إضافة المتصفح</b> — كروم وإيدج وبريف وأوبرا وفايرفوكس\n"
+               "✈️ <b>هذا البوت</b> — الأسعار والتنبيهات والتقرير اليومي داخل تيليجرام\n\n"
+               "ابدأ تثبيت أيٍّ منها من الأزرار أدناه."),
+        "en": ("📲 <b>The Entekhab apps</b>\nEntekhab on every screen — free, no ads, no tracking:\n\n"
+               "🤖 <b>Android</b> — a light, locked-down app, direct download (no Google Play)\n"
+               "📱 <b>iPhone & iPad</b> — installs from Safari; full screen and always up to date\n"
+               "💻 <b>Windows 64-bit</b> — a desktop app with the live bitcoin price on its tray icon\n"
+               "🧩 <b>Browser extension</b> — Chrome, Edge, Brave, Opera and Firefox\n"
+               "✈️ <b>This bot</b> — prices, alerts and the daily report inside Telegram\n\n"
+               "Start any install from the buttons below."),
+    },
+    "b_app_android": {"fa": "🤖 اندروید", "ckb": "🤖 ئەندرۆید", "kmr": "🤖 Android", "ar": "🤖 أندرويد", "en": "🤖 Android"},
+    "b_app_iphone": {"fa": "📱 آیفون و آیپد", "ckb": "📱 ئایفۆن و ئایپاد", "kmr": "📱 iPhone û iPad", "ar": "📱 آيفون وآيباد", "en": "📱 iPhone & iPad"},
+    "b_app_windows": {"fa": "💻 ویندوز", "ckb": "💻 ویندۆز", "kmr": "💻 Windows", "ar": "💻 ويندوز", "en": "💻 Windows"},
+    "b_app_ext": {"fa": "🧩 افزونهٔ مرورگر", "ckb": "🧩 پێوەکراوی وێبگەڕ", "kmr": "🧩 Pêveka gerokê", "ar": "🧩 إضافة المتصفح", "en": "🧩 Browser extension"},
+    "b_app_all": {"fa": "📲 همهٔ اپلیکیشن‌ها", "ckb": "📲 هەموو ئەپەکان", "kmr": "📲 Hemû sepan", "ar": "📲 كل التطبيقات", "en": "📲 All apps"},
     "b_back": {"fa": "⬅️ منو", "ckb": "⬅️ لیست", "en": "⬅️ Menu"},
     "b_more": {"fa": "بیشتر در سایت ↗", "ckb": "زیاتر لە ماڵپەڕ ↗", "en": "More on site ↗"},
     "b_mempool": {"fa": "🔴 مم‌پول زنده: هر تراکنش روی نقشه ↗", "ckb": "🔴 مێمپووڵی زیندوو: هەموو مامەڵەکان لەسەر نەخشە ↗", "kmr": "🔴 Mempoola zindî: her danûstandin li ser nexşeyê ↗", "ar": "🔴 الميمبول مباشرة: كل معاملة على الخريطة ↗", "en": "🔴 Live mempool: every transaction on a map ↗"},

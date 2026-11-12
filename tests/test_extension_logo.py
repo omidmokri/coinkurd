@@ -50,11 +50,17 @@ def browser():
 @pytest.mark.parametrize("lang", H.LANGS)
 @pytest.mark.parametrize("scheme", ["dark", "light"])
 @pytest.mark.parametrize("latest", [None, "9.9.9"])
-def test_popup_logo_is_never_covered(browser, lang, scheme, latest):
+@pytest.mark.parametrize("wide", [False, True])
+def test_popup_logo_is_never_covered(browser, lang, scheme, latest, wide):
+    """`wide`: wider type than any font the popup asks for (computers differ) — the header may wrap, never cover"""
     b, base = browser
     ctx = b.new_context(viewport={"width": 380, "height": 600})
     try:
         pg = H.open_popup(ctx, base, lang, latest=latest, scheme=scheme)
+        if wide:
+            pg.add_style_tag(content="body *{letter-spacing:.05em!important;word-spacing:.1em!important}")
+            pg.evaluate("fitHeight()")
+            pg.wait_for_timeout(100)
         errors = []
         pg.on("pageerror", lambda e: errors.append(str(e)))
         for tab in ("market", "report", "alerts", "calc", "posts"):   # the header is the same for every tab; the panes are not
@@ -64,8 +70,9 @@ def test_popup_logo_is_never_covered(browser, lang, scheme, latest):
             assert "error" not in r, r
             assert r["problems"] == [], f"[{lang}/{scheme}/{tab}] THE LOGO RULE: {r['problems']}"
             assert r["height"] <= 600, f"[{lang}/{tab}] the popup is {r['height']}px tall; Chrome stops at 600"
-            cut = pg.evaluate("[...document.querySelectorAll('footer a,.lang button,.tabs button')].filter(a => a.scrollWidth > a.clientWidth + 1).map(a => a.textContent)")
-            assert not cut, f"[{lang}] labels cut short: {cut}"
+            if not wide:
+                cut = pg.evaluate("[...document.querySelectorAll('footer a,.lang button,.tabs button')].filter(a => a.scrollWidth > a.clientWidth + 1).map(a => a.textContent)")
+                assert not cut, f"[{lang}] labels cut short: {cut}"
         if latest:
             assert pg.evaluate("!document.getElementById('nv').hidden"), "the new-version line did not show"
         assert not errors, errors

@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "17"  # bump to bust caches of chrome.css / chrome.js
+VER = "18"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -258,8 +258,8 @@ NAV = [
          L("فرمول امتیاز، اسکنر و محدودیت‌ها", "فۆرموولی خاڵ، سکانەر و سنوورەکان", "Score formula, scanner, limits")),
         ("/status/", "activity", L("شفافیت و وضعیت", "ڕوونی و دۆخ", "Transparency & status"),
          L("سلامت منابع داده و کارنامهٔ سیگنال‌ها", "تەندروستیی سەرچاوەکانی داتا و تۆماری سیگناڵەکان", "Data health and signal track record")),
-        ("/app/", "phone", L("اپلیکیشن اندروید", "ئەپی ئەندرۆید", "Android app"),
-         L("دانلود مستقیم و نصب امن", "داگرتنی ڕاستەوخۆ و دامەزراندنی سەلامەت", "Direct, verified download")),
+        ("/app/", "phone", L("اپلیکیشن‌ها", "ئەپەکان", "Apps"),
+         L("اندروید، آیفون، ویندوز، افزونهٔ مرورگر و ربات", "ئەندرۆید، ئایفۆن، ویندۆز، پێوەکراو و بۆت", "Android, iPhone, Windows, browser extension and bot")),
         ("/privacy/", "lock", L("حریم خصوصی", "پاراستنی تایبەتمەندی", "Privacy"),
          L("چه داده‌ای نگه می‌داریم (تقریباً هیچ)", "چ داتایەک هەڵدەگرین (نزیکەی هیچ)", "What we keep (almost nothing)")),
         ("/terms/", "file", L("شرایط استفاده", "مەرجەکانی بەکارهێنان", "Terms of use"),
@@ -283,7 +283,7 @@ SOCIAL = [  # (key, url, icon file, label)  — links taken from the footer of e
 T = {
     "search": L("جستجو", "گەڕان", "Search"),
     "read": L("خواندن با صدا", "خوێندنەوە بە دەنگ", "Read aloud"),
-    "app": L("دانلود اپ", "داگرتنی ئەپ", "Get the app"),
+    "app": L("دانلود اپ", "داگرتنی ئەپ", "Get the apps"),
     "me": L("فضای من", "بۆشاییی من", "My space"),
     "tg": L("تلگرام", "تێلێگرام", "Telegram"),
     "home": L("خانه", "ماڵەوە", "Home"),
@@ -352,7 +352,7 @@ def header(lang="fa"):
              f'<button type="button" data-l="fa" lang="fa">فارسی</button>'
              f'<button type="button" data-l="ar" lang="ar"{"" if AR_ON else " hidden"}>العربية</button>'
              f'<button type="button" data-l="en" lang="en">English</button></div>'
-             f'<a class="ek-appb" href="/app/" aria-label="{e(T["app"][lang])}"><i class="ek-si b-android"></i>{tri(T["app"], lang)}</a>'
+             f'<a class="ek-appb" href="/app/" aria-label="{e(T["app"][lang])}">{icon("phone")}{tri(T["app"], lang)}</a>'
              f'<a class="ek-ib ek-meb" href="/me/"{aria(T["me"], lang)}>{icon("user")}</a>')
     return (f'<!--ek:header--><a class="ek-skip" href="#ek-main">{e(T["skip"][lang])}</a>'
             f'<div class="ekh" id="ekh" role="banner" data-lang="{lang}"><div class="ek-w">'
@@ -519,7 +519,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "app", "trade-bot"]
+          "privacy", "terms", "trade-bot"]          # /app/ is built by scripts/build_apps.py
 
 
 def inject_static():
