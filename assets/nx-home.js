@@ -38,7 +38,7 @@
   var cols = { a: '', b: '' }, rail = '', doors = {}, order = [];
   DEF.forEach(function (D) {
     var sec = d.getElementById(D.id); if (!sec) return;
-    var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), link = D.id === 'library' && sec.querySelector('a[href]');
+    var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), link = D.id === 'library' ? sec.querySelector('a[href]') : D.id === 'learnmap' ? sec.querySelector('a[href="/map/"]') : null;   /* these two go straight to their page */
     var title = D.own ? tri(D.own[0][0], D.own[0][1], D.own[0][2], 'b', 'ekd-t') : t ? '<b class="ekd-t" data-i="' + esc(t.getAttribute('data-i')) + '">' + t.innerHTML + '</b>' : tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t');
     var lead = l ? '<span class="nx-l" data-i="' + esc(l.getAttribute('data-i')) + '">' + l.innerHTML + '</span>' : '';
     var body = '';

@@ -456,15 +456,11 @@ def academy(lang):
 MP = {
     "title": {"fa": "🗺 <b>نقشهٔ یادگیری</b>", "ckb": "🗺 <b>نەخشەی فێربوون</b>", "kmr": "🗺 <b>Nexşeya fêrbûnê</b>",
               "ar": "🗺 <b>خريطة التعلم</b>", "en": "🗺 <b>The learning map</b>"},
-    "desc": {"fa": "هر چیزی که این سایت یاد می‌دهد، روی یک نقشه. داخل هر موضوع فهرستی از درس‌ها، اصطلاح‌ها، "
-                   "ابزارها و منابعی است که همان درس‌ها به آن‌ها ارجاع می‌دهند — و می‌توانید تیک بزنید.",
-             "ckb": "هەر شتێک ئەم ماڵپەڕە فێری دەکات، لەسەر یەک نەخشە. لە ناو هەر بابەتێکدا لیستێکە لە وانە، زاراوە، "
-                    "ئامراز و ئەو سەرچاوانەی هەمان وانەکان ئاماژەیان پێ دەکەن — و دەتوانیت نیشانەیان بکەیت.",
-             "kmr": "Her tiştê ev malper hîn dike, li ser nexşeyekê. Di nav her mijarê de lîsteyek ji ders, "
-                    "peyv, amûr û çavkaniyan heye.",
-             "ar": "كل ما يعلّمه هذا الموقع على خريطة واحدة. داخل كل موضوع قائمة من الدروس والمصطلحات والأدوات والمصادر.",
-             "en": "Everything this site teaches, on one map. Inside each topic is a checklist of lessons, terms, "
-                   "tools and the sources those lessons cite."},
+    "desc": {"fa": "روی هر موضوع بزنید تا درس‌ها، اصطلاح‌ها و ابزارهایش باز شود.",
+             "ckb": "کلیک لە هەر بابەتێک بکە تا وانە، زاراوە و ئامرازەکانی بکرێنەوە.",
+             "kmr": "Li ser mijarekê bitikîne da ku ders, peyv û amûrên wê vebin.",
+             "ar": "اضغط على أي موضوع لتفتح دروسه ومصطلحاته وأدواته.",
+             "en": "Tap a topic to open its lessons, terms and tools."},
     "stat": {"fa": "🧭 {t} موضوع — هر کدام با فهرست قابل تیک‌زدن خودش", "ckb": "🧭 {t} بابەت — هەریەکە بە لیستی نیشانەکردنی خۆی",
              "kmr": "🧭 {t} mijar — her yek bi lîsteya xwe", "ar": "🧭 {t} موضوعاً — لكلٍّ قائمته القابلة للتعليم",
              "en": "🧭 {t} topics — each with its own checklist"},

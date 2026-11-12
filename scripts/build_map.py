@@ -324,7 +324,6 @@ def hub_page(F, per):
             f'autocomplete="off" aria-label="{e(t3("h1")[0])}"></div>'
             f'<div class="mp-res" id="mpRes" hidden></div>'
             f'<div class="mp-bar">'
-            f'<span class="mp-hint">{tri(*[e(x) for x in t3("zoom")])}</span>'
             f'<span class="mp-hint">' + tri(f'{ntop[0]} {e(t3("topics")[0])}', f'{ntop[1]} {e(t3("topics")[1])}',
                                               f'{ntop[2]} {e(t3("topics")[2])}') + "</span>"
             f'<span class="mp-hint">' + tri(f'{total[0]} {e(t3("res")[0])}', f'{total[1]} {e(t3("res")[1])}',

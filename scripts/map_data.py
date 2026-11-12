@@ -14,15 +14,10 @@ A missing key falls back to Persian, so the map never shows an empty row.
 UI = {
     "t":      ("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
     "h1":     ("می‌خواهم یاد بگیرم…", "دەمەوێت فێربم…", "I want to learn…"),
-    "lead":   ("هر گره یک موضوع است. روی آن کلیک کنید تا فهرست کارهای آن موضوع باز شود:"
-               " درس‌های سایت، اصطلاح‌ها، ابزارها و منابعی که همان درس‌ها به آن‌ها ارجاع می‌دهند."
-               " هر چیزی را که خواندید تیک بزنید؛ پیشرفت فقط در مرورگر خودتان می‌ماند.",
-               "هەر گرێیەک بابەتێکە. کلیکی لێ بکە تا لیستی کارەکانی ئەو بابەتە بکرێتەوە:"
-               " وانەکانی ماڵپەر، زاراوەکان، ئامرازەکان و ئەو سەرچاوانەی هەمان وانەکان ئاماژەیان پێ دەکەن."
-               " هەر شتێک خوێندتەوە نیشانەی بکە؛ پێشکەوتن تەنها لە وێبگەڕی خۆتدا دەمێنێتەوە.",
-               "Every node is a topic. Open one for its checklist: the site's own lessons, the terms,"
-               " the tools, and the sources those lessons cite. Tick off whatever you have read —"
-               " progress stays in your own browser."),
+    # the owner's choice (2026-11-12): one short line, no instructions
+    "lead":   ("روی هر موضوع بزنید تا درس‌ها، اصطلاح‌ها و ابزارهایش باز شود.",
+               "کلیک لە هەر بابەتێک بکە تا وانە، زاراوە و ئامرازەکانی بکرێنەوە.",
+               "Tap a topic to open its lessons, terms and tools."),
     "search": ("🔎 موضوع، درس یا اصطلاح…", "🔎 بابەت، وانە یان زاراوە…", "🔎 A topic, a lesson, a term…"),
     "nores":  ("چیزی پیدا نشد.", "هیچ شتێک نەدۆزرایەوە.", "Nothing found."),
     "topics": ("موضوع", "بابەت", "topics"),
