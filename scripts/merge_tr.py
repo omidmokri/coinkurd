@@ -31,6 +31,8 @@ for p in posts:
                    "ckb": {"title": t["ckb"]["title"].strip(), "text": clean(t["ckb"]["text"])},
                    "en": {"title": t["en"]["title"].strip(), "text": clean(t["en"]["text"])}}
         n += 1
+    if t and isinstance(p.get("tr"), dict) and isinstance(t.get("ar"), dict) and not p["tr"].get("ar"):
+        p["tr"]["ar"] = t["ar"]                     # Arabic (recent posts): kept when the post is fetched again
 def good_title(tt, text):
     if not is_label(tt or "") and len(re.findall(r"[\w\u0600-\u06FF]", re.sub(r"\d", "", tt or ""))) >= 3:
         return tt.strip()

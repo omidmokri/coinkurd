@@ -19,6 +19,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function lang() {
     var b = d.querySelector('#langs button.on'), l = b ? b.getAttribute('data-l') : (de.getAttribute('lang') || 'fa').toLowerCase();
+    if (l === 'ar') l = 'en';
     return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa';
   }
   function pick(fa, ckb, en) { return { fa: fa, ckb: ckb, en: en }[lang()]; }

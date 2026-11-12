@@ -8,7 +8,7 @@
   var RM = !!(w.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var FINE = !!(w.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches);
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function lang() { var b = d.querySelector('#langs button.on'), l = (b && b.getAttribute('data-l')) || de.lang || 'fa'; return l === 'ckb' || l === 'en' ? l : 'fa'; }
+  function lang() { var b = d.querySelector('#langs button.on'), l = (b && b.getAttribute('data-l')) || de.lang || 'fa'; if (l === 'ar') l = 'en'; return l === 'ckb' || l === 'en' ? l : 'fa'; }
   function pick(fa, ckb, en) { return { fa: fa, ckb: ckb, en: en }[lang()]; }
   function tri(fa, ckb, en, tag, cls) {
     tag = tag || 'span';

@@ -464,6 +464,21 @@ jobs:
       - name: Fetch the read-aloud voices (Persian, Sorani) into tts/
         continue-on-error: true
         run: python scripts/fetch_tts.py
+      # Arabic: the English of every page, translated once into data/i18n_ar.json (new strings only, a capped
+      # number a run), dictionaries into i18n/ar/, and assets/ar.js added to every page (scripts/i18n_ar.py)
+      - name: Arabic dictionaries
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/i18n_ar.py || echo "::warning::Arabic dictionaries failed; the site ships without new ones"
+      - name: Commit the Arabic cache
+        run: |
+          git add data/i18n_ar.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: arabic dictionary $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -X theirs origin main && git push && break
+            sleep 5
+          done
       - name: Search snippets (titles ≤ 60, descriptions ≤ 160 characters on every page)
         continue-on-error: true
         run: python scripts/seo_tidy.py

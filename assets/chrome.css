@@ -57,6 +57,7 @@
 #ekh .ek-lang{display:flex;border:1px solid var(--ek-line);border-radius:11px;overflow:hidden;height:38px;background:#ffffff06}
 #ekh .ek-lang button{background:none;border:0;color:var(--ek-mute);font:700 .78rem var(--ek-font);padding:0 9px;min-width:34px;cursor:pointer;text-decoration:none}
 #ekh .ek-lang button:hover{color:var(--ek-ink)}
+.ek-lang button[hidden]{display:none!important}
 #ekh .ek-lang button.on{background:var(--ek-acc);color:#000}
 #ekh .ek-appb{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:11px;background:linear-gradient(135deg,#f7931a,#ffb347);color:#000!important;
   font:800 .82rem var(--ek-font);white-space:nowrap;box-shadow:0 6px 18px rgba(247,147,26,.25)}
