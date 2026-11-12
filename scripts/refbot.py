@@ -337,6 +337,7 @@ def kb_main(lang, s=None):
         [b("b_follow", "m:follow"), b("b_dca", "m:dca")],
         [b("b_ref", "m:ref"), b("b_lang", "m:lang")],
         [b("b_predict", "m:predict")],
+        [btn(t("b_battle", lang), url=D.SITE + "/battle/")],
         [btn(t("b_site", lang), url=D.SITE)],
     ]
     return {"inline_keyboard": rows}
@@ -456,6 +457,7 @@ SECTIONS = {
     "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
     "opt": (D.sec_opt, "/lab/"), "xex": (D.sec_xex, "/lab/"), "dev": (D.sec_dev, "/lab/"),
     "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
+    "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد کن»: what the page shows; the button opens it on the site
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
@@ -481,14 +483,14 @@ def render(s, uid, key, page=0):
     if key in MN.GROUPS:
         text, rows = MN.group(key, lang)
         return text, {"inline_keyboard": rows}
-    text, kb = _render(s, uid, key)
+    text, kb = _render(s, uid, key, page)
     if x:
         MN.recent(x, key)
     return MN.decorate(key, text, kb, lang, x if x else None)
 
 
-def _render(s, uid, key):
-    """section content; navigation is added by render()"""
+def _render(s, uid, key, page=0):
+    """section content; navigation is added by render(); page = which page of the alert list to show"""
     lang = lang_of(s, uid)
     x = user(s, uid) or {}
     if key == "mkt":

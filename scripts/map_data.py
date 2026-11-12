@@ -279,7 +279,7 @@ TOOLS = {
            (LAB + "#calc-liq", "قیمت لیکوئید", "نرخی لیکویدکردن", "Liquidation price"),
            ("/terminal/", "ترمینال", "تێرمیناڵ", "Terminal")],
     "f6": [("/indicators/", "اندیکاتورهای اختصاصی", "ئیندیکاتۆرە تایبەتەکان", "Signature indicators"),
-           ("/battle/", "میدان نبرد", "مەیدانی شەڕ", "Battlefield"),
+           ("/battle/", "نبرد کن", "شەڕ بکە", "Fight"),
            (LAB + "#backtest", "بک‌تست", "بەکتێست", "Backtest"),
            ("/lab/", "آزمایشگاه بازار", "تاقیگەی بازاڕ", "Market lab")],
     "f7": [("/encyclopedia/", "دانشنامهٔ بازارهای مالی", "زانستنامەی بازاڕە داراییەکان", "Encyclopedia of financial markets"),
@@ -299,7 +299,7 @@ TOOLS = {
     "f12": [("/developers/", "API توسعه‌دهندگان", "API بۆ گەشەپێدەران", "Developer API"),
             ("/methodology/", "روش کار و منابع داده", "ڕێگای کار و سەرچاوەی داتا", "Methodology & data sources")],
     "f13": [("/academy/f13/", "دانشکدهٔ روش مهندس امید دباغچی مکری", "کۆلێژی ڕێبازی ئەندازیار ئومێد دەباغچی مکری", "The Mokri-method faculty"),
-            ("/battle/", "میدان نبرد", "مەیدانی شەڕ", "Battlefield")],
+            ("/battle/", "نبرد کن", "شەڕ بکە", "Fight")],
 }
 
 
