@@ -1069,17 +1069,17 @@ def build_feeds():
                     f'<{tag}{c} data-fl="ar" lang="ar" hidden>{ar_ if ar_ is not None else fa_}</{tag}>'
                     f'<{tag}{c} data-fl="en" lang="en" hidden dir="ltr">{en_}</{tag}>')
         ui = FEED_UI[path]
-        reel = NR.block(load("newsreel.json", {}), e, fmt_date) if path == "crypto-news/" else ""
+        sides = NR.block(load("newsreel.json", {}), e, fmt_date) if path == "crypto-news/" else ""
         body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home", ar_="الرئيسية")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
                 + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note", ar_=e(ui[2]))
-                + reel
                 + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note",
-                     ar_="الملخصات أدناه مكتوبة بالفارسية والكردية السورانية؛ عناوين الشريط أعلاه متوفرة بالعربية.")
+                     ar_="الملخصات أدناه مكتوبة بالفارسية والكردية السورانية؛ عناوين العمودين الجانبيين متوفرة بالعربية.")
                 + head
                 + ("".join(cards) or fl("هنوز موردی منتشر نشده است.", "هێشتا هیچ بابەتێک بڵاو نەکراوەتەوە.", "Nothing published yet.", "p", "note",
                                         ar_="لم يُنشر أي شيء بعد."))
                 + fl("آموزشی است، توصیهٔ مالی نیست.", "فێرکارییە، ئامۆژگاریی دارایی نییە.", "Educational, not financial advice.", "p", "note",
                      ar_="لأغراض تعليمية، وليست نصيحة مالية.")
+                + sides
                 + f"<style>html[lang=ckb] .fd-ck>summary{{display:none}}</style><script>{FEED_LANG_JS}</script>")
         urls.append(page(path, title, desc, body))
     v = load("deep.json", {}).get("items", [])
