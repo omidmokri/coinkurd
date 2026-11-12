@@ -58,7 +58,7 @@
   d.head.appendChild(st);
 
   /* ---- the dictionaries */
-  var M = {}, TP = [], memo = {}, nmemo = 0;
+  var M = {}, TB = {}, memo = {}, nmemo = 0, DONE = {};
   function key(u) { u = u.replace(/^\/+|\/+$/g, '') || 'home'; return u.toLowerCase().replace(/[^a-z0-9_-]+/g, '_').slice(0, 120); }
   var page = PATH.replace(/index\.html$/, '').replace(/\.html$/, '');
   var urls = ['/i18n/ar/common.json', '/i18n/ar/page/' + key(page) + '.json'];
@@ -70,7 +70,9 @@
       if (M[k]) continue; M[k] = dict[k];
       if (/\{\d+\}/.test(k) && /[A-Za-z]{2}/.test(k.replace(/\{\d+\}/g, ''))) {
         var order = [], re = esc(k).replace(/\\\{(\d+)\\\}/g, function (m, n) { order.push(+n); return '(.+?)'; });
-        try { TP.push([new RegExp('^' + re + '$'), dict[k], order]); } catch (e) { }
+        /* the literal pieces, in order: a cheap indexOf check before any regex runs */
+        var lits = k.split(/\{\d+\}/).filter(function (x) { return x.trim(); }), lw = ((lits[0] || '').toLowerCase().match(/[a-z0-9$#%+.-]+/) || [''])[0];
+        try { var tp = [new RegExp('^' + re + '$'), dict[k], order, lits, k.length - k.replace(/\{\d+\}/g, '').length]; (TB[lw] || (TB[lw] = [])).push(tp); } catch (e) { }
       }
     }
   }
@@ -78,7 +80,20 @@
   function look(t) {
     var nums = [], k = t.replace(NUM, function (m, p, n) { nums.push(n); return p + '{' + nums.length + '}'; });
     if (M[k]) return fill(M[k], nums);
-    for (var i = 0; i < TP.length; i++) { var m = TP[i][0].exec(t); if (m) { var v = []; for (var j = 0; j < TP[i][2].length; j++) v[TP[i][2][j] - 1] = m[j + 1]; return fill(TP[i][1], v); } }
+    if (t.length > 400) return null;
+    /* templates are filed under their first literal word; try only those whose words occur in t, in order */
+    var ws = {}, lt = t.toLowerCase(); lt.replace(/[a-z0-9$#%+.-]+/g, function (x) { ws[x] = 1; return x; });
+    ws[''] = 1;
+    for (var w0 in ws) { var L = TB[w0]; if (L) { var r = tryT(L, t); if (r != null) return r; } }
+    return null;
+  }
+  function tryT(L, t) {
+    for (var i = 0; i < L.length; i++) {
+      var tp = L[i], at = 0, ok = true;
+      for (var q = 0; q < tp[3].length; q++) { var f = t.indexOf(tp[3][q], at); if (f < 0) { ok = false; break; } at = f + tp[3][q].length; }
+      if (!ok) continue;
+      var m = tp[0].exec(t); if (m) { var v = []; for (var j = 0; j < tp[2].length; j++) v[tp[2][j] - 1] = m[j + 1]; return fill(tp[1], v); }
+    }
     return null;
   }
   /* dates and times the scripts write ("3 h ago", "12 Nov 26, 11:13", "Nov 12, 2026") */
@@ -108,7 +123,7 @@
       if (any) r = parts.join(' · ');
     }
     if (r == null) r = rules(t);
-    if (nmemo++ > 20000) { memo = {}; nmemo = 0; }
+    if (nmemo++ > 20000) { memo = {}; DONE = {}; nmemo = 0; }
     return (memo[t] = r);
   }
 
@@ -125,14 +140,15 @@
   var ATTR = ['placeholder', 'title', 'aria-label', 'alt'];
   function textNode(n) {
     var v = n.nodeValue; if (!v || !/[A-Za-z]/.test(v) || !ok(n.parentNode)) return;
+    if (DONE.hasOwnProperty(v)) return;   /* our own output coming back through the observer */
     var r = tr(v); if (r == null) return;
-    var lead = v.match(/^\s*/)[0], trail = v.match(/\s*$/)[0];
-    n.nodeValue = lead + r + trail;
+    var lead = v.match(/^\s*/)[0], trail = v.match(/\s*$/)[0], nv = lead + r + trail;
+    if (nv !== v) { DONE[nv] = 1; n.nodeValue = nv; }
   }
   function el(e) {
     if (e.nodeType !== 1 || !ok(e)) return;
-    for (var i = 0; i < ATTR.length; i++) { var v = e.getAttribute(ATTR[i]); if (v && /[A-Za-z]/.test(v)) { var r = tr(v); if (r != null) e.setAttribute(ATTR[i], r); } }
-    if (e.getAttribute('dir') === 'ltr' && (e.getAttribute('lang') === 'en' || e.getAttribute('data-lang') === 'en' || e.getAttribute('data-rl') === 'en')) { e.setAttribute('dir', 'rtl'); e.setAttribute('lang', 'ar'); }
+    for (var i = 0; i < ATTR.length; i++) { var v = e.getAttribute(ATTR[i]); if (v && /[A-Za-z]/.test(v)) { if (DONE.hasOwnProperty(v)) continue; var r = tr(v); if (r != null && r !== v) { DONE[r] = 1; e.setAttribute(ATTR[i], r); } } }
+    if (e.getAttribute('dir') === 'ltr' && e.getAttribute('lang') !== 'ar' && (e.getAttribute('lang') === 'en' || e.getAttribute('data-lang') === 'en' || e.getAttribute('data-rl') === 'en')) { e.setAttribute('dir', 'rtl'); e.setAttribute('lang', 'ar'); }
   }
   function walk(root) {
     if (root.nodeType === 3) { textNode(root); return; }
@@ -149,7 +165,7 @@
     buttons();
   }
   function queue(n) { pend.push(n); if (!sched) sched = (w.requestAnimationFrame || setTimeout)(flush); }
-  function title() { var r = tr(d.title); if (r) d.title = r; }
+  function title() { if (DONE.hasOwnProperty(d.title)) return; var r = tr(d.title); if (r && r !== d.title) { DONE[r] = 1; d.title = r; } }
 
   Promise.all(urls.map(function (u) { return fetch(u).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }); })).then(function (all) {
     all.forEach(add);
