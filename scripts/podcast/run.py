@@ -111,6 +111,8 @@ def main():
         import write
         rep = write.write_all(ep, day, n, rel, langs=tuple(l for l in langs if l != "fa"))
         qcrep["write_log"] = rep["log"]
+        for line in rep["log"]:                      # in the job log: the artifact is not always reachable
+            print("write:", line[:1500])
         for l, why in rep["held"].items():
             hold(l, f"writing: {why}")
     scripts = {}
@@ -173,6 +175,9 @@ def main():
             try:
                 r = qc.asr_sample(ep, l, n=12)
                 qcrep["langs"][l]["asr"] = {k: r[k] for k in ("pcer_mean", "numbers_heard_correctly")}
+                print(l, "asr", json.dumps({k: v for k, v in r.items() if k != "items"}, ensure_ascii=False)[:600])
+                for it in (r.get("items") or [])[:12]:
+                    print("  asr", json.dumps(it, ensure_ascii=False)[:400])
                 json.dump(r, open(os.path.join(ep, f"qc_asr_{l}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
                 if r["pcer_mean"] > 0.35:
                     hold(l, f"listening test: phonetic error {r['pcer_mean']}")
