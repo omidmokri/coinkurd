@@ -149,14 +149,28 @@
     function hit(f, on) { for (var i = 0; i < on.length; i++) for (var j = 0; j < on[i][1].length; j++) if (has(f || 0, on[i][1][j])) return true; return false; }
     function tags(f) { return GG.filter(function (g) { return hit(f, [g]); }).map(function (g) { return L(g[2], g[3], g[4]); }); }
 
-    /* one hue, dark to light on the dark page: the brighter the square, the higher its fee rate (log scale, 0.1 → 300+) */
+    /* one hue, dark to light on the dark page: the brighter the square, the higher its fee rate. The scale is the
+       block's own spread (2nd to 98th percentile of its rates, log), because most of a block sits within a factor of
+       two or three of its median and a fixed 0.1-300 scale would paint it all one colour; the legend says the numbers. */
     var RAMP = [[77, 42, 10], [122, 66, 11], [184, 100, 13], [247, 147, 26], [255, 201, 120], [255, 236, 204]];
-    function tOf(r) { return r > 0 ? Math.max(0, Math.min(1, Math.log(r / 0.1) / Math.log(3000))) : 0; }
-    function col(r) {
-      var k = Math.round((r || 0) * 100), c = CC[k]; if (c) return c;
-      var t = tOf(r) * (RAMP.length - 1), i = Math.min(RAMP.length - 2, Math.floor(t)), f = t - i, a = RAMP[i], b = RAMP[i + 1];
-      c = 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ',' + Math.round(a[1] + (b[1] - a[1]) * f) + ',' + Math.round(a[2] + (b[2] - a[2]) * f) + ')';
-      return (CC[k] = c);
+    function tOf(r, sc) { sc = sc || { lo: 0.1, hi: 300 }; return r > 0 ? Math.max(0, Math.min(1, Math.log(r / sc.lo) / Math.log(sc.hi / sc.lo))) : 0; }
+    function ramp(t) { t = t * (RAMP.length - 1); var i = Math.min(RAMP.length - 2, Math.floor(t)), f = t - i, a = RAMP[i], b = RAMP[i + 1]; return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ',' + Math.round(a[1] + (b[1] - a[1]) * f) + ',' + Math.round(a[2] + (b[2] - a[2]) * f) + ')'; }
+    function col(r) { var sc = (M && M.sc) || null, k = Math.round((r || 0) * 100), c = CC[k]; if (c) return c; return (CC[k] = ramp(tOf(r, sc))); }
+    function scaleOf(items) {
+      var a = []; for (var i = 0; i < items.length; i++) if (!items[i].cb && items[i].r > 0) a.push(items[i].r);
+      if (a.length < 2) return { lo: 0.1, hi: 300 };
+      a.sort(function (x, y) { return x - y; });
+      var lo = a[Math.floor(a.length * 0.02)], hi = a[Math.min(a.length - 1, Math.floor(a.length * 0.98))];
+      if (!(lo > 0)) lo = a[0] > 0 ? a[0] : 0.1;
+      if (hi / lo < 4) { var c = Math.sqrt(lo * hi); lo = c / 2; hi = c * 2; }
+      return { lo: lo, hi: hi };
+    }
+    function lgFill() {   /* the legend: this block's lowest and highest rates and a few round numbers between */
+      var box = $('.mp-lgb'); if (!box || !M || !M.sc) return;
+      var sc = M.sc, nice = [0.1, 0.2, 0.5, 1, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000, 2000], mid = nice.filter(function (v) { return v > sc.lo * 1.3 && v < sc.hi / 1.3; });
+      if (mid.length > 3) mid = [mid[0], mid[Math.floor(mid.length / 2)], mid[mid.length - 1]];
+      var h = '<i></i><span style="left:0%">' + rt(sc.lo) + '</span>' + mid.map(function (v) { return '<span style="left:' + (tOf(v, sc) * 100).toFixed(1) + '%">' + v + '</span>'; }).join('') + '<span style="left:100%">' + rt(sc.hi) + '+</span>';
+      if (box._h !== h) { box.innerHTML = h; box._h = h; }
     }
     function rt(r) { return r == null || isNaN(r) ? '—' : r < 10 ? r.toFixed(2) : r < 100 ? r.toFixed(1) : N(r); }
     function fb(s) { var v = (s || 0) / 1e8; return v >= 1000 ? N(v) : v >= 10 ? N(v, 2) : v >= 1 ? v.toFixed(3) : v >= 0.01 ? v.toFixed(4) : v >= 0.0001 ? v.toFixed(6) : v.toFixed(8); }
@@ -244,10 +258,12 @@
         for (i = 0; i < old.length; i++) if (!keep[old[i].id] && cur[i * 3] >= 0) gone.push({ x: cur[i * 3], y: cur[i * 3 + 1], s: cur[i * 3 + 2], c: old[i].cb ? '#ffd27a' : col(old[i].r) });
         M.from = from; M.gone = gone.length > 4000 ? [] : gone; M.t0 = now;
       } else { M.from = null; M.gone = []; }
+      var sc = scaleOf(items);   /* keep the colours still unless the block's spread really moved */
+      if (!M.sc || sc.lo / M.sc.lo > 1.25 || M.sc.lo / sc.lo > 1.25 || sc.hi / M.sc.hi > 1.25 || M.sc.hi / sc.hi > 1.25) { M.sc = sc; CC = {}; }
       M.items = items; M.lay = lay; M.ix = {};
       for (i = 0; i < items.length; i++) M.ix[items[i].id] = i;
       if (M.pin && M.ix[M.pin] == null) { M.pin = null; tipHide(); }
-      mapPaint();
+      lgFill(); mapPaint();
     }
     function mapPaint() { if (M && !M.raf) M.raf = requestAnimationFrame(mapFrame); }
     function mapFrame(now) {
@@ -367,8 +383,8 @@
     function pill() { return '<span class="mp-pill" hidden><i></i><span></span></span>'; }
     function mapHost() {
       return '<div class="mp-r"><div class="mp-gg"></div><div class="mp-cv"><canvas role="img"></canvas><div class="mp-tip" hidden></div><div class="mp-ov"></div></div>' +
-        '<div class="mp-lg"><span>sat/vB</span><div class="mp-lgb"><i></i>' + [0.1, 1, 10, 100, 300].map(function (v) { return '<span style="left:' + (tOf(v) * 100).toFixed(1) + '%">' + v + (v === 300 ? '+' : '') + '</span>'; }).join('') + '</div></div>' +
-        '<p class="mp-cap">' + L('هر مربع یک تراکنش است: اندازه = حجم، رنگ = نرخ کارمزد (روشن‌تر یعنی گران‌تر). روی هر مربع بروید یا بزنید.', 'هەر چوارگۆشەیەک مامەڵەیەکە: قەبارە = قەبارەی مامەڵە، ڕەنگ = ڕێژەی کرێ (ڕوونتر واتە گرانتر). بچۆ سەر هەر چوارگۆشەیەک یان دایبگرە.', 'Each square is a transaction: size = vsize, colour = fee rate (brighter means pricier). Hover or tap one.') + ' <span class="mp-cnt"></span></p></div>';
+        '<div class="mp-lg"><span>sat/vB</span><div class="mp-lgb"><i></i></div></div>' +
+        '<p class="mp-cap">' + L('هر مربع یک تراکنش است: اندازه = حجم، رنگ = نرخ کارمزد در مقایسه با بقیهٔ همین بلاک (روشن‌تر یعنی گران‌تر). روی هر مربع بروید یا بزنید.', 'هەر چوارگۆشەیەک مامەڵەیەکە: قەبارە = قەبارەی مامەڵە، ڕەنگ = ڕێژەی کرێ بە بەراورد لەگەڵ ئەوانی تری هەمان بلۆک (ڕوونتر واتە گرانتر). بچۆ سەر هەر چوارگۆشەیەک یان دایبگرە.', 'Each square is a transaction: size = vsize, colour = fee rate compared with the rest of this block (brighter means pricier). Hover or tap one.') + ' <span class="mp-cnt"></span></p></div>';
     }
     function skel(k) {
       var t = k.charAt(0), id = k.slice(2);
@@ -951,7 +967,7 @@
     return { stop: function () {
       alive = false; timers.forEach(clearInterval); clearTimeout(wsTimer); clearTimeout(hidT); wsClose(); mapKill(); if (io2) io2.disconnect();
       w.removeEventListener('resize', onRs); w.removeEventListener('scroll', onAct); d.removeEventListener('visibilitychange', onVis); if (coin) coin.destroy(); root.innerHTML = '';
-    }, _t: { pack: pack, curve: curve, has: has, isAddr: isAddr, tOf: tOf, nb: nb, eta: eta } };
+    }, _t: { pack: pack, curve: curve, has: has, isAddr: isAddr, tOf: tOf, nb: nb, eta: eta, scaleOf: scaleOf } };
   }
   w.btcLive = btcLive;
 })();
