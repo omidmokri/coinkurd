@@ -108,7 +108,7 @@ def build(ep, lang, music_dir):
 def loudnorm(src, dst_wav, dst_mp3, meta, chapters, cover=None):
     """Two-pass EBU R128 normalisation to -16 LUFS / -1.5 dBTP, then WAV (archive) and MP3 (64 kbps mono)."""
     p = subprocess.run(["ffmpeg", "-hide_banner", "-i", src, "-af", "loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json",
-                        "-f", "null", "-"], capture_output=True, text=True)
+                        "-f", "null", "-"], capture_output=True, text=True, errors="replace")
     js = p.stderr[p.stderr.rfind("{"): p.stderr.rfind("}") + 1]
     m = json.loads(js)
     af = (f"loudnorm=I=-16:TP=-1.5:LRA=11:measured_I={m['input_i']}:measured_TP={m['input_tp']}:"
@@ -121,7 +121,7 @@ def loudnorm(src, dst_wav, dst_mp3, meta, chapters, cover=None):
         for k, v in meta.items():
             f.write(f"{k}={str(v).replace('=', ' ').replace(chr(10), ' ')}\n")
         dur_ms = int(float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", dst_wav],
-                                          capture_output=True, text=True).stdout.strip()) * 1000)
+                                          capture_output=True, text=True, errors="replace").stdout.strip()) * 1000)
         for i, c in enumerate(chapters):
             end = int(chapters[i + 1]["start"] * 1000) if i + 1 < len(chapters) else dur_ms
             f.write(f"[CHAPTER]\nTIMEBASE=1/1000\nSTART={int(c['start'] * 1000)}\nEND={end}\ntitle={c['title']}\n")

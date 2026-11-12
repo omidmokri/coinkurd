@@ -133,7 +133,7 @@ def audio_health(mp3, wav):
     import soundfile as sf
     import pyloudnorm as pyln
     pr = json.loads(subprocess.run(["ffprobe", "-v", "error", "-print_format", "json", "-show_format", "-show_streams", "-show_chapters", mp3],
-                                   capture_output=True, text=True).stdout)
+                                   capture_output=True, text=True, errors="replace").stdout)
     st = next(s for s in pr["streams"] if s["codec_type"] == "audio")
     x, sr = sf.read(wav, always_2d=True)
     meter = pyln.Meter(sr)
@@ -141,8 +141,8 @@ def audio_health(mp3, wav):
     peak_db = 20 * np.log10(np.abs(x).max() + 1e-12)
     clipped = int((np.abs(x) >= 0.999).sum())
     sil = subprocess.run(["ffmpeg", "-hide_banner", "-i", mp3, "-af", "silencedetect=noise=-50dB:d=3", "-f", "null", "-"],
-                         capture_output=True, text=True).stderr.count("silence_end")
-    dec = subprocess.run(["ffmpeg", "-v", "error", "-i", mp3, "-f", "null", "-"], capture_output=True, text=True).stderr.strip()
+                         capture_output=True, text=True, errors="replace").stderr.count("silence_end")
+    dec = subprocess.run(["ffmpeg", "-v", "error", "-i", mp3, "-f", "null", "-"], capture_output=True, text=True, errors="replace").stderr.strip()
     return {"codec": st["codec_name"], "sample_rate": int(st["sample_rate"]), "channels": st["channels"],
             "bitrate_kbps": round(int(pr["format"]["bit_rate"]) / 1000), "duration_s": round(float(pr["format"]["duration"]), 1),
             "size_mb": round(int(pr["format"]["size"]) / 1e6, 2), "chapters": len(pr.get("chapters", [])),

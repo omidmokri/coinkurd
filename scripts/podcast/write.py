@@ -36,12 +36,15 @@ example does (e.g. «زمانِ تهیه‌یِ این گزارش») — it is s
     "ckb": """Central Kurdish (Sorani), Arabic script, for Kurdish traders. Write natural Sorani as a Kurdish
 broadcaster would — not Persian with Kurdish spelling. Digits are Eastern Arabic (٠-٩), thousands «٬», decimal «٫»;
 percent is «لەسەدا» BEFORE the number. Use Kurdish month names as in the style example. Never leave a Latin letter in
-the spoken text: every acronym or Latin name goes in ⟦shown|spoken⟧ markup, spoken side in Sorani letters.""",
+the spoken text: every acronym or Latin name goes in ⟦shown|spoken⟧ markup, spoken side in Sorani letters.
+Use only Sorani letters: never the Arabic-only letters ص ض ط ظ ث ذ ة ي ك (write س ز ت ز س ز ە ی ک), e.g. «پێوەر» not
+«شاخص», «تەماح» not «طمع».""",
     "en": """English, for an international audience of crypto traders. Digits are ASCII with comma thousands
 separators; write "percent" as a word. Clock times are given in UTC, with Tehran time where the master gives it.""",
     "ar": """Modern Standard Arabic, for Arab traders. FULLY vowelled text (tashkeel on every word, as the style
 example does) — it is stripped from the displayed text and only guides the voice. Digits are ASCII with comma
-thousands separators; percent is «بِالْمِئَةِ». Clock times are given in Mecca time (UTC+3) and UTC.""",
+thousands separators; percent is «بِالْمِئَةِ». Clock times are given in Mecca time (UTC+3) and UTC — never in Tehran time: convert the
+master's Tehran times with the table below (Tehran is 30 minutes ahead of Mecca).""",
 }
 
 COMMON = """You write one daily episode of the crypto-market podcast «{show}», published on entekhab.net and the Telegram
@@ -61,6 +64,8 @@ ABSOLUTE RULES
    In the technical section, give for BTC a bullish and a bearish scenario, each with the level that cancels it.
 6. Times: the data snapshot was taken at {snap_tehran} Tehran time ({snap_utc} UTC). Events come with their times in
    FACTS. The next episode is published tomorrow at 19:00 Tehran time (15:30 UTC). Use only these instants.
+   Every allowed instant in each time zone (copy these clock readings exactly, and always name the zone):
+{clock_table}
 
 STRUCTURE — exactly these ten sections, in this order, with these ids:
 open (greeting, show name, today's date as given below, headline of the day; 2-3 paragraphs)
@@ -285,7 +290,13 @@ class Writer:
         self.log = []
 
     def common(self, lang, ctx):
-        return COMMON.format(show=LB.SHOW[lang][0], snap_tehran=ctx["snap_tehran"], snap_utc=ctx["snap_utc"],
+        zones = {"fa": (("Tehran", 210),), "ckb": (("Tehran", 210),), "en": (("Tehran", 210),), "ar": (("Mecca", 180),)}[lang]
+        rows = []
+        for u in sorted(ctx["allowed_utc"]):
+            parts = [f"{u // 60:02d}:{u % 60:02d} UTC"] + [f"{((u + o) % 1440) // 60:02d}:{(u + o) % 60:02d} {z} time"
+                                                          for z, o in zones]
+            rows.append("   - " + " = ".join(parts))
+        return COMMON.format(show=LB.SHOW[lang][0], snap_tehran=ctx["snap_tehran"], snap_utc=ctx["snap_utc"], clock_table="\n".join(rows),
                              words=self.words if lang == "fa" else f"{self.words} (as long as the master)",
                              date_label=LB.date_label(ctx["day"], lang), episode_label=LB.episode_label(ctx["n"], lang))
 

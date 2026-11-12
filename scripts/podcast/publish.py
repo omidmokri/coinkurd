@@ -31,7 +31,7 @@ SITE = "https://entekhab.net"
 
 def sh(*cmd, check=True, cwd=ROOT):
     print("+", " ".join(cmd))
-    return subprocess.run(cmd, check=check, cwd=cwd, capture_output=True, text=True)
+    return subprocess.run(cmd, check=check, cwd=cwd, capture_output=True, text=True, errors="replace")
 
 
 def release(ep, rec, live):
