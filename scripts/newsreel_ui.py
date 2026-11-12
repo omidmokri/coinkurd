@@ -82,8 +82,12 @@ var u='m',v=Math.round(s/60);if(s<60)return o.n;if(v>=60){u='h';v=Math.round(s/3
 return (o.p||'')+num(v,l)+o[u]}
 function paint(l){r.querySelectorAll('time[data-at]').forEach(function(t){var s=ago(t.getAttribute('data-at'),l);t.textContent=s;t.setAttribute('dir',l==='en'?'ltr':'rtl')})}
 if(run&&!run.dataset.dup){run.dataset.dup='1';[].slice.call(run.children).forEach(function(k){var c=k.cloneNode(true);c.setAttribute('aria-hidden','true');c.tabIndex=-1;run.appendChild(c)});r.classList.add('on')}
-paint(window.EKL?window.EKL():(document.documentElement.lang||'fa'));
-addEventListener('ek-lang',function(e){paint(e.detail)});setInterval(function(){paint(window.EKL?window.EKL():'fa')},60000)})();"""
+function pick(){try{if(localStorage.getItem('ek_ar')==='1')return 'ar'}catch(e){}
+if((document.documentElement.getAttribute('lang')||'')==='ar')return 'ar';
+return window.EKL?window.EKL():(document.documentElement.lang||'fa')}
+function apply(){var l=pick();if(!L[l])l='fa';
+r.querySelectorAll('[data-fl]').forEach(function(x){x.hidden=x.getAttribute('data-fl')!==l});paint(l)}
+apply();addEventListener('ek-lang',apply);setTimeout(apply,0);setTimeout(apply,600);setInterval(apply,60000)})();"""
 
 
 def _fl(vals, tag="span", cls=""):
