@@ -327,14 +327,15 @@ def _reel_title(x, lang):
 def sec_news(lang, coin=None):
     # ریل خبری چهارزبانه (data/newsreel.json) تیتر را به زبان خود کاربر می‌دهد؛ اگر نبود، خبرخوان انگلیسی
     r = load("newsreel") or {}
-    ritems = [x for x in (r.get("items") or []) if _reel_title(x, lang) and x.get("url")]
+    ritems = [x for x in (r.get("items") or []) if _reel_title(x, lang)]
     if coin:
         ritems = [x for x in ritems if coin in (x.get("coins") or [])]
     if ritems:
         out = [f"📰 <b>{h('news', lang)}{(' · ' + coin) if coin else ''}</b>"]
         for x in ritems[:10]:
             tags = " ".join(f"#{c}" for c in (x.get("coins") or [])[:2])
-            out.append(f"• <a href=\"{e(x['url'])}\">{e(_reel_title(x, lang))}</a> <i>({e(x.get('source'))})</i>"
+            # بدون لینک بیرونی؛ فقط نام ناشر به‌عنوان رفرنس (مثل ستون‌های خبری سایت)
+            out.append(f"• {e(_reel_title(x, lang))} <i>({e(x.get('source'))})</i>"
                        + (f" {e(tags)}" if tags else ""))
         out += ["", age(r.get("updated_at"), lang)]
         return cut("\n".join(out))

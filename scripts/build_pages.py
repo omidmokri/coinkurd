@@ -1069,7 +1069,9 @@ def build_feeds():
                     f'<{tag}{c} data-fl="ar" lang="ar" hidden>{ar_ if ar_ is not None else fa_}</{tag}>'
                     f'<{tag}{c} data-fl="en" lang="en" hidden dir="ltr">{en_}</{tag}>')
         ui = FEED_UI[path]
-        sides = NR.block(load("newsreel.json", {}), e, fmt_date) if path == "crypto-news/" else ""
+        rdata = load("newsreel.json", {})
+        sides = (NR.block(rdata, e, fmt_date) if path == "crypto-news/"
+                 else NR.block(rdata, e, fmt_date, onchain=True) if path == "onchain/" else "")
         body = (f'<div class="meta"><a href="/">{fl("خانه", "ماڵەوە", "Home", ar_="الرئيسية")}</a> / {e(title)}</div><h1>{e(title)}</h1>'
                 + fl(f'{e(desc)} · به‌روز خودکار از ربات Coin_Kurd', e(ui[0]), e(ui[1]), "p", "note", ar_=e(ui[2]))
                 + fl("", "", "These summaries are written in Persian and Sorani Kurdish; choose «کو» for the Kurdish text.", "p", "note",
