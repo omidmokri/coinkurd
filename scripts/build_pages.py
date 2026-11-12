@@ -1257,7 +1257,11 @@ def build_api():
         if r.get("r24h") is not None:
             by.setdefault(r["coin"], []).append(r["r24h"])
     w("signals_performance.json", {"by_coin": {c: {"n": len(a), "avg_r24h": round(sum(a) / len(a), 3), "pct_positive": round(sum(1 for x in a if x > 0) * 100 / len(a))} for c, a in by.items()}})
-    w("posts_latest.json", {"posts": [{k: p.get(k) for k in ("id", "date", "title", "category", "coins", "url")} | {"page": f"{SITE}/p/{p['id']}/"} for p in posts[:100]]})
+    # "tt": the post's title in the other languages it has a page in (/<lang>/p/<id>/) — the extension and the apps read it
+    def _tt(p):
+        tr = p.get("tr") or {}
+        return {lg: (tr.get(lg) or {}).get("title") for lg in ("ckb", "en", "ar") if isinstance(tr.get(lg), dict) and (tr.get(lg) or {}).get("title")}
+    w("posts_latest.json", {"posts": [{k: p.get(k) for k in ("id", "date", "title", "category", "coins", "url")} | {"page": f"{SITE}/p/{p['id']}/", "tt": _tt(p)} for p in posts[:100]]})
     for c in MK:
         w(f"coins/{c.lower()}.json", {"coin": c, "market": MK[c], "score": SC.get(c), "opportunities": [o for o in market.get("opportunities", []) if o["coin"] == c],
                                      "news": [i for i in news.get("items", []) if c in i.get("coins", [])][:20]})

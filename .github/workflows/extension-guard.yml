@@ -1,0 +1,28 @@
+name: Extension logo guard
+
+# ⚠️ THE LOGO RULE — the site owner's, repeated by him: the browser extension's logo is NEVER covered.
+# Every change to the extension runs the check: the code may not draw on the toolbar icon (no badge text, badge
+# colour or repainted icon), and the popup — rendered in every language, light and dark — may not put anything over
+# the logo. A red run here means: do not ship, fix it. (scripts/build_extension.py also refuses to package it.)
+on:
+  push:
+    paths: ["chrome-extension/**", "scripts/build_extension.py", "tests/test_extension_logo.py", "tests/ext_harness.py"]
+  pull_request:
+    paths: ["chrome-extension/**", "scripts/build_extension.py", "tests/test_extension_logo.py", "tests/ext_harness.py"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  logo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q pytest playwright pillow requests beautifulsoup4
+      - name: The logo is never covered
+        env: { CHROME_BIN: /usr/bin/google-chrome }
+        run: python -m pytest -q tests/test_extension_logo.py

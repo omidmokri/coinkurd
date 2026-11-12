@@ -1,0 +1,139 @@
+name: Windows app
+
+# Entekhab for Windows (64-bit): built, tested and published on a real Windows machine.
+#   build → the app's own self-test (loads entekhab.net, checks the link rules, saves a picture)
+#   → installer (NSIS: Persian, Arabic, English) → silent install → the installed app's self-test → a screenshot of
+#   the window as a person sees it → silent uninstall (must leave nothing behind) → publish to /app/windows/.
+# Nothing is published unless every step passed. Pictures of each run go to the ci-windows branch for review.
+on:
+  push:
+    branches: [main]
+    paths: ["windows/**", ".github/workflows/windows-app.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-app
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        id: v
+        shell: pwsh
+        run: |
+          $v = (Select-String -Path windows/Entekhab.csproj -Pattern '<Version>([0-9.]+)</Version>').Matches[0].Groups[1].Value
+          if (-not $v) { throw 'no <Version> in windows/Entekhab.csproj' }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "Building Entekhab for Windows $v"
+
+      - name: Build (x64)
+        shell: pwsh
+        run: |
+          dotnet build windows/Entekhab.csproj -c Release -nologo
+          if ($LASTEXITCODE -ne 0) { throw 'build failed' }
+          Get-ChildItem -Recurse windows/bin/Release/net48 | Select-Object FullName, Length | Format-Table -AutoSize
+
+      - name: WebView2 runtime
+        shell: pwsh
+        run: |
+          $k = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          if (Test-Path $k) { "WebView2 runtime $((Get-ItemProperty $k).pv)" }
+          else {
+            Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile wv2.exe
+            Start-Process .\wv2.exe -ArgumentList '/silent','/install' -Wait
+            "WebView2 runtime installed"
+          }
+
+      - name: Self-test (the built app)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force ci | Out-Null
+          $p = Start-Process windows/bin/Release/net48/Entekhab.exe -ArgumentList '--selftest', "$PWD\ci\selftest-build.png" -PassThru
+          if (-not $p.WaitForExit(170000)) { $p.Kill(); throw 'the self-test hung' }
+          if (Test-Path ci\selftest-build.json) { Get-Content ci\selftest-build.json }
+          if ($p.ExitCode -ne 0) { throw "the self-test failed (exit $($p.ExitCode))" }
+
+      - name: Installer
+        shell: pwsh
+        run: |
+          $m = "${env:ProgramFiles(x86)}\NSIS\makensis.exe"
+          if (-not (Test-Path $m)) { choco install nsis -y --no-progress | Out-Null }
+          New-Item -ItemType Directory -Force out | Out-Null
+          & $m /V2 "/DVERSION=${{ steps.v.outputs.version }}" "/DSRC=$PWD\windows\bin\Release\net48" "/DOUT=$PWD\out" windows\installer.nsi
+          if ($LASTEXITCODE -ne 0) { throw 'makensis failed' }
+          Get-ChildItem out | Select-Object Name, Length
+
+      - name: Install, run, uninstall
+        shell: pwsh
+        run: |
+          $setup = (Get-ChildItem out\EntekhabSetup-x64-*.exe | Select-Object -First 1).FullName
+          Start-Process $setup -ArgumentList '/S' -Wait
+          $dir = "$env:LOCALAPPDATA\Programs\Entekhab"; $exe = "$dir\Entekhab.exe"
+          if (-not (Test-Path $exe)) { throw 'the installer did not install the app' }
+          (Get-Item $exe).VersionInfo | Format-List FileVersion, ProductName, CompanyName
+          $u = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Entekhab'
+          Get-ItemProperty $u | Format-List DisplayName, DisplayVersion, Publisher, EstimatedSize
+          Get-ChildItem "$env:APPDATA\Microsoft\Windows\Start Menu\Programs" -Filter 'Entekhab*' | Select-Object Name
+
+          $p = Start-Process $exe -ArgumentList '--selftest', "$PWD\ci\selftest-installed.png" -PassThru
+          if (-not $p.WaitForExit(170000)) { $p.Kill(); throw 'the installed self-test hung' }
+          Get-Content ci\selftest-installed.json
+          if ($p.ExitCode -ne 0) { throw "the installed self-test failed (exit $($p.ExitCode))" }
+
+          # the window as a person sees it
+          $app = Start-Process $exe -PassThru
+          Start-Sleep 30
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          $g = [System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+          $bmp.Save("$PWD\ci\desktop.png")
+          # a second launch must not open a second window
+          Start-Process $exe; Start-Sleep 4
+          $n = (Get-Process Entekhab -ErrorAction SilentlyContinue | Measure-Object).Count
+          "Entekhab processes after a second launch: $n"
+          if ($n -ne 1) { throw 'a second launch opened a second app' }
+          Stop-Process -Name Entekhab -Force; Start-Sleep 2
+
+          Start-Process "$dir\Uninstall.exe" -ArgumentList '/S' -Wait
+          for ($i = 0; $i -lt 30 -and (Test-Path $exe); $i++) { Start-Sleep 1 }    # NSIS finishes from a copy of itself
+          if (Test-Path $exe) { throw 'the uninstaller left the app behind' }
+          if (Test-Path $u) { throw 'the uninstaller left its Apps & features entry' }
+          'uninstalled cleanly'
+
+      - name: Pictures of this run (branch ci-windows)
+        if: always()
+        shell: bash
+        run: |
+          [ -d ci ] || exit 0
+          cp -f out/*.exe ci/ 2>/dev/null || true
+          cd ci && git init -q -b ci-windows && git config user.name ci && git config user.email ci@users.noreply.github.com
+          git add . && git commit -qm "Windows app CI run ${{ github.run_id }} (${{ github.sha }})"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:ci-windows
+
+      - name: Publish to /app/windows/
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          V=${{ steps.v.outputs.version }}; F=out/EntekhabSetup-x64-$V.exe
+          SHA=$(sha256sum "$F" | cut -d' ' -f1); SIZE=$(stat -c %s "$F")
+          git config user.name "coinkurd-bot"; git config user.email "bot@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main && git checkout -q -B pub origin/main
+            mkdir -p app/windows && rm -f app/windows/EntekhabSetup-x64-*.exe && cp "$F" app/windows/
+            printf '{\n "version": "%s",\n "file": "EntekhabSetup-x64-%s.exe",\n "url": "https://entekhab.net/app/windows/EntekhabSetup-x64-%s.exe",\n "size": %s,\n "sha256": "%s",\n "arch": "x64",\n "minWindows": "10 (1903) / 11",\n "date": "%s",\n "ci_run": %s\n}\n' \
+              "$V" "$V" "$V" "$SIZE" "$SHA" "$(date -u +%F)" "${{ github.run_id }}" > app/windows.json
+            git add -A app/windows app/windows.json
+            git diff --cached --quiet && { echo "nothing new to publish"; break; }
+            git commit -qm "Windows app $V: installer built and tested in CI run ${{ github.run_id }}"
+            git push -q origin HEAD:main && { echo "published $F ($SIZE bytes, sha256 $SHA)"; break; }
+            sleep $((i*7))
+          done

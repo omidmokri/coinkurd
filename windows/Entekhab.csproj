@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Entekhab for Windows (64-bit): a small, hardened WebView2 window on https://entekhab.net.
+       .NET Framework 4.8 ships with Windows 10 (1903+) and 11, so the app needs no runtime download of its own;
+       the page engine is Microsoft Edge WebView2, built into Windows 11 and installed on Windows 10 by Edge. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Entekhab</RootNamespace>
+    <AssemblyName>Entekhab</AssemblyName>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>Entekhab</Product>
+    <AssemblyTitle>Entekhab — entekhab.net</AssemblyTitle>
+    <Company>entekhab.net</Company>
+    <Copyright>entekhab.net</Copyright>
+    <Description>Entekhab — crypto market analysis, live prices and the Coin_Kurd archive</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DebugType>none</DebugType>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+    <EmbeddedResource Include="logo.png" LogicalName="logo.png" />
+    <EmbeddedResource Include="offline.html" LogicalName="offline.html" />
+  </ItemGroup>
+</Project>

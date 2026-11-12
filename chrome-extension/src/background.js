@@ -1,12 +1,29 @@
-/* Entekhab Chrome extension — service worker
+/* Entekhab browser extension — service worker
    Every 5 minutes: market snapshot from entekhab.net (+ live prices from Binance's public data API when reachable),
-   toolbar badge, price alerts and (optional) new Coin_Kurd post notifications. Nothing about the user is sent anywhere. */
+   the toolbar tooltip price, price alerts and (optional) new Coin_Kurd post notifications. Nothing about the user is sent anywhere.
+
+   ⚠️⚠️⚠️ THE LOGO RULE — set by the site's owner, and repeated by him: THE LOGO IS NEVER COVERED. ⚠️⚠️⚠️
+   Chrome draws a badge (setBadgeText) ON TOP of the toolbar icon — over the logo — whatever its length, and an
+   earlier version did exactly that with the price. So this extension:
+     • never sets badge text (only ever setBadgeText({ text: '' }), which clears it),
+     • never sets a badge colour and never paints its own icon (no setIcon with imageData / canvas),
+     • never draws anything over the logo in the popup.
+   The price lives in the icon's TOOLTIP instead (setTitle) and inside the popup.
+   scripts/build_extension.py refuses to package a build that breaks this, and tests/test_extension_logo.py checks
+   the popup. Do not bring the badge back — not shorter, not smaller, not as an option. */
 'use strict';
 const SITE = 'https://entekhab.net';
 const BINANCE = 'https://data-api.binance.vision/api/v3';
-const DEFAULTS = { lang: 'fa', badge: 'BTC', alerts: [], notifyPosts: false, lastPostId: 0 };
+const DEFAULTS = { lang: 'fa', tip: 'BTC', alerts: [], notifyPosts: false, lastPostId: 0 };
 
-async function settings() { const s = await chrome.storage.local.get(Object.keys(DEFAULTS)); return { ...DEFAULTS, ...s }; }
+async function settings() {
+  const s = await chrome.storage.local.get(Object.keys(DEFAULTS).concat('badge'));
+  if (s.badge !== undefined) {               // 1.5.x kept its coin under "badge": it now names the tooltip's coin
+    if (s.tip === undefined) { s.tip = s.badge; await chrome.storage.local.set({ tip: s.tip }); }
+    await chrome.storage.local.remove('badge'); delete s.badge;
+  }
+  return { ...DEFAULTS, ...s };
+}
 
 async function getJSON(url, ms = 10000) {
   const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
@@ -25,26 +42,14 @@ async function live(coins) {
   } catch (e) { return {}; }
 }
 
-/* Chrome squeezes the badge across the whole icon, so a long number hides the logo underneath it —
-   "75.9k" did exactly that. Nothing here is longer than four characters and most prices come out at
-   three; the exact figure is in the toolbar title, and the badge can be turned off in Settings. */
-function short(p) {
-  if (!isFinite(p)) return '';
-  if (p >= 995000) return Math.round(p / 1e6) + 'm';
-  if (p >= 1000) return Math.round(p / 1000) + 'k';
-  if (p >= 100) return p.toFixed(0);
-  if (p >= 10) return p.toFixed(0);
-  if (p >= 1) return p.toFixed(1);
-  if (p >= 0.1) return p.toFixed(2).replace(/^0/, '');
-  if (p >= 0.01) return p.toFixed(2).replace(/^0/, '');
-  return p.toPrecision(2).replace(/0\./, '').replace(/^0+/, '').slice(0, 2);   // sub-cent: the leading digits; the title carries the exact price
-}
+/* the only badge call this extension may make: an empty one, which removes any badge an older version left */
+async function clearIcon() { try { await chrome.action.setBadgeText({ text: '' }); } catch (e) { } }
 
 async function tick() {
   const s = await settings();
   let market = null;
   try { market = await getJSON(`${SITE}/data/market.json?t=${Date.now()}`); } catch (e) { }
-  const want = [s.badge, ...s.alerts.map(a => a.coin)].filter(c => c && c !== 'OFF');
+  const want = [s.tip, ...s.alerts.map(a => a.coin)].filter(c => c && c !== 'OFF');
   const lv = await live(want);
   const price = c => (lv[c] && lv[c].price) || ((market && market.coins || []).find(x => x.coin === c) || {}).price;
   const chg = c => (lv[c] && lv[c].chg24 != null ? lv[c].chg24 : ((market && market.coins || []).find(x => x.coin === c) || {}).chg24);
@@ -52,14 +57,13 @@ async function tick() {
   if (market) { patch.market = market; patch.marketAt = Date.now(); }
   await chrome.storage.local.set(patch);
 
-  // badge
-  if (s.badge && s.badge !== 'OFF' && price(s.badge)) {
-    const ch = chg(s.badge);
-    await chrome.action.setBadgeText({ text: short(price(s.badge)) });
-    await chrome.action.setBadgeBackgroundColor({ color: ch == null ? '#f7931a' : ch >= 0 ? '#15803d' : '#b91c1c' });
-    if (chrome.action.setBadgeTextColor) await chrome.action.setBadgeTextColor({ color: '#ffffff' });
-    await chrome.action.setTitle({ title: `${s.badge}: $${price(s.badge).toLocaleString('en-US', { maximumFractionDigits: 6 })}` + (ch != null ? ` (${ch >= 0 ? '+' : ''}${ch.toFixed(2)}%)` : '') + ' — Entekhab' });
-  } else { await chrome.action.setBadgeText({ text: '' }); }
+  // the toolbar icon: the logo alone, never covered (THE LOGO RULE above) — the price goes in its tooltip
+  await clearIcon();
+  const tc = s.tip && s.tip !== 'OFF' ? s.tip : null;
+  if (tc && price(tc)) {
+    const ch = chg(tc);
+    await chrome.action.setTitle({ title: `${tc}: $${price(tc).toLocaleString('en-US', { maximumFractionDigits: 6 })}` + (ch != null ? ` (${ch >= 0 ? '+' : ''}${ch.toFixed(2)}%)` : '') + ' — Entekhab' });
+  } else await chrome.action.setTitle({ title: chrome.i18n.getMessage('extTitle') || 'Entekhab' });
 
   // price alerts (one-shot)
   let changed = false;
@@ -68,9 +72,15 @@ async function tick() {
     const p = price(a.coin); if (!p) continue;
     if ((a.op === '>' && p >= a.price) || (a.op === '<' && p <= a.price)) {
       a.hit = Date.now(); changed = true;
-      const T = { fa: ['هشدار قیمت', a.op === '>' ? 'بالاتر از' : 'پایین‌تر از', 'رسید'], ckb: ['ئاگاداری نرخ', a.op === '>' ? 'سەرووی' : 'خوارووی', 'گەیشت'], en: ['Price alert', a.op === '>' ? 'above' : 'below', 'reached'] }[s.lang] || [];
+      const up = a.op === '>', px = '$' + p.toLocaleString('en-US', { maximumFractionDigits: 6 });
+      const N = {
+        fa: ['هشدار قیمت', `${a.coin} ${up ? 'بالاتر از' : 'پایین‌تر از'} $${a.price} رسید — ${px}`],
+        ckb: ['ئاگاداریی نرخ', `${a.coin} گەیشتە ${up ? 'سەرووی' : 'خوارووی'} $${a.price} — ${px}`],
+        ar: ['تنبيه السعر', `بلغ ${a.coin} ${up ? 'أعلى من' : 'أدنى من'} $${a.price} — ${px}`],
+        en: ['Price alert', `${a.coin} went ${up ? 'above' : 'below'} $${a.price} — ${px}`]
+      }[s.lang] || [];
       const id = 'alert-' + a.id;
-      await notify(id, `${T[0]}: ${a.coin}`, `${a.coin} ${T[1]} $${a.price} ${T[2]} — $${p.toLocaleString('en-US', { maximumFractionDigits: 6 })}`, `${SITE}/coins/${a.coin.toLowerCase()}/`);
+      await notify(id, `${N[0] || 'Entekhab'}: ${a.coin}`, N[1] || `${a.coin} ${px}`, `${SITE}/coins/${a.coin.toLowerCase()}/`);
     }
   }
   if (changed) await chrome.storage.local.set({ alerts: s.alerts });
@@ -102,28 +112,35 @@ chrome.notifications.onClicked.addListener(async id => {
 
 function ensureAlarm() { chrome.alarms.get('tick', a => { if (!a) chrome.alarms.create('tick', { periodInMinutes: 5, delayInMinutes: 0.1 }); }); }
 chrome.runtime.onInstalled.addListener(async () => {
-  const cur = await chrome.storage.local.get(Object.keys(DEFAULTS));
-  const init = {}; for (const k in DEFAULTS) if (cur[k] === undefined) init[k] = DEFAULTS[k];
+  const cur = await chrome.storage.local.get(Object.keys(DEFAULTS).concat('badge'));
+  const init = {};
+  if (cur.badge !== undefined) { if (cur.tip === undefined) init.tip = cur.badge; await chrome.storage.local.remove('badge'); }   // 1.5.x → 1.6
+  for (const k in DEFAULTS) if (cur[k] === undefined && init[k] === undefined) init[k] = DEFAULTS[k];
   if (Object.keys(init).length) await chrome.storage.local.set(init);
+  await clearIcon();
   ensureAlarm(); tick();
 });
-chrome.runtime.onStartup.addListener(() => { ensureAlarm(); tick(); });
+chrome.runtime.onStartup.addListener(() => { clearIcon(); ensureAlarm(); tick(); });
 chrome.alarms.onAlarm.addListener(a => { if (a.name === 'tick') tick(); });
 chrome.runtime.onMessage.addListener((m, _s, reply) => { if (m && m.type === 'refresh') { tick().then(() => reply({ ok: true })).catch(() => reply({ ok: false })); return true; } });
-chrome.storage.onChanged.addListener((ch, area) => { if (area === 'local' && (ch.badge || ch.alerts)) tick(); });
+chrome.storage.onChanged.addListener((ch, area) => { if (area === 'local' && (ch.tip || ch.alerts)) tick(); });
 
 // omnibox:  "ek btc" → coin page,  "ek academy" / "ek lab" / … → section
 const PAGES = [
   ['encyclopedia', '/encyclopedia/', 'دانشنامهٔ بازارهای مالی · Encyclopedia of financial markets'],
   ['enc', '/encyclopedia/', 'دانشنامه · Encyclopedia'],
+  ['satoshi', '/satoshi/', 'داستان ساتوشی · Satoshi’s story'],
+  ['map', '/map/', 'نقشهٔ یادگیری · Learning map'],
+  ['battle', '/battle/', 'نبرد من · My Battle'],
+  ['apps', '/app/', 'اپلیکیشن‌ها: اندروید، آیفون، ویندوز · Apps: Android, iPhone, Windows'],
   ['bot', '/trade-bot/', 'ربات معامله‌گر انتخاب · Entekhab trading bot'],
   ['academy', '/academy/', 'آکادمی کریپتو · Crypto Academy'], ['lab', '/academy/lab/', 'آزمایشگاه و شبیه‌ساز · Lab & simulator'],
   ['learn', '/learn/', 'مسیر یادگیری · Learning path'], ['glossary', '/academy/glossary/', 'اصطلاحات · Glossary'],
-  ['dashboard', '/dashboard/', 'داشبورد بازار · Market dashboard'], ['tools', '/tools/', 'ابزارها · Tools'], ['battle', '/battle/', 'میدان نبرد · Battle'],
+  ['dashboard', '/dashboard/', 'داشبورد بازار · Market dashboard'], ['tools', '/tools/', 'ابزارها · Tools'],
   ['safety', '/safety/', 'بررسی امنیت توکن · Token safety'], ['terminal', '/terminal/', 'ترمینال · Terminal'], ['coins', '/coins/', 'همهٔ کوین‌ها · All coins']
 ];
 function xml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c])); }
-chrome.omnibox.setDefaultSuggestion({ description: 'Entekhab: نام کوین (btc, eth…) یا encyclopedia, academy, bot, lab, tools, dashboard' });
+chrome.omnibox.setDefaultSuggestion({ description: 'Entekhab: نام کوین (btc, eth…) یا satoshi, map, battle, apps, encyclopedia, academy, dashboard' });
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   const q = text.trim().toLowerCase(); const { market } = await chrome.storage.local.get('market');
   const coins = ((market && market.coins) || []).map(c => c.coin.toLowerCase());

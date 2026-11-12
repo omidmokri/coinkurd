@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><title>Entekhab</title>
+<style>
+  html,body{height:100%;margin:0;background:#0a0a0a;color:#f5f2ee;font-family:Vazirmatn,"Segoe UI",Tahoma,sans-serif}
+  body{display:flex;align-items:center;justify-content:center;text-align:center}
+  .c{max-width:560px;padding:32px}
+  img{width:104px;height:104px;border-radius:24px;box-shadow:0 10px 40px rgba(247,147,26,.25)}
+  h1{font-size:22px;margin:22px 0 6px}
+  p{margin:4px 0;color:#a8a49c;line-height:1.9}
+  p[lang=en]{direction:ltr;font-family:"Segoe UI",sans-serif}
+  button{margin-top:22px;padding:12px 30px;border:0;border-radius:14px;font:inherit;font-weight:700;font-size:16px;color:#111;cursor:pointer;
+    background:linear-gradient(135deg,#ffcf7a,#f7931a 55%,#c2410c);box-shadow:0 12px 30px rgba(247,147,26,.28)}
+</style></head>
+<body><div class="c">
+  <img src="data:image/png;base64,{{LOGO}}" alt="Entekhab">
+  <h1>{{TITLE}}</h1>
+  <p lang="ckb">پەیوەندی بە ئینتەرنێتەوە نییە — پەیوەندییەکەت بپشکنە و دووبارە هەوڵ بدەرەوە.</p>
+  <p lang="fa">اتصال به اینترنت برقرار نیست — اتصال خود را بررسی کنید و دوباره تلاش کنید.</p>
+  <p lang="ar">لا يوجد اتصال بالإنترنت — تحقّق من اتصالك وأعد المحاولة.</p>
+  <p lang="en">No internet connection — check your connection and try again.</p>
+  <button type="button" onclick="window.chrome.webview.postMessage('retry')">{{RETRY}}</button>
+</div></body></html>
