@@ -1725,6 +1725,14 @@ def news_block_h(x, parts, tsize, bsize, width, keys):
     return h + 18
 
 
+def pruned(x, parts):
+    parts = dict(parts)
+    tw_, ww = set(x["fa_t"].split()), set((parts.get("what") or "").split())
+    if ww and len(tw_ & ww) / len(ww) >= 0.6:
+        parts["what"] = ""
+    return parts
+
+
 def s_news(base, f, tx):
     ed = f["edition"]
     im = base.copy()
@@ -1737,13 +1745,13 @@ def s_news(base, f, tx):
     for keys, tsize, bsize in ((("what", "why", "effect", "watch"), 31, 24), (("what", "why", "effect", "watch"), 29, 23),
                                (("what", "why", "effect", "watch"), 28, 22), (("why", "effect", "watch"), 31, 24),
                                (("why", "effect", "watch"), 29, 23), (("why", "effect", "watch"), 28, 22)):
-        hs = [news_block_h(x, tx["news"][x["id"]], tsize, bsize, width, keys) for x in items]
+        hs = [news_block_h(x, pruned(x, tx["news"][x["id"]]), tsize, bsize, width, keys) for x in items]
         if sum(hs) <= avail:
             break
     spare = max(0, (avail - sum(hs)) / len(items))
     y = CT
     for x, h in zip(items, hs):
-        parts = tx["news"][x["id"]]
+        parts = pruned(x, tx["news"][x["id"]])           # «چه شد» that only repeats the headline is left out
         h += spare
         box = (M - 8, y, W - M + 8, y + h)
         panel(im, box, ed)
