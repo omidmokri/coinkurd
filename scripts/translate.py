@@ -245,6 +245,9 @@ def ar_fix(s):
     return (s or "").replace("ی", "ي").replace("ک", "ك").replace("ۀ", "ة").replace("‌", " ")
 
 
+import time as _time_mod
+_START = _time_mod.time()
+
 AR_DAYS = 30            # the owner's choice (2026-11-12): posts of the last month and every new one get Arabic
 AR_PROMPT = ("Translate the following Persian (Farsi) crypto-channel post into Modern Standard Arabic (فصحى). "
              "Keep the meaning exact; keep numbers, tickers (BTC, ETH…), hashtags, emojis, URLs, markdown links and line "
@@ -262,8 +265,12 @@ def arabic(posts, store, engine, api_key):
             and not ((p["tr"].get("ar") or {}).get("text"))][:lim]
     print(f"arabic: {len(todo)} posts to translate (last {AR_DAYS} days)")
     done = fails = 0
+    import time as _t
+    # the step has 8 minutes in all: stop well before, whatever is left waits for the next run
+    stop = min(_t.time() + float(os.environ.get("AR_BUDGET", "150")), _START + float(os.environ.get("AR_DEADLINE", "300")))
     for p in todo:
-        if fails >= 3:
+        if fails >= 3 or _t.time() > stop:
+            print("arabic: time budget used, the rest waits for the next run")
             break
         try:
             body = "TITLE: " + (p.get("title") or "") + "\n\nTEXT:\n" + p["text"]
@@ -287,6 +294,9 @@ def arabic(posts, store, engine, api_key):
             store.setdefault(str(p["id"]), {})["ar"] = p["tr"]["ar"]
             done += 1
             fails = 0
+            if done % 3 == 0:   # saved as it goes: a step cut short keeps what was done
+                _save(posts)
+                json.dump(store, open(TR_FILE, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         except Exception as e:  # noqa: BLE001
             print(f"  ar {p.get('id')} FAILED: {str(e)[:160]}", file=sys.stderr)
             fails += 1
