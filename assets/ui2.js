@@ -22,6 +22,8 @@
     if (l === 'ar') l = 'en';
     return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa';
   }
+  /* «العربية» shows where the header shows it (data/ar_on) or in the owner's test mode */
+  function arOn() { if (d.querySelector('#langs button[data-l="ar"]:not([hidden])')) return true; try { return localStorage.getItem('ek_ar_test') === '1'; } catch (e) { return false; } }
   function pick(fa, ckb, en) { return { fa: fa, ckb: ckb, en: en }[lang()]; }
   function tri(fa, ckb, en, tag, cls) {
     tag = tag || 'span';
@@ -66,6 +68,27 @@
     lg.setAttribute('data-afa', 'زبان'); lg.setAttribute('data-ackb', 'زمان'); lg.setAttribute('data-aen', 'Language');
     tools.insertBefore(lg, tools.firstChild);
     lg.addEventListener('click', function () { openMenu(null, lg, true); });
+    /* the header fits itself: each language's labels have their own length (and the switcher shows four full names),
+       so instead of fixed breakpoints the parts give way in turn only while the menu and the tools actually collide:
+       1 the switcher becomes one «language» button · 2 the profile icon goes · 3 «more» goes · 4 the app button shrinks */
+    var FIT = ['ekh-c1', 'ekh-c2', 'ekh-c3', 'ekh-c4'], fitting = false, fq = 0;
+    function clash() {
+      var nav = H.querySelector('.ek-nav'); if (!nav || !nav.offsetParent) return false;
+      var t = tools.getBoundingClientRect(), lo = 1e9, hi = -1e9;
+      [].forEach.call(nav.querySelectorAll('.ek-mi,.ek-mt,.ek-ml'), function (e) { if (!e.offsetParent) return; var r = e.getBoundingClientRect(); if (r.width) { lo = Math.min(lo, r.left); hi = Math.max(hi, r.right); } });
+      return hi > lo && Math.min(hi, t.right) - Math.max(lo, t.left) > -6;
+    }
+    function fit() {
+      if (fitting) return; fitting = true;
+      FIT.forEach(function (c) { de.classList.remove(c); });
+      for (var i = 0; i < FIT.length && clash(); i++) de.classList.add(FIT[i]);
+      fitting = false;
+    }
+    function refit() { if (!fq) fq = (w.requestAnimationFrame || setTimeout)(function () { fq = 0; fit(); }); }
+    w.addEventListener('resize', refit);
+    if (w.ResizeObserver) { var ro = new ResizeObserver(function () { if (!fitting) refit(); }); var nv = H.querySelector('.ek-nav'); if (nv) ro.observe(nv); }
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(refit);
+    setTimeout(refit, 0); setTimeout(refit, 1500);
     /* the top-level items open the same full-screen menu on their own category (the old drop-down panels are hidden) */
     H.addEventListener('click', function (e) {
       var bt = e.target.closest && e.target.closest('.ek-mt'); if (!bt) return;
@@ -119,8 +142,9 @@
       '<button type="button" class="ekm-x">' + tri('بستن', 'داخستن', 'Close') + IC.x + '</button></div>' +
       '<div class="ekm-main"><div class="ekm-cats">' + cl + '</div><div class="ekm-panes">' + pl +
       '<div class="ekm-pane ekm-res" id="ekm-res"><div class="ekm-pi"></div></div></div></div>' +
-      '<div class="ekm-foot"><div class="ekm-lang" role="group"><button type="button" data-l="fa" lang="fa">فارسی</button>' +
-      '<button type="button" data-l="ckb" lang="ckb">کوردی</button><button type="button" data-l="en" lang="en">English</button></div>' +
+      '<div class="ekm-foot"><div class="ekm-lang" role="group"><button type="button" data-l="ckb" lang="ckb">کوردی</button>' +
+      '<button type="button" data-l="fa" lang="fa">فارسی</button>' + (arOn() ? '<button type="button" data-l="ar" lang="ar">العربية</button>' : '') +
+      '<button type="button" data-l="en" lang="en">English</button></div>' +
       (apps ? '<div class="ekm-apps">' + apps.innerHTML + '</div>' : '') + (soc ? '<div class="ekm-soc">' + soc.innerHTML + '</div>' : '') + '</div></div>';
     d.body.appendChild(M);
     cats = [].slice.call(M.querySelectorAll('.ekm-cat[data-k]'));
@@ -207,12 +231,13 @@
     all.forEach(function (c) { if (DESK.matches && c !== one) c.setAttribute('tabindex', '-1'); else c.removeAttribute('tabindex'); });
   }
   function syncLang() {
-    var l = lang(), lg = H && H.querySelector('.ek-lg1');
-    if (lg) lg.textContent = { fa: 'فا', ckb: 'کو', en: 'EN' }[l];
+    var l = lang(), lg = H && H.querySelector('.ek-lg1'), ar = false;
+    try { ar = localStorage.getItem('ek_ar') === '1' || de.lang === 'ar'; } catch (e) { }
+    if (lg) lg.textContent = ar ? 'العربية' : { fa: 'فارسی', ckb: 'کوردی', en: 'English' }[l];
     if (!M) return;
     M.setAttribute('aria-label', pick('منوی سایت', 'مێنیوی ماڵپەڕ', 'Site menu'));
     M.querySelector('.ekm-lang').setAttribute('aria-label', pick('زبان', 'زمان', 'Language'));
-    [].forEach.call(M.querySelectorAll('.ekm-lang button'), function (b) { var on = b.getAttribute('data-l') === l; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    [].forEach.call(M.querySelectorAll('.ekm-lang button'), function (b) { var on = b.getAttribute('data-l') === (ar ? 'ar' : l); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     var q = M.querySelector('.ekm-q input'); if (q) q.placeholder = PH[l];
     [].forEach.call(M.querySelectorAll('.ekm-cat small[data-n]'), function (s) { s.textContent = dg(s.getAttribute('data-n')); });
   }

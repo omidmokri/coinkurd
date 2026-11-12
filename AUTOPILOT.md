@@ -794,3 +794,12 @@ is untouched.
 - **Verified locally:** home/satoshi/post desktop+mobile, switch in and out, post `/p/<id>/` → `/ar/p/<id>/`, no JS
   errors; fixed `nx.js`/`ui2.js` reading the «ع» button as Persian.
 - **Next:** CI fills translations; check quality, then owner approves and `data/ar_on` is created.
+
+### 2026-11-12 · Language order and full names everywhere (asked for by the owner)
+- **Order:** کوردی · فارسی · العربية · English — Kurdish first, English last — in the header, the phone sheet, the
+  site menu, the library/glossary/learn/kids switchers and the encyclopedia (which keeps its three). Bot texts listing
+  languages reordered the same way (its keyboard already started with Kurdish and ended with English).
+- **Header fits itself** (`ui2.js` fit): four full names are wider, so instead of fixed breakpoints the switcher becomes
+  one «language» button only while the menu and the tools actually collide; scanned 1180–1940 px in fa/ckb/en/ar, no
+  overlap left (before: up to 154 px in English). Arabic mode now also turns `<body dir="ltr">` to rtl.
+- «العربية» stays hidden for visitors until `data/ar_on` (owner's approval).

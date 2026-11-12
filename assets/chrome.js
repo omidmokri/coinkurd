@@ -137,7 +137,7 @@
     });
     var soc = F && F.querySelector('.ekf-soc'), apps = F && F.querySelector('.ekf-apps');
     if (soc) h += '<h4>' + F.querySelector('.ekf-h').outerHTML + '</h4><div class="ek-socs">' + soc.innerHTML + '</div>';
-    h += '<h4>' + tri('زبان و اپلیکیشن', 'زمان و ئەپ', 'Language & app') + '</h4><div class="ek-row"><div class="ek-lang"><button type="button" data-l="fa">فارسی</button><button type="button" data-l="ckb">کوردی</button><button type="button" data-l="en">English</button>' + (d.querySelector('#langs button[data-l="ar"]:not([hidden])') || (function () { try { return localStorage.getItem('ek_ar_test') === '1'; } catch (e) { return false; } })() ? '<button type="button" data-l="ar" lang="ar">العربية</button>' : '') + '</div>' +
+    h += '<h4>' + tri('زبان و اپلیکیشن', 'زمان و ئەپ', 'Language & app') + '</h4><div class="ek-row"><div class="ek-lang"><button type="button" data-l="ckb" lang="ckb">کوردی</button><button type="button" data-l="fa" lang="fa">فارسی</button>' + (d.querySelector('#langs button[data-l="ar"]:not([hidden])') || (function () { try { return localStorage.getItem('ek_ar_test') === '1'; } catch (e) { return false; } })() ? '<button type="button" data-l="ar" lang="ar">العربية</button>' : '') + '<button type="button" data-l="en" lang="en">English</button></div>' +
       (apps ? '<div class="ekf-apps">' + apps.innerHTML + '</div>' : '') + '</div></div>';
     S.innerHTML = h; d.body.appendChild(S);
     S.addEventListener('click', function (e) {

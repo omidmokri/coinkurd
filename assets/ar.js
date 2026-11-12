@@ -17,7 +17,8 @@
     if (!PUBLIC) return;
     [].forEach.call(d.querySelectorAll('#langs,.ek-lang,.lsw'), function (box) {
       var b = box.querySelector('button[data-l="ar"]');
-      if (!b) { b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-l', 'ar'); b.setAttribute('lang', 'ar'); b.textContent = box.classList.contains('lsw') ? 'العربية' : 'ع'; box.appendChild(b); }
+      if (!b) { b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-l', 'ar'); b.setAttribute('lang', 'ar'); b.textContent = 'العربية'; box.insertBefore(b, box.querySelector('button[data-l="en"]')); }
+      else if (b.textContent === 'ع') b.textContent = 'العربية';
       b.hidden = false;
       if (ON) [].forEach.call(box.querySelectorAll('button[data-l]'), function (x) { x.classList.toggle('on', x.getAttribute('data-l') === 'ar'); });
     });
@@ -53,6 +54,9 @@
   if (!AR_PAGE && /\/p\/[^/]+\/?$/.test(PATH)) { var to = alt('ar') || (de.lang !== 'en' && alt('en')); if (to && go(to)) return; }
 
   de.classList.add('ek-ar'); de.dir = 'rtl';
+  /* the English page sets dir="ltr" on <body> too: Arabic reads right to left everywhere */
+  function rtl() { if (de.dir !== 'rtl') de.dir = 'rtl'; if (d.body && d.body.getAttribute('dir') === 'ltr') d.body.setAttribute('dir', 'rtl'); }
+  if (d.body) rtl(); else d.addEventListener('DOMContentLoaded', rtl);
   var st = d.createElement('style');
   st.textContent = 'html.ek-ar body{font-family:Vazirmatn,Tahoma,"Segoe UI",sans-serif}html.ek-ar [data-l="ar"]{font-family:Vazirmatn,Tahoma,sans-serif}';
   d.head.appendChild(st);
@@ -132,7 +136,7 @@
   function ok(el) {
     for (var e = el; e && e !== d.body; e = e.parentNode) {
       if (e.nodeType !== 1) continue;
-      if (SKIP[e.tagName] || e.getAttribute('translate') === 'no' || e.classList.contains('notranslate')) return false;
+      if (SKIP[e.tagName] || e.hasAttribute('data-l') || e.getAttribute('translate') === 'no' || e.classList.contains('notranslate')) return false;
       var lg = e.getAttribute('lang'); if (lg) return lg === 'en' || lg === 'ar';
     }
     return true;
@@ -161,7 +165,7 @@
   function flush() {
     sched = 0; var p = pend; pend = [];
     for (var i = 0; i < p.length; i++) if (p[i].isConnected) walk(p[i]);
-    if (de.dir !== 'rtl') de.dir = 'rtl';
+    rtl();
     buttons();
   }
   function queue(n) { pend.push(n); if (!sched) sched = (w.requestAnimationFrame || setTimeout)(flush); }
@@ -180,7 +184,8 @@
         else for (var j = 0; j < m.addedNodes.length; j++) queue(m.addedNodes[j]);
       }
     }).observe(d.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTR.concat(['data-lang', 'hidden']) });
-    new MutationObserver(function () { if (de.dir !== 'rtl') de.dir = 'rtl'; title(); }).observe(de, { attributes: true, attributeFilter: ['dir', 'lang'] });
+    new MutationObserver(function () { rtl(); title(); }).observe(de, { attributes: true, attributeFilter: ['dir', 'lang'] });
+    new MutationObserver(rtl).observe(d.body, { attributes: true, attributeFilter: ['dir'] });
     var tt = d.querySelector('title'); if (tt) new MutationObserver(title).observe(tt, { childList: true });
   });
 })();

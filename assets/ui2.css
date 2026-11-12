@@ -49,7 +49,7 @@ html.ek-v2 #ekh .ek-lang button.on{background:#ecebe6;color:#0b0c0f}
 html.ek-v2 #ekh .ek-appb{position:relative;overflow:hidden;border-radius:12px;background:var(--u-foil);box-shadow:0 6px 20px rgba(247,147,26,.26)}
 html.ek-v2 #ekh .ek-appb::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%);transform:translateX(-120%);animation:u-shine 6s 2s infinite}
 @keyframes u-shine{0%{transform:translateX(-120%)}16%,100%{transform:translateX(120%)}}
-html.ek-v2 #ekh .ek-lg1{display:none;font:800 .74rem var(--ek-font);color:var(--ek-ink)}
+html.ek-v2 #ekh .ek-lg1{display:none;font:800 .74rem var(--ek-font);color:var(--ek-ink);width:auto;min-width:38px;padding:0 10px}
 #ekh .ek-menu{display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04);color:var(--ek-ink);
   font:800 .82rem var(--ek-font);cursor:pointer;white-space:nowrap;transition:border-color .2s,background .2s}
 #ekh .ek-menu:hover{border-color:var(--ek-acc);background:rgba(247,147,26,.1)}
@@ -245,3 +245,9 @@ html.ek-deck #ekp .ekp-body>section{display:block}
   #ekp{clip-path:none}
 }
 @media print{#ekm,#ekp,.ekd{display:none!important}}
+
+/* the header fits itself (ui2.js fit()): each step only while the menu and the tools collide */
+html.ekh-c1 #ekh .ek-lang{display:none!important}html.ekh-c1 #ekh .ek-lg1{display:grid!important}
+html.ekh-c2 #ekh .ek-meb{display:none!important}
+html.ekh-c3 #ekh .ek-mi[data-k=more]{display:none!important}
+html.ekh-c4 #ekh .ek-appb{width:38px!important;padding:0!important;justify-content:center}html.ekh-c4 #ekh .ek-appb .ek-i{display:none!important}
