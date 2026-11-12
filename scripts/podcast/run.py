@@ -175,8 +175,8 @@ def main():
             try:
                 r = qc.asr_sample(ep, l, n=12)
                 qcrep["langs"][l]["asr"] = {k: r[k] for k in ("pcer_mean", "numbers_heard_correctly")}
-                print(l, "asr", json.dumps({k: v for k, v in r.items() if k != "items"}, ensure_ascii=False)[:600])
-                for it in (r.get("items") or [])[:12]:
+                print(l, "asr", json.dumps({k: v for k, v in r.items() if k != "rows"}, ensure_ascii=False)[:600])
+                for it in (r.get("rows") or [])[:12]:
                     print("  asr", json.dumps(it, ensure_ascii=False)[:400])
                 json.dump(r, open(os.path.join(ep, f"qc_asr_{l}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
                 if r["pcer_mean"] > 0.35:
