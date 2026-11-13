@@ -51,6 +51,7 @@ import bot_pro as PRO  # noqa: E402  (the site's live market /market/ + its pric
 import bot_econ as EC  # noqa: E402  (economic calendar: group heads-up/result in topic 47540 + opt-in private alerts)
 import econ_src as ES  # noqa: E402
 import bot_mm as MMB  # noqa: E402  (the market map: /heatmap/, /bubbles/, /money-flow/, /liquidity/, /etf/)
+import bot_obs as OBS  # noqa: E402  (the Observatory: /charts/ — liquidation heatmap and map)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
 import bot_proxy2 as PX2  # noqa: E402
@@ -465,6 +466,7 @@ SECTIONS = {
     "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
     "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
     "mmap": (lambda lang: MMB.section(lang, D.load), "/heatmap/"),   # the market map: heatmap, bubbles, money flow, liquidity, ETFs
+    "obs": (lambda lang: OBS.section(lang), "/charts/"),              # the Observatory: liquidation heatmap and liquidation map
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
@@ -640,6 +642,8 @@ def _render(s, uid, key, page=0):
             kb["inline_keyboard"][0:1] = PRO.open_rows(lang)
         if key == "mmap":                               # the five pages inside Telegram, the heatmap in the browser
             kb["inline_keyboard"][0:1] = MMB.open_rows(lang)
+        if key == "obs":                                # the charts inside Telegram, the liquidation heatmap in the browser
+            kb["inline_keyboard"][0:1] = OBS.open_rows(lang)
         if key == "chain":                              # the live mempool map on /satoshi/ (a site page; nothing is sent)
             kb["inline_keyboard"].insert(0, [btn(t("b_mempool", lang), url=D.SITE + "/satoshi/#mempool")])
         if key in ("ind", "live"):                      # readable live-analysis card <-> indicator list

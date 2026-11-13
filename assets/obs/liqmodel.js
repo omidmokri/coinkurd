@@ -176,22 +176,32 @@
     return o;
   }
 
-  /* the largest clusters above and below a price in the final state: neighbouring rows above `floor` are one cluster */
+  /* the largest clusters above and below a price in the final state.
+     A cluster is a peak of the (lightly smoothed) profile and the rows around it down to half the peak's height —
+     so a broad band of levels gives several clusters at its crests, not one cluster as wide as the band. */
   function clusters(res, price, n) {
-    var g = res.grid, rows = g.rows, NT = TIERS.length, tot = new Float64Array(rows), r, k, mx = 0;
-    for (r = 0; r < rows; r++) { var s = 0; for (k = 0; k < NT; k++) s += res.longT[k][r] + res.shortT[k][r]; tot[r] = s; if (s > mx) mx = s; }
-    var floor = mx * 0.12, out = [], cur = null;
+    var g = res.grid, rows = g.rows, NT = TIERS.length, tot = new Float64Array(rows), sm = new Float64Array(rows), r, k, mx = 0;
+    for (r = 0; r < rows; r++) { var s = 0; for (k = 0; k < NT; k++) s += res.longT[k][r] + res.shortT[k][r]; tot[r] = s; }
+    for (r = 0; r < rows; r++) { sm[r] = (tot[r] * 2 + (r > 0 ? tot[r - 1] : 0) + (r < rows - 1 ? tot[r + 1] : 0)) / 4; if (sm[r] > mx) mx = sm[r]; }
+    var peaks = [];
     for (r = 0; r < rows; r++) {
-      if (tot[r] > floor) {
-        if (!cur) cur = { r0: r, r1: r, usd: 0, peak: 0, peakRow: r };
-        cur.r1 = r; cur.usd += tot[r];
-        if (tot[r] > cur.peak) { cur.peak = tot[r]; cur.peakRow = r; }
-      } else if (cur) { out.push(cur); cur = null; }
+      if (!(sm[r] > mx * 0.12)) continue;
+      var top = true;
+      for (k = Math.max(0, r - 3); k <= Math.min(rows - 1, r + 3); k++) if (sm[k] > sm[r] || (sm[k] === sm[r] && k < r)) { top = false; break; }
+      if (top) peaks.push(r);
     }
-    if (cur) out.push(cur);
-    out.forEach(function (c) {
-      c.price = priceOf(g, c.peakRow); c.lo = g.pmin + c.r0 * g.step; c.hi = g.pmin + (c.r1 + 1) * g.step;
+    peaks.sort(function (a, b) { return sm[b] - sm[a]; });
+    var taken = new Uint8Array(rows), out = [];
+    peaks.forEach(function (pr) {
+      if (taken[pr]) return;
+      var half = sm[pr] * 0.5, a = pr, b = pr;
+      while (a > 0 && !taken[a - 1] && sm[a - 1] >= half && sm[a - 1] <= sm[a] * 1.0001) a--;
+      while (b < rows - 1 && !taken[b + 1] && sm[b + 1] >= half && sm[b + 1] <= sm[b] * 1.0001) b++;
+      var usd = 0; for (var i = a; i <= b; i++) { usd += tot[i]; taken[i] = 1; }
+      var c = { r0: a, r1: b, usd: usd, peak: tot[pr], peakRow: pr };
+      c.price = priceOf(g, pr); c.lo = g.pmin + a * g.step; c.hi = g.pmin + (b + 1) * g.step;
       c.side = c.price < price ? 'long' : 'short'; c.dist = (c.price / price - 1) * 100;
+      out.push(c);
     });
     var above = out.filter(function (c) { return c.side === 'short'; }).sort(function (a, b) { return b.usd - a.usd; }).slice(0, n || 3);
     var below = out.filter(function (c) { return c.side === 'long'; }).sort(function (a, b) { return b.usd - a.usd; }).slice(0, n || 3);

@@ -121,6 +121,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
   collects what already exists and checks every internal link against the built tree, so adding an academy faculty
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
+- **The Observatory — `/charts/` and one address per chart** (owner, 2026-11-13: "everything Glassnode, CoinGlass and
+  CryptoQuant offer", built in stages — see the Log and the Backlog): static pages from `scripts/build_obs.py` (it puts
+  the header/footer/CSP in itself; its folders join `chrome.STATIC` by `build_obs.folders()`), app
+  `assets/obs/{i18n,core,src,liqmodel,liq}.js` + `obs.css` (bump `V` in build_obs.py and `OB.V` in core.js with every
+  change). `src.js` reads Binance futures and Bybit public data in the visitor's browser (CSP: fapi.binance.com,
+  api.bybit.com) and OKX's liquidation orders; everything is brought to price per coin and size in coins (1000PEPE →
+  PEPE × 1000). `liqmodel.js` is the liquidation-level model: pure, documented at its top, never changed without
+  `node tests/test_obs_liq.js`. The hub's `HUB["todo"]` in build_obs.py is the honest "not built yet" list: move an
+  item into `HUB["secs"]` only when its page exists. Bot: `scripts/bot_obs.py` (section `obs`, Web App buttons).
+  Tests: `node tests/test_obs_liq.js`, `python3 tests/test_obs_i18n.py`, `python3 tests/obs_e2e.py`
+  (`ONLY=data|heat|map|hub|langs|errors`; exchanges mocked in their real formats), `python3 tests/test_bot_obs.py`.
 - **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
   now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
   cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
@@ -150,6 +161,16 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
+- **The Observatory, next stages** (owner's request 2026-11-13, see the Log entry of that day; one page per run is fine):
+  each is a page under `/charts/` built with `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to
+  `HUB["secs"]` when it exists. (1) open interest across exchanges (Binance, Bybit, OKX, Bitget, Gate, Hyperliquid:
+  current by exchange + history from Binance/Bybit); (2) funding rates across exchanges (table + history; rates
+  brought to one interval, and said so); (3) long/short ratios (Binance accounts / top traders / taker, Bybit
+  accounts); (4) options from Deribit (open interest by strike and expiry, max pain, put/call, DVOL); (5) on-chain
+  from CoinMetrics community (CC BY-NC, name the source): MVRV, realized price, NUPL, MVRV-Z, exchange reserve and
+  net flow, active addresses, hash rate, issuance and Puell — a CI step that commits one daily file; (6) cycle
+  indicators from price (Mayer, 200-week MA, Pi cycle, 2-year MA). Not possible without a paid source and to be
+  said so on the hub rather than faked: SOPR, CDD, HODL waves, long/short-term holder metrics.
 - **Why four regimes? BIC model selection on /regime/** (owner's repo list 2026-11-10, idea from DaruFinance/strategy-regime):
   fit K = 2..6 in regime.py (same features, same seeds), publish log-likelihood, parameter count and BIC per K, and
   say on the page whether K = 4 is the BIC choice. Check the CI run time first: today's fit is 4 seeds × 120 iterations.
@@ -194,6 +215,53 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · The Observatory, stage 1: liquidation heatmap and liquidation map (owner's request in chat, not by the loop)
+- **Why:** the owner asked for everything Glassnode, CoinGlass and CryptoQuant offer, at their quality or better, and
+  gave CoinGlass's liquidation heatmap as the example. That is months of work, so it is built in stages; stage 1 is
+  his example, done properly, plus the frame the rest hangs on (`/charts/`).
+- **What:** `/charts/liquidation-heatmap/` — estimated liquidation levels over time and price for every coin with a
+  perpetual on Binance or Bybit (both together or each alone), ten ranges (12 h … 1 y), three models, leverage tiers
+  5x–100x switched one by one, four colour scales, threshold, zoom/pan/pinch, crosshair read-out, the levels standing
+  now as a profile, the largest clusters above and below the price as tables, PNG, share link, full screen; under
+  the chart a strip of the REAL liquidation orders (OKX history page by page, Binance or Bybit live from the socket).
+  `/charts/liquidation-map/` — the present levels by price band and leverage with running totals from the price,
+  look-back 24 h … 1 month, width ±5 … ±20 %. `/charts/` — the hub: these two, the related pages the site already
+  had, and a plainly labelled "in the works" list. کوردی · فارسی · العربية · English.
+- **Model (assets/obs/liqmodel.js, written out at its top):** a rise in open interest in a candle = new contracts, one
+  long and one short each; entries spread over the candle's range; a long at leverage L is liquidated at
+  entry × (1 − 1/L + maintenance margin), a short at entry × (1 + 1/L − mm); a level the price reaches is removed, and
+  every level shrinks by the share open interest falls. Model 2 weighs the sides by the accounts' long share, model 3
+  adds 10 % of volume as turnover. Maximum leverage and maintenance margin come from Bybit's public specification.
+  Older, coarser candles before the window (30 days … 2 years) build the levels the window opens with.
+  What is assumption and not data — the tiers, their equal weights, the 10 % — is said on the page.
+- **Facts learned about the sources (measured from the owner's browser on entekhab.net, 2026-11-13):**
+  fapi.binance.com and api.bybit.com answer with CORS; OKX `public/` and `market/` do, its `rubik/` statistics do not;
+  Binance's open-interest history reaches back 30 days only and refuses an older `startTime` with HTTP 400 (the loader
+  clips; the e2e mock refuses too), Bybit's reaches years; OKX liquidation orders come 100 a page, newest first.
+  Also reachable with CORS and unused so far: Deribit, Hyperliquid (POST), Bitget, Gate, dYdX, CoinMetrics community.
+  Not usable: BGeometrics' free API (its terms forbid passing the data on; SOPR/HODL-wave style metrics need a paid
+  source), DefiLlama's CEX files in the browser (tens of MB: CI only).
+- **Verified:** `tests/test_obs_liq.js` 78 checks on candles with hand-computed answers (null case, one jump, sweep,
+  decay, tiers, the three models, wide candles, warm-up, sums, clusters, conservation); `tests/obs_e2e.py` 196 checks
+  in Chrome with the exchanges mocked in their real formats (the data the model is fed equals the mock, a planted jump
+  of open interest appears as the planted contracts at the computed price, every control, long ranges, the map's
+  totals, four languages at 1280 and 390 px, unreachable exchanges); `tests/test_obs_i18n.py`; `tests/test_bot_obs.py`
+  through refbot's real handlers in five languages; leak guard clean. **Live with real data (owner's browser):** BTC's
+  open interest on the page = Binance 99,534 + Bybit 69,835 BTC = $11.71 B, the same as the two exchanges' own
+  endpoints; maintenance margin 0.33 % and 150x from Bybit's specification; the bands end where the day's fall crossed
+  them, as on CoinGlass's map of the same hours.
+- **Changed after seeing real data:** the colour scale is nearly linear now (gamma 0.95, threshold 6 %): at 0.55 every
+  band of a month of levels glowed and nothing stood out; clusters are peaks down to half their height (the first rule
+  merged a whole band into one "cluster" $4,000 wide); the real liquidations moved from rings over the candles to a
+  strip under the chart and are paged back to the start of the window.
+- **Limits (also on the page):** an estimate, not positions; only Binance and Bybit feed the model; positions opened
+  before the data begins are invisible; OKX's liquidation feed is one exchange.
+- **Bot / apps / assistant:** bot section «🔭 رصدخانه» (`scripts/bot_obs.py`, in «تحلیل», Web App buttons for the three
+  pages); the menu's «بازار» group lists the heatmap and the hub; assistant FEATURES; sitemap. The Android and Windows
+  apps load the site, so they have it as is.
+- **Next stages (Backlog):** open interest and funding across exchanges, long/short ratios, options (Deribit), then the
+  on-chain charts CoinMetrics' community data allows (MVRV, realized price, NUPL, exchange reserve and flows, Puell…)
+  and the cycle indicators computed from price.
 ### 2026-11-13 · /dna/: «اثر انگشت دارایی» — the 8 genes as one radar shape (owner's request in chat, not by the loop)
 - New section on the DNA page (template `dna/index.html`, copied to every `/dna/<coin>/` by `build_dna()`): an SVG
   radar of the coin's 8 gene percentiles from `data/dna.json`, a dashed median ring, and up to two coins laid over

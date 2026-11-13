@@ -186,6 +186,15 @@ near('priceOf centre', M.priceOf(G, 90), 90.5);
   ok('clusters: below are long, above are short', c.below.every(x => x.side === 'long' && x.price < 100) && c.above.every(x => x.side === 'short' && x.price > 100));
   near('clusters: 10x long cluster dollars', c.below.find(x => Math.abs(x.price - 90.5) < 1e-9).usd, 200 * 90.5);
   near('clusters: distance of the 25x long', c.below.find(x => Math.abs(x.price - 96.5) < 1e-9).dist, -3.5);
+  /* a broad band with two crests gives two clusters at the crests, not one cluster as wide as the band */
+  const mkRes = prof => ({ grid: G, longT: [0, 1, 2, 3, 4].map(k => { const a = new Float64Array(200); if (k === 1) prof.forEach((v, i) => { a[40 + i] = v; }); return a; }), shortT: [0, 1, 2, 3, 4].map(() => new Float64Array(200)) });
+  const band = []; for (let i = 0; i < 40; i++) band.push(300 + 700 * Math.exp(-Math.pow((i - 8) / 2.5, 2)) + 500 * Math.exp(-Math.pow((i - 30) / 2.5, 2)));
+  const cb = M.clusters(mkRes(band), 150, 3);
+  ok('clusters: a band with two crests → two leading clusters', cb.below.length >= 2 && Math.abs(cb.below[0].peakRow - 48) <= 1 && Math.abs(cb.below[1].peakRow - 70) <= 1, cb.below.map(x => [x.peakRow, x.r0, x.r1]));
+  ok('clusters: each is narrow (down to half its peak), not the whole band', cb.below[0].r1 - cb.below[0].r0 < 12 && cb.below[1].r1 - cb.below[1].r0 < 12, cb.below.map(x => [x.r0, x.r1]));
+  ok('clusters: they do not overlap', cb.below[0].r1 < cb.below[1].r0 || cb.below[1].r1 < cb.below[0].r0);
+  near('clusters: dollars are the sum of the rows inside', cb.below[0].usd, band.slice(cb.below[0].r0 - 40, cb.below[0].r1 - 40 + 1).reduce((a, b) => a + b, 0), 1e-9);
+  ok('clusters: nothing in an empty profile', M.clusters(mkRes([]), 150, 3).below.length === 0 && M.clusters(mkRes([]), 150, 3).above.length === 0);
 }
 
 /* ---- 13. conservation on random candles: with no sweep and no fall of open interest, contracts in = contracts kept */

@@ -292,16 +292,25 @@ def run():
             check("model 1 asked for no account ratio", STATS["bn_ls"] == 0 and STATS["by_ls"] == 0, (STATS["bn_ls"], STATS["by_ls"]))
 
             # the planted jump: 3600 contracts on Binance + 2700 on Bybit in one candle, four tiers of 25 % each.
-            # 10x with 0.33 % maintenance margin: long at entry × (1 − 0.1 + 0.0033), short at entry × (1 + 0.1 − 0.0033)
+            # 10x with 0.33 % maintenance margin: long at entry × (1 − 0.1 + 0.0033), short at entry × (1 + 0.1 − 0.0033).
+            # The made-up background also leaves levels there, so the model is run twice in the page — on the feeds as loaded
+            # and on the same feeds with the jump taken out — and the difference must be the planted contracts (a few per
+            # cent less: open interest fell a little since, and falling open interest shrinks every level).
             o, h, l, c, v = candle("BTCUSDT", PLANT, 5 * MIN)
             tp = (h + l + c) / 3
             exp_units = (3600 + 3600 * BY_SCALE) * 0.25
-            r = page.evaluate("""([pl, ps]) => { const V = OB._liq.V, res = V.res, g = res.grid, M = window.OBLiq;
-              const around = (arr, p) => { const r0 = M.rowOf(g, p); let s = 0, u = 0; for (let r = r0 - 3; r <= r0 + 3; r++) if (r >= 0 && r < g.rows) { s += arr[r]; u += arr[r] / M.priceOf(g, r); } return { usd: s, units: u }; };
-              return { long10: around(res.longT[1], pl), short10: around(res.shortT[1], ps), step: g.step, rows: g.rows, tiers: res.tiers }; }""",
-                              [tp * (1 - 0.1 + 0.0033), tp * (1 + 0.1 - 0.0033)])
-            check("the planted jump's 10x long cluster holds the planted contracts", 0.97 * exp_units < r["long10"]["units"] < 1.25 * exp_units, (r["long10"], exp_units))
-            check("the planted jump's 10x short cluster holds the planted contracts", 0.97 * exp_units < r["short10"]["units"] < 1.25 * exp_units, (r["short10"], exp_units))
+            r = page.evaluate("""([pl, ps, plant, jump, byScale]) => { const V = OB._liq.V, g = V.res.grid, M = window.OBLiq, ends = V.cols.ends, tiers = { 10: 1, 25: 1, 50: 1, 100: 1 };
+              const around = (arr, p) => { const r0 = M.rowOf(g, p); let u = 0; for (let r = r0 - 3; r <= r0 + 3; r++) if (r >= 0 && r < g.rows) u += arr[r] / M.priceOf(g, r); return u; };
+              const run = feeds => M.sum(feeds.map(f => M.run(f, { model: 1, tiers, grid: g, colEnds: ends })));
+              const without = V.feeds.map(f => { const j = f.ex === 'bybit' ? jump * byScale : jump, x = Object.assign({}, f, { oi0: f.oi0.slice(), oi1: f.oi1.slice() });
+                for (let i = 0; i < f.t.length; i++) { if (f.t[i] > plant) x.oi0[i] -= j; if (f.t[i] >= plant) x.oi1[i] -= j; } return x; });
+              const A = run(V.feeds), B = run(without);
+              return { long10: around(A.longT[1], pl) - around(B.longT[1], pl), short10: around(A.shortT[1], ps) - around(B.shortT[1], ps), bgLong: around(B.longT[1], pl), tiers: V.res.tiers,
+                same: Math.abs(around(A.longT[1], pl) - around(V.res.longT[1], pl)) < 1e-6 }; }""",
+                              [tp * (1 - 0.1 + 0.0033), tp * (1 + 0.1 - 0.0033), PLANT, 3600, BY_SCALE])
+            check("re-running the model in the page reproduces what is on screen", r["same"])
+            check("the planted jump's 10x long cluster holds the planted contracts", 0.85 * exp_units < r["long10"] < 1.03 * exp_units, (r["long10"], exp_units, r["bgLong"]))
+            check("the planted jump's 10x short cluster holds the planted contracts", 0.85 * exp_units < r["short10"] < 1.03 * exp_units, (r["short10"], exp_units))
             check("the four default tiers were used", r["tiers"] == [10, 25, 50, 100], r["tiers"])
             check("the heatmap has a positive maximum", d["max"] > 1e6, d["max"])
 
@@ -390,7 +399,7 @@ def run():
             page.locator("#ob-pal button[data-v='ice']").click()
             page.wait_for_timeout(150)
             c_ice = page.evaluate("() => { const c = OB._liq.V.chart.img.getContext('2d').getImageData(0, 0, OB._liq.V.chart.img.width, OB._liq.V.chart.img.height).data; let r = 0, b = 0; for (let i = 0; i < c.length; i += 4) { r += c[i]; b += c[i + 2]; } return [r, b]; }")
-            check("the palette changes the picture (fire is red, ice is blue)", c_fire[0] > c_fire[1] and c_ice[1] > c_ice[0], (c_fire, c_ice))
+            check("the palette changes the picture (fire is far redder than ice)", c_fire[0] / c_fire[1] > 3 * c_ice[0] / c_ice[1] and c_ice[1] > c_ice[0], (c_fire, c_ice))
             page.locator("#ob-pal button[data-v='fire']").click()
             lit0 = page.evaluate("() => { const c = OB._liq.V.chart.img.getContext('2d').getImageData(0, 0, OB._liq.V.chart.img.width, OB._liq.V.chart.img.height).data; let n = 0; for (let i = 3; i < c.length; i += 4) if (c[i]) n++; return n; }")
             page.locator("#ob-thr").fill("40")
