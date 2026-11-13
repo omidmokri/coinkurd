@@ -268,7 +268,7 @@
     var leg = d.getElementById('bkErasLeg');
     if (leg) {
       var rows = [];
-      for (var k = 0; k < 6; k++) rows.push('<span>' + bd('<b>' + loc(eraYear(k)) + '–' + loc(eraYear(k + 1)) + '</b>') + ' · ' + bd(nl(subN(k) * INT / COIN, 0) + ' ' + unitB()) + ' · ' + bd(pc(100 / Math.pow(2, k + 1), k < 2 ? 0 : 3).replace(/[.٫]?0+(?=[%٪])/, '')) + '</span>');
+      for (var k = 0; k < 6; k++) rows.push('<span>' + bd('<b>' + loc(eraYear(k)) + '–' + loc(eraYear(k + 1)) + '</b>') + ' · ' + bd(nl(subN(k) * INT / COIN, 0) + ' ' + unitB()) + ' · ' + bd(loc(trim(100 / Math.pow(2, k + 1), 4)) + (LG() === 'en' ? '%' : '٪')) + '</span>');
       rows.push('<span>' + esc(T('e_rest')) + '</span>');
       leg.innerHTML = rows.join('');
     }
@@ -458,6 +458,17 @@
     el.innerHTML = h;
   }
 
+  /* world wealth in bitcoin: UBS Global Wealth Reports put personal wealth above $470 trillion ($471T at end-2023) */
+  var WEALTH = 470e12;
+  function drawWealth(N) {
+    var p = S.price, box = d.getElementById('bkWealthBig');
+    if (!N || !p) { set('bkWealth', ''); if (box) box.innerHTML = ''; return; }
+    var b = WEALTH / p, c = N.sup / COIN, x = b / c;
+    set('bkWealth', esc(tr('s_w_p', { b: usdShort(b), c: usdShort(c), x: nl(x, 0), s: pc(100 / x, 2) })));
+    if (box) box.innerHTML = '<div><b>' + esc(usdShort(b)) + '</b><small>' + esc(T('s_w_al')) + '</small></div>' +
+      '<div><b>' + esc(usdShort(c)) + '</b><small>' + esc(T('s_w_bl')) + '</small></div>' +
+      '<div><b>×' + esc(nl(x, 0)) + '</b><small>' + esc(T('s_w_xl')) + '</small></div>';
+  }
   function drawS1(N) { set('bkS1', N ? esc(tr('s_p1', { circ: nl(N.sup / COIN, 0), left: nl((MAX - N.sup) / COIN, 0) })) : ''); }
   function drawTags() {
     var b = d.getElementById('bkTags'); if (!b) return;
@@ -505,11 +516,11 @@
   function renderAll() {
     var N = now();
     drawHero(N); drawClock(N); drawGlance(N); drawBin(N); drawStacks(N); drawDots(N); drawEras(N); drawTable(N);
-    drawChart(); drawDist(); drawMine(); funnelText(N); drawCalc(); drawDca(); drawKids(); drawWords(N); drawFilm(); drawS1(N); drawTags(); toc();
+    drawChart(); drawDist(); drawMine(); funnelText(N); drawCalc(); drawDca(); drawKids(); drawWords(N); drawFilm(); drawS1(N); drawWealth(N); drawTags(); toc();
     var shareP = d.getElementById('bkShare'); if (shareP) shareP.onclick = function () { share(T('share_txt'), 'https://entekhab.net/bitcoin/'); };
   }
   function renderData() {                                       // what moves with the network (cheap, every minute)
-    var N = now(); drawHero(N); drawClock(N); drawGlance(N); drawMine(); funnelText(N); drawCalc(); drawDca(); drawKids(); drawWords(N); drawS1(N);
+    var N = now(); drawHero(N); drawClock(N); drawGlance(N); drawMine(); funnelText(N); drawCalc(); drawDca(); drawKids(); drawWords(N); drawS1(N); drawWealth(N);
   }
   function wire() {
     var by = d.getElementById('bkBy'), age = d.getElementById('bkAge'), m = d.getElementById('bkM');

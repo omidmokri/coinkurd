@@ -138,6 +138,8 @@
 .bk-big div{border-radius:16px;padding:16px;background:radial-gradient(circle at 20% 0%,rgba(247,147,26,.22),rgba(0,0,0,.25) 70%);border:1px solid rgba(247,147,26,.3);text-align:center}
 .bk-big b{display:block;font-family:var(--mono);font-size:clamp(1.8rem,5vw,2.8rem);color:var(--gold2);line-height:1.2}
 .bk-big small{color:var(--soft);font-size:.85rem}
+.bk-big.bk-big3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.bk-big.bk-big3 b{font-size:clamp(1.35rem,3.2vw,2.1rem)}
 .bk-chart{position:relative}
 .bk-chart svg{width:100%;height:auto;display:block}
 .bk-chart text{font-family:'Space Grotesk','Vazirmatn',sans-serif}
@@ -225,7 +227,7 @@
 @media (max-width:520px){
   .bk-words{grid-template-columns:1fr}
   .bk-mine{grid-template-columns:1fr}
-  .bk-big{grid-template-columns:1fr}
+  .bk-big,.bk-big.bk-big3{grid-template-columns:1fr}
   .bk-grid{gap:9px}
   .bk-st{padding:11px}
 }
