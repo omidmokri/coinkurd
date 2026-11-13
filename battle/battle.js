@@ -321,7 +321,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  /* ---- ground movement on the navigation map (nav.js): soldiers, armour and lorries keep to clear ground, go round each other and never through anything solid ---- */
  VB:[[3.55,1.62],[4.3,2.28],[5.06,2.68],[3.45,1.6]],                       // half length, half width (m): IFV, MBT, heavy tank, lorry
  navOn:false,works:[],navDirty:true,navSig:'',navT:0,
- navInit(){for(const k in this.sides){const A=this.sides[k],d=(A.dir<0?WORLD.baseB:WORLD.baseR).userData.doorW;A.door=NAV.free(d[0],d[1],.6,6)||d;A.gate=[A.dir*GATE,gateZ(A.dir*GATE)];const sh=window.GFX5&&GFX5.shed?GFX5.shed(A.team):null;A.pool=sh?[sh.x,sh.z]:NAV.free(A.dir*70,-14,6.5,16)||[A.dir*70,-14];A.poolH=sh?-Math.PI/2:(A.dir<0?0:Math.PI);A.shed=sh?{x:sh.x,door:sh.door,hw:sh.hw,open:0,user:null}:null}this.navOn=true;this.navDirty=true},
+ navInit(){for(const k in this.sides){const A=this.sides[k],d=(A.dir<0?WORLD.baseB:WORLD.baseR).userData.doorW;A.gate=[A.dir*GATE,gateZ(A.dir*GATE)];{const D=A.dir,gz=A.gate[1];A.walk=[4.3,-4.3].map(o=>NAV.free(D*(GATE+2.4),gz+o,.45,2.5)||[D*(GATE+2.4),gz+o]);A.door=A.walk[0];A.hqDoor=NAV.free(d[0],d[1],.6,6)||d}const sh=window.GFX5&&GFX5.shed?GFX5.shed(A.team):null;A.pool=sh?[sh.x,sh.z]:NAV.free(A.dir*70,-14,6.5,16)||[A.dir*70,-14];A.poolH=sh?-Math.PI/2:(A.dir<0?0:Math.PI);A.shed=sh?{x:sh.x,door:sh.door,hw:sh.hw,open:0,user:null}:null}this.navOn=true;this.navDirty=true},
  /* everything that drives: both armies' vehicles (burning ones too) and the lorries */
  movers(){const L=[];for(const k in this.sides)for(const v of this.sides[k].veh)if(!v.hold)L.push(v);for(const tr of this.trucks)if(tr.on&&!tr.hold)L.push(tr);return L},
  /* what a man or a machine on foot must not step into: a hull, or the whole circle of one turning on the spot */
@@ -341,20 +341,31 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  /* a soldier steps out of the way of a vehicle coming at him */
  dodge(s,v,t){const B=this.VB[v.tier],c=Math.cos(v.hd),sn=Math.sin(v.hd),dx=s.x-v.x,dz=s.z-v.z,lx=dx*c-dz*sn,lz=dx*sn+dz*c,nz=(lz>=0?1:-1)*(B[1]+1.7),wx=v.x+lx*c+nz*sn,wz=v.z-lx*sn+nz*c;
   if(s.mv&&!s.after)s.after={tx:s.tx,tz:s.tz,mv:s.mv,st:s.st,sp:s.sp};const r=this.hd2(v)+.9,p=NAV.free(wx,wz,.5,6,(x,z)=>!NAV.inBox(x,z,v.x,v.z,v.hd,B[0]+4,B[1]+.9)&&(x-v.x)*(x-v.x)+(z-v.z)*(z-v.z)>r*r&&!this.taken(x,z,s))||NAV.free(wx,wz,.5,5,(x,z)=>!NAV.inBox(x,z,v.x,v.z,v.hd,B[0]+4,B[1]+.9)&&!this.taken(x,z,s))||[wx,wz];s.dodge=t+2600;s.mv=1;s.st=ST.WALK;s.sp=4.4;s.t0=t;this.route(null,s,p,t)},
- updSide(A,M,buckets,sk){const tn=Date.now(),t=vt(),UN=M.UN,seen=new Set(),cap=Math.min(this.CAP,this.MAX),want=[];
+ updSide(A,M,buckets,sk){const tn=Date.now(),t=vt(),UN=M.UN,seen=new Set(),cap=Math.min(this.CAP,this.MAX),want=[],need=[];
   for(const b of buckets){const x0=X(b.p);if(Math.abs(x0)>XMAX)continue;const key=sk+b.k;seen.add(key);let sl=A.slots.get(key);if(!sl){sl={alive:[],u:-1,zc:-31+62*(((b.k*.618034)%1+1)%1)};A.slots.set(key,sl)}
    let u=Math.round(b.usd/UN);if(sl.u>=3&&u>0&&Math.abs(u-sl.u)<=Math.max(1,sl.u*.12))u=sl.u;else sl.u=u;       // small ripples in a bucket do not reshuffle its units
    sl.x=x0;sl.p=b.p;sl.w=b.w*M.scale;sl.age=tn-(M.first.get(key)||tn);const al=this.alloc(u);
    if(al.mega)want.push({id:key+'m',key,sl,tier:2,i:0,usd:b.usd});for(let i=0;i<al.heavy;i++)want.push({id:key+'h'+i,key,sl,tier:1,i:i+1,usd:b.usd});for(let i=0;i<al.light;i++)want.push({id:key+'l'+i,key,sl,tier:0,i:i+3,usd:b.usd});
-   const cur=sl.alive.length;
+   need.push([sl,key,al.sold,b]);
+   const rk=sl.age>120000?2:sl.age>30000?1:0;if(sl.rank!==rk){sl.rank=rk;for(const s of sl.alive)s.rank=rk}}
+  /* men no longer needed where they stand are spare; men already walking home are spare too. Every gap in the line is filled from
+     the spares nearest to it first, and only then does the base send out new men; only the spares left over walk home. So no army
+     walks one squad home while sending an equal one out, and the base yard does not fill with men passing each other. */
+  const spare=[];for(const s of A.sold)if(s.mv===2&&s.st!==ST.DIE)spare.push(s);
+  for(const [key,sl] of A.slots){if(seen.has(key))continue;for(const s of sl.alive)if(s.st!==ST.DIE)spare.push(s);A.slots.delete(key)}
+  for(const [sl,key,n,b] of need){if(sl.alive.length<=n)continue;const traded=M.trades.some(x=>tn-x.t<3000&&Math.abs(x.p-b.p)<=b.w*1.5);
+   while(sl.alive.length>n){const s=sl.alive.pop();if(s.st===ST.DIE)continue;if(traded)this.kill(A,s,t);else spare.push(s)}}
+  for(const [sl,key,n] of need){
+   while(sl.alive.length<n&&spare.length){let bi=0,bd=1e9;for(let q=0;q<spare.length;q++){const d=Math.abs(spare[q].x-sl.x)+Math.abs(spare[q].z-sl.zc)*.3;if(d<bd){bd=d;bi=q}}
+    const s=spare.splice(bi,1)[0],idx=sl.alive.length,o=this.standSpot(A,sl,idx);s.key=key;s.rank=sl.rank||0;s.after=null;s.held=false;s.mv=1;s.st=ST.RUN;s.sp=s.role===1?9:10.5;s.t0=t;this.route(A,s,[o.x,o.z],t);sl.alive.push(s)}
+   const cur=sl.alive.length,al={sold:n};
    if(al.sold>cur){const n=Math.min(al.sold-cur,cap-A.sold.length);for(let i=0;i<n;i++){const idx=sl.alive.length,o=this.standSpot(A,sl,idx),from=A.spawnFrom&&A.spawnFrom.until>tn?A.spawnFrom:null,role=ROLE[idx%6],sd=Math.random();
      /* out of the command post's door one after another, or off the back of a lorry */
-     const d0=from?[from.x,from.z]:(A.door||[A.dir*(GATE+5),gateZ(A.dir*GATE)]),p0=this.navOn?(NAV.free(d0[0]+rnd(.5,-.5),d0[1]+rnd(1,-1),.45,4)||d0):d0;
+     const d0=from?[from.x,from.z]:(A.walk?A.walk[(A.sold.length+i)&1]:A.door||[A.dir*(GATE+5),gateZ(A.dir*GATE)]),p0=this.navOn?(NAV.free(d0[0]+rnd(.5,-.5),d0[1]+rnd(1,-1),.45,4)||d0):d0;
      const s={key,st:ST.RUN,t0:t+i*(from?150:230)+Math.random()*80,held:true,x:p0[0],z:p0[1],tx:o.x,tz:o.z,mv:1,sd,rank:sl.rank||0,role,stn:GFX5.stance(role,sd),yaw:rnd(.3,-.3),cv:0,i:A.sold.length,ry:A.dir<0?0:Math.PI,y:0,gyT:0,sp:role===1?9:10.5};
      this.route(A,s,[o.x,o.z],s.t0);sl.alive.push(s);A.sold.push(s)}}
-   else if(al.sold<cur){const n=cur-al.sold;const traded=M.trades.some(x=>tn-x.t<3000&&Math.abs(x.p-b.p)<=b.w*1.5);for(let i=0;i<n;i++){const s=sl.alive.pop();if(!s)break;if(s.st===ST.DIE)continue;if(traded)this.kill(A,s,t);else this.retreat(A,s,t)}}
-   const rk=sl.age>120000?2:sl.age>30000?1:0;if(sl.rank!==rk){sl.rank=rk;for(const s of sl.alive)s.rank=rk}}
-  for(const [key,sl] of A.slots){if(seen.has(key))continue;for(const s of sl.alive){if(s.st!==ST.DIE)this.retreat(A,s,t)}A.slots.delete(key)}
+  }
+  for(const s of spare)if(s.mv!==2&&s.st!==ST.DIE)this.retreat(A,s,t);
   this.updVeh(A,M,want,t,tn)},
  /* armour: each vehicle is a lasting object that drives in, holds its lane, drives back when its orders are pulled and burns when they are traded through */
  vehZ(A,w){const c=[13,-13,25,-25,37,-37,49,-49];for(let k=0;k<c.length;k++){let z=w.sl.zc+c[(k+w.i)%c.length];if(z>33)z-=66;if(z<-33)z+=66;if(Math.abs(z-2)<4.5)z+=z<2?-5:5;if(!A.veh.some(v=>!v.dead&&Math.abs(v.gz-z)<6.5&&Math.abs(v.gx-w.sl.x)<10))return z}return clamp(w.sl.zc+rnd(28,-28),-33,33)},
