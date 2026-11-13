@@ -199,22 +199,24 @@ FAQ = [
     (["مولتی چارت", "مولتی‌چارت", "چند چارت", "چند نمودار", "بازپخش نمودار", "بازپخش کندل", "بار ریپلی", "تایم فریم ثانیه",
       "تایم‌فریم ثانیه‌ای", "تقویم اقتصادی", "بازار زنده", "multi chart", "multichart", "bar replay", "chart replay",
       "seconds timeframe", "economic calendar", "live market", "چەند چارت", "دووبارە پەخشی چارت", "دووبارە پەخشی مۆم",
-      "تایمفرەیمی چرکەیی", "ڕۆژژمێری ئابووری", "بازاڕی زیندوو"],
+      "تایمفرەیمی چرکەیی", "ڕۆژژمێری ئابووری", "بازاڕی زیندوو", "رنکو", "renko", "کاگی", "kagi", "فراز", "faraz"],
      L("مولتی‌چارت، بازپخش نمودار و تقویم اقتصادی دارید؟", "چەند چارت، دووبارە پەخشی چارت و ڕۆژژمێری ئابووریتان هەیە؟",
        "Do you have multi-chart, bar replay and an economic calendar?"),
-     L("بله، در صفحهٔ «بازار زنده»: تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم و خط‌نشانگر؛ تایم‌فریم ثانیه‌ای (۱ تا ۳۰ ثانیه) "
-       "و هر تایم‌فریم دلخواه؛ بازپخش کندل‌ها با ۹ سرعت و معاملهٔ تمرینی؛ ۲۲ اندیکاتور و ابزارهای فیبوناچی، گن و چنگال اندروز؛ "
-       "دیده‌بان با پرچم رنگی؛ هشدار قیمت و اندیکاتور؛ و تقویم اقتصادی با پرچم رویدادها روی چارت. همه‌چیز خودکار در مرورگر شما ذخیره "
-       "می‌شود و با لینک یا فایل منتقل می‌شود. در ربات هم بخش «بازار زنده» آن را داخل تلگرام باز می‌کند.",
-       "بەڵێ، لە پەڕەی «بازاڕی زیندوو»: تا ١٦ چارت پێکەوە بە هاوکاتکردنی دراو، تایمفرەیم و هێڵی نیشاندەر؛ تایمفرەیمی چرکەیی (١ تا ٣٠ "
-       "چرکە) و هەر تایمفرەیمێکی دڵخواز؛ دووبارە پەخشی مۆمەکان بە ٩ خێرایی و مامەڵەی ڕاهێنان؛ ٢٢ ئیندیکاتۆر و ئامرازەکانی فیبۆناچی، "
-       "گان و چنگاڵی ئەندرووز؛ لیستی چاودێری بە ئاڵای ڕەنگی؛ ئاگادارکەرەوەی نرخ و ئیندیکاتۆر؛ و ڕۆژژمێری ئابووری بە ئاڵای ڕووداوەکان "
-       "لەسەر چارت. هەموو شتێک بە خۆکاری لە وێبگەڕەکەتدا پاشەکەوت دەکرێت و بە لینک یان فایل دەگوازرێتەوە. لە بۆتیشدا بەشی «بازاڕی "
-       "زیندوو» لە ناو تێلێگرام دەیکاتەوە.",
-       "Yes — on the Live market page: up to 16 charts at once with synced symbol, timeframe and crosshair; seconds timeframes (1–30 s) "
-       "and any custom timeframe; bar replay at nine speeds with practice trades; 22 indicators plus Fibonacci, Gann and Andrews' "
-       "pitchfork tools; watchlists with colour flags; price and indicator alerts; and the economic calendar with event flags on the "
-       "chart. Everything is saved automatically in your browser and can be moved with a link or a file. In the Telegram bot, "
+     L("بله، در صفحهٔ «بازار زنده»: تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم، خط‌نشانگر و اندیکاتورها؛ تایم‌فریم ثانیه‌ای "
+       "و هر تایم‌فریم دلخواه؛ ۱۷ نوع نمودار از جمله رنکو، کاگی، نقطه و رقم و شکست خط؛ بازپخش کندل‌ها و معاملهٔ تمرینی؛ ۷۰ اندیکاتور و "
+       "ابزارهای فیبوناچی، گن و چنگال اندروز؛ دیده‌بان با بخش‌بندی و پرچم رنگی؛ هشدار قیمت و اندیکاتور؛ و تقویم اقتصادی با هشدار پیش "
+       "از انتشار خبر. همهٔ کوین‌های بایننس و بازار ایران به تومان (دلار، یورو، طلا، سکه، تتر و بیت‌کوین تومانی) هم آنجاست. همه‌چیز "
+       "خودکار در مرورگر شما ذخیره می‌شود. در ربات هم بخش «بازار زنده» آن را داخل تلگرام باز می‌کند.",
+       "بەڵێ، لە پەڕەی «بازاڕی زیندوو»: تا ١٦ چارت پێکەوە بە هاوکاتکردنی دراو، تایمفرەیم، هێڵی نیشاندەر و ئیندیکاتۆرەکان؛ تایمفرەیمی "
+       "چرکەیی و هەر تایمفرەیمێکی دڵخواز؛ ١٧ جۆری چارت لەوانە ڕێنکۆ، کاگی، خاڵ و ژمارە و شکانی هێڵ؛ دووبارە پەخشی مۆمەکان و مامەڵەی "
+       "ڕاهێنان؛ ٧٠ ئیندیکاتۆر و ئامرازەکانی فیبۆناچی، گان و چنگاڵی ئەندرووز؛ لیستی چاودێری بە بەش و ئاڵای ڕەنگی؛ ئاگادارکەرەوەی نرخ و "
+       "ئیندیکاتۆر؛ و ڕۆژژمێری ئابووری بە ئاگادارکردنەوە پێش بڵاوبوونەوەی هەواڵ. هەموو کۆینەکانی بایننس و بازاڕی ئێران بە تمەنیش "
+       "(دۆلار، یۆرۆ، زێڕ، سکە، تەتەر و بیتکۆین بە تمەن) لەوێیە. لە بۆتیشدا بەشی «بازاڕی زیندوو» لە ناو تێلێگرام دەیکاتەوە.",
+       "Yes — on the Live market page: up to 16 charts at once with synced symbol, timeframe, crosshair and indicators; seconds "
+       "timeframes and any custom timeframe; 17 chart types including Renko, Kagi, Point & Figure and Line Break; bar replay with practice "
+       "trades; 70 indicators plus Fibonacci, Gann and Andrews' pitchfork tools; watchlists with sections and colour flags; price and "
+       "indicator alerts; and the economic calendar with an alert before each release. Every Binance coin and Iran's market in toman "
+       "(dollar, euro, gold, coins, tether and bitcoin in toman) are there too. Everything is saved in your browser. In the Telegram bot, "
        "“Live market” opens it inside Telegram."),
      "/market/"),
 ]

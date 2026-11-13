@@ -43,9 +43,30 @@ function klines(q) {
 }
 function mini(sym) { const now = Math.floor(Date.now() / 1000), c = px(sym, now), o = px(sym, now - 86400); return { symbol: sym, openPrice: o.toFixed(8), highPrice: (Math.max(o, c) * 1.01).toFixed(8), lowPrice: (Math.min(o, c) * 0.99).toFixed(8), lastPrice: c.toFixed(8), volume: '1000', quoteVolume: (1e6 + h32(sym) % 9e8).toFixed(2), openTime: (now - 86400) * 1000, closeTime: now * 1000 }; }
 
+/* ---------- tgju.org (Iran's market, rial) in its real formats: TradingView UDF history, the day's table, the all-prices table */
+const TGB = { price_dollar_rl: 2670000, price_eur: 2930000, price_iqd: 1680, geram18: 250000000, sekee: 2540000000, 'crypto-tether-irr': 2700000, ons: 4000, silver: 51 };
+function tgPrice(g, t) { const b = TGB[g] || (100000 + h32(g) % 900000); return b * (1 + 0.03 * Math.sin(t / 86400 / 7 * 6.283 + h32(g) % 7) + 0.004 * Math.sin(t / 3600 / 6 * 6.283)); }
+function tgHist(q) {
+  const g = q.get('symbol'), res = q.get('resolution'), sec = res === '1D' ? 86400 : res === 'W' ? 604800 : res === 'M' ? 2592000 : +res * 60;
+  if (!sec || !g) return { s: 'no_data' };
+  const s2 = /^crypto-/.test(g) ? Math.max(sec, 86400) : sec, now = Math.floor(Date.now() / 1000), last = Math.floor(now / s2) * s2, n = s2 >= 86400 ? 1500 : 3000, out = { s: 'ok', t: [], o: [], h: [], l: [], c: [], v: [] };
+  for (let k = n - 1; k >= 0; k--) { const t = last - k * s2, o = tgPrice(g, t), c = tgPrice(g, t + s2); out.t.push(t); out.o.push(Math.round(o)); out.c.push(Math.round(c)); out.h.push(Math.round(Math.max(o, c) * 1.002)); out.l.push(Math.round(Math.min(o, c) * 0.998)); }
+  return out;
+}
+function tehClock(now) { const d = new Date((now + 12600) * 1000), z = n => String(n).padStart(2, '0'); return z(d.getUTCHours()) + ':' + z(d.getUTCMinutes()) + ':' + z(d.getUTCSeconds()); }
+function tgToday(g) { const now = Math.floor(Date.now() / 1000); return { draw: null, recordsTotal: 900, recordsFiltered: 900, data: [[Math.round(tgPrice(g, now)).toLocaleString('en-US'), tehClock(now), '1,000', '0.1%']] }; }
+function tgAll() { const now = Math.floor(Date.now() / 1000), cur = {}; Object.keys(TGB).concat(['price_gbp', 'price_aed', 'price_try', 'geram24', 'mesghal', 'gold_futures', 'sekeb', 'nim', 'rob', 'gerami', 'coin_blubber', 'silver_999']).forEach(g => { const p = Math.round(tgPrice(g, now)); cur[g] = { p: p.toLocaleString('en-US'), h: Math.round(p * 1.01).toLocaleString('en-US'), l: Math.round(p * 0.99).toLocaleString('en-US'), d: '1,000', dp: 0.5, dt: 'high', ts: '2026-11-12 ' + tehClock(now) }; }); return { current: cur }; }
+
 const OVR = {};          /* test hook: the next miniTicker prices of a symbol */
 async function mockNet(page, stats) {
   await page.route(/fonts\.(googleapis|gstatic)\.com|www\.okx\.com|t\.me\//, r => r.abort());
+  await page.route(/tgju\.org/, async r => {
+    const u = new URL(r.request().url()); stats.tgju = (stats.tgju || 0) + 1; const H = { 'access-control-allow-origin': '*' };
+    if (/\/tv2\/history/.test(u.pathname)) return r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify(tgHist(u.searchParams)) });
+    const m = /today-table-data\/([^/?]+)/.exec(u.pathname); if (m) return r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify(tgToday(decodeURIComponent(m[1]))) });
+    if (/ajax\.json/.test(u.pathname)) return r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify(tgAll()) });
+    return r.fulfill({ status: 404, body: '{}' });
+  });
   await page.route(/data-api\.binance\.vision\/api\/v3\//, async r => {
     const u = new URL(r.request().url()), p = u.pathname.replace('/api/v3/', ''); stats.rest++;
     if (p === 'klines') { const k = klines(u.searchParams); if (!k) return r.fulfill({ status: 400, body: '{"code":-1121,"msg":"Invalid symbol."}' }); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(k) }); }
@@ -261,6 +282,283 @@ async function mockNet(page, stats) {
     });
     ok(`[${lang} 390] the panels button opens the side sheet; its tabs fit on one line and its close button is on screen`, side.open && side.close && side.tabs, JSON.stringify(side));
     await shot(page, `22_${lang}_390_fresh`); await ctx.close();
+  }
+
+  /* ---------- replay as on Faraz: every chart together, a finer step inside the bar, and the first candle */
+  if (!ONLY || ONLY === 'replay2') {
+    const { page, ctx } = await newPage(1280, 860, 'en');
+    await page.click('#pm-lay'); await page.waitForTimeout(300); await page.click('.pm-layb[data-l="2v"]'); await page.waitForTimeout(400); await page.keyboard.press('Escape');
+    await page.evaluate(() => { const c = PRO.app.cells(); PRO.app.setActive(1); PRO.app.applySym('ETH'); PRO.app.setActive(0); });
+    await page.waitForFunction(() => PRO.app.cells().length === 2 && PRO.app.cells().every(c => c.disp.length > 300), null, { timeout: 20000 }).catch(() => { });
+    const r1 = await page.evaluate(() => {
+      const [a, b] = PRO.app.cells(); PRO._replay.sync(true);
+      PRO._replay.begin(a, a.bars.slice(), a.bars.length - 200);
+      const f0 = b.replay && b.replay.follower, t0 = [a.bars[a.replay.i].t, b.bars[b.replay.i].t];
+      for (let k = 0; k < 3; k++) PRO._replay.step(a, 1);
+      return { f0, t0, t1: [a.bars[a.replay.i].t, b.bars[b.replay.i].t], bi: b.replay.i };
+    });
+    ok('replay on two charts: the second follows the first, bar for bar', r1.f0 === true && r1.t0[0] === r1.t0[1] && r1.t1[0] === r1.t1[1] && r1.t1[0] - r1.t0[0] === 3 * 3600, JSON.stringify(r1));
+    await page.evaluate(() => PRO._replay.setIv(PRO.app.cells()[0], '5m'));
+    await page.waitForFunction(() => { const R = PRO.app.cells()[0].replay; return R && R.sub && R.sub.length > 10; }, null, { timeout: 10000 }).catch(() => { });
+    const r2 = await page.evaluate(() => {
+      const a = PRO.app.cells()[0], R = a.replay, i0 = R.i; const out = [];
+      for (let k = 0; k < 14; k++) { PRO._replay.step(a, 1); out.push({ i: R.i, k: R.k, c: R.part && R.part.c, sub: R.sub[R.k].c, last: a.disp[a.disp.length - 1].c }); }
+      return { i0, out: out.filter((x, j) => j % 4 === 0 || j === 13), b: PRO.app.cells()[1].replay.i };
+    });
+    const okIv = r2.out.every(x => Math.abs(x.c - x.sub) < 1e-9 && Math.abs(x.last - x.c) < 1e-9) && r2.out[0].i === r2.i0 + 1 && r2.out[r2.out.length - 1].i === r2.i0 + 2;
+    ok('replay step of 5 minutes on a 1 h chart: the bar forms tick by tick, then the next one starts', okIv, JSON.stringify(r2).slice(0, 400));
+    await shot(page, '52_replay_sync_iv');
+    await page.evaluate(() => PRO._replay.firstStart(PRO.app.cells()[0]));
+    await page.waitForTimeout(2500);
+    const r3 = await page.evaluate(() => { const a = PRO.app.cells()[0]; return { i: a.replay && a.replay.i, t: a.replay && a.bars[0].t }; });
+    ok('replay from the first candle', r3.i === 1 && r3.t < Date.now() / 1000 - 86400 * 365, JSON.stringify(r3));
+    await page.evaluate(() => PRO.replayStop(PRO.app.cells()[0]));
+    const r4 = await page.evaluate(() => PRO.app.cells().map(c => !!c.replay));
+    ok('ending the replay ends it on every chart', r4.every(x => !x), JSON.stringify(r4));
+    await ctx.close();
+  }
+
+  /* ---------- Iran's market and every coin in toman (tgju.org mocked in its formats) */
+  /* ---------- the economic calendar: date range + alerts before events (all high-impact, or one event) */
+  if (!ONLY || ONLY === 'cal') {
+    const now0 = Math.floor(Date.now() / 1000);
+    const EV = [
+      { t: now0 + 14 * 60, c: 'USD', i: 'H', n: 'Core CPI m/m', f: '0.3%', p: '0.2%', tr: { fa: 'تورم هسته‌ای ماهانه' } },
+      { t: now0 + 3 * 60, c: 'EUR', i: 'M', n: 'German ZEW Economic Sentiment', tr: { fa: 'شاخص احساسات اقتصادی ZEW آلمان' } },
+      { t: now0 + 26 * 3600, c: 'GBP', i: 'H', n: 'GDP m/m', tr: { fa: 'تولید ناخالص داخلی ماهانه' } },
+      { t: now0 + 9 * 86400, c: 'JPY', i: 'L', n: 'Tankan Index', tr: { fa: 'شاخص تانکان' } },
+      { t: now0 - 2 * 3600, c: 'USD', i: 'H', n: 'Retail Sales m/m', tr: { fa: 'خرده‌فروشی ماهانه' } }];
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.route(/\/data\/ecocal\.json/, r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ updated_at: new Date().toISOString(), source: 'test', since: '2026-01-01', events: EV }) }));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 20000 });
+    await page.click('.pm-stab[data-p="cal"]'); await page.waitForTimeout(1200);
+    const rows = sel => page.evaluate(s => [...document.querySelectorAll('.pm-cr')].map(b => b.textContent), sel);
+    const all = await rows();
+    ok('calendar: the test events are listed (low impact hidden by the default filter)', all.length === 4 && all.some(x => /تورم هسته/.test(x)) && !all.some(x => /تانکان/.test(x)), all.length + ' rows');
+    await page.click('[data-r="today"]'); await page.waitForTimeout(300);
+    const today = await rows();
+    await page.click('[data-r="tomorrow"]'); await page.waitForTimeout(300);
+    const tom = await rows();
+    await page.click('[data-r="next"]'); await page.waitForTimeout(300);
+    const nxt = await rows();
+    const tehNow = new Date((now0 + 12600) * 1000), tehH = tehNow.getUTCHours() + tehNow.getUTCMinutes() / 60;
+    /* «today» in Tehran: the events 3 and 14 minutes away (+ the one 2 hours ago if it was still today), never tomorrow's */
+    ok('calendar range «today» / «tomorrow» / «next week» filter by the page time zone', today.some(x => /تورم هسته/.test(x)) && !today.some(x => /تانکان/.test(x)) && (tehH + 26 < 48 ? tom.some(x => /تولید ناخالص/.test(x)) : true) && !tom.some(x => /تورم هسته/.test(x)) && nxt.every(x => !/تورم هسته/.test(x)), JSON.stringify({ today: today.length, tom: tom.length, nxt: nxt.length }));
+    await page.click('[data-r="all"]'); await page.waitForTimeout(300);
+    await shot(page, '60_fa_calendar_range');
+    /* one event: the bell → «5 min before» → it fires (the event is 3 minutes away) */
+    const bells = await page.evaluate(() => document.querySelectorAll('.pm-cr .pm-cb').length);
+    ok('past events have no bell, future ones do', bells === 3, String(bells));
+    const zew = await page.evaluateHandle(() => [...document.querySelectorAll('.pm-cr')].find(b => /ZEW/.test(b.textContent)).querySelector('.pm-cb'));
+    await zew.click(); await page.waitForTimeout(300);
+    const menu = await page.evaluate(() => [...document.querySelectorAll('.pm-menu .pm-mi')].map(b => b.textContent));
+    ok('the bell menu offers 0/5/15/30/60 minutes in Persian', menu.length === 5 && /۵|5/.test(menu[1]) && /دقیقه/.test(menu[1]), menu.join(' | '));
+    await page.click('.pm-menu .pm-mi:nth-of-type(2)'); await page.waitForTimeout(300);
+    await page.evaluate(() => PRO._evCheck()); await page.waitForTimeout(400);
+    const f1 = await page.evaluate(() => ({ toast: [...document.querySelectorAll('.pm-toast')].map(x => x.textContent).join(' | '), log: JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]').map(x => x.msg), on: document.querySelectorAll('.pm-cb.on').length }));
+    ok('a per-event alert fires before the release: toast + alert log, in Persian', /ZEW/.test(f1.toast) && /دیگر/.test(f1.toast) && f1.log.some(m => /ZEW/.test(m)) && f1.on === 1, JSON.stringify(f1));
+    /* firing once only */
+    await page.evaluate(() => PRO._evCheck()); await page.waitForTimeout(200);
+    const n1 = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]').filter(x => /ZEW/.test(x.msg)).length);
+    ok('it fires once, not on every check', n1 === 1, String(n1));
+    /* every high-impact event, 15 minutes before: CPI (14 min away) fires, the medium/low ones do not */
+    await page.click('.pm-evall input'); await page.waitForTimeout(200);
+    await page.evaluate(() => PRO._evCheck()); await page.waitForTimeout(300);
+    const f2 = await page.evaluate(() => ({ log: JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]').map(x => x.msg), st: JSON.parse(localStorage.getItem('ek_pro_evalerts') || '{}') }));
+    ok('«alert before every high-impact event» (15 min) fires for CPI only', f2.log.some(m => /تورم هسته/.test(m)) && !f2.log.some(m => /تانکان|تولید ناخالص/.test(m)) && f2.st.all === true && f2.st.min === 15, JSON.stringify(f2.log));
+    /* the minutes button */
+    await page.click('.pm-evmin'); await page.waitForTimeout(200);
+    await page.click('.pm-menu .pm-mi:nth-of-type(4)'); await page.waitForTimeout(200);
+    const m30 = await page.evaluate(() => ({ b: document.querySelector('.pm-evmin').textContent, min: JSON.parse(localStorage.getItem('ek_pro_evalerts')).min }));
+    ok('the minutes button switches to 30 and is remembered', m30.min === 30 && /۳۰|30/.test(m30.b), JSON.stringify(m30));
+    await shot(page, '61_fa_calendar_alerts');
+    /* survives a reload */
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 });
+    await page.waitForTimeout(1500); await page.click('.pm-stab[data-p="cal"]').catch(() => { }); await page.waitForTimeout(1200);
+    const rl = await page.evaluate(() => ({ all: (document.querySelector('.pm-evall input') || {}).checked, bell: document.querySelectorAll('.pm-cb.on').length }));
+    ok('after a reload the switch and the bell are still on', rl.all === true && rl.bell === 1, JSON.stringify(rl));
+    await ctx.close();
+  }
+
+  /* ---------- the bigger indicator library: 70 indicators, search in Persian, drawing ahead (Alligator), pivots, panes */
+  if (!ONLY || ONLY === 'inds2') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.evaluate(() => PRO.app.indDialog ? PRO.app.indDialog() : document.querySelector('#pm-inds').click()); await page.waitForTimeout(400);
+    const counts = await page.evaluate(() => { const n = () => document.querySelectorAll('.pm-idl .pm-idi').length; const tabs = [...document.querySelectorAll('.pm-idt .pm-chip')]; const r = { over: n() }; tabs[1].click(); r.pane = n(); tabs[0].click(); return r; });
+    ok('the indicator dialog lists 25 overlays and 45 pane indicators', counts.over === 25 && counts.pane === 45, JSON.stringify(counts));
+    await page.fill('.pm-id input[type=search]', 'تمساح'); await page.waitForTimeout(200);
+    const found = await page.evaluate(() => [...document.querySelectorAll('.pm-idl .pm-idi b')].map(x => x.textContent));
+    ok('search in Persian finds the Alligator', found.length === 1 && /تمساح/.test(found[0]), found.join(','));
+    await page.click('.pm-idl .pm-idi'); await page.waitForTimeout(300);
+    for (const q of ['پیوت', 'زیگزاگ', 'PPO', 'فیشر']) { await page.fill('.pm-id input[type=search]', q); await page.waitForTimeout(150); await page.click('.pm-idl .pm-idi'); await page.waitForTimeout(250); }
+    await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+    const st = await page.evaluate(() => {
+      const c = PRO.app.active(), out = {}, last = c.disp[c.disp.length - 1].t;
+      Object.values(c.series).forEach(r => { out[r.x.id] = r.list.map((s, j) => { const d = s.data(), v = d.filter(p => p.value != null); return { key: r.keys[j], n: v.length, ahead: v.length ? v[v.length - 1].time > last : false }; }); });
+      return { out, panes: c.chart.panes().length, inds: c.cfg.inds.map(x => x.id) };
+    });
+    const al = st.out.alli || [], pv = st.out.piv || [], zz = (st.out.zz || [])[0] || {}, pp = st.out.ppo || [], fi = st.out.fisher || [];
+    ok('Alligator lines are drawn ahead of the last bar (8/5/3 bars)', al.length === 3 && al.every(x => x.n > 100 && x.ahead), JSON.stringify(al));
+    ok('pivots (7 levels), ZigZag, PPO (3 plots) and Fisher (2) all have values; 3 panes added', pv.length === 7 && pv.every(x => x.n > 50) && zz.n > 100 && pp.length === 3 && pp.every(x => x.n > 100) && fi.length === 2 && st.panes >= 3, JSON.stringify({ pv: pv.map(x => x.n), zz: zz.n, panes: st.panes, inds: st.inds }));
+    await shot(page, '63_fa_new_indicators');
+    /* settings of a new indicator: Persian labels, values kept */
+    await page.evaluate(() => { const c = PRO.app.active(), x = c.cfg.inds.find(z => z.id === 'alli'); PRO.app.indSettings(c, x); }); await page.waitForTimeout(300);
+    const labels = await page.evaluate(() => [...document.querySelectorAll('.pm-iset .pm-field span')].map(x => x.textContent));
+    ok('Alligator settings show six Persian labels', labels.length === 6 && labels.includes('طول فک') && labels.includes('جابه‌جایی لب'), labels.join(' | '));
+    await page.keyboard.press('Escape');
+    /* a toman chart with zero volume: volume-based indicators show nothing rather than garbage */
+    await ctx.close();
+  }
+
+  /* ---------- watchlist sections: add, move a symbol into one, collapse, keep after reload, remove; ek_watch stays symbols only */
+  if (!ONLY || ONLY === 'sections') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    const clickMenu = async txt => { await page.waitForSelector('.pm-menu .pm-mi'); await page.evaluate(t => { const b = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => x.textContent.includes(t)); b.click(); }, txt); await page.waitForTimeout(250); };
+    await page.waitForSelector('.pm-wl .pm-wr');
+    await page.click('.pm-ph [data-a="more"]'); await clickMenu('افزودن بخش');
+    await page.fill('.pm-ask input', 'طلا و نقره'); await page.click('.pm-ask button[type=submit]'); await page.waitForTimeout(300);
+    let st = await page.evaluate(() => ({ heads: [...document.querySelectorAll('.pm-wsec b')].map(x => x.textContent), rows: [...document.querySelectorAll('.pm-wl > div')].map(x => x.dataset.sec || x.dataset.s) }));
+    ok('a section header is added at the end of «my watchlist»', st.heads.length === 1 && st.heads[0] === 'طلا و نقره' && st.rows[st.rows.length - 1] === '§طلا و نقره', JSON.stringify(st.rows));
+    await page.dispatchEvent('.pm-wr[data-s="XAUT"]', 'contextmenu'); await clickMenu('طلا و نقره');
+    st = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.pm-wl > div')].map(x => x.dataset.sec || x.dataset.s), n: document.querySelector('.pm-wsec small').textContent, watch: localStorage.getItem('ek_watch') }));
+    ok('XAUT moves under the section; the site-wide star list is not touched', st.rows.slice(-2).join() === '§طلا و نقره,XAUT' && /۱|1/.test(st.n) && (st.watch === null || !/§/.test(st.watch)), JSON.stringify(st));
+    await page.click('.pm-wsec .pm-wst'); await page.waitForTimeout(200);
+    const shut = await page.evaluate(() => ({ hidden: !document.querySelector('.pm-wr[data-s="XAUT"]'), cls: document.querySelector('.pm-wsec').className }));
+    ok('a click on the header folds the section', shut.hidden && /shut/.test(shut.cls), JSON.stringify(shut));
+    await shot(page, '64_fa_watch_sections');
+    await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForSelector('.pm-wl .pm-wsec', { timeout: 20000 }); await page.waitForTimeout(500);
+    const kept = await page.evaluate(() => ({ head: document.querySelector('.pm-wsec b').textContent, hidden: !document.querySelector('.pm-wr[data-s="XAUT"]') }));
+    ok('the section and its folded state survive a reload', kept.head === 'طلا و نقره' && kept.hidden, JSON.stringify(kept));
+    /* sorting shows the plain list; removing the section keeps XAUT */
+    await page.click('.pm-wsec .pm-wsm'); await clickMenu('حذف بخش');
+    const gone = await page.evaluate(() => ({ heads: document.querySelectorAll('.pm-wsec').length, xaut: !!document.querySelector('.pm-wr[data-s="XAUT"]') }));
+    ok('removing the section keeps its symbols', gone.heads === 0 && gone.xaut, JSON.stringify(gone));
+    /* a custom list with two sections */
+    await page.click('.pm-ph [data-a="more"]'); await clickMenu('فهرست تازه');
+    await page.fill('.pm-ask input', 'تست'); await page.click('.pm-ask button[type=submit]'); await page.waitForTimeout(300);
+    await page.click('.pm-ph [data-a="more"]'); await clickMenu('افزودن بخش'); await page.fill('.pm-ask input', 'الف'); await page.click('.pm-ask button[type=submit]'); await page.waitForTimeout(250);
+    const lists = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_watch')).lists);
+    ok('custom lists keep their sections in their own array', lists.length === 1 && lists[0].s.join() === '§الف', JSON.stringify(lists));
+    await ctx.close();
+  }
+
+  /* ---------- «sync indicators» across a multi-chart layout */
+  if (!ONLY || ONLY === 'syncind') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.click('#pm-lay'); await page.click('.pm-layb[data-l="4"]');
+    await page.waitForFunction(() => PRO.app.cells().length === 4 && PRO.app.cells().every(c => c.disp.length > 50), null, { timeout: 30000 });
+    await page.click('#pm-lay'); await page.waitForTimeout(200);
+    await page.evaluate(() => { const b = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => x.textContent.includes('اندیکاتورها')); b.click(); }); await page.waitForTimeout(300);
+    await page.keyboard.press('Escape'); await page.mouse.click(640, 120);
+    const a0 = await page.evaluate(() => PRO.app.cells().map(c => c.cfg.inds.map(x => x.id).join('+')));
+    await page.evaluate(() => { PRO.app.setActive(1); PRO.app.indDialog(); }); await page.waitForTimeout(300);
+    await page.fill('.pm-id input[type=search]', 'هال'); await page.waitForTimeout(150); await page.click('.pm-idl .pm-idi'); await page.waitForTimeout(400);
+    await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+    const a1 = await page.evaluate(() => PRO.app.cells().map(c => ({ ids: c.cfg.inds.map(x => x.id).join('+'), drawn: Object.values(c.series).some(r => r.x.id === 'hma' && r.list[0].data().length > 20) })));
+    ok('with «sync indicators» on, an indicator added on chart 2 appears, drawn, on all four charts', a1.every(x => /hma/.test(x.ids) && x.drawn), JSON.stringify({ a0, a1 }));
+    await page.evaluate(() => { const c = PRO.app.cells()[1], x = c.cfg.inds.find(z => z.id === 'hma'); x.p.len = 30; c.indsChanged(); }); await page.waitForTimeout(300);
+    const a2 = await page.evaluate(() => PRO.app.cells().map(c => (c.cfg.inds.find(z => z.id === 'hma') || {}).p.len));
+    ok('changing its length on one chart changes it everywhere', a2.every(v => v === 30), JSON.stringify(a2));
+    await page.click('#pm-lay'); await page.click('.pm-layb[data-l="1"]'); await page.waitForTimeout(600);
+    await ctx.close();
+  }
+
+  /* ---------- all 17 chart types (Faraz / TradingView list); the price-only ones are rebuilt from closes */
+  if (!ONLY || ONLY === 'types') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.click('#pm-type'); await page.waitForTimeout(300);
+    const names = await page.evaluate(() => [...document.querySelectorAll('.pm-tymenu .pm-mi span')].map(x => x.textContent));
+    ok('the chart-type menu lists 17 types in Persian, with the price-only group', names.length === 17 && names.includes('رنکو') && names.includes('کاگی') && names.includes('شمعی حجمی') && names.includes('ناحیه‌ای HLC'), names.join(' | '));
+    await page.keyboard.press('Escape'); await page.mouse.click(5, 5);
+    const res = {};
+    for (const t of ['candle', 'hollow', 'volcandle', 'heikin', 'bars', 'highlow', 'line', 'linemk', 'step', 'area', 'hlcarea', 'baseline', 'columns', 'renko', 'lbreak', 'kagi', 'pnf']) {
+      await page.evaluate(t => PRO.app.active().setType(t), t); await page.waitForTimeout(350);
+      res[t] = await page.evaluate(() => { const c = PRO.app.active(), D = c.disp; let inc = true; for (let i = 1; i < D.length; i++) if (!(D[i].t > D[i - 1].t)) { inc = false; break; } return { n: D.length, inc, data: c.main.data().length, ind: Object.keys(c.series).length }; });
+      if (['volcandle', 'hlcarea', 'renko', 'kagi', 'pnf', 'lbreak', 'highlow'].includes(t)) await shot(page, '62_type_' + t);
+    }
+    const bad = Object.entries(res).filter(([t, r]) => !(r.n > 5 && r.inc && r.data === r.n && r.ind >= 1));
+    ok('each of the 17 types draws (series = bars, times strictly increasing, volume indicator kept)', bad.length === 0, JSON.stringify(bad.length ? bad : res.renko));
+    ok('price-only types rebuild the bars (fewer items than candles)', res.renko.n < res.candle.n && res.kagi.n < res.candle.n && res.pnf.n < res.candle.n && res.lbreak.n < res.candle.n, JSON.stringify({ c: res.candle.n, r: res.renko.n, k: res.kagi.n, p: res.pnf.n, l: res.lbreak.n }));
+    /* box settings: a bigger box → fewer bricks; remembered after reload */
+    await page.evaluate(() => PRO.app.active().setType('renko')); await page.waitForTimeout(300);
+    const before = await page.evaluate(() => ({ n: PRO.app.active().disp.length, box: PRO.app.active().boxAuto }));
+    await page.click('#pm-type'); await page.waitForTimeout(300);
+    await page.evaluate(() => { const b = [...document.querySelectorAll('.pm-tymenu .pm-mi')].pop(); b.click(); }); await page.waitForTimeout(300);
+    const ph = await page.evaluate(() => (document.querySelector('.pm-iset input[name=box]') || {}).placeholder || '');
+    await page.fill('.pm-iset input[name=box]', String(before.box * 3)); await page.click('.pm-iset button[type=submit]'); await page.waitForTimeout(500);
+    const after = await page.evaluate(() => ({ n: PRO.app.active().disp.length, tp: PRO.app.active().cfg.tp }));
+    ok('renko box setting: placeholder shows the automatic size; 3× box → far fewer bricks', /خودکار/.test(ph) && after.n < before.n / 2 && after.tp.box === before.box * 3, JSON.stringify({ ph, before, after }));
+    /* live: ticks keep the rebuilt chart consistent */
+    await page.waitForTimeout(3500);
+    const live = await page.evaluate(() => { const c = PRO.app.active(), D = c.disp; return { n: D.length, data: c.main.data().length, last: D[D.length - 1] && D[D.length - 1].c }; });
+    ok('renko stays consistent while live ticks arrive', live.n === live.data && live.n > 3, JSON.stringify(live));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 3, null, { timeout: 20000 });
+    const kept = await page.evaluate(() => ({ type: PRO.app.active().cfg.type, tp: PRO.app.active().cfg.tp }));
+    ok('type and box size survive a reload', kept.type === 'renko' && kept.tp && kept.tp.box === before.box * 3, JSON.stringify(kept));
+    /* replay on a price-only type */
+    await page.evaluate(() => { const c = PRO.app.active(); c.setTP({}); }); await page.waitForTimeout(300);
+    const rp = await page.evaluate(async () => {
+      const c = PRO.app.active(); if (!PRO._replay) return 'no replay';
+      PRO._replay.begin(c, c.bars.slice(), c.bars.length - 300); await new Promise(r => setTimeout(r, 400));
+      const n1 = c.disp.length, i1 = c.replay.i, t1 = c.disp[n1 - 1].t;
+      for (let i = 0; i < 150; i++) PRO._replay.step(c); await new Promise(r => setTimeout(r, 300));
+      const n2 = c.disp.length, i2 = c.replay.i, data = c.main.data().length, lastBar = c.bars[c.replay.i].t, lastBrick = c.disp[n2 - 1].t;
+      PRO._replay.close(c); return { n1, n2, i1, i2, data, noFuture: lastBrick <= lastBar + 400, t1 };
+    });
+    ok('replay works on renko: bricks are added as bars are replayed, none from the future', rp && rp.i2 === rp.i1 + 150 && rp.n2 > rp.n1 && rp.data === rp.n2 && rp.noFuture, JSON.stringify(rp));
+    /* picking the replay start on a brick goes back to the bar that formed it */
+    const pk = await page.evaluate(() => { const c = PRO.app.active(), k = Math.floor(c.disp.length / 2), t = c.disp[k].t; c._pickClick && 0; return { k, t, bar: c.bars.findIndex(b => b.t >= t - 3600) }; });
+    ok('a brick maps back to its bar (time order kept)', pk.bar >= 0, JSON.stringify(pk));
+    await page.evaluate(() => PRO.app.active().setType('candle'));
+    await ctx.close();
+  }
+
+  if (!ONLY || ONLY === 'toman') {
+    const { page, ctx, stats } = await newPage(1280, 860, 'fa');
+    /* the search: currencies in toman */
+    await page.click('#pm-sym'); await page.waitForTimeout(400);
+    await page.click('.pm-sscat .pm-chip:nth-child(5)'); await page.waitForTimeout(400);
+    const fx = await page.evaluate(() => [...document.querySelectorAll('.pm-ssl [data-s]')].map(b => b.getAttribute('data-s') + '=' + b.querySelector('b').textContent));
+    ok('search: the currencies tab lists the dollar, euro and Iraqi dinar in toman, with names', fx.some(x => x === 'IR_USD=دلار آمریکا') && fx.some(x => /^IR_EUR=/.test(x)) && fx.some(x => /^IR_IQD=دینار عراق/.test(x)), fx.slice(0, 6).join(' | '));
+    await page.click('.pm-ssl [data-s="IR_USD"]');
+    await page.waitForFunction(() => { const c = PRO.app.active(); return c.cfg.sym === 'IR_USD' && c.disp.length > 100; }, null, { timeout: 15000 }).catch(() => { });
+    const usd = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars[c.bars.length - 1]; return { src: c.feed && c.feed.src, st: c.feed && c.feed.state, n: c.disp.length, c: b && b.c, leg: (c.el.querySelector('.pm-lsym') || {}).textContent, srcl: (c.el.querySelector('.pm-src') || {}).textContent, prec: c.prec() }; });
+    ok('the dollar in toman: tgju history ÷ 10, polled live, named and without decimals', usd.src === 'tgju' && usd.n > 100 && usd.c > 250000 && usd.c < 290000 && /دلار آمریکا/.test(usd.leg) && usd.srcl === 'tgju' && usd.prec === 0, JSON.stringify(usd));
+    await shot(page, '50_fa_toman_usd');
+    /* shorter than tgju has → 5 minutes, said */
+    await page.evaluate(() => PRO.app.active().setTF('1m')); await page.waitForTimeout(1200);
+    const t5 = await page.evaluate(() => ({ tf: PRO.app.active().cfg.tf, toast: (document.querySelector('.pm-toast') || {}).textContent || '' }));
+    ok('a 1-minute request on a tgju symbol becomes 5 minutes, and the page says why', t5.tf === '5m' && /۵|5/.test(t5.toast), JSON.stringify(t5));
+    /* bitcoin in toman = Binance × tether rate */
+    await page.evaluate(() => PRO.app.applySym('BTC_IRT')); await page.evaluate(() => PRO.app.active().setTF('1h'));
+    await page.waitForFunction(() => { const c = PRO.app.active(); return c.cfg.sym === 'BTC_IRT' && c.disp.length > 100; }, null, { timeout: 15000 }).catch(() => { });
+    const irt = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars[c.bars.length - 1], r = PRO.rateAt(b.t + 1800); return { src: c.feed.src, n: c.disp.length, c: b.c, r: r, leg: c.el.querySelector('.pm-lsym').textContent, srcl: c.el.querySelector('.pm-src').textContent }; });
+    ok('bitcoin in toman: the Binance bar × tether in toman, labelled computed', irt.src === 'irt' && irt.n > 100 && irt.r > 250000 && irt.c > 60000 * irt.r && irt.c < 90000 * irt.r && /BTC\/تومان/.test(irt.leg) && /tgju/.test(irt.srcl), JSON.stringify(irt));
+    /* tether in toman needs tether's own logo; until the site has it, it is not offered (the logo rule) */
+    const usdt = await page.evaluate(() => ({ has: PRO.hasLogo('IR_USDT'), inList: PRO.irList().indexOf('IR_USDT') >= 0 }));
+    ok('tether in toman is offered only once tether’s logo exists', usdt.has === usdt.inList, JSON.stringify(usdt));
+    /* the watchlist: Iran's market and every Binance coin */
+    await page.selectOption('.pm-spanel select', 'iran'); await page.waitForTimeout(1500);
+    const ir = await page.evaluate(() => [...document.querySelectorAll('.pm-wr[data-s]')].map(r => r.getAttribute('data-s') + '=' + r.querySelector('.pm-wc').textContent));
+    ok('watchlist «gold & currency (toman)» shows live tgju prices', ir.length >= 30 && ir.some(x => /^IR_USD=2[5-9]\d,\d{3}$/.test(x)) && ir.some(x => /^IR_SEKEE=2[0-9]{2},\d{3},\d{3}$/.test(x)), ir.slice(0, 5).join(' | '));
+    await page.selectOption('.pm-spanel select', 'all'); await page.waitForTimeout(1200);
+    const all = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-wr[data-s]').length, uni: 0, q: !!document.querySelector('.pm-wq') }));
+    const uni = await page.evaluate(() => PRO.universe().then(u => u.length));
+    await page.fill('.pm-wq', 'eth'); await page.waitForTimeout(500);
+    const filt = await page.evaluate(() => [...document.querySelectorAll('.pm-wr[data-s]')].map(r => r.getAttribute('data-s')));
+    ok('watchlist «every Binance coin» lists the whole universe, with a filter', all.n === uni && uni > 100 && all.q && filt.indexOf('ETH') >= 0 && filt.length < 10, JSON.stringify({ all, uni, filt }));
+    /* alerts: the dollar can go to the bot (its own asset names), bitcoin in toman cannot */
+    const bot = await page.evaluate(() => ({ usd: PRO._botArg({ sym: 'IR_USD', v: 270000 }), gold: PRO._botArg({ sym: 'IR_GERAM18', v: 25000000 }), irt: PRO._botArg({ sym: 'BTC_IRT', v: 1 }), btc: PRO._botArg({ sym: 'BTC', v: 72155.5 }) }));
+    ok('alert links: t_USD_270000, t_GOLD_18_…, none for computed toman coins, a_BTC_… unchanged', bot.usd === 't_USD_270000' && bot.gold === 't_GOLD_18_25000000' && bot.irt === null && bot.btc === 'a_BTC_72155d5', JSON.stringify(bot));
+    const tfs = await page.evaluate(() => { PRO.app.applySym('BTC'); return true; });
+    await page.click('#pm-tfmore').catch(() => { }); await page.waitForTimeout(300);
+    const secs = await page.evaluate(() => [...document.querySelectorAll('.pm-tfmenu .pm-tf')].map(b => b.childNodes[0].textContent).filter(t => /s$/.test(t)));
+    ok('seconds timeframes 1s–45s, as on Faraz', ['1s', '5s', '10s', '15s', '20s', '30s', '45s'].every(t => secs.indexOf(t) >= 0), secs.join(','));
+    await page.keyboard.press('Escape');
+    await ctx.close();
   }
 
   /* ---------- a background tab stops streaming (metered connections), and picks up where it left when seen again */

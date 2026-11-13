@@ -6,7 +6,8 @@ Offline test of the live market (/market/) inside the bot (no network, no Telegr
 Drives the real handlers (refbot.handle_update) with captured Telegram calls, in all five languages:
   * section "pro" (menu key m:pro): text, the Web App + browser buttons, its place in the analysis group and the market section;
   * the site's alert hand-off t.me/<bot>?start=a_<COIN>_<PRICE>: only an offer first, stored on «add», exact price kept;
-  * malformed links / callbacks are refused, a symbol that is also a toman asset (EUR) is never stored as a toman alert.
+  * malformed links / callbacks are refused, a symbol that is also a toman asset (EUR) is never stored as a toman alert;
+  * Iran's market in toman: t.me/<bot>?start=t_<ASSET>_<PRICE> offers a toman alert on the bot's own asset (pt:…).
 """
 import json
 import os
@@ -63,6 +64,9 @@ DATA = {
 }
 D.live_prices = lambda: PRICES
 D.load = lambda name: DATA.get(name)
+TOMAN = {"GOLD_18": 7400000.0, "USD": 101000.0, "USDT": 102000.0}
+IR_ASSETS = R.IR.ASSETS
+R.IR.asset_price = lambda key, snap=None: TOMAN.get(key)
 
 
 def upd(uid, text=None, data=None, lang="fa"):
@@ -154,6 +158,32 @@ for i, lang in enumerate(LANGS):
     check(len(x["alerts"]) == k and not any(z.get("iran") for z in x["alerts"]), "EUR from the site is not stored as a toman alert")
     check(msgs_since(n) and "EUR" in msgs_since(n)[-1]["text"], "…and the user is told the coin is unknown")
 
+    # 7b) Iran's market in toman: t_<ASSET>_<PRICE> offers, «pt:» stores a toman alert on the bot's own asset
+    n = len(SENT)
+    R.handle_update(S, upd(uid, "/start t_GOLD_18_7550000", lang=lang))
+    offer = [q for q in msgs_since(n) if "pt:GOLD_18:7550000" in kb_json(q)]
+    check(len(offer) == 1 and "7,550,000" in offer[0]["text"] and PRO.L("toman", lang) in offer[0]["text"], "toman link: one offer, exact price in toman")
+    check(len(x["alerts"]) == k, "toman link stores nothing before «add»")
+    R.handle_update(S, upd(uid, data="pt:GOLD_18:7550000", lang=lang))
+    a = x["alerts"][-1] if len(x["alerts"]) > k else {}
+    check(a.get("coin") == "GOLD_18" and a.get("price") == 7550000 and a.get("iran") and a.get("op") == ">",
+          "«add» stores GOLD_18 ≥ 7,550,000 toman as a toman alert (now 7,400,000)")
+    R.handle_update(S, upd(uid, "/start t_USD_95000", lang=lang))
+    R.handle_update(S, upd(uid, data="pt:USD:95000", lang=lang))
+    check(x["alerts"][-1].get("coin") == "USD" and x["alerts"][-1].get("op") == "<", "USD ≤ 95,000 toman (now 101,000)")
+    k2 = len(x["alerts"])
+    for bad in ("/start t_BTC_100", "/start t_GOLD_18_0", "/start t_usd_100", "/start t_XAU_2000"):
+        n = len(SENT)
+        R.handle_update(S, upd(uid, bad, lang=lang))
+        out = msgs_since(n)
+        check(out and out[-1]["text"] == PRO.L("bad", lang) and "pt:" not in kb_json(out[-1]), f"{bad!r} refused")
+    for bad in ("pt:BTC:100", "pt:GOLD_18:abc", "pt:USD:0", "pt:usd:100"):
+        n = len(SENT)
+        R.handle_update(S, upd(uid, data=bad, lang=lang))
+        check(msgs_since(n) and msgs_since(n)[-1]["text"] == PRO.L("bad", lang), f"callback {bad!r} refused")
+    check(len(x["alerts"]) == k2, "nothing stored by refused toman links")
+    k = k2
+
     # 8) a typed /alert still works as before (nothing changed for it)
     n = len(SENT)
     R.handle_update(S, upd(uid, "/alert ETH 2500", lang=lang))
@@ -178,6 +208,15 @@ check(vals == ["72155.5", "0.0000006", "0.00000001234567", "0.3", "64250", "0.00
 for v, num in zip(vals, [72155.5, 0.0000006, 1.234567e-8, 0.3, 64250, 0.00001234]):
     got = PRO.parse_link("a_X1_" + v.replace(".", "d"))
     check(got and abs(got[1] - num) <= num * 1e-12, f"bot reads the site's {v} back exactly")
+
+# 10) every toman asset the site can send is one the bot knows and can price
+import re  # noqa: E402
+src = open(os.path.join(ROOT, "assets", "pro", "panels.js"), encoding="utf-8").read()
+m = re.search(r"var BOT_IR = \{([^}]*)\}", src)
+site_keys = re.findall(r":\s*'([A-Z0-9_]+)'", m.group(1)) if m else []
+check(len(site_keys) >= 9, f"site's toman assets read: {site_keys}")
+for key in site_keys:
+    check(key in PRO.T_NAME and key in IR_ASSETS, f"{key}: the bot has a name and an alert asset for it")
 
 print(f"\nbot_pro end-to-end: {len(FAILS)} failures")
 raise SystemExit(1 if FAILS else 0)

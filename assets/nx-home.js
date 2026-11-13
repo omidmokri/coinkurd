@@ -309,9 +309,9 @@
         'Candles are read straight from Binance public market data (USDT pairs); if the connection fails the chart says so and no number is made up. Drag to pan; click the chart first to zoom with the wheel.') + '</p>';
     var pro = d.createElement('a'); pro.className = 'nxm-pro'; pro.href = '/market/';
     pro.innerHTML = '<b>' + tri('بازار زندهٔ کامل', 'بازاڕی زیندووی تەواو', 'The full live market') + '</b><span>' +
-      tri('مولتی‌چارت تا ۱۶ نمودار · تایم‌فریم ثانیه‌ای · بازپخش · ابزار ترسیم و ۲۲ اندیکاتور · هشدار قیمت · دیده‌بان · تقویم اقتصادی روی چارت',
-        'تا ١٦ چارت پێکەوە · تایمفرەیمی چرکەیی · دووبارە پەخش · ئامرازی کێشان و ٢٢ ئیندیکاتۆر · ئاگادارکەرەوەی نرخ · چاودێری · ڕۆژژمێری ئابووری لەسەر چارت',
-        'Up to 16 charts · seconds timeframes · replay · drawing tools and 22 indicators · price alerts · watchlists · economic calendar on the chart') + '</span><i aria-hidden="true">→</i>';
+      tri('همهٔ کوین‌های بایننس و دلار، طلا و سکه به تومان · تا ۱۶ نمودار · ۱۷ نوع نمودار و ۷۰ اندیکاتور · بازپخش · هشدار قیمت · تقویم اقتصادی با هشدار',
+        'هەموو کۆینەکانی بایننس و دۆلار، زێڕ و سکە بە تمەن · تا ١٦ چارت · ١٧ جۆری چارت و ٧٠ ئیندیکاتۆر · دووبارە پەخش · ئاگادارکەرەوەی نرخ · ڕۆژژمێری ئابووری بە ئاگادارکردنەوە',
+        'Every Binance coin, plus the dollar, gold and coins in toman · up to 16 charts · 17 chart types and 70 indicators · replay · price alerts · economic calendar with alerts') + '</span><i aria-hidden="true">→</i>';
     box.insertBefore(pro, box.firstChild);
     var map = d.createElement('a'); map.className = 'nxm-pro'; map.href = '/heatmap/';      /* the market map, next to the live market */
     map.innerHTML = '<b>' + tri('نقشهٔ بازار', 'نەخشەی بازاڕ', 'The market map') + '</b><span>' +
