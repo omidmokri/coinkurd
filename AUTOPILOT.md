@@ -286,6 +286,22 @@ The site's strategy (agreed with the owner, 2026-11-07):
   1–2 unchanged); `test_obs_i18n` (313 keys × 4), `test_bot_obs`, the other bot suites, a full site build in a
   scratch copy (sitemap, menu, assistant index carry the five pages), leak guard clean. One bug found by the tests and
   fixed before publishing: the strike labels dropped zeros (50,000 showed as "5K").
+- **Live with real data (owner's browser on entekhab.net, 22:15 UTC, after the first CI run wrote the files — 6,523 days
+  of Bitcoin in 0.56 MB, 4,115 of Ether in 0.36 MB):** the tiles equal Coin Metrics' own row for 2026-11-12 read
+  directly (price 71,280.42, MVRV 1.3241, exchange supply 2,723,131, inflow 26,241 / outflow 27,151, hash rate
+  877.65 EH/s). History comes out where the literature puts it: the Pi lines cross on 2013-04-06, 2013-12-05,
+  2017-12-16 and 2021-04-12; MVRV 4.25, Z 8.8, Mayer 3.64, Puell 6.6 on 2017-12-17; MVRV 0.78, Puell 0.43 on
+  2022-11-21. The options page's totals (342,517.8 BTC: calls 193,606.3, puts 148,911.5, put/call 0.7691) and the
+  max pain of the first five expiries equal an independent recomputation from Deribit's book at the same moment.
+  Stage 2's open-interest table was checked the same way: Binance $6.71 B, Bybit $4.74 B, OKX $2.31 B = their own
+  endpoints.
+- **Changed after seeing real data:** (1) miner revenue is offered for Bitcoin only — Ether has no miners and burns most
+  of its fees, so "issuance + fees" is nobody's revenue there. (2) Coin Metrics' exchange supply rose 46.9 K BTC in 30
+  days while its daily net flows sum to −54.1 K: the supply also moves when new exchange addresses are identified.
+  The page and its note now say so instead of leaving two figures that seem to contradict each other.
+- **CI, as it went:** the push runs were replaced by the chain's own next sync run (as update.yml documents); a light
+  rebuild (pages.yml) puts the pages up but writes no data, so the charts showed "the data is not here yet" until the
+  sync run had run `obs_chain.py` (about 20 minutes after the push).
 - **Bot / apps / assistant:** bot section «🔭 رصدخانه» lists the ten charts as Web App buttons and, when the files are
   there, the day's figures (MVRV, NUPL, realized price, exchange reserve and 7-day net flow, Mayer, Puell, drawdown
   from `obs/chain_now.json`; Deribit's put/call and max pain from `lab.json`) in five languages; the site menu has

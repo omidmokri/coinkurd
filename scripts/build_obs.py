@@ -15,7 +15,7 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "5"            # asset version (bump with any change to assets/obs/*)
+V = "6"            # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -481,6 +481,7 @@ T.update({
                    ("روش و محدودیت‌ها", [
                        "ارقام مربوط به صرافی‌هایی است که Coin Metrics آدرس‌هایشان را شناسایی کرده است؛ همهٔ صرافی‌ها و کیف‌پول‌ها را نمی‌پوشاند و با ارقام سایت‌هایی که فهرست دیگری دارند برابر نیست.",
                        "روزهای آخر موقتی‌اند و ممکن است با شناسایی آدرس‌های تازه اصلاح شوند. تفکیک صرافی‌به‌صرافی در دادهٔ رایگان نیست.",
+                       "ذخیره با شناسایی آدرس‌های تازهٔ صرافی‌ها هم جابه‌جا می‌شود؛ پس تغییر ذخیره در یک بازه لزوماً با جمع جریان‌های خالص همان بازه برابر نیست.",
                        "منبع: دادهٔ همگانی Coin Metrics (مجوز CC BY-NC)، روزی یک مقدار به وقت UTC. توصیهٔ مالی نیست."])],
             "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
                 "<b>یەدەگی ئاڵوگۆڕگەکان:</b> ژمارەی ئەو دراوانەی لە جزدانە ناسراوەکانی ئاڵوگۆڕگەکاندا هەڵگیراون، و بەشی لە کۆی خستنەڕوو.",
@@ -493,6 +494,7 @@ T.update({
                     ("ڕێگا و سنوورەکان", [
                         "ژمارەکان هی ئەو ئاڵوگۆڕگانەن کە Coin Metrics ناونیشانەکانیانی ناسیوە؛ هەموو ئاڵوگۆڕگە و جزدانەکان ناگرێتەوە.",
                         "ڕۆژە نوێیەکان کاتین و لەوانەیە ڕاست بکرێنەوە. جیاکردنەوەی ئاڵوگۆڕگە بە ئاڵوگۆڕگە لە داتای بێبەرامبەردا نییە.",
+                        "یەدەگ بە ناسینەوەی ناونیشانی نوێی ئاڵوگۆڕگەکانیش دەگۆڕێت؛ بۆیە گۆڕانی یەدەگ لە ماوەیەکدا مەرج نییە لەگەڵ کۆی ڕەوتە سافییەکانی هەمان ماوە یەکسان بێت.",
                         "سەرچاوە: داتای گشتیی Coin Metrics (مۆڵەتی CC BY-NC)، ڕۆژی یەک بەها بە کاتی UTC. ئامۆژگاریی دارایی نییە."])],
             "ar": [("ماذا تُظهر هذه الصفحة", [
                 "<b>احتياطي المنصات:</b> عدد العملات المحفوظة في محافظ المنصات المعروفة، وحصته من المعروض.",
@@ -505,6 +507,7 @@ T.update({
                    ("المنهج والحدود", [
                        "الأرقام للمنصات التي تعرّفت Coin Metrics على عناوينها؛ لا تغطّي كل المنصات والمحافظ.",
                        "الأيام الأحدث مؤقتة وقد تُعدَّل. التفصيل منصةً منصةً غير متاح في البيانات المجانية.",
+                       "يتغيّر الاحتياطي أيضًا حين تُعرَّف عناوين جديدة للمنصات؛ فلا يلزم أن يساوي تغيّره في مدة ما مجموع صافي التدفقات في المدة نفسها.",
                        "المصدر: بيانات Coin Metrics المجتمعية (رخصة CC BY-NC)، قيمة في اليوم بتوقيت UTC. ليست نصيحة مالية."])],
             "en": [("What this page shows", [
                 "<b>Exchange reserve:</b> the number of coins held in the known wallets of exchanges, and its share of the supply.",
@@ -517,6 +520,7 @@ T.update({
                    ("Method and limits", [
                        "The figures cover the exchanges whose addresses Coin Metrics has identified; not every exchange or wallet, so they differ from sites that use another list.",
                        "The newest days are provisional and may be revised as new addresses are identified. A breakdown per exchange is not in the free data.",
+                       "The reserve also moves when new exchange addresses are identified, so its change over a period need not equal the sum of that period’s net flows.",
                        "Source: Coin Metrics community data (CC BY-NC licence), one value a day, UTC. Not financial advice."])],
         },
     },
