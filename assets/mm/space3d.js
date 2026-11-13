@@ -260,8 +260,8 @@
   function cityFit() {
     var R = 20;
     E.items.forEach(function (it) { R = Math.max(R, Math.hypot(Math.abs(it.x) + it.fw / 2, Math.abs(it.z) + it.fd / 2, it.th + 4)); });
-    E.orbit.fitSphere(R * 0.8, E.w / E.h, E.cam.fov);      /* a sphere round a flat city is generous: come a little closer */
-    E.orbit.s.min = R * 0.9;
+    E.orbit.fitSphere(R * 0.66, E.w / E.h, E.cam.fov);      /* a sphere round a flat city is generous: come a little closer */
+    E.orbit.s.min = R * 0.8;
   }
   function bubFit() {
     var R = 10; E.items.forEach(function (it) { R = Math.max(R, it.p.length() + it.tr); });
