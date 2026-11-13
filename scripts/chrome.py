@@ -236,6 +236,9 @@ NAV = [
     {"k": "learn", "t": L("آموزش", "فێربوون", "Learn"), "items": [
         ("/map/", "map", L("نقشهٔ یادگیری", "نەخشەی فێربوون", "Learning map"),
          L("هر چیزی که باید بلد باشید، روی یک نقشه — با تیک زدن پیشرفت", "هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە — بە نیشانەکردنی پێشکەوتن", "Everything there is to learn on one map — tick your way through it")),
+        ("/bitcoin/", "hourglass", L("درک بیت‌کوین", "تێگەیشتن لە بیتکۆین", "Understanding Bitcoin"),
+         L("۲۱ میلیون، ۳۳ هاوینگ، قیف بازنشستگی و فیلم آموزشی به فارسی و کوردی", "٢١ ملیۆن، ٣٣ هاڵڤینگ، قیفی خانەنشینی و فیلمی فێرکاری بە کوردی و فارسی",
+           "21 million, 33 halvings, the retirement funnel and a short film in Persian and Kurdish")),
         ("/satoshi/", "eye", L("داستان ساتوشی", "چیرۆکی ساتۆشی", "Satoshi's story"),
          L("از مقالهٔ ۹ صفحه‌ای تا سکوت، در ۱۲ بلاک؛ و شبکهٔ زندهٔ امروز: نقشهٔ تک‌تک تراکنش‌ها و جست‌وجوی هر تراکنش یا آدرس", "لە توێژینەوەی ٩ لاپەڕەییەوە تا بێدەنگی، لە ١٢ بلۆکدا؛ و تۆڕی زیندووی ئەمڕۆ: نەخشەی هەموو مامەڵەکان و گەڕان بەدوای هەر مامەڵە یان ناونیشانێکدا",
            "From a nine-page paper to silence, in twelve blocks; and today's live network: every transaction on a map, any transaction or address looked up")),
@@ -331,7 +334,7 @@ FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
-GLOW = {"/academy/", "/academy/f13/"}
+GLOW = {"/academy/", "/academy/f13/", "/bitcoin/"}
 
 
 def _item(href, ic, title, desc, lang):
@@ -537,7 +540,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
+          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
 
 
 def inject_static():
