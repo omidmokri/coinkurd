@@ -260,7 +260,8 @@
   function cityFit() {
     var R = 20;
     E.items.forEach(function (it) { R = Math.max(R, Math.hypot(Math.abs(it.x) + it.fw / 2, Math.abs(it.z) + it.fd / 2, it.th + 4)); });
-    E.orbit.fitSphere(R * 0.66, E.w / E.h, E.cam.fov);      /* a sphere round a flat city is generous: come a little closer */
+    E.orbit.fitSphere(R * 0.66, E.w / E.h, E.cam.fov);
+    if (E.scene.fog) { E.scene.fog.near = E.orbit.s.r * 1.2; E.scene.fog.far = E.orbit.s.r * 3.5; }      /* a sphere round a flat city is generous: come a little closer */
     E.orbit.s.min = R * 0.8;
   }
   function bubFit() {
@@ -268,6 +269,7 @@
     /* frame the cloud by its real width and height, not a sphere round it */
     var half = E.cam.fov * Math.PI / 360, dist = Math.max(ry / Math.tan(half), rx / (Math.tan(half) * E.w / E.h)) * 1.08 + rx * 0.5;
     E.orbit.s.min = 20; E.orbit.s.max = dist * 2.5; E.orbit.fit(dist);
+    if (E.scene.fog) { E.scene.fog.near = dist * 1.1; E.scene.fog.far = dist * 3; }   /* fog only far behind the cloud, never dimming it */
   }
   function cityRelabel() {
     (E.labels || []).forEach(function (it) {
@@ -288,7 +290,7 @@
     x.fillStyle = gr; x.fillRect(0, 0, 128, 128); HALO = new THREE.CanvasTexture(c); return HALO;
   }
   function bubBuild(getSt) {
-    var st = getSt(), list = st.list.filter(function (n) { return !n.dead; }), m = Math.min(st.w, st.h), k = 64 / m;
+    var st = getSt(), list = st.list.filter(function (n) { return !n.dead; }), m = Math.min(st.w, st.h), k = 160 / m;          /* about 2.5x the first version */
     if (E.grp) { E.scene.remove(E.grp); disposeTree(E.grp); }
     var g = new THREE.Group(); E.grp = g;
     var mat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.28, metalness: 0.12, clearcoat: 1, clearcoatRoughness: 0.18 });
@@ -335,7 +337,7 @@
       if (!E.grab) return; ray(ev);
       if (!E.ray.ray.intersectPlane(plane, hit)) return;
       var it = E.grab.it, to = hit.add(off);
-      it.v.copy(to).sub(last).multiplyScalar(0.9); last.copy(to); it.p.copy(to); MM.tip(null);
+      it.v.copy(to).sub(last).multiplyScalar(1.3); last.copy(to); it.p.copy(to); MM.tip(null);
     });
     function up() { if (E && E.grab) { E.grab = null; el.style.cursor = 'grab'; } }
     el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
@@ -347,17 +349,26 @@
       if (!(E.grab && E.grab.it === a)) { var asp = Math.max(1, E.w / E.h); a.v.x -= a.p.x * 0.0005 / (asp * asp); a.v.y -= a.p.y * 0.0009; a.v.z -= a.p.z * 0.014; }   /* a wide, fairly flat cloud: fewer bubbles hide behind others */   /* a wide cloud on a wide screen */
     }
     for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
-      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 3.2 + 0.55 * Math.min(A.r, B.r);
+      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 1.6 + 0.2 * Math.min(A.r, B.r);
       if (dist < min) {
         var ov = (min - dist) / dist * 0.5, wa = B.r * B.r / (A.r * A.r + B.r * B.r), wb = 1 - wa;
         if (E.grab) { if (E.grab.it === A) { wa = 0; wb = 1; } else if (E.grab.it === B) { wa = 1; wb = 0; } }
+        /* a real knock: equal-and-opposite impulse along the line between centres, heavier bubbles move less,
+           and the faster they meet the harder they fly apart (restitution 0.92) */
+        var nx = dx / dist, ny = dy / dist, nz = dz / dist, vn = (B.v.x - A.v.x) * nx + (B.v.y - A.v.y) * ny + (B.v.z - A.v.z) * nz;
+        if (vn < 0) {
+          var mA = A.r * A.r * A.r, mB = B.r * B.r * B.r, hA = E.grab && E.grab.it === A, hB = E.grab && E.grab.it === B;
+          var iA = hA ? 0 : hB ? 1 : mB / (mA + mB), iB = hB ? 0 : hA ? 1 : mA / (mA + mB), J = -1.92 * vn;
+          A.v.x -= nx * J * iA; A.v.y -= ny * J * iA; A.v.z -= nz * J * iA;
+          B.v.x += nx * J * iB; B.v.y += ny * J * iB; B.v.z += nz * J * iB;
+        }
         A.p.x -= dx * ov * wa; A.p.y -= dy * ov * wa; A.p.z -= dz * ov * wa; B.p.x += dx * ov * wb; B.p.y += dy * ov * wb; B.p.z += dz * ov * wb;
       }
     }
     var M = new THREE.Matrix4(), q = new THREE.Quaternion(), tf = S.tf, Qh = E.q;
     for (i = 0; i < n; i++) {
       var o = it[i], held = E.grab && E.grab.it === o;
-      if (!held) { o.v.multiplyScalar(0.9); o.p.add(o.v); }
+      if (!held) { o.v.multiplyScalar(0.965); var sp = o.v.length(); if (sp > 6) o.v.multiplyScalar(6 / sp); o.p.add(o.v); }
       moving += o.v.length();
       if (o.halo) { o.halo.position.copy(o.p); var hs = o.r * 2.9; o.halo.scale.set(hs, hs, 1); }
       M.compose(o.p, q, new THREE.Vector3(o.r, o.r, o.r)); E.mesh.setMatrixAt(i, M);
@@ -402,7 +413,8 @@
       bubBuild(getSt);
       for (var i = 0; i < 260; i++) bubStep();
       bubFit();                                              /* the whole cluster in view */
-      E.step = function () { bubStep(); return true; };
+      /* keep the whole cloud in frame as bubbles are knocked about, unless the reader zoomed by hand */
+      E.step = function () { bubStep(); if (!E.orbit.s.armed && !E.grab) { var r0 = E.orbit.s.r; bubFit(); E.orbit.s.r = r0 + (E.orbit.s.r - r0) * 0.04; E.orbit.apply(); } return true; };
       wirePick(E.r.domElement); wireGrab(E.r.domElement);
       E.raf = requestAnimationFrame(loop);
     },
