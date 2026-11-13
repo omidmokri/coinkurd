@@ -261,6 +261,9 @@ M = {
              "en": "📚 <b>Learn & stay safe</b>\nFor a safe start, go through “Safe start” step by step."},
     "b_map": {"fa": "🗺 نقشهٔ یادگیری", "ckb": "🗺 نەخشەی فێربوون", "kmr": "🗺 Nexşeya fêrbûnê", "ar": "🗺 خريطة التعلم",
               "en": "🗺 Learning map"},
+    "b_btc": {"fa": "⏳ درک بیت‌کوین: هاوینگ، قیف بازنشستگی و فیلم", "ckb": "⏳ تێگەیشتن لە بیتکۆین: هاڵڤینگ، قیفی خانەنشینی و فیلم",
+              "kmr": "⏳ Têgihîştina Bitcoinê: halving û fîlm", "ar": "⏳ فهم البيتكوين: التنصيف وقمع التقاعد وفيلم",
+              "en": "⏳ Understanding Bitcoin: halvings, retirement funnel, film"},
     "b_kids": {"fa": "🧒 بیت‌کوین برای کودکان", "ckb": "🧒 بیتکۆین بۆ منداڵان",
                "kmr": "🧒 Bitcoin ji bo zarokan", "ar": "🧒 البيتكوين للأطفال",
                "en": "🧒 Bitcoin for Juniors"},
@@ -304,7 +307,8 @@ M = {
 
 def menu(lang):
     b = lambda k, d: {"text": L(M[k], lang), "callback_data": d}
-    return L(M["head"], lang), [[b("b_map", "lm:0")], [b("b_kids", "lk:0")], [b("b_lib", "ll:0")],
+    return L(M["head"], lang), [[{"text": L(M["b_btc"], lang), "url": SITE + "/bitcoin/"}],
+                                [b("b_map", "lm:0")], [b("b_kids", "lk:0")], [b("b_lib", "ll:0")],
                                 [b("b_academy", "la:0")],
                                 [b("b_start", "ln:0")], [b("b_reg", "lg:all"), b("b_local", "lc:0")],
                                 [b("b_check", "m:token"), b("b_report", "lr:0")]]

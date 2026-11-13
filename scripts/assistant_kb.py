@@ -62,6 +62,7 @@ FEATURES = [
     ("/safety/", ["token"], None),
     ("/me/", ["center", "pf"], "alerts"),
     ("/encyclopedia/", ["enc"], "enc"),
+    ("/bitcoin/", ["learn"], None),
     ("/map/", ["learn"], None),
     ("/kids/", ["learn"], None),
     ("/learn/", ["learn"], None),
