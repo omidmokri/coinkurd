@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "19"  # bump to bust caches of chrome.css / chrome.js
+VER = "20"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -319,6 +319,7 @@ T = {
     "battle": L("نبرد", "شەڕ", "Battle"),
     "learn": L("آموزش", "فێربوون", "Learn"),
     "all": L("همه", "هەموو", "All"),
+    "allsec": L("همهٔ بخش‌ها", "هەموو بەشەکان", "All sections"),
     "lang": L("زبان", "زمان", "Language"),
     "tagline": L("بازار را بفهم، نه فقط دنبال کن.", "لە بازاڕ تێبگە، تەنها دوای مەکەوە.", "Understand the market, don't just follow it."),
     "about": L("تحلیل، داده و آموزش بازار کریپتو به فارسی، کوردی و انگلیسی؛ به‌روزرسانی خودکار از کانال Coin_Kurd و منابع باز داده.",
@@ -338,7 +339,12 @@ T = {
     "autopilot": L("گزارش کار خودکار", "ڕاپۆرتی کاری خۆکار", "Autopilot log"),
     "skip": L("پرش به محتوا", "بازدان بۆ ناوەڕۆک", "Skip to content"),
 }
-FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every NAV group — the footer is the full map of the site
+# The compact footer: seven quick links, then four short columns (no address twice). The full map is the header menu.
+FOOT_QUICK = ["/market/", "/battle/", "/dashboard/", "/whales/", "/onchain/", "/class/", "/tools/"]
+FOOT_COLS = [("mkt", ["/calendar/", "/heatmap/", "/money-flow/", "/coins/", "/fear-greed/"]),
+             ("ana", ["/indicators/", "/dna/", "/reality/", "/track-record/", "/today/"]),
+             ("learn", ["/map/", "/academy/", "/encyclopedia/", "/learn/", "/glossary/"]),
+             ("more", ["/about/", "/methodology/", "/status/", "/app/"])]
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
@@ -397,30 +403,34 @@ def bottom(lang="fa"):
 
 
 def footer(lang="fa"):
+    """The compact footer (owner's brief, 2026-11-13): four layers — quick links, four short columns, brand + community,
+    the legal line. It is no longer the full map of the site: the header menu is, and «همهٔ بخش‌ها» in the legal line opens it.
+    Every link is looked up in NAV by its address, so a label changed in the menu changes here too and a removed page
+    stops the build instead of leaving a dead link."""
     cats = {c["k"]: c for c in NAV}
+    by = {h: (ic, t) for c in NAV for h, ic, t, d in c["items"]}
+    by[BATTLE[0]] = (BATTLE[1], BATTLE[2])
+    quick = "".join(f'<a class="ekf-q" href="{h}">{icon(by[h][0])}{tri(by[h][1], lang)}</a>' for h in FOOT_QUICK)
     cols = []
-    for k in FOOT_COLS:
-        c = cats[k]
-        items = list(c["items"])
-        if k == "mkt":
-            items.append((BATTLE[0], BATTLE[1], BATTLE[2], BATTLE[2]))
-        lis = "".join(f'<li><a href="{h}">{tri(t, lang)}</a></li>' for h, ic, t, d in items)
+    for k, hrefs in FOOT_COLS:
+        lis = "".join(f'<li><a href="{h}">{tri(by[h][1], lang)}</a></li>' for h in hrefs)
         if k == "more":
             lis += f'<li><a href="https://t.me/Coin_Kurd_Group" target="_blank" rel="noopener noreferrer">{tri(T["contact"], lang)}</a></li>'
-        cols.append(f'<details class="ekf-col" open><summary>{tri(c["t"], lang)}{icon("chev", "ek-svg ek-chev")}</summary><ul>{lis}</ul></details>')
+        cols.append(f'<details class="ekf-col" open><summary>{tri(cats[k]["t"], lang)}{icon("chev", "ek-svg ek-chev")}</summary><ul>{lis}</ul></details>')
     soc = "".join(_social(k, u, i, lab, lang) for k, u, i, lab in SOCIAL)
     apps = (f'<a class="ek-badge" href="/app/"><i class="ek-si b-android"></i><span>{tri(T["dl"], lang, "ek-i", "small")}{tri(T["andr"], lang, "ek-i", "b")}</span></a>'
             f'<a class="ek-badge" href="/app/#web">{icon("globe")}<span>{tri(T["anyd"], lang, "ek-i", "small")}{tri(T["pwa"], lang, "ek-i", "b")}</span></a>')
-    lab = {h: t for h, ic, t, d in cats["more"]["items"]}   # by address: inserting a menu item must not shift these labels
-    legal = (f'<a href="/privacy/">{tri(lab["/privacy/"], lang)}</a><a href="/terms/">{tri(lab["/terms/"], lang)}</a>'
-             f'<a href="/methodology/">{tri(lab["/methodology/"], lang)}</a><a href="/autopilot/">{tri(T["autopilot"], lang)}</a><a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
+    legal = (f'<a class="ekf-all" href="#ekh">{icon("grid")}{tri(T["allsec"], lang)}</a><a href="/privacy/">{tri(by["/privacy/"][1], lang)}</a><a href="/terms/">{tri(by["/terms/"][1], lang)}</a>'
+             f'<a href="/autopilot/">{tri(T["autopilot"], lang)}</a><a href="/sitemap.xml">{tri(T["sitemap"], lang)}</a><a href="/feed.xml">RSS</a>')
     return (f'<!--ek:footer--><div class="ekf" id="ekf" role="contentinfo" data-lang="{lang}"><div class="ek-w">'
-            f'<div class="ekf-top"><div class="ekf-brand"><a class="ek-brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="" width="64" height="40" loading="lazy"><span>entekhab<b>.net</b></span></a>'
-            f'{tri(T["tagline"], lang, "ek-i ekf-tag", "p")}{tri(T["about"], lang, "ek-i ekf-ab", "p")}<div class="ekf-apps">{apps}</div></div>'
-            f'<div class="ekf-com">{tri(T["join"], lang, "ek-i ekf-h", "p")}<div class="ekf-soc">{soc}</div></div></div>'
+            f'<div class="ekf-quick">{quick}</div>'
             f'<div class="ekf-cols">{"".join(cols)}</div>'
+            f'<div class="ekf-top"><div class="ekf-brand"><a class="ek-brand" href="/" aria-label="entekhab.net"><img src="/assets/logo-h.webp" alt="" width="64" height="40" loading="lazy"><span>entekhab<b>.net</b></span></a>'
+            f'{tri(T["tagline"], lang, "ek-i ekf-tag", "p")}</div>'
+            f'<div class="ekf-com">{tri(T["join"], lang, "ek-i ekf-h", "p")}<div class="ekf-soc">{soc}</div></div>'
+            f'<div class="ekf-apps">{apps}</div></div>'
             f'<div class="ekf-bot"><span class="ekf-cr">© <span class="ek-yr">2026</span> entekhab.net — {tri(T["rights"], lang)}</span>'
-            f'{tri(T["nfa"], lang, "ek-i ekf-nfa")}<span class="ekf-lg">{legal}</span></div>'
+            f'<span class="ekf-lg">{legal}</span>{tri(T["nfa"], lang, "ek-i ekf-nfa")}</div>'
             f'</div></div><!--/ek:footer-->')
 
 

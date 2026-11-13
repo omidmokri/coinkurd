@@ -262,6 +262,9 @@
   /* ---------- footer ---------- */
   if (F) {
     var yr = F.querySelector('.ek-yr'); if (yr) yr.textContent = new Date().getFullYear();
+    /* «همهٔ بخش‌ها»: the footer is short now; this opens the full menu (the same one the «همه» tab opens) */
+    var fa = F.querySelector('.ekf-all'), ba = B && B.querySelector('.ek-all');
+    if (fa && ba) fa.addEventListener('click', function (e) { e.preventDefault(); ba.click(); });
     var mq = window.matchMedia ? matchMedia('(max-width:640px)') : { matches: false };
     var cols = [].slice.call(F.querySelectorAll('.ekf-col'));
     var acc = function () { cols.forEach(function (c) { if (mq.matches) c.removeAttribute('open'); else c.setAttribute('open', ''); }); };

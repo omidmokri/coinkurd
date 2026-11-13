@@ -94,6 +94,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `BR.table`, `BR.nf`, `BR.fdate`, `BR.crumbs`, `BR.updated`, `BR.RCSS`, `BR.add_to_sitemap`. Examples:
   `scripts/build_trackrecord.py`, `scripts/build_opportunity.py`.
 - Menu (header + footer of every page): `scripts/chrome.py`, groups of `(path, icon, title L(), description L())`.
+  **The footer is short on purpose (owner's brief, 2026-11-13):** four layers — seven quick links (`FOOT_QUICK`), four
+  columns of five (`FOOT_COLS`), brand + social icons + app badges, the legal line. It is not the map of the site any
+  more (the header menu is; «همهٔ بخش‌ها» in the legal line opens it). A new page goes in `NAV`, not in the footer.
 - Site assistant knowledge: `scripts/assistant_kb.py` `FEATURES` (path, bot keys, extension tab) → `build_assistant.py`.
 - `/market/` (live market workspace): static `market/index.html` + `assets/pro/*.js|css` + `assets/vendor/lwc5.js`;
   strings in `assets/pro/i18n.js` (fa, ckb, ar, en; `tests/test_pro_i18n.py` checks them); calendar data
