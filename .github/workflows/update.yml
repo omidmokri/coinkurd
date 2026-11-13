@@ -515,6 +515,9 @@ jobs:
       - name: Search snippets (titles ≤ 60, descriptions ≤ 160 characters on every page)
         continue-on-error: true
         run: python scripts/seo_tidy.py
+      - name: Structured data (breadcrumb trail, preview picture, canonical on every indexable page that lacks one)
+        continue-on-error: true
+        run: python scripts/seo_struct.py
       - name: Leak guard (no indicator source may ever reach the public repo or site)
         run: python scripts/leak_guard.py
       - uses: actions/configure-pages@v5

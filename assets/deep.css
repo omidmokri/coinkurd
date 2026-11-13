@@ -1,0 +1,157 @@
+/* entekhab.net — "Deep" : the depth layer of every page except the homepage. Loaded after nx.css, only when <html>
+   carries .ek-deep (the switch is in scripts/chrome.py; full-screen apps such as /battle/ and /market/ never get it).
+
+   Same room, same light as the homepage: black, one warm light above, a cold far glow to the side. What is new is
+   distance: a sky behind the page (stars, far light, a floor that runs to the horizon) and surfaces that catch the light.
+   Nothing here changes a colour of the brand, a layout or a word. Motion is slow, answers the reader, and stops when the
+   visitor asked for less motion or the device has no graphics chip (.nx-lite). */
+html.ek-deep{--ds-or:#f7931a;--ds-gold:#ffd27a;--ds-edge:rgba(255,255,255,.085);--ds-edge2:rgba(255,255,255,.14);
+  --ds-glass:linear-gradient(155deg,rgba(255,255,255,.07),rgba(255,255,255,.012) 44%,rgba(255,255,255,.035));
+  --ds-lift:inset 0 1px 0 rgba(255,255,255,.07),0 26px 60px -34px rgba(0,0,0,.95),0 2px 10px rgba(0,0,0,.28);
+  --ds-e:cubic-bezier(.2,.8,.2,1)}
+
+/* ------------------------------------------------------------------ the sky: three fixed layers behind the page */
+/* far: two star fields of different grain, so the pattern never reads as a tile */
+html.ek-deep::before{content:"";position:fixed;inset:-14vh 0 -14vh 0;z-index:-3;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Ccircle cx='137.4' cy='66.1' r='0.48' fill='%23cfe9ee' fill-opacity='0.49'/%3E%3Ccircle cx='213.1' cy='19.4' r='0.48' fill='%23fff' fill-opacity='0.29'/%3E%3Ccircle cx='55.0' cy='96.0' r='0.83' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='23.2' cy='357.7' r='0.51' fill='%23fff' fill-opacity='0.3'/%3E%3Ccircle cx='78.5' cy='243.6' r='0.6' fill='%23ffd9a0' fill-opacity='0.5'/%3E%3Ccircle cx='28.6' cy='88.9' r='0.62' fill='%23fff' fill-opacity='0.39'/%3E%3Ccircle cx='127.5' cy='331.3' r='0.55' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='304.5' cy='122.6' r='0.5' fill='%23fff' fill-opacity='0.44'/%3E%3Ccircle cx='205.5' cy='20.2' r='0.76' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='290.5' cy='248.9' r='0.63' fill='%23fff' fill-opacity='0.63'/%3E%3Ccircle cx='277.6' cy='29.0' r='0.71' fill='%23fff' fill-opacity='0.7'/%3E%3Ccircle cx='162.9' cy='279.5' r='1.23' fill='%23ffd9a0' fill-opacity='0.74'/%3E%3Ccircle cx='28.3' cy='320.5' r='0.55' fill='%23cfe9ee' fill-opacity='0.43'/%3E%3Ccircle cx='189.1' cy='230.4' r='0.78' fill='%23fff' fill-opacity='0.64'/%3E%3Ccircle cx='151.8' cy='368.3' r='0.51' fill='%23fff' fill-opacity='0.33'/%3E%3Ccircle cx='203.8' cy='246.7' r='0.45' fill='%23fff' fill-opacity='0.44'/%3E%3Ccircle cx='396.7' cy='288.5' r='0.7' fill='%23ffd9a0' fill-opacity='0.55'/%3E%3Ccircle cx='374.6' cy='325.3' r='0.77' fill='%23cfe9ee' fill-opacity='0.43'/%3E%3Ccircle cx='265.3' cy='29.6' r='1.1' fill='%23cfe9ee' fill-opacity='0.74'/%3E%3Ccircle cx='4.1' cy='66.3' r='1.18' fill='%23fff' fill-opacity='0.71'/%3E%3Ccircle cx='65.2' cy='107.9' r='0.6' fill='%23fff' fill-opacity='0.31'/%3E%3Ccircle cx='196.0' cy='203.3' r='1.05' fill='%23fff' fill-opacity='0.79'/%3E%3Ccircle cx='70.5' cy='13.5' r='0.66' fill='%23cfe9ee' fill-opacity='0.32'/%3E%3Ccircle cx='221.6' cy='407.1' r='0.73' fill='%23fff' fill-opacity='0.37'/%3E%3Ccircle cx='322.0' cy='223.4' r='0.58' fill='%23fff' fill-opacity='0.35'/%3E%3Ccircle cx='355.3' cy='336.1' r='0.75' fill='%23fff' fill-opacity='0.35'/%3E%3Ccircle cx='15.9' cy='15.5' r='0.55' fill='%23fff' fill-opacity='0.56'/%3E%3Ccircle cx='390.1' cy='411.1' r='0.6' fill='%23fff' fill-opacity='0.35'/%3E%3Ccircle cx='88.2' cy='261.1' r='0.79' fill='%23fff' fill-opacity='0.47'/%3E%3Ccircle cx='38.9' cy='276.2' r='0.76' fill='%23fff' fill-opacity='0.59'/%3E%3Ccircle cx='329.1' cy='141.0' r='0.84' fill='%23fff' fill-opacity='0.43'/%3E%3Ccircle cx='302.6' cy='74.0' r='0.51' fill='%23fff' fill-opacity='0.66'/%3E%3Ccircle cx='344.5' cy='407.9' r='0.59' fill='%23ffd9a0' fill-opacity='0.5'/%3E%3Ccircle cx='9.9' cy='404.0' r='0.66' fill='%23fff' fill-opacity='0.67'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='680' height='680'%3E%3Ccircle cx='114.8' cy='467.5' r='0.64' fill='%23fff' fill-opacity='0.35'/%3E%3Ccircle cx='348.4' cy='343.4' r='1.0' fill='%23cfe9ee' fill-opacity='0.79'/%3E%3Ccircle cx='537.4' cy='160.1' r='1.02' fill='%23fff' fill-opacity='0.95'/%3E%3Ccircle cx='417.9' cy='26.9' r='0.65' fill='%23fff' fill-opacity='0.3'/%3E%3Ccircle cx='108.0' cy='553.4' r='1.46' fill='%23fff' fill-opacity='0.81'/%3E%3Ccircle cx='329.7' cy='129.6' r='1.43' fill='%23fff' fill-opacity='0.76'/%3E%3Ccircle cx='655.0' cy='604.7' r='0.76' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='324.1' cy='559.8' r='1.46' fill='%23fff' fill-opacity='0.92'/%3E%3Ccircle cx='307.3' cy='263.2' r='0.6' fill='%23ffd9a0' fill-opacity='0.26'/%3E%3Ccircle cx='486.6' cy='671.2' r='0.65' fill='%23fff' fill-opacity='0.5'/%3E%3Ccircle cx='413.2' cy='378.0' r='0.52' fill='%23ffd9a0' fill-opacity='0.33'/%3E%3Ccircle cx='627.0' cy='236.9' r='0.57' fill='%23ffd9a0' fill-opacity='0.3'/%3E%3Ccircle cx='550.8' cy='526.2' r='0.72' fill='%23fff' fill-opacity='0.55'/%3E%3Ccircle cx='277.5' cy='668.7' r='0.69' fill='%23fff' fill-opacity='0.65'/%3E%3Ccircle cx='170.1' cy='592.8' r='1.03' fill='%23fff' fill-opacity='0.9'/%3E%3Ccircle cx='566.5' cy='39.1' r='1.14' fill='%23ffd9a0' fill-opacity='0.8'/%3E%3Ccircle cx='50.7' cy='231.2' r='0.84' fill='%23fff' fill-opacity='0.59'/%3E%3Ccircle cx='648.4' cy='357.2' r='0.46' fill='%23fff' fill-opacity='0.35'/%3E%3Ccircle cx='596.3' cy='408.1' r='0.68' fill='%23ffd9a0' fill-opacity='0.63'/%3E%3Ccircle cx='363.1' cy='189.5' r='0.45' fill='%23cfe9ee' fill-opacity='0.56'/%3E%3Ccircle cx='403.0' cy='436.7' r='0.68' fill='%23fff' fill-opacity='0.37'/%3E%3Ccircle cx='612.6' cy='93.7' r='1.05' fill='%23fff' fill-opacity='0.71'/%3E%3C/svg%3E");background-size:420px 420px,680px 680px;background-position:0 0,140px 90px;opacity:.75;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.55) 46%,rgba(0,0,0,.16) 100%);mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.55) 46%,rgba(0,0,0,.16) 100%)}
+/* middle: the light — warm and close above (where the coin hangs on the homepage), cold and far to one side, an ember low on the other */
+html.ek-deep body::before{inset:-10vh -8vw;z-index:-2;
+  background:radial-gradient(30vw 20vh at 50% 9vh,rgba(255,210,122,.2),transparent 72%),
+    radial-gradient(70vw 50vh at 50% 6vh,rgba(247,147,26,.3),transparent 70%),
+    radial-gradient(46vw 64vh at 104% 56%,rgba(13,74,82,.5),transparent 70%),
+    radial-gradient(26vw 30vh at 96% 30%,rgba(20,110,120,.16),transparent 70%),
+    radial-gradient(44vw 50vh at -2% 88%,rgba(247,147,26,.16),transparent 70%),
+    radial-gradient(130vw 100vh at 50% 46%,transparent 52%,rgba(0,0,0,.6) 100%);
+  animation:ds-drift 46s ease-in-out infinite alternate;will-change:transform}
+@keyframes ds-drift{from{transform:translate3d(-1.4vw,0,0) scale(1)}to{transform:translate3d(1.6vw,1.4vh,0) scale(1.06)}}
+/* near: the floor — lines that run to a horizon, lit where it meets the sky; it is kept out of the way of the text column */
+html.ek-deep::after{content:"";position:fixed;inset:auto 0 0 0;height:38vh;z-index:-1;pointer-events:none;transform-origin:50% 0;
+  background:radial-gradient(70% 7% at 50% 0,rgba(255,210,122,.3),transparent 100%),radial-gradient(90% 30% at 50% 0,rgba(247,147,26,.18),transparent 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 400' preserveAspectRatio='none'%3E%3Cpath d='M0 6.5H1000M0 16.5H1000M0 32.0H1000M0 53.4H1000M0 81.2H1000M0 115.8H1000M0 157.4H1000M0 206.4H1000M0 263.0H1000M0 327.5H1000M0 400.0H1000M500 0L-2500 400M500 0L-2250 400M500 0L-2000 400M500 0L-1750 400M500 0L-1500 400M500 0L-1250 400M500 0L-1000 400M500 0L-750 400M500 0L-500 400M500 0L-250 400M500 0L0 400M500 0L250 400M500 0L500 400M500 0L750 400M500 0L1000 400M500 0L1250 400M500 0L1500 400M500 0L1750 400M500 0L2000 400M500 0L2250 400M500 0L2500 400M500 0L2750 400M500 0L3000 400M500 0L3250 400M500 0L3500 400' fill='none' stroke='%23f7931a' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") 50% 0/100% 100% no-repeat;
+  -webkit-mask-image:linear-gradient(90deg,#000,rgba(0,0,0,.07) 31%,rgba(0,0,0,.07) 69%,#000),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.36) 70%,rgba(0,0,0,.24));
+  mask-image:linear-gradient(90deg,#000,rgba(0,0,0,.07) 31%,rgba(0,0,0,.07) 69%,#000),linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.36) 70%,rgba(0,0,0,.24));
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+/* the page moves, the sky answers: the stars slip a little, the floor comes toward the reader (browsers with scroll timelines) */
+@supports (animation-timeline:scroll()){
+  @media (prefers-reduced-motion:no-preference){
+    html.ek-deep:not(.nx-lite)::before{animation:ds-stars linear both;animation-timeline:scroll(root block)}
+    html.ek-deep:not(.nx-lite)::after{animation:ds-floor linear both;animation-timeline:scroll(root block)}
+  }
+}
+@keyframes ds-stars{to{transform:translate3d(0,-9vh,0)}}
+@keyframes ds-floor{to{transform:scale(1.5)}}
+
+/* ------------------------------------------------------------------ type: the title stands in the light */
+html.ek-deep main h1,html.ek-deep .hero h1,html.ek-deep .wrap>h1{text-shadow:0 0 46px rgba(247,147,26,.2),0 2px 0 rgba(0,0,0,.4)}
+/* the mark that repeats on this site is the candle: one stands before each section title of the plain pages */
+html.ek-deep main.w>h2:not([class]){position:relative;padding-inline-start:15px}
+html.ek-deep main.w>h2:not([class])::before{content:"";position:absolute;inset-inline-start:0;top:.5em;width:4px;height:.86em;border-radius:2px;
+  background:linear-gradient(180deg,var(--ds-gold),var(--ds-or));box-shadow:0 0 14px rgba(247,147,26,.75)}
+/* the trail: where am I */
+html.ek-deep main.w .meta:first-child:not(:has(.pill,time)){display:inline-flex;max-width:100%;padding:5px 14px;border-radius:99px;border:1px solid var(--ds-edge);
+  background:var(--ds-glass),rgba(12,12,15,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* ------------------------------------------------------------------ surfaces: glass that catches the light on its upper edge */
+html.ek-deep :is(.kpi,.rc-kpi,.card,.pulse>div,.faq,.gt,.lv,.ic,.mbox,.tr-hero,.tr-card,.tr-two>div,.oc-card,.oc-learn,.dv-c,.lbc,.ap-sec,.ap-b,.pc-ep,
+  .rt-seat,.rt-piece,.xp-b,.mp-card,.mp-sec,.td-k,.ac-box,.ac-fac,.ac-kpi,.ac-stats>div,.lab-card,.ibox,.nums>div,.fd,.ap-e,.tl>a),
+html.ek-deep main details{border-color:var(--ds-edge);box-shadow:var(--ds-lift);
+  transition:border-color .35s,box-shadow .35s,transform .45s var(--ds-e)}
+/* the plain ones (a flat fill, no picture of their own) also let the sky through and take the pointer's light */
+html.ek-deep :is(.kpi,.rc-kpi,.card,.pulse>div,.faq,.gt,.lv,.tr-card,.oc-card,.dv-c,.lbc,.ap-sec,.pc-ep,.mp-card,.td-k,.ac-box,.ac-kpi,.ibox,.nums>div,.fd,.ap-e),
+html.ek-deep main details{background-color:rgba(13,13,16,.76);
+  background-image:radial-gradient(260px circle at var(--ds-x,50%) var(--ds-y,-60px),rgba(247,147,26,var(--ds-a,0)),transparent 70%),var(--ds-glass)}
+@media (hover:hover){
+  html.ek-deep :is(.kpi,.rc-kpi,.card,.pulse>div,.gt,.lv,.ic,.tr-card,.oc-card,.dv-c,.lbc,.pc-ep,.mp-card,.td-k,.ac-fac,.ac-kpi,.lab-card,.ibox,.nums>div,.fd,.tl>a):hover,
+  html.ek-deep main details:hover{border-color:rgba(247,147,26,.34);--ds-a:.13;
+    box-shadow:inset 0 1px 0 rgba(255,210,122,.16),0 30px 70px -34px rgba(0,0,0,.95),0 0 0 1px rgba(247,147,26,.06),0 18px 50px -30px rgba(247,147,26,.35)}
+  html.ek-deep :is(.kpi,.rc-kpi,.lbc,.mp-card,.ac-fac,.lab-card,.tl>a,.nums>div):hover{transform:translate3d(0,-3px,0)}
+}
+/* pictures and charts sit deeper than the page */
+html.ek-deep main .img,html.ek-deep main .tv{box-shadow:0 0 0 1px rgba(255,255,255,.07),0 44px 90px -44px rgba(0,0,0,.95),0 30px 80px -50px rgba(247,147,26,.4)}
+/* small things answer the pointer */
+html.ek-deep main :is(.pill,.wbtn,.coins a,.chips a){transition:border-color .25s,background-color .25s,box-shadow .25s,color .25s}
+@media (hover:hover){
+  html.ek-deep main :is(a.pill,.wbtn,.coins a,.chips a):hover{border-color:rgba(247,147,26,.55);background-color:rgba(247,147,26,.08);box-shadow:0 0 22px -6px rgba(247,147,26,.55);text-decoration:none}
+  html.ek-deep main.w table tr{transition:background-color .2s}
+  html.ek-deep main.w table tr:hover>td{background-color:rgba(247,147,26,.05)}
+  html.ek-deep main.w ul.list>li{transition:background .3s,padding .3s var(--ds-e)}
+  html.ek-deep main.w ul.list>li:hover{background:linear-gradient(to left,rgba(247,147,26,.07),transparent 70%);padding-inline-start:10px}
+  html.ek-deep[dir=ltr] main.w ul.list>li:hover{background:linear-gradient(to right,rgba(247,147,26,.07),transparent 70%)}
+}
+html.ek-deep main.w table th{color:#b9b8b2;border-bottom-color:rgba(247,147,26,.28)}
+html.ek-deep main blockquote{border-color:var(--ds-edge)}
+
+/* ------------------------------------------------------------------ the ground: the footer begins at a lit horizon */
+html.ek-deep #ekf{position:relative;background:radial-gradient(1200px 300px at 85% -10%,rgba(247,147,26,.09),transparent 60%),linear-gradient(180deg,rgba(11,12,15,.86),rgba(5,5,7,.97))}
+html.ek-deep #ekf::before{content:"";position:absolute;inset:0 0 auto 0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(247,147,26,.55) 30%,rgba(255,210,122,.8) 50%,rgba(247,147,26,.55) 70%,transparent);box-shadow:0 0 26px 1px rgba(247,147,26,.5)}
+
+/* ------------------------------------------------------------------ arriving: a block rises into place the first time it is reached (class set by deep.js) */
+.ds-rv{opacity:0;transform:translate3d(0,22px,0)}
+.ds-rv.ds-in{opacity:1;transform:none;transition:opacity .7s var(--ds-e),transform .8s var(--ds-e);transition-delay:var(--ds-d,0s)}
+
+/* ------------------------------------------------------------------ how far am I: a line of light under the top edge */
+#ds-prog{position:fixed;inset:0 0 auto 0;height:2px;z-index:130;pointer-events:none;opacity:0;transition:opacity .4s}
+#ds-prog.on{opacity:1}
+#ds-prog i{display:block;height:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#a65a07,var(--ds-or) 40%,var(--ds-gold));box-shadow:0 0 14px rgba(247,147,26,.9)}
+html[dir=rtl] #ds-prog i{transform-origin:100% 50%;background:linear-gradient(270deg,#a65a07,var(--ds-or) 40%,var(--ds-gold))}
+
+/* ------------------------------------------------------------------ where am I in this page: a rail of marks in the free margin (wide screens) */
+#ds-rail{position:fixed;inset-inline-end:14px;top:50%;z-index:60;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+  max-height:70vh;padding:8px 6px;border-radius:16px;border:1px solid transparent;font:500 .74rem/1.5 var(--ek-font);transition:background-color .3s,border-color .3s,box-shadow .3s;opacity:0;animation:ds-fade .6s .5s forwards}
+@keyframes ds-fade{to{opacity:1}}
+#ds-rail.off{visibility:hidden}
+#ds-rail a{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-height:18px;padding:1px 2px;color:rgba(255,255,255,.62);text-decoration:none;white-space:nowrap;outline-offset:2px}
+#ds-rail a span{max-width:0;overflow:hidden;text-overflow:ellipsis;opacity:0;transition:max-width .4s var(--ds-e),opacity .25s}
+#ds-rail a i{flex:0 0 auto;width:14px;height:2px;border-radius:2px;background:rgba(255,255,255,.26);transition:width .3s var(--ds-e),background-color .3s,box-shadow .3s}
+#ds-rail a.on{color:#fff}
+#ds-rail a.on i{width:26px;background:var(--ds-or);box-shadow:0 0 12px rgba(247,147,26,.9)}
+#ds-rail a:hover i{background:var(--ds-gold)}
+#ds-rail:hover,#ds-rail:focus-within{background:rgba(10,10,13,.9);border-color:var(--ds-edge2);box-shadow:0 24px 60px -20px #000,inset 0 1px 0 rgba(255,255,255,.08);overflow-y:auto;padding:10px 12px}
+#ds-rail:hover a span,#ds-rail:focus-within a span{max-width:230px;opacity:1}
+@media (max-width:1099px){#ds-rail{display:none}}
+
+/* ------------------------------------------------------------------ search that answers while you type (results under the site's search box) */
+#ekq .ds-qr{position:relative;max-width:660px;margin:10px auto 0;padding:0 16px;display:none}
+#ekq .ds-qr.on{display:block}
+#ekq .ds-qr ul{list-style:none;margin:0;padding:6px;border-radius:17px;border:1px solid rgba(255,255,255,.14);background:var(--ds-glass,none),rgba(12,12,15,.94);box-shadow:0 30px 80px -20px #000,inset 0 1px 0 rgba(255,255,255,.08);max-height:min(52vh,430px);overflow-y:auto}
+#ekq .ds-qr a{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:12px;color:var(--ek-ink);text-decoration:none}
+#ekq .ds-qr a b{font-weight:700;font-size:.92rem;flex:0 0 auto;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ekq .ds-qr a small{flex:1;min-width:0;color:var(--ek-mute);font-size:.76rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ekq .ds-qr a kbd{flex:0 0 auto;font:500 .68rem 'Space Grotesk',monospace;color:var(--ek-mute);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:1px 6px;opacity:0}
+#ekq .ds-qr li.on a,#ekq .ds-qr a:hover{background:rgba(247,147,26,.13);box-shadow:inset 0 0 0 1px rgba(247,147,26,.32)}
+#ekq .ds-qr li.on a kbd{opacity:1}
+#ekq .ds-qr .ds-qa b{color:var(--ek-acc)}
+html.ek-deep #ekq .ek-bd{background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html.ek-deep.nx-lite #ekq .ek-bd{-webkit-backdrop-filter:none;backdrop-filter:none}
+
+/* ------------------------------------------------------------------ lost in space: the page that is not there */
+html.ek-deep .nf{position:relative;isolation:isolate;padding-block:5vh 2vh}
+html.ek-deep .nf::before,html.ek-deep .nf::after{content:"";position:absolute;left:50%;top:clamp(70px,13vw,120px);z-index:-1;border-radius:50%;pointer-events:none;
+  width:min(86vw,560px);aspect-ratio:1;border:1px solid rgba(247,147,26,.2);transform:translate(-50%,-50%) rotateX(72deg);animation:ds-orbit 26s linear infinite}
+html.ek-deep .nf::after{width:min(64vw,400px);border-color:rgba(255,210,122,.16);border-style:dashed;animation-duration:38s;animation-direction:reverse}
+@keyframes ds-orbit{to{transform:translate(-50%,-50%) rotateX(72deg) rotate(360deg)}}
+html.ek-deep .nf .big{filter:drop-shadow(0 0 44px rgba(247,147,26,.45))}
+html.ek-deep .nf input{background:rgba(14,14,17,.7);border-color:var(--ds-edge2)}
+
+/* ------------------------------------------------------------------ smaller screens: less of everything, same idea */
+@media (max-width:760px){
+  html.ek-deep::after{height:30vh;opacity:.7}
+  html.ek-deep::before{opacity:.6}
+  html.ek-deep body::before{background:radial-gradient(120vw 40vh at 50% 0,rgba(247,147,26,.2),transparent 70%),radial-gradient(90vw 50vh at 104% 62%,rgba(13,74,82,.34),transparent 70%),radial-gradient(80vw 40vh at 0 96%,rgba(247,147,26,.1),transparent 70%)}
+  .ds-rv{transform:translate3d(0,14px,0)}
+}
+/* no graphics chip, or the visitor asked for less: the sky stays, nothing moves, nothing is see-through */
+html.ek-deep.nx-lite body::before{animation:none;will-change:auto}
+html.ek-deep.nx-lite::after{opacity:.6}
+html.ek-deep.nx-lite .nf::before,html.ek-deep.nx-lite .nf::after{animation:none}
+@media (prefers-reduced-motion:reduce){
+  html.ek-deep body::before,html.ek-deep .nf::before,html.ek-deep .nf::after,#ds-rail{animation:none!important}
+  #ds-rail{opacity:1}
+  .ds-rv{opacity:1!important;transform:none!important}
+}
+@media (prefers-reduced-transparency:reduce){
+  html.ek-deep :is(.kpi,.rc-kpi,.card,.pulse>div,.faq,.gt,.lv,.tr-card,.oc-card,.dv-c,.lbc,.ap-sec,.pc-ep,.mp-card,.td-k,.ac-box,.ac-kpi,.ibox,.nums>div,.fd,.ap-e),html.ek-deep main details{background-color:#0e0e11}
+}
+@media (forced-colors:active){html.ek-deep::before,html.ek-deep::after,html.ek-deep body::before{display:none}}
+@media print{html.ek-deep::before,html.ek-deep::after,html.ek-deep body::before,#ds-prog,#ds-rail{display:none!important}.ds-rv{opacity:1!important;transform:none!important}}

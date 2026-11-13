@@ -432,6 +432,12 @@ def footer(lang="fa"):
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "6"
 NX_VER = "11"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+# "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
+# that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
+# with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the
+# homepage never gets it. To switch the whole layer off, empty the two lines that mention `dp` in UI2_TAG.
+DEEP_VER = "1"
+DEEP_OFF = "battle|market|kids"
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
            "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"
@@ -441,14 +447,17 @@ UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(
            "h=/^\\/(index\\.html)?$/.test(location.pathname);"
            "addEventListener('pagereveal',function(e){var t=e.viewTransition;if(t)['ready','finished'].forEach(function(k){if(t[k]&&t[k].catch)t[k].catch(function(){})})});"
            "c.add('ek-v2');if(n){c.add('ek-v3');if(/^sw:/.test(g))c.add('nx-lite')}"
+           f"var dp=n&&!h&&!/^\\/(?:{DEEP_OFF})(?:\\/|$)/.test(location.pathname);if(dp)c.add('ek-deep');"
            "if(h){c.add('ek-deck');addEventListener('DOMContentLoaded',function(){setTimeout(function(){"
            "if(!window.ekUI2)c.remove('ek-deck');if(n&&!window.ekNX)c.remove('ek-v3')},80)})}"
            f"var s='<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\">';"
            f"if(n)s+='<link rel=\"stylesheet\" href=\"/assets/nx.css?v={NX_VER}\">';"
+           f"if(dp)s+='<link rel=\"stylesheet\" href=\"/assets/deep.css?v={DEEP_VER}\">';"
            f"s+='<script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>';"
            f"if(n){{if(h)s+='<link rel=\"preload\" as=\"image\" href=\"/assets/coin-front.webp\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
            f"if(h)s+='<script src=\"/assets/nx-coin.js?v={NX_VER}\" defer><\\/script><script src=\"/assets/nx-chart.js?v={NX_VER}\" defer><\\/script>"
            f"<script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
+           f"if(dp)s+='<script src=\"/assets/deep.js?v={DEEP_VER}\" defer><\\/script>';"
            "document.write(s)}catch(e){}})()</script>")
 HEAD_TAGS = (f'<link rel="stylesheet" href="/assets/chrome.css?v={VER}">'
              f'<meta name="referrer" content="strict-origin-when-cross-origin">')
