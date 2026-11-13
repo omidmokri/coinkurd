@@ -137,11 +137,25 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `liqmodel.js` is the liquidation-level model: pure, documented at its top, never changed without
   `node tests/test_obs_liq.js`. `ts.js` is `OB.TS`, the time-series chart of the other pages: stacked panes on one
   time axis (two measures never share a pane), line/area/step/bars/candle, legend switches, crosshair, zoom, PNG.
-  `deriv.js` = open interest, funding rates, long/short. The hub's `HUB["todo"]` in build_obs.py is the honest
-  "not built yet" list: move an item into `HUB["secs"]` only when its page exists. Bot: `scripts/bot_obs.py` (section
-  `obs`, one Web App button per chart). Tests: `node tests/test_obs_liq.js`, `python3 tests/test_obs_i18n.py`,
+  `deriv.js` = open interest, funding rates, long/short. `optmath.js` + `opt.js` = `/charts/options/` (Deribit's public
+  book, DVOL and delivery prices read in the browser; `OB.Bars` is its bar chart over strikes and expiries).
+  `chainmath.js` + `chain.js` = `/charts/mvrv/`, `/charts/exchange-flows/`, `/charts/network/`, `/charts/bitcoin-cycle/`:
+  they read `data/obs/chain_<btc|eth>.json`, one value a day per column, written by `scripts/obs_chain.py` (update.yml
+  step, Coin Metrics community API, at most every 3 hours; CC BY-NC, the pages name it) — everything else (realized
+  price, NUPL, Z-score, Puell, the moving averages, ranks) is derived in `chainmath.js`, whose head is the list of
+  definitions. `obs_chain.summary()` is the same arithmetic in Python for the bot (`data/obs/chain_now.json`);
+  **change one and you change the other** — `tests/test_obs_chain.py` runs both on the same file and compares every
+  figure. The bands on those charts (MVRV 1 / 3.7, Mayer 0.8 / 2.4 …) are conventions, shown with the share of history
+  at or below today's value; the pages never turn them into a verdict. The hub's `HUB["todo"]` in build_obs.py is the
+  honest "not built yet" list and `HUB["paid_items"]` the "no free source" list: move an item into `HUB["secs"]` only
+  when its page exists. Bot: `scripts/bot_obs.py` (section `obs`: one Web App button per chart and the day's figures
+  from `obs/chain_now.json` and `lab.json`). Tests: `node tests/test_obs_liq.js`, `node tests/test_obs_chain.js`,
+  `node tests/test_obs_opt.js`, `python3 tests/test_obs_chain.py`, `python3 tests/test_obs_i18n.py`,
   `python3 tests/obs_e2e.py` (`ONLY=data|heat|map|oi|funding|ls|hub|langs|errors`; the exchanges are mocked in their
-  real formats and units, so totals, shares and 8-hour rates are known in advance), `python3 tests/test_bot_obs.py`.
+  real formats and units, so totals, shares and 8-hour rates are known in advance), `python3 tests/obs3_e2e.py`
+  (`ONLY=options|chain|cycle|langs|errors|hub`; Deribit mocked with a book worked out by hand, the on-chain files built
+  by obs_chain.py itself; the site's service worker is blocked there because it would fetch `/data/…` past the mock),
+  `python3 tests/test_bot_obs.py`.
 - **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
   now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
   cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
@@ -171,15 +185,21 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `chrome.py` (`/kids/`). Old addresses `/kids/start|money|chain|safe|chart|studio/` are small redirect pages.
 
 ## Backlog (top = next)
-- **The Observatory, next stages** (owner's request 2026-11-13, see the Log entry of that day; one page per run is fine):
-  each is a page under `/charts/` built with `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to
-  `HUB["secs"]` when it exists. Done 2026-11-13: (1) open interest across exchanges, (2) funding rates, (3) long/short
-  ratios — see the Log. Left: (4) options from Deribit (open interest by strike and expiry, max pain, put/call, DVOL;
-  www.deribit.com is already in the CSP); (5) on-chain
-  from CoinMetrics community (CC BY-NC, name the source): MVRV, realized price, NUPL, MVRV-Z, exchange reserve and
-  net flow, active addresses, hash rate, issuance and Puell — a CI step that commits one daily file; (6) cycle
-  indicators from price (Mayer, 200-week MA, Pi cycle, 2-year MA). Not possible without a paid source and to be
-  said so on the hub rather than faked: SOPR, CDD, HODL waves, long/short-term holder metrics.
+- **The Observatory, next stages** (owner's request 2026-11-13: "everything Glassnode, CoinGlass and CryptoQuant
+  offer"; see the Log entries of that day; one page per run is fine). Each is a page under `/charts/` built with
+  `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to `HUB["secs"]` when it exists. Done: liquidation
+  heatmap and map, open interest, funding, long/short, options, MVRV / realized price / NUPL, exchange reserves and
+  flows, network and miners, the Bitcoin cycle. Left, in the hub's own order: (1) real liquidations day by day
+  (OKX's public orders kept by CI; Gate's `futures/usdt/contract_stats` has `long_liq_usd` / `short_liq_usd` — check
+  it from CI first); (2) futures basis and the Coinbase premium (Coinbase spot against Binance spot; check CORS from
+  the owner's browser first); (3) CVD, spot against futures, from klines' taker volume; (4) stablecoin supply against
+  Bitcoin's value (DefiLlama in CI, already read by mm_data.py). Also asked for by those sites and possible: Hyperliquid's
+  real positions (its API gives `liquidationPx` per account: a liquidation map that is data, not a model).
+  **Not possible without a paid source — say so (the hub does), never fake:** SOPR, CDD, HODL waves, long/short-term
+  holder supply, per-exchange reserves, miner flows. BGeometrics' free API has them but its terms forbid passing the
+  data on. For the owner to decide, not the loop: the channel's own market analysis (`scripts/onchain_data.py`,
+  `UNSEEN`) still declares MVRV, NUPL and exchange flows as "not available" — `data/obs/chain_now.json` now has them,
+  but feeding them in changes what the bot posts.
 - **Why four regimes? BIC model selection on /regime/** (owner's repo list 2026-11-10, idea from DaruFinance/strategy-regime):
   fit K = 2..6 in regime.py (same features, same seeds), publish log-likelihood, parameter count and BIC per K, and
   say on the page whether K = 4 is the BIC choice. Check the CI run time first: today's fit is 4 seeds × 120 iterations.
@@ -224,6 +244,61 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · The Observatory, stage 3: options, on-chain and the Bitcoin cycle (owner's request in chat, not by the loop)
+- **Why:** the owner repeated the request ("everything Glassnode, CoinGlass and CryptoQuant offer"). Stages 1–2 gave the
+  CoinGlass side (liquidation heatmap and map, open interest, funding, long/short); this stage builds the four items the
+  hub listed as "in the works": options, MVRV / realized price / NUPL, exchange reserves and flows, cycle indicators.
+- **What (five pages, کوردی · فارسی · العربية · English, each with its own address, text and tab):**
+  `/charts/options/` — Deribit's whole book for BTC and ETH: open interest by strike (all expiries or one, near the price
+  or every strike, coins or dollars, index price and max pain marked), by expiry (stacked calls/puts and a table: days
+  left, put/call, notional, max pain, ATM IV), and DVOL as candles under the daily index price (1 month … all, paged
+  back through Deribit's `continuation`). `/charts/mvrv/` — MVRV, MVRV Z-Score, NUPL (five named bands), market
+  against realized value; BTC and ETH. `/charts/exchange-flows/` — exchange reserve with its share of the supply, daily
+  net flow with the 30-day sum, inflow and outflow, a table of the last 14 days. `/charts/network/` — active addresses,
+  transactions, hash rate with its 30/60-day averages, miner revenue with the fee share, Puell, stock-to-flow (the
+  ratio only). `/charts/bitcoin-cycle/` — Mayer, 200-week average, Pi cycle, 2-year multiplier, golden ratio,
+  drawdown, and a table of nine measures with today's value, the conventional bands and the share of all days at or
+  below today's value. Range 1 y … all, log/linear, zoom, PNG, share link on every page.
+- **Data:** `scripts/obs_chain.py` (new update.yml step, `continue-on-error`) reads Coin Metrics' community API (the
+  catalogue first, so a measure that leaves the free tier is dropped and named instead of failing the request) and
+  writes `data/obs/chain_btc.json`, `chain_eth.json` (12 columns, 6 significant digits, about 0.5 MB for Bitcoin) and
+  `chain_now.json` (the day's figures for the bot). It asks at most every 3 hours and rewrites a big file only when a
+  number in it changed. Options are read in the visitor's browser from www.deribit.com (already in the CSP).
+- **Facts learned about the sources (measured from the owner's browser on entekhab.net, 2026-11-13):** Coin Metrics'
+  community tier has 31 daily BTC measures — among them CapMVRVCur, FlowInExNtv / FlowOutExNtv / SplyExNtv (since
+  2011-04), HashRate (TH/s), IssTotNtv, FeeTotNtv, AdrActCnt, TxCnt — but no realized cap, SOPR, CDD or per-exchange
+  supply; one request returns all 6,523 days (4.5 MB), with no gaps; CapMrktCurUSD = PriceUSD × SplyCur exactly, so the
+  market value needs no column of its own; the newest days of the exchange measures carry `-status: flash`
+  (provisional). Its catalogue lives at `/v4/catalog-v2/asset-metrics` (the old `/catalog/` refuses `assets`).
+  Deribit: the book is one request (978 BTC instruments, 0.5 MB); DVOL is `[t, o, h, l, c]`, 1,000 rows a page;
+  `get_delivery_prices` gives 100 days a page whatever `count` says; `get_tradingview_chart_data` has no CORS.
+- **Honesty rules kept:** nothing is filled in (a missing day is null and an average that spans it is not drawn);
+  max pain is called arithmetic, not a forecast; the bands are called conventions and every banded figure carries its
+  rank in history; the cycle table has no verdict; the exchange figures say they cover Coin Metrics' list of
+  exchanges and that recent days are provisional; the hub now names what no free source gives (SOPR, CDD, HODL
+  waves, holder cohorts, per-exchange reserves, miner flows).
+- **Verified:** `tests/test_obs_chain.js` 59 checks (closed forms: a flat market, a straight line, a planted high, a
+  gap); `tests/test_obs_opt.js` 33 (a book worked out by hand, ties, decimal strikes); `tests/test_obs_chain.py` 60
+  (Coin Metrics' real row shape, the Python summary equal to the JavaScript one to 9 digits on three files, main()
+  against a fake API: skipped when fresh, shorter answers refused, dropped measures, unreadable catalogue);
+  `tests/obs3_e2e.py` 346 checks in Chrome (every tile, table and series against known answers, all controls, share
+  links, PNG, four languages at 1280 and 390 px, Deribit or the data file missing); `tests/obs_e2e.py` 524 (stages
+  1–2 unchanged); `test_obs_i18n` (313 keys × 4), `test_bot_obs`, the other bot suites, a full site build in a
+  scratch copy (sitemap, menu, assistant index carry the five pages), leak guard clean. One bug found by the tests and
+  fixed before publishing: the strike labels dropped zeros (50,000 showed as "5K").
+- **Bot / apps / assistant:** bot section «🔭 رصدخانه» lists the ten charts as Web App buttons and, when the files are
+  there, the day's figures (MVRV, NUPL, realized price, exchange reserve and 7-day net flow, Mayer, Puell, drawdown
+  from `obs/chain_now.json`; Deribit's put/call and max pain from `lab.json`) in five languages; the site menu has
+  «نمودارهای آنچین بیت‌کوین» under «تحلیل»; assistant FEATURES and the sitemap follow `build_obs`. The Android and
+  Windows apps load the site, so they have the pages as they are.
+- **Stage 2, for the record (commit fb46bb7, same day; its Log entry was never written):** `/charts/open-interest/`,
+  `/charts/funding-rate/`, `/charts/long-short/` — six exchanges read in the browser, every funding rate brought to
+  8 hours from the contract's own settlement interval, an exchange whose price for a ticker is more than 15 % off left
+  out and named; `assets/obs/ts.js` (OB.TS) and `OB.ui` date from it.
+- **Limits (also on the pages):** on-chain points are closed UTC days, not live; Coin Metrics' exchange set is not
+  every exchange; options are Deribit only (no CME); ETH has no hash rate, Puell or stock-to-flow.
+- **Next (Backlog):** real liquidations day by day, futures basis and the Coinbase premium, CVD, stablecoin supply
+  against Bitcoin's value, Hyperliquid's real positions.
 ### 2026-11-13 · Track record «ادعا در برابر نتیجه», academy skill tree, the owner's background clips (owner's request in chat, not by the loop)
 - Owner supplied 7 reference clips (000–006, his Desktop\coooode). Used as moving backgrounds (assets/bg/, sound
   stripped, re-encoded small, poster first): **000** light lines → behind the top of /track-record/ and the reality

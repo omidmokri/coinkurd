@@ -107,6 +107,13 @@ jobs:
         timeout-minutes: 4
         run: python scripts/btcinfo.py
 
+      # /charts/mvrv/, /charts/exchange-flows/, /charts/network/, /charts/bitcoin-cycle/: every day of Bitcoin's and Ether's
+      # history from Coin Metrics' community API (asked at most every 3 hours; the previous file stays when the answer is broken)
+      - name: On-chain daily series for the Observatory (Coin Metrics community data)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/obs_chain.py
+
       - name: Derivatives command room (OKX funding, OI, long/short, liquidations)
         id: deriv
         continue-on-error: true

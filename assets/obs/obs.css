@@ -195,6 +195,15 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 .ob-hc.soon em{color:#9a9a94}
 .ob-hsec{font-size:1.02rem;font-weight:900;margin:22px 4px 2px;color:#f2f2ee}
 .ob-hsec small{font-weight:400;color:#9a9a94;font-size:.8rem;margin-inline-start:8px}
+.ob-hnote{margin:4px 4px 0;color:#9a9a94;font-size:.84rem;line-height:1.9;max-width:900px}
+/* ---- stage 3: bar charts (options) and the measure picker */
+.ob-bars-w{direction:ltr}
+.ob-sel{color:#ecebe6;font:inherit;font-size:.84rem;max-width:100%}
+.ob-sel option{background:#16171b;color:#ecebe6}
+.ob-grid td small{color:#9a9a94;font-size:.72rem;margin-inline-start:4px}
+.ob-grid td.up{color:var(--up)}.ob-grid td.dn{color:var(--dn)}
+.ob-lbl.ob-narrow{display:none}
+@media (max-width:900px){.ob-lbl.ob-wide{display:none}.ob-lbl.ob-narrow{display:flex}}
 
 #ob-toast{position:fixed;z-index:2147483600;left:50%;bottom:86px;transform:translate(-50%,12px);background:#1c1d22;color:#f2f2ee;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:9px 16px;font:13px Vazirmatn,system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:86vw;text-align:center}
 #ob-toast.on{opacity:1;transform:translate(-50%,0)}

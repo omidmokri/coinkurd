@@ -466,7 +466,7 @@ SECTIONS = {
     "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
     "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
     "mmap": (lambda lang: MMB.section(lang, D.load), "/heatmap/"),   # the market map: heatmap, bubbles, money flow, liquidity, ETFs
-    "obs": (lambda lang: OBS.section(lang), "/charts/"),              # the Observatory: liquidation heatmap and liquidation map
+    "obs": (lambda lang: OBS.section(lang, D.load), "/charts/"),      # the Observatory: derivatives, options, on-chain and cycle charts
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
