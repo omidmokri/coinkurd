@@ -211,7 +211,7 @@
         { label: T('deleteList'), icon: 'trash', act: function () { A.confirm(T('deleteList'), T('deleteListQ', { n: L.n }), function () { W.lists.splice(W.cur | 0, 1); W.cur = 'site'; saveW(); drawWatch(box); }); } });
     }
     items.push({ sep: true }, { label: T('sendBot'), icon: 'share', act: function () {
-      var s = listSyms().filter(function (x) { return /^[A-Z0-9]{2,10}$/.test(x); }), arg = 'w_', n = 0;
+      var s = listSyms().filter(function (x) { return /^[A-Z0-9]{1,10}$/.test(x); }), arg = 'w_', n = 0;
       for (var i = 0; i < s.length; i++) { if ((arg + s[i]).length + (n ? 1 : 0) > 64) break; arg += (n ? '-' : '') + s[i]; n++; }
       window.open('https://t.me/' + BOT + '?start=' + arg, '_blank', 'noopener');
     } });
@@ -384,7 +384,7 @@
   function botArg(a) {
     var I = P.inst ? P.inst(a.sym) : null, v = plainNum(a.v);
     if (!I || !/^\d{1,12}(\.\d{1,18})?$/.test(v)) return null;
-    if (I.kind === 'usdt' && /^[A-Z0-9]{2,12}$/.test(a.sym)) return 'a_' + a.sym + '_' + v.replace('.', 'd');
+    if (I.kind === 'usdt' && /^[A-Z0-9]{1,12}$/.test(a.sym)) return 'a_' + a.sym + '_' + v.replace('.', 'd');
     if (I.kind === 'ir' && BOT_IR[I.base]) return 't_' + BOT_IR[I.base] + '_' + v.replace('.', 'd');
     return null;
   }

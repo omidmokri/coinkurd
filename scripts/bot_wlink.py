@@ -14,7 +14,7 @@ import re
 
 SITE = "https://entekhab.net"
 MAXLEN = 64
-_SYM = re.compile(r"^[A-Z0-9]{2,12}$")
+_SYM = re.compile(r"^[A-Z0-9]{1,12}$")
 
 S = {"title": {"fa": "⭐ لیست مراقبت شما از سایت", "ckb": "⭐ لیستی چاودێریی تۆ لە ماڵپەڕ", "en": "⭐ Your watchlist from the site"},
      "none": {"fa": "هنوز داده‌ای نیست", "ckb": "هێشتا داتا نییە", "en": "no data yet"},
