@@ -175,6 +175,33 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /bitcoin/ «درک بیت‌کوین»: the halving page + a film in Persian and Kurdish (owner's request in chat, not by the loop)
+- Static page `bitcoin/index.html` + `bitcoin/bitcoin.{js,css}` (page and films went up 2026-11-12 in 7316fa0; the wiring
+  followed 2026-11-13): chrome.py STATIC, «آموزش» menu right after the map, GLOW; sitemap list in build_pages.py;
+  assistant FEATURES; a URL button at the top of the bot's Learn menu in 5 languages. Text is fa · ckb · en in the
+  page's `I.*` dictionaries (Arabic comes from the English through i18n_ar/ar.js). Edit the dictionaries in
+  index.html directly.
+- Every supply / reward / halving figure is computed in the browser from Bitcoin Core's rule (50 BTC in sats `>>`
+  halvings): max 2,099,999,997,690,000 sats; 20 M at block 939,999; last 40 years 2.4948 BTC; 99% ≈ 2035;
+  20,999,000 ≈ 2066. Live values: mempool.space (tip, hash, price, hashrate), Binance price fallback, then
+  `/data/btcinfo.json`. The halving ETA uses the 10-minute target (bitcoinblockhalf.com's convention).
+- The owner's seven images are redrawn natively (no third-party pictures): his halving table with his "probable price"
+  column (labelled as the Coin Kurd model, not a forecast), the binary right-shift table, coin stacks, a 33-notch clock,
+  nested halves (area = coins of each era), a monthly log chart with the halvings, days per price decade, a live
+  proof-of-work card and (2026-11-13) world wealth in bitcoin: UBS's > $470 trillion ÷ live price vs coins in
+  existence (≈ 340× at $68.8k; the owner's Dec-2023 picture said 500×). Plus the retirement-funnel calculator, a DCA
+  mini calculator (links to /dca/), wallet-safety steps, the quantum note (BIP-360 not active) and 22 "future headlines".
+- 2026-11-13, owner's request: the homepage hero's second button now opens /bitcoin/ «درک بیت‌کوین» instead of
+  /satoshi/ (`assets/nx-home.js` template + `scripts/nx_prerender.py` run on index.html). /satoshi/ stays in the menus.
+- 2026-11-13 fixes: era legend said "next 25 eras: 0.1%" — it is 27 eras, 1.5625% (≈ 328 k BTC); legend percentages
+  no longer show trailing zeros in Persian/Kurdish digits.
+- Film: `bitcoin/film-{fa,ckb}.mp4` (2:33, 1280×720, H.264 + AAC, ~8 MB each, preload="none") and posters/og.jpg,
+  rendered frame by frame from a deterministic HTML stage with the site's font, coin and logo; the score was
+  synthesized in code (no samples). Stage and score sources are not in the repo.
+- Checked: Playwright 1280/390 in fa/ckb/en with mempool mocked in its real formats, 0 overflow, 0 JS errors, no video
+  bytes before play; bot menu in 5 languages; assistant index lists it. Published from the owner's browser through
+  GitHub's upload page (the cloud session had no push credential).
+
 ### 2026-11-13 · /market/: toman markets, every Binance coin, and the rest of Faraz's list (owner's request in chat, not by the loop)
 - Iran's market in toman (`assets/pro/markets.js`, symbols `IR_<KEY>`): dollar, euro and 19 more currencies, 18k/24k gold,
   mesghal, the melted-gold rate, ounce, five coins and the coin bubble, silver and tether — tgju.org public data in the browser
