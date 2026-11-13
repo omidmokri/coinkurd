@@ -194,6 +194,33 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /calendar/ «تقویم اقتصادی»: ForexFactory's calendar + FedWatch-style odds, in four languages, with Telegram alerts (owner's request in chat, not by the loop)
+- **Page** `calendar/{index.html,cal.js,cal.css}` (built by the session, chrome.py STATIC, first block of the «بازار» menu
+  after /market/, sitemap, assistant FEATURES → bot "events"). fa · ckb · en in the page's `I.*` dictionaries + `CAL_KINDS`
+  (what each US release is and why it matters for crypto); Arabic from the English through i18n_ar/ar.js.
+  Every currency and impact from `data/ecocal.json` (26 weeks), week navigation Sat–Fri, time zone Tehran / Erbil-Baghdad
+  / UTC / device, impact + currency filters, "only what moves bitcoin", search, the next red release with a countdown and a
+  "volatile window" banner (±30 min). Each row: actual (coloured hawkish/dovish for bitcoin), forecast, previous, BTC 1h/4h
+  after the release; click → explanation, how to read a beat or a miss, the last 10 releases of the same title with BTC
+  reactions and a bar chart. Bell → browser reminder 15/30/60 min (localStorage `ek_cal_rem`, sound + Notification while
+  the page is open), a .ics file with a 30-min alarm, or the bot. "All red US releases this week" as one .ics.
+- **Fed odds** (`#fed`): current target range from the latest FOMC statement, Kalshi's odds for every open meeting
+  (bars, table, implied rate path, history chart). CME's FedWatch data is not used; the page names Kalshi.
+- **Data** `scripts/econ_live.py` (update.yml step after ecocal, continue-on-error) → `data/econ_actual.json` (official
+  actuals: BLS v1 API without a key for CPI, core CPI, PPI, core PPI, payrolls, unemployment, hourly earnings — at most
+  every 20 min, every run for 3 h after a release; the Fed's statement for the rate) and `data/fed.json` (rate + Kalshi +
+  history, one point per 2 h). Logic in `scripts/econ_src.py` (self-test 23 checks: series checked against
+  ForexFactory's "previous" — Sept CPI 0.6%, PPI 1.3%, core PPI 0.7%).
+- **Telegram** `scripts/bot_econ.py`, called from `refbot.minute_jobs`: 30 min before every red US release (elections
+  excluded) a heads-up in @Coin_Kurd_Group topic 47540 (Persian; time, forecast/previous, BTC's past 1h moves, how to read
+  it, Kalshi odds), then the result as a reply (official number via BLS/the Fed — site file first —, beat/miss, BTC since the
+  release minute from Binance 1m klines). The same two messages go privately to users who opted in (owner's choice: opt-in
+  only): section «📅 تقویم اقتصادی» (key "events", now EC.section with an on/off button), callbacks `ec:on`/`ec:off`, deep
+  link `?start=ec`. State in `s["econ"]` (state branch); a release missed while the bot was down is never posted late.
+- Checked: self-tests (econ_src 23, bot_econ 8), tests/test_bot_v2.py, test_bot_pro.py, test_ecocal.py pass; Playwright
+  fa/ckb/en at 1280/390 with real ecocal.json and realistic fed.json: 0 overflow, 0 JS errors; reminder stored, .ics files
+  valid, English/UTC switch. The live BLS, Fed RSS/statement and Kalshi formats were read from the owner's browser.
+
 ### 2026-11-13 · Every page except the homepage: depth ("Deep" layer), reading tools, search-as-you-type, structured data (owner's request in chat, not by the loop)
 - **Why:** the owner sent a redesign brief for the inner pages (UI depth, UX, SEO) and asked for it to be applied with
   the site's own colours, the homepage untouched. The brief's navy/cyan palette was not used: the brand's black, bitcoin
