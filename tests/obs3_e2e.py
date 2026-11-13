@@ -486,8 +486,8 @@ def run():
             clicks(page, "#ob-as", "eth")
             wait_ch(page)
             ms = page.evaluate("() => [...document.querySelectorAll('#ob-m button')].map(b => b.dataset.v)")
-            check("network, Ether: no hash rate, Puell or stock-to-flow on offer; the page falls back to the first measure", ms == ["adr", "tx", "rev"] and page.evaluate("() => OB._ch.S.m_network") == "adr", ms)
-            check("network, Ether: four tiles without hash rate and Puell", len(tiles(page)) == 3, tiles(page))
+            check("network, Ether: no hash rate, miner revenue, Puell or stock-to-flow on offer; the page falls back to the first measure", ms == ["adr", "tx"] and page.evaluate("() => OB._ch.S.m_network") == "adr", ms)
+            check("network, Ether: two tiles (addresses, transactions) — nothing about miners", len(tiles(page)) == 2, tiles(page))
             check("zero JS errors (network)", not errors, errors[:3])
             ctx.close()
 
