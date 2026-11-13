@@ -30,13 +30,10 @@ function item(k, x, z, rot, side, r) { LAY.items.push({ k, x, z, rot: rot || 0, 
   item('sam', 18 * m, -56, face, side, 6);
   item('tel', 26 * m, -68, face, side, 6.5);
   item('tel', 39 * m, -73, face, side, 6.5);
-  item('tower', 64 * m, -47, face, side, 3.4);
-  item('tower', 9 * m, -49, face, side, 3.4);
-  item('tower', 95 * m, -26, face, side, 3.4);
-  item('tower', 95 * m, 27, face, side, 3.4);
-  item('barracks', 109 * m, -9, Math.PI / 2, side, 10);
+  item('tower', 9 * m, -49, face, side, 3.4);                         // (the base's own corner towers stand guard round the compound)
+  item('barracks', 109 * m, -12, Math.PI / 2, side, 10);              // clear of the road the supply lorry uses behind the base
   item('barracks', 109 * m, 13, Math.PI / 2, side, 10);
-  item('hangar', 125 * m, -34, face, side, 12);
+  item('hangar', 125 * m, -34, face, side, 18);                     // the pad takes in the apron where its lorries park
   item('helipad', 117 * m, 38, 0, side, 8.5);
   item('lamp', 0, 0, 0, side, 0);
 });
@@ -76,7 +73,7 @@ K.blocked = function (x, z, pad) {
   pad = pad || 2;
   for (const p of LAY.pads) { const dx = x - p.x, dz = z - p.z, R = p.r + pad; if (dx * dx + dz * dz < R * R) return true; }
   for (const l of LAY.lakes) if (lakeE(l, x, z) < 1.25) return true;
-  if (Math.abs(z - roadZ(x)) < 5 && Math.abs(x) < 94) return true;
+  if (Math.abs(z - roadZ(x)) < 5 && Math.abs(x) < 132) return true;   // the road and the lorry's track behind each base stay clear
   return false;
 };
 
@@ -202,12 +199,14 @@ function bTower(side) {
   L.push(B(3.9, .26, 3.9, 0, 9.4, 0, P.dark));
   for (const s of [-1, 1]) { L.push(B(3.9, .6, .07, 0, 9.85, s * 1.92, P.steel)); L.push(B(.07, .6, 3.9, s * 1.92, 9.85, 0, P.steel)); }
   L.push(B(3.0, 1.05, 3.0, 0, 10.05, 0, P.hut), B(3.0, .5, 3.0, 0, 11.38, 0, P.hut));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) L.push(B(.16, .62, .16, sx * 1.42, 10.85, sz * 1.42, P.hut));   // corner posts carry the cab roof over the window band
   Lt.push(B(3.04, .72, 3.04, 0, 10.93, 0, WARM));
   L.push(B(3.9, .16, 3.9, 0, 11.7, 0, P.roof));
   const cap = new THREE.ConeGeometry(2.75, .9, 4); cap.rotateY(Math.PI / 4); cap.translate(0, 12.23, 0); L.push(prim(cap, P.roof));
   L.push(B(.07, 9.3, .07, -1.85, 4.65, .34, P.steel), B(.07, 9.3, .07, -1.85, 4.65, -.34, P.steel));
   for (let y = .45; y < 9.2; y += LITE ? 1.5 : .5) L.push(B(.06, .05, .68, -1.85, y, 0, P.steel));
   const head = new THREE.CylinderGeometry(.34, .4, .6, 10); head.rotateZ(Math.PI / 2); head.translate(1.85, 10.62, 0); L.push(prim(head, 0x2b2d2f));
+  L.push(CY(.07, .09, .8, 6, 1.85, 9.93, 0, 0x2b2d2f));                           // the searchlight's pedestal on the platform edge
   const lens = new THREE.CylinderGeometry(.3, .3, .05, 10); lens.rotateZ(Math.PI / 2); lens.translate(2.17, 10.62, 0); Lt.push(prim(lens, 0xfff4dc));
   return { L, Lt, top: 12.7, beam: v3(2.2, 10.62, 0) };
 }
@@ -222,7 +221,7 @@ function bBarracks(side) {
   } else {
     L.push(B(14.4, .32, 7.4, 0, 3.46, 0, P.roof));
     for (const s of [-1, 1]) { L.push(B(14.4, .5, .25, 0, 3.86, s * 3.58, P.wall)); L.push(B(.25, .5, 7.4, s * 7.08, 3.86, 0, P.wall)); }
-    L.push(CY(1.0, 1.0, 1.5, 12, 4.4, 4.5, -1.2, 0x6d6b62));
+    L.push(CY(1.0, 1.0, 1.5, 12, 4.4, 4.87, -1.2, 0x6d6b62)); for (const sx of [-1, 1]) for (const sz of [-1, 1]) L.push(B(.12, .52, .12, 4.4 + sx * .6, 3.86, -1.2 + sz * .6, 0x55585a));   // roof tank on its stand
   }
   for (let i = 0; i < 6; i++) {
     const x = -5.6 + i * 2.24; if (Math.abs(x) < 1) continue;
@@ -282,9 +281,18 @@ function bComm(side) {
   const at = (i, y) => { const r = mix(1.6, .35, y / H); return v3(legs[i][0] * r, y, legs[i][1] * r); };
   for (let i = 0; i < 3; i++) L.push(beamGeo(at(i, 0), at(i, H), .13, 0xb8b6ae));
   for (let y = 0; y < H - 1; y += LITE ? 4.8 : 2.4) for (let i = 0; i < 3; i++) L.push(beamGeo(at(i, y), at((i + 1) % 3, Math.min(H, y + 2.4)), .05, 0xc23a2a));
-  const dish = (y, ay) => { const d = new THREE.LatheGeometry([[0, 0], [.5, .06], [1.0, .25], [1.4, .55]].map(p => new THREE.Vector2(p[0], p[1])), 16); d.rotateZ(Math.PI / 2); d.translate(.25, 0, 0); d.rotateY(ay); d.translate(0, y, 0); L.push(prim(d, 0xd8d6cf)); };
+  /* microwave dishes face outward, each on a mount pipe from the mast; they are solid shells, so no angle makes them vanish */
+  const dish = (y, ay) => {
+    const r = mix(1.6, .35, y / H) + .3, ux = Math.cos(ay), uz = -Math.sin(ay);
+    G.dishGeo([[0, 0], [.5, .06], [1.0, .25], [1.4, .55]], .06, 16).forEach((d, i) => { d.rotateZ(-Math.PI / 2); d.translate(r, 0, 0); d.rotateY(ay); d.translate(0, y, 0); L.push(prim(d, i === 1 ? 0x2b2d2f : i ? 0x9a9890 : 0xd8d6cf)); });
+    /* a V of mount pipes from the two legs either side of the dish to the back of it */
+    const phi = Math.atan2(uz, ux), lr = mix(1.6, .35, y / H), back = v3(ux * (r - .03), y, uz * (r - .03));
+    const ang = legs.map(l => Math.atan2(l[1], l[0])), dif = a => { let d = a - phi; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; return d; };
+    const near = [0, 1, 2].sort((a, b) => Math.abs(dif(ang[a])) - Math.abs(dif(ang[b]))).slice(0, 2);
+    near.forEach(i => L.push(beamGeo(v3(legs[i][0] * lr, y, legs[i][1] * lr), back, .12, 0x9a9890)));
+  };
   dish(H * .55, 0); dish(H * .72, 2.2);
-  L.push(CY(.03, .03, 4, 4, 0, H + 2, 0, 0x777777));
+  L.push(CY(.5, .5, .12, 6, 0, H, 0, 0xb8b6ae), CY(.03, .03, 4, 4, 0, H + 2, 0, 0x777777));
   Lt.push(B(.32, .32, .32, 0, H + .1, 0, 0xff3020), B(.24, .24, .24, 0, H * .5, .7, 0xff3020));
   L.push(B(3, 2.4, 3, 2.6, 1.2, 2.6, P.hut), B(3.3, .18, 3.3, 2.6, 2.48, 2.6, P.roof));
   return { L, Lt, top: H, blink: [v3(0, H + .3, 0)] };
@@ -343,7 +351,7 @@ function bRuin() {
   add(wall(W, 3.4, [[2.4, 1.2, 1.0, 1.0]]), W / 2, -D / 2, Math.PI);
   add(wall(D, 3.8, [[1.8, 1.3, .9, 1.0]]), -W / 2, -D / 2, -Math.PI / 2);
   add(wall(D, 2.6, []), W / 2, D / 2, Math.PI / 2);
-  const slab = new THREE.BoxGeometry(6.2, .25, 3.2); slab.rotateZ(.38); slab.translate(.3, 1.5, -.6); L.push(prim(slab, 0x6e5d4a));
+  const slab = new THREE.BoxGeometry(5.6, .25, 3.2); slab.rotateZ(.19); slab.translate(.25, .6, -.6); L.push(prim(slab, 0x6e5d4a));   // the fallen roof: one end in the rubble, the other on the low east wall (never under 1.1 m)
   for (let i = 0; i < (LITE ? 4 : 9); i++) { const g = new THREE.IcosahedronGeometry(.35 + srand() * .55, 0); g.scale(1, .55, 1); g.translate((srand() - .5) * 8, .15, (srand() - .5) * 7); L.push(prim(g, srand() < .5 ? 0x8e8574 : 0x7b6f5d)); }
   return { L, Lt, top: 4.2 };
 }
@@ -355,6 +363,21 @@ function bWreck() {
   const t = char(tur, .9); t.rotateY(.7); t.rotateZ(-.32); t.translate(-1.2, -.5, 2.6); t.scale(1.35, 1.35, 1.35); L.push(t);
   return { L, Lt: [], top: 2.4, ember: v3(0, 1.4, 0) };
 }
+/* what a structure occupies at the height of a man or a hull (local x0, x1, z0, z1): flat aprons and pads stay passable */
+function footBox(list) {
+  let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const g of list) { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < .25 || y > 2.4) continue; const x = p.getX(i), z = p.getZ(i); if (x < x0) x0 = x; if (x > x1) x1 = x; if (z < z0) z0 = z; if (z > z1) z1 = z; } }
+  return x0 > x1 ? null : [x0, x1, z0, z1];
+}
+/* the lowest ground under a structure's footprint (its parts' outline, turned and placed as it will stand) */
+function footY(list, it, hgt) {
+  let x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  for (const g of list) { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { if (p.getY(i) > .6) continue; const x = p.getX(i), z = p.getZ(i); if (x < x0) x0 = x; if (x > x1) x1 = x; if (z < z0) z0 = z; if (z > z1) z1 = z; } }
+  if (x0 > x1) return hgt(it.x, it.z);
+  const c = Math.cos(it.rot), s = Math.sin(it.rot); let h = 1e9;
+  for (let u = 0; u <= 1.0001; u += .25) for (let v = 0; v <= 1.0001; v += .25) { const lx = x0 + (x1 - x0) * u, lz = z0 + (z1 - z0) * v; h = Math.min(h, hgt(it.x + lx * c + lz * s, it.z - lx * s + lz * c)); }
+  return h;
+}
 const BUILD = { tower: bTower, barracks: bBarracks, hangar: bHangar, helipad: bHelipad, sam: bSam, tel: bTelBase, comm: bComm, dome: bDome, yard: bYard, dump: bDump, ruin: bRuin, wreck: bWreck };
 
 /* ---------------------------------------------------------------- environment build */
@@ -365,13 +388,16 @@ K.build = function (scene, hgt, tier) {
   const chunks = { L: [], C: [], R: [] }, lights = [], chunk = x => x < -82 ? 'L' : x > 82 ? 'R' : 'C';
   for (const it of LAY.items) {
     const fn = BUILD[it.k]; if (!fn) continue;
-    const r = fn(it.side), y = hgt(it.x, it.z) - .02;
+    const r = fn(it.side), y = footY(r.L, it, hgt) - .02;
+    if (window.NAV) { const fb = footBox(r.L); if (fb) { const cx = (fb[0] + fb[1]) / 2, cz = (fb[2] + fb[3]) / 2, c = Math.cos(it.rot), sn = Math.sin(it.rot); NAV.add(NAV.box(it.x + cx * c + cz * sn, it.z - cx * sn + cz * c, (fb[1] - fb[0]) / 2 + .15, (fb[3] - fb[2]) / 2 + .15, it.rot, it.k)); } }
     grime(r.L, r.top || 4);
     place(r.L, it.x, y, it.z, it.rot); place(r.Lt, it.x, y, it.z, it.rot);
     chunks[chunk(it.x)].push(...r.L); lights.push(...r.Lt);
     const W = (v) => v.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), it.rot).add(new THREE.Vector3(it.x, y, it.z));
-    if (r.beam) E.beams.push({ p: W(r.beam), rot: it.rot, k: 'search', ph: srand() * 6 });
+    if (r.beam) E.beams.push({ p: W(r.beam), rot: it.rot, k: 'search', ph: srand() * 6, side: it.side });
     if (r.blink) r.blink.forEach(b => E.blinks.push(W(b)));
+    if (it.k === 'comm') (E.masts || (E.masts = [])).push({ side: it.side, p: W(new THREE.Vector3(0, r.top || 14, 0)) });
+    if (it.k === 'helipad') (E.pads || (E.pads = [])).push({ side: it.side, x: it.x, y: y + .2, z: it.z, yaw: it.rot + (it.side === 'bull' ? 0 : Math.PI), busy: 0 });
     if (r.ember) E.embers.push({ p: W(r.ember), side: it.side, t: srand() * 4 });
     if (it.k === 'tel') E.tels[it.side].push({ pivot: W(r.pivot), rot: it.rot, raise: 0, tgt: 0, reload: 0 });
     if (it.k === 'sam') E.sams[it.side].push({ tip: W(r.tip), rot: it.rot });
@@ -379,11 +405,11 @@ K.build = function (scene, hgt, tier) {
     if (it.k === 'helipad') E.park.push({ p: new THREE.Vector3(it.x, y + .2, it.z), rot: it.rot + (it.side === 'bull' ? 0 : Math.PI), side: it.side, heli: true });
   }
   /* street lamps along the road */
-  for (let x = -84; x <= 84; x += 21) {
+  for (let x = -42; x <= 42; x += 21) {                                   // the bases have floodlights of their own
     const s = ((x / 21) | 0) % 2 ? 1 : -1, z = roadZ(x) + s * 4.4, y = hgt(x, z) - .05, L = [], Lt = [];
     L.push(CY(.08, .11, 6.4, 6, 0, 3.2, 0, 0x3b3d3f), B(.08, .08, 1.7, 0, 6.3, -s * .8, 0x3b3d3f), B(.5, .14, .26, 0, 6.24, -s * 1.6, 0x2b2c2e));
     Lt.push(B(.4, .05, .2, 0, 6.15, -s * 1.6, 0xffd9a0));
-    place(L, x, y, z, 0); place(Lt, x, y, z, 0); chunks.C.push(...L); lights.push(...Lt);
+    place(L, x, y, z, 0); place(Lt, x, y, z, 0); chunks.C.push(...L); lights.push(...Lt); if (window.NAV) NAV.add(NAV.circle(x, z, .28, 'lamp'));
     E.beams.push({ p: new THREE.Vector3(x, y + 6.1, z - s * 1.6), rot: 0, k: 'lamp' });
   }
   /* road studs (cat's eyes) every 12 m on both edges */
@@ -410,6 +436,7 @@ K.build = function (scene, hgt, tier) {
   E.water = K.waterMaterial();
   for (const l of LAY.lakes) {
     if (l.w === null) l.w = hgt(l.x, l.z);
+    if (window.NAV) { const c = Math.cos(l.rot), sn = Math.sin(l.rot), h = Math.max(0, l.rx - l.rz); NAV.add(NAV.capsule(l.x - h * c, l.z + h * sn, l.x + h * c, l.z - h * sn, l.rz * 1.2, 'lake')); }
     const c = new THREE.CircleGeometry(1, 40); c.rotateX(-Math.PI / 2); c.scale(l.rx * 1.25, 1, l.rz * 1.25); c.rotateY(l.rot);
     const m = new THREE.Mesh(c, E.water); m.position.set(l.x, l.w, l.z); m.renderOrder = 2; scene.add(m);
     /* reeds */
@@ -470,7 +497,9 @@ function envVehicles() {                   // parked trucks + static helicopters
   for (const p of E.park) {
     if (p.heli && E.lite) continue;               // parked helicopters are several draw calls each
     const g = p.heli ? G.heli(ARMY.vmat[p.side]) : G.truck(ARMY.vmat[p.side]); g.position.copy(p.p); g.rotation.y = p.rot; g.scale.setScalar(p.heli ? 1.25 : 1.3);
+    if (window.NAV && !NAV.ready) NAV.add(p.heli ? NAV.box(p.p.x, p.p.z, 3.2 * 1.25, 1.2 * 1.25, p.rot, 'heli') : NAV.box(p.p.x, p.p.z, 2.45 * 1.3, 1.1 * 1.3, p.rot, 'truck'));
     E.scene.add(g); if (p.heli && g.userData.rotor) g.userData.rotor.rotation.y = .4;
+    if (p.heli) { const pd = (E.pads || []).find(q => q.side === p.side); if (pd) pd.static = g; }   // the helicopter on the pad is the one that flies from it
   }
   /* TEL erector arms with a ready missile */
   for (const side of ['bull', 'bear']) for (const t of E.tels[side]) {
@@ -520,7 +549,18 @@ function envTick(dt, t) {
   E.shaftMat.uniforms.uInt.value = (E.shaftBase || 0) * pulse;
   const wind = (typeof WORLD !== 'undefined' ? WORLD.wind : 0) || 0;
   for (const m of E.mist) { if (m.lake) continue; m.m.position.x += (m.vx + wind * .8) * dt; if (m.m.position.x > 150) m.m.position.x = -150; }
-  if (E.night > .25) for (const b of E.beams) if (b.k === 'search') b.g.rotation.y = b.rot + Math.sin(t * .42 + b.ph) * .85;
+  if (E.night > .25) for (const b of E.beams) if (b.k === 'search') {
+    const tp = typeof THREATS !== 'undefined' && b.side ? THREATS.nearest(b.side, b.p.x, b.p.z, 160) : null;
+    let yaw = b.rot + Math.sin(t * .42 + b.ph) * .85, el = -.38;
+    if (tp) { yaw = Math.atan2(-(tp.z - b.p.z), tp.x - b.p.x); el = cl(Math.atan2(tp.y - b.p.y, Math.hypot(tp.x - b.p.x, tp.z - b.p.z)), -.38, 1.25); }
+    const cur = b.g.rotation.y; let d = yaw - cur; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; b.g.rotation.y = cur + d * Math.min(1, dt * (tp ? 5 : 2));
+    b.el = (b.el == null ? -.38 : b.el) + (el - (b.el == null ? -.38 : b.el)) * Math.min(1, dt * 3); b.mesh.rotation.z = Math.PI / 2 + b.el;
+  }
+  /* depots and sites hit in a raid burn for a while */
+  if (E.burns && E.burns.length) for (let i = E.burns.length - 1; i >= 0; i--) { const f = E.burns[i]; f.t -= dt; f.left -= dt; if (f.left <= 0) { E.burns.splice(i, 1); continue; }
+    if (f.t <= 0 && typeof FX !== 'undefined' && PREF.layers.fx) { f.t = E.lite ? .5 : .22; const a = Math.min(1, f.left / 8); FX.smoke(f.x + rr(-f.r, f.r), f.y + 1 + Math.random() * 2, f.z + rr(-f.r, f.r), E.lite ? 1 : 2, 4 + 3 * a, 0); if (Math.random() < .5 * a) FX.spawn(1, f.x + rr(-f.r, f.r) * .6, f.y + .5, f.z + rr(-f.r, f.r) * .6, rr(-1, 1), rr(3, 7), rr(-1, 1), .4 + Math.random() * .4, 1); } }
+  /* a comm mast relaying an order: rings of signal going out from its top */
+  if (E.relays) for (const r of E.relays) { if (!r.m.visible) continue; r.f += dt / 1.8; if (r.f >= 1) { r.m.visible = false; continue; } r.m.scale.setScalar(1 + r.f * 26); r.m.material.opacity = (1 - r.f) * .7; if (typeof cam !== 'undefined') r.m.quaternion.copy(cam.quaternion); }
   E.blinkP.visible = Math.sin(t * 3.1) > -.2;
   E.emberM.opacity = (.35 + .4 * E.night) * (.75 + .25 * Math.sin(t * 11) * Math.sin(t * 7.3));
   if (typeof FX !== 'undefined' && FX.smoke && PREF.layers.fx) for (const e of E.embers) { e.t -= dt; if (e.t <= 0) { e.t = E.lite ? 1.6 : .7; FX.smoke(e.p.x + rr(-.6, .6), e.p.y + .8, e.p.z + rr(-.6, .6), 1, 3.2, 0); } }
@@ -528,6 +568,14 @@ function envTick(dt, t) {
   for (const side of ['bull', 'bear']) for (const tl of E.tels[side]) { if (!tl.tilt) continue; tl.raise += (tl.tgt - tl.raise) * Math.min(1, dt * 1.6); tl.tilt.rotation.z = tl.raise * 1.32; if (tl.reload > 0) { tl.reload -= dt; if (tl.reload <= 0) { tl.ms.visible = true; tl.tgt = 0; } } }
 }
 K.pulse = function () { if (K.env) K.env.pulseT = 4; };
+K.burn = function (x, y, z, r, dur) { const E = K.env; if (!E) return; (E.burns || (E.burns = [])).push({ x, y, z, r, left: dur, t: 0 }); };
+/* a comm mast relays an order: rings of signal from its top */
+K.relay = function (side) { const E = K.env; if (!E || !E.masts) return; if (!E.relays) E.relays = [];
+  for (const mst of E.masts) { if (mst.side !== side) continue; for (let i = 0; i < 3; i++) setTimeout(() => {
+    let r = E.relays.find(q => !q.m.visible); if (!r) { if (E.relays.length > 8) return; const g = new THREE.RingGeometry(.8, 1, 32), mt = new THREE.MeshBasicMaterial({ color: side === 'bull' ? 0x8fffb0 : 0xffa0a0, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }); r = { m: new THREE.Mesh(g, mt), f: 0 }; r.m.renderOrder = 6; E.scene.add(r.m); E.relays.push(r); }
+    r.m.position.copy(mst.p); r.f = 0; r.m.visible = true; }, i * 420); } };
+/* the army's own helipad, when no helicopter is on it already */
+K.helipad = function (side, a) { const E = K.env; if (!E || !E.pads) return null; const pd = E.pads.find(q => q.side === side && !q.busy); if (!pd || Math.random() < .35) return null; pd.busy = 1; if (pd.static) pd.static.visible = false; return pd; };
 
 /* ---------------------------------------------------------------- missiles: geometry */
 K.missileGeo = function (kind, side) {
@@ -602,16 +650,32 @@ A4.init = function () {
   this.trails = new Trails(scene, lite ? 12 : 26, lite); if (K.trailCol) this.trails.mat.uniforms.uCol.value.copy(K.trailCol);
   /* recon drones: two per army circling over their own half */
   this.drones = [];
-  const dg = G.merge([CY(.2, .12, 2.6, 8, 0, 0, 0, 0x8f9290), B(.5, .05, 4.6, -.1, .05, 0, 0x8f9290), B(.35, .5, .04, -1.15, .3, .35, 0x6f7270), B(.35, .5, .04, -1.15, .3, -.35, 0x6f7270), CY(.12, .12, .25, 8, .4, -.2, 0, 0x222222)].map((g, i) => { if (i === 0 || i === 4) g.rotateZ(Math.PI / 2); return g; }));
+  const fin = sg => { const f = new THREE.BoxGeometry(.35, .55, .04); f.translate(0, .27, 0); f.rotateX(sg * .62); f.translate(-1.15, .08, 0); return prim(f, 0x6f7270); };
+  const eye = new THREE.SphereGeometry(.12, 8, 6); eye.translate(.55, -.13, 0);
+  const dg = G.merge([CY(.2, .12, 2.6, 8, 0, 0, 0, 0x8f9290), B(.5, .05, 4.6, -.1, .05, 0, 0x8f9290), fin(1), fin(-1), prim(eye, 0x222222)].map((g, i) => { if (i === 0) g.rotateZ(Math.PI / 2); return g; }));
   const dm = K.missileMat();
   const blinkM = new THREE.SpriteMaterial({ map: K.glowTex(), color: 0xff4030, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
   ['bull', 'bear'].forEach((side, si) => { for (let k = 0; k < 2; k++) {
     const m = new THREE.Mesh(dg, dm); m.rotation.order = 'YXZ'; m.scale.setScalar(1.6); const b = new THREE.Sprite(blinkM); b.scale.setScalar(1.6); b.position.set(-.2, -.2, 0); m.add(b); scene.add(m);
-    this.drones.push({ m, b, cx: (si ? 1 : -1) * (36 + k * 18), cz: -12 + k * 20, r: 26 + k * 10, y: 46 + k * 9, w: (k ? -1 : 1) * (.16 + k * .03), ph: si * 2 + k * 3 });
+    const cx = (si ? 1 : -1) * (36 + k * 18), cz = -12 + k * 20; this.drones.push({ m, b, side, cx, cz, hx: cx, hz: cz, r: 26 + k * 10, y: 46 + k * 9, w: (k ? -1 : 1) * (.16 + k * .03), ph: si * 2 + k * 3, until: 0 });
   } });
   this.ready = true;
 };
 A4.after = function (ms, fn) { this.Q.push({ t: vt() + ms, fn }); };
+/* artillery fires on what a recon drone has eyes on: the army's nearest drone flies to circle over the target */
+A4.spot = function (side, x, z) { if (!this.ready) return; let b = null, bd = 1e9; for (const d of this.drones) { if (d.side !== side) continue; const dd = Math.hypot(d.cx - x, d.cz - z); if (dd < bd) { bd = dd; b = d; } } if (b) { b.tx = x; b.tz = z; b.until = vt() + 22000; } };
+/* a strike on a site behind the enemy's lines: one ballistic missile from the attacker's launchers; the defender's SAM site tries for it
+   most times; a hit burns there for a while (no crater: the site stands on its pad) */
+A4.strike = function (att, x, z, usd, it) {
+  if (!this.ready) return; const tels = (K.env && K.env.tels[att]) || [], tel = tels.find(t => t.reload <= 0) || tels[0];
+  if (tel) tel.tgt = 1;
+  this.after(1500, () => {
+    let p0; if (tel && tel.ms) { tel.ms.updateMatrixWorld(true); p0 = tel.ms.getWorldPosition(new THREE.Vector3()); tel.ms.visible = false; tel.reload = 16; } else { const d = att === 'bull' ? -1 : 1; p0 = new THREE.Vector3(d * 32, ARMY.gy(d * 32, -70) + 4, -70); }
+    const p1 = new THREE.Vector3(x + rr(-2, 2), K.env.hgt(x, z), z + rr(-2, 2)), m = this.spawn('B', att, p0, p1, 6 + Math.random() * .6, 125 + Math.random() * 30); if (!m) return;
+    m.site = it || true; FX.smoke(p0.x, p0.y - 2.5, p0.z, this.lite ? 7 : 16, 6, 0); FX.muzzle(p0.x, p0.y - 3, p0.z, 5); AUDIO.play('missile', { x: p0.x, z: p0.z, vol: .95 });
+    const def = att === 'bull' ? 'bear' : 'bull'; if (K.env.sams[def].length && Math.random() < .45) this.after(2000 + Math.random() * 600, () => this.launchI(def, m));
+  });
+};
 A4.clear = function () { this.Q.length = 0; this.M.forEach(m => this.free(m)); this.M.length = 0; };
 A4.spawn = function (kind, side, p0, p1, dur, apex) {
   const slot = this.pool.find(p => !p.on); if (!slot) return null;
@@ -652,6 +716,8 @@ A4.tick = function (dt) {
   }
   this.trails.tick(ts, cam.position);
   for (const d of this.drones) {
+    const sp = d.until > vt(), gx = sp ? d.tx : d.hx, gz = sp ? d.tz : d.hz, k = Math.min(1, dt * .45);
+    d.cx += (gx - d.cx) * k; d.cz += (gz - d.cz) * k; d.r += ((sp ? 9 : d.r0 || (d.r0 = d.r)) - d.r) * k;
     d.ph += d.w * dt; const x = d.cx + Math.cos(d.ph) * d.r, z = d.cz + Math.sin(d.ph) * d.r;
     const sg = Math.sign(d.w), vx = -Math.sin(d.ph) * sg, vz = Math.cos(d.ph) * sg;
     d.m.position.set(x, d.y + Math.sin(ts * .7 + d.ph) * 1.2, z); d.m.rotation.set(sg * .24, Math.atan2(-vz, vx), 0);
@@ -661,7 +727,9 @@ A4.tick = function (dt) {
 A4.hit = function (m) {
   const p = m.p1;
   if (m.kind === 'I') { if (m.target && m.target.on) { this.airburst(m.pos, 1.4); this.free(m.target); AUDIO.play('intercept', { x: m.pos.x, z: m.pos.z, vol: .9 }); if (VIEW === L) evt(VIEW, { k: 'intercept', p: VIEW.price }); K.say('intercept'); } return; }
-  if (m.kind === 'B') { FX.explode(p.x, p.z, 3.1, 0xffd6a0, true); DIRECTOR.punch(1.1); K.pulse(); }
+  if (m.kind === 'B' && m.site) { FX.explode(p.x, p.z, 3.4, 0xffc070, false); DIRECTOR.punch(1.3); K.pulse(); K.burn(p.x, K.env.hgt(p.x, p.z), p.z, 4, 40);   // the site goes up: secondary blasts, then it burns
+    for (let i = 1; i < 4; i++) this.after(i * 380 + Math.random() * 300, () => FX.explode(p.x + rr(-5, 5), p.z + rr(-5, 5), 1.6 + Math.random(), 0xffb050, false)); AUDIO.play('explosion', { x: p.x, z: p.z, vol: 1 }); }
+  else if (m.kind === 'B') { FX.explode(p.x, p.z, 3.1, 0xffd6a0, true); DIRECTOR.punch(1.1); K.pulse(); }
   else FX.explode(p.x, p.z, 2.2, 0xffc890, true);
 };
 A4.airburst = function (p, size) {

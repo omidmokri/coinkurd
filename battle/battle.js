@@ -181,34 +181,36 @@ const WORLD={cur:null,tgt:null,sunDir:new V3(),U:{uTime:{value:0},uWind:{value:0
   const pine=new THREE.InstancedMesh(GFX.pineGeo(lite?2:false),M(),T.trees),leaf=new THREE.InstancedMesh(GFX.broadleafGeo(lite?2:false),M(),T.trees),dead=new THREE.InstancedMesh(GFX.deadTreeGeo(),M(),60);
   let np=0,nl=0,nd=0;const tc=new THREE.Color();
   for(let i=0;i<T.trees*6&&(np+nl)<T.trees*1.6;i++){const x=rnd(200,-200),z=rnd(105,-150);const core=Math.abs(x)<74&&z>-50&&z<50;if(core)continue;if(window.GFX4&&GFX4.blocked(x,z))continue;if(z>60&&Math.random()<.6)continue;const h=this.hgtBase(x,z);
-   const s=.8+Math.random()*.75;d.position.set(x,h-.15,z);d.rotation.set(0,rnd(6.28),0);d.scale.set(s,s*(.85+Math.random()*.4),s);d.updateMatrix();
+   const s=.8+Math.random()*.75;(this.treeL||(this.treeL=[])).push({x,z,y:h,r:2.6*s,h:10*s});d.position.set(x,h-.15,z);d.rotation.set(0,rnd(6.28),0);d.scale.set(s,s*(.85+Math.random()*.4),s);d.updateMatrix();if(window.NAV&&Math.abs(x)<134&&Math.abs(z)<50)NAV.add(NAV.circle(x,z,.42*s,'tree'));
    const bear=x+G_n(x,z)*30>0;const k=.85+Math.random()*.3;if(bear&&Math.random()<.18&&nd<60){dead.setMatrixAt(nd++,d.matrix);continue}
    if((bear?Math.random()<.65:Math.random()<.45)&&np<T.trees){pine.setMatrixAt(np,d.matrix);tc.setRGB(k*(bear?1.08:.95),k*(bear?.92:1),k*(bear?.8:.95));pine.setColorAt(np++,tc)}
    else if(nl<T.trees){leaf.setMatrixAt(nl,d.matrix);tc.setRGB(k*(bear?1.7:.95),k*(bear?1.18:1.02),k*(bear?.45:.9));leaf.setColorAt(nl++,tc)}}
   /* scattered trees along the flanks of the battlefield */
-  for(let i=0;i<40;i++){const x=rnd(70,-70),z=(Math.random()<.5?-1:1)*rnd(62,48);if(nl>=T.trees)break;if(window.GFX4&&GFX4.blocked(x,z))continue;d.position.set(x,this.hgtBase(x,z)-.15,z);const s=.7+Math.random()*.6;d.scale.set(s,s,s);d.rotation.set(0,rnd(6.28),0);d.updateMatrix();leaf.setMatrixAt(nl,d.matrix);const k=.9+Math.random()*.2;tc.setRGB(k*(x>0?1.6:.95),k*(x>0?1.15:1),k*(x>0?.5:.9));leaf.setColorAt(nl++,tc)}
+  for(let i=0;i<40;i++){const x=rnd(70,-70),z=(Math.random()<.5?-1:1)*rnd(62,48);if(nl>=T.trees)break;if(window.GFX4&&GFX4.blocked(x,z))continue;d.position.set(x,this.hgtBase(x,z)-.15,z);const s=.7+Math.random()*.6;(this.treeL||(this.treeL=[])).push({x,z,y:this.hgtBase(x,z),r:2.6*s,h:10*s});d.scale.set(s,s,s);if(window.NAV&&Math.abs(z)<50)NAV.add(NAV.circle(x,z,.42*s,'tree'));d.rotation.set(0,rnd(6.28),0);d.updateMatrix();leaf.setMatrixAt(nl,d.matrix);const k=.9+Math.random()*.2;tc.setRGB(k*(x>0?1.6:.95),k*(x>0?1.15:1),k*(x>0?.5:.9));leaf.setColorAt(nl++,tc)}
   [[pine,np],[leaf,nl],[dead,nd]].forEach(([m,n])=>{m.count=n;m.castShadow=!lite;m.receiveShadow=std;m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;scene.add(m)});
-  const rocks=new THREE.InstancedMesh(GFX.rockGeo(),M(),T.rocks);let nr=0;for(let i=0;i<T.rocks*4&&nr<T.rocks;i++){const x=rnd(190,-190),z=rnd(100,-140);if(Math.abs(x)<66&&Math.abs(z)<44)continue;if(window.GFX4&&GFX4.blocked(x,z,1))continue;d.position.set(x,this.hgtBase(x,z)+.1,z);d.rotation.set(rnd(.4),rnd(6.28),rnd(.4));const s=.5+Math.pow(Math.random(),2)*2.6;d.scale.set(s,s*(.7+Math.random()*.5),s);d.updateMatrix();rocks.setMatrixAt(nr++,d.matrix)}
+  const rocks=new THREE.InstancedMesh(GFX.rockGeo(),M(),T.rocks);let nr=0;for(let i=0;i<T.rocks*4&&nr<T.rocks;i++){const x=rnd(190,-190),z=rnd(100,-140);if(Math.abs(x)<66&&Math.abs(z)<44)continue;if(window.GFX4&&GFX4.blocked(x,z,1))continue;d.position.set(x,this.hgtBase(x,z)+.1,z);d.rotation.set(rnd(.4),rnd(6.28),rnd(.4));const s=.5+Math.pow(Math.random(),2)*2.6;d.scale.set(s,s*(.7+Math.random()*.5),s);d.updateMatrix();rocks.setMatrixAt(nr++,d.matrix);if(window.NAV&&Math.abs(x)<134&&Math.abs(z)<50)NAV.add(NAV.circle(x,z,1.25*s,'rock'))}
   rocks.count=nr;rocks.castShadow=!lite;rocks.receiveShadow=std;rocks.instanceMatrix.needsUpdate=true;scene.add(rocks);
   const gN=T.grass;const grass=new THREE.InstancedMesh(GFX.grassGeo(),GFX.grassMaterial(this.U),gN);let ng=0;
-  for(let i=0;i<gN*3&&ng<gN;i++){const x=rnd(150,-150),z=rnd(80,-110);const rd=Math.abs(z-2*Math.sin(x*.035));if(rd<3.4&&Math.abs(x)<90)continue;if(window.GFX4&&GFX4.blocked(x,z,0))continue;if(Math.abs(x+74)<11&&Math.abs(z)<11||Math.abs(x-74)<11&&Math.abs(z)<11)continue;
+  for(let i=0;i<gN*3&&ng<gN;i++){const x=rnd(150,-150),z=rnd(80,-110);const rd=Math.abs(z-2*Math.sin(x*.035));if(rd<3.4&&Math.abs(x)<90)continue;if(window.GFX4&&GFX4.blocked(x,z,0))continue;if(Math.abs(x+84)<11&&Math.abs(z)<11||Math.abs(x-84)<11&&Math.abs(z)<11)continue;
    const bear=x+G_n(x*.5,z*.5)*36>0;if(bear&&Math.random()<.35)continue;d.position.set(x,this.hgtBase(x,z)-.03,z);d.rotation.set(0,rnd(6.28),0);const s=.65+Math.random()*.8;d.scale.set(s,s*(bear?.75:1),s);d.updateMatrix();grass.setMatrixAt(ng,d.matrix);
    const k=.85+Math.random()*.3;if(bear)tc.setRGB(.7*k,.58*k,.3*k);else tc.setRGB(.33*k,.55*k,.2*k);tc.convertSRGBToLinear();grass.setColorAt(ng++,tc)}
   grass.count=ng;grass.instanceMatrix.needsUpdate=true;grass.instanceColor.needsUpdate=true;grass.receiveShadow=std;scene.add(grass);this.grass=grass;this.grassN=ng},
  /* HQ compounds, flags, campfires */
- bases(){const std=GFX.std;const mk=(x,team,dir,name,lc)=>{const mat=GFX.vehicleMaterial(GFX.TEAMS[team],std,this.U,{dirt:.4});const grp=GFX.hq(GFX.TEAMS[team],mat,dir);grp.rotation.y=dir<0?0:Math.PI;
+ bases(){const std=GFX.std;const mk=(x,team,dir,name,lc)=>{const mat=GFX.vehicleMaterial(GFX.TEAMS[team],std,this.U,{dirt:.4});const grp=GFX.hq(GFX.TEAMS[team],mat,dir),m=dir<0?1:-1;/* built facing its own front, never turned */
    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.1,.13,11,8),std?new THREE.MeshStandardMaterial({color:0xc8c8c8,metalness:.8,roughness:.3}):new THREE.MeshLambertMaterial({color:0xc8c8c8}));pole.position.set(0,5.5,4.8);pole.castShadow=true;grp.add(pole);
    const fg=new THREE.PlaneGeometry(4.6,2.6,14,7);const fc=GFX.lin(GFX.TEAMS[team].flag);const fm=std?new THREE.MeshStandardMaterial({color:fc,side:THREE.DoubleSide,roughness:.8,emissive:fc,emissiveIntensity:.18}):new THREE.MeshLambertMaterial({color:fc,side:THREE.DoubleSide,emissive:fc,emissiveIntensity:.2});
    fm.onBeforeCompile=sh=>{sh.uniforms.uTime=U.flagT=U.flagT||{value:0};sh.uniforms.uAmp=grp.userData.amp={value:.35};sh.vertexShader='uniform float uTime,uAmp;\n'+sh.vertexShader.replace('#include <begin_vertex>','vec3 transformed=position;float fx=(position.x+2.3)/4.6;transformed.z+=sin(fx*6.+uTime*5.)*uAmp*fx;transformed.y+=sin(fx*4.+uTime*3.)*uAmp*.3*fx;')};
-   const fl=new THREE.Mesh(fg,fm);fl.position.set(2.35,9.6,4.8);fl.castShadow=true;grp.add(fl);grp.userData.flag=fl;grp.userData.flagY=9.6;
-   const lb=GFX.label(name,lc,4.2,{glow:true});lb.position.set(0,15,0);grp.add(lb);grp.scale.setScalar(1.5);grp.position.set(x,this.hgtBase(x,0),0);scene.add(grp);return grp};
-  this.baseB=mk(-74,'bull',-1,'BULLS','#4ade80');this.baseR=mk(74,'bear',1,'BEARS','#f87171');
-  const camp=x=>{if(this.soft)return;for(let i=0;i<3;i++){const f=new THREE.PointLight(0xff9a3a,0,16,2);f.position.set(x+rnd(6,-6),1.3,(i-1)*7+rnd(2,-2));scene.add(f);this.fires.push(f)}};camp(-74);camp(74)},
+   const fl=new THREE.Mesh(fg,fm);fl.position.set(2.35*m,9.6,4.8);fl.scale.x=m;fl.castShadow=true;grp.add(fl);grp.userData.flag=fl;grp.userData.flagY=9.6;
+   const lb=GFX.label(name,lc,4.2,{glow:true});lb.position.set(0,15,0);grp.add(lb);grp.scale.setScalar(1.5);grp.position.set(x,this.hgtBase(x,0),0);scene.add(grp);
+   /* the compound is solid ground for the navigation; troops come out of its door */
+   if(window.NAV)for(const f of grp.userData.foot)NAV.add(f.t==='c'?NAV.circle(x+f.x*1.5,f.z*1.5,f.r*1.5+.1,'hq'):NAV.box(x+f.x*1.5,f.z*1.5,f.hx*1.5,f.hz*1.5,0,'hq'));grp.userData.doorW=[x+grp.userData.door[0]*1.5,grp.userData.door[1]*1.5];return grp};
+  this.baseB=mk(-84,'bull',-1,'BULLS','#4ade80');this.baseR=mk(84,'bear',1,'BEARS','#f87171');   /* deep in the base: the yard between the gate and the command post is where units form up */
+  const camp=x=>{if(this.soft)return;for(let i=0;i<3;i++){const f=new THREE.PointLight(0xff9a3a,0,16,2);f.position.set(x+rnd(5,-5),1.3,(i?1:-1)*(7.4+rnd(1,0)));scene.add(f);this.fires.push(f)}};camp(-84);camp(84)},
  /* obstacles + defence lines */
  props(){const std=GFX.std,d=new THREE.Object3D();const M=c=>std?new THREE.MeshStandardMaterial({vertexColors:true,roughness:.65,metalness:.45,color:c||0xffffff}):new THREE.MeshLambertMaterial({vertexColors:true});
   const hh=new THREE.InstancedMesh(GFX.hedgehogGeo(),M(),56),ww=new THREE.InstancedMesh(GFX.wireGeo(),M(),40);let nh=0,nw=0;
-  [-1,1].forEach(s=>{for(let i=0;i<14;i++){const z=-44+i*6.6+rnd(1.6,-1.6);if(Math.abs(z-2*Math.sin(s*50*.035))<4)continue;const x=s*(50+rnd(3,-3));d.position.set(x,this.hgtBase(x,z),z);d.rotation.set(0,rnd(6.28),0);d.scale.setScalar(.9+Math.random()*.3);d.updateMatrix();hh.setMatrixAt(nh++,d.matrix)}
-   for(let i=0;i<10;i++){const z=-42+i*9+rnd(1,-1);if(Math.abs(z)<4)continue;const x=s*(44+rnd(1,-1));d.position.set(x,this.hgtBase(x,z),z);d.rotation.set(0,rnd(.3,-.3),0);d.scale.setScalar(1);d.updateMatrix();ww.setMatrixAt(nw++,d.matrix)}});
+  [-1,1].forEach(s=>{for(let i=0;i<14;i++){const z=-44+i*6.6+rnd(1.6,-1.6);if(Math.abs(z-2*Math.sin(s*50*.035))<4)continue;const x=s*(50+rnd(3,-3)),sc=.9+Math.random()*.3;d.position.set(x,this.hgtBase(x,z),z);d.rotation.set(0,rnd(6.28),0);d.scale.setScalar(sc);d.updateMatrix();hh.setMatrixAt(nh++,d.matrix);if(window.NAV)NAV.add(NAV.circle(x,z,1.12*sc,'hedgehog'))}
+   for(let i=0;i<10;i++){const z=-42+i*9+rnd(1,-1);if(Math.abs(z)<4)continue;const x=s*(44+rnd(1,-1)),ry=rnd(.3,-.3);d.position.set(x,this.hgtBase(x,z),z);d.rotation.set(0,ry,0);d.scale.setScalar(1);d.updateMatrix();ww.setMatrixAt(nw++,d.matrix);if(window.NAV)NAV.add(NAV.capsule(x-2.25*Math.sin(ry),z-2.25*Math.cos(ry),x+2.25*Math.sin(ry),z+2.25*Math.cos(ry),.46,'wire'))}});
   hh.count=nh;ww.count=nw;[hh,ww].forEach(m=>{m.castShadow=std;m.instanceMatrix.needsUpdate=true;scene.add(m)});this.obst=[hh,ww]},
  /* the price front: a living light curtain + ground glow, label above */
  frontBuild(){const U=this.FU={uTime:this.U.uTime,uCol:{value:GFX.lin(0xf7931a)},uOp:{value:1}};
@@ -227,9 +229,19 @@ const WORLD={cur:null,tgt:null,sunDir:new V3(),U:{uTime:{value:0},uWind:{value:0
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(base,3));g.setAttribute('aSpd',new THREE.BufferAttribute(spd,1));this.rainU={uTime:{value:0},uWind:{value:0},uOp:{value:0},uPR:{value:ren.getPixelRatio()}};
   const m=new THREE.ShaderMaterial({uniforms:this.rainU,transparent:true,depthWrite:false,vertexShader:'attribute float aSpd;uniform float uTime,uWind,uPR;void main(){float yy=mod(position.y-uTime*aSpd,90.);vec3 p=vec3(position.x+uWind*yy*.35,yy,position.z);vec4 mv=modelViewMatrix*vec4(p,1.);gl_PointSize=uPR*max(1.,130./max(1.,-mv.z));gl_Position=projectionMatrix*mv;}',
    fragmentShader:'uniform float uOp;void main(){vec2 c=gl_PointCoord-.5;if(abs(c.x)>.1)discard;gl_FragColor=vec4(.7,.78,.9,uOp*(1.-abs(c.y)*2.));\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}'});this.rain=new THREE.Points(g,m);this.rain.frustumCulled=false;this.rain.visible=false;scene.add(this.rain)},
- crater(x,z,r,depth){this.craters.push([x,z,r,depth]);if(this.craters.length>24)this.craters.shift();if(this.env4)this.env4.crater(x,z,r);const T=this.TU;if(T){const a=T.uCraters.value;for(let i=a.length-1;i>0;i--)a[i].copy(a[i-1]);a[0].set(x,z,r*1.35,1)}
-  if(!this.terrain||!GFX.std)return;const pos=this.tpos;let any=false;for(let i=0;i<pos.count;i++){const dx=pos.getX(i)-x,dz=pos.getZ(i)-z;if(Math.abs(dx)>r||Math.abs(dz)>r)continue;const d=Math.sqrt(dx*dx+dz*dz);if(d>r)continue;const f=1-d/r;pos.setY(i,pos.getY(i)-depth*f*f+(f<.25?depth*.3*Math.sin(f*12.5):0));any=true}
-  if(any){pos.needsUpdate=true;this.terrain.geometry.computeVertexNormals()}},
+ crater(x,z,r,depth){if(!this.terrain||!GFX.std)return;
+  /* the ground only gives way where nothing stands on it: a crater stops short of wire, hedgehogs, wrecks, guns and buildings */
+  if(window.NAV&&NAV.ready){const room=NAV.clear(x,z,true)-.4;if(room<r){if(room<1.2)return;depth*=room/r;r=room}}
+  this.craters.push([x,z,r,depth]);this.dent(x,z,r,depth,1);
+  if(this.craters.length>24){const o=this.craters.shift();this.dent(o[0],o[1],o[2],o[3],-1)}                         // the oldest one is filled in again
+  const T=this.TU;if(T){const a=T.uCraters.value;for(let i=a.length-1;i>0;i--)a[i].copy(a[i-1]);a[0].set(x,z,r*1.35,1)}
+  ARMY.settle(x,z,r+3)},                                                                                                   // whatever stands near it settles onto the new ground
+ dent(x,z,r,depth,sg){const pos=this.tpos;let any=false;for(let i=0;i<pos.count;i++){const dx=pos.getX(i)-x,dz=pos.getZ(i)-z;if(Math.abs(dx)>r||Math.abs(dz)>r)continue;const d=Math.sqrt(dx*dx+dz*dz);if(d>r)continue;const f=1-d/r;pos.setY(i,pos.getY(i)+sg*(-depth*f*f+(f<.25?depth*.3*Math.sin(f*12.5):0)));any=true}
+  if(any){pos.needsUpdate=true;this.terrain.geometry.computeVertexNormals()}if(this.env4)this.env4.crater(x,z,r)},
+ /* the height of the ground as it is drawn (the terrain mesh's own triangles, craters and all): feet and tracks stand on what is seen */
+ meshH(x,z){const g=this.terrain&&this.terrain.geometry,P=g&&g.parameters;if(!P)return this.hgt(x,z);const nx=P.widthSegments,nz=P.heightSegments,fx=(x+P.width/2)/(P.width/nx),fz=(z+18+P.height/2)/(P.height/nz);
+  if(fx<0||fz<0||fx>=nx||fz>=nz)return this.hgt(x,z);const ix=Math.floor(fx),iz=Math.floor(fz),u=fx-ix,v=fz-iz,W1=nx+1,p=this.tpos,ha=p.getY(iz*W1+ix),hb=p.getY((iz+1)*W1+ix),hc=p.getY((iz+1)*W1+ix+1),hd=p.getY(iz*W1+ix+1);
+  return u+v<=1?ha+(hd-ha)*u+(hb-ha)*v:hc+(hb-hc)*(1-u)+(hd-hc)*(1-v)},
  /* presets, weather, time */
  regimePreset(){if(S.nightUntil&&Date.now()<S.nightUntil)return PRESET.night;const r=S.regime||'';return r==='bull'?PRESET.dawn:r==='bear'?PRESET.dusk:r==='high_volatility'?PRESET.storm:PRESET.day},
  clockPreset(){const h=new Date().getHours()+new Date().getMinutes()/60;return h<5?PRESET.night:h<7?PRESET.dawn:h<17?PRESET.day:h<19.5?PRESET.dusk:PRESET.night},
@@ -272,7 +284,7 @@ const G_n=(x,z)=>GFX.noise(x*.03,z*.03);
 
 /* ======================= units 5.0: individually posed infantry (rifle, machine gun, anti-tank, leader), IFVs, MBTs, artillery, MLRS, trucks ======================= */
 const ST={IDLE:0,RUN:1,FIRE:2,DIE:3,CHEER:4,REST:5,STAG:6,WALK:7};
-const SC={sold:1.7,ifv:1.5,mbt:1.7,mega:2.25,gun:1.45};                    // world scale of each class
+const SC={sold:1.7,ifv:1.5,mbt:1.7,mega:2.0,gun:1.45};                    // world scale of each class
 const UK={sold:6,ifv:8,mbt:20,mega:54,wall:18,convoy:7,fort:36,scn:30};     // how many units a bucket fields as infantry, what each vehicle stands for, and how many units make a wall / convoy / fort
 const ROLE=[0,0,1,3,0,2];                                                   // by place in the fire team: rifle, rifle, machine gun, leader, rifle, anti-tank
 const wrapA=a=>{while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a};
@@ -297,7 +309,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  shadowMesh(n){const m=new THREE.InstancedMesh(this.shGeo,this.shMat,n);m.count=0;m.frustumCulled=false;m.renderOrder=2;scene.add(m);return m},
  setLite(on){this.lite=on},
  clear(){for(const k in this.sides){const A=this.sides[k];A.sold=[];A.slots=new Map();A.veh=[];A.front=[];A.meshes.forEach(m=>m.count=0);A.tk.forEach(t=>{t.hull.count=t.tur.count=0});if(A.sh)A.sh.count=0;if(A.vsh)A.vsh.count=0}
-  [this.hesco,this.empl,this.penn].forEach(m=>{if(m){m.count=0;m.instanceMatrix.needsUpdate=true}});this.bunkers.forEach(b=>b.visible=false);if(window.GFX6)GFX6.clear()},
+  [this.hesco,this.empl,this.penn].forEach(m=>{if(m){m.count=0;m.instanceMatrix.needsUpdate=true}});this.bunkers.forEach(b=>b.visible=false);for(const tr of this.trucks||[]){tr.on=false;tr.g.visible=false}this.works=[];this.navDirty=true;if(window.GFX6)GFX6.clear()},
  /* a bucket fields up to six infantry (one fire team); the rest of its liquidity arrives as armour */
  alloc(u){const sold=Math.min(u,UK.sold);let r=u-sold;const mega=r>=UK.mega?1:0;r-=mega*UK.mega;const heavy=Math.min(2,Math.floor(r/UK.mbt));r-=heavy*UK.mbt;const light=Math.min(2,Math.floor(r/UK.ifv));return {mega,heavy,light,sold}},
  update(M){const t=vt();if(t-M.armT<220)return;M.armT=t;this.updSide(this.sides.bull,M,M.bk.b,'b');this.updSide(this.sides.bear,M,M.bk.a,'a');this.forts(M);HUD.unit(M)},
@@ -305,62 +317,294 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  spot(A,sl,idx){const e=-A.dir,m=idx%6,row=Math.floor(idx/6);const fx=[0,-.95,-.95,-1.9,-1.9,-2.7][m]-row*2.7,fz=[0,-2,2,-4,4,0][m];
   const h=Math.sin(idx*12.9898+sl.zc*78.233)*43758.5453,j=h-Math.floor(h)-.5;return {x:sl.x+e*fx+j*.5,z:clamp(sl.zc+fz+j*.8,-37,37)}},
  kill(A,s,t){s.st=ST.DIE;s.t0=t;s.mv=0;s.key='';if(PREF.layers.fx&&S.quality!=='lite'&&Math.random()<.35)FX.blood(s.x,s.z)},
- retreat(A,s,t){s.st=ST.RUN;s.mv=2;s.key='';s.sp=10.5;this.route(A,s,[[A.dir*(GATE-2.5),gateZ(A.dir*GATE)+rnd(2,-2)],[A.dir*(GATE+5+Math.random()*3),gateZ(A.dir*GATE)+rnd(2.4,-2.4)]],t)},
- /* a walk in legs: every unit that comes from or goes back to its base passes the gate */
- route(A,o,pts,t){o.legs=pts.slice(1);this.leg(o,pts[0],t)},
- leg(o,p,t){o.x0=o.x;o.z0=o.z;o.tx=p[0];o.tz=p[1];o.t0=t;const d=Math.hypot(o.tx-o.x,o.tz-o.z);o.dur=clamp(d/(o.sp||10),.25,9);o.cv=o.legs&&o.legs.length||d<12?0:rnd(4,-4)},
+ retreat(A,s,t){s.st=ST.RUN;s.mv=2;s.key='';s.sp=10.5;s.held=false;const d=A.door||[A.dir*(GATE+6),gateZ(A.dir*GATE)];this.route(A,s,d,t,this.navOn?NAV.flow('door-'+A.team,d[0],d[1],.45):null)},
+ /* ---- ground movement on the navigation map (nav.js): soldiers, armour and lorries keep to clear ground, go round each other and never through anything solid ---- */
+ VB:[[3.55,1.62],[4.3,2.28],[5.06,2.68],[3.45,1.6]],                       // half length, half width (m): IFV, MBT, heavy tank, lorry
+ navOn:false,works:[],navDirty:true,navSig:'',navT:0,
+ navInit(){for(const k in this.sides){const A=this.sides[k],d=(A.dir<0?WORLD.baseB:WORLD.baseR).userData.doorW;A.door=NAV.free(d[0],d[1],.6,6)||d;A.gate=[A.dir*GATE,gateZ(A.dir*GATE)];const sh=window.GFX5&&GFX5.shed?GFX5.shed(A.team):null;A.pool=sh?[sh.x,sh.z]:NAV.free(A.dir*70,-14,6.5,16)||[A.dir*70,-14];A.poolH=sh?-Math.PI/2:(A.dir<0?0:Math.PI);A.shed=sh?{x:sh.x,door:sh.door,hw:sh.hw,open:0,user:null}:null}this.navOn=true;this.navDirty=true},
+ /* everything that drives: both armies' vehicles (burning ones too) and the lorries */
+ movers(){const L=[];for(const k in this.sides)for(const v of this.sides[k].veh)if(!v.hold)L.push(v);for(const tr of this.trucks)if(tr.on&&!tr.hold)L.push(tr);return L},
+ /* what a man or a machine on foot must not step into: a hull, or the whole circle of one turning on the spot */
+ inWay(x,z,pad){const t=vt();for(const o of this.movers()){if(Math.abs(o.x-x)>16||Math.abs(o.z-z)>16)continue;const b=this.VB[o.tier],op=o.ops&&o.ops[o.oi];if(op&&op.k==='P'&&!o.dead){const r=this.hd2(o)+pad;if((o.x-x)*(o.x-x)+(o.z-z)*(o.z-z)<r*r)return o}else if(NAV.inBox(x,z,o.x,o.z,o.hd,b[0],b[1],pad))return o;
+   if(op&&!o.dead&&o.la1&&o.la2&&t-(o.laT||-1e9)<300){const P1=o.la1,P2=o.la2;if(NAV.inBox(x,z,P1[0],P1[1],P1[2],b[0],b[1],pad)||NAV.inBox(x,z,P2[0],P2[1],P2[2],b[0],b[1],pad))return o}}return null},   // (and the ground it is about to cover)
+ inMover(x,z,pad){for(const o of this.movers()){if(Math.abs(o.x-x)>8||Math.abs(o.z-z)>8)continue;const b=this.VB[o.tier];if(NAV.inBox(x,z,o.x,o.z,o.hd,b[0],b[1],pad))return o}return null},
+ /* a standing place for a soldier: his place in the fire team, moved to the nearest clear ground nobody else has taken */
+ standSpot(A,sl,idx,self){const o=this.spot(A,sl,idx);if(!this.navOn)return o;const p=NAV.free(o.x,o.z,.5,6,(x,z)=>Math.abs(z)<=37&&!this.taken(x,z,self))||NAV.free(o.x,o.z,.5,8)||[o.x,o.z];o.x=p[0];o.z=p[1];return o},
+ taken(x,z,self){for(const k in this.sides){for(const s of this.sides[k].sold){if(s===self||s.st===ST.DIE||s.mv===2)continue;const px=s.mv?s.tx:s.x,pz=s.mv?s.tz:s.z;if((px-x)*(px-x)+(pz-z)*(pz-z)<.81)return true}
+   for(const v of this.sides[k].veh){const B=this.VB[v.tier];if(NAV.inBox(x,z,v.x,v.z,v.hd,B[0],B[1],.7))return true;if(v.mv&&!v.home&&v.gx!=null&&NAV.inBox(x,z,v.gx,v.gz,v.ghd==null?v.hd:v.ghd,B[0],B[1],.7))return true}}return false},
+ /* a run along a route: one ease in and out over the whole of it, turning at its corners */
+ route(A,o,dest,t,flow){const P=(flow&&NAV.flowPath(flow,o.x,o.z))||(this.navOn?NAV.path(o.x,o.z,dest[0],dest[1],.45):null)||[[o.x,o.z],[dest[0],dest[1]]];this.setPath(o,P,t)},
+ setPath(o,P,t){const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const e=P[P.length-1];o.pl=P;o.plL=L;o.D=Math.max(L[L.length-1],.01);o.x0=o.x;o.z0=o.z;o.tx=e[0];o.tz=e[1];o.t0=Math.max(t,o.t0||0);o.dur=clamp(o.D/(o.sp||10),.25,16);
+  o.cv=P.length===2&&o.D>=12&&(!this.navOn||NAV.lineClear(P[0][0],P[0][1],e[0],e[1],4.9))?rnd(4,-4):0;o.legs=null},
+ along(o,e,out){const s=e*o.D,L=o.plL,P=o.pl;let i=1;while(i<L.length-1&&L[i]<s)i++;const a=P[i-1],b=P[i],l=L[i]-L[i-1]||1,f=clamp((s-L[i-1])/l,0,1);out[0]=a[0]+(b[0]-a[0])*f;out[1]=a[1]+(b[1]-a[1])*f;out[2]=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);return out},
+ leg(o,p,t){this.route(null,o,p,t)},
+ /* a soldier steps out of the way of a vehicle coming at him */
+ dodge(s,v,t){const B=this.VB[v.tier],c=Math.cos(v.hd),sn=Math.sin(v.hd),dx=s.x-v.x,dz=s.z-v.z,lx=dx*c-dz*sn,lz=dx*sn+dz*c,nz=(lz>=0?1:-1)*(B[1]+1.7),wx=v.x+lx*c+nz*sn,wz=v.z-lx*sn+nz*c;
+  if(s.mv&&!s.after)s.after={tx:s.tx,tz:s.tz,mv:s.mv,st:s.st,sp:s.sp};const r=this.hd2(v)+.9,p=NAV.free(wx,wz,.5,6,(x,z)=>!NAV.inBox(x,z,v.x,v.z,v.hd,B[0]+4,B[1]+.9)&&(x-v.x)*(x-v.x)+(z-v.z)*(z-v.z)>r*r&&!this.taken(x,z,s))||NAV.free(wx,wz,.5,5,(x,z)=>!NAV.inBox(x,z,v.x,v.z,v.hd,B[0]+4,B[1]+.9)&&!this.taken(x,z,s))||[wx,wz];s.dodge=t+2600;s.mv=1;s.st=ST.WALK;s.sp=4.4;s.t0=t;this.route(null,s,p,t)},
  updSide(A,M,buckets,sk){const tn=Date.now(),t=vt(),UN=M.UN,seen=new Set(),cap=Math.min(this.CAP,this.MAX),want=[];
   for(const b of buckets){const x0=X(b.p);if(Math.abs(x0)>XMAX)continue;const key=sk+b.k;seen.add(key);let sl=A.slots.get(key);if(!sl){sl={alive:[],u:-1,zc:-31+62*(((b.k*.618034)%1+1)%1)};A.slots.set(key,sl)}
    let u=Math.round(b.usd/UN);if(sl.u>=3&&u>0&&Math.abs(u-sl.u)<=Math.max(1,sl.u*.12))u=sl.u;else sl.u=u;       // small ripples in a bucket do not reshuffle its units
    sl.x=x0;sl.p=b.p;sl.w=b.w*M.scale;sl.age=tn-(M.first.get(key)||tn);const al=this.alloc(u);
    if(al.mega)want.push({id:key+'m',key,sl,tier:2,i:0,usd:b.usd});for(let i=0;i<al.heavy;i++)want.push({id:key+'h'+i,key,sl,tier:1,i:i+1,usd:b.usd});for(let i=0;i<al.light;i++)want.push({id:key+'l'+i,key,sl,tier:0,i:i+3,usd:b.usd});
    const cur=sl.alive.length;
-   if(al.sold>cur){const n=Math.min(al.sold-cur,cap-A.sold.length);for(let i=0;i<n;i++){const idx=sl.alive.length,o=this.spot(A,sl,idx),from=A.spawnFrom&&A.spawnFrom.until>tn?A.spawnFrom:null,role=ROLE[idx%6],sd=Math.random();
-     const s={key,st:ST.RUN,t0:t,x:from?from.x+rnd(1.5,-1.5):A.dir*(GATE+3+Math.random()*4),z:from?from.z+rnd(3,-3):gateZ(A.dir*GATE)+rnd(2.4,-2.4),tx:o.x,tz:o.z,mv:1,sd,rank:sl.rank||0,role,stn:GFX5.stance(role,sd),yaw:rnd(.3,-.3),cv:rnd(5,-5),i:A.sold.length,ry:A.dir<0?0:Math.PI,y:0,gyT:0,sp:role===1?9:10.5};
-     this.route(A,s,from?[[o.x,o.z]]:[[A.dir*(GATE-2.5),gateZ(A.dir*GATE)+rnd(2,-2)],[o.x,o.z]],t);sl.alive.push(s);A.sold.push(s)}}
+   if(al.sold>cur){const n=Math.min(al.sold-cur,cap-A.sold.length);for(let i=0;i<n;i++){const idx=sl.alive.length,o=this.standSpot(A,sl,idx),from=A.spawnFrom&&A.spawnFrom.until>tn?A.spawnFrom:null,role=ROLE[idx%6],sd=Math.random();
+     /* out of the command post's door one after another, or off the back of a lorry */
+     const d0=from?[from.x,from.z]:(A.door||[A.dir*(GATE+5),gateZ(A.dir*GATE)]),p0=this.navOn?(NAV.free(d0[0]+rnd(.5,-.5),d0[1]+rnd(1,-1),.45,4)||d0):d0;
+     const s={key,st:ST.RUN,t0:t+i*(from?150:230)+Math.random()*80,held:true,x:p0[0],z:p0[1],tx:o.x,tz:o.z,mv:1,sd,rank:sl.rank||0,role,stn:GFX5.stance(role,sd),yaw:rnd(.3,-.3),cv:0,i:A.sold.length,ry:A.dir<0?0:Math.PI,y:0,gyT:0,sp:role===1?9:10.5};
+     this.route(A,s,[o.x,o.z],s.t0);sl.alive.push(s);A.sold.push(s)}}
    else if(al.sold<cur){const n=cur-al.sold;const traded=M.trades.some(x=>tn-x.t<3000&&Math.abs(x.p-b.p)<=b.w*1.5);for(let i=0;i<n;i++){const s=sl.alive.pop();if(!s)break;if(s.st===ST.DIE)continue;if(traded)this.kill(A,s,t);else this.retreat(A,s,t)}}
    const rk=sl.age>120000?2:sl.age>30000?1:0;if(sl.rank!==rk){sl.rank=rk;for(const s of sl.alive)s.rank=rk}}
   for(const [key,sl] of A.slots){if(seen.has(key))continue;for(const s of sl.alive){if(s.st!==ST.DIE)this.retreat(A,s,t)}A.slots.delete(key)}
   this.updVeh(A,M,want,t,tn)},
  /* armour: each vehicle is a lasting object that drives in, holds its lane, drives back when its orders are pulled and burns when they are traded through */
  vehZ(A,w){const c=[13,-13,25,-25,37,-37,49,-49];for(let k=0;k<c.length;k++){let z=w.sl.zc+c[(k+w.i)%c.length];if(z>33)z-=66;if(z<-33)z+=66;if(Math.abs(z-2)<4.5)z+=z<2?-5:5;if(!A.veh.some(v=>!v.dead&&Math.abs(v.gz-z)<6.5&&Math.abs(v.gx-w.sl.x)<10))return z}return clamp(w.sl.zc+rnd(28,-28),-33,33)},
- updVeh(A,M,want,t,tn){want.sort((a,b)=>b.tier-a.tier||b.usd-a.usd);if(want.length>this.VMAX)want.length=this.VMAX;const ids=new Map(want.map(w=>[w.id,w]));
+ updVeh(A,M,want,t,tn){want.sort((a,b)=>b.tier-a.tier||b.usd-a.usd);if(want.length>this.VMAX)want.length=this.VMAX;const ids=new Map(want.map(w=>[w.id,w])),fwd=A.dir<0?0:Math.PI,go=[];
   for(const v of A.veh){if(v.dead||v.mv===2)continue;const w=ids.get(v.id);
-   if(w){ids.delete(v.id);v.p=w.sl.p;const tx=w.sl.x+A.dir*.6;if(Math.abs(tx-(v.gx==null?v.tx:v.gx))>.4){v.gx=tx;if(v.legs&&v.legs.length)v.legs[v.legs.length-1]=[tx,v.gz];else{v.mv=1;this.route(A,v,[[tx,v.gz]],t)}}}
+   if(w){ids.delete(v.id);v.p=w.sl.p;const tx=w.sl.x+A.dir*.6;if(Math.abs(tx-v.wx)>.4){v.wx=tx;go.push(v)}}                                  // its order moved: so does the armour
    else{const traded=M.trades.some(x=>tn-x.t<3000&&Math.abs(x.p-v.p)<=M.step*.3);
-    if(traded&&PREF.layers.fx&&Math.abs(v.x)<76){v.dead=t;v.mv=0;FX.explode(v.x,v.z,v.tier?1.5:1.15,0xff9a3c)}else{v.mv=2;v.sp=8.5;this.route(A,v,[[A.dir*(GATE-3),gateZ(A.dir*GATE)],[A.dir*(GATE+7),gateZ(A.dir*GATE)]],t)}}}
+    if(v.hold)v.gone=true;
+    else if(traded&&PREF.layers.fx&&Math.abs(v.x)<GATE-14){v.dead=t;v.mv=0;v.ops=null;v.spd=0;FX.explode(v.x,v.z,v.tier?1.5:1.15,0xff9a3c);this.navDirty=true}
+    else this.recall(A,v,go)}}                                                                                                          // pulled: back to the motor pool
+  if(A.veh.some(v=>v.gone))A.veh=A.veh.filter(v=>!v.gone);
   for(const w of ids.values()){const cls=w.tier===0?0:1;if(A.veh.filter(v=>v.cls===cls).length>=this.TCAP)continue;
-   const z=this.vehZ(A,w),tx=w.sl.x+A.dir*.6,from=A.spawnFrom&&A.spawnFrom.until>tn?A.spawnFrom:null;
-   const v={id:w.id,key:w.key,p:w.sl.p,tier:w.tier,cls,x:from?from.x:A.dir*(GATE+6),z:from?from.z:gateZ(A.dir*GATE),tx,tz:z,mv:1,t0:t,sp:7,sc:w.tier===2?SC.mega:w.tier===1?SC.mbt:SC.ifv,jit:(((w.i*.37+z*.11)%1+1)%1-.5)*.16,aim:0,aimT:0,aimY:0,fire:-10,dead:0,y:0,gyT:0};
-   v.gx=tx;v.gz=z;this.route(A,v,from?[[tx,z]]:[[A.dir*(GATE-3),gateZ(A.dir*GATE)],[tx,z]],t);A.veh.push(v)}},
- vehTick(A,dt,t){const d=this.dummy,fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0,fwd=A.dir<0?0:Math.PI,n=[0,0];let ns=0;
+   const z=this.vehZ(A,w),tx=w.sl.x+A.dir*.6,p=A.pool||[A.dir*(GATE+6),gateZ(A.dir*GATE)];
+   /* every vehicle rolls out of its army's motor pool inside the base, one at a time when the yard is clear */
+   const v={id:w.id,key:w.key,team:A.team,p:w.sl.p,tier:w.tier,cls,x:p[0],z:p[1],hd:A.poolH!=null?A.poolH:fwd,mv:1,hold:true,pri:Math.random(),sc:w.tier===2?SC.mega:w.tier===1?SC.mbt:SC.ifv,jit:(((w.i*.37+z*.11)%1+1)%1-.5)*.16,aim:0,aimT:0,aimY:0,fire:-10,dead:0,y:0,gyT:0,wx:tx,wz:z,gx:tx,gz:z,spd:0,wait:0,pitch:0,roll:0};
+   A.veh.push(v);go.push(v)}
+  if(go.length){for(const v of go)if(!v.hold&&v.mv!==2)v.mv=1;this.navSync(true);for(const v of go)this.vehGo(A,v)}},
+ vehGo(A,v){const fwd=A.dir<0?0:Math.PI;if(v.home){if(v.gt&&v.gt.G.users.get(v)===true)v.gt.G.users.delete(v);v.gx=A.pool[0];v.gz=A.pool[1];v.ghd=null}else{const g=this.parkSpot(v,v.wx,v.wz,fwd+v.jit);v.gx=g[0];v.gz=g[1];v.ghd=fwd+v.jit}if(!v.hold)this.planOr(v,true)},
+ /* where a vehicle stops: as near its order's place as there is clear ground with room for the hull to turn on the spot, and far enough
+    from every other hull (standing there, or bound for its own place) that each of them can turn where it stands too */
+ parkSpot(v,x,z,hd){const B=this.VB[v.tier],r2=this.hd2(v)+this.MP+.1;x=clamp(x,-XMAX,XMAX);z=clamp(z,-34,34);if(!this.navOn)return [x,z];
+  const gates=Object.values(this.sides).map(S=>S.gate).filter(Boolean),off=(px,pz)=>gates.every(g=>(px-g[0])*(px-g[0])+(pz-g[1])*(pz-g[1])>225),
+   keep=(px,pz)=>Math.abs(px)<=XMAX&&Math.abs(pz)<=36&&Math.abs(pz-gateZ(px))>7&&off(px,pz),room=(px,pz)=>keep(px,pz)&&this.spread(v,px,pz);   // in the field, off the road, clear of both gates
+  return NAV.free(x,z,r2,14,(px,pz)=>room(px,pz)&&!this.soldIn(px,pz,hd,B,.6))||NAV.free(x,z,r2,24,room)||
+   NAV.free(x,z,B[1]+.5,24,(px,pz)=>keep(px,pz)&&NAV.hullClear(px,pz,B[0],B[1],hd,this.MP)&&!this.clash(v,px,pz,hd,.9))||[off(x,z)?x:clamp(x,16-GATE,GATE-16),z]},
+ MP:.12,mp:.12,                                                                                    // what the planner keeps between a hull and anything solid (m)
+ hd2(v){const B=this.VB[v.tier];return Math.hypot(B[0],B[1])},                               // half the diagonal: the circle a hull sweeps turning on the spot
+ spread(v,x,z){const r=this.hd2(v),near=(o,px,pz)=>{const d=r+this.hd2(o)+.3;return (px-x)*(px-x)+(pz-z)*(pz-z)<d*d};             // held hulls are still in the shed: only where they are bound counts
+  for(const k in this.sides)for(const o of this.sides[k].veh){if(o===v)continue;if(!o.hold&&near(o,o.x,o.z))return false;if(o.mv&&!o.home&&!o.dead&&o.gx!=null&&near(o,o.gx,o.gz))return false}
+  for(const o of this.trucks){if(o===v||!o.on)continue;if(!o.hold&&near(o,o.x,o.z))return false;if(o.mv&&!o.home&&o.gx!=null&&near(o,o.gx,o.gz))return false}return true},
+ clash(v,x,z,hd,pad){const B=this.VB[v.tier];for(const o of this.movers()){if(o===v)continue;const b=this.VB[o.tier];if(NAV.obb(x,z,hd,B[0],B[1],o.x,o.z,o.hd,b[0],b[1],pad))return true;if(o.mv&&!o.home&&o.gx!=null&&NAV.obb(x,z,hd,B[0],B[1],o.gx,o.gz,o.ghd==null?o.hd:o.ghd,b[0],b[1],pad))return true}return false},
+ soldIn(x,z,hd,B,pad){for(const k in this.sides)for(const s of this.sides[k].sold){if(s.st===ST.DIE||s.mv===2||s.held)continue;const px=s.mv?s.tx:s.x,pz=s.mv?s.tz:s.z;if(NAV.inBox(px,pz,x,z,hd,B[0],B[1],pad))return true}
+  if(window.GFX6&&GFX6.RB.ready)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs)){const px=o.mv?o.tx:o.x,pz=o.mv?o.tz:o.z;if(NAV.inBox(px,pz,x,z,hd,B[0],B[1],pad+.2))return true}}return false},
+ sideOf(v){return v.A||this.sides[v.team]},
+ /* the route: A* through ground with room for the hull's width, pulled straight, then driven as moves (straight 'L', arc 'A', turn on the
+    spot 'P') and every pose of the whole hull along them checked against everything solid; a corner where the hull has no room to swing
+    round is moved to where it has. With no way on from where it stands (stopped half-way through a turn in a narrow place) it backs up
+    the way it came to the last place it had room to turn, and is routed on from there. Nothing changes on the vehicle unless a route is found. */
+ vehPlan(v,extra){const B=this.VB[v.tier];this.mp=!this.navOn||NAV.hullEdge(v.x,v.z,B[0],B[1],v.hd,this.MP)?this.MP:-.04;let R=this.vehFrom(v,{x:v.x,z:v.z,hd:v.hd},extra);
+  if(!R&&this.navOn){const b=this.vehBack(v,extra);if(b){const R2=this.vehFrom(v,b,extra);if(R2){R=[b.o].concat(R2);v.trail.length=b.i+1}}}
+  this.mp=this.MP;if(!R)return false;
+  let s=0;for(const o of R){o.s0=s;s+=o.len}v.ops=R;v.oi=0;v.os=0;v.wait=0;v.blk=null;v.retry=0;v.solid=false;this.gateOf(v);return true},
+ planOr(v,keep){if(this.vehPlan(v)){v.later=0;return}const t=vt();if(keep&&v.ops&&v.oi<v.ops.length&&!v.retry){v.later=t+1500;return}v.ops=[];v.oi=0;v.os=0;v.spd=0;v.later=0;v.retry=t+1500},
+ vehFrom(v,st,extra){if(!this.navOn)return this.vehOps(v,st,[[st.x,st.z],[v.gx,v.gz]],null,false,true).ops;const B=this.VB[v.tier];
+  for(const r of [B[1]+.45,B[1]+.3]){const W=this.vehWays(v,st.x,st.z,r,extra);if(!W)continue;const R=this.vehRoute(v,st,W,extra);if(R)return R}return null},
+ /* waypoints from (x, z) to the goal: A* legs joined through the openings a route has to pass straight along their axis, the shed's
+    doorway and the base's front gate. Their points carry .lock, the one line along which a repair may slide them. */
+ vehWays(v,x,z,r,extra){const A=this.sideOf(v),S=A&&A.shed,B=this.VB[v.tier],turn=this.hd2(v)+this.MP+.1,D=A?A.dir:1,s0=[x,z],g=[v.gx,v.gz];
+  const inBase=(px,pz)=>!!A&&D*px>GATE-.5&&Math.abs(pz)<30,inShed=(px,pz)=>!!S&&Math.abs(px-S.x)<S.hw+.5&&pz<S.door+.5&&pz>S.door-15;
+  const gz=gateZ(D*GATE),I=[D*(GATE+B[0]+2.5),gz],O=[D*(GATE-B[0]-2.5),gz],E=S?[S.x,S.door+B[0]+1.5]:null;I.lock=O.lock=[1,0];if(E)E.lock=[0,1];
+  const sB=inBase(x,z),gB=inBase(g[0],g[1]),sS=inShed(x,z),gS=inShed(g[0],g[1]),chain=[s0];
+  if(sS&&!gS)chain.push(E);if(sB&&!gB)chain.push(I,O);else if(!sB&&gB)chain.push(O,I);if(gS&&!sS)chain.push(E);chain.push(g);
+  const W=[s0];
+  for(let k=1;k<chain.length;k++){const a=chain[k-1],b=chain[k];
+   if(a===s0&&b===E||a===E&&b===g||a===I&&b===O||a===O&&b===I){W.push(b);continue}                               // straight through the opening
+   const P=NAV.path(a[0],a[1],b[0],b[1],r,{extra,turn});if(!P)return null;for(let i=1;i<P.length-1;i++)W.push([P[i][0],P[i][1]]);W.push(b)}
+  return W},
+ vehBack(v,extra){const T=v.trail;if(!T||T.length<2)return null;const r2=this.hd2(v)+this.MP+.1;
+  for(let i=T.length-2;i>=0;i--){const p=T[i];if(NAV.clear(p[0],p[1])<r2||extra&&extra.some(sh=>NAV.inShape(sh,p[0],p[1],r2)))continue;
+   const pts=[[v.x,v.z,v.hd]];for(let j=T.length-1;j>=i;j--)pts.push(T[j]);const o={k:'T',pts,L:[0],len:0};
+   for(let j=1;j<pts.length;j++){const a=pts[j-1],b=pts[j];o.len+=Math.hypot(b[0]-a[0],b[1]-a[1])+Math.abs(wrapA(b[2]-a[2]))*this.hd2(v);o.L.push(o.len)}
+   if(o.len<.05||this.opRoom(v,o,Math.min(this.mp,this.MP-.08),extra)>=0)continue;return {o,x:p[0],z:p[1],hd:p[2],i}}
+  return null},
+ vehRoute(v,st,W,extra){const Q=[W[0]];for(let i=1;i<W.length;i++){const q=Q[Q.length-1];if(Math.hypot(W[i][0]-q[0],W[i][1]-q[1])>.2||W[i].lock)Q.push(W[i])}
+  let rev=false;const tried=new Set();
+  for(let it=0;it<24;it++){const r=this.vehOps(v,st,Q,extra,rev);if(r.ops)return r.ops;const f=this.vehFix(v,st,Q,r.bad,extra,tried);if(!f)return null;if(f.start)rev=f.rev}
+  return null},
+ /* the moves along waypoints Q, or {bad: the waypoint where the hull has no room}. rev: the first leg is driven backwards */
+ vehOps(v,st,Q,extra,rev,loose){const R=[4.2,5.5,7,6][v.tier],m=this.mp,r2=this.hd2(v),ops=[],hdOf=(a,c)=>Math.atan2(-(c[1]-a[1]),c[0]-a[0]),
+   room=o=>loose||this.opRoom(v,o,m,extra)<0,piv=(x,z,h0,h1)=>{const th=wrapA(h1-h0);return Math.abs(th)>.03?{k:'P',x,z,h0,th,len:Math.abs(th)*r2}:null};
+  let cur=[Q[0][0],Q[0][1]],h=st.hd;
+  for(let i=1;i<Q.length;i++){const p=Q[i],lin=Math.hypot(p[0]-cur[0],p[1]-cur[1]);if(lin<.05)continue;
+   const hIn=hdOf(cur,p),back=rev&&i===1,hb=back?wrapA(hIn+Math.PI):hIn,t0=piv(cur[0],cur[1],h,hb);
+   if(t0){if(!room(t0))return {bad:i-1};ops.push(t0)}h=hb;
+   if(!back&&i<Q.length-1){const nx=Q[i+1],lo=Math.hypot(nx[0]-p[0],nx[1]-p[1]),hOut=hdOf(p,nx),th=wrapA(hOut-hIn),ath=Math.abs(th);
+    if(ath>.03&&ath<2.2&&lo>.05){let r=R,tl=r*Math.tan(ath/2);const tm=Math.min(lin*.9,lo*.45);if(tl>tm){tl=tm;r=tl/Math.tan(ath/2)}
+     if(r>=2.4){const a=this.arcOps(cur,p,hIn,th,r,tl);if((a.pre<.05||room(a.L))&&room(a.op)){if(a.pre>=.05)ops.push(a.L);ops.push(a.op);cur=a.end;h=hOut;continue}}}}
+   const L={k:'L',ax:cur[0],az:cur[1],h:hIn,len:lin,rev:back},f=loose?-1:this.opRoom(v,L,m,extra);
+   if(f>=0)return {bad:f<.5?i-1:i};
+   ops.push(L);cur=[p[0],p[1]]}
+  if(v.ghd!=null){const t1=piv(cur[0],cur[1],h,v.ghd);if(t1&&room(t1))ops.push(t1)}                               // no room to turn into its lane: it stays as it came in
+  return {ops}},
+ /* make room at waypoint i: the start (drive ahead or back along the hull first), the end (a stop nearby), or a corner (slid along either
+    leg, or along its lock; then anywhere near): never twice to the same place */
+ vehFix(v,st,Q,i,extra,tried){const B=this.VB[v.tier],r2=this.hd2(v)+this.MP+.1,rl=B[1]+.3,n=Q.length,
+   ok=(x,z)=>NAV.clear(x,z)>=r2&&!(extra&&extra.some(sh=>NAV.inShape(sh,x,z,r2))),key=(x,z)=>i+':'+Math.round(x*2)+','+Math.round(z*2),fresh=(x,z)=>!tried.has(key(x,z));
+  if(i<=0){if(tried.has('start'))return null;tried.add('start');const c=Math.cos(st.hd),s=-Math.sin(st.hd),g=Q[n-1];
+   for(let d=1;d<=20;d+=.5)for(const sg of [1,-1]){const x=Q[0][0]+c*d*sg,z=Q[0][1]+s*d*sg;if(!ok(x,z))continue;
+    if(this.opRoom(v,{k:'L',ax:Q[0][0],az:Q[0][1],h:sg>0?st.hd:wrapA(st.hd+Math.PI),len:d,rev:sg<0},this.mp,extra)>=0)continue;
+    const W=this.vehWays(v,x,z,rl,extra);if(!W)continue;const s0=Q[0];Q.length=0;W[0].lock=[c,s];Q.push(s0);for(const w of W)Q.push(w);return {start:true,rev:sg<0}}   // the first corner stays on the hull's axis
+   return null}
+  if(i>=n-1){if(Q[n-1].lock||v.home)return null;const a=Q[n-2],q=NAV.free(Q[n-1][0],Q[n-1][1],r2,12,(x,z)=>fresh(x,z)&&NAV.lineClear(a[0],a[1],x,z,rl)&&this.spread(v,x,z));
+   if(!q)return null;tried.add(key(q[0],q[1]));Q[n-1]=q;v.gx=q[0];v.gz=q[1];return {}}
+  const a=Q[i-1],p=Q[i],b=Q[i+1],li=Math.hypot(p[0]-a[0],p[1]-a[1])||1,lo=Math.hypot(b[0]-p[0],b[1]-p[1])||1,ui=[(p[0]-a[0])/li,(p[1]-a[1])/li],uo=[(b[0]-p[0])/lo,(b[1]-p[1])/lo],
+   D=p.lock?[[p.lock,99,-1],[p.lock,99,1]]:[[ui,li,-1],[uo,99,-1],[ui,99,1],[uo,lo,1]],put=(x,z)=>{const q=[x,z];if(p.lock)q.lock=p.lock;tried.add(key(x,z));Q[i]=q;return {}};
+  for(let d=.5;d<=16;d+=.5)for(const [u,lim,sg] of D){if(d>lim-.3)continue;const x=p[0]+u[0]*d*sg,z=p[1]+u[1]*d*sg;if(!fresh(x,z)||!ok(x,z))continue;
+   if(!NAV.lineClear(a[0],a[1],x,z,rl)||!NAV.lineClear(x,z,b[0],b[1],rl))continue;return put(x,z)}
+  if(p.lock)return null;
+  const q=NAV.free(p[0],p[1],r2,16,(x,z)=>fresh(x,z)&&NAV.lineClear(a[0],a[1],x,z,rl)&&NAV.lineClear(x,z,b[0],b[1],rl));if(q)return put(q[0],q[1]);
+  return null},
+ /* a turn of radius r round the corner at p: the straight up to it, the arc, and where the arc ends */
+ arcOps(a,p,h,th,r,tl){const sg=Math.sign(th),c=Math.cos(h),s=-Math.sin(h),t1=[p[0]-c*tl,p[1]-s*tl],cx=t1[0]-sg*r*Math.sin(h),cz=t1[1]-sg*r*Math.cos(h),h1=h+th;
+  return {pre:Math.hypot(t1[0]-a[0],t1[1]-a[1]),L:{k:'L',ax:a[0],az:a[1],h,len:Math.hypot(t1[0]-a[0],t1[1]-a[1])},op:{k:'A',cx,cz,r,sg,h0:h,th,len:r*Math.abs(th)},end:[cx+sg*r*Math.sin(h1),cz+sg*r*Math.cos(h1)]}},
+ opPos(o,os,out){if(o.k==='T'){const L=o.L,s=clamp(os,0,o.len);let j=1;while(j<L.length-1&&L[j]<s)j++;const a=o.pts[j-1],b=o.pts[j],f=clamp((s-L[j-1])/((L[j]-L[j-1])||1),0,1);out[0]=a[0]+(b[0]-a[0])*f;out[1]=a[1]+(b[1]-a[1])*f;out[2]=a[2]+wrapA(b[2]-a[2])*f;return out}
+  const f=o.len>0?clamp(os/o.len,0,1):1;
+  if(o.k==='L'){const c=Math.cos(o.h),s=-Math.sin(o.h),d=f*o.len;out[0]=o.ax+c*d;out[1]=o.az+s*d;out[2]=o.rev?wrapA(o.h+Math.PI):o.h}
+  else if(o.k==='A'){const e=o.h0+o.th*f;out[0]=o.cx+o.sg*o.r*Math.sin(e);out[1]=o.cz+o.sg*o.r*Math.cos(e);out[2]=e}
+  else{out[0]=o.x;out[1]=o.z;out[2]=o.h0+o.th*f}return out},
+ /* the whole hull has room (margin m) at every pose of a move, a quarter metre apart (for a turn on the spot: a quarter metre at its
+    corners); -1, or how far along the first pose without room is */
+ opRoom(v,o,m,extra,from){const B=this.VB[v.tier],q=this.P5||(this.P5=[0,0,0]),s0=from||0,n=Math.max(1,Math.ceil((o.len-s0)/.25));
+  for(let i=0;i<=n;i++){const s=s0+(o.len-s0)*i/n;this.opPos(o,s,q);if(!NAV.hullEdge(q[0],q[1],B[0],B[1],q[2],m,extra))return o.len>0?s/o.len:0}return -1},
+ ahead(v,ds,out){const ops=v.ops;let i=v.oi,s=v.os+ds;while(i<ops.length-1&&s>ops[i].len){s-=ops[i].len;i++}const o=ops[Math.min(i,ops.length-1)];return this.opPos(o,Math.min(s,o.len),out)},
+ /* the gate in a base's wall takes one way of traffic at a time: hulls going out leave the motor pool only while nothing is coming in,
+    and hulls coming home wait short of the base while anything is going out */
+ gateQ(A){return A&&A.gate?(A.gq||(A.gq={x:A.gate[0],z:A.gate[1],users:new Map()})):null},
+ gateCan(G,out){for(const o of G.users.values())if(o!==out)return false;return true},
+ gateOf(v){const G=this.gateQ(this.sideOf(v));v.gt=null;if(!G)return;const r=7+this.VB[v.tier][0],q=this.P7||(this.P7=[0,0,0]);let s0=-1,s1=-1;
+  let sides=0;for(const o of v.ops){const n=Math.max(1,Math.ceil(o.len/.5));for(let k=0;k<=n;k++){this.opPos(o,o.len*k/n,q);if((q[0]-G.x)*(q[0]-G.x)+(q[1]-G.z)*(q[1]-G.z)<r*r){const s=o.s0+o.len*k/n;if(s0<0)s0=s;s1=s;sides|=q[0]<G.x?1:2}}}
+  if(sides!==3)s0=-1;                                                                                                   // only a route through the gate needs it
+  const S=this.sideOf(v).shed;v.dk=null;if(S){const B=this.VB[v.tier];let a=-1,b=-1;for(const o of v.ops){const n=Math.max(1,Math.ceil(o.len/.4));for(let k=0;k<=n;k++){this.opPos(o,o.len*k/n,q);if(NAV.obb(q[0],q[1],q[2],B[0]+.6,B[1]+.6,S.x,S.door,0,S.hw,.3,0)){const s=o.s0+o.len*k/n;if(a<0)a=s;b=s}}}if(a>=0)v.dk=[a,b]}
+  if(s0<0){if(G.users.get(v)===true)G.users.delete(v);return}v.gt={G,s0,s1}},
+ gateFree(v){const G=this.gateQ(this.sideOf(v));if(G)G.users.delete(v)},
+ gateTick(){for(const k in this.sides){const A=this.sides[k],G=A.gq,gone=u=>u.dead||u.done||(u.tier===3?!u.on:!A.veh.includes(u));if(G&&G.users.size)for(const u of [...G.users.keys()])if(u.hold||gone(u))G.users.delete(u);
+   const S=A.shed;if(!S)continue;if(S.user&&(gone(S.user)||S.user.hold))S.user=null;const u=S.user;let want=false;
+   if(u&&!u.inShed&&u.dk){const s=u.ops&&u.oi<u.ops.length?u.ops[u.oi].s0+u.os:-1;want=s>=u.dk[0]-16&&s<=u.dk[1]+.2}                   // the shed's door is up while its one hull is in the doorway or coming to it
+   S.open=clamp(S.open+(want?1:-1)*(vt()-(S.t||vt()))/1300,0,1);S.t=vt();if(u&&u.inShed&&S.open<=0){u.done=true;S.user=null}}},
+ /* out of the motor pool: when no hull is near enough to be in the way of its first turn, nothing is coming in through the gate, and it has a way */
+ release(v,t){if(t<(v.relT||0))return false;v.relT=t+350;const A=this.sideOf(v),G=this.gateQ(A),S=A&&A.shed;if(S&&S.user&&S.user!==v||!this.spread(v,v.x,v.z)||G&&!this.gateCan(G,true))return false;
+  if(S&&this.movers().some(o=>o!==v&&o.home&&!o.dead&&this.sideOf(o)===A&&(o.x-S.x)*(o.x-S.x)+(o.z-S.door)*(o.z-S.door)<1600))return false;
+  if(!this.vehPlan(v)){v.relT=t+1500;return false}v.hold=false;v.inShed=false;if(G&&v.gt)G.users.set(v,true);if(S)S.user=v;return true},
+ /* an order pulled: a hull still in the shed stays in it (the door comes down), one on its way out of the base drives on out of the gate
+    first (nothing turns round inside the base), the rest drive home */
+ recall(A,v,go){v.mv=2;v.home=true;const S=A.shed,s=v.ops&&v.oi<v.ops.length?v.ops[v.oi].s0+v.os:0;
+  if(S&&S.user===v&&v.dk&&s<v.dk[0]){v.inShed=true;v.ops=null;v.spd=0;return}
+  if(v.gt&&v.gt.G.users.get(v)===true){v.recall=true;return}
+  go.push(v)},
+ /* one step along the route: turn on the spot or drive (gathering speed, braking for the end and for a gate it has to wait at), never into
+    another hull, a soldier, a machine or anything solid */
+ vehFollow(v,dt,t){const ops=v.ops;
+  if(v.stand){v.spd=0;const G=this.gateQ(this.sideOf(v));if(t>(v.bayT||0)&&(!G||this.gateCan(G,false))){v.bayT=t+1200;v.stand=false;this.navSync(true);v.bay=false;if(G)G.users.set(v,false);this.vehGo(this.sideOf(v),v);if(!v.ops||!v.ops.length){v.stand=true;v.bay=true;if(G)G.users.delete(v)}}return}
+  if(!ops||v.oi>=ops.length){if(v.resumeT){v.spd=0;if(t<v.resumeT)return;v.resumeT=0;if(!this.vehPlan(v)){v.ops=[];v.retry=t+1500}return}
+   if(v.retry){if(v.recall){v.recall=false;v.retry=0;this.vehGo(this.sideOf(v),v);return}if(t>=v.retry&&!this.vehPlan(v)){v.retry=t+1500;v.fails=(v.fails||0)+1;if(!v.home&&v.fails%2===0&&v.wx!=null){const g=this.parkSpot(v,v.wx,v.wz,v.ghd!=null?v.ghd:v.hd);v.gx=g[0];v.gz=g[1]}}v.spd=0;return}this.vehArrive(v);return}
+  if(v.later&&t>=v.later){v.later=0;if(this.vehPlan(v))return;v.later=t+1500}
+  const op=ops[v.oi],q=this.P4||(this.P4=[0,0,0]),gt=v.gt;
+  if(op.k==='P'){
+   if(this.vehBlocked(v,0,t)){v.spd=0;v.wait+=dt;if(v.wait>(v.solid?.8:2.6))this.vehReplan(v,t);return}
+   v.wait=0;v.spd=0;v.os=Math.min(op.len,v.os+[1.15,.95,.75,1.0][v.tier]*this.hd2(v)*dt);this.opPos(op,v.os,q);v.x=q[0];v.z=q[1];v.hd=q[2];this.trailAdd(v);
+   if(v.os>=op.len-1e-6){v.oi++;v.os=0;if(v.oi>=ops.length)this.vehArrive(v)}return}
+  let lim=1e9;const s=op.s0+v.os;
+  if(gt&&!gt.G.users.has(v)&&s<gt.s1){const out=!v.home,w=gt.s0-(out?1:14);if(this.gateCan(gt.G,out)){if(s>=w-8)gt.G.users.set(v,out)}
+   else if(!out&&!v.bay&&s<gt.s0-1&&t>(v.bayT||0)&&this.toBay(v,t))return;else lim=w-s}
+  const S=v.dk&&this.sideOf(v).shed;if(S&&s<v.dk[1]){if(S.user!==v){const w=v.dk[0]-18;if(!S.user&&s>=w-10)S.user=v;else if(S.user)lim=Math.min(lim,w-s)}if(S.user===v&&S.open<.98)lim=Math.min(lim,v.dk[0]-.3-s)}
+  if(lim<=.05){v.spd=0;return}
+  const back=o=>!!(o.rev||o.k==='T');let rest=op.len-v.os;for(let j=v.oi+1;j<ops.length&&ops[j].k!=='P'&&back(ops[j])===back(op);j++)rest+=ops[j].len;if(lim<rest)rest=lim;   // brakes for a turn on the spot, a change of direction and the end
+  const vmax=op.rev||op.k==='T'?3:v.tier===3?(v.home?11:13):(v.mv===2?8.5:7),acc=v.tier===3?4.5:3.2,sp=Math.min(vmax,Math.sqrt(2*acc*Math.max(0,rest))+.4,v.spd+acc*dt);
+  if(this.vehBlocked(v,sp,t)){v.spd=0;v.wait+=dt;if(v.wait>(v.solid?.8:2.6))this.vehReplan(v,t);return}
+  v.wait=0;v.spd=sp;v.os+=Math.min(sp*dt,lim);
+  while(v.oi<ops.length&&ops[v.oi].k!=='P'&&v.os>=ops[v.oi].len){v.os-=ops[v.oi].len;v.oi++}
+  if(v.oi<ops.length&&ops[v.oi].k==='P')v.os=0;
+  if(v.oi<ops.length)this.opPos(ops[v.oi],v.os,q);else this.opPos(ops[ops.length-1],ops[ops.length-1].len,q);v.x=q[0];v.z=q[1];v.hd=q[2];if(op.k!=='T')this.trailAdd(v);
+  const s2=v.oi<ops.length?ops[v.oi].s0+v.os:1e9;
+  if(S&&S.user===v&&!v.home&&s2>v.dk[1])S.user=null;                                                                   // out of the doorway: the next one may come
+  if(gt&&gt.G.users.get(v)===true&&s2>gt.s1){gt.G.users.delete(v);if(v.recall){v.recall=false;this.vehGo(this.sideOf(v),v);return}}
+  if(v.oi>=ops.length)this.vehArrive(v)},
+ trailAdd(v){const T=v.trail||(v.trail=[]),l=T[T.length-1];if(!l||Math.abs(v.x-l[0])+Math.abs(v.z-l[1])>.5||Math.abs(wrapA(v.hd-l[2]))>.2){T.push([v.x,v.z,v.hd]);if(T.length>70)T.shift()}},
+ /* the holding bay: a stop off the road some way in front of the base, where a hull coming home waits while the gate is busy */
+ toBay(v,t){const A=this.sideOf(v),D=A.dir,x=D*(GATE-26);v.bayT=t+1500;
+  for(const sg of v.z<gateZ(x)?[-1,1]:[1,-1]){const z=gateZ(x)+sg*14,p=this.parkSpot(v,x,z,v.hd);if(Math.abs(p[0]-x)>16||Math.abs(p[1]-gateZ(p[0]))<7)continue;
+   v.bay=true;v.gx=p[0];v.gz=p[1];if(this.vehPlan(v))return true;v.bay=false;v.gx=A.pool[0];v.gz=A.pool[1]}return false},
+ vehArrive(v){v.spd=0;v.ops=null;v.retry=0;v.la1=v.la2=null;if(v.bay){v.stand=true;v.ops=[];this.navDirty=true;return}{const A=this.sideOf(v);if(!v.home&&A&&A.dir*v.x>GATE-1&&Math.hypot(v.x-v.gx,v.z-v.gz)>3){v.ops=[];v.retry=vt()+600;return}}if(v.recall){v.recall=false;this.vehGo(this.sideOf(v),v);return}if(v.later){v.later=0;if(!this.vehPlan(v)){v.ops=[];v.retry=vt()+1500}return}if(v.home){const S=this.sideOf(v).shed;if(S&&S.user===v){v.inShed=true;return}v.done=true;this.gateFree(v);return}if(v.gt&&v.gt.G.users.get(v)===true)v.gt.G.users.delete(v);v.mv=0;v.gx=v.x;v.gz=v.z;this.navDirty=true},
+ /* the ground the hull covers in the next moment (turning on the spot: the next few degrees of the turn): another hull there stops it
+    (unless the two already touch and it is drawing off), a soldier or a machine there stops it and is asked to step aside, and so does
+    anything solid built across the route since it was planned */
+ vehBlocked(v,sp,t){const B=this.VB[v.tier],op=v.ops[v.oi],piv=op.k==='P',la=1.2+sp*.9,P1=this.ahead(v,piv?Math.min(.9,op.len-v.os):la*.5,this.Pa||(this.Pa=[0,0,0])),P2=piv?P1:this.ahead(v,la,this.Pb||(this.Pb=[0,0,0]));let hit=false;v.blk=null;v.solid=false;
+  const L1=v.la1||(v.la1=[0,0,0]),L2=v.la2||(v.la2=[0,0,0]);L1[0]=P1[0];L1[1]=P1[1];L1[2]=P1[2];L2[0]=P2[0];L2[1]=P2[1];L2[2]=P2[2];v.laT=t;   // where it is about to be
+  for(const o of this.movers()){if(o===v||Math.abs(o.x-v.x)>24||Math.abs(o.z-v.z)>24)continue;const b=this.VB[o.tier];
+   if(!NAV.obb(P1[0],P1[1],P1[2],B[0],B[1],o.x,o.z,o.hd,b[0],b[1],.25)&&!NAV.obb(P2[0],P2[1],P2[2],B[0],B[1],o.x,o.z,o.hd,b[0],b[1],.25))continue;
+   if(NAV.obb(v.x,v.z,v.hd,B[0],B[1],o.x,o.z,o.hd,b[0],b[1],.02)&&Math.hypot(P2[0]-o.x,P2[1]-o.z)>Math.hypot(v.x-o.x,v.z-o.z)+.01)continue;
+   v.blk=o;return true}
+  for(const k in this.sides)for(const so of this.sides[k].sold){if(so.st===ST.DIE||so.held||Math.abs(so.x-v.x)>16||Math.abs(so.z-v.z)>16)continue;
+   if(NAV.inBox(so.x,so.z,P1[0],P1[1],P1[2],B[0],B[1],.45)||NAV.inBox(so.x,so.z,P2[0],P2[1],P2[2],B[0],B[1],.45)){hit=true;if(!(so.dodge>t)&&(!so.mv||v.wait>1.5||t-(so.frzT||-1e9)<400))this.dodge(so,v,t)}}
+  if(window.GFX6&&GFX6.RB.ready)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs)){if(Math.abs(o.x-v.x)>16||Math.abs(o.z-v.z)>16)continue;
+   if(NAV.inBox(o.x,o.z,P1[0],P1[1],P1[2],B[0],B[1],.6)||NAV.inBox(o.x,o.z,P2[0],P2[1],P2[2],B[0],B[1],.6)){hit=true;if(!(o.dodge>t)&&(!o.mv||v.wait>1.5||t-(o.frzT||-1e9)<400))GFX6.dodge(o,v,t)}}}
+  if(!hit&&this.navOn&&!NAV.hullEdge(P1[0],P1[1],B[0],B[1],P1[2],-.05)&&NAV.hullEdge(v.x,v.z,B[0],B[1],v.hd,-.05)){v.solid=true;return true}
+  return hit},
+ /* stuck behind something for a while: a way round it (the one of two hulls nose to nose that gives way finds it), or wait on */
+ vehReplan(v,t){const o=v.blk;v.wait=0;if(o&&o.mv&&o.blk===v&&o.pri>v.pri)return;const extra=[];if(o){const b=this.VB[o.tier];extra.push(NAV.box(o.x,o.z,b[0]+.4,b[1]+.4,o.hd,'veh'))}
+  if(this.vehPlan(v,extra)||!o||!o.mv)return;const T=v.trail;if(!T||T.length<3)return;
+  const pts=[[v.x,v.z,v.hd]];let d=0;for(let j=T.length-1;j>=0&&d<7;j--){const a=pts[pts.length-1],b=T[j];d+=Math.hypot(b[0]-a[0],b[1]-a[1]);pts.push(b)}
+  const y={k:'T',pts,L:[0],len:0};for(let j=1;j<pts.length;j++){const a=pts[j-1],b=pts[j];y.len+=Math.hypot(b[0]-a[0],b[1]-a[1])+Math.abs(wrapA(b[2]-a[2]))*this.hd2(v);y.L.push(y.len)}
+  if(y.len<1||this.opRoom(v,y,this.MP-.08)>=0)return;y.s0=0;v.ops=[y];v.oi=0;v.os=0;v.trail.length=Math.max(1,T.length-pts.length+1);v.resumeT=t+2400+Math.random()*1200},
+ /* the rest of a route still has room for the hull, checked when the ground changed (only near what was added to it) */
+ opsClear(v){const add=this.navAdd;if(!add||!add.length||!v.ops)return true;const r=this.hd2(v)+1,q=this.P7||(this.P7=[0,0,0]);let near=false;
+  for(let i=v.oi;i<v.ops.length&&!near;i++){const o=v.ops[i],n=Math.max(1,Math.ceil(o.len/2));for(let k=0;k<=n&&!near;k++){this.opPos(o,o.len*k/n,q);for(const b of add)if(q[0]>b[0]-r&&q[0]<b[2]+r&&q[1]>b[1]-r&&q[1]<b[3]+r){near=true;break}}}
+  if(!near)return true;for(let i=v.oi;i<v.ops.length;i++)if(this.opRoom(v,v.ops[i],this.MP-.06,null,i===v.oi?Math.min(v.os,v.ops[i].len):0)>=0)return false;return true},
+ /* hulls ride the ground: pitch and roll from the terrain under their four ends */
+ align(v){const B=this.VB[v.tier],c=Math.cos(v.hd),s=-Math.sin(v.hd),ex=B[0]*.8,ez=B[1]*.8;
+  const hf=this.gy(v.x+c*ex,v.z+s*ex),hb=this.gy(v.x-c*ex,v.z-s*ex),hr=this.gy(v.x-s*ez,v.z+c*ez),hl=this.gy(v.x+s*ez,v.z-c*ez),h0=this.gy(v.x,v.z);
+  v.y=Math.max((hf+hb+hr+hl)/4,h0-.05);v.pitch=Math.atan2(hf-hb,2*ex);v.roll=Math.atan2(hl-hr,2*ez)},
+ vehTick(A,dt,t){const d=this.vd||(this.vd=new THREE.Object3D()),fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0,fwd=A.dir<0?0:Math.PI,n=[0,0],q=this.vq||(this.vq=new THREE.Quaternion()),qa=this.vqa||(this.vqa=new THREE.Quaternion()),UP=this.vup||(this.vup=new THREE.Vector3(0,1,0));let ns=0;d.rotation.order='YZX';
   for(let i=A.veh.length-1;i>=0;i--){const v=A.veh[i];
-   if(v.mv){const f=clamp((t-v.t0)/1000/v.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2;v.x=v.x0+(v.tx-v.x0)*e;v.z=v.z0+(v.tz-v.z0)*e;v.gyT=0;if(f<1&&PREF.layers.fx&&Math.random()<.22*FX.K)FX.dustPuff(v.x+(v.tx>v.x0?-1:1)*2.6*v.sc,v.z,1);if(f>=1){if(v.legs&&v.legs.length)this.leg(v,v.legs.shift(),t);else if(v.mv===2){A.veh.splice(i,1);continue}else v.mv=0}}
-   if(v.dead){const el=t-v.dead;if(el>26000){A.veh.splice(i,1);continue}if(PREF.layers.fx&&el<18000&&Math.random()<.09*FX.K)FX.smoke(v.x,v.y+1.7*v.sc,v.z,1,3.4)}
-   if(!(v.gyT>t)){v.y=this.gy(v.x,v.z);v.gyT=t+2500}
-   const k=n[v.cls]++,S2=A.tk[v.cls],sink=v.dead?Math.max(0,(t-v.dead-20000)/6000)*2.4*v.sc:0,tilt=v.dead?.07:0;
-   const hd=v.mv&&Math.hypot(v.tx-v.x0,v.tz-v.z0)>1?Math.atan2(-(v.tz-v.z0),v.tx-v.x0):fwd+v.jit;if(v.hd==null)v.hd=hd;v.hd+=wrapA(hd-v.hd)*Math.min(1,dt*3.2);const rev=v.hd-fwd;
-   d.position.set(v.x,v.y-sink,v.z);d.rotation.set(0,v.hd,tilt);d.scale.setScalar(v.sc);d.updateMatrix();S2.hull.setMatrixAt(k,d.matrix);
-   if(!v.dead){const want=t<v.aimT?wrapA(v.aimY-fwd-rev):clamp(Math.atan2(-(v.z*.08),Math.max(4,Math.abs(fx-v.x))),-.35,.35)*(A.dir<0?1:-1);v.aim+=wrapA(want-v.aim)*Math.min(1,dt*5)}
-   d.rotation.set(0,fwd+rev+v.aim,tilt);d.updateMatrix();S2.tur.setMatrixAt(k,d.matrix);
+   if(v.hold&&!this.release(v,t))continue;                                                  // still in the shed: waits for the yard to clear
+   if(v.done){A.veh.splice(i,1);continue}
+   if(v.mv&&!v.dead&&!v.inShed){this.vehFollow(v,dt,t);if(v.done){A.veh.splice(i,1);continue}if(v.spd>.6&&PREF.layers.fx&&Math.random()<.22*FX.K){const B=this.VB[v.tier];FX.dustPuff(v.x-Math.cos(v.hd)*B[0],v.z+Math.sin(v.hd)*B[0],1)}}
+   if(v.dead){const el=t-v.dead;if(el>26000){A.veh.splice(i,1);this.navDirty=true;continue}if(PREF.layers.fx&&el<18000&&Math.random()<.09*FX.K)FX.smoke(v.x,v.y+1.7*v.sc,v.z,1,3.4)}
+   if(v.mv||!(v.gyT>t)){this.align(v);v.gyT=t+2500}
+   const k=n[v.cls]++,S2=A.tk[v.cls],sink=v.dead?Math.max(0,(t-v.dead-20000)/6000)*2.4*v.sc:0;
+   d.position.set(v.x,v.y-sink,v.z);d.rotation.set(v.roll,v.hd,v.pitch+(v.dead?.07:0));d.scale.setScalar(v.sc);d.updateMatrix();S2.hull.setMatrixAt(k,d.matrix);
+   if(!v.dead){const want=t<v.aimT?wrapA(v.aimY-v.hd):wrapA(fwd-v.hd)+clamp(Math.atan2(-(v.z*.08),Math.max(4,Math.abs(fx-v.x))),-.35,.35)*(A.dir<0?1:-1);v.aim+=wrapA(want-v.aim)*Math.min(1,dt*5)}
+   q.setFromEuler(d.rotation);qa.setFromAxisAngle(UP,v.aim);q.multiply(qa);d.quaternion.copy(q);d.updateMatrix();S2.tur.setMatrixAt(k,d.matrix);
    const cc=v.dead?.13:v.tier===2?.62:1;this.tmpC.setRGB(cc,cc,cc);S2.hull.setColorAt(k,this.tmpC);S2.tur.setColorAt(k,this.tmpC);S2.fire.setX(k,v.fire);
    if(A.vsh&&!sink){d.position.set(v.x,v.y+.07,v.z);d.rotation.set(0,v.hd,0);d.scale.set(8.4*v.sc,1,5*v.sc);d.updateMatrix();A.vsh.setMatrixAt(ns++,d.matrix)}}
   A.tk.forEach((S2,c)=>{S2.hull.count=S2.tur.count=n[c];S2.hull.instanceMatrix.needsUpdate=S2.tur.instanceMatrix.needsUpdate=true;S2.hull.instanceColor.needsUpdate=S2.tur.instanceColor.needsUpdate=true;S2.fire.needsUpdate=true});
   if(A.vsh){A.vsh.count=ns;A.vsh.instanceMatrix.needsUpdate=true}},
- gy(x,z){return WORLD.hgt?WORLD.hgt(x,z):0},
+ /* the dynamic part of the ground: field works, and every hull standing still (parked, unloading or burning) */
+ navSync(force){if(!this.navOn)return;const t=vt(),L=this.works.slice();for(const o of this.movers())if(!o.mv||o.dead||o.stand){const b=this.VB[o.tier];L.push(NAV.box(o.x,o.z,b[0]+.1,b[1]+.1,o.hd,'veh'))}
+  const keys=L.map(sh=>sh.t+Math.round((sh.x!=null?sh.x:sh.ax)*4)+','+Math.round((sh.z!=null?sh.z:sh.az)*4)+','+Math.round((sh.hx||sh.r||0)*4)+','+Math.round((sh.rot||0)*20)),sig=keys.join(';');
+  if(sig===this.navSig){this.navDirty=false;return}if(!force&&t-this.navT<450)return;
+  const was=this.navKeys||new Set();this.navAdd=[];keys.forEach((k,i)=>{if(!was.has(k))this.navAdd.push(NAV.bounds(L[i]))});this.navKeys=new Set(keys);
+  this.navSig=sig;this.navDirty=false;this.navT=t;NAV.setDynamic(L);NAV.rebuild();this.navCheck(t)},
+ /* after the ground changed: soldiers standing in something step out of it; anyone whose way ahead was built on finds another */
+ navCheck(t){for(const k in this.sides){const A=this.sides[k];for(const s of A.sold){if(s.st===ST.DIE||s.held)continue;
+    if(!s.mv){if(NAV.clear(s.x,s.z)<.3){const p=NAV.free(s.x,s.z,.5,6,(x,z)=>!this.taken(x,z,s));if(p){s.mv=1;s.st=ST.WALK;s.sp=4;s.t0=t;this.route(A,s,p,t)}}}
+    else if(s.pl&&t>=s.t0){const P=s.pl;let ok=true;for(let i=1;i<P.length&&ok;i++)ok=NAV.lineClear(P[i-1][0],P[i-1][1],P[i][0],P[i][1],.28);if(!ok)this.route(A,s,[s.tx,s.tz],t,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+   for(const v of A.veh)if(v.mv&&v.ops&&v.ops.length&&!v.hold&&!v.dead&&!this.opsClear(v))this.planOr(v)}
+  for(const tr of this.trucks)if(tr.on&&tr.mv&&tr.ops&&tr.ops.length&&!tr.hold&&!this.opsClear(tr))this.planOr(tr);
+  if(window.GFX6&&GFX6.navCheck)GFX6.navCheck(t)},
+ gy(x,z){return WORLD.terrain?WORLD.meshH(x,z):WORLD.hgt?WORLD.hgt(x,z):0},
+ settle(x,z,r){const near=o=>Math.abs(o.x-x)<r&&Math.abs(o.z-z)<r;for(const k in this.sides){const A=this.sides[k];for(const s of A.sold)if(near(s))s.gyT=0;for(const v of A.veh)if(near(v))v.gyT=0}for(const tr of this.trucks)if(tr.on&&near(tr))tr.gyT=0;
+  if(window.GFX6&&GFX6.RB.sides)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs))if(near(o))o.gyT=0}},
  remove(A,s){const last=A.sold.pop();if(last!==s){A.sold[s.i]=last;last.i=s.i}},
- tick(dt){const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
+ tick(dt){this.gateTick();const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
   for(const k in this.sides){const A=this.sides[k],base=A.dir<0?0:Math.PI,cnt=[0,0,0,0];
    for(let i=A.sold.length-1;i>=0;i--){const s=A.sold[i];
-    if(s.mv){const f=clamp((t-s.t0)/1000/s.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2;s.x=s.x0+(s.tx-s.x0)*e;s.z=s.z0+(s.tz-s.z0)*e+Math.sin(e*Math.PI)*(s.cv||0);s.gyT=0;
-     if(f>=1){if(s.legs&&s.legs.length){this.leg(s,s.legs.shift(),t)}else if(s.mv===2){this.remove(A,s);continue}else{s.mv=0;s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}}
+    if(s.mv){if(t<s.t0)continue;if(s.held)s.held=false;const f=clamp((t-s.t0)/1000/s.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2;
+     if(s.pl){const P3=this.P3||(this.P3=[0,0,0]);this.along(s,e,P3);const nx=P3[0],nz=P3[1]+Math.sin(e*Math.PI)*(s.cv||0);
+      /* never into a vehicle: if the next step would be inside one, wait for it to pass */
+      const mo=this.navOn&&f<1?this.inWay(nx,nz,.35):null;if(mo&&!this.inWay(s.x,s.z,.35)){s.t0+=dt*1000;s.frz=(s.frz||0)+dt;s.frzT=t;if(s.frz>.9){s.frz=0;const b=this.VB[mo.tier],op=mo.ops&&mo.ops[mo.oi],ex=[op&&op.k==='P'?NAV.circle(mo.x,mo.z,this.hd2(mo)+.8,'veh'):NAV.box(mo.x,mo.z,b[0]+.8,b[1]+.8,mo.hd,'veh')];if(mo.la2&&t-(mo.laT||-1e9)<300)ex.push(NAV.capsule(mo.x,mo.z,mo.la2[0],mo.la2[1],b[1]+.8,'veh'));const P=NAV.path(s.x,s.z,s.tx,s.tz,.45,{extra:ex});if(P)this.setPath(s,P,t)}continue}s.frz=0;s.x=nx;s.z=nz;s.hdg=P3[2]}else{s.x=s.x0+(s.tx-s.x0)*e;s.z=s.z0+(s.tz-s.z0)*e}s.gyT=0;
+     if(f>=1){if(s.mv===2){this.remove(A,s);continue}else{s.mv=0;s.pl=null;s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}}
+    else if(s.after&&t>s.dodge&&s.st!==ST.DIE){const a=s.after;s.after=null;if(a.mv===2)this.retreat(A,s,t);else{s.mv=1;s.st=a.st;s.sp=a.sp;s.t0=t;this.route(A,s,[a.tx,a.tz],t)}}
     else if(s.st===ST.DIE){if(t-s.t0>7000){this.remove(A,s);continue}}
     else if(s.st===ST.FIRE){if(t-(s.shot||s.t0)>650){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}
     else if(s.st===ST.STAG){if(t-s.t0>1700){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}
     else if(s.st===ST.CHEER){if(t-s.t0>(s.cheer||4200)){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}}
    const n=A.sold.length;
-   for(let i=0;i<n;i++){const s=A.sold[i];if(!(s.gyT>t)){s.y=this.gy(s.x,s.z);s.gyT=t+1500+s.sd*1500}
-    let ty=base+s.yaw;if(s.mv){const f=clamp((t-s.t0)/1000/s.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2,dx=s.tx-s.x0,dz=(s.tz-s.z0)+Math.PI*Math.cos(e*Math.PI)*(s.cv||0);if(Math.abs(dx)+Math.abs(dz)>.05)ty=Math.atan2(-dz,dx)}else if(t<s.aimT&&s.st!==ST.DIE)ty=s.aimY;
+   for(let i=0;i<n;i++){const s=A.sold[i];
+    if(s.held){if(A.sh){scl.set(0,0,0);pos.set(0,-50,0);q4.set(0,0,0,1);m4.compose(pos,q4,scl);m4.toArray(A.sh.instanceMatrix.array,i*16)}continue}   // still inside, waiting for his turn at the door
+    if(!(s.gyT>t)){s.y=this.gy(s.x,s.z);s.gyT=t+1500+s.sd*1500}
+    let ty=base+s.yaw;if(s.mv){if(s.cv&&s.pl){const f=clamp((t-s.t0)/1000/s.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2,P=s.pl,dx=P[1][0]-P[0][0],dz=P[1][1]-P[0][1]+Math.PI*Math.cos(e*Math.PI)*s.cv;ty=Math.atan2(-dz,dx)}else if(s.hdg!=null)ty=s.hdg;else{const dx=s.tx-s.x0,dz=s.tz-s.z0;if(Math.abs(dx)+Math.abs(dz)>.05)ty=Math.atan2(-dz,dx)}}else if(t<s.aimT&&s.st!==ST.DIE)ty=s.aimY;
     if(s.st!==ST.DIE)s.ry+=wrapA(ty-s.ry)*Math.min(1,dt*(s.mv?9:12));
     const sc=SC.sold*(s.rank===2?1.04:1)*(.96+s.sd*.08);pos.set(s.x,s.y,s.z);q4.set(0,Math.sin(s.ry/2),0,Math.cos(s.ry/2));scl.set(sc,sc,sc);m4.compose(pos,q4,scl);const M=A.meshes[s.role],c=cnt[s.role]++;m4.toArray(M.instanceMatrix.array,c*16);M.geometry.attributes.aRow.array[c]=A.row0+i;
     GFX5.pose(s,t,dt,Q,0);GFX5.bones(Q,0,s.role,BT,A.row0+i);
@@ -372,7 +616,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  /* who can shoot: the soldiers nearest the front (refreshed a few times a second) */
  frontOf(A){const t=now();if(t-A.frontT>500){A.frontT=t;const fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0;A.front=A.sold.filter(s=>s.st!==ST.DIE&&!s.mv).sort((a,b)=>Math.abs(a.x-fx)-Math.abs(b.x-fx)).slice(0,30)}return A.front},
  pick(side,role){const f=this.frontOf(this.sides[side]).filter(s=>s.st!==ST.DIE&&!s.mv&&(role==null||s.role===role));return f.length?f[Math.floor(Math.random()*Math.random()*f.length)]:null},
- pickVeh(side,heavy){const A=this.sides[side],fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0,l=A.veh.filter(v=>!v.dead&&v.mv!==2&&(heavy?v.tier>0:v.tier===0));if(!l.length)return null;l.sort((a,b)=>Math.abs(a.x-fx)-Math.abs(b.x-fx));return l[Math.floor(Math.random()*Math.min(3,l.length))]},
+ pickVeh(side,heavy){const A=this.sides[side],fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0,l=A.veh.filter(v=>!v.dead&&!v.hold&&v.mv!==2&&(heavy?v.tier>0:v.tier===0));if(!l.length)return null;l.sort((a,b)=>Math.abs(a.x-fx)-Math.abs(b.x-fx));return l[Math.floor(Math.random()*Math.min(3,l.length))]},
  /* one soldier fires at a point: he turns, shoulders the weapon, the muzzle flashes; returns the muzzle position */
  shoot(side,s,tx,tz){const A=this.sides[side],t=vt();if(s.st!==ST.FIRE){s.st=ST.FIRE;s.t0=t}s.shot=t;s.aimY=Math.atan2(-(tz-s.z),tx-s.x);s.aimT=t+1500;
   const m=GFX5.muzzle(s),sc=SC.sold*(.96+s.sd*.08),a=s.aimY,mx=s.x+Math.cos(a)*m[0]*sc,mz=s.z-Math.sin(a)*m[0]*sc,my=s.y+m[1]*sc;if(PREF.layers.fx)FX.muzzle(mx,my,mz,s.role===1?1.3:s.role===2?2.4:.85);void A;return [mx,my,mz]},
@@ -383,7 +627,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  /* the price crossed a step: the squads of the side that gained it raise a fist */
  surge(side){const A=this.sides[side],t=vt();if(t-A.lastSurge<1500)return;A.lastSurge=t;for(const s of this.frontOf(A).slice(0,8)){if(s.st===ST.DIE||s.mv||s.st===ST.FIRE)continue;s.st=ST.CHEER;s.t0=t+Math.random()*250;s.cheer=900+Math.random()*300}},
  setRest(on){if(this.rest===on)return;this.rest=on;const t=vt();for(const k in this.sides){const A=this.sides[k];for(const s of A.sold){if(s.st===ST.IDLE||s.st===ST.REST){s.st=on?ST.REST:ST.IDLE;s.t0=t}}}},
- reform(){const t=vt();for(const k in this.sides){const A=this.sides[k];for(const [key,sl] of A.slots){const b=VIEW.bk[key[0]].find(x=>x.k===+key.slice(1));if(!b)continue;sl.x=X(b.p);sl.alive.forEach((s,idx)=>{if(s.mv===2||s.st===ST.DIE)return;const o=this.spot(A,sl,idx);if(s.mv&&s.legs&&s.legs.length){s.legs[s.legs.length-1]=[o.x,o.z];return}const dd=Math.hypot(o.x-s.x,o.z-s.z);s.mv=1;s.st=dd<5?ST.WALK:ST.RUN;s.sp=s.st===ST.WALK?3.4:10.5;s.legs=null;this.leg(s,[o.x,o.z],t);s.cv=0})}}},
+ reform(){const t=vt();for(const k in this.sides){const A=this.sides[k];for(const [key,sl] of A.slots){const b=VIEW.bk[key[0]].find(x=>x.k===+key.slice(1));if(!b)continue;sl.x=X(b.p);sl.alive.forEach((s,idx)=>{if(s.mv===2||s.st===ST.DIE)return;const o=this.standSpot(A,sl,idx,s);if(s.mv){this.route(A,s,[o.x,o.z],Math.max(t,s.t0));return}const dd=Math.hypot(o.x-s.x,o.z-s.z);if(dd<.25)return;s.mv=1;s.st=dd<5?ST.WALK:ST.RUN;s.sp=s.st===ST.WALK?3.4:10.5;s.t0=t;this.route(A,s,[o.x,o.z],t);s.cv=0})}}},
  /* field works: a barrier line along every wall, sandbags in front of a squad that has held for 30 s, a pennant after two minutes, a bunker for a fort */
  fortBuild(){const std=GFX.std,M=()=>std?new THREE.MeshStandardMaterial({vertexColors:true,roughness:.95}):new THREE.MeshLambertMaterial({vertexColors:true});
   const hb=GFX.merge([GFX.solid(GFX.T(GFX.rbox(1.3,1.55,2.25,.12,1),0,.775,0),[.52,.49,.41]),GFX.solid(GFX.T(new THREE.BoxGeometry(1.08,.1,2.02),0,1.56,0),[.37,.31,.22])]);
@@ -395,26 +639,43 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
   [this.hesco,this.empl,this.penn].forEach(m=>{m.count=0;m.castShadow=std;m.receiveShadow=std;m.frustumCulled=false;scene.add(m)});
   const pbG=GFX.merge([GFX.solid(GFX.T(GFX.rbox(3.4,1.6,6.6,.35,2),0,.8,0),[.52,.51,.48]),GFX.solid(GFX.T(GFX.rbox(.1,.28,4.6,.05,1),1.72,1.15,0),[.05,.05,.05]),GFX.solid(GFX.T(GFX.rbox(3.0,.18,6.2,.08,1),0,1.68,0),[.45,.44,.41])]);
   this.bunkers=[];for(let i=0;i<6;i++){const b=new THREE.Mesh(pbG,M());b.scale.setScalar(1.35);b.castShadow=b.receiveShadow=std;b.visible=false;scene.add(b);this.bunkers.push(b)}},
- forts(M){const d=this.dummy;let nh=0,ne=0,np=0,bi=0;
+ forts(M){const d=this.dummy;let nh=0,ne=0,np=0,bi=0;const W=[],nav=this.navOn,mv=nav?this.movers():[];
+  /* nothing is built on anything: not on wire, hedgehogs, wrecks or structures, not where a vehicle stands or is going, not on other works */
+  const onHull=(x,z,hx,hz,rot)=>mv.some(o=>{const R=this.hd2(o)+.4;return NAV.obb(x,z,rot,hx,hz,o.x,o.z,0,R,R,0)||(o.mv&&!o.home&&o.gx!=null&&NAV.obb(x,z,rot,hx,hz,o.gx,o.gz,0,R,R,0))});   // (the square round the circle a hull turns in)
+  const onWorks=(x,z,pad)=>W.some(sh=>NAV.inShape(sh,x,z,pad));
+  const gates=Object.values(this.sides).map(A=>A.gate).filter(Boolean),atGate=(x,z)=>gates.some(g=>(x-g[0])*(x-g[0])+(z-g[1])*(z-g[1])<324);
+  const busy=(x,z,hx,hz,rot)=>nav&&(atGate(x,z)||Math.abs(z-gateZ(x))<Math.max(hx,hz)+4.2||!NAV.boxClear(x,z,hx,hz,rot,.08,null,true)||onHull(x,z,hx,hz,rot)||onWorks(x,z,Math.max(hx,hz)));
   for(const [key,w] of M.walls){const x=X(w.p);if(Math.abs(x)>XMAX)continue;const e=key[0]==='b'?1:-1,xx=x+e*1.55;
-   for(let i=0;i<29&&nh<200;i++){const z=-33+i*2.36;if(i%7===6||Math.abs(z-2*Math.sin(xx*.035))<3.6)continue;d.position.set(xx,this.gy(xx,z)-.06,z);d.rotation.set(0,((i*7)%5-2)*.025,0);d.scale.setScalar(1);d.updateMatrix();this.hesco.setMatrixAt(nh++,d.matrix)}
-   if(w.fort&&bi<this.bunkers.length){const b=this.bunkers[bi++],bx=x-e*3;b.visible=true;b.position.set(bx,this.gy(bx,-9),-9);b.rotation.y=e>0?0:Math.PI}}
+   for(let i=0;i<29&&nh<200;i++){const z=-33+i*2.36,r=((i*7)%5-2)*.025;if(i%7===6||Math.abs(z-2*Math.sin(xx*.035))<5.6)continue;/* the road stays open through the line: it is the vehicles' way */if(busy(xx,z,.66,1.12,r))continue;d.position.set(xx,this.gy(xx,z)-.06,z);d.rotation.set(0,r,0);d.scale.setScalar(1);d.updateMatrix();this.hesco.setMatrixAt(nh++,d.matrix);if(nav)W.push(NAV.box(xx,z,.66,1.12,r,'hesco'))}
+   if(w.fort&&bi<this.bunkers.length){const rot=e>0?0:Math.PI;let bx=x-e*3,bz=-9;if(nav){const pt=NAV.free(bx,bz,2.4,14,(px,pz)=>!busy(px,pz,2.35,4.5,rot),true);if(!pt)continue;bx=pt[0];bz=pt[1]}const b=this.bunkers[bi++];b.visible=true;b.position.set(bx,this.gy(bx,bz),bz);b.rotation.y=rot;if(nav)W.push(NAV.box(bx,bz,2.35,4.5,rot,'bunker'))}}
   for(const k in this.sides){const A=this.sides[k],e=-A.dir;for(const sl of A.slots.values()){if(sl.alive.length<3||!(sl.rank>=1)||Math.abs(sl.x)>XMAX-3)continue;
-    if(ne<70){const xx=sl.x+e*1.9;d.position.set(xx,this.gy(xx,sl.zc)-.05,sl.zc);d.rotation.set(0,e>0?0:Math.PI,0);d.scale.setScalar(1.25);d.updateMatrix();this.empl.setMatrixAt(ne++,d.matrix)}
-    if(sl.rank>=2&&np<70){const xx=sl.x-e*3.6,zz=sl.zc-2.8;d.position.set(xx,this.gy(xx,zz),zz);d.rotation.set(0,e>0?0:Math.PI,0);d.scale.setScalar(1.3);d.updateMatrix();this.penn.setMatrixAt(np,d.matrix);this.penn.setColorAt(np++,A.pcol)}}}
+    if(ne<70){const xx=sl.x+e*1.9,rot=e>0?0:Math.PI,pts=[-.9,-.45,0,.45,.9].map(a=>[xx+e*(Math.cos(a)*3.3-3.3)*1.25,sl.zc+e*Math.sin(a)*3.3*1.25]);
+     if(!nav||pts.every(p=>NAV.clear(p[0],p[1],true)>=.7&&Math.abs(p[1]-gateZ(p[0]))>5&&!atGate(p[0],p[1])&&!onHull(p[0],p[1],.6,.6,0)&&!onWorks(p[0],p[1],.7))){d.position.set(xx,this.gy(xx,sl.zc)-.05,sl.zc);d.rotation.set(0,rot,0);d.scale.setScalar(1.25);d.updateMatrix();this.empl.setMatrixAt(ne++,d.matrix);if(nav)for(const p of pts)W.push(NAV.circle(p[0],p[1],.62,'sandbag'))}}
+    if(sl.rank>=2&&np<70){const xx=sl.x-e*3.6,zz=sl.zc-2.8;if(!nav||(NAV.clear(xx,zz,true)>=.3&&Math.abs(zz-gateZ(xx))>5&&!atGate(xx,zz)&&!onWorks(xx,zz,.3)&&!onHull(xx,zz,.2,.2,0))){d.position.set(xx,this.gy(xx,zz),zz);d.rotation.set(0,e>0?0:Math.PI,0);d.scale.setScalar(1.3);d.updateMatrix();this.penn.setMatrixAt(np,d.matrix);this.penn.setColorAt(np++,A.pcol);if(nav)W.push(NAV.circle(xx,zz,.16,'flag'))}}}}
   this.hesco.count=nh;this.empl.count=ne;this.penn.count=np;this.hesco.instanceMatrix.needsUpdate=this.empl.instanceMatrix.needsUpdate=this.penn.instanceMatrix.needsUpdate=true;if(this.penn.instanceColor)this.penn.instanceColor.needsUpdate=true;
-  for(let i=bi;i<this.bunkers.length;i++)this.bunkers[i].visible=false},
+  for(let i=bi;i<this.bunkers.length;i++)this.bunkers[i].visible=false;
+  this.works=W;if(nav)this.navSync(false)},
  artillery(){const mat={bull:GFX.vehicleMaterial(GFX.TEAMS.bull,GFX.std,this.AU),bear:GFX.vehicleMaterial(GFX.TEAMS.bear,GFX.std,this.AU)};this.vmat=mat;
-  const place=(g,x,z,dir)=>{g.scale.setScalar(SC.gun);g.position.set(x,this.gy(x,z),z);g.rotation.y=dir<0?0:Math.PI;g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=GFX.std}});scene.add(g);return g};
-  this.guns={bull:[place(GFX.spg(mat.bull),-62,-45,-1),place(GFX.spg(mat.bull),-63,45,-1),place(GFX.spg(mat.bull),-68,-17,-1)],bear:[place(GFX.spg(mat.bear),62,-45,1),place(GFX.spg(mat.bear),63,45,1),place(GFX.spg(mat.bear),68,-17,1)]};
-  this.rkts={bull:[place(GFX.mlrs(mat.bull),-67,23,-1),place(GFX.mlrs(mat.bull),-63,35,-1)],bear:[place(GFX.mlrs(mat.bear),67,23,1),place(GFX.mlrs(mat.bear),63,35,1)]};
-  this.trucks=[];for(let i=0;i<6;i++){const side=i<3?'bull':'bear';const g=GFX.truck(mat[side]);g.scale.setScalar(1.4);g.visible=false;g.traverse(o=>{if(o.isMesh)o.castShadow=true});scene.add(g);this.trucks.push({g,on:false,side})}},
- convoy(side,x){const A=this.sides[side];const tr=this.trucks.find(t=>!t.on&&t.side===side);if(!tr)return;const z=rnd(30,-30),t=vt();tr.on=true;tr.x0=A.dir*(GATE+4);tr.z0=gateZ(A.dir*GATE);tr.x1=clamp(x+A.dir*5,-XMAX+3,XMAX-3);tr.z1=z;tr.t0=t;tr.dur=clamp(Math.abs(tr.x1-tr.x0)/20,1,4.5);tr.g.visible=true;
-  A.spawnFrom={x:tr.x1,z:tr.z1,until:Date.now()+tr.dur*1000+4500};AUDIO.play('engine',{x:tr.x0,z:tr.z0,vol:.5,dur:tr.dur+1})},
- trucksTick(dt){const t=vt();for(const tr of this.trucks){if(!tr.on)continue;const f=clamp((t-tr.t0)/1000/tr.dur,0,1),e=1-Math.pow(1-f,2);const x=tr.x0+(tr.x1-tr.x0)*e,z=tr.z0+(tr.z1-tr.z0)*e;tr.g.position.set(x,this.gy(x,z),z);tr.g.rotation.y=Math.atan2(-(tr.z1-tr.z0),tr.x1-tr.x0);
-   if(f>=1&&t-tr.t0>(tr.dur+5)*1000){tr.on=false;tr.g.visible=false}if(f<1&&Math.random()<.35&&PREF.layers.fx)FX.dustPuff(x-3.4*(tr.x1>tr.x0?1:-1),z)}},
+  const place=(g,x,z,dir,hx,hz)=>{g.scale.setScalar(SC.gun);g.position.set(x,this.gy(x,z),z);g.rotation.y=dir<0?0:Math.PI;g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=GFX.std}});scene.add(g);if(window.NAV)NAV.add(NAV.box(x,z,hx*SC.gun,hz*SC.gun,0,'gun'));return g};
+  const G3=(m,x,z,d)=>place(GFX.spg(m),x,z,d,2.5,1.42),R3m=(m,x,z,d)=>place(GFX.mlrs(m),x,z,d,2.8,1.16);
+  /* gun lines outside the base walls, each piece in its own earth revetment (gfx5 builds them on the same coordinates) */
+  this.guns={bull:[G3(mat.bull,-62,-45,-1),G3(mat.bull,-63,45,-1),G3(mat.bull,-35,-44,-1)],bear:[G3(mat.bear,62,-45,1),G3(mat.bear,63,45,1),G3(mat.bear,35,-44,1)]};
+  this.rkts={bull:[R3m(mat.bull,-79,38,-1),R3m(mat.bull,-95,38,-1)],bear:[R3m(mat.bear,79,38,1),R3m(mat.bear,95,38,1)]};
+  this.trucks=[];for(let i=0;i<6;i++){const side=i<3?'bull':'bear';const g=GFX.truck(mat[side]);g.scale.setScalar(1.4);g.visible=false;g.traverse(o=>{if(o.isMesh)o.castShadow=true});scene.add(g);this.trucks.push({g,on:false,side,tier:3,x:0,z:0,hd:0,mv:0})}},
+ /* a convoy: a lorry drives out of the motor pool to just behind the line, the squad jumps down off the back, the lorry drives home */
+ convoy(side,x){const A=this.sides[side];const tr=this.trucks.find(t=>!t.on&&t.side===side);if(!tr)return;const t=vt(),p=A.pool||[A.dir*(GATE+6),gateZ(A.dir*GATE)],fwd=A.dir<0?0:Math.PI;
+  Object.assign(tr,{on:true,hold:true,tier:3,x:p[0],z:p[1],hd:A.poolH!=null?A.poolH:fwd,mv:1,home:false,done:false,inShed:false,recall:false,later:0,retry:0,gt:null,dk:null,trail:[],ops:null,spd:0,wait:0,pri:Math.random(),pitch:0,roll:0,y:this.gy(p[0],p[1]),phase:'in',A,wx:clamp(x+A.dir*5,-XMAX+3,XMAX-3),wz:rnd(30,-30)});
+  const hd=Math.atan2(-(tr.wz-p[1]),tr.wx-p[0]),g=this.parkSpot(tr,tr.wx,tr.wz,hd);tr.gx=g[0];tr.gz=g[1];tr.ghd=null;tr.g.visible=false},
+ trucksTick(dt){const t=vt();for(const tr of this.trucks){if(!tr.on)continue;const A=tr.A;
+   if(tr.hold){if(!this.release(tr,t))continue;tr.g.visible=true;AUDIO.play('engine',{x:tr.x,z:tr.z,vol:.5,dur:4})}
+   if(tr.mv&&!tr.inShed){this.vehFollow(tr,dt,t);if(tr.spd>.6&&Math.random()<.35&&PREF.layers.fx)FX.dustPuff(tr.x-Math.cos(tr.hd)*3.4,tr.z+Math.sin(tr.hd)*3.4)}
+   if(tr.done){tr.on=false;tr.g.visible=false;continue}                                                                                                  // back in the motor pool
+   if(!tr.mv&&tr.phase==='in'){tr.phase='drop';tr.until=t+5200;this.navSync(true);const c=Math.cos(tr.hd),s=-Math.sin(tr.hd);A.spawnFrom={x:tr.x-c*3.9,z:tr.z-s*3.9,until:Date.now()+4500}}
+   else if(tr.phase==='drop'&&t>tr.until){tr.phase='out';tr.mv=2;tr.home=true;tr.gx=A.pool[0];tr.gz=A.pool[1];tr.ghd=null;this.navSync(true);this.planOr(tr)}
+   if(tr.mv||!(tr.gyT>t)){this.align(tr);tr.gyT=t+2500}
+   tr.g.position.set(tr.x,tr.y,tr.z);tr.g.rotation.order='YZX';tr.g.rotation.set(tr.roll,tr.hd,tr.pitch)}},
  muzzleOf(g,len){g.updateMatrixWorld(true);const v=new THREE.Vector3(len,0,0);g.userData.piv.localToWorld(v);return v},
- gunFire(side,tx,tz,usd){const guns=this.guns[side];if(!guns)return;const n=usd>=1e6?3:usd>=2.5e5?2:1;for(let i=0;i<n;i++){const g=guns[(this.gunIdx=(this.gunIdx||0)+1)%3];setTimeout(()=>{if(!R3)return;g.userData.bar.position.x=-.9;const mz=this.muzzleOf(g,4.9);FX.shell(mz.x,mz.y,mz.z,tx+rnd(6,-6),tz+rnd(6,-6),usd,side);FX.muzzle(mz.x,mz.y,mz.z,3.6);FX.smoke(mz.x,mz.y,mz.z,6,3.6);AUDIO.play('cannon',{x:g.position.x,z:g.position.z,vol:.9})},i*230)}},
+ gunFire(side,tx,tz,usd){const guns=this.guns[side];if(!guns)return;if(window.GFX4&&GFX4.air.ready&&GFX4.air.spot)GFX4.air.spot(side,tx,tz);const n=usd>=1e6?3:usd>=2.5e5?2:1;for(let i=0;i<n;i++){const g=guns[(this.gunIdx=(this.gunIdx||0)+1)%3];setTimeout(()=>{if(!R3)return;g.userData.bar.position.x=-.9;const mz=this.muzzleOf(g,4.9);FX.shell(mz.x,mz.y,mz.z,tx+rnd(6,-6),tz+rnd(6,-6),usd,side);FX.muzzle(mz.x,mz.y,mz.z,3.6);FX.smoke(mz.x,mz.y,mz.z,6,3.6);AUDIO.play('cannon',{x:g.position.x,z:g.position.z,vol:.9})},i*230)}},
  rocketFire(side,tx,tz,usd){const rk=this.rkts[side];if(!rk)return;const r=rk[(this.rkIdx=(this.rkIdx||0)+1)%2],n=usd>=6e5?12:usd>=4e5?9:6;const tip=new THREE.Vector3(2.2,.2,0);for(let i=0;i<n;i++)setTimeout(()=>{if(!R3)return;r.updateMatrixWorld(true);const p=tip.clone().set(2.0,-.3+(i%3)*.3,-.52+(i%4)*.35);r.userData.pod.localToWorld(p);FX.rocket(p.x,p.y,p.z,tx+rnd(8,-8),tz+rnd(8,-8),side);FX.smoke(p.x,p.y,p.z,3,2.4);AUDIO.play('rocket',{x:r.position.x,z:r.position.z,vol:.6})},i*140)},
  tickGuns(dt){for(const k in this.guns)this.guns[k].forEach(g=>{const b=g.userData.bar;if(b.position.x<0)b.position.x=Math.min(0,b.position.x+dt*1.6)})}};
 
@@ -433,7 +694,7 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
   for(let i=0;i<48;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:star,color:0xffe0a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));s.visible=false;scene.add(s);this.MZ.push({s,t0:0,dur:90})}
   this.aircraft()},
  spawn(ty,x,y,z,vx,vy,vz,life,size){(ty===1||ty===6||ty===7?this.G:this.S).spawn(ty,x,y,z,vx,vy,vz,life,size)},
- clear(){this.PJ.length=0;if(window.GFX4&&GFX4.air.ready)GFX4.air.clear();if(window.GFX6)GFX6.clear();this.air.forEach(a=>{a.on=false;a.back=false;a.g.visible=false});if(WORLD.decals)WORLD.decals.clear()},
+ clear(){this.PJ.length=0;if(window.GFX4&&GFX4.air.ready)GFX4.air.clear();if(window.GFX6)GFX6.clear();this.air.forEach(a=>{a.on=false;a.back=false;a.g.visible=false;if(a.pad){if(a.pad.static)a.pad.static.visible=true;a.pad.busy=0;a.pad=null}});if(window.GFX4&&GFX4.env)GFX4.env.burns=[];if(WORLD.decals)WORLD.decals.clear()},
  muzzle(x,y,z,sz){const m=this.MZ.find(m=>!m.s.visible);if(!m)return;m.s.visible=true;m.s.position.set(x,y,z);m.s.scale.setScalar((sz||1.2)*(.8+Math.random()*.4));m.s.material.rotation=Math.random()*6.28;m.s.material.opacity=1;m.t0=vt();m.dur=sz>2?120:80;
   if(sz>1.5){const li=this.lights.find(l=>!l.l.visible);if(li){li.l.visible=true;li.l.position.set(x,y+.5,z);li.l.color.setHex(0xffc070);li.l.intensity=3;li.l.distance=16;li.t0=vt();li.dur=120}}},
  dustPuff(x,z,n){const y=ARMY.gy(x,z);for(let i=0;i<(n||3);i++)this.spawn(2,x+rnd(1,-1),y+.4,z+rnd(1,-1),rnd(1,-1),rnd(1.2,.3),rnd(1,-1),1.6+Math.random(),2.4)},
@@ -475,7 +736,7 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
   this.air=[];['bull','bear'].forEach(s=>{this.air.push(mk(s,'heli'),mk(s,'heli'),mk(s,'jet'),mk(s,'jet'),mk(s,'jet'),mk(s,'jet'),mk(s,'jet'),mk(s,'bomber'))})},
  pick(k,att){return this.air.find(a=>a.k===k&&a.side===att&&!a.on)},
  heli(att,tx,tz,usd){const a=this.pick('heli',att);if(!a){if(window.GFX6&&GFX6.sortie(att,tx,tz,1,usd))return;return this.jet(att,tx,tz,usd)}const dir=att==='bull'?-1:1;a.on=true;a.att=att;a.t0=vt();a.x0=dir*150;a.z0=tz+rnd(40,-40);a.y0=26;a.hop=0;a.in=2.6;a.hy=dir<0?0:Math.PI;
-  const pad=window.GFX6&&WORLD.env5?GFX6.heliPad(att,a):null;if(pad){a.x0=pad.x;a.z0=pad.z;a.y0=pad.y;a.hy=pad.yaw;a.hop=15;a.in=5.6}/* it lifts from its spot on the carrier's quarter and comes in over the bay */
+  const land=window.GFX4&&GFX4.helipad?GFX4.helipad(att,a):null,pad=land||(window.GFX6&&WORLD.env5?GFX6.heliPad(att,a):null);a.pad=land;a.g.scale.setScalar(land?1.25:1);if(pad){a.x0=pad.x;a.z0=pad.z;a.y0=pad.y;a.hy=pad.yaw;a.hop=land?11:15;a.in=land?6.2:5.6}/* it lifts from its spot on the carrier's quarter and comes in over the bay */
   a.tx=tx;a.tz=tz;a.ty=15;a.dir=dir;a.phase=0;a.usd=usd;a.shots=0;a.g.visible=true;a.g.position.set(a.x0,a.y0,a.z0);a.g.rotation.set(0,a.hy,0);AUDIO.play('heli',{x:a.x0,z:a.z0,vol:.9,dur:a.hop?a.in*2+3.4:9,follow:a})},
  jet(att,tx,tz,usd){const a=this.pick('jet',att);if(!a)return;const dir=att==='bull'?-1:1;a.on=true;a.att=att;a.t0=vt();a.dur=2.8;a.x0=dir*240;a.x1=-dir*240;a.z=tz+rnd(6,-6);a.y=27;a.tx=tx;a.tz=tz;a.dir=dir;a.dropped=false;a.usd=usd;a.g.visible=true;a.g.rotation.set(0,dir<0?0:Math.PI,0);AUDIO.play('jet',{x:a.x0,z:a.z,vol:1,dur:3.2,follow:a});evt(VIEW,{k:'bomb',usd,p:VIEW.price})},
  bomber(att,tx,tz,usd){const a=this.pick('bomber',att);if(!a)return this.jet(att,tx,tz,usd);const dir=att==='bull'?-1:1;a.on=true;a.att=att;a.t0=vt();a.dur=5.5;a.x0=dir*260;a.x1=-dir*260;a.z=tz;a.y=46;a.tx=tx;a.tz=tz;a.dir=dir;a.dropped=false;a.usd=usd;a.nuke=usd>=2.5e7;a.g.visible=true;a.g.rotation.set(0,dir<0?0:Math.PI,0);AUDIO.play('bomber',{x:a.x0,z:a.z,vol:1,dur:6,follow:a})},
@@ -483,8 +744,8 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
    if(a.k==='heli'){ud.rotor.rotation.y+=dt*30;ud.tr.rotation.z+=dt*44;if(a.phase===0){const f=clamp(el/(a.in||2.6),0,1);if(a.hop){/* straight up off the deck, nose down to gather speed, a long hop over the bay, then flare and face the front */const lift=sm3(0,.16,f),e=sm3(.06,1,f),hx=a.tx+a.dir*14-a.x0,hz=a.tz-a.z0,h0=Math.atan2(-hz,hx);a.g.position.set(a.x0+hx*e,a.y0+4*lift+(a.ty-a.y0-4)*e+a.hop*Math.sin(Math.PI*e),a.z0+hz*e);a.g.rotation.y=angMix(angMix(a.hy,h0,sm3(.05,.22,f)),a.dir<0?0:Math.PI,sm3(.8,1,f));a.g.rotation.z=-.2*Math.sin(2*Math.PI*clamp((f-.08)/.92,0,1))}else{const e=1-Math.pow(1-f,3);a.g.position.set(a.x0+(a.tx+a.dir*14-a.x0)*e,a.y0+(a.ty-a.y0)*e,a.z0+(a.tz-a.z0)*e);a.g.rotation.z=a.dir*-.28*(1-f)*(a.dir<0?1:-1)}if(f>=1){a.phase=1;a.p1=t}}
     else if(a.phase===1){const e=(t-a.p1)/1000;a.g.position.y=a.ty+Math.sin(e*3)*.4;a.g.rotation.z=Math.sin(e*2)*.05;if(a.shots<4&&e>a.shots*.5+.2){a.shots++;const fw=a.dir<0?1:-1;this.rocket(a.g.position.x+fw*.6,a.g.position.y-.4,a.g.position.z+(a.shots%2?1.45:-1.45),a.tx+rnd(5,-5),a.tz+rnd(5,-5),a.att);AUDIO.play('rocket',{x:a.g.position.x,z:a.g.position.z,vol:.7});this.muzzle(a.g.position.x+fw*1.1,a.g.position.y-.35,a.g.position.z+(a.shots%2?1.45:-1.45),1.6);this.smoke(a.g.position.x,a.g.position.y-.4,a.g.position.z,2,1.6,4)}
      if(e>2.6){a.phase=2;a.p2=t;a.px=a.g.position.x;a.pz=a.g.position.z}}
-    else if(a.hop){/* home to the carrier: turn out, hop back, settle on the spot */if(!a.back){a.back=true;const pd=GFX6.heliPad(a.att,a);if(pd){a.x0=pd.x;a.y0=pd.y;a.z0=pd.z;a.hy=pd.yaw}a.py=a.g.position.y;a.ry0=a.g.rotation.y}
-     const f=clamp((t-a.p2)/1000/(a.in+.8),0,1),e=sm3(0,.9,f),set=sm3(.86,1,f),hx=a.x0-a.px,hz=a.z0-a.pz,h0=Math.atan2(-hz,hx);a.g.position.set(a.px+hx*e,a.py+(a.y0+4-a.py)*e+a.hop*Math.sin(Math.PI*e)-4*set,a.pz+hz*e);a.g.rotation.y=angMix(angMix(a.ry0,h0,sm3(0,.2,f)),a.hy,sm3(.74,.92,f));a.g.rotation.z=-.2*Math.sin(2*Math.PI*clamp(f/.9,0,1));if(f>=1){a.on=false;a.back=false;a.g.visible=false}}
+    else if(a.hop){/* home to the carrier: turn out, hop back, settle on the spot */if(!a.back){a.back=true;const pd=a.pad||GFX6.heliPad(a.att,a);if(pd){a.x0=pd.x;a.y0=pd.y;a.z0=pd.z;a.hy=pd.yaw}a.py=a.g.position.y;a.ry0=a.g.rotation.y}
+     const f=clamp((t-a.p2)/1000/(a.in+.8),0,1),e=sm3(0,.9,f),set=sm3(.86,1,f),hx=a.x0-a.px,hz=a.z0-a.pz,h0=Math.atan2(-hz,hx);a.g.position.set(a.px+hx*e,a.py+(a.y0+4-a.py)*e+a.hop*Math.sin(Math.PI*e)-4*set,a.pz+hz*e);a.g.rotation.y=angMix(angMix(a.ry0,h0,sm3(0,.2,f)),a.hy,sm3(.74,.92,f));a.g.rotation.z=-.2*Math.sin(2*Math.PI*clamp(f/.9,0,1));if(f>=1){a.on=false;a.back=false;a.g.visible=false;if(a.pad){if(a.pad.static)a.pad.static.visible=true;a.pad.busy=0;a.pad=null}}}
     else{const f=clamp((t-a.p2)/1000/3,0,1),e=f*f;a.g.position.set(a.px+(a.dir*-1*200-a.px)*e,a.ty+30*e,a.pz-60*e);a.g.rotation.z=.2*f;if(f>=1){a.on=false;a.g.visible=false}}
     if(Math.random()<.5)this.spawn(2,a.g.position.x,ARMY.gy(a.g.position.x,a.g.position.z)+.3,a.g.position.z,rnd(5,-5),.25,rnd(5,-5),1.3,6)}
    else{const f=clamp(el/a.dur,0,1);const x=a.x0+(a.x1-a.x0)*f;a.g.position.set(x,a.y+Math.sin(el*1.3)*.6,a.z);a.g.rotation.x=Math.sin(el*.9)*.1;if(ud.ab)ud.ab.material.opacity=.7+Math.random()*.3;
@@ -515,37 +776,145 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
   this.airTick(dt);this.S.flush();this.G.flush()}};
 
 /* ======================= director: cameras, scenarios, slow motion, strikes ======================= */
+/* ======================= the cinema camera ======================= */
+/* Cut like a war film. While nothing big happens a reel runs through acts: the theatre from the air; the armies (a crane up from a
+   squad, a dolly along the line, a push in on a tank); the yard and the road (a hull out of the motor pool and through the gate); the
+   front up close (a long lens across no-man's land, over a soldier's shoulder); the sea (alongside a destroyer, over a carrier's deck);
+   the sky (behind a recon drone, a satellite). Anything big cuts in at once with its own sequence: who fires, what flies, the hit in
+   slow motion, what is left. Shots cut, they do not drift; each one moves, and every frame keeps the camera above the ground and the
+   sea and out of buildings, trees, hulls and men. */
+const CINE={q:[],shot:null,t0:0,act:0,lift:0,P:new THREE.Vector3(),T:new THREE.Vector3(),fov:46,pri:0,trees:null,
+ V:(x,y,z)=>new THREE.Vector3(x,y,z),
+ ease:u=>u*u*(3-2*u),
+ side:()=>Math.random()<.5?'bull':'bear',
+ dirOf:s=>s==='bull'?-1:1,                                                    // where an army's base is (x sign)
+ fx(){return VIEW.round?X(VIEW.price||VIEW.round.p0):0},
+ gy(x,z){return Math.max(WORLD.hgt(x,z),-1.15)},
+ reset(){this.q.length=0;this.shot=null;this.pri=0},
+ /* ---- shots: {dur s, fov, P(u,dt), T(u,dt)} with u going 0 → 1 through the shot ---- */
+ fly(a,b,look,dur,fov){return {dur,fov:fov||48,P:u=>a.clone().lerp(b,this.ease(u)),T:typeof look==='function'?look:()=>look}},
+ orbit(c,r,h,a0,da,dur,fov,ly){return {dur,fov:fov||46,P:u=>{const C=typeof c==='function'?c():c,a=a0+da*u;return this.V(C.x+Math.cos(a)*r,C.y+h,C.z-Math.sin(a)*r)},T:()=>{const C=typeof c==='function'?c():c;return this.V(C.x,C.y+(ly==null?1:ly),C.z)}}},
+ crane(c,dx,dz,d0,d1,h0,h1,dur,fov){return {dur,fov:fov||44,P:u=>{const e=this.ease(u),d=d0+(d1-d0)*e;return this.V(c.x-dx*d,c.y+h0+(h1-h0)*e,c.z-dz*d)},T:u=>this.V(c.x+dx*5,c.y+1.3-this.ease(u)*.9,c.z+dz*5)}},
+ /* behind (back), beside (side) and above (up) something that moves, looking ahead of it; o() gives {p, f:[x,z] forward} or null */
+ track(o,back,side,up,ahead,dur,fov){let P=null,T=null;return {dur,fov:fov||50,P:(u,dt)=>{const q=o();if(q){const f=q.f,r=[-f[1],f[0]],w=this.V(q.p.x-f[0]*back+r[0]*side,q.p.y+up,q.p.z-f[1]*back+r[1]*side),l=this.V(q.p.x+f[0]*ahead,q.p.y+up*.35,q.p.z+f[1]*ahead);
+   if(!P){P=w;T=l}else{const k=Math.min(1,dt*3);P.lerp(w,k);T.lerp(l,k)}}return P||this.P.clone()},T:()=>T||this.T.clone()}},
+ still(p,t,dur,fov){return {dur,fov:fov||46,P:()=>p,T:typeof t==='function'?t:()=>t}},
+ /* ---- what there is to film ---- */
+ squad(side){const f=ARMY.frontOf(ARMY.sides[side]);return f.length?f[Math.floor(Math.random()*Math.min(8,f.length))]:null},
+ hull(side,pred){const L=ARMY.sides[side].veh.filter(v=>!v.dead&&!v.hold&&!v.inShed&&(!pred||pred(v)));return L.length?L[Math.floor(Math.random()*L.length)]:null},
+ mover(v){return ()=>v.dead||v.done||v.hold||(v.tier===3&&!v.on)?null:{p:this.V(v.x,ARMY.gy(v.x,v.z),v.z),f:[Math.cos(v.hd),-Math.sin(v.hd)]}},
+ ship(side,kind){const E=WORLD.env5;return E?E.ships.find(s=>s.side===side&&s.kind===kind):null},
+ shipOf(s){return ()=>({p:s.g.position,f:[Math.cos(s.hd||0),-Math.sin(s.hd||0)]})},
+ /* ---- the reel ---- */
+ reel(){const acts=['theatre','armies','yard','front','sea','sky'];for(let i=0;i<acts.length;i++){const a=this['act_'+acts[this.act++%acts.length]]();if(a&&a.length)return a}return this.act_theatre()},
+ act_theatre(){const fx=this.fx(),s=Math.random()<.5?-1:1,out=[];
+  if(Math.random()<.5)out.push(this.fly(this.V(fx+s*95,64,58),this.V(fx+s*30,40,44),this.V(fx,0,-4),10,50));
+  else out.push(this.fly(this.V(s*40,20,-175),this.V(s*12,30,-112),this.V(fx*.4,0,-12),10,52));     // in from the sea over the fleets, the coast ahead
+  out.push(this.fly(this.V(fx-s*20,26,-62),this.V(fx+s*24,30,-58),this.V(fx,1,0),8,46));             // along the rear, the whole front in frame
+  return out},
+ act_armies(){const out=[],k=this.side(),D=this.dirOf(k),s0=this.squad(k);
+  if(s0)out.push(this.crane(this.V(s0.x,ARMY.gy(s0.x,s0.z),s0.z),-D,0,3.2,13,1.6,15,8,42));         // from just behind a squad, up and back over it
+  const fx=this.fx(),lx=fx+D*9;out.push(this.fly(this.V(lx+D*7,3.2,-26),this.V(lx+D*7,3.2,24),()=>this.V(lx-D*8,1.6,this.P.z+8),9,48));   // a dolly down the line
+  const v=this.hull(k,v=>!v.mv);if(v){const a=Math.atan2(-(0-v.z),(fx-v.x))+(Math.random()<.5?.7:-.7);out.push({dur:7,fov:38,P:u=>{const d=24-13*this.ease(u);return this.V(v.x+Math.cos(a)*d,ARMY.gy(v.x,v.z)+1.8,v.z-Math.sin(a)*d)},T:()=>this.V(v.x,ARMY.gy(v.x,v.z)+1.9,v.z)})}   // push in, low, on a tank
+  return out},
+ act_yard(){const out=[];for(const k of ['bull','bear']){const A=ARMY.sides[k],D=A.dir;
+   const clear=v=>A.shed?Math.hypot(v.x-A.shed.x,v.z-A.shed.door)>16:true,v=A.veh.find(v=>!v.dead&&!v.hold&&!v.inShed&&v.mv&&D*v.x>40&&clear(v))||ARMY.trucks.find(t=>t.on&&!t.hold&&!t.inShed&&t.A===A&&t.mv&&D*t.x>40&&clear(t));
+   if(v){out.push(this.track(this.mover(v),11,2.5,4.2,10,8,50));return out}}
+  const k=this.side(),A=ARMY.sides[k],D=A.dir,g=A.gate;if(!g)return out;
+  out.push(this.still(this.V(D*(GATE-15),4.6,g[1]+7),this.V(D*GATE,2.2,g[1]),6,40));               // at the gate as the men come out
+  if(A.shed)out.push(this.still(this.V(A.shed.x-D*7,5.8,A.shed.door+11),this.V(A.shed.x,2.6,A.shed.door-2),5,44));   // the motor pool's door
+  return out},
+ act_front(){const fx=this.fx(),k=this.side(),D=this.dirOf(k),out=[],z=rnd(22,-22);
+  out.push(this.fly(this.V(fx+D*34,1.6,z),this.V(fx+D*31,1.7,z+3),this.V(fx-D*12,1.5,z+5),6,26));   // a long lens across no-man's land
+  const s0=this.squad(k);if(s0){const h=s0.x,zz=s0.z;out.push({dur:6,fov:40,P:u=>this.V(h+D*2.3,ARMY.gy(h,zz)+1.75,zz+.8+u*.4),T:()=>this.V(h-D*25,ARMY.gy(h,zz)+1.2,zz+2)})}   // over a soldier's shoulder
+  return out},
+ act_sea(){const out=[],k=this.side(),s=this.ship(k,Math.random()<.6?'dd':'ff');
+  if(s)out.push(this.track(this.shipOf(s),-14,-48,7,6,8,46));                                         // alongside a warship, at her pace
+  const c=window.GFX6&&GFX6.cv&&GFX6.cv[k];if(c)out.push(this.orbit(()=>c.g.position,92,30,rnd(6.28),.55,9,44,6));   // round a carrier
+  return out},
+ act_sky(){const out=[],A4=window.GFX4&&GFX4.air,k=this.side();
+  const d=A4&&A4.ready&&A4.drones.find(d=>d.side===k);if(d)out.push(this.track(()=>({p:d.m.position,f:[Math.cos(d.m.rotation.y),-Math.sin(d.m.rotation.y)]}),9,0,2.5,-6,7,56));   // riding behind a recon drone
+  if(WORLD.env5&&Math.random()<.6)out.push({sat:k,dur:9});
+  return out},
+ /* ---- big moments cut in ---- */
+ event(kind,o){if(DIRECTOR.mode!=='cine'||!R3)return;const S=this.seq(kind,o||{});if(!S||!S.length)return;const pri=o&&o.pri||2;if(this.shot&&this.pri>pri&&now()-this.t0<this.shot.dur*1000)return;
+  this.q=S;this.pri=pri;this.next()},
+ seq(kind,o){const fx=this.fx(),out=[];
+  if(kind==='guns'){const g=(ARMY.guns[o.att]||[])[0];if(g){const dx=o.tx-g.position.x,dz=o.tz-g.position.z,n=Math.hypot(dx,dz)||1;out.push(this.still(this.V(g.position.x-dx/n*10+dz/n*4,this.gy(g.position.x,g.position.z)+3.4,g.position.z-dz/n*10-dx/n*4),this.V(g.position.x+dx/n*30,9,g.position.z+dz/n*30),2.8,48))}
+   out.push(this.still(this.V(o.tx+this.dirOf(o.att)*34,10,o.tz+24),this.V(o.tx,1,o.tz),4.5,42));return out}
+  if(kind==='heli'){const a=FX.air.find(a=>a.k==='heli'&&a.on&&a.side===o.att);if(a)out.push(this.track(()=>a.on?{p:a.g.position,f:[Math.cos(a.g.rotation.y),-Math.sin(a.g.rotation.y)]}:null,15,4,4,24,7,52));
+   out.push(this.orbit(this.V(o.tx,this.gy(o.tx,o.tz),o.tz),30,11,rnd(6.28),.5,5,44));return out}
+  if(kind==='jets'){out.push(this.still(this.V(o.tx+rnd(10,-10),this.gy(o.tx,o.tz+20)+1.6,o.tz+20),this.V(o.tx,16,o.tz),3.6,62));   // on the ground looking up as they come over
+   out.push(Object.assign(this.orbit(this.V(o.tx,this.gy(o.tx,o.tz),o.tz),34,13,rnd(6.28),.6,6,44),{slow:[.15,.35,1.4]}));return out}
+  if(kind==='missile'){const tl=WORLD.env4&&WORLD.env4.tels[o.att]&&WORLD.env4.tels[o.att][0];
+   if(tl){const p=tl.pivot,fx=Math.cos(tl.rot),fz=-Math.sin(tl.rot),mx=p.x+fx*4,mz=p.z+fz*4,cx=mx-fz*9,cz=mz+fx*9;out.push(this.still(this.V(cx,this.gy(cx,cz)+1.5,cz),this.V(mx,p.y+1.5,mz),3.2,56))}   // low beside the launcher as its rail comes up and it fires
+   const A4=window.GFX4&&GFX4.air;if(A4&&A4.ready){let m=null;out.push(this.track(()=>{if(!m||!m.on)m=A4.M.find(q=>q.on&&q.kind==='B'&&q.side===o.att);if(!m)return null;const f=[m.p1.x-m.p0.x,m.p1.z-m.p0.z],n=Math.hypot(f[0],f[1])||1;return {p:m.pos,f:[f[0]/n,f[1]/n]}},26,8,7,30,3.8,56))}   // with the missile
+   out.push(Object.assign(this.still(this.V(o.tx+this.dirOf(o.att)*40,15,o.tz+30),this.V(o.tx,0,o.tz),5,44),{slow:[.45,.3,1.6]}));   // where it comes down, in slow motion
+   out.push(this.crane(this.V(o.tx,this.gy(o.tx,o.tz),o.tz),-this.dirOf(o.att),0,14,30,3,22,5,46));return out}           // what is left
+  if(kind==='raid'){const c=window.GFX6&&GFX6.cv&&GFX6.cv[o.att];if(c)out.push(this.orbit(()=>c.g.position,70,16,rnd(6.28),.35,3.6,46,8));   // off the carrier's deck
+   const t2=this.seq('missile',o);out.push(...t2.slice(0,1));out.push(this.fly(this.V(o.tx+this.dirOf(o.att)*70,48,o.tz+60),this.V(o.tx+this.dirOf(o.att)*30,32,o.tz+38),this.V(o.tx,0,o.tz),6,48));
+   out.push(Object.assign(this.still(this.V(o.tx-this.dirOf(o.att)*36,12,o.tz-30),this.V(o.tx,0,o.tz),5,44),{slow:[.3,.3,1.8]}));return out}
+  if(kind==='naval'){const s=this.ship(o.side,'dd');if(s)out.push(this.track(this.shipOf(s),6,-40,5,0,3.8,48));out.push(this.still(this.V(o.tx+this.dirOf(o.side)*30,9,o.tz+22),this.V(o.tx,1,o.tz),4.2,44));return out}
+  if(kind==='sub'){const E=WORLD.env5,s=E&&E.subs[o.att];if(s){const p=s.g.position;out.push(this.still(this.V(p.x+28,2.4,p.z+30),this.V(p.x,1.2,p.z),5.5,44))}out.push(...this.seq('missile',o).slice(1,3));return out}
+  if(kind==='wall'){const A=ARMY.sides[o.side],D=A.dir,ms=WORLD.env4&&WORLD.env4.masts&&WORLD.env4.masts.find(m=>m.side===o.side);
+   if(ms)out.push(this.still(this.V(ms.p.x+D*16,this.gy(ms.p.x+D*16,ms.p.z+16)+8,ms.p.z+16),this.V(ms.p.x,ms.p.y-5,ms.p.z),3.2,48));   // the mast relays the order
+   if(A.shed)out.push(this.still(this.V(A.shed.x-D*8,5.8,A.shed.door+12),this.V(A.shed.x,2.4,A.shed.door-2),5,44));           // the motor pool opens
+   out.push(this.fly(this.V(o.x-D*18,7,-30),this.V(o.x-D*18,8,28),()=>this.V(o.x,1,this.P.z),7,46));return out}                 // the line they come to hold
+  if(kind==='robots'){const S=window.GFX6&&GFX6.RB&&GFX6.RB.sides[o.side],b=S&&S.bots[0];if(b)out.push(this.track(()=>({p:this.V(b.x,ARMY.gy(b.x,b.z),b.z),f:[-this.dirOf(o.side),0]}),9,3,3.4,10,7,48));return out}
+  if(kind==='sat'){out.push({sat:o.side,dur:8});return out}
+  if(kind==='win'){const bx=o.bx,D=Math.sign(bx)||1;out.push(this.crane(this.V(bx,this.gy(bx,0),0),-D,0,22,46,4,26,7,46));return out}
+  return out},
+ next(){if(!this.q.length)this.q=this.reel();this.shot=this.q.shift()||null;this.t0=now();this.cut=true;if(this.shot&&this.shot.slow)this.slowT=this.shot.slow;if(!this.q.length)this.pri=0},
+ /* ---- the camera never goes into the ground, the sea, a building, a tree, a hull or a man ---- */
+ H:{hq:11,shed:6.8,fob:3.4,sam:5,tel:5,tower:10.5,barracks:6.5,hangar:9.5,comm:31,dump:4.5,dome:9.5,ruin:5,wreck:3.2,lamp:7.5,hedgehog:2.2,wire:1.6,revet:2.8,radar:6.5,gun:4.2,truck:4,rock:3.2,heli:4.5},
+ treeIndex(){if(this.trees)return this.trees;const T=new Map(),L=WORLD.treeL||[];for(const t of L){const k=Math.floor(t.x/12)+','+Math.floor(t.z/12);if(!T.has(k))T.set(k,[]);T.get(k).push(t)}return this.trees=T},
+ safe(P,T,dt,cut){let need=this.gy(P.x,P.z)+1.1;
+  if(window.NAV&&NAV.ready)for(const sh of NAV.statics){const h=this.H[sh.tag];if(!h||P.y>h+3)continue;const b=NAV.bounds(sh);if(P.x<b[0]-2||P.x>b[2]+2||P.z<b[1]-2||P.z>b[3]+2)continue;if(NAV.inShape(sh,P.x,P.z,sh.tag==='fob'&&sh.t==='b'&&sh.hx>1.3?1.2:.9)){const top=(sh.tag==='fob'&&sh.t==='b'&&sh.hx>1.3?9.5:h)+this.gy(P.x,P.z)+1.2;if(top>need)need=top}}
+  const TI=this.treeIndex(),cx=Math.floor(P.x/12),cz=Math.floor(P.z/12);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const c=TI.get((cx+i)+','+(cz+j));if(!c)continue;for(const t of c){const r=t.r+1;if((t.x-P.x)*(t.x-P.x)+(t.z-P.z)*(t.z-P.z)<r*r){const top=t.y+t.h+1.5;if(top>need&&P.y<top+2)need=top}}}
+  for(const k in ARMY.sides){const S=ARMY.sides[k].shed;if(S&&Math.abs(P.x-S.x)<S.hw+1.4&&P.z<S.door+1.4&&P.z>S.door-16){const top=this.gy(S.x,S.door-7)+7.6;if(top>need)need=top}}   // the sheds, roof and all
+  const E5=WORLD.env5;if(E5)for(const sp of E5.ships){const g=sp.g.position,L=(sp.g.userData.len||40)*(sp.g.scale.x||1)*.55+3;if(Math.abs(g.x-P.x)<L&&Math.abs(g.z-P.z)<L&&NAV.inBox(P.x,P.z,g.x,g.z,sp.hd||0,L,L*.2+3,0)){const top=-1.15+16*(sp.g.scale.x||1);if(top>need)need=top}}   // ships
+  if(window.GFX6&&GFX6.cv)for(const k in GFX6.cv){const c=GFX6.cv[k];if(!c||!c.g)continue;const g=c.g.position;if(NAV.inBox(P.x,P.z,g.x,g.z,c.g.rotation.y,58,16,0)){const top=-1.15+30;if(top>need)need=top}}   // carriers
+  for(const o of ARMY.movers()){const b=ARMY.VB[o.tier];if(NAV.inBox(P.x,P.z,o.x,o.z,o.hd,b[0],b[1],1.4)){const top=ARMY.gy(o.x,o.z)+(o.tier===2?6:4.6);if(top>need)need=top}}
+  for(const k in ARMY.sides)for(const s of ARMY.sides[k].sold){if(Math.abs(s.x-P.x)<.9&&Math.abs(s.z-P.z)<.9&&s.st!==ST.DIE){const top=ARMY.gy(s.x,s.z)+2.6;if(top>need)need=top}}
+  /* nothing of the ground between the camera and what it looks at */
+  for(let i=1;i<6;i++){const f=i/6,x=P.x+(T.x-P.x)*f,z=P.z+(T.z-P.z)*f,y=P.y+(T.y-P.y)*f,g=this.gy(x,z)+.6;if(y<g){const lift=(g-y)/(1-f);if(P.y+lift>need)need=P.y+lift}}
+  const want=Math.max(0,need-P.y);this.lift=cut?want:this.lift+(want-this.lift)*Math.min(1,dt*5);if(this.lift<want)this.lift=Math.max(this.lift,want-.25);P.y+=this.lift},
+ /* ---- one frame ---- */
+ frame(dtr){const t=now();if(this.hold==null&&(!this.shot||t-this.t0>this.shot.dur*1000))this.next();const s=this.shot;if(!s)return null;
+  if(s.sat)return {sat:s.sat};
+  const u=this.hold!=null?this.hold:Math.min(1,(t-this.t0)/(s.dur*1000)),P=s.P(u,dtr),T=s.T(u,dtr);if(!P||!T)return null;
+  const cut=this.cut;this.cut=false;if(this.slowT&&u>=this.slowT[0]){DIRECTOR.slowmo(this.slowT[1],this.slowT[2]);this.slowT=null}
+  this.P.copy(P);this.T.copy(T);this.safe(this.P,this.T,dtr,cut);this.fov=s.fov||46;
+  if(this.P.y-this.gy(this.P.x,this.P.z)<7){const k=t/1000;this.T.x+=Math.sin(k*1.7)*.12;this.T.y+=Math.sin(k*2.3+1)*.08;this.T.z+=Math.sin(k*1.3+2)*.12}   // hand-held near the ground
+  const lb=WORLD.frontLbl;if(lb)lb.material.opacity=clamp((lb.position.distanceTo(this.P)-18)/22,0,1);
+  return {P:this.P,T:this.T,fov:this.fov,cut}}};
+/* what an army's sensors see coming: the other side's aircraft and missiles in the air (radars, searchlights and the SAM site work from it) */
+const THREATS={list(side){const out=[];for(const a of FX.air||[])if(a.on&&a.side!==side&&a.g&&a.g.visible&&a.g.position.y>4)out.push(a.g.position);const A4=window.GFX4&&GFX4.air;if(A4&&A4.ready)for(const m of A4.M)if(m.on&&m.side!==side&&m.kind!=='I')out.push(m.pos);return out},
+ nearest(side,x,z,r){let b=null,bd=(r||400)*(r||400);for(const p of this.list(side)){const d=(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z);if(d<bd){bd=d;b=p}}return b}};
 const DIRECTOR={punchV:0,lbx:false,mode:PREF.cam||'orbit',yaw:0,pitch:.38,dist:74,T:new THREE.Vector3(0,0,-4),P:new THREE.Vector3(0,70,100),lookT:new THREE.Vector3(),shk:0,ortho:null,slow:null,focusO:null,cine:null,userT:0,drag:null,pinch:null,lastInteract:0,
  init(){const c=$('#gl');this.ortho=new THREE.OrthographicCamera(-100,100,60,-60,1,600);
   c.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType==='mouse')return;this.drag={x:e.clientX,y:e.clientY,yaw:this.yaw,pitch:this.pitch,id:e.pointerId};this.ptrs=this.ptrs||new Map();this.ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(this.ptrs.size===2){const a=[...this.ptrs.values()];this.pinch={d:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),dist:this.dist};this.drag=null}this.lastInteract=now();try{c.setPointerCapture(e.pointerId)}catch(x){}});
   c.addEventListener('pointermove',e=>{if(this.ptrs&&this.ptrs.has(e.pointerId))this.ptrs.set(e.pointerId,[e.clientX,e.clientY]);if(this.pinch&&this.ptrs&&this.ptrs.size===2){const a=[...this.ptrs.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);this.dist=clamp(this.pinch.dist*this.pinch.d/Math.max(1,d),24,170);return}
-   if(this.drag&&this.drag.id===e.pointerId){const dx=e.clientX-this.drag.x,dy=e.clientY-this.drag.y;if(Math.abs(dx)+Math.abs(dy)>3){this.yaw=clamp(this.drag.yaw+dx*.004,-1.1,1.1);this.pitch=clamp(this.drag.pitch-dy*.003,.22,1.25);this.lastInteract=now();if(this.mode==='cine'){this.cine=null}}}
+   if(this.drag&&this.drag.id===e.pointerId){const dx=e.clientX-this.drag.x,dy=e.clientY-this.drag.y;if(Math.abs(dx)+Math.abs(dy)>3){this.yaw=clamp(this.drag.yaw+dx*.004,-1.1,1.1);this.pitch=clamp(this.drag.pitch-dy*.003,.22,1.25);this.lastInteract=now();if(this.mode==='cine')CINE.reset()}}
    else HUD.hover(e)});
   const up=e=>{if(this.ptrs)this.ptrs.delete(e.pointerId);if(this.ptrs&&this.ptrs.size<2)this.pinch=null;if(this.drag&&this.drag.id===e.pointerId){if(Math.abs(e.clientX-this.drag.x)+Math.abs(e.clientY-this.drag.y)<=3)HUD.click(e);this.drag=null}};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);c.addEventListener('pointerleave',()=>HUD.hover(null));
   c.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();this.zoom(e.deltaY*.06)},{passive:false});this.setMode(this.mode,true)},
- setMode(m,quiet){this.mode=m;PREF.cam=m;savePref();this.cine=null;this.focusO=null;if(m==='follow'){this.dist=Math.min(this.dist,64)}if(m==='tactical'){this.dist=clamp(this.dist,60,160)}if(m==='naval'||m==='space'){this.yaw=0;this.pitch=.38}HUD.cams();if(!quiet)AUDIO.play('ui',{vol:.3})},
+ setMode(m,quiet){this.mode=m;PREF.cam=m;savePref();CINE.reset();if(WORLD.frontLbl)WORLD.frontLbl.material.opacity=1;this.focusO=null;if(m!=='cine'&&cam.fov!==46){cam.fov=46;cam.updateProjectionMatrix()}if(m==='follow'){this.dist=Math.min(this.dist,64)}if(m==='tactical'){this.dist=clamp(this.dist,60,160)}if(m==='naval'||m==='space'){this.yaw=0;this.pitch=.38}HUD.cams();if(!quiet)AUDIO.play('ui',{vol:.3})},
  zoom(d){this.dist=clamp(this.dist+d,24,170);this.lastInteract=now()},
  shake(a){if(REDUCED())return;this.shk=Math.min(3.2,this.shk+a)},
  punch(a){if(REDUCED())return;this.punchV=Math.min(9,this.punchV+a*2.4)},
  slowmo(s,dur){if(REDUCED())return;this.slow={s,until:now()+dur*1000}},
  slowTick(dtr){if(this.slow){if(now()>this.slow.until){this.slow=null}else{S.timeScale+=(this.slow.s-S.timeScale)*Math.min(1,dtr*10);return}}S.timeScale+=(1-S.timeScale)*Math.min(1,dtr*3)},
- focus(x,z,dur,opt){if(this.mode==='tactical'||this.mode==='naval'||this.mode==='space')return;if(this.mode!=='cine'&&now()-this.lastInteract<20000&&!(opt&&opt.force))return;this.focusO={x,z,until:now()+dur*1000,dist:(opt&&opt.dist)||46,pitch:(opt&&opt.pitch)||.42,yaw:this.yaw+rnd(.5,-.5)}},
- cineShot(){const fx=X(VIEW.price||(VIEW.round&&VIEW.round.p0)||0);const sh=[{T:[fx,0,-4],yaw:rnd(.6,-.6),pitch:.6,dist:96,dur:13},{T:[fx-16,0,rnd(20,-20)],yaw:rnd(1,.3),pitch:.26,dist:40,dur:10},{T:[fx+16,0,rnd(20,-20)],yaw:rnd(-.3,-1),pitch:.26,dist:40,dur:10},{T:[fx,0,0],yaw:0,pitch:1.1,dist:112,dur:9},{T:[fx+rnd(10,-10),0,rnd(30,-30)],yaw:rnd(.8,-.8),pitch:.2,dist:28,dur:8}];
-  const bull=ARMY.sides.bull.sold.length,bear=ARMY.sides.bear.sold.length;if(bull>bear*1.6)sh.push({T:[fx-24,0,0],yaw:.9,pitch:.36,dist:52,dur:9});if(bear>bull*1.6)sh.push({T:[fx+24,0,0],yaw:-.9,pitch:.36,dist:52,dur:9});
-  sh.push({T:[fx-30,1,rnd(30,-30)],yaw:rnd(1.4,.9),pitch:.09,dist:22,dur:9},{T:[fx+30,1,rnd(30,-30)],yaw:rnd(-.9,-1.4),pitch:.09,dist:22,dur:9},{T:[fx,0,-30],yaw:rnd(.3,-.3),pitch:.15,dist:62,dur:11},{T:[rnd(60,-60),0,rnd(20,-20)],yaw:rnd(1.2,-1.2),pitch:.5,dist:84,dur:12});
-  /* a squad or a tank up close, when there is one */
-  for(const k of ['bull','bear']){const A=ARMY.sides[k],f=ARMY.frontOf(A),s0=f[Math.floor(Math.random()*Math.min(6,f.length))],v=A.veh.find(v=>!v.dead&&!v.mv);if(s0)sh.push({T:[s0.x,1.4,s0.z],yaw:(k==='bull'?1:-1)*rnd(1.3,.5),pitch:.12,dist:13,dur:8});if(v)sh.push({T:[v.x,1.8,v.z],yaw:(k==='bull'?1:-1)*rnd(1.2,.4),pitch:.14,dist:20,dur:8})}
-  /* 5.0: the fleets, the bay, the harbours, the missile and radar sites, the gun lines, the view from orbit */
-  const E5=WORLD.env5;if(E5){for(const sp of E5.ships)if(Math.random()<.6)sh.push({fo:sp.g,yaw:rnd(6.28),pitch:rnd(.2,.09),dist:sp.kind==='dd'?66:50,dur:11,h:5});
-   if(window.GFX6){for(const k in GFX6.cv)sh.push({fo:GFX6.cv[k].g,yaw:rnd(6.28),pitch:rnd(.3,.14),dist:rnd(120,84),dur:12,h:9});for(const k in GFX6.RB.sides){const b=GFX6.RB.sides[k].bots[1];if(b)sh.push({T:[b.x,1.7,b.z],yaw:(k==='bull'?1:-1)*rnd(1.5,.7),pitch:.13,dist:rnd(17,11),dur:9})}}
-   sh.push({T:[0,3,-150],yaw:Math.PI+rnd(.5,-.5),pitch:.15,dist:150,dur:12},{T:[-86,2,-118],yaw:-.9,pitch:.3,dist:60,dur:10},{T:[86,2,-118],yaw:.9,pitch:.3,dist:60,dur:10},{T:[-36,2,-55],yaw:.6,pitch:.22,dist:46,dur:9},{T:[36,2,-55],yaw:-.6,pitch:.22,dist:46,dur:9},{T:[-64,1,-30],yaw:-.4,pitch:.2,dist:36,dur:9},{T:[64,1,-30],yaw:.4,pitch:.2,dist:36,dur:9},{sat:Math.random()<.5?'bull':'bear',dur:10})}
-  const s=sh[Math.floor(Math.random()*sh.length)];this.cine={s,t0:now()}},
+ focus(x,z,dur,opt){if(this.mode==='tactical'||this.mode==='naval'||this.mode==='space'||this.mode==='cine')return;/* (the cinema cuts to big moments itself) */if(this.mode!=='cine'&&now()-this.lastInteract<20000&&!(opt&&opt.force))return;this.focusO={x,z,until:now()+dur*1000,dist:(opt&&opt.dist)||46,pitch:(opt&&opt.pitch)||.42,yaw:this.yaw+rnd(.5,-.5)}},
  /* the camera rides behind a satellite and looks down on the field */
  orbital(side,k,fx){const E5=WORLD.env5,sp=E5.sats[side].g.position,r=Math.hypot(sp.x,sp.z+30)||1,ox=sp.x/r,oz=(sp.z+30)/r;this.P.lerp(new THREE.Vector3(sp.x+ox*30-oz*(this.yaw*14+7),sp.y+9+this.pitch*10,sp.z+oz*30+ox*(this.yaw*14+7)),k);this.T.lerp(new THREE.Vector3(fx*.3,0,-8),k);cam.position.copy(this.P);cam.up.set(0,1,0);cam.lookAt(this.T.x,this.T.y,this.T.z);if(AUDIO.ctx)AUDIO.listener(cam);return cam},
  tick(dt,dtr){const t=now(),fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0;let T,yaw=this.yaw,pitch=this.pitch,dist=this.dist,k=Math.min(1,dtr*2.2);
   if(this.focusO&&t<this.focusO.until){T=new THREE.Vector3(this.focusO.x,0,this.focusO.z);yaw=this.focusO.yaw;pitch=this.focusO.pitch;dist=this.focusO.dist;k=Math.min(1,dtr*3)}
   else{this.focusO=null;if(this.mode==='follow'){T=new THREE.Vector3(fx,0,0);dist=Math.min(dist,72)}
-   else if(this.mode==='cine'){if(!this.cine||t-this.cine.t0>this.cine.s.dur*1000)this.cineShot();const s=this.cine.s;if(s.sat&&WORLD.env5){this.letter(true);return this.orbital(s.sat,Math.min(1,dtr*1.4),fx)}T=s.fo?new THREE.Vector3(s.fo.position.x,s.h||2,s.fo.position.z):new THREE.Vector3(...s.T);yaw=s.yaw;pitch=s.pitch;dist=s.dist;k=Math.min(1,dtr*.9)}
+   else if(this.mode==='cine'){const r=CINE.frame(dtr);this.letter(true);if(r&&r.sat&&WORLD.env5)return this.orbital(r.sat,Math.min(1,dtr*1.4),fx);
+    if(r&&r.P){if(r.cut){this.P.copy(r.P);this.T.copy(r.T)}else{this.P.lerp(r.P,Math.min(1,dtr*12));this.T.lerp(r.T,Math.min(1,dtr*12))}this.punchV*=Math.pow(.04,dtr);const fv=r.fov+this.punchV;if(Math.abs(cam.fov-fv)>.01){cam.fov=fv;cam.updateProjectionMatrix()}
+     this.shk*=Math.pow(.02,dtr);const sh=this.shk*(Math.random()-.5);cam.position.set(this.P.x+sh,this.P.y+sh*.5,this.P.z+sh*.7);cam.up.set(0,1,0);cam.lookAt(this.T.x,this.T.y+sh*.3,this.T.z);if(AUDIO.ctx)AUDIO.listener(cam);return cam}
+    T=new THREE.Vector3(fx,0,-4)}
    else if(this.mode==='naval'){T=new THREE.Vector3(0,3,-205);yaw=Math.PI+this.yaw;pitch=clamp(this.pitch-.18,.08,.9);dist=clamp(dist*3.6,150,380)}/* far enough out that both carriers, the destroyers and the frigates share the frame */
    else if(this.mode==='space'&&WORLD.env5){this.letter(false);return this.orbital(S.pressure>=.5?'bull':'bear',Math.min(1,dtr*2),fx)}
    else if(this.mode==='tactical'){T=new THREE.Vector3(fx*.5,0,0)}
@@ -557,36 +926,37 @@ const DIRECTOR={punchV:0,lbx:false,mode:PREF.cam||'orbit',yaw:0,pitch:.38,dist:7
   if(this.punchV>.01||cam.fov!==46){this.punchV*=Math.pow(.04,dtr);cam.fov=46+this.punchV;cam.updateProjectionMatrix()}
   this.shk*=Math.pow(.02,dtr);const sh=this.shk*(Math.random()-.5);cam.position.set(this.P.x+sh,this.P.y+sh*.5,this.P.z+sh*.7);cam.up.set(0,1,0);cam.lookAt(this.T.x,1+sh*.3,this.T.z);
   if(AUDIO.ctx)AUDIO.listener(cam);return cam},
- letter(lb){if(lb!==this.lbx){this.lbx=lb;$('#bf').classList.toggle('lbx',lb);if(WORLD.post)WORLD.post.tilt(lb&&S.quality!=='low'&&S.quality!=='lite',2.4)}},
+ letter(lb){if(lb!==this.lbx){this.lbx=lb;$('#bf').classList.toggle('lbx',lb);if(WORLD.post)WORLD.post.tilt(lb&&this.mode!=='cine'&&S.quality!=='low'&&S.quality!=='lite',2.4)}},
  /* ---- scenarios ---- */
  scenario(name,o){o=o||{};const r=VIEW.round,E5=window.GFX5&&WORLD.env5?GFX5:null;
-  if(name==='win'){const side=o.side;HUD.banner(side==='bulls'?T('bullsWin'):T('bearsWin'),side==='bulls'?'bull':'bear',`${T('newRound')} ${fmtP(VIEW.price)}`);const bx=side==='bulls'?74:-74;for(let i=0;i<6;i++)setTimeout(()=>R3&&FX.explode(bx+rnd(6,-6),rnd(7,-7),2.2,side==='bulls'?0x9af5b0:0xffb0b0),i*170);
-   ARMY.cheer(side==='bulls'?'bull':'bear');AUDIO.stinger(side==='bulls'?'major':'minor');HUD.radio('push');this.focus(bx,0,3.2,{dist:52,pitch:.4});const loser=side==='bulls'?WORLD.baseR:WORLD.baseB;if(loser&&loser.userData.flag){loser.userData.flag.position.y=8.8;setTimeout(()=>loser.userData.flag.position.y=11.4,20000)}}
+  if(name==='win'){const side=o.side;HUD.banner(side==='bulls'?T('bullsWin'):T('bearsWin'),side==='bulls'?'bull':'bear',`${T('newRound')} ${fmtP(VIEW.price)}`);const bx=(side==='bulls'?WORLD.baseR:WORLD.baseB).position.x;for(let i=0;i<6;i++)setTimeout(()=>R3&&FX.explode(bx+rnd(6,-6),rnd(7,-7),2.2,side==='bulls'?0x9af5b0:0xffb0b0),i*170);
+   ARMY.cheer(side==='bulls'?'bull':'bear');AUDIO.stinger(side==='bulls'?'major':'minor');HUD.radio('push');this.focus(bx,0,3.2,{dist:52,pitch:.4});CINE.event('win',{bx,pri:5});const loser=side==='bulls'?WORLD.baseR:WORLD.baseB;if(loser&&loser.userData.flag){loser.userData.flag.position.y=8.8;setTimeout(()=>loser.userData.flag.position.y=loser.userData.flagY,20000)}}
   else if(name==='cascade'){HUD.banner(T('cascadeB'),'warn');AUDIO.play('siren',{vol:.6});HUD.radio('cascade');WORLD.cascadeUntil=now()+60000;AUDIO.intensity(1);
-   const att=o.side==='long'?'bear':'bull';if(E5&&VIEW.round&&PREF.layers.fx&&E5.naval.sub(att,X(VIEW.price||VIEW.round.p0)+(att==='bull'?8:-8),rnd(20,-20),2,o.usd)){evt(VIEW,{k:'subm',usd:o.usd,p:VIEW.price});AUDIO.play('sonar',{vol:.5})}}
+   const att=o.side==='long'?'bear':'bull',stx=X(VIEW.price||VIEW.round.p0)+(att==='bull'?8:-8),stz=rnd(20,-20);if(E5&&VIEW.round&&PREF.layers.fx&&E5.naval.sub(att,stx,stz,2,o.usd)){evt(VIEW,{k:'subm',usd:o.usd,p:VIEW.price});AUDIO.play('sonar',{vol:.5});CINE.event('sub',{att,tx:stx,tz:stz,pri:4})}}
   else if(name==='extreme'){HUD.banner(T('extremeB'),'warn')}
-  else if(name==='wall'){const x=X(o.p),side=o.side;ARMY.convoy(side,x);setTimeout(()=>ARMY.convoy(side,x),900);HUD.radio('hold');AUDIO.play('brass',{vol:.5});if(this.mode==='cine')this.focus(x+(side==='bull'?-6:6),0,4,{dist:44,pitch:.36,yaw:side==='bull'?-.8:.8})}
+  else if(name==='wall'){const x=X(o.p),side=o.side;if(window.GFX4&&GFX4.relay)GFX4.relay(side);ARMY.convoy(side,x);setTimeout(()=>ARMY.convoy(side,x),900);HUD.radio('hold');AUDIO.play('brass',{vol:.5});CINE.event('wall',{side,x,pri:2})}
   else if(name==='pulled'){AUDIO.play('retreat',{x:X(o.p),z:0,vol:.6})}
   else if(name==='convoy'){ARMY.convoy(o.side==='b'?'bull':'bear',X(o.p))}
   else if(name==='fort'){HUD.radio('wall');AUDIO.play('build',{x:X(o.p),z:0,vol:.6})}
   else if(name==='roundNum'){AUDIO.play('horn',{vol:.7});FX.flare(X(o.p),0);HUD.banner(fmtP(o.p),'warn',T('f').roundNum,2200)}
-  else if(name==='bigOrder'){const sd=o.side==='buy'?'bull':'bear';ARMY.surge(sd);this.focus(X(o.p),0,3,{dist:50,pitch:.4});AUDIO.play('cannon',{x:X(o.p),z:0,vol:.9});
-   if(E5&&PREF.layers.fx&&E5.naval.fire(sd,clamp(X(o.p)+(sd==='bull'?3:-3),-72,72),rnd(28,-28),o.usd,o.usd>=5e6?4:2)){evt(VIEW,{k:'naval',usd:o.usd,p:o.p});HUD.radio('naval')}}
+  else if(name==='bigOrder'){const sd=o.side==='buy'?'bull':'bear';if(window.GFX4&&GFX4.relay)GFX4.relay(sd);ARMY.surge(sd);this.focus(X(o.p),0,3,{dist:50,pitch:.4});AUDIO.play('cannon',{x:X(o.p),z:0,vol:.9});
+   const ntx=clamp(X(o.p)+(sd==='bull'?3:-3),-72,72),ntz=rnd(28,-28);if(E5&&PREF.layers.fx&&E5.naval.fire(sd,ntx,ntz,o.usd,o.usd>=5e6?4:2)){evt(VIEW,{k:'naval',usd:o.usd,p:o.p});HUD.radio('naval');CINE.event('naval',{side:sd,tx:ntx,tz:ntz,pri:3})}}
   /* the machines answer a sweep of the book: out through the gate, a volley for every level taken */
-  else if(name==='sweep'){const sd=o.side==='buy'?'bull':'bear';if(window.GFX6&&PREF.layers.fx&&PREF.layers.units&&GFX6.RB.sweep(sd,X(o.p),o.usd,o.n||4)){HUD.radio('robots');AUDIO.play('servo',{x:sd==='bull'?-62:62,z:0,vol:.5})}}
+  else if(name==='sweep'){const sd=o.side==='buy'?'bull':'bear';if(window.GFX6&&PREF.layers.fx&&PREF.layers.units&&GFX6.RB.sweep(sd,X(o.p),o.usd,o.n||4)){HUD.radio('robots');AUDIO.play('servo',{x:sd==='bull'?-62:62,z:0,vol:.5});CINE.event('robots',{side:sd,pri:2})}}
   else if(name==='regime'){WORLD.skyMode();AUDIO.key(o.reg)}
   else if(name==='disc'){HUD.banner(T('discB'),'warn',null,6000);HUD.radio('lost');WORLD.discFog=true;AUDIO.play('static',{vol:.4})}
   else if(name==='recon'){WORLD.discFog=false;AUDIO.play('ui',{vol:.4})}
   /* reconnaissance: one army's satellite sweeps the field and reports what the order book, the tape and the liquidation feeds say right now */
   else if(name==='intel'){const rep=intel(VIEW);if(!rep)return;const by=o.by||(S.intelBy=S.intelBy==='bull'?'bear':'bull'),tg=[];
    if(rep.bid)tg.push({x:X(rep.bid.p),z:0,col:0x4ade80,txt:fmtU(rep.bid.usd)});if(rep.ask)tg.push({x:X(rep.ask.p),z:0,col:0xf87171,txt:fmtU(rep.ask.usd)});
-   if(E5&&PREF.layers.fx)E5.scan(by,tg);HUD.intel(rep,by);HUD.radio('sat');AUDIO.play('scan',{vol:.5});evt(VIEW,{k:'intel',by});S.intelT=Date.now()}
+   if(E5&&PREF.layers.fx){E5.scan(by,tg);CINE.event('sat',{side:by,pri:2})}HUD.intel(rep,by);HUD.radio('sat');AUDIO.play('scan',{vol:.5});evt(VIEW,{k:'intel',by});S.intelT=Date.now()}
   void r},
  /* ---- liquidation strikes (4.0): strike value = max(single liquidation, 0.8 x same-side sum of the last 15 s); a cascade bumps one tier; a tier still cooling down falls back one step ---- */
  strike(side,usd,p,cas){if(!VIEW.round||!PREF.layers.fx)return;const att=side==='long'?'bear':'bull',tx=clamp(X(p),-70,70),tz=rnd(30,-30),t=Date.now();
   const sum15=VIEW.liqs.filter(x=>x.side===side&&t-x.t<15000).reduce((a,x)=>a+x.usd,0),v=Math.max(usd,.8*sum15);
   let tier=v<1e4?0:v<5e4?1:v<1.5e5?2:v<5e5?3:v<2e6?4:v<1e7?5:6;if(cas)tier=Math.min(6,tier+1);
   const CD=[0,0,3e3,8e3,15e3,3e4,9e4],last=this.tierT||(this.tierT=[0,0,0,0,0,0,0]);while(tier>1&&t-last[tier]<CD[tier])tier--;last[tier]=t;
+  if(tier>=1)setTimeout(()=>CINE.event(['','guns','guns','heli','jets','missile','raid'][tier],{att,tx,tz,pri:tier}),80);
   if(VIEW===L&&PREF.sky==='auto'){const sum5=VIEW.liqs.filter(x=>t-x.t<3e5).reduce((a,x)=>a+x.usd,0);if(sum5>=1e7&&!(S.nightUntil>t)){S.nightUntil=t+18e4;WORLD.skyMode()}}
   const A4=window.GFX4&&GFX4.air.ready?GFX4.air:null;
   const E5=window.GFX5&&WORLD.env5?GFX5:null;
@@ -595,6 +965,7 @@ const DIRECTOR={punchV:0,lbx:false,mode:PREF.cam||'orbit',yaw:0,pitch:.38,dist:7
   if(tier===3){FX.heli(att,tx,tz,usd);setTimeout(()=>R3&&FX.heli(att,clamp(tx+rnd(8,-8),-70,70),clamp(tz+rnd(14,-14),-34,34),usd),700);ARMY.rocketFire(att,tx,tz,usd);this.focus(tx,tz,6,{dist:56,pitch:.38});evt(VIEW,{k:'heli',usd,p});return}
   const E6=window.GFX6&&E5&&GFX6.cv[att]?GFX6:null,fly=(n,ms)=>{if(E6&&E6.sortie(att,tx,tz,n,usd)){HUD.radio('sortie');return true}if(A4)A4.formation(att,tx,tz,n,usd,ms);return false};
   if(tier===4){if(A4){fly(2,0);if(E5)A4.after(1600,()=>{if(E5.naval.cruise(att,tx,tz,2)){HUD.radio('cruise');GFX4.say('cruise')}});else A4.cruise(att,tx,tz,2,1600)}else FX.jet(att,tx,tz,usd);this.focus(tx,tz,6,{dist:60,pitch:.3,force:true});evt(VIEW,{k:'bomb',usd,p});return}
+  if(tier>=5&&A4&&A4.strike&&window.GFX4)A4.after(2600,()=>{const def=att==='bull'?'bear':'bull',T=GFX4.LAY.items.filter(i=>i.side===def&&['dump','yard','hangar','barracks','comm','dome','tel','sam'].includes(i.k));const it=T[Math.floor(Math.random()*T.length)];if(it){A4.strike(att,it.x,it.z,usd,it);HUD.radio('missile')}});
   if(tier===5){if(A4){A4.ballistic(att,tx,tz,E5?3:4,usd);fly(3,3200);if(E5&&E5.naval.sub(att,tx,tz,1,usd))evt(VIEW,{k:'subm',usd,p})}else FX.jet(att,tx,tz,usd);this.focus(tx,tz,8,{dist:74,pitch:.34,force:true});setTimeout(()=>this.slowmo(.3,1.6),6200);evt(VIEW,{k:'missile',usd,p});return}
   HUD.radio('raid');if(window.GFX4)GFX4.say('raid');AUDIO.play('siren',{vol:.7});
   if(A4){fly(5,1800);if(E5){A4.after(3400,()=>{E5.naval.cruise(att,tx,tz,6);HUD.radio('cruise')});E5.naval.fire(att,tx,tz,usd,4);if(E5.naval.sub(att,tx,tz,3,usd))evt(VIEW,{k:'subm',usd,p})}else A4.cruise(att,tx,tz,6,3400);A4.ballistic(att,tx,tz,2,usd,1000)}
@@ -770,7 +1141,7 @@ const HUD={depthT:0,ray:new THREE.Raycaster(),plane:new THREE.Plane(new THREE.Ve
 S.pxHud=0;S.feedRP=[];
 function boot4(){try{$('#bf').classList.toggle('soft',!!(S.gpu&&S.gpu.soft));const n=$('#gpuN');if(n&&S.gpu&&S.gpu.soft&&!ls.get('ek_bf_gpu',0)){n.hidden=false;$('#gpuX').onclick=()=>{n.hidden=true;ls.set('ek_bf_gpu',1)}}const mb=$('#mixB');if(mb)mb.onclick=()=>{const st=$('#settings');if(st.hidden)$('#setB').click();setTimeout(()=>{const r=st.querySelector('input[type=range]');if(r){r.scrollIntoView({block:'center'});r.focus()}},80)}}catch(e){console.error(e)}}
 function boot(){const ld=(p,txt)=>{$('#ldP').textContent=p+'%';$('#ldB').style.width=p+'%';void txt};HUD.bind();
- if(hasGL()){try{ld(10);WORLD.init();ld(40);ARMY.init();ld(65);FX.init();if(window.GFX4)try{GFX4.boot()}catch(e){console.error(e)}if(window.GFX6)try{GFX6.boot()}catch(e){console.error(e)}boot4();ld(85);DIRECTOR.init();WORLD.setQuality(PREF.quality==='auto'?WORLD.q0:PREF.quality);HUD.layers();requestAnimationFrame(loop);ld(100)}catch(e){console.error(e);R3=false;$('#nogl').hidden=false}}else $('#nogl').hidden=false;
+ if(hasGL()){try{ld(10);WORLD.init();ld(40);ARMY.init();ld(65);FX.init();if(window.GFX4)try{GFX4.boot()}catch(e){console.error(e)}if(window.GFX6)try{GFX6.boot()}catch(e){console.error(e)}if(window.NAV)try{NAV.bake();ARMY.navInit()}catch(e){console.error(e)}boot4();ld(85);DIRECTOR.init();WORLD.setQuality(PREF.quality==='auto'?WORLD.q0:PREF.quality);HUD.layers();requestAnimationFrame(loop);ld(100)}catch(e){console.error(e);R3=false;$('#nogl').hidden=false}}else $('#nogl').hidden=false;
  setTimeout(()=>{$('#loading').hidden=true},300);setTimeout(()=>{$('#intro').hidden=true},9000);
  uiLang(()=>HUD.lang());if(AUDIO.on)AUDIO.init();HUD.snd();
  connect();loadRegime();setInterval(loadRegime,300000);setInterval(metrics,1000);setInterval(()=>HUD.live(),30000)}

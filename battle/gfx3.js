@@ -258,7 +258,7 @@ G.heightFn = function () {
     const back = sm(70, 140, -z) * 10 * (.6 + .4 * G.fbmW(x * .01, 5, 2));
     let h = core + edge * hills + back;
     /* base plateaus (HQ compounds sit level) */
-    for (const bx of [-74, 74]) { const d = Math.hypot(x - bx, z); if (d < 16) h = mix(h, core * .3 + .15, sm(16, 9, d)); }
+    for (const bx of [-80, 80]) { const d = Math.hypot(x - bx, z); if (d < 27) h = mix(h, core * .3 + .15, sm(27, 20, d)); }
     /* road: a dirt track across the field */
     const rd = Math.abs(z - 2 * Math.sin(x * .035)); if (rd < 3.2 && ax < 90) h -= .12 * sm(3.2, 1.2, rd);
     return h;
@@ -420,6 +420,27 @@ G.profile = function (pts, depth, bevel) {
   g.translate(0, 0, -(depth - b * 2) / 2); return g;
 };
 
+/* thin square strut between two points (unpainted) */
+G.beam = function (p, q, t) {
+  const d = new THREE.Vector3().subVectors(q, p), len = d.length(), g = new THREE.BoxGeometry(t, len, t);
+  g.applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize())));
+  g.translate((p.x + q.x) / 2, (p.y + q.y) / 2, (p.z + q.z) / 2); return g.toNonIndexed();
+};
+/* a dish antenna as a solid shell with its feed: prof is the concave face from the axis out to the rim ([r, y] pairs).
+   The lathe runs down the back from the axis to the rim and up the face back to the axis, so every face of the shell points
+   outward and the dish is solid from every side (a single open surface vanishes whenever its back turns to the camera).
+   Axis on +y, vertex at the origin; returns [shell, feed horn, three struts] for the caller to paint and place. */
+G.dishGeo = function (prof, thick, seg, feed) {
+  const n = prof.length, R = prof[n - 1][0], D = prof[n - 1][1];
+  const back = prof.map(([r, y], i) => [i === n - 1 ? r + thick * .6 : r, y - thick]);
+  const out = [new THREE.LatheGeometry(back.concat(prof.slice().reverse()).map(p => new THREE.Vector2(p[0], p[1])), seg || 16).toNonIndexed()];
+  if (feed === false) return out;
+  const f = Math.max(D * 1.25, R * R / (4 * D)), V3 = THREE.Vector3;
+  const horn = new THREE.CylinderGeometry(R * .06, R * .09, R * .2, 8); horn.translate(0, f, 0); out.push(horn.toNonIndexed());
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2 + .5; out.push(G.beam(new V3(Math.cos(a) * R * .96, D - thick * .5, Math.sin(a) * R * .96), new V3(Math.cos(a) * R * .05, f - R * .06, Math.sin(a) * R * .05), R * .025)); }
+  return out;
+};
+
 /* ------------------------------------------------------------------ flora */
 G.pineGeo = function (lite) {
   const parts = [];
@@ -453,7 +474,14 @@ G.broadleafGeo = function (lite) {
 G.deadTreeGeo = function () {
   const parts = [], c = [.16, .13, .11];
   const t = new THREE.CylinderGeometry(.12, .3, 4.2, 6); T(t, 0, 2.1, 0); parts.push(solid(t, c));
-  [[.7, 2.6, .2, .9], [-.6, 3.1, -.3, -.8], [.3, 3.6, .5, .5]].forEach(([x, y, z, a]) => { const b = new THREE.CylinderGeometry(.05, .1, 1.6, 5); R(b, 'z', a); T(b, x, y, z); parts.push(solid(b, c)); });
+  /* branches grow out of the trunk: each one starts on the trunk's axis at height y and leans out at angle a (from vertical) towards heading h */
+  const V3 = THREE.Vector3;
+  [[2.4, .9, .25], [2.9, .8, 3.4], [3.4, .55, 1.6]].forEach(([y, a, h]) => {
+    const dir = new V3(Math.sin(a) * Math.cos(h), Math.cos(a), Math.sin(a) * Math.sin(h)), p = new V3(0, y, 0), q = p.clone().addScaledVector(dir, 1.6);
+    const b = new THREE.CylinderGeometry(.05, .1, 1.6, 5); b.translate(0, .8, 0);
+    b.applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new V3(0, 1, 0), dir))); b.translate(p.x, p.y, p.z); void q;
+    parts.push(solid(b, c));
+  });
   return merge(parts);
 };
 G.rockGeo = function () {
@@ -627,6 +655,7 @@ G.spg = function (mat) {
   const tu = plan([[-2.1, -1.0], [.7, -1.0], [1.05, -.6], [1.05, .6], [.7, 1.0], [-2.1, 1.0]], 1.15, .07); tu.translate(-.35, 1.1, 0); L.push(V(tu, 0));
   const band = G.rbox(2.2, .12, .02, .01, 1); band.translate(-.8, 1.8, 1.0); L.push(V(band, 4));
   const mg = new THREE.CylinderGeometry(.03, .03, .8, 5); mg.rotateZ(-Math.PI / 2); mg.translate(-.6, 2.45, .5); L.push(V(mg, 2, 0, [.1, .1, .1]));
+  const pin = new THREE.CylinderGeometry(.025, .035, .24, 5); pin.translate(-.6, 2.33, .5); L.push(V(pin, 2, 0, [.1, .1, .1]));   // the machine gun stands on a pintle
   const body = new THREE.Mesh(mergeMat(L), mat); body.castShadow = body.receiveShadow = true; g.add(body);
   const piv = new THREE.Group(); piv.position.set(.75, 1.75, 0); piv.rotation.z = .55;
   const bar = new THREE.Mesh(mergeMat([V((() => { const c = new THREE.CylinderGeometry(.11, .14, 4.6, 12); c.rotateZ(-Math.PI / 2); c.translate(2.3, 0, 0); return c; })(), 2, 0, [.14, .14, .13]),
@@ -674,11 +703,16 @@ G.heli = function (mat) {
   const stab = G.rbox(.6, .05, 1.6, .02, 1); stab.translate(-4.9, .3, 0); L.push(V(stab, 0));
   [1, -1].forEach(s => {
     const w = G.rbox(.7, .08, 1.3, .03, 1); w.translate(-.1, -.05, s * .95); L.push(V(w, 0));
-    const pod = new THREE.CylinderGeometry(.2, .2, 1.1, 10); pod.rotateZ(Math.PI / 2); pod.translate(.05, -.32, s * 1.45); L.push(V(pod, 2, 0, [.14, .14, .13]));
+    /* rocket pod on a pylon under the stub wing */
+    const pyl = G.rbox(.42, .12, .06, .02, 1); pyl.translate(.05, -.13, s * 1.45); L.push(V(pyl, 2, 0, [.12, .12, .12]));
+    const pod = new THREE.CylinderGeometry(.2, .2, 1.1, 10); pod.rotateZ(Math.PI / 2); pod.translate(.05, -.36, s * 1.45); L.push(V(pod, 2, 0, [.14, .14, .13]));
+    /* skids on two cross struts each, bolted to the belly */
     const sk = G.rbox(2.4, .07, .07, .03, 1); sk.translate(.1, -.95, s * .62); L.push(V(sk, 2, 0, [.12, .12, .12]));
-    const gear = G.rbox(.06, .45, .06, .02, 1); gear.translate(.6, -.72, s * .55); L.push(V(gear, 2, 0, [.12, .12, .12]));
+    [.75, -.55].forEach(x => L.push(V(G.beam(new THREE.Vector3(x, -.95, s * .62), new THREE.Vector3(x, -.5, s * .3), .06), 2, 0, [.12, .12, .12])));
   });
-  const gun = new THREE.CylinderGeometry(.04, .04, .9, 6); gun.rotateZ(Math.PI / 2); gun.translate(2.6, -.55, 0); L.push(V(gun, 2, 0, [.1, .1, .1]));
+  /* chin turret: a ball under the nose and its gun */
+  const ball = new THREE.SphereGeometry(.17, 8, 6); ball.translate(2.05, -.36, 0); L.push(V(ball, 2, 0, [.1, .1, .1]));
+  const gun = new THREE.CylinderGeometry(.04, .04, .8, 6); gun.rotateZ(Math.PI / 2); gun.translate(2.55, -.4, 0); L.push(V(gun, 2, 0, [.1, .1, .1]));
   const band = G.rbox(1.0, .14, 1.12, .03, 1); band.translate(-1.2, .1, 0); L.push(V(band, 4));
   const body = new THREE.Mesh(mergeMat(L), mat); body.castShadow = true; g.add(body);
   const rotor = new THREE.Group(); rotor.position.set(.1, 1.0, 0);
@@ -697,17 +731,19 @@ G.heli = function (mat) {
 G.jet = function (mat, big) {
   const g = new THREE.Group(), L = [];
   if (!big) {
-    const fus = new THREE.LatheGeometry([[0, -3.1], [.42, -2.9], [.55, -1.5], [.6, .6], [.48, 2.0], [.22, 3.0], [0, 3.55]].map(p => new THREE.Vector2(p[0], p[1])), 14);
+    const fus = new THREE.LatheGeometry([[0, -3.0], [.4, -3.0], [.42, -2.9], [.55, -1.5], [.6, .6], [.48, 2.0], [.22, 3.0], [0, 3.55]].map(p => new THREE.Vector2(p[0], p[1])), 14);
     fus.rotateZ(-Math.PI / 2); fus.scale(1, .9, 1.05); L.push(V(fus, 0));
     const can = new THREE.SphereGeometry(.45, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2); can.scale(2.4, .75, .75); can.translate(1.55, .38, 0); L.push(V(can, 5));
     const wing = plan([[-.9, 0], [1.1, 0], [-1.6, 3.7], [-2.35, 3.7]], .1, .02); const w2 = plan([[-.9, 0], [1.1, 0], [-1.6, -3.7], [-2.35, -3.7]], .1, .02);
     [wing, w2].forEach(w => { w.translate(0, -.12, 0); L.push(V(w, 0)); });
     const st = plan([[-2.4, 0], [-1.7, 0], [-2.9, 1.5], [-3.3, 1.5]], .07, .015); const st2 = plan([[-2.4, 0], [-1.7, 0], [-2.9, -1.5], [-3.3, -1.5]], .07, .015); [st, st2].forEach(w => L.push(V(w, 0)));
     [.42, -.42].forEach(z => { const fn = G.profile([[-3.0, .3], [-2.1, .3], [-2.7, 1.75], [-3.15, 1.8]], .07, .015); fn.rotateX(z > 0 ? -.22 : .22); fn.translate(0, 0, z); L.push(V(fn, 0)); });
-    const noz = new THREE.CylinderGeometry(.42, .36, .5, 12, 1, true); noz.rotateZ(Math.PI / 2); noz.translate(-3.25, 0, 0); L.push(V(noz, 2, 0, [.1, .1, .1]));
-    const ab = new THREE.CircleGeometry(.34, 12); ab.rotateY(-Math.PI / 2); ab.translate(-3.42, 0, 0); L.push(V(ab, 6));
+    /* the nozzle sits on the fuselage's flat tail; the afterburner glows at the bottom of it */
+    const noz = new THREE.CylinderGeometry(.42, .38, .5, 12, 1, true); noz.rotateZ(Math.PI / 2); noz.translate(-3.25, 0, 0); L.push(V(noz, 2, 0, [.1, .1, .1]));
+    const ab = new THREE.CircleGeometry(.38, 12); ab.rotateY(-Math.PI / 2); ab.translate(-3.02, 0, 0); L.push(V(ab, 6));
     const band = G.rbox(.9, .02, 1.6, .01, 1); band.translate(-1.2, -.08, 2.3); L.push(V(band, 4)); const b2 = band.clone(); b2.translate(0, 0, -4.6); L.push(V(b2, 4));
-    const ms = new THREE.CylinderGeometry(.09, .09, 1.4, 6); ms.rotateZ(Math.PI / 2); [1.4, -1.4].forEach(z => { const m2 = ms.clone(); m2.translate(-.6, -.3, z); L.push(V(m2, 2, 0, [.85, .85, .82])); });
+    /* wing missiles hang on pylons */
+    const ms = new THREE.CylinderGeometry(.09, .09, 1.4, 6); ms.rotateZ(Math.PI / 2); [1.4, -1.4].forEach(z => { const m2 = ms.clone(); m2.translate(-.6, -.3, z); L.push(V(m2, 2, 0, [.85, .85, .82])); const py = G.rbox(.6, .14, .05, .02, 1); py.translate(-.6, -.17, z); L.push(V(py, 2, 0, [.12, .12, .12])); });
   } else {
     const w = plan([[3.2, 0], [-1.0, 7.8], [-2.0, 7.4], [-1.5, 5.2], [-2.6, 3.2], [-2.1, 1.4], [-2.7, 0], [-2.1, -1.4], [-2.6, -3.2], [-1.5, -5.2], [-2.0, -7.4], [-1.0, -7.8]], .55, .2);
     w.translate(0, -.2, 0); L.push(V(w, 0));
@@ -731,29 +767,37 @@ G.navLights = function (g, list) {
 
 /* ------------------------------------------------------------------ HQ compound (one per army) */
 G.hq = function (team, mat, dir) {
-  const g = new THREE.Group(), L = [];
+  /* built facing its own army's front: m = +1 when the field lies towards +x (bulls), -1 when it lies towards -x (bears); the group is never turned */
+  const g = new THREE.Group(), L = [], m = dir < 0 ? 1 : -1;
   const bk = G.profile([[-4.5, 0], [4.5, 0], [4.5, 2.4], [3.2, 3.3], [-3.2, 3.3], [-4.5, 2.4]], 7, .25); L.push(V(bk, 0));
-  const door = G.rbox(.12, 1.7, 1.8, .05, 1); door.translate(dir < 0 ? 4.52 : -4.52, .9, 0); L.push(V(door, 2, 0, [.08, .08, .08]));
-  const slit = G.rbox(.1, .28, 4.8, .05, 1); slit.translate(dir < 0 ? 4.4 : -4.4, 2.05, 0); L.push(V(slit, 5));
+  const door = G.rbox(.12, 1.7, 1.8, .05, 1); door.translate(m * 4.52, .9, 0); L.push(V(door, 2, 0, [.08, .08, .08]));      // the door looks onto the gate
+  const slit = G.rbox(.1, .28, 4.8, .05, 1); slit.translate(m * 4.4, 2.05, 0); L.push(V(slit, 5));
   const stripe = G.rbox(9.2, .3, .04, .02, 1); stripe.translate(0, 2.7, 3.52); L.push(V(stripe, 4)); const s2 = stripe.clone(); s2.translate(0, 0, -7.04); L.push(V(s2, 4));
   /* mast */
-  for (let i = 0; i < 3; i++) { const leg = new THREE.CylinderGeometry(.05, .08, 9, 4); const a = i * 2.094; leg.rotateZ(Math.cos(a) * .05); leg.rotateX(Math.sin(a) * .05); leg.translate(-2.4 + Math.cos(a) * .35, 7.7, -2 + Math.sin(a) * .35); L.push(V(leg, 2, 0, [.25, .25, .25])); }
-  for (let k = 0; k < 6; k++) { const r = new THREE.TorusGeometry(.36, .03, 3, 8); r.rotateX(Math.PI / 2); r.translate(-2.4, 3.8 + k * 1.4, -2); L.push(V(r, 2, 0, [.25, .25, .25])); }
-  const lamp = new THREE.SphereGeometry(.16, 8, 6); lamp.translate(-2.4, 12.3, -2); L.push(V(lamp, 6));
+  for (let i = 0; i < 3; i++) { const leg = new THREE.CylinderGeometry(.05, .08, 9, 4); const a = i * 2.094; leg.translate(-2.4 * m + Math.cos(a) * .35, 7.7, -2 + Math.sin(a) * .35); L.push(V(leg, 2, 0, [.25, .25, .25])); }
+  for (let k = 0; k < 6; k++) { const r = new THREE.TorusGeometry(.35, .03, 3, 9); r.rotateX(Math.PI / 2); r.translate(-2.4 * m, 3.8 + k * 1.4, -2); L.push(V(r, 2, 0, [.25, .25, .25])); }   // the rings run through the three legs
+  const cap = new THREE.CylinderGeometry(.42, .42, .07, 9); cap.translate(-2.4 * m, 12.2, -2); L.push(V(cap, 2, 0, [.25, .25, .25]));
+  const lamp = new THREE.SphereGeometry(.16, 8, 6); lamp.translate(-2.4 * m, 12.36, -2); L.push(V(lamp, 6));
   /* tents with team roofs */
   [[-1, 8.5, 1], [1, 8.5, -1]].forEach(([s, z, k]) => {
-    const t = new THREE.CylinderGeometry(1.6, 1.6, 3.6, 3, 1); t.rotateZ(Math.PI / 2); t.rotateY(Math.PI / 2); t.scale(1, .85, 1); t.translate(s * 2.2, 1.2, z * (k));
-    L.push(V(t, 0));
-    const r = new THREE.CylinderGeometry(1.66, 1.66, 3.7, 3, 1, true, -.6, 1.2); r.rotateZ(Math.PI / 2); r.rotateY(Math.PI / 2); r.scale(1, .86, 1); r.translate(s * 2.2, 1.22, z * k); L.push(V(r, 4));
+    /* a ridge tent: triangular section (ridge up, both eaves on the ground), the team-coloured fly on its two upper faces */
+    const tx = s * 2.2 * m, t = new THREE.CylinderGeometry(1.6, 1.6, 3.6, 3, 1); t.rotateX(-Math.PI / 2); t.scale(1, .85, 1); t.translate(tx, .68, z * k); L.push(V(t, 0));
+    const hw = 1.6 * .866, ht = 1.6 * 1.5 * .85, sl = Math.atan2(ht, hw), fl = Math.hypot(hw, ht);
+    [1, -1].forEach(sd => { const f = new THREE.BoxGeometry(fl * .5, .04, 3.7); f.rotateZ(-sd * sl); f.translate(tx + sd * (hw * .25 + .02 * Math.sin(sl)), ht * .75 + .02 * Math.cos(sl), z * k); L.push(V(f, 4)); });
   });
-  /* fuel tanks */
-  [[3.4, -6.2], [4.8, -6.2]].forEach(([x, z]) => { const c = new THREE.CylinderGeometry(.7, .7, 2.4, 12); c.rotateX(Math.PI / 2); c.translate(x * (dir < 0 ? 1 : -1), .75, z); L.push(V(c, 0)); });
+  /* fuel tanks behind the bunker, on saddles */
+  [[-5.7, -2], [-7.2, -2]].forEach(([x, z]) => { const xx = x * m, c = new THREE.CylinderGeometry(.7, .7, 2.4, 12); c.rotateX(Math.PI / 2); c.translate(xx, .84, z); L.push(V(c, 0));
+    [-.7, .7].forEach(dz => { const sd = G.rbox(.9, .3, .22, .03, 1); sd.translate(xx, .15, z + dz); L.push(V(sd, 2, 0, [.22, .22, .2])); }); });
   const body = new THREE.Mesh(mergeMat(L), mat); body.castShadow = body.receiveShadow = true; g.add(body);
-  /* radar dish (rotates) */
-  const rad = new THREE.Group(); rad.position.set(2.4, 3.3, -2.2);
-  const dish = new THREE.LatheGeometry([[0, 0], [.4, .05], [.9, .22], [1.3, .5]].map(p => new THREE.Vector2(p[0], p[1])), 16); dish.rotateZ(Math.PI / 2); dish.translate(.2, 1.1, 0);
-  const post = new THREE.CylinderGeometry(.08, .12, 1.2, 6); post.translate(0, .6, 0);
-  rad.add(new THREE.Mesh(mergeMat([V(dish, 2, 0, [.6, .62, .6]), V(post, 2, 0, [.3, .3, .3])]), mat)); g.add(rad); g.userData.radar = rad;
+  /* radar dish (rotates): a solid shell on an arm from the post, high enough that its rim clears the roof as it turns */
+  const rad = new THREE.Group(); rad.position.set(2.4 * m, 3.3, -2.2);
+  const RL = G.dishGeo([[0, 0], [.4, .05], [.9, .22], [1.3, .5]], .05, 18).map((d, i) => { d.rotateZ(Math.PI / 2); d.translate(-.3, 1.6, 0); return V(d, 2, 0, i === 0 ? [.62, .64, .62] : i === 1 ? [.12, .12, .12] : [.3, .3, .3]); });
+  const post = new THREE.CylinderGeometry(.08, .12, 1.7, 6); post.translate(0, .85, 0); RL.push(V(post, 2, 0, [.3, .3, .3]));
+  const arm = G.rbox(.34, .14, .14, .03, 1); arm.translate(-.13, 1.6, 0); RL.push(V(arm, 2, 0, [.3, .3, .3]));
+  rad.add(new THREE.Mesh(mergeMat(RL), mat)); g.add(rad); g.userData.radar = rad;
+  /* its footprint, local to the group (unscaled): bunker, tents, tanks, flag pole — for the ground navigation */
+  g.userData.foot = [{ t: 'b', x: 0, z: 0, hx: 4.75, hz: 3.75 }, { t: 'b', x: -2.2 * m, z: 8.5, hx: 1.45, hz: 1.85 }, { t: 'b', x: 2.2 * m, z: -8.5, hx: 1.45, hz: 1.85 }, { t: 'b', x: -6.45 * m, z: -2, hx: 1.5, hz: 1.25 }, { t: 'c', x: 0, z: 4.8, r: .2 }];
+  g.userData.door = [m * 5.3, 0];
   return g;
 };
 

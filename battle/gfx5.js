@@ -136,7 +136,7 @@ K.infantryGeo = function (role, lod) {
     if (hi) add(rodX(.023, .023, .83, .89, 6, y + .004, z, true), 11, METAL);
     add(sbox(.13, .12, .1, .2, y - .105, z + .02), 11, OLIVE); add(sbox(.04, .1, .034, .03, y - .08, z, -.28), 11, METAL);
     add(sbox(.24, .075, .046, -.13, y - .005, z), 11, OLIVE); if (hi) { add(sbox(.035, .13, .05, -.25, y - .02, z), 11, METAL); add(sbox(.12, .022, .022, .32, y + .088, z), 11, METAL); }
-    [.07, -.07].forEach(d => add(sbox(.02, .25, .02, .7, y - .13, z + d, .22), 11, METAL));
+    [.07, -.07].forEach(d => add(sbox(.02, .25, .02, .7, y - .13, z + d, .22), 11, METAL)); add(sbox(.05, .03, .16, .675, y - .012, z), 11, METAL);   // bipod clamp on the barrel
   } else {                                     /* anti-tank launcher on the right shoulder, spare rounds on the pack */
     const ay = 1.535, az = -.165;
     add(rodX(.058, .058, -.44, .52, hi ? 8 : 6, ay, az, true), 11, OLIVE); add(rodX(.088, .058, -.56, -.44, hi ? 8 : 6, ay, az), 11, OLIVE);
@@ -339,6 +339,9 @@ K.muzzle = function (s) { const stn = s.stn | 0; return s.role === 2 ? [.75, s.s
    North of the missile sites the old hills become dunes and a beach that falls into a bay (headlands stay at the far corners).
    gfx4 has already installed its terrain modifier (pads, lakes); this one wraps it. */
 const SEA = K.SEA = G.seaY = -1.15;
+/* the motor pool shed in each base's front south corner (x = ±(80 − dx), on the axis of the yard between the HQ and the front wall): inside 2·hw wide from z0 (back wall) to z1 (the door), walls th thick and H high, a door Hd high */
+const GAR = K.GAR = { dx: 10.6, z0: -26.65, z1: -12.4, hw: 4.2, th: .35, H: 5.6, Hd: 4.9, y: [null, null] };
+K.shed = side => { const m = side === 'bull' ? -1 : 1; return { x: m * (80 - GAR.dx), z: (GAR.z0 + GAR.z1) / 2, door: GAR.z1, hw: GAR.hw }; };
 const shoreWob = x => 5 * G.fbmW(x * .028 + 9.1, 4.3, 2);
 {
   const prev = G.terrainMod;
@@ -346,13 +349,18 @@ const shoreWob = x => 5 * G.fbmW(x * .028 + 9.1, 4.3, 2);
     const f = prev ? prev(raw) : raw;
     return function (x, z) {
       let h = f(x, z);
+      /* each base's motor pool stands on level ground: its floor and apron, eased into the ground round them */
+      if (z > -33 && z < -1 && Math.abs(Math.abs(x) - (80 - GAR.dx)) < 9) for (const s of [-1, 1]) {
+        const cx = s * (80 - GAR.dx), dx = Math.max(0, Math.abs(x - cx) - (GAR.hw + GAR.th + .4)), dz = Math.max(0, GAR.z0 - GAR.th - .4 - z, z - GAR.z1 - 4.8), d = Math.hypot(dx, dz);
+        if (d < 2.5) { const i = s < 0 ? 0 : 1; if (GAR.y[i] == null) GAR.y[i] = f(cx, (GAR.z0 + GAR.z1) / 2); h = mix(h, GAR.y[i], sm(2.5, 0, d)); }
+      }
       if (z < -44) {
         const ax = Math.abs(x), keep = sm(150, 195, ax);
         h = mix(h, Math.min(h, 2.4), (1 - sm(22, 70, ax)) * sm(-44, -62, z));          // a gap in the ridge: the bay shows from the field
         if (z < -70) {
           const low = Math.min(h, 1.5 + .9 * G.fbmW(x * .05 + 2, z * .05 - 3, 2));
           h = mix(h, mix(low, h, keep), sm(-70, -90, z));
-          const w = shoreWob(x); h = mix(h, -6.5, sm(-98 - w, -126 - w, z) * (1 - keep));
+          const w = shoreWob(x); h = mix(h, -6.5 - 11 * sm(-165, -250, z), sm(-98 - w, -126 - w, z) * (1 - keep));   // the shelf drops away offshore: room for a submarine to dive
         }
       }
       return h;
@@ -409,6 +417,7 @@ function hullGeo(st, cTop, cBoot, cDeck) {
     quad([s0[0], s0[3], s0[1]], [s1[0], s1[3], s1[1]], [s1[0], s1[3], -s1[1]], [s0[0], s0[3], -s0[1]], d);
   }
   const s = st[0]; quad([s[0], s[3], s[1]], [s[0], s[3], -s[1]], [s[0], yW, -s[2]], [s[0], yW, s[2]], a);
+  const e = st[st.length - 1]; if (e[1] > .3) quad([e[0], e[3], -e[1]], [e[0], e[3], e[1]], [e[0], yW, e[2]], [e[0], yW, -e[2]], a);   // a bow that ends wide (the carrier's flare) is closed too
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); g.computeVertexNormals(); return g;
 }
 const NAVY = {
@@ -424,23 +433,34 @@ K.warship = function (side, big) {
   const st = [[-28, 2.6, 2.3, 2.6], [-24, 3.4, 3.0, 2.6], [-10, 3.7, 3.4, 2.7], [6, 3.6, 3.3, 2.9], [16, 3.0, 2.3, 3.3], [23, 1.8, 1.0, 3.8], [28, .12, .05, 4.3]].map(s => [s[0] * k, s[1] * k, s[2] * k, s[3] * (big ? 1 : .86)]);
   L.push(hullGeo(st, P.hull, P.boot, P.deck));
   const dk = big ? 2.75 : 2.4;                                                                    // deck height amidships
+  /* the deck's own height at x (the sheer rises towards the bow): fittings stand on it, not on a guess */
+  const deckAt = x => { for (let i = 0; i < st.length - 1; i++) if (x <= st[i + 1][0]) { const f = cl((x - st[i][0]) / (st[i + 1][0] - st[i][0]), 0, 1); return mix(st[i][3], st[i + 1][3], f); } return st[st.length - 1][3]; };
+  /* superstructure blocks: bottom below the deck line so they sit in the hull wherever the sheer runs */
+  const SB = (w, top, d, x, bot, z, hex) => B(w, top - bot, d, x, (top + bot) / 2, z, hex);
   /* bridge, deckhouse, funnel(s), mast */
-  L.push(B(8 * k, 3.2, 6.2 * k, 4 * k, dk + 1.6, 0, P.sup), B(5.4 * k, 2.1, 5.2 * k, 3.6 * k, dk + 4.25, 0, P.sup), B(5.5 * k, .55, 5.3 * k, 3.6 * k, dk + 4.55, 0, 0x10161b));
-  L.push(B(9 * k, 2.6, 5.6 * k, -5.5 * k, dk + 1.3, 0, P.sup));
-  const fun = (x, r, h) => { const f = new THREE.CylinderGeometry(r * .72, r, h, 4); f.rotateY(Math.PI / 4); f.scale(1.35, 1, 1); f.translate(x, dk + 2.6 + h / 2, 0); L.push(prim(f, P.sup)); const c = new THREE.CylinderGeometry(r * .75, r * .75, .35, 4); c.rotateY(Math.PI / 4); c.scale(1.35, 1, 1); c.translate(x, dk + 2.6 + h + .1, 0); L.push(prim(c, 0x16181a)); const bd = new THREE.CylinderGeometry(r * .88, r * .93, .7, 4, 1, true); bd.rotateY(Math.PI / 4); bd.scale(1.36, 1, 1); bd.translate(x, dk + 2.6 + h * .62, 0); L.push(prim(bd, P.band)); };
+  L.push(SB(8 * k, dk + 3.2, 6.2 * k, 4 * k, dk - .35, 0, P.sup), B(5.4 * k, 2.1, 5.2 * k, 3.6 * k, dk + 4.25, 0, P.sup), B(5.5 * k, .55, 5.3 * k, 3.6 * k, dk + 4.55, 0, 0x10161b));
+  L.push(SB(9 * k, dk + 2.6, 5.6 * k, -5.5 * k, dk - .35, 0, P.sup));
+  L.push(SB(3.2 * k, dk + 2.6, 3.4 * k, -11.3 * k, dk - .35, 0, P.sup));                             // after deckhouse extension: the close-in gun stands on it
+  const fun = (x, r, h) => {
+    const f = new THREE.CylinderGeometry(r * .72, r, h, 4); f.rotateY(Math.PI / 4); f.scale(1.35, 1, 1); f.translate(x, dk + 2.6 + h / 2, 0); L.push(prim(f, P.sup));
+    const c = new THREE.CylinderGeometry(r * .75, r * .75, .35, 4); c.rotateY(Math.PI / 4); c.scale(1.35, 1, 1); c.translate(x, dk + 2.6 + h + .1, 0); L.push(prim(c, 0x16181a));
+    const rAt = y => r - r * .28 * y / h, y0 = h * .62 - .35, y1 = h * .62 + .35;                  // the band hugs the funnel's taper
+    const bd = new THREE.CylinderGeometry(rAt(y1) * 1.012, rAt(y0) * 1.012, .7, 4, 1, true); bd.rotateY(Math.PI / 4); bd.scale(1.35, 1, 1); bd.translate(x, dk + 2.6 + h * .62, 0); L.push(prim(bd, P.band));
+  };
   fun(-3.2 * k, 1.5 * k, 3.3); if (big) fun(-9 * k, 1.25, 2.6);
   { const m = new THREE.CylinderGeometry(.34, .95 * k, 6.4, 4); m.rotateY(Math.PI / 4); m.translate(2.6 * k, dk + 5.3 + 3.2, 0); L.push(prim(m, P.sup)); L.push(B(.16, .16, 4.4 * k, 2.6 * k, dk + 9.6, 0, P.dark), CY(.05, .05, 3.2, 4, 2.6 * k, dk + 13.2, 0, P.dark)); }
-  [[6.9 * k, 1], [6.9 * k, -1]].forEach(([x, sg]) => { const a = new THREE.BoxGeometry(.12, 1.7, 1.7); a.rotateY(sg * .7); a.translate(x, dk + 4.1, sg * 2.5 * k); L.push(prim(a, P.dark)); });   // fixed array faces
+  [[6.9 * k, 1], [6.9 * k, -1]].forEach(([x, sg]) => { const a = new THREE.BoxGeometry(.12, 1.7, 1.7); a.rotateY(sg * .7); a.translate(x - .35, dk + 4.1, sg * 2.5 * k); L.push(prim(a, P.dark)); });   // fixed array faces on the bridge front
   /* missile cells, close-in gun, boats, flight deck */
-  const cells = (x, n) => { L.push(B(n * .95 + .5, .3, 3.5 * k, x, dk + .6, 0, P.dark)); for (let i = 0; i < n; i++) for (const z of [-1.05, -.35, .35, 1.05]) L.push(B(.7, .08, .55 * k, x - (n - 1) * .475 + i * .95, dk + .79, z * k, 0x6b7376)); };
+  const cells = (x, n) => { const d0 = deckAt(x); L.push(SB(n * .95 + .5, dk + .75, 3.5 * k, x, d0 - .3, 0, P.dark)); for (let i = 0; i < n; i++) for (const z of [-1.05, -.35, .35, 1.05]) L.push(B(.7, .08, .55 * k, x - (n - 1) * .475 + i * .95, dk + .79, z * k, 0x6b7376)); };
   cells(11.6 * k, big ? 4 : 3); if (big) cells(-15.5, 3);
-  L.push(CY(.55, .7, 1.1, 8, -11.5 * k, dk + 3.2, 0, 0xdadcd8), prim(G.T(new THREE.SphereGeometry(.6, 8, 5, 0, TAU, 0, Math.PI / 2), -11.5 * k, dk + 3.7, 0), 0xe6e7e2));
-  [1, -1].forEach(sg => L.push(RB(2.6 * k, .7, .9, .25, -6 * k, dk + .8, sg * 3.3 * k, 0xd2641c)));
-  L.push(B(1.9, .05, .28, -23 * k, dk + (big ? -.08 : -.3), .7, 0xe9e7df), B(1.9, .05, .28, -23 * k, dk + (big ? -.08 : -.3), -.7, 0xe9e7df), B(.28, .05, 1.4, -23 * k, dk + (big ? -.08 : -.3), 0, 0xe9e7df));
-  L.push(CY(.04, .04, 2.6, 4, -27.4 * k, dk + 1.2, 0, 0xcfd2d0), prim(G.T(new THREE.PlaneGeometry(1.9, 1.15), -26.4 * k, dk + 1.85, 0), P.band));
+  L.push(CY(.55, .7, 1.1, 8, -11.5 * k, dk + 3.15, 0, 0xdadcd8), prim(G.T(new THREE.SphereGeometry(.6, 8, 5, 0, TAU, 0, Math.PI / 2), -11.5 * k, dk + 3.7, 0), 0xe6e7e2));
+  /* sea boats on chocks beside the deckhouse */
+  [1, -1].forEach(sg => { const z = sg * 3.22 * k, y0 = deckAt(-6 * k); L.push(RB(2.6 * k, .7, .84 * k, .25, -6 * k, y0 + .62, z, 0xd2641c)); for (const dx of [-.8, .8]) L.push(B(.24, .4, .6 * k, -6 * k + dx * k, y0 + .15, z, P.dark)); });
+  { const x = -23 * k, y = deckAt(x) + .03; L.push(B(1.9, .05, .28, x, y, .7, 0xe9e7df), B(1.9, .05, .28, x, y, -.7, 0xe9e7df), B(.28, .05, 1.4, x, y, 0, 0xe9e7df)); }
+  { const x = -27.4 * k, y = deckAt(x); L.push(CY(.04, .04, 2.7, 4, x, y + 1.3, 0, 0xcfd2d0), prim(G.T(new THREE.PlaneGeometry(1.9, 1.15), x + .97, y + 2.0, 0), P.band)); }
   const body = new THREE.Mesh(G.merge(L), shipMat()); body.castShadow = !!G.std; g.add(body);
   /* gun turret (turns), radar bar (spins) */
-  const tur = new THREE.Group(); tur.position.set(17.4 * k, (big ? 3.35 : 2.95), 0);
+  const tur = new THREE.Group(); tur.position.set(17.4 * k, deckAt(17.4 * k) - .05, 0);
   const brl = new THREE.CylinderGeometry(.13, .17, 3.6 * k, 8); brl.rotateZ(-Math.PI / 2 + .28); brl.translate(1.9 * k, .95, 0);
   tur.add(new THREE.Mesh(G.merge([CY(1.25 * k, 1.35 * k, .45, 10, 0, .22, 0, P.dark), RB(2.5 * k, 1.35, 2.1 * k, .3, 0, 1.1, 0, P.sup), prim(brl, P.dark)]), shipMat())); g.add(tur);
   const rad = new THREE.Mesh(G.merge([B(3.3 * k, .34, .45, 0, 0, 0, P.dark), CY(.16, .2, .5, 6, 0, -.3, 0, P.dark)]), shipMat()); rad.position.set(2.6 * k, dk + 12.1, 0); g.add(rad);
@@ -480,15 +500,27 @@ function harbour(side, hgt) {
   L.push(B(5, .45, 34, x0 - 5 * m, top - .1, zs - 17, 0x6f6d67));                                                          // pier
   for (let i = 0; i < 6; i++) for (const sx of [-2, 2]) L.push(CY(.3, .3, 6, 6, x0 - 5 * m + sx, top - 3.2, zs - 4 - i * 6, 0x4a4944));
   for (let i = 0; i < 5; i++) L.push(CY(.22, .26, .5, 6, x0 - 5 * m + 2.1 * m, top + .35, zs - 6 - i * 7, 0x24272a));       // bollards
-  [[5.5, 3], [-.5, 3]].forEach(([dx, dz]) => { const bx = x0 + dx * m; L.push(B(5, 3.4, 8, bx, top + 1.85, zs + dz + 4, PW.wall)); const rf = new THREE.CylinderGeometry(2.9, 2.9, 8.3, 3, 1); rf.rotateX(Math.PI / 2); rf.scale(1, .5, 1); rf.translate(bx, top + 4.25, zs + dz + 4); L.push(prim(rf, PW.roof)); L.push(B(.1, 2.2, 2.6, bx - 2.52 * m, top + 1.25, zs + dz + 4, 0x23282b)); });
+  /* two sheds with pitched roofs (ridge up), doors facing the quay */
+  [[5.5, 3], [-.5, 3]].forEach(([dx, dz]) => { const bx = x0 + dx * m; L.push(B(5, 3.4, 8, bx, top + 1.85, zs + dz + 4, PW.wall)); const rf = new THREE.CylinderGeometry(2.9, 2.9, 8.3, 3, 1); rf.rotateX(-Math.PI / 2); rf.scale(1, .5, 1); rf.translate(bx, top + 4.27, zs + dz + 4); L.push(prim(rf, PW.roof)); L.push(B(.1, 2.2, 2.6, bx - 2.52 * m, top + 1.25, zs + dz + 4, 0x23282b)); });
   [[-8, 7], [-8, 3.2]].forEach(([dx, dz]) => { L.push(CY(1.55, 1.55, 3.6, 12, x0 + dx * m, top + 1.95, zs + dz, 0xcfd1cc), CY(1.58, 1.58, .3, 12, x0 + dx * m, top + 3.3, zs + dz, PW.steel)); });
-  /* crane: tower, cab, jib */
-  const cx = x0 + 2 * m, cz = zs - 1;
-  for (const [ax, az] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) L.push(B(.26, 9, .26, cx + ax * 1.1, top + 4.6, cz + az * 1.1, 0xc9a227));
-  L.push(B(2.8, .3, 2.8, cx, top + 4.6, cz, 0xc9a227), B(2.8, .3, 2.8, cx, top + 9.2, cz, 0xc9a227), B(2.4, 1.8, 2.6, cx, top + 10.2, cz, 0xd8d5c8));
-  { const j = new THREE.BoxGeometry(.32, .32, 14); j.rotateX(-.36); j.translate(cx, top + 13, cz - 6.2); L.push(prim(j, 0xc9a227)); L.push(CY(.03, .03, 9, 3, cx, top + 10.9, cz - 12.4, 0x1c1c1c)); }
-  for (const dz of [-8, -22]) L.push(CY(.07, .09, 5, 5, x0 - 7.2 * m, top + 2.6, zs + dz, 0x3b3d3f), B(.5, .12, .22, x0 - 6.9 * m, top + 5.1, zs + dz, 0x2b2c2e));
-  return { L, x0, zs, lamps: [-8, -22].map(dz => new THREE.Vector3(x0 - 6.7 * m, top + 5, zs + dz)) };
+  /* a tower crane at the root of the pier: lattice tower on the quay, slewing cab, a jib out over the pier with its hoist rope and
+     hook block, a counter-jib with its weight behind; every member meets the next one */
+  const cx = x0 - 5 * m, cz = zs + 2.4, C = 0xc9a227, V = (x, y, z) => new THREE.Vector3(x, y, z), beam = (p, q, t, hex) => prim(G.beam(p, q, t), hex);
+  for (const [ax, az] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) L.push(B(.26, 9.1, .26, cx + ax * 1.1, top + 4.6, cz + az * 1.1, C));
+  L.push(B(2.8, .3, 2.8, cx, top + 4.6, cz, C), B(2.8, .3, 2.8, cx, top + 9.2, cz, C));
+  for (const az of [-1, 1]) L.push(beam(V(cx - 1.1, top + .3, cz + az * 1.1), V(cx + 1.1, top + 4.5, cz + az * 1.1), .1, C), beam(V(cx + 1.1, top + 4.7, cz + az * 1.1), V(cx - 1.1, top + 9.1, cz + az * 1.1), .1, C));
+  L.push(CY(1.2, 1.2, .3, 12, cx, top + 9.5, cz, 0x5a5a52), B(2.4, 1.8, 2.6, cx, top + 10.55, cz, 0xd8d5c8), B(.06, .7, 1.6, cx + 1.22, top + 10.8, cz, 0x1b2228));
+  const jr = V(cx, top + 11.2, cz - 1.0), jt = V(cx, top + 13.6, cz - 15);                         // jib root on the cab, tip out over the pier
+  L.push(beam(jr, jt, .42, C), beam(V(cx, top + 11.45, cz), V(cx, top + 14.2, cz - .2), .22, C), beam(V(cx, top + 14.2, cz - .2), V(cx, top + 13.75, cz - 14.8), .06, 0x2a2a2a));
+  L.push(beam(V(cx, top + 11.2, cz + 1.0), V(cx, top + 11.4, cz + 6), .36, C), B(1.4, 1.3, 1.6, cx, top + 10.8, cz + 5.6, 0x6b6b66), beam(V(cx, top + 14.2, cz - .2), V(cx, top + 11.45, cz + 5.6), .05, 0x2a2a2a));
+  const hz = cz - 11.5, hy = top + 11.2 + 2.4 * (11.5 - 1) / 14 - .12;                             // the rope hangs from the jib
+  L.push(beam(V(cx, hy, hz), V(cx, top + 4.3, hz), .05, 0x1c1c1c), B(.5, .6, .4, cx, top + 4.0, hz, 0x2b2c2e), B(1.6, 1.0, 1.2, cx, top + 3.2, hz, 0x45627f));   // rope, hook block, a pallet on its way down
+  /* two lamp posts on the pier: a plinth bolted to the deck, a galvanised pole, an arm reaching in over the deck and a lamp head whose
+     lens is lit (it shares the floodlights' unlit material), so each reads as a lamp and not as a bare stick. They stand clear of the
+     crane's load, which comes down over the root of the pier */
+  const Lt = [], lx = x0 - 7.2 * m;
+  for (const dz of [-15, -29]) { const z = zs + dz; L.push(CY(.22, .26, .2, 8, lx, top + .225, z, 0x6b6e70), CY(.1, .13, 5, 6, lx, top + 2.825, z, 0x7d8183), B(1.25, .08, .08, lx + .6 * m, top + 5.25, z, 0x7d8183), B(.7, .18, .36, lx + 1.15 * m, top + 5.2, z, 0x4a4e52)); Lt.push(B(.56, .05, .28, lx + 1.15 * m, top + 5.1, z, 0xfff0cc)); }
+  return { L, Lt, x0, zs, lamps: [-15, -29].map(dz => new THREE.Vector3(lx + 1.15 * m, top + 5.05, zs + dz)) };
 }
 
 
@@ -498,7 +530,7 @@ K.satellite = function (side) {
   L.push(B(1.5, 2.2, 1.5, 0, 0, 0, 0xc8a240), B(1.56, .3, 1.56, 0, .5, 0, P.band), B(1.56, .1, 1.56, 0, -.6, 0, 0x8a6f2a));
   for (const sg of [1, -1]) { L.push(B(.12, .12, 1.0, 0, .2, sg * 1.2, 0x9a9da0)); L.push(B(.05, 1.9, 4.6, 0, .2, sg * 4.0, 0x15245a)); for (let i = 0; i < 4; i++) L.push(B(.07, 1.94, .05, 0, .2, sg * (2.0 + i * 1.33), 0x8f9aa8)); }
   L.push(CY(.42, .5, 1.5, 10, 0, -1.8, 0, 0x2b2e33), CY(.44, .44, .08, 10, 0, -2.58, 0, 0x10161b));
-  const dish = new THREE.LatheGeometry([[0, 0], [.35, .04], [.7, .2], [.95, .45]].map(p => new THREE.Vector2(p[0], p[1])), 10); dish.rotateX(Math.PI / 2 + .5); dish.translate(.2, 1.5, .5); L.push(prim(dish, 0xe7e7e2));
+  G.dishGeo([[0, 0], [.35, .04], [.7, .2], [.95, .45]], .04, 12).forEach((d, i) => { d.rotateX(Math.PI / 2 + .5); d.translate(.2, 1.5, .5); L.push(prim(d, i === 1 ? 0x2b2e33 : i ? 0x9a9da0 : 0xe7e7e2)); });   // a solid dish: it does not vanish when its back turns to the camera
   L.push(CY(.03, .03, .9, 4, .2, 1.3, .2, 0x9a9da0));
   g.add(new THREE.Mesh(G.merge(L), shipMat())); g.scale.setScalar(1.15);
   return g;
@@ -511,6 +543,9 @@ K.fpvGeo = function () {
 /* a rotating air-search radar on a platform; the 4.0 layout gets a flat pad for it (pads are read when the terrain is built) */
 const RADAR_AT = { bull: [-47, -49], bear: [47, -49] };
 if (window.GFX4 && GFX4.LAY) for (const k in RADAR_AT) GFX4.LAY.pads.push({ x: RADAR_AT[k][0], z: RADAR_AT[k][1], r: 4.2, h: null });
+/* the gun lines (battle.js puts the guns, this file the revetments, on these coordinates): level ground, nothing growing in the pits */
+const GUNS_AT = [[62, -45], [63, 45], [35, -44], [79, 38], [95, 38]];
+if (window.GFX4 && GFX4.LAY) for (const m of [-1, 1]) for (const [x, z] of GUNS_AT) GFX4.LAY.pads.push({ x: x * m, z, r: 8, h: null });
 function radarStation(side) {
   const st = side === 'bull' ? 0x58624b : 0x86704f, L = [B(5, .5, 3.4, 0, .25, 0, 0x6f6d67), B(2.2, 1.9, 2.2, -1.2, 1.45, 0, st), B(.9, .5, .06, -1.2, 1.7, 1.12, 0x10161b), CY(.32, .42, 2.4, 8, 1.2, 1.7, 0, 0x4b4f52), B(1.3, 1.0, 1.0, 1.4, 1.0, -1.1, 0x3d4144)];
   const A = [B(.22, 3.3, 6.2, 0, 1.9, 0, st)]; for (let i = 0; i < 6; i++) A.push(B(.26, 3.3, .08, 0, 1.9, -2.9 + i * 1.16, 0x23272a)); for (let i = 0; i < 4; i++) A.push(B(.26, .08, 6.2, 0, .35 + i * 1.03, 0, 0x23272a));
@@ -521,36 +556,68 @@ function radarStation(side) {
 const FOB = { hx: 17, hz: 28, cx: 80 };
 function fob(side, hgt) {
   const m = side === 'bull' ? -1 : 1, e = -m, bx = FOB.cx * m, L = [], Lt = [], fab = side === 'bull' ? 0x7d7a62 : 0x938466, fill = 0x54493a, con = 0x8d8b84;
-  const roadZ = x => 2 * Math.sin(x * .035);
-  const block = (x, z, rot) => { const y = hgt(x, z) - .08, a = RB(1.35, 1.9, 2.4, .12, 0, .95, 0, fab), b = B(1.1, .12, 2.1, 0, 1.92, 0, fill); moved([a, b], x, y, z, rot); L.push(a, b); };
+  const roadZ = x => 2 * Math.sin(x * .035), NV = window.NAV, solid = sh => { if (NV) NV.add(sh); };
+  const block = (x, z, rot) => { const y = hgt(x, z) - .08, a = RB(1.35, 1.9, 2.4, .12, 0, .95, 0, fab), b = B(1.1, .12, 2.1, 0, 1.92, 0, fill); moved([a, b], x, y, z, rot); L.push(a, b); if (NV) solid(NV.box(x, z, .7, 1.22, rot, 'fob')); };
   for (const sx of [1, -1]) { const x = bx + sx * FOB.hx; for (let z = -FOB.hz + 1.2; z <= FOB.hz - 1.2; z += 2.45) { if (Math.abs(z - roadZ(x)) < 5) continue; block(x, z, 0); } }
   for (const sz of [1, -1]) { const z = sz * FOB.hz; for (let x = bx - FOB.hx; x <= bx + FOB.hx; x += 2.45) block(x, z, Math.PI / 2); }
-  /* gates on the road: concrete posts, a striped boom on the front one, a guard hut */
+  /* gates on the road: concrete posts, a guard hut, and on the front gate a striped boom that rises when anyone comes through */
+  let boom = null;
   for (const sx of [1, -1]) {
     const x = bx + sx * FOB.hx, zc = roadZ(x), y = hgt(x, zc);
-    for (const sz of [1, -1]) L.push(B(1.3, 3.8, 1.3, x, y + 1.9, zc + sz * 5, con), B(1.5, .25, 1.5, x, y + 3.9, zc + sz * 5, 0x6f6d67));
-    if (sx === e) { for (let i = 0; i < 8; i++) L.push(B(.16, .16, 1.05, x + e * .9, y + 1.5, zc - 3.7 + i * 1.05, i % 2 ? 0xe7e5df : 0xc0392b)); L.push(B(.3, 1.5, .3, x + e * .9, y + .75, zc - 4.3, 0x3b3d3f)); Lt.push(B(.2, .2, .2, x, y + 4.15, zc + 5, 0xffd9a0), B(.2, .2, .2, x, y + 4.15, zc - 5, 0xffd9a0)); }
-    const hx2 = x - sx * 2.4, hz2 = zc + 8.2; L.push(B(2.4, 2.5, 2.4, hx2, hgt(hx2, hz2) + 1.25, hz2, 0x6b705c), B(2.9, .2, 2.9, hx2, hgt(hx2, hz2) + 2.6, hz2, 0x3d4135), B(.08, .9, 1.4, hx2 + sx * 1.22, hgt(hx2, hz2) + 1.6, hz2, 0x10161b));
+    for (const sz of [1, -1]) { const py = Math.min(hgt(x - .65, zc + sz * 5 - .65), hgt(x + .65, zc + sz * 5 - .65), hgt(x - .65, zc + sz * 5 + .65), hgt(x + .65, zc + sz * 5 + .65)) - .1; L.push(B(1.3, y + 3.8 - py, 1.3, x, (y + 3.8 + py) / 2, zc + sz * 5, con), B(1.5, .25, 1.5, x, y + 3.9, zc + sz * 5, 0x6f6d67)); if (NV) solid(NV.box(x, zc + sz * 5, .68, .68, 0, 'fob')); }
+    if (sx === e) {
+      L.push(B(.3, 1.5, .3, x + e * .9, y + .75, zc - 4.3, 0x3b3d3f)); if (NV) solid(NV.circle(x + e * .9, zc - 4.3, .22, 'fob'));
+      const BL = []; for (let i = 0; i < 8; i++) BL.push(B(.16, .16, 1.05, 0, 0, .6 + i * 1.05, i % 2 ? 0xe7e5df : 0xc0392b)); BL.push(B(.26, .26, .3, 0, 0, .1, 0x3b3d3f));
+      boom = { L: BL, x: x + e * .9, y: y + 1.5, z: zc - 4.3, gx: x, gz: zc, side, open: 0 };
+      Lt.push(B(.2, .2, .2, x, y + 4.15, zc + 5, 0xffd9a0), B(.2, .2, .2, x, y + 4.15, zc - 5, 0xffd9a0));
+    }
+    const hx2 = x - sx * 2.4, hz2 = zc + 8.2; L.push(B(2.4, 2.5, 2.4, hx2, hgt(hx2, hz2) + 1.25, hz2, 0x6b705c), B(2.9, .2, 2.9, hx2, hgt(hx2, hz2) + 2.6, hz2, 0x3d4135), B(.08, .9, 1.4, hx2 + sx * 1.22, hgt(hx2, hz2) + 1.6, hz2, 0x10161b)); if (NV) solid(NV.box(hx2, hz2, 1.25, 1.25, 0, 'fob'));
   }
-  /* corner towers */
+  /* corner towers (the motor pool's shed takes the front corner on the south side) */
   for (const sx of [1, -1]) for (const sz of [1, -1]) {
+    if (sx === e && sz === -1) continue;
     const x = bx + sx * (FOB.hx - 2.6), z = sz * (FOB.hz - 2.6), y = hgt(x, z);
     for (const ax of [-1, 1]) for (const az of [-1, 1]) L.push(B(.22, 5.2, .22, x + ax * 1.3, y + 2.6, z + az * 1.3, 0x4f5346));
     L.push(B(3.3, .22, 3.3, x, y + 5.2, z, 0x5d5a4a), B(3.3, 1.0, .14, x, y + 5.8, z + 1.6, 0x6b705c), B(3.3, 1.0, .14, x, y + 5.8, z - 1.6, 0x6b705c), B(.14, 1.0, 3.3, x + 1.6, y + 5.8, z, 0x6b705c), B(.14, 1.0, 3.3, x - 1.6, y + 5.8, z, 0x6b705c), B(3.9, .18, 3.9, x, y + 7.6, z, 0x3d4135));
     for (const ax of [-1, 1]) for (const az of [-1, 1]) L.push(B(.12, 2.3, .12, x + ax * 1.5, y + 6.45, z + az * 1.5, 0x4f5346));
-    Lt.push(B(.3, .16, .3, x - sx * 1.2, y + 7.42, z - sz * 1.2, 0xffe2b0));
+    Lt.push(B(.3, .16, .3, x - sx * 1.2, y + 7.42, z - sz * 1.2, 0xffe2b0)); if (NV) solid(NV.box(x, z, 1.45, 1.45, 0, 'fob'));
   }
-  /* tents, containers, crates and drums, floodlights */
-  [[-12.5, -22], [-7, -22], [-12.5, -16.5], [-7, -16.5]].forEach(([dx, dz]) => { const x = bx + e * dx, z = dz, y = hgt(x, z), t = new THREE.CylinderGeometry(1.75, 1.75, 4.4, 3, 1); t.rotateZ(Math.PI / 2); t.rotateY(Math.PI / 2); t.rotateX(Math.PI); t.scale(1, .82, 1); t.translate(x, y + .72, z); L.push(prim(t, side === 'bull' ? 0x5b6647 : 0x9a8763)); });
-  [[-13, 21.5, 0x45627f, 0], [-9.6, 21.5, 0x874a3a, 0], [-11.3, 21.5, 0x596648, 2.62]].forEach(([dx, dz, c, up]) => { const x = bx + e * dx, y = hgt(x, dz); L.push(B(2.5, 2.6, 6.1, x, y + 1.3 + up, dz, c), B(2.56, .1, 6.16, x, y + 2.62 + up, dz, 0x2f3438)); });
-  for (let i = 0; i < 7; i++) { const x = bx + e * (-4.5 + (i % 4) * 1.15), z = 22 + Math.floor(i / 4) * 1.2, y = hgt(x, z); L.push(i < 4 ? CY(.42, .42, 1.1, 8, x, y + .55, z, i % 2 ? 0x8b2e22 : 0x2d4a6b) : B(1, .8, 1, x, y + .4, z, 0x6d5a3c)); }
-  for (const [dx, dz] of [[12, 19], [12, -19], [-13, 9], [-13, -9]]) { const x = bx + e * dx, y = hgt(x, dz); L.push(CY(.09, .12, 7, 5, x, y + 3.5, dz, 0x3b3d3f), B(.9, .22, .5, x, y + 7, dz, 0x2b2c2e)); Lt.push(B(.7, .08, .36, x, y + 6.87, dz, 0xfff0cc)); }
-  return { L, Lt };
+  /* the motor pool: a vehicle shed against the south wall. Armour and lorries roll out of it one at a time and back into it, and its roller
+     door goes up for them and comes down behind them (battle.js works the door): nothing on the ground appears or goes anywhere else */
+  let shed = null;
+  {
+    const cx = m * (FOB.cx - GAR.dx), zc = (GAR.z0 + GAR.z1) / 2, len = GAR.z1 - GAR.z0, hw = GAR.hw, th = GAR.th, y = hgt(cx, zc), top = y + GAR.H, W = 2 * hw + 2 * th, wc = 0x8a8678, mid = (y - .5 + top) / 2;
+    L.push(B(2 * hw, .12, len, cx, y - .04, zc, 0x6b6964), B(W, .1, 4.4, cx, y - .03, GAR.z1 + 2.2, 0x75736c));                       // floor and apron
+    for (const s of [-1, 1]) L.push(B(th, GAR.H + .5, len + th, cx + s * (hw + th / 2), mid, zc - th / 2, wc));                            // side walls
+    L.push(B(W, GAR.H + .5, th, cx, mid, GAR.z0 - th / 2, wc));                                                                             // back wall
+    L.push(B(W, GAR.H - GAR.Hd, th, cx, y + (GAR.Hd + GAR.H) / 2, GAR.z1 - th / 2, wc));                                                  // over the door
+    for (const s of [-1, 1]) L.push(B(.65, GAR.H + .5, .6, cx + s * (hw + .345), mid, GAR.z1 + .1, 0x5f5d55));                             // piers either side of it
+    L.push(B(W + .5, .28, len + th + .7, cx, top + .14, zc - th / 2 + .15, 0x4d4b45), B(W - 1.6, .45, len - 2, cx, top + .5, zc, 0x5a5850));   // roof slab with eaves, vent
+    L.push(B(2 * hw + .1, .5, .55, cx, y + GAR.Hd + .25, GAR.z1 + .15, 0x3e3d39));                                                         // the roller's drum
+    for (const s of [-1, 1]) for (let i = 0; i < 4; i++) L.push(B(.05, .35, .62, cx + s * (hw + .7), y + .35 + i * .7, GAR.z1 + .1, i % 2 ? 0x1c1c1c : 0xd8b23a));   // hazard bands
+    Lt.push(B(.7, .12, .25, cx, y + GAR.Hd + .62, GAR.z1 + .48, 0xffe0a8));                                                              // lamp over the door
+    for (const dz of [-4.5, 0, 4.5]) Lt.push(B(.25, .06, 2.2, cx, top - .04, zc + dz, 0xf4f1e2));                                        // strip lights under the roof
+    L.push(B(3.2, .9, .55, cx - 2.2, y + .45, GAR.z0 + .3, 0x5a4a35));                                                                     // work bench and drums at the back
+    for (let i = 0; i < 3; i++) L.push(CY(.3, .3, .9, 8, cx + 1.6 + i * .7, y + .45, GAR.z0 + .35, i % 2 ? 0x2d4a6b : 0x8b2e22));
+    const D = [], nS = 14; for (let i = 0; i < nS; i++) D.push(B(2 * hw - .04, GAR.Hd / nS + .004, i % 2 ? .05 : .07, 0, -(i + .5) * GAR.Hd / nS, 0, i % 2 ? 0x7d8288 : 0x8c9197));   // interlocking slats
+    D.push(B(2 * hw - .04, .14, .1, 0, -GAR.Hd + .07, 0, 0xd8b23a));                                                                       // roller door slats, hung from the drum
+    shed = { L: D, x: cx, y: y + GAR.Hd, z: GAR.z1 - .03, side };
+    if (NV) { for (const s of [-1, 1]) solid(NV.box(cx + s * (hw + th / 2), zc - th / 2, th / 2 + .03, (len + th) / 2, 0, 'shed')); solid(NV.box(cx, GAR.z0 - th / 2, W / 2, th / 2 + .03, 0, 'shed'));
+      for (const s of [-1, 1]) solid(NV.box(cx + s * (hw + .345), GAR.z1 + .1, .325, .3, 0, 'shed'));
+      solid(NV.box(cx - 2.2, GAR.z0 + .3, 1.6, .28, 0, 'shed')); solid(NV.box(cx + 2.3, GAR.z0 + .35, 1.05, .3, 0, 'shed')); }
+  }
+  /* tents (ridge up), containers, crates and drums, floodlights */
+  [[-12.5, -21], [-7, -21], [-12.5, -15.5], [-7, -15.5]].forEach(([dx, dz]) => { const x = bx + e * dx, z = dz, y = hgt(x, z), t = new THREE.CylinderGeometry(1.75, 1.75, 4.4, 3, 1); t.rotateX(-Math.PI / 2); t.scale(1, .82, 1); t.translate(x, y + .72, z); L.push(prim(t, side === 'bull' ? 0x5b6647 : 0x9a8763)); if (NV) solid(NV.box(x, z, 1.6, 2.25, 0, 'fob')); });
+  [[-13, 20.5, 0x45627f, 0], [-9.6, 20.5, 0x874a3a, 0], [-11.3, 20.5, 0x596648, 2.62]].forEach(([dx, dz, c, up]) => { const x = bx + e * dx, y = hgt(x, dz); L.push(B(2.5, 2.6, 6.1, x, y + 1.3 + up, dz, c), B(2.56, .1, 6.16, x, y + 2.62 + up, dz, 0x2f3438)); if (NV && !up) solid(NV.box(x, dz, 1.3, 3.1, 0, 'fob')); });
+  for (let i = 0; i < 7; i++) { const x = bx + e * (-4.5 + (i % 4) * 1.15), z = 22 + Math.floor(i / 4) * 1.2, y = hgt(x, z); L.push(i < 4 ? CY(.42, .42, 1.1, 8, x, y + .55, z, i % 2 ? 0x8b2e22 : 0x2d4a6b) : B(1, .8, 1, x, y + .4, z, 0x6d5a3c)); if (NV) solid(NV.circle(x, z, .55, 'fob')); }
+  for (const [dx, dz] of [[15, 21], [-13, 9], [-13, -9]]) { const x = bx + e * dx, y = hgt(x, dz); L.push(CY(.09, .12, 7, 5, x, y + 3.5, dz, 0x3b3d3f), B(.9, .22, .5, x, y + 7, dz, 0x2b2c2e)); Lt.push(B(.7, .08, .36, x, y + 6.87, dz, 0xfff0cc)); if (NV) solid(NV.circle(x, dz, .22, 'fob')); }
+  return { L, Lt, boom, shed };
 }
 /* a U of earth in front of and beside a gun position, open to the rear */
 function revetment(x, z, e, hgt) {
   const L = [], c = 0x5b5a3d, mk = (len, px, pz, rot) => { const g = G.profile([[-1.7, 0], [1.7, 0], [.25, 1.45], [-.25, 1.45]], len, .05); if (rot) g.rotateY(Math.PI / 2); g.translate(px, hgt(px, pz) - .05, pz); L.push(prim(g, c, .9 + Math.random() * .2)); };
   mk(11, x + e * 6.6, z, 0); mk(11.5, x + e * 1.2, z + 5.8, 1); mk(11.5, x + e * 1.2, z - 5.8, 1);
+  if (window.NAV) { const N = window.NAV; N.add(N.capsule(x + e * 6.6, z - 5.5, x + e * 6.6, z + 5.5, 1.75, 'revet')); for (const s of [1, -1]) N.add(N.capsule(x + e * 1.2 - 5.75, z + s * 5.8, x + e * 1.2 + 5.75, z + s * 5.8, 1.75, 'revet')); }
   return L;
 }
 /* ================================================================== 5.0 environment: build + run
@@ -580,29 +647,34 @@ K.build = function (scene, hgt, tier) {
   }
   /* harbours */
   const pm = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .86, metalness: .04 }) : new THREE.MeshLambertMaterial({ vertexColors: true }); pm.userData.envK = .55; E.propMat = pm;
-  const HL = []; E.port = {};
-  for (const side of ['bull', 'bear']) { const h = harbour(side, hgt); HL.push(...h.L); E.port[side] = h; }
+  const HL = [], LT = []; E.port = {};
+  for (const side of ['bull', 'bear']) { const h = harbour(side, hgt); HL.push(...h.L); LT.push(...h.Lt); E.port[side] = h; }
   /* forward operating bases round the two headquarters; revetments at every gun position (the same coordinates battle.js gives its artillery) */
-  const LT = [];
-  for (const side of ['bull', 'bear']) { const f = fob(side, hgt); HL.push(...f.L); LT.push(...f.Lt); const m = side === 'bull' ? -1 : 1; for (const [gx, gz] of [[62, -45], [63, 45], [68, -17], [67, 23], [63, 35]]) HL.push(...revetment(gx * m, gz, -m, hgt)); }
+  E.booms = []; E.sheds = [];
+  for (const side of ['bull', 'bear']) { const f = fob(side, hgt); HL.push(...f.L); LT.push(...f.Lt); if (f.boom) E.booms.push(f.boom); if (f.shed) E.sheds.push(f.shed); const m = side === 'bull' ? -1 : 1; for (const [gx, gz] of GUNS_AT) HL.push(...revetment(gx * m, gz, -m, hgt)); }
   const hm = new THREE.Mesh(G.merge(HL), pm); hm.castShadow = !lite; hm.receiveShadow = !!G.std; scene.add(hm);
+  for (const b of E.booms) { const g = new THREE.Mesh(G.merge(b.L), pm); g.position.set(b.x, b.y, b.z); g.castShadow = !lite; scene.add(g); b.g = g; }   // gate booms pivot on their posts
+  for (const d of E.sheds) { const g = new THREE.Mesh(G.merge(d.L), pm); g.position.set(d.x, d.y, d.z); g.castShadow = !lite; scene.add(g); d.g = g; }   // shed doors roll up into their drums
   E.lmat = new THREE.MeshBasicMaterial({ vertexColors: true }); scene.add(new THREE.Mesh(G.merge(LT), E.lmat));
-  /* fleets: a destroyer on patrol off shore, a frigate near the harbour mouth, a submarine further out */
+  /* fleets. Each navy's destroyer and frigate steam one patrol loop half a lap apart, so they keep their distance for good; the patrol
+     boat circles the water off its harbour; the carrier lies further out and the submarine beyond it. The loops were laid out so that
+     no hull ever comes within a few metres of another, of the pier or of water too shallow for it (tests/battle_navy.py checks it). */
+  const LANE = { bull: { col: [-85, -202, 62, 44], pb: [-138, -131, 26, 18] }, bear: { col: [85, -202, 62, 44], pb: [141, -131, 20, 16] } };
   for (const side of ['bull', 'bear']) {
-    const m = side === 'bull' ? -1 : 1, d = K.warship(side, true), f = K.warship(side, false), s = K.submarine(side);
+    const m = side === 'bull' ? -1 : 1, d = K.warship(side, true), f = K.warship(side, false), s = K.submarine(side), Ln = LANE[side], w = .032 * m, p0 = m < 0 ? .6 : 2.6;
     [d, f, s].forEach(o => scene.add(o));
-    E.ships.push({ g: d, side, kind: 'dd', cx: 100 * m, cz: -188, rx: 44, rz: 19, w: -.043 * m, ph: m < 0 ? .6 : 2.6, bob: 1.7 * m, aim: null, ta: 0 });
-    E.ships.push({ g: f, side, kind: 'ff', cx: 40 * m, cz: -146, rx: 22, rz: 6, w: .05 * m, ph: m < 0 ? 3.4 : 5.9, bob: 4.1 * m, aim: null, ta: 0 });
-    const pb = K.warship(side, false); pb.scale.setScalar(.44); scene.add(pb); E.ships.push({ g: pb, side, kind: 'pb', cx: 125 * m, cz: -150, rx: 32, rz: 10, w: -.12 * m, ph: m < 0 ? 1.2 : 4.6, bob: 2.9 * m, aim: null, ta: 0 });
-    s.position.set(150 * m, SEA - 7.5, -236); s.rotation.y = m < 0 ? -.35 : Math.PI + .35;
+    E.ships.push({ g: d, side, kind: 'dd', cx: Ln.col[0], cz: Ln.col[1], rx: Ln.col[2], rz: Ln.col[3], w, ph: p0, bob: 1.7 * m, aim: null, ta: 0 });
+    E.ships.push({ g: f, side, kind: 'ff', cx: Ln.col[0], cz: Ln.col[1], rx: Ln.col[2], rz: Ln.col[3], w, ph: p0 + Math.PI, bob: 4.1 * m, aim: null, ta: 0 });
+    const pb = K.warship(side, false); pb.scale.setScalar(.44); scene.add(pb); E.ships.push({ g: pb, side, kind: 'pb', cx: Ln.pb[0], cz: Ln.pb[1], rx: Ln.pb[2], rz: Ln.pb[3], w: -.09 * m, ph: m < 0 ? 1.2 : 4.6, bob: 2.9 * m, aim: null, ta: 0 });
+    s.position.set(35 * m, SEA - 7.5, -330); s.rotation.y = m < 0 ? -.35 : Math.PI + .35;
     E.subs[side] = { g: s, side, depth: -7.5, want: -7.5, until: 0, peek: 30 + Math.random() * 60 };
   }
   /* radar stations */
   E.radars = [];
   for (const side of ['bull', 'bear']) {
-    const [x, z] = RADAR_AT[side], r = radarStation(side), y = hgt(x, z) - .02, rot = side === 'bull' ? 0 : Math.PI;
+    const [x, z] = RADAR_AT[side], r = radarStation(side), y = hgt(x, z) - .02, rot = side === 'bull' ? 0 : Math.PI; if (window.NAV) NAV.add(NAV.box(x, z, 2.7, 2.0, rot, 'radar'));
     const base = new THREE.Mesh(G.merge(moved(r.base, x, y, z, rot)), pm); base.castShadow = !lite; scene.add(base);
-    const ant = new THREE.Mesh(G.merge(r.ant), pm); ant.position.set(x + (side === 'bull' ? 1.2 : -1.2), y + 2.9, z); ant.castShadow = !lite; scene.add(ant); E.radars.push(ant);
+    const ant = new THREE.Mesh(G.merge(r.ant), pm); ant.position.set(x + (side === 'bull' ? 1.2 : -1.2), y + 2.9, z); ant.castShadow = !lite; ant.userData.side = side; scene.add(ant); E.radars.push(ant);
   }
   /* satellites: one per army on a slow circle high above; a scan beam and a scanner bar on the ground while one of them is taking pictures */
   E.sats = {};
@@ -636,7 +708,21 @@ function envTick(dt, t) {
     let want = 0; if (s.aim && t < s.aim.until) { want = Math.atan2(-(s.aim.z - s.g.position.z), s.aim.x - s.g.position.x) - hd; while (want > Math.PI) want -= TAU; while (want < -Math.PI) want += TAU; }
     let dA = want - s.ta; while (dA > Math.PI) dA -= TAU; while (dA < -Math.PI) dA += TAU; s.ta += dA * Math.min(1, dt * 2.2); U.tur.rotation.y = s.ta;
   }
-  for (const r of E.radars) r.rotation.y += dt * 1.6;
+  /* each radar station sweeps until something of the enemy's is in the air, then holds it (the SAM site fires on its track) */
+  for (const r of E.radars) { const tp = typeof THREATS !== 'undefined' ? THREATS.nearest(r.userData.side, r.position.x, r.position.z, 320) : null;
+    if (!tp) { r.rotation.y += dt * 1.6; r.userData.lock = 0; continue; }
+    const want = Math.atan2(-(tp.z - r.position.z), tp.x - r.position.x); let d = want - r.rotation.y; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU;
+    r.rotation.y += cl(d, -dt * 4, dt * 4); r.userData.lock = Math.abs(d) < .1 ? 1 : 0; }
+  /* each front gate's boom rises while anyone of its army is coming through, and drops again behind the last of them */
+  if (E.booms && typeof ARMY !== 'undefined' && ARMY.sides) for (const b of E.booms) {
+    const A = ARMY.sides[b.side], at = (x, z) => Math.abs(x - b.gx) < 9 && Math.abs(z - b.gz) < 7.5;
+    let near = !!A && (A.sold.some(o => at(o.x, o.z)) || A.veh.some(o => at(o.x, o.z)));
+    if (!near && ARMY.trucks) near = ARMY.trucks.some(t => t.on && t.side === b.side && at(t.g.position.x, t.g.position.z));
+    if (!near && window.GFX6 && GFX6.RB.sides[b.side]) { const S = GFX6.RB.sides[b.side]; near = S.bots.some(o => at(o.x, o.z)) || S.dogs.some(o => at(o.x, o.z)); }
+    b.open += ((near ? 1 : 0) - b.open) * Math.min(1, dt * 3.2); b.g.rotation.x = -b.open * Math.PI * .47;
+  }
+  /* each motor pool's roller door, as far open as battle.js has it */
+  if (E.sheds && typeof ARMY !== 'undefined' && ARMY.sides) for (const d of E.sheds) { const A = ARMY.sides[d.side], o = A && A.shed ? A.shed.open : 0; d.g.scale.y = Math.max(.001, 1 - o); d.g.visible = o < .999; }
   /* a supply lorry shuttles between the rear road and each base's back gate */
   if (typeof ARMY !== 'undefined' && ARMY.vmat) for (const k in E.lorry) {
     const l = E.lorry[k], m = k === 'bull' ? -1 : 1;
@@ -723,6 +809,10 @@ K.naval = {
   fire(side, tx, tz, usd, n, kind) {
     const E = K.env, ff = kind === 'ff', s = this.ship(side, ff ? 'ff' : 'dd'); if (!E || !s || typeof FX === 'undefined') return false;
     s.aim = { x: tx, z: tz, until: E.t + 7 };
+    const pb = !ff && this.ship(side, 'pb');                                   // the patrol boat's gun joins the destroyer's
+    if (pb) { pb.aim = { x: tx, z: tz, until: E.t + 7 }; for (let i = 0; i < 2; i++) K.after(1500 + i * 600, () => { const U = pb.g.userData, tip = U.gunTip.clone(); pb.g.updateMatrixWorld(true); U.tur.localToWorld(tip);
+      FX.shoot({ x0: tip.x, y0: tip.y, z0: tip.z, x1: tx + rr(-8, 8), z1: tz + rr(-8, 8), h: 22 + Math.random() * 6, dur: 2100 + Math.random() * 300, sz: 1.2, col: 0xffd27a, kind: 'shell', usd: usd * .3, side, trail: 1 });
+      FX.muzzle(tip.x, tip.y, tip.z, 3.2); FX.smoke(tip.x, tip.y, tip.z, E.lite ? 2 : 4, 2.6); AUDIO.play('navgun', { x: pb.g.position.x, z: pb.g.position.z, vol: .6 }); }); }
     for (let i = 0; i < (n || 2); i++) K.after(900 + i * (ff ? 430 : 520), () => {
       const U = s.g.userData, tip = U.gunTip.clone(); s.g.updateMatrixWorld(true); U.tur.localToWorld(tip);
       FX.shoot({ x0: tip.x, y0: tip.y, z0: tip.z, x1: tx + rr(-7, 7), z1: tz + rr(-7, 7), h: (ff ? 24 : 30) + Math.random() * 8, dur: (ff ? 2000 : 2300) + Math.random() * 400, sz: ff ? 1.45 : 1.9, col: 0xffd27a, kind: 'shell', usd, side, trail: 1 });

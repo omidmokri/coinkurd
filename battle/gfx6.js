@@ -153,7 +153,8 @@ K.dogBones = function (d, t, dt, T, row) {
 const RB = K.RB = { H: 4, D: 4, sides: {}, hold: 40000, ready: false };
 RB.rows = 2 * (RB.H + RB.D);
 const SCB = 1.86, SCD = 1.72;                  // world scale: a robot stands a little taller than a soldier (1.7)
-const home = (S, dog, i) => { const d = S.dir, gz = gateZ(d * GATE); return dog ? [d * (65.1 + (i % 2) * 1.9), gz - 5.3 - (i >> 1) * 2.3] : [d * (69.0 + (i % 2) * 2.3), gz - 5.5 - (i >> 1) * 2.6]; };
+/* their place in the yard behind the gate, beside the track from the command post to the gate (moved onto clear ground once the ground is mapped) */
+const home = (S, dog, i) => { const H = S.home && S.home[(dog ? 'd' : 'h') + i]; if (H) return H; const d = S.dir, gz = gateZ(d * GATE); return dog ? [d * (67.2 + (i % 2) * 1.9), gz + 6.6 + (i >> 1) * 2.3] : [d * (70.0 + (i % 2) * 2.3), gz + 7.0 + (i >> 1) * 2.6]; };   // north of the track, clear of the motor pool's way to the gate
 RB.init = function () {
   const soft = !G.std, lod = soft ? 1 : 0; this.hgeo = K.robotGeo(lod); this.dgeo = K.dogGeo(lod);
   for (const key of ['bull', 'bear']) {
@@ -170,14 +171,39 @@ RB.init = function () {
 };
 const legTo = (o, p, t) => { o.x0 = o.x; o.z0 = o.z; o.tx = p[0]; o.tz = p[1]; o.t0 = t; o.dur = Math.max(.25, Math.hypot(o.tx - o.x, o.tz - o.z) / o.sp); o.mv = 1; };
 const routeTo = (o, pts, t) => { o.legs = pts.slice(1); legTo(o, pts[0], t); };
-const inBase = (S, o) => Math.abs(o.x) > GATE - .5;
-function go(S, o, dest, t, sp) {              // to a point, through the gate whenever the wall lies between
-  const d = S.dir, gz = gateZ(d * GATE), from = inBase(S, o), to = Math.abs(dest[0]) > GATE - .5, pts = [];
-  o.sp = sp;
-  if (from && !to) pts.push([d * (GATE + 2.4), gz + rr(-1.6, 1.6)], [d * (GATE - 3), gz + rr(-2, 2)]);
-  else if (!from && to) pts.push([d * (GATE - 3), gz + rr(-2, 2)], [d * (GATE + 2.4), gz + rr(-1.6, 1.6)]);
-  pts.push(dest); routeTo(o, pts, t);
+const RAD = { bot: .62, dog: .55 };
+/* to a point by the navigation map (round every wall, wire, wreck and parked vehicle; through the gate when the base wall lies between) */
+function go(S, o, dest, t, sp, dog) {
+  o.sp = sp; const r = dog ? RAD.dog : RAD.bot, NV = window.NAV && NAV.ready ? NAV : null;
+  const P = NV ? NV.path(o.x, o.z, dest[0], dest[1], r) : null;
+  routeTo(o, P ? P.slice(1) : [dest], t);
 }
+/* a clear standing place near p for a machine: room around it, no soldier, vehicle or other machine on it */
+function place(S, p, dog, self) {
+  const NV = window.NAV && NAV.ready ? NAV : null; if (!NV) return p;
+  const mine = (x, z) => { for (const k in RB.sides) { const T = RB.sides[k]; for (const o of T.bots.concat(T.dogs)) { if (o === self) continue; const px = o.mv ? o.tx : o.x, pz = o.mv ? o.tz : o.z; if ((px - x) * (px - x) + (pz - z) * (pz - z) < 1.7) return true; } } return false; };
+  return NV.free(p[0], p[1], dog ? RAD.dog : RAD.bot, 7, (x, z) => !mine(x, z) && !ARMY.taken(x, z, null)) || NV.free(p[0], p[1], dog ? RAD.dog : RAD.bot, 9) || p;
+}
+/* once the ground is mapped: each machine's place in the yard is moved onto clear ground, and they are put there */
+K.navInit = function () {
+  for (const k in RB.sides) { const S = RB.sides[k]; S.home = {};
+    S.bots.forEach((b, i) => { const p = place(S, home(S, false, i), false, b); S.home['h' + i] = p; b.x = p[0]; b.z = p[1]; });
+    S.dogs.forEach((g, i) => { const p = place(S, home(S, true, i), true, g); S.home['d' + i] = p; g.x = p[0]; g.z = p[1]; }); }
+};
+/* a machine steps out of the way of a vehicle coming at it */
+K.dodge = function (o, v, t) {
+  const S = o.army || (o.army = Object.values(RB.sides).find(T => T.bots.includes(o) || T.dogs.includes(o))); if (!S) return;   // (a dog's .S is its stride)
+  const dog = S.dogs.includes(o), B = ARMY.VB[v.tier], c = Math.cos(v.hd), sn = Math.sin(v.hd), dx = o.x - v.x, dz = o.z - v.z, lx = dx * c - dz * sn, lz = dx * sn + dz * c, nz = (lz >= 0 ? 1 : -1) * (B[1] + 2), wx = v.x + lx * c + nz * sn, wz = v.z - lx * sn + nz * c;
+  const p = NAV.free(wx, wz, dog ? RAD.dog : RAD.bot, 6, (x, z) => !NAV.inBox(x, z, v.x, v.z, v.hd, B[0] + 4, B[1] + 1)) || [wx, wz];
+  if (o.mv && !o.after) o.after = { dest: o.legs && o.legs.length ? o.legs[o.legs.length - 1] : [o.tx, o.tz], sp: o.sp, state: S.state };   // where it was going, once the vehicle has passed
+  o.dodge = t + 3000; go(S, o, p, t, dog ? 6 : 4.2, dog); if (!dog) { o.st = ST.WALK; o.t0 = t; }
+};
+const resume = (S, o, t, dog) => { const a = o.after; o.after = null; if (a.state !== S.state) return; go(S, o, a.dest, t, a.sp, dog); if (!dog) { o.st = ST.WALK; o.t0 = t; } };
+/* after the ground changed: a machine standing in something new steps out of it */
+K.navCheck = function (t) {
+  for (const k in RB.sides) { const S = RB.sides[k];
+    S.bots.concat(S.dogs).forEach(o => { if (o.mv) return; const dog = S.dogs.includes(o); if (NAV.clear(o.x, o.z) < (dog ? RAD.dog : RAD.bot) - .15) { const p = place(S, [o.x, o.z], dog, o); go(S, o, p, t, dog ? 6 : 4.2, dog); if (!dog) { o.st = ST.WALK; o.t0 = t; } } }); }
+};
 /* a clear stretch of the lane behind the line: the candidate with the fewest soldiers standing on it */
 function clearZ(S, px) {
   const A = ARMY.sides[S.key]; let best = 0, bn = 1e9;
@@ -190,13 +216,13 @@ function spots(S, px, zc) {
 }
 RB.deploy = function (S, px, zc, t) {
   const P = spots(S, px, zc); S.px = px; S.zc = zc; S.state = 'out';
-  S.bots.forEach((b, i) => { go(S, b, P.h(i), t + i * 90, 10.5); b.st = ST.RUN; b.t0 = t; b.stn = K5.stance(4, b.sd); });
-  S.dogs.forEach((g, i) => { g.sit = false; g.st = 0; go(S, g, P.g(i), t + i * 60, 17); });
+  S.bots.forEach((b, i) => { go(S, b, place(S, P.h(i), false, b), t + i * 90, 10.5); b.st = ST.RUN; b.t0 = t; b.stn = K5.stance(4, b.sd); });
+  S.dogs.forEach((g, i) => { g.sit = false; g.st = 0; go(S, g, place(S, P.g(i), true, g), t + i * 60, 17, true); });
 };
 RB.recall = function (S, t) {
   S.state = 'back'; S.shots = 0;
   S.bots.forEach((b, i) => { go(S, b, home(S, false, i), t + i * 120, 7.2); b.st = ST.RUN; b.t0 = t; });
-  S.dogs.forEach((g, i) => { g.st = 0; go(S, g, home(S, true, i), t + i * 80, 12.5); });
+  S.dogs.forEach((g, i) => { g.st = 0; go(S, g, home(S, true, i), t + i * 80, 12.5, true); });
 };
 /* a sweep of the book on this army's side: n price levels taken in one go, worth usd, with the front at fx. True when the team sets out. */
 RB.sweep = function (side, fx, usd, n) {
@@ -211,11 +237,13 @@ RB.clear = function () {
     S.bots.forEach((b, i) => { const p = home(S, false, i); b.x = p[0]; b.z = p[1]; b.mv = 0; b.legs = null; b.st = ST.IDLE; b.ry = face; b.gyT = 0; b.q = null; });
     S.dogs.forEach((g, i) => { const p = home(S, true, i); g.x = p[0]; g.z = p[1]; g.mv = 0; g.legs = null; g.st = 0; g.sit = true; g.ry = face; g.gyT = 0; }); }
 };
-function stepMove(o, t) {
+function stepMove(o, t, dt) {
   if (!o.mv) return false;
   if (t < o.t0) return true;                   // staggered start
   const f = cl((t - o.t0) / 1000 / o.dur, 0, 1), e = f < .5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
-  o.x = o.x0 + (o.tx - o.x0) * e; o.z = o.z0 + (o.tz - o.z0) * e; o.gyT = 0;
+  const nx = o.x0 + (o.tx - o.x0) * e, nz = o.z0 + (o.tz - o.z0) * e;
+  if (f < 1 && ARMY.navOn && ARMY.inWay(nx, nz, .5) && !ARMY.inWay(o.x, o.z, .5)) { o.t0 += (dt || .016) * 1000; o.frzT = t; return true; }   // a vehicle is crossing: wait (it asks the machine to step aside if it is held up by it)
+  o.x = nx; o.z = nz; o.gyT = 0;
   if (f >= 1) { if (o.legs && o.legs.length) legTo(o, o.legs.shift(), t); else { o.mv = 0; return false; } }
   return true;
 }
@@ -241,10 +269,11 @@ RB.tick = function (dt) {
     /* go home when nothing has called for a while or the market has gone quiet; follow the line when it has moved away */
     if (S.state === 'out') {
       if (t - S.last > this.hold || ARMY.rest) this.recall(S, t);
-      else if (t - (S.adj || 0) > 2500) { S.adj = t; const px = cl(fx + S.dir * 8.5, -XMAX + 3, XMAX - 3); if (Math.abs(px - S.px) > 6.5 && !S.bots.some(b => b.mv)) { const P = spots(S, px, S.zc); S.px = px; S.bots.forEach((b, i) => { b.sp = 4.2; routeTo(b, [P.h(i)], t); b.st = ST.WALK; b.t0 = t; }); S.dogs.forEach((g, i) => { g.sp = 6; routeTo(g, [P.g(i)], t); }); } }
+      else if (t - (S.adj || 0) > 2500) { S.adj = t; const px = cl(fx + S.dir * 8.5, -XMAX + 3, XMAX - 3); if (Math.abs(px - S.px) > 6.5 && !S.bots.some(b => b.mv)) { const P = spots(S, px, S.zc); S.px = px; S.bots.forEach((b, i) => { go(S, b, place(S, P.h(i), false, b), t, 4.2); b.st = ST.WALK; b.t0 = t; }); S.dogs.forEach((g, i) => { go(S, g, place(S, P.g(i), true, g), t, 6, true); }); } }
     }
     for (let i = 0; i < S.bots.length; i++) {
-      const b = S.bots[i], mv = stepMove(b, t); if (mv) moving++;
+      const b = S.bots[i], mv = stepMove(b, t, dt); if (mv) moving++;
+      if (!mv && b.after && t > b.dodge) resume(S, b, t, false);
       if (!mv) {
         if (b.st === ST.RUN || b.st === ST.WALK) { b.st = ST.IDLE; b.t0 = t; }
         else if (b.st === ST.FIRE && t - b.shot > 800) { b.st = ST.IDLE; b.t0 = t; }
@@ -258,7 +287,8 @@ RB.tick = function (dt) {
       if (S.sh) { _p.y = b.y + .06; _s.set(SCB * 1.3, 1, SCB * 1.3); _m4.compose(_p, _q4, _s); _m4.toArray(S.sh.instanceMatrix.array, n * 16); } n++;
     }
     for (let i = 0; i < S.dogs.length; i++) {
-      const g = S.dogs[i], mv = stepMove(g, t); if (mv) moving++;
+      const g = S.dogs[i], mv = stepMove(g, t, dt); if (mv) moving++;
+      if (!mv && g.after && t > g.dodge) resume(S, g, t, true);
       if (!mv) {
         if (g.st === 2 && t - g.shot > 650) g.st = 0;
         if (S.state === 'out' && S.shots > 0 && t > g.next) { g.next = t + 640 + Math.random() * 700; S.shots--; fireFrom(S, g, true, t); }
@@ -317,11 +347,12 @@ function gearGeo() {                           // a jet's undercarriage, in the 
 }
 K.carrier = function (side) {
   const { B, CY, prim } = K5.kit, P = K5.ship.NAVY[side], L = [], Lt = [], g = new THREE.Group(), SM = K5.ship.shipMat();
-  const st = [[-52, 8.4, 7.0, 5.7], [-47, 9.2, 8.2, 5.7], [-18, 9.4, 8.6, 5.7], [22, 9.2, 8.3, 5.7], [38, 7.4, 5.4, 5.8], [47, 4.0, 2.2, 5.9], [53.5, .25, .1, 6.0]];
+  /* the bow flares out to meet the flight deck (narrow at the waterline, wide under the deck edge) */
+  const st = [[-52, 8.4, 7.0, 5.7], [-47, 9.2, 8.2, 5.7], [-18, 9.4, 8.6, 5.7], [22, 9.4, 8.3, 5.7], [38, 9.4, 5.4, 5.8], [47, 8.0, 2.2, 5.9], [53.5, 4.4, .1, 6.0]];
   L.push(K5.ship.hullGeo(st, P.hull, P.boot, P.deck));
   const out = [[53, 4.6], [50.5, 8], [34, 10.2], [-50, 10.2], [-53, 8.2], [-53, -8.2], [-50, -10.2], [-40, -10.2], [-33, -15], [16, -15], [25, -10.2], [34, -10.2], [50.5, -8], [53, -4.6]];
   const sh = new THREE.Shape(); out.forEach(([x, z], i) => { if (i) sh.lineTo(x, -z); else sh.moveTo(x, -z); });
-  const slab = new THREE.ExtrudeGeometry(sh, { depth: .8, bevelEnabled: false, curveSegments: 1 }); slab.rotateX(-Math.PI / 2); slab.translate(0, DK - .8, 0); L.push(prim(slab, 0x3a3f42));
+  const slab = new THREE.ExtrudeGeometry(sh, { depth: 2.4, bevelEnabled: false, curveSegments: 1 }); slab.rotateX(-Math.PI / 2); slab.translate(0, DK - 2.4, 0); L.push(prim(slab, 0x3a3f42));   // a deep gallery deck: no thin plate hanging over the sea
   L.push(B(47, 1.7, 5.4, -9, DK - 1.65, -12, P.hull), B(24, 1.7, 2.2, IX, DK - 1.65, 9.7, P.hull));
   /* deck markings: catapult tracks and the wells of the blast deflectors, the landing strip, lift outlines */
   const Y = DK + .025, WH = 0xdedcd3, YL = 0xd9b21c;
@@ -333,7 +364,7 @@ K.carrier = function (side) {
     for (let i = 0; i < 4; i++) strip(9.2, .14, .16 + i * .05, 0, 0x1c1f21);          // arrester wires lie across the strip
   }
   L.push(B(9.4, .04, 5.6, 4, DK + .02, 7.3, 0x303437), B(9.4, .04, 5.6, -26, DK + .02, 7.3, 0x303437), B(8, .04, 5, -42, DK + .02, -7.6, 0x303437));
-  L.push(B(100, .05, .22, -1, Y, 9.9, YL), B(1.7, .8, 1.1, -17, DK + .4, 5.6, 0xd9a514), B(1.7, .8, 1.1, -8.6, DK + .4, 5.75, 0xd9a514));
+  L.push(B(86.4, .05, .22, -7.1, Y, 9.9, YL), B(1.7, .8, 1.1, -17, DK + .4, 5.6, 0xd9a514), B(1.7, .8, 1.1, -8.6, DK + .4, 5.75, 0xd9a514));
   HPAD.forEach(([x, z]) => { const r = new THREE.RingGeometry(2.5, 2.8, 20); r.rotateX(-Math.PI / 2); r.translate(x, Y + .01, z); L.push(prim(r, WH), B(1.9, .05, .3, x, Y + .01, z, WH), B(.3, .05, 1.5, x - .8, Y + .01, z, WH), B(.3, .05, 1.5, x + .8, Y + .01, z, WH)); });
   /* island: bridge levels, window bands, funnel, mast and domes */
   L.push(B(17, 4.6, 3.6, IX, DK + 2.3, IZ, P.sup), B(11, 2.0, 4.0, IX + 1.5, DK + 5.6, IZ, P.sup), B(11.1, .62, 4.1, IX + 1.5, DK + 5.95, IZ, 0x10161b));
@@ -341,8 +372,12 @@ K.carrier = function (side) {
   L.push(CY(.95, 1.3, 3.0, 6, IX - 5.4, DK + 6.1, IZ + .1, P.sup), CY(1.0, 1.0, .3, 6, IX - 5.4, DK + 7.7, IZ + .1, 0x16181a));
   L.push(CY(.16, .32, 7.2, 5, IX + 3.2, DK + 11.8, IZ, P.dark), B(.14, .14, 4.8, IX + 3.2, DK + 13, IZ, P.dark), CY(.05, .05, 3, 4, IX + 3.2, DK + 16.6, IZ, P.dark));
   L.push(prim(G.T(new THREE.SphereGeometry(1.0, 10, 6), IX - 2.4, DK + 9.4, IZ), 0xe6e7e2), prim(G.T(new THREE.SphereGeometry(.6, 8, 5), IX + 6.6, DK + 8.9, IZ), 0xe6e7e2));
-  [[44, 9.3], [44, -9.3], [-50.5, 9.2], [-50.5, -9.2]].forEach(([x, z]) => L.push(B(2.3, .5, 2.3, x, DK - 2.1, z, P.hull), CY(.5, .65, 1.0, 8, x, DK - 1.35, z, 0xdadcd8), prim(G.T(new THREE.SphereGeometry(.55, 8, 5, 0, TAU, 0, Math.PI / 2), x, DK - .85, z), 0xe6e7e2)));
-  L.push(CY(.05, .05, 3.2, 4, -52.6, DK + 1.6, 0, 0xcfd2d0), prim(G.T(new THREE.PlaneGeometry(2.6, 1.6), -51.2, DK + 2.4, 0), P.band));
+  L.push(CY(.35, .45, 2.0, 8, IX - 2.4, DK + 7.6, IZ, P.sup), CY(.22, .3, 1.85, 8, IX + 6.6, DK + 7.5, IZ, P.sup));   // the radomes stand on pedestals on the island roof
+  /* close-in guns on sponsons built out from the hull side, braced underneath, clear of the flight deck above */
+  [[44, 9.65], [44, -9.65], [-50.5, 10.6], [-50.5, -10.6]].forEach(([x, z]) => { const sg = Math.sign(z), zi = sg * 3.6, zo = z + sg * 1.15;
+    L.push(B(2.3, .5, Math.abs(zo - zi), x, DK - 3.1, (zi + zo) / 2, P.hull), prim(G.beam(new THREE.Vector3(x, DK - 5.4, sg * 3.6), new THREE.Vector3(x, DK - 3.3, z - sg * .3), .35), P.hull));
+    L.push(CY(.5, .65, 1.0, 8, x, DK - 2.35, z, 0xdadcd8), prim(G.T(new THREE.SphereGeometry(.55, 8, 5, 0, TAU, 0, Math.PI / 2), x, DK - 1.85, z), 0xe6e7e2)); });
+  L.push(CY(.05, .05, 3.2, 4, -52.6, DK + 1.6, 0, 0xcfd2d0), prim(G.T(new THREE.PlaneGeometry(2.6, 1.6), -51.27, DK + 2.4, 0), P.band));
   const body = new THREE.Mesh(G.merge(L), SM); body.castShadow = !!G.std; g.add(body);
   /* lights: deck edge, strip centre line, island windows (lit at night through the environment's light material) */
   for (let x = -48; x <= 48; x += 8) Lt.push(B(.3, .12, .3, x, DK + .06, 10, 0xfff0cc), B(.3, .12, .3, x, DK + .06, x > -36 && x < 20 ? -14.8 : -10, 0xfff0cc));
@@ -524,7 +559,7 @@ K.boot = function () {
   const E = K5.env; if (!E || typeof ARMY === 'undefined') return;
   try {
     for (const side of ['bull', 'bear']) {
-      const m = side === 'bull' ? -1 : 1, g = K.carrier(side); g.position.set(m * 105, K5.SEA, -268); g.rotation.y = side === 'bull' ? -.55 : Math.PI + .55; scene.add(g);
+      const m = side === 'bull' ? -1 : 1, g = K.carrier(side); g.position.set(m * 100, K5.SEA, -310); g.rotation.y = side === 'bull' ? -.55 : Math.PI + .55; scene.add(g);
       const c = CV[side] = { g, side, bob: m * 2.3, next: 30 + Math.random() * 40 + (m > 0 ? 35 : 0), busy: 0 }; resetDeck(c);
       let hp = 0; if (typeof FX !== 'undefined') for (const a of FX.air) if (a.k === 'heli' && a.side === side) a.hp = hp++ % HPAD.length;
     }

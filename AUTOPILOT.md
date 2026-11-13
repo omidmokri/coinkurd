@@ -121,6 +121,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   collects what already exists and checks every internal link against the built tree, so adding an academy faculty
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
+- `/battle/` — «نبرد من», the live market as a 3D battle (three.js r128). The model kits are `battle/gfx3.js` to
+  `gfx6.js` (units, environment, navy, carriers and robots). The engine is `battle/battle.js` (WORLD, ARMY, FX, CINE,
+  THREATS, DIRECTOR, HUD) and ground navigation is `battle/nav.js`. Raise the `?v=` tags in `battle/index.html` with
+  every change. Before shipping, run `tests/battle_ground.py`, `tests/battle_geometry.py` and `tests/battle_navy.py`
+  (harness: `tests/battle_harness.py`).
+
 - `/kids/` — **Bitcoin for Juniors** (6 modules, 21 activities, ages 8-12; fa · ckb · en). Lesson text lives ONLY in
   `content/b4j/{en,fa,ckb}/**.md` (see `content/b4j/README.md`, provenance in `content/b4j/SOURCE.json`);
   `scripts/b4j_md.py` parses it and proves each translation has the English block skeleton; `scripts/build_kids.py`
@@ -175,6 +181,27 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · «نبرد من»: no physical errors, every element fights, Hollywood cinema (owner's request in chat, not by the loop)
+- **Nothing passes through anything.** New `battle/nav.js` (hull-exact A* with turn room). Vehicles drive planned routes
+  of straight, arc, pivot and reverse legs, each checked against every solid at 0.25 m steps with the hull's own size.
+  Each base has a motor-pool shed (`GFX5.GAR`) with a roll-up door that takes one vehicle at a time, and a gate that
+  passes one direction at a time; inbound vehicles wait in holding bays. Soldiers, robots and dogs step aside for
+  vehicles. Ships keep loops that never bring two hulls, or a hull and the pier, together.
+- **Nothing floats or vanishes.** Radar and microwave dishes are solid shells (`G.dishGeo`), so no angle hides them.
+  Floating parts (ship superstructure, shed slats, ruin slab) were seated. The pier's bare poles are now real lamp
+  posts with an arm, a head and a lit lens, standing clear of the crane's load.
+- **Every element has a battle role.** Radars and searchlights track incoming aircraft and missiles (`THREATS`).
+  Drones spot targets for the guns. Strikes of tier 5 and up hit an enemy site (dump, yard, hangar, barracks, comm,
+  dome, TEL or SAM); the SAM intercepts about 45%, and a hit site burns for 40 s. Helicopters use base helipads, or
+  the carrier. Patrol boats fire. Comm masts relay.
+- **Cinema** (`CINE` in battle.js): acts (theatre, armies, yard, front, sea, sky) and a shot for each big event (guns,
+  heli, jets, missile, raid, wall, naval, robots, sat, sub, win). Hard cuts, FOV punch, shake and handheld drift; the
+  camera never sits inside a model.
+- **Verified:** `tests/battle_ground.py` (160 s, exact hull against every shape: zero violations),
+  `tests/battle_geometry.py` + `battle_audit.js` (no part floats), `tests/battle_navy.py` (no hull touches another or
+  the pier); harness `tests/battle_harness.py` (Playwright + SwiftShader); screenshots of bases, harbour and cinema.
+- **Bot:** `battle_text` in five languages gained the "nothing is just for show" bullet and the Hollywood camera.
+  **App:** it loads the site, so it shows this as is.
 ### 2026-11-13 · /bitcoin/ «درک بیت‌کوین»: the halving page + a film in Persian and Kurdish (owner's request in chat, not by the loop)
 - Static page `bitcoin/index.html` + `bitcoin/bitcoin.{js,css}` (page and films went up 2026-11-12 in 7316fa0; the wiring
   followed 2026-11-13): chrome.py STATIC, «آموزش» menu right after the map, GLOW; sitemap list in build_pages.py;
