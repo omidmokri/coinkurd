@@ -57,24 +57,37 @@ def main():
     print("coins:", len(want), f"(binance usdt: {len(bb)})", "have:", len(have), "need:", len(need))
     if need:
         img = {}
+        t_gecko = time.time() + 150                          # the CI step has 5 minutes: paging stops in time to download and index
         for page in range(1, 7):
-            if not (need - set(img)):
+            if not (need - set(img)) or time.time() > t_gecko:
                 break
-            try:
-                r = requests.get("https://api.coingecko.com/api/v3/coins/markets", params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": 250, "page": page},
-                                 headers=UA, timeout=30)
-                if r.status_code != 200:
-                    print("coingecko", r.status_code)
-                    break
-                for c in r.json():
-                    s = c["symbol"].upper()
-                    if s not in img and c.get("image"):  # اولین = بزرگ‌ترین ارزش بازار (رفع ابهام نمادهای تکراری)
-                        img[s] = c["image"].replace("/large/", "/small/")
-            except Exception as e:  # noqa: BLE001
-                print("coingecko err", e)
-            time.sleep(6)
+            for attempt in range(3):                         # CoinGecko's free tier answers 429 when asked too fast: wait, ask again
+                try:
+                    r = requests.get("https://api.coingecko.com/api/v3/coins/markets", params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": 250, "page": page},
+                                     headers=UA, timeout=30)
+                except Exception as e:  # noqa: BLE001
+                    print("coingecko err", e)
+                    r = None
+                if r is not None and r.status_code == 429 and attempt < 2 and time.time() + 60 < t_gecko:
+                    wait = min(90, int(r.headers.get("Retry-After") or 0) or 60)
+                    print("coingecko 429, page", page, "waiting", wait, "s")
+                    time.sleep(wait)
+                    continue
+                break
+            if r is None or r.status_code != 200:
+                print("coingecko", r.status_code if r is not None else "-", "page", page)
+                continue
+            for c in r.json():
+                s = c["symbol"].upper()
+                if s not in img and c.get("image"):  # اولین = بزرگ‌ترین ارزش بازار (رفع ابهام نمادهای تکراری)
+                    img[s] = c["image"].replace("/large/", "/small/")
+            time.sleep(13)
         got, coincap = 0, 0
-        for s in sorted(need)[:220]:                         # a capped batch per run, so the index is always written
+        # a capped batch per run, so the index is always written: the coins CoinGecko knows first, then the rest (CoinCap)
+        t_dl = time.time() + 100
+        for s in sorted(need, key=lambda x: (x not in img, x))[:360]:
+            if time.time() > t_dl:
+                break
             urls = ([img[s]] if s in img else []) + [f"https://assets.coincap.io/assets/icons/{s.lower()}@2x.png"]
             for u in urls:
                 try:
