@@ -194,6 +194,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /dna/: «اثر انگشت دارایی» — the 8 genes as one radar shape (owner's request in chat, not by the loop)
+- New section on the DNA page (template `dna/index.html`, copied to every `/dna/<coin>/` by `build_dna()`): an SVG
+  radar of the coin's 8 gene percentiles from `data/dna.json`, a dashed median ring, and up to two coins laid over
+  it (choices: the 3 most similar coins + BTC/ETH/SOL), each with its similarity from the same file. No new number:
+  every point is a gene value the page already shows. fa · ckb · en strings (Arabic from the English layer).
+- Verified: screenshots at 1280 px (fa, en) and 390 px; no sideways scroll, 0 JS errors; `tests/deep_e2e.py` 104.
 ### 2026-11-13 · Knowledge network: grouped site search + related-page links (owner's request in chat, not by the loop)
 - `scripts/build_links.py` (both workflows, after the builders, before seo_tidy): writes `/search.json` (777 rows:
   coins, glossary terms in fa/ckb/en, academy lessons, encyclopedia entries, indicators, DNA; ~24 kB gzipped,
