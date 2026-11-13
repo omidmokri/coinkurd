@@ -60,7 +60,7 @@
   function disposeTree(o) {
     o.traverse(function (n) {
       if (n.geometry) n.geometry.dispose();
-      if (n.material) { [].concat(n.material).forEach(function (m) { if (m.map && m.map !== MM.A.tex) m.map.dispose(); m.dispose(); }); }
+      if (n.material) { [].concat(n.material).forEach(function (m) { if (m.map && m.map !== MM.A.tex && m.map !== HALO) m.map.dispose(); m.dispose(); }); }
     });
   }
 
@@ -75,6 +75,7 @@
     var drag = null;
     el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     el.addEventListener('pointerdown', function (e) {
+      s.armed = true;
       s.pts[e.pointerId] = { x: e.clientX, y: e.clientY };
       drag = { x: e.clientX, y: e.clientY, btn: e.button, moved: 0, t: performance.now() };
       s.auto = false; s.last = performance.now();
@@ -82,6 +83,7 @@
     });
     el.addEventListener('pointermove', function (e) {
       var p = s.pts[e.pointerId]; if (!p || !drag) return;
+      if (o.held && o.held()) { drag.moved += Math.abs(e.clientX - p.x) + Math.abs(e.clientY - p.y); p.x = e.clientX; p.y = e.clientY; return; }   /* a bubble is being dragged */
       var ids = Object.keys(s.pts), dx = e.clientX - p.x, dy = e.clientY - p.y;
       if (ids.length === 2) {
         var a = s.pts[ids[0]], b = s.pts[ids[1]], d0 = Math.hypot(a.x - b.x, a.y - b.y);
@@ -98,7 +100,9 @@
     });
     function end(e) { delete s.pts[e.pointerId]; if (!Object.keys(s.pts).length) { s.last = performance.now(); } }
     el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
-    el.addEventListener('wheel', function (e) { e.preventDefault(); s.r *= Math.pow(1.0016, e.deltaY); s.auto = false; s.last = performance.now(); apply(); }, { passive: false });
+    el.addEventListener('pointerleave', function () { s.armed = false; });
+    /* the wheel zooms only after a click on the scene (or with Ctrl): scrolling the page over it must not fly the camera in */
+    el.addEventListener('wheel', function (e) { if (!s.armed && !e.ctrlKey && !e.metaKey) return; e.preventDefault(); s.r *= Math.pow(1.0016, e.deltaY); s.auto = false; s.last = performance.now(); apply(); }, { passive: false });
     el.addEventListener('dblclick', function () { s.th = o.th; s.ph = o.ph; s.r = o.r; s.tgt.set(0, o.ty || 0, 0); apply(); });
     function pan(dx, dy) {
       var k = s.r * 0.0016, right = new THREE.Vector3(Math.cos(s.th), 0, -Math.sin(s.th)), fwd = new THREE.Vector3(Math.sin(s.th), 0, Math.cos(s.th));
@@ -115,7 +119,12 @@
         return false;
       },
       dragged: function () { return drag && drag.moved > 6; },
-      fit: function (r) { s.r = r; o.r = r; apply(); }, apply: apply, s: s
+      fit: function (r) { s.r = r; o.r = r; apply(); }, apply: apply, s: s,
+      /* frame a sphere of radius R round the target: the whole scene in view, and the camera never inside it */
+      fitSphere: function (R, aspect, fov) {
+        var half = Math.atan(Math.tan(fov * Math.PI / 360) * Math.min(1, aspect)), dist = R / Math.sin(half) * 1.04;
+        s.min = R * 0.95; s.max = dist * 2.6; s.r = o.r = dist; apply();
+      }
     };
   }
 
@@ -248,6 +257,16 @@
     if (E.roofs) E.roofs.instanceMatrix.needsUpdate = true;
     return busy;
   }
+  function cityFit() {
+    var R = 20;
+    E.items.forEach(function (it) { R = Math.max(R, Math.hypot(Math.abs(it.x) + it.fw / 2, Math.abs(it.z) + it.fd / 2, it.th + 4)); });
+    E.orbit.fitSphere(R * 0.8, E.w / E.h, E.cam.fov);      /* a sphere round a flat city is generous: come a little closer */
+    E.orbit.s.min = R * 0.9;
+  }
+  function bubFit() {
+    var R = 10; E.items.forEach(function (it) { R = Math.max(R, it.p.length() + it.tr); });
+    E.orbit.fitSphere(R, E.w / E.h, E.cam.fov);
+  }
   function cityRelabel() {
     (E.labels || []).forEach(function (it) {
       var c = it.lb.userData.canvas, x = c.getContext('2d'), ch = it.c.ch[S.tf], F = '"Space Grotesk",Vazirmatn,sans-serif';
@@ -259,6 +278,13 @@
   }
 
   /* ================================================================ the bubble space */
+  var HALO = null;
+  function haloTex() {
+    if (HALO) return HALO;
+    var c = d.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d'), gr = x.createRadialGradient(64, 64, 20, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.36, 'rgba(255,255,255,.55)'); gr.addColorStop(0.42, 'rgba(255,255,255,.18)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 128); HALO = new THREE.CanvasTexture(c); return HALO;
+  }
   function bubBuild(getSt) {
     var st = getSt(), list = st.list.filter(function (n) { return !n.dead; }), m = Math.min(st.w, st.h), k = 64 / m;
     if (E.grp) { E.scene.remove(E.grp); disposeTree(E.grp); }
@@ -281,6 +307,9 @@
         var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t2, transparent: true, depthWrite: false })); it.logo = sp; g.add(sp);
       } else it.logo = null;
       it.lb = null;
+      var ch = it.c.ch[S.tf];
+      it.halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex(), color: ch > 0 ? 0x34d399 : ch < 0 ? 0xff5a4d : 0x8a8a92, transparent: true, opacity: 0.42, depthWrite: false, blending: THREE.AdditiveBlending }));
+      g.add(it.halo);
     });
     E.items.slice().sort(function (a, b) { return b.tr - a.tr; }).slice(0, 30).forEach(function (it) {
       if (it.tr < 2.4) return;
@@ -288,22 +317,47 @@
     });
     E.scene.add(g); E.dirty = true;
   }
+  /* take a bubble and throw it, as in 2D: it moves on the plane facing the camera, and keeps its speed when let go */
+  function wireGrab(el) {
+    var plane = new THREE.Plane(), hit = new THREE.Vector3(), off = new THREE.Vector3(), last = new THREE.Vector3();
+    function ray(ev) { var rc = el.getBoundingClientRect(); E.ptr.set((ev.clientX - rc.left) / rc.width * 2 - 1, -(ev.clientY - rc.top) / rc.height * 2 + 1); E.ray.setFromCamera(E.ptr, E.cam); }
+    el.addEventListener('pointerdown', function (ev) {
+      if (ev.button !== 0) return;
+      var i = pick(ev); if (i == null || !E.items[i]) return;
+      var it = E.items[i]; ray(ev);
+      plane.setFromNormalAndCoplanarPoint(E.cam.getWorldDirection(new THREE.Vector3()).negate(), it.p);
+      if (!E.ray.ray.intersectPlane(plane, hit)) return;
+      off.copy(it.p).sub(hit); last.copy(it.p); E.grab = { it: it }; it.v.set(0, 0, 0); el.style.cursor = 'grabbing';
+    }, true);
+    el.addEventListener('pointermove', function (ev) {
+      if (!E.grab) return; ray(ev);
+      if (!E.ray.ray.intersectPlane(plane, hit)) return;
+      var it = E.grab.it, to = hit.add(off);
+      it.v.copy(to).sub(last).multiplyScalar(0.9); last.copy(to); it.p.copy(to); MM.tip(null);
+    });
+    function up() { if (E && E.grab) { E.grab = null; el.style.cursor = 'grab'; } }
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  }
   function bubStep() {
     var it = E.items, n = it.length, i, j, moving = 0, camDir = new THREE.Vector3();
     for (i = 0; i < n; i++) {
       var a = it[i]; a.r += (a.tr - a.r) * 0.08; moving += Math.abs(a.tr - a.r);
-      a.v.addScaledVector(a.p, -0.0028);
+      if (!(E.grab && E.grab.it === a)) a.v.addScaledVector(a.p, -0.0016);
     }
     for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
-      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 0.25;
+      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 0.6 + 0.12 * Math.min(A.r, B.r);
       if (dist < min) {
         var ov = (min - dist) / dist * 0.5, wa = B.r * B.r / (A.r * A.r + B.r * B.r), wb = 1 - wa;
+        if (E.grab) { if (E.grab.it === A) { wa = 0; wb = 1; } else if (E.grab.it === B) { wa = 1; wb = 0; } }
         A.p.x -= dx * ov * wa; A.p.y -= dy * ov * wa; A.p.z -= dz * ov * wa; B.p.x += dx * ov * wb; B.p.y += dy * ov * wb; B.p.z += dz * ov * wb;
       }
     }
     var M = new THREE.Matrix4(), q = new THREE.Quaternion(), tf = S.tf, Qh = E.q;
     for (i = 0; i < n; i++) {
-      var o = it[i]; o.v.multiplyScalar(0.86); o.p.add(o.v); moving += o.v.length();
+      var o = it[i], held = E.grab && E.grab.it === o;
+      if (!held) { o.v.multiplyScalar(0.9); o.p.add(o.v); }
+      moving += o.v.length();
+      if (o.halo) { o.halo.position.copy(o.p); var hs = o.r * 2.9; o.halo.scale.set(hs, hs, 1); }
       M.compose(o.p, q, new THREE.Vector3(o.r, o.r, o.r)); E.mesh.setMatrixAt(i, M);
       var ch = o.c.ch[tf], rgb = MM.rgb(ch == null ? null : (ch >= 0 ? 1 : -1) * Math.max(Math.abs(ch), MM.SAT[tf] * 0.35));
       if (E.hover === i) rgb = [rgb[0] + (255 - rgb[0]) * 0.3, rgb[1] + (255 - rgb[1]) * 0.3, rgb[2] + (255 - rgb[2]) * 0.3];
@@ -334,7 +388,7 @@
       E = Engine(box, size, 'city'); E.getL = getL;
       var R = 100 * Math.max(1, size.h / size.w) * 1.05;
       E.orbit = Orbit(E.cam, E.r.domElement, { th: 0.42, ph: 0.92, r: R, min: 18, max: 260, ty: 0 });
-      cityBuild(getL);
+      cityBuild(getL); cityFit();
       E.step = function () { return cityPose(); };
       wirePick(E.r.domElement);
       E.raf = requestAnimationFrame(loop);
@@ -342,13 +396,12 @@
     bubbles: function (box, getSt, size) {
       stop();
       E = Engine(box, size, 'bub'); E.getSt = getSt;
-      E.orbit = Orbit(E.cam, E.r.domElement, { th: 0, ph: 1.25, r: 120, min: 30, max: 300, ty: 0 });
+      E.orbit = Orbit(E.cam, E.r.domElement, { th: 0, ph: 1.25, r: 120, min: 30, max: 300, ty: 0, held: function () { return !!(E && E.grab); } });
       bubBuild(getSt);
       for (var i = 0; i < 160; i++) bubStep();
-      var R = 10; E.items.forEach(function (it) { R = Math.max(R, it.p.length() + it.tr); });
-      E.orbit.fit(R * (size.w < 600 ? 3.1 : 2.35));          /* the whole cluster in view */
+      bubFit();                                              /* the whole cluster in view */
       E.step = function () { bubStep(); return true; };
-      wirePick(E.r.domElement);
+      wirePick(E.r.domElement); wireGrab(E.r.domElement);
       E.raf = requestAnimationFrame(loop);
     },
     update: function (src, why) {
@@ -366,7 +419,7 @@
       if (!E) return;
       var r = E.box.getBoundingClientRect(), w = Math.max(200, Math.floor(r.width)), h = Math.max(240, Math.floor(r.height));
       E.w = w; E.h = h; E.r.setSize(w, h); E.cam.aspect = w / h; E.cam.updateProjectionMatrix();
-      if (E.kind === 'city') cityBuild(E.getL);
+      if (E.kind === 'city') { cityBuild(E.getL); cityFit(); } else bubFit();
       E.dirty = true;
     },
     snapshot: function () { if (!E) return null; E.r.render(E.scene, E.cam); return E.r.domElement; },
