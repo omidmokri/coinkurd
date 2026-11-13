@@ -15,7 +15,9 @@
   var KINDS = {
     mvrv: { assets: ['btc', 'eth'], ms: ['mvrv', 'z', 'nupl', 'caps'] },
     flows: { assets: ['btc', 'eth'], ms: ['reserve', 'net', 'inout'] },
-    network: { assets: ['btc', 'eth'], ms: ['adr', 'tx', 'hash', 'rev', 'puell', 's2f'], btcOnly: { hash: 1, puell: 1, s2f: 1 } },
+    /* Bitcoin only: hash rate, miner revenue, Puell, stock-to-flow. Ether has had no miners since September 2022 and burns most of its fees,
+       so "issuance + fees" would not be anybody's revenue there */
+    network: { assets: ['btc', 'eth'], ms: ['adr', 'tx', 'hash', 'rev', 'puell', 's2f'], btcOnly: { hash: 1, rev: 1, puell: 1, s2f: 1 } },
     cycle: { assets: ['btc'], ms: ['mayer', 'w200', 'pi', 'y2', 'gold', 'dd'] }
   };
   var RANGES = ['1y', '2y', '4y', '8y', 'all'], RYEARS = { '1y': 1, '2y': 2, '4y': 4, '8y': 8 };
@@ -122,7 +124,7 @@
       h += tile(T('t_adr7'), esc(qty(s.adr7)), '');
       h += tile(T('t_tx7'), esc(qty(s.tx7)), '');
       if (s.hash != null) h += tile(T('cm_hash'), esc(fx(s.hash, 1) + ' EH/s'), s.hash30 == null || s.hash60 == null ? '' : esc(T(s.hash30 >= s.hash60 ? 't_rib_up' : 't_rib_dn')));
-      h += tile(T('cm_rev'), esc(OB.fmtUsd(s.rev_usd)), s.fee_share == null ? '' : esc(T('t_fee', { p: OB.ltr(fx(s.fee_share, 1) + '%') })));
+      if (S.asset === 'btc') h += tile(T('cm_rev'), esc(OB.fmtUsd(s.rev_usd)), s.fee_share == null ? '' : esc(T('t_fee', { p: OB.ltr(fx(s.fee_share, 1) + '%') })));
       if (s.puell != null && S.asset === 'btc') h += tile(T('cm_puell'), fx(s.puell), rankTxt(s.puell_pct));
     } else {
       h += tile(T('p_price'), esc(usd(s.price)), esc(dateTxt(s.date)));

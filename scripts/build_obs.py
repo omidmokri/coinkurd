@@ -15,7 +15,7 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "4"            # asset version (bump with any change to assets/obs/*)
+V = "5"            # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -542,7 +542,7 @@ T.update({
                    ("محدودیت‌ها", [
                        "آدرس فعال به معنی یک کاربر نیست: یک نفر می‌تواند چند آدرس داشته باشد و یک صرافی با چند آدرس به هزاران نفر خدمت می‌دهد.",
                        "نرخ هش مستقیم اندازه‌گیری نمی‌شود؛ از سرعت پیدا شدن بلاک‌ها و سختی شبکه برآورد می‌شود و عدد روزانه‌اش پرنوسان است.",
-                       "نرخ هش، پوئل و موجودی به جریان فقط برای بیت‌کوین نشان داده می‌شوند (اتریوم از سپتامبر ۲۰۲۲ استخراج ندارد). نوارها قراردادند، نه سیگنال. توصیهٔ مالی نیست."]),
+                       "نرخ هش، درآمد ماینرها، پوئل و موجودی به جریان فقط برای بیت‌کوین نشان داده می‌شوند: اتریوم از سپتامبر ۲۰۲۲ استخراج ندارد و بیشتر کارمزدش سوزانده می‌شود. نوارها قراردادند، نه سیگنال. توصیهٔ مالی نیست."]),
                    ("منابع", ["دادهٔ همگانی Coin Metrics (مجوز CC BY-NC)، روزی یک مقدار به وقت UTC."])],
             "ckb": [("پێوەرەکانی ئەم پەڕەیە", [
                 "<b>ناونیشانە چالاکەکان:</b> ژمارەی ئەو ناونیشانانەی لە ڕۆژێکدا نێرەر یان وەرگر بوون؛ هێڵی خۆڵەمێشی ڕۆژانە و هێڵی پرتەقاڵی تێکڕای ٧ ڕۆژە.",
@@ -554,7 +554,7 @@ T.update({
                     ("سنوورەکان", [
                         "ناونیشانی چالاک واتای بەکارهێنەرێک نییە: کەسێک دەتوانێت چەند ناونیشانی هەبێت.",
                         "ڕێژەی هاش ڕاستەوخۆ ناپێورێت؛ لە خێرایی دۆزینەوەی بلۆکەکانەوە دەخەمڵێندرێت.",
-                        "ڕێژەی هاش، پوێڵ و کۆگا بۆ ڕەوت تەنها بۆ بیتکۆینن. هێڵەکان ڕێککەوتنن، نەک سیگناڵ. ئامۆژگاریی دارایی نییە."]),
+                        "ڕێژەی هاش، داهاتی ماینەرەکان، پوێڵ و کۆگا بۆ ڕەوت تەنها بۆ بیتکۆینن: ئیسیریۆم لە ئەیلوولی ٢٠٢٢ـەوە ماینینگی نییە و زۆربەی کرێکانی دەسووتێنرێت. هێڵەکان ڕێککەوتنن، نەک سیگناڵ. ئامۆژگاریی دارایی نییە."]),
                     ("سەرچاوەکان", ["داتای گشتیی Coin Metrics (مۆڵەتی CC BY-NC)، ڕۆژی یەک بەها بە کاتی UTC."])],
             "ar": [("مقاييس هذه الصفحة", [
                 "<b>العناوين النشطة:</b> عدد العناوين التي أرسلت أو استلمت في اليوم؛ الخط الرمادي يومي والبرتقالي متوسط ٧ أيام.",
@@ -566,7 +566,7 @@ T.update({
                    ("الحدود", [
                        "العنوان النشط ليس مستخدمًا: قد يملك الشخص عناوين كثيرة.",
                        "معدل التجزئة لا يُقاس مباشرة؛ يُقدَّر من سرعة العثور على الكتل.",
-                       "معدل التجزئة وبويل والمخزون إلى التدفق للبيتكوين فقط. الحدود عرف لا إشارة. ليست نصيحة مالية."]),
+                       "معدل التجزئة وإيرادات المعدّنين وبويل والمخزون إلى التدفق للبيتكوين فقط: الإيثر بلا تعدين منذ سبتمبر ٢٠٢٢ ويُحرق معظم رسومه. الحدود عرف لا إشارة. ليست نصيحة مالية."]),
                    ("المصادر", ["بيانات Coin Metrics المجتمعية (رخصة CC BY-NC)، قيمة في اليوم بتوقيت UTC."])],
             "en": [("The measures on this page", [
                 "<b>Active addresses:</b> the number of addresses that sent or received on a day; the grey line is daily, the orange one the 7-day average.",
@@ -578,7 +578,7 @@ T.update({
                    ("Limits", [
                        "An active address is not a user: one person can hold many, and an exchange serves thousands with a few.",
                        "Hash rate is not measured directly; it is estimated from how fast blocks are found and from the difficulty, and its daily figure is noisy.",
-                       "Hash rate, Puell and stock-to-flow are shown for Bitcoin only (Ether has had no mining since September 2022). The bands are conventions, not signals. Not financial advice."]),
+                       "Hash rate, miner revenue, Puell and stock-to-flow are shown for Bitcoin only: Ether has had no mining since September 2022 and burns most of its fees. The bands are conventions, not signals. Not financial advice."]),
                    ("Sources", ["Coin Metrics community data (CC BY-NC licence), one value a day, UTC."])],
         },
     },
