@@ -6,8 +6,8 @@
      2. light      — a surface takes a little light where the pointer is (mouse only)
      3. progress   — a line under the top edge shows how far down a long page the reader is
      4. rail       — on wide screens, a rail of marks for the sections of a long page (click to go, hover to read)
-     5. search     — Ctrl/⌘+K opens the site's search; while typing it lists matching sections and coin pages
-   Nothing is stored and nothing is sent anywhere; the coin list is the site's own /api/v1/index.json. */
+     5. search     — Ctrl/⌘+K opens the site's search; while typing it lists sections, coins, terms, lessons, indicators, encyclopedia
+   Nothing is stored and nothing is sent anywhere; the page index is the site's own /search.json. */
 (function () {
   'use strict';
   var w = window, d = document, de = d.documentElement;
@@ -171,11 +171,19 @@
 
   /* ---------------------------------------------------------------- 5. search that answers while you type */
   function search() {
-    var Q = null, box = null, ul = null, inp = null, idx = null, coins = null, asked = false, sel = -1;
+    var Q = null, box = null, ul = null, inp = null, idx = null, site = null, asked = false, sel = -1;
     var L = {
       arch: { fa: 'جستجو در آرشیو پست‌ها', ckb: 'گەڕان لە ئەرشیڤی پۆستەکان', ar: 'ابحث في أرشيف المنشورات', en: 'Search the post archive' },
       coin: { fa: 'صفحهٔ کوین: قیمت، تحلیل و پست‌ها', ckb: 'پەڕەی دراو: نرخ، شیکاری و پۆستەکان', ar: 'صفحة العملة: السعر والتحليل والمنشورات', en: 'Coin page: price, analysis and posts' },
-      list: { fa: 'نتیجه‌ها', ckb: 'ئەنجامەکان', ar: 'النتائج', en: 'Results' }
+      list: { fa: 'نتیجه‌ها', ckb: 'ئەنجامەکان', ar: 'النتائج', en: 'Results' },
+      sec: { fa: 'بخش‌های سایت', ckb: 'بەشەکانی ماڵپەڕ', ar: 'أقسام الموقع', en: 'Sections' },
+      coins: { fa: 'کوین‌ها', ckb: 'دراوەکان', ar: 'العملات', en: 'Coins' },
+      term: { fa: 'واژه‌نامه', ckb: 'فەرهەنگ', ar: 'المعجم', en: 'Glossary' },
+      lesson: { fa: 'درس‌های آکادمی', ckb: 'وانەکانی ئەکادیمیا', ar: 'دروس الأكاديمية', en: 'Academy lessons' },
+      enc: { fa: 'دانشنامه', ckb: 'ئینسایکلۆپیدیا', ar: 'الموسوعة', en: 'Encyclopedia' },
+      ind: { fa: 'اندیکاتورها', ckb: 'ئیندیکاتۆرەکان', ar: 'المؤشرات', en: 'Indicators' },
+      dna: { fa: 'DNA ارزها', ckb: 'DNAی دراوەکان', ar: 'DNA العملات', en: 'Coin DNA' },
+      more: { fa: 'همه', ckb: 'هەموو', ar: 'الكل', en: 'All' }
     };
     /* one spelling for matching: Arabic/Persian/Kurdish letter variants, no joiners or marks, Latin in lower case */
     function norm(s) {
@@ -202,10 +210,15 @@
       return li;
     }
     function pick(n) {
-      var items = ul.children;
+      var items = ul.querySelectorAll('li[role=option]');
       sel = n < -1 ? items.length - 1 : n >= items.length ? -1 : n;
       for (var i = 0; i < items.length; i++) { items[i].classList.toggle('on', i === sel); items[i].setAttribute('aria-selected', i === sel ? 'true' : 'false'); }
       if (sel >= 0 && items[sel].scrollIntoView) items[sel].scrollIntoView({ block: 'nearest' });
+    }
+    function head(lb, n) {
+      var li = d.createElement('li'); li.className = 'ds-qh'; li.setAttribute('role', 'presentation');
+      li.textContent = T(lb) + (n > 0 ? ' · ' + n : '');
+      ul.appendChild(li);
     }
     function render() {
       var raw = (inp.value || '').trim().slice(0, 80), q = norm(raw);
@@ -221,12 +234,27 @@
         if (sc) hits.push({ it: it, sc: sc + (it.k.indexOf(q) >= 0 ? 2 : 0), n: n });
       });
       hits.sort(function (a, b) { return b.sc - a.sc || a.n - b.n; });
-      var slug = /^[a-z0-9]{1,12}$/.test(q) ? q : '';
-      if (slug && coins && coins[slug]) ul.appendChild(row('/coins/' + slug + '/', slug.toUpperCase(), T(L.coin), 'ds-qa'));
-      hits.slice(0, 6).forEach(function (h) {
-        var it = h.it;
-        ul.appendChild(row(it.h, it.t.textContent.trim(), it.s ? it.s.textContent.trim() : '', '', /^https?:/.test(it.h)));
+      /* the site's own pages, by kind: /search.json (scripts/build_links.py), loaded once */
+      var groups = { coin: [], term: [], lesson: [], enc: [], ind: [], dna: [] };
+      if (site) site.forEach(function (r, n) {
+        var sc = 0;
+        for (var i = 0; i < toks.length; i++) {
+          if (r.n.indexOf(toks[i]) >= 0) sc += 3; else if (r.a.indexOf(toks[i]) >= 0) sc += 1; else { sc = 0; break; }
+        }
+        if (!sc) return;
+        if (r.n === q) sc += 6; else if (r.n.indexOf(q) === 0) sc += 3;
+        if (groups[r.t]) groups[r.t].push({ r: r, sc: sc, n: n });
       });
+      var per = q.length < 3 ? 3 : 4;
+      if (hits.length) { head(L.sec, 0); hits.slice(0, 4).forEach(function (h) { var it = h.it; ul.appendChild(row(it.h, it.t.textContent.trim(), it.s ? it.s.textContent.trim() : '', '', /^https?:/.test(it.h))); }); }
+      ['coin', 'term', 'lesson', 'ind', 'dna', 'enc'].forEach(function (k) {
+        var g = groups[k];
+        if (!g.length) return;
+        g.sort(function (a, b) { return b.sc - a.sc || a.n - b.n; });
+        head(L[k === 'coin' ? 'coins' : k], g.length);
+        g.slice(0, per).forEach(function (h) { ul.appendChild(row(h.r.u, h.r.N, h.r.A, k === 'coin' ? 'ds-qc' : '')); });
+      });
+      head(L.more, 0);
       ul.appendChild(row('/?q=' + encodeURIComponent(raw), '«' + raw + '»', T(L.arch), 'ds-qa'));
       ul.setAttribute('aria-label', T(L.list));
       box.classList.add('on');
@@ -244,15 +272,15 @@
         if (!box.classList.contains('on')) return;
         if (e.key === 'ArrowDown') { e.preventDefault(); pick(sel + 1); }
         else if (e.key === 'ArrowUp') { e.preventDefault(); pick(sel - 1); }
-        else if (e.key === 'Enter' && sel >= 0) { var a = ul.children[sel] && ul.children[sel].querySelector('a'); if (a) { e.preventDefault(); a.click(); } }
+        else if (e.key === 'Enter' && sel >= 0) { var o = ul.querySelectorAll('li[role=option]')[sel], a = o && o.querySelector('a'); if (a) { e.preventDefault(); a.click(); } }
       });
-      if (!asked) {                                         /* the site's own list of coin pages, fetched once, the first time search is opened */
+      if (!asked) {                                         /* the site's own index of pages, fetched once, the first time search is opened */
         asked = true;
         safe(function () {
-          fetch('/api/v1/index.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
-            var m = {}, n = 0;
-            ((j && j.endpoints) || []).forEach(function (u) { var x = /\/coins\/([a-z0-9]{1,12})\.json$/.exec(u); if (x) { m[x[1]] = 1; n++; } });
-            if (n) { coins = m; if (inp.value) render(); }
+          fetch('/search.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+            if (!j || !j.r) return;
+            site = j.r.map(function (x) { return { t: x[0], u: x[1], N: x[2], A: x[3] || '', n: norm(x[2]), a: norm(x[3] || '') }; });
+            if (inp.value) render();
           }).catch(function () { });
         });
       }

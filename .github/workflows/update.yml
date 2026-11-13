@@ -518,6 +518,9 @@ jobs:
             git pull --rebase --autostash -X theirs origin main && git push && break
             sleep 5
           done
+      - name: Knowledge network (search index + related-page links, from the built pages)
+        continue-on-error: true
+        run: python scripts/build_links.py
       - name: Search snippets (titles ≤ 60, descriptions ≤ 160 characters on every page)
         continue-on-error: true
         run: python scripts/seo_tidy.py
