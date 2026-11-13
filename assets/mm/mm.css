@@ -86,8 +86,8 @@ img.mm-lg{object-fit:contain;background:none}
 .mm-legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#9a9a94;font-size:.78rem}
 .mm-legend:empty{display:none}
 .mm-lgbar{display:block;width:220px;height:10px;border-radius:6px;border:1px solid rgba(255,255,255,.12)}
-.mm-lgt{display:flex;justify-content:space-between;width:220px;margin-inline-start:-230px;margin-top:22px;font-size:.66rem;color:#8d8d87;direction:ltr}
-.mm-legend{position:relative;padding-bottom:12px}
+.mm-lgbox{display:inline-flex;flex-direction:column;gap:3px;direction:ltr}   /* bar with its scale under it, in the flow (no overlap) */
+.mm-lgt{display:flex;justify-content:space-between;width:220px;font-size:.66rem;color:#8d8d87}
 .mm-src{margin:0;color:#7d7d77;font-size:.74rem;flex:1 1 300px}
 
 /* ---- menus, toast, tooltip, modal */
