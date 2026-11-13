@@ -267,8 +267,8 @@
   function bubFit() {
     var rx = 10, ry = 10; E.items.forEach(function (it) { rx = Math.max(rx, Math.hypot(it.p.x, it.p.z) + it.tr); ry = Math.max(ry, Math.abs(it.p.y) + it.tr); });
     /* frame the cloud by its real width and height, not a sphere round it */
-    var half = E.cam.fov * Math.PI / 360, dist = Math.max(ry / Math.tan(half), rx / (Math.tan(half) * E.w / E.h)) * 1.08 + rx * 0.5;
-    E.orbit.s.min = 20; E.orbit.s.max = dist * 2.5; E.orbit.fit(dist);
+    var half = E.cam.fov * Math.PI / 360, dist = Math.max(ry / Math.tan(half), rx / (Math.tan(half) * E.w / E.h)) * 0.95 + rx * 0.3;
+    E.orbit.s.min = 40; E.orbit.s.max = dist * 2.5; E.orbit.fit(dist);
     if (E.scene.fog) { E.scene.fog.near = dist * 1.1; E.scene.fog.far = dist * 3; }   /* fog only far behind the cloud, never dimming it */
   }
   function cityRelabel() {
@@ -290,7 +290,7 @@
     x.fillStyle = gr; x.fillRect(0, 0, 128, 128); HALO = new THREE.CanvasTexture(c); return HALO;
   }
   function bubBuild(getSt) {
-    var st = getSt(), list = st.list.filter(function (n) { return !n.dead; }), m = Math.min(st.w, st.h), k = 160 / m;          /* about 2.5x the first version */
+    var st = getSt(), list = st.list.filter(function (n) { return !n.dead; }), m = Math.min(st.w, st.h), k = 480 / m;          /* three times the previous size */
     if (E.grp) { E.scene.remove(E.grp); disposeTree(E.grp); }
     var g = new THREE.Group(); E.grp = g;
     var mat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.28, metalness: 0.12, clearcoat: 1, clearcoatRoughness: 0.18 });
@@ -349,7 +349,7 @@
       if (!(E.grab && E.grab.it === a)) { var asp = Math.max(1, E.w / E.h); a.v.x -= a.p.x * 0.0005 / (asp * asp); a.v.y -= a.p.y * 0.0009; a.v.z -= a.p.z * 0.014; }   /* a wide, fairly flat cloud: fewer bubbles hide behind others */   /* a wide cloud on a wide screen */
     }
     for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
-      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 1.6 + 0.2 * Math.min(A.r, B.r);
+      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 3 + 0.12 * Math.min(A.r, B.r);
       if (dist < min) {
         var ov = (min - dist) / dist * 0.5, wa = B.r * B.r / (A.r * A.r + B.r * B.r), wb = 1 - wa;
         if (E.grab) { if (E.grab.it === A) { wa = 0; wb = 1; } else if (E.grab.it === B) { wa = 1; wb = 0; } }
