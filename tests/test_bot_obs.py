@@ -72,7 +72,10 @@ def msgs_since(n):
 
 
 SITE = "https://entekhab.net"
-PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/open-interest/", "/charts/funding-rate/", "/charts/long-short/", "/charts/")]
+PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/open-interest/", "/charts/funding-rate/", "/charts/long-short/",
+                            "/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/", "/charts/network/", "/charts/bitcoin-cycle/", "/charts/")]
+NOW = {"btc": {"date": "2026-11-12", "mvrv": 1.324104, "nupl": 0.24478, "rprice": 53832.9, "sex": 2723131, "net7": -12345.6, "mayer": 0.8123, "puell": 0.912, "dd": -43.21}}
+LAB = {"options": {"BTC": {"pc_oi": 0.77, "max_pain": {"expiry": "2026-11-14", "max_pain": 72000.0}}}}
 S = R.load_state()
 for i, lang in enumerate(LANGS):
     uid = 900 + i
@@ -90,10 +93,18 @@ for i, lang in enumerate(LANGS):
     check("Binance" in tx and "Bybit" in tx and OBS.L("nfa", lang) in tx, "names its sources and says it is an estimate")
     n_open = OBS.N_ROWS - 1
     webapps = [b["web_app"]["url"] for r in rows[:n_open] for b in r if "web_app" in b]
-    check(webapps == PAGES, "the five charts and the hub open inside Telegram (Web App buttons)")
+    check(webapps == PAGES, "the ten charts and the hub open inside Telegram (Web App buttons)")
     check(len(rows) > n_open and rows[n_open] == [{"text": OBS.L("b_web", lang), "url": PAGES[-1]}], "then the hub in the browser")
     check(all(len(r) <= 2 and all(len(b["text"]) <= 40 for b in r) for r in rows[:OBS.N_ROWS]), "at most two buttons a row, short labels")
-    check(all(x in tx for x in ("OKX", "Bitget", "Hyperliquid", "Gate")), "names the other four exchanges it reads")
+    check(all(x in tx for x in ("OKX", "Bitget", "Hyperliquid", "Gate", "Deribit", "Coin Metrics")), "names the other exchanges and the on-chain source it reads")
+    check("📌" not in tx, "without the data files there are no figures (nothing is made up)")
+    D.load = lambda name: {"obs/chain_now": NOW, "lab": LAB}.get(name)
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="m:obs", lang=lang))
+    tx2 = (msgs_since(n)[-1] if msgs_since(n) else {}).get("text", "")
+    check(all(x in tx2 for x in ("2026-11-12", "1.32", "$53,833", "2.72M BTC", "-12.3K BTC", "0.81", "-43.2%", "0.77", "$72,000")) and len(tx2) <= 4096,
+          "with the data files: the day's on-chain figures and Deribit's put/call and max pain, as the files have them")
+    D.load = lambda name: None
     check(any(b.get("callback_data") == "m:main" for b in rows[-1]) and any(b.get("callback_data") == "m:g_analysis" for b in rows[-1]),
           "ends with ⬅️ analysis + 🏠")
     check(all(len((b.get("callback_data") or "").encode()) <= 64 for r in rows for b in r), "callback sizes")

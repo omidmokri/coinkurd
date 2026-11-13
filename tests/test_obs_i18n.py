@@ -77,6 +77,13 @@ FAMILIES = {
     "pal_": ["fire", "viridis", "ice", "mono"],
     "m": ["1", "2", "3", "1_d", "2_d", "3_d"],
     "ls_": ["bn_all", "by_all", "bn_top_acc", "bn_top_pos"],
+    # stage 3 (chain.js, opt.js): measures, ranges, NUPL bands, the pages' notes, the options views and DVOL ranges
+    "cm_": ["mvrv", "z", "nupl", "caps", "reserve", "net", "inout", "adr", "tx", "hash", "rev", "puell", "s2f", "mayer", "w200", "pi", "y2", "gold", "dd"],
+    "cr_": ["1y", "2y", "4y", "8y", "all"],
+    "nz": ["0", "1", "2", "3", "4"],
+    "note_": ["mvrv", "flows", "network", "cycle"],
+    "ov_": ["strike", "expiry", "dvol"],
+    "or_": ["1m", "3m", "1y", "all"],
 }
 for q, f in sorted(used):
     if q not in EN:
@@ -117,7 +124,7 @@ for view, folder, scripts in B.PAGES:
     if f'data-view="{view}"' not in doc or "ek:header" not in doc or "Content-Security-Policy" not in doc:
         FAIL.append(f"/{B.HUB_PATH}/{folder}/: page is not complete (view, header or CSP missing)")
 hub = B.HUB
-for part in ("h1", "p", "new", "soon", "soon_note"):
+for part in ("h1", "p", "new", "soon", "soon_note", "paid", "paid_note"):
     if sorted(hub[part]) != sorted(B.LANGS):
         FAIL.append(f"hub.{part}: languages {sorted(hub[part])}")
 for sec, cards in hub["secs"]:
@@ -128,7 +135,7 @@ for sec, cards in hub["secs"]:
             FAIL.append(f"hub card {path}: languages")
         if path.startswith(f"/{B.HUB_PATH}/") and not os.path.exists(os.path.join(ROOT, path.strip("/"), "index.html")):
             FAIL.append(f"hub card {path}: page does not exist")
-for x in hub["todo"]:
+for x in hub["todo"] + hub["paid_items"]:
     if sorted(x) != sorted(B.LANGS):
         FAIL.append(f"hub todo {x.get('en')}: languages")
 # the tabs of the app and the builder's pages are the same list

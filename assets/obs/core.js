@@ -6,7 +6,7 @@
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '3';
+  OB.V = '4';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -151,6 +151,11 @@
     layers: '<path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/>',
     percent: '<path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
     scale: '<path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7 2.5 13a2.6 2.6 0 0 0 5 0Z"/><path d="m19 7-2.5 6a2.6 2.6 0 0 0 5 0Z"/><path d="M8 21h8"/>',
+    opt: '<path d="M3 17c4 0 5-10 9-10s5 10 9 10"/><path d="M12 4v16"/>',
+    chain: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    bank: '<path d="m3 9 9-5 9 5"/><path d="M5 9v9M9.7 9v9M14.3 9v9M19 9v9"/><path d="M3 20h18"/>',
+    pulse: '<path d="M3 12h4l2.5-6 5 12 2.5-6h4"/>',
+    cycle: '<path d="M20 12a8 8 0 0 1-13.7 5.7"/><path d="M4 12a8 8 0 0 1 13.7-5.7"/><path d="M18 3v4h-4M6 21v-4h4"/>',
     grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>'
   };
   OB.icon = function (n, cls) {
@@ -237,7 +242,12 @@
     { k: 'liqmap', path: '/charts/liquidation-map/', ic: 'bars' },
     { k: 'oi', path: '/charts/open-interest/', ic: 'layers' },
     { k: 'funding', path: '/charts/funding-rate/', ic: 'percent' },
-    { k: 'ls', path: '/charts/long-short/', ic: 'scale' }
+    { k: 'ls', path: '/charts/long-short/', ic: 'scale' },
+    { k: 'options', path: '/charts/options/', ic: 'opt' },
+    { k: 'mvrv', path: '/charts/mvrv/', ic: 'chain' },
+    { k: 'flows', path: '/charts/exchange-flows/', ic: 'bank' },
+    { k: 'network', path: '/charts/network/', ic: 'pulse' },
+    { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
   ];
   var root, cur = null, curKey = null;
   function headText() {
