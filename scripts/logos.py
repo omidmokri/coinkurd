@@ -21,6 +21,7 @@ BINANCE = "https://data-api.binance.vision/api/v3/"
 UA = {"User-Agent": "entekhab.net coin logos"}
 SYM = re.compile(r"^[A-Z0-9]{1,12}$")                # Binance has one-letter coins too (S, W, T, A…)
 MULT = re.compile(r"^(?:1000000|1000|1M)(?=[A-Z])")    # 1000SATS, 1MBABYDOGE: the same coin, priced per 1000 / per million
+ALIAS = {"RONIN": "RON", "BTTC": "BTT"}                  # Binance's ticker ≠ the coin's own symbol on CoinGecko
 
 
 def binance_bases():
@@ -85,13 +86,21 @@ def main():
             time.sleep(13)
         # a multiplier token (1000SATS) is the coin itself (SATS): its logo
         for s in need:
-            base = MULT.sub("", s)
+            base = ALIAS.get(s) or MULT.sub("", s)
             if s not in img and base != s and base in img:
                 img[s] = img[base]
-        # the few CoinGecko does not list in its first pages (fan tokens, new listings): its search, by exact symbol
-        t_search, asked = time.time() + 60, 0
-        for s in sorted(x for x in need if x not in img):
-            if time.time() > t_search or asked >= 25:
+        # the few CoinGecko does not list in its first pages (fan tokens, new listings): its search, by exact symbol.
+        # A symbol it found nothing for (Binance's tokenized stocks, mostly) is asked again only after a week.
+        nologo_path = os.path.join(L, "nologo.json")
+        try:
+            nologo = json.load(open(nologo_path))
+            nologo = nologo if isinstance(nologo, dict) else {}
+        except Exception:  # noqa: BLE001
+            nologo = {}
+        now = int(time.time())
+        t_search, asked = time.time() + 75, 0
+        for s in sorted(x for x in need if x not in img and now - int(nologo.get(x, 0)) > 7 * 86400):
+            if time.time() > t_search or asked >= 30:
                 break
             q = MULT.sub("", s)
             try:
@@ -104,6 +113,8 @@ def main():
                 hits.sort(key=lambda c: c.get("market_cap_rank") or 10 ** 9)
                 if hits:
                     img[s] = (hits[0].get("large") or hits[0]["thumb"]).replace("/large/", "/small/").replace("/thumb/", "/small/")
+                else:
+                    nologo[s] = now
             except Exception as e:  # noqa: BLE001
                 print("coingecko search err", s, e)
             time.sleep(3)
@@ -125,7 +136,8 @@ def main():
                 except Exception:  # noqa: BLE001
                     pass
         missing = sorted(s for s in need if not os.path.exists(os.path.join(L, f"{s}.png")))
-        print("downloaded:", got, f"(coincap {coincap}) | no logo anywhere:", len(missing), missing[:40])
+        print("downloaded:", got, f"(coincap {coincap}) | searched: {asked} | no logo anywhere:", len(missing), missing[:40])
+        json.dump({k: v for k, v in sorted(nologo.items()) if k in missing}, open(nologo_path, "w"), separators=(",", ":"))
     have = sorted(f[:-4] for f in os.listdir(L) if f.endswith(".png"))
     json.dump(have, open(os.path.join(L, "index.json"), "w"), separators=(",", ":"))
     print("total logos:", len(have))
