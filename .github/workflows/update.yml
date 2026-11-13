@@ -181,6 +181,12 @@ jobs:
         timeout-minutes: 2
         run: python scripts/ecocal.py
 
+      - name: Calendar actuals (BLS, the Fed) and FOMC odds (Kalshi) for /calendar/ and the bot
+        id: econ_live
+        continue-on-error: true
+        timeout-minutes: 2
+        run: python scripts/econ_live.py
+
       - name: Lab (memory, Monte Carlo, volatility, options, exchanges, dev activity, macro)
         id: lab
         continue-on-error: true
