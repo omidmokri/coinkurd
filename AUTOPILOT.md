@@ -253,8 +253,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - Bot: section «🗺 نقشهٔ بازار» (`scripts/bot_mm.py`, second item of «تحلیل», also linked from «بازار»): live summary from
   the same files + the five pages as Web App buttons. Assistant: FEATURES for the five pages.
 - `scripts/i18n_ar.py` now skips `translate="no"` (as `assets/ar.js` always did): the map has its own Arabic.
-- Fixed on the way: in Arabic the map leaves `<html lang>` alone — ar.js reads `lang="ar"` as "a real /ar/p/ page" and
-  would send a reader leaving Arabic to `/p/undefined/`.
+- Fixed on the way: in Arabic the map sets `<html lang="en">` like every page in Arabic (the shared header shows its
+  English labels for ar.js) — with `lang="ar"` ar.js takes the page for a real /ar/p/ post and sends a reader leaving
+  Arabic to `/p/undefined/`. Checked live: Arabic and back to Persian stay on /heatmap/.
 - Verified: unit tests for both data scripts with fixtures in the real API formats; i18n parity/digits; bot flows in 5
   languages through refbot's real handlers; Playwright (mm_e2e.py) with Binance/OKX REST and both WebSockets mocked:
   every view and the panel, 3D in SwiftShader, 4 languages × 1280/390 (no sideways scroll, labels inside charts and

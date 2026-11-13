@@ -763,10 +763,11 @@
   };
   MM.closeCoin = function () { if (MM.panel) MM.panel.close(); };
 
-  /* <html lang>: in Arabic it is left alone. Arabic is the site's ar.js layer, which reads <html lang="ar"> as "this is a
-     real /ar/p/ post page" and, on leaving Arabic, would send the reader to /p/undefined/. The map's own root and its
-     pop-ups carry lang="ar" instead. */
-  function docLang() { if (LANG !== 'ar') de.lang = LANG; de.dir = MM.rtl() ? 'rtl' : 'ltr'; }
+  /* <html lang>: in Arabic it is "en", as on every other page in Arabic. Arabic is the site's ar.js layer: the shared
+     header and footer show their English labels for it to translate (assets/chrome.js follows <html lang>), and ar.js
+     reads <html lang="ar"> as "a real /ar/p/ post page", which on leaving Arabic would send the reader to /p/undefined/.
+     The map's own root and its pop-ups carry lang="ar" and translate="no": they have their own Arabic. */
+  function docLang() { de.lang = LANG === 'ar' ? 'en' : LANG; de.dir = MM.rtl() ? 'rtl' : 'ltr'; }
 
   /* ================================================================ start */
   function start() {
