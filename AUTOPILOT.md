@@ -196,7 +196,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   the carrier. Patrol boats fire. Comm masts relay.
 - **Cinema** (`CINE` in battle.js): acts (theatre, armies, yard, front, sea, sky) and a shot for each big event (guns,
   heli, jets, missile, raid, wall, naval, robots, sat, sub, win). Hard cuts, FOV punch, shake and handheld drift; the
-  camera never sits inside a model.
+  camera never sits inside a model, and it side-steps a lamp or flag pole near the lens so no pole splits the frame
+  (`CINE.poles`, found live in the owner's browser and fixed the same day).
 - **Verified:** `tests/battle_ground.py` (160 s, exact hull against every shape: zero violations),
   `tests/battle_geometry.py` + `battle_audit.js` (no part floats), `tests/battle_navy.py` (no hull touches another or
   the pier); harness `tests/battle_harness.py` (Playwright + SwiftShader); screenshots of bases, harbour and cinema.

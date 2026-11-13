@@ -520,7 +520,7 @@ function harbour(side, hgt) {
      crane's load, which comes down over the root of the pier */
   const Lt = [], lx = x0 - 7.2 * m;
   for (const dz of [-15, -29]) { const z = zs + dz; L.push(CY(.22, .26, .2, 8, lx, top + .225, z, 0x6b6e70), CY(.1, .13, 5, 6, lx, top + 2.825, z, 0x7d8183), B(1.25, .08, .08, lx + .6 * m, top + 5.25, z, 0x7d8183), B(.7, .18, .36, lx + 1.15 * m, top + 5.2, z, 0x4a4e52)); Lt.push(B(.56, .05, .28, lx + 1.15 * m, top + 5.1, z, 0xfff0cc)); }
-  return { L, Lt, x0, zs, lamps: [-15, -29].map(dz => new THREE.Vector3(lx + 1.15 * m, top + 5.05, zs + dz)) };
+  return { L, Lt, x0, zs, lamps: [-15, -29].map(dz => new THREE.Vector3(lx + 1.15 * m, top + 5.05, zs + dz)), poles: [-15, -29].map(dz => [lx, zs + dz, top + 5.33]) };
 }
 
 
