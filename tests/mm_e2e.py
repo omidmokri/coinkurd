@@ -531,6 +531,8 @@ def run():
             pg.wait_for_timeout(2500)
             check("ar layer: page visible (no stuck ek-ar-wait)", not pg.evaluate("() => document.documentElement.classList.contains('ek-ar-wait')"))
             check("ar layer: the map is in Arabic", pg.evaluate("() => MM.lang()") == "ar" and "الفقاعات" in pg.inner_text(".mm-tabs"))
+            hl = pg.evaluate("() => [document.documentElement.lang, document.documentElement.dir, document.querySelector('#mm').getAttribute('lang')]")
+            check("ar layer: <html lang> is en (the site header shows its English labels for ar.js), the map root says ar", hl == ["en", "rtl", "ar"], hl)
             tfs = pg.evaluate("() => [...document.querySelectorAll('.mm-tf')].map(b => b.textContent)")
             check("ar layer: timeframe buttons untouched", tfs[:5] == ["5m", "15m", "1h", "2h", "4h"], tfs)
             t = pg.evaluate("() => { const s = MM.views.heatmap.debug(); const t = s.L.tiles[0]; const r = document.querySelector('#mm-stage canvas').getBoundingClientRect(); return {x: r.left + t.x + t.w/2, y: r.top + t.y + t.h/2} }")
