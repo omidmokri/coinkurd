@@ -1201,8 +1201,9 @@ def handle_private(s, msg):
                 return send(chat_id, *render(s, uid, arg[2:]))
             except Exception:
                 log.exception("deep link %s failed", arg)
-        # the live market's ✈ button (t.me/<bot>?start=a_BTC_72155d5): the alert is only OFFERED; it is stored on «add»
-        if arg.startswith("a_"):
+        # the live market's ✈ button (t.me/<bot>?start=a_BTC_72155d5, or t_USD_95000 for Iran's market in toman):
+        # the alert is only OFFERED; it is stored on «add»
+        if arg.startswith("a_") or arg.startswith("t_"):
             try:
                 o = PRO.offer(arg, x["lang"])
                 if o:
@@ -1423,6 +1424,12 @@ def handle_callback(s, cb):
         if not got:
             return send(chat_id, PRO.L("bad", lang), kb_alerts(s, uid, lang))
         return send(chat_id, parse_alert(f"{got[0]} {got[1]}", s, uid, crypto=True), kb_alerts(s, uid, lang))
+    if data.startswith("pt:"):                       # the same for Iran's market: a toman alert on one of the bot's assets
+        got = PRO.parse_tcallback(data)
+        ans()
+        if not got:
+            return send(chat_id, PRO.L("bad", lang), kb_alerts(s, uid, lang))
+        return send(chat_id, parse_alert(f"{got[0]} {got[1]}", s, uid), kb_alerts(s, uid, lang))
     if data.startswith("pp:"):                       # paper trading: open / close / opt in / nickname / delete
         if cb["message"]["chat"].get("type") != "private":
             return ans()

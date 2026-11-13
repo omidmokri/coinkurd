@@ -428,7 +428,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "6"
-NX_VER = "10"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+NX_VER = "11"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"
            "v=L.getItem('ek_uic')||'3';g=L.getItem('ek_gpu')||'';L.removeItem('ek_ui')}catch(e){if(m)v=m[1]}"
@@ -465,7 +465,8 @@ CSP = ("default-src 'self'; "
        "media-src 'self' data: blob: https://github.com https://objects.githubusercontent.com https://release-assets.githubusercontent.com; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "
        "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
-       "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com; "
+       "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com "
+       "https://dashboard-api.tgju.org https://api.tgju.org https://call2.tgju.org https://call3.tgju.org https://call4.tgju.org; "
        "frame-src https://*.tradingview.com https://*.tradingview-widget.com; "
        "worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; "
        "upgrade-insecure-requests")

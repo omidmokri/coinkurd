@@ -175,6 +175,37 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /market/: toman markets, every Binance coin, and the rest of Faraz's list (owner's request in chat, not by the loop)
+- Iran's market in toman (`assets/pro/markets.js`, symbols `IR_<KEY>`): dollar, euro and 19 more currencies, 18k/24k gold,
+  mesghal, the melted-gold rate, ounce, five coins and the coin bubble, silver and tether — tgju.org public data in the browser
+  (history from its TradingView datafeed, latest price from its tables, `ajax.json` as fallback; rial ÷ 10; 5-minute bars
+  at least, tether daily). Any Binance coin in toman (`BTC_IRT`…) is computed: the Binance bar × tether's toman rate
+  (daily closes interpolated, today's tick live) and says so. Toman prices: no decimals, grouped digits. CSP: tgju hosts.
+- Watchlists: «همهٔ بایننس» (every USDT pair that has a logo; rows on screen stream, the rest get one REST snapshot),
+  «بازار ایران», a filter box, search tabs by market, and sections (headers that fold, rename, remove, «move to
+  section»; the site-wide `ek_watch` stays symbols only — its headers live in `ek_pro_watch.lay.site`). `scripts/logos.py`
+  now fetches logos for every Binance base (CoinGecko pages + CoinCap, 220 a run): a coin without a logo stays hidden.
+- The rest of Faraz's list: 17 chart types (volume candles, high-low and HLC area as a custom series; Renko, Line Break,
+  Kagi and Point & Figure rebuilt from closes with an ATR(14) box or the user's own, indicators and replay on the rebuilt
+  bars); 70 indicators (48 new: HMA, DEMA, TEMA, VWMA, SMMA, ALMA, LSMA, McGinley, MA cross, ribbon, envelopes, Alligator
+  drawn ahead, fractals, pivot points by auto period, ZigZag, AO, AC, momentum, TRIX, UO, PPO, TSI, CMO, Connors RSI,
+  Fisher, RVGI, KST, Coppock, DPO, Aroon, Vortex, Choppiness, Mass, Bull/Bear power, BOP, %B, BandWidth, stdev, HV, RVI,
+  ADR, CMF, A/D, Chaikin osc., EFI, EOM, PVT, volume osc.); calendar ranges (today / tomorrow / this week Sat–Fri / next
+  week) and alerts before releases (per event 0–60 min, or every high-impact event of the chosen currencies: toast,
+  sound, notification, alert log, once each); «sync indicators» across charts; 20 s / 45 s; replay of all charts on one
+  clock with replay intervals.
+- Maths fix found by the references: rolling sums over a window of exact zeros now give exactly 0 and stdev drops
+  deviations under 1e-10 (relative), as TradingView does — 0/0 cases (no volume, flat stretches) show nothing, not noise.
+- Bot: `t_<ASSET>_<PRICE>` links from toman alerts (USD, EUR, GBP, AED, TRY, GOLD_18, GOLD_MESGHAL, COIN_EMAMI, USDT) are
+  offered and stored on «add» (`pt:`) as toman alerts through `parse_alert`; the «بازار زنده» text in 5 languages, the
+  assistant's FAQ, the home card and the page's own text in 4 languages updated. The Android/Windows apps are WebView
+  shells of the site, so they get it all with the deploy.
+- Verified: 146,725 indicator values against the Python references (70 indicators × 3 data sets, pivots on 15 m and 1 D),
+  i18n in 4 languages, `tests/pro_e2e.js` 99 checks with Binance and tgju mocked in their real formats (new blocks: toman,
+  replay2, cal, types, inds2, sections, syncind), bot flows in 5 languages (toman links included), leak guard clean.
+- Limits: tgju.org is a third-party public source (named on the page); coin prices in toman are an estimate; the
+  calendar still has no "actual" values (the feed has none); price-only chart types use closes.
+
 ### 2026-11-12 · The market map: coin360-style heatmap, cryptobubbles-style bubbles, money flow, liquidity, ETFs (owner's request in chat, not by the loop)
 - Five addresses, one app (tabs switch in place): `/heatmap/` (squarified treemap by sector, sizes by market cap /
   volume / move / flow / equal, zoom into a sector, search, filters, PNG; **3D "market city"**: a tower per coin on its

@@ -301,6 +301,7 @@
       });
     });
   }
+  P._tkPut = tkPut; P._tkRest = tkRest;           /* markets.js feeds toman prices through the same table */
   P.tickers = {
     d: TK.d,
     on: function (f) { TK.subs.push(f); return function () { var i = TK.subs.indexOf(f); if (i >= 0) TK.subs.splice(i, 1); }; },
@@ -389,6 +390,11 @@
     });
   };
 
+  /* the first bars a market ever had (Binance answers from the listing day when asked from time 0) */
+  P.firstBars = function (sym, tfId) {
+    var tf = parseTF(tfId); if (!tf) return Promise.reject(new Error('tf'));
+    return klines(sym, tf.base, 1000, 1).then(function (rows) { return aggregate(merge([], rows), tf); });
+  };
   P.parseTF = parseTF; P.aggregate = aggregate; P.bucket = bucket; P.NATIVE = NATIVE; P.getJSON = getJSON;
   /* price precision from the size of the price (Binance sends 8 decimals whatever the tick) */
   P.prec = function (p) { p = Math.abs(p); if (!(p > 0)) return 2; if (p >= 100) return 2; if (p >= 10) return 3; if (p >= 1) return 4; return Math.min(10, Math.ceil(-Math.log10(p)) + 3); };
