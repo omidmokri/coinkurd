@@ -129,8 +129,8 @@ def L(fa, ckb, en):
 NAV = [
     {"k": "mkt", "t": L("بازار", "بازاڕ", "Markets"), "items": [
         ("/market/", "candles", L("بازار زنده", "بازاڕی زیندوو", "Live market"),
-         L("مولتی‌چارت، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت", "چەند چارت پێکەوە، تایمفرەیمی چرکەیی، دووبارە پەخش، ئاگادارکەرەوە و ڕۆژژمێری ئابووری",
-           "Multi-chart, seconds timeframes, replay, alerts and the economic calendar on the chart")),
+         L("مولتی‌چارت، بازپخش و بک‌تست، هشدار، دیده‌بان بازار و تقویم اقتصادی روی چارت", "چەند چارت پێکەوە، دووبارە پەخش و باکتێست، ئاگادارکەرەوە، چاودێری بازاڕ و ڕۆژژمێری ئابووری",
+           "Multi-chart, replay and backtests, alerts, market watch and the economic calendar on the chart")),
         ("/calendar/", "calendar", L("تقویم اقتصادی و فدرال رزرو", "ڕۆژژمێری ئابووری و فیدراڵ ڕیزێرڤ", "Economic calendar & Fed odds"),
          L("همهٔ خبرها به وقت تهران، عدد واقعی، واکنش بیت‌کوین، احتمالات FOMC و یادآوری", "هەموو هەواڵەکان بە کاتی خۆت، ژمارەی ڕاستەقینە، کاردانەوەی بیتکۆین، ئەگەرەکانی FOMC و ئاگادارکەرەوە",
            "Every release in your time zone, actuals, bitcoin's reaction, FOMC odds and reminders")),

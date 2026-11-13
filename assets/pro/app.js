@@ -57,12 +57,15 @@
     chev: '<path d="m6 9 6 6 6-6"/>', candle: '<path d="M7 3v18M17 3v18"/><rect x="4.5" y="7" width="5" height="9" rx="1"/><rect x="14.5" y="6" width="5" height="7" rx="1"/>',
     tpl: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/>', play: '<path d="M7 4v16l13-8z"/>', pause: '<path d="M7 4h4v16H7zM14 4h4v16h-4z"/>',
     step: '<path d="M5 4v16l10-8z"/><path d="M18 4v16"/>', back: '<path d="M19 4v16L9 12z"/><path d="M6 4v16"/>', save: '<path d="M5 3h11l4 4v14H5z"/><path d="M8 3v6h8"/><rect x="8" y="13" width="8" height="6"/>',
-    menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>', pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><path d="M12 17h0"/>', menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', bt: '<path d="M3 20h18"/><path d="M5 16l4-5 3 3 6-8"/><path d="M15 6h3v3"/>', side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>', pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'
   };
   function ic(n, cls) { return '<svg class="pm-ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>'; }
 
   /* Entekhab's own layers (outputs of the site's data; no indicator code ever reaches this page) */
-  var LAYERS = { posts: { src: '/data/impact.json' }, sigs: { src: '/data/signals.json' }, live: { src: '/data/live.json' } };
+  var LAYERS = { posts: { src: '/data/impact.json' }, sigs: { src: '/data/signals.json' }, live: { src: '/data/live.json' }, news: { src: '/data/news.json' } };
+  var NEWSALIAS = { XAUT: 'GOLD', PAXG: 'GOLD' }, NEWSC = { regulation: '#a78bfa', security: '#ff5a4d', etf_institutional: '#38bdf8', onchain: '#2dd4bf', technical: '#9ca3af', news: '#f7931a' };
+  function newsBase(sym) { var b = String(sym).replace(/_IRT$/, ''); return NEWSALIAS[b] || b; }
+  function newsTitle(it) { var L = LANG; return (L === 'fa' && it.tfa) || (L === 'ckb' && it.tckb) || it.title; }
 
   /* ---------------------------------------------------------------- state (saved automatically) */
   var ROT = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'XAUT', 'ADA', 'LINK', 'AVAX', 'TRX', 'LTC', 'DOT', 'NEAR', 'SUI', 'UNI'];
@@ -99,7 +102,7 @@
     o.active = Math.max(0, Math.min(o.charts.length - 1, s.active | 0));
     if (typeof s.tz === 'string' && s.tz.length < 40) o.tz = s.tz;
     if (s.cal === 'jalali') o.cal = 'jalali';
-    if (s.side === null || ['watch', 'alerts', 'cal', 'obj'].indexOf(s.side) >= 0) o.side = s.side;
+    if (s.side === null || ['watch', 'alerts', 'cal', 'obj', 'help'].indexOf(s.side) >= 0) o.side = s.side;
     if (Array.isArray(s.fav)) { var f = s.fav.filter(function (x) { return P.parseTF(x); }).slice(0, 14); if (f.length) o.fav = f; }
     if (s.ev && typeof s.ev === 'object') { o.ev.on = s.ev.on ? 1 : 0; if (Array.isArray(s.ev.imp)) o.ev.imp = s.ev.imp.filter(function (x) { return /^[HMLX]$/.test(x); }); if (Array.isArray(s.ev.cur)) o.ev.cur = s.ev.cur.filter(function (x) { return /^[A-Z]{3}$/.test(x); }); }
     ['keep', 'magnet', 'sound'].forEach(function (k) { if (k in s) o[k] = s[k] ? 1 : 0; });
@@ -364,7 +367,7 @@
   Cell.prototype.load = function () {
     var self = this, c = this.cfg;
     if (this.sub) { this.sub.off(); this.sub = null; }
-    this.bars = []; this.disp = []; this.state = 'load'; this.feed = null; this.lastSel = null;
+    this.bars = []; this.disp = []; this.state = 'load'; this.feed = null; this.lastSel = null; this.btMarks = null; this._btHist = null;
     this.main.setData([]); this.clearInds();
     this.chart.applyOptions({ timeScale: { secondsVisible: this.tfSec() < 60 } });
     this.msg(T('loading'));
@@ -563,6 +566,20 @@
       out.push({ time: bt, position: dn ? 'aboveBar' : 'belowBar', color: up ? '#34d399' : dn ? '#ff5a4d' : '#a78bfa', shape: up ? 'arrowUp' : dn ? 'arrowDown' : 'square', size: 1, id: 's' + sg.id });
       self.markInfo['s' + sg.id] = { kind: 'sig', s: sg };
     });
+    if (on.news && L.news && Array.isArray(L.news.items)) {                       /* headlines about this coin at the moment they were published */
+      var nb = newsBase(sym), byBar = {};
+      L.news.items.forEach(function (it) {
+        if (!it || !Array.isArray(it.coins) || it.coins.indexOf(nb) < 0) return;
+        var bt = barT(Math.floor(Date.parse(it.date) / 1000)); if (bt == null) return;
+        (byBar[bt] = byBar[bt] || []).push(it);
+      });
+      Object.keys(byBar).forEach(function (k) {
+        var its = byBar[k], cat = ['security', 'regulation', 'etf_institutional', 'onchain', 'technical'].filter(function (c) { return its.some(function (x) { return x.category === c; }); })[0] || 'news';
+        out.push({ time: +k, position: 'aboveBar', color: NEWSC[cat], shape: 'square', size: 0.7, text: its.length > 1 ? String(its.length) : '', id: 'n' + k });
+        self.markInfo['n' + k] = { kind: 'news', items: its };
+      });
+    }
+    if (this.btMarks) this.btMarks.forEach(function (m) { var bt = barT(m.time); if (bt != null) out.push(Object.assign({}, m, { time: bt })); });
     out.sort(function (a, b) { return a.time - b.time; });
     try { this.mk.setMarkers(out); } catch (e) { }
   };
@@ -670,6 +687,7 @@
     if (hit) { emit('openEvent', hit); return; }
     var mk = p.hoveredObjectId && this.markInfo && this.markInfo[p.hoveredObjectId];
     if (mk && mk.kind === 'post') window.open('/p/' + encodeURIComponent(mk.id) + '/', '_blank', 'noopener');
+    if (mk && mk.kind === 'news') newsBox(mk.items);
     emit('click', this, p);
   };
   Cell.prototype.sizeClass = function () { var w = this.el.clientWidth, hh = this.el.clientHeight; this.el.classList.toggle('pm-small', w < 430 || hh < 300); this.el.classList.toggle('pm-tiny', w < 300 || hh < 200); };
@@ -770,6 +788,10 @@
   };
   function evTip(e) { return P.evTipHtml ? P.evTipHtml(e) : ''; }
   function markTip(m, cell) {
+    if (m.kind === 'news') {
+      return m.items.slice(0, 4).map(function (it) { return '<b>' + esc(newsTitle(it)) + '</b><br><small>' + esc(it.source || '') + ' · ' + esc(fmtD(Math.floor(Date.parse(it.date) / 1000))) + '</small>'; }).join('<br>') +
+        (m.items.length > 4 ? '<br><small>+' + loc(m.items.length - 4) + '</small>' : '') + '<br><small>' + esc(T('clickNews')) + '</small>';
+    }
     if (m.kind === 'post') {
       var r = m.r, f = function (v) { return v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; };
       return '<b>' + esc(T('postBy')) + '</b><br>' + esc(fmtD(Math.floor(r.t0 / 1000))) + ' · ' + esc(cell.fmt(r.p0)) + '<br>' + esc(T('after')) + ' 1h ' + f(r.r1h) + ' · 4h ' + f(r.r4h) + ' · 24h ' + f(r.r24h) + '<br><small>' + esc(T('clickPost')) + '</small>';
@@ -777,6 +799,17 @@
     var s = m.s, o = s.out || {}, rr = o.r || {};
     return '<b>' + esc(indTitle(s.ind)) + '</b> · ' + esc(s.tf) + '<br>' + esc(s.state || s.side) + (s.prev ? ' ← ' + esc(s.prev) : '') + ' · ' + esc(cell.fmt(s.price)) + '<br>' +
       Object.keys(rr).map(function (k) { return k + ' ' + (rr[k] >= 0 ? '+' : '') + rr[k] + '%'; }).join(' · ');
+  }
+
+  function newsBox(items) {                                         /* the headlines of one bar, each with its source */
+    var f = h('<div class="pm-newsl"></div>');
+    items.forEach(function (it) {
+      var r = h('<a class="pm-newsi" target="_blank" rel="noopener nofollow"><b></b><small></small></a>');
+      if (/^https?:\/\//.test(it.url || '')) r.href = it.url;
+      $('b', r).textContent = newsTitle(it); $('small', r).textContent = (it.source || '') + ' · ' + fmtD(Math.floor(Date.parse(it.date) / 1000)) + ' · ' + T('nc_' + (NEWSC[it.category] ? it.category : 'news'));
+      f.appendChild(r);
+    });
+    modal(T('newsTitle'), f);
   }
 
   /* ================================================================ sync between charts */
@@ -1054,6 +1087,7 @@
     items.push({ sep: true },
       { label: T('shareLink'), icon: 'share', act: shareLink },
       { label: T('csv'), icon: 'down', act: csv },
+      { label: T('csvAll'), icon: 'down', act: csvAll },
       { label: T('exportJson'), icon: 'down', act: exportAll },
       { label: T('importJson'), icon: 'copy', act: importAll });
     menu(anchor, items);
@@ -1070,7 +1104,8 @@
     var done = function (code) {
       var url = location.origin + '/market/#s=' + code;
       if (url.length > 60000) { toast(T('tooBig')); return; }
-      var f = h('<div><input class="pm-in" readonly><div class="pm-row"><button class="pm-btn pri" type="button" data-c></button><a class="pm-btn" target="_blank" rel="noopener" data-t>Telegram</a></div><p class="pm-note"></p></div>');
+      var f = h('<div><input class="pm-in" readonly><div class="pm-row"><button class="pm-btn pri" type="button" data-c></button><a class="pm-btn" target="_blank" rel="noopener" data-t>Telegram</a></div><div class="pm-qr"></div><p class="pm-note"></p></div>');
+      qrInto($('.pm-qr', f), url);
       $('input', f).value = url; $('[data-c]', f).textContent = T('copy'); $('.pm-note', f).textContent = T('shareNote');
       $('[data-t]', f).href = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(T('shareText'));
       $('[data-c]', f).onclick = function () { var i = $('input', f); i.select(); (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { toast(T('copied')); }, function () { try { d.execCommand('copy'); toast(T('copied')); } catch (e) { } }); };
@@ -1078,6 +1113,16 @@
     };
     if (window.CompressionStream) new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer().then(function (b) { done('z' + b64u(b)); }, function () { done('j' + b64u(new TextEncoder().encode(json))); });
     else done('j' + b64u(new TextEncoder().encode(json)));
+  }
+  /* a QR code of the link, so a phone can open the same workspace (the library loads only when asked) */
+  var QRL = null;
+  function qrInto(box, url) {
+    if (url.length > 1500) { box.innerHTML = '<p class="pm-note">' + esc(T('qrTooBig')) + '</p>'; return; }
+    QRL = QRL || new Promise(function (ok, no) { if (window.qrcode) return ok(); var sc = d.createElement('script'); sc.src = '/assets/vendor/qrcode.js?v=1'; sc.onload = ok; sc.onerror = function () { QRL = null; no(); }; d.head.appendChild(sc); });
+    QRL.then(function () {
+      try { var q = window.qrcode(0, 'L'); q.addData(url); q.make(); var n = q.getModuleCount() + 4, cs = Math.max(2, Math.floor(232 / n)); box.innerHTML = q.createSvgTag({ cellSize: cs, margin: cs * 2 }) + '<p class="pm-note">' + esc(T('qrNote')) + '</p>'; var sv = $('svg', box); if (sv) { sv.setAttribute('role', 'img'); sv.setAttribute('aria-label', 'QR'); } }
+      catch (e) { box.innerHTML = '<p class="pm-note">' + esc(T('qrTooBig')) + '</p>'; }
+    }, function () { box.textContent = ''; });
   }
   function readShare() {
     var m = /#s=([zj])([A-Za-z0-9_-]+)$/.exec(location.hash); if (!m) return;
@@ -1110,10 +1155,22 @@
     var a = active(), bars = a.replay ? a.bars.slice(0, a.replay.i + 1) : a.bars; if (!bars.length) { toast(T('noData', { s: a.cfg.sym })); return; }
     var cols = [], vals = [];
     a.cfg.inds.forEach(function (x) { if (!I.DEF[x.id] || x.off) return; var v = I.compute(x.id, bars, x.p); Object.keys(v).forEach(function (k) { if (k === 'dir') return; cols.push(x.id + (Object.keys(x.p).length ? '(' + Object.keys(x.p).map(function (q) { return x.p[q]; }).join(' ') + ')' : '') + '.' + k); vals.push(v[k]); }); });
-    var lines = ['time_utc,unix,open,high,low,close,volume' + (cols.length ? ',' + cols.join(',') : '')];
-    bars.forEach(function (b, i) { lines.push(new Date(b.t * 1000).toISOString().replace('.000Z', 'Z') + ',' + b.t + ',' + b.o + ',' + b.h + ',' + b.l + ',' + b.c + ',' + b.v + (vals.length ? ',' + vals.map(function (v) { return I.ok(v[i]) ? +v[i].toPrecision(12) : ''; }).join(',') : '')); });
-    download('entekhab_' + a.cfg.sym + 'USDT_' + a.cfg.tf + '_' + new Date().toISOString().slice(0, 10) + '.csv', lines.join('\n') + '\n', 'text/csv');
+    var lines = ['time_utc,time_local,unix,open,high,low,close,volume' + (cols.length ? ',' + cols.join(',') : '')];
+    bars.forEach(function (b, i) { lines.push(new Date(b.t * 1000).toISOString().replace('.000Z', 'Z') + ',' + csvq(fmtT(b.t, 'fulls')) + ',' + b.t + ',' + b.o + ',' + b.h + ',' + b.l + ',' + b.c + ',' + b.v + (vals.length ? ',' + vals.map(function (v) { return I.ok(v[i]) ? +v[i].toPrecision(12) : ''; }).join(',') : '')); });
+    download('entekhab_' + fileSym(a.cfg.sym) + '_' + a.cfg.tf + '_' + new Date().toISOString().slice(0, 10) + '.csv', '\ufeff' + lines.join('\n') + '\n', 'text/csv');
     toast(T('csvDone', { n: loc(bars.length) }));
+  }
+  function csvq(v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function fileSym(sym) { return String(P.pair ? P.pair(sym) : sym).replace(/[^A-Za-z0-9]+/g, '') || 'chart'; }
+  function csvAll() {                                                  /* every chart of the layout in one file, a row per bar */
+    var lines = ['symbol,timeframe,time_utc,time_local,unix,open,high,low,close,volume'], n = 0;
+    cells.forEach(function (a) {
+      var bars = a.replay ? a.bars.slice(0, a.replay.i + 1) : a.bars, sy = csvq(P.pair ? P.pair(a.cfg.sym) : a.cfg.sym);
+      bars.forEach(function (b) { n++; lines.push(sy + ',' + a.cfg.tf + ',' + new Date(b.t * 1000).toISOString().replace('.000Z', 'Z') + ',' + csvq(fmtT(b.t, 'fulls')) + ',' + b.t + ',' + b.o + ',' + b.h + ',' + b.l + ',' + b.c + ',' + b.v); });
+    });
+    if (!n) { toast(T('noData', { s: '' })); return; }
+    download('entekhab_layout_' + cells.length + 'charts_' + new Date().toISOString().slice(0, 10) + '.csv', '\ufeff' + lines.join('\n') + '\n', 'text/csv');
+    toast(T('csvDone', { n: loc(n) }));
   }
   var KEYS = ['ek_pro', 'ek_pro_draw', 'ek_pro_alerts', 'ek_pro_layouts', 'ek_pro_tpl', 'ek_pro_watch'];
   function exportAll() { var o = { app: 'entekhab.net/market', v: 1, at: new Date().toISOString() }; KEYS.forEach(function (k) { o[k] = S.get(k, null); }); o.ek_pro = st; o.ek_pro_draw = DRAW; download('entekhab-market-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(o), 'application/json'); }
@@ -1214,6 +1271,7 @@
         '<button type="button" class="pm-tb" id="pm-ind">' + ic('fx') + '<span>' + esc(T('indicators')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-tpl" title="' + esc(T('templates')) + '">' + ic('tpl') + '<span class="pm-hide-s">' + esc(T('templates')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-rep">' + ic('replay') + '<span>' + esc(T('replay')) + '</span></button>' +
+        '<button type="button" class="pm-tb" id="pm-bt" title="' + esc(T('tester')) + '">' + ic('bt') + '<span class="pm-hide-s">' + esc(T('testerShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-alert">' + ic('bell') + '<span>' + esc(T('alert')) + '</span></button>' +
         '<button type="button" class="pm-ib" id="pm-lay" title="' + esc(T('layout')) + '">' + ic('grid') + '</button>' +
         '<button type="button" class="pm-ib" id="pm-undo" title="' + esc(T('undo')) + '">' + ic('undo') + '</button>' +
@@ -1256,6 +1314,7 @@
     $('#pm-ind').onclick = indDialog;
     $('#pm-tpl').onclick = function (e) { tplMenu(e.currentTarget); };
     $('#pm-rep').onclick = function () { if (P.replayToggle) P.replayToggle(active()); };
+    $('#pm-bt').onclick = function () { if (P.bt) P.bt.tester(active()); };
     $('#pm-alert').onclick = function () { if (P.alertDialog) P.alertDialog(active()); };
     $('#pm-lay').onclick = function (e) { layoutMenu(e.currentTarget); };
     $('#pm-undo').onclick = doUndo; $('#pm-redo').onclick = doRedo;
@@ -1289,6 +1348,10 @@
       pageText();
     });
     if (window.ResizeObserver) new ResizeObserver(debounce(fit, 60)).observe(d.body);
+    addEventListener('storage', function (e) {
+      if (e.key === 'ek_pro_draw') { var nd = S.get('ek_pro_draw', {}); if (nd && typeof nd === 'object' && !Array.isArray(nd)) { DRAW = nd; cells.forEach(function (c) { c.drawer.update(); c.ovl.update(); }); } }
+      if (e.key) emit('storage', e.key);
+    });
     addEventListener('load', function () { fit(); setTimeout(fit, 1200); setTimeout(fit, 3500); });
     addEventListener('resize', debounce(fit, 80));
     d.addEventListener('fullscreenchange', function () { root.classList.toggle('pm-fs', !!d.fullscreenElement); fit(); });
@@ -1320,7 +1383,7 @@
     var ds = h('<button type="button" class="pm-ib pm-wb">' + ['━', '┅', '┈'][(dd.s && dd.s.d) || 0] + '</button>'); ds.onclick = function () { upd(function (x) { x.s.d = ((x.s.d || 0) + 1) % 3; }); }; bar.appendChild(ds);
     if (['trend', 'arrow', 'channel', 'fib', 'fibext'].indexOf(dd.k) >= 0) { var ex = h('<button type="button" class="pm-ib pm-wb' + (dd.s && dd.s.r ? ' on' : '') + '" title="' + esc(T('extend')) + '">→|</button>'); ex.onclick = function () { upd(function (x) { x.s.r = !x.s.r; }); }; bar.appendChild(ex); }
     if (['text', 'rect', 'hline', 'hray'].indexOf(dd.k) >= 0) { var tx = h('<button type="button" class="pm-ib" title="' + esc(T('editText')) + '">' + ic('text') + '</button>'); tx.onclick = function () { editText(dd); }; bar.appendChild(tx); }
-    if ((dd.k === 'hline' || dd.k === 'hray' || dd.k === 'trend') && P.alertDialog) { var al = h('<button type="button" class="pm-ib" title="' + esc(T('alertHere')) + '">' + ic('bell') + '</button>'); al.onclick = function () { P.alertDialog(cell, { price: dd.k === 'trend' ? dd.pts[1].p : dd.pts[0].p }); }; bar.appendChild(al); }
+    if (['hline', 'hray', 'trend', 'ray', 'ext', 'channel'].indexOf(dd.k) >= 0 && P.alertDialog) { var al = h('<button type="button" class="pm-ib" title="' + esc(T('alertHere')) + '">' + ic('bell') + '</button>'); al.onclick = function () { P.alertDialog(cell, dd.k === 'hline' || dd.k === 'hray' ? { price: dd.pts[0].p } : { draw: dd }); }; bar.appendChild(al); }
     var lk = h('<button type="button" class="pm-ib" title="' + esc(T(dd.lk ? 'unlock' : 'lock')) + '">' + ic(dd.lk ? 'lock' : 'unlock') + '</button>'); lk.onclick = function () { upd(function (x) { x.lk = !x.lk; }); }; bar.appendChild(lk);
     var cp = h('<button type="button" class="pm-ib" title="' + esc(T('clone')) + '">' + ic('copy') + '</button>'); cp.onclick = function () { var nd = JSON.parse(JSON.stringify(dd)); nd.id = P.uid(); var sec = cell.tfSec() * 5; nd.pts.forEach(function (p) { p.t += sec; }); mutate(sym, function (L) { L.push(nd); }); cell.drawer.select(nd.id); }; bar.appendChild(cp);
     var del = h('<button type="button" class="pm-ib pm-del" title="' + esc(T('remove')) + '">' + ic('trash') + '</button>'); del.onclick = function () { removeDrawing(cell, dd.id); }; bar.appendChild(del);
@@ -1332,7 +1395,7 @@
   var PANELS = {};
   function buildSide() {
     var tabs = $('.pm-stabs', root);
-    tabs.innerHTML = [['watch', 'star', 'watchlist'], ['alerts', 'bell', 'alerts'], ['cal', 'cal', 'ecoCal'], ['obj', 'layers', 'objects']].map(function (t) {
+    tabs.innerHTML = [['watch', 'star', 'watchlist'], ['alerts', 'bell', 'alerts'], ['cal', 'cal', 'ecoCal'], ['obj', 'layers', 'objects'], ['help', 'help', 'helpTab']].map(function (t) {
       return '<button type="button" role="tab" class="pm-stab" data-p="' + t[0] + '" title="' + esc(T(t[2])) + '">' + ic(t[1]) + '<span>' + esc(T(t[2])) + '</span></button>';
     }).join('') + '<button type="button" class="pm-ib pm-sclose" title="' + esc(T('close')) + '">' + ic('x') + '</button>';
     $$('.pm-stab', tabs).forEach(function (b) { b.onclick = function () { var p = b.getAttribute('data-p'); setSide(st.side === p && innerWidth < 900 ? null : p); }; });

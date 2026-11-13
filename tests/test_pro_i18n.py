@@ -22,7 +22,7 @@ def strings():
 
 
 def used_keys(defs, params):
-    src = "".join(open(os.path.join(PRO, f), encoding="utf-8").read() for f in ("app.js", "panels.js", "replay.js", "draw.js"))
+    src = "".join(open(os.path.join(PRO, f), encoding="utf-8").read() for f in ("app.js", "panels.js", "replay.js", "draw.js", "backtest.js"))
     keys = set()
     keys |= {k for k in re.findall(r"\bT\('([A-Za-z][A-Za-z0-9_]*)'", src) if not k.endswith('_')}            # T('key' …
     for m in re.finditer(r"\bT\(([^()]*(?:\([^()]*\)[^()]*)*)\)", src):         # T(cond ? 'a' : 'b')
@@ -33,18 +33,26 @@ def used_keys(defs, params):
             if not lit.endswith("_"):
                 keys.add(lit)
     keys |= set(re.findall(r"data-t=\"([A-Za-z]+)\"", src))
+    keys |= set(re.findall(r"\bcard\('([A-Za-z][A-Za-z0-9_]*)'", src))                  # report cards in backtest.js
     tools = set(re.findall(r"^\s+(\w+): \{ n: -?\d \}", open(os.path.join(PRO, "draw.js"), encoding="utf-8").read(), re.M))
     tools |= set(re.findall(r"(\w+): \{ n: -?\d \}", open(os.path.join(PRO, "draw.js"), encoding="utf-8").read()))
     fam = {
         "st_": "live poll snap err load rep", "u_": "s m h d w mo", "tfg_": "s m h d",
         "ty_": "candle hollow heikin bars line linemk step area baseline columns", "sync_": "sym tf cross time",
-        "cat_": "all watch gold over pane ek", "ly_": "posts sigs live", "tpl_": "trend mom vola ichi scalp ek",
-        "flag_": "r o y g b p", "c_": "cross up down gt lt", "ai_": "rsi ma macd bb", "imp_": "H M L X",
-        "ac_": "rsi_up rsi_down rsi_gt rsi_lt ma_up ma_down macd_up macd_down bb_gt bb_lt",
+        "cat_": "all watch gold over pane ek", "ly_": "posts sigs live news", "tpl_": "trend mom vola ichi scalp ek",
+        "flag_": "r o y g b p", "c_": "cross up down gt lt pup pdn pmv", "ai_": "rsi ma macd bb xma st stoch vol", "imp_": "H M L X",
+        "ac_": "rsi_up rsi_down rsi_gt rsi_lt ma_up ma_down macd_up macd_down bb_gt bb_lt xma_up xma_down st_up st_down stoch_up stoch_down vol_gt",
+        "dc_": "cross up down out cup cdown", "exp_": "0 h d w m",
+        "nc_": "news regulation security etf_institutional onchain technical", "na_": "off watch imp all",
+        "sf_": "all up down vol os ob hi lo", "sc_": "s c p q r rsi tr", "tr_": "up down range",
+        "ht_": "chart draw ind alert news rep bt scr lay data toman", "h_": "chart draw ind alert news rep bt scr lay data toman",
+        "why_": "sl tp trail liq manual rev sig", "bt_": "bal size lev fee slip sl tp trail dir", "dir_": "both long short",
+        "ot_": "market limit stop", "of_": "price sl tp", "rk_": "net pf sharpe win dd", "rg_": "from to step", "p_": "lo hi exit",
+        "sg_": "macross smacross macd rsi bb st psar donch ek", "sgd_": "macross smacross macd rsi bb st psar donch ek",
     }
     for pre, rest in fam.items():
         keys |= {pre + x for x in rest.split()}
-    keys |= {"in_" + d for d in defs} | {"ind_" + d for d in defs + ["posts", "sigs", "live"]} | {"p_" + p for p in params}
+    keys |= {"in_" + d for d in defs} | {"ind_" + d for d in defs + ["posts", "sigs", "live", "news"]} | {"p_" + p for p in params}
     keys |= {"t_" + t for t in tools} | {"t_cursor"}
     keys |= {"watchlist", "alerts", "ecoCal", "objects"}
     return keys

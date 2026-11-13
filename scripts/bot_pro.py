@@ -27,32 +27,47 @@ TXT = {
                "• همهٔ کوین‌های بایننس، و دلار، یورو، طلا، سکه و تتر به تومان؛ بیت‌کوین و هر کوین هم به تومان\n"
                "• تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم و اندیکاتورها\n• تایم‌فریم ثانیه‌ای و هر تایم‌فریم دلخواه\n"
                "• ۱۷ نوع نمودار، از جمله رنکو، کاگی، نقطه و رقم و شکست خط\n• ۷۰ اندیکاتور، فیبوناچی، گن و پوزیشن لانگ/شورت\n"
-               "• بازپخش کندل‌ها و معاملهٔ تمرینی\n• هشدار قیمت و اندیکاتور، دیده‌بان با بخش‌بندی و پرچم رنگی\n"
-               "• تقویم اقتصادی با هشدار پیش از انتشار خبر"),
+               "• بازپخش کندل‌ها روی چند چارت با حساب تمرینی: سفارش لیمیت و استاپ، حد ضرر و سود، اهرم و کارمزد\n"
+               "• بک‌تست ۸ استراتژی (و سیگنال‌های کردستانی روی BTC) با بهینه‌ساز، منحنی سرمایه و خروجی CSV\n"
+               "• هشدار قیمت، حرکت درصدی، خط روند و کانال، اندیکاتور و اخبار؛ دیده‌بان با بخش‌بندی و پرچم رنگی\n"
+               "• دیده‌بان بازار: همهٔ کوین‌ها یا بازار ایران، با مرتب‌سازی بر اساس حجم، تغییر و RSI\n"
+               "• تقویم اقتصادی و اخبار روی چارت، با هشدار پیش از انتشار خبر\n• لینک و کد QR برای باز کردن همان فضای کار در دستگاه دیگر"),
         "ckb": ("مێزی تەواوی شیکاریی ماڵپەڕ، بە داتای زیندووی بایننس و بازاڕی ئێران:\n"
                 "• هەموو کۆینەکانی بایننس، و دۆلار، یۆرۆ، زێڕ، سکە و تەتەر بە تمەن؛ بیتکۆین و هەر کۆینێک بە تمەنیش\n"
                 "• تا ١٦ چارت پێکەوە بە هاوکاتکردنی هێما، تایمفرەیم و ئیندیکاتۆرەکان\n• تایمفرەیمی چرکەیی و هەر تایمفرەیمێکی دڵخواز\n"
                 "• ١٧ جۆری چارت، لەوانە ڕێنکۆ، کاگی، خاڵ و ژمارە و شکانی هێڵ\n• ٧٠ ئیندیکاتۆر، فیبۆناچی، گان و پۆزیشنی لۆنگ/شۆرت\n"
-                "• دووبارە پەخشی مۆمەکان و مامەڵەی ڕاهێنان\n• ئاگادارکەرەوەی نرخ و ئیندیکاتۆر، چاودێری بە بەش و ئاڵای ڕەنگی\n"
-                "• ڕۆژژمێری ئابووری بە ئاگادارکردنەوە پێش بڵاوبوونەوەی هەواڵ"),
+                "• دووبارە پەخشی مۆمەکان لەسەر چەند چارت بە هەژماری ڕاهێنان: ئۆردەری لیمیت و ستۆپ، سنووری زیان و قازانج، لیڤەرێج و کرێ\n"
+                "• باکتێستی ٨ ستراتیژ (و سیگناڵەکانی کوردستانی لەسەر BTC) بە باشترکەر، هێڵی سەرمایە و دەرچووی CSV\n"
+                "• ئاگادارکەرەوەی نرخ، جووڵەی ڕێژەیی، هێڵی ڕەوت و کەناڵ، ئیندیکاتۆر و هەواڵ؛ چاودێری بە بەش و ئاڵای ڕەنگی\n"
+                "• چاودێری بازاڕ: هەموو کۆینەکان یان بازاڕی ئێران، ڕیزکراو بەپێی قەبارە، گۆڕان و RSI\n"
+                "• ڕۆژژمێری ئابووری و هەواڵ لەسەر چارت، بە ئاگادارکردنەوە پێش بڵاوبوونەوەی هەواڵ\n• بەستەر و کۆدی QR بۆ کردنەوەی هەمان شوێنی کار لە ئامێرێکی تر"),
         "kmr": ("Maseya analîzê ya temam a malperê, bi daneyên zindî yên Binance û bazara Îranê:\n"
                 "• Hemû coinên Binance, û dolar, euro, zêr, zêrê Îmamî û tether bi tûmanan; Bitcoin û her coin jî bi tûmanan\n"
                 "• Heta 16 grafîk bi hev re, bi hevdemkirina sembol, dem û nîşanderan\n• Demên saniyeyî û her demeke xwestî\n"
                 "• 17 cureyên grafîkê, di nav de Renko, Kagi, Point & Figure û Line Break\n• 70 nîşander, Fibonacci, Gann û pozîsyonên long/short\n"
-                "• Dubarelîstina mûman û bazirganiya ceribandinê\n• Hişyariyên biha û nîşanderan, lîsteyên şopandinê bi beşan\n"
-                "• Salnameya aborî bi hişyariyê berî weşana nûçeyê"),
+                "• Dubarelîstina mûman li ser çend grafîkan bi hesabeke ceribandinê: fermanên limit û stop, stop-loss û take-profit, leverage û xerc\n"
+                "• Backtesta 8 stratejiyan (û nîşanên Kurdistanî li ser BTC) bi optîmîzer, xêza sermayeyê û derketina CSV\n"
+                "• Hişyariyên biha, tevgera ji sedî, xeta trendê û kanalê, nîşander û nûçe; lîsteyên şopandinê bi beşan\n"
+                "• Şopandina bazarê: hemû coin an bazara Îranê, li gorî qebare, guhertin û RSI rêzkirî\n"
+                "• Salnameya aborî û nûçe li ser grafîkê, bi hişyariyê berî weşana nûçeyê\n• Girêdan û koda QR ji bo vekirina heman cihê karê li amûreke din"),
         "ar": ("منصة التحليل الكاملة للموقع ببيانات Binance المباشرة والسوق الإيرانية:\n"
                "• كل عملات Binance، والدولار واليورو والذهب والمسكوكات والتيثر بالتومان؛ والبيتكوين وكل عملة بالتومان أيضًا\n"
                "• حتى ١٦ رسمًا معًا مع مزامنة الرمز والإطار الزمني والمؤشرات\n• أطر زمنية بالثواني وأي إطار مخصّص\n"
                "• ١٧ نوعًا من الرسوم، منها رينكو وكاجي والنقطة والرقم وكسر الخط\n• ٧٠ مؤشرًا وفيبوناتشي وغان ومراكز الشراء والبيع\n"
-               "• إعادة تشغيل الشموع وصفقات تدريبية\n• تنبيهات السعر والمؤشرات، وقوائم متابعة بأقسام وأعلام ملوّنة\n"
-               "• التقويم الاقتصادي مع تنبيه قبل صدور الخبر"),
+               "• إعادة تشغيل الشموع على عدة رسوم بحساب تدريبي: أوامر محددة وإيقاف، وقف الخسارة وجني الربح، ورافعة ورسوم\n"
+               "• اختبار رجعي لثماني استراتيجيات (وإشارات كردستاني على BTC) مع مُحسِّن ومنحنى رأس المال وتصدير CSV\n"
+               "• تنبيهات السعر والتحرك بالنسبة المئوية وخطوط الاتجاه والقنوات والمؤشرات والأخبار؛ وقوائم متابعة بأقسام وأعلام ملوّنة\n"
+               "• مراقبة السوق: كل العملات أو سوق إيران، مرتبة حسب الحجم والتغير وRSI\n"
+               "• التقويم الاقتصادي والأخبار على الرسم، مع تنبيه قبل صدور الخبر\n• رابط ورمز QR لفتح مساحة العمل نفسها على جهاز آخر"),
         "en": ("The site's full analysis desk, on live Binance and Iranian market data:\n"
                "• Every Binance coin, plus the dollar, euro, gold, gold coins and tether in toman; Bitcoin and any coin in toman too\n"
                "• Up to 16 charts at once, with symbol, timeframe and indicator sync\n• Seconds timeframes and any custom timeframe\n"
                "• 17 chart types, including Renko, Kagi, Point & Figure and Line Break\n• 70 indicators, Fibonacci, Gann, long/short positions\n"
-               "• Bar replay with practice trades\n• Price and indicator alerts, watchlists with sections and colour flags\n"
-               "• The economic calendar, with an alert before each release"),
+               "• Bar replay on several charts with a practice account: limit and stop orders, stop-loss and take-profit, leverage and fees\n"
+               "• Backtests of 8 strategies (plus the Kurdistani signals on BTC) with an optimizer, the equity curve and a CSV\n"
+               "• Price, % move, trend-line and channel, indicator and news alerts; watchlists with sections and colour flags\n"
+               "• Market watch: every coin or Iran's market, sorted by volume, change and RSI\n"
+               "• The economic calendar and news on the chart, with an alert before each release\n• A link and QR code to open the same workspace on another device"),
     },
     "next": {"fa": "⏳ رویداد مهم بعدی: <b>{c} · {n}</b> — {w}", "ckb": "⏳ ڕووداوی گرنگی داهاتوو: <b>{c} · {n}</b> — {w}",
              "kmr": "⏳ Bûyera girîng a pêş: <b>{c} · {n}</b> — {w}", "ar": "⏳ الحدث المهم التالي: <b>{c} · {n}</b> — {w}",
