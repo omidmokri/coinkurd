@@ -1286,8 +1286,10 @@ def handle_private(s, msg):
                 return send(chat_id, *render(s, uid, arg[2:]))
             except Exception:
                 log.exception("deep link %s failed", arg)
-        if arg == "ec":                                 # the calendar page / group post: alerts section with the on button
-            try:
+        if arg == "ec" or arg.startswith("ec_"):       # the calendar page / group post: alerts section with the on button
+            try:                                        # ec_<zone>_l<minutes>: the page's time zone and lead time come along
+                if arg.startswith("ec_") and EC.apply_link(x, arg):
+                    send(chat_id, EC.L("link_ok", x["lang"]))
                 return send(chat_id, *render(s, uid, "events"))
             except Exception:
                 log.exception("ec link failed")
@@ -1515,6 +1517,19 @@ def handle_callback(s, cb):
             x.pop("ec", None)
         ans(EC.L("on_ok" if data == "ec:on" else "off_ok", lang))
         return edit(chat_id, mid, *render(s, uid, "events"))
+    if data in ("ec:tz", "ec:ld"):                   # economic calendar: the user's own clock / lead times
+        ans()
+        return edit(chat_id, mid, *(EC.tz_view(x, lang) if data == "ec:tz" else EC.lead_view(x, lang)))
+    if data.startswith("ez:"):
+        if EC.set_tz(x, data[3:]):
+            ans(EC.L("tz_ok", lang, z=EC.tz_label(data[3:], lang)))
+        else:
+            ans()
+        return edit(chat_id, mid, *render(s, uid, "events"))
+    if data.startswith("el:"):
+        ok = data[3:].isdigit() and EC.toggle_lead(x, data[3:])
+        ans(None if ok else EC.L("ld_min", lang))
+        return edit(chat_id, mid, *EC.lead_view(x, lang))
     if data.startswith("pa:"):                       # «add» under an alert offered by the live market's ✈ link
         got = PRO.parse_callback(data)
         ans()
