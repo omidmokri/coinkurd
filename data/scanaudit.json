@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-13T01:29:29.248313+00:00",
+ "updated_at": "2026-11-13T01:48:58.764191+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-12T01:00:00+00:00"
@@ -7,7 +7,7 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 226,
+ "coins": 227,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
@@ -23,13 +23,13 @@
    "verdict": "worse"
   },
   "_all": {
-   "n": 6413,
+   "n": 6408,
    "obs": -0.2,
-   "win": 47.9,
+   "win": 48.0,
    "mid": 0.02,
    "lo": -0.29,
    "hi": 0.23,
-   "p": 0.0761,
+   "p": 0.079,
    "shifts": 1038,
    "verdict": "no_edge"
   },
@@ -67,13 +67,13 @@
    "verdict": "worse"
   },
   "bear_divergence": {
-   "n": 470,
-   "obs": 0.82,
-   "win": 60.0,
+   "n": 466,
+   "obs": 0.84,
+   "win": 60.5,
    "mid": 0.61,
-   "lo": -0.63,
-   "hi": 1.65,
-   "p": 0.6927,
+   "lo": -0.61,
+   "hi": 1.7,
+   "p": 0.6715,
    "shifts": 1038,
    "verdict": "no_edge"
   },
@@ -100,13 +100,13 @@
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 524,
+   "n": 523,
    "obs": -1.65,
    "win": 31.5,
-   "mid": -0.63,
-   "lo": -1.54,
-   "hi": 0.14,
-   "p": 0.0202,
+   "mid": -0.64,
+   "lo": -1.55,
+   "hi": 0.15,
+   "p": 0.0193,
    "shifts": 1038,
    "verdict": "worse"
   },
