@@ -588,14 +588,17 @@
   Cell.prototype.legend = function () {
     var c = this.cfg, F = this.feed, self = this;
     var stc = this.replay ? 'rep' : !F ? 'load' : F.state === 'live' ? 'live' : F.state === 'poll' ? 'poll' : F.state === 'snap' ? 'snap' : F.state === 'error' ? 'err' : 'load';
-    var src = F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && F.src === 'irt' ? 'Binance × tgju' : 'Binance';
+    var src = F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && F.src === 'irt' ? 'Binance × tgju' : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
+    var I0 = P.inst(c.sym) || {}, isFut = I0.kind === 'fut', adj = isFut && P.futAdj && P.futAdj(c.sym);
     var stTitle = T('st_' + stc) + (F && F.state === 'snap' && F.at ? ' · ' + fmtT(Math.floor(F.at / 1000)) : '');
     var leg = $('.pm-leg', this.el);
     leg.innerHTML = '<div class="pm-l1"><button type="button" class="pm-lsym" data-a="sym"><img src="' + esc(P.logo(c.sym)) + '" alt="" width="18" height="18" onerror="this.style.visibility=\'hidden\'"><b>' + esc(P.pair(c.sym)) + '</b></button>' +
-      '<button type="button" class="pm-ltf" data-a="tf">' + esc(tfLabel(c.tf)) + '</button><span class="pm-src">' + src + '</span><i class="pm-dot ' + stc + '" title="' + esc(stTitle) + '"></i>' +
+      '<button type="button" class="pm-ltf" data-a="tf">' + esc(tfLabel(c.tf)) + '</button>' + (isFut ? '<button type="button" class="pm-badj' + (adj ? ' on' : '') + '" data-a="badj" aria-pressed="' + !!adj + '" title="' + esc(T('badjT')) + '">B-ADJ</button>' : '') + '<span class="pm-src">' + src + '</span><i class="pm-dot ' + stc + '" title="' + esc(stTitle) + '"></i>' +
       (this.replay ? '<span class="pm-repb">' + esc(T('replay')) + '</span>' : '') + '<span class="pm-ohlc"></span><span class="pm-cd"></span></div><div class="pm-linds"></div><div class="pm-live"></div>';
     leg.querySelector('[data-a="sym"]').onclick = function (e) { setActive(self.i); symbolSearch(''); };
     leg.querySelector('[data-a="tf"]').onclick = function (e) { setActive(self.i); tfMenu(e.currentTarget); };
+    var bj = leg.querySelector('[data-a="badj"]');
+    if (bj) bj.onclick = function () { var on = P.futAdj(c.sym, !P.futAdj(c.sym)); cells.forEach(function (x) { if (x.cfg.sym === c.sym && !x.replay) x.load(); }); toast(T(on ? 'badjOn' : 'badjOff')); };
     this.legInds = $('.pm-linds', leg); this.legendInds(); this.legendLast(); this.liveBox();
   };
   Cell.prototype.legendLast = function (b, prev) {
@@ -898,7 +901,7 @@
   function paintTop() {
     var a = active(); if (!a || !root) return;
     var c = a.cfg, sb = $('#pm-sym'), tb = $('#pm-tfs'), ty = $('#pm-type');
-    if (sb) { var In = P.inst(c.sym) || {}; sb.innerHTML = '<img src="' + esc(P.logo(c.sym)) + '" alt="" width="20" height="20" onerror="this.style.visibility=\'hidden\'"><b>' + esc(In.kind === 'ir' ? P.pair(c.sym) : In.base || c.sym) + '</b><small>' + (In.kind === 'ir' ? '' : '/' + esc(In.quote === 'IRT' ? T('toman') : 'USDT')) + '</small>' + ic('search', 'sm'); }
+    if (sb) { var In = P.inst(c.sym) || {}; sb.innerHTML = '<img src="' + esc(P.logo(c.sym)) + '" alt="" width="20" height="20" onerror="this.style.visibility=\'hidden\'"><b>' + esc(In.kind === 'ir' || In.kind === 'fut' ? P.pair(c.sym) : In.base || c.sym) + '</b><small>' + (In.kind === 'ir' ? '' : '/' + esc(In.quote === 'IRT' ? T('toman') : In.quote === 'USD' ? 'USD' : 'USDT')) + '</small>' + ic('search', 'sm'); }
     if (tb) {
       var favs = st.fav.slice(); if (favs.indexOf(c.tf) < 0) favs.push(c.tf);
       tb.innerHTML = favs.map(function (tf) { return '<button type="button" class="pm-tf' + (tf === c.tf ? ' on' : '') + '" data-tf="' + tf + '">' + esc(tfLabel(tf)) + '</button>'; }).join('') +
@@ -978,22 +981,22 @@
     var inp = $('input', box), list = $('.pm-ssl', box), cats = $('.pm-sscat', box), note = $('.pm-ssn', box), cat = 'all', M = null, sel = 0;
     inp.placeholder = T('searchSym'); inp.value = q || '';
     /* markets: every Binance coin in USDT and in toman, Iran's currencies, gold, coins and silver in toman */
-    ['all', 'watch', 'usdt', 'irt', 'fx', 'gold'].forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
+    ['all', 'watch', 'usdt', 'irt', 'fx', 'gold', 'fut'].forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
     function names(x) { var I = P.inst(x); return I && I.name ? [I.name.fa, I.name.ckb, I.name.ar, I.name.en].join(' ').toLowerCase() : ''; }
     function draw() {
       var raw = inp.value.trim(), s = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), low = raw.toLowerCase(), W = (P.watchSyms ? P.watchSyms() : []);
-      var src = !M ? [] : cat === 'watch' ? W : cat === 'usdt' ? M.usdt : cat === 'irt' ? M.irt : cat === 'fx' ? M.ir.filter(function (x) { return P.irGroup(x) === 'fx'; }) :
+      var src = !M ? [] : cat === 'watch' ? W : cat === 'usdt' ? M.usdt : cat === 'irt' ? M.irt : cat === 'fut' ? (M.fut || []) : cat === 'fx' ? M.ir.filter(function (x) { return P.irGroup(x) === 'fx'; }) :
         cat === 'gold' ? M.ir.filter(function (x) { return /gold|coin|silver/.test(P.irGroup(x)); }).concat(M.usdt.filter(function (x) { return x === 'XAUT' || x === 'PAXG'; })) :
-        M.ir.concat(M.usdt, M.irt);
+        M.ir.concat(M.usdt, M.irt, M.fut || []);
       var r = src.filter(function (x) { return !raw || (s && x.indexOf(s) >= 0) || (low && names(x).indexOf(low) >= 0) || (low && P.pair(x).toLowerCase().indexOf(low) >= 0); });
       r.sort(function (a, b) { return (s && a.indexOf(s) === 0 ? 0 : 1) - (s && b.indexOf(s) === 0 ? 0 : 1); });
       r = r.slice(0, 120); sel = 0;
       list.innerHTML = r.length ? r.map(function (x, i) {
-        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' ? T('computed') : 'Binance';
+        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' ? T('computed') : I.kind === 'fut' ? T('futSub') + ' · Bybit' : 'Binance';
         return '<button type="button" role="option" class="pm-ssi' + (i === 0 ? ' on' : '') + '" data-s="' + x + '"><img src="' + esc(P.logo(x)) + '" alt="" width="22" height="22" loading="lazy"><b>' + esc(P.pair(x)) + '</b><small>' + esc(sub) + '</small>' +
           (tk ? '<span class="pm-num">' + P.fmt(tk.c, P.precFor(x, tk.c)) + '</span><span class="pm-num ' + (tk.chg >= 0 ? 'up' : 'dn') + '">' + (tk.chg >= 0 ? '+' : '') + (tk.chg || 0).toFixed(2) + '%</span>' : '') + '</button>';
       }).join('') : '<p class="pm-empty">' + esc(M ? T('noMatch') : T('loading')) + '</p>';
-      note.textContent = cat === 'irt' ? T('irtNote') : cat === 'fx' || cat === 'gold' ? T('irNote') : '';
+      note.textContent = cat === 'irt' ? T('irtNote') : cat === 'fx' || cat === 'gold' ? T('irNote') : cat === 'fut' ? T('futNote') : '';
       $$('[data-s]', list).forEach(function (b) { b.onclick = function () { closeModal(); applySym(b.getAttribute('data-s')); }; });
     }
     inp.oninput = draw;

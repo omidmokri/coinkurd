@@ -601,15 +601,17 @@ async function mockNet(page, stats) {
   /* ---------- alerts beyond price levels: n% moves, sloped lines and channels, an end date, more indicator conditions */
   if (!ONLY || ONLY === 'al2') {
     const { page, ctx } = await newPage(1280, 860, 'fa');
+    /* LINK: a market no other open page watches, so the shared tick hook feeds only this page */
+    await page.evaluate(() => PRO.app.active().setSym('LINK')); await page.waitForFunction(() => { const c = PRO.app.active(); return c.cfg.sym === 'LINK' && c.disp.length > 100; }, null, { timeout: 20000 });
     await page.click('#pm-alert'); await page.waitForSelector('.pm-af'); await page.waitForTimeout(120);
     await page.selectOption('.pm-af [name=c]', 'pmv'); await page.fill('.pm-af [name=v]', '1'); await page.dispatchEvent('.pm-af [name=v]', 'input');
     const tgt = await page.evaluate(() => document.querySelector('.pm-af .pm-tgt').textContent);
     await page.selectOption('.pm-af [name=exp]', String(86400e3));
     await page.click('.pm-af button[type=submit]'); await page.waitForTimeout(300);
-    const pa = await page.evaluate(() => { const a = PRO._alerts()[0]; return { k: a.k, c: a.c, v: a.v, base: a.base, exp: a.exp - a.at, lines: PRO.alertLines('BTC').map(x => x.v) }; });
+    const pa = await page.evaluate(() => { const a = PRO._alerts()[0]; return { k: a.k, c: a.c, v: a.v, base: a.base, exp: a.exp - a.at, lines: PRO.alertLines('LINK').map(x => x.v) }; });
     ok('a 1% either-way alert keeps its starting price, an end date in a day, and shows both targets', pa.c === 'pmv' && pa.v === 1 && pa.base > 0 && Math.abs(pa.exp - 86400e3) < 5000 && pa.lines.length === 2 && Math.abs(pa.lines[0] / pa.base - 1.01) < 1e-9 && Math.abs(pa.lines[1] / pa.base - 0.99) < 1e-9 && /[0-9]/.test(tgt), JSON.stringify(pa) + ' ' + tgt);
     for (let k = 0; k < 8 && !(await page.evaluate(() => PRO._alerts()[0].n >= 1)); k++) {   /* other open pages may take ticks from the shared hook: offer the move again */
-      OVR.BTCUSDT = [pa.base * 0.996, pa.base * 1.004, pa.base * 1.0105, pa.base * 1.0102]; await page.waitForTimeout(2500);
+      OVR.LINKUSDT = [pa.base * 0.996, pa.base * 1.004, pa.base * 1.0105, pa.base * 1.0102]; await page.waitForTimeout(2500);
     }
     const pf = await page.evaluate(() => { const a = PRO._alerts()[0]; return { n: a.n, on: a.on, log: JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]')[0] }; });
     ok('…and fires once the price is 1% away', pf.n === 1 && pf.on === false && pf.log && /1%/.test(pf.log.msg), JSON.stringify(pf));
@@ -617,17 +619,17 @@ async function mockNet(page, stats) {
     const now = Math.floor(Date.now() / 1000);
     const lv = await page.evaluate((now) => {
       const c = PRO.app.active(), p = c.bars[c.bars.length - 1].c;
-      PRO.app.mutate('BTC', L => { L.push({ id: 'tl1', k: 'ray', pts: [{ t: now - 36000, p: p * 0.99 }, { t: now - 18000, p: p * 0.995 }], s: {} }); L.push({ id: 'ch1', k: 'channel', pts: [{ t: now - 36000, p: p * 0.98 }, { t: now - 18000, p: p * 0.99 }, { t: now - 30000, p: p * 1.02 }], s: { r: true } }); });
-      const d = PRO.app.DRAW().BTC.find(x => x.id === 'tl1');
+      PRO.app.mutate('LINK', L => { L.push({ id: 'tl1', k: 'ray', pts: [{ t: now - 36000, p: p * 0.99 }, { t: now - 18000, p: p * 0.995 }], s: {} }); L.push({ id: 'ch1', k: 'channel', pts: [{ t: now - 36000, p: p * 0.98 }, { t: now - 18000, p: p * 0.99 }, { t: now - 30000, p: p * 1.02 }], s: { r: true } }); });
+      const d = PRO.app.DRAW().LINK.find(x => x.id === 'tl1');
       PRO.alertDialog(c, { draw: d });
-      return { p, L: PRO.alertLevels({ sym: 'BTC', did: 'tl1' }, now), C: PRO.alertLevels({ sym: 'BTC', did: 'ch1' }, now), tab: document.querySelector('.pm-af [data-k="draw"].on') ? 1 : 0, opts: [...document.querySelectorAll('.pm-af [name=dc] option')].map(o => o.value).join(',') };
+      return { p, L: PRO.alertLevels({ sym: 'LINK', did: 'tl1' }, now), C: PRO.alertLevels({ sym: 'LINK', did: 'ch1' }, now), tab: document.querySelector('.pm-af [data-k="draw"].on') ? 1 : 0, opts: [...document.querySelectorAll('.pm-af [name=dc] option')].map(o => o.value).join(',') };
     }, now);
     const lineAt = lv.p * 0.99 + lv.p * 0.005 * 36000 / 18000, base = lv.p * 0.98 + lv.p * 0.01 * 2, off = lv.p * 1.02 - (lv.p * 0.98 + lv.p * 0.01 * 6000 / 18000);
     ok('a ray: the alert reads the line where it is now; a channel gives both sides', lv.tab === 1 && lv.opts === 'cross,up,down' && Math.abs(lv.L[0] / lineAt - 1) < 1e-4 && Math.abs(lv.C[0] / base - 1) < 1e-4 && Math.abs(lv.C[1] / (base + off) - 1) < 1e-4, JSON.stringify(lv));
     await page.selectOption('.pm-af [name=dc]', 'up'); await page.click('.pm-af button[type=submit]'); await page.waitForTimeout(300);
-    const L1 = await page.evaluate(() => PRO.alertLevels({ sym: 'BTC', did: 'tl1' }, Date.now() / 1000)[0]);
+    const L1 = await page.evaluate(() => PRO.alertLevels({ sym: 'LINK', did: 'tl1' }, Date.now() / 1000)[0]);
     for (let k = 0; k < 8 && !(await page.evaluate(() => PRO._alerts()[0].k === 'draw' && PRO._alerts()[0].n >= 1)); k++) {
-      OVR.BTCUSDT = [L1 * 0.997, L1 * 0.999, L1 * 1.004, L1 * 1.006]; await page.waitForTimeout(2500);
+      OVR.LINKUSDT = [L1 * 0.997, L1 * 0.999, L1 * 1.004, L1 * 1.006]; await page.waitForTimeout(2500);
     }
     const df = await page.evaluate(() => { const a = PRO._alerts()[0]; return { k: a.k, c: a.c, n: a.n, dk: a.dk }; });
     ok('…and fires when the price breaks above the ray', df.k === 'draw' && df.c === 'up' && df.n === 1 && df.dk === 'ray', JSON.stringify(df));
@@ -755,6 +757,45 @@ async function mockNet(page, stats) {
     await p2.waitForTimeout(1200);
     const sy = await p2.evaluate(() => { const s = PRO.app.active().cfg.sym; return { d: (PRO.app.DRAW()[s] || []).some(x => x.id === 'syncx'), a: PRO._alerts().length }; });
     ok('two tabs stay in step: the drawing and the alert made in one show in the other', sy.d && sy.a >= 1, JSON.stringify(sy));
+    await ctx.close();
+  }
+
+  /* ---------- continuous quarterly futures (Bybit) with B-ADJ */
+  if (!ONLY || ONLY === 'fut') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    const OFF = {}, fx = (y, q) => { const d = new Date(Date.UTC(y, q, 0, 8)); while (d.getUTCDay() !== 5) d.setUTCDate(d.getUTCDate() - 1); return d.getTime() / 1000; };
+    for (let y = 2024; y <= 2027; y++) [3, 6, 9, 12].forEach((q, j) => { OFF['BTCUSD' + 'HMUZ'[j] + String(y % 100).padStart(2, '0')] = (y - 2024) * 400 + j * 100; });
+    const px = (sym, t) => 60000 + OFF[sym] + 2000 * Math.sin(t / 86400 / 9);
+    let kl = 0;
+    await page.route(/api\.bybit\.com\/v5\/market\/kline/, r => {
+      kl++; const q = new URL(r.request().url()).searchParams, sym = q.get('symbol'), sec = { D: 86400, '60': 3600, '240': 14400, '15': 900 }[q.get('interval')], s0 = +q.get('start') / 1000, e = Math.min(Math.floor(+q.get('end') / 1000), Math.floor(Date.now() / 1000));
+      const L = []; if (sym in OFF) for (let t = Math.ceil(s0 / sec) * sec; t <= e; t += sec) { const p = px(sym, t); L.push([String(t * 1000), String(p - 3), String(p + 20), String(p - 20), String(p), '100']); }
+      r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ retCode: 0, result: { list: L.reverse().slice(0, 1000) } }) });
+    });
+    await page.route(/api\.bybit\.com\/v5\/market\/tickers/, r => { const sym = new URL(r.request().url()).searchParams.get('symbol'), p = px(sym, Date.now() / 1000); r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ retCode: 0, result: { list: [{ lastPrice: String(p), prevPrice24h: String(p * 0.99), highPrice24h: String(p * 1.01), lowPrice24h: String(p * 0.98), volume24h: '123456' }] } }) }); });
+    await page.click('.pm-lsym'); await page.waitForSelector('.pm-ss'); await page.waitForTimeout(150);
+    await page.click('.pm-sscat .pm-chip:last-child'); await page.waitForSelector('.pm-ssi[data-s="BTC_F1"]');
+    const list = await page.evaluate(() => [...document.querySelectorAll('.pm-ssi')].map(b => b.getAttribute('data-s') + ' ' + b.querySelector('b').textContent));
+    await page.click('.pm-ssi[data-s="BTC_F1"]');
+    await page.waitForFunction(() => { const c = PRO.app.active(); return c.cfg.sym === 'BTC_F1' && c.feed && c.feed.state === 'poll' && c.disp.length > 100; }, null, { timeout: 20000 });
+    const f1 = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars; return { n: b.length, src: document.querySelector('.pm-src').textContent, pair: document.querySelector('.pm-lsym b').textContent, badj: !!document.querySelector('.pm-badj'), on: document.querySelector('.pm-badj').classList.contains('on'), gaps: b.filter((x, i) => i && x.t - b[i - 1].t !== 3600).length, last: b[b.length - 1].c, front: c.feed.front && c.feed.front.c }; });
+    ok('futures: BTC1! in its own search tab, a continuous hourly chart from Bybit with a B-ADJ button', list.join() === 'BTC_F1 BTC1!,ETH_F1 ETH1!' && f1.src === 'Bybit' && f1.pair === 'BTC1!' && f1.badj && !f1.on && f1.gaps === 0 && f1.n > 1000, JSON.stringify(f1));
+    const exp = await page.evaluate(() => { const n = Date.now() / 1000; return PRO._futExp(n, n)[0]; });
+    ok('the front contract is the next quarterly expiry, and its price is the real one', f1.front === 'BTCUSD' + exp.code && Math.abs(f1.last - (60000 + OFF['BTCUSD' + exp.code] + 2000 * Math.sin(Math.floor(Date.now() / 3600000) * 3600 / 86400 / 9))) < 30, JSON.stringify({ front: f1.front, last: f1.last }));
+    await page.evaluate(() => PRO.app.active().setTF('1d')); await page.waitForFunction(() => { const c = PRO.app.active(); return c.cfg.tf === '1d' && c.feed && c.feed.state === 'poll' && c.disp.length > 300; }, null, { timeout: 20000 });
+    const raw = await page.evaluate(() => PRO.app.active().bars.map(b => [b.t, b.c]));
+    await page.click('.pm-badj'); await page.waitForFunction(() => { const c = PRO.app.active(); return c.feed && c.feed.adj && c.feed.state === 'poll' && c.disp.length > 300; }, null, { timeout: 20000 });
+    const adj = await page.evaluate(() => ({ b: PRO.app.active().bars.map(b => [b.t, b.c]), gaps: PRO.app.active().feed.gaps.map(g => g.gap), on: document.querySelector('.pm-badj').classList.contains('on'), saved: JSON.parse(localStorage.getItem('ek_pro_badj') || '{}') }));
+    const rmap = new Map(raw), lastSame = adj.b[adj.b.length - 1][1] === rmap.get(adj.b[adj.b.length - 1][0]);
+    const wave = t => 2000 * Math.sin(t / 86400 / 9), jump = (A, i) => Math.abs((A[i][1] - A[i - 1][1]) - (wave(A[i][0]) - wave(A[i - 1][0])));   /* what is left after the market's own move */
+    let rawJ = 0, adjJ = 0; for (let i = 1; i < raw.length; i++) if (jump(raw, i) > 1) rawJ++;
+    for (let i = 1; i < adj.b.length; i++) if (jump(adj.b, i) > 1) adjJ++;
+    ok('B-ADJ: the latest price stays real, the rolls\' jumps disappear from the history, and the choice is remembered', adj.on && adj.saved.BTC_F1 === true && lastSame && rawJ >= 2 && adjJ === 0 && adj.gaps.length >= 2 && adj.gaps.every(g => g === 100 || g === 200), JSON.stringify({ rawJ, adjJ, gaps: adj.gaps, lastSame }));
+    await shot(page, '72_fa_futures_badj');
+    await page.evaluate(() => { PRO.app.active().setTF('1h'); }); await page.waitForTimeout(1500);
+    const kl0 = kl; await page.waitForTimeout(6500);
+    ok('the chart keeps polling Bybit for the live bar', kl > kl0, String(kl - kl0));
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_badj'); PRO.app.active().setSym('BTC'); });
     await ctx.close();
   }
 

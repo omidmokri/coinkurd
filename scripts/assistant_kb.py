@@ -230,7 +230,8 @@ FAQ = [
     (["بک تست", "بک‌تست", "بکتست", "backtest", "back test", "تستر استراتژی", "strategy tester", "بهینه سازی", "بهینه‌سازی", "optimizer",
       "حساب تمرینی", "practice account", "دیده بان بازار", "دیده‌بان بازار", "market watch", "screener", "اسکرینر", "هشدار خبر",
       "هشدار اخبار", "news alert", "اخبار روی چارت", "news on chart", "هشدار خط روند", "trendline alert", "کد qr", "qr code",
-      "انتقال به گوشی", "باکتێست", "باشترکردن", "چاودێری بازاڕ", "ئاگادارکەرەوەی هەواڵ", "هەواڵ لەسەر چارت"],
+      "انتقال به گوشی", "باکتێست", "باشترکردن", "چاودێری بازاڕ", "ئاگادارکەرەوەی هەواڵ", "هەواڵ لەسەر چارت",
+      "فیوچرز", "فیوچرز فصلی", "b-adj", "badj", "futures", "quarterly futures", "فیوچەرز"],
      L("بک‌تست، بهینه‌سازی استراتژی و دیده‌بان بازار دارید؟", "باکتێست، باشترکردنی ستراتیژ و چاودێری بازاڕتان هەیە؟",
        "Do you have backtesting, strategy optimization and a market watch?"),
      L("بله، در «بازار زنده»: دکمهٔ «بک‌تست» ۸ استراتژی (و روی BTC سیگنال‌های کردستانی) را روی تاریخچهٔ چارت تا ۲۰٬۰۰۰ کندل می‌آزماید؛ "
@@ -238,19 +239,22 @@ FAQ = [
        "منحنی سرمایه و فایل CSV معامله‌ها را دارد. در بازپخش، حساب تمرینی با سفارش لیمیت و استاپ، حد ضرر و سود، حد ضرر متحرک، اهرم و "
        "کارمزد کار می‌کند. «دیده‌بان بازار» همهٔ کوین‌های بایننس یا بازار ایران را با حجم، تغییر، دامنهٔ ۲۴ساعته و RSI مرتب و فیلتر "
        "می‌کند. هشدار هم برای حرکت درصدی، خط روند و کانال، اندیکاتور و اخبار هست؛ اخبار هر ارز روی چارت دیده می‌شود و با لینک یا کد QR "
-       "همان فضای کار در گوشی باز می‌شود. همه شبیه‌سازی است و به هیچ صرافی وصل نمی‌شود.",
+       "همان فضای کار در گوشی باز می‌شود. فیوچرز فصلی بیت‌کوین و اتریوم (بای‌بیت) هم به‌صورت یک چارت پیوسته با دکمهٔ B-ADJ "
+       "(تعدیل تاریخچه در هر جابه‌جایی قرارداد) هست. همه شبیه‌سازی است و به هیچ صرافی وصل نمی‌شود.",
        "بەڵێ، لە «بازاڕی زیندوو»: دوگمەی «باکتێست» ٨ ستراتیژ (و لەسەر BTC سیگناڵەکانی کوردستانی) لەسەر مێژووی چارت تا ٢٠٬٠٠٠ مۆم "
        "تاقی دەکاتەوە؛ باشترکەر هەموو ڕێکخستنەکانی مەودایەک دەپشکنێت و ڕیزیان دەکات و هەر ڕاپۆرتێک قازانجی پوخت، ڕێژەی بردنەوە، "
        "فاکتەری قازانج، گەورەترین دابەزین، شارپ، هێڵی سەرمایە و فایلی CSVی مامەڵەکانی تێدایە. لە دووبارە پەخشدا هەژماری ڕاهێنان بە "
        "ئۆردەری لیمیت و ستۆپ، سنووری زیان و قازانج، لیڤەرێج و کرێ کار دەکات. «چاودێری بازاڕ» هەموو کۆینەکانی بایننس یان بازاڕی ئێران "
        "بەپێی قەبارە، گۆڕان و RSI ڕیز و پاڵاوتن دەکات. ئاگادارکەرەوە بۆ جووڵەی ڕێژەیی، هێڵی ڕەوت و کەناڵ، ئیندیکاتۆر و هەواڵیش هەیە. "
+       "فیوچەرزی وەرزیی بیتکۆین و ئیسیریۆم (بایبیت) وەک یەک چارتی بەردەوام لەگەڵ دوگمەی B-ADJ هەیە. "
        "هەموو شتێک هاوشێوەکردنە و بە هیچ ئاڵوگۆڕخانەیەک پەیوەندی ناکات.",
        "Yes — on the Live market page: the Backtest button tests 8 strategies (plus the Kurdistani signals on BTC) on up to 20,000 bars of "
        "the chart's history; the optimizer tries every setting in a range and ranks them, and each report has the net result, win rate, "
        "profit factor, max drawdown, Sharpe, the equity curve and a CSV of the trades. In bar replay, a practice account works with limit "
        "and stop orders, stop-loss and take-profit, a trailing stop, leverage and fees. Market watch sorts and filters every Binance coin or "
        "Iran's market by volume, change, 24h range and RSI. Alerts also cover % moves, trend lines and channels, indicators and news; a "
-       "coin's news shows on the chart, and a link or QR code opens the same workspace on your phone. It is all simulation — no exchange "
+       "coin's news shows on the chart, and a link or QR code opens the same workspace on your phone. Bitcoin and Ethereum quarterly "
+       "futures (Bybit) run as one continuous chart with a B-ADJ button that back-adjusts each roll. It is all simulation — no exchange "
        "is contacted."),
      "/market/"),
 ]
