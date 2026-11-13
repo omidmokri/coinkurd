@@ -13,10 +13,26 @@
   var root = document.getElementById('dca');
   if (!root) return;
   var API = 'https://data-api.binance.vision/api/v3/klines', DAY = 86400000;
-  var COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'TRX', 'AVAX', 'LINK', 'DOT', 'LTC', 'BCH', 'NEAR', 'ATOM', 'UNI',
-    'ETC', 'XLM', 'FIL', 'APT', 'ARB', 'OP', 'SUI', 'INJ', 'AAVE', 'TON', 'PEPE', 'SHIB', 'FET', 'HBAR', 'ALGO', 'ICP', 'PAXG'];
+  var COINS = ['GOLD', 'BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'TRX', 'AVAX', 'LINK', 'DOT', 'LTC', 'BCH', 'NEAR', 'ATOM', 'UNI',
+    'ETC', 'XLM', 'FIL', 'APT', 'ARB', 'OP', 'SUI', 'INJ', 'AAVE', 'TON', 'PEPE', 'SHIB', 'FET', 'HBAR', 'ALGO', 'ICP'];
+  var SYM = { GOLD: 'PAXG' };            /* gold = PAX Gold on Binance: one token is one fine troy ounce held in a London vault */
+  var OZ_G = 31.1034768;                 /* grams in a troy ounce */
+  var RATE = null, RATE_T = null;        /* toman per dollar (USDT), live from the site's own market reading */
   var S = {
-    coin: ['ارز', 'دراو', 'Coin'], budget: ['کل بودجه (دلار)', 'کۆی بودجە (دۆلار)', 'Total budget (USD)'],
+    coin: ['دارایی', 'سامان', 'Asset'], budget: ['کل بودجه', 'کۆی بودجە', 'Total budget'],
+    gold: ['طلا (اونس جهانی)', 'زێڕ (ئۆنسی جیهانی)', 'Gold (world ounce)'],
+    cur: ['واحد پول', 'یەکەی پارە', 'Currency'], irt: ['تومان', 'تومان', 'Toman'], usdc: ['دلار', 'دۆلار', 'US dollar'],
+    rate: ['مبالغ تومانی با نرخ لحظه‌ای تتر (هر دلار {r} تومان، {t}) حساب شده‌اند؛ نرخ‌های گذشتهٔ تومان در محاسبه نیست، پس بازده همان بازده دلاری است.',
+      'بڕە تمەنییەکان بە نرخی ئێستای تەتەر (هەر دۆلارێک {r} تومان، {t}) ژمێردراون؛ نرخەکانی ڕابردووی تمەن تێدا نییە، بۆیە قازانج هەمان قازانجی دۆلارییە.',
+      'Toman amounts use the live USDT rate ({r} toman per dollar, {t}); past toman rates are not used, so the return is the dollar return.'],
+    norate: ['نرخ تومان در دسترس نبود؛ مبالغ به دلار است.', 'نرخی تمەن بەردەست نەبوو؛ بڕەکان بە دۆلارن.', 'The toman rate was not available; amounts are in dollars.'],
+    goldnote: ['طلا با توکن PAXG بایننس شبیه‌سازی شده: هر توکن یک اونس طلای خالص (۳۱٫۱ گرم) است و قیمتش قیمت جهانی طلاست، نه قیمت بازار تهران.',
+      'زێڕ بە تۆکنی PAXGی بایننس هاوشێوە کراوە: هەر تۆکنێک یەک ئۆنس زێڕی پاکە (٣١٫١ گرام) و نرخەکەی نرخی جیهانیی زێڕە.',
+      'Gold is simulated with Binance\'s PAXG token: one token is one fine troy ounce (31.1 g) at the world gold price, not a local market price.'],
+    inv: ['کل سرمایهٔ خرج‌شده', 'کۆی سەرمایەی خەرجکراو', 'Total invested'], prof: ['سود / زیان', 'قازانج / زیان', 'Profit / loss'],
+    hold: ['دارایی خریده‌شده', 'سامانی کڕدراو', 'Holdings'], oz: ['اونس', 'ئۆنس', 'oz'], gr: ['گرم', 'گرام', 'g'],
+    dcab: ['ارزش خرید پلکانی در برابر پول خرج‌شده', 'بەهای کڕینی پلەپلە بەرامبەر پارەی خەرجکراو', 'DCA value against the money put in'],
+    spent: ['پول خرج‌شده تا آن روز', 'پارەی خەرجکراو تا ئەو ڕۆژە', 'Invested so far'],
     from: ['از تاریخ', 'لە بەرواری', 'From'], to: ['تا تاریخ (خالی = امروز)', 'تا بەرواری (بەتاڵ = ئەمڕۆ)', 'To (empty = today)'],
     freq: ['هر چند وقت یک بار بخرم؟', 'هەر چەند جار جارێک بکڕم؟', 'How often to buy?'],
     d: ['روزانه', 'ڕۆژانە', 'daily'], w: ['هفتگی', 'هەفتانە', 'weekly'], w2: ['دو هفته یک بار', 'هەر دوو هەفتە', 'every two weeks'], m: ['ماهانه', 'مانگانە', 'monthly'],
@@ -68,8 +84,16 @@
   function loc(s) { var d = DIG[lang()]; s = String(s); if (!d) return s; return s.replace(/[0-9]/g, function (c) { return d[+c]; }).replace(/\./g, '٫').replace(/,/g, '٬').replace(/-/g, '−'); }
   function nf(x, dec, sign) { if (x == null || !isFinite(x)) return '—'; if (+Math.abs(x).toFixed(dec || 0) === 0) x = 0; var s = Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 }); return loc((x < 0 ? '-' : sign && x > 0 ? '+' : '') + s); }
   function pc(x, dec, sign) { return x == null || !isFinite(x) ? '—' : nf(x * 100, dec == null ? 1 : dec, sign) + (lang() === 'en' ? '%' : '٪'); }
-  function usd(x) { return '$' + nf(x, x < 100 ? 2 : 0); }
-  function px(x) { return '$' + nf(x, x < 1 ? 5 : x < 100 ? 3 : 2); }
+  function irt() { return ST.cur === 'irt' && RATE; }
+  function usd(x) { return irt() ? nf(x * RATE, 0) + ' ' + t('irt') : '$' + nf(x, x < 100 ? 2 : 0); }
+  function px(x) { return irt() ? nf(x * RATE, x * RATE < 100 ? 2 : 0) + ' ' + t('irt') : '$' + nf(x, x < 1 ? 5 : x < 100 ? 3 : 2); }
+  function cname(c) { return c === 'GOLD' ? t('gold') : c; }
+  function hold(c, q) { return c === 'GOLD' ? nf(q, 3) + ' ' + t('oz') + ' · ' + nf(q * OZ_G, 1) + ' ' + t('gr') : nf(q, q < 10 ? 6 : 2) + ' ' + c; }
+  function loadRate() {
+    return fetch('/data/friction.json?v=' + Math.floor(Date.now() / 300000)).then(function (r) { return r.json(); }).then(function (f) {
+      var p = f && f.prices; if (p && p.usdt > 1000) { RATE = +p.usdt; RATE_T = p.usdt_time || f.updated_at; }
+    }).catch(function () { });
+  }
   function g2j(gy, gm, gd) {
     var g = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], gy2 = gm > 2 ? gy + 1 : gy;
     var days = 355666 + 365 * gy + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g[gm - 1];
@@ -91,7 +115,7 @@
     if (KL[sym]) return Promise.resolve(KL[sym]);
     var out = [], start = Date.parse('2017-08-01T00:00:00Z');
     function step() {
-      return fetch(API + '?symbol=' + sym + 'USDT&interval=1d&limit=1000&startTime=' + start).then(function (r) {
+      return fetch(API + '?symbol=' + (SYM[sym] || sym) + 'USDT&interval=1d&limit=1000&startTime=' + start).then(function (r) {
         if (!r.ok) { var e = new Error('http'); e.status = r.status; throw e; } return r.json();
       }).then(function (rows) {
         rows.forEach(function (k) { out.push(k); });
@@ -129,7 +153,7 @@
       var vL = lc * D.c[i], vD = cash + dc * D.c[i];
       if (vL > pkL) pkL = vL; if (vD > pkD) pkD = vD;
       ddL = Math.min(ddL, vL / pkL - 1); ddD = Math.min(ddD, vD / pkD - 1);
-      if (curve) curve.push([D.t[i], vL, vD]);
+      if (curve) curve.push([D.t[i], vL, vD, budget - cash]);
     }
     return { lump: lc * D.c[b], dca: cash + dc * D.c[b], ddL: ddL, ddD: ddD, coinsL: lc, coinsD: dc, amt: amt, n: buys.length, curve: curve };
   }
@@ -161,16 +185,17 @@
   function med(a) { if (!a.length) return null; var s = a.slice().sort(function (x, y) { return x - y; }), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
 
   /* ------------------------------------------------------------------ UI */
-  var ST = { coin: 'BTC', budget: 1000, from: '2022-01-01', to: '', freq: 'w', fee: 0.1, gn: 5, gs: 5 };
-  try { var q = new URLSearchParams(location.search); ['coin', 'from', 'to', 'freq'].forEach(function (k) { if (q.get(k)) ST[k] = q.get(k); }); ['budget', 'fee', 'gn', 'gs'].forEach(function (k) { if (q.get(k) && isFinite(+q.get(k))) ST[k] = +q.get(k); }); } catch (e) { }
-  if (COINS.indexOf(ST.coin) < 0) ST.coin = 'BTC'; if (!{ d: 1, w: 1, w2: 1, m: 1 }[ST.freq]) ST.freq = 'w';
+  var ST = { cur: 'irt', coin: 'BTC', budget: 1000, from: '2022-01-01', to: '', freq: 'w', fee: 0.1, gn: 5, gs: 5 };
+  try { var q = new URLSearchParams(location.search); ['coin', 'from', 'to', 'freq', 'cur'].forEach(function (k) { if (q.get(k)) ST[k] = q.get(k); }); ['budget', 'fee', 'gn', 'gs'].forEach(function (k) { if (q.get(k) && isFinite(+q.get(k))) ST[k] = +q.get(k); }); } catch (e) { }
+  if (ST.coin === 'PAXG') ST.coin = 'GOLD'; if (COINS.indexOf(ST.coin) < 0) ST.coin = 'BTC'; if (ST.cur !== 'usd') ST.cur = 'irt'; if (!{ d: 1, w: 1, w2: 1, m: 1 }[ST.freq]) ST.freq = 'w';
   var LAST = null, BUSY = false;
   function sel(id, opts, v) { return '<select id="' + id + '">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(o[0]) === String(v) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>'; }
   function render() {
     root.lang = lang();
     var h = '<div class="sl-row">' +
-      '<label>' + t('coin') + sel('dc-coin', COINS.map(function (c) { return [c, c]; }), ST.coin) + '</label>' +
-      '<label>' + t('budget') + '<input id="dc-budget" type="number" min="10" step="any" value="' + ST.budget + '" style="width:110px"></label>' +
+      '<label>' + t('coin') + sel('dc-coin', COINS.map(function (c) { return [c, cname(c)]; }), ST.coin) + '</label>' +
+      '<label>' + t('cur') + sel('dc-cur', [['irt', t('irt')], ['usd', t('usdc')]], ST.cur) + '</label>' +
+      '<label>' + t('budget') + ' (' + (irt() ? t('irt') : '$') + ')<input id="dc-budget" type="number" min="1" step="any" value="' + (irt() ? Math.round(ST.budget * RATE) : ST.budget) + '" style="width:150px"></label>' +
       '<label>' + t('from') + '<input id="dc-from" type="date" value="' + esc(ST.from) + '" min="2017-08-17"></label>' +
       '<label>' + t('to') + '<input id="dc-to" type="date" value="' + esc(ST.to) + '"></label>' +
       '<label>' + t('freq') + sel('dc-freq', [['d', t('d')], ['w', t('w')], ['w2', t('w2')], ['m', t('m')]], ST.freq) + '</label>' +
@@ -178,13 +203,18 @@
       '<label>' + t('gn') + '<input id="dc-gn" type="number" min="0" max="30" step="1" value="' + ST.gn + '" style="width:70px"></label>' +
       '<label>' + t('gs') + '<input id="dc-gs" type="number" min="0.5" max="50" step="any" value="' + ST.gs + '" style="width:70px"></label>' +
       '<button type="button" class="sl-run" id="dc-run">' + t('run') + '</button><span class="mut" id="dc-msg"></span></div><div id="dc-out"></div>';
+    dropCharts();
     root.innerHTML = h;
     root.querySelector('#dc-run').onclick = run;
+    root.querySelector('#dc-cur').onchange = function () { read(); ST.cur = this.value; render(); };
     if (LAST) show(LAST);
   }
   function msg(s) { var m = root.querySelector('#dc-msg'); if (m) m.textContent = s || ''; }
   function read() {
-    ST.coin = root.querySelector('#dc-coin').value; ST.budget = Math.max(10, +root.querySelector('#dc-budget').value || 1000);
+    ST.coin = root.querySelector('#dc-coin').value;
+    var bv = +root.querySelector('#dc-budget').value || 0;
+    ST.budget = Math.max(1, irt() ? bv / RATE : bv) || 1000;            /* kept in dollars inside; the box shows the chosen currency */
+    ST.budget = +ST.budget.toFixed(2);
     ST.from = root.querySelector('#dc-from').value || '2022-01-01'; ST.to = root.querySelector('#dc-to').value || '';
     ST.freq = root.querySelector('#dc-freq').value; ST.fee = Math.min(5, Math.max(0, +root.querySelector('#dc-fee').value || 0));
     ST.gn = Math.min(30, Math.max(0, Math.round(+root.querySelector('#dc-gn').value || 0))); ST.gs = Math.min(50, Math.max(0.5, +root.querySelector('#dc-gs').value || 5));
@@ -200,28 +230,34 @@
       var r = simulate(D, a, b, schedule(D, a, b, st.freq, false), st.budget, st.fee, true);
       var R = rolling(D, b - a, st.freq, st.budget, st.fee), G = st.gn > 0 ? grid(D, a, b, st.budget, st.fee, st.gn, st.gs) : null;
       LAST = { st: st, D: D, a: a, b: b, r: r, roll: R, g: G };
-      try { history.replaceState(null, '', '?' + new URLSearchParams({ coin: st.coin, budget: st.budget, from: st.from, to: st.to, freq: st.freq, fee: st.fee, gn: st.gn, gs: st.gs }).toString()); } catch (e) { }
+      try { history.replaceState(null, '', '?' + new URLSearchParams({ cur: ST.cur, coin: st.coin, budget: st.budget, from: st.from, to: st.to, freq: st.freq, fee: st.fee, gn: st.gn, gs: st.gs }).toString()); } catch (e) { }
       msg(''); show(LAST);
     }).catch(function (e) { msg(e && e.status === 400 ? t('err_few') : t('err_net')); }).then(function () { BUSY = false; });
   }
   function kpi(l, v, cls) { return '<div class="rc-kpi"><small>' + l + '</small><b class="' + (cls || '') + '">' + v + '</b></div>'; }
   function cl(x) { return x > 0 ? 'up' : x < 0 ? 'down' : ''; }
+  var CH = [];        /* live charts: removed before the result is drawn again (a chart left on a detached node throws) */
+  function dropCharts() { CH.forEach(function (o) { try { o.ro.disconnect(); o.c.remove(); } catch (e) { } }); CH = []; }
   function show(X) {
     var out = root.querySelector('#dc-out'); if (!out) return;
+    dropCharts();
     var r = X.r, st = X.st, D = X.D, B = st.budget, rL = r.lump / B - 1, rD = r.dca / B - 1, f = st.fee / 100;
     var dcaWins = r.dca > r.lump, diff = dcaWins ? r.dca / r.lump - 1 : r.lump / r.dca - 1;
-    var h = '<section class="rc-sec"><h2><span dir="ltr">' + esc(st.coin) + '</span> · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + ' · ' + nf(X.b - X.a + 1) + ' ' + t('days') + '</h2>';
+    var h = '<section class="rc-sec"><h2><span>' + esc(cname(st.coin)) + '</span> · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + ' · ' + nf(X.b - X.a + 1) + ' ' + t('days') + '</h2>';
     h += '<p class="' + (dcaWins ? 'up' : '') + '"><b>' + t(dcaWins ? 'win_d' : 'win_l') + ' ' + t('by') + ' ' + pc(diff, 1) + '.</b></p>';
     h += '<div class="dc-cols"><div><h3>' + t('lump') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(r.lump)) + kpi(t('ret'), pc(rL, 1, true), cl(rL)) + kpi(t('mdd'), pc(r.ddL, 1), 'down') +
-      kpi(t('avg'), px(B / r.coinsL)) + kpi(t('n'), nf(1)) + kpi(t('fees'), usd(B * f)) + '</div></div>';
+      kpi(t('avg'), px(B / r.coinsL)) + kpi(t('hold'), hold(st.coin, r.coinsL)) + kpi(t('fees'), usd(B * f)) + '</div></div>';
     h += '<div><h3>' + t('dca') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(r.dca)) + kpi(t('ret'), pc(rD, 1, true), cl(rD)) + kpi(t('mdd'), pc(r.ddD, 1), 'down') +
-      kpi(t('avg'), px(B / r.coinsD)) + kpi(t('n'), nf(r.n)) + kpi(t('each'), usd(r.amt)) + '</div></div>';
+      kpi(t('avg'), px(B / r.coinsD)) + kpi(t('hold'), hold(st.coin, r.coinsD)) + kpi(t('n'), nf(r.n)) + kpi(t('each'), usd(r.amt)) +
+      kpi(t('inv'), usd(r.curve[r.curve.length - 1][3])) + kpi(t('prof'), (r.dca - B >= 0 ? '+' : '−') + usd(Math.abs(r.dca - B)), cl(r.dca - B)) + '</div></div>';
     if (X.g) { var G = X.g, rG = G.val / B - 1;
       h += '<div><h3>' + t('grid') + '</h3><div class="rc-kpis">' + kpi(t('fin'), usd(G.val)) + kpi(t('ret'), pc(rG, 1, true), cl(rG)) + kpi(t('mdd'), pc(G.dd, 1), 'down') +
         kpi(t('avg'), G.coins ? px(G.spent / G.coins) : '—') + kpi(t('g_fill'), nf(G.filled) + ' / ' + nf(G.n)) + kpi(t('g_cash'), usd(G.cash)) + '</div><p class="mut">' + t('g_note') + ' ' + px(G.low) + '.</p></div>'; }
     h += '</div>';
+    h += '<h3>' + t('dcab') + '</h3><div class="rc-legend"><span><i style="background:#f59e0b"></i>' + t('dca') + '</span><span><i style="background:#ffffff99"></i>' + t('spent') + '</span></div><div id="dc-chart2" class="rc-chart" style="height:320px"></div>';
+    h += '<p class="mut">' + (ST.cur === 'irt' ? (RATE ? t('rate').replace('{r}', nf(RATE, 0)).replace('{t}', RATE_T ? fdate(Date.parse(RATE_T)) : '') : t('norate')) : '') + (st.coin === 'GOLD' ? ' ' + t('goldnote') : '') + '</p>';
     h += '<h3>' + t('chart') + '</h3><div class="rc-legend"><span><i style="background:#64748b"></i>' + t('lump') + '</span><span><i style="background:#f59e0b"></i>' + t('dca') + '</span>' + (X.g ? '<span><i style="background:#a855f7"></i>' + t('grid') + '</span>' : '') + '<span><i style="background:#ffffff40"></i>' + t('budgetL') + '</span></div><div id="dc-chart" class="rc-chart" style="height:300px"></div>';
-    var txt = st.coin + ' · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + '\n' + t('lump') + ': ' + pc(rL, 1, true) + ' · ' + t('dca') + ' (' + t(st.freq) + '): ' + pc(rD, 1, true) + '\n— entekhab.net';
+    var txt = cname(st.coin) + ' · ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]) + '\n' + t('lump') + ': ' + pc(rL, 1, true) + ' · ' + t('dca') + ' (' + t(st.freq) + '): ' + pc(rD, 1, true) + '\n— entekhab.net';
     h += '<p class="dc-share"><a class="rc-btn2" target="_blank" rel="noopener" href="https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent(txt) + '">📤 ' + t('share') + '</a> ' +
       '<button class="rc-btn2" type="button" id="dc-img">' + t('img') + '</button> <button class="rc-btn2" type="button" id="dc-link">' + t('link') + '</button> <span id="dc-cp" class="mut"></span></p><div id="dc-card"></div></section>';
     // every possible start date
@@ -235,7 +271,7 @@
     }
     h += '</section>';
     out.innerHTML = h;
-    draw(X);
+    requestAnimationFrame(function () { if (out.isConnected) draw(X); });
     var bi = out.querySelector('#dc-img'); if (bi) bi.onclick = function () { card(X); };
     var bl = out.querySelector('#dc-link'); if (bl) bl.onclick = function () {
       var u = location.href, ok = function () { var m = out.querySelector('#dc-cp'); if (m) m.textContent = t('copied'); };
@@ -261,7 +297,7 @@
       if (logo) { var lh = 96, lw = logo.width * lh / logo.height; x.drawImage(logo, rtl ? W - P - lw : P, 58, lw, lh); }
       txt('entekhab.net/dca', E0, 118, '700 30px ' + NUM, '#f7931a', rtl ? 'left' : 'right', 'ltr');
       txt(t('c_title'), S0, 232, '800 58px ' + FF, '#ffffff');
-      txt(st.coin + '  ·  ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]), S0, 292, '500 32px ' + FF, '#cfcfcf');
+      txt(cname(st.coin) + '  ·  ' + fdate(D.t[X.a]) + ' – ' + fdate(D.t[X.b]), S0, 292, '500 32px ' + FF, '#cfcfcf');
       txt('🏆 ' + best[0], S0, 372, '800 40px ' + FF, best[2]);
       // result rows
       var y = 430, maxV = Math.max.apply(null, rows.map(function (q) { return q[1]; }).concat([B]));
@@ -305,24 +341,35 @@
     var ready = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('800 40px Vazirmatn'), document.fonts.load('700 30px "Space Grotesk"')]).catch(function () { }) : Promise.resolve();
     ready.then(function () { var im = new Image(); im.onload = function () { go(im); }; im.onerror = function () { go(null); }; im.src = '/assets/logo-hero.webp'; });
   }
+  function cl(a){var o=[],t=-1;for(var i=0;i<a.length;i++){var v=a[i];if(v&&isFinite(v.value)&&v.time>t){o.push(v);t=v.time;}}return o;}
   function draw(X) {
     var el = document.getElementById('dc-chart'); if (!el || !window.LightweightCharts) return;
     var c = LightweightCharts.createChart(el, { height: 300, layout: { background: { color: 'transparent' }, textColor: '#9a9a94', fontFamily: 'Vazirmatn' },
       grid: { vertLines: { color: '#ffffff0d' }, horzLines: { color: '#ffffff0d' } }, rightPriceScale: { borderColor: '#ffffff1a' }, timeScale: { borderColor: '#ffffff1a' },
-      localization: { priceFormatter: function (p) { return '$' + nf(p, 0); } } });
+      localization: { priceFormatter: function (p) { return usd(p); } } });
     var sec = function (ms) { return Math.floor(ms / 1000); }, cv = X.r.curve;
     var bud = c.addLineSeries({ color: '#ffffff40', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false });
     var l = c.addLineSeries({ color: '#64748b', lineWidth: 2, priceLineVisible: false });
     var d = c.addLineSeries({ color: '#f59e0b', lineWidth: 2, priceLineVisible: false });
-    bud.setData(cv.map(function (p) { return { time: sec(p[0]), value: X.st.budget }; }));
-    l.setData(cv.map(function (p) { return { time: sec(p[0]), value: p[1] }; }));
-    d.setData(cv.map(function (p) { return { time: sec(p[0]), value: p[2] }; }));
-    if (X.g) { var g = c.addLineSeries({ color: '#a855f7', lineWidth: 2, priceLineVisible: false }); g.setData(cv.map(function (p, i) { return { time: sec(p[0]), value: X.g.curve[i] }; })); }
+    bud.setData(cl(cv.map(function (p) { return { time: sec(p[0]), value: X.st.budget }; })));
+    l.setData(cl(cv.map(function (p) { return { time: sec(p[0]), value: p[1] }; })));
+    d.setData(cl(cv.map(function (p) { return { time: sec(p[0]), value: p[2] }; })));
+    if (X.g) { var g = c.addLineSeries({ color: '#a855f7', lineWidth: 2, priceLineVisible: false }); g.setData(cl(cv.map(function (p, i) { return { time: sec(p[0]), value: X.g.curve[i] }; }))); }
     c.timeScale().fitContent();
-    new ResizeObserver(function () { c.applyOptions({ width: el.clientWidth }); }).observe(el);
+    var ro = new ResizeObserver(function () { if (el.isConnected) c.applyOptions({ width: el.clientWidth }); }); ro.observe(el); CH.push({ c: c, ro: ro });
+    /* as dcabtc.com draws it: the DCA portfolio as a filled area over the money put in so far (a rising step) */
+    var el2 = document.getElementById('dc-chart2'); if (!el2) return;
+    var c2 = LightweightCharts.createChart(el2, { height: 320, layout: { background: { color: 'transparent' }, textColor: '#9a9a94', fontFamily: 'Vazirmatn' },
+      grid: { vertLines: { color: '#ffffff0d' }, horzLines: { color: '#ffffff0d' } }, rightPriceScale: { borderColor: '#ffffff1a' }, timeScale: { borderColor: '#ffffff1a' },
+      localization: { priceFormatter: function (p) { return usd(p); } } });
+    var area = c2.addAreaSeries({ lineColor: '#f59e0b', topColor: 'rgba(245,158,11,.45)', bottomColor: 'rgba(245,158,11,.04)', lineWidth: 2, priceLineVisible: false });
+    var inv = c2.addLineSeries({ color: '#ffffffaa', lineWidth: 2, lineType: 1, priceLineVisible: false });
+    area.setData(cl(cv.map(function (p) { return { time: sec(p[0]), value: p[2] - (X.st.budget - p[3]) }; })));
+    inv.setData(cl(cv.map(function (p) { return { time: sec(p[0]), value: p[3] }; })));
+    c2.timeScale().fitContent();
+    var ro2 = new ResizeObserver(function () { if (el2.isConnected) c2.applyOptions({ width: el2.clientWidth }); }); ro2.observe(el2); CH.push({ c: c2, ro: ro2 });
   }
-  render();
+  loadRate().then(function () { render(); if (location.search.indexOf('coin=') >= 0) run(); });
   new MutationObserver(function () { if (root.lang !== lang()) render(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
-  // a shared link runs straight away
-  if (location.search.indexOf('coin=') >= 0) run();
+  /* a shared link runs straight away, once the toman rate is in (above) */
 })();

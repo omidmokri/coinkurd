@@ -71,7 +71,7 @@ FAMILIES = {
     "sec_": ["btc", "l1", "defi", "l2", "ai", "meme", "rwa", "exch", "infra", "game", "privacy", "other", "stable", "wrapped"],
     "fng_": ["extreme_fear", "fear", "neutral", "greed", "extreme_greed"], "src_": ["map", "flow", "liq", "etf"],
     "p_": ["over", "chart", "flow", "book", "deriv", "ek"], "tr_": ["up", "down", "range"], "dom_": ["btc", "eth", "stable", "others"], "e_": ["btc", "eth"],
-    "pal_": ["rg", "by"],
+    "pal_": ["rg", "by"], "bt_": ["pub", "priv", "gov", "etf", "defi"], "w_": ["co", "etf", "metal", "crypto"],
     "op_": ["rsi_oversold", "rsi_overbought", "bull_divergence", "bear_divergence", "breakout_up", "breakout_down", "ema_golden_cross", "ema_death_cross", "volume_spike"],
 }
 NOT_KEYS = {"live", "snap", "saver", "x", "fa", "en", "ckb", "ar", "flow", "mc", "ch", "fl"}

@@ -373,3 +373,10 @@ section.mm-about a{color:#f7931a}
   .mm-tip{display:none}
 }
 .mm-btn.off{opacity:.45;pointer-events:none}
+.mm-btbar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:6px 0 8px;direction:ltr}
+.mm-btbar i{display:block;height:100%}
+.mm-btleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:#c9c9c4}
+.mm-btleg span{display:inline-flex;align-items:center;gap:5px}
+.mm-btleg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.mm-btleg small{color:#8d8d87}
+.mm-ft tr.mm-hl td{background:rgba(247,147,26,.12)}

@@ -11,13 +11,13 @@ import build_strategy_lab as SL  # noqa: E402  (same form styles)
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "3"
+VER = "4"
 T = {
-    "title": L("شبیه‌ساز خرید پلکانی (DCA) در برابر خرید یکجا", "هاوشێوەکەری کڕینی پلەپلە (DCA) بەرامبەر کڕینی یەکجار",
-               "DCA vs lump sum simulator"),
-    "desc": L("یک بودجه را یا یکجا بخر، یا در خریدهای مساوی هفتگی و ماهانه پخش کن. با قیمت‌های واقعی بایننس و کارمزد، ببین کدام جلو بود، افت دارایی در هر کدام چقدر بود، و در تمام تاریخچهٔ ارز چند بار DCA برده است.",
-              "بودجەیەک یان یەکجار بکڕە، یان لە کڕینی یەکسانی هەفتانە و مانگانەدا دابەشی بکە. بە نرخی ڕاستەقینەی بایننس و کرێ، ببینە کامیان پێشکەوت، داکەوتنی سامان چەند بوو، و لە هەموو مێژووی دراوەکەدا DCA چەند جار بردیەوە.",
-              "Spend a budget at once, or split it into equal weekly or monthly buys. On real Binance prices and fees, see which came out ahead, how deep each one's drawdown was, and how often DCA won across the coin's whole history."),
+    "title": L("شبیه‌ساز خرید پلکانی (DCA) در برابر خرید یکجا: طلا و رمزارز", "هاوشێوەکەری کڕینی پلەپلە (DCA) بەرامبەر یەکجار: زێڕ و دراو",
+               "DCA vs lump sum: gold and crypto"),
+    "desc": L("طلا یا هر رمزارز: یک بودجه (به تومان یا دلار) را یا یکجا بخر، یا در خریدهای مساوی هفتگی و ماهانه پخش کن. با قیمت‌های واقعی بایننس و کارمزد، ببین کدام جلو بود، افت دارایی در هر کدام چقدر بود، و در تمام تاریخچهٔ ارز چند بار DCA برده است.",
+              "زێڕ یان هەر دراوێک: بودجەیەک (بە تمەن یان دۆلار) یان یەکجار بکڕە، یان لە کڕینی یەکسانی هەفتانە و مانگانەدا دابەشی بکە. بە نرخی ڕاستەقینەی بایننس و کرێ، ببینە کامیان پێشکەوت، داکەوتنی سامان چەند بوو، و لە هەموو مێژووی دراوەکەدا DCA چەند جار بردیەوە.",
+              "Gold or any coin: spend a budget (in toman or dollars) at once, or split it into equal weekly or monthly buys. On real Binance prices and fees, see which came out ahead, how deep each one's drawdown was, and how often DCA won across the coin's whole history."),
     "home": L("خانه", "ماڵەوە", "Home"),
     "local": L("همه‌چیز در مرورگر خودت اجرا می‌شود: قیمت‌ها مستقیم از بایننس می‌آیند و هیچ داده‌ای از تو ذخیره یا ارسال نمی‌شود.",
                "هەموو شتێک لە وێبگەڕی خۆتدا دەکرێت: نرخەکان ڕاستەوخۆ لە بایننسەوە دێن و هیچ داتایەکی تۆ پاشەکەوت یان نێردراو نییە.",

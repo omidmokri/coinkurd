@@ -74,6 +74,44 @@
         return '<tr><td><b>' + esc(r.n) + '</b><small>' + flag(r.c) + ' ' + esc(r.s) + '</small></td><td class="mm-n">' + MM.fmtQty(r.h) + '</td><td class="mm-n">' + MM.fmtUsd(val) + '</td><td class="mm-n ' + MM.cls(pl) + '">' + MM.fmtPct(pl) + '</td><td class="mm-n">' + (r.p != null ? MM.loc((+r.p).toFixed(+r.p >= 1 ? 2 : 3)) + '%' : '—') + '</td></tr>';
       }).join('') + '</tbody></table></div><p class="mm-p-note">' + esc(T('t_note')) + '</p>';
   }
+  /* Bitcoin Treasuries: who holds BTC (by holder type) and the 100 listed companies with the most */
+  var BT_CATS = ['pub', 'priv', 'gov', 'etf', 'defi'], BT_COL = { pub: '#f7931a', priv: '#c084fc', gov: '#60a5fa', etf: '#34d399', defi: '#94a3b8' };
+  function btCard(b) {
+    if (!b || !b.top) return '';
+    var c = D.by.BTC, px = c ? c.p : null, cats = b.cats || {}, tot = 0;
+    BT_CATS.forEach(function (k) { tot += cats[k] || 0; });
+    var bar = tot ? '<div class="mm-btbar">' + BT_CATS.filter(function (k) { return cats[k]; }).map(function (k) {
+      return '<i style="width:' + (cats[k] / tot * 100).toFixed(2) + '%;background:' + BT_COL[k] + '" title="' + esc(T('bt_' + k)) + '"></i>'; }).join('') + '</div>' +
+      '<div class="mm-btleg">' + BT_CATS.filter(function (k) { return cats[k]; }).map(function (k) {
+        return '<span><i style="background:' + BT_COL[k] + '"></i>' + esc(T('bt_' + k)) + ' <b class="mm-n">' + MM.fmtQty(cats[k]) + ' ₿</b> <small class="mm-n">' + (px ? MM.fmtUsd(cats[k] * px) : '') + ' · ' + (cats[k] / 21e6 * 100).toFixed(2) + '%</small></span>'; }).join('') + '</div>' +
+      '<p class="mm-p-note">' + esc(T('bt_all', { b: MM.loc(Math.round(tot).toLocaleString('en-US')), p: MM.loc((tot / 21e6 * 100).toFixed(2)) + '%' })) + '</p>' : '';
+    var all = st.btAll, rows = b.top.slice(0, all ? 100 : 20);
+    var tb = '<div class="mm-tw"><table class="mm-ft mm-bt"><thead><tr><th>#</th><th>' + esc(T('bt_co')) + '</th><th>' + esc(T('bt_btc')) + '</th><th>' + esc(T('bt_val')) + '</th><th>' + esc(T('bt_mc')) + '</th><th>' + esc(T('bt_ratio')) + '</th><th>' + esc(T('bt_21')) + '</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        var v = px ? r.h * px : r.v, ratio = r.mc ? v / r.mc : null;
+        return '<tr><td class="mm-n">' + MM.loc(r.r) + '</td><td><b>' + esc(r.n) + '</b><small>' + flag(r.c) + ' ' + esc(r.s) + '</small></td><td class="mm-n">' + MM.fmtQty(r.h) + '</td><td class="mm-n">' + MM.fmtUsd(v) + '</td><td class="mm-n">' + (r.mc ? MM.fmtUsd(r.mc) : '—') + '</td>' +
+          '<td class="mm-n">' + (ratio != null ? MM.loc((ratio * 100).toFixed(ratio >= 1 ? 0 : 1)) + '%' : '—') + '</td><td class="mm-n">' + (r.p != null ? MM.loc((+r.p).toFixed(+r.p >= 1 ? 2 : 3)) + '%' : '—') + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    return '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('bt_t')) + '</h3></div><p class="mm-sub">' + esc(T('bt_sub')) + '</p>' + bar + tb +
+      (b.top.length > 20 ? '<p><button type="button" class="mm-btn" data-btall>' + esc(T(all ? 'bt_less' : 'bt_more', { n: MM.loc(b.top.length) })) + '</button></p>' : '') +
+      '<p class="mm-p-note">' + esc(T('bt_note', { t: MM.fmtDate(b.t, true) })) + '</p></section>';
+  }
+  /* the world's largest assets (8marketcap), Bitcoin's place among them */
+  var W_ICON = { co: '🏢', etf: '📊', metal: '🥇', crypto: '' };
+  function worldCard(w) {
+    if (!w || !w.top) return '';
+    var rows = w.top.slice(0, 20), btc = w.btc, gold = w.top.filter(function (r) { return r.s === 'GOLD'; })[0];
+    if (btc && !rows.some(function (r) { return r.s === 'BTC' && r.k === 'crypto'; })) rows.push(btc);
+    var k = '<div class="mm-kpis sm">' + (btc ? '<div class="mm-kpi"><small>' + esc(T('w_rank')) + '</small><b class="mm-n">#' + MM.loc(btc.r) + '</b><span class="mm-n">' + MM.fmtUsd(btc.mc) + '</span></div>' : '') +
+      (btc && gold ? '<div class="mm-kpi"><small>' + esc(T('w_gold')) + '</small><b class="mm-n">' + MM.loc((btc.mc / gold.mc * 100).toFixed(1)) + '%</b><span class="mm-n">' + MM.fmtUsd(gold.mc) + '</span></div>' : '') + '</div>';
+    var tb = '<div class="mm-tw"><table class="mm-ft"><thead><tr><th>#</th><th>' + esc(T('w_asset')) + '</th><th>' + esc(T('w_mc')) + '</th><th>' + esc(T('w_px')) + '</th><th>' + esc(T('w_d1')) + '</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        var ic = r.k === 'crypto' && MM.A.meta && MM.A.meta.i && MM.A.meta.i[r.s] != null ? MM.logo(r.s, 16) : '<span aria-hidden="true">' + (W_ICON[r.k] || '') + '</span>';
+        return '<tr' + (r.s === 'BTC' && r.k === 'crypto' ? ' class="mm-hl"' : '') + '><td class="mm-n">' + MM.loc(r.r) + '</td><td>' + ic + ' <b>' + esc(r.n) + '</b><small>' + esc(T('w_' + r.k)) + ' · ' + esc(r.s) + '</small></td><td class="mm-n">' + MM.fmtUsd(r.mc) + '</td><td class="mm-n">' + (r.p != null ? MM.fmtP(r.p) : '—') + '</td><td class="mm-n ' + MM.cls(r.d1) + '">' + MM.fmtPct(r.d1) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    return '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('w_t')) + '</h3></div><p class="mm-sub">' + esc(T('w_sub')) + '</p>' + k + tb +
+      '<p class="mm-p-note">' + esc(T('w_note', { s: '8marketcap', t: MM.fmtDate(w.t, true) })) + '</p></section>';
+  }
   function movers() {
     var tf = S.tf, list = D.coins.filter(function (c) { return c.sec !== 'wrapped'; }).slice(0, 250), tot = list.reduce(function (s, c) { return s + (c.mc || 0); }, 0), by = {};
     list.forEach(function (c) { var g = by[c.sec] = by[c.sec] || { k: c.sec, mc: 0, w: 0, wm: 0, n: 0 }; g.mc += c.mc || 0; g.n++; var v = c.ch[tf]; if (v != null) { g.w += (c.mc || 0) * v; g.wm += c.mc || 0; } });
@@ -114,8 +152,9 @@
         '<div class="mm-lgd"><span><i style="background:' + MM.upc() + '"></i>' + esc(T('e_inL')) + '</span><span><i style="background:' + MM.dnc() + '"></i>' + esc(T('e_outL')) + '</span><span><i style="background:#f7931a"></i>' + esc(T('e_cumL')) + '</span></div>' +
         '<h4>' + esc(T('e_funds')) + '</h4>' + funds(x) : '<p class="mm-p-note">' + esc(T(e ? 'e_none' : 'loading')) + '</p>') +
       '<p class="mm-p-note">' + esc(src) + ' ' + esc(T('e_note')) + '</p></section>' +
-      '<div class="mm-two cards"><section class="mm-card"><div class="mm-ch"><h3>' + esc(T('t_btc')) + '</h3></div>' + treasury(e && e.tre && e.tre.btc, 'BTC') + '</section>' +
-      '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('t_eth')) + '</h3></div>' + treasury(e && e.tre && e.tre.eth, 'ETH') + '</section></div>' +
+      (e && e.bt ? btCard(e.bt) : '') +
+      '<div class="mm-two cards">' + (e && e.bt ? '' : '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('t_btc')) + '</h3></div>' + treasury(e && e.tre && e.tre.btc, 'BTC') + '</section>') +
+      '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('t_eth')) + '</h3></div>' + treasury(e && e.tre && e.tre.eth, 'ETH') + '</section>' + (e && e.world ? worldCard(e.world) : '') + '</div>' +
       '<div class="mm-two cards"><section class="mm-card"><div class="mm-ch"><h3>' + esc(T('moversT', { tf: MM.TFLBL[S.tf] })) + '</h3></div><p class="mm-sub">' + esc(T('moversSub')) + '</p>' + (D.ok ? movers() : '') + '</section>' +
       '<section class="mm-card"><div class="mm-ch"><h3>' + esc(T('distT')) + '</h3></div>' + (D.ok ? MM.slot('dist') : '') + '</section></div>';
     if (x) MM.fill(st.box, 'etfc', function (w) { return chart(x, st.n || x.days.length, w); });
@@ -129,6 +168,7 @@
     st.box.addEventListener('click', function (e) {
       var a = e.target.closest('[data-asset]'); if (a) { st.asset = a.getAttribute('data-asset'); MM.store.set('ek_mm_etf', st.asset); render(); return; }
       var n = e.target.closest('[data-n]'); if (n) { st.n = +n.getAttribute('data-n'); MM.store.set('ek_mm_etfn', st.n); render(); return; }
+      if (e.target.closest('[data-btall]')) { st.btAll = !st.btAll; render(); return; }
       var sc = e.target.closest('[data-sec]'); if (sc) { MM.pendingZoom = sc.getAttribute('data-sec'); MM.switchTo('heatmap'); }
     });
     st.onData = MM.debounce(later, 500);
