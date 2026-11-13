@@ -234,6 +234,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   nodes, text at real size), Arabic with ar.js as CI deploys it, language switches both ways.
 - Limits: the order-book heatmap builds up while the page is open (no public history of the book); ETF days come from
   Farside's public tables; Binance flow counts Binance only.
+- First live run (09:50 UTC, 13 Nov): 246 coins, every one with its own logo (154 fetched, sheet 197 kB), 113 Binance
+  pairs (XMR, LIT, BEAM and AUTO refused by the 15 % price check), ETF 2026-11-12 BTC −$47.7M / ETH −$8.0M. CoinGecko's
+  `bridged-tokens` list turned out to hold native coins too (SPX6900 showed as "wrapped"): no longer used.
 
 ### 2026-11-12 · /market/: the live market — faraz.io's advanced features for every visitor (owner's request in chat, not by the loop)
 - New static page `market/index.html` (chrome.py STATIC, first item of the «بازار» menu, sitemap, home CTA in the live

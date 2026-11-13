@@ -53,7 +53,9 @@ TOP = 250
 # a coin's primary sector: the first group (in this order) whose CoinGecko categories contain it. BTC is its own block.
 SECTORS = [
     ("stable", ["stablecoins"]),
-    ("wrapped", ["wrapped-tokens", "liquid-staking-tokens", "liquid-restaking-tokens", "bridged-tokens"]),
+    # not "bridged-tokens": CoinGecko lists native coins there too when a bridged copy exists (SPX6900 sat in it);
+    # bridged copies are still caught by their names (WRAPPED_NAME)
+    ("wrapped", ["wrapped-tokens", "liquid-staking-tokens", "liquid-restaking-tokens"]),
     ("meme", ["meme-token"]),
     ("ai", ["artificial-intelligence"]),
     ("rwa", ["real-world-assets-rwa"]),
@@ -301,8 +303,8 @@ def logo_ok(path):
         im = Image.open(io.BytesIO(b))
         if min(im.size) < 16:
             return False
-        rgba = im.convert("RGBA").resize((24, 24))
-        px = [p for p in rgba.getdata() if p[3] > 40]
+        raw = im.convert("RGBA").resize((24, 24)).tobytes()          # (Image.getdata is deprecated in Pillow)
+        px = [tuple(raw[i:i + 4]) for i in range(0, len(raw), 4) if raw[i + 3] > 40]
         if len(px) < 40:                       # (nearly) empty
             return False
         cols = {(p[0] // 32, p[1] // 32, p[2] // 32) for p in px}
