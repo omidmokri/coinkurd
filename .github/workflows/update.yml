@@ -120,7 +120,7 @@ jobs:
 
       - name: Coin logos (CoinGecko, then CoinCap; every Binance USDT coin + tether; only new ones)
         continue-on-error: true
-        timeout-minutes: 5
+        timeout-minutes: 6
         run: python scripts/logos.py
 
       - name: Multi-source news (RSS)

@@ -55,7 +55,7 @@
   var IR = {}; CAT.forEach(function (r) { IR[r[0]] = { key: r[0], g: r[1], grp: r[2], icon: r[3], div: r[4], daily: !!r[5], n: r[6] }; });
   var TMN = N('تومان', 'تمەن', 'تومان', 'IRT');
 
-  P.SYM_RE = /^(?:[A-Z0-9]{2,12}(?:_IRT)?|IR_[A-Z0-9]{2,12})$/;
+  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_IRT)?|IR_[A-Z0-9]{2,12})$/;           /* Binance has one-letter coins too: S, W, T, A… */
   function lang() { var A = P.app; return A && A.LANG ? A.LANG() : 'fa'; }
   function iconUrl(ic) { var k = ic.slice(2); return ic[0] === 'f' ? '/assets/pro/flags/' + k + '.svg' : ic[0] === 'i' ? '/assets/pro/ic/' + k + '.svg' : '/data/logos/' + k + '.png'; }
 

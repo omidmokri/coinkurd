@@ -240,6 +240,13 @@ The site's strategy (agreed with the owner, 2026-11-07):
   «Value is null» (seen on the ounce and tether, which trade on Fridays). Ticks now go into the bar of tgju's own grid
   (Tehran's :30 hours, 00:00 UTC days), repeated times are merged, and the test mock sends tgju's real alignment and
   repeats (`ONLY=toman`: fails on the old code, passes now; full suite 100 checks).
+- «Every Binance coin», checked against Binance's own list (518 bases trading against USDT): the first logo run met
+  CoinGecko's 429 and an alphabetical cut-off (406 had logos after two runs). `logos.py` now waits and retries on 429,
+  takes the coins CoinGecko knows first, maps multiplier tokens to their coin (1000SATS → SATS, 1MBABYDOGE → BABYDOGE),
+  searches CoinGecko by exact symbol for the rest (≤25 a run) and stays inside a 6-minute step. One-letter coins (S, W,
+  T, A, G, C, F, U) were shut out by a 2-character symbol rule on the site, in `logos.py` and in the bot's `a_`/`pa:`/`w_`
+  parsing — now 1–12. Left out on purpose: Binance's 75 tokenized US stocks (AAPLB, NVDAB…: not crypto, and their only
+  logos are the companies' marks) and two tokens with Chinese names (no A–Z symbol).
 
 ### 2026-11-12 · The market map: coin360-style heatmap, cryptobubbles-style bubbles, money flow, liquidity, ETFs (owner's request in chat, not by the loop)
 - Five addresses, one app (tabs switch in place): `/heatmap/` (squarified treemap by sector, sizes by market cap /

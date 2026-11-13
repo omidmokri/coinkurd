@@ -19,7 +19,8 @@ D = os.path.join(ROOT, "data")
 L = os.path.join(D, "logos")
 BINANCE = "https://data-api.binance.vision/api/v3/"
 UA = {"User-Agent": "entekhab.net coin logos"}
-SYM = re.compile(r"^[A-Z0-9]{2,12}$")
+SYM = re.compile(r"^[A-Z0-9]{1,12}$")                # Binance has one-letter coins too (S, W, T, A…)
+MULT = re.compile(r"^(?:1000000|1000|1M)(?=[A-Z])")    # 1000SATS, 1MBABYDOGE: the same coin, priced per 1000 / per million
 
 
 def binance_bases():
@@ -57,7 +58,7 @@ def main():
     print("coins:", len(want), f"(binance usdt: {len(bb)})", "have:", len(have), "need:", len(need))
     if need:
         img = {}
-        t_gecko = time.time() + 150                          # the CI step has 5 minutes: paging stops in time to download and index
+        t_gecko = time.time() + 120                          # the CI step has 6 minutes: paging and searching stop in time to download and index
         for page in range(1, 7):
             if not (need - set(img)) or time.time() > t_gecko:
                 break
@@ -82,9 +83,33 @@ def main():
                 if s not in img and c.get("image"):  # اولین = بزرگ‌ترین ارزش بازار (رفع ابهام نمادهای تکراری)
                     img[s] = c["image"].replace("/large/", "/small/")
             time.sleep(13)
+        # a multiplier token (1000SATS) is the coin itself (SATS): its logo
+        for s in need:
+            base = MULT.sub("", s)
+            if s not in img and base != s and base in img:
+                img[s] = img[base]
+        # the few CoinGecko does not list in its first pages (fan tokens, new listings): its search, by exact symbol
+        t_search, asked = time.time() + 60, 0
+        for s in sorted(x for x in need if x not in img):
+            if time.time() > t_search or asked >= 25:
+                break
+            q = MULT.sub("", s)
+            try:
+                asked += 1
+                r = requests.get("https://api.coingecko.com/api/v3/search", params={"query": q}, headers=UA, timeout=20)
+                if r.status_code == 429:
+                    print("coingecko search 429 — the rest next run")
+                    break
+                hits = [c for c in (r.json().get("coins") or []) if str(c.get("symbol", "")).upper() == q and (c.get("large") or c.get("thumb"))]
+                hits.sort(key=lambda c: c.get("market_cap_rank") or 10 ** 9)
+                if hits:
+                    img[s] = (hits[0].get("large") or hits[0]["thumb"]).replace("/large/", "/small/").replace("/thumb/", "/small/")
+            except Exception as e:  # noqa: BLE001
+                print("coingecko search err", s, e)
+            time.sleep(3)
         got, coincap = 0, 0
         # a capped batch per run, so the index is always written: the coins CoinGecko knows first, then the rest (CoinCap)
-        t_dl = time.time() + 100
+        t_dl = time.time() + 90
         for s in sorted(need, key=lambda x: (x not in img, x))[:360]:
             if time.time() > t_dl:
                 break

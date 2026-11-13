@@ -28,7 +28,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function h(html) { var t = d.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
   function debounce(f, ms) { var t; return function () { var a = arguments, s = this; clearTimeout(t); t = setTimeout(function () { f.apply(s, a); }, ms); }; }
-  var SYM_RE = P.SYM_RE || /^[A-Z0-9]{2,12}$/;
+  var SYM_RE = P.SYM_RE || /^[A-Z0-9]{1,12}$/;
 
   /* ---------------------------------------------------------------- icons (24×24 line glyphs) */
   var IC = {

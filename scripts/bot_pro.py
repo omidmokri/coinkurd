@@ -106,7 +106,7 @@ def L(key, lang, **kw):
 
 def _link(arg):
     """'a_BTC_72155d5' -> ('BTC', 72155.5, '72155.5') : the price kept as the exact decimal the site sent"""
-    m = re.fullmatch(r"a_([A-Z0-9]{2,12})_(\d{1,12}(?:d\d{1,18})?)", str(arg or ""))
+    m = re.fullmatch(r"a_([A-Z0-9]{1,12})_(\d{1,12}(?:d\d{1,18})?)", str(arg or ""))
     if not m:
         return None
     ip, _, fr = m.group(2).partition("d")
@@ -173,7 +173,7 @@ def offer(arg, lang):
 
 def parse_callback(data):
     """'pa:BTC:72155.5' -> ('BTC', '72155.5') for refbot.parse_alert; None when it does not look right"""
-    m = re.fullmatch(r"pa:([A-Z0-9]{2,12}):(\d{1,12}(?:\.\d{1,18})?)", str(data or ""))
+    m = re.fullmatch(r"pa:([A-Z0-9]{1,12}):(\d{1,12}(?:\.\d{1,18})?)", str(data or ""))
     if not m or not (0 < float(m.group(2)) < 1e12):
         return None
     return m.group(1), m.group(2)
@@ -231,6 +231,7 @@ def open_rows(lang):
 if __name__ == "__main__":
     bad = 0
     for arg, want in [("a_BTC_72155d5", ("BTC", 72155.5)), ("a_PEPE_0d0000121", ("PEPE", 0.0000121)), ("a_ETH_2000", ("ETH", 2000.0)),
+                      ("a_S_0d55", ("S", 0.55)), ("a_W_0d0812", ("W", 0.0812)), ("a__1", None),
                       ("a_btc_100", None), ("a_BTC_", None), ("a_BTC_1d2d3", None), ("a_BTC_0", None), ("w_BTC-ETH", None),
                       ("a_BTC_100;DROP", None), ("a_" + "A" * 13 + "_1", None)]:
         got = parse_link(arg)
