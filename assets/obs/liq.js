@@ -31,10 +31,10 @@
   /* leverage is an ordered scale: one hue per side, lighter = higher leverage (nearer to the price) */
   var TIER_L = { 5: '#7c2118', 10: '#a82f23', 25: '#d6402f', 50: '#ff6a55', 100: '#ffab9c' };
   var TIER_S = { 5: '#0f5a41', 10: '#157a58', 25: '#1e9d72', 50: '#34d399', 100: '#93ecc9' };
-  var GAMMA = 0.55;
+  var GAMMA = 0.95;       /* nearly linear: only the strongest levels are bright (checked on live data: 0.55 lit up every band) */
 
   /* ---------------------------------------------------------------- settings (this browser only; a shared link overrides them once) */
-  var DEF = { coin: 'BTC', range: '24h', ex: 'all', model: 1, tiers: { 5: 0, 10: 1, 25: 1, 50: 1, 100: 1 }, pal: 'fire', thr: 3, real: true, prof: true, mapw: 10, maplb: '7d' };
+  var DEF = { coin: 'BTC', range: '24h', ex: 'all', model: 1, tiers: { 5: 0, 10: 1, 25: 1, 50: 1, 100: 1 }, pal: 'fire', thr: 6, real: true, prof: true, mapw: 10, maplb: '7d' };
   var S = (function () {
     var s = OB.store.get('ek_obs_liq', null) || {}, o = JSON.parse(JSON.stringify(DEF));
     Object.keys(o).forEach(function (k) { if (s[k] != null && typeof s[k] === typeof o[k]) o[k] = s[k]; });
@@ -198,14 +198,19 @@
     }).then(function (data) {
       if (seq !== V.seq || !data) return;
       down.forEach(function (e) { if (data.failed.indexOf(e) < 0) data.failed.push(e); });
-      V.data = data; V.loading = false; V.liqs = [];
+      V.data = data; V.loading = false; V.liqs = []; V.okx = null;
       if (st) st.classList.remove('busy');
       compute(true);
       startLive();
       /* the real liquidation orders of the last hours (OKX), drawn over the model */
-      OB.src.okx.liqs(data.coin.base, data.now - Math.min(data.R.span, 36 * 3600000), 8).then(function (a) {
-        if (seq !== V.seq) return; V.liqs = V.liqs.concat(a); V.okx = a.length; if (V.chart) V.chart.setLiqs(V.liqs); cards();
-      }, function () { V.okx = null; cards(); });
+      /* OKX keeps them in pages of 100, newest first: a busy day needs dozens of pages for the window, so they arrive page by page */
+      V.okxFrom = null;
+      OB.src.okx.liqs(data.coin.base, data.now - Math.min(data.R.span, 36 * 3600000), 60, function (part, oldest) {
+        if (seq !== V.seq) return false;
+        V.liqs = V.liqs.concat(part); V.okx = (V.okx || 0) + part.length; if (isFinite(oldest)) V.okxFrom = oldest;
+        if (V.chart) V.chart.setLiqs(V.liqs); cards();
+        return true;
+      }).then(function () { if (seq === V.seq) cards(); }, function () { if (seq === V.seq) { if (!V.okx) V.okx = null; cards(); } });
     }).catch(function (e) {
       if (seq !== V.seq) return;
       V.loading = false; V.err = e; if (st) st.classList.remove('busy');
@@ -273,7 +278,7 @@
     V.feeds.forEach(function (f) { if (isFinite(f.oiLast) && isFinite(f.pxLast)) oiUsd += f.oiLast * f.pxLast; if (f.oiFrom != null && (cover == null || f.oiFrom < cover)) cover = f.oiFrom; });
     var n = V.cols.cols.length, tl = V.res.trackL[n - 1], ts = V.res.trackS[n - 1];
     var failed = data.failed && data.failed.length ? '<p class="ob-warn">' + esc(T('part_fail', { ex: data.failed.map(function (e) { return OB.src[e].name; }).join(', ') })) + '</p>' : '';
-    var okx = V.okx == null ? '' : '<div><dt>' + esc(T('d_real')) + '</dt><dd class="ob-n">' + OB.loc(V.liqs.length) + '</dd></div>';
+    var okx = V.okx == null ? '' : '<div><dt>' + esc(T('d_real')) + '</dt><dd>' + esc(T('d_real_v', { n: OB.loc(V.liqs.length), t: V.okxFrom ? OB.fmtDate(V.okxFrom, true) : '—' })) + '</dd></div>';
     box.innerHTML =
       '<section class="ob-card"><h3><i class="ob-dot" style="background:' + SHORTC + '"></i>' + esc(T('cl_above')) + '</h3>' + rows(cl.above, 'short') + '</section>' +
       '<section class="ob-card"><h3><i class="ob-dot" style="background:' + LONGC + '"></i>' + esc(T('cl_below')) + '</h3>' + rows(cl.below, 'long') + '</section>' +

@@ -142,8 +142,9 @@
         var x = j && j.data && j.data[0]; if (!x) throw new Error('okx instrument'); return +x.ctVal;
       }).catch(function (e) { delete ctCache[base]; throw e; }));
     },
-    /* newest first, page by page (100 orders a page) until `since` or `pages` is reached */
-    liqs: function (base, since, pages) {
+    /* newest first, page by page (100 orders a page) until `since` or `pages` is reached.
+       onPage(orders of that page, oldest time so far) is called as each page arrives; returning false stops the paging. */
+    liqs: function (base, since, pages, onPage) {
       var out = [], self = this;
       return self.ctVal(base).then(function (ct) {
         function page(after, left) {
@@ -151,13 +152,15 @@
           return get(u, 12000).then(function (j) {
             var det = []; ((j && j.data) || []).forEach(function (b) { (b.details || []).forEach(function (x) { det.push(x); }); });
             if (!det.length) return out;
-            var oldest = Infinity;
+            var oldest = Infinity, part = [];
             det.forEach(function (x) {
               var t = +x.ts, px = +x.bkPx, sz = +x.sz; if (!(t && px && sz)) return;
               if (t < oldest) oldest = t;
-              if (t >= since) out.push({ t: t, px: px, usd: px * sz * ct, side: x.posSide === 'short' || x.side === 'buy' ? 'short' : 'long', ex: 'okx' });
+              if (t >= since) part.push({ t: t, px: px, usd: px * sz * ct, side: x.posSide === 'short' || x.side === 'buy' ? 'short' : 'long', ex: 'okx' });
             });
-            if (left > 1 && oldest > since && isFinite(oldest)) return page(oldest, left - 1);
+            for (var i = 0; i < part.length; i++) out.push(part[i]);
+            if (onPage && onPage(part, Math.max(oldest, since)) === false) return out;
+            if (left > 1 && oldest > since && isFinite(oldest) && (!after || oldest < after)) return page(oldest, left - 1);
             return out;
           });
         }
