@@ -299,6 +299,61 @@
     });
   }
 
-  function start() { [arriving, light, progress, rail, search].forEach(safe); }
+  /* ---------------------------------------------------------------- 6. a moving picture behind the top of some pages
+     The owner's own clips (assets/bg/): 000 — lines of light running to the floor, for the pages that test claims
+     against data; 006 — a reader turning into what he reads, for the academy. They sit behind the first screen only,
+     fade into the page, never carry sound, and stay a still picture on a slow or lite device, when the visitor asked for
+     less motion or for less data (Save-Data), and while the tab is hidden. */
+  var BANDS = [
+    { re: /^\/(track-record|reality|ledger|iran-friction|hype|silent-exit|iran-correlation)(\/|$)/, v: '000', cls: 'beam' },
+    { re: /^\/academy\/?$/, v: '006', cls: 'reader' }
+  ];
+  function band() {
+    var p = location.pathname, b = null;
+    for (var i = 0; i < BANDS.length; i++) if (BANDS[i].re.test(p)) { b = BANDS[i]; break; }
+    if (!b) return;
+    var still = RM || lite() || !!(navigator.connection && navigator.connection.saveData);
+    var wrap = d.createElement('div'); wrap.className = 'ds-band ds-' + b.cls; wrap.setAttribute('aria-hidden', 'true');
+    var v = d.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+    v.preload = 'none'; v.poster = '/assets/bg/' + b.v + '.jpg'; v.disablePictureInPicture = true; v.tabIndex = -1;
+    wrap.appendChild(v);
+    d.body.insertBefore(wrap, d.body.firstChild);
+    de.classList.add('ds-has-band');
+    if (still) return;
+    function go() {
+      if (!v.src) { v.src = '/assets/bg/' + b.v + '.mp4'; }
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () { });
+    }
+    d.addEventListener('visibilitychange', function () { if (d.hidden) v.pause(); else if (v.src) go(); });
+    if ('IntersectionObserver' in w) new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { if (w.requestIdleCallback) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 400); } else if (v.src) v.pause(); }); }).observe(wrap);
+    else setTimeout(go, 800);
+  }
+
+  /* ---------------------------------------------------------------- 7. a title that ripples under the pointer ([data-ds-ripple], mouse only) */
+  function ripple() {
+    var els = d.querySelectorAll('[data-ds-ripple]');
+    if (!els.length || RM || lite() || !w.matchMedia || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var ns = 'http://www.w3.org/2000/svg', svg = d.createElementNS(ns, 'svg');
+    svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true'); svg.style.position = 'absolute';
+    svg.innerHTML = '<filter id="ds-rip" x="-5%" y="-20%" width="110%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.06" numOctaves="2" seed="3" result="n"/>'
+      + '<feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>';
+    d.body.appendChild(svg);
+    var dm = svg.querySelector('feDisplacementMap'), tb = svg.querySelector('feTurbulence'), amp = 0, target = 0, raf = 0, t = 0;
+    function tick() {
+      amp += (target - amp) * 0.12; t += 0.02;
+      dm.setAttribute('scale', amp.toFixed(2));
+      tb.setAttribute('baseFrequency', (0.012 + Math.sin(t) * 0.004).toFixed(4) + ' ' + (0.06 + Math.cos(t * 1.3) * 0.015).toFixed(4));
+      if (amp > 0.05 || target > 0) raf = requestAnimationFrame(tick); else { raf = 0; dm.setAttribute('scale', '0'); }
+    }
+    [].forEach.call(els, function (el) {
+      el.style.filter = 'url(#ds-rip)';
+      var last = 0;
+      el.addEventListener('pointermove', function (e) { var sp = Math.min(1, Math.abs(e.movementX || 0) / 18 + 0.35); target = 16 * sp; last = Date.now(); if (!raf) raf = requestAnimationFrame(tick); setTimeout(function () { if (Date.now() - last > 140) target = 0; }, 160); });
+      el.addEventListener('pointerleave', function () { target = 0; });
+    });
+  }
+
+  function start() { [band, arriving, light, progress, rail, search, ripple].forEach(safe); }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', start); else start();
 })();

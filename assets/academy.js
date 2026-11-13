@@ -418,6 +418,47 @@
     certBox(); commit();
   })();
 
+  // ------------------------------------------------------------ skill tree (home): one isometric cube per lesson, row per faculty
+  function skillTree() {
+    var box = $('#acTree'); if (!box) return;
+    var nx = nextLesson(), W = 26, H = 8, D = 13, G = 6, rows = '', tot = 0, got = 0, open = 0;
+    function cube(x, l, st) {
+      var top = [[x, 0], [x + W / 2, -H], [x + W, 0], [x + W / 2, H]], lf = [[x, 0], [x + W / 2, H], [x + W / 2, H + D], [x, D]], rt = [[x + W / 2, H], [x + W, 0], [x + W, D], [x + W / 2, H + D]];
+      function pg(p, c) { return '<polygon points="' + p.map(function (q) { return q.join(','); }).join(' ') + '" class="' + c + '"/>'; }
+      var g = '<g class="cb ' + st + (nx && nx.id === l.id ? ' next' : '') + '">' + pg(lf, 'l') + pg(rt, 'r') + pg(top, 't') + '<title>' + esc(l.t) + (st === 'done' ? ' — آموخته‌شده' : st === 'open' ? ' — باز' : ' — قفل') + '</title></g>';
+      return st === 'lock' ? g : '<a href="' + esc(l.u) + '" aria-label="' + esc(l.t) + '">' + g + '</a>';
+    }
+    M.facs.forEach(function (f) {
+      var ls = f.ls.map(function (id) { return LS[id]; }).filter(Boolean), head = '<span class="tr-n">' + fa(f.n) + '</span><span class="tr-i">' + f.i + '</span><span class="tr-t">' + esc(f.t) + '</span>';
+      if (!f.live || !ls.length) { rows += '<div class="tr-row wip" data-k="wip"><a class="tr-h" href="/academy/' + f.id + '/">' + head + '</a><span class="tr-wip">در حال تولید</span></div>'; return; }
+      var d = 0, o = 0, svg = '';
+      var rtl = document.documentElement.dir !== 'ltr';
+      ls.forEach(function (l, i) { var st = mastered(l.id) ? 'done' : lessonOpen(l.id) ? 'open' : 'lock'; if (st === 'done') d++; else if (st === 'open') o++; svg += cube((rtl ? ls.length - 1 - i : i) * (W + G) + 2, l, st); });   /* the first lesson stands next to its faculty's name */
+      tot += ls.length; got += d; open += o;
+      var w = ls.length * (W + G) + 4;
+      rows += '<div class="tr-row" data-d="' + d + '" data-o="' + o + '"><a class="tr-h" href="/academy/' + f.id + '/">' + head + '</a>'
+        + '<svg class="tr-c" viewBox="0 ' + (-H - 4) + ' ' + w + ' ' + (2 * H + D + 8) + '" width="' + w + '" height="' + (2 * H + D + 8) + '" role="group" aria-label="' + esc(f.t) + '">' + svg + '</svg>'
+        + '<span class="tr-k">' + fa(d) + ' / ' + fa(ls.length) + '</span></div>';
+    });
+    box.innerHTML = rows;
+    var sum = $('#acTreeSum');
+    if (sum) sum.innerHTML = '<span><b>' + fa(got) + '</b> از ' + fa(tot) + ' مهارت آموخته‌شده</span><span><b>' + fa(open) + '</b> درس آمادهٔ خواندن</span>'
+      + (nx ? '<a href="' + esc(nx.u) + '">درس بعدی: ' + esc(nx.t) + ' ←</a>' : '') + '<span class="pbar"><i style="width:' + Math.round(got * 100 / Math.max(1, tot)) + '%"></i></span>';
+    var seg = $('.ac-seg'); if (!seg) return;
+    var btns = $$('button', seg), th = $('.ac-seg-t', seg);
+    function place(b) { th.style.width = b.offsetWidth + 'px'; th.style.transform = 'translateX(' + (b.offsetLeft - 4) + 'px)'; }
+    function pick(b) {
+      btns.forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      place(b); var k = b.dataset.k;
+      $$('.tr-row', box).forEach(function (r) {
+        r.hidden = k === 'all' ? false : r.dataset.k === 'wip' ? true : k === 'done' ? !+r.dataset.d : !+r.dataset.o;
+      });
+    }
+    btns.forEach(function (b) { b.onclick = function () { pick(b); }; });
+    requestAnimationFrame(function () { place(btns[0]); });
+    window.addEventListener('resize', function () { var c = btns.filter(function (x) { return x.getAttribute('aria-checked') === 'true'; })[0]; if (c) place(c); });
+  }
+
   if (page === 'home') (function () {
     $$('.ac-fac').forEach(function (a) {
       var fid = a.dataset.fid, f = FS[fid]; if (!f) return;
@@ -426,6 +467,7 @@
       a.classList.toggle('locked', !facOpen(fid));
       $('.ac-fs', a).textContent = facComplete(fid) ? '🏅 تکمیل' : st.pass ? '✅ آزمون جامع' : st.credit ? '🧭 معاف' : (done ? fa(done) + ' از ' + fa(f.ls.length) : '');
     });
+    skillTree();
     var nx = nextLesson(), go = $('#acGo'), hi = $('#acHello'), lv = level();
     if (nx && Object.keys(S.L).length) { go.href = nx.u; go.textContent = 'ادامهٔ مسیر: ' + nx.t; }
     if (Object.keys(S.L).length) hi.textContent = (S.name ? S.name + ' عزیز، ' : '') + 'سطح فعلی شما: ' + lv.fa + ' · ' + fa(S.xp) + ' امتیاز تجربه' + (dueCount() ? ' · ' + fa(dueCount()) + ' سؤال آمادهٔ مرور' : '');
