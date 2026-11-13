@@ -7,6 +7,11 @@ ETFs and institutions for /etf/ — data/etf.json
     tables (https://farside.co.uk/bitcoin-etf-flow-all-data/ and /ethereum-etf-flow-all-data/), the figures SoSoValue and
     the press quote. A day whose funds have not reported yet ("-" everywhere) is not a day of zero flow and is left out.
   * Public companies holding BTC and ETH: CoinGecko /companies/public_treasury/{bitcoin,ethereum} (keyless).
+  * Bitcoin treasuries, as Bitcoin Treasuries (https://bitcointreasuries.net/) publishes them: the top 100 public
+    companies (holding, value, market cap, share of 21 M) and the totals per holder type (public and private companies,
+    governments, ETFs and exchanges, DeFi). Preferred over CoinGecko for BTC: it is updated sooner after each purchase.
+  * The world's largest assets (companies, ETFs, metals, crypto) with Bitcoin's place among them, from 8marketcap
+    (https://8marketcap.com/): its top rows, read at most once an hour.
 
 Farside publishes once a day after the US close, so the tables are read at most once an hour; treasuries every 6 hours.
 When a source fails, the previous figures stay and the page shows when they were read. Nothing is estimated.
@@ -38,6 +43,10 @@ FUNDS = {
 MON = {m: i for i, m in enumerate(("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), 1)}
 DAY_RE = re.compile(r"^(\d{1,2}) ([A-Z][a-z]{2}) (\d{4})$")
 KEEP_DAYS = 400
+BT_URL = "https://bitcointreasuries.net/"
+MC8_URL = "https://8marketcap.com/"
+BT_CATS = {"Public Companies": "pub", "Private Companies": "priv", "Government Entities": "gov", "ETFs and Exchanges": "etf", "DeFi and Other": "defi"}
+MC8_KIND = {"badge-company": "co", "badge-etf": "etf", "badge-metal": "metal", "badge-crypto": "crypto"}
 
 
 def cell_num(t):
@@ -136,6 +145,92 @@ def treasury(j):
                      "p": c.get("percentage_of_total_supply")} for c in comp[:30]]}
 
 
+def _num(t):
+    t = re.sub(r"[^0-9.\-]", "", (t or "").replace("\u2212", "-"))
+    try:
+        return float(t) if t not in ("", "-", ".") else None
+    except ValueError:
+        return None
+
+
+def _flag(t):
+    """🇺🇸 -> US (two regional-indicator letters); anything else -> """""
+    cs = [ord(c) - 0x1F1E6 for c in (t or "").strip() if 0x1F1E6 <= ord(c) <= 0x1F1FF]
+    return "".join(chr(65 + c) for c in cs[:2]) if len(cs) >= 2 else ""
+
+
+def parse_bt(html):
+    """Bitcoin Treasuries home page -> {"cats": {...}, "top": [...]}; raises when the ranking table is not there"""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    table = None
+    for t in soup.find_all("table"):
+        head = [th.get_text(" ", strip=True) for th in t.select("thead th")]
+        if "Market Cap" in head and "In USD" in head:
+            table = t
+    if table is None:
+        raise ValueError("ranking table not found")
+    top = []
+    for tr in table.select("tbody tr"):
+        td = tr.find_all("td")
+        if len(td) < 5:
+            continue
+        a = td[2].find("a")
+        tk = td[2].find(attrs={"data-ticker": True})
+        name = (a.get_text(" ", strip=True) if a else td[2].get_text(" ", strip=True))[:60]
+        h = _num(td[3].get_text())
+        if not name or h is None or h <= 0:
+            continue
+        p21 = _num(td[-1].get_text()) if td[-1].get_text().strip().endswith("%") else None
+        top.append({"r": len(top) + 1, "n": name, "s": (tk.get_text(strip=True) if tk else "")[:16], "c": _flag(td[1].get_text()),
+                    "h": h, "v": (_num(td[4].get_text()) or 0) * 1e6 or None,
+                    "mc": (_num(td[5].get_text()) * 1e6) if len(td) > 5 and _num(td[5].get_text()) else None, "p": p21})
+        if len(top) >= 100:
+            break
+    if len(top) < 20:
+        raise ValueError(f"only {len(top)} companies read")
+    text = re.sub(r"\s+", " ", soup.get_text(" "))
+    cats = {}
+    for label, k in BT_CATS.items():
+        m = re.search(re.escape(label) + r" ₿ ?([\d,]+)", text)
+        if m:
+            cats[k] = float(m.group(1).replace(",", ""))
+    return {"cats": cats, "top": top, "n": len(top)}
+
+
+def parse_8mc(html, n=40):
+    """8marketcap home page -> the top `n` assets, plus Bitcoin's row wherever it is; raises when the table is not there"""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+    t = soup.find("table")
+    if t is None:
+        raise ValueError("table not found")
+    rows, btc = [], None
+    for tr in t.select("tbody tr"):
+        td = tr.find_all("td")
+        if len(td) < 7:
+            continue
+        nm = tr.select_one(".company-name")
+        b = tr.select_one(".badge")
+        mc = _num(td[4].get("data-sort"))
+        r = _num(td[1].get_text())
+        if not nm or not b or not mc or not r:
+            continue
+        kind = next((v for k, v in MC8_KIND.items() if k in (b.get("class") or [])), "co")
+        d1, d7 = _num(td[6].get("data-sort")), _num(td[7].get("data-sort")) if len(td) > 7 else None
+        row = {"r": int(r), "n": nm.get_text(" ", strip=True)[:50], "s": b.get_text(strip=True)[:14], "k": kind, "mc": mc,
+               "p": _num(td[5].get("data-sort")), "d1": d1 / 100 if d1 is not None else None, "d7": d7 / 100 if d7 is not None else None}
+        if len(rows) < n:
+            rows.append(row)
+        if row["s"] == "BTC" and kind == "crypto":
+            btc = row
+        if len(rows) >= n and btc:
+            break
+    if len(rows) < 10:
+        raise ValueError(f"only {len(rows)} rows read")
+    return {"top": rows, "btc": btc}
+
+
 def main(fetch_html=None, fetch_json=None, now=None):
     import requests
     now = now or time.time()
@@ -179,6 +274,18 @@ def main(fetch_html=None, fetch_json=None, now=None):
                     new[k] = tre[k]
         if new.get("btc") or new.get("eth"):
             out["tre"] = new
+    for key, url, parse, every in (("bt", BT_URL, parse_bt, 2 * 3600), ("world", MC8_URL, parse_8mc, 3600)):
+        last = (old.get("src") or {}).get(f"{key}_try", 0)
+        if key in old and now - last < every:
+            continue
+        out["src"][f"{key}_try"] = int(now)
+        try:
+            out[key] = dict(parse(fetch_html(url)), t=datetime.fromtimestamp(now, timezone.utc).isoformat())
+            errors.pop(key, None)
+            print(f"{key}: {len(out[key]['top'])} rows")
+        except Exception as e:  # noqa: BLE001
+            errors[key] = str(e)[:200]
+            print(f"{key}: {e} — the previous figures stay")
     out["errors"] = errors
     out["t"] = datetime.fromtimestamp(now, timezone.utc).isoformat()
     out["v"] = 1

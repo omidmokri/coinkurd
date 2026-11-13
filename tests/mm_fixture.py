@@ -91,6 +91,8 @@ def main(out):
     json.dump({"v": 1, "t": "2026-11-12T18:00:00+00:00", "tf": TFS, "src": {}, "f": flows, "st": st}, open(os.path.join(out, "mm_flow.json"), "w"), separators=(",", ":"))
     # ETF table in the summarised shape scripts/etf.py writes
     import etf as E
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import test_etf as TE
     days = []
     for i in range(300):
         d = 1736553600 + 86400 * i
@@ -107,7 +109,8 @@ def main(out):
         {"n": "Metaplanet", "s": "3350.T", "c": "JP", "h": 44000, "e": 3896249023, "v": 3163012376, "p": 0.21}]},
         "eth": {"total": 5100000, "value": 1.03e10, "dom": 4.2, "n": 70, "top": [{"n": "BitMine", "s": "BMNR.US", "c": "US", "h": 3500000, "e": 1.2e10, "v": 7.1e9, "p": 2.9}]}}
     json.dump({"v": 1, "t": "2026-11-12T18:00:00+00:00", "src": {"farside_btc": "2026-11-12T17:00:00+00:00", "farside_eth": "2026-11-12T17:00:00+00:00"},
-               "errors": {}, "btc": btc, "eth": eth, "tre": tre}, open(os.path.join(out, "etf.json"), "w"), separators=(",", ":"))
+               "errors": {}, "btc": btc, "eth": eth, "tre": tre,
+               "bt": dict(E.parse_bt(TE.bt_page(110)), t="2026-11-13T09:00:00+00:00"), "world": dict(E.parse_8mc(TE.mc8_page(), n=12), t="2026-11-13T09:00:00+00:00")}, open(os.path.join(out, "etf.json"), "w"), separators=(",", ":"))
     # the logo sheet, built the way CI builds it, from a copy of the logo folder
     import mm_data as M
     L = os.path.join(out, "logos")

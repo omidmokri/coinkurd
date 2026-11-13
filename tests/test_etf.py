@@ -41,6 +41,35 @@ BTC_ROWS = [
 ]
 
 
+# markup as served on 2026-11-13 (trimmed): bitcointreasuries.net ranking table and holder-type totals, 8marketcap rows
+def bt_page(n=25):
+    rows = "".join(
+        f'<tr><td>{i}</td><td><a href="/countries/x">{fl}</a></td><td><div><div><a class="flex-1 truncate" href="/public-companies/c{i}">{nm}</a> '
+        f'<span data-ticker="">{tk}</span></div><button>Buy</button></div></td><td>₿{h:,}</td><td>${v:,}M</td><td>${mc:,}M</td><td>$**M</td>'
+        f'<td>*.*</td><td>—</td><td>—</td><td>*.***</td><td>***.*%</td><td>{p}%</td></tr>'
+        for i, (fl, nm, tk, h, v, mc, p) in enumerate([("🇺🇸", "Strategy", "MSTR", 850364, 59027, 47551, "4.049"),
+                                                         ("🇯🇵", "Metaplanet Inc.", "MPJPY", 44000, 3054, 1506, "0.210")]
+                                                        + [("🇨🇦", f"Co {k}", f"T{k}", 1000 - k, 70, 90, "0.005") for k in range(n - 3)]
+                                                        + [("🇨🇦", "DevvStream", "DEVS", 0, 0, 0, "0.000")], 1))
+    head = "".join(f"<th>{h}</th>" for h in ["#", "Name", "Bitcoin", "In USD", "Market Cap", "Enterprise Value", "BTC/Share", "Cost Basis", "NgU", "mNAV", "/M.Cap", "/21M"])
+    small = '<table><thead><tr><th>Rank</th><th></th><th>Country flag</th><th>Ticker</th><th>Bitcoin</th><th>[mNAV]</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>'
+    cats = "".join(f"<div><span>{k}</span><span>₿</span><span>{v}</span></div>" for k, v in
+                   [("Public Companies", "1,238,381"), ("Private Companies", "201,884"), ("Government Entities", "645,625"),
+                    ("ETFs and Exchanges", "1,615,524"), ("DeFi and Other", "375,179")])
+    return f"<html><body>{cats}{small}<table><thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></body></html>"
+
+
+def mc8_page():
+    def row(r, n, s, kind, mc, p, d1, d7):
+        return (f'<tr><td class="fav"><img src="/fav.svg"></td><td class="td-right" data-sort="{r}">{r}</td><td class="name-td"><div class="name-div">'
+                f'<div class="company-name">{n}</div></div></td><td class="td-right"><span class="badge badge-{kind}">{s}</span></td>'
+                f'<td class="td-right" data-sort="{mc}">$x T</td><td class="td-right" data-sort="{p}">$x</td><td data-sort="{d1}"></td><td data-sort="{d7}"></td><td></td></tr>')
+    rows = [row(1, "Gold", "GOLD", "metal", 28523657982399, 4102.4, -115, -182), row(2, "Apple", "AAPL", "company", 5157180932096, 345, -14, 10)]
+    rows += [row(i, f"Co{i}", f"C{i}", "company", 4e12 - i * 1e11, 100, 5, 5) for i in range(3, 15)]
+    rows += ['<tr><td colspan="9">ad</td></tr>', row(15, "Bitcoin", "BTC", "crypto", 1397792244980, 69502, -405, -836)]
+    return "<html><table><thead><tr><th></th><th>#</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table></html>"
+
+
 def main():
     check("brackets", E.cell_num("(403.0)"), -403.0)
     check("thousands", E.cell_num("1,234.5"), 1234.5)
@@ -100,8 +129,31 @@ def main():
     # within the hour nothing is fetched again
     calls = []
     E.main(fetch_html=lambda u: calls.append(u) or page("Date", BTC_FUNDS, BTC_ROWS), fetch_json=lambda u: calls.append(u) or tre, now=1794500000 + 600)
-    check("hourly limit", calls, [])
+    check("hourly limit", [u for u in calls if "farside" in u or "coingecko" in u], [])
     check("a skipped source keeps its error", "farside_eth" in json.load(open(E.OUT))["errors"], True)
+    b = E.parse_bt(bt_page())
+    check("bt order", [c["n"] for c in b["top"][:2]], ["Strategy", "Metaplanet Inc."])
+    check("bt first row", {k: b["top"][0][k] for k in ("s", "c", "h", "v", "mc", "p")},
+          {"s": "MSTR", "c": "US", "h": 850364.0, "v": 59027e6, "mc": 47551e6, "p": 4.049})
+    check("bt zero holdings left out", any(c["n"] == "DevvStream" for c in b["top"]), False)
+    check("bt holder types", b["cats"], {"pub": 1238381.0, "priv": 201884.0, "gov": 645625.0, "etf": 1615524.0, "defi": 375179.0})
+    check("bt at most 100", len(E.parse_bt(bt_page(130))["top"]), 100)
+    try:
+        E.parse_bt("<html><title>Just a moment...</title></html>")
+        check("bt refuses a challenge page", False, True)
+    except ValueError:
+        pass
+    w = E.parse_8mc(mc8_page(), n=12)
+    check("8mc rows", (len(w["top"]), w["top"][0]["n"], w["top"][0]["k"], w["top"][0]["mc"], w["top"][0]["d1"]), (12, "Gold", "metal", 28523657982399.0, -1.15))
+    check("8mc bitcoin row found beyond the top", (w["btc"]["r"], w["btc"]["k"], w["btc"]["p"], w["btc"]["d7"]), (15, "crypto", 69502.0, -8.36))
+    # main(): a failing page keeps the previous figures and records the error
+    E.main(fetch_html=lambda u: bt_page() if "bitcointreasuries" in u else mc8_page() if "8marketcap" in u else page("Date", BTC_FUNDS, BTC_ROWS),
+           fetch_json=lambda u: tre, now=1794500000 + 4 * 3600)
+    o = json.load(open(E.OUT))
+    check("bt and world written", (o["bt"]["n"], o["world"]["btc"]["r"]), (24, 15))
+    E.main(fetch_html=lambda u: "<html>blocked</html>", fetch_json=lambda u: tre, now=1794500000 + 9 * 3600)
+    o = json.load(open(E.OUT))
+    check("blocked page keeps the old figures", (o["bt"]["n"], "bt" in o["errors"], "world" in o["errors"]), (24, True, True))
     if FAIL:
         print("\n".join("FAIL " + f for f in FAIL))
         sys.exit(1)

@@ -5,6 +5,12 @@
   var MM = window.MM = window.MM || {};
   var S = {};
   S.en = {
+    bt_t: 'Bitcoin treasuries · the top 100 public companies', bt_sub: 'Who holds Bitcoin: companies, governments, ETFs and exchanges; and the 100 listed companies with the most BTC, valued at the live price.',
+    bt_pub: 'Public companies', bt_priv: 'Private companies', bt_gov: 'Governments', bt_etf: 'ETFs & exchanges', bt_defi: 'DeFi & other', bt_all: 'Held by all of them: {b} BTC · {p} of 21 million',
+    bt_co: 'Company', bt_btc: 'Bitcoin', bt_val: 'Value now', bt_mc: 'Market cap', bt_ratio: 'BTC / market cap', bt_21: 'Of 21M',
+    bt_more: 'Show all {n}', bt_less: 'Show the top 20', bt_note: 'Bitcoin Treasuries, read {t}. Value at the live price; market cap as they report it.',
+    w_t: 'The world\'s largest assets', w_sub: 'Companies, ETFs, precious metals and crypto ranked together by market value — and where Bitcoin stands.', w_rank: 'Bitcoin\'s place', w_gold: 'Bitcoin vs gold',
+    w_asset: 'Asset', w_mc: 'Market value', w_px: 'Price', w_d1: '24h', w_co: 'company', w_etf: 'ETF', w_metal: 'metal', w_crypto: 'crypto', w_note: '{s}, read {t} (its prices can lag by minutes to hours).',
     bookGrow: 'Recording the live book: every second adds a column on the right.',
     secAgo: '{n} s ago',
     q_off: '{n} coins are beyond the scale: they sit on the edge with a dashed ring — hover or tap for the real figures.',
@@ -107,6 +113,12 @@
     distT: 'Distribution of ups and downs', distNote: 'top {n} coins (no stablecoins or wrapped tokens), {tf}'
   };
   S.fa = {
+    bt_t: 'خزانه‌های بیت‌کوین و ۱۰۰ شرکت بورسی برتر', bt_sub: 'بیت‌کوین دست کیست: شرکت‌ها، دولت‌ها، ETFها و صرافی‌ها؛ و ۱۰۰ شرکت بورسی با بیشترین بیت‌کوین، با قیمت زنده.',
+    bt_pub: 'شرکت‌های بورسی', bt_priv: 'شرکت‌های خصوصی', bt_gov: 'دولت‌ها', bt_etf: 'ETFها و صرافی‌ها', bt_defi: 'دیفای و سایر', bt_all: 'در دست همهٔ این‌ها: {b} بیت‌کوین، یعنی {p} از ۲۱ میلیون',
+    bt_co: 'شرکت', bt_btc: 'بیت‌کوین', bt_val: 'ارزش فعلی', bt_mc: 'ارزش بازار شرکت', bt_ratio: 'بیت‌کوین به ارزش شرکت', bt_21: 'از ۲۱ میلیون',
+    bt_more: 'نمایش هر {n} شرکت', bt_less: 'نمایش ۲۰ شرکت اول', bt_note: 'Bitcoin Treasuries، خوانده‌شده در {t}. ارزش با قیمت زنده؛ ارزش بازار شرکت همان‌طور که گزارش داده‌اند.',
+    w_t: 'بزرگ‌ترین دارایی‌های جهان', w_sub: 'شرکت‌ها، ETFها، فلزات گران‌بها و رمزارزها با هم بر اساس ارزش بازار — و جایگاه بیت‌کوین در میانشان.', w_rank: 'جایگاه بیت‌کوین', w_gold: 'بیت‌کوین در برابر طلا',
+    w_asset: 'دارایی', w_mc: 'ارزش بازار', w_px: 'قیمت', w_d1: '۲۴ ساعت', w_co: 'شرکت', w_etf: 'ETF', w_metal: 'فلز', w_crypto: 'رمزارز', w_note: '{s}، خوانده‌شده در {t} (قیمت‌هایش ممکن است چند دقیقه تا چند ساعت عقب باشد).',
     bookGrow: 'در حال ضبط دفتر زنده: هر ثانیه یک ستون از راست اضافه می‌شود.',
     secAgo: '{n} ثانیه پیش',
     q_off: '{n} ارز بیرون از مقیاس‌اند: با حلقهٔ خط‌چین روی لبه نشسته‌اند — برای عدد واقعی رویشان بروید یا لمس کنید.',
@@ -209,6 +221,12 @@
     distT: 'توزیع صعود و نزول', distNote: '{n} ارز برتر (بدون استیبل‌کوین و توکن رپ‌شده)، {tf}'
   };
   S.ckb = {
+    bt_t: 'گەنجینەکانی بیتکۆین و ١٠٠ کۆمپانیای بۆرسەیی سەرەوە', bt_sub: 'بیتکۆین لە دەستی کێیە: کۆمپانیاکان، حکومەتەکان، ETF و ئاڵوگۆڕگەکان؛ و ئەو ١٠٠ کۆمپانیا بۆرسەییەی زۆرترین بیتکۆینیان هەیە، بە نرخی زیندوو.',
+    bt_pub: 'کۆمپانیا بۆرسەییەکان', bt_priv: 'کۆمپانیا تایبەتەکان', bt_gov: 'حکومەتەکان', bt_etf: 'ETF و ئاڵوگۆڕگەکان', bt_defi: 'دیفای و ئەوانی تر', bt_all: 'لە دەستی هەموویاندا: {b} بیتکۆین، واتە {p} لە ٢١ ملیۆن',
+    bt_co: 'کۆمپانیا', bt_btc: 'بیتکۆین', bt_val: 'بەهای ئێستا', bt_mc: 'بەهای بازاڕی کۆمپانیا', bt_ratio: 'بیتکۆین بە بەهای کۆمپانیا', bt_21: 'لە ٢١ ملیۆن',
+    bt_more: 'پیشاندانی هەر {n} کۆمپانیا', bt_less: 'پیشاندانی ٢٠ی یەکەم', bt_note: 'Bitcoin Treasuries، خوێندراوە لە {t}. بەها بە نرخی زیندوو؛ بەهای بازاڕی کۆمپانیا وەک خۆیان ڕاپۆرتیان کردووە.',
+    w_t: 'گەورەترین سامانەکانی جیهان', w_sub: 'کۆمپانیاکان، ETFەکان، کانزا بەنرخەکان و دراوە دیجیتاڵییەکان پێکەوە بەپێی بەهای بازاڕ — و شوێنی بیتکۆین لە نێوانیاندا.', w_rank: 'شوێنی بیتکۆین', w_gold: 'بیتکۆین بەرامبەر زێڕ',
+    w_asset: 'سامان', w_mc: 'بەهای بازاڕ', w_px: 'نرخ', w_d1: '٢٤ کاتژمێر', w_co: 'کۆمپانیا', w_etf: 'ETF', w_metal: 'کانزا', w_crypto: 'دراوی دیجیتاڵی', w_note: '{s}، خوێندراوە لە {t} (نرخەکانی لەوانەیە چەند خولەک تا چەند کاتژمێر دوا بکەون).',
     bookGrow: 'دەفتەری زیندوو تۆمار دەکرێت: هەر چرکەیەک ستوونێک لە لای ڕاستەوە زیاد دەکات.',
     secAgo: '{n} چرکە لەمەوبەر',
     q_off: '{n} دراو لە دەرەوەی پێوەرن: بە ئەڵقەیەکی پچڕپچڕ لەسەر لێوارن — بۆ ژمارەی ڕاستەقینە دەستی لێ بدە.',
@@ -311,6 +329,12 @@
     distT: 'دابەشبوونی بەرزبوونەوە و دابەزین', distNote: '{n} دراوی سەرەوە (بێ ستەیبڵکۆین و تۆکنی ڕاپکراو)، {tf}'
   };
   S.ar = {
+    bt_t: 'خزائن البيتكوين وأكبر ١٠٠ شركة مدرجة', bt_sub: 'من يملك البيتكوين: الشركات والحكومات وصناديق ETF والمنصات؛ وأكبر ١٠٠ شركة مدرجة حيازةً للبيتكوين، بالسعر المباشر.',
+    bt_pub: 'شركات مدرجة', bt_priv: 'شركات خاصة', bt_gov: 'حكومات', bt_etf: 'صناديق ETF ومنصات', bt_defi: 'التمويل اللامركزي وغيره', bt_all: 'في حوزتهم جميعًا: {b} بيتكوين، أي {p} من ٢١ مليونًا',
+    bt_co: 'الشركة', bt_btc: 'بيتكوين', bt_val: 'القيمة الآن', bt_mc: 'القيمة السوقية للشركة', bt_ratio: 'البيتكوين إلى قيمة الشركة', bt_21: 'من ٢١ مليونًا',
+    bt_more: 'عرض جميع الشركات ({n})', bt_less: 'عرض أول ٢٠', bt_note: 'Bitcoin Treasuries، قُرئت في {t}. القيمة بالسعر المباشر؛ القيمة السوقية كما تُبلغ عنها.',
+    w_t: 'أكبر الأصول في العالم', w_sub: 'الشركات وصناديق ETF والمعادن الثمينة والعملات المشفرة مرتبة معًا حسب القيمة السوقية — وموقع البيتكوين بينها.', w_rank: 'موقع البيتكوين', w_gold: 'البيتكوين مقابل الذهب',
+    w_asset: 'الأصل', w_mc: 'القيمة السوقية', w_px: 'السعر', w_d1: '٢٤ ساعة', w_co: 'شركة', w_etf: 'ETF', w_metal: 'معدن', w_crypto: 'عملة مشفرة', w_note: '{s}، قُرئت في {t} (قد تتأخر أسعارها من دقائق إلى ساعات).',
     bookGrow: 'يجري تسجيل الدفتر المباشر: كل ثانية تضيف عمودًا من اليمين.',
     secAgo: 'قبل {n} ث',
     q_off: '{n} عملات خارج المقياس: تظهر على الحافة بحلقة متقطعة — مرّر أو المس لرؤية الأرقام الحقيقية.',
