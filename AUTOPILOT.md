@@ -287,7 +287,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
   scratch copy (sitemap, menu, assistant index carry the five pages), leak guard clean. One bug found by the tests and
   fixed before publishing: the strike labels dropped zeros (50,000 showed as "5K").
 - **Live with real data (owner's browser on entekhab.net, 22:15 UTC, after the first CI run wrote the files — 6,523 days
-  of Bitcoin in 0.56 MB, 4,115 of Ether in 0.36 MB):** the tiles equal Coin Metrics' own row for 2026-11-12 read
+  of Bitcoin in 0.56 MB, 4,124 of Ether in 0.36 MB):** the tiles equal Coin Metrics' own row for 2026-11-12 read
   directly (price 71,280.42, MVRV 1.3241, exchange supply 2,723,131, inflow 26,241 / outflow 27,151, hash rate
   877.65 EH/s). History comes out where the literature puts it: the Pi lines cross on 2013-04-06, 2013-12-05,
   2017-12-16 and 2021-04-12; MVRV 4.25, Z 8.8, Mayer 3.64, Puell 6.6 on 2017-12-17; MVRV 0.78, Puell 0.43 on
