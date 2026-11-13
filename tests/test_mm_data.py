@@ -173,6 +173,10 @@ def main():
     check("sector exch", M.sector_of("leo-token", "LEO", "LEO Token", cats), "exch")
     check("sector other", M.sector_of("x", "X", "Something", cats), "other")
     check("meme beats l1", M.sector_of("dual", "D", "Dual", {"layer-1": {"ids": ["dual"]}, "meme-token": {"ids": ["dual"]}}), "meme")
+    # CoinGecko's bridged-tokens list also holds native coins that have a bridged copy (seen live with SPX6900)
+    check("bridged-tokens list does not make a native coin wrapped",
+          M.sector_of("spx6900", "SPX", "SPX6900", {"bridged-tokens": {"ids": ["spx6900"]}, "meme-token": {"ids": ["spx6900"]}}), "meme")
+    check("a bridged copy is still wrapped by its name", M.sector_of("bridged-usdc", "USDC.E", "Bridged USDC", {}), "wrapped")
 
     # ---------- the whole run on fixtures, in a scratch copy of the folders
     tmp = tempfile.mkdtemp()
