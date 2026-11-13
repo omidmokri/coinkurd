@@ -194,6 +194,17 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · Knowledge network: grouped site search + related-page links (owner's request in chat, not by the loop)
+- `scripts/build_links.py` (both workflows, after the builders, before seo_tidy): writes `/search.json` (777 rows:
+  coins, glossary terms in fa/ckb/en, academy lessons, encyclopedia entries, indicators, DNA; ~24 kB gzipped,
+  fetched only when search opens; git-ignored) and adds a «شبکهٔ دانش این صفحه» block to coin, glossary-term and
+  DNA pages: DNA ↔ coin, comparisons, the glossary terms the page's own text uses (≥2 times), lessons whose text
+  names the coin/term (≥2 times), the encyclopedia entry with the same English name. Every link is found in the
+  pages, never invented; idempotent between `<!--ek:rel-->` markers. 164 pages linked on the first run.
+- `assets/deep.js` search shows results in labelled groups (sections, coins, glossary, lessons, indicators, DNA,
+  encyclopedia, archive); arrows skip the labels; on phones the descriptions are hidden. `DEEP_VER` 2.
+- Verified: `tests/test_build_links.py` (made-up site, known answers, idempotence), `tests/deep_e2e.py` 104 checks,
+  0 JS errors, screenshots at 1280 and 390 px.
 ### 2026-11-13 · /calendar/ «تقویم اقتصادی»: ForexFactory's calendar + FedWatch-style odds, in four languages, with Telegram alerts (owner's request in chat, not by the loop)
 - **Page** `calendar/{index.html,cal.js,cal.css}` (built by the session, chrome.py STATIC, first block of the «بازار» menu
   after /market/, sitemap, assistant FEATURES → bot "events"). fa · ckb · en in the page's `I.*` dictionaries + `CAL_KINDS`

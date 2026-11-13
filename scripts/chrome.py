@@ -439,7 +439,7 @@ NX_VER = "11"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the
 # homepage never gets it. To switch the whole layer off, empty the two lines that mention `dp` in UI2_TAG.
-DEEP_VER = "1"
+DEEP_VER = "2"
 DEEP_OFF = "battle|market|kids"
 UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(?:&|$)/.exec(location.search);'
            "try{var L=localStorage;if(m){if(m[1]==='3')L.removeItem('ek_uic');else L.setItem('ek_uic',m[1])}"

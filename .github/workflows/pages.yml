@@ -65,6 +65,9 @@ jobs:
       - name: Arabic dictionaries (from the cache; no new translations here)
         continue-on-error: true
         run: python scripts/i18n_ar.py --no-translate
+      - name: Knowledge network (search index + related-page links, from the built pages)
+        continue-on-error: true
+        run: python scripts/build_links.py
       - name: Search snippets (titles ≤ 60, descriptions ≤ 160 characters on every page)
         continue-on-error: true
         run: python scripts/seo_tidy.py

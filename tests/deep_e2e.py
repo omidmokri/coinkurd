@@ -158,6 +158,18 @@ async def run():
                 rows = await pg.evaluate("[].map.call(document.querySelectorAll('#ekq .ds-qr li a'),a=>a.getAttribute('href'))")
                 if os.path.exists(os.path.join(ROOT, "api/v1/index.json")):
                     check("/coins/btc/" in rows, f"typing 'btc' offers the coin page ({rows})")
+                if os.path.exists(os.path.join(ROOT, "search.json")):
+                    await pg.fill("#ekq input", "")
+                    await pg.keyboard.type("هاوینگ")
+                    await pg.wait_for_timeout(500)
+                    heads = await pg.evaluate("[].map.call(document.querySelectorAll('#ekq .ds-qr .ds-qh'),h=>h.textContent)")
+                    rows = await pg.evaluate("[].map.call(document.querySelectorAll('#ekq .ds-qr li a'),a=>a.getAttribute('href'))")
+                    check(any(r.startswith("/glossary/halving") for r in rows), f"'هاوینگ' finds the glossary term ({rows})")
+                    check(any(r.startswith("/academy/") for r in rows), f"'هاوینگ' finds an academy lesson ({rows})")
+                    check(len(heads) >= 3, f"results come in labelled groups ({heads})")
+                    await pg.keyboard.press("ArrowDown")
+                    on = await pg.evaluate("document.querySelectorAll('#ekq .ds-qr li.on').length===1&&!document.querySelector('#ekq .ds-qr li.ds-qh.on')")
+                    check(on, "arrow keys move over results only, never onto a group label")
                 await pg.fill("#ekq input", "")
                 await pg.keyboard.type("واقعیت")
                 await pg.wait_for_timeout(400)
