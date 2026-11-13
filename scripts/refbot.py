@@ -48,6 +48,8 @@ import bot_compare as CMP  # noqa: E402
 import bot_hub as HB  # noqa: E402
 import bot_paper as PAPER  # noqa: E402  (paper trading + public leaderboard)
 import bot_pro as PRO  # noqa: E402  (the site's live market /market/ + its price-alert hand-off)
+import bot_econ as EC  # noqa: E402  (economic calendar: group heads-up/result in topic 47540 + opt-in private alerts)
+import econ_src as ES  # noqa: E402
 import bot_mm as MMB  # noqa: E402  (the market map: /heatmap/, /bubbles/, /money-flow/, /liquidity/, /etf/)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
@@ -451,7 +453,7 @@ SECTIONS = {
     "mkt": (D.sec_market, "/dashboard/"), "brain": (D.sec_brain, "/dashboard/"),
     "opps": (D.sec_opps, "/dashboard/"), "movers": (D.sec_movers, "/dashboard/"),
     "score": (D.sec_score, "/coins/"), "news": (D.sec_news, "/"), "narr": (D.sec_narr, "/dashboard/"),
-    "events": (D.sec_events, "/dashboard/"), "council": (D.sec_council, "/lab/"),
+    "events": (D.sec_events, "/calendar/"), "council": (D.sec_council, "/lab/"),
     "analysis": (OA.sec_analysis, "/onchain/"), "deriv": (D.sec_deriv, "/terminal/"),
     "cycle": (D.sec_cycle, "/lab/"), "chain": (D.sec_chain, "/terminal/"),
     **BRL.SECTIONS,          # the Reality-check group, from the same files the pages read
@@ -608,6 +610,15 @@ def _render(s, uid, key, page=0):
         return head + "\n\n" + t("alert_usage", lang), kb_alerts(s, uid, lang, page)
     if key == "news":
         return news_list(s, lang)
+    if key == "events":                                 # economic calendar: red US releases, Fed odds, private alerts on/off
+        try:
+            text = EC.section(x, lang, D.load)
+        except Exception:
+            log.exception("econ section failed")
+            text = t("no_data", lang)
+        kb = kb_back(lang, refresh="m:events", more=D.SITE + "/calendar/")
+        kb["inline_keyboard"][0:1] = EC.rows(x, lang)
+        return text, kb
     if key in SECTIONS:
         fn, path = SECTIONS[key]
         try:
@@ -969,12 +980,82 @@ def group_delete(chat_id, mid):
 _last_tick = [0.0]
 
 
+def _http(url, method="GET", text=False, **kw):
+    r = requests.request(method, url, headers=ES.UA, timeout=20, **kw)
+    r.raise_for_status()
+    return r.text if text else r.json()
+
+
+def econ_actuals(evs):
+    """official numbers for these releases: the site's data/econ_actual.json first, then BLS / the Fed directly"""
+    out = {}
+    v = (D.load("econ_actual") or {}).get("v") or {}
+    for x in evs:
+        a = v.get(f'{x["t"]}|USD|{x["n"]}')
+        if a:
+            out[x["n"]] = a
+    sp = [x for x in evs if x["n"] not in out and x["n"] in ES.SPECS]
+    if sp:
+        series = ES.bls_fetch(_http, [ES.SPECS[x["n"]][0] for x in sp])
+        for x in sp:
+            a = ES.actual_from(x["n"], x["t"], series)
+            if a:
+                out[x["n"]] = {"a": a, "src": "BLS"}
+    fd = [x for x in evs if x["n"] not in out and x["n"] in ES.FED_TITLES]
+    if fd:
+        st = ES.fed_rss(_http(ES.FED_RSS, text=True))
+        for x in fd:
+            hit = next((u for ts, u in st if abs(ts - x["t"]) < 3 * 3600), None)
+            r = ES.fed_statement(ES.html_text(_http(hit, text=True))) if hit else None
+            if r:
+                out[x["n"]] = {"a": f'{r["hi"]:.2f}%', "src": "Fed", "move": r["move"], "lo": r["lo"], "hi": r["hi"]}
+    return out
+
+
+def btc_klines(t):
+    for base in D.BINANCE:
+        try:
+            r = requests.get(base + "/api/v3/klines", params={"symbol": "BTCUSDT", "interval": "1m",
+                                                               "startTime": (t // 60) * 60 * 1000, "limit": 60}, timeout=15)
+            if r.ok:
+                return r.json()
+        except Exception:
+            continue
+    return []
+
+
+def econ_job(s):
+    """the economic calendar's group posts (topic 47540) and opt-in private alerts; see bot_econ"""
+    topic = F.env_topics().get("econ", EC.TOPIC)
+    s.setdefault("econ", {})["bot_user"] = BOT_USERNAME
+
+    def post(text, kb):
+        r = group_send(GROUP, text, kb=kb, message_thread_id=topic)
+        return ((r or {}).get("result") or {}).get("message_id")
+
+    def reply(text, kb, to):
+        extra = {"reply_parameters": {"message_id": to, "allow_sending_without_reply": True}} if to else {}
+        group_send(GROUP, text, kb=kb, message_thread_id=topic, **extra)
+
+    def dm(uid, text, kb):
+        try:
+            send(int(uid), text, kb)
+        except Exception:
+            log.exception("econ dm %s failed", uid)
+        time.sleep(0.05)
+    return EC.tick(s, time.time(), D.load, econ_actuals, btc_klines, post, reply, dm, s.get("users"))
+
+
 def minute_jobs(s):
-    """every ~60s: tether spike watch + live message refresh"""
+    """every ~60s: tether spike watch + live message refresh + the economic calendar"""
     if time.time() - _last_tick[0] < 60:
         return False
     _last_tick[0] = time.time()
     changed = False
+    try:
+        changed |= bool(econ_job(s))
+    except Exception:
+        log.exception("econ job failed")
     watchers = [(uid, x.get("lang", "fa")) for uid, x in s["users"].items() if x.get("watch")]
     if watchers or LIVE:
         p = IR.snapshot().get("usdt")
@@ -1201,6 +1282,11 @@ def handle_private(s, msg):
                 return send(chat_id, *render(s, uid, arg[2:]))
             except Exception:
                 log.exception("deep link %s failed", arg)
+        if arg == "ec":                                 # the calendar page / group post: alerts section with the on button
+            try:
+                return send(chat_id, *render(s, uid, "events"))
+            except Exception:
+                log.exception("ec link failed")
         # the live market's ✈ button (t.me/<bot>?start=a_BTC_72155d5, or t_USD_95000 for Iran's market in toman):
         # the alert is only OFFERED; it is stored on «add»
         if arg.startswith("a_") or arg.startswith("t_"):
@@ -1418,6 +1504,13 @@ def handle_callback(s, cb):
         lang = (user(s, uid) or {}).get("lang", "fa")
         body = ENC.card(data[4:], lang) or ENC.NONE.get(lang, ENC.NONE["fa"])
         return send(chat_id, body, kb_back(lang, more=D.SITE + "/encyclopedia/"))
+    if data in ("ec:on", "ec:off"):                  # economic calendar: private alerts before/after each red US release
+        if data == "ec:on":
+            x["ec"] = 1
+        else:
+            x.pop("ec", None)
+        ans(EC.L("on_ok" if data == "ec:on" else "off_ok", lang))
+        return edit(chat_id, mid, *render(s, uid, "events"))
     if data.startswith("pa:"):                       # «add» under an alert offered by the live market's ✈ link
         got = PRO.parse_callback(data)
         ans()

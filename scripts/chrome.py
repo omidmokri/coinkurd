@@ -131,6 +131,9 @@ NAV = [
         ("/market/", "candles", L("بازار زنده", "بازاڕی زیندوو", "Live market"),
          L("مولتی‌چارت، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت", "چەند چارت پێکەوە، تایمفرەیمی چرکەیی، دووبارە پەخش، ئاگادارکەرەوە و ڕۆژژمێری ئابووری",
            "Multi-chart, seconds timeframes, replay, alerts and the economic calendar on the chart")),
+        ("/calendar/", "calendar", L("تقویم اقتصادی و فدرال رزرو", "ڕۆژژمێری ئابووری و فیدراڵ ڕیزێرڤ", "Economic calendar & Fed odds"),
+         L("همهٔ خبرها به وقت تهران، عدد واقعی، واکنش بیت‌کوین، احتمالات FOMC و یادآوری", "هەموو هەواڵەکان بە کاتی خۆت، ژمارەی ڕاستەقینە، کاردانەوەی بیتکۆین، ئەگەرەکانی FOMC و ئاگادارکەرەوە",
+           "Every release in your time zone, actuals, bitcoin's reaction, FOMC odds and reminders")),
         ("/heatmap/", "grid", L("نقشهٔ حرارتی بازار", "نەخشەی گەرمیی بازاڕ", "Market heatmap"),
          L("۲۵۰ ارز به اندازهٔ ارزش بازار و رنگ حرکتشان، ۵ دقیقه تا ۱ سال، دوبعدی و سه‌بعدی", "٢٥٠ دراو بە قەبارەی بەهای بازاڕ و ڕەنگی جووڵەیان، ٥ خولەک تا ١ ساڵ، دوو و سێ ڕەهەندی",
            "250 coins sized by market cap and coloured by their move, 5 minutes to a year, in 2D and 3D")),
@@ -549,7 +552,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
+          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin", "calendar"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
 
 
 def inject_static():
