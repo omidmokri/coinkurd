@@ -68,7 +68,7 @@
     (role ? '<p class="nx-role" data-i="' + esc(role.getAttribute('data-i')) + '">' + role.innerHTML + '</p>' : '') +
     '<ul class="nx-net" data-net></ul>' +
     '<div class="nx-cta"><a class="nx-btn p" href="#market" data-d="market">' + tri('ورود به بازار زنده', 'چوونە ناو بازاڕی زیندوو', 'Enter the live market') + '</a>' +
-    '<a class="nx-btn" href="/satoshi/">' + HOME + tri('داستان ساتوشی', 'چیرۆکی ساتۆشی', 'Satoshi’s story') + '</a></div></div>' +
+    '<a class="nx-btn" href="/bitcoin/">' + HOME + tri('درک بیت‌کوین', 'تێگەیشتن لە بیتکۆین', 'Understanding Bitcoin') + '</a></div></div>' +
     '<div class="nx-ps"><div class="nx-col nx-a">' + cols.a + '</div><div class="nx-col nx-b">' + cols.b + '</div></div>';
   if (pre) { var t0 = d.createElement('div'); t0.innerHTML = tpl; if (h32(t0.innerHTML) !== nx.getAttribute('data-tpl')) { nx.classList.add('nx-re'); nx.innerHTML = tpl; } }
   else nx.innerHTML = tpl;
