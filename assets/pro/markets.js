@@ -117,16 +117,30 @@
     return null;
   }
 
+  function dedup(a) {                                                  /* sorted bars → one per time (the same time merged) */
+    var out = [];
+    for (var i = 0; i < a.length; i++) {
+      var b = a[i], p = out[out.length - 1];
+      if (p && p.t === b.t) { if (b.h > p.h) p.h = b.h; if (b.l < p.l) p.l = b.l; p.c = b.c; } else out.push(b);
+    }
+    return out;
+  }
+  P._dedup = dedup;
   /* ---------------------------------------------------------------- a small feed base shared by both kinds */
   function Base(sym, tf) { this.sym = sym; this.tf = tf; this.key = sym + '|' + tf.id; this.bars = []; this.subs = []; this.refs = 0; this.state = 'load'; this.src = null; this.at = null; this.full = true; this.busy = false; this.dead = false; }
   Base.prototype.tell = function (what, x) { var s = this; this.subs.slice().forEach(function (f) { try { f(what, s, x); } catch (e) { if (window.console) console.error(e); } }); };
   Base.prototype.more = function () { return Promise.resolve(false); };
   Base.prototype.catchup = function () { };
   Base.prototype.setBars = function (bars) { this.bars = bars; this.at = Date.now(); this.tell('reset'); };
-  Base.prototype.put = function (b, closed) {                          /* a live price into the current bar of this timeframe */
+  /* a live price into the current bar. tgju's own bars set the grid (hours on Tehran's :30, days at 00:00 UTC), so a
+     tick goes into the bar it falls in, counted from the last bar, never into a bar of its own at the tick's second */
+  Base.prototype.put = function (b, closed) {
     if (this.dead || !(b.c > 0)) return;
-    var bars = this.bars, k = P.bucket(b.t, this.tf), lb = bars[bars.length - 1], nb, isNew = false;
-    if (lb && k < lb.t) return;
+    var bars = this.bars, lb = bars[bars.length - 1], sec = this.tf.sec, nb, isNew = false, k;
+    if (!lb) k = P.bucket(b.t, { sec: sec, ratio: 2 });
+    else if (b.t < lb.t) return;
+    else if (sec >= 28 * 86400) k = b.t - lb.t < 28 * 86400 ? lb.t : P.bucket(b.t, { sec: sec, ratio: 2 }) > lb.t ? P.bucket(b.t, { sec: sec, ratio: 2 }) : lb.t;
+    else k = lb.t + Math.floor((b.t - lb.t) / sec) * sec;
     if (lb && lb.t === k) { nb = { t: k, o: lb.o, h: Math.max(lb.h, b.h), l: Math.min(lb.l, b.l), c: b.c, v: lb.v + (b.dv || 0) }; bars[bars.length - 1] = nb; }
     else { nb = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, v: b.dv || 0 }; bars.push(nb); isNew = true; }
     this.at = Date.now(); this.tell('tick', { bar: nb, isNew: isNew, closed: !!closed });
@@ -145,6 +159,7 @@
       var d = I.div, base = [];
       for (var i = 0; i < j.t.length; i++) if (j.c[i] > 0) base.push({ t: j.t[i], o: j.o[i] / d, h: j.h[i] / d, l: j.l[i] / d, c: j.c[i] / d, v: 0 });
       base.sort(function (a, b) { return a.t - b.t; });
+      base = dedup(base);                                              /* tgju's history repeats a few timestamps: one bar each */
       var tf = self.tf, bars = nr[0] === tf.sec ? base : P.aggregate(base, tf);
       self.state = 'poll'; self.setBars(bars); self.tell('state'); self.poll();
     }).catch(function () { return self.fromSite(); }).catch(function () {
@@ -274,7 +289,7 @@
     var nr = tgRes(tf); if (!nr) return Promise.reject(new Error('tf'));
     return tgHist(I.grade, nr[1]).then(function (j) {
       var base = []; for (var i = 0; i < j.t.length; i++) if (j.c[i] > 0 && j.t[i] * 1000 >= startMs && j.t[i] * 1000 <= endMs) base.push({ t: j.t[i], o: j.o[i] / I.div, h: j.h[i] / I.div, l: j.l[i] / I.div, c: j.c[i] / I.div, v: 0 });
-      base.sort(function (a, b) { return a.t - b.t; }); return nr[0] === tf.sec ? base : P.aggregate(base, tf);
+      base.sort(function (a, b) { return a.t - b.t; }); base = dedup(base); return nr[0] === tf.sec ? base : P.aggregate(base, tf);
     });
   };
 

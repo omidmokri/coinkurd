@@ -232,6 +232,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
   replay2, cal, types, inds2, sections, syncind), bot flows in 5 languages (toman links included), leak guard clean.
 - Limits: tgju.org is a third-party public source (named on the page); coin prices in toman are an estimate; the
   calendar still has no "actual" values (the feed has none); price-only chart types use closes.
+- Live check after publishing (owner's built-in browser, real tgju/Binance data): the dollar 266,900 toman = tgju's
+  2,669,000 rial exactly; all 35 Iranian instruments priced with their icons; BTC in toman = Binance × 270,382; the
+  calendar's today/this-week filters and bells on real events; Renko/Kagi/P&F on real BTC; all 70 indicators give values.
+  One bug found and fixed the same hour: a live tgju tick on a timeframe that is native on Binance (1h, 1d…) became a bar
+  of its own at the tick's second, and tgju's history repeats a few timestamps — both made the chart library throw
+  «Value is null» (seen on the ounce and tether, which trade on Fridays). Ticks now go into the bar of tgju's own grid
+  (Tehran's :30 hours, 00:00 UTC days), repeated times are merged, and the test mock sends tgju's real alignment and
+  repeats (`ONLY=toman`: fails on the old code, passes now; full suite 100 checks).
 
 ### 2026-11-12 · The market map: coin360-style heatmap, cryptobubbles-style bubbles, money flow, liquidity, ETFs (owner's request in chat, not by the loop)
 - Five addresses, one app (tabs switch in place): `/heatmap/` (squarified treemap by sector, sizes by market cap /

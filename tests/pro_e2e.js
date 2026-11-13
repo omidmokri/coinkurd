@@ -49,8 +49,13 @@ function tgPrice(g, t) { const b = TGB[g] || (100000 + h32(g) % 900000); return 
 function tgHist(q) {
   const g = q.get('symbol'), res = q.get('resolution'), sec = res === '1D' ? 86400 : res === 'W' ? 604800 : res === 'M' ? 2592000 : +res * 60;
   if (!sec || !g) return { s: 'no_data' };
-  const s2 = /^crypto-/.test(g) ? Math.max(sec, 86400) : sec, now = Math.floor(Date.now() / 1000), last = Math.floor(now / s2) * s2, n = s2 >= 86400 ? 1500 : 3000, out = { s: 'ok', t: [], o: [], h: [], l: [], c: [], v: [] };
-  for (let k = n - 1; k >= 0; k--) { const t = last - k * s2, o = tgPrice(g, t), c = tgPrice(g, t + s2); out.t.push(t); out.o.push(Math.round(o)); out.c.push(Math.round(c)); out.h.push(Math.round(Math.max(o, c) * 1.002)); out.l.push(Math.round(Math.min(o, c) * 0.998)); }
+  /* as tgju really sends it: intraday bars on Tehran's clock (hours at :30 UTC), days at 00:00 UTC, and a timestamp repeated now and then */
+  const s2 = /^crypto-/.test(g) ? Math.max(sec, 86400) : sec, now = Math.floor(Date.now() / 1000), TZ = s2 < 86400 ? 12600 : 0,
+    last = Math.floor((now + TZ) / s2) * s2 - TZ, n = s2 >= 86400 ? 1500 : 3000, out = { s: 'ok', t: [], o: [], h: [], l: [], c: [], v: [] };
+  for (let k = n - 1; k >= 0; k--) {
+    const t = last - k * s2, o = tgPrice(g, t), c = tgPrice(g, t + s2), reps = k === 40 || k === 400 ? 2 : 1;
+    for (let r = 0; r < reps; r++) { out.t.push(t); out.o.push(Math.round(o)); out.c.push(Math.round(c * (1 + r * 0.001))); out.h.push(Math.round(Math.max(o, c) * 1.002)); out.l.push(Math.round(Math.min(o, c) * 0.998)); }
+  }
   return out;
 }
 function tehClock(now) { const d = new Date((now + 12600) * 1000), z = n => String(n).padStart(2, '0'); return z(d.getUTCHours()) + ':' + z(d.getUTCMinutes()) + ':' + z(d.getUTCSeconds()); }
@@ -528,6 +533,22 @@ async function mockNet(page, stats) {
     const usd = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars[c.bars.length - 1]; return { src: c.feed && c.feed.src, st: c.feed && c.feed.state, n: c.disp.length, c: b && b.c, leg: (c.el.querySelector('.pm-lsym') || {}).textContent, srcl: (c.el.querySelector('.pm-src') || {}).textContent, prec: c.prec() }; });
     ok('the dollar in toman: tgju history ÷ 10, polled live, named and without decimals', usd.src === 'tgju' && usd.n > 100 && usd.c > 250000 && usd.c < 290000 && /دلار آمریکا/.test(usd.leg) && usd.srcl === 'tgju' && usd.prec === 0, JSON.stringify(usd));
     await shot(page, '50_fa_toman_usd');
+    /* tgju's grid: hourly bars stay on Tehran's :30 after a live tick, one bar per time, ticks never make bars of their own */
+    const grid = async (sym, tf) => {
+      await page.evaluate(([s, t]) => { PRO.app.active().setTF(t); PRO.app.applySym(s); }, [sym, tf]);
+      await page.waitForFunction(s => { const c = PRO.app.active(); return c.cfg.sym === s && c.disp.length > 100; }, sym, { timeout: 15000 }).catch(() => { });
+      await page.waitForTimeout(1500);
+      return page.evaluate(() => {
+        const c = PRO.app.active(), B = c.bars, sec = c.tfSec(), d = c.main.data(); let inc = true, off = {};
+        for (let i = 1; i < B.length; i++) if (!(B[i].t > B[i - 1].t)) inc = false;
+        B.slice(-50).forEach(b => { off[(b.t % sec + sec) % sec] = 1; });
+        return { n: B.length, inc, offs: Object.keys(off), lastAge: Math.floor(Date.now() / 1000) - B[B.length - 1].t, data: d.length };
+      });
+    };
+    const g1 = await grid('IR_USD', '1h'), g2 = await grid('IR_ONS', '1d');
+    ok('tgju bars stay on their grid after live ticks (1h on :30, 1d at 00:00), strictly increasing, repeated timestamps merged',
+      g1.inc && g1.offs.join() === '1800' && g1.lastAge < 3600 && g2.inc && g2.offs.join() === '0' && g2.lastAge < 86400 && g1.data === g1.n && g2.data === g2.n, JSON.stringify({ g1, g2 }));
+    await page.evaluate(() => { PRO.app.active().setTF('1h'); PRO.app.applySym('IR_USD'); }); await page.waitForTimeout(1200);
     /* shorter than tgju has → 5 minutes, said */
     await page.evaluate(() => PRO.app.active().setTF('1m')); await page.waitForTimeout(1200);
     const t5 = await page.evaluate(() => ({ tf: PRO.app.active().cfg.tf, toast: (document.querySelector('.pm-toast') || {}).textContent || '' }));
