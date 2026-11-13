@@ -783,14 +783,14 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
    the sky (behind a recon drone, a satellite). Anything big cuts in at once with its own sequence: who fires, what flies, the hit in
    slow motion, what is left. Shots cut, they do not drift; each one moves, and every frame keeps the camera above the ground and the
    sea and out of buildings, trees, hulls and men. */
-const CINE={q:[],shot:null,t0:0,act:0,lift:0,P:new THREE.Vector3(),T:new THREE.Vector3(),fov:46,pri:0,trees:null,
+const CINE={q:[],shot:null,t0:0,act:0,lift:0,step:0,poleL:null,poleT:0,P:new THREE.Vector3(),T:new THREE.Vector3(),fov:46,pri:0,trees:null,
  V:(x,y,z)=>new THREE.Vector3(x,y,z),
  ease:u=>u*u*(3-2*u),
  side:()=>Math.random()<.5?'bull':'bear',
  dirOf:s=>s==='bull'?-1:1,                                                    // where an army's base is (x sign)
  fx(){return VIEW.round?X(VIEW.price||VIEW.round.p0):0},
  gy(x,z){return Math.max(WORLD.hgt(x,z),-1.15)},
- reset(){this.q.length=0;this.shot=null;this.pri=0},
+ reset(){this.q.length=0;this.shot=null;this.pri=0;this.step=0},
  /* ---- shots: {dur s, fov, P(u,dt), T(u,dt)} with u going 0 → 1 through the shot ---- */
  fly(a,b,look,dur,fov){return {dur,fov:fov||48,P:u=>a.clone().lerp(b,this.ease(u)),T:typeof look==='function'?look:()=>look}},
  orbit(c,r,h,a0,da,dur,fov,ly){return {dur,fov:fov||46,P:u=>{const C=typeof c==='function'?c():c,a=a0+da*u;return this.V(C.x+Math.cos(a)*r,C.y+h,C.z-Math.sin(a)*r)},T:()=>{const C=typeof c==='function'?c():c;return this.V(C.x,C.y+(ly==null?1:ly),C.z)}}},
@@ -867,8 +867,20 @@ const CINE={q:[],shot:null,t0:0,act:0,lift:0,P:new THREE.Vector3(),T:new THREE.V
  next(){if(!this.q.length)this.q=this.reel();this.shot=this.q.shift()||null;this.t0=now();this.cut=true;if(this.shot&&this.shot.slow)this.slowT=this.shot.slow;if(!this.q.length)this.pri=0},
  /* ---- the camera never goes into the ground, the sea, a building, a tree, a hull or a man ---- */
  H:{hq:11,shed:6.8,fob:3.4,sam:5,tel:5,tower:10.5,barracks:6.5,hangar:9.5,comm:31,dump:4.5,dome:9.5,ruin:5,wreck:3.2,lamp:7.5,hedgehog:2.2,wire:1.6,revet:2.8,radar:6.5,gun:4.2,truck:4,rock:3.2,heli:4.5},
+ /* thin uprights the lens must not stand right behind: street lamps, floodlights, flag poles, the lamps on the piers ([x, z, top]) */
+ poles(){const t=now();if(this.poleL&&t-this.poleT<3000)return this.poleL;const L=[];
+  if(window.NAV&&NAV.ready)for(const sh of NAV.statics)if(sh.t==='c'&&(sh.tag==='lamp'||sh.tag==='flag'||(sh.tag==='fob'&&sh.r<.3)))L.push([sh.x,sh.z,this.gy(sh.x,sh.z)+(sh.tag==='lamp'?6.6:sh.tag==='flag'?4.2:7.2)]);
+  const E5=WORLD.env5;if(E5&&E5.port)for(const k in E5.port){const h=E5.port[k];if(h&&h.poles)for(const q of h.poles)L.push(q)}
+  this.poleT=t;return this.poleL=L},
  treeIndex(){if(this.trees)return this.trees;const T=new Map(),L=WORLD.treeL||[];for(const t of L){const k=Math.floor(t.x/12)+','+Math.floor(t.z/12);if(!T.has(k))T.set(k,[]);T.get(k).push(t)}return this.trees=T},
- safe(P,T,dt,cut){let need=this.gy(P.x,P.z)+1.1;
+ safe(P,T,dt,cut){
+  /* a pole close to the lens never splits the picture down the middle: like a camera operator, the camera side-steps until the pole
+     stands on a third of the frame (the closer the pole, the smaller the step), and eases back once it has passed */
+  {const vx=T.x-P.x,vz=T.z-P.z,vl=Math.hypot(vx,vz);let want=0;if(vl>3){const ux=vx/vl,uz=vz/vl;
+    for(const p of this.poles()){if(P.y>p[2]+2)continue;const rx=p[0]-P.x,rz=p[1]-P.z,a=rx*ux+rz*uz;if(a<.4||a>16||a>vl-1)continue;
+     const d=rz*ux-rx*uz,g=(.26*a*Math.min(1,(16-a)/4)-Math.abs(d))/Math.max(.35,1-a/vl);if(g>Math.abs(want))want=d>0?-g:g}   // the step turns the view too: allow for it
+    this.step=cut?want:this.step+(want-this.step)*Math.min(1,dt*2.5);P.x-=uz*this.step;P.z+=ux*this.step}else this.step=0}
+  let need=this.gy(P.x,P.z)+1.1;
   if(window.NAV&&NAV.ready)for(const sh of NAV.statics){const h=this.H[sh.tag];if(!h||P.y>h+3)continue;const b=NAV.bounds(sh);if(P.x<b[0]-2||P.x>b[2]+2||P.z<b[1]-2||P.z>b[3]+2)continue;if(NAV.inShape(sh,P.x,P.z,sh.tag==='fob'&&sh.t==='b'&&sh.hx>1.3?1.2:.9)){const top=(sh.tag==='fob'&&sh.t==='b'&&sh.hx>1.3?9.5:h)+this.gy(P.x,P.z)+1.2;if(top>need)need=top}}
   const TI=this.treeIndex(),cx=Math.floor(P.x/12),cz=Math.floor(P.z/12);for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const c=TI.get((cx+i)+','+(cz+j));if(!c)continue;for(const t of c){const r=t.r+1;if((t.x-P.x)*(t.x-P.x)+(t.z-P.z)*(t.z-P.z)<r*r){const top=t.y+t.h+1.5;if(top>need&&P.y<top+2)need=top}}}
   for(const k in ARMY.sides){const S=ARMY.sides[k].shed;if(S&&Math.abs(P.x-S.x)<S.hw+1.4&&P.z<S.door+1.4&&P.z>S.door-16){const top=this.gy(S.x,S.door-7)+7.6;if(top>need)need=top}}   // the sheds, roof and all
