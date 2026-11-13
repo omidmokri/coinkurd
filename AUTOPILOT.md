@@ -126,15 +126,22 @@ The site's strategy (agreed with the owner, 2026-11-07):
 
 - **The Observatory — `/charts/` and one address per chart** (owner, 2026-11-13: "everything Glassnode, CoinGlass and
   CryptoQuant offer", built in stages — see the Log and the Backlog): static pages from `scripts/build_obs.py` (it puts
-  the header/footer/CSP in itself; its folders join `chrome.STATIC` by `build_obs.folders()`), app
-  `assets/obs/{i18n,core,src,liqmodel,liq}.js` + `obs.css` (bump `V` in build_obs.py and `OB.V` in core.js with every
-  change). `src.js` reads Binance futures and Bybit public data in the visitor's browser (CSP: fapi.binance.com,
-  api.bybit.com) and OKX's liquidation orders; everything is brought to price per coin and size in coins (1000PEPE →
-  PEPE × 1000). `liqmodel.js` is the liquidation-level model: pure, documented at its top, never changed without
-  `node tests/test_obs_liq.js`. The hub's `HUB["todo"]` in build_obs.py is the honest "not built yet" list: move an
-  item into `HUB["secs"]` only when its page exists. Bot: `scripts/bot_obs.py` (section `obs`, Web App buttons).
-  Tests: `node tests/test_obs_liq.js`, `python3 tests/test_obs_i18n.py`, `python3 tests/obs_e2e.py`
-  (`ONLY=data|heat|map|hub|langs|errors`; exchanges mocked in their real formats), `python3 tests/test_bot_obs.py`.
+  the header/footer/CSP in itself; its folders join `chrome.STATIC` by `build_obs.folders()`, the sitemap by the same
+  list, and the assistant by `build_obs.catalog()`), app `assets/obs/{i18n,core,src,liqmodel,liq,ts,deriv}.js` +
+  `obs.css` (bump `V` in build_obs.py and `OB.V` in core.js with every change). `core.js` holds the shell, the tabs
+  (`OB.PAGES` = the builder's `PAGES`, the i18n test checks it) and the toolbar pieces every view uses (`OB.ui`: coin
+  picker, segments, actions). `src.js` reads public data in the visitor's browser — Binance futures, Bybit, OKX,
+  Bitget, Hyperliquid (POST), Gate (every host is in the CSP's connect-src) — and brings everything to one unit:
+  price per coin, size in coins (1000PEPE → PEPE × 1000, kPEPE likewise), funding per 8 hours from each contract's
+  OWN interval (never assumed: Bitget's comes from a second list, and without it the rate stays empty).
+  `liqmodel.js` is the liquidation-level model: pure, documented at its top, never changed without
+  `node tests/test_obs_liq.js`. `ts.js` is `OB.TS`, the time-series chart of the other pages: stacked panes on one
+  time axis (two measures never share a pane), line/area/step/bars/candle, legend switches, crosshair, zoom, PNG.
+  `deriv.js` = open interest, funding rates, long/short. The hub's `HUB["todo"]` in build_obs.py is the honest
+  "not built yet" list: move an item into `HUB["secs"]` only when its page exists. Bot: `scripts/bot_obs.py` (section
+  `obs`, one Web App button per chart). Tests: `node tests/test_obs_liq.js`, `python3 tests/test_obs_i18n.py`,
+  `python3 tests/obs_e2e.py` (`ONLY=data|heat|map|oi|funding|ls|hub|langs|errors`; the exchanges are mocked in their
+  real formats and units, so totals, shares and 8-hour rates are known in advance), `python3 tests/test_bot_obs.py`.
 - **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
   now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
   cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
@@ -166,10 +173,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 - **The Observatory, next stages** (owner's request 2026-11-13, see the Log entry of that day; one page per run is fine):
   each is a page under `/charts/` built with `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to
-  `HUB["secs"]` when it exists. (1) open interest across exchanges (Binance, Bybit, OKX, Bitget, Gate, Hyperliquid:
-  current by exchange + history from Binance/Bybit); (2) funding rates across exchanges (table + history; rates
-  brought to one interval, and said so); (3) long/short ratios (Binance accounts / top traders / taker, Bybit
-  accounts); (4) options from Deribit (open interest by strike and expiry, max pain, put/call, DVOL); (5) on-chain
+  `HUB["secs"]` when it exists. Done 2026-11-13: (1) open interest across exchanges, (2) funding rates, (3) long/short
+  ratios — see the Log. Left: (4) options from Deribit (open interest by strike and expiry, max pain, put/call, DVOL;
+  www.deribit.com is already in the CSP); (5) on-chain
   from CoinMetrics community (CC BY-NC, name the source): MVRV, realized price, NUPL, MVRV-Z, exchange reserve and
   net flow, active addresses, hash rate, issuance and Puell — a CI step that commits one daily file; (6) cycle
   indicators from price (Mayer, 200-week MA, Pi cycle, 2-year MA). Not possible without a paid source and to be

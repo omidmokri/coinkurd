@@ -78,6 +78,20 @@ EXTRA_PAGES = [
 ]
 
 
+def _obs_pages():
+    """the Observatory's charts (/charts/…): title, lead and search words straight from scripts/build_obs.py, so a chart added
+    there is known to the assistant without a second edit"""
+    try:
+        import build_obs as B
+        return [(href, L(t["fa"], t["ckb"], t["en"]), L(d["fa"], d["ckb"], d["en"]), kws) for href, t, d, kws in B.catalog()]
+    except Exception as ex:          # the assistant is still built without them
+        print("assistant: the Observatory's pages were skipped:", ex)
+        return []
+
+
+EXTRA_PAGES += _obs_pages()
+
+
 def _nav():
     import chrome as C
     m = {}

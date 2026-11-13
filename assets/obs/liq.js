@@ -29,8 +29,9 @@
   function cssAt(name, x) { var c = ramp(PAL[name] || PAL.fire, x); return 'rgb(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ')'; }
   var UP = '#e9fff5', DN = '#ff4d6a', LONGC = '#ff5a4d', SHORTC = '#34d399';
   /* leverage is an ordered scale: one hue per side, lighter = higher leverage (nearer to the price) */
-  var TIER_L = { 5: '#7c2118', 10: '#a82f23', 25: '#d6402f', 50: '#ff6a55', 100: '#ffab9c' };
-  var TIER_S = { 5: '#0f5a41', 10: '#157a58', 25: '#1e9d72', 50: '#34d399', 100: '#93ecc9' };
+  /* (both ramps pass the ordinal checks of the palette validator on the dark surface: one hue, even lightness steps, darkest step ≥ 2:1) */
+  var TIER_L = { 5: '#a03226', 10: '#c23f2f', 25: '#e2503d', 50: '#ff7a66', 100: '#ffb9ac' };
+  var TIER_S = { 5: '#157050', 10: '#1a8a63', 25: '#22a67a', 50: '#3fd9a0', 100: '#9cefd0' };
   var GAMMA = 0.95;       /* nearly linear: only the strongest levels are bright (checked on live data: 0.55 lit up every band) */
 
   /* ---------------------------------------------------------------- settings (this browser only; a shared link overrides them once) */
@@ -59,16 +60,12 @@
   function curRange() { return V.kind === 'liqmap' ? OB.liqRange(MAP_LB[S.maplb] || '1w') : OB.liqRange(S.range); }
 
   /* ================================================================ toolbar */
-  function seg(id, items, cur, cls) {
-    return '<div class="ob-seg' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="group">' + items.map(function (it) {
-      return '<button type="button" data-v="' + esc(it[0]) + '"' + (String(it[0]) === String(cur) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + (it[2] ? ' title="' + esc(it[2]) + '"' : '') + '>' + esc(it[1]) + '</button>';
-    }).join('') + '</div>';
-  }
+  var seg = OB.ui.seg;
   function toolbar() {
     var heat = V.kind === 'liqheat';
     var ranges = OB.LIQ_RANGES.map(function (r) { return [r.k, T('r_' + r.k)]; });
     var h = '<div class="ob-tools">' +
-      '<button type="button" class="ob-coin" id="ob-coin" aria-haspopup="dialog" aria-expanded="false"><span id="ob-coin-l"></span><b id="ob-coin-s">' + esc(S.coin) + '</b>' + OB.icon('chev') + '</button>' +
+      OB.ui.coinBtn(S.coin) +
       '<label class="ob-lbl"><span>' + esc(T('exch')) + '</span>' + seg('ob-ex', [['all', T('ex_all')], ['binance', 'Binance'], ['bybit', 'Bybit']], S.ex) + '</label>';
     if (heat) {
       h += '<label class="ob-lbl ob-wide"><span>' + esc(T('range')) + '</span>' + seg('ob-range', ranges, S.range, 'ob-rng') + '</label>' +
@@ -99,7 +96,7 @@
       '<button type="button" class="ob-ib" id="ob-full" aria-label="' + esc(T('full')) + '" title="' + esc(T('full')) + '">' + OB.icon('full') + '</button></span></div>';
     return h;
   }
-  function setSeg(id, v) { $$('#' + id + ' button', V.el).forEach(function (b) { var on = b.getAttribute('data-v') === String(v); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); }
+  function setSeg(id, v) { OB.ui.setSeg(V.el, id, v); }
 
   function bindTools() {
     var el = V.el;
@@ -136,35 +133,8 @@
   }
 
   /* ================================================================ coin picker */
-  function coinLabel() {
-    var l = $('#ob-coin-l', V.el), s = $('#ob-coin-s', V.el); if (!l) return;
-    l.innerHTML = OB.hasLogo(S.coin) === false ? '' : OB.logo(S.coin, 20); s.textContent = S.coin;
-  }
-  function pickCoin() {
-    var old = d.getElementById('ob-pick'); if (old) { old.remove(); return; }
-    var box = OB.h('<div class="ob-pick" id="ob-pick" role="dialog" aria-label="' + esc(T('coin')) + '"><div class="ob-pick-h"><span class="ob-find">' + OB.icon('search') +
-      '<input type="search" id="ob-pq" placeholder="' + esc(T('search_coin')) + '" autocomplete="off" spellcheck="false"></span><button type="button" class="ob-ib ob-sm" id="ob-pc" aria-label="' + esc(T('close')) + '">' + OB.icon('close') + '</button></div><div class="ob-pick-l" id="ob-pl"><div class="ob-wait">…</div></div></div>');
-    d.getElementById('ob').appendChild(box);
-    var q = $('#ob-pq', box), list = $('#ob-pl', box);
-    function render() {
-      var term = q.value.trim().toUpperCase(), all = V.coins || [];
-      var rows = all.filter(function (c) { return OB.hasLogo(c.base) !== false && (!term || c.base.indexOf(term) >= 0); }).slice(0, term ? 80 : 60);
-      if (!rows.length) { list.innerHTML = '<div class="ob-wait">' + esc(V.coins ? T('no_coin') : '…') + '</div>'; return; }
-      list.innerHTML = rows.map(function (c) {
-        return '<button type="button" class="ob-pi' + (c.base === S.coin ? ' on' : '') + '" data-c="' + esc(c.base) + '">' + OB.logo(c.base, 22) + '<b>' + esc(c.base) + '</b><small>' +
-          (c.bn ? 'Binance' : '') + (c.bn && c.by ? ' · ' : '') + (c.by ? 'Bybit' : '') + '</small><span class="ob-n">' + esc(OB.fmtUsd(c.vol, 1)) + '</span></button>';
-      }).join('');
-    }
-    q.addEventListener('input', OB.debounce(render, 80));
-    box.addEventListener('click', function (e) {
-      if (e.target.closest('#ob-pc')) { box.remove(); return; }
-      var b = e.target.closest('.ob-pi'); if (!b) return;
-      S.coin = b.getAttribute('data-c'); save(); box.remove(); coinLabel(); load(true);
-    });
-    box.addEventListener('keydown', function (e) { if (e.key === 'Escape') box.remove(); if (e.key === 'Enter') { var f = $('.ob-pi', list); if (f) f.click(); } });
-    render(); OB.coins().then(function (c) { V.coins = c; render(); }, function () { list.innerHTML = '<div class="ob-wait ob-err">' + esc(T('err_net')) + '</div>'; });
-    setTimeout(function () { try { q.focus(); } catch (e) { } }, 30);
-  }
+  function coinLabel() { OB.ui.coinLabel(V.el, S.coin); }
+  function pickCoin() { OB.ui.pickCoin({ current: function () { return S.coin; }, onPick: function (base) { S.coin = base; save(); coinLabel(); load(true); } }); }
   function modelInfo() {
     var old = d.getElementById('ob-mi'); if (old) { old.remove(); return; }
     var box = OB.h('<div class="ob-pick ob-mi" id="ob-mi" role="dialog"><div class="ob-pick-h"><b>' + esc(T('model_info')) + '</b><button type="button" class="ob-ib ob-sm" aria-label="' + esc(T('close')) + '">' + OB.icon('close') + '</button></div>' +

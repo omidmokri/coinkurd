@@ -6,7 +6,7 @@
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '2';
+  OB.V = '3';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -88,6 +88,8 @@
     return (v > 0 ? '+' : v < 0 ? '-' : '') + a.toFixed(k) + '%';
   };
   OB.num = function (s) { return '<span class="ob-n">' + esc(s) + '</span>'; };
+  /* a number with its sign or unit inside a right-to-left sentence, kept as one left-to-right piece ("42.3%", not "%42.3") */
+  OB.ltr = function (s) { return '\u2066' + s + '\u2069'; };
   var FMT = {};
   var CKB_M = ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'];
   function two(n) { return (n < 10 ? '0' : '') + n; }
@@ -146,6 +148,9 @@
     bars: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     close: '<path d="M6 6l12 12M18 6 6 18"/>',
     gear: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+    layers: '<path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/>',
+    percent: '<path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
+    scale: '<path d="M12 3v18"/><path d="M5 7h14"/><path d="M5 7 2.5 13a2.6 2.6 0 0 0 5 0Z"/><path d="m19 7-2.5 6a2.6 2.6 0 0 0 5 0Z"/><path d="M8 21h8"/>',
     grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>'
   };
   OB.icon = function (n, cls) {
@@ -168,11 +173,71 @@
     return on;
   };
 
+  /* ================================================================ toolbar pieces every view uses */
+  OB.ui = {};
+  /* a row of exclusive buttons; items: [[value, label, title?], …] */
+  OB.ui.seg = function (id, items, cur, cls) {
+    return '<div class="ob-seg' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="group">' + items.map(function (it) {
+      return '<button type="button" data-v="' + esc(it[0]) + '"' + (String(it[0]) === String(cur) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + (it[2] ? ' title="' + esc(it[2]) + '"' : '') + '>' + esc(it[1]) + '</button>';
+    }).join('') + '</div>';
+  };
+  OB.ui.setSeg = function (root, id, v) {
+    OB.$$('#' + id + ' button', root).forEach(function (b) { var on = b.getAttribute('data-v') === String(v); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  };
+  OB.ui.coinBtn = function (sym) {
+    return '<button type="button" class="ob-coin" id="ob-coin" aria-haspopup="dialog" aria-expanded="false"><span id="ob-coin-l"></span><b id="ob-coin-s">' + esc(sym) + '</b>' + OB.icon('chev') + '</button>';
+  };
+  OB.ui.coinLabel = function (root, sym) {
+    var l = $('#ob-coin-l', root), s = $('#ob-coin-s', root); if (!l) return;
+    l.innerHTML = OB.hasLogo(sym) === false ? '' : OB.logo(sym, 20); s.textContent = sym;
+  };
+  /* refresh · picture · link · full screen */
+  OB.ui.acts = function () {
+    function b(id, k, ic) { return '<button type="button" class="ob-ib" id="' + id + '" aria-label="' + esc(T(k)) + '" title="' + esc(T(k)) + '">' + OB.icon(ic) + '</button>'; }
+    return '<span class="ob-grow"></span><span class="ob-acts">' + b('ob-refresh', 'refresh', 'refresh') + b('ob-png', 'png', 'camera') + b('ob-share', 'share', 'share') + b('ob-full', 'full', 'full') + '</span>';
+  };
+  OB.ui.share = function (params) {
+    var q = new URLSearchParams(); Object.keys(params).forEach(function (k) { if (params[k] != null) q.set(k, params[k]); });
+    var url = location.origin + location.pathname + '?' + q.toString();
+    if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) { navigator.share({ title: d.title, url: url }).catch(function () { }); return; }
+    OB.copy(url).then(function (ok) { OB.toast(T(ok ? 'copied' : 'copy_fail')); });
+  };
+  /* the coin list (every coin with a perpetual on Binance or Bybit and a logo), with search.
+     o.current() → the chosen symbol, o.onPick(symbol), o.filter(coin) → false hides a coin */
+  OB.ui.pickCoin = function (o) {
+    var old = d.getElementById('ob-pick'); if (old) { old.remove(); return; }
+    var box = OB.h('<div class="ob-pick" id="ob-pick" role="dialog" aria-label="' + esc(T('coin')) + '"><div class="ob-pick-h"><span class="ob-find">' + OB.icon('search') +
+      '<input type="search" id="ob-pq" placeholder="' + esc(T('search_coin')) + '" autocomplete="off" spellcheck="false"></span><button type="button" class="ob-ib ob-sm" id="ob-pc" aria-label="' + esc(T('close')) + '">' + OB.icon('close') + '</button></div><div class="ob-pick-l" id="ob-pl"><div class="ob-wait">…</div></div></div>');
+    d.getElementById('ob').appendChild(box);
+    var q = $('#ob-pq', box), list = $('#ob-pl', box), all = null, cur = o.current();
+    function render() {
+      var term = q.value.trim().toUpperCase();
+      var rows = (all || []).filter(function (c) { return OB.hasLogo(c.base) !== false && (!o.filter || o.filter(c)) && (!term || c.base.indexOf(term) >= 0); }).slice(0, term ? 80 : 60);
+      if (!rows.length) { list.innerHTML = '<div class="ob-wait">' + esc(all ? T('no_coin') : '…') + '</div>'; return; }
+      list.innerHTML = rows.map(function (c) {
+        return '<button type="button" class="ob-pi' + (c.base === cur ? ' on' : '') + '" data-c="' + esc(c.base) + '">' + OB.logo(c.base, 22) + '<b>' + esc(c.base) + '</b><small>' +
+          (c.bn ? 'Binance' : '') + (c.bn && c.by ? ' · ' : '') + (c.by ? 'Bybit' : '') + '</small><span class="ob-n">' + esc(OB.fmtUsd(c.vol, 1)) + '</span></button>';
+      }).join('');
+    }
+    q.addEventListener('input', OB.debounce(render, 80));
+    box.addEventListener('click', function (e) {
+      if (e.target.closest('#ob-pc')) { box.remove(); return; }
+      var b = e.target.closest('.ob-pi'); if (!b) return;
+      box.remove(); o.onPick(b.getAttribute('data-c'));
+    });
+    box.addEventListener('keydown', function (e) { if (e.key === 'Escape') box.remove(); if (e.key === 'Enter') { var f = $('.ob-pi', list); if (f) f.click(); } });
+    render(); OB.coins().then(function (c) { all = c; render(); }, function () { list.innerHTML = '<div class="ob-wait ob-err">' + esc(T('err_net')) + '</div>'; });
+    setTimeout(function () { try { q.focus(); } catch (e) { } }, 30);
+  };
+
   /* ================================================================ the shell: tabs of the section + the view */
   /* the pages of the Observatory, in menu order: key, address, icon */
   OB.PAGES = [
     { k: 'liqheat', path: '/charts/liquidation-heatmap/', ic: 'flame' },
-    { k: 'liqmap', path: '/charts/liquidation-map/', ic: 'bars' }
+    { k: 'liqmap', path: '/charts/liquidation-map/', ic: 'bars' },
+    { k: 'oi', path: '/charts/open-interest/', ic: 'layers' },
+    { k: 'funding', path: '/charts/funding-rate/', ic: 'percent' },
+    { k: 'ls', path: '/charts/long-short/', ic: 'scale' }
   ];
   var root, cur = null, curKey = null;
   function headText() {
@@ -187,6 +252,9 @@
     root.innerHTML = '<div class="ob-top"><nav class="ob-tabs" aria-label="' + esc(T('nav')) + '">' + tabs + '</nav>' +
       '<a class="ob-all" href="/charts/">' + OB.icon('grid') + '<span>' + esc(T('all')) + '</span></a></div><div class="ob-view" id="ob-view"></div>';
     root.setAttribute('dir', OB.rtl() ? 'rtl' : 'ltr');
+    /* on a narrow screen the row of tabs scrolls sideways: bring the page's own tab to the middle */
+    var nav = $('.ob-tabs', root), on = $('.ob-tab.on', root);
+    if (nav && on) { var ra = on.getBoundingClientRect(), rb = nav.getBoundingClientRect(); nav.scrollLeft += (ra.left + ra.width / 2) - (rb.left + rb.width / 2); }
     curKey = key; cur = null;
     if (view) { cur = view; try { view.mount($('#ob-view', root)); } catch (e) { if (w.console) console.error(e); $('#ob-view', root).innerHTML = '<div class="ob-wait ob-err">' + esc(T('err_view')) + '</div>'; } }
     else $('#ob-view', root).innerHTML = '<div class="ob-wait">…</div>';

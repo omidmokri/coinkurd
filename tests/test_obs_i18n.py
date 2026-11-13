@@ -76,6 +76,7 @@ FAMILIES = {
     "tab_": [m.group(1) for m in re.finditer(r"\{ k: '(\w+)', path:", JS[os.path.join(ROOT, "assets", "obs", "core.js")])],
     "pal_": ["fire", "viridis", "ice", "mono"],
     "m": ["1", "2", "3", "1_d", "2_d", "3_d"],
+    "ls_": ["bn_all", "by_all", "bn_top_acc", "bn_top_pos"],
 }
 for q, f in sorted(used):
     if q not in EN:
