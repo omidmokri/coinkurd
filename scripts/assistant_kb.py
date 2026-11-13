@@ -30,6 +30,7 @@ FEATURES = [
     ("/money-flow/", ["mmap", "flows"], None),
     ("/liquidity/", ["mmap"], None),
     ("/etf/", ["mmap"], None),
+    ("/calendar/", ["events"], None),
     ("/dashboard/", ["score", "opps", "movers"], None),
     ("/coins/", ["coin"], "market"),
     ("/compare/", ["cmp"], None),
