@@ -579,7 +579,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  /* after the ground changed: soldiers standing in something step out of it; anyone whose way ahead was built on finds another */
  navCheck(t){for(const k in this.sides){const A=this.sides[k];for(const s of A.sold){if(s.st===ST.DIE||s.held)continue;
     if(!s.mv){if(NAV.clear(s.x,s.z)<.3){const p=NAV.free(s.x,s.z,.5,6,(x,z)=>!this.taken(x,z,s));if(p){s.mv=1;s.st=ST.WALK;s.sp=4;s.t0=t;this.route(A,s,p,t)}}}
-    else if(s.pl&&t>=s.t0){const P=s.pl;let ok=true;for(let i=1;i<P.length&&ok;i++)ok=NAV.lineClear(P[i-1][0],P[i-1][1],P[i][0],P[i][1],.28);if(!ok)this.route(A,s,[s.tx,s.tz],t,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+    else if(s.pl){const P=s.pl,w=.28+Math.abs(s.cv||0);let ok=true;for(let i=1;i<P.length&&ok;i++)ok=NAV.lineClear(P[i-1][0],P[i-1][1],P[i][0],P[i][1],w);if(!ok)this.route(A,s,[s.tx,s.tz],t,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
    for(const v of A.veh)if(v.mv&&v.ops&&v.ops.length&&!v.hold&&!v.dead&&!this.opsClear(v))this.planOr(v)}
   for(const tr of this.trucks)if(tr.on&&tr.mv&&tr.ops&&tr.ops.length&&!tr.hold&&!this.opsClear(tr))this.planOr(tr);
   if(window.GFX6&&GFX6.navCheck)GFX6.navCheck(t)},
@@ -644,7 +644,9 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
   const onHull=(x,z,hx,hz,rot)=>mv.some(o=>{const R=this.hd2(o)+.4;return NAV.obb(x,z,rot,hx,hz,o.x,o.z,0,R,R,0)||(o.mv&&!o.home&&o.gx!=null&&NAV.obb(x,z,rot,hx,hz,o.gx,o.gz,0,R,R,0))});   // (the square round the circle a hull turns in)
   const onWorks=(x,z,pad)=>W.some(sh=>NAV.inShape(sh,x,z,pad));
   const gates=Object.values(this.sides).map(A=>A.gate).filter(Boolean),atGate=(x,z)=>gates.some(g=>(x-g[0])*(x-g[0])+(z-g[1])*(z-g[1])<324);
-  const busy=(x,z,hx,hz,rot)=>nav&&(atGate(x,z)||Math.abs(z-gateZ(x))<Math.max(hx,hz)+4.2||!NAV.boxClear(x,z,hx,hz,rot,.08,null,true)||onHull(x,z,hx,hz,rot)||onWorks(x,z,Math.max(hx,hz)));
+  const onMen=(x,z,hx,hz,rot)=>{for(const k in this.sides)for(const s of this.sides[k].sold){if(s.st===ST.DIE)continue;if(NAV.inBox(s.x,s.z,x,z,rot,hx,hz,.7))return true}
+   const R=window.GFX6&&GFX6.RB;if(R&&R.sides)for(const k in R.sides){const T=R.sides[k];for(const o of T.bots.concat(T.dogs))if(NAV.inBox(o.x,o.z,x,z,rot,hx,hz,.9))return true}return false};   /* a block is never set down on a man or a machine: where one stands, the line keeps an opening */
+  const busy=(x,z,hx,hz,rot)=>nav&&(onMen(x,z,hx,hz,rot)||atGate(x,z)||Math.abs(z-gateZ(x))<Math.max(hx,hz)+4.2||!NAV.boxClear(x,z,hx,hz,rot,.08,null,true)||onHull(x,z,hx,hz,rot)||onWorks(x,z,Math.max(hx,hz)));
   for(const [key,w] of M.walls){const x=X(w.p);if(Math.abs(x)>XMAX)continue;const e=key[0]==='b'?1:-1,xx=x+e*1.55;
    for(let i=0;i<29&&nh<200;i++){const z=-33+i*2.36,r=((i*7)%5-2)*.025;if(i%7===6||Math.abs(z-2*Math.sin(xx*.035))<5.6)continue;/* the road stays open through the line: it is the vehicles' way */if(busy(xx,z,.66,1.12,r))continue;d.position.set(xx,this.gy(xx,z)-.06,z);d.rotation.set(0,r,0);d.scale.setScalar(1);d.updateMatrix();this.hesco.setMatrixAt(nh++,d.matrix);if(nav)W.push(NAV.box(xx,z,.66,1.12,r,'hesco'))}
    if(w.fort&&bi<this.bunkers.length){const rot=e>0?0:Math.PI;let bx=x-e*3,bz=-9;if(nav){const pt=NAV.free(bx,bz,2.4,14,(px,pz)=>!busy(px,pz,2.35,4.5,rot),true);if(!pt)continue;bx=pt[0];bz=pt[1]}const b=this.bunkers[bi++];b.visible=true;b.position.set(bx,this.gy(bx,bz),bz);b.rotation.y=rot;if(nav)W.push(NAV.box(bx,bz,2.35,4.5,rot,'bunker'))}}
@@ -654,7 +656,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
     if(sl.rank>=2&&np<70){const xx=sl.x-e*3.6,zz=sl.zc-2.8;if(!nav||(NAV.clear(xx,zz,true)>=.3&&Math.abs(zz-gateZ(xx))>5&&!atGate(xx,zz)&&!onWorks(xx,zz,.3)&&!onHull(xx,zz,.2,.2,0))){d.position.set(xx,this.gy(xx,zz),zz);d.rotation.set(0,e>0?0:Math.PI,0);d.scale.setScalar(1.3);d.updateMatrix();this.penn.setMatrixAt(np,d.matrix);this.penn.setColorAt(np++,A.pcol);if(nav)W.push(NAV.circle(xx,zz,.16,'flag'))}}}}
   this.hesco.count=nh;this.empl.count=ne;this.penn.count=np;this.hesco.instanceMatrix.needsUpdate=this.empl.instanceMatrix.needsUpdate=this.penn.instanceMatrix.needsUpdate=true;if(this.penn.instanceColor)this.penn.instanceColor.needsUpdate=true;
   for(let i=bi;i<this.bunkers.length;i++)this.bunkers[i].visible=false;
-  this.works=W;if(nav)this.navSync(false)},
+  this.works=W;if(nav)this.navSync(true)},   // the map changes the moment a wall goes up, so nobody walks on through it
  artillery(){const mat={bull:GFX.vehicleMaterial(GFX.TEAMS.bull,GFX.std,this.AU),bear:GFX.vehicleMaterial(GFX.TEAMS.bear,GFX.std,this.AU)};this.vmat=mat;
   const place=(g,x,z,dir,hx,hz)=>{g.scale.setScalar(SC.gun);g.position.set(x,this.gy(x,z),z);g.rotation.y=dir<0?0:Math.PI;g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=GFX.std}});scene.add(g);if(window.NAV)NAV.add(NAV.box(x,z,hx*SC.gun,hz*SC.gun,0,'gun'));return g};
   const G3=(m,x,z,d)=>place(GFX.spg(m),x,z,d,2.5,1.42),R3m=(m,x,z,d)=>place(GFX.mlrs(m),x,z,d,2.8,1.16);
