@@ -218,6 +218,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /calendar/ + bot: each user's own time zone and alert times (owner's request in chat, not by the loop)
+- Page (`calendar/cal.js`): besides Tehran / Erbil / UTC / device, a city list (summer time through Intl) or any fixed
+  UTC offset (−12 … +14, :30/:45 included). Every time on the page, the clock, the reminders' texts and the bot link follow it.
+- Lead time: 5 min … 1 day or any custom minutes, for the browser reminders and the .ics alarm; a new switch rings for
+  every red US release automatically. The bot button carries the zone and lead over: `?start=ec_<o±min|zArea-City>_l<min>`.
+- Bot (`scripts/bot_econ.py`): «📅 تقویم اقتصادی» gets «منطقهٔ زمانی» (`ec:tz` → `ez:<IANA|o±min>`, same 16 cities +
+  38 offsets) and «زمان هشدار» (`ec:ld` → `el:<min>`, several at once: 5/10/15/30/60/120/240/1440). Private heads-ups
+  now go per user at each chosen lead, written in the user's clock; one message covers leads passed while the bot was
+  down; nothing under a minute before. The group posts (topic 47540, 30 min, Tehran/Erbil/UTC) are unchanged.
+- Checks: bot_econ self-test 20/20 (offsets incl. Berlin winter/summer, leads, deep link, late start), offline drive
+  of the callbacks and `/start ec_…`, test_bot_v2 / test_bot_pro / test_ecocal pass, Playwright fa/ckb/en at 1280/390
+  (times shift right, links, .ics TRIGGER, auto reminder rings, no overflow, no JS errors).
+
 ### 2026-11-13 · /dashboard/: the confirmed market regime at the top (owner's request in chat, not by the loop)
 - `build_pages.regime_hero()` (+ `RH_CSS`): the confirmed regime of `data/regime.json` `rule.now` (label, days in it,
   a pending change with its days of the confirmation window), its five votes (Mayer, MA200 slope, weekly RSI,
