@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "18"  # bump to bust caches of chrome.css / chrome.js
+VER = "19"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -334,7 +334,7 @@ FOOT_COLS = ["mkt", "ana", "reality", "tools", "learn", "arc", "more"]   # every
 
 
 # مسیرهایی که حاشیهٔ نور چرخان می‌گیرند (کلاس ekg در assets/chrome.css)
-GLOW = {"/academy/", "/academy/f13/", "/bitcoin/"}
+GLOW = set()   # owner 2026-11-13: no glowing items; the glow follows the active top menu (assets/chrome.js)
 
 
 def _item(href, ic, title, desc, lang):
@@ -362,7 +362,7 @@ def header(lang="fa"):
         c = cats[k]
         end = " ek-end" if i >= len(TOP_ORDER) - 2 else ""
         items = "".join(_item(h, ic, t, d, lang) for h, ic, t, d in c["items"])
-        mt = "ek-mt ekg ekg-pill" if k == "learn" else "ek-mt"
+        mt = "ek-mt"
         parts.append(f'<div class="ek-mi{end}" data-k="{k}"><button class="{mt}" type="button" aria-expanded="false" aria-haspopup="true">'
                      f'{tri(c["t"], lang)}{icon("chev", "ek-svg ek-chev")}</button><div class="ek-mp"><div class="ek-mg">{items}</div></div></div>')
     tools = (f'<button class="ek-ib ek-sb" type="button"{aria(T["search"], lang)}>{icon("search")}</button>'
