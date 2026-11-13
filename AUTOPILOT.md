@@ -218,6 +218,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /dashboard/: the confirmed market regime at the top (owner's request in chat, not by the loop)
+- `build_pages.regime_hero()` (+ `RH_CSS`): the confirmed regime of `data/regime.json` `rule.now` (label, days in it,
+  a pending change with its days of the confirmation window), its five votes (Mayer, MA200 slope, weekly RSI,
+  fear & greed, funding) with their values, four readings — sentiment (`market.json` fng), breadth
+  (`brain.json` up/range/down of n coins), BTC momentum (24 h, RSI), risk (HMM top state's probability and switch
+  risk) — and the last 180 days of the confirmed regime as a coloured strip (old → new, left → right). Any missing
+  source leaves its part out. `RH_` names because `REG_FA` already exists further down (another vocabulary).
+- Verified: real data from main, screenshots at 1280 px (fa, en shell) and 390 px; 0 JS errors; deep_e2e 104.
 ### 2026-11-13 · /market/: Faraz's feature list, done fully — backtests, optimizer, alerts, market watch, news, help, QR (owner's request in chat, not by the loop)
 - Backtesting (`assets/pro/backtest.js`, new): one account model for replay and the strategy tester — balance, size (% of
   equity), leverage with liquidation (margin lost, 0.5% maintenance), fee per side, slippage (none on limit fills and

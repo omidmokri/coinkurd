@@ -762,6 +762,93 @@ def main():
 # تا موتورهای جستجو و ابزارهایی که جاوااسکریپت اجرا نمی‌کنند هم دادهٔ واقعی ببینند.
 # جاوااسکریپت صفحه بعد از بارگذاری همین بخش‌ها را با دادهٔ تازه جایگزین می‌کند.
 
+RH_FA = {"bull": "صعودی", "bear": "نزولی", "sideways": "خنثی (رنج)", "high_vol": "پرنوسان"}
+RH_COL = {"bull": "#34d399", "bear": "#ff5a4d", "sideways": "#ffd27a", "high_vol": "#a5b4fc"}
+RH_DIM = {"mayer": ("مضرب مایر", "قیمت ÷ میانگین ۲۰۰ روزه"), "slope": ("شیب میانگین ۲۰۰", "درصد تغییر ۲۰ روزه"),
+           "wrsi": ("RSI هفتگی", "قدرت روند هفتگی"), "fng": ("ترس و طمع", "alternative.me"), "fund": ("فاندینگ", "نرخ تأمین مالی قراردادهای دائمی")}
+
+
+def _fa(x):
+    return str(x).translate(_FAD)
+
+
+def regime_hero():
+    """/dashboard/ top: the confirmed market regime, its five votes, four readings of the market and the last 180 days.
+    Every figure comes from data/regime.json (rule + HMM), data/brain.json and data/market.json; a missing source
+    leaves its part out — nothing is filled in."""
+    rg = load("regime.json", {})
+    rule = (rg.get("rule") or {}).get("now") or {}
+    lab = rule.get("label")
+    if lab not in RH_FA:
+        return ""
+    order = list((rg.get("states") or {}).keys()) or ["bull", "bear", "sideways", "high_vol"]
+    col = RH_COL[lab]
+    pend = rule.get("pending") or {}
+    pend_html = (f'<p class="rh-pend">در حال سنجش تغییر به <b style="color:{RH_COL.get(pend.get("to"), "#fff")}">{RH_FA.get(pend.get("to"), "")}</b>: '
+                 f'{_fa(pend.get("days", 0))} از {_fa(pend.get("need", 0))} روزِ لازم برای تأیید</p>') if pend.get("to") in RH_FA else ""
+    votes = ""
+    for dm in rule.get("dims") or []:
+        nm = RH_DIM.get(dm.get("k"))
+        if not nm or dm.get("v") is None:
+            continue
+        vt = dm.get("vote", 0)
+        cls, sym = ("up", "▲") if vt > 0 else ("down", "▼") if vt < 0 else ("flat", "●")
+        votes += f'<span class="rh-v {cls}" title="{e(nm[1])}"><i>{sym}</i>{e(nm[0])} <b class="num">{round(dm["v"], 2)}</b></span>'
+    # four readings
+    br = (brain.get("regime") or {})
+    b = br.get("breadth") or {}
+    f = market.get("fng") or {}
+    now = rg.get("now") or {}
+    pill = []
+    if f.get("value") is not None:
+        pill.append(("احساسات", f'<b class="num">{f["value"]}</b><small>{e(f.get("class", ""))} · شاخص ترس و طمع</small>', f["value"]))
+    if b.get("n"):
+        bar = (f'<div class="rh-br"><i style="flex:{b.get("up_pct", 0)} 0 0;background:#34d399"></i><i style="flex:{b.get("range_pct", 0)} 0 0;background:#6b6c72"></i>'
+               f'<i style="flex:{b.get("down_pct", 0)} 0 0;background:#ff5a4d"></i></div>')
+        pill.append(("پهنای بازار", f'{bar}<small>{_fa(b.get("up_pct", 0))}٪ صعودی · {_fa(b.get("range_pct", 0))}٪ رنج · {_fa(b.get("down_pct", 0))}٪ نزولی از {_fa(b["n"])} ارز</small>', None))
+    if br.get("btc_chg24") is not None:
+        c24 = br["btc_chg24"]
+        pill.append(("مومنتوم BTC", f'<b class="num {"up" if c24 >= 0 else "down"}">{c24:+.2f}%</b><small>۲۴ ساعت · RSI {_fa(br.get("btc_rsi", "—"))}</small>', None))
+    if now.get("top") in RH_FA and now.get("confidence") is not None:
+        pill.append(("ریسک", f'<b class="num">{_fa(round(now["confidence"] * 100, 1)).replace(".", "٫")}٪</b><small>احتمال حالت «{RH_FA[now["top"]]}» در مدل آماری (HMM) · '
+                              f'ریسک تغییر حالت {_fa(round((now.get("switch_risk") or 0) * 100))}٪</small>', None))
+    pills = "".join(f'<div class="rh-p"><span>{k}</span>{v}</div>' for k, v, _ in pill)
+    # last 180 days of the confirmed regime
+    hist = ((rg.get("rule") or {}).get("history") or [])[-180:]
+    strip = ""
+    if hist:
+        w = 100 / len(hist)
+        rects = "".join(f'<rect x="{i * w:.3f}" y="0" width="{w + .05:.3f}" height="10" fill="{RH_COL.get(order[h["l"]] if 0 <= h.get("l", -1) < len(order) else "", "#333")}"><title>{h["d"]} · {RH_FA.get(order[h["l"]], "") if 0 <= h.get("l", -1) < len(order) else ""}</title></rect>'
+                        for i, h in enumerate(hist))
+        legend = "".join(f'<span><i style="background:{RH_COL[k]}"></i>{RH_FA[k]}</span>' for k in order if k in RH_COL)
+        strip = (f'<div class="rh-t"><div class="rh-th"><span>{_fa(len(hist))} روز گذشته</span><span class="rh-lg">{legend}</span></div>'
+                 f'<svg viewBox="0 0 100 10" preserveAspectRatio="none" role="img" aria-label="تاریخچهٔ رژیم تأییدشده">{rects}</svg>'
+                 f'<div class="rh-th"><span class="num">{hist[0]["d"]}</span><span class="num">{hist[-1]["d"]}</span></div></div>')
+    return (f'<section class="rh" style="--rc:{col}"><div class="rh-top"><div><span class="rh-k">رژیم تأییدشدهٔ بازار · BTC</span>'
+            f'<div class="rh-l">{RH_FA[lab]}</div><p class="rh-d">{_fa(rule.get("days_in", 0))} روز در این وضعیت · تأیید پس از {_fa((rg.get("rule") or {}).get("confirm_days", 5))} روز پیاپی</p>{pend_html}</div>'
+            f'<div class="rh-vs"><span class="rh-k">پنج رأی پشت این رژیم</span><div>{votes}</div><a href="/regime/">روش و کارنامهٔ رادار رژیم ←</a></div></div>'
+            f'<div class="rh-ps">{pills}</div>{strip}<p class="disc">به‌روزرسانی {_fa(rule.get("date", ""))} · توصیف وضعیت است، نه پیش‌بینی یا توصیهٔ معاملاتی.</p></section>')
+
+
+RH_CSS = (".rh{position:relative;margin:14px 0 22px;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;"
+           "background:radial-gradient(70% 120% at 100% 0,color-mix(in srgb,var(--rc) 16%,transparent),transparent 60%),rgba(14,14,17,.8)}"
+           ".rh::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--rc),transparent);opacity:.8}"
+           ".rh-top{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;align-items:start}.rh-k{display:block;color:var(--mute);font-size:.78rem;margin-bottom:4px}"
+           ".rh-l{font-size:clamp(2rem,6vw,3.2rem);font-weight:900;line-height:1.15;color:var(--rc);text-shadow:0 0 40px color-mix(in srgb,var(--rc) 45%,transparent)}"
+           ".rh-d{margin:6px 0 0;color:#cfcfc8;font-size:.88rem}.rh-pend{margin:8px 0 0;font-size:.82rem;color:var(--mute)}"
+           ".rh-vs>div{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.rh-vs a{font-size:.8rem}"
+           ".rh-v{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:.8rem;background:#ffffff06}"
+           ".rh-v i{font-style:normal;font-size:.7rem}.rh-v.up i{color:#34d399}.rh-v.down i{color:#ff5a4d}.rh-v.flat i{color:#8d8f93}.rh-v b{font-weight:600;font-size:.78rem}"
+           ".rh-ps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0 16px}"
+           ".rh-p{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.025)}"
+           ".rh-p>span{display:block;color:var(--mute);font-size:.76rem;margin-bottom:4px}.rh-p b{font-family:'Space Grotesk',monospace;font-size:1.5rem}"
+           ".rh-p small{display:block;color:var(--mute);font-size:.72rem;line-height:1.6;margin-top:4px}"
+           ".rh-br{display:flex;width:100%;height:10px;border-radius:5px;overflow:hidden;margin:8px 0 2px;direction:ltr}.rh-br i{display:block;height:100%}"
+           ".rh-t{direction:ltr}.rh-t .rh-lg{direction:rtl}.rh-t svg{display:block;width:100%;height:16px;border-radius:5px;margin:6px 0}.rh-th{display:flex;justify-content:space-between;gap:10px;color:var(--mute);font-size:.72rem;flex-wrap:wrap}"
+           ".rh-lg{display:flex;gap:10px;flex-wrap:wrap}.rh-lg span{display:inline-flex;align-items:center;gap:4px}.rh-lg i{width:9px;height:9px;border-radius:2px;display:inline-block}"
+           "@media(max-width:760px){.rh{padding:16px}.rh-top{grid-template-columns:1fr;gap:16px}.rh-ps{grid-template-columns:repeat(2,minmax(0,1fr))}}")
+
+
 def intel_html():
     m, out = market, {}
     if m.get("fng"):
@@ -897,8 +984,8 @@ def prerender():
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.tsc,.ibox{overflow-x:auto;-webkit-overflow-scrolling:touch}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
-    body = f'<h1>داشبورد هوشمند بازار</h1><div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
-    urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}</style>")]
+    body = f'<h1>داشبورد هوشمند بازار</h1>{regime_hero()}<div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
+    urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}{RH_CSS}</style>")]
     # /categories/<id>/
     for c in meta.get("categories", []):
         ps = [p for p in posts if p["category"] == c["id"]]
