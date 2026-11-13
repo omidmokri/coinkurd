@@ -21,6 +21,23 @@ ALPHA = 0.05
 CODE = "https://github.com/omidmokri/coinkurd/blob/main/scripts/trackrecord.py"
 
 S = {
+    "cv_t": L("ادعا در برابر نتیجه", "بانگەشە بەرامبەر ئەنجام", "Claim versus result"),
+    "cv_d": L("سه چیزی که معمولاً از یک کانال انتظار می‌رود، و آنچه دادهٔ همین آرشیو دربارهٔ هرکدام می‌گوید. «تأیید شد» فقط وقتی که احتمال تصادفی بودن کمتر از ۵٪ باشد.",
+              "سێ شت کە بە زۆری لە کەناڵێک چاوەڕوان دەکرێت، و ئەوەی داتای ئەم ئەرشیفە دەربارەی هەریەکەیان دەڵێت. «پشتڕاستکرایەوە» تەنها کاتێک کە ئەگەری هەڕەمەکی بوون لە ٥٪ کەمتر بێت.",
+              "Three things people usually expect from a channel, and what this archive's own data says about each. “Confirmed” only when the chance of luck is below 5%."),
+    "cv_claim": L("انتظار", "چاوەڕوانی", "Expectation"),
+    "cv_res": L("نتیجهٔ واقعی", "ئەنجامی ڕاستەقینە", "Real result"),
+    "cv_1": L("بعد از پست، بیت‌کوین بهتر از حالت عادی حرکت می‌کند.", "دوای پۆست، بیتکۆین باشتر لە کاتی ئاسایی دەجووڵێت.", "After a post, bitcoin moves better than usual."),
+    "cv_2": L("پست‌ها بیشتر از نصف وقت‌ها جهت درست را نشان می‌دهند.", "پۆستەکان زیاتر لە نیوەی کاتەکان ئاراستەی دروست پیشان دەدەن.", "Posts point the right way more often than a coin flip."),
+    "cv_3": L("پست‌ها پیش از حرکت بازار می‌آیند، نه بعد از آن.", "پۆستەکان پێش جووڵەی بازاڕ دێن، نەک دوای ئەو.", "Posts come before the market moves, not after it."),
+    "cv_m1": L("حرکت ۲۴ ساعته بعد از پست", "جووڵەی ٢٤ کاتژمێرە دوای پۆست", "24-hour move after a post"),
+    "cv_m2": L("درصد پست‌های مثبت", "ڕێژەی پۆستە ئەرێنییەکان", "Share of positive posts"),
+    "cv_m3": L("حرکت ۴ ساعت قبل از پست", "جووڵەی ٤ کاتژمێر پێش پۆست", "Move in the 4 hours before"),
+    "cv_ok": L("تأیید شد", "پشتڕاستکرایەوە", "Confirmed"),
+    "cv_neg": L("خلافش ثابت شد", "پێچەوانەکەی سەلمێندرا", "The opposite held"),
+    "cv_no": L("با داده تأیید نشد", "بە داتا پشتڕاست نەکرایەوە", "Not confirmed by the data"),
+    "sig": L("معنادار", "بەرچاو", "Significant"),
+    "nsig": L("معنادار نیست", "بەرچاو نییە", "Not significant"),
     "title": L("کارنامهٔ واقعی کانال", "کارنامەی ڕاستەقینەی کەناڵ", "The channel's real track record"),
     "h1": L("بعد از پست‌های کانال، بازار واقعاً چه کرد؟", "دوای پۆستەکانی کەناڵ، بازاڕ بەڕاستی چی کرد؟",
             "After the channel posts, what did the market really do?"),
@@ -260,6 +277,23 @@ def s2(k, lg, **kw):
 
 
 CSS = """
+.cv{display:grid;gap:10px}
+.cv-row{display:grid;grid-template-columns:1fr 34px 1.15fr;align-items:stretch;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}
+.cv-c,.cv-r{padding:14px 16px}.cv-c small,.cv-r small{display:block;color:var(--mute);font-size:.74rem;margin-bottom:4px}
+.cv-c p{margin:0;font-weight:700;line-height:1.7}
+.cv-c{background:rgba(255,255,255,.02)}
+.cv-x{position:relative}.cv-x::before{content:"";position:absolute;top:12px;bottom:12px;left:50%;width:1px;background:var(--line)}
+.cv-x::after{content:"⟷";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--mute);background:var(--card);padding:4px 0;font-size:.9rem}
+.cv-n{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.cv-n b{font-size:1.5rem;font-family:'Space Grotesk',monospace}.cv-n span{color:var(--mute);font-size:.8rem}
+.cv-v{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:99px;font-size:.78rem;font-weight:700}
+.cv-row.ok{border-color:rgba(34,197,94,.45)}.cv-row.ok .cv-v{background:rgba(34,197,94,.15);color:#4ade80}
+.cv-row.neg{border-color:rgba(239,68,68,.45)}.cv-row.neg .cv-v{background:rgba(239,68,68,.14);color:#f87171}
+.cv-row.no .cv-v{background:rgba(255,255,255,.07);color:#cfcfc8}.cv-row.no .cv-r{background:repeating-linear-gradient(135deg,transparent 0 9px,rgba(255,255,255,.018) 9px 18px)}
+@media(max-width:700px){.cv-row{grid-template-columns:1fr}.cv-x{height:22px}.cv-x::before{top:50%;bottom:auto;left:16px;right:16px;width:auto;height:1px}}
+.tr-card{position:relative}.tr-sig{position:absolute;top:12px;inset-inline-end:12px;font-size:.68rem;font-weight:700;padding:1px 8px;border-radius:99px}
+.tr-card.sig{border-color:rgba(247,147,26,.5);box-shadow:0 0 0 1px rgba(247,147,26,.15),0 18px 40px -26px rgba(247,147,26,.6)}
+.tr-card.sig .tr-sig{background:rgba(247,147,26,.16);color:#ffb347}
+.tr-card.ns{border-style:dashed}.tr-card.ns .tr-sig{background:rgba(255,255,255,.06);color:var(--mute)}.tr-card.ns .v{opacity:.8}
 .tr-hero{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:16px 0}
 .tr-hero.up{border-color:rgba(34,197,94,.5);background:linear-gradient(180deg,rgba(34,197,94,.07),transparent 70%),var(--card)}
 .tr-hero.dn{border-color:rgba(239,68,68,.45);background:linear-gradient(180deg,rgba(239,68,68,.06),transparent 70%),var(--card)}
@@ -286,6 +320,28 @@ CSS = """
 """
 
 
+def claims(d, lg):
+    """the three usual expectations, each set against the archive's own number, its random baseline and its p-value"""
+    o, t = d["obs"], d["test"]
+    rows = ""
+    for i, (key, m, dg, sg) in enumerate((("r24", "cv_m1", 2, True), ("hit", "cv_m2", 1, False), ("before", "cv_m3", 2, True)), 1):
+        if key not in o or key not in t:
+            continue
+        sd = side(o[key], t[key])
+        if key == "before":
+            # the claim is that posts are not late: it holds unless the move *before* posts is significant either way
+            st = "neg" if sd != "no" else "ok"
+        else:
+            st = "no" if sd == "no" else "ok" if sd == "up" else "neg"
+        verdict = {"ok": "cv_ok", "neg": "cv_neg", "no": "cv_no"}[st]
+        rows += (f"<div class='cv-row {st}'><div class='cv-c'><small>{e(s('cv_claim', lg))}</small><p>{e(s('cv_' + str(i), lg))}</p></div>"
+                 f"<div class='cv-x' aria-hidden='true'></div>"
+                 f"<div class='cv-r'><small>{e(s('cv_res', lg))} · {e(s(m, lg))}</small>"
+                 f"<div class='cv-n'><b>{pct(o[key], lg, dg, sg)}</b><span>{e(s('random', lg))}: {pct(t[key]['mid'], lg, dg, sg)}</span></div>"
+                 f"<span class='cv-v'>{e(s(verdict, lg))}</span> <span class='tr-chip'>{e(s('pval', lg))}: {pv(t[key]['p'], lg)}</span></div></div>")
+    return BR.sec(s("cv_t", lg), f"<div class='cv'>{rows}</div>", lead=e(s("cv_d", lg))) if rows else ""
+
+
 def build():
     d = R.load("trackrecord.json", {})
 
@@ -307,9 +363,11 @@ def build():
         for key, nm, d2, sg in (("hit", "m_hit", 1, False), ("before", "m_before", 2, True), ("range", "m_range", 2, False)):
             sd2 = side(o[key], t[key])
             ik = {"hit": "i_hit_", "before": "i_bef_", "range": "i_rng_"}[key] + sd2
-            cards.append(f"<div class='tr-card'><h3>{e(s(nm, lg))}</h3><div class='tr-row'><span class='v'>{pct(o[key], lg, d2, sg)}</span>"
+            sig = t[key].get("p") is not None and t[key]["p"] < ALPHA
+            cards.append(f"<div class='tr-card {'sig' if sig else 'ns'}'><span class='tr-sig'>{e(s('sig' if sig else 'nsig', lg))}</span><h3>{e(s(nm, lg))}</h3><div class='tr-row'><span class='v'>{pct(o[key], lg, d2, sg)}</span>"
                          f"<span class='vs'>{e(s('random', lg))}: {pct(t[key]['mid'], lg, d2, sg)}</span></div>"
                          f"<div><span class='tr-chip'>{e(s('pval', lg))}: {pv(t[key]['p'], lg)}</span></div><p>{e(s(ik, lg))}</p></div>")
+        h += claims(d, lg)
         h += "<div class='tr-grid'>" + "".join(cards) + "</div>"
         h += BR.sec(s("hist", lg), histo(d["hist"], lg), lead=e(s("hist_d", lg)))
         rows = []

@@ -224,6 +224,23 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · Track record «ادعا در برابر نتیجه», academy skill tree, the owner's background clips (owner's request in chat, not by the loop)
+- Owner supplied 7 reference clips (000–006, his Desktop\coooode). Used as moving backgrounds (assets/bg/, sound
+  stripped, re-encoded small, poster first): **000** light lines → behind the top of /track-record/ and the reality
+  pages (/reality/, /ledger/, /iran-friction/, /hype/, /silent-exit/, /iran-correlation/); **006** the reader
+  dissolving into his book → beside the /academy/ title. `deep.js` part 6 (`BANDS`) places them; a still poster on
+  lite devices, reduced motion, Save-Data and hidden tabs; plays only in view. Used as patterns, not as footage:
+  **003** isometric cube field → the academy skill tree; **004** sliding glass pill → the tree's filter switch;
+  **005** text ripple → `[data-ds-ripple]` (deep.js part 7, mouse only) on the academy title. **001** and **002**
+  not used: light-theme UI, and 002 is another studio's poster design with its own lettering.
+- /track-record/: «ادعا در برابر نتیجه» (three usual expectations vs this archive's own number, random baseline,
+  p-value; confirmed only at p < 0.05; for "posts come before the move" a significant pre-move refutes it) and
+  significant / not-significant cards that look different (lit border vs dashed). fa · ckb · en.
+- /academy/: «درخت مهارت» — one isometric cube per lesson, a row per faculty (first lesson next to its name in RTL),
+  states from the learner's own progress in this browser (mastered / open / locked, the next lesson pulses);
+  faculties in production show «در حال تولید», no cubes. Filter all / open / mastered.
+- `DEEP_VER` 3. Verified: screenshots 1280 / 390 px, videos play, no sideways scroll, 0 JS errors; deep_e2e 104,
+  test_seo_struct, test_build_links, academy_check 0 problems.
 ### 2026-11-13 · /calendar/ + bot: each user's own time zone and alert times (owner's request in chat, not by the loop)
 - Page (`calendar/cal.js`): besides Tehran / Erbil / UTC / device, a city list (summer time through Intl) or any fixed
   UTC offset (−12 … +14, :30/:45 included). Every time on the page, the clock, the reminders' texts and the bot link follow it.
