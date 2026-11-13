@@ -123,3 +123,16 @@
   .ec-bars .br{grid-template-columns:86px minmax(0,1fr) 52px}
   .ec-hist>div{grid-template-columns:minmax(0,1.4fr) repeat(4,minmax(0,1fr));font-size:.78rem}
 }
+/* own time zone + lead time (2026-11-13) */
+#ecTz{font:inherit;font-size:.84rem;color:var(--soft);background:#14161a;border:1px solid var(--line);border-radius:999px;padding:6px 12px;max-width:100%;cursor:pointer}
+#ecTz.on{color:#111;background:var(--o2);border-color:var(--o2);font-weight:700}
+#ecTz option,#ecTz optgroup{color:#fff;background:#14161a;font-weight:400}
+.ec-lead{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.ec-lead button,.ec-pop .ec-lead button{font:inherit;font-size:.8rem;color:var(--soft,#ddd);background:rgba(255,255,255,.04);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:999px;padding:5px 10px;cursor:pointer;text-align:center}
+.ec-lead button.on,.ec-pop .ec-lead button.on{color:#111;background:var(--o2,#f7931a);border-color:var(--o2,#f7931a);font-weight:700}
+.ec-lead .cu{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:var(--mute,#9a9a94);border:1px solid var(--line,rgba(255,255,255,.12));border-radius:999px;padding:2px 8px}
+.ec-lead .cu.on{border-color:var(--o2,#f7931a);color:#fff}
+.ec-lead .cu input{width:5.2em;font:inherit;font-size:.8rem;color:#fff;background:transparent;border:0;outline:0;padding:3px 0;text-align:center}
+.ec-pop .lb,#ecRem .lb{font-size:.78rem;color:var(--mute,#9a9a94);margin-top:2px}
+#ecRem .ec-auto{margin:4px 0 10px}
+#ecRem h3+.ec-note{margin-top:0}
