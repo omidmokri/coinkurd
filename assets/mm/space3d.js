@@ -264,8 +264,10 @@
     E.orbit.s.min = R * 0.8;
   }
   function bubFit() {
-    var R = 10; E.items.forEach(function (it) { R = Math.max(R, it.p.length() + it.tr); });
-    E.orbit.fitSphere(R, E.w / E.h, E.cam.fov);
+    var rx = 10, ry = 10; E.items.forEach(function (it) { rx = Math.max(rx, Math.hypot(it.p.x, it.p.z) + it.tr); ry = Math.max(ry, Math.abs(it.p.y) + it.tr); });
+    /* frame the cloud by its real width and height, not a sphere round it */
+    var half = E.cam.fov * Math.PI / 360, dist = Math.max(ry / Math.tan(half), rx / (Math.tan(half) * E.w / E.h)) * 1.08 + rx * 0.5;
+    E.orbit.s.min = 20; E.orbit.s.max = dist * 2.5; E.orbit.fit(dist);
   }
   function cityRelabel() {
     (E.labels || []).forEach(function (it) {
@@ -342,10 +344,10 @@
     var it = E.items, n = it.length, i, j, moving = 0, camDir = new THREE.Vector3();
     for (i = 0; i < n; i++) {
       var a = it[i]; a.r += (a.tr - a.r) * 0.08; moving += Math.abs(a.tr - a.r);
-      if (!(E.grab && E.grab.it === a)) a.v.addScaledVector(a.p, -0.0016);
+      if (!(E.grab && E.grab.it === a)) { var asp = Math.max(1, E.w / E.h); a.v.x -= a.p.x * 0.0012 / asp; a.v.y -= a.p.y * 0.0016; a.v.z -= a.p.z * 0.0012; }   /* a wide cloud on a wide screen */
     }
     for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
-      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 0.6 + 0.12 * Math.min(A.r, B.r);
+      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 1.4 + 0.3 * Math.min(A.r, B.r);
       if (dist < min) {
         var ov = (min - dist) / dist * 0.5, wa = B.r * B.r / (A.r * A.r + B.r * B.r), wb = 1 - wa;
         if (E.grab) { if (E.grab.it === A) { wa = 0; wb = 1; } else if (E.grab.it === B) { wa = 1; wb = 0; } }
