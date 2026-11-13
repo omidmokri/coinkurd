@@ -3,7 +3,11 @@
      /data/ecocal.json       every currency's releases (ForexFactory feed, kept as 26 weeks of history; b1/b4 = BTC % 1h/4h)
      /data/econ_actual.json  official actuals of the red US releases (BLS / the Fed's statement) — scripts/econ_live.py
      /data/fed.json          current target range + Kalshi odds per FOMC meeting + their history — scripts/econ_live.py
-   Personal state only in localStorage: ek_cal (filters, time zone), ek_cal_rem (reminders). */
+   Personal state only in localStorage: ek_cal (filters, time zone, lead time, auto reminders), ek_cal_rem (reminders),
+   ek_cal_auto (auto reminders already rung).
+   Time zone (owner's request, 2026-11-13): the presets, a city (IANA, summer time through Intl) or any fixed offset from
+   UTC; every time on the page, the reminders' texts and the bot link (?start=ec_<zone>_l<minutes>) follow it. The city
+   list and the lead times are the same as ZONES / LEADS in scripts/bot_econ.py. */
 (function () {
   'use strict';
   var d = document, w = window;
@@ -28,15 +32,57 @@
     ckb: ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'],
     ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
     en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] };
+  /* cities (summer time follows the city) and fixed offsets — the same lists as scripts/bot_econ.py */
+  var ZONES = [
+    ['Asia/Tehran', 'تهران', 'تاران', 'Tehran', 'طهران'], ['Asia/Baghdad', 'هولیر و بغداد', 'هەولێر و بەغدا', 'Erbil & Baghdad', 'أربيل وبغداد'],
+    ['Europe/Istanbul', 'استانبول و آنکارا', 'ئەستەنبوڵ و ئەنقەرە', 'Istanbul & Ankara', 'إسطنبول وأنقرة'], ['Asia/Damascus', 'دمشق', 'دیمەشق', 'Damascus', 'دمشق'],
+    ['Asia/Dubai', 'دبی', 'دوبەی', 'Dubai', 'دبي'], ['Asia/Kabul', 'کابل', 'کابول', 'Kabul', 'كابول'], ['Europe/Moscow', 'مسکو', 'مۆسکۆ', 'Moscow', 'موسكو'],
+    ['Europe/London', 'لندن', 'لەندەن', 'London', 'لندن'], ['Europe/Berlin', 'برلین، پاریس، آمستردام', 'بەرلین، پاریس، ئەمستەردام', 'Berlin, Paris, Amsterdam', 'برلين، باريس، أمستردام'],
+    ['Europe/Stockholm', 'استکهلم، اسلو، کپنهاگ', 'ستۆکهۆڵم، ئۆسلۆ، کۆپنهاگن', 'Stockholm, Oslo, Copenhagen', 'ستوكهولم، أوسلو، كوبنهاغن'],
+    ['Europe/Helsinki', 'هلسینکی و آتن', 'هێلسینکی و ئەسینا', 'Helsinki & Athens', 'هلسنكي وأثينا'], ['America/New_York', 'نیویورک و تورنتو', 'نیویۆرک و تۆرۆنتۆ', 'New York & Toronto', 'نيويورك وتورنتو'],
+    ['America/Chicago', 'شیکاگو', 'شیکاگۆ', 'Chicago', 'شيكاغو'], ['America/Los_Angeles', 'لس‌آنجلس و ونکوور', 'لۆس ئەنجلس و ڤانکۆڤەر', 'Los Angeles & Vancouver', 'لوس أنجلوس وفانكوفر'],
+    ['Asia/Tokyo', 'توکیو', 'تۆکیۆ', 'Tokyo', 'طوكيو'], ['Australia/Sydney', 'سیدنی و ملبورن', 'سیدنی و مێلبۆرن', 'Sydney & Melbourne', 'سيدني وملبورن']];
+  var OFFS = [-720, -660, -600, -570, -540, -480, -420, -360, -300, -240, -210, -180, -120, -60, 0, 60, 120, 180, 210, 240, 270,
+    300, 330, 345, 360, 390, 420, 480, 525, 540, 570, 600, 630, 660, 720, 765, 780, 840];
+  var LEADS = [5, 10, 15, 30, 60, 120, 240, 1440];
   var ST = ls.get('ek_cal', null) || {};
-  if (!ST.tz) ST.tz = LG() === 'fa' ? 'teh' : (LG() === 'en' ? 'loc' : 'erb');
+  if (!ST.tz || !validTz(ST.tz)) ST.tz = LG() === 'fa' ? 'teh' : (LG() === 'en' ? 'loc' : 'erb');
+  if (!(ST.lead > 0)) ST.lead = 30;
   if (!ST.imp) ST.imp = ['H', 'M'];
   if (!ST.cur) ST.cur = [];          // empty = all
   if (ST.crypto == null) ST.crypto = false;
   ST.q = ''; ST.wk = 0;
-  function save() { ls.set('ek_cal', { tz: ST.tz, imp: ST.imp, cur: ST.cur, crypto: ST.crypto }); }
-  function off() { return ST.tz === 'teh' ? 210 : ST.tz === 'erb' ? 180 : ST.tz === 'utc' ? 0 : -new Date().getTimezoneOffset(); }
-  function L(t) { return new Date((t + off() * 60) * 1000); }        // "local" date in the chosen zone, read with getUTC*
+  function save() { ls.set('ek_cal', { tz: ST.tz, imp: ST.imp, cur: ST.cur, crypto: ST.crypto, lead: ST.lead, auto: !!ST.auto }); }
+  function zoneOk(z) { try { new Intl.DateTimeFormat('en-US', { timeZone: z }); return true; } catch (x) { return false; } }
+  function validTz(v) {
+    if (['teh', 'erb', 'utc', 'loc'].indexOf(v) >= 0) return true;
+    if (/^o-?\d+$/.test(v)) return OFFS.indexOf(+v.slice(1)) >= 0;
+    return v.slice(0, 2) === 'z:' && ZONES.some(function (z) { return z[0] === v.slice(2); }) && zoneOk(v.slice(2));
+  }
+  var FMT = {};
+  function zoneOff(z, t) {             // minutes east of UTC in city z at time t (summer time included)
+    try {
+      var f = FMT[z] || (FMT[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }));
+      var p = {}; f.formatToParts(new Date(t * 1000)).forEach(function (x) { p[x.type] = x.value; });
+      var u = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) / 1000;
+      return Math.round((u - Math.floor(t / 60) * 60) / 60);
+    } catch (x) { return 0; }
+  }
+  function off(t) {
+    t = t == null ? now() : t; var z = ST.tz;
+    if (z === 'teh') return 210; if (z === 'erb') return 180; if (z === 'utc') return 0;
+    if (z.charAt(0) === 'o') return +z.slice(1);
+    if (z.slice(0, 2) === 'z:') return zoneOff(z.slice(2), t);
+    return -new Date(t * 1000).getTimezoneOffset();
+  }
+  function fmtOff(m) { var a = Math.abs(m); return '\u2066UTC' + (m >= 0 ? '+' : '−') + Math.floor(a / 60) + (a % 60 ? ':' + ('0' + a % 60).slice(-2) : '') + '\u2069'; }   // isolated: reads right inside RTL text
+  function zoneName(z) { for (var i = 0; i < ZONES.length; i++) if (ZONES[i][0] === z) return ZONES[i][{ fa: 1, ckb: 2, en: 3, ar: 4 }[LG()]]; return z; }
+  function tzName() {
+    var z = ST.tz; if (z.slice(0, 2) === 'z:') return zoneName(z.slice(2));
+    return z.charAt(0) === 'o' ? T('tz_fixed') : T('tz_' + z);
+  }
+  function tzLabel() { return tzName() + ' · ' + fmtOff(off()); }
+  function L(t) { return new Date((t + off(t) * 60) * 1000); }        // "local" date in the chosen zone, read with getUTC*
   function hm(t) { var x = L(t); return ('0' + x.getUTCHours()).slice(-2) + ':' + ('0' + x.getUTCMinutes()).slice(-2); }
   function dayKey(t) { var x = L(t); return Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()) / 864e5; }
   function dayName(dk) { var x = new Date(dk * 864e5); return DAYS[LG()][x.getUTCDay()] + ' ' + x.getUTCDate() + ' ' + MONS[LG()][x.getUTCMonth()]; }
@@ -71,10 +117,17 @@
   function drawFilters() {
     var box = d.getElementById('ecF'); if (!box) return;
     var tz = ['teh', 'erb', 'utc', 'loc'].map(function (z) { return '<button type="button" data-tz="' + z + '" class="' + (ST.tz === z ? 'on' : '') + '">' + esc(T('tz_' + z)) + '</button>'; }).join('');
+    var custom = ['teh', 'erb', 'utc', 'loc'].indexOf(ST.tz) < 0, n0 = now();
+    var sel = '<select id="ecTz" class="' + (custom ? 'on' : '') + '" aria-label="' + esc(T('tz_more')) + '"><option value="">' + esc(custom ? '✓ ' + tzLabel() : T('tz_more')) + '</option>' +
+      '<optgroup label="' + esc(T('tz_cities')) + '">' + ZONES.filter(function (z) { return zoneOk(z[0]); }).map(function (z) {
+        return '<option value="z:' + z[0] + '"' + (ST.tz === 'z:' + z[0] ? ' selected' : '') + '>' + esc(zoneName(z[0]) + ' · ' + fmtOff(zoneOff(z[0], n0))) + '</option>';
+      }).join('') + '</optgroup><optgroup label="' + esc(T('tz_offsets')) + '">' + OFFS.map(function (o) {
+        return '<option value="o' + o + '"' + (ST.tz === 'o' + o ? ' selected' : '') + ' dir="ltr">' + fmtOff(o) + '</option>';
+      }).join('') + '</optgroup></select>';
     var imp = ['H', 'M', 'L', 'X'].map(function (i) { return '<button type="button" data-imp="' + i + '" class="imp' + i + (ST.imp.indexOf(i) >= 0 ? ' on' : '') + '"><i></i>' + esc(T('imp_' + i)) + '</button>'; }).join('');
     var cur = '<button type="button" data-cur="" class="' + (ST.cur.length ? '' : 'on') + '">' + esc(T('f_all')) + '</button>' +
       CURS.map(function (c) { return '<button type="button" data-cur="' + c + '" class="' + (ST.cur.indexOf(c) >= 0 ? 'on' : '') + '">' + FLAG[c] + ' ' + c + '</button>'; }).join('');
-    box.innerHTML = '<div class="row"><span class="lb">' + esc(T('tz')) + '</span><div class="seg">' + tz + '</div></div>' +
+    box.innerHTML = '<div class="row"><span class="lb">' + esc(T('tz')) + '</span><div class="seg">' + tz + '</div>' + sel + '</div>' +
       '<div class="row"><span class="lb">' + esc(T('f_imp')) + '</span><div class="chips">' + imp + '</div></div>' +
       '<div class="row"><span class="lb">' + esc(T('f_cur')) + '</span><div class="chips">' + cur + '</div></div>' +
       '<div class="row"><label class="tg"><input type="checkbox" id="ecCrypto"' + (ST.crypto ? ' checked' : '') + '> ' + esc(T('f_crypto')) + '</label>' +
@@ -89,9 +142,12 @@
       else if (b.dataset.cur !== undefined) {
         var c = b.dataset.cur; if (!c) ST.cur = []; else { var k = ST.cur.indexOf(c); if (k >= 0) ST.cur.splice(k, 1); else ST.cur.push(c); }
       } else return;
-      save(); drawFilters(); drawList(); drawHero();
+      save(); renderAll();
     });
-    box.addEventListener('change', function (ev) { if (ev.target.id === 'ecCrypto') { ST.crypto = ev.target.checked; save(); drawList(); } });
+    box.addEventListener('change', function (ev) {
+      if (ev.target.id === 'ecCrypto') { ST.crypto = ev.target.checked; save(); drawList(); }
+      else if (ev.target.id === 'ecTz' && ev.target.value && validTz(ev.target.value)) { ST.tz = ev.target.value; save(); renderAll(); }
+    });
     box.addEventListener('input', function (ev) { if (ev.target.id === 'ecQ') { ST.q = ev.target.value.trim(); drawList(); } });
   }
 
@@ -112,7 +168,7 @@
         '<span class="n">' + (FLAG[next.c] || '') + ' ' + same.map(function (e) { return esc(title(e)); }).join(' · ') + '</span>' +
         '<span class="t">' + esc(dayName(dayKey(next.t)) + ' · ' + hm(next.t)) + '</span></div>';
     }
-    h += '<div class="ec-clock"><span class="k">' + esc(T('now_tz')) + ' · ' + esc(T('tz_' + ST.tz)) + '</span><b class="v">' + esc(hm(n)) + '</b></div>';
+    h += '<div class="ec-clock"><span class="k">' + esc(T('now_tz')) + ' · ' + esc(tzLabel()) + '</span><b class="v">' + esc(hm(n)) + '</b></div>';
     if (hot.length) {
       var e0 = hot[0];
       h += '<div class="ec-hot">' + esc(tr('live_win', { n: title(e0), w: e0.t > n ? T('in') + ' ' + dur(e0.t - n) : tr('mins_ago', { m: Math.round((n - e0.t) / 60) }) })) + '</div>';
@@ -244,29 +300,77 @@
     closePop();
     var on = rems().some(function (x) { return x.k === key(e); });
     POP = d.createElement('div'); POP.className = 'ec-pop'; POP.setAttribute('role', 'dialog');
-    POP.innerHTML = '<b>' + esc(T('rem_h')) + '</b><span class="n">' + esc(title(e)) + ' · ' + esc(hm(e.t)) + '</span>' +
-      [15, 30, 60].map(function (m) { return '<button type="button" data-m="' + m + '">⏰ ' + esc(T('rem_' + m)) + '</button>'; }).join('') +
+    POP.innerHTML = '<b>' + esc(T('rem_h')) + '</b><span class="n">' + esc(title(e)) + ' · ' + esc(dayName(dayKey(e.t)) + ' · ' + hm(e.t)) + '</span>' +
+      '<span class="lb">' + esc(T('rem_before')) + '</span>' + leadChips() +
+      '<button type="button" data-m="1">⏰ ' + esc(T('rem_browser')) + '</button>' +
       '<button type="button" data-ics="1">📅 ' + esc(T('rem_ics')) + '</button>' +
-      '<a class="btn" href="' + BOT + '" target="_blank" rel="noopener">✈️ ' + esc(T('rem_tg')) + '</a>' +
+      '<a class="btn" href="' + botLink() + '" target="_blank" rel="noopener">✈️ ' + esc(T('rem_tg')) + '</a>' +
       (on ? '<button type="button" data-off="1" class="off">✕ ' + esc(T('rem_off')) + '</button>' : '');
     d.body.appendChild(POP);
     var r = anchor.getBoundingClientRect(), pw = Math.min(300, w.innerWidth - 24);
     POP.style.width = pw + 'px';
     POP.style.top = (w.scrollY + r.bottom + 6) + 'px';
     POP.style.left = Math.max(12, Math.min(w.innerWidth - pw - 12, r.left + r.width / 2 - pw / 2)) + 'px';
+    wireLead(POP);
     POP.addEventListener('click', function (ev) {
-      var b = ev.target.closest('button'); if (!b) return;
+      var b = ev.target.closest('button'); if (!b || b.dataset.lead) return;
       if (b.dataset.m) {
-        var m = +b.dataset.m, a = rems().filter(function (x) { return x.k !== key(e); });
+        var m = ST.lead, a = rems().filter(function (x) { return x.k !== key(e); });
         a.push({ k: key(e), t: e.t, n: e.n, tr: e.tr || {}, m: m }); setRems(a);
-        if (w.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (x) { } }
-        toast(tr('rem_set', { m: m }) + (w.Notification && Notification.permission === 'denied' ? ' ' + T('rem_perm') : ''));
+        askPerm();
+        toast(tr('rem_set', { m: human(m) }) + (w.Notification && Notification.permission === 'denied' ? ' ' + T('rem_perm') : ''));
         closePop(); drawList(); drawRems();
       } else if (b.dataset.ics) { ics([e]); closePop(); }
       else if (b.dataset.off) { setRems(rems().filter(function (x) { return x.k !== key(e); })); toast(T('rem_off')); closePop(); drawList(); drawRems(); }
     });
   }
   d.addEventListener('click', function (ev) { if (POP && !ev.target.closest('.ec-pop') && !ev.target.closest('[data-bell]')) closePop(); });
+  /* lead time: one choice for every reminder, the .ics alarms and the bot link */
+  function human(m) {
+    m = Math.max(0, Math.round(m)); var dd = Math.floor(m / 1440), h = Math.floor(m % 1440 / 60), mi = m % 60, b = [];
+    if (dd) b.push(dd + ' ' + T('u_day')); if (h) b.push(h + ' ' + T('u_hour')); if (mi || !b.length) b.push(mi + ' ' + T('u_min'));
+    return b.join(T('u_and'));
+  }
+  function leadChips() {
+    var custom = LEADS.indexOf(ST.lead) < 0;
+    return '<div class="ec-lead">' + LEADS.map(function (m) { return '<button type="button" data-lead="' + m + '" class="' + (ST.lead === m ? 'on' : '') + '">' + esc(human(m)) + '</button>'; }).join('') +
+      '<label class="cu' + (custom ? ' on' : '') + '"><input type="number" min="1" max="10080" step="1" inputmode="numeric" data-leadc="1" value="' + (custom ? ST.lead : '') + '" placeholder="' + esc(T('rem_custom')) + '"> ' + esc(T('u_min')) + '</label></div>';
+  }
+  function setLead(m) {
+    m = Math.round(+m); if (!(m >= 1 && m <= 10080)) return false;
+    ST.lead = m; save(); drawRems(); syncBot(); return true;
+  }
+  function wireLead(root) {
+    root.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-lead]'); if (!b) return;
+      setLead(b.dataset.lead);
+      root.querySelectorAll('[data-lead]').forEach(function (x) { x.classList.toggle('on', +x.dataset.lead === ST.lead); });
+      var c = root.querySelector('[data-leadc]'); if (c) { c.value = ''; c.parentNode.classList.remove('on'); }
+      var a = root.querySelector('a.btn'); if (a) a.href = botLink();
+    });
+    root.addEventListener('change', function (ev) {
+      if (!ev.target.dataset.leadc) return;
+      if (setLead(ev.target.value)) {
+        root.querySelectorAll('[data-lead]').forEach(function (x) { x.classList.toggle('on', +x.dataset.lead === ST.lead); });
+        ev.target.parentNode.classList.toggle('on', LEADS.indexOf(ST.lead) < 0);
+        var a = root.querySelector('a.btn'); if (a) a.href = botLink();
+      } else ev.target.value = '';
+    });
+  }
+  function askPerm() { if (w.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (x) { } } }
+  /* the bot link carries the page's zone and lead time: ?start=ec_o210_l30 / ec_zEurope-Berlin_l60 */
+  function botLink() {
+    var z = ST.tz, code;
+    if (z === 'teh') code = 'zAsia-Tehran'; else if (z === 'erb') code = 'zAsia-Baghdad'; else if (z === 'utc') code = 'o0';
+    else if (z.charAt(0) === 'o') code = z; else if (z.slice(0, 2) === 'z:') code = 'z' + z.slice(2).replace('/', '-');
+    else {
+      var dz = ''; try { dz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (x) { }
+      var o = -new Date().getTimezoneOffset();
+      code = ZONES.some(function (q) { return q[0] === dz; }) ? 'z' + dz.replace('/', '-') : (OFFS.indexOf(o) >= 0 ? 'o' + o : '');
+    }
+    return BOT + (code ? '_' + code : '') + (LEADS.indexOf(ST.lead) >= 0 ? '_l' + ST.lead : '');
+  }
+  function syncBot() { d.querySelectorAll('a[href*="Kurd_kurdistan_bot?start=ec"]').forEach(function (a) { a.href = botLink(); }); }
   d.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closePop(); });
   function toast(msg) {
     var t = d.createElement('div'); t.className = 'ec-toast'; t.textContent = msg; d.body.appendChild(t);
@@ -285,20 +389,41 @@
     a.forEach(function (x) {
       if (!x.fired && n >= x.t - x.m * 60 && n < x.t + 60) {
         x.fired = 1; changed = true;
-        var nm = LG() === 'en' ? x.n : ((x.tr || {})[LG()] || x.n), msg = tr('rem_fire', { m: Math.max(0, Math.round((x.t - n) / 60)), n: nm });
-        toast(msg); beep();
-        if (w.Notification && Notification.permission === 'granted') { try { new Notification('entekhab.net', { body: msg, tag: x.k, icon: '/assets/icon-192.png' }); } catch (y) { } }
+        ring(x.k, x.n, x.tr, x.t, n);
       }
     });
     a = a.filter(function (x) { return x.t > n - 6 * 3600; });
     if (changed || a.length !== ls.get('ek_cal_rem', []).length) setRems(a);
+    /* automatic: every red US release, ST.lead before (no need to set each one) */
+    if (ST.auto && CAL) {
+      var done = ls.get('ek_cal_auto', []), seen = {}, add = false;
+      CAL.events.forEach(function (e) {
+        if (e.c !== 'USD' || e.i !== 'H' || seen[e.t]) return;
+        if (n >= e.t - ST.lead * 60 && n < e.t + 60 && done.indexOf(e.t) < 0 && !a.some(function (x) { return x.t === e.t && x.fired; })) {
+          seen[e.t] = 1; done.push(e.t); add = true;
+          var same = CAL.events.filter(function (y) { return y.t === e.t && y.c === 'USD' && y.i === 'H'; });
+          ring('auto' + e.t, same.map(function (y) { return y.n; }).join(' · '), null, e.t, n, same.map(function (y) { return title(y); }).join(' · '));
+        }
+      });
+      if (add) ls.set('ek_cal_auto', done.filter(function (t) { return t > n - 86400; }));
+    }
+  }
+  function ring(tag, n0, trs, t, n, shown) {
+    var nm = shown || (LG() === 'en' ? n0 : ((trs || {})[LG()] || n0));
+    var msg = tr('rem_fire', { m: human((t - n) / 60), n: nm }) + ' — ' + dayName(dayKey(t)) + ' · ' + hm(t) + ' (' + fmtOff(off(t)) + ')';
+    toast(msg); beep();
+    if (w.Notification && Notification.permission === 'granted') { try { new Notification('entekhab.net', { body: msg, tag: tag, icon: '/assets/icon-192.png' }); } catch (y) { } }
   }
   function drawRems() {
     var box = d.getElementById('ecRem'); if (!box) return;
     var a = rems().filter(function (x) { return x.t > now(); }).sort(function (p, q) { return p.t - q.t; });
-    box.innerHTML = '<h3>' + esc(T('rem_list')) + '</h3>' + (a.length ? '<ul>' + a.map(function (x) {
+    box.innerHTML = '<h3>' + esc(T('rem_set_h')) + '</h3>' +
+      '<p class="ec-note">' + esc(tr('rem_tz_now', { z: tzLabel() })) + '</p>' +
+      '<div class="lb">' + esc(T('rem_before')) + '</div>' + leadChips() +
+      '<label class="tg ec-auto"><input type="checkbox" id="ecAuto"' + (ST.auto ? ' checked' : '') + '> ' + esc(tr('rem_auto', { m: human(ST.lead) })) + '</label>' +
+      '<h3>' + esc(T('rem_list')) + '</h3>' + (a.length ? '<ul>' + a.map(function (x) {
       var nm = LG() === 'en' ? x.n : ((x.tr || {})[LG()] || x.n);
-      return '<li><span>' + esc(dayName(dayKey(x.t)) + ' · ' + hm(x.t)) + '</span> <b>' + esc(nm) + '</b> <small>(' + x.m + ' ' + esc(T('m_short')) + ')</small></li>';
+      return '<li><span>' + esc(dayName(dayKey(x.t)) + ' · ' + hm(x.t)) + '</span> <b>' + esc(nm) + '</b> <small>(' + esc(tr('rem_before_x', { m: human(x.m) })) + ')</small></li>';
     }).join('') + '</ul>' : '<p class="ec-note">' + esc(T('rem_none')) + '</p>');
   }
   function icsDate(t) { return new Date(t * 1000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
@@ -309,7 +434,7 @@
       var desc = (e.f ? 'Forecast: ' + e.f + '\n' : '') + (e.p ? 'Previous: ' + e.p + '\n' : '') + PAGE;
       L2.push('BEGIN:VEVENT', 'UID:' + e.t + '-' + e.c + '-' + e.n.replace(/[^A-Za-z0-9]/g, '') + '@entekhab.net', 'DTSTAMP:' + icsDate(now()),
         'DTSTART:' + icsDate(e.t), 'DTEND:' + icsDate(e.t + 900), 'SUMMARY:' + icsEsc((e.i === 'H' ? '🔴 ' : '') + e.c + ' · ' + title(e)),
-        'DESCRIPTION:' + icsEsc(desc), 'URL:' + PAGE, 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEsc(title(e)), 'TRIGGER:-PT30M', 'END:VALARM', 'END:VEVENT');
+        'DESCRIPTION:' + icsEsc(desc), 'URL:' + PAGE, 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEsc(title(e)), 'TRIGGER:-PT' + ST.lead + 'M', 'END:VALARM', 'END:VEVENT');
     });
     L2.push('END:VCALENDAR');
     var blob = new Blob([L2.join('\r\n')], { type: 'text/calendar;charset=utf-8' }), a = d.createElement('a');
@@ -404,7 +529,7 @@
     var t = Date.parse(CAL.updated_at) / 1000; if (!t) return;
     b.textContent = tr('data_age', { t: dateShort(t) + ' ' + hm(t) });
   }
-  function renderAll() { drawFilters(); drawHero(); drawList(); drawFed(); drawRems(); drawAge(); }
+  function renderAll() { drawFilters(); drawHero(); drawList(); drawFed(); drawRems(); drawAge(); syncBot(); }
   function load() {
     return Promise.all([j('/data/ecocal.json' + V()), j('/data/econ_actual.json' + V()), j('/data/fed.json' + V())]).then(function (r) {
       if (r[0] && r[0].events) { CAL = r[0]; CAL.events.sort(function (a, b) { return a.t - b.t; }); } else if (!CAL) CAL = false;
@@ -412,9 +537,20 @@
       FED = r[2] || (FED || false);
     });
   }
+  function wireRems() {
+    var box = d.getElementById('ecRem'); if (!box) return;
+    wireLead(box);
+    box.addEventListener('click', function (ev) { if (ev.target.closest('[data-lead]')) drawRems(); });
+    box.addEventListener('change', function (ev) {
+      if (ev.target.dataset.leadc) { drawRems(); return; }
+      if (ev.target.id !== 'ecAuto') return;
+      ST.auto = ev.target.checked; save();
+      if (ST.auto) { askPerm(); ls.set('ek_cal_auto', []); toast(tr('rem_auto_on', { m: human(ST.lead) })); }
+    });
+  }
   function boot() {
     if (typeof uiLang === 'function') uiLang(renderAll); else renderAll();
-    wireFilters(); wireList(); wireIcsWeek();
+    wireFilters(); wireList(); wireIcsWeek(); wireRems();
     load().then(function () {
       renderAll();
     });
