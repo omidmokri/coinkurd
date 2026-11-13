@@ -495,6 +495,7 @@ CSP = ("default-src 'self'; "
        "media-src 'self' data: blob: https://github.com https://objects.githubusercontent.com https://release-assets.githubusercontent.com; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "
        "https://fapi.binance.com https://api.bybit.com "      # the Observatory (/charts/): futures candles and open interest
+       "https://api.bitget.com https://api.hyperliquid.xyz https://api.gateio.ws https://www.deribit.com "      # …and funding, open interest and options of the other venues
        "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com "
        "https://dashboard-api.tgju.org https://api.tgju.org https://call2.tgju.org https://call3.tgju.org https://call4.tgju.org; "

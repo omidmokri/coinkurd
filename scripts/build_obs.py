@@ -11,10 +11,11 @@ Run: python3 scripts/build_obs.py        (it puts the site's header, footer and 
 import html
 import json
 import os
+import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "2"            # asset version (bump with any change to assets/obs/*)
+V = "3"            # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -27,6 +28,9 @@ def e(s):
 PAGES = [
     ("liqheat", "liquidation-heatmap", ["src.js", "liqmodel.js", "liq.js"]),
     ("liqmap", "liquidation-map", ["src.js", "liqmodel.js", "liq.js"]),
+    ("oi", "open-interest", ["src.js", "ts.js", "deriv.js"]),
+    ("funding", "funding-rate", ["src.js", "ts.js", "deriv.js"]),
+    ("ls", "long-short", ["src.js", "ts.js", "deriv.js"]),
 ]
 
 T = {
@@ -35,6 +39,7 @@ T = {
         "desc": "نقشهٔ حرارتی لیکوییدیشن بیت‌کوین، اتریوم و صدها ارز با دادهٔ زندهٔ Binance و Bybit: ۱۲ ساعت تا ۱ سال، سه مدل شفاف، اهرم ۵ تا ۱۰۰ و لیکوییدیشن‌های واقعی.",
         "og": "نقشهٔ حرارتی لیکوییدیشن — زنده، با مدل شفاف",
         "ld": "Entekhab liquidation heatmap",
+        "kw": ["لیکوییدیشن", "لیکویید", "نقشه حرارتی لیکوییدیشن", "liquidation", "liquidation heatmap", "heatmap", "لیکویدکردن", "coinglass", "کوین گلس"],
         "h1": {"fa": "نقشهٔ حرارتی لیکوییدیشن", "ckb": "نەخشەی گەرمیی لیکویدکردن", "ar": "الخريطة الحرارية للتصفيات", "en": "Liquidation heatmap"},
         "p": {"fa": "برآورد اینکه پوزیشن‌های اهرمی فیوچرز در چه قیمت‌هایی لیکویید می‌شوند — زنده از Binance و Bybit، با مدلی که روشش کامل نوشته شده",
               "ckb": "خەمڵاندنی ئەوەی پۆزیشنە لیڤەرێجدارەکانی فیوچەرز لە چ نرخێکدا لیکوید دەکرێن — زیندوو لە Binance و Bybitـەوە، بە مۆدێلێک کە ڕێگاکەی بە تەواوی نووسراوە",
@@ -126,6 +131,7 @@ T = {
         "desc": "نقشهٔ لیکوییدیشن: برآورد دلاری لیکوییدیشن لانگ و شورت در هر محدودهٔ قیمت به تفکیک اهرم ۵ تا ۱۰۰ برابر و جمع تجمعی از قیمت فعلی، زنده از Binance و Bybit.",
         "og": "نقشهٔ لیکوییدیشن — سطوح فعلی به تفکیک اهرم",
         "ld": "Entekhab liquidation map",
+        "kw": ["نقشه لیکوییدیشن", "liquidation map", "اهرم", "leverage", "لیڤەرێج", "سطوح لیکوییدیشن"],
         "h1": {"fa": "نقشهٔ لیکوییدیشن", "ckb": "نەخشەی لیکویدکردن", "ar": "خريطة التصفيات", "en": "Liquidation map"},
         "p": {"fa": "سطوحی که همین حالا پابرجاست: برآورد دلاری لیکوییدیشن لانگ‌ها و شورت‌ها در هر محدودهٔ قیمت، به تفکیک اهرم، و جمع تجمعی از قیمت فعلی",
               "ckb": "ئەو ئاستانەی ئێستا ماون: خەمڵاندنی دۆلاریی لیکویدکردنی لۆنگ و شۆرت لە هەر مەودایەکی نرخدا، بەپێی لیڤەرێج، و کۆی کۆکراوە لە نرخی ئێستاوە",
@@ -168,6 +174,164 @@ T = {
                        "Sources: public data of Binance and Bybit, read directly in your browser."])],
         },
     },
+    "oi": {
+        "title": "اوپن اینترست بیت‌کوین و ارزها به تفکیک صرافی | entekhab.net",
+        "desc": "اوپن اینترست فیوچرز بیت‌کوین، اتریوم و صدها ارز: جمع و سهم Binance، Bybit، OKX، Bitget، Hyperliquid و Gate، با تاریخچه تا ۱ سال زیر نمودار قیمت. زنده و رایگان.",
+        "og": "اوپن اینترست صرافی‌ها — جمع، سهم و تاریخچه",
+        "ld": "Entekhab open interest by exchange",
+        "kw": ["اوپن اینترست", "اپن اینترست", "open interest", "oi", "ئۆپن ئینتەرێست", "قراردادهای باز", "العقود المفتوحة"],
+        "h1": {"fa": "اوپن اینترست صرافی‌ها", "ckb": "ئۆپن ئینتەرێستی ئاڵوگۆڕگەکان", "ar": "العقود المفتوحة عبر المنصات", "en": "Open interest by exchange"},
+        "p": {"fa": "ارزش قراردادهای باز فیوچرز هر ارز در شش صرافی، سهم هر کدام و تغییرش در زمان، زیر نمودار قیمت",
+              "ckb": "بەهای گرێبەستە کراوەکانی فیوچەرزی هەر دراوێک لە شەش ئاڵوگۆڕگە، بەشی هەر یەکێکیان و گۆڕانی بە درێژایی کات، لە ژێر چارتی نرخدا",
+              "ar": "قيمة العقود الآجلة المفتوحة لكل عملة في ست منصات، وحصة كل منها وتغيّرها عبر الزمن، تحت رسم السعر",
+              "en": "The value of open futures contracts of any coin on six exchanges, each one’s share and how it changed over time, under the price"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                "<b>اوپن اینترست چیست:</b> شمار قراردادهای فیوچرزی که باز مانده‌اند و هنوز بسته نشده‌اند. هر قرارداد یک لانگ و یک شورت دارد؛ پس اوپن اینترست می‌گوید چقدر پول درگیر بازار است، نه اینکه کدام سو سنگین‌تر است.",
+                "<b>کاشی‌های بالا:</b> جمع اوپن اینترست صرافی‌هایی که پاسخ داده‌اند، تغییر ۲۴ ساعته (از تاریخچهٔ ساعتی Binance و Bybit) و قیمت.",
+                "<b>نمودار:</b> قیمت در بالا و اوپن اینترست در پایین، روی یک محور زمان؛ یک خط برای هر صرافی و سطحی برای جمعشان. با زدن روی نام هر خط آن را پنهان یا پیدا کنید. بازه از ۲۴ ساعت تا ۱ سال، به دلار یا به تعداد ارز.",
+                "<b>جدول:</b> عدد همین لحظهٔ هر صرافی، سهمش از جمع و نرخ فاندینگش.",
+                "<b>چطور بخوانیم:</b> قیمت و اوپن اینترست هر دو رو به بالا یعنی پول تازه پشت حرکت است؛ قیمت بالا می‌رود و اوپن اینترست پایین می‌آید یعنی شورت‌ها در حال بستن‌اند؛ افت تند اوپن اینترست معمولاً یعنی لیکوییدیشن پشت‌سرهم."]),
+                   ("روش و محدودیت‌ها", [
+                       "فقط قراردادهای دائمی با مارجین استیبل‌کوین شمرده می‌شوند: قراردادهای USDT در Binance، Bybit، OKX، Bitget و Gate، و قراردادهای Hyperliquid (با USDC). قراردادهای با مارجینِ خودِ ارز، قراردادهای USDC صرافی‌های دیگر، قراردادهای سررسیددار، CME و صرافی‌های دیگر در این جمع نیستند؛ پس این عدد از رقم «کل بازار» در سایت‌هایی که همه را می‌شمارند کوچک‌تر است.",
+                       "تاریخچه را فقط Binance (۳۰ روز) و Bybit (چند سال) منتشر می‌کنند؛ خط جمع از جایی شروع می‌شود که هر دو داده دارند. مقدار دلاری هر نقطه = تعداد ارز × قیمت همان لحظه.",
+                       "اگر صرافی‌ای پاسخ ندهد یا آن ارز را نداشته باشد، نامش زیر جدول می‌آید و در جمع حساب نمی‌شود. هیچ عددی ساخته نمی‌شود.",
+                       "منابع: دادهٔ عمومی همین شش صرافی که مستقیم در مرورگر شما خوانده می‌شود. توصیهٔ مالی نیست."])],
+            "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
+                "<b>ئۆپن ئینتەرێست چییە:</b> ژمارەی ئەو گرێبەستانەی فیوچەرز کە کراوەن و هێشتا دانەخراون. هەر گرێبەستێک لۆنگێک و شۆرتێکی هەیە؛ بۆیە ئۆپن ئینتەرێست دەڵێت چەند پارە لە بازاڕدایە، نەک کام لا قورسترە.",
+                "<b>کاشییەکانی سەرەوە:</b> کۆی ئۆپن ئینتەرێستی ئەو ئاڵوگۆڕگانەی وەڵامیان داوەتەوە، گۆڕانی ٢٤ کاتژمێر (لە مێژووی کاتژمێریی Binance و Bybitـەوە) و نرخ.",
+                "<b>چارت:</b> نرخ لە سەرەوە و ئۆپن ئینتەرێست لە خوارەوە، لەسەر یەک تەوەری کات؛ هێڵێک بۆ هەر ئاڵوگۆڕگەیەک و ڕووبەرێک بۆ کۆیان. بە کرتە لە ناوی هەر هێڵێک بیشارەوە یان پیشانی بدە. ماوە لە ٢٤ کاتژمێرەوە تا ١ ساڵ، بە دۆلار یان بە ژمارەی دراو.",
+                "<b>خشتە:</b> ژمارەی ئێستای هەر ئاڵوگۆڕگەیەک، بەشی لە کۆ و نرخی فەندینگی.",
+                "<b>چۆن بیخوێنینەوە:</b> نرخ و ئۆپن ئینتەرێست هەردووکیان بەرەو سەرەوە واتە پارەی نوێ لە پشت جووڵەکەیە؛ نرخ بەرز دەبێتەوە و ئۆپن ئینتەرێست دادەبەزێت واتە شۆرتەکان دادەخرێن؛ دابەزینی توندی ئۆپن ئینتەرێست زۆرجار واتە لیکویدکردنی یەک لە دوای یەک."]),
+                    ("ڕێگا و سنوورەکان", [
+                        "تەنها گرێبەستە هەمیشەییەکان بە مارجینی ستەیبڵکۆین دەژمێردرێن: گرێبەستەکانی USDT لە Binance، Bybit، OKX، Bitget و Gate، و گرێبەستەکانی Hyperliquid (بە USDC). گرێبەستەکانی مارجینی خودی دراوەکە، گرێبەستەکانی USDCی ئاڵوگۆڕگەکانی تر، گرێبەستە بەروارییەکان، CME و ئاڵوگۆڕگەکانی تر لەم کۆیەدا نین؛ بۆیە ئەم ژمارەیە لە ژمارەی «هەموو بازاڕ»ی ئەو ماڵپەڕانەی هەمووی دەژمێرن بچووکترە.",
+                        "مێژوو تەنها Binance (٣٠ ڕۆژ) و Bybit (چەند ساڵ) بڵاوی دەکەنەوە؛ هێڵی کۆ لەو شوێنەوە دەست پێدەکات کە هەردووکیان داتایان هەیە. بەهای دۆلاریی هەر خاڵێک = ژمارەی دراو × نرخی هەمان سات.",
+                        "ئەگەر ئاڵوگۆڕگەیەک وەڵام نەداتەوە یان ئەو دراوەی نەبێت، ناوەکەی لە ژێر خشتەکە دێت و لە کۆدا ناژمێردرێت. هیچ ژمارەیەک دروست ناکرێت.",
+                        "سەرچاوەکان: داتای گشتیی ئەم شەش ئاڵوگۆڕگەیە، ڕاستەوخۆ لە وێبگەڕەکەتدا دەخوێنرێتەوە. ئامۆژگاریی دارایی نییە."])],
+            "ar": [("ماذا تُظهر هذه الصفحة", [
+                "<b>ما العقود المفتوحة:</b> عدد العقود الآجلة التي ما زالت قائمة ولم تُغلق. لكل عقد مركز شراء ومركز بيع، فالعقود المفتوحة تقول كم من المال منخرط في السوق لا أيّ الجهتين أثقل.",
+                "<b>البطاقات العليا:</b> مجموع العقود المفتوحة في المنصات التي استجابت، وتغيّر ٢٤ ساعة (من التاريخ الساعي لـBinance وBybit)، والسعر.",
+                "<b>الرسم:</b> السعر في الأعلى والعقود المفتوحة في الأسفل على محور زمني واحد؛ خط لكل منصة ومساحة لمجموعها. اضغط اسم أي خط لإخفائه أو إظهاره. المدى من ٢٤ ساعة إلى سنة، بالدولار أو بعدد العملات.",
+                "<b>الجدول:</b> رقم كل منصة الآن وحصتها من المجموع ومعدل تمويلها.",
+                "<b>كيف تُقرأ:</b> صعود السعر والعقود المفتوحة معًا يعني أموالًا جديدة خلف الحركة؛ صعود السعر مع هبوط العقود المفتوحة يعني إغلاق مراكز البيع؛ والهبوط الحاد للعقود المفتوحة يعني غالبًا تصفيات متتالية."]),
+                   ("المنهج والحدود", [
+                       "تُحتسب فقط العقود الدائمة بهامش العملات المستقرة: عقود USDT في Binance وBybit وOKX وBitget وGate، وعقود Hyperliquid (بـUSDC). العقود بهامش العملة نفسها وعقود USDC في المنصات الأخرى والعقود ذات الاستحقاق وCME والمنصات الأخرى ليست في هذا المجموع، فهو أصغر من رقم «السوق كله» في المواقع التي تعدّها جميعًا.",
+                       "لا ينشر التاريخ سوى Binance (٣٠ يومًا) وBybit (سنوات)؛ ويبدأ خط المجموع حيث توجد بيانات الاثنتين. القيمة بالدولار لكل نقطة = عدد العملات × سعر اللحظة نفسها.",
+                       "إذا لم تستجب منصة أو لم تدرج العملة يظهر اسمها تحت الجدول ولا تدخل في المجموع. لا يُختلق أي رقم.",
+                       "المصادر: البيانات العامة لهذه المنصات الست، تُقرأ مباشرة في متصفحك. ليست نصيحة مالية."])],
+            "en": [("What this page shows", [
+                "<b>What open interest is:</b> the number of futures contracts that are open and not yet closed. Every contract has one long and one short, so open interest says how much money is engaged in the market — not which side is heavier.",
+                "<b>The tiles:</b> the total open interest of the exchanges that answered, the change in 24 hours (from the hourly history of Binance and Bybit), and the price.",
+                "<b>The chart:</b> price above, open interest below, on one time axis; a line per exchange and an area for their sum. Click a name to hide or show its line. Ranges from 24 hours to a year, in dollars or in coins.",
+                "<b>The table:</b> each exchange’s figure right now, its share of the total and its funding rate.",
+                "<b>How to read it:</b> price and open interest both rising means new money is behind the move; price rising while open interest falls means shorts are closing; a sharp fall in open interest usually means a run of liquidations."]),
+                   ("Method and limits", [
+                       "Only stablecoin-margined perpetual contracts are counted: the USDT contracts of Binance, Bybit, OKX, Bitget and Gate, and Hyperliquid’s (in USDC). Coin-margined contracts, the other exchanges’ USDC contracts, dated futures, CME and other exchanges are not in this total, so it is smaller than the “whole market” figure of sites that count them all.",
+                       "History is published only by Binance (30 days) and Bybit (years); the sum line starts where both have data. The dollar value of each point = coins × the price at that moment.",
+                       "If an exchange does not answer or does not list the coin, its name is shown under the table and it is left out of the total. No number is made up.",
+                       "Sources: the public data of these six exchanges, read directly in your browser. Not financial advice."])],
+        },
+    },
+    "funding": {
+        "title": "نرخ فاندینگ بیت‌کوین و ارزها در پنج صرافی | entekhab.net",
+        "desc": "نرخ فاندینگ بیت‌کوین و صدها ارز در Binance، Bybit، OKX، Bitget و Hyperliquid: جدول مقایسه، تاریخچه تا ۱ سال، در ۸ ساعت یا سالانه. زنده و رایگان.",
+        "og": "نرخ فاندینگ صرافی‌ها — مقایسه و تاریخچه",
+        "ld": "Entekhab funding rates by exchange",
+        "kw": ["فاندینگ", "نرخ فاندینگ", "فاندینگ ریت", "funding", "funding rate", "فەندینگ", "التمويل"],
+        "h1": {"fa": "نرخ فاندینگ صرافی‌ها", "ckb": "نرخی فەندینگی ئاڵوگۆڕگەکان", "ar": "معدلات التمويل عبر المنصات", "en": "Funding rates by exchange"},
+        "p": {"fa": "نرخ فاندینگ هر ارز در پنج صرافی کنار هم، همه بر پایهٔ ۸ ساعت، با تاریخچه زیر نمودار قیمت",
+              "ckb": "نرخی فەندینگی هەر دراوێک لە پێنج ئاڵوگۆڕگە لە تەنیشت یەک، هەموویان لەسەر بنەمای ٨ کاتژمێر، لەگەڵ مێژوو لە ژێر چارتی نرخدا",
+              "ar": "معدل تمويل كل عملة في خمس منصات جنبًا إلى جنب، كلها على أساس ٨ ساعات، مع التاريخ تحت رسم السعر",
+              "en": "The funding rate of any coin on five exchanges side by side, all on an 8-hour basis, with its history under the price"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                "<b>فاندینگ چیست:</b> پرداخت دوره‌ای میان لانگ‌ها و شورت‌ها تا قیمت قرارداد دائمی نزدیک قیمت نقدی بماند. مثبت یعنی لانگ‌ها می‌پردازند (بازار بیشتر به لانگ میل دارد)، منفی یعنی شورت‌ها می‌پردازند.",
+                "<b>کاشی‌ها:</b> میانگین نرخ فعلی ارز در صرافی‌ها، همان به‌صورت سالانه، و بیشترین و کمترین با نام صرافی.",
+                "<b>نمودار:</b> قیمت در بالا و نرخ‌های تسویه‌شدهٔ Binance، Bybit و OKX در پایین؛ از ۱ هفته تا ۱ سال.",
+                "<b>جدول:</b> پرمعامله‌ترین ارزها در پنج صرافی؛ آبی یعنی شورت‌ها می‌پردازند و نارنجی یعنی لانگ‌ها. روی عنوان هر ستون بزنید تا مرتب شود و روی نام ارز تا تاریخچه‌اش بیاید. ستون «اختلاف» فاصلهٔ بیشترین و کمترین نرخ میان صرافی‌هاست."]),
+                   ("روش و محدودیت‌ها", [
+                       "صرافی‌ها هر ۱، ۴ یا ۸ ساعت تسویه می‌کنند (Hyperliquid هر ساعت). برای مقایسه، همه به نرخ ۸ ساعته برده می‌شوند: نرخ × ۸ ÷ فاصلهٔ تسویه به ساعت. «سالانه» = نرخ ۸ ساعته × ۳ × ۳۶۵، بدون سود مرکب و با این فرض که نرخ همین بماند.",
+                       "نرخ‌های جدول و کاشی‌ها نرخِ تسویهٔ بعدی‌اند و تا لحظهٔ تسویه تغییر می‌کنند؛ نمودار نرخ‌های تسویه‌شده را نشان می‌دهد.",
+                       "OKX حدود سه ماه تاریخچه می‌دهد؛ در بازه‌های بلندتر خطش کوتاه‌تر است. Bitget و Hyperliquid فقط در جدول هستند.",
+                       "فاندینگ بالا به‌تنهایی نشانهٔ برگشت قیمت نیست؛ فقط می‌گوید نگه داشتن کدام سو گران‌تر است. توصیهٔ مالی نیست."])],
+            "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
+                "<b>فەندینگ چییە:</b> پارەدانێکی خولییە لە نێوان لۆنگەکان و شۆرتەکان بۆ ئەوەی نرخی گرێبەستی هەمیشەیی نزیک نرخی نەختینە بمێنێتەوە. پۆزەتیڤ واتە لۆنگەکان پارە دەدەن، نێگەتیڤ واتە شۆرتەکان.",
+                "<b>کاشییەکان:</b> تێکڕای نرخی ئێستای دراوەکە لە ئاڵوگۆڕگەکان، هەمان بە ساڵانە، و بەرزترین و نزمترین لەگەڵ ناوی ئاڵوگۆڕگە.",
+                "<b>چارت:</b> نرخ لە سەرەوە و نرخە یەکلاکراوەکانی Binance، Bybit و OKX لە خوارەوە؛ لە ١ هەفتەوە تا ١ ساڵ.",
+                "<b>خشتە:</b> زۆرترین دراوە مامەڵەکراوەکان لە پێنج ئاڵوگۆڕگە؛ شین واتە شۆرتەکان پارە دەدەن و پرتەقاڵی واتە لۆنگەکان. کرتە لە ناونیشانی ستوون بکە بۆ ڕیزکردن و لە ناوی دراو بۆ مێژووەکەی. ستوونی «جیاوازی» مەودای نێوان بەرزترین و نزمترین نرخە لە نێوان ئاڵوگۆڕگەکاندا."]),
+                    ("ڕێگا و سنوورەکان", [
+                        "ئاڵوگۆڕگەکان هەر ١، ٤ یان ٨ کاتژمێر جارێک یەکلایی دەکەنەوە (Hyperliquid هەر کاتژمێرێک). بۆ بەراورد هەموویان دەبرێنە سەر نرخی ٨ کاتژمێری: نرخ × ٨ ÷ ماوەی یەکلاکردنەوە بە کاتژمێر. «ساڵانە» = نرخی ٨ کاتژمێری × ٣ × ٣٦٥، بێ سوودی ئاوێتە و بەو گریمانەیەی نرخەکە وەک خۆی بمێنێتەوە.",
+                        "نرخەکانی خشتە و کاشییەکان نرخی یەکلاکردنەوەی داهاتوون و تا ساتی یەکلاکردنەوە دەگۆڕێن؛ چارتەکە نرخە یەکلاکراوەکان پیشان دەدات.",
+                        "OKX نزیکەی سێ مانگ مێژوو دەدات. Bitget و Hyperliquid تەنها لە خشتەکەدان.",
+                        "فەندینگی بەرز بە تەنها نیشانەی گەڕانەوەی نرخ نییە؛ تەنها دەڵێت ڕاگرتنی کام لا گرانترە. ئامۆژگاریی دارایی نییە."])],
+            "ar": [("ماذا تُظهر هذه الصفحة", [
+                "<b>ما التمويل:</b> دفعة دورية بين مراكز الشراء ومراكز البيع ليبقى سعر العقد الدائم قريبًا من السعر الفوري. الموجب يعني أن مراكز الشراء تدفع، والسالب يعني أن مراكز البيع تدفع.",
+                "<b>البطاقات:</b> متوسط المعدل الحالي للعملة في المنصات، ونفسه سنويًّا، والأعلى والأدنى مع اسم المنصة.",
+                "<b>الرسم:</b> السعر في الأعلى والمعدلات المسوّاة في Binance وBybit وOKX في الأسفل؛ من أسبوع إلى سنة.",
+                "<b>الجدول:</b> أكثر العملات تداولًا في خمس منصات؛ الأزرق يعني أن مراكز البيع تدفع والبرتقالي أن مراكز الشراء تدفع. اضغط عنوان العمود للترتيب واسم العملة لعرض تاريخها. عمود «الفارق» هو المسافة بين أعلى معدل وأدناه بين المنصات."]),
+                   ("المنهج والحدود", [
+                       "تسوّي المنصات كل ساعة أو ٤ أو ٨ ساعات (Hyperliquid كل ساعة). للمقارنة تُحوَّل كلها إلى معدل ٨ ساعات: المعدل × ٨ ÷ فترة التسوية بالساعات. «سنويًّا» = معدل ٨ ساعات × ٣ × ٣٦٥، دون فائدة مركبة وبافتراض بقاء المعدل كما هو.",
+                       "معدلات الجدول والبطاقات هي معدلات التسوية القادمة وتتغير حتى لحظة التسوية؛ أما الرسم فيعرض المعدلات المسوّاة.",
+                       "تتيح OKX نحو ثلاثة أشهر من التاريخ. Bitget وHyperliquid في الجدول فقط.",
+                       "التمويل المرتفع وحده ليس إشارة إلى انعكاس السعر؛ إنه يقول فقط أي الجهتين أغلى كلفةً. ليست نصيحة مالية."])],
+            "en": [("What this page shows", [
+                "<b>What funding is:</b> a periodic payment between longs and shorts that keeps a perpetual contract’s price near the spot price. Positive means longs pay (the market leans long); negative means shorts pay.",
+                "<b>The tiles:</b> the coin’s average present rate across the exchanges, the same per year, and the highest and lowest with the exchange’s name.",
+                "<b>The chart:</b> price above, and the settled rates of Binance, Bybit and OKX below; one week to a year.",
+                "<b>The table:</b> the most traded coins on five exchanges; blue means shorts pay, orange means longs pay. Click a column heading to sort, a coin to see its history. “Spread” is the distance between the highest and the lowest rate among the exchanges."]),
+                   ("Method and limits", [
+                       "Exchanges settle every 1, 4 or 8 hours (Hyperliquid every hour). To compare them, every rate is brought to 8 hours: rate × 8 ÷ the settlement interval in hours. “Per year” = the 8-hour rate × 3 × 365, without compounding and assuming the rate stays as it is.",
+                       "The rates in the table and the tiles are those of the coming settlement and change until it happens; the chart shows settled rates.",
+                       "OKX gives about three months of history, so its line is shorter on longer ranges. Bitget and Hyperliquid are in the table only.",
+                       "A high funding rate alone is not a sign that the price will turn; it only says which side is dearer to hold. Not financial advice."])],
+        },
+    },
+    "ls": {
+        "title": "نسبت لانگ به شورت بیت‌کوین و ارزها، زنده | entekhab.net",
+        "desc": "نسبت لانگ به شورت بیت‌کوین و ارزها: سهم حساب‌های لانگ در Binance و Bybit، معامله‌گران برتر و خالص خرید و فروش تهاجمی زیر نمودار قیمت. زنده و رایگان.",
+        "og": "نسبت لانگ به شورت — حساب‌ها، معامله‌گران برتر، حجم تهاجمی",
+        "ld": "Entekhab long/short ratio",
+        "kw": ["لانگ شورت", "نسبت لانگ به شورت", "long short", "long/short ratio", "لۆنگ", "شۆرت", "معامله‌گران برتر", "top traders", "taker"],
+        "h1": {"fa": "نسبت لانگ به شورت", "ckb": "ڕێژەی لۆنگ بۆ شۆرت", "ar": "نسبة الشراء إلى البيع", "en": "Long/short ratio"},
+        "p": {"fa": "چند درصد حساب‌ها لانگ‌اند — همهٔ حساب‌ها و معامله‌گران برتر — و خریداران یا فروشندگان تهاجمی کدام بیشترند",
+              "ckb": "چەند لەسەدی هەژمارەکان لۆنگن — هەموو هەژمارەکان و بازرگانە سەرەکییەکان — و کڕیاران یان فرۆشیارانی هێرشبەر کامیان زیاترن",
+              "ar": "كم بالمئة من الحسابات مشترية — كل الحسابات وكبار المتداولين — وأيّ الطرفين أكثر: المشترون أم البائعون العدوانيون",
+              "en": "What share of accounts is long — all accounts and the top traders — and whether aggressive buyers or sellers lead"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                "<b>سهم حساب‌های لانگ:</b> از حساب‌هایی که پوزیشن باز دارند، چند درصد لانگ‌اند؛ ۵۰٪ یعنی نیم‌به‌نیم. خط‌ها: همهٔ حساب‌های Binance، همهٔ حساب‌های Bybit، و معامله‌گران برتر Binance (۲۰٪ حساب‌ها با بیشترین مارجین) یک‌بار به شمار حساب و یک‌بار به اندازهٔ پوزیشن.",
+                "<b>خالص حجم تهاجمی:</b> حجم خریدهایی که با سفارش بازار انجام شده منهای فروش‌های بازار در هر بازه، از Binance. سبز یعنی خریداران عجول‌تر بوده‌اند و قرمز یعنی فروشندگان.",
+                "<b>بازه:</b> از ۲۴ ساعت تا ۱ ماه، برای هر ارزی که در Binance یا Bybit قرارداد دائمی دارد."]),
+                   ("چطور بخوانیم، و محدودیت‌ها", [
+                       "این سهمِ «حساب‌ها»ست، نه پول: هر قرارداد یک لانگ و یک شورت دارد و ارزش دو سو همیشه برابر است. وقتی ۷۰٪ حساب‌ها لانگ‌اند، یعنی لانگ‌های کوچکِ پرشمار روبه‌روی شورت‌های بزرگِ کم‌شمار ایستاده‌اند.",
+                       "فاصلهٔ میان خط همهٔ حساب‌ها و خط معامله‌گران برتر گویاتر از هر کدام به‌تنهایی است.",
+                       "Binance فقط ۳۰ روز از این داده‌ها را منتشر می‌کند و تعریف «معامله‌گر برتر» هم از خود Binance است. توصیهٔ مالی نیست."])],
+            "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
+                "<b>بەشی هەژمارە لۆنگەکان:</b> لەو هەژمارانەی پۆزیشنی کراوەیان هەیە، چەند لەسەدیان لۆنگن؛ ٥٠٪ واتە نیوە بە نیوە. هێڵەکان: هەموو هەژمارەکانی Binance، هەموو هەژمارەکانی Bybit، و بازرگانە سەرەکییەکانی Binance (٢٠٪ی هەژمارەکان بە زۆرترین مارجین) جارێک بەپێی ژمارەی هەژمار و جارێک بەپێی قەبارەی پۆزیشن.",
+                "<b>سافیی قەبارەی هێرشبەرانە:</b> قەبارەی ئەو کڕینانەی بە داواکاریی بازاڕ کراون کەم فرۆشتنەکانی بازاڕ لە هەر ماوەیەکدا، لە Binanceـەوە. سەوز واتە کڕیاران پەلەیان زیاتر بووە و سوور واتە فرۆشیاران.",
+                "<b>ماوە:</b> لە ٢٤ کاتژمێرەوە تا ١ مانگ، بۆ هەر دراوێک کە لە Binance یان Bybit گرێبەستی هەمیشەیی هەیە."]),
+                    ("چۆن بیخوێنینەوە، و سنوورەکان", [
+                        "ئەمە بەشی «هەژمارەکان»ە، نەک پارە: هەر گرێبەستێک لۆنگێک و شۆرتێکی هەیە و بەهای هەردوو لا هەمیشە یەکسانە. کاتێک ٧٠٪ی هەژمارەکان لۆنگن، واتە لۆنگی بچووکی زۆر بەرامبەر شۆرتی گەورەی کەم وەستاون.",
+                        "مەودای نێوان هێڵی هەموو هەژمارەکان و هێڵی بازرگانە سەرەکییەکان لە هەر یەکێکیان بە تەنها زیاتر دەدوێت.",
+                        "Binance تەنها ٣٠ ڕۆژ لەم داتایانە بڵاو دەکاتەوە و پێناسەی «بازرگانی سەرەکی»یش هی Binance خۆیەتی. ئامۆژگاریی دارایی نییە."])],
+            "ar": [("ماذا تُظهر هذه الصفحة", [
+                "<b>حصة الحسابات المشترية:</b> من الحسابات التي لها مراكز مفتوحة، كم بالمئة منها مشترٍ؛ ٥٠٪ تعني مناصفة. الخطوط: كل حسابات Binance، كل حسابات Bybit، وكبار متداولي Binance (أعلى ٢٠٪ من الحسابات هامشًا) مرة بعدد الحسابات ومرة بحجم المراكز.",
+                "<b>صافي الحجم العدواني:</b> حجم المشتريات المنفَّذة بأوامر السوق ناقص مبيعات السوق في كل فترة، من Binance. الأخضر يعني أن المشترين كانوا أكثر استعجالًا والأحمر أن البائعين كذلك.",
+                "<b>المدى:</b> من ٢٤ ساعة إلى شهر، لكل عملة لها عقد دائم في Binance أو Bybit."]),
+                   ("كيف تُقرأ، والحدود", [
+                       "هذه حصة «الحسابات» لا الأموال: لكل عقد مركز شراء ومركز بيع وقيمة الجهتين متساوية دائمًا. حين تكون ٧٠٪ من الحسابات مشترية فمعناه أن مراكز شراء صغيرة كثيرة تقابل مراكز بيع كبيرة قليلة.",
+                       "المسافة بين خط كل الحسابات وخط كبار المتداولين أبلغ من أي منهما وحده.",
+                       "تنشر Binance ٣٠ يومًا فقط من هذه البيانات، وتعريف «كبار المتداولين» هو تعريف Binance نفسها. ليست نصيحة مالية."])],
+            "en": [("What this page shows", [
+                "<b>Share of accounts long:</b> of the accounts holding a position, what per cent is long; 50% is half and half. The lines: all Binance accounts, all Bybit accounts, and Binance’s top traders (the 20% of accounts with the largest margin) counted once by accounts and once by position size.",
+                "<b>Net taker volume:</b> the volume bought with market orders minus the volume sold with market orders in each interval, from Binance. Green means buyers were the more eager, red means sellers.",
+                "<b>Range:</b> 24 hours to a month, for any coin with a perpetual contract on Binance or Bybit."]),
+                   ("How to read it, and its limits", [
+                       "This is a share of ACCOUNTS, not of money: every contract has a long and a short, and the two sides are always equal in value. When 70% of accounts are long, many small longs are facing a few large shorts.",
+                       "The gap between the all-accounts line and the top-traders line says more than either alone.",
+                       "Binance publishes only 30 days of this data, and “top trader” is Binance’s own definition. Not financial advice."])],
+        },
+    },
 }
 
 # ---------------------------------------------------------------- the hub: /charts/
@@ -201,6 +365,18 @@ HUB = {
               "ar": "التصفيات لحظة حدوثها، الخريطة الحرارية لدفتر الأوامر وعمق السوق", "en": "Liquidations as they happen, the order-book heatmap and market depth"}),
         ]),
         ({"fa": "فیوچرز و مشتقات", "ckb": "فیوچەرز و دەرهاتەکان", "ar": "العقود الآجلة والمشتقات", "en": "Futures & derivatives"}, [
+            ("/charts/open-interest/", True,
+             {"fa": "اوپن اینترست صرافی‌ها", "ckb": "ئۆپن ئینتەرێستی ئاڵوگۆڕگەکان", "ar": "العقود المفتوحة عبر المنصات", "en": "Open interest by exchange"},
+             {"fa": "جمع و سهم شش صرافی و تاریخچه تا ۱ سال، زیر نمودار قیمت", "ckb": "کۆ و بەشی شەش ئاڵوگۆڕگە و مێژوو تا ١ ساڵ، لە ژێر چارتی نرخدا",
+              "ar": "مجموع ست منصات وحصصها وتاريخ حتى سنة، تحت رسم السعر", "en": "The total and shares of six exchanges, with history up to a year, under the price"}),
+            ("/charts/funding-rate/", True,
+             {"fa": "نرخ فاندینگ صرافی‌ها", "ckb": "نرخی فەندینگی ئاڵوگۆڕگەکان", "ar": "معدلات التمويل عبر المنصات", "en": "Funding rates by exchange"},
+             {"fa": "پنج صرافی کنار هم بر پایهٔ ۸ ساعت، جدول ۴۰ ارز و تاریخچه", "ckb": "پێنج ئاڵوگۆڕگە لە تەنیشت یەک لەسەر بنەمای ٨ کاتژمێر، خشتەی ٤٠ دراو و مێژوو",
+              "ar": "خمس منصات جنبًا إلى جنب على أساس ٨ ساعات، جدول ٤٠ عملة وتاريخ", "en": "Five exchanges side by side on an 8-hour basis, a table of 40 coins, and history"}),
+            ("/charts/long-short/", True,
+             {"fa": "نسبت لانگ به شورت", "ckb": "ڕێژەی لۆنگ بۆ شۆرت", "ar": "نسبة الشراء إلى البيع", "en": "Long/short ratio"},
+             {"fa": "سهم حساب‌های لانگ، معامله‌گران برتر و خالص حجم تهاجمی", "ckb": "بەشی هەژمارە لۆنگەکان، بازرگانە سەرەکییەکان و سافیی قەبارەی هێرشبەرانە",
+              "ar": "حصة الحسابات المشترية، كبار المتداولين وصافي الحجم العدواني", "en": "Share of accounts long, top traders and net taker volume"}),
             ("/derivatives/", False,
              {"fa": "داشبورد مشتقات", "ckb": "داشبۆردی دەرهاتەکان", "ar": "لوحة المشتقات", "en": "Derivatives dashboard"},
              {"fa": "فاندینگ، اوپن اینترست، لیکوییدیشن ۲۴ ساعته و لانگ/شورت", "ckb": "فەندینگ، ئۆپن ئینتەرێست، لیکویدی ٢٤ کاتژمێر و لۆنگ/شۆرت",
@@ -239,9 +415,6 @@ HUB = {
         ]),
     ],
     "todo": [
-        {"fa": "اوپن اینترست تجمیعی صرافی‌ها", "ckb": "ئۆپن ئینتەرێستی کۆکراوەی ئاڵوگۆڕگەکان", "ar": "العقود المفتوحة المجمّعة عبر المنصات", "en": "Open interest across exchanges"},
-        {"fa": "نرخ فاندینگ صرافی‌ها", "ckb": "نرخی فەندینگی ئاڵوگۆڕگەکان", "ar": "معدلات التمويل عبر المنصات", "en": "Funding rates across exchanges"},
-        {"fa": "نسبت لانگ به شورت", "ckb": "ڕێژەی لۆنگ بۆ شۆرت", "ar": "نسبة الشراء إلى البيع", "en": "Long/short ratios"},
         {"fa": "آپشن‌ها: اوپن اینترست، مکس پین و نوسان ضمنی", "ckb": "ئۆپشنەکان: ئۆپن ئینتەرێست، ماکس پەین و هەڵاوسانی ناوەکی", "ar": "الخيارات: العقود المفتوحة وأقصى ألم والتقلب الضمني", "en": "Options: open interest, max pain, implied volatility"},
         {"fa": "MVRV، قیمت تحقق‌یافته و NUPL", "ckb": "MVRV، نرخی بەدیهاتوو و NUPL", "ar": "MVRV والسعر المحقّق وNUPL", "en": "MVRV, realized price, NUPL"},
         {"fa": "ذخایر و جریان صرافی‌ها", "ckb": "یەدەگ و ڕەوتی ئاڵوگۆڕگەکان", "ar": "احتياطيات المنصات وتدفقاتها", "en": "Exchange reserves and flows"},
@@ -250,15 +423,21 @@ HUB = {
 }
 
 
+def rtl_list(text, lg):
+    """A list of Latin names in a right-to-left sentence ("Binance، Bybit، OKX"): a right-to-left mark after each comma keeps
+    the names in the order they are read, instead of one left-to-right run that reverses them."""
+    return text if lg == "en" else re.sub(r"([A-Za-z0-9)])، (?=[A-Za-z(])", "\\1،\u200f ", text)
+
+
 def spans(dct, tag="span"):
-    return "".join(f'<{tag} data-lang="{lg}"{"" if lg == "fa" else " hidden"}>{e(dct[lg])}</{tag}>' for lg in LANGS)
+    return "".join(f'<{tag} data-lang="{lg}"{"" if lg == "fa" else " hidden"}>{e(rtl_list(dct[lg], lg))}</{tag}>' for lg in LANGS)
 
 
 def about(view):
     out = []
     for lg in LANGS:
         secs = T[view]["about"][lg]
-        body = "".join(f"<h2>{e(h)}</h2><ul>" + "".join(f"<li>{x}</li>" for x in items) + "</ul>" for h, items in secs)
+        body = "".join(f"<h2>{e(h)}</h2><ul>" + "".join(f"<li>{rtl_list(x, lg)}</li>" for x in items) + "</ul>" for h, items in secs)
         hid = "" if lg == "fa" else " hidden"
         out.append(f'  <section class="ob-about" data-lang="{lg}" lang="{lg}" dir="{"ltr" if lg == "en" else "rtl"}"{hid}>{body}</section>')
     return "\n".join(out)
@@ -368,6 +547,11 @@ def write(rel, doc):
 def folders():
     """every folder this script writes, for chrome.STATIC and the sitemap"""
     return [HUB_PATH] + [f"{HUB_PATH}/{folder}" for _, folder, _ in PAGES]
+
+
+def catalog():
+    """every chart page for the site's assistant: (address, {language: title}, {language: lead}, search keywords)"""
+    return [(f"/{HUB_PATH}/{folder}/", T[view]["h1"], T[view]["p"], T[view].get("kw", [])) for view, folder, _ in PAGES]
 
 
 def main():

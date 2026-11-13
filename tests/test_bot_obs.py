@@ -4,7 +4,7 @@ Offline test of the Observatory inside the bot (no network, no Telegram).
     python tests/test_bot_obs.py
 
 Drives the real handlers (refbot.handle_update) with captured Telegram calls, in all five languages:
-  * section "obs" (menu key m:obs): the text, the three Web App buttons + the browser button, the standard navigation,
+  * section "obs" (menu key m:obs): the text, the six Web App buttons + the browser button, the standard navigation,
     its place in the analysis group; the description from the menu table;
   * the pages its buttons open exist in the repo and are the ones scripts/build_obs.py builds;
   * the site's menu (scripts/chrome.py) and the assistant's feature list know the section.
@@ -72,7 +72,7 @@ def msgs_since(n):
 
 
 SITE = "https://entekhab.net"
-PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/")]
+PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/open-interest/", "/charts/funding-rate/", "/charts/long-short/", "/charts/")]
 S = R.load_state()
 for i, lang in enumerate(LANGS):
     uid = 900 + i
@@ -88,9 +88,12 @@ for i, lang in enumerate(LANGS):
     check(OBS.L("title", lang) in tx and "Traceback" not in tx and len(tx) <= 4096, "section text renders (title, under 4096)")
     check(MN.desc("obs", lang) in tx, "one-line description under the title")
     check("Binance" in tx and "Bybit" in tx and OBS.L("nfa", lang) in tx, "names its sources and says it is an estimate")
-    webapps = [b["web_app"]["url"] for r in rows[:2] for b in r if "web_app" in b]
-    check(webapps == PAGES, "the three pages open inside Telegram (Web App buttons)")
-    check(len(rows) > 2 and rows[2] == [{"text": OBS.L("b_web", lang), "url": PAGES[0]}], "then the heatmap in the browser")
+    n_open = OBS.N_ROWS - 1
+    webapps = [b["web_app"]["url"] for r in rows[:n_open] for b in r if "web_app" in b]
+    check(webapps == PAGES, "the five charts and the hub open inside Telegram (Web App buttons)")
+    check(len(rows) > n_open and rows[n_open] == [{"text": OBS.L("b_web", lang), "url": PAGES[-1]}], "then the hub in the browser")
+    check(all(len(r) <= 2 and all(len(b["text"]) <= 40 for b in r) for r in rows[:OBS.N_ROWS]), "at most two buttons a row, short labels")
+    check(all(x in tx for x in ("OKX", "Bitget", "Hyperliquid", "Gate")), "names the other four exchanges it reads")
     check(any(b.get("callback_data") == "m:main" for b in rows[-1]) and any(b.get("callback_data") == "m:g_analysis" for b in rows[-1]),
           "ends with ⬅️ analysis + 🏠")
     check(all(len((b.get("callback_data") or "").encode()) <= 64 for r in rows for b in r), "callback sizes")
@@ -110,6 +113,11 @@ check("/charts/" in nav and "/charts/liquidation-heatmap/" in nav, "the site's m
 check(all(f in chrome.STATIC for f in BO.folders()), "chrome.STATIC refreshes the header of every Observatory page")
 feat = {h: k for h, k, x in KB.FEATURES}
 check(feat.get("/charts/") == ["obs"] and "obs" in feat.get("/charts/liquidation-heatmap/", []), "the assistant knows the section and its bot door")
-check("fapi.binance.com" in chrome.CSP and "api.bybit.com" in chrome.CSP, "the CSP allows the two exchanges the charts read")
+check(all(h in chrome.CSP for h in ("fapi.binance.com", "api.bybit.com", "www.okx.com", "api.bitget.com", "api.hyperliquid.xyz", "api.gateio.ws")), "the CSP allows the six exchanges the charts read")
+check(all(("/" + f + "/") in feat for f in BO.folders()), "the assistant's feature list has every page of the section")
+import build_assistant as BA  # noqa: E402
+known = {h for h, t, d, k in BA.EXTRA_PAGES} | nav
+check(all(("/" + f + "/") in known for f in BO.folders()), "every page of the section has a title the assistant can show (menu or its own list)")
+check(all(len(k) >= 4 for h, t, d, k in BO.catalog()), "every chart has search words in more than one language")
 print(f"\nbot_obs: {len(FAILS)} failures")
 sys.exit(1 if FAILS else 0)

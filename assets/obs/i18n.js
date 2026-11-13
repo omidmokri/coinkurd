@@ -5,6 +5,24 @@
   var OB = window.OB = window.OB || {};
   var S = {};
   S.en = {
+    tab_oi: 'Open interest', tab_funding: 'Funding rates', tab_ls: 'Long/short ratio',
+    unit: 'Unit', u_usd: 'Dollars', u_coin: 'Coins', u_8h: 'Per 8 hours', u_apr: 'Per year', loading2: 'Getting data from the exchanges…',
+    s_total: 'Sum of {n} exchanges', t_total_oi: 'Open interest · {n} exchanges', t_chg24: 'Change in 24 hours (dollars)', t_chg24_c: 'Change in 24 hours (coins)', t_chg24_s: 'hourly history of {ex}', t_price: 'Price',
+    aria_oi: 'Open interest of {coin} over time, by exchange, under its price', p_price: 'Price', p_oi_usd: 'Open interest (dollars)', p_oi_coin: 'Open interest ({coin})',
+    note_oi: 'Open interest is the number of futures contracts still open — every one has a long and a short. Rising with the price: new money joins the move; falling: positions are being closed. The history is Binance and Bybit; the table is each exchange’s present figure. Not financial advice.',
+    oi_note_30: 'Binance publishes only 30 days of history, so the sum starts where both lines exist.',
+    th_ex: 'Exchange', th_oi: 'Open interest', th_share: 'Share', th_coins: 'In {coin}', th_fr: 'Funding (per 8 h)',
+    tbl_oi: 'Open interest of {coin} by exchange, now', total: 'Total', ex_missing: 'Did not answer or does not list this coin: {ex}', ex_odd: 'Left out — its price is far from the others, so under this name it lists another coin or another contract unit: {ex}',
+    fr_mean: 'Average of {n} exchanges', fr_per8: 'per 8 hours', fr_ann: 'The same per year', fr_ann_s: 'rate × 3 × 365, if it stayed as it is', fr_high: 'Highest', fr_low: 'Lowest',
+    aria_fr: 'Funding rate of {coin} over time on Binance, Bybit and OKX, under its price', p_fr_8h: 'Funding rate (% per 8 hours)', p_fr_apr: 'Funding rate (% per year)',
+    note_fr: 'Funding is what longs pay shorts (positive) or shorts pay longs (negative) to keep a perpetual near the spot price. Exchanges settle every 1, 4 or 8 hours; every rate here is brought to 8 hours so they can be compared. Not financial advice.',
+    th_coin: 'Coin', th_avg: 'Average', th_spread: 'Spread', tbl_fr: 'Funding now: the most traded coins on five exchanges',
+    tbl_fr_8h: 'Per cent per 8 hours. Click a column to sort, a coin to see its history.', tbl_fr_apr: 'Per cent per year (rate × 3 × 365). Click a column to sort, a coin to see its history.',
+    fr_neg: 'shorts pay longs', fr_pos: 'longs pay shorts', part_fail2: 'Did not answer from this connection: {ex}',
+    ls_bn_all: 'Binance · all accounts', ls_by_all: 'Bybit · all accounts', ls_bn_top_acc: 'Binance · top traders (accounts)', ls_bn_top_pos: 'Binance · top traders (positions)', ls_short_is: 'short {v}',
+    p_ls: 'Share that is long (%)', mark_50: 'half and half', p_taker: 'Takers: buys minus sells ({coin})', taker_net: 'Net taker volume',
+    aria_ls: 'Share of accounts long on {coin} over time, and the takers’ net volume, under the price',
+    note_ls: 'These are shares of ACCOUNTS (and, for top traders, of their positions) — not of money: every contract has a long and a short, so the dollars are always equal. A crowd that is mostly long tells where small accounts stand, not where the price goes. Not financial advice.',
     nav: 'Sections of the Observatory', all: 'All charts', tab_liqheat: 'Liquidation heatmap', tab_liqmap: 'Liquidation map',
     err_view: 'This part did not load. Refresh the page.', ago_s: '{n} s ago', ago_m: '{n} min ago', ago_h: '{n} h ago',
     exch: 'Exchange', ex_all: 'All', range: 'Range', lookback: 'Positions opened in', width: 'Width', model: 'Model', lev: 'Leverage', palette: 'Colours', thr: 'Threshold',
@@ -33,6 +51,24 @@
     note_map: 'An estimate, not a forecast: the bars are the dollars of positions the model expects to be liquidated in that band if the price gets there. Not financial advice.'
   };
   S.fa = {
+    tab_oi: 'اوپن اینترست', tab_funding: 'نرخ فاندینگ', tab_ls: 'نسبت لانگ به شورت',
+    unit: 'واحد', u_usd: 'دلار', u_coin: 'تعداد ارز', u_8h: 'در ۸ ساعت', u_apr: 'سالانه', loading2: 'در حال گرفتن داده از صرافی‌ها…',
+    s_total: 'جمع {n} صرافی', t_total_oi: 'اوپن اینترست · {n} صرافی', t_chg24: 'تغییر ۲۴ ساعته (دلاری)', t_chg24_c: 'تغییر ۲۴ ساعته (تعداد ارز)', t_chg24_s: 'از تاریخچهٔ ساعتی {ex}', t_price: 'قیمت',
+    aria_oi: 'اوپن اینترست {coin} در طول زمان به تفکیک صرافی، زیر نمودار قیمت', p_price: 'قیمت', p_oi_usd: 'اوپن اینترست (دلار)', p_oi_coin: 'اوپن اینترست ({coin})',
+    note_oi: 'اوپن اینترست شمار قراردادهای فیوچرزی است که هنوز باز مانده‌اند؛ هر قرارداد یک لانگ و یک شورت دارد. اگر همراه قیمت بالا برود یعنی پول تازه به حرکت پیوسته، و اگر پایین بیاید یعنی پوزیشن‌ها بسته می‌شوند. تاریخچه از Binance و Bybit است و جدول، عدد همین لحظهٔ هر صرافی. توصیهٔ مالی نیست.',
+    oi_note_30: 'Binance فقط ۳۰ روز تاریخچه می‌دهد؛ پس خط جمع از جایی شروع می‌شود که هر دو خط وجود دارند.',
+    th_ex: 'صرافی', th_oi: 'اوپن اینترست', th_share: 'سهم', th_coins: 'به {coin}', th_fr: 'فاندینگ (در ۸ ساعت)',
+    tbl_oi: 'اوپن اینترست {coin} در هر صرافی، همین حالا', total: 'جمع', ex_missing: 'پاسخ ندادند یا این ارز را ندارند: {ex}', ex_odd: 'کنار گذاشته شد — قیمتش از بقیه دور است؛ یعنی با این نام ارز دیگری یا واحد قرارداد دیگری دارد: {ex}',
+    fr_mean: 'میانگین {n} صرافی', fr_per8: 'در ۸ ساعت', fr_ann: 'همان، سالانه', fr_ann_s: 'نرخ × ۳ × ۳۶۵، اگر همین بماند', fr_high: 'بیشترین', fr_low: 'کمترین',
+    aria_fr: 'نرخ فاندینگ {coin} در طول زمان در Binance، Bybit و OKX، زیر نمودار قیمت', p_fr_8h: 'نرخ فاندینگ (٪ در ۸ ساعت)', p_fr_apr: 'نرخ فاندینگ (٪ سالانه)',
+    note_fr: 'فاندینگ پولی است که لانگ‌ها به شورت‌ها (مثبت) یا شورت‌ها به لانگ‌ها (منفی) می‌دهند تا قیمت قرارداد دائمی نزدیک قیمت نقدی بماند. صرافی‌ها هر ۱، ۴ یا ۸ ساعت تسویه می‌کنند؛ این‌جا همهٔ نرخ‌ها به ۸ ساعت برده شده‌اند تا قابل مقایسه باشند. توصیهٔ مالی نیست.',
+    th_coin: 'ارز', th_avg: 'میانگین', th_spread: 'اختلاف', tbl_fr: 'فاندینگ همین حالا: پرمعامله‌ترین ارزها در پنج صرافی',
+    tbl_fr_8h: 'درصد در ۸ ساعت. برای مرتب‌سازی روی عنوان ستون و برای دیدن تاریخچه روی نام ارز بزنید.', tbl_fr_apr: 'درصد در سال (نرخ × ۳ × ۳۶۵). برای مرتب‌سازی روی عنوان ستون و برای دیدن تاریخچه روی نام ارز بزنید.',
+    fr_neg: 'شورت‌ها به لانگ‌ها می‌پردازند', fr_pos: 'لانگ‌ها به شورت‌ها می‌پردازند', part_fail2: 'از این اتصال پاسخ ندادند: {ex}',
+    ls_bn_all: 'Binance · همهٔ حساب‌ها', ls_by_all: 'Bybit · همهٔ حساب‌ها', ls_bn_top_acc: 'Binance · معامله‌گران برتر (حساب‌ها)', ls_bn_top_pos: 'Binance · معامله‌گران برتر (پوزیشن‌ها)', ls_short_is: 'شورت {v}',
+    p_ls: 'سهم لانگ (٪)', mark_50: 'نیم‌به‌نیم', p_taker: 'خرید منهای فروش تهاجمی ({coin})', taker_net: 'خالص حجم تهاجمی',
+    aria_ls: 'سهم حساب‌های لانگ {coin} در طول زمان و خالص حجم تهاجمی، زیر نمودار قیمت',
+    note_ls: 'این‌ها سهم «حساب‌ها» هستند (و برای معامله‌گران برتر، سهم پوزیشن‌هایشان) — نه سهم پول: هر قرارداد یک لانگ و یک شورت دارد و دلارها همیشه برابرند. اینکه بیشتر حساب‌ها لانگ‌اند می‌گوید حساب‌های کوچک کجا ایستاده‌اند، نه اینکه قیمت کجا می‌رود. توصیهٔ مالی نیست.',
     nav: 'بخش‌های رصدخانه', all: 'همهٔ نمودارها', tab_liqheat: 'نقشهٔ حرارتی لیکوییدیشن', tab_liqmap: 'نقشهٔ لیکوییدیشن',
     err_view: 'این بخش بارگیری نشد. صفحه را تازه کنید.', ago_s: '{n} ثانیه پیش', ago_m: '{n} دقیقه پیش', ago_h: '{n} ساعت پیش',
     exch: 'صرافی', ex_all: 'همه', range: 'بازه', lookback: 'پوزیشن‌های بازشده در', width: 'پهنا', model: 'مدل', lev: 'اهرم', palette: 'رنگ', thr: 'آستانه',
@@ -61,6 +97,24 @@
     note_map: 'برآورد است، نه پیش‌بینی: ستون‌ها دلار پوزیشن‌هایی است که به حساب مدل، اگر قیمت به آن محدوده برسد، لیکویید می‌شوند. توصیهٔ مالی نیست.'
   };
   S.ckb = {
+    tab_oi: 'ئۆپن ئینتەرێست', tab_funding: 'نرخی فەندینگ', tab_ls: 'ڕێژەی لۆنگ بۆ شۆرت',
+    unit: 'یەکە', u_usd: 'دۆلار', u_coin: 'ژمارەی دراو', u_8h: 'لە ٨ کاتژمێردا', u_apr: 'ساڵانە', loading2: 'وەرگرتنی داتا لە ئاڵوگۆڕگەکانەوە…',
+    s_total: 'کۆی {n} ئاڵوگۆڕگە', t_total_oi: 'ئۆپن ئینتەرێست · {n} ئاڵوگۆڕگە', t_chg24: 'گۆڕانی ٢٤ کاتژمێر (بە دۆلار)', t_chg24_c: 'گۆڕانی ٢٤ کاتژمێر (بە ژمارەی دراو)', t_chg24_s: 'لە مێژووی کاتژمێریی {ex}ـەوە', t_price: 'نرخ',
+    aria_oi: 'ئۆپن ئینتەرێستی {coin} بە درێژایی کات بەپێی ئاڵوگۆڕگە، لە ژێر چارتی نرخدا', p_price: 'نرخ', p_oi_usd: 'ئۆپن ئینتەرێست (دۆلار)', p_oi_coin: 'ئۆپن ئینتەرێست ({coin})',
+    note_oi: 'ئۆپن ئینتەرێست ژمارەی ئەو گرێبەستانەی فیوچەرزە کە هێشتا کراوەن؛ هەر گرێبەستێک لۆنگێک و شۆرتێکی هەیە. ئەگەر لەگەڵ نرخ بەرز ببێتەوە واتە پارەی نوێ هاتووەتە ناو جووڵەکە، و ئەگەر دابەزێت واتە پۆزیشنەکان دادەخرێن. مێژووەکە لە Binance و Bybitـەوەیە و خشتەکە ژمارەی ئێستای هەر ئاڵوگۆڕگەیەکە. ئامۆژگاریی دارایی نییە.',
+    oi_note_30: 'Binance تەنها ٣٠ ڕۆژ مێژوو دەدات؛ بۆیە هێڵی کۆ لەو شوێنەوە دەست پێدەکات کە هەردوو هێڵەکە هەن.',
+    th_ex: 'ئاڵوگۆڕگە', th_oi: 'ئۆپن ئینتەرێست', th_share: 'بەش', th_coins: 'بە {coin}', th_fr: 'فەندینگ (لە ٨ کاتژمێردا)',
+    tbl_oi: 'ئۆپن ئینتەرێستی {coin} لە هەر ئاڵوگۆڕگەیەک، ئێستا', total: 'کۆ', ex_missing: 'وەڵامیان نەدایەوە یان ئەم دراوەیان نییە: {ex}', ex_odd: 'لابرا — نرخەکەی لە ئەوانی تر دوورە؛ واتە بەم ناوە دراوێکی تر یان یەکەیەکی تری گرێبەستی هەیە: {ex}',
+    fr_mean: 'تێکڕای {n} ئاڵوگۆڕگە', fr_per8: 'لە ٨ کاتژمێردا', fr_ann: 'هەمان، ساڵانە', fr_ann_s: 'نرخ × ٣ × ٣٦٥، ئەگەر وەک خۆی بمێنێتەوە', fr_high: 'بەرزترین', fr_low: 'نزمترین',
+    aria_fr: 'نرخی فەندینگی {coin} بە درێژایی کات لە Binance، Bybit و OKX، لە ژێر چارتی نرخدا', p_fr_8h: 'نرخی فەندینگ (٪ لە ٨ کاتژمێردا)', p_fr_apr: 'نرخی فەندینگ (٪ ساڵانە)',
+    note_fr: 'فەندینگ ئەو پارەیەیە کە لۆنگەکان دەیدەن بە شۆرتەکان (پۆزەتیڤ) یان شۆرتەکان بە لۆنگەکان (نێگەتیڤ) بۆ ئەوەی نرخی گرێبەستی هەمیشەیی نزیک نرخی نەختینە بمێنێتەوە. ئاڵوگۆڕگەکان هەر ١، ٤ یان ٨ کاتژمێر جارێک یەکلایی دەکەنەوە؛ لێرەدا هەموو نرخەکان براونەتە سەر ٨ کاتژمێر تا بەراورد بکرێن. ئامۆژگاریی دارایی نییە.',
+    th_coin: 'دراو', th_avg: 'تێکڕا', th_spread: 'جیاوازی', tbl_fr: 'فەندینگی ئێستا: زۆرترین دراوە مامەڵەکراوەکان لە پێنج ئاڵوگۆڕگە',
+    tbl_fr_8h: 'لەسەد لە ٨ کاتژمێردا. بۆ ڕیزکردن کرتە لە ناونیشانی ستوون و بۆ بینینی مێژوو کرتە لە ناوی دراو بکە.', tbl_fr_apr: 'لەسەد لە ساڵێکدا (نرخ × ٣ × ٣٦٥). بۆ ڕیزکردن کرتە لە ناونیشانی ستوون و بۆ بینینی مێژوو کرتە لە ناوی دراو بکە.',
+    fr_neg: 'شۆرتەکان پارە دەدەن بە لۆنگەکان', fr_pos: 'لۆنگەکان پارە دەدەن بە شۆرتەکان', part_fail2: 'لەم پەیوەندییەوە وەڵامیان نەدایەوە: {ex}',
+    ls_bn_all: 'Binance · هەموو هەژمارەکان', ls_by_all: 'Bybit · هەموو هەژمارەکان', ls_bn_top_acc: 'Binance · بازرگانە سەرەکییەکان (هەژمار)', ls_bn_top_pos: 'Binance · بازرگانە سەرەکییەکان (پۆزیشن)', ls_short_is: 'شۆرت {v}',
+    p_ls: 'بەشی لۆنگ (٪)', mark_50: 'نیوە بە نیوە', p_taker: 'کڕین کەم فرۆشتنی هێرشبەرانە ({coin})', taker_net: 'سافیی قەبارەی هێرشبەرانە',
+    aria_ls: 'بەشی هەژمارە لۆنگەکانی {coin} بە درێژایی کات و سافیی قەبارەی هێرشبەرانە، لە ژێر چارتی نرخدا',
+    note_ls: 'ئەمانە بەشی «هەژمارەکان»ن (و بۆ بازرگانە سەرەکییەکان، بەشی پۆزیشنەکانیان) — نەک بەشی پارە: هەر گرێبەستێک لۆنگێک و شۆرتێکی هەیە و دۆلارەکان هەمیشە یەکسانن. ئەوەی زۆربەی هەژمارەکان لۆنگن دەڵێت هەژمارە بچووکەکان لە کوێ وەستاون، نەک نرخ بۆ کوێ دەچێت. ئامۆژگاریی دارایی نییە.',
     nav: 'بەشەکانی ڕوانگە', all: 'هەموو چارتەکان', tab_liqheat: 'نەخشەی گەرمیی لیکویدکردن', tab_liqmap: 'نەخشەی لیکویدکردن',
     err_view: 'ئەم بەشە بار نەبوو. پەڕەکە نوێ بکەرەوە.', ago_s: '{n} چرکە لەمەوبەر', ago_m: '{n} خولەک لەمەوبەر', ago_h: '{n} کاتژمێر لەمەوبەر',
     exch: 'ئاڵوگۆڕگە', ex_all: 'هەموو', range: 'ماوە', lookback: 'ئەو پۆزیشنانەی کراونەتەوە لە', width: 'پانی', model: 'مۆدێل', lev: 'لیڤەرێج', palette: 'ڕەنگ', thr: 'ئاستانە',
@@ -89,6 +143,24 @@
     note_map: 'خەمڵاندنە، نەک پێشبینی: ستوونەکان دۆلاری ئەو پۆزیشنانەن کە بەپێی مۆدێلەکە، ئەگەر نرخ بگاتە ئەو مەودایە، لیکوید دەکرێن. ئامۆژگاریی دارایی نییە.'
   };
   S.ar = {
+    tab_oi: 'العقود المفتوحة', tab_funding: 'معدلات التمويل', tab_ls: 'نسبة الشراء إلى البيع',
+    unit: 'الوحدة', u_usd: 'دولار', u_coin: 'عدد العملات', u_8h: 'لكل ٨ ساعات', u_apr: 'سنويًّا', loading2: 'جارٍ جلب البيانات من المنصات…',
+    s_total: 'مجموع {n} منصات', t_total_oi: 'العقود المفتوحة · {n} منصات', t_chg24: 'التغير خلال ٢٤ ساعة (بالدولار)', t_chg24_c: 'التغير خلال ٢٤ ساعة (بعدد العملات)', t_chg24_s: 'من التاريخ الساعي لـ{ex}', t_price: 'السعر',
+    aria_oi: 'العقود المفتوحة لـ{coin} عبر الزمن حسب المنصة، تحت رسم السعر', p_price: 'السعر', p_oi_usd: 'العقود المفتوحة (دولار)', p_oi_coin: 'العقود المفتوحة ({coin})',
+    note_oi: 'العقود المفتوحة هي عدد العقود الآجلة التي ما زالت قائمة، ولكل عقد مركز شراء ومركز بيع. ارتفاعها مع السعر يعني دخول أموال جديدة في الحركة، وانخفاضها يعني إغلاق المراكز. التاريخ من Binance وBybit، والجدول هو رقم كل منصة الآن. ليست نصيحة مالية.',
+    oi_note_30: 'تنشر Binance ٣٠ يومًا فقط من التاريخ، لذا يبدأ خط المجموع حيث يوجد الخطان معًا.',
+    th_ex: 'المنصة', th_oi: 'العقود المفتوحة', th_share: 'الحصة', th_coins: 'بـ{coin}', th_fr: 'التمويل (لكل ٨ ساعات)',
+    tbl_oi: 'العقود المفتوحة لـ{coin} في كل منصة الآن', total: 'المجموع', ex_missing: 'لم تستجب أو لا تدرج هذه العملة: {ex}', ex_odd: 'استُبعدت — سعرها بعيد عن البقية، فهي تدرج بهذا الاسم عملة أخرى أو وحدة عقد أخرى: {ex}',
+    fr_mean: 'متوسط {n} منصات', fr_per8: 'لكل ٨ ساعات', fr_ann: 'نفسه سنويًّا', fr_ann_s: 'المعدل × ٣ × ٣٦٥ إن بقي كما هو', fr_high: 'الأعلى', fr_low: 'الأدنى',
+    aria_fr: 'معدل تمويل {coin} عبر الزمن في Binance وBybit وOKX، تحت رسم السعر', p_fr_8h: 'معدل التمويل (٪ لكل ٨ ساعات)', p_fr_apr: 'معدل التمويل (٪ سنويًّا)',
+    note_fr: 'التمويل هو ما تدفعه مراكز الشراء لمراكز البيع (موجب) أو العكس (سالب) ليبقى سعر العقد الدائم قريبًا من السعر الفوري. المنصات تسوّي كل ساعة أو ٤ أو ٨ ساعات؛ وقد حُوّلت كل المعدلات هنا إلى ٨ ساعات لتصحّ المقارنة. ليست نصيحة مالية.',
+    th_coin: 'العملة', th_avg: 'المتوسط', th_spread: 'الفارق', tbl_fr: 'التمويل الآن: أكثر العملات تداولًا في خمس منصات',
+    tbl_fr_8h: 'بالمئة لكل ٨ ساعات. اضغط عنوان العمود للترتيب واسم العملة لعرض تاريخها.', tbl_fr_apr: 'بالمئة سنويًّا (المعدل × ٣ × ٣٦٥). اضغط عنوان العمود للترتيب واسم العملة لعرض تاريخها.',
+    fr_neg: 'مراكز البيع تدفع لمراكز الشراء', fr_pos: 'مراكز الشراء تدفع لمراكز البيع', part_fail2: 'لم تستجب من هذا الاتصال: {ex}',
+    ls_bn_all: 'Binance · كل الحسابات', ls_by_all: 'Bybit · كل الحسابات', ls_bn_top_acc: 'Binance · كبار المتداولين (حسابات)', ls_bn_top_pos: 'Binance · كبار المتداولين (مراكز)', ls_short_is: 'بيع {v}',
+    p_ls: 'حصة الشراء (٪)', mark_50: 'مناصفة', p_taker: 'شراء ناقص بيع عدواني ({coin})', taker_net: 'صافي الحجم العدواني',
+    aria_ls: 'حصة الحسابات المشترية لـ{coin} عبر الزمن وصافي الحجم العدواني، تحت رسم السعر',
+    note_ls: 'هذه حصص «الحسابات» (ولكبار المتداولين حصص مراكزهم) لا حصص الأموال: لكل عقد مركز شراء ومركز بيع، فالدولارات متساوية دائمًا. كون أغلب الحسابات مشترية يخبر أين تقف الحسابات الصغيرة لا إلى أين يتجه السعر. ليست نصيحة مالية.',
     nav: 'أقسام المرصد', all: 'كل الرسوم', tab_liqheat: 'الخريطة الحرارية للتصفيات', tab_liqmap: 'خريطة التصفيات',
     err_view: 'تعذّر تحميل هذا القسم. حدّث الصفحة.', ago_s: 'منذ {n} ث', ago_m: 'منذ {n} د', ago_h: 'منذ {n} س',
     exch: 'المنصة', ex_all: 'الكل', range: 'المدى', lookback: 'المراكز المفتوحة خلال', width: 'العرض', model: 'النموذج', lev: 'الرافعة', palette: 'الألوان', thr: 'العتبة',
@@ -120,6 +192,9 @@
   OB.tr = function (lang, k, a) {
     var s = (S[lang] && S[lang][k] != null) ? S[lang][k] : (S.en[k] != null ? S.en[k] : k);
     if (a) s = s.replace(/\{(\w+)\}/g, function (m, n) { return a[n] != null ? a[n] : m; });
+    /* a list of Latin names in a right-to-left sentence ("Binance، Bybit، OKX"): a right-to-left mark after each comma keeps
+       the names in the order they are read, instead of one left-to-right run that reverses them */
+    if (lang !== 'en') s = s.replace(/([A-Za-z0-9)])، (?=[A-Za-z(])/g, '$1،\u200f ');
     return s;
   };
 })();
