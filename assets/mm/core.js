@@ -12,7 +12,7 @@
   var w = window, d = document, de = d.documentElement;
   var MM = w.MM = w.MM || {};
   MM.views = MM.views || {};
-  var ASSET_V = '5';
+  var ASSET_V = '6';
   var API = 'https://data-api.binance.vision/api/v3/';
   MM.API = API;
   MM.WS = 'wss://data-stream.binance.vision/stream';

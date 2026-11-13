@@ -344,10 +344,10 @@
     var it = E.items, n = it.length, i, j, moving = 0, camDir = new THREE.Vector3();
     for (i = 0; i < n; i++) {
       var a = it[i]; a.r += (a.tr - a.r) * 0.08; moving += Math.abs(a.tr - a.r);
-      if (!(E.grab && E.grab.it === a)) { var asp = Math.max(1, E.w / E.h); a.v.x -= a.p.x * 0.0012 / asp; a.v.y -= a.p.y * 0.0016; a.v.z -= a.p.z * 0.0012; }   /* a wide cloud on a wide screen */
+      if (!(E.grab && E.grab.it === a)) { var asp = Math.max(1, E.w / E.h); a.v.x -= a.p.x * 0.0005 / (asp * asp); a.v.y -= a.p.y * 0.0009; a.v.z -= a.p.z * 0.014; }   /* a wide, fairly flat cloud: fewer bubbles hide behind others */   /* a wide cloud on a wide screen */
     }
     for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
-      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 1.4 + 0.3 * Math.min(A.r, B.r);
+      var A = it[i], B = it[j], dx = B.p.x - A.p.x, dy = B.p.y - A.p.y, dz = B.p.z - A.p.z, dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.001, min = A.r + B.r + 3.2 + 0.55 * Math.min(A.r, B.r);
       if (dist < min) {
         var ov = (min - dist) / dist * 0.5, wa = B.r * B.r / (A.r * A.r + B.r * B.r), wb = 1 - wa;
         if (E.grab) { if (E.grab.it === A) { wa = 0; wb = 1; } else if (E.grab.it === B) { wa = 1; wb = 0; } }
@@ -398,9 +398,9 @@
     bubbles: function (box, getSt, size) {
       stop();
       E = Engine(box, size, 'bub'); E.getSt = getSt;
-      E.orbit = Orbit(E.cam, E.r.domElement, { th: 0, ph: 1.25, r: 120, min: 30, max: 300, ty: 0, held: function () { return !!(E && E.grab); } });
+      E.orbit = Orbit(E.cam, E.r.domElement, { th: 0, ph: Math.PI / 2, r: 120, min: 30, max: 300, ty: 0, still: true, held: function () { return !!(E && E.grab); } });
       bubBuild(getSt);
-      for (var i = 0; i < 160; i++) bubStep();
+      for (var i = 0; i < 260; i++) bubStep();
       bubFit();                                              /* the whole cluster in view */
       E.step = function () { bubStep(); return true; };
       wirePick(E.r.domElement); wireGrab(E.r.domElement);

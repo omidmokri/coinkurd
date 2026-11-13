@@ -14,7 +14,7 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "5"            # asset version (bump with any change to assets/mm/*)
+V = "6"            # asset version (bump with any change to assets/mm/*)
 LANGS = ("fa", "ckb", "ar", "en")
 
 
