@@ -609,9 +609,9 @@
     var def = VIEWS.filter(function (v) { return v.k === curKey; })[0] || {};
     if (!def.map) { e.innerHTML = ''; return; }
     var s = MM.SAT[S.tf], stops = [-1, -0.5, 0, 0.5, 1];
-    e.innerHTML = '<span>' + esc(T('legend', { tf: T('tfn_' + S.tf) })) + '</span><i class="mm-lgbar" style="background:linear-gradient(90deg,' +
+    e.innerHTML = '<span>' + esc(T('legend', { tf: T('tfn_' + S.tf) })) + '</span><span class="mm-lgbox"><i class="mm-lgbar" style="background:linear-gradient(90deg,' +
       [-1, -0.75, -0.45, -0.18, 0, 0.18, 0.45, 0.75, 1].map(function (x) { return MM.css(MM.rgb(x * s)); }).join(',') + ')"></i><span class="mm-lgt mm-n">' +
-      stops.map(function (x) { return '<b>' + (x > 0 ? '+' : x < 0 ? '-' : '') + Math.abs(x * s) + '%' + (Math.abs(x) === 1 ? (x > 0 ? '+' : '') : '') + '</b>'; }).join('') + '</span>';
+      stops.map(function (x) { return '<b>' + (x > 0 ? '+' : x < 0 ? '-' : '') + Math.abs(x * s) + '%' + (Math.abs(x) === 1 ? (x > 0 ? '+' : '') : '') + '</b>'; }).join('') + '</span></span>';
   }
   MM.legend = legend;
 
