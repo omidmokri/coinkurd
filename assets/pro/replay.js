@@ -58,7 +58,18 @@
     unpick(cell);
     var old = cell.replay;
     if (old) clearInterval(old.timer);
-    cell.replay = { i: i, speed: old ? old.speed : 2, play: false, timer: null, pos: null, trades: old ? old.trades : [], more: more !== false, cash: old ? old.cash : 0, follower: !!follower, iv: null, sub: null, k: -1 };
+    var acct = null, same = !!(old && old.acct && old.acct.sym === cell.cfg.sym && !follower);
+    if (same) acct = old.acct;                                       /* the same replay goes on (e.g. sync switched) */
+    else if (!follower) {
+      acct = cell._keepAcct && cell._keepAcct.sym === cell.cfg.sym ? cell._keepAcct : null;
+      if (acct) {                                                    /* a new start: an open trade closes where it was, the results stay */
+        if (acct.pos && acct.px) acct.close(acct.px, acct.lastT, 'manual');
+        acct.pos = null; acct.orders = [];
+      } else if (P.bt) acct = P.bt.newAccount(cell.cfg.sym);
+      if (acct && bars[i]) { acct.lastT = bars[i].t; acct.px = bars[i].c; }
+    }
+    cell._keepAcct = null;
+    cell.replay = { i: i, start: same && old.start != null ? old.start : i, speed: old ? old.speed : 2, play: false, timer: null, acct: acct, more: more !== false, follower: !!follower, iv: null, sub: null, k: -1 };
     cell.bars = bars;
     cell.render(i); cell.legend(); showBar(cell);
     var r = cell.chart.timeScale().getVisibleLogicalRange(), w = r ? r.to - r.from : 120, li = cell.xform && cell.xform() ? cell.disp.length - 1 : i;
@@ -81,6 +92,7 @@
     if (k < 0) { if (R.i > 1) { R.i--; cell.render(R.i); paint(cell); syncOthers(cell); } return; }
     if (R.i >= cell.bars.length - 1) { extend(cell); return; }
     R.i++;
+    if (P.bt && !R.follower) P.bt.onBar(cell, cell.bars[R.i]);
     var bars = cell.bars.slice(0, R.i + 1);
     if (cell.xform && cell.xform()) { cell.render(R.i); cell.legendLast(); paint(cell); syncOthers(cell); return; }   /* bricks may come several at once */
     cell.disp = cell.toDisp(bars);
@@ -94,6 +106,10 @@
     var R = cell.replay; if (!R) return;
     pause(cell);
     if (!iv) {                                                       /* back to whole bars: the partial bar completes */
+      if (R.sub && R.k >= 0 && P.bt && !R.follower) {                  /* the rest of that bar still meets the open trade and the orders */
+        var end = cell.bars[R.i].t + cell.tfSec();
+        for (var j = R.k + 1; j < R.sub.length && R.sub[j].t < end; j++) P.bt.onBar(cell, R.sub[j]);
+      }
       R.iv = null; R.sub = null; R.k = -1; R.part = null; cell.render(R.i); paint(cell); return;
     }
     var tf = P.parseTF(cell.cfg.tf), it = P.parseTF(iv); if (!tf || !it || it.sec >= tf.sec || tf.sec % it.sec) return;
@@ -125,7 +141,7 @@
       }, function () { R.loading = false; pause(cell); A.toast(T('netErr')); });
       return;
     }
-    R.k++; showSub(cell, false);
+    R.k++; if (P.bt && !R.follower) P.bt.onBar(cell, R.sub[R.k]); showSub(cell, false);
   }
   function showSub(cell, back) {
     var R = cell.replay, S = R.sub, ts = S[R.k].t, tf = P.parseTF(cell.cfg.tf), bt = P.bucket(ts, tf), B = cell.bars;
@@ -167,28 +183,18 @@
   function play(cell) { var R = cell.replay; if (!R) return; R.play = true; clearInterval(R.timer); R.timer = setInterval(function () { step(cell, 1); }, SPEEDS[R.speed][0]); paint(cell); }
   function pause(cell) { var R = cell.replay; if (!R) return; R.play = false; clearInterval(R.timer); paint(cell); }
   function stop(cell, quiet) {
-    unpick(cell);
+    unpick(cell); cell._keepAcct = null;
     var R = cell.replay; if (R) clearInterval(R.timer);
     if (R && !R.follower) others(cell).forEach(function (c) { if (c.replay && c.replay.follower) stop(c, true); });
+    if (P.bt) P.bt.clear(cell);
     cell.replay = null; var b = bar(cell); if (b) b.remove();
     if (cell.feed) { cell.bars = cell.feed.bars.slice(); cell.render(); cell.fit(); }
     cell.legend(); A.emit('replay', cell);
   }
-  /* practice trades at the replay close; size in USDT, no fees, no leverage */
+  /* practice trading: the account (balance, size, leverage, fees, stops, orders) lives in backtest.js */
   function price(cell) { var R = cell.replay; return R ? (R.sub && R.k >= 0 && R.part ? R.part.c : cell.bars[R.i].c) : null; }
-  function open(cell, side) {
-    var R = cell.replay; if (!R) return;
-    if (R.pos && R.pos.side === side) return;
-    if (R.pos) close(cell);
-    R.pos = { side: side, entry: price(cell), t: cell.bars[R.i].t, size: R.size || 1000 };
-    paint(cell);
-  }
-  function close(cell) {
-    var R = cell.replay; if (!R || !R.pos) return;
-    var p = price(cell), q = R.pos, pct = (p / q.entry - 1) * 100 * q.side;
-    R.trades.push({ side: q.side, entry: q.entry, exit: p, t0: q.t, t1: cell.bars[R.i].t, pct: pct, usd: q.size * pct / 100 });
-    R.cash += q.size * pct / 100; R.pos = null; paint(cell);
-  }
+  function open(cell, side) { if (P.bt) { P.bt.market(cell, side); paint(cell); } }
+  function close(cell) { if (P.bt) { P.bt.market(cell, 0); paint(cell); } }
   function showBar(cell) {
     var b = bar(cell); if (b) b.remove();
     b = h('<div class="pm-repbar" dir="ltr"></div>'); cell.el.appendChild(b);
@@ -204,9 +210,10 @@
     if (!R) {
       b.innerHTML = '<span class="pm-rept">' + esc(T('pickStart')) + '</span><button type="button" class="pm-rb" data-a="first">⏮ ' + esc(T('firstBar')) + '</button><button type="button" class="pm-rb" data-a="rand">🎲 ' + esc(T('random')) + '</button><button type="button" class="pm-rb" data-a="date">' + ic('cal') + ' ' + esc(T('date')) + '</button><button type="button" class="pm-rb" data-a="x">' + ic('x') + '</button>';
     } else {
-      var cur = cell.bars[R.i], p = price(cell), q = R.pos, open_ = q ? (p / q.entry - 1) * 100 * q.side : null, multi = A.cells().length > 1;
-      var tShow = R.sub && R.k >= 0 ? R.sub[R.k].t : cur.t;
-      var wins = R.trades.filter(function (t) { return t.pct > 0; }).length;
+      var cur = cell.bars[R.i], p = price(cell), ac = R.acct, q = ac && ac.pos, multi = A.cells().length > 1;
+      var tShow = R.sub && R.k >= 0 ? R.sub[R.k].t : cur.t, ntr = ac ? ac.trades.length : 0;
+      var upnl = q ? q.qty * (p - q.entry) * q.side : 0, upct = q ? upnl / q.margin * 100 : 0, eq = ac ? ac.equity(p) : 0, net = ac ? eq - ac.start : 0;
+      var wins = ac ? ac.trades.filter(function (t) { return t.pnl > 0; }).length : 0;
       b.innerHTML = '<button type="button" class="pm-rb" data-a="pick" title="' + esc(T('newStart')) + '">✂</button>' +
         '<button type="button" class="pm-rb" data-a="back" title="' + esc(T('stepBack')) + '">' + ic('back') + '</button>' +
         '<button type="button" class="pm-rb pm-rplay" data-a="play" title="' + esc(T(R.play ? 'pause' : 'play')) + '">' + ic(R.play ? 'pause' : 'play') + '</button>' +
@@ -216,8 +223,11 @@
         (multi ? '<button type="button" class="pm-rb' + (SYNC ? ' on' : '') + '" data-a="sync" title="' + esc(T('repSync')) + '">🔗</button>' : '') +
         '<span class="pm-rept">' + esc(A.fmtT(tShow)) + '</span>' +
         '<button type="button" class="pm-rb buy" data-a="buy">' + esc(T('buy')) + '</button><button type="button" class="pm-rb sell" data-a="sell">' + esc(T('sell')) + '</button>' +
-        (q ? '<button type="button" class="pm-rb" data-a="close">' + esc(T('closePos')) + '</button><span class="pm-pnl ' + (open_ >= 0 ? 'up' : 'dn') + '">' + (q.side > 0 ? '▲' : '▼') + ' ' + (open_ >= 0 ? '+' : '') + open_.toFixed(2) + '%</span>' : '') +
-        (R.trades.length ? '<button type="button" class="pm-rb" data-a="stats">' + esc(T('trades')) + ' ' + R.trades.length + ' · ' + Math.round(wins / R.trades.length * 100) + '% · <b class="' + (R.cash >= 0 ? 'up' : 'dn') + '">' + (R.cash >= 0 ? '+' : '') + R.cash.toFixed(1) + '$</b></button>' : '') +
+        '<button type="button" class="pm-rb" data-a="order" title="' + esc(T('newOrder')) + '">' + esc(T('orderShort')) + '</button>' +
+        (q ? '<button type="button" class="pm-rb" data-a="close">' + esc(T('closePos')) + '</button><button type="button" class="pm-rb" data-a="stops" title="' + esc(T('slTp')) + '">SL/TP</button><span class="pm-pnl ' + (upnl >= 0 ? 'up' : 'dn') + '">' + (q.side > 0 ? '▲' : '▼') + (q.lev > 1 ? ' ' + q.lev + '×' : '') + ' ' + (upct >= 0 ? '+' : '') + upct.toFixed(2) + '%</span>' : '') +
+        (ac && ac.orders.length ? '<button type="button" class="pm-rb" data-a="cancel" title="' + esc(T('cancelOrders')) + '">✕ ' + ac.orders.length + '</button>' : '') +
+        (ac ? '<button type="button" class="pm-rb" data-a="stats" title="' + esc(T('btReport')) + '">' + esc(T('trades')) + ' ' + ntr + (ntr ? ' · ' + Math.round(wins / ntr * 100) + '%' : '') + ' · <b class="' + (net >= 0 ? 'up' : 'dn') + '">' + P.bt.pct(net / ac.start * 100) + '</b></button>' : '') +
+        '<button type="button" class="pm-rb" data-a="acct" title="' + esc(T('btSettings')) + '">⚙</button>' +
         '<button type="button" class="pm-rb" data-a="x" title="' + esc(T('exitReplay')) + '">' + ic('x') + '</button>';
     }
     $$('[data-a]', b).forEach(function (x) {
@@ -226,12 +236,16 @@
         if (a === 'x') stop(cell); if (a === 'rand') randomStart(cell); if (a === 'date') dateStart(cell); if (a === 'first') firstStart(cell);
         if (a === 'iv') ivMenu(cell, x);
         if (a === 'sync') { SYNC = !SYNC; P.store.set('ek_pro_rsync', SYNC); if (SYNC) begin(cell, cell.bars, cell.replay.i, cell.replay.more); else others(cell).forEach(function (c) { if (c.replay && c.replay.follower) stop(c, true); }); paint(cell); }
-        if (a === 'pick') { pause(cell); var keep = cell.replay; stop(cell, true); cell.replay = null; pick(cell); if (keep) { } }
+        if (a === 'pick') { pause(cell); var keep = cell.replay && cell.replay.acct; stop(cell, true); cell._keepAcct = keep || null; pick(cell); }
         if (a === 'back') { pause(cell); step(cell, -1); } if (a === 'fwd') { pause(cell); step(cell, 1); }
         if (a === 'play') { if (cell.replay.play) pause(cell); else play(cell); }
         if (a === 'spd') speedMenu(cell, x);
         if (a === 'buy') open(cell, 1); if (a === 'sell') open(cell, -1); if (a === 'close') close(cell);
-        if (a === 'stats') stats(cell);
+        if (a === 'order') { pause(cell); P.bt.order(cell); }
+        if (a === 'stops') { pause(cell); P.bt.stops(cell); }
+        if (a === 'cancel') { P.bt.cancelAll(cell); paint(cell); }
+        if (a === 'acct') { pause(cell); P.bt.settings(cell, function () { var R2 = cell.replay; if (R2 && R2.acct && !R2.acct.trades.length && !R2.acct.pos) { R2.acct = P.bt.newAccount(cell.cfg.sym); var b0 = cell.bars[R2.i]; R2.acct.lastT = b0.t; R2.acct.px = b0.c; } else A.toast(T('btNextAcct')); paint(cell); }); }
+        if (a === 'stats') { pause(cell); P.bt.report(cell); }
       };
     });
   }
@@ -266,15 +280,6 @@
       }, function () { A.toast(T('netErr')); });
     };
     A.modal(T('replayFrom'), f);
-  }
-  function stats(cell) {
-    var R = cell.replay, rows = R.trades.slice().reverse().map(function (t) {
-      return '<tr><td>' + (t.side > 0 ? '▲ ' + esc(T('buy')) : '▼ ' + esc(T('sell'))) + '</td><td class="pm-num">' + cell.fmt(t.entry) + '</td><td class="pm-num">' + cell.fmt(t.exit) + '</td><td class="pm-num ' + (t.pct >= 0 ? 'up' : 'dn') + '">' + (t.pct >= 0 ? '+' : '') + t.pct.toFixed(2) + '%</td><td><small>' + esc(A.fmtD(t.t0)) + '</small></td></tr>';
-    }).join('');
-    var win = R.trades.filter(function (t) { return t.pct > 0; }), loss = R.trades.filter(function (t) { return t.pct <= 0; });
-    var avg = function (a) { return a.length ? a.reduce(function (s, t) { return s + t.pct; }, 0) / a.length : 0; };
-    A.modal(T('trades'), '<p class="pm-p">' + esc(T('repStats', { n: A.loc(R.trades.length), w: A.loc(Math.round(win.length / Math.max(1, R.trades.length) * 100)), aw: avg(win).toFixed(2), al: avg(loss).toFixed(2), s: R.cash.toFixed(2) })) + '</p>' +
-      '<div class="pm-tw"><table class="pm-tbl" dir="ltr"><tr><th></th><th>' + esc(T('entry')) + '</th><th>' + esc(T('exit')) + '</th><th>%</th><th></th></tr>' + rows + '</table></div><p class="pm-note">' + esc(T('repNote')) + '</p>');
   }
   P.replayKey = function (cell, e) {
     var R = cell.replay; if (!R) return false;

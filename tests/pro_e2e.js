@@ -206,8 +206,8 @@ async function mockNet(page, stats) {
     ok('replay cuts the chart at the clicked bar', r0.on && r0.n === r0.i + 1 && r0.n < r0.all, JSON.stringify(r0));
     await page.click('.pm-repbar [data-a="buy"]'); for (let k = 0; k < 5; k++) await page.click('.pm-repbar [data-a="fwd"]');
     await page.click('.pm-repbar [data-a="close"]');
-    const r1 = await page.evaluate(() => { const c = PRO.app.active(); return { i: c.replay.i, trades: c.replay.trades.length, pct: c.replay.trades[0] && c.replay.trades[0].pct, e: c.replay.trades[0] && c.replay.trades[0].entry, x: c.replay.trades[0] && c.replay.trades[0].exit }; });
-    ok('replay steps 5 bars; the practice trade P&L is exit/entry − 1', r1.i === r0.i + 5 && r1.trades === 1 && Math.abs(r1.pct - (r1.x / r1.e - 1) * 100) < 1e-9, JSON.stringify(r1));
+    const r1 = await page.evaluate(() => { const c = PRO.app.active(), A = c.replay.acct, t = A.trades[0]; return { i: c.replay.i, trades: A.trades.length, pct: t && t.pct, e: t && t.entry, x: t && t.exit, fee: A.cfg.fee, lev: A.cfg.lev, slip: A.cfg.slip }; });
+    ok('replay steps 5 bars; the practice trade P&L is (exit/entry − 1) less both fees, on the margin', r1.i === r0.i + 5 && r1.trades === 1 && r1.slip === 0 && Math.abs(r1.pct - r1.lev * ((r1.x / r1.e - 1) * 100 - r1.fee * (1 + r1.x / r1.e))) < 1e-6, JSON.stringify(r1));
     await page.click('.pm-repbar [data-a="spd"]'); await page.click('.pm-menu .pm-mi:nth-child(9)'); await page.click('.pm-repbar [data-a="play"]'); await page.waitForTimeout(700);
     const r2 = await page.evaluate(() => PRO.app.active().replay.i); ok('replay plays at 50×', r2 > r1.i + 10, r1.i + ' → ' + r2);
     await page.click('.pm-repbar [data-a="play"]'); await shot(page, '08_fa_replay');
@@ -229,8 +229,8 @@ async function mockNet(page, stats) {
     await page.waitForTimeout(1200); await shot(page, '11_fa_watch');
     /* CSV export */
     const [dl] = await Promise.all([page.waitForEvent('download'), (async () => { await page.click('#pm-ws'); await page.click('.pm-menu .pm-mi:has-text("CSV")'); })()]);
-    const csv = fs.readFileSync(await dl.path(), 'utf8').split('\n');
-    ok('CSV has a header and every bar with indicator columns', /^time_utc,unix,open,high,low,close,volume,/.test(csv[0]) && csv.length > 500 && /rsi/.test(csv[0]), csv[0].slice(0, 120));
+    const raw = fs.readFileSync(await dl.path(), 'utf8'), csv = raw.replace(/^\ufeff/, '').split('\n');
+    ok('CSV (with a BOM for Excel) has every bar in UTC and in the page\'s own time and calendar, with indicator columns', raw.charCodeAt(0) === 0xfeff && /^time_utc,time_local,unix,open,high,low,close,volume,/.test(csv[0]) && csv.length > 500 && /rsi/.test(csv[0]) && /^\d{4}-\d\d-\d\dT[^,]+Z,("[^"]+"|[^,]+),\d+,/.test(csv[1]) && dl.suggestedFilename().startsWith('entekhab_BTCUSDT_'), csv[0].slice(0, 120) + ' | ' + csv[1].slice(0, 80) + ' | ' + dl.suggestedFilename());
     /* autosave: reload restores everything */
     const keep = await page.evaluate(() => JSON.stringify({ inds: PRO.app.active().cfg.inds.map(x => x.id), tf: PRO.app.active().cfg.tf }));
     await page.reload({ waitUntil: 'domcontentloaded' }); await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 20000 });
@@ -596,6 +596,256 @@ async function mockNet(page, stats) {
     const back = await page.evaluate(() => ({ up: PRO.wsState(), st: PRO.app.cells().map(c => c.feed && c.feed.state).join() }));
     ok('a hidden tab closes its socket (no data), and reopens it live when seen again', hidden.up === false && hidden.msgs === 0 && back.up === true && stats.ws === ws0 + 1 && /^live/.test(back.st), JSON.stringify({ hidden, back, sockets: stats.ws - ws0 }));
     await ctx.close();
+  }
+
+  /* ---------- alerts beyond price levels: n% moves, sloped lines and channels, an end date, more indicator conditions */
+  if (!ONLY || ONLY === 'al2') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.click('#pm-alert'); await page.waitForSelector('.pm-af'); await page.waitForTimeout(120);
+    await page.selectOption('.pm-af [name=c]', 'pmv'); await page.fill('.pm-af [name=v]', '1'); await page.dispatchEvent('.pm-af [name=v]', 'input');
+    const tgt = await page.evaluate(() => document.querySelector('.pm-af .pm-tgt').textContent);
+    await page.selectOption('.pm-af [name=exp]', String(86400e3));
+    await page.click('.pm-af button[type=submit]'); await page.waitForTimeout(300);
+    const pa = await page.evaluate(() => { const a = PRO._alerts()[0]; return { k: a.k, c: a.c, v: a.v, base: a.base, exp: a.exp - a.at, lines: PRO.alertLines('BTC').map(x => x.v) }; });
+    ok('a 1% either-way alert keeps its starting price, an end date in a day, and shows both targets', pa.c === 'pmv' && pa.v === 1 && pa.base > 0 && Math.abs(pa.exp - 86400e3) < 5000 && pa.lines.length === 2 && Math.abs(pa.lines[0] / pa.base - 1.01) < 1e-9 && Math.abs(pa.lines[1] / pa.base - 0.99) < 1e-9 && /[0-9]/.test(tgt), JSON.stringify(pa) + ' ' + tgt);
+    for (let k = 0; k < 8 && !(await page.evaluate(() => PRO._alerts()[0].n >= 1)); k++) {   /* other open pages may take ticks from the shared hook: offer the move again */
+      OVR.BTCUSDT = [pa.base * 0.996, pa.base * 1.004, pa.base * 1.0105, pa.base * 1.0102]; await page.waitForTimeout(2500);
+    }
+    const pf = await page.evaluate(() => { const a = PRO._alerts()[0]; return { n: a.n, on: a.on, log: JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]')[0] }; });
+    ok('…and fires once the price is 1% away', pf.n === 1 && pf.on === false && pf.log && /1%/.test(pf.log.msg), JSON.stringify(pf));
+    /* a sloped line: the alert follows it */
+    const now = Math.floor(Date.now() / 1000);
+    const lv = await page.evaluate((now) => {
+      const c = PRO.app.active(), p = c.bars[c.bars.length - 1].c;
+      PRO.app.mutate('BTC', L => { L.push({ id: 'tl1', k: 'ray', pts: [{ t: now - 36000, p: p * 0.99 }, { t: now - 18000, p: p * 0.995 }], s: {} }); L.push({ id: 'ch1', k: 'channel', pts: [{ t: now - 36000, p: p * 0.98 }, { t: now - 18000, p: p * 0.99 }, { t: now - 30000, p: p * 1.02 }], s: { r: true } }); });
+      const d = PRO.app.DRAW().BTC.find(x => x.id === 'tl1');
+      PRO.alertDialog(c, { draw: d });
+      return { p, L: PRO.alertLevels({ sym: 'BTC', did: 'tl1' }, now), C: PRO.alertLevels({ sym: 'BTC', did: 'ch1' }, now), tab: document.querySelector('.pm-af [data-k="draw"].on') ? 1 : 0, opts: [...document.querySelectorAll('.pm-af [name=dc] option')].map(o => o.value).join(',') };
+    }, now);
+    const lineAt = lv.p * 0.99 + lv.p * 0.005 * 36000 / 18000, base = lv.p * 0.98 + lv.p * 0.01 * 2, off = lv.p * 1.02 - (lv.p * 0.98 + lv.p * 0.01 * 6000 / 18000);
+    ok('a ray: the alert reads the line where it is now; a channel gives both sides', lv.tab === 1 && lv.opts === 'cross,up,down' && Math.abs(lv.L[0] / lineAt - 1) < 1e-4 && Math.abs(lv.C[0] / base - 1) < 1e-4 && Math.abs(lv.C[1] / (base + off) - 1) < 1e-4, JSON.stringify(lv));
+    await page.selectOption('.pm-af [name=dc]', 'up'); await page.click('.pm-af button[type=submit]'); await page.waitForTimeout(300);
+    const L1 = await page.evaluate(() => PRO.alertLevels({ sym: 'BTC', did: 'tl1' }, Date.now() / 1000)[0]);
+    for (let k = 0; k < 8 && !(await page.evaluate(() => PRO._alerts()[0].k === 'draw' && PRO._alerts()[0].n >= 1)); k++) {
+      OVR.BTCUSDT = [L1 * 0.997, L1 * 0.999, L1 * 1.004, L1 * 1.006]; await page.waitForTimeout(2500);
+    }
+    const df = await page.evaluate(() => { const a = PRO._alerts()[0]; return { k: a.k, c: a.c, n: a.n, dk: a.dk }; });
+    ok('…and fires when the price breaks above the ray', df.k === 'draw' && df.c === 'up' && df.n === 1 && df.dk === 'ray', JSON.stringify(df));
+    /* the end date: an expired alert switches off and says so */
+    const ex = await page.evaluate(() => { const a = PRO._alerts()[1]; a.on = true; a.exp = Date.now() - 1000; PRO._alertSweep(); return { on: a.on, expd: a.expd, log: JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]')[0].msg }; });
+    ok('an alert past its end date switches off and is logged', ex.on === false && ex.expd === 1 && ex.log.length > 5, JSON.stringify(ex));
+    /* the new indicator conditions fire on the bar that crosses */
+    const ev = await page.evaluate(() => {
+      const mk = (cs, vs) => cs.map((c, i) => ({ t: i * 3600, o: c, h: c * 1.001, l: c * 0.999, c, v: vs ? vs[i] : 1 }));
+      const run = (a, bars, from) => bars.map((_, n) => n >= from ? (PRO.alertEval(a, bars.slice(0, n + 1)) ? 1 : 0) : 0).join('').slice(from);
+      const dn = [...Array(60).keys()].map(i => 200 - i), cs = dn.concat([...Array(30).keys()].map(i => 141 + i * 3));
+      const x = run({ k: 'ind', ind: { id: 'xma', len: 5, len2: 15 }, c: 'up' }, mk(cs), 55);
+      const s = run({ k: 'ind', ind: { id: 'st', len: 10 }, c: 'up' }, mk(cs), 55);
+      const vv = Array(50).fill(10).concat([10, 31, 40, 10]), v = run({ k: 'ind', ind: { id: 'vol', len: 20 }, c: 'gt', v: 3 }, mk(Array(54).fill(100), vv), 48);
+      const k = run({ k: 'ind', ind: { id: 'stoch', len: 14 }, c: 'up', v: 20 }, mk(cs), 55);
+      return { x, s, v, k };
+    });
+    const once = s => (s.match(/1/g) || []).length === 1;
+    ok('new indicator alerts: EMA cross, SuperTrend flip, Stochastic and a volume spike each fire once, on their bar', once(ev.x) && once(ev.s) && once(ev.k) && ev.v === '000100', JSON.stringify(ev));
+    await page.click('.pm-stab[data-p="alerts"]'); await page.waitForTimeout(400); await shot(page, '65_fa_alerts2');
+    await ctx.close();
+  }
+
+  /* ---------- news on the chart (the site's feed) and news alerts (the four-language reel) */
+  if (!ONLY || ONLY === 'news') {
+    const ctxN = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: 'en-US', timezoneId: 'Asia/Tehran', serviceWorkers: 'block' });
+    const nowS = Math.floor(Date.now() / 1000), iso = t => new Date(t * 1000).toISOString();
+    let reel = [{ id: 'r1', at: iso(nowS - 3000), url: 'https://example.com/1', source: 'Src', coins: ['BTC'], cat: 'news', t: { en: 'Old one', fa: 'خبر قدیمی', ckb: 'کۆن', ar: 'قديم' } }];
+    await ctxN.route(/\/data\/news\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: [
+      { id: 'a', title: 'BTC one', tfa: 'بیت‌کوین یک', url: 'https://example.com/a', source: 'S1', date: iso(nowS - 5 * 3600 + 60), coins: ['BTC'], category: 'regulation' },
+      { id: 'b', title: 'BTC two', tfa: 'بیت‌کوین دو', url: 'https://example.com/b', source: 'S2', date: iso(nowS - 5 * 3600 + 900), coins: ['BTC', 'ETH'], category: 'news' },
+      { id: 'c', title: 'BTC three', url: 'https://example.com/c', source: 'S3', date: iso(nowS - 20 * 3600), coins: ['BTC'], category: 'security' },
+      { id: 'd', title: 'ETH only', url: 'https://example.com/d', source: 'S4', date: iso(nowS - 3 * 3600), coins: ['ETH'], category: 'news' }] }) }));
+    await ctxN.route(/\/data\/newsreel\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: reel }) }));
+    const page = await ctxN.newPage(); page.on('pageerror', e => errors.push('[news] ' + e.message));
+    await mockNet(page, { rest: 0, ws: 0, msgs: 0 });
+    await page.goto(`${base}/market/?lang=fa`); await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 20000 });
+    await page.click('#pm-ind'); await page.waitForSelector('.pm-chip'); await page.click('.pm-chip:nth-child(3)'); await page.click('.pm-idi[data-id="news"]'); await page.waitForTimeout(800);
+    await page.evaluate(() => PRO.app.closeModal());
+    const nm = await page.evaluate(() => { const c = PRO.app.active(), k = Object.keys(c.markInfo || {}).filter(x => x[0] === 'n'); return { k: k.length, sizes: k.map(x => c.markInfo[x].items.length).sort().join(','), first: k.length && c.markInfo[k[0]].items[0].category }; });
+    ok('news on the chart: one mark per bar, this coin only (2 in one hour, 1 alone)', nm.k === 2 && nm.sizes === '1,2', JSON.stringify(nm));
+    await page.evaluate(() => { const c = PRO.app.active(), k = Object.keys(c.markInfo).filter(x => x[0] === 'n' && c.markInfo[x].items.length === 2)[0]; c.onClick({ point: { x: 10, y: 10 }, hoveredObjectId: k }); });
+    const nb = await page.evaluate(() => [...document.querySelectorAll('.pm-newsi')].map(a => a.querySelector('b').textContent + '|' + a.href));
+    ok('clicking it lists its headlines in the reader\'s language, with links', nb.length === 2 && nb[0].startsWith('بیت‌کوین یک|https://example.com/a'), JSON.stringify(nb));
+    await page.evaluate(() => PRO.app.closeModal()); await shot(page, '66_fa_news_marks');
+    /* news alerts */
+    await page.click('.pm-stab[data-p="alerts"]'); await page.waitForSelector('.pm-nal select');
+    await page.selectOption('.pm-nal select', 'imp'); await page.waitForTimeout(400);
+    const n0 = await page.evaluate(() => PRO._newsPoll());
+    reel = reel.concat([{ id: 'r2', at: iso(nowS - 60), url: 'https://example.com/2', source: 'Src', coins: ['ZZZ'], cat: 'regulation', t: { en: 'Rule change', fa: 'قانون تازه', ckb: 'یاسای نوێ', ar: 'قانون جديد' } },
+      { id: 'r3', at: iso(nowS - 30), url: 'https://example.com/3', source: 'Src', coins: ['BTC'], cat: 'news', t: { en: 'Plain', fa: 'معمولی', ckb: 'ئاسایی', ar: 'عادي' } }]);
+    const n1 = await page.evaluate(() => PRO._newsPoll());
+    const lg = await page.evaluate(() => (JSON.parse(localStorage.getItem('ek_pro_alert_log') || '[]')[0] || {}).msg);
+    ok('news alerts: the first read is a baseline, then only new important headlines alert, in the reader\'s language', n0 === 0 && n1 === 1 && /قانون تازه/.test(lg || ''), JSON.stringify({ n0, n1, lg }));
+    await page.selectOption('.pm-nal select', 'watch'); await page.waitForTimeout(600);
+    reel = reel.concat([{ id: 'r4', at: iso(nowS - 10), url: 'https://example.com/4', source: 'Src', coins: ['ETH'], cat: 'news', t: { en: 'ETH news', fa: 'خبر اتریوم', ckb: 'ئیسیریۆم', ar: 'إيثريوم' } },
+      { id: 'r5', at: iso(nowS - 5), url: 'https://example.com/5', source: 'Src', coins: ['ZZZ'], cat: 'news', t: { en: 'Other', fa: 'دیگر', ckb: 'تر', ar: 'آخر' } }]);
+    const n2 = await page.evaluate(() => PRO._newsPoll());
+    ok('…and in watchlist mode only headlines about the watched coins', n2 === 1, String(n2));
+    await shot(page, '67_fa_news_alerts'); await ctxN.close();
+  }
+
+  /* ---------- market watch (screener) */
+  if (!ONLY || ONLY === 'scr') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.click('.pm-stab[data-p="watch"]').catch(() => { }); await page.waitForSelector('.pm-ph [data-a="scr"]');
+    await page.click('.pm-ph [data-a="scr"]'); await page.waitForSelector('.pm-scrt tbody tr[data-s]', { timeout: 20000 });
+    await page.waitForFunction(() => document.querySelectorAll('.pm-scrt tbody tr[data-s]').length > 5, null, { timeout: 20000 });
+    const s1 = await page.evaluate(() => { const r = [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')]; const q = r.map(x => x.children[4].textContent); return { n: r.length, first: r[0].getAttribute('data-s'), sum: document.querySelector('.pm-scrsum').textContent.slice(0, 80), movers: document.querySelectorAll('.pm-mv').length, sorted: PRO.app.st ? 1 : 1 }; });
+    const vols = await page.evaluate(() => { const u = { K: 1e3, M: 1e6, B: 1e9 }, L = [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].map(x => { const m = /^([\d.]+)([KMB]?)$/.exec(x.children[4].textContent.trim()); return m ? +m[1] * (u[m[2]] || 1) : NaN; }).filter(v => isFinite(v)); return L.length > 5 && L.every((v, i) => !i || v <= L[i - 1] * 1.01 + 1e-9); });
+    ok('market watch lists the Binance coins sorted by 24h volume, with breadth and top movers', s1.n >= 6 && vols && s1.movers === 8 && /[0-9۰-۹]/.test(s1.sum), JSON.stringify(s1));
+    await shot(page, '68_fa_screener');
+    await page.click('.pm-scrt th[data-k="p"]');
+    const s2 = await page.evaluate(() => { const L = [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].map(x => parseFloat(x.children[3].textContent.replace('−', '-'))).filter(v => isFinite(v)); return { ok: L.every((v, i) => !i || v <= L[i - 1] + 1e-9), n: L.length, head: L.slice(0, 5) }; });
+    ok('a click on 24h sorts by change, highest first', s2.ok && s2.n >= 6, JSON.stringify(s2));
+    await page.click('.pm-scrf [data-f="down"]');
+    const s3 = await page.evaluate(() => [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].every(x => /^-/.test(x.children[3].textContent)));
+    ok('the losers filter keeps only falling coins', s3);
+    await page.click('.pm-scrf [data-f="all"]'); await page.fill('.pm-scr input[type=search]', 'eth'); await page.waitForTimeout(300);
+    const s4 = await page.evaluate(() => [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].map(x => x.getAttribute('data-s')));
+    ok('search narrows the list', s4.length >= 1 && s4.every(x => /ETH/.test(x)), JSON.stringify(s4));
+    const star0 = await page.evaluate(() => (JSON.parse(localStorage.getItem('ek_watch') || '[]')));
+    await page.click('.pm-scrt tbody tr[data-s="ETHFI"] [data-star], .pm-scrt tbody tr[data-s]:not([data-s="ETH"]) [data-star]');
+    const star1 = await page.evaluate(() => (JSON.parse(localStorage.getItem('ek_watch') || '[]')));
+    ok('☆ adds the coin to the watchlist', star1.length === Math.max(star0.length, 7) + 1 || star1.length === star0.length + 1, JSON.stringify([star0.length, star1.length]));
+    await page.click('.pm-scrt tbody tr[data-s="ETH"] td:nth-child(2)');
+    ok('a row opens the coin on the chart and closes the list', await page.evaluate(() => !document.querySelector('.pm-scr') && PRO.app.active().cfg.sym === 'ETH'));
+    await page.evaluate(() => PRO.screener()); await page.click('.pm-scr [data-m="iran"]'); await page.waitForTimeout(2500);
+    const s5 = await page.evaluate(() => [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].map(x => x.getAttribute('data-s')));
+    if (!s5.length) console.log('DEBUG iran', await page.evaluate(() => JSON.stringify({ L: (PRO.irList ? PRO.irList() : []).slice(0, 6), d: (PRO.irList ? PRO.irList() : []).slice(0, 6).map(s => PRO.tickers.d[s] || null), body: document.querySelector('.pm-scrt tbody').textContent.slice(0, 120) })));
+    ok('the Iran tab lists the toman market', s5.length >= 5 && s5.some(x => /^IR_|_IRT$/.test(x)), JSON.stringify(s5.slice(0, 8)));
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_scr'); PRO.app.closeModal(); });
+    await ctx.close();
+    const { page: pg, ctx: cx } = await newPage(390, 844, 'ar');
+    await pg.evaluate(() => PRO.screener()); await pg.waitForSelector('.pm-scrt tbody tr[data-s]', { timeout: 20000 });
+    const fit = await pg.evaluate(() => { const m = document.querySelector('.pm-mbox').getBoundingClientRect(); return { l: m.left, r: m.right, vw: innerWidth, sw: document.documentElement.scrollWidth }; });
+    ok('[ar 390] market watch fits the phone (the table scrolls inside)', fit.l >= 0 && fit.r <= fit.vw + 0.5 && fit.sw <= fit.vw, JSON.stringify(fit));
+    await shot(pg, '69_ar_screener_phone'); await cx.close();
+  }
+
+  /* ---------- help and support; a QR code of the workspace; every chart in one CSV; two tabs in step */
+  if (!ONLY || ONLY === 'help') {
+    const { page, ctx } = await newPage(1280, 860, 'ckb');
+    await page.click('.pm-stab[data-p="help"]'); await page.waitForSelector('.pm-help');
+    const hp = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-help details').length, keys: document.querySelectorAll('.pm-keys tr').length, links: [...document.querySelectorAll('.pm-sup a')].map(a => a.getAttribute('href')), fab: !!document.getElementById('ask-fab'), dir: document.querySelector('.pm-spanel').dir }));
+    ok('[ckb] help: eleven guide topics, the keyboard, and support links (group, admin, class)', hp.n === 11 && hp.keys === 8 && hp.links.join() === 'https://t.me/Coin_Kurd_Group,https://t.me/Kurdistan_Coin,/class/' && hp.dir === 'rtl', JSON.stringify(hp));
+    await page.click('.pm-help details:nth-of-type(7) summary'); await shot(page, '70_ckb_help');
+    if (hp.fab) { await page.click('.pm-sup [data-a="ai"]'); await page.waitForTimeout(500); ok('the assistant button opens the site assistant', await page.evaluate(() => { const p = document.querySelector('.ask-panel, #ask-panel'); return !!p && getComputedStyle(p).display !== 'none'; })); }
+    await page.click('#pm-ws'); await page.click('.pm-menu .pm-mi:nth-last-child(5)').catch(() => { });
+    await page.evaluate(() => { const m = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => /share|بەستەر|لینک|رابط/i.test(x.textContent)); if (m) m.click(); });
+    await page.waitForSelector('.pm-qr svg', { timeout: 8000 }).catch(() => { });
+    const qr = await page.evaluate(() => ({ svg: !!document.querySelector('.pm-qr svg'), url: (document.querySelector('.pm-modal input') || {}).value || '' }));
+    ok('the share dialog shows a QR code of the workspace link', qr.svg && /\/market\/#s=[zj]/.test(qr.url), JSON.stringify({ svg: qr.svg, len: qr.url.length }));
+    await shot(page, '71_ckb_share_qr'); await page.evaluate(() => PRO.app.closeModal());
+    await page.evaluate(() => { PRO.app.st().layout = '2v'; }); await page.click('#pm-lay'); await page.click('.pm-menu .pm-mi:nth-child(2)').catch(() => { }); await page.waitForTimeout(1500);
+    const [dl2] = await Promise.all([page.waitForEvent('download'), page.evaluate(() => { document.querySelector('#pm-ws').click(); setTimeout(() => { const m = [...document.querySelectorAll('.pm-menu .pm-mi')].filter(x => /CSV/.test(x.textContent)); m[m.length - 1].click(); }, 200); })]);
+    const all = fs.readFileSync(await dl2.path(), 'utf8').replace(/^﻿/, '').trim().split('\n'), syms = new Set(all.slice(1).map(l => l.split(',')[0]));
+    const nCells = await page.evaluate(() => PRO.app.cells().length);
+    ok('one CSV holds every chart of the layout, symbol and timeframe on each row', /^symbol,timeframe,time_utc,time_local,unix,/.test(all[0]) && all.length > 200 && syms.size >= Math.min(2, nCells), all[0] + ' | ' + [...syms].join(' ') + ' | charts ' + nCells);
+    /* a second tab: a drawing and an alert made here appear there without a reload */
+    const p2 = await ctx.newPage(); await mockNet(p2, { rest: 0, ws: 0, msgs: 0 });
+    await p2.goto(`${base}/market/?lang=ckb`); await p2.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 20000 });
+    await page.evaluate(() => { const c = PRO.app.active(), b = c.bars[c.bars.length - 1]; PRO.app.mutate(c.cfg.sym, L => L.push({ id: 'syncx', k: 'hline', pts: [{ t: b.t, p: b.c }], s: {} })); PRO.app.save(); });
+    await page.evaluate(() => { const c = PRO.app.active(); PRO.alertDialog(c); }); await page.waitForSelector('.pm-af'); await page.waitForTimeout(120); await page.click('.pm-af button[type=submit]');
+    await p2.waitForTimeout(1200);
+    const sy = await p2.evaluate(() => { const s = PRO.app.active().cfg.sym; return { d: (PRO.app.DRAW()[s] || []).some(x => x.id === 'syncx'), a: PRO._alerts().length }; });
+    ok('two tabs stay in step: the drawing and the alert made in one show in the other', sy.d && sy.a >= 1, JSON.stringify(sy));
+    await ctx.close();
+  }
+
+  /* ---------- backtesting: the strategy tester, its optimizer and report, and the replay practice account with orders */
+  if (!ONLY || ONLY === 'bt') {
+    const { page, ctx } = await newPage(1280, 860, 'fa');
+    await page.click('#pm-bt'); await page.waitForSelector('.pm-btf'); await page.waitForTimeout(120);
+    const opts = await page.evaluate(() => [...document.querySelectorAll('.pm-btf [name="st"] option')].map(o => o.value));
+    ok('the tester lists nine strategies on BTC, the Kurdistani signals among them', opts.length === 9 && opts.includes('ek'), opts.join(','));
+    await page.selectOption('.pm-btf [name="st"]', 'macross'); await page.fill('.pm-btf [name="fast"]', '9'); await page.fill('.pm-btf [name="slow"]', '21');
+    await page.click('.pm-btf [type="submit"]'); await page.waitForSelector('.pm-btr .pm-btg');
+    const b1 = await page.evaluate(() => {
+      const c = PRO.app.active(), bars = c.bars, a = PRO.btRun(c.cfg.sym, bars, 'macross', { fast: 9, slow: 21 }, PRO.bt.cfg()), s = PRO.btStats(a, bars, c.tfSec());
+      const cards = [...document.querySelectorAll('.pm-btr .pm-btc')].map(e => e.textContent), rows = document.querySelectorAll('.pm-btr .pm-btt tr').length - 1;
+      return { n: s.n, net: s.netPct, cards: cards.length, txt: cards.join('|'), rows, marks: (c.btMarks || []).length, curve: !!document.querySelector('.pm-btr canvas.pm-eqc') };
+    });
+    const shown = (b1.txt.match(/[+−]\d+\.\d\d%/) || [''])[0].replace('−', '-');
+    ok('the report shows the same result as a direct run: trades, return, every trade, the curve, marks on the chart', b1.n > 3 && b1.rows === Math.min(300, b1.n) && Math.abs(parseFloat(shown) - b1.net) < 0.006 && b1.cards >= 20 && b1.curve && b1.marks >= b1.n * 2, JSON.stringify(b1).slice(0, 300));
+    await shot(page, '60_fa_bt_report');
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('.pm-btr [data-a="csv"]')]);
+    const csv = fs.readFileSync(await dl.path(), 'utf8').replace(/^﻿/, '').trim().split('\n');
+    ok('the CSV has a header and one line per trade', csv[0].startsWith('n,side,entry_time_utc') && csv.length === b1.n + 1, csv.length + ' lines');
+    await page.evaluate(() => PRO.app.closeModal());
+    /* the optimizer */
+    await page.click('#pm-bt'); await page.waitForSelector('.pm-btf'); await page.click('.pm-btf [data-m="opt"]');
+    const cnt = await page.evaluate(() => document.querySelector('.pm-btcnt').textContent);
+    await page.click('.pm-btf [type="submit"]'); await page.waitForSelector('.pm-opt', { timeout: 20000 });
+    const o1 = await page.evaluate(() => { const r = [...document.querySelectorAll('.pm-opt tr[data-j]')].filter(x => +x.children[4].textContent >= 3); return { n: document.querySelectorAll('.pm-opt tr[data-j]').length, nets: r.map(x => parseFloat(x.children[3].textContent.replace('−', '-'))) }; });
+    ok('the optimizer tests every combination and ranks them by return', o1.n >= 10 && o1.nets.length && o1.nets.every((v, i) => !i || v <= o1.nets[i - 1] + 0.006) && /[0-9۰-۹]/.test(cnt), cnt + ' ' + JSON.stringify(o1).slice(0, 200));
+    await shot(page, '61_fa_bt_optimizer');
+    await page.click('.pm-opt tr[data-j="0"]'); await page.waitForSelector('.pm-btr .pm-btg');
+    ok('a row opens its full report, with a way back', await page.evaluate(() => !!document.querySelector('.pm-btr [data-a="back"]')));
+    await page.click('.pm-btr [data-a="back"]'); await page.waitForSelector('.pm-opt');
+    await page.evaluate(() => PRO.app.closeModal());
+    /* more history than the chart holds */
+    await page.click('#pm-bt'); await page.waitForSelector('.pm-btf'); await page.click('.pm-btf [data-m="run"]');
+    await page.selectOption('.pm-btf [name="len"]', '5000'); await page.click('.pm-btf [type="submit"]'); await page.waitForSelector('.pm-btr .pm-btg', { timeout: 20000 });
+    const h5 = await page.evaluate(() => { const H = PRO.app.active()._btHist, b = H && H.bars.concat(PRO.app.active().bars); return { n: b && b.length, gaps: b ? b.filter((x, i) => i && x.t - b[i - 1].t !== 3600).length : -1, head: document.querySelector('.pm-btr .pm-bth').textContent }; });
+    ok('a test on the last 5,000 bars loads the older ones, without gaps', h5.n === 5000 && h5.gaps === 0, JSON.stringify(h5));
+    await page.evaluate(() => PRO.app.closeModal());
+    /* the replay practice account: a limit order, its fill, stop-loss and target, the report */
+    await page.evaluate(() => { const c = PRO.app.active(); PRO._replay.begin(c, c.bars.slice(), c.bars.length - 400); });
+    await page.waitForSelector('.pm-repbar [data-a="order"]');
+    const p0 = await page.evaluate(() => { const c = PRO.app.active(); return c.bars[c.replay.i].c; });
+    await page.click('.pm-repbar [data-a="order"]'); await page.waitForSelector('.pm-bto'); await page.waitForTimeout(120);
+    await page.selectOption('.pm-bto [name="type"]', 'limit'); await page.fill('.pm-bto [name="price"]', String(+(p0 * 0.998).toPrecision(8)));
+    await page.click('.pm-bto [type="submit"]');
+    const o0 = await page.evaluate(() => PRO.app.active().replay.acct.orders.length);
+    let filled = null;
+    for (let k = 0; k < 80 && !filled; k++) { await page.click('.pm-repbar [data-a="fwd"]'); filled = await page.evaluate(() => { const q = PRO.app.active().replay.acct.pos; return q ? { e: q.entry } : null; }); }
+    await shot(page, '64_fa_bt_replay_bar');
+    ok('a buy limit 0.2% under the price fills at its own price when a revealed bar reaches it', o0 === 1 && filled && Math.abs(filled.e - +(p0 * 0.998).toPrecision(8)) < 1e-9, JSON.stringify({ o0, filled, p0 }));
+    const now = await page.evaluate(() => PRO.app.active().replay.acct.px), SL = +(now * 0.99).toPrecision(8), TP = +(Math.max(now, filled.e) * 1.01).toPrecision(8);
+    await page.click('.pm-repbar [data-a="stops"]'); await page.waitForSelector('.pm-modal [name="sl"]'); await page.waitForTimeout(120);
+    await page.fill('.pm-modal [name="sl"]', String(SL * 1.02)); await page.click('.pm-modal [type="submit"]');
+    const bad = await page.evaluate(() => ({ modal: !!document.querySelector('.pm-modal [name="sl"]'), toast: (document.querySelector('.pm-toast') || {}).textContent, sl: PRO.app.active().replay.acct.pos.sl }));
+    ok('a stop-loss above the price of a long is refused, with the reason', bad.modal && bad.sl == null && /.{8}/.test(bad.toast || ''), JSON.stringify(bad));
+    await page.fill('.pm-modal [name="sl"]', String(SL)); await page.fill('.pm-modal [name="tp"]', String(TP));
+    await page.click('.pm-modal [type="submit"]');
+    const st1 = await page.evaluate(() => { const A = PRO.app.active().replay.acct; return { sl: A.pos && A.pos.sl, tp: A.pos && A.pos.tp, px: A.px, modal: !!document.querySelector('.pm-modal'), toast: (document.querySelector('.pm-toast') || {}).textContent }; });
+    ok('stop-loss and target are set on the open trade', st1.sl > 0 && st1.tp > 0 && !st1.modal, JSON.stringify(st1));
+    let done = null;
+    for (let k = 0; k < 300 && !done; k++) { await page.evaluate(() => PRO._replay.step(PRO.app.active(), 1)); done = await page.evaluate(() => { const A = PRO.app.active().replay.acct; return A.pos ? null : A.trades[A.trades.length - 1]; }); }
+    ok('then its stop-loss or target closes it at that price', done && (done.why === 'sl' || done.why === 'tp') && Math.abs(done.exit - (done.why === 'tp' ? TP : SL)) < 1e-6 * SL, JSON.stringify(done) + ' SL ' + SL + ' TP ' + TP);
+    await page.click('.pm-repbar [data-a="stats"]'); await page.waitForSelector('.pm-btr [data-a="reset"]'); await shot(page, '62_fa_bt_replay_report');
+    await page.click('.pm-btr [data-a="reset"]');
+    ok('the report starts a fresh account', await page.evaluate(() => { const A = PRO.app.active().replay.acct; return !A.trades.length && !A.pos && A.bal === A.start; }));
+    /* account settings: leverage and size reach the next account */
+    await page.click('.pm-repbar [data-a="acct"]'); await page.waitForSelector('.pm-bts'); await page.waitForTimeout(120);
+    await page.fill('.pm-bts [name="lev"]', '5'); await page.fill('.pm-bts [name="size"]', '20');
+    const fv = await page.evaluate(() => [...document.querySelectorAll('.pm-bts input')].map(i => i.name + '=' + i.value).join(' '));
+    await page.click('.pm-bts [type="submit"]');
+    await page.click('.pm-repbar [data-a="buy"]');
+    const lv = await page.evaluate(() => { const A = PRO.app.active().replay.acct; return { lev: A.pos && A.pos.lev, m: A.pos && A.pos.margin / A.start, liq: !!A.liqPrice(), lines: (PRO.app.active()._btL || []).length, cfg: PRO.bt.cfg(), acfg: A.cfg }; });
+    lv.form = fv;
+    ok('settings: 5× leverage, 20% of the account, a liquidation line', lv.lev === 5 && Math.abs(lv.m - 0.2) < 1e-9 && lv.liq && lv.lines >= 2, JSON.stringify(lv));
+    await page.evaluate(() => PRO.replayStop(PRO.app.active()));
+    /* not BTC: no Kurdistani signals; phones: the report fits */
+    await page.evaluate(() => PRO.app.active().setSym('ETH')); await page.waitForFunction(() => PRO.app.active().disp.length > 100);
+    await page.click('#pm-bt'); await page.waitForSelector('.pm-btf');
+    ok('other markets do not offer the BTC signals', await page.evaluate(() => ![...document.querySelectorAll('.pm-btf [name="st"] option')].some(o => o.value === 'ek')));
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_bt'); PRO.app.closeModal(); });
+    await ctx.close();
+    for (const lang of ['ckb', 'ar', 'en']) {
+      const { page: pg, ctx: cx } = await newPage(390, 844, lang);
+      await pg.evaluate(() => PRO.bt.tester(PRO.app.active())); await pg.waitForSelector('.pm-btf');
+      await pg.click('.pm-btf [type="submit"]'); await pg.waitForSelector('.pm-btr .pm-btg');
+      const fit = await pg.evaluate(() => { const m = document.querySelector('.pm-mbox'), r = m.getBoundingClientRect(); return { w: r.width, l: r.left, r: r.right, vw: innerWidth, sw: document.documentElement.scrollWidth, dir: m.dir }; });
+      ok(`[${lang} 390] the backtest report fits the phone screen`, fit.l >= 0 && fit.r <= fit.vw + 0.5 && fit.sw <= fit.vw, JSON.stringify(fit));
+      await shot(pg, '63_' + lang + '_bt_phone'); await cx.close();
+    }
   }
 
   /* ---------- a slow connection: panels.js and replay.js arrive late; the panels, calendar flags and alert checks still start */

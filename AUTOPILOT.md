@@ -215,6 +215,34 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · /market/: Faraz's feature list, done fully — backtests, optimizer, alerts, market watch, news, help, QR (owner's request in chat, not by the loop)
+- Backtesting (`assets/pro/backtest.js`, new): one account model for replay and the strategy tester — balance, size (% of
+  equity), leverage with liquidation (margin lost, 0.5% maintenance), fee per side, slippage (none on limit fills and
+  targets), fixed or trailing stop, limit/stop orders. Each bar is walked as TradingView's broker emulator does (open →
+  nearer extreme → farther extreme → close; ties go to the stop; a gap fills at the open). Strategy tester: EMA cross,
+  golden/death cross, MACD, RSI, Bollinger, SuperTrend, Parabolic SAR, Donchian/turtles, and on BTC the published
+  Kurdistani signals (acted on at the open after their daily bar closed — checked: their price is that bar's close).
+  Up to 20,000 bars (older history fetched in windows, no gaps). Optimizer: every combination of ranges (capped by
+  bars × runs), ranked by return, PF, Sharpe, win rate or drawdown. Report: 21 figures, equity curve with drawdown,
+  trades table, CSV. Replay bar: order form, SL/TP editor, cancel, report, account settings; a new start keeps the results.
+- Alerts (`panels.js`): % moves from the price at creation (up, down, either; «every» re-bases), alerts that follow a
+  sloped trend line, ray, extended line or both sides of a channel (from the drawing's bell), an end date with a log
+  entry, and new indicator conditions (EMA cross, SuperTrend flip, Stochastic level, volume spike ≥ n× average).
+- News: a «news on the chart» layer (data/news.json, per bar, coloured by category, click → headlines with links, in the
+  reader's language) and news alerts from data/newsreel.json (~13 KB, every 5 min while open; off / watchlist /
+  important / all; the first read is a baseline).
+- Market watch (`P.screener`): every Binance coin or Iran's market with 24h change, volume, 24h range, the site's 1 h RSI
+  and trend; sort, filters (gainers, losers, top volume, RSI < 30 / > 70, at the 24h high/low), breadth, top movers.
+- Help & support side panel (guide, shortcuts, assistant, Telegram group/admin, nightly class); QR code of the share
+  link (vendored `assets/vendor/qrcode.js`, MIT, loaded only when sharing); CSV with a BOM, a local-time column and a
+  file name for every market, plus one CSV for every chart of the layout; tabs of one browser stay in step (storage events
+  reload drawings, alerts, lists).
+- Not done: B-ADJ continuous futures — needs a futures history source reachable from Iran and verifiable from here; left
+  for the owner's decision.
+- Bot «بازار زنده» text (5 languages), the assistant FAQ, the menu line and the page's own text updated. Apps are WebView
+  shells of the site.
+- Verified: `tests/test_pro_bt.js` (50 hand-worked account/strategy checks), `tests/test_pro_i18n.py`, new E2E blocks
+  (bt, al2, news, scr, help) and the full suite.
 ### 2026-11-13 · The Observatory, stage 1: liquidation heatmap and liquidation map (owner's request in chat, not by the loop)
 - **Why:** the owner asked for everything Glassnode, CoinGlass and CryptoQuant offer, at their quality or better, and
   gave CoinGlass's liquidation heatmap as the example. That is months of work, so it is built in stages; stage 1 is
