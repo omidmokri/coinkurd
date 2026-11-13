@@ -121,6 +121,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
   collects what already exists and checks every internal link against the built tree, so adding an academy faculty
   grows the map by itself. Put new Kurdish lesson titles in `map_data.LES_CKB`.
 
+- **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
+  now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
+  cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
+  footer edge; the 404 orbit) and `assets/deep.js` (blocks arrive on scroll, light under the pointer, reading-progress
+  line, rail of sections on wide screens, Ctrl/⌘+K search with live results). The switch is in `scripts/chrome.py`
+  (`DEEP_VER`, `DEEP_OFF` = `battle|market|kids`, class `ek-deep` on `<html>`, interface v3 only). Colours are the
+  brand's own; nothing moves under `prefers-reduced-motion` or `.nx-lite`. A new card class gets the glass by adding
+  it to the two `:is(...)` lists in deep.css (and to `LIT` in deep.js for the pointer light). Bump `DEEP_VER` with
+  every change. Test: `python3 tests/deep_e2e.py <built tree>` (needs a built copy; see its docstring).
+- `scripts/seo_struct.py` — last build step after `seo_tidy.py` (both workflows): adds a BreadcrumbList, the default
+  preview picture, a canonical and a WebPage block to every indexable page that lacks one, on the built tree only.
+  Test: `python3 tests/test_seo_struct.py`.
+
 - `/battle/` — «نبرد من», the live market as a 3D battle (three.js r128). The model kits are `battle/gfx3.js` to
   `gfx6.js` (units, environment, navy, carriers and robots). The engine is `battle/battle.js` (WORLD, ARMY, FX, CINE,
   THREATS, DIRECTOR, HUD) and ground navigation is `battle/nav.js`. Raise the `?v=` tags in `battle/index.html` with
@@ -181,6 +194,35 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-13 · Every page except the homepage: depth ("Deep" layer), reading tools, search-as-you-type, structured data (owner's request in chat, not by the loop)
+- **Why:** the owner sent a redesign brief for the inner pages (UI depth, UX, SEO) and asked for it to be applied with
+  the site's own colours, the homepage untouched. The brief's navy/cyan palette was not used: the brand's black, bitcoin
+  orange, gold and the far teal stay. Its ideas were applied where the site did not already have them (it already had
+  page transitions, breadcrumbs on most generated pages, related links, FAQ blocks, focus rings and hreflang).
+- **Look (`assets/deep.css`):** three fixed layers behind the page (two star fields, the light, a vector floor to a lit
+  horizon that stays out of the text column), glass on the existing cards with a lit upper edge and a deeper shadow,
+  a candle mark before section titles, the breadcrumb as a capsule, a lit edge where the footer begins, orbits on the
+  404 page. With scroll timelines (Chrome/Edge/WebView) the stars slip and the floor comes toward the reader.
+- **Behaviour (`assets/deep.js`):** blocks below the first screen rise into place once; cards take light under the
+  pointer; a progress line on long pages; a rail of the page's sections in the free margin (≥1100 px, ≥3 sections);
+  Ctrl/⌘+K opens the site search, which now lists matching sections (from the page's own menu, in all languages)
+  and coin pages (from `/api/v1/index.json`) while typing — plain Enter still searches the archive as before.
+- **Not touched:** the homepage, `/battle/`, `/market/`, `/kids/` (`DEEP_OFF`); the encyclopedia app has its own
+  shell and theme and does not load the site switch. No text, layout, URL or colour of the brand changed.
+- **SEO (`scripts/seo_struct.py`, both workflows):** audit of 5,861 built pages — titles, descriptions, one visible
+  h1, hreflang and sitemap were already in order; missing were a BreadcrumbList on ~4,300 indexable pages, a preview
+  picture on 1,520 encyclopedia pages, any structured data on ~60 pages and a canonical on /lab/. After the step:
+  4,966 pages completed, every indexable page has all four; second run changes 0.
+- **Also fixed:** `/dna/<coin>/`, `/indicators/<id>/` and `/signals/` are copies of hand-written templates and went
+  out with the stale switch of the committed file (ui2.css?v=3, nx.css?v=7); `build_pages.py` now refreshes the
+  templates first.
+- **Verified:** `tests/deep_e2e.py` on a full build — 100 checks at 1280 and 390 px (layer on/off per page, no
+  sideways scroll, every block arrives, progress, rail, search incl. Persian query / coin page / markup-as-text /
+  keyboard, reduced motion, lite mode, no JavaScript), 0 JS errors; `tests/test_seo_struct.py` (made-up site with
+  known answers, idempotence); `tests/mm_e2e.py` 263/263 with the layer on; `kids_check.py` 0 problems; leak guard
+  clean; screenshots looked at: 32 page families at 1280 px in Persian, samples at 390 px and in English.
+- **Bot / apps:** the Android and Windows apps load the site, so they show it as is. Nothing here has a place
+  in the Telegram bot (no new section or data).
 ### 2026-11-13 · «نبرد من»: no physical errors, every element fights, Hollywood cinema (owner's request in chat, not by the loop)
 - **Nothing passes through anything.** New `battle/nav.js` (hull-exact A* with turn room). Vehicles drive planned routes
   of straight, arc, pivot and reverse legs, each checked against every solid at 0.25 m steps with the hull's own size.

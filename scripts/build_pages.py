@@ -1811,6 +1811,10 @@ if(location.hash){var t=document.querySelector(location.hash);if(t&&t.tagName===
 
 
 if __name__ == "__main__":
+    # First refresh the shared header/footer and the interface switch on the hand-written pages: /dna/<coin>/,
+    # /indicators/<id>/ and /signals/ are copies of those pages, and used to go out with whatever switch the
+    # committed template happened to carry (stale stylesheet versions, no depth layer).
+    print("chrome (templates):", chrome.inject_static())
     main()
     build_api()
     extra = prerender()
