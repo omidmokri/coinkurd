@@ -115,7 +115,7 @@
   function markActive(scope, sel) {
     var best = null, bs = 0;
     [].forEach.call(scope.querySelectorAll(sel), function (a) { var s = score(a.getAttribute('href')); if (s > bs) { bs = s; best = a; } });
-    if (best) { best.classList.add('on'); best.setAttribute('aria-current', 'page'); var mi = best.closest('.ek-mi'); if (mi) mi.classList.add('on'); }
+    if (best) { best.classList.add('on'); best.setAttribute('aria-current', 'page'); var mi = best.closest('.ek-mi'); if (mi) { mi.classList.add('on'); var mt = mi.querySelector('.ek-mt'); if (mt) mt.classList.add('ekg', 'ekg-pill'); } }
   }
   markActive(H, '.ek-it,.ek-ml');
   if (B) markActive(B, '.ek-tab');
