@@ -479,6 +479,7 @@ CSP = ("default-src 'self'; "
        "img-src 'self' data: blob: https:; "
        "media-src 'self' data: blob: https://github.com https://objects.githubusercontent.com https://release-assets.githubusercontent.com; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "
+       "https://fapi.binance.com https://api.bybit.com "      # the Observatory (/charts/): futures candles and open interest
        "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com "
        "https://dashboard-api.tgju.org https://api.tgju.org https://call2.tgju.org https://call3.tgju.org https://call4.tgju.org; "
@@ -553,6 +554,14 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
           "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin", "calendar"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
+
+
+# the Observatory (/charts/ and one folder per chart): scripts/build_obs.py names its own folders
+try:
+    import build_obs as _OBS
+    STATIC += [f for f in _OBS.folders() if f not in STATIC]
+except Exception:  # noqa: BLE001
+    pass
 
 
 def inject_static():
