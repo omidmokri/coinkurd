@@ -267,8 +267,15 @@ The site's strategy (agreed with the owner, 2026-11-07):
   link (vendored `assets/vendor/qrcode.js`, MIT, loaded only when sharing); CSV with a BOM, a local-time column and a
   file name for every market, plus one CSV for every chart of the layout; tabs of one browser stay in step (storage events
   reload drawings, alerts, lists).
-- Not done: B-ADJ continuous futures — needs a futures history source reachable from Iran and verifiable from here; left
-  for the owner's decision.
+- B-ADJ continuous futures (second push, same day): probed from the owner's browser at entekhab.net — Binance futures
+  (fapi/dapi) and data.binance.vision fail there; Bybit and OKX answer with CORS, and Bybit serves expired coin-margined
+  quarterlies. `BTC_F1` / `ETH_F1` (shown as BTC1! / ETH1!, kind `fut` in markets.js): the front quarterly (BTCUSD +
+  H/M/U/Z + year), a bar belongs to the contract still trading when it closes, roll at expiry (last Friday of the quarter
+  month, 08:00 UTC — checked against Bybit's deliveryTime), live bar polled every 5 s, list prices from Bybit's ticker.
+  B-ADJ (legend button, remembered per symbol in `ek_pro_badj`): each roll's gap (next − expiring, at the expiring
+  contract's last bar) added to every earlier bar. Checked on Bybit's real data in the owner's browser: 1,500 daily bars
+  each for BTC and ETH back to 2022-10, 16 rolls, no gaps, every adjusted roll equal to the next contract's real price,
+  latest price equal to Bybit's ticker. Tests: `tests/test_pro_fut.js` (17) and the E2E block `fut`.
 - Bot «بازار زنده» text (5 languages), the assistant FAQ, the menu line and the page's own text updated. Apps are WebView
   shells of the site.
 - Verified: `tests/test_pro_bt.js` (50 hand-worked account/strategy checks), `tests/test_pro_i18n.py`, new E2E blocks

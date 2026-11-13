@@ -39,7 +39,7 @@ def used_keys(defs, params):
     fam = {
         "st_": "live poll snap err load rep", "u_": "s m h d w mo", "tfg_": "s m h d",
         "ty_": "candle hollow heikin bars line linemk step area baseline columns", "sync_": "sym tf cross time",
-        "cat_": "all watch gold over pane ek", "ly_": "posts sigs live news", "tpl_": "trend mom vola ichi scalp ek",
+        "cat_": "all watch gold over pane ek fut", "ly_": "posts sigs live news", "tpl_": "trend mom vola ichi scalp ek",
         "flag_": "r o y g b p", "c_": "cross up down gt lt pup pdn pmv", "ai_": "rsi ma macd bb xma st stoch vol", "imp_": "H M L X",
         "ac_": "rsi_up rsi_down rsi_gt rsi_lt ma_up ma_down macd_up macd_down bb_gt bb_lt xma_up xma_down st_up st_down stoch_up stoch_down vol_gt",
         "dc_": "cross up down out cup cdown", "exp_": "0 h d w m",

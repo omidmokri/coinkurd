@@ -55,7 +55,7 @@
   var IR = {}; CAT.forEach(function (r) { IR[r[0]] = { key: r[0], g: r[1], grp: r[2], icon: r[3], div: r[4], daily: !!r[5], n: r[6] }; });
   var TMN = N('تومان', 'تمەن', 'تومان', 'IRT');
 
-  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_IRT)?|IR_[A-Z0-9]{2,12})$/;           /* Binance has one-letter coins too: S, W, T, A… */
+  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_IRT|_F1)?|IR_[A-Z0-9]{2,12})$/;           /* Binance has one-letter coins too: S, W, T, A… */
   function lang() { var A = P.app; return A && A.LANG ? A.LANG() : 'fa'; }
   function iconUrl(ic) { var k = ic.slice(2); return ic[0] === 'f' ? '/assets/pro/flags/' + k + '.svg' : ic[0] === 'i' ? '/assets/pro/ic/' + k + '.svg' : '/data/logos/' + k + '.png'; }
 
@@ -67,6 +67,7 @@
       return { sym: sym, kind: 'ir', base: c.key, quote: c.div === 1 ? 'USD' : 'IRT', name: c.n, logo: iconUrl(c.icon), coin: c.icon[0] === 'c' ? c.icon.slice(2) : null,
         src: 'tgju', minSec: c.daily ? 86400 : 300, grade: c.g, div: c.div, grp: c.grp };
     }
+    if (/_F1$/.test(sym)) { var fb = sym.slice(0, -3); if (!FUTC[fb]) return null; return { sym: sym, kind: 'fut', base: fb, quote: 'USD', name: FUTC[fb], logo: '/data/logos/' + fb + '.png', coin: fb, src: 'Bybit', minSec: 60 }; }
     if (/_IRT$/.test(sym)) { var b = sym.slice(0, -4); return { sym: sym, kind: 'irt', base: b, quote: 'IRT', logo: '/data/logos/' + b + '.png', coin: b, src: 'Binance × tgju', minSec: 1 }; }
     return { sym: sym, kind: 'usdt', base: sym, quote: 'USDT', logo: '/data/logos/' + sym + '.png', coin: sym, src: 'Binance', minSec: 1 };
   };
@@ -75,6 +76,7 @@
   P.pair = function (sym, short) {
     var i = P.inst(sym), l = lang(); if (!i) return sym;
     if (i.kind === 'ir') return short ? i.base : i.name[l] || i.name.en;
+    if (i.kind === 'fut') return i.base + '1!';
     return i.base + '/' + (i.quote === 'IRT' ? TMN[l] : 'USDT');
   };
   P.isToman = function (sym) { var i = P.inst(sym); return !!i && i.quote === 'IRT'; };
@@ -263,14 +265,150 @@
   };
 
   /* ---------------------------------------------------------------- P.feed for every kind of symbol */
+  /* ---------------------------------------------------------------- <COIN>_F1: the front quarterly future as one continuous chart.
+     Source: Bybit's coin-margined quarterlies (BTCUSD + H/M/U/Z + year), reachable where Binance futures is not. A bar
+     belongs to the contract that is still trading when the bar closes; the roll is at expiry (the last Friday of March,
+     June, September and December, 08:00 UTC). B-ADJ (back-adjustment, as TradingView): at each roll the gap between the
+     next contract and the expiring one, at the expiring one's last bar, is added to every bar before the roll, so the
+     history has no roll jumps and the latest prices are the real ones. */
+  var BYB = 'https://api.bybit.com/v5/market/', FUTC = { BTC: N('بیت‌کوین', 'بیتکۆین', 'بيتكوين', 'Bitcoin'), ETH: N('اتریوم', 'ئیسیریۆم', 'إيثريوم', 'Ethereum') };
+  var MCODE = { 3: 'H', 6: 'M', 9: 'U', 12: 'Z' };
+  var BNAT = [86400, 43200, 21600, 14400, 7200, 3600, 1800, 900, 300, 180, 60], BIV = { 86400: 'D', 43200: '720', 21600: '360', 14400: '240', 7200: '120', 3600: '60', 1800: '30', 900: '15', 300: '5', 180: '3', 60: '1' };
+  function lastFri(y, m) { var d = new Date(Date.UTC(y, m, 0, 8)); while (d.getUTCDay() !== 5) d.setUTCDate(d.getUTCDate() - 1); return d.getTime() / 1000; }
+  function expiries(fromSec, toSec) {                                  /* the quarterly expiries after fromSec, through the first one after toSec */
+    var out = [], y = new Date(fromSec * 1000).getUTCFullYear() - 1;
+    for (; y < 2100; y++) for (var q = 3; q <= 12; q += 3) { var e = lastFri(y, q); if (e > fromSec) { out.push({ e: e, code: MCODE[q] + String(y % 100).padStart(2, '0') }); if (e > toSec) return out; } }
+    return out;
+  }
+  P._futExp = expiries;
+  function futRes(tf) {                                                 /* Bybit's interval for a timeframe, and how many of them make one bar */
+    if (tf.id === '1w') return { iv: 'W', sec: 604800, n: 1 };
+    if (tf.id === '1M') return { iv: 'M', sec: 2592000, n: 1 };
+    if (tf.sec < 60 || tf.u === 'w' || tf.u === 'M') return null;
+    for (var i = 0; i < BNAT.length; i++) if (tf.sec % BNAT[i] === 0) return { iv: BIV[BNAT[i]], sec: BNAT[i], n: tf.sec / BNAT[i] };
+    return null;
+  }
+  function aggTo(bars, tf, r) {
+    if (r.n === 1) return bars;
+    var out = [], cur = null, g = { sec: tf.sec, ratio: 2 };
+    bars.forEach(function (b) { var k = P.bucket(b.t, g); if (!cur || cur.t !== k) { cur = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }; out.push(cur); } else { cur.h = Math.max(cur.h, b.h); cur.l = Math.min(cur.l, b.l); cur.c = b.c; cur.v += b.v; } });
+    return out;
+  }
+  /* one contract's bars in [s, e] (seconds, bar open times), oldest first */
+  function byKl(contract, iv, s, e) {
+    var out = [], end = e * 1000 + 999, pages = 0;
+    function page() {
+      return P.getJSON(BYB + 'kline?category=inverse&symbol=' + contract + '&interval=' + iv + '&start=' + s * 1000 + '&end=' + end + '&limit=1000', 15000).then(function (j) {
+        if (!j || j.retCode !== 0 || !j.result) throw new Error('bybit');
+        var L = j.result.list || [];
+        L.forEach(function (x) { var t = Math.floor(+x[0] / 1000); if (t >= s && t <= e) out.push({ t: t, o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[5] }); });
+        if (L.length < 1000 || ++pages >= 10) return;
+        end = +L[L.length - 1][0] - 1; return page();
+      });
+    }
+    return page().then(function () { out.sort(function (a, b) { return a.t - b.t; }); return dedup(out); });
+  }
+  /* the continuous series from fromSec to toSec at Bybit interval r; adj: back-adjusted */
+  function futChain(base, r, fromSec, toSec, adj) {
+    var bs = r.sec, ex = expiries(fromSec, toSec + bs);                 /* through the contract of the bar that is open at toSec */
+    var segs = ex.map(function (x, k) {
+      return { c: base + 'USD' + x.code, e: x.e, s: Math.max(fromSec, k ? ex[k - 1].e - bs + 1 : fromSec), z: Math.min(toSec, x.e - bs) };
+    }).filter(function (g) { return g.z >= g.s - bs; });
+    return Promise.all(segs.map(function (g) {
+      return byKl(g.c, r.iv, g.s - bs, Math.max(g.s, g.z)).then(function (b) { return b; }, function () { return []; });
+    })).then(function (L) {
+      var out = [], gaps = [], cum = 0;
+      for (var k = segs.length - 1; k >= 0; k--) {
+        var g = segs[k], b = L[k].filter(function (x) { return x.t >= g.s && x.t <= g.z; });
+        if (!b.length) { if (k < segs.length - 1 && out.length) break; else continue; }   /* an older contract with no data: the series starts here */
+        if (k < segs.length - 1 && adj) {
+          var lastK = b[b.length - 1], nx = L[k + 1].filter(function (x) { return x.t <= lastK.t; }), nb = nx[nx.length - 1];
+          var gap = nb && Math.abs(nb.t - lastK.t) <= bs ? nb.c - lastK.c : 0; cum += gap; gaps.push({ t: lastK.t, gap: gap, from: g.c, to: segs[k + 1].c });
+        }
+        out = (cum ? b.map(function (x) { return { t: x.t, o: x.o + cum, h: x.h + cum, l: x.l + cum, c: x.c + cum, v: x.v }; }) : b).concat(out);
+      }
+      out.sort(function (a, b) { return a.t - b.t; });
+      out.gaps = gaps; out.front = segs.length ? segs[segs.length - 1] : null;
+      return out;
+    });
+  }
+  P._futChain = futChain;
+  var BADJ = (function () { try { var o = JSON.parse(localStorage.getItem('ek_pro_badj') || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } })();
+  P.futAdj = function (sym, on) {
+    if (on == null) return !!BADJ[sym];
+    BADJ[sym] = !!on; try { localStorage.setItem('ek_pro_badj', JSON.stringify(BADJ)); } catch (e) { }
+    return BADJ[sym];
+  };
+  function FutFeed(sym, tf, adj) { Base.call(this, sym, tf); this.inst = P.inst(sym); this.src = 'bybit'; this.adj = adj; this.key = sym + '|' + tf.id + (adj ? '|a' : ''); }
+  FutFeed.prototype = Object.create(Base.prototype);
+  FutFeed.prototype.start = function () {
+    var self = this, r = futRes(this.tf), now = Math.floor(Date.now() / 1000);
+    this.state = 'load'; this.tell('state');
+    if (!r) { this.state = 'error'; this.err = 'tf'; this.tell('state'); return; }
+    this.r = r;
+    var want = Math.min(1500 * r.n, r.sec >= 86400 ? 1500 : 6000), from = now - want * r.sec;
+    futChain(this.inst.base, r, from, now, this.adj).then(function (nat) {
+      if (self.dead) return;
+      if (!nat.length) throw new Error('empty');
+      self.front = nat.front; self.gaps = nat.gaps;
+      self.state = 'poll'; self.setBars(aggTo(nat, self.tf, r)); self.tell('state'); self.poll();
+    }).catch(function () {
+      if (self.dead) return; self.state = 'error'; self.err = 'nodata'; self.tell('state');
+      clearTimeout(self.retryT); self.retryT = setTimeout(function () { if (!self.dead && self.refs) self.start(); }, 30000);
+    });
+  };
+  FutFeed.prototype.poll = function () {
+    var self = this; clearInterval(this.poller);
+    this.poller = setInterval(function () { self.tick(); }, P.saver ? 30000 : 5000);
+  };
+  function curBar(now, r, lt) {                                         /* the open time of the bar now trading, and when it closes */
+    if (r.iv === 'M') { var d = new Date(now * 1000), a = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) / 1000; return { t: a, end: Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 1000 }; }
+    var t = lt != null && now >= lt ? lt + Math.floor((now - lt) / r.sec) * r.sec : Math.floor(now / r.sec) * r.sec; return { t: t, end: t + r.sec };
+  }
+  FutFeed.prototype.tick = function () {
+    var self = this, r = this.r, f = this.front, now = Math.floor(Date.now() / 1000);
+    if (this.dead || document.hidden || !r || !f || this.busy) return;
+    var lb = this.bars[this.bars.length - 1], cb = curBar(now, r, lb ? lb.t : null), cx = expiries(cb.end - 1, cb.end)[0];
+    if (cx && this.inst.base + 'USD' + cx.code !== f.c) { this.start(); return; }   /* the bar now trading belongs to the next contract: roll */
+    var s = lb ? lb.t : now - r.sec * r.n;
+    this.busy = true;
+    byKl(f.c, r.iv, s, now).then(function (nat) {
+      self.busy = false; if (self.dead || !nat.length) return;
+      var agg = aggTo(nat, self.tf, r);
+      agg.forEach(function (b) {
+        var bars = self.bars, L = bars[bars.length - 1];
+        if (L && b.t < L.t) return;
+        var isNew = !L || b.t > L.t; if (isNew) bars.push(b); else bars[bars.length - 1] = b;
+        self.at = Date.now(); self.tell('tick', { bar: b, isNew: isNew, closed: false });
+      });
+    }, function () { self.busy = false; });
+  };
+  FutFeed.prototype.stop = function () { this.dead = true; clearInterval(this.poller); clearTimeout(this.retryT); delete FEEDS[this.key]; };
+  function futHist(I, tfId, startMs, endMs) {
+    var tf = P.parseTF(tfId), r = tf && futRes(tf); if (!r) return Promise.reject(new Error('tf'));
+    return futChain(I.base, r, Math.floor(startMs / 1000), Math.floor(endMs / 1000), !!BADJ[I.sym]).then(function (nat) { return aggTo(nat, tf, r); });
+  }
+  /* list prices for futures in watchlists and market watch: Bybit's ticker of the front contract */
+  var FUTW = [], FUTP = null;
+  function futPrices() {
+    if (!FUTW.length || document.hidden) return;
+    var now = Math.floor(Date.now() / 1000);
+    FUTW.forEach(function (s) {
+      var I = P.inst(s), f = expiries(now, now)[0]; if (!I || !f) return;
+      P.getJSON(BYB + 'tickers?category=inverse&symbol=' + I.base + 'USD' + f.code, 10000).then(function (j) {
+        var x = j && j.result && j.result.list && j.result.list[0]; if (!x || !(+x.lastPrice > 0)) return;
+        P._tkPut(s, { c: +x.lastPrice, o: +x.prevPrice24h || +x.lastPrice, h: +x.highPrice24h || +x.lastPrice, l: +x.lowPrice24h || +x.lastPrice, q: +x.volume24h || 0, src: 'bybit' });
+      }, function () { });
+    });
+  }
   var FEEDS = {}, usdtFeed = P.feed;
   P.feedUsdt = usdtFeed;
   P.feed = function (sym, tfId, fn) {
     var I = P.inst(sym); if (!I) return null;
     if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn);
     var tf = P.parseTF(tfId); if (!tf) return null;
-    var key = sym + '|' + tf.id, F = FEEDS[key];
-    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
+    var adj = I.kind === 'fut' && !!BADJ[sym], key = sym + '|' + tf.id + (adj ? '|a' : ''), F = FEEDS[key];
+    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : new IrtFeed(sym, tf); F.start(); }
     clearTimeout(F.killT); F.subs.push(fn); F.refs++;
     if (F.bars.length) setTimeout(function () { if (F.subs.indexOf(fn) >= 0) fn('reset', F); }, 0);
     return { feed: F, off: function () {
@@ -286,6 +424,7 @@
     var I = P.inst(sym), tf = P.parseTF(tfId); if (!I || !tf) return Promise.reject(new Error('sym'));
     if (I.kind === 'usdt') return histUsdt(sym, tfId, startMs, endMs);
     if (I.kind === 'irt') return Promise.all([rateLoad(), histUsdt(I.base, tfId, startMs, endMs)]).then(function (r) { return r[1].map(function (b) { return toToman(b, tf.sec); }).filter(Boolean); });
+    if (I.kind === 'fut') return futHist(I, tfId, startMs, endMs);
     var nr = tgRes(tf); if (!nr) return Promise.reject(new Error('tf'));
     return tgHist(I.grade, nr[1]).then(function (j) {
       var base = []; for (var i = 0; i < j.t.length; i++) if (j.c[i] > 0 && j.t[i] * 1000 >= startMs && j.t[i] * 1000 <= endMs) base.push({ t: j.t[i], o: j.o[i] / I.div, h: j.h[i] / I.div, l: j.l[i] / I.div, c: j.c[i] / I.div, v: 0 });
@@ -297,6 +436,7 @@
   P.firstBars = function (sym, tfId) {
     var I = P.inst(sym), tf = P.parseTF(tfId); if (!I || !tf) return Promise.reject(new Error('sym'));
     if (I.kind === 'usdt') return firstUsdt(sym, tfId);
+    if (I.kind === 'fut') return futHist(I, tfId, Date.now() - 5 * 365 * 86400e3, Date.now()).then(function (b) { return b.slice(0, 1000); });
     if (I.kind === 'irt') return Promise.all([rateLoad(), firstUsdt(I.base, tfId)]).then(function (r) { return r[1].map(function (b) { return toToman(b, tf.sec); }).filter(Boolean); });
     return P.history(sym, tfId, 0, Date.now()).then(function (b) { return b.slice(0, 1000); });
   };
@@ -327,8 +467,9 @@
   RATE.subs.push(function () { IRTW.forEach(irtPrice); });
   var watchUsdt = P.tickers.watch;
   P.tickers.watch = function (syms) {
-    var c = {}, ir = [], irt = [];
-    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'ir') ir.push(s); else { c[I.base] = 1; if (I.kind === 'irt') irt.push(s); } });
+    var c = {}, ir = [], irt = [], fut = [];
+    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'ir') ir.push(s); else if (I.kind === 'fut') fut.push(s); else { c[I.base] = 1; if (I.kind === 'irt') irt.push(s); } });
+    FUTW = fut; clearInterval(FUTP); FUTP = null; if (fut.length) { futPrices(); FUTP = setInterval(futPrices, P.saver ? 120000 : 15000); }
     watchUsdt(Object.keys(c));
     var hadIrt = IRTW.length > 0; IRW = ir; IRTW = irt;
     if (irt.length && !hadIrt) { rateUse(true); rateLoad().then(function () { IRTW.forEach(irtPrice); }, function () { }); }
@@ -341,7 +482,7 @@
   P.markets = function () {
     return Promise.all([P.universe(), P.logos()]).then(function (r) {
       var u = r[0] || [];
-      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList() };
+      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }) };
     });
   };
 })();
