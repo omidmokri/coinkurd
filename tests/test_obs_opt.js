@@ -6,7 +6,7 @@ const path = require('path');
 const O = require(path.join(__dirname, '..', 'assets', 'obs', 'optmath.js'));
 let pass = 0, fail = 0;
 function ok(name, cond, extra) { if (cond) pass++; else { fail++; console.log('  FAIL ' + name + (extra !== undefined ? '  [' + JSON.stringify(extra) + ']' : '')); } }
-const near = (a, b) => a != null && b != null && Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b));
+const near = (a, b, tol) => a != null && b != null && Math.abs(a - b) <= (tol == null ? 1e-9 : tol) * Math.max(1, Math.abs(b));
 
 /* ---- instrument names */
 {
@@ -77,6 +77,35 @@ const row = (name, oi, vol, iv, und) => ({ instrument_name: name, open_interest:
   ok('an empty book', E.exps.length === 0 && E.tot.oi === 0 && E.tot.pcOi === null && E.index === null && E.tot.notional === null);
   ok('no index price: no notional, the rest stands', (b => b.tot.notional === null && b.exps[0].notional === null && b.exps[0].maxPain === 100 && b.exps[0].mpDist === null)
     (O.build([{ instrument_name: 'BTC-20NOV26-100-C', open_interest: 5, volume: 0, mark_iv: 50 }], NOW)));
+}
+{
+  /* skew and term structure, against the definitions written out by hand */
+  ok('ncdf: known values', near(O.ncdf(0), 0.5, 1e-7) && near(O.ncdf(1.96), 0.9750021, 2e-7) && near(O.ncdf(-1), 0.1586553, 2e-7));
+  const T = 30 / 365, F = 100, iv = 50, s = 0.5 * Math.sqrt(T), d1 = (Math.log(F / 110) + s * s / 2) / s;
+  ok('delta: call N(d1), put N(d1) − 1', near(O.delta('C', F, 110, T, iv), O.ncdf(d1), 1e-12) && near(O.delta('P', F, 110, T, iv), O.ncdf(d1) - 1, 1e-12) && O.delta('C', F, 110, 0, iv) === null);
+  ok('delta: an at-the-money call is a little over 0.5', O.delta('C', 100, 100, T, 50) > 0.5 && O.delta('C', 100, 100, T, 50) < 0.54);
+  /* a smile made so that IV = 50 + 0.2 × |K − 100| on calls and 50 + 0.4 × |K − 100| on puts */
+  const NOW2 = Date.UTC(2026, 10, 14, 8), exp = NOW2 + 30 * 864e5, rows = [];
+  for (let k = 60; k <= 140; k += 5) {
+    rows.push({ instrument_name: 'BTC-14DEC26-' + k + '-C', open_interest: 1, volume: 0, mark_iv: 50 + 0.2 * Math.abs(k - 100), underlying_price: 100, estimated_delivery_price: 100 });
+    rows.push({ instrument_name: 'BTC-14DEC26-' + k + '-P', open_interest: 1, volume: 0, mark_iv: 50 + 0.4 * Math.abs(k - 100), underlying_price: 100, estimated_delivery_price: 100 });
+  }
+  const B2 = O.build(rows, NOW2), e2 = B2.exps[0];
+  ok('the expiry is 30 days away', near(e2.days, 30, 1e-9) && e2.ts === exp);
+  const sm = O.smile(e2, NOW2);
+  ok('smile: out-of-the-money side — calls above the future, puts below', sm.length === 17 && sm[0].side === 'P' && sm[0].otm === 66 && sm[16].side === 'C' && sm[16].otm === 58 && sm[8].side === 'C');
+  /* by hand: find the two call strikes whose deltas lie around 0.25 and read the line between them */
+  const cs = sm.filter(x => x.k >= 100).map(x => [x.dc, x.c]).sort((a, b) => a[0] - b[0]);
+  let want = null; for (let i = 1; i < cs.length; i++) if (cs[i - 1][0] <= 0.25 && 0.25 <= cs[i][0]) want = cs[i - 1][1] + (cs[i][1] - cs[i - 1][1]) * (0.25 - cs[i - 1][0]) / (cs[i][0] - cs[i - 1][0]);
+  const c25 = O.ivAtDelta(sm, 100, 'C', 0.25), p25 = O.ivAtDelta(sm, 100, 'P', 0.25);
+  ok('25-delta call IV on the line between its strikes', want != null && near(c25, want, 1e-12), [c25, want]);
+  ok('25-delta put IV above the call (puts dearer in this smile)', p25 > c25 && p25 > 50 && c25 > 50, [p25, c25]);
+  const tm = O.term(B2, NOW2);
+  ok('term: risk reversal = call − put, butterfly = mean − ATM', tm.length === 1 && near(tm[0].rr, c25 - p25, 1e-12) && near(tm[0].fly, (c25 + p25) / 2 - e2.atmIv, 1e-12) && near(tm[0].atm, 50, 1e-12));
+  ok('term: an expiry less than a day away is not read', O.term(B2, exp - 0.5 * 864e5).length === 0);
+  const pts = [{ days: 10, atm: 40, rr: -2 }, { days: 40, atm: 55, rr: -4 }, { days: 100, atm: 60, rr: null }];
+  ok('30-day value on the line between expiries', near(O.atDays(pts, 'atm', 30), 50, 1e-12) && near(O.atDays(pts, 'rr', 30), -2 - 2 * 20 / 30, 1e-12));
+  ok('…nothing outside them, and missing values skipped', O.atDays(pts, 'atm', 5) === null && O.atDays(pts, 'rr', 60) === null && near(O.atDays(pts, 'atm', 40), 55, 1e-12));
 }
 console.log('options arithmetic: ' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

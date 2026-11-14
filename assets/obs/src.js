@@ -495,6 +495,16 @@
           return { fr: +x.funding_rate, h: h, fr8: per8h(+x.funding_rate, h), px: px, oi: oi, oiUsd: oi * px, mult: +x.quanto_multiplier };
         });
       });
+    },
+    /* the public contract statistics: one row per interval (its start), oldest first — liquidations, taker volume, open
+       interest and the counts of accounts holding longs and shorts (all of them, and Gate's top traders) */
+    stats: function (base, iv, limit) {
+      return cached('gate_st_' + base + '_' + iv + '_' + limit, 45000, function () {
+        return get('https://api.gateio.ws/api/v4/futures/usdt/contract_stats?contract=' + base + '_USDT&interval=' + iv + '&limit=' + limit, 20000).then(function (a) {
+          if (!Array.isArray(a)) throw new Error('gate');
+          return a.slice().sort(function (x, y) { return x.time - y.time; });
+        });
+      });
     } };
 
   /* the present open interest and funding of one coin on every exchange that lists it: { exchange id: { oi, oiUsd, fr8, h, px } | null } */
@@ -581,7 +591,26 @@
       j('bn_top_pos', SRC.binance.topPos(coin.bn, R.iv, bnFrom, now)); j('bn_taker', SRC.binance.taker(coin.bn, R.iv, bnFrom, now).then(function (a) { var m = coin.bnMult; return a.map(function (x) { return [x[0], x[1] * m, x[2] * m]; }); }));
     }
     if (coin.by) j('by_all', SRC.bybit.ls(coin.by, R.iv, t0, now));
-    return Promise.all(jobs).then(function (r) { var o = {}; r.forEach(function (x) { o[x.id] = x.rows; }); return o; });
+    /* Gate: the share of accounts long, from its real counts (long_users ÷ (long_users + short_users)), of its top traders
+       by number and by size; a row with no accounts counted is a period Gate's statistics missed and is left out */
+    j('gt', SRC.gate.stats(coin.base, R.iv, Math.min(2000, Math.ceil(R.span / iv) + 2)).then(function (a) {
+      var o = { gt_all: [], gt_top_acc: [], gt_top_pos: [], last: null };
+      function share(l, s) { l = +l; s = +s; return l >= 0 && s >= 0 && l + s > 0 ? l / (l + s) : null; }
+      a.forEach(function (x) {
+        var t = x.time * 1000; if (!(t >= t0) || t > now) return;
+        var v = share(x.long_users, x.short_users); if (v == null) return;
+        o.gt_all.push([t, v]);
+        var va = share(x.top_long_account, x.top_short_account); if (va != null) o.gt_top_acc.push([t, va]);
+        var vp = share(x.top_long_size, x.top_short_size); if (vp != null) o.gt_top_pos.push([t, vp]);
+        o.last = { t: t, long: +x.long_users, short: +x.short_users, tl: +x.top_long_account, ts: +x.top_short_account };
+      });
+      return o;
+    }));
+    return Promise.all(jobs).then(function (r) {
+      var o = {};
+      r.forEach(function (x) { if (x.id === 'gt') { var g = x.rows || {}; o.gt_all = g.gt_all || null; o.gt_top_acc = g.gt_top_acc || null; o.gt_top_pos = g.gt_top_pos || null; o.gt_last = g.last || null; } else o[x.id] = x.rows; });
+      return o;
+    });
   };
 
   /* ================================================================ live: last price and liquidations as they happen */

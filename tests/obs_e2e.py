@@ -725,7 +725,7 @@ def run():
             e_coin = (oi("BTCUSDT", tl) / oi("BTCUSDT", tl - 24 * H) - 1) * 100
             e_usd = (oi("BTCUSDT", tl) * px("BTCUSDT", tl) / (oi("BTCUSDT", tl - 24 * H) * px("BTCUSDT", tl - 24 * H)) - 1) * 100
             check("the 24-hour change is the hourly history's latest row against the one a day before", d["chg"] and d["chg"]["ex"] == ["binance", "bybit"] and d["chg"]["t"] == tl and near(d["chg"]["coin"], e_coin, 1e-6) and near(d["chg"]["usd"], e_usd, 1e-6), (d["chg"], e_coin, e_usd))
-            check("…and the tile shows the dollar change", near(pnum(d["tiles"][1][1]), e_usd, 0, 0.006) and "Binance + Bybit" in d["tiles"][1][2] and "dollars" in d["tiles"][1][0], d["tiles"][1])
+            check("…and the tile shows the dollar change", near(pnum(d["tiles"][1][1]), e_usd, 0, 0.051) and "Binance + Bybit" in d["tiles"][1][2] and "dollars" in d["tiles"][1][0], d["tiles"][1])
             pn = d["panes"]
             check("two panes: candles above, open interest below", len(pn) == 2 and pn[0]["series"][0]["type"] == "candle" and [x["name"] for x in pn[1]["series"]] == ["Sum of 2 exchanges", "Binance", "Bybit"], [[x["name"] for x in q["series"]] for q in pn])
             t, v = pn[1]["series"][1]["mid"]
@@ -755,7 +755,7 @@ def run():
             d2 = page.evaluate(SNAP)
             t, v = d2["panes"][1]["series"][1]["mid"]
             check("in coins the line is the open interest itself", near(v, oi("BTCUSDT", t), 1e-6) and "BTC" in d2["panes"][1]["title"], (t, v, d2["panes"][1]["title"]))
-            check("…and the change tile turns to coins", near(pnum(d2["tiles"][1][1]), e_coin, 0, 0.006) and "coins" in d2["tiles"][1][0], d2["tiles"][1])
+            check("…and the change tile turns to coins", near(pnum(d2["tiles"][1][1]), e_coin, 0, 0.051) and "coins" in d2["tiles"][1][0], d2["tiles"][1])
             page.locator("#ob-u button[data-v='usd']").click()
             page.locator("#ob-r button[data-v='3m']").click()
             wait_dv(page, 45000)

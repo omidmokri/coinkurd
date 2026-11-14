@@ -98,6 +98,54 @@
     a.forEach(function (x) { if (x.t >= cut) { x.src = '1h'; out.push(x); } });
     return out;
   }
+  /* Gate's daily rows as bars (older days than the hourly and 4-hour rows reach): a day with no taker volume on its own row or on
+     BTC_USDT's is a day Gate's statistics missed, and the day before it is cut short (the same rule as for hours, measured on daily
+     rows too): both are bad; their figures stay as given. Each row is valued at that day's closing mark price. */
+  function dayBars(rows, ref, now) {
+    var zero = {};
+    (rows || []).concat(ref || []).forEach(function (r) { if (!(r.buy + r.sell > 0)) zero[r.t] = 1; });
+    return (rows || []).filter(function (r) { return r.t + DAY <= now; }).map(function (r) {
+      return { t: r.t, ll: r.ll, sl: r.sl, px: r.px, oi: r.oi, n: 1, want: 1, src: '1d', bad: !!zero[r.t] || !!zero[r.t + DAY], live: false };
+    });
+  }
+  /* the site's archive of one coin (data/obs/liq_archive.json, thousands of dollars, q 0 = a day Gate missed) as bars */
+  function archBars(c) {
+    if (!c || !c.t0 || !(c.n > 0)) return [];
+    var t0 = dayMs(c.t0), out = [];
+    for (var i = 0; i < c.n; i++) {
+      var ll = c.ll && c.ll[i], sl = c.sl && c.sl[i], q = c.q && c.q[i];
+      if (ll == null || sl == null || q == null) continue;
+      out.push({ t: t0 + i * DAY, ll: ll * 1000, sl: sl * 1000, px: null, oi: null, n: 1, want: 1, src: 'arch', bad: q === 0, live: false });
+    }
+    return out;
+  }
+  /* bars older than the first of `bk`, taken from each list in turn (the first list wins a day) */
+  function older(bk, lists) {
+    var first = bk.length ? bk[0].t : Infinity, seen = {}, out = [];
+    lists.forEach(function (l) { (l || []).forEach(function (x) { if (x.t < first && !seen[x.t]) { seen[x.t] = 1; out.push(x); } }); });
+    return out.sort(function (a, b) { return a.t - b.t; }).concat(bk);
+  }
+  /* Hyperliquid's real positions (data/obs/hl_liq.json: [liquidation price, dollars, side 1 long | -1 short]) put into nb equal price
+     bins between mark × (1 − z) and mark × (1 + z): [{ lo, hi, mid, long $, short $, nl, ns }]; positions outside are not counted */
+  function hlBins(pos, mark, z, nb) {
+    var lo = mark - mark * z, hi = mark + mark * z, w2 = (hi - lo) / nb, out = [];
+    for (var i = 0; i < nb; i++) out.push({ lo: lo + i * w2, hi: lo + (i + 1) * w2, mid: lo + (i + 0.5) * w2, long: 0, short: 0, nl: 0, ns: 0 });
+    (pos || []).forEach(function (p) {
+      var px = p[0], usd = p[1]; if (!(px >= lo) || !(px < hi) || !(usd > 0)) return;
+      var b = out[Math.min(nb - 1, Math.floor((px - lo) / w2))];
+      if (p[2] > 0) { b.long += usd; b.nl++; } else { b.short += usd; b.ns++; }
+    });
+    return out;
+  }
+  /* dollars that a move of `pct` per cent would liquidate: longs at or above mark × (1 − pct/100), shorts at or below mark × (1 + pct/100) */
+  function hlNear(pos, mark, pct) {
+    var down = mark * (1 - pct / 100), up = mark * (1 + pct / 100), L = 0, S = 0, nl = 0, ns = 0;
+    (pos || []).forEach(function (p) {
+      if (p[2] > 0 && p[0] >= down && p[0] <= mark) { L += p[1]; nl++; }
+      if (p[2] < 0 && p[0] <= up && p[0] >= mark) { S += p[1]; ns++; }
+    });
+    return { long: L, short: S, nl: nl, ns: ns };
+  }
   function liqTotals(buckets) {
     var L = 0, S = 0, bad = 0, max = null;
     (buckets || []).forEach(function (x) { L += x.ll; S += x.sl; if (x.bad) bad++; if (!max || x.ll + x.sl > max.ll + max.sl) max = x; });
@@ -244,7 +292,7 @@
   }
   function dayMs(iso) { return Date.parse(iso + 'T00:00:00Z'); }
 
-  var api = { H: H, DAY: DAY, MIN_ANN_DAYS: MIN_ANN_DAYS, gateRows: gateRows, gaps: gaps, roll: roll, liqSeries: liqSeries, liqTotals: liqTotals, last24: last24,
+  var api = { H: H, DAY: DAY, MIN_ANN_DAYS: MIN_ANN_DAYS, gateRows: gateRows, gaps: gaps, roll: roll, liqSeries: liqSeries, liqTotals: liqTotals, dayBars: dayBars, archBars: archBars, older: older, hlBins: hlBins, hlNear: hlNear, last24: last24,
     okxAfter: okxAfter, okxStep: okxStep, orders: orders, klineRows: klineRows, cvd: cvd, parseFuture: parseFuture, curve: curve,
     col: col, premium: premium, pairs: pairs, diff: diff, ratio: ratio, last: last, rank: rank, meanLast: meanLast, dayMs: dayMs };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

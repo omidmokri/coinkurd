@@ -72,20 +72,20 @@ for path, s in JS.items():
             used.add((q, os.path.basename(path)))
 # keys built from a prefix: T('r_' + k), T('tab_' + p.k), T('pal_' + p), T('m' + i), T('m' + i + '_d')
 FAMILIES = {
-    "r_": ["12h", "24h", "48h", "3d", "1w", "2w", "1m", "3m", "6m", "1y"],
+    "r_": ["12h", "24h", "48h", "3d", "1w", "2w", "1m", "3m", "6m", "1y", "all"],
     "tab_": [m.group(1) for m in re.finditer(r"\{ k: '(\w+)', path:", JS[os.path.join(ROOT, "assets", "obs", "core.js")])],
     "pal_": ["fire", "viridis", "ice", "mono"],
     "m": ["1", "2", "3", "1_d", "2_d", "3_d"],
-    "ls_": ["bn_all", "by_all", "bn_top_acc", "bn_top_pos"],
+    "ls_": ["bn_all", "by_all", "bn_top_acc", "bn_top_pos", "gt_all", "gt_top_acc", "gt_top_pos"],
     # stage 3 (chain.js, opt.js): measures, ranges, NUPL bands, the pages' notes, the options views and DVOL ranges
     "cm_": ["mvrv", "z", "nupl", "caps", "reserve", "net", "inout", "adr", "tx", "hash", "rev", "puell", "s2f", "mayer", "w200", "pi", "y2", "gold", "dd"],
     "cr_": ["1y", "2y", "4y", "8y", "all"],
     "nz": ["0", "1", "2", "3", "4"],
     "note_": ["mvrv", "flows", "network", "cycle"],
-    "ov_": ["strike", "expiry", "dvol"],
+    "ov_": ["strike", "expiry", "dvol", "smile", "term"],
     "or_": ["1m", "3m", "1y", "all"],
     # stage 4 (flow.js, prem.js): the views of the basis page and the measures of the stablecoin page
-    "bv_": ["cb", "perp", "curve"],
+    "bv_": ["cb", "perp", "curve", "hist"],
     "sm_": ["supply", "ssr", "chg", "mix"],
 }
 for q, f in sorted(used):

@@ -16,7 +16,8 @@
   var GATE_ROWS = 2000;                                   /* the most rows Gate gives in one answer: 83 days of hours, 333 days of 4-hour periods */
 
   var LQ_R = [{ k: '24h', span: 24 * H, step: H }, { k: '3d', span: 3 * DAY, step: H }, { k: '1w', span: 7 * DAY, step: 4 * H },
-    { k: '1m', span: 30 * DAY, step: DAY }, { k: '3m', span: 90 * DAY, step: DAY }, { k: '1y', span: 365 * DAY, step: DAY }];
+    { k: '1m', span: 30 * DAY, step: DAY }, { k: '3m', span: 90 * DAY, step: DAY }, { k: '1y', span: 365 * DAY, step: DAY },
+    { k: 'all', span: 1500 * DAY, step: DAY, all: true }];          /* "since 2023": Gate's daily rows, and before them the site's archive (data/obs/liq_archive.json) */
   var CV_R = [{ k: '24h', span: 24 * H, iv: '5m' }, { k: '3d', span: 3 * DAY, iv: '15m' }, { k: '1w', span: 7 * DAY, iv: '1h' },
     { k: '1m', span: 30 * DAY, iv: '4h' }, { k: '3m', span: 90 * DAY, iv: '1d' }, { k: '1y', span: 365 * DAY, iv: '1d' }];
   var IVK = { 3600000: '1h', 14400000: '4h', 86400000: '1d' };
@@ -61,7 +62,7 @@
   function gateSet(base, iv, limit, mult, now) {
     return Promise.all([gateStats(base, iv, limit), base === 'BTC' ? null : gateStats('BTC', iv, limit).catch(function () { return null; })]).then(function (r) {
       var rows = F.gateRows(r[0], mult), ref = base === 'BTC' ? rows : r[1] ? F.gateRows(r[1], 1) : null;
-      return { rows: rows, bad: ref ? F.gaps(ref, MS[iv], now) : null, checked: !!ref };
+      return { rows: rows, ref: ref, bad: ref ? F.gaps(ref, MS[iv], now) : null, checked: !!ref };
     });
   }
   function gateCandles(base, iv, limit) {
@@ -158,19 +159,27 @@
     return Promise.all([
       gateSet(base, '1h', hours, 1, now),
       deep ? gateSet(base, '4h', n4, 1, now).catch(function () { return null; }) : null,
-      gateCandles(base, IVK[R.step], bars).catch(function () { return null; })
-    ]).then(function (r) { return { base: base, R: R, now: now, h1: r[0], h4: r[1], deep: deep, candles: r[2] }; });
+      gateCandles(base, IVK[R.step], Math.min(GATE_ROWS, bars)).catch(function () { return null; }),
+      R.all ? gateSet(base, '1d', GATE_ROWS, 1, now).catch(function () { return null; }) : null,
+      R.all ? OB.getJSON('/data/obs/liq_archive.json', 30000).catch(function () { return null; }) : null
+    ]).then(function (r) {
+      var arch = r[4] && r[4].coins && r[4].coins[base] ? r[4].coins[base] : null;
+      return { base: base, R: R, now: now, h1: r[0], h4: r[1], deep: deep, candles: r[2], d1: r[3], arch: arch, archAt: r[4] ? r[4].updated_at : null };
+    });
   };
   RENDER.liqhist = function (D0) {
     var el = V.el, R = D0.R, step = R.step, now = D0.now, base = D0.base;
     var from = Math.floor((now - R.span) / step) * step + step;
     var bk = F.liqSeries(D0.h1.rows, D0.h4 ? D0.h4.rows : null, step, from, now, D0.h1.bad, D0.h4 ? D0.h4.bad : null);
+    if (R.all) {
+      bk = F.older(bk, [D0.d1 ? F.dayBars(D0.d1.rows, D0.d1.ref, now) : null, F.archBars(D0.arch)]);
+    }
     if (!bk.length) { fail(T('err_gate'), T('err_gate_d', { coin: base })); return; }
     var tot = F.liqTotals(bk), d24 = F.last24(D0.h1.rows, now, D0.h1.bad), first = bk[0].t;
     var ls = function (x) { return esc(T('lq_ls', { l: OB.ltr(usd(x.long)), s: OB.ltr(usd(x.short)) })); };
     $('#ob-tiles', el).innerHTML =
       tile(T('lq_24', { ex: 'Gate' }), esc(d24 ? usd(d24.total) : '—'), d24 ? ls(d24) + (d24.bad ? ' · ' + esc(T('lq_miss_h', { n: OB.loc(d24.bad) })) : '') : '', 'ob-t-24') +
-      tile(T('lq_tot', { r: T('r_' + R.k) }), esc(usd(tot.total)), ls(tot), 'ob-t-tot') +
+      tile(R.all ? T('lq_tot_all') : T('lq_tot', { r: T('r_' + R.k) }), esc(usd(tot.total)), ls(tot), 'ob-t-tot') +
       tile(T('lq_share'), esc(tot.longShare == null ? '—' : tot.longShare.toFixed(1) + '%'), tot.longShare == null ? '' : esc(T('lq_share_s', { p: OB.ltr((100 - tot.longShare).toFixed(1) + '%') })), 'ob-t-share') +
       tile(T(step >= DAY ? 'lq_max_d' : 'lq_max_b'), esc(tot.max ? usd(tot.max.ll + tot.max.sl) : '—'), tot.max ? esc(when(tot.max.t, step)) : '', 'ob-t-max') +
       tile(T('lq_24_min', { ex: 'OKX' }), '<span id="ob-okx-v">…</span>', '<span id="ob-okx-s">' + esc(T('lq_okx_wait', { n: OB.loc(0) })) + '</span>', 'ob-t-okx');
@@ -199,7 +208,11 @@
     $('#ob-tbl', el).hidden = false;
     var old = bk.filter(function (x) { return x.src === '4h'; }).length, note = T('note_lq');
     if (tot.bad) note += ' ' + T('lq_bad_n', { n: OB.loc(tot.bad), m: OB.loc(tot.n) });
-    if (old && old < bk.length) note += ' ' + T('lq_4h', { d: when(bk[old].t, step) });
+    var n1d = bk.filter(function (x) { return x.src === '1d'; }).length, nar = bk.filter(function (x) { return x.src === 'arch'; }).length;
+    if (nar) note += ' ' + T('lq_arch', { d: when(bk[nar].t, step) });
+    if (n1d) note += ' ' + T('lq_1d', { d: when(bk[nar + n1d] ? bk[nar + n1d].t : bk[bk.length - 1].t, step) });
+    old = bk.filter(function (x) { return x.src === '4h'; }).length;
+    if (old && nar + n1d + old < bk.length) note += ' ' + T('lq_4h', { d: when(bk[nar + n1d + old].t, step) });
     if (D0.deep && !D0.h4) note += ' ' + T('lq_no4h');
     if (!D0.h1.checked) note += ' ' + T('lq_unchecked');
     $('#ob-note', el).textContent = note;

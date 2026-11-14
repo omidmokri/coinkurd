@@ -11,6 +11,14 @@
                       Σ calls OI × max(0, S − K) + Σ puts OI × max(0, K − S), smallest over the listed strikes
                       (the lowest strike wins a tie — the same rule as scripts/lab.py, whose figure the bot shows)
      at-the-money IV = mark IV at the underlying price, read between the two strikes around it (mean of call and put)
+     delta           = Black's delta from the option's own mark IV, the future of its expiry (underlying_price) and the
+                       time to expiry: call N(d1), put N(d1) − 1, d1 = (ln(F/K) + σ²T/2) ÷ (σ√T) (rates are left out, as
+                       in Deribit's coin-settled options, whose prices are in coins of the future)
+     25-delta IV     = the IV where the out-of-the-money calls' (puts') delta is 0.25 (−0.25), read on the straight line
+                       between the two strikes around it
+     risk reversal   = 25-delta call IV − 25-delta put IV (negative: puts dearer — the market pays more for downside
+                       protection); butterfly = their mean − at-the-money IV
+     30-day value    = the straight line between the two expiries on either side of 30 days (nothing outside them)
    Max pain is arithmetic on open interest, not a forecast of the settlement price. */
 (function (root) {
   'use strict';
@@ -101,7 +109,56 @@
     return n - 1;
   }
 
-  var api = { DAY: DAY, parseName: parseName, build: build, maxPain: maxPain, painAt: painAt, painCurve: painCurve, atmIv: atmIv, near: near, slot: slot };
+  /* ---------------------------------------------------------------- skew and term structure */
+  function ncdf(x) {                                  /* the normal distribution, Abramowitz–Stegun 7.1.26 (error below 1.5e-7) */
+    var t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x / 2);
+    return x >= 0 ? (1 + y) / 2 : (1 - y) / 2;
+  }
+  function delta(type, F, K, T, iv) {
+    if (!(F > 0 && K > 0 && T > 0 && iv > 0)) return null;
+    var s = iv / 100 * Math.sqrt(T), d1 = (Math.log(F / K) + s * s / 2) / s, n = ncdf(d1);
+    return type === 'C' ? n : n - 1;
+  }
+  /* one expiry's smile: the out-of-the-money side of each strike (calls above the future, puts below), with its delta */
+  function smile(e, now) {
+    var T = (e.ts - now) / (365 * DAY), F = e.und, out = [];
+    (e.strikes || []).forEach(function (r) {
+      var c = r.c.iv > 0 ? r.c.iv : null, p = r.p.iv > 0 ? r.p.iv : null;
+      out.push({ k: r.k, c: c, p: p, otm: r.k >= F ? c : p, side: r.k >= F ? 'C' : 'P', dc: c != null ? delta('C', F, r.k, T, c) : null, dp: p != null ? delta('P', F, r.k, T, p) : null });
+    });
+    return out;
+  }
+  /* the IV at a delta on one side: calls 0.25 (strikes above the future), puts −0.25 (below) */
+  function ivAtDelta(sm, F, side, target) {
+    var pts = [];
+    sm.forEach(function (x) {
+      if (side === 'C' && x.k >= F && x.c != null && x.dc != null) pts.push([x.dc, x.c]);
+      if (side === 'P' && x.k <= F && x.p != null && x.dp != null) pts.push([-x.dp, x.p]);
+    });
+    pts.sort(function (a, b) { return a[0] - b[0]; });
+    for (var i = 1; i < pts.length; i++) if (pts[i - 1][0] <= target && target <= pts[i][0]) {
+      var a = pts[i - 1], b = pts[i];
+      return b[0] === a[0] ? a[1] : a[1] + (b[1] - a[1]) * (target - a[0]) / (b[0] - a[0]);
+    }
+    return null;
+  }
+  /* every expiry → {code, ts, days, atm, c25, p25, rr, fly} (expiries with less than a day left are not read: their smile is a few strikes wide) */
+  function term(B, now) {
+    return (B.exps || []).filter(function (e) { return e.ts - now >= DAY && e.und > 0; }).map(function (e) {
+      var sm = smile(e, now), c25 = ivAtDelta(sm, e.und, 'C', 0.25), p25 = ivAtDelta(sm, e.und, 'P', 0.25);
+      return { code: e.code, ts: e.ts, days: (e.ts - now) / DAY, atm: e.atmIv, c25: c25, p25: p25,
+        rr: c25 != null && p25 != null ? c25 - p25 : null, fly: c25 != null && p25 != null && e.atmIv != null ? (c25 + p25) / 2 - e.atmIv : null };
+    });
+  }
+  /* a term-structure value at k days, on the line between the expiries on either side */
+  function atDays(tm, key, k) {
+    var lo = null, hi = null;
+    tm.forEach(function (x) { if (x[key] == null) return; if (x.days <= k && (!lo || x.days > lo.days)) lo = x; if (x.days >= k && (!hi || x.days < hi.days)) hi = x; });
+    if (!lo || !hi) return null;
+    return hi.days === lo.days ? lo[key] : lo[key] + (hi[key] - lo[key]) * (k - lo.days) / (hi.days - lo.days);
+  }
+
+  var api = { DAY: DAY, ncdf: ncdf, delta: delta, smile: smile, ivAtDelta: ivAtDelta, term: term, atDays: atDays, parseName: parseName, build: build, maxPain: maxPain, painAt: painAt, painCurve: painCurve, atmIv: atmIv, near: near, slot: slot };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OBOpt = api;
 })(typeof window !== 'undefined' ? window : this);
