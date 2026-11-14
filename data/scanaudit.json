@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T21:17:34.265921+00:00",
+ "updated_at": "2026-11-14T21:33:50.937045+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-13T21:00:00+00:00"
@@ -7,7 +7,7 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 230,
+ "coins": 231,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
@@ -23,32 +23,32 @@
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6117,
+   "n": 6109,
    "obs": -0.23,
-   "win": 48.0,
+   "win": 47.9,
    "mid": 0.01,
    "lo": -0.27,
    "hi": 0.23,
-   "p": 0.0601,
+   "p": 0.0591,
    "shifts": 1082,
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 842,
+   "n": 841,
    "obs": -0.43,
-   "win": 48.6,
+   "win": 48.5,
    "mid": 0.7,
    "lo": -0.32,
-   "hi": 1.97,
+   "hi": 1.96,
    "p": 0.0434,
    "shifts": 1082,
    "verdict": "worse"
   },
   "volume_spike": {
-   "n": 1628,
-   "obs": -0.51,
-   "win": 45.3,
-   "mid": 0.12,
+   "n": 1625,
+   "obs": -0.52,
+   "win": 45.2,
+   "mid": 0.11,
    "lo": -0.36,
    "hi": 0.7,
    "p": 0.0259,
@@ -56,13 +56,13 @@
    "verdict": "worse"
   },
   "ema_golden_cross": {
-   "n": 495,
+   "n": 494,
    "obs": -1.5,
-   "win": 33.3,
+   "win": 33.4,
    "mid": -0.7,
-   "lo": -1.74,
+   "lo": -1.75,
    "hi": 0.04,
-   "p": 0.0758,
+   "p": 0.0749,
    "shifts": 1082,
    "verdict": "no_edge"
   },
@@ -78,13 +78,13 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 471,
+   "n": 470,
    "obs": -0.87,
-   "win": 42.9,
+   "win": 42.8,
    "mid": -0.68,
    "lo": -1.48,
    "hi": 0.03,
-   "p": 0.6701,
+   "p": 0.6738,
    "shifts": 1082,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "rsi_oversold": {
-   "n": 820,
-   "obs": 0.58,
-   "win": 52.8,
+   "n": 818,
+   "obs": 0.59,
+   "win": 52.9,
    "mid": -0.71,
    "lo": -1.84,
    "hi": 0.31,
-   "p": 0.025,
+   "p": 0.0222,
    "shifts": 1082,
    "verdict": "better"
   }
