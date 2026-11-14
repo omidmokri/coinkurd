@@ -452,8 +452,8 @@ def footer(lang="fa"):
 # before it, so placed lower the interface's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "8"
-NX_VER = "14"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js} (14: the galaxy under the coin and the homepage pointer, assets/nx-cosmos.js)
+UI2_VER = "9"
+NX_VER = "15"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js} (14: the galaxy under the coin and the homepage pointer, assets/nx-cosmos.js)
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the

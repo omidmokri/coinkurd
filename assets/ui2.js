@@ -277,6 +277,7 @@
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(relay);
     box._glRelay = relay;
   }
+  w.ekGlass = glass;   /* also used by assets/nx-home.js for the homepage's section dock */
   function footGlass() {
     var F = d.getElementById('ekf'); if (!F) return;
     var here = function (box) { var p = location.pathname; return [].filter.call(box.querySelectorAll('a[href]'), function (a) { return (a.getAttribute('href') || '').charAt(0) !== '#' && a.hostname === location.hostname && a.pathname === p; })[0] || null; };

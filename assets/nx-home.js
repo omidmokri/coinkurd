@@ -77,6 +77,8 @@
   var R = d.createElement('div'); R.id = 'nxr'; R.setAttribute('role', 'navigation');   /* not <nav>: the homepage styles bare nav elements */
   R.innerHTML = '<a class="nxr-home" href="#" data-home>' + HOME + tri('خانه', 'ماڵەوە', 'Home') + '</a>' + rail + '<i class="nxr-sep" aria-hidden="true"></i><a class="nxr-sat" href="/satoshi/">' + tri('ساتوشی', 'ساتۆشی', 'Satoshi') + '</a>';
   d.body.appendChild(R);
+  /* the same glass lens as the header, the footer and the menu: it rides the dock and rests on the section in view */
+  (function lens(n) { if (w.ekGlass) w.ekGlass(R, { sel: 'a', on: 'a.on', r: 13, bead: 30 }); else if (n < 40) setTimeout(function () { lens(n + 1); }, 150); })(0);
   function railLabel() { R.setAttribute('aria-label', pick('بخش‌های صفحهٔ اصلی', 'بەشەکانی پەڕەی سەرەکی', 'Homepage sections')); }
   railLabel();
   [].forEach.call(nx.querySelectorAll('.nx-p[data-d]'), function (p) { doors[p.getAttribute('data-d')] = p; });
