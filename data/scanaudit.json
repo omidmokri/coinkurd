@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T10:30:27.981499+00:00",
+ "updated_at": "2026-11-14T10:44:19.700052+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-13T10:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1687,
+   "n": 1684,
    "obs": -0.44,
    "win": 45.7,
    "mid": 0.11,
    "lo": -0.4,
-   "hi": 0.64,
-   "p": 0.0373,
+   "hi": 0.65,
+   "p": 0.0383,
    "shifts": 1071,
    "verdict": "worse"
   },
   "_all": {
-   "n": 6330,
+   "n": 6323,
    "obs": -0.18,
    "win": 48.0,
    "mid": 0.01,
    "lo": -0.27,
    "hi": 0.23,
-   "p": 0.1214,
+   "p": 0.1242,
    "shifts": 1071,
    "verdict": "no_edge"
   },
@@ -56,12 +56,12 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 502,
-   "obs": -0.61,
+   "n": 500,
+   "obs": -0.62,
    "win": 43.4,
-   "mid": -0.61,
-   "lo": -1.52,
-   "hi": 0.13,
+   "mid": -0.62,
+   "lo": -1.5,
+   "hi": 0.12,
    "p": 0.9935,
    "shifts": 1071,
    "verdict": "no_edge"
@@ -78,13 +78,13 @@
    "verdict": "no_edge"
   },
   "breakout_up": {
-   "n": 536,
-   "obs": -1.15,
+   "n": 535,
+   "obs": -1.14,
    "win": 36.8,
    "mid": -0.59,
-   "lo": -1.87,
-   "hi": 0.7,
-   "p": 0.2923,
+   "lo": -1.85,
+   "hi": 0.71,
+   "p": 0.3035,
    "shifts": 1071,
    "verdict": "no_edge"
   },
@@ -100,13 +100,13 @@
    "verdict": "no_edge"
   },
   "bear_divergence": {
-   "n": 424,
-   "obs": 0.35,
-   "win": 56.8,
+   "n": 423,
+   "obs": 0.34,
+   "win": 56.7,
    "mid": 0.55,
    "lo": -0.34,
    "hi": 1.77,
-   "p": 0.6555,
+   "p": 0.6405,
    "shifts": 1071,
    "verdict": "no_edge"
   },
