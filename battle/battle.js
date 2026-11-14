@@ -317,7 +317,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  spot(A,sl,idx){const e=-A.dir,m=idx%6,row=Math.floor(idx/6);const fx=[0,-.95,-.95,-1.9,-1.9,-2.7][m]-row*2.7,fz=[0,-2,2,-4,4,0][m];
   const h=Math.sin(idx*12.9898+sl.zc*78.233)*43758.5453,j=h-Math.floor(h)-.5;return {x:sl.x+e*fx+j*.5,z:clamp(sl.zc+fz+j*.8,-37,37)}},
  kill(A,s,t){s.st=ST.DIE;s.t0=t;s.mv=0;s.key='';if(PREF.layers.fx&&S.quality!=='lite'&&Math.random()<.35)FX.blood(s.x,s.z)},
- retreat(A,s,t){s.st=ST.RUN;s.mv=2;s.key='';s.sp=10.5;s.held=false;const d=A.door||[A.dir*(GATE+6),gateZ(A.dir*GATE)];this.route(A,s,d,t,this.navOn?NAV.flow('door-'+A.team,d[0],d[1],.45):null)},
+ retreat(A,s,t){s.st=ST.RUN;s.mv=2;s.key='';s.sp=10.5;s.held=false;const d=A.door||[A.dir*(GATE+6),gateZ(A.dir*GATE)];if(!this.navOn){this.route(A,s,d,t,null);return}s.t0=t;this.setPath(s,[[s.x,s.z],[s.x+.01,s.z]],t);s.dur=600;s.tx=d[0];s.tz=d[1];if(!s.rq){s.rq=1;(this.rq||(this.rq=[])).push([A,s])}},   /* routed in ARMY.tick, a few per frame */
  /* ---- ground movement on the navigation map (nav.js): soldiers, armour and lorries keep to clear ground, go round each other and never through anything solid ---- */
  VB:[[3.55,1.62],[4.3,2.28],[5.06,2.68],[3.45,1.6]],                       // half length, half width (m): IFV, MBT, heavy tank, lorry
  navOn:false,works:[],navDirty:true,navSig:'',navT:0,
@@ -336,7 +336,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  route(A,o,dest,t,flow){let F=flow&&NAV.flowPath(flow,o.x,o.z);if(F&&flow.ver!==NAV.ver)for(let i=1;F&&i<F.length;i++)if(!NAV.lineClear(F[i-1][0],F[i-1][1],F[i][0],F[i][1],.28))F=null;   /* a stale field's route is used only if it is still clear */
   let P=F||(this.navOn?NAV.path(o.x,o.z,dest[0],dest[1],.45):null);
   /* no way through: never walk straight through the wall; aim for the nearest reachable spot near the goal, or hold where he is */
-  if(!P&&this.navOn){const q=NAV.free(dest[0],dest[1],.45,10,(x,z)=>!!NAV.path(o.x,o.z,x,z,.45));P=q?NAV.path(o.x,o.z,q[0],q[1],.45):null;if(P){o.tx=q[0];o.tz=q[1]}else P=[[o.x,o.z],[o.x+.01,o.z]]}
+  if(!P&&this.navOn){const q=NAV.free(dest[0],dest[1],.45,10);P=q?NAV.path(o.x,o.z,q[0],q[1],.45):null;if(P){o.tx=q[0];o.tz=q[1]}else P=[[o.x,o.z],[o.x+.01,o.z]]}
   if(!P)P=[[o.x,o.z],[dest[0],dest[1]]];this.setPath(o,P,t)},
  setPath(o,P,t){const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const e=P[P.length-1];o.pl=P;o.plL=L;o.D=Math.max(L[L.length-1],.01);o.x0=o.x;o.z0=o.z;o.tx=e[0];o.tz=e[1];o.t0=Math.max(t,o.t0||0);o.dur=clamp(o.D/(o.sp||10),.25,16);
   o.cv=P.length===2&&o.D>=12&&(!this.navOn||NAV.lineClear(P[0][0],P[0][1],e[0],e[1],4.9))?rnd(4,-4):0;o.legs=null},
@@ -361,13 +361,13 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
    while(sl.alive.length>n){const s=sl.alive.pop();if(s.st===ST.DIE)continue;if(traded)this.kill(A,s,t);else spare.push(s)}}
   for(const [sl,key,n] of need){
    while(sl.alive.length<n&&spare.length){let bi=0,bd=1e9;for(let q=0;q<spare.length;q++){const d=Math.abs(spare[q].x-sl.x)+Math.abs(spare[q].z-sl.zc)*.3;if(d<bd){bd=d;bi=q}}
-    const s=spare.splice(bi,1)[0],idx=sl.alive.length,o=this.standSpot(A,sl,idx);s.key=key;s.rank=sl.rank||0;s.after=null;s.held=false;s.mv=1;s.st=ST.RUN;s.sp=s.role===1?9:10.5;s.t0=t;this.route(A,s,[o.x,o.z],t);sl.alive.push(s)}
+    const s=spare.splice(bi,1)[0],idx=sl.alive.length,o=this.standSpot(A,sl,idx);s.key=key;s.rank=sl.rank||0;s.after=null;s.held=false;s.mv=1;s.st=ST.RUN;s.sp=s.role===1?9:10.5;s.t0=t;this.setPath(s,[[s.x,s.z],[s.x+.01,s.z]],t);s.dur=600;s.tx=o.x;s.tz=o.z;if(!s.rq){s.rq=1;(this.rq||(this.rq=[])).push([A,s])}sl.alive.push(s)}
    const cur=sl.alive.length,al={sold:n};
    if(al.sold>cur){const n=Math.min(al.sold-cur,cap-A.sold.length);for(let i=0;i<n;i++){const idx=sl.alive.length,o=this.standSpot(A,sl,idx),from=A.spawnFrom&&A.spawnFrom.until>tn?A.spawnFrom:null,role=ROLE[idx%6],sd=Math.random();
      /* out of the command post's door one after another, or off the back of a lorry */
      const d0=from?[from.x,from.z]:(A.walk?A.walk[(A.sold.length+i)&1]:A.door||[A.dir*(GATE+5),gateZ(A.dir*GATE)]),p0=this.navOn?(NAV.free(d0[0]+rnd(.5,-.5),d0[1]+rnd(1,-1),.45,4)||d0):d0;
      const s={key,st:ST.RUN,t0:t+i*(from?150:230)+Math.random()*80,held:true,x:p0[0],z:p0[1],tx:o.x,tz:o.z,mv:1,sd,rank:sl.rank||0,role,stn:GFX5.stance(role,sd),yaw:rnd(.3,-.3),cv:0,i:A.sold.length,ry:A.dir<0?0:Math.PI,y:0,gyT:0,sp:role===1?9:10.5};
-     this.route(A,s,[o.x,o.z],s.t0);sl.alive.push(s);A.sold.push(s)}}
+     this.setPath(s,[[s.x,s.z],[s.x+.01,s.z]],s.t0);s.dur=600;s.tx=o.x;s.tz=o.z;s.rq=1;(this.rq||(this.rq=[])).push([A,s]);sl.alive.push(s);A.sold.push(s)}}   /* the route is drawn a few men per frame (ARMY.tick): a big order no longer stalls the page */
   }
   for(const s of spare)if(s.mv!==2&&s.st!==ST.DIE)this.retreat(A,s,t);
   this.updVeh(A,M,want,t,tn)},
@@ -603,7 +603,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
   if(window.GFX6&&GFX6.RB.sides)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs))if(near(o))o.gyT=0}},
  remove(A,s){const last=A.sold.pop();if(last!==s){A.sold[s.i]=last;last.i=s.i}},
  tick(dt){this.gateTick();
-  if(this.rq&&this.rq.length){const t0=vt();for(let n=0;n<6&&this.rq.length;n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||!s.mv||!s.pl)continue;this.route(A,s,[s.tx,s.tz],t0,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+  if(this.rq&&this.rq.length){const t0=vt();for(let n=0,b0=performance.now();this.rq.length&&(n<1||performance.now()-b0<4);n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||(!s.mv&&Math.hypot(s.x-s.tx,s.z-s.tz)<.4))continue;if(!s.mv){s.mv=1;s.st=ST.RUN;s.sp=s.sp||10.5}this.route(A,s,[s.tx,s.tz],t0,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
   const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
   for(const k in this.sides){const A=this.sides[k],base=A.dir<0?0:Math.PI,cnt=[0,0,0,0];
    for(let i=A.sold.length-1;i>=0;i--){const s=A.sold[i];
