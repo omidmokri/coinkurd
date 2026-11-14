@@ -934,7 +934,7 @@ def run():
             page.wait_for_timeout(500)
             cards = page.evaluate("() => { const s = [...document.querySelectorAll('#ob-main section')].find(x => !x.hidden); return { hrefs: [...s.querySelectorAll('a.ob-hc')].map(a => a.getAttribute('href')), soon: [...s.querySelectorAll('.ob-hc.soon b')].map(b => b.textContent), lang: s.getAttribute('data-lang') }; }")
             check("the four new charts have their cards", all(x in cards["hrefs"] for x in ("/charts/liquidations/", "/charts/cvd/", "/charts/basis/", "/charts/stablecoins/")) and cards["lang"] == "en", cards["hrefs"])
-            check("they are no longer “in the works”; what is, is named", not any("day by day" in x or "CVD" in x or "SSR" in x or "Coinbase" in x for x in cards["soon"][:3]) and len(cards["soon"]) == 7, cards["soon"])
+            check("they are no longer “in the works”; what is, is named", not any("day by day" in x or "CVD" in x or "SSR" in x or "Coinbase" in x for x in cards["soon"]) and len(cards["soon"]) == 3, cards["soon"])
             for path in ("/charts/liquidations/", "/charts/cvd/", "/charts/basis/", "/charts/stablecoins/"):
                 check(f"{path} exists as a built page", os.path.exists(os.path.join(ROOT, path.strip("/"), "index.html")))
             check("no JS errors (hub)", not errors, errors[:3])

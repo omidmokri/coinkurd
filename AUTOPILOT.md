@@ -171,8 +171,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   and the tile then names its day). The `summary` blocks of those files are what the tiles and the bot show;
   `python3 tests/test_obs_flowdata.py` runs both steps against pretend sources in the real formats
   (`tests/obs_fakes.py`) and then runs flowmath.js on the written files: page arithmetic = summary. The hub's `HUB["todo"]` in build_obs.py is the
-  honest "not built yet" list and `HUB["paid_items"]` the "no free source" list: move an item into `HUB["secs"]` only
-  when its page exists. Bot: `scripts/bot_obs.py` (section `obs`: one Web App button per chart, in the order of the
+  honest "not built yet" list: move an item into `HUB["secs"]` only when its page exists. (The hub also used to list
+  what no free source gives — SOPR, HODL waves, CDD, per-exchange reserves; the owner had that list removed on
+  2026-11-14. Do not put it back, and still never fake those figures.) Bot: `scripts/bot_obs.py` (section `obs`: one Web App button per chart, in the order of the
   site's tabs, and the day's figures from `obs/chain_now.json`, `lab.json`, `obs/stables_now.json` and
   `obs/premium.json`; a premium older than six hours is left out). Tests: `node tests/test_obs_liq.js`,
   `node tests/test_obs_chain.js`, `node tests/test_obs_opt.js`, `node tests/test_obs_flow.js`,
@@ -229,7 +230,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
   OKX, Bybit, Deribit, `data-api.binance.vision`, DefiLlama and Coin Metrics do; no `*.binance.com` host (fapi, api,
   www) and not `api.exchange.coinbase.com` — so whatever must work for him is read from the first group or by CI,
   and a page that uses Binance futures needs a second source (the CVD page falls back to Gate).
-  **Not possible without a paid source — say so (the hub does), never fake:** SOPR, CDD, HODL waves, long/short-term
+  **Not possible without a paid source — never fake (the hub no longer lists them: owner's choice, 2026-11-14):** SOPR, CDD, HODL waves, long/short-term
   holder supply, per-exchange reserves, miner flows. BGeometrics' free API has them but its terms forbid passing the
   data on. For the owner to decide, not the loop: the channel's own market analysis (`scripts/onchain_data.py`,
   `UNSEEN`) still declares MVRV, NUPL and exchange flows as "not available" — `data/obs/chain_now.json` now has them,
@@ -353,6 +354,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   readable": the mirror refuses an unknown symbol without CORS headers, so it asks for BTCUSDT once. `V` is 8.
 - **Could not be exercised live:** the Binance-futures line of the CVD page (no `*.binance.com` host answers from the
   owner's connection) — it is covered by the browser suite with Binance's real format only.
+- **Owner, same day, after seeing the hub:** remove the section "با دادهٔ رایگان شدنی نیست" and its four items (SOPR,
+  holder supply and HODL waves, CDD, per-exchange and miner flows) from `/charts/` — done in all four languages.
 - **Left for later, noted in the Backlog:** Gate's statistics also carry `long_users` / `short_users`, the top
   traders' sizes and accounts and `lsr_taker` — a long/short page by real account counts is possible from them.
 ### 2026-11-13 · The Observatory, stage 3: options, on-chain and the Bitcoin cycle (owner's request in chat, not by the loop)

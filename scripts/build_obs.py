@@ -1104,18 +1104,6 @@ HUB = {
         {"fa": "چولگی و ساختار زمانی نوسان ضمنی آپشن‌ها", "ckb": "لاری و پێکهاتەی کاتیی هەڵاوسانی ناوەکیی ئۆپشنەکان", "ar": "انحراف التقلب الضمني للخيارات وبنيته الزمنية", "en": "Options: skew and term structure of implied volatility"},
         {"fa": "آرشیو لیکوییدیشن‌ها، بلندتر از ۱۱ ماه", "ckb": "ئەرشیفی لیکویدەکان، درێژتر لە ١١ مانگ", "ar": "أرشيف التصفيات لأكثر من ١١ شهرًا", "en": "An archive of liquidations longer than 11 months"},
     ],
-    # what the three sites sell and no free, redistributable source publishes — named here instead of being faked
-    "paid": {"fa": "با دادهٔ رایگان شدنی نیست", "ckb": "بە داتای بێبەرامبەر ناکرێت", "ar": "غير ممكن ببيانات مجانية", "en": "Not possible with free data"},
-    "paid_note": {"fa": "این شاخص‌ها به پردازش تک‌تک خروجی‌های زنجیره و برچسب‌گذاری آدرس‌ها نیاز دارند و هیچ منبع رایگانی که اجازهٔ بازنشر بدهد منتشرشان نمی‌کند. به‌جای عدد ساختگی، نامشان را این‌جا نوشته‌ایم.",
-                  "ckb": "ئەم پێوەرانە پێویستیان بە پرۆسێسکردنی هەموو دەرچووەکانی زنجیرە و ناسینەوەی ناونیشانەکانە و هیچ سەرچاوەیەکی بێبەرامبەر کە ڕێگە بە بڵاوکردنەوە بدات بڵاویان ناکاتەوە. لە جیاتی ژمارەی دروستکراو، ناوەکانیانمان لێرە نووسیوە.",
-                  "ar": "تحتاج هذه المقاييس إلى معالجة كل مخرجات السلسلة ووسم العناوين، ولا ينشرها أي مصدر مجاني يسمح بإعادة النشر. كتبنا أسماءها هنا بدل أرقام مختلقة.",
-                  "en": "These measures need every output of the chain processed and addresses labelled, and no free source that allows republishing provides them. Their names are written here instead of made-up numbers."},
-    "paid_items": [
-        {"fa": "SOPR و سود و زیان تحقق‌یافته", "ckb": "SOPR و قازانج و زیانی بەدیهاتوو", "ar": "SOPR والأرباح والخسائر المحقّقة", "en": "SOPR and realized profit and loss"},
-        {"fa": "عرضهٔ هولدرهای بلندمدت و کوتاه‌مدت، موج‌های HODL", "ckb": "خستنەڕووی هەڵگرانی درێژخایەن و کورتخایەن، شەپۆلەکانی HODL", "ar": "معروض الحائزين طويلي وقصيري الأجل وموجات HODL", "en": "Long- and short-term holder supply, HODL waves"},
-        {"fa": "روزهای نابودشدهٔ کوین (CDD) و خوابیدگی", "ckb": "ڕۆژە لەناوچووەکانی دراو (CDD) و خەوتوویی", "ar": "أيام العملة المُتلَفة (CDD) والسكون", "en": "Coin days destroyed (CDD) and dormancy"},
-        {"fa": "ذخیره و جریان هر صرافی جداگانه، و جریان ماینرها", "ckb": "یەدەگ و ڕەوتی هەر ئاڵوگۆڕگەیەک بە جیا، و ڕەوتی ماینەرەکان", "ar": "احتياطي كل منصة وتدفقها على حدة، وتدفقات المعدّنين", "en": "Each exchange's own reserve and flows, and miner flows"},
-    ],
 }
 
 
@@ -1203,8 +1191,6 @@ def hub():
             body += "</div>"
         body += f'<h2 class="ob-hsec">{e(HUB["soon"][lg])}<small>{e(HUB["soon_note"][lg])}</small></h2><div class="ob-hub">'
         body += "".join(f'<div class="ob-hc soon"><b>{e(x[lg])}</b></div>' for x in HUB["todo"]) + "</div>"
-        body += f'<h2 class="ob-hsec">{e(HUB["paid"][lg])}</h2><p class="ob-hnote">{e(HUB["paid_note"][lg])}</p><div class="ob-hub">'
-        body += "".join(f'<div class="ob-hc soon"><b>{e(x[lg])}</b></div>' for x in HUB["paid_items"]) + "</div>"
         out.append(f'  <section data-lang="{lg}" lang="{lg}" dir="{"ltr" if lg == "en" else "rtl"}"{hid}>{body}</section>')
     for sec, cards in HUB["secs"]:
         for path, new, tt, ds in cards:
