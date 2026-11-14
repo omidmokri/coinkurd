@@ -259,7 +259,7 @@ function fireFrom(S, o, dog, t) {
     const col = S.key === 'bull' ? 0x7dffd0 : 0xffb38a, n = dog ? 4 : 3;
     for (let k = 0; k < n; k++) K5.after(k * (dog ? 70 : 95), () => { FX.shoot({ x0: mx, y0: my, z0: mz, x1: x1 + rr(-.7, .7), z1: z1 + rr(-.7, .7), h: .5, dur: 170 + Math.hypot(x1 - mx, z1 - mz) * 5.5, sz: .62, col, kind: 'tracer', usd: 0, side: S.key }); FX.muzzle(mx, my, mz, dog ? .8 : 1.05); });
   }
-  AUDIO.play(dog ? 'dogfire' : 'rgun', { x: o.x, z: o.z, vol: dog ? .34 : .42 });
+  AUDIO.play(dog ? 'dogfire' : 'rgun', { x: o.x, z: o.z, vol: dog ? .18 : .24 });
 }
 RB.tick = function (dt) {
   if (!this.ready) return;
@@ -304,7 +304,7 @@ RB.tick = function (dt) {
     S.hm.count = S.bots.length; S.dm.count = S.dogs.length; S.hm.instanceMatrix.needsUpdate = S.dm.instanceMatrix.needsUpdate = true;
     S.hm.geometry.attributes.aRow.needsUpdate = S.dm.geometry.attributes.aRow.needsUpdate = true;
     if (S.sh) { S.sh.count = n; S.sh.instanceMatrix.needsUpdate = true; }
-    if (moving && Math.random() < dt * 2.2) { const o = Math.random() < .5 ? S.bots[(Math.random() * S.bots.length) | 0] : S.dogs[(Math.random() * S.dogs.length) | 0]; if (o.mv) AUDIO.play('servo', { x: o.x, z: o.z, vol: .16 }); }
+    if (moving && Math.random() < dt * .6) { const o = Math.random() < .5 ? S.bots[(Math.random() * S.bots.length) | 0] : S.dogs[(Math.random() * S.dogs.length) | 0]; if (o.mv) AUDIO.play('servo', { x: o.x, z: o.z, vol: .08 }); }
   }
 };
 

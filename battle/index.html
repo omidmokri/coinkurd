@@ -83,6 +83,29 @@ body{overflow-x:hidden}
  .replay{bottom:184px}.settings{top:160px}.intel{top:auto;bottom:188px;left:10px;right:10px;width:auto;max-height:42%}}
 @supports(height:100dvh){.bf{--bfh:calc(100dvh - var(--ekh,60px) - 1px)}}@media(max-width:1180px){.bf{--bfh:calc(100vh - var(--ekh,56px) - 65px - env(safe-area-inset-bottom));min-height:480px}}@supports(height:100dvh){@media(max-width:1180px){.bf{--bfh:calc(100dvh - var(--ekh,56px) - 65px - env(safe-area-inset-bottom))}}}@media(max-width:480px){.intro{top:50%}.liq{bottom:196px}}
 @media(prefers-reduced-motion:reduce){.rnd .bar i,.pbar i{transition:none}.intel.scan .prog{animation:none;transform:scaleX(1)}}
+/* the centre: the price, then the two numbers of the fight (10-minute liquidations, session score); the rest sits in the
+   "market pulse" panel on the left, which folds away to a single line */
+.top{min-width:0;width:min(400px,calc(100% - 20px));max-width:none;padding:8px 14px 10px}
+.top .kp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:8px;border-top:1px solid rgba(255,255,255,.09)}
+.top .k{padding:7px 6px 0}.top .k+.k{border-inline-start:1px solid rgba(255,255,255,.09)}
+.top .k small{text-transform:none;letter-spacing:0;font-size:.66rem;margin-bottom:3px}
+.top .kv{display:flex;justify-content:center;gap:16px;font-variant-numeric:tabular-nums}
+.top .kv span{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.top .kv i{font-style:normal;font-size:.6rem;color:var(--mute)}
+.top .kv b{font-size:1.08rem;font-weight:700;direction:ltr;unicode-bidi:isolate}
+.top .kv .g b{color:#4ade80}.top .kv .r b{color:#f87171}
+.status{top:226px}.aux{left:10px;top:264px;width:272px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:calc(100% - 264px - 196px)}
+.auxH{all:unset;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;color:var(--mute);font-size:.68rem}
+.auxH:hover,.auxH:focus-visible{color:#e8e6e0}.auxH:focus-visible{outline:2px solid var(--o);outline-offset:-2px;border-radius:14px}
+.auxH i{font-style:normal;font-size:.9rem;line-height:1}.auxH i::before{content:'−'}
+.aux.min .auxH i::before{content:'+'}.aux.min .auxBody{display:none}.aux.min{width:auto}
+.auxBody{padding:0 12px 9px;font-size:.72rem;overflow-y:auto;scrollbar-width:thin;min-height:0}
+.auxBody .rnd2{margin-top:0;grid-template-columns:1fr 1fr;row-gap:5px;direction:ltr}.auxBody .rnd2 .bear{text-align:left}.auxBody .rnd2 .bull{text-align:right}.auxBody .rnd2 small{text-transform:none;letter-spacing:0;font-size:.6rem;unicode-bidi:plaintext}.auxBody .rnd2 b{display:block;font-size:.8rem;font-variant-numeric:tabular-nums}.auxBody .rnd2 .bar{grid-column:1/-1}
+.auxBody .ax{margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+.auxBody .ax small{text-transform:none;letter-spacing:0}
+.auxBody .row2{display:flex;justify-content:space-between;gap:6px;margin:2px 0}
+@media(min-width:761px) and (max-width:1180px){.cams{top:184px}}@media(max-width:1000px){.status{top:226px}}
+@media(max-width:760px){.aux{display:none}.top{width:calc(100% - 20px);padding:5px 10px 6px}.top .kp{margin-top:4px}.top .k{padding:3px 4px 0;display:flex;align-items:baseline;justify-content:center;gap:7px}.top .k small{font-size:.58rem;margin:0}.top .kv{gap:8px}.top .kv i{display:none}.top .kv .g i:first-child:not([data-t]),.top .kv .r i:first-child:not([data-t]){display:inline;font-size:.7rem}.top .kv span{flex-direction:row;gap:2px;align-items:baseline}.top .kv b{font-size:.84rem}}
 .how{margin:28px auto}.how h2{font-size:1.15rem;margin:18px 0 6px}.how p,.how li{line-height:1.95;color:#dcdcd6}.how ul{padding-inline-start:20px}
 </style>
 <link rel="stylesheet" href="/assets/chrome.css?v=21"><meta name="referrer" content="strict-origin-when-cross-origin"></head>
@@ -93,12 +116,15 @@ body{overflow-x:hidden}
   <div id="flash"></div>
   <div class="hud">
     <div class="pan top" id="topPan"><small id="srcLbl">BINANCE SPOT · BTC/USDT</small><div class="px" id="px">—</div><div class="ch" id="ch"></div>
-      <div class="rnd"><div class="bear">🐻 <span class="lbl" data-t="bearWin"></span> <b id="lowP">—</b></div><div class="bar"><i id="rndI" style="left:50%"></i></div><div class="bull"><b id="highP">—</b> <span class="lbl" data-t="bullWin"></span> 🐂</div></div>
-      <div class="stats"><div><small data-t="press"></small><div class="row2"><span id="buyP" style="color:#4ade80">—</span><span id="sellP" style="color:#f87171">—</span></div><div class="pbar"><i id="pI" style="width:50%"></i></div><small><span data-t="intensity"></span> <b id="intI">—</b> · σ5m <b id="sig">—</b></small></div>
-        <div><small data-t="liq10"></small><div class="row2"><span style="color:#4ade80" id="lqS">—</span><span style="color:#f87171" id="lqL">—</span></div><div id="liqSrc"></div></div>
-        <div><small data-t="score"></small><div class="row2"><span style="color:#4ade80">🐂 <b id="scB">0</b></span><span style="color:#f87171">🐻 <b id="scR">0</b></span></div><small data-t="unitT"></small><div id="unLbl" style="font-size:.68rem">—</div></div></div></div>
+      <div class="kp"><div class="k"><small data-t="liq10"></small><div class="kv"><span class="g"><i data-t="liqSh"></i><b id="lqS">—</b></span><span class="r"><i data-t="liqLo"></i><b id="lqL">—</b></span></div></div>
+        <div class="k"><small data-t="score"></small><div class="kv"><span class="g"><i>🐂</i><b id="scB">0</b></span><span class="r"><i>🐻</i><b id="scR">0</b></span></div></div></div></div>
     <div class="pan liq l"><small data-t="bidLiq"></small><span id="bidL">—</span><div class="sub" id="bidN"></div></div>
     <div class="pan liq r"><small data-t="askLiq"></small><span id="askL">—</span><div class="sub" id="askN"></div></div>
+    <div class="pan aux" id="auxPan"><button type="button" class="auxH" id="auxB" aria-expanded="true" aria-controls="auxBody"><span data-t="auxT"></span><i aria-hidden="true"></i></button>
+      <div class="auxBody" id="auxBody"><div class="rnd rnd2"><div class="bear"><small>🐻 <span data-t="bearWin"></span></small><b id="lowP">—</b></div><div class="bull"><small>🐂 <span data-t="bullWin"></span></small><b id="highP">—</b></div><div class="bar"><i id="rndI" style="left:50%"></i></div></div>
+        <div class="ax"><small data-t="press"></small><div class="row2"><span id="buyP" style="color:#4ade80">—</span><span id="sellP" style="color:#f87171">—</span></div><div class="pbar"><i id="pI" style="width:50%"></i></div><small><span data-t="intensity"></span> <b id="intI">—</b> · σ5m <b id="sig">—</b></small></div>
+        <div class="ax"><small data-t="liqSrcT"></small><div id="liqSrc"></div></div>
+        <div class="ax"><small data-t="unitT"></small><div id="unLbl" style="font-size:.68rem">—</div></div></div></div>
     <div class="pan status" id="status"><span><i id="stP"></i><span data-t="stPrice"></span> <b id="stPl"></b></span><span><i id="stD"></i><span data-t="stDepth"></span> <b id="stDl"></b></span><span><i id="stL"></i><span data-t="stLiq"></span> <b id="stLl"></b></span></div>
     <div class="pan depth"><small data-t="depthT"></small><canvas id="depth" width="660" height="240"></canvas><div class="ax"><span id="axL"></span><span id="axM"></span><span id="axR"></span></div></div>
     <div class="pan feed"><h4><span data-t="feedT"></span><b id="feedLive">● LIVE</b></h4><div class="fchips" id="fchips"></div><div id="feed"></div></div>
@@ -130,9 +156,9 @@ body{overflow-x:hidden}
 <script src="/assets/vendor/three/three.min.js"></script>
 <script src="/assets/vendor/three/CopyShader.js"></script><script src="/assets/vendor/three/LuminosityHighPassShader.js"></script><script src="/assets/vendor/three/GammaCorrectionShader.js"></script><script src="/assets/vendor/three/FXAAShader.js"></script><script src="/assets/vendor/three/HorizontalTiltShiftShader.js"></script><script src="/assets/vendor/three/VerticalTiltShiftShader.js"></script><script src="/assets/vendor/three/EffectComposer.js"></script><script src="/assets/vendor/three/ShaderPass.js"></script><script src="/assets/vendor/three/RenderPass.js"></script><script src="/assets/vendor/three/UnrealBloomPass.js"></script>
 <script src="/assets/ui.js"></script>
-<script src="/battle/gfx3.js?v=7"></script><script src="/battle/gfx4.js?v=7"></script><script src="/battle/sfx.js?v=1"></script><script src="/battle/gfx5.js?v=8"></script><script src="/battle/gfx6.js?v=2"></script>
-<script src="/battle/i18n.js?v=7"></script>
+<script src="/battle/gfx3.js?v=7"></script><script src="/battle/gfx4.js?v=7"></script><script src="/battle/sfx.js?v=2"></script><script src="/battle/gfx5.js?v=8"></script><script src="/battle/gfx6.js?v=3"></script>
+<script src="/battle/i18n.js?v=8"></script>
 <script src="/battle/nav.js?v=4"></script>
-<script src="/battle/battle.js?v=15"></script>
+<script src="/battle/battle.js?v=16"></script>
 <script src="/assets/chrome.js?v=21" defer></script></body>
 </html>
