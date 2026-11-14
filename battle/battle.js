@@ -603,7 +603,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
   if(window.GFX6&&GFX6.RB.sides)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs))if(near(o))o.gyT=0}},
  remove(A,s){const last=A.sold.pop();if(last!==s){A.sold[s.i]=last;last.i=s.i}},
  tick(dt){this.gateTick();
-  if(this.rq&&this.rq.length){const t0=vt();for(let n=0,b0=performance.now();this.rq.length&&(n<1||performance.now()-b0<4);n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||(!s.mv&&Math.hypot(s.x-s.tx,s.z-s.tz)<.4))continue;if(!s.mv){s.mv=1;s.st=ST.RUN;s.sp=s.sp||10.5}this.route(A,s,[s.tx,s.tz],t0,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+  if(this.rq&&this.rq.length){const t0=vt();for(let n=0,b0=performance.now();this.rq.length&&(n<1||performance.now()-b0<4);n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||(!s.mv&&Math.hypot(s.x-s.tx,s.z-s.tz)<.4))continue;if(!s.mv){s.mv=1;s.st=ST.RUN;s.sp=s.sp||10.5}this.route(A,s,[s.tx,s.tz],t0,null   /* each man's own short search, a few per frame, instead of one whole-map sweep that froze slow machines for up to 1/4 s */)}}
   const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
   for(const k in this.sides){const A=this.sides[k],base=A.dir<0?0:Math.PI,cnt=[0,0,0,0];
    for(let i=A.sold.length-1;i>=0;i--){const s=A.sold[i];
