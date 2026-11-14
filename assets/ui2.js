@@ -201,6 +201,99 @@
     }, true);
   }
 
+
+  /* ================================================================== glass lens for every other group of choices (v3)
+     The header's lens (island) on the footer's links and inside the full-screen menu (owner, 2026-11-14): one glass piece per
+     group that slides to the choice under the pointer or the focus, narrows to a bead on the way and opens on arrival, and
+     rests on the current choice (the open category, the current page, the current language) or fades out where there is none.
+     Positions come from offsetLeft/Top (layout, not transforms), so entry animations and hover lifts do not shake it. */
+  function glass(box, o) {
+    if (!box || box._gl || !de.classList.contains('ek-v3')) return;
+    box._gl = 1; box.classList.add('ek-gl');
+    var ink = d.createElement(box.tagName === 'UL' ? 'li' : 'i'); ink.className = 'ek-ink'; ink.setAttribute('aria-hidden', 'true');
+    var R = o.r || 999, PX = o.px || 0, PY = o.py || 0, BD = o.bead || 44, cur = null, shown = false, raf = 0, at = null, over = null, hv = 0;
+    var seat = function () { if (ink.parentNode !== box) box.insertBefore(ink, box.firstChild); };
+    var off = function (el) {
+      var x = 0, y = 0;
+      while (el && el !== box) { x += el.offsetLeft; y += el.offsetTop; var p = el.offsetParent; if (p && p !== box) { x += p.clientLeft; y += p.clientTop; } el = p; }
+      return el === box ? [x, y] : null;
+    };
+    var geo = function (el) {
+      if (!el || !el.offsetParent) return null;
+      var p = off(el); if (!p) return null;
+      var x = p[0], y = p[1], wd = el.offsetWidth, ht = el.offsetHeight;
+      if (o.text) {   /* hug the words, not the full-width button they sit in */
+        var a = el.getBoundingClientRect(), lo = 1e9, hi = -1e9, tp = 1e9, bt = -1e9;
+        [].forEach.call(el.children, function (c) { var r = c.getBoundingClientRect(); if (!r.width) return; lo = Math.min(lo, r.left); hi = Math.max(hi, r.right); tp = Math.min(tp, r.top); bt = Math.max(bt, r.bottom); });
+        if (hi > lo) { x += lo - a.left; y += tp - a.top; wd = hi - lo; ht = bt - tp; }
+      }
+      return { x: x + wd / 2, y: y + ht / 2, w: wd + PX * 2, h: ht + PY * 2 };
+    };
+    var put = function (g) {
+      seat(); cur = g;
+      ink.style.width = g.w + 'px'; ink.style.height = g.h + 'px'; ink.style.borderRadius = Math.min(R, g.h / 2, g.w / 2) + 'px';
+      ink.style.transform = 'translate(' + (g.x - g.w / 2) + 'px,' + (g.y - g.h / 2) + 'px)';
+    };
+    var mark = function (el) { [].forEach.call(box.querySelectorAll('[data-gl]'), function (e) { if (e !== el) e.removeAttribute('data-gl'); }); if (el) el.setAttribute('data-gl', ''); };
+    var hide = function () { cancelAnimationFrame(raf); ink.style.opacity = 0; shown = false; at = null; mark(null); };
+    var io = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    var oc = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var ob = function (t) { var k = 1.7; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };
+    var move = function (el, instant) {
+      var g = geo(el); if (!g) return;
+      mark(el); at = el; cancelAnimationFrame(raf);
+      if (RM || (instant && shown)) { put(g); ink.style.opacity = 1; shown = true; return; }
+      if (!shown) { var b0 = Math.min(BD, g.w, g.h); put({ x: g.x, y: g.y, w: b0, h: b0 }); ink.style.opacity = 1; shown = true; }
+      var f = cur, dist = Math.sqrt((g.x - f.x) * (g.x - f.x) + (g.y - f.y) * (g.y - f.y));
+      if (dist < .5 && Math.abs(g.w - f.w) < .5 && Math.abs(g.h - f.h) < .5) return;
+      var bd = Math.min(BD, f.w, f.h, g.w, g.h), dur = Math.max(420, Math.min(740, 380 + dist * .55)), cut = dist < 1 ? .05 : .58, t0 = performance.now();
+      var step = function (now) {
+        var t = (now - t0) / dur;
+        if (t >= 1) { put(g); return; }
+        var q, wd, ht;
+        if (t < cut) { q = oc(t / cut); wd = f.w + (bd - f.w) * q; ht = f.h + (bd - f.h) * q; }
+        else { q = ob((t - cut) / (1 - cut)); wd = bd + (g.w - bd) * q; ht = bd + (g.h - bd) * q; }
+        var m = io(Math.min(1, t / cut));
+        put({ x: f.x + (g.x - f.x) * m, y: f.y + (g.y - f.y) * m, w: Math.max(8, wd), h: Math.max(8, ht) }); raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    var home = function () { var t = typeof o.on === 'function' ? o.on(box) : (o.on ? box.querySelector(o.on) : null); return t && t.offsetParent ? t : null; };
+    var rest = function (instant) { if (over) return; var t = home(); if (t) move(t, instant); else if (shown) hide(); };
+    var pick = function (e) { var t = e.target.closest && e.target.closest(o.sel); return t && box.contains(t) && t !== box ? t : null; };
+    box.addEventListener('pointerover', function (e) {
+      var t = pick(e); if (!t) return;
+      if (e.pointerType === 'touch') { move(t); return; }   /* a tap: the lens goes to it and stays (the tap navigates anyway) */
+      over = t; clearTimeout(hv); hv = setTimeout(function () { if (over === t) move(t); }, 40);
+    });
+    box.addEventListener('pointerleave', function (e) { if (e.pointerType === 'touch') return; over = null; clearTimeout(hv); rest(); });
+    box.addEventListener('focusin', function (e) { var t = pick(e); if (t) move(t); });
+    box.addEventListener('focusout', function () { setTimeout(function () { if (!box.contains(d.activeElement)) rest(); }, 0); });
+    var relay = function () { if (shown && at && at.offsetParent && box.contains(at)) move(at, true); else rest(true); };
+    if (w.ResizeObserver) new ResizeObserver(relay).observe(box);
+    /* the current choice changes from outside (a category opens, a language is picked, search results are written): follow it */
+    if (w.MutationObserver) new MutationObserver(function () { seat(); rest(); }).observe(box, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    seat(); rest(true);
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(relay);
+    box._glRelay = relay;
+  }
+  function footGlass() {
+    var F = d.getElementById('ekf'); if (!F) return;
+    var here = function (box) { var p = location.pathname; return [].filter.call(box.querySelectorAll('a[href]'), function (a) { return (a.getAttribute('href') || '').charAt(0) !== '#' && a.hostname === location.hostname && a.pathname === p; })[0] || null; };
+    glass(F.querySelector('.ekf-quick'), { sel: '.ekf-q', on: here });
+    [].forEach.call(F.querySelectorAll('.ekf-col ul'), function (u) { glass(u, { sel: 'a', on: here, px: 11, py: 4, bead: 26 }); });
+    glass(F.querySelector('.ekf-lg'), { sel: 'a', on: here, px: 9, py: 4, bead: 26 });
+    glass(F.querySelector('.ekf-soc'), { sel: '.ek-soc', px: 3, py: 3 });
+    glass(F.querySelector('.ekf-apps'), { sel: '.ek-badge', r: 15, px: 3, py: 3 });
+  }
+  function menuGlass() {
+    glass(M.querySelector('.ekm-cats'), { sel: '.ekm-cat', on: '.ekm-cat.on', text: 1, px: 20, py: 1, bead: 58 });
+    [].forEach.call(M.querySelectorAll('.ekm-pane>.ekm-pi'), function (p) { glass(p, { sel: '.ek-it,.ekm-sq', on: p.parentNode.id === 'ekm-res' ? 'a[href]' : '.ek-it.on', r: 17, px: 1, py: 1, bead: 52 }); });
+    glass(M.querySelector('.ekm-lang'), { sel: 'button', on: 'button.on', r: 11 });
+    glass(M.querySelector('.ekm-apps'), { sel: '.ek-badge', r: 15, px: 3, py: 3 });
+    glass(M.querySelector('.ekm-soc'), { sel: '.ek-soc', r: 16, px: 3, py: 3 });
+  }
+
   /* ================================================================== full-screen menu */
   var PH = { fa: 'نام ابزار، صفحه یا موضوع را بنویس…', ckb: 'ناوی ئامراز، پەڕە یان بابەت بنووسە…', en: 'Type a tool, page or topic…' };
   var index = [], cats = [], panes = {}, curK = null, hov = null;
@@ -289,6 +382,7 @@
     panes._r = M.querySelector('#ekm-res');
     M._clearQ = clearQ;
     layout();
+    menuGlass();
     if (DESK.addEventListener) DESK.addEventListener('change', layout); else if (DESK.addListener) DESK.addListener(layout);
     if (w.ekChrome && w.ekChrome.label) w.ekChrome.label(lang());
   }
@@ -521,6 +615,7 @@
     H = d.getElementById('ekh'); B = d.getElementById('ekb');
     if (!H) return;
     island(); syncLang();
+    try { footGlass(); } catch (e) { if (w.console) console.error(e); }
     try {
       new MutationObserver(function () { syncLang(); setTimeout(restInk, 80); }).observe(de, { attributes: true, attributeFilter: ['lang'] });
       var lgs = d.getElementById('langs'); if (lgs) new MutationObserver(function () { syncLang(); setTimeout(restInk, 80); }).observe(lgs, { attributes: true, subtree: true, attributeFilter: ['class'] });
