@@ -643,8 +643,7 @@ def run():
             for pth in ("/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/", "/charts/network/", "/charts/bitcoin-cycle/"):
                 check(f"hub links {pth}", pth in links and os.path.exists(os.path.join(ROOT, pth.strip('/'), "index.html")))
             soon = page.evaluate("() => [...document.querySelectorAll('section:not([hidden]) .ob-hc.soon')].length")
-            check("hub: three items in the works and four that free data cannot give, none of them a link", soon == 7 and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
-            check("hub: says plainly what is not possible", "SOPR" in page.inner_text("section:not([hidden])") and "رایگان" in page.inner_text("section:not([hidden]) .ob-hnote"))
+            check("hub: three items in the works, none of them a link, and no list of what free data cannot give (the owner had it removed)", soon == 3 and "SOPR" not in page.inner_text("main") and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
             check("hub: no sideways scroll", overflow(page) <= 1)
             shot(page, "hub-fa-1280")
             check("zero JS errors (hub)", not errors, errors[:3])

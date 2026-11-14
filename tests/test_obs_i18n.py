@@ -127,7 +127,7 @@ for view, folder, scripts in B.PAGES:
     if f'data-view="{view}"' not in doc or "ek:header" not in doc or "Content-Security-Policy" not in doc:
         FAIL.append(f"/{B.HUB_PATH}/{folder}/: page is not complete (view, header or CSP missing)")
 hub = B.HUB
-for part in ("h1", "p", "new", "soon", "soon_note", "paid", "paid_note"):
+for part in ("h1", "p", "new", "soon", "soon_note"):
     if sorted(hub[part]) != sorted(B.LANGS):
         FAIL.append(f"hub.{part}: languages {sorted(hub[part])}")
 for sec, cards in hub["secs"]:
@@ -138,7 +138,7 @@ for sec, cards in hub["secs"]:
             FAIL.append(f"hub card {path}: languages")
         if path.startswith(f"/{B.HUB_PATH}/") and not os.path.exists(os.path.join(ROOT, path.strip("/"), "index.html")):
             FAIL.append(f"hub card {path}: page does not exist")
-for x in hub["todo"] + hub["paid_items"]:
+for x in hub["todo"]:
     if sorted(x) != sorted(B.LANGS):
         FAIL.append(f"hub todo {x.get('en')}: languages")
 # the tabs of the app and the builder's pages are the same list
