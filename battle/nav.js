@@ -49,7 +49,7 @@ N.bake = function () { occS.fill(0); for (const sh of statics) paint(occS, sh); 
 /* dynamic things (field works, bunkers, standing and wrecked vehicles): replaced as a whole, then the field is rebuilt */
 N.setDynamic = function (list) { dyn = list; N.dirty = true; };
 N.dynamics = () => dyn;
-N.rebuild = function () { occ.set(occS); for (const sh of dyn) paint(occ, sh); edt(occ, dist); N.dirty = false; N.ver = (N.ver || 0) + 1; flows.clear(); };
+N.rebuild = function () { occ.set(occS); for (const sh of dyn) paint(occ, sh); edt(occ, dist); N.dirty = false; N.ver = (N.ver || 0) + 1; };
 const cell = (x, z) => { const i = Math.floor((x - X0) / CS), j = Math.floor((z - Z0) / CS); return i < 0 || j < 0 || i >= W || j >= H ? -1 : j * W + i; };
 N.cell = cell;
 /* clearance at a point: metres from the point to the nearest solid thing (cell-centre field less half a cell, so it errs on the safe side) */
@@ -170,13 +170,15 @@ N.path = function (x0, z0, x1, z1, r, opt) {
 /* ---- flow fields: cost to reach one goal from every cell, for many movers heading to the same place (troops falling back) */
 const flows = new Map();
 N.flow = function (key, gx, gz, r) {
-  let fl = flows.get(key); if (fl && fl.ver === N.ver) return fl;
+  /* a flow field costs a sweep of the whole map (tens of ms), and the map changes several times a minute: a field up to 8 s old is
+     handed out as it is (marked stale), and whoever routes with it checks the route against the current map */
+  let fl = flows.get(key); if (fl && (fl.ver === N.ver || performance.now() - fl.at < 8000)) return fl;
   const C = (fl && fl.C) || new Float32Array(SZ); C.fill(Infinity);
   const need = r + CS * .5, g0 = N.free(gx, gz, r, 10) || [gx, gz], g = cell(g0[0], g0[1]); if (g < 0) return null;
   stamp++; heap.n = 0; C[g] = 0; heap.push(0, g);
   while (heap.n) { const c = heap.pop(); if (shut[c] === stamp) continue; shut[c] = stamp; const ci = c % W, cj = (c / W) | 0;
     for (const [di, dj, l] of NB) { const ni = ci + di, nj = cj + dj; if (ni < 0 || nj < 0 || ni >= W || nj >= H) continue; const nc = nj * W + ni; if (shut[nc] === stamp || dist[nc] < need) continue; if (di && dj && (dist[cj * W + ni] < need || dist[nj * W + ci] < need)) continue; const ng = C[c] + l * CS * (1 + .9 * Math.max(0, 1.6 - (dist[nc] - r)) / 1.6); if (ng < C[nc]) { C[nc] = ng; heap.push(ng, nc); } } }
-  fl = { C, ver: N.ver, g: g0, r }; flows.set(key, fl); return fl;
+  fl = { C, ver: N.ver, g: g0, r, at: performance.now() }; flows.set(key, fl); return fl;
 };
 /* route down a flow field from (x, z) to its goal */
 N.flowPath = function (fl, x, z) {

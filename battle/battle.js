@@ -333,7 +333,11 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  taken(x,z,self){for(const k in this.sides){for(const s of this.sides[k].sold){if(s===self||s.st===ST.DIE||s.mv===2)continue;const px=s.mv?s.tx:s.x,pz=s.mv?s.tz:s.z;if((px-x)*(px-x)+(pz-z)*(pz-z)<.81)return true}
    for(const v of this.sides[k].veh){const B=this.VB[v.tier];if(NAV.inBox(x,z,v.x,v.z,v.hd,B[0],B[1],.7))return true;if(v.mv&&!v.home&&v.gx!=null&&NAV.inBox(x,z,v.gx,v.gz,v.ghd==null?v.hd:v.ghd,B[0],B[1],.7))return true}}return false},
  /* a run along a route: one ease in and out over the whole of it, turning at its corners */
- route(A,o,dest,t,flow){const P=(flow&&NAV.flowPath(flow,o.x,o.z))||(this.navOn?NAV.path(o.x,o.z,dest[0],dest[1],.45):null)||[[o.x,o.z],[dest[0],dest[1]]];this.setPath(o,P,t)},
+ route(A,o,dest,t,flow){let F=flow&&NAV.flowPath(flow,o.x,o.z);if(F&&flow.ver!==NAV.ver)for(let i=1;F&&i<F.length;i++)if(!NAV.lineClear(F[i-1][0],F[i-1][1],F[i][0],F[i][1],.28))F=null;   /* a stale field's route is used only if it is still clear */
+  let P=F||(this.navOn?NAV.path(o.x,o.z,dest[0],dest[1],.45):null);
+  /* no way through: never walk straight through the wall; aim for the nearest reachable spot near the goal, or hold where he is */
+  if(!P&&this.navOn){const q=NAV.free(dest[0],dest[1],.45,10,(x,z)=>!!NAV.path(o.x,o.z,x,z,.45));P=q?NAV.path(o.x,o.z,q[0],q[1],.45):null;if(P){o.tx=q[0];o.tz=q[1]}else P=[[o.x,o.z],[o.x+.01,o.z]]}
+  if(!P)P=[[o.x,o.z],[dest[0],dest[1]]];this.setPath(o,P,t)},
  setPath(o,P,t){const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const e=P[P.length-1];o.pl=P;o.plL=L;o.D=Math.max(L[L.length-1],.01);o.x0=o.x;o.z0=o.z;o.tx=e[0];o.tz=e[1];o.t0=Math.max(t,o.t0||0);o.dur=clamp(o.D/(o.sp||10),.25,16);
   o.cv=P.length===2&&o.D>=12&&(!this.navOn||NAV.lineClear(P[0][0],P[0][1],e[0],e[1],4.9))?rnd(4,-4):0;o.legs=null},
  along(o,e,out){const s=e*o.D,L=o.plL,P=o.pl;let i=1;while(i<L.length-1&&L[i]<s)i++;const a=P[i-1],b=P[i],l=L[i]-L[i-1]||1,f=clamp((s-L[i-1])/l,0,1);out[0]=a[0]+(b[0]-a[0])*f;out[1]=a[1]+(b[1]-a[1])*f;out[2]=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);return out},
@@ -588,9 +592,9 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
   const was=this.navKeys||new Set();this.navAdd=[];keys.forEach((k,i)=>{if(!was.has(k))this.navAdd.push(NAV.bounds(L[i]))});this.navKeys=new Set(keys);
   this.navSig=sig;this.navDirty=false;this.navT=t;NAV.setDynamic(L);NAV.rebuild();this.navCheck(t)},
  /* after the ground changed: soldiers standing in something step out of it; anyone whose way ahead was built on finds another */
- navCheck(t){for(const k in this.sides){const A=this.sides[k];for(const s of A.sold){if(s.st===ST.DIE||s.held)continue;
-    if(!s.mv){if(NAV.clear(s.x,s.z)<.3){const p=NAV.free(s.x,s.z,.5,6,(x,z)=>!this.taken(x,z,s));if(p){s.mv=1;s.st=ST.WALK;s.sp=4;s.t0=t;this.route(A,s,p,t)}}}
-    else if(s.pl){const P=s.pl,w=.28+Math.abs(s.cv||0);let ok=true;for(let i=1;i<P.length&&ok;i++)ok=NAV.lineClear(P[i-1][0],P[i-1][1],P[i][0],P[i][1],w);if(!ok)this.route(A,s,[s.tx,s.tz],t,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+ navCheck(t){for(const k in this.sides){const A=this.sides[k];for(const s of A.sold){if(s.st===ST.DIE)continue;   /* men still waiting at the gate are re-checked too: their route was drawn before the wall went up */
+    if(!s.mv&&!s.held){if(NAV.clear(s.x,s.z)<.3){const p=NAV.free(s.x,s.z,.5,6,(x,z)=>!this.taken(x,z,s));if(p){s.mv=1;s.st=ST.WALK;s.sp=4;s.t0=t;this.route(A,s,p,t)}}}
+    else if(s.pl){const P=s.pl,w=.28+Math.abs(s.cv||0);let ok=true;for(let i=1;i<P.length&&ok;i++)ok=NAV.lineClear(P[i-1][0],P[i-1][1],P[i][0],P[i][1],w);if(!ok&&!s.rq){s.rq=1;(this.rq||(this.rq=[])).push([A,s])}}}   /* re-routed a few per frame (ARMY.tick), so a new wall never freezes the page */
    for(const v of A.veh)if(v.mv&&v.ops&&v.ops.length&&!v.hold&&!v.dead&&!this.opsClear(v))this.planOr(v)}
   for(const tr of this.trucks)if(tr.on&&tr.mv&&tr.ops&&tr.ops.length&&!tr.hold&&!this.opsClear(tr))this.planOr(tr);
   if(window.GFX6&&GFX6.navCheck)GFX6.navCheck(t)},
@@ -598,7 +602,9 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  settle(x,z,r){const near=o=>Math.abs(o.x-x)<r&&Math.abs(o.z-z)<r;for(const k in this.sides){const A=this.sides[k];for(const s of A.sold)if(near(s))s.gyT=0;for(const v of A.veh)if(near(v))v.gyT=0}for(const tr of this.trucks)if(tr.on&&near(tr))tr.gyT=0;
   if(window.GFX6&&GFX6.RB.sides)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs))if(near(o))o.gyT=0}},
  remove(A,s){const last=A.sold.pop();if(last!==s){A.sold[s.i]=last;last.i=s.i}},
- tick(dt){this.gateTick();const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
+ tick(dt){this.gateTick();
+  if(this.rq&&this.rq.length){const t0=vt();for(let n=0;n<6&&this.rq.length;n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||!s.mv||!s.pl)continue;this.route(A,s,[s.tx,s.tz],t0,s.mv===2&&A.door?NAV.flow('door-'+A.team,A.door[0],A.door[1],.45):null)}}
+  const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
   for(const k in this.sides){const A=this.sides[k],base=A.dir<0?0:Math.PI,cnt=[0,0,0,0];
    for(let i=A.sold.length-1;i>=0;i--){const s=A.sold[i];
     if(s.mv){if(t<s.t0)continue;if(s.held)s.held=false;const f=clamp((t-s.t0)/1000/s.dur,0,1),e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2;
@@ -663,11 +669,14 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
    if(w.fort&&bi<this.bunkers.length){const rot=e>0?0:Math.PI;let bx=x-e*3,bz=-9;if(nav){const pt=NAV.free(bx,bz,2.4,14,(px,pz)=>!busy(px,pz,2.35,4.5,rot),true);if(!pt)continue;bx=pt[0];bz=pt[1]}const b=this.bunkers[bi++];b.visible=true;b.position.set(bx,this.gy(bx,bz),bz);b.rotation.y=rot;if(nav)W.push(NAV.box(bx,bz,2.35,4.5,rot,'bunker'))}}
   for(const k in this.sides){const A=this.sides[k],e=-A.dir;for(const sl of A.slots.values()){if(sl.alive.length<3||!(sl.rank>=1)||Math.abs(sl.x)>XMAX-3)continue;
     if(ne<70){const xx=sl.x+e*1.9,rot=e>0?0:Math.PI,pts=[-.9,-.45,0,.45,.9].map(a=>[xx+e*(Math.cos(a)*3.3-3.3)*1.25,sl.zc+e*Math.sin(a)*3.3*1.25]);
-     if(!nav||pts.every(p=>NAV.clear(p[0],p[1],true)>=.7&&Math.abs(p[1]-gateZ(p[0]))>5&&!atGate(p[0],p[1])&&!onHull(p[0],p[1],.6,.6,0)&&!onWorks(p[0],p[1],.7))){d.position.set(xx,this.gy(xx,sl.zc)-.05,sl.zc);d.rotation.set(0,rot,0);d.scale.setScalar(1.25);d.updateMatrix();this.empl.setMatrixAt(ne++,d.matrix);if(nav)for(const p of pts)W.push(NAV.circle(p[0],p[1],.62,'sandbag'))}}
+     if(!nav||pts.every(p=>NAV.clear(p[0],p[1],true)>=.7&&Math.abs(p[1]-gateZ(p[0]))>5&&!atGate(p[0],p[1])&&!onHull(p[0],p[1],.6,.6,0)&&!onWorks(p[0],p[1],.7)&&!onMen(p[0],p[1],.62,.62,0))){d.position.set(xx,this.gy(xx,sl.zc)-.05,sl.zc);d.rotation.set(0,rot,0);d.scale.setScalar(1.25);d.updateMatrix();this.empl.setMatrixAt(ne++,d.matrix);if(nav)for(const p of pts)W.push(NAV.circle(p[0],p[1],.62,'sandbag'))}}
     if(sl.rank>=2&&np<70){const xx=sl.x-e*3.6,zz=sl.zc-2.8;if(!nav||(NAV.clear(xx,zz,true)>=.3&&Math.abs(zz-gateZ(xx))>5&&!atGate(xx,zz)&&!onWorks(xx,zz,.3)&&!onHull(xx,zz,.2,.2,0))){d.position.set(xx,this.gy(xx,zz),zz);d.rotation.set(0,e>0?0:Math.PI,0);d.scale.setScalar(1.3);d.updateMatrix();this.penn.setMatrixAt(np,d.matrix);this.penn.setColorAt(np++,A.pcol);if(nav)W.push(NAV.circle(xx,zz,.16,'flag'))}}}}
   this.hesco.count=nh;this.empl.count=ne;this.penn.count=np;this.hesco.instanceMatrix.needsUpdate=this.empl.instanceMatrix.needsUpdate=this.penn.instanceMatrix.needsUpdate=true;if(this.penn.instanceColor)this.penn.instanceColor.needsUpdate=true;
   for(let i=bi;i<this.bunkers.length;i++)this.bunkers[i].visible=false;
-  this.works=W;if(nav)this.navSync(true)},   // the map changes the moment a wall goes up, so nobody walks on through it
+  /* runs every 220 ms: rebuild the walking map at once only when a wall really went up or came down (rebuilding it on every pass made
+     the whole page stutter, with the sound breaking up); otherwise the normal throttled refresh is enough */
+  let sig='';for(const w of W)sig+=(w.x*4|0)+','+(w.z*4|0)+';';const ch=sig!==this.workSig;this.workSig=sig;
+  this.works=W;if(nav)this.navSync(ch)},
  artillery(){const mat={bull:GFX.vehicleMaterial(GFX.TEAMS.bull,GFX.std,this.AU),bear:GFX.vehicleMaterial(GFX.TEAMS.bear,GFX.std,this.AU)};this.vmat=mat;
   const place=(g,x,z,dir,hx,hz)=>{g.scale.setScalar(SC.gun);g.position.set(x,this.gy(x,z),z);g.rotation.y=dir<0?0:Math.PI;g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=GFX.std}});scene.add(g);if(window.NAV)NAV.add(NAV.box(x,z,hx*SC.gun,hz*SC.gun,0,'gun'));return g};
   const G3=(m,x,z,d)=>place(GFX.spg(m),x,z,d,2.5,1.42),R3m=(m,x,z,d)=>place(GFX.mlrs(m),x,z,d,2.8,1.16);
@@ -1016,14 +1025,14 @@ const REPLAY={on:false,cur:0,speed:1,playing:true,idx:0,span:null,
   /* book snapshots inside the window */
   const sn=REC.snaps.find(s=>s.t>prev&&s.t<=this.cur);if(sn){const bw=sn.step/5;M.bids=new Map();M.asks=new Map();sn.b.forEach(([k,u])=>{const p=(k+.5)*bw;M.bids.set(p,u/p)});sn.a.forEach(([k,u])=>{const p=(k+.5)*bw;M.asks.set(p,u/p)});computeBook(M);bookView(M)}}};
 /* ======================= main loop ======================= */
-let lastF=0,fpsN=0,fpsT=0,fpsDone=false;
+let lastF=0,fpsN=0,fpsT=0,fpsDone=false,fpsLow=0;   /* fpsLow: slow 5-second windows in a row; one hitch alone never lowers a chosen quality */
 function loop(ts){requestAnimationFrame(loop);if(!R3||document.hidden)return;const raw=Math.min(2,(ts-lastF)/1000||0),dtr=Math.min(.1,raw);lastF=ts;/* raw: real seconds, so frame-rate checks see a slide show as it is */DIRECTOR.slowTick(dtr);const dt=dtr*S.timeScale;U.t+=dt;if(U.anim)U.anim.value=U.t;
  if(L.sw&&Date.now()-L.sw.at>180)sweepEnd(L);REPLAY.tick(dtr);WORLD.tick(dt,U.t);if(VIEW.round&&PREF.layers.units&&VIEW.bk.b.length+VIEW.bk.a.length)ARMY.update(VIEW);ARMY.tick(dt);ARMY.tickGuns(dt);FX.tick(dt);if(window.GFX6)GFX6.tick(dt,U.t);
  const fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0;WORLD.front.position.x+=(fx-WORLD.front.position.x)*Math.min(1,dt*6);WORLD.frontLbl.position.x=WORLD.front.position.x;
  const c=DIRECTOR.tick(dt,dtr);if(WORLD.postOn)WORLD.post.render(c,dtr);else ren.render(scene,c);
  fpsN++;fpsT+=raw;if(fpsT>5){const fps=fpsN/fpsT;S.fps=fps;fpsN=0;fpsT=0;/* rescue: a picture slower than 12 frames a second is a slide show, whatever quality was chosen (an "ultra" saved on a machine without a
      graphics driver gave one frame a second): step down a tier and hand the choice back to auto */
-   if(fps<12&&PREF.quality!=='auto'&&S.quality!=='lite'){const dn={ultra:'high',high:'low',low:'lite'}[S.quality]||'lite';PREF.quality='auto';savePref();fpsDone=false;const qs=$('#qSel');if(qs)qs.value='auto';WORLD.setQuality(dn);HUD.toast('⚙ '+(T('qOpts')[dn]||dn))}
+   fpsLow=fps<12?fpsLow+1:0;if(fpsLow>=3&&PREF.quality!=='auto'&&S.quality!=='lite'){fpsLow=0;const dn={ultra:'high',high:'low',low:'lite'}[S.quality]||'lite';PREF.quality='auto';savePref();fpsDone=false;const qs=$('#qSel');if(qs)qs.value='auto';WORLD.setQuality(dn);HUD.toast('⚙ '+(T('qOpts')[dn]||dn))}
    else if(PREF.quality==='auto'&&!fpsDone){if(fps<12&&S.quality==='ultra'){WORLD.setQuality('high')}else if(fps<42&&S.quality==='high'){WORLD.setQuality('low');HUD.toast('⚙ '+T('qOpts').low)}else if(fps<26&&S.quality==='low'){WORLD.setQuality('lite');HUD.toast('⚙ '+T('qOpts').lite)}else if(!(fps<26&&S.quality==='high'))fpsDone=true}if(WORLD.soft&&PREF.quality==='auto')WORLD.govern(fps)}}
 /* ======================= audio: synthesized, spatial, dynamic ======================= */
 const mtof=m=>440*Math.pow(2,(m-69)/12);
