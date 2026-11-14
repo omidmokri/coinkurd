@@ -23,7 +23,8 @@ SITE = "https://entekhab.net"
 BINANCE = ["https://data-api.binance.vision", "https://api.binance.com"]
 
 TTL = {"posts_lite": 900, "translations": 900, "dna": 900, "kind": 1800, "indicators": 3600, "live": 300, "mm": 600, "mm_flow": 600, "etf": 1800,
-       "wrapped": 3600, "macro": 1800, "flows": 900}
+       "wrapped": 3600, "macro": 1800, "flows": 900,
+       "obs/premium": 900, "obs/stables_now": 1800}        # the Observatory's hourly premium file and the stablecoin summary (bot_obs.summary)
 _cache = {}
 
 

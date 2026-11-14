@@ -84,6 +84,9 @@ FAMILIES = {
     "note_": ["mvrv", "flows", "network", "cycle"],
     "ov_": ["strike", "expiry", "dvol"],
     "or_": ["1m", "3m", "1y", "all"],
+    # stage 4 (flow.js, prem.js): the views of the basis page and the measures of the stablecoin page
+    "bv_": ["cb", "perp", "curve"],
+    "sm_": ["supply", "ssr", "chg", "mix"],
 }
 for q, f in sorted(used):
     if q not in EN:

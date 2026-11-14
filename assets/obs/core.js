@@ -1,12 +1,13 @@
 /* entekhab.net — the Observatory (/charts/…): derivatives and on-chain charts. Shared core.
    One namespace (window.OB), four languages (assets/obs/i18n.js), no framework.
-   Modules: i18n.js · core.js · src.js (exchange data) · liqmodel.js (the liquidation model) · liq.js (heatmap + map view) */
+   Modules: i18n.js · core.js · src.js (exchange data) · liqmodel.js (the liquidation model) · liq.js (heatmap + map view) ·
+   ts.js (time-series chart) · deriv.js · optmath.js + opt.js · chainmath.js + chain.js · flowmath.js + flow.js + prem.js */
 (function () {
   'use strict';
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '6';
+  OB.V = '7';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -156,6 +157,10 @@
     bank: '<path d="m3 9 9-5 9 5"/><path d="M5 9v9M9.7 9v9M14.3 9v9M19 9v9"/><path d="M3 20h18"/>',
     pulse: '<path d="M3 12h4l2.5-6 5 12 2.5-6h4"/>',
     cycle: '<path d="M20 12a8 8 0 0 1-13.7 5.7"/><path d="M4 12a8 8 0 0 1 13.7-5.7"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+    updown: '<path d="M3 12h18"/><path d="M7 12V7M12 12V4M17 12V9"/><path d="M7 12v3M12 12v8M17 12v4"/>',
+    delta: '<path d="M12 5 4.5 19h15Z"/>',
+    spread: '<path d="M3 18h18"/><path d="M3 18c6 0 7-4 9-7s4-5 9-5"/>',
+    coins: '<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/><path d="M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
     grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>'
   };
   OB.icon = function (n, cls) {
@@ -240,12 +245,16 @@
   OB.PAGES = [
     { k: 'liqheat', path: '/charts/liquidation-heatmap/', ic: 'flame' },
     { k: 'liqmap', path: '/charts/liquidation-map/', ic: 'bars' },
+    { k: 'liqhist', path: '/charts/liquidations/', ic: 'updown' },
     { k: 'oi', path: '/charts/open-interest/', ic: 'layers' },
     { k: 'funding', path: '/charts/funding-rate/', ic: 'percent' },
     { k: 'ls', path: '/charts/long-short/', ic: 'scale' },
+    { k: 'cvd', path: '/charts/cvd/', ic: 'delta' },
+    { k: 'basis', path: '/charts/basis/', ic: 'spread' },
     { k: 'options', path: '/charts/options/', ic: 'opt' },
     { k: 'mvrv', path: '/charts/mvrv/', ic: 'chain' },
     { k: 'flows', path: '/charts/exchange-flows/', ic: 'bank' },
+    { k: 'stables', path: '/charts/stablecoins/', ic: 'coins' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
     { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
   ];
