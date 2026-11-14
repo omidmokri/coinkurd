@@ -281,7 +281,7 @@ def run():
             wait_op(page)
             t = tiles(page)
             tot = X["c"] + X["p"]
-            check("four tiles", len(t) == 4, t)
+            check("five tiles (the fifth: the 30-day skew)", len(t) == 5, t)
             check("tile 1: total open interest in dollars = coins × index", near(num(t[0]["v"]), tot * 70000, 0.006), (t[0], tot * 70000))
             check("tile 1: coins, calls and puts", all(near(a, b, 0.006) for a, b in zip([num(x) for x in t[0]["s"].split("·")], [tot, X["c"], X["p"]])), t[0]["s"])
             check("tile 2: put/call by open interest; by volume it is twice that (mock: put volume = OI/5, call volume = OI/10)",
@@ -554,7 +554,7 @@ def run():
                         wait(page)
                         name = path.strip("/").split("/")[-1]
                         check(f"{lang} {w}px {name}: no sideways scroll", overflow(page) <= 1, overflow(page))
-                        check(f"{lang} {w}px {name}: fourteen tabs, this one marked", page.locator(".ob-tab").count() == 14 and page.locator(".ob-tab.on").count() == 1)
+                        check(f"{lang} {w}px {name}: fifteen tabs, this one marked", page.locator(".ob-tab").count() == 15 and page.locator(".ob-tab.on").count() == 1)
                         vis = page.evaluate("() => [...document.querySelectorAll('#ob-main h1 [data-lang]')].filter(e => !e.hidden).map(e => e.getAttribute('data-lang'))")
                         check(f"{lang} {w}px {name}: the heading is in {lang}", vis == [lang], vis)
                         txt = page.inner_text("#ob-view")
@@ -614,7 +614,7 @@ def run():
             DOWN.discard("deribit")
             page.click("#ob-retry")
             wait_op(page)
-            check("try again loads the book", page.locator("#ob-tiles .ob-tile").count() == 4)
+            check("try again loads the book", page.locator("#ob-tiles .ob-tile").count() == 5)
             # DVOL alone fails: the book stays, the tile says nothing instead of a stale or made-up number
             DOWN.add("dvol")
             page.reload()
@@ -643,7 +643,7 @@ def run():
             for pth in ("/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/", "/charts/network/", "/charts/bitcoin-cycle/"):
                 check(f"hub links {pth}", pth in links and os.path.exists(os.path.join(ROOT, pth.strip('/'), "index.html")))
             soon = page.evaluate("() => [...document.querySelectorAll('section:not([hidden]) .ob-hc.soon')].length")
-            check("hub: three items in the works, none of them a link, and no list of what free data cannot give (the owner had it removed)", soon == 3 and "SOPR" not in page.inner_text("main") and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
+            check("hub: nothing left in the works, and no list of what free data cannot give (the owner had it removed)", soon == 0 and "SOPR" not in page.inner_text("main") and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
             check("hub: no sideways scroll", overflow(page) <= 1)
             shot(page, "hub-fa-1280")
             check("zero JS errors (hub)", not errors, errors[:3])

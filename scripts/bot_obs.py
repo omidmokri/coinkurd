@@ -26,6 +26,7 @@ SITE = "https://entekhab.net"
 HEAT = "/charts/liquidation-heatmap/"
 MAP = "/charts/liquidation-map/"
 LIQ = "/charts/liquidations/"
+HL = "/charts/hyperliquid/"
 OI = "/charts/open-interest/"
 FUND = "/charts/funding-rate/"
 LS = "/charts/long-short/"
@@ -47,7 +48,8 @@ TXT = {
         "fa": ("نمودارهای مشتقات و آنچین به سبک سایت‌های تخصصی، از دادهٔ عمومی و با روشِ نوشته‌شده:\n"
                "• 🔥 نقشهٔ حرارتی لیکوییدیشن: برآورد اینکه پوزیشن‌های اهرمی در چه قیمت‌هایی لیکویید می‌شوند — هر ارز، ۱۲ ساعت تا ۱ سال، سه مدل، اهرم ۵ تا ۱۰۰\n"
                "• 📊 نقشهٔ لیکوییدیشن: سطوح همین حالا به تفکیک اهرم، و جمع تجمعی از قیمت\n"
-               "• 💥 لیکوییدیشن‌های واقعی: دلار لانگ‌ها و شورت‌هایی که واقعاً لیکویید شدند، ساعت به ساعت و روز به روز تا ۱۱ ماه (Gate)، با سفارش‌های ۲۴ ساعت اخیر OKX\n"
+               "• 💥 لیکوییدیشن‌های واقعی: دلار لانگ‌ها و شورت‌هایی که واقعاً لیکویید شدند، ساعت به ساعت و روز به روز از ۲۰۲۳ (Gate)، با سفارش‌های ۲۴ ساعت اخیر OKX\n"
+               "• 🎯 لیکوییدیشن واقعی Hyperliquid: قیمت لیکوییدیشن پوزیشن‌های باز واقعی، از خود حساب‌ها نه از مدل\n"
                "• 📈 اوپن اینترست: جمع و سهم شش صرافی و تاریخچه تا ۱ سال\n"
                "• 💸 نرخ فاندینگ: پنج صرافی کنار هم بر پایهٔ ۸ ساعت، جدول ۴۰ ارز و تاریخچه\n"
                "• ⚖️ لانگ/شورت: سهم حساب‌های لانگ، معامله‌گران برتر و خالص حجم تهاجمی\n"
@@ -63,7 +65,8 @@ TXT = {
         "ckb": ("چارتەکانی دەرهاتەکان و ئانچین بە شێوازی ماڵپەڕە پسپۆڕەکان، لە داتای گشتییەوە و بە ڕێگای نووسراو:\n"
                 "• 🔥 نەخشەی گەرمیی لیکویدکردن: خەمڵاندنی ئەوەی پۆزیشنە لیڤەرێجدارەکان لە چ نرخێکدا لیکوید دەکرێن — هەر دراوێک، ١٢ کاتژمێر تا ١ ساڵ، سێ مۆدێل، لیڤەرێجی ٥ تا ١٠٠\n"
                 "• 📊 نەخشەی لیکویدکردن: ئاستەکانی ئێستا بەپێی لیڤەرێج، و کۆی کۆکراوە لە نرخەوە\n"
-                "• 💥 لیکویدە ڕاستەقینەکان: دۆلاری ئەو لۆنگ و شۆرتانەی بە ڕاستی لیکوید کراون، کاتژمێر بە کاتژمێر و ڕۆژ بە ڕۆژ تا ١١ مانگ (Gate)، لەگەڵ داواکارییەکانی ٢٤ کاتژمێری ڕابردووی OKX\n"
+                "• 💥 لیکویدە ڕاستەقینەکان: دۆلاری ئەو لۆنگ و شۆرتانەی بە ڕاستی لیکوید کراون، کاتژمێر بە کاتژمێر و ڕۆژ بە ڕۆژ لە ٢٠٢٣ـەوە (Gate)، لەگەڵ داواکارییەکانی ٢٤ کاتژمێری ڕابردووی OKX\n"
+                "• 🎯 لیکویدی ڕاستەقینەی Hyperliquid: نرخی لیکویدکردنی پۆزیشنە کراوە ڕاستەقینەکان، لە خودی هەژمارەکانەوە نەک مۆدێل\n"
                 "• 📈 ئۆپن ئینتەرێست: کۆ و بەشی شەش ئاڵوگۆڕگە و مێژوو تا ١ ساڵ\n"
                 "• 💸 نرخی فەندینگ: پێنج ئاڵوگۆڕگە لە تەنیشت یەک لەسەر بنەمای ٨ کاتژمێر، خشتەی ٤٠ دراو و مێژوو\n"
                 "• ⚖️ لۆنگ/شۆرت: بەشی هەژمارە لۆنگەکان، بازرگانە سەرەکییەکان و سافیی قەبارەی هێرشبەرانە\n"
@@ -79,7 +82,8 @@ TXT = {
         "kmr": ("Grafîkên derivatîvan û on-chain bi şêwaza malperên pispor, ji daneyên giştî û bi rêbaza nivîsandî:\n"
                 "• 🔥 Nexşeya germiyê ya tasfiyeyê: texmîna ku pozîsyonên bi leverage di kîjan bihayan de tên tasfiyekirin — her coin, 12 saet heta 1 sal, sê model, leverage 5 heta 100\n"
                 "• 📊 Nexşeya tasfiyeyê: astên niha li gorî leverage, û koma li ser hev ji bihayê\n"
-                "• 💥 Tasfiyeyên rastîn: dolarên long û shortên ku bi rastî hatine tasfiyekirin, saet bi saet û roj bi roj heta 11 mehan (Gate), bi fermanên 24 saetên dawî yên OKX\n"
+                "• 💥 Tasfiyeyên rastîn: dolarên long û shortên ku bi rastî hatine tasfiyekirin, saet bi saet û roj bi roj ji 2023an ve (Gate), bi fermanên 24 saetên dawî yên OKX\n"
+                "• 🎯 Tasfiyeya rastîn a Hyperliquid: bihayên tasfiyeyê yên pozîsyonên vekirî yên rastîn, ji hesaban bi xwe, ne ji modelê\n"
                 "• 📈 Open interest: kom û para şeş borsayan û dîrok heta 1 salê\n"
                 "• 💸 Rêjeya fundingê: pênc borsa li kêleka hev li ser bingeha 8 saetan, tabloya 40 coinan û dîrok\n"
                 "• ⚖️ Long/short: para hesabên long, bazirganên sereke û qebareya netî ya takeran\n"
@@ -95,7 +99,8 @@ TXT = {
         "ar": ("رسوم المشتقات والبيانات على السلسلة على طريقة المواقع المتخصصة، من بيانات عامة وبمنهج مكتوب:\n"
                "• 🔥 الخريطة الحرارية للتصفيات: تقدير الأسعار التي تُصفّى عندها المراكز ذات الرافعة — أي عملة، من ١٢ ساعة إلى سنة، ثلاثة نماذج، رافعة من ٥ إلى ١٠٠\n"
                "• 📊 خريطة التصفيات: المستويات الحالية حسب الرافعة، والمجموع التراكمي من السعر\n"
-               "• 💥 التصفيات الفعلية: دولارات مراكز الشراء والبيع التي صُفّيت فعلًا، ساعةً بساعة ويومًا بيوم حتى ١١ شهرًا (Gate)، مع أوامر آخر ٢٤ ساعة في OKX\n"
+               "• 💥 التصفيات الفعلية: دولارات مراكز الشراء والبيع التي صُفّيت فعلًا، ساعةً بساعة ويومًا بيوم منذ ٢٠٢٣ (Gate)، مع أوامر آخر ٢٤ ساعة في OKX\n"
+               "• 🎯 تصفيات Hyperliquid الفعلية: أسعار تصفية المراكز المفتوحة الحقيقية، من الحسابات نفسها لا من نموذج\n"
                "• 📈 العقود المفتوحة: مجموع ست منصات وحصصها وتاريخ حتى سنة\n"
                "• 💸 معدلات التمويل: خمس منصات جنبًا إلى جنب على أساس ٨ ساعات، جدول ٤٠ عملة وتاريخ\n"
                "• ⚖️ الشراء/البيع: حصة الحسابات المشترية، كبار المتداولين وصافي الحجم العدواني\n"
@@ -111,7 +116,8 @@ TXT = {
         "en": ("Derivatives and on-chain charts in the manner of the specialist sites, from public data and with the method written down:\n"
                "• 🔥 Liquidation heatmap: an estimate of the prices at which leveraged positions get liquidated — any coin, 12 hours to a year, three models, leverage 5x to 100x\n"
                "• 📊 Liquidation map: the levels standing now by leverage, and the running total from the price\n"
-               "• 💥 Real liquidations: the dollars of longs and shorts that were really liquidated, hour by hour and day by day up to 11 months (Gate), with OKX's orders of the last 24 hours\n"
+               "• 💥 Real liquidations: the dollars of longs and shorts that were really liquidated, hour by hour and day by day since 2023 (Gate), with OKX's orders of the last 24 hours\n"
+               "• 🎯 Hyperliquid liquidation levels: the liquidation prices of real open positions, from the accounts themselves, not a model\n"
                "• 📈 Open interest: the total and shares of six exchanges, with history up to a year\n"
                "• 💸 Funding rates: five exchanges side by side on an 8-hour basis, a table of 40 coins, and history\n"
                "• ⚖️ Long/short: the share of accounts long, top traders and net taker volume\n"
@@ -132,6 +138,7 @@ TXT = {
                "ar": "🔥 الخريطة الحرارية للتصفيات", "en": "🔥 Liquidation heatmap"},
     "b_map": {"fa": "📊 نقشهٔ لیکوییدیشن", "ckb": "📊 نەخشەی لیکویدکردن", "kmr": "📊 Nexşeya tasfiyeyê", "ar": "📊 خريطة التصفيات",
               "en": "📊 Liquidation map"},
+    "b_hl": {"fa": "🎯 لیکوییدیشن واقعی Hyperliquid", "ckb": "🎯 لیکویدی ڕاستەقینەی Hyperliquid", "kmr": "🎯 Tasfiyeya rastîn a Hyperliquid", "ar": "🎯 تصفيات Hyperliquid الفعلية", "en": "🎯 Hyperliquid liquidation levels"},
     "b_liq": {"fa": "💥 لیکوییدیشن‌های واقعی", "ckb": "💥 لیکویدە ڕاستەقینەکان", "kmr": "💥 Tasfiyeyên rastîn", "ar": "💥 التصفيات الفعلية", "en": "💥 Real liquidations"},
     "b_oi": {"fa": "📈 اوپن اینترست", "ckb": "📈 ئۆپن ئینتەرێست", "kmr": "📈 Open interest", "ar": "📈 العقود المفتوحة", "en": "📈 Open interest"},
     "b_fund": {"fa": "💸 نرخ فاندینگ", "ckb": "💸 نرخی فەندینگ", "kmr": "💸 Rêjeya fundingê", "ar": "💸 معدلات التمويل", "en": "💸 Funding rates"},
@@ -268,14 +275,14 @@ def section(lang, load=None):
     return "\n\n".join(parts)
 
 
-PAGES = (HEAT, MAP, LIQ, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, HUB)          # the Web App buttons, in the order of the site's tabs
+PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, HUB)          # the Web App buttons, in the order of the site's tabs
 
 
 def open_rows(lang):
     """the pages inside Telegram (Web App), and the hub in the browser; put above the standard navigation"""
     def w(k, path):
         return {"text": L("b_" + k, lang), "web_app": {"url": SITE + path}}
-    return [[w("heat", HEAT)], [w("map", MAP), w("liq", LIQ)], [w("oi", OI), w("fund", FUND)], [w("ls", LS), w("cvd", CVD)], [w("basis", BASIS), w("opt", OPT)],
+    return [[w("heat", HEAT), w("map", MAP)], [w("liq", LIQ), w("hl", HL)], [w("oi", OI), w("fund", FUND)], [w("ls", LS), w("cvd", CVD)], [w("basis", BASIS), w("opt", OPT)],
             [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
 
 

@@ -192,5 +192,28 @@ const hrs = n => F.gateRows(Array.from({ length: n }, (_, h) => G(T0 + h * H, h 
   ok('meanLast: the mean of what is there, when enough is there', F.meanLast([1, 2, null, 4], 3, 3, 2) === 3 && F.meanLast([1, 2, null, 4], 3, 3, 3) === null && F.meanLast([2, 4], 1, 2) === 3 && F.meanLast([2, 4], 1, 5, 2) === 3);
   ok('dayMs', F.dayMs('2026-11-14') === Date.UTC(2026, 10, 14));
 }
+{
+  /* stage 5: Gate's daily rows, the archive, and Hyperliquid's positions */
+  const NOW5 = Date.UTC(2026, 10, 14, 9), D = 864e5, d0 = Date.UTC(2026, 10, 10);
+  const rows = [0, 1, 2, 3, 4].map(i => ({ t: d0 + i * D, ll: 10 * (i + 1), sl: 5, buy: i === 1 ? 0 : 3, sell: i === 1 ? 0 : 3, px: 100 + i, oi: 7 }));
+  const ref = [0, 1, 2, 3, 4].map(i => ({ t: d0 + i * D, buy: i === 2 ? 0 : 1, sell: i === 2 ? 0 : 1 }));
+  const db = F.dayBars(rows, ref, NOW5);
+  ok('dayBars: closed days only (the 14th is running)', db.length === 4 && db[3].t === d0 + 3 * D, db.length);
+  ok('dayBars: a day with no taker volume on its own row or on BTC\'s is missed, and the day before it is cut short', db[0].bad && db[1].bad && db[2].bad && !db[3].bad && db[1].ll === 20 && db[0].src === '1d', db.map(x => x.bad));
+  const ar = F.archBars({ t0: '2026-11-01', n: 4, ll: [1, 2, null, 4], sl: [1, 1, 1, 1], q: [2, 0, 1, 1] });
+  ok('archBars: thousands → dollars, q 0 pale, a gap left out', ar.length === 3 && ar[0].ll === 1000 && ar[1].bad && !ar[2].bad && ar[2].t === Date.UTC(2026, 10, 4) && ar[0].src === 'arch');
+  const bk = [{ t: d0 + 2 * D, ll: 1, sl: 1, src: '4h' }];
+  const all = F.older(bk, [db, ar]);
+  ok('older: bars before the first, the first list wins a day, in time order', all.map(x => x.src).join(',') === 'arch,arch,arch,1d,1d,4h' && all[3].t === d0 && all[all.length - 1] === bk[0], all.map(x => x.src + new Date(x.t).getUTCDate()));
+  ok('older: a day held by both lists comes from the first', F.older([], [[{ t: 5, src: 'a' }], [{ t: 5, src: 'b' }, { t: 3, src: 'b' }]]).map(x => x.src).join('') === 'ba');
+  const pos = [[95, 100, 1], [99.9, 50, 1], [90, 10, 1], [105, 70, -1], [100.5, 30, -1], [130, 999, -1], [70, 999, 1], [96, 0, 1]];
+  const bins = F.hlBins(pos, 100, 0.1, 20);
+  ok('hlBins: 20 bins of 1 between 90 and 110', bins.length === 20 && near(bins[0].lo, 90) && near(bins[19].hi, 110) && near(bins[10].mid, 100.5));
+  ok('hlBins: each position in its bin, outside ones left out', bins[5].long === 100 && bins[9].long === 50 && bins[0].long === 10 && bins[15].short === 70 && bins[10].short === 30 &&
+    bins.reduce((a, b) => a + b.long + b.short, 0) === 260 && bins[5].nl === 1);
+  const nr = F.hlNear(pos, 100, 5);
+  ok('hlNear: a 5 % move liquidates longs from 95 up to the price and shorts up to 105', nr.long === 150 && nr.short === 100 && nr.nl === 3 && nr.ns === 2, nr);
+}
+
 console.log('flow arithmetic: ' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

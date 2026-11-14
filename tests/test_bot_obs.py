@@ -75,7 +75,7 @@ def msgs_since(n):
 
 
 SITE = "https://entekhab.net"
-PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/liquidations/", "/charts/open-interest/", "/charts/funding-rate/",
+PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/liquidations/", "/charts/hyperliquid/", "/charts/open-interest/", "/charts/funding-rate/",
                             "/charts/long-short/", "/charts/cvd/", "/charts/basis/", "/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/",
                             "/charts/stablecoins/", "/charts/network/", "/charts/bitcoin-cycle/", "/charts/")]
 NOW = {"btc": {"date": "2026-11-12", "mvrv": 1.324104, "nupl": 0.24478, "rprice": 53832.9, "sex": 2723131, "net7": -12345.6, "mayer": 0.8123, "puell": 0.912, "dd": -43.21}}
@@ -102,7 +102,7 @@ for i, lang in enumerate(LANGS):
     check("Binance" in tx and "Bybit" in tx and OBS.L("nfa", lang) in tx, "names its sources and says it is an estimate")
     n_open = OBS.N_ROWS - 1
     webapps = [b["web_app"]["url"] for r in rows[:n_open] for b in r if "web_app" in b]
-    check(webapps == PAGES and len(PAGES) == 15, "the fourteen charts and the hub open inside Telegram (Web App buttons), in the order of the site's tabs")
+    check(webapps == PAGES and len(PAGES) == 16, "the fifteen charts and the hub open inside Telegram (Web App buttons), in the order of the site's tabs")
     check(len(rows) > n_open and rows[n_open] == [{"text": OBS.L("b_web", lang), "url": PAGES[-1]}], "then the hub in the browser")
     check(all(len(r) <= 2 and all(len(b["text"]) <= 40 for b in r) for r in rows[:OBS.N_ROWS]), "at most two buttons a row, short labels")
     check(all(x in tx for x in ("OKX", "Bitget", "Hyperliquid", "Gate", "Deribit", "Coin Metrics")), "names the other exchanges and the on-chain source it reads")

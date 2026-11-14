@@ -34,6 +34,7 @@ FEATURES = [
     ("/charts/liquidation-heatmap/", ["obs", "deriv"], None),
     ("/charts/liquidation-map/", ["obs", "deriv"], None),
     ("/charts/liquidations/", ["obs", "deriv"], None),
+    ("/charts/hyperliquid/", ["obs", "deriv"], None),
     ("/charts/open-interest/", ["obs", "deriv"], None),
     ("/charts/funding-rate/", ["obs", "deriv"], None),
     ("/charts/long-short/", ["obs", "deriv"], None),

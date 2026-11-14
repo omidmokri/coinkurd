@@ -15,7 +15,7 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "8"            # asset version (bump with any change to assets/obs/*)
+V = "9"            # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -29,6 +29,7 @@ PAGES = [
     ("liqheat", "liquidation-heatmap", ["src.js", "liqmodel.js", "liq.js"]),
     ("liqmap", "liquidation-map", ["src.js", "liqmodel.js", "liq.js"]),
     ("liqhist", "liquidations", ["src.js", "flowmath.js", "ts.js", "flow.js"]),
+    ("hl", "hyperliquid", ["flowmath.js", "ts.js", "optmath.js", "opt.js", "hl.js"]),
     ("oi", "open-interest", ["src.js", "ts.js", "deriv.js"]),
     ("funding", "funding-rate", ["src.js", "ts.js", "deriv.js"]),
     ("ls", "long-short", ["src.js", "ts.js", "deriv.js"]),
@@ -975,6 +976,114 @@ T.update({
 })
 
 
+# ---------------------------------------------------------------- stage 5: the Hyperliquid page, and what the other pages gained
+T.update({
+    "hl": {
+        "title": "نقشه لیکوییدیشن واقعی Hyperliquid | entekhab.net",
+        "desc": "قیمت لیکوییدیشن پوزیشن‌های واقعی Hyperliquid برای بیت‌کوین، اتریوم و ارزهای بزرگ: چند دلار با ۵٪ یا ۱۰٪ حرکت لیکویید می‌شود. داده، نه مدل. رایگان.",
+        "og": "لیکوییدیشن واقعی Hyperliquid",
+        "ld": "Entekhab Hyperliquid liquidation levels",
+        "kw": ["hyperliquid liquidation map", "نقشه لیکوییدیشن هایپرلیکوئید", "hyperliquid", "هایپرلیکوئید", "liquidation levels", "سطوح لیکوییدیشن",
+               "لیکویدکردن", "التصفيات", "coinglass", "hyperdash"],
+        "h1": {"fa": "نقشهٔ لیکوییدیشن واقعی Hyperliquid", "ckb": "نەخشەی لیکویدکردنی ڕاستەقینەی Hyperliquid", "ar": "خريطة التصفيات الفعلية في Hyperliquid", "en": "Hyperliquid: real liquidation levels"},
+        "p": {"fa": "پوزیشن‌های باز واقعی Hyperliquid در چه قیمتی لیکویید می‌شوند — از خود حساب‌ها، نه از مدل",
+              "ckb": "پۆزیشنە کراوە ڕاستەقینەکانی Hyperliquid لە چ نرخێکدا لیکوید دەبن — لە خودی هەژمارەکانەوە، نەک لە مۆدێلەوە",
+              "ar": "عند أي سعر تُصفّى المراكز المفتوحة الحقيقية في Hyperliquid — من الحسابات نفسها، لا من نموذج",
+              "en": "At what prices the real open positions on Hyperliquid would be liquidated — from the accounts themselves, not from a model"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                       "<b>ستون‌ها:</b> دلار پوزیشن‌هایی که در هر بازهٔ قیمت لیکویید می‌شوند — لانگ‌ها قرمز (زیر قیمت)، شورت‌ها سبز (بالای قیمت).",
+                       "<b>کاشی‌ها:</b> چند دلار لانگ با ۵٪ (و ۱۰٪) ریزش و چند دلار شورت با ۵٪ (و ۱۰٪) رشد لیکویید می‌شود، چه سهمی از اوپن اینترست خوانده شده و چند حساب.",
+                       "<b>جدول:</b> بزرگ‌ترین پوزیشن‌های خوانده‌شده با قیمت ورود، قیمت لیکوییدیشن، فاصله و اهرم — بی‌نشانی حساب."]),
+                   ("چطور بخوانیم", [
+                       "ستون بلند نزدیک قیمت یعنی حرکتی کوچک می‌تواند لیکوییدیشن زنجیره‌ای راه بیندازد؛ این جای قیمت را پیش‌بینی نمی‌کند.",
+                       "نقشه‌های لیکوییدیشن دیگر (همین سایت و سایت‌های دیگر) مدل‌اند؛ این یکی پوزیشن واقعی است، ولی فقط از Hyperliquid و فقط از حساب‌های خوانده‌شده."]),
+                   ("روش و محدودیت‌ها", [
+                       "Hyperliquid پوزیشن‌های هر حساب را با قیمت لیکوییدیشنش منتشر می‌کند ولی فهرست همهٔ پوزیشن‌ها را نه؛ سایت تقریباً هر ساعت هر تعداد حساب را که در چند دقیقه جا شود می‌خواند — به نوبت بزرگ‌ترین‌ها و پرمعامله‌ترین‌ها از فهرست خود Hyperliquid.",
+                       "پس ستون‌ها بخشی از بازارند؛ کاشی «خوانده‌شده» می‌گوید این حساب‌ها چه سهمی از لانگ‌ها و شورت‌های باز Hyperliquid را دارند. چیزی برای حساب‌های خوانده‌نشده اضافه نمی‌شود.",
+                       "قیمت لیکوییدیشن پوزیشن کراس با سود و زیان پوزیشن‌های دیگر همان حساب جابه‌جا می‌شود؛ پوزیشن بدون قیمت لیکوییدیشن (مارجین کافی) روی نمودار نیست و شمرده می‌شود. توصیهٔ مالی نیست."]),
+                   ("منابع", ["API عمومی Hyperliquid (وضعیت هر حساب، بازار و فهرست حساب‌ها)، با CI سایت خوانده می‌شود؛ چیزی از شما جایی فرستاده نمی‌شود."])],
+            "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
+                        "<b>ستوونەکان:</b> دۆلاری ئەو پۆزیشنانەی لە هەر ماوەیەکی نرخدا لیکوید دەبن — لۆنگەکان سوور (خوار نرخ)، شۆرتەکان سەوز (سەرووی نرخ).",
+                        "<b>خانەکان:</b> چەند دۆلار لۆنگ بە ٥٪ (و ١٠٪) دابەزین و چەند دۆلار شۆرت بە ٥٪ (و ١٠٪) بەرزبوونەوە لیکوید دەبێت، چ بەشێکی ئۆپن ئینتەرێست خوێنراوە و چەند هەژمار.",
+                        "<b>خشتە:</b> گەورەترین پۆزیشنە خوێنراوەکان بە نرخی چوونەژوورەوە، نرخی لیکویدکردن، دووری و لیڤەرێج — بێ ناونیشانی هەژمار."]),
+                    ("چۆن بیخوێنینەوە", [
+                        "ستوونێکی بەرز نزیک نرخ واتە جووڵەیەکی بچووک دەتوانێت لیکویدکردنی زنجیرەیی دەست پێ بکات؛ ئەمە شوێنی نرخ پێشبینی ناکات.",
+                        "نەخشەکانی تری لیکویدکردن (ئەم ماڵپەڕە و ماڵپەڕەکانی تر) مۆدێلن؛ ئەمە پۆزیشنی ڕاستەقینەیە، بەڵام تەنها لە Hyperliquid و تەنها لە هەژمارە خوێنراوەکان."]),
+                    ("ڕێگا و سنوورەکان", [
+                        "Hyperliquid پۆزیشنەکانی هەر هەژمارێک لەگەڵ نرخی لیکویدکردنیان بڵاو دەکاتەوە بەڵام لیستی هەموو پۆزیشنەکان نا؛ ماڵپەڕەکە نزیکەی هەموو کاتژمێرێک هەر ئەوەندە هەژمار دەخوێنێتەوە کە لە چەند خولەکێکدا جێ دەبێتەوە — بە نۆرە گەورەترین و چالاکترینەکان لە لیستی خودی Hyperliquid.",
+                        "بۆیە ستوونەکان بەشێکی بازاڕن؛ خانەی «خوێنراوە» دەڵێت ئەم هەژمارانە چ بەشێکی لۆنگ و شۆرتە کراوەکانی Hyperliquidیان هەیە. هیچ شتێک بۆ هەژمارە نەخوێنراوەکان زیاد ناکرێت.",
+                        "نرخی لیکویدکردنی پۆزیشنی کرۆس لەگەڵ قازانج و زیانی پۆزیشنەکانی تری هەمان هەژمار دەجووڵێت؛ پۆزیشنی بێ نرخی لیکویدکردن (مارجینی بەس) لەسەر چارت نییە و دەژمێردرێت. ئامۆژگاریی دارایی نییە."]),
+                    ("سەرچاوەکان", ["APIی گشتیی Hyperliquid (دۆخی هەر هەژمارێک، بازاڕ و لیستی هەژمارەکان)، بە CIی ماڵپەڕەکە دەخوێنرێتەوە."])],
+            "ar": [("ماذا تعرض هذه الصفحة", [
+                       "<b>الأعمدة:</b> دولارات المراكز التي تُصفّى في كل نطاق سعري — الشراء بالأحمر (تحت السعر) والبيع بالأخضر (فوقه).",
+                       "<b>الخانات:</b> كم دولارًا من مراكز الشراء يُصفّى بهبوط ٥٪ (و١٠٪) وكم من البيع بارتفاع ٥٪ (و١٠٪)، وأي حصة من العقود المفتوحة قُرئت، وكم حسابًا.",
+                       "<b>الجدول:</b> أكبر المراكز المقروءة مع سعر الدخول وسعر التصفية والمسافة والرافعة — دون عنوان الحساب."]),
+                   ("كيف تقرأها", [
+                       "عمود مرتفع قرب السعر يعني أن حركة صغيرة قد تطلق تصفيات متتالية؛ وهذا لا يتنبأ بمكان السعر.",
+                       "خرائط التصفية الأخرى (في هذا الموقع وغيره) نماذج؛ أما هذه فمراكز حقيقية، لكن من Hyperliquid وحدها ومن الحسابات المقروءة وحدها."]),
+                   ("المنهج والحدود", [
+                       "تنشر Hyperliquid مراكز كل حساب مع سعر تصفيتها لكنها لا تنشر قائمة بكل المراكز؛ يقرأ الموقع نحو مرة في الساعة ما يتسع له بضع دقائق من الحسابات — الأكبر والأنشط بالتناوب من قائمة Hyperliquid نفسها.",
+                       "فالأعمدة جزء من السوق؛ وخانة «المقروء» تقول أي حصة من مراكز الشراء والبيع المفتوحة في Hyperliquid تملكها هذه الحسابات. لا يُضاف شيء عن الحسابات غير المقروءة.",
+                       "يتحرك سعر تصفية المركز ذي الهامش المتقاطع مع أرباح وخسائر مراكز الحساب الأخرى؛ والمركز بلا سعر تصفية (هامش كافٍ) ليس على الرسم ويُعدّ. ليست نصيحة مالية."]),
+                   ("المصادر", ["واجهة Hyperliquid العامة (حالة كل حساب والسوق وقائمة الحسابات)، يقرؤها CI الموقع."])],
+            "en": [("What this page shows", [
+                       "<b>Bars:</b> the dollars of positions that would be liquidated in each price band — longs in red (below the price), shorts in green (above it).",
+                       "<b>Tiles:</b> how many dollars of longs a 5% (and 10%) fall would liquidate, how many of shorts a 5% (and 10%) rise, what share of the open interest was read, and how many accounts.",
+                       "<b>The table:</b> the largest positions read, with entry, liquidation price, distance and leverage — no account addresses."]),
+                   ("How to read it", [
+                       "A tall bar near the price means a small move could set off a chain of liquidations; it does not forecast where the price goes.",
+                       "Other liquidation maps (this site’s and other sites’) are models; this one is real positions, but from Hyperliquid alone and from the accounts read alone."]),
+                   ("Method and limits", [
+                       "Hyperliquid publishes each account’s positions with their liquidation prices but no list of all positions; about once an hour the site reads as many accounts as fit in a few minutes — the largest and the most active in turn, from Hyperliquid’s own list.",
+                       "So the bars are part of the market; the “Read” tile says what share of Hyperliquid’s open longs and shorts these accounts hold. Nothing is added for the accounts not read.",
+                       "A cross-margin position’s liquidation price moves with the profit and loss of the account’s other positions; a position with no liquidation price (enough margin) is not on the chart and is counted. Not financial advice."]),
+                   ("Sources", ["Hyperliquid’s public API (each account’s state, the market, the list of accounts), read by the site’s CI."])],
+        },
+    },
+})
+
+# what the existing pages gained in stage 5: bullets added to their "what this page shows" (0) and "method" (2) sections
+STAGE5_ABOUT = {
+    "options": {
+        "fa": {0: ["<b>لبخند و ساختار زمانی:</b> نوسان ضمنی هر استرایک یک سررسید، و IV در پول، کال و پوت ۲۵ دلتا در همهٔ سررسیدها، با ریسک ریورسال و باترفلای؛ کاشی پنجم چولگی ۳۰ روزه است."],
+               2: ["دلتا از فرمول بلک با IV علامت‌گذاری‌شدهٔ خود هر آپشن و فیوچرز همان سررسید است؛ IV در دلتای ۲۵ روی خط میان دو استرایک دو طرف خوانده می‌شود و مقدار ۳۰ روزه روی خط میان دو سررسید دو طرف ۳۰ روز."]},
+        "ckb": {0: ["<b>زەردەخەنە و پێکهاتەی کات:</b> هەڵاوسانی ناوەکیی هەر ستراکێکی یەک بەسەرچوون، و IVی ناو پارە، کۆڵ و پوتی ٢٥ دێڵتا لە هەموو بەسەرچوونەکاندا، لەگەڵ ڕیسک ڕیڤێرساڵ و پەپوولە؛ خانەی پێنجەم لاریی ٣٠ ڕۆژەیە."],
+                2: ["دێڵتا لە فۆرمولی بلاکە بە IVی نیشانەکراوی هەر ئۆپشنێک و فیوچەرزی هەمان بەسەرچوون؛ IV لە دێڵتای ٢٥ لەسەر هێڵی نێوان دوو ستراکی دوو لا دەخوێنرێتەوە و بەهای ٣٠ ڕۆژە لەسەر هێڵی نێوان دوو بەسەرچوونی دوو لای ٣٠ ڕۆژ."]},
+        "ar": {0: ["<b>الابتسامة والهيكل الزمني:</b> التقلب الضمني لكل سعر تنفيذ في استحقاق واحد، وIV عند السعر وشراء وبيع ٢٥ دلتا في كل الاستحقاقات مع انعكاس المخاطرة والفراشة؛ والخانة الخامسة انحراف ٣٠ يومًا."],
+               2: ["الدلتا من صيغة بلاك بـIV العلامة لكل خيار والعقد الآجل لاستحقاقه؛ وتُقرأ IV عند دلتا ٢٥ على الخط بين السعرين المحيطين، وقيمة ٣٠ يومًا على الخط بين الاستحقاقين المحيطين."]},
+        "en": {0: ["<b>Smile and term structure:</b> the implied volatility of every strike of one expiry, and the at-the-money, 25-delta call and put IV of every expiry with the risk reversal and butterfly; the fifth tile is the 30-day skew."],
+               2: ["Delta is Black’s, from each option’s own mark IV and the future of its expiry; the 25-delta IV is read on the line between the two strikes around it, the 30-day value on the line between the two expiries around 30 days."]},
+    },
+    "ls": {
+        "fa": {0: ["<b>شمار واقعی حساب‌ها در Gate:</b> Gate تعداد حساب‌های لانگ و شورت را منتشر می‌کند؛ سهم لانگ‌ها، و همین برای تریدرهای برترش (به تعداد و به حجم)، تا ۱ سال."]},
+        "ckb": {0: ["<b>ژمارەی ڕاستەقینەی هەژمارەکان لە Gate:</b> Gate ژمارەی هەژمارە لۆنگ و شۆرتەکان بڵاو دەکاتەوە؛ بەشی لۆنگەکان، و هەمان شت بۆ باشترین بازرگانەکانی (بە ژمارە و بە قەبارە)، تا ١ ساڵ."]},
+        "ar": {0: ["<b>عدد الحسابات الحقيقي في Gate:</b> تنشر Gate عدد الحسابات الشارية والبائعة؛ حصة الشراء، وكذلك لكبار متداوليها (بالعدد وبالحجم)، حتى سنة."]},
+        "en": {0: ["<b>Gate’s real account counts:</b> Gate publishes how many accounts are long and short; the share long, and the same for its top traders (by number and by size), up to a year."]},
+    },
+    "basis": {
+        "fa": {0: ["<b>تاریخچهٔ منحنی:</b> بیسیس سالانهٔ فیوچرزهای Deribit با سررسید ثابت ۳۰، ۹۰ و ۱۸۰ روز، روز به روز از ۲۰۱۹، با جایگاه امروز در تاریخ."],
+               2: ["تاریخچهٔ منحنی: هر روز، بسته‌شدن روزانهٔ هر فیوچرز ماهانه و فصلی Deribit با بسته‌شدن روزانهٔ Coinbase مقایسه می‌شود؛ مقدار ۳۰، ۹۰ و ۱۸۰ روزه روی خط میان دو فیوچرز دو طرف است."]},
+        "ckb": {0: ["<b>مێژووی چەماوە:</b> بەیسیسی ساڵانەی فیوچەرزەکانی Deribit بە بەسەرچوونی جێگیری ٣٠، ٩٠ و ١٨٠ ڕۆژ، ڕۆژ بە ڕۆژ لە ٢٠١٩ـەوە، لەگەڵ شوێنی ئەمڕۆ لە مێژوودا."],
+                2: ["مێژووی چەماوە: هەموو ڕۆژێک داخستنی ڕۆژانەی هەر فیوچەرزێکی مانگانە و وەرزیی Deribit لەگەڵ داخستنی ڕۆژانەی Coinbase بەراورد دەکرێت؛ بەهای ٣٠، ٩٠ و ١٨٠ ڕۆژە لەسەر هێڵی نێوان دوو فیوچەرزی دوو لایە."]},
+        "ar": {0: ["<b>تاريخ المنحنى:</b> الأساس السنوي لعقود Deribit الآجلة باستحقاق ثابت ٣٠ و٩٠ و١٨٠ يومًا، يومًا بيوم منذ ٢٠١٩، مع موضع اليوم في التاريخ."],
+               2: ["تاريخ المنحنى: يُقارن كل يوم الإغلاق اليومي لكل عقد آجل شهري وفصلي في Deribit بإغلاق Coinbase اليومي؛ وقيم ٣٠ و٩٠ و١٨٠ يومًا على الخط بين العقدين على الجانبين."]},
+        "en": {0: ["<b>Curve history:</b> the yearly basis of Deribit’s futures at a constant 30, 90 and 180 days, day by day since 2019, with where today stands in that history."],
+               2: ["Curve history: each day, the daily close of every monthly and quarterly Deribit future is set against Coinbase’s daily close; the 30-, 90- and 180-day values lie on the line between the two futures on either side."]},
+    },
+    "liqhist": {
+        "fa": {0: ["<b>از ۲۰۲۳:</b> بازهٔ «از ۲۰۲۳» روزهای قدیمی‌تر را از ارقام روزانهٔ Gate (از ۱۱ اکتبر ۲۰۲۳) می‌آورد؛ سایت هر روز بسته‌شده را در آرشیو خودش نگه می‌دارد تا تاریخچه کوتاه نشود."]},
+        "ckb": {0: ["<b>لە ٢٠٢٣ـەوە:</b> ماوەی «لە ٢٠٢٣ـەوە» ڕۆژە کۆنترەکان لە ژمارە ڕۆژانەکانی Gate (لە ١١ی ئۆکتۆبەری ٢٠٢٣ـەوە) دەهێنێت؛ ماڵپەڕەکە هەموو ڕۆژێکی داخراو لە ئەرشیفی خۆیدا هەڵدەگرێت تا مێژوو کورت نەبێتەوە."]},
+        "ar": {0: ["<b>منذ ٢٠٢٣:</b> يأتي مدى «منذ ٢٠٢٣» بالأيام الأقدم من صفوف Gate اليومية (منذ ١١ أكتوبر ٢٠٢٣)؛ ويحفظ الموقع كل يوم مغلق في أرشيفه كي لا يقصر التاريخ."]},
+        "en": {0: ["<b>Since 2023:</b> the “Since 2023” range brings older days from Gate’s daily figures (from 11 October 2023); the site keeps every closed day in its own archive so the history does not shrink."]},
+    },
+}
+for _k, _langs in STAGE5_ABOUT.items():
+    for _lg, _secs in _langs.items():
+        for _i, _items in _secs.items():
+            T[_k]["about"][_lg][_i][1].extend(_items)
+
+
 HUB = {
     "title": "رصدخانه بازار: نمودار مشتقات و آنچین کریپتو | entekhab.net",
     "desc": "رصدخانهٔ بازار انتخاب: لیکوییدیشن، اوپن اینترست، فاندینگ، CVD، پریمیوم Coinbase، آپشن‌ها، MVRV، استیبل‌کوین‌ها و چرخهٔ بیت‌کوین؛ رایگان و به چهار زبان.",
@@ -1001,8 +1110,12 @@ HUB = {
               "ar": "المستويات الحالية حسب الرافعة والمجموع التراكمي من السعر", "en": "Present levels by leverage and the running total from the price"}),
             ("/charts/liquidations/", True,
              {"fa": "لیکوییدیشن‌های واقعی، روز به روز", "ckb": "لیکویدە ڕاستەقینەکان، ڕۆژ بە ڕۆژ", "ar": "التصفيات الفعلية يومًا بيوم", "en": "Real liquidations, day by day"},
-             {"fa": "دلار لانگ‌ها و شورت‌های لیکوییدشده در هر ساعت و روز، از Gate و OKX", "ckb": "دۆلاری لۆنگ و شۆرتە لیکویدکراوەکان لە هەر کاتژمێر و ڕۆژێکدا، لە Gate و OKX",
-              "ar": "دولارات مراكز الشراء والبيع المُصفّاة كل ساعة ويوم، من Gate وOKX", "en": "Dollars of longs and shorts liquidated every hour and day, from Gate and OKX"}),
+             {"fa": "دلار لانگ‌ها و شورت‌های لیکوییدشده در هر ساعت و روز از ۲۰۲۳، از Gate و OKX", "ckb": "دۆلاری لۆنگ و شۆرتە لیکویدکراوەکان لە هەر کاتژمێر و ڕۆژێکدا لە ٢٠٢٣ـەوە، لە Gate و OKX",
+              "ar": "دولارات مراكز الشراء والبيع المُصفّاة كل ساعة ويوم منذ ٢٠٢٣، من Gate وOKX", "en": "Dollars of longs and shorts liquidated every hour and day since 2023, from Gate and OKX"}),
+            ("/charts/hyperliquid/", True,
+             {"fa": "لیکوییدیشن واقعی Hyperliquid", "ckb": "لیکویدی ڕاستەقینەی Hyperliquid", "ar": "تصفيات Hyperliquid الفعلية", "en": "Hyperliquid: real liquidation levels"},
+             {"fa": "قیمت لیکوییدیشن پوزیشن‌های باز واقعی، از خود حساب‌ها نه از مدل", "ckb": "نرخی لیکویدکردنی پۆزیشنە کراوە ڕاستەقینەکان، لە خودی هەژمارەکانەوە نەک مۆدێل",
+              "ar": "أسعار تصفية المراكز المفتوحة الحقيقية، من الحسابات نفسها لا من نموذج", "en": "Liquidation prices of real open positions, from the accounts themselves, not a model"}),
             ("/liquidity/", False,
              {"fa": "لیکوییدیشن‌های زنده و دفتر سفارش", "ckb": "لیکویدە زیندووەکان و دەفتەری داواکاری", "ar": "التصفيات المباشرة ودفتر الأوامر", "en": "Live liquidations & order book"},
              {"fa": "لیکوییدیشن‌های همان لحظه، نقشهٔ حرارتی دفتر سفارش و عمق بازار", "ckb": "لیکویدەکان لە هەمان ساتدا، نەخشەی گەرمیی دەفتەری داواکاری و قووڵایی",
@@ -1019,20 +1132,20 @@ HUB = {
               "ar": "خمس منصات جنبًا إلى جنب على أساس ٨ ساعات، جدول ٤٠ عملة وتاريخ", "en": "Five exchanges side by side on an 8-hour basis, a table of 40 coins, and history"}),
             ("/charts/long-short/", True,
              {"fa": "نسبت لانگ به شورت", "ckb": "ڕێژەی لۆنگ بۆ شۆرت", "ar": "نسبة الشراء إلى البيع", "en": "Long/short ratio"},
-             {"fa": "سهم حساب‌های لانگ، معامله‌گران برتر و خالص حجم تهاجمی", "ckb": "بەشی هەژمارە لۆنگەکان، بازرگانە سەرەکییەکان و سافیی قەبارەی هێرشبەرانە",
-              "ar": "حصة الحسابات المشترية، كبار المتداولين وصافي الحجم العدواني", "en": "Share of accounts long, top traders and net taker volume"}),
+             {"fa": "سهم حساب‌های لانگ با شمار واقعی حساب‌ها در Gate، معامله‌گران برتر و خالص حجم تهاجمی", "ckb": "بەشی هەژمارە لۆنگەکان بە ژمارەی ڕاستەقینەی هەژمارەکان لە Gate، بازرگانە سەرەکییەکان و سافیی قەبارەی هێرشبەرانە",
+              "ar": "حصة الحسابات المشترية بعدد الحسابات الحقيقي في Gate، كبار المتداولين وصافي الحجم العدواني", "en": "Share of accounts long, with Gate’s real account counts, top traders and net taker volume"}),
             ("/charts/cvd/", True,
              {"fa": "CVD اسپات و فیوچرز", "ckb": "CVDی سپۆت و فیوچەرز", "ar": "CVD للفوري والآجل", "en": "CVD, spot and futures"},
              {"fa": "خالص تجمعی خرید و فروش تهاجمی، اسپات در برابر فیوچرز، ۲۴ ساعت تا ۱ سال", "ckb": "سافیی کۆکراوەی کڕین و فرۆشتنی هێرشبەرانە، سپۆت بەرامبەر فیوچەرز، ٢٤ کاتژمێر تا ١ ساڵ",
               "ar": "صافي الشراء والبيع العدواني التراكمي، الفوري مقابل الآجل، من ٢٤ ساعة إلى سنة", "en": "Cumulative net taker buying, spot against futures, 24 hours to a year"}),
             ("/charts/basis/", True,
              {"fa": "پریمیوم Coinbase و بیسیس فیوچرز", "ckb": "پریمیۆمی Coinbase و بەیسیسی فیوچەرز", "ar": "علاوة Coinbase وأساس العقود الآجلة", "en": "Coinbase premium and futures basis"},
-             {"fa": "پریمیوم Coinbase با تعدیل تتر از ۲۰۱۷، پریمیوم قرارداد دائمی و منحنی سررسیدها", "ckb": "پریمیۆمی Coinbase بە ڕێکخستنی تەتەر لە ٢٠١٧ـەوە، پریمیۆمی گرێبەستی هەمیشەیی و چەماوەی بەسەرچوونەکان",
-              "ar": "علاوة Coinbase بعد تعديل التيثر منذ ٢٠١٧، علاوة العقد الدائم ومنحنى الاستحقاقات", "en": "The Coinbase premium, Tether-adjusted, since 2017; the perpetual’s premium and the curve of expiries"}),
+             {"fa": "پریمیوم Coinbase از ۲۰۱۷، پریمیوم قرارداد دائمی، منحنی سررسیدها و تاریخچهٔ بیسیس از ۲۰۱۹", "ckb": "پریمیۆمی Coinbase لە ٢٠١٧ـەوە، پریمیۆمی گرێبەستی هەمیشەیی، چەماوەی بەسەرچوونەکان و مێژووی بەیسیس لە ٢٠١٩ـەوە",
+              "ar": "علاوة Coinbase منذ ٢٠١٧، علاوة العقد الدائم، منحنى الاستحقاقات وتاريخ الأساس منذ ٢٠١٩", "en": "The Coinbase premium since 2017, the perpetual’s premium, the curve of expiries and its history since 2019"}),
             ("/charts/options/", True,
              {"fa": "آپشن‌های بیت‌کوین و اتریوم", "ckb": "ئۆپشنەکانی بیتکۆین و ئیسیریۆم", "ar": "خيارات البيتكوين والإيثر", "en": "Bitcoin and Ether options"},
-             {"fa": "اوپن اینترست به تفکیک قیمت اعمال و سررسید، مکس پین، نسبت فروش به خرید و DVOL", "ckb": "ئۆپن ئینتەرێست بەپێی نرخی جێبەجێکردن و بەسەرچوون، ماکس پەین، ڕێژەی پوت بۆ کۆڵ و DVOL",
-              "ar": "العقود المفتوحة حسب سعر التنفيذ والاستحقاق، أقصى ألم، نسبة البيع إلى الشراء وDVOL", "en": "Open interest by strike and expiry, max pain, put/call ratio and DVOL"}),
+             {"fa": "اوپن اینترست به تفکیک استرایک و سررسید، مکس پین، لبخند و چولگی نوسان، ساختار زمانی و DVOL", "ckb": "ئۆپن ئینتەرێست بەپێی ستراک و بەسەرچوون، ماکس پەین، زەردەخەنە و لاریی هەڵاوسان، پێکهاتەی کات و DVOL",
+              "ar": "العقود المفتوحة حسب سعر التنفيذ والاستحقاق، أقصى ألم، ابتسامة التقلب وانحرافه، الهيكل الزمني وDVOL", "en": "Open interest by strike and expiry, max pain, the volatility smile and skew, term structure and DVOL"}),
             ("/derivatives/", False,
              {"fa": "داشبورد مشتقات", "ckb": "داشبۆردی دەرهاتەکان", "ar": "لوحة المشتقات", "en": "Derivatives dashboard"},
              {"fa": "فاندینگ، اوپن اینترست، لیکوییدیشن ۲۴ ساعته و لانگ/شورت", "ckb": "فەندینگ، ئۆپن ئینتەرێست، لیکویدی ٢٤ کاتژمێر و لۆنگ/شۆرت",
@@ -1099,11 +1212,7 @@ HUB = {
              {"fa": "احساسات امروز بازار و تاریخچهٔ آن", "ckb": "هەستی ئەمڕۆی بازاڕ و مێژووەکەی", "ar": "مزاج السوق اليوم وتاريخه", "en": "Today's market mood and its history"}),
         ]),
     ],
-    "todo": [
-        {"fa": "تاریخچهٔ منحنی فیوچرز: بیسیس سالانه در طول زمان", "ckb": "مێژووی چەماوەی فیوچەرز: بەیسیسی ساڵانە بە درێژایی کات", "ar": "تاريخ منحنى العقود الآجلة: الأساس السنوي عبر الزمن", "en": "History of the futures curve: yearly basis over time"},
-        {"fa": "چولگی و ساختار زمانی نوسان ضمنی آپشن‌ها", "ckb": "لاری و پێکهاتەی کاتیی هەڵاوسانی ناوەکیی ئۆپشنەکان", "ar": "انحراف التقلب الضمني للخيارات وبنيته الزمنية", "en": "Options: skew and term structure of implied volatility"},
-        {"fa": "آرشیو لیکوییدیشن‌ها، بلندتر از ۱۱ ماه", "ckb": "ئەرشیفی لیکویدەکان، درێژتر لە ١١ مانگ", "ar": "أرشيف التصفيات لأكثر من ١١ شهرًا", "en": "An archive of liquidations longer than 11 months"},
-    ],
+    "todo": [],                                   # nothing of the three sites' free features is left unbuilt; the section is drawn only when this holds something
 }
 
 
@@ -1189,8 +1298,9 @@ def hub():
                 badge = f'<em>{e(HUB["new"][lg])}</em>' if new else ""
                 body += f'<a class="ob-hc" href="{path}">{badge}<b>{e(tt[lg])}</b><small>{e(ds[lg])}</small></a>'
             body += "</div>"
-        body += f'<h2 class="ob-hsec">{e(HUB["soon"][lg])}<small>{e(HUB["soon_note"][lg])}</small></h2><div class="ob-hub">'
-        body += "".join(f'<div class="ob-hc soon"><b>{e(x[lg])}</b></div>' for x in HUB["todo"]) + "</div>"
+        if HUB["todo"]:
+            body += f'<h2 class="ob-hsec">{e(HUB["soon"][lg])}<small>{e(HUB["soon_note"][lg])}</small></h2><div class="ob-hub">'
+            body += "".join(f'<div class="ob-hc soon"><b>{e(x[lg])}</b></div>' for x in HUB["todo"]) + "</div>"
         out.append(f'  <section data-lang="{lg}" lang="{lg}" dir="{"ltr" if lg == "en" else "rtl"}"{hid}>{body}</section>')
     for sec, cards in HUB["secs"]:
         for path, new, tt, ds in cards:

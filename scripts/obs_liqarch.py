@@ -10,9 +10,12 @@ Each day of each coin, the best figure Gate gives (q = its quality):
        missed (the 4-hour rows reach back about 11 months)
   q 1  the day's own row — valued at that day's closing mark price, so it can differ from the 4-hour sum by a few per
        cent on a day the price moved
-  q 0  a day Gate's statistics missed: zero taker volume on that coin's row or on BTC_USDT's (which cannot be real);
-       its figures are kept as Gate gives them and the page draws them pale, never filled in
-Dollars are kept in thousands. A day already held is replaced only by a figure of the same or a better quality.
+  q 0  a day Gate's statistics missed: zero taker volume on that coin's row or on BTC_USDT's (which cannot be real) —
+       and the day before such a day, whose row Gate cuts short (measured 2026-11-14 on BTC_USDT over 332 days: every
+       day before an empty one had a fraction of the taker volume and of the liquidations its 4-hour rows add up to,
+       e.g. 2026-11-12: $0.46M against $17.2M); its figures are kept as Gate gives them and the page draws them pale
+Dollars are kept in thousands. A day Gate still gives is worked out again on every run (so a better rule reaches the
+whole file); a day Gate no longer gives stays as it was held.
 The coins: COINS below, the ones Gate lists. Runs once a day (when yesterday is missing); OBS_LIQARCH_FORCE=1 asks.
 """
 import os
@@ -75,18 +78,15 @@ def days(d1, h4, ref1, bad4, today):
         if all(q4) and not any(t + i * H4 in bad4 for i in range(6)) and all(x[2] > 0 for x in q4):
             out[t] = (round(sum(x[0] for x in q4) / 1000), round(sum(x[1] for x in q4) / 1000), 2)
             continue
-        r = ref1.get(t)
-        missed_day = not tk > 0 or (r is not None and not r[2] > 0)
+        missed_day = any(x is not None and not x[2] > 0 for x in (d1.get(t), ref1.get(t), d1.get(t + DAY), ref1.get(t + DAY)))
         out[t] = (round(ll / 1000), round(sl / 1000), 0 if missed_day else 1)
     return out
 
 
 def merge(old, new):
-    """a held day stays unless the new figure is of the same or a better quality"""
+    """the days Gate still gives, as worked out now; the days it no longer gives, as held"""
     out = dict(old)
-    for t, v in new.items():
-        if t not in out or v[2] >= out[t][2]:
-            out[t] = v
+    out.update(new)
     return out
 
 

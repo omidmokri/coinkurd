@@ -219,17 +219,14 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 - **The Observatory, next stages** (owner's request 2026-11-13: "everything Glassnode, CoinGlass and CryptoQuant
   offer"; see the Log entries of that day; one page per run is fine). Each is a page under `/charts/` built with
-  `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to `HUB["secs"]` when it exists. Done (fourteen
-  charts): liquidation heatmap and map, real liquidations day by day, open interest, funding, long/short, CVD, basis
-  and the Coinbase premium, options, MVRV / realized price / NUPL, exchange reserves and flows, stablecoins and the
-  SSR, network and miners, the Bitcoin cycle. Left, in the hub's own order: (1) history of the futures curve (nothing
-  free gives yesterday's curve back: CI would have to keep Deribit's futures summary once a day); (2) options IV skew
-  and term structure (Deribit's book carries `mark_iv` per instrument: computable in the browser, no new source);
-  (3) a liquidation archive longer than Gate's 11 months (CI would have to keep the closed days' totals — check
-  first that Gate's 4-hour rows for a closed day do not change afterwards). Also asked for by those sites and
-  possible: Hyperliquid's real positions (its API gives `liquidationPx` per account: a liquidation map that is data,
-  not a model); Gate's `contract_stats` rows also carry `long_users` / `short_users`, the top traders' sizes and
-  accounts and `lsr_taker` (a long/short page from real account counts). **Which hosts answer from the owner's own connection (measured in his browser, 2026-11-14):** Gate,
+  `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to `HUB["secs"]` when it exists. Done (fifteen charts, stage 5 on 2026-11-14): liquidation heatmap and map, real
+  liquidations day by day (since 2023, with the site's archive), Hyperliquid's real positions, open interest, funding,
+  long/short (with Gate's real account counts), CVD, basis and the Coinbase premium (with the curve's history since
+  2019), options (with the smile and term structure), MVRV / realized price / NUPL, exchange reserves and flows,
+  stablecoins and the SSR, network and miners, the Bitcoin cycle. `HUB["todo"]` is empty: nothing of the three sites'
+  free features is left unbuilt. Possible next, if the owner asks: Hyperliquid coverage beyond ~1,800 accounts (a
+  rotation over several runs, with each position's age shown), the curve history for other assets Deribit lists.
+  **Which hosts answer from the owner's own connection (measured in his browser, 2026-11-14):** Gate,
   OKX, Bybit, Deribit, `data-api.binance.vision`, DefiLlama and Coin Metrics do; no `*.binance.com` host (fapi, api,
   www) and not `api.exchange.coinbase.com` — so whatever must work for him is read from the first group or by CI,
   and a page that uses Binance futures needs a second source (the CVD page falls back to Gate).
@@ -282,6 +279,41 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-14 · The Observatory, stage 5: options skew, Gate account counts, curve history, liquidations since 2023, Hyperliquid positions (owner's request in chat, not by the loop)
+- **Why:** asked what else could be added, the owner said "build all five": the three items left "in the works" plus two
+  possible from data already measured. He also had the hub's "not possible with free data" list removed.
+- **What:** `/charts/options/` gains two views — *Smile* (the out-of-the-money IV of every strike of one expiry) and
+  *Term structure* (at-the-money, 25-delta call and put IV of every expiry) — a fifth tile (30-day 25-delta risk reversal
+  with the 30-day ATM IV) and a risk-reversal column in the expiry table (`optmath.js`: Black delta from each option's
+  own mark IV and its expiry's future, IV at ±0.25 delta on the line between strikes, 30-day values between expiries).
+  `/charts/long-short/` gains Gate's real account counts (`long_users`/`short_users`, and its top traders by number and
+  size) and the 3-month and 1-year ranges — the only lines that reach the owner, since no `*.binance.com` host answers
+  him. `/charts/basis/` gains *Curve history* (30/90/180-day constant-maturity yearly basis, day by day since 2019-12,
+  from `data/obs/curve_hist.json`). `/charts/liquidations/` gains *Since 2023* (Gate's daily rows from 2023-10-11, and
+  before Gate's first row the site's own archive `data/obs/liq_archive.json`). New page `/charts/hyperliquid/` (tab 4 of
+  15): where real Hyperliquid positions would be liquidated, from `data/obs/hl_liq.json`. Bot: a Web App button for it;
+  assistant: in its feature list; hub: its card, the changed cards, the "in the works" section hidden while empty.
+- **CI steps (update.yml):** `scripts/obs_curve.py` (Deribit `public/get_tradingview_chart_data` of every monthly and
+  quarterly future — **asked as a JSON-RPC POST: Deribit answers the GET form of that method with HTTP 400, from CI and
+  from the owner's browser alike, but answers the POST**; candles of expired futures reach back to December 2019; spot =
+  Coinbase daily close from `premium_d.json`), `scripts/obs_liqarch.py` (15 coins; the days Gate still gives are worked
+  out again each run, the days it no longer gives stay), `scripts/obs_hl.py` (Hyperliquid's leaderboard, 39 MB, lists
+  ~48,000 accounts; the step reads `clearinghouseState` of as many as fit in 200 s at 9 a second, the largest and the
+  most active in turn — first run: 1,807 accounts, Bitcoin longs 20.5 % and shorts 32.1 % of open interest; the page
+  shows that coverage and adds nothing for unread accounts; no addresses are published).
+- **Facts learned (measured 2026-11-14):** Gate's daily rows go back to 2023-10-11; 8 % are empty (zero taker volume),
+  and **the day before an empty daily row is cut short** (on all ten such days in the 4-hour window its liquidations
+  were a fraction of the 4-hour sum, e.g. 2026-11-12: $0.46M against $17.2M) — both are drawn pale, like the hourly rule.
+  Daily rows are valued at the day's closing mark price (a few per cent off the 4-hour sums on days the price moved).
+  Gate's `from=` parameter is refused for anything older than its 2,000 most recent rows. Hyperliquid's `info` API
+  answers GitHub's runners. OKX's liquidation list leaves orders out (stage 4 note) — unchanged.
+- **Tests:** `node tests/test_obs_opt.js` (44: delta, 25-delta IV and term structure against hand-worked values),
+  `node tests/test_obs_flow.js` (92: daily bars, archive bars, Hyperliquid bins), `python3 tests/test_obs_more.py` (40:
+  the three CI steps against pretend sources), `python3 tests/obs5_e2e.py` (127 checks in Chrome: every new view against figures
+  worked out in Python; four languages × two widths), the older suites again (`obs_e2e.py` 524: two checks of the
+  open-interest change tile had a tolerance tighter than the tile's one decimal and failed at some hours of the day —
+  widened to half a decimal; `obs3_e2e.py`: five option tiles, fifteen tabs, empty "in the works"), i18n (516 keys × 4),
+  bot, full build in a scratch copy, leak guard clean.
 ### 2026-11-14 · The Observatory, stage 4: real liquidations, CVD, basis and Coinbase premium, stablecoins and SSR (owner's request in chat, not by the loop)
 - **Why:** after stage 3 the hub still listed four items as "in the works"; asked which to build first, the owner answered
   "all together". With them the section has fourteen charts.

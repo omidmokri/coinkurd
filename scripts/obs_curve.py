@@ -10,11 +10,13 @@ What it keeps: for Bitcoin and Ether, one value a day — the yearly basis that 
   constant maturity at k days    = the straight line between the two futures whose days to expiry lie on either side
                                     of k (nothing when no future lies on one side)
 
-Sources: Deribit's public candles (get_tradingview_chart_data, resolution 1D) of each monthly and quarterly future —
+Sources: Deribit's public candles (public/get_tradingview_chart_data, resolution 1D, asked as a JSON-RPC POST: Deribit
+refuses the GET form of this method with HTTP 400, measured 2026-11-14, while it answers the POST) of each monthly and quarterly future —
 the last Friday of each month, the name Deribit gives it (BTC-27DEC24) — and Coinbase's daily close of BTC-USD and
 ETH-USD from data/obs/premium_d.json (scripts/obs_premium.py; Deribit's index is a basket of such USD prices). The
-first run asks for every such future since 2019 that Deribit still answers for; later runs only the futures alive in
-the last two weeks. A future Deribit does not answer for is left out; nothing is guessed.
+first run asks for every such future since 2019 that Deribit still answers for (its candles of expired futures reach
+back to December 2019); later runs only the futures alive in the last two weeks. A future Deribit does not answer for
+is left out; nothing is guessed.
 
 Writes data/obs/curve_hist.json {source, updated_at, checked, t0 day, n, btc: {cm30, cm90, cm180, px, k}, eth: …,
 summary: {btc: {day, cm30, cm90, cm180, avg365, rank, lo, lo_day, hi, hi_day, days}, eth: …}} — columns as
@@ -250,9 +252,27 @@ def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
     return "written"
 
 
+def rpc(url, params):
+    """the method named at the end of `url`, asked as Deribit's JSON-RPC POST → the answer, or None"""
+    import requests
+    body = {"jsonrpc": "2.0", "id": 1, "method": "public/" + url.rsplit("/", 1)[-1], "params": params}
+    for i in range(2):
+        try:
+            r = requests.post(DERIBIT.rsplit("/public", 1)[0], json=body, timeout=20, headers=C.UA)
+            if r.status_code == 200:
+                return r.json()
+            print("  http", r.status_code, params.get("instrument_name"), r.text[:300].replace("\n", " "))
+            if r.status_code in (400, 404):
+                return None
+        except Exception as e:  # noqa: BLE001
+            print("  err", str(e)[:120])
+        time.sleep(2)
+    return None
+
+
 def main():
     now = datetime.now(timezone.utc).replace(microsecond=0)
-    run(P.http_get, now, force=os.environ.get("OBS_CURVE_FORCE") == "1")
+    run(rpc, now, force=os.environ.get("OBS_CURVE_FORCE") == "1")
     return 0
 
 

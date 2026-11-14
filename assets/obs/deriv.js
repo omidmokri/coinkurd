@@ -7,7 +7,7 @@
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, $$ = OB.$$, clamp = OB.clamp, d = document, w = window;
   var H = 3600000, D = 86400000, lastLE = OB.TS.lastLE;
   var INK = '#e8e8e3', UPC = '#34d399', DNC = '#ff5a4d';
-  var LSC = { bn_all: '#3987e5', by_all: '#d95926', bn_top_acc: '#199e70', bn_top_pos: '#c98500' };
+  var LSC = { bn_all: '#3987e5', by_all: '#d95926', bn_top_acc: '#199e70', bn_top_pos: '#c98500', gt_all: '#2bb673', gt_top_acc: '#9b6bdf', gt_top_pos: '#e0559a' };
 
   var DEF = { coin: 'BTC', oi_r: '1w', oi_u: 'usd', fr_r: '1m', fr_u: '8h', ls_r: '1w' };
   var S = (function () {
@@ -215,7 +215,7 @@
     }, unmount: unmount };
 
   /* ================================================================ long / short */
-  var LS_R = ['24h', '3d', '1w', '1m'], LS_IDS = ['bn_all', 'by_all', 'bn_top_acc', 'bn_top_pos'];
+  var LS_R = ['24h', '3d', '1w', '1m', '3m', '1y'], LS_IDS = ['gt_all', 'bn_all', 'by_all', 'bn_top_acc', 'bn_top_pos', 'gt_top_acc', 'gt_top_pos'];
   LOAD.ls = function (coin, now) {
     var R = OB.dvRange(rangeKey('ls_r', LS_R));
     return Promise.all([OB.candles(coin, R, now), OB.lsHistory(coin, R, now)]).then(function (r) { return { coin: coin, R: R, now: now, candles: r[0], ls: r[1] }; });
@@ -225,12 +225,16 @@
     LS_IDS.forEach(function (id) {
       var a = ls[id]; if (!a || a.length < 2) return;
       var data = a.map(function (x) { return [x[0], x[1] * 100]; }), last = data[data.length - 1][1];
-      series.push({ name: T('ls_' + id), type: 'line', color: LSC[id], data: data, width: 1.7 });
-      tiles += tile(T('ls_' + id), last.toFixed(1) + '%', esc(T('ls_short_is', { v: OB.ltr((100 - last).toFixed(1) + '%') })));
+      series.push({ name: T('ls_' + id), type: 'line', color: LSC[id], data: data, width: id === 'gt_all' ? 2.2 : 1.7 });
+      var g = ls.gt_last, sub = T('ls_short_is', { v: OB.ltr((100 - last).toFixed(1) + '%') });
+      if (id === 'gt_all' && g) sub = T('ls_gt_n', { l: OB.ltr(Math.round(g.long).toLocaleString('en-US')), s: OB.ltr(Math.round(g.short).toLocaleString('en-US')) });
+      if (id === 'gt_top_acc' && g && g.tl + g.ts > 0) sub = T('ls_gt_top_n', { l: OB.ltr(String(g.tl)), s: OB.ltr(String(g.ts)) });
+      tiles += tile(T('ls_' + id), last.toFixed(1) + '%', esc(sub));
     });
     $('#ob-tiles', el).innerHTML = tiles || tile(T('tab_ls'), '—', '');
     var tk = ls.bn_taker && ls.bn_taker.length > 1 ? ls.bn_taker.map(function (x) { return [x[0], x[1] - x[2]]; }) : null;
-    V.sub = T('r_' + S.ls_r) + ' · Binance' + (ls.by_all ? ' + Bybit' : '') + ' · ' + new Date(D0.now).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    var exs = []; if (ls.gt_all && ls.gt_all.length > 1) exs.push('Gate'); if (ls.bn_all && ls.bn_all.length > 1) exs.push('Binance'); if (ls.by_all && ls.by_all.length > 1) exs.push('Bybit');
+    V.sub = T('r_' + S.ls_r) + ' · ' + (exs.join(' + ') || '—') + ' · ' + new Date(D0.now).toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
     var panes = [
       { weight: 3, title: T('p_price'), fmt: function (v) { return OB.fmtP(v); }, series: [{ name: T('p_price'), type: 'candle', data: cs }] },
       { weight: 3, title: T('p_ls'), fmt: function (v) { return v.toFixed(1) + '%'; }, marks: [{ y: 50, color: 'rgba(255,255,255,.35)', label: T('mark_50') }], series: series.length ? series : [{ name: '—', type: 'line', color: INK, data: [] }] }
@@ -241,7 +245,9 @@
     var okx = (V.coins && V.coins.ok) || {}, dead = [];
     if ((D0.coin.bn || okx.binance === false) && !(ls.bn_all && ls.bn_all.length > 1)) dead.push('Binance');
     if ((D0.coin.by || okx.bybit === false) && !(ls.by_all && ls.by_all.length > 1)) dead.push('Bybit');
-    $('#ob-note', el).textContent = T('note_ls') + (dead.length ? ' ' + T('part_fail2', { ex: dead.join(', ') }) : '');
+    if (!(ls.gt_all && ls.gt_all.length > 1)) dead.push('Gate');
+    var longR = S.ls_r === '3m' || S.ls_r === '1y';
+    $('#ob-note', el).textContent = T('note_ls') + ' ' + T('note_ls_gt') + (longR ? ' ' + T('note_ls_long') : '') + (dead.length ? ' ' + T('part_fail2', { ex: dead.join(', ') }) : '');
   };
   OB.views.ls = {
     mount: function (el) {

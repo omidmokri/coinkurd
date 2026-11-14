@@ -8,6 +8,8 @@
                               (scripts/obs_stables.py)
      Bybit    api.bybit.com    v5/market/premium-index-price-kline — the perpetual's premium index, read in the browser
      Deribit  www.deribit.com  public/get_book_summary_by_currency (kind=future) — every dated future, read in the browser
+     /data/obs/curve_hist.json   the yearly basis at a constant 30, 90 and 180 days, one value a day since 2019, from Deribit's
+                              daily candles of every monthly and quarterly future and Coinbase's daily close (scripts/obs_curve.py)
    The tiles of the two file-fed views show the summary CI wrote (the bot reads the same figures); the lines are
    plain arithmetic on the closes (assets/obs/flowmath.js). Nothing is a signal: no bands, no verdicts. */
 (function () {
@@ -18,14 +20,14 @@
   var BY = 'https://api.bybit.com/v5/market/', DB = 'https://www.deribit.com/api/v2/public/';
   var BYK = { '5m': '5', '15m': '15', '30m': '30', '1h': '60', '4h': '240', '1d': 'D' };
 
-  var BVIEWS = ['cb', 'perp', 'curve'], CB_R = ['1w', '1m', '3m', '1y', 'all'], CB_SPAN = { '1w': 7 * DAY, '1m': 30 * DAY, '3m': 90 * DAY, '1y': 365 * DAY };
+  var BVIEWS = ['cb', 'perp', 'curve', 'hist'], HI_R = ['1y', '2y', '4y', 'all'], CB_R = ['1w', '1m', '3m', '1y', 'all'], CB_SPAN = { '1w': 7 * DAY, '1m': 30 * DAY, '3m': 90 * DAY, '1y': 365 * DAY };
   var PP_R = ['24h', '3d', '1w', '1m', '3m', '1y'];
   var ST_M = ['supply', 'ssr', 'chg', 'mix'], ST_R = ['1y', '2y', '4y', 'all'], ST_YEARS = { '1y': 1, '2y': 2, '4y': 4 };
   /* the dollar stablecoins named in the table, by ticker and CoinGecko id: each is the largest coin of its ticker, so the site's
      logo of that ticker (the largest coin CoinGecko has under it) is the coin's own. Any other coin of the list is not named. */
   var KNOWN = { USDT: 'tether', USDC: 'usd-coin', USDS: 'usds', USDE: 'ethena-usde', DAI: 'dai', USD1: 'usd1-wlfi', RLUSD: 'ripple-usd', USDG: 'global-dollar',
     PYUSD: 'paypal-usd', FDUSD: 'first-digital-usd', TUSD: 'true-usd', USDD: 'usdd' };
-  var DEF = { asset: 'btc', bview: 'cb', cb_r: '1m', pp_r: '1w', st_m: 'supply', st_r: '4y', log: true };
+  var DEF = { asset: 'btc', bview: 'cb', cb_r: '1m', pp_r: '1w', hi_r: '2y', st_m: 'supply', st_r: '4y', log: true };
   var S = (function () {
     var s = OB.store.get('ek_obs_pr', null) || {}, o = JSON.parse(JSON.stringify(DEF));
     Object.keys(o).forEach(function (k) { if (typeof s[k] === typeof o[k]) o[k] = s[k]; });
@@ -166,6 +168,28 @@
     $('#ob-note', el).textContent = T('note_cu');
   }
 
+  /* ================================================================ the curve's history (file) */
+  function renderHist(D0) {
+    var el = V.el, doc = D0.file, n = doc.n, t0 = F.dayMs(doc.t0), a = doc[S.asset] || {}, s = (doc.summary || {})[S.asset] || {}, R = rangeKey('hi_r', HI_R, '2y');
+    var cm30 = F.col(a.cm30, n), cm90 = F.col(a.cm90, n), cm180 = F.col(a.cm180, n), px = F.col(a.px, n), k = F.col(a.k, n);
+    var i1 = Math.max(F.last(cm90), F.last(cm30)), yrs = ST_YEARS[R], i0 = yrs ? Math.max(0, i1 - Math.round(yrs * 365.25)) : 0;
+    function line(name, arr, color, wd) { return { name: name, type: 'line', color: color, width: wd || 1.5, data: F.pairs(t0, DAY, arr, 0) }; }
+    var p2 = function (v) { return pct(v, 2); }, i30 = F.last(cm30), i180 = F.last(cm180);
+    $('#ob-tiles', el).innerHTML =
+      tile(T('hi_t90', { d: dayTxt(s.day) }), esc(p2(s.cm90)), rankTxt(s.rank), 'ob-t-h90') +
+      tile(T('hi_t30'), esc(p2(i30 >= 0 ? cm30[i30] : null)), esc(T('hi_t180', { v: OB.ltr(p2(i180 >= 0 ? cm180[i180] : null)) })), 'ob-t-h30') +
+      tile(T('hi_avg'), esc(p2(s.avg365)), esc(T('hi_avg_s')), 'ob-t-havg') +
+      tile(T('hi_range'), esc(p2(s.lo)) + ' … ' + esc(p2(s.hi)), esc(dayTxt(s.lo_day) + ' · ' + dayTxt(s.hi_day)), 'ob-t-hrng');
+    var panes = [];
+    if (F.last(px) >= 0) panes.push({ weight: 2, log: true, title: T('p_cb_price', { coin: coin() }), fmt: function (v) { return OB.fmtP(v); }, series: [line(T('p_cb_price', { coin: coin() }), px, INK, 1.5)] });
+    panes.push({ weight: 3, title: T('p_hist'), fmt: function (v) { return v.toFixed(1) + '%'; }, zero: true, marks: [{ y: 0, color: 'rgba(255,255,255,.35)' }],
+      series: [line(T('hi_cm180'), cm180, PUR, 1.3), line(T('hi_cm90'), cm90, ACC, 2), line(T('hi_cm30'), cm30, BLUE, 1.3)] });
+    V.sub = rLabel(R) + ' · Deribit / Coinbase · ' + dayTxt(s.day);
+    V.ts.set({ daily: true, label: T('aria_hist', { coin: coin() }), view: V.keep ? null : [t0 + i0 * DAY, t0 + i1 * DAY + DAY], panes: panes });
+    $('#ob-tbl', el).hidden = true;
+    $('#ob-note', el).textContent = T('note_hist') + (F.last(k) >= 0 ? ' ' + T('hi_k', { n: OB.loc(String(k[F.last(k)])) }) : '');
+  }
+
   /* ================================================================ stablecoins (file) */
   function renderStables(D, N) {
     var el = V.el, n = D.n, t0 = F.dayMs(D.t0), M = 1e6, s = (N && N.summary) || {}, m = ST_M.indexOf(S.st_m) >= 0 ? S.st_m : (S.st_m = 'supply'), R = rangeKey('st_r', ST_R, '4y');
@@ -214,6 +238,7 @@
     if (V.kind === 'stables') renderStables(D0.file, D0.now);
     else if (D0.view === 'cb') renderCb(D0);
     else if (D0.view === 'perp') renderPerp(D0);
+    else if (D0.view === 'hist') renderHist(D0);
     else renderCurve(D0);
   }
   function load(quiet, force) {
@@ -222,7 +247,8 @@
     var p = view === 'st' ? Promise.all([file('stables', force), file('stables_now', force)]).then(function (r) { return { view: 'st', file: r[0], now: r[1] }; })
       : view === 'cb' ? Promise.all([file('premium', force), cbHourly(rangeKey('cb_r', CB_R, '1m')) ? (FILES.premium_d || null) : file('premium_d', force)]).then(function (r) {
         return { view: 'cb', h: r[0].h, summary: r[0].summary, d: r[1] ? r[1].d : null };
-      }) : view === 'perp' ? loadPerp(now) : loadCurve(now);
+      }) : view === 'hist' ? file('curve_hist', force).then(function (f) { if (!f || !f.n) throw Object.assign(new Error('empty'), { status: 404 }); return { view: 'hist', file: f }; })
+      : view === 'perp' ? loadPerp(now) : loadCurve(now);
     p.then(function (data) {
       if (seq !== V.seq) return;
       V.keep = !!quiet && !!V.data && V.data.view === view;            /* a quiet refresh of the same view leaves the reader's zoom alone */
@@ -231,7 +257,7 @@
       if (seq !== V.seq) return;
       V.loading = false; if (w.console) console.warn(e);
       if (quiet && V.data && V.data.view === view) return;
-      if (view === 'st' || view === 'cb') fail(T(e && e.status === 404 ? 'no_file' : 'err_file'), T(e && e.status === 404 ? 'no_file2_d' : 'err_file_d'));
+      if (view === 'st' || view === 'cb' || view === 'hist') fail(T(e && e.status === 404 ? 'no_file' : 'err_file'), T(e && e.status === 404 ? 'no_file2_d' : 'err_file_d'));
       else if (view === 'perp') fail(T('err_ex'), T('err_bybit_d'));
       else fail(T('err_ex'), T('err_deribit'));
     });
@@ -241,6 +267,7 @@
       '<label class="ob-lbl"><span>' + esc(T('scale')) + '</span>' + OB.ui.seg('ob-sc', [['log', T('sc_log')], ['lin', T('sc_lin')]], S.log ? 'log' : 'lin') + '</label>';
     if (S.bview === 'cb') return '<label class="ob-lbl"><span>' + esc(T('range')) + '</span>' + OB.ui.seg('ob-r', CB_R.map(function (k) { return [k, rLabel(k)]; }), rangeKey('cb_r', CB_R, '1m'), 'ob-rng') + '</label>';
     if (S.bview === 'perp') return '<label class="ob-lbl"><span>' + esc(T('range')) + '</span>' + OB.ui.seg('ob-r', PP_R.map(function (k) { return [k, T('r_' + k)]; }), rangeKey('pp_r', PP_R, '1w'), 'ob-rng') + '</label>';
+    if (S.bview === 'hist') return '<label class="ob-lbl"><span>' + esc(T('range')) + '</span>' + OB.ui.seg('ob-r', HI_R.map(function (k) { return [k, T('cr_' + k)]; }), rangeKey('hi_r', HI_R, '2y'), 'ob-rng') + '</label>';
     return '';
   }
   function pickCtl() {
@@ -269,19 +296,19 @@
     el.onclick = function (e) {
       var b = e.target.closest('button'); if (!b || !el.contains(b)) return;
       var seg = b.parentNode && b.parentNode.classList.contains('ob-seg') ? b.parentNode.id : null, v = b.getAttribute('data-v');
-      if (seg === 'ob-as' && v !== S.asset) { S.asset = v; OB.ui.setSeg(el, 'ob-as', v); save(); if (S.bview === 'cb' && V.data && V.data.view === 'cb') render(); else load(); }
+      if (seg === 'ob-as' && v !== S.asset) { S.asset = v; OB.ui.setSeg(el, 'ob-as', v); save(); if ((S.bview === 'cb' || S.bview === 'hist') && V.data && V.data.view === S.bview) render(); else load(); }
       else if (seg === 'ob-v') setView(v);
       else if (seg === 'ob-m' && v !== S.st_m) { S.st_m = v; save(); render(); }
       else if (seg === 'ob-r') {
-        var key = V.kind === 'stables' ? 'st_r' : S.bview === 'cb' ? 'cb_r' : 'pp_r'; if (v === S[key]) return;
-        S[key] = v; OB.ui.setSeg(el, 'ob-r', v); save(); if (V.kind === 'stables' || S.bview === 'cb') render(); else load();
+        var key = V.kind === 'stables' ? 'st_r' : S.bview === 'cb' ? 'cb_r' : S.bview === 'hist' ? 'hi_r' : 'pp_r'; if (v === S[key]) return;
+        S[key] = v; OB.ui.setSeg(el, 'ob-r', v); save(); if (V.kind === 'stables' || S.bview === 'cb' || S.bview === 'hist') render(); else load();
       }
       else if (seg === 'ob-sc') { S.log = v === 'log'; OB.ui.setSeg(el, 'ob-sc', v); save(); render(); }
       else if (b.id === 'ob-gear') { var op = !$('.ob-tools', el).classList.contains('open'); $('.ob-tools', el).classList.toggle('open', op); b.setAttribute('aria-expanded', op ? 'true' : 'false'); if (V.ts) V.ts.onResize(); }
       else if (b.id === 'ob-refresh' || b.id === 'ob-retry') load(false, true);
       else if (b.id === 'ob-full') OB.fullscreen(d.getElementById('ob'));
       else if (b.id === 'ob-png') { if (V.ts && V.data) V.ts.png(V.kind === 'stables' ? T('sm_' + S.st_m) : coin() + ' · ' + T('bv_' + S.bview), V.sub, 'entekhab-' + (V.kind === 'stables' ? 'stablecoins-' + S.st_m : 'basis-' + S.bview + '-' + coin()) + '.png'); }
-      else if (b.id === 'ob-share') OB.ui.share(V.kind === 'stables' ? { m: S.st_m, range: S.st_r } : { asset: S.asset, view: S.bview, range: S.bview === 'cb' ? S.cb_r : S.bview === 'perp' ? S.pp_r : null });
+      else if (b.id === 'ob-share') OB.ui.share(V.kind === 'stables' ? { m: S.st_m, range: S.st_r } : { asset: S.asset, view: S.bview, range: S.bview === 'cb' ? S.cb_r : S.bview === 'perp' ? S.pp_r : S.bview === 'hist' ? S.hi_r : null });
     };
     el.onchange = function (e) {
       if (e.target.id === 'ob-msel' && e.target.value !== S.st_m) { S.st_m = e.target.value; save(); render(); }

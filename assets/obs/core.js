@@ -7,7 +7,7 @@
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '8';
+  OB.V = '9';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -157,6 +157,7 @@
     bank: '<path d="m3 9 9-5 9 5"/><path d="M5 9v9M9.7 9v9M14.3 9v9M19 9v9"/><path d="M3 20h18"/>',
     pulse: '<path d="M3 12h4l2.5-6 5 12 2.5-6h4"/>',
     cycle: '<path d="M20 12a8 8 0 0 1-13.7 5.7"/><path d="M4 12a8 8 0 0 1 13.7-5.7"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+    target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
     updown: '<path d="M3 12h18"/><path d="M7 12V7M12 12V4M17 12V9"/><path d="M7 12v3M12 12v8M17 12v4"/>',
     delta: '<path d="M12 5 4.5 19h15Z"/>',
     spread: '<path d="M3 18h18"/><path d="M3 18c6 0 7-4 9-7s4-5 9-5"/>',
@@ -186,9 +187,9 @@
   /* ================================================================ toolbar pieces every view uses */
   OB.ui = {};
   /* a row of exclusive buttons; items: [[value, label, title?], …] */
-  OB.ui.seg = function (id, items, cur, cls) {
+  OB.ui.seg = function (id, items, cur, cls, html) {          /* html: the labels are markup the caller has escaped (a logo and a ticker) */
     return '<div class="ob-seg' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="group">' + items.map(function (it) {
-      return '<button type="button" data-v="' + esc(it[0]) + '"' + (String(it[0]) === String(cur) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + (it[2] ? ' title="' + esc(it[2]) + '"' : '') + '>' + esc(it[1]) + '</button>';
+      return '<button type="button" data-v="' + esc(it[0]) + '"' + (String(it[0]) === String(cur) ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + (it[2] ? ' title="' + esc(it[2]) + '"' : '') + '>' + (html ? it[1] : esc(it[1])) + '</button>';
     }).join('') + '</div>';
   };
   OB.ui.setSeg = function (root, id, v) {
@@ -246,6 +247,7 @@
     { k: 'liqheat', path: '/charts/liquidation-heatmap/', ic: 'flame' },
     { k: 'liqmap', path: '/charts/liquidation-map/', ic: 'bars' },
     { k: 'liqhist', path: '/charts/liquidations/', ic: 'updown' },
+    { k: 'hl', path: '/charts/hyperliquid/', ic: 'target' },
     { k: 'oi', path: '/charts/open-interest/', ic: 'layers' },
     { k: 'funding', path: '/charts/funding-rate/', ic: 'percent' },
     { k: 'ls', path: '/charts/long-short/', ic: 'scale' },
