@@ -421,7 +421,7 @@ def run():
             check("tile 4: the largest day", "day" in t[3]["l"].lower() and near(num(t[3]["v"]), 312000, 0.006), t[3])
             XO = okx_expected(st["okx"]["from"])
             check("OKX: every order of the last 24 hours was read, none twice (twins and a triplet share a millisecond)", st["okx"]["state"] == "ok" and st["okx"]["n"] == XO["n"] and not st["okx"]["lost"] and not st["okx"]["cut"], (st["okx"], XO["n"]))
-            check("tile 5: OKX’s 24 hours — total, longs, shorts and the number of orders", "OKX" in t[4]["l"] and near(num(t[4]["v"]), XO["long"] + XO["short"], 0.006) and near(nums(t[4]["s"])[0], XO["long"], 0.006)
+            check("tile 5: OKX’s 24 hours, labelled a floor — total, longs, shorts and the number of orders", "OKX" in t[4]["l"] and "at least" in t[4]["l"] and "floor" in page.inner_text("#ob-okx") and near(num(t[4]["v"]), XO["long"] + XO["short"], 0.006) and near(nums(t[4]["s"])[0], XO["long"], 0.006)
                   and near(nums(t[4]["s"])[1], XO["short"], 0.006) and near(nums(t[4]["s"])[2], XO["n"], 1e-9), (t[4], XO["long"], XO["short"], XO["n"]))
             okx_req = [r for r in REQ if r[0] == "okx"]
             check("OKX was asked in pages of 100, with the cursor one millisecond past the edge", 25 <= len(okx_req) <= 60 and all(r[2].get("limit") == "100" and r[2].get("state") == "filled" for r in okx_req), len(okx_req))

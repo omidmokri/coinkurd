@@ -2,7 +2,7 @@
    spot against futures). Read in the visitor's browser, no key and no server of ours:
      Gate      api.gateio.ws            futures/usdt/contract_stats — dollars of longs and shorts liquidated and the takers' buys
                                         and sells, per 5 minutes or per hour; futures/usdt/candlesticks — the price
-     OKX       www.okx.com              public/liquidation-orders — every liquidation order of the last 24 hours
+     OKX       www.okx.com              public/liquidation-orders — the liquidation orders of the last 24 hours (see okxLoad: not quite all of them)
      Binance   data-api.binance.vision  spot candles with the takers' share · fapi.binance.com the same for futures
    Arithmetic and definitions: assets/obs/flowmath.js. What these pages are not: the whole market. Binance and Bybit publish
    liquidations only as they happen and keep no history, so the history here is Gate's (and OKX's last day) and the pages
@@ -75,6 +75,9 @@
 
   /* ================================================================ OKX: every liquidation order of the last 24 hours */
   /* the 24 hours are cut into 2-hour slices walked at the same time; each walk pages back until it leaves its slice */
+  /* OKX's list is not a clean ledger (measured 2026-11-14 on BTC): in a dense burst the same 150 ms answer with 13 orders for one cursor and
+     with 12 partly different ones for another, so two walks over the same day differ by one to two per cent in both directions. Nothing
+     returned is made up, but something is always left out: the sum is shown as a floor. */
   function okxLoad(base, now, onProgress) {
     var SL = 2 * H, from = now - 24 * H, slices = [], all = [], lost = false, cut = false;
     for (var a = from; a < now; a += SL) slices.push([a, Math.min(now, a + SL)]);
@@ -170,7 +173,7 @@
       tile(T('lq_tot', { r: T('r_' + R.k) }), esc(usd(tot.total)), ls(tot), 'ob-t-tot') +
       tile(T('lq_share'), esc(tot.longShare == null ? '—' : tot.longShare.toFixed(1) + '%'), tot.longShare == null ? '' : esc(T('lq_share_s', { p: OB.ltr((100 - tot.longShare).toFixed(1) + '%') })), 'ob-t-share') +
       tile(T(step >= DAY ? 'lq_max_d' : 'lq_max_b'), esc(tot.max ? usd(tot.max.ll + tot.max.sl) : '—'), tot.max ? esc(when(tot.max.t, step)) : '', 'ob-t-max') +
-      tile(T('lq_24', { ex: 'OKX' }), '<span id="ob-okx-v">…</span>', '<span id="ob-okx-s">' + esc(T('lq_okx_wait', { n: OB.loc(0) })) + '</span>', 'ob-t-okx');
+      tile(T('lq_24_min', { ex: 'OKX' }), '<span id="ob-okx-v">…</span>', '<span id="ob-okx-s">' + esc(T('lq_okx_wait', { n: OB.loc(0) })) + '</span>', 'ob-t-okx');
     var dim = {}, up = [], dn = [], oi = [];
     bk.forEach(function (x) { up.push([x.t, x.sl]); dn.push([x.t, -x.ll]); if (x.bad) dim[x.t] = 1; if (x.oi) oi.push([x.t, x.oi]); });
     var cs = (D0.candles || []).filter(function (c) { return c[0] >= first && c[0] <= bk[bk.length - 1].t; });

@@ -155,7 +155,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   its open interest counts both sides and is halved; its statistics stop now and then for every contract at once, so
   the empty period and the one before it are found on BTC_USDT's rows (zero taker volume there cannot be real) and
   those bars are drawn pale and counted, never filled. OKX's public liquidation orders give the last 24 hours only;
-  they are paged exactly (orders share milliseconds: `okxAfter` / `okxStep`). *CVD:* taker delta = 2 × taker buys −
+  they are paged with care for orders sharing a millisecond (`okxAfter` / `okxStep`), but OKX's list itself leaves
+  orders out in dense bursts, differently for every cursor — so its sum is shown as a floor ("at least"), never as the total. *CVD:* taker delta = 2 × taker buys −
   volume; spot from Binance's public mirror (`data-api.binance.vision`), futures from Binance futures klines or, when
   that host does not answer, from Gate's taker sizes — the page says which. *Basis:* the Coinbase premium comes from
   `data/obs/premium.json` (hourly closes of the last 90 days + `summary`, rewritten every hour) and `premium_d.json`
@@ -223,7 +224,8 @@ The site's strategy (agreed with the owner, 2026-11-07):
   (3) a liquidation archive longer than Gate's 11 months (CI would have to keep the closed days' totals — check
   first that Gate's 4-hour rows for a closed day do not change afterwards). Also asked for by those sites and
   possible: Hyperliquid's real positions (its API gives `liquidationPx` per account: a liquidation map that is data,
-  not a model). **Which hosts answer from the owner's own connection (measured in his browser, 2026-11-14):** Gate,
+  not a model); Gate's `contract_stats` rows also carry `long_users` / `short_users`, the top traders' sizes and
+  accounts and `lsr_taker` (a long/short page from real account counts). **Which hosts answer from the owner's own connection (measured in his browser, 2026-11-14):** Gate,
   OKX, Bybit, Deribit, `data-api.binance.vision`, DefiLlama and Coin Metrics do; no `*.binance.com` host (fapi, api,
   www) and not `api.exchange.coinbase.com` — so whatever must work for him is read from the first group or by CI,
   and a page that uses Binance futures needs a second source (the CVD page falls back to Gate).
@@ -276,6 +278,83 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-14 · The Observatory, stage 4: real liquidations, CVD, basis and Coinbase premium, stablecoins and SSR (owner's request in chat, not by the loop)
+- **Why:** after stage 3 the hub still listed four items as "in the works"; asked which to build first, the owner answered
+  "all together". With them the section has fourteen charts.
+- **What (four pages, کوردی · فارسی · العربية · English, each with its own address, text and tab):**
+  `/charts/liquidations/` — dollars of longs and shorts really liquidated, bar by bar: 24 h and 3 d in hourly bars, 1 w
+  in 4-hour bars, 1 m / 3 m / 1 y in daily bars (shorts up, longs down), under the price and over the open interest;
+  tiles (last 24 h on Gate and on OKX, the range's total, the longs' share, the largest bar), a table of the last 14
+  bars, and OKX's largest liquidation orders of the last 24 hours. `/charts/cvd/` — cumulative net taker buying on
+  spot against futures, 24 h … 1 y, in coins or dollars, under the price. `/charts/basis/` — three views: the Coinbase
+  premium (plain and Tether-adjusted, hourly for 90 days and daily since 2017, with the day's rank in history), the
+  perpetual's premium index, and the futures curve with the dollar gap, the basis and the yearly basis of every
+  expiry. `/charts/stablecoins/` — the supply of dollar stablecoins since 2017, its 30-day change, Tether / USDC /
+  the rest, and the SSR against Bitcoin's market value, with a table of the well-known coins (each with its own
+  logo; a coin without one is not listed). Zoom, PNG, share link, full screen on every page.
+- **Data:** liquidations, CVD, the perpetual's premium and the curve are read in the visitor's browser (Gate, OKX,
+  Binance's public mirror, Bybit, Deribit — all already in the CSP). Two new update.yml steps (`continue-on-error`):
+  `scripts/obs_premium.py` (Coinbase Exchange and Binance spot candles; hourly) writes `data/obs/premium.json` and
+  `premium_d.json`; `scripts/obs_stables.py` (DefiLlama; every 3 hours) writes `data/obs/stables.json` and
+  `stables_now.json`. Both keep the previous files when an answer looks broken (too short, a start that moved, a total
+  20 % away, a close 10 % away from the other exchange's).
+- **Facts learned about the sources (measured from the owner's browser on entekhab.net, 2026-11-14):**
+  *Gate* `futures/usdt/contract_stats`: `long_liq_usd`, `short_liq_usd`, `long_taker_size`, `short_taker_size`
+  (contracts), `mark_price`, `open_interest_usd`; 2,000 rows at most; `long_liq_usd` is exactly `long_liq_amount`
+  (coins) × the period's closing `mark_price`, so 4-hour rows differ from the sum of their hours (BTC, 77 days:
+  median 0.13 %, worst day 1.06 %) while taker sizes add up exactly; a row exists for every period of every contract,
+  however quiet (checked on a contract with $2 of daily volume); 5-minute rows add up exactly to the hourly ones;
+  the statistics stop now and then for every contract at once (the same six hours in 2,000 for BTC and LTC) — the empty
+  period has no taker volume on BTC_USDT and the period before it is cut short; the daily rows have whole days
+  empty; its open interest is exactly twice `contracts/<name>.position_size` (both sides). Error answers carry no
+  CORS headers. *OKX* `public/liquidation-orders`: the last 24 hours only, 100 a page, `after` exclusive, several
+  orders can share a millisecond — **and the list is not a clean ledger**: in a dense burst the same 150 ms came back
+  with 13 orders for one cursor and 12 partly different ones for another, every answer repeatable; two walks over the
+  same day (4,380 and 4,388 orders) shared all but 53 / 61. Nothing returned is invented, something is always left out. *Bybit* `premium-index-price-kline`: newest first, only the close is dependable.
+  *Binance:* the public mirror refuses an unknown symbol without CORS headers (a page sees a dead request, so the CVD
+  page asks for BTCUSDT to tell "no such market" from "no connection"). *DefiLlama:* `stablecoincharts/all` has one row
+  a day since 2017-11-29 with the date as a string of seconds; the per-coin variant has the same shape but sends no
+  CORS headers to another origin; the newest row's coin amounts are a snapshot and its dollar value still moves a
+  little with prices until the row is closed. **The owner's own connection reaches Gate, OKX, Bybit, Deribit,
+  `data-api.binance.vision`, DefiLlama and Coin Metrics, but no `*.binance.com` host and not
+  `api.exchange.coinbase.com`** — which is why the premium is read by CI and the CVD page has Gate as a second source.
+- **Honesty rules kept:** the liquidation history is Gate's (and OKX's last day), said on the page: Binance and Bybit
+  publish liquidations only as they happen, so these are not the whole market's figures; a period the source missed
+  is pale and counted in the note, never filled; CVD starts at zero at the left edge and the page says its level
+  means nothing by itself; a yearly basis is not worked out for an expiry nearer than two days; the premium is
+  divided from stored closes, closed candles only; the SSR names its day when Bitcoin's value is a day behind the
+  supply; the hub's "in the works" list now holds what is really not built (history of the curve, IV skew and term
+  structure, a liquidation archive longer than 11 months).
+- **Tests:** `node tests/test_obs_flow.js` (84), `python3 tests/test_obs_flowdata.py` (69: both CI steps against pretend
+  sources in the real formats, then flowmath.js on the written files), `python3 tests/obs4_e2e.py` (478 checks in
+  Chrome: the four pages, two widths, four languages, source failures, the hub), the older suites again because the
+  chart read-out changed (`obs_e2e.py` 524, `obs3_e2e.py` 346 — its tolerances no longer depend on the day it runs),
+  `test_obs_i18n.py` (450 keys × 4), `test_bot_obs.py` and the other bot suites, a full site build in a scratch copy,
+  leak guard clean.
+- **Live with real data (owner's browser on entekhab.net, 2026-11-14 04:48–08:20 UTC, Persian UI):**
+  *Liquidations (BTC, 3 months):* the 24-hour tile $67.96M (longs $60.93M, shorts $7.03M) and the days 11-11, 11-12
+  (pale: Gate missed 02:00–03:00), 11-13 and 2026-08-19 (from 4-hour rows) equal plain sums over Gate's raw rows to
+  the dollar; 90 bars, 6 pale, 6 from 4-hour rows; the open interest is half of Gate's two-sided figure; the table's
+  times are UTC. *CVD:* BTC 1 week spot +388 BTC = 387.94 from the mirror's candles, futures −11.2K BTC = −11,244.68
+  from Gate's rows (the page says Binance futures did not answer on this connection and the line is Gate's); PEPE
+  3 days in dollars −$4.95M / −$1.15M, both equal to the same sums by hand (Gate's multiplier 10,000,000).
+  *Basis:* the premium tiles equal the file's summary (07:00 UTC close: Coinbase 67,311.74, Binance 67,376.01,
+  −0.095 %, Tether-adjusted +0.003 %); all 1,000 Binance hours compared with the mirror are identical; the daily file
+  has 3,375 of 3,376 days since 2017-08-17 and agrees on every one of the 357 Coinbase and 427 Binance days that
+  `silent_exit_store.json` also keeps; Bybit's premium index (mean, high, low, last closed) and Deribit's curve
+  (25DEC26: basis +0.582 %, +5.18 % a year) equal the same arithmetic by hand. *Stablecoins:* $286.98B for 11-13,
+  USDT $175.19B, USDC $69.20B, the three newest days equal DefiLlama's own rows, SSR 4.77 = 1,369.52B ÷ 286.98B;
+  twelve coins in the table, every logo loads. The first CI run wrote all four files (premium back-fill complete:
+  `full` lists every Coinbase series); the bot's lines are fed by the same summaries.
+- **Changed after seeing real data:** OKX's sum was shown as if the list were complete — the tile now says
+  "(at least)", the table's caption and the method text say the list leaves orders out in the busiest seconds
+  (measured: a walk holds 98.5–99.7 % of the dollars two walks find together), and the loader's head records it.
+  The liquidations page explains how Gate values a period. The CVD page tells "no spot market" from "spot not
+  readable": the mirror refuses an unknown symbol without CORS headers, so it asks for BTCUSDT once. `V` is 8.
+- **Could not be exercised live:** the Binance-futures line of the CVD page (no `*.binance.com` host answers from the
+  owner's connection) — it is covered by the browser suite with Binance's real format only.
+- **Left for later, noted in the Backlog:** Gate's statistics also carry `long_users` / `short_users`, the top
+  traders' sizes and accounts and `lsr_taker` — a long/short page by real account counts is possible from them.
 ### 2026-11-13 · The Observatory, stage 3: options, on-chain and the Bitcoin cycle (owner's request in chat, not by the loop)
 - **Why:** the owner repeated the request ("everything Glassnode, CoinGlass and CryptoQuant offer"). Stages 1–2 gave the
   CoinGlass side (liquidation heatmap and map, open interest, funding, long/short); this stage builds the four items the
