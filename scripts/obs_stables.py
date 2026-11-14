@@ -23,7 +23,7 @@ Dates. DefiLlama stamps a row with the UTC midnight at which it was taken, so a 
 before its stamp; it is filed under that day. The last day of the file is therefore yesterday, like the on-chain files,
 and each day's SSR is Bitcoin's market value at the end of that day over the stablecoins at the end of the same day.
 (Measured 2026-11-14: the row stamped that day was there at 03:19 UTC. At 04:39 its coin amounts were unchanged to the
-cent and its dollar value had moved by 0.002 %: the amounts are a snapshot, valued at the coins' latest prices until
+cent (at 08:15 they had moved by one part in ten million) and its dollar value had moved by 0.002 %: the amounts are a snapshot, valued at the coins' latest prices until
 DefiLlama closes the row — older rows are whole numbers and stay. Tether's figure in it equalled the live list's to
 the cent. So the newest day of the file can move in its sixth digit during the following day.)
 Nothing is estimated or filled in: a day without a figure is null, and SSR exists only where both sides do.

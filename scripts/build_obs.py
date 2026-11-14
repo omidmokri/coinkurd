@@ -15,7 +15,7 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "7"            # asset version (bump with any change to assets/obs/*)
+V = "8"            # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -690,7 +690,8 @@ T.update({
                        "<b>فقط Gate و OKX:</b> Binance و Bybit لیکوییدیشن‌ها را فقط در همان لحظه منتشر می‌کنند و تاریخچه‌ای نمی‌دهند؛ پس این ارقام همهٔ بازار نیست و با سایت‌هایی که دادهٔ پولی دارند برابر نیست.",
                        "<b>ساعت‌های گم‌شده:</b> آمار Gate گاهی برای همهٔ قراردادها با هم قطع می‌شود. آن ساعت و ساعت پیش از آن ناقص می‌ماند؛ این ستون‌ها کم‌رنگ کشیده و شمرده می‌شوند و هیچ‌وقت با حدس پر نمی‌شوند.",
                        "<b>ستون‌های قدیمی‌تر:</b> ارقام ساعتی Gate حدود ۸۳ روز عقب می‌رود؛ روزهای پیش از آن از ارقام ۴ ساعتهٔ خود Gate ساخته می‌شوند (تا حدود ۱۱ ماه). ارقام روزانهٔ Gate به کار نمی‌رود، چون روزهای کاملی در آن خالی است.",
-                       "<b>۲۴ ساعت:</b> ۲۳ ساعتِ بسته‌شده به‌اضافهٔ ساعت جاری. OKX فقط سفارش‌های ۲۴ ساعت اخیر را نگه می‌دارد.",
+                       "<b>ارزش دلاری:</b> Gate مقدار کوینِ لیکوییدشده در هر دوره را می‌دهد و آن را با قیمت مارک پایان همان دوره به دلار تبدیل می‌کند؛ پس هر ستون به دلارِ لحظهٔ لیکوییدیشن نزدیک است، نه دقیقاً برابر آن، و ستون‌های ساخته‌شده از ارقام ۴ ساعته با ساعتی‌ها کسری از یک درصد فرق دارند.",
+                       "<b>۲۴ ساعت:</b> ۲۳ ساعتِ بسته‌شده به‌اضافهٔ ساعت جاری. OKX فقط سفارش‌های ۲۴ ساعت اخیر را نگه می‌دارد و فهرستش در شلوغ‌ترین ثانیه‌ها بخشی از سفارش‌ها را نمی‌دهد؛ پس جمع OKX «دست‌کم» است.",
                        "زمان‌ها به وقت UTC است. توصیهٔ مالی نیست."]),
                    ("منابع", ["آمار عمومی قراردادهای Gate (لیکوییدیشن، اوپن اینترست، کندل) و سفارش‌های لیکوییدیشن عمومی OKX. همه مستقیم در مرورگر شما خوانده می‌شوند و چیزی از شما جایی فرستاده نمی‌شود."])],
             "ckb": [("ئەم پەڕەیە چی پیشان دەدات", [
@@ -707,7 +708,8 @@ T.update({
                         "<b>تەنها Gate و OKX:</b> Binance و Bybit لیکویدەکان تەنها لە هەمان ساتدا بڵاو دەکەنەوە و مێژوو نادەن؛ بۆیە ئەم ژمارانە هەموو بازاڕ نین و لەگەڵ ئەو ماڵپەڕانەی داتای پارەدارییان هەیە یەکسان نین.",
                         "<b>کاتژمێرە ونبووەکان:</b> ئاماری Gate جاروبار بۆ هەموو گرێبەستەکان پێکەوە دەپچڕێت. ئەو کاتژمێرە و کاتژمێری پێش ئەو ناتەواو دەمێننەوە؛ ئەم ستوونانە بە کاڵی دەکێشرێن و دەژمێردرێن و هەرگیز بە خەمڵاندن پڕ ناکرێنەوە.",
                         "<b>ستوونە کۆنترەکان:</b> ژمارە کاتژمێرییەکانی Gate نزیکەی ٨٣ ڕۆژ دەگەڕێنەوە دواوە؛ ڕۆژەکانی پێش ئەوە لە ژمارە ٤ کاتژمێرییەکانی خودی Gate دروست دەکرێن (تا نزیکەی ١١ مانگ). ژمارە ڕۆژانەکانی Gate بەکار ناهێنرێن، چونکە ڕۆژی تەواو تێیدا بەتاڵە.",
-                        "<b>٢٤ کاتژمێر:</b> ٢٣ کاتژمێری داخراو لەگەڵ کاتژمێری ئێستا. OKX تەنها داواکارییەکانی ٢٤ کاتژمێری ڕابردوو هەڵدەگرێت.",
+                       "<b>بەهای دۆلاری:</b> Gate بڕی کۆینی لیکویدکراو لە هەر ماوەیەکدا دەدات و بە نرخی مارکی کۆتایی هەمان ماوە دەیکاتە دۆلار؛ بۆیە هەر ستوونێک نزیکە لە دۆلاری ساتی لیکویدکردن، نەک ڕێک یەکسان، و ئەو ستوونانەی لە ژمارە ٤ کاتژمێرییەکان دروست دەکرێن بە کەمتر لە یەک لە سەد لە کاتژمێرییەکان جیاوازن.",
+                        "<b>٢٤ کاتژمێر:</b> ٢٣ کاتژمێری داخراو لەگەڵ کاتژمێری ئێستا. OKX تەنها داواکارییەکانی ٢٤ کاتژمێری ڕابردوو هەڵدەگرێت و لیستەکەی لە قەرەباڵغترین چرکەکاندا بەشێک لە داواکارییەکان نادات؛ بۆیە کۆی OKX «لانی کەم»ـە.",
                         "کاتەکان بە UTCـن. ئامۆژگاریی دارایی نییە."]),
                     ("سەرچاوەکان", ["ئاماری گشتیی گرێبەستەکانی Gate و داواکارییە گشتییەکانی لیکویدکردنی OKX، ڕاستەوخۆ لە وێبگەڕەکەتدا دەخوێنرێنەوە."])],
             "ar": [("ماذا تُظهر هذه الصفحة", [
@@ -724,7 +726,8 @@ T.update({
                        "<b>Gate وOKX فقط:</b> Binance وBybit تنشران التصفيات لحظة حدوثها فقط ولا تعطيان تاريخًا؛ فهذه الأرقام ليست السوق كلها ولا تطابق المواقع ذات البيانات المدفوعة.",
                        "<b>الساعات المفقودة:</b> تنقطع إحصاءات Gate أحيانًا لكل العقود معًا. تبقى تلك الساعة والساعة التي قبلها ناقصتين؛ تُرسم هذه الأعمدة باهتة وتُعدّ ولا تُملأ بالتخمين أبدًا.",
                        "<b>الأعمدة الأقدم:</b> أرقام Gate الساعية تعود نحو ٨٣ يومًا؛ والأيام قبلها تُبنى من أرقام Gate نفسها لكل ٤ ساعات (حتى نحو ١١ شهرًا). لا تُستعمل أرقام Gate اليومية لأن فيها أيامًا كاملة فارغة.",
-                       "<b>٢٤ ساعة:</b> ٢٣ ساعة مغلقة مع الساعة الجارية. وOKX تحتفظ بأوامر آخر ٢٤ ساعة فقط.",
+                       "<b>القيمة بالدولار:</b> تعطي Gate كمية العملات المصفّاة في كل فترة وتقوّمها بسعر العلامة عند نهاية تلك الفترة؛ فكل عمود قريب من دولارات لحظة التصفية لا مطابق لها تمامًا، والأعمدة المبنية من أرقام ٤ ساعات تختلف عن الساعية بأقل من واحد في المئة.",
+                       "<b>٢٤ ساعة:</b> ٢٣ ساعة مغلقة مع الساعة الجارية. وOKX تحتفظ بأوامر آخر ٢٤ ساعة فقط، وقائمتها لا تعيد كل الأوامر في أكثر الثواني ازدحامًا؛ فمجموع OKX حدّ أدنى.",
                        "الأوقات بتوقيت UTC. ليست نصيحة مالية."]),
                    ("المصادر", ["إحصاءات عقود Gate العامة وأوامر التصفية العامة في OKX، تُقرأ مباشرة في متصفحك."])],
             "en": [("What this page shows", [
@@ -741,7 +744,8 @@ T.update({
                        "<b>Gate and OKX only:</b> Binance and Bybit publish liquidations only as they happen and give no history, so these figures are not the whole market and do not equal sites that buy their data.",
                        "<b>Missing hours:</b> Gate’s statistics stop now and then for every contract at once. That hour and the hour before it stay incomplete; such bars are drawn pale and counted, and never filled in by guessing.",
                        "<b>Older bars:</b> Gate’s hourly figures go back about 83 days; days before that are built from Gate’s own 4-hour figures (to about 11 months). Gate’s daily figures are not used, because whole days are empty in them.",
-                       "<b>24 hours:</b> the 23 closed hours and the running one. OKX keeps only the last 24 hours of orders.",
+                       "<b>How dollars are counted:</b> Gate reports the coins liquidated in each period and values them at that period’s closing mark price; so a bar is close to, but not exactly, the dollars at the moment of each liquidation, and bars built from 4-hour figures differ from hourly ones by a fraction of one per cent.",
+                       "<b>24 hours:</b> the 23 closed hours and the running one. OKX keeps only the last 24 hours of orders, and its list leaves some out in the busiest seconds, so OKX’s sum is a floor.",
                        "Times are UTC. Not financial advice."]),
                    ("Sources", ["Gate’s public contract statistics (liquidations, open interest, candles) and OKX’s public liquidation orders, read directly in your browser; nothing about you is sent anywhere."])],
         },
