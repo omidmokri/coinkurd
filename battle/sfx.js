@@ -67,7 +67,7 @@ function gunCore(A, o, P) {
   let tg = null, tgo = null; if (P.ting) { tg = amp(C, 0); tg.connect(out); tgo = [osc(C, 'sine', 2930 * rr(.98, 1.02)), osc(C, 'sine', 4710 * rr(.98, 1.02))]; tgo.forEach(x => x.connect(tg)); }
   for (let i = 0; i < n; i++) {
     const t = t0 + i / rate + (i ? rr(-.005, .005) : 0), k = i ? rr(.8, 1) : 1;
-    hit(gc.gain, t, .0006, v * .95 * k, .022); hit(gb.gain, t, .001, v * .78 * k, .066);
+    hit(gc.gain, t, .0006, v * (P.crackG || .95) * k, .022); hit(gb.gain, t, .001, v * .78 * k, .066);
     th.frequency.setValueAtTime(150, t); th.frequency.exponentialRampToValueAtTime(52, t + .06); hit(gt.gain, t, .001, v * (P.thump || .55) * k, .06);
     if (tg) hit(tg.gain, t + .004, .001, v * .07 * k, .045);
   }
@@ -79,18 +79,21 @@ function gunCore(A, o, P) {
   done(A, end + .2);
 }
 SFX.gun = (A, o) => gunCore(A, o, {});
-SFX.rgun = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 3, rate: 12.5 }), { bp: 720, crack: 2200, thump: .75, ting: true, whir: true });
-SFX.dogfire = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 4, rate: 16 }), { bp: 1500, crack: 3000, thump: .35, whir: true });
+/* the machines' rifles: softer than a man's (less crack, no metallic ping, no servo whir after each burst): with dozens of robots
+   and dogs firing, the bright layers piled up into a harsh hiss (owner, 2026-11-14) */
+SFX.rgun = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 3, rate: 12.5 }), { bp: 620, crack: 3200, crackG: .45, thump: .8 });
+SFX.dogfire = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 3, rate: 14 }), { bp: 900, crack: 3600, crackG: .4, thump: .45 });
 
 /* ------------------------------------------------------------------ servos: a robot or a dog on the move */
 SFX.servo = function (A, o) {
   const C = A.ctx, v = o.vol == null ? .2 : o.vol, t0 = t0of(A, o) + Math.random() * .04, d = rr(.3, .55), O = spot(A, o, 'sfx'), out = O.g;
-  const m = osc(C, 'sawtooth', rr(280, 360)), bp = flt(C, 'bandpass', 800, 5), g = amp(C, 0), f0 = m.frequency.value; m.connect(bp).connect(g).connect(out);
-  m.frequency.setValueAtTime(f0, t0); m.frequency.linearRampToValueAtTime(f0 * 2.4, t0 + d * .45); m.frequency.linearRampToValueAtTime(f0 * 1.7, t0 + d);
-  bp.frequency.setValueAtTime(700, t0); bp.frequency.linearRampToValueAtTime(1900, t0 + d * .5); bp.frequency.linearRampToValueAtTime(1300, t0 + d);
-  swell(g.gain, t0, .04, v * 1.3, Math.max(.01, d - .1), .06);
-  const ch = osc(C, 'square', rr(58, 90)), cd = amp(C, v * .75); ch.connect(cd).connect(g.gain);            // gear chatter
-  const s = nsrc(A, 'white'), hp = flt(C, 'highpass', 4200, .6), gh = amp(C, 0); s.connect(hp).connect(gh).connect(out); hit(gh.gain, t0 + d - .02, .01, v * .4, .16);   // a breath of air from the actuator
+  /* a low, rounded motor hum (it was a bright sawtooth through a narrow filter, which rang like a whistle) */
+  const m = osc(C, 'triangle', rr(150, 190)), bp = flt(C, 'lowpass', 520, .7), g = amp(C, 0), f0 = m.frequency.value; m.connect(bp).connect(g).connect(out);
+  m.frequency.setValueAtTime(f0, t0); m.frequency.linearRampToValueAtTime(f0 * 1.5, t0 + d * .45); m.frequency.linearRampToValueAtTime(f0 * 1.25, t0 + d);
+  bp.frequency.setValueAtTime(420, t0); bp.frequency.linearRampToValueAtTime(820, t0 + d * .5); bp.frequency.linearRampToValueAtTime(600, t0 + d);
+  swell(g.gain, t0, .06, v * 1.1, Math.max(.01, d - .1), .08);
+  const ch = osc(C, 'sine', rr(58, 90)), cd = amp(C, v * .25); ch.connect(cd).connect(g.gain);            // gear chatter, faint
+  const s = nsrc(A, 'white'), hp = flt(C, 'bandpass', 2400, .8), gh = amp(C, 0); s.connect(hp).connect(gh).connect(out); hit(gh.gain, t0 + d - .02, .02, v * .12, .14);   // a breath of air from the actuator
   m.start(t0); m.stop(t0 + d + .02); ch.start(t0); ch.stop(t0 + d); run(s, t0 + d - .03, t0 + d + .25); done(A, t0 + d + .3);
 };
 
