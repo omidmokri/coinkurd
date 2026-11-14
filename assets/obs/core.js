@@ -7,7 +7,7 @@
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '9';
+  OB.V = '10';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

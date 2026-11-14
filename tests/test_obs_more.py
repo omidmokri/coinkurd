@@ -66,18 +66,20 @@ def premium_d():
 
 
 class Deribit:
-    def __init__(self, first=date(2020, 1, 1), dead=False):
-        self.calls, self.first, self.dead = [], first, dead
+    def __init__(self, first=date(2020, 1, 1), dead=False, fail=()):
+        self.calls, self.first, self.dead, self.fail = [], first, dead, set(fail)
 
     def __call__(self, url, params):
         self.calls.append(dict(params))
         if self.dead:
             return None
         nm = params["instrument_name"]
+        if nm in self.fail:
+            return None                                     # no answer (rate limit, network)
         cur, rest = nm.split("-", 1)
         d = datetime.strptime(rest, "%d%b%y").date()
-        if d < self.first:
-            return None                                     # Deribit answers 400: no such instrument
+        if d < self.first:                                  # Deribit answers 400: no such instrument
+            return {"jsonrpc": "2.0", "error": {"code": -32602, "data": {"reason": "instrument not found", "param": "instrument_name"}, "message": "Invalid params"}}
         exp = CV.expiry_ts(d)
         key = cur.lower()
         t0, t1 = params["start_timestamp"] // 1000, params["end_timestamp"] // 1000
@@ -88,7 +90,9 @@ class Deribit:
             if t >= listed:
                 days = (exp - (t + DAY)) / DAY
                 close.append(spot_px(key, t) * (1 + B[key] * days / 365))
-                ticks.append(t * 1000)
+                ticks.append((t + 22 * 3600) * 1000)            # the 2-hour candle that closes at the end of the day
+                close.append(spot_px(key, t) * 1.5)             # the 08:00 candle of the next day: not a day's end
+                ticks.append((t + DAY + 8 * 3600) * 1000)
             t += DAY
         return {"result": {"status": "ok" if ticks else "no_data", "ticks": ticks, "close": close}}
 
@@ -96,10 +100,17 @@ class Deribit:
 tmp = tempfile.mkdtemp()
 try:
     json.dump(premium_d(), open(os.path.join(tmp, "premium_d.json"), "w"))
+    # a first run where some futures got no answer writes nothing (a missing neighbour would bend the line)
+    rf = CV.run(Deribit(fail={"BTC-27JUN25", "ETH-26SEP25"}), NOW, out_dir=tmp, log=(lambda m: None), pause=0)
+    check("first run with failed answers: nothing written", rf == "kept" and not os.path.exists(os.path.join(tmp, "curve_hist.json")))
+    # a file from an incomplete run (no complete: true) is built again from the start, once an hour at most
+    json.dump({"t0": "2019-09-20", "n": 3, "checked": (NOW - timedelta(hours=2)).isoformat(), "btc": {"cm90": {"o": 0, "v": [83.0, 83.0, 83.0]}}}, open(os.path.join(tmp, "curve_hist.json"), "w"))
+    check("an incomplete file is due, but once an hour at most", CV.due(json.load(open(os.path.join(tmp, "curve_hist.json"))), NOW) and not CV.due({"t0": "2019-09-20", "n": 3, "checked": NOW.isoformat()}, NOW))
     der = Deribit()
     logs = []
     r = CV.run(der, NOW, out_dir=tmp, log=logs.append, pause=0)
     doc = json.load(open(os.path.join(tmp, "curve_hist.json")))
+    check("the incomplete file's days are gone, the new file says complete", doc.get("complete") is True and all(abs(v - 10.0) < 0.0011 for v in [x for x in doc["btc"]["cm90"]["v"] if x is not None]))
     check("first run: written, from the first day two futures bracket a maturity (futures from 2020-01)", r == "written" and "2019-02-01" <= doc["t0"] <= "2019-12-31", (r, doc.get("t0"), logs[-1:]))
     rows = CV.load_rows(doc, "btc")
     last = max(rows)
@@ -113,6 +124,8 @@ try:
     check("summary: day, 90 days, average, rank", s["day"] == datetime.fromtimestamp(last, UTC).strftime("%Y-%m-%d") and near(s["cm90"], 10.0, 0.0011) and near(s["avg365"], 10.0, 0.0011) and s["days"] > 1500, s)
     k_ok = all(rw.get("k", 0) >= 2 for rw in rows.values())
     check("each day used at least two futures", k_ok)
+    check("2-hour candles asked (Deribit's daily candles run 08:00 to 08:00 since 2022)", der.calls and all(c["resolution"] == "120" for c in der.calls))
+    check("the 08:00 candles are not taken for a day's end", all(abs(v - 10.0) < 0.0011 for v in vals))
     n_full = len(der.calls)
     # not due again the same day
     r2 = CV.run(der, NOW + timedelta(hours=2), out_dir=tmp, log=logs.append, pause=0)
@@ -128,6 +141,9 @@ try:
     r4 = CV.run(Deribit(dead=True), NOW + timedelta(days=2), out_dir=tmp, log=logs.append, pause=0)
     doc4 = json.load(open(os.path.join(tmp, "curve_hist.json")))
     check("Deribit silent: kept, history unchanged", r4 == "kept" and doc4["n"] == doc3["n"] and doc4.get("btc") == doc3.get("btc"))
+    r5 = CV.run(Deribit(fail={CV.name("BTC", CV.last_fridays(date(2026, 12, 1), date(2026, 12, 31))[0])}), NOW + timedelta(days=3), out_dir=tmp, log=logs.append, pause=0)
+    doc5 = json.load(open(os.path.join(tmp, "curve_hist.json")))
+    check("a daily run with one failed answer: kept, history unchanged", r5 == "kept" and doc5.get("btc") == doc3.get("btc") and doc5.get("complete") is True, logs[-1:])
     # days near expiry: a future with < 2 days is not used
     futs = {CV.expiry_ts(date(2026, 11, 27)): {TODAY - DAY: 1.0}}
     check("a future 1.4 days from expiry is left out", CV.day_points(futs, {TODAY - DAY: 1.0}, TODAY - DAY) == [] if (CV.expiry_ts(date(2026, 11, 27)) - TODAY) / DAY < 2 else True)

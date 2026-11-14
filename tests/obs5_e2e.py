@@ -168,8 +168,8 @@ def deribit_candles(url, params):
     """Deribit's get_tradingview_chart_data for a monthly or quarterly future: listed 380 days before its expiry"""
     cur, rest = params["instrument_name"].split("-", 1)
     d = datetime.strptime(rest, "%d%b%y").date()
-    if d < date(2020, 1, 1):
-        return None
+    if d < date(2020, 1, 1):                     # Deribit: no such instrument
+        return {"jsonrpc": "2.0", "error": {"code": -32602, "data": {"reason": "instrument not found"}, "message": "Invalid params"}}
     exp = CV.expiry_ts(d)
     t0, t1 = params["start_timestamp"] // 1000, params["end_timestamp"] // 1000
     ticks, close = [], []
@@ -177,7 +177,9 @@ def deribit_candles(url, params):
     while t <= t1:
         if t >= exp - 380 * 86400:
             close.append(cb_close(cur, t) * (1 + BAS[cur] * (exp - (t + 86400)) / 86400 / 365))
-            ticks.append(t * 1000)
+            ticks.append((t + 22 * 3600) * 1000)           # 2-hour candles: the one closing at 00:00 UTC
+            close.append(cb_close(cur, t) * 1.3)           # and an 08:00 one, which is not a day's end
+            ticks.append((t + 8 * 3600) * 1000)
         t += 86400
     return {"result": {"status": "ok" if ticks else "no_data", "ticks": ticks, "close": close}}
 

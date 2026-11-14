@@ -4,19 +4,28 @@
 What it keeps: for Bitcoin and Ether, one value a day — the yearly basis that a dated future of exactly 30, 90 and
 180 days would carry ("constant maturity"), worked out from Deribit's dated futures and the spot price.
 
-  basis of one future on day D   = (its daily close ÷ the spot daily close − 1) × 365 ÷ days to its expiry
-                                    (closes at the end of day D, 00:00 UTC of D+1; days counted from there to the
+  basis of one future on day D   = (its price at the end of day D ÷ the spot daily close − 1) × 365 ÷ days to expiry
+                                    (both at 00:00 UTC of D+1; days counted from there to the
                                     expiry at 08:00 UTC; a future with less than 2 days left is not used, like the page)
   constant maturity at k days    = the straight line between the two futures whose days to expiry lie on either side
                                     of k (nothing when no future lies on one side)
 
-Sources: Deribit's public candles (public/get_tradingview_chart_data, resolution 1D, asked as a JSON-RPC POST: Deribit
-refuses the GET form of this method with HTTP 400, measured 2026-11-14, while it answers the POST) of each monthly and quarterly future —
+Sources: Deribit's public candles (public/get_tradingview_chart_data, asked as a JSON-RPC POST: Deribit refuses the GET
+form of this method with HTTP 400, measured 2026-11-14, while it answers the POST) of each monthly and quarterly future,
+2-hour candles (resolution 120): the close of the candle that opens at 22:00 UTC is the price at the end of the day.
+Daily candles cannot be used: since mid-2022 Deribit's daily candles run from 08:00 to 08:00 UTC (before, 00:00 to 00:00),
+so their close is 8 hours away from Coinbase's daily close (measured 2026-11-14: BTC-30DEC22 had 153 daily candles at
+00:00 and 213 at 08:00, BTC-26DEC25 none at 00:00; on the 00:00 days the 22:00 two-hour close equals the daily close —
+189 of 189 days of BTC-27MAR20). A 2-hour series of a future (at most 400 days) is under Deribit's 5,000-candle cap —
 the last Friday of each month, the name Deribit gives it (BTC-27DEC24) — and Coinbase's daily close of BTC-USD and
 ETH-USD from data/obs/premium_d.json (scripts/obs_premium.py; Deribit's index is a basket of such USD prices). The
 first run asks for every such future since 2019 that Deribit still answers for (its candles of expired futures reach
 back to December 2019); later runs only the futures alive in the last two weeks. A future Deribit does not answer for
-is left out; nothing is guessed.
+is left out; nothing is guessed. A future Deribit failed to answer for (rate limit, network) is different: the
+whole run then keeps the previous file, since a missing neighbour would bend the straight line of the days around it
+(measured in CI 2026-11-14: asked back to back, 114 of 214 answers were refusals, and the history built from the rest
+ended in mid-2022 with a 30-day value of 83 % a year). The file says complete: true only when a full run had every
+answer; a file without it is built again from 2019.
 
 Writes data/obs/curve_hist.json {source, updated_at, checked, t0 day, n, btc: {cm30, cm90, cm180, px, k}, eth: …,
 summary: {btc: {day, cm30, cm90, cm180, avg365, rank, lo, lo_day, hi, hi_day, days}, eth: …}} — columns as
@@ -40,6 +49,8 @@ DAY = 86400
 ASSETS = (("btc", "BTC"), ("eth", "ETH"))
 CMS = (30, 90, 180)
 MIN_DAYS = 2
+RES = "120"                                     # 2-hour candles
+LAST_CANDLE = 22 * 3600                        # the one that closes at 00:00 UTC
 FIRST = date(2019, 1, 1)
 MON = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
@@ -63,7 +74,8 @@ def expiry_ts(d):
 
 
 def closes(ans):
-    """Deribit's chart answer → {day start (s): close}; anything else → {}"""
+    """Deribit's 2-hour chart answer → {day start (s): close of the candle opening at 22:00 UTC, i.e. the price at the
+    end of that day}; anything else → {}"""
     r = (ans or {}).get("result") if isinstance(ans, dict) else None
     if not isinstance(r, dict) or r.get("status") != "ok":
         return {}
@@ -73,8 +85,8 @@ def closes(ans):
             t, c = int(t) // 1000, float(c)
         except (TypeError, ValueError):
             continue
-        if t % DAY == 0 and c > 0:
-            out[t] = c
+        if t % DAY == LAST_CANDLE and c > 0:
+            out[t - LAST_CANDLE] = c
     return out
 
 
@@ -195,10 +207,12 @@ def due(doc, now):
         last = datetime.strptime(doc["t0"], "%Y-%m-%d").replace(tzinfo=timezone.utc) + timedelta(days=doc["n"] - 1)
     except Exception:  # noqa: BLE001
         return True
+    if not doc.get("complete"):                # built again from the start, once an hour at most
+        return age >= 3600
     return last.date() < (now - timedelta(days=1)).date() and age >= 3600
 
 
-def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
+def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.25):
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "curve_hist.json")
     doc = C._load(path)
@@ -206,10 +220,12 @@ def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
         log(f"curve: checked {doc.get('checked')}, not due yet")
         return "skip"
     prem = C._load(os.path.join(out_dir, "premium_d.json"))
-    full = not (doc and doc.get("t0"))
+    full = not (doc and doc.get("t0") and doc.get("complete"))
+    if full:
+        doc = None                             # an incomplete file is built again from the start, not added to
     today = now.date()
     start = FIRST if full else today - timedelta(days=16)
-    rows_by_asset, asked, answered = {}, 0, 0
+    rows_by_asset, asked, answered, failed = {}, 0, 0, []
     for key, cur in ASSETS:
         px = spot(prem, key)
         if not px:
@@ -224,8 +240,11 @@ def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
             if t0 >= t1:
                 continue
             asked += 1
-            cl = closes(get(DERIBIT + "/get_tradingview_chart_data",
-                            {"instrument_name": name(cur, d), "resolution": "1D", "start_timestamp": t0 * 1000, "end_timestamp": t1 * 1000}))
+            ans = get(DERIBIT + "/get_tradingview_chart_data",
+                      {"instrument_name": name(cur, d), "resolution": RES, "start_timestamp": t0 * 1000, "end_timestamp": t1 * 1000})
+            if ans is None:                    # no answer at all (not "no such future"): the run cannot be trusted
+                failed.append(name(cur, d))
+            cl = closes(ans)
             if cl:
                 answered += 1
                 futs[exp] = cl
@@ -235,13 +254,15 @@ def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
         rows = load_rows(doc, key)
         rows.update(new)                       # a day worked out again replaces the stored one; days not asked about stay
         rows_by_asset[key] = rows
-    if not answered:
-        log(f"curve: Deribit answered none of {asked} futures — the previous file stays")
-        if doc:
-            doc["checked"] = now.isoformat()
-            C._save(path, doc)
+    if not answered or failed:
+        log(f"curve: Deribit answered {answered} of {asked} futures and failed {len(failed)} ({' '.join(failed[:8])}) — the previous file stays")
+        old = C._load(path)
+        if old:
+            old["checked"] = now.isoformat()
+            C._save(path, old)
         return "kept"
     new_doc = pack(rows_by_asset, now)
+    new_doc["complete"] = True
     if not new_doc.get("n"):
         log("curve: no day could be worked out (spot closes missing?) — the previous file stays")
         return "kept"
@@ -252,21 +273,28 @@ def run(get, now, out_dir=OUT_DIR, force=False, log=print, pause=0.06):
     return "written"
 
 
-def rpc(url, params):
-    """the method named at the end of `url`, asked as Deribit's JSON-RPC POST → the answer, or None"""
+def rpc(url, params, tries=6):
+    """the method named at the end of `url`, asked as Deribit's JSON-RPC POST → the answer; Deribit's "no such
+    instrument" → that error answer (closes() finds no candles in it); no answer after retrying → None.
+    Deribit's rate limit (error 10028 "too_many_requests", HTTP 429) is waited out: 1, 2, 4, 8, 16 s."""
     import requests
     body = {"jsonrpc": "2.0", "id": 1, "method": "public/" + url.rsplit("/", 1)[-1], "params": params}
-    for i in range(2):
+    for i in range(tries):
         try:
             r = requests.post(DERIBIT.rsplit("/public", 1)[0], json=body, timeout=20, headers=C.UA)
-            if r.status_code == 200:
-                return r.json()
-            print("  http", r.status_code, params.get("instrument_name"), r.text[:300].replace("\n", " "))
-            if r.status_code in (400, 404):
-                return None
+            try:
+                j = r.json()
+            except ValueError:
+                j = None
+            err = (j or {}).get("error") if isinstance(j, dict) else None
+            if r.status_code == 200 and isinstance(j, dict) and "result" in j:
+                return j
+            if err and (err.get("data") or {}).get("reason") == "instrument not found":
+                return j
+            print("  deribit", r.status_code, params.get("instrument_name"), (r.text or "")[:200].replace("\n", " "))
         except Exception as e:  # noqa: BLE001
-            print("  err", str(e)[:120])
-        time.sleep(2)
+            print("  err", params.get("instrument_name"), str(e)[:120])
+        time.sleep(min(2 ** i, 16))
     return None
 
 
