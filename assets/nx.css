@@ -33,7 +33,33 @@ html.ek-v3 #ekh .ek-brand img,html.ek-v3 #ekh.ek-sc .ek-brand img{height:36px;wi
 html.ek-v3 #ekh .ek-brand span{display:none}
 html.ek-v3 #ekh .ek-nav{padding:0 6px;margin-inline:auto;gap:0}
 html.ek-v3 #ekh .ek-tools{padding:0 7px;margin-inline-start:0;gap:5px}
-html.ek-v3 #ekh .ek-ink{display:none}
+/* ---- the menu is a recessed track with one glass lens riding in it (owner's reference clip, 2026-11-14) ---- */
+html.ek-v3 #ekh .ek-nav.ek-lens{flex:0 1 auto;border-radius:999px;padding:0 9px;border-color:rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(4,4,6,.82),rgba(20,20,24,.72));
+  box-shadow:inset 0 3px 8px rgba(0,0,0,.75),inset 0 -1px 0 rgba(255,255,255,.09),inset 0 0 0 1px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.05),0 12px 34px rgba(0,0,0,.4);
+  -webkit-user-select:none;user-select:none;touch-action:pan-y}
+html.ek-v3 #ekh.ek-sc .ek-nav.ek-lens{background:linear-gradient(180deg,rgba(3,3,5,.96),rgba(17,17,20,.94))}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-mt,html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml{height:42px;padding:0 12px;border-radius:999px;opacity:.58;transition:opacity .25s,color .25s,text-shadow .25s}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-mt.lens,html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml.lens{opacity:1;color:#fff;text-shadow:0 1px 10px rgba(255,255,255,.28)}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml.ek-hot{opacity:.9}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml.ek-hot.lens{color:#ffc37a;text-shadow:0 1px 12px rgba(247,147,26,.55)}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-mt::before,html.ek-v3 #ekh .ek-nav.ek-lens .ek-mt::after,html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml::before,html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml::after{display:none}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-ink{display:block;height:42px;margin-top:-21px;border-radius:999px;transition:opacity .28s,scale .3s var(--nx-e);will-change:transform,width;
+  background:radial-gradient(120% 90% at 50% -20%,rgba(255,255,255,.34),rgba(255,255,255,0) 58%),linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.06) 46%,rgba(255,255,255,.13));
+  -webkit-backdrop-filter:blur(3px) saturate(1.7) brightness(1.35);backdrop-filter:blur(3px) saturate(1.7) brightness(1.35);
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.7),inset 0 -1.5px 1px rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.13),inset 0 -9px 14px -8px rgba(247,147,26,.5),
+    0 1px 1px rgba(0,0,0,.6),0 8px 18px rgba(0,0,0,.6),0 0 26px rgba(247,147,26,.16)}
+/* the rim: a thin ring that splits the light, strongest at the corners, as on a bevelled glass */
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-ink::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;opacity:.95;
+  background:conic-gradient(from 215deg,rgba(255,255,255,.95),rgba(190,240,255,.9) 7%,rgba(255,255,255,.4) 15%,rgba(255,255,255,.2) 30%,rgba(255,226,170,.75) 40%,rgba(255,180,235,.8) 46%,rgba(175,205,255,.75) 52%,rgba(255,255,255,.26) 62%,rgba(255,255,255,.2) 82%,rgba(215,190,255,.7) 91%,rgba(255,255,255,.95));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html.ek-v3 #ekh .ek-nav.ek-lens .ek-ink::after{content:"";position:absolute;inset:2px;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(14px 10px at 14px 7px,rgba(160,235,255,.55),transparent 70%),radial-gradient(12px 16px at calc(100% - 5px) 62%,rgba(255,170,235,.5),rgba(255,214,130,.25) 45%,transparent 72%),
+    linear-gradient(180deg,rgba(255,255,255,.2),transparent 34%)}
+html.ek-v3 #ekh .ek-nav.ek-lens.ek-drag{cursor:grabbing}
+html.ek-v3 #ekh .ek-nav.ek-lens.ek-drag .ek-ink{scale:1.07 1.1}
+html.ek-v3 #ekh .ek-nav.ek-lens.ek-drag .ek-mt,html.ek-v3 #ekh .ek-nav.ek-lens.ek-drag .ek-ml{cursor:grabbing}
+html.nx-lite #ekh .ek-nav.ek-lens .ek-ink{-webkit-backdrop-filter:none;backdrop-filter:none}
+@media (max-width:1560px){html.ek-v3 #ekh .ek-nav.ek-lens .ek-mt,html.ek-v3 #ekh .ek-nav.ek-lens .ek-ml{padding:0 10px}}
 html.ek-v3 #ekh .ek-mt,html.ek-v3 #ekh .ek-ml{height:40px;padding:0 12px;opacity:.7;transition:opacity .2s}
 html.ek-v3 #ekh .ek-mt:hover,html.ek-v3 #ekh .ek-ml:hover,html.ek-v3 #ekh .ek-mt:focus-visible,html.ek-v3 #ekh .ek-mi.on>.ek-mt,html.ek-v3 #ekh .ek-ml.on{opacity:1}
 /* the mark under a word: a small candle that rises when the word is pointed at */
