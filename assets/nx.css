@@ -90,6 +90,11 @@ html.ek-v3 #ekm .ekm-lang.ek-gl button,html.ek-v3 #ekm .ekm-lang.ek-gl button.on
 html.ek-v3 #ekm .ekm-lang.ek-gl button[data-gl]{color:#fff}
 html.ek-v3 #ekm .ekm-soc.ek-gl .ek-soc:hover{transform:none}
 /* the menu's lenses appear after the menu has opened, not while its words are still flying in */
+/* the homepage's section dock */
+#nxr.ek-gl a,#nxr.ek-gl a:hover,#nxr.ek-gl a.on,#nxr.ek-gl .nxr-home{background:none;transition:color .25s}
+#nxr.ek-gl a.on{color:rgba(255,255,255,.62)}
+#nxr.ek-gl a[data-gl]{color:#fff;text-shadow:0 1px 10px rgba(255,255,255,.25)}
+#nxr.ek-gl .nxr-sat,#nxr.ek-gl .nxr-sat[data-gl]{color:var(--nx-gold)}
 html.ek-v3 #ekm:not(.open) .ek-gl>.ek-ink{opacity:0!important}
 html.ek-v3 #ekm.open .ek-gl>.ek-ink{animation:gl-in .45s .42s both}
 @keyframes gl-in{from{opacity:0}}
