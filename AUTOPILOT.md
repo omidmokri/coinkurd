@@ -94,6 +94,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `BR.table`, `BR.nf`, `BR.fdate`, `BR.crumbs`, `BR.updated`, `BR.RCSS`, `BR.add_to_sitemap`. Examples:
   `scripts/build_trackrecord.py`, `scripts/build_opportunity.py`.
 - Menu (header + footer of every page): `scripts/chrome.py`, groups of `(path, icon, title L(), description L())`.
+  **The top menu is a recessed track with a glass lens (owner's reference clip, 2026-11-14):** `.ek-ink` in
+  `assets/ui2.js` (motion, drag, ← →) and the `.ek-lens` block in `assets/nx.css`. The words keep their old spacing —
+  the lens overhangs them — so the header's fit-to-width steps are unchanged; keep it that way.
   **The footer is short on purpose (owner's brief, 2026-11-13):** four layers — seven quick links (`FOOT_QUICK`), four
   columns of five (`FOOT_COLS`), brand + social icons + app badges, the legal line. It is not the map of the site any
   more (the header menu is; «همهٔ بخش‌ها» in the legal line opens it). A new page goes in `NAV`, not in the footer.

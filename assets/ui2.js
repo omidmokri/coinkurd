@@ -95,24 +95,105 @@
       e.preventDefault(); e.stopPropagation(); openMenu(bt.parentNode.getAttribute('data-k'), bt);
     }, true);
     d.addEventListener('mouseenter', function (e) { var t = e.target; if (t && t.nodeType === 1 && t.classList.contains('ek-mi')) e.stopPropagation(); }, true);
-    /* one highlight that slides to the item under the pointer and rests on the current section */
+    /* one highlight that slides to the item under the pointer and rests on the current section.
+       In v3 it is a glass lens (owner's reference clip, 2026-11-14): it narrows to a bead while it travels and opens again
+       on the word it lands on; it can be dragged along the track, and ← → walk it from word to word. */
     if (nav && FINE) {
       var ink = d.createElement('i'); ink.className = 'ek-ink'; ink.setAttribute('aria-hidden', 'true'); nav.insertBefore(ink, nav.firstChild);
-      var first = true;
-      var move = function (el) {
-        var a = el.getBoundingClientRect(), b = nav.getBoundingClientRect();
-        if (first) { ink.style.transition = 'none'; first = false; setTimeout(function () { ink.style.transition = ''; }, 40); }
-        ink.style.width = a.width + 'px'; ink.style.transform = 'translateX(' + (a.left - b.left) + 'px)'; ink.style.opacity = 1;
+      var V3 = de.classList.contains('ek-v3'), LENS = V3 && !RM, BEAD = 44;
+      if (V3) nav.classList.add('ek-lens');
+      var cur = null, shown = false, raf = 0, hov = 0, first = true, at = null;
+      var items = function () { return [].filter.call(nav.querySelectorAll('.ek-mt,.ek-ml'), function (e) { return e.offsetParent; }); };
+      /* the lens is a little wider than its word (it overhangs into the gaps on both sides), so the words keep their old spacing and the header fits as before */
+      var OVER = V3 ? 5 : 0;
+      var geo = function (el) { var a = el.getBoundingClientRect(), b = nav.getBoundingClientRect(); return { c: a.left - b.left - nav.clientLeft + a.width / 2, w: a.width + OVER * 2 }; };
+      var put = function (c, wd) { cur = { c: c, w: wd }; ink.style.width = wd + 'px'; ink.style.transform = 'translateX(' + (c - wd / 2) + 'px)'; };
+      var mark = function (el) { [].forEach.call(nav.querySelectorAll('.lens'), function (e) { if (e !== el) e.classList.remove('lens'); }); if (el) el.classList.add('lens'); };
+      var io = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+      var oc = function (t) { return 1 - Math.pow(1 - t, 3); };
+      var ob = function (t) { var k = 1.9; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };
+      var move = function (el, instant) {
+        var g = geo(el); mark(el); at = el; cancelAnimationFrame(raf);
+        if (!LENS) {   /* v2, or reduced motion: the plain slide the style sheet animates (or no motion at all) */
+          if (first) { ink.style.transition = 'none'; first = false; setTimeout(function () { ink.style.transition = ''; }, 40); }
+          put(g.c, g.w); ink.style.opacity = 1; shown = true; return;
+        }
+        if (instant && shown) { put(g.c, g.w); return; }
+        if (!shown) { put(g.c, BEAD); ink.style.opacity = 1; shown = true; }   /* appears as a bead on the word, then opens */
+        var f = { c: cur.c, w: cur.w }, dist = Math.abs(g.c - f.c);
+        if (dist < .5 && Math.abs(g.w - f.w) < .5) return;
+        var bead = Math.min(BEAD, f.w, g.w), dur = Math.max(440, Math.min(760, 400 + dist * .55)), cut = dist < 1 ? .05 : .6, t0 = performance.now();
+        var step = function (now) {
+          var t = (now - t0) / dur;
+          if (t >= 1) { put(g.c, g.w); return; }
+          var p = Math.min(1, t / cut), wd = t < cut ? f.w + (bead - f.w) * oc(p) : bead + (g.w - bead) * ob((t - cut) / (1 - cut));
+          put(f.c + (g.c - f.c) * io(p), Math.max(8, wd)); raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
       };
-      restInk = function () { var a = nav.querySelector('.ek-mi.on>.ek-mt,.ek-ml.on'); if (a && a.offsetParent) move(a); else ink.style.opacity = 0; };
-      nav.addEventListener('pointerover', function (e) { var t = e.target.closest && e.target.closest('.ek-mt,.ek-ml'); if (t) move(t); });
-      nav.addEventListener('pointerleave', restInk);
+      var rest = function (instant) {
+        if (drag && drag.on) return;
+        var a = nav.querySelector('.ek-mi.on>.ek-mt,.ek-ml.on');
+        if (a && a.offsetParent) move(a, instant === true); else { cancelAnimationFrame(raf); ink.style.opacity = 0; shown = false; mark(null); }
+      };
+      restInk = rest;
+      nav.addEventListener('pointerover', function (e) {
+        if (drag && drag.on) return;
+        var t = e.target.closest && e.target.closest('.ek-mt,.ek-ml'); if (!t) return;
+        clearTimeout(hov); hov = setTimeout(function () { move(t); }, LENS ? 45 : 0);
+      });
+      nav.addEventListener('pointerleave', function () { clearTimeout(hov); rest(); });
       nav.addEventListener('focusin', function (e) { var t = e.target.closest && e.target.closest('.ek-mt,.ek-ml'); if (t) move(t); });
-      nav.addEventListener('focusout', function () { setTimeout(function () { if (!nav.contains(d.activeElement)) restInk(); }, 0); });
-      H.addEventListener('transitionend', function (e) { if (e.propertyName === 'max-width') restInk(); });
-      w.addEventListener('resize', restInk);
-      restInk(); setTimeout(restInk, 600);
-      if (d.fonts && d.fonts.ready) d.fonts.ready.then(restInk);
+      nav.addEventListener('focusout', function () { setTimeout(function () { if (!nav.contains(d.activeElement)) rest(); }, 0); });
+      /* ← → walk the lens (and the focus) along the track, in the direction the eye sees */
+      nav.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        var its = items(), i = its.indexOf(d.activeElement); if (i < 0) return;
+        var rtl = getComputedStyle(nav).direction === 'rtl', n = its[i + ((e.key === 'ArrowLeft') === rtl ? 1 : -1)];
+        if (n) { e.preventDefault(); n.focus(); }
+      });
+      /* drag the lens: it follows the pointer, and on release settles on the nearest word and opens it */
+      var drag = null, eat = false;
+      if (V3) {
+        nav.addEventListener('dragstart', function (e) { e.preventDefault(); });
+        nav.addEventListener('pointerdown', function (e) {
+          if (e.button || !(e.target.closest && e.target.closest('.ek-mt,.ek-ml'))) return;
+          drag = { x: e.clientX, id: e.pointerId, on: false };
+        });
+        nav.addEventListener('pointermove', function (e) {
+          if (!drag || e.pointerId !== drag.id) return;
+          if (!drag.on) {
+            if (Math.abs(e.clientX - drag.x) < 7) return;
+            drag.on = true; clearTimeout(hov); cancelAnimationFrame(raf); nav.classList.add('ek-drag');
+            try { nav.setPointerCapture(drag.id); } catch (er) { }
+            if (!shown) { var g0 = geo(e.target.closest('.ek-mt,.ek-ml') || items()[0]); put(g0.c, g0.w); ink.style.opacity = 1; shown = true; }
+          }
+          var b = nav.getBoundingClientRect(), wd = cur.w, x = e.clientX - b.left - nav.clientLeft;
+          x = Math.max(wd / 2 + 4, Math.min(nav.clientWidth - wd / 2 - 4, x));
+          put(x, wd); mark(near(x));
+        });
+        var near = function (x) { var best = null, bd = 1e9; items().forEach(function (it) { var dd = Math.abs(geo(it).c - x); if (dd < bd) { bd = dd; best = it; } }); return best; };
+        var drop = function (e, cancel) {
+          if (!drag || e.pointerId !== drag.id) return;
+          var was = drag.on; drag = null; nav.classList.remove('ek-drag');
+          if (!was) return;
+          try { nav.releasePointerCapture(e.pointerId); } catch (er) { }
+          var t = near(cur.c);
+          if (cancel || !t) { rest(); return; }
+          move(t); eat = true;
+          setTimeout(function () { eat = false; t.click(); }, 260);
+        };
+        nav.addEventListener('pointerup', function (e) { drop(e, false); });
+        nav.addEventListener('pointercancel', function (e) { drop(e, true); });
+        nav.addEventListener('click', function (e) { if (eat) { e.preventDefault(); e.stopPropagation(); } }, true);
+      }
+      /* the track changed size (a word gave way, a language changed, fonts arrived): the lens stays on its word, without a show */
+      var relay = function () { if (drag && drag.on) return; if (shown && at && at.offsetParent) move(at, true); else rest(true); };
+      H.addEventListener('transitionend', function (e) { if (e.propertyName === 'max-width') relay(); });
+      w.addEventListener('resize', relay);
+      if (w.ResizeObserver) new ResizeObserver(relay).observe(nav);
+      rest(); setTimeout(relay, 600);
+      if (d.fonts && d.fonts.ready) d.fonts.ready.then(relay);
     }
     if (B) B.addEventListener('click', function (e) {
       var a = e.target.closest && e.target.closest('.ek-all'); if (!a) return;
