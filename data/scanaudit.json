@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T03:22:50.957683+00:00",
+ "updated_at": "2026-11-14T03:39:18.631617+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-13T03:00:00+00:00"
@@ -7,13 +7,13 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 227,
+ "coins": 226,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1639,
-   "obs": -0.46,
+   "n": 1638,
+   "obs": -0.45,
    "win": 45.1,
    "mid": 0.11,
    "lo": -0.37,
@@ -23,35 +23,35 @@
    "verdict": "worse"
   },
   "_all": {
-   "n": 6195,
-   "obs": -0.19,
+   "n": 6180,
+   "obs": -0.2,
    "win": 47.8,
    "mid": 0.0,
    "lo": -0.27,
    "hi": 0.23,
-   "p": 0.1222,
+   "p": 0.1156,
    "shifts": 1064,
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 510,
-   "obs": -1.41,
-   "win": 32.5,
+   "n": 509,
+   "obs": -1.47,
+   "win": 32.4,
    "mid": -0.64,
    "lo": -1.57,
-   "hi": 0.11,
-   "p": 0.0677,
+   "hi": 0.1,
+   "p": 0.0526,
    "shifts": 1064,
    "verdict": "no_edge"
   },
   "rsi_oversold": {
-   "n": 787,
-   "obs": 0.68,
-   "win": 53.9,
+   "n": 785,
+   "obs": 0.67,
+   "win": 53.8,
    "mid": -0.62,
    "lo": -1.96,
-   "hi": 0.39,
-   "p": 0.0348,
+   "hi": 0.4,
+   "p": 0.0357,
    "shifts": 1064,
    "verdict": "better"
   },
@@ -78,24 +78,24 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 520,
+   "n": 518,
    "obs": -0.52,
    "win": 45.4,
    "mid": -0.57,
    "lo": -1.5,
    "hi": 0.1,
-   "p": 0.8741,
+   "p": 0.8844,
    "shifts": 1064,
    "verdict": "no_edge"
   },
   "ema_death_cross": {
-   "n": 514,
-   "obs": 0.29,
-   "win": 53.5,
+   "n": 507,
+   "obs": 0.3,
+   "win": 53.6,
    "mid": 0.6,
-   "lo": -0.8,
-   "hi": 1.28,
-   "p": 0.4737,
+   "lo": -0.76,
+   "hi": 1.29,
+   "p": 0.4981,
    "shifts": 1064,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 834,
-   "obs": -0.52,
-   "win": 47.5,
+   "n": 832,
+   "obs": -0.5,
+   "win": 47.6,
    "mid": 0.61,
-   "lo": -0.31,
+   "lo": -0.32,
    "hi": 2.02,
-   "p": 0.0545,
+   "p": 0.0555,
    "shifts": 1064,
    "verdict": "no_edge"
   }
