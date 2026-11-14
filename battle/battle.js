@@ -408,7 +408,10 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
     spot 'P') and every pose of the whole hull along them checked against everything solid; a corner where the hull has no room to swing
     round is moved to where it has. With no way on from where it stands (stopped half-way through a turn in a narrow place) it backs up
     the way it came to the last place it had room to turn, and is routed on from there. Nothing changes on the vehicle unless a route is found. */
- vehPlan(v,extra){const B=this.VB[v.tier];this.mp=!this.navOn||NAV.hullEdge(v.x,v.z,B[0],B[1],v.hd,this.MP)?this.MP:-.04;let R=this.vehFrom(v,{x:v.x,z:v.z,hd:v.hd},extra);
+ /* route planning for a vehicle can take tens of ms on a slow machine: at most ~8 ms of it per frame (ARMY.tick resets the budget);
+    a vehicle refused this frame simply retries on its next turn, as it does after any failed plan */
+ vehPlan(v,extra){if((this._pu||0)>8)return false;const T0=performance.now();try{return this.vehPlan0(v,extra)}finally{this._pu=(this._pu||0)+performance.now()-T0}},
+ vehPlan0(v,extra){const B=this.VB[v.tier];this.mp=!this.navOn||NAV.hullEdge(v.x,v.z,B[0],B[1],v.hd,this.MP)?this.MP:-.04;let R=this.vehFrom(v,{x:v.x,z:v.z,hd:v.hd},extra);
   if(!R&&this.navOn){const b=this.vehBack(v,extra);if(b){const R2=this.vehFrom(v,b,extra);if(R2){R=[b.o].concat(R2);v.trail.length=b.i+1}}}
   this.mp=this.MP;if(!R)return false;
   let s=0;for(const o of R){o.s0=s;s+=o.len}v.ops=R;v.oi=0;v.os=0;v.wait=0;v.blk=null;v.retry=0;v.solid=false;this.gateOf(v);return true},
@@ -602,7 +605,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
  settle(x,z,r){const near=o=>Math.abs(o.x-x)<r&&Math.abs(o.z-z)<r;for(const k in this.sides){const A=this.sides[k];for(const s of A.sold)if(near(s))s.gyT=0;for(const v of A.veh)if(near(v))v.gyT=0}for(const tr of this.trucks)if(tr.on&&near(tr))tr.gyT=0;
   if(window.GFX6&&GFX6.RB.sides)for(const k in GFX6.RB.sides){const S=GFX6.RB.sides[k];for(const o of S.bots.concat(S.dogs))if(near(o))o.gyT=0}},
  remove(A,s){const last=A.sold.pop();if(last!==s){A.sold[s.i]=last;last.i=s.i}},
- tick(dt){this.gateTick();
+ tick(dt){this._pu=0;this.gateTick();
   if(this.rq&&this.rq.length){const t0=vt();for(let n=0,b0=performance.now();this.rq.length&&(n<1||performance.now()-b0<4);n++){const [A,s]=this.rq.shift();s.rq=0;if(s.st===ST.DIE||(!s.mv&&Math.hypot(s.x-s.tx,s.z-s.tz)<.4))continue;if(!s.mv){s.mv=1;s.st=ST.RUN;s.sp=s.sp||10.5}this.route(A,s,[s.tx,s.tz],t0,null   /* each man's own short search, a few per frame, instead of one whole-map sweep that froze slow machines for up to 1/4 s */)}}
   const t=vt(),m4=this.m4,q4=this.q4,pos=this.v3a,scl=this.v3b,Q=this.Q,BT=this.boneTex.image.data;
   for(const k in this.sides){const A=this.sides[k],base=A.dir<0?0:Math.PI,cnt=[0,0,0,0];
@@ -1030,7 +1033,8 @@ function loop(ts){requestAnimationFrame(loop);if(!R3||document.hidden)return;con
  if(L.sw&&Date.now()-L.sw.at>180)sweepEnd(L);REPLAY.tick(dtr);WORLD.tick(dt,U.t);if(VIEW.round&&PREF.layers.units&&VIEW.bk.b.length+VIEW.bk.a.length)ARMY.update(VIEW);ARMY.tick(dt);ARMY.tickGuns(dt);FX.tick(dt);if(window.GFX6)GFX6.tick(dt,U.t);
  const fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0;WORLD.front.position.x+=(fx-WORLD.front.position.x)*Math.min(1,dt*6);WORLD.frontLbl.position.x=WORLD.front.position.x;
  const c=DIRECTOR.tick(dt,dtr);if(WORLD.postOn)WORLD.post.render(c,dtr);else ren.render(scene,c);
- fpsN++;fpsT+=raw;if(fpsT>5){const fps=fpsN/fpsT;S.fps=fps;fpsN=0;fpsT=0;/* rescue: a picture slower than 12 frames a second is a slide show, whatever quality was chosen (an "ultra" saved on a machine without a
+ if(raw>.5){fpsN=0;fpsT=0}else{fpsN++;fpsT+=raw}   /* a single long stall (the shaders being rebuilt after a quality change, a busy machine) is not a frame rate: it restarts the window instead of dragging the quality down step after step */
+ if(fpsT>5){const fps=fpsN/fpsT;S.fps=fps;fpsN=0;fpsT=0;/* rescue: a picture slower than 12 frames a second is a slide show, whatever quality was chosen (an "ultra" saved on a machine without a
      graphics driver gave one frame a second): step down a tier and hand the choice back to auto */
    fpsLow=fps<12?fpsLow+1:0;if(fpsLow>=3&&PREF.quality!=='auto'&&S.quality!=='lite'){fpsLow=0;const dn={ultra:'high',high:'low',low:'lite'}[S.quality]||'lite';PREF.quality='auto';savePref();fpsDone=false;const qs=$('#qSel');if(qs)qs.value='auto';WORLD.setQuality(dn);HUD.toast('⚙ '+(T('qOpts')[dn]||dn))}
    else if(PREF.quality==='auto'&&!fpsDone){if(fps<12&&S.quality==='ultra'){WORLD.setQuality('high')}else if(fps<42&&S.quality==='high'){WORLD.setQuality('low');HUD.toast('⚙ '+T('qOpts').low)}else if(fps<26&&S.quality==='low'){WORLD.setQuality('lite');HUD.toast('⚙ '+T('qOpts').lite)}else if(!(fps<26&&S.quality==='high'))fpsDone=true}if(WORLD.soft&&PREF.quality==='auto')WORLD.govern(fps)}}
