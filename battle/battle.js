@@ -1017,11 +1017,14 @@ const REPLAY={on:false,cur:0,speed:1,playing:true,idx:0,span:null,
   const sn=REC.snaps.find(s=>s.t>prev&&s.t<=this.cur);if(sn){const bw=sn.step/5;M.bids=new Map();M.asks=new Map();sn.b.forEach(([k,u])=>{const p=(k+.5)*bw;M.bids.set(p,u/p)});sn.a.forEach(([k,u])=>{const p=(k+.5)*bw;M.asks.set(p,u/p)});computeBook(M);bookView(M)}}};
 /* ======================= main loop ======================= */
 let lastF=0,fpsN=0,fpsT=0,fpsDone=false;
-function loop(ts){requestAnimationFrame(loop);if(!R3||document.hidden)return;const dtr=Math.min(.1,(ts-lastF)/1000||0);lastF=ts;DIRECTOR.slowTick(dtr);const dt=dtr*S.timeScale;U.t+=dt;if(U.anim)U.anim.value=U.t;
+function loop(ts){requestAnimationFrame(loop);if(!R3||document.hidden)return;const raw=Math.min(2,(ts-lastF)/1000||0),dtr=Math.min(.1,raw);lastF=ts;/* raw: real seconds, so frame-rate checks see a slide show as it is */DIRECTOR.slowTick(dtr);const dt=dtr*S.timeScale;U.t+=dt;if(U.anim)U.anim.value=U.t;
  if(L.sw&&Date.now()-L.sw.at>180)sweepEnd(L);REPLAY.tick(dtr);WORLD.tick(dt,U.t);if(VIEW.round&&PREF.layers.units&&VIEW.bk.b.length+VIEW.bk.a.length)ARMY.update(VIEW);ARMY.tick(dt);ARMY.tickGuns(dt);FX.tick(dt);if(window.GFX6)GFX6.tick(dt,U.t);
  const fx=VIEW.round?X(VIEW.price||VIEW.round.p0):0;WORLD.front.position.x+=(fx-WORLD.front.position.x)*Math.min(1,dt*6);WORLD.frontLbl.position.x=WORLD.front.position.x;
  const c=DIRECTOR.tick(dt,dtr);if(WORLD.postOn)WORLD.post.render(c,dtr);else ren.render(scene,c);
- fpsN++;fpsT+=dtr;if(fpsT>5){const fps=fpsN/fpsT;S.fps=fps;fpsN=0;fpsT=0;if(PREF.quality==='auto'&&!fpsDone){if(fps<42&&S.quality==='high'){WORLD.setQuality('low');HUD.toast('⚙ '+T('qOpts').low)}else if(fps<26&&S.quality==='low'){WORLD.setQuality('lite');HUD.toast('⚙ '+T('qOpts').lite)}else fpsDone=true}if(WORLD.soft&&PREF.quality==='auto')WORLD.govern(fps)}}
+ fpsN++;fpsT+=raw;if(fpsT>5){const fps=fpsN/fpsT;S.fps=fps;fpsN=0;fpsT=0;/* rescue: a picture slower than 12 frames a second is a slide show, whatever quality was chosen (an "ultra" saved on a machine without a
+     graphics driver gave one frame a second): step down a tier and hand the choice back to auto */
+   if(fps<12&&PREF.quality!=='auto'&&S.quality!=='lite'){const dn={ultra:'high',high:'low',low:'lite'}[S.quality]||'lite';PREF.quality='auto';savePref();fpsDone=false;const qs=$('#qSel');if(qs)qs.value='auto';WORLD.setQuality(dn);HUD.toast('⚙ '+(T('qOpts')[dn]||dn))}
+   else if(PREF.quality==='auto'&&!fpsDone){if(fps<12&&S.quality==='ultra'){WORLD.setQuality('high')}else if(fps<42&&S.quality==='high'){WORLD.setQuality('low');HUD.toast('⚙ '+T('qOpts').low)}else if(fps<26&&S.quality==='low'){WORLD.setQuality('lite');HUD.toast('⚙ '+T('qOpts').lite)}else if(!(fps<26&&S.quality==='high'))fpsDone=true}if(WORLD.soft&&PREF.quality==='auto')WORLD.govern(fps)}}
 /* ======================= audio: synthesized, spatial, dynamic ======================= */
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],amb:null,music:{on:!!PREF.music,key:'major',bar:0,next:0,timer:null,nodes:[]},wx:0,
