@@ -291,7 +291,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
   own mark IV and its expiry's future, IV at ±0.25 delta on the line between strikes, 30-day values between expiries).
   `/charts/long-short/` gains Gate's real account counts (`long_users`/`short_users`, and its top traders by number and
   size) and the 3-month and 1-year ranges — the only lines that reach the owner, since no `*.binance.com` host answers
-  him. `/charts/basis/` gains *Curve history* (30/90/180-day constant-maturity yearly basis, day by day since 2019-12,
+  him. `/charts/basis/` gains *Curve history* (30/90/180-day constant-maturity yearly basis, day by day since 2019-09,
   from `data/obs/curve_hist.json`). `/charts/liquidations/` gains *Since 2023* (Gate's daily rows from 2023-10-11, and
   before Gate's first row the site's own archive `data/obs/liq_archive.json`). New page `/charts/hyperliquid/` (tab 4 of
   15): where real Hyperliquid positions would be liquidated, from `data/obs/hl_liq.json`. Bot: a Web App button for it;
@@ -317,6 +317,24 @@ The site's strategy (agreed with the owner, 2026-11-07):
   open-interest change tile had a tolerance tighter than the tile's one decimal and failed at some hours of the day —
   widened to half a decimal; `obs3_e2e.py`: five option tiles, fifteen tabs, empty "in the works"), i18n (516 keys × 4),
   bot, full build in a scratch copy, leak guard clean.
+- **After the first CI run — fix (commit 432262b1):** the curve history came out only up to 2022-06-01, its last day with
+  a 30-day value of 83 % a year. Cause, measured in the owner's browser: **since mid-2022 Deribit's daily candles run
+  08:00→08:00 UTC** (BTC-30DEC22: 153 daily candles at 00:00, 213 at 08:00; BTC-26DEC25: none at 00:00), and the step
+  kept only 00:00 candles. It now asks for 2-hour candles (resolution `120`; `240` is refused, hourly is capped at 5,000
+  candles) and takes the one opening at 22:00, which closes at 00:00 — equal to the old daily close on 189 of 189 days of
+  BTC-27MAR20. A run with any future unanswered keeps the previous file; the file carries `complete: true`, and one without
+  it is rebuilt from 2019 (hourly at most). Deribit answered 70 requests in a row from the browser without a rate limit.
+  Rebuilt file: 2019-09-28 → 2026-11-13, 2,586 days, 18 days without a value (no future on one side).
+- **Live check (2026-11-14, owner's browser):** options term structure — page vs an independent calculation from Deribit's
+  book, max 0.0085 IV points; long/short — Gate line = raw row (20,801 long · 10,057 short = 67.409 %); liquidations
+  "since 2023" — 1,131 bars from 2023-10-11, all 798 daily bars equal Gate's raw `long_liq_usd`/`short_liq_usd`, the pale
+  rule (empty row or the row after it empty) matches on every day; Hyperliquid — tiles = sums from `hl_liq.json`, the
+  file's open interest = Hyperliquid's own ($2.56B), 6 of 8 BTC positions of the 40 largest accounts found in the file
+  (the other two had changed since the file's hour), no address in the page, `kPEPE` left out (no logo); curve history —
+  cm30/cm90/cm180 worked out again from Deribit's 2-hour candles on 8 days (2020-06-15, 2022-06-15, 2024-03-11,
+  2026-11-13, BTC and ETH) equal the file within 0.003; its spot closes within 0.1 % of Binance's daily closes.
+  The liquidation archive gets the day-before-an-empty-day rule on its next daily run (it only matters for days Gate no
+  longer gives, of which there are none yet).
 ### 2026-11-14 · The Observatory, stage 4: real liquidations, CVD, basis and Coinbase premium, stablecoins and SSR (owner's request in chat, not by the loop)
 - **Why:** after stage 3 the hub still listed four items as "in the works"; asked which to build first, the owner answered
   "all together". With them the section has fourteen charts.
