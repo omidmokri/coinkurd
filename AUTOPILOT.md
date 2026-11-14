@@ -97,6 +97,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
   **The top menu is a recessed track with a glass lens (owner's reference clip, 2026-11-14):** `.ek-ink` in
   `assets/ui2.js` (motion, drag, ← →) and the `.ek-lens` block in `assets/nx.css`. The words keep their old spacing —
   the lens overhangs them — so the header's fit-to-width steps are unchanged; keep it that way.
+  The same lens rides every other group of choices — footer quick links, columns, legal line, social icons, app badges,
+  and inside the full-screen menu the categories, their items, the language switch, apps and social: `glass()` in
+  `assets/ui2.js` + the `.ek-gl` block in `assets/nx.css` (v3 only).
   **The footer is short on purpose (owner's brief, 2026-11-13):** four layers — seven quick links (`FOOT_QUICK`), four
   columns of five (`FOOT_COLS`), brand + social icons + app badges, the legal line. It is not the map of the site any
   more (the header menu is; «همهٔ بخش‌ها» in the legal line opens it). A new page goes in `NAV`, not in the footer.
