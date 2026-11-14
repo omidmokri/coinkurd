@@ -191,6 +191,31 @@ html.ek-v3.ek-deck{--top:var(--ekh,60px)!important}
 .nx-ped{position:absolute;left:50%;bottom:0;width:66%;transform:translateX(-50%);pointer-events:none;z-index:-1}
 .nx-ped svg{display:block;width:100%;height:auto;overflow:visible}
 .nx-ped .pg{transition:stroke-dasharray 1.4s var(--nx-e)}
+.nx-ped{transition:opacity 1s var(--nx-e)}
+/* the galaxy under the coin (assets/nx-cosmos.js): it takes the place of the pedestal once it has drawn its first frame */
+.nx-coin canvas.nx-gx{position:absolute;inset:auto;pointer-events:none;z-index:-1;opacity:0;transition:opacity 1.6s var(--nx-e)}   /* placed and sized by the script */
+.nx-coin.gx canvas.nx-gx{opacity:1}
+.nx-coin.gx .nx-ped{opacity:0}
+.nx-coin.nxj .nx-c3{animation:none!important;will-change:transform}
+/* the pointer on the homepage: the cursor itself is a picture set by the script; around it a ring, star dust and a burst on click */
+#nxcur{position:fixed;left:0;top:0;width:36px;height:36px;border-radius:18px;border:1.3px solid rgba(255,214,140,.5);box-shadow:0 0 16px rgba(247,147,26,.16),inset 0 0 12px rgba(247,147,26,.1);
+  pointer-events:none;z-index:2147483600;opacity:0;will-change:transform;transition:opacity .3s,border-color .3s,background-color .3s}
+#nxcur.on{opacity:1}
+#nxcur i{position:absolute;inset:-1px;border-radius:50%;animation:nxc-orb 2.8s linear infinite}
+#nxcur i::before{content:"";position:absolute;left:50%;top:-2.5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#fff3d6;box-shadow:0 0 6px 2px rgba(255,196,102,.9)}
+#nxcur.m-wrap{border-color:rgba(255,214,140,.9);background-color:rgba(247,147,26,.07)}
+#nxcur.m-wrap i{display:none}
+#nxcur.m-big{border-color:rgba(255,214,140,.72);background-color:rgba(247,147,26,.06)}
+#nxcur.m-big i{animation-duration:1.4s}
+#nxcur.m-spin{border-style:dashed;border-color:rgba(255,214,140,.8)}
+#nxcur.m-spin i{animation-duration:1s}
+#nxcur.m-txt{opacity:0}
+#nxcur.dn{border-color:#ffd27a;background-color:rgba(247,147,26,.14)}
+@keyframes nxc-orb{to{transform:rotate(1turn)}}
+#nxfx{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147483599}
+#nxfx i{position:fixed;left:0;top:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:radial-gradient(circle,#fff 0,var(--c,#ffc466) 32%,transparent 70%);opacity:0;will-change:transform,opacity}
+#nxfx b{position:fixed;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:1.5px solid rgba(255,214,140,.9);box-shadow:0 0 14px rgba(247,147,26,.45),inset 0 0 10px rgba(247,147,26,.3);opacity:0;will-change:transform,opacity}
+@media print{#nxcur,#nxfx{display:none!important}}
 .nx-h1{margin:2px 0 0;font:900 clamp(1.6rem,3.1vw,3rem)/1.25 'Vazirmatn','Space Grotesk',sans-serif;color:#fff;text-wrap:balance}
 html[lang=en] .nx-h1{font-family:'Archivo Black','Space Grotesk',sans-serif;font-weight:400;letter-spacing:-.02em;line-height:1.1}
 .nx-role{margin:6px 0 0;max-width:46ch;font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.62)}

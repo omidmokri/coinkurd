@@ -1,7 +1,7 @@
 /* entekhab.net — the 3D coin of interface v3 ("Nexus"). Raw WebGL, no library (three.js is 600 KB; this file is a few KB):
    the site's own coin art (assets/coin-front|back.webp with their height maps) on a beveled, reeded disc, lit like metal
    in a dark studio, with three orbit ribbons and a few embers around it.
-   nxCoin(canvas, opts) -> { set, pulse, face, pause, ok }   or null when WebGL is missing (the caller keeps its still coin). */
+   nxCoin(canvas, opts) -> { set, pulse, face, pause, motion, ok }   or null when WebGL is missing (the caller keeps its still coin). */
 (function () {
   'use strict';
   var VS = 'attribute vec3 aP;attribute vec3 aN;attribute vec2 aU;uniform mat4 uPV;uniform mat3 uM;uniform float uS;' +
@@ -243,6 +243,7 @@
       pulse: function () { st.glow = 1; st.heat = 1; if (!RM) st.vel += 9; st.facing = false; kick(); },
       pause: function (on) { paused = !!on; if (paused) halt(); else kick(); },
       redraw: function () { if (ready && alive) draw(performance.now()); },
+      motion: function () { return { yaw: st.yaw + st.bias, vel: drag ? drag.v : st.vel, glow: st.glow, tilt: st.tilt, bias: st.bias }; },   /* what the galaxy under the coin follows (assets/nx-cosmos.js) */
       destroy: function () { alive = false; halt(); }
     };
   }

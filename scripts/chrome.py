@@ -453,7 +453,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "8"
-NX_VER = "13"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js}
+NX_VER = "14"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js} (14: the galaxy under the coin and the homepage pointer, assets/nx-cosmos.js)
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the
@@ -478,6 +478,7 @@ UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(
            f"s+='<script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>';"
            f"if(n){{if(h)s+='<link rel=\"preload\" as=\"image\" href=\"/assets/coin-front.webp\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
            f"if(h)s+='<script src=\"/assets/nx-coin.js?v={NX_VER}\" defer><\\/script><script src=\"/assets/nx-chart.js?v={NX_VER}\" defer><\\/script>"
+           f"<script src=\"/assets/nx-cosmos.js?v={NX_VER}\" defer><\\/script>"
            f"<script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
            f"if(dp)s+='<script src=\"/assets/deep.js?v={DEEP_VER}\" defer><\\/script>';"
            "document.write(s)}catch(e){}})()</script>")

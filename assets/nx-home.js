@@ -85,20 +85,46 @@
   function door(id) { var p = doors[id]; if (vis(p)) return p; var r = R.querySelector('[data-d="' + id + '"]'); return vis(r) ? r : null; }
 
   /* ------------------------------------------------------------------ the coin */
-  var cbox = nx.querySelector('.nx-coin'), coin = null, nc = navigator.connection || {}, phone = w.innerWidth < 821;
+  var cbox = nx.querySelector('.nx-coin'), coin = null, gx = null, halv = null, nc = navigator.connection || {}, phone = w.innerWidth < 821;
+  /* without WebGL (no graphics chip, data saver, a lost context) the still coin is set in motion by assets/nx-cosmos.js
+     with the same physics, so it can still be flicked and the galaxy has one motion to follow */
+  function still() {
+    try { coin = w.nxSpin ? w.nxSpin(cbox, { area: nx, hit: cbox.querySelector('.nx-hit') }) : null; } catch (e) { coin = null; }
+    if (!coin && !RM) cbox.classList.add('css');
+    if (coin && cur) coin.pause(true);
+  }
   function startCoin() {   /* after the page has loaded and is idle: the still coin is already on screen, the 3D one takes over */
     try {
-      if (w.nxCoin && !nc.saveData && !((navigator.deviceMemory || 8) <= 1)) coin = w.nxCoin(cbox.querySelector('canvas'), {
+      /* a machine without a graphics chip (nx-lite) gets the still coin set in motion straight away: on the one measured
+         (2026-11-14) the WebGL coin fell to the watchdog after a second or two of stutter every time, and next to the galaxy
+         it would only stutter more */
+      if (w.nxCoin && !nc.saveData && !((navigator.deviceMemory || 8) <= 1) && !(de.classList.contains('nx-lite') && w.nxSpin)) coin = w.nxCoin(cbox.querySelector('canvas'), {
         yaw: 0, area: nx, hit: cbox.querySelector('.nx-hit'), dpr: phone ? 1.5 : 2, embers: phone ? 36 : 80,
-        onready: function () { cbox.classList.add('gl'); if (cur && coin) coin.pause(true); }, onlost: function () { cbox.classList.remove('gl'); if (!RM) cbox.classList.add('css'); coin = null; }
+        onready: function () { cbox.classList.add('gl'); if (cur && coin) coin.pause(true); }, onlost: function () { cbox.classList.remove('gl'); coin = null; still(); }
       });
     } catch (e) { coin = null; }
-    if (!coin && !RM) cbox.classList.add('css');
+    if (!coin) still();
+    galaxy();
+  }
+  /* the galaxy under the coin (assets/nx-cosmos.js), in the place of the pedestal: it turns with whichever coin is running */
+  function galaxy() {
+    if (gx || !w.nxGalaxy) return;
+    try { gx = w.nxGalaxy(cbox, { area: nx, motion: function () { return coin && coin.motion ? coin.motion() : null; }, onready: function () { cbox.classList.add('gx'); } }); } catch (e) { gx = null; }
+    if (!gx) return;
+    if (halv != null) gx.halving(halv);
+    if (cur) gx.pause(true);
   }
   (function () {
     var go = function () { (w.requestIdleCallback || function (f) { setTimeout(f, 200); })(startCoin, { timeout: 1500 }); };
     if (d.readyState === 'complete') go(); else w.addEventListener('load', go, { once: true });
   })();
+  /* a tap on the coin (not a drag) sets it spinning, and the galaxy flares with it */
+  (function () {
+    var hit = cbox.querySelector('.nx-hit'), hx = 0, hy = 0; if (!hit) return;
+    hit.addEventListener('pointerdown', function (e) { hx = e.clientX; hy = e.clientY; });
+    hit.addEventListener('click', function (e) { if (Math.abs(e.clientX - hx) + Math.abs(e.clientY - hy) > 6) return; if (coin) coin.pulse(); if (gx) gx.pulse(); });
+  })();
+  if (w.nxCursor) { try { w.nxCursor(); } catch (e) { } }
 
   /* ------------------------------------------------------------------ light paths from the coin to the panels */
   var svg = nx.querySelector('.nx-links'), paths = {};
@@ -119,7 +145,7 @@
   links(); [300, 1200, 3000].forEach(function (ms) { setTimeout(links, ms); });
 
   /* ------------------------------------------------------------------ pointer: the wall of glass and the coin follow it; a panel under it lights up */
-  if (FINE && !RM) {
+  if (FINE && !RM && !de.classList.contains('nx-lite')) {   /* without a graphics chip the wall stands flat (nx.css), so the restyle on every move would buy nothing */
     var pr = 0;
     nx.addEventListener('pointermove', function (e) {
       if (pr) return; pr = requestAnimationFrame(function () { pr = 0; var b = nx.getBoundingClientRect(); nx.style.setProperty('--mx', (((e.clientX - b.left) / b.width - .5) * 2).toFixed(3)); });
@@ -146,6 +172,7 @@
   function open(id, from) {
     if (!w.ekDeck) { location.hash = id; return; }
     if (coin && !cur) coin.pulse();
+    if (gx && !cur) gx.pulse();
     w.ekDeck.open(id, from || door(id));
   }
   function plain(e) { return !(e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey); }
@@ -165,6 +192,7 @@
     cur = id || null; de.classList.toggle('nx-room', !!cur);
     [].forEach.call(R.querySelectorAll('a[data-d]'), function (a) { var on = a.getAttribute('data-d') === cur; a.classList.toggle('on', on); if (on) { a.setAttribute('aria-current', 'true'); try { a.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (x) { } } else a.removeAttribute('aria-current'); });
     if (coin) coin.pause(!!cur);
+    if (gx) gx.pause(!!cur);
     if (!cur) { panels.forEach(function (p) { p.classList.remove('go'); lit(p, false); }); setTimeout(links, 700); }
     if (cur === 'market') market();
   }
@@ -234,6 +262,7 @@
       var next = Math.ceil((n + 1) / 210000) * 210000, left = next - n, prog = (n - (next - 210000)) / 210000;
       h += '<li><b>' + n.toLocaleString('en-US') + '</b> ' + tri('بلاک', 'بلۆک', 'blocks') + '</li><li><b>' + left.toLocaleString('en-US') + '</b> ' + tri('بلاک تا هاوینگ', 'بلۆک تا هاڵڤینگ', 'blocks to the halving') + '</li>';
       var pg = nx.querySelector('.nx-ped .pg'); if (pg) setTimeout(function () { pg.setAttribute('stroke-dasharray', (prog * 100).toFixed(1) + ' 100'); }, 400);
+      halv = prog; if (gx) gx.halving(prog);
     }
     if (j.g && j.g.mcap) h += '<li>' + tri('ارزش کل بازار', 'بەهای گشتیی بازاڕ', 'Total market cap') + ' <b>$' + (j.g.mcap / 1e12).toFixed(2) + 'T</b></li>';
     ul.innerHTML = h; ul.title = pick('ثبت‌شده در ', 'تۆمارکراو لە ', 'Recorded at ') + U.hhmm(j.t);
