@@ -282,6 +282,20 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-14 · Battle: sound, quieter robots, a clean centre (owner's request in chat, not by the loop)
+- **Sound "gone":** with sound saved as on, `AUDIO.init()` ran at load, before any touch, so browsers kept the context
+  suspended while the button said 🔊. Now the first pointer/key/touch anywhere (capture listeners) and a return to the
+  tab call `AUDIO.unlock()`; the button shows 🔈 with a hint until it runs; `AUDIO.toggle()` does not switch the sound
+  off on the press that woke it. A sound whose build throws gives its voice back, and a count stuck at 24 for 8 s resets
+  (before, each throw held one of the 24 voices for good). Measured in the owner's tab after the change: context
+  running, output peak 0.93.
+- **Robots:** `AUDIO.gap` (servo 2.4 s, rifles 0.4 s, `gun` 0.05 s) — 12 robot sounds in 12 s instead of ~80; volumes
+  lowered in `gfx6.js`; `sfx.js` rifles without the metallic ping and whir, the servo a low triangle hum.
+- **HUD:** the top centre holds only the price + 24 h change and, under it, the 10-minute liquidations (shorts / longs,
+  labelled) and the session score. The round targets, trade pressure, intensity, liquidation sources and unit values are
+  in `#auxPan` ("market pulse", left, under the status row), which folds to one line (`ek_bf_aux_min`) and scrolls when
+  the window is short; hidden on phones, where the mobile "stats" tab gained the round targets. Liquidity panels lost
+  "(bull army)/(bear army)". Checked at 1437×840, 1180×760 and 390×844 (no panel overlaps).
 ### 2026-11-14 · The Observatory, stage 5: options skew, Gate account counts, curve history, liquidations since 2023, Hyperliquid positions (owner's request in chat, not by the loop)
 - **Why:** asked what else could be added, the owner said "build all five": the three items left "in the works" plus two
   possible from data already measured. He also had the hub's "not possible with free data" list removed.
