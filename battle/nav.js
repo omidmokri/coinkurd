@@ -160,7 +160,7 @@ N.path = function (x0, z0, x1, z1, r, opt) {
   if (!b) return null;
   const s = cell(a[0], a[1]), g = cell(b[0], b[1]); if (s < 0 || g < 0) return [a, b];
   if (s === g || (!block && N.lineClear(a[0], a[1], b[0], b[1], r, opt.stat))) return [[x0, z0], a !== null && (a[0] !== x0 || a[1] !== z0) ? a : null, b].filter(Boolean);
-  const ok = astar(s, g, r, F, block, opt.maxN || (r < 1 ? 15000 : 0), opt.turn); if (!ok) return null;   // a man's search gives up sooner: a goal he cannot reach must not stall the page
+  const ok = astar(s, g, r, F, block, opt.maxN || (r < 1 ? 15000 : 20000), opt.turn); if (!ok) return null;   // a man's search gives up sooner: a goal he cannot reach must not stall the page
   const cells = []; for (let c = g; c !== -1; c = came[c]) cells.push(c); cells.reverse();
   const pts = cells.map(ctr); pts[0] = a; pts[pts.length - 1] = b;
   const P = pull(pts, r, opt.stat, opt.turn);
