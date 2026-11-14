@@ -125,7 +125,7 @@
       : PH ? { S: 512, nf: 440, nh: 8, dpr: 1.5, sc: 1, fps: 60, q: 'high', lvl: 0 }
         : { S: 768, nf: 1000, nh: 14, dpr: 2, sc: 1, fps: 60, q: 'high', lvl: 0 };
     var tex = null, SP = [blob('255,246,230', true, 32), blob('255,206,120', true, 32), blob('200,232,255', true, 32), blob('247,160,60', true, 32)], SK = [spike('255,226,170'), spike('190,230,255')];
-    var K0 = .27, BASE = RM ? 0 : .4, RC = .42, PS = .55;   /* tilt of the plane; spin when nothing drives it; radius (of the disc) inside which the stars turn with the coin; pattern speed of the arms */
+    var K0 = .27, BASE = RM ? 0 : .16, RC = .42, PS = .55;   /* tilt of the plane; spin when nothing drives it; radius (of the disc) inside which the stars turn with the coin; pattern speed of the arms */
     var stars = [], hero = [], i, r, q;
     function seed(n) {
       stars = [];
@@ -142,19 +142,19 @@
     function layout() {
       var b = box.getBoundingClientRect(); if (!b.width || !b.height) return false;
       var narrow = w.innerWidth < 821, wide = narrow ? 1.04 : 1.12;
-      cw = b.width * wide; chh = b.height * .68;
-      cv.style.left = ((b.width - cw) / 2).toFixed(1) + 'px'; cv.style.top = (b.height * .4).toFixed(1) + 'px';
+      cw = b.width * wide; chh = b.height * .72;
+      cv.style.left = ((b.width - cw) / 2).toFixed(1) + 'px'; cv.style.top = (b.height * .14).toFixed(1) + 'px';
       cv.style.width = cw.toFixed(1) + 'px'; cv.style.height = chh.toFixed(1) + 'px';
       dpr = Math.min(w.devicePixelRatio || 1, Q.dpr) * Q.sc;
       var nw = Math.max(2, Math.round(cw * dpr)), nh = Math.max(2, Math.round(chh * dpr));
       if (cv.width !== nw || cv.height !== nh) { cv.width = nw; cv.height = nh; }
-      W = nw; H = nh; CX = W / 2; CY = (b.height * .78 - b.height * .4) * dpr; R = W * .465;
+      W = nw; H = nh; CX = W / 2; CY = (b.height * .5 - b.height * .14) * dpr; R = W * .465;
       return true;
     }
     function draw(t, dt) {
       if (!tex) return;
       var m = null; try { m = o.motion ? o.motion() : null; } catch (e) { m = null; }
-      var vel = m && isFinite(m.vel) ? m.vel : BASE, glow = m && isFinite(m.glow) ? m.glow : .2, tilt = m && isFinite(m.tilt) ? m.tilt : 0, bias = m && isFinite(m.bias) ? m.bias : 0;
+      var vel = BASE, glow = m && isFinite(m.glow) ? m.glow : .2, tilt = m && isFinite(m.tilt) ? m.tilt : 0, bias = m && isFinite(m.bias) ? m.bias : 0;
       if (RM) vel = 0;
       V += (clamp(vel, -6, 6) - V) * Math.min(1, dt * 5);
       var v = RM ? 0 : Math.abs(V) < .05 ? (V < 0 ? -.05 : .05) : V;
@@ -210,22 +210,7 @@
       gb.addColorStop(0, 'rgba(255,250,236,' + clamp(.9 * ci, 0, 1).toFixed(3) + ')'); gb.addColorStop(.3, 'rgba(255,206,120,' + clamp(.42 * ci, 0, 1).toFixed(3) + ')');
       gb.addColorStop(.65, 'rgba(247,147,26,' + clamp(.12 * ci, 0, 1).toFixed(3) + ')'); gb.addColorStop(1, 'rgba(247,147,26,0)');
       g.globalAlpha = 1; g.setTransform(1, 0, 0, .62, ox, CY); g.fillStyle = gb; g.fillRect(-Re * .24, -Re * .24, Re * .48, Re * .48); g.setTransform(1, 0, 0, 1, 0, 0);
-      /* the outer orbit: the share of the current halving epoch already mined */
       g.globalCompositeOperation = 'source-over';
-      var rx = Re * 1.03, ry = rx * k;
-      g.globalAlpha = .55 * e; g.lineWidth = Math.max(1, dpr); g.strokeStyle = 'rgba(255,255,255,.2)';
-      g.beginPath(); g.ellipse(ox, CY, rx, ry, roll, 0, TAU); g.stroke();
-      if (halv != null) {
-        var pe = clamp(hv, 0, 1);
-        if (pe > .002) {
-          var lg = g.createLinearGradient(ox - rx, 0, ox + rx, 0); lg.addColorStop(0, '#a65a07'); lg.addColorStop(.5, '#ffd27a'); lg.addColorStop(1, '#a65a07');
-          g.strokeStyle = lg; g.lineCap = 'round';
-          g.globalAlpha = .22 * e; g.lineWidth = 7 * dpr; g.beginPath(); g.ellipse(ox, CY, rx, ry, roll, 0, TAU * pe); g.stroke();
-          g.globalAlpha = .95 * e; g.lineWidth = 2.4 * dpr; g.beginPath(); g.ellipse(ox, CY, rx, ry, roll, 0, TAU * pe); g.stroke();
-          var ha = TAU * pe, ax = Math.cos(ha) * rx, ay = Math.sin(ha) * ry, hpx = ox + ax * cr - ay * sr, hpy = CY + ax * sr + ay * cr, hz2 = (16 + 6 * Math.sin(t * .004)) * dpr;
-          g.globalCompositeOperation = 'lighter'; g.globalAlpha = .9 * e; g.drawImage(SP[1], hpx - hz2 / 2, hpy - hz2 / 2, hz2, hz2);
-        }
-      }
       g.globalCompositeOperation = 'lighter';
       /* where the pointer is over the disc: a soft well of light */
       if (H_ > .02 && pin) {
@@ -294,6 +279,17 @@
     var el = box.querySelector('.nx-c3'), hit = o.hit || box.querySelector('.nx-hit'), area = o.area || box;
     if (!el) return null;
     box.classList.remove('css'); box.classList.add('nxj');
+    /* depth: the two faces are pushed apart and the gap between them is filled with thin gold discs, so seen edge-on
+       the coin is a solid rim, not a sheet of paper (owner's request, 2026-11-14) */
+    var imgs = el.querySelectorAll('img'), NS = lite() ? 9 : 14, slices = [];
+    for (var si = 0; si < NS; si++) { var sl = d.createElement('i'); sl.className = 'nx-c3e'; el.insertBefore(sl, el.firstChild); slices.push(sl); }
+    function thick() {
+      var dd = el.offsetWidth; if (!dd) return; var t = dd * .085;
+      if (imgs[0]) imgs[0].style.transform = 'translateZ(' + (t / 2).toFixed(2) + 'px)';
+      if (imgs[1]) imgs[1].style.transform = 'rotateY(180deg) translateZ(' + (t / 2).toFixed(2) + 'px)';
+      for (var j = 0; j < NS; j++) slices[j].style.transform = 'translateZ(' + (-t / 2 + t * (j + .5) / NS).toFixed(2) + 'px)';
+    }
+    thick(); w.addEventListener('resize', thick);
     var st = { yaw: o.yaw || 0, vel: 0, spin: RM ? 0 : (o.spin == null ? .42 : o.spin), tilt: 0, tiltT: 0, bias: 0, biasT: 0, glow: .2, glowT: .2, facing: false };
     var px = 0, py = 0, rafId = 0, last = 0, paused = false, visible = true, alive = true, drag = null;
     function put() { el.style.transform = 'translate(-50%,-50%) perspective(1400px) rotateX(' + (-st.tilt).toFixed(4) + 'rad) rotateY(' + (st.yaw + st.bias).toFixed(4) + 'rad)'; }
@@ -339,7 +335,7 @@
       pause: function (on) { paused = !!on; if (paused) halt(); else kick(); },
       redraw: put,
       motion: function () { return { yaw: st.yaw + st.bias, vel: drag ? drag.v : st.vel, glow: st.glow, tilt: st.tilt, bias: st.bias }; },
-      destroy: function () { alive = false; halt(); box.classList.remove('nxj'); el.style.transform = ''; }
+      destroy: function () { alive = false; halt(); box.classList.remove('nxj'); el.style.transform = ''; slices.forEach(function (x) { x.remove(); }); for (var j = 0; j < imgs.length; j++) imgs[j].style.transform = ''; }
     };
   }
 
