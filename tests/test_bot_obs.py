@@ -4,8 +4,9 @@ Offline test of the Observatory inside the bot (no network, no Telegram).
     python tests/test_bot_obs.py
 
 Drives the real handlers (refbot.handle_update) with captured Telegram calls, in all five languages:
-  * section "obs" (menu key m:obs): the text, the six Web App buttons + the browser button, the standard navigation,
-    its place in the analysis group; the description from the menu table;
+  * section "obs" (menu key m:obs): the text, one Web App button per chart + the hub + the browser button, the standard
+    navigation, its place in the analysis group; the description from the menu table; the day's figures from the data
+    files (on-chain, options, stablecoins, the Coinbase premium) and nothing when a file is missing;
   * the pages its buttons open exist in the repo and are the ones scripts/build_obs.py builds;
   * the site's menu (scripts/chrome.py) and the assistant's feature list know the section.
 """
@@ -13,6 +14,8 @@ import json
 import os
 import sys
 import tempfile
+import time
+from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
@@ -72,10 +75,16 @@ def msgs_since(n):
 
 
 SITE = "https://entekhab.net"
-PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/open-interest/", "/charts/funding-rate/", "/charts/long-short/",
-                            "/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/", "/charts/network/", "/charts/bitcoin-cycle/", "/charts/")]
+PAGES = [SITE + p for p in ("/charts/liquidation-heatmap/", "/charts/liquidation-map/", "/charts/liquidations/", "/charts/open-interest/", "/charts/funding-rate/",
+                            "/charts/long-short/", "/charts/cvd/", "/charts/basis/", "/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/",
+                            "/charts/stablecoins/", "/charts/network/", "/charts/bitcoin-cycle/", "/charts/")]
 NOW = {"btc": {"date": "2026-11-12", "mvrv": 1.324104, "nupl": 0.24478, "rprice": 53832.9, "sex": 2723131, "net7": -12345.6, "mayer": 0.8123, "puell": 0.912, "dd": -43.21}}
 LAB = {"options": {"BTC": {"pc_oi": 0.77, "max_pain": {"expiry": "2026-11-14", "max_pain": 72000.0}}}}
+STAB = {"summary": {"date": "2026-11-13", "usd": 312.456e9, "chg30": 3.21e9, "ssr": 6.4321, "ssr_date": "2026-11-13"}}
+H_CLOSE = int(time.time()) // 3600 * 3600                    # the hour that closed last, as scripts/obs_premium.py stamps it
+PREM = {"summary": {"btc": {"t": H_CLOSE * 1000, "now": -0.01234, "h24": 0.0312}}}
+PREM_OLD = {"summary": {"btc": {"t": (H_CLOSE - 7 * 3600) * 1000, "now": -0.01234, "h24": 0.0312}}}
+H_TXT = datetime.fromtimestamp(H_CLOSE, timezone.utc).strftime("%Y-%m-%d %H:%M") + " UTC"
 S = R.load_state()
 for i, lang in enumerate(LANGS):
     uid = 900 + i
@@ -93,7 +102,7 @@ for i, lang in enumerate(LANGS):
     check("Binance" in tx and "Bybit" in tx and OBS.L("nfa", lang) in tx, "names its sources and says it is an estimate")
     n_open = OBS.N_ROWS - 1
     webapps = [b["web_app"]["url"] for r in rows[:n_open] for b in r if "web_app" in b]
-    check(webapps == PAGES, "the ten charts and the hub open inside Telegram (Web App buttons)")
+    check(webapps == PAGES and len(PAGES) == 15, "the fourteen charts and the hub open inside Telegram (Web App buttons), in the order of the site's tabs")
     check(len(rows) > n_open and rows[n_open] == [{"text": OBS.L("b_web", lang), "url": PAGES[-1]}], "then the hub in the browser")
     check(all(len(r) <= 2 and all(len(b["text"]) <= 40 for b in r) for r in rows[:OBS.N_ROWS]), "at most two buttons a row, short labels")
     check(all(x in tx for x in ("OKX", "Bitget", "Hyperliquid", "Gate", "Deribit", "Coin Metrics")), "names the other exchanges and the on-chain source it reads")
@@ -104,6 +113,17 @@ for i, lang in enumerate(LANGS):
     tx2 = (msgs_since(n)[-1] if msgs_since(n) else {}).get("text", "")
     check(all(x in tx2 for x in ("2026-11-12", "1.32", "$53,833", "2.72M BTC", "-12.3K BTC", "0.81", "-43.2%", "0.77", "$72,000")) and len(tx2) <= 4096,
           "with the data files: the day's on-chain figures and Deribit's put/call and max pain, as the files have them")
+    D.load = lambda name: {"obs/chain_now": NOW, "lab": LAB, "obs/stables_now": STAB, "obs/premium": PREM}.get(name)
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="m:obs", lang=lang))
+    tx3 = (msgs_since(n)[-1] if msgs_since(n) else {}).get("text", "")
+    check(all(x in tx3 for x in ("DefiLlama", "2026-11-13", "$312.46B", "+$3.21B", "SSR", "6.43", H_TXT, "-0.012%", "+0.031%", "$53,833", "$72,000")) and len(tx3) <= 4096,
+          "…and the stablecoin supply with its 30-day change and SSR, and the Coinbase premium of the last closed hour with its time")
+    D.load = lambda name: {"obs/stables_now": STAB, "obs/premium": PREM_OLD}.get(name)
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="m:obs", lang=lang))
+    tx4 = (msgs_since(n)[-1] if msgs_since(n) else {}).get("text", "")
+    check("$312.46B" in tx4 and "0.012%" not in tx4 and "📌" not in tx4, "a premium older than six hours is left out; the stablecoin line stands on its own")
     D.load = lambda name: None
     check(any(b.get("callback_data") == "m:main" for b in rows[-1]) and any(b.get("callback_data") == "m:g_analysis" for b in rows[-1]),
           "ends with ⬅️ analysis + 🏠")

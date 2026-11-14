@@ -114,6 +114,20 @@ jobs:
         timeout-minutes: 5
         run: python scripts/obs_chain.py
 
+      # /charts/stablecoins/: DefiLlama's daily total of dollar stablecoins, Tether and USDC, and Bitcoin's market value over it
+      # (after obs_chain.py: it reads data/obs/chain_btc.json; asked at most every 3 hours, the previous files stay when the answer is broken)
+      - name: Stablecoin supply and SSR for the Observatory (DefiLlama)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/obs_stables.py
+
+      # /charts/basis/: Coinbase's and Binance's hourly and daily closes (once an hour; Coinbase does not answer in every
+      # country, so the visitor's browser cannot be relied on for it)
+      - name: Coinbase premium for the Observatory (Coinbase and Binance candles)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: python scripts/obs_premium.py
+
       - name: Derivatives command room (OKX funding, OI, long/short, liquidations)
         id: deriv
         continue-on-error: true

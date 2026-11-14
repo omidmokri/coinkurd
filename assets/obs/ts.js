@@ -6,7 +6,8 @@
    new OB.TS(stage).set({ daily: bool, view: [t0, t1] | null, panes: [ {
        weight: 2, log: false, zero: false, title: 'text', fmt: function (v) → string, min, max,
        zones: [{ y0, y1, color }], marks: [{ y, color, label }],
-       series: [{ name, type, color, neg (colour of negative bars), data: [[t, v], …] | candles [[t, o, h, l, c], …], width, hide }] } ] }) */
+       series: [{ name, type, color, neg (colour of negative bars), data: [[t, v], …] | candles [[t, o, h, l, c], …], width, hide,
+                  dim: { t: 1 } (bars drawn pale), fmt }] } ], dimNote: 'what a pale bar means' (a line in the read-out) }) */
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, clamp = OB.clamp, d = document, w = window;
@@ -68,7 +69,7 @@
   };
   TS.prototype.set = function (o) {
     this.P = (o.panes || []).filter(function (p) { return p && p.series && p.series.length; });
-    this.daily = !!o.daily; this.label = o.label || '';
+    this.daily = !!o.daily; this.label = o.label || ''; this.dimNote = o.dimNote || '';
     var t0 = Infinity, t1 = -Infinity, gap = Infinity;
     this.P.forEach(function (p) {
       p.series.forEach(function (s) {
@@ -205,7 +206,9 @@
           for (j = i0; j <= i1; j++) {
             if (a[j][1] == null || !isFinite(a[j][1])) continue;
             yy = Y(a[j][1]); xx = X(a[j][0] + (s.center === false ? 0 : self.gap / 2));
+            if (s.dim && s.dim[a[j][0]]) ctx.globalAlpha = 0.36;                 /* a bar the page marks as incomplete is drawn pale */
             ctx.fillStyle = a[j][1] < 0 && s.neg ? s.neg : s.color; ctx.fillRect(xx - bw / 2, Math.min(yy, zeroY), bw, Math.max(1, Math.abs(yy - zeroY)));
+            ctx.globalAlpha = 1;
           }
           return;
         }
@@ -251,17 +254,23 @@
     var first = P[0], last = P[P.length - 1], top = first._y, bot = last._y + last._h;
     if (h.x < G.L || h.x > G.L + G.plotW || h.y < top || h.y > bot) { tip.hidden = true; return; }
     var t = v.x0 + (h.x - G.L) / G.plotW * (v.x1 - v.x0), near = null, self = this;
-    /* snap to the nearest point of the first series that has one */
-    P.some(function (p) { return p.series.some(function (s) { var a = s.data || [], i = lastLE(a, t + self.gap / 2); if (i >= 0) { near = a[i][0]; return true; } return false; }); });
+    /* snap to the first series that has a point there: a candle or a bar stands in the middle of its interval, so the pointer
+       is inside the interval that began last; a line's point is the nearest one */
+    var mid = false;
+    P.some(function (p) { return p.series.some(function (s) {
+      var a = s.data || [], m = s.type === 'candle' || (s.type === 'bars' && s.center !== false), i = lastLE(a, t + (m ? 0 : self.gap / 2));
+      if (i >= 0) { near = a[i][0]; mid = m; return true; } return false;
+    }); });
     if (near == null) { tip.hidden = true; return; }
-    var cx = Math.round(this._X(near + (P[0].series[0].type === 'candle' ? this.gap / 2 : 0))) + 0.5;
+    var cx = Math.round(this._X(near + (mid ? this.gap / 2 : 0))) + 0.5;
     ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, bot); ctx.stroke();
     var box = d.createElement('div'), hd = d.createElement('div'); hd.className = 'ob-tip-t'; hd.textContent = OB.fmtDate(near, !this.daily); box.appendChild(hd);
-    var any = false;
+    var any = false, pale = false;
     P.forEach(function (p) {
       p.series.forEach(function (s) {
         if (s.hide) return;
         var a = s.data || [], i = lastLE(a, near + (self.daily ? 0 : self.gap * 0.5)); if (i < 0 || near - a[i][0] > self.gap * 3) return;
+        if (s.dim && s.dim[a[i][0]]) pale = true;
         var val = s.type === 'candle' ? a[i][4] : a[i][1]; if (val == null || !isFinite(val)) return;
         var row = d.createElement('div'); row.className = 'ob-tip-r';
         var key = d.createElement('i'); key.className = 'ob-key'; key.style.background = s.type === 'bars' && val < 0 && s.neg ? s.neg : s.color;
@@ -272,6 +281,7 @@
       });
     });
     if (!any) { tip.hidden = true; return; }
+    if (pale && this.dimNote) { var nt = d.createElement('div'); nt.className = 'ob-tip-n'; nt.textContent = this.dimNote; box.appendChild(nt); }
     tip.innerHTML = ''; tip.appendChild(box); tip.hidden = false; tip.setAttribute('dir', OB.rtl() ? 'rtl' : 'ltr');
     var tw = tip.offsetWidth, th = tip.offsetHeight, lx = h.x + 16, ly = h.y + 16;
     if (lx + tw > this.W - 6) lx = h.x - tw - 16; if (lx < 4) lx = 4;

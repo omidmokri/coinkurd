@@ -492,7 +492,7 @@
         return get('https://api.gateio.ws/api/v4/futures/usdt/contracts/' + base + '_USDT', 15000).then(function (x) {
           if (!x || x.position_size == null) throw new Error('gate');
           var px = +x.mark_price, oi = +x.position_size * +x.quanto_multiplier, h = (+x.funding_interval || 28800) / 3600;
-          return { fr: +x.funding_rate, h: h, fr8: per8h(+x.funding_rate, h), px: px, oi: oi, oiUsd: oi * px };
+          return { fr: +x.funding_rate, h: h, fr8: per8h(+x.funding_rate, h), px: px, oi: oi, oiUsd: oi * px, mult: +x.quanto_multiplier };
         });
       });
     } };

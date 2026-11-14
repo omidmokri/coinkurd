@@ -127,8 +127,9 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - **The Observatory — `/charts/` and one address per chart** (owner, 2026-11-13: "everything Glassnode, CoinGlass and
   CryptoQuant offer", built in stages — see the Log and the Backlog): static pages from `scripts/build_obs.py` (it puts
   the header/footer/CSP in itself; its folders join `chrome.STATIC` by `build_obs.folders()`, the sitemap by the same
-  list, and the assistant by `build_obs.catalog()`), app `assets/obs/{i18n,core,src,liqmodel,liq,ts,deriv}.js` +
-  `obs.css` (bump `V` in build_obs.py and `OB.V` in core.js with every change). `core.js` holds the shell, the tabs
+  list, and the assistant by `build_obs.catalog()`), app `assets/obs/{i18n,core,src,liqmodel,liq,ts,deriv,optmath,opt,
+  chainmath,chain,flowmath,flow,prem}.js` + `obs.css` (bump `V` in build_obs.py and `OB.V` in core.js with every
+  change). `core.js` holds the shell, the tabs
   (`OB.PAGES` = the builder's `PAGES`, the i18n test checks it) and the toolbar pieces every view uses (`OB.ui`: coin
   picker, segments, actions). `src.js` reads public data in the visitor's browser — Binance futures, Bybit, OKX,
   Bitget, Hyperliquid (POST), Gate (every host is in the CSP's connect-src) — and brings everything to one unit:
@@ -146,16 +147,42 @@ The site's strategy (agreed with the owner, 2026-11-07):
   definitions. `obs_chain.summary()` is the same arithmetic in Python for the bot (`data/obs/chain_now.json`);
   **change one and you change the other** — `tests/test_obs_chain.py` runs both on the same file and compares every
   figure. The bands on those charts (MVRV 1 / 3.7, Mayer 0.8 / 2.4 …) are conventions, shown with the share of history
-  at or below today's value; the pages never turn them into a verdict. The hub's `HUB["todo"]` in build_obs.py is the
+  at or below today's value; the pages never turn them into a verdict.
+  `flowmath.js` (pure; its head lists the definitions; `node tests/test_obs_flow.js`) + `flow.js` =
+  `/charts/liquidations/` and `/charts/cvd/`; `flowmath.js` + `prem.js` = `/charts/basis/` and `/charts/stablecoins/`.
+  *Liquidations:* Gate's `futures/usdt/contract_stats` read in the browser — hourly rows where a bar is complete,
+  Gate's own 4-hour rows before that (to about 11 months); its daily rows are NOT used (whole days are empty in them);
+  its open interest counts both sides and is halved; its statistics stop now and then for every contract at once, so
+  the empty period and the one before it are found on BTC_USDT's rows (zero taker volume there cannot be real) and
+  those bars are drawn pale and counted, never filled. OKX's public liquidation orders give the last 24 hours only;
+  they are paged exactly (orders share milliseconds: `okxAfter` / `okxStep`). *CVD:* taker delta = 2 × taker buys −
+  volume; spot from Binance's public mirror (`data-api.binance.vision`), futures from Binance futures klines or, when
+  that host does not answer, from Gate's taker sizes — the page says which. *Basis:* the Coinbase premium comes from
+  `data/obs/premium.json` (hourly closes of the last 90 days + `summary`, rewritten every hour) and `premium_d.json`
+  (daily closes since 2017-08-17, rewritten once a day), written by `scripts/obs_premium.py` (update.yml step;
+  Coinbase Exchange BTC-USD / ETH-USD / USDT-USD and Binance spot candles, closed candles only; the premium itself is
+  divided in the page, so every figure can be checked against the two exchanges); the perpetual's premium index is
+  Bybit's, read in the browser; the futures curve is Deribit's (a yearly basis is not worked out for an expiry nearer
+  than two days). *Stablecoins:* `data/obs/stables.json` (one value a day in millions of dollars: all dollar
+  stablecoins, USDT, USDC, Bitcoin's market value, SSR; rewritten only when a number changes) and `stables_now.json`
+  (the summary and the coin list) from `scripts/obs_stables.py` (update.yml step, DefiLlama; a row stamped D+1 is the
+  supply at the end of day D; Bitcoin's value comes from `chain_btc.json`, so the SSR can be a day behind the supply
+  and the tile then names its day). The `summary` blocks of those files are what the tiles and the bot show;
+  `python3 tests/test_obs_flowdata.py` runs both steps against pretend sources in the real formats
+  (`tests/obs_fakes.py`) and then runs flowmath.js on the written files: page arithmetic = summary. The hub's `HUB["todo"]` in build_obs.py is the
   honest "not built yet" list and `HUB["paid_items"]` the "no free source" list: move an item into `HUB["secs"]` only
-  when its page exists. Bot: `scripts/bot_obs.py` (section `obs`: one Web App button per chart and the day's figures
-  from `obs/chain_now.json` and `lab.json`). Tests: `node tests/test_obs_liq.js`, `node tests/test_obs_chain.js`,
-  `node tests/test_obs_opt.js`, `python3 tests/test_obs_chain.py`, `python3 tests/test_obs_i18n.py`,
+  when its page exists. Bot: `scripts/bot_obs.py` (section `obs`: one Web App button per chart, in the order of the
+  site's tabs, and the day's figures from `obs/chain_now.json`, `lab.json`, `obs/stables_now.json` and
+  `obs/premium.json`; a premium older than six hours is left out). Tests: `node tests/test_obs_liq.js`,
+  `node tests/test_obs_chain.js`, `node tests/test_obs_opt.js`, `node tests/test_obs_flow.js`,
+  `python3 tests/test_obs_chain.py`, `python3 tests/test_obs_flowdata.py`, `python3 tests/test_obs_i18n.py`,
   `python3 tests/obs_e2e.py` (`ONLY=data|heat|map|oi|funding|ls|hub|langs|errors`; the exchanges are mocked in their
   real formats and units, so totals, shares and 8-hour rates are known in advance), `python3 tests/obs3_e2e.py`
   (`ONLY=options|chain|cycle|langs|errors|hub`; Deribit mocked with a book worked out by hand, the on-chain files built
   by obs_chain.py itself; the site's service worker is blocked there because it would fetch `/data/…` past the mock),
-  `python3 tests/test_bot_obs.py`.
+  `python3 tests/obs4_e2e.py` (`ONLY=liq|cvd|basis|stables|langs|errors|hub`; Gate, OKX, Binance, Bybit and Deribit
+  mocked in their real formats with holes and same-millisecond orders planted, the premium and stablecoin files
+  written by the real CI steps from `tests/obs_fakes.py`), `python3 tests/test_bot_obs.py`.
 - **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
   now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
   cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
@@ -187,14 +214,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
 ## Backlog (top = next)
 - **The Observatory, next stages** (owner's request 2026-11-13: "everything Glassnode, CoinGlass and CryptoQuant
   offer"; see the Log entries of that day; one page per run is fine). Each is a page under `/charts/` built with
-  `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to `HUB["secs"]` when it exists. Done: liquidation
-  heatmap and map, open interest, funding, long/short, options, MVRV / realized price / NUPL, exchange reserves and
-  flows, network and miners, the Bitcoin cycle. Left, in the hub's own order: (1) real liquidations day by day
-  (OKX's public orders kept by CI; Gate's `futures/usdt/contract_stats` has `long_liq_usd` / `short_liq_usd` — check
-  it from CI first); (2) futures basis and the Coinbase premium (Coinbase spot against Binance spot; check CORS from
-  the owner's browser first); (3) CVD, spot against futures, from klines' taker volume; (4) stablecoin supply against
-  Bitcoin's value (DefiLlama in CI, already read by mm_data.py). Also asked for by those sites and possible: Hyperliquid's
-  real positions (its API gives `liquidationPx` per account: a liquidation map that is data, not a model).
+  `scripts/build_obs.py` + `assets/obs/`, moved from `HUB["todo"]` to `HUB["secs"]` when it exists. Done (fourteen
+  charts): liquidation heatmap and map, real liquidations day by day, open interest, funding, long/short, CVD, basis
+  and the Coinbase premium, options, MVRV / realized price / NUPL, exchange reserves and flows, stablecoins and the
+  SSR, network and miners, the Bitcoin cycle. Left, in the hub's own order: (1) history of the futures curve (nothing
+  free gives yesterday's curve back: CI would have to keep Deribit's futures summary once a day); (2) options IV skew
+  and term structure (Deribit's book carries `mark_iv` per instrument: computable in the browser, no new source);
+  (3) a liquidation archive longer than Gate's 11 months (CI would have to keep the closed days' totals — check
+  first that Gate's 4-hour rows for a closed day do not change afterwards). Also asked for by those sites and
+  possible: Hyperliquid's real positions (its API gives `liquidationPx` per account: a liquidation map that is data,
+  not a model). **Which hosts answer from the owner's own connection (measured in his browser, 2026-11-14):** Gate,
+  OKX, Bybit, Deribit, `data-api.binance.vision`, DefiLlama and Coin Metrics do; no `*.binance.com` host (fapi, api,
+  www) and not `api.exchange.coinbase.com` — so whatever must work for him is read from the first group or by CI,
+  and a page that uses Binance futures needs a second source (the CVD page falls back to Gate).
   **Not possible without a paid source — say so (the hub does), never fake:** SOPR, CDD, HODL waves, long/short-term
   holder supply, per-exchange reserves, miner flows. BGeometrics' free API has them but its terms forbid passing the
   data on. For the owner to decide, not the loop: the channel's own market analysis (`scripts/onchain_data.py`,

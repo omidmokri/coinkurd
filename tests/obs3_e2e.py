@@ -241,6 +241,9 @@ def wait_ch(page, timeout=30000):
     page.wait_for_timeout(300)
 
 
+R2 = 0.0051            # a figure shown with two decimals stands up to half a hundredth from the exact one, whatever its size (the made-up series moves on a day every day)
+
+
 def tiles(page):
     return page.evaluate("() => [...document.querySelectorAll('#ob-tiles .ob-tile')].map(t => ({l: t.querySelector('small').textContent, v: t.querySelector('b').textContent, s: (t.querySelector('span') || {}).textContent || ''}))")
 
@@ -394,7 +397,7 @@ def run():
             wait_ch(page)
             t = tiles(page)
             check("mvrv: tiles show MVRV, realized price, NUPL and Z of the last day (the Python summary's figures)",
-                  near(num(t[0]["v"]), S["mvrv"], 0.004) and near(num(t[1]["v"]), S["rprice"], 0.002) and near(num(t[2]["v"]), S["nupl"], 0.02) and near(num(t[3]["v"]), S["mvrvz"], 0.01), (t, S["mvrv"], S["rprice"], S["nupl"], S["mvrvz"]))
+                  near(num(t[0]["v"]), S["mvrv"], 0.004, R2) and near(num(t[1]["v"]), S["rprice"], 0.002) and near(num(t[2]["v"]), S["nupl"], 0.02, R2) and near(num(t[3]["v"]), S["mvrvz"], 0.01, R2), (t, S["mvrv"], S["rprice"], S["nupl"], S["mvrvz"]))
             check("mvrv: the rank beside MVRV", near(num(t[0]["s"]), S["mvrv_pct"], 0.02, 0.6), (t[0]["s"], S["mvrv_pct"]))
             check("mvrv: price against the realized price", near(num(t[1]["s"]), (S["price"] / S["rprice"] - 1) * 100, 0.02, 0.06), t[1]["s"])
             P = page.evaluate("() => OB._ch.V.ts.P.map(p => ({log: !!p.log, zones: (p.zones || []).length, marks: (p.marks || []).length, s: p.series.map(s => [s.type, s.data.length, s.data[s.data.length - 1][1]])}))")
@@ -433,7 +436,7 @@ def run():
             clicks(page, "#ob-as", "eth")
             wait_ch(page)
             te = tiles(page)
-            check("Ether: its own file", near(num(te[0]["v"]), SUM["eth"]["mvrv"], 0.004) and near(num(te[1]["v"]), SUM["eth"]["rprice"], 0.002), te)
+            check("Ether: its own file", near(num(te[0]["v"]), SUM["eth"]["mvrv"], 0.004, R2) and near(num(te[1]["v"]), SUM["eth"]["rprice"], 0.002), (te, SUM["eth"]["mvrv"], SUM["eth"]["rprice"]))
             check("zero JS errors (mvrv)", not errors, errors[:3])
             ctx.close()
 
@@ -470,7 +473,7 @@ def run():
             t = tiles(page)
             check("network: five tiles for Bitcoin", len(t) == 5, t)
             check("network: active addresses, transactions, hash rate, miner revenue, Puell",
-                  near(num(t[0]["v"]), S["adr7"], 0.006) and near(num(t[1]["v"]), S["tx7"], 0.006) and near(num(t[2]["v"]), S["hash"], 0.002) and near(num(t[3]["v"]), S["rev_usd"], 0.01) and near(num(t[4]["v"]), S["puell"], 0.01),
+                  near(num(t[0]["v"]), S["adr7"], 0.006) and near(num(t[1]["v"]), S["tx7"], 0.006) and near(num(t[2]["v"]), S["hash"], 0.002) and near(num(t[3]["v"]), S["rev_usd"], 0.01) and near(num(t[4]["v"]), S["puell"], 0.01, R2),
                   (t, S["adr7"], S["tx7"], S["hash"], S["rev_usd"], S["puell"]))
             check("network: the ribbon line says which average is on top", ("above" in t[2]["s"]) == (S["hash30"] >= S["hash60"]), t[2]["s"])
             ms = page.evaluate("() => [...document.querySelectorAll('#ob-m button')].map(b => b.dataset.v)")
@@ -499,7 +502,7 @@ def run():
             page.goto(base + "/charts/bitcoin-cycle/")
             wait_ch(page)
             t = tiles(page)
-            check("cycle: price, Mayer, 200-week ratio, drawdown", near(num(t[0]["v"]), S["price"], 0.002) and near(num(t[1]["v"]), S["mayer"], 0.01) and near(num(t[2]["v"]), S["w200"], 0.01) and near(num(t[3]["v"]), S["dd"], 0.02, 0.06), (t, S["mayer"], S["w200"], S["dd"]))
+            check("cycle: price, Mayer, 200-week ratio, drawdown", near(num(t[0]["v"]), S["price"], 0.002) and near(num(t[1]["v"]), S["mayer"], 0.01, R2) and near(num(t[2]["v"]), S["w200"], 0.01, R2) and near(num(t[3]["v"]), S["dd"], 0.02, 0.06), (t, S["mayer"], S["w200"], S["dd"]))
             check("cycle: no asset switch (Bitcoin only)", page.locator("#ob-as").count() == 0)
             rows = page.evaluate("() => [...document.querySelectorAll('#ob-ctbl tbody tr')].map(r => [...r.cells].map(c => c.textContent))")
             names = [r[0] for r in rows]
@@ -551,7 +554,7 @@ def run():
                         wait(page)
                         name = path.strip("/").split("/")[-1]
                         check(f"{lang} {w}px {name}: no sideways scroll", overflow(page) <= 1, overflow(page))
-                        check(f"{lang} {w}px {name}: ten tabs, this one marked", page.locator(".ob-tab").count() == 10 and page.locator(".ob-tab.on").count() == 1)
+                        check(f"{lang} {w}px {name}: fourteen tabs, this one marked", page.locator(".ob-tab").count() == 14 and page.locator(".ob-tab.on").count() == 1)
                         vis = page.evaluate("() => [...document.querySelectorAll('#ob-main h1 [data-lang]')].filter(e => !e.hidden).map(e => e.getAttribute('data-lang'))")
                         check(f"{lang} {w}px {name}: the heading is in {lang}", vis == [lang], vis)
                         txt = page.inner_text("#ob-view")
@@ -640,7 +643,7 @@ def run():
             for pth in ("/charts/options/", "/charts/mvrv/", "/charts/exchange-flows/", "/charts/network/", "/charts/bitcoin-cycle/"):
                 check(f"hub links {pth}", pth in links and os.path.exists(os.path.join(ROOT, pth.strip('/'), "index.html")))
             soon = page.evaluate("() => [...document.querySelectorAll('section:not([hidden]) .ob-hc.soon')].length")
-            check("hub: four items in the works and four that free data cannot give, none of them a link", soon == 8 and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
+            check("hub: three items in the works and four that free data cannot give, none of them a link", soon == 7 and page.locator("section:not([hidden]) a.ob-hc.soon").count() == 0, soon)
             check("hub: says plainly what is not possible", "SOPR" in page.inner_text("section:not([hidden])") and "رایگان" in page.inner_text("section:not([hidden]) .ob-hnote"))
             check("hub: no sideways scroll", overflow(page) <= 1)
             shot(page, "hub-fa-1280")
