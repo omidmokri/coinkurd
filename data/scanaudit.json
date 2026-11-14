@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T10:44:19.700052+00:00",
+ "updated_at": "2026-11-14T10:59:02.446338+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-13T10:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1684,
-   "obs": -0.44,
-   "win": 45.7,
-   "mid": 0.11,
-   "lo": -0.4,
+   "n": 1683,
+   "obs": -0.45,
+   "win": 45.6,
+   "mid": 0.1,
+   "lo": -0.41,
    "hi": 0.65,
-   "p": 0.0383,
+   "p": 0.0364,
    "shifts": 1071,
    "verdict": "worse"
   },
   "_all": {
-   "n": 6323,
+   "n": 6319,
    "obs": -0.18,
    "win": 48.0,
    "mid": 0.01,
    "lo": -0.27,
    "hi": 0.23,
-   "p": 0.1242,
+   "p": 0.1232,
    "shifts": 1071,
    "verdict": "no_edge"
   },
@@ -67,9 +67,9 @@
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 510,
-   "obs": -1.44,
-   "win": 32.7,
+   "n": 507,
+   "obs": -1.43,
+   "win": 32.9,
    "mid": -0.65,
    "lo": -1.58,
    "hi": 0.05,
