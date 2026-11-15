@@ -41,6 +41,11 @@ S = {
               "kmr": "250 coin di 9 deman de, 2D û 3D; herikîna pereyan, likîdîte û ETF — di Telegramê an gerokê de.",
               "ar": "٢٥٠ عملة على ٩ أطر زمنية، ثنائية وثلاثية الأبعاد؛ تدفق الأموال والسيولة وصناديق ETF — في تيليغرام أو المتصفح.",
               "en": "250 coins on nine timeframes, 2D and 3D; money flow, liquidity and ETFs — in Telegram or the browser."}),
+    "pages": ("🗺", {"fa": "همهٔ صفحات سایت", "ckb": "هەموو پەڕەکانی ماڵپەڕ", "kmr": "Hemû rûpelên malperê", "ar": "كل صفحات الموقع",
+                    "en": "Every page of the site"},
+              {"fa": "نقشهٔ کامل سایت: هر صفحه با یک دکمه، داخل تلگرام.", "ckb": "نەخشەی تەواوی ماڵپەڕ: هەر پەڕەیەک بە دوگمەیەک، لەناو تێلێگرام.",
+               "kmr": "Nexşeya tevahî ya malperê: her rûpel bi bişkokekê, di Telegramê de.", "ar": "خريطة الموقع كاملة: كل صفحة بزر، داخل تيليغرام.",
+               "en": "The whole site map: every page one button away, inside Telegram."}),
     "world": ("🌍", {"fa": "جهان زنده (ثانیه به ثانیه)", "ckb": "جیهانی زیندوو (چرکە بە چرکە)", "kmr": "Cîhana zindî (saniye bi saniye)",
                     "ar": "العالم مباشرةً (ثانيةً بثانية)", "en": "The world, live (by the second)"},
               {"fa": "جمعیت، بیت‌کوین، اقتصاد، انرژی، CO₂ و سلامت با منبع؛ و ساخت پست برای شبکه‌های اجتماعی.",
@@ -405,7 +410,7 @@ GROUPS = {
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "podcast", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],
-    "g_more": ["lang", "apps", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
+    "g_more": ["pages", "lang", "apps", "learn", "enc", "proxy", "outage", "ref", "predict", "paper"],
 }
 PARENT = {k: HOME for k in HOME_ITEMS}
 for g, items in GROUPS.items():
