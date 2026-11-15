@@ -41,3 +41,8 @@ ks_pass*
 
 # the site-search index, built by scripts/build_links.py from the built pages
 /search.json
+
+# /market/<language>/ pages (and the /market/fa|ckb|ar|en/ forwards) and their string packs: built by CI from the
+# translation cache data/pro_l10n/ (scripts/build_market_l10n.py); they ship with the site, not the repo
+/market/*/
+/assets/pro/l10n/

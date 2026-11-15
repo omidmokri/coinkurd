@@ -17,10 +17,17 @@
     back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>'
   };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  /* the menus' language: the site's switch, else the page's own; the live market's 43 other languages (html lang="de",
+     "he", "ja" …) get the English menus, as Arabic does (the menus exist in the site's languages only) */
   function lang() {
     var b = d.querySelector('#langs button.on'), l = b ? b.getAttribute('data-l') : (de.getAttribute('lang') || 'fa').toLowerCase();
     if (l === 'ar') l = 'en';
-    return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa';
+    return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en';
+  }
+  /* a page in one of those languages names it on the one-button switch, in its own words (Deutsch, עברית, 日本語) */
+  function ownLangName() {
+    if (!de.hasAttribute('data-pro-lang')) return null;
+    var l = de.getAttribute('lang') || ''; try { return new Intl.DisplayNames([l], { type: 'language' }).of(l) || null; } catch (e) { return null; }
   }
   /* «العربية» shows where the header shows it (data/ar_on) or in the owner's test mode */
   function arOn() { if (d.querySelector('#langs button[data-l="ar"]:not([hidden])')) return true; try { return localStorage.getItem('ek_ar_test') === '1'; } catch (e) { return false; } }
@@ -67,7 +74,8 @@
     var lg = d.createElement('button'); lg.type = 'button'; lg.className = 'ek-ib ek-lg1';
     lg.setAttribute('data-afa', 'زبان'); lg.setAttribute('data-ackb', 'زمان'); lg.setAttribute('data-aen', 'Language');
     tools.insertBefore(lg, tools.firstChild);
-    lg.addEventListener('click', function () { openMenu(null, lg, true); });
+    /* on the live market (/market/ and its 43 language pages) the button opens the workspace's own list of 47 languages */
+    lg.addEventListener('click', function () { var A = w.PRO && w.PRO.app; if (A && A.langDialog && d.getElementById('pro')) { A.langDialog(); return; } openMenu(null, lg, true); });
     /* the header fits itself: each language's labels have their own length (and the switcher shows four full names),
        so instead of fixed breakpoints the parts give way in turn only while the menu and the tools actually collide:
        1 the switcher becomes one «language» button · 2 the profile icon goes · 3 «more» goes · 4 the app button shrinks */
@@ -408,8 +416,8 @@
   }
   function syncLang() {
     var l = lang(), lg = H && H.querySelector('.ek-lg1'), ar = false;
-    try { ar = localStorage.getItem('ek_ar') === '1' || de.lang === 'ar'; } catch (e) { }
-    if (lg) lg.textContent = ar ? 'العربية' : { fa: 'فارسی', ckb: 'کوردی', en: 'English' }[l];
+    try { ar = !de.hasAttribute('data-pro-lang') && (localStorage.getItem('ek_ar') === '1' || de.lang === 'ar'); } catch (e) { }
+    if (lg) lg.textContent = ar ? 'العربية' : ownLangName() || { fa: 'فارسی', ckb: 'کوردی', en: 'English' }[l];
     if (!M) return;
     M.setAttribute('aria-label', pick('منوی سایت', 'مێنیوی ماڵپەڕ', 'Site menu'));
     M.querySelector('.ekm-lang').setAttribute('aria-label', pick('زبان', 'زمان', 'Language'));

@@ -450,8 +450,17 @@ HEAD = ('<script id="ek-ar-h">try{if(localStorage.getItem("ek_ar")==="1"&&!/^\\/
 TAG = f'<script src="/assets/ar.js?v={VER}" defer></script>'
 
 
+NOAR = re.compile(r"<html[^>]*\sdata-noar")    # a page in another language of its own (/market/<code>/): no Arabic layer
+
+
 def inject(path):
     s = open(path, encoding="utf-8").read()
+    if NOAR.search(s[:800]):
+        s2 = re.sub(r'<script id="ek-ar-h">.*?</script><style id="ek-ar-s">.*?</style>', "", s, flags=re.S)
+        s2 = re.sub(r'<script src="/assets/ar\.js\?v=\w+" defer></script>', "", s2)
+        if s2 != s:
+            open(path, "w", encoding="utf-8").write(s2)
+        return
     if 'id="ek-ar-h"' in s:
         s = re.sub(r'<script id="ek-ar-h">.*?</script><style id="ek-ar-s">.*?</style>', lambda m: HEAD, s, count=1, flags=re.S)
     else:
@@ -473,6 +482,12 @@ def main():
     for path in walk():
         top = os.path.relpath(path, ROOT).split(os.sep)[0]
         if top in NO_DICT_TOP:
+            continue
+        try:
+            with open(path, encoding="utf-8") as fh:
+                if NOAR.search(fh.read(800)):          # not English: nothing to put in the Arabic dictionaries
+                    continue
+        except OSError:
             continue
         p = Page()
         try:

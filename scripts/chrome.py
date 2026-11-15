@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "21"  # bump to bust caches of chrome.css / chrome.js
+VER = "22"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -452,7 +452,7 @@ def footer(lang="fa"):
 # before it, so placed lower the interface's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "9"
+UI2_VER = "10"
 NX_VER = "15"   # interface v3 "Nexus": the v2 engine plus assets/nx*.{css,js} (14: the galaxy under the coin and the homepage pointer, assets/nx-cosmos.js)
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
