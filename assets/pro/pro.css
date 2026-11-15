@@ -437,3 +437,14 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
   .pm-lgl{grid-template-columns:repeat(2,minmax(0,1fr));max-height:60vh}
   .pm-bot .pm-lgb,.pm-bot .pm-curb{order:-1;padding:2px 7px}
 }
+
+/* header: the globe before the site's four languages (market pages only) */
+#ekh #langs .pm-hglobe{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:0 9px;min-width:46px;border:0;border-radius:9px;color:#0b0c0f;background:linear-gradient(135deg,#ffd27a,#f5a524 55%,#e08a12);box-shadow:0 0 0 1px #ffffff14 inset,0 4px 14px -6px #f5a524aa;cursor:pointer;transition:filter .2s,transform .2s}
+#ekh #langs .pm-hglobe svg{width:16px;height:16px;stroke-width:2;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+#ekh #langs .pm-hglobe b{font:800 .68rem/1 var(--ek-font,inherit)}
+#ekh #langs .pm-hglobe:hover{filter:brightness(1.08)}
+#ekh #langs .pm-hglobe:hover svg{transform:rotate(-180deg)}
+#ekh #langs .pm-hglobe:active{transform:scale(.96)}
+#ekh #langs .pm-hglobe:focus-visible{outline:2px solid #fff;outline-offset:1px}
+/* room for it: on market pages up to wide screens, «Get the apps» is its icon alone (as the header does when tight) */
+@media (max-width:1700px){html:has(#pro) #ekh .ek-appb{width:38px!important;padding:0!important;justify-content:center}html:has(#pro) #ekh .ek-appb .ek-i{display:none!important}}
