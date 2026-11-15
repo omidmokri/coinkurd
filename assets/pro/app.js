@@ -9,16 +9,41 @@
   if (!LW || !P || !I) return;
   window.I18N = 1;
 
-  /* ---------------------------------------------------------------- language */
+  /* ---------------------------------------------------------------- language
+     The site's own four (ckb, fa, ar, en) live here at /market/ and follow the site's switch (ck_lang; Arabic: ek_ar,
+     translated around the page by ar.js). The other 43 (langs.js) each have a page of their own, /market/<code>/,
+     which names its language on <html data-pro-lang>; their strings come from assets/pro/l10n/<code>.js, machine-
+     translated by CI (scripts/pro_l10n.py), and a string not translated yet shows in English. */
+  var LROW = {}; (P.LANGS || []).forEach(function (r) { LROW[r[0]] = r; });
+  var SITE = P.SITE_LANGS || ['ckb', 'fa', 'ar', 'en'];
+  var PAGE_LANG = de.getAttribute('data-pro-lang'); if (PAGE_LANG && (!LROW[PAGE_LANG] || SITE.indexOf(PAGE_LANG) >= 0)) PAGE_LANG = null;
   function detectLang() {
+    if (PAGE_LANG) return PAGE_LANG;
     var q = /[?&]lang=(fa|ckb|en|ar)\b/.exec(location.search), ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
-    if (q) { try { if (q[1] === 'ar') { localStorage.setItem('ek_ar', '1'); localStorage.setItem('ck_lang', 'en'); } else { localStorage.removeItem('ek_ar'); localStorage.setItem('ck_lang', q[1]); } } catch (e) { } return q[1]; }
+    if (q) { try { localStorage.removeItem('ek_pro_lang'); if (q[1] === 'ar') { localStorage.setItem('ek_ar', '1'); localStorage.setItem('ck_lang', 'en'); } else { localStorage.removeItem('ek_ar'); localStorage.setItem('ck_lang', q[1]); } } catch (e) { } return q[1]; }
     if (ls('ek_ar') === '1') return 'ar';
     var l = ls('ck_lang'); return ['fa', 'ckb', 'en'].indexOf(l) >= 0 ? l : 'fa';
   }
   var LANG = detectLang();
   var T = function (k, a) { return P.tr(LANG, k, a); };
-  var RTL = function () { return LANG !== 'en'; };
+  var RTL = function () { var r = LROW[LANG]; return r ? r[5] === 'rtl' : LANG !== 'en'; };
+  /* the language tag pages and screen readers expect: the site's own four as they are, the others by their hreflang
+     (the page path /iw/ is Hebrew, he; /jp/ is ja; /cn/ zh-Hans …) */
+  var TAG = function (l) { l = l || LANG; return SITE.indexOf(l) >= 0 || !LROW[l] ? l : LROW[l][4]; };
+  if (P.fx) P.fx.init(LANG);
+  /* a language from the menu: the site's own four at /market/ (the site's switch remembers them), any other at its
+     own address (remembered here, so /market/ opens it next time) */
+  function goLang(l) {
+    if (!LROW[l]) return;
+    try {
+      if (SITE.indexOf(l) >= 0) {
+        localStorage.removeItem('ek_pro_lang');
+        if (l === 'ar') { localStorage.setItem('ek_ar', '1'); localStorage.setItem('ck_lang', 'en'); } else { localStorage.removeItem('ek_ar'); localStorage.setItem('ck_lang', l); }
+      } else localStorage.setItem('ek_pro_lang', l);
+    } catch (e) { }
+    if (l === LANG && (PAGE_LANG ? true : SITE.indexOf(l) >= 0)) { closeModal(); return; }
+    location.href = SITE.indexOf(l) >= 0 ? '/market/?lang=' + l : '/market/' + l + '/';
+  }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩', ar: '٠١٢٣٤٥٦٧٨٩' };
   function loc(n) { var m = DIG[LANG]; return m ? String(n).replace(/\d/g, function (c) { return m[c]; }) : String(n); }
 
@@ -57,14 +82,14 @@
     chev: '<path d="m6 9 6 6 6-6"/>', candle: '<path d="M7 3v18M17 3v18"/><rect x="4.5" y="7" width="5" height="9" rx="1"/><rect x="14.5" y="6" width="5" height="7" rx="1"/>',
     tpl: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/>', play: '<path d="M7 4v16l13-8z"/>', pause: '<path d="M7 4h4v16H7zM14 4h4v16h-4z"/>',
     step: '<path d="M5 4v16l10-8z"/><path d="M18 4v16"/>', back: '<path d="M19 4v16L9 12z"/><path d="M6 4v16"/>', save: '<path d="M5 3h11l4 4v14H5z"/><path d="M8 3v6h8"/><rect x="8" y="13" width="8" height="6"/>',
-    help: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><path d="M12 17h0"/>', menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', bt: '<path d="M3 20h18"/><path d="M5 16l4-5 3 3 6-8"/><path d="M15 6h3v3"/>', side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>', pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><path d="M12 17h0"/>', globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>', menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', bt: '<path d="M3 20h18"/><path d="M5 16l4-5 3 3 6-8"/><path d="M15 6h3v3"/>', side: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>', pen: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'
   };
   function ic(n, cls) { return '<svg class="pm-ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>'; }
 
   /* Entekhab's own layers (outputs of the site's data; no indicator code ever reaches this page) */
   var LAYERS = { posts: { src: '/data/impact.json' }, sigs: { src: '/data/signals.json' }, live: { src: '/data/live.json' }, news: { src: '/data/news.json' } };
   var NEWSALIAS = { XAUT: 'GOLD', PAXG: 'GOLD' }, NEWSC = { regulation: '#a78bfa', security: '#ff5a4d', etf_institutional: '#38bdf8', onchain: '#2dd4bf', technical: '#9ca3af', news: '#f7931a' };
-  function newsBase(sym) { var b = String(sym).replace(/_IRT$/, ''); return NEWSALIAS[b] || b; }
+  function newsBase(sym) { var b = String(sym).replace(/_[A-Z]{3}$/, ''); return NEWSALIAS[b] || b; }
   function newsTitle(it) { var L = LANG; return (L === 'fa' && it.tfa) || (L === 'ckb' && it.tckb) || it.title; }
 
   /* ---------------------------------------------------------------- state (saved automatically) */
@@ -75,8 +100,9 @@
   var TFS = { s: ['1s', '5s', '10s', '15s', '20s', '30s', '45s'], m: ['1m', '3m', '5m', '15m', '30m', '45m'], h: ['1h', '2h', '3h', '4h', '6h', '8h', '12h'], d: ['1d', '3d', '1w', '1M'] };
   function hasLogo(s) { return P.hasLogo ? P.hasLogo(s) : (!P._logoSet || P._logoSet.has(s)); }      /* site rule: no coin without its own logo */
   function newChart(sym) { return { sym: sym || 'BTC', tf: '1h', type: 'candle', inds: [{ id: 'vol', p: {}, u: P.uid() }], scale: { mode: 0, auto: 1 } }; }
+  function homeSym() { var q = P.fx ? P.fx.cur() : 'IRT'; return q === 'IRT' || q === 'USD' ? 'BTC' : 'BTC_' + q; }
   function defaults() {
-    return { v: 1, layout: '1', active: 0, sync: { sym: false, tf: false, cross: true, time: false, ind: false }, charts: [newChart('BTC')],
+    return { v: 1, layout: '1', active: 0, sync: { sym: false, tf: false, cross: true, time: false, ind: false }, charts: [newChart(homeSym())],
       tz: 'local', cal: 'greg', side: innerWidth >= 900 ? 'watch' : null, fav: ['1s', '5s', '15s', '1m', '5m', '15m', '1h', '4h', '1d', '1w'],
       ev: { on: 1, imp: ['H', 'M'], cur: [] }, keep: 0, magnet: 0, sound: 1, saver: null, name: '' };
   }
@@ -131,7 +157,7 @@
   function tzName() { return st.tz === 'local' ? undefined : st.tz; }
   function dtf(kind) {
     var key = st.tz + '|' + st.cal + '|' + kind; if (FMT[key]) return FMT[key];
-    var base = st.cal === 'jalali' ? (LANG === 'fa' ? 'fa-IR-u-ca-persian-nu-latn' : 'en-u-ca-persian') : 'en-GB';
+    var base = st.cal === 'jalali' ? (LANG === 'fa' ? 'fa-IR-u-ca-persian-nu-latn' : 'en-u-ca-persian') : SITE.indexOf(LANG) < 0 && LROW[LANG] ? LROW[LANG][3] + '-u-ca-gregory-nu-latn' : 'en-GB';
     var o = { timeZone: tzName(), hourCycle: 'h23' };
     if (kind === 'full') { o.year = '2-digit'; o.month = 'short'; o.day = 'numeric'; o.hour = '2-digit'; o.minute = '2-digit'; }
     if (kind === 'fulls') { o.year = '2-digit'; o.month = 'short'; o.day = 'numeric'; o.hour = '2-digit'; o.minute = '2-digit'; o.second = '2-digit'; }
@@ -146,6 +172,7 @@
   }
   function fmtT(t, kind) { try { return dtf(kind || 'full').format(new Date(t * 1000)); } catch (e) { return ''; } }
   var LOCS = { fa: 'fa-IR', ckb: 'ckb-IQ', ar: 'ar', en: 'en-GB' }, FMTD = {};
+  Object.keys(LROW).forEach(function (k) { if (!LOCS[k]) LOCS[k] = LROW[k][3]; });
   /* dates written in the reader's language (lists, tooltips, logs) */
   function fmtD(t, kind) {
     var key = LANG + '|' + st.tz + '|' + st.cal + '|' + kind, f = FMTD[key];
@@ -192,7 +219,7 @@
   var openModal = null;
   function modal(title, body, opts) {
     closeModal(); opts = opts || {};
-    var m = h('<div class="pm-modal" role="dialog" aria-modal="true"><div class="pm-mbox' + (opts.wide ? ' wide' : '') + '" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + LANG + '">' +
+    var m = h('<div class="pm-modal" role="dialog" aria-modal="true"><div class="pm-mbox' + (opts.wide ? ' wide' : '') + '" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + TAG() + '">' +
       '<div class="pm-mhead"><b>' + esc(title) + '</b><button type="button" class="pm-ib pm-mx" aria-label="' + esc(T('close')) + '">' + ic('x') + '</button></div><div class="pm-mbody"></div></div></div>');
     var b = $('.pm-mbody', m); if (typeof body === 'string') b.innerHTML = body; else if (body) b.appendChild(body);
     m.addEventListener('mousedown', function (e) { if (e.target === m) closeModal(); });
@@ -216,7 +243,7 @@
   var openMenu = null;
   function menu(anchor, items, opts) {
     closeMenu(); opts = opts || {};
-    var m = h('<div class="pm-menu" role="menu" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + LANG + '"></div>');
+    var m = h('<div class="pm-menu" role="menu" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + TAG() + '"></div>');
     items.forEach(function (it) {
       if (!it) return;
       if (it.sep) { m.appendChild(h('<div class="pm-msep"></div>')); return; }
@@ -358,8 +385,8 @@
     this.mk = LW.createSeriesMarkers(s, []);
   };
   Cell.prototype.applyPrec = function () {
-    var pr = this.prec(), tmn = P.isToman && P.isToman(this.cfg.sym) && pr === 0;
-    /* toman prices run to hundreds of millions: grouped digits on the axis (only for this series, not the oscillators) */
+    var pr = this.prec(), tmn = P.isLocal && P.isLocal(this.cfg.sym) && pr === 0;
+    /* toman (and yen, won, dong …) prices run to hundreds of millions: grouped digits on the axis (only for this series, not the oscillators) */
     if (this.main) this.main.applyOptions({ priceFormat: tmn ? { type: 'custom', minMove: 1, formatter: function (p) { return Math.round(p).toLocaleString('en-US'); } } : { type: 'price', precision: pr, minMove: Math.pow(10, -pr) } });
     var sc = this.cfg.scale; this.chart.priceScale('right').applyOptions({ mode: sc.mode, autoScale: !!sc.auto });
   };
@@ -394,7 +421,7 @@
       var b = x.bar, n = this.bars.length;
       if (n && this.bars[n - 1].t === b.t) this.bars[n - 1] = b; else if (!n || b.t > this.bars[n - 1].t) this.bars.push(b); else return;
       this.tick(x.isNew); emit('tick', this, b, x.closed);
-    } else if (what === 'state') { this.legend(); if (F.state === 'error') this.msg(T('noData', { s: this.cfg.sym })); }
+    } else if (what === 'state') { this.legend(); if (F.state === 'error') this.msg(F.err === 'rate' ? T('noRate', { c: P.quoteOf ? P.quoteOf(this.cfg.sym) : '' }) : T('noData', { s: this.cfg.sym })); }
   };
   Cell.prototype.fit = function () {
     var n = this.disp.length; if (!n) return;
@@ -588,9 +615,10 @@
   Cell.prototype.legend = function () {
     var c = this.cfg, F = this.feed, self = this;
     var stc = this.replay ? 'rep' : !F ? 'load' : F.state === 'live' ? 'live' : F.state === 'poll' ? 'poll' : F.state === 'snap' ? 'snap' : F.state === 'error' ? 'err' : 'load';
-    var src = F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && F.src === 'irt' ? 'Binance × tgju' : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
+    var rs = F && F.R && F.R.source ? F.R.source() : '', rsn = rs === 'own' ? T('yourRate') : rs, ref = F && F.R ? ({ ecb: 'ECB', xapi: 'exchange-api' })[F.R.src] || '' : '';
+    var src = F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && (F.src === 'irt' || F.src === 'fiat') ? 'Binance × ' + (rsn || '…') : F && F.src === 'fxr' ? ref : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
     var I0 = P.inst(c.sym) || {}, isFut = I0.kind === 'fut', adj = isFut && P.futAdj && P.futAdj(c.sym);
-    var stTitle = T('st_' + stc) + (F && F.state === 'snap' && F.at ? ' · ' + fmtT(Math.floor(F.at / 1000)) : '');
+    var stTitle = (F && F.src === 'fxr' && F.state === 'snap' ? T('refDaily') : T('st_' + stc)) + (F && F.state === 'snap' && F.at && F.src !== 'fxr' ? ' · ' + fmtT(Math.floor(F.at / 1000)) : '');
     var leg = $('.pm-leg', this.el);
     leg.innerHTML = '<div class="pm-l1"><button type="button" class="pm-lsym" data-a="sym"><img src="' + esc(P.logo(c.sym)) + '" alt="" width="18" height="18" onerror="this.style.visibility=\'hidden\'"><b>' + esc(P.pair(c.sym)) + '</b></button>' +
       '<button type="button" class="pm-ltf" data-a="tf">' + esc(tfLabel(c.tf)) + '</button>' + (isFut ? '<button type="button" class="pm-badj' + (adj ? ' on' : '') + '" data-a="badj" aria-pressed="' + !!adj + '" title="' + esc(T('badjT')) + '">B-ADJ</button>' : '') + '<span class="pm-src">' + src + '</span><i class="pm-dot ' + stc + '" title="' + esc(stTitle) + '"></i>' +
@@ -901,7 +929,7 @@
   function paintTop() {
     var a = active(); if (!a || !root) return;
     var c = a.cfg, sb = $('#pm-sym'), tb = $('#pm-tfs'), ty = $('#pm-type');
-    if (sb) { var In = P.inst(c.sym) || {}; sb.innerHTML = '<img src="' + esc(P.logo(c.sym)) + '" alt="" width="20" height="20" onerror="this.style.visibility=\'hidden\'"><b>' + esc(In.kind === 'ir' || In.kind === 'fut' ? P.pair(c.sym) : In.base || c.sym) + '</b><small>' + (In.kind === 'ir' ? '' : '/' + esc(In.quote === 'IRT' ? T('toman') : In.quote === 'USD' ? 'USD' : 'USDT')) + '</small>' + ic('search', 'sm'); }
+    if (sb) { var In = P.inst(c.sym) || {}; sb.innerHTML = '<img src="' + esc(P.logo(c.sym)) + '" alt="" width="20" height="20" onerror="this.style.visibility=\'hidden\'"><b>' + esc(In.kind === 'ir' || In.kind === 'fut' ? P.pair(c.sym) : In.base || c.sym) + '</b><small>' + (In.kind === 'ir' ? '' : '/' + esc(In.quote === 'IRT' ? T('toman') : In.quote || 'USDT')) + '</small>' + ic('search', 'sm'); }
     if (tb) {
       var favs = st.fav.slice(); if (favs.indexOf(c.tf) < 0) favs.push(c.tf);
       tb.innerHTML = favs.map(function (tf) { return '<button type="button" class="pm-tf' + (tf === c.tf ? ' on' : '') + '" data-tf="' + tf + '">' + esc(tfLabel(tf)) + '</button>'; }).join('') +
@@ -980,23 +1008,26 @@
     var box = h('<div class="pm-ss"><div class="pm-ssh"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"></div><div class="pm-sscat"></div><div class="pm-ssl" role="listbox"></div><p class="pm-note pm-ssn"></p></div>');
     var inp = $('input', box), list = $('.pm-ssl', box), cats = $('.pm-sscat', box), note = $('.pm-ssn', box), cat = 'all', M = null, sel = 0;
     inp.placeholder = T('searchSym'); inp.value = q || '';
-    /* markets: every Binance coin in USDT and in toman, Iran's currencies, gold, coins and silver in toman */
-    ['all', 'watch', 'usdt', 'irt', 'fx', 'gold', 'fut'].forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
+    /* markets: every Binance coin in USDT and in the visitor's currency; Iran's toman markets (currencies, gold, coins,
+       silver, every coin in toman) where the toman is the currency or the reader is Persian or Kurdish */
+    var Q = P.fx ? P.fx.cur() : 'IRT', LOCAL = Q !== 'IRT' && Q !== 'USD', IRC = Q === 'IRT' || LANG === 'fa' || LANG === 'ckb';
+    ['all', 'watch', 'usdt'].concat(LOCAL ? ['loc'] : [], IRC ? ['irt', 'fx'] : [], ['gold', 'fut']).forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = k === 'loc' ? T('cat_loc', { c: Q }) : T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
     function names(x) { var I = P.inst(x); return I && I.name ? [I.name.fa, I.name.ckb, I.name.ar, I.name.en].join(' ').toLowerCase() : ''; }
     function draw() {
       var raw = inp.value.trim(), s = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), low = raw.toLowerCase(), W = (P.watchSyms ? P.watchSyms() : []);
-      var src = !M ? [] : cat === 'watch' ? W : cat === 'usdt' ? M.usdt : cat === 'irt' ? M.irt : cat === 'fut' ? (M.fut || []) : cat === 'fx' ? M.ir.filter(function (x) { return P.irGroup(x) === 'fx'; }) :
-        cat === 'gold' ? M.ir.filter(function (x) { return /gold|coin|silver/.test(P.irGroup(x)); }).concat(M.usdt.filter(function (x) { return x === 'XAUT' || x === 'PAXG'; })) :
-        M.ir.concat(M.usdt, M.irt, M.fut || []);
+      var loc = (M && M.loc) || [], goldC = function (x) { return /^(XAUT|PAXG)(_|$)/.test(x); };
+      var src = !M ? [] : cat === 'watch' ? W : cat === 'usdt' ? M.usdt : cat === 'loc' ? loc : cat === 'irt' ? M.irt : cat === 'fut' ? (M.fut || []) : cat === 'fx' ? M.ir.filter(function (x) { return P.irGroup(x) === 'fx'; }) :
+        cat === 'gold' ? (IRC ? M.ir.filter(function (x) { return /gold|coin|silver/.test(P.irGroup(x)); }) : []).concat(M.usdt.filter(goldC), loc.filter(goldC)) :
+        (IRC ? M.ir : []).concat(M.usdt, loc, IRC ? M.irt : [], M.fut || []);
       var r = src.filter(function (x) { return !raw || (s && x.indexOf(s) >= 0) || (low && names(x).indexOf(low) >= 0) || (low && P.pair(x).toLowerCase().indexOf(low) >= 0); });
       r.sort(function (a, b) { return (s && a.indexOf(s) === 0 ? 0 : 1) - (s && b.indexOf(s) === 0 ? 0 : 1); });
       r = r.slice(0, 120); sel = 0;
       list.innerHTML = r.length ? r.map(function (x, i) {
-        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' ? T('computed') : I.kind === 'fut' ? T('futSub') + ' · Bybit' : 'Binance';
+        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' || I.kind === 'fiat' ? T('computed') : I.kind === 'fxr' ? T('refRate') : I.kind === 'fut' ? T('futSub') + ' · Bybit' : 'Binance';
         return '<button type="button" role="option" class="pm-ssi' + (i === 0 ? ' on' : '') + '" data-s="' + x + '"><img src="' + esc(P.logo(x)) + '" alt="" width="22" height="22" loading="lazy"><b>' + esc(P.pair(x)) + '</b><small>' + esc(sub) + '</small>' +
           (tk ? '<span class="pm-num">' + P.fmt(tk.c, P.precFor(x, tk.c)) + '</span><span class="pm-num ' + (tk.chg >= 0 ? 'up' : 'dn') + '">' + (tk.chg >= 0 ? '+' : '') + (tk.chg || 0).toFixed(2) + '%</span>' : '') + '</button>';
       }).join('') : '<p class="pm-empty">' + esc(M ? T('noMatch') : T('loading')) + '</p>';
-      note.textContent = cat === 'irt' ? T('irtNote') : cat === 'fx' || cat === 'gold' ? T('irNote') : cat === 'fut' ? T('futNote') : '';
+      note.textContent = cat === 'loc' ? T('locNote', { c: Q }) : cat === 'irt' ? T('irtNote') : cat === 'fx' || (cat === 'gold' && IRC) ? T('irNote') : cat === 'fut' ? T('futNote') : '';
       $$('[data-s]', list).forEach(function (b) { b.onclick = function () { closeModal(); applySym(b.getAttribute('data-s')); }; });
     }
     inp.oninput = draw;
@@ -1211,7 +1242,8 @@
   }
   var TZS = ['local', 'UTC', 'Asia/Tehran', 'Asia/Baghdad', 'Europe/Istanbul', 'Asia/Dubai', 'Europe/London', 'Europe/Berlin', 'America/New_York', 'Asia/Tokyo'];
   function settingsMenu(anchor) {
-    var items = [{ head: T('timezone') }];
+    var items = [{ label: T('langTitle'), hint: LROW[LANG] ? LROW[LANG][1] : '', icon: 'globe', act: langDialog },
+      { label: T('curTitle'), hint: P.fx ? curLabel(P.fx.cur()) : '', act: curDialog }, { head: T('timezone') }];
     TZS.forEach(function (z) { items.push({ label: z === 'local' ? T('tzLocal') : z.replace('_', ' '), on: st.tz === z, act: function () { setTZ(z); } }); });
     items.push({ head: T('calendar') },
       { label: T('greg'), on: st.cal === 'greg', act: function () { st.cal = 'greg'; FMT = {}; relocalize(); save(); } },
@@ -1223,6 +1255,101 @@
   }
   function setTZ(z) { st.tz = z; FMT = {}; relocalize(); save(); }
   function relocalize() { cells.forEach(function (c) { c.chart.applyOptions(locOpts()); c.legend(); }); clockTick(); emit('tz'); }
+
+  /* ---- the language menu: every language of the workspace (the site's own first: Kurdish first, English last) */
+  function langDialog() {
+    closeMenu();
+    var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note"></p></div>');
+    var inp = $('input', box), list = $('.pm-lgl', box);
+    inp.placeholder = T('langSearch'); inp.setAttribute('aria-label', T('langSearch')); $('.pm-note', box).textContent = T('langNote');
+    function draw() {
+      var q = inp.value.trim().toLowerCase();
+      var L = (P.LANGS || []).filter(function (r) { return !q || (r[1] + ' ' + r[2] + ' ' + r[0]).toLowerCase().indexOf(q) >= 0; });
+      list.innerHTML = L.length ? L.map(function (r) {
+        return '<button type="button" role="option" aria-selected="' + (r[0] === LANG) + '" class="pm-lgi' + (r[0] === LANG ? ' on' : '') + '" data-lg="' + r[0] + '"><b lang="' + esc(r[4]) + '" dir="' + r[5] + '">' + esc(r[1]) + '</b><small lang="en" dir="ltr">' + esc(r[2]) + '</small></button>';
+      }).join('') : '<p class="pm-empty">' + esc(T('noMatch')) + '</p>';
+      $$('[data-lg]', list).forEach(function (b) { b.onclick = function () { goLang(b.getAttribute('data-lg')); }; });
+    }
+    inp.oninput = draw; draw();
+    modal(T('langTitle'), box, { wide: true, nofocus: matchMedia('(pointer: coarse)').matches });
+  }
+
+  /* ---- the currency prices are shown in, and the visitor's own rate for it (fx.js keeps both) */
+  var UNITS = ['USDT', 'USD'], TGJU = 'tgju';                               /* (kept out of T(…): the strings test reads literals there as keys) */
+  function curLabel(c) { return c === 'USD' ? 'USDT' : c === 'IRT' ? T('toman') : c; }
+  function refName(src) { return src === 'ecb' ? 'ECB' : src === 'xapi' ? 'exchange-api' : src || ''; }
+  function curDialog() {
+    closeMenu();
+    var box = h('<div class="pm-cud"><div class="pm-cuh"></div><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-cul" role="listbox"></div><p class="pm-note"></p></div>');
+    var head = $('.pm-cuh', box), inp = $('input', box), list = $('.pm-cul', box), LT = null;
+    inp.placeholder = T('curSearch'); inp.setAttribute('aria-label', T('curSearch')); $('.pm-note', box).textContent = T('curNote');
+    function refLine(code) {
+      if (code === 'USD') return T('curPlain');
+      if (code === 'IRT') { var r = P.rateAt ? P.rateAt(Date.now() / 1000) : null, tm = T('toman'); return r ? T('curRef', { v: P.fmt(r, 0), c: tm, s: TGJU }) : TGJU; }
+      var x = LT && LT.r && LT.r[code]; if (!x) return '';
+      return T('curRef', { v: P.fmt(x[0], P.prec(x[0])), c: code, s: refName(x[2]) + ' · ' + x[1] });       /* a rate keeps its decimals (155.78 yen) */
+    }
+    function drawHead() {
+      var c = P.fx.cur(), own = P.fx.own(c);
+      head.innerHTML = '<div class="pm-cur1"><img src="' + esc(P.fx.flag(c)) + '" alt="" width="30" height="30"><div><b></b><small></small></div></div>' +
+        (c === 'USD' ? '' : '<form class="pm-own"><b class="pm-ownt"></b><div class="pm-row"><input class="pm-in" type="number" min="0" step="any" inputmode="decimal" required><select class="pm-in"><option value="USDT"></option><option value="USD"></option></select></div>' +
+          '<div class="pm-row"><button class="pm-btn pri" type="submit"></button>' + (own ? '<button class="pm-btn" type="button" data-a="ref"></button>' : '') + '</div><small class="pm-note"></small></form>');
+      $('.pm-cur1 b', head).textContent = c === 'IRT' ? P.fx.name(c) : curLabel(c) + ' · ' + P.fx.name(c);
+      $('.pm-cur1 small', head).textContent = own ? T('ownLine', { v: P.fmt(own.v, P.prec(own.v)), c: curLabel(c), per: own.per }) : refLine(c);
+      var f = $('.pm-own', head); if (!f) return;
+      $('.pm-ownt', f).textContent = T('ownRate'); $('button[type=submit]', f).textContent = T('ownSave'); $('.pm-note', f).textContent = T('ownNote', { c: curLabel(c) });
+      var vi = $('input', f), pi = $('select', f), ops = $$('option', pi);
+      ops[0].textContent = T('perUnit', { u: UNITS[0], c: curLabel(c) }); ops[1].textContent = T('perUnit', { u: UNITS[1], c: curLabel(c) });
+      vi.setAttribute('aria-label', T('ownRate'));
+      if (own) { vi.value = own.v; pi.value = own.per; }
+      else { var rx = c === 'IRT' ? (P.rateAt ? P.rateAt(Date.now() / 1000) : null) : LT && LT.r && LT.r[c] ? LT.r[c][0] : null; if (rx) vi.placeholder = P.fmt(rx, c === 'IRT' ? 0 : P.prec(rx)).replace(/,/g, ''); }
+      var rb = $('[data-a="ref"]', f); if (rb) { rb.textContent = T('ownClear'); rb.onclick = function () { P.fx.clearOwn(c); toast(T('ownCleared', { c: curLabel(c) })); drawHead(); draw(); }; }
+      f.onsubmit = function (e) {
+        e.preventDefault(); var v = +String(vi.value).replace(/[,\s]/g, '');
+        if (!(v > 0) || !isFinite(v)) { toast(T('badValue')); return; }
+        if (P.fx.setOwn(c, v, pi.value)) { toast(T('ownSet', { c: curLabel(c) })); drawHead(); draw(); }
+      };
+    }
+    function codes() {
+      var all = LT && LT.r ? Object.keys(LT.r).filter(function (k) { return /^[A-Z]{3}$/.test(k); }) : [], seen = {}, out = [];
+      all.sort(function (a, b) { return P.fx.name(a).localeCompare(P.fx.name(b), LOCS[LANG] || 'en'); });
+      [P.fx.cur(), P.fx.defaultFor(LANG), 'USD', 'IRT'].concat(all).forEach(function (k) { if (k && !seen[k]) { seen[k] = 1; out.push(k); } });
+      return out;
+    }
+    function draw() {
+      var q = inp.value.trim().toLowerCase(), cur = P.fx.cur(), sug = P.fx.defaultFor(LANG);
+      var L = codes().filter(function (k) { return !q || (k + ' ' + curLabel(k) + ' ' + P.fx.name(k) + ' ' + P.fx.name(k, 'en')).toLowerCase().indexOf(q) >= 0; });
+      list.innerHTML = L.length ? L.map(function (k) {
+        return '<button type="button" role="option" aria-selected="' + (k === cur) + '" class="pm-cui' + (k === cur ? ' on' : '') + '" data-c="' + k + '"><img src="' + esc(P.fx.flag(k)) + '" alt="" width="22" height="22" loading="lazy">' +
+          '<b>' + esc(curLabel(k)) + '</b><span>' + esc(P.fx.name(k)) + (k === sug ? ' <i class="pm-sug">' + esc(T('curSuggest')) + '</i>' : '') + '</span><small>' + esc(refLine(k)) + '</small></button>';
+      }).join('') : '<p class="pm-empty">' + esc(LT ? T('noMatch') : T('loading')) + '</p>';
+      $$('[data-c]', list).forEach(function (b) { b.onclick = function () { P.fx.set(b.getAttribute('data-c')); drawHead(); draw(); }; });
+    }
+    inp.oninput = draw; drawHead(); draw();
+    modal(T('curTitle'), box, { wide: true, nofocus: true });
+    P.fx.latest().then(function (j) { LT = j; drawHead(); draw(); }, function () { LT = { r: {} }; draw(); });
+    /* the toman's rate (tgju) where the toman matters: shown on its row and offered as the input's example */
+    if ((P.fx.cur() === 'IRT' || LANG === 'fa' || LANG === 'ckb') && P.quoteRate && !(P.rateAt && P.rateAt(Date.now() / 1000))) P.quoteRate('IRT').load().then(function () { if (box.isConnected) { drawHead(); draw(); } }, function () { });
+  }
+  function paintCur() {
+    var b = $('#pm-cur'); if (b && P.fx) { var c = P.fx.cur(), own = P.fx.own(c); b.innerHTML = '<img src="' + esc(P.fx.flag(c)) + '" alt="" width="18" height="18"><span>' + esc(curLabel(c)) + '</span>' + (own ? '<i class="pm-owndot" title="' + esc(T('yourRate')) + '"></i>' : ''); }
+    var lb = $('#pm-lang span'); if (lb && LROW[LANG]) lb.textContent = LROW[LANG][1];
+  }
+  /* a new currency: charts of coins in the old one move to the new one (USDT charts stay), lists follow */
+  function swapSym(sym, to) {
+    var In = P.inst(sym); if (!In) return sym;
+    if (In.kind === 'irt' || In.kind === 'fiat') return to === 'USD' ? In.base : In.base + '_' + to;
+    if (In.kind === 'fxr') return to === 'USD' ? 'BTC' : to === 'IRT' ? 'IR_USDT' : 'USDT_' + to;
+    return sym;
+  }
+  if (P.fx) P.fx.on(function (what, code) {
+    if (!root) return;
+    if (what === 'cur') {
+      st.charts.forEach(function (c, i) { var n = swapSym(c.sym, code); if (n !== c.sym && SYM_RE.test(n)) { if (cells[i]) cells[i].setSym(n); else c.sym = n; } });
+      paintCur(); paintTop(); setSide(st.side, true); emit('cur', code);
+    }
+    if (what === 'rate') { cells.forEach(function (c) { c.legend(); }); paintCur(); emit('rate', code); }
+  });
 
   /* ---- bottom bar */
   var RANGES = [['1D', 86400, '1m'], ['5D', 432000, '5m'], ['1M', 2592000, '30m'], ['3M', 7776000, '1h'], ['6M', 15552000, '2h'], ['YTD', 'ytd', '1d'], ['1Y', 31536000, '1d'], ['5Y', 157680000, '1w'], ['All', 'all', '1w']];
@@ -1264,8 +1391,8 @@
   var TOOLROWS = [['cursor'], ['trend', 'ray', 'ext', 'arrow'], ['hline', 'hray', 'vline'], ['channel'], ['fib', 'fibext'], ['gann', 'pitch'], ['rect', 'circle', 'brush'], ['text'], ['measure', 'long', 'short']];
   function build() {
     root = $('#pro'); if (!root) return;
-    root.setAttribute('translate', 'no'); root.classList.add('notranslate'); root.setAttribute('lang', LANG); d.body.classList.add('pm-on');
-    de.lang = LANG; de.dir = RTL() ? 'rtl' : 'ltr';
+    root.setAttribute('translate', 'no'); root.classList.add('notranslate'); root.setAttribute('lang', TAG()); d.body.classList.add('pm-on');
+    de.lang = TAG(); de.dir = RTL() ? 'rtl' : 'ltr';
     root.innerHTML =
       '<div class="pm-top" role="toolbar">' +
         '<button type="button" class="pm-symb" id="pm-sym"></button>' +
@@ -1290,6 +1417,9 @@
         '<aside class="pm-side" id="pm-side"><div class="pm-stabs" role="tablist"></div><div class="pm-spanel"></div></aside></div>' +
       '<div class="pm-bot"><div class="pm-ranges" id="pm-ranges"></div><button type="button" class="pm-ib" id="pm-go" title="' + esc(T('goTo')) + '">' + ic('cal') + '</button>' +
         '<button type="button" class="pm-ib pm-penb" id="pm-pen" title="' + esc(T('drawing')) + '">' + ic('pen') + '</button><span class="pm-grow"></span>' +
+        /* language and currency sit with the clock (the visitor's own settings); first in the row on phones */
+        '<button type="button" class="pm-tb pm-lgb" id="pm-lang" title="' + esc(T('langTitle')) + '" aria-label="' + esc(T('langTitle')) + '">' + ic('globe') + '<span class="pm-hide-s"></span></button>' +
+        '<button type="button" class="pm-tb pm-curb" id="pm-cur" title="' + esc(T('curTitle')) + '" aria-label="' + esc(T('curTitle')) + '"></button>' +
         '<button type="button" class="pm-clock" id="pm-clock" title="' + esc(T('timezone')) + '"></button><div class="pm-scale" id="pm-scale"><button type="button" data-s="pct">%</button><button type="button" data-s="log">log</button><button type="button" data-s="auto">auto</button></div></div>';
     grid = $('#pm-grid');
     /* tools */
@@ -1324,6 +1454,8 @@
     $('#pm-ws').onclick = function (e) { wsMenu(e.currentTarget); };
     $('#pm-shot').onclick = pngShot; $('#pm-fs').onclick = fullscreen;
     $('#pm-set').onclick = function (e) { settingsMenu(e.currentTarget); };
+    $('#pm-cur').onclick = curDialog; $('#pm-lang').onclick = langDialog;
+    paintCur();
     $('#pm-go').onclick = goDialog;
     $('#pm-clock').onclick = function (e) { settingsMenu(e.currentTarget); };
     $('#pm-pen').onclick = function () { root.classList.toggle('pm-pens'); fit(); };
@@ -1343,10 +1475,12 @@
     var LG = d.getElementById('langs');
     if (LG) LG.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-l]'); if (!b) return;
-      var l = b.getAttribute('data-l'); if (l === 'ar' || LANG === 'ar') return;      /* Arabic switches are handled by ar.js (it reloads) */
+      var l = b.getAttribute('data-l');
+      if (PAGE_LANG) { e.preventDefault(); goLang(l); return; }                        /* a /market/<code>/ page: the site's switch goes back to /market/ */
+      if (l === 'ar' || LANG === 'ar') return;      /* Arabic switches are handled by ar.js (it reloads) */
       if (['fa', 'ckb', 'en'].indexOf(l) < 0 || l === LANG) return;
       try { localStorage.setItem('ck_lang', l); } catch (er) { }
-      LANG = l; FMT = {}; root.setAttribute('lang', l); de.lang = l; de.dir = RTL() ? 'rtl' : 'ltr';
+      LANG = l; FMT = {}; FMTD = {}; if (P.fx) P.fx.init(l); root.setAttribute('lang', l); de.lang = l; de.dir = RTL() ? 'rtl' : 'ltr';
       var keep = st; closeModal(); closeMenu(); cells.forEach(function (c) { c.destroy(); }); cells = []; build(); st = keep; buildGrid(); emit('lang');
       pageText();
     });
@@ -1436,19 +1570,25 @@
     menu: menu, closeMenu: closeMenu, on: on, emit: emit, st: function () { return st; }, save: save, cells: function () { return cells; }, active: active, setActive: setActive,
     applySym: applySym, fmtT: fmtT, fmtD: fmtD, tzLabel: tzLabel, panels: PANELS, setSide: setSide, DRAW: function () { return DRAW; }, mutate: mutate, removeDrawing: removeDrawing,
     goDate: goDate, tzOffset: tzOffset, indName: indName, tfLabel: tfLabel, download: download, SYM_RE: SYM_RE, debounce: debounce, symbolSearch: function (q) { symbolSearch(q); },
-    indDialog: function () { indDialog(); }, indSettings: function (c, x) { indSettings(c, x); }
+    indDialog: function () { indDialog(); }, indSettings: function (c, x) { indSettings(c, x); },
+    langDialog: function () { langDialog(); }, curDialog: function () { curDialog(); }, curLabel: function (c) { return curLabel(c); }
   };
 
   function boot() {
     if (!$('#pro')) return;
     P.setSaver(st.saver == null ? P.saverAuto : st.saver);
     build(); buildGrid(); pageText(); readShare();
+    /* /market/#lang and /market/#cur open the language or currency menu (the bot's «47 languages» button) */
+    if (/^#(lang|cur)$/.test(location.hash)) { var mh = location.hash.slice(1); history.replaceState(null, '', location.pathname + location.search); setTimeout(mh === 'lang' ? langDialog : curDialog, 300); }
     /* a chart restored from storage, a file or a link on a coin the site has no logo for moves to BTC; drawings on such
        coins are not kept (the rule above, once the logo index is known) */
     P.logos().then(function (L) {
       if (!L) return;
-      var moved = 0, gone = Object.keys(DRAW).filter(function (s) { return !L.has(s); });
-      cells.forEach(function (c) { if (!L.has(c.cfg.sym)) { c.setSym('BTC'); moved++; } });
+      /* P.hasLogo asks about the coin of a symbol (BTC_IRT, BTC_EUR → BTC; IR_USD, USDT_EUR → their own icons):
+         L.has(symbol) alone sent every toman chart back to BTC on each visit */
+      var has = function (s) { return P.hasLogo ? P.hasLogo(s) : L.has(s); };
+      var moved = 0, gone = Object.keys(DRAW).filter(function (s) { return !has(s); });
+      cells.forEach(function (c) { if (!has(c.cfg.sym)) { c.setSym('BTC'); moved++; } });
       gone.forEach(function (s) { delete DRAW[s]; });
       if (moved || gone.length) { paintTop(); save(); emit('draws'); }
       if (moved) toast(T('noLogo'));

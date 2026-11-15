@@ -220,6 +220,12 @@ jobs:
         timeout-minutes: 2
         run: python scripts/ecocal.py
 
+      - name: Reference rates for prices in every currency on /market/ (ECB + exchange-api, × tether's dollar value)
+        id: fx_rates
+        continue-on-error: true
+        timeout-minutes: 7
+        run: python scripts/fx_rates.py
+
       - name: Calendar actuals (BLS, the Fed) and FOMC odds (Kalshi) for /calendar/ and the bot
         id: econ_live
         continue-on-error: true
@@ -557,6 +563,27 @@ jobs:
             git pull --rebase --autostash -X theirs origin main && git push && break
             sleep 5
           done
+      # /market/ in 43 more languages: the workspace's English strings translated a few batches a run (free Gemini,
+      # checked, kept in data/pro_l10n/), then one page per language at /market/<code>/ (scripts/build_market_l10n.py)
+      - name: Live-market languages (new strings only, capped a run)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/pro_l10n.py || echo "::warning::market translations failed; the pages use what the cache has"
+      - name: Commit the live-market translations
+        continue-on-error: true
+        run: |
+          git add data/pro_l10n 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: market languages $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -X theirs origin main && git push && break
+            sleep 5
+          done
+      - name: Build the /market/ language pages and their string packs
+        continue-on-error: true
+        run: python scripts/build_market_l10n.py
       - name: Knowledge network (search index + related-page links, from the built pages)
         continue-on-error: true
         run: python scripts/build_links.py

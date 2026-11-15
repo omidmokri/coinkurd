@@ -27,7 +27,7 @@
   var SITE_DEF = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'XAUT'];
   function siteList() { var a = S.get('ek_watch', []); a = Array.isArray(a) ? a.filter(function (x) { return A.SYM_RE.test(x); }) : []; return a.length || W.siteEdited ? a : SITE_DEF.slice(); }
   function setSiteList(a) { S.set('ek_watch', a.slice(0, 60)); W.siteEdited = 1; saveW(); }
-  if (!W || typeof W !== 'object' || !Array.isArray(W.lists)) W = { lists: [], cur: 'site', flags: {}, sort: null, ff: null };
+  if (!W || typeof W !== 'object' || !Array.isArray(W.lists)) W = { lists: [], cur: 'site', flags: {}, sort: null, ff: null, fresh: 1 };
   W.flags = W.flags && typeof W.flags === 'object' ? W.flags : {};
   function saveW() { S.set('ek_pro_watch', W); }
   var FLAGS = { r: '#ff5a4d', o: '#f7931a', y: '#facc15', g: '#34d399', b: '#38bdf8', p: '#a78bfa' };
@@ -35,11 +35,25 @@
   P.getJSON('/data/market.json?v=' + Math.floor(Date.now() / 3e5)).then(function (m) { TOP = (m.coins || []).map(function (c) { return c.coin; }); P.universe().then(function (u) { var set = new Set(u); TOP = TOP.filter(function (c) { return set.has(c); }).slice(0, 30); if (W.cur === 'top' && curBox) drawWatch(curBox); }); }, function () { });
   /* built-in lists: every Binance coin, and Iran's market in toman (currencies, gold, coins, silver, tether) */
   var ALLB = []; P.universe().then(function (u) { ALLB = u || []; if (W.cur === 'all' && curBox) drawWatch(curBox); });
+  /* the visitor's currency (fx.js): «💱 coins in EUR» = tether's rate and the top coins in that currency */
+  function curQ() { return P.fx ? P.fx.cur() : 'IRT'; }
+  function isLocalQ(q) { return q !== 'IRT' && q !== 'USD'; }
+  function irCtx() { var l = A.LANG(); return curQ() === 'IRT' || l === 'fa' || l === 'ckb'; }
+  function locList() { var q = curQ(); return isLocalQ(q) ? ['USDT_' + q].concat((TOP.length ? TOP : SITE_DEF).map(function (s) { return s + '_' + q; })) : []; }
+  if (W.fresh) { delete W.fresh; if (isLocalQ(curQ())) W.cur = 'loc'; }     /* a first visit in another currency opens its own list */
+  /* a list that no longer exists for this currency or language (the dollar has no «coins in …», the toman list is for
+     the toman, Persian and Kurdish) falls back to the nearest one; checked on every draw, since the currency can change */
+  function normCur() {
+    if (W.cur === 'loc' && !isLocalQ(curQ())) W.cur = curQ() === 'IRT' ? 'iran' : 'site';
+    if (W.cur === 'iran' && !irCtx()) W.cur = isLocalQ(curQ()) ? 'loc' : 'site';
+  }
+  normCur();
   function listSyms() {
-    var a = W.cur === 'site' ? siteList() : W.cur === 'top' ? TOP : W.cur === 'all' ? ALLB : W.cur === 'iran' ? (P.irList ? P.irList() : []) : ((W.lists[W.cur | 0] || {}).s || []);
+    normCur();
+    var a = W.cur === 'site' ? siteList() : W.cur === 'top' ? TOP : W.cur === 'all' ? ALLB : W.cur === 'iran' ? (P.irList ? P.irList() : []) : W.cur === 'loc' ? locList() : ((W.lists[W.cur | 0] || {}).s || []);
     return a.filter(function (s) { return !isSec(s) && (P.hasLogo ? P.hasLogo(s) : !P._logoSet || P._logoSet.has(s)); });      /* never a coin without its logo */
   }
-  function editable() { return W.cur !== 'top' && W.cur !== 'all' && W.cur !== 'iran'; }
+  function editable() { return W.cur !== 'top' && W.cur !== 'all' && W.cur !== 'iran' && W.cur !== 'loc'; }
   /* ---- sections (as on TradingView/Faraz): a list's layout is its symbols with '§name' headers between them.
      Custom lists keep the headers in their own array; the site-wide star list (ek_watch, read by other pages) stays
      symbols only, and its headers live in W.lay.site, matched against it every time it is drawn. */
@@ -60,8 +74,9 @@
   }
   function sections() { return layout().filter(isSec); }
   function colKey(sec) { return String(W.cur) + sec; }
-  function label(s) {                                   /* BTC · BTC تومان · دلار آمریکا */
+  function label(s) {                                   /* BTC · BTC تومان · BTC EUR · دلار آمریکا */
     var I = P.inst ? P.inst(s) : null; if (!I || I.kind === 'usdt') return esc(s);
+    if (I.kind === 'fiat' || I.kind === 'fxr') return esc(I.base) + ' <small class="pm-tmn">' + esc(I.quote) + '</small>';
     return I.kind === 'ir' ? esc(P.pair(s)) : esc(I.base) + ' <small class="pm-tmn">' + esc(T('toman')) + '</small>';
   }
   function fmtP(s, v) { return P.fmt(v, P.precFor ? P.precFor(s, v) : null); }
@@ -77,8 +92,9 @@
   P.watchSyms = function () { return siteList(); };
   var curBox = null;
   function drawWatch(box) {
-    curBox = box;
-    var lists = [{ k: 'site', n: '⭐ ' + T('myList') }, { k: 'top', n: '🔥 ' + T('topVol') }, { k: 'all', n: '🌐 ' + T('allBinance') }, { k: 'iran', n: '💵 ' + T('iranMarket') }].concat(W.lists.map(function (l, i) { return { k: String(i), n: l.n }; }));
+    curBox = box; normCur();
+    var lists = [{ k: 'site', n: '⭐ ' + T('myList') }].concat(isLocalQ(curQ()) ? [{ k: 'loc', n: '💱 ' + T('locList', { c: curQ() }) }] : [], [{ k: 'top', n: '🔥 ' + T('topVol') }, { k: 'all', n: '🌐 ' + T('allBinance') }],
+      irCtx() ? [{ k: 'iran', n: '💵 ' + T('iranMarket') }] : []).concat(W.lists.map(function (l, i) { return { k: String(i), n: l.n }; }));
     box.innerHTML = '<div class="pm-ph"><select class="pm-sel" aria-label="' + esc(T('lists')) + '">' + lists.map(function (l) { return '<option value="' + l.k + '"' + (String(W.cur) === l.k ? ' selected' : '') + '>' + esc(l.n) + '</option>'; }).join('') + '</select>' +
       '<button type="button" class="pm-ib" data-a="scr" title="' + esc(T('screener')) + '">' + ic('tpl') + '</button><button type="button" class="pm-ib" data-a="add" title="' + esc(T('addSym')) + '">' + ic('plus') + '</button><button type="button" class="pm-ib" data-a="more" title="' + esc(T('more')) + '">' + ic('menu') + '</button></div>' +
       '<div class="pm-flags"><button type="button" class="pm-fl' + (!W.ff ? ' on' : '') + '" data-f="">' + esc(T('all')) + '</button>' + Object.keys(FLAGS).map(function (f) { return '<button type="button" class="pm-fl' + (W.ff === f ? ' on' : '') + '" data-f="' + f + '" style="--c:' + FLAGS[f] + '" aria-label="' + f + '"><i></i></button>'; }).join('') + '</div>' +
@@ -104,10 +120,10 @@
     return MKT.p;
   }
   var SCR = S.get('ek_pro_scr', null); if (!SCR || typeof SCR !== 'object') SCR = {};
-  SCR = { m: SCR.m === 'iran' ? 'iran' : 'crypto', f: ['all', 'up', 'down', 'vol', 'os', 'ob', 'hi', 'lo'].indexOf(SCR.f) >= 0 ? SCR.f : 'all', k: ['s', 'c', 'p', 'q', 'r', 'rsi', 'tr'].indexOf(SCR.k) >= 0 ? SCR.k : 'q', d: SCR.d === 1 ? 1 : -1 };
+  SCR = { m: SCR.m === 'iran' || SCR.m === 'loc' ? SCR.m : 'crypto', f: ['all', 'up', 'down', 'vol', 'os', 'ob', 'hi', 'lo'].indexOf(SCR.f) >= 0 ? SCR.f : 'all', k: ['s', 'c', 'p', 'q', 'r', 'rsi', 'tr'].indexOf(SCR.k) >= 0 ? SCR.k : 'q', d: SCR.d === 1 ? 1 : -1 };
   var SCOLS = ['s', 'c', 'p', 'q', 'r', 'rsi', 'tr'];
   function scrRow(s, site) {
-    var t = P.tickers.d[s] || {}, m = site[s] || {}, r = t.h > t.l ? (t.c - t.l) / (t.h - t.l) : null;
+    var I = P.inst ? P.inst(s) : null, t = P.tickers.d[s] || (P.locTicker && P.locTicker(s)) || {}, m = site[s] || (I && site[I.base]) || {}, r = t.h > t.l ? (t.c - t.l) / (t.h - t.l) : null;
     return { s: s, c: t.c, p: t.chg, q: t.q > 0 ? t.q : null, r: r, rsi: m.rsi != null ? m.rsi : null, tr: m.trend || null };
   }
   function scrFilter(rows, f) {
@@ -132,25 +148,31 @@
   }
   P._scr = { row: scrRow, filter: scrFilter, sort: scrSort };          /* for the tests */
   P.screener = function () {
-    var f = h('<div class="pm-scr"><div class="pm-scrtop"><div class="pm-seg"><button type="button" data-m="crypto"></button><button type="button" data-m="iran"></button></div><input class="pm-in" type="search" autocomplete="off"></div>' +
+    var Q = curQ(), LOC = isLocalQ(Q), IRC = irCtx();
+    if (SCR.m === 'loc' && !LOC) SCR.m = 'crypto'; if (SCR.m === 'iran' && !IRC) SCR.m = 'crypto';
+    var f = h('<div class="pm-scr"><div class="pm-scrtop"><div class="pm-seg"><button type="button" data-m="crypto"></button>' + (LOC ? '<button type="button" data-m="loc"></button>' : '') + (IRC ? '<button type="button" data-m="iran"></button>' : '') + '</div><input class="pm-in" type="search" autocomplete="off"></div>' +
       '<div class="pm-chips pm-scrf"></div><div class="pm-scrsum"></div><div class="pm-tw pm-scrw"><table class="pm-tbl pm-scrt" dir="ltr"><thead></thead><tbody></tbody></table></div><p class="pm-note"></p></div>');
-    $('[data-m="crypto"]', f).textContent = T('scr_crypto'); $('[data-m="iran"]', f).textContent = T('scr_iran');
+    $('[data-m="crypto"]', f).textContent = T('scr_crypto'); if (IRC) $('[data-m="iran"]', f).textContent = T('scr_iran'); if (LOC) $('[data-m="loc"]', f).textContent = T('scr_loc', { c: Q });
     var q = $('input', f); q.placeholder = T('scrSearch'); q.setAttribute('aria-label', T('scrSearch'));
     $('.pm-note', f).textContent = T('scrNote');
     var chips = $('.pm-scrf', f);
     ['all', 'up', 'down', 'vol', 'os', 'ob', 'hi', 'lo'].forEach(function (k) { var b = h('<button type="button" class="pm-chip" data-f="' + k + '"></button>'); b.textContent = T('sf_' + k); chips.appendChild(b); });
     var site = {}, timer = null, busy = false;
-    function syms() { return SCR.m === 'iran' ? (P.irList ? P.irList() : []).filter(function (s) { return !isSec(s); }) : ALLB.slice(0, 600); }
+    function syms() { return SCR.m === 'iran' ? (P.irList ? P.irList() : []).filter(function (s) { return !isSec(s); }) : SCR.m === 'loc' ? ALLB.slice(0, 600).map(function (s) { return s + '_' + Q; }) : ALLB.slice(0, 600); }
     function load() {
       if (busy || (!f.isConnected && timer)) return; busy = true;
       var go = function () {
         var L = syms(), jobs = [siteMarket().then(function (o) { site = o; })];
-        if (SCR.m === 'crypto') for (var i = 0; i < L.length; i += 100) jobs.push(P._tkRest(L.slice(i, i + 100)).catch(function () { }));
+        if (SCR.m === 'crypto' || SCR.m === 'loc') {                /* coins in a currency: their USDT tickers (bulk REST) × the rate, worked out on paint */
+          var B = SCR.m === 'loc' ? ALLB.slice(0, 600) : L;
+          for (var i = 0; i < B.length; i += 100) jobs.push(P._tkRest(B.slice(i, i + 100)).catch(function () { }));
+          if (SCR.m === 'loc' && P.quoteRate) jobs.push(P.quoteRate(Q).load().catch(function () { }));
+        }
         else want('screener', L);
         return Promise.all(jobs);
       };
       var done = function () { busy = false; paint(); };
-      (SCR.m === 'crypto' && !ALLB.length ? P.universe().then(function (u) { ALLB = u || []; }, function () { }) : Promise.resolve()).then(go).then(done, done);
+      (SCR.m !== 'iran' && !ALLB.length ? P.universe().then(function (u) { ALLB = u || []; }, function () { }) : Promise.resolve()).then(go).then(done, done);
     }
     function paint() {
       if (timer && !f.isConnected) { clearInterval(timer); want('screener', []); return; }
@@ -189,7 +211,7 @@
     var off = P.tickers.on(live);                                     /* live prices repaint the table (at most about once a second) */
     A.modal(T('screener'), f, { wide: true, nofocus: true, onclose: function () { clearInterval(timer); off(); want('screener', []); } });
     paint(); load();
-    timer = setInterval(function () { if (!f.isConnected) { clearInterval(timer); off(); return; } if (!document.hidden && SCR.m === 'crypto') load(); }, 60000);
+    timer = setInterval(function () { if (!f.isConnected) { clearInterval(timer); off(); return; } if (!document.hidden && SCR.m !== 'iran') load(); }, 60000);
   };
   function visible(box) {
     var wl = $('.pm-wl', box); if (!wl) return [];
@@ -246,14 +268,14 @@
     var c = $('.pm-wc', r), p = $('.pm-wp', r);
     c.textContent = fmtP(s, t.c); p.textContent = (t.chg >= 0 ? '+' : '') + (t.chg == null ? '—' : t.chg.toFixed(2) + '%'); p.className = 'pm-num pm-wp ' + (t.chg >= 0 ? 'up' : 'dn');
     if (flash && t.prev != null && t.prev !== t.c) { c.classList.remove('fu', 'fd'); void c.offsetWidth; c.classList.add(t.c > t.prev ? 'fu' : 'fd'); }
-    r.title = t.src === 'site' ? T('fromSnapshot') : t.src === 'irt' ? T('computed') : t.src === 'tgju' ? 'tgju.org' : '';
+    r.title = t.src === 'site' ? T('fromSnapshot') : t.src === 'irt' || t.src === 'fiat' ? T('computed') : t.src === 'fxr' ? T('refRate') : t.src === 'tgju' ? 'tgju.org' : '';
   }
   function summary(box) {
     var e = $('.pm-wsum', box), a = A.active(); if (!e || !a) return;
     var s = a.cfg.sym, t = P.tickers.d[s];
     if (!t) { e.innerHTML = ''; want('sum', [s]); return; }
     var pos = t.h > t.l ? (t.c - t.l) / (t.h - t.l) * 100 : 50;
-    var In = P.inst ? P.inst(s) : {}, qv = In && In.kind === 'usdt' ? '$' + P.fmtV(t.q) : In && In.kind === 'irt' ? P.fmtV(t.q) + ' ' + T('toman') : '';
+    var In = P.inst ? P.inst(s) : {}, qv = In && In.kind === 'usdt' ? '$' + P.fmtV(t.q) : In && In.kind === 'irt' ? P.fmtV(t.q) + ' ' + T('toman') : In && In.kind === 'fiat' ? P.fmtV(t.q) + ' ' + In.quote : '';
     e.innerHTML = '<div class="pm-sumh"><img src="' + esc(P.logo(s)) + '" alt="" width="22" height="22"><b>' + esc(P.pair(s)) + '</b><span class="pm-num ' + (t.chg >= 0 ? 'up' : 'dn') + '">' + fmtP(s, t.c) + '</span></div>' +
       '<div class="pm-range"><span class="pm-num">' + fmtP(s, t.l) + '</span><i><b style="inset-inline-start:' + pos.toFixed(1) + '%"></b></i><span class="pm-num">' + fmtP(s, t.h) + '</span></div>' +
       '<div class="pm-sumf">' + (qv ? '<span>' + esc(T('vol24')) + ' <b class="pm-num">' + qv + '</b></span>' : '<span></span>') + '<span>' + esc(T('chg24')) + ' <b class="pm-num ' + (t.chg >= 0 ? 'up' : 'dn') + '">' + (t.chg >= 0 ? '+' : '') + (t.chg || 0).toFixed(2) + '%</b></span></div>';
@@ -337,7 +359,9 @@
   function saveAL() { S.set('ek_pro_alerts', AL); S.set('ek_pro_alert_log', LOG.slice(0, 100)); refreshAlertViews(); }
   P.logos().then(function (L) {                        /* never a coin without its logo: alerts and lists follow the logo index */
     if (!L) return;
-    var n = AL.length; AL = AL.filter(function (a) { return L.has(a.sym); }); if (AL.length !== n) { saveAL(); syncIndSubs(); }
+    /* by the coin of the symbol (BTC_IRT → BTC; IR_USD and USDT_EUR have their own icons): L.has(symbol) alone used to
+       drop every toman alert each time the page opened */
+    var n = AL.length; AL = AL.filter(function (a) { return P.hasLogo ? P.hasLogo(a.sym) : L.has(a.sym); }); if (AL.length !== n) { saveAL(); syncIndSubs(); }
     if (curBox && curBox.isConnected) drawWatch(curBox);
   });
   var lastPx = {};
@@ -615,7 +639,7 @@
     if (NA.m === 'all') return true;
     if (NA.m === 'imp') return !!NIMP[it.cat];
     if (NA.m !== 'watch') return false;
-    var w = siteList().map(function (x) { var b = x.replace(/_IRT$/, ''); return b === 'XAUT' || b === 'PAXG' ? 'GOLD' : b; });
+    var w = siteList().map(function (x) { var b = x.replace(/_[A-Z]{3}$/, ''); return b === 'XAUT' || b === 'PAXG' ? 'GOLD' : b; });
     return (it.coins || []).some(function (c) { return w.indexOf(c) >= 0; });
   }
   function newsText(it) { var t = it.t || {}; return t[A.LANG()] || t.en || ''; }
@@ -657,7 +681,7 @@
     if (key === 'ek_pro_newsal') { var nn = S.get('ek_pro_newsal', null); if (nn && typeof nn === 'object') NA = nn; }
   });
   /* ---- help and support: what each tool does, the keyboard, and where to ask */
-  var HELP = ['chart', 'draw', 'ind', 'alert', 'news', 'rep', 'bt', 'scr', 'lay', 'data', 'toman'];
+  var HELP = ['chart', 'draw', 'ind', 'alert', 'news', 'rep', 'bt', 'scr', 'lay', 'data', 'toman', 'cur', 'lang'];
   var KEYS = [['A–Z', 'shSearch'], ['Alt + T · H · V · F · R', 'shDraw'], ['Esc', 'shEsc'], ['Delete', 'shDel'], ['Ctrl + Z · Ctrl + Y', 'shUndo'], ['Space', 'shPlay'], ['← · →', 'shStep'], ['Shift + B · Shift + S', 'shBuy']];
   function drawHelp(box) {
     box.innerHTML = '<div class="pm-ph"><b>' + esc(T('helpTab')) + '</b></div><div class="pm-help">' +

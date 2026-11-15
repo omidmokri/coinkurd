@@ -39,6 +39,9 @@ function klines(q) {
   const last = Math.floor(Math.min(en, now) / iv) * iv, out = [];
   if (st != null) { for (let t = st; t <= last && out.length < lim; t += iv) out.push(bar(sym, t, iv)); }
   else { for (let t = last - (lim - 1) * iv; t <= last; t += iv) out.push(bar(sym, t, iv)); }
+  /* the bar still open closes at the price of now, as on Binance (and as the socket below sends it) — not at its end */
+  const b = out[out.length - 1];
+  if (b && b[6] >= Date.now()) { const c = px(sym, Math.floor(Date.now() / 1000)); b[4] = c.toFixed(8); b[2] = Math.max(+b[2], c).toFixed(8); b[3] = Math.min(+b[3], c).toFixed(8); }
   return out;
 }
 function mini(sym) { const now = Math.floor(Date.now() / 1000), c = px(sym, now), o = px(sym, now - 86400); return { symbol: sym, openPrice: o.toFixed(8), highPrice: (Math.max(o, c) * 1.01).toFixed(8), lowPrice: (Math.min(o, c) * 0.99).toFixed(8), lastPrice: c.toFixed(8), volume: '1000', quoteVolume: (1e6 + h32(sym) % 9e8).toFixed(2), openTime: (now - 86400) * 1000, closeTime: now * 1000 }; }
@@ -656,11 +659,11 @@ async function mockNet(page, stats) {
   /* ---------- news on the chart (the site's feed) and news alerts (the four-language reel) */
   if (!ONLY || ONLY === 'news') {
     const ctxN = await browser.newContext({ viewport: { width: 1280, height: 860 }, locale: 'en-US', timezoneId: 'Asia/Tehran', serviceWorkers: 'block' });
-    const nowS = Math.floor(Date.now() / 1000), iso = t => new Date(t * 1000).toISOString();
+    const nowS = Math.floor(Date.now() / 1000), iso = t => new Date(t * 1000).toISOString(), h5 = Math.floor(nowS / 3600) * 3600 - 5 * 3600;   /* two headlines inside one hour, whatever the minute now */
     let reel = [{ id: 'r1', at: iso(nowS - 3000), url: 'https://example.com/1', source: 'Src', coins: ['BTC'], cat: 'news', t: { en: 'Old one', fa: 'خبر قدیمی', ckb: 'کۆن', ar: 'قديم' } }];
     await ctxN.route(/\/data\/news\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: [
-      { id: 'a', title: 'BTC one', tfa: 'بیت‌کوین یک', url: 'https://example.com/a', source: 'S1', date: iso(nowS - 5 * 3600 + 60), coins: ['BTC'], category: 'regulation' },
-      { id: 'b', title: 'BTC two', tfa: 'بیت‌کوین دو', url: 'https://example.com/b', source: 'S2', date: iso(nowS - 5 * 3600 + 900), coins: ['BTC', 'ETH'], category: 'news' },
+      { id: 'a', title: 'BTC one', tfa: 'بیت‌کوین یک', url: 'https://example.com/a', source: 'S1', date: iso(h5 + 60), coins: ['BTC'], category: 'regulation' },
+      { id: 'b', title: 'BTC two', tfa: 'بیت‌کوین دو', url: 'https://example.com/b', source: 'S2', date: iso(h5 + 900), coins: ['BTC', 'ETH'], category: 'news' },
       { id: 'c', title: 'BTC three', url: 'https://example.com/c', source: 'S3', date: iso(nowS - 20 * 3600), coins: ['BTC'], category: 'security' },
       { id: 'd', title: 'ETH only', url: 'https://example.com/d', source: 'S4', date: iso(nowS - 3 * 3600), coins: ['ETH'], category: 'news' }] }) }));
     await ctxN.route(/\/data\/newsreel\.json/, r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ items: reel }) }));
@@ -735,7 +738,7 @@ async function mockNet(page, stats) {
     const { page, ctx } = await newPage(1280, 860, 'ckb');
     await page.click('.pm-stab[data-p="help"]'); await page.waitForSelector('.pm-help');
     const hp = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-help details').length, keys: document.querySelectorAll('.pm-keys tr').length, links: [...document.querySelectorAll('.pm-sup a')].map(a => a.getAttribute('href')), fab: !!document.getElementById('ask-fab'), dir: document.querySelector('.pm-spanel').dir }));
-    ok('[ckb] help: eleven guide topics, the keyboard, and support links (group, admin, class)', hp.n === 11 && hp.keys === 8 && hp.links.join() === 'https://t.me/Coin_Kurd_Group,https://t.me/Kurdistan_Coin,/class/' && hp.dir === 'rtl', JSON.stringify(hp));
+    ok('[ckb] help: thirteen guide topics (your currency and the languages added), the keyboard, and support links (group, admin, class)', hp.n === 13 && hp.keys === 8 && hp.links.join() === 'https://t.me/Coin_Kurd_Group,https://t.me/Kurdistan_Coin,/class/' && hp.dir === 'rtl', JSON.stringify(hp));
     await page.click('.pm-help details:nth-of-type(7) summary'); await shot(page, '70_ckb_help');
     if (hp.fab) { await page.click('.pm-sup [data-a="ai"]'); await page.waitForTimeout(500); ok('the assistant button opens the site assistant', await page.evaluate(() => { const p = document.querySelector('.ask-panel, #ask-panel'); return !!p && getComputedStyle(p).display !== 'none'; })); }
     await page.click('#pm-ws'); await page.click('.pm-menu .pm-mi:nth-last-child(5)').catch(() => { });
@@ -975,6 +978,198 @@ async function mockNet(page, stats) {
     const ck = await page.evaluate(() => ({ lang: PRO.app.LANG(), dir: document.documentElement.dir, ek_ar: localStorage.getItem('ek_ar') }));
     ok('…and کوردی from Arabic gives Kurdish', ck.lang === 'ckb' && ck.dir === 'rtl' && !ck.ek_ar, JSON.stringify(ck));
     await ctx.close();
+  }
+
+  /* ---------- prices in the visitor's currency: the site's reference rates (data/fx, mocked here in their real format) */
+  const FXD0 = Date.UTC(2017, 0, 2) / 1000, DAY = 86400, TODAY0 = Math.floor(Date.now() / 1000 / DAY) * DAY;
+  const FXS = {                                                             /* currency: source, first day, value of day i */
+    EUR: ['ecb', FXD0, i => 0.9 + 0.0001 * (i % 100)], JPY: ['ecb', FXD0, i => 150 + 0.01 * (i % 50)],
+    TRY: ['xapi', Date.UTC(2024, 2, 2) / 1000, i => 30 + 0.01 * i], VND: ['xapi', Date.UTC(2024, 2, 2) / 1000, i => 25000 + i]
+  };
+  const fxDay = t => new Date(t * 1000).toISOString().slice(0, 10);
+  function fxFile(c) {                                                      /* the history file ends a week ago (rewritten weekly) */
+    const [src, a, f] = FXS[c], n = Math.round((TODAY0 - 8 * DAY - a) / DAY) + 1, v = [];
+    for (let i = 0; i < n; i++) v.push(+f(i).toFixed(6));
+    return { c, src, from: fxDay(a), to: fxDay(a + (n - 1) * DAY), v };
+  }
+  function fxLatest() {                                                     /* the last 14 days of each: they overlap the file's end */
+    const from = TODAY0 - 13 * DAY, r = {};
+    Object.keys(FXS).forEach(c => { const [src, a, f] = FXS[c], row = [src]; for (let k = 0; k < 14; k++) row.push(+f(Math.round((from + k * DAY - a) / DAY)).toFixed(6)); r[c] = row; });
+    return { at: new Date().toISOString(), usdt: 0.999, from: fxDay(from), to: fxDay(TODAY0), r };
+  }
+  async function mockFx(page) {
+    await page.route(/\/data\/fx\/[A-Za-z]+\.json/, r => {
+      const m = /\/data\/fx\/([A-Za-z]+)\.json/.exec(r.request().url())[1];
+      if (m === 'latest') return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fxLatest()) });
+      if (FXS[m]) return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(fxFile(m)) });
+      return r.fulfill({ status: 404, body: 'nf' });
+    });
+  }
+  async function zonePage(vw, vh, tz, url, tag) {
+    const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: 1, locale: 'en-US', timezoneId: tz, serviceWorkers: 'block' });
+    const page = await ctx.newPage(), stats = { rest: 0, ws: 0, msgs: 0 };
+    page.on('pageerror', e => errors.push(`[${tag}] pageerror: ${e.message}\n${(e.stack || '').split('\n').slice(0, 4).join('\n')}`));
+    page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|ERR_FAILED|net::/.test(m.text())) errors.push(`[${tag}] console: ${m.text()}`); });
+    await mockNet(page, stats); await mockFx(page);
+    await page.addInitScript(() => { try { if (!sessionStorage.getItem('kept')) { localStorage.clear(); sessionStorage.setItem('kept', '1'); } } catch (e) { } });
+    await page.goto(base + url, { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length && PRO.app.cells()[0].disp.length > 100, null, { timeout: 25000 }).catch(() => { });
+    await page.waitForTimeout(1200);
+    return { page, ctx, stats };
+  }
+  const waitSym = (page, s) => page.waitForFunction(x => { const c = PRO.app.active(); return c.cfg.sym === x && c.disp.length > 20; }, s, { timeout: 15000 }).catch(() => { });
+  /* every bar of a coin in a currency = the same Binance bar × the rate at the middle of the bar */
+  const conv = page => page.evaluate(() => {
+    const c = PRO.app.active(), F = c.feed, B = F.bf ? F.bf.bars : [], sec = c.tfSec(), bad = [];
+    const byT = {}; B.forEach(b => { byT[b.t] = b; });
+    c.bars.slice(-300).forEach(b => { const u = byT[b.t], r = F.R.at(b.t + sec / 2); if (!u || !r || Math.abs(b.c - u.c * r) > 1e-9 * b.c || Math.abs(b.h - u.h * r) > 1e-9 * b.h) bad.push(b.t); });
+    return { n: c.bars.length, bad: bad.length, src: F.src, srcl: (c.el.querySelector('.pm-src') || {}).textContent, sym: c.cfg.sym, prec: c.prec(), last: c.bars[c.bars.length - 1].c, usd: (B[B.length - 1] || {}).c };
+  });
+
+  if (!ONLY || ONLY === 'fx') {
+    const { page, ctx } = await zonePage(1280, 860, 'Europe/Berlin', '/market/?lang=en', 'fx');
+    const s0 = await page.evaluate(() => ({ cur: PRO.fx.cur(), sym: PRO.app.active().cfg.sym, btn: document.querySelector('#pm-cur').textContent, w: (document.querySelector('.pm-spanel select') || {}).value }));
+    ok('a visitor in Berlin starts in euros: BTC/EUR, the euro on the currency button, «coins in EUR» open', s0.cur === 'EUR' && s0.sym === 'BTC_EUR' && /EUR/.test(s0.btn) && s0.w === 'loc', JSON.stringify(s0));
+    await waitSym(page, 'BTC_EUR');
+    const c1 = await conv(page);
+    ok('BTC in euros: every bar = the Binance bar × the reference rate at its middle; source named', c1.src === 'fiat' && c1.n > 300 && c1.bad === 0 && /Binance × ECB/.test(c1.srcl), JSON.stringify(c1));
+    /* the rate itself, hand-checked: today and a week ago come from latest.json, the day before from the file */
+    const r1 = await page.evaluate(([d0]) => { const R = PRO.fx.rate('EUR'), end = t => t + 86400; return { a: R.at(end(d0 - 20 * 86400)), b: R.at(end(d0 - 3 * 86400)), mid: R.at(end(d0 - 3 * 86400) - 43200), to: R.to, n: R.pts.length }; }, [TODAY0]);
+    const f = FXS.EUR[2], iA = Math.round((TODAY0 - 20 * DAY - FXD0) / DAY), iB = Math.round((TODAY0 - 3 * DAY - FXD0) / DAY);
+    ok('the rate: a day from the history file, a day from latest.json, half a day between them a straight line', Math.abs(r1.a - f(iA)) < 1e-9 && Math.abs(r1.b - f(iB)) < 1e-9 && Math.abs(r1.mid - (f(iB) + f(iB - 1)) / 2) < 1e-9 && r1.to === fxDay(TODAY0), JSON.stringify(r1));
+    /* a currency whose rates start in March 2024: no bar before that (nothing extrapolated) */
+    await page.evaluate(() => { PRO.app.active().setTF('1w'); PRO.app.applySym('BTC_VND'); }); await waitSym(page, 'BTC_VND');
+    const v1 = await page.evaluate(() => { const b = PRO.app.active().bars; return { first: b[0].t, n: b.length, prec: PRO.app.active().prec() }; });
+    ok('BTC in dong (rates since 2 March 2024): no bar before the first known day, no decimals', v1.first >= Date.UTC(2024, 1, 26) / 1000 && v1.n > 50 && v1.prec === 0, JSON.stringify(v1));
+    /* tether in euros: the rate as a chart, one value a day */
+    await page.evaluate(() => { PRO.app.active().setTF('1d'); PRO.app.applySym('USDT_EUR'); }); await waitSym(page, 'USDT_EUR');
+    const u1 = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars; return { n: b.length, last: b[b.length - 1].c, t: b[b.length - 1].t, srcl: c.el.querySelector('.pm-src').textContent, pair: c.el.querySelector('.pm-lsym').textContent }; });
+    ok('tether in euros: one bar a day from the reference rate (ECB), named USDT/EUR', u1.n > 3000 && Math.abs(u1.last - FXS.EUR[2](Math.round((TODAY0 - FXD0) / DAY))) < 1e-9 && u1.t === TODAY0 && u1.srcl === 'ECB' && /USDT\/EUR/.test(u1.pair), JSON.stringify(u1));
+    await page.evaluate(() => { PRO.app.active().setTF('1h'); PRO.app.applySym('BTC_EUR'); }); await waitSym(page, 'BTC_EUR');
+    /* the currency menu: the visitor's own rate, per tether and per dollar, and back */
+    await page.click('#pm-cur'); await page.waitForTimeout(800);
+    const menu = await page.evaluate(() => ({ rows: document.querySelectorAll('.pm-cui').length, first: [...document.querySelectorAll('.pm-cui b')].slice(0, 4).map(b => b.textContent).join(' '), ref: document.querySelector('.pm-cur1 small').textContent, sug: !!document.querySelector('.pm-cui[data-c="EUR"] .pm-sug') }));
+    ok('the currency menu: the current one first, the time zone’s marked, USDT and the toman, then every rate in latest.json', menu.rows >= 6 && /^EUR/.test(menu.first) && /USDT/.test(menu.first) && /1 USDT = 0\.9\d* EUR · ECB/.test(menu.ref) && menu.sug, JSON.stringify(menu));
+    await shot(page, '60_fx_menu');
+    await page.fill('.pm-own input', '0.5'); await page.selectOption('.pm-own select', 'USDT'); await page.click('.pm-own button[type=submit]'); await page.waitForTimeout(900);
+    const o1 = await conv(page);
+    const o1b = await page.evaluate(() => { const c = PRO.app.active(), u = c.feed.bf.bars, b = c.bars; return { r: b[b.length - 5].c / u[u.length - 5].c, dot: !!document.querySelector('#pm-cur .pm-owndot'), srcl: c.el.querySelector('.pm-src').textContent }; });
+    ok('your own rate (0.5 per USDT): every bar, the whole history, × 0.5; the page says «your rate»', o1.bad === 0 && Math.abs(o1b.r - 0.5) < 1e-12 && o1b.dot && /your rate/.test(o1b.srcl), JSON.stringify([o1, o1b]));
+    const ref = await page.evaluate(() => { const t = PRO.tickers.d.USDT_EUR; return t ? t.c : null; });
+    ok('…while tether’s own price in the list stays the reference rate (a typed rate has no market behind it)', ref > 0.89 && ref < 0.92, ref);
+    await page.fill('.pm-own input', '0.5'); await page.selectOption('.pm-own select', 'USD'); await page.click('.pm-own button[type=submit]'); await page.waitForTimeout(900);
+    const o2 = await page.evaluate(() => { const c = PRO.app.active(), u = c.feed.bf.bars, b = c.bars; return b[b.length - 5].c / u[u.length - 5].c; });
+    ok('…per dollar: × 0.5 × the dollar value of one tether (0.999)', Math.abs(o2 - 0.5 * 0.999) < 1e-12, o2);
+    await page.click('.pm-own [data-a="ref"]'); await page.waitForTimeout(1200);
+    const o3 = await conv(page);
+    ok('…and back to the reference rate', o3.bad === 0 && /ECB/.test(o3.srcl) && !(await page.evaluate(() => !!document.querySelector('#pm-cur .pm-owndot'))), JSON.stringify(o3));
+    /* another currency: the chart follows, lists follow */
+    await page.click('.pm-cui[data-c="TRY"]'); await page.waitForTimeout(400); await page.keyboard.press('Escape');
+    await waitSym(page, 'BTC_TRY'); await page.waitForTimeout(1500);
+    const t1 = await conv(page);
+    const t1b = await page.evaluate(() => ({ list: [...document.querySelectorAll('.pm-spanel select option')].map(o => o.textContent).join('|'), rows: [...document.querySelectorAll('.pm-wr[data-s]')].slice(0, 3).map(r => r.getAttribute('data-s') + '=' + r.querySelector('.pm-wc').textContent) }));
+    ok('choosing the lira moves BTC/EUR to BTC/TRY (exchange-api) and the list to «coins in TRY» with live prices (millions of lira: no decimals)', t1.sym === 'BTC_TRY' && t1.bad === 0 && /exchange-api/.test(t1.srcl) && /Coins in TRY/.test(t1b.list) && t1b.rows.length === 3 && t1b.rows[0].indexOf('USDT_TRY=') === 0 && /^BTC_TRY=\d{1,3}(,\d{3})+$/.test(t1b.rows[1]), JSON.stringify([t1, t1b]));
+    await shot(page, '61_fx_try');
+    /* market watch in the currency */
+    await page.evaluate(() => PRO.screener()); await page.waitForTimeout(400);
+    await page.click('.pm-scr [data-m="loc"]'); await page.waitForTimeout(2500);
+    const sc = await page.evaluate(() => [...document.querySelectorAll('.pm-scrt tbody tr[data-s]')].slice(0, 3).map(r => r.getAttribute('data-s') + '=' + r.children[2].textContent));
+    ok('market watch «Crypto (TRY)»: every coin with its price in lira', sc.length === 3 && sc.every(x => /^[A-Z0-9]+_TRY=[\d,.]+$/.test(x)), sc.join(' | '));
+    await page.keyboard.press('Escape');
+    /* the backtest starts with about 10,000 USDT in lira, as a round number */
+    const bal = await page.evaluate(() => { PRO.bt.tester(PRO.app.active()); const f = [...document.querySelectorAll('.pm-mbox label, .pm-mbox .pm-field, .pm-mbox')].map(e => e.textContent).join(' '); return f; });
+    ok('the strategy tester counts in lira', /TRY/.test(bal), bal.slice(0, 200));
+    await page.keyboard.press('Escape');
+    /* reload: a chart in a currency and a chart in toman stay (they used to be sent back to BTC on every visit) */
+    await page.evaluate(() => { PRO.app.setActive(0); }); await page.evaluate(() => PRO.app.symbolSearch && 0);
+    await page.evaluate(() => { const st = PRO.app.st(); st.layout = '2v'; st.charts = [st.charts[0], JSON.parse(JSON.stringify(st.charts[0]))]; st.charts[1].sym = 'BTC_IRT'; PRO.app.save(); });
+    await page.waitForTimeout(600); await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length === 2, null, { timeout: 20000 }).catch(() => { }); await page.waitForTimeout(4000);
+    const rl = await page.evaluate(() => PRO.app.cells().map(c => c.cfg.sym).join());
+    ok('after a reload BTC/TRY and BTC in toman are still there', rl === 'BTC_TRY,BTC_IRT', rl);
+    /* the yen: no decimals */
+    await page.evaluate(() => PRO.fx.set('JPY')); await waitSym(page, 'BTC_JPY'); await page.waitForTimeout(800);
+    const j1 = await conv(page);
+    ok('in yen: no decimals, every bar converted', j1.prec === 0 && j1.bad === 0 && j1.sym === 'BTC_JPY', JSON.stringify(j1));
+    await shot(page, '62_fx_jpy');
+    /* the dollar: plain USDT pairs again */
+    await page.evaluate(() => PRO.fx.set('USD')); await waitSym(page, 'BTC'); await page.waitForTimeout(600);
+    const d1 = await page.evaluate(() => ({ sym: PRO.app.cells()[0].cfg.sym, src: PRO.app.cells()[0].feed.src, list: [...document.querySelectorAll('.pm-spanel select option')].map(o => o.value).join(), sel: document.querySelector('.pm-spanel select').value, rows: document.querySelectorAll('.pm-wr[data-s]').length }));
+    ok('USD means no conversion: back to BTC/USDT; the «coins in …» list gives way to «my watchlist»', d1.sym === 'BTC' && d1.src === 'binance' && d1.list.indexOf('loc') < 0 && d1.sel === 'site' && d1.rows > 3, JSON.stringify(d1));
+    await ctx.close();
+  }
+
+  /* ---------- the 43 other languages: one page each (/market/<code>/), built here from a fake translation cache */
+  if (!ONLY || ONLY === 'langs') {
+    const { execFileSync } = require('child_process'), os = require('os');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'l10n-')), tplPath = path.join(ROOT, 'market', 'index.html'), tplKeep = fs.readFileSync(tplPath, 'utf8');
+    try {
+      /* German and Hebrew complete; Japanese without its page text. «replay» left out of German: English shows */
+      execFileSync('python3', ['-c', `
+import sys, json, os
+sys.path.insert(0, ${JSON.stringify(path.join(ROOT, 'scripts'))})
+import pro_l10n as L
+src = L.sources()
+for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "日本 ", False)):
+    s = {k: [L.h(v), (v.replace(">", ">" + mark, 1) if "<" in v else mark + v)] for k, v in src.items() if (seo or not (k.startswith("seo.") or k.startswith("about."))) and k != "replay"}
+    json.dump({"lang": code, "s": s}, open(os.path.join(${JSON.stringify(tmp)}, code + ".json"), "w"), ensure_ascii=False)
+`]);
+      execFileSync('python3', [path.join(ROOT, 'scripts', 'build_market_l10n.py')], { env: Object.assign({}, process.env, { PRO_L10N_CACHE: tmp }) });
+      const { page, ctx } = await zonePage(1280, 860, 'Europe/Berlin', '/market/de/', 'de');
+      const g = await page.evaluate(() => ({ lang: document.documentElement.lang, dir: document.documentElement.dir, L: PRO.app.LANG(), ind: document.querySelector('#pm-ind span').textContent, rep: document.querySelector('#pm-rep span').textContent,
+        cur: PRO.fx.cur(), sym: PRO.app.active().cfg.sym, h1: [...document.querySelectorAll('.pm-head h1 span')].filter(e => !e.hidden).map(e => e.textContent).join('|'),
+        about: [...document.querySelectorAll('section.pm-about[data-lang]')].filter(e => !e.hidden).map(e => e.getAttribute('data-lang')).join(), on: [...document.querySelectorAll('#langs button.on')].length,
+        hdr: (document.querySelector('#ekh .ek-i') || {}).textContent, lgb: document.querySelector('#pm-lang span').textContent, title: document.title }));
+      ok('/market/de/: German page (lang, direction), strings from its pack, a missing one in English, prices in euros', g.lang === 'de' && g.dir === 'ltr' && g.L === 'de' && g.ind === 'ᴰᴱ Indicators' && g.rep === 'Replay' && g.cur === 'EUR' && g.sym === 'BTC_EUR' && g.lgb === 'Deutsch', JSON.stringify(g));
+      ok('…its heading, about text and title in German; the site header in English with no language marked', g.h1 === 'ᴰᴱ Live market' && g.about === 'de' && /^ᴰᴱ Live market: /.test(g.title) && g.on === 0 && /^[A-Za-z]/.test(g.hdr || ''), JSON.stringify(g));
+      const ov = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+      ok('no sideways scroll at 1280', !ov);
+      await shot(page, '70_de_1280');
+      await page.setViewportSize({ width: 390, height: 780 }); await page.waitForTimeout(900);
+      ok('no sideways scroll at 390', !(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)));
+      await shot(page, '71_de_390');
+      await page.setViewportSize({ width: 1280, height: 860 }); await page.waitForTimeout(500);
+      /* the language menu → Español: its own address, and remembered for /market/ */
+      await page.click('#pm-lang'); await page.waitForTimeout(400);
+      const lm = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-lgi').length, first: document.querySelector('.pm-lgi b').textContent, last: [...document.querySelectorAll('.pm-lgi b')].pop().textContent, on: document.querySelector('.pm-lgi.on b').textContent }));
+      ok('the language menu: 47 languages, کوردی first, English last, the current one marked', lm.n === 47 && lm.first === 'کوردی' && lm.last === 'English' && lm.on === 'Deutsch', JSON.stringify(lm));
+      await shot(page, '72_lang_menu');
+      await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.click('.pm-lgi[data-lg="es"]')]);
+      await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 }).catch(() => { });
+      const es = await page.evaluate(() => ({ path: location.pathname, L: PRO.app.LANG(), saved: localStorage.getItem('ek_pro_lang'), robots: (document.querySelector('meta[name=robots]') || {}).content || '' }));
+      ok('Español opens /market/es/ and is remembered; an untranslated page is noindex', es.path === '/market/es/' && es.L === 'es' && es.saved === 'es' && /noindex/.test(es.robots), JSON.stringify(es));
+      await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.goto(base + '/market/', { waitUntil: 'commit' })]);
+      await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 }).catch(() => { });
+      ok('/market/ then opens the remembered language', await page.evaluate(() => location.pathname === '/market/es/' && PRO.app.LANG() === 'es'));
+      /* the site's own switch on such a page: back to /market/ in Persian */
+      await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.evaluate(() => document.querySelector('#langs button[data-l="fa"]').click())]);
+      await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 }).catch(() => { });
+      const fa = await page.evaluate(() => ({ path: location.pathname, L: PRO.app.LANG(), saved: localStorage.getItem('ek_pro_lang'), dir: document.documentElement.dir }));
+      ok('فارسی in the header goes back to /market/ in Persian and forgets the other language', fa.path === '/market/' && fa.L === 'fa' && !fa.saved && fa.dir === 'rtl', JSON.stringify(fa));
+      /* the owner's /en/ address */
+      await Promise.all([page.waitForNavigation({ timeout: 15000 }).catch(() => { }), page.goto(base + '/market/en/', { waitUntil: 'commit' })]);
+      await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 }).catch(() => { });
+      ok('/market/en/ opens /market/ in English', await page.evaluate(() => location.pathname === '/market/' && PRO.app.LANG() === 'en'));
+      await ctx.close();
+      /* Hebrew: right to left */
+      const h = await zonePage(1280, 860, 'Asia/Jerusalem', '/market/iw/', 'iw');
+      const hs = await h.page.evaluate(() => ({ lang: document.documentElement.lang, dir: document.documentElement.dir, pro: document.getElementById('pro').getAttribute('dir'), cur: PRO.fx.cur(), ind: document.querySelector('#pm-ind span').textContent, over: document.documentElement.scrollWidth > innerWidth + 1 }));
+      ok('/market/iw/: Hebrew, right to left (the chart itself stays left to right), prices in shekels', hs.lang === 'he' && hs.dir === 'rtl' && hs.pro === 'ltr' && hs.cur === 'ILS' && hs.ind === 'עב Indicators' && !hs.over, JSON.stringify(hs));
+      await shot(h.page, '73_iw_1280');
+      await h.page.setViewportSize({ width: 390, height: 780 }); await h.page.waitForTimeout(900);
+      ok('Hebrew at 390: no sideways scroll', !(await h.page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)));
+      await shot(h.page, '74_iw_390');
+      await h.ctx.close();
+      /* Japanese in Tokyo: yen; its page text not translated yet, so English there */
+      const j = await zonePage(1280, 860, 'Asia/Tokyo', '/market/jp/', 'jp');
+      const js = await j.page.evaluate(() => ({ cur: PRO.fx.cur(), sym: PRO.app.active().cfg.sym, prec: PRO.app.active().prec(), ind: document.querySelector('#pm-ind span').textContent, h1: [...document.querySelectorAll('.pm-head h1 span')].filter(e => !e.hidden).map(e => e.textContent).join('|') }));
+      ok('/market/jp/ in Tokyo: yen without decimals, workspace strings in its pack, page text in English until translated', js.cur === 'JPY' && js.sym === 'BTC_JPY' && js.prec === 0 && js.ind === '日本 Indicators' && js.h1 === 'Live market', JSON.stringify(js));
+      await shot(j.page, '75_jp_1280');
+      await j.ctx.close();
+    } finally {
+      fs.writeFileSync(tplPath, tplKeep);
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   }
 
   /* ---------- Binance unreachable: OKX blocked too, BTC falls back to the site snapshot */

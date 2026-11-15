@@ -237,6 +237,27 @@ FAQ = [
        "(dollar, euro, gold, coins, tether and bitcoin in toman) are there too. Everything is saved in your browser. In the Telegram bot, "
        "“Live market” opens it inside Telegram."),
      "/market/"),
+    (["زبان", "زبان‌ها", "ارز کشور", "ارز من", "قیمت به یورو", "قیمت به لیر", "نرخ دلخواه", "نرخ خودم", "language", "languages",
+      "my currency", "local currency", "euro", "lira", "rupee", "own rate", "زمان", "زمانەکان", "دراوی خۆم", "نرخی خۆم", "یۆرۆ",
+      "deutsch", "türkçe", "русский", "español"],
+     L("بازار زنده به زبان‌ها و ارزهای دیگر هم هست؟", "بازاڕی زیندوو بە زمان و دراوەکانی تریش هەیە؟",
+       "Is the live market in other languages and currencies too?"),
+     L("بله: میز «بازار زنده» به ۴۷ زبان است و هر زبان نشانی خودش را دارد (مثلاً entekhab.net/market/de/ یا /market/tr/)؛ "
+       "دکمهٔ کرهٔ زمین در نوار بالا فهرست زبان‌ها را باز می‌کند. دکمهٔ ارز کنار آن، قیمت همهٔ کوین‌های بایننس را به ارز کشور شما نشان "
+       "می‌دهد (یورو، لیر، روپیه، ین و حدود ۱۵۰ ارز دیگر)، به همان روش تومان: قیمت بایننس × ارزش یک تتر به آن ارز در همان روز (نرخ "
+       "مرجع روزانه). می‌توانید نرخ خودتان را هم برای یک تتر یا یک دلار وارد کنید تا همهٔ کندل‌ها و قیمت‌ها با آن حساب شوند. زبان‌های "
+       "غیر از کوردی، فارسی، عربی و انگلیسی ترجمهٔ ماشینی دارند.",
+       "بەڵێ: مێزی «بازاڕی زیندوو» بە ٤٧ زمانە و هەر زمانێک ناونیشانی خۆی هەیە (بۆ نموونە entekhab.net/market/de/ یان /market/tr/)؛ "
+       "دوگمەی گۆی زەوی لە شریتی سەرەوە لیستی زمانەکان دەکاتەوە. دوگمەی دراو لە تەنیشتیەوە نرخی هەموو کۆینەکانی بایننس بە دراوی "
+       "وڵاتەکەت پیشان دەدات (یۆرۆ، لیرە، ڕووپیە، یەن و نزیکەی ١٥٠ دراوی تر)، بە هەمان ڕێگای تمەن: نرخی بایننس × بەهای یەک تەتەر "
+       "بەو دراوە لەو ڕۆژەدا (نرخی سەرچاوەی ڕۆژانە). دەتوانیت نرخی خۆتیش بۆ یەک تەتەر یان یەک دۆلار بنووسیت تا هەموو مۆم و نرخەکان "
+       "بەوە هەژمار بکرێن. زمانەکانی جگە لە کوردی، فارسی، عەرەبی و ئینگلیزی وەرگێڕانی ئامێرییان هەیە.",
+       "Yes: the Live market workspace is in 47 languages, each at its own address (e.g. entekhab.net/market/de/ or /market/tr/); the "
+       "globe button in the top bar opens the list. The currency button next to it shows every Binance coin in your country's currency "
+       "(euro, lira, rupee, yen and about 150 more), worked out like the toman: the Binance price × what one tether is worth in that "
+       "currency that day (a daily reference rate). You can also type your own rate for one tether or one dollar, and every candle and "
+       "price then uses it. Languages other than Kurdish, Persian, Arabic and English are machine-translated."),
+     "/market/"),
     (["بک تست", "بک‌تست", "بکتست", "backtest", "back test", "تستر استراتژی", "strategy tester", "بهینه سازی", "بهینه‌سازی", "optimizer",
       "حساب تمرینی", "practice account", "دیده بان بازار", "دیده‌بان بازار", "market watch", "screener", "اسکرینر", "هشدار خبر",
       "هشدار اخبار", "news alert", "اخبار روی چارت", "news on chart", "هشدار خط روند", "trendline alert", "کد qr", "qr code",

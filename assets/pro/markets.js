@@ -5,6 +5,9 @@
      <COIN>_IRT  any Binance coin in toman, computed: the Binance candle × tether's toman rate. The rate is tgju's
                  daily close for tether, drawn as a straight line between closes, and its live price today. Labelled
                  "computed" wherever it is shown; nothing is invented when a source fails.
+     <COIN>_<CUR> any Binance coin in any other currency (BTC_EUR, ETH_JPY …), computed the same way with that
+                 currency's rate for one tether (fx.js: the site's daily reference rate, or the visitor's own rate).
+     USDT_<CUR>  the reference rate itself, one value a day: what one tether is worth in that currency.
    Symbols without the suffix or prefix (BTC, ETH …) are Binance USDT pairs, as before. */
 (function () {
   'use strict';
@@ -55,7 +58,7 @@
   var IR = {}; CAT.forEach(function (r) { IR[r[0]] = { key: r[0], g: r[1], grp: r[2], icon: r[3], div: r[4], daily: !!r[5], n: r[6] }; });
   var TMN = N('تومان', 'تمەن', 'تومان', 'IRT');
 
-  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_IRT|_F1)?|IR_[A-Z0-9]{2,12})$/;           /* Binance has one-letter coins too: S, W, T, A… */
+  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_[A-Z]{3}|_F1)?|IR_[A-Z0-9]{2,12})$/;      /* Binance has one-letter coins too: S, W, T, A… */
   function lang() { var A = P.app; return A && A.LANG ? A.LANG() : 'fa'; }
   function iconUrl(ic) { var k = ic.slice(2); return ic[0] === 'f' ? '/assets/pro/flags/' + k + '.svg' : ic[0] === 'i' ? '/assets/pro/ic/' + k + '.svg' : '/data/logos/' + k + '.png'; }
 
@@ -69,6 +72,12 @@
     }
     if (/_F1$/.test(sym)) { var fb = sym.slice(0, -3); if (!FUTC[fb]) return null; return { sym: sym, kind: 'fut', base: fb, quote: 'USD', name: FUTC[fb], logo: '/data/logos/' + fb + '.png', coin: fb, src: 'Bybit', minSec: 60 }; }
     if (/_IRT$/.test(sym)) { var b = sym.slice(0, -4); return { sym: sym, kind: 'irt', base: b, quote: 'IRT', logo: '/data/logos/' + b + '.png', coin: b, src: 'Binance × tgju', minSec: 1 }; }
+    var fm = /^([A-Z0-9]{1,12})_([A-Z]{3})$/.exec(sym);
+    if (fm) {
+      if (fm[2] === 'USD') return null;                                /* dollars are the plain USDT pairs */
+      if (fm[1] === 'USDT') return { sym: sym, kind: 'fxr', base: 'USDT', quote: fm[2], logo: P.fx ? P.fx.flag(fm[2]) : '', coin: null, src: 'fx', minSec: 86400 };
+      return { sym: sym, kind: 'fiat', base: fm[1], quote: fm[2], logo: '/data/logos/' + fm[1] + '.png', coin: fm[1], src: 'fx', minSec: 1 };
+    }
     return { sym: sym, kind: 'usdt', base: sym, quote: 'USDT', logo: '/data/logos/' + sym + '.png', coin: sym, src: 'Binance', minSec: 1 };
   };
   P.logo = function (sym) { var i = P.inst(sym); return i ? i.logo : ''; };
@@ -77,10 +86,18 @@
     var i = P.inst(sym), l = lang(); if (!i) return sym;
     if (i.kind === 'ir') return short ? i.base : i.name[l] || i.name.en;
     if (i.kind === 'fut') return i.base + '1!';
-    return i.base + '/' + (i.quote === 'IRT' ? TMN[l] : 'USDT');
+    if (i.kind === 'fiat' || i.kind === 'fxr') return i.base + '/' + i.quote;
+    return i.base + '/' + (i.quote === 'IRT' ? (TMN[l] || TMN.en) : 'USDT');
   };
   P.isToman = function (sym) { var i = P.inst(sym); return !!i && i.quote === 'IRT'; };
-  P.precFor = function (sym, p) { return P.isToman(sym) && Math.abs(p) >= 1000 ? 0 : P.prec(p); };
+  /* a price in a local currency (toman or any other): worked out here, so it stays on this page */
+  P.isLocal = function (sym) { var i = P.inst(sym); return !!i && (i.kind === 'irt' || i.kind === 'fiat' || i.kind === 'fxr'); };
+  P.quoteOf = function (sym) { var i = P.inst(sym); return i ? i.quote : 'USDT'; };
+  P.precFor = function (sym, p) {
+    var i = P.inst(sym);
+    if (i && (i.kind === 'fiat' || i.kind === 'fxr') && P.fx) return P.fx.prec(i.quote, p);
+    return P.isToman(sym) && Math.abs(p) >= 1000 ? 0 : P.prec(p);
+  };
   /* the site's rule: no coin is ever shown without its own logo (icons of currencies and gold ship with the page) */
   P.hasLogo = function (sym) {
     var i = P.inst(sym); if (!i) return false;
@@ -226,17 +243,42 @@
     var p0 = pts[lo], p1 = pts[hi]; return p0[1] + (p1[1] - p0[1]) * (t - p0[0]) / (p1[0] - p0[0]);
   }
   P.rateAt = rateAt; P._rate = RATE;
-  function toToman(b, sec) { var r = rateAt(b.t + sec / 2); return r ? { t: b.t, o: b.o * r, h: b.h * r, l: b.l * r, c: b.c * r, v: b.v } : null; }
+  /* the rate a quote currency is worked out with: tether's toman rate above, any other currency from fx.js; the
+     visitor's own rate, when they typed one, wins for either */
+  var QR = {};
+  function quoteRate(code) {
+    if (QR[code]) return QR[code];
+    if (code !== 'IRT') return (QR[code] = P.fx.rate(code));
+    return (QR[code] = {
+      code: 'IRT', subs: RATE.subs,
+      load: function () { return P.fx && P.fx.ownVal('IRT') != null ? Promise.resolve(true) : rateLoad(); },
+      at: function (t) { var o = P.fx ? P.fx.ownVal('IRT') : null; return o != null ? o : rateAt(t); },
+      use: function (on) { rateUse(on); },
+      notify: function () { RATE.subs.slice().forEach(function (f) { try { f(); } catch (e) { } }); },
+      source: function () { return P.fx && P.fx.ownVal('IRT') != null ? 'own' : 'tgju'; }
+    });
+  }
+  P.quoteRate = quoteRate;
+  function conv(b, sec, R) { var r = R.at(b.t + sec / 2); return r ? { t: b.t, o: b.o * r, h: b.h * r, l: b.l * r, c: b.c * r, v: b.v } : null; }
+  function toToman(b, sec) { return conv(b, sec, quoteRate('IRT')); }
 
-  /* ---------------------------------------------------------------- <COIN>_IRT: a Binance feed × the rate */
-  function IrtFeed(sym, tf) { Base.call(this, sym, tf); this.inst = P.inst(sym); this.src = 'irt'; this.full = false; }
+  /* ---------------------------------------------------------------- <COIN>_IRT and <COIN>_<CUR>: a Binance feed × the rate */
+  function IrtFeed(sym, tf) { Base.call(this, sym, tf); this.inst = P.inst(sym); this.R = quoteRate(this.inst.quote); this.src = this.inst.kind === 'irt' ? 'irt' : 'fiat'; this.full = false; }
   IrtFeed.prototype = Object.create(Base.prototype);
   IrtFeed.prototype.start = function () {
-    var self = this; this.state = 'load'; this.tell('state'); rateUse(true); this.rated = true;
-    this.onRate = function () { var B = self.bf && self.bf.bars; if (B && B.length) self.convOne(B[B.length - 1], false); };
-    RATE.subs.push(this.onRate);
-    rateLoad().then(function () {
+    var self = this, R = this.R; this.state = 'load'; this.tell('state'); R.use(true); this.rated = true;
+    /* a new rate (today's live toman, a new day's reference rate, the visitor's own): the latest bar follows it; a
+       rate the visitor typed or removed changes the whole history, so every bar is worked out again */
+    this.onRate = function () {
+      var B = self.bf && self.bf.bars; if (!B || !B.length) return;
+      var own = P.fx ? P.fx.ownVal(self.inst.quote) : null;
+      if (own !== self.lastOwn) { self.lastOwn = own; self.convAll(); self.tell('reset'); return; }
+      self.convOne(B[B.length - 1], false);
+    };
+    R.subs.push(this.onRate);
+    R.load().then(function () {
       if (self.dead) return;
+      self.lastOwn = P.fx ? P.fx.ownVal(self.inst.quote) : null;
       self.sub = P.feedUsdt(self.inst.base, self.tf.id, function (what, F, x) {
         self.bf = F; self.full = F.full; self.busy = F.busy;
         if (what === 'reset' || what === 'more') { self.convAll(); self.tell(what === 'more' ? 'more' : 'reset', x); }
@@ -244,15 +286,18 @@
         else if (what === 'state') { self.state = F.state; self.tell('state'); }
       });
       if (!self.sub) throw new Error('tf');
-    }).catch(function () { if (self.dead) return; self.state = 'error'; self.err = 'rate'; self.tell('state'); });
+    }).catch(function () {
+      if (self.dead) return; self.state = 'error'; self.err = 'rate'; self.tell('state');
+      clearTimeout(self.retryT); self.retryT = setTimeout(function () { if (!self.dead && self.refs && !self.sub) { var i = R.subs.indexOf(self.onRate); if (i >= 0) R.subs.splice(i, 1); R.use(false); self.start(); } }, 60000);
+    });
   };
   IrtFeed.prototype.convAll = function () {
     var B = this.bf.bars, sec = this.tf.sec, out = [];
-    for (var i = 0; i < B.length; i++) { var b = toToman(B[i], sec); if (b) out.push(b); }
+    for (var i = 0; i < B.length; i++) { var b = conv(B[i], sec, this.R); if (b) out.push(b); }
     this.bars = out; this.state = this.bf.state; this.at = Date.now();
   };
   IrtFeed.prototype.convOne = function (bar, closed, isNew) {
-    var b = toToman(bar, this.tf.sec); if (!b) return;
+    var b = conv(bar, this.tf.sec, this.R); if (!b) return;
     var bars = this.bars, lb = bars[bars.length - 1];
     if (lb && lb.t === b.t) bars[bars.length - 1] = b; else if (!lb || b.t > lb.t) { bars.push(b); isNew = true; } else return;
     this.at = Date.now(); this.tell('tick', { bar: b, isNew: !!isNew, closed: !!closed });
@@ -260,8 +305,34 @@
   IrtFeed.prototype.more = function () { return this.bf ? this.bf.more() : Promise.resolve(false); };
   IrtFeed.prototype.catchup = function () { if (this.bf) this.bf.catchup(); };
   IrtFeed.prototype.stop = function () {
-    this.dead = true; if (this.sub) this.sub.off(); var i = RATE.subs.indexOf(this.onRate); if (i >= 0) RATE.subs.splice(i, 1);
-    if (this.rated) rateUse(false); clearTimeout(this.retryT); delete FEEDS[this.key];
+    this.dead = true; if (this.sub) this.sub.off(); var i = this.R.subs.indexOf(this.onRate); if (i >= 0) this.R.subs.splice(i, 1);
+    if (this.rated) this.R.use(false); clearTimeout(this.retryT); delete FEEDS[this.key];
+  };
+
+  /* ---------------------------------------------------------------- USDT_<CUR>: the reference rate as a chart (one value a day).
+     Always the reference series, never the visitor's own rate (a typed rate has no history to draw) */
+  function rateBars(R, tf) {
+    var a = R.pts || [], base = [];
+    for (var i = 0; i < a.length; i++) { var t = a[i][0] - 86400, v = a[i][1]; base.push({ t: t, o: v, h: v, l: v, c: v, v: 0 }); }
+    return tf.sec === 86400 ? base : P.aggregate(base, tf);
+  }
+  function FxrFeed(sym, tf) { Base.call(this, sym, tf); this.inst = P.inst(sym); this.R = P.fx.rate(this.inst.quote); this.src = 'fxr'; }
+  FxrFeed.prototype = Object.create(Base.prototype);
+  FxrFeed.prototype.start = function () {
+    var self = this, R = this.R; this.state = 'load'; this.tell('state');
+    if (this.tf.sec < 86400) { this.state = 'error'; this.err = 'tf'; this.tell('state'); return; }
+    R.use(true); this.rated = true;
+    this.onRate = function () { if (R.pts && R.pts.length) self.setBars(rateBars(R, self.tf)); };
+    R.subs.push(this.onRate);
+    R.load().then(function () {
+      if (self.dead) return;
+      if (!R.pts || !R.pts.length) throw new Error('no reference rate');
+      self.state = 'snap'; self.setBars(rateBars(R, self.tf)); self.tell('state');
+    }).catch(function () { if (self.dead) return; self.state = 'error'; self.err = 'rate'; self.tell('state'); });
+  };
+  FxrFeed.prototype.stop = function () {
+    this.dead = true; if (this.onRate) { var i = this.R.subs.indexOf(this.onRate); if (i >= 0) this.R.subs.splice(i, 1); }
+    if (this.rated) this.R.use(false); delete FEEDS[this.key];
   };
 
   /* ---------------------------------------------------------------- P.feed for every kind of symbol */
@@ -408,7 +479,7 @@
     if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn);
     var tf = P.parseTF(tfId); if (!tf) return null;
     var adj = I.kind === 'fut' && !!BADJ[sym], key = sym + '|' + tf.id + (adj ? '|a' : ''), F = FEEDS[key];
-    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : new IrtFeed(sym, tf); F.start(); }
+    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
     clearTimeout(F.killT); F.subs.push(fn); F.refs++;
     if (F.bars.length) setTimeout(function () { if (F.subs.indexOf(fn) >= 0) fn('reset', F); }, 0);
     return { feed: F, off: function () {
@@ -423,7 +494,8 @@
   P.history = function (sym, tfId, startMs, endMs) {
     var I = P.inst(sym), tf = P.parseTF(tfId); if (!I || !tf) return Promise.reject(new Error('sym'));
     if (I.kind === 'usdt') return histUsdt(sym, tfId, startMs, endMs);
-    if (I.kind === 'irt') return Promise.all([rateLoad(), histUsdt(I.base, tfId, startMs, endMs)]).then(function (r) { return r[1].map(function (b) { return toToman(b, tf.sec); }).filter(Boolean); });
+    if (I.kind === 'irt' || I.kind === 'fiat') { var R = quoteRate(I.quote); return Promise.all([R.load(), histUsdt(I.base, tfId, startMs, endMs)]).then(function (r) { return r[1].map(function (b) { return conv(b, tf.sec, R); }).filter(Boolean); }); }
+    if (I.kind === 'fxr') { var X = P.fx.rate(I.quote); return X.load().then(function () { return rateBars(X, tf).filter(function (b) { return b.t * 1000 >= startMs && b.t * 1000 <= endMs; }); }); }
     if (I.kind === 'fut') return futHist(I, tfId, startMs, endMs);
     var nr = tgRes(tf); if (!nr) return Promise.reject(new Error('tf'));
     return tgHist(I.grade, nr[1]).then(function (j) {
@@ -437,7 +509,7 @@
     var I = P.inst(sym), tf = P.parseTF(tfId); if (!I || !tf) return Promise.reject(new Error('sym'));
     if (I.kind === 'usdt') return firstUsdt(sym, tfId);
     if (I.kind === 'fut') return futHist(I, tfId, Date.now() - 5 * 365 * 86400e3, Date.now()).then(function (b) { return b.slice(0, 1000); });
-    if (I.kind === 'irt') return Promise.all([rateLoad(), firstUsdt(I.base, tfId)]).then(function (r) { return r[1].map(function (b) { return toToman(b, tf.sec); }).filter(Boolean); });
+    if (I.kind === 'irt' || I.kind === 'fiat') { var R = quoteRate(I.quote); return Promise.all([R.load(), firstUsdt(I.base, tfId)]).then(function (r) { return r[1].map(function (b) { return conv(b, tf.sec, R); }).filter(Boolean); }); }
     return P.history(sym, tfId, 0, Date.now()).then(function (b) { return b.slice(0, 1000); });
   };
 
@@ -458,31 +530,54 @@
       });
     }, function () { });
   }
+  /* a coin in toman or another currency: the coin's Binance ticker × the rate now (and × the rate a day ago for the
+     24-hour open, so the change includes the currency's own move, as it does for anyone holding that currency) */
   function irtPrice(s) {
-    var b = P.tickers.d[s.slice(0, -4)], now = Date.now() / 1000, r = rateAt(now), r0 = rateAt(now - 86400);
+    var I = P.inst(s); if (!I) return;
+    var R = quoteRate(I.quote), now = Date.now() / 1000, r = R.at(now), r0 = R.at(now - 86400);
+    if (I.kind === 'fxr') { var f = R.ref(now), f0 = R.ref(now - 86400); if (f && f0) P._tkPut(s, { c: f, o: f0, h: Math.max(f, f0), l: Math.min(f, f0), q: 0, src: 'fxr' }); return; }
+    var b = P.tickers.d[I.base];
     if (!b || !r || !r0) return;
-    P._tkPut(s, { c: b.c * r, o: b.o * r0, h: b.h * r, l: b.l * r, q: b.q * r, src: 'irt' });
+    P._tkPut(s, { c: b.c * r, o: b.o * r0, h: b.h * r, l: b.l * r, q: b.q * r, src: I.kind === 'irt' ? 'irt' : 'fiat' });
   }
-  P.tickers.on(function (sym) { if (IRTW.length && IRTW.indexOf(sym + '_IRT') >= 0) irtPrice(sym + '_IRT'); });
-  RATE.subs.push(function () { IRTW.forEach(irtPrice); });
+  P.tickers.on(function (sym) { if (!IRTW.length || P.inst(sym) && P.inst(sym).kind !== 'usdt') return; IRTW.forEach(function (s) { if (P.inst(s).base === sym) irtPrice(s); }); });
+  /* the same, worked out on demand and not kept (the market-watch table shows 600 coins: only the ones on screen stream) */
+  P.locTicker = function (s) {
+    var I = P.inst(s); if (!I || (I.kind !== 'irt' && I.kind !== 'fiat')) return null;
+    var b = P.tickers.d[I.base], R = quoteRate(I.quote), now = Date.now() / 1000, r = R.at(now), r0 = R.at(now - 86400);
+    if (!b || !r || !r0 || !(b.o > 0)) return null;
+    var c = b.c * r, o = b.o * r0;
+    return { c: c, o: o, h: b.h * r, l: b.l * r, q: b.q * r, chg: (c / o - 1) * 100, src: I.kind === 'irt' ? 'irt' : 'fiat' };
+  };
+  var LOCQ = {};                                                       /* quote currencies in use by the lists, and their rate listeners */
+  function locQuotes(list) {
+    var want = {}; list.forEach(function (s) { want[P.inst(s).quote] = 1; });
+    Object.keys(LOCQ).forEach(function (q) { if (!want[q]) { var R = quoteRate(q), i = R.subs.indexOf(LOCQ[q]); if (i >= 0) R.subs.splice(i, 1); R.use(false); delete LOCQ[q]; } });
+    Object.keys(want).forEach(function (q) {
+      if (LOCQ[q]) return;
+      var R = quoteRate(q); LOCQ[q] = function () { IRTW.forEach(function (s) { if (P.inst(s).quote === q) irtPrice(s); }); };
+      R.subs.push(LOCQ[q]); R.use(true);
+      R.load().then(LOCQ[q], function () { });
+      if (q !== 'IRT') P.fx.latest().then(function () { var f = LOCQ[q]; if (f) f(); }, function () { });
+    });
+  }
   var watchUsdt = P.tickers.watch;
   P.tickers.watch = function (syms) {
     var c = {}, ir = [], irt = [], fut = [];
-    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'ir') ir.push(s); else if (I.kind === 'fut') fut.push(s); else { c[I.base] = 1; if (I.kind === 'irt') irt.push(s); } });
+    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'ir') ir.push(s); else if (I.kind === 'fut') fut.push(s); else if (I.kind === 'fxr') irt.push(s); else { c[I.base] = 1; if (I.kind === 'irt' || I.kind === 'fiat') irt.push(s); } });
     FUTW = fut; clearInterval(FUTP); FUTP = null; if (fut.length) { futPrices(); FUTP = setInterval(futPrices, P.saver ? 120000 : 15000); }
     watchUsdt(Object.keys(c));
-    var hadIrt = IRTW.length > 0; IRW = ir; IRTW = irt;
-    if (irt.length && !hadIrt) { rateUse(true); rateLoad().then(function () { IRTW.forEach(irtPrice); }, function () { }); }
-    if (!irt.length && hadIrt) rateUse(false);
+    IRW = ir; IRTW = irt; locQuotes(irt);
     clearInterval(IRP); IRP = null;
     if (ir.length) { irPrices(); IRP = setInterval(irPrices, P.saver ? 300000 : 60000); }
   };
 
   /* ---------------------------------------------------------------- the lists people pick from */
+  /* loc: every coin in the visitor's currency (none for toman, which has its own lists, or for USD), tether first */
   P.markets = function () {
     return Promise.all([P.universe(), P.logos()]).then(function (r) {
-      var u = r[0] || [];
-      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }) };
+      var u = r[0] || [], q = P.fx ? P.fx.cur() : 'IRT', loc = q === 'IRT' || q === 'USD' ? [] : ['USDT_' + q].concat(u.map(function (s) { return s + '_' + q; }));
+      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }), loc: loc, cur: q };
     });
   };
 })();

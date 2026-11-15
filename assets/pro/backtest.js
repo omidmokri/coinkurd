@@ -24,7 +24,15 @@
   }
   var CFG = sane(P.store.get(KEY, {}));
   function saveCfg() { P.store.set(KEY, CFG); }
-  function forSym(sym) { var c = Object.assign({}, CFG); if (P.isToman && P.isToman(sym) && c.bal === 10000) c.bal = 100000000; return c; }
+  /* the starting balance of a test in toman or another currency: what 10,000 USDT is about worth there, as a round
+     number (10,000 → €9,000; ¥2,000,000; 100,000,000 toman as before) */
+  function nice(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e; return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * e; }
+  function defBal(sym) {
+    if (P.isToman && P.isToman(sym)) return 100000000;
+    var I = P.inst ? P.inst(sym) : null, R = I && I.kind === 'fiat' && P.quoteRate ? P.quoteRate(I.quote) : null, r = R ? R.at(Date.now() / 1000) : null;
+    return r > 0 ? nice(10000 * r) : 10000;
+  }
+  function forSym(sym) { var c = Object.assign({}, CFG); if (c.bal === 10000) c.bal = defBal(sym); return c; }
 
   /* ================================================================ the account */
   function Account(cfg, sym) {
@@ -170,10 +178,11 @@
   }
 
   /* ================================================================ the report */
-  function quote(sym) { var I = P.inst ? P.inst(sym) : null; return I && I.quote === 'IRT' ? T('toman') : I && I.quote === 'USD' ? 'USD' : 'USDT'; }
+  function quote(sym) { var I = P.inst ? P.inst(sym) : null; return I && I.quote === 'IRT' ? T('toman') : I && I.quote ? I.quote : 'USDT'; }
   function money(v, sym) {
-    var irt = P.isToman && P.isToman(sym), a = Math.abs(v);
-    var s = a.toLocaleString('en-US', { maximumFractionDigits: irt ? 0 : a >= 100 ? 2 : 4, minimumFractionDigits: irt ? 0 : 2 });
+    var I = P.inst ? P.inst(sym) : null, irt = P.isToman && P.isToman(sym), a = Math.abs(v);
+    var z = irt || (I && I.kind === 'fiat' && P.fx && P.fx.digits(I.quote) === 0);              /* toman, yen, won, dong …: no decimals */
+    var s = a.toLocaleString('en-US', { maximumFractionDigits: z ? 0 : a >= 100 ? 2 : 4, minimumFractionDigits: z ? 0 : 2 });
     return (v < 0 ? '−' : '') + s;
   }
   function pct(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + '%'; }
@@ -268,7 +277,7 @@
     f.onsubmit = function (e) {
       e.preventDefault(); var o = {};
       $$('input,select', f).forEach(function (i) { o[i.name] = i.value === '' ? 0 : i.value; });
-      if (P.isToman && P.isToman(sym) && +o.bal === 100000000) o.bal = 10000;    /* the toman default stays a default */
+      if (+o.bal === defBal(sym)) o.bal = 10000;    /* the toman (or another currency's) default stays a default */
       CFG = sane(o); saveCfg(); A.closeModal(); if (after) after();
     };
     A.modal(T('btSettings'), f);
@@ -401,7 +410,7 @@
     return acct;
   }
   function label(id, q) { var k = Object.keys(q || {}); return T('sg_' + id) + (k.length ? ' (' + k.map(function (x) { return q[x]; }).join(', ') + ')' : ''); }
-  function baseOf(sym) { return String(sym).replace(/_IRT$/, ''); }
+  function baseOf(sym) { return String(sym).replace(/_[A-Z]{3}$/, ''); }
   var SIGS = null;
   function sigsFor(sym) {
     if (baseOf(sym) !== 'BTC') return Promise.resolve([]);

@@ -1,5 +1,6 @@
 /* entekhab.net — /market/ strings in the site's four languages: کوردی (ckb) · فارسی (fa) · العربية (ar) · English (en).
-   Adding a language = adding one more object with the same keys (missing keys fall back to English).
+   The workspace's 43 other languages (langs.js) add their own object from assets/pro/l10n/<code>.js, machine-translated
+   from the English here by CI (scripts/pro_l10n.py); a key one of them lacks falls back to English.
    P.tr(lang, key, {name: value}) fills {name} placeholders. Checked by tests/test_pro_i18n.py. */
 (function () {
   'use strict';
@@ -168,7 +169,15 @@
     cat_fut: 'Futures', futSub: 'Quarterly futures, continuous',
     futNote: 'The front quarterly contract of Bybit (coin-margined) as one chart, rolled at each expiry (last Friday of Mar, Jun, Sep, Dec, 08:00 UTC). Turn on B-ADJ next to the timeframe to back-adjust the history by each roll\'s gap.',
     badjT: 'B-ADJ — back-adjust the history at each contract roll', badjOn: 'B-ADJ on: the history is back-adjusted at each roll',
-    badjOff: 'B-ADJ off: the real prices of each contract'
+    badjOff: 'B-ADJ off: the real prices of each contract',
+    langTitle: 'Language', langSearch: 'Find a language…', langNote: 'Kurdish, Persian, Arabic and English are written by hand. The other languages are machine-translated, and a phrase not translated yet shows in English.',
+    curTitle: 'Currency', curSearch: 'Find a currency: EUR, yen, rupee…', curNote: 'A coin in your currency is worked out the way the toman is: the Binance price × what one tether is worth in that currency on that day (the European Central Bank’s reference rate, or the open exchange-api data for other currencies), or × your own rate. An estimate, not that country’s exchanges.',
+    curPlain: 'No conversion: Binance’s USDT pairs', curRef: '1 USDT = {v} {c} · {s}', curSuggest: 'your region', ownRate: 'Your own rate', perUnit: '{c} for 1 {u}', ownSave: 'Use my rate',
+    ownClear: 'Back to the reference rate', ownNote: 'Every price and candle in {c} is then worked out with your rate, the same for the whole history.', ownLine: 'Your rate: 1 {per} = {v} {c}',
+    ownSet: 'Prices in {c} now use your rate.', ownCleared: 'Prices in {c} use the reference rate again.', yourRate: 'your rate', refRate: 'reference rate', refDaily: 'Reference rate, one value a day',
+    noRate: 'No rate for {c} yet. Choose another currency, or enter your own rate in the currency menu.', tomanName: 'Iranian toman', cat_loc: 'Crypto / {c}', locNote: 'In {c}: the Binance price × what one tether is worth in {c} that day (the reference rate, or your own). An estimate, not an exchange’s order book.',
+    locList: 'Coins in {c}', scr_loc: 'Crypto ({c})', ht_cur: 'Your currency', h_cur: 'The currency button at the top shows prices in your currency: every Binance coin, worked out like the toman (the Binance price × what one tether is worth there that day). Tether’s own rate is a chart too. You can type your own rate for 1 USDT or 1 USD, and every price in that currency then uses it.',
+    ht_lang: 'Languages', h_lang: 'The globe button opens 47 languages, each at its own address (/market/de/, /market/jp/ …). Your workspace, lists and alerts stay the same in every language.'
   };
   S.fa = {
     loading: 'در حال بارگذاری…', badTf: 'این تایم‌فریم در دسترس نیست', dur_d: '{n} روز', dur_h: '{n} ساعت', dur_m: '{n} دقیقه', dur_sep: ' و ', noLogo: 'آن ارز اینجا در دسترس نیست؛ نمودار BTC را نشان می‌دهد.', noData: 'فعلاً داده‌ای برای {s} نیست — بایننس، OKX و نسخهٔ پشتیبان سایت هر سه جواب ندادند؛ کمی بعد دوباره تلاش می‌شود.',
@@ -329,7 +338,15 @@
     qrTooBig: 'این فضای کار برای کد QR بزرگ است؛ به‌جایش لینک را بفرستید.', qrNote: 'با دوربین دستگاه دیگر اسکن کنید تا همین فضای کار آنجا باز شود.', csvAll: 'CSV همهٔ چارت‌ها',
     cat_fut: 'فیوچرز', futSub: 'فیوچرز فصلی، پیوسته',
     futNote: 'قرارداد فصلیِ جاری بای‌بیت (کوین-مارجین) به‌صورت یک چارت پیوسته که در هر سررسید به قرارداد بعدی می‌رود (آخرین جمعهٔ مارس، ژوئن، سپتامبر و دسامبر، ساعت ۰۸:۰۰ UTC). با روشن کردن B-ADJ کنار تایم‌فریم، تاریخچه به اندازهٔ فاصلهٔ قیمتیِ هر جابه‌جایی تعدیل می‌شود.',
-    badjT: 'B-ADJ — تعدیل تاریخچه در هر جابه‌جایی قرارداد', badjOn: 'B-ADJ روشن شد: تاریخچه در هر جابه‌جایی قرارداد تعدیل می‌شود', badjOff: 'B-ADJ خاموش شد: قیمت واقعی هر قرارداد'
+    badjT: 'B-ADJ — تعدیل تاریخچه در هر جابه‌جایی قرارداد', badjOn: 'B-ADJ روشن شد: تاریخچه در هر جابه‌جایی قرارداد تعدیل می‌شود', badjOff: 'B-ADJ خاموش شد: قیمت واقعی هر قرارداد',
+    langTitle: 'زبان', langSearch: 'جستجوی زبان…', langNote: 'کوردی، فارسی، عربی و انگلیسی را خودمان نوشته‌ایم. زبان‌های دیگر ترجمهٔ ماشینی است و عبارتی که هنوز ترجمه نشده، انگلیسی می‌ماند.',
+    curTitle: 'ارز', curSearch: 'جستجوی ارز: EUR، ین، روپیه…', curNote: 'قیمت هر کوین به ارز شما مثل تومان حساب می‌شود: قیمت بایننس × ارزش یک تتر به آن ارز در همان روز (نرخ مرجع بانک مرکزی اروپا، یا دادهٔ باز exchange-api برای ارزهای دیگر)، یا × نرخ خود شما. برآورد است، نه دفتر سفارش صرافی‌های آن کشور.',
+    curPlain: 'بدون تبدیل: جفت‌ارزهای USDT بایننس', curRef: '۱ USDT = {v} {c} · {s}', curSuggest: 'منطقهٔ شما', ownRate: 'نرخ خودتان', perUnit: '{c} به ازای ۱ {u}', ownSave: 'نرخ من را به کار ببر',
+    ownClear: 'برگشت به نرخ مرجع', ownNote: 'از این پس هر قیمت و کندل به {c} با نرخ شما حساب می‌شود؛ همین نرخ برای کل تاریخچه.', ownLine: 'نرخ شما: ۱ {per} = {v} {c}', ownSet: 'قیمت‌ها به {c} حالا با نرخ شما حساب می‌شوند.',
+    ownCleared: 'قیمت‌ها به {c} دوباره با نرخ مرجع حساب می‌شوند.', yourRate: 'نرخ شما', refRate: 'نرخ مرجع', refDaily: 'نرخ مرجع، روزی یک عدد', noRate: 'هنوز نرخی برای {c} نیست. ارز دیگری انتخاب کنید یا در منوی ارز، نرخ خودتان را وارد کنید.',
+    tomanName: 'تومان ایران', cat_loc: 'کریپتو / {c}', locNote: 'به {c}: قیمت بایننس × ارزش یک تتر به {c} در همان روز (نرخ مرجع یا نرخ خودتان). برآورد است، نه دفتر سفارش یک صرافی.',
+    locList: 'کوین‌ها به {c}', scr_loc: 'کریپتو ({c})', ht_cur: 'ارز شما', h_cur: 'دکمهٔ ارز در بالای صفحه قیمت‌ها را به ارز شما نشان می‌دهد: همهٔ کوین‌های بایننس، به همان روش تومان (قیمت بایننس × ارزش یک تتر به آن ارز در همان روز). نرخ خود تتر هم نمودار دارد. می‌توانید نرخ خودتان را به ازای ۱ USDT یا ۱ USD وارد کنید تا همهٔ قیمت‌های آن ارز با آن حساب شوند.',
+    ht_lang: 'زبان‌ها', h_lang: 'دکمهٔ کرهٔ زمین ۴۷ زبان را باز می‌کند و هر زبان نشانی خودش را دارد (‎/market/de/‎، ‎/market/jp/‎ …). فضای کار، فهرست‌ها و هشدارهای شما در همهٔ زبان‌ها یکی است.'
   };
   S.ckb = {
     loading: 'باردەکرێت…', badTf: 'ئەم تایمفرەیمە بەردەست نییە', dur_d: '{n} ڕۆژ', dur_h: '{n} کاتژمێر', dur_m: '{n} خولەک', dur_sep: ' و ', noLogo: 'ئەو دراوە لێرە بەردەست نییە، بۆیە چارتەکە BTC پیشان دەدات.', noData: 'ئێستا داتا بۆ {s} نییە — بایننس، OKX و پاشەکەوتی ماڵپەڕ هیچیان وەڵامیان نەدایەوە؛ کەمێکی تر دووبارە هەوڵ دەدرێتەوە.',
@@ -500,7 +517,15 @@
     cat_fut: 'فیوچەرز', futSub: 'فیوچەرزی وەرزی، بەردەوام',
     futNote: 'گرێبەستی وەرزیی ئێستای بایبیت (کۆین-مارجین) وەک یەک چارتی بەردەوام کە لە هەر بەسەرچوونێکدا دەچێتە سەر گرێبەستی دواتر (دوایین هەینی مانگەکانی مارس، حوزەیران، ئەیلوول و کانوونی یەکەم، کاتژمێر ٠٨:٠٠ UTC). بە کردنەوەی B-ADJ لە تەنیشت تایمفرەیم، مێژووەکە بە ئەندازەی بۆشایی هەر گواستنەوەیەک ڕێک دەخرێت.',
     badjT: 'B-ADJ — ڕێکخستنی مێژوو لە هەر گواستنەوەیەکی گرێبەست', badjOn: 'B-ADJ کرایەوە: مێژوو لە هەر گواستنەوەیەکدا ڕێک دەخرێت',
-    badjOff: 'B-ADJ کوژایەوە: نرخی ڕاستەقینەی هەر گرێبەستێک'
+    badjOff: 'B-ADJ کوژایەوە: نرخی ڕاستەقینەی هەر گرێبەستێک',
+    langTitle: 'زمان', langSearch: 'گەڕان بۆ زمان…', langNote: 'کوردی، فارسی، عەرەبی و ئینگلیزی بە دەست نووسراون. زمانەکانی تر وەرگێڕانی ئامێرین، و دەستەواژەیەک کە هێشتا وەرنەگێڕدراوە بە ئینگلیزی دەمێنێتەوە.',
+    curTitle: 'دراو', curSearch: 'گەڕان بۆ دراو: EUR، یەن، ڕووپیە…', curNote: 'نرخی هەر کۆینێک بە دراوی تۆ وەک تمەن هەژمار دەکرێت: نرخی بایننس × بەهای یەک تەتەر بەو دراوە لە هەمان ڕۆژدا (نرخی سەرچاوەی بانکی ناوەندیی ئەورووپا، یان داتای کراوەی exchange-api بۆ دراوەکانی تر)، یان × نرخی خۆت. خەمڵاندنە، نەک دەفتەری داواکاریی ئاڵوگۆڕخانەکانی ئەو وڵاتە.',
+    curPlain: 'بێ گۆڕین: جووتەکانی USDTی بایننس', curRef: '١ USDT = {v} {c} · {s}', curSuggest: 'ناوچەکەت', ownRate: 'نرخی خۆت', perUnit: '{c} بۆ ١ {u}', ownSave: 'نرخەکەم بەکاربهێنە', ownClear: 'گەڕانەوە بۆ نرخی سەرچاوە',
+    ownNote: 'لەمەودوا هەموو نرخ و مۆمێک بە {c} بە نرخی تۆ هەژمار دەکرێت؛ هەمان نرخ بۆ هەموو مێژووەکە.', ownLine: 'نرخی تۆ: ١ {per} = {v} {c}', ownSet: 'نرخەکان بە {c} ئێستا بە نرخی تۆ هەژمار دەکرێن.',
+    ownCleared: 'نرخەکان بە {c} دیسان بە نرخی سەرچاوە هەژمار دەکرێن.', yourRate: 'نرخی تۆ', refRate: 'نرخی سەرچاوە', refDaily: 'نرخی سەرچاوە، ڕۆژی یەک ژمارە', noRate: 'هێشتا نرخێک بۆ {c} نییە. دراوێکی تر هەڵبژێرە، یان لە لیستی دراودا نرخی خۆت بنووسە.',
+    tomanName: 'تمەنی ئێران', cat_loc: 'کریپتۆ / {c}', locNote: 'بە {c}: نرخی بایننس × بەهای یەک تەتەر بە {c} لەو ڕۆژەدا (نرخی سەرچاوە یان نرخی خۆت). خەمڵاندنە، نەک دەفتەری داواکاریی ئاڵوگۆڕخانەیەک.',
+    locList: 'کۆینەکان بە {c}', scr_loc: 'کریپتۆ ({c})', ht_cur: 'دراوەکەت', h_cur: 'دوگمەی دراو لە سەرەوە نرخەکان بە دراوی تۆ پیشان دەدات: هەموو کۆینەکانی بایننس، بە هەمان ڕێگای تمەن (نرخی بایننس × بەهای یەک تەتەر بەو دراوە لەو ڕۆژەدا). نرخی تەتەر خۆیشی چارتی هەیە. دەتوانیت نرخی خۆت بۆ ١ USDT یان ١ USD بنووسیت، ئینجا هەموو نرخەکانی ئەو دراوە بەوە هەژمار دەکرێن.',
+    ht_lang: 'زمانەکان', h_lang: 'دوگمەی گۆی زەوی ٤٧ زمان دەکاتەوە و هەر زمانێک ناونیشانی خۆی هەیە (‎/market/de/‎، ‎/market/jp/‎ …). شوێنی کار، لیست و ئاگادارکەرەوەکانت لە هەموو زمانەکاندا وەک خۆیانن.'
   };
   S.ar = {
     loading: 'جارٍ التحميل…', badTf: 'هذا الإطار الزمني غير متاح', dur_d: '{n} يوم', dur_h: '{n} ساعة', dur_m: '{n} دقيقة', dur_sep: ' و', noLogo: 'هذه العملة غير متاحة هنا، لذا يعرض الرسم BTC.', noData: 'لا توجد بيانات لـ {s} الآن — لم تستجب Binance ولا OKX ولا النسخة الاحتياطية للموقع؛ سنحاول مجددًا بعد قليل.',
@@ -656,7 +681,15 @@
     qrNote: 'امسحه بكاميرا الجهاز الآخر لفتح مساحة العمل نفسها هناك.', csvAll: 'CSV لكل الرسوم',
     cat_fut: 'العقود الآجلة', futSub: 'عقود آجلة فصلية، متصلة',
     futNote: 'العقد الفصلي الأقرب في بايبت (بهامش العملة) كرسم متصل واحد ينتقل إلى العقد التالي عند كل استحقاق (آخر جمعة من مارس ويونيو وسبتمبر وديسمبر، 08:00 UTC). فعّل B-ADJ بجانب الإطار الزمني لتعديل التاريخ بمقدار فجوة كل انتقال.',
-    badjT: 'B-ADJ — تعديل التاريخ عند كل انتقال بين العقود', badjOn: 'تم تفعيل B-ADJ: يُعدَّل التاريخ عند كل انتقال', badjOff: 'تم إيقاف B-ADJ: الأسعار الفعلية لكل عقد'
+    badjT: 'B-ADJ — تعديل التاريخ عند كل انتقال بين العقود', badjOn: 'تم تفعيل B-ADJ: يُعدَّل التاريخ عند كل انتقال', badjOff: 'تم إيقاف B-ADJ: الأسعار الفعلية لكل عقد',
+    langTitle: 'اللغة', langSearch: 'ابحث عن لغة…', langNote: 'الكردية والفارسية والعربية والإنجليزية مكتوبة بأيدينا. أما اللغات الأخرى فمترجمة آليًا، وما لم يُترجم بعد يبقى بالإنجليزية.',
+    curTitle: 'العملة', curSearch: 'ابحث عن عملة: EUR، الين، الروبية…', curNote: 'يُحسب سعر كل عملة رقمية بعملتك كما يُحسب بالتومان: سعر Binance × قيمة تيثر واحد بتلك العملة في اليوم نفسه (السعر المرجعي للبنك المركزي الأوروبي، أو بيانات exchange-api المفتوحة للعملات الأخرى)، أو × سعرك أنت. إنه تقدير، لا دفتر أوامر بورصات ذلك البلد.',
+    curPlain: 'بلا تحويل: أزواج USDT في Binance', curRef: '١ USDT = {v} {c} · {s}', curSuggest: 'منطقتك', ownRate: 'سعرك الخاص', perUnit: '{c} مقابل ١ {u}', ownSave: 'استخدم سعري', ownClear: 'العودة إلى السعر المرجعي',
+    ownNote: 'بعدها يُحسب كل سعر وكل شمعة بـ{c} بسعرك أنت، وبالسعر نفسه للتاريخ كله.', ownLine: 'سعرك: ١ {per} = {v} {c}', ownSet: 'الأسعار بـ{c} تُحسب الآن بسعرك.', ownCleared: 'الأسعار بـ{c} تُحسب مجددًا بالسعر المرجعي.',
+    yourRate: 'سعرك', refRate: 'السعر المرجعي', refDaily: 'السعر المرجعي، قيمة واحدة في اليوم', noRate: 'لا يوجد سعر لـ{c} بعد. اختر عملة أخرى، أو أدخل سعرك في قائمة العملة.', tomanName: 'التومان الإيراني',
+    cat_loc: 'العملات الرقمية / {c}', locNote: 'بـ{c}: سعر Binance × قيمة تيثر واحد بـ{c} في ذلك اليوم (السعر المرجعي أو سعرك). إنه تقدير، لا دفتر أوامر بورصة.', locList: 'العملات الرقمية بـ{c}',
+    scr_loc: 'العملات الرقمية ({c})', ht_cur: 'عملتك', h_cur: 'زر العملة في الأعلى يعرض الأسعار بعملتك: كل عملات Binance، محسوبة بطريقة التومان نفسها (سعر Binance × قيمة تيثر واحد بتلك العملة في ذلك اليوم). ولسعر التيثر نفسه رسم أيضًا. يمكنك إدخال سعرك مقابل ١ USDT أو ١ USD، فتُحسب به كل أسعار تلك العملة.',
+    ht_lang: 'اللغات', h_lang: 'زر الكرة الأرضية يفتح ٤٧ لغة، لكل منها عنوانها (‎/market/de/‎، ‎/market/jp/‎ …). مساحة عملك وقوائمك وتنبيهاتك هي نفسها في كل اللغات.'
   };
   P.STR = S;
   P.tr = function (lang, key, args) {

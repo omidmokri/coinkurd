@@ -37,7 +37,11 @@
   var tri = function (fa, ckb, en, tag, cls) { tag = tag || 'span'; return '<' + tag + ' class="ek-i' + (cls ? ' ' + cls : '') + '" data-fa="' + fa + '" data-ckb="' + ckb + '" data-en="' + en + '">' + fa + '</' + tag + '>'; };
 
   /* ---------- language ---------- */
-  var cur = function () { var l = (de.getAttribute('lang') || 'fa').toLowerCase(); return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : (l.indexOf('en') === 0 || l.indexOf('ar') === 0) ? 'en' : 'fa'; };   /* Arabic: English labels, translated by ar.js */
+  /* Arabic: English labels, translated by ar.js. The live market's 43 other languages (/market/<code>/, html lang="de",
+     "ja" …): English labels too — the site's menus exist in its four languages only */
+  var cur = function () { var l = (de.getAttribute('lang') || 'fa').toLowerCase(); return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; };
+  /* the switch marks the page's language only when it is one of the site's four */
+  var known = function () { var l = (de.getAttribute('lang') || 'fa').toLowerCase(); return /^(fa|ckb|ku|en|ar)\b/.test(l); };
   var chromeLang = null;
   function label(l) {
     chromeLang = l;
@@ -46,7 +50,7 @@
     var ar = d.querySelectorAll('[data-a' + l + ']');
     for (i = 0; i < ar.length; i++) { v = ar[i].getAttribute('data-a' + l); ar[i].setAttribute('aria-label', v); ar[i].setAttribute('title', v); }
     var bs = d.querySelectorAll('#langs button,#eks .ek-lang button');
-    for (i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-l') === l);
+    for (i = 0; i < bs.length; i++) bs[i].classList.toggle('on', known() && bs[i].getAttribute('data-l') === l);
     var sk = d.querySelector('.ek-skip'); if (sk) sk.textContent = { fa: 'پرش به محتوا', ckb: 'بازدان بۆ ناوەڕۆک', en: 'Skip to content' }[l];
     var q = d.querySelector('#ekq input'); if (q) q.placeholder = PH[l];
   }
