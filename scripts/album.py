@@ -2148,8 +2148,8 @@ def s_flows(base, f, tx):
     dline = "بازار آتی: " + " · ".join(deriv) if deriv else ""
     cy = f.get("cycle")
     ok_cy = bool(cy and cy.get("nupl") is not None and cy.get("mayer") and cy.get("mvrv_pct") is not None)
-    cline = (f"چرخهٔ بیت‌کوین (رصدخانهٔ سایت): نسبت MVRV {fnum(cy['mvrv'], 2)} · NUPL {fnum(cy['nupl'], 2)} · مضرب مایر "
-             f"{fnum(cy['mayer'], 2)}؛ MVRV امروز از {fnum(100 - cy['mvrv_pct'])}٪ روزهای تاریخ بیت‌کوین پایین‌تر است") if ok_cy else ""
+    cline = (f"چرخهٔ بیت‌کوین (رصدخانهٔ سایت): نسبت ارزش بازار به ارزش تحقق‌یافته {fnum(cy['mvrv'], 2)} · مضرب مایر "
+             f"{fnum(cy['mayer'], 2)}؛ این نسبت امروز از {fnum(100 - cy['mvrv_pct'])}٪ روزهای تاریخ بیت‌کوین پایین‌تر است") if ok_cy else ""
     notes = [f"{o['fa_t']} — {o['src']}، {stamp(o['date'], f['now'])}" for o in oc[:2]]
     width = W - 2 * M - 36
     need_d = ((lines_of(dline, 21, width - 90) * 30 + 14) if dline else 0) + ((lines_of(cline, 21, width - 90) * 30 + 18) if cline else 0)
