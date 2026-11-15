@@ -41,6 +41,13 @@ S = {
               "kmr": "250 coin di 9 deman de, 2D û 3D; herikîna pereyan, likîdîte û ETF — di Telegramê an gerokê de.",
               "ar": "٢٥٠ عملة على ٩ أطر زمنية، ثنائية وثلاثية الأبعاد؛ تدفق الأموال والسيولة وصناديق ETF — في تيليغرام أو المتصفح.",
               "en": "250 coins on nine timeframes, 2D and 3D; money flow, liquidity and ETFs — in Telegram or the browser."}),
+    "world": ("🌍", {"fa": "جهان زنده (ثانیه به ثانیه)", "ckb": "جیهانی زیندوو (چرکە بە چرکە)", "kmr": "Cîhana zindî (saniye bi saniye)",
+                    "ar": "العالم مباشرةً (ثانيةً بثانية)", "en": "The world, live (by the second)"},
+              {"fa": "جمعیت، بیت‌کوین، اقتصاد، انرژی، CO₂ و سلامت با منبع؛ و ساخت پست برای شبکه‌های اجتماعی.",
+               "ckb": "دانیشتووان، بیتکۆین، ئابووری، وزە، CO₂ و تەندروستی بە سەرچاوە؛ و دروستکردنی پۆست بۆ تۆڕە کۆمەڵایەتییەکان.",
+               "kmr": "Nifûs, Bitcoin, aborî, enerjî, CO₂ û tenduristî bi çavkaniyan; û çêkirina postan ji bo torên civakî.",
+               "ar": "السكان والبيتكوين والاقتصاد والطاقة وCO₂ والصحة بمصادرها؛ وصنع منشورات لوسائل التواصل.",
+               "en": "Population, Bitcoin, economy, energy, CO₂ and health with sources — and posts for social media."}),
     "obs": ("🔭", {"fa": "رصدخانه (مشتقات و آنچین)", "ckb": "ڕوانگە (دەرهاتەکان و ئانچین)", "kmr": "Çavdêrxane (derivatîv û on-chain)",
                   "ar": "المرصد (المشتقات والسلسلة)", "en": "Observatory (derivatives, on-chain)"},
             {"fa": "لیکوییدیشن (نقشه و تاریخچهٔ واقعی)، اوپن اینترست، فاندینگ، لانگ/شورت، CVD، بیسیس، آپشن‌ها، MVRV، ذخایر صرافی‌ها، استیبل‌کوین‌ها و چرخهٔ بیت‌کوین — در تلگرام یا مرورگر.",
@@ -394,7 +401,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["pro", "mmap", "obs", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
+    "g_analysis": ["pro", "mmap", "obs", "world", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "podcast", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],

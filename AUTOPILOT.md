@@ -209,6 +209,23 @@ The site's strategy (agreed with the owner, 2026-11-07):
   `python3 tests/obs4_e2e.py` (`ONLY=liq|cvd|basis|stables|langs|errors|hub`; Gate, OKX, Binance, Bybit and Deribit
   mocked in their real formats with holes and same-millisecond orders planted, the premium and stablecoin files
   written by the real CI steps from `tests/obs_fakes.py`), `python3 tests/test_bot_obs.py`.
+- `/world/` — **«جهان زنده»** (owner's request 2026-11-15: "like worldometers.info, a different, more attractive design, able to
+  produce posts for social media"). Static page `scripts/build_world.py` (writes `world/index.html` and
+  `assets/world/facts.json`; "world" is in `chrome.STATIC`, NAV «تحلیل» first item, sitemap), app
+  `assets/world/{math,i18n,world,studio}.js` + `world.css` (bump `V` in build_world.py AND world.js with any change; studio.js
+  loads on the first «ساخت پست»). **Every counter is a publisher's figure**: `scripts/world_data.py` `FACTS` (UN WPP 2024,
+  IMF WEO Oct 2026, SIPRI, WGC, Energy Institute, IEA OMR, Global Carbon Budget 2026, GFW, WHO, UNAIDS, UN IGME, ITU) —
+  each with publisher, title, URL, date and year; a yearly total is spread evenly over the visitor's calendar year/day and
+  the card says «برآورد ۲۰۲۶» / «با آهنگ سال ۲۰۲۵». Worldometers' unsourced counters (tweets, blog posts, newspapers …)
+  were left out on purpose. **Update FACTS when a publisher releases a new edition** (UN WPP next: July 2027; GCB every
+  November; SIPRI April; WGC end of January; EI end of June; IEA OMR monthly). Bitcoin is not modelled: issuance from the
+  real block height and the subsidy schedule (`math.js` = `world_data.py`, `tests/test_world_data.py` compares them).
+  Live: `data/world.json` (update.yml step after etf.py): tip, first block of the UTC day/year (mempool.space, the marks
+  once per day/year), US Treasury Debt to the Penny (every 6 h; the page runs on from the last figure at the 91-day pace and
+  says so), crypto totals from mm.json. The studio draws 1:1, 4:5, 9:16 and 16:9 images in three colour themes and four
+  languages, with a caption ending in four hashtags; it only downloads/copies/shares — nothing is posted by the site.
+  Bot: `scripts/bot_world.py` (section `world`, analysis group; Web App button). Tests: `tests/test_world_data.py`,
+  `test_world_i18n.py`, `test_bot_world.py`, `world_e2e.py` (offline Chrome, sources mocked; screenshots in /tmp/wlshots).
 - **"Deep" — the depth layer of every page except the homepage** (owner, 2026-11-13; it is part of the visual identity
   now, like the homepage stage): `assets/deep.css` (a fixed sky behind the page: stars, the warm light above and the
   cold one to the side, a floor that runs to a lit horizon; glass surfaces; the candle before section titles; the lit
@@ -300,6 +317,24 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-15 · /world/ «جهان زنده» — live world counters + a post studio (owner's request in chat, not by the loop)
+- The owner asked for a page like worldometers.info with a different, more attractive design that can produce posts for
+  social networks. Built as the site's own design (sky, glass, orange), not a copy: a hero with the world's population
+  ticking over a dotted globe where every birth (green) and death (white) lights a point at the UN's rate, today's strip,
+  the year's progress, sticky section chips and 28 cards in six sections (Bitcoin first: issued, mined today/this year,
+  left to 21 M, next halving, live price, crypto market value). Every card: its number, today, the pace per second/minute,
+  and a source pill that opens publisher, publication, date and link.
+- Only sourced figures (see Architecture → /world/); "no data yet" when a live file is missing; Tehran/UTC days are named.
+- Post studio: four templates (this number, the world today, every second, Bitcoin & gold) × four sizes × three themes ×
+  four languages; caption with emojis, time, source, page link, @Coin_Kurd and four hashtags; download PNG, Web Share
+  (with the image), Telegram/X/WhatsApp links, copy, all four languages at once. Fonts fall back to /assets/fonts when
+  Google Fonts does not answer (Iran).
+- Bot: «🌍 جهان زنده» in the analysis group (snapshot + Web App); app: WebView, so the page is there by itself; assistant
+  FEATURES entry.
+- Verified: unit tests (known answers: 10.5 M and 19.6875 M BTC supplies, the 2 099 999 997 690 000-sat cap, half a year at
+  mid-year, the debt pace; JS = Python), the CI step against faked sources in their real formats (cache, fallbacks, no
+  invented marks), bot tests in five languages, the existing bot suites, build_links, seo_struct, leak guard; offline
+  Chrome E2E in fa/en/ckb/ar at 1280 and 390 px with zero JS errors of the page's own, every image size checked and looked at.
 ### 2026-11-15 · /market/ in 47 languages, prices in every country's currency, and your own rate (owner's request in chat, not by the loop)
 - The owner's list of 46 languages (+ Kurdish): the site's four stay at /market/; 43 new ones at /market/<code>/ with his
   paths (/cn/ /tw/ /iw/ /jp/ /kr/ /gr/ /cz/ /se/ /br/ /cat/ …; the eleven without a path use their ISO code), and

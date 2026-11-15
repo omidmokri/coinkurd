@@ -31,6 +31,7 @@ FEATURES = [
     ("/liquidity/", ["mmap"], None),
     ("/etf/", ["mmap"], None),
     ("/charts/", ["obs"], None),
+    ("/world/", ["world"], None),
     ("/charts/liquidation-heatmap/", ["obs", "deriv"], None),
     ("/charts/liquidation-map/", ["obs", "deriv"], None),
     ("/charts/liquidations/", ["obs", "deriv"], None),
