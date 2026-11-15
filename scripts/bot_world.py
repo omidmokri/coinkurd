@@ -24,15 +24,15 @@ TXT = {
               "en": "🌍 <b>The world, live</b>"},
     "body": {
         "fa": ("شمارنده‌های زندهٔ جهان، هر عدد با منبعش: جمعیت، تولد و مرگ، اقتصاد، بدهی آمریکا، انرژی، نفت، CO₂، سلامت و اینترنت — "
-               "و بیت‌کوین از روی زنجیرهٔ واقعی.\n✨ «ساخت پست»: از هر عدد تصویر مربع، استوری یا افقی با متن و هشتگ آماده به چهار زبان."),
+               "و بیت‌کوین از روی زنجیرهٔ واقعی.\n✨ «ساخت پست»: از هر عدد تصویر مربع، استوری یا افقی با متن و هشتگ آماده به چهار زبان." "\n🗓 هر شب ساعت ۲۴ گزارش «جهان در روزی که گذشت» در کانال؛ جمعه‌شب‌ها هفتگی، آخر هر ماه شمسی ماهانه و شب نوروز سالانه."),
         "ckb": ("ژمێرەرە زیندووەکانی جیهان، هەر ژمارەیەک لەگەڵ سەرچاوەکەی: دانیشتووان، لەدایکبوون و مردن، ئابووری، قەرزی ئەمریکا، وزە، نەوت، CO₂، "
-                "تەندروستی و ئینتەرنێت — و بیتکۆین لەسەر زنجیرەی ڕاستەقینە.\n✨ «دروستکردنی پۆست»: لە هەر ژمارەیەک وێنە و دەقی ئامادە بە چوار زمان."),
+                "تەندروستی و ئینتەرنێت — و بیتکۆین لەسەر زنجیرەی ڕاستەقینە.\n✨ «دروستکردنی پۆست»: لە هەر ژمارەیەک وێنە و دەقی ئامادە بە چوار زمان." "\n🗓 هەموو شەوێک کاتژمێر ٢٤ ڕاپۆرتی «جیهان لەو ڕۆژەی ڕابرد» لە کەناڵ؛ شەوی هەینی هەفتانە، کۆتایی هەر مانگێکی هەتاوی مانگانە و شەوی نەورۆز ساڵانە."),
         "kmr": ("Hejmarvanên zindî yên cîhanê, her hejmar bi çavkaniya xwe: nifûs, zayîn û mirin, aborî, enerjî, petrol, CO₂, tenduristî û Bitcoin.\n"
-                "✨ «Post çêke»: ji her hejmarê wêne û nivîsek amade bi çar zimanan."),
+                "✨ «Post çêke»: ji her hejmarê wêne û nivîsek amade bi çar zimanan." "\n🗓 Her şev saet 24 rapora «cîhan di roja borî de» di kanalê de; şeva înê heftane, dawiya her meha rojî mehane û şeva Newrozê salane."),
         "ar": ("عدادات العالم المباشرة، كل رقم بمصدره: السكان والمواليد والوفيات والاقتصاد والدين الأمريكي والطاقة والنفط وCO₂ والصحة والإنترنت — "
-               "والبيتكوين من سلسلته الحقيقية.\n✨ «صنع منشور»: من أي رقم صورة ونصًا جاهزًا بأربع لغات."),
+               "والبيتكوين من سلسلته الحقيقية.\n✨ «صنع منشور»: من أي رقم صورة ونصًا جاهزًا بأربع لغات." "\n🗓 كل ليلة الساعة ٢٤ تقرير «العالم في اليوم الذي مضى» في القناة؛ أسبوعيًا ليلة الجمعة، وشهريًا آخر كل شهر شمسي، وسنويًا ليلة النوروز."),
         "en": ("Live counters of the world, every number with its source: population, births and deaths, the economy, US debt, energy, oil, CO₂, "
-               "health and the Internet — and Bitcoin from its real chain.\n✨ «Make a post»: any number as a ready image and caption in four languages."),
+               "health and the Internet — and Bitcoin from its real chain.\n✨ «Make a post»: any number as a ready image and caption in four languages." "\n🗓 Every night at 24:00 Tehran a «world in the day that ended» report in the channel; weekly on Friday night, monthly at the end of each Persian month, yearly on the eve of Nowruz."),
     },
     "now": {"fa": "📊 <b>همین حالا</b>", "ckb": "📊 <b>هەر ئێستا</b>", "kmr": "📊 <b>Niha</b>", "ar": "📊 <b>الآن</b>", "en": "📊 <b>Right now</b>"},
     "pop": {"fa": "👥 جمعیت جهان: {v}", "ckb": "👥 دانیشتووانی جیهان: {v}", "kmr": "👥 Nifûsa cîhanê: {v}", "ar": "👥 سكان العالم: {v}", "en": "👥 World population: {v}"},
