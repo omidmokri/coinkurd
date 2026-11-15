@@ -18,7 +18,7 @@ import html
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 OBS_PATHS = [f + "/" for f in build_obs.folders()]
 
@@ -420,6 +420,70 @@ def related(p, n=6):
     return sorted(near, key=lambda q: -q["id"])
 
 
+def fa_date(iso):
+    """the post's day in Tehran, as Persian readers write it (۲۳ آبان ۱۴۰۵); "" when the date is missing"""
+    try:
+        dt = datetime.fromisoformat(iso)
+    except Exception:  # noqa: BLE001
+        return ""
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone(timedelta(hours=3, minutes=30)))
+    gy, gm, gd = dt.year, dt.month, dt.day
+    g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+    gy2 = gy + 1 if gm > 2 else gy
+    days = 355666 + 365 * gy + (gy2 + 3) // 4 - (gy2 + 99) // 100 + (gy2 + 399) // 400 + gd + g_d_m[gm - 1]
+    jy = -1595 + 33 * (days // 12053)
+    days %= 12053
+    jy += 4 * (days // 1461)
+    days %= 1461
+    if days > 365:
+        jy += (days - 1) // 365
+        days = (days - 1) % 365
+    jm = 1 + days // 31 if days < 186 else 7 + (days - 186) // 30
+    jd = 1 + (days % 31 if days < 186 else (days - 186) % 30)
+    months = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"]
+    fa = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+    return f"{str(jd).translate(fa)} {months[jm - 1]} {str(jy).translate(fa)}"
+
+
+# titles the channel reuses (the morning and evening picture reports …): their pages get the day in the <title>, so each
+# is told apart in search results (SEO audit 2026-11-15: /p/50958/ and /p/50977/ had the same title)
+def fa_time(iso):
+    try:
+        dt = datetime.fromisoformat(iso)
+    except Exception:  # noqa: BLE001
+        return ""
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone(timedelta(hours=3, minutes=30)))
+    return dt.strftime("%H:%M").translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
+
+
+_TCOUNT, _DCOUNT, _MCOUNT = {}, {}, {}
+for _q in posts:
+    _t = seo_title((_q.get("title") or "").strip())   # as search results show it (cut, decor dropped)
+    _TCOUNT[_t] = _TCOUNT.get(_t, 0) + 1
+    _k = (_t, fa_date(_q.get("date", "")))
+    _DCOUNT[_k] = _DCOUNT.get(_k, 0) + 1
+    _m = _k + (fa_time(_q.get("date", "")),)
+    _MCOUNT[_m] = _MCOUNT.get(_m, 0) + 1
+
+
+def page_title(p):
+    """the post's title; when the channel used it more than once, the day (and, the same day, the hour; the same minute,
+    the post number) goes first — the end of a long title is what search results cut"""
+    t = (p.get("title") or "").strip()
+    st = seo_title(t)
+    if _TCOUNT.get(st, 0) < 2:
+        return t
+    day, hm = fa_date(p.get("date", "")), fa_time(p.get("date", ""))
+    tag = day
+    if _DCOUNT.get((st, day), 0) > 1 and hm:
+        tag = f"{day}، {hm}"
+        if _MCOUNT.get((st, day, hm), 0) > 1:
+            tag += f"، پست {str(p.get('id', '')).translate(str.maketrans('0123456789', '۰۱۲۳۴۵۶۷۸۹'))}"
+    return f"{tag} · {t}" if tag else t
+
+
 def build_post(p):
     cat = CATS.get(p["category"], {"name": {"fa": p["category"]}, "icon": ""})
     tr = p.get("tr") or {}
@@ -460,7 +524,7 @@ def build_post(p):
     head += alt_links(p)
     if p.get("q") == "low":
         head += '<meta name="robots" content="noindex,follow">'           # promos / repeats: keep the page, keep it out of search
-    return page(f"p/{p['id']}/", title, desc, body, head)
+    return page(f"p/{p['id']}/", page_title(p), desc, body, head)
 
 
 def alt_links(p):
