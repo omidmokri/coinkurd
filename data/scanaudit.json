@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15T19:17:33.123515+00:00",
+ "updated_at": "2026-11-15T19:33:40.474382+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-14T19:00:00+00:00"
@@ -7,14 +7,14 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 228,
+ "coins": 229,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1757,
+   "n": 1756,
    "obs": -0.05,
-   "win": 49.1,
+   "win": 49.0,
    "mid": 0.17,
    "lo": -0.39,
    "hi": 0.87,
@@ -23,13 +23,13 @@
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6534,
-   "obs": -0.07,
-   "win": 49.3,
+   "n": 6526,
+   "obs": -0.08,
+   "win": 49.2,
    "mid": 0.02,
    "lo": -0.29,
-   "hi": 0.27,
-   "p": 0.4973,
+   "hi": 0.28,
+   "p": 0.4855,
    "shifts": 1104,
    "verdict": "no_edge"
   },
@@ -45,35 +45,35 @@
    "verdict": "no_edge"
   },
   "ema_death_cross": {
-   "n": 530,
-   "obs": 0.81,
-   "win": 57.2,
+   "n": 529,
+   "obs": 0.8,
+   "win": 57.1,
    "mid": 0.73,
-   "lo": -0.75,
+   "lo": -0.72,
    "hi": 1.5,
-   "p": 0.8714,
+   "p": 0.9022,
    "shifts": 1104,
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 470,
-   "obs": -1.09,
-   "win": 41.9,
+   "n": 468,
+   "obs": -1.1,
+   "win": 41.7,
    "mid": -0.71,
-   "lo": -1.67,
-   "hi": 0.04,
-   "p": 0.346,
+   "lo": -1.68,
+   "hi": 0.03,
+   "p": 0.3351,
    "shifts": 1104,
    "verdict": "no_edge"
   },
   "rsi_overbought": {
-   "n": 428,
-   "obs": 1.79,
-   "win": 67.8,
-   "mid": 0.72,
-   "lo": -0.69,
+   "n": 427,
+   "obs": 1.81,
+   "win": 67.9,
+   "mid": 0.71,
+   "lo": -0.7,
    "hi": 1.99,
-   "p": 0.0996,
+   "p": 0.0987,
    "shifts": 1104,
    "verdict": "no_edge"
   },
@@ -100,13 +100,13 @@
    "verdict": "no_edge"
   },
   "breakout_up": {
-   "n": 530,
-   "obs": -1.18,
-   "win": 37.0,
-   "mid": -0.75,
+   "n": 527,
+   "obs": -1.21,
+   "win": 36.6,
+   "mid": -0.74,
    "lo": -2.04,
-   "hi": 0.69,
-   "p": 0.4411,
+   "hi": 0.7,
+   "p": 0.3995,
    "shifts": 1104,
    "verdict": "no_edge"
   },
