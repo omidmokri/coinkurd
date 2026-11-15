@@ -62,6 +62,23 @@
     }).filter(Boolean);
   }
 
+  /* a finished period (scripts/world_post.py): raw numbers in, each language formats them */
+  function periodRows(doc, lg) {
+    return (doc.rows || []).map(function (r) {
+      if (r.v == null || !isFinite(r.v)) return null;
+      var val;
+      if (r.id === 'btc_mined') val = num(r.v, 3, lg) + ' ₿' + (r.blocks ? ' · ' + Tl(lg, 'blocks', { n: num(r.blocks, 0, lg) }) : '');
+      else if (r.id === 'btc_price') {
+        /* LRMs keep «▲ +» between the two numbers: Arabic-Indic digits count as right-to-left for the neutrals around them */
+        var M_ = lg === 'en' ? '' : '\u200e';
+        val = '$' + num(r.v, 0, lg) + (r.pct != null ? M_ + '  ' + (r.pct >= 0 ? '▲ +' : '▼ −') + M_ + num(Math.abs(r.pct), 2, lg) + (lg === 'en' ? '%' : '٪') : '');
+        if (lg !== 'en') val = '\u2066' + val + '\u2069';          /* the price and its sign stay left-to-right in RTL text */
+      }
+      else val = big(r.v, r.unit, lg);
+      return { id: r.id === 'btc_mined' ? 'btc_today' : r.id, label: Tl(lg, 'k_' + r.id), val: val, ltr: r.id === 'btc_price' };
+    }).filter(Boolean);
+  }
+
   /* ---------------------------------------------------------------- caption */
   function tags(lg, cat) {
     var g = Tl(lg, 'tags').split(' ');
@@ -70,6 +87,17 @@
   function caption(st, lg, now) {
     now = now || new Date(); lg = lg || st.lang;
     var L = [], cat = 'pop';
+    if (st.tpl === 'period') {
+      var dc = st.doc, lb = dc.labels[lg] || dc.labels.en;
+      L.push('🌍 ' + lb.title); L.push('📅 ' + lb.sub);
+      periodRows(dc, lg).forEach(function (x) { L.push((EMO[x.id] || '•') + ' ' + x.label + ': ' + x.val); });
+      if (dc.pop_end) L.push('👥 ' + Tl(lg, 'pop_end', { v: num(dc.pop_end, 0, lg) }));
+      L.push('📚 ' + dc.src);
+      L.push(''); L.push('🔴 ' + Tl(lg, 'cap_more') + ' ' + SITE); L.push('📲 ' + Tl(lg, 'cap_join') + ' @Coin_Kurd'); L.push('');
+      var g = Tl(lg, 'tags').split(' ');
+      L.push([Tl(lg, 'tag_' + dc.kind), g[0], g[2], g[3]].join(' '));
+      return L.join('\n');
+    }
     if (st.tpl === 'card') {
       var r = WL.value(st.id, now); if (!r) return '';
       cat = r.cat;
@@ -162,14 +190,14 @@
     c.textAlign = rtl ? 'left' : 'right'; c.fillStyle = th.acc; c.fillText('@Coin_Kurd', rtl ? P : W - P, fy - U * 0.012);
     c.direction = rtl ? 'rtl' : 'ltr'; c.textAlign = rtl ? 'right' : 'left';
     font(c, 400, U * 0.022); c.fillStyle = th.mute;
-    c.fillText(Tl(lg, 'cap_until', { t: hhmm(now, lg) }), X0, fy - U * 0.09);
+    c.fillText(st.tpl === 'period' ? '📚 ' + st.doc.src : Tl(lg, 'cap_until', { t: hhmm(now, lg) }), X0, fy - U * 0.09);
     /* body */
     var box = { x0: P, x1: W - P, y0: top + lh + U * 0.07, y1: fy - U * 0.14, W: W, H: H, U: U, rtl: rtl, th: th, lg: lg };
     var body = st.tpl === 'card' ? drawCard : st.tpl === 'btcgold' ? drawBG : drawRows;
     var avail = box.y1 - box.y0;
     c.save(); c.globalAlpha = 0; var used = body(c, st, now, box, 1, 0); c.restore();
     var k = used > avail ? Math.max(0.55, avail / used) : used < avail * 0.7 ? Math.min(1.6, avail * 0.8 / used) : 1;
-    if (st.tpl !== 'digest' && st.tpl !== 'second' && k !== 1) { c.save(); c.globalAlpha = 0; used = body(c, st, now, box, k, 0); c.restore(); }
+    if (st.tpl !== 'digest' && st.tpl !== 'second' && st.tpl !== 'period' && k !== 1) { c.save(); c.globalAlpha = 0; used = body(c, st, now, box, k, 0); c.restore(); }
     var off = used < avail ? (avail - used) * (H / W > 1.4 ? 0.42 : 0.3) : 0;
     body(c, st, now, box, k, off);
   }
@@ -210,10 +238,12 @@
   function drawRows(c, st, now, b, k, off) {
     var sec = st.tpl === 'second', U = b.U * k, lg = b.lg, th = b.th, rtl = b.rtl, X0 = rtl ? b.x1 : b.x0, cw = b.x1 - b.x0, y = b.y0 + off;
     c.textAlign = rtl ? 'right' : 'left'; c.direction = rtl ? 'rtl' : 'ltr';
+    var per = st.tpl === 'period', lb = per ? (st.doc.labels[lg] || st.doc.labels.en) : null;
     font(c, 900, U * 0.062); c.fillStyle = th.ink;
-    wrap(c, Tl(lg, sec ? 's_title' : 'd_title'), cw).forEach(function (ln) { y += U * 0.066; c.fillText(ln, X0, y); y += U * 0.014; });
+    wrap(c, per ? lb.title : Tl(lg, sec ? 's_title' : 'd_title'), cw).forEach(function (ln) { y += U * 0.066; c.fillText(ln, X0, y); y += U * 0.014; });
+    if (per) { font(c, 700, U * 0.032); c.fillStyle = th.acc; wrap(c, lb.sub, cw).slice(0, 2).forEach(function (ln) { y += U * 0.045; c.fillText(ln, X0, y); }); }
     y += U * 0.03;
-    var list = rows(sec ? SECOND : DIGEST, now, lg, sec ? 's' : 't');
+    var list = per ? periodRows(st.doc, lg) : rows(sec ? SECOND : DIGEST, now, lg, sec ? 's' : 't');
     var cols = b.W / b.H > 0.9 ? 2 : 1, gap = U * 0.022, colw = (cw - gap * (cols - 1)) / cols;
     var nrow = Math.ceil(list.length / cols);
     var rh = Math.max(b.U * 0.1, Math.min(b.U * 0.22, (b.y1 - y - (nrow - 1) * gap - (sec ? b.U * 0.09 : 0)) / nrow));      /* rows fill the box */
@@ -226,8 +256,11 @@
       var lab = (EMO[x.id] || '•') + '  ' + x.label, lp = fit(c, lab, colw - 2 * pad, Math.min(b.U * 0.036, rh * 0.22), 700, 12);
       c.fillText(lab, lx, top + rh * 0.12 + lp);
       c.textAlign = rtl ? 'left' : 'right';
-      var px = fit(c, x.val, colw - 2 * pad, Math.min(b.U * 0.068, rh * 0.4), 900, 14);
-      c.fillStyle = i % 2 ? th.ink : th.acc; c.fillText(x.val, vx, top + rh * 0.86);
+      var vtxt = x.ltr ? x.val.replace(/[\u2066\u2069]/g, '') : x.val;
+      if (x.ltr) c.direction = 'ltr';                     /* a price with its sign: always left-to-right (canvas ignores isolates) */
+      var px = fit(c, vtxt, colw - 2 * pad, Math.min(b.U * 0.068, rh * 0.4), 900, 14);
+      c.fillStyle = i % 2 ? th.ink : th.acc; c.fillText(vtxt, vx, top + rh * 0.86);
+      c.direction = rtl ? 'rtl' : 'ltr';
       c.textAlign = rtl ? 'right' : 'left';
     });
     y += nrow * rh + (nrow - 1) * gap;
@@ -346,5 +379,18 @@
     if (!logo.complete) logo.onload = function () { render(true); };
     timer = setInterval(function () { if (m && !m.isConnected) { clearInterval(timer); m = null; return; } if (m && !d.hidden) render(true); }, 1000);
   }
-  WL.studio = { open: open, caption: caption, draw: draw, state: S, FMT: FMT };
+  /* scripts/world_post.py: the four pictures and captions of a finished period, in the site's language order */
+  function renderPeriod(doc) {
+    var lg0 = new Promise(function (res) { if (logo.complete && logo.naturalWidth) res(); else { logo.onload = res; logo.onerror = res; setTimeout(res, 8000); } });
+    return Promise.all([fonts().catch(function () { }), lg0]).then(function () {
+      var out = {}, end = new Date(doc.end);
+      ['ckb', 'fa', 'ar', 'en'].forEach(function (lg) {
+        var st = { tpl: 'period', doc: doc, fmt: 'sq', theme: 'night', lang: lg }, cv = d.createElement('canvas');
+        draw(cv, st, end);
+        out[lg] = { png: cv.toDataURL('image/png'), caption: caption(st, lg, end) };
+      });
+      return out;
+    });
+  }
+  WL.studio = { open: open, caption: caption, draw: draw, state: S, FMT: FMT, renderPeriod: renderPeriod, ready: fonts };
 })();

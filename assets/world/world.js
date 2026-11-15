@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var w = window, d = document, WL = w.WL = w.WL || {}, M = WL.M, I = WL.I18N;
-  var V = '1';
+  var V = '2';
   WL.V = V;
 
   /* ================================================================ language */

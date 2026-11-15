@@ -68,6 +68,11 @@ The site's strategy (agreed with the owner, 2026-11-07):
   **One exception, set by the owner on 2026-11-12: the daily podcast album.** `.github/workflows/podcast.yml` posts
   one album (four audios) in @Coin_Kurd every day at 19:00 Tehran. Keep it running; don't change its schedule, its
   captions or its gates without the owner, and never post from anywhere else.
+  **Second exception, set by the owner on 2026-11-15: the «جهان زنده» reports.** `.github/workflows/world-post.yml` +
+  `scripts/world_post.py` post, without asking him, one album of four images (کوردی · فارسی · العربية · English) in
+  @Coin_Kurd every night at 24:00 Tehran for the day that ended, and after it the week (Friday 24:00), the Jalali month
+  (the night its last day ends) and the Jalali year (the eve of Nowruz). Keep them running; don't change their schedule,
+  content, captions or checks without the owner. Ledger: `data/world_posts.json` (never post a period twice).
 - **Nothing destructive.** Don't delete pages, data or history; no force-push or history rewriting; don't touch secrets,
   the `refbot-state` branch or existing page URLs; don't change the visual identity.
 - **If it fails, don't ship it.** If tests or builds fail and you cannot fix them within the run, push only a Log entry
@@ -317,6 +322,19 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-15 · «جهان زنده» posts in the channel: daily, weekly, monthly, yearly (owner's request in chat, not by the loop)
+- Owner: "every day at 24 build the «world today» image and send it, no approval needed; and a detailed plan for weekly,
+  monthly and yearly, sent directly without my approval." Built `scripts/world_post.py` + `world-post.yml` (cron 23:35
+  Tehran, waits for 24:00, posts; a run more than 6 h late posts nothing; dispatch dry-run with `at` to rehearse any night).
+- Calendar: Iranian week (Saturday–Friday), Jalali month and year (jalaali algorithm, checked against ICU for 11 years).
+- Each album: births, deaths, Bitcoin mined in the period (block timestamps, mempool.space) with blocks, BTC price at the
+  start/end with the change (Binance 1-minute candles), fossil CO₂, military spending, population at the end; drawn by
+  the page's studio (`WL.studio.renderPeriod`) in headless Chrome; one caption (Persian in full, a line in each other
+  language, four hashtags, the channel signature). Checks stop a period on any missing/odd figure, blank image or long
+  caption; the bot must be allowed to post (podcast's `check_bot`).
+- Verified: `tests/test_world_post.py` (calendar vs ICU, period selection incl. month end and Nowruz, spreading, faked
+  sources in real formats, rendered images looked at in four languages, fake Telegram album order and caption), then a
+  dry run in GitHub Actions with the real sources before the first night.
 ### 2026-11-15 · /world/ «جهان زنده» — live world counters + a post studio (owner's request in chat, not by the loop)
 - The owner asked for a page like worldometers.info with a different, more attractive design that can produce posts for
   social networks. Built as the site's own design (sky, glass, orange), not a copy: a hero with the world's population

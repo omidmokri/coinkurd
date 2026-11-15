@@ -4,7 +4,7 @@
   'use strict';
   var I = {};
   I.fa = {
-    sec_btc: 'بیت‌کوین و کریپتو', sec_pop: 'جمعیت', sec_eco: 'اقتصاد و پول', sec_env: 'انرژی و محیط زیست', sec_health: 'سلامت', sec_soc: 'جامعه و اینترنت',
+    k_btc_mined: 'بیت‌کوین استخراج‌شده', pop_end: 'جمعیت جهان در پایان این دوره: {v}', tag_daily: '#گزارش_روزانه', tag_weekly: '#گزارش_هفتگی', tag_monthly: '#گزارش_ماهانه', tag_yearly: '#گزارش_سالانه', sec_btc: 'بیت‌کوین و کریپتو', sec_pop: 'جمعیت', sec_eco: 'اقتصاد و پول', sec_env: 'انرژی و محیط زیست', sec_health: 'سلامت', sec_soc: 'جامعه و اینترنت',
     secd_btc: 'از روی زنجیرهٔ واقعی بیت‌کوین، بلاک به بلاک', secd_pop: 'برآورد سازمان ملل، ثانیه به ثانیه', secd_eco: 'ارقام صندوق بین‌المللی پول، SIPRI، خزانه‌داری آمریکا و شورای جهانی طلا',
     secd_env: 'آژانس بین‌المللی انرژی، مؤسسهٔ انرژی، پروژهٔ جهانی کربن و دیده‌بان جهانی جنگل', secd_health: 'سازمان جهانی بهداشت، UNAIDS و یونیسف', secd_soc: 'اتحادیهٔ بین‌المللی مخابرات',
     k_pop: 'جمعیت جهان در این لحظه', k_births: 'تولدها', k_deaths: 'مرگ‌ها', k_growth: 'رشد خالص جمعیت',
@@ -40,7 +40,7 @@
     nfa: 'ارقام از منابع بین‌المللی است و توصیهٔ مالی نیست.'
   };
   I.ckb = {
-    sec_btc: 'بیتکۆین و کریپتۆ', sec_pop: 'دانیشتووان', sec_eco: 'ئابووری و پارە', sec_env: 'وزە و ژینگە', sec_health: 'تەندروستی', sec_soc: 'کۆمەڵگا و ئینتەرنێت',
+    k_btc_mined: 'بیتکۆینی دەرهێنراو', pop_end: 'دانیشتووانی جیهان لە کۆتایی ئەم ماوەیەدا: {v}', tag_daily: '#ڕاپۆرتی_ڕۆژانە', tag_weekly: '#ڕاپۆرتی_هەفتانە', tag_monthly: '#ڕاپۆرتی_مانگانە', tag_yearly: '#ڕاپۆرتی_ساڵانە', sec_btc: 'بیتکۆین و کریپتۆ', sec_pop: 'دانیشتووان', sec_eco: 'ئابووری و پارە', sec_env: 'وزە و ژینگە', sec_health: 'تەندروستی', sec_soc: 'کۆمەڵگا و ئینتەرنێت',
     secd_btc: 'لەسەر زنجیرەی ڕاستەقینەی بیتکۆین، بلۆک بە بلۆک', secd_pop: 'خەمڵاندنی نەتەوە یەکگرتووەکان، چرکە بە چرکە', secd_eco: 'ژمارەکانی سندووقی دراوی نێودەوڵەتی، SIPRI، گەنجینەی ئەمریکا و ئەنجومەنی جیهانیی زێڕ',
     secd_env: 'ئاژانسی نێودەوڵەتیی وزە، دامەزراوەی وزە، پرۆژەی جیهانیی کاربۆن و چاودێری جیهانیی دارستان', secd_health: 'ڕێکخراوی تەندروستیی جیهانی، UNAIDS و یونیسێف', secd_soc: 'یەکێتیی نێودەوڵەتیی گەیاندن',
     k_pop: 'دانیشتووانی جیهان لەم ساتەدا', k_births: 'لەدایکبوون', k_deaths: 'مردن', k_growth: 'گەشەی خاوێنی دانیشتووان',
@@ -76,7 +76,7 @@
     nfa: 'ژمارەکان لە سەرچاوە نێودەوڵەتییەکانەوەن و ئامۆژگاریی دارایی نین.'
   };
   I.ar = {
-    sec_btc: 'البيتكوين والعملات المشفرة', sec_pop: 'السكان', sec_eco: 'الاقتصاد والمال', sec_env: 'الطاقة والبيئة', sec_health: 'الصحة', sec_soc: 'المجتمع والإنترنت',
+    k_btc_mined: 'البيتكوين المُعدَّن', pop_end: 'سكان العالم في نهاية هذه الفترة: {v}', tag_daily: '#تقرير_يومي', tag_weekly: '#تقرير_أسبوعي', tag_monthly: '#تقرير_شهري', tag_yearly: '#تقرير_سنوي', sec_btc: 'البيتكوين والعملات المشفرة', sec_pop: 'السكان', sec_eco: 'الاقتصاد والمال', sec_env: 'الطاقة والبيئة', sec_health: 'الصحة', sec_soc: 'المجتمع والإنترنت',
     secd_btc: 'من سلسلة البيتكوين الحقيقية، كتلةً بكتلة', secd_pop: 'تقديرات الأمم المتحدة، ثانيةً بثانية', secd_eco: 'أرقام صندوق النقد الدولي وSIPRI ووزارة الخزانة الأمريكية ومجلس الذهب العالمي',
     secd_env: 'وكالة الطاقة الدولية ومعهد الطاقة ومشروع الكربون العالمي ومرصد الغابات العالمي', secd_health: 'منظمة الصحة العالمية وUNAIDS واليونيسف', secd_soc: 'الاتحاد الدولي للاتصالات',
     k_pop: 'سكان العالم في هذه اللحظة', k_births: 'المواليد', k_deaths: 'الوفيات', k_growth: 'صافي نمو السكان',
@@ -112,7 +112,7 @@
     nfa: 'الأرقام من مصادر دولية وليست نصيحة مالية.'
   };
   I.en = {
-    sec_btc: 'Bitcoin & crypto', sec_pop: 'Population', sec_eco: 'Economy & money', sec_env: 'Energy & environment', sec_health: 'Health', sec_soc: 'Society & the Internet',
+    k_btc_mined: 'Bitcoin mined', pop_end: 'World population at the end of the period: {v}', tag_daily: '#DailyReport', tag_weekly: '#WeeklyReport', tag_monthly: '#MonthlyReport', tag_yearly: '#YearlyReport', sec_btc: 'Bitcoin & crypto', sec_pop: 'Population', sec_eco: 'Economy & money', sec_env: 'Energy & environment', sec_health: 'Health', sec_soc: 'Society & the Internet',
     secd_btc: 'From Bitcoin’s real chain, block by block', secd_pop: 'United Nations estimates, second by second', secd_eco: 'Figures from the IMF, SIPRI, the US Treasury and the World Gold Council',
     secd_env: 'The IEA, the Energy Institute, the Global Carbon Project and Global Forest Watch', secd_health: 'The WHO, UNAIDS and UNICEF', secd_soc: 'The International Telecommunication Union',
     k_pop: 'World population right now', k_births: 'Births', k_deaths: 'Deaths', k_growth: 'Net population growth',

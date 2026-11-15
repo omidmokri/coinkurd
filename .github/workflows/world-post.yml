@@ -1,0 +1,61 @@
+name: World posts («جهان زنده» in the channel)
+
+# به درخواست مالک سایت، ۲۴ آبان ۱۴۰۵ (2026-11-15): هر شب ساعت ۲۴:۰۰ به وقت تهران یک آلبوم چهارتصویری (کوردی · فارسی ·
+# العربية · English) «جهان در روزی که گذشت» بدون نیاز به تأیید در کانال Coin_Kurd منتشر می‌شود؛ جمعه‌شب ۲۴:۰۰ گزارش هفته،
+# شب آخرین روز هر ماه شمسی گزارش ماه و شب پیش از نوروز گزارش سال هم پشت سرش. هر عددی که منبعش جواب ندهد یا از کنترل
+# رد شود، آن پست را متوقف می‌کند (scripts/world_post.py).
+# The owner asked for these automatic posts on 2026-11-15 (session chat); with the podcast, they are the bot posts the
+# autopilot must keep and must not change without him.
+on:
+  schedule:
+    - cron: "5 20 * * *"      # 23:35 Tehran; the script waits for 24:00 Tehran, then posts
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run = draw + check, post nothing · publish = post the periods that ended at the last 24:00 Tehran"
+        default: dry-run
+        type: choice
+        options: [dry-run, publish]
+      at:
+        description: "dry runs only: pretend the clock reads this UTC time (e.g. 2026-11-21T20:31:00Z = the night Aban ends)"
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: world-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install playwright requests pillow
+      - name: Draw, check and post
+        env:
+          REF_BOT_TOKEN: ${{ secrets.REF_BOT_TOKEN }}
+          CHROME: /usr/bin/google-chrome
+          PYTHONUNBUFFERED: "1"
+        run: |
+          git config user.name "coinkurd-bot"
+          git config user.email "bot@users.noreply.github.com"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.mode }}" = "publish" ]; then
+            python scripts/world_post.py --wait
+          elif [ -n "${{ inputs.at }}" ]; then
+            python scripts/world_post.py --dry-run --at "${{ inputs.at }}"
+          else
+            python scripts/world_post.py --dry-run
+          fi
+      - name: Keep the pictures and captions (14 days)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-post
+          retention-days: 14
+          if-no-files-found: ignore
+          path: _world_post/
