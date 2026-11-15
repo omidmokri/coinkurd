@@ -371,7 +371,7 @@ def publish(st, post, notes, g, send_fn, channel, admins, worktree):
     push_files(worktree, {"data/deep.json": json.dumps(site, ensure_ascii=False, indent=1)}, "chore: dossier for site")
     F.rebuild_site()
     try:
-        pack = generate(INSTA + "\n\nیادداشت پژوهشی:\n" + (notes or "") + "\n\nپست تلگرام:\n" + post, 3000)
+        return True; pack = generate(INSTA + "\n\nیادداشت پژوهشی:\n" + (notes or "") + "\n\nپست تلگرام:\n" + post, 3000)
         pics = insta_slides(post, notes, hist=st.setdefault("visual", {}))
         for a in admins:
             if pics:
