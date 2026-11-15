@@ -175,9 +175,10 @@ def glabel(a, b, lg):
     m = GMONTHS[lg]
     if a == b:
         return f"{m[a.month - 1]} {a.day}, {a.year}" if lg == "en" else f"{loc(a.day, lg)} {m[a.month - 1]} {loc(a.year, lg)}"
+    ya = (f", {a.year}" if lg == "en" else f" {loc(a.year, lg)}") if a.year != b.year else ""      # a range across new year names both
     if lg == "en":
-        return f"{m[a.month - 1]} {a.day} – {m[b.month - 1]} {b.day}, {b.year}"
-    return f"{loc(a.day, lg)} {m[a.month - 1]} – {loc(b.day, lg)} {m[b.month - 1]} {loc(b.year, lg)}"
+        return f"{m[a.month - 1]} {a.day}{ya} – {m[b.month - 1]} {b.day}, {b.year}"
+    return f"{loc(a.day, lg)} {m[a.month - 1]}{ya} – {loc(b.day, lg)} {m[b.month - 1]} {loc(b.year, lg)}"
 
 
 def labels(kind, start, end):
@@ -427,10 +428,14 @@ def main():
         print(kind, "images:", bad or "ok", "caption chars:", visible(cap) if cap else "—")
         if not bad:
             ready.append((kind, key, cap))
+    token = os.environ.get("REF_BOT_TOKEN", "")
     if a.dry_run:
+        for kind, key, cap in ready:
+            print(f"--- {kind} {key} caption ---\n{cap}\n---")
+        if token:
+            print("bot check (read-only):", *check_bot(token))
         print("dry run: nothing posted. Files in", a.out)
         return
-    token = os.environ.get("REF_BOT_TOKEN", "")
     if not token:
         raise SystemExit("REF_BOT_TOKEN is not set")
     ok, who = check_bot(token)
