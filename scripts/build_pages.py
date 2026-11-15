@@ -96,6 +96,14 @@ SCANS = (load("scanstats.json", {}) or {}).get("stats", {})
 AUDIT = (load("scanaudit.json", {}) or {}).get("patterns", {})
 CATS = {c["id"]: c for c in meta.get("categories", [])}
 MK = {c["coin"]: c for c in market.get("coins", [])}
+# tether's toman rate (data/friction.json, from the Iran price channels, refreshed every run): coin pages give the toman price
+_FR = load("friction.json", {}).get("prices") or {}
+USDT_T = _FR.get("usdt") if isinstance(_FR.get("usdt"), (int, float)) and 10000 < _FR.get("usdt") < 10000000 else None
+USDT_T_AT = _FR.get("usdt_time") or ""
+
+
+def fmt_toman(v):
+    return f"{round(v):,}" if v >= 1000 else (f"{v:,.0f}" if v >= 10 else f"{v:.4g}")
 TV = {"BTC": "BITSTAMP:BTCUSD", "ETH": "BITSTAMP:ETHUSD", "TON": "OKX:TONUSDT", "GOLD": "OANDA:XAUUSD"}
 NAMES = {"BTC": "Bitcoin · بیت‌کوین", "ETH": "Ethereum · اتریوم", "SOL": "Solana · سولانا", "BNB": "BNB",
          "XRP": "XRP · ریپل", "DOGE": "Dogecoin · دوج‌کوین", "TON": "Toncoin · تون‌کوین", "ADA": "Cardano · کاردانو",
@@ -524,6 +532,8 @@ def build_post(p):
     head += alt_links(p)
     if p.get("q") == "low":
         head += '<meta name="robots" content="noindex,follow">'           # promos / repeats: keep the page, keep it out of search
+    else:
+        head += '<meta name="robots" content="max-image-preview:large">'   # Google Discover shows large pictures only with this
     return page(f"p/{p['id']}/", page_title(p), desc, body, head)
 
 
@@ -570,6 +580,8 @@ def build_post_lang(p, lg):
         head += f'<meta property="og:image" content="{e(SITE + img if img.startswith("/") else img)}"><meta name="twitter:card" content="summary_large_image">'
     if p.get("q") == "low":
         head += '<meta name="robots" content="noindex,follow">'
+    else:
+        head += '<meta name="robots" content="max-image-preview:large">'
     return page(f"{lg}/p/{p['id']}/", title, desc, body, head, lang=lg)
 
 
@@ -710,10 +722,12 @@ def build_coin(c, cposts):
         tr = {"up": "صعودی", "down": "نزولی", "range": "خنثی / رنج"}[m["trend"]]
         ch = m.get("chg24")
         body += f'''<div class="grid"><div class="kpi"><small>قیمت <span class="lvl">زنده</span></small><b data-live="{c}">{fmt_price(m["price"])}</b></div>
+<div class="kpi"><small>قیمت به تومان</small><b>{fmt_toman(m["price"] * USDT_T) + " تومان" if USDT_T else "—"}</b></div>
 <div class="kpi"><small>تغییر ۲۴ ساعته</small><b class="{"up" if (ch or 0) > 0 else "down"}" data-livechg="{c}">{"—" if ch is None else f"{ch:+.2f}%"}</b></div>
 <div class="kpi"><small>RSI (دورهٔ ۱۴)</small><b>{m["rsi"]}</b></div><div class="kpi"><small>روند (EMA20/50)</small><b>{tr}</b></div>
 <div class="kpi"><small>سقف ۴۸ ساعت</small><b>{fmt_price(m["hi48"])}</b></div><div class="kpi"><small>کف ۴۸ ساعت</small><b>{fmt_price(m["lo48"])}</b></div></div>
-<p class="note">به‌روزرسانی: {fmt_date(market.get("updated_at",""))} — منبع Binance. قیمت لحظه‌ای را در نمودار بالا ببینید.</p>'''
+<p class="note">به‌روزرسانی: {fmt_date(market.get("updated_at",""))} — منبع Binance. قیمت لحظه‌ای را در نمودار بالا ببینید.''' + (
+            f' قیمت تومانی = قیمت دلاری (USDT) × نرخ تتر ({fmt_toman(USDT_T)} تومان، {fmt_date(USDT_T_AT)}، از کانال‌های نرخ بازار آزاد ایران) — هر ۱۵ دقیقه.' if USDT_T else "") + "</p>"
         opps = [o for o in market.get("opportunities", []) if o["coin"] == c]
         if opps:
             def rec(o):
@@ -746,7 +760,7 @@ def build_coin(c, cposts):
     body += "<h2>پرسش‌های متداول</h2>" + "".join(f'<details class="faq"><summary>{e(q)}</summary><p class="txt">{e(a)}</p></details>' for q, a in faq)
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
     fn = fa_name(c)
-    desc = (f"قیمت لحظه‌ای {fn} ({c})، تغییرات ۲۴ ساعته، RSI و روند EMA، امتیاز Entekhab با فرمول شفاف"
+    desc = (f"قیمت لحظه‌ای {fn} ({c}) به تومان و دلار، تغییرات ۲۴ ساعته، RSI و روند EMA، امتیاز Entekhab با فرمول شفاف"
             + (f" و {len(cposts)} تحلیل و خبر دربارهٔ {fn}" if cposts else "") + " — به‌روزرسانی هر ۱۵ دقیقه.")
     head_x = ""
     if not cposts and VOL_RANK.get(c, 999) >= 60:
@@ -754,7 +768,7 @@ def build_coin(c, cposts):
         head_x = '<meta name="robots" content="noindex,follow">'
         body = body.replace('<h2>وضعیت تکنیکال', '<p class="note">⚠️ دربارهٔ این دارایی هنوز مطلبی در آرشیو نیست و حجم معاملاتش کم است؛ اعداد این صفحه فقط توصیف خودکار بازارند و ریسک نقدشوندگی بالاست.</p><h2>وضعیت تکنیکال', 1)
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{name} ({c})", "about": {"@type": "Thing", "name": name}, "url": f"{SITE}/coins/{c.lower()}/"}
-    return page(f"coins/{c.lower()}/", f"قیمت {fn} ({c}) امروز — تحلیل تکنیکال و اخبار", desc, body,
+    return page(f"coins/{c.lower()}/", f"قیمت {fn} ({c}) امروز به تومان و دلار — تحلیل و اخبار", desc, body,
                 head_x + f'<script type="application/ld+json">{sj(ld)}</script><script type="application/ld+json">{sj(faq_ld)}</script><script src="/assets/live.js" defer></script>')
 
 
@@ -810,7 +824,7 @@ def main():
     body = "<h1>قیمت و تحلیل ارزهای دیجیتال</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر، امتیاز Entekhab و مطالب مرتبط. عدد کنار هر نماد تعداد مطالب آرشیو دربارهٔ آن است. <a href=\"/methodology/\">روش محاسبه و منابع داده</a></p><div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "قیمت و تحلیل ارزهای دیجیتال — پروفایل کوین‌ها", f"قیمت زنده و تحلیل تکنیکال {len(order)} ارز دیجیتال، از بیت‌کوین و اتریوم تا آلت‌کوین‌ها، با امتیاز شفاف و آرشیو مطالب", body), market.get("updated_at")))
-    for pth in ("market/", "world/", "heatmap/", "bubbles/", "money-flow/", "liquidity/", "etf/", *OBS_PATHS, "bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/", "bitcoin/", "calendar/"):  # /me/ is personal → robots Disallow, so not in the sitemap
+    for pth in ("market/", "heatmap/", "bubbles/", "money-flow/", "liquidity/", "etf/", *OBS_PATHS, "bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/", "bitcoin/", "calendar/"):  # /me/ is personal → robots Disallow, so not in the sitemap
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
