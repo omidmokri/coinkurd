@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var w = window, d = document, WL = w.WL = w.WL || {}, M = WL.M, I = WL.I18N;
-  var V = '2';
+  var V = '3';
   WL.V = V;
 
   /* ================================================================ language */
@@ -359,49 +359,99 @@
     w.requestAnimationFrame(loop);
   }
 
-  /* ================================================================ globe: a dotted sphere; every birth lights a point */
+  /* ================================================================ the 3D Earth: real continents (Natural Earth land,
+     assets/world/land.json) as lit dots on a sphere in perspective; drag to turn it; every birth (green) and death
+     (white) lights a point on land at the UN's rate; a ₿ satellite orbits and passes behind the planet. Canvas 2D only. */
   function globe(cv) {
     if (!cv || !cv.getContext) return;
     var reduce = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var ctx = cv.getContext('2d'), N = 720, P = [], pings = [], rot = 0, lastT = 0, acc = 0, on = true;
-    for (var i = 0; i < N; i++) { var y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = i * 2.399963229728653; P.push([Math.cos(th) * r, y, Math.sin(th) * r]); }
+    var ctx = cv.getContext('2d'), LAND = [], SEA = [], pings = [], on = true;
+    var yaw = -0.9, pitch = 0.32, vy = 0, drag = null, lastT = 0, t0 = 0;
+    for (var i = 0, N = 1500; i < N; i++) { var yy = 1 - (i + 0.5) / N * 2, r = Math.sqrt(1 - yy * yy), th = i * 2.399963229728653; SEA.push([Math.cos(th) * r, yy, Math.sin(th) * r]); }
+    function vec(lat, lon) { var a = lat * Math.PI / 180, o = lon * Math.PI / 180; return [Math.cos(a) * Math.sin(o), Math.sin(a), Math.cos(a) * Math.cos(o)]; }
+    fetch('/assets/world/land.json?v=' + V).then(function (r) { return r.json(); }).then(function (j) {
+      var b = atob(j.p), dv = new DataView(new ArrayBuffer(b.length));
+      for (var k = 0; k < b.length; k++) dv.setUint8(k, b.charCodeAt(k));
+      for (var k2 = 0; k2 + 3 < b.length; k2 += 4) LAND.push(vec(dv.getInt16(k2, true) / 100, dv.getInt16(k2 + 2, true) / 100));
+    }, function () { });
     function size() { var dpr = Math.min(2, w.devicePixelRatio || 1), b = cv.getBoundingClientRect(); cv.width = Math.max(10, b.width * dpr); cv.height = Math.max(10, b.height * dpr); }
     size(); w.addEventListener('resize', size);
     if ('IntersectionObserver' in w) new IntersectionObserver(function (es) { on = es[0].isIntersecting; }).observe(cv);
+    cv.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY }; vy = 0; try { cv.setPointerCapture(e.pointerId); } catch (er) { } });
+    cv.addEventListener('pointermove', function (e) {
+      if (!drag) return; var dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY };
+      yaw += dx * 0.008; pitch = Math.max(-1.1, Math.min(1.1, pitch + dy * 0.006)); vy = dx * 0.008;
+    });
+    function up() { drag = null; }
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     var bps = F.births ? M.perSec(F.births.per_year, new Date()) : 4.2, dps = F.deaths ? M.perSec(F.deaths.per_year, new Date()) : 2;
+    var SUN = (function () { var v = [-0.55, 0.45, 0.7], l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; })();
     function frame(t) {
       w.requestAnimationFrame(frame);
       if (!on || d.hidden) { lastT = t; return; }
-      var dt = Math.min(0.1, (t - lastT) / 1000 || 0); lastT = t;
-      if (!reduce) rot += dt * 0.12;
-      acc += dt;
-      if (Math.random() < bps * dt) pings.push({ p: P[(Math.random() * N) | 0], a: 0, c: 1 });
-      if (Math.random() < dps * dt) pings.push({ p: P[(Math.random() * N) | 0], a: 0, c: 0 });
-      var W = cv.width, H = cv.height, R = Math.min(W, H) * 0.42, cx = W / 2, cy = H / 2;
+      var dt = Math.min(0.1, (t - lastT) / 1000 || 0); lastT = t; t0 += dt;
+      if (!drag) { yaw += reduce ? 0 : dt * 0.09 + vy; vy *= 0.94; }
+      if (LAND.length) {
+        if (Math.random() < bps * dt) pings.push({ p: LAND[(Math.random() * LAND.length) | 0], a: 0, c: 1 });
+        if (Math.random() < dps * dt) pings.push({ p: LAND[(Math.random() * LAND.length) | 0], a: 0, c: 0 });
+      }
+      var W = cv.width, H = cv.height, R = Math.min(W, H) * 0.38, cx = W / 2, cy = H / 2, CAM = 3.4;
+      var cyw = Math.cos(yaw), syw = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+      /* world -> view (rotate about y by yaw, then x by pitch) -> perspective */
+      function rot(p) { var x = p[0] * cyw + p[2] * syw, z = -p[0] * syw + p[2] * cyw, y = p[1] * cp - z * sp; z = p[1] * sp + z * cp; return [x, y, z]; }
+      function proj(q, s) { var f = CAM / (CAM - q[2] * (s || 1)); return [cx + q[0] * (s || 1) * R * f, cy - q[1] * (s || 1) * R * f, f]; }
       ctx.clearRect(0, 0, W, H);
-      var g = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.1, cx, cy, R * 1.25);
-      g.addColorStop(0, 'rgba(247,147,26,0.16)'); g.addColorStop(0.6, 'rgba(247,147,26,0.04)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.25, 0, 6.2832); ctx.fill();
-      ctx.strokeStyle = 'rgba(247,147,26,0.35)'; ctx.lineWidth = Math.max(1, R * 0.006); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.stroke();
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(-0.42); ctx.strokeStyle = 'rgba(255,210,122,0.22)'; ctx.lineWidth = Math.max(1, R * 0.004);
-      ctx.beginPath(); ctx.ellipse(0, 0, R * 1.32, R * 0.34, 0, 0, 6.2832); ctx.stroke();
-      var oa = rot * 2.2, ox = Math.cos(oa) * R * 1.32, oy = Math.sin(oa) * R * 0.34;
-      ctx.fillStyle = '#f7931a'; ctx.shadowColor = '#f7931a'; ctx.shadowBlur = R * 0.08; ctx.beginPath(); ctx.arc(ox, oy, Math.max(2.5, R * 0.03), 0, 6.2832); ctx.fill();
-      ctx.restore();
-      var cr = Math.cos(rot), sr = Math.sin(rot), tilt = 0.38, ct = Math.cos(tilt), st = Math.sin(tilt);
-      function proj(p) { var x = p[0] * cr + p[2] * sr, z = -p[0] * sr + p[2] * cr, y = p[1] * ct - z * st; z = p[1] * st + z * ct; return [cx + x * R, cy + y * R, z]; }
-      for (var i = 0; i < N; i++) {
-        var q = proj(P[i]); if (q[2] < -0.05) continue;
-        var a = 0.16 + q[2] * 0.7; ctx.fillStyle = 'rgba(255,214,150,' + a.toFixed(3) + ')';
-        var s = Math.max(1.2, R * 0.0105 * (0.6 + q[2] * 0.6)); ctx.fillRect(q[0] - s / 2, q[1] - s / 2, s, s);
+      /* atmosphere and the dark disc */
+      var g = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.5);
+      g.addColorStop(0, 'rgba(247,147,26,0.30)'); g.addColorStop(0.35, 'rgba(120,140,255,0.10)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.5, 0, 6.2832); ctx.fill();
+      var gd = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.35, R * 0.1, cx, cy, R * 1.06);
+      gd.addColorStop(0, '#1d1a24'); gd.addColorStop(0.7, '#0c0b10'); gd.addColorStop(1, '#050507');
+      ctx.fillStyle = gd; ctx.beginPath(); ctx.arc(cx, cy, R * 1.06, 0, 6.2832); ctx.fill();
+      /* the satellite: drawn before the globe when it is behind it, after when in front */
+      var oa = t0 * 0.55, op = [Math.cos(oa) * 1.55, Math.sin(oa) * 0.42, Math.sin(oa) * 1.55], tilt = 0.5;
+      var oq = [op[0], op[1] * Math.cos(tilt) - op[2] * Math.sin(tilt), op[1] * Math.sin(tilt) + op[2] * Math.cos(tilt)];
+      function sat() {
+        var s = proj([oq[0], oq[1], oq[2]]), rr = Math.max(4, R * 0.045) * s[2];
+        ctx.save(); ctx.shadowColor = '#f7931a'; ctx.shadowBlur = R * 0.12; ctx.fillStyle = '#f7931a'; ctx.beginPath(); ctx.arc(s[0], s[1], rr, 0, 6.2832); ctx.fill(); ctx.restore();
+        ctx.fillStyle = '#1a1006'; ctx.font = '900 ' + Math.round(rr * 1.35) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('₿', s[0], s[1] + rr * 0.05);
       }
-      for (var j = pings.length - 1; j >= 0; j--) {
-        var pg = pings[j]; pg.a += dt * 0.9; if (pg.a > 1) { pings.splice(j, 1); continue; }
-        var q2 = proj(pg.p); if (q2[2] < 0) continue;
-        var rr = R * (0.012 + pg.a * 0.07), al = (1 - pg.a) * (0.5 + q2[2] * 0.5);
-        ctx.strokeStyle = pg.c ? 'rgba(52,211,153,' + al.toFixed(3) + ')' : 'rgba(255,255,255,' + (al * 0.55).toFixed(3) + ')';
-        ctx.lineWidth = Math.max(1, R * 0.006); ctx.beginPath(); ctx.arc(q2[0], q2[1], rr, 0, 6.2832); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,210,122,0.16)'; ctx.lineWidth = Math.max(1, R * 0.004); ctx.beginPath();
+      for (var k = 0; k <= 96; k++) {
+        var a = k / 96 * 6.2832, p0 = [Math.cos(a) * 1.55, Math.sin(a) * 0.42, Math.sin(a) * 1.55];
+        var q0 = [p0[0], p0[1] * Math.cos(tilt) - p0[2] * Math.sin(tilt), p0[1] * Math.sin(tilt) + p0[2] * Math.cos(tilt)], s0 = proj(q0);
+        if (k) ctx.lineTo(s0[0], s0[1]); else ctx.moveTo(s0[0], s0[1]);
       }
+      ctx.stroke();
+      if (oq[2] < 0) sat();
+      /* oceans: a faint grid of dots; land: lit gold dots (the side away from the sun is dim) */
+      var ds = Math.max(1, R * 0.009);
+      for (var i2 = 0; i2 < SEA.length; i2++) {
+        var q = rot(SEA[i2]); if (q[2] < 0.02) continue; var s2 = proj(q);
+        ctx.fillStyle = 'rgba(140,160,255,' + (0.05 + q[2] * 0.12).toFixed(3) + ')'; ctx.fillRect(s2[0], s2[1], ds * 0.8, ds * 0.8);
+      }
+      for (var j = 0; j < LAND.length; j++) {
+        var p = LAND[j], q1 = rot(p); if (q1[2] < 0) continue;
+        var li = Math.max(0, p[0] * SUN[0] + p[1] * SUN[1] + p[2] * SUN[2]), lum = 0.25 + 0.75 * li, s1 = proj(q1);
+        var al = (0.25 + q1[2] * 0.75) * (0.45 + lum * 0.55);
+        ctx.fillStyle = 'rgba(' + Math.round(170 + 85 * lum) + ',' + Math.round(110 + 100 * lum) + ',' + Math.round(40 + 80 * lum) + ',' + al.toFixed(3) + ')';
+        var sz = ds * (0.8 + q1[2] * 0.7); ctx.fillRect(s1[0] - sz / 2, s1[1] - sz / 2, sz, sz);
+      }
+      /* the terminator: a soft night shade over the side away from the sun */
+      var sv = rot(SUN), sh = ctx.createLinearGradient(cx + sv[0] * R, cy - sv[1] * R, cx - sv[0] * R, cy + sv[1] * R);
+      sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(0.55, 'rgba(0,0,0,0.05)'); sh.addColorStop(1, 'rgba(0,0,0,0.55)');
+      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(cx, cy, R * 1.05, 0, 6.2832); ctx.fill();
+      /* births and deaths */
+      for (var n = pings.length - 1; n >= 0; n--) {
+        var pg = pings[n]; pg.a += dt * 0.8; if (pg.a > 1) { pings.splice(n, 1); continue; }
+        var q3 = rot(pg.p); if (q3[2] < 0.05) continue; var s3 = proj(q3), rr2 = R * (0.01 + pg.a * 0.06) * s3[2], al2 = (1 - pg.a) * (0.4 + q3[2] * 0.6);
+        ctx.strokeStyle = pg.c ? 'rgba(52,211,153,' + al2.toFixed(3) + ')' : 'rgba(255,255,255,' + (al2 * 0.7).toFixed(3) + ')';
+        ctx.lineWidth = Math.max(1, R * 0.006); ctx.beginPath(); ctx.arc(s3[0], s3[1], rr2, 0, 6.2832); ctx.stroke();
+        if (pg.a < 0.25) { ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.arc(s3[0], s3[1], Math.max(1.5, R * 0.008), 0, 6.2832); ctx.fill(); }
+      }
+      /* rim light */
+      ctx.strokeStyle = 'rgba(255,190,110,0.35)'; ctx.lineWidth = Math.max(1, R * 0.008); ctx.beginPath(); ctx.arc(cx, cy, R * 1.0 * CAM / Math.sqrt(CAM * CAM - 1), 0, 6.2832); ctx.stroke();
+      if (oq[2] >= 0) sat();
     }
     w.requestAnimationFrame(frame);
   }
