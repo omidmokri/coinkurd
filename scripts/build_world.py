@@ -18,7 +18,7 @@ import world_data as WD  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "2"                      # asset version: bump with any change to assets/world/* (and V in world.js)
+V = "3"                      # asset version: bump with any change to assets/world/* (and V in world.js)
 LANGS = ("fa", "ckb", "ar", "en")
 URL = SITE + "/world/"
 
