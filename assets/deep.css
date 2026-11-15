@@ -90,7 +90,7 @@ html.ek-deep #ekf::before{content:"";position:absolute;inset:0 0 auto 0;height:1
 .ds-band{position:absolute;top:0;left:0;right:0;z-index:0;pointer-events:none;overflow:hidden}
 .ds-band video{display:block;width:100%;height:100%;object-fit:cover}
 html.ds-has-band,html.ds-has-band body{overflow-x:clip}
-html.ds-has-band main,html.ds-has-band #ek-main~div,html.ds-has-band #ekf{position:relative;z-index:1}
+html.ds-has-band main,html.ds-has-band #ekb,html.ds-has-band #ekf{position:relative;z-index:1}  /* the page itself above the band: never the menu, the assistant or the progress bar (fixed layers) */
 /* 000 — the lines of light run down to the floor where the verdict stands; tinted toward the brand, kept off the text */
 .ds-beam{height:min(640px,82vh);opacity:.8;mix-blend-mode:screen;
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 55%,transparent 100%),linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);
