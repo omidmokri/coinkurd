@@ -691,6 +691,17 @@ def gather(now, edition, prev=None):
     f["macro"] = {"last": mc.get("last") or {}, "chg": mc.get("chg_1m") or {}, "names": mc.get("names") or {},
                   "corr": (mc.get("rolling_btc_spx_30d") or [[None, None]])[-1], "src": mc.get("sources") or {}}
     f["world"] = world_news(now)
+    # the Observatory's Bitcoin cycle (/charts/mvrv/) and «جهان زنده» (/world/): read from the site's own files
+    cn = (site("obs/chain_now") or {}).get("btc") or {}
+    f["cycle"] = cn if cn.get("mvrv") and cn.get("date") and now - (parse_dt(cn["date"] + "T00:00:00+00:00") or now) < timedelta(days=3) else None
+    wj = site("world") or {}
+    wb = wj.get("btc") or {}
+    d0 = wb.get("day0") or {}
+    f["chain"] = None
+    if wb.get("tip") and d0.get("d") == now.date().isoformat() and wb["tip"] >= d0.get("h", 1e12):
+        import world_data as WDT
+        f["chain"] = {"mined": WDT.issued_sat(d0["h"], wb["tip"]) / WDT.COIN, "blocks": wb["tip"] - d0["h"] + 1,
+                      "halving": WDT.next_halving(wb["tip"]) - wb["tip"]}
     f["cal"] = calendar(now)
     # scanner and its honest record
     opps = []
@@ -1392,11 +1403,17 @@ def header(im, ed, idx, title, sub, f):
     return CT
 
 
+# the site page behind each slide (owner, 2026-11-15: the reports must lead readers to the site's new pages)
+PAGE = {1: "/world/", 2: "/heatmap/", 3: "/crypto-news/", 4: "/charts/liquidation-heatmap/", 5: "/bubbles/", 6: "/money-flow/",
+        7: "/calendar/", 8: "/track-record/", 9: "/charts/", 10: "/world/"}
+_SLIDE = {"i": 0}
+
+
 def footer(im, ed):
     _INK["content"] = _INK["max"]
     IC._footer({"pal": ED[ed]["pal"]}, im)
     d = DR(im)
-    num(d, W / 2, H - 70, "entekhab.net", 22, "m", DIM, anchor="c")
+    num(d, W / 2, H - 70, "entekhab.net" + PAGE.get(_SLIDE["i"], ""), 22, "m", DIM, anchor="c")
 
 
 # --------------------------------------------------------------- logos
@@ -2129,9 +2146,13 @@ def s_flows(base, f, tx):
     if p:
         deriv.append(f"{fnum(p)}٪ حساب‌ها لانگ")
     dline = "بازار آتی: " + " · ".join(deriv) if deriv else ""
+    cy = f.get("cycle")
+    ok_cy = bool(cy and cy.get("nupl") is not None and cy.get("mayer") and cy.get("mvrv_pct") is not None)
+    cline = (f"چرخهٔ بیت‌کوین (رصدخانهٔ سایت): نسبت MVRV {fnum(cy['mvrv'], 2)} · NUPL {fnum(cy['nupl'], 2)} · مضرب مایر "
+             f"{fnum(cy['mayer'], 2)}؛ MVRV امروز از {fnum(100 - cy['mvrv_pct'])}٪ روزهای تاریخ بیت‌کوین پایین‌تر است") if ok_cy else ""
     notes = [f"{o['fa_t']} — {o['src']}، {stamp(o['date'], f['now'])}" for o in oc[:2]]
     width = W - 2 * M - 36
-    need_d = (lines_of(dline, 21, width - 90) * 30 + 14) if dline else 0
+    need_d = ((lines_of(dline, 21, width - 90) * 30 + 14) if dline else 0) + ((lines_of(cline, 21, width - 90) * 30 + 18) if cline else 0)
     while notes and 58 + sum(min(2, lines_of(n_, 22, width)) * 31 + 6 for n_ in notes) + need_d > CB - y - 8:
         notes = notes[:-1]
     panel(im, (M - 8, y, W - M + 8, CB), ed)
@@ -2143,6 +2164,9 @@ def s_flows(base, f, tx):
         yy += 46
         for n_ in notes:
             yy = para(d, W - M - 18, yy, n_, 22, width, "r", (222, 228, 238), lead=1.4, max_lines=2) + 6
+    if cline:
+        xr = tag(im, W - M - 16, yy + 4, "داده")
+        yy = para(d, xr - 6, yy + 6, cline, 21, xr - M - 10, "r", (222, 228, 238), lead=1.4, max_lines=2) + 8
     if dline:
         xr = tag(im, W - M - 16, yy + 4, "داده")
         para(d, xr - 6, yy + 6, dline, 21, xr - M - 10, "r", MUTED, lead=1.4, max_lines=2)
@@ -2444,8 +2468,11 @@ def s_summary(base, f, tx):
         cnt = {k: st.count(k) for k in ("bearish", "bullish", "neutral")}
         line_co = (f"میزگرد تحلیلگران هوش مصنوعی سایت ({jday(parse_dt(co['at']))}): "
                    f"{fnum(cnt['bearish'])} نزولی، {fnum(cnt['bullish'])} صعودی، {fnum(cnt['neutral'])} خنثی")
+    ch = f.get("chain")
+    line_ch = (f"زنجیرهٔ بیت‌کوین امروز (جهان زنده): {fnum(ch['mined'], 3)} بیت‌کوین تازه در {fnum(ch['blocks'])} بلاک · "
+               f"{fnum(ch['halving'])} بلاک تا هاوینگ بعدی") if ch else None
     disc = DISCLAIMER
-    avail = CB - y - 66 - 56 - (40 if line_co else 0)
+    avail = CB - y - 66 - 56 - (40 if line_co else 0) - (46 if line_ch else 0)
     while wl_ and bullet_h(wl_, 23, W - 2 * M - 36, max_lines=2, gap=6) > avail:
         wl_ = wl_[:-1]
     hb = CB - y
@@ -2456,6 +2483,10 @@ def s_summary(base, f, tx):
     if line_co:
         xr = tag(im, W - M - 16, yy + 2, "تحلیل")
         para(d, xr - 6, yy + 4, line_co, 21, xr - M - 10, "r", MUTED, lead=1.4, max_lines=1)
+        yy += 46
+    if line_ch:
+        xr = tag(im, W - M - 16, yy + 2, "داده")
+        para(d, xr - 6, yy + 4, line_ch, 21, xr - M - 10, "r", MUTED, lead=1.4, max_lines=1)
         yy += 46
     d.line([(M + 10, CB - 62), (W - M - 10, CB - 62)], fill=(255, 255, 255, 26), width=1)
     tri(d, W - M - 30, CB - 34, True, 12, TAGC["هشدار"])
@@ -2542,6 +2573,7 @@ def caption(f, tx, sig=""):
     lead = tx.get("lead")
     tail = ["⚠️ " + DISCLAIMER,
             "👈 هر ۱۰ تصویر را ورق بزنید؛ از وضعیت کلی بازار تا نقشهٔ راه.",
+            "🆕 تازه در سایت: جهان زنده، رصدخانهٔ بازار، نقشهٔ حرارتی و جریان پول — زیر هر تصویر نشانی صفحه‌اش آمده است.",
             '🌐 <a href="https://entekhab.net/">سایت انتخاب؛ داده‌های زنده و ابزارهای تحلیلی</a>']
     tags = " ".join(hashtags(f))
     order = [0, 1, len(pts) - 1]                         # what is dropped last when the caption is too long
@@ -2663,6 +2695,7 @@ def build(now=None, edition=None, prev=None, use_ai=True, sig="", pub=None):
     pics = []
     for i, fn in enumerate(SLIDES, 1):
         _INK.update(max=0, content=0)
+        _SLIDE["i"] = i
         im = fn(base, f, tx)
         if _INK["content"] > CB + 6:
             raise AlbumError(f"محتوای تصویر {i} به نوار پایین رسیده است")
