@@ -65,6 +65,9 @@ check("the year is 1 Farvardin 1405 → 1 Farvardin 1406", P.g2j(y["yearly"][0].
 check("period keys", P.period_key("daily", sat[0][1]) == "1405-08-29" and P.period_key("monthly", mk["monthly"][0]) == "1405-08"
       and P.period_key("yearly", y["yearly"][0]) == "1405", (P.period_key("daily", sat[0][1]),))
 
+yl = P.labels("yearly", *y["yearly"])
+check("a range across new year names both years", "Mar 21, 2026 – Mar 20, 2027" in yl["en"]["sub"] and yl["fa"]["sub"] == "سال ۱۴۰۵", yl["en"]["sub"])
+
 # ---------------------------------------------------------------- spreading a yearly total
 a = datetime(2025, 1, 1, tzinfo=timezone.utc)
 check("a whole calendar year = the yearly total", abs(P.flow_total(365e6, a, datetime(2026, 1, 1, tzinfo=timezone.utc)) - 365e6) < 1e-3)
