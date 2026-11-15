@@ -305,8 +305,12 @@ The site's strategy (agreed with the owner, 2026-11-07):
   paths (/cn/ /tw/ /iw/ /jp/ /kr/ /gr/ /cz/ /se/ /br/ /cat/ …; the eleven without a path use their ISO code), and
   /market/fa|ckb|ar|en/ forward to /market/ in that language. Globe button (bottom bar, and the header's one-button
   switch on market pages) → all 47; a choice is remembered and /market/ opens it. Right-to-left for Hebrew and Urdu too.
-- Translation: owner chose the free Gemini key in CI (scripts/pro_l10n.py; ~470 requests for all 43, capped at 30 a run,
-  so a few hours after publishing; strings not yet translated show in English, page text first, noindex until it is in).
+- Translation: owner chose the free Gemini key in CI (scripts/pro_l10n.py; ~470 requests for all 43; strings not yet
+  translated show in English, page text first, noindex until it is in). The free quota is shared with the site's own
+  Gemini steps, which come first: ≤10 calls a run and ≤80 a quota day (midnight Pacific; data/pro_l10n/_quota.json),
+  on the run's own model only — the first exhausted quota stops it. (The first run, at 30 a run through ai.generate,
+  walked two fallback models' day within minutes of Google's reset; fixed the same morning.) So about a week for all 43,
+  the largest audiences first (PRIORITY).
 - "Instead of toman, your own country's currency": every Binance coin as <COIN>_<CUR>, computed like toman (Binance ×
   the rate at the bar's middle), lists «coins in EUR», market watch «Crypto (EUR)», the backtest's balance and digits,
   USDT_<CUR> = the rate's own daily chart. Daily reference rates from the ECB / exchange-api (scripts/fx_rates.py). Own

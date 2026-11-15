@@ -23,8 +23,11 @@ Checks on every translated string (check()):
     translate, no Arabic letters in a language that does not use them, and not just the English handed back;
   * not empty and not absurdly long.
 
-Budget: at most --requests calls (default 30) and --seconds (default 240) a run, so the free tier's daily quota still
-covers the site's other Gemini steps (news, Arabic, post translations); a run stops at the first exhausted quota.
+Budget — the free Gemini quota is shared with the site's own steps (post translations, news, Arabic, reports), and those
+come first: at most --requests calls (default 10) and --seconds (default 200) a run, and at most PRO_L10N_DAILY calls
+(default 80) a quota day (Google resets it at midnight Pacific time; the count is kept in data/pro_l10n/_quota.json).
+Only the run's own model is used: the first exhausted quota stops the run, instead of walking scripts/ai.py's
+fallback models (on 2026-11-15 the first run did that and used up two models' day within minutes of the reset).
 Languages are filled one after another in PRIORITY order, so each becomes complete as early as possible.
 
 CLI:  python3 scripts/pro_l10n.py [--requests N] [--seconds S] [--lang de,tr] [--batch 120] [--status]
@@ -63,6 +66,7 @@ KEEP = ["Binance", "OKX", "Bybit", "Deribit", "Gate", "tgju.org", "tgju", "Tradi
 # (chart types and indicator names — Renko, Kagi, Ichimoku … — are left to each language: platforms write them in
 #  their own script in some languages)
 FAIL_MAX = 3      # a string that failed its checks this many times stays in English (no endless retries on the quota)
+DAILY = int(os.environ.get("PRO_L10N_DAILY", "80"))   # Gemini calls a quota day at most (the site's own steps come first)
 KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
 
 # the script a language is written in: a translated string must use it wherever the English has words to translate
@@ -281,13 +285,57 @@ def gemini():
         return None
 
     def gen(p):
-        return ai.generate(p, as_json=True, temperature=0.1, max_tokens=8192, tries=3, timeout=120)
+        # the run's model only (ai._generate, not ai.generate): an exhausted quota raises QuotaError and the run stops,
+        # leaving ai.py's fallback models to the site's own steps
+        if ai._exhausted:
+            raise ai.QuotaError("a quota ran out earlier in this run")
+        try:
+            return ai._generate(p, True, 0.1, 8192, 3, 120)
+        except ai.QuotaError:
+            ai._exhausted.add(ai.model())
+            raise
     return gen
 
 
-def run(langs, requests_max, seconds, size, gen, src, log=print):
-    """fill the caches of `langs` in order; returns {code: (done, total)}"""
+# --------------------------------------------------------------------------------------------- the day's budget
+def quota_day(now=None):
+    """the Gemini quota day: Google resets the free tier's daily limits at midnight Pacific time"""
+    now = time.time() if now is None else now
+    try:
+        from zoneinfo import ZoneInfo
+        import datetime
+        return datetime.datetime.fromtimestamp(now, ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d")
+    except Exception:  # noqa: BLE001  (no time-zone data: UTC-8 is close enough)
+        return time.strftime("%Y-%m-%d", time.gmtime(now - 8 * 3600))
+
+
+def quota_used(day=None):
+    """calls this script made in the quota day so far"""
+    day = day or quota_day()
+    try:
+        with open(os.path.join(CACHE, "_quota.json"), encoding="utf-8") as f:
+            q = json.load(f)
+        return max(0, int(q.get("n", 0))) if q.get("day") == day else 0
+    except (OSError, ValueError, TypeError, AttributeError):
+        return 0
+
+
+def quota_add(n, day=None):
+    if n <= 0:
+        return
+    day = day or quota_day()
+    total = quota_used(day) + n
+    os.makedirs(CACHE, exist_ok=True)
+    with open(os.path.join(CACHE, "_quota.json"), "w", encoding="utf-8") as f:
+        json.dump({"day": day, "n": total}, f)
+        f.write("\n")
+
+
+def run(langs, requests_max, seconds, size, gen, src, log=print, counter=None):
+    """fill the caches of `langs` in order; returns {code: (done, total)} (and the calls made in counter["used"])"""
     t0, used, quota = time.time(), 0, False
+    counter = counter if counter is not None else {}
+    counter["used"] = 0
     for code in langs:
         s, f = load(code, fails=True)
         todo = missing(src, s, f)
@@ -300,6 +348,7 @@ def run(langs, requests_max, seconds, size, gen, src, log=print):
             if used >= requests_max or time.time() - t0 > seconds or quota:
                 break
             used += 1
+            counter["used"] = used
             try:
                 good, bad = translate_batch(code, keys, src, gen)
             except Exception as e:  # noqa: BLE001
@@ -337,8 +386,8 @@ def status(src):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--requests", type=int, default=int(os.environ.get("PRO_L10N_REQUESTS", "30")))
-    ap.add_argument("--seconds", type=int, default=int(os.environ.get("PRO_L10N_SECONDS", "240")))
+    ap.add_argument("--requests", type=int, default=int(os.environ.get("PRO_L10N_REQUESTS", "10")))
+    ap.add_argument("--seconds", type=int, default=int(os.environ.get("PRO_L10N_SECONDS", "200")))
     ap.add_argument("--batch", type=int, default=120)
     ap.add_argument("--lang", default="")
     ap.add_argument("--status", action="store_true")
@@ -354,7 +403,16 @@ def main():
         print("pro_l10n: no Gemini key — nothing translated this run (the pages use what the cache has)")
         return
     langs = [x for x in a.lang.split(",") if x] or PRIORITY
-    st = run(langs, a.requests, a.seconds, a.batch, gen, src)
+    left = DAILY - quota_used()
+    if left <= 0:
+        print(f"pro_l10n: today's {DAILY} Gemini calls are used; more tomorrow (the pages use what the cache has)")
+        return
+    c = {}
+    try:
+        st = run(langs, min(a.requests, left), a.seconds, a.batch, gen, src, counter=c)
+    finally:
+        quota_add(c.get("used", 0))
+    print(f"pro_l10n: {c.get('used', 0)} Gemini calls this run, {quota_used()} of {DAILY} today")
     done = sum(v["done"] for v in st.values())
     print(f"pro_l10n: {done} of {len(src) * len(st)} strings translated in {len(st)} languages; "
           f"page text ready in {sum(1 for v in st.values() if v['seo'])}")
