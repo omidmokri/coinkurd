@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15T14:16:32.689314+00:00",
+ "updated_at": "2026-11-15T14:32:49.203839+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-14T14:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "rsi_oversold": {
-   "n": 875,
+   "n": 874,
    "obs": 0.02,
-   "win": 48.8,
+   "win": 48.7,
    "mid": -0.77,
    "lo": -1.96,
    "hi": 0.2,
-   "p": 0.1465,
+   "p": 0.1492,
    "shifts": 1099,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6274,
+   "n": 6271,
    "obs": -0.13,
    "win": 48.6,
    "mid": 0.02,
    "lo": -0.29,
    "hi": 0.24,
-   "p": 0.2348,
+   "p": 0.2357,
    "shifts": 1099,
    "verdict": "no_edge"
   },
@@ -45,13 +45,13 @@
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 885,
+   "n": 884,
    "obs": 0.18,
-   "win": 52.7,
+   "win": 52.6,
    "mid": 0.77,
-   "lo": -0.16,
+   "lo": -0.15,
    "hi": 1.92,
-   "p": 0.2384,
+   "p": 0.2357,
    "shifts": 1099,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 498,
-   "obs": -1.64,
-   "win": 32.7,
+   "n": 497,
+   "obs": -1.63,
+   "win": 32.8,
    "mid": -0.81,
    "lo": -1.86,
-   "hi": 0.11,
-   "p": 0.0955,
+   "hi": 0.12,
+   "p": 0.101,
    "shifts": 1099,
    "verdict": "no_edge"
   }
