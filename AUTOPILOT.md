@@ -108,6 +108,24 @@ The site's strategy (agreed with the owner, 2026-11-07):
   strings in `assets/pro/i18n.js` (fa, ckb, ar, en; `tests/test_pro_i18n.py` checks them); calendar data
   `data/ecocal.json` from `scripts/ecocal.py` + `ecocal_tr.py`; bot side `scripts/bot_pro.py`. Tests: `tests/test_pro_ind.py`,
   `test_pro_i18n.py`, `test_ecocal.py`, `test_bot_pro.py`, `pro_e2e.js` (`ONLY=phones|ar` runs one block).
+  **47 languages and the visitor's own currency (owner, 2026-11-15).** The languages: `scripts/pro_langs.py` is the
+  table (the owner's list and URL paths: /cn/, /tw/, /iw/, /jp/, /kr/, /gr/, /cz/, /se/, /br/, /cat/ …; menu order Kurdish
+  first, English last) and writes `assets/pro/langs.js` (+ the time-zone → country → currency tables from
+  `scripts/pro_cldr.json`, CLDR via babel; `--check` / `tests/test_pro_langs.py`). The site's four keep living at `/market/`
+  with their hand-written strings; the other 43 each have `/market/<code>/`, built in CI (git-ignored) by
+  `scripts/build_market_l10n.py` from the template and the translation cache `data/pro_l10n/<code>.json`, which
+  `scripts/pro_l10n.py` fills with the site's free Gemini key a few batches a run (owner's choice: free, automatic;
+  checked for placeholders, tags, names, script; `FAIL_MAX` stops endless retries; page text first). **A new English
+  string in i18n.js is translated by itself on the next runs — add only fa/ckb/ar/en by hand.** A language is indexable
+  (sitemap, hreflang) only once its page text is translated; until then noindex. No ar.js on those pages (`data-noar`).
+  `chrome.js`/`ui2.js` show the English menus there; the header's one-button switch opens the 47-language list.
+  The currency: `assets/pro/fx.js` (choice + own rate in `ek_pro_fx`; default = the country of the browser's time zone,
+  Persian and Kurdish stay in toman, Iraq → dinar) and `markets.js` (`<COIN>_<CUR>` = Binance bar × the rate at the
+  bar's middle, exactly as `_IRT`; `USDT_<CUR>` = the daily rate as a chart; USD = plain USDT pairs). Rates:
+  `scripts/fx_rates.py` (update.yml step) → `data/fx/<CUR>.json` (one value a day per USDT: ECB since 2017 for its ~30
+  currencies, exchange-api since 2024-03-02 for the rest, × that day's dollar value of a tether; rewritten weekly) and
+  `data/fx/latest.json` (the last 14 days of all, daily). No rate before a currency's first day — those bars are left out.
+  Tests: `test_fx_rates.py`, `test_pro_l10n.py`, `test_market_l10n.py`, `test_pro_langs.py`, `pro_e2e.js` `ONLY=fx|langs`.
 - Market map — `/heatmap/` `/bubbles/` `/money-flow/` `/liquidity/` `/etf/` (one app, five addresses): static pages
   from `scripts/build_mm.py` (then `chrome.py`), engine `assets/mm/{i18n,core,heat,bubbles,space3d,panel,flow,liq,etf}.js`
   + `mm.css`, three.js only when 3D is asked for. Data: `scripts/mm_data.py` → `data/mm.json` (top 250, 9 timeframes,
@@ -282,6 +300,28 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-15 · /market/ in 47 languages, prices in every country's currency, and your own rate (owner's request in chat, not by the loop)
+- The owner's list of 46 languages (+ Kurdish): the site's four stay at /market/; 43 new ones at /market/<code>/ with his
+  paths (/cn/ /tw/ /iw/ /jp/ /kr/ /gr/ /cz/ /se/ /br/ /cat/ …; the eleven without a path use their ISO code), and
+  /market/fa|ckb|ar|en/ forward to /market/ in that language. Globe button (bottom bar, and the header's one-button
+  switch on market pages) → all 47; a choice is remembered and /market/ opens it. Right-to-left for Hebrew and Urdu too.
+- Translation: owner chose the free Gemini key in CI (scripts/pro_l10n.py; ~470 requests for all 43, capped at 30 a run,
+  so a few hours after publishing; strings not yet translated show in English, page text first, noindex until it is in).
+- "Instead of toman, your own country's currency": every Binance coin as <COIN>_<CUR>, computed like toman (Binance ×
+  the rate at the bar's middle), lists «coins in EUR», market watch «Crypto (EUR)», the backtest's balance and digits,
+  USDT_<CUR> = the rate's own daily chart. Daily reference rates from the ECB / exchange-api (scripts/fx_rates.py). Own
+  rate: «1 USDT = X» or «1 USD = X» (× tether's dollar value), the same for every bar, said wherever it is used.
+- Fixed on the way (old bug): on every visit the logo check sent charts and alerts on BTC_IRT / IR_* back to BTC
+  (`L.has(symbol)` instead of the coin's logo, app.js boot + panels.js) — now P.hasLogo; E2E reload check added.
+  The news E2E check depended on the minute of the hour (failed after :45): anchored to the hour.
+- Bot «بازار زنده»: a line about the languages and currencies in all five languages and a third button
+  «🌍 47 languages and your currency» (Web App → /market/#lang opens the language menu). Assistant FAQ entry added.
+- Verified: unit tests for the rates (ECB zip/Frankfurter/exchange-api in their real formats; a hand-checked euro rate,
+  weekends, tether factor, glitch vs devaluation, incremental runs), the translator (checks, retries, budget), the
+  builder (43 pages, hreflang, noindex, packs, forwards, idempotent) and the table; E2E: currency maths bar by bar, own
+  rate per USDT/USD, currency switch, market watch, reload, yen digits; German/Hebrew/Japanese pages, the language menu,
+  remembered language, the site switch back to Persian; the whole existing suite; a full local build (all steps after
+  build_pages, leak guard clean).
 ### 2026-11-14 · Battle: sound, quieter robots, a clean centre (owner's request in chat, not by the loop)
 - **Sound "gone":** with sound saved as on, `AUDIO.init()` ran at load, before any touch, so browsers kept the context
   suspended while the button said 🔊. Now the first pointer/key/touch anywhere (capture listeners) and a return to the
