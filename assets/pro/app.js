@@ -1257,6 +1257,17 @@
   function relocalize() { cells.forEach(function (c) { c.chart.applyOptions(locOpts()); c.legend(); }); clockTick(); emit('tz'); }
 
   /* ---- the language menu: every language of the workspace (the site's own first: Kurdish first, English last) */
+  /* the header's language group on market pages: a globe first (all 47), then the site's own four (owner, 2026-11-15) */
+  function headerGlobe() {
+    var g = document.getElementById('langs');
+    if (!g || g.querySelector('.pm-hglobe')) return;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pm-hglobe'; b.title = T('langTitle'); b.setAttribute('aria-label', T('langTitle'));
+    b.innerHTML = ic('globe') + '<b>47</b>';
+    b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); langDialog(); });
+    g.insertBefore(b, g.firstChild);
+  }
+  setTimeout(headerGlobe, 0);
   function langDialog() {
     closeMenu();
     var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note"></p></div>');
