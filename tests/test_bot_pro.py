@@ -106,7 +106,8 @@ for i, lang in enumerate(LANGS):
     check("CPI" in tx or "تورم" in tx or "هەڵئاوسان" in tx or "التضخم" in tx, "section shows the next high-impact event")
     check(rows[:1] == [[{"text": PRO.L("b_tg", lang), "web_app": {"url": "https://entekhab.net/market/"}}]], "first row: open inside Telegram (Web App)")
     check(len(rows) > 1 and rows[1] == [{"text": PRO.L("b_web", lang), "url": "https://entekhab.net/market/"}], "second row: open in the browser")
-    check(json.dumps(rows).count("entekhab.net/market/") == 2, "no duplicate site link")
+    check(len(rows) > 2 and rows[2] == [{"text": PRO.L("b_lang", lang), "web_app": {"url": "https://entekhab.net/market/#lang"}}], "third row: the 47 languages and your currency (opens the language menu)")
+    check(json.dumps(rows).count("entekhab.net/market/") == 3, "no duplicate site link")
     check(any(b.get("callback_data") == "m:main" for r in rows for b in r), "back button kept")
 
     # 2) where the section is reachable from
