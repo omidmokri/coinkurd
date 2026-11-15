@@ -5,7 +5,9 @@ the keys it was given), some answers good, some broken on purpose. Checks:
     not belong, English handed back, absurd length;
   * the cache keeps only what passed; a string that keeps failing is given up on after FAIL_MAX tries (no endless
     spending of the free quota); a changed English string is translated again; the budget of requests is kept;
-  * page text goes first, so a language's page can be indexed as early as possible.
+  * page text goes first, so a language's page can be indexed as early as possible;
+  * the shared free quota: one model only (the first exhausted quota stops the run, ai.py's fallback models are left to
+    the site's own steps), the calls of a run are counted, and a quota day (Pacific time) has a ceiling.
 Run: python3 tests/test_pro_l10n.py"""
 import json
 import os
@@ -103,6 +105,52 @@ def main():
         ok("PRIORITY lists each of the 43 new languages once", sorted(L.PRIORITY) == sorted(pro_langs.NEW) and len(L.PRIORITY) == 43)
         p = L.prompt_for("tw", {"k": "Close"})
         ok("the prompt names the language and its variant, and asks for JSON with the same keys", "Chinese (Traditional)" in p and "Traditional Chinese characters" in p and "same keys" in p)
+
+        # ---- the shared free quota
+        c = {}
+        calls.clear()
+        L.run(["fr"], 2, 60, 3, fake, src2, log=lambda *a: None, counter=c)
+        ok("a run counts its calls (and keeps to its own ceiling)", c.get("used") == 2 == len(calls), (c, len(calls)))
+        # 2026-11-15 08:01 UTC is just past midnight in California (PST); 07:59 UTC is still the 14th there
+        ok("the quota day is Google's (midnight Pacific time)", L.quota_day(1794729660) == "2026-11-15" and L.quota_day(1794729540) == "2026-11-14",
+           (L.quota_day(1794729660), L.quota_day(1794729540)))
+        ok("nothing used yet on a new day", L.quota_used("2026-11-15") == 0)
+        L.quota_add(3, "2026-11-15")
+        L.quota_add(4, "2026-11-15")
+        L.quota_add(0, "2026-11-15")
+        ok("the day's calls add up, and are kept in data/pro_l10n/_quota.json", L.quota_used("2026-11-15") == 7 and json.load(open(os.path.join(tmp, "_quota.json"))) == {"day": "2026-11-15", "n": 7})
+        ok("a new quota day starts from zero", L.quota_used("2026-11-16") == 0)
+        ok("the default ceilings are modest (the site's own Gemini steps come first)", 0 < L.DAILY <= 100)
+
+        # one model only: ai.generate would walk the fallback models; the translator must stop instead
+        os.environ.setdefault("GEMINI_API_KEY", "test-key")
+        os.environ["GEMINI_MODEL"] = "model-under-test"
+        import ai  # noqa: E402
+        ai._model, ai._exhausted = None, set()
+        seen = []
+
+        def fake_generate(*a, **k):
+            seen.append(ai.model())
+            raise ai.QuotaError("daily quota exhausted")
+        real = ai._generate
+        ai._generate = fake_generate
+        try:
+            gen = L.gemini()
+            e1 = e2 = None
+            try:
+                gen("prompt")
+            except Exception as e:  # noqa: BLE001
+                e1 = type(e).__name__
+            try:
+                gen("prompt")
+            except Exception as e:  # noqa: BLE001
+                e2 = type(e).__name__
+            ok("an exhausted quota stops the translator on its own model (no walk through ai.py's fallbacks)",
+               e1 == "QuotaError" and e2 == "QuotaError" and seen == ["model-under-test"] and ai._model == "model-under-test", (e1, e2, seen, ai._model))
+        finally:
+            ai._generate = real
+            ai._model, ai._exhausted = None, set()
+            os.environ.pop("GEMINI_MODEL", None)
     finally:
         L.CACHE = old_cache
         shutil.rmtree(tmp, ignore_errors=True)
