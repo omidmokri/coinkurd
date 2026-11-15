@@ -169,6 +169,10 @@ NAV = [
          L("مقایسهٔ داده‌محور دو ارز", "بەراوردی داتایی دوو دراو", "Data-driven head-to-head")),
     ]},
     {"k": "ana", "t": L("تحلیل", "شیکاری", "Analysis"), "items": [
+        ("/world/", "globe", L("جهان زنده", "جیهانی زیندوو", "The world, live"),
+         L("جمعیت، بیت‌کوین، نفت، CO₂ و سلامت ثانیه به ثانیه، با منبع؛ و ساخت پست برای شبکه‌های اجتماعی",
+           "دانیشتووان، بیتکۆین، نەوت، CO₂ و تەندروستی چرکە بە چرکە، بە سەرچاوە؛ و دروستکردنی پۆست بۆ تۆڕە کۆمەڵایەتییەکان",
+           "Population, Bitcoin, oil, CO₂ and health second by second, with sources — and posts for social media")),
         ("/indicators/", "signal", L("اندیکاتورهای اختصاصی", "ئیندیکاتۆرە تایبەتەکان", "Signature indicators"),
          L("سیگنال‌های اندیکاتورهای Coin_Kurd در TradingView", "سیگناڵی ئیندیکاتۆرەکانی Coin_Kurd لە TradingView", "Signals from Coin_Kurd's TradingView indicators")),
         ("/lab/", "flask", L("آزمایشگاه بازار", "تاقیگەی بازاڕ", "Market lab"),
@@ -574,7 +578,8 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
-          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin", "calendar"]   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
+          "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin", "calendar",
+          "world"]   # /world/: scripts/build_world.py   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
 
 
 # the Observatory (/charts/ and one folder per chart): scripts/build_obs.py names its own folders

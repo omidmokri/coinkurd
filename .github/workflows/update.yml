@@ -421,6 +421,13 @@ jobs:
         timeout-minutes: 4
         run: python scripts/etf.py
 
+      # /world/ («جهان زنده»): chain tip and the first blocks of the UTC day/year (mempool.space, the marks once a day),
+      # the US Treasury's Debt to the Penny (every 6 h), crypto totals from mm.json (scripts/world_data.py)
+      - name: Live world counters (mempool.space, US Treasury)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/world_data.py
+
       - name: Strategy-lab context (Fear & Greed, BTC regime, funding)
         continue-on-error: true
         timeout-minutes: 3

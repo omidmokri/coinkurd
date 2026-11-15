@@ -50,7 +50,8 @@ import bot_paper as PAPER  # noqa: E402  (paper trading + public leaderboard)
 import bot_pro as PRO  # noqa: E402  (the site's live market /market/ + its price-alert hand-off)
 import bot_econ as EC  # noqa: E402  (economic calendar: group heads-up/result in topic 47540 + opt-in private alerts)
 import econ_src as ES  # noqa: E402
-import bot_mm as MMB  # noqa: E402  (the market map: /heatmap/, /bubbles/, /money-flow/, /liquidity/, /etf/)
+import bot_mm as MMB  # noqa: E402
+import bot_world as WLB  # noqa: E402  (/world/: live world counters and the post studio)  (the market map: /heatmap/, /bubbles/, /money-flow/, /liquidity/, /etf/)
 import bot_obs as OBS  # noqa: E402  (the Observatory: /charts/ — liquidation heatmap and map)
 import bot_clips as CL  # noqa: E402
 import bot_proxy as PX  # noqa: E402
@@ -466,7 +467,8 @@ SECTIONS = {
     "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
     "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
     "mmap": (lambda lang: MMB.section(lang, D.load), "/heatmap/"),   # the market map: heatmap, bubbles, money flow, liquidity, ETFs
-    "obs": (lambda lang: OBS.section(lang, D.load), "/charts/"),      # the Observatory: derivatives, options, on-chain and cycle charts
+    "obs": (lambda lang: OBS.section(lang, D.load), "/charts/"),
+    "world": (lambda lang: WLB.section(lang, D.load), "/world/"),     # «جهان زنده»: live world counters, Bitcoin from the chain, post studio      # the Observatory: derivatives, options, on-chain and cycle charts
 }
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
@@ -642,6 +644,8 @@ def _render(s, uid, key, page=0):
             kb["inline_keyboard"][0:1] = PRO.open_rows(lang)
         if key == "mmap":                               # the five pages inside Telegram, the heatmap in the browser
             kb["inline_keyboard"][0:1] = MMB.open_rows(lang)
+        if key == "world":                              # the page with its post studio inside Telegram, and in the browser
+            kb["inline_keyboard"][0:1] = WLB.open_rows(lang)
         if key == "obs":                                # the charts inside Telegram, the liquidation heatmap in the browser
             kb["inline_keyboard"][0:1] = OBS.open_rows(lang)
         if key == "chain":                              # the live mempool map on /satoshi/ (a site page; nothing is sent)
