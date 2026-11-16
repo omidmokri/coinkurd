@@ -94,21 +94,21 @@ def main():
             pg.goto(url + "/", wait_until="networkidle")
 
             ok("the globe sits beside the site's own four buttons",
-               pg.locator("#langs .ek-gl").count() == 1 and pg.locator("#langs button[data-l]").count() == 4)
+               pg.locator("#langs .ekw-globe").count() == 1 and pg.locator("#langs button[data-l]").count() == 4)
             ok("the site's own four buttons are untouched",
                pg.locator('#langs button[data-l="ckb"]').inner_text() == "کوردی"
                and pg.locator('#langs button[data-l="en"]').inner_text() == "English")
-            ok("the globe turns (it has the spinning group)", pg.locator("#langs .ek-gl svg .ek-sp").count() == 1)
+            ok("the globe turns (it has the spinning group)", pg.locator("#langs .ekw-globe svg .ekw-spin").count() == 1)
 
-            pg.click("#langs .ek-gl")
-            pg.wait_for_selector(".ek-gp")
-            names = pg.locator(".ek-gl-list button .n").all_inner_texts()
+            pg.click("#langs .ekw-globe")
+            pg.wait_for_selector(".ekw-panel")
+            names = pg.locator(".ekw-list button .n").all_inner_texts()
             ok("the panel lists the ready languages by their own name", names == ["Deutsch", "Türkçe", "اردو"], names)
-            pg.fill(".ek-gs", "türk")
-            vis = [n for i, n in enumerate(names) if pg.locator(".ek-gl-list button").nth(i).is_visible()]
+            pg.fill(".ekw-search", "türk")
+            vis = [n for i, n in enumerate(names) if pg.locator(".ekw-list button").nth(i).is_visible()]
             ok("the search box narrows the list", vis == ["Türkçe"], vis)
-            pg.fill(".ek-gs", "")
-            pg.click('.ek-gl-list button[data-code="de"]')
+            pg.fill(".ekw-search", "")
+            pg.click('.ekw-list button[data-code="de"]')
             pg.wait_for_load_state("networkidle")
 
             ok("the choice is stored and any Arabic choice dropped",
@@ -121,7 +121,7 @@ def main():
             ok("a string with no entry stays in English", "Nothing has an entry" in pg.locator("#p3").inner_text())
             pg.wait_for_timeout(400)
             ok("text a script writes afterwards is translated too", pg.locator("#later").inner_text() == "Jede Binance-Münze")
-            ok("the globe shows the site is in another language", "on" in (pg.get_attribute("#langs .ek-gl", "class") or ""))
+            ok("the globe shows the site is in another language", "on" in (pg.get_attribute("#langs .ekw-globe", "class") or ""))
 
             # a right-to-left language turns the page around
             pg.evaluate("localStorage.setItem('ek_l','ur')")
@@ -130,9 +130,9 @@ def main():
                pg.evaluate("document.documentElement.dir") == "rtl" and pg.locator("h1").inner_text() == "لائیو مارکیٹ")
 
             # back to the site's own languages
-            pg.click("#langs .ek-gl")
-            pg.wait_for_selector(".ek-gp")
-            pg.click(".ek-gf button")
+            pg.click("#langs .ekw-globe")
+            pg.wait_for_selector(".ekw-panel")
+            pg.click(".ekw-foot button")
             pg.wait_for_load_state("networkidle")
             ok("going back to the site's own languages clears the choice",
                not pg.evaluate("localStorage.getItem('ek_l')") and pg.locator("h1").inner_text() == "Live market")
@@ -140,7 +140,7 @@ def main():
             # nothing ready yet: no globe at all
             json.dump({"ready": []}, open(os.path.join(tmp, "i18n", "langs.json"), "w"))
             pg.goto(url + "/?x=2", wait_until="networkidle")
-            ok("with no language ready the globe is not shown", pg.locator("#langs .ek-gl").count() == 0)
+            ok("with no language ready the globe is not shown", pg.locator("#langs .ekw-globe").count() == 0)
             b.close()
         srv.shutdown()
     finally:
