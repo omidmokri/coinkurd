@@ -9,6 +9,9 @@
    Arabic has its own layer (assets/ar.js) and is untouched by this one; the two never run together. The globe only
    offers a language once enough of the site is translated into it (/i18n/langs.json). The encyclopedia stays in its
    own three languages. */
+/* Every class and id here starts with ekw- (or ek-tr-/ek-i18n- for the ids): the site already uses ek-gl on
+   twenty-one of its own menu and footer elements, and a styling rule meant for this globe collapsed all of them.
+   Check a name against the live pages before adding one. */
 (function () {
   'use strict';
   var d = document, de = d.documentElement, w = window;
@@ -20,39 +23,39 @@
   var LANGS = null, ME = null;
 
   /* ------------------------------------------------------------------ the globe and its panel */
-  var CSS = '.ek-gl{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;'
+  var CSS = '.ekw-globe{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;'
     + 'padding:0;border:0;border-radius:50%;cursor:pointer;background:transparent;vertical-align:middle;flex:0 0 auto}'
-    + '.ek-gl::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(56,214,255,.35),transparent 70%);opacity:0;transition:opacity .25s}'
-    + '.ek-gl:hover::after,.ek-gl:focus-visible::after{opacity:1}'
-    + '.ek-gl svg{width:26px;height:26px;display:block;filter:drop-shadow(0 0 4px rgba(56,214,255,.55))}'
-    + '.ek-gl .ek-sp{animation:ek-spin 9s linear infinite}.ek-gl:hover .ek-sp{animation-duration:3.5s}'
-    + '@keyframes ek-spin{from{transform:translateX(0)}to{transform:translateX(-36px)}}'
-    + '@media (prefers-reduced-motion:reduce){.ek-gl .ek-sp{animation:none}}'
-    + '.ek-gl.on{box-shadow:0 0 0 2px rgba(56,214,255,.9)}'
-    + '.ek-gw{position:fixed;inset:0;z-index:2147483000;background:rgba(6,10,18,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}'
-    + '.ek-gp{width:min(560px,100%);max-height:min(74vh,620px);display:flex;flex-direction:column;border-radius:18px;overflow:hidden;'
+    + '.ekw-globe::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(56,214,255,.35),transparent 70%);opacity:0;transition:opacity .25s}'
+    + '.ekw-globe:hover::after,.ekw-globe:focus-visible::after{opacity:1}'
+    + '.ekw-globe svg{width:26px;height:26px;display:block;filter:drop-shadow(0 0 4px rgba(56,214,255,.55))}'
+    + '.ekw-globe .ekw-spin{animation:ekw-spinin 9s linear infinite}.ekw-globe:hover .ekw-spin{animation-duration:3.5s}'
+    + '@keyframes ekw-spinin{from{transform:translateX(0)}to{transform:translateX(-36px)}}'
+    + '@media (prefers-reduced-motion:reduce){.ekw-globe .ekw-spin{animation:none}}'
+    + '.ekw-globe.on{box-shadow:0 0 0 2px rgba(56,214,255,.9)}'
+    + '.ekw-wrap{position:fixed;inset:0;z-index:2147483000;background:rgba(6,10,18,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}'
+    + '.ekw-panel{width:min(560px,100%);max-height:min(74vh,620px);display:flex;flex-direction:column;border-radius:18px;overflow:hidden;'
     + 'background:linear-gradient(160deg,#0d1726,#0a1020);border:1px solid rgba(56,214,255,.28);box-shadow:0 24px 70px rgba(0,0,0,.6);color:#e8f1ff}'
-    + '.ek-gh{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(56,214,255,.18)}'
-    + '.ek-gh b{font-size:15px;font-weight:600;flex:1;text-align:start}'
-    + '.ek-gh button{background:transparent;border:0;color:#9fb6d4;font-size:22px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:8px}'
-    + '.ek-gh button:hover{color:#fff;background:rgba(255,255,255,.08)}'
-    + '.ek-gs{margin:12px 16px 4px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#e8f1ff;font:inherit;font-size:14px;outline:0}'
-    + '.ek-gs:focus{border-color:rgba(56,214,255,.6)}'
-    + '.ek-gl-list{overflow:auto;padding:8px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}'
-    + '.ek-gl-list button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 11px;border-radius:11px;border:1px solid transparent;'
+    + '.ekw-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(56,214,255,.18)}'
+    + '.ekw-head b{font-size:15px;font-weight:600;flex:1;text-align:start}'
+    + '.ekw-head button{background:transparent;border:0;color:#9fb6d4;font-size:22px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:8px}'
+    + '.ekw-head button:hover{color:#fff;background:rgba(255,255,255,.08)}'
+    + '.ekw-search{margin:12px 16px 4px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#e8f1ff;font:inherit;font-size:14px;outline:0}'
+    + '.ekw-search:focus{border-color:rgba(56,214,255,.6)}'
+    + '.ekw-list{overflow:auto;padding:8px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}'
+    + '.ekw-list button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 11px;border-radius:11px;border:1px solid transparent;'
     + 'background:rgba(255,255,255,.04);color:#e8f1ff;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s}'
-    + '.ek-gl-list button:hover{background:rgba(56,214,255,.14);border-color:rgba(56,214,255,.45)}'
-    + '.ek-gl-list button.on{background:rgba(56,214,255,.2);border-color:rgba(56,214,255,.75)}'
-    + '.ek-gl-list .n{font-size:14px}.ek-gl-list .e{font-size:11px;color:#8fa8c8}'
-    + '.ek-gf{padding:10px 16px;border-top:1px solid rgba(56,214,255,.18);font-size:12px;color:#8fa8c8;text-align:start}'
-    + '.ek-gf button{background:transparent;border:0;color:#38d6ff;cursor:pointer;font:inherit;padding:0;text-decoration:underline}'
+    + '.ekw-list button:hover{background:rgba(56,214,255,.14);border-color:rgba(56,214,255,.45)}'
+    + '.ekw-list button.on{background:rgba(56,214,255,.2);border-color:rgba(56,214,255,.75)}'
+    + '.ekw-list .n{font-size:14px}.ekw-list .e{font-size:11px;color:#8fa8c8}'
+    + '.ekw-foot{padding:10px 16px;border-top:1px solid rgba(56,214,255,.18);font-size:12px;color:#8fa8c8;text-align:start}'
+    + '.ekw-foot button{background:transparent;border:0;color:#38d6ff;cursor:pointer;font:inherit;padding:0;text-decoration:underline}'
     + 'html.ek-tr-wait body{opacity:0!important}';
 
   var GLOBE = '<svg viewBox="0 0 24 24" aria-hidden="true"><defs>'
     + '<clipPath id="ekgc"><circle cx="12" cy="12" r="10"/></clipPath>'
     + '<linearGradient id="ekgg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b3b63"/><stop offset="1" stop-color="#0a1c33"/></linearGradient></defs>'
     + '<circle cx="12" cy="12" r="10" fill="url(#ekgg)"/>'
-    + '<g clip-path="url(#ekgc)"><g class="ek-sp" fill="#38d6ff" fill-opacity=".92">'
+    + '<g clip-path="url(#ekgc)"><g class="ekw-spin" fill="#38d6ff" fill-opacity=".92">'
     /* two copies of the same land, 36 apart, so the spin loops without a seam */
     + '<path d="M3 7h5l2 2-3 2 1 3-3 1-2-3zM13 6h6l2 3-3 1-1 3-4-2 1-3zM9 16h7l2 3-5 2-5-2z"/>'
     + '<path d="M39 7h5l2 2-3 2 1 3-3 1-2-3zM49 6h6l2 3-3 1-1 3-4-2 1-3zM45 16h7l2 3-5 2-5-2z"/>'
@@ -72,16 +75,16 @@
   function style() { if (d.getElementById('ek-i18n-s')) return; var s = d.createElement('style'); s.id = 'ek-i18n-s'; s.textContent = CSS; (d.head || de).appendChild(s); }
 
   function openPanel() {
-    if (!LANGS || !LANGS.length || d.querySelector('.ek-gw')) return;
+    if (!LANGS || !LANGS.length || d.querySelector('.ekw-wrap')) return;
     var W = words();
-    var wrap = d.createElement('div'); wrap.className = 'ek-gw'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true');
+    var wrap = d.createElement('div'); wrap.className = 'ekw-wrap'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true');
     var dir = (de.getAttribute('dir') === 'rtl') ? 'rtl' : 'ltr';
-    wrap.innerHTML = '<div class="ek-gp" dir="' + dir + '"><div class="ek-gh"><b></b><button type="button" aria-label="close">×</button></div>'
-      + '<input class="ek-gs" type="search" autocomplete="off"><div class="ek-gl-list"></div>'
-      + '<div class="ek-gf"></div></div>';
-    wrap.querySelector('.ek-gh b').textContent = W.t;
-    wrap.querySelector('.ek-gs').setAttribute('placeholder', W.s);
-    var list = wrap.querySelector('.ek-gl-list');
+    wrap.innerHTML = '<div class="ekw-panel" dir="' + dir + '"><div class="ekw-head"><b></b><button type="button" aria-label="close">×</button></div>'
+      + '<input class="ekw-search" type="search" autocomplete="off"><div class="ekw-list"></div>'
+      + '<div class="ekw-foot"></div></div>';
+    wrap.querySelector('.ekw-head b').textContent = W.t;
+    wrap.querySelector('.ekw-search').setAttribute('placeholder', W.s);
+    var list = wrap.querySelector('.ekw-list');
     LANGS.forEach(function (L) {
       var b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-code', L.code); b.setAttribute('lang', L.code);
       if (L.code === CODE) b.className = 'on';
@@ -89,11 +92,11 @@
       b.querySelector('.n').textContent = L.native; b.querySelector('.e').textContent = L.english;
       list.appendChild(b);
     });
-    var foot = wrap.querySelector('.ek-gf');
+    var foot = wrap.querySelector('.ekw-foot');
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     else foot.textContent = W.n + ' ' + LANGS.length + '+';
     d.body.appendChild(wrap);
-    wrap.querySelector('.ek-gs').focus();
+    wrap.querySelector('.ekw-search').focus();
     wrap.addEventListener('input', function (e) {
       var q = (e.target.value || '').trim().toLowerCase();
       [].forEach.call(list.children, function (b) {
@@ -102,7 +105,7 @@
       });
     });
     wrap.addEventListener('click', function (e) {
-      if (e.target === wrap || e.target.closest('.ek-gh button')) { wrap.remove(); return; }
+      if (e.target === wrap || e.target.closest('.ekw-head button')) { wrap.remove(); return; }
       if (e.target.closest('[data-back]')) { ls.set('ek_l', null); location.reload(); return; }
       var b = e.target.closest('button[data-code]'); if (!b) return;
       var c = b.getAttribute('data-code');
@@ -117,8 +120,8 @@
   function globe() {
     if (!LANGS || !LANGS.length) return;
     [].forEach.call(d.querySelectorAll('#langs,.ek-lang,.lsw'), function (box) {
-      if (box.querySelector('.ek-gl')) { box.querySelector('.ek-gl').classList.toggle('on', ON); return; }
-      var b = d.createElement('button'); b.type = 'button'; b.className = 'ek-gl' + (ON ? ' on' : '');
+      if (box.querySelector('.ekw-globe')) { box.querySelector('.ekw-globe').classList.toggle('on', ON); return; }
+      var b = d.createElement('button'); b.type = 'button'; b.className = 'ekw-globe' + (ON ? ' on' : '');
       b.setAttribute('aria-label', words().t); b.setAttribute('title', words().t); b.innerHTML = GLOBE;
       b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openPanel(); });
       box.appendChild(b);
@@ -200,7 +203,7 @@
     function ok(el2) {
       for (var e = el2; e && e !== d.body; e = e.parentNode) {
         if (e.nodeType !== 1) continue;
-        if (SKIP[e.tagName] || e.hasAttribute('data-l') || e.classList.contains('ek-gp') || e.getAttribute('translate') === 'no' || e.classList.contains('notranslate')) return false;
+        if (SKIP[e.tagName] || e.hasAttribute('data-l') || e.classList.contains('ekw-panel') || e.getAttribute('translate') === 'no' || e.classList.contains('notranslate')) return false;
         var lg = e.getAttribute('lang'); if (lg) return lg === 'en' || lg === CODE;
       }
       return true;
