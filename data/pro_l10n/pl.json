@@ -1,6 +1,42 @@
 {
 "lang": "pl",
 "s": {
+"about.03052d4f09": [
+"03052d4f09",
+"Świece i ceny pochodzą z publicznych danych rynkowych Binance (jedno połączenie na żywo dla całej strony); jeśli Binance jest niedostępne, używane jest OKX, a na końcu własny migawka strony — kolorowa kropka obok każdego wykresu wskazuje źródło. Kalendarz ekonomiczny to cotygodniowa kanał danych z ForexFactory; ruch Bitcoina po wydarzeniu to współzmienność, a nie przyczyna. Przy słabym połączeniu włącz „Oszczędzanie danych” w ustawieniach. Skorygowane wykresy (dywidendy i podwyższenia kapitału) to funkcja Giełdy Papierów Wartościowych w Teheranie i nie mają zastosowania do krypto. Rynkowe kursy w Iranie to publiczne dane z tgju.org; ceny monet w tomanach są szacunkowe: cena z Binance × kurs Tethera w tomanach."
+],
+"about.0ae8b63705": [
+"0ae8b63705",
+"<b>Narzędzia analizy:</b> linia trendu, półprosta, kanał równoległy, zniesienie i rozszerzenie Fibonacciego, wachlarz Ganna, widły Andrewsa, prostokąt, elipsa, pędzel, tekst, pomiar oraz pozycje długie/krótkie; z magnesem i cofaniem."
+],
+"about.0f82d55655": [
+"0f82d55655",
+"<b>Interwały sekundowe:</b> 1, 5, 10, 15 i 30 sekund oraz dowolny niestandardowy interwał czasowy (7 sekund, 45 minut, 3 godziny…) aż do miesięcznego."
+],
+"about.21c406ffc0": [
+"21c406ffc0",
+"<b>Multi-wykres:</b> od 1 do 16 wykresów na jednym ekranie, każdy z własną monetą i interwałem; synchronizacja symbolu, interwału, celownika, czasu i wskaźników."
+],
+"about.39eea1a26d": [
+"39eea1a26d",
+"<b>47 języków i Twoja własna waluta:</b> przestrzeń robocza w języku kurdyjskim, perskim, arabskim, angielskim i 43 innych, każdy pod własnym adresem (/market/de/, /market/jp/ …); każda moneta z Binance w Twojej walucie (euro, lira, rupia, jen i około 150 innych), obliczana tak jak toman z dziennego kursu referencyjnego lub z Twojego własnego kursu dla jednego Tethera lub jednego dolara."
+],
+"about.3e1eaac93b": [
+"3e1eaac93b",
+"<b>17 typów wykresów:</b> świece, puste świece, świece wolumenowe, Heikin Ashi, słupki OHLC, high-low, linia, linia ze znacznikami, linia stopniowa, obszarowy, obszarowy HLC, linia bazowa, kolumny, Renko, Line Break, Kagi oraz Point &amp; Figure."
+],
+"about.440ff5af6d": [
+"440ff5af6d",
+"<small>Nic tutaj nie stanowi porady finansowej. Wykresy są rysowane za pomocą <a href=\"https://www.tradingview.com/\" rel=\"noopener\" target=\"_blank\">TradingView Lightweight Charts™</a> (Apache-2.0).</small>"
+],
+"about.4778034bb1": [
+"4778034bb1",
+"<b>Automatyczne zapisywanie:</b> każdy rysunek, lista i ustawienie są zapisywane w Twojej przeglądarce w momencie ich wykonania; bez rejestracji, nic nie jest nigdzie wysyłane."
+],
+"about.586b71fb8a": [
+"586b71fb8a",
+"<b>Bar replay:</b> wybierz dowolną świecę z przeszłości i odtwarzaj rynek do przodu z dziewięcioma prędkościami, przechodź świeca po świecy do przodu i do tyłu, buduj każdą świecę z mniejszych i uruchamiaj razem każdy wykres układu; z kontem treningowym: zlecenia limit i stop, stop-loss i take-profit, trailing stop, dźwignia, prowizje oraz pełny raport."
+],
 "about.9f16c628ea": [
 "9f16c628ea",
 "<b>70 wskaźników:</b> średnie kroczące każdego rodzaju (HMA, ALMA, TEMA…), Bollinger, Ichimoku, Alligator, punkty zwrotne (pivot), ZigZag, SuperTrend, VWAP, RSI, MACD, Stochastic, ADX, Aroon, Fisher, CMF i więcej, z definicjami TradingView."
@@ -968,6 +1004,962 @@
 "forecast": [
 "528bc4bc38",
 "Prognoza"
+],
+"fromSnapshot": [
+"1c1629b2d0",
+"Migawek ze strony (Binance jest nieosiągalny)"
+],
+"fullscreen": [
+"d15f886d60",
+"Pełny ekran"
+],
+"futNote": [
+"ddbcc9fb51",
+"Pierwszy kontrakt kwartalny Bybit (z depozytem w monecie) jako jeden wykres, rolowany przy każdym wygaśnięciu (ostatni piątek marca, czerwca, września, grudnia o 08:00 UTC). Włącz B-ADJ obok interwału, aby wstecznie dostosować historię o lukę każdego rolowania."
+],
+"futSub": [
+"16db4a6d5c",
+"Kontrakty futures kwartalne, ciągłe"
+],
+"go": [
+"2e0b45f2a4",
+"Idź"
+],
+"goNote": [
+"f4b18a30f2",
+"Starsza historia ładuje się w razie potrzeby; małe interwały nie mogą cofać się o lata."
+],
+"goTo": [
+"c8f7bbcefa",
+"Przejdź do daty"
+],
+"greg": [
+"08c6a8a77d",
+"Gregoriański"
+],
+"h_bt": [
+"eb530e92f9",
+"Backtest uruchamia osiem strategii (dziewięć na BTC, z sygnałami Kurdistani) na maksymalnie 20 000 świec; optymalizator testuje każde ustawienie w zakresie i klasyfikuje je. Każdy raport zawiera krzywą kapitału, maksymalne obsunięcie (drawdown), wskaźnik Sharpe'a oraz plik CSV ze wszystkimi transakcjami."
+],
+"h_chart": [
+"9627f715d0",
+"Wybierz rynek za pomocą przycisku symbolu lub po prostu zacznij wpisywać jego nazwę. Interwały wynoszą od 1 sekundy do 1 miesiąca (również niestandardowe), z 17 typami wykresów oraz skalą logarytmiczną lub %-ową. Kontrakty futures kwartalne dla Bitcoin i Ethereum działają jako jeden ciągły wykres z B-ADJ."
+],
+"h_cur": [
+"a44df09c3d",
+"Przycisk waluty na górze pokazuje ceny w Twojej walucie: każda moneta z Binance jest przeliczana jak toman (cena Binance × wartość jednego tethera tego dnia). Kurs samego Tethera to również wykres. Możesz wpisać własny kurs dla 1 USDT lub 1 USD, a każda cena w tej walucie użyje go."
+],
+"h_data": [
+"83f1064f82",
+"Wszystko jest zapisywane w tej przeglądarce. Z menu obok nazwy przestrzeni roboczej: udostępnij link lub kod QR, aby otworzyć ją na innym urządzeniu, pobierz dane CSV lub pełny plik kopii zapasowej i załaduj go z powrotem."
+],
+"h_draw": [
+"2158fa3ea2",
+"Linie trendu, półproste, kanały, Fibonacci, Gann, pitchfork, kształty, tekst oraz pozycje długie/krótkie z lewego paska. Kliknij rysunek, aby uzyskać dostęp do przycisków koloru, grubości, alertu, blokady, kopiowania i usuwania."
+],
+"h_ind": [
+"3328a52709",
+"70 wbudowanych wskaźników z ich ustawieniami, gotowe szablony i warstwy Entekhab: posty Coin_Kurd, sygnały Kurdistani oraz wiadomości na wykresie."
+],
+"h_lang": [
+"14a1cc795b",
+"Przycisk przycisku globu otwiera 47 języków, każdy pod własnym adresem (/market/de/, /market/jp/ …). Twoja przestrzeń robocza, listy i alerty pozostają takie same w każdym języku."
+],
+"h_lay": [
+"bfabae964e",
+"Do 16 wykresów na jednym ekranie; połącz ich symbol, interwał, celownik i czas lub zachowaj każdy niezależny."
+],
+"h_news": [
+"f03ec5c79c",
+"Wydarzenia ekonomiczne pojawiają się jako flagi na wykresie wraz z ich wpływem; dzwonek przy dowolnym wydarzeniu ostrzega Cię przed nim. Wiadomości o danej monecie można zaznaczyć na wykresie z poziomu Wskaźników."
+],
+"h_rep": [
+"6bd91318c3",
+"Replay ukrywa przyszłość od dowolnej przeszłej świecy: odtwarzaj z dziewięcioma prędkościami, buduj każdą świecę z mniejszych, uruchamiaj wszystkie wykresy w układzie razem i handluj na koncie wirtualnym z zleceniami, stop-loss, take-profit i dźwignią."
+],
+"h_scr": [
+"78808f0597",
+"Każda moneta z Binance lub rynku Iranu w jednej tabeli: sortuj według wolumenu, zmiany, zakresu 24h lub RSI, filtruj zyskujące, tracące i skrajne wartości oraz obserwuj szerokość rynku."
+],
+"h_toman": [
+"329367a6b8",
+"Dolar, euro, złoto, monety, srebro i każda kryptowaluta w tomanach, z aktualnego kursu tgju."
+],
+"helpTab": [
+"c47ae15370",
+"Pomoc"
+],
+"hgTitle": [
+"0bd1c75bbb",
+"Szybki przewodnik"
+],
+"hide": [
+"34d8b60fe2",
+"Ukryj"
+],
+"hideAll": [
+"1f0e916e42",
+"Ukryj / pokaż narzędzia do rysowania"
+],
+"ht_alert": [
+"d0efe0b2c7",
+"Alerty"
+],
+"ht_bt": [
+"b0039bc8f4",
+"Backtest i optymalizator"
+],
+"ht_chart": [
+"40362a6bc6",
+"Wykresy i interwały"
+],
+"ht_cur": [
+"2bac23ae26",
+"Twoja waluta"
+],
+"ht_data": [
+"2dede873e5",
+"Zapisywanie, udostępnianie i przenoszenie"
+],
+"ht_draw": [
+"7514ee34bc",
+"Narzędzia do rysowania"
+],
+"ht_ind": [
+"8cf71374fa",
+"Wskaźniki"
+],
+"ht_lang": [
+"db07be1844",
+"Języki"
+],
+"ht_lay": [
+"1e4644dd56",
+"Wiele wykresów"
+],
+"ht_news": [
+"58c2ed3d97",
+"Kalendarz i wiadomości"
+],
+"ht_rep": [
+"e943ae8c41",
+"Replay i trening tradingu"
+],
+"ht_scr": [
+"7f27924c12",
+"Obserwowane rynki"
+],
+"ht_toman": [
+"70a46e482f",
+"Rynki w Tomanach"
+],
+"imp_H": [
+"b1a5954a48",
+"Wysoki"
+],
+"imp_L": [
+"a124947cbd",
+"Niski"
+],
+"imp_M": [
+"d404968ea9",
+"Średni"
+],
+"imp_X": [
+"a15e435c96",
+"Święto"
+],
+"importJson": [
+"d7e3104414",
+"Importuj z pliku"
+],
+"importQ": [
+"924d8e935e",
+"Zastąpić przestrzeń roboczą, rysunki, alerty i listy w tej przeglądarce plikiem?"
+],
+"in_ac": [
+"3ac2bdb7a6",
+"Accelerator Oscillator"
+],
+"in_adl": [
+"25eea6f1b3",
+"Accumulation/Distribution"
+],
+"in_adr": [
+"12646c291b",
+"Average Day Range"
+],
+"in_adx": [
+"fc9a3046b9",
+"ADX / DMI"
+],
+"in_alli": [
+"82b00a7395",
+"Alligator"
+],
+"in_alma": [
+"17a146f32c",
+"ALMA"
+],
+"in_ao": [
+"18ef16db89",
+"Awesome Oscillator"
+],
+"in_aroon": [
+"818461e24c",
+"Aroon"
+],
+"in_atr": [
+"3af0a08a5a",
+"ATR"
+],
+"in_bb": [
+"b44e884c35",
+"Bollinger Bands"
+],
+"in_bbp": [
+"744a5d8d5a",
+"Bollinger %B"
+],
+"in_bbpow": [
+"b33254a502",
+"Bull Bear Power"
+],
+"in_bbw": [
+"279140fb7c",
+"Bollinger BandWidth"
+],
+"in_bop": [
+"3ce5f72450",
+"Balance of Power"
+],
+"in_cci": [
+"2086539684",
+"CCI"
+],
+"in_chop": [
+"07f1c48e7a",
+"Choppiness Index"
+],
+"in_chosc": [
+"17d55b2957",
+"Chaikin Oscillator"
+],
+"in_cmf": [
+"76cf6fe9a6",
+"Chaikin Money Flow"
+],
+"in_cmo": [
+"bde8858087",
+"Chande Momentum"
+],
+"in_copp": [
+"025c720b24",
+"Coppock Curve"
+],
+"in_crsi": [
+"d788a94022",
+"Connors RSI"
+],
+"in_dc": [
+"5a8e70b183",
+"Donchian Channels"
+],
+"in_dema": [
+"e7ad4eaef1",
+"DEMA"
+],
+"in_dpo": [
+"72cce6d3bc",
+"Detrended Price Osc."
+],
+"in_efi": [
+"6dccb80880",
+"Elder Force Index"
+],
+"in_ema": [
+"67b9b8a57f",
+"EMA"
+],
+"in_env": [
+"ac9a37fbe8",
+"Envelopes"
+],
+"in_eom": [
+"a945a6428e",
+"Ease of Movement"
+],
+"in_fisher": [
+"eb9846eace",
+"Fisher Transform"
+],
+"in_fract": [
+"5b7b1d99c5",
+"Fractals"
+],
+"in_hma": [
+"c65ed6ce02",
+"Hull MA"
+],
+"in_hv": [
+"7700ed0881",
+"Historical Volatility"
+],
+"in_ichi": [
+"d2945a19b9",
+"Ichimoku Cloud"
+],
+"in_kc": [
+"b1521c1478",
+"Keltner Channels"
+],
+"in_kst": [
+"1774613f5b",
+"Know Sure Thing"
+],
+"in_lsma": [
+"b9a704fcab",
+"LSMA"
+],
+"in_macd": [
+"e09f635f4e",
+"MACD"
+],
+"in_macross": [
+"586a90f61a",
+"MA Cross"
+],
+"in_mass": [
+"cf5a05c8ae",
+"Mass Index"
+],
+"in_mfi": [
+"5fc86aeec6",
+"Money Flow Index"
+],
+"in_mgd": [
+"aa3db32fb0",
+"McGinley Dynamic"
+],
+"in_mom": [
+"c29791e587",
+"Momentum"
+],
+"in_obv": [
+"31006b0724",
+"OBV"
+],
+"in_piv": [
+"70a6528c08",
+"Pivot Points"
+],
+"in_ppo": [
+"bf863777e6",
+"PPO"
+],
+"in_psar": [
+"7bd7543cd4",
+"Parabolic SAR"
+],
+"in_pvt": [
+"3a2a51a1f4",
+"Price Volume Trend"
+],
+"in_ribbon": [
+"9577cc8abc",
+"MA Ribbon"
+],
+"in_roc": [
+"4604d3c440",
+"Rate of Change"
+],
+"in_rsi": [
+"2a00496640",
+"RSI"
+],
+"in_rvgi": [
+"cefd5ba303",
+"Relative Vigor Index"
+],
+"in_rvi": [
+"1e48f22bc6",
+"Relative Volatility Index"
+],
+"in_sd": [
+"8b0c43ec4b",
+"Standard Deviation"
+],
+"in_sma": [
+"337f15d864",
+"SMA"
+],
+"in_smma": [
+"4ae7e185a9",
+"SMMA"
+],
+"in_srsi": [
+"9cbc4f7bea",
+"Stochastic RSI"
+],
+"in_st": [
+"fbb9397fce",
+"SuperTrend"
+],
+"in_stoch": [
+"5f8a5bbd51",
+"Stochastic"
+],
+"in_tema": [
+"41227a56e5",
+"TEMA"
+],
+"in_trix": [
+"9faf8d0ea1",
+"TRIX"
+],
+"in_tsi": [
+"b021a74f82",
+"True Strength Index"
+],
+"in_uo": [
+"e8a49abdab",
+"Ultimate Oscillator"
+],
+"in_vo": [
+"4eac06eb80",
+"Volume Oscillator"
+],
+"in_vol": [
+"3b18e8e332",
+"Volume"
+],
+"in_vortex": [
+"5a9a2f0644",
+"Vortex"
+],
+"in_vwap": [
+"081d3e8e7c",
+"VWAP"
+],
+"in_vwma": [
+"2fdaec23f9",
+"VWMA"
+],
+"in_willr": [
+"a5f521013b",
+"Williams %R"
+],
+"in_wma": [
+"3b02c32b34",
+"WMA"
+],
+"in_zz": [
+"9c6fc38f47",
+"ZigZag"
+],
+"indAlert": [
+"61f608dbce",
+"Wskaźnik"
+],
+"ind_ac": [
+"0719f0f7c4",
+"Acceleracja wskaźnika Awesome Oscillator"
+],
+"ind_adl": [
+"5ba791caa0",
+"Suma skumulowana wolumenu przepływu pieniędzy"
+],
+"ind_adr": [
+"f409849f73",
+"Średnia z maksimum − minimum"
+],
+"ind_adx": [
+"7c639e3034",
+"Siła trendu z +DI i −DI"
+],
+"ind_alli": [
+"96c9e76dba",
+"Williams Alligator: szczęka, zęby i wargi przesunięte w przód"
+],
+"ind_alma": [
+"0f70916dbb",
+"Średnia krocząca Arnauda Legoux"
+],
+"ind_ao": [
+"55f9651b7f",
+"Momentum: SMA 5 minus SMA 34 z punktu środkowego"
+],
+"ind_aroon": [
+"03d12d9ced",
+"Liczba świec od najwyższego szczytu i najniższego dołka"
+],
+"ind_atr": [
+"ffe1ef3913",
+"Średnia rzeczywista zasięgu (zmienność)"
+],
+"ind_bb": [
+"eae6620c87",
+"Średnia ± 2 odchylenia standardowe"
+],
+"ind_bbp": [
+"64b4e3a715",
+"Miejsce zamknięcia wewnątrz wstęg"
+],
+"ind_bbpow": [
+"073f3f886c",
+"Elder: szczyty i dołki względem EMA"
+],
+"ind_bbw": [
+"4a79161c36",
+"Szerokość wstęg (ściskanie)"
+],
+"ind_bop": [
+"f15b118c3e",
+"(zamknięcie − otwarcie) / (maksimum − minimum)"
+],
+"ind_cci": [
+"a50928c16b",
+"Wskaźnik kanału towarowego"
+],
+"ind_chop": [
+"1aa4d72d41",
+"Rynek trendowy (niski) lub boczny (wysoki)"
+],
+"ind_chosc": [
+"9ce48d30d8",
+"MACD linii akumulacji/dystrybucji"
+],
+"ind_cmf": [
+"eba520ed7c",
+"Ważona wolumenem presja kupujących vs sprzedających"
+],
+"ind_cmo": [
+"37f0be56dc",
+"Oscylator momentum Chande (−100 do 100)"
+],
+"ind_copp": [
+"bf330f58dd",
+"Długoterminowe momentum: WMA z dwóch temp zmian"
+],
+"ind_crsi": [
+"88b32534cd",
+"Połączone RSI, streak RSI i percentyl"
+],
+"ind_dc": [
+"2efb6d0b59",
+"Najwyższy szczyt i najniższy dołek z n świec"
+],
+"ind_dema": [
+"2d6077f26d",
+"Podwójna wykładnicza średnia krocząca"
+],
+"ind_dpo": [
+"104e724da0",
+"Cena minus dawna średnia: cykle bez trendu"
+],
+"ind_efi": [
+"c65b356729",
+"Zmiana ceny × wolumen, wygładzone"
+],
+"ind_ema": [
+"c499047c5b",
+"Wykładnicza średnia krocząca"
+],
+"ind_env": [
+"e2cf023f50",
+"Średnia krocząca z wstęgami oddalonymi o stały %"
+],
+"ind_eom": [
+"d648aafe8d",
+"Łatwość ruchu ceny na jednostkę wolumenu"
+],
+"ind_fisher": [
+"fc72a2f934",
+"Przekształca ceny w rozkład bliski normalnemu"
+],
+"ind_fract": [
+"9f48cce298",
+"Fraktale Williamsa: lokalne szczyty i dołki"
+],
+"ind_hma": [
+"709351f832",
+"Średnia krocząca Hulla: szybka i wygładzona"
+],
+"ind_hv": [
+"2f8a5d247e",
+"Uroczniona zmienność stóp zwrotu (%)"
+],
+"ind_ichi": [
+"5e0ce39ddb",
+"Tenkan, Kijun, chmura 25 świec w przód i linia opóźniona"
+],
+"ind_kc": [
+"afaa6cb350",
+"EMA ± 2 × ATR"
+],
+"ind_kst": [
+"87fc8c4f3b",
+"Ważona suma czterech wygładzonych temp zmian"
+],
+"ind_live": [
+"593e7bb96b",
+"Najnowszy odczyt na żywo wskaźników Kurdistani dla tej monety"
+],
+"ind_lsma": [
+"00a8d3b0d2",
+"Średnia krocząca najmniejszych kwadratów (regresja liniowa)"
+],
+"ind_macd": [
+"a5a15bd6b9",
+"EMA 12 − EMA 26 z linią sygnałową 9"
+],
+"ind_macross": [
+"831f2be175",
+"Szybka i wolna średnia krocząca dla przecięć"
+],
+"ind_mass": [
+"9d1e46cae8",
+"Rozszerzenie zasięgu, które często wyprzedza odwrócenie"
+],
+"ind_mfi": [
+"f83140e67f",
+"RSI ważone wolumenem"
+],
+"ind_mgd": [
+"fe15155f4e",
+"Średnia krocząca dostosowująca się do prędkości rynku"
+],
+"ind_mom": [
+"d6640bbc39",
+"Cena obecna minus cena n świec temu"
+],
+"ind_news": [
+"a95010ef34",
+"Nagłówki o tej monecie, zaznaczone w momencie publikacji (wiadomości ze strony z ostatniego dnia)"
+],
+"ind_obv": [
+"4ae26547e4",
+"Wskaźnik równowagi wolumenu"
+],
+"ind_piv": [
+"fd3f6c2d6b",
+"Standardowe punkty zwrotne (P, R1–R3, S1–S3), automatyczny okres"
+],
+"ind_posts": [
+"cfc6e33d3e",
+"Każdy post Coin_Kurd o tej monecie, z zachowaniem ceny 1, 4 i 24 godziny później"
+],
+"ind_ppo": [
+"2be2c47a2c",
+"MACD w procentach, porównywalne między różnymi cenami"
+],
+"ind_psar": [
+"28e4b9667e",
+"Punkty Stop-and-Reverse"
+],
+"ind_pvt": [
+"f2ff51c8ae",
+"Wolumen dodawany proporcjonalnie do % zmiany"
+],
+"ind_ribbon": [
+"eb81a82636",
+"Cztery średnie kroczące (20, 50, 100, 200)"
+],
+"ind_roc": [
+"499e537d71",
+"Procentowa zmiana przez n świec"
+],
+"ind_rsi": [
+"7f5ca5943b",
+"Wskaźnik siły względnej, 0–100"
+],
+"ind_rvgi": [
+"c6d3faa7c5",
+"Siła zamknięcie-minus-otwarcie względem zasięgu"
+],
+"ind_rvi": [
+"b36c8a14b6",
+"Jak RSI, ale zbudowane na zmienności"
+],
+"ind_sd": [
+"ad180e58aa",
+"Odchylenie cen zamknięcia wokół ich średniej"
+],
+"ind_sigs": [
+"1ea04687cb",
+"Sygnały wskaźników Kurdistani (tylko wyniki) z ich rzeczywistymi rezultatami"
+],
+"ind_sma": [
+"26db009730",
+"Prosta średnia krocząca"
+],
+"ind_smma": [
+"e59cc99c1d",
+"Wygładzona średnia krocząca (Wilder)"
+],
+"ind_srsi": [
+"479deb7dbf",
+"Stochastyczny RSI"
+],
+"ind_st": [
+"8d66b52001",
+"Linia podążająca ATR zmieniająca się z trendem"
+],
+"ind_stoch": [
+"87477b0f85",
+"%K i %D, 0–100"
+],
+"ind_tema": [
+"1ff881355e",
+"Potrójna wykładnicza średnia krocząca"
+],
+"ind_trix": [
+"68a8f31d3e",
+"Tempo zmiany potrójnie wygładzonej EMA"
+],
+"ind_tsi": [
+"a932c2a407",
+"Podwójnie wygładzone momentum"
+],
+"ind_uo": [
+"182e4a763e",
+"Presja kupujących w trzech okresach"
+],
+"ind_vo": [
+"a99f6a0038",
+"Średnia wolumenu szybka vs wolna (%)"
+],
+"ind_vol": [
+"08d6eb1b9a",
+"Wolumen obrotu każdej świecy z jej 20-świecową średnią"
+],
+"ind_vortex": [
+"6badda8c94",
+"Dodatni i ujemny ruch trendu (VI+ / VI−)"
+],
+"ind_vwap": [
+"6d86714413",
+"Średnia cena ważona wolumenem, resetowana o 00:00 UTC"
+],
+"ind_vwma": [
+"7526646bd7",
+"Średnia krocząca ważona wolumenem"
+],
+"ind_willr": [
+"1859838f88",
+"Zamknięcie względem zasięgu n świec"
+],
+"ind_wma": [
+"b08be7d4d3",
+"Ważona średnia krocząca"
+],
+"ind_zz": [
+"633eef3f51",
+"Łączy fale większe niż określony %"
+],
+"indicator": [
+"61f608dbce",
+"Wskaźnik"
+],
+"indicators": [
+"8cf71374fa",
+"Wskaźniki"
+],
+"irNote": [
+"67feca879f",
+"Wolny rynek w Iranie z tgju.org, w tomanach (światowe uncje w dolarach). Najkrótszy timeframe: 5 minut."
+],
+"iranMarket": [
+"f2f9cf1f16",
+"Złoto i waluty (toman)"
+],
+"irtNote": [
+"a1512a5cf1",
+"W tomanach: cena Binance × kurs tomada dla tethera (tgju.org: zamknięcia dzienne, dziś na żywo). Szacunek, nie order book irańskiej giełdy."
+],
+"ivBar": [
+"e496fd2013",
+"Świeca"
+],
+"ivNone": [
+"4c4d97bb8c",
+"Brak mniejszego kroku dla tego timeframe'u"
+],
+"jalali": [
+"0d43839c8f",
+"Kalendarz perski"
+],
+"keepDraw": [
+"2fb302d539",
+"Tryb rysowania (pozostań przy narzędziu)"
+],
+"langNote": [
+"8ee767eeaa",
+"Kurdyjski, perski, arabski i angielski są tłumaczone ręcznie. Pozostałe języki są tłumaczone maszynowo, a nietłumaczone frazy wyświetlają się po angielsku."
+],
+"langSearch": [
+"c3613b3142",
+"Znajdź język…"
+],
+"langTitle": [
+"89b86ab0e6",
+"Język"
+],
+"last": [
+"d1c69a859a",
+"Ostatnia"
+],
+"layout": [
+"972ad8d8a5",
+"Układ"
+],
+"layoutLoaded": [
+"7a40dfe395",
+"Otwarto układ „{n}”"
+],
+"layoutName": [
+"3f83daee27",
+"Nazwa układu"
+],
+"layoutSaved": [
+"e78f25ba1c",
+"Układ zapisany"
+],
+"length": [
+"3bade34ecb",
+"Długość"
+],
+"level": [
+"7c7f5d049f",
+"Poziom"
+],
+"lineEnded": [
+"8cb0c445a4",
+"Linia nie dociera do teraźniejszości: przedłuż ją lub narysuj promień."
+],
+"lineGone": [
+"8d9da1a07c",
+"rysunek usunięty"
+],
+"lineNow": [
+"c09ecc8299",
+"Linia jest teraz na poziomie {p}."
+],
+"liq": [
+"707f0a2509",
+"Likw."
+],
+"listName": [
+"63fb0d7fb0",
+"Nazwa listy"
+],
+"lists": [
+"57c9502a7d",
+"Listy"
+],
+"liveNone": [
+"bb18029677",
+"Brak jeszcze odczytu na żywo wskaźników Kurdistani dla tej monety."
+],
+"loading": [
+"33ce417454",
+"Wczytywanie…"
+],
+"locList": [
+"4be427203b",
+"Monety w {c}"
+],
+"locNote": [
+"f0efd31399",
+"W {c}: cena Binance × wartość jednego tethera w {c} danego dnia (kurs referencyjny lub własny). Szacunek, nie order book giełdy."
+],
+"lock": [
+"891ebccd5b",
+"Zablokuj"
+],
+"long": [
+"11eda67f9b",
+"Long"
+],
+"ly_live": [
+"c3d036c573",
+"Analiza na żywo Kurdistani"
+],
+"ly_news": [
+"0413da5dcd",
+"Wiadomości na wykresie"
+],
+"ly_posts": [
+"8eb481b328",
+"Posty Coin_Kurd"
+],
+"ly_sigs": [
+"5f703c7eba",
+"Sygnały Kurdistani"
+],
+"maType": [
+"15f86c051e",
+"Średnia"
+],
+"magnet": [
+"effa915951",
+"Magnes (przyciągaj do open/high/low/close)"
+],
+"maxIndAlerts": [
+"1d7c6d8c4f",
+"Maksymalnie 12 aktywnych alertów wskaźników."
+],
+"maxInds": [
+"f759a9bf38",
+"Maksymalnie 12 wskaźników na wykres."
+],
+"message": [
+"4e39567064",
+"Notatka (opcjonalnie)"
+],
+"more": [
+"4bab2d8fe1",
+"Więcej"
+],
+"moreTf": [
+"fdbe20f376",
+"Wszystkie timeframe'y"
+],
+"moveToSection": [
+"98d183e7cb",
+"Przenieś do sekcji"
+],
+"myLayouts": [
+"0f210d43ca",
+"Moje układy"
+],
+"myList": [
+"ee71d326b7",
+"Moja watchlist"
+],
+"na_all": [
+"2de8cf3e6c",
+"Wszystkie wiadomości krypto"
+],
+"na_imp": [
+"c08ad1252d",
+"Ważne (regulacje, bezpieczeństwo, ETF-y)"
+],
+"na_off": [
+"e3de5ab0ca",
+"Wyłączone"
+],
+"na_watch": [
+"1628defce4",
+"Monety z mojej watchlisty"
+],
+"nc_etf_institutional": [
+"4a07737ade",
+"ETF-y i instytucje"
+],
+"nc_news": [
+"34c808d0a6",
+"Wiadomości"
 ],
 "nc_onchain": [
 "bdb125f542",
@@ -1953,6 +2945,474 @@
 "fd3e796994",
 "Łączenie…"
 ],
+"st_poll": [
+"52d0ef4ee0",
+"Odświeżane co kilka sekund"
+],
+"st_rep": [
+"c0f85d6679",
+"Replay"
+],
+"st_snap": [
+"dd679a8380",
+"Migawka strony (opóźniona)"
+],
+"st_tgju": [
+"8f89d3728b",
+"tgju"
+],
+"startHere": [
+"4b174dbee9",
+"Rozpocznij replay w tym miejscu"
+],
+"stepBack": [
+"ff2d88e70b",
+"Jedna świeca w tył"
+],
+"stepFwd": [
+"e1dc417622",
+"Jedna świeca w przód"
+],
+"stop": [
+"9e253470c8",
+"Zatrzymaj"
+],
+"strategy": [
+"69fb26dda8",
+"Strategia"
+],
+"supAi": [
+"e49bfc629f",
+"Zapytaj asystenta witryny"
+],
+"supGroup": [
+"7aff038610",
+"Zapytaj na grupie Telegram"
+],
+"supNote": [
+"86d9a2fbf0",
+"Twoje wykresy, listy i alerty pozostają w tej przeglądarce; nic nie jest nigdzie wysyłane, chyba że wybierzesz Telegram."
+],
+"supTitle": [
+"f32d5a3b17",
+"Wsparcie"
+],
+"symbol": [
+"3f84ef531f",
+"Symbol"
+],
+"symbolCol": [
+"a9749253c3",
+"Krypto"
+],
+"sync": [
+"25df637672",
+"Synchronizuj między wykresami"
+],
+"sync_cross": [
+"800092e3e1",
+"Celownik"
+],
+"sync_ind": [
+"8cf71374fa",
+"Wskaźniki"
+],
+"sync_sym": [
+"3f84ef531f",
+"Symbol"
+],
+"sync_tf": [
+"ddeda2ec94",
+"Timeframe i typ wykresu"
+],
+"sync_time": [
+"a26d0ddaae",
+"Przewijanie (czas)"
+],
+"t_arrow": [
+"3a4758c3cc",
+"Strzałka"
+],
+"t_brush": [
+"25f085220c",
+"Pędzel"
+],
+"t_channel": [
+"c0350b7736",
+"Kanał równoległy"
+],
+"t_circle": [
+"8580e3175f",
+"Elipsa"
+],
+"t_cursor": [
+"2239943c8d",
+"Kursor"
+],
+"t_ext": [
+"794d85f0b5",
+"Linia rozszerzona"
+],
+"t_fib": [
+"18c530863b",
+"Zniesienie Fibonacciego"
+],
+"t_fibext": [
+"73655be9d6",
+"Rozszerzenie Fibonacciego oparte na trendzie"
+],
+"t_gann": [
+"ba563cbfc5",
+"Wachlarz Ganna"
+],
+"t_hline": [
+"6f471f8257",
+"Linia pozioma"
+],
+"t_hray": [
+"0bcbc4e087",
+"Promień poziomy"
+],
+"t_long": [
+"666f195fc4",
+"Pozycja długa (Long)"
+],
+"t_measure": [
+"2bedd64d85",
+"Zakres cenowy / Pomiar"
+],
+"t_pitch": [
+"29135fd404",
+"Widełki Andrewsa"
+],
+"t_ray": [
+"eb23efbb26",
+"Promień"
+],
+"t_rect": [
+"c158695a64",
+"Prostokąt"
+],
+"t_short": [
+"a8daf74669",
+"Pozycja krótka (Short)"
+],
+"t_text": [
+"c3328c39b0",
+"Tekst"
+],
+"t_trend": [
+"e810388344",
+"Linia trendu"
+],
+"t_vline": [
+"a790288017",
+"Linia pionowa"
+],
+"target": [
+"61ad50a9b9",
+"Cel"
+],
+"templates": [
+"f25b700ed9",
+"Szablony"
+],
+"tester": [
+"b498a94d94",
+"Tester strategii"
+],
+"testerShort": [
+"c6e3b65510",
+"Backtest"
+],
+"textPh": [
+"c3328c39b0",
+"Tekst"
+],
+"tf": [
+"85decb73d1",
+"Timeframe"
+],
+"tfMin": [
+"06144a8431",
+"{s} nie ma krótszego timeframe'u niż {tf}."
+],
+"tfg_d": [
+"72e4668ebc",
+"Dni i dłuższe"
+],
+"tfg_h": [
+"9e25a34e63",
+"Godziny"
+],
+"tfg_m": [
+"092f99ea11",
+"Minuty"
+],
+"tfg_s": [
+"5fb1db5278",
+"Sekundy"
+],
+"time": [
+"6c82e6dd86",
+"Czas"
+],
+"timezone": [
+"eea79afd83",
+"Strefa czasowa"
+],
+"toman": [
+"831a6bbefd",
+"IRT"
+],
+"tomanName": [
+"2075653709",
+"Toman irański"
+],
+"tooBig": [
+"89a2c1ba44",
+"Zbyt wiele rysunków na jeden link; usuń niektóre i spróbuj ponownie."
+],
+"tooFar": [
+"b29db0358a",
+"To jest dalej wstecz, niż ten timeframe może załadować; wybierz wyższy timeframe."
+],
+"topFixed": [
+"1a66879287",
+"Ta lista aktualizuje się automatycznie na podstawie wolumenu Binance."
+],
+"topVol": [
+"10817f084e",
+"Najchętniej handlowane na Binance"
+],
+"tpAuto": [
+"671d6e0869",
+"automatycznie: {v}"
+],
+"tpBoxNote": [
+"012ad786ce",
+"Puste lub 0 = automatycznie: zaokrąglony ATR(14) z ostatnich świec. Klocki są tworzone z cen zamknięcia."
+],
+"tpLinesNote": [
+"67fff9cd0a",
+"Linia odwrócenia pojawia się tylko wtedy, gdy cena zamknięcia przekroczy wszystkie ostatnie linie (3 to ustawienie klasyczne)."
+],
+"tp_box": [
+"e896711c52",
+"Rozmiar klocka"
+],
+"tp_boxes": [
+"362edf5c4f",
+"Odwrócenie (klocki)"
+],
+"tp_lines": [
+"77b96fe843",
+"Liczba linii"
+],
+"tp_rev": [
+"1f3a883506",
+"Wartość odwrócenia"
+],
+"tplBuilt": [
+"63fba5a10e",
+"Gotowe"
+],
+"tplDel": [
+"5b9f44ac0b",
+"Usuń szablon"
+],
+"tplMine": [
+"84ed8f3d1c",
+"Moje szablony"
+],
+"tplName": [
+"954ab955f2",
+"Nazwa szablonu"
+],
+"tplNone": [
+"b6b21978f0",
+"Brak zapisanych szablonów"
+],
+"tplSave": [
+"0fbe546267",
+"Zapisz te wskaźniki jako szablon"
+],
+"tplSaved": [
+"aa1dc3dd61",
+"Szablon zapisany"
+],
+"tpl_ek": [
+"77007d231b",
+"Entekhab: posty, sygnały i analiza na żywo"
+],
+"tpl_ichi": [
+"b7d2edc2d0",
+"Ichimoku"
+],
+"tpl_mom": [
+"e9a10a32d6",
+"Momentum: RSI + MACD"
+],
+"tpl_scalp": [
+"4a6393c0fa",
+"Scalping (sekundowy): VWAP · EMA 9 · SuperTrend"
+],
+"tpl_trend": [
+"c3b53789a3",
+"Trend: EMA 20 · 50 · 200"
+],
+"tpl_vola": [
+"f322419a94",
+"Zmienność: Bollinger + ATR"
+],
+"tr_down": [
+"bf93e5ce8b",
+"Spadek"
+],
+"tr_range": [
+"a16c5bbe4b",
+"Konsolidacja"
+],
+"tr_up": [
+"2038bdec92",
+"Wzrost"
+],
+"trades": [
+"597b1092b3",
+"Transakcje"
+],
+"trigger": [
+"323a10825b",
+"Uruchamia"
+],
+"tyOpts": [
+"b4954f20d0",
+"Ustawienia klocków i odwrócenia…"
+],
+"ty_area": [
+"2745debaa6",
+"Obszarowy"
+],
+"ty_bars": [
+"91288ecedf",
+"Słupki (OHLC)"
+],
+"ty_baseline": [
+"e6ab7982fa",
+"Linia bazowa"
+],
+"ty_candle": [
+"fad29404d2",
+"Świece"
+],
+"ty_columns": [
+"cf723c59b6",
+"Kolumny"
+],
+"ty_heikin": [
+"4b7afcbe0c",
+"Heikin Ashi"
+],
+"ty_highlow": [
+"1c158518c3",
+"Maks-Min"
+],
+"ty_hlcarea": [
+"3c77efefe8",
+"Obszar HLC"
+],
+"ty_hollow": [
+"03da03fd32",
+"Świece puste"
+],
+"ty_kagi": [
+"424cfc679f",
+"Kagi"
+],
+"ty_lbreak": [
+"781ae9bc2d",
+"Przełamanie linii (Line Break)"
+],
+"ty_line": [
+"ea96760037",
+"Liniowy"
+],
+"ty_linemk": [
+"cc33807f4d",
+"Linia ze znacznikami"
+],
+"ty_pnf": [
+"d5c2fee520",
+"Punktowo-symboliczny (Point & figure)"
+],
+"ty_price": [
+"50374796da",
+"Tylko cena (z ignorowaniem czasu)"
+],
+"ty_renko": [
+"e7cdcbed47",
+"Renko"
+],
+"ty_step": [
+"9157154e9e",
+"Linia stopniowa"
+],
+"ty_volcandle": [
+"1273b8c326",
+"Świece wolumenowe"
+],
+"tzLocal": [
+"da6496d5a4",
+"Czas tego urządzenia"
+],
+"u_d": [
+"50c9e8d5fc",
+"D"
+],
+"u_h": [
+"27d5482eeb",
+"g"
+],
+"u_m": [
+"6b0d31c0d5",
+"m"
+],
+"u_mo": [
+"c63ae6dd4f",
+"M"
+],
+"u_s": [
+"a0f1490a20",
+"s"
+],
+"u_w": [
+"e2415cb7f6",
+"T"
+],
+"undo": [
+"39fc721248",
+"Cofnij"
+],
+"undoHint": [
+"ff90b79a2b",
+"Cofnij (Ctrl+Z) przywraca je."
+],
+"unlock": [
+"1526a17ee7",
+"Odblokuj"
+],
+"value": [
+"3e8248e32e",
+"Cena"
+],
+"valuePct": [
+"bf55390d8d",
+"Procent (%)"
+],
+"vol24": [
+"ad33e8a3b2",
+"Wolumen 24h"
+],
 "volTimes": [
 "f8b992ce8d",
 "Wielokrotność średniej"
@@ -1997,14 +3457,30 @@
 "f": {
 "alertsHow": [
 "c500492742",
+2
+],
+"h_alert": [
+"28c69d926a",
 1
 ],
 "sendBot": [
 "28b70e4ad7",
-1
+2
 ],
 "slTp": [
 "41d1998bce",
+2
+],
+"supAdmin": [
+"603ac35951",
+1
+],
+"supClass": [
+"f2ae8b94c0",
+1
+],
+"tgAlso": [
+"ad88cbfa09",
 1
 ]
 }
