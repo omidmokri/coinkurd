@@ -28,6 +28,8 @@ import time
 
 import requests
 
+import ai
+
 log = logging.getLogger("aiart")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(os.environ.get("REALITY_DATA_DIR") or os.path.join(ROOT, "data"), "art")
@@ -39,12 +41,13 @@ DAILY = int(os.environ.get("AIART_DAILY", "40"))        # a hard ceiling so art 
 _dead = set()
 
 
+class Quota(RuntimeError):
+    """this key has no image quota left today"""
+
+
 def key():
-    k = os.environ.get("GEMINI_API_KEY", "").strip()
-    if k:
-        return k
-    g = os.environ.get("COIN_KURD_API_KEY", "").strip()
-    return g if g.startswith(("AIza", "AQ.")) else ""
+    """the current key of the shared pool (scripts/ai.py): the owner's keys, each with its own daily quota"""
+    return ai.key()
 
 
 def available():
@@ -115,6 +118,8 @@ def _ask(model, text):
         timeout=TIMEOUT)
     if r.status_code in (400, 404):                     # wrong model name or no image support on this key
         raise LookupError(f"{model}: {r.status_code} {r.text[:160]}")
+    if r.status_code == 429:                            # this key's quota: another key may still have some
+        raise Quota(f"{model}: 429 {r.text[:160]}")
     r.raise_for_status()
     for p in (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", []):
         d = p.get("inlineData") or p.get("inline_data")
@@ -155,18 +160,28 @@ def scene(t):
     for m in MODELS:
         if m in _dead:
             continue
-        try:
-            im = _fit(_ask(m, text))
-            os.makedirs(CACHE, exist_ok=True)
-            im.convert("RGB").save(path, "JPEG", quality=92, optimize=True)
-            log.info("backdrop painted by %s for %s/%s", m, env, pal)
-            return im
-        except LookupError as ex:
-            log.info("%s unavailable (%s); trying the next model", m, ex)
-            _dead.add(m)
-        except Exception as ex:
-            log.warning("backdrop failed on %s: %s", m, ex)
-            break
+        while True:                                     # the same model, each of the owner's keys in turn
+            try:
+                im = _fit(_ask(m, text))
+                os.makedirs(CACHE, exist_ok=True)
+                im.convert("RGB").save(path, "JPEG", quality=92, optimize=True)
+                log.info("backdrop painted by %s for %s/%s", m, env, pal)
+                return im
+            except Quota as ex:
+                ai._exhausted.add((ai._kid(key()), m))
+                if ai.rotate_key(m):
+                    log.info("backdrop: a key is out of quota on %s (%s); the next key takes over", m, ex)
+                    continue
+                log.info("backdrop: every key is out of quota on %s; trying the next model", m)
+                _dead.add(m)
+                break
+            except LookupError as ex:
+                log.info("%s unavailable (%s); trying the next model", m, ex)
+                _dead.add(m)
+                break
+            except Exception as ex:
+                log.warning("backdrop failed on %s: %s", m, ex)
+                return None
     return None
 
 

@@ -24,13 +24,18 @@ Checks on every translated string (check()):
   * not empty and not absurdly long.
 
 Budget — the free Gemini quota is shared with the site's own steps (post translations, news, Arabic, reports), and those
-come first: at most --requests calls (default 10) and --seconds (default 200) a run, and at most PRO_L10N_DAILY calls
-(default 80) a quota day (Google resets it at midnight Pacific time; the count is kept in data/pro_l10n/_quota.json).
-Only the run's own model is used: the first exhausted quota stops the run, instead of walking scripts/ai.py's
-fallback models (on 2026-11-15 the first run did that and used up two models' day within minutes of the reset).
-Languages are filled one after another in PRIORITY order, so each becomes complete as early as possible.
+come first. The owner keeps several free keys (one per Google account), each with its own daily quota, so the ceiling
+is PRO_L10N_DAILY calls (default 80) a key a quota day — Google resets it at midnight Pacific time, and the count is
+kept in data/pro_l10n/_quota.json. A run stops at --requests calls (default 10 a key) or --seconds (default 200).
+Only the run's own model is used (scripts/ai.py's generate_on_model): a key whose quota runs out hands over to the
+next key, and ai.py's fallback models are left to the site's own steps (on 2026-11-15 a run walked those models and
+used up two models' day within minutes of the reset).
 
-CLI:  python3 scripts/pro_l10n.py [--requests N] [--seconds S] [--lang de,tr] [--batch 120] [--status]
+With more than one key the batches of a run go out several at a time — one worker a key, each worker on its own key,
+so the per-minute limits do not collide. Languages are filled in PRIORITY order, so each becomes complete as early as
+possible.
+
+CLI:  python3 scripts/pro_l10n.py [--requests N] [--seconds S] [--lang de,tr] [--batch 120] [--jobs N] [--status]
 Test: python3 tests/test_pro_l10n.py (a fake Gemini in its real answer format; no network)
 """
 import argparse
@@ -38,9 +43,11 @@ import hashlib
 import html
 import json
 import os
+import queue
 import re
 import subprocess
 import sys
+import threading
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +73,7 @@ KEEP = ["Binance", "OKX", "Bybit", "Deribit", "Gate", "tgju.org", "tgju", "Tradi
 # (chart types and indicator names — Renko, Kagi, Ichimoku … — are left to each language: platforms write them in
 #  their own script in some languages)
 FAIL_MAX = 3      # a string that failed its checks this many times stays in English (no endless retries on the quota)
-DAILY = int(os.environ.get("PRO_L10N_DAILY", "80"))   # Gemini calls a quota day at most (the site's own steps come first)
+DAILY = int(os.environ.get("PRO_L10N_DAILY", "80"))   # Gemini calls a quota day A KEY at most (the site's own steps come first)
 KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
 
 # the script a language is written in: a translated string must use it wherever the English has words to translate
@@ -285,15 +292,9 @@ def gemini():
         return None
 
     def gen(p):
-        # the run's model only (ai._generate, not ai.generate): an exhausted quota raises QuotaError and the run stops,
-        # leaving ai.py's fallback models to the site's own steps
-        if ai._exhausted:
-            raise ai.QuotaError("a quota ran out earlier in this run")
-        try:
-            return ai._generate(p, True, 0.1, 8192, 3, 120)
-        except ai.QuotaError:
-            ai._exhausted.add(ai.model())
-            raise
+        # the run's model only (ai.generate_on_model, not ai.generate): a key whose daily quota runs out hands over to
+        # the next key, and ai.py's fallback models are left to the site's own steps
+        return ai.generate_on_model(p, True, 0.1, 8192, 3, 120)
     return gen
 
 
@@ -374,6 +375,86 @@ def run(langs, requests_max, seconds, size, gen, src, log=print, counter=None):
     return status(src)
 
 
+def plan(langs, src, size, limit):
+    """the requests a run would make, in order: (language, the keys of one batch), page text of a language first"""
+    items, state = [], {}
+    for code in langs:
+        s, f = load(code, fails=True)
+        state[code] = (s, f)
+        todo = missing(src, s, f)
+        if not todo:
+            continue
+        # page text first: a language's page becomes indexable as soon as its page text is in
+        todo.sort(key=lambda k: (not (k.startswith("seo.") or k.startswith("about.")), k))
+        for keys in batches(todo, src, size):
+            items.append((code, keys))
+            if len(items) >= limit:
+                return items, state
+    return items, state
+
+
+def run_parallel(langs, requests_max, seconds, size, src, pool, log=print, counter=None):
+    """run(), but with the owner's keys working at once — one worker a key, each on its own key.
+
+    Each key has its own per-minute and per-day quota, so the workers never queue behind one another. A worker whose
+    key runs out of quota puts its batch back for another key and stops. Returns the same status() map as run().
+    """
+    import ai  # noqa: E402
+    t0 = time.time()
+    counter = counter if counter is not None else {}
+    counter["used"] = 0
+    ai.model()                      # resolve the model once, before the workers start (it is looked up over the network)
+    items, state = plan(langs, src, size, requests_max)
+    if not items:
+        return status(src)
+    q = queue.Queue()
+    for it in items:
+        q.put(it)
+    lock = threading.Lock()
+    changed = set()
+
+    def worker(api_key):
+        while time.time() - t0 <= seconds:
+            try:
+                code, keys = q.get_nowait()
+            except queue.Empty:
+                return
+            with lock:
+                counter["used"] += 1
+            try:
+                good, bad = translate_batch(code, keys, src, lambda p: ai.generate_with(api_key, p, True, 0.1, 8192, 3, 120))
+            except Exception as e:  # noqa: BLE001
+                name = type(e).__name__
+                with lock:
+                    log(f"{code}: request failed ({name}: {str(e)[:160]})")
+                if name == "QuotaError":
+                    q.put((code, keys))     # this key is spent for the run; another one can still do the batch
+                    return
+                continue
+            with lock:
+                s, f = state[code]
+                for k, v in good.items():
+                    s[k] = [h(src[k]), v]
+                    f.pop(k, None)
+                    changed.add(code)
+                for k in bad:
+                    if k in src:
+                        n = f[k][1] + 1 if k in f and f[k][0] == h(src[k]) else 1
+                        f[k] = [h(src[k]), n]
+                        changed.add(code)
+                log(f"{code}: {len(good)}/{len(keys)} kept" + (f"; dropped {dict(list(bad.items())[:6])}" if bad else ""))
+
+    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in pool]
+    for th in threads:
+        th.start()
+    for th in threads:
+        th.join(timeout=max(30.0, seconds - (time.time() - t0) + 120))
+    for code in sorted(changed):
+        s, f = state[code]
+        save(code, s, f)
+    return status(src)
+
+
 def status(src):
     out = {}
     for code in pro_langs.NEW:
@@ -385,10 +466,12 @@ def status(src):
 
 
 def main():
+    import ai  # noqa: E402
     ap = argparse.ArgumentParser()
-    ap.add_argument("--requests", type=int, default=int(os.environ.get("PRO_L10N_REQUESTS", "10")))
+    ap.add_argument("--requests", type=int, default=0, help="requests this run (default: 10 a key)")
     ap.add_argument("--seconds", type=int, default=int(os.environ.get("PRO_L10N_SECONDS", "200")))
     ap.add_argument("--batch", type=int, default=120)
+    ap.add_argument("--jobs", type=int, default=0, help="requests at once (default: one a key)")
     ap.add_argument("--lang", default="")
     ap.add_argument("--status", action="store_true")
     a = ap.parse_args()
@@ -397,22 +480,36 @@ def main():
         st = status(src)
         for k in PRIORITY:
             print(f"{k:4} {st[k]['done']:4}/{st[k]['total']}  page text {'yes' if st[k]['seo'] else 'no'}")
+        done = sum(v["done"] for v in st.values())
+        print(f"\n{done} of {len(src) * len(st)} strings in {len(st)} languages; "
+              f"complete: {sum(1 for v in st.values() if v['done'] == len(src))}; "
+              f"page text ready: {sum(1 for v in st.values() if v['seo'])}")
         return
     gen = gemini()
     if not gen:
         print("pro_l10n: no Gemini key — nothing translated this run (the pages use what the cache has)")
         return
-    langs = [x for x in a.lang.split(",") if x] or PRIORITY
-    left = DAILY - quota_used()
+    pool = ai.keys()
+    print(f"pro_l10n: {ai.pool_note()}")
+    # every key has its own daily quota, so the day's ceiling grows with the pool
+    cap = DAILY * len(pool)
+    left = cap - quota_used()
     if left <= 0:
-        print(f"pro_l10n: today's {DAILY} Gemini calls are used; more tomorrow (the pages use what the cache has)")
+        print(f"pro_l10n: today's {cap} Gemini calls ({DAILY} a key) are used; more tomorrow "
+              f"(the pages use what the cache has)")
         return
+    langs = [x for x in a.lang.split(",") if x] or PRIORITY
+    requests_max = min(a.requests or int(os.environ.get("PRO_L10N_REQUESTS", "0")) or 10 * len(pool), left)
+    jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))
     c = {}
     try:
-        st = run(langs, min(a.requests, left), a.seconds, a.batch, gen, src, counter=c)
+        if jobs > 1:
+            st = run_parallel(langs, requests_max, a.seconds, a.batch, src, pool[:jobs], counter=c)
+        else:
+            st = run(langs, requests_max, a.seconds, a.batch, gen, src, counter=c)
     finally:
         quota_add(c.get("used", 0))
-    print(f"pro_l10n: {c.get('used', 0)} Gemini calls this run, {quota_used()} of {DAILY} today")
+    print(f"pro_l10n: {c.get('used', 0)} Gemini calls this run on {jobs} key(s), {quota_used()} of {cap} today")
     done = sum(v["done"] for v in st.values())
     print(f"pro_l10n: {done} of {len(src) * len(st)} strings translated in {len(st)} languages; "
           f"page text ready in {sum(1 for v in st.values() if v['seo'])}")
