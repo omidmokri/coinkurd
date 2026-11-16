@@ -65,6 +65,9 @@ jobs:
       - name: Arabic dictionaries (from the cache; no new translations here)
         continue-on-error: true
         run: python scripts/i18n_ar.py --no-translate
+      - name: Site languages (from the cache; no new translations here)
+        continue-on-error: true
+        run: python scripts/i18n_site.py --no-translate
       - name: Build the /market/ language pages and their string packs (from the cache)
         continue-on-error: true
         run: python scripts/build_market_l10n.py
