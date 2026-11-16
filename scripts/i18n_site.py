@@ -333,7 +333,7 @@ def write_dicts(code, pages, scripts, common, need):
 
 
 READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered once this much of it is translated
-VER = "1"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "2"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
