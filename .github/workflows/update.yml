@@ -573,16 +573,16 @@ jobs:
           COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/i18n_ar.py || echo "::warning::Arabic dictionaries failed; the site ships without new ones"
-        # The whole site in the other 43 languages too, from the same strings (scripts/i18n_site.py): a few batches a
-        # run on the key pool, kept in data/i18n/. A string not translated yet simply shows in English.
-        - name: Site languages (the other 43, new strings only, capped a run)
+      # The whole site in the other 43 languages too, from the same strings (scripts/i18n_site.py): a few batches a
+      # run on the key pool, kept in data/i18n/. A string not translated yet simply shows in English.
+      - name: Site languages (the other 43, new strings only, capped a run)
         continue-on-error: true
         timeout-minutes: 8
         run: python scripts/i18n_site.py || echo "::warning::site languages failed; the pages use what the cache has"
       - name: Commit the Arabic cache
         run: |
-                    git add data/i18n_ar.json data/i18n 2>/dev/null || true
-                    git diff --cached --quiet || git commit -m "chore: site dictionaries $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git add data/i18n_ar.json data/i18n 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: site dictionaries $(date -u +'%Y-%m-%d %H:%M UTC')"
           for i in 1 2 3; do
             git pull --rebase --autostash -X theirs origin main && git push && break
             sleep 5
