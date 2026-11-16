@@ -28,16 +28,16 @@ concurrency:
 env:
   PYTHONUNBUFFERED: "1"
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
-    ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
-    AZARI_API_KEY: ${{ secrets.AZARI_API_KEY }}
-    HAMA_ADI_KEY: ${{ secrets.HAMA_ADI_KEY }}
-    HANA_ADI_KEY: ${{ secrets.HANA_ADI_KEY }}
-    HANA2_ADI_KEY: ${{ secrets.HANA2_ADI_KEY }}
-    KURD_ADI_KEY: ${{ secrets.KURD_ADI_KEY }}
-    MOKRI_API_KEY: ${{ secrets.MOKRI_API_KEY }}
-    OMID_API_KEY: ${{ secrets.OMID_API_KEY }}
-    SALAH_API_KEY: ${{ secrets.SALAH_API_KEY }}
-    SARA_API_KEY: ${{ secrets.SARA_API_KEY }}
+  ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
+  AZARI_API_KEY: ${{ secrets.AZARI_API_KEY }}
+  HAMA_ADI_KEY: ${{ secrets.HAMA_ADI_KEY }}
+  HANA_ADI_KEY: ${{ secrets.HANA_ADI_KEY }}
+  HANA2_ADI_KEY: ${{ secrets.HANA2_ADI_KEY }}
+  KURD_ADI_KEY: ${{ secrets.KURD_ADI_KEY }}
+  MOKRI_API_KEY: ${{ secrets.MOKRI_API_KEY }}
+  OMID_API_KEY: ${{ secrets.OMID_API_KEY }}
+  SALAH_API_KEY: ${{ secrets.SALAH_API_KEY }}
+  SARA_API_KEY: ${{ secrets.SARA_API_KEY }}
 
 jobs:
   sync:
