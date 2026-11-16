@@ -27,6 +27,8 @@ concurrency:
 
 env:
   PYTHONUNBUFFERED: "1"
+  # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
+  GEMINI_KEYS: ${{ toJSON(secrets) }}
 
 jobs:
   sync:
