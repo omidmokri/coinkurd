@@ -10,7 +10,10 @@
 می‌رود. کلیدها از این منابع خوانده می‌شوند (به همین ترتیب):
 
   * GEMINI_API_KEY        — یک کلید، یا چند کلید جداشده با کاما/فاصله/خط جدید
-  * COIN_KURD_API_KEY     — اگر شکل کلید جمنای داشته باشد (AIza… یا AQ.…)
+  * COIN_KURD_API_KEY     — همین‌طور: هر بخشی که شکل کلید جمنای داشته باشد (AIza… یا AQ.…) برداشته می‌شود و
+                            بقیه (مثلاً یک کلید sk-ant-) دست‌نخورده برای مصرف‌کنندهٔ خودش می‌ماند. چون این متغیر
+                            همین حالا به همهٔ مرحله‌های ورک‌فلو داده می‌شود، گذاشتن چند کلید جداشده با کاما در
+                            همین یک راز، بدون هیچ تغییری در ورک‌فلو، کل استخر را فعال می‌کند.
   * هر متغیر محیطی دیگری که نامش به _KEY ختم شود و مقدارش شکل کلید جمنای داشته باشد
     (ALI_API_KEY، HAMA_ADI_KEY، SARA_API_KEY …)
   * GEMINI_KEYS — خروجی toJSON(secrets) در ورک‌فلو: هر کلیدی که مالک در گیت‌هاب اضافه کند بدون دست‌زدن به
@@ -78,9 +81,10 @@ def keys():
     # کلید صریح: هر شکلی داشته باشد پذیرفته می‌شود (تست‌ها و اجرای دستی هم از همین راه کلید می‌دهند)
     for v in re.split(r"[,\s]+", os.environ.get("GEMINI_API_KEY", "")):
         add(v)
-    g = os.environ.get("COIN_KURD_API_KEY", "").strip()
-    if _is_key(g):
-        add(g)
+    # همین متغیر هم می‌تواند چند کلید داشته باشد؛ هر چیزی که کلید جمنای نباشد (مثل sk-ant-…) نادیده گرفته می‌شود
+    for v in re.split(r"[,\s]+", os.environ.get("COIN_KURD_API_KEY", "")):
+        if _is_key(v):
+            add(v)
     # بقیهٔ کلیدهای مالک: یا هرکدام در یک متغیر جدا، یا همه با هم در GEMINI_KEYS (toJSON(secrets))
     for name in sorted(os.environ):
         if name.endswith("_KEY") and name not in ("GEMINI_API_KEY", "COIN_KURD_API_KEY") and _is_key(os.environ[name]):
