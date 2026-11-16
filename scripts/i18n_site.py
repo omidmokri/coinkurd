@@ -1,0 +1,394 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+The whole site in the other 43 languages — the same layer that gives it Arabic, opened to every language of /market/.
+
+entekhab.net is written in Persian, Sorani and English, and Arabic is already a fourth: scripts/i18n_ar.py reads the
+English of every built page and of the scripts it runs, translates it once, and assets/ar.js puts the Arabic in
+while the page loads. This script does that for the 43 languages in scripts/pro_langs.py, so the site reads in all
+47. It reuses i18n_ar's own reader, so a string is found the same way for every language and the two can never drift.
+
+Not translated, by the owner's choice: the encyclopedia (i18n_ar.NO_DICT_TOP), and pages that are already in a
+language of their own (/market/<code>/, marked data-noar).
+
+The cache, data/i18n/<code>.json (committed, one file a language):
+  {"lang": "de", "s": {"<the English>": "<the translation>"}}
+A string is translated once and kept. A translation is only kept when it passes the checks below; what is not
+translated yet simply shows in English, so a language is readable from its first run.
+
+Checks on every translated string (check()):
+  * the same {1}, {2}… placeholders as the English, in any order (grammar moves them);
+  * written in the language's own script (Cyrillic for Russian, Devanagari for Hindi …) wherever the English has
+    words to translate, and no Arabic or Persian letters in a language that does not use them;
+  * every protected name still there (Binance, Coin_Kurd, TradingView, BTC …), not empty, not absurdly long, and
+    not simply the English handed back.
+
+Budget: the free Gemini keys are shared with the rest of the site, so a run makes at most --requests calls and
+--seconds of work, and the batches go out on all of the owner's keys at once (scripts/ai.py's pool, one worker a
+key). Languages are filled in scripts/pro_l10n.PRIORITY order, so each becomes complete as early as possible.
+
+Output, i18n/<code>/ (built, never committed — the same shape as i18n/ar/):
+  common.json            the menus, footer and tab bar: the strings nearly every page has
+  page/<path>.json       what one page needs beyond those
+  js/<file>.json         what one script in assets/ needs
+  status.json            coverage
+
+CLI:  python3 scripts/i18n_site.py [--requests N] [--seconds S] [--lang de,tr] [--jobs N] [--status] [--no-translate]
+Test: python3 tests/test_i18n_site.py
+"""
+import argparse
+import json
+import os
+import queue
+import re
+import sys
+import threading
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import i18n_ar  # noqa: E402   (the reader: walk, Page, js_strings, variants, numkey, worth, page_key)
+import pro_l10n  # noqa: E402  (PRIORITY, the quota day, the script table)
+import pro_langs  # noqa: E402
+
+ROOT = i18n_ar.ROOT
+CACHE = os.path.join(ROOT, "data", "i18n")
+OUT = os.path.join(ROOT, "i18n")
+LANGS = pro_l10n.PRIORITY                       # the 43, most-read first
+DAILY = int(os.environ.get("I18N_SITE_DAILY", "60"))    # Gemini calls a quota day A KEY (pro_l10n comes first)
+
+PH = re.compile(r"\{\d+\}")
+KEEP = ["entekhab.net", "Coin_Kurd", "Coin Kurd", "Entekhab", "Telegram", "TradingView", "Binance", "mempool.space",
+        "Bitcoin Core", "OKX", "Bybit", "Deribit", "Kurdistani", "Discord", "GitHub", "BTC", "ETH", "USDT", "USDC",
+        "RSI", "MACD", "EMA", "SMA", "VWAP", "ATR", "ADX", "OHLC", "CSV", "PNG", "JSON", "QR", "UTC", "API"]
+KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_.])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
+SCRIPT = pro_l10n.SCRIPT                        # the alphabet a language must be written in
+ARABIC = re.compile(r"[؀-ۿ]")
+PERSIAN = re.compile(r"[پچژگ]")
+TAG = re.compile(r"<[^>]+>")
+
+
+# --------------------------------------------------------------------------------- the strings the site needs
+def corpus():
+    """(pages, scripts, common, need) — read with i18n_ar's own reader, so both layers see the same strings"""
+    pages, scripts = {}, {}
+    for path in i18n_ar.walk():
+        if os.path.relpath(path, ROOT).split(os.sep)[0] in i18n_ar.NO_DICT_TOP:
+            continue
+        try:
+            with open(path, encoding="utf-8") as fh:
+                if i18n_ar.NOAR.search(fh.read(800)):      # already in a language of its own
+                    continue
+            doc = open(path, encoding="utf-8").read()
+        except OSError:
+            continue
+        p = i18n_ar.Page()
+        try:
+            p.feed(doc)
+        except Exception as e:  # noqa: BLE001
+            print("skip", path, e, file=sys.stderr)
+            continue
+        keys = set(p.out)
+        for code in p.inline:
+            keys |= i18n_ar.js_strings(code)
+        if p.title and p.base and i18n_ar.worth(p.title):
+            keys.add(i18n_ar.numkey(p.title))
+        pages[path] = set().union(*(i18n_ar.variants(k) for k in keys)) if keys else keys
+    adir = os.path.join(ROOT, "assets")
+    for f in sorted(os.listdir(adir)) if os.path.isdir(adir) else []:
+        if f.endswith(".js") and f not in ("ar.js", "i18n.js") and not f.endswith(".min.js"):
+            try:
+                ks = i18n_ar.js_strings(open(os.path.join(adir, f), encoding="utf-8").read())
+                scripts[f] = set().union(*(i18n_ar.variants(k) for k in ks)) if ks else ks
+            except Exception as e:  # noqa: BLE001
+                print("skip js", f, e, file=sys.stderr)
+    from collections import Counter
+    cnt = Counter(k for ks in pages.values() for k in ks)
+    common = {k for k, c in cnt.items() if c >= max(3, len(pages) * 0.6)}
+    need = set().union(*pages.values()) if pages else set()
+    for v in scripts.values():
+        need |= v
+    return pages, scripts, common, need
+
+
+# --------------------------------------------------------------------------------- the cache
+def cache_path(code):
+    return os.path.join(CACHE, code + ".json")
+
+
+def load(code):
+    try:
+        with open(cache_path(code), encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    s = (d.get("s") if isinstance(d, dict) else None) or {}
+    return {k: v for k, v in s.items() if isinstance(v, str) and v}
+
+
+def save(code, s):
+    os.makedirs(CACHE, exist_ok=True)
+    with open(cache_path(code), "w", encoding="utf-8") as f:
+        json.dump({"lang": code, "s": dict(sorted(s.items()))}, f, ensure_ascii=False, separators=(",", ":"))
+        f.write("\n")
+
+
+# --------------------------------------------------------------------------------- checks
+def words_to_translate(en):
+    t = TAG.sub(" ", PH.sub(" ", en))
+    for _, rx in KEEP_RE:
+        t = rx.sub(" ", t)
+    return re.findall(r"[A-Za-z]{2,}", t)
+
+
+def check(code, en, tr):
+    """None when the translation can be used, else why not"""
+    if not isinstance(tr, str) or not tr.strip():
+        return "empty"
+    tr = tr.strip()
+    if sorted(PH.findall(en)) != sorted(PH.findall(tr)):
+        return "placeholders"
+    for k, rx in KEEP_RE:
+        if rx.search(en) and not rx.search(tr):
+            return "lost " + k
+    if len(tr) > 4 * len(en) + 60:
+        return "too long"
+    words = words_to_translate(en)
+    sc = SCRIPT.get(code)
+    if sc and (len(words) >= 2 or any(len(w) >= 5 for w in words)) and not re.search(sc, tr):
+        return "wrong script"
+    if code not in ("ur",) and ARABIC.search(tr) and not ARABIC.search(en):
+        return "arabic letters"
+    if PERSIAN.search(tr) and not PERSIAN.search(en):
+        return "persian letters"
+    if not sc and len(words) >= 4 and tr.lower() == en.strip().lower():
+        return "untranslated"
+    return None
+
+
+# --------------------------------------------------------------------------------- Gemini
+PROMPT = """You translate the interface and articles of entekhab.net, a crypto-market education site (live prices, charts,
+Bitcoin history, trading lessons, on-chain data), from English into {lang} ({native}){variant}.
+
+Rules:
+- Return ONLY a JSON array of strings, the same length and order as the input array.
+- Keep every placeholder like {{1}}, {{2}} exactly as written (you may move it to where the grammar needs it).
+- Keep untranslated: tickers and symbols (BTC, ETH, USDT, sat/vB, vB, kB, MB, %, $), numbers, URLs, code, and these
+  names: {keep}.
+- Use the words traders and trading platforms use in {lang} (candles, timeframe, indicator, support, resistance,
+  leverage, wallet, mining, block, transaction, fee, order book).
+- Short interface labels stay short: a button stays one or two words. Keep the tone neutral and clear.
+- Write numbers with Western digits (0-9). No explanations, no quotes around the whole answer, no notes.
+
+Input:
+"""
+
+
+def prompt_for(code, batch):
+    r = pro_langs.BY[code]
+    return PROMPT.format(lang=r["english"], native=r["native"], variant=pro_l10n.VARIANT.get(code, ""),
+                         keep=", ".join(KEEP)) + json.dumps(batch, ensure_ascii=False)
+
+
+def translate_batch(code, batch, gen):
+    """one request; returns {english: translation} of what passed the checks, and the reasons the rest did not"""
+    out = gen(prompt_for(code, batch))
+    if isinstance(out, str):
+        m = re.search(r"\[.*\]", out, re.S)
+        out = json.loads(m.group(0)) if m else None
+    if not isinstance(out, list) or len(out) != len(batch):
+        return {}, {"*": "answer was not a list of the right length"}
+    good, bad = {}, {}
+    for en, tr in zip(batch, out):
+        tr = i18n_ar.norm(str(tr)) if tr is not None else ""
+        why = check(code, en, tr)
+        if why:
+            bad[en] = why
+        else:
+            good[en] = tr
+    return good, bad
+
+
+def batches(keys, size=60, chars=6000):
+    cur, n = [], 0
+    for k in keys:
+        if cur and (len(cur) >= size or n + len(k) > chars):
+            yield cur
+            cur, n = [], 0
+        cur.append(k)
+        n += len(k)
+    if cur:
+        yield cur
+
+
+# --------------------------------------------------------------------------------- filling the caches
+def plan(langs, need, common, limit):
+    """the requests a run would make: (language, one batch), the strings nearly every page has first"""
+    items, state = [], {}
+    for code in langs:
+        s = load(code)
+        state[code] = s
+        todo = [k for k in need if k not in s]
+        if not todo:
+            continue
+        todo.sort(key=lambda k: (k not in common, len(k), k))
+        for b in batches(todo):
+            items.append((code, b))
+            if len(items) >= limit:
+                return items, state
+    return items, state
+
+
+def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=None):
+    """fill the caches of `langs`, the owner's keys working at once — one worker a key"""
+    import ai  # noqa: E402
+    t0 = time.time()
+    counter = counter if counter is not None else {}
+    counter["used"] = 0
+    ai.model()                       # settle the model before the workers start
+    items, state = plan(langs, need, common, requests_max)
+    if not items:
+        return state
+    q = queue.Queue()
+    for it in items:
+        q.put(it)
+    lock = threading.Lock()
+    changed = set()
+
+    def worker(api_key):
+        while time.time() - t0 <= seconds:
+            try:
+                code, batch = q.get_nowait()
+            except queue.Empty:
+                return
+            with lock:
+                counter["used"] += 1
+            try:
+                good, bad = translate_batch(code, batch, lambda p: ai.generate_with(api_key, p, True, 0.1, 8192, 2, 120))
+            except ai.QuotaError as e:
+                with lock:
+                    log(f"{code}: key {ai._kid(api_key)} is out for this run ({str(e)[:110]})")
+                q.put((code, batch))
+                return
+            except ai.RateLimited:
+                q.put((code, batch))
+                time.sleep(20)
+                continue
+            except Exception as e:  # noqa: BLE001
+                with lock:
+                    log(f"{code}: request failed on key {ai._kid(api_key)} ({type(e).__name__}: {str(e)[:140]})")
+                continue
+            with lock:
+                state[code].update(good)
+                if good:
+                    changed.add(code)
+                log(f"{code}: {len(good)}/{len(batch)} kept" + (f"; dropped {dict(list(bad.items())[:4])}" if bad else ""))
+
+    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in pool]
+    for th in threads:
+        th.start()
+    for th in threads:
+        th.join(timeout=max(30.0, seconds - (time.time() - t0) + 120))
+    for code in sorted(changed):
+        save(code, state[code])
+    return state
+
+
+# --------------------------------------------------------------------------------- the dictionaries
+def write_dicts(code, pages, scripts, common, need):
+    """i18n/<code>/ — the same shape as i18n/ar/, holding only what is translated"""
+    s = load(code)
+    out = os.path.join(OUT, code)
+    import shutil
+    if os.path.isdir(out):
+        shutil.rmtree(out)
+    os.makedirs(os.path.join(out, "page"), exist_ok=True)
+    os.makedirs(os.path.join(out, "js"), exist_ok=True)
+
+    def dump(rel, keys):
+        d = {k: s[k] for k in sorted(keys) if k in s}
+        with open(os.path.join(out, rel), "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
+        return len(d)
+
+    dump("common.json", common)
+    have = tot = 0
+    for path, keys in pages.items():
+        own = keys - common
+        if own:
+            dump(os.path.join("page", i18n_ar.page_key(path) + ".json"), own)
+        tot += len(keys)
+        have += sum(1 for k in keys if k in s)
+    for f, keys in scripts.items():
+        if keys:
+            dump(os.path.join("js", f[:-3] + ".json"), keys)
+            tot += len(keys)
+            have += sum(1 for k in keys if k in s)
+    cov = round(have / tot * 100, 1) if tot else 0
+    r = pro_langs.BY[code]
+    with open(os.path.join(out, "status.json"), "w", encoding="utf-8") as f:
+        json.dump({"lang": code, "dir": r["dir"], "coverage": cov, "strings": len(need),
+                   "translated": sum(1 for k in need if k in s),
+                   "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, f)
+    return cov
+
+
+def status(need):
+    return {c: {"done": sum(1 for k in need if k in load(c)), "total": len(need)} for c in LANGS}
+
+
+def main():
+    import ai  # noqa: E402
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--requests", type=int, default=0, help="requests this run (default: 8 a key)")
+    ap.add_argument("--seconds", type=int, default=int(os.environ.get("I18N_SITE_SECONDS", "240")))
+    ap.add_argument("--jobs", type=int, default=0, help="requests at once (default: one a key)")
+    ap.add_argument("--lang", default="")
+    ap.add_argument("--status", action="store_true")
+    ap.add_argument("--no-translate", action="store_true")
+    a = ap.parse_args()
+
+    pages, scripts, common, need = corpus()
+    print(f"i18n_site: {len(pages)} pages · {sum(1 for v in scripts.values() if v)} scripts · {len(need)} strings "
+          f"· {len(common)} on nearly every page")
+    if a.status:
+        for c in LANGS:
+            d = status(need)[c]
+            print(f"  {c:4} {d['done']:5}/{d['total']}")
+        st = status(need)
+        print(f"\n{sum(v['done'] for v in st.values()):,} of {len(need) * len(st):,} strings in {len(st)} languages; "
+              f"complete: {sum(1 for v in st.values() if v['done'] == len(need))}")
+        return
+
+    langs = [x for x in a.lang.split(",") if x] or LANGS
+    if not a.no_translate and ai.available():
+        pool = ai.keys()
+        print(f"i18n_site: {ai.pool_note()}")
+        cap = DAILY * len(pool)
+        left = cap - pro_l10n.quota_used()
+        if left <= 0:
+            print(f"i18n_site: today's {cap} Gemini calls are used; more tomorrow (the pages use what the cache has)")
+        else:
+            requests_max = min(a.requests or 8 * len(pool), left)
+            jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))
+            c = {}
+            try:
+                fill(langs, need, common, requests_max, a.seconds, pool[:jobs], counter=c)
+            finally:
+                pro_l10n.quota_add(c.get("used", 0))
+            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)")
+            print("i18n_site: the keys this run used —\n" + ai.pool_report())
+    elif not a.no_translate:
+        print("i18n_site: no Gemini key — nothing translated this run (the pages use what the cache has)")
+
+    ready = []
+    for code in LANGS:
+        cov = write_dicts(code, pages, scripts, common, need)
+        if cov:
+            ready.append(f"{code} {cov:.0f}%")
+    st = status(need)
+    print(f"i18n_site: {sum(v['done'] for v in st.values()):,} of {len(need) * len(st):,} strings in {len(st)} languages")
+    print("i18n_site: " + (", ".join(ready) if ready else "no language has any strings yet"))
+
+
+if __name__ == "__main__":
+    main()
