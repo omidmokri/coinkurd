@@ -12,6 +12,7 @@ limit, and that no key value is ever written to a log.
 Run: python3 tests/test_ai_keys.py"""
 import os
 import sys
+import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
@@ -127,6 +128,81 @@ def main():
            out == "done" and [x[1] for x in tried] == ["m1", "m1", "m2"] and [x[0] for x in tried[:2]] == K[:2], tried)
     finally:
         ai._generate = real
+
+    # ---- what Google's refusals mean for a key
+    env(GEMINI_API_KEY=f"{K[0]},{K[1]},{K[2]}")
+    real_post, real_sleep = ai.requests.post, time.sleep
+    ai.time.sleep = lambda s: None
+
+    class Resp:
+        def __init__(self, code, text=""):
+            self.status_code, self.text = code, text
+
+        def json(self):
+            return {}
+
+    def answers(seq):
+        """a Gemini that replies with the given statuses in turn"""
+        it = iter(seq)
+
+        def post(url, headers=None, json=None, timeout=None):
+            return next(it)
+        return post
+
+    FREE = '{"error":{"code":403,"message":"The Gemini API free tier is not available for this project."}}'
+    PERDAY = '{"error":{"code":429,"details":[{"violations":[{"quotaId":"GenerateRequestsPerDayPerProjectPerModel"}]}]}}'
+    MINUTE = '{"error":{"code":429,"message":"Resource has been exhausted."}}'
+    SLOW = '{"error":{"code":429},"retryDelay":"6711.0s"}'
+
+    def raises(statuses, tries=2):
+        ai.requests.post = answers(statuses)
+        try:
+            ai._generate("p", tries=tries)
+        except Exception as e:  # noqa: BLE001
+            return type(e).__name__
+        return None
+
+    ok("a 403 saying the project has no free tier retires that key", raises([Resp(403, FREE)]) == "QuotaError")
+    ok("a 429 that names a per-day quota retires the key", raises([Resp(429, PERDAY)]) == "QuotaError")
+    ok("a 429 with a delay of hours is a per-day quota too", raises([Resp(429, SLOW)]) == "QuotaError")
+    ok("a plain 429 is only the per-minute limit: it asks us to wait, it does not retire the key",
+       raises([Resp(429, MINUTE), Resp(429, MINUTE)]) == "RateLimited")
+    ok("another 4xx is neither: it is just a failed request", raises([Resp(400, '{"error":"bad"}')]) == "RuntimeError")
+
+    # a rate-limited key must still be usable; a retired one must not
+    ai.reset()
+    ai.requests.post = answers([Resp(429, MINUTE), Resp(429, MINUTE)])
+    try:
+        ai._generate("p", tries=2)
+    except ai.RateLimited:
+        pass
+    ok("a key that was only rate limited is still in the pool", len(ai.live_keys()) == 3 and ai.live_keys()[0] == K[0])
+    ai.requests.post = answers([Resp(403, FREE)])
+    try:
+        ai._generate("p", tries=1)
+    except ai.QuotaError:
+        ai._exhausted.add((ai._kid(ai.key()), ai.model()))
+    ok("a key whose project has no free tier drops out of the pool", len(ai.live_keys()) == 2)
+
+    # generate_on_model: a rate limit moves to the next key and keeps the first
+    ai.reset()
+    seen_keys = []
+
+    def one_slow_key(prompt, *a, **kw):
+        k = kw.get("api_key") or ai.key()
+        seen_keys.append(k)
+        if k == K[0]:
+            raise ai.RateLimited("too fast")
+        return {"ok": 1}
+    real_gen = ai._generate
+    ai._generate = one_slow_key
+    try:
+        out = ai.generate_on_model("p", True)
+        ok("a rate limit hands the request to the next key and keeps the first one in the pool",
+           out == {"ok": 1} and seen_keys == [K[0], K[1]] and len(ai.live_keys()) == 3, (seen_keys, len(ai.live_keys())))
+    finally:
+        ai._generate = real_gen
+        ai.requests.post, ai.time.sleep = real_post, real_sleep
 
     # ---- the per-minute limit belongs to each key
     env(GEMINI_API_KEY=f"{K[0]},{K[1]}")
