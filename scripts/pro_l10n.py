@@ -423,13 +423,23 @@ def run_parallel(langs, requests_max, seconds, size, src, pool, log=print, count
                 counter["used"] += 1
             try:
                 good, bad = translate_batch(code, keys, src, lambda p: ai.generate_with(api_key, p, True, 0.1, 8192, 3, 120))
-            except Exception as e:  # noqa: BLE001
-                name = type(e).__name__
+            except ai.QuotaError as e:
+                # this key is done for the run (its day is spent, or its project has no free tier): stop this worker
+                # and let another key take the batch
                 with lock:
-                    log(f"{code}: request failed ({name}: {str(e)[:160]})")
-                if name == "QuotaError":
-                    q.put((code, keys))     # this key is spent for the run; another one can still do the batch
-                    return
+                    log(f"{code}: key {ai._kid(api_key)} is out for this run ({str(e)[:120]})")
+                q.put((code, keys))
+                return
+            except ai.RateLimited as e:
+                # the key is fine, it was just asked too fast: wait a little and take the batch again
+                with lock:
+                    log(f"{code}: key {ai._kid(api_key)} rate limited ({str(e)[:120]}); waiting")
+                q.put((code, keys))
+                time.sleep(20)
+                continue
+            except Exception as e:  # noqa: BLE001
+                with lock:
+                    log(f"{code}: request failed on key {ai._kid(api_key)} ({type(e).__name__}: {str(e)[:160]})")
                 continue
             with lock:
                 s, f = state[code]

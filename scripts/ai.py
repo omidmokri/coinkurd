@@ -55,7 +55,11 @@ def thinking(mname):
 
 
 class QuotaError(RuntimeError):
-    pass
+    """این کلید تا فردا روی این مدل کاری از دستش برنمی‌آید (سهمیهٔ روزانه، یا پروژه‌ای که سطح رایگان ندارد)"""
+
+
+class RateLimited(RuntimeError):
+    """فقط خیلی سریع درخواست دادیم؛ کلید سالم است و کمی بعد دوباره جواب می‌دهد"""
 
 
 # ------------------------------------------------------------------ استخر کلیدها
@@ -199,9 +203,15 @@ def fallbacks():
 def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90):
     """ابتدا همهٔ کلیدها روی مدل فعلی؛ وقتی سهمیهٔ همه تمام شد، مدل بعدی دوباره با همهٔ کلیدها"""
     global _model, _ki
+    limited = 0
     while True:
         try:
             return _generate(prompt, as_json, temperature, max_tokens, tries, timeout)
+        except RateLimited:
+            # کلید سالم است، فقط شلوغ: برو سراغ کلید بعدی، ولی این یکی را کنار نگذار
+            limited += 1
+            if limited > len(keys()) or not rotate_key():
+                raise
         except QuotaError:
             _exhausted.add((_kid(key()), model()))
             if rotate_key():
@@ -222,9 +232,14 @@ def generate_on_model(prompt, as_json=False, temperature=0.2, max_tokens=4096, t
     """
     if keys() and not live_keys():
         raise QuotaError("every key's quota for this model ran out earlier in this run")
+    limited = 0
     while True:
         try:
             return _generate(prompt, as_json, temperature, max_tokens, tries, timeout)
+        except RateLimited:
+            limited += 1
+            if limited > len(keys()) or not rotate_key():
+                raise
         except QuotaError:
             _exhausted.add((_kid(key()), model()))
             if not rotate_key():
@@ -273,16 +288,26 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
             if r.status_code == 429:
                 m = re.search(r'"retryDelay":\s*"(\d+(?:\.\d+)?)s"', r.text)
                 delay = float(m.group(1)) if m else None
-                print(f"429 on {mname} (key {fp}): retryDelay={delay} {('PerDay' in r.text) and 'per-day quota' or ''}")
-                if delay is not None and delay <= 90 and i < tries - 1:
-                    time.sleep(delay + 1)   # سهمیهٔ دقیقه‌ای: صبر کن و دوباره
-                    continue
-                if "PerDay" in r.text or "per day" in r.text.lower() or delay is None or delay > 90:
+                # فقط وقتی کلید را کنار می‌گذاریم که گوگل صریحاً سهمیهٔ روزانه را گفته باشد (یا مهلتی چند ساعته داده
+                # باشد). ۴۲۹ بدون این نشانه معمولاً سهمیهٔ دقیقه‌ای است؛ قبلاً آن را هم «روزانه» می‌گرفتیم و کلیدِ
+                # سالم تا آخر اجرا از دست می‌رفت
+                per_day = ("PerDay" in r.text or "per day" in r.text.lower()
+                           or (delay is not None and delay > 300))
+                print(f"429 on {mname} (key {fp}): retryDelay={delay}" + (" per-day quota" if per_day else ""))
+                if per_day:
                     raise QuotaError("daily quota exhausted")
+                if i < tries - 1:
+                    time.sleep(delay + 1 if (delay is not None and delay <= 90) else 20 * (i + 1))
+                    continue
+                raise RateLimited(f"key {fp}: rate limited on {mname} after {tries} tries")
             time.sleep(15 * (i + 1))
             continue
+        if r.status_code == 403 and "free tier" in r.text.lower():
+            # کلیدی که پروژه‌اش سطح رایگان ندارد: تا آخر این اجرا هیچ درخواستی را جواب نمی‌دهد، پس کنارش می‌گذاریم
+            # تا کارگرش بی‌جهت دسته‌های بعدی را نسوزاند
+            raise QuotaError(f"key {fp}: the Gemini free tier is not available for this key's project")
         if r.status_code >= 400:
-            raise RuntimeError(f"{r.status_code}: {r.text[:300]}")
+            raise RuntimeError(f"{r.status_code} on key {fp}: {r.text[:300]}")
         data = r.json()
         try:
             text = "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
@@ -292,4 +317,4 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
             return text.strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
         return json.loads(text)
-    raise QuotaError("rate limited after retries")
+    raise RateLimited("rate limited after retries")
