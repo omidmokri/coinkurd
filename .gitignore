@@ -47,3 +47,7 @@ ks_pass*
 /market/*/
 /assets/pro/l10n/
 _world_post/
+
+# the built language dictionaries (scripts/i18n_ar.py, scripts/i18n_site.py): rebuilt every run,
+# served from the working tree, never committed — the caches they come from live in data/
+/i18n/
