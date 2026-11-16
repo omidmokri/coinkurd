@@ -213,10 +213,21 @@ def main():
     env(GEMINI_API_KEY=K[0])
     fp = ai._kid(K[0])
     ok("a key is logged only as a short fingerprint, never as itself",
-       len(fp) == 6 and fp not in K[0] and K[0] not in ai.pool_note() and ai.pool_note() == "1 Gemini key in the pool")
+       len(fp) == 6 and fp not in K[0] and K[0] not in ai.pool_note()
+       and ai.pool_note() == "1 Gemini key in the pool: GEMINI_API_KEY")
 
     env(GEMINI_API_KEY=f"{K[0]},{K[1]}")
-    ok("the pool is counted in plain words", ai.pool_note() == "2 Gemini keys in the pool")
+    ok("the pool is counted in plain words", ai.pool_note() == "2 Gemini keys in the pool: GEMINI_API_KEY, GEMINI_API_KEY")
+
+    # the report names the secret each key came from, says why a key dropped out, and never prints a key
+    env(ALI_API_KEY=K[0], SARA_API_KEY=K[1], HAMA_ADI_KEY=K[2])
+    ai.keys()
+    ai.retire(K[1], "this key's Google project has no Gemini free tier (it needs billing)", "m1")
+    rep = ai.pool_report()
+    ok("the report names each key's secret and what happened to it",
+       "ALI_API_KEY" in rep and "working" in rep and "SARA_API_KEY" in rep and "no Gemini free tier" in rep, rep)
+    ok("the report never contains a key itself", not any(k in rep for k in K))
+    ok("a retired key is out of the pool, the others are not", ai.live_keys("m1") == [K[0], K[2]])
 
     print(f"\n{len(FAILS)} failure(s)" if FAILS else "\nOK")
     sys.exit(1 if FAILS else 0)
