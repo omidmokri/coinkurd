@@ -332,6 +332,57 @@ def write_dicts(code, pages, scripts, common, need):
     return cov
 
 
+READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered once this much of it is translated
+VER = "1"      # bump when assets/i18n.js changes, so readers get the new one
+
+# the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
+# language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
+HEAD = ('<script id="ek-tr-h">try{if(localStorage.getItem("ek_l")&&localStorage.getItem("ek_ar")!=="1"'
+        '&&!/^\\/encyclopedia\\//.test(location.pathname)){var h=document.documentElement;h.classList.add("ek-tr-wait");'
+        'setTimeout(function(){h.classList.remove("ek-tr-wait")},2600)}}catch(e){}</script>'
+        '<style id="ek-tr-s">html.ek-tr-wait body{opacity:0!important}</style>')
+SCRIPT_TAG = f'<script src="/assets/i18n.js?v={VER}" defer></script>'
+HEAD_RE = re.compile(r'<script id="ek-tr-h">.*?</script><style id="ek-tr-s">.*?</style>', re.S)
+SCRIPT_TAG_RE = re.compile(r'<script src="/assets/i18n\.js\?v=\w+" defer></script>')
+
+
+def inject(path):
+    """put assets/i18n.js (and its no-flash snippet) on a page; take it off one already in a language of its own"""
+    s = open(path, encoding="utf-8").read()
+    own = i18n_ar.NOAR.search(s[:800]) or os.path.relpath(path, ROOT).split(os.sep)[0] in i18n_ar.NO_DICT_TOP
+    if own:
+        s2 = SCRIPT_TAG_RE.sub("", HEAD_RE.sub("", s))
+        if s2 != s:
+            open(path, "w", encoding="utf-8").write(s2)
+        return False
+    s = HEAD_RE.sub(lambda m: HEAD, s, count=1) if 'id="ek-tr-h"' in s else re.sub(r"(<head[^>]*>)", lambda m: m.group(1) + HEAD, s, count=1)
+    s = SCRIPT_TAG_RE.sub("", s)
+    s = s.replace("</body>", SCRIPT_TAG + "</body>", 1) if "</body>" in s else s + SCRIPT_TAG
+    open(path, "w", encoding="utf-8").write(s)
+    return True
+
+
+def write_langs(need):
+    """i18n/langs.json — what the globe in the site menu offers: the languages that read well enough to pick.
+
+    The site's own four (Kurdish, Persian, Arabic, English) stay in the menu itself and are not listed here. A
+    language appears once READY% of the site's strings are translated, so a reader never picks one that is mostly
+    English; the order is the owner's: by English name, as /market/ lists them.
+    """
+    out = []
+    for code in [r[0] for r in pro_langs.LANGS if r[0] in set(LANGS)]:
+        s = load(code)
+        done = sum(1 for k in need if k in s)
+        pct = round(done / len(need) * 100) if need else 0
+        if pct >= READY:
+            r = pro_langs.BY[code]
+            out.append({"code": code, "native": r["native"], "english": r["english"], "dir": r["dir"], "pct": pct})
+    os.makedirs(OUT, exist_ok=True)
+    with open(os.path.join(OUT, "langs.json"), "w", encoding="utf-8") as f:
+        json.dump({"ready": out, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, f, ensure_ascii=False, separators=(",", ":"))
+    return out
+
+
 def status(need):
     return {c: {"done": sum(1 for k in need if k in load(c)), "total": len(need)} for c in LANGS}
 
@@ -345,6 +396,7 @@ def main():
     ap.add_argument("--lang", default="")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--no-translate", action="store_true")
+    ap.add_argument("--no-inject", action="store_true", help="dictionaries only (local checks)")
     a = ap.parse_args()
 
     pages, scripts, common, need = corpus()
@@ -385,9 +437,15 @@ def main():
         cov = write_dicts(code, pages, scripts, common, need)
         if cov:
             ready.append(f"{code} {cov:.0f}%")
+    offered = write_langs(need)
+    print(f"i18n_site: the globe offers {len(offered)} language(s) "
+          f"({', '.join(x['code'] for x in offered) if offered else 'none yet'}; a language appears at {READY}%)")
     st = status(need)
     print(f"i18n_site: {sum(v['done'] for v in st.values()):,} of {len(need) * len(st):,} strings in {len(st)} languages")
     print("i18n_site: " + (", ".join(ready) if ready else "no language has any strings yet"))
+    n = sum(1 for path in ([] if a.no_inject else i18n_ar.walk_all()) if inject(path))
+    if not a.no_inject:
+        print(f"i18n_site: the globe is on {n} pages")
 
 
 if __name__ == "__main__":
