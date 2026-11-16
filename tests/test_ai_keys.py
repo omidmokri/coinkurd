@@ -52,6 +52,11 @@ def main():
     ok("COIN_KURD_API_KEY counts when it is a Gemini key", ai.keys() == [K[0]])
     env(COIN_KURD_API_KEY="sk-ant-not-a-gemini-key")
     ok("…and is left out when it is not", ai.keys() == [] and not ai.available())
+    # this one secret already reaches every step of every workflow, so several keys in it need no workflow change
+    env(COIN_KURD_API_KEY=f"{K[0]}, {K[1]},{K[2]}")
+    ok("several keys in COIN_KURD_API_KEY turn on the whole pool with no change to a workflow", ai.keys() == K[:3], ai.keys())
+    env(COIN_KURD_API_KEY=f"sk-ant-something, {K[0]}")
+    ok("…and a key of another kind sitting beside them is simply passed over", ai.keys() == [K[0]])
 
     # the owner's own secret names, the four spelled *_ADI_KEY included
     env(ALI_API_KEY=K[0], HAMA_ADI_KEY=K[1], KURD_ADI_KEY=K[2], SARA_API_KEY=K[3], REF_BOT_TOKEN="123:abc")
