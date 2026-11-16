@@ -72,27 +72,32 @@ def _is_key(v):
     return bool(GKEY.match((v or "").strip()))
 
 
+_names = {}      # اثرانگشت کلید -> نام متغیری که از آن آمده (برای گزارش؛ خودِ کلید هرگز)
+_reason = {}     # اثرانگشت کلید -> چرا کنار گذاشته شد
+
+
 def keys():
     """همهٔ کلیدهای جمنای که این اجرا می‌تواند استفاده کند، به ترتیبی قطعی و بدون تکرار"""
     out, seen = [], set()
 
-    def add(v):
+    def add(v, name="?"):
         v = (v or "").strip()
         if v and v not in seen:
             seen.add(v)
             out.append(v)
+            _names.setdefault(_kid(v), name)
 
     # کلید صریح: هر شکلی داشته باشد پذیرفته می‌شود (تست‌ها و اجرای دستی هم از همین راه کلید می‌دهند)
     for v in re.split(r"[,\s]+", os.environ.get("GEMINI_API_KEY", "")):
-        add(v)
+        add(v, "GEMINI_API_KEY")
     # همین متغیر هم می‌تواند چند کلید داشته باشد؛ هر چیزی که کلید جمنای نباشد (مثل sk-ant-…) نادیده گرفته می‌شود
     for v in re.split(r"[,\s]+", os.environ.get("COIN_KURD_API_KEY", "")):
         if _is_key(v):
-            add(v)
+            add(v, "COIN_KURD_API_KEY")
     # بقیهٔ کلیدهای مالک: یا هرکدام در یک متغیر جدا، یا همه با هم در GEMINI_KEYS (toJSON(secrets))
     for name in sorted(os.environ):
         if name.endswith("_KEY") and name not in ("GEMINI_API_KEY", "COIN_KURD_API_KEY") and _is_key(os.environ[name]):
-            add(os.environ[name])
+            add(os.environ[name], name)
     try:
         d = json.loads(os.environ.get("GEMINI_KEYS", "") or "{}")
     except ValueError:
@@ -100,11 +105,11 @@ def keys():
     if isinstance(d, dict):
         for name in sorted(d):
             if _is_key(d.get(name)):
-                add(d[name])
+                add(d[name], name)
     elif isinstance(d, list):
         for v in d:
             if _is_key(v):
-                add(v)
+                add(v, "GEMINI_KEYS")
     return out
 
 
@@ -146,16 +151,34 @@ def _model_spent(m):
 
 
 def pool_note():
-    n = len(keys())
-    return f"{n} Gemini key{'s' if n != 1 else ''} in the pool"
+    ks = keys()
+    names = ", ".join(_names.get(_kid(k), "?") for k in ks)
+    return f"{len(ks)} Gemini key{'s' if len(ks) != 1 else ''} in the pool: {names}"
+
+
+def retire(api_key, why, m=None):
+    """این کلید را روی این مدل کنار بگذار و دلیلش را برای گزارش پایان اجرا نگه دار"""
+    fp = _kid(api_key)
+    _exhausted.add((fp, m or model()))
+    _reason.setdefault(fp, why)
+
+
+def pool_report():
+    """یک خط برای هر کلید: نام رازش، و اینکه در این اجرا کار کرد یا چرا نکرد"""
+    out = []
+    for k in keys():
+        fp = _kid(k)
+        out.append(f"  {_names.get(fp, '?'):<20} {fp}  " + (_reason.get(fp) or "working"))
+    return "\n".join(out)
 
 
 def reset():
     """وضعیت اجرا را پاک می‌کند (تست‌ها)"""
-    global _model, _ki, _exhausted, _last
+    global _model, _ki, _exhausted, _last, _names, _reason
     _model, _ki = None, 0
     _exhausted = set()
     _last = {}
+    _names, _reason = {}, {}
 
 
 # ------------------------------------------------------------------ مدل
@@ -212,8 +235,8 @@ def generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, t
             limited += 1
             if limited > len(keys()) or not rotate_key():
                 raise
-        except QuotaError:
-            _exhausted.add((_kid(key()), model()))
+        except QuotaError as e:
+            retire(key(), str(e)[:80])
             if rotate_key():
                 print(f"quota out on a key; {len(live_keys())} of {len(keys())} keys left on {model()}")
                 continue
@@ -240,8 +263,8 @@ def generate_on_model(prompt, as_json=False, temperature=0.2, max_tokens=4096, t
             limited += 1
             if limited > len(keys()) or not rotate_key():
                 raise
-        except QuotaError:
-            _exhausted.add((_kid(key()), model()))
+        except QuotaError as e:
+            retire(key(), str(e)[:80])
             if not rotate_key():
                 raise
             print(f"quota out on a key; {len(live_keys())} of {len(keys())} keys left on {model()}")
@@ -252,8 +275,8 @@ def generate_with(api_key, prompt, as_json=False, temperature=0.2, max_tokens=40
     QuotaError آن کلید را روی این مدل «تمام‌شده» علامت می‌زند و دوباره بالا می‌رود."""
     try:
         return _generate(prompt, as_json, temperature, max_tokens, tries, timeout, api_key=api_key)
-    except QuotaError:
-        _exhausted.add((_kid(api_key), model()))
+    except QuotaError as e:
+        retire(api_key, str(e)[:80])
         raise
 
 
@@ -305,7 +328,7 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
         if r.status_code == 403 and "free tier" in r.text.lower():
             # کلیدی که پروژه‌اش سطح رایگان ندارد: تا آخر این اجرا هیچ درخواستی را جواب نمی‌دهد، پس کنارش می‌گذاریم
             # تا کارگرش بی‌جهت دسته‌های بعدی را نسوزاند
-            raise QuotaError(f"key {fp}: the Gemini free tier is not available for this key's project")
+            raise QuotaError("this key's Google project has no Gemini free tier (it needs billing)")
         if r.status_code >= 400:
             raise RuntimeError(f"{r.status_code} on key {fp}: {r.text[:300]}")
         data = r.json()

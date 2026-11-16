@@ -520,6 +520,8 @@ def main():
     finally:
         quota_add(c.get("used", 0))
     print(f"pro_l10n: {c.get('used', 0)} Gemini calls this run on {jobs} key(s), {quota_used()} of {cap} today")
+    # which of the owner's keys actually worked this run, by the name of the secret each one came from
+    print("pro_l10n: the keys this run used —\n" + ai.pool_report())
     done = sum(v["done"] for v in st.values())
     print(f"pro_l10n: {done} of {len(src) * len(st)} strings translated in {len(st)} languages; "
           f"page text ready in {sum(1 for v in st.values() if v['seo'])}")
