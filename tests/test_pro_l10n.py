@@ -6,14 +6,18 @@ the keys it was given), some answers good, some broken on purpose. Checks:
   * the cache keeps only what passed; a string that keeps failing is given up on after FAIL_MAX tries (no endless
     spending of the free quota); a changed English string is translated again; the budget of requests is kept;
   * page text goes first, so a language's page can be indexed as early as possible;
-  * the shared free quota: one model only (the first exhausted quota stops the run, ai.py's fallback models are left to
-    the site's own steps), the calls of a run are counted, and a quota day (Pacific time) has a ceiling.
+  * the shared free quota: one model only (ai.py's fallback models are left to the site's own steps; a key whose
+    quota runs out hands over to the next key instead), the calls of a run are counted, and a quota day (Pacific
+    time) has a ceiling a key;
+  * run_parallel: the owner's keys working at once give the same cache as one key working through the batches,
+    the request cap holds, and a key that runs out of quota hands its batch to another key.
 Run: python3 tests/test_pro_l10n.py"""
 import json
 import os
 import shutil
 import sys
 import tempfile
+import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
@@ -106,6 +110,56 @@ def main():
         p = L.prompt_for("tw", {"k": "Close"})
         ok("the prompt names the language and its variant, and asks for JSON with the same keys", "Chinese (Traditional)" in p and "Traditional Chinese characters" in p and "same keys" in p)
 
+        # ---- several keys at once (run_parallel): the same work, spread over the owner's keys
+        os.environ["GEMINI_MODEL"] = "model-under-test"
+        os.environ.setdefault("GEMINI_API_KEY", "test-key")
+        import ai  # noqa: E402
+        real_with = ai.generate_with
+        for code in ("vi", "it"):
+            try:
+                os.remove(os.path.join(tmp, code + ".json"))
+            except OSError:
+                pass
+        used_by = []
+
+        def by_key(api_key, prompt, *a, **k):
+            used_by.append(api_key)
+            time.sleep(0.05)          # a real request takes tens of seconds: the workers must overlap
+            return fake(prompt)
+        ai.generate_with = by_key
+        try:
+            c2 = {}
+            st2 = L.run_parallel(["vi", "it"], 20, 60, 3, src2, ["k1", "k2", "k3"], log=lambda *a: None, counter=c2)
+            seq = L.current(src2, L.load("de"))
+            vi = L.current(src2, L.load("vi"))
+            ok("several keys at once translate the same strings one key would", vi == seq and st2["vi"]["done"] == len(seq), (len(vi), len(seq)))
+            ok("the work was shared between the keys", len(set(used_by)) > 1 and len(used_by) == c2["used"], (set(used_by), c2))
+            ok("both languages were filled, and the page text of each went out first", st2["vi"]["seo"] and st2["it"]["seo"])
+
+            # the cap on requests holds
+            for code in ("vi", "it"):
+                os.remove(os.path.join(tmp, code + ".json"))
+            used_by.clear()
+            c3 = {}
+            L.run_parallel(["vi", "it"], 3, 60, 3, src2, ["k1", "k2", "k3"], log=lambda *a: None, counter=c3)
+            ok("run_parallel makes no more requests than it was given", c3["used"] == 3 == len(used_by), (c3, len(used_by)))
+
+            # a key whose quota runs out hands its batch to another key, and nothing is lost
+            for code in ("vi",):
+                os.remove(os.path.join(tmp, code + ".json"))
+            dead = {"k1"}
+
+            def one_dead(api_key, prompt, *a, **k):
+                if api_key in dead:
+                    raise ai.QuotaError("daily quota exhausted")
+                return fake(prompt)
+            ai.generate_with = one_dead
+            L.run_parallel(["vi"], 20, 60, 3, src2, ["k1", "k2"], log=lambda *a: None, counter={})
+            ok("a key that runs out of quota hands its batch to another key", L.current(src2, L.load("vi")) == seq, len(L.current(src2, L.load("vi"))))
+        finally:
+            ai.generate_with = real_with
+            os.environ.pop("GEMINI_MODEL", None)
+
         # ---- the shared free quota
         c = {}
         calls.clear()
@@ -125,8 +179,7 @@ def main():
         # one model only: ai.generate would walk the fallback models; the translator must stop instead
         os.environ.setdefault("GEMINI_API_KEY", "test-key")
         os.environ["GEMINI_MODEL"] = "model-under-test"
-        import ai  # noqa: E402
-        ai._model, ai._exhausted = None, set()
+        ai.reset()
         seen = []
 
         def fake_generate(*a, **k):
@@ -145,11 +198,11 @@ def main():
                 gen("prompt")
             except Exception as e:  # noqa: BLE001
                 e2 = type(e).__name__
-            ok("an exhausted quota stops the translator on its own model (no walk through ai.py's fallbacks)",
+            ok("an exhausted quota (every key spent) stops the translator on its own model, no walk through ai.py's fallbacks",
                e1 == "QuotaError" and e2 == "QuotaError" and seen == ["model-under-test"] and ai._model == "model-under-test", (e1, e2, seen, ai._model))
         finally:
             ai._generate = real
-            ai._model, ai._exhausted = None, set()
+            ai.reset()
             os.environ.pop("GEMINI_MODEL", None)
     finally:
         L.CACHE = old_cache
