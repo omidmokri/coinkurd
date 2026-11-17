@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-17T23:06:23.166728+00:00",
+ "updated_at": "2026-11-17T23:32:40.189295+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-16T23:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "ema_golden_cross": {
-   "n": 462,
-   "obs": -1.73,
-   "win": 34.0,
+   "n": 461,
+   "obs": -1.7,
+   "win": 34.1,
    "mid": -0.77,
    "lo": -1.49,
    "hi": 0.19,
-   "p": 0.026,
+   "p": 0.0337,
    "shifts": 1156,
    "verdict": "worse"
   },
   "_all": {
-   "n": 6378,
+   "n": 6366,
    "obs": -0.03,
    "win": 49.7,
    "mid": 0.01,
    "lo": -0.27,
    "hi": 0.26,
-   "p": 0.7292,
+   "p": 0.7422,
    "shifts": 1156,
    "verdict": "no_edge"
   },
@@ -45,13 +45,13 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 519,
+   "n": 518,
    "obs": -1.01,
-   "win": 41.6,
+   "win": 41.7,
    "mid": -0.72,
    "lo": -1.6,
    "hi": 0.1,
-   "p": 0.4048,
+   "p": 0.4187,
    "shifts": 1156,
    "verdict": "no_edge"
   },
@@ -67,35 +67,35 @@
    "verdict": "no_edge"
   },
   "rsi_overbought": {
-   "n": 398,
-   "obs": 2.1,
+   "n": 397,
+   "obs": 2.08,
    "win": 68.8,
-   "mid": 0.74,
-   "lo": -0.74,
-   "hi": 1.96,
-   "p": 0.0433,
+   "mid": 0.73,
+   "lo": -0.75,
+   "hi": 1.99,
+   "p": 0.0519,
    "shifts": 1156,
-   "verdict": "better"
+   "verdict": "no_edge"
   },
   "volume_spike": {
-   "n": 1730,
-   "obs": 0.03,
-   "win": 50.5,
+   "n": 1724,
+   "obs": 0.04,
+   "win": 50.6,
    "mid": 0.16,
    "lo": -0.36,
-   "hi": 0.76,
-   "p": 0.6799,
+   "hi": 0.75,
+   "p": 0.7059,
    "shifts": 1156,
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 929,
-   "obs": 0.79,
+   "n": 928,
+   "obs": 0.78,
    "win": 58.4,
    "mid": 0.7,
-   "lo": -0.2,
+   "lo": -0.21,
    "hi": 1.9,
-   "p": 0.8313,
+   "p": 0.8529,
    "shifts": 1156,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "bear_divergence": {
-   "n": 391,
-   "obs": 0.78,
-   "win": 58.1,
+   "n": 389,
+   "obs": 0.76,
+   "win": 57.8,
    "mid": 0.64,
    "lo": -0.36,
    "hi": 1.95,
-   "p": 0.7682,
+   "p": 0.7993,
    "shifts": 1156,
    "verdict": "no_edge"
   }
