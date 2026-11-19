@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-19T19:33:21.805462+00:00",
+ "updated_at": "2026-11-19T20:05:10.354252+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-18T19:00:00+00:00"
@@ -12,33 +12,33 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "ema_death_cross": {
-   "n": 540,
+   "n": 534,
    "obs": 0.8,
-   "win": 57.4,
+   "win": 57.3,
    "mid": 0.74,
-   "lo": -0.95,
-   "hi": 1.67,
-   "p": 0.9133,
+   "lo": -0.96,
+   "hi": 1.62,
+   "p": 0.9075,
    "shifts": 1200,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6379,
+   "n": 6370,
    "obs": 0.01,
    "win": 50.3,
    "mid": 0.01,
    "lo": -0.31,
    "hi": 0.22,
-   "p": 0.9975,
+   "p": 0.9808,
    "shifts": 1200,
    "verdict": "no_edge"
   },
   "rsi_overbought": {
-   "n": 378,
-   "obs": 1.64,
-   "win": 70.1,
+   "n": 377,
+   "obs": 1.65,
+   "win": 70.3,
    "mid": 0.7,
-   "lo": -0.35,
+   "lo": -0.36,
    "hi": 1.9,
    "p": 0.0775,
    "shifts": 1200,
@@ -56,13 +56,13 @@
    "verdict": "no_edge"
   },
   "volume_spike": {
-   "n": 1728,
+   "n": 1726,
    "obs": 0.12,
    "win": 50.9,
    "mid": 0.13,
    "lo": -0.36,
    "hi": 0.71,
-   "p": 0.9533,
+   "p": 0.9667,
    "shifts": 1200,
    "verdict": "no_edge"
   },
