@@ -110,6 +110,14 @@ def main():
             ok("only one globe shows: the site's own 47-pill gives way to ours",
                pg.locator("#langs .ekw-globe").count() == 1
                and not pg.locator("#langs .pm-hglobe").is_visible())
+            pg.click("#langs .ekw-globe"); pg.wait_for_selector(".ekw-panel")
+            scrollers = pg.evaluate("""() => [...document.querySelectorAll('.ekw-panel, .ekw-panel *')]
+                 .filter(e => { const s = getComputedStyle(e);
+                   return (s.overflowY === 'auto' || s.overflowY === 'scroll') && e.scrollHeight > e.clientHeight + 2; })
+                 .map(e => e.className)""")
+            ok("the panel has one scroller down its edge, never two", len(scrollers) <= 1, str(scrollers))
+            pg.keyboard.press("Escape")
+
             ok("the lesson pages' own three-way switch is left alone: no globe in it, Persian still offered",
                pg.locator(".lsw .ekw-globe").count() == 0
                and pg.locator('.lsw button[data-l="fa"]').is_visible())
