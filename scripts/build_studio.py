@@ -13,7 +13,7 @@ import build_reality as BR  # noqa: E402
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "1"
+VER = "2"
 SRC = "https://github.com/omidmokri/coinkurd/tree/main/assets/studio"
 T = {
     "title": L("استودیو پاین: کدنویسی و بک‌تست زنده", "ستۆدیۆی پاین: کۆدنووسین و باکتێستی زیندوو", "Pine Studio: live coding and back-testing"),
@@ -97,6 +97,9 @@ main.w:has(#studio){max-width:1600px}
 .ps-toast{position:fixed;bottom:24px;inset-inline-start:50%;transform:translateX(-50%);background:var(--acc);color:#000;font-weight:800;border-radius:99px;padding:8px 16px;z-index:99}
 .ps-scta{width:100%;min-height:170px;background:#05080f;color:#cbd5e1;border:1px solid var(--pl);border-radius:12px;padding:10px;font:12.5px/1.55 'JetBrains Mono',Consolas,monospace;direction:ltr;text-align:left;resize:vertical;tab-size:4;margin:6px 0}
 .ps-scan tr[data-s]{cursor:pointer}.ps-scan tr[data-s]:hover{background:rgba(247,147,26,.06)}.ps-scan tr.hit{background:rgba(22,199,132,.07)}
+.ps-hook{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}.ps-hook small{color:var(--mute);min-width:110px}
+.ps-hook code{flex:1;min-width:240px;background:#05080f;border:1px solid var(--pl);border-radius:10px;padding:7px 10px;direction:ltr;text-align:left;font-size:.78rem;word-break:break-all}
+.ps-feed{margin-top:10px;max-height:380px;overflow:auto}
 @media (max-width:900px){.ps-main{grid-template-columns:1fr}.ps-chart{min-height:420px}.ps-ed{min-height:300px}.ps-price{margin-inline-start:0}}
 """
 

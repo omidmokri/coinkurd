@@ -59,6 +59,12 @@
     scanEdge: ['آزمون فیلتر روی گذشته: هر بار در این بازه که شرط برقرار شد، بازده N کندل بعد ثبت شده است.', 'تاقیکردنەوەی فلتەر لە ڕابردوودا: هەر جارێک مەرجەکە ڕاست بووە، گەڕانەوەی N مۆم دواتر تۆمار کراوە.',
       'Filter tested on the past: every time the condition was true in this range, the return N candles later was recorded.'],
     hits: ['دفعات', 'جار', 'hits'], avgRet: ['میانگین بازده', 'تێکڕای گەڕانەوە', 'avg return'], winR: ['درصد مثبت', 'ڕێژەی ئەرێنی', 'positive'],
+    tvhook: ['هشدارهای TradingView', 'ئاگادارکردنەوەکانی TradingView', 'TradingView alerts'],
+    hookHow: ['هشدارهای TradingView خودت را این‌جا ببین: در TradingView هنگام ساخت هشدار، گزینهٔ Webhook URL را روشن کن و این نشانی را بگذار. متن پیام می‌تواند ساده یا JSON مثل نمونهٔ زیر باشد. هشدارها زنده در فهرست زیر می‌آیند.',
+      'ئاگادارکردنەوەکانی TradingViewی خۆت لێرە ببینە: لە TradingView لە کاتی دروستکردنی ئاگادارکردنەوە Webhook URL چالاک بکە و ئەم ناونیشانە دابنێ. پەیامەکە دەتوانێت دەقی سادە یان JSON بێت.',
+      'See your own TradingView alerts here: when creating an alert in TradingView, turn on “Webhook URL” and paste this address. The message can be plain text or JSON like the sample below. Alerts appear live in the list.'],
+    hookUrl: ['نشانی Webhook', 'ناونیشانی Webhook', 'Webhook URL'], hookMsg: ['نمونهٔ پیام', 'نموونەی پەیام', 'Sample message'], copy: ['کپی', 'کۆپی', 'Copy'],
+    hookNone: ['هنوز هشداری نرسیده.', 'هێشتا هیچ ئاگادارکردنەوەیەک نەگەیشتووە.', 'No alerts yet.'],
     matched: ['مطابق', 'گونجاو', 'match'], scanned: ['اسکن شد', 'سکان کرا', 'scanned'], open2: ['باز کردن روی نمودار', 'کردنەوە لەسەر چارت', 'open on the chart']
   };
   function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
@@ -133,10 +139,10 @@
 
   var tabs = el('div', 'ps-tabs'); root.appendChild(tabs);
   var panes = el('div', 'ps-panes'); root.appendChild(panes);
-  var TABS = ['tester', 'trades', 'scan', 'console', 'smc', 'kronos'], tabEls = {}, paneEls = {};
+  var TABS = ['tester', 'trades', 'scan', 'tvhook', 'console', 'smc', 'kronos'], tabEls = {}, paneEls = {};
   TABS.forEach(function (k) { var b = el('button', '', ''); b.type = 'button'; b.dataset.k = k; tabs.appendChild(b); tabEls[k] = b; var p = el('div', 'ps-pane'); p.hidden = true; panes.appendChild(p); paneEls[k] = p; });
   var curTab = 'tester';
-  function showTab(k) { curTab = k; TABS.forEach(function (x) { tabEls[x].classList.toggle('on', x === k); paneEls[x].hidden = x !== k; }); if (k === 'tester' && eqChart) setTimeout(function () { eqChart.timeScale().fitContent(); }, 0); }
+  function showTab(k) { curTab = k; if (k === 'tvhook' && typeof loadHook === 'function') loadHook(); TABS.forEach(function (x) { tabEls[x].classList.toggle('on', x === k); paneEls[x].hidden = x !== k; }); if (k === 'tester' && eqChart) setTimeout(function () { eqChart.timeScale().fitContent(); }, 0); }
   tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTab(b.dataset.k); });
 
   function texts() {
@@ -608,6 +614,30 @@
   scRes.addEventListener('click', function (e) { var tr = e.target.closest('tr[data-s]'); if (!tr) return; st.sym = tr.dataset.s; st.tf = SC.tf; coinSel.value = st.sym.replace(/USDT$/, ''); reload(); root.scrollIntoView({ behavior: 'smooth' }); });
   window.addEventListener('ek-lang', scTexts);
 
+
+  /* ------------------------------------------------------------------ TradingView alerts (webhook → Cloudflare Worker → this feed) */
+  var HOOK = 'https://entekhab-tv.omid-mokri.workers.dev', hookPane = paneEls.tvhook, hookT = null;
+  var HOOK_MSG = '{"symbol":"{{ticker}}","tf":"{{interval}}","price":{{close}},"side":"{{strategy.order.action}}","text":"{{strategy.order.comment}}"}';
+  function hookTexts() {
+    hookPane.innerHTML = '<p class="ps-mut">' + esc(t('hookHow')) + '</p>' +
+      '<div class="ps-hook"><small>' + esc(t('hookUrl')) + '</small><code>' + esc(HOOK + '/tv') + '</code><button type="button" class="ps-btn" data-c="u">' + esc(t('copy')) + '</button></div>' +
+      '<div class="ps-hook"><small>' + esc(t('hookMsg')) + '</small><code>' + esc(HOOK_MSG) + '</code><button type="button" class="ps-btn" data-c="m">' + esc(t('copy')) + '</button></div>' +
+      '<div class="ps-feed"></div>';
+    loadHook();
+  }
+  hookPane.addEventListener('click', function (e) { var b = e.target.closest('button[data-c]'); if (!b) return; var v = b.dataset.c === 'u' ? HOOK + '/tv' : HOOK_MSG; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(function () { toast(t('copied').replace(/لینک|بەستەر|Link/, '✓')); }, function () { prompt('', v); }); });
+  async function loadHook() {
+    var box = hookPane.querySelector('.ps-feed'); if (!box) return;
+    try {
+      var j = await (await fetch(HOOK + '/alerts?limit=50', { cache: 'no-store' })).json(), A = j.alerts || [];
+      box.innerHTML = A.length ? '<table class="ps-tbl"><tbody>' + A.map(function (a) {
+        return '<tr><td><small>' + fmtT(a.at) + '</small></td><td><b>' + esc(a.symbol || '—') + '</b> ' + esc(a.tf || '') + '</td><td>' + (a.side ? '<b class="' + (/buy|long/i.test(a.side) ? 'up' : /sell|short/i.test(a.side) ? 'dn' : '') + '">' + esc(a.side) + '</b>' : '') + '</td><td>' + (a.price != null ? nf(a.price, 6) : '') + '</td><td>' + esc(a.text || '') + '</td></tr>';
+      }).join('') + '</tbody></table>' : '<p class="ps-mut">' + esc(t('hookNone')) + '</p>';
+    } catch (e) { box.innerHTML = '<p class="ps-mut">' + esc(t('fail')) + '</p>'; }
+  }
+  setInterval(function () { if (curTab === 'tvhook' && !document.hidden) loadHook(); }, 15000);
+  window.addEventListener('ek-lang', hookTexts);
+
   /* ------------------------------------------------------------------ controls */
   function markTf() { Array.prototype.forEach.call(tfBox.children, function (b) { b.classList.toggle('on', b.dataset.tf === st.tf); }); }
   async function reload() {
@@ -645,5 +675,5 @@
   });
   window.addEventListener('ek-lang', texts);
 
-  edUpdate(); texts(); scTexts(); showTab('tester'); markTf(); reload();
+  edUpdate(); texts(); scTexts(); hookTexts(); showTab('tester'); markTf(); reload();
 })();
