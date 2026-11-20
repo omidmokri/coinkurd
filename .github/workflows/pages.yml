@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -67,6 +67,7 @@ jobs:
         run: python scripts/i18n_ar.py --no-translate
       - name: Site languages (from the cache; no new translations here)
         continue-on-error: true
+        timeout-minutes: 6
         run: python scripts/i18n_site.py --no-translate
       - name: Build the /market/ language pages and their string packs (from the cache)
         continue-on-error: true
