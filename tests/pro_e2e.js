@@ -1131,8 +1131,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       await page.setViewportSize({ width: 1280, height: 860 }); await page.waitForTimeout(500);
       /* the language menu → Español: its own address, and remembered for /market/ */
       await page.click('#pm-lang'); await page.waitForTimeout(400);
-      const lm = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-lgi').length, first: document.querySelector('.pm-lgi b').textContent, last: [...document.querySelectorAll('.pm-lgi b')].pop().textContent, on: document.querySelector('.pm-lgi.on b').textContent }));
-      ok('the language menu: 47 languages, کوردی first, English last, the current one marked', lm.n === 47 && lm.first === 'کوردی' && lm.last === 'English' && lm.on === 'Deutsch', JSON.stringify(lm));
+      const PRO_LANGS = await page.evaluate(() => (window.PRO && PRO.LANGS || window.P && P.LANGS || []).length);
+      const lm = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-lgi').length, first: document.querySelector('.pm-lgi b').textContent, last: [...document.querySelectorAll('.pm-lgi b')].pop().textContent, on: document.querySelector('.pm-lgi.on b').textContent,
+        flags: document.querySelectorAll('.pm-lgi .pm-lgf').length, kurd: (document.querySelector('.pm-lgi[data-lg="ckb"] .pm-lgf') || {}).getAttribute && document.querySelector('.pm-lgi[data-lg="ckb"] .pm-lgf').getAttribute('src'),
+        kmr: !!document.querySelector('.pm-lgi[data-lg="kmr"]'), pill: (document.querySelector('.pm-hglobe b') || {}).textContent }));
+      ok('the language menu: every language of the workspace, کوردی first, English last, the current one marked', lm.n === PRO_LANGS && lm.first === 'کوردی' && lm.last === 'English' && lm.on === 'Deutsch', JSON.stringify(lm));
+      ok('every language in the menu wears a flag, and Kurdish wears the Kurdistan Region flag', lm.flags === lm.n && /kurdistan\.svg$/.test(lm.kurd || ''), JSON.stringify({ flags: lm.flags, n: lm.n, kurd: lm.kurd }));
+      ok('Kurmanji is in the menu and the pill counts the real number', lm.kmr && lm.pill === String(PRO_LANGS), JSON.stringify({ kmr: lm.kmr, pill: lm.pill, want: PRO_LANGS }));
       await shot(page, '72_lang_menu');
       await Promise.all([page.waitForNavigation({ timeout: 15000 }), page.click('.pm-lgi[data-lg="es"]')]);
       await page.waitForFunction(() => window.PRO && PRO.app && PRO.app.cells().length, null, { timeout: 20000 }).catch(() => { });
