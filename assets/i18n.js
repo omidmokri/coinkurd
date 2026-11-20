@@ -54,8 +54,12 @@
     + '.ekw-head button:hover{color:#fff;background:rgba(255,255,255,.08)}'
     + '.ekw-search{margin:12px 16px 4px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f2ead9;font:inherit;font-size:14px;outline:0}'
     + '.ekw-search:focus{border-color:rgba(247,169,26,.6)}'
+    /* One scroller, not one per section: two lists that each scrolled put two bars down the same edge.
+       The bar itself is hidden; wheel, touch and keyboard still scroll. */
+    + '.ekw-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}'
+    + '.ekw-body::-webkit-scrollbar{width:0;height:0}'
     + '.ekw-sec{padding:10px 16px 2px;font-size:11px;color:#9b8a66;letter-spacing:.4px;text-align:start}'
-    + '.ekw-list{overflow:auto;padding:4px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}'
+    + '.ekw-list{padding:4px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}'
     + '.ekw-list button{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;border:1px solid transparent;'
     + 'background:rgba(255,255,255,.04);color:#f2ead9;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s,transform .12s}'
     + '.ekw-list button:active{transform:scale(.97)}'
@@ -102,8 +106,10 @@
     wrap.innerHTML = '<div class="ekw-panel" dir="' + dir + '"><div class="ekw-head"><b></b><span></span>'
       + '<button type="button" aria-label="close">×</button></div>'
       + '<input class="ekw-search" type="search" autocomplete="off">'
+      + '<div class="ekw-body">'
       + '<div class="ekw-sec ekw-sec1"></div><div class="ekw-list ekw-own"></div>'
       + '<div class="ekw-sec ekw-sec2"></div><div class="ekw-list ekw-more"></div>'
+      + '</div>'
       + '<div class="ekw-foot"></div></div>';
     wrap.querySelector('.ekw-head b').textContent = W.t;
     wrap.querySelector('.ekw-head span').textContent = (own.length + LANGS.length) + '';
