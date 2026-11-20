@@ -303,7 +303,7 @@ K.pose = function (s, tms, dt, A, o) {
       C[4] = mix(.62, dir > 0 ? 2.1 : -.4, f) + Math.sin(sd * 91) * .4; C[6] = mix(.48, dir > 0 ? 1.7 : .9, f) + Math.sin(sd * 57) * .5; C[5] = .2 + ((sd * 13) % 1) * .8; C[7] = .3 + ((sd * 29) % 1) * .7;
       C[12] = F; C[13] = -HIP * Math.sin(F); C[14] = HIP * (Math.cos(F) - 1) - .3 * b * (1 - f) + f * .1 + Math.abs(Math.sin(F)) * .12; C[9] = at ? .5 : .6 + f * .9; C[8] = 0;
     }
-    C[14] -= Math.max(0, tt - 3) * .22;
+    C[14] -= Math.max(0, tt - 1) * 1.05;   /* the dead go under the ground as soon as they have fallen: the fall lands at about a second, and the body is gone by two and a half (owner, 2026-11-20) */
   }
   /* smooth the controls so every change of state blends */
   let q = s.q; if (!q) { q = s.q = new Float32Array(18); q.set(C); }
