@@ -48,12 +48,9 @@ KINDS = {
     "brief": {"langs": ["fa"], "max": 2},
     "ai": {"langs": ["fa"], "max": 2},
     # Visual Capitalist: Persian only, and "old" because the owner asked for the whole run since BACKFILL below —
-    # the one feed whose items may be posted after the day they were written.
-    # The house prompt never names a source, but these findings are Visual Capitalist's own work and we draw our
-    # own picture rather than take theirs, so the post carries their name. The summary is kept shorter to leave
-    # room for that line under the picture.
-    "vc": {"langs": ["fa"], "max": 1, "every": 1800, "old": True, "limit": 940,
-           "credit": "📊 منبع داده‌ها: Visual Capitalist"},
+    # the one feed whose items may be posted after the day they were written. Like every other feed here it names
+    # no source (the house prompt forbids it); the picture is still always ours, never theirs.
+    "vc": {"langs": ["fa"], "max": 1, "every": 1800, "old": True},
 }
 # A kind listed here is read back to that date the first time it runs, page by page, and the posts wait their turn
 # in a queue so the topic is never filled at once. After that it behaves like every other feed.
@@ -526,9 +523,7 @@ def publish(s, f, topics, group_id, send_fn):
             for lang in langs:
                 th = topics.get(f"{kind}:{lang}") or topics.get(kind)
                 if it.get(lang) and th and lang not in it.get("sent", []):
-                    credit = KINDS.get(kind, {}).get("credit")
-                    body = it[lang] + ("\n\n" + credit if credit else "")
-                    r = send_fn(group_id, body, None, message_thread_id=th, plain=True, photo=picture(it, lang))
+                    r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=picture(it, lang))
                     if r.get("ok"):
                         it.setdefault("sent", []).append(lang)
                         it.setdefault("msgs", []).append(r["result"]["message_id"])
