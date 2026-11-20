@@ -406,19 +406,40 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
 .pm-curb,.pm-lgb{border:1px solid var(--line);border-radius:99px;padding:4px 9px}
 .pm-owndot{width:7px;height:7px;border-radius:50%;background:var(--acc);display:inline-block}
 .pm-lgd,.pm-cud{display:flex;flex-direction:column;gap:8px}
-/* One scroller, not two: the modal body already scrolls, so the list must not scroll inside it —
-   two nested bars down the same edge is what the owner saw (2026-11-20). The one bar left is hidden
-   in the language and currency dialogs; wheel, touch and keyboard still scroll them. */
-.pm-lgl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px}
-.pm-mbody:has(.pm-lgd),.pm-mbody:has(.pm-cud){scrollbar-width:none;-ms-overflow-style:none}
-.pm-mbody:has(.pm-lgd)::-webkit-scrollbar,.pm-mbody:has(.pm-cud)::-webkit-scrollbar{width:0;height:0}
-.pm-lgi{display:flex;flex-direction:row;align-items:center;gap:10px;background:none;border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer;text-align:start;min-height:48px}
+/* The language dialog wears the same warm panel as the globe in the site header, so a reader meets one language
+   picker on this site, not two. One scroller, not two: the modal body already scrolls, so the list must not scroll
+   inside it — two nested bars down the same edge is what the owner saw (2026-11-20). That one bar is the panel's
+   own: a gold rail that lights up under the pointer. */
+.pm-mbox:has(.pm-lgd){background:linear-gradient(160deg,#17120a,#0d0b07);border-color:rgba(247,169,26,.34);color:#f2ead9}
+.pm-mbox:has(.pm-lgd) .pm-mhead{border-bottom-color:rgba(247,169,26,.2)}
+.pm-mbox:has(.pm-lgd) .pm-in{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:#f2ead9}
+.pm-mbox:has(.pm-lgd) .pm-in:focus{border-color:rgba(247,169,26,.6)}
+.pm-mbox:has(.pm-lgd) .pm-note{color:#9b8a66}
+.pm-lgl{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}
+.pm-mbody:has(.pm-cud){scrollbar-width:none;-ms-overflow-style:none}
+.pm-mbody:has(.pm-cud)::-webkit-scrollbar{width:0;height:0}
+.pm-mbody:has(.pm-lgd){overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}
+.pm-mbody:has(.pm-lgd)::-webkit-scrollbar{width:0;height:0}
+/* the panel's own bar; it sticks to the top of the scrollport, so it rides the list without scrolling away */
+.pm-rail{position:sticky;top:0;height:0;z-index:6;pointer-events:none}
+.pm-rail>i{position:absolute;inset-inline-end:-7px;width:4px;border-radius:99px;background:rgba(247,169,26,.13)}
+.pm-rail>b{position:absolute;inset-inline-end:-9px;width:8px;border-radius:99px;pointer-events:auto;cursor:grab;
+  background:linear-gradient(180deg,#ffe3a6,#f7a91a 48%,#c9761a);box-shadow:0 0 0 1px rgba(255,255,255,.28),0 0 14px rgba(247,169,26,.45);
+  transition:width .16s,inset-inline-end .16s,box-shadow .16s,filter .16s}
+.pm-rail>b:hover,.pm-rail.on>b{width:12px;inset-inline-end:-11px;filter:brightness(1.12);box-shadow:0 0 0 1px rgba(255,255,255,.45),0 0 22px rgba(247,169,26,.75)}
+.pm-rail.on>b{cursor:grabbing}
+.pm-lgi{display:flex;flex-direction:row;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:11px;padding:8px 11px;cursor:pointer;text-align:start;min-height:48px;color:#f2ead9;transition:background .15s,border-color .15s,transform .12s}
+.pm-lgi:active{transform:scale(.97)}
 .pm-lgi b{font-size:14px;font-weight:600;width:100%}
 .pm-lgf{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:0 0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.22),0 2px 6px rgba(0,0,0,.45)}
 .pm-lgt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;flex:1 1 auto}
-.pm-lgi small{color:var(--mute);font-size:11px;width:100%;text-align:start}
-.pm-lgi:hover{background:#1c1c20}
-.pm-lgi.on{border-color:var(--acc);background:rgba(247,147,26,.08)}.pm-lgi.on b{color:var(--acc)}
+.pm-lgi small{color:#a89770;font-size:11px;width:100%;text-align:start}
+.pm-lgi:hover{background:rgba(247,169,26,.16);border-color:rgba(247,169,26,.5)}
+.pm-lgi.on{background:rgba(247,169,26,.22);border-color:rgba(247,169,26,.8)}.pm-lgi.on b{color:#ffd27a}
+/* each card comes into focus as it enters — scroll-driven, so it follows the finger exactly, forwards and back */
+@keyframes pm-arrive{from{opacity:.08;translate:0 18px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}
+@supports (animation-timeline:view()){@media (prefers-reduced-motion:no-preference){
+  .pm-lgi{animation:pm-arrive linear both;animation-timeline:view(block);animation-range:entry 0% entry 55%}}}
 .pm-cuh{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#0f0f11}
 .pm-cur1{display:flex;align-items:center;gap:10px}
 .pm-cur1 img{border-radius:50%;background:#fff1;object-fit:cover;flex:0 0 auto}
