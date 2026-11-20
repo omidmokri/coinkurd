@@ -1263,7 +1263,7 @@
     if (!g || g.querySelector('.pm-hglobe')) return;
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'pm-hglobe'; b.title = T('langTitle'); b.setAttribute('aria-label', T('langTitle'));
-    b.innerHTML = ic('globe') + '<b>47</b>';
+    b.innerHTML = ic('globe') + '<b>' + ((P.LANGS || []).length || 47) + '</b>';
     b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); langDialog(); });
     g.insertBefore(b, g.firstChild);
   }
@@ -1277,7 +1277,10 @@
       var q = inp.value.trim().toLowerCase();
       var L = (P.LANGS || []).filter(function (r) { return !q || (r[1] + ' ' + r[2] + ' ' + r[0]).toLowerCase().indexOf(q) >= 0; });
       list.innerHTML = L.length ? L.map(function (r) {
-        return '<button type="button" role="option" aria-selected="' + (r[0] === LANG) + '" class="pm-lgi' + (r[0] === LANG ? ' on' : '') + '" data-lg="' + r[0] + '"><b lang="' + esc(r[4]) + '" dir="' + r[5] + '">' + esc(r[1]) + '</b><small lang="en" dir="ltr">' + esc(r[2]) + '</small></button>';
+        var fl = P.flag ? P.flag(r[0]) : '';
+        return '<button type="button" role="option" aria-selected="' + (r[0] === LANG) + '" class="pm-lgi' + (r[0] === LANG ? ' on' : '') + '" data-lg="' + r[0] + '">' +
+          (fl ? '<img class="pm-lgf" src="' + esc(fl) + '" alt="" loading="lazy" width="26" height="26">' : '') +
+          '<span class="pm-lgt"><b lang="' + esc(r[4]) + '" dir="' + r[5] + '">' + esc(r[1]) + '</b><small lang="en" dir="ltr">' + esc(r[2]) + '</small></span></button>';
       }).join('') : '<p class="pm-empty">' + esc(T('noMatch')) + '</p>';
       $$('[data-lg]', list).forEach(function (b) { b.onclick = function () { goLang(b.getAttribute('data-lg')); }; });
     }
