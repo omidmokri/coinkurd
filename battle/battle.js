@@ -616,7 +616,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
       const mo=this.navOn&&f<1?this.inWay(nx,nz,.35):null;if(mo&&!this.inWay(s.x,s.z,.35)){s.t0+=dt*1000;s.frz=(s.frz||0)+dt;s.frzT=t;if(s.frz>.9){s.frz=0;const b=this.VB[mo.tier],op=mo.ops&&mo.ops[mo.oi],ex=[op&&op.k==='P'?NAV.circle(mo.x,mo.z,this.hd2(mo)+.8,'veh'):NAV.box(mo.x,mo.z,b[0]+.8,b[1]+.8,mo.hd,'veh')];if(mo.la2&&t-(mo.laT||-1e9)<300)ex.push(NAV.capsule(mo.x,mo.z,mo.la2[0],mo.la2[1],b[1]+.8,'veh'));const P=NAV.path(s.x,s.z,s.tx,s.tz,.45,{extra:ex});if(P)this.setPath(s,P,t)}continue}s.frz=0;s.x=nx;s.z=nz;s.hdg=P3[2]}else{s.x=s.x0+(s.tx-s.x0)*e;s.z=s.z0+(s.tz-s.z0)*e}s.gyT=0;
      if(f>=1){if(s.mv===2){this.remove(A,s);continue}else{s.mv=0;s.pl=null;s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}}
     else if(s.after&&t>s.dodge&&s.st!==ST.DIE){const a=s.after;s.after=null;if(a.mv===2)this.retreat(A,s,t);else{s.mv=1;s.st=a.st;s.sp=a.sp;s.t0=t;this.route(A,s,[a.tx,a.tz],t)}}
-    else if(s.st===ST.DIE){if(t-s.t0>7000){this.remove(A,s);continue}}
+    else if(s.st===ST.DIE){if(t-s.t0>2500){this.remove(A,s);continue}}   /* he falls, sinks and is gone: bodies no longer lie about the field for seven seconds (owner, 2026-11-20) */
     else if(s.st===ST.FIRE){if(t-(s.shot||s.t0)>650){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}
     else if(s.st===ST.STAG){if(t-s.t0>1700){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}
     else if(s.st===ST.CHEER){if(t-s.t0>(s.cheer||4200)){s.st=this.rest?ST.REST:ST.IDLE;s.t0=t}}}
@@ -628,7 +628,7 @@ const ARMY={CAP:150,MAX:150,TCAP:16,VMAX:12,TARGET:200,convoyT:{},sides:{},rest:
     if(s.st!==ST.DIE)s.ry+=wrapA(ty-s.ry)*Math.min(1,dt*(s.mv?9:12));
     const sc=SC.sold*(s.rank===2?1.04:1)*(.96+s.sd*.08);pos.set(s.x,s.y,s.z);q4.set(0,Math.sin(s.ry/2),0,Math.cos(s.ry/2));scl.set(sc,sc,sc);m4.compose(pos,q4,scl);const M=A.meshes[s.role],c=cnt[s.role]++;m4.toArray(M.instanceMatrix.array,c*16);M.geometry.attributes.aRow.array[c]=A.row0+i;
     GFX5.pose(s,t,dt,Q,0);GFX5.bones(Q,0,s.role,BT,A.row0+i);
-    if(A.sh){const lie=s.stn===3&&!s.mv&&s.st!==ST.RUN?1:s.st===ST.DIE?clamp((t-s.t0)/900,0,1):0,fade=s.st===ST.DIE?clamp(1-(t-s.t0-3500)/2500,0,1):1;pos.y=s.y+.06;scl.set(sc*(1.25+lie*1.5)*fade,1,sc*1.25*fade);m4.compose(pos,q4,scl);m4.toArray(A.sh.instanceMatrix.array,i*16)}}
+    if(A.sh){const lie=s.stn===3&&!s.mv&&s.st!==ST.RUN?1:s.st===ST.DIE?clamp((t-s.t0)/700,0,1):0,fade=s.st===ST.DIE?clamp(1-(t-s.t0-900)/1300,0,1):1;   /* the shadow goes with the body */pos.y=s.y+.06;scl.set(sc*(1.25+lie*1.5)*fade,1,sc*1.25*fade);m4.compose(pos,q4,scl);m4.toArray(A.sh.instanceMatrix.array,i*16)}}
    A.meshes.forEach((M,r)=>{M.count=cnt[r];M.instanceMatrix.needsUpdate=true;M.geometry.attributes.aRow.needsUpdate=true});if(A.sh){A.sh.count=n;A.sh.instanceMatrix.needsUpdate=true}
    this.vehTick(A,dt,t)}
   this.boneTex.needsUpdate=true;this.trucksTick(dt)},
