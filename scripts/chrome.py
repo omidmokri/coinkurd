@@ -559,6 +559,36 @@ def _replace_block(doc, name, new):
     return doc, False
 
 
+# The fonts are served from this site, but two things still come from other hosts: a stylesheet blocks the first
+# paint until it answers, and a host that is filtered does not answer at all — it just hangs. So any stylesheet from
+# another host is asked for with media="print": the browser fetches it without waiting and applies it when it arrives.
+_FCSS = re.compile(r'<link\b(?=[^>]*\brel="stylesheet")(?=[^>]*href="https?://)[^>]*>', re.I)
+
+
+def async_css(doc):
+    """Make stylesheets served by another host non-blocking (idempotent). Our own are untouched."""
+    def sub(m):
+        tag = m.group(0)
+        if "media=" in tag.lower():
+            return tag
+        return tag[:-1].rstrip() + ' media="print" onload="this.media=\'all\'">'
+    return _FCSS.sub(sub, doc)
+
+
+# KaTeX (the formula renderer on the encyclopedia pages) comes from cdnjs.cloudflare.com. Without defer the browser
+# stops at that tag, so a host that hangs holds up everything after it — on /encyclopedia/ that is app.js, the whole
+# page. With defer the page is built at once and the formulas are drawn whenever (or if) KaTeX arrives; until then
+# the reader sees the formula as plain TeX, which app.js and the per-term pages already fall back to.
+_KJS = re.compile(r'<script\b(?=[^>]*katex[^>]*\.js)(?![^>]*\b(?:defer|async)\b)[^>]*>', re.I)
+_REDRAW = ("document.querySelectorAll('[data-tex]').forEach(function(e){try{window.katex.render("
+           "e.getAttribute('data-tex'),e,{displayMode:e.hasAttribute('data-display'),throwOnError:false,strict:false})}catch(x){}})")
+
+
+def async_katex(doc):
+    """Load KaTeX without blocking the page, and draw the formulas once it is there (idempotent)."""
+    return _KJS.sub(lambda m: m.group(0)[:-1].rstrip() + ' defer onload="' + _REDRAW + '">', doc)
+
+
 def inject_doc(doc, lang="fa", credits_from_footer=True):
     """Insert or refresh header/bottom/footer + css/js tags in one HTML document (idempotent)."""
     hd, bt, ft = chrome_all(lang)
@@ -596,7 +626,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
         doc = doc.replace("</body>", BODY_TAGS + "</body>", 1)
     else:
         doc = re.sub(r"/assets/chrome\.js\?v=\w+", f"/assets/chrome.js?v={VER}", doc)
-    return with_csp(doc)
+    return with_csp(async_katex(async_css(doc)))
 
 
 STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",

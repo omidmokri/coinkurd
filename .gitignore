@@ -51,3 +51,10 @@ _world_post/
 # the built language dictionaries (scripts/i18n_ar.py, scripts/i18n_site.py): rebuilt every run,
 # served from the working tree, never committed — the caches they come from live in data/
 /i18n/
+
+# chart snapshots for visitors who cannot reach an exchange (scripts/candles.py): written again on every run, so only
+# BTC and ETH are kept in the repo — they are what the header ticker falls back to if a run cannot reach Binance.
+# The rest ship with the site, not the repo (same as data/pro_l10n/).
+/data/candles/*
+!/data/candles/BTC_*.json
+!/data/candles/ETH_*.json
