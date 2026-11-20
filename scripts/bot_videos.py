@@ -7,7 +7,8 @@ Daily videos for the main channel (@Coin_Kurd) + daily drafts for the admin.
   and the channel signature. Other people's videos are never re-uploaded.
 - Rule: one day's videos come from different sources (max one per source per day, never the same twice in a row).
 - 10 drafts a day (Persian summaries of the day's news/on-chain items + signature) go to the admins' private
-  chat, ready to be forwarded to Saved Messages and given a picture.
+  chat, each already carrying its own Coin_Kurd card as the picture, so a forward to Saved Messages (or to the
+  channel) takes the picture with it. The picture is always ours — a source's own advert image is never used.
 - Posted videos are also written to data/videos.json on main for the site.
 """
 import html
@@ -194,6 +195,19 @@ def btc_series():
         return None, ""
 
 
+CAP = 1024 - SIG_LEN - 2                   # what a caption leaves for the draft itself, under the picture
+
+
+def _fit(t, n):
+    """trim a draft to the last whole sentence that still fits under a picture, never mid-word"""
+    t = t.strip()
+    if len(t) <= n:
+        return t
+    cut = t[:n]
+    end = max(cut.rfind(x) for x in (".", "!", "?", "؟", "\n"))
+    return (cut[:end + 1] if end > n // 3 else cut.rsplit(" ", 1)[0] + " …").strip()
+
+
 def drafts(s, st, send_fn, admins):
     f = F.feed_state(s)
     items = []
@@ -204,9 +218,16 @@ def drafts(s, st, send_fn, admins):
     if not pick:
         return False
     for a in admins:
-        send_fn(a, f"📝 <b>{len(pick)} پیش‌نویس امروز</b> — هر کدام را به «پیام‌های ذخیره‌شده» فوروارد کن و عکسش را بساز")
-        for i, it in enumerate(pick, 1):
-            send_fn(a, f"<b>{i}/{len(pick)}</b>\n\n" + html.escape(it["fa"], quote=False) + "\n\n" + SIG)
+        send_fn(a, f"📝 <b>{len(pick)} پیش‌نویس امروز</b> — هر کدام با عکس خودش آماده است؛ "
+                   "فقط به «پیام‌های ذخیره‌شده» فوروارد کن")
+        for it in pick:
+            # our own card, never the source's advert picture; the text is the caption, so the whole draft
+            # travels as one message and a forward carries the picture with it
+            body = html.escape(_fit(it["fa"], CAP), quote=False) + "\n\n" + SIG
+            img = F.own_card(it)
+            if not img:
+                log.info("draft %s has no picture; sending it as text", it.get("id"))
+            send_fn(a, body, photo=img)
             time.sleep(1.5)
     return True
 
