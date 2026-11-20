@@ -106,7 +106,7 @@ def main():
         L.run(["tr", "ru"], 10, 60, 3, broke, src2, log=lambda *a: None)
         ok("an exhausted quota stops the run at once", len(calls) == 1)
         ok("the real source strings: every UI key of i18n.js plus the page text", len(L.sources()) > 850 and all(k in L.sources() for k in ("seo.title", "seo.h1", "seo.sub", "langTitle")))
-        ok("PRIORITY lists each of the 43 new languages once", sorted(L.PRIORITY) == sorted(pro_langs.NEW) and len(L.PRIORITY) == 43)
+        ok("PRIORITY lists each of the 47 new languages once", sorted(L.PRIORITY) == sorted(pro_langs.NEW) and len(L.PRIORITY) == 47)
         p = L.prompt_for("tw", {"k": "Close"})
         ok("the prompt names the language and its variant, and asks for JSON with the same keys", "Chinese (Traditional)" in p and "Traditional Chinese characters" in p and "same keys" in p)
 

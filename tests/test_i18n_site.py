@@ -10,7 +10,7 @@ the batch), some answers good and some broken on purpose. Checks:
   * the dictionaries come out in the same shape as i18n/ar/ (common.json, page/, js/, status.json) and hold only
     translated strings;
   * the encyclopedia stays out, and so does a page already in a language of its own;
-  * the real corpus of the site is read, and the 43 languages are the ones /market/ uses.
+  * the real corpus of the site is read, and the 47 languages are the ones /market/ uses.
 Run: python3 tests/test_i18n_site.py"""
 import json
 import os
@@ -146,7 +146,7 @@ def main():
     keys = ["x" * 100] * 200
     bs = list(S.batches(keys))
     ok("a batch holds at most 60 strings or 6000 characters", all(len(b) <= 60 and sum(len(k) for k in b) <= 6000 for b in bs), [len(b) for b in bs[:3]])
-    ok("the 43 languages are the ones /market/ uses", sorted(S.LANGS) == sorted(pro_langs.NEW) and len(S.LANGS) == 43)
+    ok("the 47 languages are the ones /market/ uses", sorted(S.LANGS) == sorted(pro_langs.NEW) and len(S.LANGS) == 47)
 
     # the real site
     pages, scripts, common, need = S.corpus()
