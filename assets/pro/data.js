@@ -56,6 +56,37 @@
     return fetch(url, c ? { signal: c.signal } : {}).then(function (r) { clearTimeout(t); if (!r.ok) { var e = new Error('http ' + r.status); e.status = r.status; throw e; } return r.json(); },
       function (e) { clearTimeout(t); throw e; });
   }
+
+  /* Binance and OKX answer on some networks and not on others (from inside Iran, 2026-11, usually not at all: the
+     request simply hangs). Finding that out costs 9 s per request, on every chart, on every page view. So each host
+     is asked once with a short, cheap probe and the answer is kept for an hour: a host that did not answer is then
+     skipped outright and the site's own snapshot (/data/…) is used straight away. A host that did answer is used as
+     before. The memory is per browser and only ever makes the site faster — if localStorage is unavailable the probe
+     just runs again. */
+  var RTTL = 36e5, RKEY = 'ek_reach', REACH = {}, RBUSY = {};
+  var RPROBE = { binance: API + 'ping', okx: 'https://www.okx.com/api/v5/public/time' };
+  try {
+    var _r = JSON.parse(localStorage.getItem(RKEY) || '{}');
+    for (var _h in _r) if (_r[_h] && Date.now() - _r[_h].t < RTTL) REACH[_h] = _r[_h];
+  } catch (e) { }
+  function remember(host, up) {
+    REACH[host] = { up: up, t: Date.now() };
+    try { localStorage.setItem(RKEY, JSON.stringify(REACH)); } catch (e) { }
+  }
+  function reach(host) {
+    var r = REACH[host];
+    if (r && Date.now() - r.t < RTTL) return Promise.resolve(r.up);
+    if (RBUSY[host]) return RBUSY[host];
+    RBUSY[host] = getJSON(RPROBE[host], 3500).then(function () { return true; }, function () { return false; })
+      .then(function (up) { remember(host, up); delete RBUSY[host]; return up; });
+    return RBUSY[host];
+  }
+  /* reachable host → run the request; unreachable → fail at once so the caller falls back without waiting */
+  function ifUp(host, make) {
+    return reach(host).then(function (up) { if (!up) throw new Error(host + ' unreachable'); return make(); });
+  }
+  P.reach = reach; P.ifUp = ifUp;
+
   function rowB(k) { return { t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; }
   function klines(sym, iv, limit, start, end) {
     var u = API + 'klines?symbol=' + sym + 'USDT&interval=' + iv + '&limit=' + (limit || 1000) + (start ? '&startTime=' + start : '') + (end ? '&endTime=' + end : '');
@@ -183,11 +214,15 @@
   Feed.prototype.start = function () {
     var self = this, tf = this.tf;
     this.state = 'load'; this.tell('state');
+    reach('okx');                       /* probe the fallback at the same time, so a dead Binance costs one wait, not two */
     var bm = NATIVE[tf.base] * 1000, pages = tf.ratio === 1 ? 1 : Math.min(6, Math.ceil(600 * tf.ratio / 1000));
-    var end = Math.floor(Date.now() / bm) * bm + bm, reqs = [];
-    if (pages === 1) reqs.push(klines(this.sym, tf.base, 1000));
-    else for (var k = 0; k < pages; k++) reqs.push(klines(this.sym, tf.base, 1000, end - (k + 1) * 1000 * bm, end - k * 1000 * bm - 1));
-    return Promise.all(reqs).then(function (rs) {
+    var end = Math.floor(Date.now() / bm) * bm + bm;
+    return ifUp('binance', function () {
+      var reqs = [];
+      if (pages === 1) reqs.push(klines(self.sym, tf.base, 1000));
+      else for (var k = 0; k < pages; k++) reqs.push(klines(self.sym, tf.base, 1000, end - (k + 1) * 1000 * bm, end - k * 1000 * bm - 1));
+      return Promise.all(reqs);
+    }).then(function (rs) {
       var all = []; rs.forEach(function (r) { all = all.concat(r); });
       if (!all.length) throw new Error('empty');
       self.base = merge([], all); self.src = 'binance'; self.err = null; self.at = Date.now();
@@ -207,7 +242,7 @@
     if (!ob) return Promise.reject(new Error('no okx bar'));
     this.obase = ob;
     var otf = { id: tf.id, sec: tf.sec, base: ob, ratio: tf.sec / NATIVE[ob], u: tf.u, n: tf.n };
-    return okxCandles(this.sym, OKXBAR[ob], 300).then(function (rows) {
+    return ifUp('okx', function () { return okxCandles(self.sym, OKXBAR[ob], 300); }).then(function (rows) {
       if (!rows.length) throw new Error('empty');
       self.tf = otf; self.base = rows; self.src = 'okx'; self.rebuild(); self.tell('reset'); self.poll('okx');
     });
@@ -293,7 +328,7 @@
   function tkRest(syms) {
     if (!syms.length) return Promise.resolve();
     var u = API + 'ticker/24hr?type=MINI&symbols=' + encodeURIComponent(JSON.stringify(syms.map(function (s) { return s + 'USDT'; })));
-    return getJSON(u).then(function (a) {
+    return ifUp('binance', function () { return getJSON(u); }).then(function (a) {
       (a || []).forEach(function (x) { tkPut(x.symbol.replace(/USDT$/, ''), { c: x.lastPrice, o: x.openPrice, h: x.highPrice, l: x.lowPrice, q: x.quoteVolume }); });
     }, function () {
       return getJSON('/data/market.json?v=' + Math.floor(Date.now() / 3e5)).then(function (m) {
@@ -326,7 +361,7 @@
     if (P._uni) return P._uni;
     var ls = P.store, cached = ls.get('ek_pro_px', null);
     var avail = (cached && cached.t > Date.now() - 864e5 && cached.s) ? Promise.resolve(cached.s) :
-      getJSON(API + 'ticker/price', 15000).then(function (a) {
+      ifUp('binance', function () { return getJSON(API + 'ticker/price', 15000); }).then(function (a) {
         var s = a.filter(function (x) { return /USDT$/.test(x.symbol); }).map(function (x) { return x.symbol.slice(0, -4); });
         ls.set('ek_pro_px', { t: Date.now(), s: s }); return s;
       });

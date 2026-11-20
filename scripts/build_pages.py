@@ -182,7 +182,7 @@ details{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}.kpi small{color:var(--mute);display:block;font-size:.75rem}.kpi b{font-family:'Space Grotesk',monospace;font-size:1.2rem;direction:ltr;unicode-bidi:isolate;display:inline-block}
 .up{color:#22c55e}.down{color:#ef4444}ul.list{list-style:none}ul.list li{border-bottom:1px solid var(--line);padding:10px 0}ul.list li small{color:var(--mute);display:block}
 table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:start}th{color:var(--mute);font-weight:500}
-.tv{height:420px;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}.note{color:var(--mute);font-size:.8rem;margin-top:8px}
+.tv{height:420px;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0;position:relative}.tvoff{display:none}.tv.off .tradingview-widget-container{display:none}.tv.off .tvoff{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:100%;padding:18px;text-align:center}.tvoff p{color:var(--mute);font-size:.9rem;margin:0;max-width:34em;line-height:1.9}.note{color:var(--mute);font-size:.8rem;margin-top:8px}
 footer{border-top:1px solid var(--line);padding:24px 0;color:var(--mute);font-size:.85rem}
 .coins a{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 12px;margin:4px;color:var(--ink);font-family:'Space Grotesk',monospace}"""
 
@@ -801,8 +801,11 @@ def build_coin(c, cposts):
             f'<p class="acts"><button class="wbtn" data-watch="{c}" type="button">⭐ <span>افزودن به لیست مراقبت</span></button> '
             f'<a class="wbtn" href="/tools/?cmp={",".join([c] + [x for x in ("BTC", "ETH", "SOL") if x != c][:2])}#compare">⚖️ مقایسه با کوین‌های اصلی</a> <a class="wbtn" href="/me/?paper={c}#paper">📝 معاملهٔ آزمایشی</a></p>')
     tv = TV.get(c, f"BINANCE:{c}USDT")
-    body += f'''<div class="tv"><div class="tradingview-widget-container" style="height:100%"><div class="tradingview-widget-container__widget" style="height:100%"></div>
-<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{sj({"autosize": True, "symbol": tv, "interval": "60", "theme": "dark", "style": "1", "locale": "en", "backgroundColor": "rgba(18,18,18,1)", "allow_symbol_change": False, "save_image": False, "support_host": "https://www.tradingview.com"})}</script></div></div>'''
+    # The TradingView widget comes from s3.tradingview.com. Where that host cannot be reached the box used to stay
+    # empty for good; now the reader is told why and sent to the site's own chart, which needs no foreign host.
+    body += f'''<div class="tv" id="tv"><div class="tvoff"><p>نمودار TradingView روی این شبکه باز نشد. نمودار خود سایت از داده‌های انتخاب خوانده می‌شود و به میزبان بیرونی نیازی ندارد.</p><a class="wbtn" href="/market/">نمودار پیشرفتهٔ انتخاب ↗</a></div><div class="tradingview-widget-container" style="height:100%"><div class="tradingview-widget-container__widget" style="height:100%"></div>
+<script src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>{sj({"autosize": True, "symbol": tv, "interval": "60", "theme": "dark", "style": "1", "locale": "en", "backgroundColor": "rgba(18,18,18,1)", "allow_symbol_change": False, "save_image": False, "support_host": "https://www.tradingview.com"})}</script></div>
+<script>setTimeout(function(){{var b=document.getElementById('tv');if(b&&!b.querySelector('iframe'))b.classList.add('off');}},7000);</script></div>'''
     body += '<h2>وضعیت تکنیکال (۱ ساعته)</h2>'
     if m:
         tr = {"up": "صعودی", "down": "نزولی", "range": "خنثی / رنج"}[m["trend"]]
