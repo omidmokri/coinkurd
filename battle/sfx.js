@@ -81,6 +81,28 @@ function gunCore(A, o, P) {
 SFX.gun = (A, o) => gunCore(A, o, {});
 /* the machines' rifles: softer than a man's (less crack, no metallic ping, no servo whir after each burst): with dozens of robots
    and dogs firing, the bright layers piled up into a harsh hiss (owner, 2026-11-14) */
+/* the battle that is always somewhere else: the same shots, but heard across a valley — no crack, a soft body, and a tail
+   off the hills. These carry the scene when nothing is firing on screen (owner, 2026-11-20: the field sounded empty). */
+SFX.farfire = function (A, o) {
+  const C = A.ctx, v = (o.vol == null ? .22 : o.vol), n = Math.max(1, o.burst | 0), rate = o.rate || 10, t0 = t0of(A, o) + rr(0, .05);
+  const O = spot(A, o, 'amb'), out = O.g, span = (n - 1) / rate, end = t0 + span + .9;
+  const s = nsrc(A, 'pink'), bp = flt(C, 'bandpass', rr(380, 620), .8), g = amp(C, 0); s.connect(bp).connect(g).connect(out);
+  const th = osc(C, 'sine', 90), gt = amp(C, 0); th.connect(gt).connect(out);
+  for (let i = 0; i < n; i++) {
+    const t = t0 + i / rate + (i ? rr(-.008, .008) : 0), k = i ? rr(.7, 1) : 1;
+    hit(g.gain, t, .004, v * k, .085); hit(gt.gain, t, .004, v * .5 * k, .1);
+  }
+  echo(C, out, O.lp, rr(.22, .4), 520, .34); echo(C, out, O.lp, rr(.55, .8), 340, .18);
+  run(s, t0, end); th.start(t0); th.stop(end); done(A, end + .1);
+};
+SFX.farboom = function (A, o) {                                                     // artillery somewhere behind the hills
+  const C = A.ctx, v = o.vol == null ? .35 : o.vol, O = spot(A, o, 'amb'), out = O.g, t0 = t0of(A, o);
+  const s = nsrc(A, 'brown'), lp = flt(C, 'lowpass', 300, .7), g = amp(C, 0); s.connect(lp).connect(g).connect(out);
+  sweep(lp.frequency, t0, 300, 90, 1.5); g.gain.setValueAtTime(.0001, t0); g.gain.linearRampToValueAtTime(v, t0 + .05); g.gain.exponentialRampToValueAtTime(.0001, t0 + 2.2);
+  const b = osc(C, 'sine', 54), gb = amp(C, 0); b.connect(gb).connect(out); sweep(b.frequency, t0, 54, 26, 1.2); hit(gb.gain, t0, .02, v * .7, 1.2);
+  echo(C, out, O.lp, .5, 360, .3);
+  run(s, t0, t0 + 2.3); b.start(t0); b.stop(t0 + 1.3); done(A, t0 + 2.4);
+};
 SFX.rgun = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 3, rate: 12.5 }), { bp: 620, crack: 3200, crackG: .45, thump: .8 });
 SFX.dogfire = (A, o) => gunCore(A, Object.assign({}, o, { burst: o.burst || 3, rate: 14 }), { bp: 900, crack: 3600, crackG: .4, thump: .45 });
 

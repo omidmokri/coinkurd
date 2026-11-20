@@ -4,7 +4,7 @@
 /* ======================= config & helpers ======================= */
 const SYMS=['BTC','ETH','SOL','BNB','XRP','DOGE'];let SYM=ls.get('ek_bf_sym','BTC');if(!SYMS.includes(SYM))SYM='BTC';
 const REST='https://data-api.binance.vision/api/v3',WSS='wss://data-stream.binance.vision/stream';
-const PREF=Object.assign({sky:'auto',quality:'auto',motion:'full',music:false,snd:ls.get('ek_bf_snd',false),vol:{master:.8,music:.55,sfx:.9,amb:.7,voice:.8},cam:'orbit',layers:{units:1,fx:1,depth:1,feed:1}},ls.get('ek_bf_pref',{}));
+const PREF=Object.assign({sky:'auto',quality:'auto',motion:'full',music:true,snd:ls.get('ek_bf_snd',false),vol:{master:.8,music:.72,sfx:.9,amb:.55,voice:.8},cam:'orbit',layers:{units:1,fx:1,depth:1,feed:1}},ls.get('ek_bf_pref',{}));
 const savePref=()=>ls.set('ek_bf_pref',PREF);
 const REDUCED=()=>PREF.motion==='reduced'||matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,rnd=(a=1,b=0)=>b+Math.random()*(a-b);
@@ -823,7 +823,7 @@ const CINE={q:[],shot:null,t0:0,act:0,lift:0,step:0,poleL:null,poleT:0,P:new THR
  /* behind (back), beside (side) and above (up) something that moves, looking ahead of it; o() gives {p, f:[x,z] forward} or null */
  track(o,back,side,up,ahead,dur,fov){let P=null,T=null;return {dur,fov:fov||50,P:(u,dt)=>{const q=o();if(q){const f=q.f,r=[-f[1],f[0]],w=this.V(q.p.x-f[0]*back+r[0]*side,q.p.y+up,q.p.z-f[1]*back+r[1]*side),l=this.V(q.p.x+f[0]*ahead,q.p.y+up*.35,q.p.z+f[1]*ahead);
    if(!P){P=w;T=l}else{const k=Math.min(1,dt*3);P.lerp(w,k);T.lerp(l,k)}}return P||this.P.clone()},T:()=>T||this.T.clone()}},
- still(p,t,dur,fov){return {dur,fov:fov||46,P:()=>p,T:typeof t==='function'?t:()=>t}},
+ still(p,t,dur,fov){return {dur,fov:fov||46,P:typeof p==='function'?p:()=>p,T:typeof t==='function'?t:()=>t}},
  /* ---- what there is to film ---- */
  squad(side){const f=ARMY.frontOf(ARMY.sides[side]);return f.length?f[Math.floor(Math.random()*Math.min(8,f.length))]:null},
  hull(side,pred){const L=ARMY.sides[side].veh.filter(v=>!v.dead&&!v.hold&&!v.inShed&&(!pred||pred(v)));return L.length?L[Math.floor(Math.random()*L.length)]:null},
@@ -832,34 +832,50 @@ const CINE={q:[],shot:null,t0:0,act:0,lift:0,step:0,poleL:null,poleT:0,P:new THR
  shipOf(s){return ()=>({p:s.g.position,f:[Math.cos(s.hd||0),-Math.sin(s.hd||0)]})},
  /* ---- the reel ---- */
  reel(){const acts=['theatre','armies','yard','front','sea','sky'];for(let i=0;i<acts.length;i++){const a=this['act_'+acts[this.act++%acts.length]]();if(a&&a.length)return a}return this.act_theatre()},
- act_theatre(){const fx=this.fx(),s=Math.random()<.5?-1:1,out=[];
-  if(Math.random()<.5)out.push(this.fly(this.V(fx+s*95,64,58),this.V(fx+s*30,40,44),this.V(fx,0,-4),10,50));
-  else out.push(this.fly(this.V(s*40,20,-175),this.V(s*12,30,-112),this.V(fx*.4,0,-12),10,52));     // in from the sea over the fleets, the coast ahead
-  out.push(this.fly(this.V(fx-s*20,26,-62),this.V(fx+s*24,30,-58),this.V(fx,1,0),8,46));             // along the rear, the whole front in frame
+ /* The shots below were rebuilt (owner, 2026-11-20: the old ones framed empty ground). Three rules now hold for every one of them:
+    the front line (fx) or a unit that is actually there is in frame; the camera is low and close enough for the men and the
+    machines to read against the sky; and nothing points out into bare terrain. heat() gives the z the fighting is on, so a shot
+    is framed where the line is thickest rather than at a random depth. */
+ heat(){const L=ARMY.frontOf(ARMY.sides.bull).concat(ARMY.frontOf(ARMY.sides.bear));if(!L.length)return 0;let z=0;for(const u of L)z+=u.z;return clamp(z/L.length,-30,30)},
+ act_theatre(){const fx=this.fx(),s=Math.random()<.5?-1:1,hz=this.heat(),out=[];
+  /* down out of the sky onto the line: the whole front swings through frame and the camera ends low over the fighting */
+  out.push(this.fly(this.V(fx+s*120,78,hz+86),this.V(fx+s*26,13,hz+34),()=>this.V(fx,2,hz),9,52));
+  /* then a slow crawl along no-man's land, both armies to either side */
+  out.push(this.fly(this.V(fx,7.5,hz-46),this.V(fx,7.5,hz+46),()=>this.V(fx-s*30,2.5,hz),8,40));
   return out},
- act_armies(){const out=[],k=this.side(),D=this.dirOf(k),s0=this.squad(k);
-  if(s0)out.push(this.crane(this.V(s0.x,ARMY.gy(s0.x,s0.z),s0.z),-D,0,3.2,13,1.6,15,8,42));         // from just behind a squad, up and back over it
-  const fx=this.fx(),lx=fx+D*9;out.push(this.fly(this.V(lx+D*7,3.2,-26),this.V(lx+D*7,3.2,24),()=>this.V(lx-D*8,1.6,this.P.z+8),9,48));   // a dolly down the line
-  const v=this.hull(k,v=>!v.mv);if(v){const a=Math.atan2(-(0-v.z),(fx-v.x))+(Math.random()<.5?.7:-.7);out.push({dur:7,fov:38,P:u=>{const d=24-13*this.ease(u);return this.V(v.x+Math.cos(a)*d,ARMY.gy(v.x,v.z)+1.8,v.z-Math.sin(a)*d)},T:()=>this.V(v.x,ARMY.gy(v.x,v.z)+1.9,v.z)})}   // push in, low, on a tank
+ act_armies(){const out=[],k=this.side(),D=this.dirOf(k),fx=this.fx(),hz=this.heat(),s0=this.squad(k);
+  /* up off a squad's backs until the line they are walking into fills the frame */
+  if(s0)out.push(this.crane(this.V(s0.x,ARMY.gy(s0.x,s0.z),s0.z),-D,0,2.6,11,1.5,12,7.5,44));
+  /* a low dolly along the ranks, the men passing close to the lens, the front behind them */
+  const lx=fx+D*34;out.push(this.fly(this.V(lx,3.4,hz-34),this.V(lx,3.4,hz+34),()=>this.V(lx-D*26,1.6,this.P.z+16),8,44));   // far enough out that the ranks read as ranks and the lens is not inside a man
+  /* a tank, from the ground up: the hull against the sky, the gun over the lens */
+  const v=this.hull(k);if(v){const a=Math.atan2(0-v.z,fx-v.x)+(Math.random()<.5?.55:-.55);
+   out.push({dur:6.5,fov:36,P:u=>{const d=17-7.5*this.ease(u);return this.V(v.x+Math.cos(a)*d,ARMY.gy(v.x,v.z)+1.15,v.z-Math.sin(a)*d)},T:()=>this.V(v.x,ARMY.gy(v.x,v.z)+2.2,v.z)})}
   return out},
  act_yard(){const out=[];for(const k of ['bull','bear']){const A=ARMY.sides[k],D=A.dir;
    const clear=v=>A.shed?Math.hypot(v.x-A.shed.x,v.z-A.shed.door)>16:true,v=A.veh.find(v=>!v.dead&&!v.hold&&!v.inShed&&v.mv&&D*v.x>40&&clear(v))||ARMY.trucks.find(t=>t.on&&!t.hold&&!t.inShed&&t.A===A&&t.mv&&D*t.x>40&&clear(t));
-   if(v){out.push(this.track(this.mover(v),11,2.5,4.2,10,8,50));return out}}
+   if(v){out.push(this.track(this.mover(v),9,3.2,2.6,14,7.5,46));return out}}   // low and tight on the flank of a column on the move
   const k=this.side(),A=ARMY.sides[k],D=A.dir,g=A.gate;if(!g)return out;
-  out.push(this.still(this.V(D*(GATE-15),4.6,g[1]+7),this.V(D*GATE,2.2,g[1]),6,40));               // at the gate as the men come out
-  if(A.shed)out.push(this.still(this.V(A.shed.x-D*7,5.8,A.shed.door+11),this.V(A.shed.x,2.6,A.shed.door-2),5,44));   // the motor pool's door
+  out.push(this.still(this.V(D*(GATE-11),2.4,g[1]+5),this.V(D*GATE,1.8,g[1]),5.5,42));                 // at the gate, eye level, as the men come through it
+  if(A.shed)out.push(this.still(this.V(A.shed.x-D*9,2.8,A.shed.door+9),this.V(A.shed.x,2.4,A.shed.door-2),5,46));
   return out},
- act_front(){const fx=this.fx(),k=this.side(),D=this.dirOf(k),out=[],z=rnd(22,-22);
-  out.push(this.fly(this.V(fx+D*34,1.6,z),this.V(fx+D*31,1.7,z+3),this.V(fx-D*12,1.5,z+5),6,26));   // a long lens across no-man's land
-  const s0=this.squad(k);if(s0){const h=s0.x,zz=s0.z;out.push({dur:6,fov:40,P:u=>this.V(h+D*2.3,ARMY.gy(h,zz)+1.75,zz+.8+u*.4),T:()=>this.V(h-D*25,ARMY.gy(h,zz)+1.2,zz+2)})}   // over a soldier's shoulder
+ act_front(){const fx=this.fx(),k=this.side(),D=this.dirOf(k),out=[],s0=this.squad(k),hz=this.heat();
+  /* over a man's shoulder, the enemy line beyond him */
+  if(s0){const h=s0.x,zz=s0.z;out.push({dur:6,fov:38,P:u=>this.V(h+D*4.2,ARMY.gy(h,zz)+1.9,zz-1.5+u*.5),T:()=>this.V(h-D*30,ARMY.gy(h,zz)+1.4,zz+1)})}
+  /* the long lens straight down the line of contact: both sides stacked up in the frame */
+  const z0=hz+rnd(16,-16);out.push(this.fly(this.V(fx+rnd(5,-5),1.5,z0-34),this.V(fx+rnd(5,-5),1.6,z0-24),()=>this.V(fx,1.6,z0+26),6.5,30));
+  /* a crater-level drift across the ground between the armies */
+  out.push(this.fly(this.V(fx-D*16,1.25,z0+9),this.V(fx+D*16,1.35,z0+5),()=>this.V(fx+D*34,2.6,z0),6,48));
   return out},
  act_sea(){const out=[],k=this.side(),s=this.ship(k,Math.random()<.6?'dd':'ff');
-  if(s)out.push(this.track(this.shipOf(s),-14,-48,7,6,8,46));                                         // alongside a warship, at her pace
-  const c=window.GFX6&&GFX6.cv&&GFX6.cv[k];if(c)out.push(this.orbit(()=>c.g.position,92,30,rnd(6.28),.55,9,44,6));   // round a carrier
+  if(s)out.push(this.track(this.shipOf(s),-15,-24,5.5,16,7.5,44));                                        // off her bow, low to the water, the coast behind
+  const c=window.GFX6&&GFX6.cv&&GFX6.cv[k];if(c){out.push(this.orbit(()=>c.g.position,74,19,rnd(6.28),.75,8,42,7));   // round the carrier, nearer and lower than before
+   out.push(this.still(()=>this.V(c.g.position.x+rnd(16,-16),c.g.position.y+15,c.g.position.z+52),()=>this.V(c.g.position.x,c.g.position.y+6,c.g.position.z),4.5,40))}
   return out},
- act_sky(){const out=[],A4=window.GFX4&&GFX4.air,k=this.side();
-  const d=A4&&A4.ready&&A4.drones.find(d=>d.side===k);if(d)out.push(this.track(()=>({p:d.m.position,f:[Math.cos(d.m.rotation.y),-Math.sin(d.m.rotation.y)]}),9,0,2.5,-6,7,56));   // riding behind a recon drone
-  if(WORLD.env5&&Math.random()<.6)out.push({sat:k,dur:9});
+ act_sky(){const out=[],A4=window.GFX4&&GFX4.air,k=this.side(),fx=this.fx(),hz=this.heat();
+  const d=A4&&A4.ready&&A4.drones.find(d=>d.side===k);if(d)out.push(this.track(()=>({p:d.m.position,f:[Math.cos(d.m.rotation.y),-Math.sin(d.m.rotation.y)]}),11,2,1.5,-14,6.5,54));   // behind the drone, the front under its nose
+  out.push(this.fly(this.V(fx+this.dirOf(k)*60,34,hz+52),this.V(fx-this.dirOf(k)*18,19,hz+20),()=>this.V(fx,1,hz),7,48));   // a gun-camera run in on the line
+  if(WORLD.env5&&Math.random()<.45)out.push({sat:k,dur:8});
   return out},
  /* ---- big moments cut in ---- */
  event(kind,o){if(DIRECTOR.mode!=='cine'||!R3)return;const S=this.seq(kind,o||{});if(!S||!S.length)return;const pri=o&&o.pri||2;if(this.shot&&this.pri>pri&&now()-this.t0<this.shot.dur*1000)return;
@@ -1044,19 +1060,21 @@ const mtof=m=>440*Math.pow(2,(m-69)/12);
    at the ceiling for 8 s is reset: before, each such failure kept one of the 24 voices for good, until nothing could play */
 /* robots and dogs fire and move all the time: the same sound is not started again within its gap (seconds), so the many
    machines read as one steady line of fire instead of a hiss that buries everything else */
-const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{servo:2.4,rgun:.4,dogfire:.4,gun:.05},amb:null,music:{on:!!PREF.music,key:'minor',bar:0,next:0,timer:null,nodes:[]},wx:0,
- init(){if(this.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const C=new AC();this.ctx=C;C.onstatechange=()=>{try{HUD.snd()}catch(e){}};this.master=C.createGain();this.mf=C.createBiquadFilter();this.mf.type='lowpass';this.mf.frequency.value=20000;this.comp=C.createDynamicsCompressor();this.comp.threshold.value=-10;this.comp.ratio.value=4;this.comp.attack.value=.003;this.comp.release.value=.25;
-  this.lim=C.createDynamicsCompressor();this.lim.threshold.value=-2;this.lim.knee.value=0;this.lim.ratio.value=20;this.lim.attack.value=.001;this.lim.release.value=.12;this.master.connect(this.mf).connect(this.comp).connect(this.lim).connect(C.destination);this.dk={};for(const b of ['music','sfx','amb','voice']){const g=C.createGain(),d=C.createGain();g.connect(d).connect(this.master);this.bus[b]=g;this.dk[b]=d}this.setVols();/* battlefield space: a generated 2.6 s stereo impulse response, fed from effects + ambience */try{const n=Math.floor(C.sampleRate*2.6),ir=C.createBuffer(2,n,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);let lp=0;for(let i=0;i<n;i++){const t=i/n;lp=lp*.6+(Math.random()*2-1)*.4;d[i]=i<C.sampleRate*.015?0:lp*Math.pow(1-t,3.4)*(1+.3*Math.sin(i*.0007*(ch+1)))}}this.rev=C.createConvolver();this.rev.buffer=ir;this.revG=C.createGain();this.revG.gain.value=.26;this.bus.sfx.connect(this.rev);const ag=C.createGain();ag.gain.value=.4;this.bus.amb.connect(ag).connect(this.rev);this.rev.connect(this.revG).connect(this.master)}catch(e){}
+const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{servo:2.4,rgun:.4,dogfire:.4,gun:.05,farfire:.55,farboom:2.2},amb:null,music:{on:!!PREF.music,key:'minor',bar:0,next:0,timer:null,nodes:[]},wx:0,
+ init(){if(this.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const C=new AC();this.ctx=C;C.onstatechange=()=>{try{HUD.snd()}catch(e){}};this.master=C.createGain();this.mf=C.createBiquadFilter();this.mf.type='lowpass';this.mf.frequency.value=20000;this.hp=C.createBiquadFilter();this.hp.type='highpass';this.hp.frequency.value=42;this.hp.Q.value=.6;/* below 42 Hz nothing is heard, only level: it was 97% of the energy and slammed the compressor, so the whole mix pumped (owner, 2026-11-20) */
+  this.comp=C.createDynamicsCompressor();this.comp.threshold.value=-16;this.comp.knee.value=14;this.comp.ratio.value=2.6;this.comp.attack.value=.012;this.comp.release.value=.5;
+  this.lim=C.createDynamicsCompressor();this.lim.threshold.value=-1.5;this.lim.knee.value=2;this.lim.ratio.value=12;this.lim.attack.value=.002;this.lim.release.value=.28;this.master.connect(this.mf).connect(this.hp).connect(this.comp).connect(this.lim).connect(C.destination);this.dk={};for(const b of ['music','sfx','amb','voice']){const g=C.createGain(),d=C.createGain();g.connect(d).connect(this.master);this.bus[b]=g;this.dk[b]=d}this.setVols();/* battlefield space: a generated 2.6 s stereo impulse response, fed from effects + ambience */try{const n=Math.floor(C.sampleRate*2.6),ir=C.createBuffer(2,n,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);let lp=0;for(let i=0;i<n;i++){const t=i/n;lp=lp*.6+(Math.random()*2-1)*.4;d[i]=i<C.sampleRate*.015?0:lp*Math.pow(1-t,3.4)*(1+.3*Math.sin(i*.0007*(ch+1)))}}this.rev=C.createConvolver();this.rev.buffer=ir;this.revG=C.createGain();this.revG.gain.value=.26;this.bus.sfx.connect(this.rev);const ag=C.createGain();ag.gain.value=.4;this.bus.amb.connect(ag).connect(this.rev);this.rev.connect(this.revG).connect(this.master)}catch(e){}
   this.nz={};this.ambience();if(this.music.on)this.startMusic()},
  /* a big blast pulls the music and the ambience down for a moment, the way a film mix makes room for it */
- duck(a,dur){if(!this.ctx||!this.dk)return;const t=this.ctx.currentTime;for(const b of ['music','amb']){const p=this.dk[b].gain;p.cancelScheduledValues(t);p.setValueAtTime(p.value,t);p.linearRampToValueAtTime(Math.max(.2,1-a),t+.03);p.setTargetAtTime(1,t+.1,dur)}},
+ duck(a,dur){if(!this.ctx||!this.dk)return;const t=this.ctx.currentTime,d=Math.max(.45,1-a*.55);for(const b of ['music','amb']){const p=this.dk[b].gain;if(p.value<d+.02&&p.value<.999)continue;/* already down: a second blast does not pull it further, which is what made the mix pump (owner, 2026-11-20) */
+  p.cancelScheduledValues(t);p.setValueAtTime(p.value,t);p.linearRampToValueAtTime(d,t+.06);p.setTargetAtTime(1,t+.18,Math.max(.35,dur))}},
  setVols(){if(!this.ctx)return;const v=PREF.vol;this.master.gain.value=v.master;this.bus.music.gain.value=v.music;this.bus.sfx.gain.value=v.sfx;this.bus.amb.gain.value=v.amb;this.bus.voice.gain.value=v.voice},
  /* browsers start an AudioContext "suspended" until the visitor touches the page: with sound saved as on, the button said 🔊
    while nothing played (owner, 2026-11-14). The first touch, click or key anywhere now starts it, and so does coming back to the tab */
- unlock(g){if(!this.on)return;this.init();const C=this.ctx;if(!C||C.state==='running'||C.state==='closed')return;if(g)this.held=Date.now();try{const p=C.resume();if(p&&p.catch)p.catch(()=>{})}catch(e){}},
+ unlock(g){if(!this.on)return;this.init();const C=this.ctx;if(!C||C.state==='closed')return;if(g)this.held=Date.now();if(C.state!=='running'){try{const p=C.resume();if(p&&p.then)p.then(()=>{if(this.music.on&&!this.music.timer)this.startMusic()},()=>{})}catch(e){}}else if(this.music.on&&!this.music.timer)this.startMusic()},
  /* the sound button and the M key: a press that has just woken the sound up does not also switch it off */
  toggle(){if(this.on&&this.ctx&&Date.now()-(this.held||0)<1500){this.held=0;this.play('ui',{vol:.4});return}this.enable(!this.on)},
- enable(on){this.on=on;PREF.snd=on;ls.set('ek_bf_snd',on);savePref();if(on){this.init();if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();this.play('ui',{vol:.4})}else if(this.ctx){this.ctx.suspend()}},
+ enable(on){this.on=on;PREF.snd=on;ls.set('ek_bf_snd',on);savePref();if(on){this.init();if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();if(this.music.on&&!this.music.timer)this.startMusic();this.play('ui',{vol:.4})}else if(this.ctx){this.ctx.suspend()}},
  setMusic(on){this.music.on=on;PREF.music=on;savePref();if(!this.ctx)return;if(on)this.startMusic();else this.stopMusic()},
  noise(kind){if(this.nz[kind])return this.nz[kind];const C=this.ctx,n=C.sampleRate*2,b=C.createBuffer(1,n,C.sampleRate),d=b.getChannelData(0);let last=0,b0=0,b1=0,b2=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(kind==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.5}else if(kind==='pink'){b0=.99765*b0+w*.099046;b1=.963*b1+w*.2965164;b2=.57*b2+w*1.0526913;d[i]=(b0+b1+b2+w*.1848)*.18}else d[i]=w}this.nz[kind]=b;return b},
  src(kind,rate){const C=this.ctx,s=C.createBufferSource();s.buffer=this.noise(kind||'white');s.loop=true;if(rate)s.playbackRate.value=rate;return s},
@@ -1096,16 +1114,16 @@ const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{s
  /* ---- ambience layers: wind / rain / birds / distant fire / engines ---- */
  ambience(){const C=this.ctx,mk=(kind,ft,fq,q)=>{const s=this.src(kind),f=C.createBiquadFilter();f.type=ft;f.frequency.value=fq;if(q)f.Q.value=q;const g=C.createGain();g.gain.value=0;s.connect(f).connect(g).connect(this.bus.amb);s.start();return {s,f,g}};
   const wind=mk('brown','lowpass',380),rain=mk('pink','lowpass',1800,.5),eng=mk('brown','lowpass',160);const lfo=C.createOscillator();lfo.type='sine';lfo.frequency.value=.11;const lg=C.createGain();lg.gain.value=.12;lfo.connect(lg).connect(wind.g.gain);lfo.start();
-  const sw=C.createOscillator();sw.type='sawtooth';sw.frequency.value=44;const swf=C.createBiquadFilter();swf.type='lowpass';swf.frequency.value=200;sw.connect(swf).connect(eng.g);sw.start();this.amb={wind,rain,eng};
+  const sw=C.createOscillator();sw.type='sawtooth';sw.frequency.value=62;const swf=C.createBiquadFilter();swf.type='lowpass';swf.frequency.value=180;const swg=C.createGain();swg.gain.value=.5;sw.connect(swf).connect(swg).connect(eng.g);sw.start();this.amb={wind,rain,eng};
   if(window.GFX4&&GFX4.AMBX)try{GFX4.AMBX.init(this)}catch(e){console.error(e)}this.ambTimer=setInterval(()=>this.ambTick(),500)},
  ambTick(){if(!this.ctx||!this.on||this.ctx.state!=='running')return;const I=this.I,C=this.ctx,t=C.currentTime,day=WORLD.cur?WORLD.cur.stars<.5:true;if(window.GFX4&&GFX4.AMBX)try{GFX4.AMBX.tick(this)}catch(e){}
-  this.amb.wind.g.gain.setTargetAtTime(.18+this.wx*.14+I*.08,t,.5);this.amb.rain.g.gain.setTargetAtTime(this.wx>=3?.22:0,t,1);this.amb.eng.g.gain.setTargetAtTime(Math.min(.22,I*.3),t,1);
+  this.amb.wind.g.gain.setTargetAtTime(.10+this.wx*.09+I*.05,t,.5);this.amb.rain.g.gain.setTargetAtTime(this.wx>=3?.16:0,t,1);this.amb.eng.g.gain.setTargetAtTime(Math.min(.10,I*.14),t,1);
   if(day&&I<.35&&Math.random()<.35&&this.wx<2){const g=this.out({x:rnd(120,-120),z:rnd(60,-60)},'amb');const f0=2500+Math.random()*1200;for(let i=0;i<3;i++){const s=C.createOscillator();s.type='sine';s.frequency.setValueAtTime(f0,t+i*.09);s.frequency.exponentialRampToValueAtTime(f0*1.25,t+i*.09+.06);s.connect(g);s.start(t+i*.09);s.stop(t+i*.09+.07)}this.env(g,t,.01,.12,.25,null,0,t+.3)}
   /* the war never goes quiet: far-off rifle and machine-gun bursts and now and then artillery over the hills. These replace the
      white-noise pops that read as a hiss (owner, 2026-11-20); the shot sounds are the real ones, darkened by distance */
   const far=()=>{const a=Math.random()*Math.PI*2,r=rnd(260,140);return {x:Math.cos(a)*r,z:Math.sin(a)*r}};
-  if(Math.random()<.32+I*.5){const p=far();this.play('gun',Object.assign(p,{vol:.22+I*.15,burst:Math.random()<.45?(5+(Math.random()*7|0)):(1+(Math.random()*3|0)),rate:Math.random()<.4?14:9,delay:Math.random()*.4}))}
-  if(Math.random()<.05+I*.12){const p=far();this.play('cannon',Object.assign(p,{vol:.35+I*.2,delay:Math.random()*.4}))}},
+  if(Math.random()<.5+I*.4){const p=far();this.play('farfire',Object.assign(p,{vol:.22+I*.15,burst:Math.random()<.45?(5+(Math.random()*7|0)):(1+(Math.random()*3|0)),rate:Math.random()<.4?14:9,delay:Math.random()*.4}))}
+  if(Math.random()<.07+I*.14){const p=far();this.play('farboom',Object.assign(p,{vol:.35+I*.2,delay:Math.random()*.4}))}},
  intensity(I){this.I+=(I-this.I)*.3},weather(lv){this.wx=lv},
  /* ---- generative music: 120 BPM, four layers, key by regime ---- */
  PROG:{major:[[48,52,55,59],[43,47,50,55],[45,48,52,55],[41,45,48,52]],minor:[[48,51,55,58],[44,48,51,55],[51,55,58,62],[46,50,53,58]],dorian:[[50,53,57,60],[55,59,62,65],[50,53,57,60],[48,52,55,59]]},
@@ -1121,19 +1139,19 @@ const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{s
    notes.forEach(n=>dets.forEach(d=>{const o=C.createOscillator();o.type=type;o.frequency.value=mtof(n)*Math.pow(2,d/1200);if(vib){const l=C.createOscillator(),lg=C.createGain();l.frequency.value=5+Math.random()*.6;lg.gain.value=vib;l.connect(lg).connect(o.detune);l.start(ts);l.stop(te)}o.connect(f);o.start(ts);o.stop(te)}));
    const p=g.gain;p.setValueAtTime(.0001,ts);p.linearRampToValueAtTime(peak,ts+a);p.setValueAtTime(peak,te-rel);p.linearRampToValueAtTime(.0001,te);return g};
   /* low strings: root an octave down + the chord, a slow bow swell; overlaps the next bar so it never stops */
-  voice([ch[0]-12,ch[0]],'sawtooth',260+I*260,.7,[-6,7],.9,.06,.6,t0,t0+2.3,6);
-  voice(ch.slice(0,3),'sawtooth',520+I*500,.5,[-9,0,8],1,.028+I*.012,.6,t0,t0+2.3,9);
+  voice([ch[0]-12,ch[0]],'sawtooth',300+I*280,.7,[-6,7],.9,.13,.6,t0,t0+2.3,6);
+  voice(ch.slice(0,3),'sawtooth',560+I*520,.5,[-9,0,8],1,.055+I*.025,.6,t0,t0+2.3,9);
   /* spiccato ostinato in eighths on the root, the fifth on the upbeat of beat 4 */
-  const og=sm(.15,.45);if(og>0){const pat=[0,0,0,0,0,0,7,0];for(let i=0;i<8;i++){const ts=t0+i*.25,n=ch[0]-12+pat[i]+(i===7?12:0);const g=voice([n],'sawtooth',900,.9,[-5,5],.008,(i%4===0?.07:.045)*og,.08,ts,ts+.2,0);void g}}
+  const og=sm(.15,.45);if(og>0){const pat=[0,0,0,0,0,0,7,0];for(let i=0;i<8;i++){const ts=t0+i*.25,n=ch[0]-12+pat[i]+(i===7?12:0);const g=voice([n],'sawtooth',900,.9,[-5,5],.008,(i%4===0?.13:.08)*og,.08,ts,ts+.2,0);void g}}
   /* war drums: a taiko on 1 and 3 (and a double hit at the end of the phrase), timpani on the chord root */
   const dg=sm(.3,.65);if(dg>0){const drum=(ts,f0,f1,v,d,nz)=>{const k=C.createGain();k.connect(bus);const o=C.createOscillator();o.type='sine';o.frequency.setValueAtTime(f0,ts);o.frequency.exponentialRampToValueAtTime(f1,ts+d*.6);o.connect(k);o.start(ts);o.stop(ts+d);this.env(k,ts,.004,v,d*.8,null,0,ts+d);
      if(nz){const n=C.createGain();n.connect(bus);const s=this.src('brown'),lf=C.createBiquadFilter();lf.type='lowpass';lf.frequency.value=nz;s.connect(lf).connect(n);s.start(ts);s.stop(ts+d*.5);this.env(n,ts,.002,v*.9,d*.35,null,0,ts+d*.5)}};
-    drum(t0,95,48,.55*dg,.7,420);drum(t0+1,95,48,.45*dg,.7,420);if(bar%4===3){drum(t0+1.5,110,55,.35*dg,.5,500);drum(t0+1.75,110,55,.4*dg,.5,500)}
+    drum(t0,95,48,.8*dg,.7,420);drum(t0+1,95,48,.65*dg,.7,420);if(bar%4===3){drum(t0+1.5,110,55,.5*dg,.5,500);drum(t0+1.75,110,55,.58*dg,.5,500)}
     drum(t0+.5,mtof(ch[0]-12),mtof(ch[0]-12)*.94,.22*dg,1.1,0)}
   /* a military snare roll building into the next bar, only in the thick of it */
   const sg=sm(.62,.85);if(sg>0&&bar%2===1){for(let i=0;i<16;i++){const ts=t0+1+i*.0625,k=C.createGain();k.connect(bus);const s=this.src('pink'),f=C.createBiquadFilter();f.type='bandpass';f.frequency.value=1900;f.Q.value=.9;const l=C.createBiquadFilter();l.type='lowpass';l.frequency.value=4200;s.connect(f).connect(l).connect(k);s.start(ts);s.stop(ts+.07);this.env(k,ts,.002,sg*(.05+.12*i/16),.05,null,0,ts+.07)}}
   /* the brass call at the peak: horns on root and fifth, a fourth below to answer */
-  const bg=sm(.72,.92);if(bg>0&&bar%2===0){voice([ch[0],ch[2]],'sawtooth',900+bg*500,1.2,[-4,5],.25,bg*.07,.4,t0,t0+1.3,4);voice([ch[0]-5,ch[0]],'sawtooth',800,1.1,[-4,5],.15,bg*.06,.3,t0+1.35,t0+1.95,4)}}};
+  const bg=sm(.72,.92);if(bg>0&&bar%2===0){voice([ch[0],ch[2]],'sawtooth',900+bg*500,1.2,[-4,5],.25,bg*.13,.4,t0,t0+1.3,4);voice([ch[0]-5,ch[0]],'sawtooth',800,1.1,[-4,5],.15,bg*.11,.3,t0+1.35,t0+1.95,4)}}};
 /* ======================= HUD ======================= */
 const HUD={depthT:0,ray:new THREE.Raycaster(),plane:new THREE.Plane(new THREE.Vector3(0,1,0),0),quietT:0,
  price(M){const p=M.price;if(p==null)return;const e=$('#px');e.textContent=fmtP(p);if(M.lastP!=null&&M.lastP!==p){e.classList.remove('up','dn');void e.offsetWidth;e.classList.add(p>M.lastP?'up':'dn')}
