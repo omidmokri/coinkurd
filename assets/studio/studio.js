@@ -72,6 +72,7 @@
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); return d ? s.replace(/[0-9]/g, function (c) { return d[+c]; }) : s; }
   function nf(x, dec) { if (x == null || !isFinite(x)) return '—'; return loc(Number(x).toLocaleString('en-US', { maximumFractionDigits: dec == null ? 2 : dec, minimumFractionDigits: 0 })); }
+  function px(x) { return nf(x, x == null ? 2 : Math.abs(x) >= 100 ? 2 : Math.abs(x) >= 1 ? 4 : 8); }   // a price with as many decimals as its size needs
   function pc(x, dec) { return x == null || !isFinite(x) ? '—' : loc((x >= 0 ? '+' : '') + x.toFixed(dec == null ? 2 : dec)) + (lang() === 'en' ? '%' : '٪'); }
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -229,7 +230,7 @@
     B = out; setStatus('');
     cs.setData(B.map(function (b) { return { time: b.t / 1000, open: b.o, high: b.h, low: b.l, close: b.c }; }));
     vs.setData(B.map(function (b) { return { time: b.t / 1000, value: b.v, color: b.c >= b.o ? 'rgba(22,199,132,.28)' : 'rgba(234,57,67,.28)' }; }));
-    price.textContent = nf(B[B.length - 1].c, 6);
+    price.textContent = px(B[B.length - 1].c);
     chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, B.length - 220), to: B.length + 8 });
     return true;
   }
@@ -248,7 +249,7 @@
       if (b.t === lb.t) B[B.length - 1] = b; else if (b.t > lb.t) { B.push(b); if (B.length > st.n) B.shift(); }
       cs.update({ time: b.t / 1000, open: b.o, high: b.h, low: b.l, close: b.c });
       vs.update({ time: b.t / 1000, value: b.v, color: b.c >= b.o ? 'rgba(22,199,132,.28)' : 'rgba(234,57,67,.28)' });
-      price.textContent = nf(b.c, 6); price.className = 'ps-price ' + (b.c >= lb.c ? 'up' : 'dn');
+      price.textContent = px(b.c); price.className = 'ps-price ' + (b.c >= lb.c ? 'up' : 'dn');
       if (k.x) { scheduleRun(300); } else if (last && last.ms < 350) scheduleRun(2500);
       if (smcRes && k.x) { smcRes = window.SMC ? SMC.run(B) : null; renderSMCpane(); }
       drawOverlay();
@@ -434,9 +435,9 @@
     for (var i = 0; i < F.length; i++) {
       var f = F[i], idx = n - 1 + Math.round((f.t - lastT) / tfMs); if (idx < n) continue;
       var x = X(idx), bw = Math.max(1, ((X(1) || 0) - (X(0) || 0)) * .6); if (x == null) continue;
-      if (f.hi != null && f.lo != null) { var yh = P(f.hi), yl = P(f.lo); if (yh != null && yl != null) { g.fillStyle = 'rgba(167,139,250,.10)'; g.fillRect(x - bw, yh, bw * 2, yl - yh); } }
+      if (f.hi != null && f.lo != null) { var yh = P(f.hi), yl = P(f.lo); if (yh != null && yl != null) { g.fillStyle = 'rgba(167,139,250,.16)'; g.fillRect(x - bw, yh, bw * 2, yl - yh); } }
       var yo = P(f.o), yc = P(f.c), yH = P(f.h), yL = P(f.l); if (yo == null || yc == null) continue;
-      var up = f.c >= f.o; g.strokeStyle = up ? 'rgba(52,211,153,.75)' : 'rgba(244,114,182,.75)'; g.fillStyle = up ? 'rgba(52,211,153,.25)' : 'rgba(244,114,182,.25)';
+      var up = f.c >= f.o; g.strokeStyle = up ? 'rgba(52,211,153,.95)' : 'rgba(244,114,182,.95)'; g.fillStyle = up ? 'rgba(52,211,153,.4)' : 'rgba(244,114,182,.4)';
       g.beginPath(); g.moveTo(x, yH); g.lineTo(x, yL); g.stroke(); g.fillRect(x - bw / 2, Math.min(yo, yc), bw, Math.max(1, Math.abs(yc - yo))); g.strokeRect(x - bw / 2, Math.min(yo, yc), bw, Math.max(1, Math.abs(yc - yo)));
     }
   }
@@ -478,8 +479,8 @@
     if (!s || !s.trades || !s.trades.length) { P.innerHTML = '<p class="ps-mut">' + esc(s ? t('noTrades') : t('noStrat')) + '</p>'; return; }
     var rows = s.trades.slice().reverse().slice(0, 500).map(function (x, k) {
       var pct = x.ep ? (x.xp / x.ep - 1) * 100 * (x.size < 0 ? -1 : 1) : null;
-      return '<tr><td>' + loc(s.trades.length - k) + '</td><td>' + esc(x.id) + '</td><td>' + (B[x.eb] ? fmtT(B[x.eb].t) : '—') + '<br><small>' + nf(x.ep, 6) + '</small></td><td>' +
-        (B[x.xb] ? fmtT(B[x.xb].t) : '—') + '<br><small>' + nf(x.xp, 6) + '</small></td><td class="' + (x.profit >= 0 ? 'up' : 'dn') + '">' + nf(x.profit, 2) + '<br><small>' + pc(pct) + '</small></td></tr>';
+      return '<tr><td>' + loc(s.trades.length - k) + '</td><td>' + esc(x.id) + '</td><td>' + (B[x.eb] ? fmtT(B[x.eb].t) : '—') + '<br><small>' + px(x.ep) + '</small></td><td>' +
+        (B[x.xb] ? fmtT(B[x.xb].t) : '—') + '<br><small>' + px(x.xp) + '</small></td><td class="' + (x.profit >= 0 ? 'up' : 'dn') + '">' + nf(x.profit, 2) + '<br><small>' + pc(pct) + '</small></td></tr>';
     }).join('');
     P.innerHTML = '<div class="ps-tw"><table class="ps-tbl"><thead><tr><th>#</th><th>ID</th><th>' + esc(t('entry')) + '</th><th>' + esc(t('exit')) + '</th><th>' + esc(t('pnl')) + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
   }
@@ -495,11 +496,11 @@
     var P = paneEls.smc; if (!smcRes) { P.innerHTML = '<p class="ps-mut">—</p>'; return; }
     var R = smcRes, lp = B.length ? B[B.length - 1].c : 0;
     var tr = R.trend === 1 ? '<b class="up">' + t('trendUp') + '</b>' : R.trend === -1 ? '<b class="dn">' + t('trendDn') + '</b>' : t('trendNa');
-    var ev = R.events.slice(-6).reverse().map(function (e) { return '<li><b style="color:' + (e.kind === 'CHoCH' ? '#a78bfa' : e.dir === 1 ? '#16c784' : '#ea3943') + '">' + e.kind + (e.dir === 1 ? ' ▲' : ' ▼') + '</b> ' + nf(e.p, 6) + ' <small>' + fmtT(B[e.i].t) + '</small></li>'; }).join('');
+    var ev = R.events.slice(-6).reverse().map(function (e) { return '<li><b style="color:' + (e.kind === 'CHoCH' ? '#a78bfa' : e.dir === 1 ? '#16c784' : '#ea3943') + '">' + e.kind + (e.dir === 1 ? ' ▲' : ' ▼') + '</b> ' + px(e.p) + ' <small>' + fmtT(B[e.i].t) + '</small></li>'; }).join('');
     var near = function (arr, nm) { var live = arr.filter(function (x) { return x.end == null; }).map(function (x) { return { x: x, d: Math.abs((x.top + x.bot) / 2 - lp) }; }).sort(function (a, b) { return a.d - b.d; }).slice(0, 3);
-      return live.map(function (o) { return '<li>' + nm + ' ' + (o.x.dir === 1 ? '▲' : '▼') + ' ' + nf(o.x.bot, 6) + ' – ' + nf(o.x.top, 6) + ' <small>(' + pc(((o.x.top + o.x.bot) / 2 / lp - 1) * 100) + ')</small></li>'; }).join(''); };
-    var liq = R.liq.filter(function (l) { return l.swept == null; }).map(function (l) { return '<li>$$$ ' + (l.dir === 1 ? '▲' : '▼') + ' ' + nf(l.p, 6) + ' <small>×' + loc(l.n) + '</small></li>'; }).join('');
-    P.innerHTML = '<div class="ps-smc"><p>' + tr + (R.zone ? ' — ' + esc(t('prem')) + ': ' + (lp > R.zone.eq ? 'Premium' : 'Discount') + ' <small>(EQ ' + nf(R.zone.eq, 6) + ')</small>' : '') + '</p>' +
+      return live.map(function (o) { return '<li>' + nm + ' ' + (o.x.dir === 1 ? '▲' : '▼') + ' ' + px(o.x.bot) + ' – ' + px(o.x.top) + ' <small>(' + pc(((o.x.top + o.x.bot) / 2 / lp - 1) * 100) + ')</small></li>'; }).join(''); };
+    var liq = R.liq.filter(function (l) { return l.swept == null; }).map(function (l) { return '<li>$$$ ' + (l.dir === 1 ? '▲' : '▼') + ' ' + px(l.p) + ' <small>×' + loc(l.n) + '</small></li>'; }).join('');
+    P.innerHTML = '<div class="ps-smc"><p>' + tr + (R.zone ? ' — ' + esc(t('prem')) + ': ' + (lp > R.zone.eq ? 'Premium' : 'Discount') + ' <small>(EQ ' + px(R.zone.eq) + ')</small>' : '') + '</p>' +
       '<div class="ps-cols"><div><h4>BOS / CHoCH</h4><ul>' + ev + '</ul></div><div><h4>' + esc(t('ob')) + ' & ' + esc(t('fvg')) + '</h4><ul>' + near(R.obs, 'OB') + near(R.fvgs, 'FVG') + '</ul></div><div><h4>' + esc(t('liq')) + '</h4><ul>' + (liq || '<li>—</li>') + '</ul></div></div></div>';
   }
   function renderKro() {
@@ -507,8 +508,8 @@
     if (!kro || kro.sym !== st.sym || kro.tf !== st.tf) { P.innerHTML = '<p class="ps-mut">' + esc(t('kroNone')) + '</p><p class="ps-mut"><small>' + esc(t('kroNote')) + '</small></p>'; return; }
     var F = kro.f, lp = B.length ? B[B.length - 1].c : kro.last, end = F[F.length - 1];
     var hi = Math.max.apply(null, F.map(function (f) { return f.hi != null ? f.hi : f.h; })), lo = Math.min.apply(null, F.map(function (f) { return f.lo != null ? f.lo : f.l; }));
-    P.innerHTML = '<div class="ps-cards">' + card('Kronos', esc(kro.model || 'Kronos')) + card(loc(F.length) + ' ' + t('kroH'), nf(end.c, 6) + ' <small>(' + pc((end.c / lp - 1) * 100) + ')</small>', end.c >= lp ? 'up' : 'dn') +
-      card('↑', nf(hi, 6)) + card('↓', nf(lo, 6)) + card(t('kroAt'), fmtT(kro.at)) + '</div><p class="ps-mut"><small>' + esc(t('kroNote')) + '</small></p>';
+    P.innerHTML = '<div class="ps-cards">' + card('Kronos', esc(kro.model || 'Kronos')) + card(loc(F.length) + ' ' + t('kroH'), px(end.c) + ' <small>(' + pc((end.c / lp - 1) * 100) + ')</small>', end.c >= lp ? 'up' : 'dn') +
+      card('↑', px(hi)) + card('↓', px(lo)) + card(t('kroAt'), fmtT(kro.at)) + '</div><p class="ps-mut"><small>' + esc(t('kroNote')) + '</small></p>';
   }
   async function loadKro() {
     kro = null; renderKro();
@@ -607,7 +608,7 @@
     scRes.innerHTML = '<table class="ps-tbl ps-scan"><thead><tr><th></th><th>' + esc(t('coin')) + '</th><th>$</th><th>24h</th>' + heads + '<th>' + esc(t('hits')) + '</th><th>' + esc(t('avgRet')) + '</th></tr></thead><tbody>' +
       R.map(function (r) {
         var rr = r.hits.filter(function (i) { return i + F <= r.lc; }).map(function (i) { return r.close[i + F] / r.close[i] - 1; }), a = avg(rr);
-        return '<tr data-s="' + r.u.sym + '" class="' + (r.match ? 'hit' : '') + '"><td>' + (r.match ? '✅' : '') + '</td><td><b>' + esc(r.u.sym.replace(/USDT$/, '')) + '</b></td><td>' + nf(r.u.last, 6) + '</td><td class="' + (r.u.chg >= 0 ? 'up' : 'dn') + '">' + pc(r.u.chg) + '</td>' +
+        return '<tr data-s="' + r.u.sym + '" class="' + (r.match ? 'hit' : '') + '"><td>' + (r.match ? '✅' : '') + '</td><td><b>' + esc(r.u.sym.replace(/USDT$/, '')) + '</b></td><td>' + px(r.u.last) + '</td><td class="' + (r.u.chg >= 0 ? 'up' : 'dn') + '">' + pc(r.u.chg) + '</td>' +
           r.cols.map(function (c) { return '<td>' + nf(c[1], 2) + '</td>'; }).join('') + '<td>' + nf(rr.length, 0) + '</td><td class="' + (a >= 0 ? 'up' : 'dn') + '">' + (a == null ? '—' : pc(a * 100)) + '</td></tr>';
       }).join('') + '</tbody></table>';
   }
@@ -631,7 +632,7 @@
     try {
       var j = await (await fetch(HOOK + '/alerts?limit=50', { cache: 'no-store' })).json(), A = j.alerts || [];
       box.innerHTML = A.length ? '<table class="ps-tbl"><tbody>' + A.map(function (a) {
-        return '<tr><td><small>' + fmtT(a.at) + '</small></td><td><b>' + esc(a.symbol || '—') + '</b> ' + esc(a.tf || '') + '</td><td>' + (a.side ? '<b class="' + (/buy|long/i.test(a.side) ? 'up' : /sell|short/i.test(a.side) ? 'dn' : '') + '">' + esc(a.side) + '</b>' : '') + '</td><td>' + (a.price != null ? nf(a.price, 6) : '') + '</td><td>' + esc(a.text || '') + '</td></tr>';
+        return '<tr><td><small>' + fmtT(a.at) + '</small></td><td><b>' + esc(a.symbol || '—') + '</b> ' + esc(a.tf || '') + '</td><td>' + (a.side ? '<b class="' + (/buy|long/i.test(a.side) ? 'up' : /sell|short/i.test(a.side) ? 'dn' : '') + '">' + esc(a.side) + '</b>' : '') + '</td><td>' + (a.price != null ? px(a.price) : '') + '</td><td>' + esc(a.text || '') + '</td></tr>';
       }).join('') + '</tbody></table>' : '<p class="ps-mut">' + esc(t('hookNone')) + '</p>';
     } catch (e) { box.innerHTML = '<p class="ps-mut">' + esc(t('fail')) + '</p>'; }
   }
