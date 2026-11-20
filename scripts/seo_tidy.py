@@ -7,6 +7,10 @@ comply; this catches the hand-made pages and the builders with their own templat
 A description under 70 characters, or a missing one, gets the page title and a site line in the page language.
 og:title / og:description are left whole for link previews. Idempotent: a compliant page is not touched.
 
+Also, on every page: a stylesheet or a KaTeX script served by another host is made non-blocking
+(chrome.async_css, chrome.async_katex), so a host that cannot be reached (2026-11-20, from inside Iran)
+can never hold up the first paint.
+
 Run after all builders, before the site is uploaded: python3 scripts/seo_tidy.py
 """
 import html
@@ -15,6 +19,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import chrome  # noqa: E402
 from build_pages import jlen, seo_desc, seo_title  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +71,7 @@ def tidy(doc):
         m = T_RE.search(head)
         tag = '<meta name="description" content="' + html.escape(fill("", title, lang)) + '">'
         head = head[:m.end()] + tag + head[m.end():]
-    return head + rest
+    return chrome.async_katex(chrome.async_css(head + rest))
 
 
 def main():
