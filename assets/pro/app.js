@@ -1277,7 +1277,7 @@
       var q = inp.value.trim().toLowerCase();
       var L = (P.LANGS || []).filter(function (r) { return !q || (r[1] + ' ' + r[2] + ' ' + r[0]).toLowerCase().indexOf(q) >= 0; });
       list.innerHTML = L.length ? L.map(function (r) {
-        var fl = P.flag ? P.flag(r[0]) : '';
+        var fl = P.langFlag ? P.langFlag(r[0]) : '';
         return '<button type="button" role="option" aria-selected="' + (r[0] === LANG) + '" class="pm-lgi' + (r[0] === LANG ? ' on' : '') + '" data-lg="' + r[0] + '">' +
           (fl ? '<img class="pm-lgf" src="' + esc(fl) + '" alt="" loading="lazy" width="26" height="26">' : '') +
           '<span class="pm-lgt"><b lang="' + esc(r[4]) + '" dir="' + r[5] + '">' + esc(r[1]) + '</b><small lang="en" dir="ltr">' + esc(r[2]) + '</small></span></button>';
