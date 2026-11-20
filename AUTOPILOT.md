@@ -322,6 +322,21 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-20 · /studio/ Pine Studio: live Pine, back-test, Pine screener, SMC, Kronos (owner's request in chat)
+- **Pine live on the site, no TradingView:** `assets/studio/` runs native Pine v5/v6 with PineTS 0.13.1 (LuxAlgo, AGPL-3.0,
+  owner chose it) in a Web Worker on Binance candles; plots, shapes, bgcolor, hlines, labels, lines and boxes are drawn;
+  live mode re-runs on each closed candle. That folder is AGPL (README + licence inside; source link on the page).
+- **Back-test:** strategy() scripts give net profit, win rate, profit factor, drawdown, Sharpe, Sortino, equity vs buy&hold, trades.
+- **Pine screener:** any Pine condition (`plot(cond?1:0,"match")`, other plots = columns) over the top 20/50/100 Binance
+  coins (TradingView custom screeners stop at 40 symbols), plus the filter's past edge (forward return after every hit).
+- **SMC layer** (`smc.js`, written after joshyattridge/smart-money-concepts): swings, BOS/CHoCH, order blocks, FVG,
+  equal-high/low liquidity and sweeps, previous day/week high/low, premium/discount.
+- **Kronos:** `scripts/kronos_forecast.py` + `.github/workflows/kronos.yml` (hourly, Kronos-small, 8 samples) write
+  `data/kronos/<SYM>_1h.json`; the studio draws them as ghost candles with a 15–85% band.
+- Not used: tvdatafeed (unofficial TradingView scraping, against its terms; Binance data instead). ta4j is Java: its
+  metrics are covered by PineTS's strategy engine. TradingView webhooks need an always-on server: Cloudflare Worker next.
+- **Verified:** `tests/studio_test.py` (every example, error line report, screener on 20 coins, SMC, Kronos; stubbed data).
+- **Bot:** new 💻 Pine Studio section (`studio_text`, 5 languages) under Analysis. Menu: Analysis → Pine Studio.
 ### 2026-11-15 · «جهان زنده» posts in the channel: daily, weekly, monthly, yearly (owner's request in chat, not by the loop)
 - Owner: "every day at 24 build the «world today» image and send it, no approval needed; and a detailed plan for weekly,
   monthly and yearly, sent directly without my approval." Built `scripts/world_post.py` + `world-post.yml` (cron 23:35

@@ -465,7 +465,8 @@ SECTIONS = {
     "mc": (D.sec_mc, "/lab/"), "mem": (D.sec_mem, "/lab/"), "vol": (D.sec_vol, "/lab/"),
     "opt": (D.sec_opt, "/lab/"), "xex": (D.sec_xex, "/lab/"), "dev": (D.sec_dev, "/lab/"),
     "macro": (D.sec_macro, "/lab/"), "dna": (D.sec_dna, "/dna/"),
-    "battle": (lambda lang: t("battle_text", lang), "/battle/"),   # «نبرد من»: what the page shows; the button opens it on the site
+    "battle": (lambda lang: t("battle_text", lang), "/battle/"),
+    "studio": (lambda lang: t("studio_text", lang), "/studio/"),   # Pine Studio: what the page does; the button opens it   # «نبرد من»: what the page shows; the button opens it on the site
     "pro": (lambda lang: PRO.section(lang, D.load), "/market/"),     # the live market: multi-chart, replay, alerts, calendar
     "mmap": (lambda lang: MMB.section(lang, D.load), "/heatmap/"),   # the market map: heatmap, bubbles, money flow, liquidity, ETFs
     "obs": (lambda lang: OBS.section(lang, D.load), "/charts/"),

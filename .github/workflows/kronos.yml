@@ -1,0 +1,49 @@
+name: Kronos forecasts
+
+# پیش‌بینی ۲۴ ساعت آینده با مدل Kronos برای ارزهای اصلی، هر ساعت؛ استودیو پاین (/studio/) آن را روی نمودار می‌کشد.
+# Kronos: github.com/shiyu-coder/Kronos (MIT). Weights come from Hugging Face (NeoQuasar/Kronos-small).
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kronos
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Kronos source (pinned) and CPU libraries
+        run: |
+          git clone -q https://github.com/shiyu-coder/Kronos Kronos && git -C Kronos checkout -q 67b630e67f6a18c9e9be918d9b4337c960db1e9a
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas einops==0.8.1 huggingface_hub==0.33.1 safetensors==0.6.2 tqdm
+      - name: Cache model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: kronos-small-v1
+      - name: Forecast
+        env: { KRONOS_DIR: Kronos }
+        run: python scripts/kronos_forecast.py
+      - name: Commit
+        run: |
+          rm -rf Kronos
+          git config user.name "coinkurd-bot"
+          git config user.email "coinkurd-bot@users.noreply.github.com"
+          git add data/kronos
+          git diff --cached --quiet && exit 0
+          git commit -q -m "chore: kronos forecasts $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3 4 5; do
+            git pull -q --rebase -X theirs origin main && git push -q && break
+            sleep $((i * 7))
+          done
