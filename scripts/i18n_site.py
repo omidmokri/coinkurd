@@ -391,7 +391,9 @@ def main():
     import ai  # noqa: E402
     ap = argparse.ArgumentParser()
     ap.add_argument("--requests", type=int, default=0, help="requests this run (default: 8 a key)")
-    ap.add_argument("--seconds", type=int, default=int(os.environ.get("I18N_SITE_SECONDS", "240")))
+    ap.add_argument("--seconds", type=int,
+                    default=int(os.environ.get("I18N_SITE_SECONDS", "180")),
+                    help="translating stops after this long; reading the site and writing the dictionaries\n                          takes about 160s more, and the step is given 8 minutes in all")
     ap.add_argument("--jobs", type=int, default=0, help="requests at once (default: one a key)")
     ap.add_argument("--lang", default="")
     ap.add_argument("--status", action="store_true")
@@ -402,6 +404,12 @@ def main():
     pages, scripts, common, need = corpus()
     print(f"i18n_site: {len(pages)} pages · {sum(1 for v in scripts.values() if v)} scripts · {len(need)} strings "
           f"· {len(common)} on nearly every page")
+    # The script goes on the pages before anything slow happens. It needs no translation to be correct, and a run
+    # that is cut short by its timeout used to leave the pages without it — the dictionaries were written, the
+    # languages were ready, and the globe still never appeared.
+    if not a.status and not a.no_inject:
+        n = sum(1 for path in i18n_ar.walk_all() if inject(path))
+        print(f"i18n_site: the globe is on {n} pages")
     if a.status:
         for c in LANGS:
             d = status(need)[c]
@@ -434,6 +442,8 @@ def main():
 
     ready = []
     for code in LANGS:
+        if not os.path.exists(cache_path(code)):
+            continue                      # nothing translated into it yet: no folder to write, and much less work
         cov = write_dicts(code, pages, scripts, common, need)
         if cov:
             ready.append(f"{code} {cov:.0f}%")
@@ -443,9 +453,7 @@ def main():
     st = status(need)
     print(f"i18n_site: {sum(v['done'] for v in st.values()):,} of {len(need) * len(st):,} strings in {len(st)} languages")
     print("i18n_site: " + (", ".join(ready) if ready else "no language has any strings yet"))
-    n = sum(1 for path in ([] if a.no_inject else i18n_ar.walk_all()) if inject(path))
-    if not a.no_inject:
-        print(f"i18n_site: the globe is on {n} pages")
+
 
 
 if __name__ == "__main__":
