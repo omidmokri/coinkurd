@@ -1071,7 +1071,10 @@ const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{s
  setVols(){if(!this.ctx)return;const v=PREF.vol;this.master.gain.value=v.master;this.bus.music.gain.value=v.music;this.bus.sfx.gain.value=v.sfx;this.bus.amb.gain.value=v.amb;this.bus.voice.gain.value=v.voice},
  /* browsers start an AudioContext "suspended" until the visitor touches the page: with sound saved as on, the button said 🔊
    while nothing played (owner, 2026-11-14). The first touch, click or key anywhere now starts it, and so does coming back to the tab */
- unlock(g){if(!this.on)return;this.init();const C=this.ctx;if(!C||C.state==='closed')return;if(g)this.held=Date.now();if(C.state!=='running'){try{const p=C.resume();if(p&&p.then)p.then(()=>{if(this.music.on&&!this.music.timer)this.startMusic()},()=>{})}catch(e){}}else if(this.music.on&&!this.music.timer)this.startMusic()},
+ unlock(g){if(!this.on)return;this.init();const C=this.ctx;if(!C||C.state==='closed')return;
+  if(C.state!=='running'){if(g)this.held=Date.now();/* only a gesture that actually wakes the sound counts as "held": marking every click held meant the sound button could never be switched off again (owner, 2026-11-20) */
+   try{const p=C.resume();if(p&&p.then)p.then(()=>{if(this.music.on&&!this.music.timer)this.startMusic()},()=>{})}catch(e){}}
+  else if(this.music.on&&!this.music.timer)this.startMusic()},
  /* the sound button and the M key: a press that has just woken the sound up does not also switch it off */
  toggle(){if(this.on&&this.ctx&&Date.now()-(this.held||0)<1500){this.held=0;this.play('ui',{vol:.4});return}this.enable(!this.on)},
  enable(on){this.on=on;PREF.snd=on;ls.set('ek_bf_snd',on);savePref();if(on){this.init();if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();if(this.music.on&&!this.music.timer)this.startMusic();this.play('ui',{vol:.4})}else if(this.ctx){this.ctx.suspend()}},

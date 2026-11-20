@@ -13,6 +13,7 @@ const mix = (a, b, t) => a + (b - a) * t;
 const sm = (a, b, x) => { const t = cl((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const rr = (a, b) => a + Math.random() * (b - a);
 const L3 = h => { const c = new THREE.Color(h).convertSRGBToLinear(); return [c.r, c.g, c.b]; };
+const mix3 = (a, b, t) => [mix(a[0], b[0], t), mix(a[1], b[1], t), mix(a[2], b[2], t)];
 
 /* ================================================================== indexed geometry helpers
    Everything here keeps shared vertices (smooth parts cost a third of the vertices of a non-indexed mesh). */
@@ -629,8 +630,8 @@ K.build = function (scene, hgt, tier) {
   const lite = !G.std, K4 = window.GFX4, E = K.env = { scene, hgt, lite, t: 0, ships: [], subs: {}, night: 0 };
   /* sea: a single big plane; the shore is wherever the terrain dips under it */
   if (lite || !K4) E.seaMat = K.seaMaterial(); else { E.seaMat = K4.waterMaterial(); E.seaMat.fragmentShader = E.seaMat.fragmentShader.replace('vW.xz*.32', 'vW.xz*.1'); }
-  const sg = new THREE.PlaneGeometry(1500, 640, 1, 1); sg.rotateX(-Math.PI / 2);
-  const sea = new THREE.Mesh(sg, E.seaMat); sea.position.set(0, SEA, -412); sea.renderOrder = 6; sea.frustumCulled = false; scene.add(sea); E.sea = sea;
+  const sg = new THREE.PlaneGeometry(3400, 1500, 1, 1); sg.rotateX(-Math.PI / 2);
+  const sea = new THREE.Mesh(sg, E.seaMat); sea.position.set(0, SEA, -842); sea.renderOrder = 6; sea.frustumCulled = false; scene.add(sea); E.sea = sea;
   /* surf: a pale ribbon along the waterline that breathes with the swell */
   {
     const P = [], UV = [], I = []; let last = -1, n = 0;
@@ -644,6 +645,111 @@ K.build = function (scene, hgt, tier) {
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2)); g.setIndex(I);
     E.surfM = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, opacity: .5 });
     E.surf = new THREE.Mesh(g, E.surfM); E.surf.renderOrder = 7; E.surf.frustumCulled = false; scene.add(E.surf);
+  }
+  /* ------------------------------------------------------------- the world beyond the field
+     The playable ground is a 420 × 260 slab; past its edge there was nothing at all, so from orbit the land ended at a
+     cliff with a void round it and the bay was bare water (owner, 2026-11-20). This lays a hilled apron from the slab's
+     edge out to the mountain ring, sinks it under the sea to the north, and puts wooded islands and rocks in the bay,
+     so no part of the theatre is empty. It is scenery only: nothing here is walked on, shot at or collided with. */
+  {
+    const SX = 205, Z0 = -144, Z1 = 108, R = 1400, ZN = -700;      // the apron reaches past the mountain ring; its north edge lies under the sea
+    const inSlab = (x, z) => Math.abs(x) < SX - 9 && z > Z0 + 9 && z < Z1 - 9;
+    const far = (x, z) => {
+      const ex = Math.max(0, Math.abs(x) - SX), ez = Math.max(0, z - Z1, Z0 - z), d = Math.hypot(ex, ez);
+      const base = hgt(cl(x, -SX, SX), cl(z, Z0, Z1));                  // the height of the slab edge nearest to here
+      const hill = 7 + 30 * G.fbmW(x * .0042 + 5.3, z * .0042 - 2.1, 4) + 11 * G.fbmW(x * .014 - 1.7, z * .014 + 4, 3);
+      const land = mix(base, hill, sm(0, 180, d)) * sm(-118, -58, z);   // north of the shore the apron stays under the water
+      /* under the slab the apron is held a little lower, so the two never fight for the same pixels at the seam */
+      return mix(base, land, sm(0, 26, d)) - sm(-120, -230, z) * 16 - .4 * (1 - sm(0, 7, d));
+    };
+    /* the grid is dense where it meets the field and coarse out at the rim, so the seam is clean and the mesh stays small */
+    const ax = [], az = [];
+    for (let v = -R; v <= R; v += Math.abs(v) < 760 ? 16 : 70) ax.push(v);
+    if (ax[ax.length - 1] < R) ax.push(R);
+    for (let v = ZN; v <= R; v += (v > -260 && v < 420) ? 16 : 70) az.push(v);
+    if (az[az.length - 1] < R) az.push(R);
+    const NX = ax.length, NZ = az.length, P = [], C = [], I = [], grid = new Int32Array(NX * NZ).fill(-1);
+    const grass = L3(0x3f5f24), gr2 = L3(0x587a2e), dry = L3(0x7a6540), rock = L3(0x6a6760), sand = L3(0xa8956a);
+    for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) {
+      const x = ax[i], z = az[j], k = j * NX + i;
+      if (inSlab(x, z)) continue;                                       // the slab draws its own ground
+      const y = far(x, z); grid[k] = P.length / 3; P.push(x, y, z);
+      const n = G.fbmW(x * .05 + 7, z * .05 - 3, 2), t = cl((y - SEA) / 48, 0, 1);
+      const c = y < SEA + 1.4 ? sand : t < .5 ? mix3(grass, gr2, cl(n * 1.1 + t, 0, 1)) : mix3(gr2, t > .8 ? rock : dry, cl((t - .5) * 2.2 + (n - .5) * .5, 0, 1));
+      C.push(c[0], c[1], c[2]);
+    }
+    for (let j = 0; j < NZ - 1; j++) for (let i = 0; i < NX - 1; i++) {
+      const a = grid[j * NX + i], b = grid[j * NX + i + 1], c2 = grid[(j + 1) * NX + i], d2 = grid[(j + 1) * NX + i + 1];
+      if (a < 0 || b < 0 || c2 < 0 || d2 < 0) continue;
+      I.push(a, c2, b, b, c2, d2);
+    }
+    const fg = new THREE.BufferGeometry();
+    fg.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+    fg.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
+    fg.setIndex(I); fg.computeVertexNormals();
+    const fm = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .97, metalness: 0 }) : new THREE.MeshLambertMaterial({ vertexColors: true });
+    const fmesh = new THREE.Mesh(fg, fm); fmesh.renderOrder = 4; fmesh.receiveShadow = false; fmesh.castShadow = false; scene.add(fmesh); E.farGround = fmesh;
+    /* islands in the bay, each a rounded headland with a beach; the biggest carry trees */
+    const isles = [[-330, -250, 46, 15], [250, -300, 52, 17], [-120, -395, 38, 11], [95, -430, 44, 13], [-430, -175, 34, 10], [392, -205, 30, 9], [-255, -520, 58, 19], [178, -560, 40, 12], [-40, -300, 22, 6], [330, -445, 26, 8],
+      [-212, -158, 17, 5], [196, -168, 20, 6], [-86, -192, 13, 4], [62, -205, 15, 4.5], [-390, -300, 24, 7], [455, -330, 28, 8], [-150, -612, 34, 10], [300, -600, 30, 9], [-500, -430, 26, 7], [520, -480, 22, 6]];
+    const IL = [];
+    for (const [ix, iz, ir, ih] of isles) {
+      const g = new THREE.SphereGeometry(1, 16, 9, 0, Math.PI * 2, 0, Math.PI * .5), p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) {
+        const x = p.getX(i), y = p.getY(i), z = p.getZ(i), n = .78 + .44 * G.fbmW(x * 2.4 + ix * .01, z * 2.4 + iz * .01, 3);
+        p.setXYZ(i, x * ir * n, y * ih * (.6 + .5 * n), z * ir * n * (.8 + .4 * n));
+      }
+      g.computeVertexNormals(); const gg = g.toNonIndexed(), pp = gg.attributes.position, col = [];
+      for (let i = 0; i < pp.count; i++) { const y = pp.getY(i) + SEA - 1.2, t = cl((y - SEA) / (ih * .8), 0, 1), c = t < .2 ? sand : mix3(grass, rock, cl((t - .2) * 1.5, 0, 1)); col.push(c[0], c[1], c[2]); }
+      gg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+      gg.translate(ix, SEA - 1.2, iz); IL.push(gg);
+    }
+    scene.add(new THREE.Mesh(G.merge(IL), fm));
+    /* rocks and skerries breaking the surface, so the water is never a bare sheet */
+    if (!lite) {
+      const rg = G.rockGeo(), rock2 = new THREE.InstancedMesh(rg, fm, 150), o = new THREE.Object3D(), rc = new THREE.Color(); let nr = 0;
+      for (let i = 0; i < 700 && nr < 150; i++) {
+        const x = (Math.random() * 2 - 1) * 580, z = -110 - Math.random() * 480;
+        let near = false; for (const [ix, iz, ir] of isles) if (Math.hypot(x - ix, z - iz) < ir * 1.35) { near = true; break; }
+        const s = 1.6 + Math.random() * 5.2;
+        o.position.set(x, SEA - s * (near ? .25 : .55) + .2, z); o.rotation.set(Math.random() * .4, Math.random() * 6.28, Math.random() * .4); o.scale.set(s, s * (.5 + Math.random() * .5), s * (.7 + Math.random() * .6));
+        o.updateMatrix(); rock2.setMatrixAt(nr, o.matrix); const k = .5 + Math.random() * .3; rc.setRGB(k * .62, k * .6, k * .56); rock2.setColorAt(nr++, rc);
+      }
+      rock2.count = nr; rock2.instanceMatrix.needsUpdate = true; if (rock2.instanceColor) rock2.instanceColor.needsUpdate = true; scene.add(rock2);
+    }
+    /* woods on the apron and on the islands: the land beyond the field is never bare either */
+    {
+      const n = lite ? 180 : (tier === 'low' ? 550 : 900);
+      const pine = new THREE.InstancedMesh(G.pineGeo(2), fm, n), leaf = new THREE.InstancedMesh(G.broadleafGeo(2), fm, n), o = new THREE.Object3D(), tc = new THREE.Color();
+      let np = 0, nl = 0;
+      for (let i = 0; i < n * 9 && np + nl < n * 1.7; i++) {
+        /* biased inwards: the apron is thickest where it is actually looked at, and thins out towards the rim */
+        const a = Math.random() * 6.283, rr2 = 230 + Math.pow(Math.random(), .62) * 1080, x = Math.cos(a) * rr2, z = Math.sin(a) * rr2 * .9 - 40;
+        if (Math.abs(x) > R * .97 || z < ZN + 30 || z > R * .97) continue;
+        if (inSlab(x, z) || (Math.abs(x) < SX + 14 && z > Z0 - 14 && z < Z1 + 14)) continue;
+        let y = far(x, z), onIsle = false;
+        for (const [ix, iz, ir, ih] of isles) { const d = Math.hypot(x - ix, z - iz); if (d < ir * .78) { y = SEA - 1.2 + ih * Math.sqrt(Math.max(0, 1 - (d / (ir * .9)) ** 2)) * .72; onIsle = true; break; } }
+        if (!onIsle && y < SEA + 2.2) continue;
+        const s = (1 + Math.random() * 1.3) * (onIsle ? .8 : 1.35);
+        o.position.set(x, y - .2, z); o.rotation.set(0, Math.random() * 6.28, 0); o.scale.set(s, s * (.85 + Math.random() * .5), s); o.updateMatrix();
+        const k = .8 + Math.random() * .3, cold = z < -120 || Math.abs(x) > 380;
+        if ((cold ? Math.random() < .72 : Math.random() < .45) && np < n) { pine.setMatrixAt(np, o.matrix); tc.setRGB(k * .52, k * .64, k * .44); pine.setColorAt(np++, tc); }
+        else if (nl < n) { leaf.setMatrixAt(nl, o.matrix); tc.setRGB(k * .6, k * .7, k * .4); leaf.setColorAt(nl++, tc); }
+      }
+      [[pine, np], [leaf, nl]].forEach(([m, c]) => { m.count = c; m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true; scene.add(m); });
+      if (!lite) {                                                       // boulders and scrub on the open ground between the woods
+        const rg = G.rockGeo(), rk = new THREE.InstancedMesh(rg, fm, 260), rc = new THREE.Color(); let nk = 0;
+        for (let i = 0; i < 1600 && nk < 260; i++) {
+          const a = Math.random() * 6.283, rr2 = 240 + Math.pow(Math.random(), .7) * 1000, x = Math.cos(a) * rr2, z = Math.sin(a) * rr2 * .9 - 40;
+          if (Math.abs(x) > R * .97 || z < ZN + 30 || z > R * .97 || inSlab(x, z) || (Math.abs(x) < SX + 14 && z > Z0 - 14 && z < Z1 + 14)) continue;
+          const y = far(x, z); if (y < SEA + 2) continue;
+          const sc2 = 1.4 + Math.random() * 4.5;
+          o.position.set(x, y - sc2 * .18, z); o.rotation.set(Math.random() * .5, Math.random() * 6.28, Math.random() * .5); o.scale.set(sc2, sc2 * (.6 + Math.random() * .6), sc2 * (.8 + Math.random() * .5));
+          o.updateMatrix(); rk.setMatrixAt(nk, o.matrix); const k2 = .55 + Math.random() * .35; rc.setRGB(k2 * .66, k2 * .64, k2 * .58); rk.setColorAt(nk++, rc);
+        }
+        rk.count = nk; rk.instanceMatrix.needsUpdate = true; if (rk.instanceColor) rk.instanceColor.needsUpdate = true; scene.add(rk);
+      }
+    }
   }
   /* harbours */
   const pm = G.std ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .86, metalness: .04 }) : new THREE.MeshLambertMaterial({ vertexColors: true }); pm.userData.envK = .55; E.propMat = pm;
