@@ -20,7 +20,7 @@
   var PATH = location.pathname, ENC = /^\/encyclopedia\//.test(PATH);
   var CODE = ls.get('ek_l') || '';
   var ON = !!CODE && !ENC && ls.get('ek_ar') !== '1';
-  var LANGS = null, ME = null;
+  var LANGS = null, ME = null, FLAGS = {};
 
   /* ------------------------------------------------------------------ the globe and its panel */
   /* The pill is the one /market/ already uses (.pm-hglobe): same gradient, height, corner, weight and gap, so the
@@ -52,8 +52,12 @@
     + '.ekw-search:focus{border-color:rgba(247,169,26,.6)}'
     + '.ekw-sec{padding:10px 16px 2px;font-size:11px;color:#9b8a66;letter-spacing:.4px;text-align:start}'
     + '.ekw-list{overflow:auto;padding:4px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}'
-    + '.ekw-list button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:9px 11px;border-radius:11px;border:1px solid transparent;'
-    + 'background:rgba(255,255,255,.04);color:#f2ead9;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s}'
+    + '.ekw-list button{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;border:1px solid transparent;'
+    + 'background:rgba(255,255,255,.04);color:#f2ead9;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s,transform .12s}'
+    + '.ekw-list button:active{transform:scale(.97)}'
+    + '.ekw-flag{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:0 0 auto;display:block;'
+    + 'box-shadow:0 0 0 1px rgba(255,255,255,.22),0 2px 6px rgba(0,0,0,.45)}'
+    + '.ekw-txt{display:flex;flex-direction:column;gap:1px;min-width:0}'
     + '.ekw-list button:hover{background:rgba(247,169,26,.16);border-color:rgba(247,169,26,.5)}'
     + '.ekw-list button.on{background:rgba(247,169,26,.22);border-color:rgba(247,169,26,.8)}'
     + '.ekw-list .n{font-size:14px}.ekw-list .e{font-size:11px;color:#a89770}'
@@ -106,7 +110,10 @@
     function card(code, native, english, active) {
       var b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-code', code); b.setAttribute('lang', code);
       if (active) b.className = 'on';
-      b.innerHTML = '<span class="n"></span><span class="e"></span>';
+      b.innerHTML = '<img class="ekw-flag" alt="" loading="lazy" width="26" height="26">'
+        + '<span class="ekw-txt"><span class="n"></span><span class="e"></span></span>';
+      var f = FLAGS[code], img = b.querySelector('.ekw-flag');
+      if (f) img.src = f; else img.remove();
       b.querySelector('.n').textContent = native;
       b.querySelector('.e').textContent = english || '';
       return b;
@@ -204,6 +211,7 @@
   var tick = 0;
   fetch('/i18n/langs.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
     LANGS = (j && j.ready) || [];
+    FLAGS = (j && j.flags) || {};
     for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === CODE) ME = LANGS[i];
     if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot); else boot();
     if (ON && ME) translate();
