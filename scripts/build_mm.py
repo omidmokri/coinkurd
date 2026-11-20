@@ -11,6 +11,7 @@ Run: python3 scripts/build_mm.py && python3 scripts/chrome.py
 import html
 import json
 import os
+import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
@@ -235,7 +236,7 @@ def page(view, folder, script):
 <meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://data-api.binance.vision" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+{chrome.FONTS}
 <link rel="stylesheet" href="/assets/mm/mm.css?v={V}">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False, separators=(",", ":"))}</script>
 </head>

@@ -1,8 +1,10 @@
 /* entekhab.net service worker — installable app + offline reading.
    Pages, data and scripts: network first (always fresh when online), cached copy when offline.
-   Images and fonts: cache first. Third-party requests (Binance, TradingView, Google Fonts…) are never touched. */
+   Images and fonts: cache first. Third-party requests (Binance, TradingView…) are never touched. */
 const V = 'ek-v1', STATIC = V + '-static', PAGES = V + '-pages', DATA = V + '-data';
-const CORE = ['/', '/offline.html', '/assets/ui.css', '/assets/ui.js', '/assets/logo-h.webp', '/assets/favicon-32.png', '/assets/icon-192.png'];
+const CORE = ['/', '/offline.html', '/assets/ui.css', '/assets/ui.js', '/assets/logo-h.webp', '/assets/favicon-32.png', '/assets/icon-192.png',
+  /* the text fonts, served from this domain since 2026-11-20: cached on install so an offline page reads in its own typeface */
+  '/assets/fonts/Vazirmatn-Regular.woff2?v=1', '/assets/fonts/Vazirmatn-Bold.woff2?v=1'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(STATIC).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => !k.startsWith(V + '-') && !k.startsWith('ek-tts-'))   /* voices (~90 MB each) survive site updates */.map(k => caches.delete(k)))).then(() => self.clients.claim()));
