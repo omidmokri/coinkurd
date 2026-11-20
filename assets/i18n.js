@@ -21,6 +21,10 @@
   var CODE = ls.get('ek_l') || '';
   var ON = !!CODE && !ENC && ls.get('ek_ar') !== '1';
   var LANGS = null, ME = null, FLAGS = {};
+  /* The header's own language group, and nothing else. `.lsw` on /learn/, /glossary/, /library/ and /map/
+     is those pages' own three-way switch for the lesson text (Kurdish, Persian, English); putting the globe
+     there gave the reader two globes on one page and hid the Persian the switch exists to offer. */
+  var BAR = '#langs,.ek-lang';
 
   /* ------------------------------------------------------------------ the globe and its panel */
   /* The pill is the one /market/ already uses (.pm-hglobe): same gradient, height, corner, weight and gap, so the
@@ -83,7 +87,7 @@
   /* The site's own languages come first in the panel, Persian and Arabic among them; picking one simply clicks the
      real button the header already has, so nothing about the site's own switching is reimplemented here. */
   function siteLangs() {
-    var box = d.querySelector('#langs,.ek-lang,.lsw');
+    var box = d.querySelector(BAR);
     if (!box) return [];
     return [].map.call(box.querySelectorAll('button[data-l]'), function (b) {
       return { code: b.getAttribute('data-l'), native: (b.textContent || '').trim(), btn: b, on: b.classList.contains('on') };
@@ -178,7 +182,7 @@
   function globe() {
     if (!LANGS || !LANGS.length) return;
     var mk = onMarket();
-    [].forEach.call(d.querySelectorAll('#langs,.ek-lang,.lsw'), function (box) {
+    [].forEach.call(d.querySelectorAll(BAR), function (box) {
       if (!mk) [].forEach.call(box.querySelectorAll('.pm-hglobe'), function (p) {
         if (p.style.display !== 'none') p.style.display = 'none';
       });
@@ -208,7 +212,7 @@
   w.addEventListener('click', function (ev) {
     if (!ON) return;
     var b = ev.target.closest && ev.target.closest('button[data-l]');
-    if (!b || !b.closest('#langs,.ek-lang,.lsw')) return;
+    if (!b || !b.closest(BAR)) return;
     ls.set('ek_l', null);
   }, true);
 
@@ -217,7 +221,7 @@
     /* the header rebuilds itself (the menu, the tab bar): put the globe back whenever it does */
     try {
       var mo = new MutationObserver(function () { if (!tick) tick = setTimeout(function () { tick = 0; globe(); }, 60); });
-      [].forEach.call(d.querySelectorAll('#langs,.ek-lang,.lsw'), function (b) { mo.observe(b, { childList: true }); });
+      [].forEach.call(d.querySelectorAll(BAR), function (b) { mo.observe(b, { childList: true }); });
       if (d.body) mo.observe(d.body, { childList: true, subtree: true });
     } catch (e) { }
   }
