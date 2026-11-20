@@ -496,10 +496,29 @@ BODY_TAGS = f'<script src="/assets/chrome.js?v={VER}" defer></script>'
 # third-party script host is TradingView's widget loader.
 # 'wasm-unsafe-eval' lets the read-aloud engine compile its self-hosted WebAssembly (tts/); it
 # allows WebAssembly compilation only, not JavaScript eval.
+# The fonts are served from this domain. Until 2026-11-20 every page fetched them from fonts.googleapis.com,
+# which is slow or unreachable for a reader inside Iran — the main audience — and left the first paint waiting on
+# a host the site does not control (SEO brief, action 7). Vazirmatn carries Persian, Kurdish, Arabic and Latin;
+# Space Grotesk is subset to Latin, because it is used only for figures and their labels. Both are SIL OFL
+# (assets/fonts/OFL.txt, OFL-SpaceGrotesk.txt). font-display:swap so the text is readable before they arrive.
+def _ff(fam, w, f):
+    return (f"@font-face{{font-family:'{fam}';font-style:normal;font-weight:{w};font-display:swap;"
+            f"src:url('/assets/fonts/{f}.woff2?v=1') format('woff2')}}")
+
+
+FONTS = "<style>" + "".join([
+    _ff("Vazirmatn", 400, "Vazirmatn-Regular"), _ff("Vazirmatn", 700, "Vazirmatn-Bold"), _ff("Vazirmatn", 900, "Vazirmatn-Black"),
+    _ff("Space Grotesk", 500, "SpaceGrotesk-500"), _ff("Space Grotesk", 700, "SpaceGrotesk-700"),
+    _ff("Archivo Black", 400, "ArchivoBlack"),   # --fontD, the display headings
+]) + "</style>" + "".join(
+    f'<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/{f}.woff2?v=1" crossorigin>'
+    for f in ("Vazirmatn-Regular", "Vazirmatn-Bold"))
+
+
 CSP = ("default-src 'self'; "
        "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://s3.tradingview.com; "
-       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-       "font-src 'self' https://fonts.gstatic.com data:; "
+       "style-src 'self' 'unsafe-inline'; "
+       "font-src 'self' data:; "                               # the fonts are served from this domain now (assets/fonts/)
        "img-src 'self' data: blob: https:; "
        "media-src 'self' data: blob: https://github.com https://objects.githubusercontent.com https://release-assets.githubusercontent.com; "
        "connect-src 'self' https://data-api.binance.vision wss://data-stream.binance.vision wss://fstream.binance.com "

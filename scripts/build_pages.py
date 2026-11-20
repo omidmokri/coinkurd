@@ -175,7 +175,7 @@ a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
 header .w{display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-family:'Space Grotesk',monospace;font-weight:700;color:var(--ink)}.lv-up{animation:lvu 1.2s ease-out}.lv-dn{animation:lvd 1.2s ease-out}@keyframes lvu{from{color:#22c55e}}@keyframes lvd{from{color:#ef4444}}.lvl{display:none;color:#22c55e;font-size:.7rem}html.live-on .lvl{display:inline}.acts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}.wbtn{display:inline-flex;gap:6px;align-items:center;background:#ffffff10;border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:7px 14px;font:inherit;font-size:.85rem;cursor:pointer}.wbtn.on{border-color:var(--acc);color:var(--acc)}.faq{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}.faq summary{cursor:pointer;font-weight:700}.faq p{margin:8px 0 0}:focus-visible{outline:2px solid var(--acc);outline-offset:2px}.bnav{display:none}@media(max-width:700px){.bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:95;background:rgba(10,10,10,.9);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}.bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.62rem;color:var(--mute)}.bnav a span{font-size:1.15rem;line-height:1}body{padding-bottom:62px}}.logo{display:flex;align-items:center;gap:8px}.logo img{height:40px;width:auto;display:block}@media(max-width:640px){.logo span{display:none}}.logo b{color:var(--acc)}
 nav a{color:var(--mute);margin-inline-start:16px;font-size:.9rem}header nav{min-width:0}@media(max-width:760px){header .w{gap:10px}header nav{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 14px),transparent)}header nav::-webkit-scrollbar{display:none}nav a{margin-inline-start:12px;flex:none}}main{padding:32px 0 60px}
 h1{font-size:clamp(1.5rem,4vw,2.3rem);line-height:1.45;margin:10px 0 12px}h2{font-size:1.15rem;margin:34px 0 12px;color:var(--acc)}
-.meta{color:var(--mute);font-size:.85rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--ink)}
+.meta{color:var(--mute);font-size:.85rem;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.meta .by a{color:var(--ink);border-bottom:1px solid var(--line)}.pager{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:26px 0}.pager a,.pager b{border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:.9rem}.pager b{background:var(--line);color:var(--ink)}.pill{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--ink)}
 .img{width:100%;height:auto;border-radius:10px;margin:18px 0;display:block}.note a:not(.pill):not(.btn),.txt p a,.txt>a{text-decoration:underline;text-underline-offset:3px}.txt{font-size:1.02rem;margin:18px 0}
 details{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0;background:var(--card)}summary{cursor:pointer;font-weight:700}
 .social{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding:12px 0;border-top:1px solid var(--line);margin-top:16px}.social a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;white-space:nowrap;color:var(--ink);font-size:.85rem}
@@ -349,6 +349,11 @@ def seo_desc(desc, n=158):
     return _cut(t, n)
 
 
+# the page's own feed, so a browser, a reader and an indexer find it from any page (SEO brief, action 5)
+FEED_LINK = {lg: f'<link rel="alternate" type="application/rss+xml" title="{t}" href="{SITE}/{("" if lg == "fa" else lg + "/")}feed.xml">'
+             for lg, t in (("fa", "entekhab.net — فید مطالب"), ("en", "entekhab.net — feed"), ("ckb", "entekhab.net — فیدی بابەتەکان"), ("ar", "entekhab.net — تغذية"))}
+
+
 def page(path, title, desc, body, extra_head="", lang="fa"):
     url = f"{SITE}/{path}"
     dirn = "ltr" if lang == "en" else "rtl"
@@ -359,8 +364,8 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
     doc = f"""<!doctype html><html lang="{lang}" dir="{dirn}"><head><meta charset="utf-8">{chrome.CSP_META}<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(seo_title(title))}</title><meta name="description" content="{e(seo_desc(desc))}"><link rel="canonical" href="{url}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{url}"><meta property="og:site_name" content="entekhab.net">
-<meta name="theme-color" content="#f7931a"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-{ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}
+<meta name="theme-color" content="#f7931a">{chrome.FONTS}
+{ICONS}{"" if "og:image" in extra_head else OG_DEFAULT}{FEED_LINK.get(lang, FEED_LINK["fa"])}
 <style>{CSS}</style>{chrome.HEAD_TAGS}{extra_head}</head><body>
 {chrome.header(cl)}
 <main class="w">{body}</main>
@@ -499,7 +504,7 @@ def build_post(p):
     desc = plain(p["text"]) or title
     img = post_img(p)
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
-    body = f'<div class="meta"><a class="pill" href="/categories/{e(p["category"])}/">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</a>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span></div>'
+    body = f'<div class="meta"><a class="pill" href="/categories/{e(p["category"])}/">{cat.get("icon","")} {e(cat["name"].get("fa",""))}</a>{coins}<time datetime="{p.get("date","")}">{fmt_date(p.get("date",""))}</time><span>👁 {e(p.get("views") or "—")}</span>{BYLINE["fa"]}</div>'
     body += f'<h1>{e(title)}</h1>'
     if img:
         body += hero_img(img, title)
@@ -526,7 +531,7 @@ def build_post(p):
           "author": AUTHOR, "publisher": PUBLISHER, "articleSection": cat["name"].get("fa", ""),
           "mainEntityOfPage": f"{SITE}/p/{p['id']}/", "description": desc,
           "about": [{"@type": "Thing", "name": NAMES.get(c, c), "url": f"{SITE}/coins/{c.lower()}/"} for c in p.get("coins", [])]}
-    head = f'<script type="application/ld+json">{sj(ld)}</script>'
+    head = f'<script type="application/ld+json">{sj(ld)}</script>{article_meta(p)}'
     if img:
         head += f'<meta property="og:image" content="{e(SITE + img if img.startswith("/") else img)}"><meta name="twitter:card" content="summary_large_image">'
     head += alt_links(p)
@@ -564,7 +569,7 @@ def build_post_lang(p, lg):
     desc = plain(t["text"]) or title
     img = post_img(p)
     coins = "".join(f'<a class="pill" href="/coins/{c.lower()}/">{c}</a>' for c in p.get("coins", []))
-    body = f'<div class="meta">{coins}<time datetime="{p.get("date", "")}">{fmt_date(p.get("date", ""))}</time></div><h1>{e(title)}</h1>'
+    body = f'<div class="meta">{coins}<time datetime="{p.get("date", "")}">{fmt_date(p.get("date", ""))}</time>{BYLINE.get(lg, BYLINE["en"])}</div><h1>{e(title)}</h1>'
     if img:
         body += hero_img(img, title)
     body += f'<div class="txt">{rich(t["text"])}</div>'
@@ -575,7 +580,7 @@ def build_post_lang(p, lg):
           "image": [SITE + img if img.startswith("/") else img] if img else [], "author": AUTHOR,
           "publisher": PUBLISHER, "dateModified": p.get("edited") or p.get("date"), "mainEntityOfPage": f"{SITE}/{lg}/p/{p['id']}/",
           "description": desc, "translationOfWork": {"@id": f"{SITE}/p/{p['id']}/"}}
-    head = f'<script type="application/ld+json">{sj(ld)}</script>' + alt_links(p)
+    head = f'<script type="application/ld+json">{sj(ld)}</script>{article_meta(p, lg)}' + alt_links(p)
     if img:
         head += f'<meta property="og:image" content="{e(SITE + img if img.startswith("/") else img)}"><meta name="twitter:card" content="summary_large_image">'
     if p.get("q") == "low":
@@ -585,8 +590,88 @@ def build_post_lang(p, lg):
     return page(f"{lg}/p/{p['id']}/", title, desc, body, head, lang=lg)
 
 
+# Who wrote it, in the page itself and not only inside the JSON-LD: a reader and a reviewer both look for a name
+# under the title, and Google's news and E-E-A-T guidance asks for the same (SEO brief, action 8).
+BYLINE = {lg: f'<span class="by">{lbl} <a rel="author" href="{SITE}/about/">Coin Kurd</a></span>'
+          for lg, lbl in (("fa", "نوشتهٔ"), ("en", "by"), ("ckb", "نووسینی"), ("ar", "بقلم"))}
+
+
+def article_meta(p, lg="fa"):
+    """og:type and the publication times an aggregator reads off the page itself (SEO brief, action 8)."""
+    d, m = lastmod(p.get("date")), lastmod(p.get("edited") or p.get("date"))
+    return ('<meta property="og:type" content="article">'
+            f'<meta property="article:published_time" content="{e(d)}">'
+            f'<meta property="article:modified_time" content="{e(m)}">'
+            f'<meta property="article:section" content="{e(CATS.get(p.get("category"), {}).get("name", {}).get(lg if lg in ("fa", "en", "ckb") else "fa", "") or "")}">'
+            f'<meta property="article:author" content="Coin Kurd">')
+
+
+def pager(base, i, n):
+    """Prev/next links for a paginated archive, plus a jump to each page so no page is more than one click away."""
+    if n < 2:
+        return ""
+    url = lambda k: base if k == 0 else f"{base}{k + 1}/"   # noqa: E731
+    out = ['<nav class="pager" aria-label="صفحه‌بندی">']
+    if i:
+        out.append(f'<a rel="prev" href="{url(i - 1)}">→ صفحهٔ قبل</a>')
+    for k in range(n):
+        out.append(f'<b aria-current="page">{k + 1}</b>' if k == i else f'<a href="{url(k)}">{k + 1}</a>')
+    if i + 1 < n:
+        out.append(f'<a rel="next" href="{url(i + 1)}">صفحهٔ بعد ←</a>')
+    return "".join(out) + "</nav>"
+
+
+def lastmod(d):
+    """A sitemap date with its time when we have one: a bare day tells an indexer nothing about which hour changed."""
+    if not d:
+        return ""
+    try:
+        t = datetime.fromisoformat(str(d))
+        if t.tzinfo is None:
+            t = t.replace(tzinfo=timezone.utc)
+        return t.isoformat(timespec="seconds")
+    except Exception:  # noqa: BLE001
+        return str(d)[:10]
+
+
+def build_news_sitemap():
+    """/news-sitemap.xml — Google's news sitemap: only the posts of the last 48 hours, at most 1,000, as the
+       documentation requires (https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap).
+       Each language's copy of a post is its own entry, because each is a page of its own (SEO brief, action 4)."""
+    cut = datetime.now(timezone.utc) - timedelta(hours=48)
+    rows = []
+    for p in posts:
+        if p.get("q") == "low":
+            continue
+        try:
+            t = datetime.fromisoformat(p["date"])
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=timezone.utc)
+        except Exception:  # noqa: BLE001
+            continue
+        if t < cut:
+            continue
+        tr = p.get("tr") or {}
+        langs = [("fa", f"{SITE}/p/{p['id']}/", p["title"])]
+        for lg in ("en", "ckb", "ar"):
+            x = tr.get(lg)
+            if isinstance(x, dict) and x.get("text") and x.get("title"):
+                langs.append((lg, f"{SITE}/{lg}/p/{p['id']}/", x["title"]))
+        for lg, u, ttl in langs:
+            rows.append(f'<url><loc>{e(u)}</loc><news:news><news:publication><news:name>entekhab.net</news:name>'
+                        f"<news:language>{lg}</news:language></news:publication>"
+                        f"<news:publication_date>{t.isoformat(timespec='seconds')}</news:publication_date>"
+                        f"<news:title>{e(ttl[:110])}</news:title></news:news></url>")
+    xml = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+           'xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n' + "\n".join(rows[:1000]) + "\n</urlset>")
+    open(os.path.join(ROOT, "news-sitemap.xml"), "w", encoding="utf-8").write(xml)
+    print(f"news sitemap: {min(len(rows), 1000)} urls (last 48h)")
+
+
 def build_rss():
-    """/feed.xml (Persian) and /en/feed.xml — the latest 50 real posts (promos and repeats excluded)"""
+    """One feed per language (/feed.xml, /en/feed.xml, /ckb/feed.xml, /ar/feed.xml) — the latest 50 real posts
+       (promos and repeats excluded). Announced in every page head and in robots.txt, so a reader or an indexer
+       finds them without guessing the path (SEO brief, action 5)."""
     good = [p for p in posts if p.get("q") != "low"][:50]
     now = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
     def item(p, lg):
@@ -599,13 +684,14 @@ def build_rss():
         except Exception:  # noqa: BLE001
             pd = now
         return f"<item><title>{e(t.get('title') or p['title'])}</title><link>{u}</link><guid>{u}</guid><pubDate>{pd}</pubDate><description>{e(plain(t.get('text') or '', 400))}</description></item>"
-    for lg, path, ttl in (("fa", "feed.xml", "entekhab.net — تحلیل و اخبار کریپتو"), ("en", "en/feed.xml", "entekhab.net — crypto analysis & news")):
+    for lg, path, ttl in (("fa", "feed.xml", "entekhab.net — تحلیل و اخبار کریپتو"), ("en", "en/feed.xml", "entekhab.net — crypto analysis & news"),
+                          ("ckb", "ckb/feed.xml", "entekhab.net — شیکاری و هەواڵی کریپتۆ"), ("ar", "ar/feed.xml", "entekhab.net — تحليل وأخبار الكريبتو")):
         xml = (f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>{e(ttl)}</title><link>{SITE}/</link><description>{e(ttl)}</description>'
                f"<language>{lg}</language><lastBuildDate>{now}</lastBuildDate>" + "".join(item(p, lg) for p in good) + "</channel></rss>")
         full = os.path.join(ROOT, path)
         os.makedirs(os.path.dirname(full), exist_ok=True)
         open(full, "w", encoding="utf-8").write(xml)
-    print("rss: 2 feeds")
+    print("rss: 4 feeds")
 
 
 GENE_FA = {"liquidity": "نقدشوندگی", "volatility": "نوسان", "flow": "جریان خریداران", "sentiment": "احساسات خبری", "attention": "توجه رسانه‌ای",
@@ -828,11 +914,15 @@ def main():
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:
-        lm = f"<lastmod>{d[:10]}</lastmod>" if d else ""
+        lm = f"<lastmod>{lastmod(d)}</lastmod>" if d else ""
         sm.append(f"<url><loc>{e(u)}</loc>{lm}</url>")
     sm.append("</urlset>")
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write("\n".join(sm))
-    open(os.path.join(ROOT, "robots.txt"), "w").write(f"User-agent: *\nAllow: /\nDisallow: /me/\nDisallow: /offline.html\nSitemap: {SITE}/sitemap.xml\n")
+    build_news_sitemap()
+    feeds = "".join(f"Sitemap: {SITE}/{('' if lg == 'fa' else lg + '/')}feed.xml\n" for lg in ("fa", "en", "ckb", "ar"))
+    open(os.path.join(ROOT, "robots.txt"), "w").write(
+        f"User-agent: *\nAllow: /\nDisallow: /me/\nDisallow: /offline.html\n"
+        f"Sitemap: {SITE}/sitemap.xml\nSitemap: {SITE}/news-sitemap.xml\n{feeds}")
     print(f"pages={len(urls)} posts={len(posts)} coins={len(order)}")
 
 
@@ -1067,14 +1157,45 @@ def prerender():
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.tsc,.ibox{overflow-x:auto;-webkit-overflow-scrolling:touch}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
     body = f'<h1>داشبورد هوشمند بازار</h1>{regime_hero()}<div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
     urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}{RH_CSS}</style>")]
-    # /categories/<id>/
+    # /categories/<id>/ and its pages — before this, each category listed only its newest 200 posts, so the older
+    # ones were reachable from the sitemap alone: an archive no reader and no crawler could walk into (SEO brief,
+    # action 3). Now every post sits on a numbered page, and each page carries prev/next and its own canonical.
+    PER = 60
+    cat_cards = []
     for c in meta.get("categories", []):
         ps = [p for p in posts if p["category"] == c["id"]]
         if not ps:
             continue
-        body = f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1><picture><source srcset="/assets/ic3d/{c["id"]}.webp?v=2" type="image/webp"><img src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="56" height="56" style="vertical-align:-14px;margin-inline-end:10px;object-fit:contain"></picture>{e(CAT_H1.get(c["id"], c["name"]["fa"]))}</h1><p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p><p class="note">{e(c["name"].get("ckb",""))} · {e(c["name"].get("en",""))} — {len(ps)} مطلب · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">' + "".join(post_li(p) for p in ps[:200]) + "</ul>"
-        urls.append(page(f"categories/{c['id']}/", CAT_H1.get(c["id"], c["name"]["fa"]) + " — آرشیو " + c["name"]["fa"],
-                         (CAT_INTRO.get(c["id"]) or f'آرشیو مطالب دستهٔ {c["name"]["fa"]}')[:155], body))
+        name = CAT_H1.get(c["id"], c["name"]["fa"])
+        pages_n = max(1, -(-len(ps) // PER))
+        cat_cards.append((c, name, len(ps), pages_n))
+        for i in range(pages_n):
+            part = ps[i * PER:(i + 1) * PER]
+            path = f"categories/{c['id']}/" if i == 0 else f"categories/{c['id']}/{i + 1}/"
+            head = f'<div class="meta"><a href="/">خانه</a> / <a href="/categories/">دسته‌ها</a></div><h1><picture><source srcset="/assets/ic3d/{c["id"]}.webp?v=2" type="image/webp"><img src="/assets/ic3d/{c["id"]}.png?v=2" alt="" width="56" height="56" style="vertical-align:-14px;margin-inline-end:10px;object-fit:contain"></picture>{e(name)}</h1>'
+            if i == 0:
+                head += f'<p class="txt">{e(CAT_INTRO.get(c["id"], ""))}</p>'
+            head += f'<p class="note">{e(c["name"].get("ckb", ""))} · {e(c["name"].get("en", ""))} — {len(ps)} مطلب{f" · صفحهٔ {i + 1} از {pages_n}" if pages_n > 1 else ""} · <a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p>'
+            body = head + '<ul class="list">' + "".join(post_li(q) for q in part) + "</ul>" + pager(f"/categories/{c['id']}/", i, pages_n)
+            ttl = name + " — آرشیو " + c["name"]["fa"] + (f" (صفحهٔ {i + 1})" if i else "")
+            dsc = (CAT_INTRO.get(c["id"]) or f'آرشیو مطالب دستهٔ {c["name"]["fa"]}')
+            dsc = (f'صفحهٔ {i + 1} از آرشیو {c["name"]["fa"]} — {dsc}' if i else dsc)[:155]
+            extra = f'<link rel="prev" href="{SITE}/categories/{c["id"]}/{"" if i == 1 else str(i) + "/"}">' if i else ""
+            if i + 1 < pages_n:
+                extra += f'<link rel="next" href="{SITE}/categories/{c["id"]}/{i + 2}/">'
+            u = page(path, ttl, dsc, body, extra)
+            urls.append(u)
+    # /categories/ — every post page links here from its breadcrumb, and until now the link was a 404
+    if cat_cards:
+        tot = sum(n for _, _, n, _ in cat_cards)
+        body = (f'<div class="meta"><a href="/">خانه</a> / دسته‌ها</div><h1>دسته‌های آرشیو</h1>'
+                f'<p class="txt">هر مطلب آرشیو Coin_Kurd به‌صورت خودکار در یکی از این دسته‌ها جای می‌گیرد؛ در مجموع {tot} مطلب. '
+                f'<a href="/methodology/">دسته‌ها چطور تعیین می‌شوند</a></p><ul class="list">'
+                + "".join(f'<li><a href="/categories/{c["id"]}/"><b>{e(nm)}</b></a> — {n} مطلب'
+                          + (f' · {pn} صفحه' if pn > 1 else "")
+                          + f'<br><small>{e(CAT_INTRO.get(c["id"], "")[:120])}</small></li>'
+                          for c, nm, n, pn in sorted(cat_cards, key=lambda x: -x[2])) + "</ul>")
+        urls.append(page("categories/", "دسته‌های آرشیو مطالب کریپتو", f"فهرست {len(cat_cards)} دستهٔ آرشیو entekhab.net با {tot} مطلب تحلیلی و خبری دربارهٔ بازار رمزارز", body))
     urls.append(build_replay())
     print(f"prerendered index (missing placeholders: {miss}); extra pages {len(urls)}")
     return urls
