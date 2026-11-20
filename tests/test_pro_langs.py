@@ -63,6 +63,12 @@ def main():
     ok("every currency has its flag (the site rule: nothing shown without its own picture)", not miss and os.path.exists(os.path.join(ROOT, "assets", "pro", "ic", "cur.svg")), miss)
     big = [f for f in os.listdir(flags) if f.endswith(".svg") and os.path.getsize(os.path.join(flags, f)) > 25000]
     ok("no flag over 25 kB (coats of arms are kept as a small picture inside the SVG)", not big, big)
+    js = PL.js_text()
+    ok("the page is handed a flag for every language", "P.langFlag = function" in js)
+    ok("the flag helper keeps a name of its own (panels.js owns P.flag: a collision kills the language menu)",
+       "P.flag = " not in js)
+    ok("every language has a flag, Kurmanji and Sorani both under the Kurdistan Region flag",
+       all(PL.flag(r[0]) for r in PL.LANGS) and PL.flag("kmr") == PL.flag("ckb") and PL.flag("ckb").endswith("kurdistan.svg"))
     print(f"\n{len(FAILS)} failure(s)" if FAILS else "\nOK")
     sys.exit(1 if FAILS else 0)
 
