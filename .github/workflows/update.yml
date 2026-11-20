@@ -124,7 +124,7 @@ jobs:
 
       - name: Chart snapshot and header ticker (fallback for visitors who cannot reach an exchange)
         continue-on-error: true
-        timeout-minutes: 3
+        timeout-minutes: 8      # the top 20 coins on five timeframes; BTC and ETH are done first
         run: python scripts/candles.py
 
       - name: Scanner track record (one-time 40-day backtest + live log of every finding)
