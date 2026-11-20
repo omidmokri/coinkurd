@@ -32,22 +32,35 @@ FEEDS = {
     "econ": ["iamusd"],                                              # اخبار اقتصادی
     "brief": ["newscitypro", "ForeDex", "alphractal", "MAC_DDDD"],   # خبر کوتاه
     "ai": ["MrArtificialintelligence", "silicon_brain"],             # هوش مصنوعی
+    "vc": ["visualcapitalists"],                                     # نمودار جهانی (Visual Capitalist)
 }
 from adpics import ART_ONLY, is_ad  # noqa: E402  (other channels' adverts never go into our group)
-KIND_FA = {"onchain": "آن‌چین", "news": "خبر کریپتو", "econ": "اقتصاد", "brief": "خبر کوتاه", "ai": "هوش مصنوعی"}
+KIND_FA = {"onchain": "آن‌چین", "news": "خبر کریپتو", "econ": "اقتصاد", "brief": "خبر کوتاه", "ai": "هوش مصنوعی",
+           "vc": "نمودار جهانی"}
 # per-kind settings. langs: which output languages go to that topic (a single topic must not get both,
 # or every item would be posted twice). max: new posts summarised per channel per check — the newer,
-# higher-volume feeds are kept small so they cannot flood the group or the AI budget.
+# higher-volume feeds are kept small so they cannot flood the group or the AI budget. every: seconds between
+# two items of that kind, for a feed that must be spread out rather than read as fast as the loop allows.
 KINDS = {
     "onchain": {"langs": None, "max": None},
     "news": {"langs": None, "max": None},
     "econ": {"langs": ["fa"], "max": 3},
     "brief": {"langs": ["fa"], "max": 2},
     "ai": {"langs": ["fa"], "max": 2},
+    # Visual Capitalist: Persian only, and "old" because the owner asked for the whole run since BACKFILL below —
+    # the one feed whose items may be posted after the day they were written.
+    # The house prompt never names a source, but these findings are Visual Capitalist's own work and we draw our
+    # own picture rather than take theirs, so the post carries their name. The summary is kept shorter to leave
+    # room for that line under the picture.
+    "vc": {"langs": ["fa"], "max": 1, "every": 1800, "old": True, "limit": 940,
+           "credit": "📊 منبع داده‌ها: Visual Capitalist"},
 }
+# A kind listed here is read back to that date the first time it runs, page by page, and the posts wait their turn
+# in a queue so the topic is never filled at once. After that it behaves like every other feed.
+BACKFILL = {"vc": "2026-10-27"}
 KIND_ORDER = list(FEEDS)
 # topic ids in @Coin_Kurd_Group for the kinds added above; TOPIC_IDS overrides any of them
-DEFAULT_TOPICS = {"econ": 47540, "brief": 229893, "ai": 33973}
+DEFAULT_TOPICS = {"econ": 47540, "brief": 229893, "ai": 33973, "vc": 121690}
 TOPIC_HINTS = {  # words that identify each topic by its name (Persian and Sorani topics are separate)
     "onchain:ckb": ["ئانچین", "ئۆنچەین"],
     "onchain:fa": ["آنچین", "انچین"],
@@ -316,19 +329,38 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
     backfill = f.get("backfill_day") != today          # once a day: also pick up every post published earlier today
     f["backfill_day"] = today
     for kind, channels in FEEDS.items():
+        every = KINDS.get(kind, {}).get("every")           # this feed's own pace, whatever the check interval is
+        if every:
+            last = f.setdefault("kind_last", {})
+            if now - last.get(kind, 0) < every:
+                continue
+            last[kind] = now
         for ch in channels:
             posts = read_posts(ch)
             if not posts:
                 log.info("feed %s: no posts readable", ch)
                 continue
             todays = [p for p in posts if (p[1] or "")[:10] == today]
+            pend = f.setdefault("pending", {})
             if f["seen"].get(ch) is None:
                 f["seen"][ch] = posts[-1][0] - 1
+                since = BACKFILL.get(kind)
+                if since:                                  # read the channel back to that date, once
+                    old_posts = IR.read_channel_since(ch, since)
+                    pend[ch] = [[p["id"], p["iso"], (p["text"] or "").strip(), p["links"], p.get("photos", [])]
+                                for p in old_posts if p["id"] <= posts[-1][0]]
+                    f["seen"][ch] = posts[-1][0]           # the live path takes it from here; the queue has the rest
+                    log.info("feed %s: %s posts waiting since %s", ch, len(pend[ch]), since)
             if backfill and todays:
                 f["seen"][ch] = min(f["seen"][ch], todays[0][0] - 1)
             done = {it["id"] for it in f["items"].get(kind, [])}
             cap = KINDS.get(kind, {}).get("max") or MAX_PER_CHECK
             new = [p for p in posts if p[0] > f["seen"][ch] and f"{ch}/{p[0]}" not in done][:cap]
+            if pend.get(ch):                               # the queue first: oldest waiting posts, a few at a time
+                take = [p for p in pend[ch] if f"{ch}/{p[0]}" not in done][:cap]
+                pend[ch] = [p for p in pend[ch] if take and p[0] > take[-1][0]]
+                if take:
+                    new = take
             for pid, iso, text, links, photos in new:
                 f["seen"][ch] = max(f["seen"][ch], pid)
                 text, photo = expand(text, links, photos)
@@ -339,7 +371,7 @@ def run(s, send_fn, delete_fn, group_id, admin_ids=()):
                 item = {"id": f"{ch}/{pid}", "kind": kind, "at": iso, "made": datetime.now(timezone.utc).isoformat(),
                         "photo": photo, "posted": False}
                 for lang in (KINDS.get(kind, {}).get("langs") or ("fa", "ckb")):
-                    out = summarize(text, lang)
+                    out = summarize(text, lang, KINDS.get(kind, {}).get("limit", 1024))
                     if out:
                         item[lang] = out
                 if not item.get("fa"):
@@ -483,7 +515,7 @@ def publish(s, f, topics, group_id, send_fn):
         for it in sorted(f["items"].get(kind, []), key=lambda x: x.get("at") or ""):
             if it.get("posted", True) is True and "posted" in it:
                 continue
-            if (it.get("at") or "")[:10] != today:
+            if (it.get("at") or "")[:10] != today and not KINDS.get(kind, {}).get("old"):
                 it["posted"] = True                     # older than today: never flood the topic with backlog
                 continue
             if budget <= 0:
@@ -494,7 +526,9 @@ def publish(s, f, topics, group_id, send_fn):
             for lang in langs:
                 th = topics.get(f"{kind}:{lang}") or topics.get(kind)
                 if it.get(lang) and th and lang not in it.get("sent", []):
-                    r = send_fn(group_id, it[lang], None, message_thread_id=th, plain=True, photo=picture(it, lang))
+                    credit = KINDS.get(kind, {}).get("credit")
+                    body = it[lang] + ("\n\n" + credit if credit else "")
+                    r = send_fn(group_id, body, None, message_thread_id=th, plain=True, photo=picture(it, lang))
                     if r.get("ok"):
                         it.setdefault("sent", []).append(lang)
                         it.setdefault("msgs", []).append(r["result"]["message_id"])
