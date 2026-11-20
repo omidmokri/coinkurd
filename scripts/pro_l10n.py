@@ -59,9 +59,9 @@ CACHE = os.path.join(ROOT, "data", "pro_l10n")
 TEMPLATE = os.path.join(ROOT, "market", "index.html")
 
 # the order languages are filled in: the largest audiences of the channel's region and of crypto first
-PRIORITY = ["tr", "ru", "es", "br", "de", "fr", "hi", "id", "ur", "vi", "cn", "uk", "it", "pl", "nl", "jp", "kr", "tw",
-            "th", "fil", "ms", "bn", "ta", "te", "iw", "gr", "ro", "cz", "hu", "se", "no", "da", "fi", "pt", "bg", "hr",
-            "sr", "sk", "sl", "lt", "lv", "et", "cat"]
+PRIORITY = ["kmr", "tr", "ru", "es", "br", "de", "fr", "hi", "id", "ur", "vi", "cn", "uk", "it", "pl", "nl", "jp",
+            "kr", "tw", "th", "fil", "ms", "bn", "mr", "pa", "sw", "ta", "te", "iw", "gr", "ro", "cz", "hu", "se",
+            "no", "da", "fi", "pt", "bg", "hr", "sr", "sk", "sl", "lt", "lv", "et", "cat"]
 assert sorted(PRIORITY) == sorted(pro_langs.NEW), "PRIORITY must list every new language once"
 
 # names and codes that stay exactly as written in every language
@@ -81,6 +81,7 @@ SCRIPT = {
     "ru": r"[Ѐ-ӿ]", "uk": r"[Ѐ-ӿ]", "bg": r"[Ѐ-ӿ]", "sr": r"[Ѐ-ӿ]",
     "gr": r"[Ͱ-Ͽ]", "iw": r"[֐-׿]", "ur": r"[؀-ۿ]", "hi": r"[ऀ-ॿ]",
     "bn": r"[ঀ-৿]", "ta": r"[஀-௿]", "te": r"[ఀ-౿]", "th": r"[฀-๿]",
+    "mr": r"[ऀ-ॿ]", "pa": r"[਀-੿]",
     "jp": r"[぀-ヿ一-鿿]", "kr": r"[가-힯ᄀ-ᇿ]", "cn": r"[一-鿿]",
     "tw": r"[一-鿿]",
 }
@@ -241,7 +242,7 @@ Rules:
 Input:
 {payload}"""
 
-VARIANT = {"br": " as written in Brazil", "pt": " as written in Portugal", "cn": " in Simplified Chinese characters",
+VARIANT = {"kmr": " (Kurmanji, Northern Kurdish, in the Latin alphabet — not Sorani)", "br": " as written in Brazil", "pt": " as written in Portugal", "cn": " in Simplified Chinese characters",
            "tw": " in Traditional Chinese characters (Taiwan)", "sr": " in the Cyrillic script", "no": " (Bokmål)",
            "fil": " (Filipino / Tagalog)", "ms": " (Bahasa Melayu, Malaysia)", "cat": " (Catalan)"}
 

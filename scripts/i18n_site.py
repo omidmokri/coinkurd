@@ -333,7 +333,7 @@ def write_dicts(code, pages, scripts, common, need):
 
 
 READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered once this much of it is translated
-VER = "3"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "4"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
@@ -376,10 +376,14 @@ def write_langs(need):
         pct = round(done / len(need) * 100) if need else 0
         if pct >= READY:
             r = pro_langs.BY[code]
-            out.append({"code": code, "native": r["native"], "english": r["english"], "dir": r["dir"], "pct": pct})
+            out.append({"code": code, "native": r["native"], "english": r["english"], "dir": r["dir"],
+                        "pct": pct, "flag": pro_langs.flag(code)})
     os.makedirs(OUT, exist_ok=True)
+    # every language's flag, the site's own four included, so the panel can show one beside each of them too
+    flags = {r[0]: pro_langs.flag(r[0]) for r in pro_langs.LANGS if pro_langs.flag(r[0])}
     with open(os.path.join(OUT, "langs.json"), "w", encoding="utf-8") as f:
-        json.dump({"ready": out, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump({"ready": out, "flags": flags, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
+                  f, ensure_ascii=False, separators=(",", ":"))
     return out
 
 
