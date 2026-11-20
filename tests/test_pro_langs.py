@@ -41,10 +41,11 @@ def main():
     ok("assets/pro/langs.js is what scripts/pro_langs.py makes", r.returncode == 0, r.stdout + r.stderr)
     by_en = {row[2]: row[0] for row in PL.LANGS}
     ok("all 46 languages of the owner's list, with his paths", all(by_en.get(k) == v for k, v in OWNER.items()), {k: (by_en.get(k), v) for k, v in OWNER.items() if by_en.get(k) != v})
-    ok("51 in all (the owner's 50 + Kurmanji), 47 of them new", len(PL.LANGS) == 51 and len(PL.NEW) == 47 and set(PL.SITE) == {"ckb", "fa", "ar", "en"})
-    ok("menu order: both Kurdish first, then Persian and Arabic, English last", [x[0] for x in PL.LANGS[:4]] == ["ckb", "kmr", "fa", "ar"] and PL.LANGS[-1][0] == "en")
-    mid = [x[2] for x in PL.LANGS[4:-1]]
-    ok("…the others by English name", mid == sorted(mid), mid)
+    ok("51 rows (the owner's 50 + Kurmanji), 47 of them new", len(PL.LANGS) == 51 and len(PL.NEW) == 47 and set(PL.SITE) == {"ckb", "fa", "ar", "en"})
+    ok("50 languages, not 51: Sorani and Kurmanji are one", PL.LANG_COUNT == 50 and PL.SAME.get("kmr") == "ckb")
+    ok("menu order: both Kurdish first — this site's own language", [x[0] for x in PL.LANGS[:2]] == ["ckb", "kmr"])
+    rest = [x[2] for x in PL.LANGS[2:]]
+    ok("…and every other language by English name, Persian and Arabic among them", rest == sorted(rest), rest[:6])
     ok("right to left: Kurdish, Persian, Arabic, Hebrew, Urdu — and only those", sorted(x[0] for x in PL.LANGS if x[5] == "rtl") == ["ar", "ckb", "fa", "iw", "ur"])
     ok("paths are URL-safe and unique", all(re.fullmatch(r"[a-z]{2,3}", x[0]) for x in PL.LANGS) and len({x[0] for x in PL.LANGS}) == 51)
     js = subprocess.run(["node", "-e", "global.window=globalThis;require(process.argv[1]);process.stdout.write(JSON.stringify({L:PRO.LANGS.length,"
