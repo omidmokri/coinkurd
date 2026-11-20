@@ -149,6 +149,7 @@ def js_text():
             "  P.SITE_LANGS = " + json.dumps(list(SITE)) + ";\n"
             "  P.FLAG = " + json.dumps(FLAG, separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.FLAG_DIR = " + json.dumps(FLAG_DIR) + ";\n"
+            "  P.flag = function (c) { var f = P.FLAG[c]; return f ? P.FLAG_DIR + f + \".svg\" : \"\"; };\n"
             "  P.CUR_DIG = " + json.dumps(c["digits"], separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.CCCUR = " + json.dumps(cc_cur(), separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.TZCC = " + json.dumps(c["tz_cc"], separators=(",", ":"), sort_keys=True) + ";\n"
