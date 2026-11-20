@@ -35,6 +35,7 @@ def ok(name, cond, extra=""):
 PAGE = """<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><title>Live market</title></head>
 <body>
 <nav id="langs">
+  <button type="button" class="pm-hglobe">47</button>
   <button type="button" data-l="ckb" lang="ckb">کوردی</button>
   <button type="button" data-l="fa" lang="fa">فارسی</button>
   <button type="button" data-l="ar" lang="ar">العربية</button>
@@ -74,6 +75,8 @@ def main():
         open(os.path.join(tmp, "assets", "app.js"), "w").write(
             "setTimeout(function(){document.getElementById('later').textContent='Every Binance coin';},30);")
         open(os.path.join(tmp, "index.html"), "w", encoding="utf-8").write(PAGE)
+        os.makedirs(os.path.join(tmp, "market"), exist_ok=True)
+        open(os.path.join(tmp, "market", "index.html"), "w", encoding="utf-8").write(PAGE)
         os.makedirs(os.path.join(tmp, "assets", "pro", "flags"), exist_ok=True)
         for cc in ("de", "tr", "pk", "kurdistan", "ir", "sa", "gb"):
             open(os.path.join(tmp, "assets", "pro", "flags", cc + ".svg"), "w").write(
@@ -103,6 +106,9 @@ def main():
             ok("the globe sits in the bar, in the same place /market/ keeps it (first)",
                pg.locator("#langs .ekw-globe").count() == 1
                and pg.evaluate("document.querySelector('#langs').firstElementChild.classList.contains('ekw-globe')"))
+            ok("only one globe shows: the site's own 47-pill gives way to ours",
+               pg.locator("#langs .ekw-globe").count() == 1
+               and not pg.locator("#langs .pm-hglobe").is_visible())
             ok("Kurdish and English stay in the bar",
                pg.locator('#langs button[data-l="ckb"]').is_visible()
                and pg.locator('#langs button[data-l="en"]').is_visible())
@@ -167,6 +173,17 @@ def main():
             json.dump({"ready": []}, open(os.path.join(tmp, "i18n", "langs.json"), "w"))
             pg.goto(url + "/?x=2", wait_until="networkidle")
             ok("with no language ready the globe is not shown", pg.locator("#langs .ekw-globe").count() == 0)
+
+            # /market/ runs its own picker on the same pill: this layer must not add a second globe
+            json.dump({"ready": [
+                {"code": "de", "native": "Deutsch", "english": "German", "dir": "ltr", "pct": 92,
+                 "flag": "/assets/pro/flags/de.svg"}]},
+                open(os.path.join(tmp, "i18n", "langs.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            pg.goto(url + "/market/", wait_until="networkidle")
+            ok("on /market/ no second globe is added",
+               pg.locator("#langs .ekw-globe").count() == 0)
+            ok("on /market/ the page's own 47-pill stays visible",
+               pg.locator("#langs .pm-hglobe").is_visible())
             b.close()
         srv.shutdown()
     finally:
