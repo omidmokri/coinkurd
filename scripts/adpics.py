@@ -12,7 +12,7 @@ BLOCKED = (
 )
 # Channels we never take a picture from: their every picture (and every linked page's preview) is either their own
 # advert or their own copyrighted work — Visual Capitalist's infographics are the product they sell. For all of
-# these we draw our own card from the facts and name the source in the post.
+# these we draw our own card from the facts instead.
 ART_ONLY = {"newscitypro", "iamusd", "silicon_brain", "mrartificialintelligence", "visualcapitalists"}
 
 
