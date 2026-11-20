@@ -54,11 +54,29 @@
     + '.ekw-head button:hover{color:#fff;background:rgba(255,255,255,.08)}'
     + '.ekw-search{margin:12px 16px 4px;padding:9px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#f2ead9;font:inherit;font-size:14px;outline:0}'
     + '.ekw-search:focus{border-color:rgba(247,169,26,.6)}'
-    /* One scroller, not one per section: two lists that each scrolled put two bars down the same edge.
-       The bar itself is hidden; wheel, touch and keyboard still scroll. */
-    + '.ekw-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}'
+    /* One scroller, not one per section: two lists that each scrolled put two bars down the same edge. That one bar
+       is now the panel's own — a thin gold rail that lights up under the pointer — and the scrolling itself is part
+       of the panel: the section title stays at the top while its languages pass under it, and each card arrives out
+       of a short blur as it comes into view. Everything here is decoration: a browser that knows none of it shows
+       the same list, and so does a reader who asks for less motion. */
+    + '.ekw-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}'
     + '.ekw-body::-webkit-scrollbar{width:0;height:0}'
-    + '.ekw-sec{padding:10px 16px 2px;font-size:11px;color:#9b8a66;letter-spacing:.4px;text-align:start}'
+    /* the panel's own bar, drawn here because the browser's own is a grey sliver on some machines and an invisible
+       overlay on others. It sticks to the top of the scrollport, so it rides the list without scrolling away. */
+    + '.ekw-rail{position:sticky;top:0;height:0;z-index:6;pointer-events:none}'
+    + '.ekw-rail>i{position:absolute;inset-inline-end:5px;width:4px;border-radius:99px;background:rgba(247,169,26,.13);pointer-events:none}'
+    + '.ekw-rail>b{position:absolute;inset-inline-end:3px;width:8px;border-radius:99px;pointer-events:auto;cursor:grab;'
+    + 'background:linear-gradient(180deg,#ffe3a6,#f7a91a 48%,#c9761a);box-shadow:0 0 0 1px rgba(255,255,255,.28),0 0 14px rgba(247,169,26,.45);'
+    + 'transition:width .16s,inset-inline-end .16s,box-shadow .16s,filter .16s}'
+    + '.ekw-rail>b:hover,.ekw-rail.ekw-drag>b{width:12px;inset-inline-end:1px;filter:brightness(1.12);box-shadow:0 0 0 1px rgba(255,255,255,.45),0 0 22px rgba(247,169,26,.75)}'
+    + '.ekw-rail.ekw-drag>b{cursor:grabbing}'
+    /* the section title holds the top of the panel while its own languages scroll past it */
+    + '.ekw-sec{position:sticky;top:0;z-index:3;padding:10px 16px 6px;font-size:11px;color:#9b8a66;letter-spacing:.4px;text-align:start;'
+    + 'background:linear-gradient(180deg,rgba(20,15,8,.97) 62%,rgba(20,15,8,0));backdrop-filter:blur(6px)}'
+    /* each card comes into focus as it enters — scroll-driven, so it follows the finger exactly, forwards and back */
+    + '@keyframes ekw-arrive{from{opacity:.08;translate:0 18px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}'
+    + '@supports (animation-timeline:view()){@media (prefers-reduced-motion:no-preference){'
+    + '.ekw-list button{animation:ekw-arrive linear both;animation-timeline:view(block);animation-range:entry 0% entry 55%}}}'
     + '.ekw-list{padding:4px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}'
     + '.ekw-list button{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;border:1px solid transparent;'
     + 'background:rgba(255,255,255,.04);color:#f2ead9;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s,transform .12s}'
@@ -98,6 +116,43 @@
     }).filter(function (x) { return x.code && x.native; });
   }
 
+  /* The gold bar beside the list: how tall it is says how much of the list you are seeing, where it sits says
+     where you are, and dragging it carries you there. It follows the list itself, so the search box narrowing the
+     list down to three languages makes it disappear, exactly as it should. */
+  function rail(body) {
+    var r = body.querySelector('.ekw-rail'), track = r.querySelector('i'), thumb = r.querySelector('b'), MIN = 28;
+    function draw() {
+      var h = body.clientHeight, total = body.scrollHeight, room = total - h;
+      if (room <= 2) { r.style.display = 'none'; return; }
+      r.style.display = '';
+      track.style.top = '8px'; track.style.height = (h - 16) + 'px';
+      var th = Math.max(MIN, Math.round((h - 16) * h / total));
+      thumb.style.height = th + 'px';
+      thumb.style.top = Math.round(8 + (h - 16 - th) * (body.scrollTop / room)) + 'px';
+    }
+    body.addEventListener('scroll', draw, { passive: true });
+    body.addEventListener('input', draw);                 /* the search box shortens the list */
+    if (w.ResizeObserver) new ResizeObserver(draw).observe(body);
+    setTimeout(draw, 0); draw();
+
+    thumb.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      var h = body.clientHeight, th = thumb.offsetHeight, span = h - 16 - th, room = body.scrollHeight - h;
+      var y0 = e.clientY, top0 = parseFloat(thumb.style.top) || 8;
+      r.classList.add('ekw-drag');
+      try { thumb.setPointerCapture(e.pointerId); } catch (err) { }
+      function move(ev) {
+        var t = Math.min(8 + span, Math.max(8, top0 + ev.clientY - y0));
+        body.scrollTop = span > 0 ? (t - 8) / span * room : 0;
+      }
+      function up() {
+        r.classList.remove('ekw-drag');
+        w.removeEventListener('pointermove', move); w.removeEventListener('pointerup', up);
+      }
+      w.addEventListener('pointermove', move); w.addEventListener('pointerup', up);
+    });
+  }
+
   function openPanel() {
     if (!LANGS || !LANGS.length || d.querySelector('.ekw-wrap')) return;
     var W = words(), own = siteLangs();
@@ -106,13 +161,13 @@
     wrap.innerHTML = '<div class="ekw-panel" dir="' + dir + '"><div class="ekw-head"><b></b><span></span>'
       + '<button type="button" aria-label="close">×</button></div>'
       + '<input class="ekw-search" type="search" autocomplete="off">'
-      + '<div class="ekw-body">'
+      + '<div class="ekw-body"><div class="ekw-rail" aria-hidden="true"><i></i><b></b></div>'
       + '<div class="ekw-sec ekw-sec1"></div><div class="ekw-list ekw-own"></div>'
       + '<div class="ekw-sec ekw-sec2"></div><div class="ekw-list ekw-more"></div>'
       + '</div>'
       + '<div class="ekw-foot"></div></div>';
     wrap.querySelector('.ekw-head b').textContent = W.t;
-    wrap.querySelector('.ekw-head span').textContent = (own.length + LANGS.length) + '';
+    wrap.querySelector('.ekw-head span').textContent = count(d.querySelector(BAR)) + '';
     wrap.querySelector('.ekw-search').setAttribute('placeholder', W.s);
     wrap.querySelector('.ekw-sec1').textContent = W.o;
     wrap.querySelector('.ekw-sec2').textContent = W.m;
@@ -163,6 +218,7 @@
       if (en && en.getAttribute('href')) { try { var u = new URL(en.getAttribute('href'), location.href); if (u.pathname !== location.pathname) { location.href = u.href; return; } } catch (err) { } }
       location.reload();
     });
+    rail(wrap.querySelector('.ekw-body'));
     w.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { wrap.remove(); w.removeEventListener('keydown', esc); } });
   }
 
@@ -172,9 +228,15 @@
   var INSIDE = ['fa', 'ar'];
   function seen() { return ls.get('ekw_seen') === '1'; }
 
+  /* Sorani and Kurmanji are two ways of writing one language, so they count once: the site offers 50 languages,
+     not 51. The badge on the globe and the number in the panel head are the same count, worked out the same way. */
+  var SAME = { kmr: 'ckb' };
   function count(box) {
-    var own = box.querySelectorAll('button[data-l]').length;
-    return own + (LANGS ? LANGS.length : 0);
+    var seen = {}, n = 0;
+    function add(code) { var c = SAME[code] || code; if (c && !seen[c]) { seen[c] = 1; n++; } }
+    if (box) [].forEach.call(box.querySelectorAll('button[data-l]'), function (b) { add(b.getAttribute('data-l')); });
+    (LANGS || []).forEach(function (x) { add(x.code); });
+    return n;
   }
 
   /* /market/ runs its own 47-language picker on the very same pill (.pm-hglobe).

@@ -37,10 +37,11 @@ OUT_JS = os.path.join(ROOT, "assets", "pro", "langs.js")
 
 # code (the page's key and, for new languages, the URL path), native name, English name, Intl locale, hreflang,
 # direction, home currency. The site's own four languages have no path of their own: they live at /market/.
+# Kurdish comes first — it is this site's own language, and its two dialects are one language, counted once in
+# LANG_COUNT. Every other language follows by English name, so a reader looks a language up where they expect it.
 LANGS = [
     ("ckb", "کوردی", "Kurdish (Sorani)", "ckb-IQ", "ckb", "rtl", "IRT"),
     ("kmr", "Kurmancî", "Kurdish (Kurmanji)", "kmr-TR", "kmr", "ltr", "TRY"),
-    ("fa", "فارسی", "Persian", "fa-IR", "fa", "rtl", "IRT"),
     ("ar", "العربية", "Arabic", "ar", "ar", "rtl", "USD"),
     ("bn", "বাংলা", "Bengali", "bn-BD", "bn", "ltr", "BDT"),
     ("bg", "Български", "Bulgarian", "bg-BG", "bg", "ltr", "EUR"),
@@ -51,6 +52,7 @@ LANGS = [
     ("cz", "Čeština", "Czech", "cs-CZ", "cs", "ltr", "CZK"),
     ("da", "Dansk", "Danish", "da-DK", "da", "ltr", "DKK"),
     ("nl", "Nederlands", "Dutch", "nl-NL", "nl", "ltr", "EUR"),
+    ("en", "English", "English", "en-GB", "en", "ltr", "USD"),
     ("et", "Eesti", "Estonian", "et-EE", "et", "ltr", "EUR"),
     ("fil", "Filipino", "Filipino", "fil-PH", "fil", "ltr", "PHP"),
     ("fi", "Suomi", "Finnish", "fi-FI", "fi", "ltr", "EUR"),
@@ -69,6 +71,7 @@ LANGS = [
     ("ms", "Bahasa Melayu", "Malay", "ms-MY", "ms", "ltr", "MYR"),
     ("mr", "मराठी", "Marathi", "mr-IN", "mr", "ltr", "INR"),
     ("no", "Norsk", "Norwegian", "nb-NO", "nb", "ltr", "NOK"),
+    ("fa", "فارسی", "Persian", "fa-IR", "fa", "rtl", "IRT"),
     ("pl", "Polski", "Polish", "pl-PL", "pl", "ltr", "PLN"),
     ("pt", "Português", "Portuguese", "pt-PT", "pt-PT", "ltr", "EUR"),
     ("br", "Português (Brasil)", "Portuguese (Brazil)", "pt-BR", "pt-BR", "ltr", "BRL"),
@@ -88,7 +91,6 @@ LANGS = [
     ("uk", "Українська", "Ukrainian", "uk-UA", "uk", "ltr", "UAH"),
     ("ur", "اردو", "Urdu", "ur-PK", "ur", "rtl", "PKR"),
     ("vi", "Tiếng Việt", "Vietnamese", "vi-VN", "vi", "ltr", "VND"),
-    ("en", "English", "English", "en-GB", "en", "ltr", "USD"),
 ]
 # The flag shown beside each language: a file in assets/pro/flags/ (flag-icons, MIT — see the README there).
 # A language is not a country, so this is the flag readers most associate with it, not a claim about borders:
@@ -113,6 +115,12 @@ def flag(code):
 
 
 SITE = ("ckb", "fa", "ar", "en")            # the site's own languages: hand-written strings, live at /market/
+
+# Sorani and Kurmanji are two ways of writing one language, so the site offers 50 languages, not 51. Anything that
+# tells a reader how many there are counts them this way.
+SAME = {"kmr": "ckb"}                       # dialect -> the language it belongs to
+LANG_COUNT = len({SAME.get(r[0], r[0]) for r in LANGS})
+
 NEW = [r[0] for r in LANGS if r[0] not in SITE]
 BY = {r[0]: {"code": r[0], "native": r[1], "english": r[2], "bcp": r[3], "hreflang": r[4], "dir": r[5], "cur": r[6],
              "path": None if r[0] in SITE else r[0], "flag": FLAG.get(r[0])} for r in LANGS}
