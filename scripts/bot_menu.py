@@ -290,6 +290,12 @@ S = {
               {"fa": "جمع‌بندی هوشمند شرایط کلان بازار.", "ckb": "کورتەی زیرەکی دۆخی گشتی بازاڕ.",
                "kmr": "Kurteya jîr a rewşa giştî ya bazarê.", "ar": "خلاصة ذكية لظروف السوق العامة.",
                "en": "Smart summary of the overall market regime."}),
+    "studio": ("💻", {"fa": "استودیو پاین", "ckb": "ستۆدیۆی پاین", "kmr": "Studyoya Pine", "ar": "استوديو باين", "en": "Pine Studio"},
+               {"fa": "Pine Script را زنده روی نمودار بایننس اجرا و بک‌تست کن؛ اسکرینر، اسمارت مانی و پیش‌بینی Kronos.",
+                "ckb": "Pine Script زیندوو لەسەر چارتی بایننس جێبەجێ و باکتێست بکە؛ سکانەر، سمارت مەنی و پێشبینیی Kronos.",
+                "kmr": "Pine Script li ser grafîka Binance ya zindî bixebitîne û biceribîne; skaner, Smart Money û pêşbîniya Kronos.",
+                "ar": "شغّل Pine Script مباشرة على رسم باينانس واختبره رجعيًا؛ ماسح وسمارت موني وتوقعات Kronos.",
+                "en": "Run and back-test Pine Script live on a Binance chart; screener, Smart Money and Kronos forecasts."}),
     "battle": ("⚔️", {"fa": "نبرد من", "ckb": "شەڕی من", "kmr": "Şerê min", "ar": "معركتي", "en": "My Battle"},
                {"fa": "بازار زندهٔ بیت‌کوین به شکل یک جبههٔ سه‌بعدی روی سایت.", "ckb": "بازاڕی زیندووی بیتکۆین وەک بەرەیەکی سێ‌ڕەهەندی لەسەر ماڵپەڕ.",
                 "kmr": "Bazara zindî ya Bitcoin wek eniyeke sêalî li ser malperê.", "ar": "سوق البيتكوين الحي على شكل جبهة ثلاثية الأبعاد على الموقع.",
@@ -406,7 +412,7 @@ LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
 HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
-    "g_analysis": ["pro", "mmap", "obs", "world", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle"],
+    "g_analysis": ["pro", "mmap", "obs", "world", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle", "studio"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
     "g_news": ["today", "podcast", "album", "class", "news", "narr", "events", "week", "posts", "track"],
     "g_reality": ["truth", "stratlab", "regime", "anomaly", "friction", "oppcost", "trackrec", "ledger", "hype2", "silent", "corr", "sentim", "whales"],

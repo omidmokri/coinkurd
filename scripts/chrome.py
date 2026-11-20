@@ -179,6 +179,8 @@ NAV = [
          L("حافظهٔ بازار، مونت‌کارلو و بک‌تست", "بیرەوەریی بازاڕ، مۆنتی‌کارلۆ و باک‌تێست", "Market memory, Monte Carlo, backtests")),
         ("/strategy-lab/", "flask", L("آزمایشگاه استراتژی", "تاقیگەی ستراتیژ", "Strategy lab"),
          L("قانون خودت را بک‌تست کن: آزمون جایگشت و واک-فوروارد", "یاسای خۆت باکتێست بکە: جێگۆڕکێ و واک-فۆروارد", "Back-test your own rule: permutation test and walk-forward")),
+        ("/studio/", "code", L("استودیو پاین", "ستۆدیۆی پاین", "Pine Studio"),
+         L("کد Pine را زنده روی نمودار ببین، بک‌تست کن، اسکرینر، اسمارت مانی و پیش‌بینی Kronos", "کۆدی Pine زیندوو ببینە، باکتێست، سکانەر، سمارت مەنی و پێشبینیی Kronos", "Run Pine live on the chart, back-test, screen, Smart Money and Kronos forecasts")),
         ("/dca/", "calc", L("DCA یا خرید یکجا؟", "DCA یان کڕینی یەکجار؟", "DCA or lump sum?"),
          L("شبیه‌ساز با قیمت واقعی و همهٔ تاریخ‌های شروع", "هاوشێوەکەر بە نرخی ڕاستەقینە و هەموو بەروارەکانی دەستپێک", "Simulator on real prices, every start date")),
         ("/dna/", "dna", L("DNA بازار", "DNAی بازاڕ", "Market DNA"),
