@@ -736,7 +736,7 @@ const FX={K:1,PCAP:420,PJ:[],EX:[],MZ:[],air:[],lights:[],
    const v=ARMY.pickVeh(sh,false);if(v){const m=ARMY.vehShoot(sh,v,x1,z1);this.shoot({x0:m[0],y0:m[1],z0:m[2],x1,z1,h:1.6,dur:220+far(m[0],m[2])*7,sz:1.25,col,kind:'tracer',usd,side:sh});AUDIO.play('tank',{x:v.x,z:v.z,vol:.45});return}}
   const s=(usd>=1e4&&Math.random()<.6?ARMY.pick(sh,1):null)||ARMY.pick(sh);if(!s)return;
   const m=ARMY.shoot(sh,s,x1,z1),sz=usd>=5e4?1.25:usd>=1e4?.85:.55;this.shoot({x0:m[0],y0:m[1],z0:m[2],x1,z1,h:.5+sz,dur:230+far(m[0],m[2])*7,sz,col,kind:'tracer',usd,side:sh});
-  if(Math.random()<(usd>=1e4?.6:.3))AUDIO.play('gun',{x:s.x,z:s.z,vol:.35,burst:s.role===1?(usd>=1e4?5:3):1})},
+  AUDIO.play('gun',{x:s.x,z:s.z,vol:usd>=1e4?.55:.45,burst:s.role===1?(usd>=1e4?6:4):(usd>=1e4?3:2)})},
  shell(x0,y0,z0,x1,z1,usd,side){this.shoot({x0,y0,z0,x1,z1,h:18+Math.random()*7,dur:1300+Math.random()*260,sz:1.5,col:0xffd27a,kind:'shell',usd,side,trail:1})},
  rocket(x0,y0,z0,x1,z1,side){this.shoot({x0,y0,z0,x1,z1,h:9+Math.random()*5,dur:900+Math.random()*300,sz:1.2,col:0xffb070,kind:'rocket',side,trail:2})},
  bomb(x0,y0,z0,x1,z1,kind,usd,side){this.shoot({x0,y0,z0,x1,z1,h:-y0*.5,dur:1150,sz:kind==='nuke'?3:2,col:0x3a3a3a,kind,usd,side,fall:true})},
@@ -1044,7 +1044,7 @@ const mtof=m=>440*Math.pow(2,(m-69)/12);
    at the ceiling for 8 s is reset: before, each such failure kept one of the 24 voices for good, until nothing could play */
 /* robots and dogs fire and move all the time: the same sound is not started again within its gap (seconds), so the many
    machines read as one steady line of fire instead of a hiss that buries everything else */
-const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{servo:2.4,rgun:.4,dogfire:.4,gun:.05},amb:null,music:{on:!!PREF.music,key:'major',bar:0,next:0,timer:null,nodes:[]},wx:0,
+const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{servo:2.4,rgun:.4,dogfire:.4,gun:.05},amb:null,music:{on:!!PREF.music,key:'minor',bar:0,next:0,timer:null,nodes:[]},wx:0,
  init(){if(this.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const C=new AC();this.ctx=C;C.onstatechange=()=>{try{HUD.snd()}catch(e){}};this.master=C.createGain();this.mf=C.createBiquadFilter();this.mf.type='lowpass';this.mf.frequency.value=20000;this.comp=C.createDynamicsCompressor();this.comp.threshold.value=-10;this.comp.ratio.value=4;this.comp.attack.value=.003;this.comp.release.value=.25;
   this.lim=C.createDynamicsCompressor();this.lim.threshold.value=-2;this.lim.knee.value=0;this.lim.ratio.value=20;this.lim.attack.value=.001;this.lim.release.value=.12;this.master.connect(this.mf).connect(this.comp).connect(this.lim).connect(C.destination);this.dk={};for(const b of ['music','sfx','amb','voice']){const g=C.createGain(),d=C.createGain();g.connect(d).connect(this.master);this.bus[b]=g;this.dk[b]=d}this.setVols();/* battlefield space: a generated 2.6 s stereo impulse response, fed from effects + ambience */try{const n=Math.floor(C.sampleRate*2.6),ir=C.createBuffer(2,n,C.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);let lp=0;for(let i=0;i<n;i++){const t=i/n;lp=lp*.6+(Math.random()*2-1)*.4;d[i]=i<C.sampleRate*.015?0:lp*Math.pow(1-t,3.4)*(1+.3*Math.sin(i*.0007*(ch+1)))}}this.rev=C.createConvolver();this.rev.buffer=ir;this.revG=C.createGain();this.revG.gain.value=.26;this.bus.sfx.connect(this.rev);const ag=C.createGain();ag.gain.value=.4;this.bus.amb.connect(ag).connect(this.rev);this.rev.connect(this.revG).connect(this.master)}catch(e){}
   this.nz={};this.ambience();if(this.music.on)this.startMusic()},
@@ -1058,7 +1058,7 @@ const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{s
  toggle(){if(this.on&&this.ctx&&Date.now()-(this.held||0)<1500){this.held=0;this.play('ui',{vol:.4});return}this.enable(!this.on)},
  enable(on){this.on=on;PREF.snd=on;ls.set('ek_bf_snd',on);savePref();if(on){this.init();if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();this.play('ui',{vol:.4})}else if(this.ctx){this.ctx.suspend()}},
  setMusic(on){this.music.on=on;PREF.music=on;savePref();if(!this.ctx)return;if(on)this.startMusic();else this.stopMusic()},
- noise(kind){if(this.nz[kind])return this.nz[kind];const C=this.ctx,n=C.sampleRate*2,b=C.createBuffer(1,n,C.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(kind==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.5}else d[i]=w}this.nz[kind]=b;return b},
+ noise(kind){if(this.nz[kind])return this.nz[kind];const C=this.ctx,n=C.sampleRate*2,b=C.createBuffer(1,n,C.sampleRate),d=b.getChannelData(0);let last=0,b0=0,b1=0,b2=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;if(kind==='brown'){last=(last+.02*w)/1.02;d[i]=last*3.5}else if(kind==='pink'){b0=.99765*b0+w*.099046;b1=.963*b1+w*.2965164;b2=.57*b2+w*1.0526913;d[i]=(b0+b1+b2+w*.1848)*.18}else d[i]=w}this.nz[kind]=b;return b},
  src(kind,rate){const C=this.ctx,s=C.createBufferSource();s.buffer=this.noise(kind||'white');s.loop=true;if(rate)s.playbackRate.value=rate;return s},
  env(g,t0,a,peak,d,sus,r,end){const p=g.gain;p.cancelScheduledValues(t0);p.setValueAtTime(.0001,t0);p.linearRampToValueAtTime(peak,t0+a);if(sus!=null){p.exponentialRampToValueAtTime(Math.max(.0001,sus),t0+a+d);p.setValueAtTime(Math.max(.0001,sus),end-r)}p.exponentialRampToValueAtTime(.0001,end)},
  out(o,bus){const C=this.ctx;let n=C.createGain();n.gain.value=1;if(o&&o.x!==undefined){const p=C.createPanner();p.panningModel='HRTF';p.distanceModel='inverse';p.refDistance=22;p.maxDistance=400;p.rolloffFactor=1.1;p.positionX.value=o.x;p.positionY.value=o.y||2;p.positionZ.value=o.z||0;n.connect(p).connect(this.bus[bus||'sfx']);if(o.follow)this.follow.push({p,o:o.follow,until:C.currentTime+(o.dur||5)})}else n.connect(this.bus[bus||'sfx']);return n},
@@ -1095,28 +1095,45 @@ const AUDIO={ctx:null,on:!!PREF.snd,bus:{},voices:0,I:0,follow:[],last:{},gap:{s
   notes.forEach((n,i)=>{const s=C.createOscillator();s.type='triangle';s.frequency.value=mtof(n);s.connect(f);s.start(t0+i*.12);s.stop(t0+2.2)});[48,55].forEach(n=>{const s=C.createOscillator();s.type='sawtooth';s.frequency.value=mtof(n);s.connect(f);s.start(t0+.4);s.stop(t0+2.2)});this.env(g,t0,.02,.35,1.2,.2,.5,t0+2.2)},
  /* ---- ambience layers: wind / rain / birds / distant fire / engines ---- */
  ambience(){const C=this.ctx,mk=(kind,ft,fq,q)=>{const s=this.src(kind),f=C.createBiquadFilter();f.type=ft;f.frequency.value=fq;if(q)f.Q.value=q;const g=C.createGain();g.gain.value=0;s.connect(f).connect(g).connect(this.bus.amb);s.start();return {s,f,g}};
-  const wind=mk('brown','lowpass',380),rain=mk('white','bandpass',2400,.6),eng=mk('brown','lowpass',160);const lfo=C.createOscillator();lfo.type='sine';lfo.frequency.value=.11;const lg=C.createGain();lg.gain.value=.12;lfo.connect(lg).connect(wind.g.gain);lfo.start();
+  const wind=mk('brown','lowpass',380),rain=mk('pink','lowpass',1800,.5),eng=mk('brown','lowpass',160);const lfo=C.createOscillator();lfo.type='sine';lfo.frequency.value=.11;const lg=C.createGain();lg.gain.value=.12;lfo.connect(lg).connect(wind.g.gain);lfo.start();
   const sw=C.createOscillator();sw.type='sawtooth';sw.frequency.value=44;const swf=C.createBiquadFilter();swf.type='lowpass';swf.frequency.value=200;sw.connect(swf).connect(eng.g);sw.start();this.amb={wind,rain,eng};
   if(window.GFX4&&GFX4.AMBX)try{GFX4.AMBX.init(this)}catch(e){console.error(e)}this.ambTimer=setInterval(()=>this.ambTick(),500)},
  ambTick(){if(!this.ctx||!this.on||this.ctx.state!=='running')return;const I=this.I,C=this.ctx,t=C.currentTime,day=WORLD.cur?WORLD.cur.stars<.5:true;if(window.GFX4&&GFX4.AMBX)try{GFX4.AMBX.tick(this)}catch(e){}
   this.amb.wind.g.gain.setTargetAtTime(.18+this.wx*.14+I*.08,t,.5);this.amb.rain.g.gain.setTargetAtTime(this.wx>=3?.22:0,t,1);this.amb.eng.g.gain.setTargetAtTime(Math.min(.22,I*.3),t,1);
   if(day&&I<.35&&Math.random()<.35&&this.wx<2){const g=this.out({x:rnd(120,-120),z:rnd(60,-60)},'amb');const f0=2500+Math.random()*1200;for(let i=0;i<3;i++){const s=C.createOscillator();s.type='sine';s.frequency.setValueAtTime(f0,t+i*.09);s.frequency.exponentialRampToValueAtTime(f0*1.25,t+i*.09+.06);s.connect(g);s.start(t+i*.09);s.stop(t+i*.09+.07)}this.env(g,t,.01,.12,.25,null,0,t+.3)}
-  if(Math.random()<I*.9){const g=this.out({x:rnd(90,-90),z:rnd(120,-80)},'amb'),f=C.createBiquadFilter();f.type='lowpass';f.frequency.value=700;const s=this.src('white');s.connect(f).connect(g);this.env(g,t,.003,.12+I*.1,.05,null,0,t+.08);s.start(t);s.stop(t+.09)}
-  if(Math.random()<I*I*.5){const g=this.out({x:rnd(150,-150),z:rnd(160,-120)},'amb'),f=C.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(260,t);f.frequency.exponentialRampToValueAtTime(50,t+1);const s=this.src('brown');s.connect(f).connect(g);this.env(g,t,.02,.3,.9,null,0,t+1.1);s.start(t);s.stop(t+1.2)}},
+  /* the war never goes quiet: far-off rifle and machine-gun bursts and now and then artillery over the hills. These replace the
+     white-noise pops that read as a hiss (owner, 2026-11-20); the shot sounds are the real ones, darkened by distance */
+  const far=()=>{const a=Math.random()*Math.PI*2,r=rnd(260,140);return {x:Math.cos(a)*r,z:Math.sin(a)*r}};
+  if(Math.random()<.32+I*.5){const p=far();this.play('gun',Object.assign(p,{vol:.22+I*.15,burst:Math.random()<.45?(5+(Math.random()*7|0)):(1+(Math.random()*3|0)),rate:Math.random()<.4?14:9,delay:Math.random()*.4}))}
+  if(Math.random()<.05+I*.12){const p=far();this.play('cannon',Object.assign(p,{vol:.35+I*.2,delay:Math.random()*.4}))}},
  intensity(I){this.I+=(I-this.I)*.3},weather(lv){this.wx=lv},
  /* ---- generative music: 120 BPM, four layers, key by regime ---- */
  PROG:{major:[[48,52,55,59],[43,47,50,55],[45,48,52,55],[41,45,48,52]],minor:[[48,51,55,58],[44,48,51,55],[51,55,58,62],[46,50,53,58]],dorian:[[50,53,57,60],[55,59,62,65],[50,53,57,60],[48,52,55,59]]},
- key(reg){this.music.key=reg==='bull'?'major':reg==='bear'||reg==='high_volatility'?'minor':'dorian'},
+ key(reg){this.music.key=reg==='bull'?'dorian':'minor'},
  startMusic(){if(!this.ctx||this.music.timer)return;const C=this.ctx;this.music.next=C.currentTime+.2;this.music.bar=0;this.music.timer=setInterval(()=>this.musicTick(),110)},
  stopMusic(){clearInterval(this.music.timer);this.music.timer=null},
  musicTick(){if(!this.on||!this.ctx||this.ctx.state!=='running')return;const C=this.ctx;while(this.music.next<C.currentTime+.35){this.bar(this.music.next);this.music.next+=2;this.music.bar++}},
- bar(t0){const C=this.ctx,I=this.I,prog=this.PROG[this.music.key]||this.PROG.major,ch=prog[this.music.bar%4],bus=this.bus.music;const sm=(a,b)=>clamp((I-a)/(b-a),0,1);
-  const pad=C.createGain();pad.connect(bus);const pf=C.createBiquadFilter();pf.type='lowpass';pf.frequency.value=500+I*900;pf.connect(pad);ch.slice(0,3).forEach(n=>{[0,-.07,.09].forEach(d=>{const s=C.createOscillator();s.type='sawtooth';s.frequency.value=mtof(n+d);s.connect(pf);s.start(t0);s.stop(t0+2.05)})});this.env(pad,t0,.5,.08,1,.07,.4,t0+2.05);
-  const pg=sm(.2,.5)*.14;if(pg>0){const pl=C.createGain();pl.connect(bus);pl.gain.value=pg;for(let i=0;i<8;i++){const n=ch[i%4]+(i>=4?12:0)+12;const s=C.createOscillator();s.type='triangle';s.frequency.value=mtof(n);const g=C.createGain();g.connect(pl);s.connect(g);const ts=t0+i*.25;this.env(g,ts,.01,1,.12,null,0,ts+.22);s.start(ts);s.stop(ts+.23)}}
-  const dg=sm(.45,.7);if(dg>0){const dl=C.createGain();dl.connect(bus);dl.gain.value=dg*.5;for(let b=0;b<4;b++){const ts=t0+b*.5;if(b%2===0){const k=C.createGain();k.connect(dl);const o=C.createOscillator();o.type='sine';o.frequency.setValueAtTime(130,ts);o.frequency.exponentialRampToValueAtTime(42,ts+.18);o.connect(k);o.start(ts);o.stop(ts+.28);this.env(k,ts,.003,.9,.22,null,0,ts+.28)}
-    else{const k=C.createGain();k.connect(dl);const s=this.src('white'),f=C.createBiquadFilter();f.type='bandpass';f.frequency.value=1800;s.connect(f).connect(k);s.start(ts);s.stop(ts+.16);this.env(k,ts,.002,.5,.12,null,0,ts+.16)}
-    for(let h=0;h<2;h++){const th=ts+h*.25;const k=C.createGain();k.connect(dl);const s=this.src('white'),f=C.createBiquadFilter();f.type='highpass';f.frequency.value=7000;s.connect(f).connect(k);s.start(th);s.stop(th+.05);this.env(k,th,.001,.18,.04,null,0,th+.05)}}}
-  const bg=sm(.7,.9);if(bg>0&&this.music.bar%2===0){const bl=C.createGain();bl.connect(bus);const bf=C.createBiquadFilter();bf.type='lowpass';bf.frequency.value=1100;bf.connect(bl);[ch[0]+12,ch[2]+12].forEach(n=>{[0,.05,-.05].forEach(d=>{const s=C.createOscillator();s.type='sawtooth';s.frequency.value=mtof(n+d);s.connect(bf);s.start(t0);s.stop(t0+1.9)})});this.env(bl,t0,.3,bg*.12,1,bg*.09,.4,t0+1.9)}}};
+ /* a war score, not a synth loop (owner, 2026-11-20: the old pad, triangle arpeggio and white-noise hi-hats sounded cheap and hissed).
+    Low strings hold the chord, a spiccato string ostinato drives it, war drums (taiko and timpani: pitched sine bodies and dark
+    noise, no hi-hat) come in as the battle heats up, a snare roll and a brass call at the peak. Everything is filtered dark. */
+ bar(t0){const C=this.ctx,I=this.I,prog=this.PROG[this.music.key]||this.PROG.minor,ch=prog[this.music.bar%4],bus=this.bus.music,bar=this.music.bar;const sm=(a,b)=>clamp((I-a)/(b-a),0,1);
+  const voice=(notes,type,cut,q,dets,a,peak,rel,ts,te,vib)=>{const g=C.createGain();g.gain.value=0;g.connect(bus);const f=C.createBiquadFilter();f.type='lowpass';f.frequency.value=cut;f.Q.value=q;f.connect(g);
+   notes.forEach(n=>dets.forEach(d=>{const o=C.createOscillator();o.type=type;o.frequency.value=mtof(n)*Math.pow(2,d/1200);if(vib){const l=C.createOscillator(),lg=C.createGain();l.frequency.value=5+Math.random()*.6;lg.gain.value=vib;l.connect(lg).connect(o.detune);l.start(ts);l.stop(te)}o.connect(f);o.start(ts);o.stop(te)}));
+   const p=g.gain;p.setValueAtTime(.0001,ts);p.linearRampToValueAtTime(peak,ts+a);p.setValueAtTime(peak,te-rel);p.linearRampToValueAtTime(.0001,te);return g};
+  /* low strings: root an octave down + the chord, a slow bow swell; overlaps the next bar so it never stops */
+  voice([ch[0]-12,ch[0]],'sawtooth',260+I*260,.7,[-6,7],.9,.06,.6,t0,t0+2.3,6);
+  voice(ch.slice(0,3),'sawtooth',520+I*500,.5,[-9,0,8],1,.028+I*.012,.6,t0,t0+2.3,9);
+  /* spiccato ostinato in eighths on the root, the fifth on the upbeat of beat 4 */
+  const og=sm(.15,.45);if(og>0){const pat=[0,0,0,0,0,0,7,0];for(let i=0;i<8;i++){const ts=t0+i*.25,n=ch[0]-12+pat[i]+(i===7?12:0);const g=voice([n],'sawtooth',900,.9,[-5,5],.008,(i%4===0?.07:.045)*og,.08,ts,ts+.2,0);void g}}
+  /* war drums: a taiko on 1 and 3 (and a double hit at the end of the phrase), timpani on the chord root */
+  const dg=sm(.3,.65);if(dg>0){const drum=(ts,f0,f1,v,d,nz)=>{const k=C.createGain();k.connect(bus);const o=C.createOscillator();o.type='sine';o.frequency.setValueAtTime(f0,ts);o.frequency.exponentialRampToValueAtTime(f1,ts+d*.6);o.connect(k);o.start(ts);o.stop(ts+d);this.env(k,ts,.004,v,d*.8,null,0,ts+d);
+     if(nz){const n=C.createGain();n.connect(bus);const s=this.src('brown'),lf=C.createBiquadFilter();lf.type='lowpass';lf.frequency.value=nz;s.connect(lf).connect(n);s.start(ts);s.stop(ts+d*.5);this.env(n,ts,.002,v*.9,d*.35,null,0,ts+d*.5)}};
+    drum(t0,95,48,.55*dg,.7,420);drum(t0+1,95,48,.45*dg,.7,420);if(bar%4===3){drum(t0+1.5,110,55,.35*dg,.5,500);drum(t0+1.75,110,55,.4*dg,.5,500)}
+    drum(t0+.5,mtof(ch[0]-12),mtof(ch[0]-12)*.94,.22*dg,1.1,0)}
+  /* a military snare roll building into the next bar, only in the thick of it */
+  const sg=sm(.62,.85);if(sg>0&&bar%2===1){for(let i=0;i<16;i++){const ts=t0+1+i*.0625,k=C.createGain();k.connect(bus);const s=this.src('pink'),f=C.createBiquadFilter();f.type='bandpass';f.frequency.value=1900;f.Q.value=.9;const l=C.createBiquadFilter();l.type='lowpass';l.frequency.value=4200;s.connect(f).connect(l).connect(k);s.start(ts);s.stop(ts+.07);this.env(k,ts,.002,sg*(.05+.12*i/16),.05,null,0,ts+.07)}}
+  /* the brass call at the peak: horns on root and fifth, a fourth below to answer */
+  const bg=sm(.72,.92);if(bg>0&&bar%2===0){voice([ch[0],ch[2]],'sawtooth',900+bg*500,1.2,[-4,5],.25,bg*.07,.4,t0,t0+1.3,4);voice([ch[0]-5,ch[0]],'sawtooth',800,1.1,[-4,5],.15,bg*.06,.3,t0+1.35,t0+1.95,4)}}};
 /* ======================= HUD ======================= */
 const HUD={depthT:0,ray:new THREE.Raycaster(),plane:new THREE.Plane(new THREE.Vector3(0,1,0),0),quietT:0,
  price(M){const p=M.price;if(p==null)return;const e=$('#px');e.textContent=fmtP(p);if(M.lastP!=null&&M.lastP!==p){e.classList.remove('up','dn');void e.offsetWidth;e.classList.add(p>M.lastP?'up':'dn')}
