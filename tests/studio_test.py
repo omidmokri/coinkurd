@@ -77,6 +77,8 @@ def main():
         kro = {"at": END, "model": "Kronos-small", "last": float(ALL[-1][4]),
                "forecast": [{"t": END + (i + 1) * 3600000, "o": 60000 + i * 10, "h": 60100 + i * 10, "l": 59900 + i * 10, "c": 60050 + i * 10, "hi": 60300 + i * 12, "lo": 59700 + i * 8} for i in range(24)]}
         pg.route("**/data/kronos/BTCUSDT_1h.json", lambda r: r.fulfill(status=200, content_type="application/json", body=json.dumps(kro)))
+        feed = {"alerts": [{"at": END, "symbol": "BTCUSDT", "tf": "60", "price": 65000, "side": "buy", "text": "EMA cross"}], "count": 1}
+        pg.route("https://entekhab-tv.omid-mokri.workers.dev/**", lambda r: r.fulfill(status=200, content_type="application/json", body=json.dumps(feed), headers={"access-control-allow-origin": "*"}))
         pg.goto(base + "/studio/?symbol=BTC")
         wait(pg, "!!(document.querySelector('.ps-legend') && document.querySelector('.ps-legend').textContent.length>3)")
         pg.wait_for_timeout(800)
@@ -111,6 +113,12 @@ def main():
         pg.screenshot(path=os.path.join(OUT, "studio_scan.png"), full_page=True)
         if sc["rows"] != 20 or sc["stable"] or sc["cards"] < 5:
             bad.append("screener")
+        pg.click(".ps-tabs button[data-k=tvhook]")
+        pg.wait_for_timeout(1200)
+        hk = pg.evaluate("({rows: document.querySelectorAll('.ps-feed tr').length, url: (document.querySelector('.ps-hook code')||{}).textContent})")
+        print("tv alerts", hk)
+        if hk["rows"] != 1 or "workers.dev/tv" not in (hk["url"] or ""):
+            bad.append("tvhook")
         # Kronos tab
         pg.click(".ps-tabs button[data-k=kronos]")
         k = pg.evaluate("document.querySelectorAll('.ps-pane:not([hidden]) .ps-card').length")

@@ -334,7 +334,11 @@ The site's strategy (agreed with the owner, 2026-11-07):
 - **Kronos:** `scripts/kronos_forecast.py` + `.github/workflows/kronos.yml` (hourly, Kronos-small, 8 samples) write
   `data/kronos/<SYM>_1h.json`; the studio draws them as ghost candles with a 15–85% band.
 - Not used: tvdatafeed (unofficial TradingView scraping, against its terms; Binance data instead). ta4j is Java: its
-  metrics are covered by PineTS's strategy engine. TradingView webhooks need an always-on server: Cloudflare Worker next.
+  metrics are covered by PineTS's strategy engine.
+- **TradingView webhooks:** Cloudflare Worker `entekhab-tv` on the owner's account (https://entekhab-tv.omid-mokri.workers.dev,
+  source `cloudflare/tv-webhook/worker.js`, KV `entekhab-tv-alerts` bound as ALERTS). POST /tv stores alerts (last 200,
+  30/min cap), GET /alerts feeds the studio's “TradingView alerts” tab. Optional owner-set secrets: HOOK_KEY (require a
+  key), TG_TOKEN + TG_CHAT (forward to Telegram). None set yet. Edit the code in the Cloudflare dashboard, then mirror here.
 - **Verified:** `tests/studio_test.py` (every example, error line report, screener on 20 coins, SMC, Kronos; stubbed data).
 - **Bot:** new 💻 Pine Studio section (`studio_text`, 5 languages) under Analysis. Menu: Analysis → Pine Studio.
 ### 2026-11-15 · «جهان زنده» posts in the channel: daily, weekly, monthly, yearly (owner's request in chat, not by the loop)
