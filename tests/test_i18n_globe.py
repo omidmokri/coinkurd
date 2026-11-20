@@ -93,22 +93,32 @@ def main():
             pg = b.new_page()
             pg.goto(url + "/", wait_until="networkidle")
 
-            ok("the globe sits beside the site's own four buttons",
-               pg.locator("#langs .ekw-globe").count() == 1 and pg.locator("#langs button[data-l]").count() == 4)
-            ok("the site's own four buttons are untouched",
-               pg.locator('#langs button[data-l="ckb"]').inner_text() == "کوردی"
-               and pg.locator('#langs button[data-l="en"]').inner_text() == "English")
+            ok("the globe sits in the bar, in the same place /market/ keeps it (first)",
+               pg.locator("#langs .ekw-globe").count() == 1
+               and pg.evaluate("document.querySelector('#langs').firstElementChild.classList.contains('ekw-globe')"))
+            ok("Kurdish and English stay in the bar",
+               pg.locator('#langs button[data-l="ckb"]').is_visible()
+               and pg.locator('#langs button[data-l="en"]').is_visible())
+            ok("Persian and Arabic move inside the globe, but their buttons are only hidden",
+               not pg.locator('#langs button[data-l="fa"]').is_visible()
+               and not pg.locator('#langs button[data-l="ar"]').is_visible()
+               and pg.locator('#langs button[data-l]').count() == 4)
+            ok("the globe shows how many languages there are in all",
+               pg.locator("#langs .ekw-globe b").inner_text() == "7", pg.locator("#langs .ekw-globe b").inner_text())
             ok("the globe turns (it has the spinning group)", pg.locator("#langs .ekw-globe svg .ekw-spin").count() == 1)
 
             pg.click("#langs .ekw-globe")
             pg.wait_for_selector(".ekw-panel")
-            names = pg.locator(".ekw-list button .n").all_inner_texts()
+            names = pg.locator(".ekw-more button .n").all_inner_texts()
             ok("the panel lists the ready languages by their own name", names == ["Deutsch", "Türkçe", "اردو"], names)
+            own = pg.locator(".ekw-own button .n").all_inner_texts()
+            ok("the site's own languages are in the panel too, Persian and Arabic among them",
+               "فارسی" in own and "العربية" in own and "English" in own, own)
             pg.fill(".ekw-search", "türk")
-            vis = [n for i, n in enumerate(names) if pg.locator(".ekw-list button").nth(i).is_visible()]
+            vis = [n for i, n in enumerate(names) if pg.locator(".ekw-more button").nth(i).is_visible()]
             ok("the search box narrows the list", vis == ["Türkçe"], vis)
             pg.fill(".ekw-search", "")
-            pg.click('.ekw-list button[data-code="de"]')
+            pg.click('.ekw-more button[data-code="de"]')
             pg.wait_for_load_state("networkidle")
 
             ok("the choice is stored and any Arabic choice dropped",
@@ -121,7 +131,11 @@ def main():
             ok("a string with no entry stays in English", "Nothing has an entry" in pg.locator("#p3").inner_text())
             pg.wait_for_timeout(400)
             ok("text a script writes afterwards is translated too", pg.locator("#later").inner_text() == "Jede Binance-Münze")
-            ok("the globe shows the site is in another language", "on" in (pg.get_attribute("#langs .ekw-globe", "class") or ""))
+            pg.click("#langs .ekw-globe")
+            pg.wait_for_selector(".ekw-panel")
+            ok("the panel marks the language the reader is in",
+               pg.locator('.ekw-more button[data-code="de"].on').count() == 1)
+            pg.keyboard.press("Escape")
 
             # a right-to-left language turns the page around
             pg.evaluate("localStorage.setItem('ek_l','ur')")
