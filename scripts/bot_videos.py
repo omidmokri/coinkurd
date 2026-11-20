@@ -6,9 +6,10 @@ Daily videos for the main channel (@Coin_Kurd) + daily drafts for the admin.
   branded slides of the Persian summary + real BTC chart, downloadable in Telegram) with the house-prompt caption
   and the channel signature. Other people's videos are never re-uploaded.
 - Rule: one day's videos come from different sources (max one per source per day, never the same twice in a row).
-- 10 drafts a day (Persian summaries of the day's news/on-chain items + signature) go to the admins' private
-  chat, each already carrying its own Coin_Kurd card as the picture, so a forward to Saved Messages (or to the
-  channel) takes the picture with it. The picture is always ours — a source's own advert image is never used.
+- 10 drafts a day (Persian summaries of the day's news/on-chain items + signature) are chosen each morning and
+  published by the bot itself in the owner's private channel (DRAFTS_CHAT), one every DRAFT_GAP minutes so the
+  channel is never filled at once. Each carries its own Coin_Kurd card as the picture — always ours, never a
+  source's advert image. The owner only gets two lines a day: what was chosen, and that it all went out.
 - Posted videos are also written to data/videos.json on main for the site.
 """
 import html
@@ -48,6 +49,10 @@ CHANNELS = [x for x in os.environ.get("VIDEO_CHANNELS", ",".join([
 ])).split(",") if x]
 PER_DAY = int(os.environ.get("VIDEOS_PER_DAY", "0"))   # off: owner turned automatic videos off
 DRAFTS_PER_DAY = int(os.environ.get("DRAFTS_PER_DAY", "10"))
+# The drafts are published by the bot itself, in the owner's private channel Coin_Kurd_VIP, spread through the
+# day so the channel is never filled at once. The id is the channel's own, useless to anyone outside it.
+DRAFTS_CHAT = os.environ.get("DRAFTS_CHAT", "-1001205533685")
+DRAFT_GAP = int(os.environ.get("DRAFT_GAP", "75")) * 60      # seconds between two drafts
 SLOTS_UTC = [5, 8, 11, 15, 19]          # posting hours (Iran ≈ +3:30)
 GAP_FIRST_DAY = 180                       # seconds between posts when catching up
 KEYS = re.compile(r"\b(bitcoin|btc|ethereum|eth|ether|crypto|etf|halving|altcoin)", re.I)
@@ -146,6 +151,8 @@ def state(s):
     v.setdefault("today", 0)
     v.setdefault("last_post", 0)
     v.setdefault("drafts_day", "")
+    v.setdefault("queue", [])          # today's drafts, waiting their turn in the channel
+    v.setdefault("last_draft", 0)
     v.setdefault("fail_note", 0)
     if not v.get("reel_v1"):                       # switch to own clips: post today's five again as clips
         v["reel_v1"] = True
@@ -217,18 +224,35 @@ def drafts(s, st, send_fn, admins):
     pick = (pref + [it for it in items if it not in pref])[:DRAFTS_PER_DAY]
     if not pick:
         return False
+    st["queue"] = [{k: it.get(k) for k in ("id", "fa", "at", "kind")} for it in pick]
+    st["last_draft"] = 0                      # the first one goes out on the next tick
     for a in admins:
-        send_fn(a, f"📝 <b>{len(pick)} پیش‌نویس امروز</b> — هر کدام با عکس خودش آماده است؛ "
-                   "فقط به «پیام‌های ذخیره‌شده» فوروارد کن")
-        for it in pick:
-            # our own card, never the source's advert picture; the text is the caption, so the whole draft
-            # travels as one message and a forward carries the picture with it
-            body = html.escape(_fit(it["fa"], CAP), quote=False) + "\n\n" + SIG
-            img = F.own_card(it)
-            if not img:
-                log.info("draft %s has no picture; sending it as text", it.get("id"))
-            send_fn(a, body, photo=img)
-            time.sleep(1.5)
+        send_fn(a, f"📝 <b>{len(pick)} پیش‌نویس امروز</b> انتخاب شد — در طول روز، هر "
+                   f"{DRAFT_GAP // 60} دقیقه یکی، خودکار در کانال منتشر می‌شود")
+    return True
+
+
+def post_draft(st, send_fn, admins):
+    """one queued draft into the channel, with its own picture, so a day's drafts never arrive all at once"""
+    it = st["queue"][0]
+    # our own card, never the source's advert picture; the text is the caption, so the draft is one whole post
+    body = html.escape(_fit(it["fa"], CAP), quote=False) + "\n\n" + SIG
+    img = F.own_card(it)
+    if not img:
+        log.info("draft %s has no picture; posting it as text", it.get("id"))
+    r = send_fn(DRAFTS_CHAT, body, photo=img)
+    if not r.get("ok"):
+        it["tries"] = it.get("tries", 0) + 1
+        log.warning("draft %s not posted (%s), try %s", it.get("id"), r.get("description"), it["tries"])
+        if it["tries"] < 3:
+            return False                      # the same one again on the next turn
+        if it["tries"] == 3:
+            for a in admins:
+                send_fn(a, "⚠️ یک پیش‌نویس در کانال منتشر نشد: " + html.escape(str(r.get("description"))))
+    st["queue"].pop(0)
+    if not st["queue"]:
+        for a in admins:
+            send_fn(a, "✅ پیش‌نویس‌های امروز در کانال منتشر شدند")
     return True
 
 
@@ -278,6 +302,10 @@ def tick(s, send_fn, channel, admins, worktree):
         if drafts(s, st, send_fn, admins):
             st["drafts_day"] = day
             changed = True
+    if st["queue"] and time.time() - st["last_draft"] > DRAFT_GAP:
+        st["last_draft"] = time.time()
+        post_draft(st, send_fn, admins)
+        changed = True
     return changed
 
 
