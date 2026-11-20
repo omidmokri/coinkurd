@@ -10,8 +10,10 @@ BLOCKED = (
     0x967071F1E4C4F033,   # NewsCity red cube (@newscitypro)
     0xF0F4F0E864E8F8E0,   # SiliconBrain blue brain logo (@silicon_brain)
 )
-# channels whose every picture (and every linked page's preview) is their own advert: always draw our own card
-ART_ONLY = {"newscitypro", "iamusd", "silicon_brain", "mrartificialintelligence"}
+# Channels we never take a picture from: their every picture (and every linked page's preview) is either their own
+# advert or their own copyrighted work — Visual Capitalist's infographics are the product they sell. For all of
+# these we draw our own card from the facts and name the source in the post.
+ART_ONLY = {"newscitypro", "iamusd", "silicon_brain", "mrartificialintelligence", "visualcapitalists"}
 
 
 def dhash(data, n=8):

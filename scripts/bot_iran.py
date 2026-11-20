@@ -37,14 +37,18 @@ def num(s):
 
 
 # ------------------------------------------------------------------ channel reader
-def _fetch_channel(name):
-    """-> [{"iso", "text", "id", "links"}] oldest→newest for the last ~20 posts; cached TTL s."""
-    ent = _cache.get(name)
+def _fetch_channel(name, before=None):
+    """-> [{"iso", "text", "id", "links"}] oldest→newest for the last ~20 posts; cached TTL s.
+
+    `before` asks for the page of posts older than that post id, which is how a channel is read back in time."""
+    key = (name, before)
+    ent = _cache.get(key)
     if ent and time.time() - ent[0] < TTL:
         return ent[1]
     posts = []
     try:
-        r = requests.get(f"https://t.me/s/{name}", headers=UA, timeout=20)
+        url = f"https://t.me/s/{name}" + (f"?before={before}" if before else "")
+        r = requests.get(url, headers=UA, timeout=20)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for m in soup.select(".tgme_widget_message"):
@@ -65,8 +69,31 @@ def _fetch_channel(name):
             posts.append({"iso": tm.get("datetime"), "text": body.get_text(), "id": pid, "links": links, "photos": photos})
     except Exception:
         posts = ent[1] if ent else []
-    _cache[name] = (time.time(), posts)
+    _cache[key] = (time.time(), posts)
     return posts
+
+
+def read_channel_since(name, since, pages=14):
+    """Every post of a channel from `since` (an ISO date) to now, oldest→newest, by walking the pages backwards.
+
+    One page is about 20 posts, so the default reaches a couple of months on a channel that posts a few times a
+    day. A channel that cannot be read, or that never goes back that far, simply returns what there is."""
+    out, before, seen = {}, None, set()
+    for _ in range(pages):
+        page = _fetch_channel(name, before)
+        if not page:
+            break
+        ids = [p["id"] for p in page if p["id"]]
+        if not ids or min(ids) in seen:
+            break
+        seen.add(min(ids))
+        for p in page:
+            if p["id"] and (p.get("iso") or "") >= since:
+                out[p["id"]] = p
+        if (page[0].get("iso") or "") < since:          # this page already starts before the date: far enough
+            break
+        before = min(ids)
+    return [out[k] for k in sorted(out)]
 
 
 def read_channel(name):
