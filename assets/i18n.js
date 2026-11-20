@@ -167,13 +167,26 @@
     return own + (LANGS ? LANGS.length : 0);
   }
 
+  /* /market/ runs its own 47-language picker on the very same pill (.pm-hglobe).
+     Two globes side by side is the bug the owner reported, so only one may ever show:
+     on /market/ the page's own picker wins and this layer stays out of the menu;
+     everywhere else that pill has no dictionaries behind it, so it gives way to ours. */
+  function onMarket() {
+    return /^\/market(\/|$)/.test(location.pathname);
+  }
+
   function globe() {
     if (!LANGS || !LANGS.length) return;
+    var mk = onMarket();
     [].forEach.call(d.querySelectorAll('#langs,.ek-lang,.lsw'), function (box) {
+      if (!mk) [].forEach.call(box.querySelectorAll('.pm-hglobe'), function (p) {
+        if (p.style.display !== 'none') p.style.display = 'none';
+      });
       INSIDE.forEach(function (l) {
         var b = box.querySelector('button[data-l="' + l + '"]');
         if (b && b.style.display !== 'none') b.style.display = 'none';
       });
+      if (mk) return;                               /* /market/ keeps its own picker: no second globe */
       var g = box.querySelector('.ekw-globe');
       if (!g) {
         g = d.createElement('button'); g.type = 'button'; g.className = 'ekw-globe';
