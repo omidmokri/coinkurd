@@ -9,7 +9,7 @@ One table, two readers:
     currency a visitor starts with).
 
 The site's own four languages (ckb, fa, ar, en) keep living at /market/ and keep their hand-written strings in
-assets/pro/i18n.js. The other 43 come from the owner's list (2026-11-15) with the paths he gave (/cn/, /iw/, /jp/ …);
+assets/pro/i18n.js. The other 47 come from the owner's list (2026-11-15) with the paths he gave (/cn/, /iw/, /jp/ …);
 the eleven he gave without a path use their ISO code. Their strings are machine-translated from English by CI.
 
 Order of the menu (owner's rule for every language switch on the site): Kurdish first, then Persian and Arabic,
@@ -39,6 +39,7 @@ OUT_JS = os.path.join(ROOT, "assets", "pro", "langs.js")
 # direction, home currency. The site's own four languages have no path of their own: they live at /market/.
 LANGS = [
     ("ckb", "کوردی", "Kurdish (Sorani)", "ckb-IQ", "ckb", "rtl", "IRT"),
+    ("kmr", "Kurmancî", "Kurdish (Kurmanji)", "kmr-TR", "kmr", "ltr", "TRY"),
     ("fa", "فارسی", "Persian", "fa-IR", "fa", "rtl", "IRT"),
     ("ar", "العربية", "Arabic", "ar", "ar", "rtl", "USD"),
     ("bn", "বাংলা", "Bengali", "bn-BD", "bn", "ltr", "BDT"),
@@ -66,16 +67,19 @@ LANGS = [
     ("lv", "Latviešu", "Latvian", "lv-LV", "lv", "ltr", "EUR"),
     ("lt", "Lietuvių", "Lithuanian", "lt-LT", "lt", "ltr", "EUR"),
     ("ms", "Bahasa Melayu", "Malay", "ms-MY", "ms", "ltr", "MYR"),
+    ("mr", "मराठी", "Marathi", "mr-IN", "mr", "ltr", "INR"),
     ("no", "Norsk", "Norwegian", "nb-NO", "nb", "ltr", "NOK"),
     ("pl", "Polski", "Polish", "pl-PL", "pl", "ltr", "PLN"),
     ("pt", "Português", "Portuguese", "pt-PT", "pt-PT", "ltr", "EUR"),
     ("br", "Português (Brasil)", "Portuguese (Brazil)", "pt-BR", "pt-BR", "ltr", "BRL"),
+    ("pa", "ਪੰਜਾਬੀ", "Punjabi", "pa-IN", "pa", "ltr", "INR"),
     ("ro", "Română", "Romanian", "ro-RO", "ro", "ltr", "RON"),
     ("ru", "Русский", "Russian", "ru-RU", "ru", "ltr", "RUB"),
     ("sr", "Српски", "Serbian", "sr-Cyrl-RS", "sr", "ltr", "RSD"),
     ("sk", "Slovenčina", "Slovak", "sk-SK", "sk", "ltr", "EUR"),
     ("sl", "Slovenščina", "Slovenian", "sl-SI", "sl", "ltr", "EUR"),
     ("es", "Español", "Spanish", "es-ES", "es", "ltr", "EUR"),
+    ("sw", "Kiswahili", "Swahili", "sw-KE", "sw", "ltr", "KES"),
     ("se", "Svenska", "Swedish", "sv-SE", "sv", "ltr", "SEK"),
     ("ta", "தமிழ்", "Tamil", "ta-IN", "ta", "ltr", "INR"),
     ("te", "తెలుగు", "Telugu", "te-IN", "te", "ltr", "INR"),
@@ -86,10 +90,32 @@ LANGS = [
     ("vi", "Tiếng Việt", "Vietnamese", "vi-VN", "vi", "ltr", "VND"),
     ("en", "English", "English", "en-GB", "en", "ltr", "USD"),
 ]
+# The flag shown beside each language: a file in assets/pro/flags/ (flag-icons, MIT — see the README there).
+# A language is not a country, so this is the flag readers most associate with it, not a claim about borders:
+# Kurdish, both Sorani and Kurmanji, carries the flag of the Kurdistan Region, drawn for this site because the
+# flag-icons set holds sovereign states only. Catalan uses the senyera, Swahili Kenya, English the UK.
+FLAG = {
+    "ckb": "kurdistan", "kmr": "kurdistan", "fa": "ir", "ar": "sa", "en": "gb",
+    "bn": "bd", "bg": "bg", "cat": "es-ct", "cn": "cn", "tw": "tw", "hr": "hr", "cz": "cz", "da": "dk", "nl": "nl",
+    "et": "ee", "fil": "ph", "fi": "fi", "fr": "fr", "de": "de", "gr": "gr", "iw": "il", "hi": "in", "hu": "hu",
+    "id": "id", "it": "it", "jp": "jp", "kr": "kr", "lv": "lv", "lt": "lt", "ms": "my", "mr": "in", "no": "no",
+    "pl": "pl", "pt": "pt", "br": "br", "pa": "in", "ro": "ro", "ru": "ru", "sr": "rs", "sk": "sk", "sl": "si",
+    "es": "es", "sw": "ke", "se": "se", "ta": "in", "te": "in", "th": "th", "tr": "tr", "uk": "ua", "ur": "pk",
+    "vi": "vn",
+}
+FLAG_DIR = "/assets/pro/flags/"
+
+
+def flag(code):
+    """the address of a language's flag, or None"""
+    f = FLAG.get(code)
+    return (FLAG_DIR + f + ".svg") if f else None
+
+
 SITE = ("ckb", "fa", "ar", "en")            # the site's own languages: hand-written strings, live at /market/
 NEW = [r[0] for r in LANGS if r[0] not in SITE]
 BY = {r[0]: {"code": r[0], "native": r[1], "english": r[2], "bcp": r[3], "hreflang": r[4], "dir": r[5], "cur": r[6],
-             "path": None if r[0] in SITE else r[0]} for r in LANGS}
+             "path": None if r[0] in SITE else r[0], "flag": FLAG.get(r[0])} for r in LANGS}
 
 # changes newer than the CLDR copy babel ships, and the site's own choices
 CC_OVERRIDE = {
@@ -121,6 +147,8 @@ def js_text():
     body = ("(function () {\n  'use strict';\n  var P = window.PRO = window.PRO || {};\n"
             "  P.LANGS = " + json.dumps(langs, ensure_ascii=False, separators=(",", ":")) + ";\n"
             "  P.SITE_LANGS = " + json.dumps(list(SITE)) + ";\n"
+            "  P.FLAG = " + json.dumps(FLAG, separators=(",", ":"), sort_keys=True) + ";\n"
+            "  P.FLAG_DIR = " + json.dumps(FLAG_DIR) + ";\n"
             "  P.CUR_DIG = " + json.dumps(c["digits"], separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.CCCUR = " + json.dumps(cc_cur(), separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.TZCC = " + json.dumps(c["tz_cc"], separators=(",", ":"), sort_keys=True) + ";\n"
