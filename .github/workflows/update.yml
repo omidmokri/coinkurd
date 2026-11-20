@@ -38,6 +38,20 @@ env:
   OMID_API_KEY: ${{ secrets.OMID_API_KEY }}
   SALAH_API_KEY: ${{ secrets.SALAH_API_KEY }}
   SARA_API_KEY: ${{ secrets.SARA_API_KEY }}
+  # Ten spare slots for keys added later: make a secret named KEY01_API_KEY … KEY10_API_KEY in
+  # Settings -> Secrets and variables -> Actions and it joins the pool by itself. A slot with no secret behind
+  # it arrives empty, and scripts/ai.py passes over anything not shaped like a Gemini key, so the unused ones
+  # cost nothing and nothing here has to change again.
+  KEY01_API_KEY: ${{ secrets.KEY01_API_KEY }}
+  KEY02_API_KEY: ${{ secrets.KEY02_API_KEY }}
+  KEY03_API_KEY: ${{ secrets.KEY03_API_KEY }}
+  KEY04_API_KEY: ${{ secrets.KEY04_API_KEY }}
+  KEY05_API_KEY: ${{ secrets.KEY05_API_KEY }}
+  KEY06_API_KEY: ${{ secrets.KEY06_API_KEY }}
+  KEY07_API_KEY: ${{ secrets.KEY07_API_KEY }}
+  KEY08_API_KEY: ${{ secrets.KEY08_API_KEY }}
+  KEY09_API_KEY: ${{ secrets.KEY09_API_KEY }}
+  KEY10_API_KEY: ${{ secrets.KEY10_API_KEY }}
 
 jobs:
   sync:
