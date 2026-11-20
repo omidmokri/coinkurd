@@ -38,6 +38,7 @@ import bot_data as D  # noqa: E402
 import bot_relay as RL  # noqa: E402
 import bot_iran as IR  # noqa: E402
 import bot_feeds as F  # noqa: E402
+import bot_packs as PK  # noqa: E402
 import bot_videos as V  # noqa: E402
 import bot_deep as DP  # noqa: E402
 import bot_album as AL  # noqa: E402
@@ -1197,8 +1198,29 @@ def watch_loop(s):
         time.sleep(20)
 
 
+def make_packs(s, chat_id=None, force=False):
+    """The sticker and emoji packs belong to the owner; the bot only makes them, once, and says where they are."""
+    owner = min(ADMIN_IDS) if ADMIN_IDS else None
+    if not owner or not BOT_USERNAME:
+        return
+    done = s.setdefault("packs", {})
+    if done.get("at") and not force:
+        return
+    try:
+        links = PK.run(_post_with_retry, send, chat_id or owner, BOT_USERNAME)
+        if links:
+            done["at"], done["links"] = time.time(), links
+            save_state(s)
+    except Exception:
+        log.exception("packs failed")
+
+
 def admin_v2(s, chat_id, cmd, arg):
     """admin commands added in v2; -> True if handled"""
+    if cmd == "/packs":                      # the channel's own stickers, emoji and GIFs (assets/packs/)
+        threading.Thread(target=make_packs, args=(s, chat_id, True), name="packs", daemon=True).start()
+        send(chat_id, "🎨 در حال ساختن بسته‌ها…")
+        return True
     if cmd == "/album":                      # preview into this chat only; «/album post» publishes an extra edition now
         if arg.strip().lower() in ("post", "now", "publish", "انتشار", "ارسال"):
             AL.request_now(s, chat_id)
@@ -1937,6 +1959,7 @@ def main():
     FX.start(s, _post_with_retry, fix_amp, CHANNEL, MAIN_WT, DP.push_files, sorted(ADMIN_IDS),
              lambda chat, text: group_send(chat, text), V.SIG, F.DIRTY)   # one-time repair of broken pictures
     threading.Thread(target=watch_loop, args=(s,), name="watch-v2", daemon=True).start()
+    threading.Thread(target=make_packs, args=(s,), name="packs", daemon=True).start()
     try:
         if promote(s):
             save_state(s)
