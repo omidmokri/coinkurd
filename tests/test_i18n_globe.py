@@ -74,11 +74,18 @@ def main():
         open(os.path.join(tmp, "assets", "app.js"), "w").write(
             "setTimeout(function(){document.getElementById('later').textContent='Every Binance coin';},30);")
         open(os.path.join(tmp, "index.html"), "w", encoding="utf-8").write(PAGE)
+        os.makedirs(os.path.join(tmp, "assets", "pro", "flags"), exist_ok=True)
+        for cc in ("de", "tr", "pk", "kurdistan", "ir", "sa", "gb"):
+            open(os.path.join(tmp, "assets", "pro", "flags", cc + ".svg"), "w").write(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill="#888"/></svg>')
+        F = "/assets/pro/flags/"
         json.dump({"ready": [
-            {"code": "de", "native": "Deutsch", "english": "German", "dir": "ltr", "pct": 92},
-            {"code": "tr", "native": "Türkçe", "english": "Turkish", "dir": "ltr", "pct": 88},
-            {"code": "ur", "native": "اردو", "english": "Urdu", "dir": "rtl", "pct": 80},
-        ]}, open(os.path.join(tmp, "i18n", "langs.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            {"code": "de", "native": "Deutsch", "english": "German", "dir": "ltr", "pct": 92, "flag": F + "de.svg"},
+            {"code": "tr", "native": "Türkçe", "english": "Turkish", "dir": "ltr", "pct": 88, "flag": F + "tr.svg"},
+            {"code": "ur", "native": "اردو", "english": "Urdu", "dir": "rtl", "pct": 80, "flag": F + "pk.svg"},
+        ], "flags": {"de": F + "de.svg", "tr": F + "tr.svg", "ur": F + "pk.svg",
+                     "ckb": F + "kurdistan.svg", "fa": F + "ir.svg", "ar": F + "sa.svg", "en": F + "gb.svg"}},
+            open(os.path.join(tmp, "i18n", "langs.json"), "w", encoding="utf-8"), ensure_ascii=False)
         json.dump({"Live market": "Live-Markt", "Every Binance coin": "Jede Binance-Münze"},
                   open(os.path.join(tmp, "i18n", "de", "common.json"), "w", encoding="utf-8"), ensure_ascii=False)
         json.dump({"{1} transactions": "{1} Transaktionen", "Search a coin": "Eine Münze suchen"},
@@ -111,6 +118,11 @@ def main():
             pg.wait_for_selector(".ekw-panel")
             names = pg.locator(".ekw-more button .n").all_inner_texts()
             ok("the panel lists the ready languages by their own name", names == ["Deutsch", "Türkçe", "اردو"], names)
+            ok("every language in the panel wears a flag",
+               pg.locator(".ekw-more button .ekw-flag").count() == 3
+               and pg.locator(".ekw-own button .ekw-flag").count() == 4)
+            ok("Kurdish wears the flag of the Kurdistan Region",
+               (pg.get_attribute('.ekw-own button[data-code="ckb"] .ekw-flag', "src") or "").endswith("/kurdistan.svg"))
             own = pg.locator(".ekw-own button .n").all_inner_texts()
             ok("the site's own languages are in the panel too, Persian and Arabic among them",
                "فارسی" in own and "العربية" in own and "English" in own, own)

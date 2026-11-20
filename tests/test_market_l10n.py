@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scripts/build_market_l10n.py on a copy of market/index.html with a fake translation cache:
   de: everything translated · iw: everything (a right-to-left language) · jp: the workspace strings only, no page text.
-Checks every page /market/<code>/ for the 43 languages: <html lang/dir/data-pro-lang>, its own title, description,
+Checks every page /market/<code>/ for the 47 languages: <html lang/dir/data-pro-lang>, its own title, description,
 canonical, heading and about text, hreflang links to the ready languages only, noindex until the page text is in,
 the string pack (only current translations, valid JS), no Arabic layer, the shared header in English; the forwards at
 /market/fa|ckb|ar|en/; hreflang on /market/ itself; the sitemap; and that a second run changes nothing.
@@ -60,7 +60,7 @@ def main():
         cache = os.path.join(tmp, "cache")
         fake_cache(cache, src)
         r = B.build(tmp, cache_dir=cache)
-        ok("a page for each of the 43 languages", r["pages"] == 43 and all(os.path.exists(os.path.join(tmp, "market", c, "index.html")) for c in pro_langs.NEW))
+        ok("a page for each of the 47 languages", r["pages"] == 47 and all(os.path.exists(os.path.join(tmp, "market", c, "index.html")) for c in pro_langs.NEW))
         ok("ready for search engines: de and iw (page text in), not jp", sorted(r["ready"]) == ["de", "iw"], r["ready"])
         de = open(os.path.join(tmp, "market", "de", "index.html"), encoding="utf-8").read()
         iw = open(os.path.join(tmp, "market", "iw", "index.html"), encoding="utf-8").read()
