@@ -13,7 +13,7 @@ import build_reality as BR  # noqa: E402
 from reality_common import L  # noqa: E402
 
 e = BP.e
-VER = "2"
+VER = "3"
 SRC = "https://github.com/omidmokri/coinkurd/tree/main/assets/studio"
 T = {
     "title": L("استودیو پاین: کدنویسی و بک‌تست زنده", "ستۆدیۆی پاین: کۆدنووسین و باکتێستی زیندوو", "Pine Studio: live coding and back-testing"),
