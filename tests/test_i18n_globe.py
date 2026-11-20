@@ -41,6 +41,7 @@ PAGE = """<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><
   <button type="button" data-l="ar" lang="ar">العربية</button>
   <button type="button" data-l="en" lang="en">English</button>
 </nav>
+<div class="lsw"><button data-l="ckb">کوردی</button><button data-l="fa">فارسی</button><button data-l="en">English</button></div>
 <h1>Live market</h1>
 <p id="p1">Every Binance coin</p>
 <p id="p2">2,191 transactions</p>
@@ -109,6 +110,9 @@ def main():
             ok("only one globe shows: the site's own 47-pill gives way to ours",
                pg.locator("#langs .ekw-globe").count() == 1
                and not pg.locator("#langs .pm-hglobe").is_visible())
+            ok("the lesson pages' own three-way switch is left alone: no globe in it, Persian still offered",
+               pg.locator(".lsw .ekw-globe").count() == 0
+               and pg.locator('.lsw button[data-l="fa"]').is_visible())
             ok("Kurdish and English stay in the bar",
                pg.locator('#langs button[data-l="ckb"]').is_visible()
                and pg.locator('#langs button[data-l="en"]').is_visible())
