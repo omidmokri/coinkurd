@@ -158,6 +158,66 @@ def parse_estate(line, codes):
             "price": fnum(f[3]), "ts": ts, "f": fields}
 
 
+# ------------------------------------------------------------------ a change of state is an alarm
+DIR_LONG = {"long", "buy", "up", "bull", "bullish", "صعودی"}
+DIR_SHORT = {"short", "sell", "down", "bear", "bearish", "نزولی"}
+DIR_FLAT = {"flat", "neutral", "none", "exit", "خنثی"}
+
+
+def state_dir(f):
+    """the direction an #ESTATE line reports, read the same way the page reads it"""
+    for k in ("dir", "side", "signal", "decision"):
+        v = str((f or {}).get(k, "")).strip().lower()
+        if v in DIR_LONG:
+            return "long"
+        if v in DIR_SHORT:
+            return "short"
+        if v in DIR_FLAT:
+            return "flat"
+    return ""
+
+
+def state_signals(prev_live, states, ch):
+    """Most of Coin_Kurd's indicators never fire a strategy order, so they send no #ESIG line — they publish their
+       live state every bar with #ESTATE, and nothing of theirs ever reached the signals table. But a state that
+       flips from long to short IS the alarm that indicator raises, so each flip becomes a signal here, with the
+       same shape and the same follow-up returns as a relayed order (owner's request, 2026-11-20).
+
+       Per symbol and timeframe the stored state and the newly read ones are walked in time order, so this reads the
+       same whether the run saw one new bar or re-read days of the channel: only a real change of direction counts,
+       the first state of a symbol raises nothing, and a repeat of the same direction raises nothing."""
+    seq = {}
+    for it in (prev_live.get("items") or {}).values():
+        for st in it.get("states", []):
+            seq.setdefault((st["ind"], st.get("tv_sym"), st.get("tf")), []).append(st)
+    for st in states:
+        seq.setdefault((st["ind"], st.get("tv_sym"), st.get("tf")), []).append(st)
+    out = []
+    for row in seq.values():
+        row.sort(key=lambda x: (x["t"], x.get("mid") or 0))
+        was = ""
+        for st in row:
+            d = state_dir(st.get("f"))
+            if not d:
+                continue
+            prev, was = was, d
+            if not prev or prev == d:
+                continue
+            side, kind = (prev, "exit") if d == "flat" else (d, "entry")
+            if side == "flat" or not st.get("mid"):      # no message id: it came from live.json, already accounted for
+                continue
+            f = st.get("f") or {}
+            label = next((str(f[x])[:40] for x in ("decision", "note", "phase", "regime")
+                          if isinstance(f.get(x), str) and f[x].strip()), "")
+            num = lambda k: f.get(k) if isinstance(f.get(k), (int, float)) else None   # noqa: E731
+            out.append({"ind": st["ind"], "tv_sym": st.get("tv_sym"), "sym": st.get("sym"), "tf": st.get("tf"),
+                        "side": side, "kind": kind, "price": st.get("price"), "order": label or None,
+                        "sl": num("sl"), "tp": num("tp1"), "tp2": num("tp2"),
+                        "id": f"st-{ch}-{st['mid']}", "src": "tv", "from": "state",
+                        "t": st["t"], "msg": st.get("msg")})
+    return out
+
+
 def read_channel(ch, codes, pages=10, stop_at=0):
     """returns (signals, live states, highest message id); paging stops at messages already read in an earlier run"""
     found, states, top, before = [], [], 0, None
@@ -424,6 +484,10 @@ def main():
         last_id = lr.get("last_id", 0) if lr.get("channel") == ch else 0
         found, states, top = read_channel(ch, codes, stop_at=last_id)
         for s in found:
+            if s["id"] not in have:
+                have[s["id"]] = s
+                new += 1
+        for s in state_signals(live, states, ch):          # a flip of the live state is that indicator's alarm
             if s["id"] not in have:
                 have[s["id"]] = s
                 new += 1
