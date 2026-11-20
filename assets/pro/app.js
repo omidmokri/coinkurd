@@ -1285,7 +1285,43 @@
       $$('[data-lg]', list).forEach(function (b) { b.onclick = function () { goLang(b.getAttribute('data-lg')); }; });
     }
     inp.oninput = draw; draw();
-    modal(T('langTitle'), box, { wide: true, nofocus: matchMedia('(pointer: coarse)').matches });
+    var m = modal(T('langTitle'), box, { wide: true, nofocus: matchMedia('(pointer: coarse)').matches });
+    rail($('.pm-mbody', m));
+  }
+
+  /* The gold bar beside the languages: how tall it is says how much of the list you are seeing, where it sits says
+     where you are, and dragging it carries you there. The browser's own bar is a grey sliver on some machines and
+     an invisible overlay on others, so the panel draws this one itself — still one bar, not two. */
+  function rail(body) {
+    if (!body || $('.pm-rail', body)) return;
+    var r = h('<div class="pm-rail" aria-hidden="true"><i></i><b></b></div>');
+    body.insertBefore(r, body.firstChild);
+    var track = $('i', r), thumb = $('b', r), MIN = 28;
+    function draw() {
+      var hh = body.clientHeight, total = body.scrollHeight, room = total - hh;
+      if (room <= 2) { r.style.display = 'none'; return; }
+      r.style.display = '';
+      track.style.top = '8px'; track.style.height = (hh - 16) + 'px';
+      var th = Math.max(MIN, Math.round((hh - 16) * hh / total));
+      thumb.style.height = th + 'px';
+      thumb.style.top = Math.round(8 + (hh - 16 - th) * (body.scrollTop / room)) + 'px';
+    }
+    body.addEventListener('scroll', draw, { passive: true });
+    body.addEventListener('input', draw);                 /* the search box shortens the list */
+    if (window.ResizeObserver) new ResizeObserver(draw).observe(body);
+    setTimeout(draw, 0); draw();
+    thumb.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      var hh = body.clientHeight, th = thumb.offsetHeight, span = hh - 16 - th, room = body.scrollHeight - hh;
+      var y0 = e.clientY, top0 = parseFloat(thumb.style.top) || 8;
+      r.classList.add('on');
+      function move(ev) {
+        var t = Math.min(8 + span, Math.max(8, top0 + ev.clientY - y0));
+        body.scrollTop = span > 0 ? (t - 8) / span * room : 0;
+      }
+      function up() { r.classList.remove('on'); window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); }
+      window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+    });
   }
 
   /* ---- the currency prices are shown in, and the visitor's own rate for it (fx.js keeps both) */
