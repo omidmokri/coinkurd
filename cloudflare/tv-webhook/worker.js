@@ -9,6 +9,7 @@
      HOOK_KEY  secret, optional: when set, an alert must carry it, either as ?key=… in the URL or "key" in a JSON body
      TG_TOKEN  secret, optional: Telegram bot token, to forward alerts
      TG_CHAT   variable, optional: the Telegram chat or channel id to forward to
+    TG_THREAD variable, optional: forum topic id inside TG_CHAT
 
    TradingView "Message" can be plain text or JSON, e.g.
      {"symbol":"{{ticker}}","tf":"{{interval}}","price":{{close}},"text":"EMA cross up","key":"…"} */
@@ -61,7 +62,7 @@ export default {
         try {
           await fetch(`https://api.telegram.org/bot${env.TG_TOKEN}/sendMessage`, {
             method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ chat_id: env.TG_CHAT, text: msg, disable_web_page_preview: true })
+            body: JSON.stringify(Object.assign({ chat_id: env.TG_CHAT, text: msg, disable_web_page_preview: true }, env.TG_THREAD ? { message_thread_id: Number(env.TG_THREAD) } : {}))
           });
         } catch (e) { /* the alert is stored even if Telegram is unreachable */ }
       }

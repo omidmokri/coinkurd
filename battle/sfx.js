@@ -265,7 +265,7 @@ K4.AMBX = {
     const s = nsrc(A, 'pink'), lp = flt(C, 'lowpass', 850, .5); s.connect(lp).connect(sw).connect(g); s.start(0, Math.random());
     const l1 = osc(C, 'sine', .071), d1 = amp(C, .3); l1.connect(d1).connect(sw.gain); l1.start();               // swells
     const l2 = osc(C, 'sine', .163), d2 = amp(C, .15); l2.connect(d2).connect(sw.gain); l2.start();
-    const h = nsrc(A, 'white'), hb = flt(C, 'bandpass', 2600, .4), hg = amp(C, .05); h.connect(hb).connect(hg).connect(g); h.start(0, Math.random());   // the wash breathes with the swell
+    const h = nsrc(A, 'pink'), hb = flt(C, 'lowpass', 1400, .4), hg = amp(C, .05);   /* was white noise at 2.6 kHz: a constant hiss (owner, 2026-11-20) */ h.connect(hb).connect(hg).connect(g); h.start(0, Math.random());   // the wash breathes with the swell
     const l3 = osc(C, 'sine', .071), d3 = amp(C, .05); l3.connect(d3).connect(hg.gain); l3.start();
     this.sea = { g }; this.gullT = 0;
   },
