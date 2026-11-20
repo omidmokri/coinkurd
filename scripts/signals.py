@@ -482,7 +482,9 @@ def main():
     new, states = 0, []
     if ch:
         last_id = lr.get("last_id", 0) if lr.get("channel") == ch else 0
-        found, states, top = read_channel(ch, codes, stop_at=last_id)
+        # a cold cursor means a first run or a deliberate reset: read far back once so the state flips that already
+        # happened are imported too, instead of only what arrived since the last run
+        found, states, top = read_channel(ch, codes, pages=40 if not last_id else 10, stop_at=last_id)
         for s in found:
             if s["id"] not in have:
                 have[s["id"]] = s
