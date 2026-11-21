@@ -7,6 +7,7 @@ Output (in the episode folder):
 import json
 import os
 import re
+import statistics
 import sys
 
 import numpy as np
@@ -82,14 +83,51 @@ def synth(text, lang):
     return a.astype(np.float32)
 
 
+def pace(a, text):
+    """Seconds of audio for each character of the spoken text."""
+    return (len(a) / SR) / max(1, len(text))
+
+
+def say(text, lang, paces):
+    """Synthesize one sentence, and catch the times the voice stops early.
+
+    Every so often a sentence comes back as a fraction of the audio it needs — the opening words and then nothing.
+    It is not the text: the same sentence reads perfectly on the next attempt. On 2026-11-21 it put half-spoken
+    sentences into the Persian track, and the listening test, hearing speech that stops mid-sentence, reported a
+    phonetic error of 0.46 and held the Persian version out of the episode.
+
+    So each sentence is measured against the pace of the ones already read in this track, which calibrates itself to
+    the language and the voice, and anything far short of it is read again. The first few sentences have nothing to
+    compare against and are taken as they come.
+    """
+    a = synth(text, lang)
+    if len(paces) < 5:
+        return a
+    floor = 0.55 * statistics.median(paces)
+    for _ in range(2):
+        if pace(a, text) >= floor:
+            return a
+        b = synth(text, lang)
+        print(f"  {lang}: re-read a sentence that stopped early "
+              f"({pace(a, text):.4f} s/char against {floor:.4f}): {text[:60]}")
+        if pace(b, text) > pace(a, text):
+            a = b
+    if pace(a, text) < floor:
+        print(f"::warning::{lang}: a sentence still reads short after two more attempts: {text[:80]}")
+    return a
+
+
 def build(ep, lang):
     sc = json.load(open(os.path.join(ep, f"script_{lang}.json"), encoding="utf-8"))
     chunks, timeline, t = [], [], 0.0
+    paces = []
     for si, sec in enumerate(sc["sections"]):
         sec_start = t
         for pi, par in enumerate(sec["paras"]):
             for s in sentences(par, lang):
-                a = synth(speech_text(s, lang), lang)
+                spoken = speech_text(s, lang)
+                a = say(spoken, lang, paces)
+                paces.append(pace(a, spoken))
                 timeline.append({"section": sec["id"], "para": pi, "start": round(t, 3), "end": round(t + len(a) / SR, 3),
                                  "text": display_text(s, lang), "spoken": speech_text(s, lang)})
                 chunks.append(a); t += len(a) / SR

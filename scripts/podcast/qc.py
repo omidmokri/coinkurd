@@ -219,11 +219,12 @@ def asr_sample(ep, lang, n=14, seed=7):
         else:
             c = asr.cer(x["text"], hyp, lang); cers.append(c); row["pcer"] = round(c, 3)
         out.append(row)
-    # The median carries the verdict (run.py), not the mean. Only half the sample has no digits in it, so the phonetic
-    # error rests on about six sentences, and Whisper now and then returns a degenerate transcript for one of them
-    # ("روزه هاییییییی"): on 2026-11-21 one such row pushed the mean to 0.365 and held the Persian version of a track
-    # that was otherwise clean. That is the measurement failing, not the voice, and a median ignores it while still
-    # failing a track whose sentences are mostly unintelligible.
+    # The median carries the verdict (run.py), not the mean. Only half the sample has no digits in it, so the
+    # phonetic error rests on about six sentences, and one bad row used to decide the language's fate: in November
+    # 2026 a single row of 0.6 held a Persian track that was otherwise clean. The usual cause of such a row — a
+    # sentence the voice stopped reading early — is now caught and re-read at synthesis (produce.say), and what is
+    # left is ordinary recogniser noise, which a median handles. A track whose sentences are mostly unintelligible
+    # still fails, on the median or on the capped mean.
     cers = sorted(cers)
     med = (cers[len(cers) // 2] if len(cers) % 2 else (cers[len(cers) // 2 - 1] + cers[len(cers) // 2]) / 2) if cers else 0.0
     return {"lang": lang, "pcer_mean": round(sum(cers) / max(1, len(cers)), 3), "pcer_median": round(med, 3),
