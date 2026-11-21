@@ -203,7 +203,11 @@ def asr_sample(ep, lang, n=14, seed=7):
     for x in pick:
         clip = v[int(x["start"] * sr): int(x["end"] * sr)]
         hyp = asr.transcribe(clip, sr, lang)
-        row = {"text": x["text"], "heard": hyp}
+        # Seconds of speech per hundred characters. A sentence that was only half spoken reads far below its
+        # language's usual pace, and the recogniser fills the gap by repeating itself, which is what a bad phonetic
+        # score usually turns out to be. Recording it here tells the two apart without guesswork.
+        row = {"text": x["text"], "heard": hyp, "seconds": round(len(clip) / sr, 2),
+               "pace": round(len(clip) / sr / max(1, len(x["text"])) * 100, 1)}
         if re.search(r"[0-9۰-۹]", x["text"]):
             want = [w for w in numbers(x["text"], lang)]
             got = numbers(hyp, lang) + numbers(hyp.replace(",", "").replace("٬", ""), lang)
