@@ -70,6 +70,11 @@ def worth(s):
         return False
     if re.fullmatch(r"[\w.-]+\.(js|css|json|webp|png|svg|html)(\?.*)?", s):
         return False
+    # A bare host name or a link written without its scheme (cryptoquant.com, eur-lex.europa.eu,
+    # t.me/Coin_Kurd_Group). A translator can only hand these back unchanged, and the checks then reject them as
+    # "wrong script" or "untranslated", so they used to be re-asked on every run and never stored.
+    if re.fullmatch(r"(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}(?:/\S*)?", s):
+        return False
     return True
 
 

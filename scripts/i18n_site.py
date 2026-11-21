@@ -222,8 +222,13 @@ def batches(keys, size=60, chars=6000):
 
 # --------------------------------------------------------------------------------- filling the caches
 def plan(langs, need, common, limit):
-    """the requests a run would make: (language, one batch), the strings nearly every page has first"""
-    items, state = [], {}
+    """the requests a run would make: (language, one batch), the strings nearly every page has first
+
+    The run is shared out a batch at a time, in turn, rather than filling the cap from the top of the list. Taking
+    the languages in order starved every language past the first few: the ones at the top always have some strings
+    outstanding, so the cap ran out before the planner ever reached the next language to be brought up.
+    """
+    queues, state = [], {}
     for code in langs:
         s = load(code)
         state[code] = s
@@ -231,10 +236,14 @@ def plan(langs, need, common, limit):
         if not todo:
             continue
         todo.sort(key=lambda k: (k not in common, len(k), k))
-        for b in batches(todo):
-            items.append((code, b))
-            if len(items) >= limit:
-                return items, state
+        queues.append((code, list(batches(todo))))
+    items = []
+    for i in range(max((len(b) for _, b in queues), default=0)):
+        for code, bs in queues:
+            if i < len(bs):
+                items.append((code, bs[i]))
+                if len(items) >= limit:
+                    return items, state
     return items, state
 
 

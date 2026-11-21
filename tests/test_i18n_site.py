@@ -153,6 +153,25 @@ def main():
     ok("the real corpus is read: many pages, many strings", len(pages) > 20 and len(need) > 1500, (len(pages), len(need)))
     ok("the encyclopedia is left out", not any(os.sep + "encyclopedia" + os.sep in p for p in pages))
     ok("the strings nearly every page has are a small part of the whole", 0 < len(common) < len(need) / 4, (len(common), len(need)))
+    # Two faults that between them froze the globe at 10 languages for two days (2026-11-21).
+    # A bare host name or a scheme-less link can only come back unchanged, so the checks rejected it every run and
+    # it was asked again forever, eating the day's budget.
+    import i18n_ar
+    hosts = ["cryptoquant.com", "eur-lex.europa.eu", "uk.news.yahoo.com", "t.me/Coin_Kurd_Group", "bitcointalk.org"]
+    ok("a bare host name is not sent for translation", not any(i18n_ar.worth(h) for h in hosts),
+       [h for h in hosts if i18n_ar.worth(h)])
+    prose = ["Open interest", "The market at any past moment", "Trading in the Zone", "Read more"]
+    ok("ordinary text is still sent for translation", all(i18n_ar.worth(t) for t in prose),
+       [t for t in prose if not i18n_ar.worth(t)])
+
+    # The run is shared out a batch at a time; taking the languages in order starved every one past the first few.
+    import unittest.mock
+    many = [f"s{i}" for i in range(4000)]
+    with unittest.mock.patch.object(S, "load", lambda c: {}):
+        items, _ = S.plan(["kmr", "tr", "ru", "es", "br", "de", "fr", "hi", "id", "ur"], many, set(), 20)
+    reached = {c for c, _ in items}
+    ok("a capped run reaches every unfinished language, not just the first", len(reached) == 10, sorted(reached))
+
     p = S.prompt_for("tw", ["Close"])
     ok("the prompt names the language, its variant and what must stay as written",
        "Chinese (Traditional)" in p and "Traditional Chinese" in p and "Coin_Kurd" in p and '["Close"]' in p)
