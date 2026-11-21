@@ -214,6 +214,11 @@ def main():
         for it in plan["items"]:
             print("telegram", it["lang"], it["chars"], "chars")
     print("publishable:", live, "held:", list(held))
+    try:   # one line per key: which secret it came from, and whether it worked today
+        import ai
+        print("key pool:\n" + ai.pool_report())
+    except Exception:  # noqa: BLE001
+        pass
     sys.exit(0 if live else 1)
 
 

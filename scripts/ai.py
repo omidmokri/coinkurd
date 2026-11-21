@@ -329,6 +329,14 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
             # کلیدی که پروژه‌اش سطح رایگان ندارد: تا آخر این اجرا هیچ درخواستی را جواب نمی‌دهد، پس کنارش می‌گذاریم
             # تا کارگرش بی‌جهت دسته‌های بعدی را نسوزاند
             raise QuotaError("this key's Google project has no Gemini free tier (it needs billing)")
+        # A key that Google rejects outright (deleted, revoked, mistyped when it was pasted into the secret) used to
+        # raise from here and take the whole attempt down with it, so one dead key among twenty-five held three
+        # languages out of the 2026-11-21 episode. Retire it for this run and carry on with the next key, the way a
+        # spent quota does; pool_report() names its secret at the end of the run so it can be replaced.
+        if r.status_code in (400, 401, 403) and re.search(
+                r"API[ _]key[ _]not[ _]valid|API_KEY_INVALID|API[ _]key[ _]expired|API[ _]key[ _]not[ _]found",
+                r.text, re.I):
+            raise QuotaError(f"Google rejects this key ({r.status_code}: not valid) — replace the secret")
         if r.status_code >= 400:
             raise RuntimeError(f"{r.status_code} on key {fp}: {r.text[:300]}")
         data = r.json()
