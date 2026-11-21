@@ -144,6 +144,8 @@ def report_ok(ed, t, alb, link):
     sk = (f.get("movers") or {}).get("skipped") or []
     if sk:
         lines.append("ℹ️ ارزهای بدون نشان تأییدشده کنار گذاشته شدند: " + "، ".join(sk))
+    for n in (alb.get("notes") or [])[:4]:          # data that needed fixing — the edition still went out
+        lines.append("ℹ️ " + A.IC.clean(n)[:200])
     tell_admins("\n".join(lines))
 
 

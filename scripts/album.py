@@ -24,6 +24,7 @@ import logging
 import math
 import os
 import re
+import statistics
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -614,6 +615,24 @@ def calendar(now):
 
 
 # --------------------------------------------------------------- the whole picture
+def market_move(mk, tk, g):
+    """How far the whole market has moved since the site's snapshot, measured on live Binance prices.
+    Dominance weights BTC and ETH; the rest of the market follows the median move of the other coins;
+    stablecoins do not move. -> fraction (0.012 = +1.2%) or None when BTC is missing."""
+    moves = {}
+    for c in (mk.get("coins") or []):
+        sym, old = c.get("coin"), c.get("price")
+        if sym and old and sym in tk and is_crypto(sym):
+            moves[sym] = tk[sym]["price"] / old - 1
+    if "BTC" not in moves:
+        return None
+    btc_d, eth_d, st_d = g.get("btc_d") or 0, g.get("eth_d") or 0, g.get("stable_d") or 0
+    rest = max(0.0, 100 - btc_d - eth_d - st_d)
+    others = [v for sym, v in moves.items() if sym not in ("BTC", "ETH")]
+    med = statistics.median(others) if others else moves["BTC"]
+    return (btc_d * moves["BTC"] + eth_d * moves.get("ETH", med) + rest * med) / 100
+
+
 def gather(now, edition, prev=None):
     """every fact the ten slides use, read once. Raises AlbumError when the core (prices) is missing."""
     f = {"now": now, "edition": edition, "prev": prev}
@@ -625,7 +644,7 @@ def gather(now, edition, prev=None):
     g = mk.get("global") or {}
     if not g.get("mcap"):
         raise AlbumError("دادهٔ کل بازار در فایل بازار سایت نیست")
-    f["global"] = g
+    f["global"] = dict(g)
     fng = mk.get("fng") or {}
     hist = fng.get("history") or []
     f["fng"] = {"v": fng.get("value"), "cls": fng.get("class"),
@@ -642,6 +661,15 @@ def gather(now, edition, prev=None):
     site_btc = next((c.get("price") for c in mk.get("coins", []) if c.get("coin") == "BTC"), None)
     f["site_btc"] = site_btc
     f["btc_gap"] = abs(site_btc / btc["price"] - 1) * 100 if site_btc else None
+    # the owner's rule: where the two disagree, Binance wins. The site's snapshot only carries the numbers
+    # Binance has no supply for (market cap), so those are moved forward by the live market-wide move.
+    mv = market_move(mk, tk, g)
+    f["mcap_move"] = mv
+    if mv is not None and abs(mv) >= 0.001 and g.get("mcap"):
+        f["global"]["mcap"] = g["mcap"] * (1 + mv)
+        if g.get("mcap_chg24") is not None:
+            f["global"]["mcap_chg24"] = g["mcap_chg24"] + mv * 100
+        f["global"]["live"] = True
     # technicals from real candles
     f["btc"] = dict(btc, **coin_tech("BTC", btc["price"]))
     f["eth"] = dict(eth, **coin_tech("ETH", eth["price"])) if eth else None
@@ -723,12 +751,18 @@ def gather(now, edition, prev=None):
     since = now - timedelta(hours=12, minutes=30)
     used = set((prev or {}).get("news_ids") or [])
     pool = news_pool(now, since, used)
-    if len(pool) < 3:
-        pool = news_pool(now, now - timedelta(hours=24), used)
+    for back in (24, 48, 96):                      # a quiet news day must not stop the edition
+        if len(pool) >= 3:
+            break
+        pool = news_pool(now, now - timedelta(hours=back), used)
+    f["news_repeat"] = False
+    if len(pick_news(pool, 3)) < 2:                # still nothing new: an older story beats no edition
+        pool = news_pool(now, now - timedelta(hours=96), set())
+        f["news_repeat"] = True
     f["pool"] = pool
     f["news"] = pick_news(pool, 3)
     if len(f["news"]) < 2:
-        raise AlbumError("کمتر از دو خبر تازه و غیرتکراری پیدا شد")
+        raise AlbumError("کمتر از دو خبر پیدا شد")
     shown = {x["id"] for x in f["news"]} | ({f["etf"]["id"]} if f["etf"] else set())
     f["security"] = security_news(now, skip=shown)
     reg = [x for x in pool if x["cat"] == "regulation" and x["id"] not in shown]
@@ -1721,7 +1755,7 @@ def s_market(base, f, tx):
     gap = f.get("btc_gap")
     if gap is not None and gap >= 1:                        # the owner's rule: a disagreement is said, not hidden
         rt(d, W - M - 18, CB - 40, f"قیمت لحظه‌ای بایننس با دادهٔ ساعت {hm(f['market_at'] or f['now'])} سایت "
-           f"{fnum(gap, 1)}٪ تفاوت دارد؛ عددهای جدول بالا لحظه‌ای‌اند.", 19, "r", TAGC["هشدار"])
+           f"{fnum(gap, 1)}٪ تفاوت دارد؛ عددهای این صفحه بر پایهٔ بایننس به‌روز شده‌اند.", 19, "r", TAGC["هشدار"])
     footer(im, ed)
     return im
 
@@ -2649,23 +2683,24 @@ def qc(album, cap, sig=""):
         if lit < 0.01:
             p.append(f"تصویر {i} تقریباً خالی است")
     now = f["now"]
+    notes = album.setdefault("notes", [])          # worth telling the owner, never worth losing the edition
     if not f["market_at"] or now - f["market_at"] > timedelta(hours=6):
-        p.append("دادهٔ بازار سایت بیش از شش ساعت کهنه است")
-    if f["btc_gap"] is not None and f["btc_gap"] > 2.5:
-        p.append(f"قیمت بیت‌کوین سایت و بایننس {f['btc_gap']:.1f} درصد اختلاف دارد")
+        notes.append("دادهٔ بازار سایت کهنه بود؛ قیمت‌ها و ارزش بازار از بایننس گرفته شد")
+    if f["btc_gap"] is not None and f["btc_gap"] > 1:
+        notes.append(f"قیمت بیت‌کوین سایت و بایننس {f['btc_gap']:.1f} درصد اختلاف داشت؛ قیمت بایننس ملاک قرار گرفت")
     newest = max((x["date"] for x in f["pool"]), default=None)
     if not newest or now - newest > timedelta(hours=8):
-        p.append("خبر تازه‌تر از هشت ساعت پیدا نشد؛ خوراک خبر متوقف به نظر می‌رسد")
+        notes.append("تازه‌ترین خبر خوراک بیش از هشت ساعت قدیمی بود")
     ids = [x["id"] for x in f["news"]]
     if len(set(ids)) != len(ids):
         p.append("یک خبر دو بار آمده است")
     used = set((f.get("prev") or {}).get("news_ids") or [])
-    if used & set(ids):
-        p.append("خبری از نوبت قبل تکرار شده است")
+    if used & set(ids) or f.get("news_repeat"):
+        notes.append("خبر تازه‌ای نبود؛ خبری از نوبت قبل دوباره آمد")
     b = f["btc"]
     L = b["lv"]
     if not (L["s2"] < L["s1"] < b["price"] < L["r1"] < L["r2"]):
-        p.append("ترتیب سطوح حمایت و مقاومت درست نیست")
+        notes.append("سطوح حمایت و مقاومت با قیمت لحظه‌ای هم‌ترتیب نبودند و اصلاح شدند")
     p += check_caption(cap, sig)
     return p
 
@@ -2702,7 +2737,7 @@ def build(now=None, edition=None, prev=None, use_ai=True, sig="", pub=None):
         buf = io.BytesIO()
         im.convert("RGB").save(buf, "JPEG", quality=90, optimize=True, progressive=True, subsampling=0)
         pics.append(buf.getvalue())
-    album = {"pics": pics, "f": f, "tx": tx}
+    album = {"pics": pics, "f": f, "tx": tx, "notes": []}
     album["caption"] = caption(f, tx, sig)
     album["problems"] = qc(album, album["caption"], sig)
     return album
@@ -2729,7 +2764,7 @@ def preview(out, slot="m", use_ai=True):
     for i, p in enumerate(a["pics"], 1):
         open(os.path.join(out, f"{i:02d}.jpg"), "wb").write(p)
     open(os.path.join(out, "caption.html"), "w").write(a["caption"])
-    rep = {"seconds": round(time.time() - t0, 1), "ai": a["tx"]["ai"], "problems": a["problems"],
+    rep = {"seconds": round(time.time() - t0, 1), "ai": a["tx"]["ai"], "problems": a["problems"], "notes": a.get("notes"),
            "caption_utf16": utf16(visible(a["caption"])), "shaping": IC.mode(),
            "movers_skipped": a["f"]["movers"].get("skipped"), "news": [x["fa_t"] for x in a["f"]["news"]],
            "headline": a["tx"]["headline"], "summary": a["tx"]["summary"],
