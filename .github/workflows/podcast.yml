@@ -159,3 +159,12 @@ jobs:
           else
             python scripts/podcast/publish.py --ep "$EP" --dry-run
           fi
+
+      - name: Tell the owner if the episode did not go out
+        if: failure()
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_ALERT_CHAT: ${{ secrets.TG_ALERT_CHAT }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python scripts/podcast/notify.py "$EP"
