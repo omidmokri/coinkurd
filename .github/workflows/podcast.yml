@@ -152,8 +152,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REF_BOT_TOKEN: ${{ secrets.REF_BOT_TOKEN }}
         run: |
-          git config user.name "coinkurd-bot"
-          git config user.email "bot@users.noreply.github.com"
+          git config user.name "Omid Dabbaghchi Mokri (via Coin_Kurd Autopilot)"
+          git config user.email "omidmokri@users.noreply.github.com"
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.mode }}" = "publish" ]; then
             python scripts/podcast/publish.py --ep "$EP"
           else
