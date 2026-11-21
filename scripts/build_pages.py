@@ -634,6 +634,9 @@ def lastmod(d):
         return str(d)[:10]
 
 
+NEWS_LANG = {"ckb": "ku"}   # the news sitemap takes ISO 639-1 codes only
+
+
 def build_news_sitemap():
     """/news-sitemap.xml — Google's news sitemap: only the posts of the last 48 hours, at most 1,000, as the
        documentation requires (https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap).
@@ -658,8 +661,10 @@ def build_news_sitemap():
             if isinstance(x, dict) and x.get("text") and x.get("title"):
                 langs.append((lg, f"{SITE}/{lg}/p/{p['id']}/", x["title"]))
         for lg, u, ttl in langs:
+            # Google rejects the three-letter "ckb" here (Search Console: "Invalid tag value", 16 instances,
+            # 2026-11-21) — it wants the two-letter ISO 639-1 code, so Sorani is declared as Kurdish.
             rows.append(f'<url><loc>{e(u)}</loc><news:news><news:publication><news:name>entekhab.net</news:name>'
-                        f"<news:language>{lg}</news:language></news:publication>"
+                        f"<news:language>{NEWS_LANG.get(lg, lg)}</news:language></news:publication>"
                         f"<news:publication_date>{t.isoformat(timespec='seconds')}</news:publication_date>"
                         f"<news:title>{e(ttl[:110])}</news:title></news:news></url>")
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
