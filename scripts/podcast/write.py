@@ -242,6 +242,53 @@ def spoken(text):
     return BR.sub(lambda m: m.group(2), text)
 
 
+# Our own names, which belong in every episode: the show signs off with them, so a writer that spells them in Latin
+# letters was doing as it was told. Spelling them out letter by letter (the rule for an acronym like ETF) would be
+# nonsense, and reporting them held back every language -- for a week in November 2026 nothing was published because
+# of exactly this. So each one is wrapped as ⟦shown|spoken⟧ here: the transcript keeps the Latin spelling and the
+# voice reads it in its own letters. The spoken side is the display spelling that textnorm's lexicon already tunes
+# (see textnorm.LEX / produce.FA_DISPLAY), so the Persian voice says "کُیْن کورْد", not "koyn kurd".
+# Longest first: "Coin Kurd" must match before "Coin".
+NAMES = {
+    "entekhab.net": {"fa": "انتخاب دات نت", "ckb": "ئەنتیخاب دۆت نێت", "ar": "انتخاب دوت نت"},
+    "Coin_Kurd": {"fa": "کوین کورد", "ckb": "کۆین کورد", "ar": "كوين كورد"},
+    "Coin Kurd": {"fa": "کوین کورد", "ckb": "کۆین کورد", "ar": "كوين كورد"},
+    "Entekhab": {"fa": "انتخاب", "ckb": "ئەنتیخاب", "ar": "انتخاب"},
+    "Telegram": {"fa": "تلگرام", "ckb": "تێلێگرام", "ar": "تليجرام"},
+    "Coin": {"fa": "کوین", "ckb": "کۆین", "ar": "كوين"},
+    "Kurd": {"fa": "کورد", "ckb": "کورد", "ar": "كورد"},
+}
+NAME_RE = re.compile("|".join(re.escape(k) for k in sorted(NAMES, key=len, reverse=True)))
+
+
+def fix_names(par, lang):
+    """Wrap our own Latin-spelled names with how the voice should say them, outside existing markup."""
+    def wrap(m):
+        return f"⟦{m.group(0)}|{NAMES[m.group(0)][lang]}⟧"
+    out, last = [], 0
+    for m in BR.finditer(par):
+        out.append(NAME_RE.sub(wrap, par[last:m.start()])); out.append(m.group(0)); last = m.end()
+    out.append(NAME_RE.sub(wrap, par[last:]))
+    return "".join(out)
+
+
+def latin_left(sc, lang="fa"):
+    """Sentences whose spoken side still carries a Latin word, for pruning. Run after fix_latin, which wraps our own
+    names and the acronyms; what is left is an ordinary English word the writer failed to translate."""
+    bad = []
+    for s in sc["sections"]:
+        for par in s["paras"]:
+            for sent in re.split(r"(?<=[.!?؟])\s+", par.strip()):
+                lat = sorted(set(re.findall(r"[A-Za-z][A-Za-z&.'-]*", spoken(sent))))
+                if lat:
+                    bad.append((s["id"], sent, lat))
+    for kp in sc.get("key_points", []):
+        lat = sorted(set(re.findall(r"[A-Za-z][A-Za-z&.'-]*", spoken(kp))))
+        if lat:
+            bad.append(("key_points", kp, lat))
+    return bad
+
+
 def fix_latin(sc, lang):
     """Capital abbreviations left outside markup (e.g. 'ETF') are wrapped and spelled by rule; any other Latin word in
     the spoken text is reported (the model is asked to rewrite it)."""
@@ -257,6 +304,7 @@ def fix_latin(sc, lang):
     for s in sc["sections"]:
         new = []
         for par in s["paras"]:
+            par = fix_names(par, lang)        # our own names first, so they are not spelled letter by letter
             out, last = [], 0
             for m in BR.finditer(par):        # only outside existing markup
                 out.append(re.sub(r"\b[A-Z]{2,6}\b", wrap, par[last:m.start()])); out.append(m.group(0)); last = m.end()
@@ -340,11 +388,17 @@ class Writer:
         return sc, problems
 
     def prune(self, sc, pool, ctx):
-        """Last resort for the master: drop the sentences that still carry an untraceable figure."""
+        """Last resort for the master: drop the sentences that still carry an untraceable figure, or an English word
+        the Persian voice cannot read (our own names are already handled by fix_names). One dropped sentence costs a
+        little content; holding the master cost the whole day's episode in all four languages."""
         bad = untraceable(sc, pool)
-        if len(bad) > 4:
-            return sc, [f"{len(bad)} sentences with untraceable figures"]
-        drop = {sent for _, sent, _ in bad}
+        lat = latin_left(sc)
+        if len(bad) + len(lat) > 5:
+            return sc, [f"{len(bad)} sentences with untraceable figures, {len(lat)} with Latin words"]
+        if lat:
+            self.log.append(f"fa: pruned {len(lat)} sentence(s) with a Latin word: "
+                            f"{sorted({w for _, _, ws in lat for w in ws})}")
+        drop = {sent for _, sent, _ in bad} | {sent for _, sent, _ in lat}
         for s in sc["sections"]:
             paras = []
             for par in s["paras"]:

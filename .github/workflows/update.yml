@@ -663,6 +663,37 @@ jobs:
       # arrives while the chain's next run is pending replaces (cancels) that pending run, and on
       # 2026-11-08 that silently ended the chain for over an hour. A burst of pushes still yields
       # one chain, because GitHub keeps only the newest pending run of the group.
+      # The daily podcast rides this chain instead of trusting GitHub's cron. Through November its own
+      # "50 13 * * *" schedule reached this repository between 21:30 and 23:00 UTC — hours after the 19:00
+      # Tehran slot it exists for — while this chain dispatches itself every half hour and runs on time. So
+      # the first sync run inside the window below starts the episode, early enough for publish.py to post it
+      # on the minute at 19:00 Tehran (15:30 UTC). Posting cannot double up: one podcast run at a time (its
+      # concurrency group), the guard at the top of podcast.yml, and the ledger publish.py checks before it posts.
+      - name: Start today's podcast (19:00 Tehran) if it has not run yet
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          now=$(( 10#$(date -u +%H) * 60 + 10#$(date -u +%M) ))
+          if [ "$now" -lt 800 ] || [ "$now" -gt 870 ]; then
+            echo "outside the podcast window 13:20-14:30 UTC (now $((now / 60)):$((now % 60)) UTC)"; exit 0
+          fi
+          today=$(date -u +%F)
+          f="data/podcast/$today.json"
+          if [ -f "$f" ] && python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('telegram') else 1)"; then
+            echo "today's episode is already posted"; exit 0
+          fi
+          runs=$(gh run list --repo "${{ github.repository }}" --workflow podcast.yml -L 20 \
+            --json status,createdAt --jq "[.[] | select(.createdAt >= \"${today}T11:00:00Z\")]" || echo "")
+          if [ -z "$runs" ]; then echo "::warning::could not read the podcast runs; not dispatching"; exit 0; fi
+          going=$(echo "$runs" | jq '[.[] | select(.status != "completed")] | length')
+          if [ "$going" != "0" ]; then echo "a podcast run is already going"; exit 0; fi
+          tries=$(echo "$runs" | jq 'length')
+          if [ "$tries" -ge 2 ]; then echo "today's episode was attempted $tries times already"; exit 0; fi
+          gh workflow run podcast.yml --repo "${{ github.repository }}" --ref main -f mode=publish \
+            && echo "podcast dispatched for $today (attempt $((tries + 1)))" \
+            || echo "::warning::could not dispatch the podcast; the next sync run tries again"
+
       - name: Start next run
         if: always()
         env:
