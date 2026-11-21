@@ -27,8 +27,9 @@ log = logging.getLogger("album")
 SLOTS = (("m", 4, 0), ("e", 16, 0))          # UTC → 07:30 and 19:30 Tehran
 LEAD = 8 * 60                                 # build eight minutes before the slot, post on the minute
 LATE = 75 * 60                                # a slot missed by a restart is still posted within 75 minutes
-RETRY = 4 * 60                                # a failed build is tried again after four minutes …
-MAX_TRIES = 3                                 # … three times at most
+RETRY = 7 * 60                                # a failed build is tried again after seven minutes …
+MAX_TRIES = 8                                 # … for most of the 75-minute window, so one bad minute
+                                              #    (a slow feed, a quota, a network hiccup) never costs an edition
 START = datetime(2026, 11, 12, 16, 0, tzinfo=timezone.utc)      # the first live edition (19:30 Tehran, 21 Aban)
 KEEP = 30
 
