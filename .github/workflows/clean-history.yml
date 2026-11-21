@@ -31,5 +31,5 @@ jobs:
 
       - name: Force push cleaned history
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/omidmokri/coinkurd.git
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/omidmokri/coinkurd.git
           git push origin main --force
