@@ -5,7 +5,10 @@ and the weekday, each in the language's own words and digits.
 """
 import datetime as dt
 
-LANGS = ("fa", "ckb", "en", "ar")
+# The podcast's languages, in the order the album carries them (telegram.POST_LANGS keeps the same order).
+# Arabic was dropped on 2026-11-21: the episode is made and posted in Kurdish, Persian and English. The rest of
+# entekhab.net keeps its Arabic as it was — this list is the podcast's alone.
+LANGS = ("ckb", "fa", "en")
 DIR = {"fa": "rtl", "ckb": "rtl", "en": "ltr", "ar": "rtl"}
 
 SHOW = {

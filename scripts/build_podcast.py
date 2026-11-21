@@ -22,7 +22,9 @@ e = BP.e
 L = R.L
 ROOT = BP.ROOT
 D = os.path.join(ROOT, "data", "podcast")
-ORDER = ("fa", "ckb", "en", "ar")
+# Kurdish first, then Persian, then English — the order the channel post uses too. Arabic stays in the list for
+# the episodes that already have an Arabic version; the podcast stopped making new ones on 2026-11-21.
+ORDER = ("ckb", "fa", "en", "ar")
 DIRS = {"fa": "rtl", "ckb": "rtl", "en": "ltr", "ar": "rtl"}
 TAG = {"fa": "🟢 فارسی", "ckb": "☀️ کوردی", "en": "🔵 English", "ar": "🟠 العربية"}
 
