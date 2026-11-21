@@ -1,10 +1,10 @@
 # AUTOPILOT — the site's autonomous improvement loop
 
-> **برای مالک سایت:** این فایل دفتر کار خودکار سایت است. هر یک ساعت یک بار، یک جلسهٔ تازهٔ Claude این فایل را می‌خواند،
+> **برای مالک سایت:** این فایل دفتر کار خودکار سایت است. هر یک ساعت یک بار، یک جلسهٔ تازهٔ خودکار این فایل را می‌خواند،
 > یکی از نیازهای واقعی تریدرها را انتخاب می‌کند، آن را می‌سازد، آزمایش می‌کند و منتشر می‌کند، و همین‌جا (بخش «Log») ثبت می‌کند
 > چه کرد، چرا و چطور بررسی شد. هر تغییر در تاریخچهٔ git هم با پیشوند `autopilot:` دیده می‌شود.
 
-Every hour a fresh Claude session with no memory of earlier runs opens this file. It is the only memory the loop has:
+Every hour a fresh autonomous session directed by Omid Dabbaghchi Mokri, with no memory of earlier runs, opens this file. It is the only memory the loop has:
 the mission, the rules, how to work, the backlog and the log. **Read all of it before doing anything.**
 
 ## Mission
