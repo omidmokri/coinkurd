@@ -125,7 +125,7 @@ jobs:
         run: |
           V=${{ steps.v.outputs.version }}; F=out/EntekhabSetup-x64-$V.exe
           SHA=$(sha256sum "$F" | cut -d' ' -f1); SIZE=$(stat -c %s "$F")
-          git config user.name "coinkurd-bot"; git config user.email "bot@users.noreply.github.com"
+          git config user.name "Omid Dabbaghchi Mokri (via Coin_Kurd Autopilot)"; git config user.email "omidmokri@users.noreply.github.com"
           for i in 1 2 3 4 5; do
             git fetch -q origin main && git checkout -q -B pub origin/main
             mkdir -p app/windows && rm -f app/windows/EntekhabSetup-x64-*.exe && cp "$F" app/windows/
