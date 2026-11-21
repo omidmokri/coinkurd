@@ -24,7 +24,10 @@ BR = re.compile(r"⟦([^|⟧]*)\|([^⟧]*)⟧")
 
 # One coordinated but distinct identity per language; chosen by the intelligibility test (qc_voices.json)
 VOICE = {
-    "fa": dict(backend="piper", folder="vits-piper-fa_IR-ganji_adabi-medium", sid=0, speed=1.2),
+    # Persian was read a fifth faster than the others and it cost intelligibility: on 2026-11-21 the listening test
+    # put it at 0.36 against a limit of 0.35 and the Persian version was held out of the episode that went to the
+    # channel. Back to near-normal pace — a little longer to listen to, and understood.
+    "fa": dict(backend="piper", folder="vits-piper-fa_IR-ganji_adabi-medium", sid=0, speed=1.05),
     "ar": dict(backend="piper", folder="vits-piper-ar_JO-kareem-medium", sid=0, speed=1.4),
     "ckb": dict(backend="vekol", folder="vekol", sid=0, speed=1.0),   # Vekol-TTS edge, the site's own Sorani voice
     "en": dict(backend="kokoro", folder="kokoro-en-v0_19", sid=1, speed=1.0),

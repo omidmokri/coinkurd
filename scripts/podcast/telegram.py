@@ -1,4 +1,4 @@
-"""The day's Telegram post: ONE album in @Coin_Kurd with the four audio versions together.
+"""The day's Telegram post: ONE album in @Coin_Kurd with the audio versions together.
 
 Each audio carries its own caption in its own language, opening with the language's tag (🟢 فارسی, ☀️ کوردی,
 🔵 English, 🟠 العربية) — and the audio's player title starts with the same tag — so a listener sees at once which
@@ -23,6 +23,20 @@ SIG = ('<a href="https://t.me/+QdxOfpXU3tdhOTA0">🅲🅾️🅸🅽 🅺🆄�
 TAGS = "#نبض_کریپتو #پادکست #بیت_کوین #کوین_کورد"
 CHANNEL = os.environ.get("PODCAST_CHAT", "@Coin_Kurd")
 
+# The album's running order, and the only languages it carries: Kurdish first, then Persian, then English.
+POST_LANGS = ("ckb", "fa", "en")
+
+# Bidirectional text. A caption in Persian, Kurdish or Arabic is one right-to-left paragraph with Latin words, digits
+# and links sitting inside it, and the plain text used to come out scrambled in Telegram: bullets drifting to the
+# wrong end of their line, and the signature's names breaking across lines in the wrong order. Two invisible marks
+# fix it, and both are ignored by anything that does not understand them:
+#   RLM at the head of a line fixes that line's direction as right-to-left, so a bullet or an emoji opening the line
+#   stays on the right where it belongs;
+#   FSI ... PDI around a Latin run (a link's label, the signature) isolates it, so the run reads left to right as a
+#   unit and cannot be reordered against the text around it.
+RLM, LRM, FSI, PDI = "\u200f", "\u200e", "\u2068", "\u2069"
+
+
 L = {
     "fa": dict(inside="📌 در این قسمت:", page="🔗 متن کامل، فصل‌ها و منابع:", warn="⚠️ تحلیل و اطلاع‌رسانی است، نه توصیهٔ مالی.",
                length="⏱ {m} دقیقه"),
@@ -36,6 +50,19 @@ L = {
 LIMIT = 1024
 
 
+def ltr(h):
+    """Isolate a left-to-right run so the text around it cannot reorder it."""
+    return f"{FSI}{h}{PDI}"
+
+
+def rtl_lines(h):
+    """Open every non-empty line with the right-to-left mark."""
+    return "\n".join((RLM + ln if ln.strip() else ln) for ln in h.split("\n"))
+
+
+LIMIT = 1024
+
+
 def visible(h):
     return len(html.unescape(re.sub(r"<[^>]+>", "", h)))
 
@@ -45,23 +72,38 @@ def e(s):
 
 
 def caption(sc, lang, url, minutes, last=False, n_points=4):
+    """One language's caption. Laid out in blocks with a blank line between them — heading, title, what is in the
+    episode, the link — and on the last audio the warning, the hashtags and the signature, each its own block. The
+    link shows as the word Link rather than a bare address: a long URL in a right-to-left caption wraps badly and
+    reads as noise. Right-to-left captions get the marks above so none of it comes out jumbled."""
     t = L[lang]
     d = sc.get("display", sc)
+    rtl = LB.DIR[lang] == "rtl"
     tail = ""
     if last:
-        tail = f"\n\n{t['warn']}\n{TAGS}\n{SIG}"
+        tail = f"\n\n{t['warn']}\n\n{{TAGS}}\n\n{{SIG}}"
     for n in range(n_points, 1, -1):
         pts = "\n".join(f"• {e(p)}" for p in d["key_points"][:n])
-        h = (f"{LB.TAG[lang]} | 🎙 <b>{e(sc['show'])}</b> · {e(sc['episode_label'])}\n"
+        h = (f"{LB.TAG[lang]}\n"
+             f"🎙 <b>{e(sc['show'])}</b> · {e(sc['episode_label'])}\n"
              f"📅 {e(sc['date_label'])} · {t['length'].format(m=LB.digits(minutes, lang))}\n\n"
-             f"<b>{e(d['title'])}</b>\n\n{t['inside']}\n{pts}\n\n{t['page']} {url}{tail}")
+             f"<b>{e(d['title'])}</b>\n\n"
+             f"{t['inside']}\n{pts}\n\n"
+             f"{t['page']} <a href=\"{e(url)}\">LINKWORD</a>{tail}")
+        if rtl:
+            h = rtl_lines(h)
+        # The hashtags are Persian and the signature is Latin, whichever language the caption is in, so both are
+        # isolated: each keeps its own direction instead of taking the direction of the caption around it.
+        h = (h.replace("LINKWORD", ltr("Link"))
+              .replace("{TAGS}", f"{FSI}{TAGS}{PDI}")
+              .replace("{SIG}", ltr(SIG)))
         if visible(h) <= LIMIT:
             return h
     raise ValueError(f"{lang}: caption over {LIMIT} characters even with two points")
 
 
 def build(ep, langs, base_url="https://entekhab.net"):
-    langs = [l for l in LB.LANGS if l in langs]
+    langs = [l for l in POST_LANGS if l in langs]
     items = []
     for i, lang in enumerate(langs):
         sc = json.load(open(os.path.join(ep, f"script_{lang}.json"), encoding="utf-8"))
