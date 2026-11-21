@@ -25,6 +25,8 @@ html.ob-nofs-scroll{overflow:hidden}
 .ob-top{display:flex;align-items:center;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#121316,#0e0e10)}
 .ob-tabs{display:flex;gap:2px;padding:6px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto}
 .ob-tabs::-webkit-scrollbar{display:none}
+/* from a tablet up the row breaks into as many lines as it needs, so every chart is reachable without scrolling */
+@media (min-width:760px){.ob-tabs{flex-wrap:wrap;overflow-x:visible}.ob-top{align-items:flex-start}}
 .ob-tab,.ob-all{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:12px;color:#c9c9c4;text-decoration:none;white-space:nowrap;font-weight:700;font-size:.92rem;transition:background .15s,color .15s}
 .ob-tab:hover,.ob-all:hover{background:#1a1b1f;color:#fff}
 .ob-tab.on{background:rgba(247,147,26,.14);color:var(--acc);box-shadow:inset 0 0 0 1px rgba(247,147,26,.35)}

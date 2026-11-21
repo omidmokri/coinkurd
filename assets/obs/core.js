@@ -267,15 +267,18 @@
   function build(key) {
     root = d.getElementById('ob'); if (!root) return;
     var view = OB.views[key];
-    var tabs = OB.PAGES.map(function (p) {
+    /* tabs whose label carries Latin letters (CVD, Hyperliquid, MVRV, SSR) sit at the end of the row */
+    var plain = [], latin = [];
+    OB.PAGES.forEach(function (p) { (/[A-Za-z]/.test(T('tab_' + p.k)) ? latin : plain).push(p); });
+    var tabs = plain.concat(latin).map(function (p) {
       return '<a class="ob-tab' + (p.k === key ? ' on' : '') + '" href="' + p.path + '"' + (p.k === key ? ' aria-current="page"' : '') + '>' + OB.icon(p.ic) + '<span>' + esc(T('tab_' + p.k)) + '</span></a>';
     }).join('');
     root.innerHTML = '<div class="ob-top"><nav class="ob-tabs" aria-label="' + esc(T('nav')) + '">' + tabs + '</nav>' +
       '<a class="ob-all" href="/charts/">' + OB.icon('grid') + '<span>' + esc(T('all')) + '</span></a></div><div class="ob-view" id="ob-view"></div>';
     root.setAttribute('dir', OB.rtl() ? 'rtl' : 'ltr');
-    /* on a narrow screen the row of tabs scrolls sideways: bring the page's own tab to the middle */
+    /* on a phone the row still scrolls sideways: bring the page's own tab to the middle */
     var nav = $('.ob-tabs', root), on = $('.ob-tab.on', root);
-    if (nav && on) { var ra = on.getBoundingClientRect(), rb = nav.getBoundingClientRect(); nav.scrollLeft += (ra.left + ra.width / 2) - (rb.left + rb.width / 2); }
+    if (nav && on && nav.scrollWidth > nav.clientWidth) { var ra = on.getBoundingClientRect(), rb = nav.getBoundingClientRect(); nav.scrollLeft += (ra.left + ra.width / 2) - (rb.left + rb.width / 2); }
     curKey = key; cur = null;
     if (view) { cur = view; try { view.mount($('#ob-view', root)); } catch (e) { if (w.console) console.error(e); $('#ob-view', root).innerHTML = '<div class="ob-wait ob-err">' + esc(T('err_view')) + '</div>'; } }
     else $('#ob-view', root).innerHTML = '<div class="ob-wait">…</div>';
