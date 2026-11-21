@@ -1099,6 +1099,18 @@ def ai_json(prompt, tokens=1600):
     return json.loads(raw)
 
 
+def ai_obj(data, key=None):
+    """The model sometimes answers with a bare list instead of the object it was asked for.
+    Make it the object the caller expects, so a stray answer costs a text, never the edition."""
+    if isinstance(data, dict):
+        return data
+    if isinstance(data, list):
+        if key:
+            return {key: data}
+        return next((x for x in data if isinstance(x, dict)), {})
+    return {}
+
+
 NEWS_PROMPT = """تو دبیر خبر کانال تلگرامی «کوین کورد» هستی. برای هر خبرِ زیر، چهار جملهٔ کوتاه و دقیق به فارسی روان بنویس:
 what: چه اتفاقی افتاده است (یک جمله، فقط بر پایهٔ متن خبر، حداکثر ۱۱۰ نویسه)
 why: چرا برای بازار رمزارز مهم است (حداکثر ۹۰ نویسه)
@@ -1121,11 +1133,13 @@ def ai_news(items):
         blocks.append(json.dumps({"id": x["id"], "title_fa": x["fa_t"], "summary_fa": x["fa_s"][:900],
                                   "title_en": x["title"], "source": src_fa(x["src"])}, ensure_ascii=False))
     try:
-        data = ai_json(NEWS_PROMPT + "\n".join(blocks))
+        data = ai_obj(ai_json(NEWS_PROMPT + "\n".join(blocks)), "items")
     except Exception as ex:
         log.info("AI news texts unavailable: %s", ex)
         return out
     for it in (data.get("items") or []):
+        if not isinstance(it, dict):
+            continue
         x = next((n for n in items if n["id"] == it.get("id")), None)
         if not x:
             continue
@@ -1188,7 +1202,7 @@ def ai_edition(f):
         return {}
     ft = facts_text(f)
     try:
-        data = ai_json(EDITION_PROMPT + ft, 900)
+        data = ai_obj(ai_json(EDITION_PROMPT + ft, 900))
     except Exception as ex:
         log.info("AI edition texts unavailable: %s", ex)
         return {}
@@ -1211,11 +1225,19 @@ def write(f, use_ai=True):
     """all words of the album: deterministic texts, with AI wording where it passed every check"""
     tx = {"headline": headline(f), "summary": conclusion(f), "lead": None, "news": {}, "ai": []}
     if use_ai:
-        got = ai_news(f["news"])
+        try:                                   # AI wording is a bonus: the fixed templates always stand behind it
+            got = ai_news(f["news"])
+        except Exception:
+            log.exception("AI news texts failed")
+            got = {}
         tx["news"].update(got)
         if got:
             tx["ai"].append(f"news×{len(got)}")
-        ed = ai_edition(f)
+        try:
+            ed = ai_edition(f)
+        except Exception:
+            log.exception("AI edition texts failed")
+            ed = {}
         for k in ("headline", "summary", "lead"):
             if ed.get(k):
                 tx[k] = ed[k]
