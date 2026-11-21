@@ -40,6 +40,9 @@ jobs:
         with: { sparse-checkout: data/podcast, sparse-checkout-cone-mode: false }
       - id: check
         run: |
+          if [ "${{ inputs.mode }}" = "dry-run" ]; then   # a dry run posts nothing, so nothing can be reposted
+            echo "go=1" >> "$GITHUB_OUTPUT"; exit 0
+          fi
           f="data/podcast/$(date -u +%F).json"
           if [ -f "$f" ] && python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('telegram') else 1)"; then
             echo "::notice::today's episode is already in the channel — nothing to do"
