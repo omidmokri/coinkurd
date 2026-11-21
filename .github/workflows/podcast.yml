@@ -58,6 +58,11 @@ jobs:
       PODCAST_FONTS: ${{ github.workspace }}/../podcast-fonts
       EP: ${{ github.workspace }}/_episode
       PYTHONUNBUFFERED: "1"
+      # The writer needs a capable model, not the quickest one. ai_check.py picks by latency and had settled on
+      # gemini-3.5-flash-lite (0.45 s); writing a 2000-word script it returned six unparsable answers in a row on
+      # 2026-11-21 and put figures in the script that the facts do not carry. ai.py still falls back through the
+      # list in data/ai_model.json when this model's quota runs out, so a busy day still gets an episode.
+      GEMINI_MODEL: gemini-3.6-flash
       # Every free Gemini key in this repository's secrets, as one pool for scripts/ai.py — the same pool the site
       # sync uses (update.yml). Until 2026-11-21 this job passed only two of them, so the writer ran on a single key,
       # hit its per-day quota every evening and the episode was held: that is why nothing was published for a week.

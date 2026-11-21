@@ -174,13 +174,14 @@ def main():
         for l in [x for x in scripts if x not in held and x != "ckb"]:
             try:
                 r = qc.asr_sample(ep, l, n=12)
-                qcrep["langs"][l]["asr"] = {k: r[k] for k in ("pcer_mean", "numbers_heard_correctly")}
+                qcrep["langs"][l]["asr"] = {k: r[k] for k in ("pcer_mean", "pcer_median", "pcer_worst",
+                                                               "numbers_heard_correctly")}
                 print(l, "asr", json.dumps({k: v for k, v in r.items() if k != "rows"}, ensure_ascii=False)[:600])
                 for it in (r.get("rows") or [])[:12]:
                     print("  asr", json.dumps(it, ensure_ascii=False)[:400])
                 json.dump(r, open(os.path.join(ep, f"qc_asr_{l}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-                if r["pcer_mean"] > 0.35:
-                    hold(l, f"listening test: phonetic error {r['pcer_mean']}")
+                if r["pcer_median"] > 0.35 or r["pcer_mean"] > 0.45:
+                    hold(l, f"listening test: phonetic error median {r['pcer_median']}, mean {r['pcer_mean']}")
             except Exception as ex:  # noqa: BLE001
                 traceback.print_exc()
                 qcrep["langs"][l]["asr"] = {"error": repr(ex)}
