@@ -1,6 +1,6 @@
 # AUTOPILOT — the site's autonomous improvement loop
 
-> **برای مالک سایت:** این فایل دفتر کار خودکار سایت است. هر یک ساعت یک بار، یک جلسهٔ تازهٔ خودکار این فایل را می‌خواند،
+> **برای مالک سایت:** این فایل دفتر کار خودکار سایت است. هر یک ساعت یک بار، یک جلسهٔ تازهٔ خودکار این فایل را می‌خواندhh،
 > یکی از نیازهای واقعی تریدرها را انتخاب می‌کند، آن را می‌سازد، آزمایش می‌کند و منتشر می‌کند، و همین‌جا (بخش «Log») ثبت می‌کند
 > چه کرد، چرا و چطور بررسی شد. هر تغییر در تاریخچهٔ git هم با پیشوند `autopilot:` دیده می‌شود.
 
@@ -36,7 +36,7 @@ The site's strategy (agreed with the owner, 2026-11-07):
      in the Log entry of 2026-11-07 for the standard: null case, planted effect, edge cases, a hand-checked value).
    - UI: serve the repo copy (`python3 -m http.server`), screenshot with Playwright + `/usr/bin/google-chrome` at
      1280px and 390px, in fa and en; **look at the screenshots**; zero JS errors.
-4. **Publish.** One commit per run, message starting `autopilot:` and ending with the attribution lines the session asks
+4. **Publish.** One commit per run, message starting `autopilot:` . No Co-Authored-By or AI attribution lines — the commit author is Omid Dabbaghchi Mokri.
    for. `git pull --rebase origin main && git push origin HEAD:main` (re-rebase and retry up to 3 times if rejected).
    The same commit adds your entry at the top of **Log**.
 5. **Check the deploy.** `gh run list -R omidmokri/coinkurd -L 6` — the "Sync Telegram → Site" run after your commit must
