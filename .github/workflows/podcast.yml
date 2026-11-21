@@ -52,7 +52,7 @@ jobs:
     needs: gate
     if: needs.gate.outputs.go == '1'
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 200  # up to 70 min to make the episode, then up to 100 waiting for 19:00 Tehran
     env:
       PODCAST_MODELS: ${{ github.workspace }}/../podcast-models
       PODCAST_FONTS: ${{ github.workspace }}/../podcast-fonts

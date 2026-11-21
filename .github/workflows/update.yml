@@ -666,8 +666,9 @@ jobs:
       # The daily podcast rides this chain instead of trusting GitHub's cron. Through November its own
       # "50 13 * * *" schedule reached this repository between 21:30 and 23:00 UTC — hours after the 19:00
       # Tehran slot it exists for — while this chain dispatches itself every half hour and runs on time. So
-      # the first sync run inside the window below starts the episode, early enough for publish.py to post it
-      # on the minute at 19:00 Tehran (15:30 UTC). Posting cannot double up: one podcast run at a time (its
+      # the first sync run inside the window below starts the episode. The window is set so that the episode is
+      # ready shortly before 19:00 Tehran (15:30 UTC) and publish.py posts it on the minute: making one takes about
+      # 20 minutes, 70 at worst, and publish.py refuses to sit on the clock for more than 100. Posting cannot double up: one podcast run at a time (its
       # concurrency group), the guard at the top of podcast.yml, and the ledger publish.py checks before it posts.
       - name: Start today's podcast (19:00 Tehran) if it has not run yet
         if: always()
@@ -675,8 +676,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           now=$(( 10#$(date -u +%H) * 60 + 10#$(date -u +%M) ))
-          if [ "$now" -lt 800 ] || [ "$now" -gt 870 ]; then
-            echo "outside the podcast window 13:20-14:30 UTC (now $((now / 60)):$((now % 60)) UTC)"; exit 0
+          if [ "$now" -lt 840 ] || [ "$now" -gt 890 ]; then
+            echo "outside the podcast window 14:00-14:50 UTC (now $((now / 60)):$((now % 60)) UTC)"; exit 0
           fi
           today=$(date -u +%F)
           f="data/podcast/$today.json"

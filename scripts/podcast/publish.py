@@ -27,6 +27,8 @@ import labels as LB  # noqa: E402
 import telegram  # noqa: E402
 
 SITE = "https://entekhab.net"
+# The job is allowed 150 minutes (podcast.yml); never sit on the clock longer than this waiting for the release time.
+MAX_WAIT_MIN = 100
 
 
 def sh(*cmd, check=True, cwd=ROOT):
@@ -142,10 +144,19 @@ def main():
         return
     if not token:
         raise SystemExit("REF_BOT_TOKEN is not set")
+    # A run that begins after midnight Tehran builds TOMORROW's episode, whose release time is some eighteen hours
+    # off. Until 2026-11-21 that run cut the release, committed the site page and then slept on the clock until the
+    # job's 150-minute limit killed it: that is how 14, 17 and 19 November ended up with an episode page, an empty
+    # "telegram" in their ledger, and nothing in the channel. Such a run now stops before it changes anything, and
+    # the next one inside the window (update.yml dispatches it) publishes the episode properly.
+    rel = dt.datetime.fromisoformat(rec["release_utc"]).timestamp()
+    wait_min = (rel - time.time()) / 60
+    if not a.no_wait and wait_min > MAX_WAIT_MIN:
+        raise SystemExit(f"this run is {wait_min:.0f} min early for {rec['release_utc']} — more than this job can "
+                         f"wait out ({MAX_WAIT_MIN} min). Nothing released or posted; a run nearer the time does it.")
     release(ep, rec, live)
     commit(write_data(rec), f"podcast: episode {rec['n']} ({rec['date']}) — {', '.join(live)}")
     sh("gh", "workflow", "run", "pages.yml", "--ref", "main", check=False)
-    rel = dt.datetime.fromisoformat(rec["release_utc"]).timestamp()
     if a.no_wait or time.time() >= rel:          # a late run: give the page a few minutes, then post
         wait_page(rec["date"], until=time.time() + 12 * 60)
     else:                                        # on time: the page has until the release time, then post on the minute
