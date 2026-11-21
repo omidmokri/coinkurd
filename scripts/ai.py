@@ -339,5 +339,17 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
         if not as_json:
             return text.strip()
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
-        return json.loads(text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as ex:
+            # A long answer can come back cut in half (finishReason MAX_TOKENS) or, now and then, simply
+            # malformed. Both used to burn one of the caller's few attempts — on 2026-11-21 two of the
+            # podcast writer's three attempts went this way and the day's episode was lost. Ask again on the
+            # same key instead, and only give up when the retries are spent.
+            why = (data.get("candidates") or [{}])[0].get("finishReason", "?")
+            if i < tries - 1:
+                print(f"invalid JSON from {mname} (finishReason={why}, {len(text)} chars): {ex}; asking again")
+                continue
+            raise RuntimeError(f"invalid JSON from {mname} after {tries} tries "
+                               f"(finishReason={why}, {len(text)} chars): {ex}") from ex
     raise RateLimited("rate limited after retries")

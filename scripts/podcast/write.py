@@ -122,6 +122,9 @@ PERSIAN MASTER (today's episode):
 FIX = """
 YOUR PREVIOUS ANSWER FAILED THESE CHECKS — return the whole JSON again with them fixed and nothing else changed:
 {problems}
+An "untraceable figure" is a number that is in none of the facts you were given: never adjust it to look right and
+never invent a replacement — either use the figure the facts actually carry, or rewrite the sentence without it.
+Return one complete JSON object and nothing else: no commentary before or after it, every string closed.
 """
 
 # numbers of the craft, always allowed: windows, indicator thresholds and periods, small counts, years
@@ -351,9 +354,11 @@ class Writer:
                              words=self.words if lang == "fa" else f"{self.words} (as long as the master)",
                              date_label=LB.date_label(ctx["day"], lang), episode_label=LB.episode_label(ctx["n"], lang))
 
-    def ask(self, prompt, check, what):
+    def ask(self, prompt, check, what, attempts=4):
+        """Ask until the answer passes `check`. Worth a few goes: an attempt costs a minute or two, and when the
+        master runs out of attempts the whole day is lost in all four languages."""
         sc, problems = None, None
-        for attempt in (1, 2, 3):
+        for attempt in range(1, attempts + 1):
             p = prompt + (FIX.format(problems="\n".join(f"- {x}" for x in problems)) if problems else "")
             try:
                 sc = self.gen(p)
@@ -382,7 +387,7 @@ class Writer:
             p += [f"time not allowed: {t}" for t in qc.times(all_text(sc), "fa", ctx["allowed_utc"])]
             p += [f"Latin left in spoken text of section {sid}: {w}" for sid, w in fix_latin(sc, "fa")]
             return p
-        sc, problems = self.ask(prompt, check, "fa")
+        sc, problems = self.ask(prompt, check, "fa", attempts=6)   # the master carries every language with it
         if sc and problems and not shape_problems(sc):
             sc, problems = self.prune(sc, pool, ctx)
         return sc, problems
