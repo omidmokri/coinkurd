@@ -113,9 +113,11 @@ CRAFT |= set(range(1400, 1411)) | set(range(2024, 2031))
 
 
 def _ignorable(x):
-    """Small whole numbers (1-5): one language writes them as words («one-hour», «یک‌ساعته»). Plus the craft and
-    calendar numbers above. Every figure the master carries is traced to the data separately."""
-    return x == int(x) and (0 < x <= 5 or int(x) in CRAFT)
+    """Small whole numbers (0-5): one language writes them as words («one-hour», «یک‌ساعته»), and a bare zero says
+    nothing about the market — no price, share or change is ever exactly zero, so it only ever comes from the way a
+    sentence is phrased, and on 2026-11-21 one held the English version twice over. Plus the craft and calendar
+    numbers above. Every figure the master carries is traced to the data separately."""
+    return x == int(x) and (0 <= x <= 5 or int(x) in CRAFT)
 
 
 def _unmatched(a, b):
