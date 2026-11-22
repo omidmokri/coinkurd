@@ -21,6 +21,49 @@ permissions:
 
 env:
   PYTHONUNBUFFERED: "1"
+  # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
+  # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
+  ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
+  AZARI_API_KEY: ${{ secrets.AZARI_API_KEY }}
+  HAMA_ADI_KEY: ${{ secrets.HAMA_ADI_KEY }}
+  HANA_ADI_KEY: ${{ secrets.HANA_ADI_KEY }}
+  HANA2_ADI_KEY: ${{ secrets.HANA2_ADI_KEY }}
+  KURD_ADI_KEY: ${{ secrets.KURD_ADI_KEY }}
+  MOKRI_API_KEY: ${{ secrets.MOKRI_API_KEY }}
+  OMID_API_KEY: ${{ secrets.OMID_API_KEY }}
+  SALAH_API_KEY: ${{ secrets.SALAH_API_KEY }}
+  SARA_API_KEY: ${{ secrets.SARA_API_KEY }}
+  # The owner's own numbered keys (he names them OMID01_ADI_KEY, OMID02_ADI_KEY …). Fifteen are listed so he
+  # can keep adding them in his own naming without this file changing again.
+  OMID01_ADI_KEY: ${{ secrets.OMID01_ADI_KEY }}
+  OMID02_ADI_KEY: ${{ secrets.OMID02_ADI_KEY }}
+  OMID03_ADI_KEY: ${{ secrets.OMID03_ADI_KEY }}
+  OMID04_ADI_KEY: ${{ secrets.OMID04_ADI_KEY }}
+  OMID05_ADI_KEY: ${{ secrets.OMID05_ADI_KEY }}
+  OMID06_ADI_KEY: ${{ secrets.OMID06_ADI_KEY }}
+  OMID07_ADI_KEY: ${{ secrets.OMID07_ADI_KEY }}
+  OMID08_ADI_KEY: ${{ secrets.OMID08_ADI_KEY }}
+  OMID09_ADI_KEY: ${{ secrets.OMID09_ADI_KEY }}
+  OMID10_ADI_KEY: ${{ secrets.OMID10_ADI_KEY }}
+  OMID11_ADI_KEY: ${{ secrets.OMID11_ADI_KEY }}
+  OMID12_ADI_KEY: ${{ secrets.OMID12_ADI_KEY }}
+  OMID13_ADI_KEY: ${{ secrets.OMID13_ADI_KEY }}
+  OMID14_ADI_KEY: ${{ secrets.OMID14_ADI_KEY }}
+  OMID15_ADI_KEY: ${{ secrets.OMID15_ADI_KEY }}
+  # Ten spare slots for keys added later: make a secret named KEY01_API_KEY … KEY10_API_KEY in
+  # Settings -> Secrets and variables -> Actions and it joins the pool by itself. A slot with no secret behind
+  # it arrives empty, and scripts/ai.py passes over anything not shaped like a Gemini key, so the unused ones
+  # cost nothing and nothing here has to change again.
+  KEY01_API_KEY: ${{ secrets.KEY01_API_KEY }}
+  KEY02_API_KEY: ${{ secrets.KEY02_API_KEY }}
+  KEY03_API_KEY: ${{ secrets.KEY03_API_KEY }}
+  KEY04_API_KEY: ${{ secrets.KEY04_API_KEY }}
+  KEY05_API_KEY: ${{ secrets.KEY05_API_KEY }}
+  KEY06_API_KEY: ${{ secrets.KEY06_API_KEY }}
+  KEY07_API_KEY: ${{ secrets.KEY07_API_KEY }}
+  KEY08_API_KEY: ${{ secrets.KEY08_API_KEY }}
+  KEY09_API_KEY: ${{ secrets.KEY09_API_KEY }}
+  KEY10_API_KEY: ${{ secrets.KEY10_API_KEY }}
 
 concurrency:
   group: languages
@@ -35,6 +78,13 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -r requirements.txt
+
+      # i18n reads the strings off the built pages, and /coins/, /academy/, /library/ and the rest are built by CI
+      # rather than committed. Without this the corpus is the handful of committed pages -- 52 of them, against
+      # roughly a thousand -- and almost nothing would be found to translate.
+      - name: Build the pages the strings are read from
+        timeout-minutes: 12
+        run: python scripts/build_pages.py
 
       - name: Arabic dictionaries
         continue-on-error: true
