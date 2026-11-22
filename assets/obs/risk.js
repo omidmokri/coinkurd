@@ -25,7 +25,8 @@
       (sub ? '<span>' + sub + '</span>' : '') + '</div>';
   }
   function pc(v, dp) { return v == null || !isFinite(v) ? '—' : (v * 100).toFixed(dp == null ? 1 : dp) + '%'; }
-  function money(v) { return v == null || !isFinite(v) ? '—' : '$' + OB.compact(v); }
+  /* fmtUsd is in core.js; the short-number helper lives in ts.js, which this page has no other reason to load */
+  function money(v) { return OB.fmtUsd(v); }
   function status(h, k) { var s = $('#ob-status', V.el); if (s) { s.innerHTML = h || ''; s.className = 'ob-status' + (k ? ' ' + k : ''); s.hidden = !h; } }
 
   function prices() {
