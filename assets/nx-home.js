@@ -302,7 +302,10 @@
     });
     var k = wire.querySelector('[data-wk]'), kh = '';
     [['#sPosts', 'پست', 'پۆست', 'posts'], ['#sCats', 'دسته', 'پۆل', 'categories'], ['#sCoins', 'کوین', 'دراو', 'coins']].forEach(function (x) { var e = d.querySelector(x[0]), v = e && e.textContent.trim(); if (v) kh += '<li><b>' + esc(v) + '</b>' + pick(x[1], x[2], x[3]) + '</li>'; });
-    var up = d.querySelector('#sUpd'), uv = up && up.textContent.trim(); if (uv) kh += '<li><b>' + esc(uv.replace(/^\d{4}-\d{2}-\d{2}\s*/, '')) + '</b>' + pick('آخرین به‌روزرسانی', 'دوایین نوێکردنەوە', 'last update') + '</li>';
+    /* the three tiles above hold a bare number, so .nxw-k b lays them out left-to-right. This one holds a date,
+       which is a number AND words: left-to-right would throw the day to the far end, printing "آذر ۱۴۰۵ ۱".
+       nxw-dt gives it back the direction of the page it sits on. */
+    var up = d.querySelector('#sUpd'), uv = up && up.textContent.trim(); if (uv) kh += '<li><b class="nxw-dt">' + esc(uv.replace(/^\d{4}-\d{2}-\d{2}\s*/, '')) + '</b>' + pick('آخرین به‌روزرسانی', 'دوایین نوێکردنەوە', 'last update') + '</li>';
     if (k.innerHTML !== kh) k.innerHTML = kh;
   }
   wire.addEventListener('click', function (e) {
