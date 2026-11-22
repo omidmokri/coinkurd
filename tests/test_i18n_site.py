@@ -186,6 +186,29 @@ def main():
        all(at(h) <= at(h + 1) for h in range(23)), [at(h) for h in range(0, 24, 6)])
     ok("nothing is released beyond the cap", max(at(h) for h in range(24)) <= 1000)
 
+    # One pool of keys, two translating jobs. They used to have separate caps against a single total, so the site
+    # was cut off at 1140 while the market went on to 1600 -- backwards, given the market pages are ~98% done and
+    # the site ~16%. The owner chose the site's 50 languages (2026-11-22); each side now spends only its own share.
+    pro_l10n.CACHE = tempfile.mkdtemp()
+    noon = datetime.datetime(2026, 11, 22, 12, 0, tzinfo=LA).timestamp()
+    day = pro_l10n.quota_day(noon)
+    site0, mkt0 = pro_l10n.quota_budget("site", 19, noon), pro_l10n.quota_budget("market", 19, noon)
+    ok("the site gets the larger share", site0 > mkt0 * 3, (site0, mkt0))
+    pro_l10n.quota_add(500, day=day, who="site")
+    ok("what the site spends comes off the site's share",
+       pro_l10n.quota_budget("site", 19, noon) == site0 - 500)
+    ok("and leaves the market's share alone",
+       pro_l10n.quota_budget("market", 19, noon) == mkt0, pro_l10n.quota_budget("market", 19, noon))
+    pro_l10n.quota_add(100, day=day, who="market")
+    ok("the market's spending likewise stays on its own side",
+       pro_l10n.quota_budget("market", 19, noon) == mkt0 - 100 and
+       pro_l10n.quota_budget("site", 19, noon) == site0 - 500)
+    ok("the total still adds up", pro_l10n.quota_used(day=day) == 600, pro_l10n.quota_used(day=day))
+    # the allowance and the spending must be read against the same day, or the reset hands out nothing
+    after = datetime.datetime(2026, 11, 23, 0, 1, tzinfo=LA).timestamp()
+    ok("a new quota day starts clean", pro_l10n.quota_budget("site", 19, after) > 0,
+       pro_l10n.quota_budget("site", 19, after))
+
     p = S.prompt_for("tw", ["Close"])
     ok("the prompt names the language, its variant and what must stay as written",
        "Chinese (Traditional)" in p and "Traditional Chinese" in p and "Coin_Kurd" in p and '["Close"]' in p)

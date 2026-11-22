@@ -54,7 +54,9 @@ ROOT = i18n_ar.ROOT
 CACHE = os.path.join(ROOT, "data", "i18n")
 OUT = os.path.join(ROOT, "i18n")
 LANGS = pro_l10n.PRIORITY                       # the 43, most-read first
-DAILY = int(os.environ.get("I18N_SITE_DAILY", "60"))    # Gemini calls a quota day A KEY (pro_l10n comes first)
+# The site's budget is its share of the pool's quota day (pro_l10n.SHARE["site"]), not a cap of its own; the
+# owner chose the site's 50 languages over the market pages on 2026-11-22.
+DAILY = int(os.environ.get("I18N_SITE_DAILY", "60"))    # kept for --requests arithmetic and older call sites
 
 PH = re.compile(r"\{\d+\}")
 KEEP = ["entekhab.net", "Coin_Kurd", "Coin Kurd", "Entekhab", "Telegram", "TradingView", "Binance", "mempool.space",
@@ -436,13 +438,13 @@ def main():
     if not a.no_translate and ai.available():
         pool = ai.keys()
         print(f"i18n_site: {ai.pool_note()}")
-        cap = DAILY * len(pool)
-        # released evenly through the quota day, so a run in the afternoon still has calls to make
-        allow = pro_l10n.quota_allowance(cap)
-        left = allow - pro_l10n.quota_used()
+        # the site's share of the pool's day, released evenly through it so an afternoon run still has calls
+        cap = int(pro_l10n.quota_ceiling(len(pool)) * pro_l10n.SHARE["site"])
+        left = pro_l10n.quota_budget("site", len(pool))
         if left <= 0:
-            print(f"i18n_site: {pro_l10n.quota_used()} of today's {cap} Gemini calls are used, "
-                  f"{allow} released so far; the next run has more (the pages use what the cache has)")
+            print(f"i18n_site: {pro_l10n.quota_used(who='site')} of the site's {cap} Gemini calls today are used "
+                  f"(the pool's day is {pro_l10n.quota_ceiling(len(pool))}, the site takes "
+                  f"{int(pro_l10n.SHARE['site'] * 100)}%); the next run has more")
         else:
             requests_max = min(a.requests or 8 * len(pool), left)
             jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))
@@ -450,7 +452,7 @@ def main():
             try:
                 fill(langs, need, common, requests_max, a.seconds, pool[:jobs], counter=c)
             finally:
-                pro_l10n.quota_add(c.get("used", 0))
+                pro_l10n.quota_add(c.get("used", 0), who="site")
             print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)")
             print("i18n_site: the keys this run used —\n" + ai.pool_report())
     elif not a.no_translate:

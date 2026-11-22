@@ -312,15 +312,45 @@ def quota_day(now=None):
         return time.strftime("%Y-%m-%d", time.gmtime(now - 8 * 3600))
 
 
-def quota_used(day=None):
-    """calls this script made in the quota day so far"""
-    day = day or quota_day()
+# One pool of keys serves both translating jobs, so a ceiling on the pool and a split between them is the whole
+# budget. The site's own languages come first: the market pages are about 98% translated and need only topping up,
+# while the site is near 16% and is the side being carried to 50 languages. Before this the two had separate caps
+# against one counter -- 1140 for the site, 1600 for the market -- so the site was cut off first and the market
+# went on spending, which is backwards.
+PER_KEY = int(os.environ.get("L10N_PER_KEY", "80"))   # Gemini calls a quota day a key, for both jobs together
+SHARE = {"site": 0.80, "market": 0.20}
+
+
+def _quota_doc(day):
     try:
         with open(os.path.join(CACHE, "_quota.json"), encoding="utf-8") as f:
             q = json.load(f)
-        return max(0, int(q.get("n", 0))) if q.get("day") == day else 0
+        return q if q.get("day") == day else {}
     except (OSError, ValueError, TypeError, AttributeError):
-        return 0
+        return {}
+
+
+def quota_used(day=None, who=None):
+    """calls made in the quota day so far: by one job, or by both when who is None"""
+    q = _quota_doc(day or quota_day())
+    if who is None:
+        return max(0, int(q.get("n", 0) or 0))
+    return max(0, int((q.get("by") or {}).get(who, 0) or 0))
+
+
+def quota_ceiling(pool_n):
+    return PER_KEY * max(1, int(pool_n or 1))
+
+
+def quota_budget(who, pool_n, now=None):
+    """calls this job may still make: its share of what the day has released, less what it has already spent
+
+    The day is taken from the same moment as the allowance. Reading one against the other's day would, in the
+    minutes around the Pacific midnight the free tier resets on, measure a fresh day's allowance against the
+    previous day's spending and hand out nothing.
+    """
+    allow = quota_allowance(quota_ceiling(pool_n), now)
+    return int(allow * SHARE[who]) - quota_used(day=quota_day(now), who=who)
 
 
 def quota_allowance(cap, now=None):
@@ -347,14 +377,16 @@ def quota_allowance(cap, now=None):
     return int(max(cap * FLOOR, min(cap, cap * done)))
 
 
-def quota_add(n, day=None):
+def quota_add(n, day=None, who="market"):
     if n <= 0:
         return
     day = day or quota_day()
-    total = quota_used(day) + n
+    q = _quota_doc(day)
+    by = dict(q.get("by") or {})
+    by[who] = max(0, int(by.get(who, 0) or 0)) + n
     os.makedirs(CACHE, exist_ok=True)
     with open(os.path.join(CACHE, "_quota.json"), "w", encoding="utf-8") as f:
-        json.dump({"day": day, "n": total}, f)
+        json.dump({"day": day, "n": max(0, int(q.get("n", 0) or 0)) + n, "by": by}, f)
         f.write("\n")
 
 
@@ -528,8 +560,8 @@ def main():
     pool = ai.keys()
     print(f"pro_l10n: {ai.pool_note()}")
     # every key has its own daily quota, so the day's ceiling grows with the pool
-    cap = DAILY * len(pool)
-    left = quota_allowance(cap) - quota_used()
+    cap = quota_ceiling(len(pool))
+    left = quota_budget("market", len(pool))
     if left <= 0:
         print(f"pro_l10n: today's {cap} Gemini calls ({DAILY} a key) are used; more tomorrow "
               f"(the pages use what the cache has)")
