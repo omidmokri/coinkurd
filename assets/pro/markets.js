@@ -109,14 +109,19 @@
 
   /* ---------------------------------------------------------------- tgju */
   function num(s) { return +String(s == null ? '' : s).replace(/[^\d.\-]/g, ''); }
-  var HIST = {};
-  function tgHist(grade, res) {                                        /* the whole history at one resolution (tgju sends all of it) */
-    var k = grade + '|' + res;
-    if (!HIST[k]) HIST[k] = P.getJSON(TGH + encodeURIComponent(grade) + '&resolution=' + res + '&from=0&to=' + Math.floor(Date.now() / 1000), 30000).then(function (j) {
+  /* the whole history at one resolution (tgju sends all of it). It is kept for a few minutes only: a page left open for
+     a day used to replay the history it fetched on load for ever, so its daily chart stopped on the day it was opened
+     while the price line went on moving (owner, 2026-11-22). */
+  var HIST = {}, HIST_TTL = 300000;
+  function tgHist(grade, res) {
+    var k = grade + '|' + res, e = HIST[k];
+    if (e && Date.now() - e.at < HIST_TTL) return e.p;
+    var p = P.getJSON(TGH + encodeURIComponent(grade) + '&resolution=' + res + '&from=0&to=' + Math.floor(Date.now() / 1000), 30000).then(function (j) {
       if (!j || j.s !== 'ok' || !j.t || !j.t.length) throw new Error('empty');
       return j;
-    }, function (e) { delete HIST[k]; throw e; });
-    return HIST[k];
+    }, function (err) { if (HIST[k] && HIST[k].p === p) delete HIST[k]; throw err; });
+    HIST[k] = { at: Date.now(), p: p };
+    return p;
   }
   /* the latest price in tgju's table of the day: [price, "HH:MM:SS", …] (Tehran time) */
   function tgLast(grade) {
@@ -136,6 +141,26 @@
     return null;
   }
 
+  /* Weeks and months are calendar ones here: the shared aggregate() leaves them alone (Binance sends its own weekly and
+     monthly bars), but tgju answers those resolutions with daily bars, so they are rolled up here. The week starts on
+     Saturday, as the Iranian market's does. */
+  function calBucket(t, tf) {
+    var d = new Date(t * 1000);
+    if (tf.u === 'M') return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) / 1000;
+    if (tf.u === 'w') return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 1) % 7)) / 1000;
+    return P.bucket(t, tf);
+  }
+  function roll(base, tf) {
+    var out = [], cur = null;
+    for (var i = 0; i < base.length; i++) {
+      var b = base[i], k = calBucket(b.t, tf);
+      if (!cur || cur.t !== k) { cur = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v || 0 }; out.push(cur); }
+      else { if (b.h > cur.h) cur.h = b.h; if (b.l < cur.l) cur.l = b.l; cur.c = b.c; cur.v += (b.v || 0); }
+    }
+    return out;
+  }
+  P._roll = roll;
+
   function dedup(a) {                                                  /* sorted bars → one per time (the same time merged) */
     var out = [];
     for (var i = 0; i < a.length; i++) {
@@ -149,15 +174,22 @@
   function Base(sym, tf) { this.sym = sym; this.tf = tf; this.key = sym + '|' + tf.id; this.bars = []; this.subs = []; this.refs = 0; this.state = 'load'; this.src = null; this.at = null; this.full = true; this.busy = false; this.dead = false; }
   Base.prototype.tell = function (what, x) { var s = this; this.subs.slice().forEach(function (f) { try { f(what, s, x); } catch (e) { if (window.console) console.error(e); } }); };
   Base.prototype.more = function () { return Promise.resolve(false); };
-  Base.prototype.catchup = function () { };
+  /* back from a hidden tab or a sleeping machine: the poller was stopped all that while, so the history is read again */
+  Base.prototype.catchup = function () {
+    if (this.dead || typeof this.start !== 'function') return;
+    if (Date.now() - (this.at || 0) < 60000) return;
+    this.start();
+  };
   Base.prototype.setBars = function (bars) { this.bars = bars; this.at = Date.now(); this.tell('reset'); };
   /* a live price into the current bar. tgju's own bars set the grid (hours on Tehran's :30, days at 00:00 UTC), so a
      tick goes into the bar it falls in, counted from the last bar, never into a bar of its own at the tick's second */
   Base.prototype.put = function (b, closed) {
     if (this.dead || !(b.c > 0)) return;
     var bars = this.bars, lb = bars[bars.length - 1], sec = this.tf.sec, nb, isNew = false, k;
-    if (!lb) k = P.bucket(b.t, { sec: sec, ratio: 2 });
+    var cal = this.tf.u === 'M' || this.tf.u === 'w';
+    if (!lb) k = cal ? calBucket(b.t, this.tf) : P.bucket(b.t, { sec: sec, ratio: 2 });
     else if (b.t < lb.t) return;
+    else if (cal) { k = calBucket(b.t, this.tf); if (k < lb.t) k = lb.t; }
     else if (sec >= 28 * 86400) k = b.t - lb.t < 28 * 86400 ? lb.t : P.bucket(b.t, { sec: sec, ratio: 2 }) > lb.t ? P.bucket(b.t, { sec: sec, ratio: 2 }) : lb.t;
     else k = lb.t + Math.floor((b.t - lb.t) / sec) * sec;
     if (lb && lb.t === k) { nb = { t: k, o: lb.o, h: Math.max(lb.h, b.h), l: Math.min(lb.l, b.l), c: b.c, v: lb.v + (b.dv || 0) }; bars[bars.length - 1] = nb; }
@@ -179,7 +211,18 @@
       for (var i = 0; i < j.t.length; i++) if (j.c[i] > 0) base.push({ t: j.t[i], o: j.o[i] / d, h: j.h[i] / d, l: j.l[i] / d, c: j.c[i] / d, v: 0 });
       base.sort(function (a, b) { return a.t - b.t; });
       base = dedup(base);                                              /* tgju's history repeats a few timestamps: one bar each */
-      var tf = self.tf, bars = nr[0] === tf.sec ? base : P.aggregate(base, tf);
+      /* tgju answers the weekly and monthly resolutions with daily bars all the same, so the step the series actually
+         has decides whether it still needs aggregating; otherwise a monthly chart quietly showed daily candles. */
+      var tf = self.tf, nat = nr[0];
+      if (base.length > 8) {
+        var gaps = [], i0 = Math.max(1, base.length - 60);
+        for (var g = i0; g < base.length; g++) gaps.push(base[g].t - base[g - 1].t);
+        gaps.sort(function (a, b) { return a - b; });
+        var med = gaps[gaps.length >> 1];
+        if (med > 0 && med < nat) nat = med;
+      }
+      self.nat = nat;
+      var bars = nat === tf.sec ? base : (tf.u === 'M' || tf.u === 'w') ? roll(base, tf) : P.aggregate(base, tf);
       self.state = 'poll'; self.setBars(bars); self.tell('state'); self.poll();
     }).catch(function () { return self.fromSite(); }).catch(function () {
       if (self.dead) return; self.state = 'error'; self.err = 'nodata'; self.tell('state');
@@ -488,6 +531,14 @@
     } };
   };
   P.feedsIr = FEEDS;
+  /* the Iranian feeds poll only while the tab is on screen; coming back to a tab left in the background, they read
+     their history again instead of carrying on from where the page was opened */
+  var irHidAt = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { irHidAt = Date.now(); return; }
+    if (irHidAt && Date.now() - irHidAt > 60000) Object.keys(FEEDS).forEach(function (k) { try { FEEDS[k].catchup(); } catch (e) { } });
+    irHidAt = 0;
+  });
 
   /* history for a replay that starts before what is loaded */
   var histUsdt = P.history;
