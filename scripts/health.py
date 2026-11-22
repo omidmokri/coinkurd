@@ -99,15 +99,21 @@ def main():
     out["files"] = files
 
     tok, chat = os.environ.get("TG_BOT_TOKEN"), os.environ.get("TG_ALERT_CHAT")
-    if tok and chat and status != out["last_alert_status"]:
+    changed = status != out["last_alert_status"]
+    if changed:
+        import notify
         icon = {"ok": "✅", "warn": "⚠️", "error": "🚨"}[status]
-        lines = [f"{icon} entekhab.net — وضعیت: {status}"] + [f"• {c['name']}: {c['msg']}" for c in errors + warns]
-        try:
-            requests.post(f"https://api.telegram.org/bot{tok}/sendMessage",
-                          json={"chat_id": chat, "text": "\n".join(lines)}, timeout=20).raise_for_status()
+        rows = [f"{c['name']}: {c['msg']}" for c in errors + warns]
+        lines = [f"{icon} entekhab.net — وضعیت: {status}"] + [f"• {r}" for r in rows]
+        if tok and chat:
+            try:
+                requests.post(f"https://api.telegram.org/bot{tok}/sendMessage",
+                              json={"chat_id": chat, "text": "\n".join(lines)}, timeout=20).raise_for_status()
+                out["last_alert_status"] = status
+            except Exception as e:  # noqa: BLE001
+                print(f"alert failed: {e}")
+        if notify.send(embeds=[notify.health_embed(status, rows)]):
             out["last_alert_status"] = status
-        except Exception as e:  # noqa: BLE001
-            print(f"alert failed: {e}")
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(status, [c["name"] for c in errors + warns])
 

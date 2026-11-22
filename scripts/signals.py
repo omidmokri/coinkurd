@@ -466,6 +466,18 @@ def stats(sigs):
     return st
 
 
+def to_discord(fresh, ind):
+    """Mirror new signals into the Coin_Kurd Discord channel. Silent and skipped when no webhook is set."""
+    import notify
+    if not fresh or not notify.on():
+        return
+    titles = {it["id"]: (it.get("title") or it["id"]) for it in ind.get("items", [])}
+    # oldest first, so the channel reads in the order things happened; a burst is capped rather than flooding
+    batch = sorted(fresh, key=lambda s: s["t"])[-10:]
+    sent = sum(notify.send(embeds=[notify.signal_embed(s, titles.get(s.get("ind")))]) for s in batch)
+    print(f"discord: {sent}/{len(batch)} signal(s) posted")
+
+
 def main():
     ind = load(IND, {})
     sig = load(SIG, {"signals": []})
@@ -479,7 +491,7 @@ def main():
     have = {s["id"]: s for s in sig.get("signals", [])}
     live = load(LIVE, {})
     lr = live.get("relay") or {}
-    new, states = 0, []
+    new, states, fresh = 0, [], []
     if ch:
         last_id = lr.get("last_id", 0) if lr.get("channel") == ch else 0
         # a cold cursor means a first run or a deliberate reset: read far back once so the state flips that already
@@ -488,16 +500,19 @@ def main():
         for s in found:
             if s["id"] not in have:
                 have[s["id"]] = s
+                fresh.append(s)
                 new += 1
         for s in state_signals(live, states, ch):          # a flip of the live state is that indicator's alarm
             if s["id"] not in have:
                 have[s["id"]] = s
+                fresh.append(s)
                 new += 1
         sig["relay"] = {"channel": ch, "checked_at": NOW.isoformat(), "new": new}
         lr = {"channel": ch, "checked_at": NOW.isoformat(), "last_id": max(top, last_id), "states_new": len(states)}
     else:
         sig["relay"] = {"channel": None, "checked_at": NOW.isoformat(), "note": "relay not configured yet"}
     sigs = sorted(have.values(), key=lambda s: s["t"], reverse=True)
+    to_discord(fresh, ind)
     calc = 0
     for s in sorted(sigs, key=lambda x: x["t"]):          # oldest first → one candle download per symbol covers all
         o = s.get("out") or {}

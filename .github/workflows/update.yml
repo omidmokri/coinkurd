@@ -308,6 +308,8 @@ jobs:
         id: signals
         continue-on-error: true
         timeout-minutes: 4
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python scripts/signals.py
 
       - name: Market Wrapped (weekly / monthly)
@@ -408,6 +410,7 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_ALERT_CHAT: ${{ secrets.TG_ALERT_CHAT }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           STEP_FETCH: ${{ steps.fetch.outcome }}
           STEP_REPAIR: ${{ steps.repair.outcome }}
           STEP_MARKET: ${{ steps.market.outcome }}
