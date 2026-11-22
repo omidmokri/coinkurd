@@ -286,6 +286,7 @@
     { k: 'stables', path: '/charts/stablecoins/', ic: 'coins' },
     { k: 'defi', path: '/charts/defi/', ic: 'layers' },
     { k: 'risk', path: '/charts/risk/', ic: 'scale' },
+    { k: 'scanner', path: '/charts/scanner/', ic: 'target' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
     { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
   ];

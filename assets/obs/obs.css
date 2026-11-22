@@ -280,3 +280,28 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 .ob-warn-box{margin:10px 0 0;padding:10px 12px;border-radius:9px;font-size:13px;
   background:rgba(255,90,77,.12);border:1px solid rgba(255,90,77,.32)}
 .ob-grid td.ob-dim{opacity:.6}
+
+/* ---- /charts/scanner/ : the condition form, the sortable head and the 48-hour band ---- */
+.ob-scform{display:grid;gap:10px 14px;grid-template-columns:1fr;margin:6px 0 10px}
+@media (min-width:700px){.ob-scform{grid-template-columns:repeat(3,1fr)}}
+.ob-scform label{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.ob-scform>label>span:first-child{opacity:.75}
+.ob-scpair{display:flex;align-items:center;gap:6px}
+.ob-scpair>i{opacity:.5;font-style:normal}
+.ob-scform input{background:#121214;border:1px solid rgba(255,255,255,.16);border-radius:8px;color:inherit;
+  font:inherit;padding:9px 11px;min-width:0;width:100%;direction:ltr;text-align:start}
+.ob-scform input:focus{outline:2px solid rgba(240,180,41,.55);outline-offset:1px}
+.ob-scsegs{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:0 0 12px}
+.ob-sccount{margin:0 0 8px;font-size:13px;opacity:.82}
+.ob-sortb{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;white-space:nowrap}
+.ob-sortb.on{color:#f0b429;font-weight:700}
+.ob-scoin{display:inline-flex;align-items:center;gap:7px;color:inherit;text-decoration:none}
+.ob-scoin:hover b{text-decoration:underline}
+.ob-scoin .ob-lg{border-radius:50%;flex:0 0 auto}
+.ob-sctr{font-style:normal;font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.ob-sctr.up{background:rgba(52,211,153,.16);color:#34d399}
+.ob-sctr.down{background:rgba(255,90,77,.16);color:#ff8a7d}
+.ob-sctr.range{background:rgba(255,255,255,.08);opacity:.8}
+.ob-scband{display:inline-block;width:46px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);
+  vertical-align:middle;overflow:hidden;margin-inline-end:5px}
+.ob-scband>i{display:block;height:100%;background:#f0b429;border-radius:3px}

@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "18"           # asset version (bump with any change to assets/obs/*)
+V = "19"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -42,6 +42,7 @@ PAGES = [
     ("stables", "stablecoins", ["flowmath.js", "ts.js", "prem.js"]),
     ("defi", "defi", ["ts.js", "defi.js"]),
     ("risk", "risk", ["riskmath.js", "risk.js"]),
+    ("scanner", "scanner", ["scan.js"]),
     ("network", "network", ["chainmath.js", "ts.js", "chain.js"]),
     ("cycle", "bitcoin-cycle", ["chainmath.js", "ts.js", "chain.js"]),
 ]
@@ -898,6 +899,72 @@ T.update({
                    ("Sources", ["Public candles of Coinbase and Binance (read by the site), Bybit’s public premium index and Deribit’s public futures (read in your browser)."])],
         },
     },
+    "scanner": {
+        "title": "اسکنر ارزهای دیجیتال با شرط دلخواه | entekhab.net",
+        "desc": "همهٔ ارزهایی که سایت دنبال می‌کند را با شرط خودتان فیلتر کنید: RSI، تغییر ۲۴ ساعته، روند، قیمت نسبت به EMA، حجم و جای قیمت در دامنهٔ ۴۸ ساعته. رایگان.",
+        "og": "اسکنر چندشرطی",
+        "ld": "Entekhab multi-condition crypto scanner",
+        "kw": ["اسکنر ارز دیجیتال", "crypto screener", "اسکرینر", "فیلتر RSI", "crypto scanner", "RSI scanner", "اسکنر رایگان", "فیلتر ارز دیجیتال", "coin screener"],
+        "h1": {"fa": "اسکنر چندشرطی", "ckb": "سکانەری فرەمەرج", "ar": "الماسح متعدد الشروط", "en": "Multi-condition scanner"},
+        "p": {"fa": "شرط‌هایتان را بگذارید و ببینید کدام ارزها همین حالا با آن‌ها می‌خوانند — RSI، تغییر، روند، EMA، حجم و جای قیمت در دامنهٔ ۴۸ ساعته",
+              "ckb": "مەرجەکانت دابنێ و ببینە کام دراوەکان ئێستا دەگونجێن — RSI، گۆڕان، ئاڕاستە، EMA، قەبارە و شوێنی نرخ",
+              "ar": "ضع شروطك وانظر أي العملات تطابقها الآن — RSI والتغيّر والاتجاه وEMA والحجم وموضع السعر",
+              "en": "Set your conditions and see which coins meet them right now — RSI, change, trend, EMA, volume and where the price sits in its 48-hour range"},
+        "about": {
+            "fa": [("این صفحه چه می‌کند", [
+                "هر شرطی که بگذارید روی همهٔ ارزهای تحت پیگیری سایت اعمال می‌شود و نتیجه بی‌درنگ عوض می‌شود.",
+                "<b>RSI:</b> بازهٔ دلخواه. زیر ۳۰ را معمولاً اشباع فروش و بالای ۷۰ را اشباع خرید می‌نامند.",
+                "<b>روند:</b> از رابطهٔ قیمت با EMA۲۰ و EMA۵۰ ساخته می‌شود؛ صعودی یعنی قیمت بالای هر دو و EMA۲۰ بالای EMA۵۰.",
+                "<b>جای قیمت در دامنهٔ ۴۸ ساعته:</b> صفر یعنی روی کف دو روز گذشته و صد یعنی روی سقف آن."]),
+                ("چطور خوانده شود", [
+                    "برآورده شدن یک شرط فقط یعنی همان شرط برقرار است. این صفحه سیگنال خرید و فروش نمی‌دهد و هیچ پیش‌بینی‌ای در آن نیست.",
+                    "ستون‌ها قابل مرتب‌سازی‌اند؛ روی عنوان هر ستون بزنید.",
+                    "شرط‌هایتان در لینک ذخیره می‌شود، پس می‌توانید همان فیلتر را برای خودتان نگه دارید یا برای کسی بفرستید."]),
+                ("داده", [
+                    "روی کندل یک‌ساعته، از همان فایلی که صفحات بازار می‌خوانند.",
+                    "فیلتر کردن و مرتب‌سازی داخل مرورگر شما انجام می‌شود؛ شرط‌هایتان هیچ‌جا فرستاده نمی‌شود.",
+                    "برای صرفه‌جویی، حداکثر ۲۰۰ ردیف نمایش داده می‌شود؛ دکمهٔ دانلود همهٔ موارد منطبق را می‌دهد."])],
+            "ckb": [("ئەم لاپەڕە چی دەکات", [
+                "هەر مەرجێک دابنێیت لەسەر هەموو دراوەکان جێبەجێ دەبێت و ئەنجام دەستبەجێ دەگۆڕێت.",
+                "<b>RSI:</b> مەودای دڵخواز. خوار ٣٠ و سەروو ٧٠ ئاساییترین سنوورەکانن.",
+                "<b>ئاڕاستە:</b> لە پەیوەندی نرخ بە EMA٢٠ و EMA٥٠ دروست دەبێت.",
+                "<b>شوێنی نرخ:</b> سفر واتە لەسەر بنکەی دوو ڕۆژ و سەد واتە لەسەر لووتکەکەی."]),
+                ("چۆن بخوێندرێتەوە", [
+                    "جێبەجێبوونی مەرجێک تەنها واتە هەمان مەرج. ئەم لاپەڕە سیگناڵ نادات.",
+                    "ستوونەکان ڕیزدەکرێن؛ لەسەر ناونیشانی ستوون دابگرە.",
+                    "مەرجەکانت لە بەستەرەکەدا پاشەکەوت دەبن."]),
+                ("داتا", [
+                    "لەسەر مۆمی یەک کاتژمێر، لە هەمان فایلی لاپەڕەکانی بازاڕ.",
+                    "پاڵاوتن لەناو وێبگەڕەکەی خۆتدا ڕوودەدات؛ مەرجەکانت بۆ هیچ شوێنێک نانێردرێن.",
+                    "زۆرترین ٢٠٠ ڕیز پیشان دەدرێت؛ دوگمەی داگرتن هەمووی دەداتەوە."])],
+            "ar": [("ماذا تفعل هذه الصفحة", [
+                "أي شرط تضعه يُطبَّق على كل العملات المتابَعة وتتغيّر النتيجة فوراً.",
+                "<b>RSI:</b> نطاق من اختيارك. دون ٣٠ وفوق ٧٠ هما الحدّان المعتادان.",
+                "<b>الاتجاه:</b> من علاقة السعر بـEMA٢٠ وEMA٥٠.",
+                "<b>موضع السعر:</b> صفر عند قاع اليومين ومئة عند قمتهما."]),
+                ("كيف تُقرأ", [
+                    "تحقّق شرط يعني تحقّق ذلك الشرط فقط. لا إشارات هنا ولا تنبؤ.",
+                    "الأعمدة قابلة للفرز؛ اضغط على عنوان العمود.",
+                    "شروطك تُحفظ في الرابط."]),
+                ("البيانات", [
+                    "على شموع الساعة، من الملف نفسه الذي تقرأه صفحات السوق.",
+                    "الفرز والتصفية يجريان داخل متصفحك؛ شروطك لا تُرسل إلى أي مكان.",
+                    "يُعرض ٢٠٠ صف كحد أقصى؛ زر التنزيل يعطي كل المطابقات."])],
+            "en": [("What this page does", [
+                "Any condition you set is applied to every coin the site follows, and the result changes as you type.",
+                "<b>RSI:</b> a range of your choosing. Below 30 is usually called oversold and above 70 overbought.",
+                "<b>Trend:</b> built from the price against its EMA20 and EMA50 — up means the price is above both and the 20 is above the 50.",
+                "<b>Where the price sits in its 48-hour range:</b> zero is the low of the last two days, a hundred is the high."]),
+                ("How to read it", [
+                    "A match means a condition is met, nothing more. This page gives no buy or sell signal and forecasts nothing.",
+                    "Every column sorts; click its heading.",
+                    "Your conditions are kept in the link, so you can save a filter or send it to someone."]),
+                ("The data", [
+                    "On the one-hour candles, from the same file the market pages read.",
+                    "The filtering and sorting happen inside your own browser; your conditions are not sent anywhere.",
+                    "At most 200 rows are drawn; the download button gives every match."])],
+        },
+    },
     "risk": {
         "title": "ریسک و حجم پوزیشن: VaR و حد ضرر | entekhab.net",
         "desc": "چقدر یک پوزیشن می‌تواند ببازد و چه حجمی درست است: VaR تاریخی ۹۵ و ۹۹ درصد، میانگین روزهای بدتر، نوسان سالانه، عمیق‌ترین سقوط و ماشین‌حساب حجم. رایگان.",
@@ -1320,6 +1387,12 @@ HUB = {
              {"fa": "استیبل‌کوین‌ها و نسبت SSR", "ckb": "ستەیبڵکۆینەکان و ڕێژەی SSR", "ar": "العملات المستقرة ونسبة SSR", "en": "Stablecoins and the SSR"},
              {"fa": "عرضهٔ استیبل‌کوین‌ها از ۲۰۱۷، تغییر ۳۰ روزه و ارزش بیت‌کوین در برابر آن", "ckb": "خستنەڕووی ستەیبڵکۆینەکان لە ٢٠١٧ـەوە، گۆڕانی ٣٠ ڕۆژە و بەهای بیتکۆین بەرامبەری",
               "ar": "معروض العملات المستقرة منذ ٢٠١٧، تغيّر ٣٠ يومًا وقيمة البيتكوين مقابله", "en": "Stablecoin supply since 2017, its 30-day change and Bitcoin’s value against it"}),
+            ("/charts/scanner/", True,
+             {"fa": "اسکنر چندشرطی", "ckb": "سکانەری فرەمەرج", "ar": "الماسح متعدد الشروط", "en": "Multi-condition scanner"},
+             {"fa": "شرط بگذارید و ببینید کدام ارزها همین حالا با آن می‌خوانند",
+              "ckb": "مەرج دابنێ و ببینە کام دراوەکان ئێستا دەگونجێن",
+              "ar": "ضع شرطاً وانظر أي العملات تطابقه الآن",
+              "en": "Set a condition and see which coins meet it right now"}),
             ("/charts/risk/", True,
              {"fa": "ریسک و حجم پوزیشن", "ckb": "مەترسی و قەبارەی پۆزیشن", "ar": "المخاطر وحجم المركز", "en": "Risk and position size"},
              {"fa": "یک پوزیشن در روز بد چقدر می‌بازد، و با سرمایه و حد ضرر شما چه حجمی درست است",
