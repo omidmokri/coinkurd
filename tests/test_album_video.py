@@ -24,30 +24,27 @@ def ok(what, cond, got=None):
         FAILS.append(what)
 
 
-# ---------------------------------------------------------------- the timing
+# ---------------------------------------------------------------- the timing follows the text
 hold, keep = V.plan(list(range(10)), [0.0] * 10)
 ok("with nothing to say, every slide still gets its floor", keep == 10 and all(h == V.MIN_SLIDE for h in hold),
    (keep, hold[:2]))
-ok("and silence alone cannot overrun the ceiling", sum(hold) + V.TAIL <= V.CEILING, sum(hold))
 
-# ten lines of five seconds come to 55s, which fits: nothing should be dropped there
 hold, keep = V.plan(list(range(10)), [5.0] * 10)
-ok("a set of lines that fits is kept whole", keep == 10 and sum(hold) + V.TAIL <= V.CEILING,
-   (keep, round(sum(hold), 1)))
-# at eight seconds each it cannot fit, and then slides come off the end rather than the reading being hurried
+ok("every slide is kept, whatever the total comes to", keep == 10, keep)
+ok("each slide stays as long as its line takes", all(h >= 5.0 for h in hold), hold)
+
 hold, keep = V.plan(list(range(10)), [8.0] * 10)
-ok("lines that do not fit cause slides to be dropped, not hurried", sum(hold) + V.TAIL <= V.CEILING and keep < 10,
-   (keep, round(sum(hold), 1)))
-ok("the slides that remain keep the full time their lines need", all(h >= 8.0 for h in hold), hold)
-ok("every slide that is kept still gets the time its line needs", all(h >= V.MIN_SLIDE for h in hold), hold)
+ok("a reading past a minute is not trimmed to fit", keep == 10 and sum(hold) > 60, (keep, round(sum(hold), 1)))
+ok("and no slide is hurried to make room", all(h >= 8.0 for h in hold), min(hold))
 
 hold, keep = V.plan(list(range(10)), [40.0] * 10)
-ok("one absurdly long line does not stretch its slide past the cap", max(hold) <= V.MAX_SLIDE, max(hold))
-ok("and at least one slide always survives", keep >= 1, keep)
+ok("a very long line keeps its slide up for all of it", max(hold) >= 40.0, max(hold))
 
 hold, keep = V.plan(list(range(3)), [3.0, 0.0, 2.0])
 ok("a slide with a line is held longer than one without", hold[0] > hold[1], hold)
-ok("the ceiling is sixty seconds, as the brief says", V.CEILING == 60.0, V.CEILING)
+ok("a slide is never shorter than the floor", min(hold) >= V.MIN_SLIDE, hold)
+ok("there is a tripwire for a reading that has run away, not a ceiling on the text",
+   V.GUARD >= 600 and not hasattr(V, "CEILING"), (V.GUARD, hasattr(V, "CEILING")))
 
 # ---------------------------------------------------------------- the lines come from the report, not from here
 rep = {"headline": "H", "summary": "S", "news_texts": {"a": "N1", "b": "N2", "c": "N3"}}
@@ -84,7 +81,8 @@ with tempfile.TemporaryDirectory() as tmp:
                           "stream=codec_name", "-of", "default=nw=1:nk=1", out],
                          capture_output=True, text=True).stdout.strip()
     ok("it carries an audio track even when silent, so players do not stumble", aud == "aac", aud)
-    ok("it is inside the ceiling", V.duration(out) <= V.CEILING + 0.5, V.duration(out))
+    ok("its length matches what the slides were planned to hold",
+       abs(V.duration(out) - (sum(V.plan(range(10), [0.0] * 10)[0]) + V.TAIL)) < 1.0, V.duration(out))
 
 print(("\n%d failure(s)" % len(FAILS)) if FAILS else "\nalbum video: 0 failures")
 raise SystemExit(1 if FAILS else 0)

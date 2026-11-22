@@ -10,9 +10,8 @@ What this does and does not do
     it speaks is read back out of the report album.py wrote beside those slides.
   * the reading is the man's voice, for both the morning and the evening edition. The owner listened to the
     alternatives and kept this one; the woman's voice was dropped from the cycle, so there is no slot for it.
-  * sixty seconds is a hard ceiling, not a target. Slides are given the time their line needs and the rest are
-    dropped from the end rather than the whole thing being sped up, because a report read too fast to follow
-    is worth nothing.
+  * its length follows the text. Every slide is kept and each stays for as long as its line takes to read;
+    nothing is hurried to hit a number, because a report read too fast to follow is worth nothing.
 
 Why 1080x1350: that is the shape album.py already draws, it is the tallest frame Instagram shows in full, and
 Telegram plays it without re-encoding.
@@ -30,9 +29,11 @@ import tempfile
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "podcast"))
 
 W, H = 1080, 1350
-CEILING = 60.0           # seconds; the brief's own limit
-MIN_SLIDE = 2.2          # no slide flashes past before it can be read
-MAX_SLIDE = 9.0          # and none outstays its line
+# The length follows the reading: the video ends when the text ends, and no slide is cut to hit a number.
+# An earlier version capped this at sixty seconds and dropped slides off the end to fit; the owner asked for
+# the opposite, so every slide stays and the video runs as long as its narration does.
+GUARD = 900.0            # fifteen minutes: not a target, a tripwire for a reading that has run away
+MIN_SLIDE = 2.2          # a slide with nothing to say still stays long enough to be read
 TAIL = 0.6               # a breath at the end so the last word is not clipped
 FPS = 30
 PROMPT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -82,18 +83,15 @@ def say(text, out_wav):
 
 
 def plan(slides, spoken):
-    """How long each slide stays up, and which ones make the cut.
+    """How long each slide stays up. Every slide is kept.
 
-    A slide with a line stays as long as its line takes; one without gets the floor. Then, if the whole runs
-    past the ceiling, slides come off the END until it fits. Nothing is sped up."""
+    A slide stays for as long as its line takes to read, plus a short breath; one with nothing to say stays
+    for the floor. Nothing is sped up and nothing is dropped: the video is as long as the text."""
     want = []
     for i in range(len(slides)):
         d = spoken[i] + 0.45 if spoken[i] else MIN_SLIDE
-        want.append(max(MIN_SLIDE, min(MAX_SLIDE, d)))
-    keep = len(want)
-    while keep > 1 and sum(want[:keep]) + TAIL > CEILING:
-        keep -= 1
-    return want[:keep], keep
+        want.append(max(MIN_SLIDE, d))
+    return want, len(want)
 
 
 def build(src, out, silent=False):
@@ -161,8 +159,9 @@ def build(src, out, silent=False):
             "-movflags", "+faststart", out])
 
     d = duration(out)
-    if d > CEILING + 0.5:
-        raise SystemExit(f"the video came out at {d:.1f}s, past the {CEILING:.0f}s ceiling")
+    if d > GUARD:
+        raise SystemExit(f"the video came out at {d:.0f}s, which is past the {GUARD:.0f}s tripwire: "
+                         "something in the reading ran away rather than the text being that long")
     print(f"written {out} — {d:.1f}s, {W}x{H}")
     return 0
 
