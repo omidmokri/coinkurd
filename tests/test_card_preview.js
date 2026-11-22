@@ -51,5 +51,36 @@ ok('a body that does not start with the title is left alone',
 ok('a post with nothing but a rule yields no preview at all', preview('T', 'T\n━━━━━━') === '',
    preview('T', 'T\n━━━━━━'));
 
+
+/* ---------------------------------------------------------------- the post sheet
+   What the owner saw: the picture filled a phone screen and was cropped top and bottom, so the text under it
+   was out of sight and part of the infographic was simply gone; and the post's own picture address was printed
+   underneath as a long unreadable line. Both rules are lifted out of index.html and checked here. */
+
+var sheetCss = (html.match(/\.sheet img\{[^}]*\}/) || [''])[0];
+ok('the sheet picture has a rule of its own', !!sheetCss, sheetCss);
+ok('it is never cropped: these are text infographics, not photographs',
+   /object-fit:contain/.test(sheetCss) && !/cover/.test(sheetCss), sheetCss);
+ok('its height is a share of the screen, not a fixed number of pixels',
+   /max-height:min\(\d+vh/.test(sheetCss) && !/max-height:440px/.test(sheetCss), sheetCss);
+ok('a narrow screen gets a smaller cap still', /@media\(max-width:700px\)\{\.sheet img\{max-height:\d+vh\}\}/.test(html),
+   (html.match(/@media\(max-width:700px\)\{\.sheet img[^}]*\}\}/) || [''])[0]);
+
+var ni = html.indexOf('const noImgUrl=');
+ok('the picture-address rule is in index.html', ni >= 0, ni);
+var noImgUrl = eval('(' + html.slice(html.indexOf('=', ni) + 1, html.indexOf('trim();', ni) + 7).replace(/;$/, '') + ')');
+
+var REAL = 'خروج سنگین سرمایه نهادی.\nhttps://raw.githubusercontent.com/omidmokri/coinkurd/main/data/deepimg/202611221731-v2.jpg';
+ok('the post\'s own picture address is taken out of the text', noImgUrl(REAL).indexOf('http') < 0, noImgUrl(REAL));
+ok('and the words of the post are untouched', noImgUrl(REAL).indexOf('خروج سنگین سرمایه نهادی.') === 0, noImgUrl(REAL));
+ok('a link to an article is kept, because a reader may want to follow it',
+   noImgUrl('خبر: https://example.com/news/123').indexOf('https://example.com/news/123') > 0,
+   noImgUrl('خبر: https://example.com/news/123'));
+ok('a picture address with a query on the end goes too',
+   noImgUrl('a https://x.com/p.png?v=2 b').indexOf('http') < 0, noImgUrl('a https://x.com/p.png?v=2 b'));
+ok('text with no address at all is returned as it was',
+   noImgUrl('یک متن ساده.') === 'یک متن ساده.', noImgUrl('یک متن ساده.'));
+ok('nothing in, nothing out', noImgUrl('') === '' && noImgUrl(null) === '');
+
 console.log(FAILS.length ? '\n' + FAILS.length + ' failed' : '\nall passed');
 process.exit(FAILS.length ? 1 : 0);

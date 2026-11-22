@@ -241,7 +241,7 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .modal.open{display:grid}
 .sheet{width:min(780px,100%);max-height:92vh;overflow:auto;background:#111;border:1px solid var(--line);animation:pop .25s}
 @keyframes pop{from{transform:translateY(20px);opacity:0}}
-.sheet img{width:100%;display:block;max-height:440px;object-fit:cover}
+.sheet img{width:auto;max-width:100%;margin-inline:auto;display:block;max-height:min(38vh,340px);object-fit:contain}@media(max-width:700px){.sheet img{max-height:32vh}}
 .sheet .in{padding:28px}
 .sheet .txt{white-space:pre-wrap;line-height:1.95;margin:16px 0;font-size:1rem}
 .sheet .txt a{color:var(--lime)}
@@ -615,6 +615,9 @@ function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p
   const rows=(o,max,lab,col)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,n])=>`<div class="bar-row"><span>${lab(k)}</span><div class="track"><div class="fill" style="--c:${col(k)};width:0" data-w="${n/max*100}"></div></div><b>${fmtN(n)}</b></div>`).join('');
   out.innerHTML=`<div class="bars"><div class="box"><h3>${T('byCat')}</h3>${rows(bc,mc,k=>{const c=catOf(k);return `${CI(c)}${esc(cname(c))}`},k=>catOf(k).color)}</div><div class="box"><h3>${T('byCoin')}</h3>${rows(bk,mk,k=>k,()=>'#f3c969')}</div></div>`;
   requestAnimationFrame(()=>out.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'))}
+
+/* the bare address of an image file: the picture itself is already shown, so the line is only noise */
+const noImgUrl=t=>(t||'').replace(/(^|\s)https?:\/\/[^\s<]+\.(?:jpe?g|png|gif|webp|avif)(?:\?[^\s<]*)?(?=$|\s)/gi,'$1').replace(/\n{3,}/g,'\n\n').trim();
 
 async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="close" id="close">✕</button><div class="in"><p class="count">⏳ …</p></div>`;$('#modal').classList.add('open');document.body.style.overflow='hidden';$('#close').onclick=closeModal;await loadFull()}
   const p=S.posts.find(x=>x.id===id);if(!p)return;const c=catOf(p.category);
