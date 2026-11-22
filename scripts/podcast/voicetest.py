@@ -173,6 +173,12 @@ def main():
         else:
             print(f"{r['key']:<14} failed: {r['error'][:90]}")
     print(f"\nwritten to {path}")
+    # A run where nothing could be read is a failed run. Reporting success would put a green tick on an empty
+    # report, and the next person to look would believe the voices had been tested.
+    good = [r for r in report if r.get("ok")]
+    if not good:
+        print("no candidate could be read; see the errors above", file=sys.stderr)
+        return 1
     return 0
 
 
