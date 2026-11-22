@@ -17,6 +17,11 @@ on:
   schedule:
     - cron: "2,17,32,47 * * * *"    # a few minutes ahead of the long run, so it starts with fresh signals
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Rebuild the DeFi file even if the last one is still within its three hours"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -49,6 +54,8 @@ jobs:
       - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
         continue-on-error: true
         timeout-minutes: 5
+        env:
+          OBS_DEFI_FORCE: ${{ inputs.force && '1' || '' }}
         run: python scripts/obs_defi.py
 
       - name: Commit
