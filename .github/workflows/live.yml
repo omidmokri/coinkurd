@@ -51,6 +51,20 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python scripts/signals.py
 
+      # /charts/mvrv/, /charts/exchange-flows/, /charts/network/, /charts/bitcoin-cycle/: every day of seven chains'
+      # history from Coin Metrics' community API. A handful of requests and no AI, like the rest of this workflow;
+      # it sat in the long chain, where a cancelled run meant a day's figures simply never arrived.
+      - name: On-chain daily series (Coin Metrics community data)
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python scripts/obs_chain.py
+
+      # /charts/stablecoins/ — must follow obs_chain.py: it reads data/obs/chain_btc.json for Bitcoin's market value
+      - name: Stablecoin supply and SSR (DefiLlama)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/obs_stables.py
+
       - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
         continue-on-error: true
         timeout-minutes: 5
@@ -62,7 +76,7 @@ jobs:
         run: |
           git config user.name  "coinkurd-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/signals.json data/live.json data/obs/defi.json 2>/dev/null || true
+          git add data/signals.json data/live.json data/obs 2>/dev/null || true
           git diff --cached --quiet && echo "nothing changed" && exit 0
           git commit -m "chore: live signals and DeFi $(date -u +'%Y-%m-%d %H:%M UTC')"
           for i in 1 2 3; do
