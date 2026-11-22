@@ -241,7 +241,7 @@ select{background:#141414;border:1px solid var(--line);color:var(--ink);border-r
 .modal.open{display:grid}
 .sheet{width:min(780px,100%);max-height:92vh;overflow:auto;background:#111;border:1px solid var(--line);animation:pop .25s}
 @keyframes pop{from{transform:translateY(20px);opacity:0}}
-.sheet img{width:auto;max-width:100%;margin-inline:auto;display:block;max-height:min(38vh,340px);object-fit:contain}@media(max-width:700px){.sheet img{max-height:32vh}}
+.sheet img{width:100%;height:auto;display:block;object-fit:contain}
 .sheet .in{padding:28px}
 .sheet .txt{white-space:pre-wrap;line-height:1.95;margin:16px 0;font-size:1rem}
 .sheet .txt a{color:var(--lime)}
@@ -505,13 +505,13 @@ function loadArchive(){
   const el=document.getElementById('archBtn');if(el){el.disabled=true;el.textContent='⏳ …'}
   archP=fetch('data/posts_lite.json?v='+Math.floor(Date.now()/3e5)).then(r=>r.json()).then(a=>{
     const m=new Map(S.posts.map(x=>[x.id,x]));
-    S.posts=a.map(x=>Object.assign({},x,m.get(x.id)||{}));S.arch=true;HAY.clear();
+    S.posts=a.map(x=>Object.assign({},m.get(x.id)||{},x));S.arch=true;HAY.clear();
   }).catch(()=>{archP=null});
   return archP;
 }
 let fullP=null;
 function loadFull(){if(S.full)return Promise.resolve();if(fullP)return fullP;
-  fullP=fetch('data/posts.json?v='+Math.floor(Date.now()/3e5)).then(r=>r.json()).then(a=>{const m=new Map(S.posts.map(x=>[x.id,x]));S.posts=a.map(x=>Object.assign({},x,m.get(x.id)||{}));S.full=true;S.arch=true;HAY.clear()}).catch(()=>{fullP=null});return fullP}
+  fullP=fetch('data/posts.json?v='+Math.floor(Date.now()/3e5)).then(r=>r.json()).then(a=>{const m=new Map(S.posts.map(x=>[x.id,x]));S.posts=a.map(x=>Object.assign({},m.get(x.id)||{},x));S.full=true;S.arch=true;HAY.clear()}).catch(()=>{fullP=null});return fullP}
 const NRM=t=>String(t||'').toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[\u200c\u200f\u200e]/g,' ').replace(/[^\p{L}\p{N}#$.\s]/gu,' ').replace(/\s+/g,' ').trim();
 const SYN={'بیت کوین':'btc','بیتکوین':'btc','bitcoin':'btc','بیتکۆین':'btc','اتریوم':'eth','ethereum':'eth','ئیسریۆم':'eth','اتر':'eth','سولانا':'sol','solana':'sol','ریپل':'xrp','ripple':'xrp','تتر':'usdt','tether':'usdt','دوج':'doge','dogecoin':'doge','کاردانو':'ada','cardano':'ada','تون':'ton','toncoin':'ton','بایننس':'binance','بی ان بی':'bnb','ای تی اف':'etf','صندوق':'etf','هک':'hack','هاوینگ':'halving','فدرال رزرو':'fed','ترامپ':'trump','سیلور':'saylor','بلک راک':'blackrock'};
 const HAY=new Map();
@@ -624,6 +624,8 @@ function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p
 const noEcho=(t,title)=>{let x=(t||'').trim();const tt=(title||'').replace(/\u2026$/,'').trim();
   if(tt&&x.startsWith(tt))x=x.slice(tt.length).trim();
   return x.replace(/^[\s\u2500-\u257F]+/,'').trim();};
+/* an address that points at an image file rather than at an article */
+const isImgUrl=u=>/\.(?:jpe?g|png|gif|webp|avif)(?:[?#]|$)/i.test(u||'');
 const noImgUrl=t=>(t||'').replace(/(^|\s)https?:\/\/[^\s<]+\.(?:jpe?g|png|gif|webp|avif)(?:\?[^\s<]*)?(?=$|\s)/gi,'$1').replace(/\n{3,}/g,'\n\n').trim();
 
 async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="close" id="close">✕</button><div class="in"><p class="count">⏳ …</p></div>`;$('#modal').classList.add('open');document.body.style.overflow='hidden';$('#close').onclick=closeModal;await loadFull()}
@@ -633,7 +635,7 @@ async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="cl
   $('#sheet').innerHTML=`<button class="close" id="close">✕</button>${p.photos&&p.photos[0]?`<img src="${esc(wp(p.photos[0],false))}" alt="">`:''}<div class="in">
     <div class="meta"><span class="cat" style="--c:${c.color}">${CI(c)}${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${CI(x)}${esc(cname(x))}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'full',timeStyle:'short'}):''}</time><span>· 👁 ${esc(p.views||'—')}</span></div>
     <div class="txt" dir="auto">${linkify(noEcho(noImgUrl(PT(p).text),PT(p).title))}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
-    ${p.link&&p.link.url?`<a class="lp" href="${esc(su(p.link.url))}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small> <br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
+    ${p.link&&p.link.url&&!isImgUrl(p.link.url)?`<a class="lp" href="${esc(su(p.link.url))}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small> <br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
     <div class="coins">${p.kind?`<span class="kd" style="--k:${KC[p.kind]||'#888'}">${T('k_'+p.kind)}</span>`:''}${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}${(p.ents||[]).map(x=>`<a href="#" class="ent" data-ent="${esc(x)}">${esc(x)}</a>`).join('')}</div>
     ${p.dupn>1?`<p class="count">🔁 ${T('repeated').replace('{n}',fmtN(p.dupn))}</p>`:''}${p.dup?`<p class="count">🔁 ${T('dupOf')} <a href="#p${p.dup}" data-open="${p.dup}">#${p.dup}</a></p>`:''}
     ${p.footer&&p.footer.length?`<div class="social">${p.footer.map(f=>{const ic=/discord/.test(f.url)?'👾 ':/youtu/.test(f.url)?'🎥 ':/instagram/.test(f.url)?'📸 ':/twitter|x\.com/.test(f.url)?'💬 ':'';return `<a href="${esc(su(f.url))}" target="_blank" rel="noopener">${ic}${esc(f.label)}</a>`}).join('')}</div>`:''}

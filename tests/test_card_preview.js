@@ -61,10 +61,9 @@ var sheetCss = (html.match(/\.sheet img\{[^}]*\}/) || [''])[0];
 ok('the sheet picture has a rule of its own', !!sheetCss, sheetCss);
 ok('it is never cropped: these are text infographics, not photographs',
    /object-fit:contain/.test(sheetCss) && !/cover/.test(sheetCss), sheetCss);
-ok('its height is a share of the screen, not a fixed number of pixels',
-   /max-height:min\(\d+vh/.test(sheetCss) && !/max-height:440px/.test(sheetCss), sheetCss);
-ok('a narrow screen gets a smaller cap still', /@media\(max-width:700px\)\{\.sheet img\{max-height:\d+vh\}\}/.test(html),
-   (html.match(/@media\(max-width:700px\)\{\.sheet img[^}]*\}\}/) || [''])[0]);
+/* an earlier version capped the height to keep the picture compact. The owner asked for the opposite: these
+   are infographics and the words on them are the point, so the picture is shown big enough to read. */
+ok('no fixed pixel height is left on it', !/max-height:440px/.test(sheetCss), sheetCss);
 
 var ni = html.indexOf('const noImgUrl=');
 ok('the picture-address rule is in index.html', ni >= 0, ni);
@@ -104,6 +103,41 @@ ok('a body that does not repeat its title is untouched',
 ok('nothing in, nothing out', noEcho('', 'T') === '' && noEcho(null, null) === '');
 ok('the sheet runs both cleanups on the text, not one',
    /linkify\(noEcho\(noImgUrl\(/.test(html), (html.match(/class="txt"[^<]{0,80}/) || [''])[0]);
+
+
+/* ---------------------------------------------------------------- the full text of a post
+   The page starts with short records whose text is cut at about 240 characters and ends in an ellipsis, then
+   fetches the full ones. The merge put the short record LAST, so the cut text was written back over the full
+   text and every post opened as a stub. Order matters, and that is all this checks. */
+var mi = html.indexOf('S.posts=a.map(');
+ok('the merge of the full posts is in index.html', mi >= 0, mi);
+var merges = html.match(/S\.posts=a\.map\([^;]*;/g) || [];
+ok('both places that merge are written the same way', merges.length === 2 && merges[0] === merges[1], merges);
+ok('the full record wins over the short one',
+   merges.every(function (m) { return /Object\.assign\(\{\},m\.get\(x\.id\)\|\|\{\},x\)/.test(m); }), merges);
+ok('the short record is no longer applied last',
+   !merges.some(function (m) { return /Object\.assign\(\{\},x,m\.get/.test(m); }), merges);
+
+/* the order, run on records shaped like the real ones */
+var short = { id: 1, text: 'a short text that ends in an ellipsis…', seen: true };
+var fullR = { id: 1, text: 'the whole piece, very much longer than the short one' };
+var merged = Object.assign({}, short, fullR);
+ok('the whole piece survives the merge', merged.text === fullR.text, merged.text);
+ok('state the page added while open is not lost', merged.seen === true, merged);
+
+/* the picture: big enough that the words on it can be read */
+ok('the picture is shown at the full width of the sheet, not shrunk to a thumbnail',
+   /\.sheet img\{width:100%;height:auto/.test(html), sheetCss);
+ok('and still never cropped', /\.sheet img\{[^}]*object-fit:contain/.test(html), sheetCss);
+ok('no height cap is left to cut it short', !/\.sheet img\{[^}]*max-height:(?!none)/.test(html), sheetCss);
+
+/* a link card that only shows the picture's own address is not drawn at all */
+ok('an image address is recognised', /const isImgUrl=/.test(html));
+var ii = html.indexOf('const isImgUrl=');
+var isImgUrl = eval('(' + html.slice(html.indexOf('=', ii) + 1, html.indexOf(';', ii)) + ')');
+ok('a picture link is spotted', isImgUrl('https://raw.githubusercontent.com/o/c/main/data/deepimg/x-v2.jpg'));
+ok('an article link is not', !isImgUrl('https://example.com/news/123'));
+ok('the link card is skipped for a picture', /p\.link&&p\.link\.url&&!isImgUrl\(p\.link\.url\)/.test(html));
 
 console.log(FAILS.length ? '\n' + FAILS.length + ' failed' : '\nall passed');
 process.exit(FAILS.length ? 1 : 0);
