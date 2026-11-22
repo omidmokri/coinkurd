@@ -24,10 +24,13 @@
   function pct(v, dp) { return v == null || !isFinite(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dp == null ? 2 : dp) + '%'; }
   function status(h, k) { var s = $('#ob-status', V.el); if (s) { s.innerHTML = h || ''; s.className = 'ob-status' + (k ? ' ' + k : ''); s.hidden = !h; } }
 
-  /* where the price sits between the 48-hour low and high: 0 at the low, 100 at the high */
+  /* where the price sits between the 48-hour low and high: 0 at the low, 100 at the high.
+     the live price can run past the last closed candle's high or low, so the result is
+     held inside 0..100 rather than reported as 103% or -4%. */
   function band(c) {
     if (c.hi48 == null || c.lo48 == null || !(c.hi48 > c.lo48)) return null;
-    return (c.price - c.lo48) / (c.hi48 - c.lo48) * 100;
+    var b = (c.price - c.lo48) / (c.hi48 - c.lo48) * 100;
+    return b < 0 ? 0 : b > 100 ? 100 : b;
   }
 
   function matches(c) {

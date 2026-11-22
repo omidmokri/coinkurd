@@ -169,10 +169,14 @@ def main():
         ok("the quota day is Google's (midnight Pacific time)", L.quota_day(1794729660) == "2026-11-15" and L.quota_day(1794729540) == "2026-11-14",
            (L.quota_day(1794729660), L.quota_day(1794729540)))
         ok("nothing used yet on a new day", L.quota_used("2026-11-15") == 0)
-        L.quota_add(3, "2026-11-15")
-        L.quota_add(4, "2026-11-15")
-        L.quota_add(0, "2026-11-15")
-        ok("the day's calls add up, and are kept in data/pro_l10n/_quota.json", L.quota_used("2026-11-15") == 7 and json.load(open(os.path.join(tmp, "_quota.json"))) == {"day": "2026-11-15", "n": 7})
+        L.quota_add(3, "2026-11-15", who="site")
+        L.quota_add(4, "2026-11-15", who="market")
+        L.quota_add(0, "2026-11-15", who="site")
+        ok("the day's calls add up, and are kept in data/pro_l10n/_quota.json",
+           L.quota_used("2026-11-15") == 7 and json.load(open(os.path.join(tmp, "_quota.json"))) == {"day": "2026-11-15", "n": 7, "by": {"site": 3, "market": 4}})
+        ok("each job's spending is counted on its own, so one cannot eat the other's share",
+           L.quota_used("2026-11-15", "site") == 3 and L.quota_used("2026-11-15", "market") == 4,
+           (L.quota_used("2026-11-15", "site"), L.quota_used("2026-11-15", "market")))
         ok("a new quota day starts from zero", L.quota_used("2026-11-16") == 0)
         ok("the default ceilings are modest (the site's own Gemini steps come first)", 0 < L.DAILY <= 100)
 
