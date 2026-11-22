@@ -122,12 +122,25 @@ def synth_coqui(repo, text, out_wav, cache):
     cache[key].save_wav(wav, out_wav)
 
 
+def _piper_tokens():
+    """The symbol table that ships with a Piper voice already on this machine."""
+    import glob
+    roots = [os.environ.get("PODCAST_MODELS", "/home/claude/models"), "/home/claude/models"]
+    for r in roots:
+        for d in sorted(glob.glob(os.path.join(r, "vits-piper-*"))):
+            t = os.path.join(d, "tokens.txt")
+            if os.path.exists(t):
+                return t
+    return ""
+
+
 def _espeak_dir():
     """The espeak-ng data that ships with the podcast's own voices, wherever it already sits."""
     import glob
     roots = [os.environ.get("PODCAST_MODELS", "/home/claude/models"), "/home/claude/models"]
     for r in roots:
-        hits = glob.glob(os.path.join(r, "*", "espeak-ng-data"))
+        hits = glob.glob(os.path.join(r, "vits-piper-*", "espeak-ng-data")) or \
+                glob.glob(os.path.join(r, "*", "espeak-ng-data"))
         if hits:
             return hits[0]
     return ""
@@ -183,15 +196,21 @@ def synth_piper_onnx(repo, sid, text, out_wav, cache):
         model = hf_hub_download(repo, onnx)
         data_dir = ""
         tok = hf_hub_download(repo, tokens) if tokens else ""
+        if not tok:
+            # sherpa-onnx reads a Piper symbol table of SINGLE characters only: handed "aɪ 161" it stops with
+            # "Error when reading tokens". The table that ships with the podcast's own Piper voice is the one it
+            # accepts, and this voice is a fine-tune of the same Piper base, so it shares that table. If the two
+            # ever disagreed the reading would come out as nonsense, and the CER below is what would show it.
+            tok = _piper_tokens()
         if not tok and cfg:
-            # Piper keeps its symbol table inside the json; sherpa-onnx wants it as a file
             conf = json.load(open(hf_hub_download(repo, cfg), encoding="utf-8"))
             ids = conf.get("phoneme_id_map") or {}
             if ids:
                 tok = os.path.join(os.path.dirname(model), "tokens.txt")
                 with open(tok, "w", encoding="utf-8") as fh:
                     for sym, n in sorted(ids.items(), key=lambda kv: kv[1][0]):
-                        fh.write(f"{sym} {n[0]}\n")
+                        if len(sym) == 1:
+                            fh.write(f"{sym} {n[0]}\n")
         # A plain Piper export carries none of the metadata sherpa-onnx reads ("'sample_rate' does not exist in
         # the metadata"), so it is written in from the voice's own config.json. Nothing is invented: every value
         # comes from that file.
