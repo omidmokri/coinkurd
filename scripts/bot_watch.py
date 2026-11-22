@@ -237,6 +237,14 @@ def whale_label(m):
     return usd(m).replace(".00", "")
 
 
+def _party(e, side):
+    """A name where the address is publicly known -- "Binance 8" reads as a signal, a hex string does not."""
+    name = e.get(side + "_name")
+    if not name:
+        return short(e.get(side))
+    return name + (" \u26d4" if e.get(side + "_kind") == "sanctioned" else "")
+
+
 def scan_whales(s, D, send):
     """every 5 min. send(uid, text, rows)"""
     if time.time() - _whale_last[0] < 300:
@@ -263,7 +271,7 @@ def scan_whales(s, D, send):
             lang = x.get("lang", "fa")
             amt = f"{e.get('amount', 0):,.0f}" if (e.get("amount") or 0) >= 100 else f"{e.get('amount', 0):,.2f}"
             text = L(T["whale"], lang, amt=amt, asset=e.get("asset", "?"), usd=usd(e.get("usd")),
-                     a=short(e.get("from")), b=short(e.get("to"))) + "\n" + L(T["whale_note"], lang)
+                     a=_party(e, "from"), b=_party(e, "to")) + "\n" + L(T["whale_note"], lang)
             send(int(uid), text, [[{"text": "🔗 tx", "url": link}]])
     return True
 

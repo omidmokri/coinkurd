@@ -414,9 +414,19 @@ def whales_data(s):
     hours = {}
     for e in last:
         hours[e["at"][:13]] = hours.get(e["at"][:13], 0) + e["usd"]
+    import whale_labels
+    events = []
+    for ev in w["events"][:80]:
+        ev = dict(ev)
+        for side in ("from", "to"):
+            name, cat = whale_labels.look(ev.get(side) or "")
+            if name:
+                ev[side + "_name"] = name
+                ev[side + "_kind"] = cat
+        events.append(ev)
     return {"updated_at": now_iso(), "min": {"BTC": BTC_MIN, "ETH": ETH_MIN, "stable": STABLE_MIN},
             "totals24": tot, "hourly": [{"h": k, "usd": v} for k, v in sorted(hours.items())],
-            "events": w["events"][:80]}
+            "events": events}
 
 
 # ================================================================== export + worker

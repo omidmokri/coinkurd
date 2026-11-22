@@ -1429,6 +1429,29 @@ def _short(a):
     return (a[:6] + "…" + a[-4:]) if a and len(a) > 14 else (a or "—")
 
 
+def _lab_share(d):
+    """How much of what the reader is looking at carries a name -- stated plainly rather than implied"""
+    seen = named = 0
+    for x in (d.get("events") or [])[:60]:
+        for side in ("from", "to"):
+            a = x.get(side) or ""
+            if a:
+                seen += 1
+                import whale_labels
+                named += bool(whale_labels.look(a)[0])
+    return f"{named} از {seen} نشانی در این جدول" if seen else "فعلاً نشانی‌ای ثبت نشده"
+
+
+def _party(a):
+    """Who is on this side of a transfer: a name where the address is publicly known, the address itself where not"""
+    import whale_labels
+    name, cat = whale_labels.look(a)
+    if not name:
+        return f'<span title="{e(a)}">{e(_short(a))}</span>'
+    mark = " ⛔" if cat == "sanctioned" else ""
+    return f'<b class="wl" title="{e(a)}">{e(name)}{mark}</b>'
+
+
 def build_hub():
     """/sentiment/ /predict/ /whales/ — data produced by the Telegram bot (bot_hub.py)"""
     urls = []
@@ -1481,12 +1504,15 @@ def build_hub():
                    for a, v in (d.get("totals24") or {}).items())
     hrs = json.dumps([{"time": int(datetime.fromisoformat(h["h"] + ":00:00+00:00").timestamp()), "value": round(h["usd"] / 1e6, 1)} for h in d.get("hourly", [])])
     rows_ = "".join(f'<tr><td>{fmt_date(x["at"])}</td><td><b>{x["amount"]:,.0f} {e(x["asset"])}</b><br><small class="note">${x["usd"] / 1e6:,.1f}M</small></td>'
-                    f'<td dir="ltr"><small>{e(_short(x.get("from", "")))} → {e(_short(x.get("to", "")))}</small></td>'
+                    f'<td dir="ltr"><small>{_party(x.get("from", ""))} → {_party(x.get("to", ""))}</small></td>'
                     f'<td><a href="{exp.get(x["asset"], "#")}{e(x["tx"])}" target="_blank" rel="noopener">مشاهده</a></td></tr>' for x in d.get("events", [])[:60])
     m = d.get("min", {})
     body = ('<div class="meta"><a href="/">خانه</a> / رادار نهنگ‌ها</div><h1>رادار نهنگ‌های انتخاب</h1>'
             f'<p class="note">انتقال‌های بزرگ روی زنجیره: بیت‌کوین از {m.get("BTC", 500):,} واحد، اتریوم از {m.get("ETH", 1000):,} واحد و تتر و یو‌اس‌دی‌سی از {m.get("stable", 10_000_000) / 1e6:,.0f} میلیون دلار. هر بلاک تازه بررسی می‌شود. '
             'توجه: بخشی از این انتقال‌ها جابه‌جایی داخلی صرافی‌هاست و هر انتقال بزرگ لزوماً خرید یا فروش نیست</p>'
+            + f'<p class="note">نشانی‌هایی که به‌طور عمومی شناخته‌شده‌اند با نامشان نشان داده می‌شوند ({_lab_share(d)}). '
+              'نام صرافی‌ها از فهرست عمومی Etherscan و DefiLlama می‌آید و نشان ⛔ یعنی نشانی در فهرست تحریم OFAC است. '
+              'بقیه کیف‌پول‌های خصوصی‌اند که هیچ منبع عمومی نامی برایشان ندارد و به شکل خام می‌مانند</p>'
             + (f'<div class="grid">{kpis}</div>' if kpis else "")
             + '<h2>حجم انتقال‌های بزرگ در هر ساعت (میلیون دلار)</h2><div id="whc" style="width:100%"></div>'
             + (f'<h2>آخرین انتقال‌ها</h2><div style="overflow-x:auto"><table class="txt" style="width:100%"><tr><th>زمان</th><th>مقدار</th><th>از ← به</th><th>تراکنش</th></tr>{rows_}</table></div>' if rows_ else '<p class="note">هنوز انتقال بزرگی ثبت نشده است</p>')
