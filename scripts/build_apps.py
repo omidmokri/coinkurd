@@ -67,6 +67,7 @@ IC = {
     "android": '<i class="ek-si b-android" aria-hidden="true"></i>',
     "iphone": SV.format('<rect x="6.5" y="2" width="11" height="20" rx="2.8"/><path d="M10.5 4.6h3"/><path d="M11 19h2"/>'),
     "windows": SV.format('<rect x="2.5" y="4" width="19" height="13" rx="1.8"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M2.5 7.5h19"/>'),
+    "desktop": SV.format('<rect x="2.5" y="4" width="19" height="12" rx="2"/><path d="M8.5 20h7"/><path d="M12 16v4"/><circle cx="12" cy="10" r="2.6"/>'),
     "extension": SV.format('<path d="M9 3h4a1 1 0 0 1 1 1v1.5a1.5 1.5 0 1 0 3 0V4a1 1 0 0 1 1-1h1a2 2 0 0 1 2 2v4a1 1 0 0 1-1 1h-1.5a1.5 1.5 0 1 0 0 3H20a1 1 0 0 1 1 1v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a1 1 0 0 1 1-1h1.5a1.5 1.5 0 1 0 0-3H4a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2z"/>'),
     "telegram": '<i class="ek-si b-telegram" aria-hidden="true"></i>',
     "tradebot": SV.format('<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4"/><circle cx="12" cy="3.2" r="1"/><circle cx="9" cy="13.5" r="1.3"/><circle cx="15" cy="13.5" r="1.3"/><path d="M9.5 17h5"/><path d="M2 13v3M22 13v3"/>'),
@@ -114,6 +115,9 @@ CARDS = {
     "windows": (L("ویندوز", "ویندۆز", "Windows"),
                 L("برنامهٔ دسکتاپ ۶۴ بیتی، با قیمت زندهٔ بیت‌کوین روی آیکون سینی ویندوز.", "بەرنامەی دێسکتۆپی ٦٤ بیت، بە نرخی زیندووی بیتکۆین لەسەر ئایکۆنی سینیی ویندۆز.", "A 64-bit desktop app, with the live bitcoin price on its tray icon."),
                 L("دانلود نصب‌کننده", "داگرتنی دامەزرێنەر", "Download installer")),
+    "desktop": (L("مک و لینوکس", "ماک و لینوکس", "Mac & Linux"),
+                L("خود سایت به‌عنوان برنامه نصب می‌شود: آیکون و پنجرهٔ خودش، همیشه به‌روز.", "ماڵپەڕەکە خۆی وەک بەرنامە دادەمەزرێت: ئایکۆن و پەنجەرەی خۆی، هەمیشە نوێ.", "The site installs itself as an app: its own icon and window, always up to date."),
+                L("راهنمای نصب", "ڕێنمایی دامەزراندن", "How to install")),
     "extension": (L("افزونهٔ مرورگر", "پێوەکراوی وێبگەڕ", "Browser extension"),
                   L("قیمت‌ها، گزارش، دانشنامه و هشدار قیمت در یک کلیک؛ کروم، اج، بریو، اپرا و فایرفاکس.", "نرخ، ڕاپۆرت، زانستنامە و ئاگاداریی نرخ لە یەک کلیکدا؛ کرۆم، ئێج، بڕەیڤ، ئۆپێرا و فایەرفۆکس.", "Prices, the report, the encyclopedia and price alerts in one click; Chrome, Edge, Brave, Opera and Firefox."),
                   L("دریافت افزونه", "وەرگرتنی پێوەکراو", "Get the extension")),
@@ -155,6 +159,30 @@ SEC = {
         "pts": L(["همیشه به‌روز: هر بار که باز می‌کنید، تازه‌ترین نسخهٔ سایت است.", "در کروم آیفون هم از منوی Share همین گزینه هست؛ تجربهٔ تمام‌صفحه با سافاری بهتر است.", "برای حذف: آیکون را نگه دارید و Remove App را بزنید."],
                  ["هەمیشە نوێ: هەر جارێک بیکەیتەوە، نوێترین وەشانی ماڵپەڕە.", "لە کرۆمی ئایفۆنیش لە لیستی Share هەمان بژاردە هەیە؛ ئەزموونی پڕشاشە لەگەڵ سافاری باشترە.", "بۆ سڕینەوە: ئایکۆنەکە ڕابگرە و Remove App دابگرە."],
                  ["Always current: every time you open it, it is the newest version of the site.", "Chrome on iPhone has the same option in its Share menu; the full-screen experience is best with Safari.", "To remove it: hold the icon and tap Remove App."]),
+    },
+    "desktop": {
+        "h": L("مک و لینوکس — نصب از مرورگر", "ماک و لینوکس — دامەزراندن لە وێبگەڕەوە", "Mac & Linux — install from the browser"),
+        "why": L("برای مک و لینوکس فایل نصبی جداگانه نمی‌سازیم، چون لازم نیست: خود سایت به‌صورت برنامه نصب می‌شود. آیکون جدا، پنجرهٔ جدا بدون نوار آدرس، و کار کردن بدون اینترنت برای صفحه‌هایی که قبلاً باز کرده‌اید — همان چیزی که از یک برنامهٔ دسکتاپ انتظار دارید.",
+                 "بۆ ماک و لینوکس فایلێکی دامەزراندنی جیاواز دروست ناکەین، چونکە پێویست ناکات: ماڵپەڕەکە خۆی وەک بەرنامە دادەمەزرێت. ئایکۆنی جیا، پەنجەرەی جیا بێ شریتی ناونیشان، و کارکردن بێ ئینتەرنێت بۆ ئەو پەڕانەی پێشتر کردوتەوە.",
+                 "We do not build a separate installer for Mac or Linux, because none is needed: the site installs itself as an application. Its own icon, its own window without an address bar, and the pages you have already opened keep working offline — what you would expect of a desktop app."),
+        "steps": L(["سایت را در Chrome، Edge یا Brave باز کنید (روی مک، سافاری هم از نسخهٔ ۱۷ به بعد).",
+                    "در نوار آدرس، آیکون نصب را بزنید — آیکونی شبیه صفحهٔ نمایش با فلش رو به پایین. اگر نبود، از منوی سه‌نقطه «Install» یا «Add to Dock» را انتخاب کنید.",
+                    "«نصب» را بزنید. انتخاب در Launchpad یا فهرست برنامه‌های لینوکس شما می‌نشیند و مثل هر برنامهٔ دیگری باز می‌شود."],
+                   ["ماڵپەڕەکە لە Chrome، Edge یان Brave بکەرەوە (لەسەر ماک، سافارییش لە وەشانی ١٧ـەوە).",
+                    "لە شریتی ناونیشاندا ئایکۆنی دامەزراندن دابگرە. ئەگەر نەبوو، لە مێنیووی سێ خاڵەوە «Install» یان «Add to Dock» هەڵبژێرە.",
+                    "«دامەزراندن» دابگرە. ئینتیخاب لە لیستی بەرنامەکانتدا دادەنیشێت و وەک هەر بەرنامەیەکی تر دەکرێتەوە."],
+                   ["Open the site in Chrome, Edge or Brave (on a Mac, Safari 17 and later as well).",
+                    "In the address bar, click the install icon — a small screen with a downward arrow. If it is not there, choose “Install” or “Add to Dock” from the three-dot menu.",
+                    "Click “Install”. Entekhab lands in Launchpad or your Linux applications list and opens like any other program."]),
+        "pts": L(["همان سایت است، پس همهٔ بخش‌ها و همهٔ زبان‌ها را دارد و همیشه به‌روز است؛ چیزی برای به‌روزرسانی دانلود نمی‌کنید.",
+                  "صفحه‌هایی که یک بار باز کرده‌اید بدون اینترنت هم باز می‌شوند.",
+                  "هیچ دسترسی‌ای به فایل‌ها یا دستگاه شما ندارد؛ همان محدودیت‌های مرورگر برقرار است."],
+                 ["هەمان ماڵپەڕە، بۆیە هەموو بەشەکان و هەموو زمانەکانی هەیە و هەمیشە نوێیە؛ هیچ شتێک بۆ نوێکردنەوە دانابەزێنیت.",
+                  "ئەو پەڕانەی جارێک کردوتەوە بێ ئینتەرنێتیش دەکرێنەوە.",
+                  "هیچ دەستڕاگەیشتنێکی بە فایل یان ئامێرەکەت نییە؛ هەمان سنوورەکانی وێبگەڕ هەن."],
+                 ["It is the site itself, so it has every section and every language and is always current; there is nothing to download to update it.",
+                  "Pages you have opened once open again without an internet connection.",
+                  "It can reach neither your files nor your device: the browser's own limits still apply."]),
     },
     "windows": {
         "h": L("ویندوز — برنامهٔ دسکتاپ ۶۴ بیتی", "ویندۆز — بەرنامەی دێسکتۆپی ٦٤ بیت", "Windows — the 64-bit desktop app"),
@@ -382,6 +410,7 @@ def build():
         cards = (card("android", apk_url, (parts(e(t("ver")) + " " + e(dv(an.get("version", ""), lg)), e(size(an.get("size"), lg)), "Android 5+") if has_apk else ""), soon=not has_apk, download=True)
                  + card("iphone", "#iphone", parts("iOS 16.4+", "iPadOS"))
                  + card("windows", win_url, (parts(e(t("ver")) + " " + e(dv(wi.get("version", ""), lg)), e(size(wi.get("size"), lg)), "Windows 10 / 11 · x64") if has_win else ""), soon=not has_win, download=True)
+                 + card("desktop", "#desktop", parts("macOS", "Linux", "Chrome · Edge"))
                  + card("extension", "/extension/", parts(e(t("ver")) + " " + e(dv(ext_ver, lg)), e(size(ext_size, lg)) if ext_size else "", "Chrome · Edge · Firefox"))
                  + card("telegram", "https://t.me/Kurd_kurdistan_bot", '<bdi>@Kurd_kurdistan_bot</bdi>')
                  + card("tradebot", "/trade-bot/", parts("Freqtrade · Docker")))
@@ -410,6 +439,8 @@ def build():
                    + steps("windows", size(wi.get("size"), lg)) + pts("windows") + f'<p class="note">{e(SEC["windows"]["req"][lg])}</p>'
                    + f'<p class="note">{chk} {e(SEC["windows"]["tested"][lg])} · <a href="https://github.com/omidmokri/coinkurd/tree/main/windows" rel="noopener" target="_blank">{e(t("src"))}</a></p>'
                    + sha(wi.get("file", "EXE"), wi.get("sha256", "")) + "</section>")
+        desktop = (f'<section class="ap-sec" data-sec="desktop"><h2>{IC["desktop"]}{e(SEC["desktop"]["h"][lg])}</h2>'
+                   f'<p>{e(SEC["desktop"]["why"][lg])}</p>' + steps("desktop") + pts("desktop") + "</section>")
         ext = (f'<section class="ap-sec" data-sec="extension"><h2>{IC["extension"]}{e(SEC["extension"]["h"][lg])}</h2><p>{e(SEC["extension"]["txt"][lg])}</p>'
                f'<div class="ap-cta"><a class="ap-b p" href="/extension/">{IC["extension"]}<span>{e(SEC["extension"]["more"][lg])}</span></a></div></section>')
         tg = (f'<section class="ap-sec" data-sec="telegram"><h2>{IC["telegram"]}{e(SEC["telegram"]["h"][lg])}</h2><p>{e(SEC["telegram"]["txt"][lg])}</p>'
@@ -424,7 +455,7 @@ def build():
                 f'<div class="ap-cta">{smart}</div><ul class="ap-trust">{trust}</ul></div>{show}</section>'
                 f'<h2 class="ap-h" data-sec="platforms">{e(t("plat_h"))}</h2><div class="ap-grid">{cards}</div>'
                 f'<div class="ap-qr"><img src="/assets/apps/qr-app.svg" alt="entekhab.net/app" width="96" height="96" loading="lazy"><p>{e(t("qr"))}<br><b dir="ltr">entekhab.net/app</b></p></div>'
-                f'{android}{iphone}{windows}{ext}{tg}{trb}{faq}'
+                f'{android}{iphone}{windows}{desktop}{ext}{tg}{trb}{faq}'
                 f'<p class="note">{IC["shield"]} {e(t("sha_why"))} · {e(t("nfa"))}</p></div>')
 
     import build_reality as BR

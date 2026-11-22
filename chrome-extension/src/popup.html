@@ -27,6 +27,7 @@
   <button data-tab="calc" data-t="tCalc">ماشین‌حساب</button>
   <button data-tab="posts" data-t="tPosts">کانال</button>
   <button data-tab="alerts" data-t="tAlerts">هشدار</button>
+  <button data-tab="pages" data-t="tPages">همهٔ صفحات</button>
 </nav>
 <main>
   <section data-pane="market" class="on">
@@ -64,6 +65,11 @@
     <label class="row"><span data-t="notifyPosts">اعلان پست‌های تازهٔ Coin_Kurd</span><input type="checkbox" id="notifyPosts"></label>
     <p class="note" data-t="privacy">همهٔ تنظیمات فقط روی همین مرورگر ذخیره می‌شود و هیچ اطلاعاتی از شما ارسال نمی‌شود.</p>
   </section>
+  <section data-pane="pages">
+    <input id="pq" type="search" autocomplete="off" data-tp="pagesSearch">
+    <p class="note" data-t="pagesHint">هر بخش سایت مستقیم از همین‌جا باز می‌شود.</p>
+    <div id="pages" class="list"></div>
+  </section>
   <button id="pg" class="pg" type="button" hidden aria-label="scroll"><span>⌄</span></button>
 </main>
 <footer>
@@ -77,6 +83,7 @@
   <a href="https://t.me/Coin_Kurd" target="_blank" rel="noopener">✈️ Coin_Kurd</a>
 </footer>
 <p class="nfa"><span id="upd"></span> · <span data-t="nfa">توصیهٔ مالی نیست</span></p>
+<script src="pages.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>
