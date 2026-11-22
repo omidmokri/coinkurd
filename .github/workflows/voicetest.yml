@@ -35,8 +35,10 @@ jobs:
           # coqui-tts does not pull PyTorch itself; without it every candidate fails while the job still
           # reports success. The processor-only wheels are installed first, from PyTorch's own index.
           pip install -q torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          pip install -q numpy "coqui-tts" huggingface_hub soundfile
-          python -c "import torch;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
+          # from PyTorch 2.9 the audio input and output goes through torchcodec, which coqui-tts ships as
+          # its "codec" extra; without it every model fails at import
+          pip install -q numpy "coqui-tts[codec]" huggingface_hub soundfile
+          python -c "import torch, torchcodec;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
       - name: Read the sentences and measure
         timeout-minutes: 35
         run: python scripts/podcast/voicetest.py --out "${{ runner.temp }}/voices" --only "${{ inputs.only }}"
