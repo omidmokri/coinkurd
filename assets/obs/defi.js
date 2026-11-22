@@ -161,6 +161,28 @@
     });
   }
 
+  /* one file per thing the page shows, written one after another with a blank line between, so a reader opening it
+     in a spreadsheet finds the daily total, the chains, the kinds, the protocols and the pools in that order */
+  function exportCsv() {
+    var doc = V.doc; if (!doc) return;
+    var rows = [['total value locked in DeFi, millions of USD']], t = doc.tvl || {}, v = t.v || [];
+    rows.push(['date', 'usd_m']);
+    for (var i = 0; i < v.length; i++) {
+      if (v[i] == null) continue;
+      rows.push([new Date((t.t0 + i * 86400) * 1000).toISOString().slice(0, 10), v[i]]);
+    }
+    rows.push([], ['by chain'], ['name', 'symbol', 'usd_m']);
+    (doc.chains || []).forEach(function (c) { rows.push([c.name, c.sym || '', c.usd]); });
+    rows.push([], ['by kind of protocol'], ['name', 'usd_m']);
+    (doc.cats || []).forEach(function (c) { rows.push([c.name, c.usd]); });
+    rows.push([], ['largest protocols'], ['name', 'symbol', 'kind', 'chain', 'usd_m', 'change_24h_pct', 'change_7d_pct']);
+    (doc.protos || []).forEach(function (p) { rows.push([p.name, p.sym || '', p.cat, p.chain, p.usd, p.d1, p.d7]); });
+    rows.push([], ['pools'], ['pool', 'protocol', 'chain', 'usd_m', 'apy_pct', 'from_fees_pct', 'from_rewards_pct', 'stablecoin', 'impermanent_loss']);
+    (doc.pools || []).forEach(function (p) { rows.push([p.sym, p.proj, p.chain, p.usd, p.apy, p.base, p.rew, p.stable ? 'yes' : 'no', p.il ? 'yes' : 'no']); });
+    rows.push([], ['source', doc.source || ''], ['generated', doc.updated_at || '']);
+    OB.csv('entekhab-defi.csv', rows);
+  }
+
   function mount(el) {
     V.el = el;
     el.innerHTML =
@@ -169,7 +191,7 @@
           OB.ui.seg('ob-r', RANGES.map(function (k) { return [k, T('cr_' + k)]; }), S.range, 'ob-rng') + '</label>' +
         '<label class="ob-lbl"><span>' + esc(T('scale')) + '</span>' +
           OB.ui.seg('ob-sc', [['log', T('sc_log')], ['lin', T('sc_lin')]], S.log ? 'log' : 'lin') + '</label>' +
-        OB.ui.acts() +
+        OB.ui.acts(true) +
       '</div></div>' +
       '<div class="ob-tiles" id="ob-tiles"></div>' +
       '<div class="ob-tsbox"><div class="ob-ts" id="ob-ts"></div><div class="ob-status" id="ob-status"></div></div>' +
@@ -199,6 +221,7 @@
       else if (b.id === 'ob-full') OB.fullscreen(d.getElementById('ob'));
       else if (b.id === 'ob-png') { if (V.ts && V.doc) V.ts.png(T('df_t_tvl'), T('df_h_hist'), 'entekhab-defi.png'); }
       else if (b.id === 'ob-share') OB.ui.share({ range: S.range, pool: S.pool });
+      else if (b.id === 'ob-csv') exportCsv();
     };
     load();
   }

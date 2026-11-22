@@ -141,6 +141,7 @@
     refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
     camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/>',
     full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    down: '<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 19h16"/>',
     share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/>',
     chev: '<path d="m6 9 6 6 6-6"/>',
@@ -202,10 +203,36 @@
     var l = $('#ob-coin-l', root), s = $('#ob-coin-s', root); if (!l) return;
     l.innerHTML = OB.hasLogo(sym) === false ? '' : OB.logo(sym, 20); s.textContent = sym;
   };
-  /* refresh · picture · link · full screen */
-  OB.ui.acts = function () {
-    function b(id, k, ic) { return '<button type="button" class="ob-ib" id="' + id + '" aria-label="' + esc(T(k)) + '" title="' + esc(T(k)) + '">' + OB.icon(ic) + '</button>'; }
-    return '<span class="ob-grow"></span><span class="ob-acts">' + b('ob-refresh', 'refresh', 'refresh') + b('ob-png', 'png', 'camera') + b('ob-share', 'share', 'share') + b('ob-full', 'full', 'full') + '</span>';
+  /* refresh · picture · data · link · full screen. `csv` adds the download button, for views that can hand over
+     the numbers behind what is drawn; a view without it is simply not offered one. */
+  OB.ui.acts = function (csv) {
+    /* the label is passed in already translated: a key hidden inside a variable is one no checker can see, and
+       tests/test_obs_i18n.py reads these files for exactly that */
+    function b(id, label, ic) { return '<button type="button" class="ob-ib" id="' + id + '" aria-label="' + esc(label) + '" title="' + esc(label) + '">' + OB.icon(ic) + '</button>'; }
+    return '<span class="ob-grow"></span><span class="ob-acts">' + b('ob-refresh', T('refresh'), 'refresh') + b('ob-png', T('png'), 'camera') +
+      (csv ? b('ob-csv', T('csv'), 'down') : '') + b('ob-share', T('share'), 'share') + b('ob-full', T('full'), 'full') + '</span>';
+  };
+
+  /* Hand the reader the numbers, not a picture of them. rows[0] is the header.
+     A cell is quoted only where it must be, and a leading =, +, - or @ is prefixed with a quote: a spreadsheet
+     treats those as formulas, and a downloaded file should not be able to run one. */
+  OB.csv = function (name, rows) {
+    var body = rows.map(function (r) {
+      return r.map(function (v) {
+        if (v == null) return '';
+        var t = String(v);
+        /* A leading =, +, - or @ can make a spreadsheet run the cell as a formula, so those are prefixed with a
+           quote. A plain number is not: half the figures here are negative changes and returns, and quoting them
+           would turn every numeric column into text -- the cure would do more damage than the risk. */
+        if (/^[=+\-@\t\r]/.test(t) && !(typeof v === 'number' && isFinite(v)) && !/^-?\d+(\.\d+)?([eE][-+]?\d+)?$/.test(t)) t = "'" + t;
+        return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+      }).join(',');
+    }).join('\r\n');
+    var blob = new Blob(['\ufeff' + body], { type: 'text/csv;charset=utf-8' });   // BOM: Excel reads UTF-8 without it as mojibake
+    var u = URL.createObjectURL(blob), a = d.createElement('a');
+    a.href = u; a.download = name; d.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+    return rows.length - 1;
   };
   OB.ui.share = function (params) {
     var q = new URLSearchParams(); Object.keys(params).forEach(function (k) { if (params[k] != null) q.set(k, params[k]); });

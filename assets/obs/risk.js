@@ -123,6 +123,21 @@
 
   function num(id) { var e = $('#' + id, V.el); return e ? parseFloat(String(e.value).replace(/[^0-9.]/g, '')) || 0 : 0; }
 
+  /* the daily closes and the return of each day, over the window on screen, plus the figures worked out from them */
+  function exportCsv() {
+    var px = prices(); if (!px) return;
+    var doc = V.files[S.coin], t0 = ((doc.cols || {}).price || {}), rets = M.returns(px);
+    var rows = [[S.coin + ' daily closes and returns'], ['index', 'close_usd', 'return']];
+    for (var i = 0; i < px.length; i++) rows.push([i, px[i], i ? (px[i] / px[i - 1] - 1) : null]);
+    rows.push([], ['measured over ' + rets.length + ' days'], ['figure', 'value']);
+    [['var_95', M.varHist(rets, 0.95)], ['var_99', M.varHist(rets, 0.99)],
+     ['expected_shortfall_95', M.shortfall(rets, 0.95)], ['var_95_normal_curve', M.varNormal(rets, 0.95)],
+     ['volatility_annual', M.vol(rets)], ['max_drawdown', M.drawdown(px).worst],
+     ['below_its_high_now', M.drawdown(px).now]].forEach(function (r) { rows.push(r); });
+    rows.push([], ['source', (doc || {}).source || 'Coin Metrics community data']);
+    OB.csv('entekhab-risk-' + S.coin.toLowerCase() + '.csv', rows);
+  }
+
   function mount(el) {
     V.el = el;
     el.innerHTML =
@@ -131,7 +146,7 @@
           OB.ui.seg('ob-c', COINS.map(function (c) { return [c, c]; }), S.coin) + '</label>' +
         '<label class="ob-lbl"><span>' + esc(T('range')) + '</span>' +
           OB.ui.seg('ob-w', WINDOWS.map(function (w) { return [w, T('cr_' + w)]; }), S.win, 'ob-rng') + '</label>' +
-        OB.ui.acts() +
+        OB.ui.acts(true) +
       '</div></div>' +
       '<div class="ob-tiles" id="ob-tiles"></div>' +
       '<div id="ob-status" class="ob-status" hidden></div>' +
@@ -159,6 +174,7 @@
       else if (b.id === 'ob-refresh' || b.id === 'ob-retry') load(true);
       else if (b.id === 'ob-full') OB.fullscreen(d.getElementById('ob'));
       else if (b.id === 'ob-share') OB.ui.share({ coin: S.coin, win: S.win });
+      else if (b.id === 'ob-csv') exportCsv();
     };
     load();
   }

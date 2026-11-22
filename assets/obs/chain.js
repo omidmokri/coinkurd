@@ -200,6 +200,25 @@
     return '<label class="ob-lbl ob-wide"><span>' + esc(T('measure')) + '</span>' + OB.ui.seg('ob-m', ms.map(function (k) { return [k, T('cm_' + k)]; }), cur, 'ob-rng') + '</label>' +
       '<label class="ob-lbl ob-narrow"><span>' + esc(T('measure')) + '</span><select class="ob-sel" id="ob-msel">' + ms.map(function (k) { return '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + esc(T('cm_' + k)) + '</option>'; }).join('') + '</select></label>';
   }
+  /* every day and every measure the file holds for this chain, not only the slice on screen: the chart is a view
+     of the data, and the download is the data */
+  function exportCsv() {
+    var D = V.D; if (!D || !D.cols) return;
+    var keys = Object.keys(D.cols).sort();
+    var rows = [['date'].concat(keys)];
+    for (var i = 0; i < D.n; i++) {
+      var r = [CM.dayStr(D.t0, i)], any = false;
+      for (var k = 0; k < keys.length; k++) {
+        var c = D.cols[keys[k]], j = i - (c.o || 0);
+        var v = (j >= 0 && c.v && j < c.v.length) ? c.v[j] : null;
+        if (v != null) any = true;
+        r.push(v);
+      }
+      if (any) rows.push(r);
+    }
+    OB.csv('entekhab-' + S.asset + '-onchain.csv', rows);
+  }
+
   function mount(kind, el) {
     V.kind = kind; V.el = el; V.D = null;
     var K = KINDS[kind];
@@ -211,7 +230,7 @@
       '<button type="button" class="ob-ib ob-gear" id="ob-gear" aria-expanded="false" aria-controls="ob-more" aria-label="' + esc(T('more')) + '" title="' + esc(T('more')) + '">' + OB.icon('gear') + '</button>' +
       '<div class="ob-more" id="ob-more"><label class="ob-lbl"><span>' + esc(T('range')) + '</span>' + OB.ui.seg('ob-r', RANGES.map(function (k) { return [k, T('cr_' + k)]; }), S.range, 'ob-rng') + '</label>' +
       '<label class="ob-lbl"><span>' + esc(T('scale')) + '</span>' + OB.ui.seg('ob-sc', [['log', T('sc_log')], ['lin', T('sc_lin')]], S.log ? 'log' : 'lin') + '</label></div>' +
-      OB.ui.acts() + '</div><div class="ob-tiles" id="ob-tiles"></div><div class="ob-tsbox"><div class="ob-ts" id="ob-ts"></div><div class="ob-status" id="ob-status"></div></div>' +
+      OB.ui.acts(true) + '</div><div class="ob-tiles" id="ob-tiles"></div><div class="ob-tsbox"><div class="ob-ts" id="ob-ts"></div><div class="ob-status" id="ob-status"></div></div>' +
       '<div class="ob-tblbox" id="ob-tbl" hidden></div><p class="ob-note" id="ob-note"></p>';
     V.ts = new OB.TS($('#ob-ts', el));
     el.onclick = function (e) {
@@ -226,6 +245,7 @@
       else if (b.id === 'ob-full') OB.fullscreen(d.getElementById('ob'));
       else if (b.id === 'ob-png') { if (V.ts && V.D) V.ts.png(coin() + ' · ' + T('cm_' + curM()), V.sub, 'entekhab-' + curM() + '-' + coin() + '.png'); }
       else if (b.id === 'ob-share') OB.ui.share({ asset: S.asset, m: curM(), range: S.range });
+      else if (b.id === 'ob-csv') exportCsv();
     };
     el.onchange = function (e) { if (e.target.id === 'ob-msel' && e.target.value !== S[mKey()]) { S[mKey()] = e.target.value; save(); render(); } };
     load();
