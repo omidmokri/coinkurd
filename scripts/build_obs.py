@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "16"           # asset version (bump with any change to assets/obs/*)
+V = "17"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 

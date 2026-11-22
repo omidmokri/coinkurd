@@ -169,7 +169,11 @@ check("the time of the last look counts, not the file's own", not O.due(stale, N
 
 # ---------------------------------------------------------------- main() against a fake Coin Metrics
 CALLS = []
-STATE = {"rows": {"btc": cm_rows(1600), "eth": cm_rows(700, asset="eth")}, "catalog": "ok", "fail": set(), "no_metric": set()}
+# Every asset obs_chain.py is set to read, so adding one to that list cannot silently skip this fake and leave the
+# new chain untested. Bitcoin and Ether keep their own lengths; the rest get a shorter history, as they have.
+STATE = {"rows": dict({"btc": cm_rows(1600), "eth": cm_rows(700, asset="eth")},
+                      **{a: cm_rows(500, asset=a) for a in O.ASSETS if a not in ("btc", "eth")}),
+         "catalog": "ok", "fail": set(), "no_metric": set()}
 
 
 def fake_get(url, params=None, timeout=90):
@@ -203,7 +207,7 @@ n_calls = len(CALLS)
 before = open(os.path.join(O.OUT_DIR, "chain_btc.json")).read()
 O.main()
 check("a second run right after asks nothing", len(CALLS) == n_calls)
-check("the small file remembers when each asset was last asked", sorted(f("chain_now.json")["checked"]) == ["btc", "eth"])
+check("the small file remembers when each asset was last asked", sorted(f("chain_now.json")["checked"]) == sorted(O.ASSETS))
 os.environ["OBS_CHAIN_FORCE"] = "1"
 mt = os.path.getmtime(os.path.join(O.OUT_DIR, "chain_btc.json"))
 t_now = f("chain_now.json")["updated_at"]

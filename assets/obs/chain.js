@@ -13,11 +13,15 @@
   var NZC = ['rgba(255,90,77,.13)', 'rgba(247,147,26,.11)', 'rgba(201,133,0,.10)', 'rgba(52,211,153,.10)', 'rgba(57,135,229,.13)'];
 
   var KINDS = {
-    mvrv: { assets: ['btc', 'eth'], ms: ['mvrv', 'z', 'nupl', 'caps'] },
+    mvrv: { assets: ['btc', 'eth', 'ltc', 'bch', 'doge', 'ada', 'xrp'], ms: ['mvrv', 'z', 'nupl', 'caps'] },
     flows: { assets: ['btc', 'eth'], ms: ['reserve', 'net', 'inout'] },
     /* Bitcoin only: hash rate, miner revenue, Puell, stock-to-flow. Ether has had no miners since September 2022 and burns most of its fees,
        so "issuance + fees" would not be anybody's revenue there */
-    network: { assets: ['btc', 'eth'], ms: ['adr', 'tx', 'hash', 'rev', 'puell', 's2f'], btcOnly: { hash: 1, rev: 1, puell: 1, s2f: 1 } },
+    /* `only` names the chains a measure exists for; a measure absent from it is offered for every chain listed.
+       Hash rate is proof of work, so Cardano and XRP cannot have one and are not offered it. Issuance-based
+       measures need the coins minted each day, which the free tier carries for the proof-of-work chains. */
+    network: { assets: ['btc', 'eth', 'ltc', 'bch', 'doge', 'ada', 'xrp'], ms: ['adr', 'tx', 'hash', 'rev', 'puell', 's2f'],
+      only: { hash: ['btc', 'ltc', 'bch', 'doge'], rev: ['btc'], puell: ['btc'], s2f: ['btc'] } },
     cycle: { assets: ['btc'], ms: ['mayer', 'w200', 'pi', 'y2', 'gold', 'dd'] }
   };
   var RANGES = ['1y', '2y', '4y', '8y', 'all'], RYEARS = { '1y': 1, '2y': 2, '4y': 4, '8y': 8 };
@@ -50,7 +54,10 @@
   /* ---------------------------------------------------------------- small pieces */
   function coin() { return S.asset.toUpperCase(); }
   function mKey() { return 'm_' + V.kind; }
-  function metrics() { var K = KINDS[V.kind]; return K.ms.filter(function (m) { return S.asset === 'btc' || !(K.btcOnly && K.btcOnly[m]); }); }
+  function metrics() {
+    var K = KINDS[V.kind];
+    return K.ms.filter(function (m) { return !(K.only && K.only[m]) || K.only[m].indexOf(S.asset) >= 0; });
+  }
   function curM() { var ms = metrics(); if (ms.indexOf(S[mKey()]) < 0) S[mKey()] = ms[0]; return S[mKey()]; }
   function tile(label, value, sub) { return '<div class="ob-tile"><small>' + esc(label) + '</small><b class="ob-n">' + value + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>'; }
   function status(html, cls) { var s = $('#ob-status', V.el); if (s) { s.innerHTML = html || ''; s.className = 'ob-status' + (cls ? ' ' + cls : ''); s.hidden = !html; } }

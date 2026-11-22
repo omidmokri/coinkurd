@@ -39,7 +39,14 @@ WANT = [("price", "PriceUSD"), ("mvrv", "CapMVRVCur"), ("sply", "SplyCur"), ("is
         ("fin", "FlowInExNtv"), ("fout", "FlowOutExNtv"), ("sex", "SplyExNtv")]
 INTS = {"adr", "tx", "tfr"}
 SKIP = {"eth": {"hash"}}                    # Ether's hash rate ended with the Merge (September 2022)
-ASSETS = ("btc", "eth")
+# What the community tier actually carries, read from its catalogue on 2026-11-22 and not assumed:
+#   ltc, bch, doge  9 of the 12 measures (market value, hash rate, addresses, transactions, fees)
+#   ada             8  -- no hash rate, which is right: it is not proof of work
+#   xrp             7  -- no issuance either
+# Solana and Avalanche are deliberately absent: the free tier has their price and nothing else, so a page built on
+# them would be an empty chart with a title. Exchange flows (fin/fout/sex) exist for Bitcoin and Ether alone, so
+# /charts/exchange-flows/ stays with those two.
+ASSETS = ("btc", "eth", "ltc", "bch", "doge", "ada", "xrp")
 
 
 def get(url, params=None, timeout=90):
