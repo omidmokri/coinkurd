@@ -42,6 +42,12 @@ POOL_MIN = 1_000_000          # a rate on a smaller pool says more about the poo
 N_CHAINS, N_CATS, N_PROTOS, N_POOLS = 15, 12, 40, 40
 
 
+def _sym(v):
+    """DefiLlama writes a bare "-" where a protocol has no token of its own; that is not a symbol"""
+    v = str(v or "").strip().upper().lstrip("$")
+    return "" if v in ("", "-", "NONE") else v
+
+
 def _fresh(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -97,13 +103,17 @@ def main():
         "source": SOURCE,
         "note": "Exchange reserves (DefiLlama category CEX) are excluded; the total is DefiLlama's own series.",
         "tvl": tvl,
-        "chains": [{"name": c["name"], "usd": C.sig(c["tvl"] / M)} for c in top_chains],
+        # tokenSymbol is the chain's own coin (Ethereum -> ETH): the site already has a logo for most of them
+        "chains": [{"name": c["name"], "sym": _sym(c.get("tokenSymbol")),
+                    "usd": C.sig(c["tvl"] / M)} for c in top_chains],
         "cats": [{"name": k, "usd": C.sig(v / M)}
                  for k, v in sorted(by_cat.items(), key=lambda kv: -kv[1])[:N_CATS]],
-        "protos": [{"name": p["name"], "cat": p.get("category") or "", "chain": p.get("chain") or "",
+        "protos": [{"name": p["name"], "sym": _sym(p.get("symbol")),
+                    "cat": p.get("category") or "", "chain": p.get("chain") or "",
                     "usd": C.sig(p["tvl"] / M), "d1": C.sig(p.get("change_1d") or 0, 3),
                     "d7": C.sig(p.get("change_7d") or 0, 3)} for p in top_protos],
-        "pools": [{"sym": p.get("symbol") or "", "proj": p.get("project") or "", "chain": p.get("chain") or "",
+        "pools": [{"sym": p.get("symbol") or "", "tok": _sym(str(p.get("symbol") or "").split("-")[0]),
+                   "proj": p.get("project") or "", "chain": p.get("chain") or "",
                    "usd": C.sig(p["tvlUsd"] / M), "apy": C.sig(p["apy"], 4),
                    "base": C.sig(p.get("apyBase") or 0, 4), "rew": C.sig(p.get("apyReward") or 0, 4),
                    "stable": bool(p.get("stablecoin")), "il": (p.get("ilRisk") or "") == "yes"}

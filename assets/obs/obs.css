@@ -244,8 +244,10 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 .ob-cpick{max-width:100%}.ob-skew{margin-top:8px}
 
 /* ---- /charts/defi/ : the two side-by-side tables, the bar behind a row's name, and the risk tags ---- */
-.ob-dfcols{display:grid;gap:14px;grid-template-columns:1fr}
-@media (min-width:860px){.ob-dfcols{grid-template-columns:1fr 1fr}}
+/* a wide table and its narrow companion side by side; on a phone they stack in source order */
+.ob-dfcols{display:grid;gap:14px 18px;grid-template-columns:1fr;align-items:start}
+@media (min-width:1000px){.ob-dfcols{grid-template-columns:minmax(0,1.85fr) minmax(0,1fr)}}
+.ob-dfcols>section{min-width:0}
 .ob-dfh{margin:18px 0 8px;font-size:15px;font-weight:700}
 .ob-dfbar2{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ob-dfbar2 .ob-dfh{margin-bottom:8px}
@@ -256,3 +258,8 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 .ob-dftag{display:inline-block;font-style:normal;font-size:11px;line-height:1.6;padding:0 7px;border-radius:999px;margin-inline-end:4px;white-space:nowrap}
 .ob-dftag.ok{background:rgba(52,211,153,.16);color:#34d399}
 .ob-dftag.warn{background:rgba(255,90,77,.16);color:#ff8a7d}
+/* a logo sits before the name; a chain or protocol with no coin of its own keeps the same indent */
+.ob-dfname{display:inline-flex;align-items:center;gap:7px;min-width:0}
+.ob-dfname>b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ob-dfname .ob-lg{border-radius:50%;flex:0 0 auto}
+.ob-dfnone{display:inline-block;width:18px;height:18px;flex:0 0 auto;border-radius:50%;background:rgba(255,255,255,.06)}

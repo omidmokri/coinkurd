@@ -32,21 +32,22 @@ def ok(what, cond, got=None):
         FAILS.append(what)
 
 
-CHAINS = [{"name": "Ethereum", "tvl": 35_818_585_999.8}, {"name": "Base", "tvl": 4_669_982_961.2},
-          {"name": "Solana", "tvl": 4_619_778_327.9}, {"name": "Dead", "tvl": 0}]
+CHAINS = [{"name": "Ethereum", "tokenSymbol": "ETH", "tvl": 35_818_585_999.8},
+          {"name": "Base", "tvl": 4_669_982_961.2},                      # a chain with no coin of its own
+          {"name": "Solana", "tokenSymbol": "SOL", "tvl": 4_619_778_327.9}, {"name": "Dead", "tvl": 0}]
 PROTOS = [
     {"name": "Binance CEX", "category": "CEX", "chain": "Multi-Chain", "tvl": 108_463_136_389.3,
      "change_1d": 1.34, "change_7d": -1.98},
     {"name": "OKX", "category": "CEX", "chain": "Multi-Chain", "tvl": 26_406_000_000.0,
      "change_1d": 1.5, "change_7d": 5.44},
     {"name": "LayerZero V2", "category": "Bridge", "chain": "Multi-Chain", "tvl": 17_683_000_000.0,
-     "change_1d": -0.61, "change_7d": 5.72},
+     "symbol": "ZRO", "change_1d": -0.61, "change_7d": 5.72},
     {"name": "Lido", "category": "Liquid Staking", "chain": "Multi-Chain", "tvl": 16_273_000_000.0,
      "change_1d": 2.54, "change_7d": -7.88},
     {"name": "Aave V3", "category": "Lending", "chain": "Multi-Chain", "tvl": 15_135_000_000.0,
      "change_1d": 2.78, "change_7d": 11.45},
     {"name": "Spark", "category": "Lending", "chain": "Ethereum", "tvl": 5_000_000_000.0,
-     "change_1d": 0.1, "change_7d": 0.2},
+     "symbol": "-", "change_1d": 0.1, "change_7d": 0.2},
     {"name": "Closed", "category": "Lending", "chain": "Ethereum", "tvl": 0, "change_1d": 0, "change_7d": 0},
 ]
 POOLS = {"status": "success", "data": [
@@ -106,6 +107,17 @@ def main():
     ok("the best rate leads", doc["pools"][0]["sym"] == "ETH-USDC", doc["pools"][0])
     ok("a stablecoin pool is marked", pools["USDC"]["stable"] is True and pools["USDC"]["il"] is False)
     ok("impermanent loss is marked", pools["ETH-USDC"]["il"] is True)
+
+    # a logo needs a ticker; the source writes a bare "-" where there is none, and that is not one
+    ch = {c["name"]: c for c in doc["chains"]}
+    ok("a chain's own coin is carried through", ch["Ethereum"]["sym"] == "ETH" and ch["Solana"]["sym"] == "SOL")
+    ok("a chain with no coin gets no symbol", ch["Base"]["sym"] == "", ch["Base"])
+    pr = {p["name"]: p for p in doc["protos"]}
+    ok("a protocol's token is carried through", pr["LayerZero V2"]["sym"] == "ZRO")
+    ok("a bare dash is not treated as a symbol", pr["Spark"]["sym"] == "", pr["Spark"])
+    ok("a pool's first token is picked out for its logo",
+       pools["ETH-USDC"]["tok"] == "ETH" and pools["USDC"]["tok"] == "USDC",
+       (pools["ETH-USDC"]["tok"], pools["USDC"]["tok"]))
 
     t = doc["tvl"]
     ok("the series is oldest first", t["t0"] == HIST[0]["date"] and t["n"] == 3)

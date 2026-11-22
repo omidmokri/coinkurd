@@ -34,9 +34,13 @@
   }
   function mv(v) { return v > 0 ? GRN : v < 0 ? RED : 'inherit'; }
   /* a tinted bar behind the first cell, so the shape of a table is visible before any number is read */
-  function cell(name, share, color) {
+  /* the site's own logo set, by ticker; nothing is drawn for a chain or protocol that has no coin of its own */
+  function mark(sym) {
+    return sym && OB.hasLogo(sym) !== false ? OB.logo(sym, 18) : '<i class="ob-dfnone"></i>';
+  }
+  function cell(name, share, color, sym) {
     return '<td class="ob-dfn"><i class="ob-dfbar" style="width:' + Math.max(1.5, share * 100).toFixed(1) +
-      '%;background:' + color + '"></i><span>' + esc(name) + '</span></td>';
+      '%;background:' + color + '"></i><span class="ob-dfname">' + mark(sym) + '<b>' + esc(name) + '</b></span></td>';
   }
   function grid(head, rows, id) {
     return '<div class="ob-tblw"><table class="ob-grid"' + (id ? ' id="' + id + '"' : '') + '><thead><tr>' +
@@ -95,7 +99,7 @@
     var cTop = chains.length ? chains[0].usd : 1;
     $('#ob-chains', el).innerHTML = grid([T('df_c_chain'), T('df_c_tvl'), T('df_c_share')],
       chains.map(function (c) {
-        return '<tr>' + cell(c.name, c.usd / cTop, 'rgba(240,180,41,.22)') +
+        return '<tr>' + cell(c.name, c.usd / cTop, 'rgba(240,180,41,.22)', c.sym) +
           '<td class="ob-n">' + esc(OB.ltr(usdM(c.usd))) + '</td>' +
           '<td class="ob-n">' + esc(OB.ltr(now ? (c.usd / now * 100).toFixed(1) + '%' : '—')) + '</td></tr>';
       }));
@@ -112,7 +116,7 @@
     $('#ob-protos', el).innerHTML = grid(
       [T('df_c_name'), T('df_c_cat'), T('df_c_chain'), T('df_c_tvl'), T('df_c_1d'), T('df_c_7d')],
       protos.map(function (p) {
-        return '<tr>' + cell(p.name, p.usd / pTop, 'rgba(52,211,153,.18)') +
+        return '<tr>' + cell(p.name, p.usd / pTop, 'rgba(52,211,153,.18)', p.sym) +
           '<td>' + esc(p.cat) + '</td><td>' + esc(p.chain) + '</td>' +
           '<td class="ob-n">' + esc(OB.ltr(usdM(p.usd))) + '</td>' +
           '<td class="ob-n" style="color:' + mv(p.d1) + '">' + esc(OB.ltr(pct(p.d1))) + '</td>' +
@@ -125,7 +129,7 @@
       list.map(function (p) {
         var tags = (p.stable ? '<em class="ob-dftag ok">' + esc(T('df_stable')) + '</em>' : '') +
                    (p.il ? '<em class="ob-dftag warn">' + esc(T('df_il')) + '</em>' : '');
-        return '<tr>' + cell(p.sym, Math.min(1, p.apy / (aTop || 1)), 'rgba(240,180,41,.18)') +
+        return '<tr>' + cell(p.sym, Math.min(1, p.apy / (aTop || 1)), 'rgba(240,180,41,.18)', p.tok) +
           '<td>' + esc(p.proj) + '</td><td>' + esc(p.chain) + '</td>' +
           '<td class="ob-n">' + esc(OB.ltr(usdM(p.usd))) + '</td>' +
           '<td class="ob-n"><b>' + esc(OB.ltr(pct(p.apy, 2))) + '</b></td>' +
@@ -169,14 +173,18 @@
       '</div></div>' +
       '<div class="ob-tiles" id="ob-tiles"></div>' +
       '<div class="ob-tsbox"><div class="ob-ts" id="ob-ts"></div><div class="ob-status" id="ob-status"></div></div>' +
+      /* the wide table leads each row and the narrow one sits beside it; on a phone they stack in this order */
       '<div class="ob-dfcols">' +
+        '<section class="ob-dfwide"><h3 class="ob-dfh">' + esc(T('df_h_protos')) + '</h3><div id="ob-protos"></div></section>' +
         '<section><h3 class="ob-dfh">' + esc(T('df_h_chains')) + '</h3><div id="ob-chains"></div></section>' +
+      '</div>' +
+      '<div class="ob-dfcols">' +
+        '<section class="ob-dfwide">' +
+          '<div class="ob-dfbar2"><h3 class="ob-dfh">' + esc(T('df_h_pools')) + '</h3>' +
+            OB.ui.seg('ob-pf', [['all', T('df_f_all')], ['stable', T('df_f_stable')], ['safe', T('df_f_safe')]], S.pool, 'ob-rng') +
+          '</div><div id="ob-pools"></div></section>' +
         '<section><h3 class="ob-dfh">' + esc(T('df_h_cats')) + '</h3><div id="ob-cats"></div></section>' +
       '</div>' +
-      '<h3 class="ob-dfh">' + esc(T('df_h_protos')) + '</h3><div id="ob-protos"></div>' +
-      '<div class="ob-dfbar2"><h3 class="ob-dfh">' + esc(T('df_h_pools')) + '</h3>' +
-        OB.ui.seg('ob-pf', [['all', T('df_f_all')], ['stable', T('df_f_stable')], ['safe', T('df_f_safe')]], S.pool, 'ob-rng') +
-      '</div><div id="ob-pools"></div>' +
       '<p class="ob-note" id="ob-note"></p>';
     V.ts = new OB.TS($('#ob-ts', el));      /* made at once: it gives the page its height while the data loads */
     el.onclick = function (e) {
