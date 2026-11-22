@@ -1,36 +1,36 @@
 {
- "updated_at": "2026-11-22T11:52:20.207308+00:00",
+ "updated_at": "2026-11-22T12:07:22.666979+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
+  "ETH": {
+   "n": 112,
+   "amount": 237741.61000000002,
+   "usd": 399337475
+  },
   "USDT": {
-   "n": 26,
-   "amount": 796264526,
-   "usd": 796264526
+   "n": 28,
+   "amount": 850264526,
+   "usd": 850264526
   },
   "BTC": {
-   "n": 109,
-   "amount": 285818.5800000001,
-   "usd": 17145317282
+   "n": 106,
+   "amount": 281741.42000000004,
+   "usd": 16898989741
   },
   "USDC": {
    "n": 154,
    "amount": 8830628753,
    "usd": 8830628753
-  },
-  "ETH": {
-   "n": 111,
-   "amount": 236511.83000000002,
-   "usd": 397235262
   }
  },
  "hourly": [
   {
    "h": "2026-11-21T20",
-   "usd": 2423806320
+   "usd": 2177478779
   },
   {
    "h": "2026-11-21T21",
@@ -90,10 +90,43 @@
   },
   {
    "h": "2026-11-22T11",
-   "usd": 1067324658
+   "usd": 1121324658
+  },
+  {
+   "h": "2026-11-22T12",
+   "usd": 2102213
   }
  ],
  "events": [
+  {
+   "asset": "ETH",
+   "amount": 1229.78,
+   "usd": 2102213,
+   "tx": "0x510280dbdd2b4b785b93e11560d27ff8564a84ae7b137faa689ac161f5aed50f",
+   "from": "0x690c3eebf6ee237f00fc96f9766282f096c191cc",
+   "to": "0x6781b0098e3238caeede00647c9b69dd98a86a83",
+   "at": "2026-11-22T12:00:35+00:00"
+  },
+  {
+   "asset": "USDT",
+   "amount": 27000000,
+   "usd": 27000000,
+   "tx": "0x6b9445678a26f8c5fe2d53981609bfc854db711471127d5dce3c68418cff228e",
+   "from": "0xb5fdd40dcb681c31ad3b8cf587b33d994526ffea",
+   "to": "0xf89d7b9c864f589bbf53a82105107622b35eaa40",
+   "at": "2026-11-22T11:55:49.068978+00:00"
+  },
+  {
+   "asset": "USDT",
+   "amount": 27000000,
+   "usd": 27000000,
+   "tx": "0x91299fdcc6e78685afac179d076c77d6d24ec7171a05bd5707285de6154d6db9",
+   "from": "0x99c9fc46f92e8a1c0dec1b1747d010903e884be1",
+   "to": "0xb5fdd40dcb681c31ad3b8cf587b33d994526ffea",
+   "at": "2026-11-22T11:54:06.219046+00:00",
+   "from_name": "Optimism: Gateway",
+   "from_kind": "bridge"
+  },
   {
    "asset": "USDT",
    "amount": 25000000,
@@ -814,33 +847,6 @@
    "from_kind": "entity",
    "to_name": "Null Address",
    "to_kind": "blocked"
-  },
-  {
-   "asset": "BTC",
-   "amount": 2486.79,
-   "usd": 148411768,
-   "tx": "265165df672a4865b66f12c59f4fdf49974b6acc90c76ad90ddf28f2b44ed80e",
-   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
-   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
-   "at": "2026-11-22T08:48:49+00:00"
-  },
-  {
-   "asset": "USDT",
-   "amount": 46168581,
-   "usd": 46168581,
-   "tx": "0xdf4c8505cea3286fc23916b5ac9cc392947a9e7b9189a6358208557e31790e8d",
-   "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
-   "to": "0xd1c6aca7ea7ed44e1873dafa054c28ceb690c7eb",
-   "at": "2026-11-22T08:47:56.772485+00:00"
-  },
-  {
-   "asset": "USDT",
-   "amount": 46168581,
-   "usd": 46168581,
-   "tx": "0x711f14243218a82544a053b9a0a413cd4fad0fdbc9dc321b29f3b055261a8427",
-   "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
-   "to": "0xd1c6aca7ea7ed44e1873dafa054c28ceb690c7eb",
-   "at": "2026-11-22T08:47:56.772392+00:00"
   }
  ]
 }
