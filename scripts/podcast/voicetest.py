@@ -55,6 +55,15 @@ CANDIDATES = [
     # runs through sherpa-onnx, and it has seven speakers, so each is read and measured on its own.
     dict(key="alifthi", repo="alifthi/persian-TTS", kind="piper-onnx", speakers=7,
          licence="see model card; trained only on data allowing commercial use", note="2026 VITS, Piper ONNX"),
+    # The newest of them, and the one the owner's ear is most likely to accept: a 2026 model with voice cloning
+    # that runs on the processor. Its own repository carries the reference clips, one woman and one man, so the
+    # morning and evening readings come from the same model without anyone's voice being borrowed.
+    dict(key="pocket-woman", repo="mehdi-hf/pocket-tts-farsi-v2", kind="pocket",
+         prompt="samples/prompt_hello.wav", licence="cc-by-nc-4.0",
+         note="2026 Pocket-TTS, 109M, woman's reference clip"),
+    dict(key="pocket-man", repo="mehdi-hf/pocket-tts-farsi-v2", kind="pocket",
+         prompt="samples/prompt_news_paragraph.wav", licence="cc-by-nc-4.0",
+         note="2026 Pocket-TTS, 109M, man's reference clip"),
 ]
 
 
@@ -120,6 +129,98 @@ def synth_coqui(repo, text, out_wav, cache):
                                  tts_config_path=hf_hub_download(repo, cfg), use_cuda=False)
     wav = cache[key].tts(text)
     cache[key].save_wav(wav, out_wav)
+
+
+# ---------------------------------------------------------------- Pocket-TTS (Persian), read on the processor
+# This model does NOT take Persian script. Handed Persian letters it maps every one to the unknown token and
+# emits end-of-speech at once: silence, with no error raised. So the text goes through a grapheme-to-phoneme
+# stage first, and the notation its author specifies is followed exactly. Everything below is from the model
+# card, not guessed: the translation table, dropping the question mark before G2P (that mark otherwise becomes
+# a glottal stop nobody said), stripping the ezafe marker when driving the model directly, the five-second cap
+# on the voice prompt, and splitting long text into short chunks because generations stop terminating past
+# about 21 tokens.
+G2P_REPO = "mehdi-hf/Homo-GE2PE-Persian-HF"
+TO_PHONEMES = str.maketrans({"/": "a", "a": "A", "@": "?", "$": "S", "c": "C"})
+PROMPT_SECONDS = 5.0          # longer and the model continues the prompt's own words instead of yours
+CHUNK_CHARS = 70              # keeps a chunk inside the band where generations terminate
+PAUSE = 0.25                  # seconds of silence joining the chunks
+
+
+def _pocket_g2p(cache, repo):
+    if "g2p" not in cache:
+        import torch
+        from transformers import AutoTokenizer, T5ForConditionalGeneration
+        from huggingface_hub import hf_hub_download
+        import importlib.util
+        norm_path = hf_hub_download(repo, "normalize_fa.py")      # the author's own normaliser, shipped with the model
+        spec = importlib.util.spec_from_file_location("normalize_fa", norm_path)
+        norm = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(norm)
+        tok = AutoTokenizer.from_pretrained(G2P_REPO)
+        g2p = T5ForConditionalGeneration.from_pretrained(G2P_REPO).eval()
+        cache["g2p"] = (torch, tok, g2p, norm)
+    return cache["g2p"]
+
+
+def phonemise(text, cache, repo):
+    torch, tok, g2p, norm = _pocket_g2p(cache, repo)
+    text = norm.normalize_for_model(text)          # spells numbers out; G2P drops digits silently without this
+    text = text.replace("\u061f", "").replace("?", "")
+    enc = tok([text], add_special_tokens=False, return_tensors="pt")
+    with torch.no_grad():
+        out = g2p.generate(**enc, num_beams=5, max_length=512, early_stopping=True)
+    raw = tok.batch_decode(out, skip_special_tokens=True)[0].strip()
+    # the "1" marks the ezafe and is for a chunker to read; the model itself must not see it
+    return raw.translate(TO_PHONEMES).replace("1", "")
+
+
+def _chunks(ph):
+    """Short pieces, cut on word boundaries. Long chunks run away and repeat themselves."""
+    words, out, cur = ph.split(), [], ""
+    for w in words:
+        if cur and len(cur) + 1 + len(w) > CHUNK_CHARS:
+            out.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}".strip()
+    if cur:
+        out.append(cur)
+    return out
+
+
+def synth_pocket(repo, prompt_file, text, out_wav, cache):
+    import numpy as np
+    import soundfile as sf
+    from huggingface_hub import hf_hub_download
+    from pocket_tts import TTSModel
+
+    key = "pocket::" + repo
+    if key not in cache:
+        cache[key] = TTSModel.load_model(repo)
+    model = cache[key]
+
+    pk = "prompt::" + repo + prompt_file
+    if pk not in cache:
+        raw = hf_hub_download(repo, prompt_file)
+        cut = os.path.join(os.path.dirname(raw), "prompt5.wav")
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", raw, "-t", str(PROMPT_SECONDS), cut], check=True)
+        cache[pk] = model.get_state_for_audio_prompt(cut)
+    state = cache[pk]
+
+    sr = model.sample_rate
+    parts, gap = [], np.zeros(int(PAUSE * sr), dtype=np.float32)
+    for piece in _chunks(phonemise(text, cache, repo)):
+        audio = model.generate_audio(state, piece)
+        a = audio.numpy().astype(np.float32).reshape(-1)
+        # a generation that never stops runs to the cap and repeats itself; one retry usually terminates
+        cap = len(piece.split()) * 1.1 + 3.0
+        if len(a) / sr > cap:
+            a = model.generate_audio(state, piece).numpy().astype(np.float32).reshape(-1)
+        parts.append(a)
+        parts.append(gap)
+    if not parts:
+        raise RuntimeError("the phoneme stage produced nothing to read")
+    sf.write(out_wav, np.concatenate(parts[:-1]), sr)
 
 
 def _piper_tokens():
@@ -278,6 +379,8 @@ def main():
                 w = os.path.join(a.out, f"{c['key']}_{i}.wav")
                 if c["kind"] == "piper-onnx":
                     synth_piper_onnx(c["repo"], c.get("speaker", 0), s, w, cache)
+                elif c["kind"] == "pocket":
+                    synth_pocket(c["repo"], c["prompt"], s, w, cache)
                 else:
                     synth_coqui(c["repo"], s, w, cache)
                 hz, frames = f0_median(w)
