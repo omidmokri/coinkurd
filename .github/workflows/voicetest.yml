@@ -40,7 +40,8 @@ jobs:
           # coqui-tts is installed WITHOUT its codec extra: that extra pulls torchcodec from PyPI, which is
           # built against CUDA and fails on a runner with no graphics card ("libnvrtc.so.13: cannot open
           # shared object file"). The processor build installed above is the one that must stay.
-          pip install -q numpy "coqui-tts" huggingface_hub soundfile
+          # six is pulled in indirectly by coqui-tts but not declared by it
+          pip install -q numpy "coqui-tts" huggingface_hub soundfile six
           python -c "import torch, torchcodec;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
       - name: Read the sentences and measure
         timeout-minutes: 35
