@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "11"           # asset version (bump with any change to assets/obs/*)
+V = "12"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -40,6 +40,7 @@ PAGES = [
     ("mvrv", "mvrv", ["chainmath.js", "ts.js", "chain.js"]),
     ("flows", "exchange-flows", ["chainmath.js", "ts.js", "chain.js"]),
     ("stables", "stablecoins", ["flowmath.js", "ts.js", "prem.js"]),
+    ("defi", "defi", ["ts.js", "defi.js"]),
     ("network", "network", ["chainmath.js", "ts.js", "chain.js"]),
     ("cycle", "bitcoin-cycle", ["chainmath.js", "ts.js", "chain.js"]),
 ]
@@ -896,6 +897,77 @@ T.update({
                    ("Sources", ["Public candles of Coinbase and Binance (read by the site), Bybit’s public premium index and Deribit’s public futures (read in your browser)."])],
         },
     },
+    "defi": {
+        "title": "دیفای: ارزش قفل‌شده و بازدهی‌ها | entekhab.net",
+        "desc": "ارزش قفل‌شده در دیفای از ۲۰۱۷، به تفکیک زنجیره و نوع پروتکل، بزرگ‌ترین پروتکل‌ها با تغییر ۲۴ساعته، و بهترین بازدهی استخرها با ریسکشان. رایگان.",
+        "og": "دیفای: قفل‌شده و بازدهی",
+        "ld": "Entekhab DeFi dashboard",
+        "kw": ["دیفای", "DeFi", "TVL", "ارزش قفل شده", "total value locked", "defillama", "دیفای لاما", "بازدهی دیفای", "yield farming", "APY", "aave", "lido", "uniswap", "دیفای چیست"],
+        "h1": {"fa": "دیفای: چه چیزی قفل شده و چه می‌پردازد", "ckb": "دیفای: چی قوفڵکراوە و چەند دەدات",
+               "ar": "التمويل اللامركزي: ما المقفل وما العائد", "en": "DeFi: what is locked and what it pays"},
+        "p": {"fa": "ارزش قفل‌شده در پروتکل‌های دیفای روز به روز، به تفکیک زنجیره و نوع، بزرگ‌ترین پروتکل‌ها و بازدهی استخرها با ریسکشان",
+              "ckb": "بەهای قوفڵکراو لە پڕۆتۆکۆڵەکانی دیفای ڕۆژ بە ڕۆژ، بە پێی زنجیرە و جۆر، گەورەترین پڕۆتۆکۆڵەکان و ڕێژەی حەوزەکان لەگەڵ مەترسییەکانیان",
+              "ar": "القيمة المقفلة في بروتوكولات التمويل اللامركزي يوماً بيوم، حسب السلسلة والنوع، وأكبر البروتوكولات وعوائد المجمّعات ومخاطرها",
+              "en": "What is locked in DeFi protocols day by day, by chain and by kind, the largest protocols, and what the pools pay against the risk they carry"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                "<b>قفل‌شده:</b> ارزش دلاری دارایی‌هایی که داخل قراردادهای دیفای نشسته‌اند، روز به روز از ۲۰۱۷.",
+                "<b>به تفکیک زنجیره:</b> سهم اتریوم، سولانا، Base و بقیه.",
+                "<b>به تفکیک نوع:</b> وام‌دهی، صرافی غیرمتمرکز، استیکینگ نقد، پل و بقیه.",
+                "<b>بازدهی‌ها:</b> استخرهایی با بیش از یک میلیون دلار، مرتب بر اساس نرخ سالانه، با دو ریسکی که تعیین می‌کند نرخ واقعاً رایگان است یا نه."]),
+                ("چه چیزی شمرده نمی‌شود", [
+                    "ذخایر صرافی‌های متمرکز. DefiLlama آن‌ها را هم فهرست می‌کند، ولی پول داخل صرافی در پروتکل قفل نیست — اگر شمرده می‌شد، فقط بایننس بزرگ‌تر از کل دیفای می‌شد و عدد بی‌معنا.",
+                    "پل‌ها و استیکینگ نقد شمرده می‌شوند، چون آن پول واقعاً داخل قرارداد است."]),
+                ("دربارهٔ بازدهی‌ها", [
+                    "نرخ یعنی آنچه استخر اخیراً پرداخته، نه قولی برای آینده.",
+                    "<b>استیبل‌کوین:</b> استخر دلاری است و نوسان قیمت ندارد.",
+                    "<b>ضرر ناپایدار:</b> اگر قیمت دو دارایی از هم فاصله بگیرد ممکن است از نگه‌داشتن ساده کمتر عایدتان شود.",
+                    "استخرهای کمتر از یک میلیون دلار فهرست نمی‌شوند، چون نرخ بزرگ روی استخر کوچک بیشتر دربارهٔ خود استخر می‌گوید تا دربارهٔ بازار."]),
+                ("منبع", ["DefiLlama (api.llama.fi و yields.llama.fi)، رایگان و بدون کلید. به‌روزرسانی هر سه ساعت."])],
+            "ckb": [("ئەم لاپەڕە چی پیشان دەدات", [
+                "<b>قوفڵکراو:</b> بەهای دۆلاری ئەو سامانانەی لەناو گرێبەستەکانی دیفای دانراون، ڕۆژ بە ڕۆژ لە ٢٠١٧.",
+                "<b>بە پێی زنجیرە:</b> پشکی ئیتریۆم، سۆلانا، Base و ئەوانی تر.",
+                "<b>بە پێی جۆر:</b> قەرزدان، بۆرسەی ناناوەندی، ستەیکینگی نەختینە، پرد و ئەوانی تر.",
+                "<b>ڕێژەکان:</b> حەوزەکانی زیاتر لە یەک ملیۆن دۆلار، بە پێی ڕێژەی ساڵانە، لەگەڵ دوو مەترسییەکە."]),
+                ("چی ناژمێردرێت", [
+                    "یەدەگی بۆرسە ناوەندییەکان. پارەی ناو بۆرسە لە پڕۆتۆکۆڵدا قوفڵ نەکراوە.",
+                    "پرد و ستەیکینگی نەختینە دەژمێردرێن، چونکە ئەو پارەیە بەڕاستی لەناو گرێبەستدایە."]),
+                ("دەربارەی ڕێژەکان", [
+                    "ڕێژە ئەوەیە کە حەوزەکە بەم دواییە داویەتی، نەک بەڵێنی داهاتوو.",
+                    "<b>ستەیبڵکۆین:</b> حەوزەکە دۆلارییە و جوڵەی نرخی نییە.",
+                    "<b>زیانی ناجێگیر:</b> ئەگەر نرخی دوو سامانەکە لێک دوور بکەونەوە لەوانەیە کەمتر وەربگریت.",
+                    "حەوزی کەمتر لە یەک ملیۆن دۆلار لیست ناکرێت."]),
+                ("سەرچاوە", ["DefiLlama (api.llama.fi و yields.llama.fi)، بەخۆڕایی و بەبێ کلیل. هەر سێ کاتژمێر نوێ دەبێتەوە."])],
+            "ar": [("ماذا تعرض هذه الصفحة", [
+                "<b>المقفل:</b> القيمة الدولارية للأصول داخل عقود التمويل اللامركزي، يوماً بيوم منذ ٢٠١٧.",
+                "<b>حسب السلسلة:</b> حصة إيثريوم وسولانا وBase وغيرها.",
+                "<b>حسب النوع:</b> الإقراض والمنصات اللامركزية والستيكنغ السائل والجسور وغيرها.",
+                "<b>العوائد:</b> المجمّعات فوق مليون دولار، مرتبة بالعائد السنوي، مع المخاطرتين الحاسمتين."]),
+                ("ما لا يُحسب", [
+                    "احتياطيات المنصات المركزية. المال داخل منصة ليس مقفلاً في بروتوكول.",
+                    "الجسور والستيكنغ السائل محسوبة، لأن ذلك المال داخل عقد فعلاً."]),
+                ("عن العوائد", [
+                    "العائد هو ما دفعه المجمّع مؤخراً، وليس وعداً.",
+                    "<b>عملة مستقرة:</b> المجمّع دولاري بلا تقلب سعري.",
+                    "<b>الخسارة غير الدائمة:</b> قد تحصل على أقل من مجرد الاحتفاظ إذا تباعد سعرا الأصلين.",
+                    "المجمّعات دون مليون دولار غير مدرجة."]),
+                ("المصدر", ["DefiLlama (api.llama.fi وyields.llama.fi)، مجاناً وبلا مفتاح. يُحدَّث كل ثلاث ساعات."])],
+            "en": [("What this page shows", [
+                "<b>Locked:</b> the dollar value of assets sitting inside DeFi contracts, day by day since 2017.",
+                "<b>By chain:</b> what share sits on Ethereum, Solana, Base and the rest.",
+                "<b>By kind:</b> lending, decentralised exchanges, liquid staking, bridges and the rest.",
+                "<b>Rates:</b> pools holding more than $1M, ordered by their yearly rate, with the two risks that decide whether a rate is really free."]),
+                ("What is not counted", [
+                    "The reserves of centralised exchanges. DefiLlama lists those too, but money on an exchange is not locked in a protocol — counted in, Binance alone would be larger than the whole of DeFi and the number would mean nothing.",
+                    "Bridges and liquid staking are counted: that money really is inside a contract."]),
+                ("About the rates", [
+                    "A rate is what the pool paid recently, not a promise about the future.",
+                    "<b>Stablecoin:</b> the pool is in dollars and carries no price swing.",
+                    "<b>Impermanent loss:</b> if the two assets' prices move apart you can end up with less than simply holding.",
+                    "Pools under $1M are not listed: a large rate on a small pool says more about the pool than about the market."]),
+                ("Source", ["DefiLlama (api.llama.fi and yields.llama.fi), free and without a key. Refreshed every three hours."])],
+        },
+    },
     "stables": {
         "title": "عرضه استیبل‌کوین‌ها و نسبت SSR بیت‌کوین | entekhab.net",
         "desc": "عرضهٔ کل استیبل‌کوین‌های دلاری از ۲۰۱۷، تغییر ۳۰ روزه، سهم تتر و USDC، و نسبت SSR (ارزش بازار بیت‌کوین به استیبل‌کوین‌ها) با جایگاه امروز در تاریخ. رایگان.",
@@ -1165,6 +1237,12 @@ HUB = {
              {"fa": "استیبل‌کوین‌ها و نسبت SSR", "ckb": "ستەیبڵکۆینەکان و ڕێژەی SSR", "ar": "العملات المستقرة ونسبة SSR", "en": "Stablecoins and the SSR"},
              {"fa": "عرضهٔ استیبل‌کوین‌ها از ۲۰۱۷، تغییر ۳۰ روزه و ارزش بیت‌کوین در برابر آن", "ckb": "خستنەڕووی ستەیبڵکۆینەکان لە ٢٠١٧ـەوە، گۆڕانی ٣٠ ڕۆژە و بەهای بیتکۆین بەرامبەری",
               "ar": "معروض العملات المستقرة منذ ٢٠١٧، تغيّر ٣٠ يومًا وقيمة البيتكوين مقابله", "en": "Stablecoin supply since 2017, its 30-day change and Bitcoin’s value against it"}),
+            ("/charts/defi/", True,
+             {"fa": "دیفای: قفل‌شده و بازدهی", "ckb": "دیفای: قوفڵکراو و ڕێژە", "ar": "التمويل اللامركزي: المقفل والعوائد", "en": "DeFi: locked and rates"},
+             {"fa": "ارزش قفل‌شده از ۲۰۱۷، به تفکیک زنجیره و نوع، و بازدهی استخرها با ریسکشان",
+              "ckb": "بەهای قوفڵکراو لە ٢٠١٧ـەوە، بە پێی زنجیرە و جۆر، و ڕێژەی حەوزەکان لەگەڵ مەترسییەکانیان",
+              "ar": "القيمة المقفلة منذ ٢٠١٧، حسب السلسلة والنوع، وعوائد المجمّعات ومخاطرها",
+              "en": "What is locked since 2017, by chain and kind, and what the pools pay against their risk"}),
             ("/money-flow/", False,
              {"fa": "جریان پول بازار", "ckb": "ڕەوتی پارەی بازاڕ", "ar": "تدفق الأموال", "en": "Money flow"},
              {"fa": "خرید و فروش تهاجمی هر ارز و بخش، استیبل‌کوین‌ها و دامیننس", "ckb": "کڕین و فرۆشتنی هێرشبەرانە، ستەیبڵکۆینەکان و باڵادەستی",

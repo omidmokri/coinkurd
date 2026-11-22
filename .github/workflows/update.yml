@@ -304,6 +304,11 @@ jobs:
           MACRO_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/macro.py
 
+      - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/obs_defi.py
+
       - name: Indicator signals (TradingView alert relay + real outcomes)
         id: signals
         continue-on-error: true

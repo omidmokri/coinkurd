@@ -257,6 +257,7 @@
     { k: 'mvrv', path: '/charts/mvrv/', ic: 'chain' },
     { k: 'flows', path: '/charts/exchange-flows/', ic: 'bank' },
     { k: 'stables', path: '/charts/stablecoins/', ic: 'coins' },
+    { k: 'defi', path: '/charts/defi/', ic: 'layers' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
     { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
   ];
