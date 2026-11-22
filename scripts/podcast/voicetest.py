@@ -44,12 +44,17 @@ SENTENCES = [
 # Each candidate says where it comes from and under what terms, because the licence decides whether it may be
 # used at all. "coqui" models are PyTorch and run on the processor; no graphics card is involved.
 CANDIDATES = [
+    # The 2022-23 Coqui models were measured first. They scored well for intelligibility and the owner found them
+    # unusable by ear: a reading can be perfectly clear and still sound like a machine, which CER does not catch.
+    # They stay in the list so the comparison keeps its floor, but the ones that matter are below.
     dict(key="female-vits", repo="Kamtera/persian-tts-female-vits", kind="coqui",
-         licence="openrail", note="VITS, the same architecture as the voices already in use"),
+         licence="openrail", note="2023 VITS; clear but mechanical, rejected by ear"),
     dict(key="female1-vits", repo="Kamtera/persian-tts-female1-vits", kind="coqui",
-         licence="unknown", note="a later single-speaker VITS from the same author"),
-    dict(key="female-glow", repo="Kamtera/persian-tts-female-glow_tts", kind="coqui",
-         licence="unknown", note="glow-TTS; needs a vocoder, so slower to set up"),
+         licence="unknown", note="2023 VITS; clearest of the old set, still rejected by ear"),
+    # A newer Persian VITS, trained on the Piper base model. It ships ONNX, which is what the podcast already
+    # runs through sherpa-onnx, and it has seven speakers, so each is read and measured on its own.
+    dict(key="alifthi", repo="alifthi/persian-TTS", kind="piper-onnx", speakers=7,
+         licence="see model card; trained only on data allowing commercial use", note="2026 VITS, Piper ONNX"),
 ]
 
 
@@ -117,6 +122,45 @@ def synth_coqui(repo, text, out_wav, cache):
     cache[key].save_wav(wav, out_wav)
 
 
+def synth_piper_onnx(repo, sid, text, out_wav, cache):
+    """Read one sentence with a Piper-format ONNX voice, through sherpa-onnx — the very runtime the podcast
+    already uses, so a voice that works here needs nothing new added to the daily job."""
+    import sherpa_onnx
+    import soundfile as sf
+    from huggingface_hub import hf_hub_download
+
+    key = repo.replace("/", "__")
+    if key not in cache:
+        files = json.loads(sh(["python3", "-c",
+                               "import json,huggingface_hub as h;print(json.dumps([f.rfilename for f in "
+                               f"h.HfApi().model_info('{repo}').siblings]))"]))
+        onnx = next((f for f in files if f.endswith(".onnx") and "onnx/" in f), None) \
+            or next((f for f in files if f.endswith(".onnx")), None)
+        tokens = next((f for f in files if f.endswith("tokens.txt")), None)
+        cfg = next((f for f in files if f.endswith(".onnx.json")), None) \
+            or next((f for f in files if f.rsplit("/", 1)[-1] == "config.json"), None)
+        if not onnx:
+            raise RuntimeError(f"{repo}: no .onnx among {files[:14]}")
+        model = hf_hub_download(repo, onnx)
+        data_dir = ""
+        tok = hf_hub_download(repo, tokens) if tokens else ""
+        if not tok and cfg:
+            # Piper keeps its symbol table inside the json; sherpa-onnx wants it as a file
+            conf = json.load(open(hf_hub_download(repo, cfg), encoding="utf-8"))
+            ids = conf.get("phoneme_id_map") or {}
+            if ids:
+                tok = os.path.join(os.path.dirname(model), "tokens.txt")
+                with open(tok, "w", encoding="utf-8") as fh:
+                    for sym, n in sorted(ids.items(), key=lambda kv: kv[1][0]):
+                        fh.write(f"{sym} {n[0]}\n")
+        mc = sherpa_onnx.OfflineTtsModelConfig(
+            vits=sherpa_onnx.OfflineTtsVitsModelConfig(model=model, lexicon="", tokens=tok, data_dir=data_dir),
+            num_threads=2, provider="cpu")
+        cache[key] = sherpa_onnx.OfflineTts(sherpa_onnx.OfflineTtsConfig(model=mc, max_num_sentences=1))
+    a = cache[key].generate(text, sid=sid, speed=1.0)
+    sf.write(out_wav, a.samples, a.sample_rate)
+
+
 def intelligibility(wav_path, text):
     """How much of the script a listener gets back, using the podcast's own transcriber and its own error measure."""
     try:
@@ -138,14 +182,27 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     cache, report = {}, []
 
+    jobs = []
     for c in CANDIDATES:
         if a.only and c["key"] != a.only:
             continue
+        # a model with several speakers is measured one speaker at a time: they are different voices
+        for sid in range(c.get("speakers", 1)):
+            j = dict(c)
+            if c.get("speakers", 1) > 1:
+                j["key"] = f"{c['key']}-s{sid}"
+                j["speaker"] = sid
+            jobs.append(j)
+
+    for c in jobs:
         row = dict(c, sentences=[])
         try:
             for i, s in enumerate(SENTENCES):
                 w = os.path.join(a.out, f"{c['key']}_{i}.wav")
-                synth_coqui(c["repo"], s, w, cache)
+                if c["kind"] == "piper-onnx":
+                    synth_piper_onnx(c["repo"], c.get("speaker", 0), s, w, cache)
+                else:
+                    synth_coqui(c["repo"], s, w, cache)
                 hz, frames = f0_median(w)
                 cer, hyp = intelligibility(w, s)
                 dur = float(sh(["ffprobe", "-v", "error", "-show_entries", "format=duration",

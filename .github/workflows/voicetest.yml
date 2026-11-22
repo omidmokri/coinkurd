@@ -41,7 +41,7 @@ jobs:
           # built against CUDA and fails on a runner with no graphics card ("libnvrtc.so.13: cannot open
           # shared object file"). The processor build installed above is the one that must stay.
           # six is pulled in indirectly by coqui-tts but not declared by it
-          pip install -q numpy "coqui-tts" huggingface_hub soundfile six
+          pip install -q numpy "coqui-tts" huggingface_hub soundfile six sherpa-onnx
           python -c "import torch, torchcodec;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
       # the podcast's own transcriber, so a candidate is judged by the same listening test that decides
       # whether a finished episode may go to the channel
