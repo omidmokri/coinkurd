@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  actions: write          # to ask for the light page rebuild once the data is in
 
 concurrency:
   group: live
@@ -58,6 +59,15 @@ jobs:
           git diff --cached --quiet && echo "nothing changed" && exit 0
           git commit -m "chore: live signals and DeFi $(date -u +'%Y-%m-%d %H:%M UTC')"
           for i in 1 2 3; do
-            git pull --rebase --autostash -X theirs origin main && git push && break
+            git pull --rebase --autostash -X theirs origin main && git push && { echo "pushed=1" >> "$GITHUB_ENV"; break; }
             sleep 5
           done
+
+      # Committing is only half of it: the site is served from a build, so without this the fresh data would sit
+      # in the repository until the long chain next deployed -- up to half an hour, which is what this workflow
+      # exists to avoid. The light rebuild cancels its own previous run, so asking often is harmless.
+      - name: Ask for the light page rebuild
+        if: env.pushed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main || echo "::warning::could not ask for the rebuild; the next run tries again"
