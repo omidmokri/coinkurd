@@ -1,36 +1,36 @@
 {
- "updated_at": "2026-11-22T10:29:36.646863+00:00",
+ "updated_at": "2026-11-22T10:44:51.932656+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
-  "USDC": {
-   "n": 157,
-   "amount": 9002184854,
-   "usd": 9002184854
-  },
   "BTC": {
-   "n": 106,
-   "amount": 275833.8899999999,
-   "usd": 16525532989
+   "n": 110,
+   "amount": 285572.6699999999,
+   "usd": 17117934784
+  },
+  "USDC": {
+   "n": 155,
+   "amount": 8883503879,
+   "usd": 8883503879
   },
   "ETH": {
-   "n": 111,
-   "amount": 238211.92999999996,
-   "usd": 399842540
+   "n": 110,
+   "amount": 236111.92999999996,
+   "usd": 396304754
   },
   "USDT": {
-   "n": 26,
-   "amount": 1003304838,
-   "usd": 1003304838
+   "n": 25,
+   "amount": 790104838,
+   "usd": 790104838
   }
  },
  "hourly": [
   {
    "h": "2026-11-21T18",
-   "usd": 1169053677
+   "usd": 833634916
   },
   {
    "h": "2026-11-21T19",
@@ -94,10 +94,46 @@
   },
   {
    "h": "2026-11-22T10",
-   "usd": 743623694
+   "usd": 1336025489
   }
  ],
  "events": [
+  {
+   "asset": "BTC",
+   "amount": 2486.55,
+   "usd": 151286546,
+   "tx": "caa70d6ae741e5e97016e0e4572b690055a4aaed92595488c07bb091b528a477",
+   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "at": "2026-11-22T10:41:41+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 2279.0,
+   "usd": 138658906,
+   "tx": "fd5d3498df05d7e4ffec0cfc2bfe34f9c32d5b3a642c92cb4ac37cc6a371e50e",
+   "to": "bc1qhp7n555hk5mxlp3pz0347nzah8gazwe7wp5fjj",
+   "from": "bc1qhp7n555hk5mxlp3pz0347nzah8gazwe7wp5fjj",
+   "at": "2026-11-22T10:41:41+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 2486.54,
+   "usd": 151174343,
+   "tx": "cde19dd9ed0159c2aac4dbadb8be5a2f80eb08a6810f217a46717df220564e44",
+   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "at": "2026-11-22T10:39:39+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 2486.69,
+   "usd": 151282000,
+   "tx": "5540dae724c8f548a98257b8c26d6fd9d652e272b034b6a897434baa0d789d52",
+   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "at": "2026-11-22T10:31:45+00:00"
+  },
   {
    "asset": "USDC",
    "amount": 22027699,
@@ -823,50 +859,6 @@
    "from": "0xfff2edfa5b0c48378e06531b1220ea3455d4b5ce",
    "to": "0xcd531ae9efcce479654c4926dec5f6209531ca7b",
    "at": "2026-11-22T08:22:16.652419+00:00"
-  },
-  {
-   "asset": "USDC",
-   "amount": 35453724,
-   "usd": 35453724,
-   "tx": "0x7d59d1d5f242909411e70ce706622c9e1885a407eb3b8967b8218a5e6faec8be",
-   "from": "0x4d38769e5a15513b6312895a5ce17f0797a59160",
-   "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-   "at": "2026-11-22T08:20:32.952348+00:00",
-   "to_name": "Coinbase 10",
-   "to_kind": "cex"
-  },
-  {
-   "asset": "USDC",
-   "amount": 99999999,
-   "usd": 99999999,
-   "tx": "0x9db0785acbe0e70cbf377ffca49d8264155b340be32a8d22816fc86afd487130",
-   "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-   "to": "0xfff2edfa5b0c48378e06531b1220ea3455d4b5ce",
-   "at": "2026-11-22T08:20:32.952311+00:00",
-   "from_name": "Coinbase 10",
-   "from_kind": "cex"
-  },
-  {
-   "asset": "USDC",
-   "amount": 67000000,
-   "usd": 67000000,
-   "tx": "0xb6758d13965ef53ec9d5ea1c93723109cb2f32107d62f837e29c3f45bd7386a4",
-   "from": "0xb6f21c97ca5360a95912ac8821e91378c0212b0a",
-   "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-   "at": "2026-11-22T08:20:32.952146+00:00",
-   "to_name": "Coinbase 10",
-   "to_kind": "cex"
-  },
-  {
-   "asset": "USDC",
-   "amount": 22622755,
-   "usd": 22622755,
-   "tx": "0xc2bfe100e473a4a3b8aff55d6b7188448c79c9934e23c572153725e302f6b4be",
-   "from": "0x0584f6a93718d7de52b40a71b42439acee4be655",
-   "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-   "at": "2026-11-22T08:20:32.952071+00:00",
-   "to_name": "Coinbase 10",
-   "to_kind": "cex"
   }
  ]
 }
