@@ -72,7 +72,7 @@ concurrency:
 jobs:
   languages:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -91,9 +91,12 @@ jobs:
         timeout-minutes: 8
         run: python scripts/i18n_ar.py || echo "::warning::Arabic dictionaries failed; the site ships without new ones"
 
+      # 47 languages are live now, not the 8 that existed when 8 minutes was set: the step was cut off mid-run
+      # on 2026-11-22 with work still queued. The day's calls are capped anyway, so a longer ceiling spends no
+      # more -- it only lets a run finish what it has already paid for.
       - name: Site languages (the other 43, new strings only)
         continue-on-error: true
-        timeout-minutes: 8
+        timeout-minutes: 16
         run: python scripts/i18n_site.py || echo "::warning::site languages failed; the pages use what the cache has"
 
       - name: Live-market languages (new strings only)
