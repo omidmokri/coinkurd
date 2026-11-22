@@ -110,7 +110,9 @@ def synth_coqui(repo, text, out_wav, cache):
         cfg = next((f for f in files if f.endswith("config.json")), None)
         if not ckpt or not cfg:
             raise RuntimeError(f"{repo}: no checkpoint and config pair among {files[:12]}")
-        cache[key] = Synthesizer(hf_hub_download(repo, ckpt), hf_hub_download(repo, cfg), use_cuda=False)
+        # current coqui-tts takes these by name only
+        cache[key] = Synthesizer(tts_checkpoint=hf_hub_download(repo, ckpt),
+                                 tts_config_path=hf_hub_download(repo, cfg), use_cuda=False)
     wav = cache[key].tts(text)
     cache[key].save_wav(wav, out_wav)
 
