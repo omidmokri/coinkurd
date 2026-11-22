@@ -263,3 +263,20 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 .ob-dfname>b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ob-dfname .ob-lg{border-radius:50%;flex:0 0 auto}
 .ob-dfnone{display:inline-block;width:18px;height:18px;flex:0 0 auto;border-radius:50%;background:rgba(255,255,255,.06)}
+
+/* ---- /charts/risk/ : the histogram of days, the sizing form and its warning ---- */
+.ob-rkhist{margin:4px 0 2px}
+.ob-rkbars{display:flex;align-items:flex-end;gap:1px;height:170px;padding:0 2px;
+  border-bottom:1px solid rgba(255,255,255,.14)}
+.ob-rkbars>i{flex:1 1 0;min-width:1px;border-radius:2px 2px 0 0}
+.ob-rklegend{margin:6px 0 0;font-size:12px;opacity:.72}
+.ob-rkform{display:grid;gap:10px 14px;grid-template-columns:1fr 1fr;margin:4px 0 14px}
+@media (min-width:760px){.ob-rkform{grid-template-columns:repeat(4,1fr)}}
+.ob-rkform label{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.ob-rkform span{opacity:.75}
+.ob-rkform input{background:#121214;border:1px solid rgba(255,255,255,.16);border-radius:8px;
+  color:inherit;font:inherit;padding:9px 11px;min-width:0;direction:ltr;text-align:start}
+.ob-rkform input:focus{outline:2px solid rgba(240,180,41,.55);outline-offset:1px}
+.ob-warn-box{margin:10px 0 0;padding:10px 12px;border-radius:9px;font-size:13px;
+  background:rgba(255,90,77,.12);border:1px solid rgba(255,90,77,.32)}
+.ob-grid td.ob-dim{opacity:.6}

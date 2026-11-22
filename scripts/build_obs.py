@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "14"           # asset version (bump with any change to assets/obs/*)
+V = "15"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -41,6 +41,7 @@ PAGES = [
     ("flows", "exchange-flows", ["chainmath.js", "ts.js", "chain.js"]),
     ("stables", "stablecoins", ["flowmath.js", "ts.js", "prem.js"]),
     ("defi", "defi", ["ts.js", "defi.js"]),
+    ("risk", "risk", ["riskmath.js", "risk.js"]),
     ("network", "network", ["chainmath.js", "ts.js", "chain.js"]),
     ("cycle", "bitcoin-cycle", ["chainmath.js", "ts.js", "chain.js"]),
 ]
@@ -897,6 +898,88 @@ T.update({
                    ("Sources", ["Public candles of Coinbase and Binance (read by the site), Bybit’s public premium index and Deribit’s public futures (read in your browser)."])],
         },
     },
+    "risk": {
+        "title": "ریسک و حجم پوزیشن: VaR و حد ضرر | entekhab.net",
+        "desc": "چقدر یک پوزیشن می‌تواند ببازد و چه حجمی درست است: VaR تاریخی ۹۵ و ۹۹ درصد، میانگین روزهای بدتر، نوسان سالانه، عمیق‌ترین سقوط و ماشین‌حساب حجم. رایگان.",
+        "og": "ریسک و حجم پوزیشن",
+        "ld": "Entekhab risk and position sizing",
+        "kw": ["VaR", "value at risk", "ارزش در معرض ریسک", "مدیریت ریسک", "حجم پوزیشن", "position sizing", "حد ضرر", "ماشین حساب ریسک", "drawdown", "نوسان بیت کوین", "risk management crypto"],
+        "h1": {"fa": "ریسک و حجم پوزیشن", "ckb": "مەترسی و قەبارەی پۆزیشن", "ar": "المخاطر وحجم المركز", "en": "Risk and position size"},
+        "p": {"fa": "یک پوزیشن در یک روز بد چقدر می‌بازد، در بدترین روزها چقدر، و با سرمایه و حد ضرر شما چه حجمی درست است",
+              "ckb": "پۆزیشنێک لە ڕۆژێکی خراپدا چەند لەدەست دەدات، لە خراپترین ڕۆژەکاندا چەند، و بە سەرمایە و بەربەستی تۆ چ قەبارەیەک دروستە",
+              "ar": "كم يخسر مركز في يوم سيئ، وكم في أسوأ الأيام، وما الحجم الصحيح برأس مالك ووقف خسارتك",
+              "en": "What a position loses on a bad day, what it loses on the worst of them, and how large it may be given your account and your stop"},
+        "about": {
+            "fa": [("این صفحه چه نشان می‌دهد", [
+                "<b>بدترین روز از هر بیست:</b> افتی که در ۵٪ بدترین روزهای تاریخ این ارز اتفاق افتاده یا بدتر. به این VaR ۹۵٪ می‌گویند.",
+                "<b>وقتی بد شد:</b> میانگین افت در همان روزهای بد — همیشه از خود VaR بدتر است و همین عدد است که زیان واقعی را نشان می‌دهد.",
+                "<b>عمیق‌ترین سقوط:</b> بزرگ‌ترین افت از یک سقف تا کف بعدی، و اینکه امروز چقدر زیر سقف خودش است.",
+                "<b>ماشین‌حساب حجم:</b> از سرمایه، درصد ریسک، ورود و حد ضرر، حجم درست پوزیشن را می‌دهد."]),
+                ("چرا دو عدد کنار هم", [
+                    "ستون «منحنی نرمال» فرض می‌کند بازدهی‌ها توزیع نرمال دارند. بازار کریپتو این‌طور نیست و دُم‌های سنگین دارد.",
+                    "هر جا عدد اندازه‌گیری‌شده از عدد منحنی بدتر است، یعنی تاریخ روزهایی دیده که مدل نرمال آن‌ها را تقریباً ناممکن می‌داند. صفحه عمداً هر دو را نشان می‌دهد."]),
+                ("دوره‌های بلندتر چطور حساب شده", [
+                    "افت یک هفته و یک ماه از خود قیمت‌ها اندازه گرفته شده، نه از ضرب عدد روزانه در جذر زمان.",
+                    "آن ضرب فرض می‌کند روزها مستقل و شبیه هم‌اند؛ دقیقاً در بدترین هفته‌ها این فرض غلط است."]),
+                ("محدودیت‌ها", [
+                    "این اندازه‌گیری گذشته است، نه پیش‌بینی. روزی بدتر از هر چه ثبت شده همیشه ممکن است.",
+                    "حد ضرر ممکن است با گپ رد شود؛ آن وقت ضرر از عدد محاسبه‌شده بیشتر می‌شود.",
+                    "اهرم بالای ۳ برابر هشدار می‌گیرد، چون همان گپ می‌تواند بیش از کل سرمایه ببرد.",
+                    "محاسبات روی بیت‌کوین و اتریوم است، چون دادهٔ روزانهٔ بلندمدت سایت برای همین دو تاست. توصیهٔ مالی نیست."]),
+                ("منبع", ["بسته‌شدن‌های روزانه از Coin Metrics (دادهٔ عمومی، مجوز CC BY-NC)، همان فایلی که صفحهٔ MVRV از آن می‌خواند."])],
+            "ckb": [("ئەم لاپەڕە چی پیشان دەدات", [
+                "<b>خراپترین ڕۆژ لە هەر بیست:</b> ئەو کەمبوونەوەیەی لە ٥٪ خراپترین ڕۆژەکاندا ڕوویداوە یان خراپتر (VaR ٩٥٪).",
+                "<b>کاتێک خراپ بوو:</b> ناوەندی کەمبوونەوە لە هەمان ڕۆژە خراپەکاندا — هەمیشە لە VaR خراپترە.",
+                "<b>قووڵترین کەوتن:</b> گەورەترین کەوتن لە لووتکەوە، و ئەمڕۆ چەند لە ژێر لووتکەی خۆیەتی.",
+                "<b>ژمێرەری قەبارە:</b> لە سەرمایە، ڕێژەی مەترسی، چوونەژوورەوە و بەربەست، قەبارەی دروست دەداتەوە."]),
+                ("بۆچی دوو ژمارە تەنیشت یەک", [
+                    "ستوونی «هێڵی ئاسایی» وا دادەنێت دابەشبوونەکە ئاسایی بێت. بازاڕی کریپتۆ وا نییە.",
+                    "هەرکوێ ژمارەی پێوراو خراپتر بێت، واتە مێژوو ڕۆژێکی بینیوە کە مۆدێلی ئاسایی بە نزیکەی مەحاڵ دایدەنێت."]),
+                ("ماوە درێژترەکان", [
+                    "کەمبوونەوەی هەفتە و مانگ لە خودی نرخەکانەوە پێوراوە، نەک بە لێکدانەوەی ژمارەی ڕۆژانە.",
+                    "ئەو لێکدانەوەیە وا دادەنێت ڕۆژەکان سەربەخۆ بن؛ لە خراپترین هەفتەکاندا ئەوە هەڵەیە."]),
+                ("سنوورەکان", [
+                    "ئەمە پێوانەی ڕابردووە، نەک پێشبینی. ڕۆژێکی خراپتر هەمیشە گونجاوە.",
+                    "بەربەست دەکرێت بە بۆشاییەوە تێپەڕێت؛ ئەوکات زیان زیاتر دەبێت.",
+                    "قەرزی سەروو ٣ قات ئاگادارکردنەوە وەردەگرێت.",
+                    "ژمێرکاری لەسەر بیتکۆین و ئیتریۆمە. ئامۆژگاری دارایی نییە."]),
+                ("سەرچاوە", ["داخستنی ڕۆژانە لە Coin Metrics (داتای گشتی، مۆڵەتی CC BY-NC)."])],
+            "ar": [("ماذا تعرض هذه الصفحة", [
+                "<b>أسوأ يوم من كل عشرين:</b> الهبوط الذي وقع في أسوأ ٥٪ من الأيام أو أسوأ (VaR ٩٥٪).",
+                "<b>عندما يسوء:</b> متوسط الهبوط في تلك الأيام السيئة نفسها — دائماً أسوأ من VaR.",
+                "<b>أعمق هبوط:</b> أكبر هبوط من قمة إلى قاع، وكم يبعد السعر اليوم عن قمته.",
+                "<b>حاسبة الحجم:</b> من رأس المال ونسبة المخاطرة والدخول والوقف تعطي الحجم الصحيح."]),
+                ("لماذا رقمان جنباً إلى جنب", [
+                    "عمود «المنحنى الطبيعي» يفترض توزيعاً طبيعياً. سوق العملات المشفرة ليس كذلك؛ أطرافه ثقيلة.",
+                    "حيثما كان الرقم المقيس أسوأ، فالتاريخ رأى أياماً يعدّها النموذج الطبيعي شبه مستحيلة."]),
+                ("كيف حُسبت المدد الأطول", [
+                    "هبوط الأسبوع والشهر مقيس من الأسعار نفسها، لا بضرب الرقم اليومي في جذر الزمن.",
+                    "ذلك الضرب يفترض استقلال الأيام، وهو ما يسقط في أسوأ الأسابيع."]),
+                ("الحدود", [
+                    "هذا قياس للماضي لا تنبؤ. يوم أسوأ من كل ما سُجّل ممكن دائماً.",
+                    "قد يُتجاوز الوقف بفجوة فتزيد الخسارة عن الرقم المحسوب.",
+                    "الرافعة فوق ٣ أضعاف تُنبَّه عليها.",
+                    "الحساب على البيتكوين والإيثريوم. ليست نصيحة مالية."]),
+                ("المصدر", ["الإغلاقات اليومية من Coin Metrics (بيانات عامة، رخصة CC BY-NC)."])],
+            "en": [("What this page shows", [
+                "<b>Worst day in twenty:</b> the fall that the worst 5% of this asset's days matched or exceeded. The 95% VaR.",
+                "<b>Once it is bad:</b> the average fall on those bad days — always worse than the VaR itself, and the figure that says what the loss really looks like.",
+                "<b>Deepest fall:</b> the largest drop from a peak to the trough after it, and how far below its own high the price stands today.",
+                "<b>Sizing calculator:</b> from your account, the share you will risk, your entry and your stop, the size that keeps the loss to what you chose."]),
+                ("Why two figures side by side", [
+                    "The 'normal curve' column assumes returns follow a normal distribution. Crypto's do not: the tails are heavy.",
+                    "Wherever the measured figure is the worse one, history has produced days the normal model treats as all but impossible. The page shows both on purpose."]),
+                ("How the longer holds are worked out", [
+                    "The week and month figures are measured from the prices themselves, not by multiplying the daily figure by the square root of time.",
+                    "That multiplication assumes each day is independent and alike; the worst weeks are exactly when that assumption fails."]),
+                ("Limits", [
+                    "This measures the past; it does not forecast. A day worse than anything on record is always possible.",
+                    "A stop can be jumped in a gap, and then the loss exceeds the figure calculated here.",
+                    "Leverage above 3× is flagged, because that same gap can take more than the whole account.",
+                    "The arithmetic runs on Bitcoin and Ethereum, the two the site keeps long daily histories for. Not financial advice."]),
+                ("Source", ["Daily closes from Coin Metrics community data (CC BY-NC), the same file the MVRV page reads."])],
+        },
+    },
     "defi": {
         "title": "دیفای: ارزش قفل‌شده و بازدهی‌ها | entekhab.net",
         "desc": "ارزش قفل‌شده در دیفای از ۲۰۱۷، به تفکیک زنجیره و نوع پروتکل، بزرگ‌ترین پروتکل‌ها با تغییر ۲۴ساعته، و بهترین بازدهی استخرها با ریسکشان. رایگان.",
@@ -1237,6 +1320,12 @@ HUB = {
              {"fa": "استیبل‌کوین‌ها و نسبت SSR", "ckb": "ستەیبڵکۆینەکان و ڕێژەی SSR", "ar": "العملات المستقرة ونسبة SSR", "en": "Stablecoins and the SSR"},
              {"fa": "عرضهٔ استیبل‌کوین‌ها از ۲۰۱۷، تغییر ۳۰ روزه و ارزش بیت‌کوین در برابر آن", "ckb": "خستنەڕووی ستەیبڵکۆینەکان لە ٢٠١٧ـەوە، گۆڕانی ٣٠ ڕۆژە و بەهای بیتکۆین بەرامبەری",
               "ar": "معروض العملات المستقرة منذ ٢٠١٧، تغيّر ٣٠ يومًا وقيمة البيتكوين مقابله", "en": "Stablecoin supply since 2017, its 30-day change and Bitcoin’s value against it"}),
+            ("/charts/risk/", True,
+             {"fa": "ریسک و حجم پوزیشن", "ckb": "مەترسی و قەبارەی پۆزیشن", "ar": "المخاطر وحجم المركز", "en": "Risk and position size"},
+             {"fa": "یک پوزیشن در روز بد چقدر می‌بازد، و با سرمایه و حد ضرر شما چه حجمی درست است",
+              "ckb": "پۆزیشنێک لە ڕۆژێکی خراپدا چەند لەدەست دەدات، و چ قەبارەیەک دروستە",
+              "ar": "كم يخسر مركز في يوم سيئ، وما الحجم الصحيح برأس مالك ووقفك",
+              "en": "What a position loses on a bad day, and how large it may be given your account and your stop"}),
             ("/charts/defi/", True,
              {"fa": "دیفای: قفل‌شده و بازدهی", "ckb": "دیفای: قوفڵکراو و ڕێژە", "ar": "التمويل اللامركزي: المقفل والعوائد", "en": "DeFi: locked and rates"},
              {"fa": "ارزش قفل‌شده از ۲۰۱۷، به تفکیک زنجیره و نوع، و بازدهی استخرها با ریسکشان",
