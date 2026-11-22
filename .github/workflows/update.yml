@@ -591,6 +591,17 @@ jobs:
       - name: Fetch the read-aloud voices (Persian, Sorani) into tts/
         continue-on-error: true
         run: python scripts/fetch_tts.py
+      # These two write the dictionaries onto the built pages and put the language globe in the menu. They are not
+      # only translators: the translating now happens in languages.yml, but /i18n/ is rebuilt every run and never
+      # committed, so a run that builds and deploys the site must still write it or the site ships with no globe
+      # at all. Removing them from here on 2026-11-22 did exactly that. --no-translate makes no Gemini calls.
+      - name: Arabic dictionaries (from the cache; no new translations here)
+        continue-on-error: true
+        run: python scripts/i18n_ar.py --no-translate
+      - name: Site languages (from the cache; no new translations here)
+        continue-on-error: true
+        timeout-minutes: 6
+        run: python scripts/i18n_site.py --no-translate
       - name: Build the /market/ language pages and their string packs
         continue-on-error: true
         run: python scripts/build_market_l10n.py
