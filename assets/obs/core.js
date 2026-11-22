@@ -287,6 +287,7 @@
     { k: 'defi', path: '/charts/defi/', ic: 'layers' },
     { k: 'risk', path: '/charts/risk/', ic: 'scale' },
     { k: 'scanner', path: '/charts/scanner/', ic: 'target' },
+    { k: 'vprof', path: '/charts/volume-profile/', ic: 'bars' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
     { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
   ];

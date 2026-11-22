@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "20"           # asset version (bump with any change to assets/obs/*)
+V = "21"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -43,6 +43,7 @@ PAGES = [
     ("defi", "defi", ["ts.js", "defi.js"]),
     ("risk", "risk", ["riskmath.js", "risk.js"]),
     ("scanner", "scanner", ["scan.js"]),
+    ("vprof", "volume-profile", ["vprof.js"]),
     ("network", "network", ["chainmath.js", "ts.js", "chain.js"]),
     ("cycle", "bitcoin-cycle", ["chainmath.js", "ts.js", "chain.js"]),
 ]
@@ -965,6 +966,73 @@ T.update({
                     "At most 200 rows are drawn; the download button gives every match."])],
         },
     },
+    "vprof": {
+        "title": "پروفایل حجم: معامله در کدام قیمت‌ها | entekhab.net",
+        "desc": "ببینید معامله‌ها در کدام قیمت‌ها انجام شده‌اند، نه در کدام ساعت‌ها: پرکارترین قیمت، محدودهٔ ارزش و سهم خریدار مهاجم برای بیت‌کوین، اتریوم و چند ارز دیگر.",
+        "og": "پروفایل حجم — معامله در کدام قیمت‌ها",
+        "ld": "Entekhab volume profile by price",
+        "kw": ["پروفایل حجم", "volume profile", "نقطه کنترل", "point of control", "POC", "محدوده ارزش", "value area",
+               "حجم بر اساس قیمت", "volume by price", "پروفایل حجم بیت‌کوین"],
+        "h1": {"fa": "پروفایل حجم", "ckb": "پرۆفایلی قەبارە", "ar": "ملف الحجم", "en": "Volume profile"},
+        "p": {"fa": "به‌جای اینکه بپرسیم در هر ساعت چقدر معامله شد، می‌پرسیم در هر قیمت چقدر — همان جایی که بازار واقعاً کارش را کرده است",
+              "ckb": "لەبری ئەوەی بپرسین لە هەر کاتژمێرێکدا چەند مامەڵە کرا، دەپرسین لە هەر نرخێکدا چەند — ئەو شوێنەی بازاڕ بەڕاستی کاری خۆی تێدا کردووە",
+              "ar": "بدل أن نسأل كم تُوُدِّل في كل ساعة، نسأل كم تُوُدِّل عند كل سعر — حيث أدّى السوق عمله فعلاً",
+              "en": "Instead of asking how much was traded each hour, this asks how much was traded at each price — where the market actually did its business"},
+        "about": {
+            "fa": [("این صفحه چه می‌کند", [
+                "نمودار معمولی حجم می‌گوید در هر ساعت چقدر معامله شده است. پروفایل حجم می‌گوید در هر <b>قیمت</b> چقدر. میله‌ها از پهلو کشیده شده‌اند: قیمت در کنار و دلار معامله‌شده در عرض.",
+                "<b>پرکارترین قیمت:</b> قیمتی که بیشترین دلار در آن دست به دست شده است. در منابع انگلیسی به آن Point of Control می‌گویند.",
+                "<b>محدودهٔ ارزش:</b> باریک‌ترین باریکهٔ قیمتی که ۷۰ درصد دلارها در آن معامله شده‌اند.",
+                "<b>خرید و فروش:</b> در هر معامله یک خریدار و یک فروشنده هست؛ آنچه اینجا جدا شده این است که کدام طرف برای انجام معامله از اسپرد گذشته است، نه اینکه کدام طرف درست می‌گفته."]),
+                ("چطور خوانده شود", [
+                    "قیمت‌هایی که معاملهٔ زیادی در آن‌ها انجام شده معمولاً جاهایی‌اند که بازار در آن‌ها مکث می‌کند؛ قیمت‌هایی که معاملهٔ کمی داشته‌اند معمولاً سریع رد می‌شوند. این یک قاعده است، نه قانون.",
+                    "این صفحه سیگنال خرید و فروش نمی‌دهد و هیچ پیش‌بینی‌ای در آن نیست.",
+                    "نمای «اختلاف دو طرف» تفاوت خرید و فروش را از وسط به چپ و راست می‌کشد."]),
+                ("داده و دقت", [
+                    "کندل‌های اسپات Binance. بازه‌های ۷، ۳۰ و ۹۰ روز روی کندل یک‌ساعته و بازهٔ یک‌سال روی کندل روزانه ساخته می‌شود.",
+                    "یک نکتهٔ مهم: کندل فقط سقف و کف خود را ثبت می‌کند، نه تک‌تک قیمت‌های میان آن دو. پس دلارهای هر کندل به‌طور یکنواخت میان باریکه‌های قیمتیِ دامنه‌اش پخش شده است. این یک تقریب است و پنهانش نمی‌کنیم؛ چون کندل یک‌ساعته دامنهٔ باریکی دارد، تقریب در بازه‌های کوتاه‌تر دقیق‌تر است.",
+                    "دکمهٔ دانلود، دلار خرید و فروش هر باریکهٔ قیمتی را می‌دهد."])],
+            "ckb": [("ئەم لاپەڕە چی دەکات", [
+                "هێڵکاری ئاسایی قەبارە دەڵێت لە هەر کاتژمێرێکدا چەند مامەڵە کراوە. پرۆفایلی قەبارە دەڵێت لە هەر <b>نرخێکدا</b> چەند.",
+                "<b>چالاکترین نرخ:</b> ئەو نرخەی زۆرترین دۆلاری تێدا ئاڵوگۆڕ کراوە.",
+                "<b>ناوچەی بەها:</b> باریکترین باریکەی نرخ کە ٧٠ لەسەدی دۆلارەکانی تێدا مامەڵە کراوە.",
+                "<b>کڕین و فرۆشتن:</b> لە هەر مامەڵەیەکدا کڕیارێک و فرۆشیارێک هەیە؛ ئەوەی لێرە جیا کراوەتەوە ئەوەیە کام لایەن لە ئەسپرێدەکە تێپەڕیوە."]),
+                ("چۆن بخوێندرێتەوە", [
+                    "ئەو نرخانەی مامەڵەی زۆریان تێدا کراوە زۆرجار شوێنی وەستانی بازاڕن؛ ئەوانەی کەم، بە خێرایی تێدەپەڕێن. ئەمە ڕێسایەکە، نەک یاسا.",
+                    "ئەم لاپەڕە سیگناڵی کڕین و فرۆشتن نادات و هیچ پێشبینییەکی تێدا نییە.",
+                    "دیمەنی «جیاوازی نێوانیان» جیاوازی کڕین و فرۆشتن لە ناوەڕاستەوە بۆ چەپ و ڕاست دەکێشێت."]),
+                ("داتا و وردی", [
+                    "مۆمەکانی ئەسپۆتی Binance. ماوەی ٧، ٣٠ و ٩٠ ڕۆژ لەسەر مۆمی یەک کاتژمێر و ماوەی ساڵێک لەسەر مۆمی ڕۆژانە.",
+                    "خاڵێکی گرنگ: مۆم تەنها لووتکە و بنی خۆی تۆمار دەکات، نەک هەموو نرخەکانی نێوانیان. بۆیە دۆلاری هەر مۆمێک بە یەکسانی دابەش کراوە. ئەمە نزیکەیەکە و نایشارینەوە.",
+                    "دوگمەی داگرتن دۆلاری کڕین و فرۆشتنی هەر باریکەیەک دەداتەوە."])],
+            "ar": [("ماذا تفعل هذه الصفحة", [
+                "مخطّط الحجم المعتاد يقول كم تُوُدِّل في كل ساعة. ملف الحجم يقول كم تُوُدِّل عند كل <b>سعر</b>.",
+                "<b>أكثر سعر نشاطاً:</b> السعر الذي تداولت عنده أكبر قيمة بالدولار، ويسمّى Point of Control.",
+                "<b>نطاق القيمة:</b> أضيق شريحة سعرية جرى فيها ٧٠ بالمئة من التداول بالدولار.",
+                "<b>الشراء والبيع:</b> في كل صفقة مشترٍ وبائع؛ ما يُفصل هنا هو أي الطرفين عبر الفارق السعري لإتمام الصفقة، لا أيّهما كان على صواب."]),
+                ("كيف تُقرأ", [
+                    "الأسعار التي جرى عندها تداول كثيف غالباً ما يتوقف السوق عندها، والأسعار قليلة التداول يمرّ بها سريعاً. هذه قاعدة لا قانون.",
+                    "هذه الصفحة لا تعطي إشارات شراء أو بيع ولا تتضمّن أي تنبّؤ.",
+                    "عرض «الفارق بينهما» يرسم فرق الشراء والبيع من المنتصف يميناً ويساراً."]),
+                ("البيانات والدقة", [
+                    "شموع Binance الفورية. مدد ٧ و٣٠ و٩٠ يوماً على شمعة الساعة، ومدّة السنة على الشمعة اليومية.",
+                    "نقطة مهمة: الشمعة تسجّل قمتها وقاعها فقط لا كل سعر بينهما، لذلك تُوزَّع دولاراتها بالتساوي على الشرائح السعرية لمداها. هذا تقريب لا نخفيه.",
+                    "زر التنزيل يعطي دولارات الشراء والبيع لكل شريحة سعرية."])],
+            "en": [("What this page does", [
+                "An ordinary volume chart says how much was traded each hour. A volume profile says how much was traded at each <b>price</b>. The bars run sideways: price up the side, dollars across.",
+                "<b>Busiest price:</b> the price at which the most dollars changed hands — the point of control.",
+                "<b>Value area:</b> the narrowest band of prices holding 70 per cent of the dollars.",
+                "<b>Buying and selling:</b> every trade has a buyer and a seller; what is separated here is which side crossed the spread to get it done, not which side was right."]),
+                ("How to read it", [
+                    "Prices where a lot was traded tend to be where the market pauses; thin prices tend to be crossed quickly. That is a tendency, not a rule.",
+                    "This page gives no buy or sell signal and contains no forecast.",
+                    "The difference view draws buying and selling out from the middle, selling to one side and buying to the other."]),
+                ("Data and accuracy", [
+                    "Binance spot candles. The 7, 30 and 90-day views are built from hourly candles, the one-year view from daily candles.",
+                    "One thing worth knowing: a candle records only its high and low, not every price in between, so each candle's dollars are spread evenly across the price bands its range covers. That is an approximation and it is not hidden; an hourly candle has a narrow range, so the shorter views approximate less.",
+                    "The download button gives the buying and selling dollars of every price band."])]
+        }
+    },
     "risk": {
         "title": "ریسک و حجم پوزیشن: VaR و حد ضرر | entekhab.net",
         "desc": "چقدر یک پوزیشن می‌تواند ببازد و چه حجمی درست است: VaR تاریخی ۹۵ و ۹۹ درصد، میانگین روزهای بدتر، نوسان سالانه، عمیق‌ترین سقوط و ماشین‌حساب حجم. رایگان.",
@@ -1393,6 +1461,12 @@ HUB = {
               "ckb": "مەرج دابنێ و ببینە کام دراوەکان ئێستا دەگونجێن",
               "ar": "ضع شرطاً وانظر أي العملات تطابقه الآن",
               "en": "Set a condition and see which coins meet it right now"}),
+            ("/charts/volume-profile/", True,
+             {"fa": "پروفایل حجم", "ckb": "پرۆفایلی قەبارە", "ar": "ملف الحجم", "en": "Volume profile"},
+             {"fa": "معامله‌ها در کدام قیمت‌ها انجام شده‌اند، و کدام طرف از اسپرد گذشته است",
+              "ckb": "مامەڵەکان لە چ نرخێکدا کراون، و کام لایەن لە ئەسپرێدەکە تێپەڕیوە",
+              "ar": "عند أي الأسعار جرى التداول، وأي الطرفين عبر الفارق السعري",
+              "en": "At which prices the trading was done, and which side crossed the spread"}),
             ("/charts/risk/", True,
              {"fa": "ریسک و حجم پوزیشن", "ckb": "مەترسی و قەبارەی پۆزیشن", "ar": "المخاطر وحجم المركز", "en": "Risk and position size"},
              {"fa": "یک پوزیشن در روز بد چقدر می‌بازد، و با سرمایه و حد ضرر شما چه حجمی درست است",

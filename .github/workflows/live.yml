@@ -72,6 +72,13 @@ jobs:
           OBS_DEFI_FORCE: ${{ inputs.force && '1' || '' }}
         run: python scripts/obs_defi.py
 
+      - name: Volume profile (dollars traded by price — Binance spot candles)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          OBS_VPROFILE_FORCE: ${{ inputs.force && '1' || '' }}
+        run: python scripts/obs_vprofile.py
+
       - name: Commit
         run: |
           git config user.name  "coinkurd-bot"

@@ -87,6 +87,9 @@ FAMILIES = {
     # stage 4 (flow.js, prem.js): the views of the basis page and the measures of the stablecoin page
     "bv_": ["cb", "perp", "curve", "hist"],
     "sm_": ["supply", "ssr", "chg", "mix"],
+    # stage 5 (vprof.js): the volume profile's ranges and its two ways of showing the two sides
+    "vp_r_": ["7", "30", "90", "365"],
+    "vp_s_": ["both", "net"],
 }
 for q, f in sorted(used):
     if q not in EN:
