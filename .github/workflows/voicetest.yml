@@ -11,7 +11,7 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write   # only to attach the sample files to a release for listening
 
 concurrency:
   group: voicetest
@@ -43,9 +43,38 @@ jobs:
           # six is pulled in indirectly by coqui-tts but not declared by it
           pip install -q numpy "coqui-tts" huggingface_hub soundfile six
           python -c "import torch, torchcodec;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
+      # the podcast's own transcriber, so a candidate is judged by the same listening test that decides
+      # whether a finished episode may go to the channel
+      - name: Voice models (cached)
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/../podcast-models
+          key: podcast-models-v1
+      - name: Fetch the transcriber
+        continue-on-error: true
+        env:
+          PODCAST_MODELS: ${{ github.workspace }}/../podcast-models
+        run: |
+          pip install -q sherpa-onnx
+          python scripts/podcast/models.py || echo "transcriber unavailable; the pitch reading still stands"
+
       - name: Read the sentences and measure
         timeout-minutes: 35
+        env:
+          PODCAST_MODELS: ${{ github.workspace }}/../podcast-models
         run: python scripts/podcast/voicetest.py --out "${{ runner.temp }}/voices" --only "${{ inputs.only }}"
+      - name: Put the samples where they can be listened to
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd "${{ runner.temp }}/voices"
+          ls *.wav >/dev/null 2>&1 || { echo "no samples to publish"; exit 0; }
+          gh release delete voicetest -y --cleanup-tag 2>/dev/null || true
+          gh release create voicetest --title "Persian voice test" --notes \
+            "Samples read by each candidate, with the measured pitch in report.json. Nothing here is published to the site." \
+            *.wav report.json
+
       - name: Keep the readings and the samples
         if: always()
         uses: actions/upload-artifact@v4
