@@ -617,6 +617,13 @@ function renderStats(r,out){const bc={},bk={};r.forEach(p=>{bc[p.category]=(bc[p
   requestAnimationFrame(()=>out.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'))}
 
 /* the bare address of an image file: the picture itself is already shown, so the line is only noise */
+/* the sheet already shows the title in its heading; a Telegram post repeats it and underlines it with
+   a rule, so the reader met the title twice and a bar of box characters before the first real line.
+   The heading stays; the repeat and the rule under it go. A rule further down the post is left alone:
+   there it separates sections and is doing a job. */
+const noEcho=(t,title)=>{let x=(t||'').trim();const tt=(title||'').replace(/\u2026$/,'').trim();
+  if(tt&&x.startsWith(tt))x=x.slice(tt.length).trim();
+  return x.replace(/^[\s\u2500-\u257F]+/,'').trim();};
 const noImgUrl=t=>(t||'').replace(/(^|\s)https?:\/\/[^\s<]+\.(?:jpe?g|png|gif|webp|avif)(?:\?[^\s<]*)?(?=$|\s)/gi,'$1').replace(/\n{3,}/g,'\n\n').trim();
 
 async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="close" id="close">✕</button><div class="in"><p class="count">⏳ …</p></div>`;$('#modal').classList.add('open');document.body.style.overflow='hidden';$('#close').onclick=closeModal;await loadFull()}
@@ -625,7 +632,7 @@ async function openPost(id){if(!S.full){$('#sheet').innerHTML=`<button class="cl
   const rel=VP().filter(x=>x.id!==p.id&&(x.category===p.category||x.coins.some(k=>p.coins.includes(k)))).slice(0,4);
   $('#sheet').innerHTML=`<button class="close" id="close">✕</button>${p.photos&&p.photos[0]?`<img src="${esc(wp(p.photos[0],false))}" alt="">`:''}<div class="in">
     <div class="meta"><span class="cat" style="--c:${c.color}">${CI(c)}${esc(cname(c))}</span>${p.tags.map(t=>{const x=catOf(t);return `<span class="cat" style="--c:${x.color}">${CI(x)}${esc(cname(x))}</span>`}).join('')}<span>·</span><time>${p.date?fmtDate(p.date,{dateStyle:'full',timeStyle:'short'}):''}</time><span>· 👁 ${esc(p.views||'—')}</span></div>
-    <div class="txt" dir="auto">${linkify(PT(p).text)}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
+    <div class="txt" dir="auto">${linkify(noEcho(noImgUrl(PT(p).text),PT(p).title))}</div>${(lang!=='fa'&&!(p.tr&&p.tr[lang]))?`<p class="count">${T('noTr')}</p>`:''}
     ${p.link&&p.link.url?`<a class="lp" href="${esc(su(p.link.url))}" target="_blank" rel="noopener"><small>${esc(p.link.site||'')}</small> <br><b>${esc(p.link.title||p.link.url)}</b><br><small>${esc(p.link.description||'')}</small></a>`:''}
     <div class="coins">${p.kind?`<span class="kd" style="--k:${KC[p.kind]||'#888'}">${T('k_'+p.kind)}</span>`:''}${p.coins.map(k=>`<span class="coin">${k}</span>`).join('')}${(p.ents||[]).map(x=>`<a href="#" class="ent" data-ent="${esc(x)}">${esc(x)}</a>`).join('')}</div>
     ${p.dupn>1?`<p class="count">🔁 ${T('repeated').replace('{n}',fmtN(p.dupn))}</p>`:''}${p.dup?`<p class="count">🔁 ${T('dupOf')} <a href="#p${p.dup}" data-open="${p.dup}">#${p.dup}</a></p>`:''}

@@ -82,5 +82,28 @@ ok('text with no address at all is returned as it was',
    noImgUrl('یک متن ساده.') === 'یک متن ساده.', noImgUrl('یک متن ساده.'));
 ok('nothing in, nothing out', noImgUrl('') === '' && noImgUrl(null) === '');
 
+
+/* the sheet's own body: the title must not appear twice, and no bar of box characters before the first line */
+var ei = html.indexOf('const noEcho=');
+ok('the sheet-body rule is in index.html', ei >= 0, ei);
+var noEcho = eval('(' + html.slice(html.indexOf('=', ei) + 1, html.indexOf('};', ei) + 2).replace(/;$/, '') + ')');
+
+var T2 = 'راز ریزش بیت\u200cکوین به ۵۹ هزار دلار و تله بزرگ دسامبر';
+var BODY = T2 + '\n━━━━━━━━━━\n⚡️ در ۳ ثانیه\nخروج سنگین سرمایه نهادی.';
+var b = noEcho(BODY, T2);
+ok('the sheet body does not repeat the title', b.indexOf(T2) < 0, b.slice(0, 50));
+ok('and does not open with a bar of box characters', !/^[\s\u2500-\u257F]/.test(b), b.slice(0, 30));
+ok('it opens with the first real line of the post', b.indexOf('در ۳ ثانیه') >= 0 && b.indexOf('در ۳ ثانیه') < 4,
+   b.slice(0, 30));
+ok('the body of the post is kept whole', b.indexOf('خروج سنگین سرمایه نهادی.') > 0, b);
+
+var mid = noEcho('T\nfirst\n━━━━━━\nsecond', 'T');
+ok('a rule further down the post is left where it is, as a section break', /━/.test(mid), mid);
+ok('a body that does not repeat its title is untouched',
+   noEcho('Just the body.', 'Other title') === 'Just the body.', noEcho('Just the body.', 'Other title'));
+ok('nothing in, nothing out', noEcho('', 'T') === '' && noEcho(null, null) === '');
+ok('the sheet runs both cleanups on the text, not one',
+   /linkify\(noEcho\(noImgUrl\(/.test(html), (html.match(/class="txt"[^<]{0,80}/) || [''])[0]);
+
 console.log(FAILS.length ? '\n' + FAILS.length + ' failed' : '\nall passed');
 process.exit(FAILS.length ? 1 : 0);
