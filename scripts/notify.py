@@ -14,6 +14,8 @@ import os
 import urllib.error
 import urllib.request
 
+import sys as _sys
+
 LONG, SHORT, GREY = 0x2ECC71, 0xE74C3C, 0x95A5A6
 LEVEL = {"ok": 0x2ECC71, "warn": 0xF1C40F, "error": 0xE74C3C}
 
@@ -44,6 +46,18 @@ def send(content="", embeds=None):
     except Exception as e:                                      # noqa: BLE001
         print(f"discord: {type(e).__name__}")
     return False
+
+
+def test():
+    """A one-line ping, to prove the webhook reaches the channel. Run from the Discord test workflow."""
+    if not on():
+        print("discord: DISCORD_WEBHOOK is not set")
+        return False
+    good = send(embeds=[{"title": "entekhab.net \u2014 alerts connected",
+                         "description": "Signals and status changes will arrive in this channel.",
+                         "color": LEVEL["ok"], "footer": {"text": "entekhab.net"}}])
+    print("discord: test message sent" if good else "discord: test message did NOT go out")
+    return good
 
 
 def _field(name, value, inline=True):
@@ -79,3 +93,7 @@ def health_embed(status, rows):
             "color": LEVEL.get(status, GREY),
             "description": "\n".join(f"• {r}" for r in rows)[:3900] or "—",
             "footer": {"text": "entekhab.net status"}}
+
+
+if __name__ == "__main__":
+    _sys.exit(0 if test() else 1)

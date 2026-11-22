@@ -1,0 +1,22 @@
+# Proves the Discord webhook reaches the channel. Run it by hand from the Actions tab after setting or rotating
+# DISCORD_WEBHOOK; it posts one short message and nothing else.
+name: Discord — test the webhook
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Send one test message
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python scripts/notify.py
