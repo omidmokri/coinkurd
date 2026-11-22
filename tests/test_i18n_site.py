@@ -172,6 +172,20 @@ def main():
     reached = {c for c, _ in items}
     ok("a capped run reaches every unfinished language, not just the first", len(reached) == 10, sorted(reached))
 
+    # The day's calls used to be spendable at once, so translation ran flat out for a few hours and then every
+    # translating step did nothing until the next morning. They are released through the quota day instead.
+    import pro_l10n, datetime
+    from zoneinfo import ZoneInfo
+    LA = ZoneInfo("America/Los_Angeles")
+    def at(h, m=0):
+        return pro_l10n.quota_allowance(1000, datetime.datetime(2026, 11, 22, h, m, tzinfo=LA).timestamp())
+    ok("the first run of the day can still work", 100 <= at(0) <= 200, at(0))
+    ok("about half the calls are out by midday", 450 <= at(12) <= 550, at(12))
+    ok("the whole cap is reachable by the end", at(23, 59) >= 990, at(23, 59))
+    ok("the allowance only ever grows through the day",
+       all(at(h) <= at(h + 1) for h in range(23)), [at(h) for h in range(0, 24, 6)])
+    ok("nothing is released beyond the cap", max(at(h) for h in range(24)) <= 1000)
+
     p = S.prompt_for("tw", ["Close"])
     ok("the prompt names the language, its variant and what must stay as written",
        "Chinese (Traditional)" in p and "Traditional Chinese" in p and "Coin_Kurd" in p and '["Close"]' in p)

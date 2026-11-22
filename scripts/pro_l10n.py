@@ -73,6 +73,7 @@ KEEP = ["Binance", "OKX", "Bybit", "Deribit", "Gate", "tgju.org", "tgju", "Tradi
 # (chart types and indicator names — Renko, Kagi, Ichimoku … — are left to each language: platforms write them in
 #  their own script in some languages)
 FAIL_MAX = 3      # a string that failed its checks this many times stays in English (no endless retries on the quota)
+FLOOR = 0.12                                          # the share of a day's cap the first run may already use
 DAILY = int(os.environ.get("PRO_L10N_DAILY", "80"))   # Gemini calls a quota day A KEY at most (the site's own steps come first)
 KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
 
@@ -322,6 +323,30 @@ def quota_used(day=None):
         return 0
 
 
+def quota_allowance(cap, now=None):
+    """How much of a day's cap may be spent by now.
+
+    The whole cap used to be spendable the moment the quota day opened, so translation ran at full speed until it
+    was gone -- in practice a few hours -- and then every translating step did nothing for the rest of the day. A
+    string that arrived in the afternoon waited until the next morning, and the keys were already near Google's own
+    daily limit when anything else wanted them.
+
+    The cap is released evenly through the quota day instead: by a given moment, only that share of it is
+    available. A floor keeps the first run of the day worth making, and the last hours still reach the full cap, so
+    nothing is lost -- only spread.
+    """
+    now = time.time() if now is None else now
+    try:
+        from zoneinfo import ZoneInfo
+        import datetime
+        t = datetime.datetime.fromtimestamp(now, ZoneInfo("America/Los_Angeles"))
+    except Exception:  # noqa: BLE001
+        import datetime
+        t = datetime.datetime.utcfromtimestamp(now - 8 * 3600)
+    done = (t.hour * 3600 + t.minute * 60 + t.second) / 86400.0
+    return int(max(cap * FLOOR, min(cap, cap * done)))
+
+
 def quota_add(n, day=None):
     if n <= 0:
         return
@@ -504,7 +529,7 @@ def main():
     print(f"pro_l10n: {ai.pool_note()}")
     # every key has its own daily quota, so the day's ceiling grows with the pool
     cap = DAILY * len(pool)
-    left = cap - quota_used()
+    left = quota_allowance(cap) - quota_used()
     if left <= 0:
         print(f"pro_l10n: today's {cap} Gemini calls ({DAILY} a key) are used; more tomorrow "
               f"(the pages use what the cache has)")

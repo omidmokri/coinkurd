@@ -437,9 +437,12 @@ def main():
         pool = ai.keys()
         print(f"i18n_site: {ai.pool_note()}")
         cap = DAILY * len(pool)
-        left = cap - pro_l10n.quota_used()
+        # released evenly through the quota day, so a run in the afternoon still has calls to make
+        allow = pro_l10n.quota_allowance(cap)
+        left = allow - pro_l10n.quota_used()
         if left <= 0:
-            print(f"i18n_site: today's {cap} Gemini calls are used; more tomorrow (the pages use what the cache has)")
+            print(f"i18n_site: {pro_l10n.quota_used()} of today's {cap} Gemini calls are used, "
+                  f"{allow} released so far; the next run has more (the pages use what the cache has)")
         else:
             requests_max = min(a.requests or 8 * len(pool), left)
             jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))

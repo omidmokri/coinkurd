@@ -1,0 +1,73 @@
+# The site's languages, on their own.
+#
+# The three translating steps sat at the very end of "Sync Telegram → Site", a chain whose cycle is about 29
+# minutes, immediately before the deploy. A run that ended early -- and most do, because a push supersedes the one
+# waiting -- threw away everything they had just translated, because the commit came after them. On 2026-11-22,
+# 18 of 23 runs ended that way and not one dictionary was written all day.
+#
+# They need Gemini and git and nothing else from that run, so they stand alone here, commit their own files, and
+# ask for the light rebuild. The calls themselves are paced across the quota day by pro_l10n.quota_allowance, so
+# running more often does not spend more -- it only stops the work being lost.
+name: Site and market languages
+
+on:
+  schedule:
+    - cron: "11,41 * * * *"          # twice an hour; each run takes the slice of the day's calls released by then
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write                     # to ask for the light page rebuild once the dictionaries are in
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+concurrency:
+  group: languages
+  cancel-in-progress: false          # never interrupt a run part-way through committing
+
+jobs:
+  languages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+
+      - name: Arabic dictionaries
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python scripts/i18n_ar.py || echo "::warning::Arabic dictionaries failed; the site ships without new ones"
+
+      - name: Site languages (the other 43, new strings only)
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python scripts/i18n_site.py || echo "::warning::site languages failed; the pages use what the cache has"
+
+      - name: Live-market languages (new strings only)
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          COIN_KURD_API_KEY: ${{ secrets.COIN_KURD_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/pro_l10n.py || echo "::warning::market translations failed; the pages use what the cache has"
+
+      - name: Commit
+        run: |
+          git config user.name  "coinkurd-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/i18n_ar.json data/i18n data/pro_l10n 2>/dev/null || true
+          git diff --cached --quiet && echo "nothing changed" && exit 0
+          git commit -m "chore: site and market languages $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -X theirs origin main && git push && { echo "pushed=1" >> "$GITHUB_ENV"; break; }
+            sleep 5
+          done
+
+      - name: Ask for the light page rebuild
+        if: env.pushed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main || echo "::warning::could not ask for the rebuild; the next run tries again"
