@@ -41,7 +41,7 @@ jobs:
           # built against CUDA and fails on a runner with no graphics card ("libnvrtc.so.13: cannot open
           # shared object file"). The processor build installed above is the one that must stay.
           # six is pulled in indirectly by coqui-tts but not declared by it
-          pip install -q numpy "coqui-tts" huggingface_hub soundfile six sherpa-onnx
+          pip install -q numpy "coqui-tts" huggingface_hub soundfile six sherpa-onnx onnx
           python -c "import torch, torchcodec;print('torch', torch.__version__, 'cpu only:', not torch.cuda.is_available())"
       # the podcast's own transcriber, so a candidate is judged by the same listening test that decides
       # whether a finished episode may go to the channel
@@ -57,6 +57,7 @@ jobs:
         run: |
           pip install -q sherpa-onnx
           python scripts/podcast/models.py || echo "transcriber unavailable; the pitch reading still stands"
+          ls -d "$PODCAST_MODELS"/*/espeak-ng-data 2>/dev/null | head -2 || echo "no espeak-ng-data found"
 
       - name: Read the sentences and measure
         timeout-minutes: 35

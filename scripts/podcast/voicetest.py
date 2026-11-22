@@ -122,6 +122,45 @@ def synth_coqui(repo, text, out_wav, cache):
     cache[key].save_wav(wav, out_wav)
 
 
+def _espeak_dir():
+    """The espeak-ng data that ships with the podcast's own voices, wherever it already sits."""
+    import glob
+    roots = [os.environ.get("PODCAST_MODELS", "/home/claude/models"), "/home/claude/models"]
+    for r in roots:
+        hits = glob.glob(os.path.join(r, "*", "espeak-ng-data"))
+        if hits:
+            return hits[0]
+    return ""
+
+
+def _with_metadata(model_path, conf):
+    """Write the values sherpa-onnx reads into a copy of the ONNX file, taken from the voice's config.json."""
+    import onnx
+    audio = conf.get("audio") or {}
+    inference = conf.get("inference") or {}
+    want = {"model_type": "vits",
+            "sample_rate": str(audio.get("sample_rate") or conf.get("sample_rate") or 22050),
+            "add_blank": "1" if conf.get("add_blank", True) else "0",
+            "n_speakers": str(conf.get("num_speakers") or 1),
+            "comment": "piper",
+            "language": (conf.get("espeak") or {}).get("voice") or conf.get("language") or "fa",
+            "voice": (conf.get("espeak") or {}).get("voice") or "fa",
+            "noise_scale": str(inference.get("noise_scale", 0.667)),
+            "length_scale": str(inference.get("length_scale", 1.0)),
+            "noise_w": str(inference.get("noise_w", 0.8))}
+    m = onnx.load(model_path)
+    have = {p.key for p in m.metadata_props}
+    if "sample_rate" in have:
+        return model_path
+    for k, v in want.items():
+        if k not in have:
+            e = m.metadata_props.add()
+            e.key, e.value = k, str(v)
+    out = model_path.replace(".onnx", ".meta.onnx")
+    onnx.save(m, out)
+    return out
+
+
 def synth_piper_onnx(repo, sid, text, out_wav, cache):
     """Read one sentence with a Piper-format ONNX voice, through sherpa-onnx — the very runtime the podcast
     already uses, so a voice that works here needs nothing new added to the daily job."""
@@ -153,6 +192,17 @@ def synth_piper_onnx(repo, sid, text, out_wav, cache):
                 with open(tok, "w", encoding="utf-8") as fh:
                     for sym, n in sorted(ids.items(), key=lambda kv: kv[1][0]):
                         fh.write(f"{sym} {n[0]}\n")
+        # A plain Piper export carries none of the metadata sherpa-onnx reads ("'sample_rate' does not exist in
+        # the metadata"), so it is written in from the voice's own config.json. Nothing is invented: every value
+        # comes from that file.
+        if cfg:
+            conf = json.load(open(hf_hub_download(repo, cfg), encoding="utf-8"))
+            model = _with_metadata(model, conf)
+        # A Piper voice speaks through espeak-ng. The podcast's own Persian voices ship that data, so it is
+        # borrowed from whichever of them is already on the machine rather than fetched again.
+        data_dir = _espeak_dir()
+        if not data_dir:
+            raise RuntimeError("espeak-ng data not found beside the podcast's voices; cannot read Piper phonemes")
         mc = sherpa_onnx.OfflineTtsModelConfig(
             vits=sherpa_onnx.OfflineTtsVitsModelConfig(model=model, lexicon="", tokens=tok, data_dir=data_dir),
             num_threads=2, provider="cpu")
