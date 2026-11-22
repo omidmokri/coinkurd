@@ -164,14 +164,14 @@ def _with_metadata(model_path, conf):
     m = onnx.load(model_path)
     have = {p.key for p in m.metadata_props}
     if "sample_rate" in have:
-        return model_path
+        return model_path, {"already": "the file carried its own metadata"}
     for k, v in want.items():
         if k not in have:
             e = m.metadata_props.add()
             e.key, e.value = k, str(v)
     out = model_path.replace(".onnx", ".meta.onnx")
     onnx.save(m, out)
-    return out
+    return out, want
 
 
 def synth_piper_onnx(repo, sid, text, out_wav, cache):
@@ -214,9 +214,11 @@ def synth_piper_onnx(repo, sid, text, out_wav, cache):
         # A plain Piper export carries none of the metadata sherpa-onnx reads ("'sample_rate' does not exist in
         # the metadata"), so it is written in from the voice's own config.json. Nothing is invented: every value
         # comes from that file.
+        meta = {}
         if cfg:
             conf = json.load(open(hf_hub_download(repo, cfg), encoding="utf-8"))
-            model = _with_metadata(model, conf)
+            model, meta = _with_metadata(model, conf)
+        cache[key + "::meta"] = meta
         # A Piper voice speaks through espeak-ng. The podcast's own Persian voices ship that data, so it is
         # borrowed from whichever of them is already on the machine rather than fetched again.
         data_dir = _espeak_dir()
@@ -227,6 +229,12 @@ def synth_piper_onnx(repo, sid, text, out_wav, cache):
             num_threads=2, provider="cpu")
         cache[key] = sherpa_onnx.OfflineTts(sherpa_onnx.OfflineTtsConfig(model=mc, max_num_sentences=1))
     a = cache[key].generate(text, sid=sid, speed=1.0)
+    n = len(a.samples) if a.samples is not None else 0
+    if n == 0 or not a.sample_rate:
+        # soundfile would only say "Internal" here. Say what actually came back, and what the engine was told,
+        # so one run is enough to see whether the fault is the voice, the speaker number or the phonemes.
+        raise RuntimeError(f"the engine returned {n} samples at {a.sample_rate} Hz for speaker {sid}; "
+                           f"metadata written: {cache.get(key + '::meta')}")
     sf.write(out_wav, a.samples, a.sample_rate)
 
 
