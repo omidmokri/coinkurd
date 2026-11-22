@@ -70,8 +70,9 @@ jobs:
         run: |
           cd "${{ runner.temp }}/voices"
           ls *.wav >/dev/null 2>&1 || { echo "no samples to publish"; exit 0; }
-          gh release delete voicetest -y --cleanup-tag 2>/dev/null || true
-          gh release create voicetest --title "Persian voice test" --notes \
+          R="${{ github.repository }}"   # gh is run outside the checkout, so the repository must be named
+          gh release delete voicetest -y --cleanup-tag --repo "$R" 2>/dev/null || true
+          gh release create voicetest --repo "$R" --title "Persian voice test" --notes \
             "Samples read by each candidate, with the measured pitch in report.json. Nothing here is published to the site." \
             *.wav report.json
 
