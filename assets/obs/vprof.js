@@ -28,7 +28,19 @@
   }
   /* the price a bin covers, named by its middle */
   function mid(p, i) { return p.lo + (i + 0.5) * p.step; }
-  function px(v) { return OB.ltr(OB.fmtUsd(v)); }
+  /* A price axis needs every band to read differently, so the number of decimals follows the band's own width
+     rather than the size of the price: $80,588 for Bitcoin, $0.1642 for Dogecoin. fmtUsd would shorten both to
+     "$80.6K" and "$0.2", which would print the same label on band after band. */
+  function dp(step) {
+    if (!(step > 0)) return 2;
+    var d = Math.ceil(-Math.log10(step)) + 1;
+    return Math.max(0, Math.min(8, d));
+  }
+  function price(v, step) {
+    if (v == null || !isFinite(v)) return '—';
+    var n = dp(step);
+    return OB.ltr('$' + v.toLocaleString('en-US', { minimumFractionDigits: n, maximumFractionDigits: n }));
+  }
 
   function current() {
     var a = (V.doc && V.doc.assets) ? V.doc.assets[S.coin] : null;
@@ -60,8 +72,8 @@
           '<i style="width:' + (b / maxTot * 100).toFixed(2) + '%;background:' + BUY + '"></i>' +
           '<i style="width:' + (s / maxTot * 100).toFixed(2) + '%;background:' + SELL + '"></i></span>';
       }
-      out += '<div class="' + cls + '" title="' + esc(px(mid(p, i)) + ' · ' + money(tot)) + '">' +
-        '<span class="ob-vppx ob-n">' + esc(px(mid(p, i))) + '</span>' + bar +
+      out += '<div class="' + cls + '" title="' + esc(price(mid(p, i), p.step) + ' · ' + money(tot)) + '">' +
+        '<span class="ob-vppx ob-n">' + esc(price(mid(p, i), p.step)) + '</span>' + bar +
         '<span class="ob-vpv ob-n">' + esc(OB.ltr(money(tot))) + '</span></div>';
     }
     return out;
@@ -76,8 +88,8 @@
     for (i = 0; i < p.n; i++) { buy += p.buy[i]; sell += p.sell[i]; }
     var share = (buy + sell) > 0 ? buy / (buy + sell) * 100 : null;
     $('#ob-tiles', el).innerHTML =
-      tile(T('vp_t_poc'), esc(px(pocPx)), T('vp_t_poc_s'), POC) +
-      tile(T('vp_t_va'), esc(OB.ltr(px(valPx) + ' – ' + px(vahPx))), T('vp_t_va_s')) +
+      tile(T('vp_t_poc'), esc(price(pocPx, p.step)), T('vp_t_poc_s'), POC) +
+      tile(T('vp_t_va'), esc(OB.ltr(price(valPx, p.step) + ' – ' + price(vahPx, p.step))), T('vp_t_va_s')) +
       tile(T('vp_t_total'), esc(OB.ltr(money(p.total))), T('vp_t_total_s')) +
       tile(T('vp_t_buy'), share == null ? '—' : esc(OB.ltr(share.toFixed(1) + '%')), T('vp_t_buy_s'),
            share != null && share >= 50 ? BUY : SELL);
