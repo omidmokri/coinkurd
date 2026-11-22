@@ -1,0 +1,63 @@
+# The fast half of the site's data.
+#
+# "Sync Telegram → Site" is a chain: each run dispatches the next, because this repository's cron has been known
+# to arrive hours late, and its own schedule is the net that restarts the chain if it breaks. That is working as
+# intended -- the cancelled runs in its history are the net being superseded by the chain, not a fault.
+#
+# What it does mean is a cycle about 29 minutes long. Signals were read a third of the way into that cycle but
+# not committed until roughly ten minutes later, so a signal waited half an hour for the site even when
+# everything went right, and longer when a run ended early.
+#
+# These two steps need a few API calls and no AI, so they run on their own every 15 minutes, in their own
+# concurrency group, and commit only their own files. They commit under data/, which update.yml ignores for its
+# push trigger, so this adds no work to the chain -- and the chain no longer carries these two steps at all.
+name: Live signals and DeFi
+
+on:
+  schedule:
+    - cron: "2,17,32,47 * * * *"    # a few minutes ahead of the long run, so it starts with fresh signals
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: live
+  cancel-in-progress: false         # never interrupt a run that is part-way through committing
+
+env:
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install "requests>=2.31" "beautifulsoup4>=4.12"
+
+      - name: Indicator signals (TradingView alert relay + real outcomes)
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python scripts/signals.py
+
+      - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python scripts/obs_defi.py
+
+      - name: Commit
+        run: |
+          git config user.name  "coinkurd-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/signals.json data/live.json data/obs/defi.json 2>/dev/null || true
+          git diff --cached --quiet && echo "nothing changed" && exit 0
+          git commit -m "chore: live signals and DeFi $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash -X theirs origin main && git push && break
+            sleep 5
+          done

@@ -304,19 +304,6 @@ jobs:
           MACRO_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/macro.py
 
-      - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
-        continue-on-error: true
-        timeout-minutes: 5
-        run: python scripts/obs_defi.py
-
-      - name: Indicator signals (TradingView alert relay + real outcomes)
-        id: signals
-        continue-on-error: true
-        timeout-minutes: 4
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: python scripts/signals.py
-
       - name: Market Wrapped (weekly / monthly)
         continue-on-error: true
         timeout-minutes: 3
@@ -431,7 +418,6 @@ jobs:
           STEP_FLOWS: ${{ steps.flows.outcome }}
           STEP_DNA: ${{ steps.dna.outcome }}
           STEP_KIND: ${{ steps.kind.outcome }}
-          STEP_SIGNALS: ${{ steps.signals.outcome }}
           STEP_ENRICH: ${{ steps.enrich.outcome }}
           STEP_SCANLOG: ${{ steps.scanlog.outcome }}
         run: python scripts/health.py
