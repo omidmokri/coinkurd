@@ -57,8 +57,15 @@ ok('a post with nothing but a rule yields no preview at all', preview('T', 'T\n�
    was out of sight and part of the infographic was simply gone; and the post's own picture address was printed
    underneath as a long unreadable line. Both rules are lifted out of index.html and checked here. */
 
-var sheetCss = (html.match(/\.sheet img\{[^}]*\}/) || [''])[0];
+/* The rule must reach the post's own picture and NOTHING else. Written as ".sheet img" it reached every
+   picture in the sheet — the little category icons beside the date and the thumbnails of the related posts —
+   and stretched them all to the full width, piling them on top of each other. The post's picture is the only
+   direct child of the sheet, so the child combinator is what keeps the rule honest. */
+var sheetCss = (html.match(/\.sheet>img\{[^}]*\}/) || [''])[0];
 ok('the sheet picture has a rule of its own', !!sheetCss, sheetCss);
+ok('that rule reaches the post picture only, not every picture in the sheet',
+   /\.sheet>img\{/.test(html) && !/\.sheet img\{width/.test(html),
+   (html.match(/\.sheet ?>? ?img\{[^}]*\}/g) || []));
 ok('it is never cropped: these are text infographics, not photographs',
    /object-fit:contain/.test(sheetCss) && !/cover/.test(sheetCss), sheetCss);
 /* an earlier version capped the height to keep the picture compact. The owner asked for the opposite: these
@@ -127,9 +134,9 @@ ok('state the page added while open is not lost', merged.seen === true, merged);
 
 /* the picture: big enough that the words on it can be read */
 ok('the picture is shown at the full width of the sheet, not shrunk to a thumbnail',
-   /\.sheet img\{width:100%;height:auto/.test(html), sheetCss);
-ok('and still never cropped', /\.sheet img\{[^}]*object-fit:contain/.test(html), sheetCss);
-ok('no height cap is left to cut it short', !/\.sheet img\{[^}]*max-height:(?!none)/.test(html), sheetCss);
+   /\.sheet>img\{width:100%;height:auto/.test(html), sheetCss);
+ok('and still never cropped', /\.sheet>img\{[^}]*object-fit:contain/.test(html), sheetCss);
+ok('no height cap is left to cut it short', !/\.sheet>img\{[^}]*max-height:(?!none)/.test(html), sheetCss);
 
 /* a link card that only shows the picture's own address is not drawn at all */
 ok('an image address is recognised', /const isImgUrl=/.test(html));
