@@ -29,10 +29,29 @@ VOICE = {
     # put it at 0.36 against a limit of 0.35 and the Persian version was held out of the episode that went to the
     # channel. Back to near-normal pace — a little longer to listen to, and understood.
     "fa": dict(backend="piper", folder="vits-piper-fa_IR-ganji_adabi-medium", sid=0, speed=1.05),
+    # The Persian reading moves to Pocket-TTS once PODCAST_FA_POCKET is set. It is held behind a switch on
+    # purpose: the languages job is working through the dictionaries for days yet, and a voice change landing
+    # in the middle of that would make any problem hard to attribute. The owner heard both and chose the
+    # man's voice for every edition; the woman's voice was dropped from the cycle, so there is one Persian
+    # voice, not two. The reference clip is assets/voice/fa_male_prompt.wav, five seconds, as the model needs.
     "ar": dict(backend="piper", folder="vits-piper-ar_JO-kareem-medium", sid=0, speed=1.4),
     "ckb": dict(backend="vekol", folder="vekol", sid=0, speed=1.0),   # Vekol-TTS edge, the site's own Sorani voice
     "en": dict(backend="kokoro", folder="kokoro-en-v0_19", sid=1, speed=1.0),
 }
+
+def voice_for(lang):
+    """Every reading goes through here, so the Persian switch applies wherever a voice is asked for."""
+    return _fa_voice() if lang == "fa" else VOICE[lang]
+
+
+def _fa_voice():
+    """The Persian voice of the day: the long-standing Piper reading, or Pocket-TTS where it is switched on."""
+    if os.environ.get("PODCAST_FA_POCKET") == "1":
+        here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return dict(backend="pocket", prompt=os.path.join(os.path.dirname(here), "assets", "voice",
+                                                          "fa_male_prompt.wav"), speed=1.0)
+    return VOICE["fa"]
+
 
 FA_DISPLAY = {"اِم‌اِس‌سی‌آی": "MSCI", "آر‌اس‌آی": "RSI", "آی‌بیت": "IBIT", "اوکی‌ایکس": "OKX",
               "اس‌اند‌پی ۵۰۰": "S&P 500", "انتخاب دات نت": "entekhab.net", "استاک‌تو‌فلو": "استاک‌تو‌فلو (S2F)"}
@@ -73,7 +92,7 @@ def synth(text, lang):
             raise ValueError(f"Vekol cannot read {unknown!r} in: {text[:80]}")
         a, sr = _vekol.sentence(text)
     else:
-        a, sr = tts.synth(text, voice=VOICE[lang])
+        a, sr = tts.synth(text, voice=voice_for(lang))
     a = soxr.resample(a, sr, SR, quality="VHQ")
     # trim the model's own leading/trailing silence so our pauses are exact
     thr = 0.01 * (np.abs(a).max() or 1)
@@ -137,7 +156,7 @@ def build(ep, lang):
     voice = np.concatenate(chunks)
     sf.write(os.path.join(ep, f"voice_{lang}.wav"), voice, SR, subtype="PCM_16")
     words = sum(len(x["text"].split()) for x in timeline if "text" in x)
-    meta = {"lang": lang, "voice": VOICE[lang], "duration": round(len(voice) / SR, 2), "words": words,
+    meta = {"lang": lang, "voice": voice_for(lang), "duration": round(len(voice) / SR, 2), "words": words,
             "wpm": round(words / (len(voice) / SR) * 60, 1), "timeline": timeline}
     json.dump(meta, open(os.path.join(ep, f"timeline_{lang}.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return meta
