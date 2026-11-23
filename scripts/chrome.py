@@ -304,6 +304,17 @@ NAV = [
          L("سلب مسئولیت و قوانین استفاده", "ڕاگەیاندنی بەرپرسیارێتی و یاساکان", "Disclaimer and rules of use")),
     ]},
 ]
+# /swap/ joins the Tools menu only once swaps are switched on in scripts/swap_config.json (the owner's own keys are in
+# place); until then the page exists but nothing points at it. Being in NAV also puts it in the bot and the extension.
+SWAP = ("/swap/", "coins", L("تبدیل رمزارز (سواپ)", "گۆڕینەوەی دراو (سواپ)", "Swap"),
+        L("تبدیل بین شبکه‌ها از کیف پول خودتان، با مسیریاب رنگو", "گۆڕینەوە لە نێوان تۆڕەکان لە جزدانی خۆتەوە، بە ڕێدۆزەری ڕەنگۆ",
+          "Cross-chain swaps from your own wallet, routed by Rango"))
+try:
+    import build_swap as _SW
+    if _SW.nav_on():
+        next(c for c in NAV if c["k"] == "tools")["items"].append(SWAP)
+except Exception:  # noqa: BLE001
+    pass
 BATTLE = ("/battle/", "swords", L("نبرد من", "شەڕی من", "My Battle"))
 # the order of the top bar: Markets, Analysis, Tools, Learn, Archive, Battlefield (direct), More
 TOP_ORDER = ["mkt", "ana", "reality", "tools", "learn", "arc", "BATTLE", "more"]
