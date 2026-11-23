@@ -137,11 +137,24 @@ def main():
     # ---------------------------------------------------------------- the committed page
     live = B.load()
     committed = open(B.OUT, encoding="utf-8").read()
-    ok(committed == B.page(live, data), "swap/index.html is exactly what the builder makes from the committed settings")
+    ok(committed == B.page(live, data), "swap/index.html is exactly what the builder makes (rebuild it after the menu or a script version changes)")
     raw_cfg = json.load(open(B.CONFIG, encoding="utf-8"))
     blob = json.dumps(raw_cfg).lower()
     ok(not any(w in blob for w in ("private", "mnemonic", "seed", "secret", "password", "apikey")), "the settings file holds no secret-looking field")
 
+    def loaders(doc):
+        """(tag, address) of everything the markup makes the browser fetch"""
+        out = []
+        for m in re.finditer(r"<(script|link|img|iframe|source|video|audio|embed|object)\b([^>]*)>", doc, re.I):
+            tag, attrs = m.group(1).lower(), m.group(2)
+            if tag == "link" and not re.search(r'rel="(?:stylesheet|preload|icon|apple-touch-icon|manifest|modulepreload)"', attrs):
+                continue                      # canonical, alternate … are names, not downloads
+            u = re.search(r'(?:src|href|data)="([^"]*)"', attrs)
+            if u:
+                out.append((tag, u.group(1)))
+        return out
+
+    icons = B.with_icons(data)
     for name, cfg in (("off", {"enabled": False}), ("on", B.check(copy.deepcopy(GOOD)))):
         doc = B.page(cfg, data)
         csp = re.search(r'<meta http-equiv="Content-Security-Policy" content="([^"]*)">', doc)
@@ -149,42 +162,57 @@ def main():
            f"[{name}] the policy comes before anything is loaded")
         pol = dict((p.strip().split(" ", 1) + [""])[:2] for p in csp.group(1).split(";") if p.strip())
         ok(pol.get("default-src") == "'none'", f"[{name}] default-src 'none'")
-        ok(pol.get("script-src") == "'self'" and pol.get("style-src") == "'self'", f"[{name}] scripts and styles from this site only, nothing inline")
-        ok(pol.get("connect-src") == "https://li.quest", f"[{name}] the one connection allowed is the price service")
-        ok(pol.get("img-src") == "'self'", f"[{name}] pictures come from this site only (no token logos from elsewhere)")
+        ok(pol.get("script-src") == "'self' 'inline-speculation-rules'", f"[{name}] scripts: this site's files only — no inline script, no other host")
+        ok(pol.get("connect-src") == "'self' https://li.quest", f"[{name}] connections: this site and the price service, nothing else")
+        ok(pol.get("img-src") == "'self' data:", f"[{name}] pictures come from this site only (no token logos from elsewhere)")
         ok(pol.get("frame-src") == "'none'", f"[{name}] no frames at all")
         ok(pol.get("object-src") == "'none'" and pol.get("base-uri") == "'none'" and pol.get("form-action") == "'none'",
            f"[{name}] no plug-ins, no <base>, no form may be submitted")
-        ok(pol.get("require-trusted-types-for") == "'script'", f"[{name}] Trusted Types: building markup from text would throw")
-        ok("unsafe" not in csp.group(1) and "*" not in csp.group(1) and "data:" not in csp.group(1) and "blob:" not in csp.group(1),
-           f"[{name}] no unsafe-*, wildcard, data: or blob: anywhere in the policy")
+        ok(not re.search(r"script-src[^;]*unsafe", csp.group(1)) and "*" not in csp.group(1) and "blob:" not in csp.group(1)
+           and "http:" not in csp.group(1) and "wss:" not in csp.group(1),
+           f"[{name}] no unsafe script, wildcard, blob:, plain http or socket host in the policy")
+        hosts_in_policy = set(re.findall(r"https://[^\s;]+", csp.group(1)))
+        ok(hosts_in_policy == {"https://li.quest"}, f"[{name}] the one outside host the policy names is li.quest")
 
         sc = scripts_of(doc)
-        ok(len(sc) == 1 and 'src="/assets/swap/swap.js"' in sc[0], f"[{name}] exactly one script: assets/swap/swap.js")
+        srcs = [re.search(r'src="([^"?]*)', x).group(1) if 'src="' in x else None for x in sc]
+        ok(all(x is not None for x in srcs), f"[{name}] no inline script anywhere in the page")
+        ok(set(srcs) <= B.MAY_RUN and srcs[0] == "/assets/swap/swap.js",
+           f"[{name}] only the swap engine and the site's own interface scripts run, the engine first ({srcs})")
         for rel in ("assets/swap/swap.js", "assets/swap/swap.css"):
             h = "sha384-" + base64.b64encode(hashlib.sha384(open(os.path.join(ROOT, rel), "rb").read()).digest()).decode()
             ok(f'/{rel}" integrity="{h}"' in doc, f"[{name}] {rel} is pinned by its SHA-384")
-        ok(not re.search(r"\son[a-z]+\s*=", doc) and "javascript:" not in doc.lower() and "<style" not in doc and " style=" not in doc,
-           f"[{name}] no inline handler, javascript: link or inline style")
-        hosts = set(re.findall(r'(?:src|href)="(https?://[^/"]+)', doc))
-        ok(hosts <= {"https://entekhab.net", "https://li.fi"}, f"[{name}] no other host is referenced ({sorted(hosts)})")
+        ok(not re.search(r"<[^>]+\son[a-z]+\s*=", doc) and "javascript:" not in doc.lower(), f"[{name}] no inline event handler and no javascript: link")
+        outside = [(t, u) for t, u in loaders(doc) if re.match(r"(?:https?:)?//", u)]
+        ok(not outside, f"[{name}] the markup loads nothing from another host ({outside[:3]})")
         ok("<iframe" not in doc, f"[{name}] no frame is embedded")
-        ok(re.search(r"<html[^>]*\sdata-noar", doc[:800]) is not None, f"[{name}] marked data-noar, so the translation layers add no script")
-        ok(all("noopener noreferrer" in a for a in re.findall(r"<a\b[^>]*target=\"_blank\"[^>]*>", doc)), f"[{name}] outside links open with noopener noreferrer")
+        ok(not re.search(r"<html[^>]*\sdata-noar", doc[:800]), f"[{name}] the page is open to the site's translation layers, like any other page")
+        ok('id="ekh"' in doc and 'id="ekb"' in doc and 'id="ekf"' in doc and 'href="/swap/"' in doc,
+           f"[{name}] the site's header, tab bar and footer are on the page")
+        ok(doc.count('id="ek-main"') == 1, f"[{name}] the header's skip target appears once (a second one collapsed the page)")
+        ok(all("noopener" in a for a in re.findall(r"<a\b[^>]*target=\"_blank\"[^>]*>", doc[doc.index('id="sw-main"'):doc.index('id="ekb"')])),
+           f"[{name}] outside links in the page body open with noopener")
         ok('name="referrer" content="no-referrer"' in doc, f"[{name}] no referrer leaves the page")
         ok(("noindex" in doc) == (name == "off"), f"[{name}] kept out of search only while switched off")
 
-        box = re.search(r'<div id="sw-app" class="sw-app" data-c="([^"]*)" data-d="([^"]*)">', doc)
+        box = re.search(r'<section id="sw-app" class="sw-card" data-s="" data-c="([^"]*)" data-d="([^"]*)">', doc)
         ok(bool(box), f"[{name}] the tool's box carries its settings and its data")
         ok(json.loads(H.unescape(box.group(1))) == cfg, f"[{name}] the page carries exactly the checked settings")
-        ok(json.loads(H.unescape(box.group(2))) == data, f"[{name}] …and exactly the checked chains and tokens")
-        for el in ("sw-from-chain", "sw-to-chain", "sw-from-token", "sw-to-token", "sw-amount", "sw-action",
-                   "sw-quote", "sw-receive", "sw-min", "sw-route", "sw-gas", "sw-fee", "sw-time", "sw-status",
-                   "sw-msg", "sw-balance", "sw-max", "sw-flip", "sw-slip", "sw-account", "sw-tokenwarn",
-                   "sw-from-custom", "sw-to-custom"):
-            ok(f'id="{el}"' in doc, f"[{name}] the page has {el}")
-        warn = doc[doc.index("sw-warn"):]
-        ok("عبارت بازیابی" in warn and "recovery phrase" in warn, f"[{name}] the warning never to type a recovery phrase is on the page")
+        ok(json.loads(H.unescape(box.group(2))) == icons, f"[{name}] …and exactly the checked chains and tokens, with their pictures")
+        for el in ("fc", "fc-i", "fc-n", "ft", "ft-i", "ft-n", "tc", "tc-i", "tc-n", "tt", "tt-i", "tt-n", "amount", "max", "balance",
+                   "from-usd", "to-usd", "flip", "receive", "quote", "rate", "min", "route", "gas", "fee", "time", "impact", "slip",
+                   "tokenwarn", "ackbox", "ack", "account", "action", "action-l", "action-x", "msg", "status", "dlg", "dlg-title",
+                   "dlg-q", "dlg-list", "dlg-find", "dlg-close"):
+            ok(doc.count(f'id="sw-{el}"') == 1, f"[{name}] the page has sw-{el}, once")
+        # every figure, address and name the engine fills in is out of the translation layers' reach
+        for el in ("amount", "receive", "balance", "from-usd", "to-usd", "rate", "min", "route", "gas", "fee", "time", "impact",
+                   "account", "action-x", "fc-n", "ft-n", "tc-n", "tt-n", "dlg-q"):
+            tag = re.search(rf'<[a-z]+\b[^>]*id="sw-{el}"[^>]*>', doc).group(0)
+            ok('translate="no"' in tag, f"[{name}] sw-{el} is marked translate=\"no\": a label may be re-worded, a figure never")
+        body = doc[doc.index('id="sw-main"'):doc.index('id="ekb"')]
+        ok(body.count('data-lang="fa"') == body.count('data-lang="ckb"') == body.count('data-lang="en"') > 30,
+           f"[{name}] every piece of text is there in Persian, Sorani and English")
+        ok("عبارت بازیابی" in body and "recovery phrase" in body, f"[{name}] the warning never to type a recovery phrase is on the page")
 
     on_doc = B.page(B.check(copy.deepcopy(GOOD)), data)
     ok("۰٫۵٪" in on_doc, "the site's fee is printed on the page as it is (۰٫۵٪)")
@@ -193,9 +221,25 @@ def main():
     off_doc = B.page({"enabled": False}, data)
     ok("کارمزد انتخاب" not in off_doc and "کارمزدی نمی‌گیرد" not in off_doc, "switched off: no fee is promised either way")
 
-    # ---------------------------------------------------------------- the deploy passes must leave it alone
+    # ---------------------------------------------------------------- the pictures
+    ICON = re.compile(r"^[ct]/[a-z0-9-]{1,32}\.(?:svg|webp)$")
+    used = {c["ic"] for c in icons["chains"] if "ic" in c} | {t["ic"] for v in icons["tokens"].values() for t in v if "ic" in t}
+    ok(all(ICON.match(u) and os.path.isfile(os.path.join(B.ICONS_DIR, u)) for u in used), "every picture the page names is a file in assets/swap/ic/")
+    ok(all("ic" in c for c in icons["chains"]), "every network has its picture")
+    n_t = sum(len(v) for v in icons["tokens"].values())
+    n_i = sum(1 for v in icons["tokens"].values() for t in v if "ic" in t)
+    ok(n_i >= n_t * 0.85, f"nearly every token has a picture ({n_i} of {n_t}; the rest get a letter badge)")
+    bad_svg = re.compile(rb"<script|\son[a-z]+\s*=|<foreignObject|javascript:|(?:href|src)\s*=\s*[\"']\s*(?:https?:)?//", re.I)
+    svgs = [os.path.join(B.ICONS_DIR, "c", f) for f in os.listdir(os.path.join(B.ICONS_DIR, "c"))]
+    ok(all(f.endswith(".svg") and os.path.getsize(f) < 60000 and not bad_svg.search(open(f, "rb").read()) for f in svgs),
+       "no network picture carries a script, an event handler or an outside reference")
+    webps = [os.path.join(B.ICONS_DIR, "t", f) for f in os.listdir(os.path.join(B.ICONS_DIR, "t"))]
+    ok(all(f.endswith(".webp") and open(f, "rb").read(12)[8:12] == b"WEBP" and os.path.getsize(f) < 20000 for f in webps),
+       "every token picture is a small WebP redrawn here")
+
+    # ---------------------------------------------------------------- the deploy passes: what they add must be the site's own
     import i18n_ar, i18n_site, seo_tidy, seo_struct, chrome  # noqa: E401
-    ok("swap" not in chrome.STATIC, "the site header/footer injection does not touch /swap/")
+    ok("swap" not in chrome.STATIC, "the generic header injection (which would also swap in the site-wide policy) does not touch /swap/")
     for name, cfg in (("off", {"enabled": False}), ("on", B.check(copy.deepcopy(GOOD)))):
         tmp = tempfile.mkdtemp()
         try:
@@ -208,12 +252,27 @@ def main():
                 doc = seo_struct.enrich(doc, "/swap/", seo_struct.Site(ROOT))
             except Exception as ex:  # noqa: BLE001
                 ok(False, f"[{name}] seo_struct failed: {ex}")
-            sc = scripts_of(doc)
-            ok(len(sc) == 1 and 'src="/assets/swap/swap.js"' in sc[0], f"[{name}] after the deploy passes there is still exactly one script")
-            ok("<style" not in doc and "ek-tr" not in doc and "ek-ar" not in doc and "chrome.js" not in doc,
-               f"[{name}] after the deploy passes: no inline style, no translation layer, no site script")
+            csp_at = doc.index('http-equiv="Content-Security-Policy"')
+            after = scripts_of(doc[csp_at:])
+            srcs = [re.search(r'src="([^"?]*)', x).group(1) if 'src="' in x else None for x in after]
+            ok(all(x in B.MAY_RUN for x in srcs), f"[{name}] after the deploy passes, every script under the policy is one of the site's own ({srcs})")
+            ok({"/assets/ar.js", "/assets/i18n.js"} <= set(srcs), f"[{name}] the two translation layers are added, so the page appears in every language of the site")
+            ok(len(re.findall(r'http-equiv="Content-Security-Policy"', doc)) == 1 and "li.quest" in doc[csp_at:csp_at + 600],
+               f"[{name}] the deploy passes leave this page's own policy in place")
+            outside = [(t, u) for t, u in loaders(doc) if re.match(r"(?:https?:)?//", u)]
+            ok(not outside, f"[{name}] after the deploy passes the markup still loads nothing from another host")
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+    # ---------------------------------------------------------------- the translation layers can read it
+    pg = i18n_ar.Page()
+    pg.feed(B.page(B.check(copy.deepcopy(GOOD)), data))
+    for words in ("You send", "You receive", "Before every swap", "Max price move", "Search on the network"):
+        ok(words in pg.out, f"the site's translator finds the page's English: “{words}”")
+    ok(not any(re.search(r"0x[0-9a-fA-F]{40}", x) for x in pg.out), "no address is handed to the translator")
+    js_en = i18n_ar.js_strings(open(os.path.join(ROOT, "assets", "swap", "swap.js"), encoding="utf-8").read())
+    for words in ("Connect wallet", "Swap", "Finding the best price…", "Approve token", "Choose a token"):
+        ok(words in js_en, f"…and the engine's English: “{words}”")
 
     # ---------------------------------------------------------------- the menu
     listed = any(i[0] == "/swap/" for c in chrome.NAV for i in c["items"])

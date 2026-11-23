@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-/swap/ — cross-chain token swaps on entekhab.net, routed by LI.FI, on a page kept apart from the rest of the site.
+/swap/ — cross-chain token swaps on entekhab.net, routed by LI.FI.
 
 Why LI.FI and not Rango: on 2026-11-23 every Rango host (widget, app, site and api.rango.exchange) was closed to
 readers inside Iran — the main audience — so a Rango page would have been furniture. LI.FI's service answers, and its
 route and transaction come back over one plain HTTPS call, which means this page needs no third-party code at all.
 
-Why the page is apart: a page where people connect a wallet must run as little code as possible. /swap/ carries no site
-header, no site scripts, no translation layer and no counter. It has one stylesheet, one script (assets/swap/swap.js,
-both pinned by their SHA-384) and a Content-Security-Policy that allows those two files and one connection, to
-https://li.quest. No token logos are loaded, because each one would tell a third-party host who is reading the page.
+The page is a member of the site: it carries the site's header, menu, tab bar and footer (scripts/chrome.py), follows
+the header's language buttons, and is read by the translation layers like any other page, so it appears in every
+language the site has. What stays different from the other pages is its policy. The site's own policy has to allow a
+dozen data hosts and inline script; this page allows neither:
+
+  script-src 'self'              only files of this site — no inline script, no other host
+  connect-src 'self' li.quest    the site's own files (translations, the menu) and the one price service
+  img-src 'self' data:           every network and token picture is a file of this site (scripts/swap_icons.py),
+                                 so no third-party host ever learns who is looking at which token
+  frame-src 'none'               nothing is embedded, and assets/swap/swap.js refuses to run inside another site's frame
+
+The site's chat assistant, which talks to another host, is not loaded here. The swap engine itself is pinned by its
+SHA-384. Every figure and address on the page is marked translate="no": the translation layers may re-word a label,
+they can never touch an amount.
 
 The transaction is never built here: assets/swap/swap.js asks LI.FI for it and checks every field of the answer
-(chain, both tokens, the amount, the reader's own address, how much the call carries) before the wallet is opened.
+(chain, both tokens, the amount, the reader's own address, the contract pinned for that chain, how much the call
+carries) before the wallet is opened, and asks the wallet again which chain and account it is on right before sending.
 
 Settings — scripts/swap_config.json:
   enabled      false → the page says swaps are not on yet and nothing is loaded from outside
   integrator   the name registered with LI.FI; without it a swap still works, it simply earns the site nothing
-  fee          0 … 0.03 — the site's share of each swap, as a fraction (0.005 = 0.5%). LI.FI pays it to the wallet
-               registered with that integrator name, so no wallet address is needed here and none is kept here
+  fee          0 … 0.03 — the site's share of each swap, as a fraction (0.005 = 0.5%). LI.FI forwards it straight to
+               the wallet registered with that integrator name, so no wallet address is needed here and none is kept
   slippage     the default price movement a reader accepts (0.005 = 0.5%), never above 0.05
 
 Nothing in that file is a secret: all of it travels in the request anyway. LI.FI's own API key is deliberately NOT
@@ -27,10 +38,12 @@ supported — it is meant for a server, and anything in this page is public.
 
 Data — scripts/swap_chains.json: the chains and the short token list, every address read from LI.FI itself.
 
-The page is committed, like /charts/:  python3 scripts/build_swap.py
+The page is committed, like /charts/. Rebuild it whenever the site menu or its scripts' versions change:
+    python3 scripts/build_swap.py
 Tests: python3 tests/test_swap.py · node tests/test_swap.js
 """
 import base64
+import copy
 import hashlib
 import html
 import json
@@ -51,12 +64,19 @@ INTEGRATOR = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
 EVM = re.compile(r"^0x[0-9a-fA-F]{40}$")
 LIFI_LINK = '<a href="https://li.fi/" rel="noopener noreferrer" target="_blank">LI.FI</a>'
 
-# The one policy of this page. No 'unsafe-inline', no second host, no frames at all. Trusted Types means any attempt to
-# build markup from text that came back from the service would throw instead of running. frame-ancestors cannot be set
-# from a <meta>, so assets/swap/swap.js refuses to start inside another site's frame instead.
-CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; "
-       f"connect-src {SERVICE}; frame-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'none'; "
-       "object-src 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests")
+# The policy of this page (see the top of the file). frame-ancestors cannot be set from a <meta>, so the engine checks
+# for a parent frame itself. 'inline-speculation-rules' lets the site's menu ask the browser to preload the next page a
+# reader hovers (assets/ui2.js) and allows no script at all. 'unsafe-inline' is for *styles* only: the site's header and translation layers write
+# style rules, which can restyle but not run.
+CSP = ("default-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+       f"font-src 'self' data:; connect-src 'self' {SERVICE}; frame-src 'none'; manifest-src 'self'; worker-src 'self'; "
+       "base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests")
+# the site's own scripts this page runs, in order; the two translation layers are added by the deploy (i18n_ar, i18n_site)
+SITE_SCRIPTS = ("ui2.js", "nx.js", "deep.js", "chrome.js")
+MAY_RUN = {"/assets/swap/swap.js", "/assets/ui2.js", "/assets/nx.js", "/assets/deep.js", "/assets/chrome.js",
+           "/assets/ar.js", "/assets/i18n.js"}
+ICONS_DIR = os.path.join(ROOT, "assets", "swap", "ic")
+ICON_ALIAS = {"usdc-e": "usdc", "usdce": "usdc", "usdt-e": "usdt", "usdt0": "usdt", "weth-e": "weth", "wbnb": "bnb", "xdai": "dai"}
 
 
 class ConfigError(ValueError):
@@ -211,9 +231,43 @@ def _n(v, lg):
     return s.translate(_FA) if lg == "fa" else s.translate(_CKB) if lg == "ckb" else s
 
 
-def tri(fa, ckb, en, tag="span"):
-    return (f'<{tag} class="l-fa" lang="fa" dir="rtl">{fa}</{tag}><{tag} class="l-ckb" lang="ckb" dir="rtl">{ckb}</{tag}>'
-            f'<{tag} class="l-en" lang="en" dir="ltr">{en}</{tag}>')
+def tri(fa, ckb, en, tag="span", cls=""):
+    """one piece of text in the page's three languages, by the site's contract: [data-lang] blocks, of which the
+    engine shows one. Persian is the one visible before any script runs. The English copy is what the site's
+    translation layers read for every other language."""
+    c = f' class="{cls}"' if cls else ""
+    return (f'<{tag}{c} data-lang="fa">{fa}</{tag}><{tag}{c} data-lang="ckb" hidden>{ckb}</{tag}>'
+            f'<{tag}{c} data-lang="en" lang="en" dir="ltr" hidden>{en}</{tag}>')
+
+
+def icon_key(symbol):
+    s = symbol.lower().replace("₮", "t").replace(".", "-")
+    return re.sub(r"[^a-z0-9-]", "", s)[:24]
+
+
+def with_icons(data):
+    """the checked data plus, for every network and token that has one, the name of its picture in assets/swap/ic/.
+    A token without a picture of its own wears the one of the asset it stands for (USDC.e → USDC), the chain's own
+    coin and its wrapped form wear the chain's; anything else gets a letter badge drawn by the page."""
+    out = copy.deepcopy(data)
+
+    def has(rel):
+        return os.path.isfile(os.path.join(ICONS_DIR, rel))
+    for c in out["chains"]:
+        if has(f"c/{c['id']}.svg"):
+            c["ic"] = f"c/{c['id']}.svg"
+    by_id = {str(c["id"]): c for c in out["chains"]}
+    for cid, rows in out["tokens"].items():
+        ch = by_id[cid]
+        for t in rows:
+            k = icon_key(t["symbol"])
+            if k and has(f"t/{k}.webp"):
+                t["ic"] = f"t/{k}.webp"
+            elif ICON_ALIAS.get(k) and has(f"t/{ICON_ALIAS[k]}.webp"):
+                t["ic"] = f"t/{ICON_ALIAS[k]}.webp"
+            elif (t["address"] == ZERO or t["symbol"].upper() == "W" + ch["coin"].upper()) and ch.get("ic"):
+                t["ic"] = ch["ic"]
+    return out
 
 
 def fee_block(cfg):
@@ -222,101 +276,137 @@ def fee_block(cfg):
     p = percent(cfg)
     if p > 0:
         return tri(
-            f"کارمزد انتخاب: <b><bdi>{_n(p, 'fa')}٪</bdi></b> از مبلغ هر تبدیل، که صرف کاشت بذر و نهال در زاگرس می‌شود.",
-            f"کرێی ئینتیخاب: <b><bdi>٪{_n(p, 'ckb')}</bdi></b> لە بڕی هەر گۆڕینەوەیەک، کە بۆ چاندنی تۆو و نەمام لە زاگرۆس خەرج دەکرێت.",
-            f"Entekhab's fee: <b><bdi>{_n(p, 'en')}%</bdi></b> of each swap, spent on planting seeds and saplings in the Zagros.", "p")
+            f'کارمزد انتخاب: <b translate="no"><bdi>{_n(p, "fa")}٪</bdi></b> از مبلغ هر تبدیل. همهٔ آن صرف کاشت بذر و نهال در زاگرس می‌شود.',
+            f'کرێی ئینتیخاب: <b translate="no"><bdi>٪{_n(p, "ckb")}</bdi></b> لە بڕی هەر گۆڕینەوەیەک. هەمووی بۆ چاندنی تۆو و نەمام لە زاگرۆس خەرج دەکرێت.',
+            f'Entekhab\'s fee: <b translate="no"><bdi>{_n(p, "en")}%</bdi></b> of each swap. All of it is spent on planting seeds and saplings in the Zagros.', "p")
     return tri("انتخاب از این تبدیل‌ها کارمزدی نمی‌گیرد.", "ئینتیخاب لەم گۆڕینەوانە هیچ کرێیەک وەرناگرێت.",
                "Entekhab takes no fee on these swaps.", "p")
 
 
+_CHEV = '<svg class="sw-chev" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+_FLIP = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M7 4v14m0 0l-3.5-3.5M7 18l3.5-3.5M17 20V6m0 0l-3.5 3.5M17 6l3.5 3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+
+def side(which):
+    """one half of the form: where from (an amount to type) or where to (the amount that would arrive)"""
+    f = which == "f"
+    head = tri("می‌فرستید", "دەینێریت", "You send") if f else tri("می‌گیرید", "وەری دەگریت", "You receive")
+    amount = ('<input id="sw-amount" class="sw-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" dir="ltr" placeholder="0.0" aria-label="amount" translate="no">'
+              if f else '<output id="sw-receive" class="sw-num" dir="ltr" translate="no" aria-live="polite"></output>')
+    bal = (f'<span class="sw-bal">{tri("موجودی", "ماوە", "Balance")} <b id="sw-balance" dir="ltr" translate="no"></b>'
+           f'<button type="button" id="sw-max" class="sw-max">{tri("همه", "هەموو", "Max")}</button></span>') if f else ""
+    p = "f" if f else "t"
+    return f"""<div class="sw-side" data-side="{'from' if f else 'to'}">
+<div class="sw-side-h"><span class="sw-lab">{head}</span>{bal}</div>
+<div class="sw-side-b">{amount}
+<button type="button" id="sw-{p}t" class="sw-pill" aria-haspopup="dialog"><span id="sw-{p}t-i" class="sw-ic"></span><b id="sw-{p}t-n" translate="no"></b>{_CHEV}</button></div>
+<div class="sw-side-f"><span id="sw-{'from' if f else 'to'}-usd" class="sw-usd" dir="ltr" translate="no"></span>
+<button type="button" id="sw-{p}c" class="sw-net" aria-haspopup="dialog"><span id="sw-{p}c-i" class="sw-ic sw-ic-s"></span><span id="sw-{p}c-n" translate="no"></span>{_CHEV}</button></div>
+</div>"""
+
+
 def controls():
-    """the tool itself. Every label is here in three languages; assets/swap/swap.js only fills in numbers."""
-    def lbl(fa, ckb, en):
-        return tri(fa, ckb, en)
-    slips = "".join(f'<option value="{v}"{" selected" if v == 0.005 else ""}>{p}</option>'
+    """the tool itself. Every label is here in three languages; assets/swap/swap.js only fills in names and numbers."""
+    def q(id_, fa, ckb, en):
+        return f'<div class="sw-q"><span>{tri(fa, ckb, en)}</span><b id="sw-{id_}" dir="ltr" translate="no"></b></div>'
+    slips = "".join(f'<button type="button" data-slip="{v}" aria-pressed="false" translate="no">{p}</button>'
                     for v, p in ((0.001, "0.1%"), (0.005, "0.5%"), (0.01, "1%"), (0.03, "3%")))
-    return f"""<div class="sw-row">
-<label class="sw-f"><span class="sw-lab">{lbl("از شبکهٔ", "لە تۆڕی", "From network")}</span><select id="sw-from-chain"></select></label>
-<label class="sw-f"><span class="sw-lab">{lbl("توکن مبدأ", "تۆکنی سەرچاوە", "Token in")}</span><select id="sw-from-token"></select></label>
-</div>
-<input id="sw-from-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="CAKE  |  0x…" hidden>
-<div class="sw-row sw-amt">
-<label class="sw-f"><span class="sw-lab">{lbl("مبلغ", "بڕ", "Amount")}</span>
-<input id="sw-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" dir="ltr" placeholder="0.0"></label>
-<button type="button" id="sw-max" class="sw-small">{lbl("همه", "هەموو", "Max")}</button>
-</div>
-<div class="sw-bal"><span id="sw-balance" dir="ltr"></span></div>
-<div class="sw-mid"><button type="button" id="sw-flip" class="sw-small" aria-label="swap direction">⇅</button></div>
-<div class="sw-row">
-<label class="sw-f"><span class="sw-lab">{lbl("به شبکهٔ", "بۆ تۆڕی", "To network")}</span><select id="sw-to-chain"></select></label>
-<label class="sw-f"><span class="sw-lab">{lbl("توکن مقصد", "تۆکنی مەبەست", "Token out")}</span><select id="sw-to-token"></select></label>
-</div>
-<input id="sw-to-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="CAKE  |  0x…" hidden>
-<div id="sw-tokenwarn" class="sw-warnline"></div>
+    return f"""{side("f")}
+<div class="sw-mid"><button type="button" id="sw-flip" class="sw-flip" aria-label="swap direction">{_FLIP}</button></div>
+{side("t")}
 <div id="sw-quote" class="sw-quote" data-has="0">
-<div class="sw-q"><span>{lbl("دریافت می‌کنید", "وەری دەگریت", "You receive")}</span><b id="sw-receive" dir="ltr"></b></div>
-<div class="sw-q"><span>{lbl("حداقل دریافتی", "کەمترین وەرگرتن", "At least")}</span><b id="sw-min" dir="ltr"></b></div>
-<div class="sw-q"><span>{lbl("مسیر", "ڕێگا", "Route")}</span><b id="sw-route" dir="ltr"></b></div>
-<div class="sw-q"><span>{lbl("کارمزد شبکه", "کرێی تۆڕ", "Network fee")}</span><b id="sw-gas" dir="ltr"></b></div>
-<div class="sw-q"><span>{lbl("کارمزد سرویس", "کرێی خزمەتگوزاری", "Service fee")}</span><b id="sw-fee" dir="ltr"></b></div>
-<div class="sw-q"><span>{lbl("زمان تقریبی", "کاتی نزیکەیی", "About")}</span><b id="sw-time" dir="ltr"></b></div>
+{q("rate", "نرخ", "نرخ", "Rate")}
+{q("min", "حداقل دریافتی", "کەمترین وەرگرتن", "At least")}
+{q("impact", "اثر بر ارزش", "کاریگەری لەسەر بەها", "Value lost")}
+{q("route", "مسیر", "ڕێگا", "Route")}
+{q("gas", "کارمزد شبکه", "کرێی تۆڕ", "Network fee")}
+{q("fee", "کارمزد سرویس", "کرێی خزمەتگوزاری", "Service fee")}
+{q("time", "زمان تقریبی", "کاتی نزیکەیی", "About")}
 </div>
-<div class="sw-row sw-slip"><label class="sw-f"><span class="sw-lab">{lbl("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span>
-<select id="sw-slip">{slips}</select></label><span id="sw-account" class="sw-acct" dir="ltr"></span></div>
-<button type="button" id="sw-action" class="sw-go" disabled></button>
-<div id="sw-msg" class="sw-msg"></div>
-<div id="sw-status" class="sw-status"></div>"""
+<div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
+<div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
+<label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span>{tri(
+    "خطر این تبدیل را می‌دانم و می‌خواهم ادامه دهم.", "مەترسیی ئەم گۆڕینەوەیە دەزانم و دەمەوێت بەردەوام بم.",
+    "I understand the risk of this swap and want to go on.")}</span></label>
+<button type="button" id="sw-action" class="sw-go" disabled><span id="sw-action-l"></span> <b id="sw-action-x" translate="no"></b></button>
+<div id="sw-msg" class="sw-msg" role="status" aria-live="polite"></div>
+<div id="sw-status" class="sw-status"></div>
+<div class="sw-acct"><span id="sw-account" dir="ltr" translate="no"></span></div>"""
+
+
+def dialog():
+    return f"""<div id="sw-dlg" class="sw-dlg" role="dialog" aria-modal="true" aria-labelledby="sw-dlg-title" hidden>
+<div class="sw-dlg-box">
+<div class="sw-dlg-h"><b id="sw-dlg-title"></b><button type="button" id="sw-dlg-close" class="sw-x" aria-label="close">×</button></div>
+<input id="sw-dlg-q" class="sw-search" type="search" autocomplete="off" spellcheck="false" dir="auto" placeholder="🔍" aria-label="search" translate="no">
+<div id="sw-dlg-list" class="sw-list"></div>
+<button type="button" id="sw-dlg-find" class="sw-find" hidden>{tri("جست‌وجو روی شبکه", "گەڕان لەسەر تۆڕ", "Search on the network")}</button>
+</div></div>"""
 
 
 def page(cfg, data):
+    import chrome                       # here, not at the top: scripts/chrome.py imports this module for its menu
     on = bool(cfg.get("enabled"))
     public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage") if k in cfg}
     cdata = html.escape(json.dumps(public, ensure_ascii=True, separators=(",", ":"), sort_keys=True), quote=True)
-    ddata = html.escape(json.dumps(data, ensure_ascii=False, separators=(",", ":")), quote=True)
+    ddata = html.escape(json.dumps(with_icons(data), ensure_ascii=False, separators=(",", ":")), quote=True)
+    n_chain, n_tok = len(data["chains"]), sum(len(v) for v in data["tokens"].values())
     title = "تبدیل رمزارز (سواپ) بین شبکه‌ها | entekhab.net"
-    desc = ("تبدیل غیرامانی رمزارز بین بایننس اسمارت چین، اتریوم، آربیتروم، پالیگان و شبکه‌های دیگر؛ "
+    desc = (f"تبدیل غیرامانی رمزارز بین {_n(n_chain, 'fa')} شبکه، از بایننس اسمارت چین و اتریوم تا آربیتروم و پالیگان؛ "
             "دارایی همیشه در کیف پول خود شما می‌ماند.")
     robots = "" if on else '<meta name="robots" content="noindex">'
-    doc = f"""<!DOCTYPE html>
-<html lang="fa" dir="rtl" data-noar>
-<head>
-<meta charset="utf-8">
+    styles = "".join(f'<link rel="stylesheet" href="/assets/{f}?v={v}">' for f, v in (
+        ("chrome.css", chrome.VER), ("ui2.css", chrome.UI2_VER), ("nx.css", chrome.NX_VER), ("deep.css", chrome.DEEP_VER)))
+    vers = {"ui2.js": chrome.UI2_VER, "nx.js": chrome.NX_VER, "deep.js": chrome.DEEP_VER, "chrome.js": chrome.VER}
+    scripts = "".join(f'<script src="/assets/{f}?v={vers[f]}" defer></script>' for f in SITE_SCRIPTS)
+    chips = "".join(f'<span class="sw-chip">{x}</span>' for x in (
+        tri("غیرامانی: دارایی در کیف پول خودتان", "نائەمانەتی: دارایی لە جزدانی خۆت", "Non-custodial: funds stay in your wallet"),
+        tri(f'<b translate="no">{_n(n_chain, "fa")}</b> شبکه', f'<b translate="no">{_n(n_chain, "ckb")}</b> تۆڕ', f'<b translate="no">{n_chain}</b> networks'),
+        tri("کارمزد شفاف، پیش از امضا", "کرێی ڕوون، پێش واژۆ", "Fees shown before you sign")))
+    doc = f"""<!doctype html><html lang="fa" dir="rtl" class="ek-v2 ek-v3 ek-deep"><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="{CSP}">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
 <meta name="description" content="{desc}">
 {robots}<link rel="canonical" href="https://entekhab.net/swap/">
-<link rel="icon" href="/assets/favicon-32.png">
-<link rel="stylesheet" href="/assets/swap/swap.css" integrity="{sri('assets/swap/swap.css')}">
-</head>
-<body>
-<header class="sw-top">
-<a href="/"><img src="/assets/logo-h.webp" alt="entekhab.net" width="128" height="32"></a>
-<div class="sw-lang"><button type="button" data-set-l="fa">فارسی</button><button type="button" data-set-l="ckb">کوردی</button><button type="button" data-set-l="en">English</button></div>
-<a class="sw-home" href="/">{tri("بازگشت به سایت", "گەڕانەوە بۆ ماڵپەڕ", "Back to the site")}</a>
-</header>
-<main>
-<h1>{tri("تبدیل رمزارز (سواپ)", "گۆڕینەوەی دراوی دیجیتاڵ (سواپ)", "Swap")}
-<small>{tri("بین شبکه‌ها، از کیف پول خودتان", "لە نێوان تۆڕەکان، لە جزدانی خۆتەوە", "Across chains, from your own wallet")}</small></h1>
-<div id="sw-app" class="sw-app" data-c="{cdata}" data-d="{ddata}">
+<meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:url" content="https://entekhab.net/swap/"><meta property="og:site_name" content="entekhab.net">
+<meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7931a">{chrome.FONTS}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest">
+{styles}<link rel="stylesheet" href="/assets/swap/swap.css" integrity="{sri('assets/swap/swap.css')}">
+</head><body class="sw-body">
+{chrome.header("fa")}
+<main class="sw-wrap" id="sw-main">
+<div class="sw-hero">
+<h1>{tri("تبدیل رمزارز", "گۆڕینەوەی دراوی دیجیتاڵ", "Swap")}</h1>
+<p class="sw-sub">{tri("هر توکن، روی هر شبکه، مستقیم از کیف پول خودتان", "هەر تۆکنێک، لەسەر هەر تۆڕێک، ڕاستەوخۆ لە جزدانی خۆتەوە", "Any token, on any network, straight from your own wallet")}</p>
+<div class="sw-chips-row">{chips}</div>
+</div>
+<div class="sw-grid">
+<section id="sw-app" class="sw-card" data-s="" data-c="{cdata}" data-d="{ddata}">
 <div class="sw-note s-none">{tri("<p>این بخش به جاوااسکریپت نیاز دارد.</p>", "<p>ئەم بەشە پێویستی بە جاڤاسکریپتە.</p>", "<p>This part needs JavaScript.</p>", "div")}</div>
 <div class="sw-note s-off">{tri(
-    "<p><strong>تبدیل هنوز فعال نشده است.</strong></p><p>این صفحه آماده است و پس از تأیید نهایی روشن می‌شود. تا آن زمان هیچ چیزی از بیرونِ این سایت در این صفحه بارگذاری نمی‌شود.</p>",
-    "<p><strong>گۆڕینەوە هێشتا چالاک نەکراوە.</strong></p><p>ئەم پەڕەیە ئامادەیە و دوای پشتڕاستکردنەوەی کۆتایی دەکرێتەوە. تا ئەو کاتە هیچ شتێک لە دەرەوەی ئەم ماڵپەڕە لەم پەڕەیەدا بار ناکرێت.</p>",
-    "<p><strong>Swaps are not switched on yet.</strong></p><p>This page is ready and goes live after a final check. Until then nothing from outside this site is loaded here.</p>", "div")}</div>
+    "<p><strong>تبدیل هنوز فعال نشده است.</strong></p><p>این صفحه آماده است و پس از تأیید نهایی روشن می‌شود.</p>",
+    "<p><strong>گۆڕینەوە هێشتا چالاک نەکراوە.</strong></p><p>ئەم پەڕەیە ئامادەیە و دوای پشتڕاستکردنەوەی کۆتایی دەکرێتەوە.</p>",
+    "<p><strong>Swaps are not switched on yet.</strong></p><p>This page is ready and goes live after a final check.</p>", "div")}</div>
 <div class="sw-note s-framed">{tri(
-    "<p><strong>این صفحه درون قاب یک سایت دیگر باز شده است.</strong></p><p>برای امنیت شما ابزار در این حالت کار نمی‌کند. نشانی <bdi>entekhab.net/swap/</bdi> را مستقیم در مرورگر باز کنید.</p>",
-    "<p><strong>ئەم پەڕەیە لەناو چوارچێوەی ماڵپەڕێکی تردا کراوەتەوە.</strong></p><p>بۆ پاراستنت، ئامرازەکە لەم دۆخەدا کار ناکات. ناونیشانی <bdi>entekhab.net/swap/</bdi> ڕاستەوخۆ لە وێبگەڕەکەت بکەرەوە.</p>",
-    "<p><strong>This page was opened inside another site's frame.</strong></p><p>For your safety the tool does not work this way. Open <bdi>entekhab.net/swap/</bdi> directly in your browser.</p>", "div")}</div>
+    '<p><strong>این صفحه درون قاب یک سایت دیگر باز شده است.</strong></p><p>برای امنیت شما ابزار در این حالت کار نمی‌کند. نشانی <bdi translate="no">entekhab.net/swap/</bdi> را مستقیم در مرورگر باز کنید.</p>',
+    '<p><strong>ئەم پەڕەیە لەناو چوارچێوەی ماڵپەڕێکی تردا کراوەتەوە.</strong></p><p>بۆ پاراستنت، ئامرازەکە لەم دۆخەدا کار ناکات. ناونیشانی <bdi translate="no">entekhab.net/swap/</bdi> ڕاستەوخۆ لە وێبگەڕەکەت بکەرەوە.</p>',
+    '<p><strong>This page was opened inside another site\'s frame.</strong></p><p>For your safety the tool does not work this way. Open <bdi translate="no">entekhab.net/swap/</bdi> directly in your browser.</p>', "div")}</div>
 <div class="sw-form s-on">{controls()}</div>
-</div>
-<div class="sw-info">
+</section>
+<aside class="sw-info">
 <section class="sw-warn"><h2>{tri("پیش از هر تبدیل", "پێش هەر گۆڕینەوەیەک", "Before every swap")}</h2>
 {tri(
-    "<ul><li>نشانی بالای مرورگر باید <bdi>entekhab.net</bdi> باشد.</li><li>عبارت بازیابی (۱۲ یا ۲۴ کلمه) و کلید خصوصی را هیچ‌جا وارد نکنید؛ این صفحه هرگز آن را نمی‌خواهد.</li><li>مبلغ، توکن و نشانی مقصد را در خودِ کیف پول بخوانید و بعد امضا کنید. تراکنش امضاشده برنمی‌گردد.</li><li>بار اول با مبلغ کم امتحان کنید.</li><li>برای توکنی که خودتان نشانی‌اش را وارد می‌کنید، نشانی را از منبع معتبر بگیرید؛ توکن جعلی با نام آشنا فراوان است.</li></ul>",
-    "<ul><li>ناونیشانی سەرەوەی وێبگەڕ دەبێت <bdi>entekhab.net</bdi> بێت.</li><li>دەستەواژەی گەڕاندنەوە (١٢ یان ٢٤ وشە) و کلیلی تایبەت لە هیچ شوێنێک مەنووسە؛ ئەم پەڕەیە هەرگیز داوای ناکات.</li><li>بڕ، تۆکن و ناونیشانی مەبەست لەناو جزدانەکەتدا بخوێنەرەوە، ئینجا واژۆ بکە. مامەڵەی واژۆکراو ناگەڕێتەوە.</li><li>یەکەم جار بە بڕێکی کەم تاقی بکەرەوە.</li><li>بۆ تۆکنێک کە خۆت ناونیشانەکەی دەنووسیت، لە سەرچاوەیەکی متمانەپێکراو وەریبگرە؛ تۆکنی ساختە بە ناوی ناسراو زۆرن.</li></ul>",
-    "<ul><li>The address bar must read <bdi>entekhab.net</bdi>.</li><li>Never type your recovery phrase (12 or 24 words) or a private key anywhere; this page never asks for it.</li><li>Read the amount, the token and the destination in your wallet itself, then sign. A signed transaction cannot be undone.</li><li>Try a small amount the first time.</li><li>If you paste a token address yourself, take it from a source you trust; fake tokens with familiar names are common.</li></ul>", "div")}</section>
+    '<ul><li>نشانی بالای مرورگر باید <bdi translate="no">entekhab.net</bdi> باشد.</li><li>عبارت بازیابی (۱۲ یا ۲۴ کلمه) و کلید خصوصی را هیچ‌جا وارد نکنید؛ این صفحه هرگز آن را نمی‌خواهد.</li><li>مبلغ، توکن و نشانی را در خودِ کیف پول بخوانید و بعد امضا کنید. تراکنش امضاشده برنمی‌گردد.</li><li>بار اول با مبلغ کم امتحان کنید.</li><li>برای توکنی که خودتان جست‌وجو می‌کنید، نشانی قرارداد را از منبع معتبر بگیرید؛ توکن جعلی با نام آشنا فراوان است.</li></ul>',
+    '<ul><li>ناونیشانی سەرەوەی وێبگەڕ دەبێت <bdi translate="no">entekhab.net</bdi> بێت.</li><li>دەستەواژەی گەڕاندنەوە (١٢ یان ٢٤ وشە) و کلیلی تایبەت لە هیچ شوێنێک مەنووسە؛ ئەم پەڕەیە هەرگیز داوای ناکات.</li><li>بڕ، تۆکن و ناونیشان لەناو جزدانەکەتدا بخوێنەرەوە، ئینجا واژۆ بکە. مامەڵەی واژۆکراو ناگەڕێتەوە.</li><li>یەکەم جار بە بڕێکی کەم تاقی بکەرەوە.</li><li>بۆ تۆکنێک کە خۆت بەدوایدا دەگەڕێیت، ناونیشانی گرێبەستەکە لە سەرچاوەیەکی متمانەپێکراو وەربگرە؛ تۆکنی ساختە بە ناوی ناسراو زۆرن.</li></ul>',
+    '<ul><li>The address bar must read <bdi translate="no">entekhab.net</bdi>.</li><li>Never type your recovery phrase (12 or 24 words) or a private key anywhere; this page never asks for it.</li><li>Read the amount, the token and the address in your wallet itself, then sign. A signed transaction cannot be undone.</li><li>Try a small amount the first time.</li><li>For a token you search for yourself, take the contract address from a source you trust; fake tokens with familiar names are common.</li></ul>', "div")}</section>
+<section><h2>{tri("چطور کار می‌کند", "چۆن کار دەکات", "How it works")}</h2>
+{tri(
+    "<ol><li>کیف پول را وصل کنید؛ صفحه روی همان شبکه‌ای باز می‌شود که کیف پول روی آن است.</li><li>توکن و مبلغ را انتخاب کنید؛ بهترین مسیر، مبلغ دریافتی و همهٔ کارمزدها نشان داده می‌شود.</li><li>اگر توکن برای اولین بار فروخته می‌شود، یک اجازهٔ برداشت دقیقاً به اندازهٔ همین تبدیل می‌دهید.</li><li>تراکنش را در کیف پول امضا می‌کنید. تبدیل بین دو شبکه تا رسیدن به مقصد پیگیری می‌شود.</li></ol>",
+    "<ol><li>جزدانەکەت ببەستەوە؛ پەڕەکە لەسەر هەمان ئەو تۆڕە دەکرێتەوە کە جزدانەکەی لەسەرە.</li><li>تۆکن و بڕ هەڵبژێرە؛ باشترین ڕێگا، بڕی وەرگیراو و هەموو کرێکان پیشان دەدرێن.</li><li>ئەگەر تۆکنەکە بۆ یەکەم جار دەفرۆشرێت، ڕێپێدانێکی دەرهێنان تەنیا بە ئەندازەی ئەم گۆڕینەوەیە دەدەیت.</li><li>مامەڵەکە لە جزدانەکەتدا واژۆ دەکەیت. گۆڕینەوەی نێوان دوو تۆڕ تا گەیشتن بە مەبەست شوێنی دەکەوترێت.</li></ol>",
+    "<ol><li>Connect your wallet; the page opens on the network the wallet is already on.</li><li>Choose the token and the amount; the best route, what you would receive and every fee are shown.</li><li>If the token is being sold for the first time, you grant a permission for exactly this swap's amount.</li><li>You sign the transaction in your wallet. A swap between two networks is followed until it arrives.</li></ol>", "div")}</section>
 <section><h2>{tri("چه کسی چه کاری می‌کند", "کێ چی دەکات", "Who does what")}</h2>
 {tri(
     f"<p>مسیر تبدیل را {LIFI_LINK} پیدا می‌کند و صرافی‌های غیرمتمرکز و پل‌های خودِ شبکه‌ها انجامش می‌دهند. دارایی از کیف پول شما مستقیم به قرارداد می‌رود و برمی‌گردد؛ انتخاب هیچ‌وقت آن را نگه نمی‌دارد و به کلید شما دسترسی ندارد.</p><p>این صفحه تراکنش را خودش نمی‌سازد: آن را از سرویس می‌گیرد، تک‌تک فیلدهایش را با درخواست شما مقایسه می‌کند و تنها در صورت تطابق کامل به کیف پول می‌دهد.</p>",
@@ -329,15 +419,17 @@ def page(cfg, data):
      "The network fee, the service fee and the least you would receive are shown here before you sign, and again in your wallet.", "p")}</section>
 <section><h2>{tri("حریم خصوصی", "تایبەتمەندی", "Privacy")}</h2>
 {tri(
-    "<p>این صفحه هیچ شمارنده، ردیاب یا کد شخص ثالثی ندارد، تصویر توکن‌ها را هم از میزبان دیگری نمی‌گیرد و چیزی از شما ذخیره نمی‌کند. تنها ارتباط بیرونی‌اش با سرویس قیمت است؛ کیف پول شما از خود مرورگر صدا زده می‌شود، نه از شبکه. تراکنش‌ها روی بلاک‌چین عمومی‌اند.</p>",
-    "<p>ئەم پەڕەیە هیچ ژمێرەر، شوێنپێهەڵگر یان کۆدی لایەنی سێیەمی نییە، وێنەی تۆکنەکانیش لە میوانداری تر وەرناگرێت و هیچ شتێک لە تۆ هەڵناگرێت. تەنیا پەیوەندیی دەرەکیی لەگەڵ خزمەتگوزاریی نرخە؛ جزدانەکەت لە خودی وێبگەڕەوە بانگ دەکرێت، نەک لە تۆڕەوە. مامەڵەکان لەسەر بلۆکچەین گشتین.</p>",
-    "<p>This page has no counter, tracker or third-party code, does not fetch token pictures from another host, and stores nothing about you. Its only outside connection is to the price service; your wallet is reached through the browser itself, not over the network. Transactions are public on the blockchain.</p>", "div")}
+    "<p>این صفحه هیچ شمارنده یا ردیابی ندارد و چیزی از شما ذخیره نمی‌کند. تصویر شبکه‌ها و توکن‌ها از خود این سایت می‌آید، نه از میزبان دیگر. تنها ارتباط بیرونی‌اش با سرویس قیمت است؛ کیف پول شما از خود مرورگر صدا زده می‌شود. تراکنش‌ها روی بلاک‌چین عمومی‌اند.</p>",
+    "<p>ئەم پەڕەیە هیچ ژمێرەر یان شوێنپێهەڵگرێکی نییە و هیچ شتێک لە تۆ هەڵناگرێت. وێنەی تۆڕ و تۆکنەکان لە خودی ئەم ماڵپەڕەوە دێن، نەک لە میوانداری تر. تەنیا پەیوەندیی دەرەکیی لەگەڵ خزمەتگوزاریی نرخە؛ جزدانەکەت لە خودی وێبگەڕەوە بانگ دەکرێت. مامەڵەکان لەسەر بلۆکچەین گشتین.</p>",
+    "<p>This page has no counter or tracker and stores nothing about you. The pictures of networks and tokens come from this site itself, not from another host. Its only outside connection is to the price service; your wallet is reached through the browser itself. Transactions are public on the blockchain.</p>", "div")}
 {tri("این صفحه توصیهٔ سرمایه‌گذاری نیست.", "ئەم پەڕەیە ئامۆژگاریی وەبەرهێنان نییە.", "Nothing here is investment advice.", "p")}</section>
+</aside>
 </div>
+{dialog()}
 </main>
-<script src="/assets/swap/swap.js" integrity="{sri('assets/swap/swap.js')}"></script>
-</body>
-</html>
+{chrome.bottom("fa")}{chrome.footer("fa")}
+<script src="/assets/swap/swap.js" integrity="{sri('assets/swap/swap.js')}" defer></script>{scripts}
+</body></html>
 """
     return doc
 

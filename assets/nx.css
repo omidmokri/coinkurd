@@ -236,6 +236,9 @@ html[lang=en] .nx-h1{font-family:'Archivo Black','Space Grotesk',sans-serif;font
 .nx-btn:hover{border-color:var(--nx-or);background:rgba(247,147,26,.12)}
 .nx-btn.p{border:0;background:var(--nx-foil);color:#000;box-shadow:0 0 0 1px rgba(255,210,122,.55),0 10px 34px rgba(247,147,26,.38)}
 .nx-btn.p:hover{box-shadow:0 0 0 1px #ffd27a,0 12px 44px rgba(247,147,26,.6)}
+/* the way into /swap/ — second in the row, a lit outline so it reads as an action without competing with the foil button */
+.nx-btn.nx-swap{border-color:rgba(255,210,122,.75);color:#ffd27a;background:rgba(247,147,26,.1);box-shadow:0 0 22px -8px rgba(247,147,26,.8)}
+.nx-btn.nx-swap:hover{background:rgba(247,147,26,.22);color:#fff}
 .nx-btn svg{width:18px;height:18px;flex:0 0 auto}
 .nx-btn:focus-visible,.nx-p:focus-visible,#nxr a:focus-visible,.nxm button:focus-visible,.nxc-cv:focus-visible{outline:2px solid var(--nx-gold);outline-offset:3px}
 /* the latest post, carried over from the old hero */
@@ -487,3 +490,6 @@ html.nx-lite #ekb{background:#08080a}
    template than the one written into the page) the entrance is not played a second time */
 .nx.nx-re .nx-coin,.nx.nx-re .nx-mid>*,.nx.nx-re .nx-p{animation:none!important}
 @media print{#nxr,.nx-links,.nx-bg,.nx-coin{display:none!important}}
+/* three buttons in the stage: on a phone they keep to one row (no icons, tighter) so nothing below is pushed under the tab bar */
+@media (max-width:480px){.nx-cta{gap:6px}.nx-cta .nx-btn{padding:0 10px;font-size:.78rem}.nx-cta .nx-btn svg{display:none}}
+@media (max-width:380px){.nx-cta{gap:5px}.nx-cta .nx-btn{padding:0 8px;font-size:.72rem;letter-spacing:0}}

@@ -12,6 +12,8 @@
   var esc = U.esc, pick = U.pick, tri = U.tri, dg = U.dg, RM = U.RM, FINE = U.FINE;
   var GO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></svg>';
   var HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 8h3.2a2 2 0 0 1 0 4H10m0 0h3.8a2 2 0 0 1 0 4H10M10 8v8M11.5 6.5V8M11.5 16v1.5"/></svg>';
+  /* the swap page (/swap/): two arrows passing each other */
+  var SWAP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14m0 0-3.5-3.5M18 8l-3.5 3.5M20 16H6m0 0 3.5 3.5M6 16l3.5-3.5"/></svg>';
   var DEF = [
     { id: 'market', col: 'a', s: ['بازار', 'بازاڕ', 'Market'] },
     { id: 'command', col: 'a', s: ['اتاق فرمان', 'ژووری فەرمان', 'Command room'] },
@@ -68,6 +70,7 @@
     (role ? '<p class="nx-role" data-i="' + esc(role.getAttribute('data-i')) + '">' + role.innerHTML + '</p>' : '') +
     '<ul class="nx-net" data-net></ul>' +
     '<div class="nx-cta"><a class="nx-btn p" href="#market" data-d="market">' + tri('ورود به بازار زنده', 'چوونە ناو بازاڕی زیندوو', 'Enter the live market') + '</a>' +
+    '<a class="nx-btn nx-swap" href="/swap/">' + SWAP + tri('تبدیل رمزارز', 'سواپ', 'Swap') + '</a>' +
     '<a class="nx-btn" href="/bitcoin/">' + HOME + tri('درک بیت‌کوین', 'تێگەیشتن لە بیتکۆین', 'Understanding Bitcoin') + '</a></div></div>' +
     '<div class="nx-ps"><div class="nx-col nx-a">' + cols.a + '</div><div class="nx-col nx-b">' + cols.b + '</div></div>';
   if (pre) { var t0 = d.createElement('div'); t0.innerHTML = tpl; if (h32(t0.innerHTML) !== nx.getAttribute('data-tpl')) { nx.classList.add('nx-re'); nx.innerHTML = tpl; } }
