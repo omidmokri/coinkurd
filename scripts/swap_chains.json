@@ -1,0 +1,58 @@
+{
+  "_note": "Chains and the short token list of /swap/. Every address, decimal count and chain detail here was read from LI.FI's own service (li.quest/v1/token and /v1/chains) on 2026-11-23, never from memory. tests/test_swap.py checks every address's EIP-55 checksum. Each chain's `contract` is LI.FI's own diamond (its /v1/chains diamondAddress): the page refuses to sign anything addressed anywhere else, so if LI.FI ever moves it the swap stops instead of going somewhere unknown. A reader can still paste any other token's address: the page looks it up live.",
+  "chains": [
+    {"id": 56, "key": "bsc", "name": "BNB Smart Chain", "coin": "BNB", "explorer": "https://bscscan.com/", "rpc": "https://bsc-dataseed.binance.org", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 1, "key": "eth", "name": "Ethereum", "coin": "ETH", "explorer": "https://etherscan.io/", "rpc": "https://ethereum-rpc.publicnode.com", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 42161, "key": "arb", "name": "Arbitrum One", "coin": "ETH", "explorer": "https://arbiscan.io/", "rpc": "https://arb1.arbitrum.io/rpc", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 8453, "key": "base", "name": "Base", "coin": "ETH", "explorer": "https://basescan.org/", "rpc": "https://mainnet.base.org", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 137, "key": "pol", "name": "Polygon", "coin": "POL", "explorer": "https://polygonscan.com/", "rpc": "https://polygon-bor-rpc.publicnode.com", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 10, "key": "op", "name": "OP Mainnet", "coin": "ETH", "explorer": "https://optimistic.etherscan.io/", "rpc": "https://mainnet.optimism.io/", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"},
+    {"id": 43114, "key": "avax", "name": "Avalanche", "coin": "AVAX", "explorer": "https://snowtrace.io/", "rpc": "https://api.avax.network/ext/bc/C/rpc", "contract": "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE"}
+  ],
+  "tokens": {
+    "56": [
+      {"symbol": "BNB", "name": "BNB", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDT", "name": "USDT", "address": "0x55d398326f99059fF775485246999027B3197955", "decimals": 18},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", "decimals": 18},
+      {"symbol": "ETH", "name": "Binance-Peg Ethereum", "address": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8", "decimals": 18},
+      {"symbol": "BTCB", "name": "Binance Bitcoin", "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c", "decimals": 18},
+      {"symbol": "CAKE", "name": "PancakeSwap", "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82", "decimals": 18},
+      {"symbol": "DOGE", "name": "Binance-Peg Dogecoin", "address": "0xbA2aE424d960c26247Dd6c32edC70B295c744C43", "decimals": 8}
+    ],
+    "1": [
+      {"symbol": "ETH", "name": "Ether", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDT", "name": "USDT", "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "decimals": 6},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "decimals": 6},
+      {"symbol": "DAI", "name": "DAI Stablecoin", "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "decimals": 18},
+      {"symbol": "WBTC", "name": "Wrapped Bitcoin", "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", "decimals": 8}
+    ],
+    "42161": [
+      {"symbol": "ETH", "name": "Ether", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", "decimals": 6},
+      {"symbol": "ARB", "name": "Arbitrum", "address": "0x912CE59144191C1204E64559FE8253a0e49E6548", "decimals": 18},
+      {"symbol": "WBTC", "name": "Wrapped Bitcoin", "address": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", "decimals": 8}
+    ],
+    "8453": [
+      {"symbol": "ETH", "name": "Ether", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "decimals": 6},
+      {"symbol": "cbBTC", "name": "Coinbase Wrapped BTC", "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf", "decimals": 8}
+    ],
+    "137": [
+      {"symbol": "POL", "name": "Polygon Ecosystem Token", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDT", "name": "USDT", "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", "decimals": 6},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", "decimals": 6},
+      {"symbol": "WETH", "name": "Wrapped Ether", "address": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", "decimals": 18}
+    ],
+    "10": [
+      {"symbol": "ETH", "name": "Ether", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDT", "name": "USDT", "address": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58", "decimals": 6},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85", "decimals": 6},
+      {"symbol": "OP", "name": "Optimism", "address": "0x4200000000000000000000000000000000000042", "decimals": 18}
+    ],
+    "43114": [
+      {"symbol": "AVAX", "name": "AVAX", "address": "0x0000000000000000000000000000000000000000", "decimals": 18},
+      {"symbol": "USDT", "name": "TetherToken", "address": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7", "decimals": 6},
+      {"symbol": "USDC", "name": "USD Coin", "address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E", "decimals": 6}
+    ]
+  }
+}

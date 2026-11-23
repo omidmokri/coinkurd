@@ -307,8 +307,8 @@ NAV = [
 # /swap/ joins the Tools menu only once swaps are switched on in scripts/swap_config.json (the owner's own keys are in
 # place); until then the page exists but nothing points at it. Being in NAV also puts it in the bot and the extension.
 SWAP = ("/swap/", "coins", L("تبدیل رمزارز (سواپ)", "گۆڕینەوەی دراو (سواپ)", "Swap"),
-        L("تبدیل بین شبکه‌ها از کیف پول خودتان، با مسیریاب رنگو", "گۆڕینەوە لە نێوان تۆڕەکان لە جزدانی خۆتەوە، بە ڕێدۆزەری ڕەنگۆ",
-          "Cross-chain swaps from your own wallet, routed by Rango"))
+        L("تبدیل بین شبکه‌ها، از کیف پول خودتان", "گۆڕینەوە لە نێوان تۆڕەکان، لە جزدانی خۆتەوە",
+          "Cross-chain swaps from your own wallet"))
 try:
     import build_swap as _SW
     if _SW.nav_on():
