@@ -132,10 +132,11 @@ function makeWindow(cfg, opts) {
   const { store, doc } = fakeDoc(IDS);
   store['sw-app'].setAttribute('data-c', JSON.stringify(cfg));
   store['sw-app'].setAttribute('data-d', JSON.stringify(DATA));
-  const sent = [];
+  const sent = [], asked = [];
   const provider = {
     request({ method, params }) {
-      if (method === 'eth_requestAccounts') { return Promise.resolve([ME]); }
+      if (method === 'eth_requestAccounts') { asked.push('prompt'); return Promise.resolve([ME]); }
+      if (method === 'eth_accounts') { return opts.allowed ? Promise.resolve([ME]) : Promise.resolve([]); }
       if (method === 'eth_chainId') { return Promise.resolve('0x38'); }
       if (method === 'eth_getBalance') { return Promise.resolve('0x3635c9adc5dea00000'); }   // 1000 coins
       if (method === 'eth_call') {
@@ -151,7 +152,7 @@ function makeWindow(cfg, opts) {
   };
   const win = { document: doc, localStorage: { getItem: () => null, setItem() { } }, ethereum: provider };
   win.self = win; win.top = opts.framed ? {} : win;
-  return { win, store, sent };
+  return { win, store, sent, asked };
 }
 
 const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005 };
@@ -179,6 +180,8 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
   t.store['sw-action'].fire('click');                       // connect
   await sleep(30);
   ok(t.store['sw-account'].textContent.indexOf('0x1111') === 0, 'the wallet is connected and its address is shown shortened');
+  ok(t.asked.length === 1, 'a wallet that has never allowed the site is asked exactly once');
+
 
   t.store['sw-amount'].value = '1';
   t.store['sw-amount'].fire('input');
@@ -237,6 +240,14 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
   ok(t3.sent[0].data.indexOf('0x095ea7b3') === 0, 'it is an approve call');
   ok(BigInt('0x' + amt) === 1000000000000000000n, 'it approves exactly this swap, not an unlimited amount');
   ok(BigInt('0x' + amt) !== (2n ** 256n - 1n), 'it is certainly not the unlimited value');
+
+  /* ---- a wallet that allowed the site earlier: picked up with no pop-up and no button press */
+  serve = () => goodQuote();
+  const tq = makeWindow(CFG, { allowed: true });
+  S.start(tq.win);
+  await sleep(80);
+  ok(tq.store['sw-account'].textContent.indexOf('0x1111') === 0, 'an already-allowed wallet appears on its own');
+  ok(tq.asked.length === 0, '\u2026and is never asked to approve again (this is what hung in SafePal)');
 
   /* ---- the service is unreachable */
   global.fetch = () => Promise.reject(new Error('network down'));

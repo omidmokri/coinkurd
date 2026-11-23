@@ -197,9 +197,15 @@
       if (!this.p) { return Promise.reject(new Error('no wallet')); }
       return this.p.request({ method: method, params: params || [] });
     },
+    /* Ask for the address the quiet way first: a wallet that already allowed this site answers eth_accounts with no
+       pop-up at all. Only a wallet that has never allowed it is asked, which is the one case that needs a pop-up.
+       (SafePal leaves eth_requestAccounts unanswered when the site is already allowed, which used to hang here.) */
     connect: function () {
       var self = this;
-      return this.req('eth_requestAccounts').then(function (acc) {
+      return this.req('eth_accounts').catch(function () { return []; }).then(function (have) {
+        if (have && have.length && isAddr(have[0])) { return have; }
+        return self.req('eth_requestAccounts');
+      }).then(function (acc) {
         if (!acc || !acc.length || !isAddr(acc[0])) { throw new Error('no account'); }
         self.account = acc[0];
         return self.req('eth_chainId');
@@ -513,6 +519,15 @@
     /* ---- wiring */
     W.p = W.find(win);
     fillChains(el.fc, S.from.chain); fillChains(el.tc, S.to.chain); fillTokens(); paint();
+
+    /* a wallet that allowed this site on an earlier visit is picked up silently, with no pop-up and no button press */
+    if (W.p) {
+      W.req('eth_accounts').then(function (acc) {
+        if (!acc || !acc.length || !isAddr(acc[0]) || W.account) { return; }
+        W.account = acc[0];
+        return W.req('eth_chainId').then(function (id) { W.chainId = parseInt(id, 16) || 0; paint(); ask(); });
+      }).catch(function () { });
+    }
 
     el.fc.addEventListener('change', function () { S.from.chain = Number(this.value); S.from.token = null; fillSide(el.ft, S.from); paint(); askLater(); });
     el.tc.addEventListener('change', function () { S.to.chain = Number(this.value); S.to.token = null; fillSide(el.tt, S.to); paint(); askLater(); });
