@@ -114,19 +114,24 @@ function fakeDoc(ids) {
 const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 'tc-n', 'tt', 'tt-i', 'tt-n', 'amount', 'max', 'balance',
   'from-usd', 'to-usd', 'flip', 'receive', 'quote', 'rate', 'min', 'route', 'gas', 'fee', 'time', 'impact', 'slip', 'tokenwarn',
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
-  'dlg-find', 'dlg-close'].map(x => 'sw-' + x);
+  'dlg-find', 'dlg-close', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
+  'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
            { id: 1, name: 'Ethereum', coin: 'ETH', explorer: 'https://etherscan.io/', rpc: 'https://ethereum-rpc.publicnode.com', contract: DIAMOND, ic: 'https://evil.example/x.svg' }],
   tokens: { '56': [{ symbol: 'BNB', name: 'BNB', address: BNB, decimals: 18, ic: 't/bnb.webp' }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 18, ic: 't/usdt.webp' }],
-            '1': [{ symbol: 'ETH', name: 'Ether', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 6 }] }
+            '1': [{ symbol: 'ETH', name: 'Ether', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 6 }] },
+  watch: [{ id: 56, name: 'BNB Smart Chain', rpc: 'https://bsc-dataseed.binance.org', explorer: 'https://bscscan.com/', token: USDT, decimals: 18 },
+          { id: 1, name: 'Ethereum', rpc: 'https://ethereum-rpc.publicnode.com', explorer: 'https://etherscan.io/', token: USDT, decimals: 6 }]
 };
+const GIFT = '0xe9D4C279e2c6BBf170Cbe5d54719Aa6A4A0253d0';
 
 function makeWindow(cfg, opts) {
   opts = opts || {};
   const { store, doc } = fakeDoc(IDS);
   store['sw-app'].setAttribute('data-c', JSON.stringify(cfg));
+  store['sw-gift'].setAttribute('data-a', opts.giftAddr !== undefined ? opts.giftAddr : (cfg.donate || ''));
   store['sw-app'].setAttribute('data-d', JSON.stringify(DATA));
   const sent = [], asked = [], flags = { chain: opts.chainId || '0x38', deafChain: false };
   const provider = {
@@ -154,10 +159,14 @@ function makeWindow(cfg, opts) {
     go: () => $('action').fire('click'),
     type: async (v) => { $('amount').value = v; $('amount').fire('input'); await sleep(750); },
     rows: () => $('dlg-list').kids.filter(k => k.attrs.class === 'sw-opt'),
+    giftNeed: () => $('dn-go').getAttribute('data-need'),
+    giftGo: () => $('dn-go').fire('click'),
+    giftType: async (v) => { $('dn-amount').value = v; $('dn-amount').fire('input'); await sleep(50); },
+    giftPick: (button, word) => { $(button).fire('click'); const r = $('dlg-list').kids.find(k => k.kids[1] && k.kids[1]._text === word); if (r) { r.fire('click'); } return !!r; },
     pick: (button, word) => { $(button).fire('click'); const r = $('dlg-list').kids.find(k => k.kids[1] && k.kids[1]._text === word); if (r) { r.fire('click'); } return !!r; } };
 }
 
-const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005 };
+const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005, donate: GIFT };
 
 (async function () {
   let urls = [], serve = () => goodQuote(), token = null, status = null;
@@ -190,7 +199,9 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   await t.type('1');
   const q = urls.find(u => u.indexOf('/v1/quote') > 0);
   ok(!!q, 'a price was asked for');
-  ok(urls.every(u => u.indexOf('https://li.quest/') === 0), 'every request went to li.quest and nowhere else');
+  const WATCH_RPC = DATA.watch.map(w => w.rpc);
+  ok(urls.every(u => u.indexOf('https://li.quest/') === 0 || WATCH_RPC.indexOf(u) >= 0),
+     'every request went to li.quest or to one of the nodes the page was built with, and nowhere else');
   ok(q.indexOf('integrator=entekhab') > 0 && q.indexOf('fee=0.003') > 0, "the site's integrator name and fee travel with the request");
   ok(q.indexOf('fromAddress=' + ME) > 0 && q.indexOf('toAddress=' + ME) > 0, 'the proceeds are asked to be sent to the reader, nobody else');
   ok(t.$('receive').textContent.indexOf('550') === 0, 'what the reader would receive is shown');
@@ -357,6 +368,58 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(t5.$('msg').textContent === S.T.fa.busyService, 'a busy price service is explained in plain words');
 
   /* ---------------------------------------------------------------- the file itself */
+  /* ================================================================ the gift panel */
+  freshWallet(); urls = [];
+  t = makeWindow(CFG, { allowed: true });
+  S.start(t.win); await sleep(120);
+  ok(t.$('dn-addr') !== null && t.giftNeed() === 'amount', 'the gift panel opens, waiting for an amount');
+  ok(t.$('dnt-n').textContent === 'BNB' && t.$('dnc-n').textContent === 'BNB Smart Chain',
+     'it opens on the network the wallet is on, with that network\'s own coin');
+  await t.giftType('2.5');
+  ok(t.giftNeed() === 'give', 'an amount wakes the button');
+  t.giftGo(); await sleep(120);
+  let g = t.sent[t.sent.length - 1];
+  ok(!!g && S.sameAddr(g.to, GIFT) && g.value === '0x' + (25n * 10n ** 17n).toString(16) && g.data === '0x',
+     'the chain\'s own coin goes straight to the wallet on the page, for exactly the amount typed');
+  ok(g.chainId === '0x38', '…on the network the panel was showing');
+
+  /* a token instead: an ordinary ERC-20 transfer, the address inside the call and nowhere else */
+  ok(t.giftPick('dnt', 'USDT'), 'the picker offers the gift panel its tokens');
+  await t.giftType('12');
+  t.giftGo(); await sleep(120);
+  g = t.sent[t.sent.length - 1];
+  ok(S.sameAddr(g.to, USDT) && g.value === '0x0', 'a token gift is sent to the token itself, carrying nothing');
+  ok(g.data.indexOf('0xa9059cbb') === 0, '…as a transfer call');
+  ok(g.data.slice(10, 74) === S.pad32(GIFT) && g.data.slice(74) === S.pad32(S.qty(12n * 10n ** 18n)),
+     '…to the page\'s own address, for the amount typed');
+  ok(g.data.length === 10 + 128, '…and nothing else travels with it');
+
+  /* the amount is read the way a Persian or Kurdish reader writes it */
+  await t.giftType('۱٫۵');
+  ok(t.$('dn-amount').value === '1.5' && t.giftNeed() === 'give', 'Persian digits and an Arabic decimal mark are understood');
+
+  /* more than the wallet holds is refused before the wallet is ever opened */
+  const sentSoFar = t.sent.length;
+  await t.giftType('100000');
+  ok(t.giftNeed() === 'low', 'an amount above the balance is refused');
+  t.giftGo(); await sleep(60);
+  ok(t.sent.length === sentSoFar, '…and nothing was sent');
+
+  /* the address on the page and the address in the settings must be the same one */
+  freshWallet();
+  t = makeWindow(CFG, { allowed: true, giftAddr: '0x' + '9'.repeat(40) });
+  S.start(t.win); await sleep(120);
+  ok(t.$('dn-go').getAttribute('data-need') === null, 'an address swapped in the page does not match the settings: the panel stays shut');
+
+  /* without an address in the settings there is no panel at all */
+  freshWallet();
+  const noGift = Object.assign({}, CFG); delete noGift.donate;
+  t = makeWindow(noGift, { allowed: true, giftAddr: '' });
+  S.start(t.win); await sleep(120);
+  ok(t.$('dn-go').getAttribute('data-need') === null, 'no address in the settings, no gift panel');
+  ok(S.config(CFG).donate === GIFT && S.config(Object.assign({}, CFG, { donate: 'not-an-address' })).donate === '',
+     'only a real address is taken from the settings');
+
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
   for (const w of ['eval(', 'new Function', 'innerHTML', 'outerHTML', 'document.write', 'insertAdjacentHTML', 'srcdoc',
@@ -366,8 +429,9 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   }
   const hosts = (code.match(/https?:\/\/[^'"\s)]+/g) || []);
   ok(hosts.length === 1 && hosts[0] === 'https://li.quest', 'the only address written into swap.js is https://li.quest');
+  ok(code.indexOf('rpcBalance') > 0 && /fetch\(w\.rpc/.test(code), "a network's own node is only ever read from the address the page was built with");
   ok((code.match(/localStorage\.\w+\('([^']+)'/g) || []).every(x => x.indexOf("'ck_lang'") > 0), 'the only thing kept in the browser is the chosen site language');
-  ok((code.match(/\bfetch\(/g) || []).length === 1, 'there is exactly one place that reaches the network');
+  ok((code.match(/\bfetch\(/g) || []).length === 2, 'there are exactly two places that reach the network: the price service and a node');
   ok(code.indexOf('MAX_FEE = 0.03') > 0, 'the 3% ceiling on the fee is in the file itself');
   for (const lg of ['fa', 'ckb', 'en']) {
     ok(Object.keys(S.T[lg]).sort().join() === Object.keys(S.T.en).sort().join(), 'every message exists in ' + lg);

@@ -40,7 +40,8 @@ def bad(fn, why):
         ok(False, "should be refused: " + why)
 
 
-GOOD = {"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005}
+GIFT = "0xe9D4C279e2c6BBf170Cbe5d54719Aa6A4A0253d0"
+GOOD = {"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005, "donate": GIFT}
 
 
 def scripts_of(doc):
@@ -66,7 +67,7 @@ def main():
     ok(B.check({"enabled": False}) == {"enabled": False}, "switched off: nothing but 'off' survives")
     ok(B.check({"enabled": False, "integrator": "x", "fee": 0.02})["enabled"] is False, "switched off, the fee is not carried over")
     c = B.check(copy.deepcopy(GOOD))
-    ok(c == {"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005}, "a good config passes whole")
+    ok(c == {"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005, "donate": GIFT}, "a good config passes whole")
     for why, mut in [
         ("an unknown setting (apiUrl)", lambda d: d.update(apiUrl="https://evil.example/")),
         ("an API key (it would be public in the page)", lambda d: d.update(apiKey="x")),
@@ -163,7 +164,9 @@ def main():
         pol = dict((p.strip().split(" ", 1) + [""])[:2] for p in csp.group(1).split(";") if p.strip())
         ok(pol.get("default-src") == "'none'", f"[{name}] default-src 'none'")
         ok(pol.get("script-src") == "'self' 'inline-speculation-rules'", f"[{name}] scripts: this site's files only — no inline script, no other host")
-        ok(pol.get("connect-src") == "'self' https://li.quest", f"[{name}] connections: this site and the price service, nothing else")
+        want_hosts = [B.SERVICE] + (B.rpc_hosts(data) if cfg.get("donate") else [])
+        ok(pol.get("connect-src") == "'self' " + " ".join(want_hosts),
+           f"[{name}] connections: this site, the price service and (when a gift panel is on) those networks' own nodes, nothing else")
         ok(pol.get("img-src") == "'self' data:", f"[{name}] pictures come from this site only (no token logos from elsewhere)")
         ok(pol.get("frame-src") == "'none'", f"[{name}] no frames at all")
         ok(pol.get("object-src") == "'none'" and pol.get("base-uri") == "'none'" and pol.get("form-action") == "'none'",
@@ -172,7 +175,7 @@ def main():
            and "http:" not in csp.group(1) and "wss:" not in csp.group(1),
            f"[{name}] no unsafe script, wildcard, blob:, plain http or socket host in the policy")
         hosts_in_policy = set(re.findall(r"https://[^\s;]+", csp.group(1)))
-        ok(hosts_in_policy == {"https://li.quest"}, f"[{name}] the one outside host the policy names is li.quest")
+        ok(hosts_in_policy == set(want_hosts), f"[{name}] the policy names no host beyond those: {sorted(hosts_in_policy)}")
 
         sc = scripts_of(doc)
         srcs = [re.search(r'src="([^"?]*)', x).group(1) if 'src="' in x else None for x in sc]
@@ -198,7 +201,8 @@ def main():
         box = re.search(r'<section id="sw-app" class="sw-card" data-s="" data-c="([^"]*)" data-d="([^"]*)">', doc)
         ok(bool(box), f"[{name}] the tool's box carries its settings and its data")
         ok(json.loads(H.unescape(box.group(1))) == cfg, f"[{name}] the page carries exactly the checked settings")
-        ok(json.loads(H.unescape(box.group(2))) == icons, f"[{name}] …and exactly the checked chains and tokens, with their pictures")
+        want = dict(icons, watch=B.watch_list(icons) if cfg.get("donate") else [])
+        ok(json.loads(H.unescape(box.group(2))) == want, f"[{name}] …and exactly the checked chains and tokens, with their pictures")
         for el in ("fc", "fc-i", "fc-n", "ft", "ft-i", "ft-n", "tc", "tc-i", "tc-n", "tt", "tt-i", "tt-n", "amount", "max", "balance",
                    "from-usd", "to-usd", "flip", "receive", "quote", "rate", "min", "route", "gas", "fee", "time", "impact", "slip",
                    "tokenwarn", "ackbox", "ack", "account", "action", "action-l", "action-x", "msg", "status", "dlg", "dlg-title",
@@ -215,7 +219,43 @@ def main():
         ok("عبارت بازیابی" in body and "recovery phrase" in body, f"[{name}] the warning never to type a recovery phrase is on the page")
 
     on_doc = B.page(B.check(copy.deepcopy(GOOD)), data)
-    ok("۰٫۵٪" in on_doc, "the site's fee is printed on the page as it is (۰٫۵٪)")
+    ok("۰٫۰۰۵" in on_doc and "۰٫۵٪" not in on_doc,
+       "the site's fee is printed as the fraction it is (۰٫۰۰۵ of each swap), not as a percentage")
+    ok("زاگرس" in on_doc and "Zagros" in on_doc, "…and what the fee is spent on is said in every language")
+
+    # ---------------------------------------------------------------- the gift panel
+    ok(f'data-a="{GIFT}"' in on_doc and on_doc.count(GIFT) >= 2,
+       "the address a gift goes to is written into the page itself")
+    for el in ("dnc", "dnc-n", "dnt", "dnt-n", "dn-amount", "dn-bal", "dn-go", "dn-go-l", "dn-go-x", "dn-msg",
+               "dn-status", "dn-addr", "dn-copy", "dn-total"):
+        ok(on_doc.count(f'id="sw-{el}"') == 1, f"the gift panel has sw-{el}, once")
+    for el in ("dnc-n", "dnt-n", "dn-amount", "dn-bal", "dn-go-x", "dn-addr", "dn-total"):
+        tag = re.search(rf'<[a-z]+\b[^>]*id="sw-{el}"[^>]*>', on_doc).group(0)
+        ok('translate="no"' in tag, f'sw-{el} is marked translate="no": an address or a figure is never re-worded')
+    watch = B.watch_list(B.with_icons(data))
+    ok(len(watch) >= 4 and all(w["token"] and w["decimals"] in (6, 18) for w in watch),
+       f"the wallet is read on {len(watch)} networks, each with its own USDT contract")
+    for w in watch:
+        ok(f'id="sw-dn-b{w["id"]}"' in on_doc, f"network {w['id']} has its own line in the panel")
+        ok(f'{w["explorer"].rstrip("/")}/token/{w["token"]}?a={GIFT}' in on_doc,
+           f"…and a link to {w['id']}'s own explorer, where anyone can check the figure")
+    pol_on = dict((p.strip().split(" ", 1) + [""])[:2] for p in
+                  re.search(r'Content-Security-Policy" content="([^"]+)"', on_doc).group(1).split(";") if p.strip())
+    ok(pol_on["connect-src"] == "'self' " + " ".join([B.SERVICE] + B.rpc_hosts(data)),
+       "the policy opens for the price service and those networks' nodes, and nothing else")
+    ok(all(h.startswith("https://") for h in B.rpc_hosts(data)), "every node is reached over https")
+
+    no_gift = B.page(B.check({"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005}), data)
+    ok("sw-gift" not in no_gift and GIFT not in no_gift, "no address in the settings: no gift panel and no address anywhere")
+    ok('connect-src \'self\' https://li.quest;' in no_gift, "…and the policy stays as narrow as it was")
+    flipped = "0x" + "".join(ch.lower() if ch.isupper() else ch.upper() if ch.islower() else ch for ch in GIFT[2:])
+    for wrong in ("0xe9d4c279e2c6bbf170cbe5d54719aa6a4a0253d0", "0x1234", "nope", flipped, GIFT + "0"):
+        try:
+            B.check(dict(GOOD, donate=wrong))
+            ok(False, f"a donate address that is not checksummed is refused ({wrong[:12]})")
+        except B.ConfigError:
+            ok(True, f"a donate address that is not checksummed is refused ({wrong[:12]})")
+
     ok("کارمزدی نمی‌گیرد" in B.page(B.check({"enabled": True, "integrator": "", "fee": 0, "slippage": 0.005}), data),
        "switched on with no fee: the page says so")
     off_doc = B.page({"enabled": False}, data)

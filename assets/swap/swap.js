@@ -30,7 +30,7 @@
   var MAX_FEE = 0.03;            // the most of a swap this site would ever take
   var MAX_SLIP = 0.05;           // and the most price movement a reader may accept
   var TIMEOUT = 25000;
-  var ERC20 = { allowance: '0xdd62ed3e', approve: '0x095ea7b3', balanceOf: '0x70a08231' };
+  var ERC20 = { allowance: '0xdd62ed3e', approve: '0x095ea7b3', balanceOf: '0x70a08231', transfer: '0xa9059cbb' };
 
   /* ------------------------------------------------------------------ text */
   var T = {
@@ -55,6 +55,7 @@
       impactHigh: 'این تبدیل بخش بزرگی از ارزش را از دست می‌دهد.',
       bridging: 'در راه شبکهٔ مقصد…', arrived: 'به شبکهٔ مقصد رسید.', bridgeFailed: 'انتقال بین شبکه‌ها ناموفق بود؛ با شناسهٔ تراکنش پیگیری کنید.',
       viewDest: 'تراکنش مقصد', pickChain: 'انتخاب شبکه', pickToken: 'انتخاب توکن', nothing: 'چیزی پیدا نشد.',
+      give: 'حمایت', giving: 'در انتظار امضا در کیف پول…', gave: 'رسید. ممنون.', copied: 'کپی شد', copy: 'کپی',
       findOnChain: 'جست‌وجو روی شبکه', balance: 'موجودی'
     },
     ckb: {
@@ -78,6 +79,7 @@
       impactHigh: 'ئەم گۆڕینەوەیە بەشێکی گەورەی بەهاکە لەدەست دەدات.',
       bridging: 'لە ڕێگای تۆڕی مەبەستدایە…', arrived: 'گەیشتە تۆڕی مەبەست.', bridgeFailed: 'گواستنەوەی نێوان تۆڕەکان سەرکەوتوو نەبوو؛ بە ناسنامەی مامەڵەکە بەدوایدا بچۆ.',
       viewDest: 'مامەڵەی مەبەست', pickChain: 'هەڵبژاردنی تۆڕ', pickToken: 'هەڵبژاردنی تۆکن', nothing: 'هیچ نەدۆزرایەوە.',
+      give: 'پشتگیری', giving: 'چاوەڕێی واژۆ لە جزدان…', gave: 'گەیشت. سوپاس.', copied: 'لەبەرگیرایەوە', copy: 'لەبەرگرتنەوە',
       findOnChain: 'گەڕان لەسەر تۆڕ', balance: 'ماوە'
     },
     en: {
@@ -101,6 +103,7 @@
       impactHigh: 'This swap loses a large share of its value.',
       bridging: 'On its way to the destination network…', arrived: 'Arrived on the destination network.', bridgeFailed: 'The transfer between networks failed; follow it up with the transaction id.',
       viewDest: 'Destination transaction', pickChain: 'Choose a network', pickToken: 'Choose a token', nothing: 'Nothing found.',
+      give: 'Support', giving: 'Waiting for the signature in the wallet…', gave: 'Received. Thank you.', copied: 'Copied', copy: 'Copy',
       findOnChain: 'Search on the network', balance: 'Balance'
     }
   };
@@ -339,7 +342,7 @@
         all[i].hidden = all[i].getAttribute('data-lang') !== l;
       }
       try { win.dispatchEvent(new win.CustomEvent('ek-lang', { detail: l })); } catch (e) { }
-      if (live) { labels(); paint(); }
+      if (live) { labels(); paint(); if (G) { giftLabels(); giftPaint(); } }
     }
     win.I18N = 1; win.EKSET = ap; win.EKL = function () { return lang; };
     win.__ekAsk = 1;             /* the site's chat assistant talks to another host; it has no place on a wallet page */
@@ -731,6 +734,7 @@
     }
 
     function setChain(sideName, id) {
+      if (sideName === 'gift') { S.gift = { chain: id, token: null }; pickDefault(S.gift); G.bal = null; closePick(); giftLabels(); giftPaint(); giftBalance(); return; }
       var both = sideName === 'from' && Number(S.to.chain) === Number(S.from.chain);
       S[sideName] = { chain: id, token: null, second: sideName === 'to' }; pickDefault(S[sideName]);
       if (sideName === 'to' && Number(S.to.chain) === Number(S.from.chain) && S.from.token && S.to.token && sameAddr(S.from.token.address, S.to.token.address)) {
@@ -741,6 +745,7 @@
       closePick(); labels(); paint(); ask();
     }
     function setToken(sideName, tk) {
+      if (sideName === 'gift') { S.gift.token = tk; G.bal = null; closePick(); giftLabels(); giftPaint(); giftBalance(); return; }
       var other = sideName === 'from' ? S.to : S.from, mine = S[sideName];
       if (other.token && Number(other.chain) === Number(mine.chain) && sameAddr(other.token.address, tk.address)) {
         other.token = mine.token;                        /* picking the other side's token swaps the two */
@@ -767,9 +772,181 @@
       });
     }
 
+    /* ================================================================ the gift panel
+
+       The wallet that takes the site's fee is written on the page, with what it holds, so a reader can check it on
+       the networks' own explorers before giving anything. A gift is an ordinary transfer from the reader's wallet
+       to that address: the chain's own coin, or an ERC-20 `transfer`. The address comes from the page itself and is
+       checked again here, so nothing downloaded can move a gift elsewhere. */
+    var giftBox = $('sw-gift'), G = null, gl = {};
+    if (giftBox && isAddr(cfg.donate) && sameAddr(giftBox.getAttribute('data-a'), cfg.donate)) {
+      G = { amount: '', busy: '', err: '', note: '', done: false, bal: null, seq: 0 };
+      S.gift = { chain: data.chains[0].id, token: null };
+      ['dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go', 'dn-go-l', 'dn-go-x',
+        'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total'].forEach(function (k) { gl[k] = $('sw-' + k); });
+      for (var g0 in gl) { if (own(gl, g0) && !gl[g0]) { G = null; } }
+    }
+
+    /* Persian and Arabic digits, a comma or an Arabic decimal mark: all of it becomes a plain number */
+    function digits(raw) {
+      var v = String(raw).replace(/[۰-۹]/g, function (d) { return String(d.charCodeAt(0) - 1776); })
+        .replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 1632); })
+        .replace(/[٫،,]/g, '.').replace(/[^0-9.]/g, '');
+      var p = v.split('.');
+      return p.length > 2 ? p[0] + '.' + p.slice(1).join('') : v;
+    }
+
+    /* the panel opens on whichever network the wallet is already on, like the form above it */
+    function giftFollow() {
+      if (!G || !W.chainId || !chainById(W.chainId) || Number(W.chainId) === Number(S.gift.chain)) { return; }
+      S.gift = { chain: W.chainId, token: null }; pickDefault(S.gift); G.bal = null; giftLabels();
+    }
+
+    function giftLabels() {
+      if (!G) { return; }
+      var c = chainById(S.gift.chain), tk = S.gift.token;
+      icon(gl['dnc-i'], c && c.ic, c && c.name); gl['dnc-n'].textContent = c ? c.name : '';
+      icon(gl['dnt-i'], tk && tk.ic, tk && tk.symbol); gl['dnt-n'].textContent = tk ? tk.symbol : '—';
+      gl['dn-copy'].textContent = t('copy');
+    }
+
+    function giftAmount() {
+      var tk = S.gift && S.gift.token;
+      if (!G || !tk || !G.amount) { return null; }
+      var r = parseUnits(G.amount, tk.decimals);          /* {v, cut}: the integer the chain counts in */
+      return r && r.v > 0n ? r.v : null;
+    }
+
+    function giftPaint() {
+      if (!G) { return; }
+      var c = chainById(S.gift.chain), tk = S.gift.token, amt = giftAmount(), need, label, extra = '', dis = true;
+      gl['dn-msg'].textContent = G.err || G.note || (G.done ? t('gave') : '');
+      gl['dn-msg'].setAttribute('data-ok', G.err ? '' : (G.done && !G.note ? '1' : ''));
+      gl['dn-bal'].textContent = G.bal === null || !tk ? '' : t('balance') + ' ' + formatUnits(G.bal, tk.decimals, 6) + ' ' + tk.symbol;
+      if (G.busy) { label = G.busy; need = 'busy'; }
+      else if (!W.p) { label = t('connect'); dis = false; need = 'nowallet'; }
+      else if (!W.account) { label = t('connect'); dis = false; need = 'connect'; }
+      else if (c && Number(W.chainId) !== Number(c.id)) { label = t('switchChain'); extra = c.name; dis = false; need = 'chain'; }
+      else if (!amt) { label = t('amount'); need = 'amount'; }
+      else if (G.bal !== null && amt > G.bal) { label = t('lowBalance'); need = 'low'; }
+      else { label = t('give'); extra = tk ? tk.symbol : ''; dis = false; need = 'give'; }
+      gl['dn-go-l'].textContent = label; gl['dn-go-x'].textContent = extra;
+      gl['dn-go'].disabled = dis; gl['dn-go'].setAttribute('data-need', need);
+    }
+
+    /* what the reader's own wallet holds of the coin they are about to give */
+    function giftBalance() {
+      if (!G || !W.account || !S.gift.token) { return; }
+      var c = chainById(S.gift.chain), tk = S.gift.token, mine = ++G.seq;
+      if (!c || Number(W.chainId) !== Number(c.id)) { G.bal = null; giftPaint(); return; }
+      within(W.balance(tk.address, W.account), WAIT, null).then(function (v) {
+        if (mine !== G.seq) { return; }
+        G.bal = v === null ? null : v; giftPaint();
+      });
+    }
+
+    function giftLine(words, hash) {
+      var row = doc.createElement('div'), c = chainById(S.gift.chain);
+      if (c && typeof hash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(hash)) {
+        var a = doc.createElement('a');
+        a.setAttribute('href', c.explorer.replace(/\/+$/, '') + '/tx/' + hash);
+        a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
+        a.textContent = words;
+        var h = doc.createElement('b'); h.setAttribute('translate', 'no'); h.textContent = ' ' + short(hash);
+        row.appendChild(a); row.appendChild(h);
+      } else { row.textContent = words; }
+      gl['dn-status'].appendChild(row);
+    }
+
+    function giftAct() {
+      if (!G) { return; }
+      var need = gl['dn-go'].getAttribute('data-need');
+      G.err = ''; G.note = ''; G.done = false;
+      if (need === 'nowallet') { G.err = t('noWallet'); giftPaint(); return; }
+      if (need === 'connect') {
+        G.busy = t('connecting'); giftPaint();
+        W.connect().then(function () { G.busy = ''; giftPaint(); giftBalance(); paint(); }, function (e) { G.busy = ''; G.err = code(e); giftPaint(); });
+        return;
+      }
+      if (need === 'chain') {
+        var c = chainById(S.gift.chain), mine = ++G.seq;
+        G.busy = t('switching'); giftPaint();
+        within(W.switchChain(c).then(function () { return 'ok'; }, function (e) { return e || 'fail'; }), 30000, 'silent').then(function (r) {
+          if (mine !== G.seq) { return; }
+          G.busy = '';
+          if (r === 'ok') { giftPaint(); giftBalance(); return; }
+          G.err = r === 'silent' ? t('switchHint') : code(r); giftPaint();
+        });
+        return;
+      }
+      if (need === 'give') { doGive(); }
+    }
+
+    function doGive() {
+      var c = chainById(S.gift.chain), tk = S.gift.token, amt = giftAmount(), to = cfg.donate;
+      if (!G || !c || !tk || !amt || !isAddr(to)) { return; }
+      var tx = sameAddr(tk.address, ZERO)
+        ? { from: W.account, to: to, value: qty(amt), data: '0x', chainId: qty(BigInt(c.id)) }
+        : { from: W.account, to: tk.address, data: ERC20.transfer + pad32(to) + pad32(qty(amt)), value: '0x0', chainId: qty(BigInt(c.id)) };
+      var mine = ++G.seq;
+      G.busy = t('giving'); giftPaint(); gl['dn-status'].textContent = '';
+      sameWallet({ fromChain: c.id, account: W.account }).then(function (moved) {
+        if (moved) { throw { soft: t(moved) }; }
+        return W.send(tx);
+      }).then(function (h) {
+        giftLine(t('view'), h); G.busy = t('watching'); giftPaint();
+        return waitFor(h);
+      }).then(function (okd) {
+        if (mine !== G.seq) { return; }
+        G.busy = '';
+        if (okd === false) { G.err = t('failed'); giftPaint(); return; }
+        G.amount = ''; gl['dn-amount'].value = ''; G.bal = null;
+        G.done = okd === true; if (okd === null) { G.note = t('watching'); }
+        giftPaint(); giftBalance(); openWallet();
+      }, function (e) { if (mine !== G.seq) { return; } G.busy = ''; G.err = e && e.soft ? e.soft : code(e); giftPaint(); });
+    }
+
+    /* ---- the wallet, read out loud: its USDT on each watched network, straight from that network's public node.
+       Only one question is ever asked — balanceOf(this address) — and a node that does not answer leaves a dash. */
+    function rpcBalance(w, addr) {
+      if (typeof fetch !== 'function' || !isAddr(w.token) || !isAddr(addr) || !/^https:\/\//.test(w.rpc)) { return Promise.resolve(null); }
+      var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, TIMEOUT) : null;
+      return fetch(w.rpc, {
+        method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ to: w.token, data: ERC20.balanceOf + pad32(addr) }, 'latest'] }),
+        signal: ctl ? ctl.signal : undefined
+      }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+        if (timer) { clearTimeout(timer); }
+        return j && isQty(j.result) ? BigInt(j.result) : null;
+      }, function () { if (timer) { clearTimeout(timer); } return null; });
+    }
+
+    function openWallet() {
+      if (!G || !Array.isArray(data.watch) || !data.watch.length) { return; }
+      var addr = cfg.donate, total = 0n, any = false;
+      gl['dn-total'].textContent = '…';
+      data.watch.forEach(function (w) {
+        var cell = $('sw-dn-b' + String(w.id).replace(/[^0-9]/g, ''));
+        if (!cell) { return; }
+        cell.textContent = '…';
+        rpcBalance(w, addr).then(function (v) {
+          if (v === null) { cell.textContent = '—'; return; }
+          cell.textContent = formatUnits(v, w.decimals, 2);
+          total += v * (10n ** BigInt(Math.max(0, 18 - w.decimals)));      /* every line brought to 18 places before adding */
+          any = true;
+          gl['dn-total'].textContent = formatUnits(total, 18, 2) + ' USDT';
+        });
+      });
+      setTimeout(function () { if (!any && gl['dn-total'].textContent === '…') { gl['dn-total'].textContent = '—'; } }, TIMEOUT + 1000);
+    }
+
     /* ================================================================ wiring */
     W.p = W.find(win);
-    pickDefault(S.from); pickDefault(S.to); labels(); paint(); live = true;
+    pickDefault(S.from); pickDefault(S.to); labels(); paint();
+    if (G) { pickDefault(S.gift); giftLabels(); giftPaint(); openWallet(); }
+    live = true;
 
     /* a wallet that allowed this site on an earlier visit is picked up silently, with no pop-up and no button press */
     if (W.p) {
@@ -778,6 +955,7 @@
         W.account = acc[0];
         return within(W.req('eth_chainId'), WAIT, null).then(function (id) {
           W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask();
+          if (G) { giftFollow(); giftPaint(); giftBalance(); }
         });
       }).catch(function () { });
     }
@@ -793,10 +971,7 @@
     if (doc.addEventListener) { doc.addEventListener('keydown', function (ev) { if (ev && ev.key === 'Escape' && S.pick) { closePick(); } }); }
 
     el.amount.addEventListener('input', function () {
-      var v = this.value.replace(/[۰-۹]/g, function (d) { return String(d.charCodeAt(0) - 1776); })
-        .replace(/[٠-٩]/g, function (d) { return String(d.charCodeAt(0) - 1632); })
-        .replace(/[٫،,]/g, '.').replace(/[^0-9.]/g, '');
-      var p = v.split('.'); if (p.length > 2) { v = p[0] + '.' + p.slice(1).join(''); }
+      var v = digits(this.value);
       if (v !== this.value) { this.value = v; }
       S.amount = v; reset(); paint(); askLater();
     });
@@ -825,9 +1000,33 @@
     el.ack.addEventListener('change', function () { S.ack = !!this.checked; paint(); });
     el.action.addEventListener('click', act);
 
+    if (G) {
+      gl.dnc.addEventListener('click', function () { openPick('gift', 'chain'); });
+      gl.dnt.addEventListener('click', function () { openPick('gift', 'token'); });
+      gl['dn-amount'].addEventListener('input', function () {
+        var v = digits(this.value);
+        if (v !== this.value) { this.value = v; }
+        G.amount = v; G.done = false; G.err = ''; giftPaint();
+      });
+      gl['dn-go'].addEventListener('click', giftAct);
+      gl['dn-copy'].addEventListener('click', function () {
+        var self = this, done = function () { self.textContent = t('copied'); setTimeout(function () { self.textContent = t('copy'); }, 1500); };
+        try {
+          if (win.navigator && win.navigator.clipboard) { win.navigator.clipboard.writeText(cfg.donate).then(done, function () { }); return; }
+        } catch (e) { }
+        try { var r = doc.createRange(); r.selectNodeContents(gl['dn-addr']); var sel = win.getSelection(); sel.removeAllRanges(); sel.addRange(r); done(); } catch (e2) { }
+      });
+    }
+
     if (W.p && W.p.on) {
-      W.p.on('accountsChanged', function (acc) { W.account = acc && acc.length && isAddr(acc[0]) ? acc[0] : ''; S.bal = null; paint(); ask(); });
-      W.p.on('chainChanged', function (id) { W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask(); });
+      W.p.on('accountsChanged', function (acc) {
+        W.account = acc && acc.length && isAddr(acc[0]) ? acc[0] : ''; S.bal = null; paint(); ask();
+        if (G) { G.bal = null; giftPaint(); giftBalance(); }
+      });
+      W.p.on('chainChanged', function (id) {
+        W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask();
+        if (G) { giftFollow(); giftPaint(); giftBalance(); }
+      });
     }
     return 'on';
   }
@@ -837,10 +1036,11 @@
   /* the settings the page was built with, rebuilt field by field so nothing else can travel with them */
   function config(raw) {
     if (!plain(raw) || raw.enabled !== true) { return null; }
-    var out = { integrator: '', fee: 0, slippage: 0.005 };
+    var out = { integrator: '', fee: 0, slippage: 0.005, donate: '' };
     if (typeof raw.integrator === 'string' && /^[A-Za-z0-9_.-]{1,40}$/.test(raw.integrator)) { out.integrator = raw.integrator; }
     if (typeof raw.fee === 'number' && isFinite(raw.fee) && raw.fee >= 0 && raw.fee <= MAX_FEE) { out.fee = raw.fee; }
     if (typeof raw.slippage === 'number' && isFinite(raw.slippage) && raw.slippage > 0 && raw.slippage <= MAX_SLIP) { out.slippage = raw.slippage; }
+    if (isAddr(raw.donate)) { out.donate = raw.donate; }
     if (out.fee > 0 && !out.integrator) { return null; }      /* a fee with nobody registered to receive it */
     return out;
   }

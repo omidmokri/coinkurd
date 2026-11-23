@@ -59,7 +59,7 @@ SERVICE = "https://li.quest"
 MAX_FEE = 0.03
 MAX_SLIP = 0.05
 ZERO = "0x" + "0" * 40
-KEYS = {"enabled", "integrator", "fee", "slippage"}
+KEYS = {"enabled", "integrator", "fee", "slippage", "donate"}
 INTEGRATOR = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
 EVM = re.compile(r"^0x[0-9a-fA-F]{40}$")
 LIFI_LINK = '<a href="https://li.fi/" rel="noopener noreferrer" target="_blank">LI.FI</a>'
@@ -68,6 +68,46 @@ LIFI_LINK = '<a href="https://li.fi/" rel="noopener noreferrer" target="_blank">
 # for a parent frame itself. 'inline-speculation-rules' lets the site's menu ask the browser to preload the next page a
 # reader hovers (assets/ui2.js) and allows no script at all. 'unsafe-inline' is for *styles* only: the site's header and translation layers write
 # style rules, which can restyle but not run.
+# The wallet that takes the fee and the gifts is read out loud on the page, so anyone can see what has come in. The
+# balance is read straight from these networks' own public nodes — read-only calls, no key, nothing sent but the
+# question "how much USDT does this address hold". A node that is unreachable simply leaves its line blank.
+WATCH = (56, 1, 137, 8453, 10, 43114)
+
+
+def watch_list(data):
+    """the watched chains, each with its USDT contract, as the page needs them"""
+    out = []
+    by = {c["id"]: c for c in data["chains"]}
+    for cid in WATCH:
+        c = by.get(cid)
+        if not c:
+            continue
+        for tk in data["tokens"].get(str(cid), []):
+            if tk["symbol"] == "USDT":
+                out.append({"id": cid, "name": c["name"], "rpc": c["rpc"], "explorer": c["explorer"],
+                            "ic": c.get("ic"), "token": tk["address"], "decimals": tk["decimals"]})
+                break
+    return out
+
+
+def rpc_hosts(data):
+    from urllib.parse import urlparse
+    seen = []
+    for w in watch_list(data):
+        o = urlparse(w["rpc"])
+        u = f"{o.scheme}://{o.netloc}"
+        if u not in seen:
+            seen.append(u)
+    return seen
+
+
+def csp(data):
+    hosts = " ".join([SERVICE] + rpc_hosts(data))
+    return ("default-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+            f"font-src 'self' data:; connect-src 'self' {hosts}; frame-src 'none'; manifest-src 'self'; worker-src 'self'; "
+            "base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests")
+
+
 CSP = ("default-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
        f"font-src 'self' data:; connect-src 'self' {SERVICE}; frame-src 'none'; manifest-src 'self'; worker-src 'self'; "
        "base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests")
@@ -152,7 +192,13 @@ def check(raw):
         return {"enabled": False}
     if fee > 0 and not integrator:
         raise ConfigError("a fee needs the integrator name registered with LI.FI; without it the fee is paid to nobody")
-    return {"enabled": True, "integrator": integrator, "fee": float(fee), "slippage": float(slip)}
+    out = {"enabled": True, "integrator": integrator, "fee": float(fee), "slippage": float(slip)}
+    donate = raw.get("donate", "")
+    if donate:
+        if not isinstance(donate, str) or not EVM.match(donate) or donate != eip55(donate):
+            raise ConfigError("donate must be a checksummed EVM address (the gifts are sent straight to it)")
+        out["donate"] = donate
+    return out
 
 
 def load(path=CONFIG):
@@ -273,12 +319,12 @@ def with_icons(data):
 def fee_block(cfg):
     if not cfg.get("enabled"):
         return ""
-    p = percent(cfg)
+    p = cfg.get("fee", 0)
     if p > 0:
         return tri(
-            f'کارمزد انتخاب: <b translate="no"><bdi>{_n(p, "fa")}٪</bdi></b> از مبلغ هر تبدیل. همهٔ آن صرف کاشت بذر و نهال در زاگرس می‌شود.',
-            f'کرێی ئینتیخاب: <b translate="no"><bdi>٪{_n(p, "ckb")}</bdi></b> لە بڕی هەر گۆڕینەوەیەک. هەمووی بۆ چاندنی تۆو و نەمام لە زاگرۆس خەرج دەکرێت.',
-            f'Entekhab\'s fee: <b translate="no"><bdi>{_n(p, "en")}%</bdi></b> of each swap. All of it is spent on planting seeds and saplings in the Zagros.', "p")
+            f'کارمزد انتخاب: <b translate="no"><bdi>{_n(p, "fa")}</bdi></b> از مبلغ هر تبدیل. همهٔ آن صرف کاشت بذر و نهال در زاگرس می‌شود.',
+            f'کرێی ئینتیخاب: <b translate="no"><bdi>{_n(p, "ckb")}</bdi></b> لە بڕی هەر گۆڕینەوەیەک. هەمووی بۆ چاندنی تۆو و نەمام لە زاگرۆس خەرج دەکرێت.',
+            f'Entekhab\'s fee: <b translate="no"><bdi>{_n(p, "en")}</bdi></b> of each swap. All of it is spent on planting seeds and saplings in the Zagros.', "p")
     return tri("انتخاب از این تبدیل‌ها کارمزدی نمی‌گیرد.", "ئینتیخاب لەم گۆڕینەوانە هیچ کرێیەک وەرناگرێت.",
                "Entekhab takes no fee on these swaps.", "p")
 
@@ -344,12 +390,59 @@ def dialog():
 </div></div>"""
 
 
+def short_chain(name):
+    """'BNB Smart Chain Mainnet' -> 'BNB Smart Chain': the chips are small and the word adds nothing"""
+    out = re.sub(r"\s+(Mainnet|Network|C-Chain)$", "", name).strip()
+    return out or name
+
+
+def donate_block(cfg, watch):
+    """the gift panel and, above it, the wallet laid open: its address, and what it holds right now
+
+    The address is written into the page at build time and the engine checks it again before the wallet opens, so
+    nothing the page downloads can ever change where a gift goes. The reader chooses the network, the coin and the
+    amount; the transfer is an ordinary one from their own wallet to that address.
+    """
+    if not cfg.get("donate"):
+        return ""
+    addr = cfg["donate"]
+    chips = "".join(
+        f'<a class="sw-dn-chain" href="{w["explorer"].rstrip("/")}/token/{w["token"]}?a={addr}" '
+        f'target="_blank" rel="noopener noreferrer" data-id="{w["id"]}">'
+        f'<span class="sw-ic sw-ic-s">{"<img src=/assets/swap/ic/" + w["ic"] + " alt=\"\" width=18 height=18>" if w.get("ic") else ""}</span>'
+        f'<span translate="no">{html.escape(short_chain(w["name"]))}</span>'
+        f'<b id="sw-dn-b{w["id"]}" dir="ltr" translate="no">—</b></a>' for w in watch)
+    return f"""<section class="sw-gift" id="sw-gift" data-a="{addr}">
+<div class="sw-gift-h"><h2>{tri("حمایت", "پشتگیری", "Support")}</h2>
+<p>{tri("کیف پول باز است؛ هر مقدار و با هر کوینی که بخواهید.",
+        "جزدان کراوەیە؛ هەر بڕێک و بە هەر دراوێک کە بتەوێت.",
+        "The wallet is open; any amount, in any coin you like.")}</p></div>
+<div class="sw-open">
+<div class="sw-open-t"><span>{tri("موجودی تتر", "ماوەی تێتەر", "USDT held")}</span>
+<b id="sw-dn-total" dir="ltr" translate="no">—</b></div>
+<div class="sw-open-a"><code id="sw-dn-addr" dir="ltr" translate="no">{addr}</code>
+<button type="button" id="sw-dn-copy" class="sw-copy">{tri("کپی", "لەبەرگرتنەوە", "Copy")}</button></div>
+<div class="sw-dn-chains">{chips}</div>
+</div>
+<div class="sw-gift-f">
+<div class="sw-side-b"><input id="sw-dn-amount" class="sw-num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" dir="ltr" placeholder="0.0" aria-label="amount" translate="no">
+<button type="button" id="sw-dnt" class="sw-pill" aria-haspopup="dialog"><span id="sw-dnt-i" class="sw-ic"></span><b id="sw-dnt-n" translate="no"></b>{_CHEV}</button></div>
+<div class="sw-side-f"><span id="sw-dn-bal" class="sw-usd" dir="ltr" translate="no"></span>
+<button type="button" id="sw-dnc" class="sw-net" aria-haspopup="dialog"><span id="sw-dnc-i" class="sw-ic sw-ic-s"></span><span id="sw-dnc-n" translate="no"></span>{_CHEV}</button></div>
+<button type="button" id="sw-dn-go" class="sw-go sw-go-2" disabled><span id="sw-dn-go-l"></span> <b id="sw-dn-go-x" translate="no"></b></button>
+<div id="sw-dn-msg" class="sw-msg" role="status" aria-live="polite"></div>
+<div id="sw-dn-status" class="sw-status"></div>
+</div></section>"""
+
+
 def page(cfg, data):
     import chrome                       # here, not at the top: scripts/chrome.py imports this module for its menu
     on = bool(cfg.get("enabled"))
-    public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage") if k in cfg}
+    public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage", "donate") if k in cfg}
     cdata = html.escape(json.dumps(public, ensure_ascii=True, separators=(",", ":"), sort_keys=True), quote=True)
-    ddata = html.escape(json.dumps(with_icons(data), ensure_ascii=False, separators=(",", ":")), quote=True)
+    rich = with_icons(data)
+    watch = watch_list(rich) if cfg.get("donate") else []
+    ddata = html.escape(json.dumps(dict(rich, watch=watch), ensure_ascii=False, separators=(",", ":")), quote=True)
     n_chain, n_tok = len(data["chains"]), sum(len(v) for v in data["tokens"].values())
     title = "تبدیل رمزارز (سواپ) بین شبکه‌ها | entekhab.net"
     desc = (f"تبدیل غیرامانی رمزارز بین {_n(n_chain, 'fa')} شبکه، از بایننس اسمارت چین و اتریوم تا آربیتروم و پالیگان؛ "
@@ -364,7 +457,7 @@ def page(cfg, data):
         tri(f'<b translate="no">{_n(n_chain, "fa")}</b> شبکه', f'<b translate="no">{_n(n_chain, "ckb")}</b> تۆڕ', f'<b translate="no">{n_chain}</b> networks'),
         tri("کارمزد شفاف، پیش از امضا", "کرێی ڕوون، پێش واژۆ", "Fees shown before you sign")))
     doc = f"""<!doctype html><html lang="fa" dir="rtl" class="ek-v2 ek-v3 ek-deep"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="{CSP}">
+<meta http-equiv="Content-Security-Policy" content="{csp(data) if watch else CSP}">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
@@ -396,6 +489,7 @@ def page(cfg, data):
     '<p><strong>This page was opened inside another site\'s frame.</strong></p><p>For your safety the tool does not work this way. Open <bdi translate="no">entekhab.net/swap/</bdi> directly in your browser.</p>', "div")}</div>
 <div class="sw-form s-on">{controls()}</div>
 </section>
+{donate_block(cfg, watch)}
 <aside class="sw-info">
 <section class="sw-warn"><h2>{tri("پیش از هر تبدیل", "پێش هەر گۆڕینەوەیەک", "Before every swap")}</h2>
 {tri(
