@@ -1,36 +1,36 @@
 {
- "updated_at": "2026-11-23T01:59:18.080357+00:00",
+ "updated_at": "2026-11-23T02:14:23.989354+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
-  "ETH": {
-   "n": 131,
-   "amount": 231736.19999999995,
-   "usd": 394199043
+  "USDT": {
+   "n": 33,
+   "amount": 883370823,
+   "usd": 883370823
   },
   "BTC": {
-   "n": 140,
-   "amount": 333783.72,
-   "usd": 20228077266
+   "n": 139,
+   "amount": 330720.79,
+   "usd": 20048304737
   },
   "USDC": {
    "n": 98,
-   "amount": 7202540439,
-   "usd": 7202540439
+   "amount": 7251471929,
+   "usd": 7251471929
   },
-  "USDT": {
-   "n": 31,
-   "amount": 852843805,
-   "usd": 852843805
+  "ETH": {
+   "n": 130,
+   "amount": 229436.19999999995,
+   "usd": 390393486
   }
  },
  "hourly": [
   {
    "h": "2026-11-22T05",
-   "usd": 541819841
+   "usd": 257344180
   },
   {
    "h": "2026-11-22T06",
@@ -111,9 +111,58 @@
   {
    "h": "2026-11-23T01",
    "usd": 1163275511
+  },
+  {
+   "h": "2026-11-23T02",
+   "usd": 180356083
   }
  ],
  "events": [
+  {
+   "asset": "USDT",
+   "amount": 18223381,
+   "usd": 18223381,
+   "tx": "0x2ba554e67104f780464cda379a3d3ebbbbf35b88b46c7fd101f8c7079ac772b7",
+   "from": "0x3b98b9e9cb75c1cb1729aab8f09ced2936505e4f",
+   "to": "0x559432e18b281731c054cd703d4b49872be4ed53",
+   "at": "2026-11-23T02:11:20.757067+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 592.74,
+   "usd": 35992485,
+   "tx": "ff341710725bfe4f693a40107d965777e9cc2c86c0f143fd3f5cfba9b8e508d7",
+   "to": "bc1qx9n80t5q7tfmutzaj0ramzzzsvtveara68zntc",
+   "from": "bc1qx9n80t5q7tfmutzaj0ramzzzsvtveara68zntc",
+   "at": "2026-11-23T02:08:25+00:00"
+  },
+  {
+   "asset": "USDT",
+   "amount": 12303637,
+   "usd": 12303637,
+   "tx": "0x70e1439231c813214ac998feeeae6d03be4c6b1d6d05501d462b11a3d48e3efd",
+   "from": "0xed9ab5bc05a0152b9dc2f7902e8369af7bc18771",
+   "to": "0xa4aace872d67ad4c7e575870c5db53f49a922aba",
+   "at": "2026-11-23T02:06:11.269107+00:00"
+  },
+  {
+   "asset": "USDC",
+   "amount": 100888108,
+   "usd": 100888108,
+   "tx": "0xeeee85e944aa2ffb31b55a900503886cf19a84bc04e26b3bc8fde0fd0020ba86",
+   "from": "0xce43851485f437005ef3c1821e250c4d3c53b946",
+   "to": "0x38aaef3782910bdd9ea3566c839788af6ff9b200",
+   "at": "2026-11-23T02:02:46.913847+00:00"
+  },
+  {
+   "asset": "USDC",
+   "amount": 12948472,
+   "usd": 12948472,
+   "tx": "0xe35f0b83bd87879eee831722b142184d7e669adadde98b3dfb12595475901c29",
+   "from": "0x05ff6964d21e5dae3b1010d5ae0465b3c450f381",
+   "to": "0x2744dfd9898f0babbc570cc594bbbc84b487a22b",
+   "at": "2026-11-23T02:02:46.913789+00:00"
+  },
   {
    "asset": "ETH",
    "amount": 3078.81,
@@ -800,51 +849,6 @@
    "from": "0x690c3eebf6ee237f00fc96f9766282f096c191cc",
    "to": "0xf8191d98ae98d2f7abdfb63a9b0b812b93c873aa",
    "at": "2026-11-22T22:04:47+00:00"
-  },
-  {
-   "asset": "BTC",
-   "amount": 2486.78,
-   "usd": 151516927,
-   "tx": "d14e0eacb994ccfd00836fcb688eb2bcc9932d65e5b4f193670863299a70a244",
-   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
-   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
-   "at": "2026-11-22T22:06:03+00:00"
-  },
-  {
-   "asset": "BTC",
-   "amount": 1803.61,
-   "usd": 109818104,
-   "tx": "7374d7eaa4d74539b2c73d0cf29400eb34776fcd691bd49b0bd6d0c50e2e987f",
-   "to": "bc1qx76pl3zzunj045tl0dhx36j2gpmw3mxt57l5un",
-   "from": "bc1qx76pl3zzunj045tl0dhx36j2gpmw3mxt57l5un",
-   "at": "2026-11-22T22:02:41+00:00"
-  },
-  {
-   "asset": "ETH",
-   "amount": 1960.0,
-   "usd": 3363321,
-   "tx": "0x243109b0d2fe77c7e53c4b3992e970e02a49236037f3d74bc67799aeaa2f0098",
-   "from": "0xf30ba13e4b04ce5dc4d254ae5fa95477800f0eb0",
-   "to": "0xeae7380dd4cef6fbd1144f49e4d1e6964258a4f4",
-   "at": "2026-11-22T22:02:11+00:00"
-  },
-  {
-   "asset": "ETH",
-   "amount": 1960.0,
-   "usd": 3363321,
-   "tx": "0x15a4269641f8573c140804be77e86a30b6edd281655ad291b9c9db796e6ed6e6",
-   "from": "0x7dafba1d69f6c01ae7567ffd7b046ca03b706f83",
-   "to": "0xf30ba13e4b04ce5dc4d254ae5fa95477800f0eb0",
-   "at": "2026-11-22T22:01:35+00:00"
-  },
-  {
-   "asset": "USDC",
-   "amount": 21941630,
-   "usd": 21941630,
-   "tx": "0x0554616df18dbf67f23cdd97817e2938db3d8dec17f938843ba67cc4aa5796e7",
-   "from": "0x05ff6964d21e5dae3b1010d5ae0465b3c450f381",
-   "to": "0x2744dfd9898f0babbc570cc594bbbc84b487a22b",
-   "at": "2026-11-22T22:01:03.663285+00:00"
   }
  ]
 }
