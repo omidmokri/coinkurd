@@ -907,6 +907,22 @@
               !!side.token && (isAddr(tk.address) ? sameAddr(side.token.address, tk.address) : side.token.address === tk.address));
           n++;
         }
+        /* the same coin on other networks: a reader who types BTC while Ethereum is chosen means Bitcoin, and should
+           find it. Only exact or leading matches of the symbol, a handful of them, each naming its network. */
+        if (q && q.length >= 2 && !isAddr(String(query || '').trim())) {
+          var far = 0, offer2 = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return !toOnly(c); });
+          for (var ci = 0; ci < offer2.length && far < 24; ci++) {
+            var oc = offer2[ci];
+            if (Number(oc.id) === Number(side.chain)) { continue; }
+            var ol = listFor(oc.id);
+            for (i = 0; i < ol.length && far < 24; i++) {
+              if (String(ol[i].symbol).toLowerCase().indexOf(q) !== 0) { continue; }
+              row(ol[i].ic, ol[i].symbol, ol[i].symbol, oc.name,
+                  (function (cid, x) { return function () { setChain(p.side, cid); setToken(p.side, x); }; })(oc.id, ol[i]), false);
+              far++; n++;
+            }
+          }
+        }
         /* anything beyond the short list: a symbol such as CAKE, or a contract address, looked up live on LI.FI */
         var raw = toOnly(chainById(side.chain)) ? '' : String(query || '').trim();
         if (raw && (isAddr(raw) || /^[A-Za-z0-9][A-Za-z0-9.$_₮-]{0,19}$/.test(raw)) && !(n === 1 && !isAddr(raw) && list.some(function (x) { return String(x.symbol).toLowerCase() === q; }))) {

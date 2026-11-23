@@ -380,7 +380,8 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(tp.$('dlg').hidden === false && tp.rows().length === 2, 'the token picker opens with the chain\'s list');
   ok(tp.rows().every(r => r.attrs.translate === 'no'), 'names in the picker are never handed to the translation layers');
   tp.$('dlg-q').value = 'usd'; tp.$('dlg-q').fire('input');
-  ok(tp.rows().length === 1 && tp.rows()[0].kids[1]._text === 'USDT', 'typing filters the list');
+  ok(tp.rows()[0].kids[1]._text === 'USDT' && tp.rows().every(r => r.kids[1]._text === 'USDT'), 'typing filters the list');
+  ok(tp.rows().length === 2, '…and after this network\'s own match comes the same coin on the other network a swap can start on');
   tp.$('dlg-close').fire('click');
   ok(tp.$('dlg').hidden === true, 'the picker closes');
   ok(tp.pick('ft', 'USDT') && tp.$('ft-n').textContent === 'USDT' && tp.$('tt-n').textContent === 'BNB', "picking the other side's token swaps the two");
@@ -503,6 +504,21 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   blind.go(); await sleep(60);
   ok(blind.sent.length === beforeBlind, '…and nothing is signed until the reader confirms');
   serve = () => goodQuote();
+
+  /* ---- a coin typed while another network is chosen is found on its own network */
+  global.fetch = realFetch; serve = () => goodQuote();
+  freshWallet(); const far = makeWindow(CFG, { allowed: true });
+  S.start(far.win); await sleep(60);
+  far.$('tt').fire('click'); far.$('dlg-q').value = 'btc'; far.$('dlg-q').fire('input'); await sleep(30);
+  let farRows = far.$('dlg-list').kids.filter(k => k.attrs.class === 'sw-opt');
+  ok(farRows.some(k => k.kids[1] && k.kids[1]._text === 'BTC'), 'typing BTC in the destination picker finds Bitcoin although another network is chosen');
+  farRows.find(k => k.kids[1] && k.kids[1]._text === 'BTC').fire('click'); await sleep(40);
+  ok(far.$('tc-n').textContent === 'Bitcoin' && far.$('tt-n').textContent === 'BTC', '…and choosing it moves the destination to that network');
+  ok(far.$('rcp-box').hidden === false, '…with the address box that network needs');
+  far.$('ft').fire('click'); far.$('dlg-q').value = 'btc'; far.$('dlg-q').fire('input'); await sleep(30);
+  ok(!far.$('dlg-list').kids.some(k => k.attrs.class === 'sw-opt' && k.kids[1] && k.kids[1]._text === 'BTC'),
+     'the source picker never offers a coin of a network nothing can start on');
+  far.$('dlg-close').fire('click');
 
   /* ================================================================ sending to Bitcoin from the page itself */
   global.fetch = realFetch;                     /* the two checks above left a broken service in place */

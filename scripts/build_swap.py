@@ -281,7 +281,8 @@ def chains(path=CHAINS):
             rows.append({"symbol": tk["symbol"], "name": tk["name"], "address": a, "decimals": d})
         if not rows:
             raise ConfigError(f"chain {cid}: no tokens")
-        out["tokens"][cid] = rows
+        # the network's own coin, the stablecoins and the few majors stay on top as written; the long tail reads A to Z
+        out["tokens"][cid] = rows[:8] + sorted(rows[8:], key=lambda t: t["symbol"].lower())
     for c in out["chains"]:
         if str(c["id"]) not in out["tokens"]:
             raise ConfigError(f"chain {c['id']} has no token list")
