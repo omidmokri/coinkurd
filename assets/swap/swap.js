@@ -241,6 +241,18 @@
 
   function hexToBig(h) { return isQty(h) ? BigInt(h) : 0n; }
 
+  /* A wallet extension can drop a request and never answer it — SafePal's message channel closes mid-flight and the
+     promise simply never settles. Anything we only *read* from the wallet is given a deadline, after which the page
+     carries on without it rather than waiting for ever. */
+  function within(p, ms, fallback) {
+    return new Promise(function (res) {
+      var done = false;
+      var timer = setTimeout(function () { if (!done) { done = true; res(fallback); } }, ms);
+      p.then(function (v) { if (!done) { done = true; clearTimeout(timer); res(v); } },
+             function () { if (!done) { done = true; clearTimeout(timer); res(fallback); } });
+    });
+  }
+
   /* wait for a transaction to be mined, by asking the wallet (no node of our own is contacted) */
   function waitFor(hash, tries) {
     tries = tries === undefined ? 90 : tries;
@@ -409,24 +421,29 @@
         var bad = checkQuote(q, req);
         if (bad) { S.busy = ''; S.err = t('mismatch') + ' [' + bad + ']'; paint(); return; }
         S.q = q; S.qreq = req; S.busy = '';
-        return decideApproval(q, req).then(function () { if (seq === S.seq) { showQuote(q); paint(); } });
+        showQuote(q); paint();                       /* the price is on screen before the wallet is asked anything */
+        return decideApproval(q, req).then(function () { if (seq === S.seq) { paint(); } });
       }, function (e) {
         if (seq !== S.seq) { return; }
         S.busy = '';
         S.err = e && e.status === 404 ? t('noRoute') : (e && e.message ? String(e.message).slice(0, 160) : t('offline'));
         paint();
+      }).catch(function (e) {                        /* nothing may leave the button stuck on 'finding the price' */
+        if (seq !== S.seq) { return; }
+        S.busy = ''; S.err = (e && e.message ? String(e.message) : 'error').slice(0, 160); paint();
       });
     }
 
     /* does this swap need the token's permission first, and is there even enough of it? */
     function decideApproval(q, req) {
       S.need = null;
-      return W.balance(req.fromToken, req.account).then(function (b) {
+      return within(W.balance(req.fromToken, req.account), 9000, null).then(function (b) {
+        if (b === null) { return null; }             /* the wallet did not answer: say nothing about the balance */
         S.bal = b;
         if (b < BigInt(req.fromAmount)) { S.err = t('lowBalance'); }
         if (sameAddr(req.fromToken, ZERO)) { return null; }
-        return W.allowance(req.fromToken, req.account, q.estimate.approvalAddress).then(function (a) {
-          if (a < BigInt(req.fromAmount)) { S.need = 'approve'; }
+        return within(W.allowance(req.fromToken, req.account, q.estimate.approvalAddress), 9000, null).then(function (a) {
+          if (a !== null && a < BigInt(req.fromAmount)) { S.need = 'approve'; }
         });
       }).catch(function () { return null; });
     }
@@ -522,10 +539,12 @@
 
     /* a wallet that allowed this site on an earlier visit is picked up silently, with no pop-up and no button press */
     if (W.p) {
-      W.req('eth_accounts').then(function (acc) {
+      within(W.req('eth_accounts'), 9000, null).then(function (acc) {
         if (!acc || !acc.length || !isAddr(acc[0]) || W.account) { return; }
         W.account = acc[0];
-        return W.req('eth_chainId').then(function (id) { W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask(); });
+        return within(W.req('eth_chainId'), 9000, null).then(function (id) {
+          W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask();
+        });
       }).catch(function () { });
     }
 

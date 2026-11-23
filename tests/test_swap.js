@@ -141,7 +141,7 @@ function makeWindow(cfg, opts) {
       if (method === 'eth_requestAccounts') { asked.push('prompt'); return Promise.resolve([ME]); }
       if (method === 'eth_accounts') { return opts.allowed ? Promise.resolve([ME]) : Promise.resolve([]); }
       if (method === 'eth_chainId') { return Promise.resolve(opts.chainId || '0x38'); }
-      if (method === 'eth_getBalance') { return Promise.resolve('0x3635c9adc5dea00000'); }   // 1000 coins
+      if (method === 'eth_getBalance') { return opts.deaf ? new Promise(() => {}) : Promise.resolve('0x3635c9adc5dea00000'); }   // 1000 coins
       if (method === 'eth_call') {
         const d = params[0].data;
         if (d.indexOf('0xdd62ed3e') === 0) { return Promise.resolve(opts.allowance || '0x0'); }
@@ -268,6 +268,17 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
   S.start(tn.win);
   await sleep(80);
   ok(tn.store['sw-action'].getAttribute('data-need') === 'chain', 'a network this page does not offer still asks for a switch');
+
+  /* ---- a wallet that takes a request and never answers (SafePal closes its message channel mid-flight) */
+  serve = () => goodQuote();
+  freshWallet();
+  const td = makeWindow(CFG, { allowed: true, deaf: true });
+  S.start(td.win);
+  await sleep(40);
+  td.store['sw-amount'].value = '1'; td.store['sw-amount'].fire('input');
+  await sleep(1200);
+  ok(td.store['sw-receive'].textContent.indexOf('550') === 0, 'the price still appears when the wallet never answers');
+  ok(td.store['sw-action'].getAttribute('data-need') === 'swap', '\u2026and the button is usable, not stuck on "finding the price"');
 
   /* ---- the service is unreachable */
   global.fetch = () => Promise.reject(new Error('network down'));
