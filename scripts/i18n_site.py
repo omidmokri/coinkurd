@@ -61,8 +61,13 @@ DAILY = int(os.environ.get("I18N_SITE_DAILY", "60"))    # kept for --requests ar
 PH = re.compile(r"\{\d+\}")
 KEEP = ["entekhab.net", "Coin_Kurd", "Coin Kurd", "Entekhab", "Telegram", "TradingView", "Binance", "mempool.space",
         "Bitcoin Core", "OKX", "Bybit", "Deribit", "Kurdistani", "Discord", "GitHub", "BTC", "ETH", "USDT", "USDC",
-        "RSI", "MACD", "EMA", "SMA", "VWAP", "ATR", "ADX", "OHLC", "CSV", "PNG", "JSON", "QR", "UTC", "API"]
+        "RSI", "MACD", "EMA", "SMA", "VWAP", "ATR", "ADX", "OHLC", "CSV", "PNG", "JSON", "QR", "UTC", "API",
+        # product and platform names: a language written in another alphabet keeps them in Latin letters, and
+        # without them here the script check turned the answer down and the string was re-sent run after run
+        "YouTube", "Instagram", "WhatsApp", "X (Twitter)", "Twitter", "Windows", "macOS", "iOS", "Android",
+        "Linux", "Chrome", "Firefox", "Safari", "Edge", "Pine Script", "Pine Studio", "Gemini", "Hurst"]
 KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_.])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
+FAIL_MAX = 3      # after this many unusable answers a string is left in English rather than re-sent every run
 SCRIPT = pro_l10n.SCRIPT                        # the alphabet a language must be written in
 ARABIC = re.compile(r"[؀-ۿ]")
 PERSIAN = re.compile(r"[پچژگ]")
@@ -127,10 +132,32 @@ def load(code):
     return {k: v for k, v in s.items() if isinstance(v, str) and v}
 
 
-def save(code, s):
+def load_fails(code):
+    """how often each string has come back unusable in this language
+
+    Without this the run re-sent the same strings every time. The queue puts the shortest first, and the shortest
+    are names — YouTube, Instagram, macOS, en-US — which a language written in another alphabet must keep in Latin
+    letters, so the script check turned them down, they stayed outstanding, and they were at the head of the next
+    run's batch again. Half of Hindi's batch went on them every run, and the language crawled.
+    """
+    try:
+        with open(cache_path(code), encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    v = (d.get("f") if isinstance(d, dict) else None) or {}
+    return {k: n for k, n in v.items() if isinstance(n, int) and n > 0}
+
+
+def save(code, s, fails=None):
     os.makedirs(CACHE, exist_ok=True)
+    f_ = dict(sorted((fails if fails is not None else load_fails(code)).items()))
+    f_ = {k: n for k, n in f_.items() if k not in s}      # one that came good later starts clean again
     with open(cache_path(code), "w", encoding="utf-8") as f:
-        json.dump({"lang": code, "s": dict(sorted(s.items()))}, f, ensure_ascii=False, separators=(",", ":"))
+        d = {"lang": code, "s": dict(sorted(s.items()))}
+        if f_:
+            d["f"] = f_
+        json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
 
 
@@ -234,7 +261,8 @@ def plan(langs, need, common, limit):
     for code in langs:
         s = load(code)
         state[code] = s
-        todo = [k for k in need if k not in s]
+        bad = {k for k, n in load_fails(code).items() if n >= FAIL_MAX}
+        todo = [k for k in need if k not in s and k not in bad]
         if not todo:
             continue
         todo.sort(key=lambda k: (k not in common, len(k), k))
@@ -264,6 +292,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
         q.put(it)
     lock = threading.Lock()
     changed = set()
+    fails = {code: load_fails(code) for code in {c for c, _ in items}}
 
     def worker(api_key):
         while time.time() - t0 <= seconds:
@@ -290,7 +319,9 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
                 continue
             with lock:
                 state[code].update(good)
-                if good:
+                for k in bad:
+                    fails[code][k] = fails[code].get(k, 0) + 1
+                if good or bad:
                     changed.add(code)
                 log(f"{code}: {len(good)}/{len(batch)} kept" + (f"; dropped {dict(list(bad.items())[:4])}" if bad else ""))
 
@@ -300,7 +331,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
     for th in threads:
         th.join(timeout=max(30.0, seconds - (time.time() - t0) + 120))
     for code in sorted(changed):
-        save(code, state[code])
+        save(code, state[code], fails.get(code))
     return state
 
 
