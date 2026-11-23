@@ -39,7 +39,7 @@
       swap: 'تبدیل', swapping: 'در انتظار امضا در کیف پول…', sent: 'تراکنش ارسال شد', done: 'تبدیل انجام شد',
       failed: 'تراکنش ناموفق بود.', watching: 'در حال پیگیری تبدیل…', view: 'دیدن تراکنش',
       mismatch: 'پاسخ سرویس با درخواست شما یکی نیست؛ چیزی امضا نشد.', offline: 'سرویس قیمت در دسترس نیست.',
-      badToken: 'این نشانی توکن شناخته نشد.', unverified: 'این توکن تأییدشده نیست — با احتیاط.',
+      badToken: 'این توکن روی این شبکه پیدا نشد.', searching: 'در حال جست‌وجوی توکن…', unverified: 'این توکن تأییدشده نیست — با احتیاط.',
       needAmount: 'مبلغ معتبر نیست.', same: 'مبدأ و مقصد یکی است.'
     },
     ckb: {
@@ -51,7 +51,7 @@
       swap: 'گۆڕینەوە', swapping: 'چاوەڕێی واژۆ لە جزدان…', sent: 'مامەڵەکە نێردرا', done: 'گۆڕینەوەکە ئەنجامدرا',
       failed: 'مامەڵەکە سەرکەوتوو نەبوو.', watching: 'لە شوێنکەوتنی گۆڕینەوەکەدا…', view: 'بینینی مامەڵە',
       mismatch: 'وەڵامی خزمەتگوزارییەکە لەگەڵ داواکارییەکەت یەک ناگرێتەوە؛ هیچ واژۆ نەکرا.', offline: 'خزمەتگوزاریی نرخ بەردەست نییە.',
-      badToken: 'ئەم ناونیشانی تۆکنە نەناسرایەوە.', unverified: 'ئەم تۆکنە پشتڕاست نەکراوەتەوە — بە وریاییەوە.',
+      badToken: 'ئەم تۆکنە لەسەر ئەم تۆڕە نەدۆزرایەوە.', searching: 'لە گەڕان بەدوای تۆکندا…', unverified: 'ئەم تۆکنە پشتڕاست نەکراوەتەوە — بە وریاییەوە.',
       needAmount: 'بڕەکە دروست نییە.', same: 'سەرچاوە و مەبەست یەکن.'
     },
     en: {
@@ -63,7 +63,7 @@
       swap: 'Swap', swapping: 'Waiting for the signature in the wallet…', sent: 'Transaction sent', done: 'Swap complete',
       failed: 'The transaction failed.', watching: 'Following the swap…', view: 'View transaction',
       mismatch: 'The service’s answer does not match your request; nothing was signed.', offline: 'The price service is unreachable.',
-      badToken: 'That token address was not recognised.', unverified: 'This token is not verified — take care.',
+      badToken: 'That token was not found on this network.', searching: 'Looking the token up\u2026', unverified: 'This token is not verified — take care.',
       needAmount: 'That amount is not valid.', same: 'The source and the destination are the same.'
     }
   };
@@ -328,7 +328,7 @@
       }
       o = doc.createElement('option');
       o.value = 'custom';
-      o.textContent = t('badToken') === '' ? 'custom' : (lang === 'en' ? 'Another address…' : lang === 'ckb' ? 'ناونیشانێکی تر…' : 'نشانی دیگر…');
+      o.textContent = lang === 'en' ? 'Another token…' : lang === 'ckb' ? 'تۆکنێکی تر…' : 'توکن دیگر…';
       if (cur && cur.custom) { o.selected = true; }
       sel.appendChild(o);
       if (!cur) {
@@ -554,10 +554,16 @@
       for (var i = 0; i < list.length; i++) { if (sameAddr(list[i].address, value)) { side.token = list[i]; break; } }
       S.err = ''; paint(); askLater();
     }
+    /* a symbol such as CAKE, or a token's address. Either way LI.FI is asked which token that is on this chain, and
+       the answer is checked before it is used; anything that is not verified there is flagged on the page. */
     function custom(side, value) {
       var a = String(value || '').trim();
-      if (!isAddr(a)) { side.token = { custom: true, address: '', decimals: 0, symbol: '', name: '' }; S.err = a ? t('badToken') : ''; paint(); return; }
-      S.busy = t('quoting'); paint();
+      var looksLikeSymbol = /^[A-Za-z0-9][A-Za-z0-9.$_\u20ae\u20ae-]{0,19}$/.test(a);
+      if (!isAddr(a) && !looksLikeSymbol) {
+        side.token = { custom: true, address: '', decimals: 0, symbol: '', name: '' };
+        S.err = a ? t('badToken') : ''; paint(); return;
+      }
+      S.busy = t('searching'); paint();
       lookupToken(side.chain, a).then(function (tk) {
         tk.custom = true; side.token = tk; S.busy = ''; S.err = ''; paint(); ask();
       }, function () { S.busy = ''; S.err = t('badToken'); paint(); });

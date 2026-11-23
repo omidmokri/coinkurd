@@ -239,7 +239,7 @@ def controls():
 <label class="sw-f"><span class="sw-lab">{lbl("از شبکهٔ", "لە تۆڕی", "From network")}</span><select id="sw-from-chain"></select></label>
 <label class="sw-f"><span class="sw-lab">{lbl("توکن مبدأ", "تۆکنی سەرچاوە", "Token in")}</span><select id="sw-from-token"></select></label>
 </div>
-<input id="sw-from-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="0x…" hidden>
+<input id="sw-from-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="CAKE  |  0x…" hidden>
 <div class="sw-row sw-amt">
 <label class="sw-f"><span class="sw-lab">{lbl("مبلغ", "بڕ", "Amount")}</span>
 <input id="sw-amount" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" dir="ltr" placeholder="0.0"></label>
@@ -251,7 +251,7 @@ def controls():
 <label class="sw-f"><span class="sw-lab">{lbl("به شبکهٔ", "بۆ تۆڕی", "To network")}</span><select id="sw-to-chain"></select></label>
 <label class="sw-f"><span class="sw-lab">{lbl("توکن مقصد", "تۆکنی مەبەست", "Token out")}</span><select id="sw-to-token"></select></label>
 </div>
-<input id="sw-to-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="0x…" hidden>
+<input id="sw-to-custom" class="sw-addr" type="text" inputmode="latin" spellcheck="false" autocomplete="off" dir="ltr" placeholder="CAKE  |  0x…" hidden>
 <div id="sw-tokenwarn" class="sw-warnline"></div>
 <div id="sw-quote" class="sw-quote" data-has="0">
 <div class="sw-q"><span>{lbl("دریافت می‌کنید", "وەری دەگریت", "You receive")}</span><b id="sw-receive" dir="ltr"></b></div>

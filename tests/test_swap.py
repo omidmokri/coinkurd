@@ -91,9 +91,17 @@ def main():
     # ---------------------------------------------------------------- the chains and tokens
     data = B.chains()
     ok(len(data["chains"]) >= 1 and all(str(x["id"]) in data["tokens"] for x in data["chains"]), "every chain has a token list")
-    ok(all(x["contract"] == LIFI for x in data["chains"]), "every chain pins LI.FI's own contract")
+    ok(all(x["contract"] == B.eip55(x["contract"]) for x in data["chains"]), "every chain pins a checksummed contract address")
+    ok({c["id"]: c["contract"] for c in data["chains"]}.get(56) == LIFI and {c["id"]: c["contract"] for c in data["chains"]}.get(1) == LIFI,
+       "BNB Smart Chain and Ethereum pin LI.FI's main contract")
+    ok(len({c["id"] for c in data["chains"]}) == len(data["chains"]), "no chain is listed twice")
+    ok(len(data["chains"]) >= 30, f"the page offers plenty of networks ({len(data['chains'])})")
+    ok(all(c["rpc"].startswith("https://") and c["explorer"].startswith("https://") for c in data["chains"]),
+       "every chain's node and explorer are https")
     n = sum(len(v) for v in data["tokens"].values())
-    ok(n >= 20, f"the short list has enough tokens ({n})")
+    ok(n >= 150, f"the short list has enough tokens ({n})")
+    ok(all(len({t["symbol"].lower() for t in v}) == len(v) for v in data["tokens"].values()), "no symbol appears twice on one chain")
+    ok(all(len({t["address"].lower() for t in v}) == len(v) for v in data["tokens"].values()), "no address appears twice on one chain")
     ok(all(t["address"] == B.eip55(t["address"]) for v in data["tokens"].values() for t in v if t["address"] != B.ZERO),
        "every token address carries a correct EIP-55 checksum")
     ok(not any("logo" in t for v in data["tokens"].values() for t in v), "no token picture is kept, so no other host is ever asked for one")
@@ -110,7 +118,8 @@ def main():
             os.unlink(tmp.name)
 
     for why, mut in [
-        ("a token address with one wrong character", lambda r: r["tokens"]["56"][1].update(address=r["tokens"]["56"][1]["address"][:-1] + "c")),
+        ("a token address with one wrong character", lambda r: r["tokens"]["56"][1].update(
+            address=r["tokens"]["56"][1]["address"][:-1] + ("d" if r["tokens"]["56"][1]["address"][-1] != "d" else "e"))),
         ("a lower-case address (nothing would catch a typo)", lambda r: r["tokens"]["56"][1].update(address=r["tokens"]["56"][1]["address"].lower())),
         ("a token listed twice", lambda r: r["tokens"]["56"].append(dict(r["tokens"]["56"][1]))),
         ("a token with impossible decimals", lambda r: r["tokens"]["56"][1].update(decimals=99)),
@@ -120,7 +129,7 @@ def main():
         ("an explorer served over plain http", lambda r: r["chains"][0].update(explorer="http://bscscan.com/")),
         ("a node address served over plain http", lambda r: r["chains"][0].update(rpc="http://evil.example/")),
         ("the same chain id twice", lambda r: r["chains"].append(dict(r["chains"][0]))),
-        ("tokens for a chain that is not listed", lambda r: r["tokens"].update({"999": r["tokens"]["56"]})),
+        ("tokens for a chain that is not listed", lambda r: r["tokens"].update({"123456789": r["tokens"]["56"]})),
         ("a chain with no tokens at all", lambda r: r["tokens"].update({"56": []})),
     ]:
         bad(lambda m=mut: with_chains(m), why)
