@@ -62,6 +62,17 @@ ZERO = "0x" + "0" * 40
 KEYS = {"enabled", "integrator", "fee", "slippage", "donate"}
 INTEGRATOR = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
 EVM = re.compile(r"^0x[0-9a-fA-F]{40}$")
+# Where a swap ends on a network that is not EVM, the reader types the address themselves and the money leaves our
+# hands for good. These are the shapes those addresses take; anything else is refused before the wallet ever opens.
+ADDRESS = {
+    "utxo": r"^(?:bc1[02-9ac-hj-np-z]{11,71}|[13][1-9A-HJ-NP-Za-km-z]{25,39})$",
+    "zcash": r"^(?:t1[1-9A-HJ-NP-Za-km-z]{33}|t3[1-9A-HJ-NP-Za-km-z]{33}|u1[02-9ac-hj-np-z]{70,})$",
+    "tron": r"^T[1-9A-HJ-NP-Za-km-z]{33}$",
+    "solana": r"^[1-9A-HJ-NP-Za-km-z]{32,44}$",
+    "sui": r"^0x[0-9a-fA-F]{64}$",
+    "stellar": r"^G[A-Z2-7]{55}$",
+}
+TOKEN_ADDR = re.compile(r"^[0-9A-Za-z:_.-]+$")
 LIFI_LINK = '<a href="https://li.fi/" rel="noopener noreferrer" target="_blank">LI.FI</a>'
 
 # The policy of this page (see the top of the file). frame-ancestors cannot be set from a <meta>, so the engine checks
@@ -215,17 +226,32 @@ def chains(path=CHAINS):
     for c in raw.get("chains", []):
         if not isinstance(c.get("id"), int) or c["id"] <= 0 or c["id"] in ids:
             raise ConfigError(f"chain id is missing or repeated: {c.get('id')!r}")
-        for k in ("name", "coin", "explorer", "rpc", "contract"):
+        # A `to_only` network is one a swap may end on but not start on: Bitcoin, Tron, Solana, Sui, Stellar, Zcash.
+        # The transaction is still signed on the EVM network the swap starts from, so these need no contract of their
+        # own and no node — only a name, a coin, an explorer, and the shape a recipient address takes there.
+        to_only = c.get("to_only") is True
+        need = ("name", "coin", "explorer") + (("kind",) if to_only else ("rpc", "contract"))
+        for k in need:
             if not isinstance(c.get(k), str) or not c[k]:
                 raise ConfigError(f"chain {c['id']}: {k} is missing")
-        for k in ("explorer", "rpc"):
+        for k in ("explorer",) if to_only else ("explorer", "rpc"):
             if not c[k].startswith("https://"):
                 raise ConfigError(f"chain {c['id']}: {k} must be https")
-        if not EVM.match(c["contract"]) or c["contract"] != eip55(c["contract"]):
-            raise ConfigError(f"chain {c['id']}: contract is not a checksummed address")
+        row = {"id": c["id"], "name": c["name"], "coin": c["coin"], "explorer": c["explorer"]}
+        if to_only:
+            if c["kind"] not in ADDRESS:
+                raise ConfigError(f"chain {c['id']}: {c['kind']!r} is not an address shape this page knows")
+            row["to_only"] = True
+            row["kind"] = c["kind"]
+            if c.get("contract") or c.get("rpc"):
+                raise ConfigError(f"chain {c['id']}: a to_only network must carry no contract and no node")
+        else:
+            if not EVM.match(c["contract"]) or c["contract"] != eip55(c["contract"]):
+                raise ConfigError(f"chain {c['id']}: contract is not a checksummed address")
+            row["rpc"] = c["rpc"]
+            row["contract"] = c["contract"]
         ids.add(c["id"])
-        out["chains"].append({"id": c["id"], "name": c["name"], "coin": c["coin"], "explorer": c["explorer"],
-                              "rpc": c["rpc"], "contract": c["contract"]})
+        out["chains"].append(row)
     if not out["chains"]:
         raise ConfigError("no chains")
     for cid, toks in raw.get("tokens", {}).items():
@@ -233,12 +259,16 @@ def chains(path=CHAINS):
             raise ConfigError(f"tokens for a chain that is not listed: {cid!r}")
         seen = set()
         rows = []
+        native = {c["id"]: c.get("to_only") is True for c in out["chains"]}[int(cid)]
         for tk in toks:
             a = tk.get("address")
-            if not isinstance(a, str) or not EVM.match(a):
+            if not isinstance(a, str) or not a or len(a) > 120 or not TOKEN_ADDR.match(a):
                 raise ConfigError(f"chain {cid}: {a!r} is not an address")
-            if a != ZERO and a != eip55(a):
-                raise ConfigError(f"chain {cid}: the EIP-55 checksum of {a} does not match — copy it again from LI.FI")
+            if not native:
+                if not EVM.match(a):
+                    raise ConfigError(f"chain {cid}: {a!r} is not an EVM address")
+                if a != ZERO and a != eip55(a):
+                    raise ConfigError(f"chain {cid}: the EIP-55 checksum of {a} does not match — copy it again from LI.FI")
             if a.lower() in seen:
                 raise ConfigError(f"chain {cid}: {a} is listed twice")
             seen.add(a.lower())
@@ -360,6 +390,14 @@ def controls():
     return f"""{side("f")}
 <div class="sw-mid"><button type="button" id="sw-flip" class="sw-flip" aria-label="swap direction">{_FLIP}</button></div>
 {side("t")}
+<div id="sw-rcp-box" class="sw-rcp" hidden>
+<label for="sw-rcp">{tri("نشانی دریافت روی <b id=\'sw-rcp-c\' translate=\'no\'></b>", "ناونیشانی وەرگرتن لەسەر <b id=\'sw-rcp-c\' translate=\'no\'></b>", "Receiving address on <b id=\'sw-rcp-c\' translate=\'no\'></b>")}</label>
+<input id="sw-rcp" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" dir="ltr" placeholder="" aria-describedby="sw-rcp-h" translate="no">
+<div id="sw-rcp-h" class="sw-rcp-h">{tri(
+    "این شبکه EVM نیست؛ نشانی را از کیف پول همان شبکه کپی کنید. تبدیل‌شده به همین نشانی می‌رود و بازگشتی ندارد.",
+    "ئەم تۆڕە EVM نییە؛ ناونیشان لە جزدانی هەمان تۆڕ لەبەربگرە. ئەوەی گۆڕدرا بۆ هەمان ناونیشان دەچێت و ناگەڕێتەوە.",
+    "This network is not EVM; copy the address from a wallet of that network. What you swap goes there and cannot come back.")}</div>
+</div>
 <div id="sw-quote" class="sw-quote" data-has="0">
 {q("rate", "نرخ", "نرخ", "Rate")}
 {q("min", "حداقل دریافتی", "کەمترین وەرگرتن", "At least")}
@@ -371,9 +409,9 @@ def controls():
 </div>
 <div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
 <div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
-<label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span>{tri(
+<label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span><span>{tri(
     "خطر این تبدیل را می‌دانم و می‌خواهم ادامه دهم.", "مەترسیی ئەم گۆڕینەوەیە دەزانم و دەمەوێت بەردەوام بم.",
-    "I understand the risk of this swap and want to go on.")}</span></label>
+    "I understand the risk of this swap and want to go on.")}</span><code id="sw-ack-a" dir="ltr" translate="no"></code></span></label>
 <button type="button" id="sw-action" class="sw-go" disabled><span id="sw-action-l"></span> <b id="sw-action-x" translate="no"></b></button>
 <div id="sw-msg" class="sw-msg" role="status" aria-live="polite"></div>
 <div id="sw-status" class="sw-status"></div>
@@ -441,6 +479,7 @@ def page(cfg, data):
     public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage", "donate") if k in cfg}
     cdata = html.escape(json.dumps(public, ensure_ascii=True, separators=(",", ":"), sort_keys=True), quote=True)
     rich = with_icons(data)
+    rich["addr"] = {k: ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("to_only")})}
     watch = watch_list(rich) if cfg.get("donate") else []
     ddata = html.escape(json.dumps(dict(rich, watch=watch), ensure_ascii=False, separators=(",", ":")), quote=True)
     n_chain, n_tok = len(data["chains"]), sum(len(v) for v in data["tokens"].values())

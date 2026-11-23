@@ -1,5 +1,5 @@
 {
- "_note": "Chains and the short token list of /swap/. Everything here was read from LI.FI's own service on 2026-11-23 (/v1/chains for the networks and their diamond contract, /v1/tokens for the tokens), never from memory. Kept: EVM mainnets whose native coin has 18 decimals, that publish a contract, an https node and an https explorer, and for which a real quote came back — the transaction of that quote was addressed to exactly the contract pinned here, on 40 of 40 networks and 14 different routing tools. Each chain's `contract` is what assets/swap/swap.js demands: a transaction addressed anywhere else is refused, so if LI.FI ever moves it the swap stops instead of going somewhere unknown. Only tokens LI.FI marks as verified are listed, one per symbol; a reader can reach any other token by typing its symbol or address, which the page looks up live. tests/test_swap.py checks every address's EIP-55 checksum.",
+ "_note": "Chains and the short token list of /swap/. Everything here was read from LI.FI's own service on 2026-11-23 (/v1/chains for the networks and their diamond contract, /v1/tokens for the tokens), never from memory. Kept: EVM mainnets whose native coin has 18 decimals, that publish a contract, an https node and an https explorer, and for which a real quote came back — the transaction of that quote was addressed to exactly the contract pinned here, on 40 of 40 networks and 14 different routing tools. Each chain's `contract` is what assets/swap/swap.js demands: a transaction addressed anywhere else is refused, so if LI.FI ever moves it the swap stops instead of going somewhere unknown. Only tokens LI.FI marks as verified are listed, one per symbol; a reader can reach any other token by typing its symbol or address, which the page looks up live. tests/test_swap.py checks every address's EIP-55 checksum. Added on the same day from the same service: LI.FI's six networks that are not EVM (Bitcoin, Tron, Solana, Sui, Stellar, Zcash), each marked to_only because a swap may end there but not start there — starting there needs a wallet of that network's own kind, and LI.FI itself refuses it until a fee wallet for that network is registered in the portal. Also added: the large coins that were missing from the EVM lists, each kept only where LI.FI's own coinKey matches the symbol, which is what keeps the look-alikes out (Tron's list carries 'US DT', 'U S D T' and 'UDST' beside the real USDT).",
  "chains": [
   {
    "id": 56,
@@ -320,6 +320,54 @@
    "explorer": "https://explorer.zksync.io/",
    "rpc": "https://mainnet.era.zksync.io",
    "contract": "0x341e94069f53234fE6DabeF707aD424830525715"
+  },
+  {
+   "id": 20000000000001,
+   "name": "Bitcoin",
+   "coin": "BTC",
+   "explorer": "https://mempool.space/",
+   "to_only": true,
+   "kind": "utxo"
+  },
+  {
+   "id": 728126428,
+   "name": "Tron",
+   "coin": "TRX",
+   "explorer": "https://tronscan.org/",
+   "to_only": true,
+   "kind": "tron"
+  },
+  {
+   "id": 1151111081099710,
+   "name": "Solana",
+   "coin": "SOL",
+   "explorer": "https://solscan.io/",
+   "to_only": true,
+   "kind": "solana"
+  },
+  {
+   "id": 9270000000000000,
+   "name": "Sui",
+   "coin": "SUI",
+   "explorer": "https://suivision.xyz/",
+   "to_only": true,
+   "kind": "sui"
+  },
+  {
+   "id": 1201081091099710,
+   "name": "Stellar",
+   "coin": "XLM",
+   "explorer": "https://stellarchain.io/",
+   "to_only": true,
+   "kind": "stellar"
+  },
+  {
+   "id": 20000000000005,
+   "name": "Zcash",
+   "coin": "ZEC",
+   "explorer": "https://cipherscan.app/",
+   "to_only": true,
+   "kind": "zcash"
   }
  ],
  "tokens": {
@@ -394,6 +442,66 @@
     "symbol": "WBNB",
     "name": "WBNB",
     "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "decimals": 18
+   },
+   {
+    "symbol": "UNI",
+    "name": "Uniswap",
+    "address": "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
+    "decimals": 18
+   },
+   {
+    "symbol": "AAVE",
+    "name": "Aave",
+    "address": "0xfb6115445Bff7b52FeB98650C87f44907E58f802",
+    "decimals": 18
+   },
+   {
+    "symbol": "TRX",
+    "name": "TRON",
+    "address": "0xCE7de646e7208a4Ef112cb6ed5038FA6cC6b12e3",
+    "decimals": 6
+   },
+   {
+    "symbol": "SOL",
+    "name": "SOLANA",
+    "address": "0x570A5D26f7765Ecb712C0924E4De545B89fD43dF",
+    "decimals": 18
+   },
+   {
+    "symbol": "LTC",
+    "name": "Litecoin Token",
+    "address": "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
+    "decimals": 18
+   },
+   {
+    "symbol": "BCH",
+    "name": "Bitcoin Cash Token",
+    "address": "0x8fF795a6F4D97E7887C79beA79aba5cc76444aDf",
+    "decimals": 18
+   },
+   {
+    "symbol": "XLM",
+    "name": "Stellar",
+    "address": "0x43C934A845205F0b514417d757d7235B8f53f1B9",
+    "decimals": 18
+   },
+   {
+    "symbol": "AVAX",
+    "name": "Avalanche",
+    "address": "0x1CE0c2827e2eF14D5C4f29a091d735A204794041",
+    "decimals": 18
+   },
+   {
+    "symbol": "ENA",
+    "name": "ENA",
+    "address": "0x58538e6A46E07434d7E7375Bc268D3cb839C0133",
+    "decimals": 18
+   },
+   {
+    "symbol": "FDUSD",
+    "name": "FDUSD",
+    "address": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
     "decimals": 18
    }
   ],
@@ -480,6 +588,24 @@
     "symbol": "stETH",
     "name": "Liquid staked Ether 2.0",
     "address": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+    "decimals": 18
+   },
+   {
+    "symbol": "PYUSD",
+    "name": "PayPal USD",
+    "address": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+    "decimals": 6
+   },
+   {
+    "symbol": "FDUSD",
+    "name": "FDUSD",
+    "address": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
+    "decimals": 18
+   },
+   {
+    "symbol": "POL",
+    "name": "Polygon Ecosystem Token",
+    "address": "0x455e53CBB86018Ac2B8092FdCd39d8444aFFC3F6",
     "decimals": 18
    }
   ],
@@ -577,6 +703,48 @@
     "name": "Arbitrum Bridged wstETH",
     "address": "0x5979D7b546E38E414F7E9822514be443A4800529",
     "decimals": 18
+   },
+   {
+    "symbol": "ARB",
+    "name": "Arbitrum",
+    "address": "0x912CE59144191C1204E64559FE8253a0e49E6548",
+    "decimals": 18
+   },
+   {
+    "symbol": "UNI",
+    "name": "Uniswap",
+    "address": "0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0",
+    "decimals": 18
+   },
+   {
+    "symbol": "AAVE",
+    "name": "Aave",
+    "address": "0xba5DdD1f9d7F570dc94a51479a000E3BCE967196",
+    "decimals": 18
+   },
+   {
+    "symbol": "CRV",
+    "name": "Curve DAO Token",
+    "address": "0x11cDb42B0EB46D95f990BeDD4695A6e3fA034978",
+    "decimals": 18
+   },
+   {
+    "symbol": "LDO",
+    "name": "Lido DAO Token",
+    "address": "0x13Ad51ed4F1B7e9Dc168d8a00cB3f4dDD85EfA60",
+    "decimals": 18
+   },
+   {
+    "symbol": "GRT",
+    "name": "Graph Token",
+    "address": "0x9623063377AD1B27544C965cCd7342f7EA7e88C7",
+    "decimals": 18
+   },
+   {
+    "symbol": "ENA",
+    "name": "ENA",
+    "address": "0x58538e6A46E07434d7E7375Bc268D3cb839C0133",
+    "decimals": 18
    }
   ],
   "43114": [
@@ -638,6 +806,12 @@
     "symbol": "WBNB",
     "name": "WBNB",
     "address": "0x442F7f22b1EE2c842bEAFf52880d4573E9201158",
+    "decimals": 18
+   },
+   {
+    "symbol": "ENA",
+    "name": "ENA",
+    "address": "0x58538e6A46E07434d7E7375Bc268D3cb839C0133",
     "decimals": 18
    }
   ],
@@ -718,6 +892,18 @@
     "symbol": "wstETH",
     "name": "Wrapped liquid staked Ether 2.0",
     "address": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+    "decimals": 18
+   },
+   {
+    "symbol": "GRT",
+    "name": "Graph Token",
+    "address": "0x0F4d237B09Cb37d207BA60353Dc254d4530D4dF1",
+    "decimals": 18
+   },
+   {
+    "symbol": "FET",
+    "name": "Fetch",
+    "address": "0x74F804B4140ee70830B3Eef4e690325841575F89",
     "decimals": 18
    }
   ],
@@ -1161,6 +1347,12 @@
     "name": "Staked USDe",
     "address": "0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2",
     "decimals": 18
+   },
+   {
+    "symbol": "ENA",
+    "name": "ENA",
+    "address": "0x58538e6A46E07434d7E7375Bc268D3cb839C0133",
+    "decimals": 18
    }
   ],
   "4326": [
@@ -1190,12 +1382,6 @@
     "symbol": "USDC",
     "name": "USD Coin",
     "address": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
-    "decimals": 6
-   },
-   {
-    "symbol": "USD1",
-    "name": "World Liberty Financial USD",
-    "address": "0x111111d2bf19e43C34263401e0CAd979eD1cdb61",
     "decimals": 6
    },
    {
@@ -1321,6 +1507,24 @@
     "name": "Superbridge Bridged wstETH",
     "address": "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
     "decimals": 18
+   },
+   {
+    "symbol": "OP",
+    "name": "OPTIMISM",
+    "address": "0x4200000000000000000000000000000000000042",
+    "decimals": 18
+   },
+   {
+    "symbol": "LDO",
+    "name": "Lido DAO Token",
+    "address": "0xFdb794692724153d1488CcdBE0C56c252596735F",
+    "decimals": 18
+   },
+   {
+    "symbol": "ENA",
+    "name": "ENA",
+    "address": "0x58538e6A46E07434d7E7375Bc268D3cb839C0133",
+    "decimals": 18
    }
   ],
   "1672": [
@@ -1390,6 +1594,48 @@
     "symbol": "wstETH",
     "name": "Polygon Bridged wstETH",
     "address": "0x03b54A6e9a984069379fae1a4fC4dBAE93B3bCCD",
+    "decimals": 18
+   },
+   {
+    "symbol": "UNI",
+    "name": "Uniswap (PoS)",
+    "address": "0xb33EaAd8d922B1083446DC23f610c2567fB5180f",
+    "decimals": 18
+   },
+   {
+    "symbol": "AAVE",
+    "name": "Aave",
+    "address": "0xD6DF932A45C0f255f85145f286eA0b292B21C90B",
+    "decimals": 18
+   },
+   {
+    "symbol": "MKR",
+    "name": "MAKER (PoS)",
+    "address": "0x6f7C932e7684666C9fd1d44527765433e01fF61d",
+    "decimals": 18
+   },
+   {
+    "symbol": "LDO",
+    "name": "Lido DAO Token (PoS)",
+    "address": "0xC3C7d422809852031b44ab29EEC9F1EfF2A58756",
+    "decimals": 18
+   },
+   {
+    "symbol": "GRT",
+    "name": "The Graph",
+    "address": "0x5fe2B58c013d7601147DcdD68C143A77499f5531",
+    "decimals": 18
+   },
+   {
+    "symbol": "SNX",
+    "name": "Synthetix Network Token (PoS)",
+    "address": "0x50B728D8D964fd00C2d0AAD81718b71311feF68a",
+    "decimals": 18
+   },
+   {
+    "symbol": "FET",
+    "name": "Fetch (PoS)",
+    "address": "0x7583FEDDbceFA813dc18259940F76a02710A8905",
     "decimals": 18
    }
   ],
@@ -1769,6 +2015,132 @@
     "name": "sUSDe",
     "address": "0xAD17Da2f6Ac76746EF261E835C50b2651ce36DA8",
     "decimals": 18
+   }
+  ],
+  "20000000000001": [
+   {
+    "symbol": "BTC",
+    "name": "Bitcoin",
+    "address": "bitcoin",
+    "decimals": 8
+   }
+  ],
+  "728126428": [
+   {
+    "symbol": "TRX",
+    "name": "TRX",
+    "address": "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb",
+    "decimals": 6
+   },
+   {
+    "symbol": "USDT",
+    "name": "USDT",
+    "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+    "decimals": 6
+   }
+  ],
+  "1151111081099710": [
+   {
+    "symbol": "SOL",
+    "name": "SOL",
+    "address": "11111111111111111111111111111111",
+    "decimals": 9
+   },
+   {
+    "symbol": "USDT",
+    "name": "USDT",
+    "address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "decimals": 6
+   },
+   {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "decimals": 6
+   },
+   {
+    "symbol": "ETH",
+    "name": "Ether (Wormhole)",
+    "address": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+    "decimals": 8
+   },
+   {
+    "symbol": "BNB",
+    "name": "Binance Coin (Wormhole)",
+    "address": "9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa",
+    "decimals": 8
+   },
+   {
+    "symbol": "DAI",
+    "name": "DAI Stablecoin (Wormhole)",
+    "address": "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
+    "decimals": 8
+   },
+   {
+    "symbol": "AVAX",
+    "name": "Avalanche (Wormhole)",
+    "address": "KgV1GvrHQmRBY8sHQQeUKwTm2r2h8t4C8qt12Cw1HVE",
+    "decimals": 8
+   }
+  ],
+  "9270000000000000": [
+   {
+    "symbol": "SUI",
+    "name": "SUI",
+    "address": "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI",
+    "decimals": 9
+   },
+   {
+    "symbol": "USDC",
+    "name": "USDC",
+    "address": "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
+    "decimals": 6
+   },
+   {
+    "symbol": "USDT",
+    "name": "Tether USD",
+    "address": "0xc060006111016b8a020ad5b33834984a437aaa7d3c74c18e09a95d48aceab08c::coin::COIN",
+    "decimals": 6
+   },
+   {
+    "symbol": "WBTC",
+    "name": "Wrapped BTC (Wormhole)",
+    "address": "0x027792d9fed7f9844eb4839566001bb6f6cb4804f66aa2da6fe1ee242d896881::coin::COIN",
+    "decimals": 8
+   },
+   {
+    "symbol": "WETH",
+    "name": "Wrapped ETH (Wormhole)",
+    "address": "0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN",
+    "decimals": 8
+   },
+   {
+    "symbol": "SOL",
+    "name": "Wrapped SOL (Wormhole)",
+    "address": "0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN",
+    "decimals": 8
+   }
+  ],
+  "1201081091099710": [
+   {
+    "symbol": "XLM",
+    "name": "Stellar",
+    "address": "CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA",
+    "decimals": 7
+   },
+   {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+    "decimals": 7
+   }
+  ],
+  "20000000000005": [
+   {
+    "symbol": "ZEC",
+    "name": "Zcash",
+    "address": "zcash",
+    "decimals": 8
    }
   ]
  }

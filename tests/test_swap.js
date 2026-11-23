@@ -47,8 +47,9 @@ function goodQuote(over) {
     action: { fromChainId: 56, toChainId: 56, fromToken: { address: BNB, decimals: 18, symbol: 'BNB' },
       toToken: { address: USDT, decimals: 18, symbol: 'USDT' }, fromAmount: '1000000000000000000',
       fromAddress: ME, toAddress: ME },
-    estimate: { toAmount: '550000000000000000000', toAmountMin: '547000000000000000000',
-      approvalAddress: DIAMOND, gasCosts: [{ amountUSD: '0.02' }], feeCosts: [{ amountUSD: '0.14' }], executionDuration: 30 },
+    estimate: { toAmount: '550000000000000000000', toAmountMin: '547250000000000000000',
+      approvalAddress: DIAMOND, gasCosts: [{ amountUSD: '0.02' }], feeCosts: [{ amountUSD: '0.14' }], executionDuration: 30,
+      fromAmountUSD: '560.00', toAmountUSD: '557.50' },
     transactionRequest: { to: DIAMOND, data: '0x4630a0d8' + '11'.repeat(100), value: '0xde0b6b3a7640000',
       from: ME, chainId: 56, gasLimit: '0xda5d9' }
   };
@@ -56,6 +57,92 @@ function goodQuote(over) {
 }
 const req = { fromChain: 56, toChain: 56, fromToken: BNB, toToken: USDT, fromAmount: '1000000000000000000', account: ME, contract: DIAMOND };
 ok(S.checkQuote(goodQuote(), req) === null, 'a matching answer passes');
+
+/* ---- an address belongs to exactly one network
+   Bitcoin, Tron, Solana and Zcash all write their addresses in base58, so one network's address matches another's
+   shape. Underneath they differ: Solana is a bare 32-byte key, the others carry a version byte and a check, and their
+   version bytes are not the same. Sending Bitcoin to a Tron address loses it, so each must be told apart for certain. */
+const SHAPES = {
+  utxo: /^(?:bc1[02-9ac-hj-np-z]{11,71}|[13][1-9A-HJ-NP-Za-km-z]{25,39})$/,
+  tron: /^T[1-9A-HJ-NP-Za-km-z]{33}$/,
+  solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/,
+  sui: /^0x[0-9a-fA-F]{64}$/,
+  stellar: /^G[A-Z2-7]{55}$/,
+  zcash: /^(?:t1[1-9A-HJ-NP-Za-km-z]{33}|t3[1-9A-HJ-NP-Za-km-z]{33}|u1[02-9ac-hj-np-z]{70,})$/
+};
+const REAL = {
+  utxo: ['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy',
+         'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+         'bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3'],
+  tron: ['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', 'TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt'],
+  solana: ['So11111111111111111111111111111111111111112', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+           '11111111111111111111111111111111'],
+  sui: ['0x' + 'a'.repeat(64)],
+  stellar: ['GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'],
+  zcash: ['t3Vz22vK5z2LcKEdg16Yv4FFneEL1zg9ojd']
+};
+let wrongNet = 0, missed = 0;
+for (const home in REAL) {
+  for (const a of REAL[home]) {
+    for (const other in REAL) {
+      const got = S.fits(SHAPES, other, a);
+      if (other === home && !got) { missed++; }
+      if (other !== home && got) { wrongNet++; console.log('   a ' + home + ' address was taken for ' + other + ': ' + a); }
+    }
+  }
+}
+ok(missed === 0, 'every real address of these six networks is accepted by its own network');
+ok(wrongNet === 0, "…and by no other: a Bitcoin address is never taken for a Tron or Solana one, nor the other way round");
+let junkIn = 0;
+for (const j of ['', 'hello', '0x' + 'a'.repeat(40), 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj60',
+                 '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa'.repeat(5)]) {
+  for (const k in REAL) { if (S.fits(SHAPES, k, j)) { junkIn++; console.log('   junk accepted by ' + k + ': ' + j); } }
+}
+ok(junkIn === 0, 'a malformed address is refused, whatever the network (a mistyped one is caught by its check bytes)');
+ok(S.fits(SHAPES, 'nosuchkind', REAL.tron[0]) === false, 'a network shape the page does not know accepts nothing');
+ok(S.fits({}, 'tron', REAL.tron[0]) === false, 'with no shapes at all nothing is accepted');
+
+/* ---- a swap that ends off the EVM networks: Bitcoin, Tron and their like.
+   The transaction is still an ordinary one on the network it starts from, but where the money comes out is an
+   address the reader typed, in base58 or base32, where capitals carry meaning. */
+const BTC_CHAIN = 20000000000001, BTC_ADDR = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
+function btcQuote(over) {
+  const q = goodQuote();
+  q.action.toChainId = BTC_CHAIN;
+  q.action.toToken = { address: 'bitcoin', decimals: 8, symbol: 'BTC' };
+  q.action.toAddress = BTC_ADDR;
+  q.estimate.toAmount = '320814'; q.estimate.toAmountMin = '319209';
+  return over ? over(q) || q : q;
+}
+const btcReq = { fromChain: 56, toChain: BTC_CHAIN, fromToken: BNB, toToken: 'bitcoin',
+  fromAmount: '1000000000000000000', account: ME, contract: DIAMOND, recipient: BTC_ADDR, exactTo: true,
+  fromDecimals: 18, toDecimals: 8 };
+ok(S.checkQuote(btcQuote(), btcReq) === null, 'a swap ending on Bitcoin passes when everything matches');
+ok(S.checkQuote(btcQuote(q => { q.action.toAddress = '1A1zP1eP5QGefi2DMPTfTL5SLmv7Divfna'; }), btcReq) === 'toAddress',
+   'one letter of the Bitcoin address in another case is caught — base58 is case-sensitive and the money would be lost');
+ok(S.checkQuote(btcQuote(q => { q.action.toAddress = BTC_ADDR.toLowerCase(); }), btcReq) === 'toAddress',
+   'the whole address in lower case is caught too');
+ok(S.checkQuote(btcQuote(q => { q.action.toAddress = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4'; }), btcReq) === 'toAddress',
+   'a different Bitcoin address in the answer is caught');
+ok(S.checkQuote(btcQuote(q => { q.action.toToken.address = 'BITCOIN'; }), btcReq) === 'toToken',
+   'the destination coin is compared letter for letter as well');
+ok(S.checkQuote(btcQuote(q => { q.action.toChainId = 56; }), btcReq) === 'toChain', 'a different destination network is caught');
+ok(S.checkQuote(btcQuote(q => { q.action.toToken.decimals = 18; }), btcReq) === 'toDecimals',
+   "the destination coin's decimals must be its own, or every figure shown would be wrong");
+ok(S.checkQuote(btcQuote(q => { q.transactionRequest.to = '0x' + '9'.repeat(40); }), btcReq) === 'contract',
+   'the transaction still has to be addressed to LI.FI\'s own contract on the network it starts from');
+
+/* the floor written into the transaction must honour the slippage the reader picked */
+const slipReq = Object.assign({}, req, { slippage: 0.005 });
+ok(S.checkQuote(goodQuote(), slipReq) === null, 'an answer whose floor matches the chosen slippage passes');
+ok(S.checkQuote(goodQuote(q => { q.estimate.toAmountMin = '1'; }), slipReq) === 'minTooLow',
+   'an answer that would let the trade fill at almost any price is refused');
+ok(S.checkQuote(goodQuote(q => { q.estimate.toAmountMin = '540000000000000000000'; }), slipReq) === 'minTooLow',
+   '…and so is one a little below what the reader allowed');
+ok(S.checkQuote(goodQuote(q => { q.action.slippage = 0.3; }), slipReq) === 'slippageBack',
+   'an answer that says it used a wider slippage than asked is refused');
+ok(S.checkQuote(goodQuote(q => { q.estimate.toAmountMin = q.estimate.toAmount; }), slipReq) === null,
+   'a floor better than asked for is fine');
 
 const tamper = [
   ['the transaction points at another contract', q => { q.transactionRequest.to = '0x' + '9'.repeat(40); }, 'to'],
@@ -114,14 +201,17 @@ function fakeDoc(ids) {
 const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 'tc-n', 'tt', 'tt-i', 'tt-n', 'amount', 'max', 'balance',
   'from-usd', 'to-usd', 'flip', 'receive', 'quote', 'rate', 'min', 'route', 'gas', 'fee', 'time', 'impact', 'slip', 'tokenwarn',
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
-  'dlg-find', 'dlg-close', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
+  'dlg-find', 'dlg-close', 'rcp', 'rcp-box', 'rcp-c', 'ack-a', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
   'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
-           { id: 1, name: 'Ethereum', coin: 'ETH', explorer: 'https://etherscan.io/', rpc: 'https://ethereum-rpc.publicnode.com', contract: DIAMOND, ic: 'https://evil.example/x.svg' }],
+           { id: 1, name: 'Ethereum', coin: 'ETH', explorer: 'https://etherscan.io/', rpc: 'https://ethereum-rpc.publicnode.com', contract: DIAMOND, ic: 'https://evil.example/x.svg' },
+           { id: 20000000000001, name: 'Bitcoin', coin: 'BTC', explorer: 'https://mempool.space/', to_only: true, kind: 'utxo', ic: 'c/20000000000001.svg' }],
   tokens: { '56': [{ symbol: 'BNB', name: 'BNB', address: BNB, decimals: 18, ic: 't/bnb.webp' }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 18, ic: 't/usdt.webp' }],
-            '1': [{ symbol: 'ETH', name: 'Ether', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 6 }] },
+            '1': [{ symbol: 'ETH', name: 'Ether', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 6 }],
+            '20000000000001': [{ symbol: 'BTC', name: 'Bitcoin', address: 'bitcoin', decimals: 8, ic: 't/btc.webp' }] },
+  addr: { utxo: '^(?:bc1[02-9ac-hj-np-z]{11,71}|[13][1-9A-HJ-NP-Za-km-z]{25,39})$', tron: '^T[1-9A-HJ-NP-Za-km-z]{33}$' },
   watch: [{ id: 56, name: 'BNB Smart Chain', rpc: 'https://bsc-dataseed.binance.org', explorer: 'https://bscscan.com/', token: USDT, decimals: 18 },
           { id: 1, name: 'Ethereum', rpc: 'https://ethereum-rpc.publicnode.com', explorer: 'https://etherscan.io/', token: USDT, decimals: 6 }]
 };
@@ -159,6 +249,9 @@ function makeWindow(cfg, opts) {
     go: () => $('action').fire('click'),
     type: async (v) => { $('amount').value = v; $('amount').fire('input'); await sleep(750); },
     rows: () => $('dlg-list').kids.filter(k => k.attrs.class === 'sw-opt'),
+    rcpType: async (v) => { $('rcp').value = v; $('rcp').fire('input'); await sleep(60); },
+    pickChain: (side, name) => { $(side).fire('click'); const r = $('dlg-list').kids.find(k => k.kids[1] && k.kids[1]._text === name); if (r) { r.fire('click'); } return !!r; },
+    chainRows: (side) => { $(side).fire('click'); const n = $('dlg-list').kids.filter(k => k.attrs.class === 'sw-opt').map(k => k.kids[1] && k.kids[1]._text); $('dlg-close').fire('click'); return n; },
     giftNeed: () => $('dn-go').getAttribute('data-need'),
     giftGo: () => $('dn-go').fire('click'),
     giftType: async (v) => { $('dn-amount').value = v; $('dn-amount').fire('input'); await sleep(50); },
@@ -170,11 +263,12 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
 
 (async function () {
   let urls = [], serve = () => goodQuote(), token = null, status = null;
-  global.fetch = (u) => {
+  const realFetch = (u) => {
     urls.push(u);
     const body = u.indexOf('/v1/quote') > 0 ? serve() : u.indexOf('/v1/token') > 0 ? token : u.indexOf('/v1/status') > 0 ? status : null;
     return Promise.resolve({ ok: !!body, status: body ? 200 : 404, text: () => Promise.resolve(JSON.stringify(body || { message: 'not found' })) });
   };
+  global.fetch = realFetch;
   S.tune({ wait: 300 });
 
   /* the page refuses to run inside someone else's frame, or switched off */
@@ -368,6 +462,89 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(t5.$('msg').textContent === S.T.fa.busyService, 'a busy price service is explained in plain words');
 
   /* ---------------------------------------------------------------- the file itself */
+  /* ---- the four check bytes, and bech32's own check: what catches a dropped or mistyped character */
+  const SUMCASES = [
+    ['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', true, "Bitcoin's first address"],
+    ['3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', true, 'a Bitcoin script address'],
+    ['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', true, "Tron's USDT contract"],
+    ['TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt', true, 'a Tron account'],
+    ['t3Vz22vK5z2LcKEdg16Yv4FFneEL1zg9ojd', true, 'a Zcash t3 address'],
+    ['1A1zP1eP5QGefi2DMPTfTL5SLmv7Divfn', false, 'the same Bitcoin address with a character dropped'],
+    ['1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNb', false, 'the same with its last character changed'],
+    ['TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6u', false, 'a Tron address with one character changed']
+  ];
+  for (const [addr, want, what] of SUMCASES) {
+    ok(await S.checkSum(addr) === want, (want ? 'the check bytes add up for ' : 'the check bytes catch ') + what);
+  }
+  /* bech32, from the Bitcoin standards' own test vectors */
+  const BECH = { utxo: /^(?:bc1[02-9ac-hj-np-z]{11,71}|[13][1-9A-HJ-NP-Za-km-z]{25,39})$/ };
+  for (const a of ['bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+                   'bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3',
+                   'bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0']) {
+    ok(S.fits(BECH, 'utxo', a), 'a real bc1 address passes its own check: ' + a.slice(0, 12) + '…');
+  }
+  for (const a of ['bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t5',
+                   'bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv4',
+                   'bc1q0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq5zuyut']) {
+    ok(!S.fits(BECH, 'utxo', a), 'a bc1 address with one character wrong is refused: ' + a.slice(0, 12) + '…');
+  }
+  ok(S.needsSum('utxo', '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa') && S.needsSum('tron', 'T'.repeat(34)) &&
+     !S.needsSum('utxo', 'bc1qxxx') && !S.needsSum('solana', '1'.repeat(32)),
+     'the check bytes are asked for where they exist, and not where they do not');
+
+  /* ---- when the service will not say what the swap is worth, the reader is asked to look rather than waved through */
+  global.fetch = realFetch;
+  serve = () => goodQuote(q => { delete q.estimate.fromAmountUSD; delete q.estimate.toAmountUSD; });
+  freshWallet(); const blind = makeWindow(CFG, { allowed: true });
+  S.start(blind.win); await sleep(40); await blind.type('1'); await sleep(500);
+  ok(blind.need() === 'ack', 'with no worth given for either side the confirmation is asked for, not skipped');
+  ok(blind.$('impact').textContent === '—', '…and the page says plainly that it cannot tell');
+  const beforeBlind = blind.sent.length;
+  blind.go(); await sleep(60);
+  ok(blind.sent.length === beforeBlind, '…and nothing is signed until the reader confirms');
+  serve = () => goodQuote();
+
+  /* ================================================================ sending to Bitcoin from the page itself */
+  global.fetch = realFetch;                     /* the two checks above left a broken service in place */
+  serve = () => btcQuote();
+  freshWallet(); urls = [];
+  t = makeWindow(CFG, { allowed: true });
+  S.start(t.win); await sleep(60);
+  ok(t.$('rcp-box').attrs.hidden === true || t.$('rcp-box').hidden === true, 'with an EVM destination there is no address box');
+  ok(t.chainRows('tc').indexOf('Bitcoin') >= 0, 'Bitcoin is on offer as a destination');
+  ok(t.chainRows('fc').indexOf('Bitcoin') < 0, '…and never as a source: nothing can start there');
+  ok(t.pickChain('tc', 'Bitcoin'), 'the destination is set to Bitcoin');
+  await sleep(40);
+  ok(t.$('tt-n').textContent === 'BTC', "Bitcoin's own coin is chosen with it");
+  ok(t.$('rcp-box').hidden === false, 'the address box appears');
+  ok(t.$('rcp-c').textContent === 'Bitcoin', '…naming the network the address must belong to');
+  await t.type('1');
+  ok(t.need() === 'recipient', 'without an address nothing is asked of the price service');
+  const beforeQuote = urls.length;
+  await t.rcpType('not-an-address');
+  ok(t.need() === 'badRecipient' && urls.length === beforeQuote,
+     'an address that does not fit Bitcoin is refused on the page, before anything is asked or signed');
+  await t.rcpType('TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt');
+  ok(t.need() === 'badRecipient', 'a Tron address is refused for a Bitcoin destination');
+  await t.rcpType(BTC_ADDR); await sleep(900);
+  ok(t.need() === 'ack', 'a sound address brings a price, and then asks the reader to confirm the address');
+  ok(t.$('ack-a').textContent === BTC_ADDR, '…showing it back in full, because the wallet will not show it');
+  ok(t.$('receive').textContent === '0.00320814', 'the amount is counted in Bitcoin\'s own eight places');
+  let n0 = t.sent.length;
+  t.go(); await sleep(60);
+  ok(t.sent.length === n0, 'the swap does not go through while the address is unconfirmed');
+  t.$('ack').checked = true; t.$('ack').fire('change'); await sleep(40);
+  ok(t.need() === 'swap', 'once confirmed the swap is offered');
+  t.go(); await sleep(140);
+  ok(t.sent.length === n0 + 1 && S.sameAddr(t.sent[t.sent.length - 1].to, DIAMOND),
+     'what is signed is still an ordinary transaction to LI.FI\'s contract on the network it starts from');
+  ok(urls.some(u => u.indexOf('toAddress=' + encodeURIComponent(BTC_ADDR)) > 0 || u.indexOf('toAddress=' + BTC_ADDR) > 0),
+     'the address the reader typed is what was asked for');
+  /* a changed address throws the old price away */
+  await t.rcpType(BTC_ADDR.slice(0, -1) + 'b');
+  ok(t.$('receive').textContent === '' || t.need() === 'badRecipient', 'changing the address clears the old price');
+  serve = () => goodQuote();
+
   /* ================================================================ the gift panel */
   freshWallet(); urls = [];
   t = makeWindow(CFG, { allowed: true });

@@ -38,6 +38,9 @@ CHAIN_ICON = {
     4326: "megaeth", 1088: "metis", 143: "monad", 2818: "morph", 10: "optimism", 1672: "pharos", 137: "polygon",
     4663: "robinhood", 2020: "ronin", 534352: "scroll", 1868: "soneium", 146: "sonic", 40: "telo", 130: "unichain",
     1480: "vana", 88: "viction", 480: "world", 196: "xlayer", 324: "zksync",
+    # the networks a swap can only end on
+    20000000000001: "bitcoin", 728126428: "tron", 1151111081099710: "solana", 9270000000000000: "sui",
+    1201081091099710: "stellar", 20000000000005: "zcash",
 }
 # chain id -> its folder in trustwallet/assets (only the ones that repository has)
 TW = {1: "ethereum", 56: "smartchain", 137: "polygon", 42161: "arbitrum", 10: "optimism", 8453: "base",
@@ -53,7 +56,15 @@ EXTRA = {"link": ("ethereum", "0x514910771AF9Ca656af840dff83E8264EcF986CA"),
          "ape": ("ethereum", "0x4d224452801ACEd8B2F0aebE155379bb5D594381"),
          "weeth": ("ethereum", "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee"),
          "susde": ("ethereum", "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"),
-         "reth": ("ethereum", "0xae78736Cd615f374D3085123A210448E74Fc6393")}
+         "reth": ("ethereum", "0xae78736Cd615f374D3085123A210448E74Fc6393"),
+         "mkr": ("ethereum", "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2"),
+         "cbbtc": ("ethereum", "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"),
+         "weth": ("ethereum", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"),
+         "ena": ("ethereum", "0x57e114B691Db790C35207b2e685D4A43181e6061"),
+         "fet": ("ethereum", "0xaea46A60368A7bD060eec7DF8CBa43b7EF41Ad85"),
+         "usd1": ("smartchain", "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d")}
+# a coin whose home is one of the networks a swap can only end on: its picture is that network's own
+NATIVE_ICON = {"btc": "bitcoin", "trx": "tron", "sol": "solana", "sui": "sui", "xlm": "stellar", "zec": "zcash"}
 BAD_SVG = re.compile(r"<script|\son[a-z]+\s*=|<foreignObject|javascript:|(?:href|src)\s*=\s*[\"']\s*(?:https?:)?//", re.I)
 
 
@@ -125,7 +136,9 @@ def main():
         except Exception as ex:  # noqa: BLE001
             print("  could not redraw", k, ex)
     # the chain's own coin where Trust Wallet has one (the page falls back to the chain icon otherwise)
-    for sym, folder in (("bnb", "smartchain"), ("eth", "ethereum"), ("pol", "polygon"), ("avax", "avalanchec")):
+    for sym, folder in (("bnb", "smartchain"), ("eth", "ethereum"), ("pol", "polygon"), ("avax", "avalanchec"),
+                        ("btc", "bitcoin"), ("trx", "tron"), ("sol", "solana"), ("sui", "sui"),
+                        ("xlm", "stellar"), ("zec", "zcash")):
         dst = os.path.join(OUT, "t", f"{sym}.webp")
         if not os.path.exists(dst):
             png = get(f"{RAW}/trustwallet/assets/master/blockchains/{folder}/info/logo.png")

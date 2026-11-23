@@ -129,6 +129,17 @@ output.sw-num:empty::before{content:"0.0";color:#565a64}
 .sw-none{padding:26px 8px;text-align:center;color:var(--s-mute);font-size:.88rem}
 .sw-find{margin-top:8px;padding:11px;border-radius:13px;border:1px dashed rgba(247,147,26,.55);background:rgba(247,147,26,.08);color:var(--s-o2);font:inherit;font-size:.9rem;cursor:pointer}
 
+/* ---- where a swap that ends off the EVM networks must deliver */
+.sw-rcp{margin:10px 0 0;padding:12px 14px;border-radius:16px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3)}
+.sw-rcp label{display:block;font-size:.78rem;color:#fcd34d;margin-bottom:6px}
+.sw-rcp label b{color:#fff}
+.sw-rcp input{width:100%;box-sizing:border-box;border:1px solid var(--s-line);border-radius:10px;padding:9px 10px;
+  background:rgba(0,0,0,.32);color:var(--s-ink);font-size:.82rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.sw-rcp input:focus{outline:none;border-color:rgba(245,158,11,.75)}
+.sw-rcp-h{margin-top:6px;font-size:.74rem;color:var(--s-mute);line-height:1.7}
+.sw-ack code{display:block;margin-top:5px;font-size:.74rem;color:#fcd34d;word-break:break-all}
+.sw-ack code:empty{display:none}
+
 /* ---- the gift panel: the wallet laid open, then a transfer straight to it */
 .sw-card{grid-column:1;grid-row:1}
 .sw-gift{grid-column:1;grid-row:2}

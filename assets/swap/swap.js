@@ -30,7 +30,7 @@
   var MAX_FEE = 0.03;            // the most of a swap this site would ever take
   var MAX_SLIP = 0.05;           // and the most price movement a reader may accept
   var TIMEOUT = 25000;
-  var ERC20 = { allowance: '0xdd62ed3e', approve: '0x095ea7b3', balanceOf: '0x70a08231', transfer: '0xa9059cbb' };
+  var ERC20 = { allowance: '0xdd62ed3e', approve: '0x095ea7b3', balanceOf: '0x70a08231', transfer: '0xa9059cbb', decimals: '0x313ce567' };
 
   /* ------------------------------------------------------------------ text */
   var T = {
@@ -55,6 +55,8 @@
       impactHigh: 'این تبدیل بخش بزرگی از ارزش را از دست می‌دهد.',
       bridging: 'در راه شبکهٔ مقصد…', arrived: 'به شبکهٔ مقصد رسید.', bridgeFailed: 'انتقال بین شبکه‌ها ناموفق بود؛ با شناسهٔ تراکنش پیگیری کنید.',
       viewDest: 'تراکنش مقصد', pickChain: 'انتخاب شبکه', pickToken: 'انتخاب توکن', nothing: 'چیزی پیدا نشد.',
+      rcpChecking: 'در حال بررسی نشانی…',
+      rcpNeeded: 'نشانی دریافت را وارد کنید', rcpBad: 'نشانی با قالب این شبکه نمی‌خواند', confirmAddr: 'نشانی دریافت را تأیید کنید',
       give: 'حمایت', giving: 'در انتظار امضا در کیف پول…', gave: 'رسید. ممنون.', copied: 'کپی شد', copy: 'کپی',
       findOnChain: 'جست‌وجو روی شبکه', balance: 'موجودی'
     },
@@ -79,6 +81,8 @@
       impactHigh: 'ئەم گۆڕینەوەیە بەشێکی گەورەی بەهاکە لەدەست دەدات.',
       bridging: 'لە ڕێگای تۆڕی مەبەستدایە…', arrived: 'گەیشتە تۆڕی مەبەست.', bridgeFailed: 'گواستنەوەی نێوان تۆڕەکان سەرکەوتوو نەبوو؛ بە ناسنامەی مامەڵەکە بەدوایدا بچۆ.',
       viewDest: 'مامەڵەی مەبەست', pickChain: 'هەڵبژاردنی تۆڕ', pickToken: 'هەڵبژاردنی تۆکن', nothing: 'هیچ نەدۆزرایەوە.',
+      rcpChecking: 'ناونیشان دەپشکنرێت…',
+      rcpNeeded: 'ناونیشانی وەرگرتن بنووسە', rcpBad: 'ناونیشان لەگەڵ قالبی ئەم تۆڕە ناگونجێت', confirmAddr: 'ناونیشانی وەرگرتن پەسەند بکە',
       give: 'پشتگیری', giving: 'چاوەڕێی واژۆ لە جزدان…', gave: 'گەیشت. سوپاس.', copied: 'لەبەرگیرایەوە', copy: 'لەبەرگرتنەوە',
       findOnChain: 'گەڕان لەسەر تۆڕ', balance: 'ماوە'
     },
@@ -103,6 +107,8 @@
       impactHigh: 'This swap loses a large share of its value.',
       bridging: 'On its way to the destination network…', arrived: 'Arrived on the destination network.', bridgeFailed: 'The transfer between networks failed; follow it up with the transaction id.',
       viewDest: 'Destination transaction', pickChain: 'Choose a network', pickToken: 'Choose a token', nothing: 'Nothing found.',
+      rcpChecking: 'Checking the address…',
+      rcpNeeded: 'Enter the receiving address', rcpBad: 'That address does not fit this network', confirmAddr: 'Confirm the receiving address',
       give: 'Support', giving: 'Waiting for the signature in the wallet…', gave: 'Received. Thank you.', copied: 'Copied', copy: 'Copy',
       findOnChain: 'Search on the network', balance: 'Balance'
     }
@@ -184,9 +190,110 @@
   function quote(req, cfg) {
     return api('/v1/quote', {
       fromChain: req.fromChain, toChain: req.toChain, fromToken: req.fromToken, toToken: req.toToken,
-      fromAmount: req.fromAmount, fromAddress: req.account, toAddress: req.account,
+      fromAmount: req.fromAmount, fromAddress: req.account, toAddress: req.recipient || req.account,
       slippage: req.slippage, integrator: cfg.integrator || undefined, fee: cfg.fee || undefined
     });
+  }
+
+  /* ---- base58, and what the bytes underneath an address say it is
+   * The shapes above cannot tell these networks apart: a Bitcoin address and a Tron address are both base58, and
+   * Solana's alphabet is the same again, so one network's address matches another's shape. Underneath they are not
+   * alike at all. Base58 is plain arithmetic in base 58, and once decoded the length and the leading byte say which
+   * network an address belongs to: Solana is a bare 32-byte key, while Bitcoin, Tron and Zcash carry a version byte
+   * and a four-byte check, and their version bytes differ. Sending Bitcoin to a Tron address loses it for good, so
+   * the page settles this here rather than hoping the shape was enough. */
+  var B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  function b58(str) {
+    var num = 0n, i, k, zeros = 0, out = [];
+    for (i = 0; i < str.length; i++) {
+      k = B58.indexOf(str.charAt(i));
+      if (k < 0) { return null; }
+      num = num * 58n + BigInt(k);
+    }
+    while (zeros < str.length && str.charAt(zeros) === '1') { zeros++; }
+    while (num > 0n) { out.unshift(Number(num & 255n)); num >>= 8n; }
+    while (zeros-- > 0) { out.unshift(0); }
+    return out;
+  }
+
+  /* each network: the decoded length it must have, and the bytes it must begin with (any one of them) */
+  var BYTES = {
+    utxo: { len: 25, heads: [[0x00], [0x05]] },
+    tron: { len: 25, heads: [[0x41]] },
+    zcash: { len: 26, heads: [[0x1c, 0xb8], [0x1c, 0xbd]] },
+    solana: { len: 32, heads: null }
+  };
+
+  /* bech32, as Bitcoin's bc1 addresses are written: its check is plain arithmetic over 32 symbols, no hashing */
+  var B32 = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+  function bechOk(addr) {
+    var low = addr.toLowerCase(), pos = low.lastIndexOf('1'), i, c, top;
+    if (addr !== low && addr !== addr.toUpperCase()) { return false; }     /* bech32 is never written in mixed case */
+    if (pos < 1 || pos + 7 > low.length || low.length > 90) { return false; }
+    var hrp = low.slice(0, pos), data = low.slice(pos + 1), chk = 1;
+    var GEN = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+    function step(v) {
+      var j;                                      /* its own counter: sharing the callers' would never let them end */
+      top = chk >>> 25;
+      chk = ((chk & 0x1ffffff) << 5) ^ v;
+      for (j = 0; j < 5; j++) { if ((top >>> j) & 1) { chk ^= GEN[j]; } }
+    }
+    for (i = 0; i < hrp.length; i++) { step(hrp.charCodeAt(i) >>> 5); }
+    step(0);
+    for (i = 0; i < hrp.length; i++) { step(hrp.charCodeAt(i) & 31); }
+    for (i = 0; i < data.length; i++) {
+      c = B32.indexOf(data.charAt(i));
+      if (c < 0) { return false; }
+      step(c);
+    }
+    return chk === 1 || chk === 0x2bc830a3;                                /* bech32 and bech32m */
+  }
+
+  function fits(shapes, kind, addr) {
+    var re = shapes && shapes[kind];
+    if (!re || typeof addr !== 'string' || !addr || addr.length > 120 || !re.test(addr)) { return false; }
+    var want = BYTES[kind];
+    if (!want) { return true; }                       /* sui and stellar are told apart by their shape alone */
+    if (kind === 'utxo' && addr.indexOf('bc1') === 0) { return bechOk(addr); }   /* bech32, and no other network uses it */
+    if (kind === 'zcash' && addr.indexOf('u1') === 0) { return true; }
+    var raw = b58(addr);
+    if (!raw || raw.length !== want.len) { return false; }
+    if (!want.heads) { return true; }
+    for (var i = 0; i < want.heads.length; i++) {
+      var h = want.heads[i], j = 0;
+      while (j < h.length && raw[j] === h[j]) { j++; }
+      if (j === h.length) { return true; }
+    }
+    return false;
+  }
+
+  /* The last four bytes of a Bitcoin, Tron or Zcash address are a check: the first four bytes of SHA-256 applied
+     twice to everything before them. Shape and length alone let a dropped character through — this does not. The
+     browser's own hashing is used, which is asynchronous, so the answer arrives a moment later and is remembered. */
+  var SUMS = {}, SUMMED = {};
+  function needsSum(kind, addr) {
+    return (kind === 'utxo' && addr.indexOf('bc1') !== 0) || kind === 'tron' ||
+           (kind === 'zcash' && addr.indexOf('u1') !== 0);
+  }
+
+  function sha256(bytes) {
+    var c = (typeof crypto !== 'undefined' && crypto) || (typeof root !== 'undefined' && root && root.crypto);
+    if (!c || !c.subtle) { return Promise.reject(new Error('no hashing')); }
+    return c.subtle.digest('SHA-256', new Uint8Array(bytes)).then(function (b) { return Array.prototype.slice.call(new Uint8Array(b)); });
+  }
+
+  function checkSum(addr) {
+    if (own(SUMS, addr)) { return Promise.resolve(SUMS[addr]); }
+    if (own(SUMMED, addr)) { return SUMMED[addr]; }
+    var raw = b58(addr);
+    if (!raw || raw.length < 5) { SUMS[addr] = false; return Promise.resolve(false); }
+    var body = raw.slice(0, raw.length - 4), tail = raw.slice(raw.length - 4);
+    SUMMED[addr] = sha256(body).then(sha256).then(function (h) {
+      var okd = h[0] === tail[0] && h[1] === tail[1] && h[2] === tail[2] && h[3] === tail[3];
+      SUMS[addr] = okd; delete SUMMED[addr];
+      return okd;
+    }, function () { delete SUMMED[addr]; return null; });            /* no hashing here: say nothing either way */
+    return SUMMED[addr];
   }
 
   /* ------------------------------------------------------------------ is this answer really our request?
@@ -197,13 +304,29 @@
     if (Number(a.fromChainId) !== Number(req.fromChain)) { return 'fromChain'; }
     if (Number(a.toChainId) !== Number(req.toChain)) { return 'toChain'; }
     if (!plain(a.fromToken) || !sameAddr(a.fromToken.address, req.fromToken)) { return 'fromToken'; }
-    if (!plain(a.toToken) || !sameAddr(a.toToken.address, req.toToken)) { return 'toToken'; }
+    /* On Bitcoin, Tron, Solana, Sui and Stellar an address is written in base58 or base32, where capitals carry
+       meaning: there the comparison must be letter for letter, never the case-insensitive one EVM allows. */
+    var same = req.exactTo ? function (x, y) { return typeof x === 'string' && x === y; } : sameAddr;
+    if (!plain(a.toToken) || !same(a.toToken.address, req.toToken)) { return 'toToken'; }
     if (String(a.fromAmount) !== String(req.fromAmount)) { return 'fromAmount'; }
     if (!sameAddr(a.fromAddress, req.account)) { return 'fromAddress'; }
-    if (!sameAddr(a.toAddress, req.account)) { return 'toAddress'; }
+    /* where the money comes out: what the reader typed, or their own wallet when the swap ends on an EVM network */
+    if (!same(a.toAddress, req.recipient || req.account)) { return 'toAddress'; }
     if (!isUint(String(e.toAmount)) || !isUint(String(e.toAmountMin))) { return 'toAmount'; }
     if (BigInt(e.toAmountMin) > BigInt(e.toAmount)) { return 'toAmountMin'; }
     if (BigInt(e.toAmount) <= 0n) { return 'empty'; }
+    /* The reader picks how far the price may move against them — 0.1%, 0.5%, 1% or 3%. That choice is sent with the
+       question, but the answer carries the floor that will be written into the transaction, and nothing until now
+       made sure the two agreed. An answer whose floor is lower than the reader allowed is refused here: otherwise a
+       route could hand back a floor near zero, the page would show a healthy price, and the trade could still fill
+       at almost any price once it reached the chain. */
+    if (req.slippage !== undefined) {
+      var allow = Math.round((1 - Number(req.slippage)) * 1000000);
+      if (!(allow > 0 && allow <= 1000000)) { return 'slippage'; }
+      /* the service floors this figure, so the comparison is floored the same way and one unit is left for rounding */
+      if (BigInt(e.toAmountMin) + 1n < (BigInt(e.toAmount) * BigInt(allow)) / 1000000n) { return 'minTooLow'; }
+      if (a.slippage !== undefined && !(Number(a.slippage) >= 0 && Number(a.slippage) <= Number(req.slippage) + 1e-9)) { return 'slippageBack'; }
+    }
     if (!isAddr(x.to)) { return 'to'; }
     /* the transaction must be addressed to LI.FI's own contract for this chain and nowhere else. The address is kept
        in scripts/swap_chains.json, read from LI.FI's own /v1/chains. If they ever move it the swap stops here. */
@@ -271,6 +394,15 @@
     balance: function (token, owner) {
       if (sameAddr(token, ZERO)) { return this.req('eth_getBalance', [owner, 'latest']).then(hexToBig); }
       return this.call(token, ERC20.balanceOf + pad32(owner)).then(hexToBig);
+    },
+    /* what the token itself says its places are. A gift is built from the figure in our own list, and a swap has the
+       service's answer checked against it — but a gift asks nobody, so before the first transfer of a token the
+       token is asked directly. One place out means a thousand times too much or too little. */
+    decimals: function (token) {
+      return this.call(token, ERC20.decimals).then(function (h) {
+        var v = hexToBig(h);
+        return v !== null && v >= 0n && v <= 36n ? Number(v) : null;
+      }, function () { return null; });
     },
     allowance: function (token, owner, spender) {
       return this.call(token, ERC20.allowance + pad32(owner) + pad32(spender)).then(hexToBig);
@@ -378,6 +510,7 @@
     var el = {};
     ['fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 'tc-n', 'tt', 'tt-i', 'tt-n', 'amount', 'max', 'balance',
       'from-usd', 'to-usd', 'flip', 'receive', 'quote', 'rate', 'min', 'route', 'gas', 'fee', 'time', 'impact', 'slip',
+      'rcp', 'rcp-box', 'rcp-c', 'ack-a',
       'tokenwarn', 'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title',
       'dlg-q', 'dlg-list', 'dlg-find', 'dlg-close'].forEach(function (k) { el[k] = $('sw-' + k); });
     for (var k0 in el) { if (own(el, k0) && !el[k0]) { return state('off'); } }      /* a page missing a part does not half-work */
@@ -423,9 +556,45 @@
       icon(el['tt-i'], tt && tt.ic, tt && tt.symbol); el['tt-n'].textContent = tt ? tt.symbol : '—';
     }
 
+    /* The shapes come from the page, built from scripts/swap_chains.json. Each is compiled once, and only if it is
+       made of the handful of characters an address pattern needs — a pattern arriving from anywhere else is dropped. */
+    var SHAPES = (function () {
+      var out = {}, raw = data.addr, k;
+      if (!plain(raw)) { return out; }
+      for (k in raw) {
+        if (!own(raw, k) || typeof raw[k] !== 'string' || raw[k].length > 160) { continue; }
+        if (!/^[\^\$\(\)\?:|\[\]{},0-9A-Za-z\\\-]+$/.test(raw[k])) { continue; }
+        try { out[k] = new RegExp(raw[k]); } catch (e) { }
+      }
+      return out;
+    })();
+
+    function toOnly(c) { return !!(c && c.to_only === true); }
+
+    /* '' nothing typed · 'bad' the wrong shape or a failed check · 'wait' the check is still running · 'ok' */
+    var sums = {};
+    function rcpState() {
+      var c = chainById(S.to.chain);
+      if (!toOnly(c)) { return 'ok'; }
+      if (!S.rcp) { return ''; }
+      if (!fits(SHAPES, c.kind, S.rcp)) { return 'bad'; }
+      if (!needsSum(c.kind, S.rcp)) { return 'ok'; }
+      var a = S.rcp;
+      if (own(sums, a)) { return sums[a] === false ? 'bad' : 'ok'; }   /* null: no hashing here, the shape must do */
+      checkSum(a).then(function (v) {
+        if (own(sums, a)) { return; }
+        sums[a] = v;
+        if (a === S.rcp) { paint(); ask(); }
+      });
+      return 'wait';
+    }
+    function rcpOk() { return rcpState() === 'ok'; }
+
     function needsAck() {
       var unv = (S.from.token && S.from.token.verified === false) || (S.to.token && S.to.token.verified === false);
-      return !!S.q && (unv || (S.impact !== null && S.impact >= IMPACT_ACK));
+      /* S.impact is null when the service gave no worth for one side or the other. That is not a quiet yes: with no
+         way to tell a fair price from a terrible one, the reader is asked to look and confirm. */
+      return !!S.q && (unv || toOnly(chainById(S.to.chain)) || S.impact === null || S.impact >= IMPACT_ACK);
     }
 
     /* ---- what the main button says and does */
@@ -438,13 +607,21 @@
       el.balance.textContent = S.bal === null || !S.from.token ? '' : formatUnits(S.bal, S.from.token.decimals, 6) + ' ' + S.from.token.symbol;
       el.tokenwarn.textContent = unv ? t('unverified') : (S.q && S.impact !== null && S.impact >= IMPACT_WARN ? t('impactHigh') : '');
       el.ackbox.hidden = !needsAck();
+      var tc = chainById(S.to.chain), onlyTo = toOnly(tc), rcpSt = rcpState();
+      el['rcp-box'].hidden = !onlyTo;
+      el['rcp-c'].textContent = onlyTo ? tc.name : '';
+      /* the wallet shows an EVM transaction, never the far address, so the reader reads it back here instead */
+      el['ack-a'].textContent = onlyTo && rcpSt === 'ok' ? S.rcp : '';
 
       if (S.busy) { label = S.busy; need = 'busy'; }
       else if (!W.p) { label = t('connect'); dis = false; need = 'nowallet'; }
       else if (!W.account) { label = t('connect'); dis = false; need = 'connect'; }
       else if (fromChain && Number(W.chainId) !== Number(fromChain.id)) { label = t('switchChain'); extra = fromChain.name; dis = false; need = 'chain'; }
       else if (!S.amount) { label = t('amount'); need = 'amount'; }
-      else if (S.q && needsAck() && !S.ack) { label = t('ackNeeded'); need = 'ack'; }
+      else if (onlyTo && rcpSt === '') { label = t('rcpNeeded'); need = 'recipient'; }
+      else if (onlyTo && rcpSt === 'bad') { label = t('rcpBad'); need = 'badRecipient'; }
+      else if (onlyTo && rcpSt === 'wait') { label = t('rcpChecking'); need = 'checking'; }
+      else if (S.q && needsAck() && !S.ack) { label = t(onlyTo ? 'confirmAddr' : 'ackNeeded'); need = 'ack'; }
       else if (S.q && S.need === 'approve') { label = t('approve'); extra = S.from.token ? S.from.token.symbol : ''; dis = false; need = 'approve'; }
       else if (S.q) { label = t('swap'); dis = false; need = 'swap'; }
       else { label = t('amount'); need = 'none'; }
@@ -497,15 +674,19 @@
     function ask(keepNote) {
       reset(keepNote === true);
       var ft = S.from.token, tt = S.to.token;
-      if (!ft || !tt || !isAddr(ft.address) || !isAddr(tt.address)) { paint(); return; }
+      if (!ft || !tt || !isAddr(ft.address) || !tt.address) { paint(); return; }
+      if (toOnly(chainById(S.from.chain))) { paint(); return; }
       if (Number(S.from.chain) === Number(S.to.chain) && sameAddr(ft.address, tt.address)) { S.err = t('same'); paint(); return; }
       var p = parseUnits(S.amount, ft.decimals);
       if (!p || p.v <= 0n) { S.err = S.amount ? t('needAmount') : ''; paint(); return; }
       var fc = chainById(S.from.chain);
       if (!W.account || !fc) { paint(); return; }
+      var tc = chainById(S.to.chain);
+      if (toOnly(tc) && !rcpOk()) { paint(); return; }               /* no price is asked for until the address is sound */
       var req = { fromChain: S.from.chain, toChain: S.to.chain, fromToken: ft.address, toToken: tt.address,
                   fromAmount: p.v.toString(), account: W.account, slippage: S.slip, contract: fc.contract,
                   fromDecimals: ft.decimals, toDecimals: tt.decimals };
+      if (toOnly(tc)) { req.recipient = S.rcp; req.exactTo = true; }
       var seq = S.seq;
       S.busy = t('quoting'); paint();
       quote(req, cfg).then(function (q) {
@@ -709,8 +890,10 @@
       var q = String(query || '').trim().toLowerCase(), side = S[p.side], n = 0, i;
       el['dlg-list'].textContent = ''; el['dlg-find'].hidden = true;
       if (p.kind === 'chain') {
-        for (i = 0; i < data.chains.length; i++) {
-          var c = data.chains[i];
+        /* a swap can only ever start on an EVM network: the source side and the gift panel never list the others */
+        var offer = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return !toOnly(c); });
+        for (i = 0; i < offer.length; i++) {
+          var c = offer[i];
           if (q && c.name.toLowerCase().indexOf(q) < 0 && String(c.coin).toLowerCase().indexOf(q) < 0) { continue; }
           row(c.ic, c.name, c.name, c.coin, (function (id) { return function () { setChain(p.side, id); }; })(c.id), Number(c.id) === Number(side.chain));
           n++;
@@ -721,11 +904,11 @@
           var tk = list[i];
           if (q && String(tk.symbol).toLowerCase().indexOf(q) < 0 && String(tk.name).toLowerCase().indexOf(q) < 0 && tk.address.toLowerCase() !== q) { continue; }
           row(tk.ic, tk.symbol, tk.symbol, tk.name, (function (x) { return function () { setToken(p.side, x); }; })(tk),
-              !!side.token && sameAddr(side.token.address, tk.address));
+              !!side.token && (isAddr(tk.address) ? sameAddr(side.token.address, tk.address) : side.token.address === tk.address));
           n++;
         }
         /* anything beyond the short list: a symbol such as CAKE, or a contract address, looked up live on LI.FI */
-        var raw = String(query || '').trim();
+        var raw = toOnly(chainById(side.chain)) ? '' : String(query || '').trim();
         if (raw && (isAddr(raw) || /^[A-Za-z0-9][A-Za-z0-9.$_₮-]{0,19}$/.test(raw)) && !(n === 1 && !isAddr(raw) && list.some(function (x) { return String(x.symbol).toLowerCase() === q; }))) {
           el['dlg-find'].hidden = false;
         }
@@ -742,6 +925,7 @@
       }
       if (both) { S.to = { chain: id, token: null, second: true }; pickDefault(S.to); }
       if (sideName === 'from') { S.bal = null; }
+      if (sideName === 'to') { S.rcp = ''; el.rcp.value = ''; }      /* an address belongs to one network, never the next */
       closePick(); labels(); paint(); ask();
     }
     function setToken(sideName, tk) {
@@ -892,6 +1076,11 @@
       G.busy = t('giving'); giftPaint(); gl['dn-status'].textContent = '';
       sameWallet({ fromChain: c.id, account: W.account }).then(function (moved) {
         if (moved) { throw { soft: t(moved) }; }
+        if (sameAddr(tk.address, ZERO)) { return null; }
+        return within(W.decimals(tk.address), WAIT, null);
+      }).then(function (dec) {
+        /* the token disagreeing with our list about its own places would make the amount wrong by powers of ten */
+        if (dec !== null && Number(dec) !== Number(tk.decimals)) { throw { soft: t('mismatch') + ' [decimals]' }; }
         return W.send(tx);
       }).then(function (h) {
         giftLine(t('view'), h); G.busy = t('watching'); giftPaint();
@@ -987,8 +1176,18 @@
     });
     el.flip.addEventListener('click', function () {
       var f = S.from, tt = S.to;
+      if (toOnly(chainById(tt.chain))) { return; }        /* nothing can start on Bitcoin, Tron, Solana, Sui or Stellar */
       S.from = { chain: tt.chain, token: tt.token }; S.to = { chain: f.chain, token: f.token, second: true };
       S.bal = null; labels(); paint(); ask();
+    });
+
+    el.rcp.addEventListener('input', function () {
+      /* a pasted address drags spaces and invisible direction marks along; no address of any of these networks is
+         anywhere near this long, and a very long one would only be something to make the shape test work hard */
+      S.rcp = this.value.replace(/[\s\u200b-\u200f\u202a-\u202e]/g, '').slice(0, 120);
+      if (S.rcp !== this.value) { this.value = S.rcp; }
+      S.ack = false; el.ack.checked = false;
+      reset(); paint(); askLater();
     });
     el.slip.addEventListener('click', function (ev) {
       var b = ev && ev.target && ev.target.closest ? ev.target.closest('[data-slip]') : null;
@@ -1049,6 +1248,9 @@
   api_.config = config;
   api_.frameCheck = frameCheck;
   api_.setLang = function (l) { lang = own(T, l) ? l : 'fa'; };
+  api_.fits = fits;
+  api_.checkSum = checkSum;
+  api_.needsSum = needsSum;
   api_.tune = function (o) { if (o && o.wait !== undefined) { WAIT = o.wait; } if (o && o.life !== undefined) { QUOTE_LIFE = o.life; } };   /* tests only */
   if (root && root.document) { start(root); }
 })(typeof window !== 'undefined' ? window : null);
