@@ -438,7 +438,7 @@
       if (need === 'nowallet') { S.err = t('noWallet'); paint(); return; }
       if (need === 'connect') {
         S.busy = t('connecting'); paint();
-        W.connect().then(function () { S.busy = ''; paint(); ask(); }, function (e) { S.busy = ''; S.err = code(e); paint(); });
+        W.connect().then(function () { S.busy = ''; follow(); paint(); ask(); }, function (e) { S.busy = ''; S.err = code(e); paint(); });
         return;
       }
       if (need === 'chain') {
@@ -525,8 +525,18 @@
       W.req('eth_accounts').then(function (acc) {
         if (!acc || !acc.length || !isAddr(acc[0]) || W.account) { return; }
         W.account = acc[0];
-        return W.req('eth_chainId').then(function (id) { W.chainId = parseInt(id, 16) || 0; paint(); ask(); });
+        return W.req('eth_chainId').then(function (id) { W.chainId = parseInt(id, 16) || 0; follow(); paint(); ask(); });
       }).catch(function () { });
+    }
+
+    /* Start on the network the wallet is already on, when this page offers it: then nothing has to be switched at all.
+       Some wallets never answer a switch request from a page, which used to leave the reader stuck on one button. */
+    function follow() {
+      if (!W.chainId || !chainById(W.chainId) || Number(W.chainId) === Number(S.from.chain)) { return; }
+      var both = Number(S.to.chain) === Number(S.from.chain);
+      S.from = { chain: W.chainId, token: null };
+      if (both) { S.to = { chain: W.chainId, token: null, second: true }; }
+      fillChains(el.fc, S.from.chain); fillChains(el.tc, S.to.chain); fillTokens();
     }
 
     el.fc.addEventListener('change', function () { S.from.chain = Number(this.value); S.from.token = null; fillSide(el.ft, S.from); paint(); askLater(); });
@@ -586,7 +596,7 @@
 
     if (W.p && W.p.on) {
       W.p.on('accountsChanged', function (acc) { W.account = acc && acc.length && isAddr(acc[0]) ? acc[0] : ''; S.q = null; S.bal = null; paint(); ask(); });
-      W.p.on('chainChanged', function (id) { W.chainId = parseInt(id, 16) || 0; S.q = null; paint(); });
+      W.p.on('chainChanged', function (id) { W.chainId = parseInt(id, 16) || 0; S.q = null; follow(); paint(); ask(); });
     }
     return 'on';
   }

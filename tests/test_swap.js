@@ -8,6 +8,7 @@ const fs = require('fs'), path = require('path');
 let fails = 0;
 const ok = (c, m) => { console.log((c ? '  ok  ' : 'FAIL  ') + m); if (!c) fails++; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const freshWallet = () => { S.W.p = null; S.W.account = ''; S.W.chainId = 0; };   // the module keeps one wallet object
 
 const ME = '0x1111111111111111111111111111111111111111';
 const USDT = '0x55d398326f99059fF775485246999027B3197955';
@@ -123,8 +124,10 @@ const IDS = ['sw-app', 'sw-from-chain', 'sw-to-chain', 'sw-from-token', 'sw-to-t
   'sw-receive', 'sw-min', 'sw-route', 'sw-gas', 'sw-fee', 'sw-time', 'sw-tokenwarn', 'sw-account'];
 
 const DATA = {
-  chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND }],
-  tokens: { '56': [{ symbol: 'BNB', name: 'BNB', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 18 }] }
+  chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND },
+            { id: 1, name: 'Ethereum', coin: 'ETH', explorer: 'https://etherscan.io/', rpc: 'https://ethereum-rpc.publicnode.com', contract: DIAMOND }],
+  tokens: { '56': [{ symbol: 'BNB', name: 'BNB', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 18 }],
+            '1': [{ symbol: 'ETH', name: 'Ether', address: BNB, decimals: 18 }, { symbol: 'USDT', name: 'USDT', address: USDT, decimals: 6 }] }
 };
 
 function makeWindow(cfg, opts) {
@@ -137,7 +140,7 @@ function makeWindow(cfg, opts) {
     request({ method, params }) {
       if (method === 'eth_requestAccounts') { asked.push('prompt'); return Promise.resolve([ME]); }
       if (method === 'eth_accounts') { return opts.allowed ? Promise.resolve([ME]) : Promise.resolve([]); }
-      if (method === 'eth_chainId') { return Promise.resolve('0x38'); }
+      if (method === 'eth_chainId') { return Promise.resolve(opts.chainId || '0x38'); }
       if (method === 'eth_getBalance') { return Promise.resolve('0x3635c9adc5dea00000'); }   // 1000 coins
       if (method === 'eth_call') {
         const d = params[0].data;
@@ -173,7 +176,7 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
 
   t = makeWindow(CFG);
   ok(S.start(t.win) === 'on', 'good settings: the tool starts');
-  ok(t.store['sw-from-chain'].kids.length === 1 && t.store['sw-from-token'].kids.length === 3, 'the chain and token lists are built (tokens + "another address")');
+  ok(t.store['sw-from-chain'].kids.length === 2 && t.store['sw-from-token'].kids.length === 3, 'the chain and token lists are built (tokens + "another address")');
   ok(t.store['sw-from-token'].value !== t.store['sw-to-token'].value, 'the two sides do not open on the same token');
   ok(t.store['sw-from-token'].kids.every(o => o._text.indexOf('<') < 0), 'token names are written as text, never as markup');
 
@@ -227,6 +230,7 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
     q2.action.toToken = { address: BNB, decimals: 18, symbol: 'BNB' };
     q2.transactionRequest.value = '0x0';
   });
+  freshWallet();
   const t3 = makeWindow(CFG, { allowance: '0x0' });
   S.start(t3.win);
   t3.store['sw-from-token'].value = USDT; t3.store['sw-from-token'].fire('change');
@@ -243,14 +247,31 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.005, slippage: 0.005
 
   /* ---- a wallet that allowed the site earlier: picked up with no pop-up and no button press */
   serve = () => goodQuote();
+  freshWallet();
   const tq = makeWindow(CFG, { allowed: true });
   S.start(tq.win);
   await sleep(80);
   ok(tq.store['sw-account'].textContent.indexOf('0x1111') === 0, 'an already-allowed wallet appears on its own');
   ok(tq.asked.length === 0, '\u2026and is never asked to approve again (this is what hung in SafePal)');
 
+  /* ---- a wallet sitting on another of the offered networks: the page moves to it, nothing has to be switched */
+  freshWallet();
+  const tf = makeWindow(CFG, { allowed: true, chainId: '0x1' });   // Ethereum, also in this page's list
+  S.start(tf.win);
+  await sleep(80);
+  ok(tf.store['sw-from-chain'].value === '1', 'the page starts on the network the wallet is already on');
+  ok(tf.store['sw-action'].getAttribute('data-need') !== 'chain', '\u2026so the reader is never asked to switch network');
+
+  /* a wallet on a network this page does not offer: the reader is asked to switch, as before */
+  freshWallet();
+  const tn = makeWindow(CFG, { allowed: true, chainId: '0x2329' });
+  S.start(tn.win);
+  await sleep(80);
+  ok(tn.store['sw-action'].getAttribute('data-need') === 'chain', 'a network this page does not offer still asks for a switch');
+
   /* ---- the service is unreachable */
   global.fetch = () => Promise.reject(new Error('network down'));
+  freshWallet();
   const t4 = makeWindow(CFG);
   S.start(t4.win);
   t4.store['sw-action'].fire('click'); await sleep(30);
