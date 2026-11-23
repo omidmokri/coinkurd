@@ -1,22 +1,22 @@
 {
  "model": "gemini-3.5-flash",
- "latency_s": 0.74,
- "checked_at": "2026-11-23T02:37:11.450588+00:00",
+ "latency_s": 0.54,
+ "checked_at": "2026-11-23T03:05:37.597516+00:00",
  "all": [
   [
-   0.74,
+   0.54,
    "gemini-3.5-flash"
   ],
   [
-   0.79,
-   "gemini-3.6-flash"
+   1.6,
+   "gemini-3.5-flash-lite"
   ]
  ],
  "fallbacks": [
-  "gemini-3.6-flash",
+  "gemini-3.5-flash-lite",
   "gemini-3.8-flash",
   "gemini-3.7-flash",
-  "gemini-3.5-flash-lite",
+  "gemini-3.6-flash",
   "gemini-3.1-flash-lite",
   "gemini-flash-latest",
   "gemini-flash-lite-latest"
