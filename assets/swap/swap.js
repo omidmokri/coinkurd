@@ -59,7 +59,9 @@
       bridgeNote: 'این تبدیل از این پل می‌گذرد. پل قراردادی جدا از دو شبکه است و خطر خودش را دارد؛ رسیدن پول هم چند دقیقه طول می‌کشد.',
       histSent: 'فرستاده شد', histDone: 'انجام شد', histFailed: 'ناموفق', repBusy: 'در حال خواندن…', repNone: 'این ماه هنوز تبدیلی ثبت نشده است. با انجام اولین تبدیل، آمار این ماه همین‌جا نشان داده می‌شود.',
       mine: 'انتخاب شما', timeFast: 'کمتر از ۲ دقیقه', timeFew: 'چند دقیقه', timeAbout: 'حدود', timeMin: 'دقیقه',
-      trackTip: 'وضعیت را از تاریخچهٔ همین مرورگر هم می‌توانید ببینید.', histSaved: 'در تاریخچهٔ همین مرورگر ثبت شد.', trackGo: 'در راه', trackDone: 'رسید', trackFail: 'ناموفق',
+      trackTip: 'وضعیت را از تاریخچهٔ همین مرورگر هم می‌توانید ببینید.', copied: 'لینک کپی شد.', copyFail: 'کپی نشد؛ لینک را از روی صفحه بردارید.',
+      scoreT: 'امتیاز انتخاب', whaleT: 'جابه‌جایی نهنگ‌ها (۲۴ ساعت)', asOf: 'به‌روزرسانی',
+      lblvery_weak: 'خیلی ضعیف', lblweak: 'ضعیف', lblneutral: 'خنثی', lblpositive: 'مثبت', lblstrong: 'قوی', lblvery_strong: 'خیلی قوی', histSaved: 'در تاریخچهٔ همین مرورگر ثبت شد.', trackGo: 'در راه', trackDone: 'رسید', trackFail: 'ناموفق',
       advSteps: 'مراحل مسیر', advGas: 'برآورد گس (واحد)', advFees: 'ریز کارمزدها',
       repCount: 'تعداد تبدیل‌ها', repVolume: 'حجم تبدیل‌ها', repShare: 'سهم زاگرس (تقریبی)', repErr: 'گزارش اکنون در دسترس نیست.', nothing: 'چیزی پیدا نشد.',
       rcpChecking: 'در حال بررسی نشانی…',
@@ -92,7 +94,9 @@
       bridgeNote: 'ئەم گۆڕینەوەیە بەم پردەدا تێدەپەڕێت. پرد گرێبەستێکی جیایە و مەترسیی خۆی هەیە؛ گەیشتنی پارەکەش چەند خولەکێک دەخایەنێت.',
       histSent: 'نێردرا', histDone: 'تەواو بوو', histFailed: 'سەرنەکەوت', repBusy: 'خوێندنەوە…', repNone: 'ئەم مانگە هێشتا هیچ گۆڕینەوەیەک تۆمار نەکراوە. لەگەڵ یەکەم گۆڕینەوە، ئاماری ئەم مانگە لێرە دەردەکەوێت.',
       mine: 'هەڵبژاردنی تۆ', timeFast: 'کەمتر لە ٢ خولەک', timeFew: 'چەند خولەکێک', timeAbout: 'نزیکەی', timeMin: 'خولەک',
-      trackTip: 'دۆخەکە لە مێژووی ئەم وێبگەڕەشدا دەبینیت.', histSaved: 'لە مێژووی ئەم وێبگەڕەدا تۆمار کرا.', trackGo: 'لە ڕێگادایە', trackDone: 'گەیشت', trackFail: 'سەرنەکەوت',
+      trackTip: 'دۆخەکە لە مێژووی ئەم وێبگەڕەشدا دەبینیت.', copied: 'بەستەر لەبەرگیرایەوە.', copyFail: 'لەبەرنەگیرایەوە؛ بەستەرەکە لە پەڕەکەوە ببە.',
+      scoreT: 'خاڵی ئینتیخاب', whaleT: 'جووڵەی نەهەنگەکان (٢٤ کاتژمێر)', asOf: 'نوێکردنەوە',
+      lblvery_weak: 'زۆر لاواز', lblweak: 'لاواز', lblneutral: 'بێلایەن', lblpositive: 'ئەرێنی', lblstrong: 'بەهێز', lblvery_strong: 'زۆر بەهێز', histSaved: 'لە مێژووی ئەم وێبگەڕەدا تۆمار کرا.', trackGo: 'لە ڕێگادایە', trackDone: 'گەیشت', trackFail: 'سەرنەکەوت',
       advSteps: 'هەنگاوەکانی ڕێگا', advGas: 'خەمڵاندنی گاز (یەکە)', advFees: 'وردەکاریی کرێکان',
       repCount: 'ژمارەی گۆڕینەوەکان', repVolume: 'قەبارەی گۆڕینەوەکان', repShare: 'بەشی زاگرۆس (نزیکەیی)', repErr: 'ڕاپۆرت ئێستا بەردەست نییە.', nothing: 'هیچ نەدۆزرایەوە.',
       rcpChecking: 'ناونیشان دەپشکنرێت…',
@@ -125,7 +129,9 @@
       bridgeNote: 'This swap crosses this bridge. A bridge is a contract apart from both networks and carries its own risk; the money also takes a few minutes to arrive.',
       histSent: 'sent', histDone: 'done', histFailed: 'failed', repBusy: 'Reading…', repNone: 'No swap has been recorded this month yet. With the first swap, this month\'s figures will show here.',
       mine: 'your choice', timeFast: 'under 2 minutes', timeFew: 'a few minutes', timeAbout: 'about', timeMin: 'min',
-      trackTip: 'You can also see the status in the history of this browser.', histSaved: 'Saved to the history of this browser.', trackGo: 'on its way', trackDone: 'arrived', trackFail: 'failed',
+      trackTip: 'You can also see the status in the history of this browser.', copied: 'Link copied.', copyFail: 'Could not copy; take the link from the page.',
+      scoreT: 'Entekhab score', whaleT: 'Whale moves (24h)', asOf: 'updated',
+      lblvery_weak: 'very weak', lblweak: 'weak', lblneutral: 'neutral', lblpositive: 'positive', lblstrong: 'strong', lblvery_strong: 'very strong', histSaved: 'Saved to the history of this browser.', trackGo: 'on its way', trackDone: 'arrived', trackFail: 'failed',
       advSteps: 'Route steps', advGas: 'Gas estimate (units)', advFees: 'Fees in detail',
       repCount: 'Swaps', repVolume: 'Volume', repShare: 'Zagros share (approx.)', repErr: 'The report is not available right now.', nothing: 'Nothing found.',
       rcpChecking: 'Checking the address…',
@@ -213,7 +219,7 @@
       denyBridges: alt && alt.cross ? alt.deny : undefined, denyExchanges: alt && !alt.cross ? alt.deny : undefined,
       fromChain: req.fromChain, toChain: req.toChain, fromToken: req.fromToken, toToken: req.toToken,
       fromAmount: req.fromAmount, fromAddress: req.account, toAddress: req.recipient || req.account,
-      slippage: req.slippage, integrator: cfg.integrator || undefined, fee: cfg.fee || undefined
+      slippage: req.slippage, integrator: cfg.integrator || undefined, fee: req.fee || cfg.fee || undefined
     });
   }
 
@@ -752,6 +758,21 @@
 
   /* ------------------------------------------------------------------ is this answer really our request?
    * Everything the wallet would be asked to sign is checked here. Anything off and the swap stops. */
+  /* What this page keeps of a swap is written in the quote, under the fee LI.FI collects for it. It is read back
+     here and held to the figure the reader was shown: a page that quietly took more than it said would be a worse
+     kind of wrong than any of the rest. */
+  function ourFee(q, who) {
+    var a = (q.estimate && q.estimate.feeCosts) || [], i, j, r, out = null;
+    for (i = 0; i < a.length; i++) {
+      r = plain(a[i]) && plain(a[i].feeSplit) && Array.isArray(a[i].feeSplit.recipients) ? a[i].feeSplit.recipients : null;
+      if (!r) { continue; }
+      for (j = 0; j < r.length; j++) {
+        if (plain(r[j]) && r[j].name === who && isUint(String(r[j].fee))) { out = (out || 0n) + BigInt(r[j].fee); }
+      }
+    }
+    return out;
+  }
+
   function checkQuote(q, req) {
     if (!plain(q) || !plain(q.action) || !plain(q.estimate) || !plain(q.transactionRequest)) { return 'shape'; }
     var a = q.action, e = q.estimate, x = q.transactionRequest;
@@ -765,6 +786,11 @@
     var same = req.exactTo ? function (x, y) { return typeof x === 'string' && x === y; } : sameAddr;
     if (!plain(a.toToken) || !same(a.toToken.address, req.toToken)) { return 'toToken'; }
     if (String(a.fromAmount) !== String(req.fromAmount)) { return 'fromAmount'; }
+    var mine = ourFee(q, req.integrator);                                   /* what this page keeps, never above what it showed */
+    if (mine !== null && req.fee) {
+      var top = (BigInt(req.fromAmount) * BigInt(Math.round(req.fee * 1e6)) * 102n) / 100000000n;
+      if (mine > top + 1n) { return 'ourFee'; }
+    }
     if (!fsame(a.fromAddress, req.account)) { return 'fromAddress'; }
     /* where the money comes out: what the reader typed, or their own wallet when both ends are the same kind of network */
     if (!same(a.toAddress, req.recipient || req.account)) { return 'toAddress'; }
@@ -978,8 +1004,8 @@
 
     /* parts a page may or may not carry: other routes, the bridge note, the reader's own history, the monthly report */
     var X = {};
-    ['routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-tip', 'mode', 'adv', 'mob'].forEach(function (k) { X[k] = $('sw-' + k); });
-    S.alts = []; S.altT = []; S.altState = ''; S.rep = ''; S.mode = 'simple';
+    ['routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-copy', 'track-tip', 'mode', 'adv', 'mob', 'coin', 'morebox', 'more', 'more-a', 'more-b'].forEach(function (k) { X[k] = $('sw-' + k); });
+    S.alts = []; S.altT = []; S.altState = ''; S.rep = ''; S.mode = 'simple'; S.more = false; S.coins = null; S.link = '';
 
     function chainById(id) {
       for (var i = 0; i < data.chains.length; i++) { if (Number(data.chains[i].id) === Number(id)) { return data.chains[i]; } }
@@ -1196,6 +1222,71 @@
       advanced(S.q);
     }
 
+    /* ---- what the site itself already knows about these two coins
+     * Two files of this very site, read once and only after a price is on screen: the coin's Entekhab score, and
+     * how much the large wallets moved in a day where that is measured. It is shown plainly, as a figure with the
+     * day it was worked out — never as advice to swap one coin or hold another. Nothing leaves the page for it. */
+    var SCORE = '/data/score.json', WHALE = '/data/whales.json';
+    function sym(tk) { return tk && typeof tk.symbol === 'string' ? tk.symbol.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12) : ''; }
+    function ourJson(path) {
+      return fetch(path, { credentials: 'omit', cache: 'no-store' }).then(function (r) {
+        if (!r.ok) { throw new Error('http'); }
+        return r.json();
+      });
+    }
+    function coinFacts() {
+      if (!X.coin || S.coins) { return; }
+      S.coins = 'busy';
+      Promise.all([ourJson(SCORE).catch(function () { return null; }), ourJson(WHALE).catch(function () { return null; })]).then(function (r) {
+        S.coins = { score: plain(r[0]) && plain(r[0].coins) ? r[0] : null, whale: plain(r[1]) && plain(r[1].totals24) ? r[1] : null };
+        paintCoin();
+      }, function () { S.coins = null; });
+    }
+    function day(iso) { var m = /^\d{4}-\d{2}-\d{2}/.exec(String(iso || '')); return m ? m[0] : ''; }
+    function coinRow(tk) {
+      var k = sym(tk), S2 = S.coins, out = null, sc, wh, row, b;
+      if (!k || !plain(S2)) { return null; }
+      sc = S2.score && plain(S2.score.coins[k]) ? S2.score.coins[k] : null;
+      wh = S2.whale && plain(S2.whale.totals24[k]) ? S2.whale.totals24[k] : null;
+      if (!sc && !wh) { return null; }
+      row = doc.createElement('div');
+      b = doc.createElement('b'); b.setAttribute('translate', 'no'); b.textContent = k; row.appendChild(b);
+      if (sc && isFinite(Number(sc.score))) {
+        var s1 = doc.createElement('span');
+        s1.textContent = t('scoreT') + ': ' + digits(String(Math.round(Number(sc.score)))) + '/' + digits('100') +
+          (typeof sc.label === 'string' && t('lbl' + sc.label) !== 'lbl' + sc.label ? ' · ' + t('lbl' + sc.label) : '');
+        row.appendChild(s1);
+      }
+      if (wh && isFinite(Number(wh.usd)) && Number(wh.usd) > 0) {
+        var s2 = doc.createElement('span');
+        s2.textContent = t('whaleT') + ': ' + usd(Number(wh.usd));
+        row.appendChild(s2);
+      }
+      var when = (sc && S2.score && S2.score.updated_at) || (wh && S2.whale && S2.whale.updated_at);
+      if (day(when)) { var i2 = doc.createElement('i'); i2.setAttribute('dir', 'ltr'); i2.textContent = t('asOf') + ' ' + day(when); row.appendChild(i2); }
+      out = row; return out;
+    }
+    function paintCoin() {
+      if (!X.coin) { return; }
+      X.coin.textContent = '';
+      if (!S.q || !plain(S.coins)) { X.coin.hidden = true; return; }
+      var rows = [coinRow(S.from.token), coinRow(S.to.token)], any = false, i;
+      for (i = 0; i < rows.length; i++) { if (rows[i] && (i === 0 || !rows[0] || rows[i].textContent !== rows[0].textContent)) { X.coin.appendChild(rows[i]); any = true; } }
+      X.coin.hidden = !any;
+    }
+
+    /* ---- the reader's own choice to give more than the fee asks */
+    function pct(v) { return digits((Math.round(Number(v) * 10000) / 100).toString()) + '%'; }
+    function moreFee() { return S.more && cfg.fee_zagros ? Number(cfg.fee_zagros) : Number(cfg.fee || 0); }
+    function paintMore() {
+      if (!X.morebox) { return; }
+      X.morebox.hidden = !(cfg.fee_zagros && cfg.fee_zagros > (cfg.fee || 0));
+      if (X.morebox.hidden) { return; }
+      if (X['more-a']) { X['more-a'].textContent = pct(cfg.fee); }
+      if (X['more-b']) { X['more-b'].textContent = pct(cfg.fee_zagros); }
+      if (X.more) { X.more.checked = !!S.more; }
+    }
+
     /* ---- the box that stays after signing: what was swapped, how it stands, and the links, until the reader closes it */
     function trackState(st) {
       if (!X['track-st']) { return; }
@@ -1354,7 +1445,7 @@
       S.alts = []; S.altT = []; S.altState = '';
       S.q = null; S.qreq = null; S.need = null; S.ack = false; el.ack.checked = false; S.err = ''; S.done = false;
       if (!keepNote) { S.note = ''; }
-      S.busy = ''; S.seq++; showQuote(null); paintRoutes();
+      S.busy = ''; S.seq++; showQuote(null); paintRoutes(); paintCoin();
     }
 
     /* ---- ask for a price; every answer is checked before it is shown */
@@ -1377,7 +1468,8 @@
       if (needRcp() && !rcpOk()) { paint(); return; }                /* no price is asked for until the address is sound */
       var req = { fromChain: S.from.chain, toChain: S.to.chain, fromToken: ft.address, toToken: tt.address,
                   fromAmount: p.v.toString(), account: src.account, slippage: S.slip, contract: fc.contract,
-                  fromDecimals: ft.decimals, toDecimals: tt.decimals, kind: fk, exactTo: kindOf(tc) !== 'evm' };
+                  fromDecimals: ft.decimals, toDecimals: tt.decimals, kind: fk, exactTo: kindOf(tc) !== 'evm',
+                  fee: moreFee(), integrator: cfg.integrator };
       if (needRcp()) { req.recipient = S.rcp; }
       var seq = S.seq;
       S.busy = t('quoting'); paint();
@@ -1387,6 +1479,7 @@
         if (bad) { S.busy = ''; S.err = t('mismatch') + ' [' + bad + ']'; paint(); return; }
         S.q = q; S.qreq = req; S.qt = Date.now(); S.busy = '';
         showQuote(q); paintRoutes(); paint();        /* the price is on screen before the wallet is asked anything */
+        coinFacts(); paintCoin();                    /* and only then is the site's own note about the coins read */
         return decideApproval(q, req).then(function () { if (seq === S.seq) { paint(); } });
       }, function (e) {
         if (seq !== S.seq) { return; }
@@ -1544,6 +1637,7 @@
       var tx = { from: req.account, to: x.to, data: x.data, value: x.value, chainId: qty(BigInt(req.fromChain)) };
       if (isQty(x.gasLimit) && BigInt(x.gasLimit) > 0n && BigInt(x.gasLimit) <= GAS_CAP) { tx.gas = x.gasLimit; }
       var cross = Number(req.fromChain) !== Number(req.toChain), hash = '';
+      S.link = '';                 /* the link of the swap being sent now replaces the one before it */
       S.busy = t('swapping'); paint(); el.status.textContent = ''; trackState('');
       sameWallet(req).then(function (moved) {
         if (moved) { throw { soft: t(moved) }; }
@@ -1567,6 +1661,7 @@
        transaction, and this page sends it to the network itself. Solana: the wallet signs and sends in one step. */
     function doSwapFar(q, req, x, seq) {
       var cross = Number(req.fromChain) !== Number(req.toChain), hash = '';
+      S.link = '';                 /* the link of the swap being sent now replaces the one before it */
       var fail = function (e) { if (seq !== S.seq) { return; } S.busy = ''; S.err = e && e.soft ? (e.soft === 'signature' ? t('mismatch') + ' [signature]' : e.soft) : code(e); paint(); };
       S.busy = t('swapping'); paint(); el.status.textContent = ''; trackState('');
       var sent = sameWallet(req).then(function (moved) {
@@ -1626,6 +1721,7 @@
       if (X.track) { X.track.hidden = false; }
       var c = chainId !== undefined ? chainById(chainId) : null;
       if (linkFor(c, hash)) {
+        if (!S.link) { S.link = linkFor(c, hash); }        /* the first link of a swap is the one worth passing on */
         var a = doc.createElement('a');
         a.setAttribute('href', linkFor(c, hash));
         a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
@@ -1950,6 +2046,16 @@
     if (X['routes-go']) { X['routes-go'].addEventListener('click', moreRoutes); }
     if (X['hist-clear']) { X['hist-clear'].addEventListener('click', function () { try { win.localStorage.removeItem(HKEY); } catch (e) { } histPaint(); }); }
     if (X.rep) { X.rep.addEventListener('toggle', function () { if (X.rep.open !== false) { report(); } }); }
+    if (X['track-copy']) {
+      X['track-copy'].addEventListener('click', function () {
+        var tip = X['track-tip'], said = function (k) { if (tip) { tip.textContent = t(k); setTimeout(function () { tip.textContent = ''; }, 4000); } };
+        if (!S.link) { said('copyFail'); return; }
+        var nav = win.navigator;
+        if (nav && nav.clipboard && nav.clipboard.writeText) { nav.clipboard.writeText(S.link).then(function () { said('copied'); }, function () { said('copyFail'); }); }
+        else { said('copyFail'); }
+      });
+    }
+    if (X.more) { X.more.addEventListener('change', function () { S.more = !!X.more.checked; paintMore(); ask(true); }); }
     if (X['track-close']) { X['track-close'].addEventListener('click', function () {
       if (X.track) { X.track.hidden = true; }
       var tip = X['track-tip'];
@@ -1959,7 +2065,7 @@
     }); }
     if (X.mode) { X.mode.addEventListener('click', function (ev) { var m = ev && ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-mode') : null; if (m) { setMode(m); } }); }
     if (X.track) { X.track.hidden = true; }
-    histPaint(); paintRoutes(); setMode('simple');
+    histPaint(); paintRoutes(); setMode('simple'); paintMore(); paintCoin();
     el['dlg-find'].addEventListener('click', findOnChain);
     el['dlg-q'].addEventListener('input', function () { fillPick(this.value); });
     el.dlg.addEventListener('click', function (ev) { if (ev && ev.target === el.dlg) { closePick(); } });
@@ -2041,11 +2147,13 @@
   /* the settings the page was built with, rebuilt field by field so nothing else can travel with them */
   function config(raw) {
     if (!plain(raw) || raw.enabled !== true) { return null; }
-    var out = { integrator: '', fee: 0, slippage: 0.005, donate: '' };
+    var out = { integrator: '', fee: 0, fee_zagros: 0, slippage: 0.005, donate: '' };
     if (typeof raw.integrator === 'string' && /^[A-Za-z0-9_.-]{1,40}$/.test(raw.integrator)) { out.integrator = raw.integrator; }
     if (typeof raw.fee === 'number' && isFinite(raw.fee) && raw.fee >= 0 && raw.fee <= MAX_FEE) { out.fee = raw.fee; }
     if (typeof raw.slippage === 'number' && isFinite(raw.slippage) && raw.slippage > 0 && raw.slippage <= MAX_SLIP) { out.slippage = raw.slippage; }
     if (isAddr(raw.donate)) { out.donate = raw.donate; }
+    /* the larger fee the reader may choose: it has to be larger than the fee, or there is nothing to choose */
+    if (typeof raw.fee_zagros === 'number' && isFinite(raw.fee_zagros) && raw.fee_zagros > out.fee && raw.fee_zagros <= MAX_FEE) { out.fee_zagros = raw.fee_zagros; }
     if (out.fee > 0 && !out.integrator) { return null; }      /* a fee with nobody registered to receive it */
     return out;
   }

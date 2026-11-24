@@ -228,3 +228,16 @@ output.sw-num:empty::before{content:"0.0";color:#565a64}
 .sw-mob-win{display:none}
 .sw-mob[data-app="win"] .sw-mob-win{display:block}
 .sw-mob[data-app="win"] .sw-mob-b,.sw-mob[data-app="win"] p:not(.sw-mob-win){display:none}
+
+/* what the site itself knows about the two coins, and the reader's own choice to give more */
+.sw-coin{margin:8px 0 0;padding:9px 12px;border:1px solid var(--s-line);border-radius:12px;font-size:.78rem;line-height:1.9;color:var(--s-mute)}
+.sw-coin[hidden]{display:none}
+.sw-coin div{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.sw-coin b{color:var(--s-ink);font-weight:600}
+.sw-coin i{font-style:normal;color:var(--s-mute);font-size:.74rem}
+.sw-coin a{color:var(--s-mute);text-decoration:underline}
+.sw-coin a:hover{color:var(--s-ink)}
+.sw-more-z{display:flex;gap:9px;align-items:flex-start;margin:8px 0 0;padding:9px 12px;border:1px solid rgba(90,170,110,.35);border-radius:12px;background:rgba(90,170,110,.07);font-size:.78rem;line-height:1.85;color:var(--s-mute);cursor:pointer}
+.sw-more-z[hidden]{display:none}
+.sw-more-z input{margin-top:5px;accent-color:var(--s-g,#5aaa6e);flex:none}
+.sw-more-z b{display:block;color:var(--s-ink);font-size:.82rem}

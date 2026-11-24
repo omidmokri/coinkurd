@@ -60,7 +60,7 @@ SERVICE = "https://li.quest"
 MAX_FEE = 0.03
 MAX_SLIP = 0.05
 ZERO = "0x" + "0" * 40
-KEYS = {"enabled", "integrator", "fee", "slippage", "donate"}
+KEYS = {"enabled", "integrator", "fee", "fee_zagros", "slippage", "donate"}
 INTEGRATOR = re.compile(r"^[A-Za-z0-9_.-]{1,40}$")
 EVM = re.compile(r"^0x[0-9a-fA-F]{40}$")
 # Where a swap ends on a network that is not EVM, the reader types the address themselves and the money leaves our
@@ -201,8 +201,8 @@ def check(raw):
     integrator = raw.get("integrator", "")
     if not isinstance(integrator, str) or (integrator and not INTEGRATOR.match(integrator)):
         raise ConfigError("integrator is not a LI.FI integrator name")
-    fee, slip = raw.get("fee", 0), raw.get("slippage", 0.005)
-    for name, v, lo, hi in (("fee", fee, 0, MAX_FEE), ("slippage", slip, 0, MAX_SLIP)):
+    fee, slip, more = raw.get("fee", 0), raw.get("slippage", 0.005), raw.get("fee_zagros", 0)
+    for name, v, lo, hi in (("fee", fee, 0, MAX_FEE), ("slippage", slip, 0, MAX_SLIP), ("fee_zagros", more, 0, MAX_FEE)):
         if isinstance(v, bool) or not isinstance(v, (int, float)) or not lo <= v <= hi:
             raise ConfigError(f"{name} must be between {lo} and {hi} (a fraction: 0.005 is 0.5%)")
     if slip <= 0:
@@ -211,7 +211,13 @@ def check(raw):
         return {"enabled": False}
     if fee > 0 and not integrator:
         raise ConfigError("a fee needs the integrator name registered with LI.FI; without it the fee is paid to nobody")
+    # The reader may give more than the fee asks, and the whole of the difference goes the same way as the fee.
+    # It is theirs to turn on, never on by itself, and it is refused unless it really is more than the fee.
+    if more and not (more > fee and integrator):
+        raise ConfigError("fee_zagros must be larger than fee, and needs the integrator name")
     out = {"enabled": True, "integrator": integrator, "fee": float(fee), "slippage": float(slip)}
+    if more:
+        out["fee_zagros"] = float(more)
     donate = raw.get("donate", "")
     if donate:
         if not isinstance(donate, str) or not EVM.match(donate) or donate != eip55(donate):
@@ -462,6 +468,9 @@ def controls():
 <div id="sw-bridge" class="sw-warnline" role="status"></div>
 <div class="sw-slip"><span class="sw-lab">{tri("نمایش", "پیشاندان", "View")}</span><span id="sw-mode" class="sw-chips"><button type="button" data-mode="simple" aria-pressed="true">{tri("ساده", "سادە", "Simple")}</button><button type="button" data-mode="adv" aria-pressed="false">{tri("پیشرفته", "پێشکەوتوو", "Advanced")}</button></span></div>
 <div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
+<div id="sw-coin" class="sw-coin" hidden></div>
+<label id="sw-morebox" class="sw-more-z" hidden><input type="checkbox" id="sw-more"><span><b>{tri("بیشتر برای زاگرس", "زیاتر بۆ زاگرۆس", "More for the Zagros")}</b>
+<span>{tri("کارمزد این تبدیل از <bdi id='sw-more-a' translate='no'></bdi> به <bdi id='sw-more-b' translate='no'></bdi> می‌رود. تفاوتش هم، مثل خود کارمزد، صرف کاشت نهال می‌شود.", "کرێی ئەم گۆڕینەوەیە لە <bdi id='sw-more-a' translate='no'></bdi> بۆ <bdi id='sw-more-b' translate='no'></bdi> دەچێت. جیاوازییەکەشی، وەک خودی کرێیەکە، بۆ چاندنی نەمام خەرج دەکرێت.", "The fee on this swap goes from <bdi id='sw-more-a' translate='no'></bdi> to <bdi id='sw-more-b' translate='no'></bdi>. The difference, like the fee itself, is spent on planting saplings.")}</span></span></label>
 <div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
 <label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span><span>{tri(
     "خطر این تبدیل را می‌دانم و می‌خواهم ادامه دهم.", "مەترسیی ئەم گۆڕینەوەیە دەزانم و دەمەوێت بەردەوام بم.",
@@ -473,7 +482,7 @@ def controls():
 <p class="sw-mob-win">{tri("در اپ ویندوزِ انتخاب، تبدیل انجام نمی‌شود، چون افزونهٔ کیف پول در آن نصب نیست. از منوی آیکون برنامه در نوار وظیفه «باز کردن این صفحه در مرورگر» را بزنید، یا همین نشانی را در مرورگرِ خودتان باز کنید:", "لە ئەپی ویندۆزی ئینتیخابدا گۆڕینەوە ناکرێت، چونکە پێوەکراوی جزدان لەوێدا نییە. لە مێنیوی ئایکۆنی بەرنامەکە «کردنەوەی ئەم پەڕەیە لە وێبگەڕدا» هەڵبژێرە، یان ئەم ناونیشانە لە وێبگەڕەکەی خۆتدا بکەرەوە:", "Swaps cannot run inside the Entekhab app for Windows: it carries no wallet extension. Use ‘Open this page in my browser’ from the app's tray menu, or open this address in your own browser:")} <bdi translate="no">entekhab.net/swap</bdi></p>
 <div class="sw-mob-b"><a href="https://link.metamask.io/dapp/entekhab.net/swap/" rel="noopener noreferrer" translate="no">MetaMask</a><a href="https://link.trustwallet.com/open_url?coin_id=60&amp;url=https%3A%2F%2Fentekhab.net%2Fswap%2F" rel="noopener noreferrer" translate="no">Trust Wallet</a></div>
 <p>{tri("در کیف پول‌های دیگر (سیف‌پل، توکن‌پاکت…) بخش مرورگر را باز کنید و همین نشانی را وارد کنید:", "لە جزدانەکانی تر (سەیفپاڵ، تۆکن‌پاکێت…) بەشی وێبگەڕ بکەرەوە و ئەم ناونیشانە بنووسە:", "In other wallets (SafePal, TokenPocket…) open the browser tab and enter this address:")} <bdi translate="no">entekhab.net/swap</bdi></p></div>
-<div id="sw-track" class="sw-track" hidden><div class="sw-track-h"><b>{tri("وضعیت تبدیل", "دۆخی گۆڕینەوە", "Swap status")}</b><span id="sw-track-st" class="sw-track-st" role="status" aria-live="polite"></span><button type="button" id="sw-track-close" class="sw-link">{tri("بستن", "داخستن", "Close")}</button></div>
+<div id="sw-track" class="sw-track" hidden><div class="sw-track-h"><b>{tri("وضعیت تبدیل", "دۆخی گۆڕینەوە", "Swap status")}</b><span id="sw-track-st" class="sw-track-st" role="status" aria-live="polite"></span><button type="button" id="sw-track-copy" class="sw-link">{tri("کپی لینک", "لەبەرگرتنەوەی بەستەر", "Copy link")}</button><button type="button" id="sw-track-close" class="sw-link">{tri("بستن", "داخستن", "Close")}</button></div>
 <div id="sw-track-sum" class="sw-track-sum" dir="ltr" translate="no"></div>
 <div id="sw-status" class="sw-status"></div></div>
 <div id="sw-track-tip" class="sw-tip" role="status" aria-live="polite"></div>
@@ -545,7 +554,7 @@ def donate_block(cfg, watch):
 def page(cfg, data):
     import chrome                       # here, not at the top: scripts/chrome.py imports this module for its menu
     on = bool(cfg.get("enabled"))
-    public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage", "donate") if k in cfg}
+    public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "fee_zagros", "slippage", "donate") if k in cfg}
     cdata = html.escape(json.dumps(public, ensure_ascii=True, separators=(",", ":"), sort_keys=True), quote=True)
     rich = with_icons(data)
     rich["addr"] = {k: ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("kind")})}

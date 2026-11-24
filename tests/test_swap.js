@@ -203,7 +203,7 @@ const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 't
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
   'dlg-find', 'dlg-close', 'rcp', 'rcp-box', 'rcp-c', 'ack-a', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
   'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1',
-  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-tip', 'mode', 'adv', 'mob'].map(x => 'sw-' + x);
+  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-tip', 'mode', 'adv', 'mob', 'track-copy', 'coin', 'morebox', 'more', 'more-a', 'more-b'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
@@ -263,11 +263,12 @@ function makeWindow(cfg, opts) {
 const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005, donate: GIFT };
 
 (async function () {
-  let urls = [], serve = () => goodQuote(), token = null, status = null, ledger = null;
+  let urls = [], serve = () => goodQuote(), token = null, status = null, ledger = null, site = {};
   let tronNode = () => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve('{}') });
   const realFetch = (u, o) => {
     urls.push(u);
     if (u.indexOf('https://api.trongrid.io/') === 0) { return tronNode(u.slice('https://api.trongrid.io'.length), JSON.parse(o.body)); }
+    if (u.indexOf('/data/') === 0) { return Promise.resolve({ ok: !!site[u], status: site[u] ? 200 : 404, json: () => Promise.resolve(site[u]) }); }
     const body = u.indexOf('/v1/quote') > 0 ? serve(u) : u.indexOf('/v1/token') > 0 ? token : u.indexOf('/v1/status') > 0 ? status : u.indexOf('/v1/analytics/transfers') > 0 ? ledger : null;
     return Promise.resolve({ ok: !!body, status: body ? 200 : 404, text: () => Promise.resolve(JSON.stringify(body || { message: 'not found' })) });
   };
@@ -297,8 +298,9 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   const q = urls.find(u => u.indexOf('/v1/quote') > 0);
   ok(!!q, 'a price was asked for');
   const WATCH_RPC = DATA.watch.map(w => w.rpc);
-  ok(urls.every(u => u.indexOf('https://li.quest/') === 0 || u.indexOf('https://api.trongrid.io/wallet/') === 0 || WATCH_RPC.indexOf(u) >= 0),
-     'every request went to li.quest or to one of the nodes the page was built with, and nowhere else');
+  ok(urls.every(u => u.indexOf('https://li.quest/') === 0 || u.indexOf('https://api.trongrid.io/wallet/') === 0 || u.indexOf('/data/') === 0 || WATCH_RPC.indexOf(u) >= 0),
+     "every request went to li.quest, to one of the nodes the page was built with, or to this site's own files, and nowhere else");
+  ok(urls.every(u => u.indexOf('/data/') !== 0 || u === '/data/score.json' || u === '/data/whales.json'), "and of this site, only those two files are read");
   ok(q.indexOf('integrator=entekhab') > 0 && q.indexOf('fee=0.003') > 0, "the site's integrator name and fee travel with the request");
   ok(q.indexOf('fromAddress=' + ME) > 0 && q.indexOf('toAddress=' + ME) > 0, 'the proceeds are asked to be sent to the reader, nobody else');
   ok(t.$('receive').textContent.indexOf('550') === 0, 'what the reader would receive is shown');
@@ -954,6 +956,12 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(rtW.$('track').hidden === false && rtW.$('track-sum').textContent.indexOf('1 BNB → 549 USDT') === 0 && rtW.$('track-st').attrs['data-st'] === 'done',
      'after signing a box stays with what was swapped and how it stands (' + rtW.$('track-sum').textContent + ' / ' + rtW.$('track-st').textContent + ')');
   ok(rtW.$('status').kids.some(k => k.attrs['data-ok'] === '1' && k.textContent.indexOf('تاریخچه') > 0), 'a line says the swap was saved to the local history');
+  const clip = [];
+  rtW.win.navigator = { clipboard: { writeText: (x) => { clip.push(x); return Promise.resolve(); } } };
+  rtW.$('track-copy').fire('click'); await sleep(40);
+  ok(rtW.$('track-tip').textContent.length > 0, 'the page says the link was copied');
+  rtW.$('track-tip').textContent = '';
+  ok(clip.length === 1 && clip[0].indexOf('https://bscscan.com/tx/0x') === 0, "the link the reader copies is the explorer's own, and nothing of theirs goes with it (" + clip[0] + ')');
   rtW.$('track-close').fire('click');
   ok(rtW.$('track').hidden === true, 'the reader can close the box');
   ok(rtW.$('track-tip').textContent.indexOf('تاریخچه') > 0, 'and is reminded, briefly, that the history holds it too');
@@ -1001,6 +1009,40 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   S.start(bare.win); await sleep(60);
   ok(bare.$('mob').getAttribute('data-app') === 'win', "inside the site's own Windows app the help speaks of a desktop browser, not a phone wallet");
 
+  /* ================================================================ what the site knows, and a larger fee by choice */
+  const CFGZ = Object.assign({}, CFG, { fee_zagros: 0.005 });
+  site['/data/score.json'] = { updated_at: '2026-11-24T11:41:53Z', coins: { BNB: { score: 62, label: 'neutral' }, USDT: { score: 41, label: 'weak' } } };
+  site['/data/whales.json'] = { updated_at: '2026-11-24T13:12:48Z', totals24: { USDT: { n: 86, usd: 2622422504 } } };
+  freshWallet(); urls = []; serve = () => goodQuote();
+  let zw = makeWindow(CFGZ, { allowed: true });
+  S.start(zw.win); await sleep(60); zw.go(); await sleep(80);
+  ok(zw.$('coin').hidden === true && urls.every(u => u.indexOf('/data/') < 0), "before there is a price, the site's own files are not read at all");
+  ok(zw.$('morebox').hidden === false && zw.$('more').checked === false, 'the larger fee is offered, and is off until the reader turns it on');
+  ok(zw.$('more-a').textContent.indexOf('0.3') === 0 || zw.$('more-a').textContent.indexOf('۰٫۳') === 0, 'it says plainly what the fee is now (' + zw.$('more-a').textContent + ' → ' + zw.$('more-b').textContent + ')');
+  await zw.type('1'); await sleep(400);
+  ok(urls.filter(u => u.indexOf('/v1/quote') > 0)[0].indexOf('fee=0.003') > 0, 'the ordinary fee is the one asked for');
+  ok(zw.$('coin').hidden === false, "once a price is on screen, the site's note about the coins appears");
+  const note = zw.$('coin').kids.map(k => k.textContent).join(' | ');
+  ok(note.indexOf('62/100') > 0 && note.indexOf('خنثی') > 0, 'it carries the Entekhab score of the coin being sent (' + note + ')');
+  ok(note.indexOf('$2622422504') > 0 || note.indexOf('2622422504') > 0, '…and the whale moves of the coin where that is measured');
+  ok(note.indexOf('2026-11-24') > 0 || note.indexOf('۲۰۲۶') > 0, '…each with the day it was worked out, so nothing reads as advice for today');
+  const reads = urls.filter(u => u.indexOf('/data/') === 0);
+  ok(reads.length === 2 && reads[0] === '/data/score.json' && reads[1] === '/data/whales.json', "they are read once, from this site alone");
+  await zw.type('2'); await sleep(400);
+  ok(urls.filter(u => u.indexOf('/data/') === 0).length === 2, 'and never read again for the next price');
+  /* turning the larger fee on */
+  zw.$('more').checked = true; zw.$('more').fire('change'); await sleep(700);
+  const asked = urls.filter(u => u.indexOf('/v1/quote') > 0).pop();
+  ok(asked.indexOf('fee=0.005') > 0, 'turning it on asks for the larger fee, and asks again at once so the figures match');
+  /* a quote that would keep more than the reader was shown */
+  const feeQ = (kept) => goodQuote(q => { q.estimate.feeCosts = [{ name: 'LIFI Fixed Fee', amountUSD: '0.10', feeSplit: { recipients: [{ name: 'lifi', fee: '100' }, { name: 'entekhab', fee: String(kept) }] } }]; });
+  const feeReq = { fromChain: 56, toChain: 56, fromToken: BNB, toToken: USDT, fromAmount: '1000000000000000000', account: ME,
+    slippage: 0.005, fromDecimals: 18, toDecimals: 18, fee: 0.003, integrator: 'entekhab', contract: DIAMOND };
+  ok(S.checkQuote(feeQ(3000000000000000), feeReq) === null, 'a quote keeping the 0.3% it showed is sound');
+  ok(S.checkQuote(feeQ(9000000000000000), feeReq) === 'ourFee', 'one keeping three times that is refused, however good the price');
+  ok(S.checkQuote(feeQ(3000000000000000), Object.assign({}, feeReq, { integrator: 'someone-else' })) === null, "a fee split that names another integrator is not this page's to police");
+  site = {};
+
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
   for (const w of ['eval(', 'new Function', 'innerHTML', 'outerHTML', 'document.write', 'insertAdjacentHTML', 'srcdoc',
@@ -1014,7 +1056,9 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(code.indexOf('rpcBalance') > 0 && /fetch\(w\.rpc/.test(code), "a network's own node is only ever read from the address the page was built with");
   ok((code.match(/localStorage\.\w+\(([^,)]+)/g) || []).every(x => /\('ck_lang'$|\(HKEY$/.test(x)) && code.indexOf("HKEY = 'sw_hist'") > 0,
      "two things only are kept in the browser: the chosen language, and the reader's own list of swaps");
-  ok((code.match(/\bfetch\(/g) || []).length === 3, "there are exactly three places that reach the network: the price service, a balance node, and Tron's node");
+  ok((code.match(/\bfetch\(/g) || []).length === 4, "there are exactly four places that reach the network: the price service, a balance node, Tron's node, and this site's own data");
+  ok(/SCORE = '\/data\/score\.json', WHALE = '\/data\/whales\.json'/.test(code) && /fetch\(path, \{ credentials: 'omit'/.test(code),
+     "the site's own two files are read from this site alone, and no cookie of the reader's goes with the request");
   ok(code.indexOf('MAX_FEE = 0.03') > 0, 'the 3% ceiling on the fee is in the file itself');
   for (const lg of ['fa', 'ckb', 'en']) {
     ok(Object.keys(S.T[lg]).sort().join() === Object.keys(S.T.en).sort().join(), 'every message exists in ' + lg);
