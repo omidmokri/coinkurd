@@ -468,9 +468,14 @@ def controls():
     "I understand the risk of this swap and want to go on.")}</span><code id="sw-ack-a" dir="ltr" translate="no"></code></span></label>
 <button type="button" id="sw-action" class="sw-go" disabled><span id="sw-action-l"></span> <b id="sw-action-x" translate="no"></b></button>
 <div id="sw-msg" class="sw-msg" role="status" aria-live="polite"></div>
+<div id="sw-mob" class="sw-mob" hidden><b>{tri("در گوشی یا داخل اپ هستید؟", "لە مۆبایل یان ناو ئەپدایت؟", "On a phone, or inside an app?")}</b>
+<p>{tri("این صفحه به کیف پول شما نیاز دارد و اینجا کیف پولی پیدا نشد. آن را در مرورگرِ داخل کیف پولتان باز کنید:", "ئەم پەڕەیە پێویستی بە جزدانەکەتە و لێرە جزدانێک نەدۆزرایەوە. لە وێبگەڕی ناو جزدانەکەتدا بیکەرەوە:", "This page needs your wallet and none was found here. Open it in the browser inside your wallet:")}</p>
+<div class="sw-mob-b"><a href="https://link.metamask.io/dapp/entekhab.net/swap/" rel="noopener noreferrer" translate="no">MetaMask</a><a href="https://link.trustwallet.com/open_url?coin_id=60&amp;url=https%3A%2F%2Fentekhab.net%2Fswap%2F" rel="noopener noreferrer" translate="no">Trust Wallet</a></div>
+<p>{tri("در کیف پول‌های دیگر (سیف‌پل، توکن‌پاکت…) بخش مرورگر را باز کنید و همین نشانی را وارد کنید:", "لە جزدانەکانی تر (سەیفپاڵ، تۆکن‌پاکێت…) بەشی وێبگەڕ بکەرەوە و ئەم ناونیشانە بنووسە:", "In other wallets (SafePal, TokenPocket…) open the browser tab and enter this address:")} <bdi translate="no">entekhab.net/swap</bdi></p></div>
 <div id="sw-track" class="sw-track" hidden><div class="sw-track-h"><b>{tri("وضعیت تبدیل", "دۆخی گۆڕینەوە", "Swap status")}</b><span id="sw-track-st" class="sw-track-st" role="status" aria-live="polite"></span><button type="button" id="sw-track-close" class="sw-link">{tri("بستن", "داخستن", "Close")}</button></div>
 <div id="sw-track-sum" class="sw-track-sum" dir="ltr" translate="no"></div>
 <div id="sw-status" class="sw-status"></div></div>
+<div id="sw-track-tip" class="sw-tip" role="status" aria-live="polite"></div>
 <div class="sw-acct"><span id="sw-account" dir="ltr" translate="no"></span></div>
 <details id="sw-hist" class="sw-more" hidden><summary>{tri("تبدیل‌های شما در این مرورگر", "گۆڕینەوەکانی تۆ لەم وێبگەڕەدا", "Your swaps in this browser")}</summary>
 <div id="sw-hist-list"></div>

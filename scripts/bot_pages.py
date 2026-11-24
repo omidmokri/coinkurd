@@ -43,7 +43,8 @@ def open_rows(lang):
     for _, items in pages():
         for h, t in items:
             url = SITE + h
-            web = h.startswith("/") and "#" not in h and not h.endswith(".xml")
+            # /swap/ needs the reader's wallet, and Telegram's own window has none: it opens in their browser instead
+            web = h.startswith("/") and "#" not in h and not h.endswith(".xml") and h != "/swap/"
             row.append({"text": L(t, lang)[:40], **({"web_app": {"url": url}} if web else {"url": url})})
             if len(row) == 2:
                 rows.append(row)

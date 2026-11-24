@@ -92,3 +92,11 @@ html[dir=rtl] .cf select{direction:rtl;text-align:right}
 .pgrid a{display:block;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);
   color:var(--ink);text-decoration:none;font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pgrid a:hover{border-color:var(--acc)}
+
+/* the swap page: one line, in the normal flow, never over the logo */
+.swc{display:flex;align-items:center;gap:9px;margin:0 0 8px;padding:6px 10px;border:1px solid rgba(247,147,26,.45);border-radius:12px;background:linear-gradient(135deg,rgba(247,147,26,.16),rgba(247,147,26,.04));color:var(--ink)}
+.swc:hover{border-color:var(--acc)}
+.swc-i{flex:none;width:26px;height:26px;border-radius:99px;background:var(--acc);color:#000;display:grid;place-items:center;font-size:14px;font-weight:700}
+.swc-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.swc-t b{font-size:12.5px}.swc-t small{color:var(--mute);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swc i{flex:none;font-style:normal;font-size:11px;font-weight:700;color:var(--acc);white-space:nowrap}

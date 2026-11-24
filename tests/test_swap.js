@@ -203,7 +203,7 @@ const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 't
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
   'dlg-find', 'dlg-close', 'rcp', 'rcp-box', 'rcp-c', 'ack-a', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
   'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1',
-  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'mode', 'adv'].map(x => 'sw-' + x);
+  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-tip', 'mode', 'adv', 'mob'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
@@ -956,6 +956,8 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(rtW.$('status').kids.some(k => k.attrs['data-ok'] === '1' && k.textContent.indexOf('تاریخچه') > 0), 'a line says the swap was saved to the local history');
   rtW.$('track-close').fire('click');
   ok(rtW.$('track').hidden === true, 'the reader can close the box');
+  ok(rtW.$('track-tip').textContent.indexOf('تاریخچه') > 0, 'and is reminded, briefly, that the history holds it too');
+  ok(S.T.fa.timeFast === 'کمتر از ۲ دقیقه' && S.T.fa.timeFew === 'چند دقیقه', 'durations are said in words');
   const histNow = JSON.parse(histBox.sw_hist || '[]');
   ok(histNow.length === 1 && histNow[0].fs === 'BNB' && histNow[0].ts === 'USDT' && histNow[0].st === 'done' && histNow[0].h === '0x' + 'ab'.repeat(32),
      'the swap is written into the history of this browser');
@@ -988,6 +990,12 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(repNow.length === 3 && repNow[0] === '2' && repNow[1] === '$1501' && repNow[2] === '$4.50', 'it counts finished swaps only, adds their volume, and works out the 0.3% share (' + repNow.join(' ') + ')');
   ok(repCalls().length === 1 && repCalls()[0].indexOf('integrator=entekhab') > 0 && /fromTimestamp=\d+/.test(repCalls()[0]), "it is read from LI.FI's record for this page, from the first of the month");
   ledger = null; serve = () => goodQuote();
+  /* a phone browser, or the site's own app: no wallet is injected there */
+  freshWallet(); let bare = makeWindow(CFG, {}); delete bare.win.ethereum;
+  S.start(bare.win); await sleep(60);
+  ok(bare.need() === 'nowallet' && bare.$('mob').hidden === false, 'with no wallet of any kind, the page shows the way in through a wallet\'s own browser');
+  freshWallet(); bare = makeWindow(CFG, { allowed: true }); S.start(bare.win); await sleep(60);
+  ok(bare.$('mob').hidden === true, 'and with a wallet present that help stays out of the way');
 
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');

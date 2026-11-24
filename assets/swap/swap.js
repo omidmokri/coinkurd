@@ -58,7 +58,8 @@
       viewDest: 'تراکنش مقصد', pickChain: 'انتخاب شبکه', pickToken: 'انتخاب ارز', routesBusy: 'در حال یافتن مسیرهای دیگر…', routesNone: 'مسیر دیگری پیدا نشد.', best: 'پیشنهادی',
       bridgeNote: 'این تبدیل از این پل می‌گذرد. پل قراردادی جدا از دو شبکه است و خطر خودش را دارد؛ رسیدن پول هم چند دقیقه طول می‌کشد.',
       histSent: 'فرستاده شد', histDone: 'انجام شد', histFailed: 'ناموفق', repBusy: 'در حال خواندن…', repNone: 'این ماه هنوز تبدیلی ثبت نشده است. با انجام اولین تبدیل، آمار این ماه همین‌جا نشان داده می‌شود.',
-      mine: 'انتخاب شما', histSaved: 'در تاریخچهٔ همین مرورگر ثبت شد.', trackGo: 'در راه', trackDone: 'رسید', trackFail: 'ناموفق',
+      mine: 'انتخاب شما', timeFast: 'کمتر از ۲ دقیقه', timeFew: 'چند دقیقه', timeAbout: 'حدود', timeMin: 'دقیقه',
+      trackTip: 'وضعیت را از تاریخچهٔ همین مرورگر هم می‌توانید ببینید.', histSaved: 'در تاریخچهٔ همین مرورگر ثبت شد.', trackGo: 'در راه', trackDone: 'رسید', trackFail: 'ناموفق',
       advSteps: 'مراحل مسیر', advGas: 'برآورد گس (واحد)', advFees: 'ریز کارمزدها',
       repCount: 'تعداد تبدیل‌ها', repVolume: 'حجم تبدیل‌ها', repShare: 'سهم زاگرس (تقریبی)', repErr: 'گزارش اکنون در دسترس نیست.', nothing: 'چیزی پیدا نشد.',
       rcpChecking: 'در حال بررسی نشانی…',
@@ -90,7 +91,8 @@
       viewDest: 'مامەڵەی مەبەست', pickChain: 'هەڵبژاردنی تۆڕ', pickToken: 'هەڵبژاردنی دراو', routesBusy: 'گەڕان بەدوای ڕێگای تر…', routesNone: 'ڕێگایەکی تر نەدۆزرایەوە.', best: 'پێشنیارکراو',
       bridgeNote: 'ئەم گۆڕینەوەیە بەم پردەدا تێدەپەڕێت. پرد گرێبەستێکی جیایە و مەترسیی خۆی هەیە؛ گەیشتنی پارەکەش چەند خولەکێک دەخایەنێت.',
       histSent: 'نێردرا', histDone: 'تەواو بوو', histFailed: 'سەرنەکەوت', repBusy: 'خوێندنەوە…', repNone: 'ئەم مانگە هێشتا هیچ گۆڕینەوەیەک تۆمار نەکراوە. لەگەڵ یەکەم گۆڕینەوە، ئاماری ئەم مانگە لێرە دەردەکەوێت.',
-      mine: 'هەڵبژاردنی تۆ', histSaved: 'لە مێژووی ئەم وێبگەڕەدا تۆمار کرا.', trackGo: 'لە ڕێگادایە', trackDone: 'گەیشت', trackFail: 'سەرنەکەوت',
+      mine: 'هەڵبژاردنی تۆ', timeFast: 'کەمتر لە ٢ خولەک', timeFew: 'چەند خولەکێک', timeAbout: 'نزیکەی', timeMin: 'خولەک',
+      trackTip: 'دۆخەکە لە مێژووی ئەم وێبگەڕەشدا دەبینیت.', histSaved: 'لە مێژووی ئەم وێبگەڕەدا تۆمار کرا.', trackGo: 'لە ڕێگادایە', trackDone: 'گەیشت', trackFail: 'سەرنەکەوت',
       advSteps: 'هەنگاوەکانی ڕێگا', advGas: 'خەمڵاندنی گاز (یەکە)', advFees: 'وردەکاریی کرێکان',
       repCount: 'ژمارەی گۆڕینەوەکان', repVolume: 'قەبارەی گۆڕینەوەکان', repShare: 'بەشی زاگرۆس (نزیکەیی)', repErr: 'ڕاپۆرت ئێستا بەردەست نییە.', nothing: 'هیچ نەدۆزرایەوە.',
       rcpChecking: 'ناونیشان دەپشکنرێت…',
@@ -122,7 +124,8 @@
       viewDest: 'Destination transaction', pickChain: 'Choose a network', pickToken: 'Choose a coin', routesBusy: 'Looking for other routes…', routesNone: 'No other route found.', best: 'recommended',
       bridgeNote: 'This swap crosses this bridge. A bridge is a contract apart from both networks and carries its own risk; the money also takes a few minutes to arrive.',
       histSent: 'sent', histDone: 'done', histFailed: 'failed', repBusy: 'Reading…', repNone: 'No swap has been recorded this month yet. With the first swap, this month\'s figures will show here.',
-      mine: 'your choice', histSaved: 'Saved to the history of this browser.', trackGo: 'on its way', trackDone: 'arrived', trackFail: 'failed',
+      mine: 'your choice', timeFast: 'under 2 minutes', timeFew: 'a few minutes', timeAbout: 'about', timeMin: 'min',
+      trackTip: 'You can also see the status in the history of this browser.', histSaved: 'Saved to the history of this browser.', trackGo: 'on its way', trackDone: 'arrived', trackFail: 'failed',
       advSteps: 'Route steps', advGas: 'Gas estimate (units)', advFees: 'Fees in detail',
       repCount: 'Swaps', repVolume: 'Volume', repShare: 'Zagros share (approx.)', repErr: 'The report is not available right now.', nothing: 'Nothing found.',
       rcpChecking: 'Checking the address…',
@@ -975,7 +978,7 @@
 
     /* parts a page may or may not carry: other routes, the bridge note, the reader's own history, the monthly report */
     var X = {};
-    ['routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'mode', 'adv'].forEach(function (k) { X[k] = $('sw-' + k); });
+    ['routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'track-tip', 'mode', 'adv', 'mob'].forEach(function (k) { X[k] = $('sw-' + k); });
     S.alts = []; S.altT = []; S.altState = ''; S.rep = ''; S.mode = 'simple';
 
     function chainById(id) {
@@ -1100,6 +1103,7 @@
       else if (S.q) { label = t('swap'); dis = false; need = 'swap'; }
       else { label = t('amount'); need = 'none'; }
 
+      if (X.mob) { X.mob.hidden = !!(W.p || TW.p || SW.p || BW.p); }     /* no wallet of any kind here: show the way in */
       el['action-l'].textContent = label; el['action-x'].textContent = extra;
       el.action.disabled = dis;
       el.action.setAttribute('data-need', need);
@@ -1137,7 +1141,7 @@
       for (i = 0; i < (e.feeCosts || []).length; i++) { f += Number(e.feeCosts[i].amountUSD || 0); }
       el.gas.textContent = usd(g) || '—'; el.fee.textContent = usd(f) || '—';
       var d = Number(e.executionDuration || 0);
-      el.time.textContent = d > 0 ? (d < 90 ? Math.max(1, Math.round(d)) + ' s' : Math.round(d / 60) + ' min') : '—';
+      el.time.textContent = took(d) || '—';
       var a = Number(e.fromAmountUSD), b = Number(e.toAmountUSD);
       if (isFinite(a) && isFinite(b) && a > 0 && b >= 0) {
         S.impact = Math.max(0, (1 - b / a) * 100);
@@ -1203,6 +1207,12 @@
     }
     function mark(hash, st) { histMark(hash, st); trackState(st); }
 
+    /* how long, in words a person would use: the figure itself is only ever an estimate */
+    function took(d) {
+      d = Number(d);
+      if (!isFinite(d) || d <= 0) { return ''; }
+      return d < 120 ? t('timeFast') : d <= 600 ? t('timeFew') : t('timeAbout') + ' ' + Math.round(d / 60) + ' ' + t('timeMin');
+    }
     function toolKey(q) { return typeof q.tool === 'string' && /^[\w-]{1,40}$/.test(q.tool) ? q.tool : ''; }
 
     /* ---- other routes
@@ -1221,7 +1231,7 @@
         b.setAttribute('aria-pressed', q === S.q ? 'true' : 'false');
         var n = doc.createElement('span'); n.setAttribute('translate', 'no'); n.textContent = toolName(q) + (i === 0 ? ' · ' + t('best') : '') + (i !== 0 && q === S.q ? ' · ' + t('mine') : '');
         var v = doc.createElement('b'); v.setAttribute('translate', 'no'); v.setAttribute('dir', 'ltr');
-        v.textContent = formatUnits(q.estimate.toAmount, tt.decimals, 6) + ' ' + tt.symbol + (d > 0 ? ' · ' + (d < 90 ? Math.max(1, Math.round(d)) + ' s' : Math.round(d / 60) + ' min') : '');
+        v.textContent = formatUnits(q.estimate.toAmount, tt.decimals, 6) + ' ' + tt.symbol + (took(d) ? ' · ' + took(d) : '');
         b.appendChild(n); b.appendChild(v);
         if (steps(q) !== toolName(q)) { var sm = doc.createElement('small'); sm.setAttribute('translate', 'no'); sm.setAttribute('dir', 'ltr'); sm.textContent = steps(q); b.appendChild(sm); }
         b.addEventListener('click', function () { chooseRoute(i); });
@@ -1936,7 +1946,13 @@
     if (X['routes-go']) { X['routes-go'].addEventListener('click', moreRoutes); }
     if (X['hist-clear']) { X['hist-clear'].addEventListener('click', function () { try { win.localStorage.removeItem(HKEY); } catch (e) { } histPaint(); }); }
     if (X.rep) { X.rep.addEventListener('toggle', function () { if (X.rep.open !== false) { report(); } }); }
-    if (X['track-close']) { X['track-close'].addEventListener('click', function () { if (X.track) { X.track.hidden = true; } }); }
+    if (X['track-close']) { X['track-close'].addEventListener('click', function () {
+      if (X.track) { X.track.hidden = true; }
+      var tip = X['track-tip'];
+      if (!tip || !histLoad().length) { return; }                      /* only said when there is a history to look at */
+      tip.textContent = t('trackTip');
+      setTimeout(function () { tip.textContent = ''; }, 4000);
+    }); }
     if (X.mode) { X.mode.addEventListener('click', function (ev) { var m = ev && ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-mode') : null; if (m) { setMode(m); } }); }
     if (X.track) { X.track.hidden = true; }
     histPaint(); paintRoutes(); setMode('simple');

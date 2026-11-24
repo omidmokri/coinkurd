@@ -214,3 +214,14 @@ output.sw-num:empty::before{content:"0.0";color:#565a64}
 .sw-track-sum{font-size:.82rem;color:var(--s-ink);margin-top:6px;text-align:start;unicode-bidi:isolate}
 .sw-track-sum:empty{display:none}
 .sw-status div[data-ok="1"]{color:var(--s-g)}
+.sw-tip{font-size:.78rem;color:var(--s-mute);margin:6px 4px 0}
+.sw-tip:empty{display:none}
+.sw-tip:not(:empty){animation:sw-tip 4s ease forwards}
+@keyframes sw-tip{0%{opacity:0}10%,75%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sw-tip:not(:empty){animation:none}}
+.sw-mob{margin:10px 0 0;padding:12px 14px;border:1px solid rgba(247,147,26,.4);border-radius:14px;background:linear-gradient(135deg,rgba(247,147,26,.12),rgba(247,147,26,.03));font-size:.82rem;line-height:1.9}
+.sw-mob b{color:var(--s-ink)}
+.sw-mob p{margin:4px 0 0;color:var(--s-mute)}
+.sw-mob-b{display:flex;gap:8px;margin:8px 0 2px}
+.sw-mob-b a{flex:1;text-align:center;padding:9px 10px;border-radius:12px;background:var(--s-o);color:#000;font-weight:700;text-decoration:none}
+.sw-mob-b a:hover{background:var(--s-o2)}
