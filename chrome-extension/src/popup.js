@@ -55,7 +55,7 @@ function fitHeight() {
   const b = document.body; if (!b) return;
   b.style.setProperty('--pane', '300px');
   const over = document.documentElement.scrollHeight - 596;
-  if (over > 0) b.style.setProperty('--pane', Math.max(170, 300 - over) + 'px');
+  if (over > 0) b.style.setProperty('--pane', Math.max(110, 300 - over) + 'px');
 }
 
 function applyLang() {
