@@ -16,6 +16,10 @@ on:
         description: "شناسهٔ اجرای قبلی برای استفاده از استیکرهای همان اجرا (خالی = از نو بساز)"
         type: string
         default: ""
+      recreate:
+        description: "بسته‌های موجود را پاک کن و از صفر بساز"
+        type: boolean
+        default: false
 
 concurrency:
   group: stickers
@@ -98,4 +102,5 @@ jobs:
           REF_BOT_TOKEN: ${{ secrets.REF_BOT_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           ADMIN_IDS: ${{ vars.ADMIN_IDS }}
+          RECREATE: ${{ inputs.recreate && '1' || '0' }}
         run: python scripts/make_stickers.py
