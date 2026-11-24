@@ -11,7 +11,9 @@
                   colors: ['#rgb', …] (a line painted point by point, one colour per row), dim: { t: 1 } (bars drawn pale), fmt }] } ],
      dimNote: 'what a pale bar means' (a line in the read-out),
      xmode: 'num' (the x axis is a plain number — block height, say — not a time), xfmt: function (x) → [line1, line2],
-     xtip: function (x) → string (the head of the read-out) }) */
+     xtip: function (x) → string (the head of the read-out),
+     xcross: function (x) → { title, rows: [{ label, value, color, x, y, pane }] } (more read-out lines, each with an
+       optional pin drawn on the plot at its own x and y — the same point in earlier cycles, say) }) */
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, clamp = OB.clamp, d = document, w = window;
@@ -74,7 +76,7 @@
   TS.prototype.set = function (o) {
     this.P = (o.panes || []).filter(function (p) { return p && p.series && p.series.length; });
     this.daily = !!o.daily; this.label = o.label || ''; this.dimNote = o.dimNote || '';
-    this.xmode = o.xmode === 'num' ? 'num' : 'time'; this.xfmt = o.xfmt || null; this.xtip = o.xtip || null;
+    this.xmode = o.xmode === 'num' ? 'num' : 'time'; this.xfmt = o.xfmt || null; this.xtip = o.xtip || null; this.xcross = o.xcross || null;
     var t0 = Infinity, t1 = -Infinity, gap = Infinity;
     this.P.forEach(function (p) {
       p.series.forEach(function (s) {
@@ -340,6 +342,29 @@
         var yy = p._Y(val); if (yy >= p._y && yy <= p._y + p._h && s.type !== 'bars' && s.type !== 'candle') { ctx.beginPath(); ctx.arc(cx, yy, 3.5, 0, 6.2832); ctx.fillStyle = s.color; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#0a0a0c'; ctx.stroke(); }
       });
     });
+    var ex = this.xcross ? this.xcross(near) : null;
+    if (ex && ex.rows && ex.rows.length) {
+      if (ex.title) { var ttl = d.createElement('div'); ttl.className = 'ob-tip-n'; ttl.textContent = ex.title; box.appendChild(ttl); }
+      ex.rows.forEach(function (r) {
+        var row = d.createElement('div'); row.className = 'ob-tip-r';
+        var k2 = d.createElement('i'); k2.className = 'ob-key'; k2.style.background = r.color || '#8d8d86';
+        var n2 = d.createElement('span'); n2.textContent = r.label;
+        var v2 = d.createElement('b'); v2.className = 'ob-n'; v2.textContent = r.value;
+        row.appendChild(k2); row.appendChild(n2); row.appendChild(v2); box.appendChild(row); any = true;
+        if (r.x == null || r.y == null) return;
+        var pp = P[r.pane || 0]; if (!pp) return;
+        var px = self._X(r.x), py = pp._Y(r.y);
+        if (px < G.L || px > G.L + G.plotW || py < pp._y || py > pp._y + pp._h) return;
+        ctx.beginPath(); ctx.arc(px, py, 3.5, 0, 6.2832); ctx.fillStyle = r.color || '#8d8d86'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#0a0a0c'; ctx.stroke();
+        ctx.font = FONT;
+        var lw = ctx.measureText(r.value).width + 10, lx2 = clamp(px - lw / 2, G.L + 1, G.L + G.plotW - lw - 1), ly2 = clamp(py - 21, pp._y + 1, pp._y + pp._h - 18);
+        ctx.fillStyle = 'rgba(10,10,12,.86)'; ctx.strokeStyle = r.color || '#8d8d86'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.rect(lx2, ly2, lw, 16); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = r.color || '#e8e8e3'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(r.value, lx2 + 5, ly2 + 8);
+      });
+    }
     if (!any) { tip.hidden = true; return; }
     if (pale && this.dimNote) { var nt = d.createElement('div'); nt.className = 'ob-tip-n'; nt.textContent = this.dimNote; box.appendChild(nt); }
     tip.innerHTML = ''; tip.appendChild(box); tip.hidden = false; tip.setAttribute('dir', OB.rtl() ? 'rtl' : 'ltr');
