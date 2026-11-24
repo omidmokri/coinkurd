@@ -257,23 +257,44 @@ def plan(langs, need, common, limit):
     the languages in order starved every language past the first few: the ones at the top always have some strings
     outstanding, so the cap ran out before the planner ever reached the next language to be brought up.
     """
-    queues, state = [], {}
+    queues, state, pct = [], {}, {}
     for code in langs:
         s = load(code)
         state[code] = s
         bad = {k for k, n in load_fails(code).items() if n >= FAIL_MAX}
         todo = [k for k in need if k not in s and k not in bad]
+        pct[code] = (len(need) - len(todo)) / len(need) * 100 if need else 0
         if not todo:
             continue
         todo.sort(key=lambda k: (k not in common, len(k), k))
         queues.append((code, list(batches(todo))))
-    items = []
-    for i in range(max((len(b) for _, b in queues), default=0)):
-        for code, bs in queues:
-            if i < len(bs):
-                items.append((code, bs[i]))
-                if len(items) >= limit:
-                    return items, state
+    # A language already offered in the globe comes first and takes one batch a round: a language a reader can pick
+    # today must not fall behind the pages written today. After them the whole of what is left goes to the one
+    # language closest to the gate, until it passes it — shared evenly, no language ever arrived. The rest keep the
+    # round-robin they had, on whatever is left over.
+    live = [q for q in queues if pct.get(q[0], 0) >= READY]
+    rest = sorted((q for q in queues if pct.get(q[0], 0) < READY), key=lambda q: -pct.get(q[0], 0))
+    soonest, others = rest[:1], rest[1:]
+    items, used = [], {}
+
+    def take(group, cap):
+        """one batch a language a round, until the group is spent or the cap is reached"""
+        for i in range(max((len(b) for _, b in group), default=0)):
+            for code, bs in group:
+                if i < len(bs) and i >= used.get(code, 0):
+                    items.append((code, bs[i]))
+                    used[code] = i + 1
+                    if len(items) >= min(cap, limit):
+                        return len(items) >= limit
+        return len(items) >= limit
+
+    if take(live, limit):                       # a language readers can pick today never falls behind
+        return items, state
+    if take(soonest, max(1, int(limit * SOONEST))):   # then the one nearest the gate, to bring it over
+        return items, state
+    if take(others, limit):                     # and the rest share what is left, as they always did
+        return items, state
+    take(soonest, limit)                        # nothing left to share: the nearest one may use the remainder
     return items, state
 
 
@@ -375,6 +396,10 @@ def write_dicts(code, pages, scripts, common, need):
 
 
 READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered once this much of it is translated
+# How much of one run may go to the language nearest that gate. Shared evenly between the thirty-odd unfinished
+# languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
+# language reaches readers only if one of them is carried over the line at a time.
+SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
 VER = "8"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a

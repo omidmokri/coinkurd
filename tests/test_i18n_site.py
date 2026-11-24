@@ -164,13 +164,28 @@ def main():
     ok("ordinary text is still sent for translation", all(i18n_ar.worth(t) for t in prose),
        [t for t in prose if not i18n_ar.worth(t)])
 
-    # The run is shared out a batch at a time; taking the languages in order starved every one past the first few.
+    # The run is shared out a batch at a time, but evenly between thirty-odd languages none of them ever reached the
+    # gate: each gained a few strings a day while the site grew. A language a reader can already pick comes first,
+    # then the bulk goes to the one nearest the gate, and the rest still get what is left.
     import unittest.mock
     many = [f"s{i}" for i in range(4000)]
+    done = {k: k for k in many[:3900]}                           # a language already over the gate, with a little to do
+    half = {k: k for k in many[:2000]}                           # …and the one nearest it, still under it
+    caches = {"kmr": done, "hi": half}
+    with unittest.mock.patch.object(S, "load", lambda c: dict(caches.get(c, {}))):
+        items, _ = S.plan(["kmr", "tr", "ru", "hi", "id", "ur"], many, set(), 20)
+    got = {}
+    for c, _ in items:
+        got[c] = got.get(c, 0) + 1
+    ok("the language a reader can pick today is served first", got.get("kmr", 0) >= 1, got)
+    ok("the one nearest the gate takes the bulk of the run", got.get("hi", 0) >= 10, got)
+    ok("and the rest still get a share", len([c for c in got if c not in ("kmr", "hi")]) >= 1, got)
+    ok("the run never goes over its cap", sum(got.values()) == 20, got)
     with unittest.mock.patch.object(S, "load", lambda c: {}):
-        items, _ = S.plan(["kmr", "tr", "ru", "es", "br", "de", "fr", "hi", "id", "ur"], many, set(), 20)
-    reached = {c for c, _ in items}
-    ok("a capped run reaches every unfinished language, not just the first", len(reached) == 10, sorted(reached))
+        items2, _ = S.plan(["hi", "id"], many, set(), 6)
+    ok("with nothing translated at all, one language is still carried, not two halves",
+       max((sum(1 for c, _ in items2 if c == x) for x in ("hi", "id")), default=0) >= 4,
+       [c for c, _ in items2])
 
     # The day's calls used to be spendable at once, so translation ran flat out for a few hours and then every
     # translating step did nothing until the next morning. They are released through the quota day instead.
