@@ -39,6 +39,9 @@ def main():
             E.wire(page, errors)
             page.route("https://mempool.space/api/blocks/tip/height", lambda r: r.fulfill(status=200, body=str(TIP), headers={"access-control-allow-origin": "*"}))
             page.goto(f"{base}/charts/block-cycle/", wait_until="domcontentloaded")
+            if lang == "fa":
+                check("skeleton: the shimmer stands in for the chart while it loads",
+                      page.wait_for_selector(".ob-wvbox.sk", timeout=15000) is not None)
             page.wait_for_function("() => window.OB && OB._wv && OB._wv.V.G && OB._wv.V.G.rows.length", timeout=30000)
             page.wait_for_timeout(450)
             st = page.evaluate("() => ({tip: OB._wv.V.G.tipH, rows: OB._wv.V.G.rows.length, idx: OB._wv.V.G.idx.length})")
@@ -52,6 +55,8 @@ def main():
             check(f"{lang}: the page's own arithmetic matches the definition", abs(v - wwi(TIP)) < 1e-12, (v, wwi(TIP)))
             check(f"{lang}: 0.5 at every halving", all(abs(page.evaluate(f"() => OB._wv.wwi({x})") - 0.5) < 1e-12 for x in (210000, 420000, 630000, 840000, 1050000)), "")
             check(f"{lang}: the credit is shown", "WolfyXBT" in page.inner_text("main"), "")
+            if lang == "fa":
+                check("skeleton: it is gone once the data is in", page.evaluate("() => !document.querySelector('.ob-wvbox.sk')"))
             check(f"{lang}: no page errors", not errors, errors[:3])
             if lang == "fa":
                 for st_ in ("candle", "line", "wave"):
@@ -68,6 +73,29 @@ def main():
                     n_ = page.evaluate("() => OB._wv.V.G.rows.length")
                     check(f"step {b_} buckets the price ({n_} rows)", n_ > mn and n_ < 4000, n_)
                 check("no errors after switching", not errors, errors[:3])
+                page.evaluate("() => OB._wv.S.bucket = 'd'")
+                # the cycles laid over one another
+                page.evaluate("() => { OB._wv.S.ovl = true; OB.views.wave.unmount(); OB.views.wave.mount(OB._wv.V.el); }")
+                page.wait_for_function("() => OB._wv.V.G && OB._wv.V.G.ovl", timeout=20000)
+                g = page.evaluate("() => ({n: OB._wv.V.G.series.length, e: OB._wv.V.G.cycles.map(c => c.e), cur: OB._wv.V.G.cycles.filter(c => c.cur).map(c => c.e), u: OB._wv.V.G.uNow, cols: OB._wv.V.G.cycles.map(c => c.color)})")
+                check("overlay: one series per cycle with a price at its halving", g["n"] == 4 and g["e"] == [1, 2, 3, 4], g)
+                check("overlay: the current cycle is the tip's", g["cur"] == [TIP // 210000], g)
+                check("overlay: blocks since the halving", g["u"] == TIP - (TIP // 210000) * 210000, g)
+                check("overlay: a colour of its own per cycle", len(set(g["cols"])) == 4, g["cols"])
+                b0 = page.evaluate("() => OB._wv.V.G.series.map(s => s.data[0][1])")
+                check("overlay: every cycle starts at its own halving price", all(abs(b - 1) < 1e-9 for b in b0), b0)
+                check("overlay: the index is one curve over a whole cycle", page.evaluate("() => OB._wv.V.G.idx[0][1]") == 0.5 and abs(page.evaluate("() => OB._wv.V.G.idx[OB._wv.V.G.idx.length - 1][1]") - 0.5) < 1e-9)
+                check("overlay: no page errors", not errors, errors[:3])
+                # the live price feeds the tile and the last bar
+                page.evaluate("() => { OB._wv.S.ovl = false; OB.views.wave.unmount(); OB.views.wave.mount(OB._wv.V.el); }")
+                page.wait_for_function("() => OB._wv.V.G && OB._wv.V.G.rows.length", timeout=20000)
+                page.evaluate("() => { OB._wv.V.live = 123456; OB._wv.V.redraw = 0; }")
+                page.evaluate("() => OB._wv.V.el.ownerDocument.getElementById('ob-livepx') && OB._wv.paintLive()")
+                page.wait_for_timeout(300)
+                txt2 = page.inner_text("#ob-tiles")
+                check("live: the price tile follows the stream", "123" in txt2.replace(",", "").replace("\u066c", "").replace("\u06f1", "1").replace("\u06f2", "2").replace("\u06f3", "3"), txt2[:120])
+                check("live: the bar in progress follows it too", page.evaluate("() => OB._wv.V.G.rows[OB._wv.V.G.rows.length - 1][4]") == 123456)
+                page.evaluate("() => { OB._wv.V.live = null; OB._wv.V.redraw = 0; }")
             page.screenshot(path=f"{SHOTS}/{lang}-{w}.png", full_page=False)
             ctx.close()
         br.close()
