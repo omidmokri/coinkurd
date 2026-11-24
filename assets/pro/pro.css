@@ -534,3 +534,35 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-pf,.pm-opt{display:flex;flex-direction:column;gap:8px}.pm-pfbar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#222}.pm-pfbar i{display:block;height:100%}
 .pm-pfadd .pm-in{flex:1 1 90px;width:auto}.pm-optw{max-height:52vh;overflow-y:auto}.pm-optt td,.pm-optt th{padding:3px 7px;font-size:12px}.pm-optk{background:#1b1b1f}
 .pm-optt tr.pm-atm .pm-optk{background:rgba(247,147,26,.3)}.pm-optt tr.pm-pain .pm-optk{outline:1px solid #facc15}.pm-btx{margin:2px 0}.pm-mexp{min-height:70px;height:auto}
+
+/* ---- the chart settings dialog, and the light themes (paper / light): the workspace follows the chart's background */
+.pm-cs .pm-drow>span:first-child{display:flex;flex-direction:column;gap:1px}.pm-dhint{color:var(--mute);font-size:11px;font-weight:400}
+.pm-cw{display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 0 auto}.pm-cw .pm-rng{flex:0 0 150px;width:150px;height:auto}.pm-cw .pm-in{width:48px;height:32px;padding:2px;flex:0 0 48px}
+.pm-cw input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}.pm-cw .pm-in:disabled{opacity:.35}
+.pm-crst{width:26px;height:26px;color:var(--mute);font-size:14px;line-height:1}
+.pm-rv{font-family:"Space Grotesk",sans-serif;font-variant-numeric:tabular-nums;min-width:34px;text-align:end;color:#cfcfc9;font-size:12px}
+#pro.pm-light{--line:rgba(0,0,0,.12);--card:#f4f4f2;--mute:#6b6b66;color:#20201e;background:var(--pm-bg,#fff)}
+#pro.pm-light .pm-top,#pro.pm-light .pm-bot,#pro.pm-light .pm-tools,#pro.pm-light .pm-side,#pro.pm-light .pm-stabs,#pro.pm-light .pm-cday{background:#f1f1ee}
+#pro.pm-light .pm-grid{background:rgba(0,0,0,.14)}
+#pro.pm-light .pm-cell,#pro.pm-light .pm-spanel{background:var(--pm-bg,#fff)}
+#pro.pm-light .pm-mbox,#pro.pm-light .pm-menu,#pro.pm-light .pm-fly,#pro.pm-light .pm-selbar,#pro.pm-light .pm-tip,#pro.pm-light .pm-toast,#pro.pm-light .pm-repbar{background:#fff;color:#20201e;border-color:rgba(0,0,0,.14);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+#pro.pm-light .pm-in,#pro.pm-light .pm-sel{background:#fff;color:#20201e;border-color:rgba(0,0,0,.18)}
+#pro.pm-light .pm-btn{background:#ececea;color:#20201e;border-color:rgba(0,0,0,.16)}
+#pro.pm-light .pm-btn.pri{background:var(--acc);border-color:var(--acc);color:#1a1207}
+#pro.pm-light .pm-btn.pm-del,#pro.pm-light .pm-del{color:var(--dn)}
+#pro.pm-light .pm-mtab{background:#e4e4e1;color:#3a3a36}#pro.pm-light .pm-mtab.on{background:#20201e;color:#fff}
+#pro.pm-light .pm-tool,#pro.pm-light .pm-ib,#pro.pm-light .pm-tb{color:#4a4a46}
+#pro.pm-light .pm-tool:hover,#pro.pm-light .pm-mi:hover,#pro.pm-light .pm-fi:hover,#pro.pm-light .pm-idi:hover,#pro.pm-light .pm-ranges button:hover,#pro.pm-light .pm-scale button:hover{background:#e6e6e3}
+#pro.pm-light .pm-leg,#pro.pm-light .pm-lsym,#pro.pm-light .pm-ltf,#pro.pm-light .pm-li{background:rgba(255,255,255,.72);color:#20201e}
+#pro.pm-light .pm-btc,#pro.pm-light .pm-btcv,#pro.pm-light .pm-mv{background:#f4f4f2;border-color:rgba(0,0,0,.1)}
+#pro.pm-light .pm-scrt th{background:#f1f1ee}
+#pro.pm-light .pm-sct{background:#fbfbfa}
+#pro.pm-light .pm-macro{background:rgba(255,255,255,.95);color:#20201e}
+#pro.pm-light .pm-macro td{color:#5a6a78}#pro.pm-light .pm-macro td+td{color:#20201e}
+#pro.pm-light .pm-drow>span,#pro.pm-light .pm-drow2 b,#pro.pm-light .pm-rv,#pro.pm-light .pm-leg b{color:#2a2a28}
+#pro.pm-light .pm-dtab{color:#6b6b66}#pro.pm-light .pm-dtab.on{color:#20201e}
+#pro.pm-light .pm-note,#pro.pm-light .pm-p,#pro.pm-light .pm-dhint,#pro.pm-light .pm-mute,#pro.pm-light .pm-fh,#pro.pm-light .pm-mh{color:#6b6b66}
+#pro.pm-light .pm-fi,#pro.pm-light .pm-mi,#pro.pm-light .pm-idi b{color:#20201e}
+#pro.pm-light .pm-chip{color:#3a3a36;border-color:rgba(0,0,0,.18)}#pro.pm-light .pm-chip.on{color:#20201e}
+#pro.pm-light .pm-tbl th{color:#4a4a46}#pro.pm-light .pm-tbl td{border-color:rgba(0,0,0,.08)}
+#pro.pm-light .pm-dpane,#pro.pm-light .pm-mbody{color:#20201e}

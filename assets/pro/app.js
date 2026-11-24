@@ -173,7 +173,7 @@
   function defaults() {
     return { v: 1, layout: '1', active: 0, sync: { sym: false, tf: false, cross: true, time: false, ind: false }, charts: [newChart(homeSym())],
       tz: 'local', cal: 'greg', side: null, fav: ['1s', '5s', '15s', '1m', '5m', '15m', '1h', '4h', '1d', '1w'],
-      ev: { on: 1, imp: ['H', 'M'], cur: [] }, keep: 0, magnet: 0, sound: 1, saver: null, name: '' };
+      ev: { on: 1, imp: ['H', 'M'], cur: [] }, keep: 0, magnet: 0, sound: 1, saver: null, name: '', look: Object.assign({}, LOOK0) };
   }
   function tpSane(t) {                              /* box size (0 = automatic ATR 14), reversal boxes, lines */
     var o = {}, b = +t.box, r = t.rev | 0, l = t.lines | 0;
@@ -191,7 +191,7 @@
       if (c && TYPES.indexOf(c.type) >= 0) n.type = c.type;
       if (c && c.tp && typeof c.tp === 'object') n.tp = tpSane(c.tp);
       if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
-      if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: c.scale.auto === 0 ? 0 : 1 };
+      if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: c.scale.auto === 0 ? 0 : 1, inv: c.scale.inv ? 1 : 0 };
       return n;
     });
     o.active = Math.max(0, Math.min(o.charts.length - 1, s.active | 0));
@@ -207,8 +207,50 @@
     if (typeof s.emoji === 'string' && s.emoji.length <= 4) o.emoji = s.emoji;
     if (s.saver === true || s.saver === false) o.saver = s.saver;
     if (typeof s.name === 'string') o.name = s.name.slice(0, 40);
+    o.look = saneLook(s.look);
     return o;
   }
+  /* ---------------------------------------------------------------- the chart's look: colours, grid, crosshair, font, scales.
+     One set for every chart of the workspace, kept with the workspace (so a shared link carries it too). */
+  var FONTS = [['sans', 'Vazirmatn, "Space Grotesk", Tahoma, sans-serif'], ['serif', 'Vazirmatn, Georgia, "Times New Roman", serif'], ['mono', 'ui-monospace, SFMono-Regular, Consolas, monospace']];
+  var LOOK0 = {
+    theme: 'dark', bg: '#0b0b0c', bg2: '', text: '#b8b8b2', font: 0, fsize: 11,
+    up: '#34d399', dn: '#ff5a4d', body: 1, border: 1, wick: 1, hollow: 0, bcol: '', wcol: '', line: '#f7931a', lw: 2,
+    grid: '#ffffff', ga: 3.5, gv: 1, gh: 1,
+    cross: 0, ccol: '#f7931a', cw: 1, cdash: 1, clab: 1,
+    wm: 0, wmt: '', wmsize: 44, wmcol: '#ffffff', wma: 6,
+    last: 1, lastLab: 1, hilo: 0, pscale: 'right', border2: 1,
+    mtop: 8, mbot: 8, space: 7, roff: 8, sec: 0, tsBorder: 1,
+    scroll: 1, zoom: 1, kinetic: 1, pinch: 1
+  };
+  var THEMES = {
+    dark: {}, midnight: { bg: '#0b1120', bg2: '#0d1830', text: '#c9d1d9', grid: '#8ea3b8', ga: 6 },
+    paper: { bg: '#fbfaf7', bg2: '', text: '#3a3a36', grid: '#111111', ga: 7, up: '#089981', dn: '#f23645', ccol: '#6b7280', wmcol: '#111111' },
+    light: { bg: '#ffffff', bg2: '', text: '#2a2a28', grid: '#000000', ga: 8, up: '#089981', dn: '#f23645', ccol: '#9598a1', wmcol: '#000000' }
+  };
+  function hex(v, d) { return /^#[0-9a-fA-F]{6}$/.test(v) ? v : d; }
+  function rng(v, lo, hi, d) { v = +v; return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; }
+  function saneLook(o) {
+    var L = Object.assign({}, LOOK0); if (!o || typeof o !== 'object') return L;
+    if (THEMES[o.theme]) L.theme = o.theme;
+    ['bg', 'text', 'up', 'dn', 'line', 'grid', 'ccol', 'wmcol'].forEach(function (k) { L[k] = hex(o[k], L[k]); });
+    ['bg2', 'bcol', 'wcol'].forEach(function (k) { L[k] = o[k] === '' || o[k] == null ? '' : hex(o[k], ''); });
+    ['body', 'border', 'wick', 'hollow', 'gv', 'gh', 'clab', 'wm', 'last', 'lastLab', 'hilo', 'border2', 'sec', 'tsBorder', 'scroll', 'zoom', 'kinetic', 'pinch'].forEach(function (k) { if (k in o) L[k] = o[k] ? 1 : 0; });
+    L.font = [0, 1, 2].indexOf(o.font | 0) >= 0 ? o.font | 0 : 0;
+    L.cross = [0, 1, 2].indexOf(o.cross | 0) >= 0 ? o.cross | 0 : 0;
+    L.cdash = [0, 1, 2, 3, 4].indexOf(o.cdash | 0) >= 0 ? o.cdash | 0 : 1;
+    L.pscale = ['right', 'left', 'both', 'none'].indexOf(o.pscale) >= 0 ? o.pscale : 'right';
+    L.fsize = rng(o.fsize, 9, 20, 11) | 0; L.ga = rng(o.ga, 0, 40, 3.5); L.cw = rng(o.cw, 1, 4, 1) | 0;
+    L.wmsize = rng(o.wmsize, 16, 140, 44) | 0; L.wma = rng(o.wma, 0, 60, 6);
+    L.lw = rng(o.lw, 1, 6, 2) | 0; L.mtop = rng(o.mtop, 0, 40, 8); L.mbot = rng(o.mbot, 0, 40, 8);
+    L.space = rng(o.space, 1, 60, 7); L.roff = rng(o.roff, 0, 300, 8);
+    L.wmt = typeof o.wmt === 'string' ? o.wmt.replace(/[<>]/g, '').slice(0, 40) : '';
+    return L;
+  }
+  function rgba(hx, a) { var m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hx || ''); return m ? 'rgba(' + parseInt(m[1], 16) + ',' + parseInt(m[2], 16) + ',' + parseInt(m[3], 16) + ',' + a + ')' : hx; }
+  function LK() { return st.look; }
+  function upC() { return st.look.up; }
+  function dnC() { return st.look.dn; }
   var st = sane(S.get('ek_pro', null));
   var DRAW = S.get('ek_pro_draw', {}); if (!DRAW || typeof DRAW !== 'object' || Array.isArray(DRAW)) DRAW = {};
   var saveT = null, saved = true;
@@ -276,6 +318,43 @@
     var off = -new Date().getTimezoneOffset();
     if (st.tz !== 'local') { try { var p = new Intl.DateTimeFormat('en-US', { timeZone: st.tz, timeZoneName: 'shortOffset' }).formatToParts(new Date()).filter(function (x) { return x.type === 'timeZoneName'; })[0]; return p ? p.value.replace('GMT', 'UTC') : st.tz; } catch (e) { return st.tz; } }
     var sg = off >= 0 ? '+' : '-', a = Math.abs(off); return 'UTC' + sg + Math.floor(a / 60) + (a % 60 ? ':' + String(a % 60).padStart(2, '0') : '');
+  }
+  /* every chart option that the look decides */
+  function lookOpts() {
+    var L = st.look, dark = !isLight(), gc = rgba(L.grid, L.ga / 100), bd = rgba(L.text, 0.22);
+    return {
+      layout: { background: L.bg2 ? { type: 'gradient', topColor: L.bg, bottomColor: L.bg2 } : { type: 'solid', color: L.bg },
+        textColor: L.text, fontFamily: FONTS[L.font][1], fontSize: L.fsize, attributionLogo: false,
+        panes: { separatorColor: rgba(L.text, 0.14), separatorHoverColor: rgba(L.ccol, 0.3), enableResize: true } },
+      grid: { vertLines: { color: gc, visible: !!L.gv }, horzLines: { color: gc, visible: !!L.gh } },
+      rightPriceScale: { visible: L.pscale === 'right' || L.pscale === 'both', borderVisible: !!L.border2, borderColor: bd, scaleMargins: { top: L.mtop / 100, bottom: L.mbot / 100 } },
+      leftPriceScale: { visible: L.pscale === 'left' || L.pscale === 'both', borderVisible: !!L.border2, borderColor: bd, scaleMargins: { top: L.mtop / 100, bottom: L.mbot / 100 } },
+      timeScale: { borderColor: bd, borderVisible: !!L.tsBorder, timeVisible: true, secondsVisible: !!L.sec, rightOffset: L.roff, barSpacing: L.space, shiftVisibleRangeOnNewBar: true },
+      handleScroll: { mouseWheel: !!L.zoom, pressedMouseMove: !!L.scroll, horzTouchDrag: !!L.scroll, vertTouchDrag: !!L.scroll },
+      handleScale: { mouseWheel: !!L.zoom, pinch: !!L.pinch, axisPressedMouseMove: !!L.scroll, axisDoubleClickReset: true },
+      kineticScroll: { touch: !!L.kinetic, mouse: false },
+      crosshair: { mode: L.cross === 1 ? 2 : L.cross === 2 ? 1 : 0,
+        vertLine: { color: rgba(L.ccol, 0.45), width: L.cw, style: L.cdash, visible: L.cross !== 2, labelVisible: !!L.clab, labelBackgroundColor: dark ? rgba(L.ccol, 0.35) : L.ccol },
+        horzLine: { color: rgba(L.ccol, 0.45), width: L.cw, style: L.cdash, visible: L.cross !== 2, labelVisible: !!L.clab, labelBackgroundColor: dark ? rgba(L.ccol, 0.35) : L.ccol } }
+    };
+  }
+  function isLight() { var m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(st.look.bg || ''); if (!m) return false; return (parseInt(m[1], 16) * 299 + parseInt(m[2], 16) * 587 + parseInt(m[3], 16) * 114) / 1000 > 140; }
+  /* the watermark: the symbol's name behind the candles, or the visitor's own words */
+  function setWatermark(cell) {
+    var L = st.look, txt = L.wm ? (L.wmt || P.pair(cell.cfg.sym) + '  ·  ' + tfLabel(cell.cfg.tf)) : '';
+    if (cell._wm) { try { cell._wm.detach(); } catch (e) { } cell._wm = null; }
+    if (!txt || !LW.createTextWatermark) return;
+    try { cell._wm = LW.createTextWatermark(cell.chart.panes()[0], { horzAlign: 'center', vertAlign: 'center', lines: [{ text: txt, color: rgba(L.wmcol, L.wma / 100), fontSize: L.wmsize, fontFamily: FONTS[L.font][1] }] }); } catch (e) { }
+  }
+  function applyLook(full) {
+    de.style.setProperty('--pm-bg', st.look.bg);
+    root && root.classList.toggle('pm-light', isLight());
+    cells.forEach(function (c) {
+      c.chart.applyOptions(Object.assign(lookOpts(), locOpts()));
+      if (full) { c.makeMain(); c.render(c.replay ? c.replay.i : null); c.renderInds(true); c.layers(); }
+      c.applyPrec(); setWatermark(c); c.legend();
+    });
+    save();
   }
   function locOpts() {
     return { localization: { timeFormatter: function (t) { return fmtT(t, 'fulls'); }, priceFormatter: null },
@@ -359,15 +438,7 @@
     this.el = h('<div class="pm-cell" data-i="' + i + '"><div class="pm-leg"></div><div class="pm-chart"></div><div class="pm-msg" hidden></div><div class="pm-tip" hidden></div></div>');
     this.box = $('.pm-chart', this.el);
     this.el.addEventListener('pointerdown', function () { setActive(self.i); }, true);
-    this.chart = LW.createChart(this.box, Object.assign({
-      autoSize: true,
-      layout: { background: { type: 'solid', color: '#0b0b0c' }, textColor: '#b8b8b2', fontFamily: 'Vazirmatn, "Space Grotesk", Tahoma, sans-serif', fontSize: 11, attributionLogo: false,
-        panes: { separatorColor: 'rgba(255,255,255,.09)', separatorHoverColor: 'rgba(247,147,26,.25)', enableResize: true } },
-      grid: { vertLines: { color: 'rgba(255,255,255,.035)' }, horzLines: { color: 'rgba(255,255,255,.035)' } },
-      rightPriceScale: { borderColor: 'rgba(255,255,255,.1)', scaleMargins: { top: 0.08, bottom: 0.08 } },
-      timeScale: { borderColor: 'rgba(255,255,255,.1)', timeVisible: true, secondsVisible: false, rightOffset: 8, barSpacing: 7, shiftVisibleRangeOnNewBar: true },
-      crosshair: { mode: 0, vertLine: { color: 'rgba(247,147,26,.45)', labelBackgroundColor: '#3a2a12' }, horzLine: { color: 'rgba(247,147,26,.45)', labelBackgroundColor: '#3a2a12' } }
-    }, locOpts()));
+    this.chart = LW.createChart(this.box, Object.assign({ autoSize: true }, lookOpts(), locOpts()));
     this.ovl = new Overlay(this); this.chart.panes()[0].attachPrimitive(this.ovl.prim);
     this.makeMain();
     this.chart.subscribeCrosshairMove(function (p) { self.onCross(p); });
@@ -385,7 +456,7 @@
   ProView.prototype.defaultOptions = function () { return Object.assign({}, LW.customSeriesDefaultOptions || {}, { color: '#f7931a' }); };
   ProView.prototype.draw = function (target, pc) {
     var d = this._d, kind = this.kind; if (!d || !d.bars || !d.bars.length || !d.visibleRange) return;
-    var UP = '#34d399', DN = '#ff5a4d';
+    var UP = st.look.up, DN = st.look.dn;
     target.useBitmapCoordinateSpace(function (sc) {
       var x = sc.context, hr = sc.horizontalPixelRatio, vr = sc.verticalPixelRatio, B = d.bars, sp = d.barSpacing;
       var a = Math.max(0, d.visibleRange.from - 1), z = Math.min(B.length, d.visibleRange.to + 2), i, b, o;
@@ -435,20 +506,20 @@
   Cell.prototype.prec = function () { var b = this.bars[this.bars.length - 1]; return P.precFor ? P.precFor(this.cfg.sym, b ? b.c : 1) : P.prec(b ? b.c : 1); };
   Cell.prototype.fmt = function (p) { return P.fmt(p, this.prec()); };
   Cell.prototype.makeMain = function () {
-    var c = this.cfg, ch = this.chart, t = c.type, UP = '#34d399', DN = '#ff5a4d', s;
+    var c = this.cfg, ch = this.chart, t = c.type, L = st.look, UP = L.up, DN = L.dn, BU = L.bcol || UP, BD = L.bcol || DN, WU = L.wcol || UP, WD = L.wcol || DN, s;
     if (this.drawer) { this.drawer.destroy(); this.drawer = null; }
     if (this.mk) { try { this.mk.detach(); } catch (e) { } this.mk = null; }
     if (this.main) { try { ch.removeSeries(this.main); } catch (e) { } }
     if (t === 'bars') s = ch.addSeries(LW.BarSeries, { upColor: UP, downColor: DN, thinBars: false });
-    else if (t === 'line' || t === 'linemk' || t === 'step') s = ch.addSeries(LW.LineSeries, { color: '#f7931a', lineWidth: 2, pointMarkersVisible: t === 'linemk', pointMarkersRadius: 2.5, lineType: t === 'step' ? 1 : 0 });
-    else if (t === 'area') s = ch.addSeries(LW.AreaSeries, { lineColor: '#f7931a', topColor: 'rgba(247,147,26,.32)', bottomColor: 'rgba(247,147,26,.02)', lineWidth: 2 });
+    else if (t === 'line' || t === 'linemk' || t === 'step') s = ch.addSeries(LW.LineSeries, { color: L.line, lineWidth: L.lw, pointMarkersVisible: t === 'linemk', pointMarkersRadius: 2.5, lineType: t === 'step' ? 1 : 0 });
+    else if (t === 'area') s = ch.addSeries(LW.AreaSeries, { lineColor: L.line, topColor: rgba(L.line, 0.32), bottomColor: rgba(L.line, 0.02), lineWidth: L.lw });
     else if (t === 'baseline') s = ch.addSeries(LW.BaselineSeries, { topLineColor: UP, topFillColor1: 'rgba(52,211,153,.28)', topFillColor2: 'rgba(52,211,153,.04)', bottomLineColor: DN, bottomFillColor1: 'rgba(255,90,77,.04)', bottomFillColor2: 'rgba(255,90,77,.28)', lineWidth: 2 });
     else if (t === 'columns') s = ch.addSeries(LW.HistogramSeries, { color: UP });
     else if (t === 'volcandle' || t === 'hlcarea' || t === 'kagi' || t === 'pnf') s = ch.addCustomSeries(new ProView(t), {});
     else if (t === 'highlow') s = ch.addSeries(LW.CandlestickSeries, { upColor: 'rgba(91,141,239,.75)', downColor: 'rgba(91,141,239,.75)', borderVisible: false, wickVisible: false });
-    else if (t === 'renko' || t === 'lbreak') s = ch.addSeries(LW.CandlestickSeries, { upColor: UP, downColor: DN, borderUpColor: UP, borderDownColor: DN, wickVisible: false });
-    else s = ch.addSeries(LW.CandlestickSeries, { upColor: UP, downColor: DN, borderUpColor: UP, borderDownColor: DN, wickUpColor: UP, wickDownColor: DN });
-    this.main = s; this.applyPrec();
+    else if (t === 'renko' || t === 'lbreak') s = ch.addSeries(LW.CandlestickSeries, { upColor: UP, downColor: DN, borderUpColor: BU, borderDownColor: BD, wickVisible: false });
+    else s = ch.addSeries(LW.CandlestickSeries, { upColor: L.body ? UP : 'rgba(0,0,0,0)', downColor: L.body ? DN : 'rgba(0,0,0,0)', borderVisible: !!L.border, borderUpColor: BU, borderDownColor: BD, wickVisible: !!L.wick, wickUpColor: WU, wickDownColor: WD });
+    this.main = s; this.applyPrec(); setWatermark(this);
     var self = this;
     this.drawer = new P.Drawer({ chart: ch, series: s, el: this.box, bars: function () { return self.disp; }, sec: function () { return self.tfSec(); }, sym: function () { return self.cfg.sym; },
       list: function (sym) { return DRAW[sym]; }, changed: drawChanged, fmt: function (p) { return self.fmt(p); }, T: T, touch: function () { return matchMedia('(pointer: coarse)').matches; },
@@ -467,8 +538,11 @@
   Cell.prototype.applyPrec = function () {
     var pr = this.prec(), tmn = P.isLocal && P.isLocal(this.cfg.sym) && pr === 0;
     /* toman (and yen, won, dong …) prices run to hundreds of millions: grouped digits on the axis (only for this series, not the oscillators) */
-    if (this.main) this.main.applyOptions({ priceFormat: tmn ? { type: 'custom', minMove: 1, formatter: function (p) { return Math.round(p).toLocaleString('en-US'); } } : { type: 'price', precision: pr, minMove: Math.pow(10, -pr) } });
-    var sc = this.cfg.scale; this.chart.priceScale('right').applyOptions({ mode: sc.mode, autoScale: !!sc.auto });
+    var L = st.look;
+    if (this.main) this.main.applyOptions({ lastValueVisible: !!L.lastLab, priceLineVisible: !!L.last, priceLineColor: rgba(L.ccol, 0.8),
+      priceFormat: tmn ? { type: 'custom', minMove: 1, formatter: function (p) { return Math.round(p).toLocaleString('en-US'); } } : { type: 'price', precision: pr, minMove: Math.pow(10, -pr) } });
+    var sc = this.cfg.scale, o = { mode: sc.mode, autoScale: !!sc.auto, invertScale: !!sc.inv };
+    this.chart.priceScale('right').applyOptions(o); if (L.pscale === 'left' || L.pscale === 'both') { try { this.chart.priceScale('left').applyOptions(o); } catch (e) { } }
   };
   Cell.prototype.tfSec = function () { var tf = P.parseTF(this.cfg.tf); return tf ? tf.sec : 3600; };
   Cell.prototype.load = function () {
@@ -525,9 +599,9 @@
     return bars;
   };
   Cell.prototype.point = function (b, prev) {
-    var t = this.cfg.type, UP = '#34d399', DN = '#ff5a4d';
+    var t = this.cfg.type, L = st.look, UP = L.up, DN = L.dn;
     if (t === 'line' || t === 'linemk' || t === 'step' || t === 'area' || t === 'baseline') return { time: b.t, value: b.c };
-    if (t === 'columns') return { time: b.t, value: b.c, color: b.c >= (prev ? prev.c : b.o) ? 'rgba(52,211,153,.75)' : 'rgba(255,90,77,.75)' };
+    if (t === 'columns') return { time: b.t, value: b.c, color: b.c >= (prev ? prev.c : b.o) ? rgba(UP, 0.75) : rgba(DN, 0.75) };
     if (t === 'highlow') return { time: b.t, open: b.h, high: b.h, low: b.l, close: b.l };
     var p = { time: b.t, open: b.o, high: b.h, low: b.l, close: b.c };
     if (t === 'volcandle' || t === 'hlcarea') p.v = b.v || 0;
@@ -536,7 +610,7 @@
     if (t === 'hollow') {                    /* TradingView's hollow candles: hollow when close > open, colour from the previous close */
       var col = b.c >= (prev ? prev.c : b.o) ? UP : DN;
       p.color = b.c > b.o ? 'rgba(0,0,0,0)' : col; p.borderColor = col; p.wickColor = col;
-    }
+    } else if (L.hollow && (t === 'candle' || t === 'heikin')) { var cu = b.c >= b.o; p.color = cu ? 'rgba(0,0,0,0)' : (L.body ? (cu ? UP : DN) : 'rgba(0,0,0,0)'); p.borderColor = cu ? UP : DN; p.wickColor = L.wcol || (cu ? UP : DN); }
     return p;
   };
   Cell.prototype.render = function (upto) {
@@ -1440,8 +1514,111 @@
     if (r.requestFullscreen) r.requestFullscreen().catch(function () { r.classList.toggle('pm-fs'); fit(); }); else { r.classList.toggle('pm-fs'); fit(); }
   }
   var TZS = ['local', 'UTC', 'Asia/Tehran', 'Asia/Baghdad', 'Europe/Istanbul', 'Asia/Dubai', 'Europe/London', 'Europe/Berlin', 'America/New_York', 'Asia/Tokyo'];
+  /* ---- the chart's settings, TradingView's four tabs: symbol · scales · appearance · crosshair and mouse */
+  function chartSettings(tab) {
+    closeMenu();
+    var L = st.look, tabs = [['sym', 'csSym'], ['scale', 'csScale'], ['look', 'csLook'], ['cross', 'csCross']], panes = {};
+    var f = h('<form class="pm-dset pm-cs"><div class="pm-dtabs" role="tablist"></div><div class="pm-dpane"></div>' +
+      '<div class="pm-row"><button class="pm-btn pri" type="submit"></button><button class="pm-btn" type="button" data-rst></button><button class="pm-btn" type="button" data-x></button></div></form>');
+    var tb = $('.pm-dtabs', f), pane = $('.pm-dpane', f), live = {};
+    function put(k, v) { L[k] = v; applyLook(live[k] === 'full'); }
+    function row(lbl, el, hint) { var r = h('<label class="pm-drow"><span></span></label>'); $('span', r).textContent = T(lbl); if (hint) { var sm = h('<small class="pm-dhint"></small>'); sm.textContent = hint; $('span', r).appendChild(sm); } r.appendChild(el); return r; }
+    function colour(k, full) {
+      var w = h('<span class="pm-cw"><input type="color" class="pm-in"><button type="button" class="pm-ib pm-crst" title="' + esc(T('stReset')) + '">↺</button></span>'), i = $('input', w);
+      i.value = L[k] || LOOK0[k] || '#ffffff'; live[k] = full ? 'full' : 1;
+      i.oninput = function () { put(k, i.value); }; $('.pm-crst', w).onclick = function () { i.value = LOOK0[k] || '#ffffff'; put(k, i.value); };
+      return w;
+    }
+    function toggle(k, full) { var i = h('<input type="checkbox">'); i.checked = !!L[k]; live[k] = full ? 'full' : 1; i.onchange = function () { put(k, i.checked ? 1 : 0); }; return i; }
+    function slider(k, lo, hi, stp, full) {
+      var w = h('<span class="pm-cw"><input type="range" class="pm-rng"><b class="pm-rv"></b></span>'), i = $('input', w), o = $('.pm-rv', w);
+      i.min = lo; i.max = hi; i.step = stp; i.value = L[k]; o.textContent = loc(L[k]); live[k] = full ? 'full' : 1;
+      i.oninput = function () { o.textContent = loc(+i.value); put(k, +i.value); }; return w;
+    }
+    function pick(k, opts, full) {
+      var se = h('<select class="pm-in"></select>'); opts.forEach(function (o) { var x = new Option(T(o[1]), String(o[0])); if (String(L[k]) === String(o[0])) x.selected = true; se.appendChild(x); });
+      live[k] = full ? 'full' : 1;
+      se.onchange = function () {
+        var v = typeof LOOK0[k] === 'number' ? +se.value : se.value;
+        if (k === 'theme') { st.look = saneLook(Object.assign({}, LOOK0, THEMES[v], { theme: v })); L = st.look; applyLook(true); chartSettings(tab); return; }
+        put(k, v); if (full) chartSettings(tab);
+      };
+      return se;
+    }
+    /* --- symbol: the candles themselves */
+    var P1 = h('<div></div>');
+    P1.appendChild(row('csUp', colour('up', 1))); P1.appendChild(row('csDn', colour('dn', 1)));
+    P1.appendChild(row('csBody', toggle('body', 1))); P1.appendChild(row('csBorders', toggle('border', 1))); P1.appendChild(row('csWick', toggle('wick', 1)));
+    P1.appendChild(row('csHollow', toggle('hollow', 1), T('csHollowH')));
+    var bcw = h('<span class="pm-cw"></span>'), bI = h('<input type="color" class="pm-in">'), bT = h('<input type="checkbox">');
+    bT.checked = !!L.bcol; bI.value = L.bcol || L.up; bI.disabled = !L.bcol;
+    bT.onchange = function () { bI.disabled = !bT.checked; L.bcol = bT.checked ? bI.value : ''; applyLook(true); };
+    bI.oninput = function () { L.bcol = bI.value; applyLook(true); };
+    bcw.appendChild(bT); bcw.appendChild(bI); P1.appendChild(row('csBorderC', bcw, T('csOneColour')));
+    var wcw = h('<span class="pm-cw"></span>'), wI = h('<input type="color" class="pm-in">'), wT = h('<input type="checkbox">');
+    wT.checked = !!L.wcol; wI.value = L.wcol || L.up; wI.disabled = !L.wcol;
+    wT.onchange = function () { wI.disabled = !wT.checked; L.wcol = wT.checked ? wI.value : ''; applyLook(true); };
+    wI.oninput = function () { L.wcol = wI.value; applyLook(true); };
+    wcw.appendChild(wT); wcw.appendChild(wI); P1.appendChild(row('csWickC', wcw, T('csOneColour')));
+    P1.appendChild(row('csLineC', colour('line', 1))); P1.appendChild(row('csLineW', slider('lw', 1, 6, 1, 1)));
+    P1.appendChild(row('csLast', toggle('last'))); P1.appendChild(row('csLastLab', toggle('lastLab')));
+    panes.sym = P1;
+    /* --- scales */
+    var P2 = h('<div></div>'), a = active();
+    var sm = h('<select class="pm-in"></select>'); [['0', 'scNormal'], ['1', 'scLog'], ['2', 'scPct']].forEach(function (o) { var x = new Option(T(o[1]), o[0]); if (String(a.cfg.scale.mode) === o[0]) x.selected = true; sm.appendChild(x); });
+    sm.onchange = function () { var v = +sm.value; cells.forEach(function (c) { if (st.sync.tf || c === a) c.cfg.scale.mode = v; }); cells.forEach(function (c) { c.applyPrec(); }); paintTop(); save(); };
+    P2.appendChild(row('scMode', sm, T('scModeH')));
+    var ai = h('<input type="checkbox">'); ai.checked = !!a.cfg.scale.auto; ai.onchange = function () { a.cfg.scale.auto = ai.checked ? 1 : 0; a.applyPrec(); paintTop(); save(); }; P2.appendChild(row('scAuto', ai));
+    var iv = h('<input type="checkbox">'); iv.checked = !!a.cfg.scale.inv; iv.onchange = function () { a.cfg.scale.inv = iv.checked ? 1 : 0; a.applyPrec(); save(); }; P2.appendChild(row('scInvert', iv, T('scInvertH')));
+    P2.appendChild(row('scSide', pick('pscale', [['right', 'scRight'], ['left', 'scLeft'], ['both', 'scBoth'], ['none', 'scNone']])));
+    P2.appendChild(row('scTop', slider('mtop', 0, 40, 1))); P2.appendChild(row('scBot', slider('mbot', 0, 40, 1)));
+    P2.appendChild(row('scSpace', slider('space', 2, 40, 0.5))); P2.appendChild(row('scOff', slider('roff', 0, 100, 1)));
+    P2.appendChild(row('scSec', toggle('sec'))); P2.appendChild(row('scBorder', toggle('border2'))); P2.appendChild(row('scTsBorder', toggle('tsBorder')));
+    panes.scale = P2;
+    /* --- appearance */
+    var P3 = h('<div></div>');
+    P3.appendChild(row('csTheme', pick('theme', [['dark', 'thDark'], ['midnight', 'thMid'], ['paper', 'thPaper'], ['light', 'thLight']], 1)));
+    P3.appendChild(row('csBg', colour('bg')));
+    var g2 = h('<span class="pm-cw"></span>'), g2i = h('<input type="color" class="pm-in">'), g2t = h('<input type="checkbox">');
+    g2t.checked = !!L.bg2; g2i.value = L.bg2 || L.bg; g2i.disabled = !L.bg2;
+    g2t.onchange = function () { g2i.disabled = !g2t.checked; L.bg2 = g2t.checked ? g2i.value : ''; applyLook(); };
+    g2i.oninput = function () { L.bg2 = g2i.value; applyLook(); };
+    g2.appendChild(g2t); g2.appendChild(g2i); P3.appendChild(row('csBg2', g2, T('csGrad')));
+    P3.appendChild(row('csText', colour('text')));
+    P3.appendChild(row('csFont', pick('font', [[0, 'fnSans'], [1, 'fnSerif'], [2, 'fnMono']])));
+    P3.appendChild(row('csFsize', slider('fsize', 9, 20, 1)));
+    P3.appendChild(row('csGridV', toggle('gv'))); P3.appendChild(row('csGridH', toggle('gh')));
+    P3.appendChild(row('csGridC', colour('grid'))); P3.appendChild(row('csGridA', slider('ga', 0, 30, 0.5)));
+    P3.appendChild(row('csWm', toggle('wm')));
+    var wt = h('<input class="pm-in" maxlength="40">'); wt.value = L.wmt; wt.placeholder = T('csWmAuto'); wt.oninput = function () { L.wmt = wt.value.replace(/[<>]/g, '').slice(0, 40); applyLook(); }; wt.addEventListener('keydown', function (e) { e.stopPropagation(); });
+    P3.appendChild(row('csWmText', wt)); P3.appendChild(row('csWmSize', slider('wmsize', 16, 140, 2))); P3.appendChild(row('csWmC', colour('wmcol'))); P3.appendChild(row('csWmA', slider('wma', 0, 40, 1)));
+    panes.look = P3;
+    /* --- crosshair and mouse */
+    var P4 = h('<div></div>');
+    P4.appendChild(row('csCrossMode', pick('cross', [[0, 'crFree'], [1, 'crMagnet'], [2, 'crOff']])));
+    P4.appendChild(row('csCrossC', colour('ccol'))); P4.appendChild(row('csCrossW', slider('cw', 1, 4, 1)));
+    P4.appendChild(row('csCrossD', pick('cdash', [[0, 'stSolid'], [1, 'stDotted'], [2, 'stDashed'], [3, 'crLargeDash'], [4, 'crSparse']])));
+    P4.appendChild(row('csCrossLab', toggle('clab')));
+    P4.appendChild(row('csScroll', toggle('scroll'))); P4.appendChild(row('csZoom', toggle('zoom'), T('csZoomH')));
+    P4.appendChild(row('csPinch', toggle('pinch'))); P4.appendChild(row('csKinetic', toggle('kinetic')));
+    panes.cross = P4;
+    tab = panes[tab] ? tab : 'sym';
+    tabs.forEach(function (t) {
+      var b = h('<button type="button" role="tab" class="pm-dtab' + (t[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(t[1]);
+      b.onclick = function () { tab = t[0]; $$('.pm-dtab', tb).forEach(function (x) { x.classList.toggle('on', x === b); }); pane.innerHTML = ''; pane.appendChild(panes[t[0]]); };
+      tb.appendChild(b);
+    });
+    pane.appendChild(panes[tab]);
+    $('[type=submit]', f).textContent = T('ok'); $('[data-rst]', f).textContent = T('stReset'); $('[data-x]', f).textContent = T('csClose');
+    $('[data-x]', f).onclick = closeModal;
+    $('[data-rst]', f).onclick = function () { confirmBox(T('stReset'), T('csResetQ'), function () { st.look = Object.assign({}, LOOK0); applyLook(true); chartSettings(tab); }); };
+    f.onsubmit = function (e) { e.preventDefault(); save(); closeModal(); };
+    modal(T('csTitle'), f, { nofocus: true });
+  }
+
   function settingsMenu(anchor) {
-    var items = [{ label: T('langTitle'), hint: LROW[LANG] ? LROW[LANG][1] : '', icon: 'globe', act: langDialog },
+    var items = [{ label: T('csTitle'), icon: 'gear', act: function () { chartSettings('sym'); } }, { sep: 1 },
+      { label: T('langTitle'), hint: LROW[LANG] ? LROW[LANG][1] : '', icon: 'globe', act: langDialog },
       { label: T('curTitle'), hint: P.fx ? curLabel(P.fx.cur()) : '', act: curDialog }, { head: T('timezone') }];
     TZS.forEach(function (z) { items.push({ label: z === 'local' ? T('tzLocal') : z.replace('_', ' '), on: st.tz === z, act: function () { setTZ(z); } }); });
     items.push({ head: T('calendar') },
@@ -2027,7 +2204,8 @@
     menu: menu, closeMenu: closeMenu, on: on, emit: emit, st: function () { return st; }, save: save, cells: function () { return cells; }, active: active, setActive: setActive,
     applySym: applySym, fmtT: fmtT, fmtD: fmtD, tzLabel: tzLabel, panels: PANELS, setSide: setSide, DRAW: function () { return DRAW; }, mutate: mutate, removeDrawing: removeDrawing,
     goDate: goDate, tzOffset: tzOffset, indName: indName, tfLabel: tfLabel, download: download, SYM_RE: SYM_RE, debounce: debounce, symbolSearch: function (q) { symbolSearch(q); },
-    indDialog: function () { indDialog(); }, indSettings: function (c, x) { indSettings(c, x); },
+    indDialog: function () { indDialog(); }, indSettings: function (c, x) { indSettings(c, x); }, chartSettings: function (t) { chartSettings(t); }, look: function () { return st.look; },
+
     langDialog: function () { langDialog(); }, curDialog: function () { curDialog(); }, curLabel: function (c) { return curLabel(c); }
   };
 
@@ -2035,6 +2213,7 @@
     if (!$('#pro')) return;
     P.setSaver(st.saver == null ? P.saverAuto : st.saver);
     build(); buildGrid(); pageText(); readShare();
+    de.style.setProperty('--pm-bg', st.look.bg); root.classList.toggle('pm-light', isLight()); cells.forEach(setWatermark);
     /* /market/#lang and /market/#cur open the language or currency menu (the bot's «47 languages» button) */
     if (/^#(lang|cur)$/.test(location.hash)) { var mh = location.hash.slice(1); history.replaceState(null, '', location.pathname + location.search); setTimeout(mh === 'lang' ? langDialog : curDialog, 300); }
     /* a chart restored from storage, a file or a link on a coin the site has no logo for moves to BTC; drawings on such
