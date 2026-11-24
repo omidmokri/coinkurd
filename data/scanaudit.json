@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-24T23:26:27.908503+00:00",
+ "updated_at": "2026-11-24T23:53:58.110988+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-23T23:00:00+00:00"
@@ -7,7 +7,7 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 236,
+ "coins": 235,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
@@ -23,11 +23,11 @@
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6425,
+   "n": 6418,
    "obs": 0.0,
    "win": 49.7,
    "mid": 0.0,
-   "lo": -0.37,
+   "lo": -0.36,
    "hi": 0.2,
    "p": 0.9947,
    "shifts": 1324,
@@ -45,13 +45,13 @@
    "verdict": "no_edge"
   },
   "volume_spike": {
-   "n": 1627,
-   "obs": -0.29,
-   "win": 44.9,
+   "n": 1625,
+   "obs": -0.28,
+   "win": 45.0,
    "mid": 0.13,
    "lo": -0.42,
-   "hi": 0.8,
-   "p": 0.1639,
+   "hi": 0.81,
+   "p": 0.1647,
    "shifts": 1324,
    "verdict": "no_edge"
   },
@@ -67,35 +67,35 @@
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 594,
+   "n": 593,
    "obs": -1.12,
-   "win": 42.4,
+   "win": 42.5,
    "mid": -0.82,
    "lo": -1.67,
    "hi": 0.15,
-   "p": 0.5695,
+   "p": 0.565,
    "shifts": 1324,
    "verdict": "no_edge"
   },
   "rsi_overbought": {
-   "n": 422,
+   "n": 421,
    "obs": 1.03,
-   "win": 66.6,
-   "mid": 0.75,
+   "win": 66.5,
+   "mid": 0.76,
    "lo": -0.38,
    "hi": 1.73,
-   "p": 0.5959,
+   "p": 0.5974,
    "shifts": 1324,
    "verdict": "no_edge"
   },
   "breakout_up": {
-   "n": 527,
-   "obs": -0.77,
-   "win": 37.2,
+   "n": 525,
+   "obs": -0.78,
+   "win": 37.1,
    "mid": -0.76,
-   "lo": -1.97,
+   "lo": -1.98,
    "hi": 0.4,
-   "p": 0.9887,
+   "p": 0.9796,
    "shifts": 1324,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "rsi_oversold": {
-   "n": 836,
+   "n": 835,
    "obs": -0.26,
    "win": 51.6,
    "mid": -0.74,
-   "lo": -2.4,
+   "lo": -2.41,
    "hi": 0.42,
-   "p": 0.5491,
+   "p": 0.5461,
    "shifts": 1324,
    "verdict": "no_edge"
   }
