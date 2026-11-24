@@ -63,7 +63,24 @@ def corr(a, b):
     return round(c / (da * db), 3) if da and db else None
 
 
+def regime():
+    """the open-source Macro Regime engine, for the /market/ chart (data/macro_regime.json); its own 6-hour pace"""
+    try:
+        import time
+        import macro_regime
+        if os.path.exists(macro_regime.OUT) and time.time() - os.path.getmtime(macro_regime.OUT) < 6 * 3600 and os.environ.get("MACRO_FORCE") != "1":
+            try:
+                if json.load(open(macro_regime.OUT, encoding="utf-8")).get("updated") == datetime.now(timezone.utc).date().isoformat():
+                    return
+            except Exception:  # noqa: BLE001
+                pass
+        macro_regime.main(fred)
+    except Exception as e:  # noqa: BLE001
+        print("macro_regime failed:", str(e)[:120])
+
+
 def main():
+    regime()
     old = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     if old.get("updated_at") and os.environ.get("MACRO_FORCE") != "1":
         age = (datetime.now(timezone.utc) - datetime.fromisoformat(old["updated_at"])).total_seconds() / 3600
@@ -131,11 +148,6 @@ def main():
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     m3 = windows["3m"]["matrix"]["BTC"]
     print(f"macro: {len(assets)} assets, {len(rdates)} common days; BTC~SPX 3m {m3.get('SPX')} · BTC~DXY {m3.get('DXY')} · toman {out.get('usdt_irt', {}).get('value')}")
-    try:                                                    # the open-source Macro Regime engine, for the /market/ chart (data/macro_regime.json)
-        import macro_regime
-        macro_regime.main(fred)
-    except Exception as e:  # noqa: BLE001
-        print("macro_regime failed:", str(e)[:120])
 
 
 if __name__ == "__main__":
