@@ -21,7 +21,8 @@ SRC = os.environ.get("STICKER_DIR") or os.path.join(ROOT, "assets", "stickers", 
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
 OWNER = next((int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip().lstrip("-").isdigit()), 0)
 PER_SET = 120                                  # Telegram's ceiling for one pack
-FIRST = 50                                     # how many may ride along with the create call
+FIRST = 1                                      # the create call carries one; the rest are added singly,
+                                               # so one awkward sticker can never sink a whole pack
 TITLES = ["کوین کورد | Coin Kurd", "کوین کورد ۲ | Coin Kurd 2"]
 API = "https://api.telegram.org/bot%s/" % TOKEN
 
@@ -69,6 +70,34 @@ def call(method, fields=None, files=None, tries=4):
             return {"ok": False, "description": "network: %r" % (ex,)}
 
 
+EMOJI_OK = (
+    (0x1F300, 0x1FAFF), (0x1F000, 0x1F0FF), (0x1F1E6, 0x1F1FF), (0x2600, 0x27BF),
+    (0x2B00, 0x2BFF), (0x2194, 0x21AA), (0x231A, 0x23FA), (0x2934, 0x2935),
+)
+EMOJI_SPARSE = {0x25AA, 0x25AB, 0x25B6, 0x25C0, 0x25FB, 0x25FC, 0x25FD, 0x25FE,
+                0x1F170, 0x1F171, 0x1F17E, 0x1F17F, 0x1F18E, 0x1F191, 0x1F192, 0x1F193,
+                0x1F194, 0x1F195, 0x1F196, 0x1F197, 0x1F198, 0x1F199, 0x1F19A, 0x1F201,
+                0x1F202, 0x1F21A, 0x1F22F, 0x1F232, 0x1F233, 0x1F234, 0x1F235, 0x1F236,
+                0x1F237, 0x1F238, 0x1F239, 0x1F23A, 0x1F250, 0x1F251}
+EMOJI_SINGLES = {0xFE0F, 0x200D, 0x20E3, 0x00A9, 0x00AE, 0x203C, 0x2049, 0x2122, 0x2139,
+                 0x24C2, 0x3030, 0x303D, 0x3297, 0x3299}
+
+
+def emoji(e):
+    """Telegram rejects a whole pack over one character that only looks like an emoji
+    (the Bitcoin sign and the Greek Xi are the usual culprits), so anything doubtful
+    becomes a sparkle rather than a failed run."""
+    for c in e:
+        o = ord(c)
+        if o in EMOJI_SINGLES or o in EMOJI_SPARSE:
+            continue
+        if 0x1F100 <= o <= 0x1F2FF:            # enclosed letters and numbers: only the few above
+            return "\u2728"
+        if not any(lo <= o <= hi for lo, hi in EMOJI_OK):
+            return "\u2728"
+    return e or "\u2728"
+
+
 def existing(name):
     r = call("getStickerSet", {"name": name})
     return r.get("result") if r.get("ok") else None
@@ -105,7 +134,7 @@ def main():
             for i, it in enumerate(head):
                 key = "f%d" % i
                 files[key] = (it["file"], open(os.path.join(SRC, it["file"]), "rb").read())
-                meta.append({"sticker": "attach://" + key, "format": "video", "emoji_list": [it["emoji"]]})
+                meta.append({"sticker": "attach://" + key, "format": "video", "emoji_list": [emoji(it["emoji"])]})
             r = call("createNewStickerSet", {"user_id": str(OWNER), "name": name, "title": title,
                                              "stickers": json.dumps(meta)}, files)
             if not r.get("ok"):
@@ -118,7 +147,7 @@ def main():
             blob = open(os.path.join(SRC, it["file"]), "rb").read()
             r = call("addStickerToSet", {"user_id": str(OWNER), "name": name,
                                          "sticker": json.dumps({"sticker": "attach://f", "format": "video",
-                                                                "emoji_list": [it["emoji"]]})},
+                                                                "emoji_list": [emoji(it["emoji"])]})},
                      {"f": (it["file"], blob)})
             if not r.get("ok"):
                 print("add %s -> %s failed: %s" % (it["file"], name, r.get("description")), file=sys.stderr)
