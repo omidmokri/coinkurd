@@ -198,3 +198,19 @@ output.sw-num:empty::before{content:"0.0";color:#565a64}
 .sw-hrow a{grid-column:2;grid-row:1 / span 2;align-self:center;font-family:'Space Grotesk',monospace;font-size:.76rem}
 .sw-hrow[data-st="failed"] small{color:var(--s-r,#e5484d)}
 #sw-rep-out{margin-top:6px;color:var(--s-ink)}
+
+/* route steps, the status box, the advanced view */
+.sw-route{flex-wrap:wrap}
+.sw-route small{flex-basis:100%;font-size:.72rem;color:var(--s-mute);unicode-bidi:isolate;text-align:start}
+.sw-advq{border-top:1px dashed var(--s-line);margin-top:4px;padding-top:4px}
+.sw-track{margin:10px 0 0;padding:10px 12px;border:1px solid var(--s-line);border-radius:14px;background:rgba(255,255,255,.03)}
+.sw-track-h{display:flex;align-items:center;gap:10px;font-size:.84rem}
+.sw-track-h b{color:var(--s-ink)}
+.sw-track-h .sw-link{margin-inline-start:auto}
+.sw-track-st{font-size:.76rem;padding:2px 10px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-y)}
+.sw-track-st:empty{display:none}
+.sw-track-st[data-st="done"]{color:var(--s-g)}
+.sw-track-st[data-st="failed"]{color:var(--s-r)}
+.sw-track-sum{font-size:.82rem;color:var(--s-ink);margin-top:6px;text-align:start;unicode-bidi:isolate}
+.sw-track-sum:empty{display:none}
+.sw-status div[data-ok="1"]{color:var(--s-g)}

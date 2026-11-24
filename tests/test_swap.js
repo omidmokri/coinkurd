@@ -203,7 +203,7 @@ const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 't
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
   'dlg-find', 'dlg-close', 'rcp', 'rcp-box', 'rcp-c', 'ack-a', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
   'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1',
-  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out'].map(x => 'sw-' + x);
+  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out', 'track', 'track-sum', 'track-st', 'track-close', 'mode', 'adv'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
@@ -915,7 +915,9 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
     q.estimate.toAmountMin = (BigInt(to) * 995n / 1000n).toString(); if (over) { over(q); } });
   serve = (u) => { const m = /deny(?:Exchanges|Bridges)=([^&]*)/.exec(u); const deny = m ? decodeURIComponent(m[1]).split(',') : [];
     if (deny.length === 0) { return namedQ('pancakeswap', 'PancakeSwap', '550000000000000000000'); }
-    if (deny.length === 1) { return namedQ('fly', 'Fly', '549000000000000000000'); }
+    if (deny.length === 1) { return namedQ('fly', 'Fly', '549000000000000000000', q => { q.includedSteps = [{ type: 'protocol', tool: 'feeCollection', toolDetails: { name: 'LI.FI Fee' } },
+      { type: 'swap', tool: 'fly', toolDetails: { name: 'Fly' } }, { type: 'swap', tool: 'uni', toolDetails: { name: 'Uniswap <b>' } }];
+      q.estimate.gasCosts = [{ amountUSD: '0.02', estimate: '210000' }]; q.estimate.feeCosts = [{ name: 'LIFI Fixed Fee', amountUSD: '0.14' }]; }); }
     return namedQ('evil', 'Evil', '999000000000000000000', q => { q.transactionRequest.to = '0x' + '6'.repeat(40); }); };
   freshWallet(); urls = [];
   let rtW = makeWindow(CFG, { allowed: true, storage: histStore });
@@ -936,8 +938,24 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(routeRows()[0].attrs['aria-pressed'] === 'true', 'the best route stays chosen until the reader picks another');
   routeRows()[1].fire('click'); await sleep(120);
   ok(rtW.$('route').textContent === 'Fly' && rtW.$('receive').textContent.indexOf('549') === 0 && routeRows()[1].attrs['aria-pressed'] === 'true', 'choosing the other route shows its own figures');
+  ok(routeRows()[1].kids.length === 3 && routeRows()[1].kids[2].textContent === 'Fly → Uniswap b', "its stops are listed in order, LI.FI's own fee step left out, and nothing but plain letters kept");
+  ok(routeRows()[0].kids[0].textContent.indexOf('پیشنهادی') > 0 && routeRows()[1].kids[0].textContent.indexOf('انتخاب شما') > 0, "the first stays marked as recommended and the picked one as the reader's choice");
+  ok(rtW.$('adv').hidden === true && rtW.$('route').textContent === 'Fly', 'the simple view shows the route by name only');
+  const callsNow = urls.length;
+  rtW.$('mode').fire('click', { target: { getAttribute: () => 'adv' } });
+  ok(rtW.$('adv').hidden === false && rtW.$('route').textContent === 'Fly → Uniswap b' && rtW.$('adv').textContent.indexOf('210000') > 0 && rtW.$('adv').textContent.indexOf('LIFI Fixed Fee · $0.14') > 0,
+     'the advanced view lays out the steps, the gas estimate and each fee');
+  ok(urls.length === callsNow, '…from the answer already in hand: switching the view asks the network for nothing');
+  rtW.$('mode').fire('click', { target: { getAttribute: () => 'simple' } });
+  ok(rtW.$('adv').hidden === true, 'and back to simple hides it again');
+  ok(rtW.$('track').hidden === true, 'the status box is out of sight until something is sent');
   rtW.go(); await sleep(250);
   ok(rtW.sent.length === 1 && rtW.sent[0].to === DIAMOND, "and what is signed is that route's own transaction, to LI.FI's contract");
+  ok(rtW.$('track').hidden === false && rtW.$('track-sum').textContent.indexOf('1 BNB → 549 USDT') === 0 && rtW.$('track-st').attrs['data-st'] === 'done',
+     'after signing a box stays with what was swapped and how it stands (' + rtW.$('track-sum').textContent + ' / ' + rtW.$('track-st').textContent + ')');
+  ok(rtW.$('status').kids.some(k => k.attrs['data-ok'] === '1' && k.textContent.indexOf('تاریخچه') > 0), 'a line says the swap was saved to the local history');
+  rtW.$('track-close').fire('click');
+  ok(rtW.$('track').hidden === true, 'the reader can close the box');
   const histNow = JSON.parse(histBox.sw_hist || '[]');
   ok(histNow.length === 1 && histNow[0].fs === 'BNB' && histNow[0].ts === 'USDT' && histNow[0].st === 'done' && histNow[0].h === '0x' + 'ab'.repeat(32),
      'the swap is written into the history of this browser');

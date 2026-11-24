@@ -457,8 +457,10 @@ def controls():
 {q("fee", "کارمزد سرویس", "کرێی خزمەتگوزاری", "Service fee")}
 {q("time", "زمان تقریبی", "کاتی نزیکەیی", "About")}
 </div>
+<div id="sw-adv" class="sw-quote sw-advq" hidden></div>
 <div class="sw-alt"><button type="button" id="sw-routes-go" class="sw-link" hidden>{tri("مسیرهای دیگر", "ڕێگاکانی تر", "Other routes")}</button><div id="sw-routes" class="sw-routes"></div></div>
 <div id="sw-bridge" class="sw-warnline" role="status"></div>
+<div class="sw-slip"><span class="sw-lab">{tri("نمایش", "پیشاندان", "View")}</span><span id="sw-mode" class="sw-chips"><button type="button" data-mode="simple" aria-pressed="true">{tri("ساده", "سادە", "Simple")}</button><button type="button" data-mode="adv" aria-pressed="false">{tri("پیشرفته", "پێشکەوتوو", "Advanced")}</button></span></div>
 <div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
 <div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
 <label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span><span>{tri(
@@ -466,7 +468,9 @@ def controls():
     "I understand the risk of this swap and want to go on.")}</span><code id="sw-ack-a" dir="ltr" translate="no"></code></span></label>
 <button type="button" id="sw-action" class="sw-go" disabled><span id="sw-action-l"></span> <b id="sw-action-x" translate="no"></b></button>
 <div id="sw-msg" class="sw-msg" role="status" aria-live="polite"></div>
-<div id="sw-status" class="sw-status"></div>
+<div id="sw-track" class="sw-track" hidden><div class="sw-track-h"><b>{tri("وضعیت تبدیل", "دۆخی گۆڕینەوە", "Swap status")}</b><span id="sw-track-st" class="sw-track-st" role="status" aria-live="polite"></span><button type="button" id="sw-track-close" class="sw-link">{tri("بستن", "داخستن", "Close")}</button></div>
+<div id="sw-track-sum" class="sw-track-sum" dir="ltr" translate="no"></div>
+<div id="sw-status" class="sw-status"></div></div>
 <div class="sw-acct"><span id="sw-account" dir="ltr" translate="no"></span></div>
 <details id="sw-hist" class="sw-more" hidden><summary>{tri("تبدیل‌های شما در این مرورگر", "گۆڕینەوەکانی تۆ لەم وێبگەڕەدا", "Your swaps in this browser")}</summary>
 <div id="sw-hist-list"></div>
