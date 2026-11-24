@@ -124,6 +124,13 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(doc, f, ensure_ascii=False, separators=(",", ":"))
     print(f"defi: {doc['counts']} | total ${tvl['v'][-1] / 1000:,.1f}B | wrote {os.path.getsize(OUT) / 1024:.0f} KB")
+    # The unlock schedules come from the same place and need no clock of their own, so they ride along here.
+    # A failure there is not a failure of this file: the DeFi figures are written above, whatever happens next.
+    try:
+        import unlocks
+        unlocks.main()
+    except Exception as e:  # noqa: BLE001
+        print("unlocks: skipped —", str(e)[:160])
 
 
 if __name__ == "__main__":
