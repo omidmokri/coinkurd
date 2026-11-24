@@ -35,7 +35,7 @@
   /* ------------------------------------------------------------------ text */
   var T = {
     fa: {
-      noWalletTron: 'کیف پول ترون در این مرورگر پیدا نشد (ترون‌لینک، سیف‌پل، تراست ولت…).', noWalletSol: 'کیف پول سولانا در این مرورگر پیدا نشد (فانتوم، سیف‌پل، تراست ولت…).',
+      noWalletBtc: 'کیف پول بیت‌کوین در این مرورگر پیدا نشد (تراست ولت، سیف‌پل…).', noWalletTron: 'کیف پول ترون در این مرورگر پیدا نشد (ترون‌لینک، سیف‌پل، تراست ولت…).', noWalletSol: 'کیف پول سولانا در این مرورگر پیدا نشد (فانتوم، سیف‌پل، تراست ولت…).',
       noWallet: 'کیف پولی در این مرورگر پیدا نشد. این صفحه را در مرورگر داخلی کیف پول خود (متامسک، تراست ولت، سیف‌پل…) باز کنید.',
       connect: 'اتصال کیف پول', connecting: 'در حال اتصال…', rejected: 'درخواست در کیف پول رد شد.',
       switchChain: 'تغییر شبکهٔ کیف پول', switching: 'در انتظار کیف پول…',
@@ -62,7 +62,7 @@
       findOnChain: 'جست‌وجو روی شبکه', balance: 'موجودی'
     },
     ckb: {
-      noWalletTron: 'جزدانی ترۆن لەم وێبگەڕەدا نەدۆزرایەوە (ترۆن‌لینک، سەیفپاڵ، تراست وۆلێت…).', noWalletSol: 'جزدانی سۆلانا لەم وێبگەڕەدا نەدۆزرایەوە (فانتۆم، سەیفپاڵ، تراست وۆلێت…).',
+      noWalletBtc: 'جزدانی بیتکۆین لەم وێبگەڕەدا نەدۆزرایەوە (تراست وۆلێت، سەیفپاڵ…).', noWalletTron: 'جزدانی ترۆن لەم وێبگەڕەدا نەدۆزرایەوە (ترۆن‌لینک، سەیفپاڵ، تراست وۆلێت…).', noWalletSol: 'جزدانی سۆلانا لەم وێبگەڕەدا نەدۆزرایەوە (فانتۆم، سەیفپاڵ، تراست وۆلێت…).',
       noWallet: 'هیچ جزدانێک لەم وێبگەڕەدا نەدۆزرایەوە. ئەم پەڕەیە لە وێبگەڕی ناوەوەی جزدانەکەت (مێتاماسک، تراست وۆلێت، سەیفپاڵ…) بکەرەوە.',
       connect: 'بەستنەوەی جزدان', connecting: 'لە بەستنەوەدا…', rejected: 'داواکارییەکە لە جزدانەکەدا ڕەتکرایەوە.',
       switchChain: 'گۆڕینی تۆڕی جزدان', switching: 'چاوەڕێی جزدان…',
@@ -89,7 +89,7 @@
       findOnChain: 'گەڕان لەسەر تۆڕ', balance: 'ماوە'
     },
     en: {
-      noWalletTron: 'No Tron wallet found in this browser (TronLink, SafePal, Trust Wallet…).', noWalletSol: 'No Solana wallet found in this browser (Phantom, SafePal, Trust Wallet…).',
+      noWalletBtc: 'No Bitcoin wallet found in this browser (Trust Wallet, SafePal…).', noWalletTron: 'No Tron wallet found in this browser (TronLink, SafePal, Trust Wallet…).', noWalletSol: 'No Solana wallet found in this browser (Phantom, SafePal, Trust Wallet…).',
       noWallet: 'No wallet found in this browser. Open this page in the browser inside your wallet (MetaMask, Trust Wallet, SafePal…).',
       connect: 'Connect wallet', connecting: 'Connecting…', rejected: 'The request was rejected in the wallet.',
       switchChain: 'Switch the wallet’s network', switching: 'Waiting for the wallet…',
@@ -518,6 +518,191 @@
     }
   };
 
+  /* ------------------------------------------------------------------ Bitcoin
+   * A swap that starts on Bitcoin is not a contract call: LI.FI builds a plain Bitcoin transaction that spends the
+   * reader's own coins and pays a deposit address it names. The wallet is asked to sign that transaction, so what it
+   * contains has to be read first, byte by byte, from the PSBT itself — the amount leaving the reader's hands, where
+   * it goes, and what comes back as change. */
+  var BTC_FEE_CAP = 50000n;                       /* the miners' fee this page will let a transaction carry, in satoshi */
+
+  /* bech32 addresses hold five bits per letter; these are the bytes underneath */
+  function bech32Data(addr) {
+    if (!bechOk(addr)) { return null; }
+    var low = addr.toLowerCase(), pos = low.lastIndexOf('1'), data = low.slice(pos + 1, low.length - 6), i, c;
+    var bits = 0, acc = 0, out = [], ver = B32.indexOf(data.charAt(0));
+    if (ver < 0 || ver > 16 || low.slice(0, pos) !== 'bc') { return null; }
+    for (i = 1; i < data.length; i++) {
+      c = B32.indexOf(data.charAt(i)); if (c < 0) { return null; }
+      acc = (acc << 5) | c; bits += 5;
+      if (bits >= 8) { bits -= 8; out.push((acc >> bits) & 255); }
+    }
+    if (bits >= 5 || ((acc << (8 - bits)) & 255)) { return null; }        /* no spare bits may carry anything */
+    return { ver: ver, prog: out };
+  }
+
+  /* what a Bitcoin address says must be written into an output for it to be paid */
+  function btcScript(addr) {
+    if (typeof addr !== 'string') { return ''; }
+    if (addr.indexOf('bc1') === 0) {
+      var d = bech32Data(addr); if (!d) { return ''; }
+      if (d.ver === 0 && (d.prog.length === 20 || d.prog.length === 32)) { return (d.prog.length === 20 ? '0014' : '0020') + hexOf(d.prog); }
+      if (d.ver === 1 && d.prog.length === 32) { return '5120' + hexOf(d.prog); }
+      return '';
+    }
+    var raw = b58(addr);
+    if (!raw || raw.length !== 25) { return ''; }
+    if (raw[0] === 0x00) { return '76a914' + hexOf(raw.slice(1, 21)) + '88ac'; }
+    if (raw[0] === 0x05) { return 'a914' + hexOf(raw.slice(1, 21)) + '87'; }
+    return '';
+  }
+
+  /* a PSBT, read plainly: the transaction that will be signed, every coin it spends and every payment it makes */
+  function psbtRead(hex) {
+    var b = bytesOf(hex), i = 5, nin, nout, j, k, n, ins = [], outs = [], tx, maps = [];
+    if (!b || b.length < 10 || hexOf(b.slice(0, 5)) !== '70736274ff') { return null; }
+    function num(bytes, at, len) { var v = 0n, q; for (q = len - 1; q >= 0; q--) { v = (v << 8n) | BigInt(bytes[at + q]); } return v; }
+    function vi(bytes, at) {                                        /* a count, as Bitcoin writes counts */
+      var h = bytes[at];
+      if (h === undefined) { return null; }
+      if (h < 0xfd) { return { v: BigInt(h), at: at + 1 }; }
+      var len = h === 0xfd ? 2 : h === 0xfe ? 4 : 8;
+      if (at + 1 + len > bytes.length) { return null; }
+      return { v: num(bytes, at + 1, len), at: at + 1 + len };
+    }
+    function kv(at) {                                               /* one key-value map, to its closing zero */
+      var m = {}, r, kl, key, vl;
+      for (;;) {
+        r = vi(b, at); if (!r) { return null; }
+        at = r.at; kl = Number(r.v);
+        if (kl === 0) { return { m: m, at: at }; }
+        if (at + kl > b.length) { return null; }
+        key = hexOf(b.slice(at, at + kl)); at += kl;
+        r = vi(b, at); if (!r) { return null; }
+        at = r.at; vl = Number(r.v);
+        if (vl < 0 || at + vl > b.length) { return null; }
+        m[key] = b.slice(at, at + vl); at += vl;
+      }
+    }
+    var g = kv(i); if (!g || !g.m['00']) { return null; }
+    i = g.at; tx = g.m['00'];
+    /* the unsigned transaction itself: its inputs name coins, its outputs name payments */
+    j = 4;
+    var r1 = vi(tx, j); if (!r1) { return null; }
+    j = r1.at; nin = Number(r1.v);
+    if (!(nin > 0 && nin <= 1000)) { return null; }
+    for (n = 0; n < nin; n++) {
+      j += 36;
+      var rs = vi(tx, j); if (!rs) { return null; }
+      j = rs.at + Number(rs.v) + 4;
+      if (j > tx.length) { return null; }
+    }
+    var r2 = vi(tx, j); if (!r2) { return null; }
+    j = r2.at; nout = Number(r2.v);
+    if (!(nout > 0 && nout <= 1000)) { return null; }
+    for (n = 0; n < nout; n++) {
+      if (j + 8 > tx.length) { return null; }
+      var val = num(tx, j, 8); j += 8;
+      var rl = vi(tx, j); if (!rl) { return null; }
+      j = rl.at; k = Number(rl.v);
+      if (j + k > tx.length) { return null; }
+      outs.push({ value: val, script: hexOf(tx.slice(j, j + k)) }); j += k;
+    }
+    if (j + 4 !== tx.length) { return null; }                       /* nothing may trail the transaction */
+    for (n = 0; n < nin; n++) {
+      var im = kv(i); if (!im) { return null; }
+      i = im.at;
+      var w = im.m['01'];                                           /* the coin being spent: its amount and whose it is */
+      if (!w || w.length < 9) { return null; }
+      var sl = vi(w, 8); if (!sl) { return null; }
+      if (sl.at + Number(sl.v) !== w.length) { return null; }
+      ins.push({ value: num(w, 0, 8), script: hexOf(w.slice(sl.at)) });
+    }
+    for (n = 0; n < nout; n++) { var om = kv(i); if (!om) { return null; } i = om.at; maps.push(om); }
+    if (i !== b.length) { return null; }
+    return { tx: hexOf(tx), ins: ins, outs: outs };
+  }
+
+  /* Bitcoin cannot be taken back, so this is where the whole of it is settled: the reader parts with the amount they
+     typed and a miners' fee no larger than the cap above, and everything else returns to them as change. */
+  function checkBitcoin(x, req) {
+    if (typeof x.data !== 'string' || x.data.length < 20 || x.data.length > 200000) { return 'data'; }
+    if (!isUint(String(x.value))) { return 'value'; }
+    var want = BigInt(req.fromAmount);
+    if (BigInt(x.value) !== want) { return 'nativeValue'; }           /* on Bitcoin there is only the coin itself */
+    var mine = btcScript(req.account), dest = btcScript(x.to);
+    if (!mine || !dest || dest === mine) { return 'to'; }            /* the deposit address is never the reader's own */
+    var p = psbtRead(x.data); if (!p) { return 'data'; }
+    var inSum = 0n, outSum = 0n, back = 0n, paid = 0n, i;
+    for (i = 0; i < p.ins.length; i++) {
+      if (p.ins[i].script !== mine) { return 'txFrom'; }               /* only the reader's own coins are spent */
+      inSum += p.ins[i].value;
+    }
+    for (i = 0; i < p.outs.length; i++) {
+      outSum += p.outs[i].value;
+      if (p.outs[i].script === mine) { back += p.outs[i].value; }
+      if (p.outs[i].script === dest) { paid += p.outs[i].value; }
+    }
+    if (inSum <= outSum) { return 'feeLimit'; }
+    var fee = inSum - outSum;
+    if (fee > BTC_FEE_CAP || fee > want) { return 'feeLimit'; }        /* the miners' fee, held to a ceiling */
+    if (inSum - back !== want + fee) { return 'spend'; }               /* exactly the amount typed leaves, and no more */
+    if (paid * 50n < want * 49n) { return 'toAddress'; }               /* nearly all of it reaches the deposit address */
+    return null;
+  }
+
+  /* the Bitcoin wallet in the browser: it alone holds the keys, and it alone sends the transaction to the network */
+  var BW = {
+    p: null, account: '',
+    find: function (win) {
+      var w = win || root, b = w && (w.bitcoin || (w.trustwallet && w.trustwallet.bitcoin));
+      return b && (typeof b.requestAccounts === 'function' || typeof b.connect === 'function') ? b : null;
+    },
+    pick: function (r) {
+      var a = Array.isArray(r) ? r[0] : (r && typeof r === 'object' ? (r.address || (Array.isArray(r.addresses) ? r.addresses[0] : '')) : r);
+      if (a && typeof a === 'object') { a = a.address; }
+      return typeof a === 'string' && btcScript(a) ? a : '';
+    },
+    connect: function () {
+      var self = this, p = this.p;
+      if (!p) { return Promise.reject(new Error('no wallet')); }
+      var asked = typeof p.requestAccounts === 'function' ? p.requestAccounts() : p.connect();
+      return Promise.resolve(asked).then(function (r) {
+        var a = self.pick(r);
+        if (!a) { throw new Error('no account'); }
+        self.account = a; return a;
+      });
+    },
+    read: function () { return this.account; },
+    /* the wallet is asked again, right before signing, that it is still the same address this swap was built for */
+    current: function () {
+      var p = this.p, self = this;
+      if (!p || typeof p.getAccounts !== 'function') { return Promise.resolve(this.account); }
+      return Promise.resolve(p.getAccounts()).then(function (r) { return self.pick(r) || self.account; }, function () { return self.account; });
+    },
+    /* the wallet signs the transaction; what comes back must still be the very transaction that went in */
+    sign: function (hex) {
+      var p = this.p, fn = p && (p.signPSBT || p.signPsbt);
+      if (typeof fn !== 'function') { return Promise.reject(new Error('no wallet')); }
+      var before = psbtRead(hex);
+      return Promise.resolve(fn.call(p, hex)).then(function (r) {
+        var out = typeof r === 'string' ? r : (r && typeof r.psbt === 'string' ? r.psbt : '');
+        if (out && !/^[0-9a-fA-F]+$/.test(out)) { var raw = b64(out); out = raw ? hexOf(raw) : ''; }
+        var after = out ? psbtRead(out) : null;
+        if (!after || !before || after.tx !== before.tx) { throw { soft: 'signature' }; }
+        return out;
+      });
+    },
+    send: function (hex) {
+      var p = this.p, fn = p && (p.pushPSBT || p.pushPsbt);
+      if (typeof fn !== 'function') { return Promise.reject(new Error('no wallet')); }
+      return Promise.resolve(fn.call(p, hex)).then(function (r) {
+        var id = typeof r === 'string' ? r : (r && typeof r.txid === 'string' ? r.txid : '');
+        if (!/^[0-9a-f]{64}$/.test(id)) { throw { soft: 'signature' }; }
+        return id;
+      });
+    }
+  };
+
   function checkTron(x, e, req) {
     var t = plain(x.customData) ? x.customData.tronTransaction : null;
     if (!plain(t) || !plain(t.raw_data) || typeof t.raw_data_hex !== 'string' || !/^[0-9a-f]{20,400000}$/.test(t.raw_data_hex)) { return 'tronShape'; }
@@ -584,6 +769,7 @@
     if (req.toDecimals !== undefined && Number(a.toToken.decimals) !== Number(req.toDecimals)) { return 'toDecimals'; }
     if (kind === 'tron') { return checkTron(x, e, req); }
     if (kind === 'solana') { return checkSolana(x, req); }
+    if (kind === 'utxo') { return checkBitcoin(x, req); }
     if (kind !== 'evm') { return 'kind'; }
     if (!isAddr(x.to)) { return 'to'; }
     /* the transaction must be addressed to LI.FI's own contract for this chain and nowhere else. The address is kept
@@ -828,7 +1014,7 @@
     function toOnly(c) { return !!(c && c.to_only === true); }
     function kindOf(c) { return c && typeof c.kind === 'string' ? c.kind : 'evm'; }
     /* the wallet that signs for the network the swap starts on */
-    function srcW() { var k = kindOf(chainById(S.from.chain)); return k === 'tron' ? TW : k === 'solana' ? SW : W; }
+    function srcW() { var k = kindOf(chainById(S.from.chain)); return k === 'tron' ? TW : k === 'solana' ? SW : k === 'utxo' ? BW : W; }
     /* The swap comes out at the reader's own address only when both ends are the same kind of network, because one
        wallet address means nothing on another kind. Everywhere else the reader says where it should arrive. */
     function needRcp() {
@@ -981,7 +1167,7 @@
     /* does this swap need the token's permission first, and is there even enough of it? */
     function decideApproval(q, req) {
       S.need = null;
-      if (req.kind === 'solana') { return Promise.resolve(null); }   /* no node to ask, and nothing to approve there */
+      if (req.kind === 'solana' || req.kind === 'utxo') { return Promise.resolve(null); }   /* nothing to approve on either */
       var w = req.kind === 'tron' ? TW : W, own_ = req.kind === 'tron' ? req.fromToken === TRX : sameAddr(req.fromToken, ZERO);
       return within(w.balance(req.fromToken, req.account), WAIT, null).then(function (b) {
         if (b === null) { return null; }             /* the wallet did not answer: say nothing about the balance */
@@ -1010,7 +1196,7 @@
       var need = el.action.getAttribute('data-need');
       S.err = ''; S.note = ''; S.done = false;
       var src = srcW();
-      if (need === 'nowallet') { S.err = t(src === TW ? 'noWalletTron' : src === SW ? 'noWalletSol' : 'noWallet'); paint(); return; }
+      if (need === 'nowallet') { S.err = t(src === TW ? 'noWalletTron' : src === SW ? 'noWalletSol' : src === BW ? 'noWalletBtc' : 'noWallet'); paint(); return; }
       if (need === 'connect') {
         var cseq = ++S.seq;
         S.busy = t('connecting'); paint();
@@ -1042,6 +1228,7 @@
     function sameWallet(req) {
       if (req.kind === 'tron') { return Promise.resolve(TW.read() === req.account ? null : 'chainMoved'); }
       if (req.kind === 'solana') { var k = SW.key(null); return Promise.resolve(!k || k === req.account ? null : 'chainMoved'); }
+      if (req.kind === 'utxo') { return within(BW.current(), WAIT, req.account).then(function (a) { return a === req.account ? null : 'chainMoved'; }); }
       return Promise.all([within(W.req('eth_chainId'), WAIT, null), within(W.req('eth_accounts'), WAIT, null)]).then(function (r) {
         if (r[0] === null || r[1] === null) { return 'chainUnknown'; }
         if (parseInt(r[0], 16) !== Number(req.fromChain)) { return 'chainMoved'; }
@@ -1117,7 +1304,7 @@
       var bad = checkQuote(q, req);                      /* checked once more, right before the wallet opens */
       if (bad) { reset(); S.err = t('mismatch') + ' [' + bad + ']'; paint(); return; }
       var x = q.transactionRequest, seq = S.seq;
-      if (req.kind === 'tron' || req.kind === 'solana') { doSwapFar(q, req, x, seq); return; }
+      if (req.kind !== 'evm') { doSwapFar(q, req, x, seq); return; }
       var tx = { from: req.account, to: x.to, data: x.data, value: x.value, chainId: qty(BigInt(req.fromChain)) };
       if (isQty(x.gasLimit) && BigInt(x.gasLimit) > 0n && BigInt(x.gasLimit) <= GAS_CAP) { tx.gas = x.gasLimit; }
       var cross = Number(req.fromChain) !== Number(req.toChain), hash = '';
@@ -1148,6 +1335,7 @@
       var sent = sameWallet(req).then(function (moved) {
         if (moved) { throw { soft: t(moved) }; }
         if (req.kind === 'solana') { return SW.send(b64(x.data)); }
+        if (req.kind === 'utxo') { return BW.sign(x.data).then(function (signed) { return BW.send(signed); }); }
         var tt = x.customData.tronTransaction;
         return tronId(tt).then(function (okd) {
           if (!okd) { throw { soft: t('mismatch') + ' [tronId]' }; }
@@ -1162,7 +1350,7 @@
         if (okd === false) { S.busy = ''; S.err = t('failed'); paint(); return; }
         reset(); S.amount = ''; el.amount.value = ''; S.bal = null;
         /* Solana has no node here to ask, so LI.FI's own record of the swap is followed whichever way it goes */
-        if ((cross && okd === true) || req.kind === 'solana') { S.note = t(cross ? 'bridging' : 'watching'); paint(); track(hash, req, q.tool); return; }
+        if ((cross && okd === true) || req.kind === 'solana' || req.kind === 'utxo') { S.note = t(cross ? 'bridging' : 'watching'); paint(); track(hash, req, q.tool); return; }
         S.done = okd === true; if (okd === null) { S.note = t('watching'); }
         paint();
       }, fail);
@@ -1191,7 +1379,7 @@
     function line(words, chainId, hash) {
       var row = doc.createElement('div');
       var c = chainId !== undefined ? chainById(chainId) : null;
-      var k = kindOf(c), okHash = typeof hash === 'string' && (k === 'tron' ? /^[0-9a-f]{64}$/.test(hash)
+      var k = kindOf(c), okHash = typeof hash === 'string' && (k === 'tron' || k === 'utxo' ? /^[0-9a-f]{64}$/.test(hash)
         : k === 'solana' ? /^[1-9A-HJ-NP-Za-km-z]{64,90}$/.test(hash) : /^0x[0-9a-fA-F]{64}$/.test(hash));
       if (c && okHash) {
         var a = doc.createElement('a');
@@ -1493,7 +1681,7 @@
     }
 
     /* ================================================================ wiring */
-    W.p = W.find(win); TW.p = TW.find(win); SW.p = SW.find(win);
+    W.p = W.find(win); TW.p = TW.find(win); SW.p = SW.find(win); BW.p = BW.find(win);
     pickDefault(S.from); pickDefault(S.to); labels(); paint();
     if (G) { pickDefault(S.gift); giftLabels(); giftPaint(); openWallet(); }
     live = true;
@@ -1537,7 +1725,7 @@
     });
     el.flip.addEventListener('click', function () {
       var f = S.from, tt = S.to;
-      if (toOnly(chainById(tt.chain))) { return; }        /* nothing can start on Bitcoin, Tron, Solana, Sui or Stellar */
+      if (toOnly(chainById(tt.chain))) { return; }        /* nothing can start on Sui, Stellar or Zcash */
       S.from = { chain: tt.chain, token: tt.token }; S.to = { chain: f.chain, token: f.token, second: true };
       S.bal = null; labels(); paint(); ask();
     });
@@ -1611,6 +1799,7 @@
   api_.setLang = function (l) { lang = own(T, l) ? l : 'fa'; };
   api_.fits = fits;
   api_.checkQuote = api_.checkQuote || checkQuote;
+  api_.psbtRead = psbtRead; api_.btcScript = btcScript; api_.BW = BW;
   api_.tronFacts = tronFacts; api_.tronHex = tronHex; api_.solPayer = solPayer; api_.b58enc = b58enc; api_.TW = TW; api_.SW = SW;
   api_.checkSum = checkSum;
   api_.needsSum = needsSum;

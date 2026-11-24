@@ -95,15 +95,16 @@ def main():
     evm = [c for c in data["chains"] if not c.get("kind")]
     only_to = [c for c in data["chains"] if c.get("to_only")]
     far = [c for c in data["chains"] if c.get("kind") and not c.get("to_only")]
-    ok({c["coin"] for c in far} == {"TRX", "SOL"}, "Tron and Solana are the two networks off EVM a swap may start on")
+    ok({c["coin"] for c in far} == {"TRX", "SOL", "BTC"}, "Tron, Solana and Bitcoin are the networks off EVM a swap may start on")
     ok(all("rpc" not in c for c in far), "…and neither brings a node of its own into the page")
     ok(next(c for c in far if c["coin"] == "TRX").get("contract") == "TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt",
        "Tron pins LI.FI's own contract there, in Tron's address form")
-    ok("contract" not in next(c for c in far if c["coin"] == "SOL"), "Solana pins none, because it has none")
+    ok(all("contract" not in c for c in far if c["coin"] in ("SOL", "BTC")), "Solana and Bitcoin pin none, because they have none")
+    ok(next(c for c in far if c["coin"] == "BTC")["kind"] == "utxo", "Bitcoin is read as Bitcoin's own kind of address")
     ok(all(x["contract"] == B.eip55(x["contract"]) for x in evm), "every network a swap can start on pins a checksummed contract address")
-    ok(len(only_to) >= 4 and all("contract" not in c and "rpc" not in c and c["kind"] in B.ADDRESS for c in only_to),
+    ok(len(only_to) >= 3 and all("contract" not in c and "rpc" not in c and c["kind"] in B.ADDRESS for c in only_to),
        f"the {len(only_to)} networks a swap can only end on carry no contract and no node, and each has an address shape")
-    ok({c["coin"] for c in only_to} >= {"BTC", "ZEC"}, "Bitcoin is among them")
+    ok({c["coin"] for c in only_to} >= {"ZEC", "SUI"}, "Zcash and Sui are among them")
     for c in only_to + far:
         toks = data["tokens"][str(c["id"])]
         ok(toks[0]["symbol"] == c["coin"], f"{c['name']}'s own coin comes first in its list")

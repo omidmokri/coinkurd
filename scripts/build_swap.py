@@ -233,13 +233,13 @@ def chains(path=CHAINS):
     for c in raw.get("chains", []):
         if not isinstance(c.get("id"), int) or c["id"] <= 0 or c["id"] in ids:
             raise ConfigError(f"chain id is missing or repeated: {c.get('id')!r}")
-        # A `to_only` network is one a swap may end on but not start on: Bitcoin, Tron, Solana, Sui, Stellar, Zcash.
+        # A `to_only` network is one a swap may end on but not start on: Sui, Stellar and Zcash.
         # The transaction is still signed on the EVM network the swap starts from, so these need no contract of their
         # own and no node — only a name, a coin, an explorer, and the shape a recipient address takes there.
         to_only = c.get("to_only") is True
-        # Tron and Solana are neither: a swap may start there, signed by a wallet of that network. Tron pins LI.FI's
-        # contract in its own address form; Solana has no single contract to pin.
-        far = (not to_only) and c.get("kind") in ("tron", "solana")
+        # Tron, Solana and Bitcoin are neither: a swap may start there, signed by a wallet of that network. Tron
+        # pins LI.FI's contract in its own address form; Solana and Bitcoin have no single contract to pin.
+        far = (not to_only) and c.get("kind") in ("tron", "solana", "utxo")
         need = ("name", "coin", "explorer") + (("kind",) if (to_only or far) else ("rpc", "contract"))
         for k in need:
             if not isinstance(c.get(k), str) or not c[k]:
@@ -257,7 +257,7 @@ def chains(path=CHAINS):
                     raise ConfigError(f"chain {c['id']}: Tron must pin LI.FI's contract in Tron's own address form")
                 row["contract"] = c["contract"]
             elif c.get("contract"):
-                raise ConfigError(f"chain {c['id']}: Solana has no contract to pin")
+                raise ConfigError(f"chain {c['id']}: {c['kind']} has no contract to pin")
         elif to_only:
             if c["kind"] not in ADDRESS:
                 raise ConfigError(f"chain {c['id']}: {c['kind']!r} is not an address shape this page knows")

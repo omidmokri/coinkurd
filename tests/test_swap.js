@@ -807,6 +807,107 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(urls.some(u => u.indexOf('/v1/status') > 0 && u.indexOf('fromChain=' + SOL) > 0), 'the swap is then followed on LI.FI\'s own record');
   serve = () => goodQuote();
 
+  /* ================================================================ a swap that starts on Bitcoin */
+  const BTC_CHAIN = 20000000000001;
+  const B_ME = 'bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq', B_DEP = 'bc1qshvjmt6um3zsy8dwycx7j84vrdzx8lk6dwall8';
+  const B_STRANGER = 'bc1q9ab105ce5f65cc9d3e51e4b24'.length ? 'bc1qn2csfues7ewf6038ykfyq0h0rqc7kk7l4kqrsd' : '';
+  ok(S.btcScript(B_ME) === '0014e8df018c7e326cc253faac7e46cdc51e68542c42', "a bech32 address says which script pays it");
+  ok(S.btcScript('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa') === '76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac' &&
+     S.btcScript('3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy') === 'a914b472a266d0bd89c13706a4132ccfb16f7c3b9fcb87' &&
+     S.btcScript('bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297').indexOf('5120') === 0,
+     'the older forms and taproot are read too');
+  ok(!S.btcScript(B_ME.slice(0, -1) + 'x') && !S.btcScript('TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt') && !S.btcScript(ME) && !S.btcScript(''),
+     'a mistyped address, and an address of another network, pay nothing');
+  /* a Bitcoin transaction written the way the chain writes one, wrapped as a PSBT */
+  const le = (n, w) => { let b = []; let v = BigInt(n); for (let i = 0; i < w; i++) { b.push(Number(v & 255n)); v >>= 8n; } return b; };
+  const bvi = n => n < 0xfd ? [n] : n <= 0xffff ? [0xfd].concat(le(n, 2)) : [0xfe].concat(le(n, 4));
+  const bHex = b => Buffer.from(b).toString('hex');
+  function psbtMake(ins, outs) {
+    let tx = le(2, 4).concat(bvi(ins.length));
+    ins.forEach((v, i) => { tx = tx.concat(new Array(32).fill(i + 1), le(i, 4), [0], le(4294967293, 4)); });
+    tx = tx.concat(bvi(outs.length));
+    outs.forEach(o => { const sc = [...Buffer.from(o.script, 'hex')]; tx = tx.concat(le(o.value, 8), bvi(sc.length), sc); });
+    tx = tx.concat(le(0, 4));
+    let out = [...Buffer.from('70736274ff', 'hex')].concat([1, 0], bvi(tx.length), tx, [0]);
+    ins.forEach(v => { const sc = [...Buffer.from(v.script, 'hex')]; const w = le(v.value, 8).concat(bvi(sc.length), sc);
+      out = out.concat([1, 1], bvi(w.length), w, [0]); });
+    outs.forEach(() => { out = out.concat([0]); });
+    return bHex(out);
+  }
+  const MS = S.btcScript(B_ME), DS = S.btcScript(B_DEP), XS = S.btcScript(B_STRANGER);
+  const plainBtc = (o) => { o = Object.assign({ in: 6303070, dep: 2486250, change: 3802705, fees: 13750, extra: null }, o || {});
+    const outs = [{ value: o.dep, script: DS }, { value: 0, script: '6a0d3d7c6c696669efe9b0468e89c5' },
+      { value: o.change, script: MS }, { value: o.fees, script: XS }];
+    if (o.extra) { outs.push(o.extra); }
+    return psbtMake([{ value: o.in, script: MS }], outs); };
+  const bq = (over, o) => { const q = { tool: 'near', action: { fromChainId: BTC_CHAIN, toChainId: 728126428,
+      fromToken: { address: 'bitcoin', decimals: 8, symbol: 'BTC' }, toToken: { address: T_USDT, decimals: 6, symbol: 'USDT' },
+      fromAmount: '2500000', fromAddress: B_ME, toAddress: T_ME, slippage: 0.005 },
+    estimate: { toAmount: '1503707947', toAmountMin: '1496189407', approvalAddress: DIAMOND, gasCosts: [], feeCosts: [], fromAmountUSD: '150', toAmountUSD: '149' },
+    transactionRequest: { to: B_DEP, value: '2500000', data: plainBtc(o) } }; return over ? (over(q) || q) : q; };
+  const bReq = { kind: 'utxo', fromChain: BTC_CHAIN, toChain: 728126428, fromToken: 'bitcoin', toToken: T_USDT,
+    fromAmount: '2500000', account: B_ME, recipient: T_ME, slippage: 0.005, fromDecimals: 8, toDecimals: 6, exactTo: true };
+  ok(S.checkQuote(bq(), bReq) === null, 'a Bitcoin swap passes when the coins spent, the deposit and the change all add up');
+  const pr = S.psbtRead(plainBtc());
+  ok(pr && pr.ins.length === 1 && pr.outs.length === 4 && pr.ins[0].value === 6303070n, 'the transaction is read back from its own bytes');
+  ok(S.psbtRead('00') === null && S.psbtRead(plainBtc().slice(0, -6)) === null && S.psbtRead(plainBtc() + 'ff') === null,
+     'bytes that are not a transaction, or carry anything extra, are not read at all');
+  ok(S.checkQuote(bq(null, { in: 6303070, dep: 2486250, change: 3802705 - 400000, fees: 13750, extra: { value: 400000, script: XS } }), bReq) === 'spend',
+     'an extra payment to a stranger, taken out of the change, is refused');
+  ok(S.checkQuote(bq(null, { change: 3802705 - 60000 }), bReq) === 'feeLimit', 'a transaction leaving an outsized fee to the miners is refused');
+  ok(S.checkQuote(bq(null, { dep: 1000000, fees: 13750 + 1486250 }), bReq) === 'toAddress', 'one where most of the money misses the deposit address is refused');
+  ok(S.checkQuote(bq(q => { q.transactionRequest.data = psbtMake([{ value: 6303070, script: XS }], [{ value: 2486250, script: DS }, { value: 3802705, script: MS }, { value: 13750, script: XS }]); }), bReq) === 'txFrom',
+     'a transaction spending somebody else\'s coins is refused');
+  ok(S.checkQuote(bq(q => { q.transactionRequest.to = B_ME; }), bReq) === 'to', "a deposit address that is the reader's own address is refused");
+  ok(S.checkQuote(bq(q => { q.transactionRequest.value = '2400000'; }), bReq) === 'nativeValue', 'an amount other than the one typed is refused');
+  ok(S.checkQuote(bq(q => { q.transactionRequest.data = 'zz'; }), bReq) === 'data', 'bytes that cannot be read are refused');
+
+  /* ---- the whole way on the page, with a Bitcoin wallet that signs and sends */
+  const btcSign = [], btcPush = [];
+  let btcTamper = false;
+  const DATA3 = JSON.parse(JSON.stringify(DATA2));
+  DATA3.chains = DATA3.chains.map(c => c.id === BTC_CHAIN ? { id: BTC_CHAIN, name: 'Bitcoin', coin: 'BTC', explorer: 'https://mempool.space/', kind: 'utxo' } : c);
+  DATA3.tokens[String(BTC_CHAIN)] = [{ symbol: 'BTC', name: 'Bitcoin', address: 'bitcoin', decimals: 8 }];
+  freshWallet(); S.BW.account = ''; S.TW.account = ''; S.SW.account = '';
+  serve = () => farQ;
+  let bw = makeWindow(CFG, { allowed: true, data: DATA3 });
+  bw.win.bitcoin = { requestAccounts: () => Promise.resolve([B_ME]),
+    signPSBT: (h) => { btcSign.push(h); return Promise.resolve(btcTamper ? plainBtc({ dep: 2400000 }) : h); },
+    pushPSBT: (h) => { btcPush.push(h); return Promise.resolve('aa'.repeat(32)); } };
+  S.start(bw.win); await sleep(60);
+  ok(bw.chainRows('fc').indexOf('Bitcoin') >= 0, 'Bitcoin is offered as a place to start');
+  bw.pickChain('fc', 'Bitcoin'); await sleep(40);
+  ok(bw.need() === 'connect', 'the page asks for the Bitcoin wallet');
+  bw.go(); await sleep(80);
+  ok(bw.$('account').textContent.length > 0, 'it connects, and there is no network to switch');
+  bw.pickChain('tc', 'Tron'); await sleep(30); bw.pick('tt', 'USDT'); await sleep(30);
+  farQ = bq();
+  await bw.type('0.025'); await sleep(60);
+  ok(bw.need() === 'recipient', 'Bitcoin to Tron: the page asks where the money should arrive, and asks no price yet');
+  await bw.rcpType(T_ME); await sleep(900);
+  ok(bw.need() === 'ack', 'a sound Tron address brings a price and asks the reader to confirm it (' + bw.$('msg').textContent + ')');
+  bw.$('ack').checked = true; bw.$('ack').fire('change'); await sleep(40);
+  ok(bw.need() === 'swap', 'there is nothing to approve on Bitcoin');
+  bw.go(); await sleep(250);
+  ok(btcSign.length === 1 && btcSign[0] === farQ.transactionRequest.data, 'the wallet was handed exactly the transaction that was checked');
+  ok(btcPush.length === 1 && btcPush[0] === btcSign[0], 'and what it signed, and only that, was sent to the network');
+  ok(bw.sent.length === 0, 'no EVM wallet was asked for anything');
+  ok(bw.$('status').kids.some(k => k.kids[0] && String(k.kids[0].attrs.href).indexOf('https://mempool.space/tx/') === 0), "the link goes to Bitcoin's own explorer");
+  /* a wallet that hands back a different transaction than it was given */
+  btcTamper = true; btcPush.length = 0; btcSign.length = 0; S.BW.account = '';
+  bw = makeWindow(CFG, { allowed: true, data: DATA3 });
+  bw.win.bitcoin = { requestAccounts: () => Promise.resolve([B_ME]),
+    signPSBT: (h) => { btcSign.push(h); return Promise.resolve(plainBtc({ dep: 2400000 })); },
+    pushPSBT: (h) => { btcPush.push(h); return Promise.resolve('aa'.repeat(32)); } };
+  S.start(bw.win); await sleep(60);
+  bw.pickChain('fc', 'Bitcoin'); await sleep(30); bw.go(); await sleep(80);
+  bw.pickChain('tc', 'Tron'); await sleep(30); bw.pick('tt', 'USDT'); await sleep(30);
+  farQ = bq(); await bw.type('0.025'); await bw.rcpType(T_ME); await sleep(900);
+  bw.$('ack').checked = true; bw.$('ack').fire('change'); await sleep(40);
+  bw.go(); await sleep(250);
+  ok(btcSign.length === 1 && btcPush.length === 0 && bw.$('msg').textContent.indexOf('signature') > 0,
+     'a wallet that changes the transaction while signing it is not obeyed: nothing is sent');
+
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
   for (const w of ['eval(', 'new Function', 'innerHTML', 'outerHTML', 'document.write', 'insertAdjacentHTML', 'srcdoc',
