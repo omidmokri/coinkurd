@@ -28,7 +28,7 @@ import map_data as MD               # noqa: E402
 ROOT = BP.ROOT
 SITE = BP.SITE
 e = BP.e
-VER = "1"
+VER = 2   # 2: on a phone the map shows the thirteen faculties alone, and a name never runs off the edge
 ICON = {"les": "📘", "src": "🔗", "trm": "📖", "tol": "🧪", "pat": "🎓"}
 missing = []
 

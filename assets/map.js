@@ -145,14 +145,21 @@
     }
 
     var touched = 0;
+    /* On a narrow screen the whole graph — every topic and every one of its lessons — is more dots than anyone can
+       read. There only the thirteen faculties are drawn, each with its name, and the rest of the map is the list
+       below. The physics still moves every node, so the shape is the same shape, only told shorter. */
+    function few() { return W > 0 && W < 520; }
+    function shown(n) { return !few() || n.k === "f"; }
     function fit(snap) {
       if (!N.length || !W) return;
       var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
       for (var i = 0; i < N.length; i++) {
         var n = N[i];
+        if (!shown(n)) continue;
         if (n.x < x0) x0 = n.x; if (n.y < y0) y0 = n.y;
         if (n.x > x1) x1 = n.x; if (n.y > y1) y1 = n.y;
       }
+      if (x0 > x1) { return; }
       var pad = Math.min(46, W * .06) + 22;
       var s2 = Math.min((W - pad * 2) / ((x1 - x0) || 1), (H - pad * 2) / ((y1 - y0) || 1));
       s2 = Math.max(.26, Math.min(1.4, s2));
@@ -168,6 +175,7 @@
       var i, a, b;
       for (i = 0; i < E.length; i++) {
         a = E[i][0]; b = E[i][1];
+        if (!shown(a) || !shown(b)) continue;
         var lit = a.hit && b.hit;
         ctx.strokeStyle = lit ? "rgba(255,255,255,.13)" : "rgba(255,255,255,.04)";
         ctx.lineWidth = 1;
@@ -176,6 +184,7 @@
       var lbl = [];
       for (i = 0; i < N.length; i++) {
         a = N[i];
+        if (!shown(a)) continue;
         var r = a.r * Math.max(view.s, .55), col = (CL[a.g] || "#f7931a");
         var x = sx(a), y = sy(a);
         if (x < -60 || y < -60 || x > W + 60 || y > H + 60) continue;
@@ -203,15 +212,20 @@
         var fs = a.k === "f" ? (small ? 12 : 13) : (small ? 10 : 11);
         ctx.font = (a.k === "f" ? "700 " : "400 ") + fs + "px Vazirmatn,Tahoma,sans-serif";
         var t = txt(a.t), m = ctx.measureText(t).width;
-        var x = lbl[i][1], y = lbl[i][2] + lbl[i][3] + 5, h2 = fs + 4;
-        var r = [x - m / 2 - 4, y - 2, m + 8, h2], clash = 0;
-        if (a !== hot) {
-          for (var b2 = 0; b2 < box.length; b2++) {
-            var o = box[b2];
-            if (r[0] < o[0] + o[2] && o[0] < r[0] + r[2] && r[1] < o[1] + o[3] && o[1] < r[1] + r[3]) { clash = 1; break; }
+        var x = Math.max(m / 2 + 6, Math.min(W - m / 2 - 6, lbl[i][1])), h2 = fs + 4;   /* a name never runs off the edge */
+        var below = lbl[i][2] + lbl[i][3] + 5, above = lbl[i][2] - lbl[i][3] - 5 - h2;
+        var r = null, clash = 1, tries = [below, above], ti;
+        for (ti = 0; ti < tries.length && clash; ti++) {        /* under the node first, over it if that is taken */
+          r = [x - m / 2 - 4, tries[ti] - 2, m + 8, h2]; clash = 0;
+          if (a !== hot) {
+            for (var b2 = 0; b2 < box.length; b2++) {
+              var o = box[b2];
+              if (r[0] < o[0] + o[2] && o[0] < r[0] + r[2] && r[1] < o[1] + o[3] && o[1] < r[1] + r[3]) { clash = 1; break; }
+            }
           }
         }
         if (clash) continue;
+        var y = r[1] + 2;
         box.push(r);
         ctx.globalAlpha = a.hit ? 1 : .2;
         ctx.fillStyle = "rgba(5,6,8,.74)";

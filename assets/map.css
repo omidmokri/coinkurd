@@ -14,10 +14,11 @@
 /* ---- graph */
 .mp-wrap{position:relative;border:1px solid var(--line);border-radius:18px;background:
   radial-gradient(120% 90% at 50% 0,rgba(247,147,26,.07),transparent 60%),#07080b;overflow:hidden}
-#mpCv{display:block;width:100%;height:min(66vh,560px);touch-action:none;cursor:grab}
+#mpCv{display:block;width:100%;height:min(66vh,560px);min-height:330px;touch-action:none;cursor:grab}
 #mpCv.drag{cursor:grabbing}
-.mp-legend{display:flex;gap:4px 12px;flex-wrap:wrap;padding:9px 13px;border-top:1px solid var(--line);
+.mp-legend{display:flex;gap:6px;flex-wrap:wrap;padding:9px 13px;border-top:1px solid var(--line);
   font-size:.74rem;color:var(--mute)}
+.mp-legend span{border:1px solid var(--line);border-radius:99px;padding:2px 9px;white-space:nowrap}
 .mp-legend i{display:inline-block;width:8px;height:8px;border-radius:99px;margin-inline-end:5px;vertical-align:1px}
 
 /* ---- search results + list view */
@@ -81,3 +82,9 @@
 [hidden]{display:none!important}
 @media (max-width:560px){#mpCv{height:58vh}.mp-r{padding:10px 13px}.mp-sec>h2{padding:11px 13px}}
 @media (prefers-reduced-motion:reduce){.mp-ring .fg{transition:none}}
+
+/* a phone: the graph gets the room, and the map shows the thirteen faculties alone (assets/map.js) */
+@media (max-width:560px){
+  #mpCv{height:clamp(360px,62vh,520px)}
+  .mp-legend{font-size:.7rem;padding:8px 10px;gap:5px}
+}
