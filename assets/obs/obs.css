@@ -148,6 +148,10 @@ html.ob-nofs-scroll{overflow:hidden}
 .ob-tile>span{color:#c9c9c4;font-size:.76rem}
 .ob-tsbox{position:relative;background:#0a0a0c;min-width:0}
 /* /charts/block-cycle/ — the spectrum the chart is read by, standing beside it */
+/* with one series a pane draws no legend, so on the timeline view the top bar would hold nothing but the zoom
+   cluster; where :has is understood it floats over the plot's corner instead, as on every other chart. */
+.ob-wvbox .ob-ts-top:has(.ob-ts-lgd:empty){position:absolute;top:12px;left:62px;z-index:3;padding:0;width:auto}
+@media (max-width:560px){.ob-wvbox .ob-ts-top:has(.ob-ts-lgd:empty){left:40px;top:10px}}
 .ob-wvbox{display:flex;align-items:stretch;gap:0}
 .ob-wvbox .ob-ts{flex:1 1 auto}
 .ob-wvsc{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:46px 8px 30px;font-size:.66rem;color:#9a9a94;letter-spacing:.02em}

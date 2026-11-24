@@ -76,7 +76,7 @@
     return o;
   })();
   var save = OB.debounce(function () { OB.store.set('ek_obs_wv', S); }, 300);
-  var V = { el: null, ts: null, D: null, seq: 0, ws: null, bws: null, live: null, liveAt: 0, redraw: 0 };
+  var V = { el: null, ts: null, D: null, seq: 0, lastStyle: null, ws: null, bws: null, live: null, liveAt: 0, redraw: 0 };
 
   function tile(label, value, sub, cls, id) { return '<div class="ob-tile"><small>' + esc(label) + '</small><b class="ob-n' + (cls ? ' ' + cls : '') + '"' + (id ? ' id="' + id + '"' : '') + '>' + value + '</b>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>'; }
   function status(html, cls) { var s = $('#ob-status', V.el); if (s) { s.innerHTML = html || ''; s.className = 'ob-status' + (cls ? ' ' + cls : ''); s.hidden = !html; } }
@@ -192,8 +192,9 @@
     if (S.halv) vl.push({ x: 0, color: 'rgba(233,233,228,.4)', label: T('wv_halving'), ink: 'rgba(233,233,228,.55)' });
     vl.push({ x: G.uNow, color: 'rgba(247,147,26,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(247,147,26,.9)' });
 
+    var keepO = V.lastStyle === 'ovl' && V.ts.v != null; V.lastStyle = 'ovl';
     V.ts.set({
-      label: T('aria_wave_ovl'), xmode: 'num',
+      label: T('aria_wave_ovl'), xmode: 'num', keepView: keepO,
       xfmt: function (x) { return [num(x), '≈ ' + OB.loc((x / 52560).toFixed(1)) + ' ' + T('wv_yr')]; },
       xtip: function (x) { return T('wv_tip_ovl', { h: num(x), y: OB.loc((x / 52560).toFixed(2)) }); },
       panes: [
@@ -251,13 +252,19 @@
     vl.push({ x: tipH, color: 'rgba(247,147,26,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(247,147,26,.9)' });
 
     var price = S.style === 'candle'
-      ? { name: T('p_price'), type: 'candle', color: INK, data: G.rows.map(function (r) { return [r[0], r[1], r[2], r[3], r[4]]; }) }
+      ? { name: T('p_price'), type: 'candle', color: INK, up: '#00e676', dn: '#ff2d1f', data: G.rows.map(function (r) { return [r[0], r[1], r[2], r[3], r[4]]; }) }
       : { name: T('p_price'), type: 'line', color: '#ffa21a', width: 2, data: G.rows.map(function (r) { return [r[0], r[4]]; }) };
     price.fmt = function (v) { return OB.fmtUsd(v, v < 10 ? 2 : 0); };
     if (S.style === 'wave') price.colors = G.pcol;
 
+    /* a candle drawn over fifteen years is a hairline, so candles open on the last stretch — ⟲ comes back here,
+       and zooming out from it still reaches the whole history. Everything else opens on the whole history, and
+       any view the reader has zoomed to survives every switch but a change of style. */
+    var B = BUCKET[S.bucket], view = S.style === 'candle' ? [tipH - 320 * B, tipH + 14 * B] : null;
+    var keep = V.lastStyle === S.style && V.ts.v != null;
+    V.lastStyle = S.style;
     V.ts.set({
-      label: T('aria_wave'), xmode: 'num',
+      label: T('aria_wave'), xmode: 'num', view: view, keepView: keep,
       xfmt: function (x) { return [num(x), '≈ ' + dax(x)]; },
       xtip: function (x) { return T('wv_tip', { h: num(x), d: dstr(x) }); },
       xcross: priorCycles,
@@ -349,8 +356,8 @@
       '<button type="button" class="ob-ib ob-gear" id="ob-gear" aria-expanded="false" aria-controls="ob-more" aria-label="' + esc(T('more')) + '" title="' + esc(T('more')) + '">' + OB.icon('gear') + '</button>' +
       '<div class="ob-more" id="ob-more">' +
       '<label class="ob-lbl"><span>' + esc(T('scale')) + '</span>' + OB.ui.seg('ob-sc', [['log', T('sc_log')], ['lin', T('sc_lin')]], S.log ? 'log' : 'lin') + '</label>' +
-      '<label class="ob-lbl"><span>' + esc(T('wv_marks')) + '</span>' + OB.ui.seg('ob-hv', [['on', T('wv_halv')], ['off', T('wv_off')]], S.halv ? 'on' : 'off') +
-      OB.ui.seg('ob-ph', [['on', T('wv_phases')], ['off', T('wv_off')]], S.phase ? 'on' : 'off') + '</label>' +
+      '<label class="ob-lbl"><span>' + esc(T('wv_halv')) + '</span>' + OB.ui.seg('ob-hv', [['on', T('wv_on')], ['off', T('wv_off')]], S.halv ? 'on' : 'off') + '</label>' +
+      '<label class="ob-lbl"><span>' + esc(T('wv_phases')) + '</span>' + OB.ui.seg('ob-ph', [['on', T('wv_on')], ['off', T('wv_off')]], S.phase ? 'on' : 'off') + '</label>' +
       '<label class="ob-lbl"><span>' + esc(T('wv_live')) + '</span>' + OB.ui.seg('ob-lv', [['on', T('wv_on')], ['off', T('wv_off')]], S.live ? 'on' : 'off') + '</label></div>' +
       OB.ui.acts(true) + '</div><div class="ob-tiles" id="ob-tiles"></div>' +
       '<div class="ob-tsbox ob-wvbox"><div class="ob-ts" id="ob-ts"></div>' + scaleHtml() + '<div class="ob-status" id="ob-status"></div></div>' +

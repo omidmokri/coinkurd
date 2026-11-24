@@ -218,10 +218,11 @@
         var i0 = Math.max(0, lastLE(a, v.x0)), i1 = Math.min(a.length - 1, lastLE(a, v.x1) + 1), n = i1 - i0 + 1, j, xx, yy;
         if (s.type === 'candle') {
           var cw = Math.max(1, Math.min(14, self.gap * xs * 0.66)), thin = self.gap * xs < 3;
+          var cu = s.up || '#34d399', cd = s.dn || '#ff5a4d';
           for (j = i0; j <= i1; j++) {
             var c = a[j], cx = X(c[0] + self.gap / 2), up = c[4] >= c[1];
-            ctx.strokeStyle = up ? '#34d399' : '#ff5a4d'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx, Y(c[2])); ctx.lineTo(cx, Y(c[3])); ctx.stroke();
-            if (!thin) { var tp = Math.min(Y(c[1]), Y(c[4])), hh = Math.max(1, Math.abs(Y(c[4]) - Y(c[1]))); ctx.fillStyle = up ? '#34d399' : '#ff5a4d'; ctx.fillRect(cx - cw / 2, tp, cw, hh); }
+            ctx.strokeStyle = up ? cu : cd; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx, Y(c[2])); ctx.lineTo(cx, Y(c[3])); ctx.stroke();
+            if (!thin) { var tp = Math.min(Y(c[1]), Y(c[4])), hh = Math.max(1, Math.abs(Y(c[4]) - Y(c[1]))); ctx.fillStyle = up ? cu : cd; ctx.fillRect(cx - cw / 2, tp, cw, hh); }
           }
           return;
         }
