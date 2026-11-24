@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -7,7 +9,22 @@ namespace Entekhab
 {
     static class Program
     {
-        public const string Version = "1.0.1";
+        /// The version the app says it is: read from the file itself, which the build stamps from
+        /// windows/Entekhab.csproj. Written by hand it drifts, and an app that believes it is older than it is
+        /// tells its owner forever that an update is waiting.
+        public static readonly string Version = ReadVersion();
+
+        static string ReadVersion()
+        {
+            try
+            {
+                var v = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+                var n = v.FileMajorPart + "." + v.FileMinorPart + "." + v.FileBuildPart;
+                if (n != "0.0.0") return n;
+            }
+            catch { }
+            return "0.0.0";
+        }
 
         [STAThread]
         static int Main(string[] args)
