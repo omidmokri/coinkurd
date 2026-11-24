@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-24T22:32:06.766416+00:00",
+ "updated_at": "2026-11-24T22:58:34.260728+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-23T22:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "ema_death_cross": {
-   "n": 532,
+   "n": 531,
    "obs": 1.07,
-   "win": 58.3,
+   "win": 58.2,
    "mid": 0.79,
    "lo": -0.85,
    "hi": 1.77,
-   "p": 0.6122,
+   "p": 0.613,
    "shifts": 1323,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6431,
-   "obs": -0.0,
+   "n": 6428,
+   "obs": 0.0,
    "win": 49.7,
    "mid": 0.0,
    "lo": -0.36,
    "hi": 0.2,
-   "p": 0.9887,
+   "p": 0.9985,
    "shifts": 1323,
    "verdict": "no_edge"
   },
@@ -67,13 +67,13 @@
    "verdict": "no_edge"
   },
   "ema_golden_cross": {
-   "n": 596,
+   "n": 594,
    "obs": -1.12,
-   "win": 42.3,
+   "win": 42.4,
    "mid": -0.82,
-   "lo": -1.7,
-   "hi": 0.16,
-   "p": 0.5646,
+   "lo": -1.69,
+   "hi": 0.15,
+   "p": 0.5639,
    "shifts": 1323,
    "verdict": "no_edge"
   },
