@@ -97,6 +97,19 @@ def main():
     far = [c for c in data["chains"] if c.get("kind") and not c.get("to_only")]
     ok({c["coin"] for c in far} == {"TRX", "SOL", "BTC"}, "Tron, Solana and Bitcoin are the networks off EVM a swap may start on")
     ok(all("rpc" not in c for c in far), "…and neither brings a node of its own into the page")
+    rank = B.market_rank()
+    ok(rank.get("BTC") == 1 and rank.get("USDT", 99) <= 10 and len(rank) > 200, "the ranking knows the largest coins, and is not a short list")
+    coins = {str(c["id"]): c["coin"] for c in data["chains"]}
+    ok(all(ts[0]["symbol"].upper() == coins[cid].upper()
+           for cid, ts in data["tokens"].items()
+           if any(t["symbol"].upper() == coins[cid].upper() for t in ts)),
+       "a list that holds the network's own coin opens with it, the one its fees are paid in")
+    def ordered(ts):
+        got = [rank.get(t["symbol"].upper(), B.BIG) for t in ts[1:]]
+        return all(got[i] <= got[i + 1] for i in range(len(got) - 1))
+    ok(all(ordered(ts) for ts in data["tokens"].values()), "…and everything after it reads biggest first, by market capitalisation")
+    ok([t["symbol"] for t in data["tokens"]["56"]][:4] == ["BNB", "USDT", "USDC", "XRP"], "on BNB Smart Chain that reads BNB, USDT, USDC, XRP")
+
     ok(next(c for c in far if c["coin"] == "TRX").get("contract") == "TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt",
        "Tron pins LI.FI's own contract there, in Tron's address form")
     ok(all("contract" not in c for c in far if c["coin"] in ("SOL", "BTC")), "Solana and Bitcoin pin none, because they have none")
@@ -344,7 +357,7 @@ def main():
         ok(words in pg.out, f"the site's translator finds the page's English: “{words}”")
     ok(not any(re.search(r"0x[0-9a-fA-F]{40}", x) for x in pg.out), "no address is handed to the translator")
     js_en = i18n_ar.js_strings(open(os.path.join(ROOT, "assets", "swap", "swap.js"), encoding="utf-8").read())
-    for words in ("Connect wallet", "Swap", "Finding the best price…", "Approve token", "Choose a token"):
+    for words in ("Connect wallet", "Swap", "Finding the best price…", "Approve token", "Choose a coin"):
         ok(words in js_en, f"…and the engine's English: “{words}”")
 
     # ---------------------------------------------------------------- the menu

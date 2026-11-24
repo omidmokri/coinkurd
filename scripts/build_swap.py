@@ -54,6 +54,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG = os.path.join(ROOT, "scripts", "swap_config.json")
 CHAINS = os.path.join(ROOT, "scripts", "swap_chains.json")
+RANKS = os.path.join(ROOT, "scripts", "swap_rank.json")
 OUT = os.path.join(ROOT, "swap", "index.html")
 SERVICE = "https://li.quest"
 MAX_FEE = 0.03
@@ -224,11 +225,36 @@ def load(path=CONFIG):
         return check(json.load(f))
 
 
+BIG = 10 ** 6
+
+
+def market_rank():
+    """How large each coin is, by symbol: a ranking taken from CoinGecko and kept in the repository.
+
+    It decides the order the coin lists are shown in and nothing else, so a symbol missing from it costs nothing —
+    that coin simply reads after the ranked ones."""
+    with open(RANKS, encoding="utf-8") as f:
+        raw = json.load(f)
+    out = {}
+    if not isinstance(raw, dict) or not isinstance(raw.get("rank"), dict):
+        raise ConfigError("swap_rank.json: no ranking in it")
+    for sym, r in raw["rank"].items():
+        if not isinstance(sym, str) or not re.fullmatch(r"[A-Z0-9.$_-]{1,20}", sym):
+            raise ConfigError(f"swap_rank.json: {sym!r} is not a symbol")
+        if not isinstance(r, int) or isinstance(r, bool) or not 1 <= r <= BIG:
+            raise ConfigError(f"swap_rank.json: {sym} has no sensible rank")
+        out[sym] = r
+    if not out:
+        raise ConfigError("swap_rank.json: the ranking is empty")
+    return out
+
+
 def chains(path=CHAINS):
     """scripts/swap_chains.json → what the page may offer, checked hard: a wrong address here would cost somebody money"""
     with open(path, encoding="utf-8") as f:
         raw = json.load(f)
     out = {"chains": [], "tokens": {}}
+    rank = market_rank()
     ids = set()
     for c in raw.get("chains", []):
         if not isinstance(c.get("id"), int) or c["id"] <= 0 or c["id"] in ids:
@@ -301,8 +327,11 @@ def chains(path=CHAINS):
             rows.append({"symbol": tk["symbol"], "name": tk["name"], "address": a, "decimals": d})
         if not rows:
             raise ConfigError(f"chain {cid}: no tokens")
-        # the network's own coin, the stablecoins and the few majors stay on top as written; the long tail reads A to Z
-        out["tokens"][cid] = rows[:8] + sorted(rows[8:], key=lambda t: t["symbol"].lower())
+        # The network's own coin opens the list, because it is what fees are paid in there; everything after it reads
+        # biggest first, by market capitalisation, so the coins people look for are at the top and the tail follows.
+        own = (next((c for c in out["chains"] if c["id"] == int(cid)), {}) or {}).get("coin", "")
+        out["tokens"][cid] = sorted(rows, key=lambda t: (t["symbol"].upper() != own.upper(),
+                                                         rank.get(t["symbol"].upper(), BIG), t["symbol"].lower(), t["name"].lower()))
     for c in out["chains"]:
         if str(c["id"]) not in out["tokens"]:
             raise ConfigError(f"chain {c['id']} has no token list")
