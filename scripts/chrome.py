@@ -431,9 +431,14 @@ def footer(lang="fa"):
     cats = {c["k"]: c for c in NAV}
     by = {h: (ic, t) for c in NAV for h, ic, t, d in c["items"]}
     by[BATTLE[0]] = (BATTLE[1], BATTLE[2])
+    # owner 2026-11-24: the footer's last column carries the swap page where «شفافیت و وضعیت» used to be (that page stays
+    # in the header menu). Until swaps are switched on the old link stays, so the footer never points at a dark page.
+    swap_on = SWAP[0] in by
+    by[SWAP[0]] = (SWAP[1], L("تبدیل رمزارز", "گۆڕینەوەی دراو", "Swap"))
     quick = "".join(f'<a class="ekf-q" href="{h}">{icon(by[h][0])}{tri(by[h][1], lang)}</a>' for h in FOOT_QUICK)
     cols = []
     for k, hrefs in FOOT_COLS:
+        hrefs = [SWAP[0] if (h == "/status/" and swap_on) else h for h in hrefs]
         lis = "".join(f'<li><a href="{h}">{tri(by[h][1], lang)}</a></li>' for h in hrefs)
         if k == "more":
             lis += f'<li><a href="https://t.me/Coin_Kurd_Group" target="_blank" rel="noopener noreferrer">{tri(T["contact"], lang)}</a></li>'
