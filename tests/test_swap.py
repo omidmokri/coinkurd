@@ -228,7 +228,9 @@ def main():
            f"[{name}] only the swap engine and the site's own interface scripts run, the engine first ({srcs})")
         for rel in ("assets/swap/swap.js", "assets/swap/swap.css"):
             h = "sha384-" + base64.b64encode(hashlib.sha384(open(os.path.join(ROOT, rel), "rb").read()).digest()).decode()
-            ok(f'/{rel}" integrity="{h}"' in doc, f"[{name}] {rel} is pinned by its SHA-384")
+            ok(f'/{rel}{B.ver(rel)}" integrity="{h}"' in doc, f"[{name}] {rel} is pinned by its SHA-384")
+            ok(B.ver(rel)[3:] in h.replace("+", "").replace("/", "").replace("=", ""),
+               f"[{name}] …and its address carries that same hash, so no browser keeps an older copy of it")
         ok(not re.search(r"<[^>]+\son[a-z]+\s*=", doc) and "javascript:" not in doc.lower(), f"[{name}] no inline event handler and no javascript: link")
         outside = [(t, u) for t, u in loaders(doc) if re.match(r"(?:https?:)?//", u)]
         ok(not outside, f"[{name}] the markup loads nothing from another host ({outside[:3]})")

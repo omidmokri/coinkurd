@@ -354,6 +354,16 @@ def sri(rel):
         return "sha384-" + base64.b64encode(hashlib.sha384(f.read()).digest()).decode()
 
 
+def ver(rel):
+    """A short name for this exact version of a file, to hang on its address.
+
+    The page pins both of its own files by their hash, so a browser holding an older copy of one of them would refuse
+    to run it at all and the page would simply be dead until that copy expired. Giving the address a name that changes
+    with the file means a new page always asks for a file no browser has yet."""
+    h = "".join(c for c in sri(rel)[7:] if c.isalnum())
+    return "?v=" + h[:10]
+
+
 _FA = str.maketrans("0123456789.", "۰۱۲۳۴۵۶۷۸۹٫")
 _CKB = str.maketrans("0123456789.", "٠١٢٣٤٥٦٧٨٩٫")
 
@@ -584,7 +594,7 @@ def page(cfg, data):
 <meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f7931a">{chrome.FONTS}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest">
-{styles}<link rel="stylesheet" href="/assets/swap/swap.css" integrity="{sri('assets/swap/swap.css')}">
+{styles}<link rel="stylesheet" href="/assets/swap/swap.css{ver('assets/swap/swap.css')}" integrity="{sri('assets/swap/swap.css')}">
 </head><body class="sw-body">
 {chrome.header("fa")}
 <main class="sw-wrap" id="sw-main">
@@ -639,7 +649,7 @@ def page(cfg, data):
 {dialog()}
 </main>
 {chrome.bottom("fa")}{chrome.footer("fa")}
-<script src="/assets/swap/swap.js" integrity="{sri('assets/swap/swap.js')}" defer></script>{scripts}
+<script src="/assets/swap/swap.js{ver('assets/swap/swap.js')}" integrity="{sri('assets/swap/swap.js')}" defer></script>{scripts}
 </body></html>
 """
     return doc
