@@ -634,7 +634,7 @@
   Drawer.prototype.paint = function (ctx, W, H) {
     var self = this, L = this.list();
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
-    try { this.paintProfiles(ctx, W, H); } catch (e) { }
+    try { this.paintMacro(ctx, W, H); this.paintProfiles(ctx, W, H); } catch (e) { }
     var cat = tfCat(this.o.sec());
     L.forEach(function (d) { if (d.hd || (d.s && d.s.hv && d.s.hv.indexOf(cat) >= 0)) { d._g = null; return; } self.paintOne(ctx, d, W, H, self.sel === d.id, self.hover === d.id); });
     if (this.cur) this.paintOne(ctx, this.cur, W, H, true, false);
@@ -883,6 +883,89 @@
     if (!this.keep) this.o.toolDone && this.o.toolDone();
   };
   Drawer.prototype.cancel = function () { this.cur = null; this._brush = false; this.req(); };
+
+
+  /* ================================================================ Kurdistani Bitcoin Spiral (Coin_Kurd, open source)
+     The script's own curated keyframes and polar mapping: one turn = four years (a halving cycle), radius = log10(price). */
+  var SP = {
+    T: [2009.00,2009.83,2010.00,2010.40,2010.70,2010.92,2011.10,2011.40,2011.50,2011.75,2011.92,2012.30,2012.60,2012.91,2013.00,2013.25,2013.33,2013.50,2013.83,2013.93,
+      2014.10,2014.30,2014.60,2014.92,2015.04,2015.30,2015.60,2015.92,2016.30,2016.52,2016.75,2016.92,2017.20,2017.40,2017.60,2017.75,2017.85,2017.92,2017.96,2018.05,
+      2018.20,2018.40,2018.60,2018.83,2018.95,2019.10,2019.30,2019.50,2019.55,2019.75,2019.92,2020.10,2020.20,2020.35,2020.60,2020.75,2020.85,2020.95,2021.00,2021.15,
+      2021.28,2021.40,2021.50,2021.55,2021.75,2021.85,2021.87,2022.00,2022.15,2022.30,2022.45,2022.55,2022.70,2022.83,2022.87,2023.00,2023.20,2023.40,2023.60,2023.80,
+      2023.95,2024.03,2024.20,2024.22,2024.30,2024.50,2024.60,2024.75,2024.85,2024.95,2024.97,2025.05,2025.15,2025.30,2025.40,2025.50,2025.60,2025.76,2025.85,2025.92,
+      2026.00,2026.10,2026.20,2026.30,2026.40,2026.52],
+    P: [0.0008,0.0008,0.003,0.0025,0.05,0.30,1.0,30.0,17.0,5.0,2.0,5.0,8.0,12.0,13.0,230.0,70.0,110.0,900.0,1150.0,800.0,450.0,600.0,320.0,170.0,240.0,230.0,430.0,420.0,650.0,
+      600.0,750.0,1000.0,1800.0,2800.0,4300.0,7000.0,17000.0,19700.0,13500.0,8000.0,8300.0,6500.0,6300.0,3200.0,3600.0,5000.0,10500.0,13000.0,8000.0,
+      7200.0,8600.0,3800.0,9000.0,9200.0,10800.0,13800.0,19000.0,29000.0,48000.0,64000.0,57000.0,35000.0,29000.0,47000.0,61000.0,69000.0,46000.0,42000.0,39000.0,
+      30000.0,17600.0,20000.0,19000.0,15600.0,16500.0,23000.0,28000.0,26000.0,34000.0,42000.0,46000.0,52000.0,73000.0,64000.0,61000.0,58000.0,63000.0,68000.0,100000.0,
+      108000.0,95000.0,97000.0,84000.0,94000.0,122000.0,115000.0,126210.0,100000.0,87000.0,92000.0,80000.0,76000.0,68000.0,64000.0,63000.0],
+    ath: [[2013.93, 1150, 2013.83], [2017.96, 19700, 2017.85], [2021.87, 69000, 2021.78], [2024.97, 108000, 2024.90], [2025.76, 126210, 2025.66]],
+    bot: [[2011.92, 2], [2015.04, 170], [2018.95, 3200], [2022.87, 15600]], halv: [[2012.91, 12], [2016.52, 650], [2020.35, 9000], [2024.30, 64000]],
+    dec: ['$1', '$10', '$100', '$1000', '$10k', '$100k', '$1M'], axis: ["2009, '13, '17, '21, '25", "2010, '14, '18, '22, '26", "2011, '15, '19, '23, '27", "2012, '16, '20, '24, '28"]
+  };
+  function spPrice(t) {
+    var T = SP.T, Pp = SP.P, n = T.length; if (t <= T[0]) return Pp[0]; if (t >= T[n - 1]) return Pp[n - 1];
+    var lo = 0, hi = n - 1; while (hi - lo > 1) { var m = (lo + hi) >> 1; if (T[m] <= t) lo = m; else hi = m; }
+    var f = (t - T[lo]) / (T[hi] - T[lo]), l0 = Math.log10(Pp[lo]), l1 = Math.log10(Pp[hi]); return Math.pow(10, l0 + (l1 - l0) * f);
+  }
+  function spAng(t) { var c = ((t - 2009) % 4 + 4) % 4; return c / 4 * 2 * Math.PI; }
+  function spR(l) { return 18 + (l + 3.1) / (6.15 + 3.1) * (400 - 18); }
+  function spRad(p) { return spR(Math.max(-3.1, Math.min(6.15, Math.log10(p)))); }
+  /* now(): { year: fractional year, price } of the latest daily BTC close, or null (then the curated backbone ends the line) */
+  P.paintSpiral = function (ctx, W, H, now, T) {
+    var RO = spR(7), k = Math.min(W, H) / 2 / (RO * 1.3), cx = W / 2, cy = H / 2, i, a;
+    function xy(t, p, extra) { var an = spAng(t), r = (spRad(p) + (extra || 0)) * k; return [cx + r * Math.sin(an), cy - r * Math.cos(an)]; }
+    function pol(r, an) { return [cx + r * k * Math.sin(an), cy - r * k * Math.cos(an)]; }
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip(); ctx.fillStyle = '#07111B'; ctx.fillRect(0, 0, W, H);
+    var last = SP.T[SP.T.length - 1], nowY = now ? Math.max(now.year, last) : last, nowP = now ? now.price : SP.P[SP.P.length - 1], y0 = Math.floor(nowY);
+    /* the current year's wedge, fainter toward the centre */
+    var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, RO * k); gr.addColorStop(0, 'rgba(247,147,26,.02)'); gr.addColorStop(1, 'rgba(247,147,26,.2)');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(cx, cy); for (i = 0; i <= 24; i++) { a = pol(RO, spAng(y0 + i / 24 * 0.9999)); ctx.lineTo(a[0], a[1]); } ctx.closePath(); ctx.fill();
+    ctx.font = '600 12px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#F7931A';
+    a = pol(RO * 1.07, spAng(y0 + 0.5)); ctx.fillText(String(y0), a[0], a[1]);
+    /* rings ($1 … $1M), spokes and the four year axes */
+    ctx.setLineDash([]);
+    for (i = 0; i < 7; i++) { ctx.strokeStyle = 'rgba(148,163,184,' + (i % 2 ? 0.14 : 0.26) + ')'; ctx.lineWidth = i % 2 ? 1 : 1.5; ctx.beginPath(); ctx.arc(cx, cy, spR(i) * k, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(148,163,184,.45)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(cx, cy, RO * k, 0, Math.PI * 2); ctx.stroke();
+    for (i = 0; i < 8; i++) { a = pol(RO, i * Math.PI / 4); ctx.strokeStyle = 'rgba(148,163,184,' + (i % 2 ? 0.14 : 0.4) + ')'; ctx.lineWidth = i % 2 ? 1 : 1.5; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(a[0], a[1]); ctx.stroke(); }
+    ctx.fillStyle = '#c9d1d9'; ctx.font = '600 ' + Math.max(10, Math.min(13, W / 60)) + 'px Vazirmatn, Tahoma, sans-serif';
+    [0, 1, 2, 3].forEach(function (q) { var b = pol(RO * 1.16, q * Math.PI / 2); ctx.textAlign = q === 1 ? 'left' : q === 3 ? 'right' : 'center'; var bx = q === 1 ? cx + RO * k + 8 : q === 3 ? cx - RO * k - 8 : b[0]; ctx.fillText('⁦' + SP.axis[q] + '⁩', bx, b[1]); });
+    ctx.font = '500 10px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(201,209,217,.75)';
+    for (i = 0; i < 7; i++) ctx.fillText(SP.dec[i], cx + 4, cy + spR(i) * k - 7);
+    /* the spiral itself: glow, line, highlight */
+    var pts = [], st = 1 / 150; for (var t = 2009; t <= last + 1e-9; t += st) pts.push(xy(t, spPrice(t)));
+    function path() { ctx.beginPath(); pts.forEach(function (q, j) { if (j) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.stroke(); }
+    ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(245,168,60,.3)'; ctx.lineWidth = 5; path(); ctx.strokeStyle = '#F5A83C'; ctx.lineWidth = 2; path(); ctx.strokeStyle = 'rgba(255,233,168,.45)'; ctx.lineWidth = 1; path();
+    /* halvings, bottoms, all-time highs with their run-up */
+    SP.halv.forEach(function (h) { var q = xy(h[0], h[1]); ctx.fillStyle = 'rgba(121,197,143,.4)'; ctx.fillRect(q[0] - 6, q[1] - 6, 12, 12); ctx.fillStyle = '#79C58F'; ctx.beginPath(); ctx.arc(q[0], q[1], 2.5, 0, Math.PI * 2); ctx.fill(); });
+    SP.bot.forEach(function (b) { var q = xy(b[0], b[1]); ctx.fillStyle = '#DC143C'; ctx.beginPath(); ctx.moveTo(q[0], q[1] - 6); ctx.lineTo(q[0] + 5, q[1]); ctx.lineTo(q[0], q[1] + 6); ctx.lineTo(q[0] - 5, q[1]); ctx.closePath(); ctx.fill(); });
+    SP.ath.forEach(function (A) { for (var j = 0; j <= 24; j++) { var f = j / 24, tt = A[2] + (A[0] - A[2]) * f, q = xy(tt, spPrice(tt), j === 24 ? 0 : f * 8); ctx.fillStyle = j === 24 ? '#2E5BFF' : 'rgba(46,91,255,.3)'; ctx.beginPath(); ctx.arc(q[0], q[1], j === 24 ? 5 : f < 0.66 ? 1.6 : 2.4, 0, Math.PI * 2); ctx.fill(); } });
+    /* now: the dotted live extension and the marker */
+    var nq = xy(nowY, nowP), lq = xy(last, SP.P[SP.P.length - 1]);
+    if (now && nowY > last) { ctx.strokeStyle = 'rgba(247,147,26,.6)'; ctx.lineWidth = 1.2; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(lq[0], lq[1]); ctx.lineTo(nq[0], nq[1]); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.fillStyle = 'rgba(247,147,26,.35)'; ctx.beginPath(); ctx.arc(nq[0], nq[1], 9, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#F7931A'; ctx.beginPath(); ctx.moveTo(nq[0], nq[1] - 5); ctx.lineTo(nq[0] + 5, nq[1] + 4); ctx.lineTo(nq[0] - 5, nq[1] + 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(201,209,217,.8)'; ctx.font = '600 10px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('₿ 2009', cx, cy);
+    /* legend */
+    var L = [['#F5A83C', '━', 'Bitcoin'], ['#2E5BFF', '●', "ATH's"], ['#DC143C', '◆', 'Bottoms'], ['#79C58F', '◉', 'Halvings'], ['#F7931A', '▲', 'Now' + (now ? ' ~$' + Math.round(nowP).toLocaleString('en-US') : '')]];
+    ctx.textAlign = 'left'; ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif'; ctx.fillStyle = '#e5e7eb'; ctx.fillText('Kurdistani Bitcoin Spiral', 10, 14);
+    L.forEach(function (r, j) { ctx.fillStyle = r[0]; ctx.fillText(r[1], 10, 32 + j * 15); ctx.fillStyle = 'rgba(201,209,217,.85)'; ctx.fillText(r[2], 28, 32 + j * 15); });
+    ctx.restore();
+  };
+  /* Macro Regime: the regime's colour behind the candles and a red band while the 2y–10y curve is inverted */
+  var MRC = ['255,23,68', '255,109,0', '0,200,83', '105,240,174', '244,180,0'];
+  Drawer.prototype.paintMacro = function (ctx, W, H) {
+    var M = this.o.macro ? this.o.macro() : null; if (!M || !M.map) return;
+    var bars = this.o.bars(), ts = this.o.chart.timeScale(), r = ts.getVisibleLogicalRange(); if (!r || !bars.length) return;
+    var i0 = Math.max(0, Math.floor(r.from)), i1 = Math.min(bars.length - 1, Math.ceil(r.to)), half = (ts.logicalToCoordinate(1) - ts.logicalToCoordinate(0)) / 2 || 3, run = null;
+    function flush() { if (!run) return; ctx.fillStyle = 'rgba(' + MRC[run.g] + ',.07)'; ctx.fillRect(run.x0, 0, run.x1 - run.x0, H); if (run.inv) { ctx.fillStyle = 'rgba(255,23,68,.08)'; ctx.fillRect(run.x0, 0, run.x1 - run.x0, H); } run = null; }
+    for (var i = i0; i <= i1; i++) {
+      var rw = M.map[Math.floor(bars[i].t / 86400)], x = ts.logicalToCoordinate(i); if (!rw || x == null) { flush(); continue; }
+      if (run && (run.g !== rw[0] || run.inv !== rw[2])) flush();
+      if (!run) run = { g: rw[0], inv: rw[2], x0: x - half, x1: x + half }; else run.x1 = x + half;
+    }
+    flush();
+  };
 
   P.Drawer = Drawer; P.TOOLS = TOOLS; P.TEXTY = TEXTY; P.LV = LV; P.FIB = FIB; P.FIBX = FIBX; P.t2l = t2l; P.l2t = l2t;
   P.dur = function (s) { s = Math.abs(s); var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60); return d ? d + 'd ' + h + 'h' : h ? h + 'h ' + m + 'm' : m ? m + 'm' : Math.round(s) + 's'; };

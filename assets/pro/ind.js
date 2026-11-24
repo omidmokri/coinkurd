@@ -624,14 +624,21 @@
     cp_doji: { p: {}, plots: [], marks: 1 }, cp_mstar: { p: {}, plots: [], marks: 1 }, cp_soldiers: { p: {}, plots: [], marks: 1 }, cp_harami: { p: {}, plots: [], marks: 1 },
     cp_pierce: { p: {}, plots: [], marks: 1 }, cp_maru: { p: {}, plots: [], marks: 1 }, cp_tweezer: { p: {}, plots: [], marks: 1 }, cp_inside: { p: {}, plots: [], marks: 1 },
     /* Coin_Kurd's own open-source script (TradingView umPv6JPM): fair value = 8.31e-17 · days-since-genesis^5.48, ±10 %, buy zone 18 % under the lower band */
-    kpl: { p: {}, plots: [['up', 'line', 'rgba(255,90,77,.8)'], ['fair', 'line', '#facc15'], ['lo', 'line', 'rgba(52,211,153,.8)'], ['buy', 'line', '#22d3ee']], band: ['lo', 'buy', 'rgba(34,211,238,.07)'] }
+    kpl: { p: {}, plots: [['up', 'line', '#ffff00'], ['fair', 'line', '#ff0000'], ['lo', 'line', '#00ff00'], ['buy', 'line', 'rgba(0,255,0,.45)']], band: ['up', 'lo', 'rgba(255,255,0,.07)'] },
+    /* Kurdistani Style Cycle (DRuCJ6Bk): the series is computed once a day on the server exactly as the script does (MVRV from Coin Metrics); here it is laid on the bars */
+    ksc: { pane: true, p: {}, plots: [['v', 'hist', ''], ['pz', 'line', 'rgba(201,209,217,.7)']], levels: [1.5, 0, -1.5], ext: 'kind' },
+    /* Kurdistani Bitcoin Spiral (tECCygHQ): drawn in its own pane by the app */
+    kspiral: { pane: true, p: {}, plots: [['z', 'line', 'rgba(0,0,0,0)']], range: [-1, 1], spiral: 1, ext: 'kind' },
+    /* Kurdistani Macro Regime (IUgkPeGI): regime background, signals and a dashboard from data/macro_regime.json */
+    kmacro: { p: {}, plots: [], ext: 'macro', macro: 1 }
   };
   DEF.atr.fmt = 'price'; DEF.macd.fmt = 'price'; DEF.obv.fmt = 'vol';
   var ORDER_OVER = ['sma', 'ema', 'wma', 'hma', 'dema', 'tema', 'vwma', 'smma', 'alma', 'lsma', 'mgd', 'macross', 'ribbon', 'bb', 'env', 'dc', 'kc', 'ichi', 'alli', 'psar', 'st', 'vwap', 'piv', 'fract', 'zz'];
   var ORDER_COM = ['sqz', 'wt', 'halft', 'ut', 'ce', 'ssl', 'alpha', 'qqe', 'nwe', 'vixfix', 'rf', 'hull', 'zlsma', 'tdi', 'stc', 'kdj', 'smi', 'vwapb', 'emacloud', 'gmma', 'srlux', 'atrts'];
   var ORDER_PROF = ['vpvr', 'vpsess'];
   var ORDER_PAT = ['cp_all', 'cp_engulf', 'cp_hammer', 'cp_star', 'cp_doji', 'cp_mstar', 'cp_soldiers', 'cp_harami', 'cp_pierce', 'cp_maru', 'cp_tweezer', 'cp_inside'];
-  var ORDER_CK = ['kpl'];
+  var ORDER_CK = ['ksc', 'kpl', 'kspiral', 'kmacro'];
+  var EXT = {};                                             /* server-made data the app loads for the indicators that need it */
   var ORDER_PANE = ['vol', 'rsi', 'macd', 'stoch', 'srsi', 'cci', 'willr', 'mfi', 'mom', 'roc', 'ao', 'ac', 'uo', 'ppo', 'tsi', 'trix', 'cmo', 'crsi', 'fisher', 'rvgi', 'kst', 'copp', 'dpo',
     'adx', 'aroon', 'vortex', 'chop', 'mass', 'bbpow', 'bop', 'atr', 'adr', 'bbp', 'bbw', 'sd', 'hv', 'rvi', 'obv', 'adl', 'chosc', 'cmf', 'efi', 'eom', 'pvt', 'vo'];
 
@@ -796,6 +803,17 @@
         for (i = 0; i < n; i++) { if (!ok(at9[i])) continue; var ls9 = q.mult * at9[i]; if (!ok(T9)) T9 = C.c[i] - ls9; else if (dr > 0) { if (C.c[i] < T9) { dr = -1; T9 = C.c[i] + ls9; } else T9 = Math.max(T9, C.c[i] - ls9); } else { if (C.c[i] > T9) { dr = 1; T9 = C.c[i] - ls9; } else T9 = Math.min(T9, C.c[i] + ls9); } ta[i] = T9; da9[i] = dr; }
         var o9 = trail(da9, ta); return { up: o9.up, dn: o9.dn };
       }
+      case 'kspiral': { var zz = arr(n); for (i = 0; i < n; i++) zz[i] = 0; return { z: zz }; }
+      case 'ksc': {
+        var S = EXT.kind && EXT.kind.style_cycle && EXT.kind.style_cycle.series, vv = arr(n), pz = arr(n), ph = arr(n); if (!S || !S.length) return { v: vv, pz: pz, ph: ph };
+        if (!EXT._ksc) {                                   /* day → [bull-bear, phase, z-score of log price over 365 days] */
+          var mp = {}, lg = S.map(function (r) { return Math.log(r[3]); }), mz = sma(lg, 365), sz = stdev(lg, 365);
+          S.forEach(function (r, k) { mp[Math.floor(Date.parse(r[0] + 'T00:00:00Z') / 86400000)] = [r[1], r[2], ok(mz[k]) && sz[k] ? (lg[k] - mz[k]) / sz[k] : N]; });
+          EXT._ksc = { m: mp, last: Math.floor(Date.parse(S[S.length - 1][0] + 'T00:00:00Z') / 86400000) };
+        }
+        for (i = 0; i < n; i++) { var dk = Math.floor(C.t[i] / 86400), rw = EXT._ksc.m[dk] || (dk > EXT._ksc.last && dk - EXT._ksc.last <= 3 ? EXT._ksc.m[EXT._ksc.last] : null); if (rw) { vv[i] = rw[0]; ph[i] = rw[1]; pz[i] = rw[2]; } }
+        return { v: vv, pz: pz, ph: ph };
+      }
       case 'kpl': {                                         /* Kurdistani Bitcoin Power Law [Coin_Kurd], open source */
         var G = Date.UTC(2009, 0, 3) / 1000, f = arr(n), u5 = arr(n), l5 = arr(n), b5 = arr(n);
         for (i = 0; i < n; i++) { var dd5 = (C.t[i] - G) / 86400; if (dd5 <= 0) continue; var fv = 8.31e-17 * Math.pow(dd5, 5.48); f[i] = fv; u5[i] = fv * 1.1; l5[i] = fv * 0.9; b5[i] = fv * 0.9 * 0.82; }
@@ -941,7 +959,7 @@
     }
     return {};
   }
-  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
+  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.EXT = EXT; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
   root.PRO = root.PRO || {}; root.PRO.ind = M;
   if (typeof module !== 'undefined' && module.exports) module.exports = M;
 })(typeof window !== 'undefined' ? window : globalThis);

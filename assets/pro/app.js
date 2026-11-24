@@ -166,7 +166,7 @@
   var XFORM = { renko: 1, lbreak: 1, kagi: 1, pnf: 1 };          /* rebuilt from price alone (time only orders them) */
   var TFS = { s: ['1s', '5s', '10s', '15s', '20s', '30s', '45s'], m: ['1m', '3m', '5m', '15m', '30m', '45m'], h: ['1h', '2h', '3h', '4h', '6h', '8h', '12h'], d: ['1d', '3d', '1w', '1M'] };
   function hasLogo(s) { return P.hasLogo ? P.hasLogo(s) : (!P._logoSet || P._logoSet.has(s)); }      /* site rule: no coin without its own logo */
-  function newChart(sym) { return { sym: sym || 'BTC', tf: '1h', type: 'candle', inds: [{ id: 'vol', p: {}, u: P.uid() }], scale: { mode: 0, auto: 1 } }; }
+  function newChart(sym) { return { sym: sym || 'BTC', tf: '1h', type: 'candle', inds: [{ id: 'ksc', p: {}, u: P.uid() }], scale: { mode: 0, auto: 1 } }; }
   function homeSym() { var q = P.fx ? P.fx.cur() : 'IRT'; return q === 'IRT' || q === 'USD' ? 'BTC' : 'BTC_' + q; }
   function defaults() {
     return { v: 1, layout: '1', active: 0, sync: { sym: false, tf: false, cross: true, time: false, ind: false }, charts: [newChart(homeSym())],
@@ -188,7 +188,7 @@
       if (c && P.parseTF(c.tf)) n.tf = c.tf;
       if (c && TYPES.indexOf(c.type) >= 0) n.type = c.type;
       if (c && c.tp && typeof c.tp === 'object') n.tp = tpSane(c.tp);
-      if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).slice(0, 12).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
+      if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).slice(0, 400).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
       if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: c.scale.auto === 0 ? 0 : 1 };
       return n;
     });
@@ -452,7 +452,7 @@
       list: function (sym) { return DRAW[sym]; }, changed: drawChanged, fmt: function (p) { return self.fmt(p); }, T: T, touch: function () { return matchMedia('(pointer: coarse)').matches; },
       selected: function (dd) { emit('drawsel', self, dd); }, editText: editText, styleFor: function () { return lastStyle; }, blocked: function () { return !!self.picking; },
       settings: function (dd) { drawSettings(self, dd); }, erase: function (id) { removeDrawing(self, id); }, zoom: function (dd) { zoomTo(self, dd); },
-      toolDone: function () { if (curTool) setTool(null); }, profiles: function () { return self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].prof && !x.off; }).map(function (x) { return { mode: I.DEF[x.id].prof, rows: x.p.rows }; }); }, emoji: function () { return st.emoji || EMOJI[0]; } });
+      toolDone: function () { if (curTool) setTool(null); }, macro: function () { return I.EXT.macro && self.cfg.inds.some(function (x) { return x.id === 'kmacro' && !x.off; }) ? I.EXT.macro : null; }, profiles: function () { return self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].prof && !x.off; }).map(function (x) { return { mode: I.DEF[x.id].prof, rows: x.p.rows }; }); }, emoji: function () { return st.emoji || EMOJI[0]; } });
     this.drawer.keep = !!st.keep; this.drawer.magnet = st.magnet | 0; this.drawer.eraser = eraserOn;
     if (curTool && st.active === this.i) this.drawer.setTool(curTool);
     this.mk = LW.createSeriesMarkers(s, []);
@@ -593,6 +593,12 @@
       else if (pi && D.fmt === 'price') list.forEach(function (s) { s.applyOptions({ priceFormat: { type: 'price', precision: self.prec(), minMove: Math.pow(10, -self.prec()) } }); });
       else if (pi) list.forEach(function (s) { s.applyOptions({ priceFormat: { type: 'price', precision: 2, minMove: 0.01 } }); });
       if (x.id !== 'vol' && pi === 0 && D.pane !== 'vol') list.forEach(function (s) { s.applyOptions({ priceFormat: { type: 'price', precision: self.prec(), minMove: Math.pow(10, -self.prec()) } }); });
+      if (D.spiral && list[0]) {                          /* the Bitcoin Spiral paints its own pane */
+        try {
+          list[0].attachPrimitive({ updateAllViews: function () { }, paneViews: function () { return [{ zOrder: function () { return 'top'; }, renderer: function () { return { draw: function (tg) { tg.useMediaCoordinateSpace(function (sp) { try { P.paintSpiral(sp.context, sp.mediaSize.width, sp.mediaSize.height, spiralNow(self), T); } catch (e) { } }); } }; } }]; } });
+          list[0].applyOptions({ lastValueVisible: false }); var pn = ch.panes()[pi]; if (pn && pn.setHeight) pn.setHeight(Math.max(300, Math.round(self.box.clientHeight * 0.55)));
+        } catch (e) { }
+      }
       var rec = { list: list, keys: keys, def: D, x: x, pane: pi };
       if (D.band || D.cloud) { rec.band = new Band(self, rec); list[0].attachPrimitive(rec.band.prim); }
       self.series[x.u] = rec;
@@ -606,7 +612,47 @@
     var src = this.cfg.type === 'heikin' && x.id !== 'vol' ? this.disp : bars;
     return I.compute(x.id, src, x.p);
   };
+  /* server-made series some indicators stand on (Style Cycle, Spiral: data/kind.json · Macro Regime: data/macro_regime.json) */
+  var EXTSRC = { kind: '/data/kind.json', macro: '/data/macro_regime.json' }, extBusy = {};
+  function prepMacro(j) {
+    var mp = {}; (Array.isArray(j.rows) ? j.rows : []).forEach(function (r) { var d = Math.floor(Date.parse(r[0] + 'T00:00:00Z') / 86400000); if (isFinite(d) && r[1] >= 0 && r[1] <= 4) mp[d] = [r[1] | 0, r[2] | 0, r[3] ? 1 : 0]; });
+    j.map = mp; return j;
+  }
+  function ensureExt(cell) {
+    cell.cfg.inds.forEach(function (x) {
+      var D = I.DEF[x.id], k = D && D.ext; if (!k || I.EXT[k] || extBusy[k]) return; extBusy[k] = 1;
+      P.getJSON(EXTSRC[k] + '?v=' + Math.floor(Date.now() / 36e5)).then(function (j) {
+        if (!j || typeof j !== 'object') throw 0; I.EXT[k] = k === 'macro' ? prepMacro(j) : j;
+        cells.forEach(function (c) { c.renderInds(true); c.marks(); c.legend(); macroBox(c); if (c.drawer) c.drawer.update(); });
+      }).catch(function () { delete extBusy[k]; toast(T('extFail')); });
+    });
+  }
+  function spiralNow(cell) {
+    var b = cell.cfg.sym === 'BTC' && cell.bars.length ? cell.bars[cell.bars.length - 1] : null, sc = I.EXT.kind && I.EXT.kind.style_cycle, t, p;
+    if (b) { t = b.t * 1000; p = b.c; } else if (sc && sc.price > 0) { t = Date.parse(sc.date + 'T00:00:00Z'); p = +sc.price; } else return null;
+    var d = new Date(t); if (!isFinite(t) || !(p > 0)) return null;
+    return { year: d.getUTCFullYear() + d.getUTCMonth() / 12 + (d.getUTCDate() - 1) / 365, price: p };
+  }
+  /* the Macro Regime dashboard: the script's table, as a small box on the chart */
+  function macroBox(cell) {
+    $$('.pm-macro', cell.el).forEach(function (x) { x.remove(); });
+    var on = cell.cfg.inds.some(function (x) { return x.id === 'kmacro' && !x.off; }), M = I.EXT.macro, n = M && M.now; if (!on || !n) return;
+    var RC = ['#ff1744', '#ff6d00', '#00c853', '#69f0ae', '#f4b400'], rc = RC[(M.regimes || []).indexOf(n.regime)] || '#f4b400', sc = n.scores || {};
+    function row(a, b, c) { return '<tr><td>' + esc(a) + '</td><td' + (c ? ' style="color:' + c + '"' : '') + '>' + esc(String(b)) + '</td></tr>'; }
+    function clr(v) { return v >= 65 ? '#00c853' : v >= 40 ? '#f4b400' : '#ff5a5f'; }
+    var box = h('<div class="pm-macro" dir="ltr"><button type="button" class="pm-macx" aria-label="' + esc(T('close')) + '">\u2212</button><b>\u26A1 KURDISTANI MACRO REGIME</b><div class="pm-macr" style="color:' + rc + '"></div><table>' +
+      row('CPI (YoY)', (+n.cpi).toFixed(2) + '%') + row('Real rate', (+n.real_rate).toFixed(2) + '%', n.real_rate < -0.5 ? '#00c853' : n.real_rate > 2 ? '#ff5a5f' : '#f4b400') + row('Fed / ECB rate', (+n.fed_rate).toFixed(2) + '% / ' + (+n.ecb_rate).toFixed(2) + '%') +
+      row('VIX', (+n.vix).toFixed(1), n.vix > 25 ? '#ff5a5f' : '#00c853') + row('Unemployment', (+n.unemp).toFixed(2) + '%') + row('PMI proxy', (+n.pmi).toFixed(1), n.pmi < 50 ? '#ff5a5f' : '#00c853') + row('US GDP YoY', (+n.gdp).toFixed(2) + '%') +
+      row('2Y-10Y / 2Y-30Y', (+n.yc).toFixed(2) + '% / ' + (+n.yc30).toFixed(2) + '%', n.yc < 0 ? '#ff5a5f' : '#00c853') + row('Recession risk', (n.rec_risk | 0) + '%', n.rec_risk > 60 ? '#ff5a5f' : n.rec_risk > 35 ? '#f4b400' : '#00c853') +
+      row('Macro health', (n.health | 0) + '/100', clr(n.health)) + row('Fed pivot score', (n.pivot | 0) + '%') + row('$ Milkshake', (n.milkshake | 0) + '/99') + row('Credit spread (HY-IG)', (+n.credit).toFixed(2) + '%') +
+      ['XAU', 'BTC', 'DXY', 'SPX', 'TLT'].map(function (a) { return row(a + ' outlook', (sc[a] | 0) + ' / 100', clr(sc[a] | 0)); }).join('') + '</table><small></small></div>');
+    $('.pm-macr', box).textContent = String(n.regime) + '  \u00B7  ' + String(n.risk);
+    $('small', box).textContent = String(n.date) + ' \u00B7 FRED \u00B7 ' + T('macroNote');
+    $('.pm-macx', box).onclick = function () { box.classList.toggle('min'); };
+    cell.el.appendChild(box);
+  }
   Cell.prototype.renderInds = function (full, isNew) {
+    ensureExt(this);
     var sig = this.cfg.inds.map(function (x) { return x.id + JSON.stringify(x.p) + (x.off ? 0 : 1); }).join('|') + this.cfg.type;
     if (sig !== this.indSig) { this.buildInds(); full = true; }
     var self = this, bars = this.xform() ? this.disp : this.replay ? this.bars.slice(0, this.replay.i + 1) : this.bars, D = this.disp, n = bars.length, sec = this.tfSec();
@@ -622,6 +668,7 @@
         if (rec.def.shift && rec.def.shift[key]) shift = +x.p[rec.def.shift[key]] || 0;      /* e.g. the Alligator's lines are drawn ahead */
         var color = null;
         if (rec.def.plots[j][1] === 'hist') color = function (i) {
+          if (id === 'ksc') return ['rgba(21,101,192,.85)', 'rgba(0,188,212,.75)', 'rgba(0,200,83,.85)', 'rgba(255,140,0,.85)', 'rgba(255,0,0,.85)'][v.ph[i]] || 'rgba(128,128,128,.4)';
           if (id === 'vol') { var b = D[i] || bars[i]; return b && b.c >= b.o ? 'rgba(52,211,153,.42)' : 'rgba(255,90,77,.42)'; }
           var val = arr[i], pv = arr[i - 1]; return val >= 0 ? (pv != null && val < pv ? 'rgba(52,211,153,.45)' : 'rgba(52,211,153,.85)') : (pv != null && val > pv ? 'rgba(255,90,77,.45)' : 'rgba(255,90,77,.85)');
         };
@@ -679,6 +726,11 @@
         self.markInfo['n' + k] = { kind: 'news', items: its };
       });
     }
+    if (I.EXT.macro && this.cfg.inds.some(function (x) { return x.id === 'kmacro' && !x.off; })) (I.EXT.macro.signals || []).slice(-300).forEach(function (sg, k) {   /* the Macro Regime script's signals */
+      var bt = barT(Math.floor(Date.parse(sg[0] + 'T12:00:00Z') / 1000)), c = String(sg[1] || '').slice(0, 16); if (bt == null) return;
+      var up = c === 'XAU+' || c === 'BTC+' || c === 'PIVOT?' || c === 'OIL-', sh = c.slice(0, 2) === 'R:';
+      out.push({ time: bt, position: up ? 'belowBar' : 'aboveBar', color: c === 'XAU+' ? '#ffd700' : c === 'BTC+' ? '#f7931a' : c === 'PIVOT?' ? '#69f0ae' : sh ? '#e5e7eb' : '#ff5a5f', shape: sh ? 'square' : up ? 'arrowUp' : 'arrowDown', size: 0.8, text: sh ? '\u21BA ' + c.slice(2) : c, id: 'm' + k });
+    });
     this.cfg.inds.forEach(function (x) {                                           /* candlestick patterns found on the bars */
       if (x.off || !I.DEF[x.id] || !I.DEF[x.id].marks) return;
       I.candles(bars, x.id).slice(-400).forEach(function (m) { out.push({ time: bars[m.i].t, position: m.d > 0 ? 'belowBar' : 'aboveBar', color: m.d > 0 ? '#34d399' : m.d < 0 ? '#ff5a4d' : '#9ca3af', shape: m.d > 0 ? 'arrowUp' : m.d < 0 ? 'arrowDown' : 'circle', size: 0.7, text: m.c, id: 'c' + x.id + m.i }); });
@@ -757,7 +809,7 @@
     }).join('');
   };
   function indTitle(slug) { return String(slug || '').replace(/^kurdistani-/, 'Kurdistani ').replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }); }
-  Cell.prototype.indsChanged = function () { this.renderInds(true); this.layers(); this.legend(); if (this.drawer) this.drawer.update(); if (st.sync.ind) syncInds(this); save(); emit('inds', this); };
+  Cell.prototype.indsChanged = function () { this.renderInds(true); this.layers(); this.legend(); macroBox(this); if (this.drawer) this.drawer.update(); if (st.sync.ind) syncInds(this); save(); emit('inds', this); };
   /* «sync indicators»: every chart gets the same indicators, with the same settings, as the one just changed */
   var syncingInds = false;
   function cloneInds(a) { return a.map(function (x) { return { id: x.id, p: JSON.parse(JSON.stringify(x.p || {})), off: x.off ? 1 : undefined, u: P.uid() }; }).map(function (x) { if (!x.off) delete x.off; return x; }); }
@@ -1139,13 +1191,7 @@
       if (main === 'prof' && !q) { var pn = h('<p class="pm-p pm-mute"></p>'); pn.textContent = T('profNote'); list.appendChild(pn); }
       $$('[data-st]', list).forEach(function (b) { b.onclick = function () { closeModal(); if (P.bt) P.bt.tester(a, { id: b.getAttribute('data-st') }); }; });
       $$('[data-id]', list).forEach(function (b) { b.onclick = function () { addInd(a, b.getAttribute('data-id')); drawAct(); }; });
-      if (main === 'ind' && tab === 'ck' && !q) {                       /* Coin_Kurd's other open-source scripts need TradingView's data: they open there */
-        var nt = h('<p class="pm-p pm-mute"></p>'); nt.textContent = T('ckNote'); list.insertBefore(nt, list.firstChild);
-        CKTV.forEach(function (x) {
-          var l = h('<a class="pm-idi" target="_blank" rel="noopener noreferrer"><b></b><small></small>' + ic('share') + '</a>');
-          l.href = 'https://www.tradingview.com/script/' + x[1] + '/'; $('b', l).textContent = T('ck_' + x[0]); $('small', l).textContent = T('ckd_' + x[0]) + ' · ' + T('openTv'); list.appendChild(l);
-        });
-      }
+      if (main === 'ind' && tab === 'ck' && !q) { var nt = h('<p class="pm-p pm-mute"></p>'); nt.textContent = T('ckNote'); list.insertBefore(nt, list.firstChild); }
     }
     function drawAct() {
       act.innerHTML = a.cfg.inds.length ? a.cfg.inds.map(function (x) { return '<div class="pm-ia" data-u="' + esc(x.u) + '"><span>' + esc(indName(x)) + '</span>' + (I.DEF[x.id] && Object.keys(I.DEF[x.id].p).length ? '<button type="button" class="pm-ib" data-a="set">' + ic('gear') + '</button>' : '') + '<button type="button" class="pm-ib" data-a="del">' + ic('trash') + '</button></div>'; }).join('') : '<p class="pm-empty">' + esc(T('noInds')) + '</p>';
@@ -1158,7 +1204,6 @@
     modal(T('indicators'), box, { wide: true });
   }
   function addInd(cell, id) {
-    if (cell.cfg.inds.length >= 12) { toast(T('maxInds')); return; }
     if (LAYERS[id] && cell.cfg.inds.some(function (x) { return x.id === id; })) return;
     var x = { id: id, p: I.DEF[id] ? I.params(id, {}) : {}, u: P.uid() };
     if (id === 'ema' && cell.cfg.inds.some(function (z) { return z.id === 'ema' && z.p.len === 50; })) x.p.len = 200;

@@ -131,6 +131,11 @@ def main():
     json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     m3 = windows["3m"]["matrix"]["BTC"]
     print(f"macro: {len(assets)} assets, {len(rdates)} common days; BTC~SPX 3m {m3.get('SPX')} · BTC~DXY {m3.get('DXY')} · toman {out.get('usdt_irt', {}).get('value')}")
+    try:                                                    # the open-source Macro Regime engine, for the /market/ chart (data/macro_regime.json)
+        import macro_regime
+        macro_regime.main(fred)
+    except Exception as e:  # noqa: BLE001
+        print("macro_regime failed:", str(e)[:120])
 
 
 if __name__ == "__main__":
