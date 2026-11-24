@@ -107,11 +107,28 @@ def existing(name):
     return r.get("result") if r.get("ok") else None
 
 
+def wait_ready(name, tries=12):
+    """A set Telegram has just been told to create is not immediately there to add to."""
+    for _ in range(tries):
+        if existing(name):
+            return True
+        time.sleep(3)
+    return False
+
+
+def add_one(name, it):
+    blob = open(os.path.join(SRC, it["file"]), "rb").read()
+    return call("addStickerToSet",
+                {"user_id": str(OWNER), "name": name,
+                 "sticker": json.dumps({"sticker": "attach://f", "format": "video",
+                                        "emoji_list": [emoji(it["emoji"])]})},
+                {"f": (it["file"], blob)})
+
+
 def main():
     if not TOKEN or not OWNER:
         print("missing REF_BOT_TOKEN/TG_BOT_TOKEN or ADMIN_IDS", file=sys.stderr)
         return 1
-    print("token length %d, owner %d" % (len(TOKEN), OWNER))
     me = call("getMe")
     if not me.get("ok"):
         print("getMe failed: %s" % (me.get("description") or me), file=sys.stderr)
@@ -129,7 +146,7 @@ def main():
         if RECREATE and existing(name):
             r = call("deleteStickerSet", {"name": name})
             print("delete %s -> %s" % (name, r.get("ok") or r.get("description")))
-            time.sleep(2)
+            time.sleep(12)                      # the name stays unusable for a moment after a delete
         have = existing(name)
         done = len(have["stickers"]) if have else 0
         if done >= len(chunk):
@@ -142,7 +159,8 @@ def main():
             for i, it in enumerate(head):
                 key = "f%d" % i
                 files[key] = (it["file"], open(os.path.join(SRC, it["file"]), "rb").read())
-                meta.append({"sticker": "attach://" + key, "format": "video", "emoji_list": [emoji(it["emoji"])]})
+                meta.append({"sticker": "attach://" + key, "format": "video",
+                             "emoji_list": [emoji(it["emoji"])]})
             r = call("createNewStickerSet", {"user_id": str(OWNER), "name": name, "title": title,
                                              "stickers": json.dumps(meta)}, files)
             if not r.get("ok"):
@@ -150,24 +168,35 @@ def main():
                 failed.append(name)
                 continue
             done = len(head)
+            if not wait_ready(name):
+                print("%s did not come up after being created" % name, file=sys.stderr)
             print("created %s with %d" % (name, done))
-        for it in chunk[done:]:
-            blob = open(os.path.join(SRC, it["file"]), "rb").read()
-            r = call("addStickerToSet", {"user_id": str(OWNER), "name": name,
-                                         "sticker": json.dumps({"sticker": "attach://f", "format": "video",
-                                                                "emoji_list": [emoji(it["emoji"])]})},
-                     {"f": (it["file"], blob)})
-            if not r.get("ok"):
-                print("add %s -> %s failed: %s" % (it["file"], name, r.get("description")), file=sys.stderr)
-                failed.append(it["file"])
-            time.sleep(1.2)                     # stay well inside the per-bot rate limit
+
+        pending = list(chunk[done:])
+        for attempt in range(4):                # a refused add is usually just the set settling
+            still = []
+            for it in pending:
+                r = add_one(name, it)
+                if not r.get("ok"):
+                    still.append((it, r.get("description")))
+                time.sleep(1.2)
+            if not still:
+                pending = []
+                break
+            print("pass %d: %d of %d still to add (%s)"
+                  % (attempt + 1, len(still), len(pending), still[0][1]))
+            pending = [it for it, _ in still]
+            time.sleep(20)
+        for it in pending:
+            failed.append(it["file"])
+        got = existing(name)
+        print("%s holds %d of %d" % (name, len(got["stickers"]) if got else 0, len(chunk)))
         links.append("https://t.me/addstickers/" + name)
-        print("%s done" % name)
 
     note = "🎨 بسته‌های استیکر متحرک کوین کورد آماده شد:\n\n" + "\n".join(links)
     if failed:
         note += "\n\n⚠️ %d مورد ناموفق: %s" % (len(failed), ", ".join(failed[:8]))
-    call("sendMessage", {"chat_id": str(OWNER), "text": note, "disable_web_page_preview": "true"})
+    call("sendMessage", {"chat_id": str(OWNER), "text": note, "disable_web_page_preview": True})
     print(note)
     return 1 if failed else 0
 
