@@ -355,7 +355,7 @@
   var AL = S.get('ek_pro_alerts', []); if (!Array.isArray(AL)) AL = [];
   var LOG = S.get('ek_pro_alert_log', []); if (!Array.isArray(LOG)) LOG = [];
   var MAXAL = Infinity;                                   /* price alerts kept here; indicator alerts stay at 12 (they each watch a feed) */
-  AL = AL.filter(function (a) { return a && A.SYM_RE.test(a.sym) && (a.k === 'price' || a.k === 'ind' || a.k === 'draw'); }).slice(0, MAXAL);
+  AL = AL.filter(function (a) { return a && A.SYM_RE.test(a.sym) && (a.k === 'price' || a.k === 'ind' || a.k === 'draw' || (a.k === 'multi' && typeof a.expr === 'string' && a.expr.length <= 600)); }).slice(0, MAXAL);
   function saveAL() { S.set('ek_pro_alerts', AL); S.set('ek_pro_alert_log', LOG.slice(0, 100)); refreshAlertViews(); }
   P.logos().then(function (L) {                        /* never a coin without its logo: alerts and lists follow the logo index */
     if (!L) return;
@@ -390,6 +390,7 @@
   P.alertLevels = levelsAt;           /* exposed for the tests */
   function condText(a) {
     if (a.k === 'price') return PCT[a.c] ? T('c_' + a.c) + ' ' + a.v + '% (' + targets(a).map(function (v) { return fmtP(a.sym, v); }).join(' / ') + ')' : T('c_' + a.c) + ' ' + fmtP(a.sym, a.v);
+    if (a.k === 'multi') return T('multiAl') + ': ' + a.expr + ' · ' + A.tfLabel(a.tf);
     if (a.k === 'draw') return T('dc_' + a.c) + ' · ' + T('t_' + a.dk) + (drawingOf(a) ? '' : ' (' + T('lineGone') + ')');
     var x = a.ind, nm = T('ai_' + x.id) + (x.len ? ' (' + x.len + (x.len2 ? '/' + x.len2 : '') + ')' : '');
     return nm + ' · ' + T('ac_' + x.id + '_' + a.c, { v: a.v }) + ' · ' + A.tfLabel(a.tf);
@@ -448,7 +449,7 @@
   var indSubs = {};
   function syncIndSubs() {
     var need = {};
-    AL.forEach(function (a) { if (a.on && a.k === 'ind') need[a.sym + '|' + a.tf] = 1; });
+    AL.forEach(function (a) { if (a.on && (a.k === 'ind' || a.k === 'multi')) need[a.sym + '|' + a.tf] = 1; });
     Object.keys(indSubs).forEach(function (k) { if (!need[k]) { indSubs[k].off(); delete indSubs[k]; } });
     Object.keys(need).forEach(function (k) {
       if (indSubs[k]) return; var sp = k.split('|');
@@ -480,8 +481,20 @@
     var r1 = s.ref[i], r0 = s.ref[j]; if (!ok(r1) || !ok(r0)) return false;
     return a.c === 'up' ? v0 < r0 && v1 >= r1 : v0 > r0 && v1 <= r1;
   }
+  /* several conditions in one alert (and / or), written as one line of Entekhab Script; fires on the bar where the line turns true */
+  var condCache = {};
+  function evalMulti(a, bars) {
+    if (!P.script || bars.length < 3) return false;
+    var c = condCache[a.expr] || (condCache[a.expr] = P.script.cond(a.expr)); if (!c.ok) return false;
+    var r = c.test(bars.slice(-1500)); return a.mode === 'every' ? !!r[1] && !r[0] : !!r[1] && !r[0];
+  }
   function checkInd(sym, tf, bars) {
     AL.forEach(function (a) {
+      if (a.on && a.k === 'multi' && a.sym === sym && a.tf === tf && !(a.exp && Date.now() > a.exp)) {
+        var lt = bars[bars.length - 1].t; if (a.bar === lt) return;
+        if (evalMulti(a, bars)) { a.bar = lt; fire(a, P.pair(sym) + ' · ' + condText(a) + (a.msg ? ' · ' + a.msg : '')); }
+        return;
+      }
       if (!a.on || a.k !== 'ind' || a.sym !== sym || a.tf !== tf || (a.exp && Date.now() > a.exp)) return;
       var lastT = bars[bars.length - 1].t; if (a.bar === lastT) return;
       if (evalInd(a, bars)) { a.bar = lastT; fire(a, P.pair(sym) + ' · ' + condText(a) + (a.msg ? ' · ' + a.msg : '')); }
@@ -489,6 +502,26 @@
   }
   P.alertEval = evalInd;              /* exposed for the tests */
   function addAlert(a) { AL.unshift(a); if (AL.length > MAXAL) AL.length = MAXAL; saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); }); }
+  P.multiAlert = function (cell) {
+    var sym = cell.cfg.sym, f = h('<form class="pm-iset"><p class="pm-note"></p><textarea class="pm-in pm-sct pm-mexp" dir="ltr" rows="3" maxlength="600" spellcheck="false"></textarea><p class="pm-scerr" dir="ltr"></p>' +
+      '<label class="pm-field"><span></span><select class="pm-in" name="tf"></select></label><label class="pm-field"><span></span><select class="pm-in" name="mode"><option value="once"></option><option value="every"></option></select></label>' +
+      '<label class="pm-field"><span></span><input class="pm-in" name="msg" maxlength="80"></label><div class="pm-row"><button class="pm-btn pri" type="submit"></button><button class="pm-btn" type="button" data-x></button></div></form>');
+    $('.pm-note', f).textContent = T('multiNote'); var ex = $('.pm-mexp', f), er = $('.pm-scerr', f), tf = $('[name=tf]', f);
+    ex.value = 'ta.rsi(close, 14) < 30 and close > ta.ema(close, 200) and volume > 1.5 * ta.sma(volume, 20)';
+    var L = $$('.pm-field span', f); L[0].textContent = T('mTf'); L[1].textContent = T('mMode'); L[2].textContent = T('mMsg');
+    ['1m', '5m', '15m', '1h', '4h', '1d'].concat([cell.cfg.tf]).filter(function (x, i, a) { return a.indexOf(x) === i && P.parseTF(x); }).forEach(function (x) { var o = new Option(A.tfLabel(x), x); if (x === cell.cfg.tf) o.selected = true; tf.appendChild(o); });
+    $$('[name=mode] option', f)[0].textContent = T('once'); $$('[name=mode] option', f)[1].textContent = T('every');
+    $('[type=submit]', f).textContent = T('ok'); $('[data-x]', f).textContent = T('cancel'); $('[data-x]', f).onclick = A.closeModal;
+    ex.addEventListener('keydown', function (e) { e.stopPropagation(); });
+    f.onsubmit = function (e) {
+      e.preventDefault(); var txt = ex.value.replace(/\s+/g, ' ').trim(), c = P.script ? P.script.cond(txt) : { ok: false, err: '' };
+      if (!c.ok) { er.className = 'pm-scerr bad'; er.textContent = c.err; return; }
+      addAlert({ id: P.uid(), sym: sym, k: 'multi', expr: txt, tf: tf.value, mode: $('[name=mode]', f).value === 'every' ? 'every' : 'once', on: true, at: Date.now(), msg: $('[name=msg]', f).value.trim().slice(0, 80) });
+      A.closeModal(); A.toast(T('alertSet'));
+    };
+    A.modal(T('multiAl') + ' · ' + P.pair(sym), f, { nofocus: true });
+  };
+  P.want = want;
   P.alertDialog = function (cell, preset) {
     preset = preset || {};
     var sym = cell.cfg.sym, last = cell.bars.length ? cell.bars[cell.bars.length - 1].c : (P.tickers.d[sym] || {}).c, dd = preset.draw || null;
@@ -601,6 +634,7 @@
       '<label class="pm-field pm-nal"><span>📰 ' + esc(T('newsAl')) + '</span><select class="pm-in" name="na">' + ['off', 'watch', 'imp', 'all'].map(function (k) { return '<option value="' + k + '"' + (NA.m === k ? ' selected' : '') + '>' + esc(T('na_' + k)) + '</option>'; }).join('') + '</select><small>' + esc(T('newsAlNote')) + '</small></label>' +
       '<div class="pm-al"></div><h4 class="pm-h4">' + esc(T('alertLog')) + '</h4><div class="pm-alog"></div><p class="pm-note">' + esc(T('alertsHow')) + '</p>';
     $('[data-a="new"]', box).onclick = function () { P.alertDialog(A.active()); };
+    var mb = h('<button type="button" class="pm-btn wide"></button>'); mb.textContent = '\u2795 ' + T('multiAl'); mb.onclick = function () { P.multiAlert(A.active()); }; var nb0 = $('[data-a="new"]', box); nb0.parentNode.insertBefore(mb, nb0.nextSibling);
     $('[name="na"]', box).onchange = function () {
       NA = { m: this.value, since: Date.now() }; S.set('ek_pro_newsal', NA);
       if (NA.m !== 'off') { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); newsPoll(); }
@@ -669,7 +703,7 @@
   A.on('storage', function (key) {
     if (key === 'ek_pro_alerts' || key === 'ek_pro_alert_log') {
       var na = S.get('ek_pro_alerts', []), nl = S.get('ek_pro_alert_log', []);
-      if (Array.isArray(na)) AL = na.filter(function (a) { return a && A.SYM_RE.test(a.sym) && (a.k === 'price' || a.k === 'ind' || a.k === 'draw'); }).slice(0, MAXAL);
+      if (Array.isArray(na)) AL = na.filter(function (a) { return a && A.SYM_RE.test(a.sym) && (a.k === 'price' || a.k === 'ind' || a.k === 'draw' || (a.k === 'multi' && typeof a.expr === 'string' && a.expr.length <= 600)); }).slice(0, MAXAL);
       if (Array.isArray(nl)) LOG = nl;
       syncIndSubs(); refreshAlertViews(); A.cells().forEach(function (c) { c.ovl.update(); });
     }

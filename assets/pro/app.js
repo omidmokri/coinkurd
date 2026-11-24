@@ -57,6 +57,7 @@
 
   /* ---------------------------------------------------------------- icons (24×24 line glyphs) */
   var IC = {
+    wallet: '<path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z"/><path d="M3 7V6a2 2 0 0 1 2-2h11"/><path d="M16 13.5h2"/>',
     code: '<path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13.5 5-3 14"/>', scan: '<path d="M3 5h18"/><path d="M6 10h12"/><path d="M9 15h6"/><path d="M11 20h2"/>', edit: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
     dot: '<circle cx="12" cy="12" r="2.6" fill="currentColor"/>',
     arrowc: '<path d="M6 3v15l4-4 3 6 2-1-3-6h6z"/>',
@@ -453,7 +454,12 @@
       list: function (sym) { return DRAW[sym]; }, changed: drawChanged, fmt: function (p) { return self.fmt(p); }, T: T, touch: function () { return matchMedia('(pointer: coarse)').matches; },
       selected: function (dd) { emit('drawsel', self, dd); }, editText: editText, styleFor: function () { return lastStyle; }, blocked: function () { return !!self.picking; },
       settings: function (dd) { drawSettings(self, dd); }, erase: function (id) { removeDrawing(self, id); }, zoom: function (dd) { zoomTo(self, dd); },
-      toolDone: function () { if (curTool) setTool(null); }, macro: function () { return I.EXT.macro && self.cfg.inds.some(function (x) { return x.id === 'kmacro' && !x.off; }) ? I.EXT.macro : null; }, profiles: function () { return self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].prof && !x.off; }).map(function (x) { return { mode: I.DEF[x.id].prof, rows: x.p.rows }; }); }, emoji: function () { return st.emoji || EMOJI[0]; } });
+      toolDone: function () { if (curTool) setTool(null); }, macro: function () { return I.EXT.macro && self.cfg.inds.some(function (x) { return x.id === 'kmacro' && !x.off; }) ? I.EXT.macro : null; }, smc: function () {
+        var want = self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].smc && !x.off; }); if (!want.length) return null;
+        var key = want.map(function (x) { return x.id + (x.p.len || ''); }).join() + '|' + self.disp.length + '|' + (self.disp.length ? self.disp[self.disp.length - 1].c : 0);
+        if (self._smcK !== key) { self._smcK = key; self._smc = []; want.forEach(function (x) { self._smc = self._smc.concat(I.structure(self.disp, x.p.len || 5, I.DEF[x.id].smc)); }); }
+        return self._smc;
+      }, foot: function () { return self.cfg.inds.some(function (x) { return x.id === 'fpbar' && !x.off; }); }, profiles: function () { return self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].prof && !x.off; }).map(function (x) { return { mode: I.DEF[x.id].prof, rows: x.p.rows }; }); }, emoji: function () { return st.emoji || EMOJI[0]; } });
     this.drawer.keep = !!st.keep; this.drawer.magnet = st.magnet | 0; this.drawer.eraser = eraserOn;
     if (curTool && st.active === this.i) this.drawer.setTool(curTool);
     this.mk = LW.createSeriesMarkers(s, []);
@@ -1213,17 +1219,21 @@
     var inp = $('input', box), mains = $('.pm-idm', box), tabs = $('.pm-idt', box), list = $('.pm-idl', box), act = $('.pm-ida', box), main = 'ind', tab = 'over';
     inp.placeholder = T('searchInd'); $('.pm-h4', box).textContent = T('activeInds');
     /* TradingView's five kinds; the indicators have their own shelf of groups below */
-    [['ind', 'indicators'], ['strat', 'mt_strat'], ['prof', 'mt_prof'], ['pat', 'mt_pat'], ['mine', 'mt_mine']].forEach(function (p) { var b = h('<button type="button" role="tab" class="pm-mtab' + (p[0] === main ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { main = p[0]; $$('.pm-mtab', mains).forEach(function (x) { x.classList.toggle('on', x === b); }); tabs.style.display = main === 'ind' ? '' : 'none'; draw(); }; mains.appendChild(b); });
+    [['ind', 'indicators'], ['strat', 'mt_strat'], ['prof', 'mt_prof'], ['pat', 'mt_pat'], ['smc', 'mt_smc'], ['opt', 'mt_opt'], ['mine', 'mt_mine']].forEach(function (p) { var b = h('<button type="button" role="tab" class="pm-mtab' + (p[0] === main ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { main = p[0]; $$('.pm-mtab', mains).forEach(function (x) { x.classList.toggle('on', x === b); }); tabs.style.display = main === 'ind' ? '' : 'none'; draw(); }; mains.appendChild(b); });
     [['over', 'cat_over'], ['pane', 'cat_pane'], ['com', 'cat_com'], ['ck', 'cat_ck'], ['ek', 'cat_ek']].forEach(function (p) { var b = h('<button type="button" class="pm-chip' + (p[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { tab = p[0]; $$('.pm-chip', tabs).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; tabs.appendChild(b); });
     var SIDS = Object.keys(P.btStrats || {}).filter(function (k) { return !P.btStrats[k].btc || a.cfg.sym === 'BTC'; });
     function draw() {
-      var q = inp.value.trim().toLowerCase(), all = I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, I.ORDER_PROF, I.ORDER_PAT, Object.keys(LAYERS));
+      var q = inp.value.trim().toLowerCase(), all = I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, I.ORDER_PROF, I.ORDER_PAT, I.ORDER_SMC, Object.keys(LAYERS));
       var mine = P.script ? P.script.list().map(function (x) { return x.id; }) : []; all = all.concat(mine);
-      var ids = q ? all : main === 'mine' ? mine : main === 'prof' ? I.ORDER_PROF : main === 'pat' ? I.ORDER_PAT : main === 'strat' ? [] : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
+      var ids = q ? all : main === 'opt' ? [] : main === 'smc' ? I.ORDER_SMC : main === 'mine' ? mine : main === 'prof' ? I.ORDER_PROF : main === 'pat' ? I.ORDER_PAT : main === 'strat' ? [] : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
       ids = ids.filter(function (id) { var nm = (LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + ' ' + id + ' ' + T('ind_' + id); return !q || nm.toLowerCase().indexOf(q) >= 0; });
       var sids = (q || main === 'strat') ? SIDS.filter(function (id) { return !q || (T('sg_' + id) + ' ' + id).toLowerCase().indexOf(q) >= 0; }) : [];
       list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi' + (I.DEF[id] && I.DEF[id].user ? ' pm-usr' : '') + '" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('') +
         sids.map(function (id) { return '<button type="button" class="pm-idi" data-st="' + id + '"><b>' + esc(T('sg_' + id)) + '</b><small>' + esc(T('stratRun')) + '</small>' + ic('bt') + '</button>'; }).join('');
+      if (main === 'opt' && !q) {
+        var on = h('<p class="pm-p pm-mute"></p>'); on.textContent = T('optNote'); list.appendChild(on);
+        ['BTC', 'ETH'].forEach(function (cc) { var ob = h('<button type="button" class="pm-idi"><b></b><small></small>' + ic('layers') + '</button>'); $('b', ob).textContent = T('optChain', { c: cc }); $('small', ob).textContent = 'Deribit'; ob.onclick = function () { closeModal(); if (P.options) P.options(cc); }; list.appendChild(ob); });
+      }
       if (main === 'mine' && !q) {
         var nb = h('<button type="button" class="pm-btn pri pm-newsc"></button>'); nb.textContent = '+ ' + T('scriptNew'); nb.onclick = function () { closeModal(); scriptEditor(null); }; list.insertBefore(nb, list.firstChild);
         var mn = h('<p class="pm-p pm-mute"></p>'); mn.textContent = T('scriptNote'); list.insertBefore(mn, list.firstChild);
@@ -1658,6 +1668,7 @@
         '<button type="button" class="pm-tb" id="pm-rep">' + ic('replay') + '<span>' + esc(T('replay')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-code" title="' + esc(T('scriptEd')) + '">' + ic('code') + '<span class="pm-hide-s">' + esc(T('scriptShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-scr" title="' + esc(T('screenerBtn')) + '">' + ic('scan') + '<span class="pm-hide-s">' + esc(T('screenerBtn')) + '</span></button>' +
+        '<button type="button" class="pm-tb" id="pm-pf" title="' + esc(T('pfTitle')) + '">' + ic('wallet') + '<span class="pm-hide-s">' + esc(T('pfShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-bt" title="' + esc(T('tester')) + '">' + ic('bt') + '<span class="pm-hide-s">' + esc(T('testerShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-alert">' + ic('bell') + '<span>' + esc(T('alert')) + '</span></button>' +
         '<button type="button" class="pm-ib" id="pm-lay" title="' + esc(T('layout')) + '">' + ic('grid') + '</button>' +
@@ -1688,6 +1699,7 @@
     $('#pm-type').onclick = function (e) { typeMenu(e.currentTarget); };
     $('#pm-ind').onclick = indDialog;
     $('#pm-code').onclick = function () { scriptEditor(null); };
+    $('#pm-pf').onclick = function () { if (P.portfolio) P.portfolio(); };
     $('#pm-scr').onclick = function () { if (P.screener) P.screener(); };
     $('#pm-tpl').onclick = function (e) { tplMenu(e.currentTarget); };
     $('#pm-rep').onclick = function () { if (P.replayToggle) P.replayToggle(active()); };

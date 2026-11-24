@@ -424,19 +424,20 @@
   GEO.emoji = function (D, d, g, P, W, H, s) { var a = P[0]; if (!ok(a)) return; g.ops.push({ t: 'txt', s: s.x || '⭐', x: a.x, y: a.y, fs: s.fs || 26, align: 'center', emo: 1 }); };
 
   /* ---- volume profiles as indicators: the visible range (at the right edge) and one per day */
-  function profOf(sel, N) {
+  function profOf(sel, N, tpo) {
     var hi = -Infinity, lo = Infinity, tot = 0, i; sel.forEach(function (q) { if (q.h > hi) hi = q.h; if (q.l < lo) lo = q.l; tot += q.v || 0; });
     if (!(hi > lo) || !tot) return null; var up = new Array(N).fill(0), dn = new Array(N).fill(0), st = (hi - lo) / N;
-    sel.forEach(function (q) { var v = q.v || 0; if (!v) return; var j0 = Math.max(0, Math.min(N - 1, Math.floor((q.l - lo) / st))), j1 = Math.max(0, Math.min(N - 1, Math.floor((q.h - lo) / st))), per = v / (j1 - j0 + 1); for (var j = j0; j <= j1; j++) { if (q.c >= q.o) up[j] += per; else dn[j] += per; } });
+    sel.forEach(function (q) { var v = q.v || 0; if (!v) return; var j0 = Math.max(0, Math.min(N - 1, Math.floor((q.l - lo) / st))), j1 = Math.max(0, Math.min(N - 1, Math.floor((q.h - lo) / st))), per = tpo ? 1 : v / (j1 - j0 + 1); for (var j = j0; j <= j1; j++) { if (tpo) up[j] += 1; else if (q.c >= q.o) up[j] += per; else dn[j] += per; } });
+    if (tpo) { tot = 0; for (var z = 0; z < N; z++) tot += up[z]; }
     var mx = 0, poc = 0; for (i = 0; i < N; i++) if (up[i] + dn[i] > mx) { mx = up[i] + dn[i]; poc = i; }
     var va = mx, a = poc, b = poc; while (va < tot * 0.7 && (a > 0 || b < N - 1)) { var u = b < N - 1 ? up[b + 1] + dn[b + 1] : -1, d = a > 0 ? up[a - 1] + dn[a - 1] : -1; if (u >= d) { b++; va += u; } else { a--; va += d; } }
-    return { lo: lo, st: st, up: up, dn: dn, mx: mx, poc: poc, a: a, b: b, N: N };
+    return { lo: lo, st: st, up: up, dn: dn, mx: mx, poc: poc, a: a, b: b, N: N, tpo: tpo ? 1 : 0 };
   }
   function paintProf(ctx, se, pr, x0, maxW, right, xEnd) {
     for (var i = 0; i < pr.N; i++) {
       var yA = se.priceToCoordinate(pr.lo + pr.st * i), yB = se.priceToCoordinate(pr.lo + pr.st * (i + 1)); if (yA == null || yB == null) continue;
       var y = Math.min(yA, yB) + 0.5, hg = Math.max(1, Math.abs(yA - yB) - 1), wu = maxW * pr.up[i] / pr.mx, wd = maxW * pr.dn[i] / pr.mx, al = i >= pr.a && i <= pr.b ? 0.42 : 0.2;
-      ctx.fillStyle = 'rgba(52,211,153,' + al + ')'; ctx.fillRect(right ? x0 - wu : x0, y, wu, hg);
+      ctx.fillStyle = (pr.tpo ? 'rgba(167,139,250,' : 'rgba(52,211,153,') + (pr.tpo ? al * 0.6 : al) + ')'; ctx.fillRect(right ? x0 - wu : x0, y, wu, hg);
       ctx.fillStyle = 'rgba(255,90,77,' + al + ')'; ctx.fillRect(right ? x0 - wu - wd : x0 + wu, y, wd, hg);
     }
     var yp = se.priceToCoordinate(pr.lo + pr.st * (pr.poc + 0.5)); if (yp != null) { ctx.strokeStyle = '#facc15'; ctx.lineWidth = 1.2; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(right ? x0 - maxW : x0, yp); ctx.lineTo(xEnd, yp); ctx.stroke(); }
@@ -446,16 +447,53 @@
     var bars = this.o.bars(), ts = this.o.chart.timeScale(), se = this.o.series, r = ts.getVisibleLogicalRange(); if (!r || !bars.length) return;
     var i0 = Math.max(0, Math.ceil(r.from)), i1 = Math.min(bars.length - 1, Math.floor(r.to)); if (i1 <= i0) return;
     L.forEach(function (c) {
+      var tpo = c.mode === 'tpo', src = tpo ? bars.map(function (q) { return { o: q.o, h: q.h, l: q.l, c: q.c, v: 1 }; }) : bars;
       if (c.mode === 'vis') { var pr = profOf(bars.slice(i0, i1 + 1), c.rows); if (pr) paintProf(ctx, se, pr, W, W * 0.22, true, W); return; }
       var groups = [], cur = null, long = bars.length > 1 && bars[1].t - bars[0].t >= 86400;
       for (var i = i0; i <= i1; i++) { var d = new Date(bars[i].t * 1000), key = long ? d.getUTCFullYear() * 12 + d.getUTCMonth() : Math.floor(bars[i].t / 86400); if (!cur || cur.k !== key) { cur = { k: key, a: i, b: i }; groups.push(cur); } else cur.b = i; }
       groups.slice(-40).forEach(function (g) {
-        if (g.b - g.a < 2) return; var pr = profOf(bars.slice(g.a, g.b + 1), c.rows); if (!pr) return;
+        if (g.b - g.a < 2) return; var pr = profOf(src.slice(g.a, g.b + 1), c.rows, tpo); if (!pr) return;
         var xa = ts.logicalToCoordinate(g.a), xb = ts.logicalToCoordinate(g.b); if (xa == null || xb == null) return;
         ctx.strokeStyle = 'rgba(156,163,175,.25)'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(xa, 0); ctx.lineTo(xa, H); ctx.stroke();
-        paintProf(ctx, se, pr, xa, (xb - xa) * 0.7, false, xb);
+        paintProf(ctx, se, pr, xa, (xb - xa) * (tpo ? 0.35 : 0.7), false, xb);
       });
     });
+  };
+
+  /* ---- market structure (BOS / CHoCH, fair value gaps, order blocks, equal highs and lows), bar-delta footprint */
+  Drawer.prototype.paintSmc = function (ctx, W, H) {
+    var L = this.o.smc ? this.o.smc() : null; if (!L || !L.length) return;
+    var ts = this.o.chart.timeScale(), se = this.o.series, r = ts.getVisibleLogicalRange(); if (!r) return;
+    ctx.setLineDash([]); ctx.font = '600 10px Vazirmatn, Tahoma, sans-serif'; ctx.textBaseline = 'middle';
+    L.forEach(function (o) {
+      if (o.i1 < r.from - 2 || o.i0 > r.to + 2) return;
+      var x0 = ts.logicalToCoordinate(o.i0), x1 = o.open ? W : ts.logicalToCoordinate(o.i1); if (x0 == null || x1 == null) return;
+      var up = o.d > 0, col = up ? '52,211,153' : '255,90,77';
+      if (o.k === 'box') {
+        var y0 = se.priceToCoordinate(o.top), y1 = se.priceToCoordinate(o.bot); if (y0 == null || y1 == null) return;
+        var ob = o.t === 'OB'; ctx.fillStyle = 'rgba(' + (ob ? (up ? '56,189,248' : '167,139,250') : col) + ',' + (o.open ? 0.16 : 0.07) + ')'; ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+        if (o.open) { ctx.strokeStyle = 'rgba(' + (ob ? (up ? '56,189,248' : '167,139,250') : col) + ',.5)'; ctx.lineWidth = 1; ctx.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0 - 1, y1 - y0 - 1); ctx.fillStyle = 'rgba(229,231,235,.75)'; ctx.textAlign = 'left'; ctx.fillText(ob ? 'OB' : 'FVG', x0 + 3, (y0 + y1) / 2); }
+      } else {
+        var y = se.priceToCoordinate(o.p); if (y == null) return; var ch = o.t === 'CHoCH', eq = o.t === 'EQH' || o.t === 'EQL';
+        ctx.strokeStyle = eq ? 'rgba(250,204,21,.8)' : 'rgba(' + col + ',.9)'; ctx.lineWidth = ch ? 1.5 : 1; ctx.setLineDash(ch ? [] : [4, 3]); ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = eq ? '#facc15' : 'rgb(' + col + ')'; ctx.textAlign = 'center'; ctx.fillText(o.t, (x0 + x1) / 2, y + (up ? -8 : 8));
+      }
+    });
+  };
+  /* what the buyers and the sellers took in each candle, written under it once the candles are wide enough */
+  Drawer.prototype.paintFoot = function (ctx, W, H) {
+    if (!this.o.foot || !this.o.foot()) return;
+    var bars = this.o.bars(), ts = this.o.chart.timeScale(), se = this.o.series, r = ts.getVisibleLogicalRange(); if (!r || !bars.length) return;
+    var sp = (ts.logicalToCoordinate(1) - ts.logicalToCoordinate(0)) || 0, i0 = Math.max(0, Math.floor(r.from)), i1 = Math.min(bars.length - 1, Math.ceil(r.to)), wide = sp >= 46;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = '600 ' + (wide ? 10 : 9) + 'px Vazirmatn, Tahoma, sans-serif';
+    for (var i = i0; i <= i1; i++) {
+      var b = bars[i], x = ts.logicalToCoordinate(i), y = se.priceToCoordinate(b.l); if (x == null || y == null || !(b.v > 0)) continue;
+      var buy = b.tb != null ? b.tb : (b.h > b.l ? b.v * (b.c - b.l) / (b.h - b.l) : b.v / 2), sell = b.v - buy, dl = buy - sell, fr = Math.max(-1, Math.min(1, dl / b.v));
+      ctx.fillStyle = 'rgba(' + (dl >= 0 ? '52,211,153' : '255,90,77') + ',' + (0.25 + 0.6 * Math.abs(fr)) + ')'; ctx.fillRect(x - Math.max(2, sp * 0.35), y + 4, Math.max(4, sp * 0.7), 4);
+      if (sp < 26) continue;
+      ctx.fillStyle = dl >= 0 ? '#34d399' : '#ff5a4d'; ctx.fillText((dl >= 0 ? '+' : '') + P.big(dl), x, y + 11);
+      if (wide) { ctx.fillStyle = 'rgba(201,209,217,.8)'; ctx.fillText(P.big(buy) + ' \u00D7 ' + P.big(sell), x, y + 23); }
+    }
   };
 
   /* one painter for every op */
@@ -634,7 +672,7 @@
   Drawer.prototype.paint = function (ctx, W, H) {
     var self = this, L = this.list();
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
-    try { this.paintMacro(ctx, W, H); this.paintProfiles(ctx, W, H); } catch (e) { }
+    try { this.paintMacro(ctx, W, H); this.paintProfiles(ctx, W, H); this.paintSmc(ctx, W, H); this.paintFoot(ctx, W, H); } catch (e) { }
     var cat = tfCat(this.o.sec());
     L.forEach(function (d) { if (d.hd || (d.s && d.s.hv && d.s.hv.indexOf(cat) >= 0)) { d._g = null; return; } self.paintOne(ctx, d, W, H, self.sel === d.id, self.hover === d.id); });
     if (this.cur) this.paintOne(ctx, this.cur, W, H, true, false);

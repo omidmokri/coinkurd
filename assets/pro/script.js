@@ -251,8 +251,16 @@
     LIST.forEach(function (s) { try { register(s); } catch (e) { } });
   }
   function store() { try { root.localStorage.setItem(KEY, JSON.stringify(LIST)); } catch (e) { } }
+  /* one line that is true or false on each bar, for the alerts: cond(text) → { ok, test(bars) → the last two values } */
+  function cond(text) {
+    try {
+      text = String(text || '').trim(); if (!text || text.length > 600 || /[\n\r]/.test(text)) throw E('write the condition on one line', 1);
+      var tree = parse('plot(' + text + ')'); if (tree.length !== 1) throw E('one condition only', 1); run(tree, sample(), null);
+      return { ok: true, test: function (bars) { try { var o = run(tree, bars, null).out.p0, n = o.length; return [o[n - 2] > 0 ? 1 : 0, o[n - 1] > 0 ? 1 : 0]; } catch (e) { return [0, 0]; } } };
+    } catch (e) { return { ok: false, err: String(e && e.message || e).slice(0, 160) }; }
+  }
   P.script = {
-    check: check, list: function () { return LIST.slice(); },
+    cond: cond, check: check, list: function () { return LIST.slice(); },
     save: function (id, name, src) {
       var s = id ? LIST.filter(function (x) { return x.id === id; })[0] : null;
       if (!s) { s = { id: 'us_' + (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)).slice(-12), name: '', src: '' }; LIST.push(s); }

@@ -618,6 +618,13 @@
     srlux: { p: { left: 15, right: 15 }, breaks: true, plots: [['res', 'line', '#ff5a4d'], ['sup', 'line', '#34d399']] },
     atrts: { p: { len: 14, mult: 3 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d']] },
     /* profiles (painted by the drawing layer) and candlestick patterns (markers on the bars) */
+    /* order flow from the taker-buy volume of each candle (Binance); an estimate from the candle's shape where that is missing */
+    vdelta: { pane: true, p: {}, plots: [['v', 'hist', '']], levels: [0], fmt: 'vol' },
+    cvd: { pane: true, p: {}, plots: [['v', 'line', '#38bdf8']], fmt: 'vol' },
+    fpbar: { p: {}, plots: [], foot: 1 },
+    /* market structure (painted by the drawing layer) */
+    ms: { p: { len: 5 }, plots: [], smc: 'ms' }, fvg: { p: {}, plots: [], smc: 'fvg' }, ob: { p: { len: 5 }, plots: [], smc: 'ob' }, eqhl: { p: { len: 5 }, plots: [], smc: 'eq' },
+    tpo: { p: { rows: 24 }, plots: [], prof: 'tpo' },
     vpvr: { p: { rows: 40 }, plots: [], prof: 'vis' },
     vpsess: { p: { rows: 20 }, plots: [], prof: 'sess' },
     cp_all: { p: {}, plots: [], marks: 1 }, cp_engulf: { p: {}, plots: [], marks: 1 }, cp_hammer: { p: {}, plots: [], marks: 1 }, cp_star: { p: {}, plots: [], marks: 1 },
@@ -635,7 +642,8 @@
   DEF.atr.fmt = 'price'; DEF.macd.fmt = 'price'; DEF.obv.fmt = 'vol';
   var ORDER_OVER = ['sma', 'ema', 'wma', 'hma', 'dema', 'tema', 'vwma', 'smma', 'alma', 'lsma', 'mgd', 'macross', 'ribbon', 'bb', 'env', 'dc', 'kc', 'ichi', 'alli', 'psar', 'st', 'vwap', 'piv', 'fract', 'zz'];
   var ORDER_COM = ['sqz', 'wt', 'halft', 'ut', 'ce', 'ssl', 'alpha', 'qqe', 'nwe', 'vixfix', 'rf', 'hull', 'zlsma', 'tdi', 'stc', 'kdj', 'smi', 'vwapb', 'emacloud', 'gmma', 'srlux', 'atrts'];
-  var ORDER_PROF = ['vpvr', 'vpsess'];
+  var ORDER_PROF = ['vpvr', 'vpsess', 'tpo', 'fpbar', 'vdelta', 'cvd'];
+  var ORDER_SMC = ['ms', 'fvg', 'ob', 'eqhl'];
   var ORDER_PAT = ['cp_all', 'cp_engulf', 'cp_hammer', 'cp_star', 'cp_doji', 'cp_mstar', 'cp_soldiers', 'cp_harami', 'cp_pierce', 'cp_maru', 'cp_tweezer', 'cp_inside'];
   var ORDER_CK = ['ksc', 'kpl', 'kspiral', 'kmacro'];
   var EXT = {}, USER = {};                                   /* USER: the visitor's own scripts (script.js), id → function (bars, params) */
@@ -805,6 +813,11 @@
         for (i = 0; i < n; i++) { if (!ok(at9[i])) continue; var ls9 = q.mult * at9[i]; if (!ok(T9)) T9 = C.c[i] - ls9; else if (dr > 0) { if (C.c[i] < T9) { dr = -1; T9 = C.c[i] + ls9; } else T9 = Math.max(T9, C.c[i] - ls9); } else { if (C.c[i] > T9) { dr = 1; T9 = C.c[i] - ls9; } else T9 = Math.min(T9, C.c[i] + ls9); } ta[i] = T9; da9[i] = dr; }
         var o9 = trail(da9, ta); return { up: o9.up, dn: o9.dn };
       }
+      case 'vdelta': case 'cvd': {
+        var dl = arr(n), acc = 0, B = C.bars || [];
+        for (i = 0; i < n; i++) { var bb2 = B[i], d0 = bb2 && bb2.tb != null ? 2 * bb2.tb - C.v[i] : (C.h[i] > C.l[i] ? C.v[i] * (C.c[i] - C.o[i]) / (C.h[i] - C.l[i]) : 0); if (id === 'cvd') { acc += d0; dl[i] = acc; } else dl[i] = d0; }
+        return { v: dl };
+      }
       case 'kspiral': { var zz = arr(n); for (i = 0; i < n; i++) zz[i] = 0; return { z: zz }; }
       case 'ksc': {
         var S = EXT.kind && EXT.kind.style_cycle && EXT.kind.style_cycle.series, vv = arr(n), pz = arr(n), ph = arr(n); if (!S || !S.length) return { v: vv, pz: pz, ph: ph };
@@ -823,6 +836,51 @@
       }
     }
     return null;
+  }
+  /* market structure from confirmed swing points (a pivot needs `len` bars on each side):
+     ms  → breaks of the last swing: BOS continues the trend, CHoCH is the first break against it
+     fvg → three-bar fair value gaps, each ending at the bar that fills it
+     ob  → the last opposite candle before the move that broke structure, ending when price closes through it
+     eq  → equal highs / lows: two swings within 0.1 ATR of each other */
+  function structure(bars, len, what) {
+    var n = bars.length, out = [], i, L = Math.max(2, Math.min(50, len | 0 || 5));
+    if (what === 'fvg') {
+      for (i = 2; i < n; i++) {
+        var a = bars[i - 2], c = bars[i], up = c.l > a.h, dn = c.h < a.l; if (!up && !dn) continue;
+        var top = up ? c.l : a.l, bot = up ? a.h : c.h, end = n - 1, filled = false;
+        for (var j = i + 1; j < n; j++) if (up ? bars[j].l <= bot : bars[j].h >= top) { end = j; filled = true; break; }
+        out.push({ k: 'box', i0: i - 1, i1: end, top: top, bot: bot, d: up ? 1 : -1, open: !filled });
+      }
+      return out.slice(-200);
+    }
+    var hs = [], ls = [], at = (function () { var C = cols(bars); return atr(C.h, C.l, C.c, 14); })();
+    for (i = L; i < n - L; i++) {
+      var isH = true, isL = true;
+      for (var k = i - L; k <= i + L; k++) { if (k === i) continue; if (k < i ? bars[k].h >= bars[i].h : bars[k].h > bars[i].h) isH = false; if (k < i ? bars[k].l <= bars[i].l : bars[k].l < bars[i].l) isL = false; if (!isH && !isL) break; }
+      if (isH) hs.push(i); if (isL) ls.push(i);
+    }
+    if (what === 'eq') {
+      [[hs, 'h', -1], [ls, 'l', 1]].forEach(function (S) { for (var q = 1; q < S[0].length; q++) { var i0 = S[0][q - 1], i1 = S[0][q], tol = (ok(at[i1]) ? at[i1] : 0) * 0.1; if (Math.abs(bars[i0][S[1]] - bars[i1][S[1]]) <= tol) out.push({ k: 'line', i0: i0, i1: i1, p: (bars[i0][S[1]] + bars[i1][S[1]]) / 2, t: S[1] === 'h' ? 'EQH' : 'EQL', d: S[2] }); } });
+      return out.slice(-120);
+    }
+    var hp = 0, lp = 0, lastH = -1, lastL = -1, usedH = -1, usedL = -1, trend = 0;
+    for (i = L * 2; i < n; i++) {
+      while (hp < hs.length && hs[hp] + L <= i) { lastH = hs[hp]; hp++; }
+      while (lp < ls.length && ls[lp] + L <= i) { lastL = ls[lp]; lp++; }
+      var cl = bars[i].c, brk = 0, from = -1;
+      if (lastH >= 0 && lastH !== usedH && cl > bars[lastH].h) { brk = 1; from = lastH; usedH = lastH; }
+      else if (lastL >= 0 && lastL !== usedL && cl < bars[lastL].l) { brk = -1; from = lastL; usedL = lastL; }
+      if (!brk) continue;
+      var kind = trend === brk || trend === 0 ? 'BOS' : 'CHoCH'; trend = brk;
+      if (what === 'ms') out.push({ k: 'line', i0: from, i1: i, p: brk > 0 ? bars[from].h : bars[from].l, t: kind, d: brk });
+      else {                                               /* order block: the last candle against the move, between the swing and the break */
+        var obi = -1; for (var z = i - 1; z >= Math.max(0, from - L); z--) if (brk > 0 ? bars[z].c < bars[z].o : bars[z].c > bars[z].o) { obi = z; break; }
+        if (obi < 0) continue; var tp = bars[obi].h, bt = bars[obi].l, e2 = n - 1, alive = true;
+        for (var y = i + 1; y < n; y++) if (brk > 0 ? bars[y].c < bt : bars[y].c > tp) { e2 = y; alive = false; break; }
+        out.push({ k: 'box', i0: obi, i1: e2, top: tp, bot: bt, d: brk, open: alive, t: 'OB' });
+      }
+    }
+    return out.slice(-150);
   }
   /* candlestick patterns → [{ i, d: 1 bullish | −1 bearish | 0 neutral, c: short code }] */
   function candles(bars, which) {
@@ -860,6 +918,7 @@
   function compute(id, bars, p) {
     var C = cols(bars), q = params(id, p), r;
     if (USER[id]) return USER[id](bars, q) || {};
+    if (id === 'vdelta' || id === 'cvd') { C.bars = bars; return comm(id, C, q) || {}; }
     if (ORDER_COM.indexOf(id) >= 0 || ORDER_CK.indexOf(id) >= 0) return comm(id, C, q) || {};
     switch (id) {
       case 'vol': return { vol: C.v, ma: sma(C.v, q.ma) };
@@ -962,7 +1021,7 @@
     }
     return {};
   }
-  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.EXT = EXT; M.USER = USER; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
+  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.EXT = EXT; M.USER = USER; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.structure = structure; M.ORDER_SMC = ORDER_SMC; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
   root.PRO = root.PRO || {}; root.PRO.ind = M;
   if (typeof module !== 'undefined' && module.exports) module.exports = M;
 })(typeof window !== 'undefined' ? window : globalThis);

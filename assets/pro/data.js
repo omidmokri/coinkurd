@@ -44,8 +44,8 @@
     var out = [], cur = null;
     for (var i = 0; i < base.length; i++) {
       var b = base[i], k = bucket(b.t, tf);
-      if (!cur || cur.t !== k) { cur = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }; out.push(cur); }
-      else { if (b.h > cur.h) cur.h = b.h; if (b.l < cur.l) cur.l = b.l; cur.c = b.c; cur.v += b.v; }
+      if (!cur || cur.t !== k) { cur = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }; if (b.tb != null) cur.tb = b.tb; out.push(cur); }
+      else { if (b.h > cur.h) cur.h = b.h; if (b.l < cur.l) cur.l = b.l; cur.c = b.c; cur.v += b.v; if (cur.tb != null) cur.tb = b.tb != null ? cur.tb + b.tb : undefined; }
     }
     return out;
   }
@@ -87,7 +87,7 @@
   }
   P.reach = reach; P.ifUp = ifUp;
 
-  function rowB(k) { return { t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; }
+  function rowB(k) { var b = { t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; if (k[9] != null && isFinite(+k[9])) b.tb = +k[9]; return b; }   /* tb: taker-buy volume, for delta and CVD */
   function klines(sym, iv, limit, start, end) {
     var u = API + 'klines?symbol=' + sym + 'USDT&interval=' + iv + '&limit=' + (limit || 1000) + (start ? '&startTime=' + start : '') + (end ? '&endTime=' + end : '');
     return getJSON(u).then(function (a) { if (!Array.isArray(a)) throw new Error('bad'); return a.map(rowB); });
@@ -159,7 +159,7 @@
       var k = d && d.k; if (!k) return;
       self.lastWs = Date.now();
       if (self.poller && self.src === 'binance') { clearInterval(self.poller); self.poller = null; }
-      self.tick({ t: Math.floor(k.t / 1000), o: +k.o, h: +k.h, l: +k.l, c: +k.c, v: +k.v }, !!k.x);
+      var tk = { t: Math.floor(k.t / 1000), o: +k.o, h: +k.h, l: +k.l, c: +k.c, v: +k.v }; if (k.V != null && isFinite(+k.V)) tk.tb = +k.V; self.tick(tk, !!k.x);
     };
   }
   Feed.prototype.tell = function (what, x) { var s = this; this.subs.slice().forEach(function (f) { try { f(what, s, x); } catch (e) { if (window.console) console.error(e); } }); };
@@ -176,13 +176,13 @@
     if (last && b.t < last.t) return;
     if (last && last.t === b.t) B[n - 1] = b; else B.push(b);
     var tf = this.tf, k = bucket(b.t, tf), bars = this.bars, lb = bars[bars.length - 1], nb;
-    if (tf.ratio === 1) nb = { t: b.t, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v };
+    if (tf.ratio === 1) { nb = { t: b.t, o: b.o, h: b.h, l: b.l, c: b.c, v: b.v }; if (b.tb != null) nb.tb = b.tb; }
     else {
       nb = null;
       for (var i = B.length - 1; i >= 0 && B[i].t >= k; i--) {
         var x = B[i];
-        if (!nb) nb = { t: k, o: x.o, h: x.h, l: x.l, c: x.c, v: x.v };
-        else { nb.o = x.o; if (x.h > nb.h) nb.h = x.h; if (x.l < nb.l) nb.l = x.l; nb.v += x.v; }
+        if (!nb) { nb = { t: k, o: x.o, h: x.h, l: x.l, c: x.c, v: x.v }; if (x.tb != null) nb.tb = x.tb; }
+        else { nb.o = x.o; if (x.h > nb.h) nb.h = x.h; if (x.l < nb.l) nb.l = x.l; nb.v += x.v; if (nb.tb != null) nb.tb = x.tb != null ? nb.tb + x.tb : undefined; }
       }
     }
     var isNew = !lb || nb.t > lb.t;

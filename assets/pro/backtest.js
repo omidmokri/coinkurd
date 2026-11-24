@@ -161,7 +161,26 @@
     var dsd = rr.length ? Math.sqrt(rr.reduce(function (s, x) { return s + (x < 0 ? x * x : 0); }, 0) / rr.length) : 0;
     var side = function (sg) { var a = tr.filter(function (x) { return x.side === sg; }); return { n: a.length, win: a.length ? a.filter(function (x) { return x.pnl > 0; }).length / a.length * 100 : 0, net: a.reduce(function (s, x) { return s + x.pnl; }, 0) }; };
     var endEq = acct.equity(acct.px), first = bars && bars.length ? bars[0] : null, last = bars && bars.length ? bars[bars.length - 1] : null;
+    /* growth per year, Calmar, payoff; Monte Carlo: the same trades in 1,000 random orders (how much of the result is luck of the sequence);
+       and the first 70 % of the trades against the last 30 % (does the edge hold later on) */
+    var yrs = first && last ? (last.t - first.t) / 31557600 : 0, cagr = yrs > 0.02 && endEq > 0 && acct.start > 0 ? (Math.pow(endEq / acct.start, 1 / yrs) - 1) * 100 : null;
+    var rets = tr.map(function (x) { return x.ret / 100; }).filter(function (x) { return isFinite(x); }), mc = null, split = null;
+    var comp = function (a) { var e = 1; a.forEach(function (x) { e *= 1 + x; }); return (e - 1) * 100; };
+    if (rets.length >= 10) {
+      var seed = 12345, rnd = function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }, fin = [], dds = [];
+      for (var k = 0; k < 1000; k++) {
+        var a = rets.slice(), e = 1, pk = 1, md = 0;
+        for (var j = a.length - 1; j > 0; j--) { var z = Math.floor(rnd() * (j + 1)), tmp = a[j]; a[j] = a[z]; a[z] = tmp; }
+        for (j = 0; j < a.length; j++) { e *= 1 + a[j]; if (e > pk) pk = e; if (pk > 0 && (pk - e) / pk > md) md = (pk - e) / pk; }
+        fin.push((e - 1) * 100); dds.push(md * 100);
+      }
+      dds.sort(function (x, y) { return x - y; });
+      mc = { ddMed: dds[500], dd95: dds[950], ddMax: dds[999] };
+      var cut = Math.floor(rets.length * 0.7), A1 = rets.slice(0, cut), B1 = rets.slice(cut);
+      split = { a: comp(A1), b: comp(B1), aw: A1.filter(function (x) { return x > 0; }).length / A1.length * 100, bw: B1.length ? B1.filter(function (x) { return x > 0; }).length / B1.length * 100 : 0, an: A1.length, bn: B1.length };
+    }
     return {
+      cagr: cagr, calmar: cagr != null && ddp > 0 ? cagr / (ddp * 100) : null, payoff: l.length && gl > 0 && w.length ? (gp / w.length) / (gl / l.length) : null, mc: mc, split: split,
       n: n, wins: w.length, losses: l.length, win: n ? w.length / n * 100 : 0,
       net: endEq - acct.start, netPct: (endEq / acct.start - 1) * 100, end: endEq, start: acct.start,
       gp: gp, gl: gl, pf: gl > 0 ? gp / gl : gp > 0 ? Infinity : 0,
@@ -217,6 +236,7 @@
       card('btAvg', money(s.avg, sym), ud(s.avg)) + card('btAvgW', money(s.avgW, sym), 'up') + card('btAvgL', money(s.avgL, sym), 'dn') +
       card('btBest', money(s.best, sym), 'up') + card('btWorst', money(s.worst, sym), 'dn') + card('btStreak', int(s.ws) + ' / ' + int(s.ls)) +
       card('btBars', s.bars ? s.bars.toFixed(1) : '—') + card('btExpo', s.expo.toFixed(1) + '%') + card('btFees', money(s.fees, sym)) +
+      (s.cagr != null ? card('btCagr', pct(s.cagr), ud(s.cagr)) : '') + (s.calmar != null ? card('btCalmar', s.calmar.toFixed(2), ud(s.calmar)) : '') + (s.payoff != null ? card('btPayoff', s.payoff.toFixed(2), s.payoff >= 1 ? 'up' : 'dn') : '') +
       card('btLong', int(s.long.n) + ' · ' + s.long.win.toFixed(0) + '% · ' + money(s.long.net, sym), ud(s.long.net)) +
       card('btShort', int(s.short.n) + ' · ' + s.short.win.toFixed(0) + '% · ' + money(s.short.net, sym), ud(s.short.net)) +
       '</div>';
@@ -225,7 +245,9 @@
         '</td><td>' + esc(A.fmtT(t.t1)) + '</td><td class="pm-num">' + cell.fmt(t.exit) + '</td><td class="pm-num ' + ud(t.pnl) + '">' + money(t.pnl, sym) + '</td><td class="pm-num ' + ud(t.pct) + '">' + pct(t.pct) + '</td><td>' + esc(T('why_' + t.why)) + '</td></tr>';
     }).join('');
     var c = acct.cfg;
-    var f = h('<div class="pm-btr">' + head + grid + '<div class="pm-btcv"></div>' +
+    var extra = (s.mc ? '<p class="pm-note pm-btx"><b>' + esc(T('btMC')) + '</b> ' + esc(T('btMCv', { a: s.mc.ddMed.toFixed(1), b: s.mc.dd95.toFixed(1), c: s.mc.ddMax.toFixed(1), d: s.ddPct.toFixed(1) })) + '</p>' : '') +
+      (s.split ? '<p class="pm-note pm-btx"><b>' + esc(T('btSplit')) + '</b> ' + esc(T('btSplitv', { a: pct(s.split.a), aw: s.split.aw.toFixed(0), an: s.split.an, b: pct(s.split.b), bw: s.split.bw.toFixed(0), bn: s.split.bn })) + '</p>' : '');
+    var f = h('<div class="pm-btr">' + head + grid + '<div class="pm-btcv"></div>' + extra +
       (acct.trades.length ? '<div class="pm-tw"><table class="pm-tbl pm-btt" dir="ltr"><tr><th>#</th><th></th><th>' + esc(T('btIn')) + '</th><th>' + esc(T('entry')) + '</th><th>' + esc(T('btOut')) + '</th><th>' + esc(T('exit')) + '</th><th>' + esc(q) + '</th><th>%</th><th></th></tr>' + rows + '</table></div>' : '<p class="pm-note">' + esc(T('btNoTrades')) + '</p>') +
       '<p class="pm-note">' + esc(T('btNote', { b: money(acct.start, sym), q: q, s: c.size, l: c.lev, f: c.fee, p: c.slip })) + (acct.trades.length > 300 ? ' ' + esc(T('btLast300')) : '') + (s.liq ? ' ' + esc(T('btLiqN', { n: A.loc(s.liq) })) : '') + (s.open ? ' ' + esc(T('btOpenNote')) : '') + '</p>' +
       '<div class="pm-row"><button type="button" class="pm-btn" data-a="csv">' + esc(T('btCsv')) + '</button>' + (opts.reset ? '<button type="button" class="pm-btn" data-a="reset">' + esc(T('btReset')) + '</button>' : '') + (opts.back ? '<button type="button" class="pm-btn" data-a="back">' + esc(T('btBack')) + '</button>' : '') + '</div></div>');
