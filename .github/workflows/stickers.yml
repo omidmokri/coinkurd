@@ -2,6 +2,8 @@ name: Stickers
 
 # Builds the Coin_Kurd animated sticker packs from the brand sheets and publishes them to Telegram.
 # Run by hand from the Actions tab. Safe to run again: a pack that already exists is only topped up.
+# Building takes about a quarter of an hour, so a retry of the publishing step alone can reuse an
+# earlier run's artifact by putting that run's id in build_run_id.
 
 on:
   workflow_dispatch:
@@ -10,10 +12,18 @@ on:
         description: "فقط بساز، روی تلگرام منتشر نکن"
         type: boolean
         default: false
+      build_run_id:
+        description: "شناسهٔ اجرای قبلی برای استفاده از استیکرهای همان اجرا (خالی = از نو بساز)"
+        type: string
+        default: ""
 
 concurrency:
   group: stickers
   cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   stickers:
@@ -33,9 +43,50 @@ jobs:
           pip install -q pillow numpy scipy
 
       - name: Build the stickers
+        if: ${{ inputs.build_run_id == '' }}
         run: python scripts/sticker_build.py
 
+      - name: Reuse an earlier build
+        if: ${{ inputs.build_run_id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: coinkurd-stickers
+          path: assets/stickers/build
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Check them against Telegram's limits
+        run: |
+          python - <<'EOF'
+          import glob, json, os, subprocess, sys
+          d = "assets/stickers/build"
+          files = sorted(glob.glob(d + "/*.webm"))
+          index = json.load(open(d + "/index.json", encoding="utf-8"))
+          bad = []
+          if len(files) != len(index):
+              bad.append("index lists %d files, %d were written" % (len(index), len(files)))
+          for f in files:
+              o = json.loads(subprocess.run(["ffprobe", "-v", "quiet", "-print_format", "json",
+                                             "-show_format", "-show_streams", f],
+                                            capture_output=True, text=True).stdout)
+              s = o["streams"][0]
+              dur = float(o["format"]["duration"])
+              if s["codec_name"] != "vp9" or (s["width"], s["height"]) != (512, 512):
+                  bad.append("%s: %s %sx%s" % (f, s["codec_name"], s["width"], s["height"]))
+              if (s.get("tags") or {}).get("alpha_mode") != "1":
+                  bad.append("%s: no alpha channel" % f)
+              if dur > 3.0 or s["r_frame_rate"] != "30/1":
+                  bad.append("%s: %.2fs at %s" % (f, dur, s["r_frame_rate"]))
+              if os.path.getsize(f) > 256 * 1024:
+                  bad.append("%s: %d bytes" % (f, os.path.getsize(f)))
+          print("checked %d stickers" % len(files))
+          if bad:
+              print("\n".join(bad[:20]), file=sys.stderr)
+              sys.exit(1)
+          EOF
+
       - uses: actions/upload-artifact@v4
+        if: ${{ inputs.build_run_id == '' }}
         with:
           name: coinkurd-stickers
           path: assets/stickers/build
