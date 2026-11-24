@@ -20,6 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.environ.get("STICKER_DIR") or os.path.join(ROOT, "assets", "stickers", "build")
 TOKEN = os.environ.get("REF_BOT_TOKEN") or os.environ.get("TG_BOT_TOKEN") or ""
 OWNER = next((int(x) for x in os.environ.get("ADMIN_IDS", "").split(",") if x.strip().lstrip("-").isdigit()), 0)
+RECREATE = os.environ.get("RECREATE") == "1"   # start the packs over instead of topping them up
 PER_SET = 120                                  # Telegram's ceiling for one pack
 FIRST = 1                                      # the create call carries one; the rest are added singly,
                                                # so one awkward sticker can never sink a whole pack
@@ -79,6 +80,7 @@ EMOJI_SPARSE = {0x25AA, 0x25AB, 0x25B6, 0x25C0, 0x25FB, 0x25FC, 0x25FD, 0x25FE,
                 0x1F194, 0x1F195, 0x1F196, 0x1F197, 0x1F198, 0x1F199, 0x1F19A, 0x1F201,
                 0x1F202, 0x1F21A, 0x1F22F, 0x1F232, 0x1F233, 0x1F234, 0x1F235, 0x1F236,
                 0x1F237, 0x1F238, 0x1F239, 0x1F23A, 0x1F250, 0x1F251}
+EMOJI_REJECTED = {0x1F5E8}                     # valid Unicode, still refused on a sticker
 EMOJI_SINGLES = {0xFE0F, 0x200D, 0x20E3, 0x00A9, 0x00AE, 0x203C, 0x2049, 0x2122, 0x2139,
                  0x24C2, 0x3030, 0x303D, 0x3297, 0x3299}
 
@@ -87,6 +89,8 @@ def emoji(e):
     """Telegram rejects a whole pack over one character that only looks like an emoji
     (the Bitcoin sign and the Greek Xi are the usual culprits), so anything doubtful
     becomes a sparkle rather than a failed run."""
+    if any(ord(c) in EMOJI_REJECTED for c in e):
+        return "\u2728"
     for c in e:
         o = ord(c)
         if o in EMOJI_SINGLES or o in EMOJI_SPARSE:
@@ -122,6 +126,10 @@ def main():
         n = s // PER_SET
         name = ("CoinKurd_%d_by_%s" % (n + 1, user))[:64]
         title = TITLES[n] if n < len(TITLES) else "کوین کورد %d" % (n + 1)
+        if RECREATE and existing(name):
+            r = call("deleteStickerSet", {"name": name})
+            print("delete %s -> %s" % (name, r.get("ok") or r.get("description")))
+            time.sleep(2)
         have = existing(name)
         done = len(have["stickers"]) if have else 0
         if done >= len(chunk):
