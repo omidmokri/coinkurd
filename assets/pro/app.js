@@ -57,6 +57,73 @@
 
   /* ---------------------------------------------------------------- icons (24×24 line glyphs) */
   var IC = {
+    dot: '<circle cx="12" cy="12" r="2.6" fill="currentColor"/>',
+    arrowc: '<path d="M6 3v15l4-4 3 6 2-1-3-6h6z"/>',
+    eraser: '<path d="M15 4l5 5-9 9H6l-3-3z"/><path d="M10 9l5 5"/><path d="M11 20h9"/>',
+    info: '<path d="M4 19 20 5"/><circle cx="4" cy="19" r="1.6"/><circle cx="20" cy="5" r="1.6"/><rect x="12" y="14" width="9" height="6" rx="1"/>',
+    angle: '<path d="M4 19 19 6"/><path d="M4 19h16"/><path d="M11 19a7 7 0 0 0-2-5"/>',
+    cross: '<path d="M2 12h20M12 2v20"/><circle cx="12" cy="12" r="1.6"/>',
+    regress: '<path d="M3 15 21 7"/><path d="M3 9 21 1" stroke-dasharray="2 2"/><path d="M3 21 21 13" stroke-dasharray="2 2"/>',
+    flat: '<path d="M3 6h18"/><path d="M3 20 21 10"/>',
+    disjoint: '<path d="M3 5 21 9"/><path d="M3 19 21 13"/>',
+    schiff: '<path d="M3 15h18"/><path d="M8 8h13M8 20h13"/><path d="M8 8v12"/><path d="M3 20l5-5" stroke-dasharray="2 2"/>',
+    mschiff: '<path d="M5 14h16"/><path d="M9 8h12M9 20h12"/><path d="M9 8v12"/><circle cx="5" cy="14" r="1.6"/>',
+    inside: '<path d="M3 12h18"/><path d="M9 9h12M9 15h12"/><path d="M3 12 9 5v14z"/>',
+    fibch: '<path d="M3 13 21 5M3 17 21 9M3 21 21 13"/>',
+    fibtz: '<path d="M4 3v18M7 3v18M10 3v18M14 3v18M20 3v18"/>',
+    fibfan: '<path d="M4 20 20 4M4 20 20 9M4 20l16-3M4 20 9 4"/>',
+    fibtime: '<path d="M5 3v18M10 3v18M14 3v18M20 3v18"/><path d="M3 16l4-6 4 4" />',
+    fibcirc: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="9.5"/>',
+    fibspiral: '<path d="M12 12a1.5 1.5 0 0 1 3 0 3 3 0 0 1-3 3 5 5 0 0 1-5-5 7 7 0 0 1 7-7 9 9 0 0 1 9 9"/>',
+    fibarc: '<path d="M3 20a5 5 0 0 1 10 0M3 20a9 9 0 0 1 18 0"/><path d="M8 20h0"/>',
+    fibwedge: '<path d="M4 20 20 6M4 20h17"/><path d="M12 20a8 8 0 0 0-2-5M17 20a13 13 0 0 0-3-9"/>',
+    pitchfan: '<path d="M4 18 20 4M4 18l16-6M4 18h16"/><path d="M20 4v14"/>',
+    gannbox: '<rect x="3" y="3" width="18" height="18"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+    gannsq: '<rect x="3" y="3" width="18" height="18"/><path d="M3 21 21 3M3 3l18 18"/><path d="M3 21a18 18 0 0 1 18-18"/>',
+    xabcd: '<path d="M3 18 8 5l3 9 5-6 5 12"/><path d="M3 18l8-4" stroke-dasharray="2 2"/>',
+    cypher: '<path d="M3 16 7 6l4 7 5-9 5 14"/><circle cx="21" cy="18" r="1.4"/>',
+    hs: '<path d="M2 18l4-7 3 4 3-10 3 10 3-4 4 7"/><path d="M2 15h20" stroke-dasharray="2 2"/>',
+    abcd: '<path d="M3 18 9 6l5 7 7-9"/>',
+    tri: '<path d="M3 4l5 14 4-10 4 7 5-4"/><path d="M3 4 21 11M8 18l13-7" stroke-dasharray="2 2"/>',
+    drives: '<path d="M2 18l4-5 2 2 5-7 2 2 7-8"/>',
+    ewimp: '<path d="M2 19l4-7 3 3 5-10 3 4 5-6"/><text x="13" y="23" font-size="7" fill="currentColor" stroke="none">5</text>',
+    ewcor: '<path d="M3 5l6 10 4-5 8 10"/><text x="15" y="10" font-size="7" fill="currentColor" stroke="none">C</text>',
+    ewtri: '<path d="M2 6l4 12 4-9 4 7 4-5 4 3"/>',
+    ewdbl: '<path d="M3 5l5 7 5-3 8 11"/><text x="2" y="22" font-size="7" fill="currentColor" stroke="none">WXY</text>',
+    ewtrp: '<path d="M2 4l4 6 3-2 4 6 3-2 6 8"/>',
+    cyclic: '<path d="M4 3v18M10 3v18M16 3v18M22 3v18"/>',
+    tcycle: '<path d="M2 18a5 5 0 0 1 10 0 5 5 0 0 1 10 0"/>',
+    sine: '<path d="M2 12c2-8 5-8 7 0s5 8 7 0 5-8 6-3"/>',
+    forecast: '<path d="M4 18 20 6" stroke-dasharray="3 2"/><circle cx="20" cy="6" r="2.2"/><circle cx="4" cy="18" r="1.6"/>',
+    proj: '<path d="M3 18 10 6l11 8z"/>',
+    avwap: '<path d="M3 18c4 0 5-6 9-6s5 3 9-6"/><circle cx="3" cy="18" r="1.8"/>',
+    vrp: '<path d="M4 4v16"/><path d="M4 6h6M4 9h10M4 12h15M4 15h9M4 18h5"/>',
+    prange: '<path d="M12 4v16"/><path d="M8 8l4-4 4 4M8 16l4 4 4-4"/><path d="M5 4h14M5 20h14"/>',
+    drange: '<path d="M4 12h16"/><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/><path d="M4 5v14M20 5v14"/>',
+    hl: '<path d="M5 19l5-1 9-9-4-4-9 9z" fill="rgba(250,204,21,.35)"/><path d="M3 21h18"/>',
+    arrowmk: '<path d="M3 15h11v4l7-7-7-7v4H3z"/>',
+    arrowup: '<path d="M12 3 5 11h4v9h6v-9h4z"/>',
+    arrowdn: '<path d="M12 21 5 13h4V4h6v9h4z"/>',
+    rrect: '<path d="M6 3 21 9l-4 11L2 14z"/>',
+    path: '<path d="M3 18l6-9 5 5 6-9"/><path d="M16 5h4v4"/>',
+    circ: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+    poly: '<path d="M4 7l7-4 9 6-3 11H7z"/>',
+    tri3: '<path d="M12 3 21 20H3z"/>',
+    arc: '<path d="M3 18C5 6 19 6 21 18"/>',
+    curve: '<path d="M3 19C6 4 18 4 21 19"/><circle cx="12" cy="5" r="1.2" fill="currentColor"/>',
+    dcurve: '<path d="M3 18c4-14 9-14 9-6s5 8 9-6"/>',
+    note: '<path d="M5 3h14v14l-4 4H5z"/><path d="M15 21v-4h4"/><path d="M8 8h8M8 12h6"/>',
+    signpost: '<path d="M12 22V10"/><path d="M5 3h12l3 3-3 3H5z"/>',
+    callout: '<rect x="3" y="3" width="18" height="11" rx="2"/><path d="M8 14l-3 7"/>',
+    comment: '<path d="M4 4h16v11H10l-5 5v-5H4z"/>',
+    plabel: '<path d="M3 12l5-6h13v12H8z"/>',
+    pnote: '<circle cx="5" cy="18" r="2"/><path d="M6.5 16.5 12 11"/><rect x="11" y="4" width="10" height="7" rx="1.5"/>',
+    flag: '<path d="M5 21V4"/><path d="M5 4h12l-3 4 3 4H5"/>',
+    emoji: '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h0M15 9h0"/>',
+    zoom: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2M8 11h6M11 8v6"/>',
+    zoomin: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2M8 11h6M11 8v6"/>',
+    zoomout: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2M8 11h6"/>',
+    magnet2: '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4M14 7h4"/><path d="M12 1v3" stroke-width="2.4"/>',
     cursor: '<path d="M5 3l14 7-6 2-2 6z"/>', trend: '<path d="M4 19 20 5"/><circle cx="4" cy="19" r="1.6"/><circle cx="20" cy="5" r="1.6"/>',
     ray: '<path d="M4 19 21 4"/><circle cx="4" cy="19" r="1.6"/><circle cx="12" cy="12" r="1.6"/>', ext: '<path d="M2 21 22 3"/><circle cx="8" cy="15.6" r="1.6"/><circle cx="16" cy="8.4" r="1.6"/>',
     arrow: '<path d="M4 20 19 5"/><path d="M11 5h8v8"/>', hline: '<path d="M2 12h20"/><circle cx="12" cy="12" r="1.6"/>', hray: '<path d="M8 12h14"/><circle cx="8" cy="12" r="1.6"/>',
@@ -67,12 +134,12 @@
     text: '<path d="M5 6V4h14v2"/><path d="M12 4v16"/><path d="M9 20h6"/>', measure: '<path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16l4-5 3 3 5-7"/>',
     long: '<rect x="4" y="4" width="16" height="7" rx="1" fill="rgba(52,211,153,.35)"/><rect x="4" y="11" width="16" height="7" rx="1" fill="rgba(255,90,77,.35)"/>',
     short: '<rect x="4" y="4" width="16" height="7" rx="1" fill="rgba(255,90,77,.35)"/><rect x="4" y="11" width="16" height="7" rx="1" fill="rgba(52,211,153,.35)"/>',
-    magnet: '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4M14 7h4"/>', keep: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0"/>',
+    magnet: '<path d="M6 3v8a6 6 0 0 0 12 0V3"/><path d="M6 7h4M14 7h4"/>', keep: '<path d="M4 20l3-1 9-9-2-2-9 9z"/><path d="M14 6l2-2 2 2-2 2"/><rect x="14" y="15" width="7" height="6" rx="1"/><path d="M15.5 15v-1.5a2 2 0 0 1 4 0V15"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>', eyeoff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 22 12s-1 2-3 4M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7c1.6 0 3-.4 4.2-1"/>',
     trash: '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>', lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
     unlock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>', copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',
-    x: '<path d="M6 6l12 12M18 6 6 18"/>', plus: '<path d="M12 5v14M5 12h14"/>', search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/>',
+    x: '<path d="M6 6l12 12M18 6 6 18"/>', fold: '<path d="m9 6 6 6-6 6"/><path d="M4 4v16"/>', plus: '<path d="M12 5v14M5 12h14"/>', search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/>',
     fx: '<path d="M8 20c2 0 2-2 2.5-6S12 4 15 4"/><path d="M7 11h7"/><path d="m14 14 6 6M20 14l-6 6"/>', replay: '<path d="M11 7 5 12l6 5z"/><path d="M19 7l-6 5 6 5z"/>',
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>', grid: '<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
     undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>', redo: '<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>',
@@ -131,7 +198,11 @@
     if (s.side === null || ['watch', 'alerts', 'cal', 'obj', 'help'].indexOf(s.side) >= 0) o.side = s.side;
     if (Array.isArray(s.fav)) { var f = s.fav.filter(function (x) { return P.parseTF(x); }).slice(0, 14); if (f.length) o.fav = f; }
     if (s.ev && typeof s.ev === 'object') { o.ev.on = s.ev.on ? 1 : 0; if (Array.isArray(s.ev.imp)) o.ev.imp = s.ev.imp.filter(function (x) { return /^[HMLX]$/.test(x); }); if (Array.isArray(s.ev.cur)) o.ev.cur = s.ev.cur.filter(function (x) { return /^[A-Z]{3}$/.test(x); }); }
-    ['keep', 'magnet', 'sound'].forEach(function (k) { if (k in s) o[k] = s[k] ? 1 : 0; });
+    ['keep', 'sound'].forEach(function (k) { if (k in s) o[k] = s[k] ? 1 : 0; });
+    if ('magnet' in s) o.magnet = s.magnet === 2 ? 2 : s.magnet ? 1 : 0;
+    if (['cursor', 'dot', 'arrowc'].indexOf(s.cm) >= 0) o.cm = s.cm;
+    if (s.tg && typeof s.tg === 'object') { o.tg = {}; ['cur', 'lines', 'fib', 'pat', 'fc', 'shape', 'ann'].forEach(function (g) { if (typeof s.tg[g] === 'string' && /^[a-z0-9]{2,10}$/.test(s.tg[g])) o.tg[g] = s.tg[g]; }); }
+    if (typeof s.emoji === 'string' && s.emoji.length <= 4) o.emoji = s.emoji;
     if (s.saver === true || s.saver === false) o.saver = s.saver;
     if (typeof s.name === 'string') o.name = s.name.slice(0, 40);
     return o;
@@ -379,8 +450,10 @@
     var self = this;
     this.drawer = new P.Drawer({ chart: ch, series: s, el: this.box, bars: function () { return self.disp; }, sec: function () { return self.tfSec(); }, sym: function () { return self.cfg.sym; },
       list: function (sym) { return DRAW[sym]; }, changed: drawChanged, fmt: function (p) { return self.fmt(p); }, T: T, touch: function () { return matchMedia('(pointer: coarse)').matches; },
-      selected: function (dd) { emit('drawsel', self, dd); }, editText: editText, styleFor: function () { return lastStyle; }, blocked: function () { return !!self.picking; } });
-    this.drawer.keep = !!st.keep; this.drawer.magnet = !!st.magnet;
+      selected: function (dd) { emit('drawsel', self, dd); }, editText: editText, styleFor: function () { return lastStyle; }, blocked: function () { return !!self.picking; },
+      settings: function (dd) { drawSettings(self, dd); }, erase: function (id) { removeDrawing(self, id); }, zoom: function (dd) { zoomTo(self, dd); },
+      toolDone: function () { if (curTool) setTool(null); }, emoji: function () { return st.emoji || EMOJI[0]; } });
+    this.drawer.keep = !!st.keep; this.drawer.magnet = st.magnet | 0; this.drawer.eraser = eraserOn;
     if (curTool && st.active === this.i) this.drawer.setTool(curTool);
     this.mk = LW.createSeriesMarkers(s, []);
   };
@@ -1042,16 +1115,24 @@
   }
 
   /* ---- indicators dialog */
+  var CKTV = [['ksc', 'DRuCJ6Bk-Kurdistani-Style-Cycle'], ['kspiral', 'tECCygHQ-Kurdistani-Bitcoin-Spiral-Historical-Logarithmic-Visualization'], ['kmacro', 'IUgkPeGI-Kurdistani-Macro-Regime']];
   function indDialog() {
     var a = active(), box = h('<div class="pm-id"><input class="pm-in" type="search" autocomplete="off"><div class="pm-idt"></div><div class="pm-idl"></div><h4 class="pm-h4"></h4><div class="pm-ida"></div><div class="pm-tplrow"></div></div>');
     var inp = $('input', box), tabs = $('.pm-idt', box), list = $('.pm-idl', box), act = $('.pm-ida', box), tab = 'over';
     inp.placeholder = T('searchInd'); $('.pm-h4', box).textContent = T('activeInds');
-    [['over', 'cat_over'], ['pane', 'cat_pane'], ['ek', 'cat_ek']].forEach(function (p) { var b = h('<button type="button" class="pm-chip' + (p[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { tab = p[0]; $$('.pm-chip', tabs).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; tabs.appendChild(b); });
+    [['over', 'cat_over'], ['pane', 'cat_pane'], ['com', 'cat_com'], ['ck', 'cat_ck'], ['ek', 'cat_ek']].forEach(function (p) { var b = h('<button type="button" class="pm-chip' + (p[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { tab = p[0]; $$('.pm-chip', tabs).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; tabs.appendChild(b); });
     function draw() {
-      var q = inp.value.trim().toLowerCase(), ids = q ? I.ORDER_OVER.concat(I.ORDER_PANE, Object.keys(LAYERS)) : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : Object.keys(LAYERS);
+      var q = inp.value.trim().toLowerCase(), ids = q ? I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, Object.keys(LAYERS)) : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
       ids = ids.filter(function (id) { var nm = (LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + ' ' + id + ' ' + T('ind_' + id); return !q || nm.toLowerCase().indexOf(q) >= 0; });
       list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('');
       $$('[data-id]', list).forEach(function (b) { b.onclick = function () { addInd(a, b.getAttribute('data-id')); drawAct(); }; });
+      if (tab === 'ck' && !q) {                       /* Coin_Kurd's other open-source scripts need TradingView's data: they open there */
+        var nt = h('<p class="pm-p pm-mute"></p>'); nt.textContent = T('ckNote'); list.insertBefore(nt, list.firstChild);
+        CKTV.forEach(function (x) {
+          var l = h('<a class="pm-idi" target="_blank" rel="noopener noreferrer"><b></b><small></small>' + ic('share') + '</a>');
+          l.href = 'https://www.tradingview.com/script/' + x[1] + '/'; $('b', l).textContent = T('ck_' + x[0]); $('small', l).textContent = T('ckd_' + x[0]) + ' · ' + T('openTv'); list.appendChild(l);
+        });
+      }
     }
     function drawAct() {
       act.innerHTML = a.cfg.inds.length ? a.cfg.inds.map(function (x) { return '<div class="pm-ia" data-u="' + esc(x.u) + '"><span>' + esc(indName(x)) + '</span>' + (I.DEF[x.id] && Object.keys(I.DEF[x.id].p).length ? '<button type="button" class="pm-ib" data-a="set">' + ic('gear') + '</button>' : '') + '<button type="button" class="pm-ib" data-a="del">' + ic('trash') + '</button></div>'; }).join('') : '<p class="pm-empty">' + esc(T('noInds')) + '</p>';
@@ -1183,7 +1264,15 @@
     var pts = x.pts.slice(0, 400).filter(function (p) { return p && isFinite(p.t); }).map(function (p) { return { t: Math.round(+p.t), p: p.p == null ? null : +p.p }; });
     if (!pts.length) return null;
     var s = x.s || {}, col = /^#[0-9a-fA-F]{6}$/.test(s.c) ? s.c : '#f7931a';
-    return { id: String(x.id || P.uid()).slice(0, 20), k: x.k, pts: pts, s: { c: col, w: Math.max(1, Math.min(6, +s.w || 2)), d: [0, 1, 2].indexOf(s.d) >= 0 ? s.d : 0, x: typeof s.x === 'string' ? s.x.slice(0, 120) : undefined, l: !!s.l, r: !!s.r, f: s.f !== false }, lk: !!x.lk, hd: !!x.hd };
+    var o = { c: col, w: Math.max(1, Math.min(6, +s.w || 2)), d: [0, 1, 2].indexOf(s.d) >= 0 ? s.d : 0, x: typeof s.x === 'string' ? s.x.slice(0, 120) : undefined, l: !!s.l, r: !!s.r, f: s.f !== false };
+    if (isFinite(s.fs)) o.fs = Math.max(8, Math.min(48, +s.fs));
+    if (isFinite(s.fo)) o.fo = Math.max(0, Math.min(0.6, +s.fo));
+    if (isFinite(s.dv)) o.dv = Math.max(0.5, Math.min(5, +s.dv));
+    if (isFinite(s.rows)) o.rows = Math.max(6, Math.min(80, Math.round(+s.rows)));
+    if (/^#[0-9a-fA-F]{6}$/.test(s.tc)) o.tc = s.tc;
+    if (Array.isArray(s.lv)) { var lv = s.lv.slice(0, 24).map(Number).filter(function (v) { return isFinite(v) && v >= -10 && v <= 100; }); if (lv.length) o.lv = lv; }
+    if (Array.isArray(s.hv)) { var hv = s.hv.filter(function (v) { return ['S', 'm', 'h', 'D', 'W', 'M'].indexOf(v) >= 0; }); if (hv.length) o.hv = hv; }
+    return { id: String(x.id || P.uid()).slice(0, 20), k: x.k, pts: pts, s: o, lk: !!x.lk, hd: !!x.hd };
   }
   function csv() {
     var a = active(), bars = a.replay ? a.bars.slice(0, a.replay.i + 1) : a.bars; if (!bars.length) { toast(T('noData', { s: a.cfg.sym })); return; }
@@ -1438,7 +1527,23 @@
   }
 
   /* ================================================================ build the page */
-  var TOOLROWS = [['cursor'], ['trend', 'ray', 'ext', 'arrow'], ['hline', 'hray', 'vline'], ['channel'], ['fib', 'fibext'], ['gann', 'pitch'], ['rect', 'circle', 'brush'], ['text'], ['measure', 'long', 'short']];
+  /* TradingView's left toolbar: each button keeps the tool last picked from its group; the small arrow opens the group */
+  var TGROUPS = [
+    { id: 'cur', rows: [['cursor', 'dot', 'arrowc', 'eraser']], heads: ['g_cursors'] },
+    { id: 'lines', rows: [['trend', 'ray', 'info', 'ext', 'angle', 'hline', 'hray', 'vline', 'cross'], ['channel', 'regress', 'flat', 'disjoint'], ['pitch', 'schiff', 'mschiff', 'inside']], heads: ['g_lines', 'g_channels', 'g_pitch'] },
+    { id: 'fib', rows: [['fib', 'fibext', 'fibch', 'fibtz', 'fibfan', 'fibtime', 'fibcirc', 'fibspiral', 'fibarc', 'fibwedge', 'pitchfan'], ['gannbox', 'gannsq', 'gann']], heads: ['g_fib', 'g_gann'] },
+    { id: 'pat', rows: [['xabcd', 'cypher', 'hs', 'abcd', 'tri', 'drives'], ['ewimp', 'ewcor', 'ewtri', 'ewdbl', 'ewtrp'], ['cyclic', 'tcycle', 'sine']], heads: ['g_pat', 'g_elliott', 'g_cycles'] },
+    { id: 'fc', rows: [['long', 'short', 'forecast', 'proj'], ['avwap', 'vrp'], ['prange', 'drange', 'measure']], heads: ['g_proj', 'g_vol', 'g_measurer'] },
+    { id: 'shape', rows: [['brush', 'hl'], ['arrowmk', 'arrow', 'arrowup', 'arrowdn'], ['rect', 'rrect', 'path', 'circ', 'circle', 'poly', 'tri3', 'arc', 'curve', 'dcurve']], heads: ['g_brush', 'g_arrows', 'g_shapes'] },
+    { id: 'ann', rows: [['text', 'note', 'callout', 'comment', 'signpost', 'plabel', 'pnote', 'flag']], heads: ['g_text'] },
+    { id: 'emo', emoji: 1 }
+  ];
+  var EMOJI = ['⭐', '🚀', '🔥', '💥', '⚡', '💰', '💸', '💎', '🎯', '📌', '🚩', '⚠️', '✅', '❌', '❓', '❗',
+    '🐂', '🐻', '🐳', '🦄', '👀', '😎', '😱', '🤔', '😂', '😭', '👍', '👎', '🙏', '💪',
+    '🌙', '☀️', '🎉', '🔔', '⏰', '📈', '📉', '⬆️', '⬇️', '➡️', '⬅️', '🔴', '🟢', '🟡', '🔵', '₿'];
+  var CMODES = { cursor: 1, dot: 1, arrowc: 1, eraser: 1 };
+  function groupOf(t) { for (var i = 0; i < TGROUPS.length; i++) { var G = TGROUPS[i]; if (G.rows && G.rows.some(function (r) { return r.indexOf(t) >= 0; })) return G; } return null; }
+  function grpTool(G) { var t = st.tg && st.tg[G.id]; return t && G.rows.some(function (r) { return r.indexOf(t) >= 0; }) ? t : G.rows[0][0]; }
   function build() {
     root = $('#pro'); if (!root) return;
     root.setAttribute('translate', 'no'); root.classList.add('notranslate'); root.setAttribute('lang', TAG()); d.body.classList.add('pm-on');
@@ -1473,22 +1578,7 @@
         '<button type="button" class="pm-clock" id="pm-clock" title="' + esc(T('timezone')) + '"></button><div class="pm-scale" id="pm-scale"><button type="button" data-s="pct">%</button><button type="button" data-s="log">log</button><button type="button" data-s="auto">auto</button></div></div>';
     grid = $('#pm-grid');
     /* tools */
-    var tools = $('#pm-tools'), th = '';
-    TOOLROWS.forEach(function (row, k) { if (k) th += '<i class="pm-tsep"></i>'; row.forEach(function (t) { th += '<button type="button" class="pm-tool' + (t === 'cursor' ? ' on' : '') + '" data-tool="' + t + '" title="' + esc(T('t_' + t)) + '" aria-label="' + esc(T('t_' + t)) + '">' + ic(t) + '</button>'; }); });
-    th += '<i class="pm-tsep"></i><button type="button" class="pm-tool' + (st.magnet ? ' on' : '') + '" data-opt="magnet" title="' + esc(T('magnet')) + '">' + ic('magnet') + '</button>' +
-      '<button type="button" class="pm-tool' + (st.keep ? ' on' : '') + '" data-opt="keep" title="' + esc(T('keepDraw')) + '">' + ic('keep') + '</button>' +
-      '<button type="button" class="pm-tool" data-opt="hide" title="' + esc(T('hideAll')) + '">' + ic('eye') + '</button>' +
-      '<button type="button" class="pm-tool" data-opt="clear" title="' + esc(T('clearAll')) + '">' + ic('trash') + '</button>';
-    tools.innerHTML = th;
-    $$('[data-tool]', tools).forEach(function (b) { b.onclick = function () { setTool(b.getAttribute('data-tool')); }; });
-    $$('[data-opt]', tools).forEach(function (b) {
-      b.onclick = function () {
-        var o = b.getAttribute('data-opt'), a = active(), sym = a.cfg.sym;
-        if (o === 'magnet' || o === 'keep') { st[o] = st[o] ? 0 : 1; b.classList.toggle('on', !!st[o]); cells.forEach(function (c) { c.drawer[o] = !!st[o]; }); save(); }
-        if (o === 'hide') { var L = DRAW[sym] || []; var hide = L.some(function (x) { return !x.hd; }); mutate(sym, function (L2) { L2.forEach(function (x) { x.hd = hide; }); }); b.innerHTML = ic(hide ? 'eyeoff' : 'eye'); }
-        if (o === 'clear') { if (!(DRAW[sym] || []).length) return; confirmBox(T('clearAll'), T('clearQ', { s: sym }), function () { mutate(sym, function (L2) { L2.length = 0; }); toast(T('undoHint')); }); }
-      };
-    });
+    buildTools();
     /* ranges */
     var rg = $('#pm-ranges'); RANGES.forEach(function (r) { var b = h('<button type="button"></button>'); b.textContent = r[0] === 'All' ? T('all') : r[0]; b.onclick = function () { setRange(r); }; rg.appendChild(b); });
     /* toolbar actions */
@@ -1552,10 +1642,195 @@
     var vis = top - scrollY, hgt = Math.max(420, innerHeight - Math.max(0, vis) - bh - 8);
     root.style.height = hgt + 'px';
   }
+  var eraserOn = false;
   function setTool(t) {
-    curTool = t === 'cursor' ? null : t;
-    $$('#pm-tools [data-tool]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tool') === (curTool || 'cursor')); });
-    cells.forEach(function (c) { c.drawer.setTool(c.i === st.active ? curTool : null); });
+    closeFly();
+    if (CMODES[t]) { eraserOn = t === 'eraser'; if (!eraserOn) { st.cm = t; save(); } curTool = null; }
+    else { curTool = t || null; eraserOn = false; }
+    cells.forEach(function (c) { c.drawer.setTool(c.i === st.active ? curTool : null); c.drawer.eraser = eraserOn; });
+    applyCm(); paintTools();
+  }
+  function applyCm() {
+    var hide = !curTool && !eraserOn && (st.cm === 'dot' || st.cm === 'arrowc');
+    cells.forEach(function (c) { try { c.chart.applyOptions({ crosshair: { vertLine: { visible: !hide }, horzLine: { visible: !hide } } }); } catch (e) { } });
+  }
+  function buildTools() {
+    var tools = $('#pm-tools'), th = '';
+    TGROUPS.forEach(function (G) {
+      var t = G.emoji ? 'emoji' : grpTool(G), icon = G.emoji ? '<span class="pm-emo">' + esc(st.emoji || EMOJI[0]) + '</span>' : ic(t);
+      th += '<div class="pm-tg" data-g="' + G.id + '"><button type="button" class="pm-tool" data-tool="' + t + '" title="' + esc(T(G.emoji ? 't_emoji' : 't_' + t)) + '" aria-label="' + esc(T(G.emoji ? 't_emoji' : 't_' + t)) + '">' + icon + '</button>' +
+        '<button type="button" class="pm-tfly" data-fly="' + G.id + '" aria-label="' + esc(T('moreTools')) + '" aria-haspopup="menu"><i></i></button></div>';
+    });
+    th += '<i class="pm-tsep"></i>' +
+      '<button type="button" class="pm-tool" data-tool="measure" title="' + esc(T('t_measure')) + '">' + ic('measure') + '</button>' +
+      '<button type="button" class="pm-tool" data-tool="zoom" title="' + esc(T('t_zoom')) + '">' + ic('zoomin') + '</button>' +
+      '<button type="button" class="pm-tool" data-opt="zoomout" title="' + esc(T('zoomOut')) + '">' + ic('zoomout') + '</button>' +
+      '<i class="pm-tsep"></i>' +
+      '<div class="pm-tg"><button type="button" class="pm-tool' + (st.magnet ? ' on' : '') + '" data-opt="magnet" title="' + esc(T(st.magnet === 2 ? 'magnetS' : 'magnetW')) + '">' + ic(st.magnet === 2 ? 'magnet2' : 'magnet') + '</button><button type="button" class="pm-tfly" data-fly="magnet" aria-label="' + esc(T('magnet')) + '"><i></i></button></div>' +
+      '<button type="button" class="pm-tool' + (st.keep ? ' on' : '') + '" data-opt="keep" title="' + esc(T('keepDraw')) + '">' + ic('keep') + '</button>' +
+      '<button type="button" class="pm-tool" data-opt="lockall" title="' + esc(T('lockAll')) + '">' + ic('lock') + '</button>' +
+      '<div class="pm-tg"><button type="button" class="pm-tool" data-opt="hide" title="' + esc(T('hideAll')) + '">' + ic('eye') + '</button><button type="button" class="pm-tfly" data-fly="hide" aria-label="' + esc(T('hideAll')) + '"><i></i></button></div>' +
+      '<div class="pm-tg"><button type="button" class="pm-tool" data-opt="clear" title="' + esc(T('clearAll')) + '">' + ic('trash') + '</button><button type="button" class="pm-tfly" data-fly="clear" aria-label="' + esc(T('clearAll')) + '"><i></i></button></div>';
+    tools.innerHTML = th;
+    $$('[data-tool]', tools).forEach(function (b) { b.onclick = function () { setTool(b.getAttribute('data-tool')); }; });
+    $$('[data-fly]', tools).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); flyout(b, b.getAttribute('data-fly')); }; });
+    $$('[data-opt]', tools).forEach(function (b) { b.onclick = function () { toolOpt(b.getAttribute('data-opt'), b); }; });
+    paintTools();
+  }
+  function paintTools() {
+    var on = curTool || (eraserOn ? 'eraser' : st.cm || 'cursor');
+    $$('#pm-tools [data-tool]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tool') === on); });
+    $$('#pm-tools [data-opt="magnet"]').forEach(function (b) { b.classList.toggle('on', !!st.magnet); b.innerHTML = ic(st.magnet === 2 ? 'magnet2' : 'magnet'); b.title = T(st.magnet === 2 ? 'magnetS' : st.magnet ? 'magnetW' : 'magnet'); });
+    if (root) { root.classList.toggle('pm-cm-dot', st.cm === 'dot' && !curTool && !eraserOn); root.classList.toggle('pm-cm-arrow', st.cm === 'arrowc' && !curTool && !eraserOn); root.classList.toggle('pm-cm-erase', eraserOn && !curTool); }
+  }
+  /* the group's list, TradingView style: headings, an icon and a name per tool */
+  var openFly = null;
+  function closeFly() { if (openFly) { openFly.remove(); openFly = null; } }
+  function flyout(btn, gid) {
+    if (openFly && openFly._g === gid) { closeFly(); return; }
+    closeFly(); closeMenu();
+    var f = h('<div class="pm-fly" role="menu" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + TAG() + '"></div>'); f._g = gid;
+    function item(key, label, icon, onA, act) {
+      var b = h('<button type="button" role="menuitem" class="pm-fi' + (onA ? ' on' : '') + '">' + icon + '<span></span></button>'); $('span', b).textContent = label;
+      b.onclick = function (e) { e.stopPropagation(); closeFly(); act(); }; f.appendChild(b);
+    }
+    function head(k) { var hd = h('<div class="pm-fh"></div>'); hd.textContent = T(k); f.appendChild(hd); }
+    var G = TGROUPS.filter(function (x) { return x.id === gid; })[0];
+    if (G && G.emoji) {
+      head('t_emoji'); var gridE = h('<div class="pm-emog"></div>');
+      EMOJI.forEach(function (em) { var b = h('<button type="button" class="pm-emob"></button>'); b.textContent = em; b.onclick = function (e) { e.stopPropagation(); closeFly(); st.emoji = em; save(); var tb = $('#pm-tools [data-g="emo"] [data-tool]'); if (tb) tb.innerHTML = '<span class="pm-emo">' + esc(em) + '</span>'; setTool('emoji'); }; gridE.appendChild(b); });
+      f.appendChild(gridE);
+    } else if (G) {
+      G.rows.forEach(function (row, i) {
+        if (G.heads && G.heads[i]) head(G.heads[i]);
+        row.forEach(function (t) { item(t, T('t_' + t), ic(t), t === (curTool || (eraserOn ? 'eraser' : st.cm || 'cursor')), function () { st.tg = st.tg || {}; st.tg[G.id] = t; save(); var tb = $('#pm-tools [data-g="' + G.id + '"] [data-tool]'); if (tb) { tb.setAttribute('data-tool', t); tb.innerHTML = ic(t); tb.title = T('t_' + t); tb.setAttribute('aria-label', T('t_' + t)); } setTool(t); }); });
+      });
+    } else if (gid === 'magnet') {
+      item('m0', T('magnetOff'), ic('magnet'), !st.magnet, function () { setMagnet(0); });
+      item('m1', T('magnetW'), ic('magnet'), st.magnet === 1, function () { setMagnet(1); });
+      item('m2', T('magnetS'), ic('magnet2'), st.magnet === 2, function () { setMagnet(2); });
+    } else if (gid === 'hide') {
+      item('hd', T('hideDraw'), ic('pen'), false, function () { toolOpt('hide'); });
+      item('hi', T('hideInds'), ic('fx'), false, function () { toolOpt('hideinds'); });
+      item('ha', T('hideBoth'), ic('eyeoff'), false, function () { toolOpt('hide'); toolOpt('hideinds'); });
+    } else if (gid === 'clear') {
+      item('cd', T('clearDraw'), ic('pen'), false, function () { toolOpt('clear'); });
+      item('ci', T('clearInds'), ic('fx'), false, function () { toolOpt('clearinds'); });
+      item('ca', T('clearBoth'), ic('trash'), false, function () { toolOpt('clearboth'); });
+    }
+    (root || d.body).appendChild(f); openFly = f;
+    var r = btn.getBoundingClientRect(), R = root.getBoundingClientRect(), fw = f.offsetWidth, fh = f.offsetHeight, rail = $('#pm-tools').getBoundingClientRect();
+    var x, y;
+    if (rail.width > rail.height) { x = r.left - R.left; y = rail.top - R.top - fh - 6; }               /* phones: the rail is a row at the bottom */
+    else { x = rail.right - R.left + 4; y = r.top - R.top - 6; }
+    x = Math.max(4, Math.min(R.width - fw - 4, x)); y = Math.max(4, Math.min(R.height - fh - 4, y));
+    f.style.left = x + 'px'; f.style.top = y + 'px';
+  }
+  d.addEventListener('pointerdown', function (e) { if (openFly && !openFly.contains(e.target) && !(e.target.closest && e.target.closest('.pm-tfly'))) closeFly(); }, true);
+  function setMagnet(v) { st.magnet = v; cells.forEach(function (c) { c.drawer.magnet = v; }); save(); paintTools(); }
+  function toolOpt(o, b) {
+    var a = active(), sym = a.cfg.sym, L = DRAW[sym] || [];
+    if (o === 'magnet') setMagnet(st.magnet ? 0 : 1);
+    else if (o === 'keep') { st.keep = st.keep ? 0 : 1; if (b) b.classList.toggle('on', !!st.keep); cells.forEach(function (c) { c.drawer.keep = !!st.keep; }); save(); }
+    else if (o === 'lockall') { if (!L.length) return; var lk = L.some(function (x) { return !x.lk; }); mutate(sym, function (L2) { L2.forEach(function (x) { x.lk = lk; }); }); toast(T(lk ? 'lockedAll' : 'unlockedAll')); }
+    else if (o === 'hide') { if (!L.length) return; var hide = L.some(function (x) { return !x.hd; }); mutate(sym, function (L2) { L2.forEach(function (x) { x.hd = hide; }); }); var hb = $('#pm-tools [data-opt="hide"]'); if (hb) hb.innerHTML = ic(hide ? 'eyeoff' : 'eye'); }
+    else if (o === 'hideinds') { if (!a.cfg.inds.length) return; var off = a.cfg.inds.some(function (x) { return !x.off; }); a.cfg.inds.forEach(function (x) { x.off = off; }); a.indsChanged(); }
+    else if (o === 'clear') { if (!L.length) return; confirmBox(T('clearAll'), T('clearQ', { s: sym }), function () { mutate(sym, function (L2) { L2.length = 0; }); toast(T('undoHint')); }); }
+    else if (o === 'clearinds') { if (!a.cfg.inds.length) return; confirmBox(T('clearInds'), T('clearIndsQ'), function () { a.cfg.inds = []; a.indsChanged(); }); }
+    else if (o === 'clearboth') { confirmBox(T('clearBoth'), T('clearQ', { s: sym }), function () { if (L.length) mutate(sym, function (L2) { L2.length = 0; }); if (a.cfg.inds.length) { a.cfg.inds = []; a.indsChanged(); } }); }
+    else if (o === 'zoomout') {
+      var ts = a.chart.timeScale(), prev = a._zst && a._zst.pop();
+      if (prev) ts.setVisibleLogicalRange(prev);
+      else { var r = ts.getVisibleLogicalRange(); if (r) { var m = (r.from + r.to) / 2, w = (r.to - r.from) || 50; ts.setVisibleLogicalRange({ from: m - w, to: m + w }); } }
+      a.chart.priceScale('right').applyOptions({ autoScale: true });
+    }
+  }
+  /* zoom in: the box the visitor drew becomes the visible time range */
+  function zoomTo(cell, dd) {
+    var ts = cell.chart.timeScale(), bars = cell.disp, sec = cell.tfSec(), a = P.t2l(bars, dd.pts[0].t, sec), b = P.t2l(bars, dd.pts[1].t, sec);
+    if (a == null || b == null || Math.abs(b - a) < 2) { toast(T('zoomSmall')); return; }
+    cell._zst = cell._zst || []; var r = ts.getVisibleLogicalRange(); if (r) { cell._zst.push({ from: r.from, to: r.to }); if (cell._zst.length > 20) cell._zst.shift(); }
+    ts.setVisibleLogicalRange({ from: Math.min(a, b), to: Math.max(a, b) });
+  }
+
+  /* ---- a drawing's settings: Style · Text · Coordinates · Visibility (TradingView's four tabs) */
+  var LVKIND = { fib: 'FIB', fibext: 'FIBX', fibch: 1, fibtz: 1, fibfan: 1, fibtime: 1, fibcirc: 1, fibarc: 1, fibwedge: 1, pitchfan: 1, gannbox: 1 };
+  var EXTK = { trend: 1, arrow: 1, channel: 1, fib: 1, fibext: 1, info: 1, regress: 1, flat: 1, fibch: 1 };
+  var FILLK = { rect: 1, circle: 1, channel: 1, rrect: 1, circ: 1, poly: 1, tri3: 1, arc: 1, regress: 1, flat: 1, disjoint: 1, pitch: 1, schiff: 1, mschiff: 1, inside: 1, fibch: 1, gannbox: 1, gannsq: 1, xabcd: 1, cypher: 1, hs: 1, tri: 1, tcycle: 1, proj: 1 };
+  var TFCATS = [['S', 'vSec'], ['m', 'vMin'], ['h', 'vHour'], ['D', 'vDay'], ['W', 'vWeek'], ['M', 'vMonth']];
+  function drawSettings(cell, dd) {
+    var sym = cell.cfg.sym, s = dd.s || {}, k = dd.k, tabs = [['style', 'stStyle']];
+    if (P.TEXTY[k] || k === 'emoji') tabs.push(['text', 'stText']);
+    tabs.push(['coord', 'stCoord'], ['vis', 'stVis']);
+    var f = h('<form class="pm-dset"><div class="pm-dtabs" role="tablist"></div><div class="pm-dpane"></div><div class="pm-row"><button class="pm-btn pri" type="submit">' + esc(T('ok')) + '</button><button class="pm-btn" type="button" data-x>' + esc(T('cancel')) + '</button></div></form>');
+    var panes = {}, tb = $('.pm-dtabs', f), pane = $('.pm-dpane', f);
+    function row(lbl, el) { var r = h('<label class="pm-drow"><span></span></label>'); $('span', r).textContent = T(lbl); r.appendChild(el); return r; }
+    /* style */
+    var P1 = h('<div></div>'), col = h('<input type="color" class="pm-in">'); col.value = /^#[0-9a-f]{6}$/i.test(s.c || '') ? s.c : '#f7931a'; P1.appendChild(row('stColor', col));
+    var wd = h('<select class="pm-in"></select>'); [1, 2, 3, 4, 5, 6].forEach(function (n) { var o = h('<option></option>'); o.value = n; o.textContent = n + 'px'; if ((s.w || 2) === n) o.selected = true; wd.appendChild(o); }); P1.appendChild(row('stWidth', wd));
+    var dsh = h('<select class="pm-in"></select>'); [['stSolid', 0], ['stDashed', 1], ['stDotted', 2]].forEach(function (x) { var o = h('<option></option>'); o.value = x[1]; o.textContent = T(x[0]); if ((s.d || 0) === x[1]) o.selected = true; dsh.appendChild(o); }); P1.appendChild(row('stLine', dsh));
+    var fl = null, fo = null, exl = null, exr = null, lvIn = null, dv = null, rows = null;
+    if (FILLK[k]) { fl = h('<input type="checkbox">'); fl.checked = s.f !== false; P1.appendChild(row('stFill', fl)); fo = h('<input type="range" min="0" max="60" step="1" class="pm-rng">'); fo.value = Math.round((s.fo != null ? s.fo : 0.1) * 100); P1.appendChild(row('stOpacity', fo)); }
+    if (EXTK[k]) { if (k === 'trend' || k === 'arrow' || k === 'info') { exl = h('<input type="checkbox">'); exl.checked = !!s.l; P1.appendChild(row('stExtL', exl)); } exr = h('<input type="checkbox">'); exr.checked = !!s.r; P1.appendChild(row('stExtR', exr)); }
+    if (LVKIND[k]) { var def = LVKIND[k] === 'FIB' ? P.FIB : LVKIND[k] === 'FIBX' ? P.FIBX : P.LV[k]; lvIn = h('<input class="pm-in" dir="ltr" maxlength="200">'); lvIn.value = (s.lv && s.lv.length ? s.lv : def).join(', '); P1.appendChild(row('stLevels', lvIn)); var rs = h('<button type="button" class="pm-btn sm"></button>'); rs.textContent = T('stReset'); rs.onclick = function () { lvIn.value = def.join(', '); }; P1.appendChild(rs); }
+    if (k === 'regress') { dv = h('<input type="number" class="pm-in" min="0.5" max="5" step="0.1" dir="ltr">'); dv.value = s.dv || 2; P1.appendChild(row('stDev', dv)); }
+    if (k === 'vrp') { rows = h('<input type="number" class="pm-in" min="6" max="80" step="1" dir="ltr">'); rows.value = s.rows || 24; P1.appendChild(row('stRows', rows)); }
+    panes.style = P1;
+    /* text */
+    var tx = null, fs = null, tcol = null;
+    if (P.TEXTY[k] || k === 'emoji') {
+      var P2 = h('<div></div>');
+      if (k === 'emoji') { tx = h('<select class="pm-in"></select>'); EMOJI.forEach(function (em) { var o = h('<option></option>'); o.value = em; o.textContent = em; if (s.x === em) o.selected = true; tx.appendChild(o); }); P2.appendChild(row('t_emoji', tx)); }
+      else { tx = h('<textarea class="pm-in" rows="3" maxlength="120"></textarea>'); tx.value = s.x || ''; P2.appendChild(row('stTextL', tx)); tcol = h('<input type="color" class="pm-in">'); tcol.value = /^#[0-9a-f]{6}$/i.test(s.tc || '') ? s.tc : (k === 'text' ? (s.c || '#f7931a') : '#0b0b0c'); if (k !== 'text') P2.appendChild(row('stTextC', tcol)); else tcol = null; }
+      fs = h('<select class="pm-in"></select>'); [10, 11, 12, 14, 16, 20, 24, 28, 32, 40].forEach(function (n) { var o = h('<option></option>'); o.value = n; o.textContent = n; if ((s.fs || (k === 'emoji' ? 26 : k === 'text' ? 14 : 11)) === n) o.selected = true; fs.appendChild(o); });
+      if (k === 'emoji' && [10, 11, 12, 14, 16, 20, 24, 28, 32, 40].indexOf(s.fs || 26) < 0) { var o26 = h('<option selected></option>'); o26.value = s.fs || 26; o26.textContent = s.fs || 26; fs.appendChild(o26); }
+      P2.appendChild(row('stSize', fs)); panes.text = P2;
+    }
+    /* coordinates: each anchor's price and time (UTC) */
+    var P3 = h('<div class="pm-dcoord"></div>'), cin = [];
+    dd.pts.slice(0, 12).forEach(function (p, i) {
+      var r = h('<div class="pm-drow2"><b></b><input class="pm-in" dir="ltr" inputmode="decimal"><input class="pm-in" dir="ltr" maxlength="16" placeholder="YYYY-MM-DD HH:MM"></div>');
+      $('b', r).textContent = '#' + (i + 1); var ins = $$('input', r);
+      ins[0].value = p.p == null ? '' : String(+p.p.toPrecision(10)); if (p.p == null) ins[0].disabled = true;
+      ins[1].value = new Date(p.t * 1000).toISOString().slice(0, 16).replace('T', ' ');
+      cin.push(ins); P3.appendChild(r);
+    });
+    if (dd.pts.length > 12) { var more = h('<p class="pm-p"></p>'); more.textContent = T('stManyPts'); P3.appendChild(more); }
+    var nt = h('<p class="pm-p pm-mute"></p>'); nt.textContent = T('stUtc'); P3.appendChild(nt); panes.coord = P3;
+    /* visibility on timeframes */
+    var P4 = h('<div></div>'), vis = {};
+    TFCATS.forEach(function (c) { var cb = h('<input type="checkbox">'); cb.checked = !(s.hv && s.hv.indexOf(c[0]) >= 0); vis[c[0]] = cb; P4.appendChild(row(c[1], cb)); });
+    panes.vis = P4;
+    tabs.forEach(function (t, i) {
+      var b = h('<button type="button" role="tab" class="pm-dtab' + (i ? '' : ' on') + '"></button>'); b.textContent = T(t[1]);
+      b.onclick = function () { $$('.pm-dtab', tb).forEach(function (x) { x.classList.toggle('on', x === b); }); pane.innerHTML = ''; pane.appendChild(panes[t[0]]); };
+      tb.appendChild(b);
+    });
+    pane.appendChild(panes.style);
+    $('[data-x]', f).onclick = closeModal;
+    f.onsubmit = function (e) {
+      e.preventDefault();
+      var ns = { c: col.value, w: +wd.value, d: +dsh.value }, bad = false, npts = null;
+      if (fl) { ns.f = fl.checked; ns.fo = Math.max(0, Math.min(0.6, +fo.value / 100)); }
+      if (exl) ns.l = exl.checked; if (exr) ns.r = exr.checked;
+      if (lvIn) { var lv = lvIn.value.split(/[,\s،]+/).filter(Boolean).map(Number); if (!lv.length || lv.length > 24 || lv.some(function (v) { return !isFinite(v) || v < -10 || v > 100; })) { toast(T('stBadLv')); return; } ns.lv = lv; }
+      if (dv) ns.dv = Math.max(0.5, Math.min(5, +dv.value || 2)); if (rows) ns.rows = Math.max(6, Math.min(80, Math.round(+rows.value || 24)));
+      if (tx) ns.x = String(tx.value).slice(0, 120); if (fs) ns.fs = Math.max(8, Math.min(48, +fs.value || 14)); if (tcol) ns.tc = tcol.value;
+      var hv = TFCATS.filter(function (c) { return !vis[c[0]].checked; }).map(function (c) { return c[0]; }); if (hv.length) ns.hv = hv;
+      npts = dd.pts.map(function (p, i) {
+        if (!cin[i]) return p;
+        var pr = cin[i][0].disabled ? p.p : parseFloat(String(cin[i][0].value).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 1632; }).replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 1776; }).replace(/[,٬]/g, ''));
+        var m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})$/.exec(String(cin[i][1].value).trim()), tt = m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) / 1000 : NaN;
+        if (!isFinite(pr) || !isFinite(tt)) { bad = true; return p; }
+        var keep = Math.abs(tt - Math.floor(p.t / 60) * 60) < 1 ? p.t : tt;     /* the minutes field drops seconds: leave the time alone when unchanged */
+        return { t: Math.round(keep), p: p.p == null ? null : pr };
+      });
+      if (bad) { toast(T('stBadPt')); return; }
+      closeModal();
+      mutate(sym, function (L) { L.forEach(function (x) { if (x.id === dd.id) { var keepS = x.s || {}; x.s = Object.assign({}, keepS, ns); if (!hv.length) delete x.s.hv; x.pts = npts; lastStyle = { c: x.s.c, w: x.s.w, d: x.s.d }; } }); });
+      var nd = cell.drawer.find(dd.id); if (nd) { cell.drawer.select(nd.id); selBar(cell, nd); }
+    };
+    modal(T('t_' + k) + ' · ' + T('settings'), f, { nofocus: true });
   }
   on('drawsel', function (cell, dd) { selBar(cell, dd); });
   /* the small bar over a selected drawing: colour, width, style, extend, text, alert, lock, copy, delete */
@@ -1568,8 +1843,9 @@
     COLORS.forEach(function (c) { var b = h('<button type="button" class="pm-sw' + ((dd.s && dd.s.c) === c ? ' on' : '') + '" style="background:' + c + '" aria-label="' + c + '"></button>'); b.onclick = function () { upd(function (x) { x.s.c = c; }); }; bar.appendChild(b); });
     var w = h('<button type="button" class="pm-ib pm-wb">' + ((dd.s && dd.s.w) || 2) + 'px</button>'); w.onclick = function () { upd(function (x) { x.s.w = ((x.s.w || 2) % 4) + 1; }); }; bar.appendChild(w);
     var ds = h('<button type="button" class="pm-ib pm-wb">' + ['━', '┅', '┈'][(dd.s && dd.s.d) || 0] + '</button>'); ds.onclick = function () { upd(function (x) { x.s.d = ((x.s.d || 0) + 1) % 3; }); }; bar.appendChild(ds);
-    if (['trend', 'arrow', 'channel', 'fib', 'fibext'].indexOf(dd.k) >= 0) { var ex = h('<button type="button" class="pm-ib pm-wb' + (dd.s && dd.s.r ? ' on' : '') + '" title="' + esc(T('extend')) + '">→|</button>'); ex.onclick = function () { upd(function (x) { x.s.r = !x.s.r; }); }; bar.appendChild(ex); }
-    if (['text', 'rect', 'hline', 'hray'].indexOf(dd.k) >= 0) { var tx = h('<button type="button" class="pm-ib" title="' + esc(T('editText')) + '">' + ic('text') + '</button>'); tx.onclick = function () { editText(dd); }; bar.appendChild(tx); }
+    if (EXTK[dd.k]) { var ex = h('<button type="button" class="pm-ib pm-wb' + (dd.s && dd.s.r ? ' on' : '') + '" title="' + esc(T('extend')) + '">→|</button>'); ex.onclick = function () { upd(function (x) { x.s.r = !x.s.r; }); }; bar.appendChild(ex); }
+    var gs = h('<button type="button" class="pm-ib" title="' + esc(T('settings')) + '">' + ic('gear') + '</button>'); gs.onclick = function () { drawSettings(cell, cell.drawer.find(dd.id) || dd); }; bar.appendChild(gs);
+    if (P.TEXTY[dd.k]) { var tx = h('<button type="button" class="pm-ib" title="' + esc(T('editText')) + '">' + ic('text') + '</button>'); tx.onclick = function () { editText(dd); }; bar.appendChild(tx); }
     if (['hline', 'hray', 'trend', 'ray', 'ext', 'channel'].indexOf(dd.k) >= 0 && P.alertDialog) { var al = h('<button type="button" class="pm-ib" title="' + esc(T('alertHere')) + '">' + ic('bell') + '</button>'); al.onclick = function () { P.alertDialog(cell, dd.k === 'hline' || dd.k === 'hray' ? { price: dd.pts[0].p } : { draw: dd }); }; bar.appendChild(al); }
     var lk = h('<button type="button" class="pm-ib" title="' + esc(T(dd.lk ? 'unlock' : 'lock')) + '">' + ic(dd.lk ? 'lock' : 'unlock') + '</button>'); lk.onclick = function () { upd(function (x) { x.lk = !x.lk; }); }; bar.appendChild(lk);
     var cp = h('<button type="button" class="pm-ib" title="' + esc(T('clone')) + '">' + ic('copy') + '</button>'); cp.onclick = function () { var nd = JSON.parse(JSON.stringify(dd)); nd.id = P.uid(); var sec = cell.tfSec() * 5; nd.pts.forEach(function (p) { p.t += sec; }); mutate(sym, function (L) { L.push(nd); }); cell.drawer.select(nd.id); }; bar.appendChild(cp);
@@ -1584,9 +1860,11 @@
     var tabs = $('.pm-stabs', root);
     tabs.innerHTML = [['watch', 'star', 'watchlist'], ['alerts', 'bell', 'alerts'], ['cal', 'cal', 'ecoCal'], ['obj', 'layers', 'objects'], ['help', 'help', 'helpTab']].map(function (t) {
       return '<button type="button" role="tab" class="pm-stab" data-p="' + t[0] + '" title="' + esc(T(t[2])) + '">' + ic(t[1]) + '<span>' + esc(T(t[2])) + '</span></button>';
-    }).join('') + '<button type="button" class="pm-ib pm-sclose" title="' + esc(T('close')) + '">' + ic('x') + '</button>';
-    $$('.pm-stab', tabs).forEach(function (b) { b.onclick = function () { var p = b.getAttribute('data-p'); setSide(st.side === p && innerWidth < 900 ? null : p); }; });
+    }).join('') + '<button type="button" class="pm-ib pm-sclose" title="' + esc(T('close')) + '" aria-label="' + esc(T('close')) + '">' + ic('x') + '</button>' +
+      '<button type="button" class="pm-ib pm-sfold" title="' + esc(T('close')) + '" aria-label="' + esc(T('close')) + '">' + ic('fold') + '</button>';
+    $$('.pm-stab', tabs).forEach(function (b) { b.onclick = function () { var p = b.getAttribute('data-p'); setSide(st.side === p ? null : p); }; });   /* a click on the open tab folds the panel away */
     $('.pm-sclose', tabs).onclick = function () { setSide(null); };
+    $('.pm-sfold', tabs).onclick = function () { setSide(null); };
     setSide(st.side, true);
   }
   function setSide(p, quiet) {
@@ -1602,7 +1880,7 @@
   d.addEventListener('keydown', function (e) {
     if (!root || e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
     var a = active(); if (!a) return;
-    if (e.key === 'Escape') { if (openModal) closeModal(); else if (openMenu) closeMenu(); else if (a.drawer.cur) a.drawer.cancel(); else if (curTool) setTool('cursor'); else a.drawer.select(null); return; }
+    if (e.key === 'Escape') { if (openModal) closeModal(); else if (openMenu) closeMenu(); else if (openFly) closeFly(); else if (a.drawer.cur) a.drawer.cancel(); else if (openFly) closeFly(); else if (curTool || eraserOn) setTool(null); else a.drawer.select(null); return; }
     if ((e.key === 'Delete' || e.key === 'Backspace') && a.drawer.sel) { e.preventDefault(); removeDrawing(a, a.drawer.sel); return; }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); doRedo(); return; }

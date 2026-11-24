@@ -46,6 +46,33 @@
 .pm-tool{display:grid;place-items:center;width:34px;height:32px;flex:0 0 auto;border:0;background:none;border-radius:8px;cursor:pointer;color:#c9c9c4;padding:0}
 .pm-tool:hover{background:#1c1c20}.pm-tool.on{color:var(--acc);background:rgba(247,147,26,.14)}
 .pm-tsep{display:block;width:22px;height:1px;background:var(--line);margin:3px 0;flex:0 0 auto}
+.pm-tg{position:relative;flex:0 0 auto;display:flex}
+.pm-tfly{position:absolute;right:-2px;bottom:-1px;width:12px;height:12px;border:0;background:none;padding:0;cursor:pointer;color:#7d7d78;border-radius:3px;opacity:.75}
+.pm-tfly i{position:absolute;right:2px;bottom:2px;border-left:5px solid transparent;border-bottom:5px solid currentColor}
+.pm-tg:hover .pm-tfly{opacity:1;color:#d8d8d2}.pm-tfly:hover{background:#2a2a2f}
+.pm-emo{font-size:17px;line-height:1;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif}
+.pm-fly{position:absolute;z-index:46;min-width:230px;max-width:min(300px,94%);max-height:78%;overflow-y:auto;background:#151517;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:5px;box-shadow:0 14px 40px rgba(0,0,0,.6);scrollbar-width:thin}
+.pm-fh{color:var(--mute);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;padding:8px 9px 3px}
+.pm-fi{display:flex;align-items:center;gap:9px;width:100%;background:none;border:0;border-radius:8px;padding:6px 9px;cursor:pointer;color:#d6d6d0;font:inherit;font-size:13px;text-align:start}
+.pm-fi:hover{background:#202024}.pm-fi.on{color:var(--acc);background:rgba(247,147,26,.12)}.pm-fi .pm-ic{flex:0 0 auto}
+.pm-emog{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:4px}
+.pm-emob{border:0;background:none;border-radius:8px;font-size:20px;line-height:1;padding:5px 0;cursor:pointer;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif}.pm-emob:hover{background:#26262b}
+#pro.pm-cm-dot .pm-grid{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%23f7931a' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E") 6 6,crosshair}
+#pro.pm-cm-arrow .pm-grid{cursor:default}
+#pro.pm-cm-erase .pm-grid{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cpath d='M11 2l5 5-8 8H4l-2-2z' fill='%23ff5a4d' stroke='%23000'/%3E%3C/svg%3E") 3 15,not-allowed}
+.pm-dset{min-width:min(420px,86vw)}
+.pm-dtabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px 0 10px;overflow-x:auto}
+.pm-dtab{border:0;background:none;color:#a9a9a3;font:inherit;font-size:13px;padding:7px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.pm-dtab.on{color:#f2f2ec;border-bottom-color:var(--acc)}
+.pm-dpane{min-height:170px;max-height:52vh;overflow-y:auto;padding:2px}
+.pm-drow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}
+.pm-drow>span{flex:0 0 auto;color:#cfcfc9}.pm-drow .pm-in{width:auto;flex:0 1 210px;padding:6px 8px;font-size:13px}
+.pm-drow input[type=color]{width:48px;height:32px;padding:2px;flex:0 0 48px}.pm-drow input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
+.pm-drow textarea.pm-in{flex:1 1 240px;resize:vertical}
+.pm-rng{flex:0 1 180px;accent-color:var(--acc)}
+.pm-drow2{display:grid;grid-template-columns:28px 1fr 1.25fr;gap:6px;align-items:center;padding:3px 0}.pm-drow2 b{color:var(--mute);font-size:12px}.pm-drow2 .pm-in{padding:6px 8px;font-size:13px}
+.pm-btn.sm{padding:4px 10px;font-size:12px;margin:2px 0 6px}
+.pm-mute{color:var(--mute);font-size:12px}
 .pm-grid{flex:1 1 auto;display:grid;gap:2px;min-width:0;min-height:0;background:#000;grid-template:1fr/1fr}
 .pm-grid[data-l="2v"]{grid-template:1fr/1fr 1fr}
 .pm-grid[data-l="2h"]{grid-template:1fr 1fr/1fr}
@@ -108,6 +135,9 @@ span.pm-imp{width:auto;height:auto;border-radius:6px;padding:0 6px;color:#111;fo
 .pm-stab span{display:none}
 .pm-stab:hover{background:#1c1c20}.pm-stab.on{color:var(--acc);background:rgba(247,147,26,.14)}
 .pm-sclose{display:none}
+/* desktop: a fold arrow at the foot of the strip, shown only while a panel is open, so the chart can take the room */
+.pm-sfold{display:inline-grid;margin-top:auto;color:#cfcfca}
+.pm-noside .pm-sfold{display:none}
 .pm-spanel{width:300px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;padding:8px 10px;gap:8px}
 .pm-noside .pm-spanel{display:none}
 .pm-ph{display:flex;align-items:center;gap:6px}
@@ -291,6 +321,7 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
   .pm-tools{display:none}
   #pro.pm-pens .pm-tools{display:flex;position:absolute;left:4px;right:4px;bottom:4px;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;z-index:9;border:1px solid var(--line);border-radius:12px;height:44px;padding:4px;align-items:center}
   #pro.pm-pens .pm-tsep{width:1px;height:22px;margin:0 3px}
+  .pm-tfly{width:14px;height:14px}.pm-fly{max-height:60%}
   .pm-penb{display:inline-grid}
   .pm-side{position:absolute;left:0;right:0;bottom:0;height:62%;z-index:20;flex-direction:column;border:0;border-top:1px solid rgba(255,255,255,.16);box-shadow:0 -12px 30px rgba(0,0,0,.55);border-radius:14px 14px 0 0}
   .pm-noside .pm-side{display:none}
@@ -299,6 +330,7 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
   .pm-stab{white-space:nowrap;flex:0 0 auto}
   .pm-stab.on span{display:inline}            /* phones: the open tab is named, the others are icons (they keep a title) */
   .pm-sclose{display:inline-grid;margin-inline-start:auto}
+  .pm-sfold{display:none}
   .pm-spanel{width:auto;flex:1}
   .pm-hide-s,#pm-tpl span,#pm-ind span,#pm-alert span,#pm-rep span,#pm-type span{display:none}
   .pm-tfs .pm-tf:not(.on){display:none}
@@ -476,3 +508,4 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
 #ekh #langs .pm-hglobe:focus-visible{outline:2px solid #fff;outline-offset:1px}
 /* room for it: on market pages up to wide screens, «Get the apps» is its icon alone (as the header does when tight) */
 @media (max-width:1700px){html:has(#pro) #ekh .ek-appb{width:38px!important;padding:0!important;justify-content:center}html:has(#pro) #ekh .ek-appb .ek-i{display:none!important}}
+a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}

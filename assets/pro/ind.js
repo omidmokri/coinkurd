@@ -593,10 +593,26 @@
     efi: { pane: true, p: { len: 13 }, plots: [['v', 'line', '#fb7185']], levels: [0], fmt: 'vol' },
     eom: { pane: true, p: { len: 14, div: 10000 }, plots: [['v', 'line', '#2dd4bf']], levels: [0] },
     pvt: { pane: true, p: {}, plots: [['v', 'line', '#3b82f6']], fmt: 'vol' },
-    vo: { pane: true, p: { short: 5, long: 10 }, plots: [['v', 'line', '#a78bfa']], levels: [0] }
+    vo: { pane: true, p: { short: 5, long: 10 }, plots: [['v', 'line', '#a78bfa']], levels: [0] },
+    /* the community's most-liked TradingView scripts, written here from each author's published method (credited in the list) */
+    sqz: { pane: true, p: { len: 20, mult: 2, kcm: 1.5 }, plots: [['v', 'hist', ''], ['on', 'dots', '#ff5a4d'], ['off', 'dots', '#6b7280']], levels: [0], fmt: 'price' },
+    wt: { pane: true, p: { n1: 10, n2: 21 }, plots: [['wt1', 'line', '#34d399'], ['wt2', 'line', '#ff5a4d']], levels: [60, 53, 0, -53, -60] },
+    halft: { p: { amp: 2, chdev: 2 }, plots: [['up', 'line', '#2962ff'], ['dn', 'line', '#ff5a4d']] },
+    ce: { p: { len: 22, mult: 3 }, plots: [['long', 'line', '#34d399'], ['short', 'line', '#ff5a4d']] },
+    ut: { p: { key: 1, atr: 10 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d']] },
+    ssl: { p: { len: 10 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d']] },
+    alpha: { p: { coeff: 1, len: 14 }, plots: [['at', 'line', '#2962ff'], ['lag', 'line', '#ff5a4d']], band: ['at', 'lag', 'rgba(41,98,255,.08)'] },
+    qqe: { pane: true, p: { rsi: 6, sf: 5, qqe: 3 }, plots: [['v', 'hist', ''], ['tl', 'line', '#e5e7eb']], levels: [0] },
+    nwe: { p: { bw: 8, mult: 3 }, plots: [['up', 'line', '#ff5a4d'], ['mid', 'line', 'rgba(156,163,175,.6)'], ['lo', 'line', '#34d399']], band: ['up', 'lo', 'rgba(156,163,175,.05)'] },
+    vixfix: { pane: true, p: { pd: 22, bbl: 20, mult: 2, lb: 50, ph: 0.85 }, plots: [['v', 'hist', ''], ['ub', 'line', '#60a5fa'], ['rh', 'line', '#f59e0b']] },
+    rf: { p: { per: 100, mult: 3 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d'], ['hi', 'line', 'rgba(52,211,153,.35)'], ['lo', 'line', 'rgba(255,90,77,.35)']] },
+    /* Coin_Kurd's own open-source script (TradingView umPv6JPM): fair value = 8.31e-17 · days-since-genesis^5.48, ±10 %, buy zone 18 % under the lower band */
+    kpl: { p: {}, plots: [['up', 'line', 'rgba(255,90,77,.8)'], ['fair', 'line', '#facc15'], ['lo', 'line', 'rgba(52,211,153,.8)'], ['buy', 'line', '#22d3ee']], band: ['lo', 'buy', 'rgba(34,211,238,.07)'] }
   };
   DEF.atr.fmt = 'price'; DEF.macd.fmt = 'price'; DEF.obv.fmt = 'vol';
   var ORDER_OVER = ['sma', 'ema', 'wma', 'hma', 'dema', 'tema', 'vwma', 'smma', 'alma', 'lsma', 'mgd', 'macross', 'ribbon', 'bb', 'env', 'dc', 'kc', 'ichi', 'alli', 'psar', 'st', 'vwap', 'piv', 'fract', 'zz'];
+  var ORDER_COM = ['sqz', 'wt', 'halft', 'ut', 'ce', 'ssl', 'alpha', 'qqe', 'nwe', 'vixfix', 'rf'];
+  var ORDER_CK = ['kpl'];
   var ORDER_PANE = ['vol', 'rsi', 'macd', 'stoch', 'srsi', 'cci', 'willr', 'mfi', 'mom', 'roc', 'ao', 'ac', 'uo', 'ppo', 'tsi', 'trix', 'cmo', 'crsi', 'fisher', 'rvgi', 'kst', 'copp', 'dpo',
     'adx', 'aroon', 'vortex', 'chop', 'mass', 'bbpow', 'bop', 'atr', 'adr', 'bbp', 'bbw', 'sd', 'hv', 'rvi', 'obv', 'adl', 'chosc', 'cmf', 'efi', 'eom', 'pvt', 'vo'];
 
@@ -608,7 +624,8 @@
   function int(x, d, lo, hi) { x = Math.round(+x); return isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d; }
   function num(x, d, lo, hi) { x = +x; return isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d; }
   /* clean user parameters (they come from storage and from shared links) */
-  var BND = { mult: [0.1, 20, 1], pct: [0.1, 100, 1], dev: [0.1, 100, 1], div: [1, 1e9, 1], offset: [0, 1, 1], sigma: [0.1, 50, 1], jawOff: [0, 100], teethOff: [0, 100], lipsOff: [0, 100], rank: [2, 500] };
+  var BND = { mult: [0.1, 20, 1], pct: [0.1, 100, 1], dev: [0.1, 100, 1], div: [1, 1e9, 1], offset: [0, 1, 1], sigma: [0.1, 50, 1], jawOff: [0, 100], teethOff: [0, 100], lipsOff: [0, 100], rank: [2, 500],
+    kcm: [0.1, 10, 1], chdev: [0.1, 10, 1], key: [0.1, 10, 1], coeff: [0.1, 10, 1], qqe: [0.1, 10, 1], bw: [1, 50, 1], ph: [0.5, 1, 1], amp: [1, 100], per: [2, 500] };
   function params(id, p) {
     var d = DEF[id] && DEF[id].p, o = {}; if (!d) return o; p = p || {};
     for (var k in d) {
@@ -618,9 +635,124 @@
     return o;
   }
   function aoOf(C) { var m = hl2(C.h, C.l); return map2(sma(m, 5), sma(m, 34), function (a, b) { return a - b; }); }
+
+  /* ---- community scripts */
+  function trail(dir, a, b) { var up = arr(dir.length), dn = arr(dir.length); for (var i = 0; i < dir.length; i++) { if (!ok(a[i])) continue; if (dir[i] > 0) up[i] = a[i]; else dn[i] = b ? b[i] : a[i]; } return { up: up, dn: dn }; }
+  function comm(id, C, q) {
+    var n = C.c.length, i;
+    switch (id) {
+      case 'sqz': {                                         /* Squeeze Momentum [LazyBear] */
+        var b = bb(C.c, q.len, q.mult), ma = sma(C.c, q.len), rg = sma(trueRange(C.h, C.l, C.c), q.len), hh = highest(C.h, q.len), ll = lowest(C.l, q.len);
+        var src = arr(n), on = arr(n), off = arr(n);
+        for (i = 0; i < n; i++) {
+          if (ok(hh[i]) && ok(ma[i])) src[i] = C.c[i] - ((hh[i] + ll[i]) / 2 + ma[i]) / 2;
+          if (ok(b.up[i]) && ok(rg[i])) { var sq = b.lo[i] > ma[i] - rg[i] * q.kcm && b.up[i] < ma[i] + rg[i] * q.kcm; if (sq) on[i] = 0; else off[i] = 0; }
+        }
+        return { v: linreg(src, q.len, 0), on: on, off: off };
+      }
+      case 'wt': {                                          /* WaveTrend Oscillator [LazyBear] */
+        var ap = arr(n); for (i = 0; i < n; i++) ap[i] = (C.h[i] + C.l[i] + C.c[i]) / 3;
+        var esa = ema(ap, q.n1), dd = ema(map2(ap, esa, function (a, e) { return Math.abs(a - e); }), q.n1);
+        var ci = arr(n); for (i = 0; i < n; i++) if (ok(esa[i]) && ok(dd[i]) && dd[i]) ci[i] = (ap[i] - esa[i]) / (0.015 * dd[i]);
+        var w1 = ema(ci, q.n2); return { wt1: w1, wt2: sma(w1, 4) };
+      }
+      case 'halft': {                                       /* HalfTrend [everget], MPL-2.0 */
+        var a2 = atr(C.h, C.l, C.c, 100), hp = highest(C.h, q.amp), lp = lowest(C.l, q.amp), hm = sma(C.h, q.amp), lm = sma(C.l, q.amp);
+        var trend = 0, next = 0, maxL = C.l[0], minH = C.h[0], up = arr(n), dn = arr(n), U = N, D = N, pT = N;
+        for (i = 1; i < n; i++) {
+          if (!ok(hp[i]) || !ok(hm[i])) continue;
+          if (next === 1) { maxL = Math.max(lp[i], maxL); if (hm[i] < maxL && C.c[i] < C.l[i - 1]) { trend = 1; next = 0; minH = hp[i]; } }
+          else { minH = Math.min(hp[i], minH); if (lm[i] > minH && C.c[i] > C.h[i - 1]) { trend = 0; next = 1; maxL = lp[i]; } }
+          var nu = N, nd = N;
+          if (trend === 0) { if (ok(pT) && pT !== 0) nu = ok(D) ? D : D; else nu = ok(U) ? Math.max(maxL, U) : maxL; }
+          else { if (pT !== 1) nd = ok(U) ? U : U; else nd = ok(D) ? Math.min(minH, D) : minH; }
+          if (trend === 0) { U = nu; up[i] = U; } else { D = nd; dn[i] = D; }
+          pT = trend;
+        }
+        return { up: up, dn: dn };
+      }
+      case 'ce': {                                          /* Chandelier Exit [everget], MPL-2.0 */
+        var at = atr(C.h, C.l, C.c, q.len), hc = highest(C.c, q.len), lc = lowest(C.c, q.len), L = N, S = N, dir = 1, dirs = arr(n), ls = arr(n), ss = arr(n);
+        for (i = 0; i < n; i++) {
+          if (!ok(at[i]) || !ok(hc[i])) continue;
+          var l0 = hc[i] - q.mult * at[i], s0 = lc[i] + q.mult * at[i], lp2 = ok(L) ? L : l0, sp2 = ok(S) ? S : s0;
+          L = i && C.c[i - 1] > lp2 ? Math.max(l0, lp2) : l0; S = i && C.c[i - 1] < sp2 ? Math.min(s0, sp2) : s0;
+          dir = C.c[i] > sp2 ? 1 : C.c[i] < lp2 ? -1 : dir; dirs[i] = dir; ls[i] = L; ss[i] = S;
+        }
+        var o = trail(dirs, ls, ss); return { long: o.up, short: o.dn };
+      }
+      case 'ut': {                                          /* UT Bot Alerts [QuantNomad] */
+        var at2 = atr(C.h, C.l, C.c, q.atr), ts = N, tsa = arr(n), d2 = arr(n);
+        for (i = 0; i < n; i++) {
+          if (!ok(at2[i])) continue; var x = C.c[i], loss = q.key * at2[i], px = i ? C.c[i - 1] : x;
+          if (!ok(ts)) ts = x - loss;
+          else if (x > ts && px > ts) ts = Math.max(ts, x - loss); else if (x < ts && px < ts) ts = Math.min(ts, x + loss); else ts = x > ts ? x - loss : x + loss;
+          tsa[i] = ts; d2[i] = x > ts ? 1 : -1;
+        }
+        var o2 = trail(d2, tsa); return { up: o2.up, dn: o2.dn };
+      }
+      case 'ssl': {                                         /* SSL Channel [ErwinBeckers] */
+        var sh = sma(C.h, q.len), sl = sma(C.l, q.len), hl = 0, u = arr(n), d3 = arr(n);
+        for (i = 0; i < n; i++) { if (!ok(sh[i])) continue; hl = C.c[i] > sh[i] ? 1 : C.c[i] < sl[i] ? -1 : hl; u[i] = hl < 0 ? sl[i] : sh[i]; d3[i] = hl < 0 ? sh[i] : sl[i]; }
+        return { up: u, dn: d3 };
+      }
+      case 'alpha': {                                       /* AlphaTrend [KivancOzbilgic], MPL-2.0 */
+        var at3 = sma(trueRange(C.h, C.l, C.c), q.len), hasV = C.v.some(function (v) { return v > 0; }), osc = hasV ? mfi(C.h, C.l, C.c, C.v, q.len) : rsi(C.c, q.len), A = N, out = arr(n);
+        for (i = 0; i < n; i++) {
+          if (!ok(at3[i]) || !ok(osc[i])) continue; var upT = C.l[i] - at3[i] * q.coeff, dnT = C.h[i] + at3[i] * q.coeff;
+          A = osc[i] >= 50 ? (ok(A) && upT < A ? A : upT) : (ok(A) && dnT > A ? A : dnT); out[i] = A;
+        }
+        return { at: out, lag: back(out, 2) };
+      }
+      case 'qqe': {                                         /* QQE (the core of QQE MOD [Mihkel00]) */
+        var R = rsi(C.c, q.rsi), RM = ema(R, q.sf), wl = q.rsi * 2 - 1, ar = arr(n);
+        for (i = 1; i < n; i++) if (ok(RM[i]) && ok(RM[i - 1])) ar[i] = Math.abs(RM[i - 1] - RM[i]);
+        var dar = ema(ema(ar, wl), wl), lb = N, sb = N, tr2 = 1, tl = arr(n), hv = arr(n);
+        for (i = 1; i < n; i++) {
+          if (!ok(RM[i]) || !ok(dar[i])) continue; var dv2 = dar[i] * q.qqe, nl = RM[i] - dv2, ns = RM[i] + dv2, plb = lb, psb = sb;
+          lb = ok(plb) && RM[i - 1] > plb && RM[i] > plb ? Math.max(plb, nl) : nl;
+          sb = ok(psb) && RM[i - 1] < psb && RM[i] < psb ? Math.min(psb, ns) : ns;
+          if (ok(psb) && RM[i - 1] <= psb && RM[i] > psb) tr2 = 1; else if (ok(plb) && RM[i - 1] >= plb && RM[i] < plb) tr2 = -1;
+          tl[i] = (tr2 === 1 ? lb : sb) - 50; hv[i] = RM[i] - 50;
+        }
+        return { v: hv, tl: tl };
+      }
+      case 'nwe': {                                         /* Nadaraya-Watson Envelope [LuxAlgo], CC BY-NC-SA 4.0 — the non-repainting (end-point) form */
+        var W = Math.min(499, n - 1), wt = []; for (var k = 0; k <= W; k++) wt.push(Math.exp(-(k * k) / (2 * q.bw * q.bw)));
+        var mid = arr(n), err = arr(n);
+        for (i = 0; i < n; i++) { var sw = 0, sv = 0; for (k = 0; k <= W && k <= i; k++) { sv += C.c[i - k] * wt[k]; sw += wt[k]; } mid[i] = sv / sw; err[i] = Math.abs(C.c[i] - mid[i]); }
+        var mae = sma(err, Math.max(2, W)), up2 = arr(n), lo2 = arr(n);
+        for (i = 0; i < n; i++) if (ok(mae[i])) { up2[i] = mid[i] + mae[i] * q.mult; lo2[i] = mid[i] - mae[i] * q.mult; }
+        return { up: up2, mid: mid, lo: lo2 };
+      }
+      case 'vixfix': {                                      /* CM Williams Vix Fix [ChrisMoody] */
+        var hc2 = highest(C.c, q.pd), wv = arr(n); for (i = 0; i < n; i++) if (ok(hc2[i]) && hc2[i]) wv[i] = (hc2[i] - C.l[i]) / hc2[i] * 100;
+        var md = sma(wv, q.bbl), sd2 = stdev(wv, q.bbl), hw = highest(wv, q.lb), ub = arr(n), rh = arr(n);
+        for (i = 0; i < n; i++) { if (ok(md[i]) && ok(sd2[i])) ub[i] = md[i] + q.mult * sd2[i]; if (ok(hw[i])) rh[i] = hw[i] * q.ph; }
+        return { v: wv, ub: ub, rh: rh };
+      }
+      case 'rf': {                                          /* Range Filter [DonovanWall] */
+        var ad = arr(n); for (i = 1; i < n; i++) ad[i] = Math.abs(C.c[i] - C.c[i - 1]);
+        var sr = ema(ema(ad, q.per), q.per * 2 - 1), F = N, dir4 = 0, ua = arr(n), da = arr(n), hi4 = arr(n), lo4 = arr(n);
+        for (i = 0; i < n; i++) {
+          if (!ok(sr[i])) continue; var r4 = sr[i] * q.mult, x4 = C.c[i], pf = ok(F) ? F : x4;
+          F = x4 > pf ? (x4 - r4 < pf ? pf : x4 - r4) : (x4 + r4 > pf ? pf : x4 + r4);
+          dir4 = F > pf ? 1 : F < pf ? -1 : dir4; if (dir4 >= 0) ua[i] = F; else da[i] = F; hi4[i] = F + r4; lo4[i] = F - r4;
+        }
+        return { up: ua, dn: da, hi: hi4, lo: lo4 };
+      }
+      case 'kpl': {                                         /* Kurdistani Bitcoin Power Law [Coin_Kurd], open source */
+        var G = Date.UTC(2009, 0, 3) / 1000, f = arr(n), u5 = arr(n), l5 = arr(n), b5 = arr(n);
+        for (i = 0; i < n; i++) { var dd5 = (C.t[i] - G) / 86400; if (dd5 <= 0) continue; var fv = 8.31e-17 * Math.pow(dd5, 5.48); f[i] = fv; u5[i] = fv * 1.1; l5[i] = fv * 0.9; b5[i] = fv * 0.9 * 0.82; }
+        return { fair: f, up: u5, lo: l5, buy: b5 };
+      }
+    }
+    return null;
+  }
   /* compute → { key: array } aligned with bars */
   function compute(id, bars, p) {
     var C = cols(bars), q = params(id, p), r;
+    if (ORDER_COM.indexOf(id) >= 0 || ORDER_CK.indexOf(id) >= 0) return comm(id, C, q) || {};
     switch (id) {
       case 'vol': return { vol: C.v, ma: sma(C.v, q.ma) };
       case 'sma': return { v: sma(C.c, q.len) };
@@ -722,7 +854,7 @@
     }
     return {};
   }
-  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
+  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
   root.PRO = root.PRO || {}; root.PRO.ind = M;
   if (typeof module !== 'undefined' && module.exports) module.exports = M;
 })(typeof window !== 'undefined' ? window : globalThis);
