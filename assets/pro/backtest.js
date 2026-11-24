@@ -337,7 +337,10 @@
     for (var i = 1; i < a.length; i++) { if (!ok(a[i]) || !ok(b[i]) || !ok(a[i - 1]) || !ok(b[i - 1])) continue; if (a[i - 1] <= b[i - 1] && a[i] > b[i]) o[i] = 1; else if (a[i - 1] >= b[i - 1] && a[i] < b[i]) o[i] = -1; }
     return o;
   }
-  var FLOAT = { mult: 1, start: 1, inc: 1, max: 1 };
+  function flip(up, dn) {                                    /* a trailing line that jumps under the price is a long, over it a short */
+    var o = zeros(up.length); for (var i = 1; i < up.length; i++) { if (ok(up[i]) && !ok(up[i - 1]) && ok(dn[i - 1])) o[i] = 1; else if (ok(dn[i]) && !ok(dn[i - 1]) && ok(up[i - 1])) o[i] = -1; } return o;
+  }
+  var FLOAT = { mult: 1, start: 1, inc: 1, max: 1, key: 1, coeff: 1, chdev: 1, qqe: 1, kcm: 1, bw: 1 };
   /* sig(bars, params, ctx) → signals at each bar's close: 1 long, −1 short; or { e: those, x: exits } (x: 1 leaves a long, −1 a short) */
   var STRATS = {
     macross: { p: { fast: 9, slow: 21 }, sig: function (C, q) { return cross(ind('ema', C, { len: q.fast }).v, ind('ema', C, { len: q.slow }).v); } },
@@ -377,6 +380,31 @@
         if (ok(loX[i - 1]) && c < loX[i - 1]) x[i] = 1; else if (ok(hiX[i - 1]) && c > hiX[i - 1]) x[i] = -1;
       }
       return { e: e, x: x };
+    } },
+    /* the community's favourites as strategies: the indicator's own flip or cross is the signal */
+    ut: { p: { key: 1, atr: 10 }, sig: function (C, q) { var r = ind('ut', C, q); return flip(r.up, r.dn); } },
+    halft: { p: { amp: 2, chdev: 2 }, sig: function (C, q) { var r = ind('halft', C, q); return flip(r.up, r.dn); } },
+    ce: { p: { len: 22, mult: 3 }, sig: function (C, q) { var r = ind('ce', C, q); return flip(r.long, r.short); } },
+    rf: { p: { per: 100, mult: 3 }, sig: function (C, q) { var r = ind('rf', C, q); return flip(r.up, r.dn); } },
+    hull: { p: { len: 55 }, sig: function (C, q) { var r = ind('hull', C, q); return flip(r.up, r.dn); } },
+    atrts: { p: { len: 14, mult: 3 }, sig: function (C, q) { var r = ind('atrts', C, q); return flip(r.up, r.dn); } },
+    ssl: { p: { len: 10 }, sig: function (C, q) { var r = ind('ssl', C, q); return cross(r.up, r.dn); } },
+    alpha: { p: { coeff: 1, len: 14 }, sig: function (C, q) { var r = ind('alpha', C, q); return cross(r.at, r.lag); } },
+    wt: { p: { n1: 10, n2: 21 }, sig: function (C, q) { var r = ind('wt', C, q); return cross(r.wt1, r.wt2); } },
+    sqz: { p: { len: 20, mult: 2, kcm: 1.5 }, sig: function (C, q) { var r = ind('sqz', C, q); return cross(r.v, zeros(C.length)); } },
+    qqe: { p: { rsi: 6, sf: 5, qqe: 3 }, sig: function (C, q) { var r = ind('qqe', C, q); return cross(r.v, r.tl); } },
+    ichi: { p: { conv: 9, base: 26 }, sig: function (C, q) { var r = ind('ichi', C, { conv: q.conv, base: q.base }); return cross(r.conv, r.base); } },
+    srsi: { p: { rsi: 14, len: 14, k: 3, d: 3 }, sig: function (C, q) { var r = ind('srsi', C, q); return cross(r.k, r.d); } },
+    adx: { p: { len: 14 }, sig: function (C, q) { var r = ind('adx', C, { len: q.len, smooth: q.len }); return cross(r.pdi, r.mdi); } },
+    stc: { p: { len: 10, fast: 23, slow: 50 }, sig: function (C, q) {
+      var v = ind('stc', C, q).v, o = zeros(C.length); for (var i = 1; i < C.length; i++) { if (!ok(v[i]) || !ok(v[i - 1])) continue; if (v[i - 1] < 25 && v[i] >= 25) o[i] = 1; else if (v[i - 1] > 75 && v[i] <= 75) o[i] = -1; } return o;
+    } },
+    tdi: { p: { rsi: 13, band: 34, fast: 2, slow: 7 }, sig: function (C, q) { var r = ind('tdi', C, q); return cross(r.fast, r.slow); } },
+    kdj: { p: { len: 9, k: 3, d: 3 }, sig: function (C, q) { var r = ind('kdj', C, q); return cross(r.k, r.d); } },
+    nwe: { p: { bw: 8, mult: 3 }, sig: function (C, q) {
+      var b = ind('nwe', C, q), o = zeros(C.length);
+      for (var i = 1; i < C.length; i++) { if (!ok(b.lo[i]) || !ok(b.lo[i - 1])) continue; var c = C[i].c, c0 = C[i - 1].c; if (c0 < b.lo[i - 1] && c >= b.lo[i]) o[i] = 1; else if (c0 > b.up[i - 1] && c <= b.up[i]) o[i] = -1; }
+      return o;
     } },
     ek: { p: {}, btc: true, sig: function (C, q, ctx) {                       /* the published Kurdistani signals, acted on once their daily bar has closed */
       var o = zeros(C.length), S = ctx && ctx.sigs || [];
@@ -486,6 +514,7 @@
     sel.previousElementSibling.textContent = T('strategy'); lenSel.previousElementSibling.textContent = T('btHist'); rank.previousElementSibling.textContent = T('btRankBy');
     ids.forEach(function (k) { sel.appendChild(new Option(T('sg_' + k), k)); });
     if (ids.indexOf(last.id) >= 0) sel.value = last.id;
+    if (preset && ids.indexOf(preset.id) >= 0) sel.value = preset.id;
     LENS.forEach(function (n) { if (n && n <= have) return; lenSel.appendChild(new Option(n ? T('btHistN', { n: A.loc(n) }) : T('btHistChart', { n: A.loc(have) }), String(n))); });
     if (last.len && $('option[value="' + last.len + '"]', lenSel)) lenSel.value = String(last.len);
     ['net', 'pf', 'sharpe', 'win', 'dd'].forEach(function (k) { rank.appendChild(new Option(T('rk_' + k), k)); }); if (METRIC[last.rank]) rank.value = last.rank;
@@ -509,7 +538,7 @@
         row.setAttribute('data-k', k); box.appendChild(row);
       });
       if (!ks.length) { var p = h('<p class="pm-note"></p>'); p.textContent = T('btNoParams'); box.appendChild(p); }
-      var dsc = h('<p class="pm-note"></p>'); dsc.textContent = T('sgd_' + id); box.appendChild(dsc);
+      var dsc = h('<p class="pm-note"></p>'); var dt = T('sgd_' + id); if (dt === 'sgd_' + id) dt = T('ind_' + id); dsc.textContent = dt === 'ind_' + id ? '' : dt; box.appendChild(dsc);
       $('.pm-btrank', f).hidden = mode !== 'opt'; count();
       $$('[data-m]', f).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-m') === mode); });
       $('[type="submit"]', f).textContent = T({ opt: 'optRun', run: 'runTest' }[mode]);

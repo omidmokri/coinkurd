@@ -606,12 +606,31 @@
     nwe: { p: { bw: 8, mult: 3 }, plots: [['up', 'line', '#ff5a4d'], ['mid', 'line', 'rgba(156,163,175,.6)'], ['lo', 'line', '#34d399']], band: ['up', 'lo', 'rgba(156,163,175,.05)'] },
     vixfix: { pane: true, p: { pd: 22, bbl: 20, mult: 2, lb: 50, ph: 0.85 }, plots: [['v', 'hist', ''], ['ub', 'line', '#60a5fa'], ['rh', 'line', '#f59e0b']] },
     rf: { p: { per: 100, mult: 3 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d'], ['hi', 'line', 'rgba(52,211,153,.35)'], ['lo', 'line', 'rgba(255,90,77,.35)']] },
+    hull: { p: { len: 55 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d']] },
+    zlsma: { p: { len: 32 }, plots: [['v', 'line', '#facc15']] },
+    tdi: { pane: true, p: { rsi: 13, band: 34, fast: 2, slow: 7 }, plots: [['fast', 'line', '#34d399'], ['slow', 'line', '#ff5a4d'], ['up', 'line', '#60a5fa'], ['mid', 'line', '#facc15'], ['lo', 'line', '#60a5fa']], levels: [68, 50, 32], range: [0, 100] },
+    stc: { pane: true, p: { len: 10, fast: 23, slow: 50 }, plots: [['v', 'line', '#e879f9']], levels: [75, 25], range: [0, 100] },
+    kdj: { pane: true, p: { len: 9, k: 3, d: 3 }, plots: [['k', 'line', '#38bdf8'], ['d', 'line', '#fb923c'], ['j', 'line', '#e879f9']], levels: [80, 20] },
+    smi: { pane: true, p: { len: 10, k: 3, d: 3 }, plots: [['smi', 'line', '#38bdf8'], ['sig', 'line', '#fb923c']], levels: [40, 0, -40] },
+    vwapb: { p: { mult: 2 }, plots: [['up2', 'line', 'rgba(255,90,77,.7)'], ['up', 'line', 'rgba(255,90,77,.45)'], ['v', 'line', '#e879f9'], ['lo', 'line', 'rgba(52,211,153,.45)'], ['lo2', 'line', 'rgba(52,211,153,.7)']], band: ['up2', 'lo2', 'rgba(232,121,249,.04)'] },
+    emacloud: { p: { fast: 8, slow: 21, fast2: 34, slow2: 50 }, plots: [['a', 'line', '#34d399'], ['b', 'line', '#34d399'], ['c', 'line', '#60a5fa'], ['d', 'line', '#60a5fa']], band: ['a', 'b', 'rgba(52,211,153,.14)'] },
+    gmma: { p: {}, plots: [3, 5, 8, 10, 12, 15].map(function (n) { return ['s' + n, 'line', 'rgba(56,189,248,.8)']; }).concat([30, 35, 40, 45, 50, 60].map(function (n) { return ['l' + n, 'line', 'rgba(255,90,77,.8)']; })) },
+    srlux: { p: { left: 15, right: 15 }, breaks: true, plots: [['res', 'line', '#ff5a4d'], ['sup', 'line', '#34d399']] },
+    atrts: { p: { len: 14, mult: 3 }, plots: [['up', 'line', '#34d399'], ['dn', 'line', '#ff5a4d']] },
+    /* profiles (painted by the drawing layer) and candlestick patterns (markers on the bars) */
+    vpvr: { p: { rows: 40 }, plots: [], prof: 'vis' },
+    vpsess: { p: { rows: 20 }, plots: [], prof: 'sess' },
+    cp_all: { p: {}, plots: [], marks: 1 }, cp_engulf: { p: {}, plots: [], marks: 1 }, cp_hammer: { p: {}, plots: [], marks: 1 }, cp_star: { p: {}, plots: [], marks: 1 },
+    cp_doji: { p: {}, plots: [], marks: 1 }, cp_mstar: { p: {}, plots: [], marks: 1 }, cp_soldiers: { p: {}, plots: [], marks: 1 }, cp_harami: { p: {}, plots: [], marks: 1 },
+    cp_pierce: { p: {}, plots: [], marks: 1 }, cp_maru: { p: {}, plots: [], marks: 1 }, cp_tweezer: { p: {}, plots: [], marks: 1 }, cp_inside: { p: {}, plots: [], marks: 1 },
     /* Coin_Kurd's own open-source script (TradingView umPv6JPM): fair value = 8.31e-17 · days-since-genesis^5.48, ±10 %, buy zone 18 % under the lower band */
     kpl: { p: {}, plots: [['up', 'line', 'rgba(255,90,77,.8)'], ['fair', 'line', '#facc15'], ['lo', 'line', 'rgba(52,211,153,.8)'], ['buy', 'line', '#22d3ee']], band: ['lo', 'buy', 'rgba(34,211,238,.07)'] }
   };
   DEF.atr.fmt = 'price'; DEF.macd.fmt = 'price'; DEF.obv.fmt = 'vol';
   var ORDER_OVER = ['sma', 'ema', 'wma', 'hma', 'dema', 'tema', 'vwma', 'smma', 'alma', 'lsma', 'mgd', 'macross', 'ribbon', 'bb', 'env', 'dc', 'kc', 'ichi', 'alli', 'psar', 'st', 'vwap', 'piv', 'fract', 'zz'];
-  var ORDER_COM = ['sqz', 'wt', 'halft', 'ut', 'ce', 'ssl', 'alpha', 'qqe', 'nwe', 'vixfix', 'rf'];
+  var ORDER_COM = ['sqz', 'wt', 'halft', 'ut', 'ce', 'ssl', 'alpha', 'qqe', 'nwe', 'vixfix', 'rf', 'hull', 'zlsma', 'tdi', 'stc', 'kdj', 'smi', 'vwapb', 'emacloud', 'gmma', 'srlux', 'atrts'];
+  var ORDER_PROF = ['vpvr', 'vpsess'];
+  var ORDER_PAT = ['cp_all', 'cp_engulf', 'cp_hammer', 'cp_star', 'cp_doji', 'cp_mstar', 'cp_soldiers', 'cp_harami', 'cp_pierce', 'cp_maru', 'cp_tweezer', 'cp_inside'];
   var ORDER_CK = ['kpl'];
   var ORDER_PANE = ['vol', 'rsi', 'macd', 'stoch', 'srsi', 'cci', 'willr', 'mfi', 'mom', 'roc', 'ao', 'ac', 'uo', 'ppo', 'tsi', 'trix', 'cmo', 'crsi', 'fisher', 'rvgi', 'kst', 'copp', 'dpo',
     'adx', 'aroon', 'vortex', 'chop', 'mass', 'bbpow', 'bop', 'atr', 'adr', 'bbp', 'bbw', 'sd', 'hv', 'rvi', 'obv', 'adl', 'chosc', 'cmf', 'efi', 'eom', 'pvt', 'vo'];
@@ -625,7 +644,7 @@
   function num(x, d, lo, hi) { x = +x; return isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d; }
   /* clean user parameters (they come from storage and from shared links) */
   var BND = { mult: [0.1, 20, 1], pct: [0.1, 100, 1], dev: [0.1, 100, 1], div: [1, 1e9, 1], offset: [0, 1, 1], sigma: [0.1, 50, 1], jawOff: [0, 100], teethOff: [0, 100], lipsOff: [0, 100], rank: [2, 500],
-    kcm: [0.1, 10, 1], chdev: [0.1, 10, 1], key: [0.1, 10, 1], coeff: [0.1, 10, 1], qqe: [0.1, 10, 1], bw: [1, 50, 1], ph: [0.5, 1, 1], amp: [1, 100], per: [2, 500] };
+    kcm: [0.1, 10, 1], chdev: [0.1, 10, 1], key: [0.1, 10, 1], coeff: [0.1, 10, 1], qqe: [0.1, 10, 1], bw: [1, 50, 1], ph: [0.5, 1, 1], amp: [1, 100], per: [2, 500], rows: [6, 120], left: [2, 60], right: [1, 60] };
   function params(id, p) {
     var d = DEF[id] && DEF[id].p, o = {}; if (!d) return o; p = p || {};
     for (var k in d) {
@@ -741,6 +760,42 @@
         }
         return { up: ua, dn: da, hi: hi4, lo: lo4 };
       }
+      case 'hull': { var hv2 = hma(C.c, q.len), d6 = arr(n); for (i = 2; i < n; i++) if (ok(hv2[i]) && ok(hv2[i - 2])) d6[i] = hv2[i] > hv2[i - 2] ? 1 : -1; var o6 = trail(d6, hv2); return { up: o6.up, dn: o6.dn }; }   /* Hull Suite [InSilico] */
+      case 'zlsma': { var l1 = linreg(C.c, q.len, 0), l2 = linreg(l1, q.len, 0); return { v: map2(l1, l2, function (a, b) { return a + (a - b); }) }; }   /* ZLSMA [veryfid] */
+      case 'tdi': { var rr = rsi(C.c, q.rsi), mb = sma(rr, q.band), sdv = stdev(rr, q.band); return { fast: sma(rr, q.fast), slow: sma(rr, q.slow), mid: mb, up: map2(mb, sdv, function (a, b) { return a + 1.6185 * b; }), lo: map2(mb, sdv, function (a, b) { return a - 1.6185 * b; }) }; }   /* Traders Dynamic Index */
+      case 'stc': {                                         /* Schaff Trend Cycle */
+        var m7 = map2(ema(C.c, q.fast), ema(C.c, q.slow), function (a, b) { return a - b; }), f1 = N, pf2 = N, out7 = arr(n), k1 = arr(n), lo7 = lowest(m7, q.len), hi7 = highest(m7, q.len);
+        for (i = 0; i < n; i++) { if (!ok(lo7[i])) continue; var rg7 = hi7[i] - lo7[i], st7 = rg7 > 0 ? (m7[i] - lo7[i]) / rg7 * 100 : (ok(f1) ? f1 : 0); f1 = ok(f1) ? f1 + 0.5 * (st7 - f1) : st7; k1[i] = f1; }
+        var lo8 = lowest(k1, q.len), hi8 = highest(k1, q.len);
+        for (i = 0; i < n; i++) { if (!ok(lo8[i])) continue; var rg8 = hi8[i] - lo8[i], st8 = rg8 > 0 ? (k1[i] - lo8[i]) / rg8 * 100 : (ok(pf2) ? pf2 : 0); pf2 = ok(pf2) ? pf2 + 0.5 * (st8 - pf2) : st8; out7[i] = pf2; }
+        return { v: out7 };
+      }
+      case 'kdj': { var hh9 = highest(C.h, q.len), ll9 = lowest(C.l, q.len), rsv = arr(n); for (i = 0; i < n; i++) if (ok(hh9[i]) && hh9[i] > ll9[i]) rsv[i] = (C.c[i] - ll9[i]) / (hh9[i] - ll9[i]) * 100; var K = rma(rsv, q.k), Dd = rma(K, q.d); return { k: K, d: Dd, j: map2(K, Dd, function (a, b) { return 3 * a - 2 * b; }) }; }
+      case 'smi': {                                         /* Stochastic Momentum Index */
+        var hh0 = highest(C.h, q.len), ll0 = lowest(C.l, q.len), rel = arr(n), rng0 = arr(n); for (i = 0; i < n; i++) if (ok(hh0[i])) { rel[i] = C.c[i] - (hh0[i] + ll0[i]) / 2; rng0[i] = hh0[i] - ll0[i]; }
+        var a0 = ema(ema(rel, q.k), q.k), b0 = ema(ema(rng0, q.k), q.k), sm = map2(a0, b0, function (x, y) { return y ? 200 * x / y : N; }); return { smi: sm, sig: ema(sm, q.d) };
+      }
+      case 'vwapb': {                                       /* VWAP with standard-deviation bands (daily anchor) */
+        var vw = arr(n), u1 = arr(n), u2b = arr(n), d1 = arr(n), d2b = arr(n), pv = 0, vv = 0, p2 = 0, day = -1;
+        for (i = 0; i < n; i++) { var dy = Math.floor(C.t[i] / 86400); if (dy !== day) { day = dy; pv = 0; vv = 0; p2 = 0; } var tp = (C.h[i] + C.l[i] + C.c[i]) / 3, v0 = C.v[i] || 1e-9; pv += tp * v0; vv += v0; p2 += tp * tp * v0; var w0 = pv / vv, sg = Math.sqrt(Math.max(0, p2 / vv - w0 * w0)); vw[i] = w0; u1[i] = w0 + sg; d1[i] = w0 - sg; u2b[i] = w0 + q.mult * sg; d2b[i] = w0 - q.mult * sg; }
+        return { v: vw, up: u1, lo: d1, up2: u2b, lo2: d2b };
+      }
+      case 'emacloud': return { a: ema(C.c, q.fast), b: ema(C.c, q.slow), c: ema(C.c, q.fast2), d: ema(C.c, q.slow2) };   /* EMA clouds [Ripster47] */
+      case 'gmma': { var g = {}; [3, 5, 8, 10, 12, 15].forEach(function (k2) { g['s' + k2] = ema(C.c, k2); }); [30, 35, 40, 45, 50, 60].forEach(function (k2) { g['l' + k2] = ema(C.c, k2); }); return g; }
+      case 'srlux': {                                       /* Support and Resistance Levels with Breaks [LuxAlgo], CC BY-NC-SA 4.0 */
+        var res = arr(n), sup = arr(n), R0 = N, S0 = N;
+        for (i = 0; i < n; i++) {
+          var c0 = i - q.right;
+          if (c0 - q.left >= 0) { var isH = true, isL = true; for (var j = c0 - q.left; j <= i; j++) { if (C.h[j] > C.h[c0]) isH = false; if (C.l[j] < C.l[c0]) isL = false; } if (isH) R0 = C.h[c0]; if (isL) S0 = C.l[c0]; }
+          res[i] = R0; sup[i] = S0;
+        }
+        return { res: res, sup: sup };
+      }
+      case 'atrts': {                                       /* ATR trailing stops */
+        var at9 = atr(C.h, C.l, C.c, q.len), T9 = N, dr = 1, ta = arr(n), da9 = arr(n);
+        for (i = 0; i < n; i++) { if (!ok(at9[i])) continue; var ls9 = q.mult * at9[i]; if (!ok(T9)) T9 = C.c[i] - ls9; else if (dr > 0) { if (C.c[i] < T9) { dr = -1; T9 = C.c[i] + ls9; } else T9 = Math.max(T9, C.c[i] - ls9); } else { if (C.c[i] > T9) { dr = 1; T9 = C.c[i] - ls9; } else T9 = Math.min(T9, C.c[i] + ls9); } ta[i] = T9; da9[i] = dr; }
+        var o9 = trail(da9, ta); return { up: o9.up, dn: o9.dn };
+      }
       case 'kpl': {                                         /* Kurdistani Bitcoin Power Law [Coin_Kurd], open source */
         var G = Date.UTC(2009, 0, 3) / 1000, f = arr(n), u5 = arr(n), l5 = arr(n), b5 = arr(n);
         for (i = 0; i < n; i++) { var dd5 = (C.t[i] - G) / 86400; if (dd5 <= 0) continue; var fv = 8.31e-17 * Math.pow(dd5, 5.48); f[i] = fv; u5[i] = fv * 1.1; l5[i] = fv * 0.9; b5[i] = fv * 0.9 * 0.82; }
@@ -748,6 +803,38 @@
       }
     }
     return null;
+  }
+  /* candlestick patterns → [{ i, d: 1 bullish | −1 bearish | 0 neutral, c: short code }] */
+  function candles(bars, which) {
+    var out = [], n = bars.length, want = function (k) { return which === 'cp_all' || which === 'cp_' + k; }, avg = 0;
+    function body(b) { return Math.abs(b.c - b.o); } function up(b) { return b.c > b.o; } function dn(b) { return b.c < b.o; }
+    for (var i = 0; i < n; i++) {
+      var b = bars[i], a = bars[i - 1], z = bars[i - 2], rg = b.h - b.l, bd = body(b), top = b.h - Math.max(b.o, b.c), bot = Math.min(b.o, b.c) - b.l;
+      avg = i ? avg + (bd - avg) / Math.min(i + 1, 14) : bd;
+      if (i < 15 || rg <= 0) continue;
+      var trendUp = bars[i - 1].c > bars[i - 6].c, trendDn = bars[i - 1].c < bars[i - 6].c, hit = null;
+      if (want('mstar') && z && dn(z) && body(z) > avg && body(a) < body(z) * 0.4 && up(b) && b.c > (z.o + z.c) / 2 && Math.max(a.o, a.c) < z.c) hit = [1, 'MS'];
+      else if (want('mstar') && z && up(z) && body(z) > avg && body(a) < body(z) * 0.4 && dn(b) && b.c < (z.o + z.c) / 2 && Math.min(a.o, a.c) > z.c) hit = [-1, 'ES'];
+      else if (want('soldiers') && z && up(z) && up(a) && up(b) && a.c > z.c && b.c > a.c && a.o > z.o && b.o > a.o && body(z) > avg * 0.8 && body(a) > avg * 0.8 && bd > avg * 0.8) hit = [1, '3W'];
+      else if (want('soldiers') && z && dn(z) && dn(a) && dn(b) && a.c < z.c && b.c < a.c && a.o < z.o && b.o < a.o && body(z) > avg * 0.8 && body(a) > avg * 0.8 && bd > avg * 0.8) hit = [-1, '3B'];
+      else if (want('engulf') && a && dn(a) && up(b) && b.c >= a.o && b.o <= a.c && bd > body(a) && trendDn) hit = [1, 'BE'];
+      else if (want('engulf') && a && up(a) && dn(b) && b.o >= a.c && b.c <= a.o && bd > body(a) && trendUp) hit = [-1, 'SE'];
+      else if (want('pierce') && a && dn(a) && up(b) && body(a) > avg && b.o < a.l && b.c > (a.o + a.c) / 2 && b.c < a.o) hit = [1, 'PL'];
+      else if (want('pierce') && a && up(a) && dn(b) && body(a) > avg && b.o > a.h && b.c < (a.o + a.c) / 2 && b.c > a.o) hit = [-1, 'DC'];
+      else if (want('harami') && a && dn(a) && up(b) && body(a) > avg && b.c < a.o && b.o > a.c && bd < body(a) * 0.6) hit = [1, 'H+'];
+      else if (want('harami') && a && up(a) && dn(b) && body(a) > avg && b.o < a.c && b.c > a.o && bd < body(a) * 0.6) hit = [-1, 'H-'];
+      else if (want('tweezer') && a && trendDn && dn(a) && up(b) && Math.abs(a.l - b.l) <= rg * 0.03) hit = [1, 'TB'];
+      else if (want('tweezer') && a && trendUp && up(a) && dn(b) && Math.abs(a.h - b.h) <= rg * 0.03) hit = [-1, 'TT'];
+      else if (want('hammer') && bot >= bd * 2 && top <= bd * 0.4 && bd > rg * 0.05 && trendDn) hit = [1, 'H'];
+      else if (want('hammer') && bot >= bd * 2 && top <= bd * 0.4 && bd > rg * 0.05 && trendUp) hit = [-1, 'HM'];
+      else if (want('star') && top >= bd * 2 && bot <= bd * 0.4 && bd > rg * 0.05 && trendUp) hit = [-1, 'SS'];
+      else if (want('star') && top >= bd * 2 && bot <= bd * 0.4 && bd > rg * 0.05 && trendDn) hit = [1, 'IH'];
+      else if (want('maru') && bd >= rg * 0.95 && bd > avg * 1.3) hit = [up(b) ? 1 : -1, 'M'];
+      else if (want('doji') && bd <= rg * 0.05) hit = [0, 'D'];
+      else if (want('inside') && a && b.h < a.h && b.l > a.l && which !== 'cp_all') hit = [0, 'IB'];
+      if (hit) out.push({ i: i, d: hit[0], c: hit[1] });
+    }
+    return out;
   }
   /* compute → { key: array } aligned with bars */
   function compute(id, bars, p) {
@@ -854,7 +941,7 @@
     }
     return {};
   }
-  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
+  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
   root.PRO = root.PRO || {}; root.PRO.ind = M;
   if (typeof module !== 'undefined' && module.exports) module.exports = M;
 })(typeof window !== 'undefined' ? window : globalThis);

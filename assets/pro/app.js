@@ -170,7 +170,7 @@
   function homeSym() { var q = P.fx ? P.fx.cur() : 'IRT'; return q === 'IRT' || q === 'USD' ? 'BTC' : 'BTC_' + q; }
   function defaults() {
     return { v: 1, layout: '1', active: 0, sync: { sym: false, tf: false, cross: true, time: false, ind: false }, charts: [newChart(homeSym())],
-      tz: 'local', cal: 'greg', side: innerWidth >= 900 ? 'watch' : null, fav: ['1s', '5s', '15s', '1m', '5m', '15m', '1h', '4h', '1d', '1w'],
+      tz: 'local', cal: 'greg', side: null, fav: ['1s', '5s', '15s', '1m', '5m', '15m', '1h', '4h', '1d', '1w'],
       ev: { on: 1, imp: ['H', 'M'], cur: [] }, keep: 0, magnet: 0, sound: 1, saver: null, name: '' };
   }
   function tpSane(t) {                              /* box size (0 = automatic ATR 14), reversal boxes, lines */
@@ -195,7 +195,7 @@
     o.active = Math.max(0, Math.min(o.charts.length - 1, s.active | 0));
     if (typeof s.tz === 'string' && s.tz.length < 40) o.tz = s.tz;
     if (s.cal === 'jalali') o.cal = 'jalali';
-    if (s.side === null || ['watch', 'alerts', 'cal', 'obj', 'help'].indexOf(s.side) >= 0) o.side = s.side;
+    /* the side panel always starts folded, so the chart opens at full width */
     if (Array.isArray(s.fav)) { var f = s.fav.filter(function (x) { return P.parseTF(x); }).slice(0, 14); if (f.length) o.fav = f; }
     if (s.ev && typeof s.ev === 'object') { o.ev.on = s.ev.on ? 1 : 0; if (Array.isArray(s.ev.imp)) o.ev.imp = s.ev.imp.filter(function (x) { return /^[HMLX]$/.test(x); }); if (Array.isArray(s.ev.cur)) o.ev.cur = s.ev.cur.filter(function (x) { return /^[A-Z]{3}$/.test(x); }); }
     ['keep', 'sound'].forEach(function (k) { if (k in s) o[k] = s[k] ? 1 : 0; });
@@ -452,7 +452,7 @@
       list: function (sym) { return DRAW[sym]; }, changed: drawChanged, fmt: function (p) { return self.fmt(p); }, T: T, touch: function () { return matchMedia('(pointer: coarse)').matches; },
       selected: function (dd) { emit('drawsel', self, dd); }, editText: editText, styleFor: function () { return lastStyle; }, blocked: function () { return !!self.picking; },
       settings: function (dd) { drawSettings(self, dd); }, erase: function (id) { removeDrawing(self, id); }, zoom: function (dd) { zoomTo(self, dd); },
-      toolDone: function () { if (curTool) setTool(null); }, emoji: function () { return st.emoji || EMOJI[0]; } });
+      toolDone: function () { if (curTool) setTool(null); }, profiles: function () { return self.cfg.inds.filter(function (x) { return I.DEF[x.id] && I.DEF[x.id].prof && !x.off; }).map(function (x) { return { mode: I.DEF[x.id].prof, rows: x.p.rows }; }); }, emoji: function () { return st.emoji || EMOJI[0]; } });
     this.drawer.keep = !!st.keep; this.drawer.magnet = st.magnet | 0; this.drawer.eraser = eraserOn;
     if (curTool && st.active === this.i) this.drawer.setTool(curTool);
     this.mk = LW.createSeriesMarkers(s, []);
@@ -679,6 +679,10 @@
         self.markInfo['n' + k] = { kind: 'news', items: its };
       });
     }
+    this.cfg.inds.forEach(function (x) {                                           /* candlestick patterns found on the bars */
+      if (x.off || !I.DEF[x.id] || !I.DEF[x.id].marks) return;
+      I.candles(bars, x.id).slice(-400).forEach(function (m) { out.push({ time: bars[m.i].t, position: m.d > 0 ? 'belowBar' : 'aboveBar', color: m.d > 0 ? '#34d399' : m.d < 0 ? '#ff5a4d' : '#9ca3af', shape: m.d > 0 ? 'arrowUp' : m.d < 0 ? 'arrowDown' : 'circle', size: 0.7, text: m.c, id: 'c' + x.id + m.i }); });
+    });
     if (this.btMarks) this.btMarks.forEach(function (m) { var bt = barT(m.time); if (bt != null) out.push(Object.assign({}, m, { time: bt })); });
     out.sort(function (a, b) { return a.time - b.time; });
     try { this.mk.setMarkers(out); } catch (e) { }
@@ -753,7 +757,7 @@
     }).join('');
   };
   function indTitle(slug) { return String(slug || '').replace(/^kurdistani-/, 'Kurdistani ').replace(/-/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); }); }
-  Cell.prototype.indsChanged = function () { this.renderInds(true); this.layers(); this.legend(); if (st.sync.ind) syncInds(this); save(); emit('inds', this); };
+  Cell.prototype.indsChanged = function () { this.renderInds(true); this.layers(); this.legend(); if (this.drawer) this.drawer.update(); if (st.sync.ind) syncInds(this); save(); emit('inds', this); };
   /* «sync indicators»: every chart gets the same indicators, with the same settings, as the one just changed */
   var syncingInds = false;
   function cloneInds(a) { return a.map(function (x) { return { id: x.id, p: JSON.parse(JSON.stringify(x.p || {})), off: x.off ? 1 : undefined, u: P.uid() }; }).map(function (x) { if (!x.off) delete x.off; return x; }); }
@@ -1117,16 +1121,25 @@
   /* ---- indicators dialog */
   var CKTV = [['ksc', 'DRuCJ6Bk-Kurdistani-Style-Cycle'], ['kspiral', 'tECCygHQ-Kurdistani-Bitcoin-Spiral-Historical-Logarithmic-Visualization'], ['kmacro', 'IUgkPeGI-Kurdistani-Macro-Regime']];
   function indDialog() {
-    var a = active(), box = h('<div class="pm-id"><input class="pm-in" type="search" autocomplete="off"><div class="pm-idt"></div><div class="pm-idl"></div><h4 class="pm-h4"></h4><div class="pm-ida"></div><div class="pm-tplrow"></div></div>');
-    var inp = $('input', box), tabs = $('.pm-idt', box), list = $('.pm-idl', box), act = $('.pm-ida', box), tab = 'over';
+    var a = active(), box = h('<div class="pm-id"><div class="pm-idhead"><input class="pm-in" type="search" autocomplete="off"><div class="pm-idm" role="tablist"></div><div class="pm-idt"></div></div><div class="pm-idl"></div><h4 class="pm-h4"></h4><div class="pm-ida"></div><div class="pm-tplrow"></div></div>');
+    var inp = $('input', box), mains = $('.pm-idm', box), tabs = $('.pm-idt', box), list = $('.pm-idl', box), act = $('.pm-ida', box), main = 'ind', tab = 'over';
     inp.placeholder = T('searchInd'); $('.pm-h4', box).textContent = T('activeInds');
+    /* TradingView's five kinds; the indicators have their own shelf of groups below */
+    [['ind', 'indicators'], ['strat', 'mt_strat'], ['prof', 'mt_prof'], ['pat', 'mt_pat']].forEach(function (p) { var b = h('<button type="button" role="tab" class="pm-mtab' + (p[0] === main ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { main = p[0]; $$('.pm-mtab', mains).forEach(function (x) { x.classList.toggle('on', x === b); }); tabs.style.display = main === 'ind' ? '' : 'none'; draw(); }; mains.appendChild(b); });
     [['over', 'cat_over'], ['pane', 'cat_pane'], ['com', 'cat_com'], ['ck', 'cat_ck'], ['ek', 'cat_ek']].forEach(function (p) { var b = h('<button type="button" class="pm-chip' + (p[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { tab = p[0]; $$('.pm-chip', tabs).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; tabs.appendChild(b); });
+    var SIDS = Object.keys(P.btStrats || {}).filter(function (k) { return !P.btStrats[k].btc || a.cfg.sym === 'BTC'; });
     function draw() {
-      var q = inp.value.trim().toLowerCase(), ids = q ? I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, Object.keys(LAYERS)) : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
+      var q = inp.value.trim().toLowerCase(), all = I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, I.ORDER_PROF, I.ORDER_PAT, Object.keys(LAYERS));
+      var ids = q ? all : main === 'prof' ? I.ORDER_PROF : main === 'pat' ? I.ORDER_PAT : main === 'strat' ? [] : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
       ids = ids.filter(function (id) { var nm = (LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + ' ' + id + ' ' + T('ind_' + id); return !q || nm.toLowerCase().indexOf(q) >= 0; });
-      list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('');
+      var sids = (q || main === 'strat') ? SIDS.filter(function (id) { return !q || (T('sg_' + id) + ' ' + id).toLowerCase().indexOf(q) >= 0; }) : [];
+      list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('') +
+        sids.map(function (id) { return '<button type="button" class="pm-idi" data-st="' + id + '"><b>' + esc(T('sg_' + id)) + '</b><small>' + esc(T('stratRun')) + '</small>' + ic('bt') + '</button>'; }).join('');
+      if (main === 'strat' && !q) { var sn = h('<p class="pm-p pm-mute"></p>'); sn.textContent = T('stratNote'); list.insertBefore(sn, list.firstChild); }
+      if (main === 'prof' && !q) { var pn = h('<p class="pm-p pm-mute"></p>'); pn.textContent = T('profNote'); list.appendChild(pn); }
+      $$('[data-st]', list).forEach(function (b) { b.onclick = function () { closeModal(); if (P.bt) P.bt.tester(a, { id: b.getAttribute('data-st') }); }; });
       $$('[data-id]', list).forEach(function (b) { b.onclick = function () { addInd(a, b.getAttribute('data-id')); drawAct(); }; });
-      if (tab === 'ck' && !q) {                       /* Coin_Kurd's other open-source scripts need TradingView's data: they open there */
+      if (main === 'ind' && tab === 'ck' && !q) {                       /* Coin_Kurd's other open-source scripts need TradingView's data: they open there */
         var nt = h('<p class="pm-p pm-mute"></p>'); nt.textContent = T('ckNote'); list.insertBefore(nt, list.firstChild);
         CKTV.forEach(function (x) {
           var l = h('<a class="pm-idi" target="_blank" rel="noopener noreferrer"><b></b><small></small>' + ic('share') + '</a>');
@@ -1648,7 +1661,20 @@
     if (CMODES[t]) { eraserOn = t === 'eraser'; if (!eraserOn) { st.cm = t; save(); } curTool = null; }
     else { curTool = t || null; eraserOn = false; }
     cells.forEach(function (c) { c.drawer.setTool(c.i === st.active ? curTool : null); c.drawer.eraser = eraserOn; });
-    applyCm(); paintTools();
+    applyCm(); paintTools(); toolBar();
+  }
+  /* the tool's own settings appear as soon as it is picked: they are what the next drawing starts with */
+  function toolBar() {
+    $$('.pm-toolbar').forEach(function (x) { x.remove(); });
+    if (!curTool || curTool === 'zoom' || curTool === 'measure') return;
+    var cell = active(), bar = h('<div class="pm-selbar pm-toolbar" role="toolbar"><b class="pm-tbn"></b></div>'), ls = lastStyle || {};
+    $('.pm-tbn', bar).textContent = T('t_' + curTool);
+    function set(k, v) { lastStyle = Object.assign({ c: '#f7931a', w: 2, d: 0 }, lastStyle || {}); lastStyle[k] = v; toolBar(); }
+    COLORS.forEach(function (c) { var b = h('<button type="button" class="pm-sw' + ((ls.c || '#f7931a') === c ? ' on' : '') + '" style="background:' + c + '" aria-label="' + c + '"></button>'); b.onclick = function () { set('c', c); }; bar.appendChild(b); });
+    var w = h('<button type="button" class="pm-ib pm-wb">' + (ls.w || 2) + 'px</button>'); w.onclick = function () { set('w', ((ls.w || 2) % 4) + 1); }; bar.appendChild(w);
+    var ds = h('<button type="button" class="pm-ib pm-wb">' + ['━', '┅', '┈'][ls.d || 0] + '</button>'); ds.onclick = function () { set('d', ((ls.d || 0) + 1) % 3); }; bar.appendChild(ds);
+    var hint = h('<small class="pm-tbh"></small>'); hint.textContent = T('toolHint'); bar.appendChild(hint);
+    cell.el.appendChild(bar);
   }
   function applyCm() {
     var hide = !curTool && !eraserOn && (st.cm === 'dot' || st.cm === 'arrowc');
@@ -1844,7 +1870,7 @@
     var w = h('<button type="button" class="pm-ib pm-wb">' + ((dd.s && dd.s.w) || 2) + 'px</button>'); w.onclick = function () { upd(function (x) { x.s.w = ((x.s.w || 2) % 4) + 1; }); }; bar.appendChild(w);
     var ds = h('<button type="button" class="pm-ib pm-wb">' + ['━', '┅', '┈'][(dd.s && dd.s.d) || 0] + '</button>'); ds.onclick = function () { upd(function (x) { x.s.d = ((x.s.d || 0) + 1) % 3; }); }; bar.appendChild(ds);
     if (EXTK[dd.k]) { var ex = h('<button type="button" class="pm-ib pm-wb' + (dd.s && dd.s.r ? ' on' : '') + '" title="' + esc(T('extend')) + '">→|</button>'); ex.onclick = function () { upd(function (x) { x.s.r = !x.s.r; }); }; bar.appendChild(ex); }
-    var gs = h('<button type="button" class="pm-ib" title="' + esc(T('settings')) + '">' + ic('gear') + '</button>'); gs.onclick = function () { drawSettings(cell, cell.drawer.find(dd.id) || dd); }; bar.appendChild(gs);
+    var gs = h('<button type="button" class="pm-ib pm-gsb" title="' + esc(T('settings')) + '">' + ic('gear') + '<span>' + esc(T('settings')) + '</span></button>'); gs.onclick = function () { drawSettings(cell, cell.drawer.find(dd.id) || dd); }; bar.appendChild(gs);
     if (P.TEXTY[dd.k]) { var tx = h('<button type="button" class="pm-ib" title="' + esc(T('editText')) + '">' + ic('text') + '</button>'); tx.onclick = function () { editText(dd); }; bar.appendChild(tx); }
     if (['hline', 'hray', 'trend', 'ray', 'ext', 'channel'].indexOf(dd.k) >= 0 && P.alertDialog) { var al = h('<button type="button" class="pm-ib" title="' + esc(T('alertHere')) + '">' + ic('bell') + '</button>'); al.onclick = function () { P.alertDialog(cell, dd.k === 'hline' || dd.k === 'hray' ? { price: dd.pts[0].p } : { draw: dd }); }; bar.appendChild(al); }
     var lk = h('<button type="button" class="pm-ib" title="' + esc(T(dd.lk ? 'unlock' : 'lock')) + '">' + ic(dd.lk ? 'lock' : 'unlock') + '</button>'); lk.onclick = function () { upd(function (x) { x.lk = !x.lk; }); }; bar.appendChild(lk);
