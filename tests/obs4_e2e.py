@@ -35,6 +35,8 @@ from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
+import build_obs as _BO  # noqa: E402  (the section's pages: the tab row has one for each)
+NTAB = len(_BO.PAGES)
 import obs_e2e as E  # noqa: E402  (the local server, the page wiring and the exchanges' mocks of stages 1 and 2)
 import obs_fakes as K  # noqa: E402
 import obs_chain as OC  # noqa: E402
@@ -778,7 +780,7 @@ def run():
                             page.wait_for_function("() => OB._fl.V.okx && OB._fl.V.okx.state !== 'load'", timeout=40000)
                         tag = f"{lang} {w}px {name}"
                         check(f"{tag}: no sideways scroll", overflow(page) <= 1, overflow(page))
-                        check(f"{tag}: fifteen tabs, this one marked", page.locator(".ob-tab").count() == 15 and page.locator(".ob-tab.on").count() == 1)
+                        check(f"{tag}: a tab for every page of the section, this one marked", page.locator(".ob-tab").count() == NTAB and page.locator(".ob-tab.on").count() == 1)
                         head = page.evaluate("() => { const e = [...document.querySelectorAll('.ob-head h1 [data-lang]')].find(x => !x.hidden); return e ? e.textContent : ''; }")
                         check(f"{tag}: the heading in its language", head == B.T[h1[name]]["h1"][lang], head)
                         tl = tiles(page)

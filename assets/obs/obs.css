@@ -147,6 +147,14 @@ html.ob-nofs-scroll{overflow:hidden}
 .ob-tile b.up{color:var(--up)}.ob-tile b.dn{color:var(--dn)}
 .ob-tile>span{color:#c9c9c4;font-size:.76rem}
 .ob-tsbox{position:relative;background:#0a0a0c;min-width:0}
+/* /charts/block-cycle/ — the spectrum the chart is read by, standing beside it */
+.ob-wvbox{display:flex;align-items:stretch;gap:0}
+.ob-wvbox .ob-ts{flex:1 1 auto}
+.ob-wvsc{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:46px 8px 30px;font-size:.66rem;color:#9a9a94;letter-spacing:.02em}
+.ob-wvsc i{flex:1 1 auto;width:11px;border-radius:3px;border:1px solid rgba(255,255,255,.1)}
+#ob-credit{color:#8d8d86;font-size:.76rem}
+#ob-credit a{color:#b9b9b3;text-decoration:underline}
+@media (max-width:560px){.ob-wvsc{display:none}}
 .ob-ts{display:flex;flex-direction:column;min-width:0}
 .ob-ts-w{position:relative;height:clamp(420px,64vh,740px)}
 #ob.ob-fs .ob-ts-w{height:calc(100vh - 260px);min-height:340px}

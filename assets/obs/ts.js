@@ -6,8 +6,12 @@
    new OB.TS(stage).set({ daily: bool, view: [t0, t1] | null, panes: [ {
        weight: 2, log: false, zero: false, title: 'text', fmt: function (v) → string, min, max,
        zones: [{ y0, y1, color }], marks: [{ y, color, label }],
+       vbands: [{ x0, x1, color, label }] (a stretch of the x axis with a meaning), vlines: [{ x, color, label, dash }],
        series: [{ name, type, color, neg (colour of negative bars), data: [[t, v], …] | candles [[t, o, h, l, c], …], width, hide,
-                  dim: { t: 1 } (bars drawn pale), fmt }] } ], dimNote: 'what a pale bar means' (a line in the read-out) }) */
+                  colors: ['#rgb', …] (a line painted point by point, one colour per row), dim: { t: 1 } (bars drawn pale), fmt }] } ],
+     dimNote: 'what a pale bar means' (a line in the read-out),
+     xmode: 'num' (the x axis is a plain number — block height, say — not a time), xfmt: function (x) → [line1, line2],
+     xtip: function (x) → string (the head of the read-out) }) */
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, clamp = OB.clamp, d = document, w = window;
@@ -70,6 +74,7 @@
   TS.prototype.set = function (o) {
     this.P = (o.panes || []).filter(function (p) { return p && p.series && p.series.length; });
     this.daily = !!o.daily; this.label = o.label || ''; this.dimNote = o.dimNote || '';
+    this.xmode = o.xmode === 'num' ? 'num' : 'time'; this.xfmt = o.xfmt || null; this.xtip = o.xtip || null;
     var t0 = Infinity, t1 = -Infinity, gap = Infinity;
     this.P.forEach(function (p) {
       p.series.forEach(function (s) {
@@ -112,7 +117,7 @@
       var f = p.fmt || compact, a = ctx.measureText(f(p._dom[1])).width, b = ctx.measureText(f(p._dom[0])).width;
       axis = Math.max(axis, Math.ceil(Math.max(a, b)) + 18);
     });
-    var L = 8, Tp = 8, B = 24, gap = 12, tot = 0;
+    var L = 8, Tp = 8, B = this.xmode === 'num' ? 34 : 24, gap = 12, tot = 0;
     P.forEach(function (p) { tot += p.weight || 1; });
     var avail = this.H - Tp - B - gap * Math.max(0, P.length - 1), y = Tp;
     P.forEach(function (p) { p._y = y; p._h = Math.max(30, avail * (p.weight || 1) / tot); y += p._h + gap; });
@@ -152,10 +157,15 @@
     var x0 = G.L, pw = G.plotW, xs = pw / (v.x1 - v.x0);
     function X(t) { return x0 + (t - v.x0) * xs; }
     this._X = X;
-    /* time ticks */
+    /* ticks: plain numbers when the axis is one (block height), otherwise times */
     var spanMs = v.x1 - v.x0, want = spanMs / Math.max(2, Math.floor(pw / 96)), step = null, i, mode = 't';
-    for (i = 0; i < TSTEPS.length; i++) if (TSTEPS[i] >= want) { step = TSTEPS[i]; break; }
     var ticks = [], tz = new Date().getTimezoneOffset() * 60000, t;
+    if (this.xmode === 'num') {
+      var ns = nice(spanMs, Math.max(2, Math.floor(pw / 110))), n0 = Math.ceil(v.x0 / ns) * ns;
+      for (t = n0; t <= v.x1; t += ns) ticks.push(t);
+      mode = 'n';
+    }
+    else { for (i = 0; i < TSTEPS.length; i++) if (TSTEPS[i] >= want) { step = TSTEPS[i]; break; }
     if (step) { for (t = Math.ceil((v.x0 - tz) / step) * step + tz; t <= v.x1; t += step) ticks.push(t); mode = step >= DAY ? 'd' : 't'; }
     else {                                               /* months or years */
       var months = want / (30.44 * DAY), ms = months <= 1 ? 1 : months <= 2 ? 2 : months <= 3 ? 3 : months <= 6 ? 6 : 12 * Math.ceil(months / 12), dt = new Date(v.x0);
@@ -163,12 +173,17 @@
       if (ms >= 12) { m = 0; y = Math.ceil(y / (ms / 12)) * (ms / 12); } else m = Math.ceil(m / ms) * ms;
       for (var k = 0; k < 400; k++) { t = Date.UTC(y, m + k * ms, 1); if (t > v.x1) break; if (t >= v.x0) ticks.push(t); }
       mode = ms >= 12 ? 'y' : 'm';
-    }
+    } }
     P.forEach(function (p) {
       var py = p._y, ph = p._h, dom = p._dom, f = p.fmt || compact;
       function Y(val) { var q = p.log ? Math.log10(val) : val; return py + (dom[1] - q) / (dom[1] - dom[0]) * ph; }
       p._Y = Y;
       ctx.fillStyle = '#0d0d11'; ctx.fillRect(x0, py, pw, ph);
+      /* bands: a stretch of the x axis with a meaning (a bull or a bear market, say) */
+      (p.vbands || []).forEach(function (b) {
+        var a = clamp(X(b.x0), x0, x0 + pw), c = clamp(X(b.x1), x0, x0 + pw);
+        if (c - a > 0.5) { ctx.fillStyle = b.color; ctx.fillRect(a, py, c - a, ph); }
+      });
       /* zones (a band of values with a meaning) */
       (p.zones || []).forEach(function (z) {
         var a = Y(Math.max(z.y0, p.log ? 1e-12 : -Infinity)), b = Y(z.y1), top = clamp(Math.min(a, b), py, py + ph), bot = clamp(Math.max(a, b), py, py + ph);
@@ -187,6 +202,13 @@
       ctx.save(); ctx.beginPath(); ctx.rect(x0, py, pw, ph); ctx.clip();
       /* marks: a level worth naming */
       (p.marks || []).forEach(function (mk) { var yy = Math.round(Y(mk.y)) + 0.5; if (yy < py || yy > py + ph) return; ctx.strokeStyle = mk.color || 'rgba(255,255,255,.3)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + pw, yy); ctx.stroke(); });
+      /* lines across the panes: a halving, say */
+      (p.vlines || []).forEach(function (ln) {
+        var xx = Math.round(X(ln.x)) + 0.5; if (xx < x0 || xx > x0 + pw) return;
+        ctx.save(); if (ln.dash) ctx.setLineDash(ln.dash);
+        ctx.strokeStyle = ln.color || 'rgba(255,255,255,.3)'; ctx.lineWidth = ln.width || 1;
+        ctx.beginPath(); ctx.moveTo(xx, py); ctx.lineTo(xx, py + ph); ctx.stroke(); ctx.restore();
+      });
       var zeroY = clamp(Y(p.log ? Math.pow(10, dom[0]) : 0), py, py + ph);
       p.series.forEach(function (s) {
         if (s.hide) return;
@@ -212,6 +234,23 @@
           }
           return;
         }
+        /* a line whose colour is part of the reading: drawn in runs of one colour, so a 6,000-point line is a few dozen strokes */
+        if (s.colors && s.type !== 'step' && s.type !== 'area') {
+          var px = null, py2 = 0, run = null, open2 = false;
+          ctx.lineWidth = s.width || 1.8; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+          for (j = i0; j <= i1; j++) {
+            var v2 = a[j][1];
+            if (v2 == null || !isFinite(v2) || (p.log && !(v2 > 0))) { if (open2) { ctx.stroke(); open2 = false; } px = null; continue; }
+            var qx = X(a[j][0]), qy = Y(v2), col2 = s.colors[j] || s.color;
+            if (px != null) {
+              if (!open2 || col2 !== run) { if (open2) ctx.stroke(); ctx.beginPath(); ctx.moveTo(px, py2); ctx.strokeStyle = col2; run = col2; open2 = true; }
+              ctx.lineTo(qx, qy);
+            }
+            px = qx; py2 = qy;
+          }
+          if (open2) ctx.stroke();
+          return;
+        }
         /* line, step, area — thinned to the lowest and highest value of every pixel column when the points are denser than the pixels */
         ctx.beginPath();
         var started = false, perPx = n / pw, lastX = null, mn = 0, mx = 0, lastY = 0, firstX = null, endX = null;
@@ -234,6 +273,21 @@
       ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1; ctx.strokeRect(x0 + 0.5, py + 0.5, pw - 1, ph - 1);
       /* marks' labels and the pane's title */
       ctx.font = '10.5px Vazirmatn, system-ui, sans-serif'; ctx.textBaseline = 'bottom';
+      (p.vbands || []).forEach(function (b) {
+        if (!b.label) return;
+        var a2 = Math.max(X(b.x0), x0), c2 = Math.min(X(b.x1), x0 + pw); if (c2 - a2 < 34) return;
+        ctx.save(); ctx.beginPath(); ctx.rect(x0, py, pw, ph); ctx.clip();
+        ctx.fillStyle = b.ink || '#b9b9b3'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.direction = 'ltr';
+        ctx.fillText(b.label, (a2 + c2) / 2, py + ph - 5); ctx.restore();
+      });
+      (p.vlines || []).forEach(function (ln) {
+        if (!ln.label) return;
+        var xx = X(ln.x); if (xx < x0 + 8 || xx > x0 + pw - 8) return;
+        ctx.save(); ctx.beginPath(); ctx.rect(x0, py, pw, ph); ctx.clip();
+        ctx.translate(xx - 3, py + 8); ctx.rotate(Math.PI / 2);
+        ctx.fillStyle = ln.ink || ln.color || '#9a9a94'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.direction = 'ltr';
+        ctx.fillText(ln.label, 0, 0); ctx.restore();
+      });
       (p.marks || []).forEach(function (mk) { var yy = Y(mk.y); if (!mk.label || yy < py + 12 || yy > py + ph) return; ctx.fillStyle = mk.color || '#9a9a94'; ctx.direction = OB.rtl() ? 'rtl' : 'ltr'; ctx.textAlign = 'right'; ctx.fillText(mk.label, x0 + pw - 6, yy - 2); ctx.direction = 'ltr'; });
       if (p.title) { ctx.font = '600 11.5px Vazirmatn, "Space Grotesk", system-ui, sans-serif'; ctx.fillStyle = '#e8e8e3'; ctx.textBaseline = 'top'; ctx.direction = OB.rtl() ? 'rtl' : 'ltr'; ctx.textAlign = OB.rtl() ? 'right' : 'left'; ctx.fillText(p.title, OB.rtl() ? x0 + pw - 8 : x0 + 8, py + 6); ctx.direction = 'ltr'; }
     });
@@ -242,6 +296,12 @@
     ctx.font = FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ticks.forEach(function (tt) {
       var tx = X(tt); if (tx < x0 + 18 || tx > x0 + pw - 18) return;
+      if (mode === 'n') {                               /* a plain number axis: the number, and under it what it means */
+        var two = self.xfmt ? self.xfmt(tt) : [compact(tt), ''];
+        ctx.fillStyle = '#e8e8e3'; ctx.fillText(two[0], tx, ay + 5);
+        if (two[1]) { ctx.fillStyle = '#7f7f79'; ctx.fillText(two[1], tx, ay + 18); }
+        return;
+      }
       var dt = new Date(tt), mid = mode === 't' && dt.getHours() === 0 && dt.getMinutes() === 0;
       ctx.fillStyle = mid || (mode === 'm' && dt.getUTCMonth() === 0) ? '#e8e8e3' : '#9a9a94';
       ctx.fillText(mode === 'y' ? fmtYear(tt) : mode === 'm' ? fmtMonth(tt) : mode === 'd' || mid ? OB.axisDay(tt) : OB.axisTime(tt), tx, ay + 6);
@@ -264,7 +324,7 @@
     if (near == null) { tip.hidden = true; return; }
     var cx = Math.round(this._X(near + (mid ? this.gap / 2 : 0))) + 0.5;
     ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, bot); ctx.stroke();
-    var box = d.createElement('div'), hd = d.createElement('div'); hd.className = 'ob-tip-t'; hd.textContent = OB.fmtDate(near, !this.daily); box.appendChild(hd);
+    var box = d.createElement('div'), hd = d.createElement('div'); hd.className = 'ob-tip-t'; hd.textContent = this.xtip ? this.xtip(near) : OB.fmtDate(near, !this.daily); box.appendChild(hd);
     var any = false, pale = false;
     P.forEach(function (p) {
       p.series.forEach(function (s) {

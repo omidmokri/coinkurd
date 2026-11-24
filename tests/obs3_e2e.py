@@ -29,6 +29,8 @@ from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
+import build_obs as _BO  # noqa: E402  (the section's pages: the tab row has one for each)
+NTAB = len(_BO.PAGES)
 import obs_e2e as E  # noqa: E402  (the local server, the page wiring and the exchanges' mocks of stages 1 and 2)
 import obs_chain as OC  # noqa: E402
 
@@ -554,7 +556,7 @@ def run():
                         wait(page)
                         name = path.strip("/").split("/")[-1]
                         check(f"{lang} {w}px {name}: no sideways scroll", overflow(page) <= 1, overflow(page))
-                        check(f"{lang} {w}px {name}: fifteen tabs, this one marked", page.locator(".ob-tab").count() == 15 and page.locator(".ob-tab.on").count() == 1)
+                        check(f"{lang} {w}px {name}: a tab for every page of the section, this one marked", page.locator(".ob-tab").count() == NTAB and page.locator(".ob-tab.on").count() == 1)
                         vis = page.evaluate("() => [...document.querySelectorAll('#ob-main h1 [data-lang]')].filter(e => !e.hidden).map(e => e.getAttribute('data-lang'))")
                         check(f"{lang} {w}px {name}: the heading is in {lang}", vis == [lang], vis)
                         txt = page.inner_text("#ob-view")

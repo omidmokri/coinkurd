@@ -7,7 +7,7 @@
   var w = window, d = document, de = d.documentElement;
   var OB = w.OB = w.OB || {};
   OB.views = OB.views || {};
-  OB.V = '10';
+  OB.V = '11';
 
   /* ================================================================ language (the site's keys: ck_lang, ek_ar) */
   function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -289,7 +289,8 @@
     { k: 'scanner', path: '/charts/scanner/', ic: 'target' },
     { k: 'vprof', path: '/charts/volume-profile/', ic: 'bars' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
-    { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' }
+    { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' },
+    { k: 'wave', path: '/charts/block-cycle/', ic: 'pulse' }
   ];
   var root, cur = null, curKey = null;
   function headText() {

@@ -23,6 +23,8 @@ from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tests"))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
+import build_obs as _BO  # noqa: E402  (the section's pages: the tab row has one for each)
+NTAB = len(_BO.PAGES)
 import obs4_e2e as F4  # noqa: E402  (stage 4's mocks: Gate, Binance mirror, Bybit, Deribit futures, the CI files, the page factory)
 import obs_e2e as E  # noqa: E402
 import obs_curve as CV  # noqa: E402
@@ -446,7 +448,7 @@ def run():
                         page.goto(base + path)
                         wait(page, mod, cond)
                         tag = f"{lang} {w}px {path}"
-                        check(f"{tag}: fifteen tabs, no sideways scroll", page.locator(".ob-tab").count() == 15 and not E.overflow(page))
+                        check(f"{tag}: a tab for every page of the section, no sideways scroll", page.locator(".ob-tab").count() == NTAB and not E.overflow(page))
                         txt = page.inner_text("#ob-tiles") + page.inner_text("#ob-note")
                         check(f"{tag}: no key names leak into the text", not re.search(r"\b(hl|hi|ot|sm|tm)_[a-z0-9_]+\b", txt), re.findall(r"\b(?:hl|hi|ot|sm|tm)_[a-z0-9_]+\b", txt)[:3])
                         if w == 390 and path.startswith("/charts/hyperliquid"):

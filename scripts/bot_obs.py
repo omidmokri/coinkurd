@@ -38,6 +38,7 @@ FLOWS = "/charts/exchange-flows/"
 STAB = "/charts/stablecoins/"
 NET = "/charts/network/"
 CYCLE = "/charts/bitcoin-cycle/"
+WAVE = "/charts/block-cycle/"
 HUB = "/charts/"
 URL = SITE + HUB
 
@@ -151,6 +152,7 @@ TXT = {
     "b_stab": {"fa": "💵 استیبل‌کوین‌ها و SSR", "ckb": "💵 ستەیبڵکۆینەکان و SSR", "kmr": "💵 Stablecoin û SSR", "ar": "💵 العملات المستقرة وSSR", "en": "💵 Stablecoins & SSR"},
     "b_net": {"fa": "⛏ شبکه و ماینرها", "ckb": "⛏ تۆڕ و ماینەرەکان", "kmr": "⛏ Tor û madenkar", "ar": "⛏ الشبكة والمعدّنون", "en": "⛏ Network & miners"},
     "b_cycle": {"fa": "🔄 چرخهٔ بیت‌کوین", "ckb": "🔄 خولی بیتکۆین", "kmr": "🔄 Çerxa Bitcoinê", "ar": "🔄 دورة البيتكوين", "en": "🔄 Bitcoin cycle"},
+    "b_wave": {"fa": "〰️ چرخهٔ بلاکی", "ckb": "〰️ خولی بلۆکی", "kmr": "〰️ Çerxa blokê", "ar": "〰️ دورة الكتل", "en": "〰️ Block cycle"},
     # the day's figures (numbers stay in Latin digits, like every price in the bot)
     "now": {"fa": "📌 <b>بیت‌کوین در {d}</b>", "ckb": "📌 <b>بیتکۆین لە {d}</b>", "kmr": "📌 <b>Bitcoin di {d} de</b>", "ar": "📌 <b>البيتكوين في {d}</b>", "en": "📌 <b>Bitcoin on {d}</b>"},
     "l_mvrv": {"fa": "• MVRV {m} · NUPL {n} · قیمت تحقق‌یافته {r}", "ckb": "• MVRV {m} · NUPL {n} · نرخی بەدیهاتوو {r}", "kmr": "• MVRV {m} · NUPL {n} · bihayê pêkhatî {r}",
@@ -275,7 +277,7 @@ def section(lang, load=None):
     return "\n\n".join(parts)
 
 
-PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, HUB)          # the Web App buttons, in the order of the site's tabs
+PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, WAVE, HUB)          # the Web App buttons, in the order of the site's tabs
 
 
 def open_rows(lang):
@@ -283,10 +285,10 @@ def open_rows(lang):
     def w(k, path):
         return {"text": L("b_" + k, lang), "web_app": {"url": SITE + path}}
     return [[w("heat", HEAT), w("map", MAP)], [w("liq", LIQ), w("hl", HL)], [w("oi", OI), w("fund", FUND)], [w("ls", LS), w("cvd", CVD)], [w("basis", BASIS), w("opt", OPT)],
-            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
+            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("wave", WAVE)], [w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
 
 
-N_ROWS = 9                                      # rows open_rows() puts above the navigation
+N_ROWS = 10                                     # rows open_rows() puts above the navigation
 
 
 if __name__ == "__main__":

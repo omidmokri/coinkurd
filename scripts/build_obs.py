@@ -46,6 +46,7 @@ PAGES = [
     ("vprof", "volume-profile", ["vprof.js"]),
     ("network", "network", ["chainmath.js", "ts.js", "chain.js"]),
     ("cycle", "bitcoin-cycle", ["chainmath.js", "ts.js", "chain.js"]),
+    ("wave", "block-cycle", ["ts.js", "wave.js"]),
 ]
 
 T = {
@@ -664,6 +665,72 @@ T.update({
                        "Each of these lines marked only three or four tops and bottoms in the past; that is too few for any statistical conclusion, and each cycle’s peak was lower against the averages than the one before.",
                        "Prices are the daily close in UTC, and the last point is the last closed day. Not financial advice.",
                        "Source: Coin Metrics’ daily price (CC BY-NC licence) since July 2010."])],
+        },
+    },
+    "wave": {
+        "title": "شاخص موج بلاکی: جایگاه در چرخهٔ هاوینگ | entekhab.net",
+        "desc": "شاخصی که فقط از ارتفاع بلاک ساخته می‌شود: جایگاه امروز در چرخهٔ هاوینگ روی مقیاس صفر تا یک، با قیمت بیت‌کوین روی همان محور و رنگ‌بندی فاز صعودی و نزولی.",
+        "og": "شاخص موج بلاکی — جایگاه امروز در چرخهٔ هاوینگ",
+        "ld": "Entekhab block-cycle wave index",
+        "kw": ["چرخه هاوینگ", "halving cycle", "block height", "ارتفاع بلاک", "wave index", "شاخص موج", "bitcoin halving", "هاوینگ بیت کوین", "خولی هاوینگ", "دورة الهالفينغ"],
+        "h1": {"fa": "شاخص موج بلاکی", "ckb": "پێوەری شەپۆلی بلۆکی", "ar": "مؤشر موجة الكتل", "en": "Block-cycle wave index"},
+        "p": {"fa": "یک شاخص که هیچ ورودی‌اش قیمت نیست: جایگاه امروز در چرخهٔ ۲۱۰٬۰۰۰ بلاکی هاوینگ، روی مقیاس صفر تا یک، در کنار قیمت بیت‌کوین روی همان محور",
+              "ckb": "پێوەرێک کە هیچ تێچووێکی نرخ نییە: شوێنی ئەمڕۆ لە خولی ٢١٠٬٠٠٠ بلۆکی هاوینگ، لەسەر پێوەری سفر بۆ یەک، لەگەڵ نرخی بیتکۆین لەسەر هەمان تەوەر",
+              "ar": "مؤشر لا يدخل فيه السعر إطلاقًا: موضع اليوم في دورة الهالفينغ البالغة ٢١٠٬٠٠٠ كتلة، على مقياس من صفر إلى واحد، إلى جانب سعر البيتكوين على المحور نفسه",
+              "en": "An index with no price input at all: where today sits in the 210,000-block halving cycle on a zero-to-one scale, beside Bitcoin’s price on the same axis"},
+        "about": {
+            "fa": [("شاخص چطور حساب می‌شود", [
+                "تنها ورودی، ارتفاع بلاک است. فاصلهٔ ارتفاع از هاوینگ، نیم‌چرخه (۷۸٬۷۵۰ بلاک) جابه‌جا و بر ۲۱۰٬۰۰۰ باقی‌مانده گرفته می‌شود؛ نتیجه <b>s</b> است.",
+                "اگر s کمتر از ۱۵۷٬۵۰۰ باشد شاخص <b>s ÷ ۱۵۷٬۵۰۰</b> است و رو به بالا می‌رود (فاز صعودی)؛ وگرنه <b>۱ − (s − ۱۵۷٬۵۰۰) ÷ ۵۲٬۵۰۰</b> است و رو به پایین می‌آید (فاز نزولی).",
+                "پس شاخص در هر هاوینگ دقیقاً ۰٫۵ است، صفر را حدود ۷۸٬۷۵۰ بلاک پس از هاوینگ و یک را حدود ۵۲٬۵۰۰ بلاک پیش از هاوینگ بعدی می‌زند. دوره‌اش ثابت است و به بازار کاری ندارد."]),
+                   ("خواندن نمودار", [
+                       "محور افقی ارتفاع بلاک است، نه تاریخ؛ تاریخ‌ها زیر ارتفاع و تقریبی‌اند (میانگین ده دقیقه برای هر بلاک).",
+                       "خط‌های عمودی هاوینگ‌ها هستند و نوارهای پشت نمودار فاز صعودی و نزولی را از هم جدا می‌کنند. بخشِ پس از ارتفاع فعلی، ادامهٔ ریاضی شاخص است و پیش‌بینی قیمت نیست.",
+                       "ارتفاع فعلی از mempool.space خوانده می‌شود؛ اگر در دسترس نباشد از آخرین هاوینگ و میانگین ده دقیقه برآورد می‌شود."]),
+                   ("محدودیت‌ها و منبع", [
+                       "این شاخص یک تقویم است، نه سیگنال: چون هیچ داده‌ای از بازار در آن نیست، نمی‌تواند از بازار خبر بدهد و همیشه همین شکل را دارد، چه قیمت بالا برود چه پایین.",
+                       "فقط چهار هاوینگ تا امروز رخ داده است؛ هر تطبیقی با قیمت روی چنین تعداد کمی، نتیجهٔ آماری نیست.",
+                       "ایدهٔ این شاخص از Wolfy Wave Index ساختهٔ WolfyXBT است. پیاده‌سازی اینجا از پایه و با فرمول منتشرشدهٔ خودش نوشته شده و هیچ کد یا دادهٔ آن صفحه در آن به کار نرفته است.",
+                       "قیمت: قیمت پایانی روزانهٔ Coin Metrics (مجوز CC BY-NC). توصیهٔ مالی نیست."])],
+            "ckb": [("پێوەر چۆن دەژمێردرێت", [
+                "تەنها تێچوو بەرزی بلۆکە. مەودای بەرزی لە هاوینگ، نیوە‌خول (٧٨٬٧٥٠ بلۆک) دەجوڵێنرێت و لەسەر ٢١٠٬٠٠٠ پاشماوە دەگیرێت؛ ئەنجام <b>s</b>ـە.",
+                "ئەگەر s کەمتر لە ١٥٧٬٥٠٠ بێت پێوەر <b>s ÷ ١٥٧٬٥٠٠</b>ـە و بەرەو سەرەوە دەچێت (قۆناغی بەرزبوونەوە)؛ ئەگەرنا <b>١ − (s − ١٥٧٬٥٠٠) ÷ ٥٢٬٥٠٠</b>ـە و بەرەو خوارەوە (قۆناغی دابەزین).",
+                "بۆیە پێوەر لە هەر هاوینگێکدا تەواو ٠٫٥ـە، سفر نزیکەی ٧٨٬٧٥٠ بلۆک دوای هاوینگ و یەک نزیکەی ٥٢٬٥٠٠ بلۆک پێش هاوینگی داهاتوو دەبێت. ماوەکەی جێگیرە و کارێکی بە بازاڕ نییە."]),
+                    ("خوێندنەوەی نەخشە", [
+                        "تەوەری ئاسۆیی بەرزی بلۆکە، نەک ڕێکەوت؛ ڕێکەوتەکان لە خوارەوەن و نزیکەین (تێکڕای دە خولەک بۆ هەر بلۆک).",
+                        "هێڵەکانی ستوونی هاوینگەکانن و نوارەکانی پشتەوە قۆناغی بەرزبوونەوە و دابەزین جیا دەکەنەوە. بەشی دوای بەرزی ئێستا درێژکردنەوەی بیرکارییە، نەک پێشبینیی نرخ.",
+                        "بەرزی ئێستا لە mempool.space دەخوێنرێت؛ ئەگەر بەردەست نەبوو لە دوا هاوینگ و تێکڕای دە خولەک خەمڵێندراوە."]),
+                    ("سنوورەکان و سەرچاوە", [
+                        "ئەم پێوەرە ساڵنامەیەکە، نەک ئاماژە: چونکە هیچ داتایەکی بازاڕ تێدا نییە، ناتوانێت لە بازاڕ هەواڵ بدات.",
+                        "تەنها چوار هاوینگ ڕوویان داوە؛ هەر لێکچوونێک لەگەڵ نرخ لەسەر ئەم ژمارە کەمە ئەنجامی ئاماری نییە.",
+                        "بیرۆکەی ئەم پێوەرە لە Wolfy Wave Index ـی WolfyXBT ـەوە هاتووە. ئەم پەیادەکردنە لە بنەڕەتەوە و بە فۆرمولی بڵاوکراوەی خۆی نووسراوە و هیچ کۆد یان داتایەکی ئەو پەڕەیە بەکار نەهاتووە.",
+                        "نرخ: نرخی داخستنی ڕۆژانەی Coin Metrics (مۆڵەتی CC BY-NC). ئامۆژگاریی دارایی نییە."])],
+            "ar": [("كيف يُحسب المؤشر", [
+                "المُدخل الوحيد هو ارتفاع الكتلة. يُزاح الارتفاع بنصف دورة (٧٨٬٧٥٠ كتلة) ويؤخذ باقي قسمته على ٢١٠٬٠٠٠؛ والنتيجة <b>s</b>.",
+                "إذا كان s أقل من ١٥٧٬٥٠٠ فالمؤشر <b>s ÷ ١٥٧٬٥٠٠</b> ويصعد (الطور الصاعد)؛ وإلا فهو <b>١ − (s − ١٥٧٬٥٠٠) ÷ ٥٢٬٥٠٠</b> ويهبط (الطور الهابط).",
+                "لذلك يكون المؤشر ٠٫٥ بالضبط عند كل هالفينغ، ويبلغ الصفر بعد نحو ٧٨٬٧٥٠ كتلة من الهالفينغ والواحد قبل نحو ٥٢٬٥٠٠ كتلة من الهالفينغ التالي. دورته ثابتة ولا علاقة لها بالسوق."]),
+                   ("قراءة الرسم", [
+                       "المحور الأفقي هو ارتفاع الكتلة لا التاريخ؛ والتواريخ تحته تقريبية (بمعدّل عشر دقائق للكتلة).",
+                       "الخطوط الرأسية هي الهالفينغات، والأشرطة الخلفية تفصل الطور الصاعد عن الهابط. ما بعد الارتفاع الحالي امتداد حسابي للمؤشر وليس توقّعًا للسعر.",
+                       "يُقرأ الارتفاع الحالي من mempool.space؛ وإذا تعذّر ذلك يُقدّر من آخر هالفينغ وبمعدّل عشر دقائق."]),
+                   ("الحدود والمصدر", [
+                       "هذا المؤشر تقويم لا إشارة: لا تدخل فيه أي بيانات سوق، فلا يمكنه أن يخبر عن السوق.",
+                       "لم يحدث سوى أربع هالفينغات حتى اليوم؛ وأي تطابق مع السعر على هذا العدد القليل ليس نتيجة إحصائية.",
+                       "فكرة المؤشر من Wolfy Wave Index لصاحبه WolfyXBT. وقد كُتب التنفيذ هنا من الصفر بصيغته المنشورة، ولم يُستخدم أي كود أو بيانات من تلك الصفحة.",
+                       "السعر: إغلاق يومي من Coin Metrics (رخصة CC BY-NC). ليست نصيحة مالية."])],
+            "en": [("How the index is computed", [
+                "The only input is the block height. The height is shifted by half a cycle (78,750 blocks) and taken modulo 210,000; the result is <b>s</b>.",
+                "If s is below 157,500 the index is <b>s ÷ 157,500</b> and rising (the bull phase); otherwise it is <b>1 − (s − 157,500) ÷ 52,500</b> and falling (the bear phase).",
+                "So the index is exactly 0.5 at every halving, reaches zero about 78,750 blocks after a halving and one about 52,500 blocks before the next. Its period is fixed and owes nothing to the market."]),
+                   ("Reading the chart", [
+                       "The horizontal axis is block height, not the date; the dates beneath it are approximate (ten minutes a block on average).",
+                       "The vertical lines are the halvings and the bands behind the chart separate the bull and bear phases. Everything past the current height is the arithmetic continuation of the index, not a price forecast.",
+                       "The current height is read from mempool.space; if that is unavailable it is estimated from the last halving at ten minutes a block."]),
+                   ("Limits and credit", [
+                       "This index is a calendar, not a signal: with no market data in it, it cannot tell you anything about the market, and it looks the same whether the price rises or falls.",
+                       "Only four halvings have happened so far; any fit against the price on so few cycles is not a statistical result.",
+                       "The idea comes from the Wolfy Wave Index by WolfyXBT. The implementation here was written from scratch against his published formula, and none of his code or data is used.",
+                       "Price: daily closes from Coin Metrics (CC BY-NC licence). Not financial advice."])],
         },
     },
 })
@@ -1518,6 +1585,10 @@ HUB = {
              {"fa": "شاخص‌های چرخهٔ بیت‌کوین", "ckb": "پێوەرەکانی خولی بیتکۆین", "ar": "مؤشرات دورة البيتكوين", "en": "Bitcoin cycle indicators"},
              {"fa": "ضریب مایر، میانگین ۲۰۰ هفته، پای سایکل، ضریب ۲ ساله و جایگاه امروز در تاریخ", "ckb": "چەندجارەی مایەر، تێکڕای ٢٠٠ هەفتە، خولی پای، چەندجارەی ٢ ساڵە و شوێنی ئەمڕۆ لە مێژوودا",
               "ar": "مضاعف ماير، متوسط ٢٠٠ أسبوع، دورة باي، مضاعف السنتين وموضع اليوم في التاريخ", "en": "Mayer multiple, 200-week average, Pi cycle, 2-year multiplier and where today stands in history"}),
+            ("/charts/block-cycle/", True,
+             {"fa": "شاخص موج بلاکی", "ckb": "پێوەری شەپۆلی بلۆکی", "ar": "مؤشر موجة الكتل", "en": "Block-cycle wave index"},
+             {"fa": "جایگاه امروز در چرخهٔ ۲۱۰٬۰۰۰ بلاکی هاوینگ، فقط از ارتفاع بلاک", "ckb": "شوێنی ئەمڕۆ لە خولی ٢١٠٬٠٠٠ بلۆکی هاوینگ، تەنها لە بەرزی بلۆک",
+              "ar": "موضع اليوم في دورة الهالفينغ البالغة ٢١٠٬٠٠٠ كتلة، من ارتفاع الكتلة وحده", "en": "Where today sits in the 210,000-block halving cycle, from the block height alone"}),
             ("/regime/", False,
              {"fa": "رادار رژیم بازار", "ckb": "ڕاداری دۆخی بازاڕ", "ar": "رادار نظام السوق", "en": "Market-regime radar"},
              {"fa": "احتمال صعودی، نزولی، خنثی یا پرنوسان بودن بازار", "ckb": "ئەگەری بەرزبوونەوە، دابەزین، مامناوەند یان هەڵاوسان",
