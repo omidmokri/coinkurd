@@ -996,6 +996,10 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(bare.need() === 'nowallet' && bare.$('mob').hidden === false, 'with no wallet of any kind, the page shows the way in through a wallet\'s own browser');
   freshWallet(); bare = makeWindow(CFG, { allowed: true }); S.start(bare.win); await sleep(60);
   ok(bare.$('mob').hidden === true, 'and with a wallet present that help stays out of the way');
+  freshWallet(); bare = makeWindow(CFG, {}); delete bare.win.ethereum;
+  bare.win.navigator = { userAgent: 'Mozilla/5.0 (Windows NT 10.0) Chrome/130 EntekhabWin/1.0.2' };
+  S.start(bare.win); await sleep(60);
+  ok(bare.$('mob').getAttribute('data-app') === 'win', "inside the site's own Windows app the help speaks of a desktop browser, not a phone wallet");
 
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');

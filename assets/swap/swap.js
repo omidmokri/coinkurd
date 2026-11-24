@@ -1103,7 +1103,11 @@
       else if (S.q) { label = t('swap'); dis = false; need = 'swap'; }
       else { label = t('amount'); need = 'none'; }
 
-      if (X.mob) { X.mob.hidden = !!(W.p || TW.p || SW.p || BW.p); }     /* no wallet of any kind here: show the way in */
+      if (X.mob) {
+        X.mob.hidden = !!(W.p || TW.p || SW.p || BW.p);    /* no wallet of any kind here: show the way in */
+        /* the site's own desktop app carries no wallet extension, and a phone wallet is no help there */
+        X.mob.setAttribute('data-app', /EntekhabWin\//.test(String((win.navigator && win.navigator.userAgent) || '')) ? 'win' : '');
+      }
       el['action-l'].textContent = label; el['action-x'].textContent = extra;
       el.action.disabled = dis;
       el.action.setAttribute('data-need', need);

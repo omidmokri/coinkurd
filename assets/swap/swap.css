@@ -225,3 +225,6 @@ output.sw-num:empty::before{content:"0.0";color:#565a64}
 .sw-mob-b{display:flex;gap:8px;margin:8px 0 2px}
 .sw-mob-b a{flex:1;text-align:center;padding:9px 10px;border-radius:12px;background:var(--s-o);color:#000;font-weight:700;text-decoration:none}
 .sw-mob-b a:hover{background:var(--s-o2)}
+.sw-mob-win{display:none}
+.sw-mob[data-app="win"] .sw-mob-win{display:block}
+.sw-mob[data-app="win"] .sw-mob-b,.sw-mob[data-app="win"] p:not(.sw-mob-win){display:none}

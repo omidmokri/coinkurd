@@ -184,6 +184,7 @@ namespace Entekhab
         void OpenExternal(string url)
         {
             if (!Uri.TryCreate(url, UriKind.Absolute, out var u)) return;
+            if (u.Scheme == Uri.UriSchemeHttp && IsSite(url)) { u = new Uri("https://" + u.Host + u.PathAndQuery + u.Fragment); }
             var ok = new[] { "https", "http", "tg", "mailto" };
             if (Array.IndexOf(ok, u.Scheme) < 0) return;              // javascript:, file:, ms-… and the like never leave the window
             external.Add(u.AbsoluteUri);
@@ -244,6 +245,9 @@ namespace Entekhab
             menu.Items.Add(S.Get("open"), null, (o, e) => BringBack());
             menu.Items.Add(S.Get("home"), null, (o, e) => { BringBack(); web.CoreWebView2?.Navigate(Site); });
             menu.Items.Add(S.Get("reload"), null, (o, e) => { BringBack(); web.CoreWebView2?.Reload(); });
+            // Some pages need a wallet extension, which this window has none of: /swap/ is one. This hands the page
+            // the person is on to their own browser, where their wallet lives.
+            menu.Items.Add(S.Get("inBrowser"), null, (o, e) => OpenExternal(web.CoreWebView2?.Source ?? Site));
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(S.Get("update"), null, async (o, e) => await CheckUpdate(true));
             menu.Items.Add(new ToolStripSeparator());
