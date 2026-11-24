@@ -222,7 +222,7 @@ function makeWindow(cfg, opts) {
   const { store, doc } = fakeDoc(IDS);
   store['sw-app'].setAttribute('data-c', JSON.stringify(cfg));
   store['sw-gift'].setAttribute('data-a', opts.giftAddr !== undefined ? opts.giftAddr : (cfg.donate || ''));
-  store['sw-app'].setAttribute('data-d', JSON.stringify(DATA));
+  store['sw-app'].setAttribute('data-d', JSON.stringify(opts.data || DATA));
   const sent = [], asked = [], flags = { chain: opts.chainId || '0x38', deafChain: false };
   const provider = {
     request({ method, params }) {
@@ -263,8 +263,10 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
 
 (async function () {
   let urls = [], serve = () => goodQuote(), token = null, status = null;
-  const realFetch = (u) => {
+  let tronNode = () => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve('{}') });
+  const realFetch = (u, o) => {
     urls.push(u);
+    if (u.indexOf('https://api.trongrid.io/') === 0) { return tronNode(u.slice('https://api.trongrid.io'.length), JSON.parse(o.body)); }
     const body = u.indexOf('/v1/quote') > 0 ? serve() : u.indexOf('/v1/token') > 0 ? token : u.indexOf('/v1/status') > 0 ? status : null;
     return Promise.resolve({ ok: !!body, status: body ? 200 : 404, text: () => Promise.resolve(JSON.stringify(body || { message: 'not found' })) });
   };
@@ -294,7 +296,7 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   const q = urls.find(u => u.indexOf('/v1/quote') > 0);
   ok(!!q, 'a price was asked for');
   const WATCH_RPC = DATA.watch.map(w => w.rpc);
-  ok(urls.every(u => u.indexOf('https://li.quest/') === 0 || WATCH_RPC.indexOf(u) >= 0),
+  ok(urls.every(u => u.indexOf('https://li.quest/') === 0 || u.indexOf('https://api.trongrid.io/wallet/') === 0 || WATCH_RPC.indexOf(u) >= 0),
      'every request went to li.quest or to one of the nodes the page was built with, and nowhere else');
   ok(q.indexOf('integrator=entekhab') > 0 && q.indexOf('fee=0.003') > 0, "the site's integrator name and fee travel with the request");
   ok(q.indexOf('fromAddress=' + ME) > 0 && q.indexOf('toAddress=' + ME) > 0, 'the proceeds are asked to be sent to the reader, nobody else');
@@ -613,6 +615,198 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(S.config(CFG).donate === GIFT && S.config(Object.assign({}, CFG, { donate: 'not-an-address' })).donate === '',
      'only a real address is taken from the settings');
 
+  /* ================================================================ a swap that starts on Tron, or on Solana */
+  const crypto = require('crypto');
+  const sha = b => crypto.createHash('sha256').update(Buffer.from(b)).digest();
+  const vi = n => { n = BigInt(n); const o = []; do { let b = Number(n & 127n); n >>= 7n; if (n > 0n) { b |= 128; } o.push(b); } while (n > 0n); return o; };
+  const fld = (n, wt, body) => vi((BigInt(n) << 3n) | BigInt(wt)).concat(wt === 2 ? vi(body.length).concat(body) : body);
+  const tronAddr = h20 => { const b = [0x41].concat([...Buffer.from(h20, 'hex')]); const c = sha(sha(b)); return S.b58enc(b.concat([...c.slice(0, 4)])); };
+  const hex21 = a => S.tronHex(a);
+  const T_ME = tronAddr('11'.repeat(20)), T_LIFI = 'TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt', T_USDT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', T_TRX = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb';
+  ok(S.tronHex(T_LIFI) === '41c6594cd50c39ba5f23538fdc3b8492c95edb6fe1', "LI.FI's Tron contract reads as the 21 bytes the chain uses");
+  ok(S.tronHex('TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHL') === null && S.tronHex(ME) === null, 'what is not a Tron address is not read as one');
+  /* a Tron transaction, built the way the chain encodes it */
+  function tronTx(o) {
+    o = Object.assign({ owner: T_ME, to: T_LIFI, call: 0n, data: 'c46059b2' + '00'.repeat(64), fee: 150000000n, exp: Date.now() + 600000, type: 31, n: 1 }, o || {});
+    let val = fld(1, 2, [...Buffer.from(hex21(o.owner), 'hex')]).concat(fld(2, 2, [...Buffer.from(hex21(o.to), 'hex')]));
+    if (o.call > 0n) { val = val.concat(fld(3, 0, vi(o.call))); }
+    val = val.concat(fld(4, 2, [...Buffer.from(o.data, 'hex')]));
+    if (o.trc10) { val = val.concat(fld(5, 0, vi(5))); }
+    const any = fld(1, 2, [...Buffer.from('type.googleapis.com/protocol.TriggerSmartContract')]).concat(fld(2, 2, val));
+    const contract = fld(1, 0, vi(o.type)).concat(fld(2, 2, any));
+    let raw = fld(1, 2, [0xe7, 0xbf]).concat(fld(4, 2, [1, 2, 3, 4, 5, 6, 7, 8]), fld(8, 0, vi(o.exp)));
+    for (let i = 0; i < o.n; i++) { raw = raw.concat(fld(11, 2, contract)); }
+    raw = raw.concat(fld(14, 0, vi(Date.now())), fld(18, 0, vi(o.fee)));
+    const hex = Buffer.from(raw).toString('hex');
+    return { visible: true, txID: sha(raw).toString('hex'), raw_data: { contract: [{}] }, raw_data_hex: hex };
+  }
+  const f0 = S.tronFacts(tronTx({ call: 100000000n }).raw_data_hex);
+  ok(f0 && f0.type === 31n && f0.owner === hex21(T_ME) && f0.contract === hex21(T_LIFI) && f0.call === 100000000n && f0.feeLimit === 150000000n,
+     'a Tron transaction is read back from its own bytes: who, to which contract, how much TRX, what fee limit');
+  ok(S.tronFacts(tronTx({ n: 2 }).raw_data_hex) === null, 'a transaction carrying two calls is not read at all');
+  ok(S.tronFacts(tronTx({ trc10: true }).raw_data_hex) === null, 'nor one with a second kind of token riding along');
+  ok(S.tronFacts('zz') === null && S.tronFacts('') === null && S.tronFacts('0aff') === null, 'nor bytes that are not a transaction');
+
+  const TRON = 728126428, SOL = 1151111081099710;
+  function tronQuote(over, o) {
+    const t = tronTx(o);
+    const q = { tool: 'sunswap', action: { fromChainId: TRON, toChainId: TRON, fromToken: { address: T_USDT, decimals: 6, symbol: 'USDT' },
+        toToken: { address: T_TRX, decimals: 6, symbol: 'TRX' }, fromAmount: '50000000', fromAddress: T_ME, toAddress: T_ME, slippage: 0.005 },
+      estimate: { toAmount: '160000000', toAmountMin: '159200000', approvalAddress: T_LIFI, fromAmountUSD: '50.00', toAmountUSD: '49.80', gasCosts: [], feeCosts: [], executionDuration: 20 },
+      transactionRequest: { from: T_ME, to: T_LIFI, chainId: TRON, data: '0x' + t.raw_data_hex, value: '0x0', customData: { contractType: 'TriggerSmartContract', tronTransaction: t } } };
+    return over ? (over(q) || q) : q;
+  }
+  const tReq = { kind: 'tron', fromChain: TRON, toChain: TRON, fromToken: T_USDT, toToken: T_TRX, fromAmount: '50000000', account: T_ME,
+    contract: T_LIFI, slippage: 0.005, fromDecimals: 6, toDecimals: 6, exactTo: true };
+  ok(S.checkQuote(tronQuote(), tReq) === null, 'a Tron swap passes when every byte agrees with the request');
+  const swapT = (o) => tronQuote(null, o);
+  ok(S.checkQuote(swapT({ to: T_USDT }), tReq) === 'contract', "a Tron transaction aimed at any contract but LI.FI's own is refused");
+  ok(S.checkQuote(swapT({ owner: T_LIFI }), tReq) === 'txFrom', 'one that would be sent from another address is refused');
+  ok(S.checkQuote(swapT({ call: 5n }), tReq) === 'tokenValue', 'a token swap that also carries TRX is refused');
+  ok(S.checkQuote(swapT({ fee: 5000000000n }), tReq) === 'feeLimit', 'a fee limit above 1000 TRX is refused');
+  ok(S.checkQuote(swapT({ exp: Date.now() - 1000 }), tReq) === 'expired', 'a transaction already past its time is refused');
+  ok(S.checkQuote(swapT({ type: 1 }), tReq) === 'tronType', 'anything but a contract call — a plain transfer, say — is refused');
+  ok(S.checkQuote(tronQuote(q => { q.transactionRequest.data = '0x' + tronTx({ to: T_USDT }).raw_data_hex; }), tReq) === 'data',
+     'the bytes shown and the bytes to be signed must be the same bytes');
+  ok(S.checkQuote(tronQuote(q => { q.estimate.approvalAddress = T_USDT; }), tReq) === 'approvalAddress', 'the spender to approve must be LI.FI on Tron');
+  ok(S.checkQuote(tronQuote(q => { q.action.fromAddress = T_ME.toLowerCase(); }), tReq) === 'fromAddress', 'a Tron address is compared letter for letter');
+  ok(S.checkQuote(tronQuote(q => { q.action.toAddress = T_LIFI; }), tReq) === 'toAddress', 'where the swap comes out is held to the request');
+  const nReq = Object.assign({}, tReq, { fromToken: T_TRX, toToken: T_USDT, fromAmount: '100000000' });
+  const nQ = (call) => tronQuote(q => { q.action.fromToken.address = T_TRX; q.action.toToken.address = T_USDT; q.action.fromAmount = '100000000'; }, { call });
+  ok(S.checkQuote(nQ(100000000n), nReq) === null, 'a swap from TRX itself carries exactly the TRX typed');
+  ok(S.checkQuote(nQ(100000001n), nReq) === 'nativeValue' && S.checkQuote(nQ(0n), nReq) === 'nativeValue', '…and one unit more, or none, is refused');
+
+  /* Solana: one signature slot, a version-0 message, and the payer first among its keys */
+  const solKey = [...sha([7, 7, 7])], solOther = [...sha([9])];
+  const SOL_ME = S.b58enc(solKey);
+  const solTx = (payer) => Buffer.from([1].concat(new Array(64).fill(0), [0x80, 1, 0, 1, 2], payer, solOther, [...sha([1])], [1, 1, 0, 0])).toString('base64');
+  ok(S.solPayer(solTx(solKey)) && S.b58enc(S.solPayer(solTx(solKey))) === SOL_ME, 'the key that pays for a Solana transaction is read from its bytes');
+  ok(S.solPayer('not base64!') === null && S.solPayer('AAAA') === null, 'bytes that are not a transaction give no payer');
+  const sQuote = (over, payer) => { const q = { tool: 'mayan', action: { fromChainId: SOL, toChainId: 56, fromToken: { address: '11111111111111111111111111111111', decimals: 9, symbol: 'SOL' },
+      toToken: { address: USDT, decimals: 18, symbol: 'USDT' }, fromAmount: '500000000', fromAddress: SOL_ME, toAddress: ME, slippage: 0.005 },
+    estimate: { toAmount: '35000000000000000000', toAmountMin: '34825000000000000000', approvalAddress: DIAMOND, fromAmountUSD: '36', toAmountUSD: '35', gasCosts: [], feeCosts: [], executionDuration: 60 },
+    transactionRequest: { data: solTx(payer || solKey), svmTransactionVersion: 0 } }; return over ? (over(q) || q) : q; };
+  const sReq = { kind: 'solana', fromChain: SOL, toChain: 56, fromToken: '11111111111111111111111111111111', toToken: USDT, fromAmount: '500000000',
+    account: SOL_ME, recipient: ME, slippage: 0.005, fromDecimals: 9, toDecimals: 18, exactTo: false };
+  ok(S.checkQuote(sQuote(), sReq) === null, 'a Solana swap passes when the reader\'s own key pays for it');
+  ok(S.checkQuote(sQuote(null, solOther), sReq) === 'txFrom', 'one paid for by another key is refused');
+  ok(S.checkQuote(sQuote(q => { q.action.toAddress = '0x' + '9'.repeat(40); }), sReq) === 'toAddress', 'where it comes out is held to the address typed');
+  ok(S.checkQuote(sQuote(q => { q.transactionRequest.data = 'AAAA'; }), sReq) === 'data', 'a transaction too short to be one is refused');
+  ok(S.checkQuote(sQuote(), Object.assign({}, sReq, { kind: 'cosmos' })) === 'kind', 'a kind of network the page does not know is refused outright');
+
+  /* ---- the whole way on the page, with a Tron wallet that signs and a node that answers */
+  const DATA2 = JSON.parse(JSON.stringify(DATA));
+  DATA2.chains.push({ id: TRON, name: 'Tron', coin: 'TRX', explorer: 'https://tronscan.org/', kind: 'tron', contract: T_LIFI },
+                    { id: SOL, name: 'Solana', coin: 'SOL', explorer: 'https://solscan.io/', kind: 'solana' });
+  DATA2.tokens[String(TRON)] = [{ symbol: 'TRX', name: 'TRX', address: T_TRX, decimals: 6 }, { symbol: 'USDT', name: 'USDT', address: T_USDT, decimals: 6 }];
+  DATA2.tokens[String(SOL)] = [{ symbol: 'SOL', name: 'SOL', address: '11111111111111111111111111111111', decimals: 9 }];
+  DATA2.addr.solana = '^[1-9A-HJ-NP-Za-km-z]{32,44}$';
+  let node = { allowance: 0n, calls: [], signed: [], broadcast: [], tamperSign: false };
+  tronNode = (path_, body) => {
+    node.calls.push(path_);
+    let j = {};
+    if (path_ === '/wallet/getaccount') { j = { balance: 5000000000 }; }
+    else if (path_ === '/wallet/triggerconstantcontract') { j = { constant_result: [(body.function_selector.indexOf('allowance') === 0 ? node.allowance : 900000000n).toString(16).padStart(64, '0')] }; }
+    else if (path_ === '/wallet/triggersmartcontract') { j = { transaction: tronTx({ to: body.contract_address, data: '095ea7b3' + body.parameter, fee: BigInt(body.fee_limit) }) }; node.built = j.transaction; }
+    else if (path_ === '/wallet/broadcasttransaction') { node.broadcast.push(body); j = { result: true, txid: body.txID }; }
+    else if (path_ === '/wallet/gettransactioninfobyid') { j = { id: body.value, blockNumber: 1, receipt: { result: 'SUCCESS' } }; }
+    return Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(JSON.stringify(j)) });
+  };
+  const tronWallet = (w) => {
+    w.tronLink = { request: () => Promise.resolve({ code: 200 }) };
+    w.tronWeb = { defaultAddress: { base58: T_ME }, trx: { sign: (t) => { node.signed.push(t); const s = Object.assign({}, t, { signature: ['ab'.repeat(65)] }); if (node.tamperSign) { s.raw_data_hex = tronTx({ to: T_USDT }).raw_data_hex; } return Promise.resolve(s); } } };
+  };
+  S.tune({ wait: 300, poll: 20 });
+  global.fetch = realFetch; freshWallet(); S.TW.account = ''; S.SW.account = '';
+  let farQ = null; serve = () => farQ;
+  let farTW = makeWindow(CFG, { allowed: true, data: DATA2 }); tronWallet(farTW.win);
+  S.start(farTW.win); await sleep(60);
+  ok(farTW.chainRows('fc').indexOf('Tron') >= 0 && farTW.chainRows('fc').indexOf('Solana') >= 0 && farTW.chainRows('fc').indexOf('Bitcoin') < 0,
+     'Tron and Solana are offered as a place to start; Bitcoin still is not');
+  farTW.$('dnc').fire('click');
+  ok(!farTW.$('dlg-list').kids.some(k => k.kids[1] && (k.kids[1]._text === 'Tron' || k.kids[1]._text === 'Solana')), 'the gift panel, which sends a plain EVM transfer, offers neither');
+  farTW.$('dlg-close').fire('click');
+  ok(farTW.pickChain('fc', 'Tron'), 'the start is set to Tron'); await sleep(40);
+  ok(farTW.need() === 'connect', 'the page asks for the Tron wallet, not the EVM one');
+  farTW.go(); await sleep(80);
+  ok(farTW.$('account').textContent.length > 0 && farTW.need() !== 'chain', 'once connected there is no network to switch: Tron is Tron');
+  /* TRX -> USDT on Tron itself: no address to type, no approval */
+  ok(farTW.pickChain('tc', 'Tron'), 'the destination is Tron too'); await sleep(40);
+  ok(farTW.$('rcp-box').hidden === true, 'both ends on Tron: the swap comes back to the reader\'s own address, nothing to type');
+  farQ = tronQuote(q => { q.action.fromToken.address = T_TRX; q.action.toToken.address = T_USDT; q.action.fromAmount = '100000000'; q.estimate.toAmount = '30000000'; q.estimate.toAmountMin = '29850000'; }, { call: 100000000n });
+  await farTW.type('100'); await sleep(400);
+  ok(farTW.need() === 'swap', 'a price arrives and the swap is offered (need=' + farTW.need() + ' ' + farTW.$('msg').textContent + ')');
+  ok(farTW.$('balance').textContent.indexOf('5,000') === 0, 'the balance was read from Tron\'s own node');
+  farTW.go(); await sleep(250);
+  ok(node.signed.length === 1 && node.signed[0].txID === farQ.transactionRequest.customData.tronTransaction.txID, 'the wallet was handed exactly the transaction that was checked');
+  ok(node.broadcast.length === 1 && node.broadcast[0].txID === node.signed[0].txID && node.broadcast[0].signature.length === 1, 'the signed transaction, and only it, was sent to the network');
+  ok(farTW.sent.length === 0, 'the EVM wallet was never asked for anything');
+  ok(farTW.$('status').kids.some(k => k.kids[0] && String(k.kids[0].attrs.href).indexOf('https://tronscan.org/#/transaction/') === 0), 'the link goes to Tron\'s own explorer');
+  ok(farTW.$('msg').getAttribute('data-ok') === '1', 'and the page says it is done once the network confirms it');
+
+  /* a token from Tron to an EVM network: the address is asked for, the approval comes first, and it is exact */
+  S.TW.account = ''; node = { allowance: 0n, calls: [], signed: [], broadcast: [], tamperSign: false };
+  farTW = makeWindow(CFG, { allowed: false, data: DATA2 }); tronWallet(farTW.win);
+  S.start(farTW.win); await sleep(60);
+  farTW.pickChain('fc', 'Tron'); await sleep(30); farTW.go(); await sleep(80);
+  farTW.pick('ft', 'USDT'); await sleep(30);
+  farTW.pickChain('tc', 'BNB Smart Chain'); await sleep(30);
+  ok(farTW.$('rcp-box').hidden === false, 'Tron to an EVM network: the page asks where it should arrive');
+  farQ = tronQuote(q => { q.action.toChainId = 56; q.action.toToken = { address: BNB, decimals: 18, symbol: 'BNB' }; q.action.toAddress = ME; q.estimate.toAmount = '90000000000000000'; q.estimate.toAmountMin = '89550000000000000'; });
+  farTW.pick('tt', 'BNB'); await sleep(30);
+  await farTW.type('50');
+  ok(farTW.$('rcp').value === ME, 'the EVM wallet already known to the page is offered as the address');
+  await farTW.rcpType('');
+  ok(farTW.need() === 'recipient', 'with no address nothing is asked of the price service');
+  await farTW.rcpType('0x123'); ok(farTW.need() === 'badRecipient', 'an address that is not an EVM address is refused');
+  await farTW.rcpType(ME); await sleep(900);
+  ok(farTW.need() === 'ack', 'a sound address brings a price and asks the reader to confirm it');
+  farTW.$('ack').checked = true; farTW.$('ack').fire('change'); await sleep(40);
+  ok(farTW.need() === 'approve', 'the token must be approved first');
+  farTW.go(); await sleep(300);
+  const ap = node.signed[0] && S.tronFacts(node.signed[0].raw_data_hex);
+  ok(ap && ap.contract === hex21(T_USDT) && ap.owner === hex21(T_ME) && ap.call === 0n, 'the approval is a call to the token itself, from the reader, carrying nothing');
+  ok(ap && ap.data === '095ea7b3' + hex21(T_LIFI).slice(2).padStart(64, '0') + (50000000).toString(16).padStart(64, '0'),
+     '…approve(LI.FI on Tron, exactly this amount), never more');
+  ok(farTW.need() === 'swap', 'after it confirms the swap is offered');
+  node.tamperSign = true; farTW.go(); await sleep(250);
+  ok(node.broadcast.length === 1 && farTW.$('msg').textContent.indexOf('signature') > 0, 'a wallet that hands back a different transaction than it was given is not obeyed: nothing more is sent');
+  /* an approval the node builds wrongly is never signed */
+  node.tamperSign = false;
+  const goodNode = tronNode;
+  tronNode = (p_, b_) => p_ === '/wallet/triggersmartcontract' ? Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve(JSON.stringify({ transaction: tronTx({ to: b_.contract_address, data: '095ea7b3' + 'f'.repeat(128) }) })) }) : goodNode(p_, b_);
+  S.TW.account = ''; node.signed = []; node.broadcast = [];
+  farTW = makeWindow(CFG, { allowed: false, data: DATA2 }); tronWallet(farTW.win);
+  S.start(farTW.win); await sleep(60);
+  farTW.pickChain('fc', 'Tron'); await sleep(30); farTW.go(); await sleep(80); farTW.pick('ft', 'USDT'); await sleep(30); farTW.pickChain('tc', 'BNB Smart Chain'); await sleep(30);
+  farTW.pick('tt', 'BNB'); await sleep(30); await farTW.type('50'); await farTW.rcpType(ME); await sleep(900); farTW.$('ack').checked = true; farTW.$('ack').fire('change'); await sleep(40);
+  farTW.go(); await sleep(250);
+  ok(node.signed.length === 0 && farTW.$('msg').textContent.indexOf('approve') > 0, 'an approval for an unlimited amount, slipped in by the node, never reaches the wallet');
+  tronNode = goodNode;
+
+  /* Solana: the wallet is handed the very bytes LI.FI built, and what comes back is followed on LI.FI */
+  const solSent = [];
+  S.SW.account = ''; freshWallet();
+  let farSW = makeWindow(CFG, { allowed: true, data: DATA2 });
+  farSW.win.solana = { connect: () => Promise.resolve({ publicKey: { toString: () => SOL_ME } }), publicKey: { toString: () => SOL_ME },
+    request: (r) => { solSent.push(r); return Promise.resolve({ signature: S.b58enc([...sha([1]), ...sha([2])]) }); } };
+  S.start(farSW.win); await sleep(60);
+  farSW.pickChain('fc', 'Solana'); await sleep(30);
+  ok(farSW.need() === 'connect', 'the page asks for the Solana wallet'); farSW.go(); await sleep(80);
+  farSW.pickChain('tc', 'BNB Smart Chain'); await sleep(30); farSW.pick('tt', 'USDT'); await sleep(30);
+  farQ = sQuote();
+  await farSW.type('0.5'); await sleep(900);
+  ok(farSW.$('rcp').value === ME, 'the EVM address already connected is offered as the place to receive');
+  ok(farSW.need() === 'ack', 'and the reader confirms it before anything is signed (need=' + farSW.need() + ' ' + farSW.$('msg').textContent + ')');
+  farSW.$('ack').checked = true; farSW.$('ack').fire('change'); await sleep(40);
+  ok(farSW.need() === 'swap', 'no approval is needed on Solana');
+  farSW.go(); await sleep(200);
+  ok(solSent.length === 1 && solSent[0].method === 'signAndSendTransaction' && solSent[0].params.message === S.b58enc([...Buffer.from(farQ.transactionRequest.data, 'base64')]),
+     'the wallet received exactly the bytes that were checked');
+  ok(farSW.sent.length === 0, 'and the EVM wallet was not asked to sign');
+  ok(urls.some(u => u.indexOf('/v1/status') > 0 && u.indexOf('fromChain=' + SOL) > 0), 'the swap is then followed on LI.FI\'s own record');
+  serve = () => goodQuote();
+
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
   for (const w of ['eval(', 'new Function', 'innerHTML', 'outerHTML', 'document.write', 'insertAdjacentHTML', 'srcdoc',
@@ -621,10 +815,11 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
     ok(code.indexOf(w) < 0, 'swap.js never uses ' + w);
   }
   const hosts = (code.match(/https?:\/\/[^'"\s)]+/g) || []);
-  ok(hosts.length === 1 && hosts[0] === 'https://li.quest', 'the only address written into swap.js is https://li.quest');
+  ok(hosts.length === 2 && hosts[0] === 'https://li.quest' && hosts[1] === 'https://api.trongrid.io',
+     "the only addresses written into swap.js are LI.FI's and Tron's public node");
   ok(code.indexOf('rpcBalance') > 0 && /fetch\(w\.rpc/.test(code), "a network's own node is only ever read from the address the page was built with");
   ok((code.match(/localStorage\.\w+\('([^']+)'/g) || []).every(x => x.indexOf("'ck_lang'") > 0), 'the only thing kept in the browser is the chosen site language');
-  ok((code.match(/\bfetch\(/g) || []).length === 2, 'there are exactly two places that reach the network: the price service and a node');
+  ok((code.match(/\bfetch\(/g) || []).length === 3, "there are exactly three places that reach the network: the price service, a balance node, and Tron's node");
   ok(code.indexOf('MAX_FEE = 0.03') > 0, 'the 3% ceiling on the fee is in the file itself');
   for (const lg of ['fa', 'ckb', 'en']) {
     ok(Object.keys(S.T[lg]).sort().join() === Object.keys(S.T.en).sort().join(), 'every message exists in ' + lg);

@@ -35,6 +35,7 @@
   /* ------------------------------------------------------------------ text */
   var T = {
     fa: {
+      noWalletTron: 'کیف پول ترون در این مرورگر پیدا نشد (ترون‌لینک، سیف‌پل، تراست ولت…).', noWalletSol: 'کیف پول سولانا در این مرورگر پیدا نشد (فانتوم، سیف‌پل، تراست ولت…).',
       noWallet: 'کیف پولی در این مرورگر پیدا نشد. این صفحه را در مرورگر داخلی کیف پول خود (متامسک، تراست ولت، سیف‌پل…) باز کنید.',
       connect: 'اتصال کیف پول', connecting: 'در حال اتصال…', rejected: 'درخواست در کیف پول رد شد.',
       switchChain: 'تغییر شبکهٔ کیف پول', switching: 'در انتظار کیف پول…',
@@ -61,6 +62,7 @@
       findOnChain: 'جست‌وجو روی شبکه', balance: 'موجودی'
     },
     ckb: {
+      noWalletTron: 'جزدانی ترۆن لەم وێبگەڕەدا نەدۆزرایەوە (ترۆن‌لینک، سەیفپاڵ، تراست وۆلێت…).', noWalletSol: 'جزدانی سۆلانا لەم وێبگەڕەدا نەدۆزرایەوە (فانتۆم، سەیفپاڵ، تراست وۆلێت…).',
       noWallet: 'هیچ جزدانێک لەم وێبگەڕەدا نەدۆزرایەوە. ئەم پەڕەیە لە وێبگەڕی ناوەوەی جزدانەکەت (مێتاماسک، تراست وۆلێت، سەیفپاڵ…) بکەرەوە.',
       connect: 'بەستنەوەی جزدان', connecting: 'لە بەستنەوەدا…', rejected: 'داواکارییەکە لە جزدانەکەدا ڕەتکرایەوە.',
       switchChain: 'گۆڕینی تۆڕی جزدان', switching: 'چاوەڕێی جزدان…',
@@ -87,6 +89,7 @@
       findOnChain: 'گەڕان لەسەر تۆڕ', balance: 'ماوە'
     },
     en: {
+      noWalletTron: 'No Tron wallet found in this browser (TronLink, SafePal, Trust Wallet…).', noWalletSol: 'No Solana wallet found in this browser (Phantom, SafePal, Trust Wallet…).',
       noWallet: 'No wallet found in this browser. Open this page in the browser inside your wallet (MetaMask, Trust Wallet, SafePal…).',
       connect: 'Connect wallet', connecting: 'Connecting…', rejected: 'The request was rejected in the wallet.',
       switchChain: 'Switch the wallet’s network', switching: 'Waiting for the wallet…',
@@ -296,6 +299,253 @@
     return SUMMED[addr];
   }
 
+  /* ================================================================== Tron and Solana: a swap may start there too
+   * Neither is signed through window.ethereum, and neither hands the wallet a transaction it can read back the way an
+   * EVM wallet can. So what LI.FI returns is opened here, byte by byte, before any wallet sees it:
+   *   Tron   — the transaction is a protobuf. It must be exactly one TriggerSmartContract, owned by the reader's own
+   *            address, calling LI.FI's own contract on Tron (pinned in scripts/swap_chains.json), carrying exactly the
+   *            TRX the reader typed (or none for a token), with a bounded fee limit and an expiry still ahead.
+   *            Its id must be the SHA-256 of those very bytes, because the id is what the wallet signs.
+   *   Solana — programs cannot be pinned that way, so less can be proved: the transaction must be paid for by the
+   *            reader's own key, and where the money comes out is held to the address in the request as everywhere.
+   * Broadcasting and reading balances on Tron go to TronGrid's public API, not through the wallet. */
+  var TRON_API = 'https://api.trongrid.io';
+  var TRX = 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb';          /* how LI.FI writes Tron's own coin */
+  var TRON_FEE_CAP = 1000000000n;                           /* 1000 TRX: no swap needs a fee limit above this */
+
+  function hexOf(bytes) { var s = '', i; for (i = 0; i < bytes.length; i++) { s += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16); } return s; }
+  function bytesOf(hex) {
+    if (typeof hex !== 'string' || hex.length % 2 || !/^[0-9a-fA-F]*$/.test(hex)) { return null; }
+    var out = [], i; for (i = 0; i < hex.length; i += 2) { out.push(parseInt(hex.substr(i, 2), 16)); } return out;
+  }
+  function b58enc(bytes) {
+    var num = 0n, i, s = '', z = 0;
+    for (i = 0; i < bytes.length; i++) { num = (num << 8n) | BigInt(bytes[i]); }
+    while (num > 0n) { s = B58.charAt(Number(num % 58n)) + s; num /= 58n; }
+    while (z < bytes.length && bytes[z] === 0) { s = '1' + s; z++; }
+    return s;
+  }
+  function b64(str) {
+    if (typeof str !== 'string' || !/^[A-Za-z0-9+/]*={0,2}$/.test(str) || str.length % 4) { return null; }
+    try { var bin = atob(str), out = [], i; for (i = 0; i < bin.length; i++) { out.push(bin.charCodeAt(i)); } return out; } catch (e) { return null; }
+  }
+  /* a Tron address as the 21 bytes the chain itself uses, in hex: 41 and then twenty bytes */
+  function tronHex(addr) {
+    var raw = typeof addr === 'string' && addr.length === 34 ? b58(addr) : null;
+    return raw && raw.length === 25 && raw[0] === 0x41 ? hexOf(raw.slice(0, 21)) : null;
+  }
+
+  /* protobuf, read plainly: every field with its number, and either its number-value or its bytes */
+  function pb(bytes) {
+    var out = [], i = 0, key, n, wt, v, sh, len;
+    function varint() {
+      v = 0n; sh = 0n;
+      for (;;) {
+        if (i >= bytes.length || sh > 63n) { return null; }
+        var b = bytes[i++]; v |= BigInt(b & 127) << sh; sh += 7n;
+        if (!(b & 128)) { return v; }
+      }
+    }
+    while (i < bytes.length) {
+      key = varint(); if (key === null) { return null; }
+      n = Number(key >> 3n); wt = Number(key & 7n);
+      if (wt === 0) { if (varint() === null) { return null; } out.push({ n: n, v: v }); }
+      else if (wt === 2) {
+        len = varint(); if (len === null || len > BigInt(bytes.length - i)) { return null; }
+        out.push({ n: n, b: bytes.slice(i, i + Number(len)) }); i += Number(len);
+      }
+      else if (wt === 1) { i += 8; if (i > bytes.length) { return null; } }
+      else if (wt === 5) { i += 4; if (i > bytes.length) { return null; } }
+      else { return null; }
+    }
+    return out;
+  }
+  function pbAll(f, n) { return f.filter(function (x) { return x.n === n; }); }
+  function pbOne(f, n) { var a = pbAll(f, n); return a.length === 1 ? a[0] : null; }
+
+  /* what a Tron transaction really is, read from the bytes that get signed */
+  function tronFacts(rawHex) {
+    var bytes = bytesOf(rawHex); if (!bytes || !bytes.length) { return null; }
+    var raw = pb(bytes); if (!raw) { return null; }
+    var cs = pbAll(raw, 11); if (cs.length !== 1 || !cs[0].b) { return null; }       /* one contract call, no more */
+    var c = pb(cs[0].b); if (!c) { return null; }
+    var type = pbOne(c, 1), any = pbOne(c, 2); if (!type || type.v === undefined || !any || !any.b) { return null; }
+    var a = pb(any.b); if (!a) { return null; }
+    var val = pbOne(a, 2); if (!val || !val.b) { return null; }
+    var v = pb(val.b); if (!v) { return null; }
+    var owner = pbOne(v, 1), to = pbOne(v, 2), call = pbAll(v, 3), data = pbOne(v, 4);
+    if (!owner || !owner.b || owner.b.length !== 21 || !to || !to.b || to.b.length !== 21 || call.length > 1) { return null; }
+    if (pbAll(v, 5).length || pbAll(v, 6).length) { return null; }                    /* no TRC-10 token rides along */
+    var exp = pbOne(raw, 8), fee = pbOne(raw, 18);
+    return { type: type.v, owner: hexOf(owner.b), contract: hexOf(to.b),
+             call: call.length && call[0].v !== undefined ? call[0].v : 0n,
+             data: data && data.b ? hexOf(data.b) : '',
+             expiration: exp && exp.v !== undefined ? exp.v : 0n, feeLimit: fee && fee.v !== undefined ? fee.v : 0n };
+  }
+
+  /* who pays for a Solana transaction: the first key of its message */
+  function solPayer(data) {
+    var b = b64(data), i = 0, n, k;
+    if (!b || b.length < 100 || b.length > 4096) { return null; }
+    function compact() { var v = 0, sh = 0, x; do { if (i >= b.length || sh > 14) { return -1; } x = b[i++]; v |= (x & 127) << sh; sh += 7; } while (x & 128); return v; }
+    n = compact(); if (n < 1 || n > 8) { return null; }
+    i += 64 * n; if (i >= b.length) { return null; }
+    if (b[i] & 128) { i++; }                                 /* a versioned message says so in its first byte */
+    i += 3;                                                  /* the header: three counts */
+    k = compact(); if (k < 1 || i + 32 > b.length) { return null; }
+    return b.slice(i, i + 32);
+  }
+  function sameBytes(x, y) { if (!x || !y || x.length !== y.length) { return false; } for (var i = 0; i < x.length; i++) { if (x[i] !== y[i]) { return false; } } return true; }
+
+  function tron(path, body) {
+    if (!/^\/wallet\/[a-z]+$/.test(path)) { return Promise.reject(new Error('bad path')); }
+    var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) { ctl.abort(); } }, TIMEOUT);
+    return fetch(TRON_API + path, { method: 'POST', mode: 'cors', credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer',
+      headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.text(); })
+      .then(function (txt) { clearTimeout(timer); var j = null; try { j = JSON.parse(txt); } catch (e) { } if (!plain(j)) { throw new Error('tron node'); } return j; },
+            function (e) { clearTimeout(timer); throw e; });
+  }
+  /* the id of a Tron transaction is the SHA-256 of its bytes, and the id is the thing the wallet signs */
+  function tronId(t) {
+    var bytes = bytesOf(t.raw_data_hex);
+    if (!bytes) { return Promise.resolve(false); }
+    return sha256(bytes).then(function (h) { return hexOf(h) === String(t.txID).toLowerCase(); }, function () { return false; });
+  }
+
+  var TW = {
+    p: null, account: '',
+    find: function (win) { var w = win || root; return w && ((w.tronLink && typeof w.tronLink.request === 'function') || w.tronWeb) ? w : null; },
+    web: function () { var w = this.p; return (w && (w.tronWeb || (w.tronLink && w.tronLink.tronWeb))) || null; },
+    read: function () {
+      var tw = this.web(), a = tw && tw.defaultAddress && tw.defaultAddress.base58;
+      return typeof a === 'string' && tronHex(a) ? a : '';
+    },
+    connect: function () {
+      var self = this, w = this.p;
+      if (!w) { return Promise.reject(new Error('no wallet')); }
+      var asked = w.tronLink && typeof w.tronLink.request === 'function' ? w.tronLink.request({ method: 'tron_requestAccounts' }) : null;
+      return Promise.resolve(asked).then(function (r) {
+        if (r && r.code === 4001) { var e = new Error('rejected'); e.code = 4001; throw e; }
+        var a = self.read();
+        if (!a) { throw new Error('no account'); }
+        return checkSum(a).then(function (okd) { if (okd === false) { throw new Error('no account'); } self.account = a; return a; });
+      });
+    },
+    constant: function (token, owner, selector, param) {
+      return tron('/wallet/triggerconstantcontract', { owner_address: owner, contract_address: token, function_selector: selector, parameter: param, visible: true })
+        .then(function (j) {
+          var r = Array.isArray(j.constant_result) && typeof j.constant_result[0] === 'string' ? j.constant_result[0] : '';
+          return /^[0-9a-fA-F]{1,64}$/.test(r) ? BigInt('0x' + r) : null;
+        });
+    },
+    balance: function (token, owner) {
+      if (token === TRX) { return tron('/wallet/getaccount', { address: owner, visible: true }).then(function (j) { return typeof j.balance === 'number' && j.balance >= 0 ? BigInt(j.balance) : 0n; }); }
+      return this.constant(token, owner, 'balanceOf(address)', pad32(tronHex(owner).slice(2)));
+    },
+    allowance: function (token, owner, spender) {
+      return this.constant(token, owner, 'allowance(address,address)', pad32(tronHex(owner).slice(2)) + pad32(tronHex(spender).slice(2)));
+    },
+    /* the wallet signs; what comes back must be the very transaction that went in, with a signature on it */
+    sign: function (t) {
+      var tw = this.web();
+      if (!tw || !tw.trx || typeof tw.trx.sign !== 'function') { return Promise.reject(new Error('no wallet')); }
+      return Promise.resolve(tw.trx.sign(t)).then(function (s) {
+        if (!plain(s) || s.txID !== t.txID || s.raw_data_hex !== t.raw_data_hex || !Array.isArray(s.signature) || !s.signature.length ||
+            typeof s.signature[0] !== 'string' || !/^[0-9a-fA-F]{130}$/.test(s.signature[0])) { throw { soft: 'signature' }; }
+        return s;
+      });
+    },
+    broadcast: function (signed) {
+      return tron('/wallet/broadcasttransaction', signed).then(function (j) {
+        if (j.result !== true) { var e = new Error(String(j.code || j.message || 'not accepted').slice(0, 80)); throw e; }
+        return signed.txID;
+      });
+    },
+    receipt: function (id) {
+      return tron('/wallet/gettransactioninfobyid', { value: id }).then(function (j) {
+        if (!j.id) { return null; }                                         /* not in a block yet */
+        if (j.result === 'FAILED') { return false; }
+        if (plain(j.receipt) && typeof j.receipt.result === 'string') { return j.receipt.result === 'SUCCESS'; }
+        return true;
+      });
+    }
+  };
+  function tronWait(id, tries) {
+    tries = tries === undefined ? 60 : tries;
+    var again = function () { return tries <= 0 ? null : new Promise(function (res) { setTimeout(res, POLL); }).then(function () { return tronWait(id, tries - 1); }); };
+    return TW.receipt(id).then(function (r) { return r === null ? again() : r; }, again);
+  }
+
+  var SW = {
+    p: null, account: '',
+    find: function (win) {
+      var w = win || root, s = w && (w.solana || (w.phantom && w.phantom.solana));
+      return s && typeof s.connect === 'function' ? s : null;
+    },
+    key: function (r) {
+      var k = (r && r.publicKey) || (this.p && this.p.publicKey), a = k && typeof k.toString === 'function' ? k.toString() : '';
+      var raw = typeof a === 'string' && a.length >= 32 && a.length <= 44 ? b58(a) : null;
+      return raw && raw.length === 32 ? a : '';
+    },
+    connect: function () {
+      var self = this;
+      if (!this.p) { return Promise.reject(new Error('no wallet')); }
+      return Promise.resolve(this.p.connect()).then(function (r) {
+        var a = self.key(r);
+        if (!a) { throw new Error('no account'); }
+        self.account = a; return a;
+      });
+    },
+    /* The bytes go to the wallet exactly as LI.FI built them. Wallets differ in how they take them: the request form
+       first, and for one that does not know it, an object that hands back those same bytes when asked to serialise. */
+    send: function (bytes) {
+      var p = this.p, u8 = new Uint8Array(bytes);
+      if (!p) { return Promise.reject(new Error('no wallet')); }
+      var first = typeof p.request === 'function'
+        ? Promise.resolve().then(function () { return p.request({ method: 'signAndSendTransaction', params: { message: b58enc(bytes) } }); })
+        : Promise.reject(new Error('no request'));
+      return first.catch(function (e) {
+        if ((e && e.code === 4001) || typeof p.signAndSendTransaction !== 'function') { throw e; }
+        return p.signAndSendTransaction({ version: 0, serialize: function () { return u8; } });
+      }).then(function (r) {
+        var sig = typeof r === 'string' ? r : (r && typeof r.signature === 'string' ? r.signature : '');
+        var raw = sig.length >= 64 && sig.length <= 90 ? b58(sig) : null;
+        if (!raw || raw.length !== 64) { throw { soft: 'signature' }; }
+        return sig;
+      });
+    }
+  };
+
+  function checkTron(x, e, req) {
+    var t = plain(x.customData) ? x.customData.tronTransaction : null;
+    if (!plain(t) || !plain(t.raw_data) || typeof t.raw_data_hex !== 'string' || !/^[0-9a-f]{20,400000}$/.test(t.raw_data_hex)) { return 'tronShape'; }
+    if (typeof t.txID !== 'string' || !/^[0-9a-f]{64}$/.test(t.txID)) { return 'tronId'; }
+    if (x.data !== '0x' + t.raw_data_hex) { return 'data'; }
+    if (Number(x.chainId) !== Number(req.fromChain)) { return 'txChain'; }
+    var f = tronFacts(t.raw_data_hex), me = tronHex(req.account), lifi = tronHex(req.contract);
+    if (!f || !me || !lifi) { return 'tronShape'; }
+    if (f.type !== 31n) { return 'tronType'; }                         /* a call to a contract, and nothing else */
+    if (f.owner !== me) { return 'txFrom'; }
+    if (f.contract !== lifi) { return 'contract'; }                    /* LI.FI's own contract on Tron, pinned */
+    if (req.fromToken === TRX) { if (f.call !== BigInt(req.fromAmount)) { return 'nativeValue'; } }
+    else {
+      if (f.call !== 0n) { return 'tokenValue'; }
+      if (e.approvalAddress !== req.contract) { return 'approvalAddress'; }
+    }
+    if (!(f.feeLimit > 0n && f.feeLimit <= TRON_FEE_CAP)) { return 'feeLimit'; }
+    if (!(f.expiration > BigInt(Date.now()))) { return 'expired'; }
+    return null;
+  }
+  function checkSolana(x, req) {
+    if (typeof x.data !== 'string' || x.data.length < 100 || x.data.length > 6000) { return 'data'; }
+    var payer = solPayer(x.data), me = b58(req.account);
+    if (!payer || !me || me.length !== 32) { return 'data'; }
+    if (!sameBytes(payer, me)) { return 'txFrom'; }                    /* the reader's own key pays for it */
+    return null;
+  }
+
   /* ------------------------------------------------------------------ is this answer really our request?
    * Everything the wallet would be asked to sign is checked here. Anything off and the swap stops. */
   function checkQuote(q, req) {
@@ -303,14 +553,16 @@
     var a = q.action, e = q.estimate, x = q.transactionRequest;
     if (Number(a.fromChainId) !== Number(req.fromChain)) { return 'fromChain'; }
     if (Number(a.toChainId) !== Number(req.toChain)) { return 'toChain'; }
-    if (!plain(a.fromToken) || !sameAddr(a.fromToken.address, req.fromToken)) { return 'fromToken'; }
+    var kind = req.kind || 'evm';
+    var fsame = kind === 'evm' ? sameAddr : function (x, y) { return typeof x === 'string' && x === y; };
+    if (!plain(a.fromToken) || !fsame(a.fromToken.address, req.fromToken)) { return 'fromToken'; }
     /* On Bitcoin, Tron, Solana, Sui and Stellar an address is written in base58 or base32, where capitals carry
        meaning: there the comparison must be letter for letter, never the case-insensitive one EVM allows. */
     var same = req.exactTo ? function (x, y) { return typeof x === 'string' && x === y; } : sameAddr;
     if (!plain(a.toToken) || !same(a.toToken.address, req.toToken)) { return 'toToken'; }
     if (String(a.fromAmount) !== String(req.fromAmount)) { return 'fromAmount'; }
-    if (!sameAddr(a.fromAddress, req.account)) { return 'fromAddress'; }
-    /* where the money comes out: what the reader typed, or their own wallet when the swap ends on an EVM network */
+    if (!fsame(a.fromAddress, req.account)) { return 'fromAddress'; }
+    /* where the money comes out: what the reader typed, or their own wallet when both ends are the same kind of network */
     if (!same(a.toAddress, req.recipient || req.account)) { return 'toAddress'; }
     if (!isUint(String(e.toAmount)) || !isUint(String(e.toAmountMin))) { return 'toAmount'; }
     if (BigInt(e.toAmountMin) > BigInt(e.toAmount)) { return 'toAmountMin'; }
@@ -327,15 +579,18 @@
       if (BigInt(e.toAmountMin) + 1n < (BigInt(e.toAmount) * BigInt(allow)) / 1000000n) { return 'minTooLow'; }
       if (a.slippage !== undefined && !(Number(a.slippage) >= 0 && Number(a.slippage) <= Number(req.slippage) + 1e-9)) { return 'slippageBack'; }
     }
+    /* the decimals the page will count in must be the token's own, or every figure shown would be wrong */
+    if (req.fromDecimals !== undefined && Number(a.fromToken.decimals) !== Number(req.fromDecimals)) { return 'fromDecimals'; }
+    if (req.toDecimals !== undefined && Number(a.toToken.decimals) !== Number(req.toDecimals)) { return 'toDecimals'; }
+    if (kind === 'tron') { return checkTron(x, e, req); }
+    if (kind === 'solana') { return checkSolana(x, req); }
+    if (kind !== 'evm') { return 'kind'; }
     if (!isAddr(x.to)) { return 'to'; }
     /* the transaction must be addressed to LI.FI's own contract for this chain and nowhere else. The address is kept
        in scripts/swap_chains.json, read from LI.FI's own /v1/chains. If they ever move it the swap stops here. */
     if (!sameAddr(x.to, req.contract)) { return 'contract'; }
     if (!isHexData(x.data)) { return 'data'; }
     if (x.data.length > 400000) { return 'dataSize'; }                 /* no route needs call data this large */
-    /* the decimals the page will count in must be the token's own, or every figure shown would be wrong */
-    if (req.fromDecimals !== undefined && Number(a.fromToken.decimals) !== Number(req.fromDecimals)) { return 'fromDecimals'; }
-    if (req.toDecimals !== undefined && Number(a.toToken.decimals) !== Number(req.toDecimals)) { return 'toDecimals'; }
     if (!isQty(x.value)) { return 'value'; }
     if (Number(x.chainId) !== Number(req.fromChain)) { return 'txChain'; }
     if (!sameAddr(x.from, req.account)) { return 'txFrom'; }
@@ -444,6 +699,7 @@
 
   /* ================================================================== the page */
   var QUOTE_LIFE = 60000;        /* a price older than this is fetched again before it can be signed */
+  var POLL = 3000;               /* how often a Tron transaction is looked for in a block */
   var WAIT = 9000;               /* how long a wallet gets to answer a question before the page moves on without it */
   var IMPACT_WARN = 3, IMPACT_ACK = 15;     /* % of value lost: warn / demand a tick */
   var GAS_CAP = 30000000n;       /* a gas limit above a whole block is not passed on */
@@ -570,13 +826,23 @@
     })();
 
     function toOnly(c) { return !!(c && c.to_only === true); }
+    function kindOf(c) { return c && typeof c.kind === 'string' ? c.kind : 'evm'; }
+    /* the wallet that signs for the network the swap starts on */
+    function srcW() { var k = kindOf(chainById(S.from.chain)); return k === 'tron' ? TW : k === 'solana' ? SW : W; }
+    /* The swap comes out at the reader's own address only when both ends are the same kind of network, because one
+       wallet address means nothing on another kind. Everywhere else the reader says where it should arrive. */
+    function needRcp() {
+      var fc = chainById(S.from.chain), tc = chainById(S.to.chain);
+      return !!tc && (toOnly(tc) || kindOf(fc) !== kindOf(tc));
+    }
 
     /* '' nothing typed · 'bad' the wrong shape or a failed check · 'wait' the check is still running · 'ok' */
     var sums = {};
     function rcpState() {
       var c = chainById(S.to.chain);
-      if (!toOnly(c)) { return 'ok'; }
+      if (!needRcp()) { return 'ok'; }
       if (!S.rcp) { return ''; }
+      if (kindOf(c) === 'evm') { return isAddr(S.rcp) ? 'ok' : 'bad'; }
       if (!fits(SHAPES, c.kind, S.rcp)) { return 'bad'; }
       if (!needsSum(c.kind, S.rcp)) { return 'ok'; }
       var a = S.rcp;
@@ -594,7 +860,7 @@
       var unv = (S.from.token && S.from.token.verified === false) || (S.to.token && S.to.token.verified === false);
       /* S.impact is null when the service gave no worth for one side or the other. That is not a quiet yes: with no
          way to tell a fair price from a terrible one, the reader is asked to look and confirm. */
-      return !!S.q && (unv || toOnly(chainById(S.to.chain)) || S.impact === null || S.impact >= IMPACT_ACK);
+      return !!S.q && (unv || needRcp() || S.impact === null || S.impact >= IMPACT_ACK);
     }
 
     /* ---- what the main button says and does */
@@ -603,20 +869,21 @@
       var unv = (S.from.token && S.from.token.verified === false) || (S.to.token && S.to.token.verified === false);
       el.msg.textContent = S.err || S.note || (S.done ? t('done') : '');
       el.msg.setAttribute('data-ok', S.err ? '' : (S.done && !S.note ? '1' : ''));
-      el.account.textContent = W.account ? short(W.account) : '';
+      var src = srcW(), evmSrc = src === W;
+      el.account.textContent = src.account ? short(src.account) : '';
       el.balance.textContent = S.bal === null || !S.from.token ? '' : formatUnits(S.bal, S.from.token.decimals, 6) + ' ' + S.from.token.symbol;
       el.tokenwarn.textContent = unv ? t('unverified') : (S.q && S.impact !== null && S.impact >= IMPACT_WARN ? t('impactHigh') : '');
       el.ackbox.hidden = !needsAck();
-      var tc = chainById(S.to.chain), onlyTo = toOnly(tc), rcpSt = rcpState();
+      var tc = chainById(S.to.chain), onlyTo = needRcp(), rcpSt = rcpState();
       el['rcp-box'].hidden = !onlyTo;
       el['rcp-c'].textContent = onlyTo ? tc.name : '';
       /* the wallet shows an EVM transaction, never the far address, so the reader reads it back here instead */
       el['ack-a'].textContent = onlyTo && rcpSt === 'ok' ? S.rcp : '';
 
       if (S.busy) { label = S.busy; need = 'busy'; }
-      else if (!W.p) { label = t('connect'); dis = false; need = 'nowallet'; }
-      else if (!W.account) { label = t('connect'); dis = false; need = 'connect'; }
-      else if (fromChain && Number(W.chainId) !== Number(fromChain.id)) { label = t('switchChain'); extra = fromChain.name; dis = false; need = 'chain'; }
+      else if (!src.p) { label = t('connect'); dis = false; need = 'nowallet'; }
+      else if (!src.account) { label = t('connect'); dis = false; need = 'connect'; }
+      else if (evmSrc && fromChain && Number(W.chainId) !== Number(fromChain.id)) { label = t('switchChain'); extra = fromChain.name; dis = false; need = 'chain'; }
       else if (!S.amount) { label = t('amount'); need = 'amount'; }
       else if (onlyTo && rcpSt === '') { label = t('rcpNeeded'); need = 'recipient'; }
       else if (onlyTo && rcpSt === 'bad') { label = t('rcpBad'); need = 'badRecipient'; }
@@ -674,19 +941,22 @@
     function ask(keepNote) {
       reset(keepNote === true);
       var ft = S.from.token, tt = S.to.token;
-      if (!ft || !tt || !isAddr(ft.address) || !tt.address) { paint(); return; }
+      if (!ft || !tt || !ft.address || !tt.address) { paint(); return; }
       if (toOnly(chainById(S.from.chain))) { paint(); return; }
-      if (Number(S.from.chain) === Number(S.to.chain) && sameAddr(ft.address, tt.address)) { S.err = t('same'); paint(); return; }
+      if (Number(S.from.chain) === Number(S.to.chain) && (ft.address === tt.address || (isAddr(ft.address) && sameAddr(ft.address, tt.address)))) { S.err = t('same'); paint(); return; }
       var p = parseUnits(S.amount, ft.decimals);
       if (!p || p.v <= 0n) { S.err = S.amount ? t('needAmount') : ''; paint(); return; }
-      var fc = chainById(S.from.chain);
-      if (!W.account || !fc) { paint(); return; }
+      var fc = chainById(S.from.chain), src = srcW(), fk = kindOf(fc);
+      if (!src.account || !fc) { paint(); return; }
+      if (fk === 'evm' ? !isAddr(ft.address) : (fk === 'tron' && !tronHex(fc.contract))) { paint(); return; }
       var tc = chainById(S.to.chain);
-      if (toOnly(tc) && !rcpOk()) { paint(); return; }               /* no price is asked for until the address is sound */
+      /* an EVM address the reader has already connected is offered as the place to receive; they can change it */
+      if (needRcp() && kindOf(tc) === 'evm' && !S.rcp && W.account) { S.rcp = W.account; el.rcp.value = W.account; }
+      if (needRcp() && !rcpOk()) { paint(); return; }                /* no price is asked for until the address is sound */
       var req = { fromChain: S.from.chain, toChain: S.to.chain, fromToken: ft.address, toToken: tt.address,
-                  fromAmount: p.v.toString(), account: W.account, slippage: S.slip, contract: fc.contract,
-                  fromDecimals: ft.decimals, toDecimals: tt.decimals };
-      if (toOnly(tc)) { req.recipient = S.rcp; req.exactTo = true; }
+                  fromAmount: p.v.toString(), account: src.account, slippage: S.slip, contract: fc.contract,
+                  fromDecimals: ft.decimals, toDecimals: tt.decimals, kind: fk, exactTo: kindOf(tc) !== 'evm' };
+      if (needRcp()) { req.recipient = S.rcp; }
       var seq = S.seq;
       S.busy = t('quoting'); paint();
       quote(req, cfg).then(function (q) {
@@ -711,12 +981,14 @@
     /* does this swap need the token's permission first, and is there even enough of it? */
     function decideApproval(q, req) {
       S.need = null;
-      return within(W.balance(req.fromToken, req.account), WAIT, null).then(function (b) {
+      if (req.kind === 'solana') { return Promise.resolve(null); }   /* no node to ask, and nothing to approve there */
+      var w = req.kind === 'tron' ? TW : W, own_ = req.kind === 'tron' ? req.fromToken === TRX : sameAddr(req.fromToken, ZERO);
+      return within(w.balance(req.fromToken, req.account), WAIT, null).then(function (b) {
         if (b === null) { return null; }             /* the wallet did not answer: say nothing about the balance */
         S.bal = b;
         if (b < BigInt(req.fromAmount)) { S.err = t('lowBalance'); }
-        if (sameAddr(req.fromToken, ZERO)) { return null; }
-        return within(W.allowance(req.fromToken, req.account, q.estimate.approvalAddress), WAIT, null).then(function (a) {
+        if (own_) { return null; }
+        return within(w.allowance(req.fromToken, req.account, q.estimate.approvalAddress), WAIT, null).then(function (a) {
           if (a !== null && a < BigInt(req.fromAmount)) { S.need = 'approve'; }
         });
       }).catch(function () { return null; });
@@ -725,6 +997,7 @@
     /* Start on the network the wallet is already on, when this page offers it: then nothing has to be switched at all.
        Some wallets never answer a switch request from a page, which used to leave the reader stuck on one button. */
     function follow() {
+      if (kindOf(chainById(S.from.chain)) !== 'evm') { return; }      /* the reader chose Tron or Solana: leave it */
       if (!W.chainId || !chainById(W.chainId) || Number(W.chainId) === Number(S.from.chain)) { return; }
       var both = Number(S.to.chain) === Number(S.from.chain);
       S.from = { chain: W.chainId, token: null }; pickDefault(S.from);
@@ -736,10 +1009,17 @@
     function act() {
       var need = el.action.getAttribute('data-need');
       S.err = ''; S.note = ''; S.done = false;
-      if (need === 'nowallet') { S.err = t('noWallet'); paint(); return; }
+      var src = srcW();
+      if (need === 'nowallet') { S.err = t(src === TW ? 'noWalletTron' : src === SW ? 'noWalletSol' : 'noWallet'); paint(); return; }
       if (need === 'connect') {
+        var cseq = ++S.seq;
         S.busy = t('connecting'); paint();
-        W.connect().then(function () { S.busy = ''; follow(); paint(); ask(); }, function (e) { S.busy = ''; S.err = code(e); paint(); });
+        within(src.connect().then(function () { return 'ok'; }, function (e) { return { e: e }; }), 60000, { e: null }).then(function (r) {
+          if (cseq !== S.seq) { return; }
+          S.busy = '';
+          if (r === 'ok') { if (src === W) { follow(); } paint(); ask(); return; }
+          S.err = code(r.e); paint();
+        });
         return;
       }
       if (need === 'chain') {
@@ -760,6 +1040,8 @@
     /* the wallet is asked once more where it is and who it is, right before anything is signed. A wallet that will not
        say is not sent a transaction built for another network. */
     function sameWallet(req) {
+      if (req.kind === 'tron') { return Promise.resolve(TW.read() === req.account ? null : 'chainMoved'); }
+      if (req.kind === 'solana') { var k = SW.key(null); return Promise.resolve(!k || k === req.account ? null : 'chainMoved'); }
       return Promise.all([within(W.req('eth_chainId'), WAIT, null), within(W.req('eth_accounts'), WAIT, null)]).then(function (r) {
         if (r[0] === null || r[1] === null) { return 'chainUnknown'; }
         if (parseInt(r[0], 16) !== Number(req.fromChain)) { return 'chainMoved'; }
@@ -768,7 +1050,39 @@
       });
     }
 
+    /* On Tron the approval is built by the network's own node, then opened and checked like any other transaction
+       before the wallet sees it: the reader's address, the token itself, nothing sent with it, and call data that is
+       approve(LI.FI's contract, exactly this amount) and not one byte else. */
+    function doApproveTron() {
+      var q = S.q, req = S.qreq, seq = S.seq;
+      if (!q || !req || q.estimate.approvalAddress !== req.contract) { return; }
+      var spender = tronHex(req.contract), amount = BigInt(req.fromAmount);
+      var param = pad32(spender.slice(2)) + pad32(amount.toString(16)), built = null;
+      S.busy = t('approving'); paint();
+      sameWallet(req).then(function (bad) {
+        if (bad) { throw { soft: t(bad) }; }
+        return tron('/wallet/triggersmartcontract', { owner_address: req.account, contract_address: req.fromToken,
+          function_selector: 'approve(address,uint256)', parameter: param, fee_limit: 100000000, call_value: 0, visible: true });
+      }).then(function (j) {
+        var tx = plain(j) ? j.transaction : null, f = plain(tx) && typeof tx.raw_data_hex === 'string' ? tronFacts(tx.raw_data_hex) : null;
+        if (!f || typeof tx.txID !== 'string' || f.type !== 31n || f.owner !== tronHex(req.account) || f.contract !== tronHex(req.fromToken) ||
+            f.call !== 0n || f.data !== '095ea7b3' + param || !(f.feeLimit > 0n && f.feeLimit <= TRON_FEE_CAP)) { throw { soft: t('mismatch') + ' [approve]' }; }
+        built = tx;
+        return tronId(tx);
+      }).then(function (okd) {
+        if (!okd) { throw { soft: t('mismatch') + ' [tronId]' }; }
+        return TW.sign(built);
+      }).then(function (signed) { return TW.broadcast(signed); })
+        .then(function (id) { line(t('view'), req.fromChain, id); return tronWait(id); })
+        .then(function (okd) {
+          if (seq !== S.seq) { return; }
+          S.busy = '';
+          if (okd === false) { S.err = t('failed'); } else { S.need = null; }
+          paint();
+        }, function (e) { if (seq !== S.seq) { return; } S.busy = ''; S.err = e && e.soft ? (e.soft === 'signature' ? t('mismatch') + ' [signature]' : e.soft) : code(e); paint(); });
+    }
     function doApprove() {
+      if (S.qreq && S.qreq.kind === 'tron') { doApproveTron(); return; }
       var q = S.q, req = S.qreq, seq = S.seq;
       if (!q || !req || !sameAddr(q.estimate.approvalAddress, req.contract)) { return; }
       var spender = q.estimate.approvalAddress, amount = BigInt(req.fromAmount);
@@ -803,6 +1117,7 @@
       var bad = checkQuote(q, req);                      /* checked once more, right before the wallet opens */
       if (bad) { reset(); S.err = t('mismatch') + ' [' + bad + ']'; paint(); return; }
       var x = q.transactionRequest, seq = S.seq;
+      if (req.kind === 'tron' || req.kind === 'solana') { doSwapFar(q, req, x, seq); return; }
       var tx = { from: req.account, to: x.to, data: x.data, value: x.value, chainId: qty(BigInt(req.fromChain)) };
       if (isQty(x.gasLimit) && BigInt(x.gasLimit) > 0n && BigInt(x.gasLimit) <= GAS_CAP) { tx.gas = x.gasLimit; }
       var cross = Number(req.fromChain) !== Number(req.toChain), hash = '';
@@ -824,6 +1139,34 @@
     }
 
     /* a swap between two networks is only half done when the first transaction lands: ask LI.FI how the rest goes */
+    /* Tron: the id is checked against the bytes, the wallet signs, what it hands back is checked to be the same
+       transaction, and this page sends it to the network itself. Solana: the wallet signs and sends in one step. */
+    function doSwapFar(q, req, x, seq) {
+      var cross = Number(req.fromChain) !== Number(req.toChain), hash = '';
+      var fail = function (e) { if (seq !== S.seq) { return; } S.busy = ''; S.err = e && e.soft ? (e.soft === 'signature' ? t('mismatch') + ' [signature]' : e.soft) : code(e); paint(); };
+      S.busy = t('swapping'); paint(); el.status.textContent = '';
+      var sent = sameWallet(req).then(function (moved) {
+        if (moved) { throw { soft: t(moved) }; }
+        if (req.kind === 'solana') { return SW.send(b64(x.data)); }
+        var tt = x.customData.tronTransaction;
+        return tronId(tt).then(function (okd) {
+          if (!okd) { throw { soft: t('mismatch') + ' [tronId]' }; }
+          return TW.sign(tt);
+        }).then(function (signed) { return TW.broadcast(signed); });
+      }).then(function (h) {
+        hash = h; line(t('view'), req.fromChain, h); S.busy = t('watching'); paint();
+        return req.kind === 'tron' ? tronWait(h) : true;
+      });
+      sent.then(function (okd) {
+        if (seq !== S.seq) { return; }
+        if (okd === false) { S.busy = ''; S.err = t('failed'); paint(); return; }
+        reset(); S.amount = ''; el.amount.value = ''; S.bal = null;
+        /* Solana has no node here to ask, so LI.FI's own record of the swap is followed whichever way it goes */
+        if ((cross && okd === true) || req.kind === 'solana') { S.note = t(cross ? 'bridging' : 'watching'); paint(); track(hash, req, q.tool); return; }
+        S.done = okd === true; if (okd === null) { S.note = t('watching'); }
+        paint();
+      }, fail);
+    }
     function track(hash, req, tool, tries) {
       tries = tries === undefined ? 90 : tries;
       var mine = S.seq;
@@ -848,9 +1191,11 @@
     function line(words, chainId, hash) {
       var row = doc.createElement('div');
       var c = chainId !== undefined ? chainById(chainId) : null;
-      if (c && typeof hash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(hash)) {
+      var k = kindOf(c), okHash = typeof hash === 'string' && (k === 'tron' ? /^[0-9a-f]{64}$/.test(hash)
+        : k === 'solana' ? /^[1-9A-HJ-NP-Za-km-z]{64,90}$/.test(hash) : /^0x[0-9a-fA-F]{64}$/.test(hash));
+      if (c && okHash) {
         var a = doc.createElement('a');
-        a.setAttribute('href', c.explorer.replace(/\/+$/, '') + '/tx/' + hash);
+        a.setAttribute('href', c.explorer.replace(/\/+$/, '') + (k === 'tron' ? '/#/transaction/' : '/tx/') + hash);
         a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
         a.textContent = words;
         var h = doc.createElement('b'); h.setAttribute('translate', 'no'); h.textContent = ' ' + short(hash);
@@ -891,7 +1236,7 @@
       el['dlg-list'].textContent = ''; el['dlg-find'].hidden = true;
       if (p.kind === 'chain') {
         /* a swap can only ever start on an EVM network: the source side and the gift panel never list the others */
-        var offer = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return !toOnly(c); });
+        var offer = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return p.side === 'gift' ? kindOf(c) === 'evm' : !toOnly(c); });
         for (i = 0; i < offer.length; i++) {
           var c = offer[i];
           if (q && c.name.toLowerCase().indexOf(q) < 0 && String(c.coin).toLowerCase().indexOf(q) < 0) { continue; }
@@ -910,7 +1255,7 @@
         /* the same coin on other networks: a reader who types BTC while Ethereum is chosen means Bitcoin, and should
            find it. Only exact or leading matches of the symbol, a handful of them, each naming its network. */
         if (q && q.length >= 2 && !isAddr(String(query || '').trim())) {
-          var far = 0, offer2 = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return !toOnly(c); });
+          var far = 0, offer2 = p.side === 'to' ? data.chains : data.chains.filter(function (c) { return p.side === 'gift' ? kindOf(c) === 'evm' : !toOnly(c); });
           for (var ci = 0; ci < offer2.length && far < 24; ci++) {
             var oc = offer2[ci];
             if (Number(oc.id) === Number(side.chain)) { continue; }
@@ -924,7 +1269,7 @@
           }
         }
         /* anything beyond the short list: a symbol such as CAKE, or a contract address, looked up live on LI.FI */
-        var raw = toOnly(chainById(side.chain)) ? '' : String(query || '').trim();
+        var raw = kindOf(chainById(side.chain)) !== 'evm' ? '' : String(query || '').trim();
         if (raw && (isAddr(raw) || /^[A-Za-z0-9][A-Za-z0-9.$_₮-]{0,19}$/.test(raw)) && !(n === 1 && !isAddr(raw) && list.some(function (x) { return String(x.symbol).toLowerCase() === q; }))) {
           el['dlg-find'].hidden = false;
         }
@@ -1148,7 +1493,7 @@
     }
 
     /* ================================================================ wiring */
-    W.p = W.find(win);
+    W.p = W.find(win); TW.p = TW.find(win); SW.p = SW.find(win);
     pickDefault(S.from); pickDefault(S.to); labels(); paint();
     if (G) { pickDefault(S.gift); giftLabels(); giftPaint(); openWallet(); }
     live = true;
@@ -1265,8 +1610,10 @@
   api_.frameCheck = frameCheck;
   api_.setLang = function (l) { lang = own(T, l) ? l : 'fa'; };
   api_.fits = fits;
+  api_.checkQuote = api_.checkQuote || checkQuote;
+  api_.tronFacts = tronFacts; api_.tronHex = tronHex; api_.solPayer = solPayer; api_.b58enc = b58enc; api_.TW = TW; api_.SW = SW;
   api_.checkSum = checkSum;
   api_.needsSum = needsSum;
-  api_.tune = function (o) { if (o && o.wait !== undefined) { WAIT = o.wait; } if (o && o.life !== undefined) { QUOTE_LIFE = o.life; } };   /* tests only */
+  api_.tune = function (o) { if (o && o.wait !== undefined) { WAIT = o.wait; } if (o && o.life !== undefined) { QUOTE_LIFE = o.life; } if (o && o.poll !== undefined) { POLL = o.poll; } };   /* tests only */
   if (root && root.document) { start(root); }
 })(typeof window !== 'undefined' ? window : null);

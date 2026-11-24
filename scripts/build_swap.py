@@ -112,8 +112,15 @@ def rpc_hosts(data):
     return seen
 
 
-def csp(data):
-    hosts = " ".join([SERVICE] + rpc_hosts(data))
+TRON_API = "https://api.trongrid.io"
+
+
+def far_hosts(data):
+    return [TRON_API] if any(c.get("kind") == "tron" and not c.get("to_only") for c in data["chains"]) else []
+
+
+def csp(data, watched=True, live=True):
+    hosts = " ".join([SERVICE] + (far_hosts(data) if live else []) + (rpc_hosts(data) if watched else []))
     return ("default-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
             f"font-src 'self' data:; connect-src 'self' {hosts}; frame-src 'none'; manifest-src 'self'; worker-src 'self'; "
             "base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests")
@@ -230,15 +237,28 @@ def chains(path=CHAINS):
         # The transaction is still signed on the EVM network the swap starts from, so these need no contract of their
         # own and no node — only a name, a coin, an explorer, and the shape a recipient address takes there.
         to_only = c.get("to_only") is True
-        need = ("name", "coin", "explorer") + (("kind",) if to_only else ("rpc", "contract"))
+        # Tron and Solana are neither: a swap may start there, signed by a wallet of that network. Tron pins LI.FI's
+        # contract in its own address form; Solana has no single contract to pin.
+        far = (not to_only) and c.get("kind") in ("tron", "solana")
+        need = ("name", "coin", "explorer") + (("kind",) if (to_only or far) else ("rpc", "contract"))
         for k in need:
             if not isinstance(c.get(k), str) or not c[k]:
                 raise ConfigError(f"chain {c['id']}: {k} is missing")
-        for k in ("explorer",) if to_only else ("explorer", "rpc"):
+        for k in ("explorer",) if (to_only or far) else ("explorer", "rpc"):
             if not c[k].startswith("https://"):
                 raise ConfigError(f"chain {c['id']}: {k} must be https")
         row = {"id": c["id"], "name": c["name"], "coin": c["coin"], "explorer": c["explorer"]}
-        if to_only:
+        if far:
+            row["kind"] = c["kind"]
+            if c.get("rpc"):
+                raise ConfigError(f"chain {c['id']}: a network signed by its own wallet carries no node here")
+            if c["kind"] == "tron":
+                if not isinstance(c.get("contract"), str) or not re.match(ADDRESS["tron"], c["contract"]):
+                    raise ConfigError(f"chain {c['id']}: Tron must pin LI.FI's contract in Tron's own address form")
+                row["contract"] = c["contract"]
+            elif c.get("contract"):
+                raise ConfigError(f"chain {c['id']}: Solana has no contract to pin")
+        elif to_only:
             if c["kind"] not in ADDRESS:
                 raise ConfigError(f"chain {c['id']}: {c['kind']!r} is not an address shape this page knows")
             row["to_only"] = True
@@ -259,7 +279,7 @@ def chains(path=CHAINS):
             raise ConfigError(f"tokens for a chain that is not listed: {cid!r}")
         seen = set()
         rows = []
-        native = {c["id"]: c.get("to_only") is True for c in out["chains"]}[int(cid)]
+        native = {c["id"]: bool(c.get("kind")) for c in out["chains"]}[int(cid)]
         for tk in toks:
             a = tk.get("address")
             if not isinstance(a, str) or not a or len(a) > 120 or not TOKEN_ADDR.match(a):
@@ -395,9 +415,9 @@ def controls():
 <label for="sw-rcp">{tri("نشانی دریافت روی <b id=\'sw-rcp-c\' translate=\'no\'></b>", "ناونیشانی وەرگرتن لەسەر <b id=\'sw-rcp-c\' translate=\'no\'></b>", "Receiving address on <b id=\'sw-rcp-c\' translate=\'no\'></b>")}</label>
 <input id="sw-rcp" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" dir="ltr" placeholder="" aria-describedby="sw-rcp-h" translate="no">
 <div id="sw-rcp-h" class="sw-rcp-h">{tri(
-    "این شبکه EVM نیست؛ نشانی را از کیف پول همان شبکه کپی کنید. تبدیل‌شده به همین نشانی می‌رود و بازگشتی ندارد.",
-    "ئەم تۆڕە EVM نییە؛ ناونیشان لە جزدانی هەمان تۆڕ لەبەربگرە. ئەوەی گۆڕدرا بۆ هەمان ناونیشان دەچێت و ناگەڕێتەوە.",
-    "This network is not EVM; copy the address from a wallet of that network. What you swap goes there and cannot come back.")}</div>
+    "نشانی را از کیف پول همین شبکه کپی کنید. تبدیل‌شده به همین نشانی می‌رود و بازگشتی ندارد.",
+    "ناونیشان لە جزدانی هەمان تۆڕ لەبەربگرە. ئەوەی گۆڕدرا بۆ هەمان ناونیشان دەچێت و ناگەڕێتەوە.",
+    "Copy the address from a wallet of this very network. What you swap goes there and cannot come back.")}</div>
 </div>
 <div id="sw-quote" class="sw-quote" data-has="0">
 {q("rate", "نرخ", "نرخ", "Rate")}
@@ -480,7 +500,7 @@ def page(cfg, data):
     public = {k: cfg[k] for k in ("enabled", "integrator", "fee", "slippage", "donate") if k in cfg}
     cdata = html.escape(json.dumps(public, ensure_ascii=True, separators=(",", ":"), sort_keys=True), quote=True)
     rich = with_icons(data)
-    rich["addr"] = {k: ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("to_only")})}
+    rich["addr"] = {k: ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("kind")})}
     watch = watch_list(rich) if cfg.get("donate") else []
     ddata = html.escape(json.dumps(dict(rich, watch=watch), ensure_ascii=False, separators=(",", ":")), quote=True)
     n_chain, n_tok = len(data["chains"]), sum(len(v) for v in data["tokens"].values())
@@ -497,7 +517,7 @@ def page(cfg, data):
         tri(f'<b translate="no">{_n(n_chain, "fa")}</b> شبکه', f'<b translate="no">{_n(n_chain, "ckb")}</b> تۆڕ', f'<b translate="no">{n_chain}</b> networks'),
         tri("کارمزد شفاف، پیش از امضا", "کرێی ڕوون، پێش واژۆ", "Fees shown before you sign")))
     doc = f"""<!doctype html><html lang="fa" dir="rtl" class="ek-v2 ek-v3 ek-deep"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="{csp(data) if watch else CSP}">
+<meta http-equiv="Content-Security-Policy" content="{csp(data, bool(watch), bool(cfg.get('enabled')))}">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>

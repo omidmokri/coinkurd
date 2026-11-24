@@ -92,18 +92,24 @@ def main():
     # ---------------------------------------------------------------- the chains and tokens
     data = B.chains()
     ok(len(data["chains"]) >= 1 and all(str(x["id"]) in data["tokens"] for x in data["chains"]), "every chain has a token list")
-    evm = [c for c in data["chains"] if not c.get("to_only")]
+    evm = [c for c in data["chains"] if not c.get("kind")]
     only_to = [c for c in data["chains"] if c.get("to_only")]
+    far = [c for c in data["chains"] if c.get("kind") and not c.get("to_only")]
+    ok({c["coin"] for c in far} == {"TRX", "SOL"}, "Tron and Solana are the two networks off EVM a swap may start on")
+    ok(all("rpc" not in c for c in far), "…and neither brings a node of its own into the page")
+    ok(next(c for c in far if c["coin"] == "TRX").get("contract") == "TU3ymitEKCWQFtASkEeHaPb8NfZcJtCHLt",
+       "Tron pins LI.FI's own contract there, in Tron's address form")
+    ok("contract" not in next(c for c in far if c["coin"] == "SOL"), "Solana pins none, because it has none")
     ok(all(x["contract"] == B.eip55(x["contract"]) for x in evm), "every network a swap can start on pins a checksummed contract address")
-    ok(len(only_to) >= 5 and all("contract" not in c and "rpc" not in c and c["kind"] in B.ADDRESS for c in only_to),
+    ok(len(only_to) >= 4 and all("contract" not in c and "rpc" not in c and c["kind"] in B.ADDRESS for c in only_to),
        f"the {len(only_to)} networks a swap can only end on carry no contract and no node, and each has an address shape")
-    ok({c["coin"] for c in only_to} >= {"BTC", "TRX"}, "Bitcoin and Tron are among them")
-    for c in only_to:
+    ok({c["coin"] for c in only_to} >= {"BTC", "ZEC"}, "Bitcoin is among them")
+    for c in only_to + far:
         toks = data["tokens"][str(c["id"])]
         ok(toks[0]["symbol"] == c["coin"], f"{c['name']}'s own coin comes first in its list")
         ok(not any(re.search(r"[\s\u200b\u00a0]", t["symbol"]) for t in toks),
            f"{c['name']} has no coin whose name hides a space — that is how the fake USDTs are written")
-    tron = data["tokens"][str(next(c["id"] for c in only_to if c["coin"] == "TRX"))]
+    tron = data["tokens"][str(next(c["id"] for c in far if c["coin"] == "TRX"))]
     ok(any(t["symbol"] == "USDT" and t["address"] == "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" for t in tron),
        "Tron's USDT is the real contract, not a look-alike")
     ok({c["id"]: c["contract"] for c in evm}.get(56) == LIFI and {c["id"]: c["contract"] for c in evm}.get(1) == LIFI,
@@ -188,7 +194,7 @@ def main():
         pol = dict((p.strip().split(" ", 1) + [""])[:2] for p in csp.group(1).split(";") if p.strip())
         ok(pol.get("default-src") == "'none'", f"[{name}] default-src 'none'")
         ok(pol.get("script-src") == "'self' 'inline-speculation-rules'", f"[{name}] scripts: this site's files only — no inline script, no other host")
-        want_hosts = [B.SERVICE] + (B.rpc_hosts(data) if cfg.get("donate") else [])
+        want_hosts = [B.SERVICE] + ((B.far_hosts(data) + (B.rpc_hosts(data) if cfg.get("donate") else [])) if cfg.get("enabled") else [])
         ok(pol.get("connect-src") == "'self' " + " ".join(want_hosts),
            f"[{name}] connections: this site, the price service and (when a gift panel is on) those networks' own nodes, nothing else")
         ok(pol.get("img-src") == "'self' data:", f"[{name}] pictures come from this site only (no token logos from elsewhere)")
@@ -226,7 +232,7 @@ def main():
         ok(bool(box), f"[{name}] the tool's box carries its settings and its data")
         ok(json.loads(H.unescape(box.group(1))) == cfg, f"[{name}] the page carries exactly the checked settings")
         want = dict(icons, watch=B.watch_list(icons) if cfg.get("donate") else [])
-        want["addr"] = {k: B.ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("to_only")})}
+        want["addr"] = {k: B.ADDRESS[k] for k in sorted({c["kind"] for c in data["chains"] if c.get("kind")})}
         ok(json.loads(H.unescape(box.group(2))) == want, f"[{name}] …and exactly the checked chains and tokens, with their pictures")
         for el in ("fc", "fc-i", "fc-n", "ft", "ft-i", "ft-n", "tc", "tc-i", "tc-n", "tt", "tt-i", "tt-n", "amount", "max", "balance",
                    "from-usd", "to-usd", "flip", "receive", "quote", "rate", "min", "route", "gas", "fee", "time", "impact", "slip",
@@ -266,13 +272,14 @@ def main():
            f"…and a link to {w['id']}'s own explorer, where anyone can check the figure")
     pol_on = dict((p.strip().split(" ", 1) + [""])[:2] for p in
                   re.search(r'Content-Security-Policy" content="([^"]+)"', on_doc).group(1).split(";") if p.strip())
-    ok(pol_on["connect-src"] == "'self' " + " ".join([B.SERVICE] + B.rpc_hosts(data)),
+    ok(pol_on["connect-src"] == "'self' " + " ".join([B.SERVICE] + B.far_hosts(data) + B.rpc_hosts(data)),
        "the policy opens for the price service and those networks' nodes, and nothing else")
     ok(all(h.startswith("https://") for h in B.rpc_hosts(data)), "every node is reached over https")
 
     no_gift = B.page(B.check({"enabled": True, "integrator": "entekhab", "fee": 0.005, "slippage": 0.005}), data)
     ok("sw-gift" not in no_gift and GIFT not in no_gift, "no address in the settings: no gift panel and no address anywhere")
-    ok('connect-src \'self\' https://li.quest;' in no_gift, "…and the policy stays as narrow as it was")
+    ok('connect-src \'self\' https://li.quest https://api.trongrid.io;' in no_gift, "…and the policy opens only for the price service and Tron's public node")
+    ok(B.far_hosts(data) == ["https://api.trongrid.io"], "Tron's node is the one host a swap that starts off EVM adds")
     flipped = "0x" + "".join(ch.lower() if ch.isupper() else ch.upper() if ch.islower() else ch for ch in GIFT[2:])
     for wrong in ("0xe9d4c279e2c6bbf170cbe5d54719aa6a4a0253d0", "0x1234", "nope", flipped, GIFT + "0"):
         try:
