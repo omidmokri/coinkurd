@@ -638,7 +638,8 @@
   var ORDER_PROF = ['vpvr', 'vpsess'];
   var ORDER_PAT = ['cp_all', 'cp_engulf', 'cp_hammer', 'cp_star', 'cp_doji', 'cp_mstar', 'cp_soldiers', 'cp_harami', 'cp_pierce', 'cp_maru', 'cp_tweezer', 'cp_inside'];
   var ORDER_CK = ['ksc', 'kpl', 'kspiral', 'kmacro'];
-  var EXT = {};                                             /* server-made data the app loads for the indicators that need it */
+  var EXT = {}, USER = {};                                   /* USER: the visitor's own scripts (script.js), id → function (bars, params) */
+  var _unused_ext;                                             /* server-made data the app loads for the indicators that need it */
   var ORDER_PANE = ['vol', 'rsi', 'macd', 'stoch', 'srsi', 'cci', 'willr', 'mfi', 'mom', 'roc', 'ao', 'ac', 'uo', 'ppo', 'tsi', 'trix', 'cmo', 'crsi', 'fisher', 'rvgi', 'kst', 'copp', 'dpo',
     'adx', 'aroon', 'vortex', 'chop', 'mass', 'bbpow', 'bop', 'atr', 'adr', 'bbp', 'bbw', 'sd', 'hv', 'rvi', 'obv', 'adl', 'chosc', 'cmf', 'efi', 'eom', 'pvt', 'vo'];
 
@@ -654,6 +655,7 @@
     kcm: [0.1, 10, 1], chdev: [0.1, 10, 1], key: [0.1, 10, 1], coeff: [0.1, 10, 1], qqe: [0.1, 10, 1], bw: [1, 50, 1], ph: [0.5, 1, 1], amp: [1, 100], per: [2, 500], rows: [6, 120], left: [2, 60], right: [1, 60] };
   function params(id, p) {
     var d = DEF[id] && DEF[id].p, o = {}; if (!d) return o; p = p || {};
+    if (DEF[id].free) { for (var fk in d) o[fk] = num(p[fk], d[fk], -1e12, 1e12); return o; }
     for (var k in d) {
       var dv = d[k], b = BND[k];
       o[k] = b ? (b[2] ? num(p[k], dv, b[0], b[1]) : int(p[k], dv, b[0], b[1])) : (dv % 1 !== 0) ? num(p[k], dv, 0.0001, 100) : int(p[k], dv, 1, 500);
@@ -857,6 +859,7 @@
   /* compute → { key: array } aligned with bars */
   function compute(id, bars, p) {
     var C = cols(bars), q = params(id, p), r;
+    if (USER[id]) return USER[id](bars, q) || {};
     if (ORDER_COM.indexOf(id) >= 0 || ORDER_CK.indexOf(id) >= 0) return comm(id, C, q) || {};
     switch (id) {
       case 'vol': return { vol: C.v, ma: sma(C.v, q.ma) };
@@ -959,7 +962,7 @@
     }
     return {};
   }
-  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.EXT = EXT; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
+  M.DEF = DEF; M.ORDER_OVER = ORDER_OVER; M.ORDER_PANE = ORDER_PANE; M.ORDER_COM = ORDER_COM; M.EXT = EXT; M.USER = USER; M.ORDER_PROF = ORDER_PROF; M.ORDER_PAT = ORDER_PAT; M.candles = candles; M.ORDER_CK = ORDER_CK; M.compute = compute; M.params = params; M.cols = cols; M.ok = ok;
   root.PRO = root.PRO || {}; root.PRO.ind = M;
   if (typeof module !== 'undefined' && module.exports) module.exports = M;
 })(typeof window !== 'undefined' ? window : globalThis);

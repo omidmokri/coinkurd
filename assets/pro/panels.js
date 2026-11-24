@@ -26,7 +26,7 @@
      coins, without writing them: opening this page must not star coins across the site */
   var SITE_DEF = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'XAUT'];
   function siteList() { var a = S.get('ek_watch', []); a = Array.isArray(a) ? a.filter(function (x) { return A.SYM_RE.test(x); }) : []; return a.length || W.siteEdited ? a : SITE_DEF.slice(); }
-  function setSiteList(a) { S.set('ek_watch', a.slice(0, 60)); W.siteEdited = 1; saveW(); }
+  function setSiteList(a) { S.set('ek_watch', a); W.siteEdited = 1; saveW(); }
   if (!W || typeof W !== 'object' || !Array.isArray(W.lists)) W = { lists: [], cur: 'site', flags: {}, sort: null, ff: null, fresh: 1 };
   W.flags = W.flags && typeof W.flags === 'object' ? W.flags : {};
   function saveW() { S.set('ek_pro_watch', W); }
@@ -69,8 +69,8 @@
     return listSyms();
   }
   function setLayout(a) {
-    if (W.cur === 'site') { W.lay = W.lay || {}; W.lay.site = a.slice(0, 120); var syms = a.filter(function (x) { return !isSec(x); }); if (syms.join() !== siteList().join()) setSiteList(syms); else saveW(); }
-    else if (editable()) { var L = W.lists[W.cur | 0]; if (L) { L.s = a.slice(0, 120); saveW(); } }
+    if (W.cur === 'site') { W.lay = W.lay || {}; W.lay.site = a; var syms = a.filter(function (x) { return !isSec(x); }); if (syms.join() !== siteList().join()) setSiteList(syms); else saveW(); }
+    else if (editable()) { var L = W.lists[W.cur | 0]; if (L) { L.s = a; saveW(); } }
   }
   function sections() { return layout().filter(isSec); }
   function colKey(sec) { return String(W.cur) + sec; }
@@ -354,7 +354,7 @@
   /* ================================================================ ALERTS */
   var AL = S.get('ek_pro_alerts', []); if (!Array.isArray(AL)) AL = [];
   var LOG = S.get('ek_pro_alert_log', []); if (!Array.isArray(LOG)) LOG = [];
-  var MAXAL = 1000;                                   /* price alerts kept here; indicator alerts stay at 12 (they each watch a feed) */
+  var MAXAL = Infinity;                                   /* price alerts kept here; indicator alerts stay at 12 (they each watch a feed) */
   AL = AL.filter(function (a) { return a && A.SYM_RE.test(a.sym) && (a.k === 'price' || a.k === 'ind' || a.k === 'draw'); }).slice(0, MAXAL);
   function saveAL() { S.set('ek_pro_alerts', AL); S.set('ek_pro_alert_log', LOG.slice(0, 100)); refreshAlertViews(); }
   P.logos().then(function (L) {                        /* never a coin without its logo: alerts and lists follow the logo index */
@@ -560,7 +560,6 @@
         if (id === 'xma') { a.ind.len2 = Math.max(3, Math.min(400, Math.round(+$('[name=len2]', f).value || 21))); if (a.ind.len2 <= len) { A.toast(T('fastSlowAl')); return; } }
         a.c = $('[name=ic]', f).value; a.tf = TF.value;
         if (LV[id]) { a.v = +$('[name=lv]', f).value; if (!(id === 'vol' ? a.v > 1 && a.v <= 50 : a.v >= 0 && a.v <= 100)) { A.toast(T('badValue')); return; } }
-        if (AL.filter(function (z) { return z.on && z.k === 'ind'; }).length >= 12) { A.toast(T('maxIndAlerts')); return; }
       }
       var wantNt = $('[name=nt]', f).checked, tg = kind === 'price' && !PCT[a.c] && $('[name=tg]', f).checked;
       A.closeModal(); addAlert(a); A.toast(T('alertSet', { c: P.pair(sym) + ' · ' + condText(a) }));

@@ -57,6 +57,7 @@
 
   /* ---------------------------------------------------------------- icons (24×24 line glyphs) */
   var IC = {
+    code: '<path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13.5 5-3 14"/>', scan: '<path d="M3 5h18"/><path d="M6 10h12"/><path d="M9 15h6"/><path d="M11 20h2"/>', edit: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
     dot: '<circle cx="12" cy="12" r="2.6" fill="currentColor"/>',
     arrowc: '<path d="M6 3v15l4-4 3 6 2-1-3-6h6z"/>',
     eraser: '<path d="M15 4l5 5-9 9H6l-3-3z"/><path d="M10 9l5 5"/><path d="M11 20h9"/>',
@@ -188,7 +189,7 @@
       if (c && P.parseTF(c.tf)) n.tf = c.tf;
       if (c && TYPES.indexOf(c.type) >= 0) n.type = c.type;
       if (c && c.tp && typeof c.tp === 'object') n.tp = tpSane(c.tp);
-      if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).slice(0, 400).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
+      if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
       if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: c.scale.auto === 0 ? 0 : 1 };
       return n;
     });
@@ -731,6 +732,10 @@
       var up = c === 'XAU+' || c === 'BTC+' || c === 'PIVOT?' || c === 'OIL-', sh = c.slice(0, 2) === 'R:';
       out.push({ time: bt, position: up ? 'belowBar' : 'aboveBar', color: c === 'XAU+' ? '#ffd700' : c === 'BTC+' ? '#f7931a' : c === 'PIVOT?' ? '#69f0ae' : sh ? '#e5e7eb' : '#ff5a5f', shape: sh ? 'square' : up ? 'arrowUp' : 'arrowDown', size: 0.8, text: sh ? '\u21BA ' + c.slice(2) : c, id: 'm' + k });
     });
+    this.cfg.inds.forEach(function (x) {                                           /* plotshape() of the visitor's scripts */
+      var D = I.DEF[x.id], v = self.lastVals && self.lastVals[x.u]; if (x.off || !D || !D.shapes || !v) return;
+      D.shapes.forEach(function (sh) { var arr = v[sh.key]; if (!arr) return; var cnt = 0; for (var i = Math.min(arr.length, n) - 1; i >= 0 && cnt < 300; i--) if (arr[i] > 0 && bars[i]) { cnt++; out.push({ time: bars[i].t, position: sh.below ? 'belowBar' : 'aboveBar', color: sh.color, shape: sh.below ? 'arrowUp' : 'arrowDown', size: 0.8, text: sh.text, id: 'u' + x.u + sh.key + i }); } });
+    });
     this.cfg.inds.forEach(function (x) {                                           /* candlestick patterns found on the bars */
       if (x.off || !I.DEF[x.id] || !I.DEF[x.id].marks) return;
       I.candles(bars, x.id).slice(-400).forEach(function (m) { out.push({ time: bars[m.i].t, position: m.d > 0 ? 'belowBar' : 'aboveBar', color: m.d > 0 ? '#34d399' : m.d < 0 ? '#ff5a4d' : '#9ca3af', shape: m.d > 0 ? 'arrowUp' : m.d < 0 ? 'arrowDown' : 'circle', size: 0.7, text: m.c, id: 'c' + x.id + m.i }); });
@@ -1171,22 +1176,59 @@
   }
 
   /* ---- indicators dialog */
+  /* ---- Entekhab Script: write an indicator in a Pine-like language; it is interpreted, never evaluated as page code (script.js) */
+  function scriptEditor(id) {
+    if (!P.script) return;
+    var cur = id ? P.script.list().filter(function (x) { return x.id === id; })[0] : null, a = active();
+    var f = h('<form class="pm-sc"><div class="pm-row"><input class="pm-in" name="n" maxlength="60"><select class="pm-in pm-scex"></select></div>' +
+      '<textarea class="pm-in pm-sct" name="s" dir="ltr" spellcheck="false" autocapitalize="off" autocomplete="off" maxlength="20000"></textarea><p class="pm-scerr" dir="ltr"></p>' +
+      '<div class="pm-row"><button class="pm-btn pri" type="submit"></button><button class="pm-btn" type="button" data-chk></button>' + (cur ? '<button class="pm-btn pm-del" type="button" data-del></button>' : '') + '<button class="pm-btn" type="button" data-x></button></div>' +
+      '<details class="pm-scref"><summary></summary><p dir="ltr"></p></details></form>');
+    var nm = $('[name=n]', f), ta = $('[name=s]', f), er = $('.pm-scerr', f), ex = $('.pm-scex', f);
+    nm.placeholder = T('scriptName'); nm.value = cur ? cur.name : ''; ta.value = cur ? cur.src : P.script.EXAMPLES[0][1];
+    ex.appendChild(new Option(T('scriptExamples'), '')); P.script.EXAMPLES.forEach(function (e, i) { ex.appendChild(new Option(e[0], String(i))); });
+    ex.onchange = function () { if (ex.value !== '') { ta.value = P.script.EXAMPLES[+ex.value][1]; if (!nm.value) nm.value = P.script.EXAMPLES[+ex.value][0]; ex.value = ''; er.textContent = ''; } };
+    $('[type=submit]', f).textContent = T('scriptSave'); $('[data-chk]', f).textContent = T('scriptCheck'); $('[data-x]', f).textContent = T('cancel'); if (cur) $('[data-del]', f).textContent = T('remove');
+    $('summary', f).textContent = T('scriptRef');
+    $('.pm-scref p', f).textContent = 'open high low close volume hl2 hlc3 ohlc4 time bar_index · x[n] · + - * / % < > <= >= == != and or not  c ? a : b\n' +
+      'input(def, "title")  indicator("name", overlay=true)  plot(x, "title", color=#f7931a, style=plot.style_columns)  hline(v)  plotshape(cond, "t", location=location.belowbar, text="B")\n' +
+      'ta.sma ema rma wma hma vwma stdev dev highest lowest sum cum change mom roc rsi atr tr stoch cci linreg percentrank correlation crossover crossunder cross rising falling barssince valuewhen · nz fixnan · math.abs sqrt log log10 exp pow round floor ceil sign max min avg';
+    function show(r) { er.className = 'pm-scerr ' + (r.ok ? 'ok' : 'bad'); er.textContent = r.ok ? T('scriptOk', { n: r.meta.plots.length + r.meta.shapes.length }) : T('scriptLine', { n: r.line }) + ': ' + r.err; }
+    $('[data-chk]', f).onclick = function () { show(P.script.check(ta.value)); };
+    $('[data-x]', f).onclick = closeModal;
+    if (cur) $('[data-del]', f).onclick = function () { confirmBox(T('remove'), cur.name || T('scriptEd'), function () { cells.forEach(function (c) { var k = c.cfg.inds.length; c.cfg.inds = c.cfg.inds.filter(function (x) { return x.id !== cur.id; }); if (c.cfg.inds.length !== k) c.indsChanged(); }); P.script.remove(cur.id); save(); }); };
+    ta.addEventListener('keydown', function (e) { if (e.key === 'Tab') { e.preventDefault(); var st0 = ta.selectionStart; ta.value = ta.value.slice(0, st0) + '    ' + ta.value.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = st0 + 4; } e.stopPropagation(); });
+    f.onsubmit = function (e) {
+      e.preventDefault(); var r = P.script.save(cur ? cur.id : null, nm.value.trim() || (P.script.check(ta.value).meta || {}).title || 'Script', ta.value);
+      if (!r.ok) { show(r); return; }
+      closeModal();
+      var used = false; cells.forEach(function (c) { c.cfg.inds.forEach(function (x) { if (x.id === r.id) { x.p = I.params(r.id, x.p); used = true; } }); if (c.cfg.inds.some(function (x) { return x.id === r.id; })) { c.indSig = ''; c.indsChanged(); } });
+      if (!used) addInd(a, r.id); else toast(T('scriptSaved'));
+    };
+    modal(T('scriptEd'), f, { wide: true, nofocus: true });
+  }
   var CKTV = [['ksc', 'DRuCJ6Bk-Kurdistani-Style-Cycle'], ['kspiral', 'tECCygHQ-Kurdistani-Bitcoin-Spiral-Historical-Logarithmic-Visualization'], ['kmacro', 'IUgkPeGI-Kurdistani-Macro-Regime']];
   function indDialog() {
     var a = active(), box = h('<div class="pm-id"><div class="pm-idhead"><input class="pm-in" type="search" autocomplete="off"><div class="pm-idm" role="tablist"></div><div class="pm-idt"></div></div><div class="pm-idl"></div><h4 class="pm-h4"></h4><div class="pm-ida"></div><div class="pm-tplrow"></div></div>');
     var inp = $('input', box), mains = $('.pm-idm', box), tabs = $('.pm-idt', box), list = $('.pm-idl', box), act = $('.pm-ida', box), main = 'ind', tab = 'over';
     inp.placeholder = T('searchInd'); $('.pm-h4', box).textContent = T('activeInds');
     /* TradingView's five kinds; the indicators have their own shelf of groups below */
-    [['ind', 'indicators'], ['strat', 'mt_strat'], ['prof', 'mt_prof'], ['pat', 'mt_pat']].forEach(function (p) { var b = h('<button type="button" role="tab" class="pm-mtab' + (p[0] === main ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { main = p[0]; $$('.pm-mtab', mains).forEach(function (x) { x.classList.toggle('on', x === b); }); tabs.style.display = main === 'ind' ? '' : 'none'; draw(); }; mains.appendChild(b); });
+    [['ind', 'indicators'], ['strat', 'mt_strat'], ['prof', 'mt_prof'], ['pat', 'mt_pat'], ['mine', 'mt_mine']].forEach(function (p) { var b = h('<button type="button" role="tab" class="pm-mtab' + (p[0] === main ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { main = p[0]; $$('.pm-mtab', mains).forEach(function (x) { x.classList.toggle('on', x === b); }); tabs.style.display = main === 'ind' ? '' : 'none'; draw(); }; mains.appendChild(b); });
     [['over', 'cat_over'], ['pane', 'cat_pane'], ['com', 'cat_com'], ['ck', 'cat_ck'], ['ek', 'cat_ek']].forEach(function (p) { var b = h('<button type="button" class="pm-chip' + (p[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(p[1]); b.onclick = function () { tab = p[0]; $$('.pm-chip', tabs).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; tabs.appendChild(b); });
     var SIDS = Object.keys(P.btStrats || {}).filter(function (k) { return !P.btStrats[k].btc || a.cfg.sym === 'BTC'; });
     function draw() {
       var q = inp.value.trim().toLowerCase(), all = I.ORDER_OVER.concat(I.ORDER_PANE, I.ORDER_COM, I.ORDER_CK, I.ORDER_PROF, I.ORDER_PAT, Object.keys(LAYERS));
-      var ids = q ? all : main === 'prof' ? I.ORDER_PROF : main === 'pat' ? I.ORDER_PAT : main === 'strat' ? [] : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
+      var mine = P.script ? P.script.list().map(function (x) { return x.id; }) : []; all = all.concat(mine);
+      var ids = q ? all : main === 'mine' ? mine : main === 'prof' ? I.ORDER_PROF : main === 'pat' ? I.ORDER_PAT : main === 'strat' ? [] : tab === 'over' ? I.ORDER_OVER : tab === 'pane' ? I.ORDER_PANE : tab === 'com' ? I.ORDER_COM : tab === 'ck' ? I.ORDER_CK : Object.keys(LAYERS);
       ids = ids.filter(function (id) { var nm = (LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + ' ' + id + ' ' + T('ind_' + id); return !q || nm.toLowerCase().indexOf(q) >= 0; });
       var sids = (q || main === 'strat') ? SIDS.filter(function (id) { return !q || (T('sg_' + id) + ' ' + id).toLowerCase().indexOf(q) >= 0; }) : [];
-      list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('') +
+      list.innerHTML = ids.map(function (id) { return '<button type="button" class="pm-idi' + (I.DEF[id] && I.DEF[id].user ? ' pm-usr' : '') + '" data-id="' + id + '"><b>' + esc(LAYERS[id] ? T('ly_' + id) : T('in_' + id)) + '</b><small>' + esc(T('ind_' + id)) + '</small>' + ic('plus') + '</button>'; }).join('') +
         sids.map(function (id) { return '<button type="button" class="pm-idi" data-st="' + id + '"><b>' + esc(T('sg_' + id)) + '</b><small>' + esc(T('stratRun')) + '</small>' + ic('bt') + '</button>'; }).join('');
+      if (main === 'mine' && !q) {
+        var nb = h('<button type="button" class="pm-btn pri pm-newsc"></button>'); nb.textContent = '+ ' + T('scriptNew'); nb.onclick = function () { closeModal(); scriptEditor(null); }; list.insertBefore(nb, list.firstChild);
+        var mn = h('<p class="pm-p pm-mute"></p>'); mn.textContent = T('scriptNote'); list.insertBefore(mn, list.firstChild);
+      }
+      $$('.pm-usr', list).forEach(function (b) { var e = h('<span class="pm-ib pm-sced" role="button" title="' + esc(T('scriptEdit')) + '">' + ic('edit') + '</span>'); e.onclick = function (ev) { ev.stopPropagation(); closeModal(); scriptEditor(b.getAttribute('data-id')); }; b.appendChild(e); });
       if (main === 'strat' && !q) { var sn = h('<p class="pm-p pm-mute"></p>'); sn.textContent = T('stratNote'); list.insertBefore(sn, list.firstChild); }
       if (main === 'prof' && !q) { var pn = h('<p class="pm-p pm-mute"></p>'); pn.textContent = T('profNote'); list.appendChild(pn); }
       $$('[data-st]', list).forEach(function (b) { b.onclick = function () { closeModal(); if (P.bt) P.bt.tester(a, { id: b.getAttribute('data-st') }); }; });
@@ -1251,11 +1293,11 @@
   /* ---- workspace menu: named layouts, export/import, share link, CSV */
   function wsMenu(anchor) {
     var L = S.get('ek_pro_layouts', []); if (!Array.isArray(L)) L = [];
-    var items = [{ label: T('saveAs'), icon: 'save', act: function () { ask(T('saveAs'), st.name || '', function (n) { if (!n) return; st.name = n.slice(0, 40); L = L.filter(function (x) { return x.n !== st.name; }); L.unshift({ n: st.name, at: Date.now(), s: JSON.parse(JSON.stringify(st)) }); S.set('ek_pro_layouts', L.slice(0, 40)); paintTop(); save(); toast(T('layoutSaved')); }, T('layoutName')); } },
+    var items = [{ label: T('saveAs'), icon: 'save', act: function () { ask(T('saveAs'), st.name || '', function (n) { if (!n) return; st.name = n.slice(0, 40); L = L.filter(function (x) { return x.n !== st.name; }); L.unshift({ n: st.name, at: Date.now(), s: JSON.parse(JSON.stringify(st)) }); S.set('ek_pro_layouts', L); paintTop(); save(); toast(T('layoutSaved')); }, T('layoutName')); } },
       { label: T('newLayout'), icon: 'plus', act: function () { confirmBox(T('newLayout'), T('newLayoutQ'), function () { var keep = st.name; st = defaults(); st.name = ''; buildGrid(); save(); }); } },
       { head: T('myLayouts') }];
     if (!L.length) items.push({ label: T('noLayouts'), disabled: true });
-    L.slice(0, 15).forEach(function (x) { items.push({ label: x.n, hint: fmtD(Math.floor(x.at / 1000), 'date'), act: function () { st = sane(x.s); st.name = x.n; buildGrid(); save(); toast(T('layoutLoaded', { n: x.n })); } }); });
+    L.forEach(function (x) { items.push({ label: x.n, hint: fmtD(Math.floor(x.at / 1000), 'date'), act: function () { st = sane(x.s); st.name = x.n; buildGrid(); save(); toast(T('layoutLoaded', { n: x.n })); } }); });
     if (L.length) items.push({ label: T('delLayout'), icon: 'trash', act: function () { menu(anchor, L.map(function (x, k) { return { label: x.n, icon: 'trash', act: function () { L.splice(k, 1); S.set('ek_pro_layouts', L); toast(T('removed')); } }; })); } });
     items.push({ sep: true },
       { label: T('shareLink'), icon: 'share', act: shareLink },
@@ -1306,7 +1348,7 @@
       var o = JSON.parse(txt); if (!o || o.v !== 1) return;
       confirmBox(T('sharedTitle'), T('sharedQ'), function () {
         var L = S.get('ek_pro_layouts', []); if (!Array.isArray(L)) L = [];
-        L.unshift({ n: T('beforeShare') + ' ' + fmtD(Math.floor(Date.now() / 1000), 'date'), at: Date.now(), s: JSON.parse(JSON.stringify(st)) }); S.set('ek_pro_layouts', L.slice(0, 40));
+        L.unshift({ n: T('beforeShare') + ' ' + fmtD(Math.floor(Date.now() / 1000), 'date'), at: Date.now(), s: JSON.parse(JSON.stringify(st)) }); S.set('ek_pro_layouts', L);
         var ns = sane({ layout: o.l, sync: o.y, charts: o.c }); ns.tz = st.tz; ns.side = st.side; ns.fav = st.fav; st = ns;
         Object.keys(o.d || {}).forEach(function (s) {
           if (!SYM_RE.test(s) || !Array.isArray(o.d[s])) return;
@@ -1614,6 +1656,8 @@
         '<button type="button" class="pm-tb" id="pm-ind">' + ic('fx') + '<span>' + esc(T('indicators')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-tpl" title="' + esc(T('templates')) + '">' + ic('tpl') + '<span class="pm-hide-s">' + esc(T('templates')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-rep">' + ic('replay') + '<span>' + esc(T('replay')) + '</span></button>' +
+        '<button type="button" class="pm-tb" id="pm-code" title="' + esc(T('scriptEd')) + '">' + ic('code') + '<span class="pm-hide-s">' + esc(T('scriptShort')) + '</span></button>' +
+        '<button type="button" class="pm-tb" id="pm-scr" title="' + esc(T('screenerBtn')) + '">' + ic('scan') + '<span class="pm-hide-s">' + esc(T('screenerBtn')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-bt" title="' + esc(T('tester')) + '">' + ic('bt') + '<span class="pm-hide-s">' + esc(T('testerShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-alert">' + ic('bell') + '<span>' + esc(T('alert')) + '</span></button>' +
         '<button type="button" class="pm-ib" id="pm-lay" title="' + esc(T('layout')) + '">' + ic('grid') + '</button>' +
@@ -1643,6 +1687,8 @@
     $('#pm-sym').onclick = function () { symbolSearch(''); };
     $('#pm-type').onclick = function (e) { typeMenu(e.currentTarget); };
     $('#pm-ind').onclick = indDialog;
+    $('#pm-code').onclick = function () { scriptEditor(null); };
+    $('#pm-scr').onclick = function () { if (P.screener) P.screener(); };
     $('#pm-tpl').onclick = function (e) { tplMenu(e.currentTarget); };
     $('#pm-rep').onclick = function () { if (P.replayToggle) P.replayToggle(active()); };
     $('#pm-bt').onclick = function () { if (P.bt) P.bt.tester(active()); };
