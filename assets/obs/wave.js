@@ -117,11 +117,17 @@
   /* ---------------------------------------------------------------- the series */
   function build() {
     var D = V.D, B = BUCKET[S.bucket], tipH = D.tip.h;
-    var rows = [], cur = null;
+    /* the series is one close a day, so a bar opens where the one before it closed — the usual way to candle a
+       close-only series. Without that a daily bar would have open = close and no body at all, just a dot. */
+    var rows = [], cur = null, prev = null;
     for (var i = 0; i < D.days.length; i++) {
       var h = heightAt(D.days[i][0]), p = D.days[i][1], k = Math.floor(h / B) * B;
-      if (!cur || cur[0] !== k) { cur = [k, p, p, p, p]; rows.push(cur); }
-      else { if (p > cur[2]) cur[2] = p; if (p < cur[3]) cur[3] = p; cur[4] = p; }
+      if (!cur || cur[0] !== k) {
+        var o = prev == null ? p : prev;
+        cur = [k, o, Math.max(o, p), Math.min(o, p), p]; rows.push(cur); prev = p;
+      } else {
+        if (p > cur[2]) cur[2] = p; if (p < cur[3]) cur[3] = p; cur[4] = p; prev = p;
+      }
     }
     /* the index, over the whole span and on past the tip to the next top the model points at */
     var endH = Math.ceil((tipH - HALF) / HALVING) * HALVING + HALF + B;    /* the next height where the index reads 1 */
@@ -274,7 +280,7 @@
           series: [{ name: T('wv_name'), type: 'line', color: '#00e676', width: 2.2, data: G.idx, colors: G.icol, fmt: function (v) { return OB.loc(v.toFixed(3)); } }] }
       ]
     });
-    var note = $('#ob-note', V.el); if (note) note.textContent = T('note_wave');
+    var note = $('#ob-note', V.el); if (note) note.textContent = T('note_wave') + (S.style === 'candle' ? ' ' + T('wv_candle_note') : '');
   }
 
   /* ---------------------------------------------------------------- the skeleton, until the first load lands */

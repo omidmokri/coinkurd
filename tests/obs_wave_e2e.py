@@ -64,6 +64,11 @@ def main():
                     page.evaluate("() => OB.views.wave.mount(OB._wv.V.el)")
                     page.wait_for_function("() => OB._wv.V.G && OB._wv.V.G.rows.length", timeout=20000)
                     check(f"style {st_} draws", page.evaluate("() => OB._wv.V.G.rows.length") > 100, st_)
+                    if st_ == "candle":
+                        bod = page.evaluate("() => OB._wv.V.G.rows.slice(-400).filter(r => r[1] !== r[4]).length")
+                        check("candles have a body: a bar opens where the one before it closed", bod > 350, bod)
+                        ohlc = page.evaluate("() => OB._wv.V.G.rows.slice(-400).every(r => r[2] >= Math.max(r[1], r[4]) && r[3] <= Math.min(r[1], r[4]))")
+                        check("candles are well formed: the high is the highest and the low the lowest", ohlc)
                 for b_, mn in (("w", 400), ("m", 90)):
                     page.evaluate(f"() => OB._wv.S.bucket = '{b_}'")
                     page.evaluate("() => OB.views.wave.unmount() || 0")
