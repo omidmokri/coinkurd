@@ -202,7 +202,8 @@ const IDS = ['app', 'fc', 'fc-i', 'fc-n', 'ft', 'ft-i', 'ft-n', 'tc', 'tc-i', 't
   'from-usd', 'to-usd', 'flip', 'receive', 'quote', 'rate', 'min', 'route', 'gas', 'fee', 'time', 'impact', 'slip', 'tokenwarn',
   'ackbox', 'ack', 'account', 'action', 'action-l', 'action-x', 'msg', 'status', 'dlg', 'dlg-title', 'dlg-q', 'dlg-list',
   'dlg-find', 'dlg-close', 'rcp', 'rcp-box', 'rcp-c', 'ack-a', 'gift', 'dnc', 'dnc-i', 'dnc-n', 'dnt', 'dnt-i', 'dnt-n', 'dn-amount', 'dn-bal', 'dn-go',
-  'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1'].map(x => 'sw-' + x);
+  'dn-go-l', 'dn-go-x', 'dn-msg', 'dn-status', 'dn-addr', 'dn-copy', 'dn-total', 'dn-b56', 'dn-b1',
+  'routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out'].map(x => 'sw-' + x);
 
 const DATA = {
   chains: [{ id: 56, name: 'BNB Smart Chain', coin: 'BNB', explorer: 'https://bscscan.com/', rpc: 'https://bsc-dataseed.binance.org', contract: DIAMOND, ic: 'c/56.svg' },
@@ -241,7 +242,7 @@ function makeWindow(cfg, opts) {
     },
     on() { }
   };
-  const win = { document: doc, localStorage: { getItem: () => null, setItem() { } }, ethereum: provider };
+  const win = { document: doc, localStorage: opts.storage || { getItem: () => null, setItem() { } }, ethereum: provider };
   win.self = win; win.top = opts.framed ? {} : win;
   const $ = id => store['sw-' + id];
   return { win, store, sent, asked, flags, $,
@@ -262,12 +263,12 @@ function makeWindow(cfg, opts) {
 const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005, donate: GIFT };
 
 (async function () {
-  let urls = [], serve = () => goodQuote(), token = null, status = null;
+  let urls = [], serve = () => goodQuote(), token = null, status = null, ledger = null;
   let tronNode = () => Promise.resolve({ ok: true, status: 200, text: () => Promise.resolve('{}') });
   const realFetch = (u, o) => {
     urls.push(u);
     if (u.indexOf('https://api.trongrid.io/') === 0) { return tronNode(u.slice('https://api.trongrid.io'.length), JSON.parse(o.body)); }
-    const body = u.indexOf('/v1/quote') > 0 ? serve() : u.indexOf('/v1/token') > 0 ? token : u.indexOf('/v1/status') > 0 ? status : null;
+    const body = u.indexOf('/v1/quote') > 0 ? serve(u) : u.indexOf('/v1/token') > 0 ? token : u.indexOf('/v1/status') > 0 ? status : u.indexOf('/v1/analytics/transfers') > 0 ? ledger : null;
     return Promise.resolve({ ok: !!body, status: body ? 200 : 404, text: () => Promise.resolve(JSON.stringify(body || { message: 'not found' })) });
   };
   global.fetch = realFetch;
@@ -908,6 +909,68 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(btcSign.length === 1 && btcPush.length === 0 && bw.$('msg').textContent.indexOf('signature') > 0,
      'a wallet that changes the transaction while signing it is not obeyed: nothing is sent');
 
+  /* ================================================================ other routes, the bridge note, history, the report */
+  const histBox = {}; const histStore = { getItem: k => (k in histBox ? histBox[k] : null), setItem: (k, v) => { histBox[k] = String(v); }, removeItem: k => { delete histBox[k]; } };
+  const namedQ = (tool, name, to, over) => goodQuote(q => { q.tool = tool; q.toolDetails = { name }; q.estimate.toAmount = to;
+    q.estimate.toAmountMin = (BigInt(to) * 995n / 1000n).toString(); if (over) { over(q); } });
+  serve = (u) => { const m = /deny(?:Exchanges|Bridges)=([^&]*)/.exec(u); const deny = m ? decodeURIComponent(m[1]).split(',') : [];
+    if (deny.length === 0) { return namedQ('pancakeswap', 'PancakeSwap', '550000000000000000000'); }
+    if (deny.length === 1) { return namedQ('fly', 'Fly', '549000000000000000000'); }
+    return namedQ('evil', 'Evil', '999000000000000000000', q => { q.transactionRequest.to = '0x' + '6'.repeat(40); }); };
+  freshWallet(); urls = [];
+  let rtW = makeWindow(CFG, { allowed: true, storage: histStore });
+  S.start(rtW.win); await sleep(60); rtW.go(); await sleep(80);
+  ok(rtW.$('hist').hidden === true, 'with no swap made yet the history stays out of sight');
+  ok(rtW.$('routes-go').hidden === true, 'and there are no other routes to ask for quotesBefore there is a price');
+  await rtW.type('1'); await sleep(300);
+  ok(rtW.need() === 'swap' && rtW.$('routes-go').hidden === false, 'once a price is shown, other routes can be asked for');
+  ok(rtW.$('bridge').textContent === '', 'a swap inside one network crosses no bridge, and says nothing about one');
+  const quotesBefore = urls.filter(u => u.indexOf('/v1/quote') > 0).length;
+  ok(quotesBefore === 1, 'until the reader asks, only the one price has been fetched');
+  rtW.$('routes-go').fire('click'); await sleep(200);
+  const routeRows = () => rtW.$('routes').kids.filter(k => k.attrs.class === 'sw-route');
+  ok(routeRows().length === 2 && routeRows()[0].textContent.indexOf('PancakeSwap') === 0 && routeRows()[1].textContent.indexOf('Fly') === 0,
+     'the next route is listed beside the best one (' + routeRows().map(r => r.textContent).join(' | ') + ')');
+  ok(!routeRows().some(r => r.textContent.indexOf('Evil') >= 0), 'a route whose transaction goes to another contract is never offered, however good its price');
+  ok(urls.some(u => u.indexOf('denyExchanges=pancakeswap') > 0) && !urls.some(u => u.indexOf('denyBridges') > 0), 'inside one network it is the exchange that is left out, not a bridge');
+  ok(routeRows()[0].attrs['aria-pressed'] === 'true', 'the best route stays chosen until the reader picks another');
+  routeRows()[1].fire('click'); await sleep(120);
+  ok(rtW.$('route').textContent === 'Fly' && rtW.$('receive').textContent.indexOf('549') === 0 && routeRows()[1].attrs['aria-pressed'] === 'true', 'choosing the other route shows its own figures');
+  rtW.go(); await sleep(250);
+  ok(rtW.sent.length === 1 && rtW.sent[0].to === DIAMOND, "and what is signed is that route's own transaction, to LI.FI's contract");
+  const histNow = JSON.parse(histBox.sw_hist || '[]');
+  ok(histNow.length === 1 && histNow[0].fs === 'BNB' && histNow[0].ts === 'USDT' && histNow[0].st === 'done' && histNow[0].h === '0x' + 'ab'.repeat(32),
+     'the swap is written into the history of this browser');
+  ok(JSON.stringify(histNow).indexOf(ME.slice(2, 12)) < 0, '…and no address is written with it');
+  ok(rtW.$('hist').hidden === false && rtW.$('hist-list').kids.length === 1 && String(rtW.$('hist-list').kids[0].kids[2].attrs.href).indexOf('https://bscscan.com/tx/0x') === 0,
+     "it is shown with a link to the network's own explorer");
+  /* whatever sits in the browser's histStore is read as a stranger's writing */
+  histBox.sw_hist = JSON.stringify([{ t: 1, fc: 56, tc: 56, fs: 'BNB', ts: 'USDT', fa: '1', ta: '2', h: 'javascript:alert(1)', st: 'done' },
+    { t: 2, fc: 999999, tc: 56, fs: 'A', ts: 'B', fa: '1', ta: '2', h: '0x' + 'ab'.repeat(32), st: 'done' },
+    { t: 3, fc: 56, tc: 56, fs: 'A', ts: 'B', fa: '<b>1</b>', ta: '2', h: '0x' + 'ab'.repeat(32), st: 'done' }, histNow[0]]);
+  freshWallet(); rtW = makeWindow(CFG, { allowed: true, storage: histStore }); S.start(rtW.win); await sleep(60);
+  ok(rtW.$('hist-list').kids.length === 1, 'a planted entry with a made-up link, an unknown network or markup in a figure is dropped');
+  rtW.$('hist-clear').fire('click');
+  ok(!('sw_hist' in histBox) && rtW.$('hist').hidden === true, 'the reader can wipe the list');
+  /* a swap between two networks names its bridge */
+  serve = () => goodQuote(q => { q.tool = 'across'; q.toolDetails = { name: 'AcrossV4' }; q.action.toChainId = 1; q.action.toToken = { address: USDT, decimals: 6, symbol: 'USDT' };
+    q.estimate.toAmount = '550000000'; q.estimate.toAmountMin = '547250000'; });
+  rtW.go(); await sleep(80); rtW.pickChain('tc', 'Ethereum'); await sleep(30); rtW.pick('tt', 'USDT'); await sleep(30);
+  await rtW.type('1'); await sleep(300);
+  ok(rtW.$('bridge').textContent.indexOf('AcrossV4') === 0 && rtW.$('bridge').textContent.length > 30, 'a swap between two networks names the bridge it rides and warns about it (' + rtW.need() + ')');
+  rtW.$('routes-go').fire('click'); await sleep(150);
+  ok(urls.some(u => u.indexOf('denyBridges=across') > 0), 'between two networks it is the bridge that is left out when asking for another route');
+  /* the monthly report */
+  const repCalls = () => urls.filter(u => u.indexOf('/v1/analytics/transfers') > 0);
+  ok(repCalls().length === 0, 'the report is not fetched until the reader opens it');
+  ledger = { transfers: [{ status: 'DONE', sending: { amountUSD: '1000' } }, { status: 'DONE', sending: { amountUSD: '500.5' } },
+    { status: 'FAILED', sending: { amountUSD: '900' } }, { status: 'DONE', sending: { amountUSD: 'NaN' } }, { status: 'DONE', sending: { amountUSD: '1e12' } }, null] };
+  rtW.$('rep').open = true; rtW.$('rep').fire('toggle'); await sleep(80);
+  const repNow = rtW.$('rep-out').kids.map(k => k.kids[1].textContent);
+  ok(repNow.length === 3 && repNow[0] === '2' && repNow[1] === '$1501' && repNow[2] === '$4.50', 'it counts finished swaps only, adds their volume, and works out the 0.3% share (' + repNow.join(' ') + ')');
+  ok(repCalls().length === 1 && repCalls()[0].indexOf('integrator=entekhab') > 0 && /fromTimestamp=\d+/.test(repCalls()[0]), "it is read from LI.FI's record for this page, from the first of the month");
+  ledger = null; serve = () => goodQuote();
+
   const js = fs.readFileSync(path.join(__dirname, '..', 'assets', 'swap', 'swap.js'), 'utf8');
   const code = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
   for (const w of ['eval(', 'new Function', 'innerHTML', 'outerHTML', 'document.write', 'insertAdjacentHTML', 'srcdoc',
@@ -919,7 +982,8 @@ const CFG = { enabled: true, integrator: 'entekhab', fee: 0.003, slippage: 0.005
   ok(hosts.length === 2 && hosts[0] === 'https://li.quest' && hosts[1] === 'https://api.trongrid.io',
      "the only addresses written into swap.js are LI.FI's and Tron's public node");
   ok(code.indexOf('rpcBalance') > 0 && /fetch\(w\.rpc/.test(code), "a network's own node is only ever read from the address the page was built with");
-  ok((code.match(/localStorage\.\w+\('([^']+)'/g) || []).every(x => x.indexOf("'ck_lang'") > 0), 'the only thing kept in the browser is the chosen site language');
+  ok((code.match(/localStorage\.\w+\(([^,)]+)/g) || []).every(x => /\('ck_lang'$|\(HKEY$/.test(x)) && code.indexOf("HKEY = 'sw_hist'") > 0,
+     "two things only are kept in the browser: the chosen language, and the reader's own list of swaps");
   ok((code.match(/\bfetch\(/g) || []).length === 3, "there are exactly three places that reach the network: the price service, a balance node, and Tron's node");
   ok(code.indexOf('MAX_FEE = 0.03') > 0, 'the 3% ceiling on the fee is in the file itself');
   for (const lg of ['fa', 'ckb', 'en']) {

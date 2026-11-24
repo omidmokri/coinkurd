@@ -457,6 +457,8 @@ def controls():
 {q("fee", "کارمزد سرویس", "کرێی خزمەتگوزاری", "Service fee")}
 {q("time", "زمان تقریبی", "کاتی نزیکەیی", "About")}
 </div>
+<div class="sw-alt"><button type="button" id="sw-routes-go" class="sw-link" hidden>{tri("مسیرهای دیگر", "ڕێگاکانی تر", "Other routes")}</button><div id="sw-routes" class="sw-routes"></div></div>
+<div id="sw-bridge" class="sw-warnline" role="status"></div>
 <div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
 <div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
 <label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span><span>{tri(
@@ -465,7 +467,14 @@ def controls():
 <button type="button" id="sw-action" class="sw-go" disabled><span id="sw-action-l"></span> <b id="sw-action-x" translate="no"></b></button>
 <div id="sw-msg" class="sw-msg" role="status" aria-live="polite"></div>
 <div id="sw-status" class="sw-status"></div>
-<div class="sw-acct"><span id="sw-account" dir="ltr" translate="no"></span></div>"""
+<div class="sw-acct"><span id="sw-account" dir="ltr" translate="no"></span></div>
+<details id="sw-hist" class="sw-more" hidden><summary>{tri("تبدیل‌های شما در این مرورگر", "گۆڕینەوەکانی تۆ لەم وێبگەڕەدا", "Your swaps in this browser")}</summary>
+<div id="sw-hist-list"></div>
+<p>{tri("این فهرست فقط در همین مرورگر نگه داشته می‌شود و به هیچ‌جا فرستاده نمی‌شود.", "ئەم لیستە تەنها لەم وێبگەڕەدا دەمێنێتەوە و بۆ هیچ شوێنێک نانێردرێت.", "This list is kept in this browser only and is sent nowhere.")}
+<button type="button" id="sw-hist-clear" class="sw-link">{tri("پاک کردن", "سڕینەوە", "Clear")}</button></p></details>
+<details id="sw-rep" class="sw-more"><summary>{tri("گزارش شفافیت این ماه", "ڕاپۆرتی ڕوونیی ئەم مانگە", "This month's transparency report")}</summary>
+<div id="sw-rep-out" role="status"></div>
+<p>{tri("از دفتر عمومی LI.FI خوانده می‌شود: تبدیل‌های انجام‌شده از همین صفحه در ماه جاری. سهم زاگرس همان کارمزد سرویس این صفحه است.", "لە تۆماری گشتیی LI.FI دەخوێنرێتەوە: ئەو گۆڕینەوانەی ئەم مانگە لەم پەڕەیەوە کراون. بەشی زاگرۆس هەمان کرێی Entekhab ـە.", "Read from LI.FI's public record: swaps made through this page this month. The Zagros share is Entekhab's own fee.")}</p></details>"""
 
 
 def dialog():

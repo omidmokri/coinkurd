@@ -55,7 +55,10 @@
       ackNeeded: 'برای ادامه، تیک تأیید را بزنید.',
       impactHigh: 'این تبدیل بخش بزرگی از ارزش را از دست می‌دهد.',
       bridging: 'در راه شبکهٔ مقصد…', arrived: 'به شبکهٔ مقصد رسید.', bridgeFailed: 'انتقال بین شبکه‌ها ناموفق بود؛ با شناسهٔ تراکنش پیگیری کنید.',
-      viewDest: 'تراکنش مقصد', pickChain: 'انتخاب شبکه', pickToken: 'انتخاب ارز', nothing: 'چیزی پیدا نشد.',
+      viewDest: 'تراکنش مقصد', pickChain: 'انتخاب شبکه', pickToken: 'انتخاب ارز', routesBusy: 'در حال یافتن مسیرهای دیگر…', routesNone: 'مسیر دیگری پیدا نشد.', best: 'بهترین',
+      bridgeNote: 'این تبدیل از این پل می‌گذرد. پل قراردادی جدا از دو شبکه است و خطر خودش را دارد؛ رسیدن پول هم چند دقیقه طول می‌کشد.',
+      histSent: 'فرستاده شد', histDone: 'انجام شد', histFailed: 'ناموفق', repBusy: 'در حال خواندن…', repNone: 'این ماه هنوز تبدیلی ثبت نشده است.',
+      repCount: 'تعداد تبدیل‌ها', repVolume: 'حجم تبدیل‌ها', repShare: 'سهم زاگرس (تقریبی)', repErr: 'گزارش اکنون در دسترس نیست.', nothing: 'چیزی پیدا نشد.',
       rcpChecking: 'در حال بررسی نشانی…',
       rcpNeeded: 'نشانی دریافت را وارد کنید', rcpBad: 'نشانی با قالب این شبکه نمی‌خواند', confirmAddr: 'نشانی دریافت را تأیید کنید',
       give: 'حمایت', giving: 'در انتظار امضا در کیف پول…', gave: 'رسید. ممنون.', copied: 'کپی شد', copy: 'کپی',
@@ -82,7 +85,10 @@
       ackNeeded: 'بۆ بەردەوامبوون، نیشانەی پشتڕاستکردنەوە بدە.',
       impactHigh: 'ئەم گۆڕینەوەیە بەشێکی گەورەی بەهاکە لەدەست دەدات.',
       bridging: 'لە ڕێگای تۆڕی مەبەستدایە…', arrived: 'گەیشتە تۆڕی مەبەست.', bridgeFailed: 'گواستنەوەی نێوان تۆڕەکان سەرکەوتوو نەبوو؛ بە ناسنامەی مامەڵەکە بەدوایدا بچۆ.',
-      viewDest: 'مامەڵەی مەبەست', pickChain: 'هەڵبژاردنی تۆڕ', pickToken: 'هەڵبژاردنی دراو', nothing: 'هیچ نەدۆزرایەوە.',
+      viewDest: 'مامەڵەی مەبەست', pickChain: 'هەڵبژاردنی تۆڕ', pickToken: 'هەڵبژاردنی دراو', routesBusy: 'گەڕان بەدوای ڕێگای تر…', routesNone: 'ڕێگایەکی تر نەدۆزرایەوە.', best: 'باشترین',
+      bridgeNote: 'ئەم گۆڕینەوەیە بەم پردەدا تێدەپەڕێت. پرد گرێبەستێکی جیایە و مەترسیی خۆی هەیە؛ گەیشتنی پارەکەش چەند خولەکێک دەخایەنێت.',
+      histSent: 'نێردرا', histDone: 'تەواو بوو', histFailed: 'سەرنەکەوت', repBusy: 'خوێندنەوە…', repNone: 'ئەم مانگە هێشتا هیچ گۆڕینەوەیەک تۆمار نەکراوە.',
+      repCount: 'ژمارەی گۆڕینەوەکان', repVolume: 'قەبارەی گۆڕینەوەکان', repShare: 'بەشی زاگرۆس (نزیکەیی)', repErr: 'ڕاپۆرت ئێستا بەردەست نییە.', nothing: 'هیچ نەدۆزرایەوە.',
       rcpChecking: 'ناونیشان دەپشکنرێت…',
       rcpNeeded: 'ناونیشانی وەرگرتن بنووسە', rcpBad: 'ناونیشان لەگەڵ قالبی ئەم تۆڕە ناگونجێت', confirmAddr: 'ناونیشانی وەرگرتن پەسەند بکە',
       give: 'پشتگیری', giving: 'چاوەڕێی واژۆ لە جزدان…', gave: 'گەیشت. سوپاس.', copied: 'لەبەرگیرایەوە', copy: 'لەبەرگرتنەوە',
@@ -109,7 +115,10 @@
       ackNeeded: 'Tick the confirmation box to continue.',
       impactHigh: 'This swap loses a large share of its value.',
       bridging: 'On its way to the destination network…', arrived: 'Arrived on the destination network.', bridgeFailed: 'The transfer between networks failed; follow it up with the transaction id.',
-      viewDest: 'Destination transaction', pickChain: 'Choose a network', pickToken: 'Choose a coin', nothing: 'Nothing found.',
+      viewDest: 'Destination transaction', pickChain: 'Choose a network', pickToken: 'Choose a coin', routesBusy: 'Looking for other routes…', routesNone: 'No other route found.', best: 'best',
+      bridgeNote: 'This swap crosses this bridge. A bridge is a contract apart from both networks and carries its own risk; the money also takes a few minutes to arrive.',
+      histSent: 'sent', histDone: 'done', histFailed: 'failed', repBusy: 'Reading…', repNone: 'No swap has been recorded this month yet.',
+      repCount: 'Swaps', repVolume: 'Volume', repShare: 'Zagros share (approx.)', repErr: 'The report is not available right now.', nothing: 'Nothing found.',
       rcpChecking: 'Checking the address…',
       rcpNeeded: 'Enter the receiving address', rcpBad: 'That address does not fit this network', confirmAddr: 'Confirm the receiving address',
       give: 'Support', giving: 'Waiting for the signature in the wallet…', gave: 'Received. Thank you.', copied: 'Copied', copy: 'Copy',
@@ -190,8 +199,9 @@
     });
   }
 
-  function quote(req, cfg) {
+  function quote(req, cfg, alt) {
     return api('/v1/quote', {
+      denyBridges: alt && alt.cross ? alt.deny : undefined, denyExchanges: alt && !alt.cross ? alt.deny : undefined,
       fromChain: req.fromChain, toChain: req.toChain, fromToken: req.fromToken, toToken: req.toToken,
       fromAmount: req.fromAmount, fromAddress: req.account, toAddress: req.recipient || req.account,
       slippage: req.slippage, integrator: cfg.integrator || undefined, fee: cfg.fee || undefined
@@ -957,6 +967,11 @@
       'dlg-q', 'dlg-list', 'dlg-find', 'dlg-close'].forEach(function (k) { el[k] = $('sw-' + k); });
     for (var k0 in el) { if (own(el, k0) && !el[k0]) { return state('off'); } }      /* a page missing a part does not half-work */
 
+    /* parts a page may or may not carry: other routes, the bridge note, the reader's own history, the monthly report */
+    var X = {};
+    ['routes', 'routes-go', 'bridge', 'hist', 'hist-list', 'hist-clear', 'rep', 'rep-out'].forEach(function (k) { X[k] = $('sw-' + k); });
+    S.alts = []; S.altT = []; S.altState = ''; S.rep = '';
+
     function chainById(id) {
       for (var i = 0; i < data.chains.length; i++) { if (Number(data.chains[i].id) === Number(id)) { return data.chains[i]; } }
       return null;
@@ -1092,7 +1107,7 @@
     function showQuote(q) {
       var names = ['receive', 'to-usd', 'from-usd', 'rate', 'min', 'route', 'gas', 'fee', 'time', 'impact'];
       S.impact = null;
-      if (!q) { names.forEach(function (n) { el[n].textContent = ''; }); el.impact.setAttribute('data-level', ''); return; }
+      if (!q) { names.forEach(function (n) { el[n].textContent = ''; }); el.impact.setAttribute('data-level', ''); if (X.bridge) { X.bridge.textContent = ''; } return; }
       var ft = S.from.token, tt = S.to.token, e = q.estimate;
       el.receive.textContent = formatUnits(e.toAmount, tt.decimals, 8);
       el.min.textContent = formatUnits(e.toAmountMin, tt.decimals, 8) + ' ' + tt.symbol;
@@ -1100,7 +1115,16 @@
       /* 1 of the source token in the destination token, by whole numbers only */
       var num = BigInt(e.toAmount) * (10n ** BigInt(ft.decimals)) * 1000000n, den = BigInt(q.action.fromAmount) * (10n ** BigInt(tt.decimals));
       el.rate.textContent = den > 0n ? '1 ' + ft.symbol + ' ≈ ' + formatUnits(num / den, 6, 6) + ' ' + tt.symbol : '';
-      el.route.textContent = String((q.toolDetails && q.toolDetails.name) || q.tool || '').replace(/[^\w .()-]/g, '').slice(0, 40);
+      el.route.textContent = toolName(q);
+      /* a swap between two networks rides a bridge: say which, and that it is a risk of its own */
+      if (X.bridge) {
+        X.bridge.textContent = '';
+        if (Number(q.action.fromChainId) !== Number(q.action.toChainId) && toolName(q)) {
+          var bn = doc.createElement('b'); bn.setAttribute('translate', 'no'); bn.textContent = toolName(q) + ' — ';
+          var bs = doc.createElement('span'); bs.textContent = t('bridgeNote');
+          X.bridge.appendChild(bn); X.bridge.appendChild(bs);
+        }
+      }
       var g = 0, f = 0, i;
       for (i = 0; i < (e.gasCosts || []).length; i++) { g += Number(e.gasCosts[i].amountUSD || 0); }
       for (i = 0; i < (e.feeCosts || []).length; i++) { f += Number(e.feeCosts[i].amountUSD || 0); }
@@ -1115,10 +1139,143 @@
       } else { el.impact.textContent = '—'; el.impact.setAttribute('data-level', ''); }
     }
 
+    function toolName(q) { return String((q.toolDetails && q.toolDetails.name) || q.tool || '').replace(/[^\w .()-]/g, '').slice(0, 40); }
+    function toolKey(q) { return typeof q.tool === 'string' && /^[\w-]{1,40}$/.test(q.tool) ? q.tool : ''; }
+
+    /* ---- other routes
+     * The service answers with its best route. Asked again with that route's tool left out, it answers with the next
+     * one. Each answer goes through the very same checks as the first before it is shown, and one that fails them is
+     * simply not offered. Nothing is asked until the reader wants to see more. */
+    function paintRoutes() {
+      if (!X.routes || !X['routes-go']) { return; }
+      X['routes-go'].hidden = !S.q || !!S.altState;
+      X.routes.textContent = '';
+      if (!S.altState) { return; }
+      var tt = S.to.token;
+      S.alts.forEach(function (q, i) {
+        var b = doc.createElement('button'), d = Number(q.estimate.executionDuration || 0);
+        b.setAttribute('type', 'button'); b.setAttribute('class', 'sw-route'); b.setAttribute('data-i', String(i));
+        b.setAttribute('aria-pressed', q === S.q ? 'true' : 'false');
+        var n = doc.createElement('span'); n.setAttribute('translate', 'no'); n.textContent = toolName(q) + (i === 0 ? ' · ' + t('best') : '');
+        var v = doc.createElement('b'); v.setAttribute('translate', 'no'); v.setAttribute('dir', 'ltr');
+        v.textContent = formatUnits(q.estimate.toAmount, tt.decimals, 6) + ' ' + tt.symbol + (d > 0 ? ' · ' + (d < 90 ? Math.max(1, Math.round(d)) + ' s' : Math.round(d / 60) + ' min') : '');
+        b.appendChild(n); b.appendChild(v);
+        b.addEventListener('click', function () { chooseRoute(i); });
+        X.routes.appendChild(b);
+      });
+      if (S.altState === 'busy' || S.alts.length < 2) {
+        var m = doc.createElement('div'); m.setAttribute('class', 'sw-route-n'); m.textContent = t(S.altState === 'busy' ? 'routesBusy' : 'routesNone');
+        X.routes.appendChild(m);
+      }
+    }
+    function moreRoutes() {
+      var q0 = S.q, req = S.qreq, seq = S.seq;
+      if (!q0 || !req || S.altState || S.busy) { return; }
+      var cross = Number(req.fromChain) !== Number(req.toChain), deny = [toolKey(q0)];
+      if (!deny[0]) { return; }
+      S.alts = [q0]; S.altT = [S.qt]; S.altState = 'busy'; paintRoutes();
+      var next = function (left) {
+        if (left <= 0) { return Promise.resolve(); }
+        return quote(req, cfg, { cross: cross, deny: deny.join(',') }).then(function (q) {
+          if (seq !== S.seq) { return; }
+          var k = plain(q) ? toolKey(q) : '';
+          if (!k || deny.indexOf(k) >= 0 || checkQuote(q, req)) { return; }      /* not sound: not offered */
+          S.alts.push(q); S.altT.push(Date.now()); deny.push(k); paintRoutes();
+          return next(left - 1);
+        }, function () { });
+      };
+      next(2).then(function () { if (seq === S.seq) { S.altState = 'done'; paintRoutes(); } });
+    }
+    function chooseRoute(i) {
+      var q = S.alts[i], req = S.qreq, seq = S.seq;
+      if (!q || !req || S.busy || q === S.q) { return; }
+      if (checkQuote(q, req)) { return; }                               /* checked again, as every route is */
+      S.q = q; S.qt = S.altT[i]; S.need = null; S.ack = false; el.ack.checked = false; S.err = ''; S.done = false;
+      showQuote(q); paintRoutes(); paint();
+      decideApproval(q, req).then(function () { if (seq === S.seq) { paint(); } });
+    }
+
+    /* ---- the reader's own swaps, kept in this browser and nowhere else
+     * No address is written down: only what was swapped, when, and the public transaction id. Whatever is read back
+     * is checked as if a stranger had written it, because another script on this site could have. */
+    var HKEY = 'sw_hist', HMAX = 20;
+    function histOk(r) {
+      return plain(r) && typeof r.t === 'number' && isFinite(r.t) && r.t > 0 && !!chainById(r.fc) && !!chainById(r.tc) &&
+        typeof r.fs === 'string' && r.fs.length > 0 && r.fs.length <= 20 && typeof r.ts === 'string' && r.ts.length > 0 && r.ts.length <= 20 &&
+        typeof r.fa === 'string' && /^[\d.,]{1,40}$/.test(r.fa) && typeof r.ta === 'string' && /^[\d.,]{1,40}$/.test(r.ta) &&
+        typeof r.h === 'string' && !!linkFor(chainById(r.fc), r.h) && (r.st === 'sent' || r.st === 'done' || r.st === 'failed');
+    }
+    function histLoad() {
+      var a = null;
+      try { a = JSON.parse(win.localStorage.getItem(HKEY) || '[]'); } catch (e) { a = null; }
+      return Array.isArray(a) ? a.filter(histOk).slice(0, HMAX) : [];
+    }
+    function histSave(a) { try { win.localStorage.setItem(HKEY, JSON.stringify(a.slice(0, HMAX))); } catch (e) { } }
+    function histAdd(req, q, hash) {
+      if (!X.hist) { return; }
+      var ft = S.from.token, tt = S.to.token;
+      if (!ft || !tt) { return; }
+      var r = { t: Date.now(), fc: Number(req.fromChain), tc: Number(req.toChain), fs: String(ft.symbol).slice(0, 20), ts: String(tt.symbol).slice(0, 20),
+                fa: formatUnits(req.fromAmount, ft.decimals, 6), ta: formatUnits(q.estimate.toAmount, tt.decimals, 6), h: hash, st: 'sent' };
+      if (!histOk(r)) { return; }
+      var a = histLoad(); a.unshift(r); histSave(a); histPaint();
+    }
+    function histMark(hash, st) {
+      if (!X.hist || !hash) { return; }
+      var a = histLoad(), hit = false;
+      a.forEach(function (r) { if (r.h === hash && r.st === 'sent') { r.st = st; hit = true; } });
+      if (hit) { histSave(a); histPaint(); }
+    }
+    function histPaint() {
+      if (!X.hist || !X['hist-list']) { return; }
+      var a = histLoad();
+      X.hist.hidden = !a.length;
+      X['hist-list'].textContent = '';
+      a.forEach(function (r) {
+        var fc = chainById(r.fc), tc = chainById(r.tc), row = doc.createElement('div'), d = new Date(r.t);
+        row.setAttribute('class', 'sw-hrow'); row.setAttribute('data-st', r.st);
+        var w = doc.createElement('span'); w.setAttribute('translate', 'no'); w.setAttribute('dir', 'ltr');
+        w.textContent = r.fa + ' ' + r.fs + ' → ' + r.ta + ' ' + r.ts;
+        var n = doc.createElement('small');
+        n.textContent = fc.name + (fc === tc ? '' : ' → ' + tc.name) + ' · ' + d.toISOString().slice(0, 10) + ' · ' + t(r.st === 'done' ? 'histDone' : r.st === 'failed' ? 'histFailed' : 'histSent');
+        var l = doc.createElement('a');
+        l.setAttribute('href', linkFor(fc, r.h)); l.setAttribute('target', '_blank'); l.setAttribute('rel', 'noopener noreferrer');
+        l.setAttribute('translate', 'no'); l.textContent = short(r.h);
+        row.appendChild(w); row.appendChild(n); row.appendChild(l);
+        X['hist-list'].appendChild(row);
+      });
+    }
+
+    /* ---- this month, from LI.FI's own public record of swaps made through this page: how many, and how much */
+    function report() {
+      var out = X['rep-out'];
+      if (!X.rep || !out || S.rep || !cfg.integrator) { return; }
+      S.rep = 'busy'; out.textContent = t('repBusy');
+      var now = new Date(), from = Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1) / 1000);
+      api('/v1/analytics/transfers', { integrator: cfg.integrator, fromTimestamp: from }).then(function (j) {
+        var a = Array.isArray(j.transfers) ? j.transfers : [], n = 0, v = 0, i, x;
+        for (i = 0; i < a.length && i < 5000; i++) {
+          x = plain(a[i]) && a[i].status === 'DONE' && plain(a[i].sending) ? Number(a[i].sending.amountUSD) : NaN;
+          if (isFinite(x) && x >= 0 && x < 1e9) { n++; v += x; }
+        }
+        var money = function (m) { return '$' + (m >= 100 ? m.toFixed(0) : m.toFixed(2)); };
+        out.textContent = n ? '' : t('repNone');
+        if (n) {
+          [['repCount', String(n)], ['repVolume', money(v)], ['repShare', money(v * Number(cfg.fee || 0))]].forEach(function (r) {
+            var row = doc.createElement('div'), a1 = doc.createElement('span'), b1 = doc.createElement('b');
+            row.setAttribute('class', 'sw-q'); a1.textContent = t(r[0]); b1.setAttribute('dir', 'ltr'); b1.setAttribute('translate', 'no'); b1.textContent = r[1];
+            row.appendChild(a1); row.appendChild(b1); out.appendChild(row);
+          });
+        }
+        S.rep = 'done';
+      }, function () { out.textContent = t('repErr'); S.rep = ''; });
+    }
+
     function reset(keepNote) {      /* whatever was on screen belonged to the old question */
+      S.alts = []; S.altT = []; S.altState = '';
       S.q = null; S.qreq = null; S.need = null; S.ack = false; el.ack.checked = false; S.err = ''; S.done = false;
       if (!keepNote) { S.note = ''; }
-      S.busy = ''; S.seq++; showQuote(null);
+      S.busy = ''; S.seq++; showQuote(null); paintRoutes();
     }
 
     /* ---- ask for a price; every answer is checked before it is shown */
@@ -1150,7 +1307,7 @@
         var bad = checkQuote(q, req);
         if (bad) { S.busy = ''; S.err = t('mismatch') + ' [' + bad + ']'; paint(); return; }
         S.q = q; S.qreq = req; S.qt = Date.now(); S.busy = '';
-        showQuote(q); paint();                       /* the price is on screen before the wallet is asked anything */
+        showQuote(q); paintRoutes(); paint();        /* the price is on screen before the wallet is asked anything */
         return decideApproval(q, req).then(function () { if (seq === S.seq) { paint(); } });
       }, function (e) {
         if (seq !== S.seq) { return; }
@@ -1313,9 +1470,10 @@
         if (moved) { throw { soft: t(moved) }; }
         return W.send(tx);
       }).then(function (h) {
-        hash = h; line(t('view'), req.fromChain, h); S.busy = t('watching'); paint();
+        hash = h; line(t('view'), req.fromChain, h); histAdd(req, q, h); S.busy = t('watching'); paint();
         return waitFor(h);
       }).then(function (okd) {
+        if (okd === false) { histMark(hash, 'failed'); } else if (okd === true && !cross) { histMark(hash, 'done'); }
         if (seq !== S.seq) { return; }
         if (okd === false) { S.busy = ''; S.err = t('failed'); paint(); return; }
         reset(); S.amount = ''; el.amount.value = ''; S.bal = null;
@@ -1342,10 +1500,11 @@
           return TW.sign(tt);
         }).then(function (signed) { return TW.broadcast(signed); });
       }).then(function (h) {
-        hash = h; line(t('view'), req.fromChain, h); S.busy = t('watching'); paint();
+        hash = h; line(t('view'), req.fromChain, h); histAdd(req, q, h); S.busy = t('watching'); paint();
         return req.kind === 'tron' ? tronWait(h) : true;
       });
       sent.then(function (okd) {
+        if (okd === false) { histMark(hash, 'failed'); } else if (okd === true && !cross && req.kind === 'tron') { histMark(hash, 'done'); }
         if (seq !== S.seq) { return; }
         if (okd === false) { S.busy = ''; S.err = t('failed'); paint(); return; }
         reset(); S.amount = ''; el.amount.value = ''; S.bal = null;
@@ -1364,11 +1523,12 @@
           if (mine !== S.seq) { return; }
           var st = r && typeof r.status === 'string' ? r.status : '';
           if (st === 'DONE') {
+            histMark(hash, 'done');
             S.note = ''; S.done = true; paint(); line(t('arrived'));
             if (r.receiving && typeof r.receiving.txHash === 'string') { line(t('viewDest'), req.toChain, r.receiving.txHash); }
             return;
           }
-          if (st === 'FAILED') { S.note = ''; S.err = t('bridgeFailed'); paint(); return; }
+          if (st === 'FAILED') { histMark(hash, 'failed'); S.note = ''; S.err = t('bridgeFailed'); paint(); return; }
           if (tries <= 0) { return; }
           setTimeout(function () { track(hash, req, tool, tries - 1); }, 10000);
         });
@@ -1376,14 +1536,17 @@
 
     /* one line under the button: some words, and a link to a transaction when there is one. The link is built from
        this site's own list of explorers and a hash that looks like a hash, nothing else. */
+    function linkFor(c, hash) {
+      var k = kindOf(c), okHash = typeof hash === 'string' && (k === 'tron' || k === 'utxo' ? /^[0-9a-f]{64}$/.test(hash)
+        : k === 'solana' ? /^[1-9A-HJ-NP-Za-km-z]{64,90}$/.test(hash) : /^0x[0-9a-fA-F]{64}$/.test(hash));
+      return c && okHash ? c.explorer.replace(/\/+$/, '') + (k === 'tron' ? '/#/transaction/' : '/tx/') + hash : '';
+    }
     function line(words, chainId, hash) {
       var row = doc.createElement('div');
       var c = chainId !== undefined ? chainById(chainId) : null;
-      var k = kindOf(c), okHash = typeof hash === 'string' && (k === 'tron' || k === 'utxo' ? /^[0-9a-f]{64}$/.test(hash)
-        : k === 'solana' ? /^[1-9A-HJ-NP-Za-km-z]{64,90}$/.test(hash) : /^0x[0-9a-fA-F]{64}$/.test(hash));
-      if (c && okHash) {
+      if (linkFor(c, hash)) {
         var a = doc.createElement('a');
-        a.setAttribute('href', c.explorer.replace(/\/+$/, '') + (k === 'tron' ? '/#/transaction/' : '/tx/') + hash);
+        a.setAttribute('href', linkFor(c, hash));
         a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer');
         a.textContent = words;
         var h = doc.createElement('b'); h.setAttribute('translate', 'no'); h.textContent = ' ' + short(hash);
@@ -1703,6 +1866,10 @@
     el.ft.addEventListener('click', function () { openPick('from', 'token'); });
     el.tt.addEventListener('click', function () { openPick('to', 'token'); });
     el['dlg-close'].addEventListener('click', closePick);
+    if (X['routes-go']) { X['routes-go'].addEventListener('click', moreRoutes); }
+    if (X['hist-clear']) { X['hist-clear'].addEventListener('click', function () { try { win.localStorage.removeItem(HKEY); } catch (e) { } histPaint(); }); }
+    if (X.rep) { X.rep.addEventListener('toggle', function () { if (X.rep.open !== false) { report(); } }); }
+    histPaint(); paintRoutes();
     el['dlg-find'].addEventListener('click', findOnChain);
     el['dlg-q'].addEventListener('input', function () { fillPick(this.value); });
     el.dlg.addEventListener('click', function (ev) { if (ev && ev.target === el.dlg) { closePick(); } });
