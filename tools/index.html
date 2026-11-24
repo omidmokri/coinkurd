@@ -42,6 +42,17 @@ section.card[id]{scroll-margin-top:72px}.jmp{display:flex;gap:6px;overflow-x:aut
     <p class="lead" data-t="feeH"></p>
     <div class="out" id="rOut"></div><div id="rWarn"></div></section>
 
+
+  <section class="card" id="journal"><h2 data-t="jlT"></h2><p class="lead" data-t="jlL"></p>
+    <div class="f"><label><span data-t="jlDate"></span><input id="jDate" type="date"></label><label><span data-t="jlPair"></span><input id="jPair" type="text" maxlength="16" placeholder="BTC" dir="ltr" autocomplete="off" spellcheck="false"></label>
+      <label><span data-t="side"></span><select id="jSide"></select></label><label><span data-t="jlQty"></span><input id="jQty" type="number" min="0" step="any"></label>
+      <label><span data-t="entry"></span><input id="jEn" type="number" min="0" step="any"></label><label><span data-t="jlEx"></span><input id="jEx" type="number" min="0" step="any"></label>
+      <label><span data-t="stop"></span><input id="jSl" type="number" min="0" step="any"></label><label><span data-t="jlFee"></span><input id="jFee" type="number" min="0" step="any" placeholder="0"></label>
+      <label style="flex:1 1 100%"><span data-t="jlNote"></span><input id="jNote" type="text" maxlength="120" autocomplete="off"></label></div>
+    <div class="f"><button type="button" id="jAdd" class="btn" data-t="jlAdd"></button><button type="button" id="jCsv" class="btn ghost" data-t="jlCsv"></button><button type="button" id="jWipe" class="btn ghost" data-t="jlWipe"></button></div>
+    <div id="jErr"></div><div class="out" id="jOut"></div><div class="tscroll"><table id="jTab"></table></div>
+    <p class="disc" data-t="jlNoteFoot"></p></section>
+
   <section class="card" id="streaks"><h2 data-t="mT"></h2><p class="lead" data-t="mL"></p>
     <div class="f"><label><span data-t="mWinL"></span><input id="mWin" type="number" min="0" max="100" step="any" value="45"></label><label><span data-t="mRRL"></span><input id="mRR" type="number" min="0" step="any" value="2"></label>
       <label><span data-t="riskP"></span><input id="mRisk" type="number" min="0" max="99" step="any" value="1"></label><label><span data-t="mNL"></span><input id="mN" type="number" min="1" max="2000" step="1" value="100"></label></div>
@@ -294,7 +305,7 @@ async function renderFx(){const c=$('#fCoin').value,q=+$('#fQty').value||0,cur=$
  $('#fNote').innerHTML=(FX?.time_last_update_utc?T('fxSrc')+esc(FX.time_last_update_utc.slice(5,22))+'. ':'')+(mkt&&!mine?T('mktSrc'):['IRT','IQD'].includes(cur)?T('fxWarn'):'')}
 $('#fRate').addEventListener('change',()=>{const R=ls.get('ek_fx',{}),v=+$('#fRate').value;if(v>0)R[$('#fCur').value]=v;else delete R[$('#fCur').value];ls.set('ek_fx',R);renderFx()});
 ['#fCoin','#fQty'].forEach(s=>$(s).addEventListener('input',renderFx));$('#fCur').addEventListener('change',()=>{$('#fRate').value='';renderFx()});
-function forms(){const cs=coins();['#wCoin','#fCoin','#slCoin'].forEach(s=>{const v=$(s).value||'BTC';$(s).innerHTML=opt(cs,v)});{const sv=$('#slSide').value||'buy';$('#slSide').innerHTML=Object.entries(T('slSides')).map(([k,v])=>`<option value="${k}"${k===sv?' selected':''}>${v}</option>`).join('')}$('#rCoin').innerHTML='<option value="">—</option>'+opt(cs);{const uv=$('#uSide').value||'long',uc=$('#uCoin').value;$('#uSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}"${k===uv?' selected':''}>${v}</option>`).join('');$('#uCoin').innerHTML='<option value="">—</option>'+((DV?.swaps)||[]).filter(x=>x.funding!=null&&/^[A-Z0-9]{1,12}$/.test(x.coin)).map(x=>`<option${x.coin===uc?' selected':''}>${x.coin}</option>`).join('')}
+function forms(){const cs=coins();['#wCoin','#fCoin','#slCoin'].forEach(s=>{const v=$(s).value||'BTC';$(s).innerHTML=opt(cs,v)});{const sv=$('#slSide').value||'buy';$('#slSide').innerHTML=Object.entries(T('slSides')).map(([k,v])=>`<option value="${k}"${k===sv?' selected':''}>${v}</option>`).join('')}$('#rCoin').innerHTML='<option value="">—</option>'+opt(cs);{const jv=$('#jSide').value||'long';$('#jSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}"${k===jv?' selected':''}>${v}</option>`).join('')}{const uv=$('#uSide').value||'long',uc=$('#uCoin').value;$('#uSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}"${k===uv?' selected':''}>${v}</option>`).join('');$('#uCoin').innerHTML='<option value="">—</option>'+((DV?.swaps)||[]).filter(x=>x.funding!=null&&/^[A-Z0-9]{1,12}$/.test(x.coin)).map(x=>`<option${x.coin===uc?' selected':''}>${x.coin}</option>`).join('')}
  $('#rSide').innerHTML=Object.entries(T('sides')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');$('#wMode').innerHTML=Object.entries(T('modes')).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
  const fc=$('#fCur').value||'IQD';$('#fCur').innerHTML=Object.entries(T('curs')).map(([k,v])=>`<option value="${k}"${k===fc?' selected':''}>${v} (${k})</option>`).join('');
  if(!$('#wDate').value){const d=new Date(Date.now()-365*864e5);$('#wDate').value=d.toISOString().slice(0,10)}$('#wDate').max=new Date().toISOString().slice(0,10);
@@ -363,7 +374,86 @@ async function adCheck(raw){const s=(raw||'').trim();if(!s)return null;if(/\s/.t
 function renderAd(){const o=$('#adOut');if(!o)return;const v=$('#adIn').value,id=++adSeq;adCheck(v).then(r=>{if(id!==adSeq)return;if(!r){o.innerHTML='';return}const t=v.trim();
  o.innerHTML=`<div style="grid-column:1/-1"><small>${T(r.ok?'adOk':'adBad')}</small><b style="color:${r.ok?'#22c55e':'#ef4444'};font-family:inherit;font-size:15px;letter-spacing:0;line-height:1.7">${r.ok?T('adNet')[r.net]:T('adWhy')[r.why]}</b></div>`+(r.ok?`<div style="grid-column:1/-1"><small>${T('adEnds')}</small><b dir="ltr">${t.slice(0,6)} … ${t.slice(-6)}</b></div>`:'')+(r.mixed?`<div style="grid-column:1/-1"><small>${T('adMix')}</small></div>`:'')}).catch(()=>{o.innerHTML=''})}
 let adSeq=0;$('#adIn').addEventListener('input',renderAd);
-function render(){forms();renderCmp();renderRisk();renderMc();renderFund();renderAvg();renderRec();renderMk();renderLiq();renderPnl();renderNzF();renderBe();renderTp();renderFx();renderSs();renderAd()}
+
+/* ---- the trade journal: every trade the reader writes down, kept in this browser and nowhere else.
+   Nothing is sent anywhere: no account, no server, no counter. What comes back out of the browser's own store is
+   read as a stranger's writing and checked again, because another script on this site could have written it. */
+const JK='ek_journal', JMAX=400;
+const jNum=v=>{const n=parseFloat(v);return isFinite(n)?n:NaN};
+function jOk(r){return r&&typeof r==='object'&&typeof r.d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(r.d)
+  &&typeof r.p==='string'&&r.p.length>0&&r.p.length<=16&&(r.s==='long'||r.s==='short')
+  &&['q','e','x'].every(k=>typeof r[k]==='number'&&isFinite(r[k])&&r[k]>0&&r[k]<1e15)
+  &&typeof r.f==='number'&&isFinite(r.f)&&r.f>=0&&r.f<1e15
+  &&(r.sl===null||(typeof r.sl==='number'&&isFinite(r.sl)&&r.sl>0&&r.sl<1e15))
+  &&typeof r.n==='string'&&r.n.length<=120}
+function jLoad(){let a=null;try{a=JSON.parse(localStorage.getItem(JK)||'[]')}catch(e){a=null}
+ return Array.isArray(a)?a.filter(jOk).slice(0,JMAX):[]}
+function jSave(a){try{localStorage.setItem(JK,JSON.stringify(a.slice(0,JMAX)))}catch(e){}}
+/* what one trade came to: the money made or lost, and how many times the risk it was */
+function jPnl(r){const dir=r.s==='long'?1:-1,gross=(r.x-r.e)*r.q*dir,net=gross-r.f;
+ const risk=r.sl?Math.abs(r.e-r.sl)*r.q:0;return{net:net,gross:gross,R:risk>0?net/risk:null}}
+function jStats(a){const o={n:a.length,win:0,loss:0,net:0,gw:0,gl:0,best:null,worst:null,R:0,Rn:0};
+ a.forEach(r=>{const v=jPnl(r);o.net+=v.net;if(v.net>=0){o.win++;o.gw+=v.net}else{o.loss++;o.gl+=-v.net}
+  if(o.best===null||v.net>o.best)o.best=v.net;if(o.worst===null||v.net<o.worst)o.worst=v.net;
+  if(v.R!==null){o.R+=v.R;o.Rn++}});
+ o.rate=o.n?o.win/o.n*100:0;o.avgW=o.win?o.gw/o.win:0;o.avgL=o.loss?o.gl/o.loss:0;
+ o.pf=o.gl>0?o.gw/o.gl:(o.gw>0?Infinity:0);return o}
+function renderJn(){const a=jLoad(),o=$('#jOut'),tb=$('#jTab');
+ if(!a.length){o.innerHTML=`<p class="lead" style="grid-column:1/-1">${esc(T('jlEmpty'))}</p>`;tb.innerHTML='';return}
+ const st=jStats(a),sg=v=>(v>0?'+':'')+fm(v,2);
+ o.innerHTML=[[T('jlN'),fm(st.n,0)],[T('jlNet'),sg(st.net)+' $'],[T('jlRate'),fm(st.rate,1)+'%'],
+  [T('jlAvgW'),fm(st.avgW,2)+' $'],[T('jlAvgL'),fm(st.avgL,2)+' $'],
+  [T('jlPf'),st.pf===Infinity?'∞':fm(st.pf,2)],[T('jlBest'),sg(st.best||0)+' $'],[T('jlWorst'),sg(st.worst||0)+' $'],
+  [T('jlR'),st.Rn?sg(st.R)+'R':'—']].map(([k,v])=>`<div><small>${esc(k)}</small><b>${esc(v)}</b></div>`).join('');
+ tb.innerHTML='<thead><tr>'+[T('jlDate'),T('jlPair'),T('side'),T('jlQty'),T('entry'),T('jlEx'),T('jlPnl'),'R',''].map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'+
+  a.map((r,i)=>{const v=jPnl(r);return `<tr><td dir="ltr">${esc(r.d)}</td><td dir="ltr">${esc(r.p)}</td><td>${esc(T('sides')[r.s]||r.s)}</td><td dir="ltr">${esc(fm(r.q,r.q<1?6:4))}</td><td dir="ltr">${esc(fm(r.e,r.e<1?6:2))}</td><td dir="ltr">${esc(fm(r.x,r.x<1?6:2))}</td><td dir="ltr" class="${v.net>=0?'up':'down'}">${esc((v.net>0?'+':'')+fm(v.net,2))}</td><td dir="ltr">${v.R===null?'—':esc((v.R>0?'+':'')+fm(v.R,2))}</td><td><button type="button" class="btn ghost jdel" data-i="${i}">${esc(T('jlDel'))}</button></td></tr>`}).join('')+'</tbody>';
+ [...tb.querySelectorAll('.jdel')].forEach(b=>b.addEventListener('click',()=>{const a2=jLoad();a2.splice(+b.dataset.i,1);jSave(a2);renderJn()}))}
+function jAdd(){const e=$('#jErr'),r={d:$('#jDate').value||new Date().toISOString().slice(0,10),
+  p:($('#jPair').value||'').trim().toUpperCase().replace(/[^A-Z0-9/.-]/g,'').slice(0,16),
+  s:$('#jSide').value==='short'?'short':'long',q:jNum($('#jQty').value),e:jNum($('#jEn').value),
+  x:jNum($('#jEx').value),f:$('#jFee').value===''?0:jNum($('#jFee').value),
+  sl:$('#jSl').value===''?null:jNum($('#jSl').value),n:($('#jNote').value||'').slice(0,120)};
+ if(!jOk(r)){e.innerHTML=`<p class="err">${esc(T('jlBad'))}</p>`;return}
+ e.innerHTML='';const a=jLoad();a.unshift(r);jSave(a);
+ ['#jQty','#jEn','#jEx','#jSl','#jFee','#jNote'].forEach(s=>$(s).value='');renderJn()}
+function jCsv(){const a=jLoad();if(!a.length)return;
+ const head=['date','pair','side','qty','entry','exit','stop','fee','pnl','R','note'];
+ const rows=a.map(r=>{const v=jPnl(r);return [r.d,r.p,r.s,r.q,r.e,r.x,r.sl===null?'':r.sl,r.f,v.net.toFixed(2),v.R===null?'':v.R.toFixed(2),'"'+String(r.n).replace(/"/g,'""')+'"'].join(',')});
+ const blob=new Blob([head.join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
+ const u=URL.createObjectURL(blob),link=document.createElement('a');
+ link.href=u;link.download='entekhab-journal.csv';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+$('#jAdd').addEventListener('click',jAdd);
+$('#jCsv').addEventListener('click',jCsv);
+$('#jWipe').addEventListener('click',()=>{if(!jLoad().length)return;if(window.confirm(T('jlSure'))){try{localStorage.removeItem(JK)}catch(e){}renderJn()}});
+Object.assign(I.fa,{jlT:'📓 دفترچهٔ معاملات',jlL:'هر معامله را که بستید همین‌جا بنویسید تا کارنامهٔ خودتان را ببینید: درصد برد، میانگین سود و زیان، ضریب سود و مجموع R. همه‌چیز فقط در مرورگر خودتان می‌ماند.',
+ jlDate:'تاریخ',jlPair:'نماد',jlQty:'مقدار (واحد)',jlEx:'قیمت خروج',jlFee:'کارمزد (دلار)',jlNote:'یادداشت (اختیاری)',
+ jlAdd:'افزودن معامله',jlCsv:'خروجی CSV',jlWipe:'پاک کردن همه',jlDel:'حذف',
+ jlEmpty:'هنوز معامله‌ای ثبت نشده است. اولین معامله‌تان را بالا وارد کنید.',
+ jlBad:'تاریخ، نماد، مقدار، قیمت ورود و قیمت خروج لازم است و باید عددی بزرگ‌تر از صفر باشند.',
+ jlSure:'همهٔ معامله‌های ثبت‌شده در این مرورگر پاک شوند؟',
+ jlN:'تعداد معامله',jlNet:'سود/زیان خالص',jlRate:'درصد برد',jlAvgW:'میانگین سود',jlAvgL:'میانگین زیان',
+ jlPf:'ضریب سود',jlBest:'بهترین',jlWorst:'بدترین',jlR:'مجموع R',jlPnl:'سود/زیان',
+ jlNoteFoot:'R وقتی حساب می‌شود که حد ضرر را هم نوشته باشید: سود یا زیان تقسیم بر همان چیزی که روی آن ریسک کرده بودید. این دفترچه روی سرور ذخیره نمی‌شود؛ اگر حافظهٔ مرورگر را پاک کنید از بین می‌رود، پس هر چند وقت یک بار خروجی CSV بگیرید.'});
+Object.assign(I.ckb,{jlT:'📓 دەفتەری مامەڵەکان',jlL:'هەر مامەڵەیەک کە دایدەخەیت لێرە بینووسە تا کارنامەی خۆت ببینیت: ڕێژەی بردنەوە، تێکڕای قازانج و زیان، فاکتەری قازانج و کۆی R. هەمووی تەنها لە وێبگەڕی خۆتدا دەمێنێتەوە.',
+ jlDate:'بەروار',jlPair:'هێما',jlQty:'بڕ (یەکە)',jlEx:'نرخی دەرچوون',jlFee:'کرێ (دۆلار)',jlNote:'تێبینی (ئارەزوومەندانە)',
+ jlAdd:'زیادکردنی مامەڵە',jlCsv:'دەرهاویشتەی CSV',jlWipe:'سڕینەوەی هەمووی',jlDel:'سڕینەوە',
+ jlEmpty:'هێشتا هیچ مامەڵەیەک تۆمار نەکراوە. یەکەم مامەڵەت لە سەرەوە بنووسە.',
+ jlBad:'بەروار، هێما، بڕ، نرخی چوونەژوورەوە و نرخی دەرچوون پێویستن و دەبێت ژمارەیەکی گەورەتر لە سفر بن.',
+ jlSure:'هەموو ئەو مامەڵانەی لەم وێبگەڕەدا تۆمار کراون بسڕدرێنەوە؟',
+ jlN:'ژمارەی مامەڵە',jlNet:'قازانج/زیانی ڕوون',jlRate:'ڕێژەی بردنەوە',jlAvgW:'تێکڕای قازانج',jlAvgL:'تێکڕای زیان',
+ jlPf:'فاکتەری قازانج',jlBest:'باشترین',jlWorst:'خراپترین',jlR:'کۆی R',jlPnl:'قازانج/زیان',
+ jlNoteFoot:'R کاتێک دەژمێردرێت کە سنووری زیانیشت نووسیبێت: قازانج یان زیان بەسەر ئەوەی لەسەری مەترسیت کردبوو. ئەم دەفتەرە لەسەر سێرڤەر هەڵناگیرێت؛ ئەگەر بیرگەی وێبگەڕ بسڕیتەوە لەناودەچێت، بۆیە هەر چەند جارێک دەرهاویشتەی CSV وەربگرە.'});
+Object.assign(I.en,{jlT:'📓 Trade journal',jlL:'Write down each trade as you close it and see your own record: win rate, average win and loss, profit factor and total R. All of it stays in this browser and nowhere else.',
+ jlDate:'Date',jlPair:'Symbol',jlQty:'Quantity (units)',jlEx:'Exit price',jlFee:'Fees ($)',jlNote:'Note (optional)',
+ jlAdd:'Add trade',jlCsv:'Export CSV',jlWipe:'Clear all',jlDel:'Delete',
+ jlEmpty:'No trade written down yet. Enter your first one above.',
+ jlBad:'Date, symbol, quantity, entry and exit are needed, and each must be a number above zero.',
+ jlSure:'Delete every trade kept in this browser?',
+ jlN:'Trades',jlNet:'Net P&L',jlRate:'Win rate',jlAvgW:'Average win',jlAvgL:'Average loss',
+ jlPf:'Profit factor',jlBest:'Best',jlWorst:'Worst',jlR:'Total R',jlPnl:'P&L',
+ jlNoteFoot:'R is worked out only when you also write the stop: the money made or lost divided by what you had put at risk. This journal is not kept on any server; clearing the browser’s storage removes it, so export the CSV now and then.'});
+
+function render(){forms();renderJn();renderCmp();renderRisk();renderMc();renderFund();renderAvg();renderRec();renderMk();renderLiq();renderPnl();renderNzF();renderBe();renderTp();renderFx();renderSs();renderAd()}
 (async()=>{const qc=new URLSearchParams(location.search).get('cmp');if(qc){const a=qc.split(',').map(x=>x.trim().toUpperCase()).filter(x=>/^[A-Z0-9]{2,10}$/.test(x)).slice(0,6);if(a.length)cmp=[...new Set(a)]}
  const [m,s,fx,mc,dv]=await Promise.all([j('/data/market.json'+V()),j('/data/score.json'+V()),j('https://open.er-api.com/v6/latest/USD'),j('/data/macro.json'+V()),j('/data/derivatives.json'+V())]);DV=dv;M=m;SC=s;MAC=mc;FX=fx&&fx.result==='success'?fx:null;uiLang(render);
  if(location.hash){const t=document.querySelector(location.hash);if(t)setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300)}})();
