@@ -2177,6 +2177,11 @@ if __name__ == "__main__":
         build_psych.build()
     except Exception as ex:                                   # noqa: BLE001
         print("psychology page failed:", ex)
+    try:                                                      # /unlocks/: when locked tokens are due to reach the market
+        import build_unlocks
+        extra.append(build_unlocks.build("fa"))
+    except Exception as ex:                                   # noqa: BLE001
+        print("unlocks page failed:", ex)
     print("chrome:", chrome.inject_static())   # keep the shared header/footer identical on the hand-written pages too
     sm = os.path.join(ROOT, "sitemap.xml")
     s = open(sm, encoding="utf-8").read().replace("</urlset>", "".join(f"<url><loc>{e(u)}</loc></url>" for u in extra) + "</urlset>")

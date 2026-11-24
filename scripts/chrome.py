@@ -242,6 +242,8 @@ NAV = [
     {"k": "tools", "t": L("ابزارها", "ئامرازەکان", "Tools"), "items": [
         ("/tools/", "calc", L("ابزارهای معامله‌گر", "ئامرازەکانی بازرگان", "Trader tools"),
          L("حجم پوزیشن، ریسک، تبدیل و مقایسه", "قەبارەی پۆزیشن، ڕیسک، گۆڕین و بەراورد", "Position size, risk, converter, compare")),
+        ("/unlocks/", "calendar", L("آنلاک توکن‌ها", "کردنەوەی تۆکنەکان", "Token unlocks"),
+         L("چه توکنی کِی از قفل درمی‌آید و چقدر", "چ تۆکنێک کەی لە قوفڵ دەردەچێت و چەند", "Which tokens unlock, when and how many")),
         ("/safety/", "shield", L("بررسی امنیت توکن", "پشکنینی ئاسایشی تۆکن", "Token safety check"),
          L("هانی‌پات، مالیات معامله و نقدینگی", "هانی‌پۆت، باجی مامەڵە و نەختینە", "Honeypot, trading tax and liquidity")),
         ("/me/", "user", L("فضای من", "بۆشاییی من", "My space"),
@@ -645,7 +647,7 @@ def inject_doc(doc, lang="fa", credits_from_footer=True):
     return with_csp(async_katex(async_css(doc)))
 
 
-STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools",
+STATIC = ["about", "battle", "developers", "dna", "indicators", "lab", "me", "safety", "status", "terminal", "tools", "unlocks",
           "privacy", "terms", "trade-bot", "market", "heatmap", "bubbles", "money-flow", "liquidity", "etf", "bitcoin", "calendar",
           "world"]   # /world/: scripts/build_world.py   # the market map: scripts/build_mm.py          # /app/ is built by scripts/build_apps.py
 

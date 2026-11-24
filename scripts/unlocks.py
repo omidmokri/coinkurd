@@ -149,7 +149,9 @@ def summary(slug, doc, now=None):
     sym = ""
     tok = (doc.get("metadata") or {}).get("token") if isinstance(doc.get("metadata"), dict) else ""
     if isinstance(tok, str) and ":" in tok:
-        sym = tok.split(":", 1)[1][:24]
+        sym = tok.split(":", 1)[1]
+        # the source writes either a CoinGecko name ("aptos") or a contract address; an address is no ticker
+        sym = sym[:24] if sym and not sym.startswith("0x") and len(sym) <= 24 else ""
     return {
         "slug": slug,
         "name": (name if isinstance(name, str) else slug)[:40],
