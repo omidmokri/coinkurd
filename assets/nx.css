@@ -274,6 +274,10 @@ html[lang=en] .nx .ekd-t{font:700 .95rem/1.5 'Space Grotesk',var(--ek-font);lett
 .nx-go svg{width:13px;height:13px}
 .nx-p:hover .nx-go,.nx-p:focus-visible .nx-go{background:var(--nx-or);color:#000}
 .nx-pb{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;margin-top:4px}
+.nx-wm{position:absolute;inset-inline-end:14px;top:14px;width:52px;height:52px;color:var(--nx-or);opacity:.2;pointer-events:none;transition:opacity .3s,transform .5s var(--nx-e)}
+.nx-wm svg{width:100%;height:100%;stroke-width:1.5}
+.nx-p:hover .nx-wm,.nx-p:focus-visible .nx-wm{opacity:.5;transform:scale(1.08)}
+.nx-pg .nx-go{display:none}
 .nx-s{font:700 .86rem 'Space Grotesk',var(--ek-font);color:var(--nx-gold);font-variant-numeric:tabular-nums}
 .nx-l{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.76rem;line-height:1.6;color:rgba(255,255,255,.58)}
 .nx-mk{display:flex;align-items:baseline;gap:9px;direction:ltr;justify-content:flex-start;font-family:'Space Grotesk',var(--ek-font);font-variant-numeric:tabular-nums}

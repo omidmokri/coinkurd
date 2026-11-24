@@ -14,15 +14,25 @@
   var HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M10 8h3.2a2 2 0 0 1 0 4H10m0 0h3.8a2 2 0 0 1 0 4H10M10 8v8M11.5 6.5V8M11.5 16v1.5"/></svg>';
   /* the swap page (/swap/): two arrows passing each other */
   var SWAP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14m0 0-3.5-3.5M18 8l-3.5 3.5M20 16H6m0 0 3.5 3.5M6 16l3.5-3.5"/></svg>';
+  var SWORDS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2"/></svg>';
   var DEF = [
+    /* owner 2026-11-24: the eight panels carry the best of the site. One side is the market as it moves, the other is
+       what a reader does here: swap, read, learn. Two pages of their own (the swap, the battle) took the places of
+       Categories and Library, which stay in the rail below and in the page (np: no panel). */
     { id: 'market', col: 'a', s: ['بازار', 'بازاڕ', 'Market'] },
     { id: 'command', col: 'a', s: ['اتاق فرمان', 'ژووری فەرمان', 'Command room'] },
     { id: 'intel', col: 'a', s: ['داشبورد', 'داشبۆرد', 'Dashboard'] },
-    { id: 'coinswall', col: 'a', s: ['کوین‌ها', 'دراوەکان', 'Coins'] },
+    { id: 'battle', col: 'a', href: '/battle/', s: ['نبرد من', 'شەڕی من', 'My Battle'],
+      chips: [['اوردربوک', 'ئۆردەربووک', 'Order book'], ['معاملات زنده', 'مامەڵەی زیندوو', 'Live trades'], ['لیکوئیدها', 'لیکویدەکان', 'Liquidations']],
+      line: ['گاوها در برابر خرس‌ها · سه‌بعدی', 'گاکان بەرامبەر ورچەکان · سێ‌ڕەهەندی', 'Bulls against bears · in 3D'] },
     { id: 'feed', col: 'b', s: ['آرشیو', 'ئەرشیف', 'Archive'], own: [['آرشیو پست‌های کانال', 'ئەرشیفی پۆستەکانی کەناڵ', 'Channel archive']] },
-    { id: 'hall', col: 'b', s: ['دسته‌ها', 'پۆلەکان', 'Categories'] },
+    { id: 'swap', col: 'b', href: '/swap/', s: ['تبدیل رمزارز', 'گۆڕینەوەی دراو', 'Swap'],
+      chips: [['بیت‌کوین', 'بیتکۆین', 'Bitcoin'], ['ترون', 'ترۆن', 'Tron'], ['سولانا', 'سۆلانا', 'Solana'], ['اتریوم و BNB', 'ئیتریۆم و BNB', 'Ethereum & BNB']],
+      line: ['۴۶ شبکه · از کیف پول خودتان', '٤٦ تۆڕ · لە جزدانی خۆتەوە', '46 networks · from your own wallet'] },
     { id: 'learnmap', col: 'b', s: ['یادگیری', 'فێربوون', 'Learning'] },
-    { id: 'library', col: 'b', s: ['کتابخانه', 'کتێبخانە', 'Library'] }
+    { id: 'coinswall', col: 'b', s: ['کوین‌ها', 'دراوەکان', 'Coins'] },
+    { id: 'hall', np: 1, s: ['دسته‌ها', 'پۆلەکان', 'Categories'] },
+    { id: 'library', np: 1, s: ['کتابخانه', 'کتێبخانە', 'Library'] }
   ];
   var FNG = { 'Extreme Fear': ['ترس شدید', 'ترسی زۆر'], 'Fear': ['ترس', 'ترس'], 'Neutral': ['خنثی', 'بێلایەن'], 'Greed': ['طمع', 'تەماح'], 'Extreme Greed': ['طمع شدید', 'تەماحی زۆر'] };
   function cnt(sel, fa, ckb, en) { var e = d.querySelector(sel), v = e && e.textContent.trim(); return v ? esc(v) + ' ' + pick(fa, ckb, en) : ''; }
@@ -39,6 +49,13 @@
   if (!nx) { nx = d.createElement('section'); nx.className = 'nx'; nx.id = 'nx'; nx.setAttribute('aria-labelledby', 'nx-h'); }
   var cols = { a: '', b: '' }, rail = '', doors = {}, order = [];
   DEF.forEach(function (D) {
+    if (D.href) {                                   /* a page of its own: the panel is a plain link to it */
+      var hb = ''; D.chips.forEach(function (c) { hb += tri(c[0], c[1], c[2], 'span'); });
+      cols[D.col] += '<a class="nx-p nx-pg" href="' + D.href + '" data-k="' + D.id + '"><span class="nx-pt">' + tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t') + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span>' +
+        '<i class="nx-wm" aria-hidden="true">' + (D.id === 'swap' ? SWAP : SWORDS) + '</i><span class="nx-pb"><span class="nx-chips">' + hb + '</span>' + tri(D.line[0], D.line[1], D.line[2], 'span', 'nx-s') + '</span></a>';
+      rail += '<a href="' + D.href + '">' + tri(D.s[0], D.s[1], D.s[2]) + '</a>';
+      return;
+    }
     var sec = d.getElementById(D.id); if (!sec) return;
     var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), link = D.id === 'library' ? sec.querySelector('a[href]') : D.id === 'learnmap' ? sec.querySelector('a[href="/map/"]') : null;   /* these two go straight to their page */
     var title = D.own ? tri(D.own[0][0], D.own[0][1], D.own[0][2], 'b', 'ekd-t') : t ? '<b class="ekd-t" data-i="' + esc(t.getAttribute('data-i')) + '">' + t.innerHTML + '</b>' : tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t');
@@ -53,7 +70,7 @@
     else if (D.id === 'learnmap') body = '<span class="nx-chips" data-c="learnmap"></span>' + lead;
     else body = lead;
     var href = link ? esc(link.getAttribute('href')) : '#' + D.id;
-    cols[D.col] += '<a class="nx-p" href="' + href + '"' + (link ? '' : ' data-d="' + D.id + '"') + ' data-k="' + D.id + '"><span class="nx-pt">' + title + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span><span class="nx-pb">' + body + '</span></a>';
+    if (!D.np) cols[D.col] += '<a class="nx-p" href="' + href + '"' + (link ? '' : ' data-d="' + D.id + '"') + ' data-k="' + D.id + '"><span class="nx-pt">' + title + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span><span class="nx-pb">' + body + '</span></a>';
     rail += '<a href="' + href + '"' + (link ? '' : ' data-d="' + D.id + '"') + '>' + tri(D.s[0], D.s[1], D.s[2]) + '</a>';
     if (!link) order.push(D.id);
   });
