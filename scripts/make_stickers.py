@@ -26,29 +26,38 @@ TITLES = ["کوین کورد | Coin Kurd", "کوین کورد ۲ | Coin Kurd 2"]
 API = "https://api.telegram.org/bot%s/" % TOKEN
 
 
-def call(method, fields, files=None, tries=4):
-    """POST to the Bot API as multipart; retries on 429 and on a hiccup."""
+def call(method, fields=None, files=None, tries=4):
+    """Call the Bot API. JSON when there is nothing to upload, multipart when there is.
+    Every failure comes back with a description, so a bad call is never a silent one."""
+    fields = fields or {}
     for attempt in range(tries):
-        boundary = "----ck%d" % time.time_ns()
-        body = b""
-        for k, v in fields.items():
-            body += ("--%s\r\nContent-Disposition: form-data; name=\"%s\"\r\n\r\n%s\r\n" % (boundary, k, v)).encode()
-        for k, (name, blob) in (files or {}).items():
-            body += ("--%s\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n"
-                     "Content-Type: video/webm\r\n\r\n" % (boundary, k, name)).encode()
-            body += blob + b"\r\n"
-        body += ("--%s--\r\n" % boundary).encode()
-        req = urllib.request.Request(API + method, data=body,
-                                     headers={"Content-Type": "multipart/form-data; boundary=" + boundary})
+        if files:
+            boundary = "----ck%d" % time.time_ns()
+            body = b""
+            for k, v in fields.items():
+                body += ("--%s\r\nContent-Disposition: form-data; name=\"%s\"\r\n\r\n%s\r\n"
+                         % (boundary, k, v)).encode()
+            for k, (name, blob) in files.items():
+                body += ("--%s\r\nContent-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n"
+                         "Content-Type: video/webm\r\n\r\n" % (boundary, k, name)).encode()
+                body += blob + b"\r\n"
+            body += ("--%s--\r\n" % boundary).encode()
+            ctype = "multipart/form-data; boundary=" + boundary
+        else:
+            body = json.dumps(fields).encode()
+            ctype = "application/json"
+        req = urllib.request.Request(API + method, data=body, headers={"Content-Type": ctype})
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
                 return json.load(r)
         except urllib.error.HTTPError as ex:
-            raw = ex.read().decode("utf-8", "replace")
+            raw = ex.read().decode("utf-8", "replace").strip()
             try:
                 data = json.loads(raw)
+                if not data.get("description"):
+                    data["description"] = "HTTP %d, body %s" % (ex.code, raw[:200] or "(empty)")
             except Exception:
-                data = {"ok": False, "description": raw[:300]}
+                data = {"ok": False, "description": "HTTP %d, body %s" % (ex.code, raw[:200] or "(empty)")}
             if ex.code == 429 and attempt < tries - 1:
                 time.sleep(int((data.get("parameters") or {}).get("retry_after") or 5) + 1)
                 continue
@@ -57,7 +66,7 @@ def call(method, fields, files=None, tries=4):
             if attempt < tries - 1:
                 time.sleep(4)
                 continue
-            return {"ok": False, "description": repr(ex)}
+            return {"ok": False, "description": "network: %r" % (ex,)}
 
 
 def existing(name):
@@ -69,9 +78,10 @@ def main():
     if not TOKEN or not OWNER:
         print("missing REF_BOT_TOKEN/TG_BOT_TOKEN or ADMIN_IDS", file=sys.stderr)
         return 1
-    me = call("getMe", {})
+    print("token length %d, owner %d" % (len(TOKEN), OWNER))
+    me = call("getMe")
     if not me.get("ok"):
-        print("getMe failed: %s" % me.get("description"), file=sys.stderr)
+        print("getMe failed: %s" % (me.get("description") or me), file=sys.stderr)
         return 1
     user = me["result"]["username"]
     items = json.load(open(os.path.join(SRC, "index.json"), encoding="utf-8"))
