@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-25T22:34:45.104327+00:00",
+ "updated_at": "2026-11-25T23:02:39.827914+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-24T22:00:00+00:00"
@@ -7,7 +7,7 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 241,
+ "coins": 240,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
@@ -23,13 +23,13 @@
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6289,
-   "obs": 0.14,
+   "n": 6286,
+   "obs": 0.13,
    "win": 50.6,
    "mid": 0.01,
-   "lo": -0.38,
+   "lo": -0.37,
    "hi": 0.28,
-   "p": 0.3905,
+   "p": 0.4024,
    "shifts": 1347,
    "verdict": "no_edge"
   },
@@ -45,13 +45,13 @@
    "verdict": "no_edge"
   },
   "ema_death_cross": {
-   "n": 582,
-   "obs": 1.54,
-   "win": 62.0,
+   "n": 580,
+   "obs": 1.52,
+   "win": 61.9,
    "mid": 0.84,
-   "lo": -0.86,
-   "hi": 2.11,
-   "p": 0.3081,
+   "lo": -0.78,
+   "hi": 2.09,
+   "p": 0.3259,
    "shifts": 1347,
    "verdict": "no_edge"
   },
@@ -78,13 +78,13 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 574,
-   "obs": -1.0,
-   "win": 44.4,
+   "n": 573,
+   "obs": -1.01,
+   "win": 44.3,
    "mid": -0.86,
    "lo": -2.12,
-   "hi": 0.1,
-   "p": 0.7335,
+   "hi": 0.11,
+   "p": 0.7342,
    "shifts": 1347,
    "verdict": "no_edge"
   },
