@@ -279,16 +279,32 @@ def _size(f):
     return f.get("filesize") or f.get("filesize_approx") or 0
 
 
-def pick_format(info, audio_only):
-    """The best quality that still fits the upload cap, as a yt-dlp format string."""
+def has_ffmpeg():
+    """Checked per call, not at import: the bot's runner installs ffmpeg in the background."""
+    return bool(shutil.which("ffmpeg") and shutil.which("ffprobe"))
+
+
+def pick_format(info, audio_only, merge):
+    """The best quality that still fits the upload cap.
+
+    Without ffmpeg nothing can be merged, so only progressive formats — one file already
+    carrying its audio — are asked for. That is the difference between a working download
+    and 'ERROR: ffprobe and ffmpeg not found'."""
     if audio_only:
-        return "ba/b", True
+        return "ba/b"
     formats = [f for f in (info.get("formats") or []) if f.get("vcodec") not in (None, "none")]
+    if merge:
+        pool = formats
+    else:
+        pool = [f for f in formats if f.get("acodec") not in (None, "none")]
     best_audio = min((_size(f) for f in (info.get("formats") or [])
                       if f.get("acodec") not in (None, "none") and f.get("vcodec") in (None, "none")
                       and _size(f)), default=0)
+    heights = [f.get("height") or 0 for f in pool]
+    if not pool or not any(heights):
+        return "b" if not merge else "bv*+ba/b"      # a plain file, or a source that lists no heights
     for h in LADDER:
-        fits = [f for f in formats if (f.get("height") or 0) <= h]
+        fits = [f for f in pool if (f.get("height") or 0) <= h]
         if not fits:
             continue
         known = [f for f in fits if _size(f)]
@@ -298,8 +314,8 @@ def pick_format(info, audio_only):
                            for f in known)
             if smallest > CAP:
                 continue
-        return "bv*[height<=%d]+ba/b[height<=%d]" % (h, h), False
-    return None, False
+        return ("bv*[height<=%d]+ba/b[height<=%d]" % (h, h)) if merge else "b[height<=%d]" % h
+    return None
 
 
 def fetch(url, audio_only=False):
@@ -307,16 +323,18 @@ def fetch(url, audio_only=False):
     info, err = probe(url)
     if err:
         return {"ok": False, "err": err}
-    fmt, as_audio = pick_format(info, audio_only)
+    merge = has_ffmpeg()
+    fmt = pick_format(info, audio_only, merge)
     if not fmt:
         return {"ok": False, "err": "too_big"}
     full = max((f.get("height") or 0) for f in (info.get("formats") or [{}])) or 0
     tmp = tempfile.mkdtemp(prefix="ckdl_")
-    args = ["-f", fmt, "--max-filesize", str(CAP), "-o", os.path.join(tmp, "m.%(ext)s"), url]
-    if as_audio:
-        args = ["-f", "ba/b", "-x", "--audio-format", "mp3", "--audio-quality", "5",
-                "--max-filesize", str(CAP), "-o", os.path.join(tmp, "m.%(ext)s"), url]
-    elif not audio_only:
+    out = os.path.join(tmp, "m.%(ext)s")
+    args = ["-f", fmt, "--max-filesize", str(CAP), "-o", out, url]
+    if audio_only and merge:                     # mp3 needs ffmpeg; without it the native audio is sent
+        args = ["-f", fmt, "-x", "--audio-format", "mp3", "--audio-quality", "5",
+                "--max-filesize", str(CAP), "-o", out, url]
+    elif not audio_only and merge:
         args[1:1] = ["--merge-output-format", "mp4"]
     try:
         p = _run(args)
@@ -330,7 +348,7 @@ def fetch(url, audio_only=False):
         low = (p.stderr or "").lower()
         if "file is larger" in low or "max-filesize" in low:
             return {"ok": False, "err": "too_big"}
-        log.warning("fetch %s -> %s", url, (p.stderr or "")[-200:])
+        log.warning("fetch %s -> %s", url, (p.stderr or "")[-250:])
         return {"ok": False, "err": "failed"}
     path = max(files, key=os.path.getsize)
     size = os.path.getsize(path)
@@ -338,14 +356,14 @@ def fetch(url, audio_only=False):
         shutil.rmtree(tmp, ignore_errors=True)
         return {"ok": False, "err": "too_big"}
     got = 0
-    if not as_audio:
-        try:                                    # the height actually delivered, for the caption
+    if not audio_only:
+        try:                                     # the height actually delivered, for the caption
             q = _run(["--no-download", "-f", fmt, "--print", "%(height)s", url], timeout=60)
             got = int((q.stdout or "0").strip().splitlines()[-1])
         except Exception:
             got = 0
     return {"ok": True, "path": path, "dir": tmp, "size": size,
-            "kind": "audio" if as_audio else "video",
+            "kind": "audio" if audio_only else "video",
             "title": (info.get("title") or "")[:200],
             "uploader": (info.get("uploader") or info.get("channel") or "")[:80],
             "duration": int(info.get("duration") or 0),
