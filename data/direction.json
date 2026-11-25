@@ -1,10 +1,10 @@
 {
  "posts": {
   "bullish": 342,
-  "bearish": 105,
+  "bearish": 106,
   "neutral": 168
  },
- "n_days": 99,
+ "n_days": 100,
  "days": [
   {
    "day": "2026-08-04",
@@ -599,6 +599,12 @@
    "stance": -1,
    "r24": 2.42,
    "n": 3
+  },
+  {
+   "day": "2026-11-24",
+   "stance": -1,
+   "r24": -2.055,
+   "n": 1
   }
  ],
  "min_days": 30,
@@ -607,18 +613,18 @@
   "seed": 20261108,
   "unit": "utc_day"
  },
- "hits": 59,
- "hit_rate": 59.6,
- "expected_rate": 50.3,
- "up_rate": 50.5,
+ "hits": 60,
+ "hit_rate": 60.0,
+ "expected_rate": 50.0,
+ "up_rate": 50.0,
  "bull_days": 78,
- "bear_days": 21,
- "p": 0.0212,
+ "bear_days": 22,
+ "p": 0.0153,
  "enough": true,
  "window": {
   "from": "2026-08-04",
-  "to": "2026-11-22"
+  "to": "2026-11-24"
  },
- "model": "gemini-3.1-flash-lite",
- "updated_at": "2026-11-25T05:15:59+00:00"
+ "model": "gemini-3.5-flash-lite",
+ "updated_at": "2026-11-25T05:39:28+00:00"
 }
