@@ -34,6 +34,28 @@
     { id: 'hall', np: 1, s: ['دسته‌ها', 'پۆلەکان', 'Categories'] },
     { id: 'library', np: 1, s: ['کتابخانه', 'کتێبخانە', 'Library'] }
   ];
+  /* owner 2026-11-25: the rail used to repeat the names of the panels standing right above it — Market, Command room,
+     Dashboard, Archive, Coins… — so the dock said nothing the first screen did not already say. It now carries the best
+     of the site from the menus instead, and only pages whose name appears nowhere on the homepage: no Market, no Swap,
+     no Battle, no Learning map, no Coins, Categories or Library, and not "Understanding Bitcoin" either, which is a
+     button on the first screen. Satoshi stays, pinned past the separator where it was. Short labels, because this is a
+     dock: the full titles live in the header menu (scripts/chrome.py NAV), and these follow its wording. The rooms of
+     the homepage are reached from the panels themselves; the rail no longer carries data-d, which the room highlight
+     and the arrow keys simply find nothing to mark, exactly as when no room is open. */
+  var BEST = [
+    ['/heatmap/', 'نقشهٔ حرارتی', 'نەخشەی گەرمی', 'Heatmap'],
+    ['/calendar/', 'تقویم اقتصادی', 'ڕۆژژمێری ئابووری', 'Calendar'],
+    ['/whales/', 'رادار نهنگ‌ها', 'ڕاداری نەهەنگەکان', 'Whale radar'],
+    ['/reality/', 'واقعیت‌سنج', 'ڕاستی‌پێو', 'Reality check'],
+    ['/track-record/', 'کارنامهٔ کانال', 'کارنامەی کەناڵ', 'Track record'],
+    ['/academy/', 'آکادمی', 'ئەکادیمیا', 'Academy'],
+    ['/encyclopedia/', 'دانشنامه', 'زانستنامە', 'Encyclopedia'],
+    ['/kids/', 'بیت‌کوین کودکان', 'بیتکۆین بۆ منداڵان', 'For juniors'],
+    ['/tools/', 'ابزارها', 'ئامرازەکان', 'Tools'],
+    ['/podcast/', 'پادکست', 'پۆدکاست', 'Podcast'],
+    ['/me/', 'فضای من', 'بۆشاییی من', 'My space'],
+    ['/app/', 'اپلیکیشن‌ها', 'ئەپەکان', 'Apps']
+  ];
   var FNG = { 'Extreme Fear': ['ترس شدید', 'ترسی زۆر'], 'Fear': ['ترس', 'ترس'], 'Neutral': ['خنثی', 'بێلایەن'], 'Greed': ['طمع', 'تەماح'], 'Extreme Greed': ['طمع شدید', 'تەماحی زۆر'] };
   function cnt(sel, fa, ckb, en) { var e = d.querySelector(sel), v = e && e.textContent.trim(); return v ? esc(v) + ' ' + pick(fa, ckb, en) : ''; }
   function nfmt(n) { return dg(Number(n).toLocaleString('en-US')).replace(/,/g, U.lang() === 'en' ? ',' : '٬'); }
@@ -47,14 +69,14 @@
   function h32(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0; return h.toString(36); }
   var nx = d.getElementById('nx'), pre = !!nx;
   if (!nx) { nx = d.createElement('section'); nx.className = 'nx'; nx.id = 'nx'; nx.setAttribute('aria-labelledby', 'nx-h'); }
-  var cols = { a: '', b: '' }, rail = '', doors = {}, order = [];
+  var cols = { a: '', b: '' }, doors = {}, order = [];
+  var rail = BEST.map(function (B) { return '<a href="' + B[0] + '">' + tri(B[1], B[2], B[3]) + '</a>'; }).join('');
   DEF.forEach(function (D) {
     if (D.href) {                                   /* a page of its own: the panel is a plain link to it */
       var hb = ''; D.chips.forEach(function (c) { hb += tri(c[0], c[1], c[2], 'span'); });
       cols[D.col] += '<a class="nx-p nx-pg" href="' + D.href + '" data-k="' + D.id + '"><span class="nx-pt">' + tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t') + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span>' +
         '<i class="nx-wm" aria-hidden="true">' + (D.id === 'swap' ? SWAP : SWORDS) + '</i><span class="nx-pb"><span class="nx-chips">' + hb + '</span>' + tri(D.line[0], D.line[1], D.line[2], 'span', 'nx-s') + '</span></a>';
-      rail += '<a href="' + D.href + '">' + tri(D.s[0], D.s[1], D.s[2]) + '</a>';
-      return;
+        return;
     }
     var sec = d.getElementById(D.id); if (!sec) return;
     var t = sec.querySelector('h2[data-i]'), l = sec.querySelector('p.lead[data-i]'), link = D.id === 'library' ? sec.querySelector('a[href]') : D.id === 'learnmap' ? sec.querySelector('a[href="/map/"]') : null;   /* these two go straight to their page */
@@ -71,7 +93,6 @@
     else body = lead;
     var href = link ? esc(link.getAttribute('href')) : '#' + D.id;
     if (!D.np) cols[D.col] += '<a class="nx-p" href="' + href + '"' + (link ? '' : ' data-d="' + D.id + '"') + ' data-k="' + D.id + '"><span class="nx-pt">' + title + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span><span class="nx-pb">' + body + '</span></a>';
-    rail += '<a href="' + href + '"' + (link ? '' : ' data-d="' + D.id + '"') + '>' + tri(D.s[0], D.s[1], D.s[2]) + '</a>';
     if (!link) order.push(D.id);
   });
   var role = hero.querySelector('.role[data-i]');
@@ -99,7 +120,7 @@
   d.body.appendChild(R);
   /* the same glass lens as the header, the footer and the menu: it rides the dock and rests on the section in view */
   (function lens(n) { if (w.ekGlass) w.ekGlass(R, { sel: 'a', on: 'a.on', r: 13, bead: 30 }); else if (n < 40) setTimeout(function () { lens(n + 1); }, 150); })(0);
-  function railLabel() { R.setAttribute('aria-label', pick('بخش‌های صفحهٔ اصلی', 'بەشەکانی پەڕەی سەرەکی', 'Homepage sections')); }
+  function railLabel() { R.setAttribute('aria-label', pick('بهترین‌های سایت', 'باشترینەکانی ماڵپەڕ', 'The best of the site')); }
   railLabel();
   [].forEach.call(nx.querySelectorAll('.nx-p[data-d]'), function (p) { doors[p.getAttribute('data-d')] = p; });
   var panels = [].slice.call(nx.querySelectorAll('.nx-p'));

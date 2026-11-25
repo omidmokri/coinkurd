@@ -477,7 +477,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "10"
-NX_VER = "18"
+NX_VER = "19"
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the
