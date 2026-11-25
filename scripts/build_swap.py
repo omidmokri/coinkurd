@@ -368,6 +368,11 @@ _FA = str.maketrans("0123456789.", "۰۱۲۳۴۵۶۷۸۹٫")
 _CKB = str.maketrans("0123456789.", "٠١٢٣٤٥٦٧٨٩٫")
 
 
+def _pct(v):
+    """0.003 -> 0.3%  (the same figure assets/swap/swap.js prints)"""
+    return f"{round(float(v) * 10000) / 100:g}%"
+
+
 def _n(v, lg):
     s = f"{v:g}"
     return s.translate(_FA) if lg == "fa" else s.translate(_CKB) if lg == "ckb" else s
@@ -447,8 +452,13 @@ def side(which):
 </div>"""
 
 
-def controls():
+def controls(cfg=None):
     """the tool itself. Every label is here in three languages; assets/swap/swap.js only fills in names and numbers."""
+    # the two fees of the "more for the Zagros" line are written here, in all three copies: an id can only be on one
+    # of them, so a script filling it in left the Sorani and the English (and with it every other language) without
+    # the figures. The English is one whole sentence, numbers and all, which is what the translation layers need.
+    cfg = cfg or {}
+    pa, pb = _pct(cfg.get("fee", 0)), _pct(cfg.get("fee_zagros", 0))
     def q(id_, fa, ckb, en):
         return f'<div class="sw-q"><span>{tri(fa, ckb, en)}</span><b id="sw-{id_}" dir="ltr" translate="no"></b></div>'
     slips = "".join(f'<button type="button" data-slip="{v}" aria-pressed="false" translate="no">{p}</button>'
@@ -480,7 +490,7 @@ def controls():
 <div class="sw-slip"><span class="sw-lab">{tri("حداکثر تغییر قیمت", "زۆرترین گۆڕانی نرخ", "Max price move")}</span><span id="sw-slip" class="sw-chips">{slips}</span></div>
 <div id="sw-coin" class="sw-coin" hidden></div>
 <label id="sw-morebox" class="sw-more-z" hidden><input type="checkbox" id="sw-more"><span><b>{tri("بیشتر برای زاگرس", "زیاتر بۆ زاگرۆس", "More for the Zagros")}</b>
-<span>{tri("کارمزد این تبدیل از <bdi id='sw-more-a' translate='no'></bdi> به <bdi id='sw-more-b' translate='no'></bdi> می‌رود. تفاوتش هم، مثل خود کارمزد، صرف کاشت نهال می‌شود.", "کرێی ئەم گۆڕینەوەیە لە <bdi id='sw-more-a' translate='no'></bdi> بۆ <bdi id='sw-more-b' translate='no'></bdi> دەچێت. جیاوازییەکەشی، وەک خودی کرێیەکە، بۆ چاندنی نەمام خەرج دەکرێت.", "The fee on this swap goes from <bdi id='sw-more-a' translate='no'></bdi> to <bdi id='sw-more-b' translate='no'></bdi>. The difference, like the fee itself, is spent on planting saplings.")}</span></span></label>
+<span>{tri(f"کارمزد این تبدیل از <bdi id='sw-more-a' translate='no'>{pa}</bdi> به <bdi id='sw-more-b' translate='no'>{pb}</bdi> می‌رود. تفاوتش هم، مثل خود کارمزد، صرف کاشت نهال می‌شود.", f"کرێی ئەم گۆڕینەوەیە لە <bdi translate='no'>{pa}</bdi> بۆ <bdi translate='no'>{pb}</bdi> دەچێت. جیاوازییەکەشی، وەک خودی کرێیەکە، بۆ چاندنی نەمام خەرج دەکرێت.", f"The fee on this swap goes from {pa} to {pb}. The difference, like the fee itself, is spent on planting saplings.")}</span></span></label>
 <div id="sw-tokenwarn" class="sw-warnline" role="status"></div>
 <label id="sw-ackbox" class="sw-ack" hidden><input type="checkbox" id="sw-ack"><span><span>{tri(
     "خطر این تبدیل را می‌دانم و می‌خواهم ادامه دهم.", "مەترسیی ئەم گۆڕینەوەیە دەزانم و دەمەوێت بەردەوام بم.",
@@ -614,7 +624,7 @@ def page(cfg, data):
     '<p><strong>این صفحه درون قاب یک سایت دیگر باز شده است.</strong></p><p>برای امنیت شما ابزار در این حالت کار نمی‌کند. نشانی <bdi translate="no">entekhab.net/swap/</bdi> را مستقیم در مرورگر باز کنید.</p>',
     '<p><strong>ئەم پەڕەیە لەناو چوارچێوەی ماڵپەڕێکی تردا کراوەتەوە.</strong></p><p>بۆ پاراستنت، ئامرازەکە لەم دۆخەدا کار ناکات. ناونیشانی <bdi translate="no">entekhab.net/swap/</bdi> ڕاستەوخۆ لە وێبگەڕەکەت بکەرەوە.</p>',
     '<p><strong>This page was opened inside another site\'s frame.</strong></p><p>For your safety the tool does not work this way. Open <bdi translate="no">entekhab.net/swap/</bdi> directly in your browser.</p>', "div")}</div>
-<div class="sw-form s-on">{controls()}</div>
+<div class="sw-form s-on">{controls(cfg)}</div>
 </section>
 {donate_block(cfg, watch)}
 <aside class="sw-info">

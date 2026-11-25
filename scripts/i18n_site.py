@@ -187,7 +187,7 @@ def check(code, en, tr):
         return "wrong script"
     if code not in ("ur",) and ARABIC.search(tr) and not ARABIC.search(en):
         return "arabic letters"
-    if PERSIAN.search(tr) and not PERSIAN.search(en):
+    if code not in ("ur",) and PERSIAN.search(tr) and not PERSIAN.search(en):   # پ چ ژ گ are Urdu's own letters too
         return "persian letters"
     if not sc and len(words) >= 4 and tr.lower() == en.strip().lower():
         return "untranslated"
