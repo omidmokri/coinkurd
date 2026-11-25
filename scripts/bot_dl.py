@@ -285,37 +285,43 @@ def has_ffmpeg():
 
 
 def pick_format(info, audio_only, merge):
-    """The best quality that still fits the upload cap.
+    """-> (format string, full height, size of that full quality)
 
-    Without ffmpeg nothing can be merged, so only progressive formats — one file already
-    carrying its audio — are asked for. That is the difference between a working download
-    and 'ERROR: ffprobe and ffmpeg not found'."""
+    The selector asks for a file that FITS, not the best one: yt-dlp is told the size limit
+    inside the selector, so it steps down by itself instead of grabbing a 1 GB stream and
+    aborting on --max-filesize. Without ffmpeg only progressive formats are asked for, since
+    nothing can be merged — that is the difference between a download and
+    'ERROR: ffprobe and ffmpeg not found'."""
     if audio_only:
-        return "ba/b"
+        return "ba/b", 0, 0
     formats = [f for f in (info.get("formats") or []) if f.get("vcodec") not in (None, "none")]
-    if merge:
-        pool = formats
-    else:
-        pool = [f for f in formats if f.get("acodec") not in (None, "none")]
+    pool = formats if merge else [f for f in formats if f.get("acodec") not in (None, "none")]
     best_audio = min((_size(f) for f in (info.get("formats") or [])
                       if f.get("acodec") not in (None, "none") and f.get("vcodec") in (None, "none")
                       and _size(f)), default=0)
-    heights = [f.get("height") or 0 for f in pool]
-    if not pool or not any(heights):
-        return "b" if not merge else "bv*+ba/b"      # a plain file, or a source that lists no heights
+
+    def need(f):                                  # what this format really costs, audio included
+        return _size(f) + (0 if f.get("acodec") not in (None, "none") else best_audio)
+
+    if not pool or not any(f.get("height") for f in pool):
+        return ("bv*+ba/b" if merge else "b"), 0, 0
+    full_h = max((f.get("height") or 0) for f in pool)
+    full_size = min((need(f) for f in pool if (f.get("height") or 0) == full_h and _size(f)), default=0)
     for h in LADDER:
         fits = [f for f in pool if (f.get("height") or 0) <= h]
         if not fits:
             continue
         known = [f for f in fits if _size(f)]
-        if known:
-            # a progressive file carries its own audio; a video-only one still needs the audio track
-            smallest = min(_size(f) + (0 if f.get("acodec") not in (None, "none") else best_audio)
-                           for f in known)
-            if smallest > CAP:
-                continue
-        return ("bv*[height<=%d]+ba/b[height<=%d]" % (h, h)) if merge else "b[height<=%d]" % h
-    return None
+        if known and min(need(f) for f in known) > CAP:
+            continue                              # not even the smallest at this rung fits
+        if merge:
+            fmt = ("bv*[height<=%d][filesize<%d]+ba/b[height<=%d][filesize<%d]"
+                   "/bv*[height<=%d]+ba/b[height<=%d]" % (h, CAP, h, CAP, h, h))
+        else:
+            fmt = ("b[height<=%d][filesize<%d]/b[height<=%d][filesize_approx<%d]/b[height<=%d]"
+                   % (h, CAP, h, CAP, h))
+        return fmt, full_h, full_size
+    return None, full_h, full_size
 
 
 def fetch(url, audio_only=False):
@@ -324,10 +330,9 @@ def fetch(url, audio_only=False):
     if err:
         return {"ok": False, "err": err}
     merge = has_ffmpeg()
-    fmt = pick_format(info, audio_only, merge)
+    fmt, full_h, full_size = pick_format(info, audio_only, merge)
     if not fmt:
         return {"ok": False, "err": "too_big"}
-    full = max((f.get("height") or 0) for f in (info.get("formats") or [{}])) or 0
     tmp = tempfile.mkdtemp(prefix="ckdl_")
     out = os.path.join(tmp, "m.%(ext)s")
     args = ["-f", fmt, "--max-filesize", str(CAP), "-o", out]
@@ -368,7 +373,7 @@ def fetch(url, audio_only=False):
             "uploader": (info.get("uploader") or info.get("channel") or "")[:80],
             "duration": int(info.get("duration") or 0),
             "width": info.get("width") or 0, "height": got or info.get("height") or 0,
-            "capped": bool(full and got and got < full)}
+            "capped": bool(got and full_h and got < full_h and full_size > CAP)}
 
 
 def human(n):
