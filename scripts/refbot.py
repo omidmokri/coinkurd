@@ -60,6 +60,7 @@ import bot_proxy as PX  # noqa: E402
 import bot_proxy2 as PX2  # noqa: E402
 import bot_outage as OU  # noqa: E402
 import bot_token as TK  # noqa: E402
+import bot_dl as DL  # noqa: E402  (social downloader: a link in, the media file out)
 import bot_watch as W  # noqa: E402
 import bot_learn as LN  # noqa: E402
 import bot_academy as AK  # noqa: E402
@@ -477,6 +478,52 @@ SECTIONS = {
 LAB = {"mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"}
 
 
+def dl_start(chat_id, uid, x, text, lang):
+    """A link from the member -> the file, fetched on a thread so the bot keeps answering."""
+    url = DL.find_url(text)
+    if not url:
+        x["await"] = "dl"                       # still waiting: they sent words, not a link
+        return send(chat_id, DL.L("no_url", lang), kb_back(lang))
+    site = DL.blocked_site(url)
+    if site:
+        return send(chat_id, DL.L("blocked", lang, site=site), kb_back(lang))
+    ok, why, n = DL.allow(x, uid, uid in ADMIN_IDS)
+    if not ok:
+        return send(chat_id, DL.L(why, lang, n=n), kb_back(lang))
+    DL.charge(x)
+    send(chat_id, DL.L("working", lang))
+    threading.Thread(target=dl_worker, args=(chat_id, url, DL.wants_audio(text), lang),
+                     name="dl", daemon=True).start()
+    return None
+
+
+def dl_worker(chat_id, url, audio, lang):
+    res = None
+    try:
+        res = DL.fetch(url, audio)
+        if not res.get("ok"):
+            return send(chat_id, DL.L(res["err"], lang, site=DL.site_of(url)), kb_back(lang))
+        with open(res["path"], "rb") as fh:
+            blob = fh.read()
+        name = os.path.basename(res["path"])
+        data = {"chat_id": chat_id, "caption": DL.caption(res, lang, DL.site_of(url)),
+                "parse_mode": "HTML"}
+        if res["kind"] == "audio":
+            r = _post_with_retry("sendAudio", data, files={"audio": (name, blob)}, timeout=300)
+        else:
+            r = _post_with_retry("sendVideo", {**data, "supports_streaming": True},
+                                 files={"video": (name, blob, "video/mp4")}, timeout=300)
+        if not r.get("ok"):                      # Telegram refused the container: send it as a file
+            r = _post_with_retry("sendDocument", data, files={"document": (name, blob)}, timeout=300)
+        if not r.get("ok"):
+            send(chat_id, DL.L("failed", lang), kb_back(lang))
+    except Exception:
+        log.exception("download %s failed", url)
+        send(chat_id, DL.L("failed", lang), kb_back(lang))
+    finally:
+        DL.cleanup(res)
+
+
 def market_age_min():
     try:
         iso = (D.load("market") or {}).get("updated_at")
@@ -508,6 +555,9 @@ def _render(s, uid, key, page=0):
     """section content; navigation is added by render(); page = which page of the alert list to show"""
     lang = lang_of(s, uid)
     x = user(s, uid) or {}
+    if key == "dl":
+        x["await"] = "dl"                       # the next plain message is the link to fetch
+        return DL.screen(lang), {"inline_keyboard": [[btn(t("b_back", lang), "m:main")]]}
     if key == "mkt":
         try:
             body = D.sec_market(lang)
@@ -900,13 +950,13 @@ def check_alerts(s):
     return changed
 
 
-def _post_with_retry(method, data, files=None, tries=3):
+def _post_with_retry(method, data, files=None, tries=3, timeout=90):
     """Bot API call that waits out Telegram's per-group rate limit (429 retry_after) instead of dropping the post"""
     r = {"ok": False}
     for _ in range(tries):
         try:
             if files:
-                r = requests.post(API + method, data=data, files=files, timeout=90).json()
+                r = requests.post(API + method, data=data, files=files, timeout=timeout).json()
             else:
                 r = requests.post(API + method, json=data, timeout=60).json()
         except Exception as ex:
@@ -1364,6 +1414,8 @@ def handle_private(s, msg):
             return send(chat_id, PAPER.L("bad_nick", lang), kb_back(lang))
         body, rows = PAPER.screen(s, uid, lang)
         return send(chat_id, PAPER.L("nick_ok", lang, n=D.e(n)) + "\n\n" + body, {"inline_keyboard": rows + kb_back(lang)["inline_keyboard"]})
+    if aw == "dl" and text and not text.startswith("/"):
+        return dl_start(chat_id, uid, x, text, lang)
     if aw == "wiki" and text and not text.startswith("/"):
         body, rows = ENC.reply(text, lang)
         if rows:                                # several entries matched — keep waiting for the pick
@@ -1377,6 +1429,8 @@ def handle_private(s, msg):
         for a in ADMIN_IDS:
             send(a, f"🚩 <b>scam report</b> from {who} (<code>{uid}</code>)\n\n{D.e(text[:3000])}")
         return send(chat_id, LN.L(LN.M["report_ok"], lang), kb_back(lang))
+    if text and not text.startswith("/") and DL.find_url(text) and len(text.split()) <= 3:
+        return dl_start(chat_id, uid, x, text, lang)
     if text and not text.startswith("/"):
         addr = TK.detect(text)
         if addr and (aw == "ca" or len(text.split()) <= 3):
@@ -1419,6 +1473,11 @@ def handle_private(s, msg):
             return send(chat_id, body, rows_kb([[btn(lb, cb)] for lb, cb in rows] + [[btn(t("b_back", lang), "m:main")]]))
         x["await"] = "wiki"
         return send(chat_id, ENC.ask(lang))
+    if cmd in ("/dl", "/download", "/save"):
+        if arg:
+            return dl_start(chat_id, uid, x, arg, lang)
+        x["await"] = "dl"
+        return send(chat_id, DL.L("ask", lang))
     if cmd == "/report":
         if arg:
             x["await"] = "report"

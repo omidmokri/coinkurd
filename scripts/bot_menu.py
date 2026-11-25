@@ -26,6 +26,14 @@ def L(d, lang, /, **kw):
 # ================================================================== section catalogue
 # key: (icon, {name}, {one-line description})
 S = {
+    "dl": ("⬇️", {"fa": "دانلودر شبکه‌های اجتماعی", "ckb": "داگرتنی تۆڕە کۆمەڵایەتییەکان",
+                  "kmr": "Daxistina torên civakî", "ar": "مُنزِّل الشبكات الاجتماعية",
+                  "en": "Social downloader"},
+           {"fa": "لینک را بفرست، فایلش را همین‌جا بگیر — ایکس، تیک‌تاک، فیسبوک، توییچ، ساندکلاد، تلگرام و ده‌ها سایت دیگر.",
+            "ckb": "لینک بنێرە، فایلەکەی لێرە وەربگرە — ئێکس، تیکتۆک، فەیسبووک، تویچ، ساوندکلاود، تێلێگرام و دەیان ماڵپەڕی تر.",
+            "kmr": "Girêdanê bişîne, pelê li vir bistîne — X, TikTok, Facebook, Twitch, SoundCloud, Telegram û dehan malperên din.",
+            "ar": "أرسل الرابط واحصل على الملف هنا — إكس، تيك توك، فيسبوك، تويتش، ساوندكلاود، تيليغرام وعشرات المواقع.",
+            "en": "Send a link, get the file here — X, TikTok, Facebook, Twitch, SoundCloud, Telegram and dozens more."}),
     "pro": ("📈", {"fa": "بازار زنده (مولتی‌چارت)", "ckb": "بازاڕی زیندوو (چەند چارت)", "kmr": "Bazara zindî (pir-grafîk)",
                   "ar": "السوق المباشر (رسوم متعددة)", "en": "Live market (multi-chart)"},
             {"fa": "تا ۱۶ نمودار، تایم‌فریم ثانیه‌ای، بازپخش، هشدار و تقویم اقتصادی روی چارت — در تلگرام یا مرورگر.",
@@ -410,7 +418,7 @@ S = {
 }
 LAB_ITEMS = ["mc", "mem", "vol", "opt", "xex", "dev", "macro", "dna"]
 
-HOME_ITEMS = ["token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
+HOME_ITEMS = ["dl", "token", "pf", "center", "mkt", "g_analysis", "g_reality", "g_opps", "g_news", "g_more"]
 GROUPS = {
     "g_analysis": ["pro", "mmap", "obs", "world", "analysis", "coin", "tools", "cmp", "chain", "ind", "cycle", "deriv", "lab", "council", "brain", "flows", "battle", "studio"],
     "g_opps": ["opps", "movers", "dca", "follow", "score"],
