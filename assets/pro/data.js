@@ -64,7 +64,11 @@
      before. The memory is per browser and only ever makes the site faster — if localStorage is unavailable the probe
      just runs again. */
   var RTTL = 36e5, RKEY = 'ek_reach', REACH = {}, RBUSY = {};
-  var RPROBE = { binance: API + 'ping', okx: 'https://www.okx.com/api/v5/public/time' };
+  /* one cheap probe per host, remembered for an hour (below). The exchanges a visitor can pick are probed the same
+     way: Coinbase and Kraken answer nothing at all on some networks, and without this a visitor who picks one waits
+     out the whole timeout on every chart before seeing an error. */
+  var RPROBE = { binance: API + 'ping', okx: 'https://www.okx.com/api/v5/public/time',
+    coinbase: 'https://api.exchange.coinbase.com/time', bybit: 'https://api.bybit.com/v5/market/time', kraken: 'https://api.kraken.com/0/public/Time' };
   try {
     var _r = JSON.parse(localStorage.getItem(RKEY) || '{}');
     for (var _h in _r) if (_r[_h] && Date.now() - _r[_h].t < RTTL) REACH[_h] = _r[_h];
@@ -280,7 +284,7 @@
     var self = this, tf = this.tf, id = this.ex, E = EX[id], bsec = exBase(id, tf);
     if (!E || !bsec) return Promise.reject(new Error(id + ': no such bar length'));
     var btf = { id: tf.id, sec: tf.sec, base: 'x' + bsec, ratio: tf.sec / bsec, u: tf.u, n: tf.n };
-    return E.get(this.sym, bsec, E.max || 300).then(function (rows) {
+    return ifUp(id, function () { return E.get(self.sym, bsec, E.max || 300); }).then(function (rows) {
       if (!rows || !rows.length) throw new Error('empty');
       self.tf = btf; self.exSec = bsec; self.base = merge([], rows); self.src = id; self.err = null; self.at = Date.now();
       self.full = E.back === false; self.rebuild(); self.tell('reset'); self.exPoll();

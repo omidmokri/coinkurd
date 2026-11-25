@@ -58,7 +58,7 @@
   var IR = {}; CAT.forEach(function (r) { IR[r[0]] = { key: r[0], g: r[1], grp: r[2], icon: r[3], div: r[4], daily: !!r[5], n: r[6] }; });
   var TMN = N('تومان', 'تمەن', 'تومان', 'IRT');
 
-  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_[A-Z]{3}|_F1)?|IR_[A-Z0-9]{2,12})$/;      /* Binance has one-letter coins too: S, W, T, A… */
+  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_[A-Z]{3}|_F1)?|IR_[A-Z0-9]{2,12}|FX_[A-Z]{6})$/;      /* Binance has one-letter coins too: S, W, T, A… */
   function lang() { var A = P.app; return A && A.LANG ? A.LANG() : 'fa'; }
   function iconUrl(ic) { var k = ic.slice(2); return ic[0] === 'f' ? '/assets/pro/flags/' + k + '.svg' : ic[0] === 'i' ? '/assets/pro/ic/' + k + '.svg' : '/data/logos/' + k + '.png'; }
 
@@ -72,6 +72,8 @@
     }
     if (/_F1$/.test(sym)) { var fb = sym.slice(0, -3); if (!FUTC[fb]) return null; return { sym: sym, kind: 'fut', base: fb, quote: 'USD', name: FUTC[fb], logo: '/data/logos/' + fb + '.png', coin: fb, src: 'Bybit', minSec: 60 }; }
     if (/_IRT$/.test(sym)) { var b = sym.slice(0, -4); return { sym: sym, kind: 'irt', base: b, quote: 'IRT', logo: '/data/logos/' + b + '.png', coin: b, src: 'Binance × tgju', minSec: 1 }; }
+    var xm = /^FX_([A-Z]{3})([A-Z]{3})$/.exec(sym);
+    if (xm && xm[1] !== xm[2]) return { sym: sym, kind: 'fx2', base: xm[1], quote: xm[2], logo: P.fx ? P.fx.flag(xm[1]) : '', coin: null, src: 'fx', minSec: 86400 };
     var fm = /^([A-Z0-9]{1,12})_([A-Z]{3})$/.exec(sym);
     if (fm) {
       if (fm[2] === 'USD') return null;                                /* dollars are the plain USDT pairs */
@@ -86,7 +88,7 @@
     var i = P.inst(sym), l = lang(); if (!i) return sym;
     if (i.kind === 'ir') return short ? i.base : i.name[l] || i.name.en;
     if (i.kind === 'fut') return i.base + '1!';
-    if (i.kind === 'fiat' || i.kind === 'fxr') return i.base + '/' + i.quote;
+    if (i.kind === 'fiat' || i.kind === 'fxr' || i.kind === 'fx2') return i.base + '/' + i.quote;
     return i.base + '/' + (i.quote === 'IRT' ? (TMN[l] || TMN.en) : 'USDT');
   };
   P.isToman = function (sym) { var i = P.inst(sym); return !!i && i.quote === 'IRT'; };
@@ -95,7 +97,7 @@
   P.quoteOf = function (sym) { var i = P.inst(sym); return i ? i.quote : 'USDT'; };
   P.precFor = function (sym, p) {
     var i = P.inst(sym);
-    if (i && (i.kind === 'fiat' || i.kind === 'fxr') && P.fx) return P.fx.prec(i.quote, p);
+    if (i && (i.kind === 'fiat' || i.kind === 'fxr' || i.kind === 'fx2') && P.fx) return P.fx.prec(i.quote, p);
     return P.isToman(sym) && Math.abs(p) >= 1000 ? 0 : P.prec(p);
   };
   /* the site's rule: no coin is ever shown without its own logo (icons of currencies and gold ship with the page) */
@@ -378,6 +380,75 @@
     if (this.rated) this.R.use(false); delete FEEDS[this.key];
   };
 
+  /* ---------------------------------------------------------------- FX_<BASE><QUOTE>: one world currency against another.
+     Both sides come from the site's own daily reference rates (data/fx/<CUR>.json, scripts/fx_rates.py: the European
+     Central Bank's reference rates, the exchange-api dataset for currencies the ECB does not quote). Each file says how
+     many units of that currency one tether bought that day, so a cross is one divided by the other and the tether
+     cancels out exactly. The dollar's own file is data/fx/USDT.json — "USD per 1 USDT" — which is that same quantity
+     for the dollar, so it is the dollar's series here.
+     What this is, and is not: one value a day, so a daily candle is a single point (the chart draws these as a line by
+     default) while a weekly or monthly candle is a real open/high/low/close of the days inside it. These are reference
+     rates published once a day, not a broker's tick data: there is no intraday forex here and none is invented. A pair
+     only goes back as far as the later of its two files — against the dollar that is 2 March 2024, between two ECB
+     currencies it is 2017. Before that there is no rate, so there is no candle. */
+  function xrate(code) { return P.fx.rate(code === 'USD' ? 'USDT' : code); }
+  function crossBars(RB, RQ, tf) {
+    var a = RB.pts || [], b = RQ.pts || [], out = [], Q = {}, i;
+    /* only the days both sides really published: both files are daily values on the same UTC midnight grid, so the two
+       are matched day by day and nothing is interpolated or held forward across the pair. Where the ECB publishes and
+       the other dataset does not (or the reverse) that day simply has no bar — weekends and holidays included, which is
+       when the currency market is shut anyway. */
+    var has = Object.prototype.hasOwnProperty;
+    for (i = 0; i < b.length; i++) Q[b[i][0]] = b[i][1];
+    for (i = 0; i < a.length; i++) {
+      var t = a[i][0], vb = a[i][1], vq = has.call(Q, t) ? +Q[t] : 0;
+      if (!(vb > 0) || !(vq > 0)) continue;
+      var v = vq / vb;                                                 /* units of the quote currency for one of the base */
+      out.push({ t: t - 86400, o: v, h: v, l: v, c: v, v: 0 });
+    }
+    /* a day is one value, so only a longer bar has a real open/high/low/close: the days inside it, by the calendar
+       (roll) for weeks and months, by the plain grid for 2d, 3d and the like */
+    if (tf.sec === 86400) return out;
+    if (tf.u === 'w' || tf.u === 'M') return roll(out, tf);
+    return P.aggregate(out, { id: tf.id, u: tf.u, sec: tf.sec, ratio: 2 });   /* ratio 2: aggregate by the plain grid, not "already native" */
+  }
+  function Fx2Feed(sym, tf) {
+    Base.call(this, sym, tf); this.inst = P.inst(sym);
+    this.RB = xrate(this.inst.base); this.RQ = xrate(this.inst.quote); this.src = 'fx2';
+  }
+  Fx2Feed.prototype = Object.create(Base.prototype);
+  Fx2Feed.prototype.start = function () {
+    var self = this, RB = this.RB, RQ = this.RQ; this.state = 'load'; this.tell('state');
+    if (this.tf.sec < 86400) { this.state = 'error'; this.err = 'tf'; this.tell('state'); return; }
+    RB.use(true); RQ.use(true); this.rated = true;
+    this.onRate = function () { if (RB.pts && RB.pts.length && RQ.pts && RQ.pts.length) self.setBars(crossBars(RB, RQ, self.tf)); };
+    RB.subs.push(this.onRate); RQ.subs.push(this.onRate);
+    Promise.all([RB.load(), RQ.load()]).then(function () {
+      if (self.dead) return;
+      if (!RB.pts || !RB.pts.length || !RQ.pts || !RQ.pts.length) throw new Error('no reference rate');
+      var bars = crossBars(RB, RQ, self.tf);
+      if (!bars.length) throw new Error('no overlapping day');
+      self.state = 'snap'; self.setBars(bars); self.tell('state');
+    }).catch(function () { if (self.dead) return; self.state = 'error'; self.err = 'rate'; self.tell('state'); });
+  };
+  Fx2Feed.prototype.stop = function () {
+    this.dead = true;
+    if (this.onRate) [this.RB, this.RQ].forEach(function (R) { var i = R.subs.indexOf(this.onRate); if (i >= 0) R.subs.splice(i, 1); }, this);
+    if (this.rated) { this.RB.use(false); this.RQ.use(false); }
+    delete FEEDS[this.key];
+  };
+  /* where a cross rate's two sides come from, in the words the page shows */
+  P.fx2Source = function (sym) {
+    var I = P.inst(sym); if (!I || I.kind !== 'fx2') return '';
+    var a = xrate(I.base).source(), b = xrate(I.quote).source();
+    return a && b ? (a === b ? a : a + ' × ' + b) : (a || b || '');
+  };
+  /* the ten pairs the world trades most, then the crosses that follow them (BIS triennial survey order) */
+  var FXP = ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD', 'USDCHF', 'NZDUSD', 'EURJPY', 'EURGBP', 'GBPJPY',
+    'EURCHF', 'AUDJPY', 'CADJPY', 'CHFJPY', 'EURAUD', 'EURCAD', 'AUDNZD', 'GBPAUD', 'GBPCAD', 'USDCNY',
+    'USDTRY', 'USDINR', 'USDBRL', 'USDMXN', 'USDZAR', 'USDSEK', 'USDNOK', 'USDPLN', 'USDKRW', 'USDRUB'];
+  P.fxPairs = function () { return FXP.map(function (p) { return 'FX_' + p; }); };
+
   /* ---------------------------------------------------------------- P.feed for every kind of symbol */
   /* ---------------------------------------------------------------- <COIN>_F1: the front quarterly future as one continuous chart.
      Source: Bybit's coin-margined quarterlies (BTCUSD + H/M/U/Z + year), reachable where Binance futures is not. A bar
@@ -522,7 +593,7 @@
     if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn, ex);
     var tf = P.parseTF(tfId); if (!tf) return null;
     var adj = I.kind === 'fut' && !!BADJ[sym], key = sym + '|' + tf.id + (adj ? '|a' : ''), F = FEEDS[key];
-    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
+    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : I.kind === 'fx2' ? new Fx2Feed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
     clearTimeout(F.killT); F.subs.push(fn); F.refs++;
     if (F.bars.length) setTimeout(function () { if (F.subs.indexOf(fn) >= 0) fn('reset', F); }, 0);
     return { feed: F, off: function () {
@@ -628,7 +699,7 @@
   P.markets = function () {
     return Promise.all([P.universe(), P.logos()]).then(function (r) {
       var u = r[0] || [], q = P.fx ? P.fx.cur() : 'IRT', loc = q === 'IRT' || q === 'USD' ? [] : ['USDT_' + q].concat(u.map(function (s) { return s + '_' + q; }));
-      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }), loc: loc, cur: q };
+      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }), loc: loc, cur: q, fx2: P.fxPairs() };
     });
   };
 })();

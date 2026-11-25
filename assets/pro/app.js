@@ -859,7 +859,7 @@
     var c = this.cfg, F = this.feed, self = this;
     var stc = this.replay ? 'rep' : !F ? 'load' : F.state === 'live' ? 'live' : F.state === 'poll' ? 'poll' : F.state === 'snap' ? 'snap' : F.state === 'error' ? 'err' : 'load';
     var rs = F && F.R && F.R.source ? F.R.source() : '', rsn = rs === 'own' ? T('yourRate') : rs, ref = F && F.R ? ({ ecb: 'ECB', xapi: 'exchange-api' })[F.R.src] || '' : '';
-    var src = F && F.src === 'coinbase' ? 'Coinbase' : F && F.src === 'kraken' ? 'Kraken' : F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && (F.src === 'irt' || F.src === 'fiat') ? 'Binance × ' + (rsn || '…') : F && F.src === 'fxr' ? ref : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
+    var src = F && F.src === 'fx2' ? (P.fx2Source ? P.fx2Source(c.sym) : 'fx') : F && F.src === 'coinbase' ? 'Coinbase' : F && F.src === 'kraken' ? 'Kraken' : F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && (F.src === 'irt' || F.src === 'fiat') ? 'Binance × ' + (rsn || '…') : F && F.src === 'fxr' ? ref : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
     var I0 = P.inst(c.sym) || {}, isFut = I0.kind === 'fut', adj = isFut && P.futAdj && P.futAdj(c.sym);
     var stTitle = (F && F.src === 'fxr' && F.state === 'snap' ? T('refDaily') : T('st_' + stc)) + (F && F.state === 'snap' && F.at && F.src !== 'fxr' ? ' · ' + fmtT(Math.floor(F.at / 1000)) : '');
     var leg = $('.pm-leg', this.el);
@@ -978,10 +978,14 @@
   };
   Cell.prototype.setSym = function (sym) { if (!SYM_RE.test(sym) || !hasLogo(sym) || sym === this.cfg.sym) return; this.cfg.sym = sym; if (this.replay && P.replayStop) P.replayStop(this, true); this.load(); this.drawer.select(null); save(); emit('sym', this); };
   Cell.prototype.setEx = function (ex) {
+    var self = this;
     ex = P.EX && P.EX[ex] && ex !== 'binance' ? ex : null;
     if ((this.cfg.ex || null) === ex) return;
-    this.cfg.ex = ex || undefined; if (this.replay && P.replayStop) P.replayStop(this, true);
-    this.load(); paintTop(); save();
+    function go() { self.cfg.ex = ex || undefined; if (self.replay && P.replayStop) P.replayStop(self, true); self.load(); paintTop(); save(); }
+    /* Coinbase and Kraken answer nothing at all on some networks. The host is probed once and the answer kept for an
+       hour (data.js), so this says so straight away instead of leaving the chart waiting out a timeout. */
+    if (!ex || !P.reach) return go();
+    P.reach(ex).then(function (up) { if (up) go(); else toast(T('exDown', { x: P.exName(ex) })); }, go);
   };
   Cell.prototype.setTF = function (tf) { if (!P.parseTF(tf) || tf === this.cfg.tf) return; this.cfg.tf = tf; if (this.replay && P.replayStop) P.replayStop(this, true); this.load(); save(); emit('tf', this); };
   Cell.prototype.setType = function (t) {
@@ -1266,23 +1270,27 @@
     /* markets: every Binance coin in USDT and in the visitor's currency; Iran's toman markets (currencies, gold, coins,
        silver, every coin in toman) where the toman is the currency or the reader is Persian or Kurdish */
     var Q = P.fx ? P.fx.cur() : 'IRT', LOCAL = Q !== 'IRT' && Q !== 'USD', IRC = Q === 'IRT' || LANG === 'fa' || LANG === 'ckb';
-    ['all', 'watch', 'usdt'].concat(LOCAL ? ['loc'] : [], IRC ? ['irt', 'fx'] : [], ['gold', 'fut']).forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = k === 'loc' ? T('cat_loc', { c: Q }) : T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
+    ['all', 'watch', 'usdt', 'forex'].concat(LOCAL ? ['loc'] : [], IRC ? ['irt', 'fx'] : [], ['gold', 'fut']).forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = k === 'loc' ? T('cat_loc', { c: Q }) : T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
     function names(x) { var I = P.inst(x); return I && I.name ? [I.name.fa, I.name.ckb, I.name.ar, I.name.en].join(' ').toLowerCase() : ''; }
     function draw() {
       var raw = inp.value.trim(), s = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), low = raw.toLowerCase(), W = (P.watchSyms ? P.watchSyms() : []);
       var loc = (M && M.loc) || [], goldC = function (x) { return /^(XAUT|PAXG)(_|$)/.test(x); };
+      /* gold and silver: the world ounce in dollars (tgju) for every reader, Iran's own gold and coin markets as well
+         where the toman is the currency or the reader is Persian or Kurdish, plus the tokenised ounces on Binance */
+      var metal = !M ? [] : M.ir.filter(function (x) { var g = P.irGroup(x); return IRC ? /gold|coin|silver/.test(g) : /gold|silver/.test(g) && (P.inst(x) || {}).quote === 'USD'; });
       var src = !M ? [] : cat === 'watch' ? W : cat === 'usdt' ? M.usdt : cat === 'loc' ? loc : cat === 'irt' ? M.irt : cat === 'fut' ? (M.fut || []) : cat === 'fx' ? M.ir.filter(function (x) { return P.irGroup(x) === 'fx'; }) :
-        cat === 'gold' ? (IRC ? M.ir.filter(function (x) { return /gold|coin|silver/.test(P.irGroup(x)); }) : []).concat(M.usdt.filter(goldC), loc.filter(goldC)) :
-        (IRC ? M.ir : []).concat(M.usdt, loc, IRC ? M.irt : [], M.fut || []);
+        cat === 'forex' ? (M.fx2 || []) :
+        cat === 'gold' ? metal.concat(M.usdt.filter(goldC), loc.filter(goldC)) :
+        (IRC ? M.ir : []).concat(M.usdt, M.fx2 || [], metal, loc, IRC ? M.irt : [], M.fut || []);
       var r = src.filter(function (x) { return !raw || (s && x.indexOf(s) >= 0) || (low && names(x).indexOf(low) >= 0) || (low && P.pair(x).toLowerCase().indexOf(low) >= 0); });
       r.sort(function (a, b) { return (s && a.indexOf(s) === 0 ? 0 : 1) - (s && b.indexOf(s) === 0 ? 0 : 1); });
       r = r.slice(0, 120); sel = 0;
       list.innerHTML = r.length ? r.map(function (x, i) {
-        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' || I.kind === 'fiat' ? T('computed') : I.kind === 'fxr' ? T('refRate') : I.kind === 'fut' ? T('futSub') + ' · Bybit' : 'Binance';
+        var tk = P.tickers.d[x], I = P.inst(x) || {}, sub = I.kind === 'ir' ? (I.quote === 'USD' ? 'USD · tgju' : T('toman') + ' · tgju') : I.kind === 'irt' || I.kind === 'fiat' ? T('computed') : I.kind === 'fxr' ? T('refRate') : I.kind === 'fx2' ? T('refRate') + (P.fx2Source ? ' · ' + P.fx2Source(x) : '') : I.kind === 'fut' ? T('futSub') + ' · Bybit' : 'Binance';
         return '<button type="button" role="option" class="pm-ssi' + (i === 0 ? ' on' : '') + '" data-s="' + x + '"><img src="' + esc(P.logo(x)) + '" alt="" width="22" height="22" loading="lazy"><b>' + esc(P.pair(x)) + '</b><small>' + esc(sub) + '</small>' +
           (tk ? '<span class="pm-num">' + P.fmt(tk.c, P.precFor(x, tk.c)) + '</span><span class="pm-num ' + (tk.chg >= 0 ? 'up' : 'dn') + '">' + (tk.chg >= 0 ? '+' : '') + (tk.chg || 0).toFixed(2) + '%</span>' : '') + '</button>';
       }).join('') : '<p class="pm-empty">' + esc(M ? T('noMatch') : T('loading')) + '</p>';
-      note.textContent = cat === 'loc' ? T('locNote', { c: Q }) : cat === 'irt' ? T('irtNote') : cat === 'fx' || (cat === 'gold' && IRC) ? T('irNote') : cat === 'fut' ? T('futNote') : '';
+      note.textContent = cat === 'loc' ? T('locNote', { c: Q }) : cat === 'irt' ? T('irtNote') : cat === 'forex' ? T('fx2Note') : cat === 'fx' || (cat === 'gold' && IRC) ? T('irNote') : cat === 'fut' ? T('futNote') : '';
       $$('[data-s]', list).forEach(function (b) { b.onclick = function () { closeModal(); applySym(b.getAttribute('data-s')); }; });
     }
     inp.oninput = draw;
