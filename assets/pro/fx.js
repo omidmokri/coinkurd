@@ -49,6 +49,7 @@
     var cc = tzCountry(), r = row(lang), home = r ? r[6] : 'USD';
     if (lang === 'fa') return cc === 'AF' ? 'AFN' : cc === 'TJ' ? 'TJS' : 'IRT';
     if (lang === 'ckb') return cc === 'IQ' ? 'IQD' : 'IRT';
+    if (lang === 'en') return 'USD';                                 /* the page's own default: tether pairs, nothing converted */
     return (cc && P.CCCUR && P.CCCUR[cc]) || home;
   }
 

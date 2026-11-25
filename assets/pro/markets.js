@@ -517,9 +517,9 @@
   }
   var FEEDS = {}, usdtFeed = P.feed;
   P.feedUsdt = usdtFeed;
-  P.feed = function (sym, tfId, fn) {
+  P.feed = function (sym, tfId, fn, ex) {
     var I = P.inst(sym); if (!I) return null;
-    if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn);
+    if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn, ex);
     var tf = P.parseTF(tfId); if (!tf) return null;
     var adj = I.kind === 'fut' && !!BADJ[sym], key = sym + '|' + tf.id + (adj ? '|a' : ''), F = FEEDS[key];
     if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : new IrtFeed(sym, tf); F.start(); }

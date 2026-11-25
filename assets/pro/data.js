@@ -104,6 +104,69 @@
     return Object.keys(m).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return m[k]; });
   }
 
+  /* ---------------------------------------------------------------- the other exchanges
+     The chart's candles normally come from Binance (websocket) and fall back to OKX and to the site's own snapshot.
+     A visitor who wants another exchange's own prices and history picks one here; those are read straight from the
+     exchange's public endpoint in the visitor's browser and refreshed every ten seconds, with no websocket.
+     Each entry says which bar lengths the exchange serves natively; anything else is built from the largest that divides it. */
+  var EX = {
+    binance: { n: 'Binance', q: 'USDT' },
+    bybit: {
+      n: 'Bybit', q: 'USDT', max: 1000, nat: [60, 180, 300, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 604800],
+      iv: { 60: '1', 180: '3', 300: '5', 900: '15', 1800: '30', 3600: '60', 7200: '120', 14400: '240', 21600: '360', 43200: '720', 86400: 'D', 604800: 'W' },
+      get: function (sym, sec, limit, endMs) {
+        var u = 'https://api.bybit.com/v5/market/kline?category=spot&symbol=' + sym + 'USDT&interval=' + this.iv[sec] + '&limit=' + Math.min(1000, limit) + (endMs ? '&end=' + Math.round(endMs) : '');
+        return getJSON(u, 15000).then(function (j) {
+          if (!j || j.retCode !== 0 || !j.result || !j.result.list) throw new Error('bybit');
+          return j.result.list.map(function (x) { return { t: Math.floor(+x[0] / 1000), o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[5] }; }).reverse();
+        });
+      }
+    },
+    okx: {
+      n: 'OKX', q: 'USDT', max: 300, nat: [60, 180, 300, 900, 1800, 3600, 7200, 14400, 21600, 43200, 86400, 604800],
+      iv: { 60: '1m', 180: '3m', 300: '5m', 900: '15m', 1800: '30m', 3600: '1H', 7200: '2H', 14400: '4H', 21600: '6H', 43200: '12H', 86400: '1D', 604800: '1W' },
+      get: function (sym, sec, limit, endMs) {
+        var iv = this.iv[sec];
+        return getJSON(OKX + (endMs ? 'history-candles' : 'candles') + '?instId=' + sym + '-USDT&bar=' + iv + '&limit=' + Math.min(300, limit) + (endMs ? '&after=' + Math.round(endMs) : ''), 15000).then(function (j) {
+          if (!j || !j.data) throw new Error('okx');
+          return j.data.map(function (k) { return { t: Math.floor(k[0] / 1000), o: +k[1], h: +k[2], l: +k[3], c: +k[4], v: +k[5] }; }).reverse();
+        });
+      }
+    },
+    coinbase: {
+      n: 'Coinbase', q: 'USD', max: 300, nat: [60, 300, 900, 3600, 21600, 86400],
+      get: function (sym, sec, limit, endMs) {
+        var end = Math.floor((endMs || Date.now()) / 1000), n = Math.min(300, limit), start = end - n * sec;
+        var u = 'https://api.exchange.coinbase.com/products/' + sym + '-USD/candles?granularity=' + sec + '&start=' + new Date(start * 1000).toISOString() + '&end=' + new Date(end * 1000).toISOString();
+        return getJSON(u, 15000).then(function (a) {
+          if (!Array.isArray(a)) throw new Error('coinbase');
+          return a.map(function (k) { return { t: +k[0], l: +k[1], h: +k[2], o: +k[3], c: +k[4], v: +k[5] }; }).sort(function (x, y) { return x.t - y.t; });
+        });
+      }
+    },
+    kraken: {
+      n: 'Kraken', q: 'USD', max: 720, back: false, nat: [60, 300, 900, 1800, 3600, 14400, 86400, 604800],
+      get: function (sym, sec) {
+        var pair = (sym === 'BTC' ? 'XBT' : sym) + 'USD';
+        return getJSON('https://api.kraken.com/0/public/OHLC?pair=' + pair + '&interval=' + (sec / 60), 15000).then(function (j) {
+          if (!j || !j.result) throw new Error('kraken');
+          var k = Object.keys(j.result).filter(function (x) { return x !== 'last'; })[0], rows = k && j.result[k];
+          if (!rows || !rows.length) throw new Error('kraken empty');
+          return rows.map(function (x) { return { t: +x[0], o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[6] }; });
+        });
+      }
+    }
+  };
+  P.EX = EX;
+  P.exList = function () { return ['binance', 'coinbase', 'bybit', 'okx', 'kraken']; };
+  P.exName = function (id) { return (EX[id] || EX.binance).n; };
+  /* the largest native bar of this exchange that divides the asked-for timeframe */
+  function exBase(ex, tf) {
+    var E = EX[ex]; if (!E || !E.nat) return null;
+    for (var i = E.nat.length - 1; i >= 0; i--) if (tf.sec >= E.nat[i] && tf.sec % E.nat[i] === 0) return E.nat[i];
+    return null;
+  }
+
   /* ---------------------------------------------------------------- one WebSocket for the whole page */
   var W = { ws: null, want: {}, live: {}, h: {}, timer: null, retry: 0, id: 1, on: [], up: false };
   function wsFlush() {
@@ -149,8 +212,9 @@
 
   /* ---------------------------------------------------------------- a feed: one symbol + timeframe, shared by every chart that shows it */
   var feeds = {};
-  function Feed(sym, tf) {
-    this.key = sym + '|' + tf.id; this.sym = sym; this.tf = tf; this.base = []; this.bars = [];
+  function Feed(sym, tf, ex) {
+    this.ex = EX[ex] && ex !== 'binance' ? ex : null;
+    this.key = sym + '|' + tf.id + (this.ex ? '|' + this.ex : ''); this.sym = sym; this.tf = tf; this.base = []; this.bars = [];
     this.state = 'load'; this.src = null; this.at = null; this.err = null; this.full = false; this.busy = false;
     this.subs = []; this.refs = 0; this.poller = null; this.dead = false;
     var self = this;
@@ -192,7 +256,7 @@
     this.tell('tick', { bar: nb, isNew: isNew, closed: closed && nb.t + tf.sec <= b.t + (NATIVE[tf.base] || 1) });
   };
   Feed.prototype.stream = function () {
-    if (this.dead || this.streaming) return;
+    if (this.dead || this.streaming || this.ex) return;
     if (P.saver || !('WebSocket' in window)) return this.poll('binance');
     this.streaming = this.sym.toLowerCase() + 'usdt@kline_' + this.tf.base;
     this.streamAt = Date.now();
@@ -211,9 +275,32 @@
     }
     this.poller = setInterval(once, every);
   };
+  /* candles from the exchange the visitor picked: one request, then a poll; no websocket */
+  Feed.prototype.fromEx = function () {
+    var self = this, tf = this.tf, id = this.ex, E = EX[id], bsec = exBase(id, tf);
+    if (!E || !bsec) return Promise.reject(new Error(id + ': no such bar length'));
+    var btf = { id: tf.id, sec: tf.sec, base: 'x' + bsec, ratio: tf.sec / bsec, u: tf.u, n: tf.n };
+    return E.get(this.sym, bsec, E.max || 300).then(function (rows) {
+      if (!rows || !rows.length) throw new Error('empty');
+      self.tf = btf; self.exSec = bsec; self.base = merge([], rows); self.src = id; self.err = null; self.at = Date.now();
+      self.full = E.back === false; self.rebuild(); self.tell('reset'); self.exPoll();
+    });
+  };
+  Feed.prototype.exPoll = function () {
+    var self = this, E = EX[this.ex]; clearInterval(this.poller);
+    this.state = 'poll'; this.tell('state');
+    this.poller = setInterval(function () {
+      if (self.dead || document.hidden) return;
+      E.get(self.sym, self.exSec, 3).then(function (rows) { rows.forEach(function (r) { self.tick(r, false); }); self.at = Date.now(); self.tell('state'); }, function () { });
+    }, P.saver ? 30000 : 10000);
+  };
   Feed.prototype.start = function () {
     var self = this, tf = this.tf;
     this.state = 'load'; this.tell('state');
+    if (this.ex) return this.fromEx().catch(function (e) {
+      self.err = 'nodata'; self.exErr = e; self.state = 'error'; self.tell('state');
+      clearTimeout(self.retryT); self.retryT = setTimeout(function () { if (!self.dead && self.refs) self.start(); }, 30000);
+    });
     reach('okx');                       /* probe the fallback at the same time, so a dead Binance costs one wait, not two */
     var bm = NATIVE[tf.base] * 1000, pages = tf.ratio === 1 ? 1 : Math.min(6, Math.ceil(600 * tf.ratio / 1000));
     var end = Math.floor(Date.now() / bm) * bm + bm;
@@ -258,6 +345,17 @@
   /* older history when the user scrolls back */
   Feed.prototype.more = function () {
     var self = this, tf = this.tf;
+    if (this.ex) {
+      var E = EX[this.ex];
+      if (this.busy || this.full || !E.get || E.back === false || !this.base.length || this.base.length >= MAXBASE) return Promise.resolve(false);
+      this.busy = true;
+      return E.get(this.sym, this.exSec, E.max || 300, this.base[0].t * 1000 - 1).then(function (rows) {
+        self.busy = false;
+        var got = (rows || []).filter(function (b) { return b.t < self.base[0].t; });
+        if (!got.length) { self.full = true; return false; }
+        self.base = merge(self.base, got); self.rebuild(); self.tell('more'); return true;
+      }, function () { self.busy = false; return false; });
+    }
     if (this.busy || this.full || this.src !== 'binance' || !this.base.length || this.base.length >= MAXBASE || this.bars.length >= MAXBARS) return Promise.resolve(false);
     this.busy = true;
     var bm = NATIVE[tf.base] * 1000, first = this.base[0].t * 1000, pages = tf.ratio === 1 ? 1 : Math.min(3, Math.ceil(300 * tf.ratio / 1000)), reqs = [];
@@ -300,10 +398,11 @@
   }, 5000);
 
   /* subscribe(sym, tf, fn) -> unsubscribe function. fn(what, feed, x): what = reset | tick | more | state */
-  P.feed = function (sym, tfId, fn) {
+  P.feed = function (sym, tfId, fn, ex) {
     var tf = parseTF(tfId); if (!tf) return null;
-    var key = sym + '|' + tf.id, F = feeds[key];
-    if (!F) { F = feeds[key] = new Feed(sym, tf); F.start(); }
+    ex = EX[ex] && ex !== 'binance' ? ex : null;
+    var key = sym + '|' + tf.id + (ex ? '|' + ex : ''), F = feeds[key];
+    if (!F) { F = feeds[key] = new Feed(sym, tf, ex); F.start(); }
     clearTimeout(F.killT);
     F.subs.push(fn); F.refs++;
     if (F.bars.length) setTimeout(function () { if (F.subs.indexOf(fn) >= 0) fn('reset', F); }, 0);

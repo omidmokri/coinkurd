@@ -1,10 +1,10 @@
 /* entekhab.net — /market/ workspace. Dark, orange accent (#f7931a), the site's line/card colours. */
-.pm-page{max-width:none!important;padding:8px 10px 24px!important;font-family:Vazirmatn,system-ui,sans-serif;color:#f2f2ee}
-.pm-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 4px 8px}
+.pm-page{max-width:none!important;padding:6px 8px 24px!important;font-family:Vazirmatn,system-ui,sans-serif;color:#f2f2ee}
+.pm-head{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 .pm-head h1{font-size:1.25rem;margin:0;font-weight:900;letter-spacing:-.01em}
 .pm-head p{margin:0;color:#9a9a94;font-size:.86rem}
 #pro{--line:rgba(255,255,255,.09);--card:#111113;--acc:#f7931a;--up:#34d399;--dn:#ff5a4d;--mute:#9a9a94;
-  position:relative;display:flex;flex-direction:column;height:calc(100vh - 150px);min-height:440px;background:#0b0b0c;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  position:relative;display:flex;flex-direction:column;height:calc(100vh - 92px);min-height:460px;background:#0b0b0c;border:1px solid var(--line);border-radius:16px;overflow:hidden;
   color:#e8e8e3;font:13px/1.35 Vazirmatn,"Space Grotesk",Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
 #pro *{box-sizing:border-box}
 #pro button{font:inherit;color:inherit}
@@ -64,7 +64,7 @@
 .pm-dtabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-4px 0 10px;overflow-x:auto}
 .pm-dtab{border:0;background:none;color:#a9a9a3;font:inherit;font-size:13px;padding:7px 11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .pm-dtab.on{color:#f2f2ec;border-bottom-color:var(--acc)}
-.pm-dpane{min-height:170px;max-height:52vh;overflow-y:auto;padding:2px}
+.pm-dpane{min-height:170px;padding:2px}
 .pm-drow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px}
 .pm-drow>span{flex:0 0 auto;color:#cfcfc9}.pm-drow .pm-in{width:auto;flex:0 1 210px;padding:6px 8px;font-size:13px}
 .pm-drow input[type=color]{width:48px;height:32px;padding:2px;flex:0 0 48px}.pm-drow input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
@@ -246,7 +246,7 @@ span.pm-imp{width:auto;height:auto;border-radius:6px;padding:0 6px;color:#111;fo
 .pm-p{margin:0;line-height:1.7}
 .pm-field{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mute)}
 .pm-field[hidden]{display:none}
-.pm-ss .pm-ssl,.pm-idl{display:flex;flex-direction:column;max-height:52vh;overflow-y:auto}
+.pm-ss .pm-ssl,.pm-idl{display:flex;flex-direction:column}
 .pm-sscat,.pm-idt{display:flex;gap:4px;flex-wrap:wrap}
 .pm-ssi{display:grid;grid-template-columns:24px auto 1fr auto auto;gap:8px;align-items:center;background:none;border:0;border-radius:10px;padding:6px 8px;cursor:pointer;text-align:start}
 .pm-ssi img{border-radius:50%;background:#fff1}
@@ -291,7 +291,7 @@ span.pm-imp{width:auto;height:auto;border-radius:6px;padding:0 6px;color:#111;fo
 .pm-checks{display:flex;flex-direction:column;gap:5px;font-size:12.5px}
 .pm-checks label{display:flex;gap:6px;align-items:flex-start}
 .pm-tbl{width:100%;border-collapse:collapse;font-size:12px}.pm-tbl td,.pm-tbl th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:start}
-.pm-tw{max-height:46vh;overflow:auto}
+.pm-tw{overflow-x:auto}
 .pm-toast{position:absolute;left:50%;bottom:52px;transform:translate(-50%,20px);opacity:0;transition:.3s;z-index:60;background:#1b1b1f;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px 14px;max-width:min(560px,92%);box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none}
 .pm-toast.on{opacity:1;transform:translate(-50%,0)}
 .pm-toast.long{border-color:var(--acc)}
@@ -510,6 +510,10 @@ html[dir=ltr] body.pm-on .pm-bot{padding-right:64px}
 @media (max-width:1700px){html:has(#pro) #ekh .ek-appb{width:38px!important;padding:0!important;justify-content:center}html:has(#pro) #ekh .ek-appb .ek-i{display:none!important}}
 a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-id .pm-idl{max-height:none;overflow:visible}
+.pm-mbody{overscroll-behavior:contain}
+.pm-ss>.pm-in:first-child,.pm-ss .pm-sshead{position:sticky;top:-10px;z-index:3;background:#131315;margin-top:-10px;padding-top:10px}
+.pm-dtabs{position:sticky;top:-10px;z-index:2;background:#131315;margin-top:-4px;padding-top:4px}
+#pro.pm-light .pm-ss>.pm-in:first-child,#pro.pm-light .pm-dtabs,#pro.pm-light .pm-idhead,#pro.pm-light .pm-scrt th{background:#fff}
 .pm-idhead{position:sticky;top:-10px;z-index:3;background:#131315;display:flex;flex-direction:column;gap:8px;padding:10px 0 8px;margin-top:-10px;border-bottom:1px solid var(--line)}
 .pm-idm{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .pm-mtab{border:0;background:#222226;color:#d6d6d0;border-radius:99px;padding:6px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -532,7 +536,7 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-scref summary{cursor:pointer;color:var(--mute);font-size:12px}.pm-scref p{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:#b8b8b2;white-space:pre-wrap;text-align:left;line-height:1.7;margin:6px 0 0}
 .pm-newsc{align-self:flex-start;margin:4px 0 8px}.pm-sced{margin-inline-start:4px;color:var(--mute)}.pm-idi.pm-usr{grid-template-columns:1fr auto auto}.pm-idi.pm-usr .pm-sced{grid-row:1 / span 2;grid-column:3}
 .pm-pf,.pm-opt{display:flex;flex-direction:column;gap:8px}.pm-pfbar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#222}.pm-pfbar i{display:block;height:100%}
-.pm-pfadd .pm-in{flex:1 1 90px;width:auto}.pm-optw{max-height:52vh;overflow-y:auto}.pm-optt td,.pm-optt th{padding:3px 7px;font-size:12px}.pm-optk{background:#1b1b1f}
+.pm-pfadd .pm-in{flex:1 1 90px;width:auto}.pm-optw{overflow-x:auto}.pm-optt td,.pm-optt th{padding:3px 7px;font-size:12px}.pm-optk{background:#1b1b1f}
 .pm-optt tr.pm-atm .pm-optk{background:rgba(247,147,26,.3)}.pm-optt tr.pm-pain .pm-optk{outline:1px solid #facc15}.pm-btx{margin:2px 0}.pm-mexp{min-height:70px;height:auto}
 
 /* ---- the chart settings dialog, and the light themes (paper / light): the workspace follows the chart's background */
@@ -566,3 +570,7 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 #pro.pm-light .pm-chip{color:#3a3a36;border-color:rgba(0,0,0,.18)}#pro.pm-light .pm-chip.on{color:#20201e}
 #pro.pm-light .pm-tbl th{color:#4a4a46}#pro.pm-light .pm-tbl td{border-color:rgba(0,0,0,.08)}
 #pro.pm-light .pm-dpane,#pro.pm-light .pm-mbody{color:#20201e}
+.pm-exb{flex:0 0 auto;background:#17171a;border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:11.5px;color:#b8b8b2;cursor:pointer;white-space:nowrap}
+.pm-exb:hover{background:#1f1f23}.pm-exb.on{color:var(--acc);border-color:rgba(247,147,26,.4)}
+.pm-mnote{margin:4px 10px 6px;color:var(--mute);font-size:11.5px;max-width:260px;white-space:normal;line-height:1.5}
+#pro.pm-light .pm-exb{background:#f1f1ee;color:#3a3a36}

@@ -545,6 +545,9 @@ CSP = ("default-src 'self'; "
        "https://fapi.binance.com https://api.bybit.com "      # the Observatory (/charts/): futures candles and open interest
        "https://api.bitget.com https://api.hyperliquid.xyz https://api.gateio.ws https://www.deribit.com "      # …and funding, open interest and options of the other venues
        "https://www.okx.com wss://ws.okx.com wss://stream.bybit.com https://mempool.space wss://mempool.space "
+       # /market/: the candles and the history of the other spot exchanges, read in the visitor's own browser.
+       # Read-only public endpoints, no key and no cookie; Binance, Bybit and OKX are already above.
+       "https://api.exchange.coinbase.com https://api.kraken.com "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com https://entekhab-tv.omid-mokri.workers.dev "   # Pine Studio: the TradingView alert feed
        
        "https://dashboard-api.tgju.org https://api.tgju.org https://call2.tgju.org https://call3.tgju.org https://call4.tgju.org; "
