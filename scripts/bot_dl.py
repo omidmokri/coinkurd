@@ -330,12 +330,12 @@ def fetch(url, audio_only=False):
     full = max((f.get("height") or 0) for f in (info.get("formats") or [{}])) or 0
     tmp = tempfile.mkdtemp(prefix="ckdl_")
     out = os.path.join(tmp, "m.%(ext)s")
-    args = ["-f", fmt, "--max-filesize", str(CAP), "-o", out, url]
+    args = ["-f", fmt, "--max-filesize", str(CAP), "-o", out]
     if audio_only and merge:                     # mp3 needs ffmpeg; without it the native audio is sent
-        args = ["-f", fmt, "-x", "--audio-format", "mp3", "--audio-quality", "5",
-                "--max-filesize", str(CAP), "-o", out, url]
+        args += ["-x", "--audio-format", "mp3", "--audio-quality", "5"]
     elif not audio_only and merge:
-        args[1:1] = ["--merge-output-format", "mp4"]
+        args += ["--merge-output-format", "mp4"]
+    args.append(url)                             # the URL stays last, after every option
     try:
         p = _run(args)
     except subprocess.TimeoutExpired:
