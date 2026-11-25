@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: |
-          pip install requests beautifulsoup4 pillow arabic-reshaper python-bidi fonttools
+          pip install requests beautifulsoup4 pillow arabic-reshaper python-bidi fonttools yt-dlp
           python scripts/infocard.py --check || echo "::error::Persian text shaping is broken — the bot will post text without pictures until it is fixed"
           # ffmpeg serves only the occasional video post, and bot_reel already skips the video when it
           # is missing. On run #139 installing it took the runner more than fifteen minutes with the
