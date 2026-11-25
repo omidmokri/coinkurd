@@ -1,0 +1,66 @@
+name: Downloader probe
+
+# One-off check: which sites answer yt-dlp from a GitHub runner's datacenter IP.
+# Metadata only — nothing is downloaded, nothing is posted.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install yt-dlp
+        run: pip install -q -U yt-dlp && yt-dlp --version
+
+      - name: Probe
+        run: |
+          python - <<'EOF'
+          import json, subprocess, sys
+          CASES = [
+            ("YouTube",    "https://www.youtube.com/watch?v=aqz-KE-bpKQ"),
+            ("YouTube",    "https://www.youtube.com/watch?v=BaW_jenozKc"),
+            ("YouTube Sh", "https://www.youtube.com/shorts/tPEE9ZwTmy0"),
+            ("X/Twitter",  "https://x.com/NASA/status/1704715707584590263"),
+            ("X/Twitter",  "https://x.com/SpaceX/status/1732824684683784516"),
+            ("Instagram",  "https://www.instagram.com/p/C2Ux8MxLZ1k/"),
+            ("Instagram",  "https://www.instagram.com/reel/C5Ww0oFLhVJ/"),
+            ("TikTok",     "https://www.tiktok.com/@tiktok/video/7106594312292453675"),
+            ("Facebook",   "https://www.facebook.com/watch/?v=10153231379946729"),
+            ("Reddit",     "https://www.reddit.com/r/videos/comments/1ad1ov2/"),
+            ("SoundCloud", "https://soundcloud.com/forss/flickermood"),
+            ("Vimeo",      "https://vimeo.com/76979871"),
+            ("Pinterest",  "https://www.pinterest.com/pin/99360735500167749/"),
+            ("Twitch",     "https://www.twitch.tv/videos/106400740"),
+            ("Dailymotion","https://www.dailymotion.com/video/x2hwqn9"),
+            ("Telegram",   "https://t.me/telegram/83"),
+            ("Direct mp4", "https://download.samplelib.com/mp4/sample-5s.mp4"),
+          ]
+          rows = []
+          for name, url in CASES:
+              p = subprocess.run(["yt-dlp", "-J", "--no-warnings", "--socket-timeout", "20",
+                                  "--retries", "1", url],
+                                 capture_output=True, text=True, timeout=120)
+              if p.returncode == 0 and p.stdout.strip():
+                  try:
+                      d = json.loads(p.stdout)
+                      best = max((f.get("height") or 0) for f in (d.get("formats") or [{}]))
+                      rows.append((name, "OK", "%s | up to %sp" % ((d.get("title") or "")[:40], best or "?")))
+                  except Exception as ex:
+                      rows.append((name, "OK?", repr(ex)[:70]))
+              else:
+                  err = (p.stderr or "").strip().splitlines()
+                  msg = err[-1][:150] if err else "no output"
+                  rows.append((name, "FAIL", msg))
+          print("\n================ RESULT ================")
+          for name, st, note in rows:
+              print("%-12s %-5s %s" % (name, st, note))
+          ok = {n for n, s, _ in rows if s.startswith("OK")}
+          print("\nWORKING: " + ", ".join(sorted(ok)))
+          print("BLOCKED: " + ", ".join(sorted({n for n, s, _ in rows if s == "FAIL"} - ok)))
+          EOF
