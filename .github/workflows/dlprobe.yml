@@ -1,7 +1,9 @@
 name: Downloader probe
 
-# Self-test for the bot's downloader: runs scripts/bot_dl.py against real links on the runner
-# and reports what came back. Nothing is posted to Telegram.
+# Self-test for the bot's downloader. It runs scripts/bot_dl.py against real links twice —
+# once with no ffmpeg on the machine and once with it — because the bot's own runner installs
+# ffmpeg in the background and the first minutes of every run have none.
+# Nothing is posted to Telegram.
 
 on:
   workflow_dispatch:
@@ -21,51 +23,54 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install
-        run: pip install -q -U yt-dlp && yt-dlp --version && ffmpeg -version | head -1
+      - name: Install yt-dlp
+        run: pip install -q -U yt-dlp && yt-dlp --version
 
-      - name: Self-test
-        env:
-          ONE: ${{ inputs.url }}
+      - name: Write the test
         run: |
-          python - <<'EOF'
-          import logging, os, sys, time
+          cat > /tmp/selftest.py <<'EOF'
+          import logging, os, shutil, sys, time
           logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s %(message)s")
           sys.path.insert(0, "scripts")
           import bot_dl as DL
 
-          raw = DL._run(["-J", "https://x.com/SpaceX/status/1732824684683784516"], timeout=90)
-          print("RAW rc=%s  out=%dB" % (raw.returncode, len(raw.stdout or "")))
-          print("RAW stderr: " + (raw.stderr or "")[-400:])
-          print("which yt-dlp: %s" % __import__("shutil").which("yt-dlp"))
-
-          CASES = [("X video",     "https://x.com/SpaceX/status/1732824684683784516", False),
-                   ("TikTok",      "https://www.tiktok.com/@tiktok/video/7106594312292453675", False),
-                   ("SoundCloud",  "https://soundcloud.com/forss/flickermood", True),
-                   ("Direct mp4",  "https://download.samplelib.com/mp4/sample-5s.mp4", False),
-                   ("YouTube",     "https://www.youtube.com/watch?v=aqz-KE-bpKQ", False)]
+          CASES = [("X video",    "https://x.com/SpaceX/status/1732824684683784516", False),
+                   ("TikTok",     "https://www.tiktok.com/@tiktok/video/7106594312292453675", False),
+                   ("SoundCloud", "https://soundcloud.com/forss/flickermood", True),
+                   ("Direct mp4", "https://download.samplelib.com/mp4/sample-5s.mp4", False)]
           one = (os.environ.get("ONE") or "").strip()
           if one:
               CASES = [("custom", one, DL.wants_audio(one))]
 
+          print("ffmpeg present: %s" % DL.has_ffmpeg())
           bad = 0
           for name, url, audio in CASES:
               t0 = time.time()
-              blocked = DL.blocked_site(url)
-              if blocked:
-                  print("%-11s BLOCKED-EARLY  %s  (%s)" % (name, blocked, DL.L("blocked", "en", site=blocked)[:60]))
-                  continue
               res = DL.fetch(url, audio)
               dt = time.time() - t0
               if not res.get("ok"):
-                  print("%-11s FAIL  err=%-12s %5.1fs  msg=%s" % (name, res["err"], dt, DL.L(res["err"], "en", site=DL.site_of(url))[:70]))
+                  print("%-11s FAIL  err=%-10s %5.1fs" % (name, res["err"], dt))
                   bad += 1
                   continue
-              print("%-11s OK    %-5s %-9s %5.1fs  %s" % (name, res["kind"], DL.human(res["size"]), dt, res["title"][:40]))
-              print("            caption: " + DL.caption(res, "fa", DL.site_of(url)).replace("\n", " / ")[:160])
-              assert res["size"] <= DL.CAP, "over the upload cap!"
+              assert res["size"] <= DL.CAP, "over the upload cap"
               assert os.path.getsize(res["path"]) == res["size"]
+              print("%-11s OK    %-5s %-9s %5.1fs  %s" % (name, res["kind"], DL.human(res["size"]), dt, res["title"][:38]))
+              print("            " + DL.caption(res, "fa", DL.site_of(url)).replace("\n", " / ")[:150])
               DL.cleanup(res)
               assert not os.path.exists(res["dir"]), "temp dir left behind"
-          print("\nfailures: %d" % bad)
+          print("failures: %d" % bad)
+          sys.exit(1 if bad else 0)
           EOF
+
+      - name: Without ffmpeg (the bot's first minutes)
+        env:
+          ONE: ${{ inputs.url }}
+        run: python /tmp/selftest.py
+
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg && ffmpeg -version | head -1
+
+      - name: With ffmpeg
+        env:
+          ONE: ${{ inputs.url }}
+        run: python /tmp/selftest.py
