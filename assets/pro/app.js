@@ -193,7 +193,7 @@
       if (c && c.tp && typeof c.tp === 'object') n.tp = tpSane(c.tp);
       if (c && Array.isArray(c.inds)) n.inds = c.inds.filter(function (x) { return x && (I.DEF[x.id] || LAYERS[x.id]); }).map(function (x) { return { id: x.id, p: I.DEF[x.id] ? I.params(x.id, x.p) : {}, u: typeof x.u === 'string' ? x.u.slice(0, 16) : P.uid(), off: !!x.off }; });
       if (typeof c.ex === 'string' && ['coinbase', 'bybit', 'okx', 'kraken'].indexOf(c.ex) >= 0) n.ex = c.ex;
-      if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: c.scale.auto === 0 ? 0 : 1, inv: c.scale.inv ? 1 : 0 };
+      if (c && c.scale) n.scale = { mode: [0, 1, 2].indexOf(c.scale.mode) >= 0 ? c.scale.mode : 0, auto: 1, inv: c.scale.inv ? 1 : 0 };  /* a manual price range is never stored, so a restored auto:0 would pin the series to the pane edge and the chart would look empty */
       return n;
     });
     o.active = Math.max(0, Math.min(o.charts.length - 1, s.active | 0));
@@ -610,6 +610,19 @@
     var n = this.disp.length; if (!n) return;
     var w = this.box.clientWidth || 600, show = Math.max(40, Math.min(n, Math.round(w / 7)));
     this.chart.timeScale().setVisibleLogicalRange({ from: n - show, to: n + 6 });
+    this.guardScale();
+  };
+  /* last resort: if the price scale puts the newest candle on the very edge of the pane, nothing is visible -- go back to auto */
+  Cell.prototype.guardScale = function () {
+    var self = this;
+    requestAnimationFrame(function () {
+      try {
+        var d = self.disp, b = d && d[d.length - 1];
+        if (!b || !self.main || !self.cfg.scale || self.cfg.scale.auto) return;
+        var h = self.box.clientHeight || 0, v = b.c != null ? b.c : b.v, y = self.main.priceToCoordinate(v);
+        if (h && (y === null || y === undefined || y <= 1 || y >= h - 1)) { self.cfg.scale.auto = 1; self.applyPrec(); paintTop(); save(); }
+      } catch (e) { }
+    });
   };
   Cell.prototype.xform = function () { return !!XFORM[this.cfg.type]; };
   Cell.prototype.boxSize = function (bars) {
