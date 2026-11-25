@@ -29,9 +29,15 @@ jobs:
           ONE: ${{ inputs.url }}
         run: |
           python - <<'EOF'
-          import os, sys, time
+          import logging, os, sys, time
+          logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s %(message)s")
           sys.path.insert(0, "scripts")
           import bot_dl as DL
+
+          raw = DL._run(["-J", "https://x.com/SpaceX/status/1732824684683784516"], timeout=90)
+          print("RAW rc=%s  out=%dB" % (raw.returncode, len(raw.stdout or "")))
+          print("RAW stderr: " + (raw.stderr or "")[-400:])
+          print("which yt-dlp: %s" % __import__("shutil").which("yt-dlp"))
 
           CASES = [("X video",     "https://x.com/SpaceX/status/1732824684683784516", False),
                    ("TikTok",      "https://www.tiktok.com/@tiktok/video/7106594312292453675", False),
