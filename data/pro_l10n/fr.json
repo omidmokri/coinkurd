@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Modèles, téléchargement et transfert :</b> ensembles d'indicateurs prêts à l'emploi et vos propres modèles ; CSV des barres avec valeurs des indicateurs ; export et import ; lien de partage pour une mise en page. Un lien et un code QR ouvrent le même espace de travail sur votre téléphone ou un autre appareil, et les onglets de ce navigateur restent synchronisés."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Les barres et les prix proviennent des données de marché publiques de Binance (une connexion en direct pour toute la page) ; si Binance est inaccessible, OKX est utilisé, et enfin le propre instantané du site — le point coloré à côté de chaque graphique indique la source. Pour tout graphique, vous pouvez choisir Coinbase, Bybit, OKX ou Kraken au lieu de Binance, lus directement depuis le point de terminaison public de cet échange dans votre navigateur ; si un échange ne répond pas sur votre connexion, la page l'indique immédiatement. Les paires de devises mondiales (EUR/USD, USD/JPY et autres) proviennent des taux de référence quotidiens du site — la Banque centrale européenne et le jeu de données exchange-api — une valeur par jour, et non des données de tick d'un courtier. Le calendrier économique est le flux hebdomadaire de ForexFactory ; le mouvement du Bitcoin après un événement est une co-évolution, pas une cause. Sur une connexion faible, activez « Économiseur de données » dans les paramètres. Les graphiques ajustés (dividendes et augmentations de capital) sont une fonctionnalité de la Bourse de Téhéran et ne s'appliquent pas aux cryptos. Les taux du marché iranien sont des données publiques de tgju.org ; les prix des pièces en toman sont une estimation : le prix Binance × le taux du tether en toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "D'où proviennent les données"
@@ -220,6 +224,10 @@
 "alertNote": [
 "252e1f7660",
 "Les alertes sont vérifiées dans ce navigateur tant que la page est ouverte (quel que soit l'onglet). Les alertes d'indicateur se déclenchent à la clôture d'une barre."
+],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Alerte sur ce dessin"
 ],
 "alertSet": [
 "80c4c4abee",
@@ -645,6 +653,10 @@
 "84bfe05ceb",
 "Entekhab"
 ],
+"cat_forex": [
+"fcbd829497",
+"Forex (mondial)"
+],
 "cat_fut": [
 "965db80f65",
 "Futures"
@@ -760,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Copier"
+],
+"cloned": [
+"51fbf8cb72",
+"Copié à côté"
 ],
 "close": [
 "bbfa773e5a",
@@ -1021,6 +1037,26 @@
 "fe93409ef8",
 "{n} bougies téléchargées"
 ],
+"ctxAlert": [
+"50bc7eabdd",
+"Ajouter une alerte ici"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Copier ce prix"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Ajuster chaque bougie"
+],
+"ctxHline": [
+"588d2eb492",
+"Ligne horizontale ici"
+],
+"ctxReset": [
+"242cb352c0",
+"Réinitialiser la vue"
+],
 "curNote": [
 "538ead2fdf",
 "Une crypto dans votre devise est calculée de la même manière que le toman : le prix Binance × la valeur d'un tether dans cette devise ce jour-là (taux de référence de la Banque centrale européenne, ou données open exchange-api pour les autres devises), ou × votre propre taux. Une estimation, et non les bourses de ce pays."
@@ -1197,9 +1233,29 @@
 "2422a88320",
 "À chaque fois (au maximum une fois par minute / par bougie)"
 ],
+"exAuto": [
+"1ff048b76e",
+"en direct, avec OKX par défaut"
+],
+"exDown": [
+"e8ba18613e",
+"{x} ne répond pas sur cette connexion. Le graphique reste sur l'échange actuel."
+],
+"exNote": [
+"0eb4c03240",
+"Binance diffuse en direct ; les autres sont lus depuis leur propre point de terminaison public toutes les dix secondes, avec leur propre historique."
+],
+"exTitle": [
+"5b13eac7ed",
+"Échange"
+],
 "exit": [
 "f83b6fe3ae",
 "Sortie"
+],
+"exitFull": [
+"fc61e74cd9",
+"Quitter le plein écran"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -1713,6 +1769,10 @@
 "d788a94022",
 "Connors RSI"
 ],
+"in_cvd": [
+"fbd0df870e",
+"Delta de volume cumulé (CVD)"
+],
 "in_dc": [
 "5a8e70b183",
 "Canaux de Donchian"
@@ -1761,6 +1821,10 @@
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Gaps de juste valeur (FVG)"
+],
 "in_gmma": [
 "bf822f6db4",
 "Guppy Multiple MA"
@@ -1792,6 +1856,22 @@
 "in_kdj": [
 "2945cfeb3d",
 "KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Régime macro Kurdistani"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Loi de puissance du Bitcoin Kurdistani"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Cycle de style Kurdistani"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Spirale du Bitcoin Kurdistani"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1825,6 +1905,18 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Structure de marché (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Enveloppe Nadaraya-Watson [LuxAlgo]"
+],
+"in_ob": [
+"80c4ef99a7",
+"Blocs d'ordres (Order Blocks)"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1844,6 +1936,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Filtre de range [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1873,25 +1973,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Indice de momentum stochastique"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Momentum de compression [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Support & Résistance avec cassures [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"Canal SSL [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Cycle de tendance Schaff"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastique"
 ],
+"in_tdi": [
+"2af75b9512",
+"Indice dynamique des traders"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"Profil TPO (temps au prix)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1905,6 +2033,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Delta de volume"
+],
 "in_vo": [
 "4eac06eb80",
 "Oscillateur de volume"
@@ -1917,9 +2053,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Profil de volume de session"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Profil de volume de plage visible"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"Bandes VWAP"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1932,6 +2080,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1965,6 +2121,10 @@
 "0f70916dbb",
 "Moyenne mobile Arnaud Legoux"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · Ligne de tendance ATR pilotée par MFI (RSI sans volume)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum : SMA 5 moins SMA 34 du point médian"
@@ -1976,6 +2136,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Average True Range (volatilité)"
+],
+"ind_atrts": [
+"8223831420",
+"Un stop qui suit par k·ATR et change de côté"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -2001,6 +2165,10 @@
 "a50928c16b",
 "Commodity Channel Index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · Sorties ATR suspendues au plus haut/plus bas de clôture"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Marché en tendance (faible) ou en range (élevé)"
@@ -2021,9 +2189,61 @@
 "bf330f58dd",
 "Momentum à long terme : WMA de deux taux de variation"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Marque chaque motif ci-dessous sur les barres"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Ouverture et clôture presque égales (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Englobante haussière (BE) et baissière (SE)"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Longue ombre inférieure après une chute (H) ou une hausse (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Un petit corps à l'intérieur du grand précédent (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Une barre entièrement à l'intérieur de la précédente (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Un grand corps sans ombres (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Retournement en trois barres : MS haussier, ES baissier"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap et clôture au-delà du milieu de la barre précédente (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Trois barres fortes consécutives (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Longue ombre supérieure après une hausse (SS) ou une chute (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Deux barres avec le même plus haut (TT) ou plus bas (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, streak RSI et rang centile combinés"
+],
+"ind_cvd": [
+"690d30a274",
+"Somme courante du delta de volume : qui a le contrôle"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -2045,6 +2265,10 @@
 "c499047c5b",
 "Moyenne mobile exponentielle"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · deux nuages EMA, rapide et lent"
+],
 "ind_env": [
 "e2cf023f50",
 "Moyenne mobile avec des bandes à un % fixe"
@@ -2053,17 +2277,41 @@
 "d648aafe8d",
 "Facilité de mouvement du prix par unité de volume"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Deux swings au même prix : liquidité dormante"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Convertit les prix en une distribution quasi normale"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Volume achat × vente et delta écrits sous chaque bougie ; zoomez pour lire. Par bougie, pas par niveau de prix"
 ],
 "ind_fract": [
 "9f48cce298",
 "Fractales de Williams : plus hauts et plus bas locaux"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Gaps de trois bougies ; chaque boîte se termine là où le prix le comble"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Six EMA courtes et six longues : traders contre investisseurs"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · une ligne de tendance en escalier qui ne change que sur une vraie cassure de swing"
+],
 "ind_hma": [
 "709351f832",
 "Hull Moving Average : rapide et lissée"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA colorée par sa pente"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -2076,6 +2324,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastique avec la ligne J (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (open source, MPL-2.0) · régime macro derrière les bougies, ses signaux et le tableau de bord, à partir des données FRED"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (open source) · Juste valeur du Bitcoin 8.31e-17·jours^5.48 avec bandes ±10 % et la zone d'achat ; pour BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (open source) · Phases de cycle Bitcoin à partir du MVRV, NUPL et un proxy SOPR : Ours extrême, Ours, Taureau précoce, Taureau, Surchauffe ; la ligne grise est le prix normalisé"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (open source) · Toute l'histoire du Bitcoin sur une spirale logarithmique, un tour par cycle de halving, avec sommets, creux, halvings et maintenant"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -2113,9 +2381,21 @@
 "d6640bbc39",
 "Prix actuel moins le prix d'il y a n barres"
 ],
+"ind_ms": [
+"13fc87db00",
+"Cassures du dernier swing confirmé : BOS avec la tendance, CHoCH contre elle"
+],
 "ind_news": [
 "a95010ef34",
 "Titres sur cette crypto, marqués au moment de leur publication (actualités du site du dernier jour)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · prix lissé par noyau avec une enveloppe d'erreur moyenne ; forme sans repeint"
+],
+"ind_ob": [
+"530cdc224f",
+"La dernière bougie opposée avant une cassure de structure, jusqu'à ce que le prix clôture à travers"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -2140,6 +2420,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volume ajouté proportionnellement au % de variation"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · RSI lissé avec une ligne de suivi de volatilité (cœur QQE MOD)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtre le bruit plus petit que la moyenne lissée"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -2173,25 +2461,53 @@
 "26db009730",
 "Moyenne mobile simple"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Clôture par rapport au milieu de la plage, doublement lissé"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Moyenne mobile lissée (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger dans Keltner = compression (points rouges) ; l'histogramme montre dans quel sens ça casse"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · le dernier pivot haut et bas comme niveaux"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastique du RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · moyennes mobiles des plus hauts et plus bas qui s'inversent quand la tendance tourne"
+],
 "ind_st": [
 "8d66b52001",
 "Ligne suiveuse ATR qui s'inverse avec la tendance"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD passé deux fois dans un stochastique : retournements de tendance précoces (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K et %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI avec ses bandes de volatilité, une ligne rapide et une lente"
+],
 "ind_tema": [
 "1ff881355e",
 "Triple moyenne mobile exponentielle"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Combien de bougies ont été échangées à chaque prix, par jour"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -2205,6 +2521,18 @@
 "182e4a763e",
 "Pression acheteuse sur trois périodes"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · stop suiveur ATR ; le prix qui le croise est le signal d'achat/vente"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Volume d'achat moins volume de vente de chaque bougie (données taker de Binance ; une estimation ailleurs)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · VIX synthétique pour tout marché ; les pics au-dessus des bandes marquent souvent des creux de panique"
+],
 "ind_vo": [
 "a99f6a0038",
 "Moyenne de volume rapide vs lente (%)"
@@ -2217,9 +2545,21 @@
 "6badda8c94",
 "Mouvement de tendance positif et négatif (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Un profil de volume par jour (par mois sur les barres journalières)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volume à chaque prix pour les barres à l'écran, avec POC et zone de valeur"
+],
 "ind_vwap": [
 "6d86714413",
 "Volume Weighted Average Price, réinitialisé à 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"VWAP journalier avec bandes ±1σ et ±k·σ"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -2232,6 +2572,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Moyenne mobile pondérée"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · oscillateur d'indice de canal ; les croisements au-dessus de 53/60 et en dessous de −53/−60 marquent des mouvements étendus"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · moyenne mobile des moindres carrés sans décalage"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -2357,6 +2705,14 @@
 "891ebccd5b",
 "Verrouiller"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Verrouiller tous les dessins"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Tous les dessins sont verrouillés"
+],
 "long": [
 "11eda67f9b",
 "Achat (Long)"
@@ -2377,13 +2733,41 @@
 "5f703c7eba",
 "Signaux Kurdistani"
 ],
+"mMode": [
+"659eba1219",
+"Répéter"
+],
+"mMsg": [
+"2c924e3088",
+"Note"
+],
+"mTf": [
+"85decb73d1",
+"Unité de temps"
+],
 "maType": [
 "15f86c051e",
 "Moyenne"
 ],
+"macroNote": [
+"c4a94f666d",
+"estimation basée sur des règles, pas un conseil"
+],
 "magnet": [
 "effa915951",
 "Aimant (accrocher à l'ouverture/plus haut/plus bas/clôture)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Aimant désactivé"
+],
+"magnetS": [
+"607a7625b1",
+"Aimant fort"
+],
+"magnetW": [
+"181021d95b",
+"Aimant faible"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -2405,9 +2789,45 @@
 "fdbe20f376",
 "Toutes les unités de temps"
 ],
+"moreTools": [
+"c871f1056a",
+"Plus d'outils"
+],
 "moveToSection": [
 "98d183e7cb",
 "Déplacer vers la section"
+],
+"mt_mine": [
+"1cf761ac34",
+"Mes scripts"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Options"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Motifs"
+],
+"mt_prof": [
+"0c2a930099",
+"Profils"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Structure"
+],
+"mt_strat": [
+"876f3e0202",
+"Stratégies"
+],
+"multiAl": [
+"5bafcd2412",
+"Alerte multi-conditions"
+],
+"multiNote": [
+"c7e278bae8",
+"Écrivez les conditions sur une ligne et joignez-les avec and / or. L'alerte se déclenche sur la bougie où la ligne devient vraie."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -2456,6 +2876,10 @@
 "nc_technical": [
 "41fc086088",
 "Technique"
+],
+"neckline": [
+"993062b2d6",
+"Ligne de cou"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2565,6 +2989,10 @@
 "77f8046dcf",
 "(haut, aucune section)"
 ],
+"noVol": [
+"0960b9b69d",
+"pas de volume pour ce symbole"
+],
 "notif": [
 "270d190970",
 "Notification du navigateur"
@@ -2617,21 +3045,57 @@
 "c0da22faab",
 "Ouvrir sur le graphique"
 ],
+"openTv": [
+"94d7227248",
+"Ouvrir sur TradingView"
+],
+"optChain": [
+"234f0372e8",
+"Chaîne d'options {c}"
+],
+"optDays": [
+"c2fd31e918",
+"Jours avant expiration"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} combinaisons testées en {s} s, dont {p} rentables ; triées par {r}. Cliquez sur une ligne pour afficher son rapport complet."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit n'a pas répondu depuis cette connexion. Changez la connexion ou le VPN et réessayez."
+],
+"optIV": [
+"c1bc12118c",
+"Volatilité implicite ATM"
+],
 "optMax": [
 "7b9c1b1490",
 "Trop de combinaisons — au maximum {n}. Utilisez un pas plus grand."
+],
+"optMove": [
+"8aa36fe05d",
+"Mouvement attendu"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} combinaisons (au maximum {m} pour cet historique)"
 ],
 "optNote": [
-"4b4713d390",
-"Le meilleur résultat sur des données passées relève souvent de la chance (surajustement). Préférez les paramètres dont les voisins obtiennent également de bons résultats, et vérifiez-les sur une autre période ou un autre marché."
+"96723a0ac4",
+"Chaîne d'options BTC et ETH à partir des données publiques de Deribit, lues par votre navigateur."
+],
+"optNote2": [
+"26dfa389e8",
+"OI et volume en contrats (pièces) ; $ est le prix de marque en dollars. Max pain : le prix de règlement qui paie le moins les détenteurs d'options. Mouvement attendu = prix × IV × √(jours/365). Pas un conseil."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2640,6 +3104,10 @@
 "optRun": [
 "9a456cc451",
 "Trouver les meilleurs paramètres"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Sous-jacent"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2701,13 +3169,37 @@
 "0777981263",
 "Les prix en {c} utilisent désormais votre taux."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitude"
+],
 "p_atr": [
 "0d1283ae88",
 "Longueur ATR"
 ],
+"p_band": [
+"3541c5f4e1",
+"Longueur de bande"
+],
 "p_base": [
 "077fe9c54e",
 "Base"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Longueur de bande"
+],
+"p_bw": [
+"1d06cbba91",
+"Largeur de bande"
+],
+"p_chdev": [
+"65acb623a8",
+"Déviation du canal"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplicateur"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2741,6 +3233,10 @@
 "8db6a2f1d3",
 "Rapide"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Rapide 2"
+],
 "p_hi": [
 "70a2565504",
 "Niveau supérieur"
@@ -2761,6 +3257,14 @@
 "a0623fa9a3",
 "Lissage %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"Multiplicateur KC"
+],
+"p_key": [
+"ab76f1670b",
+"Valeur clé"
+],
 "p_l1": [
 "ba51565baf",
 "Longueur MA 1"
@@ -2776,6 +3280,14 @@
 "p_l4": [
 "a5c110eb00",
 "Longueur MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Look-back centile"
+],
+"p_left": [
+"3b219a058a",
+"Barres à gauche"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2817,6 +3329,14 @@
 "a44d6c906d",
 "Barres de chaque côté"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Longueur du canal"
+],
+"p_n2": [
+"2df99da939",
+"Longueur de la moyenne"
+],
 "p_offset": [
 "ce66771654",
 "Décalage"
@@ -2825,13 +3345,41 @@
 "ac556cf593",
 "Pourcentage"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Période d'échantillonnage"
+],
+"p_ph": [
+"b1f698cc3d",
+"Centile haut"
+],
+"p_qqe": [
+"f1fb561b11",
+"Facteur QQE"
+],
 "p_rank": [
 "1df2ca7462",
 "Longueur du rang centile"
 ],
+"p_right": [
+"307c9815b6",
+"Barres à droite"
+],
+"p_rows": [
+"52d0b35277",
+"Lignes"
+],
 "p_rsi": [
 "560e6b61c6",
 "Longueur RSI"
+],
+"p_sf": [
+"590f20262b",
+"Lissage RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2848,6 +3396,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Lent"
+],
+"p_slow2": [
+"c252d2ccab",
+"Lent 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2893,6 +3445,54 @@
 "07300ad49f",
 "{c} pour 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Ajouter"
+],
+"pfAvg": [
+"def9f57b0c",
+"Prix d'achat moyen"
+],
+"pfCost": [
+"64ae43e8fe",
+"Coût"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Rien ici pour le moment. Ajoutez une crypto, la quantité détenue et le prix d'achat."
+],
+"pfName": [
+"a5a98fb17f",
+"Portefeuille {n}"
+],
+"pfNote": [
+"f46050561e",
+"Stocké uniquement dans ce navigateur. Aucune clé d'échange n'est demandée et aucune donnée n'est envoyée. Les prix sont basés sur les paires USDT de Binance."
+],
+"pfNow": [
+"039df35064",
+"Prix actuel"
+],
+"pfPnl": [
+"8ae3945397",
+"Profit / perte"
+],
+"pfQty": [
+"44f6af6945",
+"Quantité"
+],
+"pfShort": [
+"036b18f02a",
+"Portefeuille"
+],
+"pfTitle": [
+"036b18f02a",
+"Portefeuille"
+],
+"pfValue": [
+"8dce170de2",
+"Valeur"
+],
 "pickStart": [
 "1e214a5fd6",
 "Cliquez sur le graphique là où le replay doit commencer"
@@ -2916,6 +3516,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Prix"
+],
+"profNote": [
+"c1da831af8",
+"Pour un profil sur une plage choisie, utilisez « Profil de volume de plage fixe » dans la barre d'outils de gauche."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3089,6 +3693,86 @@
 "56a2285c5b",
 "Enregistrement…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Ajuster automatiquement l'échelle de prix"
+],
+"scBorder": [
+"45c60c0e85",
+"Bordure de l'échelle de prix"
+],
+"scBot": [
+"77a5b77d62",
+"Espace en bas (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Deux côtés"
+],
+"scInvert": [
+"ba80abaac1",
+"Inverser l'échelle de prix"
+],
+"scInvertH": [
+"ebb1688761",
+"le haut devient le bas"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Gauche"
+],
+"scLog": [
+"65fa51781b",
+"Logarithmique"
+],
+"scMode": [
+"a5e5771ca0",
+"Échelle de prix"
+],
+"scModeH": [
+"ab58fc981e",
+"normale, logarithmique ou pourcentage"
+],
+"scNone": [
+"d4c2792a72",
+"Masqué"
+],
+"scNormal": [
+"7802670ec0",
+"Normale (arithmétique)"
+],
+"scOff": [
+"3557c35506",
+"Espace vide à droite"
+],
+"scPct": [
+"c4519ac7cc",
+"Pourcentage"
+],
+"scRight": [
+"954daa8b00",
+"Droite"
+],
+"scSec": [
+"c92a4af093",
+"Secondes sur l'échelle de temps"
+],
+"scSide": [
+"82acb7ee2b",
+"Position de l'échelle de prix"
+],
+"scSpace": [
+"2878a3a43e",
+"Espacement des bougies"
+],
+"scTop": [
+"25126a3aab",
+"Espace en haut (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Bordure de l'échelle de temps"
+],
 "sc_c": [
 "3e8248e32e",
 "Prix"
@@ -3148,6 +3832,62 @@
 "screener": [
 "7f27924c12",
 "Veille de marché"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Vérifier"
+],
+"scriptEd": [
+"989a6a8a22",
+"Éditeur de script Entekhab"
+],
+"scriptEdit": [
+"ae909c75da",
+"Modifier le script"
+],
+"scriptExamples": [
+"41a27a4710",
+"Exemples…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Ligne {n}"
+],
+"scriptName": [
+"709a23220f",
+"Nom"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nouveau script"
+],
+"scriptNote": [
+"c265d2248f",
+"Écrivez vos propres indicateurs dans un langage similaire à Pine. Ils sont enregistrés dans ce navigateur et ne s'exécutent qu'ici, sur votre graphique."
+],
+"scriptOk": [
+"eb3da0c952",
+"Aucune erreur · {n} sorties"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Référence du langage"
+],
+"scriptSave": [
+"1e291c4d98",
+"Enregistrer et ajouter au graphique"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Script enregistré"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -3253,9 +3993,25 @@
 "e97d96a8bc",
 "Top volume"
 ],
+"sg_adx": [
+"815b591f93",
+"Croisement DMI (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"Stops suiveurs ATR"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Retournement Bollinger"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3265,6 +4021,22 @@
 "c3de6d0cdd",
 "Signaux Kurdistani (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Croisement Ichimoku Tenkan/Kijun"
+],
+"sg_kdj": [
+"a9a165bc50",
+"Croisement KDJ"
+],
 "sg_macd": [
 "db0453bd2b",
 "Croisement MACD"
@@ -3273,9 +4045,21 @@
 "6677aad0c9",
 "Croisement EMA"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Retournement Nadaraya-Watson [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -3285,9 +4069,37 @@
 "446d28671b",
 "Croisement doré / de la mort (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Croisement Stochastic RSI"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"Croisement WaveTrend [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3421,6 +4233,106 @@
 "2d2cb022bc",
 "Vitesse"
 ],
+"stBadLv": [
+"683a05683a",
+"Les niveaux doivent contenir jusqu'à 24 nombres."
+],
+"stBadPt": [
+"a73083f114",
+"Un prix ou une heure n'est pas valide."
+],
+"stColor": [
+"f28563a477",
+"Couleur"
+],
+"stCoord": [
+"8ebebca019",
+"Coordonnées"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Tirets"
+],
+"stDev": [
+"e789c07831",
+"Déviation (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Pointillés"
+],
+"stExtL": [
+"ef880cf8fc",
+"Étendre à gauche"
+],
+"stExtR": [
+"fbff580b3d",
+"Étendre à droite"
+],
+"stFill": [
+"64dd60fe1a",
+"Arrière-plan"
+],
+"stLevels": [
+"ae3d013ab1",
+"Niveaux (séparés par des virgules)"
+],
+"stLine": [
+"120ee44bec",
+"Style de ligne"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Seuls les 12 premiers points peuvent être modifiés ici."
+],
+"stOpacity": [
+"f12e36bd83",
+"Opacité de l'arrière-plan"
+],
+"stReset": [
+"40aab769d0",
+"Niveaux par défaut"
+],
+"stRows": [
+"52d0b35277",
+"Lignes"
+],
+"stSize": [
+"83ca9e48c3",
+"Taille de police"
+],
+"stSolid": [
+"d00635865c",
+"Plein"
+],
+"stStyle": [
+"99a0efc6cf",
+"Style"
+],
+"stText": [
+"c3328c39b0",
+"Texte"
+],
+"stTextC": [
+"d160595fcf",
+"Couleur du texte"
+],
+"stTextL": [
+"c3328c39b0",
+"Texte"
+],
+"stUtc": [
+"c9dbd25df4",
+"Les heures sont en UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Visibilité"
+],
+"stWidth": [
+"ad48f34186",
+"Épaisseur"
+],
 "st_err": [
 "d802d232a8",
 "Aucune donnée"
@@ -3464,6 +4376,14 @@
 "stop": [
 "9e253470c8",
 "Arrêter"
+],
+"stratNote": [
+"16dc19eef4",
+"Chaque stratégie s'exécute sur l'historique de ce graphique dans le testeur : entrées et sorties sur le graphique, résultat net, taux de réussite, drawdown et un optimiseur pour ses paramètres."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Exécuter dans le testeur de stratégie"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3525,25 +4445,133 @@
 "a26d0ddaae",
 "Défilement (temps)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"Modèle ABCD"
+],
+"t_angle": [
+"30cd1e7703",
+"Angle de tendance"
+],
+"t_arc": [
+"853a983f6b",
+"Arc"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Flèche"
+],
+"t_arrowc": [
+"0f722804ec",
+"Curseur flèche"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Flèche vers le bas"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Marqueur flèche"
+],
+"t_arrowup": [
+"8023467135",
+"Flèche vers le haut"
+],
+"t_avwap": [
+"0a4f86b195",
+"VWAP ancré"
 ],
 "t_brush": [
 "25f085220c",
 "Pinceau"
 ],
+"t_callout": [
+"f1647ad880",
+"Légende"
+],
 "t_channel": [
 "c0350b7736",
 "Canal parallèle"
+],
+"t_circ": [
+"1cc7820a08",
+"Cercle"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Commentaire"
+],
+"t_cross": [
+"983bdb7b27",
+"Croix"
+],
 "t_cursor": [
 "2239943c8d",
 "Curseur"
+],
+"t_curve": [
+"916f09aff8",
+"Courbe"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Lignes cycliques"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Figure Cypher"
+],
+"t_dcurve": [
+"faef75cb57",
+"Double courbe"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Canal disjoint"
+],
+"t_dot": [
+"46856bf702",
+"Point"
+],
+"t_drange": [
+"c65ea4ae01",
+"Plage de dates"
+],
+"t_drives": [
+"3a261ca869",
+"Figure Three Drives"
+],
+"t_emoji": [
+"707fd71017",
+"Icônes et émojis"
+],
+"t_eraser": [
+"a5742851f0",
+"Gomme"
+],
+"t_ewcor": [
+"a819268f2f",
+"Vague de correction Elliott (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Vague combinée double Elliott (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Vague d'impulsion Elliott (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Vague triangle Elliott (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Vague combinée triple Elliott (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3553,13 +4581,69 @@
 "18c530863b",
 "Retracement de Fibonacci"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Arcs de Fibonacci"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Canal de Fibonacci"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Cercles de Fibonacci"
+],
 "t_fibext": [
 "73655be9d6",
 "Extension de Fibonacci basée sur la tendance"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Éventail de Fibonacci"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Spirale de Fibonacci"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Fibonacci temporel basé sur la tendance"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fuseaux horaires de Fibonacci"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Biseau de Fibonacci"
+],
+"t_flag": [
+"23d91e7740",
+"Marqueur de drapeau"
+],
+"t_flat": [
+"52d3db252e",
+"Haut/bas plat"
+],
+"t_forecast": [
+"528bc4bc38",
+"Prévision"
+],
 "t_gann": [
 "ba563cbfc5",
 "Éventail de Gann"
+],
+"t_gannbox": [
+"58a3842138",
+"Boîte de Gann"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Carré de Gann"
+],
+"t_hl": [
+"8cb3f79b49",
+"Surligneur"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3569,6 +4653,18 @@
 "0bcbc4e087",
 "Rayon horizontal"
 ],
+"t_hs": [
+"43353dbcec",
+"Épaule-tête-épaule"
+],
+"t_info": [
+"a690e33098",
+"Ligne d'info"
+],
+"t_inside": [
+"30d6b425dc",
+"Fourchette d'Andrews interne"
+],
 "t_long": [
 "666f195fc4",
 "Position acheteuse"
@@ -3577,9 +4673,45 @@
 "2bedd64d85",
 "Plage de prix / mesure"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Fourchette de Schiff modifiée"
+],
+"t_note": [
+"2c924e3088",
+"Note"
+],
+"t_path": [
+"519e39132b",
+"Chemin"
+],
 "t_pitch": [
 "29135fd404",
 "Fourchette d'Andrews"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Éventail de fourchette"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Étiquette de prix"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Note de prix"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polyligne"
+],
+"t_prange": [
+"c20f7ce09a",
+"Plage de prix"
+],
+"t_proj": [
+"8aa49fe840",
+"Projection"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3589,9 +4721,33 @@
 "c158695a64",
 "Rectangle"
 ],
+"t_regress": [
+"bb57f2c725",
+"Tendance de régression"
+],
+"t_rrect": [
+"65807afaf7",
+"Rectangle pivoté"
+],
+"t_schiff": [
+"c4c1201685",
+"Fourchette de Schiff"
+],
 "t_short": [
 "a8daf74669",
 "Position vendeuse"
+],
+"t_signpost": [
+"89f361362e",
+"Panneau"
+],
+"t_sine": [
+"3852fedc7e",
+"Ligne sinusoïdale"
+],
+"t_tcycle": [
+"521a687246",
+"Cycles temporels"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3601,9 +4757,29 @@
 "e810388344",
 "Ligne de tendance"
 ],
+"t_tri": [
+"32547b031d",
+"Figure triangle"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangle"
+],
 "t_vline": [
 "a790288017",
 "Ligne verticale"
+],
+"t_vrp": [
+"bcba420b37",
+"Profil de volume à plage fixe"
+],
+"t_xabcd": [
+"ae78e60931",
+"Figure XABCD"
+],
+"t_zoom": [
+"4fc05f2763",
+"Zoom avant"
 ],
 "target": [
 "61ad50a9b9",
@@ -3653,6 +4829,26 @@
 "ad88cbfa09",
 "Également sur Telegram (le bot surveille même lorsque cette page est fermée)"
 ],
+"thDark": [
+"ae1ef01432",
+"Sombre"
+],
+"thLight": [
+"a36ef8aba2",
+"Clair"
+],
+"thMid": [
+"4fe978738d",
+"Bleu nuit"
+],
+"thNavy": [
+"0229e960cf",
+"Marine"
+],
+"thPaper": [
+"22d507f2ba",
+"Papier"
+],
 "time": [
 "6c82e6dd86",
 "Heure"
@@ -3676,6 +4872,10 @@
 "tooFar": [
 "b29db0358a",
 "C'est plus loin dans le passé que cette unité de temps ne peut charger ; choisissez une unité de temps supérieure."
+],
+"toolHint": [
+"56e62363ce",
+"cliquez sur le graphique pour dessiner"
 ],
 "topFixed": [
 "1a66879287",
@@ -3901,6 +5101,34 @@
 "1526a17ee7",
 "Déverrouiller"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Tous les dessins sont déverrouillés"
+],
+"vDay": [
+"f6bb0f468a",
+"Jours"
+],
+"vHour": [
+"9e25a34e63",
+"Heures"
+],
+"vMin": [
+"092f99ea11",
+"Minutes"
+],
+"vMonth": [
+"200dcdce9b",
+"Mois"
+],
+"vSec": [
+"5fb1db5278",
+"Secondes"
+],
+"vWeek": [
+"7d75266a53",
+"Semaines"
+],
 "value": [
 "3e8248e32e",
 "Prix"
@@ -3908,6 +5136,10 @@
 "valuePct": [
 "bf55390d8d",
 "Pourcentage (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3952,15 +5184,23 @@
 "yourRate": [
 "ca14282aa6",
 "votre taux"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Zoom arrière"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Faites glisser une zone plus large pour zoomer."
 ]
 },
 "f": {
-"in_cvd": [
-"fbd0df870e",
+"fx2Note": [
+"15ebd3b4a9",
 1
 ],
-"in_fvg": [
-"bad3ce3dd2",
+"in_vixfix": [
+"f6152b3b33",
 1
 ]
 }

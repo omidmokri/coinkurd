@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Plantillas, descarga y transferencia:</b> conjuntos de indicadores listos y tus propias plantillas; CSV de las barras con valores de indicadores; exportación e importación; un enlace para compartir un diseño. Un enlace y un código QR abren el mismo espacio de trabajo en tu teléfono u otro dispositivo, y las pestañas de este navegador se mantienen sincronizadas."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Las barras y los precios son datos de mercado públicos de Binance (una conexión en vivo para toda la página); si no se puede acceder a Binance, se utiliza OKX y, por último, la propia instantánea del sitio; el punto de color junto a cada gráfico indica cuál. Para cualquier gráfico, puede elegir Coinbase, Bybit, OKX o Kraken en lugar de Binance, leyendo directamente desde el endpoint público de ese exchange en su navegador; si un exchange no responde en su conexión, la página lo indica de inmediato. Los pares de divisas mundiales (EUR/USD, USD/JPY y el resto) provienen de las tasas de referencia diarias del propio sitio (el Banco Central Europeo y el conjunto de datos exchange-api), un valor por día, no datos de ticks de un bróker. El calendario económico es el feed semanal de ForexFactory; el movimiento de Bitcoin después de un evento es co-movimiento, no causa. En una conexión débil, active el \"Ahorro de datos\" en la configuración. Los gráficos ajustados (dividendos y aumentos de capital) son una característica de la Bolsa de Valores de Teherán y no se aplican a las criptomonedas. Las tasas del mercado de Irán son datos públicos de tgju.org; los precios de las monedas en toman son una estimación: el precio de Binance × la tasa de tether en toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "De dónde provienen los datos"
@@ -220,6 +224,10 @@
 "alertNote": [
 "252e1f7660",
 "Las alertas se verifican en este navegador mientras la página esté abierta (cualquier pestaña). Las alertas de indicadores se disparan al cierre de una vela."
+],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Alerta en este dibujo"
 ],
 "alertSet": [
 "80c4c4abee",
@@ -645,6 +653,10 @@
 "84bfe05ceb",
 "Entekhab"
 ],
+"cat_forex": [
+"fcbd829497",
+"Forex (mundial)"
+],
 "cat_fut": [
 "965db80f65",
 "Futuros"
@@ -760,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Copiar"
+],
+"cloned": [
+"51fbf8cb72",
+"Copiado al lado"
 ],
 "close": [
 "bbfa773e5a",
@@ -1021,6 +1037,26 @@
 "fe93409ef8",
 "{n} velas descargadas"
 ],
+"ctxAlert": [
+"50bc7eabdd",
+"Añadir una alerta aquí"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Copiar este precio"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Ajustar cada vela"
+],
+"ctxHline": [
+"588d2eb492",
+"Línea horizontal aquí"
+],
+"ctxReset": [
+"242cb352c0",
+"Restablecer la vista"
+],
 "curNote": [
 "538ead2fdf",
 "Una moneda en tu divisa se calcula igual que el toman: el precio de Binance × lo que vale un tether en esa divisa ese día (tasa de referencia del Banco Central Europeo, o datos abiertos de exchange-api para otras divisas), o × tu propia tasa. Es una estimación, no de los exchanges de ese país."
@@ -1197,9 +1233,29 @@
 "2422a88320",
 "Cada vez (como máximo una vez por minuto / una vez por vela)"
 ],
+"exAuto": [
+"1ff048b76e",
+"en vivo, con OKX como alternativa"
+],
+"exDown": [
+"e8ba18613e",
+"{x} no responde en esta conexión. El gráfico permanece en el exchange en el que se encuentra."
+],
+"exNote": [
+"0eb4c03240",
+"Binance transmite en vivo; los otros se leen de su propio endpoint público cada diez segundos, con su propio historial."
+],
+"exTitle": [
+"5b13eac7ed",
+"Exchange"
+],
 "exit": [
 "f83b6fe3ae",
 "Salir"
+],
+"exitFull": [
+"fc61e74cd9",
+"Salir de pantalla completa"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -1332,6 +1388,10 @@
 "futSub": [
 "16db4a6d5c",
 "Futuros trimestrales, continuos"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Una moneda frente a otra, a partir de las tasas de referencia diarias del propio sitio (Banco Central Europeo y el conjunto de datos exchange-api donde el ECB no cotiza una moneda). Un valor al día, por lo que una barra diaria es un solo punto y las barras semanales y mensuales se construyen a partir de los días que contienen. Tasas de referencia publicadas una vez al día, no datos de ticks de un bróker: no hay forex intradía aquí. Los pares en dólares comienzan el 2 de marzo de 2024, los pares entre dos monedas del ECB en 2017."
 ],
 "g_arrows": [
 "0cf604cb00",
@@ -4777,6 +4837,10 @@
 "4fe978738d",
 "Azul medianoche"
 ],
+"thNavy": [
+"0229e960cf",
+"Azul marino"
+],
 "thPaper": [
 "22d507f2ba",
 "Papel"
@@ -5129,11 +5193,11 @@
 "f": {
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "slTp": [
 "41d1998bce",

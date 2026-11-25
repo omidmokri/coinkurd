@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Vorlagen, Download und Übertragung:</b> Verteilte Indikatorensets und eigene Vorlagen; CSV der Kerzen mit Indikatorwerten; Export und Import; ein Teiler-Link für ein Layout. Ein Link und QR-Code öffnen denselben Arbeitsbereich auf Ihrem Smartphone oder einem anderen Gerät, und Tabs dieses Browsers bleiben synchron."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Balken und Preise stammen aus den öffentlichen Marktdaten von Binance (eine Live-Verbindung für die gesamte Seite); falls Binance nicht erreichbar ist, werden OKX und zuletzt der eigene Snapshot der Seite verwendet – der farbige Punkt neben jedem Chart zeigt an, welcher. Für jeden Chart können Sie anstelle von Binance auch Coinbase, Bybit, OKX oder Kraken wählen, die direkt über den öffentlichen Endpunkt der jeweiligen Börse in Ihrem Browser abgerufen werden; falls eine Börse über Ihre Verbindung nicht antwortet, zeigt die Seite dies sofort an. Weltweite Forex-Paare (EUR/USD, USD/JPY und andere) stammen aus den täglichen Referenzkursen der Seite – dem Datensatz der Europäischen Zentralbank und der exchange-api – ein Wert pro Tag, keine Tick-Daten eines Brokers. Der Wirtschaftskalender ist der wöchentliche Feed von ForexFactory; die Kursbewegung von Bitcoin nach einem Ereignis ist eine Mitbewegung, keine Ursache. Aktivieren Sie bei einer schwachen Verbindung den „Datensparmodus“ in den Einstellungen. Bereinigte Charts (Dividenden und Kapitalerhöhungen) sind eine Funktion der Tehran Stock Exchange und gelten nicht für Krypto. Die Marktpreise für den Iran stammen aus den öffentlichen Daten von tgju.org; Münzpreise in Toman sind eine Schätzung: der Binance-Preis × der Tether-Kurs in Toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Woher die Daten stammen"
@@ -220,6 +224,10 @@
 "alertNote": [
 "252e1f7660",
 "Alarme werden in diesem Browser überprüft, während die Seite geöffnet ist (jeder Tab). Indikatoralarme werden beim Schließen einer Kerze ausgelöst."
+],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Alarm für diese Zeichnung"
 ],
 "alertSet": [
 "80c4c4abee",
@@ -645,6 +653,10 @@
 "84bfe05ceb",
 "Entekhab"
 ],
+"cat_forex": [
+"fcbd829497",
+"Forex (Welt)"
+],
 "cat_fut": [
 "965db80f65",
 "Futures"
@@ -760,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Kopieren"
+],
+"cloned": [
+"51fbf8cb72",
+"Daneben kopiert"
 ],
 "close": [
 "bbfa773e5a",
@@ -1021,6 +1037,26 @@
 "fe93409ef8",
 "{n} Kerzen heruntergeladen"
 ],
+"ctxAlert": [
+"50bc7eabdd",
+"Hier einen Alarm hinzufügen"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Diesen Preis kopieren"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Alle Kerzen einpassen"
+],
+"ctxHline": [
+"588d2eb492",
+"Horizontale Linie hier"
+],
+"ctxReset": [
+"242cb352c0",
+"Ansicht zurücksetzen"
+],
 "curNote": [
 "538ead2fdf",
 "Eine Münze in Ihrer Landeswährung wird wie der Toman berechnet: Binance-Preis × Wert eines Tethers in dieser Währung an diesem Tag (Referenzkurs der Europäischen Zentralbank oder offene exchange-api-Daten für andere Währungen) oder × Ihr eigener Kurs. Ein Schätzwert, keine Börsen dieses Landes."
@@ -1197,9 +1233,29 @@
 "2422a88320",
 "Jedes Mal (höchstens einmal pro Minute / einmal pro Kerze)"
 ],
+"exAuto": [
+"1ff048b76e",
+"live, mit OKX als Fallback"
+],
+"exDown": [
+"e8ba18613e",
+"{x} antwortet nicht auf dieser Verbindung. Der Chart bleibt auf der aktuellen Börse."
+],
+"exNote": [
+"0eb4c03240",
+"Binance streamt live; die anderen werden alle zehn Sekunden von ihrem eigenen öffentlichen Endpunkt mit ihrer eigenen Historie gelesen."
+],
+"exTitle": [
+"5b13eac7ed",
+"Börse"
+],
 "exit": [
 "f83b6fe3ae",
 "Ausstieg"
+],
+"exitFull": [
+"fc61e74cd9",
+"Vollbild beenden"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -1332,6 +1388,10 @@
 "futSub": [
 "16db4a6d5c",
 "Quartals-Futures, kontinuierlich"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Eine Währung gegen eine andere, basierend auf den täglichen Referenzkursen der Website (Europäische Zentralbank und der exchange-api Datensatz, wo die ECB keine Währung notiert). Ein Wert pro Tag, daher ist ein Tagesbalken ein einzelner Punkt und die Wochen- und Monatsbalken werden aus den darin enthaltenen Tagen gebildet. Referenzkurse werden einmal täglich veröffentlicht, keine Tick-Daten eines Brokers: Es gibt hier kein Intraday-Forex. Dollar-Paare beginnen am 2. März 2024, Paare zwischen zwei ECB-Währungen im Jahr 2017."
 ],
 "g_arrows": [
 "0cf604cb00",
@@ -4769,6 +4829,10 @@
 "4fe978738d",
 "Mitternachtsblau"
 ],
+"thNavy": [
+"0229e960cf",
+"Marineblau"
+],
 "thPaper": [
 "22d507f2ba",
 "Papier"
@@ -5121,23 +5185,23 @@
 "f": {
 "in_cvd": [
 "fbd0df870e",
-1
+2
 ],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_srlux": [
 "50cfe9a1d5",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ]
 }
 }

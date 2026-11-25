@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Şablonlar, indirme ve aktarım:</b> hazır indikatör setleri ve kendi şablonlarınız; indikatör değerleriyle çubukların CSV'si; dışa ve içe aktarma; bir yerleşim için paylaşım bağlantısı. Bir bağlantı ve QR kodu aynı çalışma alanını telefonunuzda veya başka bir cihazda açar ve bu tarayıcının sekmeleri senkronize kalır."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Çubuklar ve fiyatlar Binance halka açık piyasa verileridir (tüm sayfa için tek bir canlı bağlantı); Binance'e ulaşılamazsa OKX ve son olarak sitenin kendi anlık görüntüsü kullanılır — her grafiğin yanındaki renkli nokta hangisinin kullanıldığını belirtir. Herhangi bir grafik için Binance yerine Coinbase, Bybit, OKX veya Kraken seçebilir, doğrudan tarayıcınız üzerinden ilgili borsanın kendi halka açık uç noktasından okuma yapabilirsiniz; bir borsa bağlantınıza yanıt vermezse sayfa bunu anında bildirir. Dünya forex pariteleri (EUR/USD, USD/JPY ve diğerleri) sitenin kendi günlük referans kurlarından — Avrupa Merkez Bankası ve exchange-api veri setinden — gelir; bir aracı kurumun anlık verisi değil, günlük tek bir değerdir. Ekonomik takvim, ForexFactory'nin haftalık akışıdır; Bitcoin'in bir olaydan sonraki hareketi eş yönlü harekettir, neden-sonuç ilişkisi değildir. Zayıf bir bağlantıda, ayarlardan “Veri tasarrufu” modunu açın. Düzeltilmiş grafikler (temettü ve sermaye artırımları) Tahran Borsası'na özgü bir özelliktir ve kripto için geçerli değildir. İran piyasa kurları tgju.org halka açık verileridir; toman cinsinden coin fiyatları bir tahmindir: Binance fiyatı × toman cinsinden tether kuru."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Verilerin kaynağı"
@@ -220,6 +224,10 @@
 "alertNote": [
 "252e1f7660",
 "Alarmlar sayfa açıkken (herhangi bir sekmede) bu tarayıcıda kontrol edilir. İndikatör alarmları bar kapandığında tetiklenir."
+],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Bu çizim için alarm kur"
 ],
 "alertSet": [
 "80c4c4abee",
@@ -645,6 +653,10 @@
 "84bfe05ceb",
 "Entekhab"
 ],
+"cat_forex": [
+"fcbd829497",
+"Forex (dünya)"
+],
 "cat_fut": [
 "965db80f65",
 "Vadeli İşlemler"
@@ -760,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Kopyala"
+],
+"cloned": [
+"51fbf8cb72",
+"Yanına kopyalandı"
 ],
 "close": [
 "bbfa773e5a",
@@ -1021,6 +1037,26 @@
 "fe93409ef8",
 "{n} mum indirildi"
 ],
+"ctxAlert": [
+"50bc7eabdd",
+"Buraya alarm ekle"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Bu fiyatı kopyala"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Tüm mumları sığdır"
+],
+"ctxHline": [
+"588d2eb492",
+"Buraya yatay çizgi ekle"
+],
+"ctxReset": [
+"242cb352c0",
+"Görünümü sıfırla"
+],
 "curNote": [
 "538ead2fdf",
 "Para biriminizdeki bir coin, toman ile aynı şekilde hesaplanır: Binance fiyatı × o gün o para birimindeki bir tether'in değeri (Avrupa Merkez Bankası ECB referans kuru veya diğer para birimleri için açık exchange-api verileri) veya kendi kurunuz. Bir tahmindir, o ülkenin borsaları değildir."
@@ -1197,9 +1233,29 @@
 "2422a88320",
 "Her seferinde (en fazla dakikada bir / mum başına bir kez)"
 ],
+"exAuto": [
+"1ff048b76e",
+"canlı, yedek olarak OKX ile"
+],
+"exDown": [
+"e8ba18613e",
+"{x} bu bağlantıda yanıt vermiyor. Grafik mevcut borsasında kalmaya devam eder."
+],
+"exNote": [
+"0eb4c03240",
+"Binance canlı veri akışı sağlar; diğerleri kendi geçmiş verileriyle birlikte her on saniyede bir kendi genel uç noktalarından okunur."
+],
+"exTitle": [
+"5b13eac7ed",
+"Borsa"
+],
 "exit": [
 "f83b6fe3ae",
 "Çıkış"
+],
+"exitFull": [
+"fc61e74cd9",
+"Tam ekrandan çık"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -1332,6 +1388,10 @@
 "futSub": [
 "16db4a6d5c",
 "Çeyreklik vadeli işlemler, sürekli"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Bir para biriminin diğerine karşı değeri, sitenin kendi günlük referans kurları üzerinden (Avrupa Merkez Bankası ve ECB'nin kur belirtmediği durumlarda exchange-api veri seti). Günde tek bir değer olduğundan, günlük bar tek bir noktadır; haftalık ve aylık barlar ise içindeki günlerden oluşturulur. Referans kurları günde bir kez yayınlanır, bir aracı kurumun anlık (tick) verisi değildir: burada gün içi forex verisi bulunmaz. Dolar pariteleri 2 Mart 2024'te, iki ECB para birimi arasındaki pariteler ise 2017'de başlamıştır."
 ],
 "g_arrows": [
 "0cf604cb00",
@@ -4781,6 +4841,10 @@
 "4fe978738d",
 "Gece mavisi"
 ],
+"thNavy": [
+"0229e960cf",
+"Lacivert"
+],
 "thPaper": [
 "22d507f2ba",
 "Kağıt"
@@ -5133,11 +5197,11 @@
 "f": {
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "sg_nwe": [
 "4e506ad872",
-1
+2
 ]
 }
 }
