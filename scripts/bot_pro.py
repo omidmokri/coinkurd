@@ -24,7 +24,7 @@ TXT = {
               "en": "📈 <b>Live market</b>"},
     "body": {
         "fa": ("میز تحلیل کامل سایت، با دادهٔ زندهٔ بایننس و بازار ایران:\n"
-               "• همهٔ کوین‌های بایننس، و دلار، یورو، طلا، سکه و تتر به تومان؛ بیت‌کوین و هر کوین هم به تومان\n• ۴۷ زبان و ارز هر کشور: همهٔ کوین‌ها به ارز شما (یورو، لیر، روپیه…) یا با نرخ خودتان برای یک تتر یا یک دلار\n"
+               "• همهٔ کوین‌های بایننس، و دلار، یورو، طلا، سکه و تتر به تومان؛ بیت‌کوین و هر کوین هم به تومان\n• قیمت و تاریخچه از پنج صرافی: بایننس، کوین‌بیس، بای‌بیت، اوکی‌ایکس و کراکن — انتخابی برای هر چارت\n• فارکس جهانی (EUR/USD، USD/JPY و ۳۰ جفت‌ارز) و انس طلا و نقره به دلار\n• ۴۷ زبان و ارز هر کشور: همهٔ کوین‌ها به ارز شما (یورو، لیر، روپیه…) یا با نرخ خودتان برای یک تتر یا یک دلار\n"
                "• تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم و اندیکاتورها\n• تایم‌فریم ثانیه‌ای و هر تایم‌فریم دلخواه\n"
                "• ۱۷ نوع نمودار، از جمله رنکو، کاگی، نقطه و رقم و شکست خط\n• ۷۰ اندیکاتور، فیبوناچی، گن و پوزیشن لانگ/شورت\n"
                "• بازپخش کندل‌ها روی چند چارت با حساب تمرینی: سفارش لیمیت و استاپ، حد ضرر و سود، اهرم و کارمزد\n"
@@ -34,7 +34,7 @@ TXT = {
                "• دیده‌بان بازار: همهٔ کوین‌ها یا بازار ایران، با مرتب‌سازی بر اساس حجم، تغییر و RSI\n"
                "• تقویم اقتصادی و اخبار روی چارت، با هشدار پیش از انتشار خبر\n• لینک و کد QR برای باز کردن همان فضای کار در دستگاه دیگر"),
         "ckb": ("مێزی تەواوی شیکاریی ماڵپەڕ، بە داتای زیندووی بایننس و بازاڕی ئێران:\n"
-                "• هەموو کۆینەکانی بایننس، و دۆلار، یۆرۆ، زێڕ، سکە و تەتەر بە تمەن؛ بیتکۆین و هەر کۆینێک بە تمەنیش\n• ٤٧ زمان و دراوی هەر وڵاتێک: هەموو کۆینەکان بە دراوی تۆ (یۆرۆ، لیرە، ڕووپیە…) یان بە نرخی خۆت بۆ یەک تەتەر یان یەک دۆلار\n"
+                "• هەموو کۆینەکانی بایننس، و دۆلار، یۆرۆ، زێڕ، سکە و تەتەر بە تمەن؛ بیتکۆین و هەر کۆینێک بە تمەنیش\n• نرخ و ڕابردوو لە پێنج ئاڵوگۆڕخانە: بایننس، کۆینبەیس، بایبیت، ئۆکەیئێکس و کراکن — هەڵبژاردە بۆ هەر چارتێک\n• فۆرێکسی جیهانی (EUR/USD، USD/JPY و ٣٠ جووت دراو) و ئۆنسی زێڕ و زیو بە دۆلار\n• ٤٧ زمان و دراوی هەر وڵاتێک: هەموو کۆینەکان بە دراوی تۆ (یۆرۆ، لیرە، ڕووپیە…) یان بە نرخی خۆت بۆ یەک تەتەر یان یەک دۆلار\n"
                 "• تا ١٦ چارت پێکەوە بە هاوکاتکردنی هێما، تایمفرەیم و ئیندیکاتۆرەکان\n• تایمفرەیمی چرکەیی و هەر تایمفرەیمێکی دڵخواز\n"
                 "• ١٧ جۆری چارت، لەوانە ڕێنکۆ، کاگی، خاڵ و ژمارە و شکانی هێڵ\n• ٧٠ ئیندیکاتۆر، فیبۆناچی، گان و پۆزیشنی لۆنگ/شۆرت\n"
                 "• دووبارە پەخشی مۆمەکان لەسەر چەند چارت بە هەژماری ڕاهێنان: ئۆردەری لیمیت و ستۆپ، سنووری زیان و قازانج، لیڤەرێج و کرێ\n"
@@ -44,7 +44,7 @@ TXT = {
                 "• چاودێری بازاڕ: هەموو کۆینەکان یان بازاڕی ئێران، ڕیزکراو بەپێی قەبارە، گۆڕان و RSI\n"
                 "• ڕۆژژمێری ئابووری و هەواڵ لەسەر چارت، بە ئاگادارکردنەوە پێش بڵاوبوونەوەی هەواڵ\n• بەستەر و کۆدی QR بۆ کردنەوەی هەمان شوێنی کار لە ئامێرێکی تر"),
         "kmr": ("Maseya analîzê ya temam a malperê, bi daneyên zindî yên Binance û bazara Îranê:\n"
-                "• Hemû coinên Binance, û dolar, euro, zêr, zêrê Îmamî û tether bi tûmanan; Bitcoin û her coin jî bi tûmanan\n• 47 ziman û pereyê her welatî: hemû coin bi pereyê te (euro, lîre, rûpî…) an bi bihayê te ji bo yek tether an yek dolarî\n"
+                "• Hemû coinên Binance, û dolar, euro, zêr, zêrê Îmamî û tether bi tûmanan; Bitcoin û her coin jî bi tûmanan\n• Biha û dîrok ji pênc borsayan: Binance, Coinbase, Bybit, OKX û Kraken — ji bo her grafîkê bijartî\n• Forexa cîhanî (EUR/USD, USD/JPY û 30 cot pere) û ûnsa zêr û zîv bi dolaran\n• 47 ziman û pereyê her welatî: hemû coin bi pereyê te (euro, lîre, rûpî…) an bi bihayê te ji bo yek tether an yek dolarî\n"
                 "• Heta 16 grafîk bi hev re, bi hevdemkirina sembol, dem û nîşanderan\n• Demên saniyeyî û her demeke xwestî\n"
                 "• 17 cureyên grafîkê, di nav de Renko, Kagi, Point & Figure û Line Break\n• 70 nîşander, Fibonacci, Gann û pozîsyonên long/short\n"
                 "• Dubarelîstina mûman li ser çend grafîkan bi hesabeke ceribandinê: fermanên limit û stop, stop-loss û take-profit, leverage û xerc\n"
@@ -54,7 +54,7 @@ TXT = {
                 "• Şopandina bazarê: hemû coin an bazara Îranê, li gorî qebare, guhertin û RSI rêzkirî\n"
                 "• Salnameya aborî û nûçe li ser grafîkê, bi hişyariyê berî weşana nûçeyê\n• Girêdan û koda QR ji bo vekirina heman cihê karê li amûreke din"),
         "ar": ("منصة التحليل الكاملة للموقع ببيانات Binance المباشرة والسوق الإيرانية:\n"
-               "• كل عملات Binance، والدولار واليورو والذهب والمسكوكات والتيثر بالتومان؛ والبيتكوين وكل عملة بالتومان أيضًا\n• ٤٧ لغة وعملة كل بلد: كل العملات الرقمية بعملتك (اليورو، الليرة، الروبية…) أو بسعرك أنت لتيثر واحد أو دولار واحد\n"
+               "• كل عملات Binance، والدولار واليورو والذهب والمسكوكات والتيثر بالتومان؛ والبيتكوين وكل عملة بالتومان أيضًا\n• الأسعار والتاريخ من خمس منصات: Binance وCoinbase وBybit وOKX وKraken — بالاختيار لكل رسم\n• الفوركس العالمي (EUR/USD وUSD/JPY و٣٠ زوجًا) وأونصة الذهب والفضة بالدولار\n• ٤٧ لغة وعملة كل بلد: كل العملات الرقمية بعملتك (اليورو، الليرة، الروبية…) أو بسعرك أنت لتيثر واحد أو دولار واحد\n"
                "• حتى ١٦ رسمًا معًا مع مزامنة الرمز والإطار الزمني والمؤشرات\n• أطر زمنية بالثواني وأي إطار مخصّص\n"
                "• ١٧ نوعًا من الرسوم، منها رينكو وكاجي والنقطة والرقم وكسر الخط\n• ٧٠ مؤشرًا وفيبوناتشي وغان ومراكز الشراء والبيع\n"
                "• إعادة تشغيل الشموع على عدة رسوم بحساب تدريبي: أوامر محددة وإيقاف، وقف الخسارة وجني الربح، ورافعة ورسوم\n"
@@ -64,7 +64,7 @@ TXT = {
                "• مراقبة السوق: كل العملات أو سوق إيران، مرتبة حسب الحجم والتغير وRSI\n"
                "• التقويم الاقتصادي والأخبار على الرسم، مع تنبيه قبل صدور الخبر\n• رابط ورمز QR لفتح مساحة العمل نفسها على جهاز آخر"),
         "en": ("The site's full analysis desk, on live Binance and Iranian market data:\n"
-               "• Every Binance coin, plus the dollar, euro, gold, gold coins and tether in toman; Bitcoin and any coin in toman too\n• 47 languages and every country's currency: every coin in your currency (euro, lira, rupee…) or at your own rate for one tether or one dollar\n"
+               "• Every Binance coin, plus the dollar, euro, gold, gold coins and tether in toman; Bitcoin and any coin in toman too\n• Prices and history from five exchanges: Binance, Coinbase, Bybit, OKX and Kraken — chosen per chart\n• World forex (EUR/USD, USD/JPY and 30 pairs) and the gold and silver ounce in dollars\n• 47 languages and every country's currency: every coin in your currency (euro, lira, rupee…) or at your own rate for one tether or one dollar\n"
                "• Up to 16 charts at once, with symbol, timeframe and indicator sync\n• Seconds timeframes and any custom timeframe\n"
                "• 17 chart types, including Renko, Kagi, Point & Figure and Line Break\n• 70 indicators, Fibonacci, Gann, long/short positions\n"
                "• Bar replay on several charts with a practice account: limit and stop orders, stop-loss and take-profit, leverage and fees\n"
