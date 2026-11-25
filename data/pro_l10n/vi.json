@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Mẫu, tải về và chuyển tiếp:</b> các bộ indicator có sẵn và mẫu của riêng bạn; tệp CSV của các nến kèm giá trị indicator; xuất và nhập; liên kết chia sẻ bố cục. Liên kết và mã QR giúp mở cùng một workspace trên điện thoại hoặc thiết bị khác, và các tab trên trình duyệt này sẽ tự động đồng bộ."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Thanh giá và giá là dữ liệu thị trường công khai từ Binance (một kết nối trực tiếp cho toàn bộ trang); nếu không kết nối được với Binance, sẽ dùng OKX và cuối cùng là ảnh chụp nhanh của trang — dấu chấm màu cạnh mỗi biểu đồ cho biết nguồn nào. Đối với bất kỳ biểu đồ nào, bạn có thể chọn Coinbase, Bybit, OKX hoặc Kraken thay cho Binance, dữ liệu được đọc trực tiếp từ điểm cuối công khai của sàn giao dịch đó trong trình duyệt của bạn; nếu sàn giao dịch không phản hồi kết nối của bạn, trang web sẽ thông báo ngay lập tức. Các cặp ngoại hối thế giới (EUR/USD, USD/JPY và các cặp khác) lấy từ tỷ giá tham chiếu hàng ngày của trang web — bộ dữ liệu từ ECB và exchange-api — một giá trị mỗi ngày, không phải dữ liệu tick của nhà môi giới. Lịch kinh tế là nguồn cấp dữ liệu hàng tuần từ ForexFactory; biến động của Bitcoin sau một sự kiện là sự đồng biến động, không phải nguyên nhân. Khi kết nối yếu, hãy bật “Tiết kiệm dữ liệu” trong phần cài đặt. Biểu đồ đã điều chỉnh (cổ tức và tăng vốn) là tính năng của Tehran Stock Exchange và không áp dụng cho tiền điện tử. Tỷ giá thị trường Iran là dữ liệu công khai từ tgju.org; giá coin tính bằng toman là ước tính: giá Binance × tỷ giá tether tính bằng toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Nguồn dữ liệu"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Cảnh báo được kiểm tra trong trình duyệt này khi trang đang mở (bất kỳ tab nào). Cảnh báo indicator kích hoạt khi nến đóng cửa."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Cảnh báo trên bản vẽ này"
+],
 "alertSet": [
 "80c4c4abee",
 "Đã đặt cảnh báo: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Lệnh tốt nhất"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Tăng trưởng hàng năm (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Tải danh sách lệnh (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Các lệnh Long"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1.000 lệnh cho cùng các giao dịch):"
+],
+"btMCv": [
+"992209a3c0",
+"sụt giảm điển hình {a}% · 95% lệnh nằm dưới {b}% · tệ nhất {c}% · lần chạy này {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Tối ưu hóa"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Hệ số lợi nhuận (Profit factor)"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Tỷ lệ lợi nhuận (lệnh thắng TB / lệnh thua TB)"
+],
 "btRange": [
 "63a44ed01a",
 "từ / đến / bước nhảy"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Tỷ lệ Sortino (hàng năm)"
+],
+"btSplit": [
+"5bdfe209e3",
+"70% đầu so với 30% cuối của các giao dịch:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} với {aw}% thắng ({an} lệnh) → {b} với {bw}% thắng ({bn} lệnh)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Tất cả"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · mã nguồn mở"
+],
+"cat_com": [
+"90566b4c6f",
+"Yêu thích bởi cộng đồng"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (thế giới)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "Thay đổi 24g"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Các mã nguồn mở TradingView của Coin_Kurd, đang chạy ở đây trên biểu đồ của bạn."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Bảng điều khiển vĩ mô từ dữ liệu công khai: chế độ rủi ro / né rủi ro"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Các chu kỳ on-chain (MVRV, NUPL) kèm vị thế giá"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Toàn bộ lịch sử Bitcoin trên một đường xoắn ốc logarit"
+],
 "clearAll": [
 "7de68ccb43",
 "Xóa tất cả công cụ vẽ"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Xóa bản vẽ và chỉ báo"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Xóa bản vẽ"
+],
+"clearInds": [
+"8b56474294",
+"Xóa chỉ báo"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Xóa mọi chỉ báo khỏi biểu đồ này?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Sao chép"
+],
+"cloned": [
+"51fbf8cb72",
+"Đã sao chép bên cạnh"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Thời gian còn lại cho đến khi đóng cây nến này"
 ],
+"crFree": [
+"6b4b480231",
+"Theo con trỏ chuột"
+],
+"crLargeDash": [
+"a7503adc35",
+"Đứt nét dài"
+],
+"crMagnet": [
+"77fa49774c",
+"Hít vào nến"
+],
+"crOff": [
+"d4c2792a72",
+"Ẩn"
+],
+"crSparse": [
+"e50cc378a1",
+"Chấm thưa"
+],
 "create": [
 "8ac903c3c3",
 "Tạo cảnh báo"
+],
+"csBg": [
+"64dd60fe1a",
+"Hình nền"
+],
+"csBg2": [
+"9ebb790d74",
+"Màu nền thứ hai"
+],
+"csBody": [
+"718a7e8a58",
+"Thân nến"
+],
+"csBorderC": [
+"eeffa83765",
+"Màu viền"
+],
+"csBorders": [
+"685f23bc5e",
+"Viền"
+],
+"csClose": [
+"bbfa773e5a",
+"Đóng"
+],
+"csCross": [
+"b0b83f89e8",
+"Con trỏ & chuột"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Màu con trỏ"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Đường con trỏ"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Nhãn giá và thời gian trên con trỏ"
+],
+"csCrossMode": [
+"800092e3e1",
+"Con trỏ"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Độ rộng con trỏ"
+],
+"csDn": [
+"11f5ff3829",
+"Nến giảm"
+],
+"csFont": [
+"b97c4d4cdd",
+"Phông chữ"
+],
+"csFsize": [
+"83ca9e48c3",
+"Cỡ chữ"
+],
+"csGrad": [
+"c716191a01",
+"chuyển nền thành dạng chuyển màu"
+],
+"csGridA": [
+"f773586220",
+"Độ mờ lưới (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Màu lưới"
+],
+"csGridH": [
+"4eaa1c008a",
+"Đường lưới ngang"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Đường lưới dọc"
+],
+"csHollow": [
+"9165bccc85",
+"Thân rỗng"
+],
+"csHollowH": [
+"fb63aba345",
+"chỉ các nến tăng"
+],
+"csKinetic": [
+"6e771721f0",
+"Cuộn quán tính khi chạm"
+],
+"csLast": [
+"aacdc5bea4",
+"Đường giá cuối cùng"
+],
+"csLastLab": [
+"91c990bcb9",
+"Nhãn giá trên thang đo"
+],
+"csLineC": [
+"01212659ee",
+"Màu đường / vùng"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Độ dày đường"
+],
+"csLook": [
+"41def7a0fe",
+"Giao diện"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"một màu cho cả hai chiều"
+],
+"csPinch": [
+"e557a41794",
+"Chụm để thu phóng khi chạm"
+],
+"csResetQ": [
+"9c369383c1",
+"Khôi phục mọi cài đặt biểu đồ về mặc định?"
+],
+"csScale": [
+"0b414bdcb7",
+"Thang đo"
+],
+"csScroll": [
+"468c89cb3b",
+"Kéo biểu đồ bằng chuột"
+],
+"csSym": [
+"fad29404d2",
+"Nến"
+],
+"csText": [
+"d160595fcf",
+"Màu chữ"
+],
+"csTheme": [
+"a797e30923",
+"Chủ đề"
+],
+"csTitle": [
+"ae445d4cd9",
+"Cài đặt biểu đồ"
+],
+"csUp": [
+"971a95475d",
+"Nến tăng"
+],
+"csWick": [
+"fe6e2bfd48",
+"Bóng nến"
+],
+"csWickC": [
+"0fcb21d161",
+"Màu bóng nến"
+],
+"csWm": [
+"33c7b41ac6",
+"Hình nền mờ đằng sau nến"
+],
+"csWmA": [
+"69a1810ea2",
+"Độ mờ hình nền mờ (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"mã giao dịch và khung thời gian"
+],
+"csWmC": [
+"bad81c749f",
+"Màu hình nền mờ"
+],
+"csWmSize": [
+"4af7e52f80",
+"Kích thước hình nền mờ"
+],
+"csWmText": [
+"ecf870ab34",
+"Văn bản hình nền mờ"
+],
+"csZoom": [
+"c6f40d9d03",
+"Con lăn chuột"
+],
+"csZoomH": [
+"4ca34c1092",
+"thu phóng vào và ra"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "Đã tải xuống {n} nến"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Thêm cảnh báo ở đây"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Sao chép mức giá này"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Vừa vặn mọi nến"
+],
+"ctxHline": [
+"588d2eb492",
+"Đường ngang ở đây"
+],
+"ctxReset": [
+"242cb352c0",
+"Đặt lại chế độ xem"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Mỗi lần (tối đa một lần một phút / một lần mỗi nến)"
 ],
+"exAuto": [
+"1ff048b76e",
+"trực tiếp, dùng OKX làm dự phòng"
+],
+"exDown": [
+"e8ba18613e",
+"{x} không phản hồi trên kết nối này. Biểu đồ vẫn giữ nguyên trên sàn giao dịch hiện tại."
+],
+"exNote": [
+"0eb4c03240",
+"Binance phát trực tiếp; các sàn khác được đọc từ điểm cuối công khai của riêng họ sau mỗi mười giây, kèm theo lịch sử riêng."
+],
+"exTitle": [
+"5b13eac7ed",
+"Sàn giao dịch"
+],
 "exit": [
 "f83b6fe3ae",
 "Thoát"
+],
+"exitFull": [
+"fc61e74cd9",
+"Thoát toàn màn hình"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Xuất tất cả (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Dữ liệu cho chỉ báo này chưa tải được. Vui lòng thử lại sau."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Vàng"
 ],
+"fnMono": [
+"216fcddff2",
+"Đơnospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Dự báo"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Hợp đồng tương lai theo quý, liên tục"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Một loại tiền tệ so với loại khác, từ tỷ giá tham chiếu hàng ngày của trang web (Ngân hàng Trung ương Châu Âu ECB, và tập dữ liệu exchange-api khi ECB không niêm yết tiền tệ đó. Một giá trị mỗi ngày, do đó một thanh nến ngày là một điểm duy nhất và các thanh nến tuần, tháng được xây dựng từ các ngày bên trong chúng. Tỷ giá tham chiếu được công bố một lần một ngày, không phải dữ liệu tick của nhà môi giới: không có dữ liệu forex trong phiên ở đây. Các cặp đồng đô la bắt đầu từ ngày 2 tháng 3 năm 2024, các cặp giữa hai đồng tiền của ECB bắt đầu từ năm 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Mũi tên"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Cọ vẽ"
+],
+"g_channels": [
+"18e03e2a37",
+"Kênh giá"
+],
+"g_cursors": [
+"f4d2f91040",
+"Con trỏ"
+],
+"g_cycles": [
+"97f064aff5",
+"Chu kỳ"
+],
+"g_elliott": [
+"25f12f8289",
+"Sóng Elliott"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Đường"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Thước đo"
+],
+"g_pat": [
+"2c179da0f5",
+"Mô hình biểu đồ"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchfork"
+],
+"g_proj": [
+"8aa49fe840",
+"Phép chiếu"
+],
+"g_shapes": [
+"b1985e3874",
+"Hình khối"
+],
+"g_text": [
+"d7cd4cda4f",
+"Văn bản & ghi chú"
+],
+"g_vol": [
+"1b4620951d",
+"Dựa trên khối lượng"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Ẩn / hiện hình vẽ"
+],
+"hideBoth": [
+"3502a3299d",
+"Ẩn bản vẽ và chỉ báo"
+],
+"hideDraw": [
+"f4492c5211",
+"Ẩn bản vẽ"
+],
+"hideInds": [
+"764ab9d614",
+"Ẩn chỉ báo"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1264,6 +1720,34 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Tất cả mô hình nến"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Nhấn chìm (Engulfing)"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Búa / Người treo cổ (Hammer / Hanging man)"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
 ],
 "in_crsi": [
 "d788a94022",
@@ -3069,9 +3553,77 @@
 "8580e3175f",
 "Hình elip"
 ],
+"t_comment": [
+"153d7a58b3",
+"Bình luận"
+],
+"t_cross": [
+"983bdb7b27",
+"Đường chéo"
+],
 "t_cursor": [
 "2239943c8d",
 "Con trỏ"
+],
+"t_curve": [
+"916f09aff8",
+"Đường cong"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Đường chu kỳ"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Mô hình Cypher"
+],
+"t_dcurve": [
+"faef75cb57",
+"Đường cong kép"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Kênh rời"
+],
+"t_dot": [
+"46856bf702",
+"Điểm"
+],
+"t_drange": [
+"c65ea4ae01",
+"Phạm vi ngày"
+],
+"t_drives": [
+"3a261ca869",
+"Mô hình 3 nhịp"
+],
+"t_emoji": [
+"707fd71017",
+"Biểu tượng & emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Cục tẩy"
+],
+"t_ewcor": [
+"a819268f2f",
+"Sóng hiệu chỉnh Elliott (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Sóng kết hợp kép Elliott (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Sóng đẩy Elliott (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Sóng tam giác Elliott (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Sóng kết hợp ba Elliott (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3081,13 +3633,69 @@
 "18c530863b",
 "Fibonacci thoái lui"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Cung kháng cự tốc độ Fib"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Kênh Fib"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Vòng tròn Fib"
+],
 "t_fibext": [
 "73655be9d6",
 "Fibonacci mở rộng dựa trên xu hướng"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Quạt kháng cự tốc độ Fib"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Đường xoắn ốc Fib"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Thời gian Fib dựa trên xu hướng"
+],
+"t_fibtz": [
+"4263c185f4",
+"Vùng thời gian Fib"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Nêm Fib"
+],
+"t_flag": [
+"23d91e7740",
+"Đánh dấu cờ"
+],
+"t_flat": [
+"52d3db252e",
+"Đỉnh/đáy phẳng"
+],
+"t_forecast": [
+"528bc4bc38",
+"Dự báo"
+],
 "t_gann": [
 "ba563cbfc5",
 "Góc Gann"
+],
+"t_gannbox": [
+"58a3842138",
+"Hộp Gann"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Hình vuông Gann"
+],
+"t_hl": [
+"8cb3f79b49",
+"Bút đánh dấu"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3097,6 +3705,18 @@
 "0bcbc4e087",
 "Tia nằm ngang"
 ],
+"t_hs": [
+"43353dbcec",
+"Vai đầu vai"
+],
+"t_info": [
+"a690e33098",
+"Đường thông tin"
+],
+"t_inside": [
+"30d6b425dc",
+"Pitchfork bên trong"
+],
 "t_long": [
 "666f195fc4",
 "Lệnh Long"
@@ -3105,9 +3725,45 @@
 "2bedd64d85",
 "Khoảng giá / Đo lường"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Pitchfork Schiff sửa đổi"
+],
+"t_note": [
+"2c924e3088",
+"Ghi chú"
+],
+"t_path": [
+"519e39132b",
+"Đường dẫn"
+],
 "t_pitch": [
 "29135fd404",
 "Đường đinh ba Andrews"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Nhãn giá"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Ghi chú giá"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Đường gấp khúc"
+],
+"t_prange": [
+"c20f7ce09a",
+"Biên độ giá"
+],
+"t_proj": [
+"8aa49fe840",
+"Dự phóng"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3117,9 +3773,33 @@
 "c158695a64",
 "Hình chữ nhật"
 ],
+"t_regress": [
+"bb57f2c725",
+"Xu hướng hồi quy"
+],
+"t_rrect": [
+"65807afaf7",
+"Hình chữ nhật xoay"
+],
+"t_schiff": [
+"c4c1201685",
+"Pitchfork Schiff"
+],
 "t_short": [
 "a8daf74669",
 "Lệnh Short"
+],
+"t_signpost": [
+"89f361362e",
+"Biển báo"
+],
+"t_sine": [
+"3852fedc7e",
+"Đường sin"
+],
+"t_tcycle": [
+"521a687246",
+"Chu kỳ thời gian"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3129,9 +3809,29 @@
 "e810388344",
 "Đường xu hướng"
 ],
+"t_tri": [
+"32547b031d",
+"Mô hình tam giác"
+],
+"t_tri3": [
+"73d3ae245f",
+"Tam giác"
+],
 "t_vline": [
 "a790288017",
 "Đường thẳng đứng"
+],
+"t_vrp": [
+"bcba420b37",
+"Hồ sơ khối lượng theo phạm vi cố định"
+],
+"t_xabcd": [
+"ae78e60931",
+"Mô hình XABCD"
+],
+"t_zoom": [
+"4fc05f2763",
+"Phóng to"
 ],
 "target": [
 "61ad50a9b9",
@@ -3181,6 +3881,26 @@
 "ad88cbfa09",
 "Cũng trên Telegram (bot vẫn theo dõi ngay cả khi đóng trang này)"
 ],
+"thDark": [
+"ae1ef01432",
+"Tối"
+],
+"thLight": [
+"a36ef8aba2",
+"Sáng"
+],
+"thMid": [
+"4fe978738d",
+"Xanh lam đậm"
+],
+"thNavy": [
+"0229e960cf",
+"Xanh hải quân"
+],
+"thPaper": [
+"22d507f2ba",
+"Giấy"
+],
 "time": [
 "6c82e6dd86",
 "Thời gian"
@@ -3204,6 +3924,10 @@
 "tooFar": [
 "b29db0358a",
 "Thời gian quá xa so với dữ liệu timeframe này có thể tải; vui lòng chọn timeframe lớn hơn."
+],
+"toolHint": [
+"56e62363ce",
+"nhấp vào biểu đồ để vẽ"
 ],
 "topFixed": [
 "1a66879287",
@@ -3429,6 +4153,34 @@
 "1526a17ee7",
 "Mở khóa"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Tất cả các bản vẽ đã được mở khóa"
+],
+"vDay": [
+"f6bb0f468a",
+"Ngày"
+],
+"vHour": [
+"9e25a34e63",
+"Giờ"
+],
+"vMin": [
+"092f99ea11",
+"Phút"
+],
+"vMonth": [
+"200dcdce9b",
+"Tháng"
+],
+"vSec": [
+"5fb1db5278",
+"Giây"
+],
+"vWeek": [
+"7d75266a53",
+"Tuần"
+],
 "value": [
 "3e8248e32e",
 "Giá"
@@ -3436,6 +4188,10 @@
 "valuePct": [
 "bf55390d8d",
 "Phần trăm (%)"
+],
+"vol": [
+"1837d13d11",
+"KL"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3480,6 +4236,14 @@
 "yourRate": [
 "ca14282aa6",
 "tỷ lệ của bạn"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Thu nhỏ"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Kéo một vùng rộng hơn để phóng to."
 ]
 }
 }
