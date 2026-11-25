@@ -345,6 +345,14 @@
 "98464789c4",
 "En iyi işlem"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Yıllık büyüme (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "İşlemleri indir (CSV)"
@@ -397,6 +405,14 @@
 "d669a6654d",
 "Long işlemler"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (aynı işlemlerden 1.000 adet):"
+],
+"btMCv": [
+"992209a3c0",
+"tipik düşüş {a}% · emirlerin %95'i {b}% altında kalıyor · en kötü {c}% · bu çalışma {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimize et"
@@ -445,6 +461,10 @@
 "80e53e077c",
 "Profit factor"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Getiri oranı (ort. kazanç / ort. kayıp)"
+],
 "btRange": [
 "63a44ed01a",
 "başlangıç / bitiş / adım"
@@ -488,6 +508,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (yıllık)"
+],
+"btSplit": [
+"5bdfe209e3",
+"İşlemlerin ilk %70'i ile son %30'u:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{aw}% kazançlı {a} ({an} işlem) → {bw}% kazançlı {b} ({bn} işlem)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,6 +633,14 @@
 "6a72085653",
 "Tümü"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · açık kaynak"
+],
+"cat_com": [
+"90566b4c6f",
+"Topluluk favorileri"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
@@ -653,9 +689,53 @@
 "3090f6af60",
 "24s değişim"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Coin_Kurd’ün açık kaynaklı TradingView scriptleri, burada grafiğinizde çalışıyor."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Makro Rejim"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Stil Döngüsü"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spirali"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Halka açık verilerden makro gösterge paneli: risk-on / risk-off rejimi"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Fiyat konumu ile zincir üstü (on-chain) döngü aşamaları (MVRV, NUPL)"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Bitcoin'in tüm geçmişi logaritmik bir spiral üzerinde"
+],
 "clearAll": [
 "7de68ccb43",
 "Tüm çizimleri kaldır"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Çizimleri ve indikatörleri kaldır"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Çizimleri kaldır"
+],
+"clearInds": [
+"8b56474294",
+"İndikatörleri kaldır"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Bu grafikteki tüm indikatörler kaldırılsın mı?"
 ],
 "clearLog": [
 "096311b563",
@@ -713,9 +793,221 @@
 "d0d4d379f5",
 "Bu mumun kapanmasına kalan süre"
 ],
+"crFree": [
+"6b4b480231",
+"Fareyi takip eder"
+],
+"crLargeDash": [
+"a7503adc35",
+"Uzun kesikli"
+],
+"crMagnet": [
+"77fa49774c",
+"Mum çubuklarına yapışır"
+],
+"crOff": [
+"d4c2792a72",
+"Gizli"
+],
+"crSparse": [
+"e50cc378a1",
+"Seyrek noktalar"
+],
 "create": [
 "8ac903c3c3",
 "Alarm oluştur"
+],
+"csBg": [
+"64dd60fe1a",
+"Arka plan"
+],
+"csBg2": [
+"9ebb790d74",
+"İkinci arka plan rengi"
+],
+"csBody": [
+"718a7e8a58",
+"Gövde"
+],
+"csBorderC": [
+"eeffa83765",
+"Kenarlık rengi"
+],
+"csBorders": [
+"685f23bc5e",
+"Kenarlıklar"
+],
+"csClose": [
+"bbfa773e5a",
+"Kapanış"
+],
+"csCross": [
+"b0b83f89e8",
+"Artı gösterge & fare"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Artı gösterge rengi"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Artı gösterge çizgisi"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Artı gösterge üzerinde fiyat ve zaman etiketleri"
+],
+"csCrossMode": [
+"800092e3e1",
+"Artı gösterge"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Artı gösterge kalınlığı"
+],
+"csDn": [
+"11f5ff3829",
+"Düşüş mumu"
+],
+"csFont": [
+"b97c4d4cdd",
+"Yazı tipi"
+],
+"csFsize": [
+"83ca9e48c3",
+"Yazı tipi boyutu"
+],
+"csGrad": [
+"c716191a01",
+"arka planı gradyan yapar"
+],
+"csGridA": [
+"f773586220",
+"Izgara opaklığı (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Izgara rengi"
+],
+"csGridH": [
+"4eaa1c008a",
+"Yatay ızgara çizgileri"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Dikey ızgara çizgileri"
+],
+"csHollow": [
+"9165bccc85",
+"İçi boş gövdeler"
+],
+"csHollowH": [
+"fb63aba345",
+"sadece yükseliş mumları"
+],
+"csKinetic": [
+"6e771721f0",
+"Dokunmatik kinetik kaydırma"
+],
+"csLast": [
+"aacdc5bea4",
+"Son fiyat çizgisi"
+],
+"csLastLab": [
+"91c990bcb9",
+"Ölçek üzerinde fiyat etiketi"
+],
+"csLineC": [
+"01212659ee",
+"Çizgi / alan rengi"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Çizgi kalınlığı"
+],
+"csLook": [
+"41def7a0fe",
+"Görünüm"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"her iki yön için tek renk"
+],
+"csPinch": [
+"e557a41794",
+"Dokunmatik yakınlaştırma"
+],
+"csResetQ": [
+"9c369383c1",
+"Tüm grafik ayarları varsayılana döndürülsün mü?"
+],
+"csScale": [
+"0b414bdcb7",
+"Ölçekler"
+],
+"csScroll": [
+"468c89cb3b",
+"Grafiği fare ile sürükle"
+],
+"csSym": [
+"fad29404d2",
+"Mumlar"
+],
+"csText": [
+"d160595fcf",
+"Metin rengi"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Grafik ayarları"
+],
+"csUp": [
+"971a95475d",
+"Yükseliş mumu"
+],
+"csWick": [
+"fe6e2bfd48",
+"Fitiller"
+],
+"csWickC": [
+"0fcb21d161",
+"Fitil rengi"
+],
+"csWm": [
+"33c7b41ac6",
+"Mumların arkasında filigran"
+],
+"csWmA": [
+"69a1810ea2",
+"Filigran opaklığı (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"sembol ve zaman dilimi"
+],
+"csWmC": [
+"bad81c749f",
+"Filigran rengi"
+],
+"csWmSize": [
+"4af7e52f80",
+"Filigran boyutu"
+],
+"csWmText": [
+"ecf870ab34",
+"Filigran metni"
+],
+"csZoom": [
+"c6f40d9d03",
+"Fare tekerleği"
+],
+"csZoomH": [
+"4ca34c1092",
+"yakınlaştırma ve uzaklaştırma"
 ],
 "csv": [
 "518463f518",
@@ -949,6 +1241,10 @@
 "b4d35c5dfc",
 "Her şeyi dışa aktar (JSON)"
 ],
+"extFail": [
+"55919e4281",
+"Bu indikatörün verileri yüklenemedi. Birazdan tekrar deneyin."
+],
 "extend": [
 "ab07d3f288",
 "Sağa uzat"
@@ -1005,6 +1301,18 @@
 "3526f607bc",
 "Sarı"
 ],
+"fnMono": [
+"216fcddff2",
+"Eş aralıklı (Monospace)"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Tahmin"
@@ -1024,6 +1332,70 @@
 "futSub": [
 "16db4a6d5c",
 "Çeyreklik vadeli işlemler, sürekli"
+],
+"g_arrows": [
+"0cf604cb00",
+"Oklar"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Fırçalar"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanallar"
+],
+"g_cursors": [
+"f4d2f91040",
+"İmleçler"
+],
+"g_cycles": [
+"97f064aff5",
+"Döngüler"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott dalgaları"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Çizgiler"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Ölçüm aracı"
+],
+"g_pat": [
+"2c179da0f5",
+"Grafik formasyonları"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Dirgenler"
+],
+"g_proj": [
+"8aa49fe840",
+"Projeksiyon"
+],
+"g_shapes": [
+"b1985e3874",
+"Şekiller"
+],
+"g_text": [
+"d7cd4cda4f",
+"Metin & notlar"
+],
+"g_vol": [
+"1b4620951d",
+"Hacim tabanlı"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1480,18 @@
 "hideAll": [
 "1f0e916e42",
 "Çizimleri gizle / göster"
+],
+"hideBoth": [
+"3502a3299d",
+"Çizimleri ve indikatörleri gizle"
+],
+"hideDraw": [
+"f4492c5211",
+"Çizimleri gizle"
+],
+"hideInds": [
+"764ab9d614",
+"İndikatörleri gizle"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1593,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1608,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1637,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1265,9 +1661,61 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Tüm mum formasyonları"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Yutan (Engulfing)"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Çekiç / Asılı adam"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"İç bar (Inside bar)"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Sabah / Akşam yıldızı"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Delen hat / Kara bulut"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Üç beyaz asker / siyah kargalar"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Kayan yıldız / Ters çekiç"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Cımbız tepe / dip"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kümülatif Hacim Deltası (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1737,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA Bulutları [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1749,41 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Eşit Tepeler / Dipler"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Adil Değer Boşlukları (FVG)"
+],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Çoklu Hareketli Ortalama"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1796,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Makro Rejimi"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Güç Yasası"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Stil Döngüsü"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spirali"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1849,18 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Piyasa yapısı (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Nadaraya-Watson Zarfları [LuxAlgo]"
+],
+"in_ob": [
+"80c4ef99a7",
+"Emir Blokları"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1880,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Aralık Filtresi [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1917,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stokastik Momentum Endeksi"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Sıkışma Momentumu [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Kırılımlı Destek & Direnç [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Kanalı [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Döngüsü"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profili (fiyattaki zaman)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +1977,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Hacim Deltası"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +1997,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Oturum Hacim Profili"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Görünür Aralık Hacim Profili"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP bantları"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2024,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1493,6 +2065,10 @@
 "0f70916dbb",
 "Arnaud Legoux hareketli ortalaması"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · MFI tarafından yönlendirilen ATR trend çizgisi (hacimsiz RSI)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: Orta noktanın SMA 5 eksi SMA 34'ü"
@@ -1504,6 +2080,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Ortalama gerçek aralık (oynaklık)"
+],
+"ind_atrts": [
+"8223831420",
+"k·ATR ile takip eden ve yön değiştiren bir stop"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1529,6 +2109,10 @@
 "a50928c16b",
 "Emtia kanal endeksi"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · en yüksek/en düşük kapanıştan sarkan ATR çıkışları"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trend olan (düşük) veya yatay (yüksek) piyasa"
@@ -1549,9 +2133,61 @@
 "bf330f58dd",
 "Uzun vadeli momentum: İki değişim oranının WMA'sı"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Aşağıdaki her formasyonu barlar üzerinde işaretler"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Açılış ve kapanış neredeyse eşit (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Yutan boğa (BE) ve yutan ayı (SE)"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Düşüşten sonra uzun alt gölge (H) veya yükselişten sonra (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Önceki büyük gövdenin içinde küçük bir gövde (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Tamamen önceki barın içinde kalan bar (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Gölgesiz büyük bir gövde (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Üç barlı dönüş: MS boğa, ES ayı"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Boşluk ve önceki barın ortasının ötesinde kapanış (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Arka arkaya üç güçlü bar (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Yükselişten sonra uzun üst gölge (SS) veya düşüşten sonra (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Aynı tepeye (TT) veya dibe (TB) sahip iki bar"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, seri RSI ve yüzde sıralamasının birleşimi"
+],
+"ind_cvd": [
+"690d30a274",
+"Hacim deltasının toplamı: kimin kontrolü elinde tuttuğu"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1573,6 +2209,10 @@
 "c499047c5b",
 "Üstel hareketli ortalama"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · hızlı ve yavaş iki EMA bulutu"
+],
 "ind_env": [
 "e2cf023f50",
 "Sabit bir % mesafedeki bantlara sahip hareketli ortalama"
@@ -1581,17 +2221,41 @@
 "d648aafe8d",
 "Fiyatın hacim birimi başına ne kadar kolay hareket ettiği"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Neredeyse aynı fiyatta iki salınım: bekleyen likidite"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Fiyatları normale yakın bir dağılıma dönüştürür"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Her mumun altında yazılı alım × satım hacmi ve delta; okumak için yakınlaştırın. Fiyat seviyesi başına değil, mum başına"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fraktalları: Yerel tepeler ve dipler"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Üç mumluk boşluklar; her kutu fiyatın orayı doldurduğu yerde biter"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Altı kısa ve altı uzun EMA: yatırımcılara karşı traderlar"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · sadece gerçek bir salınım kırılımında yön değiştiren basamaklı bir trend çizgisi"
+],
 "ind_hma": [
 "709351f832",
 "Hull hareketli ortalama: Hızlı ve düzgün"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · eğimine göre renklendirilmiş Hull MA"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1604,6 +2268,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"J çizgili stokastik (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (açık kaynak, MPL-2.0) · FRED verilerinden gelen mumların arkasındaki makro rejimi, sinyalleri ve gösterge paneli"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (açık kaynak) · Bitcoin adil değeri 8.31e-17·gün^5.48, ±%10 bantları ve alım bölgesi ile; BTC için"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (açık kaynak) · MVRV, NUPL ve SOPR vekilinden Bitcoin döngü aşamaları: Aşırı Ayı, Ayı, Erken Boğa, Boğa, Aşırı Isınmış; gri çizgi normalize edilmiş fiyattır"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (açık kaynak) · Bitcoin'in logaritmik spiral üzerindeki tüm geçmişi, her halving döngüsünde bir tur, tepeler, dipler, halvingler ve şimdi"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1641,9 +2325,21 @@
 "d6640bbc39",
 "Şimdiki fiyat eksi n mum önceki fiyat"
 ],
+"ind_ms": [
+"13fc87db00",
+"Son onaylanmış salınımın kırılımları: trend yönünde BOS, trende karşı CHoCH"
+],
 "ind_news": [
 "a95010ef34",
 "Bu coin hakkındaki haberler, yayınlandıkları anda işaretlenir (sitenin son güne ait haberleri)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · ortalama hata zarflı çekirdek yumuşatılmış fiyat; yeniden boyama yapmayan form"
+],
+"ind_ob": [
+"530cdc224f",
+"Fiyat içinden kapanana kadar, yapı kırılımından önceki son zıt mum"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1668,6 +2364,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "% değişimle orantılı olarak eklenen hacim"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · volatilite takip çizgili yumuşatılmış RSI (QQE MOD çekirdeği)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · yumuşatılmış ortalama aralıktan daha küçük gürültüleri filtreler"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1701,25 +2405,53 @@
 "26db009730",
 "Basit hareketli ortalama"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Aralığın ortasına karşı kapanış, çift yumuşatılmış"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Düzeltilmiş hareketli ortalama (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Keltner içindeki Bollinger = sıkışma (kırmızı noktalar); histogram hangi yöne kırıldığını gösterir"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · seviye olarak son pivot tepe ve dip"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "RSI Stokastiği"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · trend döndüğünde yer değiştiren tepe ve diplerin hareketli ortalamaları"
+],
 "ind_st": [
 "8d66b52001",
 "Trendle birlikte dönen ATR takip çizgisi"
+],
+"ind_stc": [
+"29439e9c85",
+"Stokastik içinden iki kez geçirilmiş MACD: erken trend dönüşleri (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K ve %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"Volatilite bantları, hızlı ve yavaş çizgisi ile RSI"
+],
 "ind_tema": [
 "1ff881355e",
 "Üçlü üstel hareketli ortalama"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Günlük bazda her fiyatta kaç mum işlem gördüğü"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1733,6 +2465,18 @@
 "182e4a763e",
 "Üç periyot üzerindeki alım baskısı"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR takip eden stop; fiyatın onu kesmesi alım/satım sinyalidir"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Her mumun alım hacmi eksi satım hacmi (Binance'ten taker verisi; başka yerlerde tahmindir)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · herhangi bir piyasa için sentetik VIX; bantların üzerindeki ani yükselişler genellikle panik diplerini işaret eder"
+],
 "ind_vo": [
 "a99f6a0038",
 "Hızlı ve yavaş hacim ortalaması (%)"
@@ -1745,9 +2489,21 @@
 "6badda8c94",
 "Pozitif ve negatif trend hareketi (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Günlük bir hacim profili (günlük barlarda aylık)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"POC ve değer alanı ile ekrandaki barlar için her fiyattaki hacim"
+],
 "ind_vwap": [
 "6d86714413",
 "Hacim ağırlıklı ortalama fiyat, 00:00 UTC'de sıfırlanır"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"±1σ ve ±k·σ bantlı günlük VWAP"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1760,6 +2516,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Ağırlıklı hareketli ortalama"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · kanal endeksi osilatörü; 53/60'ın üzerinde ve −53/−60'ın altındaki kesişimler aşırı hareketleri işaret eder"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · sıfır gecikmeli en küçük kareler hareketli ortalaması"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1885,6 +2649,14 @@
 "891ebccd5b",
 "Kilitle"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Tüm çizimleri kilitle"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Tüm çizimler kilitlendi"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1905,13 +2677,41 @@
 "5f703c7eba",
 "Kurdistani sinyalleri"
 ],
+"mMode": [
+"659eba1219",
+"Tekrarla"
+],
+"mMsg": [
+"2c924e3088",
+"Not"
+],
+"mTf": [
+"85decb73d1",
+"Zaman dilimi"
+],
 "maType": [
 "15f86c051e",
 "Ortalama"
 ],
+"macroNote": [
+"c4a94f666d",
+"kural tabanlı tahmin, tavsiye değildir"
+],
 "magnet": [
 "effa915951",
 "Mıknatıs (açılış/yüksek/düşük/kapanışa yapış)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Mıknatıs kapalı"
+],
+"magnetS": [
+"607a7625b1",
+"Güçlü mıknatıs"
+],
+"magnetW": [
+"181021d95b",
+"Zayıf mıknatıs"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1933,9 +2733,45 @@
 "fdbe20f376",
 "Tüm timeframeler"
 ],
+"moreTools": [
+"c871f1056a",
+"Daha fazla araç"
+],
 "moveToSection": [
 "98d183e7cb",
 "Bölüme taşı"
+],
+"mt_mine": [
+"1cf761ac34",
+"Scriptlerim"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opsiyonlar"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Formasyonlar"
+],
+"mt_prof": [
+"0c2a930099",
+"Profiller"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Yapı"
+],
+"mt_strat": [
+"876f3e0202",
+"Stratejiler"
+],
+"multiAl": [
+"5bafcd2412",
+"Çok koşullu alarm"
+],
+"multiNote": [
+"c7e278bae8",
+"Koşulları tek bir satıra yazın ve ve / veya ile birleştirin. Alarm, satırın doğru olduğu mumda tetiklenir."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1984,6 +2820,10 @@
 "nc_technical": [
 "41fc086088",
 "Teknik"
+],
+"neckline": [
+"993062b2d6",
+"Boyun çizgisi"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2093,6 +2933,10 @@
 "77f8046dcf",
 "(üst, bölüm yok)"
 ],
+"noVol": [
+"0960b9b69d",
+"bu sembol için hacim yok"
+],
 "notif": [
 "270d190970",
 "Tarayıcı bildirimi"
@@ -2145,21 +2989,57 @@
 "c0da22faab",
 "Grafikte aç"
 ],
+"openTv": [
+"94d7227248",
+"TradingView üzerinde aç"
+],
+"optChain": [
+"234f0372e8",
+"{c} opsiyon zinciri"
+],
+"optDays": [
+"c2fd31e918",
+"Vadeye kalan gün"
+],
 "optDone": [
 "29cda6ac3f",
 "{s} saniyede {n} kombinasyon test edildi, bunlardan {p} tanesi kârlı; {r} göre sıralandı. Tam raporu için bir satıra tıklayın."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit bu bağlantıdan yanıt vermedi. Bağlantıyı veya VPN'i değiştirip tekrar deneyin."
+],
+"optIV": [
+"c1bc12118c",
+"ATM zımni volatilite"
+],
 "optMax": [
 "7b9c1b1490",
 "Çok fazla kombinasyon — en fazla {n}. Daha büyük bir adım kullanın."
+],
+"optMove": [
+"8aa36fe05d",
+"Beklenen hareket"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} kombinasyon (bu geçmiş için en fazla {m})"
 ],
 "optNote": [
-"4b4713d390",
-"Geçmiş verilerdeki en iyi sonuç genellikle şanstır (aşırı uyum/overfitting). Komşuları da iyi performans gösteren ayarları tercih edin ve bunları başka bir dönemde veya piyasada kontrol edin."
+"96723a0ac4",
+"Tarayıcınız tarafından okunan Deribit'in halka açık verilerinden BTC ve ETH opsiyon zinciri."
+],
+"optNote2": [
+"26dfa389e8",
+"Kontrat (coin) bazında OI ve hacim; $ dolar cinsinden işaret fiyatıdır. Max pain: opsiyon sahiplerine en az ödemeyi yapan uzlaşma fiyatı. Beklenen hareket = fiyat × IV × √(gün/365). Tavsiye değildir."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2168,6 +3048,10 @@
 "optRun": [
 "9a456cc451",
 "En iyi ayarları bul"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Dayanak varlık"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2229,13 +3113,37 @@
 "0777981263",
 "{c} cinsinden fiyatlar artık sizin kurunuzu kullanıyor."
 ],
+"p_amp": [
+"15b948e105",
+"Genlik"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR uzunluğu"
 ],
+"p_band": [
+"3541c5f4e1",
+"Bant uzunluğu"
+],
 "p_base": [
 "077fe9c54e",
 "Taban"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Bant uzunluğu"
+],
+"p_bw": [
+"1d06cbba91",
+"Bant genişliği"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanal sapması"
+],
+"p_coeff": [
+"b032583db6",
+"Çarpan"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2269,6 +3177,10 @@
 "8db6a2f1d3",
 "Hızlı"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Hızlı 2"
+],
 "p_hi": [
 "70a2565504",
 "Üst seviye"
@@ -2289,6 +3201,14 @@
 "a0623fa9a3",
 "%K düzeltme"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC çarpanı"
+],
+"p_key": [
+"ab76f1670b",
+"Anahtar değer"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1 uzunluğu"
@@ -2304,6 +3224,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4 uzunluğu"
+],
+"p_lb": [
+"0f484e5cc3",
+"Yüzdelik geriye dönük"
+],
+"p_left": [
+"3b219a058a",
+"Sol barlar"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2345,6 +3273,14 @@
 "a44d6c906d",
 "Her iki taraftaki mumlar"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanal uzunluğu"
+],
+"p_n2": [
+"2df99da939",
+"Ortalama uzunluğu"
+],
 "p_offset": [
 "ce66771654",
 "Ofset"
@@ -2353,13 +3289,41 @@
 "ac556cf593",
 "Yüzde"
 ],
+"p_pd": [
+"4997ad18cf",
+"Geriye dönük"
+],
+"p_per": [
+"a89f63abb8",
+"Örnekleme periyodu"
+],
+"p_ph": [
+"b1f698cc3d",
+"Yüksek yüzdelik"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE faktörü"
+],
 "p_rank": [
 "1df2ca7462",
 "Yüzdelik sıra uzunluğu"
 ],
+"p_right": [
+"307c9815b6",
+"Sağ çubuklar"
+],
+"p_rows": [
+"52d0b35277",
+"Satırlar"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI uzunluğu"
+],
+"p_sf": [
+"590f20262b",
+"RSI yumuşatma"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2376,6 +3340,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Yavaş"
+],
+"p_slow2": [
+"c252d2ccab",
+"Yavaş 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2421,6 +3389,54 @@
 "07300ad49f",
 "1 {u} için {c}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Ekle"
+],
+"pfAvg": [
+"def9f57b0c",
+"Ortalama alış fiyatı"
+],
+"pfCost": [
+"64ae43e8fe",
+"Maliyet"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Henüz burada bir şey yok. Bir coin, ne kadar tuttuğunuzu ve ne kadar ödediğinizi ekleyin."
+],
+"pfName": [
+"a5a98fb17f",
+"Portföy {n}"
+],
+"pfNote": [
+"f46050561e",
+"Sadece bu tarayıcıda tutulur. Asla borsa anahtarları istemez ve hiçbir yere veri göndermez. Fiyatlar Binance USDT pariteleridir."
+],
+"pfNow": [
+"039df35064",
+"Güncel fiyat"
+],
+"pfPnl": [
+"8ae3945397",
+"Kâr / zarar"
+],
+"pfQty": [
+"44f6af6945",
+"Miktar"
+],
+"pfShort": [
+"036b18f02a",
+"Portföy"
+],
+"pfTitle": [
+"036b18f02a",
+"Portföy"
+],
+"pfValue": [
+"8dce170de2",
+"Değer"
+],
 "pickStart": [
 "1e214a5fd6",
 "Replay'in başlamasını istediğiniz yere grafikte tıklayın"
@@ -2444,6 +3460,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Fiyat"
+],
+"profNote": [
+"c1da831af8",
+"Seçtiğiniz bir aralığın profili için sol araç çubuğundaki “Sabit aralıklı hacim profili”ni kullanın."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2617,6 +3637,86 @@
 "56a2285c5b",
 "Kaydediliyor…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Fiyat ölçeğini otomatik sığdır"
+],
+"scBorder": [
+"45c60c0e85",
+"Fiyat ölçeği kenarlığı"
+],
+"scBot": [
+"77a5b77d62",
+"Alttaki boşluk (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Her iki taraf"
+],
+"scInvert": [
+"ba80abaac1",
+"Fiyat ölçeğini ters çevir"
+],
+"scInvertH": [
+"ebb1688761",
+"yukarı aşağı olur"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Sol"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmik"
+],
+"scMode": [
+"a5e5771ca0",
+"Fiyat ölçeği"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logaritmik veya yüzde"
+],
+"scNone": [
+"d4c2792a72",
+"Gizli"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmetik)"
+],
+"scOff": [
+"3557c35506",
+"Sağdaki boş alan"
+],
+"scPct": [
+"c4519ac7cc",
+"Yüzde"
+],
+"scRight": [
+"954daa8b00",
+"Sağ"
+],
+"scSec": [
+"c92a4af093",
+"Zaman ölçeğinde saniyeler"
+],
+"scSide": [
+"82acb7ee2b",
+"Fiyat ölçeğinin konumu"
+],
+"scSpace": [
+"2878a3a43e",
+"Mum aralığı"
+],
+"scTop": [
+"25126a3aab",
+"Üstteki boşluk (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Zaman ölçeği kenarlığı"
+],
 "sc_c": [
 "3e8248e32e",
 "Fiyat"
@@ -2676,6 +3776,62 @@
 "screener": [
 "7f27924c12",
 "Piyasa ekranı"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Tarayıcı"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Kontrol et"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script editörü"
+],
+"scriptEdit": [
+"ae909c75da",
+"Scripti düzenle"
+],
+"scriptExamples": [
+"41a27a4710",
+"Örnekler…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Satır {n}"
+],
+"scriptName": [
+"709a23220f",
+"İsim"
+],
+"scriptNew": [
+"ebac729ca3",
+"Yeni script"
+],
+"scriptNote": [
+"c265d2248f",
+"Pine benzeri bir dilde kendi indikatörlerinizi yazın. Bu tarayıcıya kaydedilirler ve sadece burada, grafiğinizde çalışırlar."
+],
+"scriptOk": [
+"eb3da0c952",
+"Hata yok · {n} çıktı"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Dilin bildikleri"
+],
+"scriptSave": [
+"1e291c4d98",
+"Kaydet ve grafiğe ekle"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Script kaydedildi"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -2781,9 +3937,25 @@
 "e97d96a8bc",
 "En yüksek hacim"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI kesişimi (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger dönüşü"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2792,6 +3964,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani sinyalleri (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun kesişimi"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ kesişimi"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2805,6 +3993,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI dönüşü"
@@ -2813,9 +4009,37 @@
 "446d28671b",
 "Altın / ölümcül kesişim (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI kesişimi"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend kesişimi [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2949,6 +4173,106 @@
 "2d2cb022bc",
 "Hız"
 ],
+"stBadLv": [
+"683a05683a",
+"Seviyeler en fazla 24 sayıdan oluşmalıdır."
+],
+"stBadPt": [
+"a73083f114",
+"Bir fiyat veya zaman geçerli değil."
+],
+"stColor": [
+"f28563a477",
+"Renk"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinatlar"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Kesikli"
+],
+"stDev": [
+"e789c07831",
+"Sapma (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Noktalı"
+],
+"stExtL": [
+"ef880cf8fc",
+"Sola uzat"
+],
+"stExtR": [
+"fbff580b3d",
+"Sağa uzat"
+],
+"stFill": [
+"64dd60fe1a",
+"Arka plan"
+],
+"stLevels": [
+"ae3d013ab1",
+"Seviyeler (virgülle ayrılmış)"
+],
+"stLine": [
+"120ee44bec",
+"Çizgi stili"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Burada sadece ilk 12 nokta düzenlenebilir."
+],
+"stOpacity": [
+"f12e36bd83",
+"Arka plan opaklığı"
+],
+"stReset": [
+"40aab769d0",
+"Varsayılan seviyeler"
+],
+"stRows": [
+"52d0b35277",
+"Satırlar"
+],
+"stSize": [
+"83ca9e48c3",
+"Yazı boyutu"
+],
+"stSolid": [
+"d00635865c",
+"Düz"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stil"
+],
+"stText": [
+"c3328c39b0",
+"Metin"
+],
+"stTextC": [
+"d160595fcf",
+"Metin rengi"
+],
+"stTextL": [
+"c3328c39b0",
+"Metin"
+],
+"stUtc": [
+"c9dbd25df4",
+"Zamanlar UTC (YYYY-AA-GG SS:DD) cinsindendir."
+],
+"stVis": [
+"7d9ff4f0de",
+"Görünürlük"
+],
+"stWidth": [
+"ad48f34186",
+"Kalınlık"
+],
 "st_err": [
 "d802d232a8",
 "Veri yok"
@@ -2992,6 +4316,14 @@
 "stop": [
 "9e253470c8",
 "Durdur"
+],
+"stratNote": [
+"16dc19eef4",
+"Her strateji, test edicide bu grafiğin geçmişi üzerinde çalışır: grafikteki giriş ve çıkışlar, net sonuç, kazanma oranı, düşüş (drawdown) ve ayarları için bir optimize edici."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Strateji test edicide çalıştır"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3053,25 +4385,133 @@
 "a26d0ddaae",
 "Kaydırma (zaman)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD formasyonu"
+],
+"t_angle": [
+"30cd1e7703",
+"Trend açısı"
+],
+"t_arc": [
+"853a983f6b",
+"Yay"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Ok"
+],
+"t_arrowc": [
+"0f722804ec",
+"Ok imleci"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Aşağı ok işareti"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Ok işaretleyici"
+],
+"t_arrowup": [
+"8023467135",
+"Yukarı ok işareti"
+],
+"t_avwap": [
+"0a4f86b195",
+"Sabitlenmiş VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Fırça"
 ],
+"t_callout": [
+"f1647ad880",
+"Balon metin"
+],
 "t_channel": [
 "c0350b7736",
 "Paralel kanal"
+],
+"t_circ": [
+"1cc7820a08",
+"Daire"
 ],
 "t_circle": [
 "8580e3175f",
 "Elips"
 ],
+"t_comment": [
+"153d7a58b3",
+"Yorum"
+],
+"t_cross": [
+"983bdb7b27",
+"Çapraz çizgi"
+],
 "t_cursor": [
 "2239943c8d",
 "İmleç"
+],
+"t_curve": [
+"916f09aff8",
+"Eğri"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Döngüsel çizgiler"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher formasyonu"
+],
+"t_dcurve": [
+"faef75cb57",
+"Çift eğri"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Ayrık kanal"
+],
+"t_dot": [
+"46856bf702",
+"Nokta"
+],
+"t_drange": [
+"c65ea4ae01",
+"Tarih aralığı"
+],
+"t_drives": [
+"3a261ca869",
+"Üçlü vuruş (Three drives) formasyonu"
+],
+"t_emoji": [
+"707fd71017",
+"İkonlar ve emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Silgi"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliott düzeltme dalgası (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliott çiftli kombo dalgası (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott itki dalgası (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliott üçgen dalgası (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliott üçlü kombo dalgası (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3081,13 +4521,69 @@
 "18c530863b",
 "Fibonacci düzeltmesi"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fib hız direnç yayları"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fib kanalı"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib daireleri"
+],
 "t_fibext": [
 "73655be9d6",
 "Trend temelli Fibonacci uzatması"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fib hız direnç yelpazesi"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fib spirali"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trend tabanlı Fib zamanı"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib zaman dilimi"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib takozu"
+],
+"t_flag": [
+"23d91e7740",
+"Bayrak işareti"
+],
+"t_flat": [
+"52d3db252e",
+"Düz tepe/dip"
+],
+"t_forecast": [
+"528bc4bc38",
+"Tahmin"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann yelpazesi"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann kutusu"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann karesi"
+],
+"t_hl": [
+"8cb3f79b49",
+"Vurgulayıcı"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3097,6 +4593,18 @@
 "0bcbc4e087",
 "Yatay ışın"
 ],
+"t_hs": [
+"43353dbcec",
+"Omuz baş omuz"
+],
+"t_info": [
+"a690e33098",
+"Bilgi çizgisi"
+],
+"t_inside": [
+"30d6b425dc",
+"İç çatal (pitchfork)"
+],
 "t_long": [
 "666f195fc4",
 "Long pozisyon"
@@ -3105,9 +4613,45 @@
 "2bedd64d85",
 "Fiyat aralığı / ölçüm"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modifiye Schiff çatalı"
+],
+"t_note": [
+"2c924e3088",
+"Not"
+],
+"t_path": [
+"519e39132b",
+"Yol"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews tırmığı"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Fiyat etiketi"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Fiyat notu"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Çoklu çizgi"
+],
+"t_prange": [
+"c20f7ce09a",
+"Fiyat aralığı"
+],
+"t_proj": [
+"8aa49fe840",
+"Projeksiyon"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3117,9 +4661,33 @@
 "c158695a64",
 "Dikdörtgen"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regresyon trendi"
+],
+"t_rrect": [
+"65807afaf7",
+"Döndürülmüş dikdörtgen"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff çatalı"
+],
 "t_short": [
 "a8daf74669",
 "Short pozisyon"
+],
+"t_signpost": [
+"89f361362e",
+"Tabela"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinüs çizgisi"
+],
+"t_tcycle": [
+"521a687246",
+"Zaman döngüleri"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3129,9 +4697,29 @@
 "e810388344",
 "Trend çizgisi"
 ],
+"t_tri": [
+"32547b031d",
+"Üçgen formasyonu"
+],
+"t_tri3": [
+"73d3ae245f",
+"Üçgen"
+],
 "t_vline": [
 "a790288017",
 "Dikey çizgi"
+],
+"t_vrp": [
+"bcba420b37",
+"Sabit aralıklı hacim profili"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD formasyonu"
+],
+"t_zoom": [
+"4fc05f2763",
+"Yakınlaştır"
 ],
 "target": [
 "61ad50a9b9",
@@ -3181,6 +4769,22 @@
 "ad88cbfa09",
 "Telegram'da da var (sayfa kapalı olsa bile bot izlemeye devam eder)"
 ],
+"thDark": [
+"ae1ef01432",
+"Koyu"
+],
+"thLight": [
+"a36ef8aba2",
+"Açık"
+],
+"thMid": [
+"4fe978738d",
+"Gece mavisi"
+],
+"thPaper": [
+"22d507f2ba",
+"Kağıt"
+],
 "time": [
 "6c82e6dd86",
 "Zaman"
@@ -3204,6 +4808,10 @@
 "tooFar": [
 "b29db0358a",
 "Bu, bu timeframe'in yükleyebileceğinden daha geride; daha büyük bir timeframe seçin."
+],
+"toolHint": [
+"56e62363ce",
+"çizim yapmak için grafiğe tıklayın"
 ],
 "topFixed": [
 "1a66879287",
@@ -3429,6 +5037,34 @@
 "1526a17ee7",
 "Kilidi aç"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Tüm çizimlerin kilidi açık"
+],
+"vDay": [
+"f6bb0f468a",
+"Gün"
+],
+"vHour": [
+"9e25a34e63",
+"Saat"
+],
+"vMin": [
+"092f99ea11",
+"Dakika"
+],
+"vMonth": [
+"200dcdce9b",
+"Ay"
+],
+"vSec": [
+"5fb1db5278",
+"Saniye"
+],
+"vWeek": [
+"7d75266a53",
+"Hafta"
+],
 "value": [
 "3e8248e32e",
 "Fiyat"
@@ -3436,6 +5072,10 @@
 "valuePct": [
 "bf55390d8d",
 "Yüzde (%)"
+],
+"vol": [
+"1837d13d11",
+"Hacim"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3480,6 +5120,24 @@
 "yourRate": [
 "ca14282aa6",
 "oranınız"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Uzaklaştır"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Yakınlaştırmak için daha geniş bir kutu sürükleyin."
+]
+},
+"f": {
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
 ]
 }
 }
