@@ -213,6 +213,10 @@
 "252e1f7660",
 "Notiser kontrolleras i denna webbläsare medan sidan är öppen (valfri flik). Indikatornotiser utlöses när en stapel stängs."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Larm på denna ritning"
+],
 "alertSet": [
 "80c4c4abee",
 "Notis inställd: {c}"
@@ -337,6 +341,14 @@
 "98464789c4",
 "Bästa affär"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Tillväxt per år (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Ladda ner affärer (CSV)"
@@ -389,6 +401,14 @@
 "d669a6654d",
 "Långa affärer"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1 000 ordrar av samma affärer):"
+],
+"btMCv": [
+"992209a3c0",
+"typisk drawdown {a}% · 95% av ordrarna stannar under {b}% · sämsta {c}% · denna körning {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimera"
@@ -437,6 +457,10 @@
 "80e53e077c",
 "Vinstfaktor"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Payoff (genomsnittlig vinst / genomsnittlig förlust)"
+],
 "btRange": [
 "63a44ed01a",
 "från / till / intervall"
@@ -480,6 +504,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (årlig)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Första 70% mot sista 30% av affärerna:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} med {aw}% vinster ({an} affärer) → {b} med {bw}% vinster ({bn} affärer)"
 ],
 "btStreak": [
 "260b23b529",
@@ -597,9 +629,21 @@
 "6a72085653",
 "Alla"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · öppen källkod"
+],
+"cat_com": [
+"90566b4c6f",
+"Community-favoriter"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (världen)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -645,9 +689,49 @@
 "3090f6af60",
 "24h förändring"
 ],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro-dashboard från offentlig data: risk-on / risk-off regim"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"On-chain cykelfaser (MVRV, NUPL) med prisposition"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Bitcoins hela historik på en logaritmisk spiral"
+],
 "clearAll": [
 "7de68ccb43",
 "Ta bort alla ritverktyg"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Ta bort ritningar och indikatorer"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Ta bort ritningar"
+],
+"clearInds": [
+"8b56474294",
+"Ta bort indikatorer"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Ta bort varje indikator från detta diagram?"
 ],
 "clearLog": [
 "096311b563",
@@ -672,6 +756,10 @@
 "clone": [
 "af74f7c536",
 "Kopiera"
+],
+"cloned": [
+"51fbf8cb72",
+"Kopierad bredvid"
 ],
 "close": [
 "bbfa773e5a",
@@ -705,9 +793,221 @@
 "d0d4d379f5",
 "Tid kvar tills denna stapel stänger"
 ],
+"crFree": [
+"6b4b480231",
+"Följer musen"
+],
+"crLargeDash": [
+"a7503adc35",
+"Långa streck"
+],
+"crMagnet": [
+"77fa49774c",
+"Snäpper till candles"
+],
+"crOff": [
+"d4c2792a72",
+"Dold"
+],
+"crSparse": [
+"e50cc378a1",
+"Glesa punkter"
+],
 "create": [
 "8ac903c3c3",
 "Skapa larm"
+],
+"csBg": [
+"64dd60fe1a",
+"Bakgrund"
+],
+"csBg2": [
+"9ebb790d74",
+"Andra bakgrundsfärg"
+],
+"csBody": [
+"718a7e8a58",
+"Kropp"
+],
+"csBorderC": [
+"eeffa83765",
+"Kantfärg"
+],
+"csBorders": [
+"685f23bc5e",
+"Kanter"
+],
+"csClose": [
+"bbfa773e5a",
+"Stäng"
+],
+"csCross": [
+"b0b83f89e8",
+"Korshår & mus"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Korshårfärg"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Korshårslinje"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Pris- och tidsetiketter på korshåret"
+],
+"csCrossMode": [
+"800092e3e1",
+"Korshår"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Korshårbredd"
+],
+"csDn": [
+"11f5ff3829",
+"Fallande candle"
+],
+"csFont": [
+"b97c4d4cdd",
+"Typsnitt"
+],
+"csFsize": [
+"83ca9e48c3",
+"Teckenstorlek"
+],
+"csGrad": [
+"c716191a01",
+"gör bakgrunden till en gradient"
+],
+"csGridA": [
+"f773586220",
+"Rutnätsopacitet (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Rutnätsfärg"
+],
+"csGridH": [
+"4eaa1c008a",
+"Horisontella rutnätslinjer"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Vertikala rutnätslinjer"
+],
+"csHollow": [
+"9165bccc85",
+"Ihåliga kroppar"
+],
+"csHollowH": [
+"fb63aba345",
+"endast de stigande candles"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetisk scrollning vid touch"
+],
+"csLast": [
+"aacdc5bea4",
+"Senaste prislinje"
+],
+"csLastLab": [
+"91c990bcb9",
+"Prisetikett på skalan"
+],
+"csLineC": [
+"01212659ee",
+"Linje- / områdesfärg"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Linjebredd"
+],
+"csLook": [
+"41def7a0fe",
+"Utseende"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"en färg för båda riktningar"
+],
+"csPinch": [
+"e557a41794",
+"Nypzoom vid touch"
+],
+"csResetQ": [
+"9c369383c1",
+"Återställ alla diagraminställningar till hur de var?"
+],
+"csScale": [
+"0b414bdcb7",
+"Skalor"
+],
+"csScroll": [
+"468c89cb3b",
+"Dra diagrammet med musen"
+],
+"csSym": [
+"fad29404d2",
+"Candles"
+],
+"csText": [
+"d160595fcf",
+"Textfärg"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Diagraminställningar"
+],
+"csUp": [
+"971a95475d",
+"Stigande candle"
+],
+"csWick": [
+"fe6e2bfd48",
+"Vekar"
+],
+"csWickC": [
+"0fcb21d161",
+"Vekfärg"
+],
+"csWm": [
+"33c7b41ac6",
+"Vattenstämpel bakom candles"
+],
+"csWmA": [
+"69a1810ea2",
+"Vattenstämpelopacitet (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"symbol och tidsram"
+],
+"csWmC": [
+"bad81c749f",
+"Vattenstämpelfärg"
+],
+"csWmSize": [
+"4af7e52f80",
+"Vattenstämpelstorlek"
+],
+"csWmText": [
+"ecf870ab34",
+"Vattenstämpeltext"
+],
+"csZoom": [
+"c6f40d9d03",
+"Mushjul"
+],
+"csZoomH": [
+"4ca34c1092",
+"zooma in och ut"
 ],
 "csv": [
 "518463f518",
@@ -720,6 +1020,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} staplar nedladdade"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Lägg till ett larm här"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopiera detta pris"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Anpassa varje candle"
+],
+"ctxHline": [
+"588d2eb492",
+"Horisontell linje här"
+],
+"ctxReset": [
+"242cb352c0",
+"Återställ vyn"
 ],
 "curNote": [
 "538ead2fdf",
@@ -893,9 +1213,29 @@
 "2422a88320",
 "Varje gång (högst en gång i minuten / en gång per stapel)"
 ],
+"exAuto": [
+"1ff048b76e",
+"live, med OKX som fallback"
+],
+"exDown": [
+"e8ba18613e",
+"{x} svarar inte på denna anslutning. Diagrammet stannar på den börs det är på."
+],
+"exNote": [
+"0eb4c03240",
+"Binance streamar live; de andra läses från deras egna publika endpoint var tionde sekund, med sin egen historik."
+],
+"exTitle": [
+"5b13eac7ed",
+"Börs"
+],
 "exit": [
 "f83b6fe3ae",
 "Utgång"
+],
+"exitFull": [
+"fc61e74cd9",
+"Lämna helskärm"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -936,6 +1276,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Exportera allt (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Datan för denna indikator laddades inte. Försök igen om en stund."
 ],
 "extend": [
 "ab07d3f288",
@@ -993,6 +1337,18 @@
 "3526f607bc",
 "Gul"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Prognos"
@@ -1012,6 +1368,74 @@
 "futSub": [
 "16db4a6d5c",
 "Kvartalsvisa terminskontrakt, kontinuerliga"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"En valuta mot en annan, från sajtens egna dagliga referenskurser (Europeiska centralbanken, och exchange-api-datasetet där ECB inte anger en valuta). Ett värde per dag, så en daglig stapel är en enskild punkt och de veckovisa och månatliga staplarna är byggda från dagarna inuti dem. Referenskurser publiceras en gång om dagen, inte en mäklares tick-data: det finns ingen intradag-forex här. Dollar-par startar 2 mars 2024, par mellan två ECB-valutor 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Pilar"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Penslar"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanaler"
+],
+"g_cursors": [
+"f4d2f91040",
+"Markörer"
+],
+"g_cycles": [
+"97f064aff5",
+"Cykler"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott-vågor"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Linjer"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Mätverktyg"
+],
+"g_pat": [
+"2c179da0f5",
+"Diagrammönster"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchforks"
+],
+"g_proj": [
+"8aa49fe840",
+"Projektion"
+],
+"g_shapes": [
+"b1985e3874",
+"Former"
+],
+"g_text": [
+"d7cd4cda4f",
+"Text & anteckningar"
+],
+"g_vol": [
+"1b4620951d",
+"Volymbaserat"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1096,6 +1520,18 @@
 "hideAll": [
 "1f0e916e42",
 "Dölj / visa ritningar"
+],
+"hideBoth": [
+"3502a3299d",
+"Dölj ritningar och indikatorer"
+],
+"hideDraw": [
+"f4492c5211",
+"Dölj ritningar"
+],
+"hideInds": [
+"764ab9d614",
+"Dölj indikatorer"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1197,6 +1633,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1208,6 +1648,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1233,6 +1677,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1252,6 +1700,46 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Alla candlestick-mönster"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hanging man"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Morgon- / Aftonstjärna"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Tre vita soldater / svarta kråkor"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Tweezer top / bottom"
 ],
 "in_crsi": [
 "d788a94022",
@@ -1277,6 +1765,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA Clouds [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1285,17 +1777,37 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Equal Highs / Lows"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1308,6 +1820,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1341,6 +1873,14 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Marknadsstruktur (BOS / CHoCH)"
+],
+"in_ob": [
+"80c4ef99a7",
+"Order Blocks"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1360,6 +1900,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1389,25 +1937,49 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profile (tid vid pris)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1421,6 +1993,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volume Delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1433,9 +2013,17 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Session Volume Profile"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP bands"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1448,6 +2036,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1481,6 +2077,10 @@
 "0f70916dbb",
 "Arnaud Legoux rörligt medelvärde"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR-trendlinje styrd av MFI (RSI utan volym)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 minus SMA 34 av mittpunkten"
@@ -1492,6 +2092,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Average true range (volatilitet)"
+],
+"ind_atrts": [
+"8223831420",
+"En stop-loss som följer med k·ATR och byter sida"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1517,6 +2121,10 @@
 "a50928c16b",
 "Commodity channel index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR-utgångar hängda från högsta/lägsta stängning"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trendande (låg) eller sidledes (hög) marknad"
@@ -1537,9 +2145,61 @@
 "bf330f58dd",
 "Långsiktigt momentum: WMA av två förändringstakter"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Markerar varje mönster nedan på staplarna"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Öppning och stängning nästan lika (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bullish (BE) och bearish (SE) engulfing"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Lång undre skugga efter ett fall (H) eller en uppgång (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"En liten kropp inuti den föregående stora (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"En stapel helt inuti den föregående (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"En stor kropp utan skuggor (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Trestapels-vändning: MS bullish, ES bearish"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap och stängning bortom mitten av föregående stapel (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tre starka staplar i rad (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Lång övre skugga efter en uppgång (SS) eller ett fall (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Två staplar med samma högsta (TT) eller lägsta (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, streak RSI och procentuell rang kombinerade"
+],
+"ind_cvd": [
+"690d30a274",
+"Löpande summa av volym-delta: vem som har haft kontrollen"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1561,6 +2221,10 @@
 "c499047c5b",
 "Exponentiellt rörligt medelvärde"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · två EMA-moln, snabba och långsamma"
+],
 "ind_env": [
 "e2cf023f50",
 "Rörligt medelvärde med band på ett fixt %-avstånd"
@@ -1569,17 +2233,41 @@
 "d648aafe8d",
 "Hur lätt priset rör sig per volymenhet"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Två svängningar vid nästan samma pris: vilande likviditet"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Omvandlar priser till en nästan normalfördelning"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Köp × säljvolym och delta skrivet under varje candle; zooma in för att läsa. Per candle, inte per prisnivå"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams-fraktaler: lokala toppar och bottnar"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Trestapels-gap; varje box slutar där priset fyller det"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Sex korta och sex långa EMA: traders mot investerare"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · en trappstegsformad trendlinje som bara vänder vid ett verkligt svängbrott"
+],
 "ind_hma": [
 "709351f832",
 "Hull rörligt medelvärde: snabbt och mjukt"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA färgad efter sin lutning"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1592,6 +2280,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic med J-linjen (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (öppen källkod, MPL-2.0) · makroregim bakom candles, dess signaler och instrumentpanel, från FRED-data"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (öppen källkod) · Bitcoin fair value 8.31e-17·dagar^5.48 med ±10 % band och köpzon; för BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (öppen källkod) · Bitcoin-cykelfaser från MVRV, NUPL och en SOPR-proxy: Extreme Bear, Bear, Early Bull, Bull, Overheated; den grå linjen är det normaliserade priset"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (öppen källkod) · Bitcoins hela historik på en logaritmisk spiral, ett varv per halveringscykel, med toppar, bottnar, halveringar och nuet"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1629,9 +2337,21 @@
 "d6640bbc39",
 "Pris nu minus pris för n staplar sedan"
 ],
+"ind_ms": [
+"13fc87db00",
+"Brott av den senaste bekräftade svängningen: BOS med trenden, CHoCH mot den"
+],
 "ind_news": [
 "a95010ef34",
 "Rubriker om detta mynt, markerade vid tidpunkten för publicering (webbplatsens nyheter från det sista dygnet)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · kärnutjämnat pris med ett medelfels-band; icke-omritande form"
+],
+"ind_ob": [
+"530cdc224f",
+"Den sista motsatta candlen före ett strukturbrott, tills priset stänger genom den"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1656,6 +2376,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volym tillagd i proportion till %-förändringen"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · utjämnad RSI med en volatilitetslinje (QQE MOD-kärna)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtrerar bort brus mindre än det utjämnade genomsnittliga intervallet"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1689,25 +2417,53 @@
 "26db009730",
 "Enkelt rörligt medelvärde"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Stängning mot mitten av intervallet, dubbelt utjämnad"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Utjämnat rörligt medelvärde (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger inuti Keltner = squeeze (röda prickar); histogrammet visar åt vilket håll det bryter"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · den senaste pivot-högsta och lägsta som nivåer"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastic för RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · glidande medelvärden av högsta och lägsta som byter plats när trenden vänder"
+],
 "ind_st": [
 "8d66b52001",
 "ATR-eftersläpande linje som vänder med trenden"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD körd två gånger genom en stochastic: tidiga trendvändningar (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K och %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI med dess volatilitetsband, en snabb och en långsam linje"
+],
 "ind_tema": [
 "1ff881355e",
 "Trippelt exponentiellt rörligt medelvärde"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Hur många candles som handlades vid varje pris, per dag"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1721,6 +2477,18 @@
 "182e4a763e",
 "Köptryck över tre perioder"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR trailing stop; när priset korsar den är det köp-/säljsignalen"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Köpvolym minus säljvolym för varje candle (taker-data från Binance; en uppskattning annars)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · syntetisk VIX för vilken marknad som helst; spikar över banden markerar ofta panikbottnar"
+],
 "ind_vo": [
 "a99f6a0038",
 "Snabb vs långsam volym-SMA (%)"
@@ -1733,9 +2501,21 @@
 "6badda8c94",
 "Positiv och negativ trendrörelse (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"En volymprofil per dag (per månad på dagliga staplar)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volym vid varje pris för staplarna på skärmen, med POC och värdeområde"
+],
 "ind_vwap": [
 "6d86714413",
 "Volymvägt genomsnittspris, nollställs kl. 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Daglig VWAP med ±1σ och ±k·σ band"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1748,6 +2528,10 @@
 "ind_wma": [
 "b08be7d4d3",
 "Viktat rörligt medelvärde"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · kanalindex-oscillator; korsningar över 53/60 och under −53/−60 markerar utsträckta rörelser"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1873,6 +2657,14 @@
 "891ebccd5b",
 "Lås"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Lås alla ritverktyg"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Alla ritverktyg är låsta"
+],
 "long": [
 "11eda67f9b",
 "Köp (Long)"
@@ -1893,13 +2685,41 @@
 "5f703c7eba",
 "Kurdistani-signaler"
 ],
+"mMode": [
+"659eba1219",
+"Upprepa"
+],
+"mMsg": [
+"2c924e3088",
+"Notering"
+],
+"mTf": [
+"85decb73d1",
+"Tidsram"
+],
 "maType": [
 "15f86c051e",
 "Medelvärde"
 ],
+"macroNote": [
+"c4a94f666d",
+"regelbaserad uppskattning, inte finansiell rådgivning"
+],
 "magnet": [
 "effa915951",
 "Magnet (snäpp fast vid öppning/hög/låg/stängning)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnet av"
+],
+"magnetS": [
+"607a7625b1",
+"Stark magnet"
+],
+"magnetW": [
+"181021d95b",
+"Svag magnet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1921,9 +2741,45 @@
 "fdbe20f376",
 "Alla tidsramar"
 ],
+"moreTools": [
+"c871f1056a",
+"Fler verktyg"
+],
 "moveToSection": [
 "98d183e7cb",
 "Flytta till sektion"
+],
+"mt_mine": [
+"1cf761ac34",
+"Mina skript"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Optioner"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Mönster"
+],
+"mt_prof": [
+"0c2a930099",
+"Profiler"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Struktur"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategier"
+],
+"multiAl": [
+"5bafcd2412",
+"Multivillkors-larm"
+],
+"multiNote": [
+"c7e278bae8",
+"Skriv villkoren på en rad och koppla ihop dem med and / or. Larmet utlöses på den candle där raden blir sann."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1972,6 +2828,10 @@
 "nc_technical": [
 "41fc086088",
 "Teknisk"
+],
+"neckline": [
+"993062b2d6",
+"Nacklinje"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2081,6 +2941,10 @@
 "77f8046dcf",
 "(övergst, ingen sektion)"
 ],
+"noVol": [
+"0960b9b69d",
+"ingen volym för denna symbol"
+],
 "notif": [
 "270d190970",
 "Webbläsaravisering"
@@ -2133,13 +2997,37 @@
 "c0da22faab",
 "Öppna på diagrammet"
 ],
+"openTv": [
+"94d7227248",
+"Öppna på TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} optionskedja"
+],
+"optDays": [
+"c2fd31e918",
+"Dagar till förfall"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombinationer testade på {s} s, varav {p} lönsamma; sorterade efter {r}. Klicka på en rad för dess fullständiga rapport."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit svarade inte från denna anslutning. Ändra anslutning eller VPN och försök igen."
+],
+"optIV": [
+"c1bc12118c",
+"ATM implicit volatilitet"
+],
 "optMax": [
 "7b9c1b1490",
 "För många kombinationer — högst {n}. Använd ett större steg."
+],
+"optMove": [
+"8aa36fe05d",
+"Förväntad rörelse"
 ],
 "optN": [
 "1e919c1ca4",
@@ -2149,6 +3037,18 @@
 "4b4713d390",
 "Det bästa resultatet på tidigare data är ofta tur (överanpassning). Föredra inställningar vars grannar också presterar bra och kontrollera dem på en annan period eller marknad."
 ],
+"optNote2": [
+"26dfa389e8",
+"OI och volym i kontrakt (mynt); $ är markpriset i dollar. Max pain: lösenpriset som ger optionsinnehavare minst vinst. Förväntad rörelse = pris × IV × √(dagar/365). Inte finansiell rådgivning."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
+],
 "optProg": [
 "2b404f9f4a",
 "Testar {i} / {n}…"
@@ -2156,6 +3056,10 @@
 "optRun": [
 "9a456cc451",
 "Hitta de bästa inställningarna"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Underliggande"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2217,13 +3121,25 @@
 "0777981263",
 "Priser i {c} använder nu din kurs."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitud"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR-längd"
 ],
+"p_band": [
+"3541c5f4e1",
+"Bandlängd"
+],
 "p_base": [
 "077fe9c54e",
 "Bas"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Bandlängd"
 ],
 "p_conv": [
 "9151f8433f",
@@ -3053,9 +3969,77 @@
 "8580e3175f",
 "Ellips"
 ],
+"t_comment": [
+"153d7a58b3",
+"Kommentar"
+],
+"t_cross": [
+"983bdb7b27",
+"Korshår"
+],
 "t_cursor": [
 "2239943c8d",
 "Markör"
+],
+"t_curve": [
+"916f09aff8",
+"Kurva"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Cykliska linjer"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher-mönster"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dubbelkurva"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Disjoint-kanal"
+],
+"t_dot": [
+"46856bf702",
+"Punkt"
+],
+"t_drange": [
+"c65ea4ae01",
+"Datumintervall"
+],
+"t_drives": [
+"3a261ca869",
+"Three drives-mönster"
+],
+"t_emoji": [
+"707fd71017",
+"Ikoner & emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Suddgummi"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliott korrektionsvåg (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliott dubbel kombinationsvåg (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott impulsvåg (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliott triangelvåg (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliott trippel kombinationsvåg (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3065,13 +4049,69 @@
 "18c530863b",
 "Fibonacci-retracement"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fib hastighetsmotståndsbågar"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fib-kanal"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib-cirklar"
+],
 "t_fibext": [
 "73655be9d6",
 "Trendbaserad Fibonacci-förlängning"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fib hastighetsmotståndsfläkt"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fib-spiral"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trendbaserad Fib-tid"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib-tidszon"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib-kil"
+],
+"t_flag": [
+"23d91e7740",
+"Flaggmarkering"
+],
+"t_flat": [
+"52d3db252e",
+"Platt topp/botten"
+],
+"t_forecast": [
+"528bc4bc38",
+"Prognos"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann-fläkt"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann-box"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann-kvadrat"
+],
+"t_hl": [
+"8cb3f79b49",
+"Markeringspenna"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3081,6 +4121,18 @@
 "0bcbc4e087",
 "Horisontell stråle"
 ],
+"t_hs": [
+"43353dbcec",
+"Huvud och axlar"
+],
+"t_info": [
+"a690e33098",
+"Infolinje"
+],
+"t_inside": [
+"30d6b425dc",
+"Inside pitchfork"
+],
 "t_long": [
 "666f195fc4",
 "Lång position"
@@ -3089,9 +4141,45 @@
 "2bedd64d85",
 "Prisintervall / mätning"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modifierad Schiff pitchfork"
+],
+"t_note": [
+"2c924e3088",
+"Anteckning"
+],
+"t_path": [
+"519e39132b",
+"Sökväg"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews pitchfork"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Prisetikett"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Prisanteckning"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polylinje"
+],
+"t_prange": [
+"c20f7ce09a",
+"Prisintervall"
+],
+"t_proj": [
+"8aa49fe840",
+"Projektion"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3101,9 +4189,33 @@
 "c158695a64",
 "Rektangel"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regressionstrend"
+],
+"t_rrect": [
+"65807afaf7",
+"Roterad rektangel"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff pitchfork"
+],
 "t_short": [
 "a8daf74669",
 "Kort position"
+],
+"t_signpost": [
+"89f361362e",
+"Vägvisare"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinuskurva"
+],
+"t_tcycle": [
+"521a687246",
+"Tidscykler"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3113,9 +4225,29 @@
 "e810388344",
 "Trendlinje"
 ],
+"t_tri": [
+"32547b031d",
+"Triangelmönster"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangel"
+],
 "t_vline": [
 "a790288017",
 "Vertikal linje"
+],
+"t_vrp": [
+"bcba420b37",
+"Volymprofil för fast intervall"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD-mönster"
+],
+"t_zoom": [
+"4fc05f2763",
+"Zooma in"
 ],
 "target": [
 "61ad50a9b9",
@@ -3165,6 +4297,26 @@
 "ad88cbfa09",
 "Även i Telegram (boten bevakar även när denna sida är stängd)"
 ],
+"thDark": [
+"ae1ef01432",
+"Mörkt"
+],
+"thLight": [
+"a36ef8aba2",
+"Ljust"
+],
+"thMid": [
+"4fe978738d",
+"Midnattsblått"
+],
+"thNavy": [
+"0229e960cf",
+"Marinblått"
+],
+"thPaper": [
+"22d507f2ba",
+"Papper"
+],
 "time": [
 "6c82e6dd86",
 "Tid"
@@ -3188,6 +4340,10 @@
 "tooFar": [
 "b29db0358a",
 "Det ligger längre tillbaka än vad denna tidsram kan ladda; välj en större tidsram."
+],
+"toolHint": [
+"56e62363ce",
+"klicka på diagrammet för att rita"
 ],
 "topFixed": [
 "1a66879287",
@@ -3413,6 +4569,34 @@
 "1526a17ee7",
 "Lås upp"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Alla ritningar är upplåsta"
+],
+"vDay": [
+"f6bb0f468a",
+"Dagar"
+],
+"vHour": [
+"9e25a34e63",
+"Timmar"
+],
+"vMin": [
+"092f99ea11",
+"Minuter"
+],
+"vMonth": [
+"200dcdce9b",
+"Månader"
+],
+"vSec": [
+"5fb1db5278",
+"Sekunder"
+],
+"vWeek": [
+"7d75266a53",
+"Veckor"
+],
 "value": [
 "3e8248e32e",
 "Pris"
@@ -3420,6 +4604,10 @@
 "valuePct": [
 "bf55390d8d",
 "Procent (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3464,6 +4652,14 @@
 "yourRate": [
 "ca14282aa6",
 "din kurs"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Zooma ut"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Dra en större box för att zooma in."
 ]
 },
 "f": {
@@ -3471,13 +4667,61 @@
 "03052d4f09",
 3
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+1
+],
 "about.bd3e93adef": [
 "bd3e93adef",
 3
 ],
+"ckNote": [
+"bc9c1644bd",
+1
+],
 "curPlain": [
 "ad051e540f",
 3
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+1
+],
+"in_cp_star": [
+"f1940a30a1",
+1
+],
+"in_cvd": [
+"fbd0df870e",
+1
+],
+"in_fvg": [
+"bad3ce3dd2",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_srlux": [
+"50cfe9a1d5",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"in_vpvr": [
+"f757c4a16d",
+1
+],
+"ind_zlsma": [
+"814b9eebab",
+1
+],
+"optNote": [
+"96723a0ac4",
+1
 ],
 "slTp": [
 "41d1998bce",

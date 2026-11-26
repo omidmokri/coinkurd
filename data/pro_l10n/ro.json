@@ -3185,6 +3185,18 @@
 "3541c5f4e1",
 "Lungime bandă"
 ],
+"p_bw": [
+"1d06cbba91",
+"Lățime bandă"
+],
+"p_chdev": [
+"65acb623a8",
+"Deviație canal"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplicator"
+],
 "p_conv": [
 "9151f8433f",
 "Conversie"
@@ -3217,6 +3229,10 @@
 "8db6a2f1d3",
 "Rapid"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Rapid 2"
+],
 "p_hi": [
 "70a2565504",
 "Nivel superior"
@@ -3237,6 +3253,14 @@
 "a0623fa9a3",
 "Netezire %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"Multiplicator KC"
+],
+"p_key": [
+"ab76f1670b",
+"Valoare cheie"
+],
 "p_l1": [
 "ba51565baf",
 "Lungime MA 1"
@@ -3252,6 +3276,14 @@
 "p_l4": [
 "a5c110eb00",
 "Lungime MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Look-back percentilă"
+],
+"p_left": [
+"3b219a058a",
+"Bare stânga"
 ],
 "p_len": [
 "3bade34ecb",
@@ -3293,6 +3325,14 @@
 "a44d6c906d",
 "Lumânări pe fiecare parte"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Lungime canal"
+],
+"p_n2": [
+"2df99da939",
+"Lungime medie"
+],
 "p_offset": [
 "ce66771654",
 "Offset"
@@ -3301,13 +3341,41 @@
 "ac556cf593",
 "Procent"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Perioadă eșantionare"
+],
+"p_ph": [
+"b1f698cc3d",
+"Percentilă superioară"
+],
+"p_qqe": [
+"f1fb561b11",
+"Factor QQE"
+],
 "p_rank": [
 "1df2ca7462",
 "Lungime percent-rank"
 ],
+"p_right": [
+"307c9815b6",
+"Bare dreapta"
+],
+"p_rows": [
+"52d0b35277",
+"Rânduri"
+],
 "p_rsi": [
 "560e6b61c6",
 "Lungime RSI"
+],
+"p_sf": [
+"590f20262b",
+"Netezire RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -3324,6 +3392,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Lent"
+],
+"p_slow2": [
+"c252d2ccab",
+"Lent 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -3369,6 +3441,54 @@
 "07300ad49f",
 "{c} pentru 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Adaugă"
+],
+"pfAvg": [
+"def9f57b0c",
+"Preț mediu cumpărare"
+],
+"pfCost": [
+"64ae43e8fe",
+"Cost"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Nimic aici încă. Adaugă o monedă, cât deții și cât ai plătit."
+],
+"pfName": [
+"a5a98fb17f",
+"Portofoliu {n}"
+],
+"pfNote": [
+"f46050561e",
+"Păstrat doar în acest browser. Nu cere niciodată chei de schimb și nu trimite nimic nicăieri. Prețurile sunt perechi Binance USDT."
+],
+"pfNow": [
+"039df35064",
+"Preț actual"
+],
+"pfPnl": [
+"8ae3945397",
+"Profit / pierdere"
+],
+"pfQty": [
+"44f6af6945",
+"Cantitate"
+],
+"pfShort": [
+"036b18f02a",
+"Portofoliu"
+],
+"pfTitle": [
+"036b18f02a",
+"Portofoliu"
+],
+"pfValue": [
+"8dce170de2",
+"Valoare"
+],
 "pickStart": [
 "1e214a5fd6",
 "Faceți clic pe grafic unde doriți să înceapă reluarea"
@@ -3392,6 +3512,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Preț"
+],
+"profNote": [
+"c1da831af8",
+"Pentru un profil al unui interval ales, folosește „Fixed range volume profile” în bara de instrumente din stânga."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3565,6 +3689,86 @@
 "56a2285c5b",
 "Se salvează…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Ajustare automată scară preț"
+],
+"scBorder": [
+"45c60c0e85",
+"Margine scară preț"
+],
+"scBot": [
+"77a5b77d62",
+"Spațiu jos (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Ambele părți"
+],
+"scInvert": [
+"ba80abaac1",
+"Inversează scara prețului"
+],
+"scInvertH": [
+"ebb1688761",
+"sus devine jos"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Stânga"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmic"
+],
+"scMode": [
+"a5e5771ca0",
+"Scară preț"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logaritmic sau procentual"
+],
+"scNone": [
+"d4c2792a72",
+"Ascuns"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmetic)"
+],
+"scOff": [
+"3557c35506",
+"Spațiu gol în dreapta"
+],
+"scPct": [
+"c4519ac7cc",
+"Procentaj"
+],
+"scRight": [
+"954daa8b00",
+"Dreapta"
+],
+"scSec": [
+"c92a4af093",
+"Secunde pe scara timpului"
+],
+"scSide": [
+"82acb7ee2b",
+"Unde este plasată scara prețului"
+],
+"scSpace": [
+"2878a3a43e",
+"Spațiere lumânări"
+],
+"scTop": [
+"25126a3aab",
+"Spațiu sus (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Margine scară timp"
+],
 "sc_c": [
 "3e8248e32e",
 "Preț"
@@ -3624,6 +3828,62 @@
 "screener": [
 "7f27924c12",
 "Monitorizare piață"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Verifică"
+],
+"scriptEd": [
+"989a6a8a22",
+"Editor script Entekhab"
+],
+"scriptEdit": [
+"ae909c75da",
+"Editează scriptul"
+],
+"scriptExamples": [
+"41a27a4710",
+"Exemple…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Linia {n}"
+],
+"scriptName": [
+"709a23220f",
+"Nume"
+],
+"scriptNew": [
+"ebac729ca3",
+"Script nou"
+],
+"scriptNote": [
+"c265d2248f",
+"Scrie proprii indicatori într-un limbaj de tip Pine. Sunt salvați în acest browser și rulează doar aici, pe graficul tău."
+],
+"scriptOk": [
+"eb3da0c952",
+"Fără erori · {n} ieșiri"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Ce știe limbajul"
+],
+"scriptSave": [
+"1e291c4d98",
+"Salvează și adaugă pe grafic"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Script salvat"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -3729,9 +3989,25 @@
 "e97d96a8bc",
 "Volum maxim"
 ],
+"sg_adx": [
+"815b591f93",
+"Încrucișare DMI (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Reversie Bollinger"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3740,6 +4016,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Semnale Kurdistani (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Încrucișare Ichimoku Tenkan/Kijun"
+],
+"sg_kdj": [
+"a9a165bc50",
+"Încrucișare KDJ"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -3753,6 +4045,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "Reversie RSI"
@@ -3761,9 +4061,37 @@
 "446d28671b",
 "Golden / death cross (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Încrucișare Stochastic RSI"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"Încrucișare WaveTrend [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3893,6 +4221,106 @@
 "2d2cb022bc",
 "Viteză"
 ],
+"stBadLv": [
+"683a05683a",
+"Nivelurile trebuie să conțină până la 24 de numere."
+],
+"stBadPt": [
+"a73083f114",
+"Un preț sau un timp nu este valid."
+],
+"stColor": [
+"f28563a477",
+"Culoare"
+],
+"stCoord": [
+"8ebebca019",
+"Coordonate"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Întrerupt"
+],
+"stDev": [
+"e789c07831",
+"Deviație (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Punctat"
+],
+"stExtL": [
+"ef880cf8fc",
+"Extinde stânga"
+],
+"stExtR": [
+"fbff580b3d",
+"Extinde dreapta"
+],
+"stFill": [
+"64dd60fe1a",
+"Fundal"
+],
+"stLevels": [
+"ae3d013ab1",
+"Niveluri (separate prin virgulă)"
+],
+"stLine": [
+"120ee44bec",
+"Stil linie"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Doar primele 12 puncte pot fi editate aici."
+],
+"stOpacity": [
+"f12e36bd83",
+"Opacitate fundal"
+],
+"stReset": [
+"40aab769d0",
+"Niveluri implicite"
+],
+"stRows": [
+"52d0b35277",
+"Rânduri"
+],
+"stSize": [
+"83ca9e48c3",
+"Dimensiune font"
+],
+"stSolid": [
+"d00635865c",
+"Continuu"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stil"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Culoare text"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Orele sunt în UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Vizibilitate"
+],
+"stWidth": [
+"ad48f34186",
+"Grosime"
+],
 "st_err": [
 "d802d232a8",
 "Fără date"
@@ -3936,6 +4364,14 @@
 "stop": [
 "9e253470c8",
 "Stop"
+],
+"stratNote": [
+"16dc19eef4",
+"Fiecare strategie rulează pe istoricul acestui grafic în tester: intrări și ieșiri pe grafic, rezultat net, rată de câștig, drawdown și un optimizator pentru setările sale."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Rulează în testerul de strategii"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3997,17 +4433,57 @@
 "a26d0ddaae",
 "Derulare (timp)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"Model ABCD"
+],
+"t_angle": [
+"30cd1e7703",
+"Unghi trend"
+],
+"t_arc": [
+"853a983f6b",
+"Arc"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Săgeată"
+],
+"t_arrowc": [
+"0f722804ec",
+"Cursor săgeată"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Marcaj săgeată jos"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Marker săgeată"
+],
+"t_arrowup": [
+"8023467135",
+"Marcaj săgeată sus"
+],
+"t_avwap": [
+"0a4f86b195",
+"VWAP ancorat"
 ],
 "t_brush": [
 "25f085220c",
 "Pensulă"
 ],
+"t_callout": [
+"f1647ad880",
+"Casetă text"
+],
 "t_channel": [
 "c0350b7736",
 "Canal paralel"
+],
+"t_circ": [
+"1cc7820a08",
+"Cerc"
 ],
 "t_circle": [
 "8580e3175f",
@@ -4709,14 +5185,18 @@
 "f": {
 "fx2Note": [
 "15ebd3b4a9",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
+2
+],
+"sg_nwe": [
+"4e506ad872",
 1
 ],
 "slTp": [

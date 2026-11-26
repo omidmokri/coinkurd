@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Sablonok, letöltés és átvitel:</b> kész indikátorkészletek és saját sablonok; a gyertyák CSV-fájlja az indikátorok értékeivel; export és import; megosztási link egy elrendezéshez. Egy link és QR kód megnyitja ugyanezt a munkaterületet a telefonodon vagy más eszközön, és a böngésző fülei szinkronban maradnak."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"A gyertyák és az árak a Binance nyilvános piaci adatai (egyetlen élő kapcsolat az egész oldalhoz); ha a Binance nem érhető el, akkor az OKX, végül az oldal saját pillanatképe — az egyes diagramok melletti színes pont jelzi, melyik. Bármelyik diagramhoz választhatja a Coinbase, Bybit, OKX vagy Kraken szolgáltatót a Binance helyett, amelyeket a böngészője közvetlenül az adott tőzsde saját nyilvános végpontjáról olvas be; ha egy tőzsde nem válaszol a kapcsolatán keresztül, az oldal azonnal jelzi. A világ devizapárjai (EUR/USD, USD/JPY és a többiek) az oldal saját napi referenciaárfolyamaiból származnak — az Európai Központi Bank és az exchange-api adatkészletéből — napi egy érték, nem bróker tick-adatok. A gazdasági naptár a ForexFactory heti hírfolyama; a Bitcoin mozgása egy esemény után együttmozgás, nem ok-okozati összefüggés. Gyenge kapcsolat esetén kapcsolja be az „Adatkímélő” módot a beállításokban. A korrigált diagramok (osztalékok és tőkeemelések) a Teheráni Értéktőzsde funkciói, és nem vonatkoznak a kriptovalutákra. Irán piaci árfolyamai a tgju.org nyilvános adatai; az érmeárak tomanban becslések: a Binance árfolyam × a tether árfolyama tomanban."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Honnan származnak az adatok"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "A riasztások ebben a böngészőben futnak, amíg az oldal nyitva van (bármelyik fülön). Az indikátor-riasztások a gyertya zárásakor lépnek működésbe."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Riasztás ezen a rajzon"
+],
 "alertSet": [
 "80c4c4abee",
 "Riasztás beállítva: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Legjobb kötés"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Éves növekedés (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar-mutató"
+],
 "btCsv": [
 "7e55b55d0e",
 "Kötések letöltése (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Long kötések"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1000 azonos kötés sorrendje):"
+],
+"btMCv": [
+"992209a3c0",
+"tipikus visszaesés {a}% · a kötések 95%-a {b}% alatt marad · legrosszabb {c}% · ez a futtatás {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimalizálás"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Profit faktor"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Kifizetési arány (átl. nyerő / átl. vesztes)"
+],
 "btRange": [
 "63a44ed01a",
 "tól / ig / lépésköz"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (évesített)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Az első 70% vs az utolsó 30% a kötésekből:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} {aw}% nyerési aránnyal ({an} kötés) → {b} {bw}% nyerési aránnyal ({bn} kötés)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Összes"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · nyílt forráskódú"
+],
+"cat_com": [
+"90566b4c6f",
+"Közösségi kedvencek"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (világ)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "24 órás változás"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Coin_Kurd nyílt forráskódú TradingView szkriptek, itt futnak a grafikonodon."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Makro Rezsim"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Stílusú Ciklus"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spirál"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro irányítópult nyilvános adatokból: risk-on / risk-off rezsim"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"On-chain ciklusfázisok (MVRV, NUPL) árfolyam pozícióval"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"A Bitcoin teljes története logaritmikus spirálon"
+],
 "clearAll": [
 "7de68ccb43",
 "Összes rajz törlése"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Rajzok és indikátorok törlése"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Rajzok törlése"
+],
+"clearInds": [
+"8b56474294",
+"Indikátorok törlése"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Törlöd az összes indikátort erről a grafikonról?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Másolat"
+],
+"cloned": [
+"51fbf8cb72",
+"Mellé másolva"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Hátralévő idő a gyertya zárásáig"
 ],
+"crFree": [
+"6b4b480231",
+"Követi az egeret"
+],
+"crLargeDash": [
+"a7503adc35",
+"Hosszú szaggatott"
+],
+"crMagnet": [
+"77fa49774c",
+"Gyertyákhoz illesztés"
+],
+"crOff": [
+"d4c2792a72",
+"Rejtett"
+],
+"crSparse": [
+"e50cc378a1",
+"Ritka pontok"
+],
 "create": [
 "8ac903c3c3",
 "Riasztás létrehozása"
+],
+"csBg": [
+"64dd60fe1a",
+"Háttér"
+],
+"csBg2": [
+"9ebb790d74",
+"Második háttérszín"
+],
+"csBody": [
+"718a7e8a58",
+"Gyertyatest"
+],
+"csBorderC": [
+"eeffa83765",
+"Szegélyszín"
+],
+"csBorders": [
+"685f23bc5e",
+"Szegélyek"
+],
+"csClose": [
+"bbfa773e5a",
+"Záróár"
+],
+"csCross": [
+"b0b83f89e8",
+"Szálkereszt és egér"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Szálkereszt színe"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Szálkereszt vonal"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Ár- és időcímkék a szálkereszten"
+],
+"csCrossMode": [
+"800092e3e1",
+"Szálkereszt"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Szálkereszt vastagsága"
+],
+"csDn": [
+"11f5ff3829",
+"Eső gyertya"
+],
+"csFont": [
+"b97c4d4cdd",
+"Betűtípus"
+],
+"csFsize": [
+"83ca9e48c3",
+"Betűméret"
+],
+"csGrad": [
+"c716191a01",
+"háttér színátmenetessé tétele"
+],
+"csGridA": [
+"f773586220",
+"Rács átlátszatlansága (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Rácsszín"
+],
+"csGridH": [
+"4eaa1c008a",
+"Vízszintes rácsvonalak"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Függőleges rácsvonalak"
+],
+"csHollow": [
+"9165bccc85",
+"Üres gyertyatestek"
+],
+"csHollowH": [
+"fb63aba345",
+"csak az emelkedő gyertyák"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetikus görgetés érintőképernyőn"
+],
+"csLast": [
+"aacdc5bea4",
+"Utolsó ár vonala"
+],
+"csLastLab": [
+"91c990bcb9",
+"Árcímke a skálán"
+],
+"csLineC": [
+"01212659ee",
+"Vonal / terület színe"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Vonalvastagság"
+],
+"csLook": [
+"41def7a0fe",
+"Megjelenés"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"egy szín mindkét irányhoz"
+],
+"csPinch": [
+"e557a41794",
+"Nagyítás csippentéssel érintőképernyőn"
+],
+"csResetQ": [
+"9c369383c1",
+"Visszaállítod az összes grafikonbeállítást az eredetire?"
+],
+"csScale": [
+"0b414bdcb7",
+"Skálák"
+],
+"csScroll": [
+"468c89cb3b",
+"Grafikon mozgatása egérrel"
+],
+"csSym": [
+"fad29404d2",
+"Gyertyák"
+],
+"csText": [
+"d160595fcf",
+"Szövegszín"
+],
+"csTheme": [
+"a797e30923",
+"Téma"
+],
+"csTitle": [
+"ae445d4cd9",
+"Grafikon beállításai"
+],
+"csUp": [
+"971a95475d",
+"Emelkedő gyertya"
+],
+"csWick": [
+"fe6e2bfd48",
+"Kanócok"
+],
+"csWickC": [
+"0fcb21d161",
+"Kanóc színe"
+],
+"csWm": [
+"33c7b41ac6",
+"Vízjel a gyertyák mögött"
+],
+"csWmA": [
+"69a1810ea2",
+"Vízjel átlátszatlansága (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"szimbólum és idősík"
+],
+"csWmC": [
+"bad81c749f",
+"Vízjel színe"
+],
+"csWmSize": [
+"4af7e52f80",
+"Vízjel mérete"
+],
+"csWmText": [
+"ecf870ab34",
+"Vízjel szövege"
+],
+"csZoom": [
+"c6f40d9d03",
+"Egérgörgő"
+],
+"csZoomH": [
+"4ca34c1092",
+"nagyítás és kicsinyítés"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} gyertya letöltve"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Riasztás hozzáadása ide"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Ár másolása"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Minden gyertya megjelenítése"
+],
+"ctxHline": [
+"588d2eb492",
+"Vízszintes vonal ide"
+],
+"ctxReset": [
+"242cb352c0",
+"Nézet alaphelyzetbe"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Minden alkalommal (legfeljebb percenként / gyertyánként egyszer)"
 ],
+"exAuto": [
+"1ff048b76e",
+"élő, OKX tartalékkal"
+],
+"exDown": [
+"e8ba18613e",
+"{x} nem válaszol ezen a kapcsolaton. A grafikon marad azon a tőzsdén, amelyen éppen van."
+],
+"exNote": [
+"0eb4c03240",
+"A Binance élőben közvetít; a többiek tíz másodpercenként olvassák a saját nyilvános végpontjukat, saját előzményekkel."
+],
+"exTitle": [
+"5b13eac7ed",
+"Tőzsde"
+],
 "exit": [
 "f83b6fe3ae",
 "Kilépés"
+],
+"exitFull": [
+"fc61e74cd9",
+"Kilépés teljes képernyőből"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Minden exportálása (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Az indikátor adatai nem töltődtek be. Próbáld újra egy pillanat múlva."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Sárga"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Előrejelzés"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Negyedéves határidős ügyletek, folyamatos"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Egy valuta egy másikkal szemben, a webhely saját napi referenciaárfolyamai alapján (Európai Központi Bank, és az exchange-api adatkészlet, ahol az ECB nem jegyez valutát). Napi egy érték, így a napi gyertya egyetlen pont, a heti és havi gyertyák pedig a bennük lévő napokból épülnek fel. A referenciaárfolyamok naponta egyszer jelennek meg, nem bróker tick adatok: itt nincs napon belüli forex. A dollár párok 2024. március 2-án kezdődnek, a két ECB valuta közötti párok 2017-ben."
+],
+"g_arrows": [
+"0cf604cb00",
+"Nyilak"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Ecsetek"
+],
+"g_channels": [
+"18e03e2a37",
+"Csatornák"
+],
+"g_cursors": [
+"f4d2f91040",
+"Kurzorok"
+],
+"g_cycles": [
+"97f064aff5",
+"Ciklusok"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott hullámok"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Vonalak"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Mérőeszköz"
+],
+"g_pat": [
+"2c179da0f5",
+"Grafikon minták"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Villák"
+],
+"g_proj": [
+"8aa49fe840",
+"Vetítés"
+],
+"g_shapes": [
+"b1985e3874",
+"Alakzatok"
+],
+"g_text": [
+"d7cd4cda4f",
+"Szöveg és jegyzetek"
+],
+"g_vol": [
+"1b4620951d",
+"Volumen alapú"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Rajzok elrejtése / megjelenítése"
+],
+"hideBoth": [
+"3502a3299d",
+"Rajzok és indikátorok elrejtése"
+],
+"hideDraw": [
+"f4492c5211",
+"Rajzok elrejtése"
+],
+"hideInds": [
+"764ab9d614",
+"Indikátorok elrejtése"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1265,9 +1721,61 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Összes gyertyaalakzat"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Elnyelő (Engulfing)"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Kalapács / Akasztott ember"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Hajnali / Esti csillag"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Áttörő vonal / Sötét felhő takarás"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Három fehér katona / fekete varjú"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Hullócsillag / Fordított kalapács"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Csipesz tető / alj"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulatív Volumendelta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1797,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA Felhők [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1809,41 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Egyenlő csúcsok / aljak"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Fair Value Gap-ek (FVG)"
+],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Többszörös MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1856,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Makro Rezsim"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Stílusú Ciklus"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spirál"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1909,18 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Piaci struktúra (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Nadaraya-Watson Boríték [LuxAlgo]"
+],
+"in_ob": [
+"80c4ef99a7",
+"Order Block-ok"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1940,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1977,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Támasz & Ellenállás törésekkel [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Csatorna [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Ciklus"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profil (idő az árnál)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +2037,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volumendelta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +2057,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Szakasz Volumeprofil"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Látható tartomány volumeprofilja"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP sávok"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2084,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1493,6 +2125,10 @@
 "0f70916dbb",
 "Arnaud Legoux mozgóátlag"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR trendvonal MFI által vezérelve (RSI volumen nélkül)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: A felezőpont SMA 5 mínusz SMA 34"
@@ -1504,6 +2140,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Átlagos valódi tartomány (volatilitás)"
+],
+"ind_atrts": [
+"8223831420",
+"Stop, amely k·ATR-rel követ és oldalt vált"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1529,6 +2169,10 @@
 "a50928c16b",
 "Árupiaci csatorna index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR kilépések a legmagasabb/legalacsonyabb záróárakhoz kötve"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trendelő (alacsony) vagy oldalt mozgó (magas) piac"
@@ -1549,9 +2193,61 @@
 "bf330f58dd",
 "Hosszú távú momentum: két változási ütem WMA-ja"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Minden alábbi mintát megjelöl a gyertyákon"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Nyitó és záróár majdnem egyenlő (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bika (BE) és medve (SE) elnyelő gyertya"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Hosszú alsó kanóc esés (H) vagy emelkedés (HM) után"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Kis test az előző nagy gyertyán belül (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Egy gyertya teljes egészében az előzőn belül (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Nagy test kanócok nélkül (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Háromgyertyás forduló: MS bika, ES medve"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Rés és zárás az előző gyertya felezőjén túl (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Három erős gyertya egymás után (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Hosszú felső kanóc emelkedés (SS) vagy esés (IH) után"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Két gyertya azonos csúccsal (TT) vagy aljjal (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, sorozat RSI és százalékos rangsor kombinációja"
+],
+"ind_cvd": [
+"690d30a274",
+"A volumendelta futó összege: ki irányít"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1573,6 +2269,10 @@
 "c499047c5b",
 "Exponenciális mozgóátlag"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · két EMA felhő, gyors és lassú"
+],
 "ind_env": [
 "e2cf023f50",
 "Mozgóátlag rögzített %-os távolságú sávokkal"
@@ -1581,17 +2281,41 @@
 "d648aafe8d",
 "Mennyire könnyen mozog az ár egységnyi volumenre vetítve"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Két swing majdnem azonos áron: pihenő likviditás"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Az árakat szinte normális eloszlásúvá alakítja"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Vételi × eladási volumen és delta minden gyertya alatt; nagyítson az olvasáshoz. Gyertyánként, nem árszinten"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fraktálok: helyi csúcsok és aljak"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Háromgyertyás rések; minden doboz ott végződik, ahol az ár kitölti"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Hat rövid és hat hosszú EMA: traderek a befektetők ellen"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · lépcsőzetes trendvonal, amely csak valódi swing-törésnél vált"
+],
 "ind_hma": [
 "709351f832",
 "Hull mozgóátlag: gyors és sima"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA a meredeksége szerint színezve"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1604,6 +2328,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic a J vonallal (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (nyílt forráskód, MPL-2.0) · makro rezsim a gyertyák mögött, jelzései és műszerfal, FRED adatokból"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (nyílt forráskód) · Bitcoin fair érték 8.31e-17·nap^5.48, ±10 % sávokkal és vételi zónával; BTC-re"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (nyílt forráskód) · Bitcoin ciklusfázisok MVRV, NUPL és SOPR proxy alapján: Extrém Medve, Medve, Korai Bika, Bika, Túlhevült; a szürke vonal a normalizált ár"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (nyílt forráskód) · Bitcoin teljes története logaritmikus spirálon, egy fordulat felezési ciklusonként, csúcsokkal, aljakkal, felezésekkel és a jelennel"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1641,9 +2385,21 @@
 "d6640bbc39",
 "Aktuális ár mínusz n gyertyával ezelőtti ár"
 ],
+"ind_ms": [
+"13fc87db00",
+"Az utolsó megerősített swing törései: BOS a trenddel, CHoCH ellene"
+],
 "ind_news": [
 "a95010ef34",
 "Cikkek erről az érméről, a közzétételük időpontjával jelölve (az oldal utolsó napi hírei)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · kernel-simított ár átlagos hibaborítékkal; nem átfestő forma"
+],
+"ind_ob": [
+"530cdc224f",
+"Az utolsó ellentétes gyertya a struktúratörés előtt, amíg az ár nem zár rajta keresztül"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1668,6 +2424,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "A %-os változással arányosan hozzáadott volumen"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · simított RSI volatilitás-követő vonallal (QQE MOD mag)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · kiszűri a simított átlagos tartománynál kisebb zajt"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1701,25 +2465,53 @@
 "26db009730",
 "Egyszerű mozgóátlag"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Záróár a tartomány közepéhez képest, duplán simítva"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Simított mozgóátlag (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger a Keltneren belül = squeeze (piros pontok); a hisztogram mutatja a törés irányát"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · az utolsó pivot csúcs és alj szintekként"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochasztikus RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · csúcsok és aljak mozgóátlagai, amelyek helyet cserélnek a trendfordulókor"
+],
 "ind_st": [
 "8d66b52001",
 "ATR követő vonal, amely a trenddel együtt fordul"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD kétszer futtatva egy stochastic-on: korai trendfordulók (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K és %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI volatilitási sávokkal, egy gyors és egy lassú vonallal"
+],
 "ind_tema": [
 "1ff881355e",
 "Tripla exponenciális mozgóátlag"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Hány gyertya kereskedett az egyes árakon, naponta"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1733,6 +2525,18 @@
 "182e4a763e",
 "Vételi nyomás három időszakon keresztül"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR követő stop; az ár keresztezése a vételi/eladási jel"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Vételi volumen mínusz eladási volumen gyertyánként (taker adatok Binance-ről; máshol becslés)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · szintetikus VIX bármely piachoz; a sávok feletti tüskék gyakran pánik-aljakat jeleznek"
+],
 "ind_vo": [
 "a99f6a0038",
 "Gyors vs lassú volumenátlag (%)"
@@ -1745,9 +2549,21 @@
 "6badda8c94",
 "Pozitív és negatív trendmozgás (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Egy volumeprofil naponta (havi bontásban napi gyertyákon)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volumen az egyes árakon a képernyőn lévő gyertyákhoz, POC-kal és értékterülettel"
+],
 "ind_vwap": [
 "6d86714413",
 "Volumensúlyozott átlagár, 00:00 UTC-kor újrainicializálva"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Napi VWAP ±1σ és ±k·σ sávokkal"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1760,6 +2576,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Súlyozott mozgóátlag"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · csatorna-index oszcillátor; 53/60 feletti és −53/−60 alatti keresztezések jelzik a túlfeszített mozgásokat"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · nulla késleltetésű legkisebb négyzetes mozgóátlag"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1885,6 +2709,14 @@
 "891ebccd5b",
 "Zárolás"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Minden rajz zárolása"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Minden rajz zárolva"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1905,13 +2737,41 @@
 "5f703c7eba",
 "Kurdistani szignálok"
 ],
+"mMode": [
+"659eba1219",
+"Ismétlés"
+],
+"mMsg": [
+"2c924e3088",
+"Megjegyzés"
+],
+"mTf": [
+"85decb73d1",
+"Időkeret"
+],
 "maType": [
 "15f86c051e",
 "Átlag"
 ],
+"macroNote": [
+"c4a94f666d",
+"szabályalapú becslés, nem tanács"
+],
 "magnet": [
 "effa915951",
 "Mágnes (igazítás nyitó/magas/alacsony/záró értékhez)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Mágnes kikapcsolva"
+],
+"magnetS": [
+"607a7625b1",
+"Erős mágnes"
+],
+"magnetW": [
+"181021d95b",
+"Gyenge mágnes"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1933,9 +2793,45 @@
 "fdbe20f376",
 "Összes idősík"
 ],
+"moreTools": [
+"c871f1056a",
+"További eszközök"
+],
 "moveToSection": [
 "98d183e7cb",
 "Áthelyezés szakaszba"
+],
+"mt_mine": [
+"1cf761ac34",
+"Saját szkriptek"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opciók"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Minták"
+],
+"mt_prof": [
+"0c2a930099",
+"Profilok"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Struktúra"
+],
+"mt_strat": [
+"876f3e0202",
+"Stratégiák"
+],
+"multiAl": [
+"5bafcd2412",
+"Több feltételes riasztás"
+],
+"multiNote": [
+"c7e278bae8",
+"Írja a feltételeket egy sorba és kösse össze őket és / vagy operátorokkal. A riasztás azon a gyertyán aktiválódik, ahol a sor igaz lesz."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1984,6 +2880,10 @@
 "nc_technical": [
 "41fc086088",
 "Technikai"
+],
+"neckline": [
+"993062b2d6",
+"Nyakvonal"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2093,6 +2993,10 @@
 "77f8046dcf",
 "(felső, nincs szekció)"
 ],
+"noVol": [
+"0960b9b69d",
+"nincs volumen ehhez a szimbólumhoz"
+],
 "notif": [
 "270d190970",
 "Böngészőértesítés"
@@ -2145,21 +3049,57 @@
 "c0da22faab",
 "Megnyitás a grafikonon"
 ],
+"openTv": [
+"94d7227248",
+"Megnyitás TradingView-ban"
+],
+"optChain": [
+"234f0372e8",
+"{c} opciós lánc"
+],
+"optDays": [
+"c2fd31e918",
+"Napok a lejáratig"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombináció tesztelve {s} mp alatt, ebből {p} nyereséges; rendezve: {r}. Kattints egy sorra a teljes jelentésért."
 ],
+"optFail": [
+"ab2a990eed",
+"A Deribit nem válaszolt erről a kapcsolatról. Váltson kapcsolatot vagy VPN-t és próbálja újra."
+],
+"optIV": [
+"c1bc12118c",
+"ATM implicit volatilitás"
+],
 "optMax": [
 "7b9c1b1490",
 "Túl sok kombináció — legfeljebb {n}. Használj nagyobb lépésközt."
+],
+"optMove": [
+"8aa36fe05d",
+"Várható elmozdulás"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} kombináció (legfeljebb {m} ehhez az előzményhez)"
 ],
 "optNote": [
-"4b4713d390",
-"A múltbeli adatokon elért legjobb eredmény gyakran a szerencse műve (túlillesztés). Olyan beállításokat válassz, amelyek szomszédai is jól teljesítenek, és ellenőrizd őket másik időszakon vagy piacon."
+"96723a0ac4",
+"BTC és ETH opciós lánc a Deribit nyilvános adataiból, a böngészője által olvasva."
+],
+"optNote2": [
+"26dfa389e8",
+"OI és volumen kontraktusokban (coinokban); $ a mark ár dollárban. Max pain: az az elszámolási ár, amely a legkevesebbet fizeti az opciótartóknak. Várható elmozdulás = ár × IV × √(napok/365). Nem tanács."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2168,6 +3108,10 @@
 "optRun": [
 "9a456cc451",
 "Legjobb beállítások keresése"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Mögöttes termék"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2229,13 +3173,37 @@
 "0777981263",
 "A(z) {c} pénznemben lévő árak mostantól a te árfolyamodat használják."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitúdó"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR hossz"
 ],
+"p_band": [
+"3541c5f4e1",
+"Sáv hossza"
+],
 "p_base": [
 "077fe9c54e",
 "Alap"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Sáv hossza"
+],
+"p_bw": [
+"1d06cbba91",
+"Sávszélesség"
+],
+"p_chdev": [
+"65acb623a8",
+"Csatornaeltérés"
+],
+"p_coeff": [
+"b032583db6",
+"Szorzó"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2269,6 +3237,10 @@
 "8db6a2f1d3",
 "Gyors"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Gyors 2"
+],
 "p_hi": [
 "70a2565504",
 "Felső szint"
@@ -2289,6 +3261,14 @@
 "a0623fa9a3",
 "%K simítás"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC szorzó"
+],
+"p_key": [
+"ab76f1670b",
+"Kulcsérték"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1 hossz"
@@ -2304,6 +3284,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4 hossz"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentilis visszatekintés"
+],
+"p_left": [
+"3b219a058a",
+"Bal oldali gyertyák"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2345,6 +3333,14 @@
 "a44d6c906d",
 "Gyertyák mindkét oldalon"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Csatorna hossza"
+],
+"p_n2": [
+"2df99da939",
+"Átlag hossza"
+],
 "p_offset": [
 "ce66771654",
 "Eltolás"
@@ -2353,13 +3349,41 @@
 "ac556cf593",
 "Százalék"
 ],
+"p_pd": [
+"4997ad18cf",
+"Visszatekintés"
+],
+"p_per": [
+"a89f63abb8",
+"Mintavételi periódus"
+],
+"p_ph": [
+"b1f698cc3d",
+"Felső percentilis"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE tényező"
+],
 "p_rank": [
 "1df2ca7462",
 "Százalékos rang hossz"
 ],
+"p_right": [
+"307c9815b6",
+"Jobb oldali gyertyák"
+],
+"p_rows": [
+"52d0b35277",
+"Sorok"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI hossz"
+],
+"p_sf": [
+"590f20262b",
+"RSI simítás"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2376,6 +3400,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Lassú"
+],
+"p_slow2": [
+"c252d2ccab",
+"Lassú 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2421,6 +3449,54 @@
 "07300ad49f",
 "{c} 1 {u} egységre"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Hozzáadás"
+],
+"pfAvg": [
+"def9f57b0c",
+"Átlagos vételi ár"
+],
+"pfCost": [
+"64ae43e8fe",
+"Költség"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Még nincs itt semmi. Adj hozzá egy érmét, a mennyiséget és a vételárat."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfólió {n}"
+],
+"pfNote": [
+"f46050561e",
+"Csak ebben a böngészőben tárolva. Nem kér tőzsdei kulcsokat és nem küld semmit sehova. Az árak Binance USDT párok."
+],
+"pfNow": [
+"039df35064",
+"Jelenlegi ár"
+],
+"pfPnl": [
+"8ae3945397",
+"Nyereség / veszteség"
+],
+"pfQty": [
+"44f6af6945",
+"Mennyiség"
+],
+"pfShort": [
+"036b18f02a",
+"Portfólió"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfólió"
+],
+"pfValue": [
+"8dce170de2",
+"Érték"
+],
 "pickStart": [
 "1e214a5fd6",
 "Kattints arra a pontra a grafikonon, ahol az újrajátszásnak kezdődnie kell"
@@ -2444,6 +3520,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Árfolyam"
+],
+"profNote": [
+"c1da831af8",
+"Egy választott tartomány profiljához használd a „Fixed range volume profile” eszközt a bal oldali eszköztárban."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2617,6 +3697,86 @@
 "56a2285c5b",
 "Mentés…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Árskála automatikus igazítása"
+],
+"scBorder": [
+"45c60c0e85",
+"Árskála szegélye"
+],
+"scBot": [
+"77a5b77d62",
+"Alsó helyköz (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Mindkét oldal"
+],
+"scInvert": [
+"ba80abaac1",
+"Árskála megfordítása"
+],
+"scInvertH": [
+"ebb1688761",
+"a felfelé lefelé válik"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Bal"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmikus"
+],
+"scMode": [
+"a5e5771ca0",
+"Árskála"
+],
+"scModeH": [
+"ab58fc981e",
+"normál, logaritmikus vagy százalékos"
+],
+"scNone": [
+"d4c2792a72",
+"Rejtett"
+],
+"scNormal": [
+"7802670ec0",
+"Normál (aritmetikai)"
+],
+"scOff": [
+"3557c35506",
+"Üres hely a jobb oldalon"
+],
+"scPct": [
+"c4519ac7cc",
+"Százalék"
+],
+"scRight": [
+"954daa8b00",
+"Jobb"
+],
+"scSec": [
+"c92a4af093",
+"Másodpercek az időskálán"
+],
+"scSide": [
+"82acb7ee2b",
+"Az árskála elhelyezkedése"
+],
+"scSpace": [
+"2878a3a43e",
+"Gyertyák közötti távolság"
+],
+"scTop": [
+"25126a3aab",
+"Felső helyköz (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Időskála szegélye"
+],
 "sc_c": [
 "3e8248e32e",
 "Ár"
@@ -2676,6 +3836,62 @@
 "screener": [
 "7f27924c12",
 "Piacifigyelő"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Ellenőrzés"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script szerkesztő"
+],
+"scriptEdit": [
+"ae909c75da",
+"Szkript szerkesztése"
+],
+"scriptExamples": [
+"41a27a4710",
+"Példák…"
+],
+"scriptLine": [
+"1acb1c0448",
+"{n}. sor"
+],
+"scriptName": [
+"709a23220f",
+"Név"
+],
+"scriptNew": [
+"ebac729ca3",
+"Új szkript"
+],
+"scriptNote": [
+"c265d2248f",
+"Írj saját indikátorokat Pine-szerű nyelven. Ezek a böngésződben mentődnek és csak itt, a chartodon futnak."
+],
+"scriptOk": [
+"eb3da0c952",
+"Nincs hiba · {n} kimenet"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"A nyelv ismeretei"
+],
+"scriptSave": [
+"1e291c4d98",
+"Mentés és hozzáadás a charthoz"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Szkript mentve"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Szkript"
 ],
 "searchEv": [
 "0a08612647",
@@ -2781,9 +3997,25 @@
 "e97d96a8bc",
 "Legnagyobb forgalom"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI kereszteződés (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger fordulat"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2792,6 +4024,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani szignálok (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun kereszteződés"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ kereszteződés"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2805,6 +4053,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI fordulat"
@@ -2813,9 +4069,37 @@
 "446d28671b",
 "Arany / halálkereszt (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI kereszteződés"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend kereszteződés [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2945,6 +4229,106 @@
 "2d2cb022bc",
 "Sebesség"
 ],
+"stBadLv": [
+"683a05683a",
+"A szintek legfeljebb 24 számot tartalmazhatnak."
+],
+"stBadPt": [
+"a73083f114",
+"Egy ár vagy időpont érvénytelen."
+],
+"stColor": [
+"f28563a477",
+"Szín"
+],
+"stCoord": [
+"8ebebca019",
+"Koordináták"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Szaggatott"
+],
+"stDev": [
+"e789c07831",
+"Eltérés (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Pontozott"
+],
+"stExtL": [
+"ef880cf8fc",
+"Nyújtás balra"
+],
+"stExtR": [
+"fbff580b3d",
+"Nyújtás jobbra"
+],
+"stFill": [
+"64dd60fe1a",
+"Háttér"
+],
+"stLevels": [
+"ae3d013ab1",
+"Szintek (vesszővel elválasztva)"
+],
+"stLine": [
+"120ee44bec",
+"Vonalstílus"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Itt csak az első 12 pont szerkeszthető."
+],
+"stOpacity": [
+"f12e36bd83",
+"Háttér átlátszósága"
+],
+"stReset": [
+"40aab769d0",
+"Alapértelmezett szintek"
+],
+"stRows": [
+"52d0b35277",
+"Sorok"
+],
+"stSize": [
+"83ca9e48c3",
+"Betűméret"
+],
+"stSolid": [
+"d00635865c",
+"Folytonos"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stílus"
+],
+"stText": [
+"c3328c39b0",
+"Szöveg"
+],
+"stTextC": [
+"d160595fcf",
+"Szöveg színe"
+],
+"stTextL": [
+"c3328c39b0",
+"Szöveg"
+],
+"stUtc": [
+"c9dbd25df4",
+"Az időpontok UTC-ben értendők (ÉÉÉÉ-HH-NN ÓÓ:PP)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Láthatóság"
+],
+"stWidth": [
+"ad48f34186",
+"Vastagság"
+],
 "st_err": [
 "d802d232a8",
 "Nincs adat"
@@ -2988,6 +4372,14 @@
 "stop": [
 "9e253470c8",
 "Leállítás"
+],
+"stratNote": [
+"16dc19eef4",
+"Minden stratégia a chart történeti adatain fut a tesztelőben: belépők és kilépők a charton, nettó eredmény, találati arány, visszaesés (drawdown) és optimalizáló a beállításokhoz."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Futtatás a stratégia tesztelőben"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3037,25 +4429,133 @@
 "a26d0ddaae",
 "Görgetés (idő)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD minta"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendszög"
+],
+"t_arc": [
+"853a983f6b",
+"Ív"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Nyíl"
+],
+"t_arrowc": [
+"0f722804ec",
+"Nyíl kurzor"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Lefelé mutató nyíl"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Nyíl jelölő"
+],
+"t_arrowup": [
+"8023467135",
+"Felfelé mutató nyíl"
+],
+"t_avwap": [
+"0a4f86b195",
+"Horgonyzott VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Ecset"
 ],
+"t_callout": [
+"f1647ad880",
+"Felirat"
+],
 "t_channel": [
 "c0350b7736",
 "Párhuzamos csatorna"
+],
+"t_circ": [
+"1cc7820a08",
+"Kör"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipszis"
 ],
+"t_comment": [
+"153d7a58b3",
+"Megjegyzés"
+],
+"t_cross": [
+"983bdb7b27",
+"Keresztvonal"
+],
 "t_cursor": [
 "2239943c8d",
 "Kurzor"
+],
+"t_curve": [
+"916f09aff8",
+"Görbe"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Ciklikus vonalak"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher alakzat"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dupla görbe"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Szétválasztott csatorna"
+],
+"t_dot": [
+"46856bf702",
+"Pont"
+],
+"t_drange": [
+"c65ea4ae01",
+"Dátumtartomány"
+],
+"t_drives": [
+"3a261ca869",
+"Három hullám alakzat"
+],
+"t_emoji": [
+"707fd71017",
+"Ikonok és emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Radír"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliott korrekciós hullám (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliott dupla kombinált hullám (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott impulzus hullám (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliott háromszög hullám (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliott tripla kombinált hullám (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3065,13 +4565,69 @@
 "18c530863b",
 "Fibonacci visszatérés"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fib sebesség-ellenállás ívek"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fib csatorna"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib körök"
+],
 "t_fibext": [
 "73655be9d6",
 "Trendalapú Fibonacci kiterjesztés"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fib sebesség-ellenállás legyező"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fib spirál"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trendalapú Fib idő"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib időzóna"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib ék"
+],
+"t_flag": [
+"23d91e7740",
+"Zászló jelölő"
+],
+"t_flat": [
+"52d3db252e",
+"Lapos tető/alj"
+],
+"t_forecast": [
+"528bc4bc38",
+"Előrejelzés"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann legyező"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann doboz"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann négyzet"
+],
+"t_hl": [
+"8cb3f79b49",
+"Kiemelő"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3081,6 +4637,18 @@
 "0bcbc4e087",
 "Vízszintes sugár"
 ],
+"t_hs": [
+"43353dbcec",
+"Fej-váll alakzat"
+],
+"t_info": [
+"a690e33098",
+"Infóvonal"
+],
+"t_inside": [
+"30d6b425dc",
+"Belső villás (pitchfork)"
+],
 "t_long": [
 "666f195fc4",
 "Long pozíció"
@@ -3089,9 +4657,45 @@
 "2bedd64d85",
 "Ártartomány / mérés"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Módosított Schiff villás"
+],
+"t_note": [
+"2c924e3088",
+"Jegyzet"
+],
+"t_path": [
+"519e39132b",
+"Útvonal"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews villa"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Árcímke"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Árjegyzet"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polivonal"
+],
+"t_prange": [
+"c20f7ce09a",
+"Ártartomány"
+],
+"t_proj": [
+"8aa49fe840",
+"Vetítés"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3101,9 +4705,33 @@
 "c158695a64",
 "Téglalap"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regressziós trend"
+],
+"t_rrect": [
+"65807afaf7",
+"Forgatott téglalap"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff villás"
+],
 "t_short": [
 "a8daf74669",
 "Short pozíció"
+],
+"t_signpost": [
+"89f361362e",
+"Útjelző"
+],
+"t_sine": [
+"3852fedc7e",
+"Szinuszvonal"
+],
+"t_tcycle": [
+"521a687246",
+"Időciklusok"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3113,9 +4741,29 @@
 "e810388344",
 "Trendvonal"
 ],
+"t_tri": [
+"32547b031d",
+"Háromszög alakzat"
+],
+"t_tri3": [
+"73d3ae245f",
+"Háromszög"
+],
 "t_vline": [
 "a790288017",
 "Függőleges vonal"
+],
+"t_vrp": [
+"bcba420b37",
+"Fix tartományú volumenprofil"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD alakzat"
+],
+"t_zoom": [
+"4fc05f2763",
+"Nagyítás"
 ],
 "target": [
 "61ad50a9b9",
@@ -3161,6 +4809,26 @@
 "5fb1db5278",
 "Másodpercek"
 ],
+"thDark": [
+"ae1ef01432",
+"Sötét"
+],
+"thLight": [
+"a36ef8aba2",
+"Világos"
+],
+"thMid": [
+"4fe978738d",
+"Éjkék"
+],
+"thNavy": [
+"0229e960cf",
+"Tengerészkék"
+],
+"thPaper": [
+"22d507f2ba",
+"Papír"
+],
 "time": [
 "6c82e6dd86",
 "Idő"
@@ -3184,6 +4852,10 @@
 "tooFar": [
 "b29db0358a",
 "Ez régebbi, mint amit ez az idősík betölthet; válasszon nagyobb idősíkot."
+],
+"toolHint": [
+"56e62363ce",
+"kattintson a diagramra a rajzoláshoz"
 ],
 "topFixed": [
 "1a66879287",
@@ -3409,6 +5081,34 @@
 "1526a17ee7",
 "Feloldás"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Minden rajz feloldva"
+],
+"vDay": [
+"f6bb0f468a",
+"Nap"
+],
+"vHour": [
+"9e25a34e63",
+"Óra"
+],
+"vMin": [
+"092f99ea11",
+"Perc"
+],
+"vMonth": [
+"200dcdce9b",
+"Hónap"
+],
+"vSec": [
+"5fb1db5278",
+"Másodperc"
+],
+"vWeek": [
+"7d75266a53",
+"Hét"
+],
 "value": [
 "3e8248e32e",
 "Ár"
@@ -3416,6 +5116,10 @@
 "valuePct": [
 "bf55390d8d",
 "Százalék (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3460,9 +5164,25 @@
 "yourRate": [
 "ca14282aa6",
 "az ön árfolyama"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Kicsinyítés"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Húzzon egy nagyobb dobozt a nagyításhoz."
 ]
 },
 "f": {
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
+],
 "slTp": [
 "41d1998bce",
 3
