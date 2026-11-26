@@ -72,6 +72,16 @@ jobs:
         timeout-minutes: 3
         run: python scripts/obs_xchain.py
 
+      # /charts/sopr/ and /charts/hodl-waves/: SOPR and coin-age bands from Bitview (Bitcoin Research Kit, open source,
+      # no key), checked against the coins in existence and once a day against BGeometrics' free tier; it looks at most
+      # every few hours and keeps the last good file whenever a check fails
+      - name: SOPR and HODL waves (Bitview, checked against BGeometrics)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          OBS_AGE_FORCE: ${{ inputs.force && '1' || '' }}
+        run: python scripts/obs_age.py
+
       - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
         continue-on-error: true
         timeout-minutes: 5

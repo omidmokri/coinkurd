@@ -41,6 +41,8 @@ CYCLE = "/charts/bitcoin-cycle/"
 WAVE = "/charts/block-cycle/"
 SCORE = "/charts/onchain-score/"
 COMPASS = "/charts/cycle-compass/"
+SOPR = "/charts/sopr/"
+HODL = "/charts/hodl-waves/"
 HUB = "/charts/"
 URL = SITE + HUB
 
@@ -162,6 +164,8 @@ TXT = {
     "b_wave": {"fa": "〰️ چرخهٔ بلاکی", "ckb": "〰️ خولی بلۆکی", "kmr": "〰️ Çerxa blokê", "ar": "〰️ دورة الكتل", "en": "〰️ Block cycle"},
     "b_score": {"fa": "🌡 امتیاز آنچین", "ckb": "🌡 نمرەی ئانچین", "kmr": "🌡 Pûana on-chain", "ar": "🌡 درجة السلسلة", "en": "🌡 On-chain score"},
     "b_compass": {"fa": "🧭 قطب‌نمای چرخه", "ckb": "🧭 قیبلەنمای خول", "kmr": "🧭 Qibleya çerxê", "ar": "🧭 بوصلة الدورة", "en": "🧭 Cycle compass"},
+    "b_sopr": {"fa": "🪐 SOPR سود و زیان", "ckb": "🪐 SOPR قازانج و زیان", "kmr": "🪐 SOPR qezenc û zirar", "ar": "🪐 SOPR الربح والخسارة", "en": "🪐 SOPR profit & loss"},
+    "b_hodl": {"fa": "🌌 موج‌های HODL", "ckb": "🌌 شەپۆلەکانی HODL", "kmr": "🌌 Pêlên HODL", "ar": "🌌 موجات HODL", "en": "🌌 HODL waves"},
     # the day's figures (numbers stay in Latin digits, like every price in the bot)
     "now": {"fa": "📌 <b>بیت‌کوین در {d}</b>", "ckb": "📌 <b>بیتکۆین لە {d}</b>", "kmr": "📌 <b>Bitcoin di {d} de</b>", "ar": "📌 <b>البيتكوين في {d}</b>", "en": "📌 <b>Bitcoin on {d}</b>"},
     "l_mvrv": {"fa": "• MVRV {m} · NUPL {n} · قیمت تحقق‌یافته {r}", "ckb": "• MVRV {m} · NUPL {n} · نرخی بەدیهاتوو {r}", "kmr": "• MVRV {m} · NUPL {n} · bihayê pêkhatî {r}",
@@ -184,6 +188,15 @@ TXT = {
                 "ar": "• درجة السلسلة ({d}): {s} · {b}", "en": "• On-chain score ({d}): {s} · {b}"},
     "l_hp": {"fa": " · هش‌پرایس {h} برای هر PH در روز", "ckb": " · هاشپرایس {h} بۆ هەر PH لە ڕۆژێکدا", "kmr": " · hashprice {h} ji bo her PH di rojê de",
              "ar": " · سعر الهاش {h} لكل PH يوميًا", "en": " · hashprice {h} per PH a day"},
+    # SOPR and coin age (data/obs/age_now.json, scripts/obs_age.py: the same figures as /charts/sopr/ and /charts/hodl-waves/)
+    "l_age": {"fa": "• SOPR (Bitview، {d}): میانگین ۷ روزه {s} · {k} روز پیاپی {w}", "ckb": "• SOPR (Bitview، {d}): تێکڕای ٧ ڕۆژ {s} · {k} ڕۆژی یەک لە دوای یەک {w}",
+              "kmr": "• SOPR (Bitview, {d}): navgîniya 7 rojan {s} · {k} roj li pey hev {w}", "ar": "• SOPR (Bitview، {d}): متوسط ٧ أيام {s} · {k} يومًا متتاليًا {w}",
+              "en": "• SOPR (Bitview, {d}): 7-day average {s} · {k} days in a row {w}"},
+    "l_side": {"fa": ["زیر ۱، یعنی فروش با زیان", "بالای ۱، یعنی فروش با سود"], "ckb": ["لە خوار ١، واتە فرۆشتن بە زیان", "لە سەرووی ١، واتە فرۆشتن بە قازانج"],
+               "kmr": ["di bin 1 de, ango firotin bi zirarê", "li ser 1, ango firotin bi qezencê"], "ar": ["دون ١، أي بيع بخسارة", "فوق ١، أي بيع بربح"],
+               "en": ["below 1, selling at a loss", "above 1, selling at a profit"]},
+    "l_old": {"fa": " · سکه‌های بی‌حرکت بیش از یک سال {o}", "ckb": " · دراوی نەجووڵاو زیاتر لە ساڵێک {o}", "kmr": " · coinên ji salekê zêdetir neliviyayî {o}",
+              "ar": " · العملات الساكنة أكثر من سنة {o}", "en": " · coins unmoved for over a year {o}"},
     "band": {"fa": ["خیلی سرد", "سرد", "معتدل", "گرم", "داغ"], "ckb": ["زۆر سارد", "سارد", "مامناوەند", "گەرم", "زۆر گەرم"], "kmr": ["pir sar", "sar", "navîn", "germ", "pir germ"],
              "ar": ["بارد جدًا", "بارد", "معتدل", "دافئ", "ساخن"], "en": ["very cold", "cold", "neutral", "warm", "hot"]},
     "src": {"fa": "آنچین: Coin Metrics، آخرین روز بسته‌شده به وقت UTC.", "ckb": "ئانچین: Coin Metrics، دوایین ڕۆژی داخراو بە کاتی UTC.", "kmr": "On-chain: Coin Metrics, roja dawî ya girtî bi dema UTC.",
@@ -258,6 +271,19 @@ def summary(lang, load, now=None):
         if _num(x.get("hpusd")) and x["hpusd"] > 0:
             line += L("l_hp", lang, h=f(f"${x['hpusd']:.2f}"))
         out.append(line)
+    # SOPR's 7-day mean and how long it has stayed on one side of 1, and the coins unmoved for a year (scripts/obs_age.py);
+    # left out when the file's own checks failed, and the coin-age part only when it is the same day and the supply check held
+    ag = obj(load("obs/age_now"))
+    sa, ck = obj(ag.get("summary")), obj(ag.get("checks"))
+    s7, sd, sk = sa.get("sopr7"), sa.get("side_days"), sa.get("side")
+    if (_num(s7) and 0 < s7 < 10 and isinstance(sd, int) and not isinstance(sd, bool) and 0 < sd < 100000 and sk in ("loss", "profit")
+            and (s7 >= 1) == (sk == "profit") and _is_date(sa.get("date")) and obj(ck.get("other")).get("sopr_ok") is not False):
+        line = L("l_age", lang, d=f(sa["date"]), s=f(f"{s7:.3f}"), k=f(str(sd)), w=pick(TXT["l_side"], lang)[sk == "profit"])
+        o1 = sa.get("old1y")
+        if (_num(o1) and 0 <= o1 <= 100 and sa.get("wave_date") == sa["date"] and obj(ck.get("supply")).get("ok") is True
+                and obj(ck.get("other")).get("hodl_ok") is not False):
+            line += L("l_old", lang, o=f(f"{o1:.1f}%"))
+        out.append(line)
     o = obj(obj(obj(load("lab")).get("options")).get("BTC"))
     mp = obj(o.get("max_pain"))
     if _num(o.get("pc_oi")) and _num(mp.get("max_pain")) and isinstance(mp.get("expiry"), str):
@@ -301,7 +327,7 @@ def section(lang, load=None):
     return "\n\n".join(parts)
 
 
-PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, WAVE, SCORE, COMPASS, HUB)          # the Web App buttons, in the order of the site's tabs
+PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, WAVE, SCORE, COMPASS, SOPR, HODL, HUB)          # the Web App buttons, in the order of the site's tabs
 
 
 def open_rows(lang):
@@ -309,10 +335,10 @@ def open_rows(lang):
     def w(k, path):
         return {"text": L("b_" + k, lang), "web_app": {"url": SITE + path}}
     return [[w("heat", HEAT), w("map", MAP)], [w("liq", LIQ), w("hl", HL)], [w("oi", OI), w("fund", FUND)], [w("ls", LS), w("cvd", CVD)], [w("basis", BASIS), w("opt", OPT)],
-            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("wave", WAVE)], [w("score", SCORE), w("compass", COMPASS)], [w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
+            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("wave", WAVE)], [w("score", SCORE), w("compass", COMPASS)], [w("sopr", SOPR), w("hodl", HODL)], [w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
 
 
-N_ROWS = 11                                     # rows open_rows() puts above the navigation
+N_ROWS = 12                                     # rows open_rows() puts above the navigation
 
 
 if __name__ == "__main__":
@@ -424,6 +450,33 @@ if __name__ == "__main__":
         withall = summary(lang, {"obs/chain_now": now, "lab": lab, "obs/xchain_now": xn}.get)
         if len(withall.split("\n")) != 7 or "23/100" not in withall:
             print("FAIL", lang, "score line beside the others", withall)
+            bad += 1
+    # SOPR and coin age (scripts/obs_age.py): the 7-day mean, its run on one side of 1, and the coins unmoved for a year, only from a file whose checks held
+    ag = {"summary": {"date": "2026-11-25", "sopr7": 0.9829, "side": "loss", "side_days": 27, "wave_date": "2026-11-25", "old1y": 68.43},
+          "checks": {"supply": {"ok": True}, "other": {"sopr_ok": True, "hodl_ok": True}}}
+    for lang in ("fa", "ckb", "kmr", "ar", "en"):
+        al = summary(lang, {"obs/age_now": ag}.get)
+        if len(al.split("\n")) != 1 or not all(x in al for x in ("SOPR", "Bitview", "2026-11-25", "0.983", "27", "68.4%", TXT["l_side"][lang][0])) or "📌" in al:
+            print("FAIL", lang, "SOPR line", al)
+            bad += 1
+        up = summary(lang, {"obs/age_now": {"summary": dict(ag["summary"], sopr7=1.0123, side="profit", side_days=3), "checks": ag["checks"]}}.get)
+        if TXT["l_side"][lang][1] not in up or "1.012" not in up:
+            print("FAIL", lang, "SOPR line above 1", up)
+            bad += 1
+        no_old = [dict(ag, summary=dict(ag["summary"], wave_date="2026-11-24")), dict(ag, checks={"supply": {"ok": False}, "other": {}}),
+                  dict(ag, checks={"other": {"hodl_ok": False}}), dict(ag, summary=dict(ag["summary"], old1y=130))]
+        if any("%" in summary(lang, {"obs/age_now": j}.get) or "0.983" not in summary(lang, {"obs/age_now": j}.get) for j in no_old):
+            print("FAIL", lang, "the coin-age part needs the same day and its checks")
+            bad += 1
+        odd = [dict(ag, summary=dict(ag["summary"], side="profit")), dict(ag, summary=dict(ag["summary"], side_days=True)), dict(ag, summary=dict(ag["summary"], sopr7="0.98")),
+               dict(ag, summary=dict(ag["summary"], date="<b>x</b>")), dict(ag, summary=dict(ag["summary"], sopr7=float("nan"))), dict(ag, checks={"other": {"sopr_ok": False}}),
+               {"summary": []}, [], "x"]
+        if any(summary(lang, {"obs/age_now": j}.get) != "" for j in odd):
+            print("FAIL", lang, "odd coin-age files must give nothing")
+            bad += 1
+        withall = summary(lang, {"obs/chain_now": now, "lab": lab, "obs/age_now": ag}.get)
+        if len(withall.split("\n")) != 7 or "0.983" not in withall:
+            print("FAIL", lang, "SOPR line beside the others", withall)
             bad += 1
     for v, w in ((312.456e9, "$312.46B"), (1.2345e12, "$1.23T"), (7e8, "$700.0M"), (12.345e6, "$12.35M"), (250e3, "$250K"), (2500.0, "$2.5K"), (12.0, "$12"), (-2.1e9, "-$2.10B")):
         if _usd(v) != w:
