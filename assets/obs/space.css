@@ -100,3 +100,68 @@ html.ob-space .ob-stage,html.ob-space .ob-mapbox,html.ob-space .ob-tsbox,html.ob
 /* in the pages with a world of their own (assets/obs/worlds.js) the glass is a little clearer, so the planet behind it shows;
    the charts keep their own dark ground */
 html.ob-space[data-world]:not([data-world=deep]) #ob{background:linear-gradient(170deg,rgba(12,16,42,.5),rgba(4,6,20,.4))}
+
+/* ---------- the door of the craft, opening as each page of the Observatory arrives (scripts/build_obs.py DOOR).
+   Metal panels lit by the page's own colour, a light that turns from red to green, the name of the world behind it.
+   Transforms only; gone after about a second and a half; never takes a click. */
+.ob-door{position:fixed;inset:0;z-index:2147483000;pointer-events:none;overflow:hidden;contain:strict;animation:obd-gone 0s linear 1.55s forwards}
+@keyframes obd-gone{to{visibility:hidden}}
+.ob-door i{position:absolute;display:block;will-change:transform;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.08),rgba(255,255,255,0) 60%),linear-gradient(150deg,#2c3448 0%,#151b2c 55%,#1e2538 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),inset 0 0 60px rgba(0,0,0,.55)}
+.ob-door i::after{content:"";position:absolute;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#c8d0e0,#3a4256 70%);box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+.ob-door .dl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;text-align:center;
+  font:600 clamp(1.1rem,3.4vw,1.9rem)/1.3 inherit;color:#eef4ff;text-shadow:0 0 18px var(--dc);white-space:nowrap;animation:obd-lab .62s ease-in forwards;z-index:2}
+.ob-door .dl small{font-size:.5em;letter-spacing:.14em;color:var(--dc);opacity:.9;display:flex;align-items:center;gap:.6em}
+.ob-door .dl small::before{content:"";width:.9em;height:.9em;border-radius:50%;background:#ff4f6a;box-shadow:0 0 10px #ff4f6a;animation:obd-ok .42s steps(1) forwards}
+@keyframes obd-ok{to{background:#5ef2d6;box-shadow:0 0 12px #5ef2d6}}
+@keyframes obd-lab{0%,70%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.06)}}
+/* two halves, side to side */
+.ob-door[data-d=h] .p1{inset:0 50% 0 0;border-right:3px solid var(--dc);animation:obd-l .72s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=h] .p2{inset:0 0 0 50%;border-left:3px solid var(--dc);animation:obd-r .72s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=h] .p1::after{right:18px;top:calc(50% - 5px)}.ob-door[data-d=h] .p2::after{left:18px;top:calc(50% - 5px)}
+/* two halves, up and down */
+.ob-door[data-d=v] .p1{inset:0 0 50% 0;border-bottom:3px solid var(--dc);animation:obd-u .72s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=v] .p2{inset:50% 0 0 0;border-top:3px solid var(--dc);animation:obd-d .72s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=v] .p1::after{bottom:16px;left:calc(50% - 5px)}.ob-door[data-d=v] .p2::after{top:16px;left:calc(50% - 5px)}
+/* four leaves, out to the corners */
+.ob-door[data-d=quad] .p1{inset:0 50% 50% 0;border-right:2px solid var(--dc);border-bottom:2px solid var(--dc);animation:obd-q1 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=quad] .p2{inset:0 0 50% 50%;border-left:2px solid var(--dc);border-bottom:2px solid var(--dc);animation:obd-q2 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=quad] .p3{inset:50% 50% 0 0;border-right:2px solid var(--dc);border-top:2px solid var(--dc);animation:obd-q3 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=quad] .p4{inset:50% 0 0 50%;border-left:2px solid var(--dc);border-top:2px solid var(--dc);animation:obd-q4 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=quad] i::after{display:none}
+/* cut on the diagonal */
+.ob-door[data-d=diag] .p1{inset:0;clip-path:polygon(0 0,100% 0,0 100%);animation:obd-dg1 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=diag] .p2{inset:0;clip-path:polygon(100% 0,100% 100%,0 100%);animation:obd-dg2 .75s cubic-bezier(.7,0,.25,1) .55s forwards}
+.ob-door[data-d=diag] .p3{inset:0;background:linear-gradient(to top right,transparent calc(50% - 2px),var(--dc) 50%,transparent calc(50% + 2px));box-shadow:none;animation:obd-fade .2s linear .55s forwards}
+.ob-door[data-d=diag] i::after{display:none}
+/* an iris that opens from the middle */
+.ob-door[data-d=iris] .p1{left:50%;top:50%;width:0;height:0;border-radius:50%;transform:translate(-50%,-50%);background:none;
+  box-shadow:0 0 0 160vmax #171d2e,0 0 0 calc(160vmax + 0px) #171d2e,inset 0 0 0 3px var(--dc),0 0 30px 6px var(--dc);animation:obd-iris .85s cubic-bezier(.6,0,.3,1) .5s forwards}
+.ob-door[data-d=iris] .p1::after{display:none}
+/* a round hatch: the wheel turns, then the whole hatch swings past us */
+.ob-door[data-d=hatch] .p1{inset:0;animation:obd-sw .7s cubic-bezier(.6,0,.4,1) .62s forwards;transform-origin:0 50%}
+.ob-door[data-d=hatch] .p2{left:50%;top:50%;width:min(56vmin,420px);height:min(56vmin,420px);border-radius:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,transparent 0 28%,rgba(255,255,255,.1) 29% 31%,transparent 32% 62%,var(--dc) 63% 64%,#1b2134 65% 100%);
+  box-shadow:0 0 40px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.12);animation:obd-wh .5s ease-in-out .1s forwards,obd-fade .25s linear .62s forwards}
+.ob-door[data-d=hatch] .p2::after{left:calc(50% - 5px);top:calc(50% - 5px)}
+.ob-door[data-d=hatch] .p1::after{display:none}
+.ob-door[data-d=h] .p3,.ob-door[data-d=h] .p4,.ob-door[data-d=v] .p3,.ob-door[data-d=v] .p4,.ob-door[data-d=diag] .p4,
+.ob-door[data-d=iris] .p2,.ob-door[data-d=iris] .p3,.ob-door[data-d=iris] .p4,.ob-door[data-d=hatch] .p3,.ob-door[data-d=hatch] .p4{display:none}
+@keyframes obd-l{to{transform:translateX(-102%)}}@keyframes obd-r{to{transform:translateX(102%)}}
+@keyframes obd-u{to{transform:translateY(-102%)}}@keyframes obd-d{to{transform:translateY(102%)}}
+@keyframes obd-q1{to{transform:translate(-102%,-102%)}}@keyframes obd-q2{to{transform:translate(102%,-102%)}}
+@keyframes obd-q3{to{transform:translate(-102%,102%)}}@keyframes obd-q4{to{transform:translate(102%,102%)}}
+@keyframes obd-dg1{to{transform:translate(-80%,-80%)}}@keyframes obd-dg2{to{transform:translate(80%,80%)}}
+@keyframes obd-iris{to{width:300vmax;height:300vmax;box-shadow:0 0 0 160vmax rgba(23,29,46,0),inset 0 0 0 3px transparent,0 0 30px 6px transparent}}
+@keyframes obd-sw{to{transform:perspective(900px) rotateY(-100deg);opacity:0}}
+@keyframes obd-wh{to{transform:translate(-50%,-50%) rotate(100deg)}}
+@keyframes obd-fade{to{opacity:0}}
+html[dir=ltr] .ob-door[data-d=hatch] .p1{transform-origin:100% 50%}
+html[dir=ltr] .ob-door[data-d=hatch] .p1{animation-name:obd-sw2}@keyframes obd-sw2{to{transform:perspective(900px) rotateY(100deg);opacity:0}}
+html.ek-still .ob-door{display:none}
+@media (prefers-reduced-motion:reduce){
+  .ob-door{animation:obd-fade .5s linear .5s forwards,obd-gone 0s linear 1.05s forwards}
+  .ob-door i,.ob-door .dl,.ob-door .dl small::before{animation:none!important}
+}
+@media print{.ob-door{display:none!important}}

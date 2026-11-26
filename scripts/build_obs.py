@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "38"           # asset version (bump with any change to assets/obs/*)
+V = "39"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -2124,6 +2124,58 @@ def about(view):
     return "\n".join(out)
 
 
+# The door of the craft, opening on every page of the Observatory (owner 2026-11-26: "I never saw a spacecraft's door
+# open"): a style of door, its light, and the name of the world behind it (assets/obs/worlds.js SCENE). Drawn in CSS only
+# (assets/obs/space.css .ob-door), gone in about a second and a half, never in the way of a click; under reduced motion it
+# only fades, and it never shows when the visitor has switched motion off.
+DOOR_TO = {"fa": "مقصد", "ckb": "شوێنی گەیشتن", "ar": "الوجهة", "en": "Destination"}
+DOOR = {
+    "oi": ("h", "#ffcf6b", ("مدار مشتری", "خولگەی موشتەری", "مدار المشتري", "Jupiter orbit")),
+    "funding": ("v", "#ffb36b", ("غروب تایتان", "ئاوابوونی تایتان", "غروب تيتان", "Sunset on Titan")),
+    "ls": ("hatch", "#7cc8ff", ("کابین، بر فراز زمین", "کابینە، بەسەر زەویەوە", "قمرة القيادة فوق الأرض", "Cockpit over Earth")),
+    "basis": ("iris", "#5ef2d6", ("ماه، کنار پرچم", "مانگ، لای ئاڵاکە", "القمر، عند العلم", "The Moon, by the flag")),
+    "options": ("quad", "#ffd27a", ("میدان ژرف جیمز وب", "کێڵگەی قووڵی جەیمس وێب", "الحقل العميق لجيمس ويب", "Webb's deep field")),
+    "hl": ("diag", "#ff6a3a", ("لبهٔ سیاه‌چاله", "لێواری کونە ڕەشەکە", "حافة الثقب الأسود", "Edge of a black hole")),
+    "liqheat": ("v", "#ff8a3a", ("کنار خورشید", "لای خۆرەوە", "قرب الشمس", "Beside the Sun")),
+    "liqmap": ("h", "#ff9a5a", ("طوفان مریخ", "گەردەلولی مەریخ", "عاصفة المريخ", "Dust storm on Mars")),
+    "liqhist": ("iris", "#c8dcff", ("روی دنباله‌دار", "لەسەر کلکدارەکە", "على المذنّب", "On a comet")),
+    "cvd": ("hatch", "#6a9cff", ("خداحافظی با نپتون", "ماڵئاوایی لە نێپتون", "وداعاً نبتون", "Farewell, Neptune")),
+    "vprof": ("diag", "#ffcf8a", ("ستون‌های آفرینش", "ستوونەکانی ئافراندن", "أعمدة الخلق", "Pillars of Creation")),
+    "mvrv": ("quad", "#5ef2d6", ("یخ اروپا", "سەهۆڵی ئەورووپا", "جليد أوروبا", "The ice of Europa")),
+    "flows": ("h", "#7cc8ff", ("شب زمین، از ایستگاه", "شەوی زەوی، لە وێستگەوە", "ليل الأرض من المحطة", "Earth at night, from the station")),
+    "network": ("v", "#ffe2a8", ("حلقه‌های زحل", "ئەڵقەکانی زوحەل", "حلقات زحل", "The rings of Saturn")),
+    "thermo": ("iris", "#b8c8ff", ("قطب جنوب ماه، شب", "جەمسەری باشووری مانگ، شەو", "القطب الجنوبي للقمر ليلاً", "The Moon's south pole, at night")),
+    "models": ("hatch", "#ffd27a", ("عدسهٔ گرانشی", "هاوێنەی کێشکردن", "العدسة الجاذبية", "A gravitational lens")),
+    "capflow": ("quad", "#7cc8ff", ("راهپیمایی فضایی بر فراز زمین", "پیاسەی ئاسمانی بەسەر زەویدا", "سير في الفضاء فوق الأرض", "Spacewalk over Earth")),
+    "nvm": ("diag", "#ff6fb5", ("سحابی شکارچی", "تەمی ڕاوچی", "سديم الجبّار", "The Orion Nebula")),
+    "hashp": ("h", "#ffcf6b", ("طلوع خورشید از مدار", "خۆرهەڵاتن لە خولگەوە", "شروق الشمس من المدار", "Sunrise from orbit")),
+    "ethsup": ("v", "#e8b080", ("ظهر مریخ", "نیوەڕۆی مەریخ", "ظهيرة المريخ", "Noon on Mars")),
+    "pools": ("iris", "#ffb020", ("آتشفشان‌های آیو", "گڕکانەکانی ئایۆ", "براكين آيو", "The volcanoes of Io")),
+    "cycle": ("hatch", "#ffcf6b", ("فرود به تایتان", "دابەزین بۆ تایتان", "الهبوط إلى تيتان", "Down to Titan")),
+    "wave": ("quad", "#d8b8c8", ("آبفشان‌های تریتون", "کانیاوە گەرمەکانی تریتۆن", "نوافير تريتون", "The geysers of Triton")),
+    "compass": ("diag", "#9b7bff", ("سکوت سیاه‌چاله", "بێدەنگیی کونە ڕەشەکە", "صمت الثقب الأسود", "Black hole silence")),
+    "rotation": ("h", "#c8e4ff", ("دنباله‌دار از کنار زمین", "کلکدار بە لای زەویدا", "مذنّب يمرّ بالأرض", "A comet passes Earth")),
+    "score": ("v", "#5ef2d6", ("فرود روی مریخ", "نیشتنەوە لەسەر مەریخ", "الهبوط على المريخ", "Landing on Mars")),
+    "stables": ("iris", "#5ef2d6", ("شفق قطبی از مدار", "تیشکی جەمسەری لە خولگەوە", "الشفق القطبي من المدار", "Aurora from orbit")),
+    "defi": ("hatch", "#9b7bff", ("گنبد پنجره‌دار ایستگاه", "گومبەزی پەنجەرەداری وێستگە", "قبّة المحطة", "The station's cupola")),
+    "risk": ("diag", "#ff4f6a", ("کمربند سیارک‌ها", "پشتێنەی ئەستێرۆچکەکان", "حزام الكويكبات", "The asteroid belt")),
+    "scanner": ("quad", "#5ef2d6", ("شب مریخ", "شەوی مەریخ", "ليل المريخ", "Night on Mars")),
+    "hub": ("h", "#ff6fb5", ("پرتاب استارشیپ", "هەڵدانی ستارشیپ", "إطلاق ستارشيب", "Starship launch")),
+    "sopr": ("v", "#ffb070", ("دریاچهٔ شب تایتان", "دەریاچەی شەوی تایتان", "بحيرة تيتان ليلاً", "Titan's lake at night")),
+    "hodl": ("iris", "#9fb8ff", ("تنها در فضا", "تەنیا لە بۆشاییدا", "وحيداً في الفضاء", "Alone in space")),
+}
+
+
+def door(view):
+    style, col, names = DOOR[view]
+    nm = dict(zip(("fa", "ckb", "ar", "en"), names))
+    js = ('(function(){var d=document,h=d.documentElement,L="fa";try{var q=/[?&]lang=(fa|ckb|en|ar)\\b/.exec(location.search),c=localStorage.getItem("ck_lang");'
+          'L=q?q[1]:localStorage.getItem("ek_ar")==="1"?"ar":["fa","ckb","en"].indexOf(c)>=0?c:"fa";if(localStorage.getItem("ek_motion")==="off")h.classList.add("ek-still")}catch(e){}'
+          'var s=d.querySelectorAll(".ob-door [data-lang]");for(var i=0;i<s.length;i++)s[i].hidden=s[i].getAttribute("data-lang")!==L})();')
+    return (f'<div class="ob-door" data-d="{style}" style="--dc:{col}" aria-hidden="true"><i class="p1"></i><i class="p2"></i><i class="p3"></i><i class="p4"></i>'
+            f'<b class="dl"><small>{spans(DOOR_TO)}</small><strong>{spans(nm)}</strong></b></div><script>{js}</script>\n')
+
+
 CSS = {"sopr": ["cosmos.css"], "hodl": ["cosmos.css"]}   # a page's own stylesheets after obs.css and space.css
 
 
@@ -2158,7 +2210,7 @@ def page(view, folder, scripts):
           "publisher": {"@type": "Organization", "name": "Entekhab (entekhab.net)", "url": SITE}, "description": t["p"]["en"]}
     tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js", "space.js", "worlds.js"] + scripts)
     return head(t["title"], t["desc"], t["og"], url, ld, CSS.get(view, ())) + f"""<body>
-<!--ek:header--><!--/ek:header-->
+{door(view)}<!--ek:header--><!--/ek:header-->
 <main class="ob-page" id="ob-main" data-view="{view}" translate="no">
   <nav class="ob-crumb"><a href="/{HUB_PATH}/">{spans(HUB["h1"])}</a></nav>
   <div class="ob-head">
@@ -2201,7 +2253,7 @@ def hub():
           "inLanguage": ["ckb", "fa", "ar", "en"], "description": HUB["p"]["en"],
           "mainEntity": {"@type": "ItemList", "itemListElement": items}}
     return head(HUB["title"], HUB["desc"], HUB["og"], url, ld) + f"""<body>
-<!--ek:header--><!--/ek:header-->
+{door("hub")}<!--ek:header--><!--/ek:header-->
 <main class="ob-page" id="ob-main" data-view="hub" translate="no">
   <div class="ob-head">
     <h1>{spans(HUB["h1"])}</h1>
