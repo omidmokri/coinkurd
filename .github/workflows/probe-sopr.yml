@@ -9,7 +9,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - run: mkdir out && cd out && python3 ../probe/p.py
+      - run: pip install "requests>=2.31"
+      - run: python3 scripts/obs_age.py && ls -la data/obs/age_*
       - run: |
           git config user.name "probe" && git config user.email "probe@users.noreply.github.com"
-          git add out && git commit -qm "probe output" && git push -q
+          git add -f data/obs/age_btc.json data/obs/age_now.json && git commit -qm "probe output (age)" && git push -q
