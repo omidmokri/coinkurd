@@ -287,7 +287,7 @@
     pa.setAttribute('d', 'M12 4a8 8 0 0 1 7.5 5.2l1.6-.9.6 5.2-4.8-2 1.5-.9A5.9 5.9 0 0 0 6.2 10.3L4.3 9.7A8 8 0 0 1 12 4zm-7.7 6.3 4.8 2-1.5.9a5.9 5.9 0 0 0 10.2.5l1.9.6A8 8 0 0 1 4.5 14.8l-1.6.9z');
     s.appendChild(pa); orb.appendChild(s);
     return el('div', { class: 'ek-ac-hero' }, [orb, el('div', { class: 'ek-ac-ht' }, [el('span', { class: 'ek-ac-kick', text: L.title }), el('h3', { text: L.hero }),
-      el('ul', { class: 'ek-ac-chips' }, L.chips.map(function (c) { return el('li', { text: c }); }))])]);
+      el('ul', { class: 'ek-ac-chips' }, (L.chips || []).map(function (c) { return el('li', { text: c }); }))])]);
   }
   function render() {
     var L = t(), dir = lang() === 'en' ? 'ltr' : 'rtl';
