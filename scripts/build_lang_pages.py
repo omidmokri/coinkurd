@@ -49,7 +49,7 @@ SITE = "https://entekhab.net"
 # reader from abroad looks for first: 26 pages × 50 languages ≈ 1,300 files.
 CORE = ["/", "/indicators/", "/fear-greed/", "/heatmap/", "/bubbles/", "/liquidity/", "/charts/liquidation-heatmap/",
         "/etf/", "/money-flow/", "/coins/", "/derivatives/", "/world/", "/onchain/", "/track-record/", "/reality/",
-        "/today/", "/calendar/", "/dca/", "/compare/", "/swap/", "/bitcoin/", "/safety/", "/tools/", "/app/",
+        "/today/", "/calendar/", "/dca/", "/trader/", "/compare/", "/swap/", "/bitcoin/", "/safety/", "/tools/", "/app/",
         "/about/", "/podcast/"]
 MARKET = "/market/"
 OWN = ("fa", "ckb", "ar", "en")               # the site's own four; fa is the original

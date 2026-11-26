@@ -10,6 +10,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import chrome  # noqa: E402
 import trader_data as D  # noqa: E402
+import trader_more as M  # noqa: E402
+import trader_pos as P  # noqa: E402
 
 bad = []
 
@@ -32,11 +34,20 @@ def walk(o, where):
             walk(v, f"{where}[{i}]")
 
 
-walk(D.HUB, "HUB"), walk(D.QUIZ, "QUIZ"), walk(D.QUIZ_TXT, "QUIZ_TXT"), walk(D.LV, "LV"), walk(D.SEC, "SEC")
-
-# quiz: five questions of four answers, cuts cover 0..15 in four bands
-if len(D.QUIZ) != 5 or any(len(a) != 4 for _, a in D.QUIZ) or not (0 < D.QUIZ_CUT[0] < D.QUIZ_CUT[1] < D.QUIZ_CUT[2] < 15):
-    bad.append("quiz shape")
+walk(D.HUB, "HUB"), walk(D.LV, "LV"), walk(D.SEC, "SEC")
+walk(M.MANAGE, "MANAGE"), walk(M.AFTER, "AFTER"), walk(M.FAQ, "FAQ"), walk(M.TODAY, "TODAY")
+walk({k: v["story"] for k, v in M.EXAMPLE.items()}, "EXAMPLE")
+walk(P.T, "POS"), walk(P.FAM, "FAM"), walk(P.REG, "REG"), walk(P.FNG, "FNG"), walk(P.TF, "TF")
+for k in D.LEVELS:
+    for part in ("MANAGE", "AFTER", "FAQ", "EXAMPLE"):
+        if k not in getattr(M, part):
+            bad.append(f"{part}: no {k}")
+for key, v in M.TODAY.items():
+    if set(v) != set(D.LEVELS):
+        bad.append(f"TODAY.{key}: levels")
+import trader_setups as TS  # noqa: E402
+if set(P.FAM) != set(TS.FAMILIES):
+    bad.append("every rule family needs its words in trader_pos.FAM")
 if list(D.LV) != D.LEVELS:
     bad.append("levels order")
 
@@ -59,8 +70,61 @@ for k, v in D.LV.items():
 if "/trader/" not in nav:
     bad.append("/trader/ is not in the menu")
 
-# build and look at the output
-r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "build_trader.py")], cwd=ROOT, capture_output=True, text=True)
+# build and look at the output (a saved replay result: no network in tests)
+FIX = os.path.join(ROOT, "tests", "fixtures")
+
+
+def build(src):
+    env = dict(os.environ, TRADER_SETUPS=src)
+    return subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "build_trader.py")], cwd=ROOT, capture_output=True, text=True, env=env)
+
+
+def page(k=None):
+    return open(os.path.join(ROOT, "trader", *([k] if k else []), "index.html"), encoding="utf-8").read()
+
+
+# 1) a made-up qualified long and short: full cards, beginner sees the long only, pro sees leverage
+r = build(os.path.join(FIX, "trader_setups_qual.json"))
+if r.returncode:
+    bad.append("build (qual) failed: " + r.stderr[-400:])
+else:
+    h = page()
+    if h.count("<article class='rc-card tr-pos") != 6:
+        bad.append(f"hub: expected 2 cards × 3 languages, got {h.count('<article class=' + chr(39) + 'rc-card tr-pos')}")
+    for need in ("98.875", "94.00", "106.00", "118.00", "tr-pb", "tr-rt"):
+        if need not in h:
+            bad.append(f"hub card: no {need}")
+    b = page("beginner")
+    if b.count("<article class='rc-card tr-pos tr-long'") != 3 or "tr-pos tr-short" in b:
+        bad.append("beginner: long cards only")
+    if P.e(P.T["beg_short"]["fa"]) not in b:
+        bad.append("beginner: no note on leaving shorts out")
+    if "class='rc-btn2 tr-load'" not in b:
+        bad.append("beginner: no load button")
+    pr = page("pro")
+    if "9x" not in pr.replace("<span class='rc-num' dir='ltr'>", "").replace("</span>", ""):
+        bad.append("pro: no safe leverage")
+# 2) nothing passes: the honest empty state, the fired rule named, no card, no plan of it
+r = build(os.path.join(FIX, "trader_setups_none.json"))
+if r.returncode:
+    bad.append("build (none) failed: " + r.stderr[-400:])
+else:
+    for k in [None] + D.LEVELS:
+        h = page(k)
+        if "<article class='rc-card tr-pos" in h:
+            bad.append(f"{k or 'hub'}: a card although nothing passes")
+        if P.e(P.T["none_h"]["fa"]) not in h or P.e(P.T["none_h"]["en"]) not in h:
+            bad.append(f"{k or 'hub'}: no empty-state line")
+        if "1.2964" in h:
+            bad.append(f"{k or 'hub'}: the plan of a non-passing setup leaked")
+# 3) no data at all: say so, never a number
+r = build("off")
+if r.returncode:
+    bad.append("build (off) failed: " + r.stderr[-400:])
+elif P.e(P.T["nodata"]["en"]) not in page():
+    bad.append("off: no 'not available' line")
+# last: the fixture with nothing passing, which is also the honest default look; then the general checks
+r = build(os.path.join(FIX, "trader_setups_none.json"))
 if r.returncode:
     bad.append("build failed: " + r.stderr[-400:])
 for k in [None] + D.LEVELS:
@@ -78,8 +142,8 @@ for k in [None] + D.LEVELS:
         bad.append(f"{k}: checkboxes")
     if re.search(r"<script>(?![\s\S]*?ck_lang)[^<]*</script>", h.split("</main>")[0].split("<main")[-1]):
         bad.append(f"{k or 'hub'}: unexpected inline script in main")
-    if not k and h.count("class='tr-q'") != 15:
-        bad.append("hub: quiz fieldsets")
+    if ">…<" in h:
+        bad.append(f"{k or 'hub'}: an empty placeholder is left")
 
 for b in bad:
     print("FAIL", b)

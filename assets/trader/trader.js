@@ -1,6 +1,7 @@
-/* /trader/ — «مسیر تریدر»: the plan sheet every level ends with, the checklist ticks, the «which level am I?» quiz and
-   the "today's market" strip. Everything runs in the visitor's browser; nothing is sent anywhere. The only requests are
-   the site's own /data/regime.json and /data/market.json (same origin, read-only).
+/* /trader/ — «مسیر تریدر»: the plan sheet every level ends with, the checklist ticks, and the small helpers of the
+   position cards (put a position or an example into the plan sheet, warn when a check is old or an entry window has
+   closed). The cards, the record and the "today" strip are rendered at build time (scripts/trader_pos.py). Everything
+   here runs in the visitor's browser; nothing is sent and nothing is fetched.
 
    The plan (TR.plan, pure; node tests/test_trader.js checks it against figures worked out by hand):
      d        = +1 long, −1 short
@@ -24,7 +25,9 @@
     var s = String(v == null ? '' : v).trim()
       .replace(/[۰-۹]/g, function (c) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)); })
       .replace(/[٠-٩]/g, function (c) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(c)); })
-      .replace(/[,٬\s]/g, '').replace(/٫/g, '.');
+      .replace(/[٬\s]/g, '').replace(/٫/g, '.').replace(/\u2212/g, '-');
+    if (/^[-+]?\d{1,3}(,\d{3})+(\.\d*)?$/.test(s)) s = s.replace(/,/g, '');     /* 60,000 or 1,250.5: thousands */
+    else if (/^[^,]*,[^,]*$/.test(s) && s.indexOf('.') < 0) s = s.replace(',', '.');  /* 1,5 or 0,25: a decimal comma */
     if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return NaN;
     var n = parseFloat(s); return isFinite(n) ? n : NaN;
   }
@@ -35,7 +38,9 @@
     var d = x.side === 'short' ? -1 : 1;
     var cap = num(x.cap), risk = num(x.risk), E = num(x.entry), S = num(x.stop), T1 = num(x.tp1);
     var T2 = num(x.tp2), share = isNaN(num(x.share)) ? 50 : num(x.share);
-    var fee = (num(x.fee) || 0) / 100, slip = (num(x.slip) || 0) / 100, fr = (num(x.funding) || 0) / 100, hrs = num(x.hours) || 0;
+    var opt = function (v, dflt) { return v == null || String(v).trim() === '' ? dflt : num(v); };   /* empty: default; junk: NaN */
+    var fee = opt(x.fee, 0) / 100, slip = opt(x.slip, 0) / 100, fr = opt(x.funding, 0) / 100, hrs = opt(x.hours, 0);
+    if (x.tp2 != null && String(x.tp2).trim() !== '' && !(T2 > 0)) return { ok: false, err: 'eTp2' };
     var lev = isNaN(num(x.lev)) ? 1 : num(x.lev), mm = (num(x.mm) || 0) / 100;
     if (!(cap > 0)) return { ok: false, err: 'eCap' };
     if (!(risk > 0 && risk <= 100)) return { ok: false, err: 'eRisk' };
@@ -45,7 +50,7 @@
     var two = T2 > 0;
     if (two && !(d * (T2 - T1) > 0)) return { ok: false, err: 'eTp2' };
     if (two && !(share > 0 && share < 100)) return { ok: false, err: 'eShare' };
-    if (!(fee >= 0 && fee < 0.05) || !(slip >= 0 && slip < 0.5) || !(hrs >= 0) || Math.abs(fr) >= 0.05) return { ok: false, err: 'eCost' };
+    if (!(fee >= 0 && fee < 0.05) || !(slip >= 0 && slip < 0.5) || !(hrs >= 0 && hrs <= 8760) || Math.abs(fr) >= 0.05) return { ok: false, err: 'eCost' };
     if (!(lev >= 1 && lev <= 200) || !(mm >= 0 && mm < 0.5)) return { ok: false, err: 'eLev' };
 
     var sx = S * (1 - d * slip);
@@ -54,12 +59,13 @@
     var g = function (t) { return d * (t - E) - fee * E - fee * t; };
     var w = two ? share / 100 : 1;
     var gainU = w * g(T1) + (two ? (1 - w) * g(T2) : 0) - fundU;
-    if (!(lossU > 0)) return { ok: false, err: 'eCost' };
+    if (!(lossU > 0)) return { ok: false, err: fundU < 0 ? 'eFund' : 'eCost' };
 
     var riskMoney = cap * risk / 100;
     var qty = riskMoney / lossU, capped = false;
     var qmax = cap * lev / E;
     if (qty > qmax) { qty = qmax; capped = true; }
+    if (!isFinite(qty) || !(qty > 0)) return { ok: false, err: 'eCost' };
     var notional = qty * E, loss = qty * lossU, gain = qty * gainU;
     var riskPct = loss / cap * 100;
     var R = gainU / lossU;
@@ -74,9 +80,9 @@
       liq: null, liqOk: null
     };
     r.costs = qty * (fee * E + fee * sx + Math.abs(S - sx) + fundU);      /* fees + stop slippage + funding, on the losing path */
-    if (lev > 1) {
+    if (lev > 1 || (d < 0 && x.lev != null)) {          /* a 1x short perpetual still has a liquidation price */
       r.liq = d > 0 ? E * (1 - 1 / lev) / (1 - mm) : E * (1 + 1 / lev) / (1 + mm);
-      r.liqOk = d > 0 ? S > r.liq : S < r.liq;
+      r.liqOk = d > 0 ? sx > r.liq : sx < r.liq;          /* where the stop really fills, after slippage */
     }
     var p = num(x.win) / 100;
     if (p > 0 && p < 1) {
@@ -89,7 +95,7 @@
         r.kelly = R > 0 ? (p - (1 - p) / R) * 100 : -100;
         r.kellyF = r.kelly * kf;
         r.room = Math.max(0, maxh - heat);
-        r.sugg = Math.max(0, Math.min(risk, r.kellyF, r.room));
+        r.sugg = Math.max(0, Math.min(r.riskPct, r.kellyF, r.room));
         r.heatAfter = heat + riskPct;
         r.heatOk = r.heatAfter <= maxh + 1e-9;
         r.maxheat = maxh; r.kf = kf;
@@ -139,21 +145,21 @@
     liq: ['قیمت تقریبی لیکوییدیشن', 'نرخی نزیکەیی لیکویدکردن', 'Approx. liquidation price'],
     ev: ['امید ریاضی هر معامله', 'چاوەڕوانیی بیرکاریی هەر مامەڵەیەک', 'Expectancy per trade'],
     kelly: ['کلی کامل (ریسک)', 'کێلیی تەواو (مەترسی)', 'Full Kelly (risk)'], kellyF: ['کسر کلی', 'بەشی کێلی', 'Fractional Kelly'],
-    sugg: ['ریسک پیشنهادی این معامله', 'مەترسیی پێشنیارکراوی ئەم مامەڵەیە', 'Suggested risk for this trade'],
+    sugg: ['سقف ریسک با کلی (از آمار خودت)', 'سەقفی مەترسی بە کێلی (لە ئاماری خۆت)', 'Kelly-capped risk ceiling (from your stats)'],
     heatA: ['حرارت پورتفوی بعد از ورود', 'گەرمیی پۆرتفۆلیۆ دوای چوونەژوورەوە', 'Portfolio heat after entry'],
     dd: ['اگر ۵ و ۱۰ بار پشت سر هم حد ضرر بخورد', 'ئەگەر ٥ و ١٠ جار لەسەریەک سنووری زیان بکەوێت', 'After 5 and 10 stops in a row'],
     checks: ['چک‌های انجام‌شده', 'پشکنینە کراوەکان', 'Checks done'],
     copy: ['کپی برنامه', 'کۆپیکردنی پلان', 'Copy the plan'], copied: ['کپی شد ✓', 'کۆپی کرا ✓', 'Copied ✓'],
     reset: ['پاک کردن', 'سڕینەوە', 'Clear'],
     /* verdicts */
-    vBad: ['سود این برنامه بعد از هزینه از ضررش کمتر است. یا تارگت دورتر، یا ورود بهتر، یا از این معامله بگذر.', 'قازانجی ئەم پلانە دوای تێچوو لە زیانەکەی کەمترە. یان ئامانجی دوورتر، یان چوونەژوورەوەی باشتر، یان وازی لێ بهێنە.', 'After costs this plan makes less than it risks. Find a further target or a better entry, or skip the trade.'],
-    vMid: ['قابل قبول ولی تنگ: باید بیشتر از نیمی از این‌جور معامله‌ها را ببری تا سود کنی.', 'قبووڵکراو بەڵام تەنگ: دەبێت زیاتر لە نیوەی ئەم جۆرە مامەڵانە ببەیتەوە تا قازانج بکەیت.', 'Acceptable but tight: you need to win more than half of such trades to come out ahead.'],
-    vOk: ['نسبت سود به ضرر سالم است. حالا فقط به برنامه پایبند بمان.', 'ڕێژەی قازانج بە زیان تەندروستە. ئێستا تەنها پابەندی پلانەکە بە.', 'A healthy reward to risk. Now just stick to the plan.'],
+    vBad: ['سود این برنامه بعد از هزینه از ضررش کمتر است؛ فقط با درصد برد خیلی بالا به سود می‌رسد. تارگت دورتر یا ورود بهتر را بسنج.', 'قازانجی ئەم پلانە دوای تێچوو لە زیانەکەی کەمترە؛ تەنها بە ڕێژەی بردنەوەی زۆر بەرز قازانج دەکات. ئامانجی دوورتر یان چوونەژوورەوەی باشتر بپێوە.', 'After costs this plan makes less than it risks; it only pays with a very high win rate. Weigh a further target or a better entry.'],
+    vMid: ['قابل قبول ولی تنگ: برای سود، باید در بیش از {be}٪ این‌جور معامله‌ها ببری.', 'قبووڵکراو بەڵام تەنگ: بۆ قازانج، دەبێت لە زیاتر لە {be}٪ی ئەم جۆرە مامەڵانە ببەیتەوە.', 'Acceptable but tight: to come out ahead you need to win more than {be}% of such trades.'],
+    vOk: ['نسبت سود به ضرر سالم است؛ این به‌تنهایی نمی‌گوید معامله درست درمی‌آید. اگر وارد شدی، به برنامه پایبند بمان.', 'ڕێژەی قازانج بە زیان تەندروستە؛ ئەمە بە تەنها ناڵێت مامەڵەکە سەردەکەوێت. ئەگەر چوویتە ژوورەوە، پابەندی پلانەکە بە.', 'A healthy reward to risk; on its own that does not say the trade will work. If you take it, stick to the plan.'],
     vNoGain: ['بعد از کارمزد و فاندینگ، رسیدن به این تارگت سودی نمی‌دهد.', 'دوای کرێ و فەندینگ، گەیشتن بەم ئامانجە هیچ قازانجێک نادات.', 'After fees and funding, reaching this target earns nothing.'],
     wRisk: ['ریسک بیشتر از ۲٪ در یک معامله: چند ضرر پشت سر هم می‌تواند بخش بزرگی از سرمایه را ببرد.', 'مەترسی زیاتر لە ٢٪ لە یەک مامەڵەدا: چەند زیانی لەسەریەک دەتوانێت بەشێکی گەورەی سەرمایە ببات.', 'Over 2% on one trade: a few losses in a row can take a large part of the capital.'],
     wCap: ['با این سرمایه و اهرم نمی‌شود این حجم را گرفت؛ حجم به بیشترین ممکن محدود شد و ریسک واقعی کمتر از چیزی است که خواستی.', 'بەم سەرمایە و لێڤەرێجە ناکرێت ئەم قەبارەیە بگیرێت؛ قەبارە بە زۆرترینی گونجاو سنووردار کرا و مەترسیی ڕاستەقینە لەوەی ویستت کەمترە.', 'This capital and leverage cannot carry that size; it was capped at the maximum, so the real risk is below what you asked for.'],
     wLiq: ['⚠️ لیکوییدیشن قبل از حد ضرر می‌رسد؛ حد ضرر تو عملاً کار نمی‌کند. اهرم را کم کن.', '⚠️ لیکویدکردن پێش سنووری زیان دەگات؛ سنووری زیانەکەت لە کرداردا کار ناکات. لێڤەرێج کەم بکەرەوە.', '⚠️ Liquidation comes before your stop, so the stop never works. Lower the leverage.'],
-    okLiq: ['حد ضرر قبل از لیکوییدیشن فعال می‌شود ✓', 'سنووری زیان پێش لیکویدکردن کار دەکات ✓', 'The stop triggers before liquidation ✓'],
+    okLiq: ['حد ضرر تقریباً قبل از لیکوییدیشن فعال می‌شود ✓', 'سنووری زیان نزیکەی پێش لیکویدکردن کار دەکات ✓', 'The stop triggers before the approximate liquidation price ✓'],
     wEv: ['با این درصد برد، امید ریاضی منفی است: در بلندمدت این برنامه پول می‌بازد.', 'بەم ڕێژەی بردنەوەیە، چاوەڕوانیی بیرکاری نەرێنییە: لە درێژخایەندا ئەم پلانە پارە دەدۆڕێنێت.', 'At this win rate the expectancy is negative: over time this plan loses money.'],
     wKelly: ['کلی منفی یا صفر است: آمار تو برای این معامله لبه‌ای نشان نمی‌دهد.', 'کێلی نەرێنی یان سفرە: ئامارەکەت بۆ ئەم مامەڵەیە هیچ لێوارێک پیشان نادات.', 'Kelly is zero or negative: your stats show no edge for this trade.'],
     wHeat: ['با این معامله از سقف حرارت پورتفوی رد می‌شوی.', 'بەم مامەڵەیە لە سنووری گەرمیی پۆرتفۆلیۆ تێدەپەڕیت.', 'This trade takes you over your portfolio heat cap.'],
@@ -166,20 +172,12 @@
     eTpS: ['در شورت، تارگت باید زیر قیمت ورود باشد.', 'لە شۆرتدا، ئامانج دەبێت لە خوار نرخی چوونەژوورەوە بێت.', 'For a short, the target must be below the entry.'],
     eTp2: ['تارگت دوم باید از تارگت اول دورتر باشد.', 'ئامانجی دووەم دەبێت لە ئامانجی یەکەم دوورتر بێت.', 'The second target must lie beyond the first.'],
     eShare: ['درصد بستن در تارگت اول باید بین ۰ و ۱۰۰ باشد.', 'لە سەدی داخستن لە ئامانجی یەکەم دەبێت لە نێوان ٠ و ١٠٠ دا بێت.', 'The share closed at the first target must be between 0 and 100.'],
+    eFund: ['فاندینگ دریافتی از فاصلهٔ حد ضرر بیشتر است؛ مدت یا فاندینگ را بررسی کن.', 'ئەو فەندینگەی وەریدەگریت لە مەودای سنووری زیان زیاترە؛ ماوە یان فەندینگ بپشکنە.', 'The funding you receive is larger than the distance to your stop; check the holding time or the funding.'],
     eCost: ['کارمزد، فاندینگ، لغزش یا مدت عدد معقولی نیست.', 'کرێ، فەندینگ، خلیسکان یان ماوە ژمارەیەکی گونجاو نییە.', 'The fee, funding, slippage or holding time is not a sensible number.'],
-    eLev: ['اهرم بین ۱ و ۲۰۰ و مارجین نگه‌داری زیر ۵۰٪.', 'لێڤەرێج لە نێوان ١ و ٢٠٠ و مارجینی ڕاگرتن لە خوار ٥٠٪.', 'Leverage between 1 and 200, maintenance margin below 50%.'],
-    /* today strip */
-    regime: ['رژیم بیت‌کوین', 'دۆخی بیتکۆین', 'Bitcoin regime'], fng: ['ترس و طمع', 'ترس و تەماح', 'Fear & Greed'],
-    switchR: ['احتمال تغییر رژیم', 'ئەگەری گۆڕانی دۆخ', 'Chance the regime switches'],
-    upd: ['به‌روزرسانی', 'نوێکردنەوە', 'Updated'], nodata: ['هنوز داده‌ای نیست.', 'هێشتا داتا نییە.', 'No data yet.'],
-    bull: ['صعودی', 'بەرزبوونەوە', 'Bull'], bear: ['نزولی', 'دابەزین', 'Bear'], sideways: ['خنثی / رِنج', 'مامناوەند / ڕەینج', 'Sideways'],
-    high_vol: ['پرنوسانِ بی‌جهت', 'هەڵاوسانی بێ ئاڕاستە', 'Volatile, no trend'],
-    'Extreme Fear': ['ترس شدید', 'ترسی زۆر', 'Extreme fear'], Fear: ['ترس', 'ترس', 'Fear'], Neutral: ['خنثی', 'مامناوەند', 'Neutral'],
-    Greed: ['طمع', 'تەماح', 'Greed'], 'Extreme Greed': ['طمع شدید', 'تەماحی زۆر', 'Extreme greed'],
-    tNote: ['توصیف امروز است، نه پیش‌بینی.', 'وەسفی ئەمڕۆیە، نەک پێشبینی.', 'A description of today, not a forecast.']
+    eLev: ['اهرم بین ۱ و ۲۰۰ و مارجین نگه‌داری زیر ۵۰٪.', 'لێڤەرێج لە نێوان ١ و ٢٠٠ و مارجینی ڕاگرتن لە خوار ٥٠٪.', 'Leverage between 1 and 200, maintenance margin below 50%.']
   };
   function lg() { var l = (root.EKL && root.EKL()) || document.documentElement.lang || 'fa'; return l === 'ckb' ? 1 : l === 'en' ? 2 : 0; }
-  function t(k) { var v = S[k]; return v ? v[lg()] : k; }
+  function t(k) { var v = Object.prototype.hasOwnProperty.call(S, k) ? S[k] : null; return v ? v[lg()] : k; }
   function el(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
   function fmt(v, dg) {
     if (v == null || !isFinite(v)) return '—';
@@ -231,7 +229,7 @@
           inp = el('select');
           ['long', 'short'].forEach(function (v) { var o = el('option'); o.value = v; o.setAttribute('data-k', v); inp.appendChild(o); });
         } else {
-          inp = el('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off'; inp.spellcheck = false;
+          inp = el('input'); inp.type = 'text'; inp.inputMode = id === 'funding' ? 'text' : 'decimal'; inp.autocomplete = 'off'; inp.spellcheck = false;
           inp.setAttribute('dir', 'ltr'); inp.maxLength = 24; if (f[1]) inp.placeholder = f[1];
         }
         inp.id = 'tr-' + level + '-' + id;
@@ -260,7 +258,7 @@
       parent.appendChild(r);
     }
     function frag() { var f = el('span'); for (var i = 0; i < arguments.length; i++) { var a = arguments[i]; f.appendChild(typeof a === 'string' ? document.createTextNode(a) : a); } return f; }
-    function note(cls, k) { out.appendChild(el('p', 'tr-v ' + cls, t(k))); }
+    function note(cls, k, be) { out.appendChild(el('p', 'tr-v ' + cls, t(k).replace('{be}', be == null ? '' : fmt(be, 1)))); }
 
     function go() {
       var x = vals(); store(key, x);
@@ -291,7 +289,7 @@
         line('sugg', nm(r.sugg, 2, '%')); line('heatA', nt(fmt(r.heatAfter, 2) + '% / ' + fmt(r.maxheat, 2) + '%'));
       }
       if (cc[1]) line('checks', nt(cc[0] + ' / ' + cc[1]));
-      if (r.gain <= 0) note('tr-err', 'vNoGain'); else note(r.R < 1 ? 'tr-err' : r.R < 1.5 ? 'tr-warn' : 'tr-ok', r.R < 1 ? 'vBad' : r.R < 1.5 ? 'vMid' : 'vOk');
+      if (r.gain <= 0) note('tr-err', 'vNoGain'); else note(r.R < 1 ? 'tr-err' : r.R < 1.5 ? 'tr-warn' : 'tr-ok', r.R < 1 ? 'vBad' : r.R < 1.5 ? 'vMid' : 'vOk', r.be);
       if (r.riskPct > 2) note('tr-warn', 'wRisk');
       if (r.capped) note('tr-warn', 'wCap');
       if (r.liq != null) note(r.liqOk ? 'tr-ok' : 'tr-err', r.liqOk ? 'okLiq' : 'wLiq');
@@ -326,64 +324,44 @@
     labels(); go();
   }
 
-  /* ------------------------------------------------------------------ quiz (hub) */
-  function quiz(box) {
-    var cut = (box.getAttribute('data-cut') || '3,7,11').split(',').map(Number);
-    box.querySelectorAll('.tr-qgo').forEach(function (btn) {
+  /* ------------------------------------------------------------------ position cards */
+  var PLAN_KEYS = ['side', 'entry', 'stop', 'tp1', 'tp2', 'share', 'lev', 'win', 'cap', 'risk', 'fee', 'mm', 'funding', 'hours', 'slip', 'kf', 'heat', 'maxheat'];
+  function loader() {
+    document.querySelectorAll('button.tr-load[data-plan]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var blk = btn.closest('[data-rl]') || box, sum = 0, n = 0, q = blk.querySelectorAll('fieldset.tr-q');
-        var res = blk.querySelector('.tr-qres'); if (!res) return;
-        q.forEach(function (f) { var c = f.querySelector('input:checked'); if (c) { sum += Math.max(0, Math.min(3, parseInt(c.value, 10) || 0)); n++; } });
-        res.textContent = '';
-        if (n < q.length) { res.appendChild(el('p', 'tr-v tr-warn', res.getAttribute('data-need') || '')); return; }
-        var i = sum <= cut[0] ? 0 : sum <= cut[1] ? 1 : sum <= cut[2] ? 2 : 3;
-        var a = blk.querySelectorAll('a.tr-lvl')[i]; if (!a) return;
-        var p = el('p', 'tr-v tr-ok'); p.appendChild(document.createTextNode((res.getAttribute('data-res') || '') + ' '));
-        var link = el('a', null, a.getAttribute('data-name') || ''); link.href = a.getAttribute('href'); p.appendChild(link);
-        p.appendChild(el('span', 'mut', ' (' + sum + '/15)'));
-        res.appendChild(p);
+        var box = document.querySelector('.tr-plan[data-level]'); if (!box) return;
+        var p; try { p = JSON.parse(btn.getAttribute('data-plan') || '{}'); } catch (e) { return; }
+        if (!p || typeof p !== 'object') return;
+        var key = 'ek_tr_plan_' + box.getAttribute('data-level'), cur = load(key) || {};
+        PLAN_KEYS.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(p, k)) cur[k] = String(p[k]).slice(0, 24); });
+        store(key, cur);
+        planUI(box);
+        var lab = btn.textContent; btn.textContent = btn.getAttribute('data-done') || lab;
+        setTimeout(function () { btn.textContent = lab; }, 2400);
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   }
-
-  /* ------------------------------------------------------------------ today strip */
-  function today(box) {
-    var R = null, M = null;
-    function draw() {
-      box.textContent = '';
-      var g = el('div', 'tr-kpis');
-      if (R && R.now && S[R.now.top]) {
-        var k = el('div', 'tr-kpi'); k.appendChild(el('small', null, t('regime')));
-        var b = el('b', 'rg-' + R.now.top, t(R.now.top)); k.appendChild(b);
-        var s = el('em'); s.appendChild(nm((R.now.confidence || 0) * 100, 0, '%')); s.appendChild(document.createTextNode(' · ' + t('switchR') + ' '));
-        s.appendChild(nm((R.now.switch_risk || 0) * 100, 0, '%')); k.appendChild(s);
-        g.appendChild(k);
-      }
-      if (M && M.fng && isFinite(M.fng.value)) {
-        var f = el('div', 'tr-kpi'); f.appendChild(el('small', null, t('fng')));
-        var fb = el('b'); fb.appendChild(nm(+M.fng.value, 0)); fb.appendChild(document.createTextNode(' / 100'));
-        f.appendChild(fb); f.appendChild(el('em', null, S[M.fng['class']] ? t(M.fng['class']) : ''));
-        g.appendChild(f);
-      }
-      if (!g.childNodes.length) { box.appendChild(el('p', 'note', t('nodata'))); return; }
-      box.appendChild(g);
-      var u = (M && M.updated_at) || (R && R.updated_at) || '';
-      var d = u ? new Date(u) : null;
-      box.appendChild(el('p', 'note', t('tNote') + (d && !isNaN(d) ? ' · ' + t('upd') + ': ' + d.toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : '')));
-    }
-    function get(u, cb) { fetch(u, { credentials: 'omit', cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(cb, function () { cb(null); }); }
-    var left = 2, done = function () { if (--left === 0) draw(); };
-    get('/data/regime.json', function (j) { R = j && typeof j === 'object' ? j : null; done(); });
-    get('/data/market.json', function (j) { M = j && typeof j === 'object' ? j : null; done(); });
-    window.addEventListener('ek-lang', draw);
+  function freshness() {
+    var now = Date.now();
+    document.querySelectorAll('.tr-upd[data-upd]').forEach(function (p) {
+      var u = +p.getAttribute('data-upd'); if (!u || now - u < 2 * 3600e3) return;
+      var w = el('p', 'tr-v tr-warn', (p.getAttribute('data-stale') || '').replace('{h}', String(Math.round((now - u) / 3600e3))));
+      p.parentNode.insertBefore(w, p.nextSibling);
+    });
+    document.querySelectorAll('.tr-pos[data-valid]').forEach(function (c) {
+      var v = +c.getAttribute('data-valid'); if (!v || now <= v) return;
+      c.classList.add('tr-old');
+      var x = c.querySelector('.tr-expired'); if (x) x.hidden = false;
+      c.querySelectorAll('button.tr-load').forEach(function (b) { b.disabled = true; });
+    });
   }
 
   function boot() {
     var lv = document.querySelector('[data-tr-level]');
     if (lv) checks(lv.getAttribute('data-tr-level'));
     document.querySelectorAll('.tr-plan[data-fields]').forEach(planUI);
-    var q = document.querySelector('.tr-quiz'); if (q) { var c = q.getAttribute('data-cut'); document.documentElement.setAttribute('data-cut', c || ''); quiz(document.documentElement); }
-    var tdy = document.getElementById('tr-today'); if (tdy) today(tdy);
+    loader(); freshness();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(typeof window !== 'undefined' ? window : this);

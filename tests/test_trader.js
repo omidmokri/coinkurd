@@ -54,5 +54,15 @@ err({cap: 1, risk: 1, entry: 'abc', stop: 99, tp1: 110}, 'eNeed');
 // 9. digits typed in Persian / Arabic / with separators
 near(T.num('۶۰٬۰۰۰'), 60000, 0, 'persian digits'); near(T.num('٥٫٥'), 5.5, 0, 'arabic decimal'); is(isNaN(T.num('1e400')), 'overflow -> NaN');
 is(isNaN(T.num('<img>')), 'junk -> NaN');
+// 10. review fixes: decimal comma, unicode minus, slippage-aware liquidation, junk optional fields
+near(T.num('1,5'), 1.5, 0, 'decimal comma'); near(T.num('0,25'), 0.25, 0, 'decimal comma 2'); near(T.num('60,000'), 60000, 0, 'thousands');
+near(T.num('1,250.5'), 1250.5, 0, 'thousands+dot'); near(T.num('\u22120.01'), -0.01, 1e-12, 'unicode minus');
+(function () { var r = T.plan({cap: 1000, risk: 1, entry: 100, stop: 90.5, tp1: 120, fee: 0.05, lev: 10, mm: 0.5, slip: 0.1});
+  is(r.ok && r.liqOk === false, 'stop fill after slippage beyond liquidation is flagged'); })();
+err({cap: 1, risk: 1, entry: 100, stop: 99, tp1: 110, fee: 'x'}, 'eCost');
+err({cap: 1, risk: 1, entry: 100, stop: 99, tp1: 110, tp2: 'x'}, 'eTp2');
+err({cap: 1, risk: 1, entry: 100, stop: 99, tp1: 110, hours: 9000}, 'eCost');
+(function () { var r = T.plan({cap: 1000, risk: 1, entry: 100, stop: 110, tp1: 90, side: 'short', lev: 1, mm: 0.5});
+  is(r.ok && r.liq > 190 && r.liqOk, '1x short perpetual has a liquidation price'); })();
 console.log(fail ? fail + ' FAILED' : 'trader plan: all checks passed');
 process.exit(fail ? 1 : 0);
