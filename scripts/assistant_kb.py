@@ -81,6 +81,7 @@ FEATURES = [
     ("/hype/", ["hype2"], "reality"),
     ("/silent-exit/", ["silent"], "reality"),
     ("/iran-correlation/", ["corr"], "reality"),
+    ("/trader/", [], None),
     ("/tools/", ["dca", "tools"], "calc"),
     ("/safety/", ["token"], None),
     ("/me/", ["center", "pf"], "alerts"),

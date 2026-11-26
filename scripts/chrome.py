@@ -240,6 +240,9 @@ NAV = [
          L("کریپتو در برابر دلار، تتر، طلا و سکه", "کریپتۆ بەرامبەر دۆلار، تەتەر، زێڕ و سکە", "Crypto vs dollar, tether, gold, coins")),
     ]},
     {"k": "tools", "t": L("ابزارها", "ئامرازەکان", "Tools"), "items": [
+        ("/trader/", "gauge", L("مسیر تریدر: چهار سطح", "ڕێڕەوی بازرگان: چوار ئاست", "The trader's path: four levels"),
+         L("مبتدی تا فوق‌حرفه‌ای، هر کدام با زبان خودش: ورود، ریسک و تارگت", "سەرەتایی تا زۆر پرۆفیشناڵ، هەریەکە بە زمانی خۆی: چوونەژوورەوە، مەترسی و ئامانج",
+           "Beginner to super-pro, each in its own words: entry, risk and target")),
         ("/tools/", "calc", L("ابزارهای معامله‌گر", "ئامرازەکانی بازرگان", "Trader tools"),
          L("حجم پوزیشن، ریسک، تبدیل و مقایسه", "قەبارەی پۆزیشن، ڕیسک، گۆڕین و بەراورد", "Position size, risk, converter, compare")),
         ("/unlocks/", "calendar", L("آنلاک توکن‌ها", "کردنەوەی تۆکنەکان", "Token unlocks"),
