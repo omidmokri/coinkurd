@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "22"  # bump to bust caches of chrome.css / chrome.js
+VER = "23"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -552,6 +552,7 @@ CSP = ("default-src 'self'; "
        # Read-only public endpoints, no key and no cookie; Binance, Bybit and OKX are already above.
        "https://api.exchange.coinbase.com https://api.kraken.com "
        "https://api.gopluslabs.io https://api.dexscreener.com https://open.er-api.com https://entekhab-tv.omid-mokri.workers.dev "   # Pine Studio: the TradingView alert feed
+       "https://api.entekhab.net "     # the optional account (sign-in + sync): cloudflare/account, switched on in assets/account/config.js
        
        "https://dashboard-api.tgju.org https://api.tgju.org https://call2.tgju.org https://call3.tgju.org https://call4.tgju.org; "
        "frame-src https://*.tradingview.com https://*.tradingview-widget.com; "

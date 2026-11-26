@@ -1,0 +1,31 @@
+# entekhab.net account service. Setup steps: README.fa.md
+name = "entekhab-account"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = false
+
+# api.entekhab.net must be a Custom Domain of this Worker: the sign-in cookie has to live on the site's own domain,
+# because browsers no longer send cookies from another site (workers.dev) inside entekhab.net.
+routes = [{ pattern = "api.entekhab.net", custom_domain = true }]
+
+[vars]
+SITE_ORIGIN = "https://entekhab.net"
+API_ORIGIN = "https://api.entekhab.net"
+RP_ID = "entekhab.net"
+EXTRA_ORIGINS = "https://www.entekhab.net"
+TG_BOT_NAME = ""
+EMAIL_FROM = ""
+EMAIL_DAILY = "90"
+NEW_DAILY = "2000"          # new accounts a day, all together (each network: 10)
+
+[[d1_databases]]
+binding = "DB"
+database_name = "entekhab-account"
+database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+
+# Secrets (never in this file):  npx wrangler secret put NAME
+#   DATA_KEY              32 random bytes, base64url  (node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
+#   GITHUB_CLIENT_ID      GITHUB_CLIENT_SECRET
+#   GOOGLE_CLIENT_ID      GOOGLE_CLIENT_SECRET
+#   TG_BOT_TOKEN          a bot used only for sign-in, its domain set to entekhab.net in @BotFather (whoever holds this token can sign in as anyone with Telegram)
+#   RESEND_KEY            (email links; optional)

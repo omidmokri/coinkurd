@@ -363,5 +363,13 @@
     var as = d.createElement('script'); as.src = '/assets/ask.js?v=3'; as.defer = true; d.body.appendChild(as);
   }
 
+  /* the optional account: a visitor who signed in (in «فضای من») gets their saved data synced on every page.
+     Nobody else downloads a byte of it, and nothing on any page waits for it. */
+  try {
+    if (/"on":1/.test(localStorage.getItem('ek_sync') || '') && !d.querySelector('script[src*="/assets/account/sync.js"]')) {
+      ['config', 'merge', 'sync'].forEach(function (n) { var s = d.createElement('script'); s.src = '/assets/account/' + n + '.js?v=1'; s.async = false; d.body.appendChild(s); });
+    }
+  } catch (e) { /* storage blocked: nothing to sync */ }
+
   label(pageI18nNow() ? cur() : (de.getAttribute('lang') ? cur() : (ls.get('ck_lang') || 'fa')));
 })();
