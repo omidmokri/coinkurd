@@ -133,7 +133,30 @@ def load(code):
     except (OSError, ValueError):
         return {}
     s = (d.get("s") if isinstance(d, dict) else None) or {}
-    return {k: v for k, v in s.items() if isinstance(v, str) and v}
+    s = {k: v for k, v in s.items() if isinstance(v, str) and v}
+    s.update(fixes().get(code) or {})
+    return s
+
+
+_fixes = None
+
+
+def fixes():
+    """data/i18n_fixes.json -- translations corrected by hand, {code: {english: translation}}
+
+    The caches are rewritten by every translating run and merged with -X theirs, so a correction made in a cache
+    by hand lasts only until the next run; one kept here is laid over the cache each time it is read.
+    """
+    global _fixes
+    if _fixes is None:
+        try:
+            with open(os.path.join(ROOT, "data", "i18n_fixes.json"), encoding="utf-8") as f:
+                raw = json.load(f)
+        except (OSError, ValueError):
+            raw = {}
+        _fixes = {c: {k: v for k, v in (m or {}).items() if isinstance(v, str) and v}
+                  for c, m in raw.items() if isinstance(m, dict) and not c.startswith("_")}
+    return _fixes
 
 
 def load_fails(code):
