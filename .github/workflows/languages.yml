@@ -28,7 +28,10 @@ env:
   L10N_PER_KEY: "400"
   I18N_SITE_SECONDS: "1320"          # 22 minutes of translating a run (it was 3)
   I18N_SITE_REQUESTS: "3000"         # the run takes whatever the day has released, not 8 calls a key
-  I18N_SITE_WORKERS_PER_KEY: "2"     # two requests at once on a key: a call takes ~30 s, well under the minute limit
+  # Google turns most requests away as too many a minute (1,167 refusals to 134 answers on 2026-11-26), so a second
+  # worker a key only adds refusals; a larger batch carries more of the site in each request that is let through.
+  I18N_SITE_BATCH: "90"
+  I18N_SITE_BATCH_CHARS: "9000"
   # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
   ALI_API_KEY: ${{ secrets.ALI_API_KEY }}

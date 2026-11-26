@@ -241,7 +241,11 @@ def translate_batch(code, batch, gen):
     return good, bad
 
 
-def batches(keys, size=60, chars=6000):
+def batches(keys, size=None, chars=None):
+    """the strings of one request. The pool is held back by how many requests Google takes a minute, not by their
+    size, so a bigger batch is more of the site translated a minute; 16k answer tokens leave room for it."""
+    size = size or int(os.environ.get("I18N_SITE_BATCH", "60"))
+    chars = chars or int(os.environ.get("I18N_SITE_BATCH_CHARS", "6000"))
     cur, n = [], 0
     for k in keys:
         if cur and (len(cur) >= size or n + len(k) > chars):
@@ -335,6 +339,11 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
                 q.put((code, batch))
                 return
             except ai.RateLimited:
+                # a 429 is turned away before any work is done; counting it spent the day's share on refusals --
+                # 1,167 of them against 134 answers in one run on 2026-11-26 -- and ended the chain early
+                with lock:
+                    counter["used"] -= 1
+                    counter["limited"] = counter.get("limited", 0) + 1
                 q.put((code, batch))
                 time.sleep(20)
                 continue
@@ -561,7 +570,8 @@ def main():
                 fill(langs, need, common | home, requests_max, a.seconds, pool[:jobs], counter=c)
             finally:
                 pro_l10n.quota_add(c.get("used", 0), who="site")
-            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)")
+            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)"
+                  f" ({c.get('limited', 0)} turned away as too many a minute, not counted)")
             more_after(langs, need, c.get("used", 0), len(pool), ai)
             print("i18n_site: the keys this run used —\n" + ai.pool_report())
     elif not a.no_translate:
