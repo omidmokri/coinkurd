@@ -51,9 +51,22 @@ RULES = {
     "max_bars": 30,             # time exit after 5 days
     "cost_side": 0.15,          # % per fill: 0.10 fee + 0.05 slippage (the site's Truth Lab uses the same)
 }
-QUAL = {"n": 60, "p1_lo": 0.45, "ev_lo": 0.0, "coin_n": 15}
-UNIVERSE = 20
-STABLE = ("USDT", "USDC", "FDUSD", "TUSD", "DAI", "USDE", "PYUSD", "EUR", "XAUT", "PAXG", "USD1", "BUSD")
+# Two more families, written down on 2026-11-26 after the first one's record came back slightly negative and before
+# either was run. Each is traded with the same layers / stop / targets / costs machinery; only the trigger, the candle
+# size and the time limits differ. Several rules and two sides mean several tests, so the bar below uses z = 2.64
+# (Bonferroni for 6 tests at 5%) for both lower bounds.
+FAMILIES = {
+    "pullback-4h-v1": {"tf": "4h", "layer_bars": 6, "max_bars": 30, "stop_mode": "swing"},
+    "breakout-1d-v1": {"tf": "1d", "layer_bars": 3, "max_bars": 20, "stop_mode": "atr2", "donchian": 20},
+    "dip-4h-v1": {"tf": "4h", "layer_bars": 6, "max_bars": 30, "stop_mode": "swing", "rsi_dip": 30, "rsi_pop": 70},
+}
+Z = 2.64
+QUAL = {"n": 60, "p1_lo": 0.40, "ev_lo": 0.0, "coin_n": 15, "z": Z}
+# A fixed list of large, long-listed coins (chosen before any result): tokenised stocks and fresh listings stay out.
+UNIVERSE_LIST = ["BTC", "ETH", "SOL", "XRP", "BNB", "DOGE", "ADA", "TRX", "LINK", "AVAX",
+                 "SUI", "LTC", "DOT", "BCH", "TON", "NEAR", "UNI", "APT", "ATOM", "ETC"]
+UNIVERSE = len(UNIVERSE_LIST)
+TF_MS = {"4h": H4, "1d": 86400000}
 
 
 # ------------------------------------------------------------------ indicators (pure)
@@ -129,6 +142,34 @@ def prepare(k4, k1d):
     return f
 
 
+def prepare_1d(k1):
+    c = [b["c"] for b in k1]
+    return {"e20": ema(c, RULES["ema_fast"]), "e50": ema(c, RULES["ema_slow"]), "atr": atr(k1, RULES["atr"]),
+            "rsi": rsi_series(c, RULES["rsi"]), "dtrend": [0] * len(k1)}
+
+
+def signal_for(fam, k, f, i):
+    if fam == "pullback-4h-v1":
+        return signal(k, f, i)
+    if i < RULES["ema_slow"] + 2 or f["atr"][i] is None or f["rsi"][i] is None or f["atr"][i] <= 0:
+        return 0
+    b, e20, e50, r = k[i], f["e20"][i], f["e50"][i], f["rsi"][i]
+    if fam == "breakout-1d-v1":
+        n = FAMILIES[fam]["donchian"]
+        prev = k[i - n:i]
+        if b["c"] > max(x["h"] for x in prev) and b["c"] > e50 and e20 > e50:
+            return 1
+        if b["c"] < min(x["l"] for x in prev) and b["c"] < e50 and e20 < e50:
+            return -1
+        return 0
+    if fam == "dip-4h-v1":
+        if f["dtrend"][i] == 1 and r < FAMILIES[fam]["rsi_dip"] and b["c"] > b["o"]:
+            return 1
+        if f["dtrend"][i] == -1 and r > FAMILIES[fam]["rsi_pop"] and b["c"] < b["o"]:
+            return -1
+    return 0
+
+
 def signal(k4, f, i):
     """+1 long, -1 short, 0 none — on closed candle i"""
     if i < RULES["ema_slow"] + 2 or f["atr"][i] is None or f["rsi"][i] is None:
@@ -148,13 +189,15 @@ def signal(k4, f, i):
     return 0
 
 
-def levels(k4, f, i, d):
+def levels(k4, f, i, d, fam="pullback-4h-v1"):
     """the published plan for a signal on candle i"""
     b, a = k4[i], f["atr"][i]
     c = b["c"]
     lay = [c - d * x * a for x in RULES["layers"]]
     lo = k4[max(0, i - RULES["swing_bars"] + 1): i + 1]
-    if d > 0:
+    if FAMILIES[fam]["stop_mode"] == "atr2":
+        stop = c - d * 2.0 * a
+    elif d > 0:
         stop = min(min(x["l"] for x in lo), c - RULES["stop_atr"] * a) - RULES["stop_pad"] * a
     else:
         stop = max(max(x["h"] for x in lo), c + RULES["stop_atr"] * a) + RULES["stop_pad"] * a
@@ -165,7 +208,7 @@ def levels(k4, f, i, d):
     return {"d": d, "layers": lay, "weights": list(w), "stop": stop, "tps": tps, "avg_all": avg, "atr": a, "r1": r1}
 
 
-def simulate(k4, i, plan):
+def simulate(k4, i, plan, fam="pullback-4h-v1"):
     """trade the plan on the candles after i; worst order inside a candle. Returns the result in R (of the risk if
     every layer fills) and what happened"""
     d, lay, w, stop, tps = plan["d"], plan["layers"], plan["weights"], plan["stop"], plan["tps"]
@@ -190,12 +233,12 @@ def simulate(k4, i, plan):
         held -= q
 
     fill(0, k4[i + 1]["o"])                      # layer 1: at the open after the signal candle
-    end = min(len(k4) - 1, i + RULES["max_bars"])
+    end = min(len(k4) - 1, i + FAMILIES[fam]["max_bars"])
     out = "time"
     for j in range(i + 1, end + 1):
         b = k4[j]
         adverse, favour = (b["l"], b["h"]) if d > 0 else (b["h"], b["l"])
-        if hit == 0 and j <= i + RULES["layer_bars"]:
+        if hit == 0 and j <= i + FAMILIES[fam]["layer_bars"]:
             for k in (1, 2):
                 if not filled[k] and d * (lay[k] - adverse) >= 0:
                     fill(k, lay[k])
@@ -219,14 +262,14 @@ def simulate(k4, i, plan):
     return {"R": pnl / risk, "hit": hit, "out": out, "fills": sum(filled), "bars": j - i}
 
 
-def backtest(k4, f):
+def backtest(k4, f, fam="pullback-4h-v1"):
     """every past signal, one trade at a time per coin"""
     trades, i, last = [], RULES["ema_slow"] + 2, len(k4) - 1
     while i < last:
-        d = signal(k4, f, i)
+        d = signal_for(fam, k4, f, i)
         if d:
-            plan = levels(k4, f, i, d)
-            res = simulate(k4, i, plan)
+            plan = levels(k4, f, i, d, fam)
+            res = simulate(k4, i, plan, fam)
             if res and i + res["bars"] <= last:          # only finished trades count
                 res["d"] = d
                 res["t"] = k4[i]["t"]
@@ -248,8 +291,8 @@ def summarise(trades):
     k2 = sum(1 for t in trades if t["hit"] >= 2)
     k3 = sum(1 for t in trades if t["hit"] >= 3)
     ks = sum(1 for t in trades if t["out"] == "stop")
-    lo1, hi1 = wilson(k1, n)
-    return {"n": n, "ev": round(m, 3), "ev_lo": round(m - 1.96 * sd / math.sqrt(n), 3), "ev_hi": round(m + 1.96 * sd / math.sqrt(n), 3),
+    lo1, hi1 = wilson(k1, n, Z)
+    return {"n": n, "ev": round(m, 3), "ev_lo": round(m - Z * sd / math.sqrt(n), 3), "ev_hi": round(m + Z * sd / math.sqrt(n), 3),
             "p1": round(k1 / n, 3), "p1_lo": round(lo1, 3), "p1_hi": round(hi1, 3), "p2": round(k2 / n, 3), "p3": round(k3 / n, 3),
             "p_stop": round(ks / n, 3), "win": round(sum(1 for x in rs if x > 0) / n, 3),
             "bars_med": sorted(t["bars"] for t in trades)[n // 2],
@@ -349,72 +392,83 @@ def run(use_local=False, n=UNIVERSE):
     now = datetime.now(timezone.utc)
     now_ms = int(now.timestamp() * 1000)
     mk = jload("market.json", {}) or {}
-    coins = ["BTC", "ETH"] if use_local else universe(mk, n)
+    coins = ["BTC", "ETH"] if use_local else UNIVERSE_LIST[:n]
     data, errors = {}, {}
 
-    def one(s):
+    def one(s_):
         try:
-            k4, k1 = local(s) if use_local else fetch(s)
-            return s, closed(k4, H4, now_ms), closed(k1, 86400000, now_ms), None
+            k4, k1 = local(s_) if use_local else fetch(s_)
+            return s_, closed(k4, H4, now_ms), closed(k1, 86400000, now_ms), None
         except Exception as e:  # noqa: BLE001
-            return s, [], [], str(e)[:120]
+            return s_, [], [], str(e)[:120]
 
     with ThreadPoolExecutor(max_workers=1 if use_local else 6) as ex:
-        for s, k4, k1, err in ex.map(one, coins):
+        for s_, k4, k1, err in ex.map(one, coins):
             if err or len(k4) < 120 or len(k1) < 60:
-                errors[s] = err or "short history"
+                errors[s_] = err or "short history"
                 continue
-            data[s] = (k4, k1)
+            data[s_] = (k4, k1)
 
-    trades, per_coin, live = [], {}, []
-    for s, (k4, k1) in data.items():
-        f = prepare(k4, k1)
-        tr = backtest(k4, f)
-        for t in tr:
-            t["coin"] = s
-        trades += tr
-        per_coin[s] = {"long": summarise([t for t in tr if t["d"] > 0]), "short": summarise([t for t in tr if t["d"] < 0])}
-        i = len(k4) - 1
-        d = signal(k4, f, i)
-        if d:
-            live.append((s, d, k4, f, i))
-
-    stats = {"long": summarise([t for t in trades if t["d"] > 0]), "short": summarise([t for t in trades if t["d"] < 0])}
     side = {1: "long", -1: "short"}
+    fams = {}
     deriv, regime = jload("derivatives.json", {}), jload("regime.json", {})
     opps = mk.get("opportunities") or []
+    for fam, cfg in FAMILIES.items():
+        trades, per_coin, live = [], {}, []
+        for s_, (k4, k1) in data.items():
+            k = k4 if cfg["tf"] == "4h" else k1
+            f = prepare(k4, k1) if cfg["tf"] == "4h" else prepare_1d(k1)
+            tr = backtest(k, f, fam)
+            for t in tr:
+                t["coin"] = s_
+            trades += tr
+            per_coin[s_] = {"long": summarise([t for t in tr if t["d"] > 0]), "short": summarise([t for t in tr if t["d"] < 0])}
+            i = len(k) - 1
+            d = signal_for(fam, k, f, i)
+            if d:
+                live.append((s_, d, k, f, i))
+        stats = {"long": summarise([t for t in trades if t["d"] > 0]), "short": summarise([t for t in trades if t["d"] < 0])}
+        fams[fam] = {"tf": cfg["tf"], "stats": stats, "qualified": {k_: qualifies(v) for k_, v in stats.items()},
+                     "per_coin": per_coin, "live": live}
+
     setups, watch = [], []
-    for s, d, k4, f, i in live:
-        plan = levels(k4, f, i, d)
-        st = stats[side[d]]
-        cs = per_coin[s][side[d]]
-        b = k4[i]
-        item = {
-            "coin": s, "side": side[d], "tf": "4h", "bar": b["t"], "price": rnd(b["c"], b["c"]),
-            "atr": rnd(plan["atr"], b["c"]), "atr_pct": round(plan["atr"] / b["c"] * 100, 2),
-            "layers": [{"px": rnd(p, b["c"]), "w": w} for p, w in zip(plan["layers"], plan["weights"])],
-            "avg": rnd(plan["avg_all"], b["c"]), "stop": rnd(plan["stop"], b["c"]),
-            "tps": [rnd(p, b["c"]) for p in plan["tps"]],
-            "stop_pct": round(abs(b["c"] - plan["stop"]) / b["c"] * 100, 2),
-            "tp_pct": [round(abs(p - b["c"]) / b["c"] * 100, 2) for p in plan["tps"]],
-            "rr_avg": [round(abs(p - plan["avg_all"]) / abs(plan["avg_all"] - plan["stop"]), 2) for p in plan["tps"]],
-            "lev_max": safe_leverage(plan),
-            "valid_until": b["t"] + H4 + RULES["layer_bars"] * H4,
-            "exit_by": b["t"] + H4 + RULES["max_bars"] * H4,
-            "why": {"dtrend": d, "e20": rnd(f["e20"][i], b["c"]), "e50": rnd(f["e50"][i], b["c"]), "rsi": round(f["rsi"][i], 1),
-                    "ext_atr": round(abs(b["c"] - f["e50"][i]) / plan["atr"], 2)},
-            "ctx": context(s, d, mk, deriv, regime, opps),
-            "coin_stats": cs if cs.get("n", 0) >= QUAL["coin_n"] else None,
-        }
-        (setups if qualifies(st) else watch).append(item)
-    setups.sort(key=lambda x: (x["coin"] not in ("BTC", "ETH"), -(x["ctx"].get("vol24") or 0)))
+    for fam, F in fams.items():
+        cfg, ms = FAMILIES[fam], TF_MS[FAMILIES[fam]["tf"]]
+        for s_, d, k, f, i in F["live"]:
+            plan = levels(k, f, i, d, fam)
+            st = F["stats"][side[d]]
+            cs = F["per_coin"][s_][side[d]]
+            b = k[i]
+            item = {
+                "family": fam, "coin": s_, "side": side[d], "tf": cfg["tf"], "bar": b["t"], "price": rnd(b["c"], b["c"]),
+                "atr": rnd(plan["atr"], b["c"]), "atr_pct": round(plan["atr"] / b["c"] * 100, 2),
+                "layers": [{"px": rnd(p_, b["c"]), "w": w} for p_, w in zip(plan["layers"], plan["weights"])],
+                "avg": rnd(plan["avg_all"], b["c"]), "stop": rnd(plan["stop"], b["c"]),
+                "tps": [rnd(p_, b["c"]) for p_ in plan["tps"]],
+                "close_at": list(RULES["close_at"]),
+                "stop_pct": round(abs(b["c"] - plan["stop"]) / b["c"] * 100, 2),
+                "tp_pct": [round(abs(p_ - b["c"]) / b["c"] * 100, 2) for p_ in plan["tps"]],
+                "rr_avg": [round(abs(p_ - plan["avg_all"]) / abs(plan["avg_all"] - plan["stop"]), 2) for p_ in plan["tps"]],
+                "lev_max": safe_leverage(plan),
+                "valid_until": b["t"] + ms + cfg["layer_bars"] * ms,
+                "exit_by": b["t"] + ms + cfg["max_bars"] * ms,
+                "why": {"dtrend": f["dtrend"][i] or d, "e20": rnd(f["e20"][i], b["c"]), "e50": rnd(f["e50"][i], b["c"]),
+                        "rsi": round(f["rsi"][i], 1), "ext_atr": round(abs(b["c"] - f["e50"][i]) / plan["atr"], 2)},
+                "ctx": context(s_, d, mk, deriv, regime, opps),
+                "stats": st,
+                "coin_stats": cs if cs.get("n", 0) >= QUAL["coin_n"] else None,
+            }
+            (setups if F["qualified"][side[d]] else watch).append(item)
+        F.pop("live")
+    order = {c: n_ for n_, c in enumerate(UNIVERSE_LIST)}
+    setups.sort(key=lambda x: (-(x["stats"].get("ev") or 0), order.get(x["coin"], 99)))
+    watch.sort(key=lambda x: order.get(x["coin"], 99))
+    last = [k4[-1]["t"] for k4, _ in data.values()]
     return {
-        "updated_at": now.isoformat(timespec="seconds"), "rules": RULES, "qual": QUAL,
+        "updated_at": now.isoformat(timespec="seconds"), "rules": RULES, "families": FAMILIES, "qual": QUAL,
         "source": "local" if use_local else "Binance public market data",
-        "coins": list(data.keys()), "errors": errors,
-        "stats": stats, "qualified": {k: qualifies(v) for k, v in stats.items()},
-        "per_coin": per_coin, "setups": setups, "watch": watch,
-        "last_bar": max((k4[-1]["t"] for k4, _ in data.values()), default=None),
+        "coins": list(data.keys()), "errors": errors, "fams": fams,
+        "setups": setups, "watch": watch, "last_bar": max(last) if last else None,
     }
 
 
@@ -428,11 +482,13 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(res, fh, ensure_ascii=False, separators=(",", ":"))
-    s = res["stats"]
-    print(f"trader setups: {len(res['coins'])} coins, {len(res['errors'])} errors, "
-          f"long n={s['long'].get('n')} ev={s['long'].get('ev')} p1={s['long'].get('p1')} q={res['qualified']['long']}, "
-          f"short n={s['short'].get('n')} ev={s['short'].get('ev')} p1={s['short'].get('p1')} q={res['qualified']['short']}, "
-          f"setups={len(res['setups'])} watch={len(res['watch'])} ({time.time() - t0:.1f}s)")
+    parts = []
+    for fam, F in res["fams"].items():
+        for sd in ("long", "short"):
+            st = F["stats"][sd]
+            parts.append(f"{fam}/{sd} n={st.get('n')} ev={st.get('ev')} [{st.get('ev_lo')}] p1={st.get('p1')} [{st.get('p1_lo')}] q={F['qualified'][sd]}")
+    print(f"trader setups: {len(res['coins'])} coins, {len(res['errors'])} errors; " + "; ".join(parts) +
+          f"; setups={len(res['setups'])} watch={len(res['watch'])} ({time.time() - t0:.1f}s)")
 
 
 if __name__ == "__main__":
