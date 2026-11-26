@@ -2,7 +2,7 @@ name: Probe SOPR sources (temporary)
 on:
   push:
     branches: [probe-sopr]
-permissions: {contents: read}
+permissions: {contents: write}
 jobs:
   probe:
     runs-on: ubuntu-latest
@@ -10,5 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: mkdir out && cd out && python3 ../probe/p.py
-      - uses: actions/upload-artifact@v4
-        with: {name: probe, path: out/, retention-days: 2}
+      - run: |
+          git config user.name "probe" && git config user.email "probe@users.noreply.github.com"
+          git add out && git commit -qm "probe output" && git push -q
