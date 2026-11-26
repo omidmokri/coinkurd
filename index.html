@@ -468,6 +468,9 @@ const I18N={
   mHome:'home',mFeed:'archive',mCats:'categories',mCoins:'coins',all:'all',t24:'24h',t7:'7d',t30:'30d',result:'results',empty:'No posts match these filters.',open:'open in telegram',share:'copy link',copied:'copied!',byCat:'Category distribution',byCoin:'Top coins',heatHint:'posts by category × coin — click a cell to filter',related:'Related'}
 };
 let lang=(()=>{try{return localStorage.getItem('ck_lang')}catch(e){return null}})()||'fa';
+/* a globe language (assets/i18n.js) reads the English page translated; the AI report has its own copy (scripts/live_tr.py) */
+const XL=(()=>{try{const c=localStorage.getItem('ek_l');return c&&localStorage.getItem('ek_ar')!=='1'?c:''}catch(e){return ''}})();
+const RL=r=>r&&((lang==='en'&&XL&&r[XL])||r[lang]);
 const T=k=>(I18N[lang]&&I18N[lang][k])||I18N.fa[k]||k;
 /* WebP is a third of the weight of these JPEGs. Every browser since 2020 reads it; the
    originals stay in place, and a browser that cannot decode WebP keeps getting them. */
@@ -786,10 +789,10 @@ async function homeLive(){const g=u=>fetch(u+'?v='+Math.floor(Date.now()/12e4)).
  const bt=cs.find(c=>c.coin==='BTC');if(bt&&X.score&&X.score.coins&&X.score.coins.BTC)set('hCoin',`BTC · score ${X.score.coins.BTC.score} · RSI ${bt.rsi}`);if(X.health)set('hStat',`${X.health.status} · ${(X.health.checks||[]).filter(c=>c.ok).length}/${(X.health.checks||[]).length} checks`)}
 function addHelp(){const H=T('HELP');if(!H)return;document.querySelectorAll('.intel>.ibox').forEach(bx=>{const t=H[bx.id];const h3=bx.querySelector('h3');if(!t||!h3||h3.querySelector('.hlp'))return;
  h3.insertAdjacentHTML('beforeend',` <button class="hlp" type="button" aria-label="?">ⓘ</button>`);h3.insertAdjacentHTML('afterend',`<p class="hlpbox" hidden>${t}</p>`)})}
-function speakReport(){const rp=X.brain&&X.brain.report&&X.brain.report[lang];if(!rp||!('speechSynthesis' in window))return;const ss=speechSynthesis;if(ss.speaking){ss.cancel();return}
+function speakReport(){const rp=X.brain&&RL(X.brain.report);if(!rp||!('speechSynthesis' in window))return;const ss=speechSynthesis;if(ss.speaking){ss.cancel();return}
  const code=lang==='en'?'en':lang==='ckb'?'ckb':'fa',vs=ss.getVoices(),v=vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith(code))||(code==='ckb'?vs.find(x=>/^(ku|ckb)/i.test(x.lang||'')):null);
  if(!v){alert(T('noVoice'));return}const u=new SpeechSynthesisUtterance((rp.headline+'. '+rp.body).replace(/[•*#]/g,' '));u.voice=v;u.lang=v.lang;u.rate=1;ss.speak(u)}
-function copyReport(){const rp=X.brain&&X.brain.report&&X.brain.report[lang];if(!rp)return;const bl=rp.body.split(/\n+/).map(x=>x.replace(/^\s*[•\-*]\s*/,'').trim()).filter(Boolean);const t=big(rp.headline)+'\n\n'+bl.map(x=>'• '+big(x)).join('\n')+'\n\n— entekhab.net/#intel';navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>{const b=$('#cpBtn');if(b){b.textContent='✅ '+T('copied');setTimeout(()=>b.textContent='📋 '+T('copy'),1800)}}).catch(()=>{})}
+function copyReport(){const rp=X.brain&&RL(X.brain.report);if(!rp)return;const bl=rp.body.split(/\n+/).map(x=>x.replace(/^\s*[•\-*]\s*/,'').trim()).filter(Boolean);const t=big(rp.headline)+'\n\n'+bl.map(x=>'• '+big(x)).join('\n')+'\n\n— entekhab.net/#intel';navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>{const b=$('#cpBtn');if(b){b.textContent='✅ '+T('copied');setTimeout(()=>b.textContent='📋 '+T('copy'),1800)}}).catch(()=>{})}
 const RD={get(){try{return new Set(JSON.parse(localStorage.getItem('ek_read')||'[]'))}catch(e){return new Set()}}};function markRead(u){const a=[...RD.get()];if(!a.includes(u))a.push(u);try{localStorage.setItem('ek_read',JSON.stringify(a.slice(-300)))}catch(e){}}
 function newsTabs(n){return `<div class="modeT" style="margin:0 0 6px"><button data-nt="en" class="${S.newsTab!=='fa'?'on':''}">🌍 ${T('newsGlobal')}</button><button data-nt="fa" class="${S.newsTab==='fa'?'on':''}">📰 ${T('newsFa')} (${n})</button></div>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-nt]');if(b){S.newsTab=b.dataset.nt;renderIntel()}const of=e.target.closest('[data-of]');if(of){S.oppF=of.dataset.of;S.oppAll=false;renderIntel()}const nw=e.target.closest('[data-nw]');if(nw){S.newsW=nw.dataset.nw==='1';renderIntel()}const nl=e.target.closest('#newsBox li a[target=_blank]');if(nl){markRead(nl.href);nl.closest('li').classList.add('rd')}const cp=e.target.closest('#cpBtn');if(cp)copyReport();const h=e.target.closest('.hlp');if(h){const box=h.closest('.ibox'),p=box&&box.querySelector('.hlpbox');if(p)p.hidden=!p.hidden}const sp=e.target.closest('#rdBtn');if(sp)speakReport()});
@@ -836,7 +839,7 @@ function _renderIntel(){
   const br=X.brain;if(br&&br.regime){const r=br.regime,b=r.breadth,rc={bull:'#22c55e',bear:'#ef4444',sideways:'#eab308',high_volatility:'#a855f7'}[r.regime];
     const chip=a=>a.map(x=>`<a class="coin" href="coins/${x.coin.toLowerCase()}/">${x.coin} <span class="num ${x.chg24>=0?'pos':'neg'}">${x.chg24>=0?'+':''}${x.chg24}%</span></a>`).join(' ');
     const why=(br.movers||[]).slice(0,8).map(mv=>`<tr><td><a href="coins/${mv.coin.toLowerCase()}/">${mv.coin}</a> <span class="num ${mv.chg24>=0?'pos':'neg'}">${mv.chg24>=0?'+':''}${mv.chg24}%</span></td><td>${mv.why.map(w=>w.k==='news'?`${T('w_news')}: ${w.items.map(n=>`<a href="${esc(su(n.url))}" target="_blank" rel="noopener nofollow">${esc(n.source)}</a>`).join(', ')}`:w.k==='range48'?`${T('w_range48')} <span class="num">${w.v}%</span>`:w.k==='with_btc'?`${T('w_with_btc')} <span class="num">(${w.v}%)</span>`:w.k==='idiosyncratic'?`${T('w_idiosyncratic')} <span class="num">(${w.v>0?'+':''}${w.v}%)</span>`:T('w_'+w.k)).join(' · ')}</td></tr>`).join('');
-    const rp=br.report&&br.report[lang],rf=br.report_facts,fg=(X.market||{}).fng,bm=((X.market||{}).coins||[]).find(c=>c.coin==='BTC');
+    const rp=RL(br.report),rf=br.report_facts,fg=(X.market||{}).fng,bm=((X.market||{}).coins||[]).find(c=>c.coin==='BTC');
     const dg=x=>x.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
     const big=t=>String(t||'').replace(/[0-9۰-۹٠-٩][0-9۰-۹٠-٩,٬]{9,}(?:[.٫][0-9۰-۹٠-٩]+)?/g,m=>{const n=+dg(m).replace(/[,٬]/g,'').replace('٫','.');if(!isFinite(n)||n<1e9)return m;
       const L=v=>{try{return new Intl.NumberFormat(T('locale'),{maximumFractionDigits:2}).format(v)}catch(e){return v}};
@@ -893,7 +896,7 @@ if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWor
 initMode();tilesInit();load().then(()=>{const m=location.hash.match(/^#p(\d+)/);if(m)openPost(+m[1]);else goHash()}).catch(e=>{try{reveal()}catch(_){}$('#out').innerHTML=`<div class="empty">⚠ ${esc(e.message)}</div>`});
 </script>
 <script>setTimeout(function(){if(!window.__rv)document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('v')})},4000)</script>
-<script src="/assets/news.js?v=5" defer></script>
+<script src="/assets/news.js?v=6" defer></script>
 <script src="/assets/wimport.js?v=1" defer></script>
 <script src="/assets/chrome.js?v=27" defer></script><script src="/assets/ask.js?v=3" defer></script>
 <script>(function(){/* Tonight's class is 20:00 Tehran = 16:30 UTC (Iran has kept UTC+3:30 all year since 2022).

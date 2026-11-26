@@ -486,6 +486,11 @@ jobs:
         timeout-minutes: 3
         run: python scripts/tv_images.py
 
+      - name: Live headlines and AI report in the globe's languages (Google's free endpoint, no Gemini)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: timeout 200 python scripts/live_tr.py
+
       - name: Leak guard (no indicator source may ever reach the public repo or site)
         run: python scripts/leak_guard.py
 

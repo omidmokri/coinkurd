@@ -57,7 +57,12 @@
   const lists = () => { const n = X.news || {}; return { fa: (n.regional && n.regional.items) || [], en: n.items || [], w: (n.world && n.world.items) || [] } };
   const cur = () => lists()[st.tab] || [];
   const wantTr = it => st.tr && (it._fa ? (lang === 'en' || (lang === 'ckb' && !!it.tckb)) : lang !== 'en');   // English UI translates Persian; fa/ckb UI translates English
-  const trTitle = it => { if (!wantTr(it)) return null; return (lang === 'en' ? it.ten : (it['t' + lang] || (!it._fa && it.tfa))) || CT.get(it.title + '|' + tgt(it)) || null };
+  /* a reader who picked one of the globe's languages (assets/i18n.js) has the English page translated; its headlines
+     come from data/live_tr/<code>.json (scripts/live_tr.py), loaded only for that reader */
+  const XL = (() => { try { const c = localStorage.getItem('ek_l'); return c && localStorage.getItem('ek_ar') !== '1' ? c : '' } catch (e) { return '' } })();
+  let XT = {};
+  if (XL) fetch('/data/live_tr/' + XL + '.json?v=' + Math.floor(Date.now() / 3e5)).then(r => r.ok ? r.json() : null).then(j => { if (j && j.news) { XT = j.news; if (st.mounted) remount() } }).catch(() => { });
+  const trTitle = it => { if (XL && lang === 'en' && !it._fa && XT[it.id]) return XT[it.id]; if (!wantTr(it)) return null; return (lang === 'en' ? it.ten : (it['t' + lang] || (!it._fa && it.tfa))) || CT.get(it.title + '|' + tgt(it)) || null };
   const tgt = it => lang === 'en' ? 'en' : (lang === 'ckb' ? 'ckb' : 'fa');
   const shownTitle = it => trTitle(it) || it.title;
   const dirOf = s => /[؀-ۿ]/.test(s) ? 'rtl' : 'ltr';
