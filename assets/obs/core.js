@@ -319,7 +319,8 @@
     { k: 'rotation', path: '/charts/capital-rotation/', ic: 'cycle' },
     { k: 'pools', path: '/charts/decentralization/', ic: 'grid' },
     { k: 'sopr', path: '/charts/sopr/', ic: 'orbit' },
-    { k: 'hodl', path: '/charts/hodl-waves/', ic: 'galaxy' }
+    { k: 'hodl', path: '/charts/hodl-waves/', ic: 'galaxy' },
+    { k: 'rare', path: '/charts/rare/', ic: 'target' }
   ];
   var root, cur = null, curKey = null;
   function headText() {
@@ -332,7 +333,7 @@
     var plain = [], latin = [];
     OB.PAGES.forEach(function (p) { (/[A-Za-z]/.test(T('tab_' + p.k)) ? latin : plain).push(p); });
     var tabs = plain.concat(latin).map(function (p) {
-      return '<a class="ob-tab' + (p.k === key ? ' on' : '') + '" href="' + p.path + '"' + (p.k === key ? ' aria-current="page"' : '') + '>' + OB.icon(p.ic) + '<span>' + esc(T('tab_' + p.k)) + '</span></a>';
+      return '<a class="ob-tab' + (p.k === key || (p.k === 'rare' && /^r_/.test(key)) ? ' on' : '') + '" href="' + p.path + '"' + (p.k === key ? ' aria-current="page"' : '') + '>' + OB.icon(p.ic) + '<span>' + esc(T('tab_' + p.k)) + '</span></a>';
     }).join('');
     root.innerHTML = '<div class="ob-top"><nav class="ob-tabs" aria-label="' + esc(T('nav')) + '">' + tabs + '</nav>' +
       '<a class="ob-all" href="/charts/">' + OB.icon('grid') + '<span>' + esc(T('all')) + '</span></a></div><div class="ob-view" id="ob-view"></div>';

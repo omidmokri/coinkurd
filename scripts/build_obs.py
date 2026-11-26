@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "39"           # asset version (bump with any change to assets/obs/*)
+V = "40"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -2307,6 +2307,10 @@ def main():
     assert len(HUB["desc"]) <= 160, ("hub description", len(HUB["desc"]))
     write(HUB_PATH, hub())
     print(f"/{HUB_PATH}/ written (title {len(HUB['title'])}, description {len(HUB['desc'])} characters)")
+
+
+import rare_pages as _RARE  # rare indicators: extra pages wired in by a hook
+_RARE.hook(globals())
 
 
 if __name__ == "__main__":

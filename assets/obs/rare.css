@@ -1,0 +1,20 @@
+/* entekhab.net — the Observatory's rare indicators (assets/obs/rare.js): the row of sibling pages, the reading of today,
+   the index cards. Same glass, lines and accent as obs.css. */
+.rr-nav{display:flex;align-items:center;gap:6px;padding:6px;border-bottom:1px solid var(--line);background:rgba(10,15,44,.55)}
+.rr-all{display:flex;align-items:center;gap:6px;flex:0 0 auto;padding:6px 11px;border-radius:11px;border:1px solid var(--line);color:#cbd3f5;text-decoration:none;font-size:.8rem;font-weight:700;white-space:nowrap}
+.rr-all:hover{color:var(--acc);border-color:rgba(255,207,107,.45)}
+.rr-chips{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+.rr-chips::-webkit-scrollbar{display:none}
+.rr-chip{flex:0 0 auto;padding:6px 11px;border-radius:999px;color:#a3aed8;text-decoration:none;font-size:.8rem;white-space:nowrap;transition:background .15s,color .15s}
+.rr-chip:hover{color:#eef1ff;background:rgba(255,255,255,.05)}
+.rr-chip.on{color:var(--acc);background:rgba(255,207,107,.13);box-shadow:inset 0 0 0 1px rgba(255,207,107,.32);font-weight:700}
+.rr-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rr-read{margin:0;padding:12px 16px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(255,207,107,.09),rgba(124,200,255,.04));border-inline-start:3px solid var(--acc)}
+.rr-read small{display:block;color:var(--acc);font-size:.72rem;font-weight:700;letter-spacing:.02em;margin-bottom:3px}
+.rr-read p{margin:0;color:#eef1ff;line-height:1.9;font-size:.92rem}
+.rr-tbl td:first-child{font-weight:700}
+.rr-card{position:relative}
+.rr-now{display:block;margin-top:4px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.1);color:#dfe5ff;font-size:.8rem;line-height:1.8}
+.rr-now.wait{color:#7d88b8}
+.rr-asof{font-style:normal;color:#7d88b8;font-size:.7rem}
+@media (max-width:560px){.rr-nav{flex-wrap:wrap}.rr-all{order:2}.rr-chips{flex-basis:100%}}

@@ -82,6 +82,18 @@ jobs:
           OBS_AGE_FORCE: ${{ inputs.force && '1' || '' }}
         run: python scripts/obs_age.py
 
+      # rare indicators (stablecoin velocity, coin-age cohorts, cohort cost bases, funding against flows, developer pulse
+      # and more): free sources only (the Coin Metrics and DefiLlama files already here, Bitview, Binance public data and
+      # OKX funding, GitHub API);
+      # each part looks at most every few hours and keeps the last good file when a source fails
+      - name: Rare indicators
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OBS_RARE_FORCE: ${{ inputs.force && '1' || '' }}
+        run: python scripts/obs_rare.py
+
       - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
         continue-on-error: true
         timeout-minutes: 5
