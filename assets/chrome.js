@@ -417,3 +417,5 @@
   }
   w.ekBreath = scan;
 })();
+/* motion switched off on this device (the switch is on the Observatory pages, assets/obs/worlds.js) */
+(function () { try { if (localStorage.getItem('ek_motion') === 'off') document.documentElement.classList.add('ek-still'); } catch (e) { } })();

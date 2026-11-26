@@ -335,6 +335,8 @@ html.nx-lite .br-neb::before{will-change:auto}
   .br-neb::after{animation-delay:-6s}
   html.ek-v3 #ekf.ekf::before{animation:br-breathe 8s ease-in-out infinite;background-position:50% 0,0 0}}
 @media (forced-colors:active){.br::after,.br-neb{display:none}}
+/* the switch on the Observatory pages (assets/obs/worlds.js) stops the light too, remembered on this device */
+html.ek-still .br::after,html.ek-still .br>.br-neb::before,html.ek-still .br>.br-neb::after,html.ek-still.ek-v3 #ekf.ekf::before{animation-play-state:paused!important}
 
 /* ---- the logo is the name alone (owner 2026-11-26): no box, no border, no background behind it */
 html.ek-v3 #ekh .ek-brand,html.ek-v3 #ekh.ek-sc .ek-brand,html.nx-lite #ekh .ek-brand{background:none!important;border-color:transparent!important;box-shadow:none!important;

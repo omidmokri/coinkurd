@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "35"           # asset version (bump with any change to assets/obs/*)
+V = "36"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -2156,7 +2156,7 @@ def page(view, folder, scripts):
           "applicationCategory": "FinanceApplication", "operatingSystem": "Any (web browser)", "inLanguage": ["ckb", "fa", "ar", "en"],
           "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
           "publisher": {"@type": "Organization", "name": "Entekhab (entekhab.net)", "url": SITE}, "description": t["p"]["en"]}
-    tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js", "space.js"] + scripts)
+    tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js", "space.js", "worlds.js"] + scripts)
     return head(t["title"], t["desc"], t["og"], url, ld, CSS.get(view, ())) + f"""<body>
 <!--ek:header--><!--/ek:header-->
 <main class="ob-page" id="ob-main" data-view="{view}" translate="no">
@@ -2214,6 +2214,7 @@ def hub():
 <script src="/assets/obs/i18n.js?v={V}" defer></script>
 <script src="/assets/obs/core.js?v={V}" defer></script>
 <script src="/assets/obs/space.js?v={V}" defer></script>
+<script src="/assets/obs/worlds.js?v={V}" defer></script>
 <script src="/assets/ui.js" defer></script>
 </body>
 </html>

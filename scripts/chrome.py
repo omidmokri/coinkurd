@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "25"  # bump to bust caches of chrome.css / chrome.js
+VER = "26"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.

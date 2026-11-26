@@ -87,3 +87,12 @@ html.ob-space #ekf{background:linear-gradient(180deg,rgba(6,8,22,.5),rgba(3,4,12
 /* ---- the charts themselves sit in the glass, not on a flat black slab (owner 2026-11-26): the canvases paint a deep-space
    ground of their own (OB.bg in core.js), so their boxes stay clear and the sky's light reaches them */
 html.ob-space .ob-stage,html.ob-space .ob-mapbox,html.ob-space .ob-tsbox,html.ob-space .x-clgd{background:transparent}
+
+/* ---- the motion switch under the page title (assets/obs/worlds.js) */
+.ek-mo{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:7px 13px;border-radius:999px;border:1px solid var(--cz-line2,rgba(150,175,255,.28));
+  background:rgba(10,14,38,.55);color:rgba(214,224,255,.78);font-weight:600;font-size:.78rem;line-height:1;font-family:inherit;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ek-mo:hover{color:#fff;border-color:rgba(94,242,214,.55)}
+.ek-mo:focus-visible{outline:2px solid #5ef2d6;outline-offset:2px}
+.ek-mo[aria-pressed=true]{color:#5ef2d6}
+.ek-mo svg{flex:0 0 auto}
+@media print{.ek-mo,.ob-sky{display:none!important}}

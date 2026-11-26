@@ -295,65 +295,79 @@
     g.globalAlpha = 1;
   }
 
+  /* the page's own world (assets/obs/worlds.js): what to keep of deep space, and what to draw over it */
+  var DEF = {}, C = {}, prev = 0;
+  function still() { return de.classList.contains('ek-still'); }
   function frame(now, once) {
     if (!Lp) return;
-    var lt = lite(), gap = RM ? 100 : lt ? 66 : 33;
+    var lt = lite(), gap = RM ? 100 : lt ? 66 : 33, st = still();
+    if (st && !once) { raf = 0; return; }
     if (!once && now - last < gap) { raf = w.requestAnimationFrame(frame); return; }
-    last = now;
+    var dt = Math.min(.1, (now - (prev || now)) / 1000); prev = now; last = now;
     var t = (now - t0) / 1000, mv = RM ? .3 : 1, par = RM ? 0 : 1, T = TX;
+    var WD = w.OBWORLD || null, cf = (WD && WD.cfg) || DEF;
     var breath = .5 + .5 * Math.sin(t * TAU / 6 - Math.PI / 2);   /* the frames' 6-second breath */
     px += (tx - px) * .06; py += (ty - py) * .06;
     var ssy = sy * par, ppx = px * par, ppy = py * par;
+    C.g = g; C.W = W; C.H = H; C.t = t; C.mv = mv; C.breath = breath; C.ppx = ppx; C.ppy = ppy; C.ssy = sy; C.lt = lt; C.small = W < 700;
+    C.rtl = (de.dir || d.dir) === 'rtl'; C.once = !!once; C.RM = RM; C.dt = once ? 0 : dt; C.dpr = dpr; C.still = st;
     g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-    var bg = g.createLinearGradient(0, 0, W * .3, H);
-    bg.addColorStop(0, '#02030a'); bg.addColorStop(.55, '#050717'); bg.addColorStop(1, '#0a0620');
-    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    if (WD && WD.sky) { try { WD.sky(C); } catch (e) { WD.sky = null; } }
+    else {
+      var bg = g.createLinearGradient(0, 0, W * .3, H);
+      bg.addColorStop(0, '#02030a'); bg.addColorStop(.55, '#050717'); bg.addColorStop(1, '#0a0620');
+      g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    }
 
     /* the two clouds, drifting against each other */
     var big = Math.max(W, H);
-    g.globalAlpha = .62 + .3 * breath;
-    if (T.cliff) tile(T.cliff, big * 1.05, t * 7 * mv + ppx * 10, t * 2.2 * mv + ssy * .04 + ppy * 10);
-    if (T.pillar) { g.globalAlpha = .4 + .3 * (1 - breath); tile(T.pillar, big * .8, -t * 5 * mv + ppx * 16 + big * .3, -t * 3 * mv + ssy * .07 + ppy * 16); }
+    var ck = cf.clouds == null ? 1 : cf.clouds;
+    g.globalAlpha = (.62 + .3 * breath) * ck;
+    if (T.cliff && ck) tile(T.cliff, big * 1.05, t * 7 * mv + ppx * 10, t * 2.2 * mv + ssy * .04 + ppy * 10);
+    if (T.pillar && ck) { g.globalAlpha = (.4 + .3 * (1 - breath)) * ck; tile(T.pillar, big * .8, -t * 5 * mv + ppx * 16 + big * .3, -t * 3 * mv + ssy * .07 + ppy * 16); }
 
     g.globalCompositeOperation = 'lighter';
-    if (band) { g.globalAlpha = .8 + .2 * breath; g.drawImage(band, -ppx * 10, -ppy * 10 - ssy * .05, W, H); }
+    if (band && cf.band !== false) { g.globalAlpha = .8 + .2 * breath; g.drawImage(band, -ppx * 10, -ppy * 10 - ssy * .05, W, H); }
 
     var lift = Math.min(ssy * .08, H * .35);
     /* the galaxies, turning */
     var G = Lp.gal, G2 = Lp.gal2;
-    if (T.gal) { g.save(); g.translate(G[0] - ppx * 8, G[1] - lift - ppy * 8); g.rotate(-.5); g.scale(1, .5); g.rotate(t * TAU / 120 * mv);
+    if (T.gal && cf.gal !== false) { g.save(); g.translate(G[0] - ppx * 8, G[1] - lift - ppy * 8); g.rotate(-.5); g.scale(1, .5); g.rotate(t * TAU / 120 * mv);
     g.globalAlpha = .82 + .18 * breath; g.drawImage(T.gal, -G[2], -G[2], G[2] * 2, G[2] * 2); g.restore(); }
-    if (T.gal2) { g.save(); g.translate(G2[0] - ppx * 5, G2[1] - lift * .7 - ppy * 5); g.rotate(.7); g.scale(1, .62); g.rotate(-t * TAU / 90 * mv);
+    if (T.gal2 && cf.gal2 !== false) { g.save(); g.translate(G2[0] - ppx * 5, G2[1] - lift * .7 - ppy * 5); g.rotate(.7); g.scale(1, .62); g.rotate(-t * TAU / 90 * mv);
     g.globalAlpha = .7; g.drawImage(T.gal2, -G2[2], -G2[2], G2[2] * 2, G2[2] * 2); g.restore(); }
 
-    var WH = Lp.wh; if (T.throat) wormhole(WH[0] - ppx * 9, WH[1] - lift - ppy * 9, WH[2], t, mv, breath);
-    var BH = Lp.bh; if (T.disk) blackHole(BH[0] - ppx * 12, BH[1] - lift - ppy * 12, BH[2], t, mv);
+    var WH = Lp.wh; if (T.throat && cf.wh !== false) wormhole(WH[0] - ppx * 9, WH[1] - lift - ppy * 9, WH[2], t, mv, breath);
+    var BH = Lp.bh; if (T.disk && cf.bh !== false) blackHole(BH[0] - ppx * 12, BH[1] - lift - ppy * 12, BH[2], t, mv);
 
     /* stars in three depths */
     g.globalCompositeOperation = 'source-over';
+    var sTop = cf.starTop ? cf.starTop * H : 0, sK = cf.stars == null ? 1 : cf.stars;
     for (var i = 0; i < stars.length; i++) {
       var s = stars[i], k = .05 + s.z * .28, y = ((s.y - ssy * k - ppy * s.z * 18) % (H * 1.6) + H * 1.6) % (H * 1.6);
-      if (y > H + 4) continue;
-      var x = s.x - ppx * s.z * 18, tw = .45 + .55 * Math.sin(t * s.sp + s.ph);
+      if (y > H + 4 || (sTop && y > sTop)) continue;
+      var x = s.x - ppx * s.z * 18, tw = (.45 + .55 * Math.sin(t * s.sp + s.ph)) * sK;
+      if (sTop) tw *= Math.min(1, (sTop - y) / (H * .15));
       if (tw < .05) tw = .05;
       if (s.r > 1.2 && T.dot) { g.globalAlpha = Math.min(1, (.35 + s.z * .65) * tw); var rr = s.r * 3.4; g.drawImage(T.dot[s.k], x - rr, y - rr, rr * 2, rr * 2); }
       else { g.globalAlpha = (.22 + s.z * .78) * tw; g.fillStyle = s.c; g.fillRect(x - s.r, y - s.r, s.r * 2, s.r * 2); }
     }
     g.globalCompositeOperation = 'lighter';
-    for (i = 0; T.spike && i < spikes.length; i++) {
+    for (i = 0; T.spike && cf.spikes !== false && i < spikes.length; i++) {
       var p = spikes[i], yy = ((p.y - ssy * .3 - ppy * 18) % (H * 1.3) + H * 1.3) % (H * 1.3);
       if (yy > H + p.s) continue;
       var a = .55 + .45 * Math.sin(t * .8 + p.ph), sz = p.s * (.85 + .15 * a);
       g.globalAlpha = a; g.drawImage(T.spike[p.k], p.x - ppx * 18 - sz / 2, yy - sz / 2, sz, sz);
     }
     /* dust drifting up through the light */
-    if (mv === 1 || RM) for (i = 0; i < dust.length; i++) {
+    if (cf.dust !== false) for (i = 0; i < dust.length; i++) {
       var q = dust[i];
       if (!once) { q.x += q.vx * (lt ? .066 : .033) * mv; q.y += q.vy * (lt ? .066 : .033) * mv; }
       if (q.y < -4) q.y = H + 4; if (q.x < -4) q.x = W + 4; if (q.x > W + 4) q.x = -4;
       g.globalAlpha = q.a * (.6 + .4 * breath); g.fillStyle = '#cfe0ff'; g.fillRect(q.x, q.y, q.r, q.r);
     }
-    if (!RM) {
+    if (WD && WD.front) { g.globalAlpha = 1; try { WD.front(C); } catch (e) { WD.front = null; } g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    if (!RM && cf.shoot !== false) {
       /* a falling star every few seconds */
       if (!shoot && t > nextShoot) { shoot = { x: W * (.25 + Math.random() * .75), y: Math.random() * H * .45, vx: -(6 + Math.random() * 6), vy: 2.2 + Math.random() * 2.4, life: 1 }; if (de.dir === 'rtl') { shoot.x = W - shoot.x; shoot.vx = -shoot.vx; } }
       if (shoot) {
@@ -378,6 +392,7 @@
       }
     }
     g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+    if (w.OBFX) { try { w.OBFX(C); } catch (e) { } g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.setTransform(dpr, 0, 0, dpr, 0, 0); }
     if (!once && !d.hidden) raf = w.requestAnimationFrame(frame); else if (!once) raf = 0;
   }
 
@@ -394,10 +409,11 @@
       w.addEventListener('pointermove', function (e) { tx = (e.clientX / W - .5) * 2; ty = (e.clientY / H - .5) * 2; }, { passive: true });
     }
     d.addEventListener('visibilitychange', function () { if (!d.hidden) wake(); });
+    w.addEventListener('ek-motion', wake);
     sy = w.scrollY || 0; size();
     raf = w.requestAnimationFrame(frame);
   }
-  function wake() { if (!cv || !g) return; frame(performance.now(), true); if (!raf) raf = w.requestAnimationFrame(frame); }
+  function wake() { if (!cv || !g) return; frame(performance.now(), true); if (!raf && !still()) raf = w.requestAnimationFrame(frame); }
   w.OBSKY = { wake: wake };
   if (d.body) start(); else d.addEventListener('DOMContentLoaded', start);
 })();
