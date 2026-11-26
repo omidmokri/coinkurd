@@ -219,6 +219,20 @@ FOOT = {"fa": '© entekhab.net — داده‌ها به‌صورت خودکار 
 CREDIT = {"fa": 'داده‌ها به‌صورت خودکار از کانال <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a>، Binance، CoinGecko و alternative.me به‌روز می‌شوند.',
           "ckb": 'داتاکان بە شێوەی ئۆتۆماتیکی لە کەناڵی <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a>، Binance، CoinGecko و alternative.me نوێ دەکرێنەوە.',
           "en": 'Data is updated automatically from the <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me.'}
+# On a Persian page the credit line carries its Sorani and English copies too, so the per-language copies of the
+# site (which open these pages with ck_lang set) never show it in Persian; the inline script picks one before paint.
+CREDIT_JS = ("try{(function(){function s(l){if(['fa','ckb','en'].indexOf(l)<0)l='fa';document.querySelectorAll('.ek-credit>[data-lang]')"
+             ".forEach(function(e){e.hidden=e.dataset.lang!==l})}var l;try{l=localStorage.getItem('ck_lang')}catch(e){}s(l);"
+             "addEventListener('ek-lang',function(ev){s(ev.detail)})})()}catch(e){}")
+
+
+def credit_line(cl):
+    if cl != "fa":
+        return f'<p class="ek-credit">{CREDIT.get(cl, CREDIT["fa"])}</p>'
+    return (f'<p class="ek-credit"><span data-lang="fa">{CREDIT["fa"]}</span><span data-lang="ckb" hidden>{CREDIT["ckb"]}</span>'
+            f'<span data-lang="en" lang="en" dir="ltr" hidden>{CREDIT["en"]}</span></p><script>{CREDIT_JS}</script>')
+
+
 # "recently viewed" for /me/ — stored only in the visitor's own browser (localStorage), never sent anywhere
 RECENT_JS = ("try{var k='ek_recent',p=location.pathname,a=JSON.parse(localStorage.getItem(k)||'[]').filter(function(x){return x&&x.p!==p});"
              "a.unshift({p:p,t:document.title.replace(/\\s*\\|\\s*entekhab\\.net\\s*$/i,''),at:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,30)))}catch(e){}"
@@ -369,7 +383,7 @@ def page(path, title, desc, body, extra_head="", lang="fa"):
 <style>{CSS}</style>{chrome.HEAD_TAGS}{extra_head}</head><body>
 {chrome.header(cl)}
 <main class="w">{body}</main>
-<p class="ek-credit">{CREDIT.get(cl, CREDIT["fa"])}</p>{chrome.bottom(cl)}{chrome.footer(cl)}<script>{RECENT_JS}{WATCH_JS}</script>{chrome.BODY_TAGS}</body></html>"""
+{credit_line(cl)}{chrome.bottom(cl)}{chrome.footer(cl)}<script>{RECENT_JS}{WATCH_JS}</script>{chrome.BODY_TAGS}</body></html>"""
     full = os.path.join(ROOT, path, "index.html") if path else os.path.join(ROOT, "index.html")
     os.makedirs(os.path.dirname(full), exist_ok=True)
     open(full, "w", encoding="utf-8").write(doc)
@@ -951,7 +965,44 @@ def _fa(x):
     return str(x).translate(_FAD)
 
 
+_CKD = str.maketrans("0123456789.", "٠١٢٣٤٥٦٧٨٩٫")
+# the regime card in Sorani and English; the Persian stays as it was in RH_FA / RH_DIM and the strings below
+RH_L = {
+    "ckb": {"lab": {"bull": "بەرزبوونەوە", "bear": "دابەزین", "sideways": "مامناوەند (ڕەنج)", "high_vol": "هەڵاوسانی زۆر"},
+            "dim": {"mayer": ("ڕێژەی مایەر", "نرخ ÷ تێکڕای ٢٠٠ ڕۆژە"), "slope": ("لێژیی تێکڕای ٢٠٠", "ڕێژەی گۆڕانی ٢٠ ڕۆژە"),
+                    "wrsi": ("RSIی هەفتانە", "هێزی ڕەوتی هەفتانە"), "fng": ("ترس و تەماح", "alternative.me"),
+                    "fund": ("فاندینگ", "ڕێژەی پارەدانی گرێبەستە هەمیشەییەکان")},
+            "pend": "پێوانی گۆڕان بۆ <b style=\"color:{c}\">{l}</b>: {d} لە {n} ڕۆژی پێویست بۆ پشتڕاستکردنەوە",
+            "mood": "هەست", "fngs": "پێوەری ترس و تەماح", "br": "پانیی بازاڕ",
+            "brs": "{u}% بەرزبوونەوە · {r}% ڕەنج · {d}% دابەزین لە {n} دراو", "mom": "مۆمێنتۆمی BTC", "h24": "٢٤ کاتژمێر",
+            "risk": "مەترسی", "risks": "ئەگەری دۆخی «{l}» لە مۆدێلی ئاماریدا (HMM) · مەترسیی گۆڕانی دۆخ {s}%",
+            "days": "{n} ڕۆژی ڕابردوو", "aria": "مێژووی ڕژێمی پشتڕاستکراو", "k": "ڕژێمی پشتڕاستکراوی بازاڕ · BTC",
+            "din": "{d} ڕۆژ لەم دۆخەدا · پشتڕاستکردنەوە دوای {c} ڕۆژی یەک لە دوای یەک", "votes": "پێنج دەنگی پشت ئەم ڕژێمە",
+            "link": "ڕێباز و کارنامەی ڕاداری ڕژێم ←", "disc": "نوێکردنەوە {d} · وەسفی دۆخەکەیە، نەک پێشبینی یان ئامۆژگاریی بازرگانی."},
+    "en": {"lab": {"bull": "Bullish", "bear": "Bearish", "sideways": "Neutral (range)", "high_vol": "Volatile"},
+           "dim": {"mayer": ("Mayer multiple", "price ÷ 200-day average"), "slope": ("200-day average slope", "20-day change in %"),
+                   "wrsi": ("Weekly RSI", "weekly trend strength"), "fng": ("Fear & Greed", "alternative.me"),
+                   "fund": ("Funding", "perpetual futures funding rate")},
+           "pend": "Measuring a change to <b style=\"color:{c}\">{l}</b>: {d} of the {n} days needed to confirm",
+           "mood": "Sentiment", "fngs": "Fear & Greed index", "br": "Market breadth",
+           "brs": "{u}% up · {r}% range · {d}% down of {n} coins", "mom": "BTC momentum", "h24": "24 hours",
+           "risk": "Risk", "risks": "Probability of the “{l}” state in the statistical model (HMM) · regime switch risk {s}%",
+           "days": "Last {n} days", "aria": "History of the confirmed regime", "k": "Confirmed market regime · BTC",
+           "din": "{d} days in this state · confirmed after {c} days in a row", "votes": "The five votes behind this regime",
+           "link": "How the regime radar works, and its record →", "disc": "Updated {d} · describes the state of the market, not a forecast or trading advice."},
+}
+
+
 def regime_hero():
+    """/dashboard/ top in Persian, Sorani and English: three copies, LANG_JS shows the visitor's one (Persian first)"""
+    fa = _regime_hero("fa")
+    if not fa:
+        return ""
+    return (f'<div data-lang="fa">{fa}</div><div data-lang="ckb" hidden>{_regime_hero("ckb")}</div>'
+            f'<div data-lang="en" lang="en" dir="ltr" hidden>{_regime_hero("en")}</div>')
+
+
+def _regime_hero(lg="fa"):
     """/dashboard/ top: the confirmed market regime, its five votes, four readings of the market and the last 180 days.
     Every figure comes from data/regime.json (rule + HMM), data/brain.json and data/market.json; a missing source
     leaves its part out — nothing is filled in."""
@@ -960,14 +1011,24 @@ def regime_hero():
     lab = rule.get("label")
     if lab not in RH_FA:
         return ""
+    L = RH_L.get(lg)
+    LAB = RH_FA if L is None else L["lab"]
+    DIM = RH_DIM if L is None else L["dim"]
+    dg = _fa if lg == "fa" else (lambda x: str(x).translate(_CKD)) if lg == "ckb" else str
     order = list((rg.get("states") or {}).keys()) or ["bull", "bear", "sideways", "high_vol"]
     col = RH_COL[lab]
     pend = rule.get("pending") or {}
-    pend_html = (f'<p class="rh-pend">در حال سنجش تغییر به <b style="color:{RH_COL.get(pend.get("to"), "#fff")}">{RH_FA.get(pend.get("to"), "")}</b>: '
-                 f'{_fa(pend.get("days", 0))} از {_fa(pend.get("need", 0))} روزِ لازم برای تأیید</p>') if pend.get("to") in RH_FA else ""
+    if pend.get("to") not in RH_FA:
+        pend_html = ""
+    elif L is None:
+        pend_html = (f'<p class="rh-pend">در حال سنجش تغییر به <b style="color:{RH_COL.get(pend.get("to"), "#fff")}">{RH_FA.get(pend.get("to"), "")}</b>: '
+                     f'{_fa(pend.get("days", 0))} از {_fa(pend.get("need", 0))} روزِ لازم برای تأیید</p>')
+    else:
+        pend_html = '<p class="rh-pend">' + L["pend"].format(c=RH_COL.get(pend.get("to"), "#fff"), l=LAB.get(pend.get("to"), ""),
+                                                             d=dg(pend.get("days", 0)), n=dg(pend.get("need", 0))) + '</p>'
     votes = ""
     for dm in rule.get("dims") or []:
-        nm = RH_DIM.get(dm.get("k"))
+        nm = DIM.get(dm.get("k"))
         if not nm or dm.get("v") is None:
             continue
         vt = dm.get("vote", 0)
@@ -979,34 +1040,57 @@ def regime_hero():
     f = market.get("fng") or {}
     now = rg.get("now") or {}
     pill = []
-    if f.get("value") is not None:
-        pill.append(("احساسات", f'<b class="num">{f["value"]}</b><small>{e(f.get("class", ""))} · شاخص ترس و طمع</small>', f["value"]))
-    if b.get("n"):
-        bar = (f'<div class="rh-br"><i style="flex:{b.get("up_pct", 0)} 0 0;background:#34d399"></i><i style="flex:{b.get("range_pct", 0)} 0 0;background:#6b6c72"></i>'
-               f'<i style="flex:{b.get("down_pct", 0)} 0 0;background:#ff5a4d"></i></div>')
-        pill.append(("پهنای بازار", f'{bar}<small>{_fa(b.get("up_pct", 0))}٪ صعودی · {_fa(b.get("range_pct", 0))}٪ رنج · {_fa(b.get("down_pct", 0))}٪ نزولی از {_fa(b["n"])} ارز</small>', None))
-    if br.get("btc_chg24") is not None:
-        c24 = br["btc_chg24"]
-        pill.append(("مومنتوم BTC", f'<b class="num {"up" if c24 >= 0 else "down"}">{c24:+.2f}%</b><small>۲۴ ساعت · RSI {_fa(br.get("btc_rsi", "—"))}</small>', None))
-    if now.get("top") in RH_FA and now.get("confidence") is not None:
-        pill.append(("ریسک", f'<b class="num">{_fa(round(now["confidence"] * 100, 1)).replace(".", "٫")}٪</b><small>احتمال حالت «{RH_FA[now["top"]]}» در مدل آماری (HMM) · '
-                              f'ریسک تغییر حالت {_fa(round((now.get("switch_risk") or 0) * 100))}٪</small>', None))
+    if L is None:
+        if f.get("value") is not None:
+            pill.append(("احساسات", f'<b class="num">{f["value"]}</b><small>{e(f.get("class", ""))} · شاخص ترس و طمع</small>', f["value"]))
+        if b.get("n"):
+            bar = (f'<div class="rh-br"><i style="flex:{b.get("up_pct", 0)} 0 0;background:#34d399"></i><i style="flex:{b.get("range_pct", 0)} 0 0;background:#6b6c72"></i>'
+                   f'<i style="flex:{b.get("down_pct", 0)} 0 0;background:#ff5a4d"></i></div>')
+            pill.append(("پهنای بازار", f'{bar}<small>{_fa(b.get("up_pct", 0))}٪ صعودی · {_fa(b.get("range_pct", 0))}٪ رنج · {_fa(b.get("down_pct", 0))}٪ نزولی از {_fa(b["n"])} ارز</small>', None))
+        if br.get("btc_chg24") is not None:
+            c24 = br["btc_chg24"]
+            pill.append(("مومنتوم BTC", f'<b class="num {"up" if c24 >= 0 else "down"}">{c24:+.2f}%</b><small>۲۴ ساعت · RSI {_fa(br.get("btc_rsi", "—"))}</small>', None))
+        if now.get("top") in RH_FA and now.get("confidence") is not None:
+            pill.append(("ریسک", f'<b class="num">{_fa(round(now["confidence"] * 100, 1)).replace(".", "٫")}٪</b><small>احتمال حالت «{RH_FA[now["top"]]}» در مدل آماری (HMM) · '
+                                  f'ریسک تغییر حالت {_fa(round((now.get("switch_risk") or 0) * 100))}٪</small>', None))
+    else:
+        if f.get("value") is not None:
+            fc = (IL.get(lg) or {}).get("FNG", {}).get(f.get("class", ""), f.get("class", ""))
+            pill.append((L["mood"], f'<b class="num">{f["value"]}</b><small>{e(fc)} · {e(L["fngs"])}</small>', f["value"]))
+        if b.get("n"):
+            bar = (f'<div class="rh-br"><i style="flex:{b.get("up_pct", 0)} 0 0;background:#34d399"></i><i style="flex:{b.get("range_pct", 0)} 0 0;background:#6b6c72"></i>'
+                   f'<i style="flex:{b.get("down_pct", 0)} 0 0;background:#ff5a4d"></i></div>')
+            pill.append((L["br"], f'{bar}<small>' + L["brs"].format(u=dg(b.get("up_pct", 0)), r=dg(b.get("range_pct", 0)), d=dg(b.get("down_pct", 0)), n=dg(b["n"])) + '</small>', None))
+        if br.get("btc_chg24") is not None:
+            c24 = br["btc_chg24"]
+            pill.append((L["mom"], f'<b class="num {"up" if c24 >= 0 else "down"}">{c24:+.2f}%</b><small>{L["h24"]} · RSI {dg(br.get("btc_rsi", "—"))}</small>', None))
+        if now.get("top") in RH_FA and now.get("confidence") is not None:
+            pill.append((L["risk"], f'<b class="num">{dg(round(now["confidence"] * 100, 1))}%</b><small>'
+                                    + L["risks"].format(l=LAB[now["top"]], s=dg(round((now.get("switch_risk") or 0) * 100))) + '</small>', None))
     pills = "".join(f'<div class="rh-p"><span>{k}</span>{v}</div>' for k, v, _ in pill)
     # last 180 days of the confirmed regime
     hist = ((rg.get("rule") or {}).get("history") or [])[-180:]
     strip = ""
     if hist:
         w = 100 / len(hist)
-        rects = "".join(f'<rect x="{i * w:.3f}" y="0" width="{w + .05:.3f}" height="10" fill="{RH_COL.get(order[h["l"]] if 0 <= h.get("l", -1) < len(order) else "", "#333")}"><title>{h["d"]} · {RH_FA.get(order[h["l"]], "") if 0 <= h.get("l", -1) < len(order) else ""}</title></rect>'
+        rects = "".join(f'<rect x="{i * w:.3f}" y="0" width="{w + .05:.3f}" height="10" fill="{RH_COL.get(order[h["l"]] if 0 <= h.get("l", -1) < len(order) else "", "#333")}"><title>{h["d"]} · {LAB.get(order[h["l"]], "") if 0 <= h.get("l", -1) < len(order) else ""}</title></rect>'
                         for i, h in enumerate(hist))
-        legend = "".join(f'<span><i style="background:{RH_COL[k]}"></i>{RH_FA[k]}</span>' for k in order if k in RH_COL)
-        strip = (f'<div class="rh-t"><div class="rh-th"><span>{_fa(len(hist))} روز گذشته</span><span class="rh-lg">{legend}</span></div>'
-                 f'<svg viewBox="0 0 100 10" preserveAspectRatio="none" role="img" aria-label="تاریخچهٔ رژیم تأییدشده">{rects}</svg>'
+        legend = "".join(f'<span><i style="background:{RH_COL[k]}"></i>{LAB[k]}</span>' for k in order if k in RH_COL)
+        days_t = f'{_fa(len(hist))} روز گذشته' if L is None else L["days"].format(n=dg(len(hist)))
+        aria = "تاریخچهٔ رژیم تأییدشده" if L is None else L["aria"]
+        strip = (f'<div class="rh-t"><div class="rh-th"><span>{days_t}</span><span class="rh-lg">{legend}</span></div>'
+                 f'<svg viewBox="0 0 100 10" preserveAspectRatio="none" role="img" aria-label="{aria}">{rects}</svg>'
                  f'<div class="rh-th"><span class="num">{hist[0]["d"]}</span><span class="num">{hist[-1]["d"]}</span></div></div>')
-    return (f'<section class="rh" style="--rc:{col}"><div class="rh-top"><div><span class="rh-k">رژیم تأییدشدهٔ بازار · BTC</span>'
-            f'<div class="rh-l">{RH_FA[lab]}</div><p class="rh-d">{_fa(rule.get("days_in", 0))} روز در این وضعیت · تأیید پس از {_fa((rg.get("rule") or {}).get("confirm_days", 5))} روز پیاپی</p>{pend_html}</div>'
-            f'<div class="rh-vs"><span class="rh-k">پنج رأی پشت این رژیم</span><div>{votes}</div><a href="/regime/">روش و کارنامهٔ رادار رژیم ←</a></div></div>'
-            f'<div class="rh-ps">{pills}</div>{strip}<p class="disc">به‌روزرسانی {_fa(rule.get("date", ""))} · توصیف وضعیت است، نه پیش‌بینی یا توصیهٔ معاملاتی.</p></section>')
+    cd = (rg.get("rule") or {}).get("confirm_days", 5)
+    if L is None:
+        return (f'<section class="rh" style="--rc:{col}"><div class="rh-top"><div><span class="rh-k">رژیم تأییدشدهٔ بازار · BTC</span>'
+                f'<div class="rh-l">{RH_FA[lab]}</div><p class="rh-d">{_fa(rule.get("days_in", 0))} روز در این وضعیت · تأیید پس از {_fa(cd)} روز پیاپی</p>{pend_html}</div>'
+                f'<div class="rh-vs"><span class="rh-k">پنج رأی پشت این رژیم</span><div>{votes}</div><a href="/regime/">روش و کارنامهٔ رادار رژیم ←</a></div></div>'
+                f'<div class="rh-ps">{pills}</div>{strip}<p class="disc">به‌روزرسانی {_fa(rule.get("date", ""))} · توصیف وضعیت است، نه پیش‌بینی یا توصیهٔ معاملاتی.</p></section>')
+    return (f'<section class="rh" style="--rc:{col}"><div class="rh-top"><div><span class="rh-k">{L["k"]}</span>'
+            f'<div class="rh-l">{LAB[lab]}</div><p class="rh-d">' + L["din"].format(d=dg(rule.get("days_in", 0)), c=dg(cd)) + f'</p>{pend_html}</div>'
+            f'<div class="rh-vs"><span class="rh-k">{L["votes"]}</span><div>{votes}</div><a href="/regime/">{L["link"]}</a></div></div>'
+            f'<div class="rh-ps">{pills}</div>{strip}<p class="disc">' + L["disc"].format(d=rule.get("date", "")) + '</p></section>')
 
 
 RH_CSS = (".rh{position:relative;margin:14px 0 22px;padding:22px;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;"
