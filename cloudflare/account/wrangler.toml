@@ -21,7 +21,7 @@ NEW_DAILY = "2000"          # new accounts a day, all together (each network: 10
 [[d1_databases]]
 binding = "DB"
 database_name = "entekhab-account"
-database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+database_id = "3a965847-6a60-4c2d-bf3a-fad7c491bd49"
 
 # Secrets (never in this file):  npx wrangler secret put NAME
 #   DATA_KEY              32 random bytes, base64url  (node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
