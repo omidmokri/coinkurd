@@ -19,7 +19,9 @@ def ok(name, cond):
 
 
 def main():
-    with tempfile.TemporaryDirectory() as d:
+    with tempfile.TemporaryDirectory() as top:
+        d = os.path.join(top, "i18n")
+        os.makedirs(d)
         S.CACHE = d
         need = {"Open the chart", "Price {1}", "Bitcoin <b>now</b>", "Line one\nline two", "Fear and greed index"}
 
@@ -61,6 +63,18 @@ def main():
         ok("a string Gemini redid is no longer marked", "Open the chart" not in S.load_g("ru"))
         raw = json.load(open(os.path.join(d, "ru.json"), encoding="utf-8"))
         ok("the mark is kept in the cache file", isinstance(raw.get("g"), list))
+
+        # drafts made outside the runs fill only what the cache lacks, count as Google's, and survive a save
+        os.makedirs(os.path.join(top, "i18n_drafts"))
+        with open(os.path.join(top, "i18n_drafts", "fr.json"), "w", encoding="utf-8") as f:
+            json.dump({"s": {"Open the chart": "Ouvrir le graphique", "Price {1}": "Prix {1}"}}, f)
+        S.save("fr", {"Price {1}": "Prix : {1}"})
+        s = S.load("fr")
+        ok("a draft fills a string the cache lacks", s.get("Open the chart") == "Ouvrir le graphique")
+        ok("a draft never replaces the cache's own translation", s.get("Price {1}") == "Prix : {1}")
+        ok("a draft counts as Google's for Gemini to redo", S.load_g("fr") == {"Open the chart"})
+        S.save("fr", S.load("fr"))
+        ok("a draft is still marked after a run saves the language", S.load_g("fr") == {"Open the chart"})
 
         ok("site codes map to Google's", G.gcode("cn") == "zh-CN" and G.gcode("jp") == "ja" and G.gcode("fil") == "tl"
            and G.gcode("gr") == "el" and G.gcode("se") == "sv" and G.gcode("cz") == "cs")

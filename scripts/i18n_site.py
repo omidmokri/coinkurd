@@ -134,8 +134,31 @@ def load(code):
         return {}
     s = (d.get("s") if isinstance(d, dict) else None) or {}
     s = {k: v for k, v in s.items() if isinstance(v, str) and v}
+    for k, v in drafts(code).items():
+        s.setdefault(k, v)                     # a draft only fills what the cache has not translated
     s.update(fixes().get(code) or {})
     return s
+
+
+def drafts_path(code):
+    return os.path.join(os.path.dirname(CACHE), "i18n_drafts", f"{code}.json")
+
+
+def drafts(code):
+    """data/i18n_drafts/<code>.json -- Google Translate drafts made outside the translating runs, {english: text}
+
+    scripts/i18n_gt.py is turned away by Google after a few hundred requests from a GitHub runner, while the same
+    script run elsewhere fills a whole language. Its drafts land here, a file no run writes, so the runs' commits
+    (merged with -X theirs) cannot drop them. Each is checked again here as the run's own answers are, fills only a
+    string the cache lacks, and counts as Google's (load_g), so Gemini replaces it as the calls allow.
+    """
+    try:
+        with open(drafts_path(code), encoding="utf-8") as f:
+            raw = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    raw = (raw.get("s") if isinstance(raw, dict) and "s" in raw else raw) or {}
+    return {k: v for k, v in raw.items() if isinstance(k, str) and isinstance(v, str) and v.strip()}
 
 
 _fixes = None
@@ -148,15 +171,16 @@ def fixes():
     by hand lasts only until the next run; one kept here is laid over the cache each time it is read.
     """
     global _fixes
-    if _fixes is None:
+    path = os.path.join(os.path.dirname(CACHE), "i18n_fixes.json")
+    if _fixes is None or _fixes[0] != path:
         try:
-            with open(os.path.join(ROOT, "data", "i18n_fixes.json"), encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 raw = json.load(f)
         except (OSError, ValueError):
             raw = {}
-        _fixes = {c: {k: v for k, v in (m or {}).items() if isinstance(v, str) and v}
-                  for c, m in raw.items() if isinstance(m, dict) and not c.startswith("_")}
-    return _fixes
+        _fixes = (path, {c: {k: v for k, v in (m or {}).items() if isinstance(v, str) and v}
+                         for c, m in raw.items() if isinstance(m, dict) and not c.startswith("_")})
+    return _fixes[1]
 
 
 def load_fails(code):
@@ -183,16 +207,20 @@ def load_g(code):
         with open(cache_path(code), encoding="utf-8") as f:
             d = json.load(f)
     except (OSError, ValueError):
-        return set()
+        d = {}
     v = (d.get("g") if isinstance(d, dict) else None) or []
-    return {k for k in v if isinstance(k, str)}
+    s = (d.get("s") if isinstance(d, dict) else None) or {}
+    return {k for k in v if isinstance(k, str)} | {k for k in drafts(code) if not s.get(k)}
 
 
 def save(code, s, fails=None, g=None):
     os.makedirs(CACHE, exist_ok=True)
     f_ = dict(sorted((fails if fails is not None else load_fails(code)).items()))
     f_ = {k: n for k, n in f_.items() if k not in s}      # one that came good later starts clean again
-    g_ = sorted(k for k in (g if g is not None else load_g(code)) if k in s)
+    if g is None:
+        dr = drafts(code)                       # a draft the cache already had its own answer for is not Google's
+        g = {k for k in load_g(code) if not (k in dr and k in s and s[k] != dr[k])}
+    g_ = sorted(k for k in g if k in s)
     with open(cache_path(code), "w", encoding="utf-8") as f:
         d = {"lang": code, "s": dict(sorted(s.items()))}
         if f_:
