@@ -148,15 +148,16 @@ def fixes():
     by hand lasts only until the next run; one kept here is laid over the cache each time it is read.
     """
     global _fixes
-    if _fixes is None:
+    path = os.path.join(os.path.dirname(CACHE), "i18n_fixes.json")      # beside data/i18n/, wherever a test puts it
+    if _fixes is None or _fixes[0] != path:
         try:
-            with open(os.path.join(ROOT, "data", "i18n_fixes.json"), encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 raw = json.load(f)
         except (OSError, ValueError):
             raw = {}
-        _fixes = {c: {k: v for k, v in (m or {}).items() if isinstance(v, str) and v}
-                  for c, m in raw.items() if isinstance(m, dict) and not c.startswith("_")}
-    return _fixes
+        _fixes = (path, {c: {k: v for k, v in (m or {}).items() if isinstance(v, str) and v}
+                         for c, m in raw.items() if isinstance(m, dict) and not c.startswith("_")})
+    return _fixes[1]
 
 
 def load_fails(code):

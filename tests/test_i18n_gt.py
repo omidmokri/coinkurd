@@ -19,7 +19,9 @@ def ok(name, cond):
 
 
 def main():
-    with tempfile.TemporaryDirectory() as d:
+    with tempfile.TemporaryDirectory() as top:
+        d = os.path.join(top, "i18n")
+        os.makedirs(d)
         S.CACHE = d
         need = {"Open the chart", "Price {1}", "Bitcoin <b>now</b>", "Line one\nline two", "Fear and greed index"}
 
