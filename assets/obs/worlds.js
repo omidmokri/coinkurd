@@ -1013,7 +1013,7 @@
       if (n) { g.globalCompositeOperation = 'lighter'; halo(g, X(C, .04), hz, 0, H * .3, [[0, 'rgba(255,250,236,.8)'], [.08, 'rgba(255,240,210,.25)'], [1, 'rgba(255,240,210,0)']]); g.globalCompositeOperation = 'source-over'; }
       var cols = n ? ['#1c1e2a', '#10121c', '#05060c'] : ['#7c7c82', '#5e5e64', '#3c3c42'];
       ridge(C, this.rd[0], hz, H * .035, 3, cols[0], n ? 'rgba(220,230,255,.35)' : null);
-      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, n ? '#14161f' : '#9a9aa0'); gg.addColorStop(1, n ? '#030308' : '#48484e');
+      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, n ? '#14161f' : '#86868c'); gg.addColorStop(.5, n ? '#08090f' : '#4a4a50'); gg.addColorStop(1, n ? '#030308' : '#1c1c22');
       g.fillStyle = gg; g.fillRect(0, hz + H * .02, W, H);
       ridge(C, this.rd[1], hz + H * .04, H * .025, 7, n ? '#0c0d16' : '#8a8a90');
       /* craters, lit on the far rim */
@@ -1318,7 +1318,7 @@
       var R = Math.min(W, H) * (C.small ? .5 : .46), cx = X(C, .74) - C.ppx * 5, cy = H * .06 - C.ppy * 5;
       planet(g, turn('jupI', TX.jupI, t / 150 * mv, C, .3), cx, cy, R, C.rtl);
       ridge(C, this.rd[0], hz, H * .05, 4, '#8a6a28');
-      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, '#c8a84a'); gg.addColorStop(.5, '#8a6a24'); gg.addColorStop(1, '#3a2a0c');
+      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, '#b8983e'); gg.addColorStop(.45, '#6a5018'); gg.addColorStop(1, '#1e1606');
       g.fillStyle = gg; g.fillRect(0, hz + H * .02, W, H);
       var bc = ['rgba(214,112,40,.45)', 'rgba(246,244,228,.35)', 'rgba(40,24,14,.5)', 'rgba(180,60,20,.4)'];
       for (var i = 0; i < this.bl.length; i++) { var q = this.bl[i], v = Math.pow(q[1], 1.3), by = hz + H * .04 + (H - hz) * v, br = (10 + v * 90) * (.5 + q[2]); g.fillStyle = bc[q[3]]; g.beginPath(); g.ellipse(q[0] * W - C.ppx * (4 + v * 14), by, br, br * .22, 0, 0, TAU); g.fill(); }
@@ -1351,11 +1351,11 @@
       if (!this.rd) this.rd = ridgesOf(1616, 2, 90, .5);
       var R = Math.min(W, H) * .2, cx = X(C, .26) - C.ppx * 4, cy = H * .22 - C.ppy * 4;
       planet(g, turn('nP2', TX.nP2, t / 120 * mv, C, .4), cx, cy, R, C.rtl);
-      ridge(C, this.rd[0], hz, H * .03, 4, '#8a7a80');
-      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, '#b8a6a8'); gg.addColorStop(.4, '#7a6a70'); gg.addColorStop(1, '#2a2228');
+      ridge(C, this.rd[0], hz, H * .03, 4, '#5a4c56');
+      var gg = g.createLinearGradient(0, hz, 0, H); gg.addColorStop(0, '#8a7880'); gg.addColorStop(.35, '#4e424a'); gg.addColorStop(1, '#16121a');
       g.fillStyle = gg; g.fillRect(0, hz + H * .015, W, H);
       for (var i = 0; i < this.dm.length; i++) { var q = this.dm[i], v = Math.pow(q[1], 1.2), dy = hz + H * .03 + (H - hz) * v, dr = (6 + v * 40) * (.6 + q[2]); g.fillStyle = 'rgba(60,46,54,.28)'; g.beginPath(); g.ellipse(q[0] * W - C.ppx * (3 + v * 12), dy, dr, dr * .3, 0, 0, TAU); g.fill(); }
-      ridge(C, this.rd[1], hz + H * .12, H * .025, 12, '#4a3c44');
+      ridge(C, this.rd[1], hz + H * .12, H * .025, 12, '#2e262e');
       /* the geysers */
       var srcs = [.4, .62, .86];
       if (!C.once) for (var s = 0; s < srcs.length; s++) if (Math.random() < (C.lt ? .5 : 1)) this.gp.push({ s: s, a: 0, j: (Math.random() - .5) * .02 });
@@ -1823,9 +1823,12 @@
     };
     W0.front = function (C) {
       var V = virt(C);
+      /* space.js leaves the canvas adding light on light; the world's ground is drawn as solid paint */
+      C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over';
       if (F0) F0.call(W0, V);
       C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over';
       if (HF) { HF(V); C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over'; }
+      if (V.H < C.H - 1) { var bf = C.g.createLinearGradient(0, V.H * .8, 0, V.H); bf.addColorStop(0, 'rgba(3,4,12,0)'); bf.addColorStop(1, 'rgba(3,4,12,.6)'); C.g.fillStyle = bf; C.g.fillRect(0, V.H * .8, C.W, V.H * .2 + 1); }
       below(C, V.H);
     };
     w.OBWORLD = W0;

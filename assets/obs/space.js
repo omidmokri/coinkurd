@@ -366,7 +366,7 @@
       if (q.y < -4) q.y = H + 4; if (q.x < -4) q.x = W + 4; if (q.x > W + 4) q.x = -4;
       g.globalAlpha = q.a * (.6 + .4 * breath); g.fillStyle = '#cfe0ff'; g.fillRect(q.x, q.y, q.r, q.r);
     }
-    if (WD && WD.front) { g.globalAlpha = 1; try { WD.front(C); } catch (e) { WD.front = null; } g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    if (WD && WD.front) { g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; try { WD.front(C); } catch (e) { WD.front = null; } g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.setTransform(dpr, 0, 0, dpr, 0, 0); }
     if (!RM && cf.shoot !== false) {
       /* a falling star every few seconds */
       if (!shoot && t > nextShoot) { shoot = { x: W * (.25 + Math.random() * .75), y: Math.random() * H * .45, vx: -(6 + Math.random() * 6), vy: 2.2 + Math.random() * 2.4, life: 1 }; if (de.dir === 'rtl') { shoot.x = W - shoot.x; shoot.vx = -shoot.vx; } }
