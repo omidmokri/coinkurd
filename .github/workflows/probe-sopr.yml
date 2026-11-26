@@ -1,0 +1,12 @@
+name: Probe SOPR sources (temporary)
+on:
+  push:
+    branches: [probe-sopr]
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 probe/p.py
