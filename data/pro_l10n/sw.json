@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Violezo, pakua na uhamishe:</b> seti za viashiria tayari na violezo vyako mwenyewe; CSV ya pau zenye thamani za viashiria; hamisha na ingiza; kiungo cha kushiriki kwa mpangilio. Kiungo na QR code hufungua nafasi ya kazi ile ile kwenye simu yako au kifaa kingine, na vichupo vya kivinjari hiki hubaki sambamba."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Baa na bei ni data ya soko ya umma ya Binance (muunganisho mmoja wa moja kwa moja kwa ukurasa mzima); ikiwa Binance haiwezi kufikiwa, OKX, na mwisho picha ya tovuti yenyewe — nukta ya rangi karibu na kila chati inaonyesha ipi. Kwa chati yoyote unaweza kuchagua Coinbase, Bybit, OKX au Kraken badala ya Binance, soma moja kwa moja kutoka kwa endpoint ya umma ya ubadilishaji huo kwenye kivinjari chako; ikiwa ubadilishaji haujibu kwenye muunganisho wako ukurasa unasema hivyo mara moja. Jozi za forex za dunia (EUR/USD, USD/JPY na nyinginezo) zinatoka kwa viwango vya marejeleo vya kila siku vya tovuti yenyewe — Benki Kuu ya Ulaya na seti ya data ya exchange-api — thamani moja kwa siku, si data ya tick ya broker. Kalenda ya kiuchumi ni feed ya kila wiki ya ForexFactory; mienendo ya Bitcoin baada ya tukio ni mwendo wa pamoja, si sababu. Kwenye muunganisho dhaifu, washa “Data saver” katika mipangilio. Chati zilizorekebishwa (gawio na ongezeko la mtaji) ni kipengele cha Soko la Hisa la Tehran na hazitumiki kwa crypto. Viwango vya soko vya Iran ni data ya umma ya tgju.org; bei za sarafu katika toman ni makadirio: bei ya Binance × kiwango cha tether katika toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Data inatoka wapi"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Tahadhari zinakaguliwa katika kivinjari hiki wakati ukurasa uko wazi (tabu yoyote). Tahadhari za kiashiria huanzishwa wakati baa inafungwa."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Weka tahadhari kwenye mchoro huu"
+],
 "alertSet": [
 "80c4c4abee",
 "Tahadhari imewekwa: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Biashara bora zaidi"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Ukuaji kwa mwaka (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Pakua biashara (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Biashara za Long"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (maagizo 1,000 ya biashara zilezile):"
+],
+"btMCv": [
+"992209a3c0",
+"drawdown ya kawaida {a}% · 95% ya maagizo yanabaki chini ya {b}% · mbaya zaidi {c}% · mzunguko huu {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Boresha (Optimize)"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Kipengele cha faida (Profit factor)"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Payoff (wastani wa faida / wastani wa hasara)"
+],
 "btRange": [
 "63a44ed01a",
 "kutoka / hadi / hatua"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (ya mwaka)"
+],
+"btSplit": [
+"5bdfe209e3",
+"70% ya kwanza dhidi ya 30% ya mwisho ya biashara:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} na {aw}% ya ushindi (biashara {an}) → {b} na {bw}% ya ushindi (biashara {bn})"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Zote"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · open source"
+],
+"cat_com": [
+"90566b4c6f",
+"Vipendwa vya jamii"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (dunia)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "Mabadiliko ya 24h"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Scripts za TradingView za Coin_Kurd zilizo wazi (open-source), zinazofanya kazi hapa kwenye chati yako."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Dashibodi ya macro kutoka data ya umma: utawala wa risk-on / risk-off"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Awamu za mzunguko wa on-chain (MVRV, NUPL) na nafasi ya bei"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Historia nzima ya Bitcoin kwenye spiral ya logarithmic"
+],
 "clearAll": [
 "7de68ccb43",
 "Ondoa michoro yote"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Ondoa michoro na viashiria"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Ondoa michoro"
+],
+"clearInds": [
+"8b56474294",
+"Ondoa viashiria"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Ondoa kila kiashiria kutoka kwenye chati hii?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Nakili"
+],
+"cloned": [
+"51fbf8cb72",
+"Nakala iliyoundwa kando yake"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Muda uliobaki hadi mshumaa huu ufungwe"
 ],
+"crFree": [
+"6b4b480231",
+"Inafuata kipanya"
+],
+"crLargeDash": [
+"a7503adc35",
+"Mistari mirefu iliyokatika"
+],
+"crMagnet": [
+"77fa49774c",
+"Inanasa kwenye mishumaa"
+],
+"crOff": [
+"d4c2792a72",
+"Imefichwa"
+],
+"crSparse": [
+"e50cc378a1",
+"Dots chache"
+],
 "create": [
 "8ac903c3c3",
 "Tengeneza tahadhari"
+],
+"csBg": [
+"64dd60fe1a",
+"Mandharinyuma"
+],
+"csBg2": [
+"9ebb790d74",
+"Rangi ya pili ya mandharinyuma"
+],
+"csBody": [
+"718a7e8a58",
+"Mwili"
+],
+"csBorderC": [
+"eeffa83765",
+"Rangi ya mpaka"
+],
+"csBorders": [
+"685f23bc5e",
+"Mipaka"
+],
+"csClose": [
+"bbfa773e5a",
+"Funga"
+],
+"csCross": [
+"b0b83f89e8",
+"Crosshair na kipanya"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Rangi ya crosshair"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Mstari wa crosshair"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Lebo za bei na muda kwenye crosshair"
+],
+"csCrossMode": [
+"800092e3e1",
+"Crosshair"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Upana wa crosshair"
+],
+"csDn": [
+"11f5ff3829",
+"Mshumaa unaoshuka"
+],
+"csFont": [
+"b97c4d4cdd",
+"Fonti"
+],
+"csFsize": [
+"83ca9e48c3",
+"Ukubwa wa fonti"
+],
+"csGrad": [
+"c716191a01",
+"inabadilisha mandharinyuma kuwa gradient"
+],
+"csGridA": [
+"f773586220",
+"Uwazi wa gridi (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Rangi ya gridi"
+],
+"csGridH": [
+"4eaa1c008a",
+"Mistari ya gridi ya mlalo"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Mistari ya gridi ya wima"
+],
+"csHollow": [
+"9165bccc85",
+"Miili mitupu"
+],
+"csHollowH": [
+"fb63aba345",
+"mishumaa inayopanda pekee"
+],
+"csKinetic": [
+"6e771721f0",
+"Kusogeza kwa kinetic kwenye mguso"
+],
+"csLast": [
+"aacdc5bea4",
+"Mstari wa bei ya mwisho"
+],
+"csLastLab": [
+"91c990bcb9",
+"Lebo ya bei kwenye mizani"
+],
+"csLineC": [
+"01212659ee",
+"Rangi ya mstari / eneo"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Upana wa mstari"
+],
+"csLook": [
+"41def7a0fe",
+"Muonekano"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"rangi moja kwa pande zote mbili"
+],
+"csPinch": [
+"e557a41794",
+"Kuvuta kwa vidole kwenye mguso"
+],
+"csResetQ": [
+"9c369383c1",
+"Rudisha kila mpangilio wa chati kama ulivyokuwa?"
+],
+"csScale": [
+"0b414bdcb7",
+"Mizani"
+],
+"csScroll": [
+"468c89cb3b",
+"Buruta chati kwa kipanya"
+],
+"csSym": [
+"fad29404d2",
+"Mishumaa"
+],
+"csText": [
+"d160595fcf",
+"Rangi ya maandishi"
+],
+"csTheme": [
+"a797e30923",
+"Mandhari"
+],
+"csTitle": [
+"ae445d4cd9",
+"Mipangilio ya chati"
+],
+"csUp": [
+"971a95475d",
+"Mshumaa unaopanda"
+],
+"csWick": [
+"fe6e2bfd48",
+"Wicks"
+],
+"csWickC": [
+"0fcb21d161",
+"Rangi ya wick"
+],
+"csWm": [
+"33c7b41ac6",
+"Watermark nyuma ya mishumaa"
+],
+"csWmA": [
+"69a1810ea2",
+"Uwazi wa watermark (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"alama na muda"
+],
+"csWmC": [
+"bad81c749f",
+"Rangi ya watermark"
+],
+"csWmSize": [
+"4af7e52f80",
+"Ukubwa wa watermark"
+],
+"csWmText": [
+"ecf870ab34",
+"Maandishi ya watermark"
+],
+"csZoom": [
+"c6f40d9d03",
+"Gurudumu la kipanya"
+],
+"csZoomH": [
+"4ca34c1092",
+"kuvuta ndani na nje"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} mishumaa imepakuliwa"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Ongeza tahadhari hapa"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Nakili bei hii"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Linganisha kila mshumaa"
+],
+"ctxHline": [
+"588d2eb492",
+"Mstari wa mlalo hapa"
+],
+"ctxReset": [
+"242cb352c0",
+"Rudisha mtazamo"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Kila wakati (angalau mara moja kwa dakika / mara moja kwa mshumaa)"
 ],
+"exAuto": [
+"1ff048b76e",
+"moja kwa moja, na OKX kama mbadala"
+],
+"exDown": [
+"e8ba18613e",
+"{x} haijibu kwenye muunganisho huu. Chati inabaki kwenye soko ililopo."
+],
+"exNote": [
+"0eb4c03240",
+"Binance inatiririsha moja kwa moja; nyingine zinasomwa kutoka endpoint zao za umma kila sekunde kumi, na historia yao wenyewe."
+],
+"exTitle": [
+"5b13eac7ed",
+"Soko la kubadilishia"
+],
 "exit": [
 "f83b6fe3ae",
 "Toka"
+],
+"exitFull": [
+"fc61e74cd9",
+"Ondoka kwenye skrini nzima"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Hamisha kila kitu (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Data ya kiashiria hiki haikupakia. Jaribu tena baada ya muda mfupi."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Njano"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Utabiri"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Hatima za robo mwaka, zinazoendelea"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Sarafu moja dhidi ya nyingine, kutoka viwango vya marejeleo vya kila siku vya tovuti (Benki Kuu ya Ulaya, na dataset ya exchange-api ambapo ECB hainukuu sarafu). Thamani moja kwa siku, kwa hivyo bar ya kila siku ni nukta moja na bar za kila wiki na mwezi zinajengwa kutoka siku zilizomo ndani yake. Viwango vya marejeleo vinachapishwa mara moja kwa siku, si data ya tick ya broker: hakuna forex ya intraday hapa. Jozi za dola zinaanza tarehe 2 Machi 2024, jozi kati ya sarafu mbili za ECB mnamo 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Mishale"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Brashi"
+],
+"g_channels": [
+"18e03e2a37",
+"Njia"
+],
+"g_cursors": [
+"f4d2f91040",
+"Vionyeshi"
+],
+"g_cycles": [
+"97f064aff5",
+"Mizunguko"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott waves"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Mistari"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Kipimo"
+],
+"g_pat": [
+"2c179da0f5",
+"Miundo ya chati"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchforks"
+],
+"g_proj": [
+"8aa49fe840",
+"Makadirio"
+],
+"g_shapes": [
+"b1985e3874",
+"Maumbo"
+],
+"g_text": [
+"d7cd4cda4f",
+"Maandishi na dokezo"
+],
+"g_vol": [
+"1b4620951d",
+"Kulingana na ujazo"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Ficha / onyesha michoro"
+],
+"hideBoth": [
+"3502a3299d",
+"Ficha michoro na viashiria"
+],
+"hideDraw": [
+"f4492c5211",
+"Ficha michoro"
+],
+"hideInds": [
+"764ab9d614",
+"Ficha viashiria"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1264,6 +1720,34 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Miundo yote ya mishumaa"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hanging man"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
 ],
 "in_crsi": [
 "d788a94022",

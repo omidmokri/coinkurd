@@ -2077,6 +2077,10 @@
 "96c9e76dba",
 "Williams Alligator: jaw, teeth at lips na nakaguhit sa harap"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR trend line steered by MFI (RSI na walang volume)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 minus SMA 34 ng midpoint"
@@ -2084,6 +2088,10 @@
 "ind_aroon": [
 "03d12d9ced",
 "Mga bar mula sa pinakamataas na high at pinakamababang low"
+],
+"ind_atrts": [
+"8223831420",
+"Stop na sumusunod sa k·ATR at nagpapalit ng direksyon"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -2105,6 +2113,10 @@
 "a50928c16b",
 "Commodity channel index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR exits na nakabitin mula sa pinakamataas/pinakamababang close"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trending (mababa) o sideways (mataas) na market"
@@ -2121,9 +2133,57 @@
 "bf330f58dd",
 "Long-term momentum: WMA ng dalawang rate of change"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Markahan ang bawat pattern sa ibaba sa mga bar"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Halos magkapareho ang open at close (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bullish (BE) at bearish (SE) engulfing"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Mahabang lower shadow pagkatapos ng pagbaba (H) o pagtaas (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Maliit na body sa loob ng naunang malaking body (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Bar na nasa loob mismo ng naunang bar (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Malaking body na walang shadows (M)"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap at close na lampas sa gitna ng naunang bar (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tatlong malalakas na bar nang sunod-sunod (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Mahabang upper shadow pagkatapos ng pagtaas (SS) o pagbaba (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dalawang bar na may parehong high (TT) o low (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "Pinagsamang RSI, streak RSI at percent rank"
+],
+"ind_cvd": [
+"690d30a274",
+"Running sum ng volume delta: sino ang may kontrol"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -2141,6 +2201,10 @@
 "c499047c5b",
 "Exponential moving average"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · dalawang EMA clouds, mabilis at mabagal"
+],
 "ind_env": [
 "e2cf023f50",
 "Moving average na may bands na may nakatakdang % na layo"
@@ -2149,17 +2213,41 @@
 "d648aafe8d",
 "Gaano kadaling gumagalaw ang presyo kada unit ng volume"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Dalawang swings sa halos parehong presyo: resting liquidity"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Ginagawang malapit sa normal distribution ang mga presyo"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Buy × sell volume at delta na nakasulat sa ilalim ng bawat candle; mag-zoom in para basahin. Bawat candle, hindi bawat price level"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fractals: mga lokal na high at low"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Three-candle gaps; ang bawat box ay nagtatapos kung saan ito napupunan ng presyo"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Anim na maikli at anim na mahabang EMA: traders laban sa investors"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · stepped trend line na nagpapalit lang sa totoong swing break"
+],
 "ind_hma": [
 "709351f832",
 "Hull moving average: mabilis at smooth"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA na may kulay base sa slope nito"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -2172,6 +2260,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic na may J line (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (open source, MPL-2.0) · macro regime sa likod ng mga candle, ang mga signal at dashboard nito, mula sa data ng FRED"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (open source) · Bitcoin fair value 8.31e-17·days^5.48 na may ±10 % bands at buy zone; para sa BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (open source) · Bitcoin cycle phases mula sa MVRV, NUPL at SOPR proxy: Extreme Bear, Bear, Early Bull, Bull, Overheated; ang grey line ay ang normalised price"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (open source) · Buong kasaysayan ng Bitcoin sa isang logarithmic spiral, isang ikot bawat halving cycle, kasama ang tops, bottoms, halvings at ngayon"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -2205,9 +2313,21 @@
 "d6640bbc39",
 "Presyo ngayon minus presyo n na bar ang nakalipas"
 ],
+"ind_ms": [
+"13fc87db00",
+"Breaks ng huling confirmed swing: BOS kasabay ng trend, CHoCH laban sa trend"
+],
 "ind_news": [
 "a95010ef34",
 "Mga headline tungkol sa coin na ito, nakatanda sa oras na na-publish ang mga ito (balita ng site sa nakaraang araw)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · kernel-smoothed price na may mean-error envelope; non-repainting form"
+],
+"ind_ob": [
+"530cdc224f",
+"Ang huling opposite candle bago ang break of structure, hanggang sa mag-close ang presyo sa loob nito"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -2232,6 +2352,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volume na idinagdag ayon sa proporsyon ng % change"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · smoothed RSI na may volatility trailing line (QQE MOD core)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · tinatanggal ang noise na mas maliit sa smoothed average range"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -2265,17 +2393,45 @@
 "26db009730",
 "Simple moving average"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Close laban sa gitna ng range, double smoothed"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger sa loob ng Keltner = squeeze (red dots); ipinapakita ng histogram kung saan ito mag-be-break"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · ang huling pivot high at low bilang mga level"
+],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastic ng RSI"
+],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · moving averages ng highs at lows na nagpapalitan ng pwesto kapag nagbago ang trend"
 ],
 "ind_st": [
 "8d66b52001",
 "ATR trailing line na umiikot kasama ng trend"
 ],
+"ind_stc": [
+"29439e9c85",
+"MACD na dumaan nang dalawang beses sa stochastic: maagang pagbabago ng trend (25/75)"
+],
 "ind_stoch": [
 "87477b0f85",
 "%K at %D, 0–100"
+],
+"ind_tdi": [
+"03d1464e0d",
+"RSI na may volatility bands, isang mabilis at isang mabagal na line"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Ilang candles ang nag-trade sa bawat presyo, bawat araw"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -2289,6 +2445,18 @@
 "182e4a763e",
 "Buying pressure sa tatlong period"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR trailing stop; ang pag-cross ng presyo dito ay ang buy/sell signal"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Buy volume minus sell volume ng bawat candle (taker data mula sa Binance; estimate sa ibang platform)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · synthetic VIX para sa kahit anong market; ang mga spike sa itaas ng bands ay madalas na hudyat ng panic lows"
+],
 "ind_vo": [
 "a99f6a0038",
 "Mabilis vs mabagal na volume average (%)"
@@ -2301,9 +2469,21 @@
 "6badda8c94",
 "Positibo at negatibong galaw ng trend (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Isang volume profile bawat araw (bawat buwan sa daily bars)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volume sa bawat presyo para sa mga bar sa screen, kasama ang POC at value area"
+],
 "ind_vwap": [
 "6d86714413",
 "Volume-weighted average price, nagre-reset sa 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Daily VWAP na may ±1σ at ±k·σ bands"
 ],
 "ind_willr": [
 "1859838f88",
@@ -2312,6 +2492,10 @@
 "ind_wma": [
 "b08be7d4d3",
 "Weighted moving average"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · channel-index oscillator; ang pag-cross sa itaas ng 53/60 at sa ibaba ng −53/−60 ay hudyat ng stretched moves"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -4877,287 +5061,103 @@
 "f": {
 "btPayoff": [
 "64c65d41f5",
-1
+2
 ],
 "in_cp_pierce": [
 "de9e3d4b02",
-1
+2
 ],
 "in_cp_soldiers": [
 "32c51f18a5",
-1
+2
 ],
 "in_cp_star": [
 "f1940a30a1",
-1
+2
 ],
 "in_cvd": [
 "fbd0df870e",
-1
+2
 ],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_ms": [
 "14c6c6c316",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_srlux": [
 "50cfe9a1d5",
-1
+2
 ],
 "in_tpo": [
 "cd41be0fc7",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "in_vpvr": [
 "f757c4a16d",
-1
+2
 ],
 "ind_alma": [
 "0f70916dbb",
 3
 ],
-"ind_alpha": [
-"a1b106dbe0",
-1
-],
 "ind_atr": [
 "ffe1ef3913",
 3
-],
-"ind_atrts": [
-"8223831420",
-1
 ],
 "ind_bop": [
 "f15b118c3e",
 3
 ],
-"ind_ce": [
-"eb9529e97b",
-1
-],
 "ind_cmf": [
 "eba520ed7c",
 3
 ],
-"ind_cp_all": [
-"9273e33e88",
-1
-],
-"ind_cp_doji": [
-"80ff1c526e",
-1
-],
-"ind_cp_engulf": [
-"838b5e0794",
-1
-],
-"ind_cp_hammer": [
-"2233604708",
-1
-],
-"ind_cp_harami": [
-"7fc3e9a5e0",
-1
-],
-"ind_cp_inside": [
-"7375801c53",
-1
-],
-"ind_cp_maru": [
-"0864a92a99",
-1
-],
 "ind_cp_mstar": [
 "b611b84eab",
-1
-],
-"ind_cp_pierce": [
-"375a6d3e2b",
-1
-],
-"ind_cp_soldiers": [
-"b1a55fae64",
-1
-],
-"ind_cp_star": [
-"f1d238e6b1",
-1
-],
-"ind_cp_tweezer": [
-"78a03d0fb2",
-1
-],
-"ind_cvd": [
-"690d30a274",
-1
+2
 ],
 "ind_dema": [
 "2d6077f26d",
 3
 ],
-"ind_emacloud": [
-"82454f4531",
-1
-],
-"ind_eqhl": [
-"7911f35044",
-1
-],
-"ind_fpbar": [
-"72df84d4bf",
-1
-],
-"ind_fvg": [
-"be42490ea0",
-1
-],
-"ind_gmma": [
-"bfeaafeca6",
-1
-],
-"ind_halft": [
-"09f45602f1",
-1
-],
-"ind_hull": [
-"4463208ec7",
-1
-],
-"ind_kdj": [
-"77ec2cdedc",
-1
-],
-"ind_kmacro": [
-"ca07959e1c",
-1
-],
-"ind_kpl": [
-"3d570e5254",
-1
-],
-"ind_ksc": [
-"6fedf8b4e9",
-1
-],
-"ind_kspiral": [
-"899a8ea3ae",
-1
-],
 "ind_lsma": [
 "00a8d3b0d2",
 3
-],
-"ind_ms": [
-"13fc87db00",
-1
-],
-"ind_nwe": [
-"e52da4c085",
-1
-],
-"ind_ob": [
-"530cdc224f",
-1
-],
-"ind_qqe": [
-"3c5e11ebed",
-1
-],
-"ind_rf": [
-"0bf4dbcc13",
-1
-],
-"ind_smi": [
-"ef8f7803b6",
-1
 ],
 "ind_smma": [
 "e59cc99c1d",
 3
 ],
-"ind_sqz": [
-"928bfb7046",
-1
-],
-"ind_srlux": [
-"93d0ceff44",
-1
-],
-"ind_ssl": [
-"6f7ed9b6c1",
-1
-],
-"ind_stc": [
-"29439e9c85",
-1
-],
-"ind_tdi": [
-"03d1464e0d",
-1
-],
 "ind_tema": [
 "1ff881355e",
 3
-],
-"ind_tpo": [
-"e1ee1b7549",
-1
-],
-"ind_ut": [
-"bde2d091af",
-1
-],
-"ind_vdelta": [
-"d8b588eda0",
-1
-],
-"ind_vixfix": [
-"101ce888f8",
-1
-],
-"ind_vpsess": [
-"a416aab998",
-1
-],
-"ind_vpvr": [
-"adf09232a6",
-1
-],
-"ind_vwapb": [
-"ff28e74ee1",
-1
 ],
 "ind_vwma": [
 "7526646bd7",
 3
 ],
-"ind_wt": [
-"d823a77eaa",
-1
-],
 "ind_zlsma": [
 "814b9eebab",
-1
+2
 ],
 "sg_ichi": [
 "730fce5fe8",
-1
+2
 ],
 "sg_nwe": [
 "4e506ad872",
-1
+2
 ],
 "shDraw": [
 "3018b07267",
@@ -5169,23 +5169,23 @@
 ],
 "t_ewcor": [
 "a819268f2f",
-1
+2
 ],
 "t_ewdbl": [
 "83c7bcc32d",
-1
+2
 ],
 "t_ewtri": [
 "bf0f6b602d",
-1
+2
 ],
 "t_ewtrp": [
 "3670c19480",
-1
+2
 ],
 "t_fibarc": [
 "09d8fecaa7",
-1
+2
 ],
 "t_fibext": [
 "73655be9d6",
@@ -5193,15 +5193,15 @@
 ],
 "t_fibfan": [
 "5b948b7296",
-1
+2
 ],
 "t_fibtime": [
 "574f8ab37b",
-1
+2
 ],
 "t_vrp": [
 "bcba420b37",
-1
+2
 ]
 }
 }
