@@ -1,20 +1,20 @@
 {
- "updated_at": "2026-11-26T21:01:20.186912+00:00",
+ "updated_at": "2026-11-26T21:16:29.093177+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
-  "USDC": {
-   "n": 143,
-   "amount": 5423572632,
-   "usd": 5423572632
-  },
   "BTC": {
-   "n": 96,
-   "amount": 400324.7899999998,
-   "usd": 24279662408
+   "n": 98,
+   "amount": 403737.0899999998,
+   "usd": 24487178542
+  },
+  "USDC": {
+   "n": 141,
+   "amount": 5303372632,
+   "usd": 5303372632
   },
   "USDT": {
    "n": 66,
@@ -30,7 +30,7 @@
  "hourly": [
   {
    "h": "2026-11-26T08",
-   "usd": 1201367371
+   "usd": 1081167371
   },
   {
    "h": "2026-11-26T09",
@@ -79,9 +79,31 @@
   {
    "h": "2026-11-26T20",
    "usd": 5444375192
+  },
+  {
+   "h": "2026-11-26T21",
+   "usd": 207516134
   }
  ],
  "events": [
+  {
+   "asset": "BTC",
+   "amount": 2489.69,
+   "usd": 151408395,
+   "tx": "2c0b8dd4802a90e76ce0291685f97931136429f728c5d7ada510ebb0a1915154",
+   "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
+   "at": "2026-11-26T21:01:31+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 922.61,
+   "usd": 56107739,
+   "tx": "9a68f10515ccac64dfb7a14c7e01d8e99270feb0f9e88d982686ffcbd5f82d93",
+   "to": "1NpkQ8qGerbVsxvZ5vcqSpbYGBQDQtYTXF",
+   "from": "1NpkQ8qGerbVsxvZ5vcqSpbYGBQDQtYTXF",
+   "at": "2026-11-26T21:01:31+00:00"
+  },
   {
    "asset": "USDC",
    "amount": 10121397,
@@ -837,28 +859,6 @@
    "from": "0xeb764951e58f93ecfd5492a9e518b48aafc99226",
    "to": "0x549d835356d92983abb76e4cae639f7857963425",
    "at": "2026-11-26T17:39:11+00:00"
-  },
-  {
-   "asset": "ETH",
-   "amount": 1291.0,
-   "usd": 2188180,
-   "tx": "0xef797dd6d6c4ddfa20a3a4233d7801e18dbefde7f19bb70b4e5d4418d6229925",
-   "from": "0x2e1dbdc78584d160015ea73b57632a73c557343b",
-   "to": "0xca169fc8ae01663792981c0dbfe0b7a9c1ee2533",
-   "at": "2026-11-26T17:23:23+00:00"
-  },
-  {
-   "asset": "USDC",
-   "amount": 15691788,
-   "usd": 15691788,
-   "tx": "0x4f88e5a2fb3e3342074a32e857aebb515c4eb34035dadebb44e82919377419b6",
-   "from": "0x55fe002aeff02f77364de339a1292923a15844b8",
-   "to": "0x0000000000000000000000000000000000000000",
-   "at": "2026-11-26T17:19:19.695372+00:00",
-   "from_name": "Circle",
-   "from_kind": "entity",
-   "to_name": "Null Address",
-   "to_kind": "blocked"
   }
  ]
 }
