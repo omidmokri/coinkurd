@@ -343,8 +343,8 @@ def brk_pages(cache):
     # ---- 1. vintage spending: coin-days destroyed by the year the coins were created
     try:
         y_now = (BRK_DAY0 + timedelta(days=n - 1)).year
-        tot = brk_series("coindays_destroyed", cache)
-        lth = brk_series("lth_coindays_destroyed", cache)
+        tot = brk_first(["coindays_destroyed_sum_24h", "coindays_destroyed"], cache)[1]
+        lth = brk_first(["lth_coindays_destroyed_sum_24h", "lth_coindays_destroyed"], cache)[1]
         eras = [("e1", 2009, 2012, GOLD, L("۲۰۰۹ تا ۲۰۱۲", "٢٠٠٩ تا ٢٠١٢", "2009–2012", "2009–2012")),
                 ("e2", 2013, 2016, PUR, L("۲۰۱۳ تا ۲۰۱۶", "٢٠١٣ تا ٢٠١٦", "2013–2016", "2013–2016")),
                 ("e3", 2017, 2020, BLUE, L("۲۰۱۷ تا ۲۰۲۰", "٢٠١٧ تا ٢٠٢٠", "2017–2020", "2017–2020")),
@@ -352,7 +352,7 @@ def brk_pages(cache):
                 ("e5", 2024, y_now, RED, L("۲۰۲۴ تا امروز", "٢٠٢٤ تا ئەمڕۆ", "2024 حتى اليوم", "2024 to today"))]
         years = {}
         for y in range(2009, y_now + 1):
-            v = brk_series(f"vintage_{y}_coindays_destroyed", cache)
+            v = brk_series(f"vintage_{y}_coindays_destroyed_sum_24h", cache)
             if v:
                 years[y] = v
         if tot and len(years) >= 10:
@@ -591,8 +591,8 @@ def brk_pages(cache):
 
     # ---- 6. fresh blood and returning wallets; 7. short-term holders' pain
     try:
-        new = brk_series("new_address_count", cache)
-        rea = brk_series("reactivated_address_count", cache)
+        new = brk_first(["new_address_count_sum_24h", "new_address_count"], cache)[1]
+        rea = brk_first(["reactivated_address_count_sum_24h", "reactivated_address_count"], cache)[1]
         if new and rea:
             n30, r30 = sma(new, 30), sma(rea, 30)
             ratio = [None if not ok(n30[i]) or not ok(r30[i]) or n30[i] <= 0 else r30[i] / n30[i] for i in range(n)]
@@ -652,15 +652,15 @@ def brk_pages(cache):
 
     # ---- 8. who takes profit: realized profit and loss by wallet size
     try:
-        sizes = [("s1", ["addrs_10m_sats_to_1btc"], L("۰٫۱ تا ۱ BTC", "٠٫١ تا ١ BTC", "0.1–1 BTC", "0.1–1 BTC"), GOLD),
-                 ("s2", ["addrs_1btc_to_10btc"], L("۱ تا ۱۰ BTC", "١ تا ١٠ BTC", "1–10 BTC", "1–10 BTC"), TEAL),
-                 ("s3", ["addrs_10btc_to_100btc"], L("۱۰ تا ۱۰۰ BTC", "١٠ تا ١٠٠ BTC", "10–100 BTC", "10–100 BTC"), BLUE),
-                 ("s4", ["addrs_100btc_to_1k_btc"], L("۱۰۰ تا ۱۰۰۰ BTC", "١٠٠ تا ١٠٠٠ BTC", "100–1k BTC", "100–1k BTC"), PUR),
-                 ("s5", ["addrs_1k_btc_to_10k_btc"], L("۱۰۰۰ تا ۱۰٬۰۰۰ BTC", "١٠٠٠ تا ١٠٬٠٠٠ BTC", "1k–10k BTC", "1k–10k BTC"), RED)]
+        sizes = [("s1", ["amount_10m_to_100m_sats"], L("۰٫۱ تا ۱ BTC", "٠٫١ تا ١ BTC", "0.1–1 BTC", "0.1–1 BTC"), GOLD),
+                 ("s2", ["amount_1_to_10_btc"], L("۱ تا ۱۰ BTC", "١ تا ١٠ BTC", "1–10 BTC", "1–10 BTC"), TEAL),
+                 ("s3", ["amount_10_to_100_btc"], L("۱۰ تا ۱۰۰ BTC", "١٠ تا ١٠٠ BTC", "10–100 BTC", "10–100 BTC"), BLUE),
+                 ("s4", ["amount_100_to_1k_btc"], L("۱۰۰ تا ۱۰۰۰ BTC", "١٠٠ تا ١٠٠٠ BTC", "100–1k BTC", "100–1k BTC"), PUR),
+                 ("s5", ["amount_1k_to_10k_btc"], L("۱۰۰۰ تا ۱۰٬۰۰۰ BTC", "١٠٠٠ تا ١٠٬٠٠٠ BTC", "1k–10k BTC", "1k–10k BTC"), RED)]
         cols, got = {"price": price}, []
         for k, pre, nm_, c in sizes:
-            _, pf = brk_first([p + "_realized_profit" for p in pre], cache)
-            _, ls = brk_first([p + "_realized_loss" for p in pre], cache)
+            _, pf = brk_first([p + "_realized_profit_sum_24h" for p in pre] + [p + "_realized_profit" for p in pre], cache)
+            _, ls = brk_first([p + "_realized_loss_sum_24h" for p in pre] + [p + "_realized_loss" for p in pre], cache)
             if pf and ls:
                 net = [None if not ok(pf[i]) or not ok(ls[i]) else pf[i] - ls[i] for i in range(n)]
                 cols[k] = rsum([x if ok(x) else 0.0 for x in net], 7)
@@ -970,7 +970,12 @@ def local_pages():
             tiles = [tile(L("بهترین تأخیر امروز", "باشترین دواکەوتنی ئەمڕۆ", "أفضل تأخير اليوم", "Best lag today"), fnum(best_lag[j], 0, L(" روز", " ڕۆژ", " يوم", " days")["en"])),
                      tile(L("همبستگی", "پەیوەندی", "الارتباط", "Correlation"), fnum(best_r[j], 2))]
             strong = ok(best_r[j]) and best_r[j] >= 0.5
-            read_ = (L(f"در یک سال اخیر، رشد استیبل‌کوین‌ها با تأخیر حدود {best_lag[j]} روز بیشترین هم‌حرکتی را با بازده بیت‌کوین داشته (همبستگی {best_r[j]:.2f}). رابطهٔ گذشته است، نه قانون.",
+            read_ = (L(f"در یک سال اخیر، رشد استیبل‌کوین‌ها و بازده بیت‌کوین هم‌زمان حرکت کرده‌اند (همبستگی {best_r[j]:.2f})؛ پیشرو نبوده، همراه بوده. رابطهٔ گذشته است، نه قانون.",
+                       f"لە ساڵی ڕابردوودا گەشەی ستەیبڵکۆین و بیتکۆین هاوکات جووڵاون ({best_r[j]:.2f})؛ پێشڕەو نەبووە.",
+                       f"خلال العام الماضي تحرك نمو العملات المستقرة وعائد البيتكوين معًا (ارتباط {best_r[j]:.2f})؛ لم يسبقه بل رافقه. علاقة ماضية وليست قانونًا.",
+                       f"Over the past year stablecoin growth and bitcoin's return moved together (correlation {best_r[j]:.2f}): it went alongside, not ahead. A past relation, not a law.")
+                     if strong and best_lag[j] == 0 else
+                     L(f"در یک سال اخیر، رشد استیبل‌کوین‌ها با تأخیر حدود {best_lag[j]} روز بیشترین هم‌حرکتی را با بازده بیت‌کوین داشته (همبستگی {best_r[j]:.2f}). رابطهٔ گذشته است، نه قانون.",
                        f"لە ساڵی ڕابردوودا گەشەی ستەیبڵکۆین بە دواکەوتنی نزیکەی {best_lag[j]} ڕۆژ زۆرترین هاوجووڵەی لەگەڵ بیتکۆین هەبووە ({best_r[j]:.2f}).",
                        f"خلال العام الماضي توافق نمو العملات المستقرة مع عائد البيتكوين بأفضل شكل بتأخير نحو {best_lag[j]} يومًا (ارتباط {best_r[j]:.2f}). علاقة ماضية وليست قانونًا.",
                        f"Over the past year stablecoin growth matched bitcoin's return best about {best_lag[j]} days ahead (correlation {best_r[j]:.2f}). A past relation, not a law.")
@@ -1033,6 +1038,7 @@ def local_pages():
     # ---- chains: breadth, ETH against BTC, address elasticity, weekend rhythm, the exchange drain and issuance absorption
     allc = {a: chain(a) for a in ("btc", "eth", "ltc", "bch", "doge", "ada", "xrp")}
     allc = {a: c for a, c in allc.items() if c}
+    btc_asof = (date.fromisoformat(allc["btc"][0]) + timedelta(days=allc["btc"][1] - 1)).isoformat() if "btc" in allc else None
     if "btc" in allc and len(allc) >= 5:
         t0 = "2018-01-01"
         n = (date.fromisoformat(allc["btc"][0]) + timedelta(days=allc["btc"][1] - 1) - date.fromisoformat(t0)).days + 1
@@ -1174,7 +1180,7 @@ def local_pages():
         else:
             read_ = L("در بیت‌کوین آخر هفته و روزهای کاری تقریباً هم‌اندازه‌اند: ریتم هفتگی کسب‌وکارها دیده نمی‌شود.", "لە بیتکۆیندا کۆتایی هەفتە و ڕۆژانی کار نزیکەی یەکسانن.",
                       "في البيتكوين تتساوى عطلة الأسبوع وأيام العمل تقريبًا: لا يظهر إيقاع الشركات الأسبوعي.", "On bitcoin, weekends and weekdays are about even: no business week rhythm shows.")
-        write("weekend", {"updated_at": now_utc().isoformat(timespec="seconds"), "source": CM, "asof": allc["btc"][0], "variants": vari, "view": view, "tiles": tiles, "read": read_, "note": NOTE})
+        write("weekend", {"updated_at": now_utc().isoformat(timespec="seconds"), "source": CM, "asof": btc_asof, "variants": vari, "view": view, "tiles": tiles, "read": read_, "note": NOTE})
 
     vari, tl = [], []
     for a in ("btc", "eth"):
@@ -1212,7 +1218,7 @@ def local_pages():
                  if ok(dd) else
                  L(f"در ۳۰ روز اخیر {sym} بیشتری وارد صرافی‌ها شده تا خارج؛ ساعت خالی شدن متوقف است.", f"لە ٣٠ ڕۆژی ڕابردوودا {sym}ی زیاتر چووەتە ناو ئاڵوگۆڕگەکان؛ کاتژمێرەکە وەستاوە.",
                    f"دخل إلى المنصات {sym} أكثر مما خرج في 30 يومًا؛ ساعة النفاد متوقفة.", f"More {sym} went onto exchanges than left them over 30 days: the drain clock is stopped."))
-        write("drain", {"updated_at": now_utc().isoformat(timespec="seconds"), "source": CM, "asof": allc["btc"][0], "variants": vari, "view": view, "tiles": tiles, "read": read_, "note": NOTE})
+        write("drain", {"updated_at": now_utc().isoformat(timespec="seconds"), "source": CM, "asof": btc_asof, "variants": vari, "view": view, "tiles": tiles, "read": read_, "note": NOTE})
 
     # ---- history's closest twin: the past 180-day bitcoin paths most like the last 180 days
     if "btc" in allc:

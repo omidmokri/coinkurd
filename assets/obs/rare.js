@@ -30,14 +30,18 @@
   function R(k, a) {
     var s = (RS[OB.lang()] || RS.en)[k] || RS.en[k] || k;
     if (a) s = s.replace(/\{(\w+)\}/g, function (_, n) { return a[n] == null ? '' : a[n]; });
-    return OB.lang() === 'en' ? s : OB.loc(s);
+    return OB.lang() === 'en' ? s : loc(s);
+  }
+  /* digits in the reader's script, but never inside a Latin token such as bc1q or P2SH */
+  function loc(s) {
+    return String(s).replace(/[A-Za-z][A-Za-z0-9]*|\d/g, function (m) { return m.length === 1 && m >= '0' && m <= '9' ? OB.loc(m) : m; });
   }
   /* a {fa, ckb, ar, en} label from a file, in the reader's language, digits in its own script for prose */
   function tx(o, prose) {
     if (o == null) return '';
     if (typeof o === 'string') return o;
     var s = o[OB.lang()] || o.en || '';
-    return prose && OB.lang() !== 'en' ? OB.loc(s) : s;
+    return prose && OB.lang() !== 'en' ? loc(s) : s;
   }
   function col(c, def) { return typeof c === 'string' && COLOR.test(c) ? c : def || INK; }
   function unpack(c, n) {

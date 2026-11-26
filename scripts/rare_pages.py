@@ -458,19 +458,19 @@ page("sizepl", "who-takes-profit", "cost", "bv",
      {"fa": (["هر میله سود منهای زیان تحقق‌یافتهٔ یک گروه اندازه در ۷ روز است، به دلار. مثبت یعنی این گروه با سود فروخته؛ منفی یعنی با زیان (تسلیم).",
               "وقتی نهنگ‌ها سود سنگین برمی‌دارند و کوچک‌ها با زیان می‌فروشند، پول از دست ضعیف به دست قوی می‌رود یا برعکس."],
              ["سود و زیان تحقق‌یافتهٔ روزانهٔ هر گروه از Bitcoin Research Kit (تفاوت قیمت خرج شدن با قیمت آخرین جابه‌جایی، ضرب در تعداد)، جمع ۷ روزه، سود منهای زیان."],
-             ["گروه‌ها بر اساس موجودی آدرس‌اند و صرافی‌ها هم داخلشان‌اند؛ انتقال داخلی صرافی‌ها می‌تواند عدد را پرنوسان کند."]),
+             ["گروه‌ها بر اساس اندازهٔ هر تکه سکه (خروجی تراکنش) هستند، نه موجودی کل کیف؛ صرافی‌ها هم داخلشان‌اند و انتقال داخلی‌شان می‌تواند عدد را پرنوسان کند."]),
       "ckb": (["هەر ستوونێک قازانج کەم زیانی بەدیهاتووی گرووپێکی قەبارەیە لە ٧ ڕۆژدا، بە دۆلار. پۆزەتیڤ واتە بە قازانج فرۆشتوویەتی؛ نێگەتیڤ واتە بە زیان.",
                "کاتێک نەهەنگەکان قازانجی قورس وەردەگرن و بچووکەکان بە زیان دەفرۆشن، پارە لە دەستی لاوازەوە دەچێتە دەستی بەهێز یان بە پێچەوانەوە."],
               ["قازانج و زیانی بەدیهاتووی ڕۆژانەی هەر گرووپێک لە Bitcoin Research Kit، کۆی ٧ ڕۆژ، قازانج کەم زیان."],
-              ["گرووپەکان بەپێی باڵانسی ناونیشانن و ئاڵوگۆڕگەکانیش تێیاندان."]),
+              ["گرووپەکان بەپێی قەبارەی هەر پارچە دراوێکن (دەرچووی مامەڵە)، نەک باڵانسی تەواوی جزدان؛ ئاڵوگۆڕگەکانیش تێیاندان."]),
       "ar": (["كل عمود هو الربح ناقص الخسارة المحققين لفئة حجم خلال 7 أيام بالدولار. الموجب يعني أن الفئة باعت بربح، والسالب بخسارة (استسلام).",
               "حين تجني الحيتان أرباحًا كبيرة ويبيع الصغار بخسارة، ينتقل المال من يد إلى أخرى."],
              ["الربح والخسارة المحققان يوميًا لكل فئة من Bitcoin Research Kit (فرق سعر الإنفاق عن سعر آخر حركة مضروبًا في الكمية)، مجموع 7 أيام، الربح ناقص الخسارة."],
-             ["الفئات حسب رصيد العنوان والمنصات داخلة فيها؛ والتحويلات الداخلية للمنصات قد تجعل الرقم متقلبًا."]),
+             ["الفئات حسب حجم كل قطعة من العملات (مخرج المعاملة) لا رصيد المحفظة كلها؛ والمنصات داخلة فيها وتحويلاتها الداخلية قد تجعل الرقم متقلبًا."]),
       "en": (["Each bar is a size group's realized profit minus realized loss over 7 days, in dollars. Positive means the group sold at a profit; negative at a loss (capitulation).",
               "When whales take heavy profits while small wallets sell at a loss, money is changing hands between strong and weak holders."],
              ["Each group's daily realized profit and loss from the Bitcoin Research Kit (the spent price against the last-moved price, times the amount), summed over 7 days, profit minus loss."],
-             ["Groups go by address balance and exchanges sit inside them; exchanges' internal transfers can make the numbers jumpy."])})
+             ["Groups go by the size of each coin output, not a whole wallet's balance; exchanges sit inside them, and their internal transfers can make the numbers jumpy."])})
 
 # ================================================================ leverage, builders, exchanges
 page("fundflow", "funding-vs-flows", "lev", "fund",
