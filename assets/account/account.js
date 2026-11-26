@@ -10,7 +10,7 @@
   var UA = navigator.userAgent || '';
   var inApp = /; wv\)|FBAN|FBAV|Instagram|Line\/|Telegram|MicroMessenger/i.test(UA);
   var hasPasskey = !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create);
-  var me = null, msg = null, busy = false, confirmDel = false, emailOpen = false, pendingEmail = null, lastResult = null;
+  var me = null, msg = null, busy = false, pend = null, entered = false, msgShown = null, confirmDel = false, emailOpen = false, pendingEmail = null, lastResult = null;
 
   function lang() {
     var l = (document.documentElement.lang || 'fa').toLowerCase();
@@ -31,19 +31,23 @@
     (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
     return n;
   }
-  var ICON = {   // simple monochrome marks
-    github: 'M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z',
-    telegram: 'M21.5 4.2 2.9 11.4c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.8-1.3-1.5zM8.6 14.1l9.6-6.1-7.7 7.2-.3 3.3-1.6-4.4z',
-    wallet: 'M3 7a2 2 0 0 1 2-2h12a1 1 0 0 1 1 1v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zm2 0v.01h11V7H5zm-.01 3V18h14v-2.5h-3.5a2.5 2.5 0 0 1 0-5H19V10H5zm10.5 2.5a.5.5 0 0 0 0 1H19v-1h-3.5z',
-    passkey: 'M7.5 14a4.5 4.5 0 1 1 4.24-6h9.26v3h-2v3h-3v-3h-4.26A4.5 4.5 0 0 1 7.5 14zm0-2.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
-    email: 'M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.6 7l6.4 4.2L18.4 7H5.6z',
+  // The marks of the sign-in services, drawn as each service publishes them (Google's four-colour G, GitHub's mark,
+  // Telegram's plane in its circle, the Ethereum diamond); passkey and email are plain pictograms. Constant markup only.
+  var SVGNS = 'http://www.w3.org/2000/svg', gid = 0;
+  var MARK = {
+    google: '<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>',
+    github: '<svg viewBox="0 0 24 24"><path fill="#fff" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>',
+    telegram: '<svg viewBox="0 0 240 240"><defs><linearGradient id="GID" x1="120" y1="240" x2="120" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#1d93d2"/><stop offset="1" stop-color="#38b0e3"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#GID)"/><path fill="#c8daea" d="M81.23 128.77l14.24 39.41s1.78 3.69 3.69 3.69 30.25-29.5 30.25-29.5l31.53-60.89-79.2 37.12z"/><path fill="#a9c6d8" d="M100.11 138.88l-2.73 29.05s-1.15 8.9 7.75 0 17.42-15.77 17.42-15.77"/><path fill="#fff" d="M81.49 130.18L52.2 120.64s-3.5-1.42-2.37-4.64c.23-.67.7-1.23 2.1-2.2 6.49-4.52 120.1-45.36 120.1-45.36s3.21-1.08 5.1-.36a2.77 2.77 0 0 1 1.89 2.06 9.36 9.36 0 0 1 .25 2.58c-.01.75-.1 1.45-.17 2.54-.69 11.17-21.4 94.5-21.4 94.5s-1.24 4.87-5.68 5.04a8.13 8.13 0 0 1-5.92-2.3c-8.71-7.49-38.82-27.72-45.47-32.17a1.27 1.27 0 0 1-.55-.9c-.09-.47.42-1.05.42-1.05s52.42-46.6 53.82-51.5c.1-.37-.3-.56-.85-.4-3.48 1.29-63.84 39.41-70.5 43.61a3.21 3.21 0 0 1-1.48.09z"/></svg>',
+    wallet: '<svg viewBox="0 0 24 24"><path fill="#fff" fill-opacity=".62" d="M12 0 4.64 12.22 12 16.57l7.36-4.35z"/><path fill="#fff" d="M12 17.97 4.58 13.62 12 24l7.37-10.38z"/><path fill="#fff" fill-opacity=".9" d="M12 0v16.57l7.36-4.35z"/></svg>',
+    passkey: '<svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" fill="#06262b"/><path fill="#06262b" d="M2 19.5C2 15.9 5.1 13 9 13c1.2 0 2.3.27 3.3.75A5.9 5.9 0 0 0 11 17.5c0 1 .25 1.95.7 2.8V21H3a1 1 0 0 1-1-1z"/><path fill="#06262b" d="M17.5 12.5a3.5 3.5 0 0 1 1.1 6.83V20l-1.1 1.2-1.1-1.2v-.7l.7-.7-.7-.7v-.27a3.5 3.5 0 0 1 1.1-6.83zm0 1.8a.95.95 0 1 0 0 1.9.95.95 0 0 0 0-1.9z"/></svg>',
+    email: '<svg viewBox="0 0 24 24"><path fill="#2a1600" d="M3.5 5h17A1.5 1.5 0 0 1 22 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 17.5v-11A1.5 1.5 0 0 1 3.5 5zm.6 2.2v9.6h15.8V7.2L12 12.4zM5.9 7 12 11l6.1-4z"/></svg>',
   };
-  function icon(p) {
-    if (p === 'google') return el('b', { class: 'ek-ac-g', 'aria-hidden': 'true', text: 'G' });
-    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true'); s.setAttribute('class', 'ek-ac-i');
-    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path'); path.setAttribute('d', ICON[p] || ''); path.setAttribute('fill', 'currentColor');
-    s.appendChild(path); return s;
+  function icon(p, big) {
+    var src = MARK[p]; if (!src) return null;
+    if (p === 'telegram') src = src.replace(/GID/g, 'ek-tg' + (++gid));
+    var svg = document.importNode(new DOMParser().parseFromString(src.replace('<svg ', '<svg xmlns="' + SVGNS + '" '), 'image/svg+xml').documentElement, true);
+    svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    return el('span', { class: 'ek-ac-logo ek-ac-l-' + p + (big ? ' big' : ''), 'aria-hidden': 'true' }, [svg]);
   }
 
   // ------------------------------------------------------------ talking to the account service
@@ -62,7 +66,7 @@
   // a message that follows the page language if it changes while shown
   function mt(k) { return function () { return t().m[k]; }; }
   function et(c) { return function () { return errText(c); }; }
-  function fail(e) { busy = false; say('err', e && e.code === 'preview' ? t().preview : errText(e && e.code)); }
+  function fail(e) { busy = false; pend = null; say('err', e && e.code === 'preview' ? t().preview : errText(e && e.code)); }
 
   function load() {
     if (preview) { me = { signedIn: false, providers: { google: true, github: true, telegram: true, wallet: true, passkey: true, email: true } }; render(); return Promise.resolve(); }
@@ -107,7 +111,7 @@
   // remember that this tab started a sign-in, so a result in the address is only trusted when it was asked for
   function leaving(url) { try { sessionStorage.setItem('ek_acct_wait', String(Date.now())); } catch (e) { } location.href = url; }
   function oauth(p) {
-    if (mode() === 'login') { leaving(API + '/v1/auth/' + p + '/start?mode=login&return=' + encodeURIComponent('/me/')); return; }
+    if (mode() === 'login') { busy = true; render(); leaving(API + '/v1/auth/' + p + '/start?mode=login&return=' + encodeURIComponent('/me/')); return; }
     busy = true; render();          // adding a method to the account starts from a POST only
     call('POST', '/v1/auth/' + p + '/start', { mode: 'link', ret: '/me/' }).then(function (j) {
       var ok = p === 'github' ? /^https:\/\/github\.com\/login\/oauth\/authorize\?/ : /^https:\/\/accounts\.google\.com\/o\/oauth2\/v2\/auth\?/;
@@ -256,24 +260,43 @@
   function btn(label, onclick, cls, p) {
     return el('button', { type: 'button', class: 'ek-ac-b' + (cls ? ' ' + cls : ''), disabled: busy, on: { click: onclick } }, [p ? icon(p) : null, el('span', { text: label })]);
   }
+  // one tile per sign-in service: its mark large in a lit disc, "continue with" over the service's own name
+  function tile(p, onclick, i) {
+    var L = t(), on = busy && pend === p, open = p === 'email' && emailOpen;
+    return el('button', { type: 'button', class: 'ek-ac-t ek-ac-t-' + p + (on ? ' is-busy' : '') + (open ? ' is-on' : ''), style: '--i:' + i, disabled: busy,
+      'aria-busy': on ? 'true' : false, 'aria-expanded': p === 'email' ? String(!!open) : false,
+      on: { click: function () { if (preview) { say('info', L.preview); return; } msg = null; pend = p; onclick(); } } },
+      [el('span', { class: 'ek-ac-disc' }, [icon(p, true), el('i', { class: 'ek-ac-spin', 'aria-hidden': 'true' })]),
+       el('span', { class: 'ek-ac-tx' }, [el('small', { text: L.cont + ' ' }), el('b', { text: L.n[p] })])]);
+  }
   function methodButtons(linked) {
-    var P = (me && me.providers) || {}, L = t(), row = el('div', { class: 'ek-ac-row' });
+    var P = (me && me.providers) || {}, grid = el('div', { class: 'ek-ac-grid' + (linked ? ' sm' : '') }), i = 0;
     ['google', 'github', 'telegram', 'wallet', 'passkey', 'email'].forEach(function (p) {
       if (!P[p]) return;
       if (p === 'google' && inApp) return;
       if (p === 'passkey' && !hasPasskey) return;
       if (linked && linked[p] && p !== 'passkey' && p !== 'wallet') return;
-      if (p === 'passkey' && me && me.signedIn) { row.appendChild(btn(L.p.passkey, passkeyCreate, '', 'passkey')); return; }
-      row.appendChild(btn(L.p[p], function () { if (preview) { say('info', L.preview); return; } msg = null; START[p](); }, '', p));
+      grid.appendChild(tile(p, p === 'passkey' && me && me.signedIn ? passkeyCreate : START[p], i++));
     });
-    return row;
+    return grid;
+  }
+  function hero(L) {
+    var orb = el('span', { class: 'ek-ac-orb', 'aria-hidden': 'true' }, [el('i', { class: 'r1' }), el('i', { class: 'r2' }), el('i', { class: 'dot d1' }), el('i', { class: 'dot d2' }), el('i', { class: 'dot d3' })]);
+    var s = document.createElementNS(SVGNS, 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', 'ek-ac-sync');
+    var pa = document.createElementNS(SVGNS, 'path'); pa.setAttribute('fill', 'currentColor');
+    pa.setAttribute('d', 'M12 4a8 8 0 0 1 7.5 5.2l1.6-.9.6 5.2-4.8-2 1.5-.9A5.9 5.9 0 0 0 6.2 10.3L4.3 9.7A8 8 0 0 1 12 4zm-7.7 6.3 4.8 2-1.5.9a5.9 5.9 0 0 0 10.2.5l1.9.6A8 8 0 0 1 4.5 14.8l-1.6.9z');
+    s.appendChild(pa); orb.appendChild(s);
+    return el('div', { class: 'ek-ac-hero' }, [orb, el('div', { class: 'ek-ac-ht' }, [el('span', { class: 'ek-ac-kick', text: L.title }), el('h3', { text: L.hero }),
+      el('ul', { class: 'ek-ac-chips' }, L.chips.map(function (c) { return el('li', { text: c }); }))])]);
   }
   function render() {
     var L = t(), dir = lang() === 'en' ? 'ltr' : 'rtl';
     root.hidden = false; root.setAttribute('dir', dir);
     root.textContent = '';
-    var card = el('div', { class: 'card ek-ac' });
-    card.appendChild(el('h3', { text: L.title }));
+    var card = el('div', { class: 'card ek-ac' + (me && !me.signedIn ? ' ek-ac-out' : '') });
+    if (me && !entered) { card.classList.add('ek-ac-enter'); entered = true; }
+    if (!busy) pend = null;
+    if (!me || !me.signedIn) card.appendChild(hero(L)); else card.appendChild(el('h3', { class: 'ek-ac-h', text: L.title }));
     if (!me) { card.appendChild(el('p', { class: 'ek-ac-mute', text: '…' })); root.appendChild(card); return; }
 
     if (pendingEmail) {
@@ -286,10 +309,12 @@
     }
 
     if (!me.signedIn) {
-      card.appendChild(el('p', { class: 'ek-ac-lead', text: L.lead }));
-      card.appendChild(methodButtons(null));
+      card.appendChild(el('p', { class: 'ek-ac-pick', text: L.pick }));
+      card.appendChild(methodButtons(null)); mailForm(card, L);
       if (me.providers && me.providers.passkey && hasPasskey)
-        card.appendChild(el('button', { type: 'button', class: 'ek-ac-link', disabled: busy, on: { click: function () { if (preview) { say('info', L.preview); return; } msg = null; passkeyCreate(); } }, text: L.passkeyNew }));
+        card.appendChild(el('button', { type: 'button', class: 'ek-ac-new', disabled: busy, on: { click: function () { if (preview) { say('info', L.preview); return; } msg = null; passkeyCreate(); } } },
+          [el('span', { class: 'ek-ac-plus', 'aria-hidden': 'true', text: '+' }), el('span', { text: L.passkeyNew })]));
+      card.appendChild(el('p', { class: 'ek-ac-lead', text: L.lead }));
       if (inApp && me.providers && me.providers.google) card.appendChild(el('p', { class: 'ek-ac-mute', text: L.inApp }));
     } else if (me.askJoin) {
       card.appendChild(el('div', { class: 'ek-ac-box' }, [el('b', { text: L.joinT }), el('p', { text: L.joinB }), methodList(false),
@@ -297,13 +322,14 @@
     } else {
       var st = self.EKSync && self.EKSync.state();
       var when = st && st.at ? new Date(st.at).toLocaleString(lang() === 'en' ? 'en-GB' : lang() === 'ar' ? 'ar' : 'fa-IR', { dateStyle: 'medium', timeStyle: 'short' }) : L.never;
-      card.appendChild(el('p', { class: 'ek-ac-ok' }, [el('b', { text: '✓ ' + L.signedIn }), ' · ', L.synced + ': ', busy ? L.syncing : when]));
+      card.appendChild(el('div', { class: 'ek-ac-in' }, [el('span', { class: 'ek-ac-tick', 'aria-hidden': 'true' }),
+        el('div', null, [el('b', { class: 'ek-ac-ok', text: L.signedIn }), el('span', { class: 'ek-ac-mute' }, [L.synced + ': ', busy ? L.syncing : when])])]));
       if (st && st.full) card.appendChild(el('p', { class: 'ek-ac-warn', text: L.full }));
       card.appendChild(el('h4', { text: L.methodsT }));
       card.appendChild(methodList(true));
       card.appendChild(el('h4', { text: L.addT }));
       var linked = {}; (me.methods || []).forEach(function (x) { linked[x.provider] = 1; });
-      card.appendChild(methodButtons(linked));
+      card.appendChild(methodButtons(linked)); mailForm(card, L);
       var act = el('div', { class: 'ek-ac-row ek-ac-act' }, [
         btn(L.syncNow, function () { busy = true; render(); self.EKSync.now().then(function () { busy = false; say('ok', L.m.synced); }); }),
         btn(L.download, download),
@@ -324,26 +350,32 @@
         el('div', { class: 'ek-ac-row' }, [btn(L.delGo, del, 'd'), btn(L.cancel, function () { confirmDel = false; render(); })])]));
     }
 
-    if (emailOpen) {
-      var inp = el('input', { type: 'email', autocomplete: 'email', inputmode: 'email', dir: 'ltr', placeholder: L.emailPh, maxlength: '254', 'aria-label': L.emailPh,
-        on: { keydown: function (ev) { if (ev.key === 'Enter') sendEmail(inp); } } });
-      card.appendChild(el('div', { class: 'ek-ac-row ek-ac-mail' }, [inp, btn(L.emailSend, function () { if (preview) { say('info', L.preview); return; } sendEmail(inp); }, 'p')]));
-    }
-    if (msg && !(me && me.askJoin && msg.kind === 'ok')) card.appendChild(el('p', { class: 'ek-ac-msg ek-ac-' + msg.kind, role: msg.kind === 'err' ? 'alert' : 'status', text: typeof msg.text === 'function' ? msg.text() : msg.text }));
+    if (msg && !(me && me.askJoin && msg.kind === 'ok')) card.appendChild(el('p', { class: 'ek-ac-msg ek-ac-' + msg.kind + (msgShown !== msg ? ' pop' : ''), role: msg.kind === 'err' ? 'alert' : 'status', text: typeof msg.text === 'function' ? msg.text() : msg.text }));
+    msgShown = msg;
     if (preview) card.appendChild(el('p', { class: 'ek-ac-warn', text: L.preview }));
     card.appendChild(el('details', { class: 'ek-ac-priv' }, [el('summary', { text: L.privacyT }), el('p', { text: L.privacyB })]));
     root.appendChild(card);
   }
+  function mailForm(card, L) {
+    if (!emailOpen) return;
+    {
+      var inp = el('input', { type: 'email', autocomplete: 'email', inputmode: 'email', dir: 'ltr', placeholder: L.emailPh, maxlength: '254', 'aria-label': L.emailPh,
+        on: { keydown: function (ev) { if (ev.key === 'Enter') sendEmail(inp); } } });
+      card.appendChild(el('div', { class: 'ek-ac-row ek-ac-mail' }, [inp, btn(L.emailSend, function () { if (preview) { say('info', L.preview); return; } sendEmail(inp); }, 'p')]));
+    }
+  }
   function methodList(removable) {
     var L = t(), ul = el('ul', { class: 'ek-ac-list' }), list = (me && me.methods) || [];
     list.forEach(function (x) {
-      var li = el('li', null, [icon(x.provider), el('span', { class: 'ek-ac-pn', text: L.n[x.provider] || x.provider }), el('bdi', { class: 'ek-ac-lb', dir: 'ltr', text: x.label || '' })]);
+      var li = el('li', null, [icon(x.provider) || el('span', { class: 'ek-ac-logo' }), el('span', { class: 'ek-ac-pn', text: L.n[x.provider] || x.provider }), el('bdi', { class: 'ek-ac-lb', dir: 'ltr', text: x.label || '' })]);
       if (removable && list.length > 1) li.appendChild(el('button', { type: 'button', class: 'ek-ac-link', disabled: busy, on: { click: function () { unlink(x.ref); } }, text: L.remove }));
       ul.appendChild(li);
     });
     return ul;
   }
 
+  // coming back with the browser's Back button after leaving for a sign-in: the page is live again
+  window.addEventListener('pageshow', function (ev) { if (ev.persisted && busy) { busy = false; pend = null; render(); } });
   new MutationObserver(function () { render(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   window.addEventListener('ek:sync', function () { if (me && me.signedIn && !busy) render(); });
   window.addEventListener('ek:signedout', function () { load(); });
