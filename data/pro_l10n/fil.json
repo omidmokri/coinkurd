@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Mga template, i-download at i-transfer:</b> mga nakahandang indicator set at ang sarili mong mga template; CSV ng mga bar na may mga value ng indicator; i-export at i-import; isang share link para sa isang layout. Ang isang link at QR code ay nagbubukas ng parehong workspace sa iyong telepono o iba pang aparato, at ang mga tab ng browser na ito ay mananatiling naka-sync."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Ang mga bar at presyo ay pampublikong data ng merkado mula sa Binance (isang live na koneksyon para sa buong pahina); kung hindi maabot ang Binance, susunod ang OKX, at huli ang sariling snapshot ng site — ang may kulay na tuldok sa tabi ng bawat chart ang nagsasabi kung alin. Para sa anumang chart, maaari kang pumili ng Coinbase, Bybit, OKX o Kraken sa halip na Binance, na direktang binabasa mula sa sariling pampublikong endpoint ng exchange na iyon sa iyong browser; kung hindi sumasagot ang isang exchange sa iyong koneksyon, agad itong sasabihin ng pahina. Ang mga world forex pair (EUR/USD, USD/JPY at iba pa) ay nagmumula sa sariling daily reference rates ng site — ang European Central Bank at ang exchange-api dataset — isang halaga bawat araw, hindi tick data ng broker. Ang economic calendar ay lingguhang feed mula sa ForexFactory; ang paggalaw ng Bitcoin pagkatapos ng isang kaganapan ay co-movement, hindi sanhi. Sa mahinang koneksyon, i-on ang “Data saver” sa mga setting. Ang mga adjusted chart (dividends at capital increases) ay feature ng Tehran Stock Exchange at hindi nalalapat sa crypto. Ang mga market rate ng Iran ay pampublikong data mula sa tgju.org; ang mga presyo ng coin sa toman ay pagtatantya lamang: presyo sa Binance × rate ng tether sa toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Saan nanggagaling ang data"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Tinitingnan ang mga alert sa browser na ito habang nakabukas ang page (anumang tab). Gumagana ang mga indicator alert kapag nag-close ang bar."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Mag-alerto sa drawing na ito"
+],
 "alertSet": [
 "80c4c4abee",
 "Naka-set ang alert: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Pinakamagandang trade"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Paglago bawat taon (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "I-download ang mga trade (CSV)"
@@ -396,6 +412,14 @@
 "btLong": [
 "d669a6654d",
 "Mga Long trade"
+],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1,000 order ng parehong trade):"
+],
+"btMCv": [
+"992209a3c0",
+"karaniwang drawdown {a}% · 95% ng mga order ay mananatili sa ilalim ng {b}% · pinakamalala {c}% · ang takbong ito {d}%"
 ],
 "btModeOpt": [
 "a8cdd9eaea",
@@ -488,6 +512,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (taun-taon)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Unang 70% vs huling 30% ng mga trade:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} na may {aw}% wins ({an} trades) → {b} na may {bw}% wins ({bn} trades)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +637,21 @@
 "6a72085653",
 "Lahat"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · open source"
+],
+"cat_com": [
+"90566b4c6f",
+"Mga paborito ng komunidad"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (mundo)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +697,53 @@
 "3090f6af60",
 "Pagbabago sa 24h"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Ang mga open-source na TradingView script ng Coin_Kurd, na tumatakbo rito sa iyong chart."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Macro dashboard mula sa pampublikong data: risk-on / risk-off regime"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"On-chain cycle phases (MVRV, NUPL) na may posisyon ng presyo"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Buong kasaysayan ng Bitcoin sa isang logarithmic spiral"
+],
 "clearAll": [
 "7de68ccb43",
 "Alisin ang lahat ng drawing"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Alisin ang mga drawing at indicator"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Alisin ang mga drawing"
+],
+"clearInds": [
+"8b56474294",
+"Alisin ang mga indicator"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Alisin ang bawat indicator mula sa chart na ito?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +768,10 @@
 "clone": [
 "af74f7c536",
 "Kopyahin"
+],
+"cloned": [
+"51fbf8cb72",
+"Kinopya sa tabi nito"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +805,221 @@
 "d0d4d379f5",
 "Natitirang oras bago mag-close ang bar na ito"
 ],
+"crFree": [
+"6b4b480231",
+"Sumusunod sa mouse"
+],
+"crLargeDash": [
+"a7503adc35",
+"Mahabang gitling"
+],
+"crMagnet": [
+"77fa49774c",
+"Dumidikit sa mga candles"
+],
+"crOff": [
+"d4c2792a72",
+"Nakatago"
+],
+"crSparse": [
+"e50cc378a1",
+"Kalat na tuldok"
+],
 "create": [
 "8ac903c3c3",
 "Gumawa ng alert"
+],
+"csBg": [
+"64dd60fe1a",
+"Background"
+],
+"csBg2": [
+"9ebb790d74",
+"Pangalawang kulay ng background"
+],
+"csBody": [
+"718a7e8a58",
+"Katawan"
+],
+"csBorderC": [
+"eeffa83765",
+"Kulay ng border"
+],
+"csBorders": [
+"685f23bc5e",
+"Mga border"
+],
+"csClose": [
+"bbfa773e5a",
+"Close"
+],
+"csCross": [
+"b0b83f89e8",
+"Crosshair at mouse"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Kulay ng crosshair"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Linya ng crosshair"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Label ng presyo at oras sa crosshair"
+],
+"csCrossMode": [
+"800092e3e1",
+"Crosshair"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Lapad ng crosshair"
+],
+"csDn": [
+"11f5ff3829",
+"Bumababang candle"
+],
+"csFont": [
+"b97c4d4cdd",
+"Font"
+],
+"csFsize": [
+"83ca9e48c3",
+"Laki ng font"
+],
+"csGrad": [
+"c716191a01",
+"ginagawang gradient ang background"
+],
+"csGridA": [
+"f773586220",
+"Opacity ng grid (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Kulay ng grid"
+],
+"csGridH": [
+"4eaa1c008a",
+"Pahalang na linya ng grid"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Patayong linya ng grid"
+],
+"csHollow": [
+"9165bccc85",
+"Hollow bodies"
+],
+"csHollowH": [
+"fb63aba345",
+"tanging ang mga tumataas na candle"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetic scrolling sa touch"
+],
+"csLast": [
+"aacdc5bea4",
+"Linya ng huling presyo"
+],
+"csLastLab": [
+"91c990bcb9",
+"Label ng presyo sa scale"
+],
+"csLineC": [
+"01212659ee",
+"Kulay ng linya / area"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Lapad ng linya"
+],
+"csLook": [
+"41def7a0fe",
+"Hitsura"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"isang kulay para sa parehong direksyon"
+],
+"csPinch": [
+"e557a41794",
+"Pinch zoom sa touch"
+],
+"csResetQ": [
+"9c369383c1",
+"Ibalik ang bawat setting ng chart sa dati?"
+],
+"csScale": [
+"0b414bdcb7",
+"Mga scale"
+],
+"csScroll": [
+"468c89cb3b",
+"I-drag ang chart gamit ang mouse"
+],
+"csSym": [
+"fad29404d2",
+"Mga candle"
+],
+"csText": [
+"d160595fcf",
+"Kulay ng teksto"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Mga setting ng chart"
+],
+"csUp": [
+"971a95475d",
+"Tumataas na candle"
+],
+"csWick": [
+"fe6e2bfd48",
+"Mga wick"
+],
+"csWickC": [
+"0fcb21d161",
+"Kulay ng wick"
+],
+"csWm": [
+"33c7b41ac6",
+"Watermark sa likod ng mga candle"
+],
+"csWmA": [
+"69a1810ea2",
+"Opacity ng watermark (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"simbolo at timeframe"
+],
+"csWmC": [
+"bad81c749f",
+"Kulay ng watermark"
+],
+"csWmSize": [
+"4af7e52f80",
+"Laki ng watermark"
+],
+"csWmText": [
+"ecf870ab34",
+"Teksto ng watermark"
+],
+"csZoom": [
+"c6f40d9d03",
+"Mouse wheel"
+],
+"csZoomH": [
+"4ca34c1092",
+"pag-zoom in at out"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1032,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} na bar ang na-download"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Magdagdag ng alerto rito"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopyahin ang presyong ito"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Pagkasyahin ang bawat candle"
+],
+"ctxHline": [
+"588d2eb492",
+"Pahalang na linya rito"
+],
+"ctxReset": [
+"242cb352c0",
+"I-reset ang view"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1229,29 @@
 "2422a88320",
 "Bawat oras (pinakamarami ay minsan bawat minuto / minsan bawat bar)"
 ],
+"exAuto": [
+"1ff048b76e",
+"live, gamit ang OKX bilang fallback"
+],
+"exDown": [
+"e8ba18613e",
+"Hindi sumasagot ang {x} sa koneksyong ito. Mananatili ang chart sa exchange kung nasaan ito."
+],
+"exNote": [
+"0eb4c03240",
+"Ang Binance ay nag-i-stream nang live; ang iba ay binabasa mula sa kanilang sariling pampublikong endpoint bawat sampung segundo, kasama ang kanilang sariling history."
+],
+"exTitle": [
+"5b13eac7ed",
+"Exchange"
+],
 "exit": [
 "f83b6fe3ae",
 "Lumabas"
+],
+"exitFull": [
+"fc61e74cd9",
+"Lumabas sa full screen"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1292,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "I-export ang lahat (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Hindi nag-load ang data para sa indicator na ito. Subukan muli sandali."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1353,18 @@
 "3526f607bc",
 "Dilaw"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Pagtantiya"
@@ -1024,6 +1384,74 @@
 "futSub": [
 "16db4a6d5c",
 "Quarterly futures, continuous"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Isang currency laban sa isa pa, mula sa pang-araw-araw na reference rates ng site (European Central Bank, at ang exchange-api dataset kung saan hindi nagbibigay ng quote ang ECB). Isang value bawat araw, kaya ang daily bar ay isang punto at ang weekly at monthly bars ay binuo mula sa mga araw sa loob nito. Ang mga reference rate ay inilalathala isang beses bawat araw, hindi broker tick data: walang intraday forex dito. Ang mga dollar pair ay nagsimula noong 2 Marso 2024, ang mga pair sa pagitan ng dalawang ECB currency noong 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Mga arrow"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Mga brush"
+],
+"g_channels": [
+"18e03e2a37",
+"Mga channel"
+],
+"g_cursors": [
+"f4d2f91040",
+"Mga cursor"
+],
+"g_cycles": [
+"97f064aff5",
+"Mga cycle"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott waves"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Mga linya"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Panukat"
+],
+"g_pat": [
+"2c179da0f5",
+"Mga pattern ng chart"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Mga pitchfork"
+],
+"g_proj": [
+"8aa49fe840",
+"Projection"
+],
+"g_shapes": [
+"b1985e3874",
+"Mga hugis"
+],
+"g_text": [
+"d7cd4cda4f",
+"Teksto at mga nota"
+],
+"g_vol": [
+"1b4620951d",
+"Batay sa volume"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1536,18 @@
 "hideAll": [
 "1f0e916e42",
 "Itago / ipakita ang mga drawing"
+],
+"hideBoth": [
+"3502a3299d",
+"Itago ang mga drawing at indicator"
+],
+"hideDraw": [
+"f4492c5211",
+"Itago ang mga drawing"
+],
+"hideInds": [
+"764ab9d614",
+"Itago ang mga indicator"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1649,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1664,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1693,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1264,6 +1716,42 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Lahat ng candlestick pattern"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hanging man"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Morning / Evening star"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Tweezer top / bottom"
 ],
 "in_crsi": [
 "d788a94022",
@@ -1289,6 +1777,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA Clouds [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1789,37 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Equal Highs / Lows"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1832,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1885,10 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ob": [
+"80c4ef99a7",
+"Order Blocks"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1908,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,21 +1945,41 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
 ],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
+],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
 ],
 "in_tema": [
 "41227a56e5",
@@ -1433,6 +1997,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volume Delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +2017,17 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Session Volume Profile"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP bands"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2040,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1849,6 +2437,14 @@
 "891ebccd5b",
 "I-lock"
 ],
+"lockAll": [
+"f6cda61fb8",
+"I-lock ang lahat ng drawings"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Naka-lock na ang lahat ng drawings"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1869,13 +2465,41 @@
 "5f703c7eba",
 "Mga signal ng Kurdistani"
 ],
+"mMode": [
+"659eba1219",
+"Ulitin"
+],
+"mMsg": [
+"2c924e3088",
+"Paalala"
+],
+"mTf": [
+"85decb73d1",
+"Timeframe"
+],
 "maType": [
 "15f86c051e",
 "Average"
 ],
+"macroNote": [
+"c4a94f666d",
+"pagtatantya base sa panuntunan, hindi payo"
+],
 "magnet": [
 "effa915951",
 "Magnet (kumapit sa open/high/low/close)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnet off"
+],
+"magnetS": [
+"607a7625b1",
+"Strong magnet"
+],
+"magnetW": [
+"181021d95b",
+"Weak magnet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1897,9 +2521,45 @@
 "fdbe20f376",
 "Lahat ng timeframe"
 ],
+"moreTools": [
+"c871f1056a",
+"Higit pang tools"
+],
 "moveToSection": [
 "98d183e7cb",
 "Ilipat sa seksyon"
+],
+"mt_mine": [
+"1cf761ac34",
+"Aking mga script"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Options"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Patterns"
+],
+"mt_prof": [
+"0c2a930099",
+"Profiles"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Structure"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategies"
+],
+"multiAl": [
+"5bafcd2412",
+"Multi-condition alert"
+],
+"multiNote": [
+"c7e278bae8",
+"Isulat ang mga kondisyon sa isang linya at pagdugtungin ang mga ito gamit ang and / or. Mag-a-alert ito sa candle kung saan nagiging totoo ang linya."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1948,6 +2608,10 @@
 "nc_technical": [
 "41fc086088",
 "Teknikal"
+],
+"neckline": [
+"993062b2d6",
+"Neckline"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2057,6 +2721,10 @@
 "77f8046dcf",
 "(itaas, walang section)"
 ],
+"noVol": [
+"0960b9b69d",
+"walang volume para sa symbol na ito"
+],
 "notif": [
 "270d190970",
 "Browser notification"
@@ -2109,21 +2777,57 @@
 "c0da22faab",
 "Buksan sa chart"
 ],
+"openTv": [
+"94d7227248",
+"Buksan sa TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} options chain"
+],
+"optDays": [
+"c2fd31e918",
+"Mga araw hanggang expiry"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombinasyon ang nasubukan sa loob ng {s} s, {p} sa mga ito ay profitable; naka-sort ayon sa {r}. I-click ang row para sa buong report nito."
 ],
+"optFail": [
+"ab2a990eed",
+"Hindi sumagot ang Deribit mula sa koneksyong ito. Palitan ang koneksyon o ang VPN at subukan muli."
+],
+"optIV": [
+"c1bc12118c",
+"ATM implied volatility"
+],
 "optMax": [
 "7b9c1b1490",
 "Masyadong maraming kombinasyon — hanggang {n} lang. Gumamit ng mas malaking step."
+],
+"optMove": [
+"8aa36fe05d",
+"Inaasahang galaw"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} kombinasyon (hanggang {m} para sa history na ito)"
 ],
 "optNote": [
-"4b4713d390",
-"Ang pinakamagandang resulta sa nakaraang data ay madalas na tsamba lang (overfitting). Mas piliin ang mga setting na maganda rin ang performance sa mga katabing setting, at i-check ang mga ito sa ibang panahon o market."
+"96723a0ac4",
+"Options chain ng BTC at ETH mula sa public data ng Deribit, binabasa ng iyong browser."
+],
+"optNote2": [
+"26dfa389e8",
+"OI at volume sa contracts (coins); $ ang mark price sa dolyar. Max pain: ang settlement price na nagbabayad ng pinakamaliit sa mga option holder. Inaasahang galaw = price × IV × √(days/365). Hindi ito payo."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2132,6 +2836,10 @@
 "optRun": [
 "9a456cc451",
 "Hanapin ang pinakamagandang setting"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Underlying"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2193,13 +2901,37 @@
 "0777981263",
 "Ang mga presyo sa {c} ay gumagamit na ngayon ng iyong rate."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitude"
+],
 "p_atr": [
 "0d1283ae88",
 "Haba ng ATR"
 ],
+"p_band": [
+"3541c5f4e1",
+"Band length"
+],
 "p_base": [
 "077fe9c54e",
 "Base"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Band length"
+],
+"p_bw": [
+"1d06cbba91",
+"Bandwidth"
+],
+"p_chdev": [
+"65acb623a8",
+"Channel deviation"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplier"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2233,6 +2965,10 @@
 "8db6a2f1d3",
 "Mabilis"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Fast 2"
+],
 "p_hi": [
 "70a2565504",
 "Upper level"
@@ -2253,6 +2989,14 @@
 "a0623fa9a3",
 "%K smoothing"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Key value"
+],
 "p_l1": [
 "ba51565baf",
 "Haba ng MA 1"
@@ -2268,6 +3012,14 @@
 "p_l4": [
 "a5c110eb00",
 "Haba ng MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentile look-back"
+],
+"p_left": [
+"3b219a058a",
+"Left bars"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2309,6 +3061,14 @@
 "a44d6c906d",
 "Mga bar sa bawat panig"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Channel length"
+],
+"p_n2": [
+"2df99da939",
+"Average length"
+],
 "p_offset": [
 "ce66771654",
 "Offset"
@@ -2317,13 +3077,41 @@
 "ac556cf593",
 "Porsyento"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Sampling period"
+],
+"p_ph": [
+"b1f698cc3d",
+"High percentile"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE factor"
+],
 "p_rank": [
 "1df2ca7462",
 "Haba ng percent-rank"
 ],
+"p_right": [
+"307c9815b6",
+"Right bars"
+],
+"p_rows": [
+"52d0b35277",
+"Rows"
+],
 "p_rsi": [
 "560e6b61c6",
 "Haba ng RSI"
+],
+"p_sf": [
+"590f20262b",
+"RSI smoothing"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2340,6 +3128,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Mabagal"
+],
+"p_slow2": [
+"c252d2ccab",
+"Slow 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2385,6 +3177,54 @@
 "07300ad49f",
 "{c} para sa 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Idagdag"
+],
+"pfAvg": [
+"def9f57b0c",
+"Average buy price"
+],
+"pfCost": [
+"64ae43e8fe",
+"Gastos"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Wala pang laman dito. Magdagdag ng coin, kung ilan ang hawak mo at kung magkano ang bili mo."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfolio {n}"
+],
+"pfNote": [
+"f46050561e",
+"Naka-save lang sa browser na ito. Hindi ito humihingi ng exchange keys at walang ipinapadala kahit saan. Ang mga presyo ay Binance USDT pairs."
+],
+"pfNow": [
+"039df35064",
+"Presyo ngayon"
+],
+"pfPnl": [
+"8ae3945397",
+"Profit / loss"
+],
+"pfQty": [
+"44f6af6945",
+"Dami"
+],
+"pfShort": [
+"036b18f02a",
+"Portfolio"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfolio"
+],
+"pfValue": [
+"8dce170de2",
+"Halaga"
+],
 "pickStart": [
 "1e214a5fd6",
 "I-click sa chart kung saan dapat magsimula ang replay"
@@ -2408,6 +3248,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Presyo"
+],
+"profNote": [
+"c1da831af8",
+"Para sa profile ng range na pipiliin mo, gamitin ang “Fixed range volume profile” sa kaliwang toolbar."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2581,6 +3425,86 @@
 "56a2285c5b",
 "Tino-to-save…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Auto fit ang price scale"
+],
+"scBorder": [
+"45c60c0e85",
+"Price scale border"
+],
+"scBot": [
+"77a5b77d62",
+"Space sa ibaba (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Parehong panig"
+],
+"scInvert": [
+"ba80abaac1",
+"I-invert ang price scale"
+],
+"scInvertH": [
+"ebb1688761",
+"ang pataas ay magiging pababa"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Kaliwa"
+],
+"scLog": [
+"65fa51781b",
+"Logarithmic"
+],
+"scMode": [
+"a5e5771ca0",
+"Price scale"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logarithmic o percentage"
+],
+"scNone": [
+"d4c2792a72",
+"Nakatago"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (arithmetic)"
+],
+"scOff": [
+"3557c35506",
+"Bakanteng espasyo sa kanan"
+],
+"scPct": [
+"c4519ac7cc",
+"Percentage"
+],
+"scRight": [
+"954daa8b00",
+"Kanan"
+],
+"scSec": [
+"c92a4af093",
+"Seconds sa time scale"
+],
+"scSide": [
+"82acb7ee2b",
+"Kung saan nakalagay ang price scale"
+],
+"scSpace": [
+"2878a3a43e",
+"Candle spacing"
+],
+"scTop": [
+"25126a3aab",
+"Space sa itaas (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Time scale border"
+],
 "sc_c": [
 "3e8248e32e",
 "Presyo"
@@ -2640,6 +3564,62 @@
 "screener": [
 "7f27924c12",
 "Market watch"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Suriin"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script editor"
+],
+"scriptEdit": [
+"ae909c75da",
+"I-edit ang script"
+],
+"scriptExamples": [
+"41a27a4710",
+"Mga halimbawa…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Line {n}"
+],
+"scriptName": [
+"709a23220f",
+"Pangalan"
+],
+"scriptNew": [
+"ebac729ca3",
+"Bagong script"
+],
+"scriptNote": [
+"c265d2248f",
+"Sumulat ng sarili mong indicators sa wikang parang Pine. Naka-save ang mga ito sa browser na ito at tumatakbo lang dito, sa iyong chart."
+],
+"scriptOk": [
+"eb3da0c952",
+"Walang error · {n} outputs"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Ano ang alam ng wika"
+],
+"scriptSave": [
+"1e291c4d98",
+"I-save at idagdag sa chart"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Naka-save ang script"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -2745,9 +3725,25 @@
 "e97d96a8bc",
 "Pinakamataas na volume"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI cross (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger reversal"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2756,6 +3752,18 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Mga signal ng Kurdistani (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ cross"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2769,6 +3777,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI reversal"
@@ -2777,9 +3793,37 @@
 "446d28671b",
 "Golden / death cross (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI cross"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend cross [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2905,6 +3949,106 @@
 "2d2cb022bc",
 "Bilis"
 ],
+"stBadLv": [
+"683a05683a",
+"Ang mga level ay dapat hanggang 24 na numero."
+],
+"stBadPt": [
+"a73083f114",
+"Ang presyo o oras ay hindi valid."
+],
+"stColor": [
+"f28563a477",
+"Kulay"
+],
+"stCoord": [
+"8ebebca019",
+"Coordinates"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Dashed"
+],
+"stDev": [
+"e789c07831",
+"Deviation (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Dotted"
+],
+"stExtL": [
+"ef880cf8fc",
+"I-extend sa kaliwa"
+],
+"stExtR": [
+"fbff580b3d",
+"I-extend sa kanan"
+],
+"stFill": [
+"64dd60fe1a",
+"Background"
+],
+"stLevels": [
+"ae3d013ab1",
+"Levels (paghiwalayin ng kuwit)"
+],
+"stLine": [
+"120ee44bec",
+"Line style"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Unang 12 points lang ang pwedeng i-edit dito."
+],
+"stOpacity": [
+"f12e36bd83",
+"Background opacity"
+],
+"stReset": [
+"40aab769d0",
+"Default levels"
+],
+"stRows": [
+"52d0b35277",
+"Rows"
+],
+"stSize": [
+"83ca9e48c3",
+"Laki ng font"
+],
+"stSolid": [
+"d00635865c",
+"Solid"
+],
+"stStyle": [
+"99a0efc6cf",
+"Style"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Kulay ng text"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Ang mga oras ay nasa UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Visibility"
+],
+"stWidth": [
+"ad48f34186",
+"Kapal"
+],
 "st_err": [
 "d802d232a8",
 "Walang data"
@@ -2948,6 +4092,14 @@
 "stop": [
 "9e253470c8",
 "Ihinto"
+],
+"stratNote": [
+"16dc19eef4",
+"Ang bawat strategy ay tumatakbo sa history ng chart na ito sa tester: entries at exits sa chart, net result, win rate, drawdown, at optimizer para sa mga settings nito."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Patakbuhin sa strategy tester"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3009,25 +4161,117 @@
 "a26d0ddaae",
 "Pagalaw (oras)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD pattern"
+],
+"t_angle": [
+"30cd1e7703",
+"Trend angle"
+],
+"t_arc": [
+"853a983f6b",
+"Arc"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Arrow"
+],
+"t_arrowc": [
+"0f722804ec",
+"Arrow cursor"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Arrow mark down"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Arrow marker"
+],
+"t_arrowup": [
+"8023467135",
+"Arrow mark up"
+],
+"t_avwap": [
+"0a4f86b195",
+"Anchored VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Brush"
 ],
+"t_callout": [
+"f1647ad880",
+"Callout"
+],
 "t_channel": [
 "c0350b7736",
 "Parallel channel"
+],
+"t_circ": [
+"1cc7820a08",
+"Circle"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Komento"
+],
+"t_cross": [
+"983bdb7b27",
+"Cross line"
+],
 "t_cursor": [
 "2239943c8d",
 "Cursor"
+],
+"t_curve": [
+"916f09aff8",
+"Kurba"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Cyclic lines"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher pattern"
+],
+"t_dcurve": [
+"faef75cb57",
+"Double curve"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Disjoint channel"
+],
+"t_dot": [
+"46856bf702",
+"Tuldok"
+],
+"t_drange": [
+"c65ea4ae01",
+"Date range"
+],
+"t_drives": [
+"3a261ca869",
+"Three drives pattern"
+],
+"t_emoji": [
+"707fd71017",
+"Icons & emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Pambura"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott impulse wave (12345)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3037,9 +4281,53 @@
 "18c530863b",
 "Fibonacci retracement"
 ],
+"t_fibch": [
+"c691e1e9b4",
+"Fib channel"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib circles"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fib spiral"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib time zone"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib wedge"
+],
+"t_flag": [
+"23d91e7740",
+"Flag mark"
+],
+"t_flat": [
+"52d3db252e",
+"Flat top/bottom"
+],
+"t_forecast": [
+"528bc4bc38",
+"Forecast"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann fan"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann box"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann square"
+],
+"t_hl": [
+"8cb3f79b49",
+"Highlighter"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3049,6 +4337,18 @@
 "0bcbc4e087",
 "Horizontal ray"
 ],
+"t_hs": [
+"43353dbcec",
+"Head and shoulders"
+],
+"t_info": [
+"a690e33098",
+"Info line"
+],
+"t_inside": [
+"30d6b425dc",
+"Inside pitchfork"
+],
 "t_long": [
 "666f195fc4",
 "Long position"
@@ -3057,9 +4357,45 @@
 "2bedd64d85",
 "Price range / sukat"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modified Schiff pitchfork"
+],
+"t_note": [
+"2c924e3088",
+"Note"
+],
+"t_path": [
+"519e39132b",
+"Path"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews’ pitchfork"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Price label"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Price note"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polyline"
+],
+"t_prange": [
+"c20f7ce09a",
+"Price range"
+],
+"t_proj": [
+"8aa49fe840",
+"Projection"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3069,9 +4405,33 @@
 "c158695a64",
 "Rectangle"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regression trend"
+],
+"t_rrect": [
+"65807afaf7",
+"Rotated rectangle"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff pitchfork"
+],
 "t_short": [
 "a8daf74669",
 "Short position"
+],
+"t_signpost": [
+"89f361362e",
+"Signpost"
+],
+"t_sine": [
+"3852fedc7e",
+"Sine line"
+],
+"t_tcycle": [
+"521a687246",
+"Time cycles"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3081,9 +4441,25 @@
 "e810388344",
 "Trend line"
 ],
+"t_tri": [
+"32547b031d",
+"Triangle pattern"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangle"
+],
 "t_vline": [
 "a790288017",
 "Vertical line"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD pattern"
+],
+"t_zoom": [
+"4fc05f2763",
+"Mag-zoom in"
 ],
 "target": [
 "61ad50a9b9",
@@ -3133,6 +4509,26 @@
 "ad88cbfa09",
 "Pati sa Telegram (binabantayan ng bot kahit nakasara ang page na ito)"
 ],
+"thDark": [
+"ae1ef01432",
+"Madilim"
+],
+"thLight": [
+"a36ef8aba2",
+"Maliwanag"
+],
+"thMid": [
+"4fe978738d",
+"Midnight blue"
+],
+"thNavy": [
+"0229e960cf",
+"Navy"
+],
+"thPaper": [
+"22d507f2ba",
+"Papel"
+],
 "time": [
 "6c82e6dd86",
 "Oras"
@@ -3156,6 +4552,10 @@
 "tooFar": [
 "b29db0358a",
 "Mas malayo 'yan kaysa sa kayang i-load ng timeframe na ito; pumili ng mas malaking timeframe."
+],
+"toolHint": [
+"56e62363ce",
+"i-click ang chart para gumuhit"
 ],
 "topFixed": [
 "1a66879287",
@@ -3381,6 +4781,34 @@
 "1526a17ee7",
 "I-unlock"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Naka-unlock ang lahat ng drawings"
+],
+"vDay": [
+"f6bb0f468a",
+"Mga araw"
+],
+"vHour": [
+"9e25a34e63",
+"Mga oras"
+],
+"vMin": [
+"092f99ea11",
+"Mga minuto"
+],
+"vMonth": [
+"200dcdce9b",
+"Mga buwan"
+],
+"vSec": [
+"5fb1db5278",
+"Mga segundo"
+],
+"vWeek": [
+"7d75266a53",
+"Mga linggo"
+],
 "value": [
 "3e8248e32e",
 "Presyo"
@@ -3388,6 +4816,10 @@
 "valuePct": [
 "bf55390d8d",
 "Porsyento (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3432,44 +4864,300 @@
 "yourRate": [
 "ca14282aa6",
 "iyong rate"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Mag-zoom out"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Mag-drag ng mas malawak na box para mag-zoom in."
 ]
 },
 "f": {
+"btPayoff": [
+"64c65d41f5",
+1
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+1
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+1
+],
+"in_cp_star": [
+"f1940a30a1",
+1
+],
+"in_cvd": [
+"fbd0df870e",
+1
+],
+"in_fvg": [
+"bad3ce3dd2",
+1
+],
+"in_ms": [
+"14c6c6c316",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_srlux": [
+"50cfe9a1d5",
+1
+],
+"in_tpo": [
+"cd41be0fc7",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"in_vpvr": [
+"f757c4a16d",
+1
+],
 "ind_alma": [
 "0f70916dbb",
 3
+],
+"ind_alpha": [
+"a1b106dbe0",
+1
 ],
 "ind_atr": [
 "ffe1ef3913",
 3
 ],
+"ind_atrts": [
+"8223831420",
+1
+],
 "ind_bop": [
 "f15b118c3e",
 3
+],
+"ind_ce": [
+"eb9529e97b",
+1
 ],
 "ind_cmf": [
 "eba520ed7c",
 3
 ],
+"ind_cp_all": [
+"9273e33e88",
+1
+],
+"ind_cp_doji": [
+"80ff1c526e",
+1
+],
+"ind_cp_engulf": [
+"838b5e0794",
+1
+],
+"ind_cp_hammer": [
+"2233604708",
+1
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+1
+],
+"ind_cp_inside": [
+"7375801c53",
+1
+],
+"ind_cp_maru": [
+"0864a92a99",
+1
+],
+"ind_cp_mstar": [
+"b611b84eab",
+1
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+1
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+1
+],
+"ind_cp_star": [
+"f1d238e6b1",
+1
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+1
+],
+"ind_cvd": [
+"690d30a274",
+1
+],
 "ind_dema": [
 "2d6077f26d",
 3
+],
+"ind_emacloud": [
+"82454f4531",
+1
+],
+"ind_eqhl": [
+"7911f35044",
+1
+],
+"ind_fpbar": [
+"72df84d4bf",
+1
+],
+"ind_fvg": [
+"be42490ea0",
+1
+],
+"ind_gmma": [
+"bfeaafeca6",
+1
+],
+"ind_halft": [
+"09f45602f1",
+1
+],
+"ind_hull": [
+"4463208ec7",
+1
+],
+"ind_kdj": [
+"77ec2cdedc",
+1
+],
+"ind_kmacro": [
+"ca07959e1c",
+1
+],
+"ind_kpl": [
+"3d570e5254",
+1
+],
+"ind_ksc": [
+"6fedf8b4e9",
+1
+],
+"ind_kspiral": [
+"899a8ea3ae",
+1
 ],
 "ind_lsma": [
 "00a8d3b0d2",
 3
 ],
+"ind_ms": [
+"13fc87db00",
+1
+],
+"ind_nwe": [
+"e52da4c085",
+1
+],
+"ind_ob": [
+"530cdc224f",
+1
+],
+"ind_qqe": [
+"3c5e11ebed",
+1
+],
+"ind_rf": [
+"0bf4dbcc13",
+1
+],
+"ind_smi": [
+"ef8f7803b6",
+1
+],
 "ind_smma": [
 "e59cc99c1d",
 3
+],
+"ind_sqz": [
+"928bfb7046",
+1
+],
+"ind_srlux": [
+"93d0ceff44",
+1
+],
+"ind_ssl": [
+"6f7ed9b6c1",
+1
+],
+"ind_stc": [
+"29439e9c85",
+1
+],
+"ind_tdi": [
+"03d1464e0d",
+1
 ],
 "ind_tema": [
 "1ff881355e",
 3
 ],
+"ind_tpo": [
+"e1ee1b7549",
+1
+],
+"ind_ut": [
+"bde2d091af",
+1
+],
+"ind_vdelta": [
+"d8b588eda0",
+1
+],
+"ind_vixfix": [
+"101ce888f8",
+1
+],
+"ind_vpsess": [
+"a416aab998",
+1
+],
+"ind_vpvr": [
+"adf09232a6",
+1
+],
+"ind_vwapb": [
+"ff28e74ee1",
+1
+],
 "ind_vwma": [
 "7526646bd7",
 3
+],
+"ind_wt": [
+"d823a77eaa",
+1
+],
+"ind_zlsma": [
+"814b9eebab",
+1
+],
+"sg_ichi": [
+"730fce5fe8",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
 ],
 "shDraw": [
 "3018b07267",
@@ -3479,9 +5167,41 @@
 "41d1998bce",
 3
 ],
+"t_ewcor": [
+"a819268f2f",
+1
+],
+"t_ewdbl": [
+"83c7bcc32d",
+1
+],
+"t_ewtri": [
+"bf0f6b602d",
+1
+],
+"t_ewtrp": [
+"3670c19480",
+1
+],
+"t_fibarc": [
+"09d8fecaa7",
+1
+],
 "t_fibext": [
 "73655be9d6",
 3
+],
+"t_fibfan": [
+"5b948b7296",
+1
+],
+"t_fibtime": [
+"574f8ab37b",
+1
+],
+"t_vrp": [
+"bcba420b37",
+1
 ]
 }
 }
