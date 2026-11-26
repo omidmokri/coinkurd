@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-26T13:28:30.962593+00:00",
+ "updated_at": "2026-11-26T13:49:42.615831+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-25T13:00:00+00:00"
@@ -7,40 +7,40 @@
  "hold_h": 24,
  "alpha": 0.05,
  "min_n": 30,
- "coins": 242,
+ "coins": 243,
  "coins_failed": 0,
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1540,
+   "n": 1537,
    "obs": -0.16,
    "win": 45.5,
    "mid": 0.15,
    "lo": -0.58,
-   "hi": 0.98,
-   "p": 0.3906,
+   "hi": 0.99,
+   "p": 0.3943,
    "shifts": 1362,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6360,
+   "n": 6356,
    "obs": 0.12,
    "win": 50.1,
    "mid": 0.01,
-   "lo": -0.35,
+   "lo": -0.34,
    "hi": 0.27,
-   "p": 0.4714,
+   "p": 0.4655,
    "shifts": 1362,
    "verdict": "no_edge"
   },
   "breakdown": {
-   "n": 961,
+   "n": 960,
    "obs": 0.4,
    "win": 48.5,
-   "mid": 0.79,
-   "lo": -0.59,
+   "mid": 0.8,
+   "lo": -0.6,
    "hi": 2.61,
-   "p": 0.6366,
+   "p": 0.6292,
    "shifts": 1362,
    "verdict": "no_edge"
   },
