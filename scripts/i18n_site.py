@@ -153,14 +153,29 @@ def load_fails(code):
     return {k: n for k, n in v.items() if isinstance(n, int) and n > 0}
 
 
-def save(code, s, fails=None):
+def load_g(code):
+    """the strings of `code` that only Google Translate has done (scripts/i18n_gt.py): shown to readers, and
+    re-done by Gemini once nothing untranslated is left ahead of them"""
+    try:
+        with open(cache_path(code), encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        return set()
+    v = (d.get("g") if isinstance(d, dict) else None) or []
+    return {k for k in v if isinstance(k, str)}
+
+
+def save(code, s, fails=None, g=None):
     os.makedirs(CACHE, exist_ok=True)
     f_ = dict(sorted((fails if fails is not None else load_fails(code)).items()))
     f_ = {k: n for k, n in f_.items() if k not in s}      # one that came good later starts clean again
+    g_ = sorted(k for k in (g if g is not None else load_g(code)) if k in s)
     with open(cache_path(code), "w", encoding="utf-8") as f:
         d = {"lang": code, "s": dict(sorted(s.items()))}
         if f_:
             d["f"] = f_
+        if g_:
+            d["g"] = g_
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
 
@@ -270,11 +285,12 @@ def plan(langs, need, common, limit):
         s = load(code)
         state[code] = s
         bad = {k for k, n in load_fails(code).items() if n >= FAIL_MAX}
-        todo = [k for k in need if k not in s and k not in bad]
-        pct[code] = (len(need) - len(todo)) / len(need) * 100 if need else 0
+        gt = load_g(code)
+        todo = [k for k in need if (k not in s or k in gt) and k not in bad]
+        pct[code] = sum(1 for k in need if k in s) / len(need) * 100 if need else 0
         if not todo:
             continue
-        todo.sort(key=lambda k: (k not in common, len(k), k))
+        todo.sort(key=lambda k: (k in gt, k not in common, len(k), k))   # Google's drafts are re-done last
         queues.append((code, list(batches(todo))))
     # A language already offered in the globe comes first and takes one batch a round: a language a reader can pick
     # today must not fall behind the pages written today. After them the whole of what is left goes to the one
@@ -322,6 +338,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
     lock = threading.Lock()
     changed = set()
     fails = {code: load_fails(code) for code in {c for c, _ in items}}
+    gts = {code: load_g(code) for code in {c for c, _ in items}}
 
     def worker(api_key):
         while time.time() - t0 <= seconds:
@@ -353,6 +370,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
                 continue
             with lock:
                 state[code].update(good)
+                gts[code] -= set(good)            # Gemini's answer replaces Google's draft
                 for k in bad:
                     fails[code][k] = fails[code].get(k, 0) + 1
                 if good or bad:
@@ -363,7 +381,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
         """write what has been translated so far: a run cut off by its step's timeout keeps everything it paid for"""
         with lock:
             todo = sorted(changed)
-            snap = {c: (dict(state[c]), dict(fails.get(c) or {})) for c in todo}
+            snap = {c: (dict(state[c]), dict(fails.get(c) or {}), set(gts.get(c) or ())) for c in todo}
             changed.clear()
         for c in todo:
             save(c, *snap[c])

@@ -129,6 +129,13 @@ jobs:
         timeout-minutes: 30            # 22 of translating, the caches written every minute, then the dictionaries
         run: python scripts/i18n_site.py || echo "::warning::site languages failed; the pages use what the cache has"
 
+      # What Gemini has not reached yet gets Google Translate's version, so every language is readable now; those
+      # strings are marked and Gemini replaces them as its calls allow (see scripts/i18n_gt.py). No Gemini calls.
+      - name: Site languages, Google Translate for what Gemini has not reached
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python scripts/i18n_gt.py --seconds 600 || echo "::warning::Google Translate step failed; Gemini carries on alone"
+
       - name: Live-market languages (new strings only)
         continue-on-error: true
         timeout-minutes: 8
