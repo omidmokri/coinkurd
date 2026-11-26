@@ -1028,17 +1028,118 @@ RH_CSS = (".rh{position:relative;margin:14px 0 22px;padding:22px;border:1px soli
            "@media(max-width:760px){.rh{padding:16px}.rh-top{grid-template-columns:1fr;gap:16px}.rh-ps{grid-template-columns:repeat(2,minmax(0,1fr))}}")
 
 
-def intel_html():
-    m, out = market, {}
+# The homepage dashboard boxes (and /dashboard/) in three copies: Persian, Sorani and English. Before
+# 2026-11-26 they were Persian only, so a reader on /ckb/, /de/, /ar/ … saw a translated page around a
+# Persian dashboard. The English copy is what the site's language layer (i18n_site.py / i18n_ar.py) reads
+# and translates for the other languages; text that changes every run (the AI report, news headlines) is
+# marked translate="no" there, so it shows in English instead of costing a translation each run.
+IL = {
+    "fa": {"fng": "شاخص ترس و طمع", "glob": "وضعیت کل بازار", "mcap": "ارزش کل بازار", "vol": "حجم ۲۴ ساعته",
+           "opp": "اسکنر فرصت‌ها (۱ ساعته)", "coin": "کوین", "find": "یافته", "str": "قدرت", "conf": "اطمینان", "price": "قیمت",
+           "hi": "بالا", "mid": "متوسط", "agree": "✅ همه هم‌جهت", "mixed": "⚠️ یافته‌های متضاد؛ با احتیاط",
+           "none": "در حال حاضر الگوی قابل‌توجهی پیدا نشد.",
+           "scanned": "{n} کوین اسکن شد · Binance · {d} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.",
+           "imp": "کارنامهٔ کانال: آزمون در برابر ساعت‌های تصادفی", "rnd": "Binance 1h · آزمون تصادفی‌سازی",
+           "brain": "مغز بازار Entekhab", "rule": "رژیم تأییدشدهٔ BTC (۵ روز تأیید): {r}", "days": " · {n} روز در این رژیم",
+           "mean": "؛ میانگین ماندگاری ~{n} روز",
+           "mood": "حال‌وهوای ۲۴ ساعتهٔ بازار: <b>{r}</b> · پهنای بازار: {u}% صعودی، {d}% نزولی، میانگین تغییر ۲۴h {a}% (n={n}؛ ارزهای اصلی و پرحجم‌ترین جفت‌های USDT بایننس، بدون استیبل‌کوین)",
+           "ai": "گزارش هوش مصنوعی ({g}) — {d}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.",
+           "score": "امتیاز Entekhab", "mix": "تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کارنامهٔ کانال ۱۵٪ — توصیف وضعیت، نه پیش‌بینی",
+           "state": "وضعیت", "pts": "امتیاز", "news": "اخبار چندمنبعی",
+           "f_scan": "اسکنر", "f_tg": "آرشیو تلگرام", "f_ok": "سلامت سیستم",
+           "RG": {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"},
+           "RR": {"bull": "صعودی", "bear": "نزولی", "sideways": "خنثی", "high_vol": "پرنوسانِ بی‌جهت"},
+           "LBL": {"strong": "قوی", "positive": "مثبت", "neutral": "خنثی", "weak": "ضعیف", "very_weak": "خیلی ضعیف"},
+           "FNG": {}},          # the Persian copy has always shown alternative.me's own words; unchanged
+    "ckb": {"fng": "پێوەری ترس و تەماح", "glob": "دۆخی گشتیی بازاڕ", "mcap": "کۆی بەهای بازاڕ", "vol": "قەبارەی ٢٤ کاتژمێر",
+            "opp": "سکانەری دەرفەتەکان (١ کاتژمێر)", "coin": "دراو", "find": "دۆزراوە", "str": "هێز", "conf": "دڵنیایی", "price": "نرخ",
+            "hi": "بەرز", "mid": "مامناوەند", "agree": "✅ هەمووی هاوئاراستەن", "mixed": "⚠️ دۆزراوەی دژبەیەک؛ بە وریاییەوە",
+            "none": "لە ئێستادا هیچ نەخشێکی بەرچاو نەدۆزرایەوە.",
+            "scanned": "{n} دراو پشکنرا · Binance · {d} · دۆزراوە تەکنیکییەکان خۆکارن و ئامۆژگاریی کڕین یان فرۆشتن نین.",
+            "imp": "تۆماری کەناڵ: تاقیکردنەوە بەرامبەر کاتژمێرە هەڕەمەکییەکان", "rnd": "Binance 1h · تاقیکردنەوەی هەڕەمەکی",
+            "brain": "مێشکی بازاڕی Entekhab", "rule": "دۆخی پشتڕاستکراوەی BTC (پشتڕاستکردنەوەی ٥ ڕۆژ): {r}", "days": " · {n} ڕۆژ لەم دۆخەدا",
+            "mean": "؛ تێکڕای مانەوە ~{n} ڕۆژ",
+            "mood": "کەشوهەوای ٢٤ کاتژمێری بازاڕ: <b>{r}</b> · پانیی بازاڕ: {u}% بەرزبوونەوە، {d}% دابەزین، تێکڕای گۆڕانی ٢٤h {a}% (n={n}؛ دراوە سەرەکییەکان و پڕقەبارەترین جووتەکانی USDTی بایننس، بەبێ ستەیبڵکۆین)",
+            "ai": "ڕاپۆرتی AI ({g}) — {d}؛ تەنها لە داتای ئەم پەڕەیە. ئامۆژگاریی دارایی نییە.",
+            "score": "خاڵی Entekhab", "mix": "تەکنیکی ٤٠٪ · هەست ٢٥٪ · هەواڵ ٢٠٪ · تۆماری کەناڵ ١٥٪ — وەسفی دۆخە، نەک پێشبینی",
+            "state": "دۆخ", "pts": "خاڵ", "news": "هەواڵ لە چەند سەرچاوەوە",
+            "f_scan": "سکانەر", "f_tg": "ئەرشیڤی تێلێگرام", "f_ok": "تەندروستیی سیستەم",
+            "RG": {"bull": "بەرزبوونەوە", "bear": "دابەزین", "sideways": "ڕەنج / مامناوەند", "high_volatility": "هەڵاوسانی زۆر"},
+            "RR": {"bull": "بەرزبوونەوە", "bear": "دابەزین", "sideways": "مامناوەند", "high_vol": "هەڵاوسانی بێ ئاراستە"},
+            "LBL": {"strong": "بەهێز", "positive": "ئەرێنی", "neutral": "مامناوەند", "weak": "لاواز", "very_weak": "زۆر لاواز"},
+            "FNG": {"Extreme Fear": "ترسی زۆر", "Fear": "ترس", "Neutral": "مامناوەند", "Greed": "تەماح", "Extreme Greed": "تەماحی زۆر"}},
+    "en": {"fng": "Fear & Greed index", "glob": "The whole market", "mcap": "Total market cap", "vol": "24h volume",
+           "opp": "Opportunity scanner (1h)", "coin": "Coin", "find": "Finding", "str": "Strength", "conf": "Confidence", "price": "Price",
+           "hi": "High", "mid": "Medium", "agree": "✅ all point the same way", "mixed": "⚠️ conflicting findings; take care",
+           "none": "No notable pattern right now.",
+           "scanned": "{n} coins scanned · Binance · {d} · Technical findings are automatic and are not a buy or sell recommendation.",
+           "imp": "The channel's record: tested against random hours", "rnd": "Binance 1h · randomisation test",
+           "brain": "Entekhab market brain", "rule": "Confirmed BTC regime (5-day confirmation): {r}", "days": " · {n} days in this regime",
+           "mean": "; it usually lasts ~{n} days",
+           "mood": "Market mood over 24 hours: {r} · breadth: {u}% rising, {d}% falling, average 24h change {a}% (n={n}; major coins and Binance's highest-volume USDT pairs, no stablecoins)",
+           "ai": "AI report ({g}) — {d}; written only from the data on this page. Not financial advice.",
+           "score": "Entekhab score", "mix": "Technicals 40% · sentiment 25% · news 20% · channel record 15% — a description of the state, not a forecast",
+           "state": "State", "pts": "Score", "news": "News from many sources",
+           "f_scan": "Scanner", "f_tg": "Telegram archive", "f_ok": "System health",
+           "RG": {"bull": "bullish", "bear": "bearish", "sideways": "range / neutral", "high_volatility": "high volatility"},
+           "RR": {"bull": "bull", "bear": "bear", "sideways": "neutral", "high_vol": "volatile, no direction"},
+           "LBL": {"strong": "strong", "positive": "positive", "neutral": "neutral", "weak": "weak", "very_weak": "very weak"},
+           "FNG": {}},
+}
+OPP_L = {"ckb": {"rsi_oversold": "RSI فرۆشتنی زۆر", "rsi_overbought": "RSI کڕینی زۆر", "ema_golden_cross": "یەکتربڕینی زێڕینی EMA20/50",
+                 "ema_death_cross": "یەکتربڕینی مردنی EMA20/50", "breakout_up": "شکاندنی بەرزترینی ٤٨ کاتژمێر", "breakdown": "شکاندنی نزمترینی ٤٨ کاتژمێر",
+                 "volume_spike": "بازدانی قەبارە", "bull_divergence": "لادانی ئەرێنی RSI", "bear_divergence": "لادانی نەرێنی RSI"},
+         "en": {"rsi_oversold": "RSI oversold", "rsi_overbought": "RSI overbought", "ema_golden_cross": "EMA20/50 golden cross",
+                "ema_death_cross": "EMA20/50 death cross", "breakout_up": "48h high breakout", "breakdown": "48h low breakdown",
+                "volume_spike": "Volume spike", "bull_divergence": "RSI bullish divergence", "bear_divergence": "RSI bearish divergence"}}
+TESTED_L = {
+    "ckb": ("تاقیکردنەوەی تۆماری کەناڵ هێشتا داتای نییە.", "تۆماری تاقیکراوە", "جیاوازییەکە لە ڕووی ئامارییەوە واتادارە",
+            "هێشتا جیاوازییەکی پێوانەکراو لەگەڵ کاتژمێرە هەڕەمەکییەکان نابینرێت",
+            "لە تاقیکردنەوەی {n} پۆستی کەناڵدا، بیتکۆین ٢٤ کاتژمێر دوای پۆستەکان بە تێکڕا <b>{o}</b> و لە کاتژمێرە هەڕەمەکییە هاوتاکاندا <b>{b}</b> جووڵا (p = {p}) — {v}. تێکڕای خاوی جووڵە دوای پۆستەکان بەبێ بەراورد لەگەڵ بازاڕ چەواشەکارە.",
+            "تۆماری تاقیکراوەی کەناڵ"),
+    "en": ("The channel's record test has no data yet.", "Tested record", "the difference is statistically significant",
+           "no measurable difference from random hours yet",
+           "Across {n} tested channel posts, BTC moved {o} on average 24 hours after a post and {b} at matched random hours (p = {p}) — {v}. The raw average move after posts is misleading without that comparison.",
+           "The channel's tested record"),
+}
+
+
+def tested_line_l(lg, tr=None):
+    """tested_line() in Sorani or English (the Persian stays in tested_line, which other pages use)"""
+    if lg == "fa":
+        return tested_line(tr)
+    tr = trackrec if tr is None else tr
+    nd, link1, sig_t, ns_t, body, link2 = TESTED_L[lg]
+    t = ((tr.get("test") or {}).get("r24") or {})
+    o, b = (tr.get("obs") or {}).get("r24"), (tr.get("base") or {}).get("r24")
+    if t.get("p") is None or o is None or b is None:
+        return f'<p class="txt">{nd} <a href="/track-record/">{link1}</a></p>'
+    v = sig_t if t["p"] < 0.05 else ns_t
+    return ('<p class="txt">' + body.format(n=tr.get("n_posts", "—"), o=f"{o:+.2f}%", b=f"{b:+.2f}%", p=f'{t["p"]:.2f}', v=v)
+            + f' <a href="/track-record/">{link2}</a></p>')
+
+
+def _intel(lg):
+    """the dashboard boxes in one language -> {box: html}"""
+    T, m, out = IL[lg], market, {}
+    opp_n = OPP_FA if lg == "fa" else OPP_L[lg]
+    nt = ' translate="no"' if lg == "en" else ""          # changes every run: shown as is, never queued for translation
     if m.get("fng"):
         f = m["fng"]
-        out["fng"] = f'<h3>شاخص ترس و طمع</h3><div class="big">{f["value"]}</div><p>{e(f["class"])}</p><p class="disc">alternative.me</p>'
+        out["fng"] = f'<h3>{T["fng"]}</h3><div class="big">{f["value"]}</div><p>{e(T["FNG"].get(f["class"], f["class"]))}</p><p class="disc">alternative.me</p>'
     if m.get("global"):
         g = m["global"]
-        out["glob"] = ('<h3>وضعیت کل بازار</h3><table class="otab">'
-                       f'<tr><td>ارزش کل بازار</td><td class="num">${g["mcap"]/1e12:.2f}T ({g["mcap_chg24"]:+}%)</td></tr>'
-                       f'<tr><td>حجم ۲۴ ساعته</td><td class="num">${g["vol"]/1e9:.1f}B</td></tr>'
-                       f'<tr><td>دامیننس BTC</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>دامیننس ETH</td><td class="num">{g["eth_d"]}%</td></tr></table><p class="disc">CoinGecko</p>')
+        out["glob"] = (f'<h3>{T["glob"]}</h3><table class="otab">'
+                       f'<tr><td>{T["mcap"]}</td><td class="num">${g["mcap"]/1e12:.2f}T ({g["mcap_chg24"]:+}%)</td></tr>'
+                       f'<tr><td>{T["vol"]}</td><td class="num">${g["vol"]/1e9:.1f}B</td></tr>'
+                       f'<tr><td>BTC dominance</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>ETH dominance</td><td class="num">{g["eth_d"]}%</td></tr></table><p class="disc">CoinGecko</p>'
+                       if lg == "en" else
+                       f'<h3>{T["glob"]}</h3><table class="otab">'
+                       f'<tr><td>{T["mcap"]}</td><td class="num">${g["mcap"]/1e12:.2f}T ({g["mcap_chg24"]:+}%)</td></tr>'
+                       f'<tr><td>{T["vol"]}</td><td class="num">${g["vol"]/1e9:.1f}B</td></tr>'
+                       + (f'<tr><td>دامیننس BTC</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>دامیننس ETH</td><td class="num">{g["eth_d"]}%</td></tr>' if lg == "fa" else
+                          f'<tr><td>باڵادەستیی BTC</td><td class="num">{g["btc_d"]}%</td></tr><tr><td>باڵادەستیی ETH</td><td class="num">{g["eth_d"]}%</td></tr>')
+                       + '</table><p class="disc">CoinGecko</p>')
     ops = m.get("opportunities", [])
     # one row per coin (a coin often trips several detectors at once); the strongest finding leads, the rest follow
     by_coin = {}
@@ -1046,34 +1147,51 @@ def intel_html():
         by_coin.setdefault(o["coin"], []).append(o)
     groups = [sorted(g, key=lambda o: (o["confidence"] != "high", -(o.get("strength") or 0))) for g in by_coin.values()]
     groups.sort(key=lambda g: (g[0]["confidence"] != "high", -(g[0].get("strength") or 0)))
-    rows = "".join(f'<tr><td><a href="/coins/{g[0]["coin"].lower()}/">{g[0]["coin"]}</a></td><td>{OPP_FA.get(g[0]["type"], g[0]["type"])}'
-                   + (f'<small> + {"، ".join(OPP_FA.get(x["type"], x["type"]) for x in g[1:])} — '
-                      + ("✅ همه هم‌جهت" if all(x.get("dir") == g[0].get("dir") for x in g[1:]) else "⚠️ یافته‌های متضاد؛ با احتیاط")
+    sep = ", " if lg == "en" else "، "
+    rows = "".join(f'<tr><td><a href="/coins/{g[0]["coin"].lower()}/">{g[0]["coin"]}</a></td><td>{opp_n.get(g[0]["type"], g[0]["type"])}'
+                   + (f'<small> + {sep.join(opp_n.get(x["type"], x["type"]) for x in g[1:])} — '
+                      + (T["agree"] if all(x.get("dir") == g[0].get("dir") for x in g[1:]) else T["mixed"])
                       + '</small>' if len(g) > 1 else "")  # confirmations are not shown in this table, so nothing repeats
-                   + f'</td><td class="num">{g[0]["strength"]}</td><td>{"بالا" if g[0]["confidence"] == "high" else "متوسط"}</td><td class="num">{fmt_price(g[0]["price"])}</td></tr>' for g in groups[:14])
+                   + f'</td><td class="num">{g[0]["strength"]}</td><td>{T["hi"] if g[0]["confidence"] == "high" else T["mid"]}</td><td class="num">{fmt_price(g[0]["price"])}</td></tr>' for g in groups[:14])
     coins = "".join(f'<td><a href="/coins/{c["coin"].lower()}/">{c["coin"]}</a><div class="num">{c["chg24"]:+}%</div><div class="num">RSI {c["rsi"]}</div></td>' for c in m.get("coins", [])[:10] if c.get("chg24") is not None)
-    out["opp"] = ('<h3>اسکنر فرصت‌ها (۱ ساعته)</h3>' + (f'<table class="otab"><tr><th>کوین</th><th>یافته</th><th>قدرت</th><th>اطمینان</th><th>قیمت</th></tr>{rows}</table>' if rows else '<p class="disc">در حال حاضر الگوی قابل‌توجهی پیدا نشد.</p>')
-                  + f'<div class="tsc"><table class="otab"><tr>{coins}</tr></table></div><p class="disc">{m.get("scanned", len(m.get("coins", [])))} کوین اسکن شد · Binance · {fmt_date(m.get("updated_at",""))} · یافته‌های تکنیکال خودکارند و توصیهٔ خرید یا فروش نیستند.</p>')
-    out["imp"] = '<h3>کارنامهٔ کانال: آزمون در برابر ساعت‌های تصادفی</h3>' + tested_line() + '<p class="disc">Binance 1h · آزمون تصادفی‌سازی</p>'
+    out["opp"] = (f'<h3>{T["opp"]}</h3>' + (f'<table class="otab"><tr><th>{T["coin"]}</th><th>{T["find"]}</th><th>{T["str"]}</th><th>{T["conf"]}</th><th>{T["price"]}</th></tr>{rows}</table>' if rows else f'<p class="disc">{T["none"]}</p>')
+                  + f'<div class="tsc"><table class="otab"><tr>{coins}</tr></table></div><p class="disc">'
+                  + T["scanned"].format(n=m.get("scanned", len(m.get("coins", []))), d=fmt_date(m.get("updated_at", ""))) + '</p>')
+    out["imp"] = f'<h3>{T["imp"]}</h3>' + tested_line_l(lg) + f'<p class="disc">{T["rnd"]}</p>'
     if brain.get("regime"):
-        RG = {"bull": "صعودی", "bear": "نزولی", "sideways": "رنج / خنثی", "high_volatility": "نوسان بالا"}
         r, b = brain["regime"], brain["regime"]["breadth"]
-        rp = (brain.get("report") or {}).get("fa")
-        RR = {"bull": "صعودی", "bear": "نزولی", "sideways": "خنثی", "high_vol": "پرنوسانِ بی‌جهت"}
+        rep = brain.get("report") or {}
+        rp = rep.get(lg) or rep.get("en") or rep.get("fa")
         rad = brain.get("radar") or {}
-        lead = (f'<p><b>رژیم تأییدشدهٔ BTC (۵ روز تأیید): {RR.get(rad["rule"], rad["rule"])}</b>'
-                + (f' · {rad["days_in"]} روز در این رژیم' if rad.get("days_in") else "")
-                + (f'؛ میانگین ماندگاری ~{round(rad["mean_days"])} روز' if rad.get("mean_days") else "") + '</p>') if rad.get("rule") else ""
-        out["brain"] = (f'<h3>مغز بازار Entekhab</h3>{lead}<p>حال‌وهوای ۲۴ ساعتهٔ بازار: <b>{RG[r["regime"]]}</b> · پهنای بازار: {b["up_pct"]}% صعودی، {b["down_pct"]}% نزولی، میانگین تغییر ۲۴h {b["avg_chg24"]}% (n={b["n"]}؛ ارزهای اصلی و پرحجم‌ترین جفت‌های USDT بایننس، بدون استیبل‌کوین)</p>'
-                        + (f'<div><b>{e(big(rp["headline"]))}</b><p style="white-space:pre-wrap">{e(big(rp["body"]))}</p><p class="disc">گزارش هوش مصنوعی ({e(brain.get("report_engine",""))}) — {fmt_date(brain.get("report_at",""))}؛ فقط از داده‌های همین صفحه. توصیهٔ مالی نیست.</p></div>' if rp else ""))
+        tail = ((T["days"].format(n=rad["days_in"]) if rad.get("days_in") else "")
+                + (T["mean"].format(n=round(rad["mean_days"])) if rad.get("mean_days") else ""))
+        rule = T["rule"].format(r=T["RR"].get(rad.get("rule"), rad.get("rule")))
+        # English is one sentence in one text node, so the language layer translates it whole (word order differs)
+        lead = ((f'<p><b>{rule}{tail}</b></p>' if lg == "en" else f'<p><b>{rule}</b>{tail}</p>') if rad.get("rule") else "")
+        mood = T["mood"].format(r=T["RG"].get(r["regime"], r["regime"]), u=b["up_pct"], d=b["down_pct"], a=b["avg_chg24"], n=b["n"])
+        out["brain"] = (f'<h3>{T["brain"]}</h3>{lead}<p>{mood}</p>'
+                        + (f'<div><b{nt}>{e(big(rp["headline"], lg))}</b><p{nt} style="white-space:pre-wrap">{e(big(rp["body"], lg))}</p>'
+                           f'<p class="disc">{T["ai"].format(g=e(brain.get("report_engine", "")), d=fmt_date(brain.get("report_at", "")))}</p></div>' if rp else ""))
     arr = sorted(SC.items(), key=lambda kv: -kv[1]["score"])
     if arr:
-        out["score"] = '<h3>امتیاز Entekhab</h3><p class="disc">تکنیکال ۴۰٪ · احساسات ۲۵٪ · اخبار ۲۰٪ · کارنامهٔ کانال ۱۵٪ — توصیف وضعیت، نه پیش‌بینی</p><table class="otab"><tr><th>کوین</th><th>امتیاز</th><th>وضعیت</th></tr>' + "".join(
-            f'<tr><td><a href="/coins/{k.lower()}/">{k}</a></td><td class="num">{v["score"]}</td><td>{LBL[v["label"]]}</td></tr>' for k, v in arr[:12]) + "</table>"
+        out["score"] = (f'<h3>{T["score"]}</h3><p class="disc">{T["mix"]}</p><table class="otab"><tr><th>{T["coin"]}</th><th>{T["pts"]}</th><th>{T["state"]}</th></tr>' + "".join(
+            f'<tr><td><a href="/coins/{k.lower()}/">{k}</a></td><td class="num">{v["score"]}</td><td>{T["LBL"].get(v["label"], v["label"])}</td></tr>' for k, v in arr[:12]) + "</table>")
     if news.get("items"):
-        out["news"] = '<h3>اخبار چندمنبعی</h3><ul class="list">' + "".join(news_li(i) for i in news["items"][:15]) + "</ul>"
+        out["news"] = f'<h3>{T["news"]}</h3><ul class="list"{nt}>' + "".join(news_li(i) for i in news["items"][:15]) + "</ul>"
     h = load("health.json", {})
-    out["fresh"] = f'<span>اسکنر: {fmt_date(m.get("updated_at",""))}</span><span>آرشیو تلگرام: {fmt_date(meta.get("updated_at",""))}</span><span>سلامت سیستم: {e(h.get("status","—"))}</span>'
+    out["fresh"] = (f'<span>{T["f_scan"]}: {fmt_date(m.get("updated_at",""))}</span><span>{T["f_tg"]}: {fmt_date(meta.get("updated_at",""))}</span>'
+                    f'<span>{T["f_ok"]}: {e(h.get("status","—"))}</span>')
+    return out
+
+
+def intel_html():
+    """{box: three copies} — Persian shown, Sorani and English hidden until the reader's language picks one"""
+    per = {lg: _intel(lg) for lg in ("fa", "ckb", "en")}
+    out = {}
+    for k in per["fa"]:
+        out[k] = (f'<div data-lang="fa">{per["fa"][k]}</div>'
+                  f'<div data-lang="ckb" hidden>{per["ckb"].get(k, per["fa"][k])}</div>'
+                  f'<div data-lang="en" lang="en" dir="ltr" hidden>{per["en"].get(k, "")}</div>')
     return out
 
 
@@ -1163,8 +1281,12 @@ def prerender():
     open(idx, "w", encoding="utf-8").write(s)
     # /dashboard/
     css_x = ".big{font-size:2.4rem;font-weight:700;font-family:'Space Grotesk',monospace}.tsc,.ibox{overflow-x:auto;-webkit-overflow-scrolling:touch}.otab{width:100%;border-collapse:collapse}.otab td,.otab th{padding:8px;border-bottom:1px solid var(--line);text-align:start}.num{direction:ltr;unicode-bidi:isolate}.disc{color:var(--mute);font-size:.8rem}.fresh span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin:3px;display:inline-block;font-size:.8rem;color:var(--mute)}.ibox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin:10px 0}"
-    body = f'<h1>داشبورد هوشمند بازار</h1>{regime_hero()}<div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
-    urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body, f"<style>{css_x}{RH_CSS}</style>")]
+    css_x += "#fresh>[data-lang],.fresh>[data-lang]{display:contents}.fresh>[data-lang][hidden],.ibox>[data-lang][hidden]{display:none!important}"
+    h1 = ('<h1><span data-lang="fa">داشبورد هوشمند بازار</span><span data-lang="ckb" hidden>داشبۆردی زیرەکی بازاڕ</span>'
+          '<span data-lang="en" lang="en" dir="ltr" hidden>Smart market dashboard</span></h1>')
+    body = f'{h1}{regime_hero()}<div class="fresh">{it["fresh"]}</div>' + "".join(f'<div class="ibox">{it.get(k,"")}</div>' for k in ("brain", "score", "fng", "glob", "opp", "news", "imp"))
+    urls = [page("dashboard/", "داشبورد هوشمند بازار کریپتو", "اسکنر خودکار فرصت‌ها، شاخص ترس و طمع، وضعیت کل بازار و کارنامهٔ واقعی تحلیل‌ها", body,
+                 f"<style>{css_x}{RH_CSS}</style><script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}}})</script>")]
     # /categories/<id>/ and its pages — before this, each category listed only its newest 200 posts, so the older
     # ones were reachable from the sitemap alone: an archive no reader and no crawler could walk into (SEO brief,
     # action 3). Now every post sits on a numbered page, and each page carries prev/next and its own canonical.
