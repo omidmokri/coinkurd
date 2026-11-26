@@ -111,7 +111,7 @@ def main():
             seen_models = []
             ai.generate_with = lambda api_key, prompt, *a, **k: (seen_models.append(a[5] if len(a) > 5 else None),
                                                                  gen_with(api_key, prompt))[1]
-            os.environ["I18N_SITE_MODELS"] = "fake-model-2"
+            os.environ["I18N_SITE_MODELS"] = "fake-model,fake-model-2"
             shutil.rmtree(S.CACHE, ignore_errors=True)
             cnt3 = {}
             S.fill(["ru"], set(big), set(), 3, 60, ["k1", "k2"], log=lambda *a: None, counter=cnt3)

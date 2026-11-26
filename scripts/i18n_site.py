@@ -346,14 +346,20 @@ def plan(langs, need, common, limit):
 
 
 def models():
-    """the models the site's translation spreads over: this run's own, then those named in I18N_SITE_MODELS"""
+    """the models the site's translation spreads over: I18N_SITE_MODELS when it is set (the first is the one held to
+    the site's share of the day), otherwise this run's own model
+
+    The run's own model is whatever data/ai_model.json picked last; at 09:00 on 2026-11-26 that was a flash model
+    whose free day ended after one call a key, which left the chain with no key and stopped it. The site names the
+    flash-lite models, whose free day is long enough for a batch of 120 strings at a time.
+    """
     import ai  # noqa: E402
-    out = [ai.model()]
+    out = []
     for m in (os.environ.get("I18N_SITE_MODELS") or "").split(","):
         m = m.strip()
         if m and m not in out:
             out.append(m)
-    return out
+    return out or [ai.model()]
 
 
 def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=None):
@@ -568,7 +574,7 @@ def more_after(langs, need, used, pool_n, ai):
         s = load(code)
         bad = {k for k, n in load_fails(code).items() if n >= FAIL_MAX}
         waiting += sum(1 for k in need if k not in s and k not in bad)
-    live = len(ai.live_keys()) if hasattr(ai, "live_keys") else 1
+    live = (len({k for m in models() for k in ai.live_keys(m)}) if hasattr(ai, "live_keys") else 1)
     more = used > 0 and left > 0 and live > 0 and waiting > 0
     print(f"i18n_site: {waiting:,} strings still waiting, {max(0, left)} calls left for the site now, "
           f"{live} key(s) live -> {'another run next' if more else 'no chained run'}")
@@ -633,7 +639,7 @@ def main():
                 fill(langs, need, common | home, requests_max, a.seconds, pool[:jobs], counter=c)
             finally:
                 pro_l10n.quota_add(c.get("used", 0), who="site")
-            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s) on {ai.model()}, "
+            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s) on {models()[0]}, "
                   f"{c.get('other', 0)} more on {', '.join(models()[1:]) or 'no other model'}"
                   f" ({c.get('limited', 0)} turned away as too many a minute, not counted)")
             more_after(langs, need, c.get("used", 0) + c.get("other", 0), len(pool), ai)
