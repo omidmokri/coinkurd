@@ -140,19 +140,19 @@
   /* Europa's ice: pale plains crossed by the reddish double ridges (lineae) and blotches of chaos terrain */
   function iceTex(GW, GH) {
     var c = mk(GW, GH), x = c.getContext('2d');
-    var gr = x.createLinearGradient(0, 0, 0, GH); gr.addColorStop(0, '#9fb3c6'); gr.addColorStop(1, '#e2ebf2');
+    var gr = x.createLinearGradient(0, 0, 0, GH); gr.addColorStop(0, '#3e5064'); gr.addColorStop(1, '#7f93a7');
     x.fillStyle = gr; x.fillRect(0, 0, GW, GH);
     var i, k;
     for (i = 0; i < 26; i++) {
       var bx = rnd() * GW, by = rnd() * GH, br = 20 + rnd() * 70, bg = x.createRadialGradient(bx, by, 0, bx, by, br);
-      bg.addColorStop(0, 'rgba(150,96,74,.34)'); bg.addColorStop(1, 'rgba(150,96,74,0)'); x.fillStyle = bg; x.fillRect(bx - br, by - br, br * 2, br * 2);
+      bg.addColorStop(0, 'rgba(120,70,54,.4)'); bg.addColorStop(1, 'rgba(150,96,74,0)'); x.fillStyle = bg; x.fillRect(bx - br, by - br, br * 2, br * 2);
     }
     x.lineCap = 'round';
     for (i = 0; i < 46; i++) {
       var px = rnd() * GW, py = rnd() * GH, ang = rnd() * TAU, len = 60 + rnd() * 420, pts = [];
       for (k = 0; k < 18; k++) { pts.push([px, py]); ang += (rnd() - .5) * .35; px += Math.cos(ang) * len / 18; py += Math.sin(ang) * len / 18 * .6; }
       var wd = .8 + rnd() * 2.4;
-      [[wd * 2.4, 'rgba(140,74,52,.38)'], [wd * .7, 'rgba(244,236,226,.55)']].forEach(function (s) {
+      [[wd * 2.4, 'rgba(120,60,44,.42)'], [wd * .7, 'rgba(200,214,226,.3)']].forEach(function (s) {
         x.strokeStyle = s[1]; x.lineWidth = s[0]; x.beginPath(); x.moveTo(pts[0][0], pts[0][1]);
         for (var q = 1; q < pts.length; q++) x.lineTo(pts[q][0], pts[q][1]); x.stroke();
       });
@@ -232,7 +232,12 @@
       halo(g, cx, cy, R * .9, R * 1.35, [[0, 'rgba(255,214,170,.16)'], [.4, 'rgba(155,123,255,.06)'], [1, 'rgba(155,123,255,0)']]);
       g.globalCompositeOperation = 'source-over';
       var img = turn('jup', TX.jup, -t / 95 * mv, C, .16);
-      if (img) { g.imageSmoothingEnabled = true; g.save(); if (C.rtl) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); } g.drawImage(img, cx - R, cy - R, R * 2, R * 2); g.restore(); }
+      if (img) {
+        g.imageSmoothingEnabled = true; g.save(); if (C.rtl) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+        g.drawImage(img, cx - R, cy - R, R * 2, R * 2);
+        g.globalCompositeOperation = 'lighter'; g.globalAlpha = .22; g.drawImage(img, cx - R, cy - R, R * 2, R * 2); g.restore();
+        g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+      }
       else { g.fillStyle = '#1a1420'; g.beginPath(); g.arc(cx, cy, R, 0, TAU); g.fill(); }
       /* the shadows of the moons crossing the disc */
       for (i = 0; i < pos.length; i++) if (pos[i][3]) {
@@ -243,10 +248,13 @@
       /* the rim of the atmosphere, then the polar aurora that Hubble and Webb see in ultraviolet and infrared */
       g.globalCompositeOperation = 'lighter';
       g.strokeStyle = 'rgba(255,226,190,.22)'; g.lineWidth = Math.max(1.5, R * .02); g.beginPath(); g.arc(cx, cy, R * 1.005, 0, TAU); g.stroke();
-      var ab = .5 + .5 * Math.sin(t * 1.7 * mv) * Math.sin(t * .63 * mv + 1);
-      g.save(); g.translate(cx, cy - R * .9); g.scale(1, .24);
-      g.strokeStyle = 'rgba(94,242,214,' + (.3 + .35 * ab * C.breath + .1) + ')'; g.lineWidth = R * .05; g.beginPath(); g.arc(0, 0, R * .3, 0, TAU); g.stroke();
-      g.strokeStyle = 'rgba(155,123,255,' + (.25 + .25 * ab) + ')'; g.lineWidth = R * .1; g.beginPath(); g.arc(0, 0, R * .36, 0, TAU); g.stroke();
+      /* the aurora oval sits on the pole, just over the limb: only its near half shows, flickering */
+      var ab = .55 + .45 * Math.sin(t * 1.7 * mv) * Math.sin(t * .63 * mv + 1), ax = cx + L * R * .1, ay = cy - R * .955;
+      g.save(); g.beginPath(); g.arc(cx, cy, R * 1.06, 0, TAU); g.clip(); g.translate(ax, ay); g.scale(1, .3);
+      for (var au = 0; au < 3; au++) {
+        g.strokeStyle = au === 0 ? 'rgba(94,242,214,' + (.22 + .3 * ab) + ')' : au === 1 ? 'rgba(124,200,255,' + (.12 + .14 * ab) + ')' : 'rgba(155,123,255,' + (.1 + .12 * ab * C.breath) + ')';
+        g.lineWidth = R * (.012 + au * .02); g.beginPath(); g.arc(0, 0, R * (.17 + au * .015), Math.PI * .05, Math.PI * .95); g.stroke();
+      }
       g.restore();
       g.globalCompositeOperation = 'source-over';
       for (i = 0; i < pos.length; i++) if (pos[i][3]) moon(g, pos[i][0], pos[i][1], pos[i][2], pos[i][4], -L);
@@ -395,7 +403,7 @@
         }
       }
       /* lit by Jupiter: blue night, brighter towards the planet, dark at the horizon */
-      var sh = g.createLinearGradient(0, hz, 0, H); sh.addColorStop(0, 'rgba(4,8,22,.82)'); sh.addColorStop(.25, 'rgba(8,16,40,.6)'); sh.addColorStop(1, 'rgba(10,20,50,.38)');
+      var sh = g.createLinearGradient(0, hz, 0, H); sh.addColorStop(0, 'rgba(4,8,22,.9)'); sh.addColorStop(.25, 'rgba(6,12,32,.72)'); sh.addColorStop(1, 'rgba(8,16,40,.55)');
       g.fillStyle = sh; g.fillRect(0, hz, W, H - hz);
       var side = g.createLinearGradient(X(C, 1), 0, X(C, 0), 0); side.addColorStop(0, 'rgba(255,214,170,.12)'); side.addColorStop(1, 'rgba(255,214,170,0)');
       g.fillStyle = side; g.fillRect(0, hz, W, H - hz);

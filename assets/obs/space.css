@@ -96,3 +96,7 @@ html.ob-space .ob-stage,html.ob-space .ob-mapbox,html.ob-space .ob-tsbox,html.ob
 .ek-mo[aria-pressed=true]{color:#5ef2d6}
 .ek-mo svg{flex:0 0 auto}
 @media print{.ek-mo,.ob-sky{display:none!important}}
+
+/* in the pages with a world of their own (assets/obs/worlds.js) the glass is a little clearer, so the planet behind it shows;
+   the charts keep their own dark ground */
+html.ob-space[data-world]:not([data-world=deep]) #ob{background:linear-gradient(170deg,rgba(12,16,42,.5),rgba(4,6,20,.4))}

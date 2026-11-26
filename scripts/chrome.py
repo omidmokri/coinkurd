@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "26"  # bump to bust caches of chrome.css / chrome.js
+VER = "27"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -480,7 +480,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "10"
-NX_VER = "19"
+NX_VER = "20"
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the

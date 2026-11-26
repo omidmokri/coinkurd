@@ -348,6 +348,44 @@ html[lang=en] .nxw-h{font-family:'Archivo Black','Space Grotesk',sans-serif;font
 .nxw-list button:focus-visible,.nxw-all:focus-visible{outline:2px solid var(--nx-gold);outline-offset:2px;border-radius:10px}
 @media (max-width:1099px){.nxw-cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:820px){.nxw{padding:30px 14px 26px}.nxw-cols{grid-template-columns:minmax(0,1fr);gap:12px}.nxw-col{padding:14px 14px 6px;border-radius:20px}.nxw-k li{min-width:0;flex:1 1 40%}}
+/* owner 2026-11-26: what matters most, before the channel's newest posts */
+.nxw{padding-top:20px}
+.nxi{position:relative;max-width:1320px;margin:0 auto;padding:56px clamp(16px,2.4vw,34px) 8px;font-family:var(--ek-font);color:#fff}
+.nxi *{box-sizing:border-box}
+.nxi-h{margin:0;font:900 clamp(1.5rem,3vw,2.4rem)/1.3 'Vazirmatn','Space Grotesk',sans-serif;color:#fff}
+html[lang=en] .nxi-h{font-family:'Archivo Black','Space Grotesk',sans-serif;font-weight:400;letter-spacing:-.02em}
+.nxi-l{margin:6px 0 0;max-width:62ch;font-size:.92rem;line-height:1.9;color:rgba(255,255,255,.62)}
+.nxi-feat{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:16px;margin-top:22px}
+.nxi-feat:empty{display:none}
+.nxi-f{position:relative;display:flex;flex-direction:column;min-width:0;padding:0;border:1px solid rgba(255,255,255,.1);border-radius:24px;overflow:hidden;background:var(--nx-glass),#060607;color:#fff;text-align:start;font-family:var(--ek-font);cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:transform .35s var(--nx-e),border-color .25s,box-shadow .35s}
+.nxi-f:hover,.nxi-f:focus-visible{transform:translateY(-3px);border-color:rgba(247,147,26,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 44px rgba(0,0,0,.5),0 0 0 1px rgba(247,147,26,.18)}
+.nxi-f:focus-visible{outline:2px solid var(--nx-gold);outline-offset:3px}
+.nxi-im{position:relative;display:block;aspect-ratio:16/9;background:radial-gradient(120% 90% at 30% 20%,rgba(247,147,26,.22),rgba(10,10,14,1) 70%)}
+.nxi-im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--nx-e)}
+.nxi-f:hover .nxi-im img{transform:scale(1.04)}
+.nxi-im::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(6,6,7,.85))}
+.nxi-tx{display:flex;flex-direction:column;gap:6px;padding:14px 18px 18px}
+.nxi-tx small{font-size:.74rem;color:var(--nx-gold)}
+.nxi-tx b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:1.02rem;font-weight:800;line-height:1.75}
+.nxi-f.big .nxi-tx b{font-size:1.2rem}
+.nxi-ess{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.nxi-e{display:flex;align-items:center;gap:14px;min-width:0;padding:16px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#fff;text-decoration:none;transition:border-color .25s,background .25s,transform .35s var(--nx-e)}
+.nxi-e:hover,.nxi-e:focus-visible{border-color:rgba(255,210,122,.5);background:rgba(247,147,26,.08);transform:translateY(-2px)}
+.nxi-e:focus-visible{outline:2px solid var(--nx-gold);outline-offset:2px}
+.nxi-e>i{flex:0 0 46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(150deg,rgba(247,147,26,.22),rgba(247,147,26,.05));color:var(--nx-gold)}
+.nxi-e>i svg{width:24px;height:24px}
+.nxi-e>span{display:flex;flex-direction:column;gap:3px;min-width:0}
+.nxi-e b{font-size:.98rem;font-weight:800;line-height:1.5}
+.nxi-e small{font-size:.8rem;line-height:1.7;color:rgba(255,255,255,.58)}
+@media (max-width:1099px){.nxi-feat{grid-template-columns:1fr 1fr}.nxi-f.big{grid-column:1/-1}.nxi-ess{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.nxi{padding:34px 14px 4px}.nxi-feat{grid-template-columns:minmax(0,1fr);gap:12px}.nxi-f{border-radius:20px}.nxi-ess{grid-template-columns:minmax(0,1fr);gap:10px}.nxi-e{padding:13px 14px}}
+@media (prefers-reduced-motion:reduce){.nxi-f,.nxi-e,.nxi-im img{transition:none}.nxi-f:hover,.nxi-e:hover{transform:none}.nxi-f:hover .nxi-im img{transform:none}}
+/* the morning panel's rows: a dot of colour for each kind */
+.nx-td .nx-fl li::before{content:"";flex:0 0 6px;height:6px;border-radius:50%;align-self:center;background:var(--nx-gold)}
+.nx-td .nx-fl li.ev::before{background:#7cc8ff}.nx-td .nx-fl li.wh::before{background:#5ef2d6}.nx-td .nx-fl li.nw::before{background:var(--nx-or)}
+.nx-td .nx-fl li small{color:rgba(255,210,122,.75)}
+.nx-td .nx-fl{margin-bottom:6px}
 
 /* the rail: every room of the homepage, always within reach */
 #nxr{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:156;display:flex;align-items:center;gap:2px;max-width:calc(100vw - 24px);padding:5px;border-radius:18px;overflow-x:auto;scrollbar-width:none;

@@ -15,6 +15,8 @@
   /* the swap page (/swap/): two arrows passing each other */
   var SWAP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14m0 0-3.5-3.5M18 8l-3.5 3.5M20 16H6m0 0 3.5 3.5M6 16l3.5-3.5"/></svg>';
   var SWORDS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2"/></svg>';
+  /* the morning panel: the sun over the horizon */
+  var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 5v3M4.6 9.6l2 2M19.4 9.6l-2 2M7 22h10"/></svg>';
   var DEF = [
     /* owner 2026-11-24: the eight panels carry the best of the site. One side is the market as it moves, the other is
        what a reader does here: swap, read, learn. Two pages of their own (the swap, the battle) took the places of
@@ -25,7 +27,12 @@
     { id: 'battle', col: 'a', href: '/battle/', s: ['نبرد من', 'شەڕی من', 'My Battle'],
       chips: [['اوردربوک', 'ئۆردەربووک', 'Order book'], ['معاملات زنده', 'مامەڵەی زیندوو', 'Live trades'], ['لیکوئیدها', 'لیکویدەکان', 'Liquidations']],
       line: ['گاوها در برابر خرس‌ها · سه‌بعدی', 'گاکان بەرامبەر ورچەکان · سێ‌ڕەهەندی', 'Bulls against bears · in 3D'] },
-    { id: 'feed', col: 'b', s: ['آرشیو', 'ئەرشیف', 'Archive'], own: [['آرشیو پست‌های کانال', 'ئەرشیفی پۆستەکانی کەناڵ', 'Channel archive']] },
+    /* owner 2026-11-26: "what does a posts archive mean, the visitor has not even started yet". The first panel of this
+       side is the visitor's morning instead: the next market-moving release, what the whales moved in a day, and the
+       newest headline, with the whole day one tap away (/today/). The archive stays a room, reached from the wire. */
+    { id: 'today', col: 'b', href: '/today/', live: 1, s: ['امروزِ تو، در یک نگاه', 'ئەمڕۆی تۆ، بە یەک نیگا', 'Your day at a glance'],
+      line: ['همهٔ ۲۴ ساعت در یک صفحه', 'هەموو ٢٤ کاتژمێر لە یەک پەڕەدا', 'The whole 24 hours on one page'] },
+    { id: 'feed', np: 1, s: ['آرشیو', 'ئەرشیف', 'Archive'] },
     { id: 'swap', col: 'b', href: '/swap/', s: ['تبدیل رمزارز', 'گۆڕینەوەی دراو', 'Swap'],
       chips: [['بیت‌کوین', 'بیتکۆین', 'Bitcoin'], ['ترون', 'ترۆن', 'Tron'], ['سولانا', 'سۆلانا', 'Solana'], ['اتریوم و BNB', 'ئیتریۆم و BNB', 'Ethereum & BNB']],
       line: ['۴۶ شبکه · از کیف پول خودتان', '٤٦ تۆڕ · لە جزدانی خۆتەوە', '46 networks · from your own wallet'] },
@@ -73,9 +80,9 @@
   var rail = BEST.map(function (B) { return '<a href="' + B[0] + '">' + tri(B[1], B[2], B[3]) + '</a>'; }).join('');
   DEF.forEach(function (D) {
     if (D.href) {                                   /* a page of its own: the panel is a plain link to it */
-      var hb = ''; D.chips.forEach(function (c) { hb += tri(c[0], c[1], c[2], 'span'); });
-      cols[D.col] += '<a class="nx-p nx-pg" href="' + D.href + '" data-k="' + D.id + '"><span class="nx-pt">' + tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t') + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span>' +
-        '<i class="nx-wm" aria-hidden="true">' + (D.id === 'swap' ? SWAP : SWORDS) + '</i><span class="nx-pb"><span class="nx-chips">' + hb + '</span>' + tri(D.line[0], D.line[1], D.line[2], 'span', 'nx-s') + '</span></a>';
+      var hb = ''; (D.chips || []).forEach(function (c) { hb += tri(c[0], c[1], c[2], 'span'); });
+      cols[D.col] += '<a class="nx-p nx-pg' + (D.live ? ' nx-td' : '') + '" href="' + D.href + '" data-k="' + D.id + '"><span class="nx-pt">' + tri(D.s[0], D.s[1], D.s[2], 'b', 'ekd-t') + '<i class="nx-go" aria-hidden="true">' + GO + '</i></span>' +
+        '<i class="nx-wm" aria-hidden="true">' + (D.id === 'swap' ? SWAP : D.live ? SUN : SWORDS) + '</i><span class="nx-pb">' + (D.live ? '<ul class="nx-fl" data-c="' + D.id + '"></ul>' : '<span class="nx-chips">' + hb + '</span>') + tri(D.line[0], D.line[1], D.line[2], 'span', 'nx-s') + '</span></a>';
         return;
     }
     var sec = d.getElementById(D.id); if (!sec) return;
@@ -288,16 +295,47 @@
     e = nx.querySelector('[data-s=coinswall]'); if (e) e.innerHTML = cnt('#sCoins', 'کوین', 'دراو', 'coins');
     e = nx.querySelector('[data-c=coinswall]');
     if (e && !e.firstChild) { h = ''; var seen = {}; [].forEach.call(d.querySelectorAll('#wall img'), function (im) { var s = im.getAttribute('src'); if (!s || seen[s] || Object.keys(seen).length >= 9) return; seen[s] = 1; h += '<img src="' + esc(s) + '" alt="" width="28" height="28" loading="lazy" decoding="async">'; }); e.innerHTML = h; }
-    /* archive: the newest posts and how many there are in all */
-    try {
-      var ps = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 4); h = '';
-      ps.forEach(function (p) { h += '<li><span dir="auto">' + esc(PT(p).title || '') + '</span><small>' + esc(when(p.date)) + '</small></li>'; });
-      e = nx.querySelector('[data-c=feed]'); if (e && h && e.innerHTML !== h) e.innerHTML = h;
-      e = nx.querySelector('[data-s=feed]'); var c = S.meta && S.meta.count; if (e && c) e.textContent = nfmt(c) + ' ' + pick('پست', 'پۆست', 'posts');
-    } catch (x) { }
+    /* the visitor's day: the next release that moves the market, the whales' day, the newest headline */
+    try { e = nx.querySelector('[data-c=today]'); h = todayRows(); if (e && h && e.innerHTML !== h) e.innerHTML = h; } catch (x) { }
     /* dashboard: Fear & Greed and dominance, from the page's own market data when it has arrived, else the small ticker file */
     try { var f = X.market.fng, g = X.market.global; if (f && f.value != null) gauge(+f.value, f.class); if (g && g.btc_d != null) dom(g.btc_d); } catch (x) { }
   }
+  var TD = { ev: null, wh: null, asked: 0 };
+  function tdLoad() {
+    if (TD.asked) return; TD.asked = 1; var v = Math.floor(Date.now() / 3e5);
+    function get(f, k) { fetch('/data/' + f + '.json?v=' + v).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j) { TD[k] = j; fill(); } }, function () { }); }
+    get('ecocal', 'ev'); get('whales', 'wh');
+  }
+  function soon(sec) {
+    var m = Math.round(sec / 60), hh = Math.round(sec / 3600), dd = Math.round(sec / 86400);
+    return m < 60 ? pick(dg(Math.max(m, 1)) + ' دقیقهٔ دیگر', dg(Math.max(m, 1)) + ' خولەکی تر', 'in ' + Math.max(m, 1) + ' min')
+      : hh < 36 ? pick(dg(hh) + ' ساعت دیگر', dg(hh) + ' کاتژمێری تر', 'in ' + hh + ' h')
+        : pick(dg(dd) + ' روز دیگر', dg(dd) + ' ڕۆژی تر', 'in ' + dd + ' days');
+  }
+  function usd(n) { return n >= 1e9 ? '$' + (n / 1e9).toFixed(1) + 'B' : n >= 1e6 ? '$' + Math.round(n / 1e6) + 'M' : ''; }
+  function todayRows() {
+    var h = '', now = Date.now() / 1000, L = U.lang();
+    var ev = TD.ev && TD.ev.events, nx1 = null;
+    if (ev) {
+      var up = ev.filter(function (x) { return x.t > now && x.t < now + 8 * 86400; }).sort(function (a, b) { return a.t - b.t; });
+      nx1 = up.filter(function (x) { return x.i === 'H'; })[0] || up.filter(function (x) { return x.i === 'M'; })[0] || null;
+    }
+    if (nx1) {
+      var nm = (L === 'en' ? '' : nx1.tr && nx1.tr[L === 'ckb' ? 'ckb' : 'fa']) || nx1.n;
+      h += '<li class="ev"><span dir="auto">' + esc(nm) + ' · ' + esc(nx1.c) + '</span><small>' + esc(soon(nx1.t - now)) + '</small></li>';
+    }
+    var wt = TD.wh && TD.wh.totals24, fresh = TD.wh && Date.now() - Date.parse(TD.wh.updated_at) < 6 * 36e5;
+    if (wt && fresh) {
+      var sum = 0; Object.keys(wt).forEach(function (k) { sum += +wt[k].usd || 0; });
+      if (sum) h += '<li class="wh"><span>' + esc(pick('جابه‌جایی نهنگ‌ها در ۲۴ ساعت', 'گواستنەوەی نەهەنگەکان لە ٢٤ کاتژمێردا', 'Whales moved in 24 hours')) + '</span><small>' + esc(usd(sum)) + '</small></li>';
+    }
+    try {
+      var p = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; })[0];
+      if (p) h += '<li class="nw"><span dir="auto">' + esc(PT(p).title || '') + '</span><small>' + esc(when(p.date)) + '</small></li>';
+    } catch (x) { }
+    return h;
+  }
+  setTimeout(tdLoad, 1200);
   function dom(v) { var e = nx.querySelector('[data-s=intel]'); if (e) e.textContent = pick('سهم بیت‌کوین از بازار: ', 'پشکی بیتکۆین لە بازاڕ: ', 'Bitcoin dominance: ') + dg(Number(v).toFixed(1)) + (U.lang() === 'en' ? '%' : '٪'); }
   function net(j) {
     var ul = nx.querySelector('[data-net]'); if (!ul || !j) return; var h = '', n = j.h && j.h.n;
@@ -312,6 +350,45 @@
     if (j.fng && !nx.querySelector('[data-fg] svg')) gauge(+j.fng.v, j.fng.k);
     if (j.g && j.g.btc_d != null && !nx.querySelector('[data-s=intel]').textContent) dom(j.g.btc_d);
   }
+  /* ------------------------------------------------------------------ under the stage: what matters most
+     owner 2026-11-26: "we have so many important articles on the site, put them first". Before the channel's newest
+     posts, the week's most-read deep analyses (real view counts from the channel, real pictures) and the guides that
+     stay true: the pages a first visitor should find before anything else. */
+  var ESS = [
+    ['/bitcoin/', '<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/>', ['درک بیت‌کوین', 'تێگەیشتن لە بیتکۆین', 'Understanding Bitcoin'], ['۲۱ میلیون، ۳۳ هاوینگ و فیلم آموزشی، از صفر', '٢١ ملیۆن، ٣٣ هاڵڤینگ و فیلمی فێرکاری، لە سفرەوە', '21 million, 33 halvings and a short film, from zero']],
+    ['/dossier/', '<rect x="3" y="4" width="15" height="16" rx="2"/><path d="M18 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2M7 8h7M7 12h7M7 16h4"/>', ['پرونده‌های تحلیلی', 'دۆسیە شیکارییەکان', 'Analysis dossiers'], ['تحلیل عمیق رویدادهای مهم روز', 'شیکاری قووڵی ڕووداوە گرنگەکان', "Deep dives on the day's key stories"]],
+    ['/track-record/', '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>', ['کارنامهٔ واقعی کانال', 'کارنامەی ڕاستەقینەی کەناڵ', "The channel's real record"], ['بعد از پست‌ها چه شد، بی‌سانسور و قابل‌بازبینی', 'دوای پۆستەکان چی ڕوویدا، بێ دەستکاری', 'What happened after the posts, open to check']],
+    ['/map/', '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"/>', ['نقشهٔ یادگیری', 'نەخشەی فێربوون', 'Learning map'], ['هر چیزی که باید بلد باشید، روی یک نقشه', 'هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە', 'Everything there is to learn, on one map']],
+    ['/academy/', '<path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5M22 9v6"/>', ['آکادمی کریپتو', 'ئەکادیمیای کریپتۆ', 'Crypto Academy'], ['از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز', 'لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە', 'Zero to pro, with quizzes and a simulator']],
+    ['/encyclopedia/', '<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4ZM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6Z"/>', ['دانشنامهٔ بازارهای مالی', 'زانستنامەی بازاڕە داراییەکان', 'Encyclopedia of markets'], ['۵۰۶ مدخل با فرمول و منبع', '٥٠٦ خاڵ بە فۆرموڵ و سەرچاوە', '506 entries with formulas and sources']]
+  ];
+  var imp = d.createElement('section'); imp.className = 'nxi'; imp.id = 'nxi'; imp.setAttribute('aria-labelledby', 'nxi-h');
+  imp.innerHTML = '<div class="nxi-top">' + tri('مهم‌ترین‌ها، پیش از هر چیز', 'گرنگترینەکان، پێش هەموو شتێک', 'What matters most, first', 'h2', 'nxi-h').replace('<h2 ', '<h2 id="nxi-h" ') +
+    tri('پرخواننده‌ترین تحلیل‌های این هفته و راهنماهایی که هر روز به کار می‌آیند.', 'خوێنراوترین شیکارییەکانی ئەم هەفتەیە و ڕێنماییەکان کە هەموو ڕۆژێک بەکار دێن.', "This week's most-read analyses, and the guides you will use every day.", 'p', 'nxi-l') + '</div>' +
+    '<div class="nxi-feat" data-feat></div>' +
+    '<div class="nxi-ess">' + ESS.map(function (E) {
+      return '<a class="nxi-e" href="' + E[0] + '"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + E[1] + '</svg></i>' +
+        '<span>' + tri(E[2][0], E[2][1], E[2][2], 'b') + tri(E[3][0], E[3][1], E[3][2], 'small') + '</span></a>';
+    }).join('') + '</div>';
+  nx.parentNode.insertBefore(imp, nx.nextSibling);
+  function featFill() {
+    var box = imp.querySelector('[data-feat]'); if (!box) return;
+    var ps; try { ps = VP(); } catch (e) { return; }
+    var lim = Date.now() - 7 * 864e5;
+    var cand = ps.filter(function (p) { return p.photos && p.photos[0] && /\/deepimg\//.test(p.photos[0]) && Date.parse(p.date) > lim && p.q !== 'low'; });
+    cand.sort(function (a, b) { return (+b.views || 0) - (+a.views || 0) || (a.date < b.date ? 1 : -1); });
+    var h = '';
+    cand.slice(0, 3).forEach(function (p, i) {
+      var t = {}; try { t = PT(p) || {}; } catch (e) { }
+      var ttl = String(t.title || '').trim(); if (!ttl) return;
+      var src = p.photos[0]; try { src = wp(src, true); } catch (e) { }
+      h += '<button type="button" class="nxi-f' + (i ? '' : ' big') + '" data-post="' + esc(p.id) + '"><span class="nxi-im"><img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" width="540" height="304" onerror="this.parentNode.classList.add(\'no\');this.remove()"></span>' +
+        '<span class="nxi-tx"><small>' + esc(when(p.date)) + (+p.views ? ' · ' + esc(nfmt(+p.views)) + ' ' + esc(pick('بازدید', 'بینین', 'views')) : '') + '</small><b dir="auto">' + esc(ttl) + '</b></span></button>';
+    });
+    if (h && box.innerHTML !== h) box.innerHTML = h;
+  }
+  imp.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-post]'); if (b) { try { openPost(b.getAttribute('data-post')); } catch (x) { } } });
+
   /* ------------------------------------------------------------------ under the stage: the channel, as a wire
      (replaces the photo strip and the two picture halves of the old page: titles you can read, not pictures of text) */
   var wire = d.createElement('section'); wire.className = 'nxw'; wire.id = 'nxw'; wire.setAttribute('aria-labelledby', 'nxw-h');
@@ -322,13 +399,13 @@
       return '<div class="nxw-col" data-cat="' + g[0] + '"><div class="nxw-hd"><h3>' + tri(g[1], g[2], g[3]) + '</h3><span class="nxw-n" data-wn></span>' +
         '<button type="button" class="nxw-all" data-wall="' + g[0].split(',')[0] + '">' + tri('همه', 'هەموو', 'All') + '</button></div><ol class="nxw-list" data-wl></ol></div>';
     }).join('') + '</div>';
-  nx.parentNode.insertBefore(wire, nx.nextSibling);
+  imp.parentNode.insertBefore(wire, imp.nextSibling);
   function when(iso) { try { return String(ago(iso)).replace(/^[^\d\u06F0-\u06F9\u0660-\u0669A-Za-z]+/, ''); } catch (e) { return ''; } }   /* the page's own "ago" marks stale data with a warning sign; a post's age is not a warning */
   function wireFill() {
     var ps; try { ps = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }); } catch (e) { return; }
     [].forEach.call(wire.querySelectorAll('.nxw-col'), function (col) {
       var cats = col.getAttribute('data-cat').split(','), h = '';
-      ps.filter(function (p) { return cats.indexOf(p.category) >= 0; }).slice(0, 4).forEach(function (p) {
+      ps.filter(function (p) { return cats.indexOf(p.category) >= 0; }).slice(0, 3).forEach(function (p) {
         var t = {}; try { t = PT(p) || {}; } catch (e) { }
         var body = String(t.text || '').replace(/[\u2500-\u257F_=~*]{3,}/g, ' ').replace(/\s+/g, ' ').trim(), ttl = String(t.title || '').trim(); if (body.indexOf(ttl) === 0) body = body.slice(ttl.length).trim();
         var coins = Array.isArray(p.coins) ? p.coins.slice(0, 3) : [], lg = '';
@@ -356,11 +433,11 @@
 
   var tk = null;
   U.ticker().then(function (j) { tk = j; net(j); U.seed(); }, function () { });
-  fill(); wireFill(); charts(); U.seed(); U.live();
-  [900, 2200, 5000, 10000].forEach(function (ms) { setTimeout(function () { fill(); wireFill(); links(); }, ms); });
+  fill(); wireFill(); featFill(); charts(); U.seed(); U.live();
+  [900, 2200, 5000, 10000].forEach(function (ms) { setTimeout(function () { fill(); wireFill(); featFill(); links(); }, ms); });
   new MutationObserver(function () {
     setTimeout(function () {
-      railLabel(); fill(); wireFill(); if (tk) net(tk);
+      railLabel(); fill(); wireFill(); featFill(); if (tk) net(tk);
       [].forEach.call(d.querySelectorAll('.nx-st,.nxm-st'), function (el) { if (el._s) stSet(el, el._s[0], el._s[1]); });
       if (w.ekChrome && w.ekChrome.label) w.ekChrome.label(U.lang());
       linksSoon();
