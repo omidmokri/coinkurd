@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "27"           # asset version (bump with any change to assets/obs/*)
+V = "28"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -58,6 +58,9 @@ PAGES = [
     ("compass", "cycle-compass", ["chainmath.js", "xchainmath.js", "xchain.js"]),
     ("rotation", "capital-rotation", ["chainmath.js", "xchainmath.js", "ts.js", "xchain.js"]),
     ("pools", "decentralization", ["chainmath.js", "xchainmath.js", "xchain.js"]),
+    # coin age: SOPR and the HODL waves, drawn in deep space (assets/obs/cosmos.css)
+    ("sopr", "sopr", ["agemath.js", "cosmos.js"]),
+    ("hodl", "hodl-waves", ["agemath.js", "cosmos.js"]),
 ]
 
 T = {
@@ -1789,6 +1792,120 @@ T.update({
 })
 
 
+
+# SOPR and the HODL waves (assets/obs/agemath.js, assets/obs/cosmos.js): every figure from data/obs/age_btc.json, which
+# scripts/obs_age.py builds from the Bitcoin Research Kit and checks against Coin Metrics and BGeometrics before it is kept.
+_AH = {"fa": ("این صفحه چه نشان می‌دهد", "محدودیت‌ها", "منبع و بررسی"), "ckb": ("ئەم پەڕەیە چی پیشان دەدات", "سنوورەکان", "سەرچاوە و پشکنین"),
+       "ar": ("ماذا تعرض هذه الصفحة", "الحدود", "المصدر والتحقق"), "en": ("What this page shows", "Limits", "Source and checks")}
+_ASRC = {
+    "fa": ["محاسبه از تک‌تک بلاک‌های بلاکچین بیت‌کوین با Bitcoin Research Kit (متن‌باز، مجوز MIT، bitview.space)، روزی یک مقدار به وقت UTC؛ روز جاری تا بسته نشود نشان داده نمی‌شود.",
+           "هر بار پیش از نگه‌داشتن داده بررسی می‌شود که جمع همهٔ بازه‌های سنی با عرضهٔ بیت‌کوین در Coin Metrics بخواند، و روزی یک بار که SOPR و امواج با BGeometrics هم‌خوان باشند. اگر بررسی رد شود، آخرین دادهٔ سالم می‌ماند.",
+           "توصیهٔ مالی نیست."],
+    "ckb": ["ژمێردراو لە هەموو بلۆکەکانی بلۆکچەینی بیتکۆین بە Bitcoin Research Kit (سەرچاوە-کراوە، مۆڵەتی MIT، bitview.space)، ڕۆژی یەک بەها بە کاتی UTC؛ ڕۆژی ئێستا تا دانەخرێت پیشان نادرێت.",
+            "پێش هەڵگرتنی داتاکە هەموو جارێک دەپشکنرێت کە کۆی هەموو ماوەکانی تەمەن لەگەڵ بڕی بیتکۆین لە Coin Metrics بگونجێت، و ڕۆژی جارێک کە SOPR و شەپۆلەکان لەگەڵ BGeometrics یەک بگرنەوە. ئەگەر پشکنین شکستی هێنا، دوایین داتای دروست دەمێنێتەوە.",
+            "ئامۆژگاریی دارایی نییە."],
+    "ar": ["محسوبة من كل كتلة في بلوكشين البيتكوين بواسطة Bitcoin Research Kit (مفتوح المصدر، رخصة MIT، bitview.space)، قيمة واحدة في اليوم بتوقيت UTC؛ ولا يُعرض اليوم الجاري حتى يُغلق.",
+           "قبل حفظ البيانات يُتحقَّق في كل مرة من أن مجموع كل الشرائح العمرية يطابق معروض البيتكوين لدى Coin Metrics، ومرة في اليوم من اتفاق SOPR والموجات مع BGeometrics. إن فشل التحقق تبقى آخر بيانات سليمة.",
+           "ليست نصيحة مالية."],
+    "en": ["Computed from every block of the Bitcoin blockchain by the Bitcoin Research Kit (open source, MIT licence, bitview.space), one value a day in UTC; the current day is shown only once it has closed.",
+           "Before the data is kept it is checked every time that all the age bands add up to Bitcoin’s supply at Coin Metrics, and once a day that SOPR and the waves agree with BGeometrics. If a check fails, the last good data stays.",
+           "Not financial advice."],
+}
+
+
+def _aabout(shows, limits):
+    return {lg: [(_AH[lg][0], shows[lg]), (_AH[lg][1], limits[lg]), (_AH[lg][2], _ASRC[lg])] for lg in LANGS}
+
+
+T.update({
+    "sopr": {
+        "title": "SOPR بیت‌کوین؛ سود یا زیان کوین‌های خرج‌شده | entekhab.net",
+        "desc": "SOPR بیت‌کوین هر روز از ۲۰۰۹: کوین‌هایی که امروز جابه‌جا می‌شوند در سود فروخته می‌شوند یا در زیان؛ برای همه، دارندگان کوتاه‌مدت و بلندمدت. رایگان، چهار زبان.",
+        "og": "SOPR بیت‌کوین — سود یا زیان کوین‌های خرج‌شده",
+        "ld": "Entekhab Bitcoin SOPR",
+        "kw": ["SOPR", "سوپر", "spent output profit ratio", "STH SOPR", "LTH SOPR", "aSOPR", "adjusted SOPR", "سود و زیان آنچین", "نسبت سود خروجی خرج‌شده", "قازانج و زیان", "الربح والخسارة"],
+        "h1": {"fa": "SOPR: سود یا زیان کوین‌های خرج‌شده", "ckb": "SOPR: قازانج یان زیانی دراوە خەرجکراوەکان", "ar": "SOPR: ربح أو خسارة العملات المُنفقة", "en": "SOPR: profit or loss on coins spent"},
+        "p": {"fa": "کوین‌هایی که هر روز روی زنجیره جابه‌جا می‌شوند، به‌طور میانگین گران‌تر از قیمت خریدشان فروخته شده‌اند یا ارزان‌تر: برای همهٔ کوین‌ها و دارندگان کوتاه‌مدت و بلندمدت، از ۲۰۰۹ تا دیروز",
+              "ckb": "ئەو دراوانەی هەموو ڕۆژێک لەسەر زنجیرە دەجوڵێن، بە تێکڕا گرانتر لە نرخی کڕینیان فرۆشراون یان هەرزانتر: بۆ هەموو دراوەکان و هەڵگرانی کورتخایەن و درێژخایەن، لە ٢٠٠٩ـەوە تا دوێنێ",
+              "ar": "هل بيعت العملات التي تتحرك على السلسلة كل يوم، في المتوسط، بأكثر من سعر شرائها أم بأقل: لكل العملات ولحائزي المدى القصير والطويل، من ٢٠٠٩ حتى أمس",
+              "en": "Whether the coins that move on the chain each day were, on average, sold for more than they were bought for or for less: for all coins and for short- and long-term holders, from 2009 to yesterday"},
+        "about": _aabout({
+            "fa": ["<b>SOPR:</b> برای هر کوینی که در یک روز خرج می‌شود، ارزش دلاری‌اش هنگام خرج ÷ ارزش دلاری‌اش وقتی آخرین بار جابه‌جا شده بود. عدد هر روز همین نسبت برای جمع همهٔ کوین‌های خرج‌شدهٔ آن روز است.",
+                   "<b>خط ۱:</b> بالای ۱ یعنی کوین‌های خرج‌شده به‌طور میانگین در سود فروخته شده‌اند و زیر ۱ یعنی در زیان. در روندهای صعودی گذشته، برگشت به ۱ اغلب جایی بوده که فروشنده‌ها حاضر به فروش در زیان نبوده‌اند؛ در روندهای نزولی، ۱ اغلب سقف بوده است.",
+                   "<b>کوتاه‌مدت و بلندمدت:</b> کوین‌هایی که کمتر از حدود ۱۵۵ روز است جابه‌جا نشده‌اند و آن‌هایی که بیشتر. <b>SOPR تعدیل‌شده</b> کوین‌هایی را که کمتر از یک ساعت نگه داشته شده‌اند کنار می‌گذارد، چون بیشترشان جابه‌جایی فنی‌اند نه معامله.",
+                   "<b>صفحه و نمودار:</b> صفحهٔ بالا میانگین ۷ روزه را روی مداری از ۰٫۹۴ تا ۱٫۰۶ نشان می‌دهد. در نمودار، قیمت بالا و SOPR پایین است؛ فیروزه‌ای سمت سود و سرخابی سمت زیان. میانگین ۷ و ۳۰ روزه نوسان روزانه را هموار می‌کند."],
+            "ckb": ["<b>SOPR:</b> بۆ هەر دراوێک کە لە ڕۆژێکدا خەرج دەکرێت، بەهای دۆلاریی لە کاتی خەرجکردن ÷ بەهای دۆلاریی کاتێک دواجار جووڵاوە. ژمارەی هەر ڕۆژێک هەمان ڕێژەیە بۆ کۆی هەموو دراوە خەرجکراوەکانی ئەو ڕۆژە.",
+                    "<b>هێڵی ١:</b> سەرووی ١ واتە دراوە خەرجکراوەکان بە تێکڕا بە قازانج فرۆشراون و خوار ١ واتە بە زیان. لە ڕەوتە بەرزبووەکانی ڕابردوودا، گەڕانەوە بۆ ١ زۆرجار ئەو شوێنە بووە کە فرۆشیاران ئامادە نەبوون بە زیان بفرۆشن؛ لە ڕەوتە نزمبووەکاندا، ١ زۆرجار سەقف بووە.",
+                    "<b>کورتخایەن و درێژخایەن:</b> ئەو دراوانەی کەمتر لە نزیکەی ١٥٥ ڕۆژە نەجوڵاون و ئەوانەی زیاتر. <b>SOPRی ڕێکخراو</b> ئەو دراوانە لادەدات کە کەمتر لە کاتژمێرێک هەڵگیراون، چونکە زۆربەیان گواستنەوەی تەکنیکین نەک مامەڵە.",
+                    "<b>پیشاندەر و نەخشە:</b> پیشاندەری سەرەوە تێکڕای ٧ ڕۆژە لەسەر خولگەیەک لە ٠٫٩٤ تا ١٫٠٦ پیشان دەدات. لە نەخشەکەدا نرخ لە سەرەوە و SOPR لە خوارەوەیە؛ فیرۆزەیی لای قازانج و سوورمەیی لای زیان. تێکڕای ٧ و ٣٠ ڕۆژە لەرینەوەی ڕۆژانە نەرم دەکات."],
+            "ar": ["<b>SOPR:</b> لكل عملة تُنفق في يوم ما، قيمتها الدولارية عند الإنفاق ÷ قيمتها الدولارية حين تحرّكت آخر مرة. رقم كل يوم هو هذه النسبة لمجموع كل العملات المُنفقة في ذلك اليوم.",
+                   "<b>خط ١:</b> فوق ١ يعني أن العملات المُنفقة بيعت في المتوسط بربح، وتحته يعني بخسارة. في الاتجاهات الصاعدة السابقة كان الرجوع إلى ١ غالبًا حيث رفض البائعون البيع بخسارة؛ وفي الاتجاهات الهابطة كان ١ غالبًا سقفًا.",
+                   "<b>المدى القصير والطويل:</b> العملات التي لم تتحرك منذ أقل من نحو ١٥٥ يومًا، والتي لم تتحرك منذ أكثر. <b>SOPR المعدّل</b> يستبعد العملات المحتفظ بها أقل من ساعة، لأن معظمها تحويلات تقنية لا صفقات.",
+                   "<b>المؤشر والرسم:</b> يعرض المؤشر العلوي متوسط ٧ أيام على مدار من ٠٫٩٤ إلى ١٫٠٦. في الرسم السعر في الأعلى وSOPR في الأسفل؛ الفيروزي جهة الربح والأرجواني جهة الخسارة. متوسطا ٧ و٣٠ يومًا يخفّفان التذبذب اليومي."],
+            "en": ["<b>SOPR:</b> for every coin spent on a day, its dollar value when spent ÷ its dollar value when it last moved. Each day’s number is that ratio for all the coins spent that day taken together.",
+                   "<b>The line at 1:</b> above 1, the coins spent were on average sold at a profit; below 1, at a loss. In past uptrends a return to 1 was often where sellers refused to sell at a loss; in downtrends, 1 was often a ceiling.",
+                   "<b>Short- and long-term:</b> coins unmoved for less than about 155 days, and those unmoved for longer. <b>Adjusted SOPR</b> leaves out coins held for under an hour, since most of those are technical transfers, not trades.",
+                   "<b>The dial and the chart:</b> the dial shows the 7-day mean on an orbit from 0.94 to 1.06. On the chart the price is on top and SOPR below; teal is the profit side and magenta the loss side. The 7- and 30-day means smooth the daily swings."],
+        }, {
+            "fa": ["SOPR نمی‌داند فروشنده کیست: جابه‌جایی کوین بین کیف‌پول‌های یک نفر یا یک صرافی هم خرج حساب می‌شود.",
+                   "هزینهٔ هر کوین قیمت روزی است که آخرین بار جابه‌جا شده، نه قیمتی که صاحب فعلی‌اش واقعاً پرداخته است.",
+                   "سطح ۱ قاعده‌ای از رفتار گذشته است، نه سیگنال خرید یا فروش."],
+            "ckb": ["SOPR نازانێت فرۆشیار کێیە: گواستنەوەی دراو لە نێوان جزدانەکانی یەک کەس یان ئاڵوگۆڕخانەیەکیش خەرجکردن دەژمێردرێت.",
+                    "تێچووی هەر دراوێک نرخی ئەو ڕۆژەیە کە دواجار جووڵاوە، نەک ئەو نرخەی خاوەنی ئێستای بە ڕاستی داویەتی.",
+                    "ئاستی ١ یاسایەکە لە ڕەفتاری ڕابردووەوە، نەک سیگناڵی کڕین یان فرۆشتن."],
+            "ar": ["لا يعرف SOPR من البائع: نقل العملات بين محافظ شخص واحد أو منصة واحدة يُحسب إنفاقًا أيضًا.",
+                   "تكلفة كل عملة هي سعر اليوم الذي تحرّكت فيه آخر مرة، لا ما دفعه مالكها الحالي فعلًا.",
+                   "مستوى ١ قاعدة من سلوك سابق، لا إشارة شراء أو بيع."],
+            "en": ["SOPR does not know who the seller is: moving coins between one person’s or one exchange’s own wallets counts as spending too.",
+                   "Each coin’s cost is the price on the day it last moved, not what its current owner actually paid.",
+                   "The level of 1 is a rule drawn from past behaviour, not a signal to buy or sell."],
+        }),
+    },
+    "hodl": {
+        "title": "موج‌های HODL بیت‌کوین؛ سن کوین‌ها | entekhab.net",
+        "desc": "موج‌های HODL بیت‌کوین از ۲۰۱۰: چه سهمی از همهٔ بیت‌کوین‌ها چند وقت است جابه‌جا نشده، در ۱۳ بازهٔ سنی از یک روز تا بیش از ده سال، با ماشین زمان. رایگان.",
+        "og": "موج‌های HODL — بیت‌کوین بر پایهٔ سن کوین‌ها",
+        "ld": "Entekhab Bitcoin HODL waves",
+        "kw": ["HODL waves", "موج HODL", "هودل", "hodl", "coin age", "سن کوین", "long-term holders", "دارندگان بلندمدت", "age bands", "شەپۆلی HODL", "موجات HODL"],
+        "h1": {"fa": "موج‌های HODL: بیت‌کوین بر پایهٔ سن کوین‌ها", "ckb": "شەپۆلەکانی HODL: بیتکۆین بەپێی تەمەنی دراوەکان", "ar": "موجات HODL: البيتكوين بحسب عمر العملات", "en": "HODL waves: Bitcoin by the age of its coins"},
+        "p": {"fa": "چه سهمی از همهٔ بیت‌کوین‌ها چند وقت است جابه‌جا نشده: ۱۳ بازهٔ سنی از کمتر از یک روز تا بیش از ده سال، هر روز از ۲۰۱۰ تا دیروز",
+              "ckb": "چ بەشێک لە هەموو بیتکۆینەکان چەند ماوەیە نەجوڵاون: ١٣ ماوەی تەمەن لە کەمتر لە ڕۆژێکەوە تا زیاتر لە دە ساڵ، هەموو ڕۆژێک لە ٢٠١٠ـەوە تا دوێنێ",
+              "ar": "أي حصة من كل البيتكوين لم تتحرك ومنذ متى: ١٣ شريحة عمرية من أقل من يوم إلى أكثر من عشر سنوات، كل يوم من ٢٠١٠ حتى أمس",
+              "en": "What share of all bitcoin has not moved, and for how long: 13 age bands from under a day to over ten years, every day from 2010 to yesterday"},
+        "about": _aabout({
+            "fa": ["<b>سن یک کوین:</b> زمانی که از آخرین جابه‌جایی‌اش روی زنجیره گذشته است. هر بار که خرج شود، سنش از صفر شروع می‌شود.",
+                   "<b>کهکشان:</b> تازه‌ترین کوین‌ها در مرکز و قدیمی‌ترین‌ها در لبه‌اند، و مساحت هر حلقه برابر سهم آن بازه از همهٔ بیت‌کوین‌هاست. ذره‌های بازه‌های جوان تندتر می‌چرخند. با ماشین زمان می‌شود هر روزی از ۲۰۱۰ تا دیروز را دید.",
+                   "<b>امواج در گذر زمان:</b> سهم هر بازه روی هم، قدیمی‌ترین‌ها پایین، با قیمت روی آن. وقتی موج‌های قدیمی پهن می‌شوند دارندگان نگه می‌دارند؛ نزدیک سقف‌های گذشته، کوین‌های قدیمی جابه‌جا شده و موج‌های جوان پهن شده‌اند.",
+                   "<b>کاشی‌ها:</b> سهم کوین‌هایی که بیش از یک سال بی‌حرکت مانده‌اند، تغییرش در ۳۰ روز و یک سال، و رتبهٔ امروزش در میان همهٔ روزها."],
+            "ckb": ["<b>تەمەنی دراوێک:</b> ئەو ماوەیەی لە دوایین جووڵەیەوە لەسەر زنجیرە تێپەڕیوە. هەر جارێک خەرج بکرێت، تەمەنەکەی لە سفرەوە دەست پێدەکاتەوە.",
+                    "<b>گەلەستێرە:</b> نوێترین دراوەکان لە ناوەڕاست و کۆنترینەکان لە لێوارن، و ڕووبەری هەر ئەڵقەیەک یەکسانە بە بەشی ئەو ماوەیە لە هەموو بیتکۆینەکان. گەردیلەکانی ماوە گەنجەکان خێراتر دەسووڕێنەوە. بە ئامێری کات دەتوانیت هەر ڕۆژێک لە ٢٠١٠ـەوە تا دوێنێ ببینیت.",
+                    "<b>شەپۆلەکان بە درێژایی کات:</b> بەشی هەر ماوەیەک لەسەر یەک، کۆنترینەکان لە خوارەوە، لەگەڵ نرخ لەسەری. کاتێک شەپۆلە کۆنەکان پان دەبنەوە هەڵگران ڕایدەگرن؛ نزیک لووتکەکانی ڕابردوو، دراوە کۆنەکان جووڵاون و شەپۆلە گەنجەکان پان بوونەتەوە.",
+                    "<b>خانەکان:</b> بەشی ئەو دراوانەی زیاتر لە ساڵێک نەجوڵاون، گۆڕانی لە ٣٠ ڕۆژ و ساڵێکدا، و پلەی ئەمڕۆی لە نێوان هەموو ڕۆژەکاندا."],
+            "ar": ["<b>عمر العملة:</b> الوقت الذي مرّ منذ آخر تحرّك لها على السلسلة. كلما أُنفقت يبدأ عمرها من الصفر.",
+                   "<b>المجرّة:</b> أحدث العملات في المركز وأقدمها على الحافة، ومساحة كل حلقة تساوي حصة تلك الشريحة من كل البيتكوين. جسيمات الشرائح الفتية تدور أسرع. بآلة الزمن يمكن رؤية أي يوم من ٢٠١٠ حتى أمس.",
+                   "<b>الموجات عبر الزمن:</b> حصص الشرائح مكدّسة، الأقدم في الأسفل، والسعر فوقها. حين تتسع الموجات القديمة فالحائزون يحتفظون؛ وقرب القمم السابقة تحرّكت العملات القديمة واتسعت الموجات الفتية.",
+                   "<b>البطاقات:</b> حصة العملات التي لم تتحرك منذ أكثر من سنة، وتغيّرها في ٣٠ يومًا وسنة، وترتيبها اليوم بين كل الأيام."],
+            "en": ["<b>A coin’s age:</b> the time since it last moved on the chain. Each time it is spent, its age starts again from zero.",
+                   "<b>The galaxy:</b> the newest coins are at the core and the oldest on the rim, and each ring’s area equals that band’s share of all bitcoin. Particles in the young bands orbit faster. The time machine shows any day from 2010 to yesterday.",
+                   "<b>Waves through time:</b> the bands’ shares stacked, the oldest at the bottom, with the price over them. When the old waves widen, holders are holding; near past tops, old coins moved and the young waves widened.",
+                   "<b>The tiles:</b> the share of coins unmoved for over a year, its change over 30 days and a year, and today’s rank among all days."],
+        }, {
+            "fa": ["کوین‌های گم‌شده (مثل کوین‌های سال‌های اول) هم در بازه‌های قدیمی شمرده می‌شوند، پس بخشی از موج‌های پیر هرگز جابه‌جا نخواهد شد.",
+                   "جابه‌جایی کوین بین کیف‌پول‌های یک صرافی یا یک نفر هم سن آن را صفر می‌کند، بی‌آنکه کسی فروخته باشد.",
+                   "پهن یا باریک شدن موج‌ها الگویی از گذشته است، نه پیش‌بینی."],
+            "ckb": ["دراوە ونبووەکان (وەک دراوەکانی ساڵانی یەکەم) لە ماوە کۆنەکاندا دەژمێردرێن، بۆیە بەشێک لە شەپۆلە پیرەکان هەرگیز ناجووڵێن.",
+                    "گواستنەوەی دراو لە نێوان جزدانەکانی ئاڵوگۆڕخانەیەک یان یەک کەسیش تەمەنەکەی سفر دەکاتەوە، بێ ئەوەی کەس فرۆشتبێتی.",
+                    "پان یان باریکبوونی شەپۆلەکان نەخشێکە لە ڕابردووەوە، نەک پێشبینی."],
+            "ar": ["تُحسب العملات المفقودة (كعملات السنوات الأولى) ضمن الشرائح القديمة، فجزء من الموجات العتيقة لن يتحرك أبدًا.",
+                   "نقل العملات بين محافظ منصة واحدة أو شخص واحد يعيد عمرها إلى الصفر دون أن يبيع أحد.",
+                   "اتساع الموجات أو ضيقها نمط من الماضي، لا تنبّؤ."],
+            "en": ["Lost coins (such as many from the first years) are counted in the old bands too, so part of the oldest waves will never move.",
+                   "Moving coins between one exchange’s or one person’s own wallets also resets their age to zero, though nobody sold.",
+                   "Waves widening or narrowing is a pattern from the past, not a forecast."],
+        }),
+    },
+})
+
 HUB = {
     "title": "رصدخانه بازار: نمودار مشتقات و آنچین کریپتو | entekhab.net",
     "desc": "رصدخانهٔ بازار انتخاب: لیکوییدیشن، اوپن اینترست، فاندینگ، CVD، پریمیوم Coinbase، آپشن‌ها، MVRV، استیبل‌کوین‌ها و چرخهٔ بیت‌کوین؛ رایگان و به چهار زبان.",
@@ -1945,6 +2062,12 @@ HUB = {
              {"fa": "احساسات امروز بازار و تاریخچهٔ آن", "ckb": "هەستی ئەمڕۆی بازاڕ و مێژووەکەی", "ar": "مزاج السوق اليوم وتاريخه", "en": "Today's market mood and its history"}),
         ]),
         ({"fa": "سنجه‌های بیشتر آنچین", "ckb": "پێوەرە زیاترەکانی ئۆنچەین", "ar": "مقاييس أخرى على السلسلة", "en": "More on-chain measures"}, [
+            ("/charts/sopr/", True, {"fa": "SOPR", "ckb": "SOPR", "ar": "SOPR", "en": "SOPR"},
+             {"fa": "کوین‌های خرج‌شده در سود فروخته می‌شوند یا در زیان", "ckb": "دراوە خەرجکراوەکان بە قازانج دەفرۆشرێن یان بە زیان",
+              "ar": "هل تُباع العملات المُنفقة بربح أم بخسارة", "en": "Whether the coins spent are sold at a profit or a loss"}),
+            ("/charts/hodl-waves/", True, {"fa": "موج‌های HODL", "ckb": "شەپۆلەکانی HODL", "ar": "موجات HODL", "en": "HODL waves"},
+             {"fa": "سهم بیت‌کوین‌ها بر پایهٔ سن، در کهکشانی با ماشین زمان", "ckb": "بەشی بیتکۆینەکان بەپێی تەمەن، لە گەلەستێرەیەکدا لەگەڵ ئامێری کات",
+              "ar": "حصص البيتكوين بحسب العمر، في مجرّة بآلة زمن", "en": "Bitcoin’s shares by age, in a galaxy with a time machine"}),
             ("/charts/onchain-score/", True, {"fa": "امتیاز آنچین", "ckb": "نمرەی ئۆنچەین", "ar": "مؤشر السلسلة", "en": "On-chain score"},
              {"fa": "شش شاخص چرخه در یک عدد از ۰ تا ۱۰۰، بدون دیدن آینده", "ckb": "شەش پێوەری خول لە یەک ژمارەدا لە ٠ تا ١٠٠، بێ بینینی داهاتوو",
               "ar": "ستة مقاييس للدورة في رقم واحد من ٠ إلى ١٠٠، دون رؤية المستقبل", "en": "Six cycle measures in one number from 0 to 100, with no look at the future"}),
@@ -2001,7 +2124,10 @@ def about(view):
     return "\n".join(out)
 
 
-def head(title, desc, og, url, ld):
+CSS = {"sopr": ["cosmos.css"], "hodl": ["cosmos.css"]}   # a page's own stylesheets after obs.css
+
+
+def head(title, desc, og, url, ld, css=()):
     return f"""<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -2017,7 +2143,7 @@ def head(title, desc, og, url, ld):
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 {chrome.FONTS}
 <link rel="stylesheet" href="/assets/obs/obs.css?v={V}">
-<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False, separators=(",", ":"))}</script>
+{"".join(f'<link rel="stylesheet" href="/assets/obs/{c}?v={V}">\n' for c in css)}<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False, separators=(",", ":"))}</script>
 </head>
 """
 
@@ -2030,7 +2156,7 @@ def page(view, folder, scripts):
           "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
           "publisher": {"@type": "Organization", "name": "Entekhab (entekhab.net)", "url": SITE}, "description": t["p"]["en"]}
     tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js"] + scripts)
-    return head(t["title"], t["desc"], t["og"], url, ld) + f"""<body>
+    return head(t["title"], t["desc"], t["og"], url, ld, CSS.get(view, ())) + f"""<body>
 <!--ek:header--><!--/ek:header-->
 <main class="ob-page" id="ob-main" data-view="{view}" translate="no">
   <nav class="ob-crumb"><a href="/{HUB_PATH}/">{spans(HUB["h1"])}</a></nav>

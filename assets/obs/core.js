@@ -163,7 +163,9 @@
     delta: '<path d="M12 5 4.5 19h15Z"/>',
     spread: '<path d="M3 18h18"/><path d="M3 18c6 0 7-4 9-7s4-5 9-5"/>',
     coins: '<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/><path d="M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
-    grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>'
+    grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.8"/>',
+    orbit: '<path d="M4.5 17a9 9 0 1 1 15 0"/><circle cx="17.6" cy="8.2" r="1.6" fill="currentColor"/><path d="M12 13.5v-3"/>',
+    galaxy: '<circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="9"/><circle cx="19" cy="9.5" r="1" fill="currentColor"/>'
   };
   OB.icon = function (n, cls) {
     return '<svg class="ob-ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>';
@@ -300,7 +302,9 @@
     { k: 'score', path: '/charts/onchain-score/', ic: 'scale' },
     { k: 'compass', path: '/charts/cycle-compass/', ic: 'target' },
     { k: 'rotation', path: '/charts/capital-rotation/', ic: 'cycle' },
-    { k: 'pools', path: '/charts/decentralization/', ic: 'grid' }
+    { k: 'pools', path: '/charts/decentralization/', ic: 'grid' },
+    { k: 'sopr', path: '/charts/sopr/', ic: 'orbit' },
+    { k: 'hodl', path: '/charts/hodl-waves/', ic: 'galaxy' }
   ];
   var root, cur = null, curKey = null;
   function headText() {
