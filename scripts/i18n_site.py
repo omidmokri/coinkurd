@@ -67,6 +67,10 @@ KEEP = ["entekhab.net", "Coin_Kurd", "Coin Kurd", "Entekhab", "Telegram", "Tradi
         "YouTube", "Instagram", "WhatsApp", "X (Twitter)", "Twitter", "Windows", "macOS", "iOS", "Android",
         "Linux", "Chrome", "Firefox", "Safari", "Edge", "Pine Script", "Pine Studio", "Gemini", "Hurst"]
 KEEP_RE = [(k, re.compile(r"(?<![A-Za-z0-9_.])" + re.escape(k) + r"(?![A-Za-z0-9_])")) for k in sorted(KEEP, key=len, reverse=True)]
+# Room for the answer. 8,192 tokens cut off the longer batches in languages whose script costs more tokens a letter
+# (Hindi, Thai, Bengali …): the JSON came back unfinished and the whole batch was thrown away and paid for again.
+MAX_TOKENS = int(os.environ.get("I18N_SITE_MAX_TOKENS", "16384"))
+SAVE_EVERY = int(os.environ.get("I18N_SITE_SAVE_EVERY", "60"))   # seconds between writes of the caches during a run
 FAIL_MAX = 3      # after this many unusable answers a string is left in English rather than re-sent every run
 SCRIPT = pro_l10n.SCRIPT                        # the alphabet a language must be written in
 ARABIC = re.compile(r"[؀-ۿ]")
@@ -324,7 +328,7 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
             with lock:
                 counter["used"] += 1
             try:
-                good, bad = translate_batch(code, batch, lambda p: ai.generate_with(api_key, p, True, 0.1, 8192, 2, 120))
+                good, bad = translate_batch(code, batch, lambda p: ai.generate_with(api_key, p, True, 0.1, MAX_TOKENS, 2, 150))
             except ai.QuotaError as e:
                 with lock:
                     log(f"{code}: key {ai._kid(api_key)} is out for this run ({str(e)[:110]})")
@@ -346,13 +350,26 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
                     changed.add(code)
                 log(f"{code}: {len(good)}/{len(batch)} kept" + (f"; dropped {dict(list(bad.items())[:4])}" if bad else ""))
 
+    def flush():
+        """write what has been translated so far: a run cut off by its step's timeout keeps everything it paid for"""
+        with lock:
+            todo = sorted(changed)
+            snap = {c: (dict(state[c]), dict(fails.get(c) or {})) for c in todo}
+            changed.clear()
+        for c in todo:
+            save(c, *snap[c])
+
     threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in pool]
     for th in threads:
         th.start()
-    for th in threads:
-        th.join(timeout=max(30.0, seconds - (time.time() - t0) + 120))
-    for code in sorted(changed):
-        save(code, state[code], fails.get(code))
+    deadline = t0 + max(30.0, seconds + 120)
+    last = time.time()
+    while any(th.is_alive() for th in threads) and time.time() < deadline:
+        time.sleep(1.0)
+        if time.time() - last >= SAVE_EVERY:
+            flush()
+            last = time.time()
+    flush()
     return state
 
 
@@ -455,7 +472,38 @@ def write_langs(need):
 
 
 def status(need):
-    return {c: {"done": sum(1 for k in need if k in load(c)), "total": len(need)} for c in LANGS}
+    """each language's cache read once -- the old form re-read it for every string (4,000+ reads of a 1.3 MB file a
+    language), which alone took six minutes and made the light rebuild's step time out every run"""
+    out = {}
+    for c in LANGS:
+        s = load(c)
+        out[c] = {"done": sum(1 for k in need if k in s), "total": len(need)}
+    return out
+
+
+def more_after(langs, need, used, pool_n, ai):
+    """tell the workflow whether to start another run straight away (GITHUB_OUTPUT more=1)
+
+    GitHub runs this workflow's schedule three or four times a day, not the 48 its cron asks for, so a run that
+    stops with work queued and calls to spare used to leave both waiting six hours. Another run starts only when
+    this one did make calls, the day still has calls released for the site, some key is still live and some
+    string is still waiting -- so the chain ends by itself when the work or the day's share is used up.
+    """
+    left = pro_l10n.quota_budget("site", pool_n)
+    waiting = 0
+    for code in langs:
+        s = load(code)
+        bad = {k for k, n in load_fails(code).items() if n >= FAIL_MAX}
+        waiting += sum(1 for k in need if k not in s and k not in bad)
+    live = len(ai.live_keys()) if hasattr(ai, "live_keys") else 1
+    more = used > 0 and left > 0 and live > 0 and waiting > 0
+    print(f"i18n_site: {waiting:,} strings still waiting, {max(0, left)} calls left for the site now, "
+          f"{live} key(s) live -> {'another run next' if more else 'no chained run'}")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as f:
+            f.write(f"more={1 if more else 0}\n")
+    return more
 
 
 def main():
@@ -482,10 +530,10 @@ def main():
         n = sum(1 for path in i18n_ar.walk_all() if inject(path))
         print(f"i18n_site: the globe is on {n} pages")
     if a.status:
-        for c in LANGS:
-            d = status(need)[c]
-            print(f"  {c:4} {d['done']:5}/{d['total']}")
         st = status(need)
+        for c in LANGS:
+            d = st[c]
+            print(f"  {c:4} {d['done']:5}/{d['total']}")
         print(f"\n{sum(v['done'] for v in st.values()):,} of {len(need) * len(st):,} strings in {len(st)} languages; "
               f"complete: {sum(1 for v in st.values() if v['done'] == len(need))}")
         return
@@ -502,7 +550,7 @@ def main():
                   f"(the pool's day is {pro_l10n.quota_ceiling(len(pool))}, the site takes "
                   f"{int(pro_l10n.SHARE['site'] * 100)}%); the next run has more")
         else:
-            requests_max = min(a.requests or 8 * len(pool), left)
+            requests_max = min(a.requests or int(os.environ.get("I18N_SITE_REQUESTS", "0") or 0) or 8 * len(pool), left)
             jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))
             c = {}
             try:
@@ -510,6 +558,7 @@ def main():
             finally:
                 pro_l10n.quota_add(c.get("used", 0), who="site")
             print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)")
+            more_after(langs, need, c.get("used", 0), len(pool), ai)
             print("i18n_site: the keys this run used —\n" + ai.pool_report())
     elif not a.no_translate:
         print("i18n_site: no Gemini key — nothing translated this run (the pages use what the cache has)")

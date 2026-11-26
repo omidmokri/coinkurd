@@ -21,6 +21,13 @@ permissions:
 
 env:
   PYTHONUNBUFFERED: "1"
+  # 2026-11-26: the owner asked for every language to be finished as fast as possible. 80 calls a key a day
+  # left the 50 languages weeks away (about 6,000 calls still to make), and every key reported "working" with
+  # room to spare. A key that does reach Google's own daily limit is retired for the run by scripts/ai.py, so
+  # this only lifts our own ceiling, not Google's.
+  L10N_PER_KEY: "400"
+  I18N_SITE_SECONDS: "1320"          # 22 minutes of translating a run (it was 3)
+  I18N_SITE_REQUESTS: "3000"         # the run takes whatever the day has released, not 8 calls a key
   # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
   ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
@@ -72,7 +79,7 @@ concurrency:
 jobs:
   languages:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 58
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -95,8 +102,9 @@ jobs:
       # on 2026-11-22 with work still queued. The day's calls are capped anyway, so a longer ceiling spends no
       # more -- it only lets a run finish what it has already paid for.
       - name: Site languages (the other 43, new strings only)
+        id: site
         continue-on-error: true
-        timeout-minutes: 16
+        timeout-minutes: 30            # 22 of translating, the caches written every minute, then the dictionaries
         run: python scripts/i18n_site.py || echo "::warning::site languages failed; the pages use what the cache has"
 
       - name: Live-market languages (new strings only)
@@ -124,3 +132,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main || echo "::warning::could not ask for the rebuild; the next run tries again"
+
+      # GitHub starts this schedule three or four times a day rather than every 30 minutes. While strings are
+      # still waiting and the day has calls left, the run starts the next one itself; i18n_site.more_after
+      # decides, and the chain ends on its own when either runs out.
+      - name: Start the next run while work and calls remain
+        if: steps.site.outputs.more == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run languages.yml --repo "${{ github.repository }}" --ref main || echo "::warning::could not start the next run; the schedule picks it up"
