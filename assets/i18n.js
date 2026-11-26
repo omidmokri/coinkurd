@@ -352,7 +352,7 @@
       for (var w0 in ws) { var L = TB[w0]; if (L) { var r = tryT(L, t); if (r != null) return r; } }
       return null;
     }
-    var EDGE = /^[^A-Za-z0-9{$£€]+|[\s:·↗↓→←…]+$/g;
+    var EDGE = /^[^A-Za-z0-9{$£€]+|[\s:·↗↓→←…~]+$/g;
     /* a label the page's scripts join from parts ("scanner: DELAYED · 46 min ago", "RSI overbought, Volume spike")
        has no entry of its own: each part is looked up alone, and the whole is used only when every part left in
        English is a ticker or a number, so a sentence is never half translated */
@@ -369,7 +369,7 @@
       for (var i = 0; i < ps.length; i++) {
         var p = ps[i]; if (i % 2 || !p || !/[A-Za-z]{2}/.test(p)) { out += p; continue; }
         var x = part(p);
-        if (x != null) { out += x; any = true; } else if (/[a-z]{3}/.test(p)) return null; else out += p;
+        if (x != null) { out += x; any = true; } else if (/[a-z]{3}/.test(p) && !/^\s*[A-Z0-9][\w.&$%+-]*\s*$|^\s*[\w-]+\.[a-z]{2,}\s*$/.test(p)) return null; else out += p;
       }
       return any ? out : null;
     }

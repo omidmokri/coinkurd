@@ -79,9 +79,12 @@ def main():
     posts = [p for p in load(os.path.join(DATA, "posts_week.json"), []) if isinstance(p, dict) and p.get("id")
              and p.get("q") != "low" and ((p.get("tr") or {}).get("en") or {}).get("title")][:N_POSTS]
     ptitle = {p["id"]: p["tr"]["en"]["title"].strip() for p in posts}
+    narr = load(os.path.join(DATA, "narratives.json"), {})
+    heads = list(dict.fromkeys((h.get("title") or "").strip() for n in (narr.get("narratives") or [])[:10]
+                               for h in (n.get("headlines") or [])[:2] if (h.get("title") or "").strip()))
     rep_en = ((brain.get("report") or {}).get("en")) or {}
     rlines = report_lines(rep_en) if rep_en.get("headline") else []
-    want = list(dict.fromkeys(rlines + list(ptitle.values()) + [i["title"].strip() for i in items]))
+    want = list(dict.fromkeys(rlines + list(ptitle.values()) + [i["title"].strip() for i in items] + heads))
 
     codes = langs()
     cache = load(CACHE, {})
@@ -123,6 +126,7 @@ def main():
         dump(os.path.join(OUTDIR, code + ".json"),
              {"news": {i["id"]: c[i["title"].strip()] for i in items if i["title"].strip() in c},
               "posts": {pid: c[t] for pid, t in ptitle.items() if t in c},
+              "heads": {t: c[t] for t in heads if t in c},
               "at": news.get("updated_at")})
     for f in os.listdir(OUTDIR):                     # a language the globe no longer offers
         if f.endswith(".json") and not f.startswith("_") and f[:-5] not in codes:
