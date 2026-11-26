@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document;
-  var GRN = '#34d399', RED = '#ff5a4d';
+  var GRN = '#5ef2d6', RED = '#ff4f9a';
   var DEF = { rsiLo: 0, rsiHi: 100, chgLo: -100, chgHi: 100, trend: 'any', ema: 'any',
               volMin: 0, near: 'any', sort: 'chg24', desc: true };
   var S = (function () {

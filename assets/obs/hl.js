@@ -7,7 +7,7 @@
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, w = window, F = w.OBFlow;
-  var INK = '#e8e8e3', GRN = '#34d399', RED = '#ff5a4d', NB = 64, ZOOM = [5, 10, 20, 30];
+  var INK = '#eef1ff', GRN = '#5ef2d6', RED = '#ff4f9a', NB = 64, ZOOM = [5, 10, 20, 30];
   var DEF = { coin: 'BTC', zoom: 10 };
   var S = (function () {
     var s = OB.store.get('ek_obs_hl', null) || {}, o = JSON.parse(JSON.stringify(DEF));

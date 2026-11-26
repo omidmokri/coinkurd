@@ -8,9 +8,9 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, w = window, CM = w.OBChain;
   var DAY = 86400000, YEAR = 365.25 * DAY;
-  var INK = '#e8e8e3', ACC = '#f7931a', BLUE = '#3987e5', TEAL = '#199e70', RED = '#ff5a4d', GRN = '#34d399', PUR = '#a78bfa', GOLD = '#c98500', GREY = '#8d8d86', INC = '#d95926';
-  var ZHI = 'rgba(255,90,77,.11)', ZLO = 'rgba(52,211,153,.10)';
-  var NZC = ['rgba(255,90,77,.13)', 'rgba(247,147,26,.11)', 'rgba(201,133,0,.10)', 'rgba(52,211,153,.10)', 'rgba(57,135,229,.13)'];
+  var INK = '#eef1ff', ACC = '#ffcf6b', BLUE = '#7cc8ff', TEAL = '#199e70', RED = '#ff4f9a', GRN = '#5ef2d6', PUR = '#9b7bff', GOLD = '#c98500', GREY = '#8f9ac7', INC = '#d95926';
+  var ZHI = 'rgba(255,79,154,.11)', ZLO = 'rgba(94,242,214,.10)';
+  var NZC = ['rgba(255,79,154,.13)', 'rgba(255,207,107,.11)', 'rgba(201,133,0,.10)', 'rgba(94,242,214,.10)', 'rgba(124,200,255,.13)'];
 
   var KINDS = {
     mvrv: { assets: ['btc', 'eth', 'ltc', 'bch', 'doge', 'ada', 'xrp'], ms: ['mvrv', 'z', 'nupl', 'caps'] },
@@ -75,7 +75,7 @@
     return z.lo != null && z.hi != null ? T('band_lo_hi', { lo: OB.ltr(String(z.lo)), hi: OB.ltr(String(z.hi)) }) : z.hi != null ? T('band_hi', { hi: OB.ltr(String(z.hi)) }) : T('band_lo', { lo: OB.ltr(String(z.lo)) });
   }
   function zonesOf(k) { var z = CM.ZONES[k], out = []; if (z.hi != null) out.push({ y0: z.hi, y1: Infinity, color: ZHI }); if (z.lo != null) out.push({ y0: -Infinity, y1: z.lo, color: ZLO }); return out; }
-  function marksOf(k) { var z = CM.ZONES[k], out = []; if (z.hi != null) out.push({ y: z.hi, color: 'rgba(255,90,77,.55)', label: String(z.hi) }); if (z.lo != null) out.push({ y: z.lo, color: 'rgba(52,211,153,.5)', label: String(z.lo) }); return out; }
+  function marksOf(k) { var z = CM.ZONES[k], out = []; if (z.hi != null) out.push({ y: z.hi, color: 'rgba(255,79,154,.55)', label: String(z.hi) }); if (z.lo != null) out.push({ y: z.lo, color: 'rgba(94,242,214,.5)', label: String(z.lo) }); return out; }
 
   /* ---------------------------------------------------------------- panes */
   function build(D) {

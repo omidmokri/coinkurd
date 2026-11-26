@@ -26,6 +26,21 @@
   OB.loc = function (s) { var m = DIG[LANG]; return m ? String(s).replace(/\d/g, function (c) { return m[c]; }) : String(s); };
   function docLang() { de.lang = LANG === 'ar' ? 'en' : LANG; de.dir = OB.rtl() ? 'rtl' : 'ltr'; }
 
+  /* ================================================================ the charts' own ground (owner 2026-11-26: no flat black box —
+     the observatory's deep-space glass, the sky faintly through it on screen, solid in a saved picture) */
+  OB.bg = function (ctx, x, y, w, h, solid) {
+    var g = ctx.createLinearGradient(x, y, x + w * .35, y + h);
+    if (solid) { g.addColorStop(0, '#070b22'); g.addColorStop(.6, '#090d28'); g.addColorStop(1, '#0d0a2a'); }
+    else { g.addColorStop(0, 'rgba(6,10,32,.78)'); g.addColorStop(.6, 'rgba(8,12,36,.72)'); g.addColorStop(1, 'rgba(14,9,40,.78)'); }
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    if (!solid) {                                   /* a faint aurora rim along the top, like light over a horizon */
+      var r = ctx.createLinearGradient(x, y, x, y + Math.min(90, h * .2));
+      r.addColorStop(0, 'rgba(124,200,255,.07)'); r.addColorStop(1, 'rgba(124,200,255,0)');
+      ctx.fillStyle = r; ctx.fillRect(x, y, w, Math.min(90, h * .2));
+    }
+  };
+  OB.PLOT = 'rgba(12,18,52,.42)';
+
   /* ================================================================ helpers */
   OB.$ = function (s, r) { return (r || d).querySelector(s); };
   OB.$$ = function (s, r) { return [].slice.call((r || d).querySelectorAll(s)); };

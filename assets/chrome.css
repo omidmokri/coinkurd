@@ -290,26 +290,51 @@ html.ek-app .ek-appb,html.ek-app .ekf-apps,html.ek-app #eka:not(.ek-upd),html.ek
 @media (max-width:1180px){.ek-rd{bottom:calc(74px + env(safe-area-inset-bottom))}}
 @media (prefers-reduced-motion:reduce){.ek-rd-pg i,.ek-rd-toast{transition:none}}
 
-/* ---- breathing light (owner 2026-11-26): a soft aurora travels round each frame of the site and swells and fades like a
-   breath — the header bars, the open menus, the tab bar, the footer and its boxes, and every frame of the observatory.
-   assets/chrome.js marks the frames (.br) and runs the light only while a frame is on screen; none of it moves under
-   prefers-reduced-motion or on the software-drawn light mode (nx-lite). */
+/* ---- breathing light (owner 2026-11-26, made livelier the same day): the site's aurora colours flow round the edge of
+   each frame (header bars, open menus, tab bar, footer and its boxes, every frame of the observatory) while a brighter
+   glint turns round it and the whole edge swells and fades like a breath; inside each frame two soft clouds of the same
+   colours drift past each other. assets/chrome.js marks the frames (.br), adds the cloud layer (.br-neb) and runs all of it
+   only while a frame is on screen. The edge repaints at about 15 frames a second (steps), the clouds only move (no
+   repaint), so a phone's battery barely notices. Under prefers-reduced-motion nothing slides: the colours still flow,
+   more slowly, and the clouds fade into each other in place. */
 @property --br-a{syntax:"<angle>";inherits:false;initial-value:0deg}
 @keyframes br-turn{to{--br-a:360deg}}
-@keyframes br-breathe{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes br-flow{from{background-position:0 0,0 0}to{background-position:0 0,100% 0}}
+@keyframes br-breathe{0%,100%{opacity:.5}50%{opacity:1}}
 @keyframes br-slide{from{background-position:-60% 0}to{background-position:160% 0}}
-.br::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.3px;pointer-events:none;z-index:4;
-  background:conic-gradient(from var(--br-a),transparent 0 14%,rgba(94,242,214,.92) 24%,rgba(124,200,255,.86) 30%,rgba(155,123,255,.82) 36%,transparent 47% 64%,rgba(255,111,181,.68) 76%,transparent 88%);
+@keyframes br-drift{0%{transform:translate3d(-14%,6%,0) rotate(-4deg) scale(1)}50%{transform:translate3d(6%,-8%,0) rotate(7deg) scale(1.14)}100%{transform:translate3d(16%,5%,0) rotate(-2deg) scale(1.04)}}
+@keyframes br-drift2{0%{transform:translate3d(14%,-4%,0) rotate(5deg) scale(1.08)}50%{transform:translate3d(-8%,7%,0) rotate(-6deg) scale(1)}100%{transform:translate3d(-16%,-6%,0) rotate(3deg) scale(1.12)}}
+@keyframes br-fade{0%,100%{opacity:.25}50%{opacity:1}}
+.br::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;z-index:4;
+  background:conic-gradient(from var(--br-a),transparent 0 58%,rgba(255,255,255,.85) 68%,transparent 78%),
+    linear-gradient(90deg,#5ef2d6,#7cc8ff 10%,#9b7bff 20%,#ff6fb5 30%,#ffcf6b 40%,#5ef2d6 50%,#7cc8ff 60%,#9b7bff 70%,#ff6fb5 80%,#ffcf6b 90%,#5ef2d6);
+  background-size:100% 100%,200% 100%;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
-  opacity:.6;animation:br-turn 18s linear var(--br-d,0s) infinite paused,br-breathe 6s ease-in-out infinite paused}
-.br.br-on::after{animation-play-state:running}
+  opacity:.7;
+  animation:br-turn 9s steps(135) var(--br-d,0s) infinite paused,br-flow 10s steps(150) var(--br-d,0s) infinite paused,br-breathe 6s ease-in-out infinite paused}
+.br-neb{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:-1}
+.br-neb::before,.br-neb::after{content:"";position:absolute;inset:-70% -35%;will-change:transform;
+  background:radial-gradient(34% 48% at 28% 42%,rgba(94,242,214,.26),transparent 70%),radial-gradient(30% 44% at 72% 58%,rgba(155,123,255,.28),transparent 70%),
+    radial-gradient(22% 36% at 52% 28%,rgba(124,200,255,.2),transparent 70%);
+  animation:br-drift 19s ease-in-out var(--br-d,0s) infinite alternate paused}
+.br-neb::after{background:radial-gradient(30% 46% at 66% 36%,rgba(255,111,181,.22),transparent 70%),radial-gradient(26% 40% at 32% 66%,rgba(124,200,255,.22),transparent 70%),
+    radial-gradient(18% 30% at 82% 72%,rgba(255,207,107,.14),transparent 70%);
+  animation:br-drift2 27s ease-in-out var(--br-d,0s) infinite alternate paused}
+.br.br-on::after,.br.br-on>.br-neb::before,.br.br-on>.br-neb::after{animation-play-state:running}
 /* the footer's top line: the same light running along it */
-html.ek-v3 #ekf.ekf::before{height:1.5px;background:linear-gradient(90deg,transparent,rgba(94,242,214,.95),rgba(155,123,255,.9),rgba(255,111,181,.75),transparent) no-repeat,
-  linear-gradient(90deg,transparent,rgba(150,175,255,.22) 50%,transparent);background-size:38% 100%,100% 100%;animation:br-slide 11s linear infinite,br-breathe 6s ease-in-out infinite}
-html.nx-lite .br::after,html.nx-lite #ekf.ekf::before{animation:none}
-@media (prefers-reduced-motion:reduce){.br::after,html.ek-v3 #ekf.ekf::before{animation:none!important;opacity:.55}}
-@media (forced-colors:active){.br::after{display:none}}
+html.ek-v3 #ekf.ekf::before{height:2px;background:linear-gradient(90deg,transparent,rgba(94,242,214,.95),rgba(124,200,255,.9),rgba(155,123,255,.9),rgba(255,111,181,.8),transparent) no-repeat,
+  linear-gradient(90deg,transparent,rgba(150,175,255,.26) 50%,transparent);background-size:38% 100%,100% 100%;animation:br-slide 8s steps(120) infinite,br-breathe 6s ease-in-out infinite}
+/* the light mode for phones without a graphics chip: the same life, half as many repaints, one cloud */
+html.nx-lite .br::after{animation-timing-function:steps(68),steps(75),ease-in-out}
+html.nx-lite .br-neb::after{display:none}
+html.nx-lite .br-neb::before{will-change:auto}
+@media (prefers-reduced-motion:reduce){
+  .br::after{animation:br-flow 22s steps(110) var(--br-d,0s) infinite paused,br-breathe 8s ease-in-out infinite paused}
+  .br-neb::before,.br-neb::after{transform:none;animation:br-fade 12s ease-in-out var(--br-d,0s) infinite paused;will-change:auto}
+  .br-neb::after{animation-delay:-6s}
+  html.ek-v3 #ekf.ekf::before{animation:br-breathe 8s ease-in-out infinite;background-position:50% 0,0 0}}
+@media (forced-colors:active){.br::after,.br-neb{display:none}}
 
 /* ---- the logo is the name alone (owner 2026-11-26): no box, no border, no background behind it */
 html.ek-v3 #ekh .ek-brand,html.ek-v3 #ekh.ek-sc .ek-brand,html.nx-lite #ekh .ek-brand{background:none!important;border-color:transparent!important;box-shadow:none!important;

@@ -10,9 +10,9 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, w = window, CM = w.OBChain, X = w.OBX;
   var DAY = 86400000, YEAR = 365.25 * DAY;
-  var INK = '#e8e8e3', ACC = '#f7931a', BLUE = '#3987e5', TEAL = '#199e70', RED = '#ff5a4d', GRN = '#34d399', PUR = '#a78bfa', GOLD = '#c98500', GREY = '#8d8d86', INC = '#d95926', PINK = '#f472b6';
-  var BANDC = ['#3987e5', '#199e70', '#c98500', '#f7931a', '#ff5a4d'];
-  var BANDZ = ['rgba(57,135,229,.12)', 'rgba(25,158,112,.10)', 'rgba(201,133,0,.09)', 'rgba(247,147,26,.10)', 'rgba(255,90,77,.13)'];
+  var INK = '#eef1ff', ACC = '#ffcf6b', BLUE = '#7cc8ff', TEAL = '#199e70', RED = '#ff4f9a', GRN = '#5ef2d6', PUR = '#9b7bff', GOLD = '#c98500', GREY = '#8f9ac7', INC = '#d95926', PINK = '#ff6fb5';
+  var BANDC = ['#7cc8ff', '#199e70', '#c98500', '#ffcf6b', '#ff4f9a'];
+  var BANDZ = ['rgba(124,200,255,.12)', 'rgba(25,158,112,.10)', 'rgba(201,133,0,.09)', 'rgba(255,207,107,.10)', 'rgba(255,79,154,.13)'];
   var ASSET_C = { btc: ACC, eth: '#8c8cf7', ltc: '#a6a9aa', bch: GRN, doge: GOLD, ada: BLUE, xrp: INK };
   var ALL7 = ['btc', 'eth', 'ltc', 'bch', 'doge', 'ada', 'xrp'];
 
@@ -100,7 +100,7 @@
       case 'thermo:tcap': return [{ weight: 3, log: S.log, title: T('x_caps'), fmt: usdc, series: [L(T('s_mcap'), Z.mcap, INK, 1.6), L(T('s_rcap'), Z.rcap, ACC, 1.5), L(T('x_thermo'), Z.thermo, TEAL, 1.6)] }];
       case 'models:bands': return [price([L(T('x_top'), Z.topprice, RED, 1.3), L(T('s_rprice'), Z.rprice, ACC, 1.4), L(T('x_avg'), Z.avgprice, BLUE, 1.3), L(T('x_delta'), Z.deltaprice, GRN, 1.4)], 4)];
       case 'models:chpos': return [price(null, 2), { weight: 3, title: T('x_chpos'), fmt: function (v) { return v.toFixed(0) + '%'; },
-        zones: [{ y0: -Infinity, y1: 0, color: BANDZ[0] }, { y0: 80, y1: Infinity, color: BANDZ[4] }], marks: [{ y: 0, color: 'rgba(52,211,153,.5)', label: '0' }, { y: 100, color: 'rgba(255,90,77,.55)', label: '100' }],
+        zones: [{ y0: -Infinity, y1: 0, color: BANDZ[0] }, { y0: 80, y1: Infinity, color: BANDZ[4] }], marks: [{ y: 0, color: 'rgba(94,242,214,.5)', label: '0' }, { y: 100, color: 'rgba(255,79,154,.55)', label: '100' }],
         series: [L(T('x_chpos'), Z.chpos, ACC, 1.6)] }];
       case 'capflow:flow30': return [price(null, 2), { weight: 3, title: T('x_flow30'), fmt: usdc, zero: true, marks: [{ y: 0, color: 'rgba(255,255,255,.3)' }],
         series: [{ name: T('x_flow30'), type: 'bars', color: TEAL, neg: RED, data: CM.pairs(D, Z.rflow30, 0) }] }];
@@ -194,7 +194,7 @@
   }
 
   /* ---------------------------------------------------------------- the compass (its own canvas) */
-  var EPOCHS = [['2012-11-28', '#3987e5'], ['2016-07-09', '#34d399'], ['2020-05-11', '#a78bfa'], ['2024-04-20', '#f7931a']];
+  var EPOCHS = [['2012-11-28', '#7cc8ff'], ['2016-07-09', '#5ef2d6'], ['2020-05-11', '#9b7bff'], ['2024-04-20', '#ffcf6b']];
   function compassData(D) {
     var Z = X.xseries(D), pts = [];
     for (var i = 0; i < D.n; i++) if (Z.score[i] != null && Z.rpct90[i] != null) pts.push({ i: i, t: D.t0 + i * DAY, x: Z.score[i], y: Z.rpct90[i] });
@@ -220,7 +220,7 @@
     V.map = { sx: sx, sy: sy, lo: lo, hi: hi, padL: padL, padT: padT, pw: pw, ph: ph, rtl: rtl };
     /* four quarters: cold or hot, capital arriving or leaving */
     var x50 = sx(50), y0 = sy(0), F = '11px "Space Grotesk", system-ui, sans-serif';
-    [[0, 50, 0, hi, 'rgba(25,158,112,.07)', 'x_q_acc'], [50, 100, 0, hi, 'rgba(247,147,26,.08)', 'x_q_heat'], [50, 100, lo, 0, 'rgba(255,90,77,.08)', 'x_q_dist'], [0, 50, lo, 0, 'rgba(57,135,229,.08)', 'x_q_cap']].forEach(function (q) {
+    [[0, 50, 0, hi, 'rgba(25,158,112,.07)', 'x_q_acc'], [50, 100, 0, hi, 'rgba(255,207,107,.08)', 'x_q_heat'], [50, 100, lo, 0, 'rgba(255,79,154,.08)', 'x_q_dist'], [0, 50, lo, 0, 'rgba(124,200,255,.08)', 'x_q_cap']].forEach(function (q) {
       var xa = sx(q[0]), xb = sx(q[1]), ya = sy(q[3]), yb = sy(q[2]);
       g.fillStyle = q[4]; g.fillRect(Math.min(xa, xb), ya, Math.abs(xb - xa), yb - ya);
       g.fillStyle = 'rgba(232,232,227,.55)'; g.font = '600 12px "Vazirmatn", "Space Grotesk", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -242,7 +242,7 @@
     var trail = pts.filter(function (p) { return p.t >= trailFrom; });
     for (var k = 1; k < trail.length; k++) {
       var a = trail[k - 1], b = trail[k], u = k / trail.length;
-      g.strokeStyle = 'rgba(247,147,26,' + (0.15 + 0.85 * u).toFixed(3) + ')'; g.lineWidth = 1 + 1.6 * u;
+      g.strokeStyle = 'rgba(255,207,107,' + (0.15 + 0.85 * u).toFixed(3) + ')'; g.lineWidth = 1 + 1.6 * u;
       g.beginPath(); g.moveTo(sx(a.x), sy(a.y)); g.lineTo(sx(b.x), sy(b.y)); g.stroke();
     }
     g.fillStyle = ACC; g.beginPath(); g.arc(sx(last.x), sy(last.y), 5.5, 0, 7); g.fill();

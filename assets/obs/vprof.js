@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document;
-  var BUY = '#2ec27e', SELL = '#ff5a4d', POC = '#f0b429';
+  var BUY = '#5ef2d6', SELL = '#ff4f9a', POC = '#ffcf6b';
   var RANGES = ['7', '30', '90', '365'], SIDES = ['both', 'net'];
   var DEF = { coin: 'btc', range: '30', side: 'both' };
   var S = (function () {

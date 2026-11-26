@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, M = window.OBRisk;
-  var ACC = '#f0b429', RED = '#ff5a4d', INK = '#e8e8e3';
+  var ACC = '#ffcf6b', RED = '#ff4f9a', INK = '#eef1ff';
   var COINS = ['BTC', 'ETH'], WINDOWS = ['1y', '3y', 'all'], DAYS = { '1y': 365, '3y': 1095 };
   var DEF = { coin: 'BTC', win: '3y', account: 10000, riskPct: 1, entry: 0, stop: 0 };
   var S = (function () {
@@ -83,7 +83,7 @@
     host.innerHTML = '<div class="ob-rkbars">' + bins.map(function (b) {
       var mid = (b.x0 + b.x1) / 2, bad = mid <= -cut;
       return '<i style="height:' + Math.max(1, b.n / max * 100).toFixed(1) + '%;background:' +
-        (bad ? RED : mid < 0 ? 'rgba(255,90,77,.42)' : 'rgba(52,211,153,.5)') + '" title="' +
+        (bad ? RED : mid < 0 ? 'rgba(255,79,154,.42)' : 'rgba(94,242,214,.5)') + '" title="' +
         esc(OB.ltr((mid * 100).toFixed(1) + '% · ' + b.n)) + '"></i>';
     }).join('') + '</div><p class="ob-rklegend"><span style="color:' + RED + '">■</span> ' +
       esc(T('rk_legend', { v: OB.ltr(pc(cut, 2)) })) + '</p>';

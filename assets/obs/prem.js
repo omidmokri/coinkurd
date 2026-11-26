@@ -16,7 +16,7 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, w = window, F = w.OBFlow, SRC = OB.src;
   var H = 3600000, DAY = 86400000, YEAR = 365.25 * DAY, MS = OB.IVMS;
-  var INK = '#e8e8e3', ACC = '#f7931a', BLUE = '#3987e5', GRN = '#34d399', RED = '#ff5a4d', TEAL = '#199e70', PUR = '#a78bfa', GREY = '#8d8d86';
+  var INK = '#eef1ff', ACC = '#ffcf6b', BLUE = '#7cc8ff', GRN = '#5ef2d6', RED = '#ff4f9a', TEAL = '#199e70', PUR = '#9b7bff', GREY = '#8f9ac7';
   var BY = 'https://api.bybit.com/v5/market/', DB = 'https://www.deribit.com/api/v2/public/';
   var BYK = { '5m': '5', '15m': '15', '30m': '30', '1h': '60', '4h': '240', '1d': 'D' };
 

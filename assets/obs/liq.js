@@ -9,12 +9,13 @@
 
   /* ---------------------------------------------------------------- palettes: every one runs dark → light (semantic heat) */
   var PAL = {
+    aurora: [[0, 14, 12, 48], [0.14, 44, 22, 110], [0.32, 92, 46, 186], [0.5, 70, 112, 236], [0.66, 64, 196, 230], [0.8, 110, 242, 214], [0.92, 214, 255, 236], [1, 255, 252, 236]],
     fire: [[0, 24, 12, 44], [0.14, 66, 18, 84], [0.32, 128, 26, 92], [0.5, 198, 54, 44], [0.68, 247, 147, 26], [0.86, 255, 214, 102], [1, 255, 250, 224]],
     viridis: [[0, 68, 1, 84], [0.13, 72, 40, 120], [0.25, 62, 73, 137], [0.38, 49, 104, 142], [0.5, 38, 130, 142], [0.63, 31, 158, 137], [0.75, 53, 183, 121], [0.86, 110, 206, 88], [0.94, 181, 222, 43], [1, 253, 231, 37]],
     ice: [[0, 10, 24, 54], [0.2, 13, 54, 107], [0.45, 28, 92, 171], [0.65, 57, 135, 229], [0.85, 158, 197, 244], [1, 240, 247, 255]],
     mono: [[0, 34, 34, 37], [0.5, 128, 128, 131], [1, 255, 255, 255]]
   };
-  var PALS = ['fire', 'viridis', 'ice', 'mono'];
+  var PALS = ['aurora', 'fire', 'viridis', 'ice', 'mono'];
   function ramp(stops, x) {
     for (var i = 1; i < stops.length; i++) if (x <= stops[i][0]) { var a = stops[i - 1], b = stops[i], t = (x - a[0]) / (b[0] - a[0]); return [a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t]; }
     var l = stops[stops.length - 1]; return [l[1], l[2], l[3]];
@@ -22,20 +23,20 @@
   var LUTS = {};
   function lut(name) {                        /* 256 packed little-endian RGBA values; entry 0 is transparent */
     if (LUTS[name]) return LUTS[name];
-    var u = new Uint32Array(256), st = PAL[name] || PAL.fire;
+    var u = new Uint32Array(256), st = PAL[name] || PAL.aurora;
     for (var i = 1; i < 256; i++) { var c = ramp(st, (i - 1) / 254); u[i] = (255 << 24) | ((c[2] & 255) << 16) | ((c[1] & 255) << 8) | (c[0] & 255); }
     return (LUTS[name] = u);
   }
-  function cssAt(name, x) { var c = ramp(PAL[name] || PAL.fire, x); return 'rgb(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ')'; }
-  var UP = '#e9fff5', DN = '#ff4d6a', LONGC = '#ff5a4d', SHORTC = '#34d399';
+  function cssAt(name, x) { var c = ramp(PAL[name] || PAL.aurora, x); return 'rgb(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ')'; }
+  var UP = '#eafffb', DN = '#ff4f9a', LONGC = '#ff4f9a', SHORTC = '#5ef2d6';
   /* leverage is an ordered scale: one hue per side, lighter = higher leverage (nearer to the price) */
   /* (both ramps pass the ordinal checks of the palette validator on the dark surface: one hue, even lightness steps, darkest step ≥ 2:1) */
-  var TIER_L = { 5: '#a03226', 10: '#c23f2f', 25: '#e2503d', 50: '#ff7a66', 100: '#ffb9ac' };
-  var TIER_S = { 5: '#157050', 10: '#1a8a63', 25: '#22a67a', 50: '#3fd9a0', 100: '#9cefd0' };
+  var TIER_L = { 5: '#8a1f57', 10: '#b02a72', 25: '#e0408f', 50: '#ff74b4', 100: '#ffc4df' };
+  var TIER_S = { 5: '#12655f', 10: '#178a80', 25: '#20b3a1', 50: '#52e6cd', 100: '#b6fbef' };
   var GAMMA = 0.95;       /* nearly linear: only the strongest levels are bright (checked on live data: 0.55 lit up every band) */
 
   /* ---------------------------------------------------------------- settings (this browser only; a shared link overrides them once) */
-  var DEF = { coin: 'BTC', range: '24h', ex: 'all', model: 1, tiers: { 5: 0, 10: 1, 25: 1, 50: 1, 100: 1 }, pal: 'fire', thr: 6, real: true, prof: true, mapw: 10, maplb: '7d' };
+  var DEF = { coin: 'BTC', range: '24h', ex: 'all', model: 1, tiers: { 5: 0, 10: 1, 25: 1, 50: 1, 100: 1 }, pal: 'aurora', pv: 2, thr: 6, real: true, prof: true, mapw: 10, maplb: '7d' };
   var S = (function () {
     var s = OB.store.get('ek_obs_liq', null) || {}, o = JSON.parse(JSON.stringify(DEF));
     Object.keys(o).forEach(function (k) { if (s[k] != null && typeof s[k] === typeof o[k]) o[k] = s[k]; });
@@ -45,7 +46,7 @@
     if ((v = q.get('ex')) && /^(all|binance|bybit)$/.test(v)) o.ex = v;
     if ((v = q.get('model')) && /^[123]$/.test(v)) o.model = +v;
     if (!o.tiers || typeof o.tiers !== 'object') o.tiers = JSON.parse(JSON.stringify(DEF.tiers));
-    if (PALS.indexOf(o.pal) < 0) o.pal = 'fire';
+    if (PALS.indexOf(o.pal) < 0 || s.pv !== 2) { o.pal = 'aurora'; o.pv = 2; }   /* the site's own heat (owner 2026-11-26), once for everyone */
     return o;
   })();
   var save = OB.debounce(function () { OB.store.set('ek_obs_liq', S); }, 300);
@@ -350,8 +351,8 @@
     function Y(p) { return y0 + (v.y1 - p) * ys; }
     this._X = X; this._Y = Y; this._G = G;
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#0d0d11'; ctx.fillRect(x0, y0, G.plotW, ph);
+    OB.bg(ctx, 0, 0, W, H, !!target);
+    ctx.fillStyle = OB.PLOT; ctx.fillRect(x0, y0, G.plotW, ph);
 
     /* grid: hairlines one shade off the surface */
     var gtop = g.pmin + g.rows * g.step, ps = niceStep(v.y1 - v.y0, Math.max(3, Math.floor(ph / 54))), p;
@@ -398,7 +399,7 @@
         ctx.fillStyle = sideL[k] ? LONGC : SHORTC; ctx.globalAlpha = 0.85; ctx.fillRect(px0 + 2, y0 + k * binH, bl, binH - 1); ctx.globalAlpha = 1;
       }
       this.profMax = mxb;
-      ctx.fillStyle = '#9a9a94'; ctx.textBaseline = 'top'; ctx.font = '10px Vazirmatn, system-ui, sans-serif';
+      ctx.fillStyle = '#a3aed8'; ctx.textBaseline = 'top'; ctx.font = '10px Vazirmatn, system-ui, sans-serif';
       ctx.direction = OB.rtl() ? 'rtl' : 'ltr'; ctx.textAlign = 'center';
       ctx.fillText(T('prof_now'), px0 + G.pw / 2, y0 + 3); ctx.direction = 'ltr';
     }
@@ -408,7 +409,7 @@
       if (!this.agg) this.agg = aggLiqs(this.liq, D.start, D.step, n);
       var ly0 = G.liqY, lmid = ly0 + G.liqH / 2, lmx = 0, q;
       for (k = a; k <= b; k++) { q = this.agg[k]; if (q) { if (q[0] > lmx) lmx = q[0]; if (q[2] > lmx) lmx = q[2]; } }
-      ctx.fillStyle = '#0d0d11'; ctx.fillRect(x0, ly0, G.plotW, G.liqH);
+      ctx.fillStyle = OB.PLOT; ctx.fillRect(x0, ly0, G.plotW, G.liqH);
       ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1; ctx.strokeRect(x0 + 0.5, ly0 + 0.5, G.plotW - 1, G.liqH - 1);
       ctx.beginPath(); ctx.moveTo(x0, Math.round(lmid) + 0.5); ctx.lineTo(x0 + hw, Math.round(lmid) + 0.5); ctx.stroke();
       if (lmx > 0) {
@@ -424,7 +425,7 @@
       }
       this.liqMax = lmx;
       /* its label and scale sit beside it, physically left-aligned in every language (the chart itself is left-to-right) */
-      ctx.font = '10px Vazirmatn, system-ui, sans-serif'; ctx.fillStyle = '#9a9a94'; ctx.textBaseline = 'top'; ctx.direction = OB.rtl() ? 'rtl' : 'ltr'; ctx.textAlign = 'left';
+      ctx.font = '10px Vazirmatn, system-ui, sans-serif'; ctx.fillStyle = '#a3aed8'; ctx.textBaseline = 'top'; ctx.direction = OB.rtl() ? 'rtl' : 'ltr'; ctx.textAlign = 'left';
       ctx.fillText(T('real_strip'), x0 + hw + 6, ly0 + 5);
       ctx.direction = 'ltr'; ctx.font = '10px "Space Grotesk", system-ui, sans-serif';
       if (lmx > 0) ctx.fillText('±' + OB.fmtUsd(lmx, 1), x0 + hw + 6, ly0 + 21);
@@ -433,27 +434,27 @@
     /* the price now */
     var yp = Y(this.px);
     if (yp >= y0 && yp <= y0 + ph) {
-      ctx.strokeStyle = 'rgba(247,147,26,.9)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, Math.round(yp) + 0.5); ctx.lineTo(x0 + G.plotW, Math.round(yp) + 0.5); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,207,107,.9)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, Math.round(yp) + 0.5); ctx.lineTo(x0 + G.plotW, Math.round(yp) + 0.5); ctx.stroke();
     }
     /* frame */
     ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.lineWidth = 1; ctx.strokeRect(x0 + 0.5, y0 + 0.5, G.plotW - 1, ph - 1);
 
     /* price axis */
-    ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#b9b9b3';
+    ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillStyle = '#c3ccf2';
     for (p = Math.ceil(v.y0 / ps) * ps; p <= v.y1; p += ps) { var ty = Y(p); if (ty > y0 + 6 && ty < y0 + ph - 4) ctx.fillText(OB.fmtP(p), x0 + G.plotW + 8, ty); }
     if (yp >= y0 && yp <= y0 + ph) {
       var lab = OB.fmtP(this.px), tw = ctx.measureText(lab).width + 12;
-      ctx.fillStyle = '#f7931a'; ctx.fillRect(x0 + G.plotW + 2, yp - 9, tw, 18); ctx.fillStyle = '#16100a'; ctx.font = '600 11px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(lab, x0 + G.plotW + 8, yp + 0.5);
+      var pg = ctx.createLinearGradient(0, yp - 9, 0, yp + 9); pg.addColorStop(0, '#ffe29a'); pg.addColorStop(1, '#f5b544'); ctx.fillStyle = pg; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x0 + G.plotW + 2, yp - 9, tw, 18, 9); else ctx.rect(x0 + G.plotW + 2, yp - 9, tw, 18); ctx.fill(); ctx.fillStyle = '#16100a'; ctx.font = '600 11px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(lab, x0 + G.plotW + 8, yp + 0.5);
     }
     /* time axis */
     var spanMs = (v.x1 - v.x0) * D.step, want = spanMs / Math.max(2, Math.floor(hw / 92)), ts = TSTEPS[TSTEPS.length - 1], i;
     for (i = 0; i < TSTEPS.length; i++) if (TSTEPS[i] >= want) { ts = TSTEPS[i]; break; }
     var tz = new Date().getTimezoneOffset() * 60000, t0 = D.start + v.x0 * D.step, t1 = D.start + v.x1 * D.step, t;
-    ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.fillStyle = '#9a9a94'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.fillStyle = '#a3aed8'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for (t = Math.ceil((t0 - tz) / ts) * ts + tz; t <= t1; t += ts) {
       var tx = X((t - D.start) / D.step); if (tx < x0 + 16 || tx > x0 + hw - 16) continue;
       var dt = new Date(t), mid = dt.getHours() === 0 && dt.getMinutes() === 0;
-      ctx.fillStyle = mid ? '#e8e8e3' : '#9a9a94';
+      ctx.fillStyle = mid ? '#eef1ff' : '#a3aed8';
       var ay = G.liqH ? G.liqY + G.liqH : y0 + ph;
       ctx.fillText(ts >= 864e5 || mid ? OB.axisDay(t) : OB.axisTime(t), tx, ay + 6);
       ctx.strokeStyle = 'rgba(255,255,255,.10)'; ctx.beginPath(); ctx.moveTo(Math.round(tx) + 0.5, ay); ctx.lineTo(Math.round(tx) + 0.5, ay + 4); ctx.stroke();
@@ -463,8 +464,8 @@
       var bx = 12, bw2 = 10, by = y0 + 22, bh = Math.min(ph - 44, 260), gr = ctx.createLinearGradient(0, by + bh, 0, by);
       for (i = 0; i <= 10; i++) gr.addColorStop(i / 10, cssAt(S.pal, i / 10));
       ctx.fillStyle = gr; ctx.fillRect(bx, by, bw2, bh); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.strokeRect(bx + 0.5, by + 0.5, bw2 - 1, bh - 1);
-      ctx.fillStyle = '#e8e8e3'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.font = '600 10.5px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(OB.fmtUsd(this.max, 1), 6, by - 5);
-      ctx.fillStyle = '#9a9a94'; ctx.textBaseline = 'top'; ctx.font = '10px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(S.thr ? OB.fmtUsd(this.max * S.thr / 100, 1) : '0', 6, by + bh + 5);
+      ctx.fillStyle = '#eef1ff'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom'; ctx.font = '600 10.5px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(OB.fmtUsd(this.max, 1), 6, by - 5);
+      ctx.fillStyle = '#a3aed8'; ctx.textBaseline = 'top'; ctx.font = '10px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(S.thr ? OB.fmtUsd(this.max * S.thr / 100, 1) : '0', 6, by + bh + 5);
     }
     if (!target) this.cross(ctx);
   };
@@ -501,7 +502,7 @@
       this.place(th, h); return;
     }
     var lab = OB.fmtP(price); ctx.font = '600 11px "Space Grotesk", system-ui, sans-serif'; var tw = ctx.measureText(lab).width + 12;
-    ctx.fillStyle = '#2a2b31'; ctx.fillRect(x0 + G.plotW + 2, h.y - 9, tw, 18); ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x0 + G.plotW + 8, h.y + 0.5);
+    ctx.fillStyle = '#232c5c'; ctx.fillRect(x0 + G.plotW + 2, h.y - 9, tw, 18); ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(lab, x0 + G.plotW + 8, h.y + 0.5);
     /* the read-out */
     var row = M.rowOf(g, price), rows = g.rows, tip = this.tip, html = '';
     var plo = g.pmin + row * g.step, phi = plo + g.step, inGrid = row >= 0 && row < rows;
@@ -612,14 +613,14 @@
     if (V.kind === 'liqmap') return exportSvg();
     var ch = V.chart; if (!ch || !ch.D) return;
     var dpr = 2, head = 46, c = d.createElement('canvas'); c.width = ch.W * dpr; c.height = (ch.H + head) * dpr;
-    var ctx = c.getContext('2d'); ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0, 0, c.width, c.height);
+    var ctx = c.getContext('2d'); OB.bg(ctx, 0, 0, c.width, c.height, true);
     var keep = ch.hover; ch.hover = null; ch.draw({ ctx: ctx, dpr: dpr, oy: head }); ch.hover = keep;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#f2f2ee'; ctx.font = '700 16px "Space Grotesk", Vazirmatn, system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#f4f6ff'; ctx.font = '700 16px "Space Grotesk", Vazirmatn, system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     ctx.fillText(S.coin + ' · Liquidation heatmap · ' + S.range, 14, 17);
-    ctx.fillStyle = '#9a9a94'; ctx.font = '11px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillStyle = '#a3aed8'; ctx.font = '11px "Space Grotesk", system-ui, sans-serif';
     ctx.fillText(V.data.raws.map(function (r) { return OB.src[r.ex].name; }).join(' + ') + ' · model ' + S.model + ' · ' + new Date(V.data.now).toISOString().slice(0, 16).replace('T', ' ') + ' UTC · estimate, not a forecast', 14, 35);
-    ctx.fillStyle = '#f7931a'; ctx.font = '700 15px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', ch.W - 14, 23);
+    ctx.fillStyle = '#ffcf6b'; ctx.font = '700 15px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', ch.W - 14, 23);
     ch.draw();
     c.toBlob(function (b) { if (!b) return; dl(URL.createObjectURL(b), 'entekhab-liquidation-heatmap-' + S.coin + '-' + S.range + '.png'); }, 'image/png');
   }
@@ -627,8 +628,8 @@
     var svg = $('#ob-map svg', V.el); if (!svg) return;
     var s = new XMLSerializer().serializeToString(svg), img = new Image(), W = svg.viewBox.baseVal.width, H = svg.viewBox.baseVal.height;
     img.onload = function () {
-      var c = d.createElement('canvas'); c.width = W * 2; c.height = H * 2; var ctx = c.getContext('2d'); ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
-      ctx.fillStyle = '#f7931a'; ctx.font = '700 28px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', c.width - 24, 40);
+      var c = d.createElement('canvas'); c.width = W * 2; c.height = H * 2; var ctx = c.getContext('2d'); OB.bg(ctx, 0, 0, c.width, c.height, true); ctx.drawImage(img, 0, 0, c.width, c.height);
+      ctx.fillStyle = '#ffcf6b'; ctx.font = '700 28px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', c.width - 24, 40);
       c.toBlob(function (b) { if (b) dl(URL.createObjectURL(b), 'entekhab-liquidation-map-' + S.coin + '.png'); }, 'image/png');
     };
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
@@ -658,12 +659,12 @@
     var cmx = Math.max(cumL[0] || 0, cumS[nb - 1] || 0);
     function X(p) { return L + (p - p0) / (p1 - p0) * pw; }
     var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="' + esc(T('aria_map', { coin: S.coin })) + '" xmlns="http://www.w3.org/2000/svg" style="direction:ltr;font-family:\'Space Grotesk\',Vazirmatn,system-ui,sans-serif">';      /* the page may be right-to-left; the chart's geometry is not */
-    s += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#0a0a0c"/>';
-    function txt(x, y, anchor, t, o) { o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + (o.fs || 11) + '" fill="' + (o.fill || '#9a9a94') + '"' + (o.w ? ' font-weight="' + o.w + '"' : '') + (o.rtl ? ' direction="rtl" unicode-bidi="embed"' : '') + '>' + esc(t) + '</text>'; }
+    s += '<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="rgba(6,10,32,.55)"/>';
+    function txt(x, y, anchor, t, o) { o = o || {}; return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-size="' + (o.fs || 11) + '" fill="' + (o.fill || '#a3aed8') + '"' + (o.w ? ' font-weight="' + o.w + '"' : '') + (o.rtl ? ' direction="rtl" unicode-bidi="embed"' : '') + '>' + esc(t) + '</text>'; }
     var rtl = OB.rtl();
     /* panel 1: dollars per price band, stacked by leverage */
     var y1 = T0, yb = T0 + H1, st = niceStep(mx || 1, 4), yv;
-    s += txt(rtl ? W - R : L, 15, 'start', T(narrow ? 'map_p1s' : 'map_p1'), { fill: '#e8e8e3', fs: narrow ? 11 : 12, w: 700, rtl: rtl });      /* with direction:rtl "start" is the right end */
+    s += txt(rtl ? W - R : L, 15, 'start', T(narrow ? 'map_p1s' : 'map_p1'), { fill: '#eef1ff', fs: narrow ? 11 : 12, w: 700, rtl: rtl });      /* with direction:rtl "start" is the right end */
     for (yv = 0; yv <= mx * 1.001; yv += st) { var gy = yb - (mx ? yv / mx * (H1 - 8) : 0); s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy.toFixed(1) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,.06)"/>' + txt(L - 6, gy + 4, 'end', axUsd(yv, st)); }
     var bwid = Math.max(1, pw / nb - 2);
     for (b = 0; b < nb; b++) {
@@ -677,7 +678,7 @@
     }
     /* panel 2: cumulative dollars from the price outward */
     var y2 = yb + GAP, yb2 = y2 + H2, st2 = niceStep(cmx || 1, 3);
-    s += txt(rtl ? W - R : L, y2 - 9, 'start', T('map_p2'), { fill: '#e8e8e3', fs: narrow ? 11 : 12, w: 700, rtl: rtl });
+    s += txt(rtl ? W - R : L, y2 - 9, 'start', T('map_p2'), { fill: '#eef1ff', fs: narrow ? 11 : 12, w: 700, rtl: rtl });
     for (yv = 0; yv <= cmx * 1.001; yv += st2) { var gy2 = yb2 - (cmx ? yv / cmx * (H2 - 8) : 0); s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy2.toFixed(1) + '" y2="' + gy2.toFixed(1) + '" stroke="rgba(255,255,255,.06)"/>' + txt(L - 6, gy2 + 4, 'end', axUsd(yv, st2)); }
     function area(arr, from, to, col) {
       var pts = [], i; for (i = from; i <= to; i++) pts.push((L + (i + 0.5) * pw / nb).toFixed(1) + ',' + (yb2 - (cmx ? arr[i] / cmx * (H2 - 8) : 0)).toFixed(1));
@@ -690,8 +691,8 @@
     var pst = niceStep(p1 - p0, Math.max(3, Math.floor(pw / 90))), p;
     for (p = Math.ceil(p0 / pst) * pst; p <= p1; p += pst) { var tx = X(p); if (tx < L + 20 || tx > W - R - 20) continue; s += '<line x1="' + tx.toFixed(1) + '" x2="' + tx.toFixed(1) + '" y1="' + yb2 + '" y2="' + (yb2 + 4) + '" stroke="rgba(255,255,255,.2)"/>' + txt(tx, yb2 + 18, 'middle', OB.fmtP(p)); }
     var xp = X(px);
-    s += '<line x1="' + xp.toFixed(1) + '" x2="' + xp.toFixed(1) + '" y1="' + (y1 - 4) + '" y2="' + yb2 + '" stroke="#f7931a" stroke-width="1.4"/>' +
-      '<rect x="' + (xp - 34).toFixed(1) + '" y="' + (y1 - 8) + '" width="68" height="17" rx="4" fill="#f7931a"/>' + txt(xp, y1 + 4.5, 'middle', OB.fmtP(px), { fill: '#16100a', w: 700 });
+    s += '<line x1="' + xp.toFixed(1) + '" x2="' + xp.toFixed(1) + '" y1="' + (y1 - 4) + '" y2="' + yb2 + '" stroke="#ffcf6b" stroke-width="1.4"/>' +
+      '<rect x="' + (xp - 34).toFixed(1) + '" y="' + (y1 - 8) + '" width="68" height="17" rx="4" fill="#ffcf6b"/>' + txt(xp, y1 + 4.5, 'middle', OB.fmtP(px), { fill: '#16100a', w: 700 });
     s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yb + '" y2="' + yb + '" stroke="rgba(255,255,255,.18)"/><line x1="' + L + '" x2="' + (W - R) + '" y1="' + yb2 + '" y2="' + yb2 + '" stroke="rgba(255,255,255,.18)"/>';
     s += '<line id="ob-mx" x1="0" x2="0" y1="' + y1 + '" y2="' + yb2 + '" stroke="rgba(255,255,255,.4)" visibility="hidden"/></svg>';
     var dirA = ' dir="' + (rtl ? 'rtl' : 'ltr') + '"';

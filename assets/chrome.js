@@ -374,25 +374,34 @@
   label(pageI18nNow() ? cur() : (de.getAttribute('lang') ? cur() : (ls.get('ck_lang') || 'fa')));
 })();
 
-/* breathing light (owner 2026-11-26): marks the frames that carry it (.br, styled in chrome.css) and lets the light run only
-   while a frame is on screen. Nothing runs under prefers-reduced-motion, and nothing at all where the browser cannot mask
-   an edge. */
+/* breathing light (owner 2026-11-26): marks the frames that carry it (.br, styled in chrome.css), gives each one its layer
+   of drifting clouds (.br-neb) and lets the light run only while a frame is on screen. Under prefers-reduced-motion it
+   still runs, in the calmer form chrome.css gives it; nothing at all where the browser cannot mask an edge. */
 (function () {
   var w = window, d = document, de = d.documentElement;
   try { if (!(w.CSS && (CSS.supports('mask-composite', 'exclude') || CSS.supports('-webkit-mask-composite', 'xor')))) return; } catch (e) { return; }
-  var RM = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var SITE = ['#ekh .ek-nav', '#ekh .ek-tools', '#ekb', '#ekf .ekf-quick', '#ekf .ekf-col', '#ekf .ekf-apps .ek-badge',
     '#ekm .ekm-q', '#ekm .ekm-pane>.ekm-pi', '#ekm .ekm-lang', '#ekm .ekm-apps .ek-badge'];
   var EVERY = ['#ob', '.ob-ac', '.ob-hubf'];
-  var io = !RM && 'IntersectionObserver' in w ? new IntersectionObserver(function (es) {
+  var io = 'IntersectionObserver' in w ? new IntersectionObserver(function (es) {
     es.forEach(function (e) { e.target.classList.toggle('br-on', e.isIntersecting); });
   }, { rootMargin: '60px' }) : null;
+  /* a frame whose insides are rebuilt (the observatory's #ob) gets its cloud layer back */
+  var mo = 'MutationObserver' in w ? new MutationObserver(function (ms) { ms.forEach(function (m) { neb(m.target); }); }) : null;
+  function neb(el) {
+    for (var c = el.firstElementChild; c; c = c.nextElementSibling) if (c.classList.contains('br-neb')) return;
+    var s = d.createElement('span'); s.className = 'br-neb'; s.setAttribute('aria-hidden', 'true');
+    el.insertBefore(s, el.firstChild);
+  }
   function mark(el) {
-    if (el.classList.contains('br')) return;
+    if (el.classList.contains('br')) { neb(el); return; }
     if (w.getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    el.style.isolation = 'isolate';                                            /* the clouds sit behind the frame's content */
     el.style.setProperty('--br-d', (-Math.random() * 18).toFixed(2) + 's');   /* each frame's light starts at its own place */
     el.classList.add('br');
-    if (io) io.observe(el); else if (!RM) el.classList.add('br-on');
+    neb(el);
+    if (mo) mo.observe(el, { childList: true });
+    if (io) io.observe(el); else el.classList.add('br-on');
   }
   function scan() {
     var sel = (de.classList.contains('ek-v3') ? SITE.concat(EVERY) : EVERY).join(',');
@@ -402,8 +411,8 @@
   w.addEventListener('load', function () { setTimeout(scan, 300); });
   /* the mobile menu (#ekm) is built on first open: mark its panels once it lands */
   if ('MutationObserver' in w) {
-    var mo = new MutationObserver(function () { if (d.getElementById('ekm')) { mo.disconnect(); setTimeout(scan, 30); } });
-    var watch = function () { if (d.getElementById('ekm')) scan(); else mo.observe(d.body, { childList: true }); };
+    var mm = new MutationObserver(function () { if (d.getElementById('ekm')) { mm.disconnect(); setTimeout(scan, 30); } });
+    var watch = function () { if (d.getElementById('ekm')) scan(); else mm.observe(d.body, { childList: true }); };
     if (d.body) watch(); else d.addEventListener('DOMContentLoaded', watch);
   }
   w.ekBreath = scan;

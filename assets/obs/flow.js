@@ -11,7 +11,7 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document, w = window, F = w.OBFlow, SRC = OB.src;
   var H = 3600000, DAY = 86400000, MS = OB.IVMS;
-  var INK = '#e8e8e3', GRN = '#34d399', RED = '#ff5a4d', BLUE = '#3987e5', ACC = '#f7931a';
+  var INK = '#eef1ff', GRN = '#5ef2d6', RED = '#ff4f9a', BLUE = '#7cc8ff', ACC = '#ffcf6b';
   var GATE = 'https://api.gateio.ws/api/v4/futures/usdt/', BNS = 'https://data-api.binance.vision/api/v3/', BNF = 'https://fapi.binance.com/fapi/v1/', OKX = 'https://www.okx.com/api/v5/';
   var GATE_ROWS = 2000;                                   /* the most rows Gate gives in one answer: 83 days of hours, 333 days of 4-hour periods */
 

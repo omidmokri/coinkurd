@@ -19,7 +19,7 @@
   var HALVING = 210000, BULL = 157500, BEAR = 52500, HALF = 78750, DAY = 864e5, BLOCK_MS = 600000;
   var ANCHOR = [[0, '2009-01-03'], [210000, '2012-11-28'], [420000, '2016-07-09'], [630000, '2020-05-11'], [840000, '2024-04-20']];
   var BUCKET = { d: 144, w: 1008, m: 4368 };                 /* a day, a week and a month of blocks */
-  var INK = '#e8e8e3', GREY = '#8d8d86';
+  var INK = '#eef1ff', GREY = '#8f9ac7';
   /* the spectrum the whole page reads by: 0 deep blue, 1 red. Quantised into steps so a 6,000-point line
      is drawn as a few dozen strokes rather than six thousand. */
   var STOPS = [[0x1e, 0x5b, 0xff], [0x00, 0xd0, 0xff], [0x00, 0xe6, 0x76], [0xff, 0xe0, 0x2e], [0xff, 0x98, 0x00], [0xff, 0x2d, 0x1f]];
@@ -34,7 +34,7 @@
   })();
   /* the colours the cycle overlay reads by: one per halving epoch, fixed, so turning the overlay on and off
      or hiding a cycle never repaints the others. Checked for colour-blind separation against the dark surface. */
-  var CYC = { 1: '#c77dff', 2: '#00e0b0', 3: '#4da3ff', 4: '#ffa21a', 5: '#d6d6d0' };
+  var CYC = { 1: '#c77dff', 2: '#00e0b0', 3: '#4da3ff', 4: '#ffcf6b', 5: '#d6d6d0' };
   function hue(v, future) { var i = OB.clamp(Math.round(v * (STEPS - 1)), 0, STEPS - 1); return future ? RAMPF[i] : RAMP[i]; }
 
   /* ---------------------------------------------------------------- the index */
@@ -196,7 +196,7 @@
       vb.push({ x0: b.x0, x1: b.x1, color: b.bull ? 'rgba(0,230,118,.15)' : 'rgba(255,45,31,.14)', label: T(b.bull ? 'wv_bull' : 'wv_bear'), ink: b.bull ? 'rgba(0,230,118,.95)' : 'rgba(255,77,64,.95)' });
     });
     if (S.halv) vl.push({ x: 0, color: 'rgba(233,233,228,.4)', label: T('wv_halving'), ink: 'rgba(233,233,228,.55)' });
-    vl.push({ x: G.uNow, color: 'rgba(247,147,26,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(247,147,26,.9)' });
+    vl.push({ x: G.uNow, color: 'rgba(255,207,107,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(255,207,107,.9)' });
 
     var keepO = V.lastStyle === 'ovl' && V.ts.v != null; V.lastStyle = 'ovl';
     V.ts.set({
@@ -206,7 +206,7 @@
       panes: [
         { weight: 2.6, log: S.log, title: T('wv_vs_halv'), fmt: function (v) { return OB.loc('×' + (v >= 10 ? v.toFixed(0) : v.toFixed(2))); }, vbands: vb, vlines: vl, series: G.series },
         { weight: 1, min: 0, max: 1, title: T('wv_name'), fmt: function (v) { return OB.loc(v.toFixed(2)); }, vbands: vb, vlines: vl,
-          series: [{ name: T('wv_name'), type: 'line', color: '#00e676', width: 2.2, data: G.idx, colors: G.icol, fmt: function (v) { return OB.loc(v.toFixed(3)); } }] }
+          series: [{ name: T('wv_name'), type: 'line', color: '#5ef2d6', width: 2.2, data: G.idx, colors: G.icol, fmt: function (v) { return OB.loc(v.toFixed(3)); } }] }
       ]
     });
     var note = $('#ob-note', V.el); if (note) note.textContent = T('note_wave_ovl');
@@ -255,11 +255,11 @@
     if (S.halv) G.halv.forEach(function (h) {
       vl.push({ x: h, color: h > tipH ? 'rgba(233,233,228,.22)' : 'rgba(233,233,228,.4)', dash: h > tipH ? [4, 4] : null, label: T('wv_halv_at', { h: num(h) }), ink: 'rgba(233,233,228,.55)' });
     });
-    vl.push({ x: tipH, color: 'rgba(247,147,26,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(247,147,26,.9)' });
+    vl.push({ x: tipH, color: 'rgba(255,207,107,.85)', width: 1.5, label: T('wv_now'), ink: 'rgba(255,207,107,.9)' });
 
     var price = S.style === 'candle'
-      ? { name: T('p_price'), type: 'candle', color: INK, up: '#00e676', dn: '#ff2d1f', data: G.rows.map(function (r) { return [r[0], r[1], r[2], r[3], r[4]]; }) }
-      : { name: T('p_price'), type: 'line', color: '#ffa21a', width: 2, data: G.rows.map(function (r) { return [r[0], r[4]]; }) };
+      ? { name: T('p_price'), type: 'candle', color: INK, up: '#5ef2d6', dn: '#ff4f9a', data: G.rows.map(function (r) { return [r[0], r[1], r[2], r[3], r[4]]; }) }
+      : { name: T('p_price'), type: 'line', color: '#ffcf6b', width: 2, data: G.rows.map(function (r) { return [r[0], r[4]]; }) };
     price.fmt = function (v) { return OB.fmtUsd(v, v < 10 ? 2 : 0); };
     if (S.style === 'wave') price.colors = G.pcol;
 
@@ -277,7 +277,7 @@
       panes: [
         { weight: 2.6, log: S.log, title: T('p_price'), fmt: function (v) { return OB.compact(v); }, vbands: vb, vlines: vl, series: [price] },
         { weight: 1, min: 0, max: 1, title: T('wv_name'), fmt: function (v) { return OB.loc(v.toFixed(2)); }, vbands: vb, vlines: vl,
-          series: [{ name: T('wv_name'), type: 'line', color: '#00e676', width: 2.2, data: G.idx, colors: G.icol, fmt: function (v) { return OB.loc(v.toFixed(3)); } }] }
+          series: [{ name: T('wv_name'), type: 'line', color: '#5ef2d6', width: 2.2, data: G.idx, colors: G.icol, fmt: function (v) { return OB.loc(v.toFixed(3)); } }] }
       ]
     });
     var note = $('#ob-note', V.el); if (note) note.textContent = T('note_wave') + (S.style === 'candle' ? ' ' + T('wv_candle_note') : '');

@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, d = document;
-  var INK = '#e8e8e3', ACC = '#f0b429', GRN = '#34d399', RED = '#ff5a4d', BLUE = '#60a5fa';
+  var INK = '#eef1ff', ACC = '#ffcf6b', GRN = '#5ef2d6', RED = '#ff4f9a', BLUE = '#7cc8ff';
   var RANGES = ['1y', '3y', 'all'], SPAN = { '1y': 365, '3y': 1095 };
   var DEF = { range: 'all', log: false, pool: 'all' };
   var S = (function () {
@@ -116,7 +116,7 @@
     $('#ob-protos', el).innerHTML = grid(
       [T('df_c_name'), T('df_c_cat'), T('df_c_chain'), T('df_c_tvl'), T('df_c_1d'), T('df_c_7d')],
       protos.map(function (p) {
-        return '<tr>' + cell(p.name, p.usd / pTop, 'rgba(52,211,153,.18)', p.sym) +
+        return '<tr>' + cell(p.name, p.usd / pTop, 'rgba(94,242,214,.18)', p.sym) +
           '<td>' + esc(p.cat) + '</td><td>' + esc(p.chain) + '</td>' +
           '<td class="ob-n">' + esc(OB.ltr(usdM(p.usd))) + '</td>' +
           '<td class="ob-n" style="color:' + mv(p.d1) + '">' + esc(OB.ltr(pct(p.d1))) + '</td>' +

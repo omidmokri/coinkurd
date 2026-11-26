@@ -83,3 +83,7 @@ html.ob-space #ekf{background:linear-gradient(180deg,rgba(6,8,22,.5),rgba(3,4,12
 }
 @media (prefers-reduced-motion:reduce){html.ob-space .ob-hc{transition:none}html.ob-space a.ob-hc:hover{transform:none}}
 @media (forced-colors:active){html.ob-space .ob-head h1{color:CanvasText;background:none}}
+
+/* ---- the charts themselves sit in the glass, not on a flat black slab (owner 2026-11-26): the canvases paint a deep-space
+   ground of their own (OB.bg in core.js), so their boxes stay clear and the sky's light reaches them */
+html.ob-space .ob-stage,html.ob-space .ob-mapbox,html.ob-space .ob-tsbox,html.ob-space .x-clgd{background:transparent}

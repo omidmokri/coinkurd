@@ -12,7 +12,7 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, clamp = OB.clamp, d = document, w = window, M = w.OBOpt;
   var DB = 'https://www.deribit.com/api/v2/public/', H = 3600000, DAY = 86400000;
-  var INK = '#e8e8e3', ACC = '#f7931a', GRN = '#34d399', RED = '#ff5a4d', FONT = '11px "Space Grotesk", system-ui, sans-serif';
+  var INK = '#eef1ff', ACC = '#ffcf6b', GRN = '#5ef2d6', RED = '#ff4f9a', FONT = '11px "Space Grotesk", system-ui, sans-serif';
   var MIN_OI = { BTC: 500, ETH: 5000 };                 /* an expiry counts as "the next one" from this open interest on (scripts/lab.py's rule) */
   var DV_R = [{ k: '1m', res: '3600', span: 30 * DAY }, { k: '3m', res: '43200', span: 91 * DAY }, { k: '1y', res: '1D', span: 365 * DAY }, { k: 'all', res: '1D', span: 0 }];
   var DV0 = Date.UTC(2021, 2, 24);                      /* DVOL begins */
@@ -29,7 +29,7 @@
     return o;
   })();
   var save = OB.debounce(function () { var c = Object.assign({}, S); delete c.exp; OB.store.set('ek_obs_op', c); }, 300);
-  var BLU = '#3987e5';
+  var BLU = '#7cc8ff';
   var V = { el: null, chart: null, kind: null, book: null, term: null, dv: {}, dvNow: null, seq: 0, dseq: 0, loading: false, timer: null, sub: '', at: 0 };
 
   /* ================================================================ Deribit */
@@ -103,7 +103,7 @@
     if (this.dead) return;
     var ctx = target ? target.ctx : this.ctx, dpr = target ? target.dpr : this.dpr, W = this.W, Hh = this.H, o = this.o;
     ctx.setTransform(dpr, 0, 0, dpr, 0, target ? (target.oy || 0) * dpr : 0);
-    ctx.clearRect(0, 0, W, Hh); ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0, 0, W, Hh); ctx.direction = 'ltr';        /* every label on this chart is a number or a Latin date */
+    ctx.clearRect(0, 0, W, Hh); OB.bg(ctx, 0, 0, W, Hh, !!target); ctx.direction = 'ltr';        /* every label on this chart is a number or a Latin date */
     if (!o || !o.cats.length) return;
     var n = o.cats.length, ns = o.series.length, fmt = o.fmt || OB.compact, max = 0, min = Infinity, i, k;
     var allLines = o.series.every(function (s2) { return s2.line; });
@@ -115,11 +115,11 @@
     var axis = Math.max(46, Math.ceil(ctx.measureText(fmt(top)).width) + 18), L = 8, Tp = 10, B = 26, pw = W - L - axis, ph = Hh - Tp - B, slot = pw / n;
     this._G = { L: L, slot: slot, T: Tp, ph: ph, pw: pw };
     function Y(v2) { return Tp + ph - (v2 - lo) / (top - lo) * ph; }
-    ctx.fillStyle = '#0d0d11'; ctx.fillRect(L, Tp, pw, ph);
+    ctx.fillStyle = '#0b1130'; ctx.fillRect(L, Tp, pw, ph);
     if (this.hover >= 0 && !target) { ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(L + this.hover * slot, Tp, slot, ph); }
     /* grid and value axis */
     var st = nice(top - lo, Math.max(2, Math.floor(ph / 52)));
-    ctx.strokeStyle = 'rgba(255,255,255,.055)'; ctx.lineWidth = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#b9b9b3'; ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,.055)'; ctx.lineWidth = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#c3ccf2'; ctx.beginPath();
     for (var gv = Math.ceil(lo / st) * st; gv <= top + st * 1e-9; gv += st) { var gy = Math.round(Y(gv)) + 0.5; if (gy < Tp + 2) break; ctx.moveTo(L, gy); ctx.lineTo(L + pw, gy); ctx.fillText(fmt(gv), L + pw + 8, gy); }
     ctx.stroke();
     /* bars */
@@ -149,7 +149,7 @@
       ctx.restore();
     });
     /* category labels: as many as fit */
-    ctx.fillStyle = '#b9b9b3'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillStyle = '#c3ccf2'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     var mw = 0; for (i = 0; i < n; i++) mw = Math.max(mw, ctx.measureText(o.cats[i]).width);
     var every = Math.max(1, Math.ceil((mw + 12) / slot));
     for (i = 0; i < n; i += every) ctx.fillText(o.cats[i], L + (i + 0.5) * slot, Tp + ph + 7);
@@ -172,12 +172,12 @@
   Bars.prototype.png = function (title, sub, file) {
     if (!this.o) return;
     var dpr = 2, head = 46, c = d.createElement('canvas'); c.width = this.W * dpr; c.height = (this.H + head) * dpr;
-    var ctx = c.getContext('2d'); ctx.fillStyle = '#0a0a0c'; ctx.fillRect(0, 0, c.width, c.height);
+    var ctx = c.getContext('2d'); OB.bg(ctx, 0, 0, c.width, c.height, true);
     this.draw({ ctx: ctx, dpr: dpr, oy: head });
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#f2f2ee'; ctx.font = '700 16px "Space Grotesk", Vazirmatn, system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillText(title || '', 14, 17);
-    ctx.fillStyle = '#9a9a94'; ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(sub || '', 14, 35);
-    ctx.fillStyle = '#f7931a'; ctx.font = '700 15px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', this.W - 14, 23);
+    ctx.fillStyle = '#f4f6ff'; ctx.font = '700 16px "Space Grotesk", Vazirmatn, system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left'; ctx.fillText(title || '', 14, 17);
+    ctx.fillStyle = '#a3aed8'; ctx.font = '11px "Space Grotesk", system-ui, sans-serif'; ctx.fillText(sub || '', 14, 35);
+    ctx.fillStyle = '#ffcf6b'; ctx.font = '700 15px "Space Grotesk", system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('entekhab.net', this.W - 14, 23);
     this.draw();
     c.toBlob(function (b) { if (!b) return; var u = URL.createObjectURL(b), a = d.createElement('a'); a.href = u; a.download = file || 'entekhab-chart.png'; d.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); }, 'image/png');
   };

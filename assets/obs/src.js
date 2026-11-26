@@ -329,7 +329,7 @@
   /* The exchanges a snapshot is asked from, in a fixed order (their colours follow the exchange, never its rank).
      Funding is brought to one interval — the rate per 8 hours — because the exchanges settle every 1, 4 or 8 hours. */
   OB.EX = [
-    { id: 'binance', name: 'Binance', color: '#3987e5' }, { id: 'bybit', name: 'Bybit', color: '#d95926' }, { id: 'okx', name: 'OKX', color: '#199e70' },
+    { id: 'binance', name: 'Binance', color: '#7cc8ff' }, { id: 'bybit', name: 'Bybit', color: '#d95926' }, { id: 'okx', name: 'OKX', color: '#199e70' },
     { id: 'bitget', name: 'Bitget', color: '#c98500' }, { id: 'hyperliquid', name: 'Hyperliquid', color: '#d55181' }, { id: 'gate', name: 'Gate', color: '#008300' }
   ];
   OB.exById = function (id) { for (var i = 0; i < OB.EX.length; i++) if (OB.EX[i].id === id) return OB.EX[i]; return null; };

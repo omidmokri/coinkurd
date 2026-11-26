@@ -6,8 +6,8 @@
   'use strict';
   var OB = window.OB, T = OB.T, esc = OB.esc, $ = OB.$, $$ = OB.$$, clamp = OB.clamp, d = document, w = window;
   var H = 3600000, D = 86400000, lastLE = OB.TS.lastLE;
-  var INK = '#e8e8e3', UPC = '#34d399', DNC = '#ff5a4d';
-  var LSC = { bn_all: '#3987e5', by_all: '#d95926', bn_top_acc: '#199e70', bn_top_pos: '#c98500', gt_all: '#2bb673', gt_top_acc: '#9b6bdf', gt_top_pos: '#e0559a' };
+  var INK = '#eef1ff', UPC = '#5ef2d6', DNC = '#ff4f9a';
+  var LSC = { bn_all: '#7cc8ff', by_all: '#d95926', bn_top_acc: '#199e70', bn_top_pos: '#c98500', gt_all: '#2bb673', gt_top_acc: '#9b6bdf', gt_top_pos: '#e0559a' };
 
   var DEF = { coin: 'BTC', oi_r: '1w', oi_u: 'usd', fr_r: '1m', fr_u: '8h', ls_r: '1w' };
   var S = (function () {
@@ -193,7 +193,7 @@
         '<td class="ob-n ob-frc" style="' + frBg(r.avg) + '">' + esc(frTxt(r.avg)) + '</td><td class="ob-n">' + esc(pct(frShow(r.spread), S.fr_u === 'apr' ? 1 : 4).replace(/^\+/, '')) + '</td></tr>';
     }).join('');
     $('#ob-table', el).innerHTML = '<h3>' + esc(T('tbl_fr')) + '</h3><p class="ob-mut ob-small">' + esc(T(S.fr_u === 'apr' ? 'tbl_fr_apr' : 'tbl_fr_8h')) + '</p><div class="ob-tblw"><table class="ob-tb ob-grid ob-frt">' + th + '<tbody>' + tb + '</tbody></table></div>' +
-      '<p class="ob-frk"><i style="background:rgba(57,135,229,.5)"></i>' + esc(T('fr_neg')) + '<i style="background:rgba(247,147,26,.5)"></i>' + esc(T('fr_pos')) + '</p>' +
+      '<p class="ob-frk"><i style="background:rgba(124,200,255,.5)"></i>' + esc(T('fr_neg')) + '<i style="background:rgba(255,207,107,.5)"></i>' + esc(T('fr_pos')) + '</p>' +
       (dead.length ? '<p class="ob-warn">' + esc(T('part_fail2', { ex: dead.join(', ') })) + '</p>' : '');
   };
   OB.views.funding = {
