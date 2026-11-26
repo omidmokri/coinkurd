@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Šablóny, sťahovanie a prenos:</b> pripravené sady indikátorov a vaše vlastné šablóny; CSV sviečok s hodnotami indikátorov; export a import; odkaz na zdieľanie rozloženia. Odkaz a QR kód otvoria rovnaký pracovný priestor v mobile alebo inom zariadení a karty tohto prehliadača zostávajú zosynchronizované."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Stĺpce a ceny sú verejné trhové údaje z Binance (jedno živé pripojenie pre celú stránku); ak Binance nie je dostupná, použije sa OKX a napokon vlastný snapshot stránky — farebná bodka vedľa každého grafu označuje zdroj. Pre akýkoľvek graf si môžete namiesto Binance vybrať Coinbase, Bybit, OKX alebo Kraken, pričom údaje sa načítajú priamo z verejného koncového bodu danej burzy vo vašom prehliadači; ak burza na vaše pripojenie neodpovedá, stránka vás o tom okamžite informuje. Svetové forexové páry (EUR/USD, USD/JPY a ostatné) pochádzajú z denných referenčných kurzov stránky — Európskej centrálnej banky a datasetu exchange-api — jedna hodnota denne, nie tickové údaje brokera. Ekonomický kalendár je týždenný feed z ForexFactory; pohyb Bitcoinu po udalosti je súbeh, nie príčina. Pri slabom pripojení zapnite v nastaveniach „Šetrič dát“. Upravené grafy (dividendy a zvýšenia kapitálu) sú funkciou Teheránskej burzy cenných papierov a na kryptomeny sa nevzťahujú. Trhové kurzy v Iráne sú verejné údaje z tgju.org; ceny mincí v tomanoch sú odhad: cena na Binance × kurz tetheru v tomanoch."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Odkiaľ dáta pochádzajú"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Upozornenia sa kontrolujú v tomto prehliadači, kým je stránka otvorená (v akejkoľvek karte). Upozornenia indikátorov sa spustia pri zatvorení sviečky."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Upozornenie na tento nákres"
+],
 "alertSet": [
 "80c4c4abee",
 "Upozornenie nastavené: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Najlepší obchod"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Ročný rast (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Stiahnuť obchody (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Longové obchody"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1 000 objednávok rovnakých obchodov):"
+],
+"btMCv": [
+"992209a3c0",
+"typický drawdown {a}% · 95% objednávok zostáva pod {b}% · najhorší {c}% · tento beh {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimalizovať"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Faktor zisku"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Výnos (priemerný zisk / priemerná strata)"
+],
 "btRange": [
 "63a44ed01a",
 "od / do / krok"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (ročne)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Prvých 70% vs posledných 30% obchodov:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} s {aw}% úspešnosťou ({an} obchodov) → {b} s {bw}% úspešnosťou ({bn} obchodov)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Všetky"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · open source"
+],
+"cat_com": [
+"90566b4c6f",
+"Obľúbené v komunite"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (svet)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "Zmena za 24h"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Open-source skripty TradingView od Coin_Kurd, bežiace tu na vašom grafe."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro dashboard z verejných dát: režim risk-on / risk-off"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Fázy on-chain cyklu (MVRV, NUPL) s cenovou pozíciou"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Celá história Bitcoinu na logaritmickej špirále"
+],
 "clearAll": [
 "7de68ccb43",
 "Odstrániť všetky kresby"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Odstrániť nákresy a indikátory"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Odstrániť nákresy"
+],
+"clearInds": [
+"8b56474294",
+"Odstrániť indikátory"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Odstrániť všetky indikátory z tohto grafu?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Kopírovať"
+],
+"cloned": [
+"51fbf8cb72",
+"Skopírované vedľa"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Zostávajúci čas do zatvorenia tohto baru"
 ],
+"crFree": [
+"6b4b480231",
+"Nasleduje kurzor myši"
+],
+"crLargeDash": [
+"a7503adc35",
+"Dlhé pomlčky"
+],
+"crMagnet": [
+"77fa49774c",
+"Prichytávať na sviečky"
+],
+"crOff": [
+"d4c2792a72",
+"Skryté"
+],
+"crSparse": [
+"e50cc378a1",
+"Riedke bodky"
+],
 "create": [
 "8ac903c3c3",
 "Vytvoriť upozornenie"
+],
+"csBg": [
+"64dd60fe1a",
+"Pozadie"
+],
+"csBg2": [
+"9ebb790d74",
+"Druhá farba pozadia"
+],
+"csBody": [
+"718a7e8a58",
+"Telo"
+],
+"csBorderC": [
+"eeffa83765",
+"Farba okraja"
+],
+"csBorders": [
+"685f23bc5e",
+"Okraje"
+],
+"csClose": [
+"bbfa773e5a",
+"Záver"
+],
+"csCross": [
+"b0b83f89e8",
+"Nitkový kríž a myš"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Farba nitkového kríža"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Čiara nitkového kríža"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Cenové a časové štítky na nitkovom kríži"
+],
+"csCrossMode": [
+"800092e3e1",
+"Nitkový kríž"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Hrúbka nitkového kríža"
+],
+"csDn": [
+"11f5ff3829",
+"Klesajúca sviečka"
+],
+"csFont": [
+"b97c4d4cdd",
+"Písmo"
+],
+"csFsize": [
+"83ca9e48c3",
+"Veľkosť písma"
+],
+"csGrad": [
+"c716191a01",
+"zmení pozadie na gradient"
+],
+"csGridA": [
+"f773586220",
+"Priehľadnosť mriežky (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Farba mriežky"
+],
+"csGridH": [
+"4eaa1c008a",
+"Horizontálne čiary mriežky"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Vertikálne čiary mriežky"
+],
+"csHollow": [
+"9165bccc85",
+"Duté telá"
+],
+"csHollowH": [
+"fb63aba345",
+"iba rastúce sviečky"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetické posúvanie dotykom"
+],
+"csLast": [
+"aacdc5bea4",
+"Čiara poslednej ceny"
+],
+"csLastLab": [
+"91c990bcb9",
+"Cenový štítok na osi"
+],
+"csLineC": [
+"01212659ee",
+"Farba čiary / plochy"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Hrúbka čiary"
+],
+"csLook": [
+"41def7a0fe",
+"Vzhľad"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"jedna farba pre oba smery"
+],
+"csPinch": [
+"e557a41794",
+"Priblíženie zovretím prstov"
+],
+"csResetQ": [
+"9c369383c1",
+"Obnoviť všetky nastavenia grafu do pôvodného stavu?"
+],
+"csScale": [
+"0b414bdcb7",
+"Osi"
+],
+"csScroll": [
+"468c89cb3b",
+"Posúvať graf myšou"
+],
+"csSym": [
+"fad29404d2",
+"Sviečky"
+],
+"csText": [
+"d160595fcf",
+"Farba textu"
+],
+"csTheme": [
+"a797e30923",
+"Téma"
+],
+"csTitle": [
+"ae445d4cd9",
+"Nastavenia grafu"
+],
+"csUp": [
+"971a95475d",
+"Rastúca sviečka"
+],
+"csWick": [
+"fe6e2bfd48",
+"Knioty"
+],
+"csWickC": [
+"0fcb21d161",
+"Farba kniotu"
+],
+"csWm": [
+"33c7b41ac6",
+"Vodoznak za sviečkami"
+],
+"csWmA": [
+"69a1810ea2",
+"Priehľadnosť vodoznaku (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"symbol a časový rámec"
+],
+"csWmC": [
+"bad81c749f",
+"Farba vodoznaku"
+],
+"csWmSize": [
+"4af7e52f80",
+"Veľkosť vodoznaku"
+],
+"csWmText": [
+"ecf870ab34",
+"Text vodoznaku"
+],
+"csZoom": [
+"c6f40d9d03",
+"Koliesko myši"
+],
+"csZoomH": [
+"4ca34c1092",
+"približovanie a odďaľovanie"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} barov stiahnutých"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Pridať upozornenie sem"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopírovať túto cenu"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Prispôsobiť všetky sviečky"
+],
+"ctxHline": [
+"588d2eb492",
+"Horizontálna čiara sem"
+],
+"ctxReset": [
+"242cb352c0",
+"Resetovať zobrazenie"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Zakaždým (najviac raz za minútu / raz za bar)"
 ],
+"exAuto": [
+"1ff048b76e",
+"naživo, s OKX ako zálohou"
+],
+"exDown": [
+"e8ba18613e",
+"{x} na tomto pripojení neodpovedá. Graf zostáva na burze, na ktorej je."
+],
+"exNote": [
+"0eb4c03240",
+"Binance streamuje naživo; ostatné sa načítavajú z ich vlastných verejných koncových bodov každých desať sekúnd, s vlastnou históriou."
+],
+"exTitle": [
+"5b13eac7ed",
+"Burza"
+],
 "exit": [
 "f83b6fe3ae",
 "Výstup"
+],
+"exitFull": [
+"fc61e74cd9",
+"Ukončiť celú obrazovku"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Exportovať všetko (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Dáta pre tento indikátor sa nenačítali. Skúste to o chvíľu znova."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Žltá"
 ],
+"fnMono": [
+"216fcddff2",
+"Neproporcionálne"
+],
+"fnSans": [
+"c1ccf83eea",
+"Bezpatkové"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Patkové"
+],
 "forecast": [
 "528bc4bc38",
 "Predikcia"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Štvrťročné futures, kontinuálne"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Jedna mena voči druhej, z denných referenčných kurzov stránky (Európska centrálna banka a dataset exchange-api, kde ECB menu neuvádza). Jedna hodnota denne, takže denný stĺpec je jeden bod a týždenné a mesačné stĺpce sú vytvorené z dní v nich. Referenčné kurzy sú zverejňované raz denne, nejde o tickové dáta brokera: intradenný forex tu nie je. Dolárové páry začínajú 2. marca 2024, páry medzi dvoma menami ECB v roku 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Šípky"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Štetce"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanály"
+],
+"g_cursors": [
+"f4d2f91040",
+"Kurzory"
+],
+"g_cycles": [
+"97f064aff5",
+"Cykly"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliottove vlny"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Čiary"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Merač"
+],
+"g_pat": [
+"2c179da0f5",
+"Vzory grafov"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Vidly"
+],
+"g_proj": [
+"8aa49fe840",
+"Projekcia"
+],
+"g_shapes": [
+"b1985e3874",
+"Tvary"
+],
+"g_text": [
+"d7cd4cda4f",
+"Text a poznámky"
+],
+"g_vol": [
+"1b4620951d",
+"Založené na objeme"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Skryť / zobraziť nákresy"
+],
+"hideBoth": [
+"3502a3299d",
+"Skryť nákresy a indikátory"
+],
+"hideDraw": [
+"f4492c5211",
+"Skryť nákresy"
+],
+"hideInds": [
+"764ab9d614",
+"Skryť indikátory"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1265,9 +1721,57 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Všetky sviečkové formácie"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Pohltenie (Engulfing)"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Kladivo / Obesenec"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Vnútorná sviečka (Inside bar)"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Ranná / Večerná hviezda"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Tri biele sviece / čierne vrany"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Padajúca hviezda / Invertované kladivo"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Pinzeta vrchol / dno"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulatívny objemový delta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1793,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA mraky [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1805,37 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Rovnaké maximá / minimá"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1848,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1901,14 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Trhová štruktúra (BOS / CHoCH)"
+],
+"in_ob": [
+"80c4ef99a7",
+"Order Blocks"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1928,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1965,49 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profil (čas na cene)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +2021,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Objemová delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +2041,17 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Session Volume Profile"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP pásma"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2064,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1489,6 +2101,10 @@
 "96c9e76dba",
 "Williams Alligator: čeľusť, zuby a pery vykreslené vopred"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR trendová čiara riadená MFI (RSI bez objemu)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 mínus SMA 34 stredu sviečky"
@@ -1500,6 +2116,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Average true range (volatilita)"
+],
+"ind_atrts": [
+"8223831420",
+"Stop-loss, ktorý nasleduje cenu o k·ATR a mení strany"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1525,6 +2145,10 @@
 "a50928c16b",
 "Commodity channel index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR výstupy zavesené na najvyššej/najnižšej uzatváracej cene"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trendový (nízky) alebo bočný (vysoký) trh"
@@ -1545,9 +2169,61 @@
 "bf330f58dd",
 "Dlhodobé momentum: WMA dvoch mier zmien"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Označí každý vzor nižšie na sviečkach"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Otvorenie a zatvorenie takmer rovnaké (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Býčie (BE) a medvedie (SE) pohltenie"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Dlhý spodný tieň po poklese (H) alebo raste (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Malé telo vo vnútri predchádzajúceho veľkého (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Sviečka úplne vo vnútri predchádzajúcej (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Veľké telo bez tieňov (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Troj-sviečkový obrat: MS býčí, ES medvedí"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap a zatvorenie za stredom predchádzajúcej sviečky (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tri silné sviece za sebou (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Dlhý horný tieň po raste (SS) alebo poklese (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dve sviece s rovnakým maximom (TT) alebo minimom (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "Kombinácia RSI, streak RSI a percentuálneho poradia"
+],
+"ind_cvd": [
+"690d30a274",
+"Priebežný súčet objemovej delty: kto má kontrolu"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1569,6 +2245,10 @@
 "c499047c5b",
 "Exponenciálny kĺzavý priemer"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · dva EMA mraky, rýchly a pomalý"
+],
 "ind_env": [
 "e2cf023f50",
 "Kĺzavý priemer s pásmami v pevnej % vzdialenosti"
@@ -1577,17 +2257,41 @@
 "d648aafe8d",
 "Ako ľahko sa cena pohybuje na jednotku objemu"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Dva výkyvy na takmer rovnakej cene: odpočívajúca likvidita"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Premieňa ceny na takmer normálne rozdelenie"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Nákupný × predajný objem a delta napísaná pod každou sviečkou; priblížte pre čítanie. Na sviečku, nie na cenovú úroveň"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fractals: lokálne maximá a minimá"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Gapy troch sviečok; každý box končí tam, kde ho cena vyplní"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Šesť krátkych a šesť dlhých EMA: obchodníci proti investorom"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · stupňovitá trendová čiara, ktorá sa mení len pri skutočnom prelomení výkyvu"
+],
 "ind_hma": [
 "709351f832",
 "Hull moving average: rýchly a hladký"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA vyfarbený podľa sklonu"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1600,6 +2304,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastika s J čiarou (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (open source, MPL-2.0) · makro režim za sviečkami, jeho signály a dashboard, z dát FRED"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (open source) · Bitcoin férová hodnota 8.31e-17·dni^5.48 s ±10 % pásmami a nákupnou zónou; pre BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (open source) · Fázy cyklu Bitcoinu z MVRV, NUPL a SOPR proxy: Extrémny medveď, Medveď, Skorý býk, Býk, Prehriaty; sivá čiara je normalizovaná cena"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (open source) · Celá história Bitcoinu na logaritmickej špirále, jedna otočka na halvingový cyklus, s vrcholmi, dnami, halvingami a súčasnosťou"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1637,9 +2361,21 @@
 "d6640bbc39",
 "Aktuálna cena mínus cena pred n sviečkami"
 ],
+"ind_ms": [
+"13fc87db00",
+"Prelomenia posledného potvrdeného výkyvu: BOS v smere trendu, CHoCH proti nemu"
+],
 "ind_news": [
 "a95010ef34",
 "Hlavné správy o tejto minci, označené v čase zverejnenia (správy stránky za posledný deň)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · cenou vyhladenou jadrom s pásmom strednej chyby; forma bez prekresľovania"
+],
+"ind_ob": [
+"530cdc224f",
+"Posledná opačná sviečka pred prelomením štruktúry, kým cena cez ňu neuzatvorí"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1664,6 +2400,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Objem pridaný úmerne k % zmenám"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · vyhladené RSI s volatilitnou nasledujúcou čiarou (jadro QQE MOD)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtruje šum menší ako vyhladený priemerný rozsah"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1697,25 +2441,53 @@
 "26db009730",
 "Jednoduchý kĺzavý priemer"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Zatvorenie oproti stredu rozsahu, dvojito vyhladené"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Vyhladený kĺzavý priemer (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger vo vnútri Keltner = squeeze (červené bodky); histogram ukazuje smer prelomenia"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · posledné pivotné maximum a minimum ako úrovne"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastický indikátor pre RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · kĺzavé priemery maxím a miním, ktoré si vymenia miesta pri zmene trendu"
+],
 "ind_st": [
 "8d66b52001",
 "ATR trailing línia, ktorá sa otáča s trendom"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD dvakrát prehnané cez stochastiku: skoré obraty trendu (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K a %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI s jeho volatilitnými pásmami, rýchlou a pomalou čiarou"
+],
 "ind_tema": [
 "1ff881355e",
 "Trojitý exponenciálny kĺzavý priemer"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Koľko sviečok sa obchodovalo na každej cene, za deň"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1729,6 +2501,18 @@
 "182e4a763e",
 "Nákupný tlak za tri obdobia"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR nasledujúci stop-loss; cena, ktorá ho pretne, je nákupný/predajný signál"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Nákupný objem mínus predajný objem každej sviečky (dáta od Binance; inde odhad)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · syntetický VIX pre akýkoľvek trh; špičky nad pásmami často značia panické dná"
+],
 "ind_vo": [
 "a99f6a0038",
 "Rýchly vs. pomalý priemer objemu (%)"
@@ -1741,9 +2525,21 @@
 "6badda8c94",
 "Pozitívny a negatívny pohyb trendu (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Jeden objemový profil za deň (za mesiac na denných sviečkach)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Objem na každej cene pre sviečky na obrazovke, s POC a hodnotovou oblasťou"
+],
 "ind_vwap": [
 "6d86714413",
 "Volume-weighted average price, reset o 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Denný VWAP s ±1σ a ±k·σ pásmami"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1756,6 +2552,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Vážený kĺzavý priemer"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · oscilátor indexu kanála; kríženia nad 53/60 a pod −53/−60 značia prepäté pohyby"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · kĺzavý priemer najmenších štvorcov s nulovým oneskorením"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1881,6 +2685,14 @@
 "891ebccd5b",
 "Zamknúť"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Zamknúť všetky nákresy"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Všetky nákresy sú zamknuté"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1901,13 +2713,41 @@
 "5f703c7eba",
 "Signály Kurdistani"
 ],
+"mMode": [
+"659eba1219",
+"Opakovať"
+],
+"mMsg": [
+"2c924e3088",
+"Poznámka"
+],
+"mTf": [
+"85decb73d1",
+"Časový rámec"
+],
 "maType": [
 "15f86c051e",
 "Priemer"
 ],
+"macroNote": [
+"c4a94f666d",
+"odhad založený na pravidlách, nie poradenstvo"
+],
 "magnet": [
 "effa915951",
 "Magnet (prichytiť k otvoreniu/maximu/minimu/zatvoreniu)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnet vypnutý"
+],
+"magnetS": [
+"607a7625b1",
+"Silný magnet"
+],
+"magnetW": [
+"181021d95b",
+"Slabý magnet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1929,9 +2769,45 @@
 "fdbe20f376",
 "Všetky časové rámce"
 ],
+"moreTools": [
+"c871f1056a",
+"Viac nástrojov"
+],
 "moveToSection": [
 "98d183e7cb",
 "Presunúť do sekcie"
+],
+"mt_mine": [
+"1cf761ac34",
+"Moje skripty"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opcie"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Vzory"
+],
+"mt_prof": [
+"0c2a930099",
+"Profily"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Štruktúra"
+],
+"mt_strat": [
+"876f3e0202",
+"Stratégie"
+],
+"multiAl": [
+"5bafcd2412",
+"Viacpodmienkové upozornenie"
+],
+"multiNote": [
+"c7e278bae8",
+"Napíšte podmienky na jeden riadok a spojte ich pomocou and / or. Upozornenie sa spustí na sviečke, kde sa riadok stane pravdivým."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1980,6 +2856,10 @@
 "nc_technical": [
 "41fc086088",
 "Technické"
+],
+"neckline": [
+"993062b2d6",
+"Línia krku"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2089,6 +2969,10 @@
 "77f8046dcf",
 "(nahor, bez sekcie)"
 ],
+"noVol": [
+"0960b9b69d",
+"žiadny objem pre tento symbol"
+],
 "notif": [
 "270d190970",
 "Upozornenie prehliadača"
@@ -2141,21 +3025,57 @@
 "c0da22faab",
 "Otvoriť na grafe"
 ],
+"openTv": [
+"94d7227248",
+"Otvoriť na TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} opčný reťazec"
+],
+"optDays": [
+"c2fd31e918",
+"Dni do expirácie"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombinácií otestovaných za {s} s, z toho {p} ziskových; zoradené podľa {r}. Kliknutím na riadok zobrazíte úplnú správu."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit neodpovedal z tohto pripojenia. Zmeňte pripojenie alebo VPN a skúste to znova."
+],
+"optIV": [
+"c1bc12118c",
+"ATM implikovaná volatilita"
+],
 "optMax": [
 "7b9c1b1490",
 "Príliš veľa kombinácií — najviac {n}. Použite väčší krok."
+],
+"optMove": [
+"8aa36fe05d",
+"Očakávaný pohyb"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} kombinácií (najviac {m} pre túto históriu)"
 ],
 "optNote": [
-"4b4713d390",
-"Najlepší výsledok na minulých údajoch je často len šťastie (preučenie). Uprednostnite nastavenia, ktorých susedia sú tiež úspešní, a overte ich na inom období alebo trhu."
+"96723a0ac4",
+"Opčný reťazec BTC a ETH z verejných dát Deribit, čítaný vaším prehliadačom."
+],
+"optNote2": [
+"26dfa389e8",
+"OI a objem v kontraktoch (mince); $ je mark cena v dolároch. Max pain: vyrovnávacia cena, ktorá platí držiteľom opcií najmenej. Očakávaný pohyb = cena × IV × √(dni/365). Nie je to poradenstvo."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2164,6 +3084,10 @@
 "optRun": [
 "9a456cc451",
 "Nájsť najlepšie nastavenia"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Podkladové aktívum"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2225,13 +3149,37 @@
 "0777981263",
 "Ceny v {c} teraz používajú váš kurz."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitúda"
+],
 "p_atr": [
 "0d1283ae88",
 "Dĺžka ATR"
 ],
+"p_band": [
+"3541c5f4e1",
+"Dĺžka pásma"
+],
 "p_base": [
 "077fe9c54e",
 "Základňa"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Dĺžka pásma"
+],
+"p_bw": [
+"1d06cbba91",
+"Šírka pásma"
+],
+"p_chdev": [
+"65acb623a8",
+"Odchýlka kanála"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplikátor"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2265,6 +3213,10 @@
 "8db6a2f1d3",
 "Rýchla"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Rýchly 2"
+],
 "p_hi": [
 "70a2565504",
 "Horná úroveň"
@@ -2285,6 +3237,14 @@
 "a0623fa9a3",
 "Vyhladenie %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Kľúčová hodnota"
+],
 "p_l1": [
 "ba51565baf",
 "Dĺžka MA 1"
@@ -2300,6 +3260,14 @@
 "p_l4": [
 "a5c110eb00",
 "Dĺžka MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentil spätného pohľadu"
+],
+"p_left": [
+"3b219a058a",
+"Ľavé sviečky"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2341,6 +3309,14 @@
 "a44d6c906d",
 "Sviečky na každej strane"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Dĺžka kanála"
+],
+"p_n2": [
+"2df99da939",
+"Dĺžka priemeru"
+],
 "p_offset": [
 "ce66771654",
 "Posun"
@@ -2349,13 +3325,41 @@
 "ac556cf593",
 "Percento"
 ],
+"p_pd": [
+"4997ad18cf",
+"Spätný pohľad"
+],
+"p_per": [
+"a89f63abb8",
+"Perióda vzorkovania"
+],
+"p_ph": [
+"b1f698cc3d",
+"Horný percentil"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE faktor"
+],
 "p_rank": [
 "1df2ca7462",
 "Dĺžka percentilu"
 ],
+"p_right": [
+"307c9815b6",
+"Pravé sviečky"
+],
+"p_rows": [
+"52d0b35277",
+"Riadky"
+],
 "p_rsi": [
 "560e6b61c6",
 "Dĺžka RSI"
+],
+"p_sf": [
+"590f20262b",
+"Vyhladenie RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2372,6 +3376,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Pomalá"
+],
+"p_slow2": [
+"c252d2ccab",
+"Pomalý 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2417,6 +3425,54 @@
 "07300ad49f",
 "{c} za 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Pridať"
+],
+"pfAvg": [
+"def9f57b0c",
+"Priemerná nákupná cena"
+],
+"pfCost": [
+"64ae43e8fe",
+"Náklady"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Zatiaľ tu nič nie je. Pridajte mincu, množstvo, ktoré držíte, a cenu, ktorú ste zaplatili."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfólio {n}"
+],
+"pfNote": [
+"f46050561e",
+"Uložené iba v tomto prehliadači. Nikdy nežiada o kľúče k burzám a nikam nič neposiela. Ceny sú páry Binance USDT."
+],
+"pfNow": [
+"039df35064",
+"Aktuálna cena"
+],
+"pfPnl": [
+"8ae3945397",
+"Zisk / strata"
+],
+"pfQty": [
+"44f6af6945",
+"Množstvo"
+],
+"pfShort": [
+"036b18f02a",
+"Portfólio"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfólio"
+],
+"pfValue": [
+"8dce170de2",
+"Hodnota"
+],
 "pickStart": [
 "1e214a5fd6",
 "Kliknite na graf, kde by malo prebehnúť prehrávanie"
@@ -2440,6 +3496,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Cena"
+],
+"profNote": [
+"c1da831af8",
+"Pre profil zvoleného rozsahu použite „Fixed range volume profile“ v ľavom paneli nástrojov."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2613,6 +3673,86 @@
 "56a2285c5b",
 "Ukladá sa…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Automaticky prispôsobiť cenovú os"
+],
+"scBorder": [
+"45c60c0e85",
+"Okraj cenovej osi"
+],
+"scBot": [
+"77a5b77d62",
+"Priestor dole (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Obe strany"
+],
+"scInvert": [
+"ba80abaac1",
+"Invertovať cenovú os"
+],
+"scInvertH": [
+"ebb1688761",
+"hore sa stane dole"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Vľavo"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmická"
+],
+"scMode": [
+"a5e5771ca0",
+"Cenová os"
+],
+"scModeH": [
+"ab58fc981e",
+"normálna, logaritmická alebo percentuálna"
+],
+"scNone": [
+"d4c2792a72",
+"Skryté"
+],
+"scNormal": [
+"7802670ec0",
+"Normálna (aritmetická)"
+],
+"scOff": [
+"3557c35506",
+"Prázdny priestor vpravo"
+],
+"scPct": [
+"c4519ac7cc",
+"Percentuálna"
+],
+"scRight": [
+"954daa8b00",
+"Vpravo"
+],
+"scSec": [
+"c92a4af093",
+"Sekundy na časovej osi"
+],
+"scSide": [
+"82acb7ee2b",
+"Umiestnenie cenovej osi"
+],
+"scSpace": [
+"2878a3a43e",
+"Rozostup sviečok"
+],
+"scTop": [
+"25126a3aab",
+"Priestor hore (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Okraj časovej osi"
+],
 "sc_c": [
 "3e8248e32e",
 "Cena"
@@ -2672,6 +3812,62 @@
 "screener": [
 "7f27924c12",
 "Sledovanie trhu"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Skontrolovať"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script editor"
+],
+"scriptEdit": [
+"ae909c75da",
+"Upraviť skript"
+],
+"scriptExamples": [
+"41a27a4710",
+"Príklady…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Riadok {n}"
+],
+"scriptName": [
+"709a23220f",
+"Názov"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nový skript"
+],
+"scriptNote": [
+"c265d2248f",
+"Píšte vlastné indikátory v jazyku podobnom Pine. Ukladajú sa v tomto prehliadači a spúšťajú sa iba tu, vo vašom grafe."
+],
+"scriptOk": [
+"eb3da0c952",
+"Žiadne chyby · {n} výstupov"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Čo jazyk pozná"
+],
+"scriptSave": [
+"1e291c4d98",
+"Uložiť a pridať do grafu"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skript uložený"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skript"
 ],
 "searchEv": [
 "0a08612647",
@@ -2777,9 +3973,25 @@
 "e97d96a8bc",
 "Najväčší objem"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI kríženie (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollingerov obrat"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2788,6 +4000,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani signály (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun kríženie"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ kríženie"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2801,6 +4029,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI obrat"
@@ -2809,9 +4045,37 @@
 "446d28671b",
 "Zlatý / kríž smrti (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI kríženie"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend kríženie [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2941,6 +4205,106 @@
 "2d2cb022bc",
 "Rýchlosť"
 ],
+"stBadLv": [
+"683a05683a",
+"Úrovne musia obsahovať maximálne 24 čísel."
+],
+"stBadPt": [
+"a73083f114",
+"Cena alebo čas nie sú platné."
+],
+"stColor": [
+"f28563a477",
+"Farba"
+],
+"stCoord": [
+"8ebebca019",
+"Súradnice"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Čiarkovaná"
+],
+"stDev": [
+"e789c07831",
+"Odchýlka (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Bodkovaná"
+],
+"stExtL": [
+"ef880cf8fc",
+"Predĺžiť vľavo"
+],
+"stExtR": [
+"fbff580b3d",
+"Predĺžiť vpravo"
+],
+"stFill": [
+"64dd60fe1a",
+"Pozadie"
+],
+"stLevels": [
+"ae3d013ab1",
+"Úrovne (oddelené čiarkou)"
+],
+"stLine": [
+"120ee44bec",
+"Štýl čiary"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Tu možno upraviť iba prvých 12 bodov."
+],
+"stOpacity": [
+"f12e36bd83",
+"Priehľadnosť pozadia"
+],
+"stReset": [
+"40aab769d0",
+"Predvolené úrovne"
+],
+"stRows": [
+"52d0b35277",
+"Riadky"
+],
+"stSize": [
+"83ca9e48c3",
+"Veľkosť písma"
+],
+"stSolid": [
+"d00635865c",
+"Plná"
+],
+"stStyle": [
+"99a0efc6cf",
+"Štýl"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Farba textu"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Časy sú v UTC (RRRR-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Viditeľnosť"
+],
+"stWidth": [
+"ad48f34186",
+"Hrúbka"
+],
 "st_err": [
 "d802d232a8",
 "Žiadne dáta"
@@ -2984,6 +4348,14 @@
 "stop": [
 "9e253470c8",
 "Zastaviť"
+],
+"stratNote": [
+"16dc19eef4",
+"Každá stratégia beží na histórii tohto grafu v testeri: vstupy a výstupy v grafe, čistý výsledok, úspešnosť, drawdown a optimalizátor nastavení."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Spustiť v testeri stratégií"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3045,25 +4417,133 @@
 "a26d0ddaae",
 "Posúvanie (čas)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD vzor"
+],
+"t_angle": [
+"30cd1e7703",
+"Uhol trendu"
+],
+"t_arc": [
+"853a983f6b",
+"Oblúk"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Šípka"
+],
+"t_arrowc": [
+"0f722804ec",
+"Kurzor šípky"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Šípka nadol"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Značka šípky"
+],
+"t_arrowup": [
+"8023467135",
+"Šípka nahor"
+],
+"t_avwap": [
+"0a4f86b195",
+"Ukotvený VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Štetec"
 ],
+"t_callout": [
+"f1647ad880",
+"Popisná bublina"
+],
 "t_channel": [
 "c0350b7736",
 "Rovnobežný kanál"
+],
+"t_circ": [
+"1cc7820a08",
+"Kruh"
 ],
 "t_circle": [
 "8580e3175f",
 "Elipsa"
 ],
+"t_comment": [
+"153d7a58b3",
+"Komentár"
+],
+"t_cross": [
+"983bdb7b27",
+"Kríž"
+],
 "t_cursor": [
 "2239943c8d",
 "Kurzor"
+],
+"t_curve": [
+"916f09aff8",
+"Krivka"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Cyklické čiary"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher pattern"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dvojitá krivka"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Disjoint kanál"
+],
+"t_dot": [
+"46856bf702",
+"Bodka"
+],
+"t_drange": [
+"c65ea4ae01",
+"Časový rozsah"
+],
+"t_drives": [
+"3a261ca869",
+"Pattern troch vĺn"
+],
+"t_emoji": [
+"707fd71017",
+"Ikony a emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Guma"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliottova korekčná vlna (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliottova dvojitá kombinovaná vlna (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliottova impulzná vlna (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliottova trojuholníková vlna (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliottova trojitá kombinovaná vlna (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3073,13 +4553,69 @@
 "18c530863b",
 "Fibonacciho retracement"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fibonacciho oblúky"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fibonacciho kanál"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fibonacciho kruhy"
+],
 "t_fibext": [
 "73655be9d6",
 "Trendové Fibonacciho predĺženie"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fibonacciho vejár"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fibonacciho špirála"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Fibonacciho čas podľa trendu"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fibonacciho časové zóny"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fibonacciho klin"
+],
+"t_flag": [
+"23d91e7740",
+"Vlajka"
+],
+"t_flat": [
+"52d3db252e",
+"Plochý vrchol/dno"
+],
+"t_forecast": [
+"528bc4bc38",
+"Predpoveď"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gannov vejár"
+],
+"t_gannbox": [
+"58a3842138",
+"Gannov box"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gannov štvorec"
+],
+"t_hl": [
+"8cb3f79b49",
+"Zvýrazňovač"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3089,6 +4625,18 @@
 "0bcbc4e087",
 "Vodorovný lúč"
 ],
+"t_hs": [
+"43353dbcec",
+"Hlava a ramená"
+],
+"t_info": [
+"a690e33098",
+"Informačná čiara"
+],
+"t_inside": [
+"30d6b425dc",
+"Vnútorné vidly"
+],
 "t_long": [
 "666f195fc4",
 "Long pozícia"
@@ -3097,9 +4645,45 @@
 "2bedd64d85",
 "Cenové rozpätie / meranie"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modifikované Schiffove vidly"
+],
+"t_note": [
+"2c924e3088",
+"Poznámka"
+],
+"t_path": [
+"519e39132b",
+"Cesta"
+],
 "t_pitch": [
 "29135fd404",
 "Andrewsove vidlice"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Cenový štítok"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Cenová poznámka"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Lomená čiara"
+],
+"t_prange": [
+"c20f7ce09a",
+"Cenový rozsah"
+],
+"t_proj": [
+"8aa49fe840",
+"Projekcia"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3109,9 +4693,33 @@
 "c158695a64",
 "Obdĺžnik"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regresný trend"
+],
+"t_rrect": [
+"65807afaf7",
+"Otočený obdĺžnik"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiffove vidly"
+],
 "t_short": [
 "a8daf74669",
 "Short pozícia"
+],
+"t_signpost": [
+"89f361362e",
+"Smerovník"
+],
+"t_sine": [
+"3852fedc7e",
+"Sínusoida"
+],
+"t_tcycle": [
+"521a687246",
+"Časové cykly"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3121,9 +4729,29 @@
 "e810388344",
 "Trendová čiara"
 ],
+"t_tri": [
+"32547b031d",
+"Trojuholníkový pattern"
+],
+"t_tri3": [
+"73d3ae245f",
+"Trojuholník"
+],
 "t_vline": [
 "a790288017",
 "Zvislá čiara"
+],
+"t_vrp": [
+"bcba420b37",
+"Objemový profil s fixným rozsahom"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD pattern"
+],
+"t_zoom": [
+"4fc05f2763",
+"Priblížiť"
 ],
 "target": [
 "61ad50a9b9",
@@ -3169,6 +4797,26 @@
 "5fb1db5278",
 "Sekundy"
 ],
+"thDark": [
+"ae1ef01432",
+"Tmavá"
+],
+"thLight": [
+"a36ef8aba2",
+"Svetlá"
+],
+"thMid": [
+"4fe978738d",
+"Polnočná modrá"
+],
+"thNavy": [
+"0229e960cf",
+"Námornícka modrá"
+],
+"thPaper": [
+"22d507f2ba",
+"Papierová"
+],
 "time": [
 "6c82e6dd86",
 "Čas"
@@ -3192,6 +4840,10 @@
 "tooFar": [
 "b29db0358a",
 "To je hlbšie v histórii, než tento časový rámec dokáže načítať; zvoľte väčší časový rámec."
+],
+"toolHint": [
+"56e62363ce",
+"kliknite na graf pre kreslenie"
 ],
 "topFixed": [
 "1a66879287",
@@ -3417,6 +5069,34 @@
 "1526a17ee7",
 "Odomknúť"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Všetky nákresy sú odomknuté"
+],
+"vDay": [
+"f6bb0f468a",
+"Dni"
+],
+"vHour": [
+"9e25a34e63",
+"Hodiny"
+],
+"vMin": [
+"092f99ea11",
+"Minúty"
+],
+"vMonth": [
+"200dcdce9b",
+"Mesiace"
+],
+"vSec": [
+"5fb1db5278",
+"Sekundy"
+],
+"vWeek": [
+"7d75266a53",
+"Týždne"
+],
 "value": [
 "3e8248e32e",
 "Cena"
@@ -3424,6 +5104,10 @@
 "valuePct": [
 "bf55390d8d",
 "Percentá (%)"
+],
+"vol": [
+"1837d13d11",
+"Objem"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3468,12 +5152,48 @@
 "yourRate": [
 "ca14282aa6",
 "vaša sadzba"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Oddialiť"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Pre priblíženie potiahnite širší obdĺžnik."
 ]
 },
 "f": {
+"in_cp_pierce": [
+"de9e3d4b02",
+1
+],
+"in_fvg": [
+"bad3ce3dd2",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_srlux": [
+"50cfe9a1d5",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"in_vpvr": [
+"f757c4a16d",
+1
+],
 "ind_alma": [
 "0f70916dbb",
 3
+],
+"sg_nwe": [
+"4e506ad872",
+1
 ],
 "slTp": [
 "41d1998bce",

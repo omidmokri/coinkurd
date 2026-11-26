@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Šablonai, atsisiuntimas ir perkėlimas:</b> paruošti indikatorių rinkiniai ir jūsų paties šablonai; žvakių CSV su indikatorių reikšmėmis; eksportas ir importas; bendrinimo nuoroda maketui. Nuoroda ir QR kodas atveria tą pačią darbo sritį jūsų telefone ar kitame įrenginyje, o šios naršyklės kortelės išlieka sinchronizuotos."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Stulpeliai ir kainos yra Binance vieši rinkos duomenys (vienas tiesioginis ryšys visam puslapiui); jei Binance nepasiekiamas, naudojamas OKX, o galiausiai – svetainės nuosava kopija; spalvotas taškas šalia kiekvieno grafiko nurodo šaltinį. Kiekvienam grafikui galite pasirinkti Coinbase, Bybit, OKX arba Kraken vietoj Binance, duomenys bus skaitomi tiesiogiai iš tos biržos viešojo galinio taško jūsų naršyklėje; jei birža neatsako, puslapis apie tai iškart praneš. Pasaulinės forex poros (EUR/USD, USD/JPY ir kitos) gaunamos iš svetainės kasdienių orientacinių kursų – Europos centrinio banko (ECB) ir exchange-api duomenų rinkinio – viena vertė per dieną, o ne brokerio tikrieji duomenys. Ekonominis kalendorius yra ForexFactory savaitinė informacijos santrauka; Bitcoin judėjimas po įvykio yra koreliacija, o ne priežastis. Esant silpnam ryšiui, nustatymuose įjunkite „Duomenų taupymo režimą“. Koreguoti grafikai (dividendai ir kapitalo didinimas) yra Teherano vertybinių popierių biržos funkcija ir kriptovaliutoms netaikoma. Irano rinkos kursai yra tgju.org vieši duomenys; monetų kainos tomanais yra apytikslės: Binance kaina × tether kursas tomanais."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Iš kur gaunami duomenys"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Įspėjimai tikrinami šiame naršyklėje, kol puslapis yra atidarytas (bet kuriame skirtuke). Indikatorių įspėjimai suveikia užsidarius barui."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Įspėjimas apie šį brėžinį"
+],
 "alertSet": [
 "80c4c4abee",
 "Įspėjimas nustatytas: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Geriausias sandoris"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Metinis augimas (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Atsisiųsti sandorius (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Ilgi sandoriai"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1 000 tų pačių sandorių serijų):"
+],
+"btMCv": [
+"992209a3c0",
+"tipinis nuosmukis {a}% · 95% serijų išlieka žemiau {b}% · blogiausias {c}% · šis vykdymas {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimizuoti"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Pelno koeficientas"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Atsipirkimas (vid. laimėjimas / vid. nuostolis)"
+],
 "btRange": [
 "63a44ed01a",
 "nuo / iki / žingsnis"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (metinis)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Pirmieji 70% vs paskutiniai 30% sandorių:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} su {aw}% laimėjimų ({an} sandoriai) → {b} su {bw}% laimėjimų ({bn} sandoriai)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Visi"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · atviras kodas"
+],
+"cat_com": [
+"90566b4c6f",
+"Bendruomenės mėgstamiausi"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (pasaulinis)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "24h pokytis"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Coin_Kurd atviro kodo TradingView scenarijai, veikiantys čia jūsų grafike."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani makro režimas"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani stiliaus ciklas"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin spiralė"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro prietaisų skydelis iš viešų duomenų: rizikos priėmimo / vengimo režimas"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Ciklo fazės grandinėje (MVRV, NUPL) su kainos pozicija"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Visa Bitcoin istorija logaritminėje spiralėje"
+],
 "clearAll": [
 "7de68ccb43",
 "Pašalinti visus brėžinius"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Pašalinti brėžinius ir indikatorius"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Pašalinti brėžinius"
+],
+"clearInds": [
+"8b56474294",
+"Pašalinti indikatorius"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Pašalinti visus indikatorius iš šio grafiko?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Kopijuoti"
+],
+"cloned": [
+"51fbf8cb72",
+"Nukopijuota šalia"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Laiko liko iki šios žvakės uždarymo"
 ],
+"crFree": [
+"6b4b480231",
+"Sekti pelę"
+],
+"crLargeDash": [
+"a7503adc35",
+"Ilgi brūkšniai"
+],
+"crMagnet": [
+"77fa49774c",
+"Pritraukti prie žvakių"
+],
+"crOff": [
+"d4c2792a72",
+"Paslėpta"
+],
+"crSparse": [
+"e50cc378a1",
+"Reti taškai"
+],
 "create": [
 "8ac903c3c3",
 "Sukurti įspėjimą"
+],
+"csBg": [
+"64dd60fe1a",
+"Fonas"
+],
+"csBg2": [
+"9ebb790d74",
+"Antra fono spalva"
+],
+"csBody": [
+"718a7e8a58",
+"Kūnas"
+],
+"csBorderC": [
+"eeffa83765",
+"Kraštinės spalva"
+],
+"csBorders": [
+"685f23bc5e",
+"Kraštinės"
+],
+"csClose": [
+"bbfa773e5a",
+"Uždarymo kaina"
+],
+"csCross": [
+"b0b83f89e8",
+"Kryžmė ir pelė"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Kryžmės spalva"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Kryžmės linija"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Kainos ir laiko žymos ant kryžmės"
+],
+"csCrossMode": [
+"800092e3e1",
+"Kryžmė"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Kryžmės plotis"
+],
+"csDn": [
+"11f5ff3829",
+"Krentanti žvakė"
+],
+"csFont": [
+"b97c4d4cdd",
+"Šriftas"
+],
+"csFsize": [
+"83ca9e48c3",
+"Šrifto dydis"
+],
+"csGrad": [
+"c716191a01",
+"paversti foną gradientu"
+],
+"csGridA": [
+"f773586220",
+"Tinklelio neskaidrumas (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Tinklelio spalva"
+],
+"csGridH": [
+"4eaa1c008a",
+"Horizontalios tinklelio linijos"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Vertikalios tinklelio linijos"
+],
+"csHollow": [
+"9165bccc85",
+"Tuščiaviduriai kūnai"
+],
+"csHollowH": [
+"fb63aba345",
+"tik kylančios žvakės"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetinis slinkimas liečiant"
+],
+"csLast": [
+"aacdc5bea4",
+"Paskutinės kainos linija"
+],
+"csLastLab": [
+"91c990bcb9",
+"Kainos žyma ant skalės"
+],
+"csLineC": [
+"01212659ee",
+"Linijos / srities spalva"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Linijos plotis"
+],
+"csLook": [
+"41def7a0fe",
+"Išvaizda"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"viena spalva abiem kryptims"
+],
+"csPinch": [
+"e557a41794",
+"Mastelio keitimas liečiant"
+],
+"csResetQ": [
+"9c369383c1",
+"Atkurti visus grafiko nustatymus į pradinius?"
+],
+"csScale": [
+"0b414bdcb7",
+"Skalės"
+],
+"csScroll": [
+"468c89cb3b",
+"Vilkite grafiką pele"
+],
+"csSym": [
+"fad29404d2",
+"Žvakės"
+],
+"csText": [
+"d160595fcf",
+"Teksto spalva"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Grafiko nustatymai"
+],
+"csUp": [
+"971a95475d",
+"Kylanti žvakė"
+],
+"csWick": [
+"fe6e2bfd48",
+"Dagčiai"
+],
+"csWickC": [
+"0fcb21d161",
+"Dagčio spalva"
+],
+"csWm": [
+"33c7b41ac6",
+"Vandens ženklas už žvakių"
+],
+"csWmA": [
+"69a1810ea2",
+"Vandens ženklo neskaidrumas (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"simbolis ir laiko intervalas"
+],
+"csWmC": [
+"bad81c749f",
+"Vandens ženklo spalva"
+],
+"csWmSize": [
+"4af7e52f80",
+"Vandens ženklo dydis"
+],
+"csWmText": [
+"ecf870ab34",
+"Vandens ženklo tekstas"
+],
+"csZoom": [
+"c6f40d9d03",
+"Pelės ratukas"
+],
+"csZoomH": [
+"4ca34c1092",
+"priartinimas ir atitolinimas"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "atsisiųsta žvakių: {n}"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Pridėti įspėjimą čia"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopijuoti šią kainą"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Sutalpinti visas žvakes"
+],
+"ctxHline": [
+"588d2eb492",
+"Horizontali linija čia"
+],
+"ctxReset": [
+"242cb352c0",
+"Atstatyti vaizdą"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Kaskart (daugiausia kartą per minutę / kartą per žvakę)"
 ],
+"exAuto": [
+"1ff048b76e",
+"tiesiogiai, su OKX kaip atsarginiu"
+],
+"exDown": [
+"e8ba18613e",
+"{x} neatsako per šį ryšį. Grafikas lieka toje biržoje, kurioje yra."
+],
+"exNote": [
+"0eb4c03240",
+"Binance transliuoja tiesiogiai; kiti kas dešimt sekundžių nuskaitomi iš savo viešų galinių punktų su savo istorija."
+],
+"exTitle": [
+"5b13eac7ed",
+"Birža"
+],
 "exit": [
 "f83b6fe3ae",
 "Išeiti"
+],
+"exitFull": [
+"fc61e74cd9",
+"Išeiti iš viso ekrano"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Eksportuoti viską (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Šio indikatoriaus duomenys neįsikėlė. Bandykite dar kartą vėliau."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Geltona"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Prognozė"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Ketvirčio ateities sandoriai, tęstiniai"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Viena valiuta kitos atžvilgiu, pagal svetainės dienos orientacinius kursus (Europos Centrinis Bankas ir exchange-api duomenų rinkinys, kai ECB nekotiruoja valiutos). Viena vertė per dieną, todėl dienos juosta yra vienas taškas, o savaitės ir mėnesio juostos sudarytos iš jose esančių dienų. Orientaciniai kursai skelbiami kartą per dieną, tai nėra brokerio tikriniai duomenys: čia nėra dienos Forex prekybos. Dolerio poros prasideda nuo 2024 m. kovo 2 d., poros tarp dviejų ECB valiutų – nuo 2017 m."
+],
+"g_arrows": [
+"0cf604cb00",
+"Rodyklės"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Teptukai"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanalai"
+],
+"g_cursors": [
+"f4d2f91040",
+"Žymekliai"
+],
+"g_cycles": [
+"97f064aff5",
+"Ciklai"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott bangos"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Linijos"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Matuoklis"
+],
+"g_pat": [
+"2c179da0f5",
+"Grafiko modeliai"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Šakutės"
+],
+"g_proj": [
+"8aa49fe840",
+"Projekcija"
+],
+"g_shapes": [
+"b1985e3874",
+"Formos"
+],
+"g_text": [
+"d7cd4cda4f",
+"Tekstas ir pastabos"
+],
+"g_vol": [
+"1b4620951d",
+"Apimties pagrindu"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Slėpti / rodyti brėžinius"
+],
+"hideBoth": [
+"3502a3299d",
+"Slėpti brėžinius ir indikatorius"
+],
+"hideDraw": [
+"f4492c5211",
+"Slėpti brėžinius"
+],
+"hideInds": [
+"764ab9d614",
+"Slėpti indikatorius"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1265,9 +1721,61 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Visi žvakių modeliai"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hanging man"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Rytinė / Vakarinė žvaigždė"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Prasiskverbimo linija / Tamsus debesis"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Trys balti kariai / juodi varnai"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Krintanti žvaigždė / Apverstas kūjis"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Pinceto viršūnė / dugnas"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kaupiamasis apimties delta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1797,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA debesys [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1809,41 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Lygios viršūnės / dugnai"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (baro delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Tikrosios vertės spragos (FVG)"
+],
+"in_gmma": [
+"bf822f6db4",
+"Guppy daugialypis MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1856,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani makro režimas"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin galios dėsnis"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani stiliaus ciklas"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin spiralė"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1909,18 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Rinkos struktūra (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Nadaraya-Watson vokas [LuxAlgo]"
+],
+"in_ob": [
+"80c4ef99a7",
+"Užsakymų blokai (OB)"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1940,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Diapazono filtras [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1977,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastinis momentum indeksas"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Palaikymas ir pasipriešinimas su lūžiais [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL kanalas [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff tendencijų ciklas"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Prekiautojų dinaminis indeksas"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profilis (laikas pagal kainą)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +2037,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Apimties delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +2057,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Sesijos apimties profilis"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Matomo diapazono apimties profilis"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP juostos"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2084,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1493,6 +2125,10 @@
 "0f70916dbb",
 "Arnaud Legoux slankusis vidurkis"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR tendencijos linija, valdoma MFI (RSI be apimties)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 minus SMA 34 iš vidurio taško"
@@ -1504,6 +2140,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Vidutinis tikrasis diapazonas (kintamumas)"
+],
+"ind_atrts": [
+"8223831420",
+"Stop-loss, sekantis k·ATR ir keičiantis puses"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1529,6 +2169,10 @@
 "a50928c16b",
 "Prekių kanalo indeksas"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR išėjimai, pakabinti nuo aukščiausio/žemiausio uždarymo"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Tendencijų (žema) arba šoninė (aukšta) rinka"
@@ -1549,9 +2193,61 @@
 "bf330f58dd",
 "Ilgalaikis impulsas: dviejų pokyčių greičių WMA"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Pažymi kiekvieną žemiau esantį modelį ant žvakių"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Atidarymas ir uždarymas beveik lygūs (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bulių (BE) ir meškų (SE) apgaubimas"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Ilgas apatinis šešėlis po kritimo (H) arba kilimo (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Mažas kūnas ankstesnio didelio viduje (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Žvakė visiškai ankstesnės viduje (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Didelis kūnas be šešėlių (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Trijų žvakių apsisukimas: MS bulių, ES meškų"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Spraga ir uždarymas už ankstesnės žvakės vidurio (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Trys stiprios žvakės iš eilės (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Ilgas viršutinis šešėlis po kilimo (SS) arba kritimo (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dvi žvakės su ta pačia viršūne (TT) arba dugnu (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, serijos RSI ir procentinis rangas kartu"
+],
+"ind_cvd": [
+"690d30a274",
+"Einamoji apimties deltos suma: kas kontroliuoja rinką"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1573,6 +2269,10 @@
 "c499047c5b",
 "Eksponentinis slankusis vidurkis"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · du EMA debesys, greitas ir lėtas"
+],
 "ind_env": [
 "e2cf023f50",
 "Slankusis vidurkis su juostomis fiksuotu % atstumu"
@@ -1581,17 +2281,41 @@
 "d648aafe8d",
 "Kaip lengvai kaina juda vienam apimties vienetui"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Du svyravimai beveik ta pačia kaina: sukauptas likvidumas"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Paverčia kainas beveik normaliuoju skirstiniu"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Pirkimo × pardavimo apimtis ir delta, parašyta po kiekviena žvake; priartinkite, kad perskaitytumėte. Pagal žvakę, ne pagal kainos lygį"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fraktalai: lokalios aukštumos ir žemumos"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Trijų žvakių spragos; kiekvienas langelis baigiasi ten, kur kaina ją užpildo"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Šeši trumpi ir šeši ilgi EMA: prekiautojai prieš investuotojus"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · laiptuota tendencijos linija, kuri apsisuka tik esant tikram svyravimo lūžiui"
+],
 "ind_hma": [
 "709351f832",
 "Hull slankusis vidurkis: greitas ir sklandus"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA, nuspalvintas pagal nuolydį"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1604,6 +2328,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastinis su J linija (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (atviras kodas, MPL-2.0) · makro režimas už žvakių, jo signalai ir prietaisų skydelis, iš FRED duomenų"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (atviras kodas) · Bitcoin tikroji vertė 8.31e-17·dienos^5.48 su ±10 % juostomis ir pirkimo zona; skirta BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (atviras kodas) · Bitcoin ciklo fazės iš MVRV, NUPL ir SOPR tarpinio rodiklio: Ekstremalus meškų, Meškų, Ankstyvas bulių, Bulių, Perkaitęs; pilka linija yra normalizuota kaina"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (atviras kodas) · Visa Bitcoin istorija logaritminėje spiralėje, vienas apsisukimas per pusijimo ciklą, su viršūnėmis, dugnais, pusijimais ir dabartimi"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1641,9 +2385,21 @@
 "d6640bbc39",
 "Kaina dabar minus kaina prieš n žvakių"
 ],
+"ind_ms": [
+"13fc87db00",
+"Paskutinio patvirtinto svyravimo lūžiai: BOS pagal tendenciją, CHoCH prieš ją"
+],
 "ind_news": [
 "a95010ef34",
 "Antraštės apie šią monetą, pažymėtos jų paskelbimo metu (svetainės paskutinės dienos naujienos)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · branduoliu glotninta kaina su vidutinės paklaidos voku; neperpiešiamas formatas"
+],
+"ind_ob": [
+"530cdc224f",
+"Paskutinė priešinga žvakė prieš struktūros lūžį, kol kaina užsidaro už jos"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1668,6 +2424,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Apimtis, pridėta proporcingai % pokyčiui"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · glotnintas RSI su kintamumo sekimo linija (QQE MOD branduolys)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · išfiltruoja triukšmą, mažesnį už glotnintą vidutinį diapazoną"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1701,25 +2465,53 @@
 "26db009730",
 "Paprastasis slankusis vidurkis"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Uždarymas prieš diapazono vidurį, dvigubai glotnintas"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Išlygintas slankusis vidurkis (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger viduje Keltner = suspaudimas (raudoni taškai); histograma rodo, į kurią pusę lūžta"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · paskutinė viršūnė ir dugnas kaip lygiai"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastinis RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · aukštumų ir žemumų slankieji vidurkiai, kurie apsikeičia vietomis, kai tendencija pasisuka"
+],
 "ind_st": [
 "8d66b52001",
 "ATR besivelkanti linija, apsiverčianti su tendencija"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD du kartus praleistas per stochastinį: ankstyvi tendencijų posūkiai (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K ir %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI su kintamumo juostomis, greita ir lėta linija"
+],
 "ind_tema": [
 "1ff881355e",
 "Trigubas eksponentinis slankusis vidurkis"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Kiek žvakių prekiauta kiekviena kaina, per dieną"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1733,6 +2525,18 @@
 "182e4a763e",
 "Pirkimo spaudimas per tris periodus"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR sekantis stop-loss; kainos kirtimas yra pirkimo/pardavimo signalas"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Pirkimo apimtis minus pardavimo apimtis kiekvienai žvakei (tiekėjo duomenys iš Binance; kitur – įvertis)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · sintetinis VIX bet kuriai rinkai; šuoliai virš juostų dažnai žymi panikos dugnus"
+],
 "ind_vo": [
 "a99f6a0038",
 "Greitų ir lėtų apimčių vidurkis (%)"
@@ -1745,9 +2549,21 @@
 "6badda8c94",
 "Teigiamas ir neigiamas tendencijos judėjimas (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Vienas apimties profilis per dieną (per mėnesį dienos žvakėse)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Apimtis kiekviena kaina ekrane matomoms žvakėms, su POC ir vertės zona"
+],
 "ind_vwap": [
 "6d86714413",
 "Apimtimis svertinė vidutinė kaina, atstatoma 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Dienos VWAP su ±1σ ir ±k·σ juostomis"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1760,6 +2576,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Svertinis slankusis vidurkis"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · kanalo indekso osciliatorius; kirtimai virš 53/60 ir žemiau −53/−60 žymi ištemptus judesius"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · nulinio vėlavimo mažiausių kvadratų slankusis vidurkis"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1885,6 +2709,14 @@
 "891ebccd5b",
 "Užrakinti"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Užrakinti visus brėžinius"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Visi brėžiniai užrakinti"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1905,13 +2737,41 @@
 "5f703c7eba",
 "Kurdistani signalai"
 ],
+"mMode": [
+"659eba1219",
+"Kartoti"
+],
+"mMsg": [
+"2c924e3088",
+"Pastaba"
+],
+"mTf": [
+"85decb73d1",
+"Laiko intervalas"
+],
 "maType": [
 "15f86c051e",
 "Vidurkis"
 ],
+"macroNote": [
+"c4a94f666d",
+"taisyklėmis pagrįstas įvertis, ne patarimas"
+],
 "magnet": [
 "effa915951",
 "Magnetas (pririšti prie atidarymo / aukštumos / žemumos / uždarymo)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnetas išjungtas"
+],
+"magnetS": [
+"607a7625b1",
+"Stiprus magnetas"
+],
+"magnetW": [
+"181021d95b",
+"Silpnas magnetas"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1933,9 +2793,45 @@
 "fdbe20f376",
 "Visi laiko tarpai"
 ],
+"moreTools": [
+"c871f1056a",
+"Daugiau įrankių"
+],
 "moveToSection": [
 "98d183e7cb",
 "Perkelti į skyrių"
+],
+"mt_mine": [
+"1cf761ac34",
+"Mano skriptai"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Parinktys"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Modeliai"
+],
+"mt_prof": [
+"0c2a930099",
+"Profiliai"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Struktūra"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategijos"
+],
+"multiAl": [
+"5bafcd2412",
+"Kelių sąlygų įspėjimas"
+],
+"multiNote": [
+"c7e278bae8",
+"Įrašykite sąlygas vienoje eilutėje ir sujunkite jas su and / or. Įspėjimas suveikia žvakėje, kurioje sąlyga tampa teisinga."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1984,6 +2880,10 @@
 "nc_technical": [
 "41fc086088",
 "Techninė"
+],
+"neckline": [
+"993062b2d6",
+"Kaklo linija"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2093,6 +2993,10 @@
 "77f8046dcf",
 "(viršuje, be skyriaus)"
 ],
+"noVol": [
+"0960b9b69d",
+"nėra apimties šiam simboliui"
+],
 "notif": [
 "270d190970",
 "Naršyklės pranešimas"
@@ -2145,21 +3049,57 @@
 "c0da22faab",
 "Atidaryti grafike"
 ],
+"openTv": [
+"94d7227248",
+"Atidaryti per TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} opcionų grandinė"
+],
+"optDays": [
+"c2fd31e918",
+"Dienos iki galiojimo pabaigos"
+],
 "optDone": [
 "29cda6ac3f",
 "Išbandyta {n} derinių per {s} s, {p} iš jų pelningi; rūšiuojama pagal {r}. Spustelėkite eilutę, kad pamatytumėte pilną ataskaitą."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit neatsakė iš šio ryšio. Pakeiskite ryšį arba VPN ir bandykite dar kartą."
+],
+"optIV": [
+"c1bc12118c",
+"ATM numanomas kintamumas"
+],
 "optMax": [
 "7b9c1b1490",
 "Per daug derinių — daugiausiai {n}. Naudokite didesnį žingsnį."
+],
+"optMove": [
+"8aa36fe05d",
+"Tikėtinas judėjimas"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} deriniai (daugiausiai {m} šiai istorijai)"
 ],
 "optNote": [
-"4b4713d390",
-"Geriausias rezultatas su praeities duomenimis dažnai yra sėkmė (persitaisymas). Pirmenybę teikite nustatymams, kurių kaimynai taip pat veikia gerai, ir patikrinkite juos kitu laikotarpiu ar rinkoje."
+"96723a0ac4",
+"BTC ir ETH opcionų grandinė iš Deribit viešų duomenų, nuskaitoma jūsų naršyklės."
+],
+"optNote2": [
+"26dfa389e8",
+"OI ir apimtis kontraktais (monetomis); $ yra rinkos kaina doleriais. Max pain: atsiskaitymo kaina, kuri opcionų turėtojams atneša mažiausiai naudos. Tikėtinas judėjimas = kaina × IV × √(dienos/365). Tai nėra patarimas."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2168,6 +3108,10 @@
 "optRun": [
 "9a456cc451",
 "Rasti geriausius nustatymus"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Pagrindinis turtas"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2229,13 +3173,37 @@
 "0777981263",
 "Kainos {c} dabar naudoja jūsų kursą."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitudė"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR ilgis"
 ],
+"p_band": [
+"3541c5f4e1",
+"Juostos ilgis"
+],
 "p_base": [
 "077fe9c54e",
 "Bazė"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Juostos ilgis"
+],
+"p_bw": [
+"1d06cbba91",
+"Pralaidumas"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanalo nuokrypis"
+],
+"p_coeff": [
+"b032583db6",
+"Daugiklis"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2269,6 +3237,10 @@
 "8db6a2f1d3",
 "Greitas"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Greitas 2"
+],
 "p_hi": [
 "70a2565504",
 "Viršutinis lygis"
@@ -2289,6 +3261,14 @@
 "a0623fa9a3",
 "%K glodinimas"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC daugiklis"
+],
+"p_key": [
+"ab76f1670b",
+"Pagrindinė reikšmė"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1 ilgis"
@@ -2304,6 +3284,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4 ilgis"
+],
+"p_lb": [
+"0f484e5cc3",
+"Procentilių peržiūra"
+],
+"p_left": [
+"3b219a058a",
+"Kairės žvakės"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2345,6 +3333,14 @@
 "a44d6c906d",
 "Žvakės iš abiejų pusių"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanalo ilgis"
+],
+"p_n2": [
+"2df99da939",
+"Vidutinis ilgis"
+],
 "p_offset": [
 "ce66771654",
 "Poslinkis"
@@ -2353,13 +3349,41 @@
 "ac556cf593",
 "Procentas"
 ],
+"p_pd": [
+"4997ad18cf",
+"Peržiūra"
+],
+"p_per": [
+"a89f63abb8",
+"Atrankos periodas"
+],
+"p_ph": [
+"b1f698cc3d",
+"Aukštas procentilis"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE faktorius"
+],
 "p_rank": [
 "1df2ca7462",
 "Procentinio rango ilgis"
 ],
+"p_right": [
+"307c9815b6",
+"Dešinės žvakės"
+],
+"p_rows": [
+"52d0b35277",
+"Eilutės"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI ilgis"
+],
+"p_sf": [
+"590f20262b",
+"RSI glotninimas"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2376,6 +3400,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Lėtas"
+],
+"p_slow2": [
+"c252d2ccab",
+"Lėtas 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2421,6 +3449,54 @@
 "07300ad49f",
 "{c} už 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Pridėti"
+],
+"pfAvg": [
+"def9f57b0c",
+"Vidutinė pirkimo kaina"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kaina"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Čia dar nieko nėra. Pridėkite monetą, kiek turite ir kiek sumokėjote."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfelis {n}"
+],
+"pfNote": [
+"f46050561e",
+"Saugoma tik šioje naršyklėje. Niekada neprašo biržos raktų ir niekur nieko nesiunčia. Kainos yra Binance USDT poros."
+],
+"pfNow": [
+"039df35064",
+"Dabartinė kaina"
+],
+"pfPnl": [
+"8ae3945397",
+"Pelnas / nuostolis"
+],
+"pfQty": [
+"44f6af6945",
+"Kiekis"
+],
+"pfShort": [
+"036b18f02a",
+"Portfelis"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfelis"
+],
+"pfValue": [
+"8dce170de2",
+"Vertė"
+],
 "pickStart": [
 "1e214a5fd6",
 "Spustelėkite grafiką, kur turėtų prasidėti pakartojimas"
@@ -2444,6 +3520,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Kaina"
+],
+"profNote": [
+"c1da831af8",
+"Norėdami gauti pasirinkto diapazono profilį, kairiajame įrankių skydelyje naudokite „Fixed range volume profile“."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2617,6 +3697,86 @@
 "56a2285c5b",
 "Saugoma..."
 ],
+"scAuto": [
+"6e0f8f2742",
+"Automatiškai pritaikyti kainų skalę"
+],
+"scBorder": [
+"45c60c0e85",
+"Kainų skalės rėmelis"
+],
+"scBot": [
+"77a5b77d62",
+"Tarpas apačioje (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Abi pusės"
+],
+"scInvert": [
+"ba80abaac1",
+"Apversti kainų skalę"
+],
+"scInvertH": [
+"ebb1688761",
+"viršus tampa apačia"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Kairė"
+],
+"scLog": [
+"65fa51781b",
+"Logaritminė"
+],
+"scMode": [
+"a5e5771ca0",
+"Kainų skalė"
+],
+"scModeH": [
+"ab58fc981e",
+"įprasta, logaritminė arba procentinė"
+],
+"scNone": [
+"d4c2792a72",
+"Paslėpta"
+],
+"scNormal": [
+"7802670ec0",
+"Įprasta (aritmetinė)"
+],
+"scOff": [
+"3557c35506",
+"Tuščia vieta dešinėje"
+],
+"scPct": [
+"c4519ac7cc",
+"Procentinė"
+],
+"scRight": [
+"954daa8b00",
+"Dešinė"
+],
+"scSec": [
+"c92a4af093",
+"Sekundės laiko skalėje"
+],
+"scSide": [
+"82acb7ee2b",
+"Kur yra kainų skalė"
+],
+"scSpace": [
+"2878a3a43e",
+"Tarpas tarp žvakių"
+],
+"scTop": [
+"25126a3aab",
+"Tarpas viršuje (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Laiko skalės rėmelis"
+],
 "sc_c": [
 "3e8248e32e",
 "Kaina"
@@ -2676,6 +3836,62 @@
 "screener": [
 "7f27924c12",
 "Rinkos stebėjimas"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Atrankos įrankis"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Patikrinti"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab scenarijų redaktorius"
+],
+"scriptEdit": [
+"ae909c75da",
+"Redaguoti scenarijų"
+],
+"scriptExamples": [
+"41a27a4710",
+"Pavyzdžiai…"
+],
+"scriptLine": [
+"1acb1c0448",
+"{n} eilutė"
+],
+"scriptName": [
+"709a23220f",
+"Pavadinimas"
+],
+"scriptNew": [
+"ebac729ca3",
+"Naujas scenarijus"
+],
+"scriptNote": [
+"c265d2248f",
+"Rašykite savo indikatorius Pine tipo kalba. Jie išsaugomi šioje naršyklėje ir veikia tik čia, jūsų grafike."
+],
+"scriptOk": [
+"eb3da0c952",
+"Nėra klaidų · {n} išvestys"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Kalbos žinynas"
+],
+"scriptSave": [
+"1e291c4d98",
+"Išsaugoti ir pridėti prie grafiko"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Scenarijus išsaugotas"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Scenarijus"
 ],
 "searchEv": [
 "0a08612647",
@@ -2781,9 +3997,25 @@
 "e97d96a8bc",
 "Didžiausia apimtis"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI kirtimas (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger apsisukimas"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2792,6 +4024,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani signalai (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun kirtimas"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ kirtimas"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2805,6 +4053,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI apsisukimas"
@@ -2813,9 +4069,37 @@
 "446d28671b",
 "Auksinis / mirties kryžius (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI kirtimas"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend kirtimas [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2949,6 +4233,106 @@
 "2d2cb022bc",
 "Greitis"
 ],
+"stBadLv": [
+"683a05683a",
+"Lygiai turi būti iki 24 skaičių."
+],
+"stBadPt": [
+"a73083f114",
+"Kaina arba laikas neteisingi."
+],
+"stColor": [
+"f28563a477",
+"Spalva"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinatės"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Brūkšninė"
+],
+"stDev": [
+"e789c07831",
+"Nuokrypis (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Taškinė"
+],
+"stExtL": [
+"ef880cf8fc",
+"Tęsti į kairę"
+],
+"stExtR": [
+"fbff580b3d",
+"Tęsti į dešinę"
+],
+"stFill": [
+"64dd60fe1a",
+"Fonas"
+],
+"stLevels": [
+"ae3d013ab1",
+"Lygiai (atskirti kableliais)"
+],
+"stLine": [
+"120ee44bec",
+"Linijos stilius"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Čia galima redaguoti tik pirmuosius 12 taškų."
+],
+"stOpacity": [
+"f12e36bd83",
+"Fono neskaidrumas"
+],
+"stReset": [
+"40aab769d0",
+"Numatytieji lygiai"
+],
+"stRows": [
+"52d0b35277",
+"Eilutės"
+],
+"stSize": [
+"83ca9e48c3",
+"Šrifto dydis"
+],
+"stSolid": [
+"d00635865c",
+"Ištisinė"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stilius"
+],
+"stText": [
+"c3328c39b0",
+"Tekstas"
+],
+"stTextC": [
+"d160595fcf",
+"Teksto spalva"
+],
+"stTextL": [
+"c3328c39b0",
+"Tekstas"
+],
+"stUtc": [
+"c9dbd25df4",
+"Laikas nurodytas UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Matomumas"
+],
+"stWidth": [
+"ad48f34186",
+"Storis"
+],
 "st_err": [
 "d802d232a8",
 "Nėra duomenų"
@@ -2992,6 +4376,14 @@
 "stop": [
 "9e253470c8",
 "Sustabdyti"
+],
+"stratNote": [
+"16dc19eef4",
+"Kiekviena strategija veikia pagal šio grafiko istoriją testuotojuje: įėjimai ir išėjimai grafike, grynasis rezultatas, laimėjimų procentas, nuosmukis ir nustatymų optimizavimo įrankis."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Paleisti strategijų testuotojuje"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3053,25 +4445,133 @@
 "a26d0ddaae",
 "Slinkimas (laikas)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD modelis"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendo kampas"
+],
+"t_arc": [
+"853a983f6b",
+"Lankas"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Rodyklė"
+],
+"t_arrowc": [
+"0f722804ec",
+"Rodyklės žymeklis"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Rodyklė žemyn"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Rodyklės žymė"
+],
+"t_arrowup": [
+"8023467135",
+"Rodyklė aukštyn"
+],
+"t_avwap": [
+"0a4f86b195",
+"Anchored VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Teptukas"
 ],
+"t_callout": [
+"f1647ad880",
+"Iškylantis tekstas"
+],
 "t_channel": [
 "c0350b7736",
 "Lygiagretus kanalas"
+],
+"t_circ": [
+"1cc7820a08",
+"Apskritimas"
 ],
 "t_circle": [
 "8580e3175f",
 "Elipsė"
 ],
+"t_comment": [
+"153d7a58b3",
+"Komentaras"
+],
+"t_cross": [
+"983bdb7b27",
+"Kryžminė linija"
+],
 "t_cursor": [
 "2239943c8d",
 "Žymeklis"
+],
+"t_curve": [
+"916f09aff8",
+"Kreivė"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Ciklinės linijos"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher modelis"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dviguba kreivė"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Atskirtas kanalas"
+],
+"t_dot": [
+"46856bf702",
+"Taškas"
+],
+"t_drange": [
+"c65ea4ae01",
+"Datos intervalas"
+],
+"t_drives": [
+"3a261ca869",
+"Trijų bangų modelis"
+],
+"t_emoji": [
+"707fd71017",
+"Piktogramos ir jaustukai"
+],
+"t_eraser": [
+"a5742851f0",
+"Trintukas"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elioto korekcinė banga (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elioto dviguba kombinuota banga (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elioto impulsinė banga (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elioto trikampio banga (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elioto triguba kombinuota banga (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3081,13 +4581,69 @@
 "18c530863b",
 "Fibonacci atsekimas"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fibonačio greičio pasipriešinimo lankai"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fibonačio kanalas"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fibonačio apskritimai"
+],
 "t_fibext": [
 "73655be9d6",
 "Tandemu pagrįstas Fibonacci išplėtimas"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fibonačio greičio pasipriešinimo vėduoklė"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fibonačio spiralė"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Fibonačio laikas pagal tendenciją"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fibonačio laiko zona"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fibonačio pleištas"
+],
+"t_flag": [
+"23d91e7740",
+"Vėliavėlė"
+],
+"t_flat": [
+"52d3db252e",
+"Plokščia viršūnė/apačia"
+],
+"t_forecast": [
+"528bc4bc38",
+"Prognozė"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann vėduoklė"
+],
+"t_gannbox": [
+"58a3842138",
+"Gano dėžė"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gano kvadratas"
+],
+"t_hl": [
+"8cb3f79b49",
+"Žymeklis"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3097,6 +4653,18 @@
 "0bcbc4e087",
 "Horizontalus spindulys"
 ],
+"t_hs": [
+"43353dbcec",
+"Galva ir pečiai"
+],
+"t_info": [
+"a690e33098",
+"Informacinė linija"
+],
+"t_inside": [
+"30d6b425dc",
+"Vidinis šakutės įrankis"
+],
 "t_long": [
 "666f195fc4",
 "Ilgoji pozicija (Long)"
@@ -3105,9 +4673,45 @@
 "2bedd64d85",
 "Kainų intervalas / matavimas"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modifikuota Schiff šakutė"
+],
+"t_note": [
+"2c924e3088",
+"Pastaba"
+],
+"t_path": [
+"519e39132b",
+"Kelias"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews šakutė"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan vėduoklė"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Kainos etiketė"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Kainos pastaba"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polilinija"
+],
+"t_prange": [
+"c20f7ce09a",
+"Kainos intervalas"
+],
+"t_proj": [
+"8aa49fe840",
+"Projekcija"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3117,9 +4721,33 @@
 "c158695a64",
 "Stačiakampis"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regresijos tendencija"
+],
+"t_rrect": [
+"65807afaf7",
+"Pasuktas stačiakampis"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff šakutė"
+],
 "t_short": [
 "a8daf74669",
 "Trumpoji pozicija (Short)"
+],
+"t_signpost": [
+"89f361362e",
+"Kelio ženklas"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinusoidė"
+],
+"t_tcycle": [
+"521a687246",
+"Laiko ciklai"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3129,9 +4757,29 @@
 "e810388344",
 "Tendencijos linija"
 ],
+"t_tri": [
+"32547b031d",
+"Trikampio modelis"
+],
+"t_tri3": [
+"73d3ae245f",
+"Trikampis"
+],
 "t_vline": [
 "a790288017",
 "Vertikali linija"
+],
+"t_vrp": [
+"bcba420b37",
+"Fiksuoto diapazono apimties profilis"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD modelis"
+],
+"t_zoom": [
+"4fc05f2763",
+"Priartinti"
 ],
 "target": [
 "61ad50a9b9",
@@ -3181,6 +4829,26 @@
 "ad88cbfa09",
 "Taip pat Telegram tinkle (botas stebi net tada, kai šis puslapis uždarytas)"
 ],
+"thDark": [
+"ae1ef01432",
+"Tamsi"
+],
+"thLight": [
+"a36ef8aba2",
+"Šviesi"
+],
+"thMid": [
+"4fe978738d",
+"Vidurnakčio mėlyna"
+],
+"thNavy": [
+"0229e960cf",
+"Tamsiai mėlyna"
+],
+"thPaper": [
+"22d507f2ba",
+"Popierinė"
+],
 "time": [
 "6c82e6dd86",
 "Laikas"
@@ -3204,6 +4872,10 @@
 "tooFar": [
 "b29db0358a",
 "Tai senesnis periodas, nei šis laiko tarpas gali užkrauti; pasirinkite didesnį laiko tarpą."
+],
+"toolHint": [
+"56e62363ce",
+"spustelėkite diagramą, kad nubrėžtumėte"
 ],
 "topFixed": [
 "1a66879287",
@@ -3429,6 +5101,34 @@
 "1526a17ee7",
 "Atrakinti"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Visi brėžiniai atrakinti"
+],
+"vDay": [
+"f6bb0f468a",
+"Dienos"
+],
+"vHour": [
+"9e25a34e63",
+"Valandos"
+],
+"vMin": [
+"092f99ea11",
+"Minutės"
+],
+"vMonth": [
+"200dcdce9b",
+"Mėnesiai"
+],
+"vSec": [
+"5fb1db5278",
+"Sekundės"
+],
+"vWeek": [
+"7d75266a53",
+"Savaitės"
+],
 "value": [
 "3e8248e32e",
 "Kaina"
@@ -3436,6 +5136,10 @@
 "valuePct": [
 "bf55390d8d",
 "Procentai (%)"
+],
+"vol": [
+"1837d13d11",
+"Apimtis"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3480,6 +5184,24 @@
 "yourRate": [
 "ca14282aa6",
 "jūsų kursas"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Atitolinti"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Vilkite didesnį laukelį, kad priartintumėte."
+]
+},
+"f": {
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
 ]
 }
 }

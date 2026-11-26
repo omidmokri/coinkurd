@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Plantilles, descàrrega i transferència:</b> conjunts d'indicadors preparats i les teves pròpies plantilles; CSV de les barres amb els valors dels indicadors; exportació i importació; un enllaç per compartir una disposició. Un enllaç i codi QR obren el mateix espai de treball al telèfon o un altre dispositiu, i les pestanyes d'aquest navegador es mantenen sincronitzades."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Les barres i els preus són dades de mercat públiques de Binance (una connexió en directe per a tota la pàgina); si no es pot accedir a Binance, s'utilitza OKX i, finalment, la pròpia instantània del lloc: el punt de color al costat de cada gràfic indica quina. Per a qualsevol gràfic, podeu triar Coinbase, Bybit, OKX o Kraken en lloc de Binance, llegint directament des del punt final públic d'aquest exchange al vostre navegador; si un exchange no respon a la vostra connexió, la pàgina ho indica immediatament. Els parells de divises mundials (EUR/USD, USD/JPY i la resta) provenen de les taxes de referència diàries del propi lloc: el Banc Central Europeu i el conjunt de dades exchange-api — un valor al dia, no dades de tick d'un broker. El calendari econòmic és el feed setmanal de ForexFactory; el moviment de Bitcoin després d'un esdeveniment és un co-moviment, no una causa. Amb una connexió feble, activeu \"Estalvi de dades\" a la configuració. Els gràfics ajustats (dividends i augments de capital) són una característica de la Borsa de Teheran i no s'apliquen a les criptomonedes. Les taxes de mercat de l'Iran són dades públiques de tgju.org; els preus de les monedes en toman són una estimació: el preu de Binance × la taxa de tether en toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "D'on provenen les dades"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Les alertes es comproven en aquest navegador mentre la pàgina estigui oberta (qualsevol pestanya). Les alertes d'indicadors es disparen quan una barra tanca."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Alerta en aquest dibuix"
+],
 "alertSet": [
 "80c4c4abee",
 "Alerta configurada: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Millor operació"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Creixement anual (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Descarrega les operacions (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Operacions llargues (Long)"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1.000 ordres de les mateixes operacions):"
+],
+"btMCv": [
+"992209a3c0",
+"drawdown típic {a}% · el 95% de les ordres es mantenen per sota del {b}% · pitjor {c}% · aquesta execució {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimització"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Factor de benefici (Profit factor)"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Payoff (mitjana guanys / mitjana pèrdues)"
+],
 "btRange": [
 "63a44ed01a",
 "des de / fins a / pas"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (anual)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Primer 70% vs últim 30% de les operacions:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} amb {aw}% de guanys ({an} operacions) → {b} amb {bw}% de guanys ({bn} operacions)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Tots"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · codi obert"
+],
+"cat_com": [
+"90566b4c6f",
+"Preferits de la comunitat"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (món)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "Canvi 24h"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Scripts de TradingView de codi obert de Coin_Kurd, executant-se aquí al teu gràfic."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Tauler macro de dades públiques: règim de risc activat / risc desactivat"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Fases del cicle on-chain (MVRV, NUPL) amb la posició del preu"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Tota la història de Bitcoin en una espiral logarítmica"
+],
 "clearAll": [
 "7de68ccb43",
 "Eliminar tots els dibuixos"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Elimina dibuixos i indicadors"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Elimina dibuixos"
+],
+"clearInds": [
+"8b56474294",
+"Elimina indicadors"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Eliminar tots els indicadors d'aquest gràfic?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Copiar"
+],
+"cloned": [
+"51fbf8cb72",
+"Copiat al costat"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Temps restant perquè aquesta barra tanqui"
 ],
+"crFree": [
+"6b4b480231",
+"Segueix el ratolí"
+],
+"crLargeDash": [
+"a7503adc35",
+"Guions llargs"
+],
+"crMagnet": [
+"77fa49774c",
+"S'ajusta a les espelmes"
+],
+"crOff": [
+"d4c2792a72",
+"Amagat"
+],
+"crSparse": [
+"e50cc378a1",
+"Punts dispersos"
+],
 "create": [
 "8ac903c3c3",
 "Crear alerta"
+],
+"csBg": [
+"64dd60fe1a",
+"Fons"
+],
+"csBg2": [
+"9ebb790d74",
+"Segon color de fons"
+],
+"csBody": [
+"718a7e8a58",
+"Cos"
+],
+"csBorderC": [
+"eeffa83765",
+"Color de la vora"
+],
+"csBorders": [
+"685f23bc5e",
+"Vores"
+],
+"csClose": [
+"bbfa773e5a",
+"Tancament"
+],
+"csCross": [
+"b0b83f89e8",
+"Reticle i ratolí"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Color del reticle"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Línia del reticle"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Etiquetes de preu i temps al reticle"
+],
+"csCrossMode": [
+"800092e3e1",
+"Reticle"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Amplada del reticle"
+],
+"csDn": [
+"11f5ff3829",
+"Espelma baixista"
+],
+"csFont": [
+"b97c4d4cdd",
+"Tipus de lletra"
+],
+"csFsize": [
+"83ca9e48c3",
+"Mida de la lletra"
+],
+"csGrad": [
+"c716191a01",
+"converteix el fons en un degradat"
+],
+"csGridA": [
+"f773586220",
+"Opacitat de la graella (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Color de la graella"
+],
+"csGridH": [
+"4eaa1c008a",
+"Línies de graella horitzontals"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Línies de graella verticals"
+],
+"csHollow": [
+"9165bccc85",
+"Cossos buits"
+],
+"csHollowH": [
+"fb63aba345",
+"només les espelmes alcistes"
+],
+"csKinetic": [
+"6e771721f0",
+"Desplaçament cinètic al tacte"
+],
+"csLast": [
+"aacdc5bea4",
+"Línia de l'últim preu"
+],
+"csLastLab": [
+"91c990bcb9",
+"Etiqueta de preu a l'escala"
+],
+"csLineC": [
+"01212659ee",
+"Color de la línia / àrea"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Amplada de la línia"
+],
+"csLook": [
+"41def7a0fe",
+"Aspecte"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"un color per a ambdues direccions"
+],
+"csPinch": [
+"e557a41794",
+"Zoom de pessic al tacte"
+],
+"csResetQ": [
+"9c369383c1",
+"Restablir tota la configuració del gràfic tal com estava?"
+],
+"csScale": [
+"0b414bdcb7",
+"Escales"
+],
+"csScroll": [
+"468c89cb3b",
+"Arrossega el gràfic amb el ratolí"
+],
+"csSym": [
+"fad29404d2",
+"Espelmes"
+],
+"csText": [
+"d160595fcf",
+"Color del text"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Configuració del gràfic"
+],
+"csUp": [
+"971a95475d",
+"Espelma alcista"
+],
+"csWick": [
+"fe6e2bfd48",
+"Metxes"
+],
+"csWickC": [
+"0fcb21d161",
+"Color de la metxa"
+],
+"csWm": [
+"33c7b41ac6",
+"Marca d'aigua darrere de les espelmes"
+],
+"csWmA": [
+"69a1810ea2",
+"Opacitat de la marca d'aigua (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"símbol i timeframe"
+],
+"csWmC": [
+"bad81c749f",
+"Color de la marca d'aigua"
+],
+"csWmSize": [
+"4af7e52f80",
+"Mida de la marca d'aigua"
+],
+"csWmText": [
+"ecf870ab34",
+"Text de la marca d'aigua"
+],
+"csZoom": [
+"c6f40d9d03",
+"Roda del ratolí"
+],
+"csZoomH": [
+"4ca34c1092",
+"fer zoom endavant i enrere"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} barres descarregades"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Afegeix una alerta aquí"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Copia aquest preu"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Ajusta totes les espelmes"
+],
+"ctxHline": [
+"588d2eb492",
+"Línia horitzontal aquí"
+],
+"ctxReset": [
+"242cb352c0",
+"Restableix la vista"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Cada vegada (com a màxim un cop per minut / un cop per barra)"
 ],
+"exAuto": [
+"1ff048b76e",
+"en directe, amb OKX com a alternativa"
+],
+"exDown": [
+"e8ba18613e",
+"{x} no respon en aquesta connexió. El gràfic es manté a l'exchange on es troba."
+],
+"exNote": [
+"0eb4c03240",
+"Binance transmet en directe; els altres es llegeixen del seu propi endpoint públic cada deu segons, amb el seu propi historial."
+],
+"exTitle": [
+"5b13eac7ed",
+"Exchange"
+],
 "exit": [
 "f83b6fe3ae",
 "Sortida"
+],
+"exitFull": [
+"fc61e74cd9",
+"Surt de la pantalla completa"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Exportar-ho tot (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Les dades d'aquest indicador no s'han carregat. Torna-ho a provar en un moment."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Groc"
 ],
+"fnMono": [
+"216fcddff2",
+"Monoespai"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Previsió"
@@ -1024,6 +1388,70 @@
 "futSub": [
 "16db4a6d5c",
 "Futurs trimestrals, continus"
+],
+"g_arrows": [
+"0cf604cb00",
+"Fletxes"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Pinzells"
+],
+"g_channels": [
+"18e03e2a37",
+"Canals"
+],
+"g_cursors": [
+"f4d2f91040",
+"Cursors"
+],
+"g_cycles": [
+"97f064aff5",
+"Cicles"
+],
+"g_elliott": [
+"25f12f8289",
+"Ones d'Elliott"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Línies"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Mesurador"
+],
+"g_pat": [
+"2c179da0f5",
+"Patrons de gràfic"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Forques"
+],
+"g_proj": [
+"8aa49fe840",
+"Projecció"
+],
+"g_shapes": [
+"b1985e3874",
+"Formes"
+],
+"g_text": [
+"d7cd4cda4f",
+"Text i notes"
+],
+"g_vol": [
+"1b4620951d",
+"Basat en volum"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1536,18 @@
 "hideAll": [
 "1f0e916e42",
 "Amagar / mostrar dibuixos"
+],
+"hideBoth": [
+"3502a3299d",
+"Amaga dibuixos i indicadors"
+],
+"hideDraw": [
+"f4492c5211",
+"Amaga dibuixos"
+],
+"hideInds": [
+"764ab9d614",
+"Amaga indicadors"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1649,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Oscil·lador Awesome"
@@ -1220,6 +1664,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1693,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Índex Choppiness"
@@ -1265,9 +1717,61 @@
 "025c720b24",
 "Corba de Coppock"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Tots els patrons d'espelmes"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Envoltant"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Martell / Penjat"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Estel del matí / del vespre"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Línia de penetració / Cobertura de núvol fosc"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Tres soldats blancs / corbs negres"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Estel fugaç / Martell invertit"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Pinces de sostre / de terra"
+],
 "in_crsi": [
 "d788a94022",
 "RSI de Connors"
+],
+"in_cvd": [
+"fbd0df870e",
+"Delta de volum acumulat (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1793,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"Núvols EMA [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envolupants"
@@ -1297,17 +1805,41 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Màxims / Mínims iguals"
+],
 "in_fisher": [
 "eb9846eace",
 "Transformada de Fisher"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (delta de barra)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Buits de valor raonable (FVG)"
+],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1852,26 @@
 "in_kc": [
 "b1521c1478",
 "Canals de Keltner"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1905,14 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Estructura de mercat (BOS / CHoCH)"
+],
+"in_ob": [
+"80c4ef99a7",
+"Blocs d'ordres (Order Blocks)"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1932,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1969,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Suport i resistència amb ruptures [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "RSI estocàstic"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Estocàstic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"Perfil TPO (temps al preu)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +2029,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Delta de volum"
+],
 "in_vo": [
 "4eac06eb80",
 "Oscil·lador de volum"
@@ -1445,9 +2049,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Perfil de volum de sessió"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Perfil de volum de rang visible"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"Bandes VWAP"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2076,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1493,6 +2117,10 @@
 "0f70916dbb",
 "Mitjana mòbil Arnaud Legoux"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · línia de tendència ATR dirigida per MFI (RSI sense volum)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 menys SMA 34 del punt mitjà"
@@ -1504,6 +2132,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Rang veritable mitjà (volatilitat)"
+],
+"ind_atrts": [
+"8223831420",
+"Un stop que segueix amb k·ATR i canvia de costat"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1529,6 +2161,10 @@
 "a50928c16b",
 "Índex del canal de productes bàsics"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · sortides ATR penjades del tancament més alt/baix"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Mercat en tendència (baix) o lateral (alt)"
@@ -1549,9 +2185,61 @@
 "bf330f58dd",
 "Momentum a llarg termini: WMA de dues taxes de canvi"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Marca tots els patrons següents a les barres"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Obertura i tancament gairebé iguals (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Envolvent alcista (BE) i baixista (SE)"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Ombra inferior llarga després d'una caiguda (H) o una pujada (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Un cos petit dins de l'anterior gran (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Una barra totalment dins de l'anterior (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Un cos gran sense ombres (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Reversió de tres barres: MS alcista, ES baixista"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Buit i tancament més enllà de la meitat de la barra anterior (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tres barres fortes seguides (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Ombra superior llarga després d'una pujada (SS) o una caiguda (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dues barres amb el mateix màxim (TT) o mínim (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, RSI de ratxa i rang percentual combinats"
+],
+"ind_cvd": [
+"690d30a274",
+"Suma acumulada del delta de volum: qui ha tingut el control"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1573,6 +2261,10 @@
 "c499047c5b",
 "Mitjana mòbil exponencial"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · dos núvols EMA, ràpid i lent"
+],
 "ind_env": [
 "e2cf023f50",
 "Mitjana mòbil amb bandes a un % fix de distància"
@@ -1581,17 +2273,41 @@
 "d648aafe8d",
 "Com de fàcilment es mou el preu per unitat de volum"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Dos swings al mateix preu aproximadament: liquiditat en repòs"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Converteix els preus en una distribució gairebé normal"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Volum de compra × venda i delta escrit sota cada espelma; apropa per llegir-ho. Per espelma, no per nivell de preu"
 ],
 "ind_fract": [
 "9f48cce298",
 "Fractals de Williams: màxims i mínims locals"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Buits de tres espelmes; cada caixa acaba on el preu l'omple"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Sis EMA curtes i sis llargues: traders contra inversors"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · una línia de tendència esglaonada que només canvia en una ruptura real de swing"
+],
 "ind_hma": [
 "709351f832",
 "Mitjana mòbil Hull: ràpida i suau"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA acolorida per la seva pendent"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1604,6 +2320,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Estocàstic amb la línia J (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (codi obert, MPL-2.0) · règim macro darrere les espelmes, els seus senyals i el tauler, a partir de dades FRED"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (codi obert) · valor just de Bitcoin 8.31e-17·dies^5.48 amb bandes de ±10 % i la zona de compra; per a BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (codi obert) · fases del cicle de Bitcoin a partir de MVRV, NUPL i un proxy SOPR: Ós extrem, Ós, Bull inicial, Bull, Sobreescalfat; la línia grisa és el preu normalitzat"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (codi obert) · tota la història de Bitcoin en una espiral logarítmica, un gir per cicle de halving, amb màxims, mínims, halvings i l'actualitat"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1641,9 +2377,21 @@
 "d6640bbc39",
 "Preu actual menys el preu de fa n barres"
 ],
+"ind_ms": [
+"13fc87db00",
+"Ruptures de l'últim swing confirmat: BOS amb la tendència, CHoCH contra ella"
+],
 "ind_news": [
 "a95010ef34",
 "Titulars sobre aquesta criptomoneda, marcats en el moment en què es van publicar (notícies del darrer dia del lloc)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · preu suavitzat per nucli amb una banda d'error mitjà; forma que no repinta"
+],
+"ind_ob": [
+"530cdc224f",
+"L'última espelma oposada abans d'una ruptura d'estructura, fins que el preu tanca a través d'ella"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1668,6 +2416,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volum afegit en proporció al % de canvi"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · RSI suavitzat amb una línia de seguiment de volatilitat (nucli QQE MOD)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtra el soroll més petit que el rang mitjà suavitzat"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1701,25 +2457,53 @@
 "26db009730",
 "Mitjana mòbil simple"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Tancament contra la meitat del rang, doblement suavitzat"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Mitjana mòbil suavitzada (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger dins de Keltner = compressió (punts vermells); l'histograma mostra cap a on trenca"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · l'últim pivot màxim i mínim com a nivells"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Estocàstic del RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · mitjanes mòbils de màxims i mínims que canvien de lloc quan la tendència gira"
+],
 "ind_st": [
 "8d66b52001",
 "Línia de seguiment ATR que canvia de sentit amb la tendència"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD executat dues vegades a través d'un estocàstic: girs de tendència primerencs (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K i %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI amb les seves bandes de volatilitat, una línia ràpida i una de lenta"
+],
 "ind_tema": [
 "1ff881355e",
 "Mitjana mòbil exponencial triple"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Quantes espelmes han negociat a cada preu, per dia"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1733,6 +2517,18 @@
 "182e4a763e",
 "Pressió de compra durant tres períodes"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · stop de seguiment ATR; el preu que el creua és el senyal de compra/venda"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Volum de compra menys volum de venda de cada espelma (dades de taker de Binance; una estimació en altres llocs)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · VIX sintètic per a qualsevol mercat; els pics per sobre de les bandes sovint marquen mínims de pànic"
+],
 "ind_vo": [
 "a99f6a0038",
 "Mitjana de volum ràpida vs lenta (%)"
@@ -1745,9 +2541,21 @@
 "6badda8c94",
 "Moviment de tendència positiu i negatiu (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Un perfil de volum per dia (per mes en barres diàries)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volum a cada preu per a les barres a la pantalla, amb POC i àrea de valor"
+],
 "ind_vwap": [
 "6d86714413",
 "Preu mitjà ponderat per volum, reiniciat a les 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"VWAP diari amb bandes de ±1σ i ±k·σ"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1760,6 +2568,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Mitjana mòbil ponderada"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · oscil·lador d'índex de canal; els encreuaments per sobre de 53/60 i per sota de −53/−60 marquen moviments estirats"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · mitjana mòbil de mínims quadrats de retard zero"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1885,6 +2701,14 @@
 "891ebccd5b",
 "Bloqueja"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Bloqueja tots els dibuixos"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Tots els dibuixos estan bloquejats"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1905,13 +2729,41 @@
 "5f703c7eba",
 "Senyals de Kurdistani"
 ],
+"mMode": [
+"659eba1219",
+"Repeteix"
+],
+"mMsg": [
+"2c924e3088",
+"Nota"
+],
+"mTf": [
+"85decb73d1",
+"Timeframe"
+],
 "maType": [
 "15f86c051e",
 "Mitjana"
 ],
+"macroNote": [
+"c4a94f666d",
+"estimació basada en regles, no és consell"
+],
 "magnet": [
 "effa915951",
 "Imant (ajusta a obertura/màxim/mínim/tancament)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Imant desactivat"
+],
+"magnetS": [
+"607a7625b1",
+"Imant fort"
+],
+"magnetW": [
+"181021d95b",
+"Imant feble"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1933,9 +2785,45 @@
 "fdbe20f376",
 "Tots els marcs temporals"
 ],
+"moreTools": [
+"c871f1056a",
+"Més eines"
+],
 "moveToSection": [
 "98d183e7cb",
 "Mou a la secció"
+],
+"mt_mine": [
+"1cf761ac34",
+"Els meus scripts"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opcions"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Patrons"
+],
+"mt_prof": [
+"0c2a930099",
+"Perfils"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Estructura"
+],
+"mt_strat": [
+"876f3e0202",
+"Estratègies"
+],
+"multiAl": [
+"5bafcd2412",
+"Alerta multicondició"
+],
+"multiNote": [
+"c7e278bae8",
+"Escriu les condicions en una línia i uneix-les amb and / or. L'alerta s'activa a l'espelma on la línia esdevé certa."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1984,6 +2872,10 @@
 "nc_technical": [
 "41fc086088",
 "Tècnic"
+],
+"neckline": [
+"993062b2d6",
+"Línia de coll"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2093,6 +2985,10 @@
 "77f8046dcf",
 "(part superior, sense secció)"
 ],
+"noVol": [
+"0960b9b69d",
+"sense volum per a aquest símbol"
+],
 "notif": [
 "270d190970",
 "Notificació del navegador"
@@ -2145,21 +3041,57 @@
 "c0da22faab",
 "Obrir al gràfic"
 ],
+"openTv": [
+"94d7227248",
+"Obre a TradingView"
+],
+"optChain": [
+"234f0372e8",
+"Cadena d'opcions {c}"
+],
+"optDays": [
+"c2fd31e918",
+"Dies per al venciment"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} combinacions provades en {s} s, {p} d'elles rendibles; ordenades per {r}. Fes clic en una fila per veure l'informe complet."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit no ha respost des d'aquesta connexió. Canvia la connexió o la VPN i torna a provar."
+],
+"optIV": [
+"c1bc12118c",
+"Volatilitat implícita ATM"
+],
 "optMax": [
 "7b9c1b1490",
 "Massa combinacions — com a màxim {n}. Utilitza un pas més gran."
+],
+"optMove": [
+"8aa36fe05d",
+"Moviment esperat"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} combinacions (com a màxim {m} per a aquest historial)"
 ],
 "optNote": [
-"4b4713d390",
-"El millor resultat en dades passades sovint és sort (sobreajust). Prefereix configuracions els veïns de les quals també funcionin bé, i comprova-les en un altre període o mercat."
+"96723a0ac4",
+"Cadena d'opcions de BTC i ETH de les dades públiques de Deribit, llegides pel teu navegador."
+],
+"optNote2": [
+"26dfa389e8",
+"OI i volum en contractes (monedes); $ és el preu de marca en dòlars. Max pain: el preu de liquidació que paga menys als titulars d'opcions. Moviment esperat = preu × IV × √(dies/365). No és consell."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2168,6 +3100,10 @@
 "optRun": [
 "9a456cc451",
 "Troba les millors configuracions"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Subjacent"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2229,13 +3165,37 @@
 "0777981263",
 "Els preus en {c} ara utilitzen la teva taxa."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitud"
+],
 "p_atr": [
 "0d1283ae88",
 "Longitud ATR"
 ],
+"p_band": [
+"3541c5f4e1",
+"Longitud de banda"
+],
 "p_base": [
 "077fe9c54e",
 "Base"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Longitud de banda"
+],
+"p_bw": [
+"1d06cbba91",
+"Amplada de banda"
+],
+"p_chdev": [
+"65acb623a8",
+"Desviació del canal"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplicador"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2269,6 +3229,10 @@
 "8db6a2f1d3",
 "Ràpid"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Ràpid 2"
+],
 "p_hi": [
 "70a2565504",
 "Nivell superior"
@@ -2289,6 +3253,14 @@
 "a0623fa9a3",
 "Suavitzat %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"Multiplicador KC"
+],
+"p_key": [
+"ab76f1670b",
+"Valor clau"
+],
 "p_l1": [
 "ba51565baf",
 "Longitud MA 1"
@@ -2304,6 +3276,14 @@
 "p_l4": [
 "a5c110eb00",
 "Longitud MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Look-back percentil"
+],
+"p_left": [
+"3b219a058a",
+"Barres esquerra"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2345,6 +3325,14 @@
 "a44d6c906d",
 "Barres a cada costat"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Longitud del canal"
+],
+"p_n2": [
+"2df99da939",
+"Longitud mitjana"
+],
 "p_offset": [
 "ce66771654",
 "Desplaçament"
@@ -2353,13 +3341,41 @@
 "ac556cf593",
 "Percentatge"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Període de mostreig"
+],
+"p_ph": [
+"b1f698cc3d",
+"Percentil alt"
+],
+"p_qqe": [
+"f1fb561b11",
+"Factor QQE"
+],
 "p_rank": [
 "1df2ca7462",
 "Longitud del rang percentual"
 ],
+"p_right": [
+"307c9815b6",
+"Barres dreta"
+],
+"p_rows": [
+"52d0b35277",
+"Files"
+],
 "p_rsi": [
 "560e6b61c6",
 "Longitud RSI"
+],
+"p_sf": [
+"590f20262b",
+"Suavitzat RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2376,6 +3392,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Lent"
+],
+"p_slow2": [
+"c252d2ccab",
+"Lent 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2421,6 +3441,54 @@
 "07300ad49f",
 "{c} per 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Afegeix"
+],
+"pfAvg": [
+"def9f57b0c",
+"Preu mitjà de compra"
+],
+"pfCost": [
+"64ae43e8fe",
+"Cost"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Encara no hi ha res aquí. Afegeix una moneda, quantitat que tens i el preu pagat."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfoli {n}"
+],
+"pfNote": [
+"f46050561e",
+"Desat només en aquest navegador. Mai demana claus d'exchange ni envia res enlloc. Els preus són parells USDT de Binance."
+],
+"pfNow": [
+"039df35064",
+"Preu actual"
+],
+"pfPnl": [
+"8ae3945397",
+"Pèrdues / Guanys"
+],
+"pfQty": [
+"44f6af6945",
+"Quantitat"
+],
+"pfShort": [
+"036b18f02a",
+"Portfoli"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfoli"
+],
+"pfValue": [
+"8dce170de2",
+"Valor"
+],
 "pickStart": [
 "1e214a5fd6",
 "Fes clic al gràfic on hauria de començar la reproducció"
@@ -2444,6 +3512,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Preu"
+],
+"profNote": [
+"c1da831af8",
+"Per a un perfil d'un rang que triïs, utilitza “Perfil de volum de rang fix” a la barra d'eines esquerra."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2617,6 +3689,86 @@
 "56a2285c5b",
 "Desant…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Ajusta automàticament l'escala de preus"
+],
+"scBorder": [
+"45c60c0e85",
+"Vora de l'escala de preus"
+],
+"scBot": [
+"77a5b77d62",
+"Espai inferior (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Ambdós costats"
+],
+"scInvert": [
+"ba80abaac1",
+"Inverteix l'escala de preus"
+],
+"scInvertH": [
+"ebb1688761",
+"amunt esdevé avall"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Esquerra"
+],
+"scLog": [
+"65fa51781b",
+"Logarítmica"
+],
+"scMode": [
+"a5e5771ca0",
+"Escala de preus"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logarítmica o percentatge"
+],
+"scNone": [
+"d4c2792a72",
+"Amagat"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmètica)"
+],
+"scOff": [
+"3557c35506",
+"Espai buit a la dreta"
+],
+"scPct": [
+"c4519ac7cc",
+"Percentatge"
+],
+"scRight": [
+"954daa8b00",
+"Dreta"
+],
+"scSec": [
+"c92a4af093",
+"Segons a l'escala de temps"
+],
+"scSide": [
+"82acb7ee2b",
+"On es situa l'escala de preus"
+],
+"scSpace": [
+"2878a3a43e",
+"Espaiat de les espelmes"
+],
+"scTop": [
+"25126a3aab",
+"Espai superior (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Vora de l'escala de temps"
+],
 "sc_c": [
 "3e8248e32e",
 "Preu"
@@ -2676,6 +3828,62 @@
 "screener": [
 "7f27924c12",
 "Seguiment del mercat"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Comprova"
+],
+"scriptEd": [
+"989a6a8a22",
+"Editor d'scripts Entekhab"
+],
+"scriptEdit": [
+"ae909c75da",
+"Edita l'script"
+],
+"scriptExamples": [
+"41a27a4710",
+"Exemples…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Línia {n}"
+],
+"scriptName": [
+"709a23220f",
+"Nom"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nou script"
+],
+"scriptNote": [
+"c265d2248f",
+"Escriu els teus propis indicadors en un llenguatge tipus Pine. Es desen en aquest navegador i s'executen només aquí, al teu gràfic."
+],
+"scriptOk": [
+"eb3da0c952",
+"Sense errors · {n} sortides"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"El que sap el llenguatge"
+],
+"scriptSave": [
+"1e291c4d98",
+"Desa i afegeix al gràfic"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Script desat"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -2781,9 +3989,25 @@
 "e97d96a8bc",
 "Màxim volum"
 ],
+"sg_adx": [
+"815b591f93",
+"Encreuament DMI (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Reversió de Bollinger"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2793,6 +4017,22 @@
 "c3de6d0cdd",
 "Senyals de Kurdistani (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Encreuament Ichimoku Tenkan/Kijun"
+],
+"sg_kdj": [
+"a9a165bc50",
+"Encreuament KDJ"
+],
 "sg_macd": [
 "db0453bd2b",
 "Encreuament MACD"
@@ -2801,9 +4041,21 @@
 "6677aad0c9",
 "Encreuament EMA"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Inversió Nadaraya-Watson [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -2813,9 +4065,37 @@
 "446d28671b",
 "Creu d'or / de la mort (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Encreuament Stochastic RSI"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"Encreuament WaveTrend [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2945,6 +4225,106 @@
 "2d2cb022bc",
 "Velocitat"
 ],
+"stBadLv": [
+"683a05683a",
+"Els nivells han de ser fins a 24 números."
+],
+"stBadPt": [
+"a73083f114",
+"Un preu o un temps no és vàlid."
+],
+"stColor": [
+"f28563a477",
+"Color"
+],
+"stCoord": [
+"8ebebca019",
+"Coordenades"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Traçat"
+],
+"stDev": [
+"e789c07831",
+"Desviació (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Puntejat"
+],
+"stExtL": [
+"ef880cf8fc",
+"Estén a l'esquerra"
+],
+"stExtR": [
+"fbff580b3d",
+"Estén a la dreta"
+],
+"stFill": [
+"64dd60fe1a",
+"Fons"
+],
+"stLevels": [
+"ae3d013ab1",
+"Nivells (separats per comes)"
+],
+"stLine": [
+"120ee44bec",
+"Estil de línia"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Només els primers 12 punts es poden editar aquí."
+],
+"stOpacity": [
+"f12e36bd83",
+"Opacitat del fons"
+],
+"stReset": [
+"40aab769d0",
+"Nivells per defecte"
+],
+"stRows": [
+"52d0b35277",
+"Files"
+],
+"stSize": [
+"83ca9e48c3",
+"Mida de la font"
+],
+"stSolid": [
+"d00635865c",
+"Sòlid"
+],
+"stStyle": [
+"99a0efc6cf",
+"Estil"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Color del text"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Els horaris són en UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Visibilitat"
+],
+"stWidth": [
+"ad48f34186",
+"Gruix"
+],
 "st_err": [
 "d802d232a8",
 "Sense dades"
@@ -2988,6 +4368,14 @@
 "stop": [
 "9e253470c8",
 "Atura"
+],
+"stratNote": [
+"16dc19eef4",
+"Cada estratègia s'executa en l'historial d'aquest gràfic al provador: entrades i sortides al gràfic, resultat net, taxa d'encert, drawdown i un optimitzador per a la seva configuració."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Executa al provador d'estratègies"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3049,25 +4437,133 @@
 "a26d0ddaae",
 "Desplaçament (temps)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"Patró ABCD"
+],
+"t_angle": [
+"30cd1e7703",
+"Angle de tendència"
+],
+"t_arc": [
+"853a983f6b",
+"Arc"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Fletxa"
+],
+"t_arrowc": [
+"0f722804ec",
+"Cursor de fletxa"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Marca de fletxa avall"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Marcador de fletxa"
+],
+"t_arrowup": [
+"8023467135",
+"Marca de fletxa amunt"
+],
+"t_avwap": [
+"0a4f86b195",
+"VWAP ancorat"
 ],
 "t_brush": [
 "25f085220c",
 "Pinzell"
 ],
+"t_callout": [
+"f1647ad880",
+"Llamada"
+],
 "t_channel": [
 "c0350b7736",
 "Canal paral·lel"
+],
+"t_circ": [
+"1cc7820a08",
+"Cercle"
 ],
 "t_circle": [
 "8580e3175f",
 "El·lipse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Comentari"
+],
+"t_cross": [
+"983bdb7b27",
+"Línia creuada"
+],
 "t_cursor": [
 "2239943c8d",
 "Cursor"
+],
+"t_curve": [
+"916f09aff8",
+"Corba"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Línies cícliques"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Patró Cypher"
+],
+"t_dcurve": [
+"faef75cb57",
+"Doble corba"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Canal disjunt"
+],
+"t_dot": [
+"46856bf702",
+"Punt"
+],
+"t_drange": [
+"c65ea4ae01",
+"Interval de dates"
+],
+"t_drives": [
+"3a261ca869",
+"Patró de tres impulsos"
+],
+"t_emoji": [
+"707fd71017",
+"Icones i emojis"
+],
+"t_eraser": [
+"a5742851f0",
+"Goma d'esborrar"
+],
+"t_ewcor": [
+"a819268f2f",
+"Ona de correcció d'Elliott (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Ona combinada doble d'Elliott (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Ona d'impuls d'Elliott (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Ona de triangle d'Elliott (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Ona combinada triple d'Elliott (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3077,13 +4573,69 @@
 "18c530863b",
 "Retrocés de Fibonacci"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Arcs de resistència de velocitat Fib"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Canal de Fib"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Cercles de Fib"
+],
 "t_fibext": [
 "73655be9d6",
 "Extensió de Fibonacci basada en tendència"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Ventall de resistència de velocitat Fib"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Espiral de Fib"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Temps de Fib basat en tendència"
+],
+"t_fibtz": [
+"4263c185f4",
+"Zona horària de Fib"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Falca de Fib"
+],
+"t_flag": [
+"23d91e7740",
+"Marca de bandera"
+],
+"t_flat": [
+"52d3db252e",
+"Sostre/terra pla"
+],
+"t_forecast": [
+"528bc4bc38",
+"Previsió"
+],
 "t_gann": [
 "ba563cbfc5",
 "Ventall de Gann"
+],
+"t_gannbox": [
+"58a3842138",
+"Caixa de Gann"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Quadrat de Gann"
+],
+"t_hl": [
+"8cb3f79b49",
+"Marcador"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3093,6 +4645,18 @@
 "0bcbc4e087",
 "Raig horitzontal"
 ],
+"t_hs": [
+"43353dbcec",
+"Cap i espatlles"
+],
+"t_info": [
+"a690e33098",
+"Línia d'informació"
+],
+"t_inside": [
+"30d6b425dc",
+"Forca interna"
+],
 "t_long": [
 "666f195fc4",
 "Posició llarga"
@@ -3101,9 +4665,45 @@
 "2bedd64d85",
 "Rang de preu / mesura"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Forca de Schiff modificada"
+],
+"t_note": [
+"2c924e3088",
+"Nota"
+],
+"t_path": [
+"519e39132b",
+"Trajectòria"
+],
 "t_pitch": [
 "29135fd404",
 "Forca d'Andrews"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Ventall de forca"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Etiqueta de preu"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Nota de preu"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polilínia"
+],
+"t_prange": [
+"c20f7ce09a",
+"Interval de preus"
+],
+"t_proj": [
+"8aa49fe840",
+"Projecció"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3113,9 +4713,33 @@
 "c158695a64",
 "Rectangle"
 ],
+"t_regress": [
+"bb57f2c725",
+"Tendència de regressió"
+],
+"t_rrect": [
+"65807afaf7",
+"Rectangle rotat"
+],
+"t_schiff": [
+"c4c1201685",
+"Forca de Schiff"
+],
 "t_short": [
 "a8daf74669",
 "Posició curta"
+],
+"t_signpost": [
+"89f361362e",
+"Senyalitzador"
+],
+"t_sine": [
+"3852fedc7e",
+"Línia sinusoïdal"
+],
+"t_tcycle": [
+"521a687246",
+"Cicles temporals"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3125,9 +4749,29 @@
 "e810388344",
 "Línia de tendència"
 ],
+"t_tri": [
+"32547b031d",
+"Patró de triangle"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangle"
+],
 "t_vline": [
 "a790288017",
 "Línia vertical"
+],
+"t_vrp": [
+"bcba420b37",
+"Perfil de volum d'interval fix"
+],
+"t_xabcd": [
+"ae78e60931",
+"Patró XABCD"
+],
+"t_zoom": [
+"4fc05f2763",
+"Apropar"
 ],
 "target": [
 "61ad50a9b9",
@@ -3177,6 +4821,26 @@
 "ad88cbfa09",
 "També a Telegram (el bot vigila fins i tot quan aquesta pàgina està tancada)"
 ],
+"thDark": [
+"ae1ef01432",
+"Fosc"
+],
+"thLight": [
+"a36ef8aba2",
+"Clar"
+],
+"thMid": [
+"4fe978738d",
+"Blau nit"
+],
+"thNavy": [
+"0229e960cf",
+"Blau marí"
+],
+"thPaper": [
+"22d507f2ba",
+"Paper"
+],
 "time": [
 "6c82e6dd86",
 "Temps"
@@ -3200,6 +4864,10 @@
 "tooFar": [
 "b29db0358a",
 "Això és més enrere del que pot carregar aquest timeframe; tria un timeframe més gran."
+],
+"toolHint": [
+"56e62363ce",
+"fes clic al gràfic per dibuixar"
 ],
 "topFixed": [
 "1a66879287",
@@ -3425,6 +5093,34 @@
 "1526a17ee7",
 "Desbloqueja"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Tots els dibuixos estan desbloquejats"
+],
+"vDay": [
+"f6bb0f468a",
+"Dies"
+],
+"vHour": [
+"9e25a34e63",
+"Hores"
+],
+"vMin": [
+"092f99ea11",
+"Minuts"
+],
+"vMonth": [
+"200dcdce9b",
+"Mesos"
+],
+"vSec": [
+"5fb1db5278",
+"Segons"
+],
+"vWeek": [
+"7d75266a53",
+"Setmanes"
+],
 "value": [
 "3e8248e32e",
 "Preu"
@@ -3432,6 +5128,10 @@
 "valuePct": [
 "bf55390d8d",
 "Percentatge (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3476,9 +5176,29 @@
 "yourRate": [
 "ca14282aa6",
 "la teva taxa"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Allunyar"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Arrossega un quadre més gran per apropar."
 ]
 },
 "f": {
+"fx2Note": [
+"15ebd3b4a9",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
 "slTp": [
 "41d1998bce",
 3
