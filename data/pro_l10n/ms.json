@@ -3189,6 +3189,18 @@
 "3541c5f4e1",
 "Panjang jalur"
 ],
+"p_bw": [
+"1d06cbba91",
+"Lebar jalur"
+],
+"p_chdev": [
+"65acb623a8",
+"Sisihan saluran"
+],
+"p_coeff": [
+"b032583db6",
+"Pengganda"
+],
 "p_conv": [
 "9151f8433f",
 "Penukaran"
@@ -3221,6 +3233,10 @@
 "8db6a2f1d3",
 "Cepat"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Pantas 2"
+],
 "p_hi": [
 "70a2565504",
 "Tahap atas"
@@ -3241,6 +3257,14 @@
 "a0623fa9a3",
 "Pelicinan %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Nilai kunci"
+],
 "p_l1": [
 "ba51565baf",
 "Panjang MA 1"
@@ -3256,6 +3280,14 @@
 "p_l4": [
 "a5c110eb00",
 "Panjang MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Look-back persentil"
+],
+"p_left": [
+"3b219a058a",
+"Bar kiri"
 ],
 "p_len": [
 "3bade34ecb",
@@ -3297,6 +3329,14 @@
 "a44d6c906d",
 "Bar pada setiap sisi"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Panjang saluran"
+],
+"p_n2": [
+"2df99da939",
+"Panjang purata"
+],
 "p_offset": [
 "ce66771654",
 "Offset"
@@ -3305,13 +3345,41 @@
 "ac556cf593",
 "Peratus"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Tempoh pensampelan"
+],
+"p_ph": [
+"b1f698cc3d",
+"Persentil tinggi"
+],
+"p_qqe": [
+"f1fb561b11",
+"Faktor QQE"
+],
 "p_rank": [
 "1df2ca7462",
 "Panjang percent-rank"
 ],
+"p_right": [
+"307c9815b6",
+"Bar kanan"
+],
+"p_rows": [
+"52d0b35277",
+"Baris"
+],
 "p_rsi": [
 "560e6b61c6",
 "Panjang RSI"
+],
+"p_sf": [
+"590f20262b",
+"Pelancaran RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -3328,6 +3396,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Perlahankan"
+],
+"p_slow2": [
+"c252d2ccab",
+"Perlahan 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -3373,6 +3445,54 @@
 "07300ad49f",
 "{c} untuk 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Tambah"
+],
+"pfAvg": [
+"def9f57b0c",
+"Harga beli purata"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kos"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Tiada apa-apa di sini lagi. Tambah syiling, jumlah pegangan dan harga belian anda."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfolio {n}"
+],
+"pfNote": [
+"f46050561e",
+"Disimpan hanya dalam pelayar ini. Ia tidak pernah meminta kunci pertukaran dan tidak menghantar apa-apa ke mana-mana. Harga adalah pasangan Binance USDT."
+],
+"pfNow": [
+"039df35064",
+"Harga semasa"
+],
+"pfPnl": [
+"8ae3945397",
+"Untung / rugi"
+],
+"pfQty": [
+"44f6af6945",
+"Kuantiti"
+],
+"pfShort": [
+"036b18f02a",
+"Portfolio"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfolio"
+],
+"pfValue": [
+"8dce170de2",
+"Nilai"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klik pada carta di mana replay patut bermula"
@@ -3396,6 +3516,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Harga"
+],
+"profNote": [
+"c1da831af8",
+"Untuk profil julat yang anda pilih, gunakan “Fixed range volume profile” di bar alat kiri."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3569,6 +3693,86 @@
 "56a2285c5b",
 "Menyimpan…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Sesuaikan skala harga secara automatik"
+],
+"scBorder": [
+"45c60c0e85",
+"Sempadan skala harga"
+],
+"scBot": [
+"77a5b77d62",
+"Ruang di bawah (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Kedua-dua belah"
+],
+"scInvert": [
+"ba80abaac1",
+"Songsangkan skala harga"
+],
+"scInvertH": [
+"ebb1688761",
+"atas menjadi bawah"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Kiri"
+],
+"scLog": [
+"65fa51781b",
+"Logaritma"
+],
+"scMode": [
+"a5e5771ca0",
+"Skala harga"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logaritma atau peratusan"
+],
+"scNone": [
+"d4c2792a72",
+"Tersembunyi"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmetik)"
+],
+"scOff": [
+"3557c35506",
+"Ruang kosong di sebelah kanan"
+],
+"scPct": [
+"c4519ac7cc",
+"Peratusan"
+],
+"scRight": [
+"954daa8b00",
+"Kanan"
+],
+"scSec": [
+"c92a4af093",
+"Saat pada skala masa"
+],
+"scSide": [
+"82acb7ee2b",
+"Kedudukan skala harga"
+],
+"scSpace": [
+"2878a3a43e",
+"Jarak lilin"
+],
+"scTop": [
+"25126a3aab",
+"Ruang di atas (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Sempadan skala masa"
+],
 "sc_c": [
 "3e8248e32e",
 "Harga"
@@ -3628,6 +3832,62 @@
 "screener": [
 "7f27924c12",
 "Pantau pasaran"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Penyaring"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Semak"
+],
+"scriptEd": [
+"989a6a8a22",
+"Editor skrip Entekhab"
+],
+"scriptEdit": [
+"ae909c75da",
+"Edit skrip"
+],
+"scriptExamples": [
+"41a27a4710",
+"Contoh…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Baris {n}"
+],
+"scriptName": [
+"709a23220f",
+"Nama"
+],
+"scriptNew": [
+"ebac729ca3",
+"Skrip baharu"
+],
+"scriptNote": [
+"c265d2248f",
+"Tulis penunjuk anda sendiri dalam bahasa seperti Pine. Ia disimpan dalam pelayar ini dan hanya berjalan di sini, pada carta anda."
+],
+"scriptOk": [
+"eb3da0c952",
+"Tiada ralat · {n} output"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Apa yang diketahui oleh bahasa ini"
+],
+"scriptSave": [
+"1e291c4d98",
+"Simpan dan tambah pada carta"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skrip disimpan"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skrip"
 ],
 "searchEv": [
 "0a08612647",
@@ -3733,9 +3993,25 @@
 "e97d96a8bc",
 "Volume tertinggi"
 ],
+"sg_adx": [
+"815b591f93",
+"Silang DMI (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Pembalikan Bollinger"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3745,6 +4021,22 @@
 "c3de6d0cdd",
 "Sinyal Kurdistani (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Silang Ichimoku Tenkan/Kijun"
+],
+"sg_kdj": [
+"a9a165bc50",
+"Silang KDJ"
+],
 "sg_macd": [
 "db0453bd2b",
 "Persilangan MACD"
@@ -3753,9 +4045,21 @@
 "6677aad0c9",
 "Persilangan EMA"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Pembalikan Nadaraya-Watson [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -3765,9 +4069,37 @@
 "446d28671b",
 "Persilangan golden / death (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Silang Stochastic RSI"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"Silang WaveTrend [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3901,6 +4233,106 @@
 "2d2cb022bc",
 "Kelajuan"
 ],
+"stBadLv": [
+"683a05683a",
+"Tahap mestilah sehingga 24 nombor."
+],
+"stBadPt": [
+"a73083f114",
+"Harga atau masa tidak sah."
+],
+"stColor": [
+"f28563a477",
+"Warna"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinat"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Garis putus-putus"
+],
+"stDev": [
+"e789c07831",
+"Sisihan (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Bertitik"
+],
+"stExtL": [
+"ef880cf8fc",
+"Sambung ke kiri"
+],
+"stExtR": [
+"fbff580b3d",
+"Sambung ke kanan"
+],
+"stFill": [
+"64dd60fe1a",
+"Latar belakang"
+],
+"stLevels": [
+"ae3d013ab1",
+"Tahap (dipisahkan dengan koma)"
+],
+"stLine": [
+"120ee44bec",
+"Gaya garis"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Hanya 12 titik pertama boleh diedit di sini."
+],
+"stOpacity": [
+"f12e36bd83",
+"Kelegapan latar belakang"
+],
+"stReset": [
+"40aab769d0",
+"Tahap lalai"
+],
+"stRows": [
+"52d0b35277",
+"Baris"
+],
+"stSize": [
+"83ca9e48c3",
+"Saiz fon"
+],
+"stSolid": [
+"d00635865c",
+"Padu"
+],
+"stStyle": [
+"99a0efc6cf",
+"Gaya"
+],
+"stText": [
+"c3328c39b0",
+"Teks"
+],
+"stTextC": [
+"d160595fcf",
+"Warna teks"
+],
+"stTextL": [
+"c3328c39b0",
+"Teks"
+],
+"stUtc": [
+"c9dbd25df4",
+"Masa adalah dalam UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Keterlihatan"
+],
+"stWidth": [
+"ad48f34186",
+"Ketebalan"
+],
 "st_err": [
 "d802d232a8",
 "Tiada data"
@@ -3944,6 +4376,14 @@
 "stop": [
 "9e253470c8",
 "Henti"
+],
+"stratNote": [
+"16dc19eef4",
+"Setiap strategi berjalan pada sejarah carta ini dalam penguji: entri dan keluar pada carta, hasil bersih, kadar kemenangan, drawdown, dan pengoptimum untuk tetapannya."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Jalankan dalam penguji strategi"
 ],
 "strategy": [
 "69fb26dda8",
@@ -4005,9 +4445,41 @@
 "a26d0ddaae",
 "Tatalan (masa)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"Corak ABCD"
+],
+"t_angle": [
+"30cd1e7703",
+"Sudut trend"
+],
+"t_arc": [
+"853a983f6b",
+"Lengkok"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Panah"
+],
+"t_arrowc": [
+"0f722804ec",
+"Kursor anak panah"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Tanda anak panah bawah"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Penanda anak panah"
+],
+"t_arrowup": [
+"8023467135",
+"Tanda anak panah atas"
+],
+"t_avwap": [
+"0a4f86b195",
+"Anchored VWAP"
 ],
 "t_brush": [
 "25f085220c",
@@ -4725,11 +5197,11 @@
 "f": {
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ]
 }
 }
