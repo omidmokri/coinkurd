@@ -137,28 +137,6 @@
     }
     x.putImageData(im, 0, 0); return c;
   }
-  /* Europa's ice: pale plains crossed by the reddish double ridges (lineae) and blotches of chaos terrain */
-  function iceTex(GW, GH) {
-    var c = mk(GW, GH), x = c.getContext('2d');
-    var gr = x.createLinearGradient(0, 0, 0, GH); gr.addColorStop(0, '#3e5064'); gr.addColorStop(1, '#7f93a7');
-    x.fillStyle = gr; x.fillRect(0, 0, GW, GH);
-    var i, k;
-    for (i = 0; i < 26; i++) {
-      var bx = rnd() * GW, by = rnd() * GH, br = 20 + rnd() * 70, bg = x.createRadialGradient(bx, by, 0, bx, by, br);
-      bg.addColorStop(0, 'rgba(120,70,54,.4)'); bg.addColorStop(1, 'rgba(150,96,74,0)'); x.fillStyle = bg; x.fillRect(bx - br, by - br, br * 2, br * 2);
-    }
-    x.lineCap = 'round';
-    for (i = 0; i < 46; i++) {
-      var px = rnd() * GW, py = rnd() * GH, ang = rnd() * TAU, len = 60 + rnd() * 420, pts = [];
-      for (k = 0; k < 18; k++) { pts.push([px, py]); ang += (rnd() - .5) * .35; px += Math.cos(ang) * len / 18; py += Math.sin(ang) * len / 18 * .6; }
-      var wd = .8 + rnd() * 2.4;
-      [[wd * 2.4, 'rgba(120,60,44,.42)'], [wd * .7, 'rgba(200,214,226,.3)']].forEach(function (s) {
-        x.strokeStyle = s[1]; x.lineWidth = s[0]; x.beginPath(); x.moveTo(pts[0][0], pts[0][1]);
-        for (var q = 1; q < pts.length; q++) x.lineTo(pts[q][0], pts[q][1]); x.stroke();
-      });
-    }
-    return c;
-  }
   /* a soft vertical ray for the aurora curtains: teal at the foot, violet and pink higher up */
   function rayTex() {
     var c = mk(8, 128), x = c.getContext('2d'), g = x.createLinearGradient(0, 128, 0, 0);
@@ -371,7 +349,7 @@
     cfg: { clouds: .3, gal: true, gal2: true, bh: false, wh: false, starTop: .8 },
     init: function () {
       build([['jS', function () { return bandStrip(SWJ); }], ['jup', function () { return TX.jS && sphere(PD, TX.jS, SWJ, SWJ / 2, [1, -.15, .28]); }],
-        ['ice', function () { s0 = 515; return iceTex(LT ? 640 : 1024, LT ? 200 : 300); }]]);
+        ['glints', function () { s0 = 515; var G = []; for (var i = 0; i < (LT ? 40 : 90); i++) G.push([rnd(), Math.pow(rnd(), 1.6), rnd() * TAU, .6 + rnd() * 1.4]); return G; }]]);
     },
     plumes: [], nextPlume: 7, glow: null, nextGlow: 20,
     plume: function (C, x) {
@@ -389,22 +367,21 @@
       g.globalCompositeOperation = 'source-over';
       var img = turn('jup', TX.jup, -t / 140 * mv, C, .2);
       if (img) { g.save(); if (C.rtl) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); } g.drawImage(img, cx - R, cy - R, R * 2, R * 2); g.restore(); }
-      /* the ice, laid in bands so it recedes to the horizon */
-      var ice = TX.ice, B = C.lt ? 14 : 24, drift = t * 5 * mv + C.ppx * 30;
-      g.fillStyle = '#5a6e84'; g.fillRect(0, hz, W, H - hz);
-      if (ice) {
-        var GW = ice.width, GH = ice.height;
-        for (var k = 0; k < B; k++) {
-          var a = k / B, b = (k + 1) / B, ya = hz + (H - hz) * Math.pow(a, 1.7), yb = hz + (H - hz) * Math.pow(b, 1.7) + 1;
-          var sc = .45 + a * 1.4, sw = GW / sc, sx = ((drift * (.4 + a) % GW) + GW) % GW;
-          var sy = GH * a, shh = GH / B;
-          if (sx + sw <= GW) g.drawImage(ice, sx, sy, sw, shh, 0, ya, W, yb - ya);
-          else { var p1 = GW - sx; g.drawImage(ice, sx, sy, p1, shh, 0, ya, W * p1 / sw, yb - ya); g.drawImage(ice, 0, sy, sw - p1, shh, W * p1 / sw, ya, W * (sw - p1) / sw, yb - ya); }
+      /* the ice: a smooth, dark frozen plain under Jupiter's light, with a few glints. No texture: a picture of the
+         ridges laid in perspective strips read as a broken screen (owner 2026-11-26, the thermocap page). */
+      var gi = g.createLinearGradient(0, hz, 0, H); gi.addColorStop(0, '#22344c'); gi.addColorStop(.18, '#142238'); gi.addColorStop(1, '#070d1a');
+      g.fillStyle = gi; g.fillRect(0, hz, W, H - hz);
+      var gl = TX.glints;
+      if (gl) {
+        g.globalCompositeOperation = 'lighter';
+        for (var k = 0; k < gl.length; k++) {
+          var Q = gl[k], gy2 = hz + (H - hz) * Q[1], gx2 = ((Q[0] * W - (t * 4 * mv + C.ppx * 20) * (.3 + Q[1])) % W + W) % W;
+          var tw = C.RM ? .5 : .5 + .5 * Math.sin(t * Q[3] + Q[2]);
+          g.fillStyle = 'rgba(190,225,255,' + (.08 + .3 * tw * (.4 + Q[1] * .6)).toFixed(3) + ')';
+          var sz = .8 + Q[1] * 1.6; g.fillRect(gx2, gy2, sz, sz);
         }
+        g.globalCompositeOperation = 'source-over';
       }
-      /* lit by Jupiter: blue night, brighter towards the planet, dark at the horizon */
-      var sh = g.createLinearGradient(0, hz, 0, H); sh.addColorStop(0, 'rgba(4,8,22,.9)'); sh.addColorStop(.25, 'rgba(6,12,32,.72)'); sh.addColorStop(1, 'rgba(8,16,40,.55)');
-      g.fillStyle = sh; g.fillRect(0, hz, W, H - hz);
       var side = g.createLinearGradient(X(C, 1), 0, X(C, 0), 0); side.addColorStop(0, 'rgba(255,214,170,.12)'); side.addColorStop(1, 'rgba(255,214,170,0)');
       g.fillStyle = side; g.fillRect(0, hz, W, H - hz);
       g.globalCompositeOperation = 'lighter';
