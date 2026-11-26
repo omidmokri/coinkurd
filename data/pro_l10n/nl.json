@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Templates, downloaden en overdragen:</b> kant-en-klare indicator-sets en je eigen templates; CSV van de bars met indicatorwaarden; exporteren en importeren; een deellink voor een layout. Een link en QR-code openen dezelfde werkruimte op je telefoon of een ander apparaat, en tabbladen in deze browser blijven synchroon."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Bars en prijzen zijn publieke marktdata van Binance (één live verbinding voor de hele pagina); als Binance niet bereikbaar is, wordt OKX gebruikt, en als laatste de eigen snapshot van de site — de gekleurde stip naast elke grafiek geeft aan welke. Voor elke grafiek kun je Coinbase, Bybit, OKX of Kraken kiezen in plaats van Binance, waarbij de data rechtstreeks uit het eigen publieke eindpunt van die exchange in je browser wordt gelezen; als een exchange niet reageert op je verbinding, geeft de pagina dit direct aan. Wereldwijde forex-paren (EUR/USD, USD/JPY en de rest) zijn afkomstig van de eigen dagelijkse referentiekoersen van de site — de Europese Centrale Bank en de exchange-api dataset — één waarde per dag, geen tick-data van een broker. De economische kalender is de wekelijkse feed van ForexFactory; de beweging van Bitcoin na een gebeurtenis is co-beweging, geen oorzaak. Schakel bij een zwakke verbinding “Data saver” in bij de instellingen. Aangepaste grafieken (dividenden en kapitaalverhogingen) zijn een functie van de Tehran Stock Exchange en zijn niet van toepassing op crypto. De marktkoersen van Iran zijn publieke data van tgju.org; muntprijzen in toman zijn een schatting: de Binance-prijs × de tether-koers in toman."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Waar de data vandaan komt"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Alerts worden gecontroleerd in deze browser zolang de pagina open staat (elk tabblad). Indicator-alerts gaan af wanneer een candle sluit."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Alert op deze tekening"
+],
 "alertSet": [
 "80c4c4abee",
 "Alert ingesteld: {c}"
@@ -341,6 +349,14 @@
 "98464789c4",
 "Beste trade"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Groei per jaar (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Trades downloaden (CSV)"
@@ -393,6 +409,14 @@
 "d669a6654d",
 "Long-trades"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1.000 orders van dezelfde trades):"
+],
+"btMCv": [
+"992209a3c0",
+"typische drawdown {a}% · 95% van de orders blijft onder {b}% · slechtste {c}% · deze run {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimaliseren"
@@ -441,6 +465,10 @@
 "80e53e077c",
 "Profit factor"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Payoff (gem. winst / gem. verlies)"
+],
 "btRange": [
 "63a44ed01a",
 "van / tot / stap"
@@ -484,6 +512,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (jaarlijks)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Eerste 70% vs laatste 30% van de trades:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} met {aw}% winst ({an} trades) → {b} met {bw}% winst ({bn} trades)"
 ],
 "btStreak": [
 "260b23b529",
@@ -601,9 +637,21 @@
 "6a72085653",
 "Alles"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · open source"
+],
+"cat_com": [
+"90566b4c6f",
+"Favorieten van de community"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (wereld)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -649,9 +697,53 @@
 "3090f6af60",
 "24u verandering"
 ],
+"ckNote": [
+"bc9c1644bd",
+"Coin_Kurd’s open-source TradingView scripts, draaiend op jouw grafiek."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Macro dashboard van publieke data: risk-on / risk-off regime"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"On-chain cyclusfasen (MVRV, NUPL) met prijspositie"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Bitcoin’s volledige geschiedenis op een logaritmische spiraal"
+],
 "clearAll": [
 "7de68ccb43",
 "Alle tekeningen verwijderen"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Verwijder tekeningen en indicatoren"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Verwijder tekeningen"
+],
+"clearInds": [
+"8b56474294",
+"Verwijder indicatoren"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Elke indicator van deze grafiek verwijderen?"
 ],
 "clearLog": [
 "096311b563",
@@ -676,6 +768,10 @@
 "clone": [
 "af74f7c536",
 "Kopiëren"
+],
+"cloned": [
+"51fbf8cb72",
+"Gekopieerd ernaast"
 ],
 "close": [
 "bbfa773e5a",
@@ -709,9 +805,221 @@
 "d0d4d379f5",
 "Resterende tijd tot deze candle sluit"
 ],
+"crFree": [
+"6b4b480231",
+"Volgt de muis"
+],
+"crLargeDash": [
+"a7503adc35",
+"Lange streepjes"
+],
+"crMagnet": [
+"77fa49774c",
+"Snapt naar de candles"
+],
+"crOff": [
+"d4c2792a72",
+"Verborgen"
+],
+"crSparse": [
+"e50cc378a1",
+"Verspreide stippen"
+],
 "create": [
 "8ac903c3c3",
 "Alert aanmaken"
+],
+"csBg": [
+"64dd60fe1a",
+"Achtergrond"
+],
+"csBg2": [
+"9ebb790d74",
+"Tweede achtergrondkleur"
+],
+"csBody": [
+"718a7e8a58",
+"Body"
+],
+"csBorderC": [
+"eeffa83765",
+"Randkleur"
+],
+"csBorders": [
+"685f23bc5e",
+"Randen"
+],
+"csClose": [
+"bbfa773e5a",
+"Slotkoers"
+],
+"csCross": [
+"b0b83f89e8",
+"Crosshair & muis"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Crosshair kleur"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Crosshair lijn"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Prijs- en tijdlabels op de crosshair"
+],
+"csCrossMode": [
+"800092e3e1",
+"Crosshair"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Crosshair breedte"
+],
+"csDn": [
+"11f5ff3829",
+"Dalende candle"
+],
+"csFont": [
+"b97c4d4cdd",
+"Lettertype"
+],
+"csFsize": [
+"83ca9e48c3",
+"Lettergrootte"
+],
+"csGrad": [
+"c716191a01",
+"maakt een verloop van de achtergrond"
+],
+"csGridA": [
+"f773586220",
+"Raster dekking (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Raster kleur"
+],
+"csGridH": [
+"4eaa1c008a",
+"Horizontale rasterlijnen"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Verticale rasterlijnen"
+],
+"csHollow": [
+"9165bccc85",
+"Holle bodies"
+],
+"csHollowH": [
+"fb63aba345",
+"alleen de stijgende candles"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetisch scrollen op touch"
+],
+"csLast": [
+"aacdc5bea4",
+"Laatste prijslijn"
+],
+"csLastLab": [
+"91c990bcb9",
+"Prijslabel op de schaal"
+],
+"csLineC": [
+"01212659ee",
+"Lijn / gebied kleur"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Lijnbreedte"
+],
+"csLook": [
+"41def7a0fe",
+"Uiterlijk"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"één kleur voor beide richtingen"
+],
+"csPinch": [
+"e557a41794",
+"Pinch zoom op touch"
+],
+"csResetQ": [
+"9c369383c1",
+"Elke grafiekinstelling terugzetten naar hoe het was?"
+],
+"csScale": [
+"0b414bdcb7",
+"Schalen"
+],
+"csScroll": [
+"468c89cb3b",
+"Sleep de grafiek met de muis"
+],
+"csSym": [
+"fad29404d2",
+"Candles"
+],
+"csText": [
+"d160595fcf",
+"Tekstkleur"
+],
+"csTheme": [
+"a797e30923",
+"Thema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Grafiekinstellingen"
+],
+"csUp": [
+"971a95475d",
+"Stijgende candle"
+],
+"csWick": [
+"fe6e2bfd48",
+"Wicks"
+],
+"csWickC": [
+"0fcb21d161",
+"Wick kleur"
+],
+"csWm": [
+"33c7b41ac6",
+"Watermerk achter de candles"
+],
+"csWmA": [
+"69a1810ea2",
+"Watermerk dekking (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"symbool en timeframe"
+],
+"csWmC": [
+"bad81c749f",
+"Watermerk kleur"
+],
+"csWmSize": [
+"4af7e52f80",
+"Watermerk grootte"
+],
+"csWmText": [
+"ecf870ab34",
+"Watermerk tekst"
+],
+"csZoom": [
+"c6f40d9d03",
+"Muiswiel"
+],
+"csZoomH": [
+"4ca34c1092",
+"in- en uitzoomen"
 ],
 "csv": [
 "518463f518",
@@ -724,6 +1032,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} candles gedownload"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Voeg hier een alert toe"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopieer deze prijs"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Passend voor elke candle"
+],
+"ctxHline": [
+"588d2eb492",
+"Horizontale lijn hier"
+],
+"ctxReset": [
+"242cb352c0",
+"Reset het beeld"
 ],
 "curNote": [
 "538ead2fdf",
@@ -901,9 +1229,29 @@
 "2422a88320",
 "Elke keer (maximaal eenmaal per minuut / eenmaal per candle)"
 ],
+"exAuto": [
+"1ff048b76e",
+"live, met OKX als fallback"
+],
+"exDown": [
+"e8ba18613e",
+"{x} antwoordt niet op deze verbinding. De grafiek blijft op de exchange waar deze op staat."
+],
+"exNote": [
+"0eb4c03240",
+"Binance streamt live; de anderen worden elke tien seconden uitgelezen van hun eigen publieke endpoint, met hun eigen geschiedenis."
+],
+"exTitle": [
+"5b13eac7ed",
+"Exchange"
+],
 "exit": [
 "f83b6fe3ae",
 "Exit"
+],
+"exitFull": [
+"fc61e74cd9",
+"Verlaat volledig scherm"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -944,6 +1292,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Alles exporteren (JSON)"
+],
+"extFail": [
+"55919e4281",
+"De data voor deze indicator kon niet worden geladen. Probeer het zo meteen opnieuw."
 ],
 "extend": [
 "ab07d3f288",
@@ -1001,6 +1353,18 @@
 "3526f607bc",
 "Geel"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Prognose"
@@ -1020,6 +1384,74 @@
 "futSub": [
 "16db4a6d5c",
 "Kwartaalfutures, continu"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Eén valuta tegenover een andere, van de eigen dagelijkse referentiekoersen van de site (Europese Centrale Bank, en de exchange-api dataset waar de ECB geen valuta noteert). Eén waarde per dag, dus een dagelijkse bar is een enkel punt en de wekelijkse en maandelijkse bars zijn opgebouwd uit de dagen daarin. Referentiekoersen worden één keer per dag gepubliceerd, geen tick-data van een broker: er is hier geen intraday forex. Dollar-paren beginnen op 2 maart 2024, paren tussen twee ECB-valuta's in 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Pijlen"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Penselen"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanalen"
+],
+"g_cursors": [
+"f4d2f91040",
+"Cursors"
+],
+"g_cycles": [
+"97f064aff5",
+"Cycli"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott waves"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Lijnen"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Meter"
+],
+"g_pat": [
+"2c179da0f5",
+"Grafiekpatronen"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchforks"
+],
+"g_proj": [
+"8aa49fe840",
+"Projectie"
+],
+"g_shapes": [
+"b1985e3874",
+"Vormen"
+],
+"g_text": [
+"d7cd4cda4f",
+"Tekst & notities"
+],
+"g_vol": [
+"1b4620951d",
+"Volume-gebaseerd"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1104,6 +1536,18 @@
 "hideAll": [
 "1f0e916e42",
 "Tekeningen verbergen / tonen"
+],
+"hideBoth": [
+"3502a3299d",
+"Verberg tekeningen en indicatoren"
+],
+"hideDraw": [
+"f4492c5211",
+"Verberg tekeningen"
+],
+"hideInds": [
+"764ab9d614",
+"Verberg indicatoren"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1205,6 +1649,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1216,6 +1664,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1241,6 +1693,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1260,6 +1716,42 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Alle candlestick patronen"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hanging man"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Inside bar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Morning / Evening star"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Tweezer top / bottom"
 ],
 "in_crsi": [
 "d788a94022",
@@ -1285,6 +1777,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA Clouds [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1293,17 +1789,37 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Equal Highs / Lows"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1316,6 +1832,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1349,6 +1885,10 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ob": [
+"80c4ef99a7",
+"Order Blocks"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1368,6 +1908,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1397,21 +1945,41 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
 ],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
+],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
 ],
 "in_tema": [
 "41227a56e5",
@@ -1429,6 +1997,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volume Delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1441,9 +2017,17 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Session Volume Profile"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP bands"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1456,6 +2040,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1489,6 +2081,10 @@
 "0f70916dbb",
 "Arnaud Legoux voortschrijdend gemiddelde"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR trendlijn gestuurd door MFI (RSI zonder volume)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 minus SMA 34 van het middelpunt"
@@ -1500,6 +2096,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Average true range (volatiliteit)"
+],
+"ind_atrts": [
+"8223831420",
+"Een stop die volgt met k·ATR en van kant wisselt"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1525,6 +2125,10 @@
 "a50928c16b",
 "Commodity channel index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR exits gebaseerd op de hoogste/laagste slotkoers"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trending (laag) of zijwaartse (hoog) markt"
@@ -1545,9 +2149,61 @@
 "bf330f58dd",
 "Lange-termijn momentum: WMA van twee rates of change"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Markeert elk onderstaand patroon op de candles"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Open en slot bijna gelijk (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bullish (BE) en bearish (SE) engulfing"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Lange onderste schaduw na een daling (H) of een stijging (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Een klein lichaam binnen het vorige grote lichaam (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Een candle volledig binnen de vorige (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Een groot lichaam zonder schaduwen (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Drie-candle omkeer: MS bullish, ES bearish"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap en slot voorbij het midden van de vorige candle (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Drie sterke candles op rij (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Lange bovenste schaduw na een stijging (SS) of een daling (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Twee candles met dezelfde high (TT) of low (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, streak RSI en percent rank gecombineerd"
+],
+"ind_cvd": [
+"690d30a274",
+"Lopende som van de volume delta: wie heeft de controle"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1569,6 +2225,10 @@
 "c499047c5b",
 "Exponential moving average"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · twee EMA clouds, snel en langzaam"
+],
 "ind_env": [
 "e2cf023f50",
 "Moving average met bands op een vast % afstand"
@@ -1577,17 +2237,41 @@
 "d648aafe8d",
 "Hoe gemakkelijk de prijs beweegt per volume-eenheid"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Twee swings op bijna dezelfde prijs: rustende liquiditeit"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Zet prijzen om naar een bijna-normale verdeling"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Koop × verkoop volume en delta geschreven onder elke candle; zoom in om het te lezen. Per candle, niet per prijsniveau"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fractals: lokale highs en lows"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Drie-candle gaps; elk vak eindigt waar de prijs het opvult"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Zes korte en zes lange EMA's: traders tegen investeerders"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · een getrapte trendlijn die alleen flipt bij een echte swing break"
+],
 "ind_hma": [
 "709351f832",
 "Hull moving average: snel en gefilterd"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA gekleurd op basis van de helling"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1600,6 +2284,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic met de J-lijn (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (open source, MPL-2.0) · macro regime achter de candles, signalen en dashboard, op basis van FRED data"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (open source) · Bitcoin reële waarde 8.31e-17·dagen^5.48 met ±10 % banden en de koopzone; voor BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (open source) · Bitcoin cyclusfasen op basis van MVRV, NUPL en een SOPR proxy: Extreme Bear, Bear, Early Bull, Bull, Overheated; de grijze lijn is de genormaliseerde prijs"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (open source) · Bitcoin’s volledige geschiedenis op een logaritmische spiraal, één draai per halving cyclus, met toppen, bodems, halvings en nu"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1637,9 +2341,21 @@
 "d6640bbc39",
 "Prijs nu minus prijs n bars geleden"
 ],
+"ind_ms": [
+"13fc87db00",
+"Breaks van de laatst bevestigde swing: BOS met de trend mee, CHoCH ertegenin"
+],
 "ind_news": [
 "a95010ef34",
 "Koppen over deze coin, gemarkeerd op het moment van publicatie (het nieuws van de site van de laatste dag)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · kernel-geëffende prijs met een mean-error envelope; niet-repainting vorm"
+],
+"ind_ob": [
+"530cdc224f",
+"De laatste tegenovergestelde candle voor een break van de structuur, totdat de prijs erdoorheen sluit"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1664,6 +2380,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volume toegevoegd in verhouding tot de % verandering"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · geëffende RSI met een volatiliteits-volgende lijn (QQE MOD core)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtert ruis kleiner dan het geëffende gemiddelde bereik"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1697,25 +2421,53 @@
 "26db009730",
 "Simple moving average"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Slotkoers ten opzichte van het midden van het bereik, dubbel geëffend"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Afgevlakt voortschrijdend gemiddelde (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger binnen Keltner = squeeze (rode stippen); het histogram toont de richting van de uitbraak"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · de laatste pivot high en low als niveaus"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastic van RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · voortschrijdende gemiddelden van highs en lows die van plaats wisselen wanneer de trend keert"
+],
 "ind_st": [
 "8d66b52001",
 "ATR trailing-lijn die meedraait met de trend"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD twee keer door een stochastic gehaald: vroege trendomkeringen (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K en %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI met zijn volatiliteitsbanden, een snelle en een langzame lijn"
+],
 "ind_tema": [
 "1ff881355e",
 "Drievoudig exponentieel voortschrijdend gemiddelde"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Hoeveel candles verhandeld op elke prijs, per dag"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1729,6 +2481,18 @@
 "182e4a763e",
 "Koopdruk over drie periodes"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR trailing stop; prijs die hierdoorheen breekt is het koop/verkoop signaal"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Koopvolume minus verkoopvolume van elke candle (taker data van Binance; elders een schatting)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · synthetische VIX voor elke markt; pieken boven de banden markeren vaak paniekbodems"
+],
 "ind_vo": [
 "a99f6a0038",
 "Snel vs. traag volumegemiddelde (%)"
@@ -1741,9 +2505,21 @@
 "6badda8c94",
 "Positieve en negatieve trendbeweging (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Eén volume profile per dag (per maand op dagelijkse candles)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volume op elke prijs voor de candles op het scherm, met POC en value area"
+],
 "ind_vwap": [
 "6d86714413",
 "Volume-weighted average price, gereset om 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Dagelijkse VWAP met ±1σ en ±k·σ banden"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1756,6 +2532,10 @@
 "ind_wma": [
 "b08be7d4d3",
 "Weighted moving average"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · channel-index oscillator; kruisingen boven 53/60 en onder −53/−60 markeren uitgerekte bewegingen"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1881,6 +2661,14 @@
 "891ebccd5b",
 "Vergrendelen"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Alle tekeningen vergrendelen"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Alle tekeningen zijn vergrendeld"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1901,13 +2689,41 @@
 "5f703c7eba",
 "Kurdistani-signalen"
 ],
+"mMode": [
+"659eba1219",
+"Herhalen"
+],
+"mMsg": [
+"2c924e3088",
+"Notitie"
+],
+"mTf": [
+"85decb73d1",
+"Timeframe"
+],
 "maType": [
 "15f86c051e",
 "Gemiddelde"
 ],
+"macroNote": [
+"c4a94f666d",
+"op regels gebaseerde schatting, geen advies"
+],
 "magnet": [
 "effa915951",
 "Magneet (snappen naar open/high/low/close)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magneet uit"
+],
+"magnetS": [
+"607a7625b1",
+"Sterke magneet"
+],
+"magnetW": [
+"181021d95b",
+"Zwakke magneet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1929,9 +2745,45 @@
 "fdbe20f376",
 "Alle timeframes"
 ],
+"moreTools": [
+"c871f1056a",
+"Meer tools"
+],
 "moveToSection": [
 "98d183e7cb",
 "Verplaatsen naar sectie"
+],
+"mt_mine": [
+"1cf761ac34",
+"Mijn scripts"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opties"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Patronen"
+],
+"mt_prof": [
+"0c2a930099",
+"Profielen"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Structuur"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategieën"
+],
+"multiAl": [
+"5bafcd2412",
+"Multi-conditie alert"
+],
+"multiNote": [
+"c7e278bae8",
+"Schrijf de condities op één regel en verbind ze met and / or. De alert gaat af op de candle waar de regel waar wordt."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1980,6 +2832,10 @@
 "nc_technical": [
 "41fc086088",
 "Technisch"
+],
+"neckline": [
+"993062b2d6",
+"Neklijn"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2089,6 +2945,10 @@
 "77f8046dcf",
 "(boven, geen sectie)"
 ],
+"noVol": [
+"0960b9b69d",
+"geen volume voor dit symbool"
+],
 "notif": [
 "270d190970",
 "Browser-melding"
@@ -2141,21 +3001,57 @@
 "c0da22faab",
 "Open op de grafiek"
 ],
+"openTv": [
+"94d7227248",
+"Open op TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} optieketen"
+],
+"optDays": [
+"c2fd31e918",
+"Dagen tot expiratie"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} combinaties getest in {s} s, waarvan {p} winstgevend; gesorteerd op {r}. Klik op een rij voor het volledige rapport."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit antwoordde niet vanaf deze verbinding. Wijzig de verbinding of de VPN en probeer het opnieuw."
+],
+"optIV": [
+"c1bc12118c",
+"ATM impliciete volatiliteit"
+],
 "optMax": [
 "7b9c1b1490",
 "Te veel combinaties — maximaal {n}. Gebruik een grotere stap."
+],
+"optMove": [
+"8aa36fe05d",
+"Verwachte beweging"
 ],
 "optN": [
 "1e919c1ca4",
 "{n} combinaties (maximaal {m} voor deze historie)"
 ],
 "optNote": [
-"4b4713d390",
-"Het beste resultaat op historische gegevens is vaak geluk (overfitting). Geef de voorkeur aan instellingen waarvan de omliggende waarden ook goed presteren, en controleer ze op een andere periode of markt."
+"96723a0ac4",
+"Optieketen van BTC en ETH van Deribit’s publieke data, gelezen door uw browser."
+],
+"optNote2": [
+"26dfa389e8",
+"OI en volume in contracten (coins); $ is de marktprijs in dollars. Max pain: de afwikkelingsprijs die optiehouders het minst uitbetaalt. Verwachte beweging = prijs × IV × √(dagen/365). Geen advies."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Max pain"
 ],
 "optProg": [
 "2b404f9f4a",
@@ -2164,6 +3060,10 @@
 "optRun": [
 "9a456cc451",
 "Vind de beste instellingen"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Onderliggende waarde"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2225,13 +3125,37 @@
 "0777981263",
 "Prijzen in {c} gebruiken nu jouw koers."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitude"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR-lengte"
 ],
+"p_band": [
+"3541c5f4e1",
+"Bandlengte"
+],
 "p_base": [
 "077fe9c54e",
 "Basis"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Bandlengte"
+],
+"p_bw": [
+"1d06cbba91",
+"Bandbreedte"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanaalafwijking"
+],
+"p_coeff": [
+"b032583db6",
+"Vermenigvuldiger"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2265,6 +3189,10 @@
 "8db6a2f1d3",
 "Snel"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Snel 2"
+],
 "p_hi": [
 "70a2565504",
 "Bovenste niveau"
@@ -2285,6 +3213,14 @@
 "a0623fa9a3",
 "%K-smoothing"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Sleutelwaarde"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1-lengte"
@@ -2300,6 +3236,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4-lengte"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentiel look-back"
+],
+"p_left": [
+"3b219a058a",
+"Linker balken"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2341,6 +3285,14 @@
 "a44d6c906d",
 "Candles aan elke zijde"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanaallengte"
+],
+"p_n2": [
+"2df99da939",
+"Gemiddelde lengte"
+],
 "p_offset": [
 "ce66771654",
 "Offset"
@@ -2349,13 +3301,41 @@
 "ac556cf593",
 "Percent"
 ],
+"p_pd": [
+"4997ad18cf",
+"Look-back"
+],
+"p_per": [
+"a89f63abb8",
+"Samplingperiode"
+],
+"p_ph": [
+"b1f698cc3d",
+"Hoog percentiel"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE factor"
+],
 "p_rank": [
 "1df2ca7462",
 "Percent-rank-lengte"
 ],
+"p_right": [
+"307c9815b6",
+"Rechter balken"
+],
+"p_rows": [
+"52d0b35277",
+"Rijen"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI-lengte"
+],
+"p_sf": [
+"590f20262b",
+"RSI smoothing"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2372,6 +3352,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Traag"
+],
+"p_slow2": [
+"c252d2ccab",
+"Traag 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2417,6 +3401,54 @@
 "07300ad49f",
 "{c} voor 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Toevoegen"
+],
+"pfAvg": [
+"def9f57b0c",
+"Gemiddelde aankoopprijs"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kosten"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Nog niets hier. Voeg een munt toe, hoeveel je bezit en wat je hebt betaald."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfolio {n}"
+],
+"pfNote": [
+"f46050561e",
+"Alleen opgeslagen in deze browser. Er wordt nooit om exchange-sleutels gevraagd en er wordt niets verzonden. Prijzen zijn Binance USDT-paren."
+],
+"pfNow": [
+"039df35064",
+"Huidige prijs"
+],
+"pfPnl": [
+"8ae3945397",
+"Winst / verlies"
+],
+"pfQty": [
+"44f6af6945",
+"Hoeveelheid"
+],
+"pfShort": [
+"036b18f02a",
+"Portfolio"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfolio"
+],
+"pfValue": [
+"8dce170de2",
+"Waarde"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klik op de grafiek waar de replay moet starten"
@@ -2440,6 +3472,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Prijs"
+],
+"profNote": [
+"c1da831af8",
+"Gebruik voor een profiel van een bereik naar keuze “Fixed range volume profile” in de linker werkbalk."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2613,6 +3649,86 @@
 "56a2285c5b",
 "Opslaan…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Prijsas automatisch aanpassen"
+],
+"scBorder": [
+"45c60c0e85",
+"Rand prijsas"
+],
+"scBot": [
+"77a5b77d62",
+"Ruimte onder (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Beide kanten"
+],
+"scInvert": [
+"ba80abaac1",
+"Prijsas omkeren"
+],
+"scInvertH": [
+"ebb1688761",
+"omhoog wordt omlaag"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Links"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmisch"
+],
+"scMode": [
+"a5e5771ca0",
+"Prijsas"
+],
+"scModeH": [
+"ab58fc981e",
+"normaal, logaritmisch of percentage"
+],
+"scNone": [
+"d4c2792a72",
+"Verborgen"
+],
+"scNormal": [
+"7802670ec0",
+"Normaal (rekenkundig)"
+],
+"scOff": [
+"3557c35506",
+"Lege ruimte aan de rechterkant"
+],
+"scPct": [
+"c4519ac7cc",
+"Percentage"
+],
+"scRight": [
+"954daa8b00",
+"Rechts"
+],
+"scSec": [
+"c92a4af093",
+"Seconden op de tijdsas"
+],
+"scSide": [
+"82acb7ee2b",
+"Waar de prijsas staat"
+],
+"scSpace": [
+"2878a3a43e",
+"Candle-afstand"
+],
+"scTop": [
+"25126a3aab",
+"Ruimte boven (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Rand tijdsas"
+],
 "sc_c": [
 "3e8248e32e",
 "Prijs"
@@ -2672,6 +3788,62 @@
 "screener": [
 "7f27924c12",
 "Market watch"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Controleren"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script editor"
+],
+"scriptEdit": [
+"ae909c75da",
+"Script bewerken"
+],
+"scriptExamples": [
+"41a27a4710",
+"Voorbeelden…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Regel {n}"
+],
+"scriptName": [
+"709a23220f",
+"Naam"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nieuw script"
+],
+"scriptNote": [
+"c265d2248f",
+"Schrijf je eigen indicatoren in een Pine-achtige taal. Ze worden in deze browser opgeslagen en draaien alleen hier, op je grafiek."
+],
+"scriptOk": [
+"eb3da0c952",
+"Geen fouten · {n} outputs"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Wat de taal kent"
+],
+"scriptSave": [
+"1e291c4d98",
+"Opslaan en toevoegen aan grafiek"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Script opgeslagen"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Script"
 ],
 "searchEv": [
 "0a08612647",
@@ -2777,9 +3949,25 @@
 "e97d96a8bc",
 "Hoogste volume"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI kruising (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger reversal"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2788,6 +3976,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani signalen (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun kruising"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ kruising"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2801,6 +4005,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI reversal"
@@ -2809,9 +4021,37 @@
 "446d28671b",
 "Golden / death cross (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI kruising"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend kruising [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2941,6 +4181,106 @@
 "2d2cb022bc",
 "Snelheid"
 ],
+"stBadLv": [
+"683a05683a",
+"Niveaus moeten uit maximaal 24 getallen bestaan."
+],
+"stBadPt": [
+"a73083f114",
+"Een prijs of tijd is niet geldig."
+],
+"stColor": [
+"f28563a477",
+"Kleur"
+],
+"stCoord": [
+"8ebebca019",
+"Coördinaten"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Gestreept"
+],
+"stDev": [
+"e789c07831",
+"Afwijking (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Gestippeld"
+],
+"stExtL": [
+"ef880cf8fc",
+"Links verlengen"
+],
+"stExtR": [
+"fbff580b3d",
+"Rechts verlengen"
+],
+"stFill": [
+"64dd60fe1a",
+"Achtergrond"
+],
+"stLevels": [
+"ae3d013ab1",
+"Niveaus (komma gescheiden)"
+],
+"stLine": [
+"120ee44bec",
+"Lijnstijl"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Alleen de eerste 12 punten kunnen hier worden bewerkt."
+],
+"stOpacity": [
+"f12e36bd83",
+"Achtergronddekking"
+],
+"stReset": [
+"40aab769d0",
+"Standaardniveaus"
+],
+"stRows": [
+"52d0b35277",
+"Rijen"
+],
+"stSize": [
+"83ca9e48c3",
+"Lettergrootte"
+],
+"stSolid": [
+"d00635865c",
+"Doorgetrokken"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stijl"
+],
+"stText": [
+"c3328c39b0",
+"Tekst"
+],
+"stTextC": [
+"d160595fcf",
+"Tekstkleur"
+],
+"stTextL": [
+"c3328c39b0",
+"Tekst"
+],
+"stUtc": [
+"c9dbd25df4",
+"Tijden zijn in UTC (YYYY-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Zichtbaarheid"
+],
+"stWidth": [
+"ad48f34186",
+"Dikte"
+],
 "st_err": [
 "d802d232a8",
 "Geen gegevens"
@@ -2984,6 +4324,14 @@
 "stop": [
 "9e253470c8",
 "Stop"
+],
+"stratNote": [
+"16dc19eef4",
+"Elke strategie draait op de geschiedenis van deze grafiek in de tester: entries en exits op de grafiek, netto resultaat, winstpercentage, drawdown en een optimizer voor de instellingen."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Draaien in de strategie-tester"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3045,25 +4393,133 @@
 "a26d0ddaae",
 "Scrollen (tijd)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD patroon"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendhoek"
+],
+"t_arc": [
+"853a983f6b",
+"Boog"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Pijl"
+],
+"t_arrowc": [
+"0f722804ec",
+"Pijlcursor"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Pijl omlaag"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Pijlmarkering"
+],
+"t_arrowup": [
+"8023467135",
+"Pijl omhoog"
+],
+"t_avwap": [
+"0a4f86b195",
+"Verankerde VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Penseel"
 ],
+"t_callout": [
+"f1647ad880",
+"Toelichting"
+],
 "t_channel": [
 "c0350b7736",
 "Parallel kanaal"
+],
+"t_circ": [
+"1cc7820a08",
+"Cirkel"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Opmerking"
+],
+"t_cross": [
+"983bdb7b27",
+"Kruislijn"
+],
 "t_cursor": [
 "2239943c8d",
 "Cursor"
+],
+"t_curve": [
+"916f09aff8",
+"Curve"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Cyclische lijnen"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher patroon"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dubbele curve"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Disjoint kanaal"
+],
+"t_dot": [
+"46856bf702",
+"Punt"
+],
+"t_drange": [
+"c65ea4ae01",
+"Datumbereik"
+],
+"t_drives": [
+"3a261ca869",
+"Three drives patroon"
+],
+"t_emoji": [
+"707fd71017",
+"Iconen & emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Gum"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliott correctiegolf (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliott dubbele combogolf (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott impulsgolf (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliott driehoeksgolf (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliott triple combogolf (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3073,13 +4529,61 @@
 "18c530863b",
 "Fibonacci retracement"
 ],
+"t_fibch": [
+"c691e1e9b4",
+"Fib kanaal"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib cirkels"
+],
 "t_fibext": [
 "73655be9d6",
 "Trend-gebaseerde Fibonacci extensie"
 ],
+"t_fibspiral": [
+"7e523968e1",
+"Fib spiraal"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trend-gebaseerde Fib tijd"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib tijdzone"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib wedge"
+],
+"t_flag": [
+"23d91e7740",
+"Vlagmarkering"
+],
+"t_flat": [
+"52d3db252e",
+"Vlakke top/bodem"
+],
+"t_forecast": [
+"528bc4bc38",
+"Voorspelling"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann fan"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann box"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann square"
+],
+"t_hl": [
+"8cb3f79b49",
+"Markeerstift"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3089,6 +4593,18 @@
 "0bcbc4e087",
 "Horizontale straal"
 ],
+"t_hs": [
+"43353dbcec",
+"Head and shoulders"
+],
+"t_info": [
+"a690e33098",
+"Infolijn"
+],
+"t_inside": [
+"30d6b425dc",
+"Inside pitchfork"
+],
 "t_long": [
 "666f195fc4",
 "Long position"
@@ -3097,9 +4613,45 @@
 "2bedd64d85",
 "Prijsbereik / meten"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modified Schiff pitchfork"
+],
+"t_note": [
+"2c924e3088",
+"Notitie"
+],
+"t_path": [
+"519e39132b",
+"Pad"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews’ pitchfork"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Prijslabel"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Prijsnotitie"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polyline"
+],
+"t_prange": [
+"c20f7ce09a",
+"Prijsbereik"
+],
+"t_proj": [
+"8aa49fe840",
+"Projectie"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3109,9 +4661,33 @@
 "c158695a64",
 "Rechthoek"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regressietrend"
+],
+"t_rrect": [
+"65807afaf7",
+"Gedraaide rechthoek"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff pitchfork"
+],
 "t_short": [
 "a8daf74669",
 "Short position"
+],
+"t_signpost": [
+"89f361362e",
+"Wegwijzer"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinuslijn"
+],
+"t_tcycle": [
+"521a687246",
+"Tijdcycli"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3121,9 +4697,25 @@
 "e810388344",
 "Trendlijn"
 ],
+"t_tri": [
+"32547b031d",
+"Driehoekspatroon"
+],
+"t_tri3": [
+"73d3ae245f",
+"Driehoek"
+],
 "t_vline": [
 "a790288017",
 "Verticale lijn"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD patroon"
+],
+"t_zoom": [
+"4fc05f2763",
+"Inzoomen"
 ],
 "target": [
 "61ad50a9b9",
@@ -3173,6 +4765,26 @@
 "ad88cbfa09",
 "Ook in Telegram (de bot kijkt mee, zelfs als deze pagina gesloten is)"
 ],
+"thDark": [
+"ae1ef01432",
+"Donker"
+],
+"thLight": [
+"a36ef8aba2",
+"Licht"
+],
+"thMid": [
+"4fe978738d",
+"Middernachtblauw"
+],
+"thNavy": [
+"0229e960cf",
+"Marineblauw"
+],
+"thPaper": [
+"22d507f2ba",
+"Papier"
+],
 "time": [
 "6c82e6dd86",
 "Tijd"
@@ -3196,6 +4808,10 @@
 "tooFar": [
 "b29db0358a",
 "Dat is verder terug dan deze timeframe kan laden; kies een grotere timeframe."
+],
+"toolHint": [
+"56e62363ce",
+"klik op de grafiek om te tekenen"
 ],
 "topFixed": [
 "1a66879287",
@@ -3421,6 +5037,34 @@
 "1526a17ee7",
 "Ontgrendelen"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Alle tekeningen zijn ontgrendeld"
+],
+"vDay": [
+"f6bb0f468a",
+"Dagen"
+],
+"vHour": [
+"9e25a34e63",
+"Uren"
+],
+"vMin": [
+"092f99ea11",
+"Minuten"
+],
+"vMonth": [
+"200dcdce9b",
+"Maanden"
+],
+"vSec": [
+"5fb1db5278",
+"Seconden"
+],
+"vWeek": [
+"7d75266a53",
+"Weken"
+],
 "value": [
 "3e8248e32e",
 "Prijs"
@@ -3428,6 +5072,10 @@
 "valuePct": [
 "bf55390d8d",
 "Percent (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3472,6 +5120,14 @@
 "yourRate": [
 "ca14282aa6",
 "jouw tarief"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Uitzoomen"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Sleep een groter kader om in te zoomen."
 ]
 },
 "f": {
@@ -3479,9 +5135,73 @@
 "808dfa3911",
 3
 ],
+"in_cp_pierce": [
+"de9e3d4b02",
+1
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+1
+],
+"in_cp_star": [
+"f1940a30a1",
+1
+],
+"in_cvd": [
+"fbd0df870e",
+1
+],
+"in_fvg": [
+"bad3ce3dd2",
+1
+],
+"in_ms": [
+"14c6c6c316",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_srlux": [
+"50cfe9a1d5",
+1
+],
+"in_tpo": [
+"cd41be0fc7",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"in_vpvr": [
+"f757c4a16d",
+1
+],
+"ind_zlsma": [
+"814b9eebab",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
+],
 "slTp": [
 "41d1998bce",
 3
+],
+"t_fibarc": [
+"09d8fecaa7",
+1
+],
+"t_fibfan": [
+"5b948b7296",
+1
+],
+"t_vrp": [
+"bcba420b37",
+1
 ]
 }
 }
