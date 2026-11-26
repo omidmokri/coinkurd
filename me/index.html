@@ -20,6 +20,20 @@
 .note{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0}.note small{color:var(--mute)}
 .tg{cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--mute);padding:5px 12px;font-size:.82rem}.tg.on{background:rgba(247,147,26,.16);border-color:var(--o);color:var(--ink)}.fd{display:block;padding:9px 12px}.fd b{font-weight:600}.fd small{color:var(--mute)}
 .lv-info{background:rgba(56,189,248,.15);color:#7dd3fc}.lv-important{background:rgba(245,158,11,.18);color:#fbbf24}.lv-critical{background:rgba(239,68,68,.2);color:#f87171}
+.hub{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.hub .hb-wide{grid-column:1/-1}@media(max-width:900px){.hub{grid-template-columns:1fr}}
+.hb-row{display:flex;align-items:center;gap:10px;padding:9px 10px;margin:6px 0;border:1px solid var(--line);border-radius:12px;color:inherit;text-decoration:none;transition:border-color .2s,background .2s}
+a.hb-row:hover,a.hb-pick:hover,a.hb-f:hover,a.nd:hover,a.bd:hover,a.hb-mini:hover{border-color:var(--o);background:rgba(247,147,26,.08)}
+.hb-row>span:nth-child(2){flex:1;min-width:0}.hb-row b,.hb-row small,.hb-nb b,.hb-nb small,.hb-pick b,.hb-pick small{display:block}.hb-row small,.hb-nb small,.hb-pick small{color:var(--mute);font-size:.78rem;overflow:hidden;text-overflow:ellipsis}
+.hb-row em,.hb-pick em{font-style:normal;font-size:.78rem;color:var(--o);white-space:nowrap}.hb-flat{border-style:dashed}
+.hb-ic{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.05);font-size:1.1rem}.hb-ic img{border-radius:50%}
+.hb-nb{display:flex;gap:12px;align-items:flex-start}.hb-nb>div{flex:1}.hb-big{font-size:2rem;line-height:1}.hb-go{display:inline-block;margin:10px 0 4px}
+.hb-bar{height:7px;border-radius:9px;background:#ffffff14;overflow:hidden;margin:7px 0 3px}.hb-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#f7931a,#ffc46b)}
+.hb-mini{display:block;font-size:.8rem;padding:6px 9px;margin:5px 0;border:1px solid var(--line);border-radius:10px;color:inherit;text-decoration:none}.hb-mini small{color:var(--mute);float:inline-end}
+.hb-pick{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;border:1px solid rgba(247,147,26,.45);background:linear-gradient(135deg,rgba(247,147,26,.14),rgba(247,147,26,.03));color:inherit;text-decoration:none}.hb-pick>span:nth-child(2){flex:1}.hb-pick b{font-size:1.1rem}
+.hb-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-top:10px}
+.hb-f{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;font-size:.8rem;color:var(--mute);text-decoration:none}.hb-f span{filter:grayscale(1);opacity:.55}
+.hb-f.on{border-style:solid;border-color:rgba(247,147,26,.5);color:var(--ink);background:rgba(247,147,26,.07)}.hb-f.on span{filter:none;opacity:1}
+a.nd,a.bd{display:block;color:inherit;text-decoration:none}.nd small{float:inline-end;color:var(--mute);font-size:.72rem}.bd .hb-bar{height:4px}
 </style>
 <link rel="stylesheet" href="/assets/chrome.css?v=27"><meta name="referrer" content="strict-origin-when-cross-origin"><link rel="stylesheet" href="/assets/account/account.css?v=3"></head>
 <body>
@@ -27,6 +41,7 @@
 <div class="wrap">
   <div class="hero" style="padding-bottom:10px"><h1 data-t="h1"></h1><p data-t="lead"></p></div>
   <section id="ek-acct" class="ek-acct" hidden></section>
+  <section id="today"><h2><b data-t="tdT"></b><span>FOR YOU</span></h2><p class="lead" data-t="tdL"></p><div class="hub" id="hub"></div></section>
   <div class="grid">
     <div class="card"><h3 data-t="lvT"></h3><div id="lvl"></div></div>
     <div class="card"><h3 data-t="trT"></h3><div class="tree" id="tree"></div></div>
@@ -38,16 +53,16 @@
     <div class="card"><h3 data-t="dnT"></h3><div id="tdna"></div></div>
   </div>
   <section><h2><b data-t="bdT"></b><span>BADGES</span></h2><p class="lead" data-t="bdL"></p><div class="badges" id="badges"></div></section>
-  <section><h2><b data-t="pfT"></b><span>PRIVATE</span></h2><p class="lead" data-t="pfL"></p>
+  <section id="pfS"><h2><b data-t="pfT"></b><span>PRIVATE</span></h2><p class="lead" data-t="pfL"></p>
     <div class="card"><div class="form"><select id="pC"></select><input id="pQ" type="number" step="any" min="0" placeholder="qty" style="width:110px"><input id="pP" type="number" step="any" min="0" placeholder="avg $" style="width:110px"><button class="btn p" id="pAdd">+</button></div>
     <div id="pf" style="margin-top:12px"></div></div></section>
   <section id="paper"><h2><b data-t="ppT"></b><span>PAPER</span></h2><p class="lead" data-t="ppL"></p>
     <div class="card"><div class="form"><select id="ppC"></select><select id="ppS"></select><input id="ppA" type="number" min="1" step="any" placeholder="$" style="width:110px"><input id="ppSl" type="number" min="0" step="any" style="width:120px"><input id="ppTp" type="number" min="0" step="any" style="width:120px"><button class="btn p" id="ppGo"></button></div>
     <div id="ppMsg" class="disc"></div><div id="ppOut" style="margin-top:10px"></div></div></section>
-  <section><h2><b data-t="alT"></b><span>ALERTS</span></h2><p class="lead" data-t="alL"></p>
+  <section id="alertsS"><h2><b data-t="alT"></b><span>ALERTS</span></h2><p class="lead" data-t="alL"></p>
     <div class="grid"><div class="card"><div class="form"><select id="aC"></select><select id="aM"></select><select id="aO"><option>&gt;</option><option>&lt;</option></select><input id="aV" placeholder="value" style="width:110px"><button class="btn" id="aAnd" title="AND">＋ <span data-t="andT"></span></button><select id="aL"></select><button class="btn p" id="aAdd">+</button></div><div id="aPend" class="row" style="margin-top:6px"></div><div id="alerts" style="margin-top:10px"></div></div>
     <div class="card"><h3 data-t="alLogT"></h3><div id="alog"></div></div></div></section>
-  <section><h2><b data-t="nbT"></b><span>NOTES</span></h2><p class="lead" data-t="nbL"></p>
+  <section id="notesS"><h2><b data-t="nbT"></b><span>NOTES</span></h2><p class="lead" data-t="nbL"></p>
     <div class="card"><div class="form"><input id="nT" style="flex:1 1 200px"><select id="nC"></select><input id="nG" style="width:150px"></div><textarea id="nB" rows="3" style="width:100%;margin-top:6px;background:#000;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-family:inherit"></textarea>
     <div class="row" style="margin-top:6px"><button class="btn p" id="nAdd">+</button><input id="nS" style="flex:1 1 160px"><button class="btn" id="nExp">⬇ JSON</button><label class="btn" style="cursor:pointer">⬆ JSON<input type="file" id="nImp" accept="application/json" hidden></label></div><div id="notes" style="margin-top:10px"></div></div></section>
   <section><div class="honest" data-t="privacy"></div></section>
@@ -57,7 +72,7 @@
 <script>
 Object.assign(I.fa,{ppT:'معاملهٔ آزمایشی (پول مجازی)',ppL:'با ۱۰٬۰۰۰ دلار مجازی و قیمت زندهٔ Binance تمرین کنید؛ حد ضرر و هدف خودکار بررسی می‌شوند (با کندل‌های ۱ ساعته از لحظهٔ ورود). از کارت‌های اسکنر صفحهٔ اول هم با یک کلیک می‌شود معاملهٔ آزمایشی باز کرد. همه‌چیز فقط در مرورگر شماست.',ppOpen:'باز کردن معامله',ppSides:{long:'لانگ',short:'شورت'},ppSl:'حد ضرر',ppTp:'هدف',ppCash:'نقد',ppEq:'ارزش کل',ppPnl:'سود/زیان کل',ppWin:'نرخ برد',ppTr:'معامله‌ها',ppOpenT:'معامله‌های باز',ppHist:'تاریخچه',ppClose:'بستن',ppReset:'شروع دوباره',ppNoCash:'نقد کافی نیست.',ppNoPx:'قیمت زنده پیدا نشد.',ppBadSl:'حد ضرر باید زیر ورود (لانگ) یا بالای ورود (شورت) باشد.',ppR:{sl:'حد ضرر',tp:'هدف',man:'دستی'},ppFrom:'پیشنهاد از اسکنر:',ppRiskCalc:'ماشین‌حساب اندازهٔ پوزیشن',ppConfirm:'همهٔ معامله‌های آزمایشی پاک شود و با ۱۰٬۰۰۰ دلار از نو شروع کنید؟',
  fdT:'فید شخصی من',fdL:'موضوع‌هایی را که دنبال می‌کنی انتخاب کن؛ تازه‌ترین پست‌های کانال دربارهٔ همان‌ها اینجا جمع می‌شود. پست‌های تبلیغاتی، اطلاعیه‌ها و تکراری‌ها حذف می‌شوند.',fdHint:'هنوز موضوعی انتخاب نکرده‌ای؛ فعلاً تازه‌ترین پست‌های باکیفیت نمایش داده می‌شود.',newT:'تازه',moreF:'نمایش بیشتر',topics:{btc:'بیت‌کوین',eth:'اتریوم',alt:'آلت‌کوین‌ها',etf:'ETF و نهادی',reg:'قانون‌گذاری',chain:'آن‌چین',sec:'امنیت و هک',macro:'اقتصاد کلان',ta:'تحلیل و سیگنال',edu:'آموزش',watch:'لیست مراقبت من'},rvT:'اخیراً دیده‌شده',clr:'پاک کردن تاریخچه',rvNo:'هنوز صفحه‌ای ثبت نشده؛ از این به بعد صفحه‌هایی که باز می‌کنی (پست‌ها، کوین‌ها، ابزارها) اینجا می‌آیند.',dnT:'DNA معامله‌گری من',dnNo:'هنوز کارت DNA معامله‌گری نساخته‌ای — ۶ سؤال کوتاه در آزمایشگاه.',dnMake:'ساخت کارت DNA',dnRedo:'ساخت دوباره',dnAx:{risk:'ریسک‌پذیری',disc:'انضباط و حد ضرر',pat:'صبر',data:'داده‌محوری'},u:['دقیقه','ساعت','روز'],agoW:'پیش',dnaTypes:{sniper:['تک‌تیرانداز روند','صبور، دقیق، با حد ضرر؛ منتظر شکست تمیز می‌ماند.'],surfer:['موج‌سوار','با روند می‌رود و سود را پله‌ای برمی‌دارد.'],hunter:['شکارچی نوسان','سریع، پرتحرک و عاشق نوسان کوتاه‌مدت.'],oak:['بلوط','بلندمدت، آرام و بی‌اعتنا به نویز روزانه.'],gambler:['ریسک‌باز','جسور با ریسک بالا — مدیریت سرمایه را جدی‌تر بگیر!'],analyst:['تحلیلگر','اول داده، بعد تصمیم؛ منطقی و منظم.']},
- h1:'فضای <em>من</em>',lead:'سطح، زنجیرهٔ حضور، مهارت‌ها و نشان‌های تو؛ سبد خصوصی، دفترچهٔ تحقیق و مرکز هشدار. همه‌چیز فقط در همین مرورگر ذخیره می‌شود.',
+ h1:'فضای <em>من</em>',lead:'سطح، زنجیرهٔ حضور، مهارت‌ها و نشان‌های تو؛ سبد خصوصی، دفترچهٔ تحقیق و مرکز هشدار. همه‌چیز در همین مرورگر ذخیره می‌شود و اگر وارد حسابت شوی، روی همهٔ دستگاه‌هایت همراهت است.',
  lvT:'سطح و زنجیرهٔ حضور',trT:'درخت مهارت معامله‌گری',bdT:'نشان‌ها',bdL:'نشان‌های غیرمالی برای یادگیری و مشارکت مفید؛ با استفاده از ابزارهای سایت باز می‌شوند.',
  pfT:'گزارشگر خصوصی سبد',pfL:'دارایی‌هایت را وارد کن: ارزش، سود/زیان، سهم هر دارایی، تمرکز، نوسان ۳۰ روزه و همبستگی. فقط در مرورگر خودت؛ کارت اشتراک فقط درصدها را نشان می‌دهد.',
  alT:'مرکز هشدار هوشمند',alL:'قانون بساز (قیمت، تغییر ۲۴ ساعته، RSI، سیگنال اسکنر، فاندینگ)؛ هشدارهای تکراری ادغام می‌شوند و هر قانون حداکثر هر ۶ ساعت یک بار فعال می‌شود. وقتی یکی از صفحه‌های Entekhab باز است بررسی می‌شود.',alLogT:'هشدارهای اخیر',
@@ -71,7 +86,7 @@ Object.assign(I.fa,{ppT:'معاملهٔ آزمایشی (پول مجازی)',ppL:
  TR:[['تحلیل تکنیکال',['chart','sharp','explorer']],['مدیریت ریسک',['risk','alert','research']],['داده و کشف',['first','dna','curious']],['نظم و پیوستگی',['streak3','streak7','trader']]]});
 Object.assign(I.ckb,{ppT:'مامەڵەی تاقیکاری (پارەی خەیاڵی)',ppL:'بە ١٠٬٠٠٠ دۆلاری خەیاڵی و نرخی زیندووی Binance ڕاهێنان بکە؛ وەستاندنی زیان و ئامانج خۆکار دەپشکنرێن. لە کارتەکانی پشکنەری پەڕەی یەکەمیش دەکرێت بە یەک کرتە مامەڵەی تاقیکاری بکەیتەوە.',ppOpen:'کردنەوەی مامەڵە',ppSides:{long:'لۆنگ',short:'شۆرت'},ppSl:'وەستاندنی زیان',ppTp:'ئامانج',ppCash:'نەخت',ppEq:'کۆی بەها',ppPnl:'کۆی قازانج/زیان',ppWin:'ڕێژەی بردنەوە',ppTr:'مامەڵەکان',ppOpenT:'مامەڵە کراوەکان',ppHist:'مێژوو',ppClose:'داخستن',ppReset:'دەستپێکردنەوە',ppNoCash:'نەختی پێویست نییە.',ppNoPx:'نرخی زیندوو نەدۆزرایەوە.',ppBadSl:'وەستاندنی زیان دەبێت خوار چوونەژوورەوە (لۆنگ) یان سەرووی (شۆرت) بێت.',ppR:{sl:'وەستاندن',tp:'ئامانج',man:'دەستی'},ppFrom:'پێشنیار لە پشکنەر:',ppRiskCalc:'ژمێرەری قەبارەی پۆزیشن',ppConfirm:'هەموو مامەڵە تاقیکارییەکان بسڕێنەوە و لە سەرەتاوە دەست پێبکەیتەوە؟',
  fdT:'فیدی تایبەتی من',fdL:'ئەو بابەتانەی دوایان دەکەویت هەڵبژێرە؛ نوێترین پۆستەکانی کەناڵ دەربارەیان لێرە کۆدەبنەوە. پۆستی ڕیکلام، ئاگاداری و دووبارە لادەبرێن.',fdHint:'هێشتا بابەتێکت هەڵنەبژاردووە؛ ئێستا نوێترین پۆستە باشەکان پیشان دەدرێن.',newT:'نوێ',moreF:'زیاتر',topics:{btc:'بیتکۆین',eth:'ئیتریۆم',alt:'ئاڵتکۆینەکان',etf:'ETF و دامەزراوەکان',reg:'یاسادانان',chain:'ئۆن‌چەین',sec:'ئاسایش و هاک',macro:'ئابووریی گشتی',ta:'شیکاری و ئاماژە',edu:'فێرکاری',watch:'لیستی چاودێریم'},rvT:'دوایین بینراوەکان',clr:'سڕینەوەی مێژوو',rvNo:'هێشتا هیچ پەڕەیەک تۆمار نەکراوە؛ لەمەودوا ئەو پەڕانەی دەیانکەیتەوە لێرە دەردەکەون.',dnT:'DNAی بازرگانیی من',dnNo:'هێشتا کارتی DNAی بازرگانیت دروست نەکردووە — ٦ پرسیاری کورت لە تاقیگە.',dnMake:'دروستکردنی کارتی DNA',dnRedo:'دووبارە دروستکردنەوە',dnAx:{risk:'مەترسیخوازی',disc:'ڕێکوپێکی و وەستاندنی زیان',pat:'ئارامی',data:'پشت‌بەستن بە داتا'},u:['خولەک','کاتژمێر','ڕۆژ'],agoW:'لەمەوبەر',dnaTypes:{sniper:['تەقەکەری ڕەوت','ئارام، ورد، بە وەستاندنی زیان؛ چاوەڕێی شکاندنێکی پاک دەکات.'],surfer:['شەپۆلسوار','لەگەڵ ڕەوت دەڕوات و قازانج پلە بە پلە هەڵدەگرێت.'],hunter:['ڕاوچیی لەرزین','خێرا، چالاک و ئەوینداری لەرزینی کورتخایەن.'],oak:['بەڕوو','درێژخایەن، ئارام و بێخەم لە ژاوەژاوی ڕۆژانە.'],gambler:['مەترسیخواز','ئازا بە مەترسیی زۆر — بەڕێوەبردنی سەرمایە جددیتر بگرە!'],analyst:['شیکەرەوە','سەرەتا داتا، پاشان بڕیار؛ لۆژیکی و ڕێکخراو.']},
- h1:'بۆشاییی <em>من</em>',lead:'ئاست، زنجیرەی ئامادەبوون، کارامەیی و نیشانەکانت؛ سەبەتەی تایبەت، دەفتەری توێژینەوە و ناوەندی ئاگادارکردنەوە. هەموو شتێک تەنها لەم وێبگەڕەدا هەڵدەگیرێت.',
+ h1:'بۆشاییی <em>من</em>',lead:'ئاست، زنجیرەی ئامادەبوون، کارامەیی و نیشانەکانت؛ سەبەتەی تایبەت، دەفتەری توێژینەوە و ناوەندی ئاگادارکردنەوە. هەموو شتێک لەم وێبگەڕەدا هەڵدەگیرێت و ئەگەر بچیتە ژوورەوە، لەسەر هەموو ئامێرەکانت لەگەڵتە.',
  lvT:'ئاست و زنجیرەی ئامادەبوون',trT:'درەختی کارامەیی',bdT:'نیشانەکان',bdL:'نیشانەی نا-دارایی بۆ فێربوون و بەشداریی بەسوود.',
  pfT:'ڕاپۆرتەری تایبەتی سەبەتە',pfL:'سامانەکانت بنووسە: بەها، قازانج/زیان، بەش، چڕبوونەوە، لەرزینی ٣٠ ڕۆژ و پەیوەندی. تەنها لە وێبگەڕەکەتدا.',
  alT:'ناوەندی ئاگادارکردنەوەی زیرەک',alL:'یاسا دروست بکە؛ ئاگادارییە دووبارەکان یەکدەخرێن و هەر یاسایەک هەر ٦ کاتژمێر جارێک چالاک دەبێت.',alLogT:'دوایین ئاگادارییەکان',
@@ -85,7 +100,7 @@ Object.assign(I.ckb,{ppT:'مامەڵەی تاقیکاری (پارەی خەیاڵ
  TR:[['شیکاریی تەکنیکی',['chart','sharp','explorer']],['بەڕێوەبردنی مەترسی',['risk','alert','research']],['داتا و دۆزینەوە',['first','dna','curious']],['ڕێکوپێکی',['streak3','streak7','trader']]]});
 Object.assign(I.en,{ppT:'Paper trading (virtual money)',ppL:'Practise with $10,000 of virtual money at live Binance prices; stops and targets are checked automatically from 1-hour candles since entry. You can open a paper trade from any scanner card on the homepage. Everything stays in your browser.',ppOpen:'Open trade',ppSides:{long:'Long',short:'Short'},ppSl:'Stop',ppTp:'Target',ppCash:'Cash',ppEq:'Equity',ppPnl:'Total P&L',ppWin:'Win rate',ppTr:'Trades',ppOpenT:'Open trades',ppHist:'History',ppClose:'Close',ppReset:'Start over',ppNoCash:'Not enough cash.',ppNoPx:'Live price not found.',ppBadSl:'The stop must be below entry (long) or above entry (short).',ppR:{sl:'stop',tp:'target',man:'manual'},ppFrom:'Suggested by the scanner:',ppRiskCalc:'Position-size calculator',ppConfirm:'Delete all paper trades and start again with $10,000?',
  fdT:'My feed',fdL:'Pick the topics you follow; the newest channel posts about them collect here. Promos, notices and repeats are removed.',fdHint:'No topics selected yet — showing the newest quality posts for now.',newT:'new',moreF:'Show more',topics:{btc:'Bitcoin',eth:'Ethereum',alt:'Altcoins',etf:'ETF & institutions',reg:'Regulation',chain:'On-chain',sec:'Security & hacks',macro:'Macro',ta:'Analysis & signals',edu:'Education',watch:'My watchlist'},rvT:'Recently viewed',clr:'Clear history',rvNo:'Nothing recorded yet — from now on, pages you open (posts, coins, tools) appear here.',dnT:'My trader DNA',dnNo:'You have not made your Trader DNA card yet — 6 quick questions in the Lab.',dnMake:'Make my DNA card',dnRedo:'Redo',dnAx:{risk:'Risk appetite',disc:'Discipline & stop-loss',pat:'Patience',data:'Data-driven'},u:['minute','hour','day'],agoW:'ago',dnaTypes:{sniper:['Trend Sniper','Patient, precise, always with a stop; waits for the clean break.'],surfer:['Wave Surfer','Rides the trend and scales out of profits.'],hunter:['Volatility Hunter','Fast, active, loves short-term swings.'],oak:['The Oak','Long-term, calm, ignores daily noise.'],gambler:['Risk Taker','Bold with high risk — take money management seriously!'],analyst:['The Analyst','Data first, decision second; logical and disciplined.']},
- h1:'My <em>space</em>',lead:'Your level, streak, skills and badges; a private portfolio, research notebook and alert center. Everything is stored only in this browser.',
+ h1:'My <em>space</em>',lead:'Your level, streak, skills and badges; a private portfolio, research notebook and alert center. Everything is saved in this browser, and on all your devices once you sign in.',
  lvT:'Level & streak',trT:'Trader skill tree',bdT:'Badges',bdL:'Non-financial badges for learning and useful participation; unlocked by using the site’s tools.',
  pfT:'Private portfolio reporter',pfL:'Enter your holdings: value, P&L, allocation, concentration, 30-day volatility and correlation. Only in your browser; the share card shows percentages only.',
  alT:'Smart alert center',alL:'Create rules (price, 24h change, RSI, scanner signal, funding). Duplicates are merged and each rule fires at most once per 6 hours. Checked while any Entekhab tool page is open.',alLogT:'Recent alerts',
@@ -124,7 +139,7 @@ async function renderPf(){const pf=ls.get('ek_port',[]),el=$('#pf');if(!pf.lengt
  <table style="margin-top:10px"><tr><th></th><th>qty</th><th>$</th><th>${T('alloc')}</th><th>${T('pnl')}</th><th></th></tr>${rows.map((r,k)=>`<tr><td><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${pal[k%pal.length]}"></i> ${logoTag(r.coin,18)}${esc(r.coin)}</td><td class="num">${fm(r.qty,6)}</td><td class="num">${r.px?fm(r.v,2):'—'}</td><td class="num">${(r.w*100).toFixed(1)}%</td><td>${r.cost&&r.px?sg((r.px/r.cost-1)*100):'—'}</td><td><button class="btn" data-del="${r.i}" style="padding:2px 8px">✕</button></td></tr>`).join('')}</table>
  ${rows.length>1&&n>=10?`<h3 style="font-size:.9rem;margin-top:12px">${T('corrT')}</h3><table>${['',...rows.map(r=>r.coin)].map((h,i)=>i===0?`<tr><th></th>${rows.map(r=>`<th>${esc(r.coin)}</th>`).join('')}</tr>`:`<tr><th>${esc(h)}</th>${rows.map((r2,k2)=>{const c=corr(rets[i-1],rets[k2]);return `<td class="num" style="background:rgba(247,147,26,${c==null?0:Math.max(0,c)*.35})">${c==null?'—':c.toFixed(2)}</td>`}).join('')}</tr>`).join('')}</table>`:''}
  <p style="margin-top:10px"><button class="btn" id="pCard">🖼 ${T('shareCard')}</button></p><div id="pOut"></div>`;
- el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const a=ls.get('ek_port',[]);a.splice(+b.dataset.del,1);ls.set('ek_port',a);renderPf();renderLvl()});
+ el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const a=ls.get('ek_port',[]);a.splice(+b.dataset.del,1);ls.set('ek_port',a);renderPf();renderLvl();renderHub()});
  $('#pCard').onclick=()=>{const cv=document.createElement('canvas');cv.width=1080;cv.height=1080;const x=cv.getContext('2d');bgPaint(x,1080,1080);x.textAlign='center';x.fillStyle='#f7931a';x.font='700 44px "Space Grotesk"';x.fillText('MY CRYPTO MIX',540,100);
   let a0=-Math.PI/2;rows.forEach((r,k)=>{x.beginPath();x.moveTo(540,460);x.arc(540,460,250,a0,a0+r.w*Math.PI*2);x.closePath();x.fillStyle=pal[k%pal.length];x.fill();a0+=r.w*Math.PI*2});x.beginPath();x.arc(540,460,140,0,7);x.fillStyle='#0b0c0f';x.fill();
   x.fillStyle='#fff';x.font='700 40px "Space Grotesk"';x.fillText(rows.length+' assets',540,475);rows.slice(0,8).forEach((r,k)=>{const y=790+Math.floor(k/2)*58,cx=k%2?760:320;x.fillStyle=pal[k%pal.length];x.fillRect(cx-150,y-26,28,28);x.fillStyle='#fff';x.textAlign='left';x.font='600 34px "Space Grotesk"';x.fillText(`${r.coin} ${(r.w*100).toFixed(1)}%`,cx-108,y-2);x.textAlign='center'});
@@ -145,7 +160,7 @@ addEventListener('ek-alerts',renderAlerts);
 /* ---- notebook ---- */
 function renderNotes(){const q=($('#nS').value||'').toLowerCase(),a=ls.get('ek_notes',[]).filter(n=>!q||(n.title+' '+n.body+' '+(n.tags||'')+' '+(n.coin||'')).toLowerCase().includes(q));
  $('#notes').innerHTML=a.length?a.map(n=>{const nowPx=n.coin?(M?.coins||[]).find(c=>c.coin===n.coin)?.price:null;return `<div class="note"><b>${esc(n.title)}</b> ${n.coin?`${logoTag(n.coin,16)}<span class="chip">${esc(n.coin)}</span>`:''}${(n.tags||'').split(/[,،\s]+/).filter(Boolean).map(t=>`<span class="chip">#${esc(t)}</span>`).join('')}<div style="white-space:pre-wrap;font-size:.9rem;margin:4px 0">${esc(n.body)}</div><small>${new Date(n.t).toLocaleString(lang==='en'?'en-GB':'fa-IR')}${n.px?` · ${T('then')} <span class="num">$${fm(n.px,n.px<1?6:2)}</span>${nowPx?` → ${T('now')} <span class="num">$${fm(nowPx,nowPx<1?6:2)}</span> ${sg((nowPx/n.px-1)*100)}`:''}`:''}</small> <button class="btn" data-ndel="${n.id}" style="padding:1px 8px;float:inline-end">✕</button></div>`}).join(''):`<p class="disc">${T('none')}</p>`;
- $('#notes').querySelectorAll('[data-ndel]').forEach(b=>b.onclick=()=>{ls.set('ek_notes',ls.get('ek_notes',[]).filter(n=>n.id!=b.dataset.ndel));renderNotes();renderLvl()})}
+ $('#notes').querySelectorAll('[data-ndel]').forEach(b=>b.onclick=()=>{ls.set('ek_notes',ls.get('ek_notes',[]).filter(n=>n.id!=b.dataset.ndel));renderNotes();renderLvl();renderHub()})}
 $('#nAdd').onclick=()=>{const t=$('#nT').value.trim(),b=$('#nB').value.trim();if(!t&&!b)return;const c=$('#nC').value,px=c?(M?.coins||[]).find(x=>x.coin===c)?.price:null;const a=ls.get('ek_notes',[]);a.unshift({id:Date.now(),t:Date.now(),title:t||b.slice(0,40),body:b,tags:$('#nG').value,coin:c||null,px:px||null});ls.set('ek_notes',a.slice(0,500));$('#nT').value=$('#nB').value=$('#nG').value='';renderNotes();renderLvl()};
 $('#nS').oninput=renderNotes;
 $('#nExp').onclick=()=>{const blob=new Blob([JSON.stringify({notes:ls.get('ek_notes',[]),portfolio:ls.get('ek_port',[]),alerts:ls.get('ek_alerts',[])},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='entekhab-my-space.json';a.click()};
@@ -207,8 +222,99 @@ function paperForm(){const cs=coinsList(),v=$('#ppC').value;$('#ppC').innerHTML=
  $('#ppS').innerHTML=Object.entries(T('ppSides')).map(([k,x])=>`<option value="${k}">${x}</option>`).join('');$('#ppGo').textContent=T('ppOpen');$('#ppSl').placeholder=T('ppSl');$('#ppTp').placeholder=T('ppTp');
  const q=new URLSearchParams(location.search);if(q.get('paper')&&!paperForm.done){paperForm.done=1;const c=q.get('paper').toUpperCase();if(cs.includes(c))$('#ppC').value=c;$('#ppS').value=q.get('side')==='short'?'short':'long';
   if(+q.get('sl'))$('#ppSl').value=+q.get('sl');if(+q.get('tp'))$('#ppTp').value=+q.get('tp');$('#ppA').value=1000;$('#ppMsg').textContent=T('ppFrom')+' '+c+(q.get('why')?' · '+q.get('why'):'');setTimeout(()=>$('#paper').scrollIntoView({behavior:'smooth'}),400)}}
-function renderAll(){forms();paperForm();renderLvl();renderFeed();renderRecent();renderTD();renderPf();renderPaper();renderAlerts();renderNotes();renderPend()}
+function renderAll(){forms();paperForm();renderLvl();try{renderHub()}catch(e){console.error(e)}renderFeed();renderRecent();renderTD();renderPf();renderPaper();renderAlerts();renderNotes();renderPend()}
 (async()=>{const [m,lg]=await Promise.all([j('/data/market.json'+V()),j('/data/logos/index.json'+V())]);M=m;LOGO=new Set(lg||[]);uiLang(renderAll)})();
 </script>
-<script src="/assets/chrome.js?v=27" defer></script><script src="/assets/i18n.js?v=8" defer></script><script src="/assets/account/config.js?v=2" defer></script><script src="/assets/account/merge.js?v=1" defer></script><script src="/assets/account/i18n.js?v=3" defer></script><script src="/assets/account/sync.js?v=1" defer></script><script src="/assets/account/account.js?v=3" defer></script></body>
+<script>
+/* «فضای من» hub: today's picks, the next step and the site map you've explored. Everything is computed in the browser
+   from what this browser (or the signed-in account) already keeps; nothing new is collected. No timers, no
+   countdowns, no pressure: every card says plainly what it is and where it goes. */
+Object.assign(I.fa,{tdT:'امروز برای تو',tdL:'از جایی که بودی ادامه بده، قدم بعدی‌ات را ببین و هر روز یک بخش تازه از سایت را کشف کن.',
+ hCont:'ادامهٔ مسیر',hNext:'قدم بعدی',hDisc:'کشف امروز',hMap:'نقشهٔ کاوش تو',hGo:'برو',hOpen:'ببین',hStart:'شروع کن',
+ hAcad:'آکادمی',hAcadNo:'هنوز درسی شروع نکرده‌ای. از سطح مبتدی شروع کن.',hAcadOn:(xp,n)=>`${n} درس شروع‌شده · ${xp} امتیاز تجربه`,
+ hEnc:'آکادمی دانشنامه',hEncOn:n=>`${n} مدخل خوانده‌شده`,hEncNo:'فلش‌کارت و آزمون با ۱۰۹ مدخل سه‌زبانه',
+ hLast:'آخرین صفحه‌ای که دیدی',hNextAll:'همهٔ نشان‌ها را گرفته‌ای. آفرین!',hNeed:(a,b)=>`${a} از ${b}`,hStreakTip:'فقط کافی است فردا هم سر بزنی.',
+ hMover:(c,x)=>`${c} در ۲۴ ساعت ${x}`,hFng:v=>`شاخص ترس و طمع: ${v}`,hDiscMore:'رویدادهای غیرعادی امروز، مأموریت‌ها و هواشناسی کوین‌ها',
+ hSeen:(a,b)=>`${a} از ${b} بخش سایت را دیده‌ای`,hPick:'پیشنهاد امروز',hNew:'هنوز ندیده‌ای',
+ hTo:{first:'/lab/',sharp:'/lab/#arenaS',chart:'/lab/#arenaS',explorer:'/lab/#discS',dna:'/dna/',research:'#notesS',risk:'#pfS',curious:'/terminal/',alert:'#alertsS',trader:'/lab/#dnaS'},
+ F:[['/academy/','🎓','آکادمی','درس‌به‌درس از صفر تا حرفه‌ای، با آزمون و مرور هوشمند'],['/encyclopedia/','📚','دانشنامه','۱۰۹ اصطلاح مالی به سه زبان، با فرمول و مثال'],
+  ['/lab/','🧪','آزمایشگاه','کشف روزانه، مأموریت‌ها، پیش‌بینی و DNA معامله‌گری'],['/terminal/','🤖','ترمینال هوشمند','از «انتخاب» دربارهٔ بازار بپرس'],
+  ['/market/','📈','بازار زنده','مولتی‌چارت، ابزار رسم و هشدار قیمت'],['/charts/','🔭','رصدخانه','مشتقات، فاندینگ و آنچین در یک نگاه'],
+  ['/heatmap/','🗺','نقشهٔ حرارتی','کل بازار در یک تصویر سه‌بعدی'],['/bubbles/','🫧','حباب‌های بازار','کوین‌ها به شکل حباب‌های زنده'],
+  ['/money-flow/','💧','جریان پول','پول از کجا به کجا می‌رود'],['/liquidity/','🌊','نقدینگی','دفتر سفارش زنده و دیوارهای خرید و فروش'],
+  ['/dna/','🧬','DNA بازار','شخصیت هر کوین در چند عدد'],['/calendar/','📅','تقویم اقتصادی','رویدادها و احتمالات فدرال رزرو'],
+  ['/etf/','🏦','جریان ETF','ورود و خروج روزانهٔ ETFهای بیت‌کوین و اتریوم'],['/unlocks/','🔓','آنلاک توکن‌ها','کدام توکن‌ها به‌زودی آزاد می‌شوند'],
+  ['/tools/','🧮','ابزارهای معامله‌گر','اندازهٔ پوزیشن، ریسک و مقایسهٔ کوین‌ها'],['/studio/','💻','استودیو پاین','کد پاین بنویس و زنده بک‌تست کن'],
+  ['/indicators/','📐','اندیکاتورها','اندیکاتورهای اختصاصی Coin_Kurd'],['/battle/','⚔️','نبرد من','بیت‌کوین زنده به شکل جبههٔ سه‌بعدی'],
+  ['/bitcoin/','₿','درک بیت‌کوین','هاوینگ، ۲۱ میلیون و آیندهٔ پول'],['/world/','🌍','جهان زنده','شمارنده‌های زندهٔ جهان و بیت‌کوین']]});
+Object.assign(I.ckb,{tdT:'ئەمڕۆ بۆ تۆ',tdL:'لەو شوێنەی بوویت بەردەوام بە، هەنگاوی داهاتووت ببینە و هەموو ڕۆژێک بەشێکی نوێی ماڵپەڕەکە بدۆزەوە.',
+ hCont:'بەردەوامبوون',hNext:'هەنگاوی داهاتوو',hDisc:'دۆزینەوەی ئەمڕۆ',hMap:'نەخشەی گەڕانی تۆ',hGo:'بڕۆ',hOpen:'ببینە',hStart:'دەست پێبکە',
+ hAcad:'ئەکادیمیا',hAcadNo:'هێشتا هیچ وانەیەکت دەست پێنەکردووە. لە ئاستی سەرەتاوە دەست پێبکە.',hAcadOn:(xp,n)=>`${n} وانەی دەستپێکراو · ${xp} خاڵی ئەزموون`,
+ hEnc:'ئەکادیمیای ئینسایکلۆپیدیا',hEncOn:n=>`${n} بابەتی خوێندراو`,hEncNo:'فلاشکارت و تاقیکردنەوە بە ١٠٩ بابەتی سێ‌زمانە',
+ hLast:'دوایین پەڕە کە بینیت',hNextAll:'هەموو نیشانەکانت وەرگرتووە. دەستخۆش!',hNeed:(a,b)=>`${a} لە ${b}`,hStreakTip:'تەنها بەسە سبەینێش سەر بدەیت.',
+ hMover:(c,x)=>`${c} لە ٢٤ کاتژمێردا ${x}`,hFng:v=>`پێوەری ترس و تەماع: ${v}`,hDiscMore:'ڕووداوە نائاساییەکانی ئەمڕۆ، ئەرکەکان و کەشوهەوای کۆینەکان',
+ hSeen:(a,b)=>`${a} لە ${b} بەشی ماڵپەڕەکەت بینیوە`,hPick:'پێشنیاری ئەمڕۆ',hNew:'هێشتا نەتبینیوە',
+ F:[['/academy/','🎓','ئەکادیمیا','وانە بە وانە لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە'],['/encyclopedia/','📚','ئینسایکلۆپیدیا','١٠٩ زاراوەی دارایی بە سێ زمان'],
+  ['/lab/','🧪','تاقیگە','دۆزینەوەی ڕۆژانە، ئەرکەکان و DNAی بازرگانی'],['/terminal/','🤖','تێرمیناڵی زیرەک','پرسیار لەبارەی بازاڕ بکە'],
+  ['/market/','📈','بازاڕی زیندوو','فرەچارت، ئامرازی کێشان و ئاگادارکەرەوەی نرخ'],['/charts/','🔭','چاودێرگە','دێریڤاتیڤ، فاندینگ و ئۆنچەین'],
+  ['/heatmap/','🗺','نەخشەی گەرمی','هەموو بازاڕ لە یەک وێنەی سێ‌ڕەهەندیدا'],['/bubbles/','🫧','بڵقەکانی بازاڕ','کۆینەکان وەک بڵقی زیندوو'],
+  ['/money-flow/','💧','ڕەوتی پارە','پارە لە کوێوە بۆ کوێ دەچێت'],['/liquidity/','🌊','شلی','دەفتەری داواکاریی زیندوو'],
+  ['/dna/','🧬','DNAی بازاڕ','کەسایەتیی هەر کۆینێک لە چەند ژمارەیەکدا'],['/calendar/','📅','ڕۆژژمێری ئابووری','ڕووداوەکان و ئەگەرەکانی فێد'],
+  ['/etf/','🏦','ڕەوتی ETF','هاتن و ڕۆیشتنی ڕۆژانەی ETFەکان'],['/unlocks/','🔓','ئەنلۆکی تۆکن','کام تۆکن بەم زووانە ئازاد دەبێت'],
+  ['/tools/','🧮','ئامرازەکانی بازرگان','قەبارەی پۆزیشن، مەترسی و بەراوردی کۆین'],['/studio/','💻','ستۆدیۆی پاین','کۆدی پاین بنووسە و باکتێستی زیندوو بکە'],
+  ['/indicators/','📐','ئیندیکاتۆرەکان','ئیندیکاتۆرە تایبەتەکانی Coin_Kurd'],['/battle/','⚔️','شەڕی من','بیتکۆینی زیندوو وەک بەرەیەکی سێ‌ڕەهەندی'],
+  ['/bitcoin/','₿','تێگەیشتن لە بیتکۆین','هاڤینگ، ٢١ ملیۆن و داهاتووی پارە'],['/world/','🌍','جیهانی زیندوو','ژمێرەرە زیندووەکانی جیهان']]});
+Object.assign(I.en,{tdT:'Today for you',tdL:'Pick up where you left off, see your next step, and discover a new part of the site every day.',
+ hCont:'Keep going',hNext:'Your next step',hDisc:"Today's discovery",hMap:'Your exploration map',hGo:'Go',hOpen:'Open',hStart:'Start',
+ hAcad:'Academy',hAcadNo:'No lesson started yet. Begin at the beginner level.',hAcadOn:(xp,n)=>`${n} lessons started · ${xp} XP`,
+ hEnc:'Encyclopedia academy',hEncOn:n=>`${n} entries read`,hEncNo:'Flashcards and quizzes over 109 trilingual entries',
+ hLast:'The last page you viewed',hNextAll:'You have every badge. Well done!',hNeed:(a,b)=>`${a} of ${b}`,hStreakTip:'Just come back tomorrow.',
+ hMover:(c,x)=>`${c} moved ${x} in 24h`,hFng:v=>`Fear & Greed: ${v}`,hDiscMore:"Today's unusual events, missions and coin weather",
+ hSeen:(a,b)=>`You have explored ${a} of ${b} parts of the site`,hPick:"Today's pick",hNew:'Not seen yet',
+ F:[['/academy/','🎓','Academy','Lesson by lesson from zero to pro, with quizzes and smart review'],['/encyclopedia/','📚','Encyclopedia','109 financial terms in three languages'],
+  ['/lab/','🧪','Lab','Daily discovery, missions, predictions and trader DNA'],['/terminal/','🤖','Smart terminal','Ask Entekhab about the market'],
+  ['/market/','📈','Live market','Multi-chart, drawing tools and price alerts'],['/charts/','🔭','Observatory','Derivatives, funding and on-chain at a glance'],
+  ['/heatmap/','🗺','Heatmap','The whole market in one 3D picture'],['/bubbles/','🫧','Market bubbles','Coins as live bubbles'],
+  ['/money-flow/','💧','Money flow','Where money is moving'],['/liquidity/','🌊','Liquidity','Live order book and walls'],
+  ['/dna/','🧬','Market DNA','Each coin’s character in a few numbers'],['/calendar/','📅','Economic calendar','Events and Fed odds'],
+  ['/etf/','🏦','ETF flows','Daily Bitcoin and Ether ETF flows'],['/unlocks/','🔓','Token unlocks','Which tokens unlock soon'],
+  ['/tools/','🧮','Trader tools','Position size, risk and coin comparison'],['/studio/','💻','Pine Studio','Write Pine and back-test it live'],
+  ['/indicators/','📐','Indicators','Coin_Kurd’s own indicators'],['/battle/','⚔️','My battle','Live Bitcoin as a 3D front line'],
+  ['/bitcoin/','₿','Understanding Bitcoin','Halving, 21 million and the future of money'],['/world/','🌍','Live world','Live counters of the world and Bitcoin']]});
+I.ckb.hTo=I.en.hTo=I.fa.hTo;I.fa.hArr=I.ckb.hArr='←';I.en.hArr='→';
+function hubLang(){return lang==='ckb'||lang==='en'?lang:'fa'}
+function hubProg(){const ar=ls.get('ek_arena',{calls:[]}),gs=ls.get('ek_guess',{h:0,n:0}),ms=ls.get('ek_miss',{pts:0}),pg=ls.get('ek_pages',[]),st=streak();
+ const tools=pg.filter(p=>/^\/(lab|dna|terminal|me|dashboard|replay)\//.test(p)).length,hits=(ar.calls||[]).filter(c=>c.res===1).length;
+ return {first:[tools,3],streak3:[st,3],streak7:[st,7],sharp:[hits,5],chart:[gs.h||0,10],explorer:[ms.pts||0,50],dna:[pg.some(p=>p.startsWith('/dna/'))?1:0,1],
+  research:[ls.get('ek_notes',[]).length,5],risk:[ls.get('ek_port',[]).length,3],curious:[ls.get('ek_asks',[]).length,10],alert:[ls.get('ek_alerts',[]).length,1],trader:[ls.get('ek_dna',null)?1:0,1]}}
+function hubBar(a,b){const p=Math.max(0,Math.min(100,Math.round(a*100/b)));return `<div class="hb-bar" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div>`}
+function renderHub(){const el=$('#hub');if(!el)return;const lg=hubLang(),P=hubProg(),Bs=T('B'),TO=T('hTo'),pg=ls.get('ek_pages',[]);
+ // keep going: the academy, the encyclopedia's academy, the last page
+ const A=ls.get('ek_academy',null),aN=A&&A.L?Object.keys(A.L).length:0;let ep=null;try{ep=JSON.parse(localStorage.getItem('enc:prog')||'null')}catch(e){}
+ const eN=ep&&ep.seen?Object.keys(ep.seen).length:0,rec=(ls.get('ek_recent',[])||[]).find(x=>x&&x.p&&!/^\/me\//.test(x.p));
+ const cont=`<a class="hb-row" href="${aN?'/academy/me/':'/academy/'}"><span class="hb-ic">🎓</span><span><b>${T('hAcad')}</b><small>${aN?T('hAcadOn')(A.xp||0,aN):T('hAcadNo')}</small></span><em>${aN?T('hGo'):T('hStart')}</em></a>`
+  +`<a class="hb-row" href="/encyclopedia/#/${lg}/academy"><span class="hb-ic">📚</span><span><b>${T('hEnc')}</b><small>${eN?T('hEncOn')(eN):T('hEncNo')}</small></span><em>${eN?T('hGo'):T('hStart')}</em></a>`
+  +(rec?`<a class="hb-row" href="${esc(su(rec.p))}"><span class="hb-ic">↩</span><span><b>${T('hLast')}</b><small>${esc(rec.t||rec.p)}</small></span><em>${T('hOpen')}</em></a>`:'');
+ // next step: the unearned badge closest to done
+ const todo=Bs.filter(b=>P[b[0]]&&P[b[0]][0]<P[b[0]][1]).sort((x,y)=>(P[y[0]][0]/P[y[0]][1])-(P[x[0]][0]/P[x[0]][1]));const nb=todo[0];
+ const next=nb?`<div class="hb-nb"><span class="hb-big">${nb[1]}</span><div><b>${esc(nb[2])}</b><small>${esc(nb[3])}</small>${hubBar(...P[nb[0]])}<small class="num">${T('hNeed')(Math.min(...P[nb[0]]),P[nb[0]][1])}</small></div></div>`
+  +(TO[nb[0]]?`<a class="btn p hb-go" href="${TO[nb[0]]}">${T('hGo')} ${T('hArr')}</a>`:`<p class="disc">${T('hStreakTip')}</p>`)
+  +todo.slice(1,3).map(b=>`<a class="hb-mini" href="${TO[b[0]]||'#'}">${b[1]} ${esc(b[2])} <small class="num">${T('hNeed')(Math.min(...P[b[0]]),P[b[0]][1])}</small></a>`).join(''):`<p>${T('hNextAll')}</p>`;
+ // today's discovery: the day's biggest real move and the market's mood, from the same data the site shows
+ let disc='';const cs=(M&&M.coins||[]).filter(c=>typeof c.chg24==='number'&&c.vol24>5e6);if(cs.length){const mv=cs.slice().sort((a,b)=>Math.abs(b.chg24)-Math.abs(a.chg24))[0],x=(mv.chg24>0?'+':'')+mv.chg24.toFixed(1)+'%';
+  disc=`<a class="hb-row" href="/heatmap/"><span class="hb-ic">${logoTag(mv.coin,22)||'⚡'}</span><span><b class="${mv.chg24>0?'pos':'neg'}">${esc(T('hMover')(mv.coin,x))}</b><small>RSI ${Math.round(mv.rsi||0)}</small></span><em>${T('hOpen')}</em></a>`}
+ if(M&&M.fng)disc+=`<div class="hb-row hb-flat"><span class="hb-ic">🌡</span><span><b>${T('hFng')(M.fng.value)}</b><small>${esc(M.fng.class||'')}</small></span></div>`;
+ disc+=`<a class="hb-row" href="/lab/#discS"><span class="hb-ic">🧪</span><span><b>${T('hDisc')}</b><small>${T('hDiscMore')}</small></span><em>${T('hOpen')}</em></a>`;
+ // exploration map: every part of the site, the ones already seen lit, one unseen pick for today
+ const F=T('F'),seen=f=>pg.some(p=>p.startsWith(f[0])),uns=F.filter(f=>!seen(f)),day=Math.floor(Date.now()/864e5),pick=uns.length?uns[day%uns.length]:F[day%F.length],nS=F.length-uns.length;
+ const map=`<a class="hb-pick" href="${pick[0]}"><span class="hb-big">${pick[1]}</span><span><small>${T('hPick')}${seen(pick)?'':' · '+T('hNew')}</small><b>${esc(pick[2])}</b><small>${esc(pick[3])}</small></span><em>${T('hOpen')} ${T('hArr')}</em></a>`
+  +`<p class="disc num" style="margin:10px 0 6px">${T('hSeen')(nS,F.length)}</p>${hubBar(nS,F.length)}`
+  +`<div class="hb-map">${F.map(f=>`<a class="hb-f${seen(f)?' on':''}" href="${f[0]}" title="${esc(f[3])}"><span>${f[1]}</span>${esc(f[2])}</a>`).join('')}</div>`;
+ el.innerHTML=`<div class="card"><h3>${T('hCont')}</h3>${cont}</div><div class="card"><h3>${T('hNext')}</h3>${next}</div><div class="card"><h3>${T('hDisc')}</h3>${disc}</div><div class="card hb-wide"><h3>${T('hMap')}</h3>${map}</div>`;
+ // the skill tree and the badges lead to where each one is earned
+ const nm=Object.fromEntries(Bs.map(b=>[b[0],b]));
+ $('#tree').innerHTML=T('TR').map(([t,ids])=>`<div class="br"><h4>${t}</h4>${ids.map((id,k)=>{const p=P[id],on=p&&p[0]>=p[1],h=TO[id];return `<${h?`a href="${h}"`:'div'} class="nd ${on?'on':''}" title="${esc(nm[id][3])}">${k?'↳ ':''}${nm[id][1]} ${esc(nm[id][2])}<small class="num">${on?'✓':T('hNeed')(Math.min(...p),p[1])}</small></${h?'a':'div'}>`}).join('')}</div>`).join('');
+ $('#badges').innerHTML=Bs.map(([id,ic,n,d])=>{const p=P[id],on=p&&p[0]>=p[1],h=TO[id];return `<${h?`a href="${h}"`:'div'} class="bd ${on?'':'off'}"><span>${ic}</span><b>${esc(n)}</b><div class="disc" style="margin:2px 0 0">${esc(d)}</div>${on?'':hubBar(...p)}</${h?'a':'div'}>`}).join('')}
+</script>
+<script src="/assets/chrome.js?v=27" defer></script><script src="/assets/i18n.js?v=8" defer></script><script src="/assets/account/config.js?v=2" defer></script><script src="/assets/account/merge.js?v=2" defer></script><script src="/assets/account/i18n.js?v=3" defer></script><script src="/assets/account/sync.js?v=2" defer></script><script src="/assets/account/account.js?v=3" defer></script></body>
 </html>

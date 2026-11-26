@@ -32,6 +32,38 @@
     for (var i = 0; i < ls.length; i++) { var k = ls.key(i); if (M.syncable(k)) out.push(k); }
     return out;
   }
+  /* Parts of the site that keep their data under their own names (the encyclopedia's academy: 'enc:prog', 'enc:hist'…)
+     travel inside one syncable key, as parsed values so a first join merges them field by field, and the account
+     service needs no change. pack() before each sync folds them in;
+     unpack() after one brings the account's copy back out. An empty set never overwrites a saved one. */
+  var GROUPS = [{ re: /^enc:/, pre: 'enc:', key: 'ek_enc' }];
+  function pack() {
+    GROUPS.forEach(function (g) {
+      var o = {}, n = 0;
+      for (var i = 0; i < ls.length; i++) { var k = ls.key(i); if (g.re.test(k)) { var raw = ls.getItem(k), x; try { x = JSON.parse(raw); } catch (e) { x = { _raw: raw }; } o[k.slice(g.pre.length)] = x; n++; } }
+      if (!n) return;
+      var v = M.stable(o);
+      if (v.length <= M.MAX_VALUE && ls.getItem(g.key) !== v) { try { rawSet.call(ls, g.key, v); } catch (e) { } }
+    });
+  }
+  function unpack(changed) {
+    GROUPS.forEach(function (g) {
+      if (changed.indexOf(g.key) < 0) return;
+      var o; try { o = JSON.parse(ls.getItem(g.key) || 'null'); } catch (e) { return; }
+      if (!o || typeof o !== 'object' || Array.isArray(o) || !Object.keys(o).length) return;
+      Object.keys(o).forEach(function (k) {
+        if (!/^[A-Za-z0-9_.:-]{1,60}$/.test(k)) return;
+        var x = o[k], v = x && typeof x === 'object' && typeof x._raw === 'string' ? x._raw : JSON.stringify(x);
+        if (ls.getItem(g.pre + k) !== v && M.stable(safe(ls.getItem(g.pre + k))) !== M.stable(x)) setLocal(g.pre + k, v);
+      });
+      var gone = [];
+      for (var i = 0; i < ls.length; i++) { var k = ls.key(i); if (g.re.test(k) && !(k.slice(g.pre.length) in o)) gone.push(k); }
+      gone.forEach(function (k) { setLocal(k, null); });
+    });
+  }
+  function safe(v) { try { return JSON.parse(v); } catch (e) { return { _raw: v }; } }
+  function grouped(k) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].re.test(k)) return true; return false; }
+
   function setLocal(k, v) { try { if (v == null) rawDel.call(ls, k); else rawSet.call(ls, k, v); return true; } catch (e) { return false; } }
 
   // local changes since the last sync, found by comparing fingerprints (catches every way a page writes storage)
@@ -136,12 +168,14 @@
     if (busy) { again = true; return Promise.resolve(null); }
     busy = true;
     s.fp = s.fp || {}; s.t = s.t || {}; s.lt = s.lt || {}; s.lf = s.lf || {}; delete s.err;
+    pack();
     var work = !s.joined
       ? join(s).then(function (changed) { return { first: true, changed: changed }; })
       : (changes(s), pull(s, s.rev || 0)).then(function (p) {        // note local edits first, so a pull never overwrites a newer one
           return push(s, changes(s), opts.keepalive).then(function (stale) { return { changed: p.changed.concat(stale) }; });
         });
     return work.then(function (res) {
+      unpack(res.changed);
       s.at = Date.now(); lastErr = s.err || null;      // a full storage is noted, the rest synced
       if (getState()) putState(s);           // not signed out meanwhile
       emit('ek:sync', res);
@@ -190,7 +224,7 @@
   }
 
   // notice the site's own writes (any page) and sync a few seconds later
-  function touched(k) { if (M.syncable(k) && getState()) schedule(4000); }
+  function touched(k) { if ((M.syncable(k) || grouped(k)) && getState()) schedule(4000); }
   P.setItem = function (k, v) { var r = rawSet.apply(this, arguments); if (this === ls) touched(k); return r; };
   P.removeItem = function (k) { var r = rawDel.apply(this, arguments); if (this === ls) touched(k); return r; };
 

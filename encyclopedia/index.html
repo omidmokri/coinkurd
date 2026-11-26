@@ -87,6 +87,8 @@
 <noscript><div class="wrap" style="padding:20px"><div class="notice">این دانشنامه برای جستجو و نمایش سه‌زبانه به جاوااسکریپت نیاز دارد. دادهٔ کامل مدخل‌ها به‌صورت باز در فایل <code>terms.json</code> و فراداده در <code>meta.json</code> در همین پوشه در دسترس است.</div></div></noscript>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" integrity="sha512-LQNxIMR5rXv7o+b1l8+N1EZMfhG7iFZ9HhnbJkTp4zjNr5Wvst75AqUeFDxeRUa7l5vEDV6YvbpSIrFcSpY3Aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="app.js?v=2"></script>
+<script src="app.js?v=3"></script>
+<script>/* the optional account: a visitor who signed in (in «فضای من») gets their academy progress here synced too */
+try{if(/"on":1/.test(localStorage.getItem('ek_sync')||'')){['config','merge','sync'].forEach(function(n){var s=document.createElement('script');s.src='/assets/account/'+n+'.js?v=2';s.async=false;document.body.appendChild(s)})}}catch(e){}</script>
 <script src="/assets/ar.js?v=3" defer></script></body>
 </html>
