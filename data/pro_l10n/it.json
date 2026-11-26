@@ -1389,6 +1389,10 @@
 "16db4a6d5c",
 "Futures trimestrali, continui"
 ],
+"fx2Note": [
+"15ebd3b4a9",
+"Una valuta contro un'altra, dai tassi di riferimento giornalieri del sito (Banca Centrale Europea e il dataset exchange-api dove la ECB non quota una valuta). Un valore al giorno, quindi una barra giornaliera è un singolo punto e le barre settimanali e mensili sono costruite dai giorni al loro interno. Tassi di riferimento pubblicati una volta al giorno, non dati tick di un broker: non c'è forex intraday qui. Le coppie in Dollari iniziano il 2 marzo 2024, le coppie tra due valute ECB nel 2017."
+],
 "g_arrows": [
 "0cf604cb00",
 "Frecce"
@@ -3161,6 +3165,10 @@
 "077fe9c54e",
 "Base"
 ],
+"p_bbl": [
+"3541c5f4e1",
+"Lunghezza banda"
+],
 "p_bw": [
 "1d06cbba91",
 "Larghezza di banda"
@@ -4473,9 +4481,77 @@
 "8580e3175f",
 "Ellisse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Commento"
+],
+"t_cross": [
+"983bdb7b27",
+"Croce"
+],
 "t_cursor": [
 "2239943c8d",
 "Cursore"
+],
+"t_curve": [
+"916f09aff8",
+"Curva"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Linee cicliche"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Pattern Cypher"
+],
+"t_dcurve": [
+"faef75cb57",
+"Doppia curva"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Canale disgiunto"
+],
+"t_dot": [
+"46856bf702",
+"Punto"
+],
+"t_drange": [
+"c65ea4ae01",
+"Intervallo date"
+],
+"t_drives": [
+"3a261ca869",
+"Pattern Three drives"
+],
+"t_emoji": [
+"707fd71017",
+"Icone ed emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Gomma"
+],
+"t_ewcor": [
+"a819268f2f",
+"Onda correttiva di Elliott (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Onda doppia combinata di Elliott (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Onda impulsiva di Elliott (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Onda triangolare di Elliott (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Onda tripla combinata di Elliott (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -4485,13 +4561,69 @@
 "18c530863b",
 "Ritracciamento di Fibonacci"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Archi di resistenza di velocità di Fib"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Canale di Fib"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Cerchi di Fib"
+],
 "t_fibext": [
 "73655be9d6",
 "Estensione di Fibonacci basata sul trend"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Ventaglio di resistenza di velocità di Fib"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Spirale di Fib"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Tempo di Fib basato sul trend"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fuso orario di Fib"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Cuneo di Fib"
+],
+"t_flag": [
+"23d91e7740",
+"Segnalibro"
+],
+"t_flat": [
+"52d3db252e",
+"Top/bottom piatto"
+],
+"t_forecast": [
+"528bc4bc38",
+"Previsione"
+],
 "t_gann": [
 "ba563cbfc5",
 "Ventaglio di Gann"
+],
+"t_gannbox": [
+"58a3842138",
+"Box di Gann"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Quadrato di Gann"
+],
+"t_hl": [
+"8cb3f79b49",
+"Evidenziatore"
 ],
 "t_hline": [
 "6f471f8257",
@@ -4501,6 +4633,18 @@
 "0bcbc4e087",
 "Raggio orizzontale"
 ],
+"t_hs": [
+"43353dbcec",
+"Testa e spalle"
+],
+"t_info": [
+"a690e33098",
+"Linea informativa"
+],
+"t_inside": [
+"30d6b425dc",
+"Pitchfork interna"
+],
 "t_long": [
 "666f195fc4",
 "Posizione Long"
@@ -4509,9 +4653,45 @@
 "2bedd64d85",
 "Range di prezzo / misura"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Pitchfork di Schiff modificata"
+],
+"t_note": [
+"2c924e3088",
+"Nota"
+],
+"t_path": [
+"519e39132b",
+"Percorso"
+],
 "t_pitch": [
 "29135fd404",
 "Forcone di Andrews"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Etichetta prezzo"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Nota prezzo"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polilinea"
+],
+"t_prange": [
+"c20f7ce09a",
+"Intervallo prezzo"
+],
+"t_proj": [
+"8aa49fe840",
+"Proiezione"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -4521,9 +4701,33 @@
 "c158695a64",
 "Rettangolo"
 ],
+"t_regress": [
+"bb57f2c725",
+"Trend di regressione"
+],
+"t_rrect": [
+"65807afaf7",
+"Rettangolo ruotato"
+],
+"t_schiff": [
+"c4c1201685",
+"Pitchfork di Schiff"
+],
 "t_short": [
 "a8daf74669",
 "Posizione Short"
+],
+"t_signpost": [
+"89f361362e",
+"Segnale"
+],
+"t_sine": [
+"3852fedc7e",
+"Linea sinusoidale"
+],
+"t_tcycle": [
+"521a687246",
+"Cicli temporali"
 ],
 "t_text": [
 "c3328c39b0",
@@ -4533,9 +4737,29 @@
 "e810388344",
 "Trend line"
 ],
+"t_tri": [
+"32547b031d",
+"Pattern triangolo"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangolo"
+],
 "t_vline": [
 "a790288017",
 "Linea verticale"
+],
+"t_vrp": [
+"bcba420b37",
+"Volume profile a intervallo fisso"
+],
+"t_xabcd": [
+"ae78e60931",
+"Pattern XABCD"
+],
+"t_zoom": [
+"4fc05f2763",
+"Ingrandisci"
 ],
 "target": [
 "61ad50a9b9",
@@ -4585,6 +4809,26 @@
 "ad88cbfa09",
 "Anche su Telegram (il bot osserva anche quando questa pagina è chiusa)"
 ],
+"thDark": [
+"ae1ef01432",
+"Scuro"
+],
+"thLight": [
+"a36ef8aba2",
+"Chiaro"
+],
+"thMid": [
+"4fe978738d",
+"Blu mezzanotte"
+],
+"thNavy": [
+"0229e960cf",
+"Blu navy"
+],
+"thPaper": [
+"22d507f2ba",
+"Carta"
+],
 "time": [
 "6c82e6dd86",
 "Ora"
@@ -4608,6 +4852,10 @@
 "tooFar": [
 "b29db0358a",
 "È più indietro di quanto questo timeframe possa caricare; scegli un timeframe più ampio."
+],
+"toolHint": [
+"56e62363ce",
+"clicca sul grafico per disegnare"
 ],
 "topFixed": [
 "1a66879287",
@@ -4833,6 +5081,34 @@
 "1526a17ee7",
 "Sblocca"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Tutti i disegni sono sbloccati"
+],
+"vDay": [
+"f6bb0f468a",
+"Giorni"
+],
+"vHour": [
+"9e25a34e63",
+"Ore"
+],
+"vMin": [
+"092f99ea11",
+"Minuti"
+],
+"vMonth": [
+"200dcdce9b",
+"Mesi"
+],
+"vSec": [
+"5fb1db5278",
+"Secondi"
+],
+"vWeek": [
+"7d75266a53",
+"Settimane"
+],
 "value": [
 "3e8248e32e",
 "Prezzo"
@@ -4840,6 +5116,10 @@
 "valuePct": [
 "bf55390d8d",
 "Percentuale (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -4884,40 +5164,44 @@
 "yourRate": [
 "ca14282aa6",
 "il tuo tasso"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Rimpicciolisci"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Trascina un riquadro più ampio per ingrandire."
 ]
 },
 "f": {
-"fx2Note": [
-"15ebd3b4a9",
-2
-],
 "in_cp_pierce": [
 "de9e3d4b02",
-1
+2
 ],
 "in_cvd": [
 "fbd0df870e",
-1
+2
 ],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_srlux": [
 "50cfe9a1d5",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "in_vpvr": [
 "f757c4a16d",
-1
+2
 ]
 }
 }

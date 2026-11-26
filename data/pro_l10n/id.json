@@ -2081,6 +2081,10 @@
 "96c9e76dba",
 "Williams Alligator: rahang, gigi, dan bibir digambarkan di depan"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · Garis tren ATR yang diarahkan oleh MFI (RSI tanpa volume)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 dikurangi SMA 34 dari titik tengah"
@@ -2092,6 +2096,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Average true range (volatilitas)"
+],
+"ind_atrts": [
+"8223831420",
+"Stop-loss yang mengikuti dengan k·ATR dan membalikkan arah"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -2117,6 +2125,10 @@
 "a50928c16b",
 "Commodity channel index"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · Exit ATR yang digantung dari harga penutupan tertinggi/terendah"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Pasar tren (rendah) atau sideways (tinggi)"
@@ -2137,9 +2149,61 @@
 "bf330f58dd",
 "Momentum jangka panjang: WMA dari dua tingkat perubahan"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Menandai setiap pola di bawah ini pada bar"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Harga pembukaan dan penutupan hampir sama (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bullish (BE) dan bearish (SE) engulfing"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Shadow bawah panjang setelah penurunan (H) atau kenaikan (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Body kecil di dalam body besar sebelumnya (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Bar yang sepenuhnya berada di dalam bar sebelumnya (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Body besar tanpa shadow (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Pembalikan tiga-bar: MS bullish, ES bearish"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gap dan penutupan melampaui tengah bar sebelumnya (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tiga bar kuat berturut-turut (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Shadow atas panjang setelah kenaikan (SS) atau penurunan (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dua bar dengan high (TT) atau low (TB) yang sama"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, streak RSI, dan persen rank digabungkan"
+],
+"ind_cvd": [
+"690d30a274",
+"Jumlah berjalan dari volume delta: siapa yang memegang kendali"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -2157,6 +2221,10 @@
 "c499047c5b",
 "Exponential moving average"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · dua cloud EMA, cepat dan lambat"
+],
 "ind_env": [
 "e2cf023f50",
 "Moving average dengan band pada % tetap"
@@ -2165,17 +2233,41 @@
 "d648aafe8d",
 "Seberapa mudah harga bergerak per unit volume"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Dua swing pada harga yang hampir sama: likuiditas yang tertahan"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Mengubah harga menjadi distribusi mendekati normal"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Volume beli × jual dan delta tertulis di bawah setiap candle; perbesar untuk membaca. Per candle, bukan per level harga"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fractals: titik tertinggi dan terendah lokal"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Gap tiga-candle; setiap kotak berakhir di mana harga mengisinya"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Enam EMA pendek dan enam EMA panjang: trader melawan investor"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · garis tren bertingkat yang hanya berbalik pada pematahan swing nyata"
+],
 "ind_hma": [
 "709351f832",
 "Hull moving average: cepat dan halus"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA yang diwarnai berdasarkan kemiringannya"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -2188,6 +2280,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic dengan garis J (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (open source, MPL-2.0) · rezim makro di balik candle, sinyalnya, dan dasbor, dari data FRED"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (open source) · Nilai wajar Bitcoin 8.31e-17·days^5.48 dengan pita ±10 % dan zona beli; untuk BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (open source) · Fase siklus Bitcoin dari MVRV, NUPL, dan proksi SOPR: Extreme Bear, Bear, Early Bull, Bull, Overheated; garis abu-abu adalah harga yang dinormalisasi"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (open source) · Seluruh sejarah Bitcoin pada spiral logaritmik, satu putaran per siklus halving, dengan puncak, dasar, halving, dan saat ini"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -2225,9 +2337,21 @@
 "d6640bbc39",
 "Harga sekarang dikurangi harga n batang yang lalu"
 ],
+"ind_ms": [
+"13fc87db00",
+"Pematahan swing terakhir yang terkonfirmasi: BOS searah tren, CHoCH melawan tren"
+],
 "ind_news": [
 "a95010ef34",
 "Berita tentang koin ini, ditandai saat diterbitkan (berita situs ini dari hari terakhir)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · harga yang dihaluskan kernel dengan envelope mean-error; bentuk non-repainting"
+],
+"ind_ob": [
+"530cdc224f",
+"Candle berlawanan terakhir sebelum pematahan struktur, sampai harga ditutup melewatinya"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -2252,6 +2376,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volume ditambahkan sebanding dengan % perubahan"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · RSI yang dihaluskan dengan garis trailing volatilitas (inti QQE MOD)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · memfilter noise yang lebih kecil dari rata-rata rentang yang dihaluskan"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -2285,17 +2417,45 @@
 "26db009730",
 "Simple moving average"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Penutupan terhadap tengah rentang, dihaluskan dua kali"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger di dalam Keltner = squeeze (titik merah); histogram menunjukkan ke arah mana harga menembus"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · pivot high dan low terakhir sebagai level"
+],
 "ind_srsi": [
 "479deb7dbf",
 "Stochastic dari RSI"
+],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · moving average dari high dan low yang bertukar tempat saat tren berbalik"
 ],
 "ind_st": [
 "8d66b52001",
 "Garis trailing ATR yang berbalik arah mengikuti tren"
 ],
+"ind_stc": [
+"29439e9c85",
+"MACD dijalankan dua kali melalui stochastic: pembalikan tren awal (25/75)"
+],
 "ind_stoch": [
 "87477b0f85",
 "%K dan %D, 0–100"
+],
+"ind_tdi": [
+"03d1464e0d",
+"RSI dengan pita volatilitasnya, satu garis cepat dan satu garis lambat"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Berapa banyak candle yang diperdagangkan pada setiap harga, per hari"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -2309,6 +2469,18 @@
 "182e4a763e",
 "Tekanan beli selama tiga periode"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR trailing stop; harga yang menembusnya adalah sinyal beli/jual"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Volume beli dikurangi volume jual setiap candle (data taker dari Binance; estimasi di tempat lain)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · VIX sintetis untuk pasar apa pun; lonjakan di atas pita sering menandai dasar kepanikan"
+],
 "ind_vo": [
 "a99f6a0038",
 "Rata-rata volume cepat vs lambat (%)"
@@ -2321,9 +2493,21 @@
 "6badda8c94",
 "Pergerakan tren positif dan negatif (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Satu volume profile per hari (per bulan pada bar harian)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volume pada setiap harga untuk bar di layar, dengan POC dan value area"
+],
 "ind_vwap": [
 "6d86714413",
 "Volume-weighted average price, disetel ulang pada 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"VWAP harian dengan pita ±1σ dan ±k·σ"
 ],
 "ind_willr": [
 "1859838f88",
@@ -2332,6 +2516,10 @@
 "ind_wma": [
 "b08be7d4d3",
 "Weighted moving average"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · osilator indeks saluran; persilangan di atas 53/60 dan di bawah −53/−60 menandai pergerakan yang jenuh"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -4945,259 +5133,71 @@
 "f": {
 "in_cp_pierce": [
 "de9e3d4b02",
-1
+2
 ],
 "in_cp_soldiers": [
 "32c51f18a5",
-1
+2
 ],
 "in_cp_star": [
 "f1940a30a1",
-1
+2
 ],
 "in_cvd": [
 "fbd0df870e",
-1
+2
 ],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_ms": [
 "14c6c6c316",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_srlux": [
 "50cfe9a1d5",
-1
+2
 ],
 "in_tpo": [
 "cd41be0fc7",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "in_vpvr": [
 "f757c4a16d",
-1
+2
 ],
 "ind_alma": [
 "0f70916dbb",
 3
 ],
-"ind_alpha": [
-"a1b106dbe0",
-1
-],
-"ind_atrts": [
-"8223831420",
-1
-],
-"ind_ce": [
-"eb9529e97b",
-1
-],
-"ind_cp_all": [
-"9273e33e88",
-1
-],
-"ind_cp_doji": [
-"80ff1c526e",
-1
-],
-"ind_cp_engulf": [
-"838b5e0794",
-1
-],
-"ind_cp_hammer": [
-"2233604708",
-1
-],
-"ind_cp_harami": [
-"7fc3e9a5e0",
-1
-],
-"ind_cp_inside": [
-"7375801c53",
-1
-],
-"ind_cp_maru": [
-"0864a92a99",
-1
-],
-"ind_cp_mstar": [
-"b611b84eab",
-1
-],
-"ind_cp_pierce": [
-"375a6d3e2b",
-1
-],
-"ind_cp_soldiers": [
-"b1a55fae64",
-1
-],
-"ind_cp_star": [
-"f1d238e6b1",
-1
-],
-"ind_cp_tweezer": [
-"78a03d0fb2",
-1
-],
-"ind_cvd": [
-"690d30a274",
-1
-],
 "ind_dema": [
 "2d6077f26d",
 3
-],
-"ind_emacloud": [
-"82454f4531",
-1
-],
-"ind_eqhl": [
-"7911f35044",
-1
-],
-"ind_fpbar": [
-"72df84d4bf",
-1
-],
-"ind_fvg": [
-"be42490ea0",
-1
-],
-"ind_gmma": [
-"bfeaafeca6",
-1
-],
-"ind_halft": [
-"09f45602f1",
-1
-],
-"ind_hull": [
-"4463208ec7",
-1
-],
-"ind_kdj": [
-"77ec2cdedc",
-1
-],
-"ind_kmacro": [
-"ca07959e1c",
-1
-],
-"ind_kpl": [
-"3d570e5254",
-1
-],
-"ind_ksc": [
-"6fedf8b4e9",
-1
-],
-"ind_kspiral": [
-"899a8ea3ae",
-1
-],
-"ind_ms": [
-"13fc87db00",
-1
-],
-"ind_nwe": [
-"e52da4c085",
-1
-],
-"ind_ob": [
-"530cdc224f",
-1
-],
-"ind_qqe": [
-"3c5e11ebed",
-1
-],
-"ind_rf": [
-"0bf4dbcc13",
-1
-],
-"ind_smi": [
-"ef8f7803b6",
-1
 ],
 "ind_smma": [
 "e59cc99c1d",
 3
 ],
-"ind_sqz": [
-"928bfb7046",
-1
-],
-"ind_srlux": [
-"93d0ceff44",
-1
-],
-"ind_ssl": [
-"6f7ed9b6c1",
-1
-],
-"ind_stc": [
-"29439e9c85",
-1
-],
-"ind_tdi": [
-"03d1464e0d",
-1
-],
 "ind_tema": [
 "1ff881355e",
 3
-],
-"ind_tpo": [
-"e1ee1b7549",
-1
-],
-"ind_ut": [
-"bde2d091af",
-1
-],
-"ind_vdelta": [
-"d8b588eda0",
-1
-],
-"ind_vixfix": [
-"101ce888f8",
-1
-],
-"ind_vpsess": [
-"a416aab998",
-1
-],
-"ind_vpvr": [
-"adf09232a6",
-1
-],
-"ind_vwapb": [
-"ff28e74ee1",
-1
 ],
 "ind_vwma": [
 "7526646bd7",
 3
 ],
-"ind_wt": [
-"d823a77eaa",
-1
-],
 "ind_zlsma": [
 "814b9eebab",
-1
+2
 ],
 "slTp": [
 "41d1998bce",
