@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-26T17:07:17.675182+00:00",
+ "updated_at": "2026-11-26T17:26:12.206805+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-25T17:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "ema_golden_cross": {
-   "n": 530,
-   "obs": -1.07,
-   "win": 41.1,
+   "n": 528,
+   "obs": -1.05,
+   "win": 41.3,
    "mid": -0.71,
    "lo": -1.68,
-   "hi": 0.04,
-   "p": 0.4963,
+   "hi": 0.03,
+   "p": 0.5168,
    "shifts": 1366,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6392,
-   "obs": 0.13,
-   "win": 50.2,
+   "n": 6378,
+   "obs": 0.14,
+   "win": 50.3,
    "mid": 0.01,
    "lo": -0.35,
    "hi": 0.27,
-   "p": 0.4019,
+   "p": 0.3836,
    "shifts": 1366,
    "verdict": "no_edge"
   },
@@ -67,35 +67,35 @@
    "verdict": "no_edge"
   },
   "volume_spike": {
-   "n": 1551,
-   "obs": -0.25,
-   "win": 45.0,
+   "n": 1544,
+   "obs": -0.24,
+   "win": 45.1,
    "mid": 0.16,
-   "lo": -0.59,
-   "hi": 0.99,
-   "p": 0.2606,
+   "lo": -0.58,
+   "hi": 0.97,
+   "p": 0.2709,
    "shifts": 1366,
    "verdict": "no_edge"
   },
   "ema_death_cross": {
-   "n": 565,
+   "n": 564,
    "obs": 1.27,
-   "win": 59.3,
-   "mid": 0.75,
+   "win": 59.4,
+   "mid": 0.74,
    "lo": -1.11,
    "hi": 2.03,
-   "p": 0.4517,
+   "p": 0.4436,
    "shifts": 1366,
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 591,
-   "obs": -0.76,
-   "win": 47.2,
+   "n": 590,
+   "obs": -0.75,
+   "win": 47.3,
    "mid": -0.8,
-   "lo": -2.03,
+   "lo": -2.02,
    "hi": 0.29,
-   "p": 0.9341,
+   "p": 0.9224,
    "shifts": 1366,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "no_edge"
   },
   "breakout_up": {
-   "n": 482,
-   "obs": -0.86,
-   "win": 37.1,
+   "n": 479,
+   "obs": -0.87,
+   "win": 37.2,
    "mid": -0.76,
-   "lo": -1.73,
-   "hi": 0.5,
-   "p": 0.8726,
+   "lo": -1.72,
+   "hi": 0.51,
+   "p": 0.8587,
    "shifts": 1366,
    "verdict": "no_edge"
   }
