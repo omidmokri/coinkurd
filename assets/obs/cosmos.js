@@ -228,7 +228,7 @@
   }
   function seg(id, items, cur) { return OB.ui.seg(id, items, cur, 'cz-seg'); }
   function tile(label, value, sub, tone, unit) {
-    return '<div class="cz-tile' + (tone ? ' ' + tone : '') + '"><small>' + esc(label) + '</small>' + (unit && value !== '—' ? '<b class="cz-uv"><span class="ob-n">' + esc(value) + '</span><em class="cz-u">' + esc(unit) + '</em></b>' : '<b class="ob-n">' + esc(value) + '</b>') + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i aria-hidden="true"></i></div>';
+    return '<div class="cz-tile' + (tone ? ' ' + tone : '') + '"><small>' + esc(label) + '</small>' + (unit && value !== '—' ? '<b class="cz-uv"><bdi class="ob-n">' + esc(value) + '</bdi><em class="cz-u">' + esc(unit) + '</em></b>' : '<b class="ob-n">' + esc(value) + '</b>') + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i aria-hidden="true"></i></div>';
   }
   var RANGES = ['1y', '2y', '4y', '8y', 'all'], RY = { '1y': 1, '2y': 2, '4y': 4, '8y': 8 };
   function window0(D, i1, range) { return range === 'all' ? 0 : Math.max(0, i1 - Math.round(RY[range] * 365.25)); }
