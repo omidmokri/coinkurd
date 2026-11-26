@@ -78,7 +78,7 @@
       'بودجە بە یەکسانی دابەشکرا: یەکەم بە نرخی کردنەوەی ڕۆژی یەکەم، هەر پلەیەکی تر ئەم ڕێژەیە نزمتر؛ پلە پڕ دەبێت کاتێک نزمیی ڕۆژ پێی بگات. فرۆشتن نییە. نزمترین پلە:',
       'The budget is split equally: the first level at the first day\'s open, each next one this much lower; a level fills when the day\'s low reaches it (or the day opens below it). Nothing is sold. Lowest level:']
   };
-  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function t(k) { var v = S[k]; return v ? v[{ fa: 0, ckb: 1, en: 2 }[lang()]] : k; }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); if (!d) return s; return s.replace(/[0-9]/g, function (c) { return d[+c]; }).replace(/\./g, '٫').replace(/,/g, '٬').replace(/-/g, '−'); }

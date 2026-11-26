@@ -49,7 +49,7 @@
     stale: ['⚠️ این داده بیش از ۳ ساعت است تازه نشده.', '⚠️ ئەم داتایە زیاتر لە ٣ کاتژمێرە نوێ نەکراوەتەوە.', '⚠️ This data has not been refreshed for over 3 hours.'],
     nfa: ['این صفحه وضعیت را توصیف می‌کند، پیش‌بینی نمی‌کند و توصیهٔ مالی نیست.', 'ئەم پەڕەیە دۆخەکە وەسف دەکات، پێشبینی ناکات و ئامۆژگاریی دارایی نییە.', 'This page describes the state of the market; it is not a forecast and not financial advice.']
   };
-  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function t(k) { var v = S[k]; return v ? v[{ fa: 0, ckb: 1, en: 2 }[lang()]] : k; }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); if (!d) return s; return s.replace(/[0-9]/g, function (c) { return d[+c]; }).replace(/\./g, '٫').replace(/,/g, '٬').replace(/-/g, '−'); }

@@ -25,7 +25,7 @@
     upd: ['به‌روزرسانی', 'نوێکردنەوە', 'updated'], nfa: ['معاملهٔ آزمایشی است، نه پول واقعی؛ رتبهٔ بالا در گذشته تضمین آینده نیست.', 'مامەڵەی تاقیکارییە، نەک پارەی ڕاستەقینە.', 'Paper trading, not real money; a high rank in the past is no promise for the future.'],
     nodata: ['جدول هنوز ساخته نشده؛ اولین نسخه چند دقیقه بعد از اولین معامله‌ها منتشر می‌شود.', 'خشتەکە هێشتا دروست نەکراوە.', 'The table has not been published yet; the first version appears a few minutes after the first trades.']
   };
-  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function t(v) { return (typeof v === 'string' ? S[v] : v)[{ fa: 0, ckb: 1, en: 2 }[lang()]]; }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); if (!d) return s; return s.replace(/[0-9]/g, function (c) { return d[+c]; }).replace(/\./g, '٫').replace(/,/g, '٬').replace(/-/g, '−'); }

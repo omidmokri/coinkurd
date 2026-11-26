@@ -412,7 +412,7 @@ def header(lang="fa"):
              f'<button type="button" data-l="fa" lang="fa">فارسی</button>'
              f'<button type="button" data-l="ar" lang="ar"{"" if AR_ON else " hidden"}>العربية</button>'
              f'<button type="button" data-l="en" lang="en">English</button></div>'
-             f'<a class="ek-appb" href="/app/" aria-label="{e(T["app"][lang])}">{icon("phone")}{tri(T["app"], lang)}</a>'
+             f'<a class="ek-appb" href="/app/"{aria(T["app"], lang)}>{icon("phone")}{tri(T["app"], lang)}</a>'
              f'<a class="ek-ib ek-meb" href="/me/"{aria(T["me"], lang)}>{icon("user")}</a>')
     return (f'<!--ek:header--><a class="ek-skip" href="#ek-main">{e(T["skip"][lang])}</a>'
             f'<div class="ekh" id="ekh" role="banner" data-lang="{lang}"><div class="ek-w">'

@@ -16,7 +16,7 @@
   function L() {
     if (window.EKL) return window.EKL();
     var l = (de.getAttribute('lang') || 'fa').toLowerCase();
-    return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa';
+    return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en';
   }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function n(x) { var l = L(); return DIG[l] ? String(x).replace(/\d/g, function (d) { return DIG[l][d]; }) : String(x); }

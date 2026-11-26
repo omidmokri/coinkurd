@@ -117,7 +117,7 @@
       'Fear & Greed exists from 2018, the BTC regime from 2019 and funding only for BTC and ETH over recent months; on days without data that condition is false.'],
     bars: ['کندل', 'مۆم', 'bars'],
   };
-  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function t(k) { var v = S[k]; if (!v) return k; return v[{ fa: 0, ckb: 1, en: 2 }[lang()]]; }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); if (!d) return s; return s.replace(/[0-9]/g, function (c) { return d[+c]; }).replace(/\./g, '٫').replace(/,/g, '٬').replace(/-/g, '−'); }

@@ -833,7 +833,7 @@
   var LBL = {
     fa: ['توقف حرکت', 'پخش حرکت'], ckb: ['وەستاندنی جوڵە', 'دەستپێکردنەوەی جوڵە'], ar: ['إيقاف الحركة', 'تشغيل الحركة'], en: ['Pause motion', 'Play motion']
   };
-  function lg() { var l = (de.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 || l === 'ku' ? 'ckb' : l.indexOf('ar') === 0 ? 'ar' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lg() { var l = (de.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 || l === 'ku' ? 'ckb' : l.indexOf('ar') === 0 ? 'ar' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function sw() {
     var head = d.querySelector('#ob-main .ob-head'); if (!head || d.querySelector('.ek-mo')) return;
     var b = d.createElement('button'); b.type = 'button'; b.className = 'ek-mo';

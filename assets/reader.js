@@ -16,7 +16,7 @@
 
 const de = document.documentElement;
 const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
-const UI = () => { const l = (de.getAttribute('lang') || 'fa').toLowerCase(); return l.startsWith('ckb') || l === 'ku' ? 'ckb' : l.startsWith('en') ? 'en' : 'fa'; };
+const UI = () => { const l = (de.getAttribute('lang') || 'fa').toLowerCase(); return l.startsWith('ckb') || l === 'ku' ? 'ckb' : l.startsWith('fa') ? 'fa' : 'en'; };
 
 /* ---------------- UI strings ---------------- */
 const TX = {

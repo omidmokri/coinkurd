@@ -67,7 +67,7 @@
     hookNone: ['هنوز هشداری نرسیده.', 'هێشتا هیچ ئاگادارکردنەوەیەک نەگەیشتووە.', 'No alerts yet.'],
     matched: ['مطابق', 'گونجاو', 'match'], scanned: ['اسکن شد', 'سکان کرا', 'scanned'], open2: ['باز کردن روی نمودار', 'کردنەوە لەسەر چارت', 'open on the chart']
   };
-  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('en') === 0 ? 'en' : 'fa'; }
+  function lang() { var l = (document.documentElement.getAttribute('lang') || 'fa').toLowerCase(); return l.indexOf('ckb') === 0 ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : 'en'; }
   function t(k) { var v = S[k]; return v ? v[{ fa: 0, ckb: 1, en: 2 }[lang()]] : k; }
   var DIG = { fa: '۰۱۲۳۴۵۶۷۸۹', ckb: '٠١٢٣٤٥٦٧٨٩' };
   function loc(s) { var d = DIG[lang()]; s = String(s); return d ? s.replace(/[0-9]/g, function (c) { return d[+c]; }) : s; }

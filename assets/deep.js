@@ -18,7 +18,7 @@
   function rtl() { return (de.getAttribute('dir') || '').toLowerCase() === 'rtl'; }
   function lang() {
     var l = (de.getAttribute('lang') || 'fa').toLowerCase();
-    return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('en') === 0 ? 'en' : l.indexOf('ar') === 0 ? 'ar' : 'fa';
+    return (l.indexOf('ckb') === 0 || l === 'ku') ? 'ckb' : l.indexOf('fa') === 0 ? 'fa' : l.indexOf('ar') === 0 ? 'ar' : 'en';
   }
   function T(o) { return o[lang()] || o.en; }
   function safe(f) { try { f(); } catch (e) { } }
