@@ -353,3 +353,31 @@ a.ob-hc:hover{border-color:rgba(247,147,26,.55);transform:translateY(-1px)}
 @media (max-width: 560px) {
   .ob-vprow { grid-template-columns: 6.6em 1fr 4.6em; font-size: .72rem; gap: .4em; }
 }
+/* the extra on-chain pages (xchain.js) */
+.x-coins button{display:inline-flex;align-items:center;gap:6px}
+.x-coins button img,.x-coins button svg{width:16px;height:16px;flex:0 0 auto;border-radius:50%}
+.ob-tile.x-temp{position:relative;padding-bottom:20px}
+.ob-tile.x-temp b{color:var(--x-c);font-size:1.7rem}
+.ob-tile.x-temp b i{font-style:normal;font-size:.9rem;color:var(--mute);margin-inline-start:3px;font-weight:500}
+.ob-tile.x-temp>span{color:var(--x-c);font-weight:700}
+.x-meter{position:absolute;inset-inline:16px;bottom:9px;height:5px;border-radius:99px;direction:ltr;background:linear-gradient(90deg,#3987e5 0,#199e70 30%,#c98500 50%,#f7931a 70%,#ff5a4d 100%);opacity:.85}
+[dir=rtl] .x-meter{transform:scaleX(-1)}
+.x-meter i{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #0d0d0f}
+.x-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:7px;vertical-align:middle}
+.x-cbox{padding:10px 6px 4px}
+.x-cbox canvas{display:block;width:100%;touch-action:pan-y}
+.x-ctip{position:absolute;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:2px;min-width:150px;padding:8px 10px;border-radius:10px;background:rgba(17,17,19,.96);box-shadow:0 0 0 1px rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.45);font-size:.78rem;color:#c9c9c4}
+.x-ctip b{color:var(--ink)}
+.x-ctip[hidden]{display:none}
+.x-clgd{justify-content:center;direction:inherit;padding:2px 10px 10px;background:#0a0a0c}
+.x-clgd span{display:inline-flex;align-items:center;gap:6px}
+.x-clgd i{display:inline-block;width:9px;height:9px;border-radius:50%}
+.ob-grid tr.x-cross td{border-bottom:2px dashed rgba(255,90,77,.55)}
+.x-nobox{min-height:0}
+.x-nobox:has(.ob-status:not([hidden])){min-height:180px}
+.x-nobox .ob-status[hidden]{display:none}
+.x-two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.x-two .ob-grid,.x-wide .ob-grid{width:100%}
+@media (max-width:900px){.x-two{grid-template-columns:1fr}}
+#x-btbl td small{display:block;margin:3px 0 0;white-space:nowrap}
+#x-btbl td:first-child{white-space:nowrap}

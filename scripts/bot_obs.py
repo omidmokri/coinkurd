@@ -39,6 +39,8 @@ STAB = "/charts/stablecoins/"
 NET = "/charts/network/"
 CYCLE = "/charts/bitcoin-cycle/"
 WAVE = "/charts/block-cycle/"
+SCORE = "/charts/onchain-score/"
+COMPASS = "/charts/cycle-compass/"
 HUB = "/charts/"
 URL = SITE + HUB
 
@@ -62,6 +64,7 @@ TXT = {
                "• 💵 استیبل‌کوین‌ها و SSR: عرضهٔ استیبل‌کوین‌های دلاری، سهم USDT و USDC، و نسبت ارزش بیت‌کوین به آن\n"
                "• ⛏ شبکه و ماینرها: آدرس‌های فعال، تراکنش‌ها، نرخ هش، درآمد ماینرها و ضریب پوئل\n"
                "• 🔄 چرخهٔ بیت‌کوین: ضریب مایر، میانگین ۲۰۰ هفته، پای سایکل و جایگاه امروز در تاریخ\n"
+               "• 🌡 سنجه‌های بیشتر آنچین: امتیاز آنچین از ۰ تا ۱۰۰، قطب‌نمای چرخه، ترموکپ، مدل‌های قیمت، جریان سرمایهٔ واقعی، هش‌پرایس، عرضهٔ اتر، ارزش شبکه (NVM)، چرخش سرمایه میان کوین‌ها و تمرکز استخراج\n"
                "دادهٔ مشتقات زنده از Binance، Bybit، OKX، Bitget، Hyperliquid، Gate و Deribit در خود صفحه خوانده می‌شود؛ دادهٔ آنچین روزانه از Coin Metrics، عرضهٔ استیبل‌کوین‌ها از DefiLlama و پریمیوم از کندل‌های Coinbase و Binance است."),
         "ckb": ("چارتەکانی دەرهاتەکان و ئانچین بە شێوازی ماڵپەڕە پسپۆڕەکان، لە داتای گشتییەوە و بە ڕێگای نووسراو:\n"
                 "• 🔥 نەخشەی گەرمیی لیکویدکردن: خەمڵاندنی ئەوەی پۆزیشنە لیڤەرێجدارەکان لە چ نرخێکدا لیکوید دەکرێن — هەر دراوێک، ١٢ کاتژمێر تا ١ ساڵ، سێ مۆدێل، لیڤەرێجی ٥ تا ١٠٠\n"
@@ -79,6 +82,7 @@ TXT = {
                "• 💵 ستەیبڵکۆینەکان و SSR: خستنەڕووی ستەیبڵکۆینە دۆلارییەکان، بەشی USDT و USDC، و ڕێژەی بەهای بیتکۆین بۆ ئەوان\n"
                "• ⛏ تۆڕ و ماینەرەکان: ناونیشانە چالاکەکان، مامەڵەکان، ڕێژەی هاش، داهاتی ماینەرەکان و چەندجارەی پوێڵ\n"
                "• 🔄 خولی بیتکۆین: چەندجارەی مایەر، تێکڕای ٢٠٠ هەفتە، خولی پای و شوێنی ئەمڕۆ لە مێژوودا\n"
+               "• 🌡 پێوەری زیاتری ئانچین: نمرەی ئانچین لە ٠ تا ١٠٠، قیبلەنمای خول، ترمۆکاپ، مۆدێلەکانی نرخ، ڕەوتی ڕاستەقینەی سەرمایە، هاشپرایس، خستنەڕووی ئیتەر، بەهای تۆڕ (NVM)، سووڕانی سەرمایە لە نێوان کۆینەکان و چڕبوونەوەی کانکردن\n"
                "داتای زیندووی دەرهاتەکان لە Binance، Bybit، OKX، Bitget، Hyperliquid، Gate و Deribitـەوە لە پەڕەکەدا دەخوێنرێتەوە؛ داتای ئانچینی ڕۆژانە لە Coin Metrics، خستنەڕووی ستەیبڵکۆینەکان لە DefiLlama و پریمیۆم لە مۆمەکانی Coinbase و Binanceـەوەیە."),
         "kmr": ("Grafîkên derivatîvan û on-chain bi şêwaza malperên pispor, ji daneyên giştî û bi rêbaza nivîsandî:\n"
                 "• 🔥 Nexşeya germiyê ya tasfiyeyê: texmîna ku pozîsyonên bi leverage di kîjan bihayan de tên tasfiyekirin — her coin, 12 saet heta 1 sal, sê model, leverage 5 heta 100\n"
@@ -96,6 +100,7 @@ TXT = {
                "• 💵 Stablecoin û SSR: arza stablecoinên dolarî, para USDT û USDC, û rêjeya nirxê Bitcoinê li hember wê\n"
                "• ⛏ Tor û madenkar: navnîşanên çalak, danûstandin, rêjeya hash, dahata madenkaran û pirjimara Puell\n"
                "• 🔄 Çerxa Bitcoinê: pirjimara Mayer, navgîniya 200 hefteyan, Pi cycle û cihê îro di dîrokê de\n"
+               "• 🌡 Pîvanên din ên on-chain: pûana on-chain ji 0 heta 100, qibleya çerxê, thermocap, modelên bihayê, herikîna rastîn a sermayeyê, hashprice, arza Etherê, nirxa torê (NVM), zivirîna sermayeyê di navbera coinan de û kombûna madenkariyê\n"
                "Daneyên zindî yên derivatîvan ji Binance, Bybit, OKX, Bitget, Hyperliquid, Gate û Deribit di rûpelê de tên xwendin; daneyên on-chain ên rojane ji Coin Metrics, arza stablecoinan ji DefiLlama û premium ji mûmên Coinbase û Binance ne."),
         "ar": ("رسوم المشتقات والبيانات على السلسلة على طريقة المواقع المتخصصة، من بيانات عامة وبمنهج مكتوب:\n"
                "• 🔥 الخريطة الحرارية للتصفيات: تقدير الأسعار التي تُصفّى عندها المراكز ذات الرافعة — أي عملة، من ١٢ ساعة إلى سنة، ثلاثة نماذج، رافعة من ٥ إلى ١٠٠\n"
@@ -113,6 +118,7 @@ TXT = {
                "• 💵 العملات المستقرة وSSR: معروض العملات المستقرة الدولارية، حصة USDT وUSDC، ونسبة قيمة البيتكوين إليه\n"
                "• ⛏ الشبكة والمعدّنون: العناوين النشطة والمعاملات ومعدل التجزئة وإيرادات المعدّنين ومضاعف بويل\n"
                "• 🔄 دورة البيتكوين: مضاعف ماير، متوسط ٢٠٠ أسبوع، دورة باي وموضع اليوم في التاريخ\n"
+               "• 🌡 مقاييس أخرى على السلسلة: درجة السلسلة من ٠ إلى ١٠٠، بوصلة الدورة، الثيرموكاب، نماذج السعر، تدفق رأس المال الفعلي، سعر الهاش، معروض الإيثر، قيمة الشبكة (NVM)، دوران رأس المال بين العملات وتركّز التعدين\n"
                "بيانات المشتقات المباشرة من Binance وBybit وOKX وBitget وHyperliquid وGate وDeribit تُقرأ في الصفحة نفسها؛ وبيانات السلسلة اليومية من Coin Metrics، ومعروض العملات المستقرة من DefiLlama، والعلاوة من شموع Coinbase وBinance."),
         "en": ("Derivatives and on-chain charts in the manner of the specialist sites, from public data and with the method written down:\n"
                "• 🔥 Liquidation heatmap: an estimate of the prices at which leveraged positions get liquidated — any coin, 12 hours to a year, three models, leverage 5x to 100x\n"
@@ -130,6 +136,7 @@ TXT = {
                "• 💵 Stablecoins and SSR: the supply of dollar stablecoins, the shares of USDT and USDC, and Bitcoin's value against it\n"
                "• ⛏ Network and miners: active addresses, transactions, hash rate, miner revenue and the Puell multiple\n"
                "• 🔄 Bitcoin cycle: the Mayer multiple, the 200-week average, the Pi cycle and where today stands in history\n"
+               "• 🌡 More on-chain measures: the on-chain score from 0 to 100, the cycle compass, thermocap, price models, real capital flow, hashprice, Ether's supply, network value (NVM), capital rotation between coins and mining concentration\n"
                "Live derivatives data from Binance, Bybit, OKX, Bitget, Hyperliquid, Gate and Deribit is read right in the page; the daily on-chain data is Coin Metrics', the stablecoin supply DefiLlama's, and the premium comes from Coinbase's and Binance's candles."),
     },
     "nfa": {"fa": "نقشه‌های لیکوییدیشن برآوردند؛ هیچ‌کدام پیش‌بینی یا توصیهٔ مالی نیست.", "ckb": "نەخشەکانی لیکویدکردن خەمڵاندنن؛ هیچیان پێشبینی یان ئامۆژگاریی دارایی نییە.",
@@ -153,6 +160,8 @@ TXT = {
     "b_net": {"fa": "⛏ شبکه و ماینرها", "ckb": "⛏ تۆڕ و ماینەرەکان", "kmr": "⛏ Tor û madenkar", "ar": "⛏ الشبكة والمعدّنون", "en": "⛏ Network & miners"},
     "b_cycle": {"fa": "🔄 چرخهٔ بیت‌کوین", "ckb": "🔄 خولی بیتکۆین", "kmr": "🔄 Çerxa Bitcoinê", "ar": "🔄 دورة البيتكوين", "en": "🔄 Bitcoin cycle"},
     "b_wave": {"fa": "〰️ چرخهٔ بلاکی", "ckb": "〰️ خولی بلۆکی", "kmr": "〰️ Çerxa blokê", "ar": "〰️ دورة الكتل", "en": "〰️ Block cycle"},
+    "b_score": {"fa": "🌡 امتیاز آنچین", "ckb": "🌡 نمرەی ئانچین", "kmr": "🌡 Pûana on-chain", "ar": "🌡 درجة السلسلة", "en": "🌡 On-chain score"},
+    "b_compass": {"fa": "🧭 قطب‌نمای چرخه", "ckb": "🧭 قیبلەنمای خول", "kmr": "🧭 Qibleya çerxê", "ar": "🧭 بوصلة الدورة", "en": "🧭 Cycle compass"},
     # the day's figures (numbers stay in Latin digits, like every price in the bot)
     "now": {"fa": "📌 <b>بیت‌کوین در {d}</b>", "ckb": "📌 <b>بیتکۆین لە {d}</b>", "kmr": "📌 <b>Bitcoin di {d} de</b>", "ar": "📌 <b>البيتكوين في {d}</b>", "en": "📌 <b>Bitcoin on {d}</b>"},
     "l_mvrv": {"fa": "• MVRV {m} · NUPL {n} · قیمت تحقق‌یافته {r}", "ckb": "• MVRV {m} · NUPL {n} · نرخی بەدیهاتوو {r}", "kmr": "• MVRV {m} · NUPL {n} · bihayê pêkhatî {r}",
@@ -170,6 +179,13 @@ TXT = {
     "l_prem": {"fa": "• پریمیوم Coinbase (ساعت بسته‌شده در {t}): {p}", "ckb": "• پریمیۆمی Coinbase (کاتژمێری داخراو لە {t}): {p}", "kmr": "• Premiuma Coinbase (saeta girtî di {t} de): {p}",
                "ar": "• علاوة Coinbase (الساعة المغلقة في {t}): {p}", "en": "• Coinbase premium (hour closed at {t}): {p}"},
     "l_prem24": {"fa": " · میانگین ۲۴ ساعته {h}", "ckb": " · تێکڕای ٢٤ کاتژمێر {h}", "kmr": " · navgîniya 24 saetan {h}", "ar": " · متوسط ٢٤ ساعة {h}", "en": " · 24-hour average {h}"},
+    # the on-chain score and hashprice (data/obs/xchain_now.json, scripts/obs_xchain.py: the same arithmetic as /charts/onchain-score/)
+    "l_score": {"fa": "• امتیاز آنچین ({d}): {s} · {b}", "ckb": "• نمرەی ئانچین ({d}): {s} · {b}", "kmr": "• Pûana on-chain ({d}): {s} · {b}",
+                "ar": "• درجة السلسلة ({d}): {s} · {b}", "en": "• On-chain score ({d}): {s} · {b}"},
+    "l_hp": {"fa": " · هش‌پرایس {h} برای هر PH در روز", "ckb": " · هاشپرایس {h} بۆ هەر PH لە ڕۆژێکدا", "kmr": " · hashprice {h} ji bo her PH di rojê de",
+             "ar": " · سعر الهاش {h} لكل PH يوميًا", "en": " · hashprice {h} per PH a day"},
+    "band": {"fa": ["خیلی سرد", "سرد", "معتدل", "گرم", "داغ"], "ckb": ["زۆر سارد", "سارد", "مامناوەند", "گەرم", "زۆر گەرم"], "kmr": ["pir sar", "sar", "navîn", "germ", "pir germ"],
+             "ar": ["بارد جدًا", "بارد", "معتدل", "دافئ", "ساخن"], "en": ["very cold", "cold", "neutral", "warm", "hot"]},
     "src": {"fa": "آنچین: Coin Metrics، آخرین روز بسته‌شده به وقت UTC.", "ckb": "ئانچین: Coin Metrics، دوایین ڕۆژی داخراو بە کاتی UTC.", "kmr": "On-chain: Coin Metrics, roja dawî ya girtî bi dema UTC.",
             "ar": "السلسلة: Coin Metrics، آخر يوم مغلق بتوقيت UTC.", "en": "On-chain: Coin Metrics, the last closed UTC day."},
     "b_all": {"fa": "🔭 همهٔ نمودارها", "ckb": "🔭 هەموو چارتەکان", "kmr": "🔭 Hemû grafîk", "ar": "🔭 كل الرسوم", "en": "🔭 All charts"},
@@ -234,6 +250,14 @@ def summary(lang, load, now=None):
     if chain and not head:
         return ""
     out = list(chain)
+    # the on-chain score (0 to 100) and hashprice: the summary scripts/obs_xchain.py writes, its own day named
+    x = obj(obj(load("obs/xchain_now")).get("btc"))
+    sc, bd = x.get("score"), x.get("score_band")
+    if _num(sc) and 0 <= sc <= 100 and isinstance(bd, int) and not isinstance(bd, bool) and 0 <= bd <= 4 and _is_date(x.get("score_date")):
+        line = L("l_score", lang, d=f(x["score_date"]), s=f(f"{sc:.0f}/100"), b=pick(TXT["band"], lang)[bd])
+        if _num(x.get("hpusd")) and x["hpusd"] > 0:
+            line += L("l_hp", lang, h=f(f"${x['hpusd']:.2f}"))
+        out.append(line)
     o = obj(obj(obj(load("lab")).get("options")).get("BTC"))
     mp = obj(o.get("max_pain"))
     if _num(o.get("pc_oi")) and _num(mp.get("max_pain")) and isinstance(mp.get("expiry"), str):
@@ -277,7 +301,7 @@ def section(lang, load=None):
     return "\n\n".join(parts)
 
 
-PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, WAVE, HUB)          # the Web App buttons, in the order of the site's tabs
+PAGES = (HEAT, MAP, LIQ, HL, OI, FUND, LS, CVD, BASIS, OPT, MVRV, FLOWS, STAB, NET, CYCLE, WAVE, SCORE, COMPASS, HUB)          # the Web App buttons, in the order of the site's tabs
 
 
 def open_rows(lang):
@@ -285,10 +309,10 @@ def open_rows(lang):
     def w(k, path):
         return {"text": L("b_" + k, lang), "web_app": {"url": SITE + path}}
     return [[w("heat", HEAT), w("map", MAP)], [w("liq", LIQ), w("hl", HL)], [w("oi", OI), w("fund", FUND)], [w("ls", LS), w("cvd", CVD)], [w("basis", BASIS), w("opt", OPT)],
-            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("wave", WAVE)], [w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
+            [w("mvrv", MVRV), w("flows", FLOWS)], [w("stab", STAB), w("net", NET)], [w("cycle", CYCLE), w("wave", WAVE)], [w("score", SCORE), w("compass", COMPASS)], [w("all", HUB)], [{"text": L("b_web", lang), "url": URL}]]
 
 
-N_ROWS = 10                                     # rows open_rows() puts above the navigation
+N_ROWS = 11                                     # rows open_rows() puts above the navigation
 
 
 if __name__ == "__main__":
@@ -380,6 +404,26 @@ if __name__ == "__main__":
         txt2 = "\n\n".join([L("title", lang), L("body", lang), both, "<i>" + L("nfa", lang) + "</i>"])
         if len(txt2) > 3900 or "DefiLlama" not in txt or "$312.46B" not in txt:
             print("FAIL", lang, "section with every figure", len(txt2))
+            bad += 1
+    # the on-chain score and hashprice (scripts/obs_xchain.py): its own day, the band in words, nothing from odd files
+    xn = {"btc": {"score_date": "2026-11-24", "score": 22.6745, "score_band": 1, "hpusd": 28.2582}}
+    for lang in ("fa", "ckb", "kmr", "ar", "en"):
+        sl = summary(lang, {"obs/xchain_now": xn}.get)
+        if len(sl.split("\n")) != 1 or "23/100" not in sl or "2026-11-24" not in sl or "$28.26" not in sl or TXT["band"][lang][1] not in sl:
+            print("FAIL", lang, "score line", sl)
+            bad += 1
+        nohp = summary(lang, {"obs/xchain_now": {"btc": dict(xn["btc"], hpusd=None)}}.get)
+        if "23/100" not in nohp or "$" in nohp:
+            print("FAIL", lang, "score line without hashprice", nohp)
+            bad += 1
+        odd = [{"btc": dict(xn["btc"], score=130)}, {"btc": dict(xn["btc"], score_band=7)}, {"btc": dict(xn["btc"], score_band=True)}, {"btc": dict(xn["btc"], score="22")},
+               {"btc": dict(xn["btc"], score_date="<b>x</b>")}, {"btc": dict(xn["btc"], score=float("nan"))}, {"btc": []}, [], "x"]
+        if any(summary(lang, {"obs/xchain_now": j}.get) != "" for j in odd):
+            print("FAIL", lang, "odd score files must give nothing")
+            bad += 1
+        withall = summary(lang, {"obs/chain_now": now, "lab": lab, "obs/xchain_now": xn}.get)
+        if len(withall.split("\n")) != 7 or "23/100" not in withall:
+            print("FAIL", lang, "score line beside the others", withall)
             bad += 1
     for v, w in ((312.456e9, "$312.46B"), (1.2345e12, "$1.23T"), (7e8, "$700.0M"), (12.345e6, "$12.35M"), (250e3, "$250K"), (2500.0, "$2.5K"), (12.0, "$12"), (-2.1e9, "-$2.10B")):
         if _usd(v) != w:

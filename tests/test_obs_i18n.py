@@ -90,6 +90,15 @@ FAMILIES = {
     # stage 5 (vprof.js): the volume profile's ranges and its two ways of showing the two sides
     "vp_r_": ["7", "30", "90", "365"],
     "vp_s_": ["both", "net"],
+    # stage 6 (xchain.js): the extra on-chain pages' measures, notes, the score's parts and bands, the compass
+    "xm_": ["thermo_tmult", "thermo_rtc", "thermo_tcap", "models_bands", "models_chpos", "capflow_flow30", "capflow_flow90", "capflow_pct",
+            "hashp_hpusd", "hashp_hpsat", "ethsup_merge", "ethsup_infl", "ethsup_burn", "nvm_nvm", "nvm_nvmz", "score_score", "score_parts",
+            "rotation_real", "rotation_market"],
+    "note_x_": ["thermo", "models", "capflow", "hashp", "ethsup", "nvm", "score", "compass", "rotation", "pools"],
+    "xp_": ["mvrvz", "puell", "mayer", "w200", "y2", "tmult"],
+    "xb_": ["0", "1", "2", "3", "4"],
+    "x_ep": ["0", "1", "2", "3"],
+    "x_q_": ["acc", "heat", "dist", "cap"],
 }
 for q, f in sorted(used):
     if q not in EN:

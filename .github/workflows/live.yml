@@ -65,6 +65,13 @@ jobs:
         timeout-minutes: 5
         run: python scripts/obs_stables.py
 
+      # /charts/thermocap/ … /charts/decentralization/ — must follow obs_chain.py: it reads data/obs/chain_*.json
+      # (and data/btcinfo.json for the mining pools); no network, a few seconds
+      - name: More on-chain measures (score, compass, thermocap, hashprice, rotation)
+        continue-on-error: true
+        timeout-minutes: 3
+        run: python scripts/obs_xchain.py
+
       - name: DeFi (TVL, chains, protocols, yields — DefiLlama)
         continue-on-error: true
         timeout-minutes: 5

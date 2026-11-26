@@ -290,7 +290,17 @@
     { k: 'vprof', path: '/charts/volume-profile/', ic: 'bars' },
     { k: 'network', path: '/charts/network/', ic: 'pulse' },
     { k: 'cycle', path: '/charts/bitcoin-cycle/', ic: 'cycle' },
-    { k: 'wave', path: '/charts/block-cycle/', ic: 'pulse' }
+    { k: 'wave', path: '/charts/block-cycle/', ic: 'pulse' },
+    { k: 'thermo', path: '/charts/thermocap/', ic: 'flame' },
+    { k: 'models', path: '/charts/price-models/', ic: 'layers' },
+    { k: 'capflow', path: '/charts/capital-flow/', ic: 'delta' },
+    { k: 'hashp', path: '/charts/hashprice/', ic: 'pulse' },
+    { k: 'ethsup', path: '/charts/eth-supply/', ic: 'coins' },
+    { k: 'nvm', path: '/charts/network-value/', ic: 'chain' },
+    { k: 'score', path: '/charts/onchain-score/', ic: 'scale' },
+    { k: 'compass', path: '/charts/cycle-compass/', ic: 'target' },
+    { k: 'rotation', path: '/charts/capital-rotation/', ic: 'cycle' },
+    { k: 'pools', path: '/charts/decentralization/', ic: 'grid' }
   ];
   var root, cur = null, curKey = null;
   function headText() {
