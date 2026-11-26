@@ -221,9 +221,15 @@ CREDIT = {"fa": 'داده‌ها به‌صورت خودکار از کانال <a
           "en": 'Data is updated automatically from the <a href="https://t.me/Coin_Kurd" rel="noopener noreferrer" target="_blank">Coin_Kurd</a> channel, Binance, CoinGecko and alternative.me.'}
 # On a Persian page the credit line carries its Sorani and English copies too, so the per-language copies of the
 # site (which open these pages with ck_lang set) never show it in Persian; the inline script picks one before paint.
-CREDIT_JS = ("try{(function(){function s(l){if(['fa','ckb','en'].indexOf(l)<0)l='fa';document.querySelectorAll('.ek-credit>[data-lang]')"
+CREDIT_JS = ("try{(function(){function s(l){if(['fa','ckb','en'].indexOf(l)<0)l='fa';document.querySelectorAll('.ek-credit>[data-lang],[data-tri]>[data-lang]')"
              ".forEach(function(e){e.hidden=e.dataset.lang!==l})}var l;try{l=localStorage.getItem('ck_lang')}catch(e){}s(l);"
              "addEventListener('ek-lang',function(ev){s(ev.detail)})})()}catch(e){}")
+
+
+def tri3(fa, ckb, en, tag="div"):
+    """one block in Persian, Sorani and English; CREDIT_JS (on every page() page) or LANG_JS shows the visitor's one"""
+    return (f'<{tag} data-tri><{tag} data-lang="fa">{fa}</{tag}><{tag} data-lang="ckb" hidden>{ckb}</{tag}>'
+            f'<{tag} data-lang="en" lang="en" dir="ltr" hidden>{en}</{tag}></{tag}>')
 
 
 def credit_line(cl):
@@ -929,7 +935,9 @@ def main():
         if c not in THIN:
             urls.append((u, market.get("updated_at")))
     order = sorted(set(by_coin) | set(MK), key=lambda c: -len(by_coin.get(c, [])))
-    body = "<h1>قیمت و تحلیل ارزهای دیجیتال</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر، امتیاز Entekhab و مطالب مرتبط. عدد کنار هر نماد تعداد مطالب آرشیو دربارهٔ آن است. <a href=\"/methodology/\">روش محاسبه و منابع داده</a></p><div class=coins>" + "".join(
+    body = tri3("<h1>قیمت و تحلیل ارزهای دیجیتال</h1><p class=txt>پروفایل هر دارایی با قیمت زنده، وضعیت تکنیکال، فرصت‌های اسکنر، امتیاز Entekhab و مطالب مرتبط. عدد کنار هر نماد تعداد مطالب آرشیو دربارهٔ آن است. <a href=\"/methodology/\">روش محاسبه و منابع داده</a></p>",
+                "<h1>نرخ و شیکاریی دراوە دیجیتاڵییەکان</h1><p class=txt>پرۆفایلی هەر سامانێک لەگەڵ نرخی ڕاستەوخۆ، دۆخی تەکنیکی، دەرفەتەکانی سکانەر، خاڵی Entekhab و بابەتە پەیوەندیدارەکان. ژمارەی تەنیشت هەر هێمایەک ژمارەی بابەتەکانی ئەرشیفە کە باسی دەکەن. <a href=\"/methodology/\">ڕێبازی ژماردن و سەرچاوەکانی داتا</a></p>",
+                "<h1>Crypto prices and analysis</h1><p class=txt>A profile for every asset with its live price, technical state, scanner opportunities, Entekhab score and related posts. The number next to each symbol is how many archive posts cover it. <a href=\"/methodology/\">Methodology and data sources</a></p>") + "<div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "قیمت و تحلیل ارزهای دیجیتال — پروفایل کوین‌ها", f"قیمت زنده و تحلیل تکنیکال {len(order)} ارز دیجیتال، از بیت‌کوین و اتریوم تا آلت‌کوین‌ها، با امتیاز شفاف و آرشیو مطالب", body), market.get("updated_at")))
     for pth in ("market/", "heatmap/", "bubbles/", "money-flow/", "liquidity/", "etf/", *OBS_PATHS, "bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/", "bitcoin/", "calendar/", "swap/"):  # /me/ is personal → robots Disallow, so not in the sitemap
@@ -2006,7 +2014,9 @@ def build_compare():
                     '<p class="note">برنده در هر ردیف فقط بر اساس همان معیار مشخص شده است؛ این مقایسه آموزشی است و توصیهٔ مالی نیست.</p>')
             urls.append(page(f"compare/{a.lower()}-vs-{b.lower()}/", f"{a} یا {b}؟ مقایسهٔ {NAMES.get(a, a)} و {NAMES.get(b, b)}",
                              f"مقایسهٔ داده‌محور {a} و {b}: بازده، نوسان، سهم خریداران، فاندینگ، فعالیت توسعه، همبستگی و DNA بازار", body, f"<style>{css}</style>"))
-    hub = "<h1>مقایسهٔ ارزها</h1><ul>" + "".join(f'<li><a href="{u}">{e(u.rsplit("/", 2)[-2].replace("-vs-", " یا ").upper())}</a></li>' for u in urls) + "</ul>"
+    def _hub(h1, sep):
+        return f"<h1>{h1}</h1><ul>" + "".join(f'<li><a href="{u}">{e(u.rsplit("/", 2)[-2].upper().replace("-VS-", sep))}</a></li>' for u in urls) + "</ul>"
+    hub = tri3(_hub("مقایسهٔ ارزها", " یا "), _hub("بەراوردی دراوەکان", " یان "), _hub("Compare coins", " vs "))
     urls.append(page("compare/", "مقایسهٔ ارزهای دیجیتال", "مقایسهٔ داده‌محور ارزهای پرحجم با DNA بازار", hub, f"<style>{css}</style>"))
     print(f"compare pages: {len(urls)}")
     return urls
@@ -2019,6 +2029,9 @@ def build_indicators():
     if not ind.get("items") or not os.path.exists(tpl_p):
         return []
     tpl = open(tpl_p, encoding="utf-8").read()
+    # the hub is written back over its own template below, so empty its SEO block first: otherwise every indicator
+    # page would keep the hub's list there and never get its own summary
+    tpl = re.sub(r'(<div id="seo" class="disc" style="margin:30px 0">).*?(</div>)', r"\1\2", tpl, count=1, flags=re.S)
     kind_ = load("kind.json", {})
     urls = []
     KFA = {"strategy": "استراتژی", "indicator": "اندیکاتور"}
@@ -2063,8 +2076,11 @@ def build_indicators():
         os.makedirs(os.path.dirname(out), exist_ok=True)
         open(out, "w", encoding="utf-8").write(doc)
         urls.append(url)
-    hub_seo = "<h2>فهرست اندیکاتورها</h2><ul>" + "".join(f'<li><a href="/indicators/{it["id"]}/">{e(it["name"])}</a> — {e(it["t"]["fa"]["sum"][:180])}</li>' for it in ind["items"]) + "</ul>"
-    hub = tpl.replace('<div id="seo" class="disc" style="margin:30px 0"></div>', f'<div id="seo" class="disc" style="margin:30px 0">{hub_seo}</div>')
+    def _seo_list(lg, h2):
+        return f"<h2>{h2}</h2><ul>" + "".join(f'<li><a href="/indicators/{it["id"]}/">{e(it["name"])}</a> — {e(((it["t"].get(lg) or it["t"]["fa"])["sum"])[:180])}</li>' for it in ind["items"]) + "</ul>"
+    hub_seo = (tri3(_seo_list("fa", "فهرست اندیکاتورها"), _seo_list("ckb", "لیستی ئیندیکاتەرەکان"), _seo_list("en", "List of indicators"), tag="section")
+               + f"<script>{CREDIT_JS}</script>")
+    hub = re.sub(r'<div id="seo" class="disc" style="margin:30px 0">.*?</div>', lambda m: f'<div id="seo" class="disc" style="margin:30px 0">{hub_seo}</div>', tpl, count=1, flags=re.S)
     open(tpl_p, "w", encoding="utf-8").write(hub)
     sig = (hub.replace('<link rel="canonical" href="https://entekhab.net/indicators/">', f'<link rel="canonical" href="{SITE}/signals/">')
               .replace("<title>اندیکاتورهای اختصاصی Coin_Kurd و سیگنال‌های TradingView | entekhab.net</title>", "<title>سیگنال‌های اندیکاتورهای Coin_Kurd و نتیجهٔ واقعی آن‌ها | entekhab.net</title>")
