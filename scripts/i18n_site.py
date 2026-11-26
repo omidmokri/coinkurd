@@ -314,7 +314,11 @@ def plan(langs, need, common, limit):
         pct[code] = sum(1 for k in need if k in s) / len(need) * 100 if need else 0
         if not todo:
             continue
-        todo.sort(key=lambda k: (k in gt, k not in common, len(k), k))   # Google's drafts are re-done last
+        # Google's drafts are re-done last -- except, in a language the globe already offers, the drafts of the
+        # homepage and of the strings nearly every page has: those are what its readers see first, so they go with
+        # the untranslated strings of the same kind
+        shown = pct[code] >= READY
+        todo.sort(key=lambda k: (k in gt and not (shown and k in common), k not in common, len(k), k))
         queues.append((code, list(batches(todo))))
     # A language already offered in the globe comes first and takes one batch a round: a language a reader can pick
     # today must not fall behind the pages written today. After them the whole of what is left goes to the one
