@@ -1,0 +1,18 @@
+name: Trader setups probe (temporary, branch only)
+on:
+  push:
+    branches: [trader-v2]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python scripts/trader_setups.py
+      - run: python scripts/trader_probe_report.py
