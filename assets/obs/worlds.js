@@ -643,7 +643,9 @@
     vg.addColorStop(0, '#ffe7a3'); vg.addColorStop(.35, '#d99a2b'); vg.addColorStop(.75, '#6a3a0a'); vg.addColorStop(1, '#2a1404');
     g.fillStyle = vg; g.beginPath(); g.ellipse(.7 * u, -8.2 * u, 3.3 * u, 2.7 * u, 0, 0, TAU); g.fill();
     g.fillStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.ellipse(-.4 * u, -9.4 * u, 1.3 * u, .55 * u, -.5, 0, TAU); g.fill();
-    if (o.tint) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = o.tint; g.fillRect(-8 * u, -14 * u, 16 * u, 30 * u); g.globalCompositeOperation = 'source-over'; }
+    if (o.tint) {      /* the shade lies on the suit only: on the helmet and the torso, never as a box over the scene */
+      g.fillStyle = o.tint; g.beginPath(); g.arc(0, -8.4 * u, 4.4 * u, 0, TAU); g.fill(); rr(g, -4.6 * u, -5.4 * u, 9.2 * u, 11.4 * u, 3.2 * u); g.fill();
+    }
     g.restore();
     if (o.lamp) {      /* a headlamp, its beam on whatever is ahead */
       var la = (ang || 0) + (o.flip ? Math.PI : 0) + (o.lampA || 0), hx = x + Math.sin(ang || 0) * 8.4 * u, hy = y - Math.cos(ang || 0) * 8.4 * u, L2 = s * 9;
@@ -1471,7 +1473,7 @@
       planet(g, turn('eP' + PD, TX['eP' + PD], t / 160 * mv, C, .3), cx, cy, R, C.rtl);
       rim(g, cx, cy, R * 1.002, 'rgba(110,180,255,.55)', Math.max(3, R * .006));
       g.globalCompositeOperation = 'lighter'; halo(g, cx, cy, R, R * 1.03, [[0, 'rgba(110,180,255,.35)'], [1, 'rgba(110,180,255,0)']]); g.globalCompositeOperation = 'source-over';
-      var u = ((t * mv) % 26) / 26, s = Math.max(20, Math.min(W, H) * .045), lx = X(C, .74) - C.ppx * 12;
+      var u = ((t * mv) % 26) / 26, s = Math.max(26, Math.min(W, H) * .085), lx = X(C, .74) - C.ppx * 12;
       if (u < .8) {
         var k = u / .8, sy = H * 1.05 - Math.pow(k, 1.6) * H * 1.4, tilt = (C.rtl ? -1 : 1) * k * .25, sep = k > .45;
         g.save(); g.translate(lx + (C.rtl ? -1 : 1) * k * k * W * .12, sy); g.rotate(tilt);
@@ -1837,7 +1839,7 @@
     g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
     try { tg.clearRect(0, 0, 24, 1); tg.drawImage(g.canvas, 0, Math.max(0, Math.floor((vh - 6) * dpr)), Math.floor(W * dpr), Math.max(1, Math.floor(4 * dpr)), 0, 0, 24, 1);
       g.imageSmoothingEnabled = true; g.drawImage(tiny, 0, 0, 24, 1, 0, vh - 1, W, H - vh + 1); } catch (e) { g.fillStyle = '#03040c'; g.fillRect(0, vh - 1, W, H - vh + 1); }
-    var fd = g.createLinearGradient(0, vh, 0, H); fd.addColorStop(0, 'rgba(3,4,12,.1)'); fd.addColorStop(.35, 'rgba(3,4,12,.55)'); fd.addColorStop(1, 'rgba(3,4,12,.8)');
+    var fd = g.createLinearGradient(0, vh, 0, H); fd.addColorStop(0, 'rgba(3,4,12,.5)'); fd.addColorStop(.25, 'rgba(3,4,12,.78)'); fd.addColorStop(1, 'rgba(3,4,12,.9)');
     g.fillStyle = fd; g.fillRect(0, vh - 1, W, H - vh + 1); g.restore();
   }
   /* what a click brings is drawn on a layer over the page, so it is seen wherever the click was; nothing on it can be pressed */
