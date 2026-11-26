@@ -107,6 +107,18 @@ def main():
             S.fill(["ru"], set(big), set(), 40, 60, ["k1", "k2", "k3"], log=lambda *a: None, counter=cnt2)
             ok("with several batches the keys work at the same time",
                len(set(used_by)) > 1 and len(used_by) == cnt2["used"] > 1, (set(used_by), cnt2))
+            # a second model: its own workers, and only the first model's calls held to the run's share
+            seen_models = []
+            ai.generate_with = lambda api_key, prompt, *a, **k: (seen_models.append(a[5] if len(a) > 5 else None),
+                                                                 gen_with(api_key, prompt))[1]
+            os.environ["I18N_SITE_MODELS"] = "fake-model-2"
+            shutil.rmtree(S.CACHE, ignore_errors=True)
+            cnt3 = {}
+            S.fill(["ru"], set(big), set(), 3, 60, ["k1", "k2"], log=lambda *a: None, counter=cnt3)
+            os.environ.pop("I18N_SITE_MODELS")
+            ai.generate_with = gen_with
+            ok("a second model gets workers of its own, the first stays within the share",
+               "fake-model-2" in seen_models and cnt3.get("used", 0) <= 3 and cnt3.get("other", 0) > 0, (cnt3, seen_models))
             shutil.rmtree(S.CACHE, ignore_errors=True)
             S.fill(["ru"], need, common, 20, 60, ["k1"], log=lambda *a: None, counter={})
 

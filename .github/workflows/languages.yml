@@ -35,6 +35,7 @@ env:
   I18N_SITE_BATCH: "120"
   I18N_SITE_BATCH_CHARS: "14000"
   I18N_SITE_MAX_TOKENS: "32768"      # room for a 14,000-character batch in Hindi, Thai or Tamil
+  I18N_SITE_MODELS: "gemini-3.5-flash-lite"   # a second model: Google counts the per-minute limit for each model apart
   # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
   ALI_API_KEY: ${{ secrets.ALI_API_KEY }}

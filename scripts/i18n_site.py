@@ -322,6 +322,17 @@ def plan(langs, need, common, limit):
     return items, state
 
 
+def models():
+    """the models the site's translation spreads over: this run's own, then those named in I18N_SITE_MODELS"""
+    import ai  # noqa: E402
+    out = [ai.model()]
+    for m in (os.environ.get("I18N_SITE_MODELS") or "").split(","):
+        m = m.strip()
+        if m and m not in out:
+            out.append(m)
+    return out
+
+
 def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=None):
     """fill the caches of `langs`, the owner's keys working at once — one worker a key"""
     import ai  # noqa: E402
@@ -329,7 +340,10 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
     counter = counter if counter is not None else {}
     counter["used"] = 0
     ai.model()                       # settle the model before the workers start
-    items, state = plan(langs, need, common, requests_max)
+    ms = models()
+    # requests_max is the day's share on this run's own model; the other models have days of their own, so the
+    # queue holds work for each of them and only the first one's calls are held to the share
+    items, state = plan(langs, need, common, requests_max * len(ms))
     if not items:
         return state
     q = queue.Queue()
@@ -340,26 +354,30 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
     fails = {code: load_fails(code) for code in {c for c, _ in items}}
     gts = {code: load_g(code) for code in {c for c, _ in items}}
 
-    def worker(api_key):
+    def worker(api_key, mname):
         while time.time() - t0 <= seconds:
+            with lock:
+                if mname == ms[0] and counter["used"] >= requests_max:
+                    return                       # this model's share for the run is spent; the others go on
             try:
                 code, batch = q.get_nowait()
             except queue.Empty:
                 return
+            mine = "used" if mname == ms[0] else "other"
             with lock:
-                counter["used"] += 1
+                counter[mine] = counter.get(mine, 0) + 1
             try:
-                good, bad = translate_batch(code, batch, lambda p: ai.generate_with(api_key, p, True, 0.1, MAX_TOKENS, 2, 150))
+                good, bad = translate_batch(code, batch, lambda p: ai.generate_with(api_key, p, True, 0.1, MAX_TOKENS, 2, 150, mname))
             except ai.QuotaError as e:
                 with lock:
-                    log(f"{code}: key {ai._kid(api_key)} is out for this run ({str(e)[:110]})")
+                    log(f"{code}: key {ai._kid(api_key)} is out on {mname} for this run ({str(e)[:110]})")
                 q.put((code, batch))
                 return
             except ai.RateLimited:
                 # a 429 is turned away before any work is done; counting it spent the day's share on refusals --
                 # 1,167 of them against 134 answers in one run on 2026-11-26 -- and ended the chain early
                 with lock:
-                    counter["used"] -= 1
+                    counter[mine] -= 1
                     counter["limited"] = counter.get("limited", 0) + 1
                 q.put((code, batch))
                 time.sleep(20)
@@ -387,7 +405,11 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
             save(c, *snap[c])
 
     per = max(1, int(os.environ.get("I18N_SITE_WORKERS_PER_KEY", "1") or 1))
-    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in list(pool) * per]
+    # one worker for each key on each model: Google counts the per-minute limit for every model apart, so a second
+    # model doubles what the same keys can answer in a minute (on 2026-11-26 four of every five requests on one
+    # model were turned away with a 429)
+    threads = [threading.Thread(target=worker, args=(k, m), daemon=True)
+               for m in ms for k in list(pool) * per]
     for th in threads:
         th.start()
     deadline = t0 + max(30.0, seconds + 120)
@@ -588,9 +610,10 @@ def main():
                 fill(langs, need, common | home, requests_max, a.seconds, pool[:jobs], counter=c)
             finally:
                 pro_l10n.quota_add(c.get("used", 0), who="site")
-            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)"
+            print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s) on {ai.model()}, "
+                  f"{c.get('other', 0)} more on {', '.join(models()[1:]) or 'no other model'}"
                   f" ({c.get('limited', 0)} turned away as too many a minute, not counted)")
-            more_after(langs, need, c.get("used", 0), len(pool), ai)
+            more_after(langs, need, c.get("used", 0) + c.get("other", 0), len(pool), ai)
             print("i18n_site: the keys this run used —\n" + ai.pool_report())
     elif not a.no_translate:
         print("i18n_site: no Gemini key — nothing translated this run (the pages use what the cache has)")

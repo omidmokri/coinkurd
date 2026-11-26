@@ -270,17 +270,19 @@ def generate_on_model(prompt, as_json=False, temperature=0.2, max_tokens=4096, t
             print(f"quota out on a key; {len(live_keys())} of {len(keys())} keys left on {model()}")
 
 
-def generate_with(api_key, prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90):
+def generate_with(api_key, prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90, mname=None):
     """یک درخواست روی یک کلید مشخص — برای اجرایی که چند کلید را هم‌زمان به کار می‌گیرد.
-    QuotaError آن کلید را روی این مدل «تمام‌شده» علامت می‌زند و دوباره بالا می‌رود."""
+    QuotaError آن کلید را روی این مدل «تمام‌شده» علامت می‌زند و دوباره بالا می‌رود.
+    mname: a model other than this run's (scripts/i18n_site.py spreads its workers over several, since Google's
+    per-minute limit is counted for each model on its own)."""
     try:
-        return _generate(prompt, as_json, temperature, max_tokens, tries, timeout, api_key=api_key)
+        return _generate(prompt, as_json, temperature, max_tokens, tries, timeout, api_key=api_key, mname=mname)
     except QuotaError as e:
-        retire(api_key, str(e)[:80])
+        retire(api_key, str(e)[:80], mname)
         raise
 
 
-def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90, api_key=None):
+def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, timeout=90, api_key=None, mname=None):
     k = api_key or key()
     if not k:
         raise RuntimeError("no Gemini key")
@@ -289,15 +291,15 @@ def _generate(prompt, as_json=False, temperature=0.2, max_tokens=4096, tries=3, 
             "generationConfig": {"temperature": temperature, "maxOutputTokens": max_tokens}}
     if as_json:
         body["generationConfig"]["responseMimeType"] = "application/json"
-    mname = model()
+    mname = mname or model()
     tc = thinking(mname)
     if tc:
         body["generationConfig"]["thinkingConfig"] = tc
     for i in range(tries):
-        wait = MIN_GAP - (time.time() - _last.get(fp, 0.0))
+        wait = MIN_GAP - (time.time() - _last.get((fp, mname), 0.0))   # each model has its own minute
         if wait > 0:
             time.sleep(wait)
-        _last[fp] = time.time()
+        _last[(fp, mname)] = time.time()
         try:
             r = requests.post(f"{BASE}/models/{mname}:generateContent", headers={"x-goog-api-key": k}, json=body, timeout=timeout)
         except requests.exceptions.Timeout:
