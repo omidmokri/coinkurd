@@ -98,22 +98,32 @@
     function gs() { return (r() + r() + r() - 1.5) / 1.5; }
     x.globalCompositeOperation = 'lighter';
     var disk = x.createRadialGradient(h, h, 0, h, h, h);
-    disk.addColorStop(0, rgba(warm, .55)); disk.addColorStop(.18, rgba(warm, .18)); disk.addColorStop(.6, rgba(cool, .06)); disk.addColorStop(1, rgba(cool, 0));
+    disk.addColorStop(0, rgba(warm, .32)); disk.addColorStop(.18, rgba(warm, .12)); disk.addColorStop(.6, rgba(cool, .06)); disk.addColorStop(1, rgba(cool, 0));
     x.fillStyle = disk; x.fillRect(0, 0, S, S);
     for (var a = 0; a < arms; a++) {
-      var off = a * TAU / arms;
-      for (var i = 0; i < 1100; i++) {
-        var u = i / 1100, th = u * 3.1 * Math.PI, rr = h * .08 + h * .86 * u;
-        var ang = th * tight + off + gs() * .22, sp = rr * .09 * (1 + u);
+      var off = a * TAU / arms, i, u, rr, ang;
+      /* the arm's glow: soft overlapping clouds of light along the spiral */
+      for (i = 0; i < 140; i++) {
+        u = i / 140; rr = h * .08 + h * .86 * u; ang = u * 3.1 * Math.PI * tight + off + gs() * .1;
+        var bx = h + Math.cos(ang) * rr, by = h + Math.sin(ang) * rr, br = h * (.1 - u * .05);
+        var bg = x.createRadialGradient(bx, by, 0, bx, by, br);
+        bg.addColorStop(0, rgba(u < .3 ? warm : cool, .09 * (1 - u * .55))); bg.addColorStop(1, rgba(cool, 0));
+        x.fillStyle = bg; x.fillRect(bx - br, by - br, br * 2, br * 2);
+      }
+      /* its stars, and pink knots where new stars are being born */
+      for (i = 0; i < 1600; i++) {
+        u = i / 1600; rr = h * .08 + h * .86 * u;
+        ang = u * 3.1 * Math.PI * tight + off + gs() * .2;
+        var sp = rr * .08 * (1 + u);
         var px = h + Math.cos(ang) * rr + gs() * sp, py = h + Math.sin(ang) * rr + gs() * sp;
-        var knot = r() < .025;
-        x.fillStyle = knot ? 'rgba(255,111,181,' + (.35 + r() * .4) + ')' : rgba(u < .35 ? warm : cool, (.08 + r() * .22) * (1 - u * .6));
-        var z = knot ? 2.2 : (r() < .9 ? 1 : 1.8);
+        var knot = r() < .018;
+        x.fillStyle = knot ? 'rgba(255,111,181,' + (.25 + r() * .3) + ')' : rgba(u < .35 ? warm : cool, (.06 + r() * .2) * (1 - u * .6));
+        var z = knot ? 1.6 : (r() < .92 ? .8 : 1.4);
         x.fillRect(px, py, z, z);
       }
     }
     var core = x.createRadialGradient(h, h, 0, h, h, h * .16);
-    core.addColorStop(0, 'rgba(255,250,236,.95)'); core.addColorStop(.4, rgba(warm, .5)); core.addColorStop(1, rgba(warm, 0));
+    core.addColorStop(0, 'rgba(255,250,236,.72)'); core.addColorStop(.4, rgba(warm, .3)); core.addColorStop(1, rgba(warm, 0));
     x.fillStyle = core; x.fillRect(0, 0, S, S);
     return c;
   }
@@ -128,7 +138,7 @@
       var st = bands[Math.floor(rr * 63)] * (.72 + .28 * Math.sin(ang * 3 + rr * 18)) * (.85 + .15 * Math.sin(ang * 11 - rr * 40));
       var edge = Math.min(1, (rr - .3) / .05) * Math.min(1, (1 - rr) / .25);
       var col = ramp([[0, 140, 40, 120], [.35, 255, 79, 154], [.62, 255, 170, 90], [.85, 255, 224, 170], [1, 255, 250, 236]], f);
-      p[i] = col[0]; p[i + 1] = col[1]; p[i + 2] = col[2]; p[i + 3] = Math.min(255, 255 * (.15 + .85 * f) * st * edge);
+      p[i] = col[0]; p[i + 1] = col[1]; p[i + 2] = col[2]; p[i + 3] = Math.min(255, 255 * 1.35 * (.22 + 1.1 * f) * st * edge);
     }
     x.putImageData(im, 0, 0); return c;
   }
@@ -185,7 +195,7 @@
     var base = small ? W : Math.min(W, H * 1.5);
     Lp = small
       ? { gal: [X(.8), H * .17, base * .44], gal2: [X(.16), H * .44, base * .2], bh: [X(.26), H * .76, base * .075], wh: [X(.82), H * .58, base * .17] }
-      : { gal: [X(.82), H * .24, base * .3], gal2: [X(.36), H * .13, base * .12], bh: [X(.15), H * .7, base * .05], wh: [X(.62), H * .86, base * .1] };
+      : { gal: [X(.82), H * .24, base * .3], gal2: [X(.36), H * .13, base * .12], bh: [X(.14), H * .74, base * .042], wh: [X(.62), H * .86, base * .1] };
     seed0 = 20261126;
     var area = W * H;
     stars = [];
@@ -246,7 +256,7 @@
     gl.addColorStop(0, 'rgba(255,170,90,.22)'); gl.addColorStop(.35, 'rgba(255,79,154,.08)'); gl.addColorStop(1, 'rgba(155,123,255,0)');
     g.fillStyle = gl; g.fillRect(cx - R * 1.5, cy - R * 1.5, R * 3, R * 3);
     /* the far side of the disk, bent up and over the shadow by gravity */
-    g.save(); g.translate(cx, cy); g.rotate(-rot * .5); g.globalAlpha = .55;
+    g.save(); g.translate(cx, cy); g.rotate(-rot * .5); g.globalAlpha = .8;
     g.drawImage(T.disk, -r * 1.75, -r * 1.75, r * 3.5, r * 3.5); g.restore();
     /* the disk behind */
     g.save(); g.beginPath(); g.rect(cx - R - 2, cy - R - 2, R * 2 + 4, R + 2); g.clip();
@@ -259,6 +269,8 @@
     g.globalCompositeOperation = 'source-over';
     g.fillStyle = '#000'; g.beginPath(); g.arc(cx, cy, r, 0, TAU); g.fill();
     g.globalCompositeOperation = 'lighter';
+    g.strokeStyle = 'rgba(255,214,160,.35)'; g.lineWidth = Math.max(3, r * .12); g.beginPath(); g.arc(cx, cy, r * 1.05, 0, TAU); g.stroke();
+    g.strokeStyle = 'rgba(255,244,222,.9)'; g.lineWidth = Math.max(1.2, r * .035); g.beginPath(); g.arc(cx, cy, r * 1.02, 0, TAU); g.stroke();
     /* the disk in front */
     g.save(); g.beginPath(); g.rect(cx - R - 2, cy, R * 2 + 4, R + 2); g.clip();
     g.translate(cx, cy); g.scale(1, .26); g.rotate(rot);
