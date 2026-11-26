@@ -338,13 +338,17 @@ def universe(mk, n):
 
 def fetch(sym):
     import market as M  # noqa: E402  (the site's Binance client: data-api.binance.vision first)
-    k4 = M.klines(sym, "4h", 1000)
-    if k4:
-        older = M.klines(sym, "4h", 1000, start=k4[0]["t"] - 1000 * H4)
-        older = [x for x in (older or []) if x["t"] < k4[0]["t"]]
-        k4 = older + k4
-    k1 = M.klines(sym, "1d", 500)
-    return k4, k1
+    def back(tf, ms, pages):
+        k = M.klines(sym, tf, 1000)
+        for _ in range(pages - 1):
+            if not k:
+                break
+            older = [x for x in (M.klines(sym, tf, 1000, start=k[0]["t"] - 1000 * ms) or []) if x["t"] < k[0]["t"]]
+            if not older:
+                break
+            k = older + k
+        return k
+    return back("4h", H4, 3), back("1d", 86400000, 2)      # about 16 months of 4h candles, 5 years of daily
 
 
 def local(sym):
