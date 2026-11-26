@@ -29,9 +29,12 @@ env:
   I18N_SITE_SECONDS: "1320"          # 22 minutes of translating a run (it was 3)
   I18N_SITE_REQUESTS: "3000"         # the run takes whatever the day has released, not 8 calls a key
   # Google turns most requests away as too many a minute (1,167 refusals to 134 answers on 2026-11-26), so a second
-  # worker a key only adds refusals; a larger batch carries more of the site in each request that is let through.
-  I18N_SITE_BATCH: "90"
-  I18N_SITE_BATCH_CHARS: "9000"
+  # worker a key only adds refusals, and some keys reach their daily limit by mid-morning: a larger batch carries more
+  # of the site in each request that is let through. The new pages are long paragraphs, so 9,000 characters held
+  # only 4 to 28 of them.
+  I18N_SITE_BATCH: "120"
+  I18N_SITE_BATCH_CHARS: "14000"
+  I18N_SITE_MAX_TOKENS: "32768"      # room for a 14,000-character batch in Hindi, Thai or Tamil
   # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
   ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
