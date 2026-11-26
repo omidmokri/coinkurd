@@ -16,7 +16,7 @@ import chrome   # the shared @font-face block (fonts served from this domain)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://entekhab.net"
-V = "31"           # asset version (bump with any change to assets/obs/*)
+V = "32"           # asset version (bump with any change to assets/obs/*)
 LANGS = ("fa", "ckb", "ar", "en")
 HUB_PATH = "charts"
 
@@ -2118,18 +2118,18 @@ def about(view):
     out = []
     for lg in LANGS:
         secs = T[view]["about"][lg]
-        body = "".join(f"<h2>{e(h)}</h2><ul>" + "".join(f"<li>{rtl_list(x, lg)}</li>" for x in items) + "</ul>" for h, items in secs)
+        body = "".join(f'<div class="ob-ac"><h2>{e(h)}</h2><ul>' + "".join(f"<li>{rtl_list(x, lg)}</li>" for x in items) + "</ul></div>" for h, items in secs)
         hid = "" if lg == "fa" else " hidden"
         out.append(f'  <section class="ob-about" data-lang="{lg}" lang="{lg}" dir="{"ltr" if lg == "en" else "rtl"}"{hid}>{body}</section>')
     return "\n".join(out)
 
 
-CSS = {"sopr": ["cosmos.css"], "hodl": ["cosmos.css"]}   # a page's own stylesheets after obs.css
+CSS = {"sopr": ["cosmos.css"], "hodl": ["cosmos.css"]}   # a page's own stylesheets after obs.css and space.css
 
 
 def head(title, desc, og, url, ld, css=()):
     return f"""<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" class="ob-space">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -2143,6 +2143,7 @@ def head(title, desc, og, url, ld, css=()):
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta property="og:image" content="https://entekhab.net/assets/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 {chrome.FONTS}
 <link rel="stylesheet" href="/assets/obs/obs.css?v={V}">
+<link rel="stylesheet" href="/assets/obs/space.css?v={V}">
 {"".join(f'<link rel="stylesheet" href="/assets/obs/{c}?v={V}">\n' for c in css)}<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False, separators=(",", ":"))}</script>
 </head>
 """
@@ -2155,7 +2156,7 @@ def page(view, folder, scripts):
           "applicationCategory": "FinanceApplication", "operatingSystem": "Any (web browser)", "inLanguage": ["ckb", "fa", "ar", "en"],
           "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
           "publisher": {"@type": "Organization", "name": "Entekhab (entekhab.net)", "url": SITE}, "description": t["p"]["en"]}
-    tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js"] + scripts)
+    tags = "".join(f'<script src="/assets/obs/{s}?v={V}" defer></script>\n' for s in ["i18n.js", "core.js", "space.js"] + scripts)
     return head(t["title"], t["desc"], t["og"], url, ld, CSS.get(view, ())) + f"""<body>
 <!--ek:header--><!--/ek:header-->
 <main class="ob-page" id="ob-main" data-view="{view}" translate="no">
@@ -2184,7 +2185,7 @@ def hub():
         hid = "" if lg == "fa" else " hidden"
         body = ""
         for sec, cards in HUB["secs"]:
-            body += f'<h2 class="ob-hsec">{e(sec[lg])}</h2><div class="ob-hub">'
+            body += f'<h2 class="ob-hsec">{e(sec[lg])}</h2><div class="ob-hub ob-hubf">'
             for path, new, tt, ds in cards:
                 badge = f'<em>{e(HUB["new"][lg])}</em>' if new else ""
                 body += f'<a class="ob-hc" href="{path}">{badge}<b>{e(tt[lg])}</b><small>{e(ds[lg])}</small></a>'
@@ -2212,6 +2213,7 @@ def hub():
 <!--ek:footer--><!--/ek:footer-->
 <script src="/assets/obs/i18n.js?v={V}" defer></script>
 <script src="/assets/obs/core.js?v={V}" defer></script>
+<script src="/assets/obs/space.js?v={V}" defer></script>
 <script src="/assets/ui.js" defer></script>
 </body>
 </html>

@@ -289,3 +289,31 @@ html.ek-app .ek-appb,html.ek-app .ekf-apps,html.ek-app #eka:not(.ek-upd),html.ek
 .ek-rd-hov{outline:2px dashed var(--ek-acc)!important;outline-offset:3px;border-radius:6px}
 @media (max-width:1180px){.ek-rd{bottom:calc(74px + env(safe-area-inset-bottom))}}
 @media (prefers-reduced-motion:reduce){.ek-rd-pg i,.ek-rd-toast{transition:none}}
+
+/* ---- breathing light (owner 2026-11-26): a soft aurora travels round each frame of the site and swells and fades like a
+   breath — the header bars, the open menus, the tab bar, the footer and its boxes, and every frame of the observatory.
+   assets/chrome.js marks the frames (.br) and runs the light only while a frame is on screen; none of it moves under
+   prefers-reduced-motion or on the software-drawn light mode (nx-lite). */
+@property --br-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes br-turn{to{--br-a:360deg}}
+@keyframes br-breathe{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes br-slide{from{background-position:-60% 0}to{background-position:160% 0}}
+.br::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.3px;pointer-events:none;z-index:4;
+  background:conic-gradient(from var(--br-a),transparent 0 14%,rgba(94,242,214,.92) 24%,rgba(124,200,255,.86) 30%,rgba(155,123,255,.82) 36%,transparent 47% 64%,rgba(255,111,181,.68) 76%,transparent 88%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  opacity:.6;animation:br-turn 18s linear var(--br-d,0s) infinite paused,br-breathe 6s ease-in-out infinite paused}
+.br.br-on::after{animation-play-state:running}
+/* the footer's top line: the same light running along it */
+html.ek-v3 #ekf.ekf::before{height:1.5px;background:linear-gradient(90deg,transparent,rgba(94,242,214,.95),rgba(155,123,255,.9),rgba(255,111,181,.75),transparent) no-repeat,
+  linear-gradient(90deg,transparent,rgba(150,175,255,.22) 50%,transparent);background-size:38% 100%,100% 100%;animation:br-slide 11s linear infinite,br-breathe 6s ease-in-out infinite}
+html.nx-lite .br::after,html.nx-lite #ekf.ekf::before{animation:none}
+@media (prefers-reduced-motion:reduce){.br::after,html.ek-v3 #ekf.ekf::before{animation:none!important;opacity:.55}}
+@media (forced-colors:active){.br::after{display:none}}
+
+/* ---- the logo is the name alone (owner 2026-11-26): no box, no border, no background behind it */
+html.ek-v3 #ekh .ek-brand,html.ek-v3 #ekh.ek-sc .ek-brand,html.nx-lite #ekh .ek-brand{background:none!important;border-color:transparent!important;box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0 2px!important}
+html.ek-v3 #ekh .ek-brand img,html.ek-v3 #ekh.ek-sc .ek-brand img{height:44px;filter:drop-shadow(0 3px 10px rgba(0,0,0,.65))}
+.ek-brand img{filter:none}
+@media (max-width:760px){html.ek-v3 #ekh .ek-brand img,html.ek-v3 #ekh.ek-sc .ek-brand img{height:38px}}

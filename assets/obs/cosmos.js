@@ -142,6 +142,7 @@
   /* ---------------------------------------------------------------- the sky behind the page (one per page) */
   var SKY = null;
   function sky() {
+    if (w.OBSKY) { w.OBSKY.wake(); return null; }      /* the section's own sky (assets/obs/space.js) is already there */
     if (SKY) { SKY.wake(); return SKY; }
     var cv = d.createElement('canvas'); cv.className = 'cz-sky'; cv.setAttribute('aria-hidden', 'true');
     d.body.insertBefore(cv, d.body.firstChild);

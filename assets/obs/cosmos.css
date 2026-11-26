@@ -1,7 +1,7 @@
 /* entekhab.net — the Observatory in deep space (SOPR, HODL waves). Loaded only by those two pages; everything is scoped to
    html.cz-on (set by assets/obs/cosmos.js while one of them is on screen), so no other page changes.
    Glass over a live star field, an aurora accent (teal → violet → magenta) instead of the site's orange, starlight numbers.
-   Motion: one slow drift of the frame's edge light; none of it under prefers-reduced-motion. */
+   Motion: the frame's breathing light (assets/chrome.css); none of it under prefers-reduced-motion. */
 
 html.cz-on{background:#03040c!important;color-scheme:dark;
   --cz-ink:#e9eeff;--cz-mute:rgba(196,208,255,.62);--cz-line:rgba(150,175,255,.16);--cz-line2:rgba(150,175,255,.28);
@@ -32,12 +32,7 @@ html.cz-on #ekf{background:linear-gradient(180deg,rgba(6,8,22,.55),rgba(3,4,12,.
   background:linear-gradient(170deg,rgba(12,16,42,.62),rgba(4,6,20,.5));border:1px solid var(--cz-line);border-radius:24px;isolation:isolate;
   -webkit-backdrop-filter:blur(6px) saturate(130%);backdrop-filter:blur(6px) saturate(130%);
   box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.02) inset,0 0 60px -20px rgba(124,120,255,.35)}
-#ob.cz-ob::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
-  background:conic-gradient(from var(--cz-a,0deg),transparent 0 18%,rgba(94,242,214,.75) 26%,rgba(155,123,255,.7) 34%,transparent 44% 68%,rgba(255,111,181,.55) 78%,transparent 88%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
-  animation:cz-edge 18s linear infinite;opacity:.85}
-@property --cz-a{syntax:"<angle>";inherits:false;initial-value:0deg}
-@keyframes cz-edge{to{--cz-a:360deg}}
+/* the edge light is the site's breathing light now (.br, assets/chrome.css) */
 #ob.cz-ob.ob-fs{background:#03040c}
 
 /* the section's tabs, recoloured for space */
@@ -180,11 +175,10 @@ html.cz-on #ekf{background:linear-gradient(180deg,rgba(6,8,22,.55),rgba(3,4,12,.
 
 /* ---- calm */
 @media (prefers-reduced-motion:reduce){
-  #ob.cz-ob::before,.cz-orbit i{animation:none}
+  .cz-orbit i{animation:none}
   .cz-tile,.cz-play{transition:none}
   .cz-tile:hover,.cz-play:hover{transform:none}
 }
 @media (forced-colors:active){
   html.cz-on .ob-head h1{color:CanvasText;background:none}
-  #ob.cz-ob::before{display:none}
 }
