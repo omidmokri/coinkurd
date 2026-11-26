@@ -359,7 +359,8 @@ def fill(langs, need, common, requests_max, seconds, pool, log=print, counter=No
         for c in todo:
             save(c, *snap[c])
 
-    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in pool]
+    per = max(1, int(os.environ.get("I18N_SITE_WORKERS_PER_KEY", "1") or 1))
+    threads = [threading.Thread(target=worker, args=(k,), daemon=True) for k in list(pool) * per]
     for th in threads:
         th.start()
     deadline = t0 + max(30.0, seconds + 120)

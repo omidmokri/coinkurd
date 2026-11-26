@@ -28,6 +28,7 @@ env:
   L10N_PER_KEY: "400"
   I18N_SITE_SECONDS: "1320"          # 22 minutes of translating a run (it was 3)
   I18N_SITE_REQUESTS: "3000"         # the run takes whatever the day has released, not 8 calls a key
+  I18N_SITE_WORKERS_PER_KEY: "2"     # two requests at once on a key: a call takes ~30 s, well under the minute limit
   # the same pool of free Gemini keys the long chain declares; without them nothing here translates at all
   # every free Gemini key in this repository's secrets, as one pool for scripts/ai.py
   ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
@@ -92,6 +93,21 @@ jobs:
       - name: Build the pages the strings are read from
         timeout-minutes: 12
         run: python scripts/build_pages.py
+
+      # The light rebuild (pages.yml) builds these too, and the site's dictionaries are written from what it built:
+      # 9,516 strings, against the 4,312 that build_pages.py alone gives. Built here as well, the other 5,204 --
+      # the kids course, Satoshi, the studio, the class, the podcast page and the rest -- are translated at last.
+      # Without them a language finished here showed as 45% on the site (Hindi, 2026-11-26) and never reached the
+      # globe. Keep this list the same as pages.yml's.
+      - name: Build the other pages the site carries
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          for s in build_reality build_roundtable build_opportunity build_trackrecord build_today build_podcast \
+                   build_class build_autopilot build_map build_kids build_quant build_strategy_lab build_studio \
+                   build_dca build_trader build_satoshi build_derivatives build_leaderboard; do
+            python scripts/$s.py >/dev/null || echo "::warning::$s did not build; its strings wait for the next run"
+          done
 
       - name: Arabic dictionaries
         continue-on-error: true
