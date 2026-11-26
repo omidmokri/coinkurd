@@ -17,7 +17,8 @@
   var d = document, de = d.documentElement, w = window;
   var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
              set: function (k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { } } };
-  var PATH = location.pathname, ENC = /^\/encyclopedia\//.test(PATH);
+  /* a language copy (/de/heatmap/, scripts/build_lang_pages.py) uses the dictionary of the page it copies */
+  var PATH = (window.EKLP && window.EKLP.src) || location.pathname, ENC = /^\/encyclopedia\//.test(PATH);
   var CODE = ls.get('ek_l') || '';
   var ON = !!CODE && !ENC && ls.get('ek_ar') !== '1';
   var LANGS = null, ME = null, FLAGS = {};

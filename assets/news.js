@@ -66,7 +66,7 @@
 
   /* ---------- body (summaries) loaded on demand ---------- */
   let bodyP = null;
-  const body = () => bodyP || (bodyP = fetch('data/news_body.json?v=' + Math.floor(Date.now() / 12e4)).then(r => r.ok ? r.json() : { b: {} }).then(j => j.b || {}).catch(() => { bodyP = null; return {} }));
+  const body = () => bodyP || (bodyP = fetch('/data/news_body.json?v=' + Math.floor(Date.now() / 12e4)).then(r => r.ok ? r.json() : { b: {} }).then(j => j.b || {}).catch(() => { bodyP = null; return {} }));
 
   /* ---------- on-device browser translation (Chrome Translator API) as a fallback ---------- */
   const CT = new Map(); const TRS = {};
@@ -238,7 +238,7 @@
         <div class="nw-rs" dir="${dirOf(showS || it.title)}">${b === null ? `<div class="nw-skel"></div><div class="nw-skel"></div><div class="nw-skel s"></div>` :
           showS ? `<div${canClient ? ' data-ctrx data-src="s"' : ''}>${paras(showS)}</div>` : `<p class="disc">${L('noSum')}</p>`}
           ${b && tr && sOrig && !sTr && !hasTR() && lang !== 'en' ? `<p class="disc">⏳ ${L('trWait')}</p>` : ''}</div>
-        ${(it.coins || []).length ? `<div class="nw-rcoins"><small>${L('coins')}:</small> ${it.coins.map(c => `<a class="coin" href="coins/${esc(c.toLowerCase())}/">${esc(c)}</a>`).join(' ')}</div>` : ''}
+        ${(it.coins || []).length ? `<div class="nw-rcoins"><small>${L('coins')}:</small> ${it.coins.map(c => `<a class="coin" href="/coins/${esc(c.toLowerCase())}/">${esc(c)}</a>`).join(' ')}</div>` : ''}
         <div class="nw-ract"><button data-nwsh="${esc(it.id)}">🔗 ${L('share')}</button>${'speechSynthesis' in window ? `<button data-nwsp>🔊 ${L('listen')}</button>` : ''}</div>
         <div class="nw-rsrc"><small>${L('srcs')}:</small> ${srcList(it).map(s => `<span class="nw-src" style="--h:${H(s.source)}">${esc(s.source)}</span>`).join(' ')}
           ${it.own ? '' : `<a class="nw-att" href="${esc(su(it.url))}" target="_blank" rel="noopener nofollow">${L('attrib')} ↗</a>`}</div>

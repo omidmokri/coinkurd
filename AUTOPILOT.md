@@ -322,6 +322,13 @@ The site's strategy (agreed with the owner, 2026-11-07):
     repository's Branches page. Harmless meanwhile (it points at a commit already on main). Do not retry.
 
 ## Log (newest first)
+### 2026-11-26 · Every language at its own address: /<code>/ and /<code>/<page>/ (owner's request in chat, not by the loop)
+- Why: the owner wants the site found worldwide. A reader who chose German got German on the Persian page's own address (text swapped in the browser), so search engines saw one language. Owner: the home page too, both Kurdish dialects, all 50 languages with their own pages.
+- `scripts/build_lang_pages.py` (CI step after seo_struct, before the leak guard, in pages.yml and update.yml): copies of 26 main pages (home, indicators, fear-greed, heatmap, bubbles, liquidity, liquidation heatmap, ETF, money flow, coins, derivatives, world, on-chain, track record, reality, today, calendar, DCA, compare, swap, bitcoin, safety, tools, app, about, podcast) in all 51 codes of pro_langs except fa = 1,300 files (~4 MB a language, ~0.9 MB compressed). Same built HTML, so the design is identical; differences: html lang/dir, translated title/description/canonical/og, a first-in-head script (`#ek-lp`, `window.EKLP`) that sets the language keys for the visit and sends every language switch (bar, menu, globe, its "back") to that language's address, links between main pages kept in the language, relative addresses made absolute (the home page's inline scripts too). /market/ is not copied (its own /market/<code>/).
+- Search engines: hreflang both ways on originals and copies (x-default = the Persian original), `/sitemap-langs.xml` + a robots line. A language is indexable when it is ckb/ar/en or the globe offers it (i18n/langs.json, 70%); the rest say noindex and stay out of hreflang/sitemap until translated — nothing to change when they arrive.
+- `assets/i18n.js` and `assets/ar.js` take the page's dictionary from `EKLP.src` (VER 9 / 4). `assets/news.js` and `assets/cinema.js` use root addresses (identical on the home page, needed from /<code>/); home page loads them at v=5.
+- Tests: `python3 tests/test_lang_pages.py` (links, inline addresses, head, noindex, hreflang reciprocity, sitemap, idempotent rerun, the boot script run in node: keys and every switch). Full scratch build: 1,300 copies in 8 s, no new broken local link in any copy, leak guard clean.
+
 ### 2026-11-20 · /studio/ Pine Studio: live Pine, back-test, Pine screener, SMC, Kronos (owner's request in chat)
 - **Pine live on the site, no TradingView:** `assets/studio/` runs native Pine v5/v6 with PineTS 0.13.1 (LuxAlgo, AGPL-3.0,
   owner chose it) in a Web Worker on Binance candles; plots, shapes, bgcolor, hlines, labels, lines and boxes are drawn;

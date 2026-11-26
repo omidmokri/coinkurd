@@ -417,7 +417,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "8"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "9"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)

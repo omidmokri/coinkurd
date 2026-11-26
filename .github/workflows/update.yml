@@ -600,6 +600,10 @@ jobs:
       - name: Structured data (breadcrumb trail, preview picture, canonical on every indexable page that lacks one)
         continue-on-error: true
         run: python scripts/seo_struct.py
+      - name: Main pages at their own address in every language (/de/, /kmr/heatmap/ …, hreflang, sitemap-langs.xml)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python scripts/build_lang_pages.py
       - name: Leak guard (no indicator source may ever reach the public repo or site)
         run: python scripts/leak_guard.py
       - uses: actions/configure-pages@v5
