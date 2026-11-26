@@ -49,6 +49,10 @@
 "a640cb3b0e",
 "<b>Predlošci, preuzimanje i prijenos:</b> gotovi skupovi indikatora i vlastiti predlošci; CSV s podacima svijeća i vrijednostima indikatora; izvoz i uvoz; poveznica za dijeljenje rasporeda. Poveznica i QR kôd otvaraju isti radni prostor na vašem telefonu ili drugom uređaju, a kartice ovog preglednika ostaju sinkronizirane."
 ],
+"about.ae2074a92f": [
+"ae2074a92f",
+"Barovi i cijene su javni tržišni podaci s Binancea (jedna aktivna veza za cijelu stranicu); ako Binance nije dostupan, koriste se OKX, i na kraju vlastita snimka stanja stranice — obojena točka pored svakog grafikona označava izvor. Za bilo koji grafikon možete odabrati Coinbase, Bybit, OKX ili Kraken umjesto Binancea, uz izravno čitanje s javne krajnje točke tog mjenjačnice u vašem pregledniku; ako mjenjačnica ne odgovara na vašu vezu, stranica će to odmah prikazati. Svjetski forex parovi (EUR/USD, USD/JPY i ostali) dolaze iz vlastitih dnevnih referentnih tečajeva stranice — Europske središnje banke i skupa podataka exchange-api — jedna vrijednost dnevno, a ne tick podaci posrednika. Ekonomski kalendar je tjedni izvor s portala ForexFactory; kretanje Bitcoina nakon nekog događaja je su-kretanje, a ne uzrok. Na slaboj vezi uključite „Uštedu podataka” u postavkama. Prilagođeni grafikoni (dividende i povećanja kapitala) značajka su Teheranske burze i ne primjenjuju se na kripto. Tržišne stope u Iranu javni su podaci s tgju.org; cijene kovanica u tomanima su procjena: cijena s Binancea pomnožena s tečajem tethera u tomanima."
+],
 "about.bbe83cefc5": [
 "bbe83cefc5",
 "Izvor podataka"
@@ -221,6 +225,10 @@
 "252e1f7660",
 "Obavijesti se provjeravaju u ovom pregledniku dok je stranica otvorena (bilo koja kartica). Obavijesti indikatora aktiviraju se pri zatvaranju svijeće."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Upozorenje na ovom crtežu"
+],
 "alertSet": [
 "80c4c4abee",
 "Obavijest postavljena: {c}"
@@ -345,6 +353,14 @@
 "98464789c4",
 "Najbolja trgovina"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Rast po godini (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Preuzmi trgovine (CSV)"
@@ -397,6 +413,14 @@
 "d669a6654d",
 "Long trgovine"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1.000 naloga istih trgovina):"
+],
+"btMCv": [
+"992209a3c0",
+"tipičan drawdown {a}% · 95% naloga ostaje ispod {b}% · najgori {c}% · ovo pokretanje {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimiziraj"
@@ -445,6 +469,10 @@
 "80e53e077c",
 "Faktor profita"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Omjer isplate (prosječan dobitak / prosječan gubitak)"
+],
 "btRange": [
 "63a44ed01a",
 "od / do / korak"
@@ -488,6 +516,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (godišnje)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Prvih 70% naspram posljednjih 30% trgovina:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} s {aw}% dobitaka ({an} trgovina) → {b} s {bw}% dobitaka ({bn} trgovina)"
 ],
 "btStreak": [
 "260b23b529",
@@ -605,9 +641,21 @@
 "6a72085653",
 "Sve"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · otvoreni kôd"
+],
+"cat_com": [
+"90566b4c6f",
+"Omiljeno u zajednici"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (svijet)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -653,9 +701,53 @@
 "3090f6af60",
 "Promjena u 24h"
 ],
+"ckNote": [
+"bc9c1644bd",
+"TradingView skripte otvorenog koda Coin_Kurd, koje se izvode ovdje na vašem grafikonu."
+],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro nadzorna ploča iz javnih podataka: risk-on / risk-off režim"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Faze on-chain ciklusa (MVRV, NUPL) s pozicijom cijene"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Cijela povijest Bitcoina na logaritamskoj spirali"
+],
 "clearAll": [
 "7de68ccb43",
 "Ukloni sve crteže"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Ukloni crteže i indikatore"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Ukloni crteže"
+],
+"clearInds": [
+"8b56474294",
+"Ukloni indikatore"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Ukloniti sve indikatore s ovog grafikona?"
 ],
 "clearLog": [
 "096311b563",
@@ -680,6 +772,10 @@
 "clone": [
 "af74f7c536",
 "Kopiraj"
+],
+"cloned": [
+"51fbf8cb72",
+"Kopirano pored"
 ],
 "close": [
 "bbfa773e5a",
@@ -713,9 +809,221 @@
 "d0d4d379f5",
 "Preostalo vrijeme do zatvaranja ove svijeće"
 ],
+"crFree": [
+"6b4b480231",
+"Prati miš"
+],
+"crLargeDash": [
+"a7503adc35",
+"Duga crta"
+],
+"crMagnet": [
+"77fa49774c",
+"Lijepi se za svijeće"
+],
+"crOff": [
+"d4c2792a72",
+"Skriveno"
+],
+"crSparse": [
+"e50cc378a1",
+"Rijetke točke"
+],
 "create": [
 "8ac903c3c3",
 "Stvori upozorenje"
+],
+"csBg": [
+"64dd60fe1a",
+"Pozadina"
+],
+"csBg2": [
+"9ebb790d74",
+"Druga boja pozadine"
+],
+"csBody": [
+"718a7e8a58",
+"Tijelo"
+],
+"csBorderC": [
+"eeffa83765",
+"Boja ruba"
+],
+"csBorders": [
+"685f23bc5e",
+"Rubovi"
+],
+"csClose": [
+"bbfa773e5a",
+"Zatvori"
+],
+"csCross": [
+"b0b83f89e8",
+"Nišan i miš"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Boja nišana"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Linija nišana"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Oznake cijene i vremena na nišanu"
+],
+"csCrossMode": [
+"800092e3e1",
+"Nišan"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Širina nišana"
+],
+"csDn": [
+"11f5ff3829",
+"Padajuća svijeća"
+],
+"csFont": [
+"b97c4d4cdd",
+"Font"
+],
+"csFsize": [
+"83ca9e48c3",
+"Veličina fonta"
+],
+"csGrad": [
+"c716191a01",
+"pretvara pozadinu u gradijent"
+],
+"csGridA": [
+"f773586220",
+"Prozirnost mreže (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Boja mreže"
+],
+"csGridH": [
+"4eaa1c008a",
+"Vodoravne linije mreže"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Okomite linije mreže"
+],
+"csHollow": [
+"9165bccc85",
+"Šuplja tijela"
+],
+"csHollowH": [
+"fb63aba345",
+"samo rastuće svijeće"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetičko pomicanje dodirom"
+],
+"csLast": [
+"aacdc5bea4",
+"Linija zadnje cijene"
+],
+"csLastLab": [
+"91c990bcb9",
+"Oznaka cijene na skali"
+],
+"csLineC": [
+"01212659ee",
+"Boja linije / površine"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Širina linije"
+],
+"csLook": [
+"41def7a0fe",
+"Izgled"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"jedna boja za oba smjera"
+],
+"csPinch": [
+"e557a41794",
+"Zumiranje prstima dodirom"
+],
+"csResetQ": [
+"9c369383c1",
+"Vratiti sve postavke grafikona na izvorne?"
+],
+"csScale": [
+"0b414bdcb7",
+"Skale"
+],
+"csScroll": [
+"468c89cb3b",
+"Povucite grafikon mišem"
+],
+"csSym": [
+"fad29404d2",
+"Svijeće"
+],
+"csText": [
+"d160595fcf",
+"Boja teksta"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Postavke grafikona"
+],
+"csUp": [
+"971a95475d",
+"Rastuća svijeća"
+],
+"csWick": [
+"fe6e2bfd48",
+"Fitilji"
+],
+"csWickC": [
+"0fcb21d161",
+"Boja fitilja"
+],
+"csWm": [
+"33c7b41ac6",
+"Vodeni žig iza svijeća"
+],
+"csWmA": [
+"69a1810ea2",
+"Prozirnost vodenog žiga (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"simbol i vremenski okvir"
+],
+"csWmC": [
+"bad81c749f",
+"Boja vodenog žiga"
+],
+"csWmSize": [
+"4af7e52f80",
+"Veličina vodenog žiga"
+],
+"csWmText": [
+"ecf870ab34",
+"Tekst vodenog žiga"
+],
+"csZoom": [
+"c6f40d9d03",
+"Kotačić miša"
+],
+"csZoomH": [
+"4ca34c1092",
+"zumiranje u i izvan"
 ],
 "csv": [
 "518463f518",
@@ -728,6 +1036,26 @@
 "csvDone": [
 "fe93409ef8",
 "Preuzeto {n} svijeća"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Dodaj upozorenje ovdje"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopiraj ovu cijenu"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Prilagodi svaku svijeću"
+],
+"ctxHline": [
+"588d2eb492",
+"Vodoravna linija ovdje"
+],
+"ctxReset": [
+"242cb352c0",
+"Poništi prikaz"
 ],
 "curNote": [
 "538ead2fdf",
@@ -905,9 +1233,29 @@
 "2422a88320",
 "Svaki put (najviše jednom u minuti / jednom po svijeći)"
 ],
+"exAuto": [
+"1ff048b76e",
+"uživo, s OKX-om kao rezervnom opcijom"
+],
+"exDown": [
+"e8ba18613e",
+"{x} ne odgovara na ovoj vezi. Grafikon ostaje na burzi na kojoj jest."
+],
+"exNote": [
+"0eb4c03240",
+"Binance prenosi podatke uživo; ostali se čitaju s vlastite javne krajnje točke svakih deset sekundi, uz vlastitu povijest."
+],
+"exTitle": [
+"5b13eac7ed",
+"Burza"
+],
 "exit": [
 "f83b6fe3ae",
 "Izlaz"
+],
+"exitFull": [
+"fc61e74cd9",
+"Izađi iz cijelog zaslona"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -948,6 +1296,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Izvezi sve (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Podaci za ovaj indikator se nisu učitali. Pokušajte ponovno za trenutak."
 ],
 "extend": [
 "ab07d3f288",
@@ -1005,6 +1357,18 @@
 "3526f607bc",
 "Žuta"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Prognoza"
@@ -1024,6 +1388,74 @@
 "futSub": [
 "16db4a6d5c",
 "Tromjesečni terminski ugovori, kontinuirani"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Jedna valuta prema drugoj, iz vlastitih dnevnih referentnih tečajeva stranice (Europska središnja banka i skup podataka exchange-api gdje ECB ne navodi valutu). Jedna vrijednost dnevno, tako da je dnevni stupac jedna točka, a tjedni i mjesečni stupci grade se od dana unutar njih. Referentni tečajevi objavljuju se jednom dnevno, a ne podaci o tickovima posrednika: ovdje nema intraday forexa. Parovi s dolarom počinju 2. ožujka 2024., parovi između dvije ECB valute 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Strelice"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Kistovi"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanali"
+],
+"g_cursors": [
+"f4d2f91040",
+"Pokazivači"
+],
+"g_cycles": [
+"97f064aff5",
+"Ciklusi"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliottovi valovi"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Linije"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Mjerač"
+],
+"g_pat": [
+"2c179da0f5",
+"Uorci grafikona"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Vile"
+],
+"g_proj": [
+"8aa49fe840",
+"Projekcija"
+],
+"g_shapes": [
+"b1985e3874",
+"Oblici"
+],
+"g_text": [
+"d7cd4cda4f",
+"Tekst i bilješke"
+],
+"g_vol": [
+"1b4620951d",
+"Na temelju volumena"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1108,6 +1540,18 @@
 "hideAll": [
 "1f0e916e42",
 "Sakrij / prikaži crteže"
+],
+"hideBoth": [
+"3502a3299d",
+"Sakrij crteže i indikatore"
+],
+"hideDraw": [
+"f4492c5211",
+"Sakrij crteže"
+],
+"hideInds": [
+"764ab9d614",
+"Sakrij indikatore"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1209,6 +1653,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1220,6 +1668,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1245,6 +1697,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1265,9 +1721,61 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Svi uzorci svijećnjaka"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Čekić / Vješanjak"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Unutarnja svijeća"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Jutarnja / Večernja zvijezda"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Linija probijanja / Tamni oblak"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Tri bijela vojnika / crne vrane"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Zvijezda padalica / Obrnuti čekić"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Vrh / dno u obliku pincete"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulativni volumni delta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1289,6 +1797,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA oblaci [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1297,17 +1809,41 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Jednaki vrhovi / dno"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (delta svijeće)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_fvg": [
+"bad3ce3dd2",
+"Praznine fer vrijednosti (FVG)"
+],
+"in_gmma": [
+"bf822f6db4",
+"Guppy višestruki MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull paket [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1320,6 +1856,10 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1353,6 +1893,18 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Tržišna struktura (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Nadaraya-Watson ovojnica [LuxAlgo]"
+],
+"in_ob": [
+"80c4ef99a7",
+"Zone naloga (Order Blocks)"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1372,6 +1924,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Filtar raspona [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1401,25 +1961,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stohastički indeks momenta"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Podrška i otpor s probijanjima [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL kanal [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaffov trendni ciklus"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profil (vrijeme po cijeni)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1433,6 +2021,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volumni delta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1445,9 +2041,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Profil volumena sesije"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Profil volumena vidljivog raspona"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP pojasevi"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1460,6 +2068,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1493,6 +2109,10 @@
 "0f70916dbb",
 "Arnaud Legoux pomični prosjek"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR linija trenda vođena s MFI (RSI bez volumena)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Zamah: SMA 5 minus SMA 34 srednje točke"
@@ -1504,6 +2124,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Prosječni stvarni raspon (volatilnost)"
+],
+"ind_atrts": [
+"8223831420",
+"Zaustavljanje koje prati s k·ATR i mijenja strane"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1529,6 +2153,10 @@
 "a50928c16b",
 "Indeks robnog kanala"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR izlasci obješeni o najvišu/najnižu cijenu zatvaranja"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Tržište u trendu (nisko) ili bočno (visoko)"
@@ -1549,9 +2177,61 @@
 "bf330f58dd",
 "Dugoročni zamah: WMA dviju stopa promjene"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Označava svaki uzorak u nastavku na svijećama"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Otvaranje i zatvaranje gotovo jednaki (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Bikovsko (BE) i medvjeđe (SE) proždiranje"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Duga donja sjena nakon pada (H) ili rasta (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Malo tijelo unutar prethodnog velikog (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"Svijeća u potpunosti unutar prethodne (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Veliko tijelo bez sjena (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Preokret u tri svijeće: bikovski MS, medvjeđi ES"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Praznina i zatvaranje preko sredine prethodne svijeće (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tri snažne svijeće zaredom (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Duga gornja sjena nakon rasta (SS) ili pada (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"Dvije svijeće s istim vrhom (TT) ili dnom (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, niz RSI-ja i postotni rang kombinirano"
+],
+"ind_cvd": [
+"690d30a274",
+"Tekuća suma volumnog delte: tko je imao kontrolu"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1573,6 +2253,10 @@
 "c499047c5b",
 "Eksponencijalni pomični prosjek"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · dva EMA oblaka, brzi i spori"
+],
 "ind_env": [
 "e2cf023f50",
 "Pomični prosjek s pojasevima na fiksnoj % udaljenosti"
@@ -1581,17 +2265,41 @@
 "d648aafe8d",
 "Koliko se lako cijena kreće po jedinici volumena"
 ],
+"ind_eqhl": [
+"7911f35044",
+"Dva swinga na gotovo istoj cijeni: preostala likvidnost"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Pretvara cijene u kvazi-normalnu distribuciju"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Kupi × prodaj volumen i delta napisani ispod svake svijeće; približite za čitanje. Po svijeći, ne po razini cijene"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fraktali: lokalni vrhovi i dna"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Praznine od tri svijeće; svaki okvir završava tamo gdje cijena popuni prazninu"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Šest kratkih i šest dugih EMA: trgovci protiv investitora"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · stepenasta linija trenda koja se mijenja samo kod stvarnog probijanja swinga"
+],
 "ind_hma": [
 "709351f832",
 "Hull pomični prosjek: brz i gladak"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA obojen prema nagibu"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1604,6 +2312,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stohastik s J linijom (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (otvoreni kôd, MPL-2.0) · makro režim iza svijeća, njegovi signali i nadzorna ploča, iz FRED podataka"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (otvoreni kôd) · Bitcoin fer vrijednost 8.31e-17·dani^5.48 s pojasevima ±10 % i zonom kupnje; za BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (otvoreni kôd) · Faze ciklusa Bitcoina iz MVRV, NUPL i SOPR proksija: Ekstremni medvjed, Medvjed, Rani bik, Bik, Pregrijano; siva linija je normalizirana cijena"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (otvoreni kôd) · Cijela povijest Bitcoina na logaritamskoj spirali, jedan krug po ciklusu prepolovljivanja (halvinga), s vrhovima, dnovima, prepolovljivanjima i sadašnjošću"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1641,9 +2369,21 @@
 "d6640bbc39",
 "Trenutna cijena minus cijena prije n svijeća"
 ],
+"ind_ms": [
+"13fc87db00",
+"Probijanja zadnjeg potvrđenog swinga: BOS s trendom, CHoCH protiv njega"
+],
 "ind_news": [
 "a95010ef34",
 "Naslovi o ovom coinu, označeni u trenutku objave (vijesti stranice za posljednji dan)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · cijena glađena kernelom s omotačem srednje pogreške; oblik koji ne crta ponovno"
+],
+"ind_ob": [
+"530cdc224f",
+"Zadnja suprotna svijeća prije probijanja strukture, sve dok cijena ne zatvori kroz nju"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1668,6 +2408,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volumen pridodan razmjerno postotnoj promjeni"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · zaglađeni RSI s linijom praćenja volatilnosti (QQE MOD jezgra)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtrira šum manji od zaglađenog prosječnog raspona"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1701,25 +2449,53 @@
 "26db009730",
 "Jednostavni pomični prosjek"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Zatvaranje u odnosu na sredinu raspona, dvostruko zaglađeno"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Izravnani pomični prosjek (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger unutar Keltnera = stiskanje (crvene točke); histogram pokazuje u kojem smjeru probija"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · zadnji pivot vrh i dno kao razine"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stohastički RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · pomični prosjeci vrhova i dna koji mijenjaju mjesta kada se trend okrene"
+],
 "ind_st": [
 "8d66b52001",
 "ATR praćenje linije koja se okreće s trendom"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD provučen dvaput kroz stohastik: rani okreti trenda (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K i %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI s pojasevima volatilnosti, brza i spora linija"
+],
 "ind_tema": [
 "1ff881355e",
 "Trostruki eksponencijalni pomični prosjek"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Koliko je svijeća trgovano po kojoj cijeni, po danu"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1733,6 +2509,14 @@
 "182e4a763e",
 "Pritisak kupnje tijekom tri razdoblja"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR praćenje zaustavljanja; cijena koja ga probija je signal za kupnju/prodaju"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · sintetički VIX za bilo koje tržište; skokovi iznad pojaseva često označavaju panična dna"
+],
 "ind_vo": [
 "a99f6a0038",
 "Brzi vs spori prosjek volumena (%)"
@@ -1745,9 +2529,21 @@
 "6badda8c94",
 "Pozitivno i negativno kretanje trenda (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Jedan profil volumena po danu (po mjesecu na dnevnim svijećama)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volumen po svakoj cijeni za svijeće na ekranu, s POC-om i područjem vrijednosti"
+],
 "ind_vwap": [
 "6d86714413",
 "Prosječna cijena ponderirana volumenom, resetira se u 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Dnevni VWAP s pojasevima ±1σ i ±k·σ"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1760,6 +2556,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Ponderirani pomični prosjek"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · oscilator kanalskog indeksa; presjeci iznad 53/60 i ispod −53/−60 označavaju rastegnuta kretanja"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · pomični prosjek najmanjih kvadrata bez kašnjenja"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1885,6 +2689,14 @@
 "891ebccd5b",
 "Zaključaj"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Zaključaj sve crteže"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Svi crteži su zaključani"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1905,13 +2717,41 @@
 "5f703c7eba",
 "Kurdistani signali"
 ],
+"mMode": [
+"659eba1219",
+"Ponavljanje"
+],
+"mMsg": [
+"2c924e3088",
+"Napomena"
+],
+"mTf": [
+"85decb73d1",
+"Vremenski okvir"
+],
 "maType": [
 "15f86c051e",
 "Prosjek"
 ],
+"macroNote": [
+"c4a94f666d",
+"procjena temeljena na pravilima, nije savjet"
+],
 "magnet": [
 "effa915951",
 "Magnet (privuci na otvaranje/vrh/dno/zatvaranje)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnet isključen"
+],
+"magnetS": [
+"607a7625b1",
+"Jaki magnet"
+],
+"magnetW": [
+"181021d95b",
+"Slabi magnet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1933,9 +2773,45 @@
 "fdbe20f376",
 "Svi vremenski okviri"
 ],
+"moreTools": [
+"c871f1056a",
+"Više alata"
+],
 "moveToSection": [
 "98d183e7cb",
 "Premjesti u odjeljak"
+],
+"mt_mine": [
+"1cf761ac34",
+"Moje skripte"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opcije"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Uzorci"
+],
+"mt_prof": [
+"0c2a930099",
+"Profili"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Struktura"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategije"
+],
+"multiAl": [
+"5bafcd2412",
+"Upozorenje s više uvjeta"
+],
+"multiNote": [
+"c7e278bae8",
+"Napišite uvjete u jednom retku i spojite ih s and / or. Upozorenje se aktivira na svijeći u kojoj redak postaje istinit."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1984,6 +2860,10 @@
 "nc_technical": [
 "41fc086088",
 "Tehničko"
+],
+"neckline": [
+"993062b2d6",
+"Linija vrata (Neckline)"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2093,6 +2973,10 @@
 "77f8046dcf",
 "(vrh, bez odjeljka)"
 ],
+"noVol": [
+"0960b9b69d",
+"nema volumena za ovaj simbol"
+],
 "notif": [
 "270d190970",
 "Obavijest preglednika"
@@ -2145,13 +3029,37 @@
 "c0da22faab",
 "Otvori na grafu"
 ],
+"openTv": [
+"94d7227248",
+"Otvori na TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} lanac opcija"
+],
+"optDays": [
+"c2fd31e918",
+"Dana do isteka"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombinacija testirano u {s} s, {p} njih profitabilno; sortirano prema {r}. Kliknite redak za cjelovito izvješće."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit nije odgovorio s ove veze. Promijenite vezu ili VPN i pokušajte ponovno."
+],
+"optIV": [
+"c1bc12118c",
+"Implicirana volatilnost ATM-a"
+],
 "optMax": [
 "7b9c1b1490",
 "Previše kombinacija — najviše {n}. Upotrijebite veći korak."
+],
+"optMove": [
+"8aa36fe05d",
+"Očekivano kretanje"
 ],
 "optN": [
 "1e919c1ca4",
@@ -2161,6 +3069,18 @@
 "4b4713d390",
 "Najbolji rezultat na prošlim podacima često je stvar sreće (overfitting). Preferirajte postavke čiji susjedi također postižu dobre rezultate i provjerite ih na drugom razdoblju ili tržištu."
 ],
+"optNote2": [
+"26dfa389e8",
+"OI i volumen u ugovorima (kovanicama); $ je označena cijena u dolarima. Maksimalna bol: cijena namire koja imateljima opcija isplaćuje najmanje. Očekivano kretanje = cijena × IV × √(dani/365). Nije savjet."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Maksimalna bol"
+],
 "optProg": [
 "2b404f9f4a",
 "Testiranje {i} / {n}…"
@@ -2168,6 +3088,10 @@
 "optRun": [
 "9a456cc451",
 "Pronađi najbolje postavke"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Temeljna imovina"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2229,13 +3153,37 @@
 "0777981263",
 "Cijene u {c} sada koriste vaš tečaj."
 ],
+"p_amp": [
+"15b948e105",
+"Amplituda"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR duljina"
 ],
+"p_band": [
+"3541c5f4e1",
+"Duljina pojasa"
+],
 "p_base": [
 "077fe9c54e",
 "Osnovica"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Duljina pojasa"
+],
+"p_bw": [
+"1d06cbba91",
+"Propusnost"
+],
+"p_chdev": [
+"65acb623a8",
+"Devijacija kanala"
+],
+"p_coeff": [
+"b032583db6",
+"Množitelj"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2269,6 +3217,10 @@
 "8db6a2f1d3",
 "Brzo"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Brzi 2"
+],
 "p_hi": [
 "70a2565504",
 "Gornja razina"
@@ -2289,6 +3241,14 @@
 "a0623fa9a3",
 "%K glađenje"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Ključna vrijednost"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1 duljina"
@@ -2304,6 +3264,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4 duljina"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentilni period"
+],
+"p_left": [
+"3b219a058a",
+"Lijeve svijeće"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2345,6 +3313,14 @@
 "a44d6c906d",
 "Svijeće sa svake strane"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Duljina kanala"
+],
+"p_n2": [
+"2df99da939",
+"Prosječna duljina"
+],
 "p_offset": [
 "ce66771654",
 "Pomak"
@@ -2353,13 +3329,41 @@
 "ac556cf593",
 "Postotak"
 ],
+"p_pd": [
+"4997ad18cf",
+"Period unazad"
+],
+"p_per": [
+"a89f63abb8",
+"Razdoblje uzorkovanja"
+],
+"p_ph": [
+"b1f698cc3d",
+"Visoki percentil"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE faktor"
+],
 "p_rank": [
 "1df2ca7462",
 "Duljina postotnog rangiranja"
 ],
+"p_right": [
+"307c9815b6",
+"Desne svijeće"
+],
+"p_rows": [
+"52d0b35277",
+"Redci"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI duljina"
+],
+"p_sf": [
+"590f20262b",
+"RSI glađenje"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2376,6 +3380,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Sporo"
+],
+"p_slow2": [
+"c252d2ccab",
+"Spori 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2421,6 +3429,54 @@
 "07300ad49f",
 "{c} za 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Dodaj"
+],
+"pfAvg": [
+"def9f57b0c",
+"Prosječna cijena kupnje"
+],
+"pfCost": [
+"64ae43e8fe",
+"Trošak"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Ovdje još nema ničega. Dodajte kriptovalutu, količinu koju posjedujete i cijenu po kojoj ste je platili."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfelj {n}"
+],
+"pfNote": [
+"f46050561e",
+"Pohranjeno samo u ovom pregledniku. Ne traži ključeve mjenjačnice i ne šalje ništa nikamo. Cijene su Binance USDT parovi."
+],
+"pfNow": [
+"039df35064",
+"Trenutačna cijena"
+],
+"pfPnl": [
+"8ae3945397",
+"Dobit / gubitak"
+],
+"pfQty": [
+"44f6af6945",
+"Količina"
+],
+"pfShort": [
+"036b18f02a",
+"Portfelj"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfelj"
+],
+"pfValue": [
+"8dce170de2",
+"Vrijednost"
+],
 "pickStart": [
 "1e214a5fd6",
 "Kliknite na graf gdje bi repriza trebala početi"
@@ -2444,6 +3500,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Cijena"
+],
+"profNote": [
+"c1da831af8",
+"Za profil odabranog raspona koristite „Fixed range volume profile” u lijevoj alatnoj traci."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2617,6 +3677,86 @@
 "56a2285c5b",
 "Spremanje…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Automatsko prilagođavanje skale cijena"
+],
+"scBorder": [
+"45c60c0e85",
+"Okvir skale cijena"
+],
+"scBot": [
+"77a5b77d62",
+"Prostor ispod (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Obje strane"
+],
+"scInvert": [
+"ba80abaac1",
+"Obrni skaliranje cijena"
+],
+"scInvertH": [
+"ebb1688761",
+"gore postaje dolje"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Lijevo"
+],
+"scLog": [
+"65fa51781b",
+"Logaritamski"
+],
+"scMode": [
+"a5e5771ca0",
+"Skala cijena"
+],
+"scModeH": [
+"ab58fc981e",
+"normalno, logaritamski ili postotno"
+],
+"scNone": [
+"d4c2792a72",
+"Skriveno"
+],
+"scNormal": [
+"7802670ec0",
+"Normalno (aritmetički)"
+],
+"scOff": [
+"3557c35506",
+"Prazan prostor s desne strane"
+],
+"scPct": [
+"c4519ac7cc",
+"Postotak"
+],
+"scRight": [
+"954daa8b00",
+"Desno"
+],
+"scSec": [
+"c92a4af093",
+"Sekunde na vremenskoj skali"
+],
+"scSide": [
+"82acb7ee2b",
+"Položaj skale cijena"
+],
+"scSpace": [
+"2878a3a43e",
+"Razmak između svijeća"
+],
+"scTop": [
+"25126a3aab",
+"Prostor iznad (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Okvir vremenske skale"
+],
 "sc_c": [
 "3e8248e32e",
 "Cijena"
@@ -2676,6 +3816,62 @@
 "screener": [
 "7f27924c12",
 "Praćenje tržišta"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Provjeri"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab uređivač skripti"
+],
+"scriptEdit": [
+"ae909c75da",
+"Uredi skriptu"
+],
+"scriptExamples": [
+"41a27a4710",
+"Primjeri…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Redak {n}"
+],
+"scriptName": [
+"709a23220f",
+"Naziv"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nova skripta"
+],
+"scriptNote": [
+"c265d2248f",
+"Napišite vlastite indikatore u jeziku sličnom Pine-u. Spremaju se u ovom pregledniku i pokreću se samo ovdje, na vašem grafikonu."
+],
+"scriptOk": [
+"eb3da0c952",
+"Nema pogrešaka · {n} izlaza"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Što jezik podržava"
+],
+"scriptSave": [
+"1e291c4d98",
+"Spremi i dodaj na grafikon"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skripta je spremljena"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skripta"
 ],
 "searchEv": [
 "0a08612647",
@@ -2781,9 +3977,25 @@
 "e97d96a8bc",
 "Najveći volumen"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI križanje (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollingerov preokret"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2792,6 +4004,22 @@
 "sg_ek": [
 "c3de6d0cdd",
 "Kurdistani signali (BTC)"
+],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun križanje"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ križanje"
 ],
 "sg_macd": [
 "db0453bd2b",
@@ -2805,6 +4033,14 @@
 "7bd7543cd4",
 "Parabolic SAR"
 ],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
+],
 "sg_rsi": [
 "d890614a3f",
 "RSI preokret"
@@ -2813,9 +4049,37 @@
 "446d28671b",
 "Zlatni / mrtvački križ (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI križanje"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend križanje [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2945,6 +4209,106 @@
 "2d2cb022bc",
 "Brzina"
 ],
+"stBadLv": [
+"683a05683a",
+"Razina mora imati najviše 24 broja."
+],
+"stBadPt": [
+"a73083f114",
+"Cijena ili vrijeme nisu valjani."
+],
+"stColor": [
+"f28563a477",
+"Boja"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinate"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Isprekidano"
+],
+"stDev": [
+"e789c07831",
+"Devijacija (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Točkasto"
+],
+"stExtL": [
+"ef880cf8fc",
+"Produži lijevo"
+],
+"stExtR": [
+"fbff580b3d",
+"Produži desno"
+],
+"stFill": [
+"64dd60fe1a",
+"Pozadina"
+],
+"stLevels": [
+"ae3d013ab1",
+"Razine (odvojene zarezom)"
+],
+"stLine": [
+"120ee44bec",
+"Stil linije"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Ovdje se mogu uređivati samo prvih 12 točaka."
+],
+"stOpacity": [
+"f12e36bd83",
+"Prozirnost pozadine"
+],
+"stReset": [
+"40aab769d0",
+"Zadane razine"
+],
+"stRows": [
+"52d0b35277",
+"Redci"
+],
+"stSize": [
+"83ca9e48c3",
+"Veličina fonta"
+],
+"stSolid": [
+"d00635865c",
+"Puna linija"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stil"
+],
+"stText": [
+"c3328c39b0",
+"Tekst"
+],
+"stTextC": [
+"d160595fcf",
+"Boja teksta"
+],
+"stTextL": [
+"c3328c39b0",
+"Tekst"
+],
+"stUtc": [
+"c9dbd25df4",
+"Vremena su u UTC (GGGG-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Vidljivost"
+],
+"stWidth": [
+"ad48f34186",
+"Debljina"
+],
 "st_err": [
 "d802d232a8",
 "Nema podataka"
@@ -2988,6 +4352,14 @@
 "stop": [
 "9e253470c8",
 "Zaustavi"
+],
+"stratNote": [
+"16dc19eef4",
+"Svaka strategija se u testeru pokreće na povijesnim podatcima ovog grafikona: ulazi i izlasci na grafikonu, neto rezultat, postotak dobitnih poslova, najveći pad (drawdown) i optimizator postavki."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Pokreni u testeru strategija"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3041,25 +4413,133 @@
 "a26d0ddaae",
 "Pomicanje (vrijeme)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD uzorak"
+],
+"t_angle": [
+"30cd1e7703",
+"Kut trenda"
+],
+"t_arc": [
+"853a983f6b",
+"Luk"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Strijelka"
+],
+"t_arrowc": [
+"0f722804ec",
+"Kursor strelice"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Oznaka strelice prema dolje"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Oznaka strelice"
+],
+"t_arrowup": [
+"8023467135",
+"Oznaka strelice prema gore"
+],
+"t_avwap": [
+"0a4f86b195",
+"Sidreni VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Kist"
 ],
+"t_callout": [
+"f1647ad880",
+"Oblačić s tekstom"
+],
 "t_channel": [
 "c0350b7736",
 "Paralelni kanal"
+],
+"t_circ": [
+"1cc7820a08",
+"Krug"
 ],
 "t_circle": [
 "8580e3175f",
 "Elipsa"
 ],
+"t_comment": [
+"153d7a58b3",
+"Komentar"
+],
+"t_cross": [
+"983bdb7b27",
+"Križna linija"
+],
 "t_cursor": [
 "2239943c8d",
 "Kursor"
+],
+"t_curve": [
+"916f09aff8",
+"Krivulja"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Cikličke linije"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher uzorak"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dvostruka krivulja"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Prekinuti kanal"
+],
+"t_dot": [
+"46856bf702",
+"Točka"
+],
+"t_drange": [
+"c65ea4ae01",
+"Vremenski raspon"
+],
+"t_drives": [
+"3a261ca869",
+"Uzorak s tri vala"
+],
+"t_emoji": [
+"707fd71017",
+"Ikone i emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Gumica"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliottov korektivni val (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliottova dvostruka kombinacija (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliottov impulsni val (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliottov trokutasti val (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliottova trostruka kombinacija (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3069,13 +4549,69 @@
 "18c530863b",
 "Fibonaccijevo vraćanje"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fibonaccijevi lukovi otpora"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fibonaccijev kanal"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fibonaccijevi krugovi"
+],
 "t_fibext": [
 "73655be9d6",
 "Fibonaccijeva ekstenzija temeljena na trendu"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fibonaccijeva lepeza otpora"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fibonaccijeva spirala"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Fibonaccijevo vrijeme temeljeno na trendu"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fibonaccijeva vremenska zona"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fibonaccijev klin"
+],
+"t_flag": [
+"23d91e7740",
+"Oznaka zastavice"
+],
+"t_flat": [
+"52d3db252e",
+"Ravni vrh/dno"
+],
+"t_forecast": [
+"528bc4bc38",
+"Prognoza"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gannova lepeza"
+],
+"t_gannbox": [
+"58a3842138",
+"Gannova kutija"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gannov kvadrat"
+],
+"t_hl": [
+"8cb3f79b49",
+"Marker"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3085,6 +4621,18 @@
 "0bcbc4e087",
 "Vodoravni zrak"
 ],
+"t_hs": [
+"43353dbcec",
+"Glava i ramena"
+],
+"t_info": [
+"a690e33098",
+"Informativna linija"
+],
+"t_inside": [
+"30d6b425dc",
+"Unutarnji pitchfork"
+],
 "t_long": [
 "666f195fc4",
 "Long pozicija"
@@ -3093,9 +4641,45 @@
 "2bedd64d85",
 "Raspon cijena / mjerenje"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modificirani Schiffov pitchfork"
+],
+"t_note": [
+"2c924e3088",
+"Bilješka"
+],
+"t_path": [
+"519e39132b",
+"Putanja"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews’ pitchfork"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchfan"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Oznaka cijene"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Cjenovna bilješka"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polilinija"
+],
+"t_prange": [
+"c20f7ce09a",
+"Raspon cijena"
+],
+"t_proj": [
+"8aa49fe840",
+"Projekcija"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3105,9 +4689,33 @@
 "c158695a64",
 "Pravokutnik"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regresijski trend"
+],
+"t_rrect": [
+"65807afaf7",
+"Rotirani pravokutnik"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiffov pitchfork"
+],
 "t_short": [
 "a8daf74669",
 "Short pozicija"
+],
+"t_signpost": [
+"89f361362e",
+"Putokaz"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinusoidna linija"
+],
+"t_tcycle": [
+"521a687246",
+"Vremenski ciklusi"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3117,9 +4725,29 @@
 "e810388344",
 "Linija trenda"
 ],
+"t_tri": [
+"32547b031d",
+"Uzorak trokuta"
+],
+"t_tri3": [
+"73d3ae245f",
+"Trokut"
+],
 "t_vline": [
 "a790288017",
 "Okomita linija"
+],
+"t_vrp": [
+"bcba420b37",
+"Profil volumena fiksnog raspona"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD uzorak"
+],
+"t_zoom": [
+"4fc05f2763",
+"Povećaj"
 ],
 "target": [
 "61ad50a9b9",
@@ -3165,6 +4793,26 @@
 "5fb1db5278",
 "Sekunde"
 ],
+"thDark": [
+"ae1ef01432",
+"Tamna"
+],
+"thLight": [
+"a36ef8aba2",
+"Svijetla"
+],
+"thMid": [
+"4fe978738d",
+"Ponoćno plava"
+],
+"thNavy": [
+"0229e960cf",
+"Mornarsko plava"
+],
+"thPaper": [
+"22d507f2ba",
+"Papir"
+],
 "time": [
 "6c82e6dd86",
 "Vrijeme"
@@ -3188,6 +4836,10 @@
 "tooFar": [
 "b29db0358a",
 "To je dalje u prošlosti nego što ovaj vremenski okvir može učitati; odaberite veći vremenski okvir."
+],
+"toolHint": [
+"56e62363ce",
+"kliknite na grafikon za crtanje"
 ],
 "topFixed": [
 "1a66879287",
@@ -3413,6 +5065,34 @@
 "1526a17ee7",
 "Otključaj"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Svi crteži su otključani"
+],
+"vDay": [
+"f6bb0f468a",
+"Dani"
+],
+"vHour": [
+"9e25a34e63",
+"Sati"
+],
+"vMin": [
+"092f99ea11",
+"Minute"
+],
+"vMonth": [
+"200dcdce9b",
+"Mjeseci"
+],
+"vSec": [
+"5fb1db5278",
+"Sekunde"
+],
+"vWeek": [
+"7d75266a53",
+"Tjedni"
+],
 "value": [
 "3e8248e32e",
 "Cijena"
@@ -3420,6 +5100,10 @@
 "valuePct": [
 "bf55390d8d",
 "Postotak (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3464,9 +5148,49 @@
 "yourRate": [
 "ca14282aa6",
 "vaša stopa"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Smanji"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Povucite veći okvir za uvećanje."
 ]
 },
 "f": {
+"in_kmacro": [
+"8d14b84b22",
+1
+],
+"in_kpl": [
+"91c22dd9b4",
+1
+],
+"in_ksc": [
+"29bc3d0cd6",
+1
+],
+"in_kspiral": [
+"9dd53ce639",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"ind_vdelta": [
+"d8b588eda0",
+1
+],
+"optNote": [
+"96723a0ac4",
+1
+],
+"sg_nwe": [
+"4e506ad872",
+1
+],
 "slTp": [
 "41d1998bce",
 3

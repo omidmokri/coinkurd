@@ -217,6 +217,10 @@
 "252e1f7660",
 "Hälytyksiä tarkistetaan tässä selaimessa sivun ollessa auki (millä tahansa välilehdellä). Indikaattorihälytykset laukeavat palkin sulkeutuessa."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Hälytys tästä piirroksesta"
+],
 "alertSet": [
 "80c4c4abee",
 "Hälytys asetettu: {c}"
@@ -341,6 +345,14 @@
 "98464789c4",
 "Paras kauppa"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Vuotuinen kasvu (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Lataa kaupat (CSV)"
@@ -393,6 +405,14 @@
 "d669a6654d",
 "Pitkät kaupat"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1 000 toistoa samoista kaupoista):"
+],
+"btMCv": [
+"992209a3c0",
+"tyypillinen drawdown {a}% · 95% tilauksista pysyy alle {b}% · huonoin {c}% · tämä ajo {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimoi"
@@ -441,6 +461,10 @@
 "80e53e077c",
 "Voittokerroin"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Tuotto-suhde (keskim. voitto / keskim. tappio)"
+],
 "btRange": [
 "63a44ed01a",
 "alkaen / asti / askel"
@@ -484,6 +508,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (vuosittainen)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Ensimmäiset 70% vs. viimeiset 30% kaupoista:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} voitolla {aw}% ({an} kauppaa) → {b} voitolla {bw}% ({bn} kauppaa)"
 ],
 "btStreak": [
 "260b23b529",
@@ -601,9 +633,21 @@
 "6a72085653",
 "Kaikki"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · avoin lähdekoodi"
+],
+"cat_com": [
+"90566b4c6f",
+"Yhteisön suosikit"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (maailma)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -649,9 +693,49 @@
 "3090f6af60",
 "24h muutos"
 ],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro-ohjausnäkymä julkisesta datasta: risk-on / risk-off -tilanne"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"Ketjupohjaiset syklivaiheet (MVRV, NUPL) hintasijainnilla"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Bitcoinin koko historia logaritmisella spiraalilla"
+],
 "clearAll": [
 "7de68ccb43",
 "Poista kaikki piirrokset"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Poista piirrokset ja indikaattorit"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Poista piirrokset"
+],
+"clearInds": [
+"8b56474294",
+"Poista indikaattorit"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Poistetaanko jokainen indikaattori tästä kaaviosta?"
 ],
 "clearLog": [
 "096311b563",
@@ -676,6 +760,10 @@
 "clone": [
 "af74f7c536",
 "Kopioi"
+],
+"cloned": [
+"51fbf8cb72",
+"Kopioitu viereen"
 ],
 "close": [
 "bbfa773e5a",
@@ -709,9 +797,221 @@
 "d0d4d379f5",
 "Aikaa jäljellä tämän kynttilän sulkeutumiseen"
 ],
+"crFree": [
+"6b4b480231",
+"Seuraa hiirtä"
+],
+"crLargeDash": [
+"a7503adc35",
+"Pitkät katkoviivat"
+],
+"crMagnet": [
+"77fa49774c",
+"Tarttuu kynttilöihin"
+],
+"crOff": [
+"d4c2792a72",
+"Piilotettu"
+],
+"crSparse": [
+"e50cc378a1",
+"Hajanaiset pisteet"
+],
 "create": [
 "8ac903c3c3",
 "Luo hälytys"
+],
+"csBg": [
+"64dd60fe1a",
+"Tausta"
+],
+"csBg2": [
+"9ebb790d74",
+"Toinen taustaväri"
+],
+"csBody": [
+"718a7e8a58",
+"Kynttilän kroppa"
+],
+"csBorderC": [
+"eeffa83765",
+"Reunuksen väri"
+],
+"csBorders": [
+"685f23bc5e",
+"Reunukset"
+],
+"csClose": [
+"bbfa773e5a",
+"Sulku"
+],
+"csCross": [
+"b0b83f89e8",
+"Ristikko & hiiri"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Ristikon väri"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Ristikon viiva"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Hinta- ja aikamerkinnät ristikossa"
+],
+"csCrossMode": [
+"800092e3e1",
+"Ristikko"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Ristikon paksuus"
+],
+"csDn": [
+"11f5ff3829",
+"Laskeva kynttilä"
+],
+"csFont": [
+"b97c4d4cdd",
+"Fontti"
+],
+"csFsize": [
+"83ca9e48c3",
+"Fonttikoko"
+],
+"csGrad": [
+"c716191a01",
+"muuttaa taustan liukuväriksi"
+],
+"csGridA": [
+"f773586220",
+"Ruudukon läpinäkyvyys (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Ruudukon väri"
+],
+"csGridH": [
+"4eaa1c008a",
+"Vaakasuuntaiset ruudukon viivat"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Pystysuuntaiset ruudukon viivat"
+],
+"csHollow": [
+"9165bccc85",
+"Ontot kynttilät"
+],
+"csHollowH": [
+"fb63aba345",
+"vain nousevat kynttilät"
+],
+"csKinetic": [
+"6e771721f0",
+"Kineettinen vieritys kosketuksella"
+],
+"csLast": [
+"aacdc5bea4",
+"Viimeisin hintaviiva"
+],
+"csLastLab": [
+"91c990bcb9",
+"Hintamerkintä asteikolla"
+],
+"csLineC": [
+"01212659ee",
+"Viivan / alueen väri"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Viivan paksuus"
+],
+"csLook": [
+"41def7a0fe",
+"Ulkoasu"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"sama väri molempiin suuntiin"
+],
+"csPinch": [
+"e557a41794",
+"Nipistyszoomaus kosketuksella"
+],
+"csResetQ": [
+"9c369383c1",
+"Palautetaanko kaikki kaavion asetukset oletuksiksi?"
+],
+"csScale": [
+"0b414bdcb7",
+"Asteikot"
+],
+"csScroll": [
+"468c89cb3b",
+"Raahaa kaaviota hiirellä"
+],
+"csSym": [
+"fad29404d2",
+"Kynttilät"
+],
+"csText": [
+"d160595fcf",
+"Tekstin väri"
+],
+"csTheme": [
+"a797e30923",
+"Teema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Kaavion asetukset"
+],
+"csUp": [
+"971a95475d",
+"Nouseva kynttilä"
+],
+"csWick": [
+"fe6e2bfd48",
+"Sydämet"
+],
+"csWickC": [
+"0fcb21d161",
+"Sydämen väri"
+],
+"csWm": [
+"33c7b41ac6",
+"Vesileima kynttilöiden takana"
+],
+"csWmA": [
+"69a1810ea2",
+"Vesileiman läpinäkyvyys (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"symboli ja aikaväli"
+],
+"csWmC": [
+"bad81c749f",
+"Vesileiman väri"
+],
+"csWmSize": [
+"4af7e52f80",
+"Vesileiman koko"
+],
+"csWmText": [
+"ecf870ab34",
+"Vesileimateksti"
+],
+"csZoom": [
+"c6f40d9d03",
+"Hiiren rulla"
+],
+"csZoomH": [
+"4ca34c1092",
+"zoomaus sisään ja ulos"
 ],
 "csv": [
 "518463f518",
@@ -724,6 +1024,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} kynttilää ladattu"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Lisää hälytys tähän"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopioi tämä hinta"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Sovita kaikki kynttilät"
+],
+"ctxHline": [
+"588d2eb492",
+"Vaakasuora viiva tähän"
+],
+"ctxReset": [
+"242cb352c0",
+"Nollaa näkymä"
 ],
 "curNote": [
 "538ead2fdf",
@@ -897,9 +1217,29 @@
 "2422a88320",
 "Joka kerta (enintään kerran minuutissa / kerran per kynttilä)"
 ],
+"exAuto": [
+"1ff048b76e",
+"reaaliaikainen, varalla OKX"
+],
+"exDown": [
+"e8ba18613e",
+"{x} ei vastaa tällä yhteydellä. Kaavio pysyy nykyisessä pörssissä."
+],
+"exNote": [
+"0eb4c03240",
+"Binance suoratoistaa reaaliajassa; muita luetaan omista julkisista rajapinnoistaan kymmenen sekunnin välein omalla historiallaan."
+],
+"exTitle": [
+"5b13eac7ed",
+"Pörssi"
+],
 "exit": [
 "f83b6fe3ae",
 "Poistumistaso"
+],
+"exitFull": [
+"fc61e74cd9",
+"Poistu koko näytön tilasta"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -940,6 +1280,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Vie kaikki (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Tämän indikaattorin data ei latautunut. Yritä hetken kuluttua uudelleen."
 ],
 "extend": [
 "ab07d3f288",
@@ -997,6 +1341,18 @@
 "3526f607bc",
 "Keltainen"
 ],
+"fnMono": [
+"216fcddff2",
+"Tasalevyinen"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Ennuste"
@@ -1012,6 +1368,70 @@
 "futSub": [
 "16db4a6d5c",
 "Neljännesvuosittaiset futuurit, jatkuva"
+],
+"g_arrows": [
+"0cf604cb00",
+"Nuolet"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Siveltimet"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanavat"
+],
+"g_cursors": [
+"f4d2f91040",
+"Kursorit"
+],
+"g_cycles": [
+"97f064aff5",
+"Syklit"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott-aallot"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Viivat"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Mittaustyökalu"
+],
+"g_pat": [
+"2c179da0f5",
+"Kaaviokuviot"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchfork-haarukat"
+],
+"g_proj": [
+"8aa49fe840",
+"Projektio"
+],
+"g_shapes": [
+"b1985e3874",
+"Muodot"
+],
+"g_text": [
+"d7cd4cda4f",
+"Teksti & muistiinpanot"
+],
+"g_vol": [
+"1b4620951d",
+"Volyymipohjaiset"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1096,6 +1516,18 @@
 "hideAll": [
 "1f0e916e42",
 "Piilota / näytä piirrokset"
+],
+"hideBoth": [
+"3502a3299d",
+"Piilota piirrokset ja indikaattorit"
+],
+"hideDraw": [
+"f4492c5211",
+"Piilota piirrokset"
+],
+"hideInds": [
+"764ab9d614",
+"Piilota indikaattorit"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1197,6 +1629,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1208,6 +1644,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1233,6 +1673,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1252,6 +1696,34 @@
 "in_copp": [
 "025c720b24",
 "Coppock Curve"
+],
+"in_cp_all": [
+"b43801ff03",
+"Kaikki kynttiläkuviot"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Nielaiseva (Engulfing)"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Vasara / Hirtetty (Hammer / Hanging man)"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Sisäpalkki (Inside bar)"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
 ],
 "in_cp_mstar": [
 "5114d8a4f7",
@@ -1484,6 +1956,10 @@
 "in_sqz": [
 "b42e6347a2",
 "Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Tuki & Vastus murroilla [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
@@ -2020,6 +2496,10 @@
 "ind_ut": [
 "bde2d091af",
 "QuantNomad · ATR trailing stop; hinnan ylitys on osto-/myyntisignaali"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Kunkin kynttilän osto- miinus myyntivolyymi (taker-data Binance sta; muualla arvio)"
 ],
 "ind_vixfix": [
 "101ce888f8",
@@ -2574,8 +3054,8 @@
 "{n} yhdistelmää (enintään {m} tälle historialle)"
 ],
 "optNote": [
-"4b4713d390",
-"Paras tulos aiemmalla datalla on usein onnea (ylisovittaminen). Suosi asetuksia, joiden naapurit toimivat myös hyvin, ja tarkista ne toisella ajanjaksolla tai markkinalla."
+"96723a0ac4",
+"BTC:n ja ETH:n optioketju Deribit:n julkisesta datasta, selaimesi lukemana."
 ],
 "optNote2": [
 "26dfa389e8",
@@ -2681,6 +3161,18 @@
 "3541c5f4e1",
 "Nauhan pituus"
 ],
+"p_bw": [
+"1d06cbba91",
+"Kaistanleveys"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanavan poikkeama"
+],
+"p_coeff": [
+"b032583db6",
+"Kerroin"
+],
 "p_conv": [
 "9151f8433f",
 "Muunnos"
@@ -2713,6 +3205,10 @@
 "8db6a2f1d3",
 "Nopea"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Nopea 2"
+],
 "p_hi": [
 "70a2565504",
 "Ylätaso"
@@ -2733,6 +3229,14 @@
 "a0623fa9a3",
 "%K tasoitus"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC-kerroin"
+],
+"p_key": [
+"ab76f1670b",
+"Avainarvo"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1 pituus"
@@ -2748,6 +3252,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4 pituus"
+],
+"p_lb": [
+"0f484e5cc3",
+"Prosenttipisteen tarkastelujakso"
+],
+"p_left": [
+"3b219a058a",
+"Vasen palkki"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2789,6 +3301,14 @@
 "a44d6c906d",
 "Kynttilöitä molemmin puolin"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanavan pituus"
+],
+"p_n2": [
+"2df99da939",
+"Keskiarvon pituus"
+],
 "p_offset": [
 "ce66771654",
 "Siirtymä"
@@ -2797,13 +3317,41 @@
 "ac556cf593",
 "Prosentti"
 ],
+"p_pd": [
+"4997ad18cf",
+"Tarkastelujakso"
+],
+"p_per": [
+"a89f63abb8",
+"Otantajakso"
+],
+"p_ph": [
+"b1f698cc3d",
+"Yläprosenttipiste"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE-tekijä"
+],
 "p_rank": [
 "1df2ca7462",
 "Prosentti-rank pituus"
 ],
+"p_right": [
+"307c9815b6",
+"Oikea palkki"
+],
+"p_rows": [
+"52d0b35277",
+"Rivit"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI-pituus"
+],
+"p_sf": [
+"590f20262b",
+"RSI-tasoitus"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2820,6 +3368,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Hidas"
+],
+"p_slow2": [
+"c252d2ccab",
+"Hidas 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2865,6 +3417,54 @@
 "07300ad49f",
 "{c} per 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Lisää"
+],
+"pfAvg": [
+"def9f57b0c",
+"Keskimääräinen ostohinta"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kustannus"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Täällä ei ole vielä mitään. Lisää kolikko, omistamasi määrä ja maksettu hinta."
+],
+"pfName": [
+"a5a98fb17f",
+"Salkku {n}"
+],
+"pfNote": [
+"f46050561e",
+"Säilytetään vain tässä selaimessa. Se ei koskaan pyydä pörssin avaimia eikä lähetä mitään mihinkään. Hinnat ovat Binance USDT-pareja."
+],
+"pfNow": [
+"039df35064",
+"Hinta nyt"
+],
+"pfPnl": [
+"8ae3945397",
+"Voitto / tappio"
+],
+"pfQty": [
+"44f6af6945",
+"Määrä"
+],
+"pfShort": [
+"036b18f02a",
+"Salkku"
+],
+"pfTitle": [
+"036b18f02a",
+"Salkku"
+],
+"pfValue": [
+"8dce170de2",
+"Arvo"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klikkaa kaaviota kohdasta, josta toiston tulisi alkaa"
@@ -2888,6 +3488,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Hinta"
+],
+"profNote": [
+"c1da831af8",
+"Käyttääksesi valitsemasi alueen profiilia, käytä vasemmassa työkalurivissä olevaa \"Kiinteän välin volyymiprofiilia\"."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3061,6 +3665,86 @@
 "56a2285c5b",
 "Tallennetaan..."
 ],
+"scAuto": [
+"6e0f8f2742",
+"Sovita hintaskaala automaattisesti"
+],
+"scBorder": [
+"45c60c0e85",
+"Hintaskaalan reunus"
+],
+"scBot": [
+"77a5b77d62",
+"Tilaa alapuolella (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Molemmat puolet"
+],
+"scInvert": [
+"ba80abaac1",
+"Käännä hintaskaala ylösalaisin"
+],
+"scInvertH": [
+"ebb1688761",
+"ylös muuttuu alas"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Vasen"
+],
+"scLog": [
+"65fa51781b",
+"Logaritminen"
+],
+"scMode": [
+"a5e5771ca0",
+"Hintaskaala"
+],
+"scModeH": [
+"ab58fc981e",
+"normaali, logaritminen tai prosentuaalinen"
+],
+"scNone": [
+"d4c2792a72",
+"Piilotettu"
+],
+"scNormal": [
+"7802670ec0",
+"Normaali (aritmeettinen)"
+],
+"scOff": [
+"3557c35506",
+"Tyhjää tilaa oikealla"
+],
+"scPct": [
+"c4519ac7cc",
+"Prosenttia"
+],
+"scRight": [
+"954daa8b00",
+"Oikea"
+],
+"scSec": [
+"c92a4af093",
+"Sekunteja aikaskaalassa"
+],
+"scSide": [
+"82acb7ee2b",
+"Mihin hintaskaala sijoittuu"
+],
+"scSpace": [
+"2878a3a43e",
+"Kynttilöiden välistys"
+],
+"scTop": [
+"25126a3aab",
+"Tilaa yläpuolella (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Aikaskaalan reunus"
+],
 "sc_c": [
 "3e8248e32e",
 "Hinta"
@@ -3120,6 +3804,62 @@
 "screener": [
 "7f27924c12",
 "Markkinoiden seuranta"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Seuloo"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Tarkista"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script -editori"
+],
+"scriptEdit": [
+"ae909c75da",
+"Muokkaa skriptiä"
+],
+"scriptExamples": [
+"41a27a4710",
+"Esimerkkejä..."
+],
+"scriptLine": [
+"1acb1c0448",
+"Rivi {n}"
+],
+"scriptName": [
+"709a23220f",
+"Nimi"
+],
+"scriptNew": [
+"ebac729ca3",
+"Uusi skripti"
+],
+"scriptNote": [
+"c265d2248f",
+"Kirjoita omat indikaattorisi Pine-tyylisellä kielellä. Ne tallennetaan tähän selaimeen ja suoritetaan vain täällä, kaaviollasi."
+],
+"scriptOk": [
+"eb3da0c952",
+"Ei virheitä · {n} tulostetta"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Mitä kieli tietää"
+],
+"scriptSave": [
+"1e291c4d98",
+"Tallenna ja lisää kaavioon"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skripti tallennettu"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skripti"
 ],
 "searchEv": [
 "0a08612647",
@@ -3225,9 +3965,25 @@
 "e97d96a8bc",
 "Suurin vaihto"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI-risteys (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollingerin käännös"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3237,6 +3993,22 @@
 "c3de6d0cdd",
 "Kurdistani-signaalit (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun -risteys"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ-risteys"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD-risteys"
@@ -3245,9 +4017,21 @@
 "6677aad0c9",
 "EMA-risteys"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Nadaraya-Watson käännös [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -3257,9 +4041,37 @@
 "446d28671b",
 "Kultainen / kuolemanristeys (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI -risteys"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend-risteys [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3393,6 +4205,106 @@
 "2d2cb022bc",
 "Nopeus"
 ],
+"stBadLv": [
+"683a05683a",
+"Tasojen täytyy olla enintään 24 numeroa."
+],
+"stBadPt": [
+"a73083f114",
+"Hinta tai aika ei kelpaa."
+],
+"stColor": [
+"f28563a477",
+"Väri"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinaatit"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Katkoviiva"
+],
+"stDev": [
+"e789c07831",
+"Poikkeama (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Pisteviiva"
+],
+"stExtL": [
+"ef880cf8fc",
+"Jatka vasemmalle"
+],
+"stExtR": [
+"fbff580b3d",
+"Jatka oikealle"
+],
+"stFill": [
+"64dd60fe1a",
+"Tausta"
+],
+"stLevels": [
+"ae3d013ab1",
+"Tasot (pilkulla erotettuna)"
+],
+"stLine": [
+"120ee44bec",
+"Viivan tyyli"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Vain 12 ensimmäistä pistettä voidaan muokata täällä."
+],
+"stOpacity": [
+"f12e36bd83",
+"Taustan peittävyys"
+],
+"stReset": [
+"40aab769d0",
+"Oletustasot"
+],
+"stRows": [
+"52d0b35277",
+"Rivit"
+],
+"stSize": [
+"83ca9e48c3",
+"Fontin koko"
+],
+"stSolid": [
+"d00635865c",
+"Yhtenäinen"
+],
+"stStyle": [
+"99a0efc6cf",
+"Tyyli"
+],
+"stText": [
+"c3328c39b0",
+"Teksti"
+],
+"stTextC": [
+"d160595fcf",
+"Tekstin väri"
+],
+"stTextL": [
+"c3328c39b0",
+"Teksti"
+],
+"stUtc": [
+"c9dbd25df4",
+"Ajat ovat UTC-aikaa (VVVV-KK-PP TT:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Näkyvyys"
+],
+"stWidth": [
+"ad48f34186",
+"Paksuus"
+],
 "st_err": [
 "d802d232a8",
 "Ei tietoja"
@@ -3436,6 +4348,14 @@
 "stop": [
 "9e253470c8",
 "Pysäytä"
+],
+"stratNote": [
+"16dc19eef4",
+"Jokainen strategiasi toimii tämän kaavion historialla testaajassa: merkinnät ja poistumiset kaaviolla, nettotulos, voittoprosentti, drawdown ja optimoija sen asetuksille."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Suorita strategiatestaajassa"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3485,25 +4405,133 @@
 "a26d0ddaae",
 "Vieritys (aika)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD-kuvio"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendikulma"
+],
+"t_arc": [
+"853a983f6b",
+"Kaari"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Nuoli"
+],
+"t_arrowc": [
+"0f722804ec",
+"Nuolikohdistin"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Nuolimerkki alas"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Nuolimerkitsin"
+],
+"t_arrowup": [
+"8023467135",
+"Nuolimerkki ylös"
+],
+"t_avwap": [
+"0a4f86b195",
+"Ankkuroitu VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Sivellin"
 ],
+"t_callout": [
+"f1647ad880",
+"Huomioteksti"
+],
 "t_channel": [
 "c0350b7736",
 "Rinnakkainen kanava"
+],
+"t_circ": [
+"1cc7820a08",
+"Ympyrä"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipsi"
 ],
+"t_comment": [
+"153d7a58b3",
+"Kommentti"
+],
+"t_cross": [
+"983bdb7b27",
+"Ristiviiva"
+],
 "t_cursor": [
 "2239943c8d",
 "Kursori"
+],
+"t_curve": [
+"916f09aff8",
+"Käyrä"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Sykliset viivat"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher-kuvio"
+],
+"t_dcurve": [
+"faef75cb57",
+"Kaksoiskäyrä"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Erillinen kanava"
+],
+"t_dot": [
+"46856bf702",
+"Piste"
+],
+"t_drange": [
+"c65ea4ae01",
+"Päivämääräväli"
+],
+"t_drives": [
+"3a261ca869",
+"Kolme sysäystä -kuvio"
+],
+"t_emoji": [
+"707fd71017",
+"Kuvakkeet ja emojit"
+],
+"t_eraser": [
+"a5742851f0",
+"Pyyhin"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliottin korjausaalto (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliottin kaksoisyhdistelmäaalto (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliottin impulssiaalto (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliottin kolmioaalto (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliottin kolmoisyhdistelmäaalto (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3513,13 +4541,69 @@
 "18c530863b",
 "Fibonacci-korjaus"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fibonacci-nopeusvastuskaaret"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fibonacci-kanava"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fibonacci-ympyrät"
+],
 "t_fibext": [
 "73655be9d6",
 "Trendipohjainen Fibonaccin laajennus"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fibonacci-nopeusvastusviuhka"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fibonacci-spiraali"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trendipohjainen Fib-aika"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fibonacci-aikavyöhyke"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fibonacci-kiila"
+],
+"t_flag": [
+"23d91e7740",
+"Lippumerkki"
+],
+"t_flat": [
+"52d3db252e",
+"Tasainen ylä-/alareuna"
+],
+"t_forecast": [
+"528bc4bc38",
+"Ennuste"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gannin viuhka"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann-laatikko"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann-neliö"
+],
+"t_hl": [
+"8cb3f79b49",
+"Korostuskynä"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3529,6 +4613,18 @@
 "0bcbc4e087",
 "Vaakasuora säde"
 ],
+"t_hs": [
+"43353dbcec",
+"Pää ja hartiat"
+],
+"t_info": [
+"a690e33098",
+"Infoviiva"
+],
+"t_inside": [
+"30d6b425dc",
+"Sisäinen haarukka"
+],
 "t_long": [
 "666f195fc4",
 "Pitkä positio"
@@ -3537,9 +4633,45 @@
 "2bedd64d85",
 "Hintaväli / mitta"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Muokattu Schiffin haarukka"
+],
+"t_note": [
+"2c924e3088",
+"Muistiinpano"
+],
+"t_path": [
+"519e39132b",
+"Polku"
+],
 "t_pitch": [
 "29135fd404",
 "Andrewsin haarukka"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Haarukkaviuhka"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Hintamerkki"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Hintamuistiinpano"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Murtoviiva"
+],
+"t_prange": [
+"c20f7ce09a",
+"Hintaväli"
+],
+"t_proj": [
+"8aa49fe840",
+"Projektio"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3549,9 +4681,33 @@
 "c158695a64",
 "Suorakulmio"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regressiotrendi"
+],
+"t_rrect": [
+"65807afaf7",
+"Käännetty suorakulmio"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiffin haarukka"
+],
 "t_short": [
 "a8daf74669",
 "Lyhyt positio"
+],
+"t_signpost": [
+"89f361362e",
+"Opaste"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinikäyrä"
+],
+"t_tcycle": [
+"521a687246",
+"Aikasylit"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3561,9 +4717,29 @@
 "e810388344",
 "Trendiviiva"
 ],
+"t_tri": [
+"32547b031d",
+"Kolmiokuvio"
+],
+"t_tri3": [
+"73d3ae245f",
+"Kolmio"
+],
 "t_vline": [
 "a790288017",
 "Pystysuora viiva"
+],
+"t_vrp": [
+"bcba420b37",
+"Kiinteän välin volyymiprofiili"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD-kuvio"
+],
+"t_zoom": [
+"4fc05f2763",
+"Lähennä"
 ],
 "target": [
 "61ad50a9b9",
@@ -3609,6 +4785,26 @@
 "5fb1db5278",
 "Sekunnit"
 ],
+"thDark": [
+"ae1ef01432",
+"Tumma"
+],
+"thLight": [
+"a36ef8aba2",
+"Vaalea"
+],
+"thMid": [
+"4fe978738d",
+"Keskiyön sininen"
+],
+"thNavy": [
+"0229e960cf",
+"Laivastonsininen"
+],
+"thPaper": [
+"22d507f2ba",
+"Paperi"
+],
 "time": [
 "6c82e6dd86",
 "Aika"
@@ -3632,6 +4828,10 @@
 "tooFar": [
 "b29db0358a",
 "Tämä on kauempana menneisyydessä kuin tämä aikakehys pystyy lataamaan; valitse suurempi aikakehys."
+],
+"toolHint": [
+"56e62363ce",
+"piirrä napsauttamalla kaaviota"
 ],
 "topFixed": [
 "1a66879287",
@@ -3853,6 +5053,34 @@
 "1526a17ee7",
 "Poista lukitus"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Kaikki piirrokset on vapautettu"
+],
+"vDay": [
+"f6bb0f468a",
+"Päivää"
+],
+"vHour": [
+"9e25a34e63",
+"Tuntia"
+],
+"vMin": [
+"092f99ea11",
+"Minuuttia"
+],
+"vMonth": [
+"200dcdce9b",
+"Kuukautta"
+],
+"vSec": [
+"5fb1db5278",
+"Sekuntia"
+],
+"vWeek": [
+"7d75266a53",
+"Viikkoa"
+],
 "value": [
 "3e8248e32e",
 "Hinta"
@@ -3860,6 +5088,10 @@
 "valuePct": [
 "bf55390d8d",
 "Prosentti (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3904,16 +5136,28 @@
 "yourRate": [
 "ca14282aa6",
 "sinun kurssisi"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Loitonna"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Lähennä vetämällä leveämpi laatikko."
 ]
 },
 "f": {
 "about.ae2074a92f": [
 "ae2074a92f",
-1
+2
 ],
 "about.bd3e93adef": [
 "bd3e93adef",
 3
+],
+"ckNote": [
+"bc9c1644bd",
+1
 ],
 "curPlain": [
 "ad051e540f",
@@ -3923,29 +5167,21 @@
 "ddbcc9fb51",
 3
 ],
+"fx2Note": [
+"15ebd3b4a9",
+1
+],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
-],
-"in_srlux": [
-"50cfe9a1d5",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
-],
-"ind_vdelta": [
-"d8b588eda0",
-1
-],
-"optNote": [
-"96723a0ac4",
-1
+2
 ],
 "supAdmin": [
 "603ac35951",
