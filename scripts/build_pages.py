@@ -1729,6 +1729,39 @@ def build_hub():
     return urls
 
 
+FG_L = {
+    "ckb": {"cls": {"Extreme Fear": "ترسی زۆر", "Fear": "ترس", "Neutral": "مامناوەند", "Greed": "تەماح", "Extreme Greed": "تەماحی زۆر"},
+            "home": "سەرەتا", "crumb": "پێوەری ترس و تەماح", "h1": "پێوەری ترس و تەماحی کریپتۆ ئەمڕۆ: {v} ({c})", "today": "ئەمڕۆ", "state": "دۆخ",
+            "d7": "٧ ڕۆژ پێش", "d30": "٣٠ ڕۆژ پێش", "note": "٣٠ ڕۆژی ڕابردوو · سەرچاوە alternative.me · نوێکردنەوە {u}", "what": "ئەم پێوەرە چییە؟",
+            "p1": "پێوەری ترس و تەماح (٠ تا ١٠٠) هەستی گشتیی بازاڕی کریپتۆ لە هەڵبەزودابەز، قەبارە، تۆڕە کۆمەڵایەتییەکان، دەسەڵاتی بیتکۆین و ڕەوتەکانەوە کورت دەکاتەوە. "
+                  "خوار ٢٥ «ترسی زۆر»، ٢٥ تا ٤٥ «ترس»، ٤٥ تا ٥٥ «مامناوەند»، ٥٥ تا ٧٥ «تەماح» و سەرووی ٧٥ «تەماحی زۆر»ە. ترسی زۆر هەندێک جار لەگەڵ بنی بازاڕ و تەماحی زۆر لەگەڵ لووتکەکان هاوکات بووە، بەڵام ئەمە یاسایەکی بڕاو نییە.",
+            "p2": 'بۆ بینینی ڕژێمی بازاڕ، پانیی بازاڕ و ڕاپۆرتی زیرەکی دەستکرد بڕۆ بۆ <a href="/#intel">مێشکی بازاڕ</a> و بۆ مێژووی ڕۆژانە بۆ <a href="/daily/">ڕاپۆرتە ڕۆژانەکان</a>.',
+            "nfa": "فێرکارییە، ئامۆژگاریی دارایی نییە."},
+    "en": {"cls": {},
+           "home": "Home", "crumb": "Fear & Greed index", "h1": "Crypto Fear & Greed index today: {v} ({c})", "today": "Today", "state": "State",
+           "d7": "7 days ago", "d30": "30 days ago", "note": "Last 30 days · source alternative.me · updated {u}", "what": "What is this index?",
+           "p1": "The Fear & Greed index (0 to 100) sums up the overall mood of the crypto market from volatility, volume, social media, Bitcoin dominance and trends. "
+                 "Below 25 is “extreme fear”, 25 to 45 “fear”, 45 to 55 “neutral”, 55 to 75 “greed” and above 75 “extreme greed”. Extreme fear has at times coincided with market bottoms and extreme greed with tops, but this is not a fixed rule.",
+           "p2": 'For the market regime, market breadth and the AI report, see the <a href="/#intel">market brain</a>; for the day-by-day history, see the <a href="/daily/">daily reports</a>.',
+           "nfa": "Educational only, not financial advice."},
+}
+
+
+def _fg_body(lg, fg, hist, pts):
+    """the /fear-greed/ body in Sorani or English (the Persian copy is built in build_seo_extra)"""
+    T = FG_L[lg]
+    dg = (lambda x: str(x).translate(_CKD)) if lg == "ckb" else str
+    cls = T["cls"].get(fg.get("class"), fg.get("class"))
+    upd = fmt_date(market.get("updated_at", ""))
+    return (f'<div class="meta"><a href="/">{T["home"]}</a> / {e(T["crumb"])}</div><h1>{e(T["h1"].format(v=fg["value"], c=cls))}</h1>'
+            f'<div class="grid"><div class="kpi"><small>{T["today"]}</small><b>{fg["value"]}</b></div><div class="kpi"><small>{T["state"]}</small><b>{e(cls)}</b></div>'
+            + (f'<div class="kpi"><small>{T["d7"]}</small><b>{hist[-8][1]}</b></div>' if len(hist) >= 8 else "")
+            + (f'<div class="kpi"><small>{T["d30"]}</small><b>{hist[0][1]}</b></div>' if hist else "") + "</div>"
+            + (f'<svg viewBox="0 0 600 100" style="width:100%;height:140px;border:1px solid var(--line);border-radius:10px;margin:14px 0"><line x1="0" x2="600" y1="50" y2="50" stroke="#ffffff22"/><polyline points="{pts}" fill="none" stroke="#f7931a" stroke-width="2"/></svg>'
+               f'<p class="note">{T["note"].format(u=upd)}</p>' if hist else "")
+            + f'<h2>{e(T["what"])}</h2><p class="txt">{e(T["p1"])}</p><p class="txt">{T["p2"]}</p><p class="note">{T["nfa"]}</p>')
+
+
 def build_seo_extra():
     """/fear-greed/ و /sectors/ — صفحات ثابت شاخص ترس و طمع و بخش‌های بازار با دادهٔ واقعی"""
     urls = []
@@ -1745,6 +1778,9 @@ def build_seo_extra():
                 + '<h2>این شاخص چیست؟</h2><p class="txt">شاخص ترس و طمع (۰ تا ۱۰۰) احساس کلی بازار کریپتو را از نوسان، حجم، شبکه‌های اجتماعی، دامیننس بیت‌کوین و روندها خلاصه می‌کند. '
                 'زیر ۲۵ «ترس شدید»، ۲۵ تا ۴۵ «ترس»، ۴۵ تا ۵۵ «خنثی»، ۵۵ تا ۷۵ «طمع» و بالای ۷۵ «طمع شدید» است. ترس شدید گاهی با کف‌های بازار هم‌زمان بوده و طمع شدید با سقف‌ها — اما این قاعدهٔ قطعی نیست.</p>'
                 '<p class="txt">برای دیدن رژیم بازار، پهنای بازار و گزارش هوش مصنوعی به <a href="/#intel">مغز بازار</a> و برای تاریخچهٔ روزانه به <a href="/daily/">گزارش‌های روزانه</a> بروید.</p><p class="note">آموزشی است، توصیهٔ مالی نیست.</p>')
+        body = (f'<div data-lang="fa">{body}</div><div data-lang="ckb" hidden>{_fg_body("ckb", fg, hist, pts)}</div>'
+                f'<div data-lang="en" lang="en" dir="ltr" hidden>{_fg_body("en", fg, hist, pts)}</div>'
+                f"<script>document.addEventListener('DOMContentLoaded',function(){{{LANG_JS}}})</script>")
         urls.append(page("fear-greed/", f"شاخص ترس و طمع کریپتو امروز — {fg['value']} ({cls})", f"شاخص ترس و طمع بازار کریپتو امروز {fg['value']} است ({cls}). نمودار ۳۰ روزه و توضیح شاخص.", body))
     fl = load("flows.json", {})
     secs = [x for x in fl.get("sectors", []) if not x.get("suspect")]
