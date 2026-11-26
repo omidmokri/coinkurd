@@ -674,10 +674,10 @@ def brk_pages(cache):
             tiles = [tile(nm_, fusd(cols[k][j])) for k, nm_, _ in got]
             top = max(got, key=lambda g: abs(cols[g[0]][j] or 0))
             sign = (cols[top[0]][j] or 0) >= 0
-            read_ = L(f"بزرگ‌ترین {'سودگیری' if sign else 'زیان‌فروشی'} هفته را کیف‌های {top[1]['fa']} انجام داده‌اند.",
-                      f"گەورەترین {'قازانجوەرگرتن' if sign else 'فرۆشتن بە زیان'}ی هەفتە لە جزدانەکانی {top[1]['ckb']}ـەوە بووە.",
-                      f"أكبر {'جني أرباح' if sign else 'بيع بخسارة'} هذا الأسبوع جاء من محافظ {top[1]['ar']}.",
-                      f"The week's biggest {'profit-taking' if sign else 'selling at a loss'} came from {top[1]['en']} wallets.")
+            read_ = L(f"بزرگ‌ترین {'سودگیری' if sign else 'زیان‌فروشی'} هفته را سکه‌هایی انجام داده‌اند که در تکه‌های {top[1]['fa']} نگه داشته می‌شدند.",
+                      f"گەورەترین {'قازانجوەرگرتن' if sign else 'فرۆشتن بە زیان'}ی هەفتە لەو دراوانەوە بووە کە لە پارچەی {top[1]['ckb']}دا بوون.",
+                      f"أكبر {'جني أرباح' if sign else 'بيع بخسارة'} هذا الأسبوع جاء من عملات محفوظة في قطع من {top[1]['ar']}.",
+                      f"The week's biggest {'profit-taking' if sign else 'selling at a loss'} came from coins held in pieces of {top[1]['en']}.")
             write("sizepl", daily_doc(BV, "2015-01-01", cols, view, tiles, read_))
         else:
             print("  size cohorts: not enough series")
