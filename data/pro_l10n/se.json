@@ -1733,9 +1733,17 @@
 "5114d8a4f7",
 "Morgon- / Aftonstjärna"
 ],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Genomträngande linje / Mörkt molntäcke"
+],
 "in_cp_soldiers": [
 "32c51f18a5",
 "Tre vita soldater / svarta kråkor"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Stjärnfall / Inverterad hammare"
 ],
 "in_cp_tweezer": [
 "7c91c654a1",
@@ -1744,6 +1752,10 @@
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulativ volymdelta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -3141,6 +3153,18 @@
 "3541c5f4e1",
 "Bandlängd"
 ],
+"p_bw": [
+"1d06cbba91",
+"Bandbredd"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanalavvikelse"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplikator"
+],
 "p_conv": [
 "9151f8433f",
 "Omvandling"
@@ -3173,6 +3197,10 @@
 "8db6a2f1d3",
 "Snabb"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Snabb 2"
+],
 "p_hi": [
 "70a2565504",
 "Övre nivå"
@@ -3193,6 +3221,14 @@
 "a0623fa9a3",
 "%K-utjämning"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Nyckelvärde"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1-längd"
@@ -3208,6 +3244,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4-längd"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentil-tillbakablick"
+],
+"p_left": [
+"3b219a058a",
+"Vänstra staplar"
 ],
 "p_len": [
 "3bade34ecb",
@@ -3249,6 +3293,14 @@
 "a44d6c906d",
 "Staplar på varje sida"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanallängd"
+],
+"p_n2": [
+"2df99da939",
+"Genomsnittslängd"
+],
 "p_offset": [
 "ce66771654",
 "Förskjutning"
@@ -3257,13 +3309,41 @@
 "ac556cf593",
 "Procent"
 ],
+"p_pd": [
+"4997ad18cf",
+"Tillbakablick"
+],
+"p_per": [
+"a89f63abb8",
+"Samplingsperiod"
+],
+"p_ph": [
+"b1f698cc3d",
+"Hög percentil"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE-faktor"
+],
 "p_rank": [
 "1df2ca7462",
 "Procentranglängd"
 ],
+"p_right": [
+"307c9815b6",
+"Högra staplar"
+],
+"p_rows": [
+"52d0b35277",
+"Rader"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI-längd"
+],
+"p_sf": [
+"590f20262b",
+"RSI-utjämning"
 ],
 "p_short": [
 "3445c2f23b",
@@ -3280,6 +3360,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Långsam"
+],
+"p_slow2": [
+"c252d2ccab",
+"Långsam 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -3325,6 +3409,54 @@
 "07300ad49f",
 "{c} för 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Lägg till"
+],
+"pfAvg": [
+"def9f57b0c",
+"Genomsnittligt inköpspris"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kostnad"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Ingenting här ännu. Lägg till ett mynt, hur mycket du innehar och vad du betalade."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfölj {n}"
+],
+"pfNote": [
+"f46050561e",
+"Sparas endast i denna webbläsare. Den frågar aldrig efter utbytesnycklar och skickar ingenting någonstans. Priserna är Binance USDT-par."
+],
+"pfNow": [
+"039df35064",
+"Pris nu"
+],
+"pfPnl": [
+"8ae3945397",
+"Vinst / förlust"
+],
+"pfQty": [
+"44f6af6945",
+"Antal"
+],
+"pfShort": [
+"036b18f02a",
+"Portfölj"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfölj"
+],
+"pfValue": [
+"8dce170de2",
+"Värde"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klicka på diagrammet där uppspelningen ska börja"
@@ -3348,6 +3480,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Pris"
+],
+"profNote": [
+"c1da831af8",
+"För en profil av ett intervall du väljer, använd \"Fast range volume profile\" i den vänstra verktygsfältet."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3521,6 +3657,86 @@
 "56a2285c5b",
 "Sparar…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Anpassa prisskalan automatiskt"
+],
+"scBorder": [
+"45c60c0e85",
+"Prisskalans kant"
+],
+"scBot": [
+"77a5b77d62",
+"Utrymme nedan (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Båda sidor"
+],
+"scInvert": [
+"ba80abaac1",
+"Invertera prisskalan"
+],
+"scInvertH": [
+"ebb1688761",
+"upp blir ner"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Vänster"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmisk"
+],
+"scMode": [
+"a5e5771ca0",
+"Prisskala"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logaritmisk eller procentuell"
+],
+"scNone": [
+"d4c2792a72",
+"Dold"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmetisk)"
+],
+"scOff": [
+"3557c35506",
+"Tomt utrymme till höger"
+],
+"scPct": [
+"c4519ac7cc",
+"Procent"
+],
+"scRight": [
+"954daa8b00",
+"Höger"
+],
+"scSec": [
+"c92a4af093",
+"Sekunder på tidsskalan"
+],
+"scSide": [
+"82acb7ee2b",
+"Var prisskalan sitter"
+],
+"scSpace": [
+"2878a3a43e",
+"Luft mellan staplar"
+],
+"scTop": [
+"25126a3aab",
+"Utrymme ovan (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Tidsskalan kant"
+],
 "sc_c": [
 "3e8248e32e",
 "Pris"
@@ -3580,6 +3796,62 @@
 "screener": [
 "7f27924c12",
 "Marknadsbevakning"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Kontrollera"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Skriptredigerare"
+],
+"scriptEdit": [
+"ae909c75da",
+"Redigera skriptet"
+],
+"scriptExamples": [
+"41a27a4710",
+"Exempel..."
+],
+"scriptLine": [
+"1acb1c0448",
+"Rad {n}"
+],
+"scriptName": [
+"709a23220f",
+"Namn"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nytt skript"
+],
+"scriptNote": [
+"c265d2248f",
+"Skriv dina egna indikatorer på ett Pine-liknande språk. De sparas i den här webbläsaren och körs bara här, på ditt diagram."
+],
+"scriptOk": [
+"eb3da0c952",
+"Inga fel · {n} utdata"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Vad språket kan"
+],
+"scriptSave": [
+"1e291c4d98",
+"Spara och lägg till i diagram"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skript sparat"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skript"
 ],
 "searchEv": [
 "0a08612647",
@@ -3685,9 +3957,25 @@
 "e97d96a8bc",
 "Högst volym"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI-kors (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger-vändning"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3697,6 +3985,22 @@
 "c3de6d0cdd",
 "Kurdistani-signaler (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun-kors"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ-kors"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD-kors"
@@ -3705,9 +4009,21 @@
 "6677aad0c9",
 "EMA-kors"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Nadaraya-Watson vändning [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -3717,9 +4033,37 @@
 "446d28671b",
 "Gyllene / dödskors (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI-kors"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend-kors [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3849,6 +4193,106 @@
 "2d2cb022bc",
 "Hastighet"
 ],
+"stBadLv": [
+"683a05683a",
+"Nivåer får vara upp till 24 nummer."
+],
+"stBadPt": [
+"a73083f114",
+"Ett pris eller en tid är inte giltig."
+],
+"stColor": [
+"f28563a477",
+"Färg"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinater"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Streckad"
+],
+"stDev": [
+"e789c07831",
+"Avvikelse (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Prickad"
+],
+"stExtL": [
+"ef880cf8fc",
+"Förläng åt vänster"
+],
+"stExtR": [
+"fbff580b3d",
+"Förläng åt höger"
+],
+"stFill": [
+"64dd60fe1a",
+"Bakgrund"
+],
+"stLevels": [
+"ae3d013ab1",
+"Nivåer (kommaseparerade)"
+],
+"stLine": [
+"120ee44bec",
+"Linjestil"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Endast de 12 första punkterna kan redigeras här."
+],
+"stOpacity": [
+"f12e36bd83",
+"Bakgrunds-opacitet"
+],
+"stReset": [
+"40aab769d0",
+"Standardnivåer"
+],
+"stRows": [
+"52d0b35277",
+"Rader"
+],
+"stSize": [
+"83ca9e48c3",
+"Teckenstorlek"
+],
+"stSolid": [
+"d00635865c",
+"Heldragen"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stil"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Textfärg"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Tiderna är i UTC (ÅÅÅÅ-MM-DD TT:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Synlighet"
+],
+"stWidth": [
+"ad48f34186",
+"Tjocklek"
+],
 "st_err": [
 "d802d232a8",
 "Ingen data"
@@ -3892,6 +4336,14 @@
 "stop": [
 "9e253470c8",
 "Stopp"
+],
+"stratNote": [
+"16dc19eef4",
+"Varje strategi körs på detta diagrams historik i testaren: ingångar och utgångar på diagrammet, nettovresultat, vinstprocent, drawdown och en optimerare för dess inställningar."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Kör i strategitestaren"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3953,17 +4405,57 @@
 "a26d0ddaae",
 "Rullning (tid)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD-mönster"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendvinkel"
+],
+"t_arc": [
+"853a983f6b",
+"Båge"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Pil"
+],
+"t_arrowc": [
+"0f722804ec",
+"Pilpekare"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Pilmärke nedåt"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Pilmarkör"
+],
+"t_arrowup": [
+"8023467135",
+"Pilmärke uppåt"
+],
+"t_avwap": [
+"0a4f86b195",
+"Förankrad VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Pensel"
 ],
+"t_callout": [
+"f1647ad880",
+"Utropsruta"
+],
 "t_channel": [
 "c0350b7736",
 "Parallellkanal"
+],
+"t_circ": [
+"1cc7820a08",
+"Cirkel"
 ],
 "t_circle": [
 "8580e3175f",
@@ -4669,7 +5161,7 @@
 ],
 "about.ae2074a92f": [
 "ae2074a92f",
-1
+2
 ],
 "about.bd3e93adef": [
 "bd3e93adef",
@@ -4677,51 +5169,39 @@
 ],
 "ckNote": [
 "bc9c1644bd",
-1
+2
 ],
 "curPlain": [
 "ad051e540f",
 3
 ],
-"in_cp_pierce": [
-"de9e3d4b02",
-1
-],
-"in_cp_star": [
-"f1940a30a1",
-1
-],
-"in_cvd": [
-"fbd0df870e",
-1
-],
 "in_fvg": [
 "bad3ce3dd2",
-1
+2
 ],
 "in_nwe": [
 "1b2ee5c713",
-1
+2
 ],
 "in_srlux": [
 "50cfe9a1d5",
-1
+2
 ],
 "in_vixfix": [
 "f6152b3b33",
-1
+2
 ],
 "in_vpvr": [
 "f757c4a16d",
-1
+2
 ],
 "ind_zlsma": [
 "814b9eebab",
-1
+2
 ],
 "optNote": [
 "96723a0ac4",
-1
+2
 ],
 "slTp": [
 "41d1998bce",

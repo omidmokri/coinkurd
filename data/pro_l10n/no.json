@@ -213,6 +213,10 @@
 "252e1f7660",
 "Varsler sjekkes i denne nettleseren mens siden er åpen (uavhengig fane). Indikatorvarsler utløses når en bar stenger."
 ],
+"alertOnDraw": [
+"1b4d4a6c36",
+"Varsle på denne tegningen"
+],
 "alertSet": [
 "80c4c4abee",
 "Varsel satt: {c}"
@@ -337,6 +341,14 @@
 "98464789c4",
 "Beste handel"
 ],
+"btCagr": [
+"cd93a1e7a6",
+"Vekst per år (CAGR)"
+],
+"btCalmar": [
+"fa55d97af6",
+"Calmar"
+],
 "btCsv": [
 "7e55b55d0e",
 "Last ned handler (CSV)"
@@ -389,6 +401,14 @@
 "d669a6654d",
 "Long-handler"
 ],
+"btMC": [
+"f001673f1d",
+"Monte Carlo (1 000 ordrer av de samme tradene):"
+],
+"btMCv": [
+"992209a3c0",
+"typisk drawdown {a}% · 95% av ordrene holder seg under {b}% · verste {c}% · denne kjøringen {d}%"
+],
 "btModeOpt": [
 "a8cdd9eaea",
 "Optimaliser"
@@ -437,6 +457,10 @@
 "80e53e077c",
 "Profit factor"
 ],
+"btPayoff": [
+"64c65d41f5",
+"Utbetaling (gj.sn. gevinst / gj.sn. tap)"
+],
 "btRange": [
 "63a44ed01a",
 "fra / til / intervall"
@@ -480,6 +504,14 @@
 "btSortino": [
 "58f8c55160",
 "Sortino (årlig)"
+],
+"btSplit": [
+"5bdfe209e3",
+"Første 70% vs siste 30% av tradene:"
+],
+"btSplitv": [
+"1d029e5f3b",
+"{a} med {aw}% gevinster ({an} tradere) → {b} med {bw}% gevinster ({bn} tradere)"
 ],
 "btStreak": [
 "260b23b529",
@@ -597,9 +629,21 @@
 "6a72085653",
 "Alle"
 ],
+"cat_ck": [
+"4bb6425f08",
+"Coin_Kurd · åpen kildekode"
+],
+"cat_com": [
+"90566b4c6f",
+"Fellesskapets favoritter"
+],
 "cat_ek": [
 "84bfe05ceb",
 "Entekhab"
+],
+"cat_forex": [
+"fcbd829497",
+"Forex (verden)"
 ],
 "cat_fut": [
 "965db80f65",
@@ -645,9 +689,49 @@
 "3090f6af60",
 "24t endring"
 ],
+"ck_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"ck_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"ck_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
+],
+"ckd_kmacro": [
+"b8470d70cb",
+"Makro-dashbord fra offentlige data: risk-on / risk-off-regime"
+],
+"ckd_ksc": [
+"cac32afa6c",
+"On-chain syklusfaser (MVRV, NUPL) med prisposisjon"
+],
+"ckd_kspiral": [
+"a5dda6628e",
+"Bitcoins hele historie på en logaritmisk spiral"
+],
 "clearAll": [
 "7de68ccb43",
 "Fjern alle tegninger"
+],
+"clearBoth": [
+"a45f3ff75c",
+"Fjern tegninger og indikatorer"
+],
+"clearDraw": [
+"5f0fecbfc1",
+"Fjern tegninger"
+],
+"clearInds": [
+"8b56474294",
+"Fjern indikatorer"
+],
+"clearIndsQ": [
+"f844e802b5",
+"Fjern hver eneste indikator fra dette diagrammet?"
 ],
 "clearLog": [
 "096311b563",
@@ -672,6 +756,10 @@
 "clone": [
 "af74f7c536",
 "Kopier"
+],
+"cloned": [
+"51fbf8cb72",
+"Kopiert ved siden av"
 ],
 "close": [
 "bbfa773e5a",
@@ -705,9 +793,221 @@
 "d0d4d379f5",
 "Tid igjen til denne staven stenger"
 ],
+"crFree": [
+"6b4b480231",
+"Følger musen"
+],
+"crLargeDash": [
+"a7503adc35",
+"Lange stipler"
+],
+"crMagnet": [
+"77fa49774c",
+"Snapper til lysene"
+],
+"crOff": [
+"d4c2792a72",
+"Skjult"
+],
+"crSparse": [
+"e50cc378a1",
+"Spredte prikker"
+],
 "create": [
 "8ac903c3c3",
 "Opprett varsel"
+],
+"csBg": [
+"64dd60fe1a",
+"Bakgrunn"
+],
+"csBg2": [
+"9ebb790d74",
+"Andre bakgrunnsfarge"
+],
+"csBody": [
+"718a7e8a58",
+"Kropp"
+],
+"csBorderC": [
+"eeffa83765",
+"Kantfarge"
+],
+"csBorders": [
+"685f23bc5e",
+"Kanter"
+],
+"csClose": [
+"bbfa773e5a",
+"Lukk"
+],
+"csCross": [
+"b0b83f89e8",
+"Hårkors og mus"
+],
+"csCrossC": [
+"f09ffc78a6",
+"Hårkorsfarge"
+],
+"csCrossD": [
+"c3f46f0c78",
+"Hårkorslinje"
+],
+"csCrossLab": [
+"b5b9c1136c",
+"Pris- og tidsetiketter på hårkorset"
+],
+"csCrossMode": [
+"800092e3e1",
+"Hårkors"
+],
+"csCrossW": [
+"1150ddfb7b",
+"Hårkorsbredde"
+],
+"csDn": [
+"11f5ff3829",
+"Fallende lys"
+],
+"csFont": [
+"b97c4d4cdd",
+"Skrift"
+],
+"csFsize": [
+"83ca9e48c3",
+"Skriftstørrelse"
+],
+"csGrad": [
+"c716191a01",
+"gjører bakgrunnen til en fargeovergang"
+],
+"csGridA": [
+"f773586220",
+"Rutenettets ugjennomsiktighet (%)"
+],
+"csGridC": [
+"9b908e643a",
+"Rutenettfarge"
+],
+"csGridH": [
+"4eaa1c008a",
+"Horisontale rutenettlinjer"
+],
+"csGridV": [
+"d3d1f3eeca",
+"Vertikale rutenettlinjer"
+],
+"csHollow": [
+"9165bccc85",
+"Hule kropper"
+],
+"csHollowH": [
+"fb63aba345",
+"bare de stigende lysene"
+],
+"csKinetic": [
+"6e771721f0",
+"Kinetisk rulling ved berøring"
+],
+"csLast": [
+"aacdc5bea4",
+"Siste prislinje"
+],
+"csLastLab": [
+"91c990bcb9",
+"Prisetikett på skalaen"
+],
+"csLineC": [
+"01212659ee",
+"Linje- / omrøringsfarge"
+],
+"csLineW": [
+"e3d64d0b2f",
+"Linjebredde"
+],
+"csLook": [
+"41def7a0fe",
+"Utseende"
+],
+"csOneColour": [
+"ffb8d6ef92",
+"én farge for begge retninger"
+],
+"csPinch": [
+"e557a41794",
+"Knip-zoom ved berøring"
+],
+"csResetQ": [
+"9c369383c1",
+"Tilbakestill hver diagraminnstilling slik den var?"
+],
+"csScale": [
+"0b414bdcb7",
+"Skalaer"
+],
+"csScroll": [
+"468c89cb3b",
+"Dra diagrammet med musen"
+],
+"csSym": [
+"fad29404d2",
+"Lys"
+],
+"csText": [
+"d160595fcf",
+"Tekstfarge"
+],
+"csTheme": [
+"a797e30923",
+"Tema"
+],
+"csTitle": [
+"ae445d4cd9",
+"Diagraminnstillinger"
+],
+"csUp": [
+"971a95475d",
+"Stigende lys"
+],
+"csWick": [
+"fe6e2bfd48",
+"Veker"
+],
+"csWickC": [
+"0fcb21d161",
+"Vekefarge"
+],
+"csWm": [
+"33c7b41ac6",
+"Vannmerke bak lysene"
+],
+"csWmA": [
+"69a1810ea2",
+"Vannmerkets ugjennomsiktighet (%)"
+],
+"csWmAuto": [
+"b5b7adca59",
+"symbol og tidsramme"
+],
+"csWmC": [
+"bad81c749f",
+"Vannmerkefarge"
+],
+"csWmSize": [
+"4af7e52f80",
+"Vannmerkestørrelse"
+],
+"csWmText": [
+"ecf870ab34",
+"Vannmerketekst"
+],
+"csZoom": [
+"c6f40d9d03",
+"Musehjul"
+],
+"csZoomH": [
+"4ca34c1092",
+"zoome inn og ut"
 ],
 "csv": [
 "518463f518",
@@ -720,6 +1020,26 @@
 "csvDone": [
 "fe93409ef8",
 "{n} staver lastet ned"
+],
+"ctxAlert": [
+"50bc7eabdd",
+"Legg til et varsel her"
+],
+"ctxCopyPrice": [
+"7166a5c8fe",
+"Kopier denne prisen"
+],
+"ctxFit": [
+"8c723d6ed2",
+"Tilpass alle lys"
+],
+"ctxHline": [
+"588d2eb492",
+"Horisontal linje her"
+],
+"ctxReset": [
+"242cb352c0",
+"Tilbakestill visningen"
 ],
 "curNote": [
 "538ead2fdf",
@@ -893,9 +1213,29 @@
 "2422a88320",
 "Hver gang (maksimalt en gang i minuttet / en gang per stav)"
 ],
+"exAuto": [
+"1ff048b76e",
+"direkte, med OKX som reserve"
+],
+"exDown": [
+"e8ba18613e",
+"{x} svarer ikke på denne tilkoblingen. Diagrammet forblir på børsen det er på."
+],
+"exNote": [
+"0eb4c03240",
+"Binance strømmer direkte; de andre leses fra sitt eget offentlige endepunkt hvert tiende sekund, med sin egen historikk."
+],
+"exTitle": [
+"5b13eac7ed",
+"Børs"
+],
 "exit": [
 "f83b6fe3ae",
 "Utgang"
+],
+"exitFull": [
+"fc61e74cd9",
+"Forlat fullskjerm"
 ],
 "exitReplay": [
 "e83c9949f7",
@@ -936,6 +1276,10 @@
 "exportJson": [
 "b4d35c5dfc",
 "Eksporter alt (JSON)"
+],
+"extFail": [
+"55919e4281",
+"Dataene for denne indikatoren ble ikke lastet inn. Prøv igjen om et øyeblikk."
 ],
 "extend": [
 "ab07d3f288",
@@ -993,6 +1337,18 @@
 "3526f607bc",
 "Gul"
 ],
+"fnMono": [
+"216fcddff2",
+"Monospace"
+],
+"fnSans": [
+"c1ccf83eea",
+"Sans"
+],
+"fnSerif": [
+"a5c78a86fa",
+"Serif"
+],
 "forecast": [
 "528bc4bc38",
 "Prognose"
@@ -1012,6 +1368,74 @@
 "futSub": [
 "16db4a6d5c",
 "Kvartalsfutures, kontinuerlig"
+],
+"fx2Note": [
+"15ebd3b4a9",
+"Én valuta mot en annen, fra nettstedets egne daglige referansekurser (Den europeiske sentralbanken og exchange-api-datasettet der ECB ikke oppgir en valuta). Én verdi om dagen, så en daglig stolpe er ett enkelt punkt, og ukentlige og månedlige stolper bygges fra dagene i dem. Referansekurser publiseres én gang om dagen, ikke en meglers tick-data: det er ingen intradag forex her. Dollarpar starter 2. mars 2024, par mellom to ECB-valutaer i 2017."
+],
+"g_arrows": [
+"0cf604cb00",
+"Piler"
+],
+"g_brush": [
+"bfe3f2cb1c",
+"Blyanter"
+],
+"g_channels": [
+"18e03e2a37",
+"Kanaler"
+],
+"g_cursors": [
+"f4d2f91040",
+"Markører"
+],
+"g_cycles": [
+"97f064aff5",
+"Sykluser"
+],
+"g_elliott": [
+"25f12f8289",
+"Elliott-bølger"
+],
+"g_fib": [
+"8e6f828053",
+"Fibonacci"
+],
+"g_gann": [
+"b157c573ab",
+"Gann"
+],
+"g_lines": [
+"c6fd3870c8",
+"Linjer"
+],
+"g_measurer": [
+"8ba6c4232d",
+"Måler"
+],
+"g_pat": [
+"2c179da0f5",
+"Diagrammønstre"
+],
+"g_pitch": [
+"53ee86e2fa",
+"Pitchforks"
+],
+"g_proj": [
+"8aa49fe840",
+"Projeksjon"
+],
+"g_shapes": [
+"b1985e3874",
+"Former"
+],
+"g_text": [
+"d7cd4cda4f",
+"Tekst og notater"
+],
+"g_vol": [
+"1b4620951d",
+"Volumbasert"
 ],
 "go": [
 "2e0b45f2a4",
@@ -1096,6 +1520,18 @@
 "hideAll": [
 "1f0e916e42",
 "Skjul / vis tegninger"
+],
+"hideBoth": [
+"3502a3299d",
+"Skjul tegninger og indikatorer"
+],
+"hideDraw": [
+"f4492c5211",
+"Skjul tegninger"
+],
+"hideInds": [
+"764ab9d614",
+"Skjul indikatorer"
 ],
 "ht_alert": [
 "d0efe0b2c7",
@@ -1197,6 +1633,10 @@
 "17a146f32c",
 "ALMA"
 ],
+"in_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
 "in_ao": [
 "18ef16db89",
 "Awesome Oscillator"
@@ -1208,6 +1648,10 @@
 "in_atr": [
 "3af0a08a5a",
 "ATR"
+],
+"in_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
 ],
 "in_bb": [
 "b44e884c35",
@@ -1233,6 +1677,10 @@
 "2086539684",
 "CCI"
 ],
+"in_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
+],
 "in_chop": [
 "07f1c48e7a",
 "Choppiness Index"
@@ -1253,9 +1701,61 @@
 "025c720b24",
 "Coppock Curve"
 ],
+"in_cp_all": [
+"b43801ff03",
+"Alle lysestakemønstre"
+],
+"in_cp_doji": [
+"c942ca8bee",
+"Doji"
+],
+"in_cp_engulf": [
+"0613ef3f92",
+"Engulfing"
+],
+"in_cp_hammer": [
+"19d315a821",
+"Hammer / Hengende mann"
+],
+"in_cp_harami": [
+"4e373d8fca",
+"Harami"
+],
+"in_cp_inside": [
+"4dc3e91068",
+"Innsidebar"
+],
+"in_cp_maru": [
+"0fdb4998e3",
+"Marubozu"
+],
+"in_cp_mstar": [
+"5114d8a4f7",
+"Morgenstjerne / Aftenstjerne"
+],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Gjennomtrengende linje / Mørk skydekke"
+],
+"in_cp_soldiers": [
+"32c51f18a5",
+"Tre hvite soldater / svarte kråker"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Stjerneskudd / Invertert hammer"
+],
+"in_cp_tweezer": [
+"7c91c654a1",
+"Pincett topp / bunn"
+],
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulativt volumdeltag (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1277,6 +1777,10 @@
 "67b9b8a57f",
 "EMA"
 ],
+"in_emacloud": [
+"d369effed0",
+"EMA-skyer [Ripster47]"
+],
 "in_env": [
 "ac9a37fbe8",
 "Envelopes"
@@ -1285,17 +1789,37 @@
 "a945a6428e",
 "Ease of Movement"
 ],
+"in_eqhl": [
+"74820f89a2",
+"Lige topper / bunner"
+],
 "in_fisher": [
 "eb9846eace",
 "Fisher Transform"
+],
+"in_fpbar": [
+"032f273137",
+"Footprint (bar-delta)"
 ],
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
 ],
+"in_gmma": [
+"bf822f6db4",
+"Guppy Multiple MA"
+],
+"in_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
 "in_hma": [
 "c65ed6ce02",
 "Hull MA"
+],
+"in_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
 ],
 "in_hv": [
 "7700ed0881",
@@ -1308,6 +1832,26 @@
 "in_kc": [
 "b1521c1478",
 "Keltner Channels"
+],
+"in_kdj": [
+"2945cfeb3d",
+"KDJ"
+],
+"in_kmacro": [
+"8d14b84b22",
+"Kurdistani Macro Regime"
+],
+"in_kpl": [
+"91c22dd9b4",
+"Kurdistani Bitcoin Power Law"
+],
+"in_ksc": [
+"29bc3d0cd6",
+"Kurdistani Style Cycle"
+],
+"in_kspiral": [
+"9dd53ce639",
+"Kurdistani Bitcoin Spiral"
 ],
 "in_kst": [
 "1774613f5b",
@@ -1341,6 +1885,14 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Markedsstruktur (BOS / CHoCH)"
+],
+"in_ob": [
+"80c4ef99a7",
+"Order Blocks"
+],
 "in_obv": [
 "31006b0724",
 "OBV"
@@ -1360,6 +1912,14 @@
 "in_pvt": [
 "3a2a51a1f4",
 "Price Volume Trend"
+],
+"in_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"in_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "in_ribbon": [
 "9577cc8abc",
@@ -1389,25 +1949,53 @@
 "337f15d864",
 "SMA"
 ],
+"in_smi": [
+"0de7a5fe32",
+"Stochastic Momentum Index"
+],
 "in_smma": [
 "4ae7e185a9",
 "SMMA"
+],
+"in_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"in_srlux": [
+"50cfe9a1d5",
+"Støtte & Motstand med Brudd [LuxAlgo]"
 ],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
 ],
+"in_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "in_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"in_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
 ],
 "in_stoch": [
 "5f8a5bbd51",
 "Stochastic"
 ],
+"in_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO-profil (tid ved pris)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -1421,6 +2009,14 @@
 "e8a49abdab",
 "Ultimate Oscillator"
 ],
+"in_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"in_vdelta": [
+"03acb8406a",
+"Volumdelta"
+],
 "in_vo": [
 "4eac06eb80",
 "Volume Oscillator"
@@ -1433,9 +2029,21 @@
 "5a9a2f0644",
 "Vortex"
 ],
+"in_vpsess": [
+"26e15fb568",
+"Sesjonsvolumprofil"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Synlig rekkevidde volumprofil (VPVR)"
+],
 "in_vwap": [
 "081d3e8e7c",
 "VWAP"
+],
+"in_vwapb": [
+"ddded07957",
+"VWAP-bånd"
 ],
 "in_vwma": [
 "2fdaec23f9",
@@ -1448,6 +2056,14 @@
 "in_wma": [
 "3b02c32b34",
 "WMA"
+],
+"in_wt": [
+"893235c070",
+"WaveTrend [LazyBear]"
+],
+"in_zlsma": [
+"c38c0da5e0",
+"ZLSMA [veryfid]"
 ],
 "in_zz": [
 "9c6fc38f47",
@@ -1481,6 +2097,10 @@
 "0f70916dbb",
 "Arnaud Legoux glidende gjennomsnitt"
 ],
+"ind_alpha": [
+"a1b106dbe0",
+"KivancOzbilgic (MPL-2.0) · ATR-trendlinje styrt av MFI (RSI uten volum)"
+],
 "ind_ao": [
 "55f9651b7f",
 "Momentum: SMA 5 minus SMA 34 av midtpunktet"
@@ -1492,6 +2112,10 @@
 "ind_atr": [
 "ffe1ef3913",
 "Gjennomsnittlig sann rekkevidde (volatilitet)"
+],
+"ind_atrts": [
+"8223831420",
+"En stopp som følger etter med k·ATR og snur retning"
 ],
 "ind_bb": [
 "eae6620c87",
@@ -1517,6 +2141,10 @@
 "a50928c16b",
 "Råvarekanalindeks"
 ],
+"ind_ce": [
+"eb9529e97b",
+"everget (MPL-2.0) · ATR-utganger hengt fra høyeste/laveste sluttkurs"
+],
 "ind_chop": [
 "1aa4d72d41",
 "Trendende (lav) eller sidelengs (høy) markeds"
@@ -1537,9 +2165,61 @@
 "bf330f58dd",
 "Langtidymomentum: WMA av to endringsrater"
 ],
+"ind_cp_all": [
+"9273e33e88",
+"Marker hvert mønster nedenfor på barene"
+],
+"ind_cp_doji": [
+"80ff1c526e",
+"Åpning og slutt nesten lik (D)"
+],
+"ind_cp_engulf": [
+"838b5e0794",
+"Omsluttende bullish (BE) og bearish (SE)"
+],
+"ind_cp_hammer": [
+"2233604708",
+"Lang nedre skygge etter et fall (H) eller en stigning (HM)"
+],
+"ind_cp_harami": [
+"7fc3e9a5e0",
+"Et lite legeme inne i det forrige store (H+ / H−)"
+],
+"ind_cp_inside": [
+"7375801c53",
+"En bar helt inne i den forrige (IB)"
+],
+"ind_cp_maru": [
+"0864a92a99",
+"Et stort legeme uten skygger (M)"
+],
+"ind_cp_mstar": [
+"b611b84eab",
+"Tre-bars snuoperasjon: MS bullish, ES bearish"
+],
+"ind_cp_pierce": [
+"375a6d3e2b",
+"Gapp og sluttkurs utover midten av den forrige bar (PL / DC)"
+],
+"ind_cp_soldiers": [
+"b1a55fae64",
+"Tre sterke barer på rad (3W / 3B)"
+],
+"ind_cp_star": [
+"f1d238e6b1",
+"Lang øvre skygge etter en stigning (SS) eller et fall (IH)"
+],
+"ind_cp_tweezer": [
+"78a03d0fb2",
+"To barer med samme topp (TT) eller bunn (TB)"
+],
 "ind_crsi": [
 "88b32534cd",
 "RSI, serie-RSI og prosentrangering kombinert"
+],
+"ind_cvd": [
+"690d30a274",
+"Løpende sum av volumdelta: hvem som har hatt kontrollen"
 ],
 "ind_dc": [
 "2efb6d0b59",
@@ -1561,6 +2241,10 @@
 "c499047c5b",
 "Eksponentielt glidende gjennomsnitt"
 ],
+"ind_emacloud": [
+"82454f4531",
+"Ripster47 · to EMA-skyer, rask og langsom"
+],
 "ind_env": [
 "e2cf023f50",
 "Glidende gjennomsnitt med bånd en fast % unna"
@@ -1569,17 +2253,41 @@
 "d648aafe8d",
 "Hvor lett prisen beveger seg per volumenhet"
 ],
+"ind_eqhl": [
+"7911f35044",
+"To svinger til nesten samme pris: hvilende likviditet"
+],
 "ind_fisher": [
 "fc72a2f934",
 "Gjør priser om til en nesten normalfordeling"
+],
+"ind_fpbar": [
+"72df84d4bf",
+"Kjøps- × salgsvolum og delta skrevet under hver candle; zoom inn for å lese. Per candle, ikke per prisnivå"
 ],
 "ind_fract": [
 "9f48cce298",
 "Williams fraktaler: lokale topper og bunner"
 ],
+"ind_fvg": [
+"be42490ea0",
+"Tre-candles gapper; hver boks ender der prisen fyller den"
+],
+"ind_gmma": [
+"bfeaafeca6",
+"Seks korte og seks lange EMA-er: tradere mot investorer"
+],
+"ind_halft": [
+"09f45602f1",
+"everget (MPL-2.0) · en trappevis trendlinje som bare snur ved et ekte svingbrudd"
+],
 "ind_hma": [
 "709351f832",
 "Hull glidende gjennomsnitt: raskt og glatt"
+],
+"ind_hull": [
+"4463208ec7",
+"InSilico · Hull MA fargelagt etter stigningen"
 ],
 "ind_hv": [
 "2f8a5d247e",
@@ -1592,6 +2300,26 @@
 "ind_kc": [
 "afaa6cb350",
 "EMA ± 2 × ATR"
+],
+"ind_kdj": [
+"77ec2cdedc",
+"Stochastic med J-linjen (3K − 2D)"
+],
+"ind_kmacro": [
+"ca07959e1c",
+"Coin_Kurd (åpen kildekode, MPL-2.0) · makroregime bak candles, dens signaler og dashbordet, fra FRED-data"
+],
+"ind_kpl": [
+"3d570e5254",
+"Coin_Kurd (åpen kildekode) · Bitcoin teoretisk verdi 8.31e-17·days^5.48 med ±10 % bånd og kjøpesonen; for BTC"
+],
+"ind_ksc": [
+"6fedf8b4e9",
+"Coin_Kurd (åpen kildekode) · Bitcoin-syklusfaser fra MVRV, NUPL og en SOPR-proxy: Ekstrem Bear, Bear, Tidlig Bull, Bull, Overopphetet; den grå linjen er den normaliserte prisen"
+],
+"ind_kspiral": [
+"899a8ea3ae",
+"Coin_Kurd (åpen kildekode) · Bitcoins hele historie på en logaritmisk spiral, én omdreining per halveringssyklus, med topper, bunner, halveringer og nå"
 ],
 "ind_kst": [
 "87fc8c4f3b",
@@ -1629,9 +2357,21 @@
 "d6640bbc39",
 "Pris nå minus pris for n stolper siden"
 ],
+"ind_ms": [
+"13fc87db00",
+"Brudd på den siste bekreftede svingen: BOS med trenden, CHoCH mot den"
+],
 "ind_news": [
 "a95010ef34",
 "Overskrifter om denne mynten, markert i det øyeblikket de ble publisert (nettstedets nyheter fra den siste dagen)"
+],
+"ind_nwe": [
+"e52da4c085",
+"LuxAlgo (CC BY-NC-SA 4.0) · kjernesmidde pris med et middelverdi-feilbånd; ikke-repainting form"
+],
+"ind_ob": [
+"530cdc224f",
+"Den siste motsatte candle før et brudd på strukturen, til prisen lukker gjennom den"
 ],
 "ind_obv": [
 "4ae26547e4",
@@ -1656,6 +2396,14 @@
 "ind_pvt": [
 "f2ff51c8ae",
 "Volum lagt til i proporsjon til %-endringen"
+],
+"ind_qqe": [
+"3c5e11ebed",
+"Mihkel00 / Glaz · glattet RSI med en volatilitetsfølende linje (QQE MOD-kjerne)"
+],
+"ind_rf": [
+"0bf4dbcc13",
+"DonovanWall · filtrerer bort støy som er mindre enn det glattede gjennomsnittlige intervallet"
 ],
 "ind_ribbon": [
 "eb81a82636",
@@ -1689,25 +2437,53 @@
 "26db009730",
 "Enkelt glidende gjennomsnitt"
 ],
+"ind_smi": [
+"ef8f7803b6",
+"Sluttkurs mot midten av intervallet, dobbelt glattet"
+],
 "ind_smma": [
 "e59cc99c1d",
 "Glattet glidende gjennomsnitt (Wilder)"
+],
+"ind_sqz": [
+"928bfb7046",
+"LazyBear · Bollinger inne i Keltner = squeeze (røde prikker); histogrammet viser hvilken vei det bryter ut"
+],
+"ind_srlux": [
+"93d0ceff44",
+"LuxAlgo (CC BY-NC-SA 4.0) · den siste pivot-toppen og -bunnen som nivåer"
 ],
 "ind_srsi": [
 "479deb7dbf",
 "Stokastisk for RSI"
 ],
+"ind_ssl": [
+"6f7ed9b6c1",
+"ErwinBeckers · glidende gjennomsnitt av topper og bunner som bytter plass når trenden snur"
+],
 "ind_st": [
 "8d66b52001",
 "ATR-glidende linje som snur med trenden"
+],
+"ind_stc": [
+"29439e9c85",
+"MACD kjørt to ganger gjennom en stochastic: tidlige trendskifter (25/75)"
 ],
 "ind_stoch": [
 "87477b0f85",
 "%K og %D, 0–100"
 ],
+"ind_tdi": [
+"03d1464e0d",
+"RSI med sine volatilitetsbånd, en rask og en langsom linje"
+],
 "ind_tema": [
 "1ff881355e",
 "Trippel eksponentielt glidende gjennomsnitt"
+],
+"ind_tpo": [
+"e1ee1b7549",
+"Hvor mange candles handlet til hver pris, per dag"
 ],
 "ind_trix": [
 "68a8f31d3e",
@@ -1721,6 +2497,18 @@
 "182e4a763e",
 "Kjøpstrykk over tre perioder"
 ],
+"ind_ut": [
+"bde2d091af",
+"QuantNomad · ATR trailing stop; pris som krysser denne er kjøps-/salgssignalet"
+],
+"ind_vdelta": [
+"d8b588eda0",
+"Kjøpsvolum minus salgsvolum for hver candle (taker-data fra Binance; et estimat ellers)"
+],
+"ind_vixfix": [
+"101ce888f8",
+"ChrisMoody · syntetisk VIX for ethvert marked; topper over båndene markerer ofte panikkbunner"
+],
 "ind_vo": [
 "a99f6a0038",
 "Raskt vs tregt volumgjennomsnitt (%)"
@@ -1733,9 +2521,21 @@
 "6badda8c94",
 "Positiv og negativ trendbevegelse (VI+ / VI−)"
 ],
+"ind_vpsess": [
+"a416aab998",
+"Én volumprofil per dag (per måned på daglige barer)"
+],
+"ind_vpvr": [
+"adf09232a6",
+"Volum til hver pris for barene på skjermen, med POC og verdiområde"
+],
 "ind_vwap": [
 "6d86714413",
 "Volumvektet gjennomsnittspris, tilbakestilt kl. 00:00 UTC"
+],
+"ind_vwapb": [
+"ff28e74ee1",
+"Daglig VWAP med ±1σ- og ±k·σ-bånd"
 ],
 "ind_vwma": [
 "7526646bd7",
@@ -1748,6 +2548,14 @@
 "ind_wma": [
 "b08be7d4d3",
 "Vektet glidende gjennomsnitt"
+],
+"ind_wt": [
+"d823a77eaa",
+"LazyBear · kanalindeks-oscillator; krysser over 53/60 og under −53/−60 markerer strukne bevegelser"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · null-forsinkelse minste kvadraters glidende gjennomsnitt"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -1873,6 +2681,14 @@
 "891ebccd5b",
 "Lås"
 ],
+"lockAll": [
+"f6cda61fb8",
+"Lås alle tegninger"
+],
+"lockedAll": [
+"8928b1cf1a",
+"Alle tegninger er låst"
+],
 "long": [
 "11eda67f9b",
 "Long"
@@ -1893,13 +2709,41 @@
 "5f703c7eba",
 "Kurdistani-signaler"
 ],
+"mMode": [
+"659eba1219",
+"Gjenta"
+],
+"mMsg": [
+"2c924e3088",
+"Notat"
+],
+"mTf": [
+"85decb73d1",
+"Tidsramme"
+],
 "maType": [
 "15f86c051e",
 "Gjennomsnitt"
 ],
+"macroNote": [
+"c4a94f666d",
+"regelbasert estimat, ikke råd"
+],
 "magnet": [
 "effa915951",
 "Magnet (fest til åpning/høy/lav/stenging)"
+],
+"magnetOff": [
+"da32f4b9fc",
+"Magnet av"
+],
+"magnetS": [
+"607a7625b1",
+"Sterk magnet"
+],
+"magnetW": [
+"181021d95b",
+"Svak magnet"
 ],
 "maxIndAlerts": [
 "1d7c6d8c4f",
@@ -1921,9 +2765,45 @@
 "fdbe20f376",
 "Alle tidsrammer"
 ],
+"moreTools": [
+"c871f1056a",
+"Flere verktøy"
+],
 "moveToSection": [
 "98d183e7cb",
 "Flytt til seksjon"
+],
+"mt_mine": [
+"1cf761ac34",
+"Mine skript"
+],
+"mt_opt": [
+"6bf5da9c08",
+"Opsjoner"
+],
+"mt_pat": [
+"4d34f7a2b0",
+"Mønstre"
+],
+"mt_prof": [
+"0c2a930099",
+"Profiler"
+],
+"mt_smc": [
+"9482c5d5bf",
+"Struktur"
+],
+"mt_strat": [
+"876f3e0202",
+"Strategier"
+],
+"multiAl": [
+"5bafcd2412",
+"Flere-betingelsers varsel"
+],
+"multiNote": [
+"c7e278bae8",
+"Skriv betingelsene på én linje og koble dem sammen med and / or. Varslet utløses på den candle der linjen blir sann."
 ],
 "myLayouts": [
 "0f210d43ca",
@@ -1972,6 +2852,10 @@
 "nc_technical": [
 "41fc086088",
 "Teknisk"
+],
+"neckline": [
+"993062b2d6",
+"Halslinje"
 ],
 "needMore": [
 "5e5b150c83",
@@ -2081,6 +2965,10 @@
 "77f8046dcf",
 "(øverst, ingen seksjon)"
 ],
+"noVol": [
+"0960b9b69d",
+"ingen volum for dette symbolet"
+],
 "notif": [
 "270d190970",
 "Nettleservarsling"
@@ -2133,13 +3021,37 @@
 "c0da22faab",
 "Åpne på diagrammet"
 ],
+"openTv": [
+"94d7227248",
+"Åpne på TradingView"
+],
+"optChain": [
+"234f0372e8",
+"{c} opsjonskjede"
+],
+"optDays": [
+"c2fd31e918",
+"Dager til utløp"
+],
 "optDone": [
 "29cda6ac3f",
 "{n} kombinasjoner testet på {s} s, {p} av dem profitable; sortert etter {r}. Klikk på en rad for å se hele rapporten."
 ],
+"optFail": [
+"ab2a990eed",
+"Deribit svarte ikke fra denne tilkoblingen. Endre tilkoblingen eller VPN-en og prøv igjen."
+],
+"optIV": [
+"c1bc12118c",
+"ATM implisitt volatilitet"
+],
 "optMax": [
 "7b9c1b1490",
 "For mange kombinasjoner — maks {n}. Bruk et større trinn."
+],
+"optMove": [
+"8aa36fe05d",
+"Forventet bevegelse"
 ],
 "optN": [
 "1e919c1ca4",
@@ -2149,6 +3061,18 @@
 "4b4713d390",
 "Det beste resultatet på historiske data er ofte flaks (overtilpasning). Foretrekk innstillinger der naboene også gjør det bra, og sjekk dem på en annen periode eller et annet marked."
 ],
+"optNote2": [
+"26dfa389e8",
+"OI og volum i kontrakter (mynter); $ er markedsprisen i dollar. Maks smerte: avregningsprisen som betaler opsjonsholderne minst mulig. Forventet bevegelse = pris × IV × √(dager/365). Ikke råd."
+],
+"optPC": [
+"422f798e31",
+"Put/Call (OI)"
+],
+"optPain": [
+"0afba48a24",
+"Maks smerte"
+],
 "optProg": [
 "2b404f9f4a",
 "Tester {i} / {n}…"
@@ -2156,6 +3080,10 @@
 "optRun": [
 "9a456cc451",
 "Finn de beste innstillingene"
+],
+"optSpot": [
+"bdfcb0e0a9",
+"Underliggende"
 ],
 "optTitle": [
 "54c355c81a",
@@ -2217,13 +3145,37 @@
 "0777981263",
 "Priser i {c} bruker nå din kurs."
 ],
+"p_amp": [
+"15b948e105",
+"Amplitue"
+],
 "p_atr": [
 "0d1283ae88",
 "ATR-lengde"
 ],
+"p_band": [
+"3541c5f4e1",
+"Båndlengde"
+],
 "p_base": [
 "077fe9c54e",
 "Base"
+],
+"p_bbl": [
+"3541c5f4e1",
+"Båndlengde"
+],
+"p_bw": [
+"1d06cbba91",
+"Båndbredde"
+],
+"p_chdev": [
+"65acb623a8",
+"Kanalavvik"
+],
+"p_coeff": [
+"b032583db6",
+"Multiplikator"
 ],
 "p_conv": [
 "9151f8433f",
@@ -2257,6 +3209,10 @@
 "8db6a2f1d3",
 "Rask"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Rask 2"
+],
 "p_hi": [
 "70a2565504",
 "Øvre nivå"
@@ -2277,6 +3233,14 @@
 "a0623fa9a3",
 "%K utjevning"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC-mult"
+],
+"p_key": [
+"ab76f1670b",
+"Nøkkelverdi"
+],
 "p_l1": [
 "ba51565baf",
 "MA 1-lengde"
@@ -2292,6 +3256,14 @@
 "p_l4": [
 "a5c110eb00",
 "MA 4-lengde"
+],
+"p_lb": [
+"0f484e5cc3",
+"Percentil-tilbakeblikk"
+],
+"p_left": [
+"3b219a058a",
+"Venstre stolper"
 ],
 "p_len": [
 "3bade34ecb",
@@ -2333,6 +3305,14 @@
 "a44d6c906d",
 "Stolper på hver side"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Kanallengde"
+],
+"p_n2": [
+"2df99da939",
+"Gjennomsnittlig lengde"
+],
 "p_offset": [
 "ce66771654",
 "Forskyvning"
@@ -2341,13 +3321,41 @@
 "ac556cf593",
 "Prosent"
 ],
+"p_pd": [
+"4997ad18cf",
+"Tilbakeblikk"
+],
+"p_per": [
+"a89f63abb8",
+"Samplingsperiode"
+],
+"p_ph": [
+"b1f698cc3d",
+"Høy percentil"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE-faktor"
+],
 "p_rank": [
 "1df2ca7462",
 "Prosentrang-lengde"
 ],
+"p_right": [
+"307c9815b6",
+"Høyre stolper"
+],
+"p_rows": [
+"52d0b35277",
+"Rader"
+],
 "p_rsi": [
 "560e6b61c6",
 "RSI-lengde"
+],
+"p_sf": [
+"590f20262b",
+"RSI-utjevning"
 ],
 "p_short": [
 "3445c2f23b",
@@ -2364,6 +3372,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Treg"
+],
+"p_slow2": [
+"c252d2ccab",
+"Sakte 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -2409,6 +3421,54 @@
 "07300ad49f",
 "{c} for 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Legg til"
+],
+"pfAvg": [
+"def9f57b0c",
+"Gjennomsnittlig kjøpspris"
+],
+"pfCost": [
+"64ae43e8fe",
+"Kostnad"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Ingenting her ennå. Legg til en mynt, hvor mye du eier og hva du betalte."
+],
+"pfName": [
+"a5a98fb17f",
+"Portefølje {n}"
+],
+"pfNote": [
+"f46050561e",
+"Lagres kun i denne nettleseren. Den ber aldri om børstøkler og sender ingenting til noen. Prisene er Binance USDT-par."
+],
+"pfNow": [
+"039df35064",
+"Pris nå"
+],
+"pfPnl": [
+"8ae3945397",
+"Fortjeneste / tap"
+],
+"pfQty": [
+"44f6af6945",
+"Antall"
+],
+"pfShort": [
+"036b18f02a",
+"Portefølje"
+],
+"pfTitle": [
+"036b18f02a",
+"Portefølje"
+],
+"pfValue": [
+"8dce170de2",
+"Verdi"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klikk på diagrammet der avspillingen skal starte"
@@ -2432,6 +3492,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Pris"
+],
+"profNote": [
+"c1da831af8",
+"For en profil av et intervall du velger, bruk «Fast range volume profile» i venstre verktøylinje."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -2605,6 +3669,86 @@
 "56a2285c5b",
 "Lagrer…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Tilpass prisskalaen automatisk"
+],
+"scBorder": [
+"45c60c0e85",
+"Prisskalakant"
+],
+"scBot": [
+"77a5b77d62",
+"Plass under (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Begge sider"
+],
+"scInvert": [
+"ba80abaac1",
+"Inverter prisskalaen"
+],
+"scInvertH": [
+"ebb1688761",
+"opp blir ned"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Venstre"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmisk"
+],
+"scMode": [
+"a5e5771ca0",
+"Prisskala"
+],
+"scModeH": [
+"ab58fc981e",
+"normal, logaritmisk eller prosent"
+],
+"scNone": [
+"d4c2792a72",
+"Skjult"
+],
+"scNormal": [
+"7802670ec0",
+"Normal (aritmetisk)"
+],
+"scOff": [
+"3557c35506",
+"Tomrom til høyre"
+],
+"scPct": [
+"c4519ac7cc",
+"Prosent"
+],
+"scRight": [
+"954daa8b00",
+"Høyre"
+],
+"scSec": [
+"c92a4af093",
+"Sekunder på tidsskalaen"
+],
+"scSide": [
+"82acb7ee2b",
+"Hvor prisskalaen plasseres"
+],
+"scSpace": [
+"2878a3a43e",
+"Stearinlysavstand"
+],
+"scTop": [
+"25126a3aab",
+"Plass over (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Tidsskalakant"
+],
 "sc_c": [
 "3e8248e32e",
 "Pris"
@@ -2664,6 +3808,62 @@
 "screener": [
 "7f27924c12",
 "Markedsoversikt"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Sjekk"
+],
+"scriptEd": [
+"989a6a8a22",
+"Entekhab Script-redigering"
+],
+"scriptEdit": [
+"ae909c75da",
+"Rediger skriptet"
+],
+"scriptExamples": [
+"41a27a4710",
+"Eksempler…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Linje {n}"
+],
+"scriptName": [
+"709a23220f",
+"Navn"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nytt skript"
+],
+"scriptNote": [
+"c265d2248f",
+"Skriv dine egne indikatorer på et Pine-lignende språk. De lagres i denne nettleseren og kjører bare her, på diagrammet ditt."
+],
+"scriptOk": [
+"eb3da0c952",
+"Ingen feil · {n} utdata"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Hva språket kan"
+],
+"scriptSave": [
+"1e291c4d98",
+"Lagre og legg til på diagrammet"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skript lagret"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skript"
 ],
 "searchEv": [
 "0a08612647",
@@ -2769,9 +3969,25 @@
 "e97d96a8bc",
 "Topp volum"
 ],
+"sg_adx": [
+"815b591f93",
+"DMI-kryss (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR Trailing Stops"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollinger-reversering"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -2781,6 +3997,22 @@
 "c3de6d0cdd",
 "Kurdistani-signaler (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Ichimoku Tenkan/Kijun-kryss"
+],
+"sg_kdj": [
+"a9a165bc50",
+"KDJ-kryss"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD-kryss"
@@ -2789,9 +4021,21 @@
 "6677aad0c9",
 "EMA-kryss"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Nadaraya-Watson snuoperasjon [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -2801,9 +4045,37 @@
 "446d28671b",
 "Gyldene / død kryss (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Stochastic RSI-kryss"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"WaveTrend-kryss [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -2933,6 +4205,106 @@
 "2d2cb022bc",
 "Hastighet"
 ],
+"stBadLv": [
+"683a05683a",
+"Nivåer kan være opptil 24 tall."
+],
+"stBadPt": [
+"a73083f114",
+"En pris eller et tidspunkt er ugyldig."
+],
+"stColor": [
+"f28563a477",
+"Farge"
+],
+"stCoord": [
+"8ebebca019",
+"Koordinater"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Stiplet"
+],
+"stDev": [
+"e789c07831",
+"Avvik (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Prikket"
+],
+"stExtL": [
+"ef880cf8fc",
+"Utvid til venstre"
+],
+"stExtR": [
+"fbff580b3d",
+"Utvid til høyre"
+],
+"stFill": [
+"64dd60fe1a",
+"Bakgrunn"
+],
+"stLevels": [
+"ae3d013ab1",
+"Nivåer (kommadelt)"
+],
+"stLine": [
+"120ee44bec",
+"Linjestil"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Bare de første 12 punktene kan redigeres her."
+],
+"stOpacity": [
+"f12e36bd83",
+"Bakgrunnsgjennomsiktighet"
+],
+"stReset": [
+"40aab769d0",
+"Standardnivåer"
+],
+"stRows": [
+"52d0b35277",
+"Rader"
+],
+"stSize": [
+"83ca9e48c3",
+"Skriftstørrelse"
+],
+"stSolid": [
+"d00635865c",
+"Hele"
+],
+"stStyle": [
+"99a0efc6cf",
+"Stil"
+],
+"stText": [
+"c3328c39b0",
+"Tekst"
+],
+"stTextC": [
+"d160595fcf",
+"Tekstfarge"
+],
+"stTextL": [
+"c3328c39b0",
+"Tekst"
+],
+"stUtc": [
+"c9dbd25df4",
+"Tidspunkter er i UTC (ÅÅÅÅ-MM-DD TT:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Synlighet"
+],
+"stWidth": [
+"ad48f34186",
+"Tykkelse"
+],
 "st_err": [
 "d802d232a8",
 "Ingen data"
@@ -2976,6 +4348,14 @@
 "stop": [
 "9e253470c8",
 "Stopp"
+],
+"stratNote": [
+"16dc19eef4",
+"Hver strategi kjører på dette diagrammets historikk i testeren: innganger og utganger på diagrammet, nettoresultat, vinnerfrekvens, drawdown og en optimerer for innstillingene."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Kjør i strategitesteren"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3037,25 +4417,133 @@
 "a26d0ddaae",
 "Rulling (tid)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"ABCD-mønster"
+],
+"t_angle": [
+"30cd1e7703",
+"Trendvinkel"
+],
+"t_arc": [
+"853a983f6b",
+"Bue"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Pil"
+],
+"t_arrowc": [
+"0f722804ec",
+"Pilkursor"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Pilmerke ned"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Pillabel"
+],
+"t_arrowup": [
+"8023467135",
+"Pilmerke opp"
+],
+"t_avwap": [
+"0a4f86b195",
+"Ankret VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Pensel"
 ],
+"t_callout": [
+"f1647ad880",
+"Utsagn"
+],
 "t_channel": [
 "c0350b7736",
 "Parallellkanal"
+],
+"t_circ": [
+"1cc7820a08",
+"Sirkel"
 ],
 "t_circle": [
 "8580e3175f",
 "Ellipse"
 ],
+"t_comment": [
+"153d7a58b3",
+"Kommentar"
+],
+"t_cross": [
+"983bdb7b27",
+"Krysslinje"
+],
 "t_cursor": [
 "2239943c8d",
 "Markør"
+],
+"t_curve": [
+"916f09aff8",
+"Kurve"
+],
+"t_cyclic": [
+"ce00a6cfeb",
+"Sykliske linjer"
+],
+"t_cypher": [
+"e2260b5c0c",
+"Cypher-mønster"
+],
+"t_dcurve": [
+"faef75cb57",
+"Dobbel kurve"
+],
+"t_disjoint": [
+"9b6c4d15ec",
+"Frakoblet kanal"
+],
+"t_dot": [
+"46856bf702",
+"Prikk"
+],
+"t_drange": [
+"c65ea4ae01",
+"Datointervall"
+],
+"t_drives": [
+"3a261ca869",
+"Tre drives-mønster"
+],
+"t_emoji": [
+"707fd71017",
+"Ikoner og emoji"
+],
+"t_eraser": [
+"a5742851f0",
+"Viskelær"
+],
+"t_ewcor": [
+"a819268f2f",
+"Elliott korreksjonsbølge (ABC)"
+],
+"t_ewdbl": [
+"83c7bcc32d",
+"Elliott dobbel kombinasjonsbølge (WXY)"
+],
+"t_ewimp": [
+"b28cdeecea",
+"Elliott impulsbølge (12345)"
+],
+"t_ewtri": [
+"bf0f6b602d",
+"Elliott triangelbølge (ABCDE)"
+],
+"t_ewtrp": [
+"3670c19480",
+"Elliott trippel kombinasjonsbølge (WXYXZ)"
 ],
 "t_ext": [
 "794d85f0b5",
@@ -3065,13 +4553,69 @@
 "18c530863b",
 "Fibonacci-retrett"
 ],
+"t_fibarc": [
+"09d8fecaa7",
+"Fib hastighetsmotstandsbuer"
+],
+"t_fibch": [
+"c691e1e9b4",
+"Fib-kanal"
+],
+"t_fibcirc": [
+"6daa1d027f",
+"Fib-sirkler"
+],
 "t_fibext": [
 "73655be9d6",
 "Trendbasert Fibonacci-utvidelse"
 ],
+"t_fibfan": [
+"5b948b7296",
+"Fib hastighetsmotstandsvifte"
+],
+"t_fibspiral": [
+"7e523968e1",
+"Fib-spiral"
+],
+"t_fibtime": [
+"574f8ab37b",
+"Trendbasert Fib-tid"
+],
+"t_fibtz": [
+"4263c185f4",
+"Fib-tidssone"
+],
+"t_fibwedge": [
+"4d61bde1f7",
+"Fib-kile"
+],
+"t_flag": [
+"23d91e7740",
+"Flaggmerke"
+],
+"t_flat": [
+"52d3db252e",
+"Flate topp/bunn"
+],
+"t_forecast": [
+"528bc4bc38",
+"Prognose"
+],
 "t_gann": [
 "ba563cbfc5",
 "Gann-vifte"
+],
+"t_gannbox": [
+"58a3842138",
+"Gann-boks"
+],
+"t_gannsq": [
+"68dac85dcb",
+"Gann-kvadrat"
+],
+"t_hl": [
+"8cb3f79b49",
+"Uthever"
 ],
 "t_hline": [
 "6f471f8257",
@@ -3081,6 +4625,18 @@
 "0bcbc4e087",
 "Horisontal stråle"
 ],
+"t_hs": [
+"43353dbcec",
+"Hode og skuldre"
+],
+"t_info": [
+"a690e33098",
+"Infolinje"
+],
+"t_inside": [
+"30d6b425dc",
+"Innvendig pitchfork"
+],
 "t_long": [
 "666f195fc4",
 "Long-posisjon"
@@ -3089,9 +4645,45 @@
 "2bedd64d85",
 "Prisområde / mål"
 ],
+"t_mschiff": [
+"5e728d30e7",
+"Modifisert Schiff-pitchfork"
+],
+"t_note": [
+"2c924e3088",
+"Notat"
+],
+"t_path": [
+"519e39132b",
+"Sti"
+],
 "t_pitch": [
 "29135fd404",
 "Andrews’ pitchfork"
+],
+"t_pitchfan": [
+"075ddc86de",
+"Pitchvifte"
+],
+"t_plabel": [
+"cd6ff53b4d",
+"Prisetikett"
+],
+"t_pnote": [
+"b3ed5d44b7",
+"Prisnotat"
+],
+"t_poly": [
+"dd0c89e0c5",
+"Polylinje"
+],
+"t_prange": [
+"c20f7ce09a",
+"Prisintervall"
+],
+"t_proj": [
+"8aa49fe840",
+"Projeksjon"
 ],
 "t_ray": [
 "eb23efbb26",
@@ -3101,9 +4693,33 @@
 "c158695a64",
 "Rektangel"
 ],
+"t_regress": [
+"bb57f2c725",
+"Regresjonstrend"
+],
+"t_rrect": [
+"65807afaf7",
+"Rtert rektangel"
+],
+"t_schiff": [
+"c4c1201685",
+"Schiff-pitchfork"
+],
 "t_short": [
 "a8daf74669",
 "Short-posisjon"
+],
+"t_signpost": [
+"89f361362e",
+"Veiviser"
+],
+"t_sine": [
+"3852fedc7e",
+"Sinuslinje"
+],
+"t_tcycle": [
+"521a687246",
+"Tidssykluser"
 ],
 "t_text": [
 "c3328c39b0",
@@ -3113,9 +4729,29 @@
 "e810388344",
 "Trendlinje"
 ],
+"t_tri": [
+"32547b031d",
+"Triangelmønster"
+],
+"t_tri3": [
+"73d3ae245f",
+"Triangel"
+],
 "t_vline": [
 "a790288017",
 "Vertikal linje"
+],
+"t_vrp": [
+"bcba420b37",
+"Volumprofil med fast intervall"
+],
+"t_xabcd": [
+"ae78e60931",
+"XABCD-mønster"
+],
+"t_zoom": [
+"4fc05f2763",
+"Zoom inn"
 ],
 "target": [
 "61ad50a9b9",
@@ -3165,6 +4801,26 @@
 "ad88cbfa09",
 "Også på Telegram (boten overvåker selv når denne siden er stengt)"
 ],
+"thDark": [
+"ae1ef01432",
+"Mørk"
+],
+"thLight": [
+"a36ef8aba2",
+"Lys"
+],
+"thMid": [
+"4fe978738d",
+"Midnattssblå"
+],
+"thNavy": [
+"0229e960cf",
+"Marineblå"
+],
+"thPaper": [
+"22d507f2ba",
+"Papir"
+],
 "time": [
 "6c82e6dd86",
 "Tid"
@@ -3188,6 +4844,10 @@
 "tooFar": [
 "b29db0358a",
 "Det er lenger tilbake enn denne tidsrammen kan laste; velg en større tidsramme."
+],
+"toolHint": [
+"56e62363ce",
+"klikk på diagrammet for å tegne"
 ],
 "topFixed": [
 "1a66879287",
@@ -3413,6 +5073,34 @@
 "1526a17ee7",
 "Lås opp"
 ],
+"unlockedAll": [
+"fa23ac90b8",
+"Alle tegninger er låst opp"
+],
+"vDay": [
+"f6bb0f468a",
+"Dager"
+],
+"vHour": [
+"9e25a34e63",
+"Timer"
+],
+"vMin": [
+"092f99ea11",
+"Minutter"
+],
+"vMonth": [
+"200dcdce9b",
+"Måneder"
+],
+"vSec": [
+"5fb1db5278",
+"Sekunder"
+],
+"vWeek": [
+"7d75266a53",
+"Uker"
+],
 "value": [
 "3e8248e32e",
 "Pris"
@@ -3420,6 +5108,10 @@
 "valuePct": [
 "bf55390d8d",
 "Prosent (%)"
+],
+"vol": [
+"1837d13d11",
+"Vol"
 ],
 "vol24": [
 "ad33e8a3b2",
@@ -3464,6 +5156,14 @@
 "yourRate": [
 "ca14282aa6",
 "din rate"
+],
+"zoomOut": [
+"a4ae4b24a1",
+"Zoom ut"
+],
+"zoomSmall": [
+"6a2ccf1788",
+"Dra en bredere boks for å zoome inn."
 ]
 },
 "f": {
@@ -3473,15 +5173,35 @@
 ],
 "about.ae2074a92f": [
 "ae2074a92f",
-1
+2
 ],
 "about.bd3e93adef": [
 "bd3e93adef",
 3
 ],
+"ckNote": [
+"bc9c1644bd",
+1
+],
 "curPlain": [
 "ad051e540f",
 3
+],
+"in_fvg": [
+"bad3ce3dd2",
+1
+],
+"in_nwe": [
+"1b2ee5c713",
+1
+],
+"in_vixfix": [
+"f6152b3b33",
+1
+],
+"optNote": [
+"96723a0ac4",
+1
 ],
 "slTp": [
 "41d1998bce",

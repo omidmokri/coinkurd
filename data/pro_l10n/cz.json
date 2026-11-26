@@ -1753,9 +1753,17 @@
 "5114d8a4f7",
 "Ranní / Večerní hvězda"
 ],
+"in_cp_pierce": [
+"de9e3d4b02",
+"Pronikavá svíce / Temný mrak"
+],
 "in_cp_soldiers": [
 "32c51f18a5",
 "Tři bílí vojáci / černí vrány"
+],
+"in_cp_star": [
+"f1940a30a1",
+"Padající hvězda / Obrácené kladivo"
 ],
 "in_cp_tweezer": [
 "7c91c654a1",
@@ -1764,6 +1772,10 @@
 "in_crsi": [
 "d788a94022",
 "Connors RSI"
+],
+"in_cvd": [
+"fbd0df870e",
+"Kumulativní objemová delta (CVD)"
 ],
 "in_dc": [
 "5a8e70b183",
@@ -1812,6 +1824,10 @@
 "in_fract": [
 "5b7b1d99c5",
 "Fractals"
+],
+"in_fvg": [
+"bad3ce3dd2",
+"Mezery reálné hodnoty (FVG)"
 ],
 "in_gmma": [
 "bf822f6db4",
@@ -1893,6 +1909,14 @@
 "c29791e587",
 "Momentum"
 ],
+"in_ms": [
+"14c6c6c316",
+"Tržní struktura (BOS / CHoCH)"
+],
+"in_nwe": [
+"1b2ee5c713",
+"Nadaraya-Watsonova obálka [LuxAlgo]"
+],
 "in_ob": [
 "80c4ef99a7",
 "Order Blocks"
@@ -1965,6 +1989,10 @@
 "b42e6347a2",
 "Squeeze Momentum [LazyBear]"
 ],
+"in_srlux": [
+"50cfe9a1d5",
+"S&R s průrazy [LuxAlgo]"
+],
 "in_srsi": [
 "9cbc4f7bea",
 "Stochastic RSI"
@@ -1992,6 +2020,10 @@
 "in_tema": [
 "41227a56e5",
 "TEMA"
+],
+"in_tpo": [
+"cd41be0fc7",
+"TPO profil (čas na cenu)"
 ],
 "in_trix": [
 "9faf8d0ea1",
@@ -2028,6 +2060,10 @@
 "in_vpsess": [
 "26e15fb568",
 "Session Volume Profile"
+],
+"in_vpvr": [
+"f757c4a16d",
+"Objemový profil viditelného rozsahu"
 ],
 "in_vwap": [
 "081d3e8e7c",
@@ -2544,6 +2580,10 @@
 "ind_wt": [
 "d823a77eaa",
 "LazyBear · oscilátor indexu kanálu; překřížení nad 53/60 a pod −53/−60 značí přepálené pohyby"
+],
+"ind_zlsma": [
+"814b9eebab",
+"veryfid · klouzavý průměr s nejmenšími čtverci bez zpoždění"
 ],
 "ind_zz": [
 "633eef3f51",
@@ -3153,6 +3193,18 @@
 "3541c5f4e1",
 "Délka pásma"
 ],
+"p_bw": [
+"1d06cbba91",
+"Šířka pásma"
+],
+"p_chdev": [
+"65acb623a8",
+"Odchylka kanálu"
+],
+"p_coeff": [
+"b032583db6",
+"Násobitel"
+],
 "p_conv": [
 "9151f8433f",
 "Konverze"
@@ -3185,6 +3237,10 @@
 "8db6a2f1d3",
 "Rychlá"
 ],
+"p_fast2": [
+"e2f2bf4a45",
+"Rychlá 2"
+],
 "p_hi": [
 "70a2565504",
 "Horní úroveň"
@@ -3205,6 +3261,14 @@
 "a0623fa9a3",
 "Vyhlazení %K"
 ],
+"p_kcm": [
+"aa2c34c47b",
+"KC mult"
+],
+"p_key": [
+"ab76f1670b",
+"Klíčová hodnota"
+],
 "p_l1": [
 "ba51565baf",
 "Délka MA 1"
@@ -3220,6 +3284,14 @@
 "p_l4": [
 "a5c110eb00",
 "Délka MA 4"
+],
+"p_lb": [
+"0f484e5cc3",
+"Zpětné hledání percentilu"
+],
+"p_left": [
+"3b219a058a",
+"Levé bary"
 ],
 "p_len": [
 "3bade34ecb",
@@ -3261,6 +3333,14 @@
 "a44d6c906d",
 "Svíček na každé straně"
 ],
+"p_n1": [
+"6cb19b55ac",
+"Délka kanálu"
+],
+"p_n2": [
+"2df99da939",
+"Průměrná délka"
+],
 "p_offset": [
 "ce66771654",
 "Posun"
@@ -3269,13 +3349,41 @@
 "ac556cf593",
 "Procenta"
 ],
+"p_pd": [
+"4997ad18cf",
+"Zpětné hledání"
+],
+"p_per": [
+"a89f63abb8",
+"Vzorkovací období"
+],
+"p_ph": [
+"b1f698cc3d",
+"Horní percentil"
+],
+"p_qqe": [
+"f1fb561b11",
+"QQE faktor"
+],
 "p_rank": [
 "1df2ca7462",
 "Délka percentilového ranku"
 ],
+"p_right": [
+"307c9815b6",
+"Pravé bary"
+],
+"p_rows": [
+"52d0b35277",
+"Řádky"
+],
 "p_rsi": [
 "560e6b61c6",
 "Délka RSI"
+],
+"p_sf": [
+"590f20262b",
+"Vyhlazení RSI"
 ],
 "p_short": [
 "3445c2f23b",
@@ -3292,6 +3400,10 @@
 "p_slow": [
 "33dcec9ce4",
 "Pomalá"
+],
+"p_slow2": [
+"c252d2ccab",
+"Pomalá 2"
 ],
 "p_smooth": [
 "054d3bf0dd",
@@ -3337,6 +3449,54 @@
 "07300ad49f",
 "{c} za 1 {u}"
 ],
+"pfAdd": [
+"61cc55aa04",
+"Přidat"
+],
+"pfAvg": [
+"def9f57b0c",
+"Průměrná nákupní cena"
+],
+"pfCost": [
+"64ae43e8fe",
+"Náklady"
+],
+"pfEmpty": [
+"c0bb736cd7",
+"Zatím zde nic není. Přidejte minci, množství, které držíte, a nákupní cenu."
+],
+"pfName": [
+"a5a98fb17f",
+"Portfolia {n}"
+],
+"pfNote": [
+"f46050561e",
+"Ukládá se pouze v tomto prohlížeči. Nevyžaduje klíče burzy ani nic nikam neodesílá. Ceny jsou v párech Binance USDT."
+],
+"pfNow": [
+"039df35064",
+"Aktuální cena"
+],
+"pfPnl": [
+"8ae3945397",
+"Zisk / ztráta"
+],
+"pfQty": [
+"44f6af6945",
+"Množství"
+],
+"pfShort": [
+"036b18f02a",
+"Portfolia"
+],
+"pfTitle": [
+"036b18f02a",
+"Portfolia"
+],
+"pfValue": [
+"8dce170de2",
+"Hodnota"
+],
 "pickStart": [
 "1e214a5fd6",
 "Klikněte do grafu, kde má přehrávání začít"
@@ -3360,6 +3520,10 @@
 "priceAlert": [
 "3e8248e32e",
 "Cena"
+],
+"profNote": [
+"c1da831af8",
+"Pro profil vámi zvoleného rozsahu použijte v levém panelu nástrojů „Pevný objemový profil“."
 ],
 "qrNote": [
 "bcd49f2e1c",
@@ -3533,6 +3697,86 @@
 "56a2285c5b",
 "Ukládání…"
 ],
+"scAuto": [
+"6e0f8f2742",
+"Automaticky přizpůsobit cenovou osu"
+],
+"scBorder": [
+"45c60c0e85",
+"Ohraničení cenové osy"
+],
+"scBot": [
+"77a5b77d62",
+"Odstavec dole (%)"
+],
+"scBoth": [
+"d7031f3a11",
+"Obě strany"
+],
+"scInvert": [
+"ba80abaac1",
+"Invertovat cenovou osu"
+],
+"scInvertH": [
+"ebb1688761",
+"nahoru bude dolů"
+],
+"scLeft": [
+"8ae1c34bd3",
+"Vlevo"
+],
+"scLog": [
+"65fa51781b",
+"Logaritmická"
+],
+"scMode": [
+"a5e5771ca0",
+"Cenová osa"
+],
+"scModeH": [
+"ab58fc981e",
+"normální, logaritmická nebo procentuální"
+],
+"scNone": [
+"d4c2792a72",
+"Skryto"
+],
+"scNormal": [
+"7802670ec0",
+"Normální (aritmetická)"
+],
+"scOff": [
+"3557c35506",
+"Prázdné místo vpravo"
+],
+"scPct": [
+"c4519ac7cc",
+"Procentuální"
+],
+"scRight": [
+"954daa8b00",
+"Vpravo"
+],
+"scSec": [
+"c92a4af093",
+"Sekundy na časové ose"
+],
+"scSide": [
+"82acb7ee2b",
+"Umístění cenové osy"
+],
+"scSpace": [
+"2878a3a43e",
+"Rozestup svíček"
+],
+"scTop": [
+"25126a3aab",
+"Odstavec nahoře (%)"
+],
+"scTsBorder": [
+"c521ac6047",
+"Ohraničení časové osy"
+],
 "sc_c": [
 "3e8248e32e",
 "Cena"
@@ -3592,6 +3836,62 @@
 "screener": [
 "7f27924c12",
 "Sledování trhů"
+],
+"screenerBtn": [
+"9bd16e58ad",
+"Screener"
+],
+"scriptCheck": [
+"4b5e84be0e",
+"Zkontrolovat"
+],
+"scriptEd": [
+"989a6a8a22",
+"Editor skriptů Entekhab"
+],
+"scriptEdit": [
+"ae909c75da",
+"Upravit skript"
+],
+"scriptExamples": [
+"41a27a4710",
+"Příklady…"
+],
+"scriptLine": [
+"1acb1c0448",
+"Řádek {n}"
+],
+"scriptName": [
+"709a23220f",
+"Název"
+],
+"scriptNew": [
+"ebac729ca3",
+"Nový skript"
+],
+"scriptNote": [
+"c265d2248f",
+"Pište vlastní indikátory v jazyce podobném Pine. Jsou uloženy v tomto prohlížeči a běží pouze zde, na vašem grafu."
+],
+"scriptOk": [
+"eb3da0c952",
+"Žádné chyby · {n} výstupů"
+],
+"scriptRef": [
+"3a7bd85f8b",
+"Co jazyk podporuje"
+],
+"scriptSave": [
+"1e291c4d98",
+"Uložit a přidat do grafu"
+],
+"scriptSaved": [
+"e4e7d05763",
+"Skript uložen"
+],
+"scriptShort": [
+"ee6d6afa9f",
+"Skript"
 ],
 "searchEv": [
 "0a08612647",
@@ -3697,9 +3997,25 @@
 "e97d96a8bc",
 "Největší objem"
 ],
+"sg_adx": [
+"815b591f93",
+"Křížení DMI (+DI / −DI)"
+],
+"sg_alpha": [
+"b7771f3a87",
+"AlphaTrend [KivancOzbilgic]"
+],
+"sg_atrts": [
+"d8f90ef4d0",
+"ATR posuvná stop loss"
+],
 "sg_bb": [
 "c7d2698f8f",
 "Bollingerův obrat"
+],
+"sg_ce": [
+"17c8f9d4bc",
+"Chandelier Exit [everget]"
 ],
 "sg_donch": [
 "da5a85fee6",
@@ -3709,6 +4025,22 @@
 "c3de6d0cdd",
 "Kurdistani signály (BTC)"
 ],
+"sg_halft": [
+"a087f03711",
+"HalfTrend [everget]"
+],
+"sg_hull": [
+"b26e7794a7",
+"Hull Suite [InSilico]"
+],
+"sg_ichi": [
+"730fce5fe8",
+"Křížení Ichimoku Tenkan/Kijun"
+],
+"sg_kdj": [
+"a9a165bc50",
+"Křížení KDJ"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD křížení"
@@ -3717,9 +4049,21 @@
 "6677aad0c9",
 "EMA křížení"
 ],
+"sg_nwe": [
+"4e506ad872",
+"Nadaraya-Watsonův obrat [LuxAlgo]"
+],
 "sg_psar": [
 "7bd7543cd4",
 "Parabolic SAR"
+],
+"sg_qqe": [
+"01c980abfa",
+"QQE [Mihkel00]"
+],
+"sg_rf": [
+"38de140a29",
+"Range Filter [DonovanWall]"
 ],
 "sg_rsi": [
 "d890614a3f",
@@ -3729,9 +4073,37 @@
 "446d28671b",
 "Zlaté / kříž smrti (SMA)"
 ],
+"sg_sqz": [
+"b42e6347a2",
+"Squeeze Momentum [LazyBear]"
+],
+"sg_srsi": [
+"d756854031",
+"Křížení stochastického RSI"
+],
+"sg_ssl": [
+"a4da9d9e87",
+"SSL Channel [ErwinBeckers]"
+],
 "sg_st": [
 "fbb9397fce",
 "SuperTrend"
+],
+"sg_stc": [
+"bef16e48fa",
+"Schaff Trend Cycle"
+],
+"sg_tdi": [
+"2af75b9512",
+"Traders Dynamic Index"
+],
+"sg_ut": [
+"39cf5fa59f",
+"UT Bot [QuantNomad]"
+],
+"sg_wt": [
+"ede0583749",
+"Křížení WaveTrend [LazyBear]"
 ],
 "sgd_bb": [
 "d4538cb207",
@@ -3861,6 +4233,106 @@
 "2d2cb022bc",
 "Rychlost"
 ],
+"stBadLv": [
+"683a05683a",
+"Úrovně mohou obsahovat maximálně 24 čísel."
+],
+"stBadPt": [
+"a73083f114",
+"Cena nebo čas nejsou platné."
+],
+"stColor": [
+"f28563a477",
+"Barva"
+],
+"stCoord": [
+"8ebebca019",
+"Souřadnice"
+],
+"stDashed": [
+"7b0a09ba9c",
+"Čárkovaná"
+],
+"stDev": [
+"e789c07831",
+"Odchylka (×σ)"
+],
+"stDotted": [
+"14949230a3",
+"Tečkovaná"
+],
+"stExtL": [
+"ef880cf8fc",
+"Prodloužit vlevo"
+],
+"stExtR": [
+"fbff580b3d",
+"Prodloužit vpravo"
+],
+"stFill": [
+"64dd60fe1a",
+"Pozadí"
+],
+"stLevels": [
+"ae3d013ab1",
+"Úrovně (oddělené čárkou)"
+],
+"stLine": [
+"120ee44bec",
+"Styl čáry"
+],
+"stManyPts": [
+"22a9cfe08f",
+"Zde lze upravit pouze prvních 12 bodů."
+],
+"stOpacity": [
+"f12e36bd83",
+"Neprůhlednost pozadí"
+],
+"stReset": [
+"40aab769d0",
+"Výchozí úrovně"
+],
+"stRows": [
+"52d0b35277",
+"Řádky"
+],
+"stSize": [
+"83ca9e48c3",
+"Velikost písma"
+],
+"stSolid": [
+"d00635865c",
+"Plná"
+],
+"stStyle": [
+"99a0efc6cf",
+"Styl"
+],
+"stText": [
+"c3328c39b0",
+"Text"
+],
+"stTextC": [
+"d160595fcf",
+"Barva textu"
+],
+"stTextL": [
+"c3328c39b0",
+"Text"
+],
+"stUtc": [
+"c9dbd25df4",
+"Časy jsou v UTC (RRRR-MM-DD HH:MM)."
+],
+"stVis": [
+"7d9ff4f0de",
+"Viditelnost"
+],
+"stWidth": [
+"ad48f34186",
+"Tloušťka"
+],
 "st_err": [
 "d802d232a8",
 "Žádná data"
@@ -3904,6 +4376,14 @@
 "stop": [
 "9e253470c8",
 "Zastavit"
+],
+"stratNote": [
+"16dc19eef4",
+"Každá strategie běží v testeru na historických datech tohoto grafu: vstupy a výstupy na grafu, čistý výsledek, úspěšnost, propad (drawdown) a optimalizátor nastavení."
+],
+"stratRun": [
+"3ff4f05e4c",
+"Spustit v testeru strategií"
 ],
 "strategy": [
 "69fb26dda8",
@@ -3957,17 +4437,57 @@
 "a26d0ddaae",
 "Posouvání (čas)"
 ],
+"t_abcd": [
+"f054eb6ac0",
+"Vzor ABCD"
+],
+"t_angle": [
+"30cd1e7703",
+"Úhel trendu"
+],
+"t_arc": [
+"853a983f6b",
+"Oblouk"
+],
 "t_arrow": [
 "3a4758c3cc",
 "Šipka"
+],
+"t_arrowc": [
+"0f722804ec",
+"Kurzor šipky"
+],
+"t_arrowdn": [
+"4e914ce8f0",
+"Šipka dolů"
+],
+"t_arrowmk": [
+"dc7de2d1de",
+"Značka šipky"
+],
+"t_arrowup": [
+"8023467135",
+"Šipka nahoru"
+],
+"t_avwap": [
+"0a4f86b195",
+"Ukotvený VWAP"
 ],
 "t_brush": [
 "25f085220c",
 "Štětec"
 ],
+"t_callout": [
+"f1647ad880",
+"Popisek"
+],
 "t_channel": [
 "c0350b7736",
 "Rovnoběžný kanál"
+],
+"t_circ": [
+"1cc7820a08",
+"Kruh"
 ],
 "t_circle": [
 "8580e3175f",
@@ -4663,49 +5183,9 @@
 ]
 },
 "f": {
-"in_cp_pierce": [
-"de9e3d4b02",
-1
-],
-"in_cp_star": [
-"f1940a30a1",
-1
-],
-"in_cvd": [
-"fbd0df870e",
-1
-],
-"in_fvg": [
-"bad3ce3dd2",
-1
-],
-"in_ms": [
-"14c6c6c316",
-1
-],
-"in_nwe": [
-"1b2ee5c713",
-1
-],
-"in_srlux": [
-"50cfe9a1d5",
-1
-],
-"in_tpo": [
-"cd41be0fc7",
-1
-],
 "in_vixfix": [
 "f6152b3b33",
-1
-],
-"in_vpvr": [
-"f757c4a16d",
-1
-],
-"ind_zlsma": [
-"814b9eebab",
-1
+2
 ],
 "slTp": [
 "41d1998bce",
