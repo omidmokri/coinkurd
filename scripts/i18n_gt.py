@@ -35,6 +35,62 @@ SPECIAL = {"cn": "zh-CN", "tw": "zh-TW", "iw": "iw", "fil": "tl", "br": "pt", "p
            "no": "no", "cat": "ca"}
 CHUNK_CHARS = 3800      # Google's web endpoint takes 5,000; room for the strings that come back longer
 CHUNK_LINES = 40
+GTX = "https://translate.googleapis.com/translate_a/single"   # the endpoint Google's own web widgets call
+RATE = float(os.environ.get("I18N_GT_RATE", "4"))            # requests a second across every thread; Google allows 5
+
+
+class Pace:
+    """one shared clock, so six threads together stay under Google's requests-a-second"""
+
+    def __init__(self, per_second):
+        self.gap = 1.0 / max(0.1, per_second)
+        self.next = 0.0
+        self.lock = threading.Lock()
+
+    def wait(self):
+        with self.lock:
+            now = time.time()
+            at = max(now, self.next)
+            self.next = at + self.gap
+        if at > now:
+            time.sleep(at - now)
+
+
+def turned_away(e):
+    m = str(e).lower()
+    return "429" in m or "too many" in m
+
+
+def gtx_factory(pace):
+    import requests
+    sess = requests.Session()
+
+    def make(code):
+        tl = gcode(code)
+
+        def tr(text):
+            pace.wait()
+            r = sess.post(GTX, params={"client": "gtx", "sl": "en", "tl": tl, "dt": "t"},
+                          data={"q": text}, timeout=30)
+            if r.status_code == 429:
+                raise RuntimeError("429 too many requests")
+            r.raise_for_status()
+            return "".join(seg[0] for seg in (r.json() or [[]])[0] or [] if seg and seg[0])
+        return tr
+    return make
+
+
+def deep_factory(pace):
+    from deep_translator import GoogleTranslator
+
+    def make(code):
+        g = GoogleTranslator(source="en", target=gcode(code))
+
+        def tr(text):
+            pace.wait()
+            return g.translate(text)
+        return tr
+    return make
 
 
 def gcode(code):
@@ -110,11 +166,8 @@ def fill(langs, need, first, seconds, threads=6, tr_factory=None, log=print):
     """fill the untranslated strings of `langs` with Google Translate, `threads` languages at a time"""
     t0 = time.time()
     if tr_factory is None:
-        from deep_translator import GoogleTranslator
-
-        def tr_factory(code):
-            g = GoogleTranslator(source="en", target=gcode(code))
-            return lambda text: g.translate(text)
+        pace = Pace(RATE)
+        tr_factory = (deep_factory if os.environ.get("I18N_GT_ENGINE") == "deep" else gtx_factory)(pace)
     todo_langs = list(order(langs, need))
     lock = threading.Lock()
     stats = {"strings": 0, "requests": 0, "stopped": False}
@@ -138,7 +191,7 @@ def fill(langs, need, first, seconds, threads=6, tr_factory=None, log=print):
                 log(f"gt {code}: {type(e).__name__}: {str(e)[:120]}")
                 if errors >= 3:
                     with lock:
-                        if "429" in str(e) or "Too Many" in str(e):
+                        if turned_away(e):
                             stats["stopped"] = True       # Google is turning this runner away: stop every language
                     break
                 time.sleep(5 * errors)
@@ -151,7 +204,6 @@ def fill(langs, need, first, seconds, threads=6, tr_factory=None, log=print):
             if time.time() - last > 60:
                 S.save(code, s, g=g)
                 last = time.time()
-            time.sleep(0.3)
         if added:
             S.save(code, s, g=g)
         with lock:
