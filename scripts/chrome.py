@@ -479,7 +479,7 @@ def footer(lang="fa"):
 # before it, so placed lower the interface's own stylesheet would start a second later.
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
-UI2_VER = "10"
+UI2_VER = "11"
 NX_VER = "20"
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides

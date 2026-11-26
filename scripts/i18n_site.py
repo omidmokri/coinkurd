@@ -474,7 +474,8 @@ def write_dicts(code, pages, scripts, common, need):
             json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
         return len(d)
 
-    dump("common.json", common)
+    # a hand fix may name a string the corpus cannot see (a word a script joins at run time: "DELAYED", "{1} h ago")
+    dump("common.json", set(common) | set(fixes().get(code, {})))
     have = tot = 0
     for path, keys in pages.items():
         own = keys - common
@@ -501,7 +502,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "9"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "10"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)

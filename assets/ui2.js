@@ -417,7 +417,11 @@
   function syncLang() {
     var l = lang(), lg = H && H.querySelector('.ek-lg1'), ar = false;
     try { ar = !de.hasAttribute('data-pro-lang') && (localStorage.getItem('ek_ar') === '1' || de.lang === 'ar'); } catch (e) { }
-    if (lg) lg.textContent = ar ? 'العربية' : ownLangName() || { fa: 'فارسی', ckb: 'کوردی', en: 'English' }[l];
+    /* a page the globe translated (assets/i18n.js) is in a language the menus do not have: lang() says 'en', so
+       the button would read English and then be translated into the word for English; it names the language
+       itself, kept out of the translator's reach */
+    var tn = !ar && !de.hasAttribute('data-pro-lang') && de.getAttribute('data-ek-lname');
+    if (lg) { if (tn) lg.innerHTML = '<span translate="no">' + esc(tn) + '</span>'; else lg.textContent = ar ? 'العربية' : ownLangName() || { fa: 'فارسی', ckb: 'کوردی', en: 'English' }[l]; }
     if (!M) return;
     M.setAttribute('aria-label', pick('منوی سایت', 'مێنیوی ماڵپەڕ', 'Site menu'));
     M.querySelector('.ekm-lang').setAttribute('aria-label', pick('زبان', 'زمان', 'Language'));
@@ -602,7 +606,7 @@
       };
     }
     new MutationObserver(function () { setTimeout(function () { stats(); navLabel(); if (cur && title) { var r = rowOf(cur), rt = r && r.querySelector('.ekd-t'); if (rt) title.textContent = rt.textContent; } }, 60); })
-      .observe(de, { attributes: true, attributeFilter: ['lang'] });
+      .observe(de, { attributes: true, attributeFilter: ['lang', 'data-ek-lname'] });
     w.ekDeck = { open: openDoor, close: closeDoor, swap: swap, ids: ids, cur: function () { return cur; } };
     deckSync();
     /* a search link (/?q=…) lands in the archive: the page's own jump may have been taken before this script ran */
@@ -626,7 +630,7 @@
     island(); syncLang();
     try { footGlass(); } catch (e) { if (w.console) console.error(e); }
     try {
-      new MutationObserver(function () { syncLang(); setTimeout(restInk, 80); }).observe(de, { attributes: true, attributeFilter: ['lang'] });
+      new MutationObserver(function () { syncLang(); setTimeout(restInk, 80); }).observe(de, { attributes: true, attributeFilter: ['lang', 'data-ek-lname'] });
       var lgs = d.getElementById('langs'); if (lgs) new MutationObserver(function () { syncLang(); setTimeout(restInk, 80); }).observe(lgs, { attributes: true, subtree: true, attributeFilter: ['class'] });
     } catch (e) { }
     w.addEventListener('popstate', function () {

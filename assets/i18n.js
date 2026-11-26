@@ -306,6 +306,8 @@
 
   /* ------------------------------------------------------------------ the page, string by string */
   function translate() {
+    /* the header's one language button names the language in its own words (ui2.js reads this) */
+    if (ME.native) de.setAttribute('data-ek-lname', ME.native);
     de.setAttribute('lang', CODE); de.setAttribute('dir', ME.dir);
     function fixdir() { if (d.body && d.body.getAttribute('dir') && d.body.getAttribute('dir') !== ME.dir) d.body.setAttribute('dir', ME.dir); }
     var M = {}, TB = {}, memo = {}, nmemo = 0, DONE = {};
@@ -336,7 +338,9 @@
         var tp = L[i], at = 0, ok2 = true;
         for (var q = 0; q < tp[3].length; q++) { var f = t.indexOf(tp[3][q], at); if (f < 0) { ok2 = false; break; } at = f + tp[3][q].length; }
         if (!ok2) continue;
-        var m = tp[0].exec(t); if (m) { var v = []; for (var j = 0; j < tp[2].length; j++) v[tp[2][j] - 1] = m[j + 1]; return fill(tp[1], v); }
+        /* a {n} stands for a number: a capture holding words or a separator means the template swallowed a joined
+           label ("{1} min ago" once took "scanner: DELAYED · 46" for its number) */
+        var m = tp[0].exec(t); if (m) { var v = [], bad = false; for (var j = 0; j < tp[2].length; j++) { if (/[A-Za-z]{2}|[·•|;—]|: /.test(m[j + 1])) bad = true; v[tp[2][j] - 1] = m[j + 1]; } if (!bad) return fill(tp[1], v); }
       }
       return null;
     }
@@ -349,12 +353,33 @@
       return null;
     }
     var EDGE = /^[^A-Za-z0-9{$£€]+|[\s:·↗↓→←…]+$/g;
+    /* a label the page's scripts join from parts ("scanner: DELAYED · 46 min ago", "RSI overbought, Volume spike")
+       has no entry of its own: each part is looked up alone, and the whole is used only when every part left in
+       English is a ticker or a number, so a sentence is never half translated */
+    var SEPS = /(\s+[·•|—–]\s+|,\s+|:\s+)/;
+    function part(p) {
+      var x = look(p); if (x != null) return x;
+      var c = p.replace(EDGE, ''); if (!c || c === p) return null;
+      var y = look(c); if (y == null) return null;
+      var i0 = p.indexOf(c); return p.slice(0, i0) + y + p.slice(i0 + c.length);
+    }
+    function pieces(t) {
+      if (t.length > 300 || !SEPS.test(t)) return null;
+      var ps = t.split(SEPS), out = '', any = false;
+      for (var i = 0; i < ps.length; i++) {
+        var p = ps[i]; if (i % 2 || !p || !/[A-Za-z]{2}/.test(p)) { out += p; continue; }
+        var x = part(p);
+        if (x != null) { out += x; any = true; } else if (/[a-z]{3}/.test(p)) return null; else out += p;
+      }
+      return any ? out : null;
+    }
     function tr(raw) {
       var t = raw.replace(/\s+/g, ' ').trim();
       if (!t || t.length > 4000 || !/[A-Za-z]{2}/.test(t)) return null;
       if (memo.hasOwnProperty(t)) return memo[t];
       var r = look(t);
       if (r == null) { var core = t.replace(EDGE, ''); if (core && core !== t) { var c = look(core); if (c != null) { var i0 = t.indexOf(core); r = t.slice(0, i0) + c + t.slice(i0 + core.length); } } }
+      if (r == null) r = pieces(t);
       if (nmemo++ > 20000) { memo = {}; DONE = {}; nmemo = 0; }
       return (memo[t] = r);
     }
