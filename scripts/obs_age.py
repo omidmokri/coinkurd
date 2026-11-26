@@ -118,7 +118,7 @@ def build(raw, today):
     bands = {k: [None] * n for k in BAND_KEYS}
     for i in range(n):
         k = off + i
-        vals = [raw[c][k] for c in RAW]
+        vals = [raw["age_%s_supply" % c][k] for c in RAW]
         if any(v is None for v in vals):
             continue
         tot = sum(vals)
