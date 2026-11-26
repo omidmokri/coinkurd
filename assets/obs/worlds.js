@@ -173,6 +173,17 @@
     return s.cv;
   }
   function X(C, f) { return (C.rtl ? 1 - f : f) * C.W; }
+  /* the window onto the world (.ob-stage, under the title): the scene is laid out in the part of the screen down to its bottom edge,
+     so its ground, its craft and its people are seen and not hidden under the panels. STY gives a height inside that window. */
+  var stEl = null, stTop = 0, stBot = 0, stAt = -9;
+  function stage(C) {
+    if (C.t - stAt > .6 || C.t < stAt) {
+      stAt = C.t; if (!stEl || !stEl.isConnected) stEl = d.querySelector('.ob-stage');
+      if (stEl) { var r = stEl.getBoundingClientRect(), y0 = w.scrollY || 0; stTop = r.top + y0; stBot = r.bottom + y0; } else stTop = stBot = 0;
+    }
+  }
+  function VHof(C) { stage(C); return stBot > 0 ? cl(stBot, C.H * .42, C.H) : C.H; }
+  function STY(C, f) { return stBot > 0 && stBot <= C.H + 1 ? stTop + (C.H - stTop) * f : C.H * (.18 + f * .2); }
   function halo(g, x, y, r0, r1, stops) {
     var gr = g.createRadialGradient(x, y, r0, x, y, r1);
     for (var i = 0; i < stops.length; i++) gr.addColorStop(stops[i][0], stops[i][1]);
@@ -1493,8 +1504,8 @@
   /* the cast on the five first worlds, by version */
   var HERO = {
     eva: function (C) {   /* oi: over Jupiter, the capsule's hatch open, an astronaut out on a tether */
-      var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, s = Math.max(40, Math.min(W, H) * .08);
-      var kx = X(C, C.small ? .18 : .2) - C.ppx * 20, ky = H * (C.small ? .2 : .26) + Math.sin(t * .4) * 6 - C.ppy * 14;
+      var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, s = Math.max(30, Math.min(W, H) * .1);
+      var kx = X(C, C.small ? .2 : .24) - C.ppx * 20, ky = STY(C, .42) + Math.sin(t * .4) * 6 - C.ppy * 10;
       capsule(g, kx, ky, s * 1.4, (C.rtl ? -.2 : .2) + Math.sin(t * .1 * mv) * .05, t, true);
       var ax = kx + (C.rtl ? -1 : 1) * s * (2.2 + .4 * Math.sin(t * .21 * mv)), ay = ky + s * (.8 + .4 * Math.sin(t * .27 * mv));
       astro(g, ax, ay, s * .8, Math.sin(t * .2 * mv) * .5 - .2, { t: t, float: true, tether: [kx + (C.rtl ? -1 : 1) * s * .5, ky + s * .1], flip: C.rtl, wave: Math.sin(t * .05) > .6 ? 0 : null });
@@ -1512,7 +1523,7 @@
     },
     iss: function (C) {   /* flows: the station itself, big, going slowly over the night side */
       var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, u = ((t * mv) % 80) / 80, s = Math.max(40, Math.min(W, H) * .1);
-      station(g, X(C, -.15 + u * 1.3) - C.ppx * 16, H * (.26 + .04 * Math.sin(u * Math.PI)) - C.ppy * 12, s, (C.rtl ? .12 : -.12) + u * .1, t, false);
+      station(g, X(C, -.15 + u * 1.3) - C.ppx * 16, STY(C, .45 - .12 * Math.sin(u * Math.PI)) - C.ppy * 8, s, (C.rtl ? .12 : -.12) + u * .1, t, false);
     },
     aurora: function (C) { /* stables: a train of new satellites crossing above the aurora */
       var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, u = ((t * mv) % 36) / 36;
@@ -1523,12 +1534,12 @@
     cupola: cupolaFrame,
     close: function (C) { /* network: Cassini, close to the rings */
       var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, s = Math.max(26, Math.min(W, H) * .055);
-      cassini(g, X(C, .22 + .03 * Math.sin(t * .1 * mv)) - C.ppx * 18, H * .22 + Math.sin(t * .3) * 5 - C.ppy * 14, s, (C.rtl ? -.5 : .5) + Math.sin(t * .07) * .1);
+      cassini(g, X(C, .22 + .03 * Math.sin(t * .1 * mv)) - C.ppx * 18, STY(C, .45) + Math.sin(t * .3) * 5 - C.ppy * 10, s, (C.rtl ? -.5 : .5) + Math.sin(t * .07) * .1);
     },
     chute: function (C) { /* cycle: a probe under its parachute, going down into Titan's haze */
       var g = C.g, W = C.W, H = C.H, t = C.t, mv = C.mv, u = ((t * mv) % 45) / 45, s = Math.max(16, Math.min(W, H) * .035);
       g.globalAlpha = u < .1 ? u / .1 : u > .9 ? (1 - u) / .1 : 1;
-      chute(g, X(C, .2 + u * .08) - C.ppx * 14, H * (.12 + u * .4) - C.ppy * 10, s * (1 - u * .4), t); g.globalAlpha = 1;
+      chute(g, X(C, .2 + u * .08) - C.ppx * 14, STY(C, -.2 + u * .75) - C.ppy * 8, s * (1.3 - u * .5), t); g.globalAlpha = 1;
     },
     storm: function (C) { /* liqmap: an astronaut by the rover, lamp on, leaning into the dust */
       var g = C.g, W = C.W, H = C.H, t = C.t, s = Math.max(30, Math.min(W, H) * .06), M = WORLDS.mars, hz = H * (C.small ? .8 : .74);
@@ -1583,7 +1594,7 @@
   }
   function okTarget(el) {
     if (!el || !el.closest) return false;
-    if (el.closest('a,button,input,select,textarea,label,summary,details,[role=button],[role=tab],[contenteditable],#ob,.ob-hc,.ob-about,#ekh,#ekf,#ekb,#eks,#ekq,#eka,.ek-mo,svg,canvas:not(.ob-sky),img,video,iframe')) return false;
+    if (el.closest('a,button,input,select,textarea,label,summary,details,[role=button],[role=tab],[contenteditable],.ob-hc,#ekh,#ekf,#ekb,#eks,#ekq,#eka,.ek-mo,svg,canvas:not(.ob-sky),img,video,iframe')) return false;
     var s = w.getSelection && w.getSelection(); if (s && String(s).length) return false;
     return true;
   }
@@ -1801,9 +1812,41 @@
   var W0 = WORLDS[KIND];
   if (W0) {
     if (W0.init) W0.init();
-    var HF = HERO[VAR], F0 = W0.front;
-    if (HF) W0.front = function (C) { if (F0) F0.call(W0, C); C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over'; HF(C); };
+    var HF = HERO[VAR], F0 = W0.front, S0 = W0.sky, VC = {};
+    var virt = function (C) { for (var k in C) VC[k] = C[k]; VC.H = VHof(C); return VC; };
+    if (S0) W0.sky = function (C) {
+      var V = virt(C);
+      if (V.H < C.H) { C.g.fillStyle = '#03040c'; C.g.fillRect(0, V.H - 2, C.W, C.H - V.H + 2); }
+      S0.call(W0, V);
+    };
+    W0.front = function (C) {
+      var V = virt(C);
+      if (F0) F0.call(W0, V);
+      C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over';
+      if (HF) { HF(V); C.g.globalAlpha = 1; C.g.globalCompositeOperation = 'source-over'; }
+      below(C, V.H);
+    };
     w.OBWORLD = W0;
+  }
+  /* under the window the scene goes on in its own colours, darker, behind the panels */
+  var tiny = null, tg = null;
+  function below(C, vh) {
+    var H = C.H; if (vh >= H - 1) return;
+    var g = C.g, W = C.W, dpr = C.dpr || 1;
+    if (!tiny) { tiny = d.createElement('canvas'); tiny.width = 24; tiny.height = 1; tg = tiny.getContext('2d'); }
+    g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+    try { tg.clearRect(0, 0, 24, 1); tg.drawImage(g.canvas, 0, Math.max(0, Math.floor((vh - 6) * dpr)), Math.floor(W * dpr), Math.max(1, Math.floor(4 * dpr)), 0, 0, 24, 1);
+      g.imageSmoothingEnabled = true; g.drawImage(tiny, 0, 0, 24, 1, 0, vh - 1, W, H - vh + 1); } catch (e) { g.fillStyle = '#03040c'; g.fillRect(0, vh - 1, W, H - vh + 1); }
+    var fd = g.createLinearGradient(0, vh, 0, H); fd.addColorStop(0, 'rgba(3,4,12,.1)'); fd.addColorStop(.35, 'rgba(3,4,12,.55)'); fd.addColorStop(1, 'rgba(3,4,12,.8)');
+    g.fillStyle = fd; g.fillRect(0, vh - 1, W, H - vh + 1); g.restore();
+  }
+  /* what a click brings is drawn on a layer over the page, so it is seen wherever the click was; nothing on it can be pressed */
+  var fxc = null, fxg = null, fxOn = false, FC = {};
+  function fxLayer(C) {
+    if (!fxc) { fxc = d.createElement('canvas'); fxc.className = 'ob-fxc'; fxc.setAttribute('aria-hidden', 'true'); d.body.appendChild(fxc); fxg = fxc.getContext('2d'); }
+    var dpr = C.dpr || 1, pw = Math.round(C.W * dpr), ph = Math.round(C.H * dpr);
+    if (fxc.width !== pw || fxc.height !== ph) { fxc.width = pw; fxc.height = ph; }
+    return fxg;
   }
   var tStart = -1;
   w.OBFX = function (C) {
@@ -1812,7 +1855,14 @@
     if (!C.RM && !C.still) arrive = cl((C.t - tStart - .1) / 3.2, 0, 1); else arrive = 1;
     if (C.once) return;
     if (!C.RM && !still() && C.t > ambientNext) { FX.push({ k: 'ufofar', x: 0, y: C.H * (.08 + Math.random() * .3), dir: Math.random() < .5 ? 1 : -1, t0: -1 }); ambientNext = C.t + 70 + Math.random() * 50; }
-    if (FX.length) drawFx(C);
+    if (FX.length) {
+      var fg = fxLayer(C);
+      if (fg) {
+        if (!fxOn) { fxc.style.display = 'block'; fxOn = true; }
+        fg.setTransform(1, 0, 0, 1, 0, 0); fg.clearRect(0, 0, fxc.width, fxc.height); fg.setTransform(C.dpr || 1, 0, 0, C.dpr || 1, 0, 0);
+        for (var k in C) FC[k] = C[k]; FC.g = fg; drawFx(FC); fg.globalAlpha = 1; fg.globalCompositeOperation = 'source-over';
+      } else drawFx(C);
+    } else if (fxOn) { fxg.setTransform(1, 0, 0, 1, 0, 0); fxg.clearRect(0, 0, fxc.width, fxc.height); fxc.style.display = 'none'; fxOn = false; }
     if (warpIn && !C.RM && !d.querySelector('.ob-door')) {
       var k = cl((C.t - tStart) / .8, 0, 1);
       streaks(C.g, C.W, C.H, k, false, C.W / 2, C.H / 2);

@@ -2176,6 +2176,13 @@ def door(view):
             f'<b class="dl"><small>{spans(DOOR_TO)}</small><strong>{spans(nm)}</strong></b></div><script>{js}</script>\n')
 
 
+def stage(view):
+    """the window onto the page's world: an empty strip under the title where nothing covers the scene, with its name"""
+    style, col, names = DOOR[view]
+    nm = dict(zip(("fa", "ckb", "ar", "en"), names))
+    return f'  <div class="ob-stage" aria-hidden="true"><span class="ob-where" style="--dc:{col}">{spans(nm)}</span></div>\n'
+
+
 CSS = {"sopr": ["cosmos.css"], "hodl": ["cosmos.css"]}   # a page's own stylesheets after obs.css and space.css
 
 
@@ -2217,7 +2224,7 @@ def page(view, folder, scripts):
     <h1>{spans(t["h1"])}</h1>
     <p>{spans(t["p"])}</p>
   </div>
-  <div id="ob" class="ob" translate="no"><div class="ob-wait">…</div></div>
+{stage(view)}  <div id="ob" class="ob" translate="no"><div class="ob-wait">…</div></div>
   <noscript><p class="ob-about">این صفحه با جاوااسکریپت کار می‌کند. / This page needs JavaScript.</p></noscript>
 {about(view)}
 </main>
@@ -2259,7 +2266,7 @@ def hub():
     <h1>{spans(HUB["h1"])}</h1>
     <p>{spans(HUB["p"])}</p>
   </div>
-{chr(10).join(out)}
+{stage("hub")}{chr(10).join(out)}
 </main>
 <!--ek:bottom--><!--/ek:bottom-->
 <!--ek:footer--><!--/ek:footer-->
