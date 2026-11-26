@@ -227,8 +227,8 @@
     return { g: g, W: W, H: H };
   }
   function seg(id, items, cur) { return OB.ui.seg(id, items, cur, 'cz-seg'); }
-  function tile(label, value, sub, tone) {
-    return '<div class="cz-tile' + (tone ? ' ' + tone : '') + '"><small>' + esc(label) + '</small><b class="ob-n">' + esc(value) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i aria-hidden="true"></i></div>';
+  function tile(label, value, sub, tone, unit) {
+    return '<div class="cz-tile' + (tone ? ' ' + tone : '') + '"><small>' + esc(label) + '</small><b class="ob-n">' + esc(value) + (unit && value !== '—' ? '<em class="cz-u">' + esc(unit) + '</em>' : '') + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '<i aria-hidden="true"></i></div>';
   }
   var RANGES = ['1y', '2y', '4y', '8y', 'all'], RY = { '1y': 1, '2y': 2, '4y': 4, '8y': 8 };
   function window0(D, i1, range) { return range === 'all' ? 0 : Math.max(0, i1 - Math.round(RY[range] * 365.25)); }
@@ -457,8 +457,8 @@
       tile(t('t_old'), pct(s.old1y, 2), t('of_all'), up ? 'up' : 'dn') +
       tile(t('t_young'), pct(s.young6m, 2), t('of_all')) +
       tile(t('t_lthsh'), pct(s.lth, 2), '') +
-      tile(t('t_c30'), t('pts', { v: sgn(s.old1y_chg30) }), '', (s.old1y_chg30 || 0) >= 0 ? 'up' : 'dn') +
-      tile(t('t_c365'), t('pts', { v: sgn(s.old1y_chg365) }), t(up ? 'read_up' : 'read_dn'), up ? 'up' : 'dn') +
+      tile(t('t_c30'), sgn(s.old1y_chg30), '', (s.old1y_chg30 || 0) >= 0 ? 'up' : 'dn', t('pts', { v: '' }).trim()) +
+      tile(t('t_c365'), sgn(s.old1y_chg365), t(up ? 'read_up' : 'read_dn'), up ? 'up' : 'dn', t('pts', { v: '' }).trim()) +
       tile(t('t_orank'), pct(s.old1y_pct, 1), t('t_rank_s', { p: loc((s.old1y_pct || 0).toFixed(1)) }));
     note(D);
   }
