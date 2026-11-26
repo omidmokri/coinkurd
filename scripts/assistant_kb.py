@@ -62,6 +62,8 @@ FEATURES = [
     ("/charts/cycle-compass/", ["obs", "cycle"], None),
     ("/charts/capital-rotation/", ["obs"], None),
     ("/charts/decentralization/", ["obs", "chain"], None),
+    ("/charts/sopr/", ["obs", "cycle"], None),
+    ("/charts/hodl-waves/", ["obs", "cycle"], None),
     ("/calendar/", ["events"], None),
     ("/dashboard/", ["score", "opps", "movers"], None),
     ("/coins/", ["coin"], "market"),
