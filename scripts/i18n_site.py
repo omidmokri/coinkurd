@@ -554,7 +554,10 @@ def main():
             jobs = max(1, min(a.jobs or len(pool), len(pool), requests_max))
             c = {}
             try:
-                fill(langs, need, common, requests_max, a.seconds, pool[:jobs], counter=c)
+                # the homepage goes first in every language (the owner, 2026-11-26): its strings join the ones
+                # nearly every page has at the head of each language's queue
+                home = next((v for p, v in pages.items() if os.path.relpath(p, ROOT) == "index.html"), set())
+                fill(langs, need, common | home, requests_max, a.seconds, pool[:jobs], counter=c)
             finally:
                 pro_l10n.quota_add(c.get("used", 0), who="site")
             print(f"i18n_site: {c.get('used', 0)} Gemini calls this run on {jobs} key(s)")
