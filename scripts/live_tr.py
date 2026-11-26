@@ -7,7 +7,7 @@ Why: assets/i18n.js translates the page from dictionaries of the site's own stri
 changes every few minutes and is never in them, so a reader who picked Hindi or German saw them in English.
 
 What it does, each data run (update.yml), with Google's free web endpoint (scripts/i18n_gt.py, no Gemini calls):
-  - the newest headlines of the "Global crypto" and "World markets" tabs -> data/live_tr/<code>.json {"news": {id: title}}
+  - the newest channel posts' English titles (posts_week.json tr.en) and the newest headlines of the "Global crypto" and "World markets" tabs -> data/live_tr/<code>.json {"news": {id: title}, "posts": {id: title}}
     (a file per language, fetched only by a reader in that language, so news.json stays the size it was)
   - the AI report's English headline and bullets -> data/brain.json report[<code>] (read where report[lang] is read)
 Each string is translated once (data/live_tr/_cache.json); only what is still shown is kept. A run stops at Google's
@@ -31,7 +31,7 @@ OUTDIR = os.path.join(DATA, "live_tr")
 CACHE = os.path.join(OUTDIR, "_cache.json")
 LIVE = ["kmr", "cn", "nl", "fr", "de", "hi", "it", "pt", "br", "ru", "es", "tr", "vi"]   # the globe on 2026-11-26
 OWN = {"fa", "ckb", "en", "ar"}
-N_NEWS, N_WORLD = 40, 20
+N_NEWS, N_WORLD, N_POSTS = 40, 20, 16
 
 
 def load(p, d):
@@ -76,9 +76,12 @@ def main():
     brain = load(brain_p, {})
     items = (news.get("items") or [])[:N_NEWS] + ((news.get("world") or {}).get("items") or [])[:N_WORLD]
     items = [i for i in items if i.get("id") and i.get("title")]
+    posts = [p for p in load(os.path.join(DATA, "posts_week.json"), []) if isinstance(p, dict) and p.get("id")
+             and p.get("q") != "low" and ((p.get("tr") or {}).get("en") or {}).get("title")][:N_POSTS]
+    ptitle = {p["id"]: p["tr"]["en"]["title"].strip() for p in posts}
     rep_en = ((brain.get("report") or {}).get("en")) or {}
     rlines = report_lines(rep_en) if rep_en.get("headline") else []
-    want = list(dict.fromkeys([i["title"].strip() for i in items] + rlines))
+    want = list(dict.fromkeys(rlines + list(ptitle.values()) + [i["title"].strip() for i in items]))
 
     codes = langs()
     cache = load(CACHE, {})
@@ -95,10 +98,10 @@ def main():
             return fn(text)
         return tr
 
-    # the report first (one block a language), then headlines, a language at a time
+    # the report first, then the channel's posts, then headlines, a language at a time
     for code in codes:
         c = cache.setdefault(code, {})
-        todo = [k for k in rlines + [k for k in want if k not in rlines] if k not in c]
+        todo = [k for k in want if k not in c]
         if stopped or not todo:
             continue
         tr_fn = counted(make(code))
@@ -119,6 +122,7 @@ def main():
         c = cache.get(code, {})
         dump(os.path.join(OUTDIR, code + ".json"),
              {"news": {i["id"]: c[i["title"].strip()] for i in items if i["title"].strip() in c},
+              "posts": {pid: c[t] for pid, t in ptitle.items() if t in c},
               "at": news.get("updated_at")})
     for f in os.listdir(OUTDIR):                     # a language the globe no longer offers
         if f.endswith(".json") and not f.startswith("_") and f[:-5] not in codes:
