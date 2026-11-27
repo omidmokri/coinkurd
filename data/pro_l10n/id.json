@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} bar diunduh"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Semua alert pada koin ini"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Hapus alert ini"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} alert dihapus."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Tambahkan alert di sini"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Semua gambar ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Semua indikator ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Kembali"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Bersihkan seluruh chart"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Hapus semua gambar dan indikator, serta level ODM beserta alert-nya dari {s}? Alert lainnya tetap ada. Anda dapat membatalkan ini."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Chart dibersihkan."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Salin harga ini"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} gambar dihapus."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Gambar, terbaru di atas"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Sebuah gambar…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Garis horizontal di sini"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Sebuah indikator…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indikator dihapus."
+],
+"ctxNothing": [
+"300e0e8374",
+"Tidak ada yang dihapus"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Hapus level dan alert ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Level ODM dan alert-nya"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Buka ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Hapus dari chart"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} dihapus."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Hapus {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3729,6 +3813,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} alert ODM dihapus."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} level dan {m} alert ODM dihapus."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} pada {p} ({d}% dari harga terakhir)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Seret garis bertanda ↕ untuk memindahkannya, atau pegangan bulat untuk memindahkan candle awal. Rencana akan dihitung ulang saat Anda menyeretnya."
+],
 "odEExit": [
 "3d85c7e08a",
 "Exit {n}, lalu stop-loss"
@@ -3921,6 +4021,10 @@
 "56746816d8",
 "Jarak per langkah (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Pandu saya, langkah demi langkah"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Setiap skenario akhir (semua entry terisi)"
@@ -3944,6 +4048,26 @@
 "odHow": [
 "c54859aa22",
 "Bagaimana ini berakhir"
+],
+"odHudE": [
+"19172e9e47",
+"Entry"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Buka ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Urungkan perubahan terakhir"
+],
+"odHudX": [
+"61ad50a9b9",
+"Target"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4025,6 +4149,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Ketuk chart tempat entry baru diletakkan. Esc untuk membatalkan."
+],
+"odPick_s": [
+"39a71b4de2",
+"Ketuk chart tempat stop diletakkan. Esc untuk membatalkan."
+],
+"odPick_x": [
+"fd10db7af2",
+"Ketuk chart tempat target baru diletakkan. Esc untuk membatalkan."
+],
 "odPnl": [
 "5faa59d4bc",
 "Hasil"
@@ -4070,8 +4206,8 @@
 "Tampilkan di chart"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} tingkatan digambar. Buka ODM lagi untuk menyembunyikannya."
+"aeb3fca140",
+"{n} level digambar. Seret garis untuk mengubah rencana, atau klik kanan pada chart untuk menghapusnya."
 ],
 "odStep": [
 "dc416e1088",
@@ -4149,6 +4285,118 @@
 "5a8f23f567",
 "Risiko"
 ],
+"odTourBack": [
+"b52b36b726",
+"Kembali"
+],
+"odTourDone": [
+"e9b450d14b",
+"Selesai"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Mulai tur"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} dari {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Berikutnya"
+],
+"odTourNo": [
+"e457149073",
+"Tidak sekarang"
+],
+"odTourOffer": [
+"d0012e3974",
+"Baru menggunakan ODM? Tur satu menit akan menunjukkan fungsi setiap bagian."
+],
+"odTourSkip": [
+"35b754350f",
+"Tutup tur"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Atur saldo Anda, risiko per trade dalam persen, leverage, dan biaya. Risiko adalah jumlah maksimal yang hilang jika semua entry terisi dan stop tersentuh."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Akun Anda"
+],
+"odTr_act_b": [
+"7644c76432",
+"Tampilkan rencana di chart dan seret garisnya, uji pada candle sebelumnya, tambahkan alert untuk setiap level, atau simpan ke papan risiko. Tidak ada yang menempatkan order di sini."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Jalankan rencana"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Hingga 10 harga limit, masing-masing dengan porsinya. Buat tangga dalam satu ketukan atau ketik harga Anda sendiri. Porsi harus berjumlah 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Tempat Anda masuk"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Hingga 8 langkah, masing-masing pada harga, persentase dari rata-rata entry, atau kelipatan R, risiko Anda per koin."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Tempat Anda take profit"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Setiap bagian, kolom, dan hasil memiliki ikonnya sendiri. Ini menjelaskan bagian tersebut, memberikan contoh dengan angka Anda, dan memiliki kotak untuk pertanyaan Anda."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Bingung? Ketuk ikon"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Jika stop tersentuh setelah hanya beberapa entry terisi, kerugian Anda lebih kecil. Bar menunjukkan seberapa besar dari total risiko Anda."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Kerugian di setiap langkah"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Ukuran, margin, estimasi likuidasi, dan hasil dari setiap skenario akhir trade, termasuk biaya."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Gambaran lengkap"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Stop berada di luar entry terdalam. Atur berdasarkan harga, persentase, atau kelipatan ATR agar mengikuti volatilitas pasar."
+],
+"odTr_stop_t": [
+"f316187400",
+"Tempat Anda salah"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risiko, rata-rata entry, stop, R, dan hasil terbaik, dihitung ulang saat Anda mengetik."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Rencana sekilas"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Porsi yang tidak ditutup oleh exit dapat menggunakan trailing stop, dan stop dapat berpindah ke break-even setelah exit terisi."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Apa yang tersisa"
+],
 "odTrail": [
 "f4d671693b",
 "Bagian tersisa"
@@ -4156,6 +4404,10 @@
 "odTrailHint": [
 "952ea83894",
 "Porsi yang tidak ditutup oleh exit dapat mengikuti trailing stop. Stop juga dapat pindah ke break-even setelah exit tereksekusi."
+],
+"odUndone": [
+"d94a6ce055",
+"Perubahan terakhir dibatalkan."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4212,6 +4464,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Reward"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risiko"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",

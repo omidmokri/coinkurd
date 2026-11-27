@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} mum indirildi"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Bu coin üzerindeki tüm alarmlar"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Bu alarmı sil"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} alarm silindi."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Buraya alarm ekle"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Tüm çizimler ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Tüm indikatörler ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Geri"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Grafiği tamamen temizle"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"{s} üzerindeki tüm çizimleri, indikatörleri, ODM seviyelerini ve bunlara ait alarmları kaldırmak istiyor musunuz? Diğer alarmlar kalacaktır. Bu işlemi geri alabilirsiniz."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Grafik temizlendi."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Bu fiyatı kopyala"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} çizim kaldırıldı."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Çizimler, en yeniden eskiye"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Bir çizim…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Buraya yatay çizgi ekle"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Bir indikatör…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indikatör kaldırıldı."
+],
+"ctxNothing": [
+"300e0e8374",
+"Kaldırılacak bir şey yok"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"ODM seviyelerini ve alarmlarını kaldır"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"ODM seviyeleri ve alarmları"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"ODM'yi aç"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Grafikten kaldır"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} kaldırıldı."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"{x} kaldır"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3781,6 +3865,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} ODM alarmı kaldırıldı."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} seviye ve {m} ODM alarmı kaldırıldı."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l}, {p} noktasında (son fiyattan %{d} uzaklıkta)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Taşımak için ↕ işaretli çizgiyi veya başlangıç mumunu hareket ettirmek için yuvarlak tutamacı sürükleyin. Siz sürükledikçe plan yeniden hesaplanır."
+],
 "odEExit": [
 "3d85c7e08a",
 "Çıkış {n}, ardından stop"
@@ -3973,6 +4073,10 @@
 "56746816d8",
 "Adım başına boşluk (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Bana adım adım rehberlik et"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Tüm sonlanma biçimleri (tüm girişler doldu)"
@@ -3996,6 +4100,26 @@
 "odHow": [
 "c54859aa22",
 "Nasıl biter"
+],
+"odHudE": [
+"19172e9e47",
+"Giriş"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"ODM'yi aç"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Son değişikliği geri al"
+],
+"odHudX": [
+"61ad50a9b9",
+"Hedef"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4077,6 +4201,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Yeni girişin olacağı yere grafikte dokunun. Esc iptal eder."
+],
+"odPick_s": [
+"39a71b4de2",
+"Stop noktasının olacağı yere grafikte dokunun. Esc iptal eder."
+],
+"odPick_x": [
+"fd10db7af2",
+"Yeni hedefin olacağı yere grafikte dokunun. Esc iptal eder."
+],
 "odPnl": [
 "5faa59d4bc",
 "Sonuç"
@@ -4122,8 +4258,8 @@
 "Grafikte göster"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} seviye çizildi. Gizlemek için ODM'yi tekrar açın."
+"aeb3fca140",
+"{n} seviye çizildi. Planı değiştirmek için bir çizgiyi sürükleyin veya kaldırmak için grafiğe sağ tıklayın."
 ],
 "odStep": [
 "dc416e1088",
@@ -4201,6 +4337,118 @@
 "5a8f23f567",
 "Risk"
 ],
+"odTourBack": [
+"b52b36b726",
+"Geri"
+],
+"odTourDone": [
+"e9b450d14b",
+"Tamam"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Turu başlat"
+],
+"odTourN": [
+"a9f84daf43",
+"{n} / {i}"
+],
+"odTourNext": [
+"bc981983e7",
+"İleri"
+],
+"odTourNo": [
+"e457149073",
+"Şimdi değil"
+],
+"odTourOffer": [
+"d0012e3974",
+"ODM'de yeni misiniz? Bir dakikalık tur, her bölümün ne işe yaradığını gösterir."
+],
+"odTourSkip": [
+"35b754350f",
+"Turu kapat"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Bakiyenizi, işlem başına yüzde olarak riskinizi, kaldıracı ve komisyonları ayarlayın. Risk, tüm girişler gerçekleştiğinde ve stop tetiklendiğinde kaybedebileceğiniz maksimum tutardır."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Hesabınız"
+],
+"odTr_act_b": [
+"7644c76432",
+"Planı grafikte gösterin ve çizgilerini sürükleyin, geçmiş mumlarda test edin, her seviye için alarm ekleyin veya risk panosuna kaydedin. Buradaki hiçbir şey emir vermez."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"İşleme koyun"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Her biri kendi payına sahip 10 adede kadar limit fiyat. Tek dokunuşla kademeli giriş oluşturun veya kendi fiyatlarınızı girin. Payların toplamı %100 olmalıdır."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Giriş noktalarınız"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"8 adıma kadar; her biri bir fiyatta, ortalama girişten yüzde olarak veya coin başına riskiniz olan R'nin bir katı şeklinde."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Kar al noktalarınız"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Her bölümün, alanın ve sonucun kendi simgesi vardır. Bu simge bölümü açıklar, rakamlarınızla örnek verir ve sorunuz için bir kutucuk sunar."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Takıldınız mı? Bir simgeye dokunun"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Stop, sadece bazı girişler gerçekleştikten sonra tetiklenirse, daha az kaybedersiniz. Çubuk, toplam riskinizin ne kadarının gerçekleştiğini gösterir."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Her adımdaki kayıp"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Büyüklük, marjin, likidasyon tahmini ve komisyonlar dahil olmak üzere işlemin sonuçlanabileceği her durumun sonucu."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Tam tablo"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Stop, en derin girişin ötesinde yer alır. Fiyatla, yüzdeyle veya piyasanın oynaklığını takip etmesi için ATR'nin bir katı olarak ayarlayın."
+],
+"odTr_stop_t": [
+"f316187400",
+"Hatalı olduğunuz yer"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risk, ortalama giriş, stop, R ve en iyi sonuç; siz yazdıkça yeniden hesaplanır."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Plana genel bakış"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Kapanmayan paylar takip eden stop (trailing stop) ile izlenebilir ve bir çıkış gerçekleştiğinde stop başa baş (break-even) noktasına taşınabilir."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Kalan kısım"
+],
 "odTrail": [
 "f4d671693b",
 "Kalan kısım"
@@ -4208,6 +4456,10 @@
 "odTrailHint": [
 "952ea83894",
 "Hiçbir çıkışın kapatmadığı pay, iz süren bir stop takip edebilir. Stop ayrıca bir çıkış gerçekleştikten sonra başa baş (break-even) seviyesine taşınebilir."
+],
+"odUndone": [
+"d94a6ce055",
+"Son değişiklik geri alındı."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4264,6 +4516,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Kazanç"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risk"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",

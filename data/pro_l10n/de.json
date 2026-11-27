@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} Kerzen heruntergeladen"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Alle Alarme für diesen Coin"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Diesen Alarm löschen"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} Alarme gelöscht."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Hier einen Alarm hinzufügen"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Alle Zeichnungen ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Alle Indikatoren ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Zurück"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Gesamten Chart leeren"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Alle Zeichnungen, Indikatoren sowie ODM-Level und deren Alarme aus {s} entfernen? Andere Alarme bleiben erhalten. Dies kann rückgängig gemacht werden."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Chart geleert."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Diesen Preis kopieren"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} Zeichnungen entfernt."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Zeichnungen, neueste zuerst"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Eine Zeichnung…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Horizontale Linie hier"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Ein Indikator…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} Indikatoren entfernt."
+],
+"ctxNothing": [
+"300e0e8374",
+"Nichts zum Entfernen"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"ODM-Level und Alarme entfernen"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"ODM-Level und deren Alarme"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"ODM öffnen"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Vom Chart entfernen"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} entfernt."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"{x} entfernen"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3765,6 +3849,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} ODM-Alarme entfernt."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} Level und {m} ODM-Alarme entfernt."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} bei {p} ({d}% vom letzten Preis)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Ziehen Sie eine mit ↕ markierte Linie, um sie zu verschieben, oder den runden Griff, um die Start-Kerze zu ändern. Der Plan wird beim Ziehen neu berechnet."
+],
 "odEExit": [
 "3d85c7e08a",
 "Ausstieg {n}, dann der Stopp"
@@ -3957,6 +4057,10 @@
 "56746816d8",
 "Abstand pro Schritt (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Schritt-für-Schritt-Anleitung"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Jedes Endszenario (alle Einstiege ausgeführt)"
@@ -3980,6 +4084,26 @@
 "odHow": [
 "c54859aa22",
 "Wie es endet"
+],
+"odHudE": [
+"19172e9e47",
+"Einstieg"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"ODM öffnen"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Letzte Änderung rückgängig machen"
+],
+"odHudX": [
+"61ad50a9b9",
+"Ziel"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4061,6 +4185,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Klicken Sie in den Chart, wo der neue Einstieg liegen soll. Esc zum Abbrechen."
+],
+"odPick_s": [
+"39a71b4de2",
+"Klicken Sie in den Chart, wo der Stop liegen soll. Esc zum Abbrechen."
+],
+"odPick_x": [
+"fd10db7af2",
+"Klicken Sie in den Chart, wo das neue Ziel liegen soll. Esc zum Abbrechen."
+],
 "odPnl": [
 "5faa59d4bc",
 "Ergebnis"
@@ -4106,8 +4242,8 @@
 "Auf Chart anzeigen"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} Level gezeichnet. Öffnen Sie ODM erneut, um sie auszublenden."
+"aeb3fca140",
+"{n} Level gezeichnet. Ziehen Sie eine Linie, um den Plan zu ändern, oder klicken Sie mit der rechten Maustaste in den Chart, um sie zu entfernen."
 ],
 "odStep": [
 "dc416e1088",
@@ -4185,6 +4321,118 @@
 "5a8f23f567",
 "Risiko"
 ],
+"odTourBack": [
+"b52b36b726",
+"Zurück"
+],
+"odTourDone": [
+"e9b450d14b",
+"Fertig"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Tour starten"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} von {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Weiter"
+],
+"odTourNo": [
+"e457149073",
+"Nicht jetzt"
+],
+"odTourOffer": [
+"d0012e3974",
+"Neu bei ODM? Eine einminütige Tour zeigt Ihnen, was die einzelnen Funktionen bewirken."
+],
+"odTourSkip": [
+"35b754350f",
+"Tour schließen"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Legen Sie Ihr Guthaben, das Risiko pro Trade in Prozent, den Hebel und die Gebühren fest. Das Risiko ist der maximale Verlust, wenn alle Einstiege ausgeführt werden und der Stop erreicht wird."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Ihr Konto"
+],
+"odTr_act_b": [
+"7644c76432",
+"Zeigen Sie den Plan im Chart an und verschieben Sie die Linien, testen Sie ihn an vergangenen Kerzen, fügen Sie einen Alarm für jedes Level hinzu oder speichern Sie ihn im Risikoboard. Hier wird kein Trade platziert."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Anwenden"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Bis zu 10 Limit-Preise, jeder mit seinem Anteil. Erstellen Sie eine Leiter mit einem Klick oder geben Sie Ihre eigenen Preise ein. Die Anteile müssen sich auf 100% summieren."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Einstiegspunkte"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Bis zu 8 Schritte, jeweils zu einem Preis, einem Prozentsatz vom durchschnittlichen Einstieg oder einem Vielfachen von R, Ihrem Risiko pro Coin."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Take-Profit-Punkte"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Jeder Bereich, jedes Feld und jedes Ergebnis hat ein eigenes Symbol. Es erklärt den Teil, gibt ein Beispiel mit Ihren Zahlen und bietet ein Feld für Ihre Fragen."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Nicht weiter? Tippen Sie auf ein Symbol"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Wenn der Stop erreicht wird, nachdem nur einige Einstiege ausgeführt wurden, verlieren Sie weniger. Der Balken zeigt, wie viel Prozent Ihres Gesamtrisikos das ist."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Verlust bei jedem Schritt"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Größe, Margin, geschätzte Liquidation und das Ergebnis für jedes Szenario, inklusive Gebühren."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Das Gesamtbild"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Der Stop liegt hinter dem tiefsten Einstieg. Legen Sie ihn per Preis, Prozent oder als Vielfaches des ATR fest, um der Marktvolatilität zu folgen."
+],
+"odTr_stop_t": [
+"f316187400",
+"Wo Sie falsch liegen"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risiko, durchschnittlicher Einstieg, Stop, R und das beste Ergebnis, bei jeder Eingabe neu berechnet."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Der Plan auf einen Blick"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Der Anteil, der nicht durch Exits geschlossen wird, kann einen Trailing-Stop nutzen, und der Stop kann auf Break-Even verschoben werden, sobald ein Exit ausgeführt wurde."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Was übrig bleibt"
+],
 "odTrail": [
 "f4d671693b",
 "Was übrig bleibt"
@@ -4192,6 +4440,10 @@
 "odTrailHint": [
 "952ea83894",
 "Der Anteil, den kein Exit schließt, kann mit einem Trailing-Stop versehen werden. Der Stop kann sich nach Ausführung eines Exits auch auf Breakeven bewegen."
+],
+"odUndone": [
+"d94a6ce055",
+"Letzte Änderung rückgängig gemacht."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4248,6 +4500,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Gewinn"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risiko"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",

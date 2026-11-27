@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} bougies téléchargées"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Toutes les alertes sur cette crypto"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Supprimer cette alerte"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} alertes supprimées."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Ajouter une alerte ici"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Tous les dessins ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Tous les indicateurs ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Retour"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Effacer tout le graphique"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Supprimer tous les dessins, indicateurs et niveaux ODM avec leurs alertes de {s} ? Les autres alertes seront conservées. Vous pouvez annuler cette action."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Graphique effacé."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Copier ce prix"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} dessins supprimés."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Dessins, du plus récent au plus ancien"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Un dessin…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Ligne horizontale ici"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Un indicateur…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indicateurs supprimés."
+],
+"ctxNothing": [
+"300e0e8374",
+"Rien à supprimer"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Supprimer les niveaux et alertes ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Niveaux ODM et leurs alertes"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Ouvrir ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Supprimer du graphique"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} supprimé."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Supprimer {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3777,6 +3861,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} alertes ODM supprimées."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} niveaux et {m} alertes ODM supprimés."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} à {p} ({d}% du dernier prix)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Faites glisser une ligne marquée ↕ pour la déplacer, ou la poignée ronde pour changer la bougie de départ. Le plan est recalculé pendant que vous faites glisser."
+],
 "odEExit": [
 "3d85c7e08a",
 "Sortie {n}, puis le stop"
@@ -3969,6 +4069,10 @@
 "56746816d8",
 "Écart par palier (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Guide étape par étape"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Toutes les issues possibles (toutes les entrées exécutées)"
@@ -3992,6 +4096,26 @@
 "odHow": [
 "c54859aa22",
 "Issue"
+],
+"odHudE": [
+"19172e9e47",
+"Entrée"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Ouvrir ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Annuler la dernière modification"
+],
+"odHudX": [
+"61ad50a9b9",
+"Cible"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4073,6 +4197,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Cliquez sur le graphique pour placer la nouvelle entrée. Échap pour annuler."
+],
+"odPick_s": [
+"39a71b4de2",
+"Cliquez sur le graphique pour placer le stop. Échap pour annuler."
+],
+"odPick_x": [
+"fd10db7af2",
+"Cliquez sur le graphique pour placer la nouvelle cible. Échap pour annuler."
+],
 "odPnl": [
 "5faa59d4bc",
 "Résultat"
@@ -4118,8 +4254,8 @@
 "Afficher sur le graphique"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} niveaux tracés. Ouvrez ODM à nouveau pour les masquer."
+"aeb3fca140",
+"{n} niveaux tracés. Faites glisser une ligne pour modifier le plan, ou faites un clic droit sur le graphique pour les supprimer."
 ],
 "odStep": [
 "dc416e1088",
@@ -4197,6 +4333,118 @@
 "5a8f23f567",
 "Risque"
 ],
+"odTourBack": [
+"b52b36b726",
+"Retour"
+],
+"odTourDone": [
+"e9b450d14b",
+"Terminé"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Démarrer la visite"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} sur {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Suivant"
+],
+"odTourNo": [
+"e457149073",
+"Pas maintenant"
+],
+"odTourOffer": [
+"d0012e3974",
+"Nouveau sur ODM ? Une visite d'une minute explique chaque fonctionnalité."
+],
+"odTourSkip": [
+"35b754350f",
+"Fermer la visite"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Définissez votre solde, le risque par trade en pourcentage, l'effet de levier et les frais. Le risque correspond à la perte maximale si toutes les entrées sont exécutées et le stop touché."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Votre compte"
+],
+"odTr_act_b": [
+"7644c76432",
+"Affichez le plan sur le graphique et déplacez ses lignes, testez-le sur les bougies passées, ajoutez une alerte pour chaque niveau ou enregistrez-le dans le tableau des risques. Rien ici ne passe d'ordre."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Mise en pratique"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Jusqu'à 10 prix limites, chacun avec sa part. Créez une échelle en un clic ou saisissez vos propres prix. La somme des parts doit être de 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Points d'entrée"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Jusqu'à 8 étapes, chacune à un prix, un pourcentage de l'entrée moyenne ou un multiple de R, votre risque par pièce."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Prise de profit"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Chaque section, champ et résultat possède sa propre icône. Elle explique la partie, donne un exemple avec vos chiffres et contient une zone pour vos questions."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Bloqué ? Cliquez sur une icône"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Si le stop est touché alors que seules certaines entrées ont été exécutées, vous perdez moins. La barre indique quelle part de votre risque total cela représente."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Perte à chaque étape"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Taille, marge, estimation de liquidation et résultat selon chaque scénario de fin de trade, frais inclus."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Vue d'ensemble"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Le stop se situe au-delà de l'entrée la plus profonde. Définissez-le par prix, pourcentage ou multiple de ATR pour suivre la volatilité du marché."
+],
+"odTr_stop_t": [
+"f316187400",
+"Votre invalidation"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risque, entrée moyenne, stop, R et meilleur résultat, recalculés en temps réel."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Le plan en un coup d'œil"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"La part non clôturée peut suivre un stop suiveur, et le stop peut se déplacer au point mort une fois qu'une sortie est exécutée."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Ce qu'il reste"
+],
 "odTrail": [
 "f4d671693b",
 "Ce qui reste"
@@ -4204,6 +4452,10 @@
 "odTrailHint": [
 "952ea83894",
 "La partie non clôturée par les sorties peut bénéficier d'un stop suiveur. Le stop peut aussi se déplacer au seuil de rentabilité après l'exécution d'une sortie."
+],
+"odUndone": [
+"d94a6ce055",
+"Dernière modification annulée."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4260,6 +4512,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Gain"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risque"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",

@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} barre scaricate"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Tutti gli avvisi su questa coin"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Elimina questo avviso"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} avvisi eliminati."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Aggiungi un avviso qui"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Tutti i disegni ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Tutti gli indicatori ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Indietro"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Pulisci l'intero grafico"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Rimuovere ogni disegno, indicatore e i livelli ODM con i relativi avvisi da {s}? Gli altri avvisi rimarranno. È possibile annullare questa operazione."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Grafico pulito."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Copia questo prezzo"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} disegni rimossi."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Disegni, i più recenti per primi"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Un disegno…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Linea orizzontale qui"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Un indicatore…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indicatori rimossi."
+],
+"ctxNothing": [
+"300e0e8374",
+"Nulla da rimuovere"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Rimuovi livelli ODM e avvisi"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Livelli ODM e relativi avvisi"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Apri ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Rimuovi dal grafico"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} rimosso."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Rimuovi {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3757,6 +3841,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} avvisi ODM rimossi."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} livelli e {m} avvisi ODM rimossi."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} a {p} ({d}% dall'ultimo prezzo)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Trascina una linea contrassegnata con ↕ per spostarla, o la maniglia rotonda per spostare la candela di inizio. Il piano viene ricalcolato mentre trascini."
+],
 "odEExit": [
 "3d85c7e08a",
 "Uscita {n}, poi lo stop"
@@ -3949,6 +4049,10 @@
 "56746816d8",
 "Gap per step (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Guidami, passo dopo passo"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Tutte le modalità di conclusione (tutti gli ingressi eseguiti)"
@@ -3972,6 +4076,26 @@
 "odHow": [
 "c54859aa22",
 "Come finisce"
+],
+"odHudE": [
+"19172e9e47",
+"Entrata"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Apri ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Annulla l'ultima modifica"
+],
+"odHudX": [
+"61ad50a9b9",
+"Target"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4053,6 +4177,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Tocca il grafico dove inserire la nuova entrata. Esc per annullare."
+],
+"odPick_s": [
+"39a71b4de2",
+"Tocca il grafico dove inserire lo stop. Esc per annullare."
+],
+"odPick_x": [
+"fd10db7af2",
+"Tocca il grafico dove inserire il nuovo target. Esc per annullare."
+],
 "odPnl": [
 "5faa59d4bc",
 "Risultato"
@@ -4098,8 +4234,8 @@
 "Mostra sul grafico"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} livelli disegnati. Apri di nuovo ODM per nasconderli."
+"aeb3fca140",
+"{n} livelli disegnati. Trascina una linea per modificare il piano, o fai clic destro sul grafico per rimuoverli."
 ],
 "odStep": [
 "dc416e1088",
@@ -4177,6 +4313,118 @@
 "5a8f23f567",
 "Rischio"
 ],
+"odTourBack": [
+"b52b36b726",
+"Indietro"
+],
+"odTourDone": [
+"e9b450d14b",
+"Fatto"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Inizia il tour"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} di {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Avanti"
+],
+"odTourNo": [
+"e457149073",
+"Non ora"
+],
+"odTourOffer": [
+"d0012e3974",
+"Nuovo su ODM? Un tour di un minuto mostra cosa fa ogni parte."
+],
+"odTourSkip": [
+"35b754350f",
+"Chiudi il tour"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Imposta il tuo saldo, il rischio per operazione in percentuale, la leva e le commissioni. Il rischio è la perdita massima se ogni entrata viene eseguita e lo stop viene colpito."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Il tuo account"
+],
+"odTr_act_b": [
+"7644c76432",
+"Mostra il piano sul grafico e trascina le sue linee, testalo su candele passate, aggiungi un avviso per ogni livello o salvalo nella bacheca del rischio. Nulla qui piazza un ordine."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Mettilo in pratica"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Fino a 10 prezzi limite, ognuno con la sua quota. Costruisci una scala con un tocco o digita i tuoi prezzi. Le quote devono sommare al 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Dove entri"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Fino a 8 step, ognuno a un prezzo, una percentuale dall'entrata media o un multiplo di R, il tuo rischio per coin."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Dove prendi profitto"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Ogni sezione, campo e risultato ha la sua icona. Spiega la parte, fornisce un esempio con i tuoi numeri e ha una casella per la tua domanda."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Bloccato? Tocca un'icona"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Se lo stop viene colpito dopo che solo alcune entrate sono state eseguite, perdi meno. La barra mostra quanto del tuo rischio totale rappresenta."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"La perdita a ogni step"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Dimensione, margine, stima della liquidazione e il risultato di ogni possibile esito dell'operazione, commissioni incluse."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Il quadro completo"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Lo stop si trova oltre l'entrata più profonda. Impostalo per prezzo, per percentuale o come multiplo di ATR in modo che segua la volatilità del mercato."
+],
+"odTr_stop_t": [
+"f316187400",
+"Dove sbagli"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Rischio, entrata media, stop, R e il miglior risultato, ricalcolati mentre digiti."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Il piano a colpo d'occhio"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"La quota che non viene chiusa dalle uscite può seguire un trailing stop, e lo stop può spostarsi a break-even una volta che un'uscita viene eseguita."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Cosa rimane"
+],
 "odTrail": [
 "f4d671693b",
 "Cosa rimane"
@@ -4184,6 +4432,10 @@
 "odTrailHint": [
 "952ea83894",
 "La quota non chiusa da alcuna uscita può seguire un trailing stop. Lo stop può anche spostarsi al punto di pareggio (break-even) dopo che un'uscita viene eseguita."
+],
+"odUndone": [
+"d94a6ce055",
+"Ultima modifica annullata."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4240,6 +4492,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Profitto"
+],
+"odZRisk": [
+"5a8f23f567",
+"Rischio"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",
@@ -6401,6 +6669,18 @@
 "33a819eb5c",
 "Il margine richiesto supera il saldo: riduci il rischio o aumenta la leva."
 ],
+"rcW_noedge": [
+"abfe462fe4",
+"Nessun vantaggio con questi numeri: Kelly dice di non scommettere."
+],
+"rcWin": [
+"8ef4ec1075",
+"Tasso di vincita (%)"
+],
+"rcYes": [
+"5397e0583f",
+"Sì"
+],
 "redo": [
 "471b94d402",
 "Ripristina"
@@ -6469,17 +6749,153 @@
 "b3bd0b5a70",
 "Riprendi"
 ],
+"rgAgree": [
+"f77278511d",
+"Regole concordanti"
+],
+"rgHeld": [
+"88f22bff61",
+"Barre mantenute"
+],
+"rgHist": [
+"6d17cf2890",
+"Regimi passati (una barra per candela)"
+],
+"rgInvBear": [
+"fdc48eb73b",
+"Cosa lo terminerebbe: una chiusura sopra EMA 50 ({p}), o ADX che scende sotto 20."
+],
+"rgInvBull": [
+"40f59312f6",
+"Cosa lo terminerebbe: una chiusura sotto EMA 50 ({p}), o ADX che scende sotto 20."
+],
+"rgInvMixed": [
+"cf42406689",
+"Nessuno stato chiaro: prezzo e medie non concordano. Si risolve quando la chiusura e EMA 50 si trovano sullo stesso lato di EMA 200."
+],
+"rgInvRange": [
+"bcda5cad4b",
+"Cosa lo terminerebbe: ADX che sale a 20 o più con la chiusura su un lato di EMA 50."
+],
+"rgNeg": [
+"f39d173d91",
+"In calo"
+],
+"rgPartial": [
+"e853bfc072",
+"Meno di 200 candele: EMA 200 non è disponibile, quindi il trend usa solo EMA 50."
+],
+"rgPos": [
+"0bec14f205",
+"In rialzo"
+],
+"rgShort": [
+"d6843789bf",
+"Non abbastanza candele su questo grafico per un regime."
+],
+"rgSlope": [
+"4c5ef055f6",
+"Pendenza EMA 50 (5 barre)"
+],
+"rgThAtr": [
+"00f7c0f452",
+"Movimento shock (× ATR)"
+],
+"rgThEx": [
+"5f90f25679",
+"Espansione da percentile"
+],
+"rgThReset": [
+"0363e3d886",
+"Soglie predefinite"
+],
+"rgThSq": [
+"e5114bf7a4",
+"Compressione fino al percentile"
+],
+"rgThVh": [
+"1e0e2d2f5f",
+"Alta volatilità da percentile"
+],
+"rgThVl": [
+"a2a69335ec",
+"Bassa volatilità fino al percentile"
+],
+"rgThVol": [
+"a622f16336",
+"Volume shock (× media)"
+],
+"rgTitle": [
+"2313be422a",
+"Regime · {s} · {tf}"
+],
+"rgVolX": [
+"64c3ac6b3e",
+"Volume ultima barra vs media 20 barre"
+],
+"rgVolaPct": [
+"2002c38d60",
+"Percentile volatilità"
+],
+"rgWhy": [
+"a7cdabf894",
+"Perché questo regime? Regole, numeri e soglie"
+],
+"rgWidthPct": [
+"00b60f938b",
+"Percentile ampiezza banda"
+],
+"rg_bear": [
+"c2be37036c",
+"Trend ribassista"
+],
+"rg_bull": [
+"09d381cec9",
+"Trend rialzista"
+],
+"rg_expansion": [
+"5210fc6fc2",
+"Espansione"
+],
 "rg_from": [
 "3f66052a10",
 "Da"
+],
+"rg_mixed": [
+"c0dcb865ad",
+"Misto"
+],
+"rg_range": [
+"a16c5bbe4b",
+"Range"
+],
+"rg_selloff": [
+"6bcf189f4c",
+"Forte sell-off"
+],
+"rg_squeeze": [
+"92c9ea71c1",
+"Compressione"
 ],
 "rg_step": [
 "dc416e1088",
 "Passo"
 ],
+"rg_surge": [
+"9b02b303eb",
+"Forte rally"
+],
 "rg_to": [
 "ae79ea1e9c",
 "A"
+],
+"rg_vhigh": [
+"6c69519a16",
+"Alta volatilità"
+],
+"rg_vlow": [
+"02a5abe305",
+"Bassa volatilità"
 ],
 "rk_dd": [
 "a15b45a44d",
@@ -6524,6 +6940,338 @@
 "runTest": [
 "2c7f471fce",
 "Esegui il test"
+],
+"saAddC": [
+"2f4979324e",
+"Condizione"
+],
+"saAddG": [
+"171a0606f7",
+"Gruppo"
+],
+"saBN": [
+"b7baa1d40c",
+"Numero"
+],
+"saBS": [
+"3a43d0e663",
+"Indicatore / prezzo"
+],
+"saBars": [
+"76dcd41fff",
+"{n} barre"
+],
+"saBarsN": [
+"bd019a756d",
+"Barre consecutive"
+],
+"saCopy": [
+"af74f7c536",
+"Copia"
+],
+"saDotNo": [
+"38a82961e6",
+"Falso sull'ultima barra chiusa"
+],
+"saDotWait": [
+"2d596b20ba",
+"Non abbastanza barre per questo indicatore"
+],
+"saDotYes": [
+"a0ff91462d",
+"Vero sull'ultima barra chiusa"
+],
+"saE_empty": [
+"597d80feb5",
+"Aggiungi almeno una condizione."
+],
+"saE_emptyG": [
+"70e1ad95bb",
+"Un gruppo non ha condizioni."
+],
+"saE_long": [
+"427b53e1e0",
+"La regola è troppo lunga ({n} di 600 caratteri): rimuovi una condizione."
+],
+"saE_num": [
+"c249973a4b",
+"Una condizione richiede un numero."
+],
+"saE_script": [
+"f60d6bd8a3",
+"La regola non può essere verificata."
+],
+"saE_side": [
+"4651a22984",
+"Scegli cosa rappresenta ogni lato della condizione."
+],
+"saExpT": [
+"7dcda53b12",
+"La regola come Entekhab Script"
+],
+"saGNot": [
+"969e7d8dee",
+"NON"
+],
+"saGNotTip": [
+"1e1d749332",
+"L'intero gruppo deve essere falso"
+],
+"saGroup": [
+"ec98a63469",
+"Gruppo {n}"
+],
+"saHist": [
+"5820fa4201",
+"Sulle ultime {b} barre chiuse {tf} avrebbe generato {n} segnali."
+],
+"saHistPct": [
+"24e303adf5",
+"La regola è stata vera nel {p}% di quelle barre."
+],
+"saJG_and": [
+"4ad42ed12b",
+"Tutte queste (AND)"
+],
+"saJG_or": [
+"834d918bfb",
+"Una qualsiasi di queste (OR)"
+],
+"saJT_and": [
+"595d3df086",
+"Tutti i gruppi devono essere veri (AND)"
+],
+"saJT_or": [
+"2d2e690caf",
+"È sufficiente un qualsiasi gruppo (OR)"
+],
+"saJ_and": [
+"c2f934cb8c",
+"AND"
+],
+"saJ_or": [
+"f579c52396",
+"OR"
+],
+"saLoading": [
+"ea358bfeb3",
+"Caricamento barre…"
+],
+"saNever": [
+"6f89c4ce1a",
+"Non ha mai generato segnali qui: controlla i numeri."
+],
+"saNoBars": [
+"f4f0ebd381",
+"Non ci sono ancora abbastanza barre chiuse su questo timeframe."
+],
+"saNoisy": [
+"60ccc916b7",
+"Si attiva spesso, quindi l'avviso potrebbe essere rumoroso."
+],
+"saNot": [
+"969e7d8dee",
+"NON"
+],
+"saNotTip": [
+"72a2de0282",
+"Questa condizione deve essere falsa"
+],
+"saNote": [
+"0a4c1d2dc0",
+"Verificato su questo dispositivo mentre la pagina di mercato o l'app è aperta, alla chiusura di una barra. Non effettua ordini e non costituisce consulenza."
+],
+"saNowNo": [
+"9de2f51a64",
+"Non vero ora, sull'ultima barra chiusa {tf}"
+],
+"saNowT": [
+"1468db9a9e",
+"Ora, e sullo storico di questo grafico"
+],
+"saNowYes": [
+"e9ef398126",
+"Vero ora, sull'ultima barra chiusa {tf}"
+],
+"saO_fall": [
+"8cf0b8e1dd",
+"in calo da"
+],
+"saO_ge": [
+"dcec4f1daf",
+"≥"
+],
+"saO_gt": [
+"091385be99",
+">"
+],
+"saO_le": [
+"c8426723ce",
+"≤"
+],
+"saO_lt": [
+"c4dd3c8cdd",
+"<"
+],
+"saO_rise": [
+"22723b9834",
+"in rialzo da"
+],
+"saO_xdn": [
+"76b13b6946",
+"incrocia al di sotto"
+],
+"saO_xup": [
+"b0849ce10e",
+"incrocia al di sopra"
+],
+"saP_brk": [
+"b05b2596c8",
+"Breakout a 20 barre con volume"
+],
+"saP_calm": [
+"23cc54ef55",
+"Incrocio MACD in un mercato calmo"
+],
+"saP_cross": [
+"fe7e9ec902",
+"Incrocio EMA 9/21 con volume"
+],
+"saP_dip": [
+"7430b571e3",
+"Ritracciamento in un trend rialzista"
+],
+"saP_ext": [
+"d5d8c4d9e0",
+"Fuori dalle bande di Bollinger"
+],
+"saS_atrp": [
+"1f65ad77c8",
+"ATR come % del prezzo"
+],
+"saS_bbl": [
+"e23f4aec2d",
+"Bollinger inferiore (2σ)"
+],
+"saS_bbm": [
+"e0d19c8bad",
+"Bollinger centrale"
+],
+"saS_bbu": [
+"2d5e3e5e77",
+"Bollinger superiore (2σ)"
+],
+"saS_cci": [
+"2086539684",
+"CCI"
+],
+"saS_close": [
+"bbfa773e5a",
+"Chiusura"
+],
+"saS_ema": [
+"67b9b8a57f",
+"EMA"
+],
+"saS_hh": [
+"6ca9f69f43",
+"Massimo più alto delle ultime N barre"
+],
+"saS_high": [
+"b1a5954a48",
+"Massimo"
+],
+"saS_hma": [
+"78b8503f6b",
+"HMA"
+],
+"saS_ll": [
+"9c648f4c23",
+"Minimo più basso delle ultime N barre"
+],
+"saS_low": [
+"a124947cbd",
+"Minimo"
+],
+"saS_macd": [
+"9a34c31ad5",
+"Linea MACD (12, 26)"
+],
+"saS_macdh": [
+"7a920aaf88",
+"Istogramma MACD"
+],
+"saS_macds": [
+"cfb2113118",
+"Segnale MACD (9)"
+],
+"saS_open": [
+"cf9b77061f",
+"Apertura"
+],
+"saS_roc": [
+"ad73d69b6c",
+"Variazione % su N barre"
+],
+"saS_rsi": [
+"2a00496640",
+"RSI"
+],
+"saS_sma": [
+"337f15d864",
+"SMA"
+],
+"saS_stoch": [
+"5183f479ec",
+"Stocastico %K"
+],
+"saS_volume": [
+"3b18e8e332",
+"Volume"
+],
+"saS_volx": [
+"da0afcae21",
+"Volume ÷ la sua media"
+],
+"saS_vwma": [
+"2fdaec23f9",
+"VWMA"
+],
+"saS_wma": [
+"3b02c32b34",
+"WMA"
+],
+"saSave": [
+"895f538a76",
+"Crea l'avviso"
+],
+"saScript": [
+"a99f36583c",
+"Modifica come script"
+],
+"saTab": [
+"50aeccb002",
+"Smart (AND/OR/NON)"
+],
+"saTitle": [
+"0082d082b6",
+"Avviso smart: AND / OR / NON"
+],
+"saTop": [
+"7c6b0e4270",
+"Unisci i gruppi"
+],
+"saTx_and": [
+"c2f934cb8c",
+"AND"
+],
+"saTx_not": [
+"969e7d8dee",
+"NON"
+],
+"saTx_or": [
+"f579c52396",
+"OR"
 ],
 "saWhy1": [
 "6505c505e8",

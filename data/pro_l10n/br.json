@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "{n} barras baixadas"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Todos os alertas nesta moeda"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Excluir este alerta"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} alertas excluídos."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Adicionar um alerta aqui"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Todos os desenhos ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Todos os indicadores ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Voltar"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Limpar todo o gráfico"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Remover todos os desenhos, indicadores e níveis ODM com seus alertas de {s}? Outros alertas serão mantidos. Você pode desfazer esta ação."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Gráfico limpo."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Copiar este preço"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} desenhos removidos."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Desenhos, mais recentes primeiro"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Um desenho…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Linha horizontal aqui"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Um indicador…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indicadores removidos."
+],
+"ctxNothing": [
+"300e0e8374",
+"Nada para remover"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Remover níveis e alertas ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Níveis ODM e seus alertas"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Abrir ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Remover do gráfico"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} removido."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Remover {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3773,6 +3857,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} alertas ODM removidos."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} níveis e {m} alertas ODM removidos."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} em {p} ({d}% do último preço)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Arraste uma linha marcada com ↕ para movê-la, ou a alça redonda para mover a candle inicial. O plano é recalculado conforme você arrasta."
+],
 "odEExit": [
 "3d85c7e08a",
 "Saída {n}, depois o stop"
@@ -3965,6 +4065,10 @@
 "56746816d8",
 "Intervalo por passo (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Guie-me, passo a passo"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Todas as formas de encerramento (todas as entradas executadas)"
@@ -3988,6 +4092,26 @@
 "odHow": [
 "c54859aa22",
 "Como termina"
+],
+"odHudE": [
+"19172e9e47",
+"Entrada"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Abrir ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Desfazer última alteração"
+],
+"odHudX": [
+"61ad50a9b9",
+"Alvo"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4069,6 +4193,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Toque no gráfico onde a nova entrada será colocada. Esc cancela."
+],
+"odPick_s": [
+"39a71b4de2",
+"Toque no gráfico onde o stop será colocado. Esc cancela."
+],
+"odPick_x": [
+"fd10db7af2",
+"Toque no gráfico onde o novo alvo será colocado. Esc cancela."
+],
 "odPnl": [
 "5faa59d4bc",
 "Resultado"
@@ -4114,8 +4250,8 @@
 "Mostrar no gráfico"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} níveis desenhados. Abra o ODM novamente para ocultá-los."
+"aeb3fca140",
+"{n} níveis desenhados. Arraste uma linha para alterar o plano ou clique com o botão direito no gráfico para removê-los."
 ],
 "odStep": [
 "dc416e1088",
@@ -4193,6 +4329,118 @@
 "5a8f23f567",
 "Risco"
 ],
+"odTourBack": [
+"b52b36b726",
+"Voltar"
+],
+"odTourDone": [
+"e9b450d14b",
+"Concluído"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Iniciar o tour"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} de {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Próximo"
+],
+"odTourNo": [
+"e457149073",
+"Agora não"
+],
+"odTourOffer": [
+"d0012e3974",
+"Novo no ODM? Um tour de um minuto mostra o que cada parte faz."
+],
+"odTourSkip": [
+"35b754350f",
+"Fechar o tour"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Defina seu saldo, o risco por operação em porcentagem, a alavancagem e as taxas. O risco é o máximo que você perde se todas as entradas forem executadas e o stop for atingido."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Sua conta"
+],
+"odTr_act_b": [
+"7644c76432",
+"Exiba o plano no gráfico e arraste suas linhas, teste-o em candles passados, adicione um alerta para cada nível ou salve-o no painel de risco. Nada aqui executa uma ordem."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Coloque em prática"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Até 10 preços limite, cada um com sua parcela. Monte uma escada com um toque ou digite seus próprios preços. As parcelas devem somar 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Onde você entra"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Até 8 etapas, cada uma em um preço, uma porcentagem da entrada média ou um múltiplo de R, seu risco por moeda."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Onde você realiza lucro"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Cada seção, campo e resultado tem seu próprio ícone. Ele explica a parte, dá um exemplo com seus números e tem uma caixa para sua pergunta."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Preso? Toque em um ícone"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Se o stop for atingido após apenas algumas entradas serem executadas, você perde menos. A barra mostra quanto do seu risco total isso representa."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"A perda em cada etapa"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Tamanho, margem, estimativa de liquidação e o resultado de cada forma que a operação pode terminar, taxas incluídas."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"O panorama completo"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"O stop fica além da entrada mais profunda. Defina-o por preço, por porcentagem ou como um múltiplo de ATR para acompanhar a volatilidade do mercado."
+],
+"odTr_stop_t": [
+"f316187400",
+"Onde você está errado"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risco, entrada média, stop, R e o melhor resultado, recalculados conforme você digita."
+],
+"odTr_top_t": [
+"71ea78684e",
+"O plano em resumo"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"A parcela que nenhuma saída fecha pode usar um trailing stop, e o stop pode se mover para o ponto de equilíbrio (break-even) assim que uma saída for executada."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"O que resta"
+],
 "odTrail": [
 "f4d671693b",
 "O que resta"
@@ -4200,6 +4448,10 @@
 "odTrailHint": [
 "952ea83894",
 "A parte que nenhuma saída fecha pode seguir um trailing stop. O stop também pode mover-se para o break-even após uma saída ser executada."
+],
+"odUndone": [
+"d94a6ce055",
+"Última alteração desfeita."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4256,6 +4508,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Compra"
+],
+"odZRew": [
+"c7d7652ec6",
+"Recompensa"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risco"
+],
+"odZShort": [
+"0fe7d82f25",
+"Venda"
 ],
 "odhA0": [
 "d97012c5ea",

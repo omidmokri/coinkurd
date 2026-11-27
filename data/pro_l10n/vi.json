@@ -1077,13 +1077,61 @@
 "fe93409ef8",
 "Đã tải xuống {n} nến"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Tất cả cảnh báo trên coin này"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Xóa cảnh báo này"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"Đã xóa {n} cảnh báo."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Thêm cảnh báo ở đây"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Tất cả công cụ vẽ ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Tất cả chỉ báo ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Quay lại"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Xóa toàn bộ biểu đồ"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Xóa mọi công cụ vẽ, chỉ báo, và các mức ODM cùng cảnh báo của chúng khỏi {s}? Các cảnh báo khác vẫn được giữ lại. Bạn có thể hoàn tác hành động này."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Đã xóa biểu đồ."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Sao chép mức giá này"
+],
+"ctxDrawGone": [
+"083f64337b",
+"Đã xóa {n} công cụ vẽ."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Công cụ vẽ, mới nhất trước"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Một công cụ vẽ…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1140,42 @@
 "ctxHline": [
 "588d2eb492",
 "Đường ngang ở đây"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Một chỉ báo…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"Đã xóa {n} chỉ báo."
+],
+"ctxNothing": [
+"300e0e8374",
+"Không có gì để xóa"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Xóa các mức và cảnh báo ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Các mức ODM và cảnh báo của chúng"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Mở ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Xóa khỏi biểu đồ"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"Đã xóa {x}."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Xóa {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3765,6 +3849,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"Đã xóa {m} cảnh báo ODM."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"Đã xóa {n} mức và {m} cảnh báo ODM."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} tại {p} ({d}% so với giá gần nhất)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Kéo đường có dấu ↕ để di chuyển, hoặc kéo điểm tròn để thay đổi nến bắt đầu. Kế hoạch sẽ được tính toán lại khi bạn kéo."
+],
 "odEExit": [
 "3d85c7e08a",
 "Thoát {n}, sau đó là cắt lỗ"
@@ -3957,6 +4057,10 @@
 "56746816d8",
 "Khoảng cách mỗi bước (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Hướng dẫn từng bước"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Mọi kịch bản kết thúc (tất cả lệnh vào đã khớp)"
@@ -3980,6 +4084,26 @@
 "odHow": [
 "c54859aa22",
 "Cách kết thúc"
+],
+"odHudE": [
+"19172e9e47",
+"Vào lệnh"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Mở ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Dừng lỗ"
+],
+"odHudUndo": [
+"3d206179a5",
+"Hoàn tác thay đổi cuối"
+],
+"odHudX": [
+"61ad50a9b9",
+"Chốt lời"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4061,6 +4185,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Chạm vào biểu đồ tại điểm vào lệnh mới. Esc để hủy."
+],
+"odPick_s": [
+"39a71b4de2",
+"Chạm vào biểu đồ tại điểm dừng lỗ. Esc để hủy."
+],
+"odPick_x": [
+"fd10db7af2",
+"Chạm vào biểu đồ tại điểm chốt lời mới. Esc để hủy."
+],
 "odPnl": [
 "5faa59d4bc",
 "Kết quả"
@@ -4106,8 +4242,8 @@
 "Hiển thị trên biểu đồ"
 ],
 "odShown": [
-"bbfafee1df",
-"Đã vẽ {n} mức. Mở lại ODM để ẩn chúng."
+"aeb3fca140",
+"Đã vẽ {n} mức. Kéo đường để thay đổi kế hoạch, hoặc chuột phải vào biểu đồ để xóa chúng."
 ],
 "odStep": [
 "dc416e1088",
@@ -4185,6 +4321,118 @@
 "5a8f23f567",
 "Rủi ro"
 ],
+"odTourBack": [
+"b52b36b726",
+"Quay lại"
+],
+"odTourDone": [
+"e9b450d14b",
+"Xong"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Bắt đầu hướng dẫn"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} trên {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Tiếp theo"
+],
+"odTourNo": [
+"e457149073",
+"Để sau"
+],
+"odTourOffer": [
+"d0012e3974",
+"Bạn mới dùng ODM? Hướng dẫn một phút này sẽ chỉ cho bạn cách sử dụng từng phần."
+],
+"odTourSkip": [
+"35b754350f",
+"Đóng hướng dẫn"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Thiết lập số dư, rủi ro mỗi lệnh theo phần trăm, đòn bẩy và phí. Rủi ro là số tiền tối đa bạn mất nếu tất cả các lệnh vào đều khớp và chạm dừng lỗ."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Tài khoản của bạn"
+],
+"odTr_act_b": [
+"7644c76432",
+"Hiển thị kế hoạch trên biểu đồ và kéo các đường, kiểm tra trên nến quá khứ, thêm cảnh báo cho mỗi mức, hoặc lưu vào bảng rủi ro. Không có hành động nào ở đây đặt lệnh thực tế."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Áp dụng kế hoạch"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Tối đa 10 mức giá limit, mỗi mức kèm khối lượng. Xây dựng thang lệnh chỉ với một lần chạm hoặc tự nhập giá. Tổng khối lượng phải bằng 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Điểm vào lệnh"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Tối đa 8 bước, mỗi bước tại một mức giá, một phần trăm từ giá vào trung bình, hoặc bội số của R (rủi ro mỗi lệnh)."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Điểm chốt lời"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Mỗi phần, trường và kết quả đều có biểu tượng riêng. Nó giải thích chức năng, đưa ra ví dụ với con số của bạn và có ô để bạn đặt câu hỏi."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Cần giúp đỡ? Chạm vào biểu tượng"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Nếu dừng lỗ bị chạm sau khi chỉ một vài lệnh khớp, bạn sẽ mất ít hơn. Thanh này hiển thị phần trăm rủi ro thực tế so với tổng rủi ro."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Mức lỗ tại mỗi bước"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Quy mô, ký quỹ, ước tính thanh lý và kết quả của mọi kịch bản giao dịch, đã bao gồm phí."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Bức tranh toàn cảnh"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Dừng lỗ nằm ngoài điểm vào lệnh sâu nhất. Thiết lập theo giá, phần trăm, hoặc bội số của ATR để theo sát biến động thị trường."
+],
+"odTr_stop_t": [
+"f316187400",
+"Điểm sai của bạn"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Rủi ro, giá vào trung bình, dừng lỗ, R và kết quả tốt nhất, được tính toán lại khi bạn nhập."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Tổng quan kế hoạch"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Phần khối lượng chưa chốt có thể dùng trailing stop, và dừng lỗ có thể dời về hòa vốn khi một lệnh chốt lời khớp."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Phần còn lại"
+],
 "odTrail": [
 "f4d671693b",
 "Phần còn lại"
@@ -4192,6 +4440,10 @@
 "odTrailHint": [
 "952ea83894",
 "Phần khối lượng không có điểm chốt lời có thể áp dụng trailing stop. Stop-loss cũng có thể dịch chuyển về hòa vốn sau khi một điểm thoát lệnh khớp."
+],
+"odUndone": [
+"d94a6ce055",
+"Đã hoàn tác thay đổi cuối."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4248,6 +4500,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Lợi nhuận"
+],
+"odZRisk": [
+"5a8f23f567",
+"Rủi ro"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
 ],
 "odhA0": [
 "d97012c5ea",

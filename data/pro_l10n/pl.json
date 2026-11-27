@@ -1073,13 +1073,61 @@
 "fe93409ef8",
 "Pobrano {n} świec"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Wszystkie alerty dla tej monety"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Usuń ten alert"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"Usunięto {n} alertów."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Dodaj alert tutaj"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Wszystkie rysunki ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Wszystkie wskaźniki ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Wstecz"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Wyczyść cały wykres"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Usunąć wszystkie rysunki, wskaźniki oraz poziomy ODM wraz z ich alertami z {s}? Inne alerty pozostaną. Możesz cofnąć tę operację."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Wykres wyczyszczony."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Skopiuj tę cenę"
+],
+"ctxDrawGone": [
+"083f64337b",
+"Usunięto {n} rysunków."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Rysunki, najnowsze najpierw"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Rysunek…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1088,6 +1136,42 @@
 "ctxHline": [
 "588d2eb492",
 "Pozioma linia tutaj"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Wskaźnik…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"Usunięto {n} wskaźników."
+],
+"ctxNothing": [
+"300e0e8374",
+"Brak elementów do usunięcia"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Usuń poziomy i alerty ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Poziomy ODM i ich alerty"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Otwórz ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Usuń z wykresu"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"Usunięto {x}."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Usuń {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3685,6 +3769,10 @@
 "3629af8343",
 "Wszystkie zaznaczone do bota Telegram ({n})"
 ],
+"odAlBotCut": [
+"2fcde082d6",
+"{n} z {m} poziomów mieści się w jednym linku Telegram (najpierw stop i wyjścia). Dodaj resztę za pomocą ✈ obok każdego poziomu."
+],
 "odAlDone": [
 "dcb0bb6e26",
 "Dodano {n} alertów, {d} już tam było."
@@ -3768,6 +3856,22 @@
 "odBtn": [
 "9cd499490a",
 "ODM"
+],
+"odClearedAl": [
+"10dc663b4f",
+"Usunięto {m} alertów ODM."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"Usunięto {n} poziomów i {m} alertów ODM."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} na {p} ({d}% od ostatniej ceny)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Przeciągnij linię oznaczoną ↕, aby ją przesunąć, lub okrągły uchwyt, aby zmienić świecę początkową. Plan jest przeliczany na bieżąco podczas przeciągania."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -3961,6 +4065,10 @@
 "56746816d8",
 "Odstęp na krok (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Poprowadź mnie krok po kroku"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Każdy sposób zakończenia (wszystkie wejścia wypełnione)"
@@ -3984,6 +4092,26 @@
 "odHow": [
 "c54859aa22",
 "Jak się kończy"
+],
+"odHudE": [
+"19172e9e47",
+"Wejście"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Otwórz ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Cofnij ostatnią zmianę"
+],
+"odHudX": [
+"61ad50a9b9",
+"Cel"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4065,6 +4193,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Kliknij na wykresie miejsce nowego wejścia. Esc anuluje."
+],
+"odPick_s": [
+"39a71b4de2",
+"Kliknij na wykresie miejsce stopa. Esc anuluje."
+],
+"odPick_x": [
+"fd10db7af2",
+"Kliknij na wykresie miejsce nowego celu. Esc anuluje."
+],
 "odPnl": [
 "5faa59d4bc",
 "Wynik"
@@ -4110,8 +4250,8 @@
 "Pokaż na wykresie"
 ],
 "odShown": [
-"bbfafee1df",
-"Narysowano {n} poziomów. Otwórz ODM ponownie, aby je ukryć."
+"aeb3fca140",
+"Narysowano {n} poziomów. Przeciągnij linię, aby zmienić plan, lub kliknij prawym przyciskiem myszy na wykres, aby je usunąć."
 ],
 "odStep": [
 "dc416e1088",
@@ -4189,6 +4329,118 @@
 "5a8f23f567",
 "Ryzyko"
 ],
+"odTourBack": [
+"b52b36b726",
+"Wstecz"
+],
+"odTourDone": [
+"e9b450d14b",
+"Gotowe"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Rozpocznij wycieczkę"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} z {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Dalej"
+],
+"odTourNo": [
+"e457149073",
+"Nie teraz"
+],
+"odTourOffer": [
+"d0012e3974",
+"Nowy w ODM? Minutowa wycieczka pokaże, co robi każda część."
+],
+"odTourSkip": [
+"35b754350f",
+"Zamknij wycieczkę"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Ustaw swój kapitał, ryzyko na transakcję w procentach, dźwignię i prowizje. Ryzyko to maksymalna strata, jeśli wszystkie wejścia zostaną zrealizowane, a stop zostanie osiągnięty."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Twoje konto"
+],
+"odTr_act_b": [
+"7644c76432",
+"Pokaż plan na wykresie i przeciągaj jego linie, przetestuj go na historycznych świecach, dodaj alert dla każdego poziomu lub zapisz go w panelu ryzyka. Nic tutaj nie składa zlecenia."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Wdróż w życie"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Do 10 cen limit, każda z własnym udziałem. Zbuduj drabinę jednym kliknięciem lub wpisz własne ceny. Udziały muszą sumować się do 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Gdzie wchodzisz"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Do 8 kroków, każdy po cenie, procencie od średniego wejścia lub wielokrotności R, czyli Twojego ryzyka na monetę."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Gdzie realizujesz zysk"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Każda sekcja, pole i wynik ma własną ikonę. Wyjaśnia ona dany element, podaje przykład z Twoimi liczbami i zawiera pole na Twoje pytanie."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Utknąłeś? Kliknij ikonę"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Jeśli stop zostanie osiągnięty po zrealizowaniu tylko części wejść, stracisz mniej. Pasek pokazuje, jaka to część Twojego pełnego ryzyka."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Strata na każdym kroku"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Wielkość pozycji, depozyt zabezpieczający, szacowana likwidacja i wynik każdego możliwego zakończenia transakcji, wliczając prowizje."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Pełny obraz"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Stop znajduje się za najdalszym wejściem. Ustaw go cenowo, procentowo lub jako wielokrotność ATR, aby podążał za zmiennością rynku."
+],
+"odTr_stop_t": [
+"f316187400",
+"Gdzie się mylisz"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Ryzyko, średnie wejście, stop, R i najlepszy wynik, przeliczane na bieżąco podczas wpisywania."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Plan w skrócie"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Udział, dla którego nie ma wyjścia, może być chroniony przez trailing stop, a stop może przesunąć się na break-even po zrealizowaniu wyjścia."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Co pozostało"
+],
 "odTrail": [
 "f4d671693b",
 "Co zostało"
@@ -4196,6 +4448,10 @@
 "odTrailHint": [
 "952ea83894",
 "Część, której nie zamyka żadne wyjście, może być prowadzona trailing stopem. Stop może też przejść na poziom break-even po wypełnieniu wyjścia."
+],
+"odUndone": [
+"d94a6ce055",
+"Ostatnia zmiana cofnięta."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4253,6 +4509,22 @@
 "78c72d9090",
 "× R"
 ],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Zysk"
+],
+"odZRisk": [
+"5a8f23f567",
+"Ryzyko"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
+],
 "odhA0": [
 "d97012c5ea",
 "Ponieważ ODM działa wspak: dzieli Twoje ryzyko przez stratę każdej jednostki od wejścia do stopu, wliczając opłaty i poślizg. Dzięki temu wielkość zawsze odpowiada wybranemu przez Ciebie ryzyku."
@@ -4264,6 +4536,10 @@
 "odhA10": [
 "c493f48847",
 "Zazwyczaj stop znajduje się po niewłaściwej stronie wejść, udziały wejść nie sumują się do 100% lub take-profit nie znajduje się poza średnią. Komunikat wskazuje, co dokładnie."
+],
+"odhA11": [
+"d35315306a",
+"'Pokaż na wykresie' rysuje każdy poziom jako linię. Przycisk alertów dodaje alert dla każdego poziomu, a przycisk Telegram wysyła wszystkie zaznaczone poziomy do bota w jednym linku."
 ],
 "odhA12": [
 "dd70fbb6c9",
@@ -4320,6 +4596,10 @@
 "odhClose": [
 "bbfa773e5a",
 "Zamknij"
+],
+"odhCopied": [
+"a567d021f9",
+"Twoje pytanie zostało skopiowane. Wklej je na czacie Telegram, który się otworzy."
 ],
 "odhEx": [
 "0f01ed56a1",
@@ -5885,6 +6165,102 @@
 "11cdb9ef40",
 "Zrealizowany PnL"
 ],
+"plPnlPh": [
+"37a5301a88",
+"wynik"
+],
+"plR2": [
+"b3839316b2",
+"TP2 (× ryzyko)"
+],
+"plR3": [
+"4cfedeb55f",
+"TP3 (× ryzyko)"
+],
+"plS_active": [
+"a733b809d2",
+"Aktywne"
+],
+"plS_closed": [
+"88d86b7721",
+"Zamknięte"
+],
+"plS_planned": [
+"9cbe42aaff",
+"Zaplanowane"
+],
+"plSave": [
+"c3f10085f9",
+"Zapisz plan"
+],
+"plSaved": [
+"5ad336f045",
+"Plan zapisany."
+],
+"plScaled": [
+"71027ef6dd",
+"Udziały nie sumowały się do 100%, więc zostały przeskalowane."
+],
+"plShare1": [
+"3d669b7968",
+"Udział przy TP1 (%)"
+],
+"plShare2": [
+"527587bedf",
+"Udział przy TP2 (%)"
+],
+"plShare3": [
+"1de10b521f",
+"Udział przy TP3 (%)"
+],
+"plShortX": [
+"e0e2e891e2",
+"Ekspozycja short"
+],
+"plStatus": [
+"bae7d5be70",
+"Status"
+],
+"plTipActive": [
+"4e20f49ee8",
+"Plany oznaczone jako aktywne (otwarte lub na papierze): ile tracą, jeśli każdy stop zostanie osiągnięty."
+],
+"plTipFund": [
+"0b6a70a096",
+"Dodatnia stawka jest płacona przez pozycje long i otrzymywana przez short; ujemna stawka działa odwrotnie."
+],
+"plTipLeft": [
+"6139c9c234",
+"limit − dzisiejsza zrealizowana strata − aktywne ryzyko na stopach"
+],
+"plTipLoss": [
+"a238701251",
+"Koszt stopa: kapitał w ryzyku plus finansowanie, jeśli jest kosztem."
+],
+"plTipPlanned": [
+"4326a18e06",
+"Plany, które tylko zaprojektowałeś. Nie wliczają się do dziennego limitu."
+],
+"plTitle": [
+"6aa0fd12fe",
+"Plan transakcji"
+],
+"plTop": [
+"8a661b765f",
+"Największy udział ryzyka"
+],
+"plTotal": [
+"77ffec55dd",
+"Wszystkie cele osiągnięte"
+],
+"plUnalloc": [
+"b92d412dc9",
+"Udział bez celu (nadal otwarty)"
+],
+"plW_fees": [
+"1ba96c9a8b",
+"Prowizje pochłaniają cały zysk z tych celów."
+],
 "place": [
 "6aea8612f3",
 "Złóż zlecenie"
@@ -5920,6 +6296,102 @@
 "random": [
 "7b57e4d500",
 "Losowy słupek"
+],
+"rcAdd": [
+"3b7e34f346",
+"Dodawane w każdym okresie"
+],
+"rcBE": [
+"f05a5bace4",
+"Cena break-even"
+],
+"rcBEafter": [
+"9efc4f3287",
+"Stop na break-even po celu 1"
+],
+"rcBEwin": [
+"5a7eb19d0d",
+"Wymagana skuteczność dla break-even"
+],
+"rcBal": [
+"98dcb75a7c",
+"Saldo konta"
+],
+"rcCt": [
+"5a0ba3bb83",
+"Kontrakt"
+],
+"rcDD": [
+"db066ddc8a",
+"Drawdown (%)"
+],
+"rcDDlimit": [
+"38fe5b1885",
+"Drawdown uznawany za bankructwo (%)"
+],
+"rcEV": [
+"26effee29e",
+"Wartość oczekiwana na transakcję"
+],
+"rcE_dist": [
+"12390b8d52",
+"Wejście i stop nie mogą być w tej samej cenie."
+],
+"rcE_lev": [
+"e81f8b7d27",
+"Dźwignia musi wynosić 1 lub więcej."
+],
+"rcE_num": [
+"e7dcd677d6",
+"Wpisz liczby dodatnie."
+],
+"rcE_oco_num": [
+"bcb3e41b53",
+"Wpisz wejście i stop w różnych cenach."
+],
+"rcE_oco_order": [
+"26adf98964",
+"Cele muszą oddalać się od wejścia w odpowiedniej kolejności."
+],
+"rcE_oco_pct": [
+"4993270f9b",
+"Udziały muszą sumować się do 100%."
+],
+"rcE_oco_tg": [
+"2cf289fad7",
+"Podaj od jednego do trzech celów."
+],
+"rcE_oco_tp": [
+"319a13b9cc",
+"Cel jest po złej stronie wejścia lub brakuje jego udziału."
+],
+"rcE_pctOver": [
+"bfbad21ecc",
+"Udziały celów sumują się do ponad 100%."
+],
+"rcE_risk": [
+"e1bdf14f74",
+"Ryzyko na transakcję nie może przekraczać 100%."
+],
+"rcE_side": [
+"3a9e32ddf9",
+"Stop jest po złej stronie wejścia."
+],
+"rcE_spotShort": [
+"6bc1577913",
+"Pozycja spot może być tylko typu long."
+],
+"rcE_tp": [
+"a5526e2098",
+"Cel jest po złej stronie wejścia."
+],
+"rcEntry": [
+"b30218aca8",
+"Cena wejścia"
+],
+"rcFee": [
+"6c58eac908",
+"Prowizja za stronę (%)"
 ],
 "rcW_noedge": [
 "abfe462fe4",
@@ -8067,21 +8539,9 @@
 "f6152b3b33",
 3
 ],
-"odAlBotCut": [
-"2fcde082d6",
-1
-],
-"odhA11": [
-"d35315306a",
-1
-],
-"odhCopied": [
-"a567d021f9",
-1
-],
 "odhTg": [
 "54f13b7555",
-1
+2
 ],
 "sendBot": [
 "28b70e4ad7",

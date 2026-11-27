@@ -37,6 +37,10 @@
 "7380ba50bf",
 "<b>50 talen en je eigen valuta:</b> de workspace in het Koerdisch, Perzisch, Arabisch, Engels en nog 46 talen, elk op een eigen adres (/market/de/, /market/jp/ …); elke Binance-coin in je eigen valuta (de euro, lira, roepie, yen en nog zo'n 150 andere), berekend zoals de toman via een dagelijkse referentiekoers, of via je eigen koers voor één tether of één dollar."
 ],
+"about.9481d12afe": [
+"9481d12afe",
+"De <b>ODM</b>-knop plant een volledige trade: gespreide instapmomenten, een ATR-stop, gespreide uitstapmomenten op basis van prijs, percentage of R, een trailing stop voor de rest, elk mogelijk scenario, een backtest op historische candles en een alert voor elk niveau."
+],
 "about.9f16c628ea": [
 "9f16c628ea",
 "<b>70 indicatoren:</b> moving averages in alle soorten (HMA, ALMA, TEMA…), Bollinger, Ichimoku, Alligator, pivot points, ZigZag, SuperTrend, VWAP, RSI, MACD, Stochastic, ADX, Aroon, Fisher, CMF en meer, met de definities van TradingView."
@@ -84,6 +88,10 @@
 "about.fb578e06d6": [
 "fb578e06d6",
 "<b>Prijs-, lijn- en indicator-alerts:</b> kruisen, omhoog of omlaag kruisen, boven of onder, % bewegingen; schuine trendlijnen, stralen en kanalen; RSI, voortschrijdend gemiddelde en EMA-kruisingen, MACD, Bollinger, SuperTrend, Stochastic en volumespikes; nieuws-alerts — met een einddatum, browsermelding, geluid en prijs-alerts die naar de Telegram-bot worden gestuurd."
+],
+"about.fca76d932c": [
+"fca76d932c",
+"De knop Databronnen (het download-icoon in de bovenbalk) toont gratis historische data voor crypto, forex, futures, aandelen en macro, inclusief de licentie en limieten van elke bron."
 ],
 "ac_bb_gt": [
 "8edb588c2d",
@@ -781,6 +789,34 @@
 "bbfa773e5a",
 "Sluiten"
 ],
+"cmMode": [
+"2c8ea521d1",
+"Candle-kleuring"
+],
+"cmModeH": [
+"8404fd51e3",
+"Op basis van richting, of een regel gelezen uit de bars."
+],
+"cmMom": [
+"cc8d5297d7",
+"Momentum (ROC 10)"
+],
+"cmRsi": [
+"b76fb892f0",
+"RSI (14)"
+],
+"cmStd": [
+"303ed38987",
+"Richting (omhoog / omlaag)"
+],
+"cmTrend": [
+"7fe9e85b12",
+"Trend (EMA 50)"
+],
+"cmVol": [
+"76fe65a559",
+"Volume-kracht"
+],
 "computed": [
 "fce79dfc7c",
 "berekend: Binance × tether-koers"
@@ -880,6 +916,10 @@
 "csDn": [
 "11f5ff3829",
 "Dalende candle"
+],
+"csDraw": [
+"9de36050c7",
+"Tekening"
 ],
 "csFont": [
 "b97c4d4cdd",
@@ -1033,13 +1073,61 @@
 "fe93409ef8",
 "{n} candles gedownload"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Alle alerts op deze coin"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Verwijder deze alert"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} alerts verwijderd."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Voeg hier een alert toe"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Alle tekeningen ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Alle indicatoren ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Terug"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Wis de gehele grafiek"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Verwijder elke tekening en indicator, en de ODM-niveaus met hun alerts, van {s}? Andere alerts blijven behouden. Je kunt dit ongedaan maken."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Grafiek gewist."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Kopieer deze prijs"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} tekeningen verwijderd."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Tekeningen, nieuwste eerst"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Een tekening…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1048,6 +1136,42 @@
 "ctxHline": [
 "588d2eb492",
 "Horizontale lijn hier"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Een indicator…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} indicatoren verwijderd."
+],
+"ctxNothing": [
+"300e0e8374",
+"Niets om te verwijderen"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Verwijder ODM-niveaus en alerts"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"ODM-niveaus en hun alerts"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Open ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Verwijder van grafiek"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} verwijderd."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Verwijder {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -1137,6 +1261,226 @@
 "3954de7300",
 "Alleen short"
 ],
+"dlAll": [
+"6a72085653",
+"Alles"
+],
+"dlBtn": [
+"dadd6ac5ba",
+"Databronnen"
+],
+"dlChecked": [
+"50f7b428c1",
+"Links en voorwaarden gecontroleerd op {d}. entekhab.net linkt alleen naar deze sites; het kopieert of host hun data niet."
+],
+"dlLic": [
+"d3980b6cf5",
+"Licentie of voorwaarden, zoals de aanbieder deze vermeldt"
+],
+"dlLicNone": [
+"be2ebfbb17",
+"Geen licentie vermeld"
+],
+"dlLicOther": [
+"bff074f4cc",
+"Aangepaste licentie"
+],
+"dlLicTerms": [
+"c66e6957e7",
+"Eigen voorwaarden"
+],
+"dlLicVaries": [
+"00231f3b79",
+"Per dataset"
+],
+"dlNone": [
+"0b16331ac1",
+"Geen bron komt overeen."
+],
+"dlNote": [
+"8209efc853",
+"Waar je gratis historische data kunt krijgen voor crypto, forex, futures, aandelen en macro, en gratis tools om deze te lezen. Elke link is geopend en de gratis tier en voorwaarden zijn gelezen. Voorwaarden veranderen, dus lees ze voordat je de data gebruikt of deelt. Verschillende bronnen staan alleen niet-commercieel gebruik toe."
+],
+"dlSearch": [
+"93386c6297",
+"Zoek bronnen"
+],
+"dlTip1": [
+"176e90a67b",
+"Converteer elke tijd naar UTC voordat je bestanden van verschillende bronnen samenvoegt."
+],
+"dlTip2": [
+"85b8a5f7d4",
+"Houd de kolommen in deze volgorde: time, open, high, low, close, volume."
+],
+"dlTip3": [
+"35478962a9",
+"Voor tick- of 1-minuut historie is Parquet veel kleiner en sneller dan CSV."
+],
+"dlTip4": [
+"b8885df839",
+"Markeer weekend- en vakantie-gaten in plaats van ze te vullen met verzonnen bars, anders zal een backtest handelen op prijzen die nooit hebben bestaan."
+],
+"dlTips": [
+"8c402b7491",
+"Data netjes importeren"
+],
+"dlTitle": [
+"b5822318cc",
+"Gratis marktdata en tools"
+],
+"dl_av": [
+"4839dbddf4",
+"Aandelen, forex en crypto via API met een gratis sleutel en een kleine dagelijkse verzoeklimiet. Lees de prijspagina voor de huidige limiet."
+],
+"dl_binv": [
+"a23b5a4769",
+"Maandelijkse en dagelijkse ZIP-bestanden van klines (1s tot 1 maand), trades en aggTrades voor Binance spot en USD-M/COIN-M futures. Geen account of sleutel nodig. Alleen niet-commercieel gebruik, niet opnieuw hosten, vermeld Binance Vision."
+],
+"dl_ccd": [
+"66dee06dc3",
+"Een script dat candles van Binance, OKX en Bybit naar schone bestanden dumpt, inclusief aangepaste intervallen. Een zeer nieuw project met weinig gebruikers."
+],
+"dl_cdd": [
+"e0fd7c2ef5",
+"Dagelijkse, uurlijkse en minuut CSV-bestanden van verschillende exchanges. Alleen niet-commercieel gebruik en niet opnieuw hosten."
+],
+"dl_duka": [
+"3a998ee29c",
+"Command-line tool die Dukascopy tick- en candle-historie downloadt voor forex, metalen, indices, energie en sommige crypto als CSV of JSON. De tool is MIT; Dukascopy's eigen voorwaarden voor de data zijn niet gepubliceerd."
+],
+"dl_evtl": [
+"19191f39b1",
+"Kant-en-klare OHLCV-bestanden met bid en ask gebouwd van Dukascopy ticks voor goud, zilver, grote forex paren, indices, BTC en ETH, M1 tot D1. Educatief gebruik met naamsvermelding."
+],
+"dl_finnhub": [
+"cb53f627f4",
+"Aandelen, forex en crypto via API met een gratis sleutel en een verzoeklimiet per minuut. Lees de prijspagina voor de huidige limiet."
+],
+"dl_fred": [
+"0496b77aa2",
+"Honderdduizenden Amerikaanse en wereldwijde economische reeksen: rentes, inflatie, banen. Gratis, maar de API heeft een sleutel nodig, de bron moet worden vermeld en de voorwaarden verbieden het cachen van de data."
+],
+"dl_freech": [
+"41c5b5ac27",
+"Webgrafieken die draaien op je eigen gratis API-sleutel (bijvoorbeeld Twelve Data of Binance)."
+],
+"dl_fx1m": [
+"2d40c5dac8",
+"Scripts en een archief van 1-minuut forex historie afkomstig van HistData, handig om in één keer te downloaden."
+],
+"dl_hf": [
+"d6bf62a064",
+"Kant-en-klare 1-minuut datasets voor grote Amerikaanse indices, futures, VIX en sommige crypto en grondstoffen. Aangepaste licentie: lees deze op de pagina."
+],
+"dl_hfd": [
+"c687eb1e28",
+"Gratis voorbeeldbestanden (10-seconden en 1-minuut) voor ES, NQ, goud, ruwe olie en anderen, en volledige dagelijkse historie met een gratis account. Geen licentie vermeld."
+],
+"dl_histdata": [
+"605a2236a9",
+"Gratis maandelijkse ZIP-bestanden van 1-minuut en tick forex data, geen aanmelding nodig. De site vermeldt geen licentie."
+],
+"dl_kaggle": [
+"6c66534191",
+"Duizenden kant-en-klare CSV-datasets; zoek op forex, crypto of goud. Elke dataset heeft zijn eigen licentie, dus controleer deze voor gebruik."
+],
+"dl_lse": [
+"575c1953d1",
+"Een zeer groot archief van aandelen, forex, crypto, futures, opties en macro-reeksen. Een gratis sleutel staat 10 downloads per uur toe als CSV of Parquet; exchange-gelicentieerde data is betaald."
+],
+"dl_lwc": [
+"4ab8089278",
+"De open-source grafiekbibliotheek waarop deze pagina is gebouwd. Gratis, inclusief voor commercieel gebruik, met naamsvermelding."
+],
+"dl_mt5": [
+"4caae7d59c",
+"Trading terminal waarvan het historiecentrum jaren aan forex, index en grondstof-candles naar CSV kan exporteren. Hoe ver het teruggaat hangt af van de broker."
+],
+"dl_okx": [
+"7021ebbbed",
+"Downloads van OKX spot en derivaten historie: candles vanaf juli 2023, funding rates vanaf maart 2022, trades vanaf september 2021."
+],
+"dl_openbb": [
+"b00e3cda10",
+"Open-source Python-platform dat veel gratis bronnen (Yahoo, FRED, exchanges en meer) op één plek samenbrengt. Gratis voor individuen."
+],
+"dl_pricehub": [
+"65f9da264e",
+"Een kleine Python-bibliotheek die OHLCV-candles ophaalt van 7 exchanges met één functie en zonder API-sleutel."
+],
+"dl_prt": [
+"08174f29c9",
+"Grafiekplatform met een gratis web-abonnement: end-of-day data, en 15-minuten vertraagde data voor sommige markten."
+],
+"dl_qdm": [
+"d0786b57ec",
+"Downloadt en reinigt tick- en candle-data van verschillende bronnen en exporteert deze naar vele formaten. Gratis tier met betaalde upgrades."
+],
+"dl_sifting": [
+"b3525e5ca6",
+"CSV- of Excel-export van Amerikaanse aandelen, forex, metalen en crypto. De laatste 24 uur (5-minuten tot 1-uur bars) vereisen geen account; langere historie vereist een gratis account en sleutel. Prijzen zijn niet gesplitst of dividend-gecorrigeerd."
+],
+"dl_stooq": [
+"3ca445487c",
+"Gratis dagelijkse (en sommige intraday) CSV-bestanden voor aandelen, indices, forex en grondstoffen. Bulk-downloads vragen om een CAPTCHA."
+],
+"dl_tickstory": [
+"b1a433f7bf",
+"Downloadt Dukascopy-data en exporteert deze voor MetaTrader of als CSV, waarbij gaten worden opgevuld. Gratis tier met betaalde upgrades."
+],
+"dl_tickview": [
+"debabf5f0c",
+"Open-source candle-grafieken met gratis Binance, Yahoo en CFTC-data, geen aanmelding nodig. Een klein, jong project."
+],
+"dl_truefx": [
+"8862a592ca",
+"Gratis tick-level forex historie na een gratis registratie."
+],
+"dl_tvcl": [
+"6475a0d996",
+"TradingView's grafiekbibliotheek voor je eigen site en data. Gratis voor publieke webprojecten op aanvraag; het TradingView-logo moet zichtbaar blijven."
+],
+"dl_twelve": [
+"be02a30e49",
+"Aandelen, ETF's, forex en crypto via API. Het gratis Basic-abonnement is alleen voor intern, niet-publiek gebruik, dus het kan geen publieke pagina aansturen."
+],
+"dl_yf": [
+"5437629d2b",
+"Python-bibliotheek die prijzen leest van Yahoo Finance. De code is Apache-2.0, maar Yahoo's data is alleen voor persoonlijk gebruik."
+],
+"dlc_api": [
+"ac6931afbb",
+"API's met een gratis sleutel"
+],
+"dlc_crypto": [
+"e849494484",
+"Crypto"
+],
+"dlc_ds": [
+"e6c2f4e616",
+"Kant-en-klare datasets"
+],
+"dlc_fut": [
+"1c0dd9564d",
+"Futures en grondstoffen"
+],
+"dlc_fx": [
+"faed5365ef",
+"Forex en CFD's"
+],
+"dlc_macro": [
+"1f8c0db097",
+"Macro en economie"
+],
+"dlc_stk": [
+"b179d8b69a",
+"Aandelen en multi-markt"
+],
+"dlc_tool": [
+"7869b0dbaa",
+"Tools en platforms"
+],
 "draft": [
 "23d33e22ac",
 "Concept"
@@ -1173,6 +1517,38 @@
 "d3bc9a378d",
 ","
 ],
+"ec_an": [
+"1780ecaa16",
+"Dieren"
+],
+"ec_fl": [
+"5d728758ad",
+"Vlaggen"
+],
+"ec_hd": [
+"23d3f6704e",
+"Handen en harten"
+],
+"ec_mk": [
+"569bbd757e",
+"Markt"
+],
+"ec_ob": [
+"72a83add2c",
+"Objecten"
+],
+"ec_rec": [
+"cc5bc923e8",
+"Recent gebruikt"
+],
+"ec_sm": [
+"fdbb8fef19",
+"Gezichten"
+],
+"ec_sy": [
+"22ad664e9e",
+"Symbolen"
+],
 "ecoCal": [
 "6d68264bb4",
 "Economische kalender"
@@ -1180,6 +1556,22 @@
 "editText": [
 "c3328c39b0",
 "Tekst"
+],
+"emoEmojis": [
+"ac171aacfa",
+"Emoji's"
+],
+"emoIcoNote": [
+"58a7f252e8",
+"Iconen nemen de kleur en grootte van de tekening aan: verander deze in de instellingen."
+],
+"emoIcons": [
+"edb8f6c142",
+"Iconen"
+],
+"emoStickers": [
+"9dca595b1a",
+"Stickers"
 ],
 "emptyList": [
 "544648e49b",
@@ -1305,9 +1697,29 @@
 "7f980d6a5f",
 "De trage lengte moet langer zijn dan de snelle."
 ],
+"favAdd": [
+"6b2ac06d56",
+"Toevoegen aan favorieten"
+],
+"favDel": [
+"624f82c132",
+"Verwijderen uit favorieten"
+],
+"favFull": [
+"3950f549f0",
+"De favorietenbalk is vol (24 tools)."
+],
+"favMove": [
+"6b9c3927d7",
+"Sleep om de balk te verplaatsen"
+],
 "favTf": [
 "ce59fda88d",
 "Vastpinnen op de werkbalk"
+],
+"favTools": [
+"4fa8cc860c",
+"Tools"
 ],
 "filled": [
 "f7b2d37425",
@@ -1520,6 +1932,42 @@
 "h_toman": [
 "329367a6b8",
 "Dollar, euro, goud, munten, zilver en elke crypto in toman, via de live tgju-koers."
+],
+"hdCon": [
+"5add073ddb",
+"Hoog contrast"
+],
+"hdMag": [
+"d7f87f222d",
+"Magneet"
+],
+"hdMagH": [
+"4c9991b205",
+"Snapt een nieuw punt naar de dichtstbijzijnde candle."
+],
+"hdMin": [
+"a711cca9a4",
+"Minimaal"
+],
+"hdMode": [
+"e2144806a5",
+"Selectie-handles"
+],
+"hdModeH": [
+"9263c148e4",
+"Houdt de candle eronder leesbaar."
+],
+"hdNorm": [
+"d00635865c",
+"Solide"
+],
+"hdTr": [
+"a09334607d",
+"Doorschijnend"
+],
+"hdTrans": [
+"7b2ec8c047",
+"Handle-transparantie"
 ],
 "helpTab": [
 "c47ae15370",
@@ -2685,6 +3133,166 @@
 "11eda67f9b",
 "Long"
 ],
+"lqBooks": [
+"52aa248e2a",
+"Orderboeken"
+],
+"lqBtn": [
+"76a3e625b1",
+"Liquiditeit"
+],
+"lqL_bnf": [
+"2d42564524",
+"Binance liquidaties"
+],
+"lqL_byf": [
+"738f6e941d",
+"Bybit liquidaties"
+],
+"lqLay_heat": [
+"996b295aa4",
+"Heatmap over tijd"
+],
+"lqLay_liq": [
+"30d1693268",
+"Liquidaties"
+],
+"lqLay_prof": [
+"1b7f22ab6a",
+"Book nu (rechterkant)"
+],
+"lqLayers": [
+"f055f18aea",
+"Lagen"
+],
+"lqLiqSum": [
+"53dd3e4363",
+"{n} liquidaties gezien sinds {since}: longs gesloten {l}, shorts gesloten {s}."
+],
+"lqLiqT": [
+"2e7bee73ac",
+"Liquidaties tijdens open"
+],
+"lqLiveOk": [
+"98aadb3708",
+"live"
+],
+"lqLong": [
+"5159d6b96c",
+"Long geliquideerd"
+],
+"lqMin": [
+"37e737d92c",
+"{n} min"
+],
+"lqNoSym": [
+"9eda810b3c",
+"De liquiditeitskaart werkt voor coins die tegen USDT worden verhandeld op Binance, Bybit of OKX. {s} is er daar geen van."
+],
+"lqNow": [
+"1cf45f3e25",
+"{n} orderboeken toegevoegd. Elk daarvan beslaat {lo} tot {hi}, in stappen van {step}. {k} metingen bewaard sinds je het hebt ingeschakeld ({since})."
+],
+"lqOff": [
+"1a01ac36a1",
+"Uit. Vink het vakje hierboven aan om de orderboeken te lezen."
+],
+"lqSec": [
+"55220b204c",
+"{n}s"
+],
+"lqShort": [
+"89d59d2f0a",
+"Short geliquideerd"
+],
+"lqShow": [
+"051401a51e",
+"Toon op de grafiek"
+],
+"lqSrcT": [
+"be018e47a2",
+"Bronnen en hoe actueel ze zijn"
+],
+"lqStep": [
+"41b6a9dc1c",
+"Prijsstap"
+],
+"lqTitle": [
+"5163cb5fa5",
+"Liquiditeitskaart"
+],
+"lqVBad": [
+"1ad25e9e10",
+"momenteel niet bereikbaar vanaf hier"
+],
+"lqVOk": [
+"f9efa46205",
+"boek van {lo} tot {hi}, gelezen {t} geleden"
+],
+"lqV_bnf": [
+"ec2ef9ae21",
+"Binance futures"
+],
+"lqV_bns": [
+"47849f1dfa",
+"Binance spot"
+],
+"lqV_byf": [
+"d88c2ab7c7",
+"Bybit futures"
+],
+"lqV_okx": [
+"71057c6407",
+"OKX spot"
+],
+"lqWDist": [
+"54ecd0e57f",
+"Vanaf midden"
+],
+"lqWHeld": [
+"87807a0b14",
+"Vastgehouden"
+],
+"lqWPrice": [
+"c20f7ce09a",
+"Prijsbereik"
+],
+"lqWSize": [
+"b7152342a2",
+"Grootte"
+],
+"lqWTop": [
+"06db06f316",
+"Grootste aandeel"
+],
+"lqWait": [
+"e9c5b7b234",
+"wachten op het eerste antwoord"
+],
+"lqWallNote": [
+"98ee1d2b6b",
+"\"Vastgehouden\" is hoe lang de muur minstens de helft van zijn grootte heeft behouden in de metingen die hier zijn opgeslagen."
+],
+"lqWallsT": [
+"1ef7390586",
+"Grootste muren nu"
+],
+"lqWhy1": [
+"6325436ac2",
+"Alleen gegevens die de exchanges publiceren: hun orderboeken, elke 10 seconden gelezen, en hun liquidatiefeeds. Niets wordt geschat en er worden geen \"liquidatieniveaus\" geraden op basis van leverage."
+],
+"lqWhy2": [
+"67effe4128",
+"Groen zijn wachtende kooporders, rood zijn wachtende verkooporders. De balken aan de rechterkant zijn de huidige orderboeken; de heatmap achter de candles is elke meting die bewaard is gebleven terwijl deze pagina open staat. Niets ouder kan worden getoond, omdat geen enkele gratis bron oude orderboeken bewaart."
+],
+"lqWhy3": [
+"f6d28bc855",
+"Een order kan op elk moment worden ingetrokken, dus een muur toont wat er was, geen belofte. Elk boek bereikt slechts een deel van de weg vanaf de prijs: voorbij het bereik dat elk gekozen boek beslaat, zouden totalen orders missen, dus ze worden vervaagd en uit de lijst gelaten. Binance verstuurt maximaal één liquidatie per coin per seconde, dus het aantal is een ondergrens; Bybit verstuurt ze allemaal."
+],
+"lqWhyT": [
+"2d7735c077",
+"Wat deze kaart toont, en wat niet"
+],
 "ly_live": [
 "c3d036c573",
 "Kurdistani live-analyse"
@@ -2765,9 +3373,65 @@
 "98d183e7cb",
 "Verplaatsen naar sectie"
 ],
+"ms_confirmed": [
+"8cc7acb8f3",
+"Bevestigd"
+],
+"ms_conflicting": [
+"41f18332f6",
+"Tegenstrijdig"
+],
+"ms_developing": [
+"7903b5f5b9",
+"In ontwikkeling"
+],
+"ms_insufficient": [
+"0da1cb3c48",
+"Onvoldoende data"
+],
+"ms_neutral": [
+"4bd2913945",
+"Neutraal"
+],
+"ms_tip_confirmed": [
+"d0f8fd73bd",
+"Trend, structuur en lean wijzen allemaal dezelfde kant op."
+],
+"ms_tip_conflicting": [
+"0161400e1f",
+"De EMA-trend en de swingstructuur, of de trend en MACD, wijzen de tegenovergestelde kant op."
+],
+"ms_tip_developing": [
+"c7be2bde9d",
+"De lean wijst één kant op, maar de trend of structuur is er nog niet bij aangesloten."
+],
+"ms_tip_insufficient": [
+"7f50d7c30d",
+"Minder dan 200 gesloten candles: EMA 200 en de 200-bar percentielen zijn niet beschikbaar."
+],
+"ms_tip_neutral": [
+"0ae8ec4891",
+"Geen lean naar beide kanten."
+],
+"mt_down": [
+"bf93e5ce8b",
+"Omlaag"
+],
+"mt_flat": [
+"79c9e13ab7",
+"Vlak"
+],
 "mt_mine": [
 "1cf761ac34",
 "Mijn scripts"
+],
+"mt_mixed": [
+"c0dcb865ad",
+"Gemengd"
+],
+"mt_na": [
+"1b93795b97",
+"—"
 ],
 "mt_opt": [
 "6bf5da9c08",
@@ -2788,6 +3452,66 @@
 "mt_strat": [
 "876f3e0202",
 "Strategieën"
+],
+"mt_up": [
+"2038bdec92",
+"Omhoog"
+],
+"mtfBtn": [
+"58947ebc8f",
+"Matrix"
+],
+"mtfLean": [
+"551b5aa2a6",
+"Lean"
+],
+"mtfNoData": [
+"5e59eb443a",
+"Geen data op deze timeframe"
+],
+"mtfNote": [
+"44b9187f41",
+"Elke cel is een vastgestelde regel op de gesloten candles van die timeframe. Timeframes zijn segmenten van één prijsreeks, dus hun overeenstemming is geen onafhankelijk bewijs, en niets hiervan voorspelt iets."
+],
+"mtfRegime": [
+"0b655e2471",
+"Regime"
+],
+"mtfShort": [
+"2567ff70d2",
+"Niet genoeg candles"
+],
+"mtfState": [
+"a725020675",
+"Status"
+],
+"mtfStruct": [
+"9482c5d5bf",
+"Structuur"
+],
+"mtfSum": [
+"25609d2c57",
+"{u} van {n} timeframes leunen omhoog, {d} leunen omlaag."
+],
+"mtfTf": [
+"f136a6c6e6",
+"TF"
+],
+"mtfTitle": [
+"80c7c684e0",
+"Timeframe matrix"
+],
+"mtfTrend": [
+"dae07c6ee8",
+"Trend"
+],
+"mtfVol": [
+"3b18e8e332",
+"Volume"
+],
+"mtfVola": [
+"205bdd6065",
+"Volatiliteit"
 ],
 "multiAl": [
 "5bafcd2412",
@@ -2980,6 +3704,730 @@
 "objects": [
 "d80a665c4b",
 "Tekeningen"
+],
+"odA_none": [
+"efac6f456a",
+"Direct"
+],
+"odA_pct": [
+"7724ed0a06",
+"Op % van gem."
+],
+"odA_price": [
+"34cd6e6ad0",
+"Op een prijs"
+],
+"odA_r": [
+"6e45e5e9e3",
+"Op × R"
+],
+"odAcc": [
+"e6018a209f",
+"Account en contract"
+],
+"odAddE": [
+"19172e9e47",
+"Entry"
+],
+"odAddX": [
+"f83b6fe3ae",
+"Exit"
+],
+"odAlAdd": [
+"f06c9cb834",
+"Voeg de aangevinkte alerts toe"
+],
+"odAlBot": [
+"3629af8343",
+"Alles aangevinkt naar de Telegram bot ({n})"
+],
+"odAlBotCut": [
+"2fcde082d6",
+"{n} van {m} niveaus passen in één Telegram link (stop en exits eerst). Voeg de rest toe met ✈ naast elk niveau."
+],
+"odAlDone": [
+"dcb0bb6e26",
+"{n} alerts toegevoegd, {d} stonden er al in."
+],
+"odAlNote": [
+"d01e0d0ed8",
+"Ze gaan naar je alerts-lijst en rinkelen in deze browser. Voor de Telegram bot, stuur alle aangevinkte niveaus tegelijk en tik op “Add all” daar, of tik op ✈ naast één niveau."
+],
+"odAlT": [
+"c4db405f26",
+"Een alert voor elk niveau"
+],
+"odAlerts": [
+"4d34373477",
+"Alerts voor elk niveau"
+],
+"odAmb": [
+"7802cc464b",
+"Onduidelijke bars"
+],
+"odAmbTip": [
+"bb7b5e1048",
+"Bars waar één candle twee niveaus bereikte. De candle kan niet laten zien welke eerst kwam, dus de slechtste werd genomen."
+],
+"odAt": [
+"1030b5c14f",
+"Resultaat als alles sluit op"
+],
+"odAtRes": [
+"ed6f422e42",
+"Resultaat op {p}"
+],
+"odAtrIs": [
+"a6c0a4559a",
+"ATR({n}) op {tf} = {v}, van {b} gesloten bars. De vormende bar is weggelaten."
+],
+"odAtrLen": [
+"0d1283ae88",
+"ATR lengte"
+],
+"odAtrNone": [
+"b5b8e149bf",
+"ATR({n}) heeft meer gesloten bars nodig op deze grafiek."
+],
+"odAvg": [
+"195d5c2e94",
+"Gemiddelde entry (alles gevuld)"
+],
+"odAvgAfter": [
+"6b5b19bc70",
+"Gemiddelde tot nu toe"
+],
+"odAvgS": [
+"bf3c2aa634",
+"Gem. tot nu toe"
+],
+"odBE": [
+"c728685de9",
+"Stop naar break-even"
+],
+"odBEAfter": [
+"a5351e110f",
+"Na exit {n}"
+],
+"odBENo": [
+"80c3052d33",
+"Nooit"
+],
+"odBack": [
+"50e2c403dc",
+"Start zoveel bars terug"
+],
+"odBars": [
+"b3c192ff2d",
+"Bars doorlopen"
+],
+"odBest": [
+"802503cf21",
+"Alle exits gevuld"
+],
+"odBtn": [
+"9cd499490a",
+"ODM"
+],
+"odClearedAl": [
+"10dc663b4f",
+"{m} ODM alerts verwijderd."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} niveaus en {m} ODM alerts verwijderd."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} op {p} ({d}% van de laatste prijs)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Sleep een lijn gemarkeerd met ↕ om deze te verplaatsen, of de ronde hendel om de start-candle te verplaatsen. Het plan wordt opnieuw berekend terwijl je sleept."
+],
+"odEExit": [
+"3d85c7e08a",
+"Exit {n}, dan de stop"
+],
+"odEExitBE": [
+"0ad2bfc2b3",
+"Exit {n}, dan break-even"
+],
+"odEOpen": [
+"5345d6a804",
+"Alle exits, {p}% nog open"
+],
+"odEStop": [
+"86bdb5dd1a",
+"Gestopt voor elke exit"
+],
+"odETrail": [
+"4a7ecb3fd6",
+"Alle exits, dan de trail op zijn minst"
+],
+"odETrailStop": [
+"aa767f2da5",
+"Alle exits, dan beweegt de trail nooit (worst case)"
+],
+"odE_act": [
+"62e5648dbd",
+"De start van de trail moet aan de winstkant van de gemiddelde entry liggen."
+],
+"odE_atr": [
+"806d58c951",
+"ATR is nog niet beschikbaar: laad meer historie of kies een ander stoptype."
+],
+"odE_entryPct": [
+"82eb26283f",
+"De entry-aandelen moeten optellen tot 100%."
+],
+"odE_gen": [
+"444ab6efd0",
+"Voor een ladder: een eerste prijs, 1–10 stappen en een gat onder 50%."
+],
+"odE_inverse": [
+"ab5e9b4538",
+"Coin-margined contracten worden hier niet gemodelleerd: gebruik de lineaire of spot-instelling."
+],
+"odE_lev": [
+"19c0779ac0",
+"Leverage moet tussen 1 en 500 liggen."
+],
+"odE_many": [
+"f6b50a805f",
+"Te veel rijen: maximaal 10 entries en 8 exits."
+],
+"odE_noEntry": [
+"919adac637",
+"Voeg ten minste één entry-prijs toe."
+],
+"odE_num": [
+"86a4dc7d7f",
+"Controleer de getallen: elk veld heeft een positief getal nodig."
+],
+"odE_order": [
+"2119b7e150",
+"Exit {n} moet verder liggen dan de exit ervoor."
+],
+"odE_pctOver": [
+"888f2ba05b",
+"De exits sluiten meer dan 100%."
+],
+"odE_risk": [
+"4193f0db38",
+"Risico kan niet meer dan 100% zijn."
+],
+"odE_side": [
+"e208f5757c",
+"De stop moet voorbij elke entry liggen: eronder voor een long, erboven voor een short."
+],
+"odE_spotShort": [
+"dff80cfcdf",
+"Spot kan niet worden geshort."
+],
+"odE_stop": [
+"6c5a7a58fe",
+"De stop heeft een geldige waarde nodig."
+],
+"odE_tp": [
+"2f260004d9",
+"Exit {n} moet aan de winstkant van de gemiddelde entry liggen."
+],
+"odE_trail": [
+"900ad94e6a",
+"De trail heeft een afstand nodig (een percentage onder 50, of een ATR-veelvoud)."
+],
+"odEnd": [
+"d2df8e9351",
+"Beëindigd door"
+],
+"odEnd_be": [
+"813161b07c",
+"Break-even"
+],
+"odEnd_exits": [
+"f80c25cfd5",
+"Alle exits"
+],
+"odh_exits_w": [
+"6583c3543e",
+"Elke take-profit met zijn prijs, aandeel, winst en R, inclusief kosten."
+],
+"odh_exits_y": [
+"6ffd5d67c1",
+"R = winst ÷ risico: 2R betekent twee keer wat je riskeerde."
+],
+"odh_fee_e": [
+"8921531f35",
+"Het openen en sluiten van 600 USDT tegen 0,1% kost ongeveer 0,60 + 0,60."
+],
+"odh_fee_t": [
+"6c58eac908",
+"Kosten per zijde (%)"
+],
+"odh_fee_w": [
+"6004b55350",
+"Wat de exchange rekent bij elke uitvoering, bij openen en sluiten. 0,1 betekent 0,1%."
+],
+"odh_fee_y": [
+"642cdb8277",
+"Het plan voegt kosten toe aan het verlies bij de stop en trekt ze af van elke winst, zodat de getallen zijn wat je werkelijk overhoudt."
+],
+"odh_fills_e": [
+"361360351c",
+"Als alleen E1 wordt uitgevoerd en de prijs draait naar de stop, verlies je 4,65. Na E1 en E2, 7,98. Na alle drie, 10: je volledige risico."
+],
+"odh_fills_t": [
+"f53f7d6784",
+"Entries, één voor één uitgevoerd"
+],
+"odh_fills_w": [
+"99acb19630",
+"Elke rij is één entry, in de volgorde waarin de prijs ze bereikt, met wat je aanhoudt en wat een stop-out op dat punt zou kosten."
+],
+"odh_fills_y": [
+"5a0b9cae0f",
+"Je ziet wat je hebt en wat je zou verliezen als de prijs daar zou draaien."
+],
+"odh_fiv_e": [
+"e7f856aebd",
+"24 uur met intervallen van 8 uur is 3 betalingen."
+],
+"odh_fiv_t": [
+"c23c171d42",
+"Funding interval (u)"
+],
+"odh_fiv_w": [
+"44fdbaad78",
+"Uren tussen funding betalingen, meestal 8, bij sommige coins 4 of 1."
+],
+"odh_fiv_y": [
+"94a10dd3eb",
+"Alleen volledige intervallen binnen je aanhoudtijd worden geteld."
+],
+"odh_frate_e": [
+"3f837807a7",
+"0,01 betekent 0,01% van de positie per interval."
+],
+"odh_frate_t": [
+"78ace74a36",
+"Funding rate (%)"
+],
+"odh_frate_w": [
+"927ac8eeff",
+"Het tarief dat elk interval wordt betaald tussen longs en shorts. Positief betekent dat longs shorts betalen."
+],
+"odh_frate_y": [
+"3d0ee675d0",
+"Wordt gebruikt om te schatten wat aanhouden kost of oplevert."
+],
+"odh_funding_e": [
+"ee50b81e00",
+"0,01% × 3 betalingen op 600 is −0,18 voor een long."
+],
+"odh_funding_t": [
+"6ff171c667",
+"Funding"
+],
+"odh_funding_w": [
+"64133ff6df",
+"De geschatte funding betaald (−) of ontvangen (+) terwijl je aanhoudt, over de volledige positie."
+],
+"odh_funding_y": [
+"b030dbc350",
+"Een long aanhouden op een perpetual kan stilletjes geld kosten."
+],
+"odh_gfirst_e": [
+"3d995fe6b8",
+"Eerste 61.590 met een stap van 1%: de volgende zijn 60.974 en 60.358 voor een long."
+],
+"odh_gfirst_t": [
+"de46c48c22",
+"Eerste prijs"
+],
+"odh_gfirst_w": [
+"cfd41aab02",
+"Waar de ladder begint, meestal nabij de huidige prijs."
+],
+"odh_gfirst_y": [
+"b3ad923426",
+"De andere stappen worden vanaf hier geplaatst, op één stapgrootte afstand."
+],
+"odh_gn_e": [
+"1239d66c32",
+"3 stappen van elk een derde, of 4 groeiende stappen van 10, 20, 30 en 40%."
+],
+"odh_gn_t": [
+"c4790c1a36",
+"Aantal stappen"
+],
+"odh_gn_w": [
+"1995ec85a3",
+"Hoeveel entries de ladder heeft, van 1 tot 10."
+],
+"odh_gn_y": [
+"43cfb5c4b3",
+"Meer stappen spreiden je entry. Minder stappen worden sneller uitgevoerd."
+],
+"odh_gsplit_e": [
+"fc81f5201f",
+"4 groeiende stappen: 10%, 20%, 30%, 40%."
+],
+"odh_gsplit_t": [
+"fc8230b411",
+"Verdeling"
+],
+"odh_gsplit_w": [
+"440061ba84",
+"Gelijk: elke stap krijgt hetzelfde aandeel. Groeiend: diepere stappen krijgen meer."
+],
+"odh_gsplit_y": [
+"64991c6f7a",
+"Groeiend trekt het gemiddelde dichter naar de diepere prijzen."
+],
+"odh_gstep_e": [
+"b0de2aa211",
+"1% van 61.590 geeft 60.974, daarna 60.358."
+],
+"odh_gstep_t": [
+"d1655c2e70",
+"Stapgrootte (%)"
+],
+"odh_gstep_w": [
+"9fe0fa2fbe",
+"Hoe ver de stappen uit elkaar liggen, als percentage van de vorige stap."
+],
+"odh_gstep_y": [
+"9515786990",
+"Wijdere stappen bereiken diepere dips maar worden mogelijk niet uitgevoerd."
+],
+"odh_hours_e": [
+"d9e97301c7",
+"48 uur met intervallen van 8 uur is 6 betalingen."
+],
+"odh_hours_t": [
+"4f7caed1a9",
+"Aanhouden voor (u)"
+],
+"odh_hours_w": [
+"0f42a300fc",
+"Hoe lang je verwacht de positie open te houden."
+],
+"odh_hours_y": [
+"ba701b1861",
+"Wordt gebruikt met de funding rate om funding te schatten."
+],
+"odh_lev_e": [
+"d39c72de29",
+"Een positie van 600 USDT heeft 120 marge nodig bij 5×, en 60 bij 10×."
+],
+"odh_lev_n": [
+"79cb13846f",
+"Jouw plan: positie {notional} tegen {lev}× heeft {margin} aan marge nodig."
+],
+"odh_lev_t": [
+"040daa23f9",
+"Leverage (×)"
+],
+"odh_lev_w": [
+"48f13cd159",
+"Hoeveel keer je marge de positie is."
+],
+"odh_lev_y": [
+"3f58eb70f9",
+"Het verandert de marge die je inlegt en de liquidatieprijs. Het verandert niet de grootte of het verlies bij de stop: die komen voort uit je risico."
+],
+"odh_liq_e": [
+"643586810b",
+"Bij 1× heeft een long meestal helemaal geen liquidatieprijs."
+],
+"odh_liq_t": [
+"8ee1ead8ac",
+"Vereenvoudigde geschatte liquidatie"
+],
+"odh_liq_w": [
+"7e48938681",
+"Een ruwe prijs waar de exchange de positie zou sluiten wegens gebrek aan marge, alleen op basis van leverage en onderhoudsmarge."
+],
+"odh_liq_y": [
+"b9fc181b96",
+"Als deze voor je stop ligt, sluit de exchange je voordat je plan dat doet: verlaag de leverage. Echte exchanges gebruiken tiers, de markprijs en kosten, dus behandel het als een schatting."
+],
+"odh_lossat_e": [
+"67df41a297",
+"−4,65 en 47%: na alleen E1 kost een stop-out 4,65, wat 47% is van de 10 die je riskeert."
+],
+"odh_lossat_t": [
+"b651bbbbf8",
+"Verlies als de stop hier wordt geraakt"
+],
+"odh_lossat_w": [
+"ff737e28b3",
+"Wat je verliest als deze stap wordt uitgevoerd en de prijs vervolgens draait en de stop raakt, inclusief kosten en slippage. De balk toont dit als aandeel van je volledige risico."
+],
+"odh_lossat_y": [
+"2dc8fd5f7a",
+"Je ziet in één oogopslag hoeveel van je risico in het spel is bij elke stap."
+],
+"odh_margin_e": [
+"6936a70109",
+"390 bij 1× heeft 390 nodig; bij 5×, 78."
+],
+"odh_margin_n": [
+"725dd35461",
+"Jouw: {margin} bij {lev}×."
+],
+"odh_margin_t": [
+"0d1a4bfb87",
+"Benodigde marge"
+],
+"odh_margin_w": [
+"a1b8f1e64e",
+"Positiewaarde ÷ leverage: wat de exchange inhoudt van je saldo."
+],
+"odh_margin_y": [
+"e96ecfca33",
+"Als dit meer is dan je saldo, kan het plan niet worden geopend zoals het is."
+],
+"odh_maxloss_e": [
+"7269d3f27d",
+"1% van 1.000: −10."
+],
+"odh_maxloss_n": [
+"64cbcec263",
+"Jouw: −{risk}."
+],
+"odh_maxloss_t": [
+"c668b9dc04",
+"Verlies bij de stop"
+],
+"odh_maxloss_w": [
+"2dffb76217",
+"Wat je verliest als elke entry wordt uitgevoerd en vervolgens de stop wordt geraakt, inclusief kosten en slippage."
+],
+"odh_maxloss_y": [
+"b3912a7024",
+"Het is altijd gelijk aan het risico dat je koos, omdat de grootte daarop was ingesteld."
+],
+"odh_mmode_e": [
+"15606fde2c",
+"Geïsoleerd met 120 marge: maximaal die 120 kan worden geliquideerd. Cross: de rest van het saldo houdt de positie ook in stand."
+],
+"odh_mmode_t": [
+"501f9eaddf",
+"Margin mode"
+],
+"odh_mmode_w": [
+"675627717c",
+"Geïsoleerd: alleen de marge van deze positie kan verloren gaan bij liquidatie. Cross: je volledige saldo ondersteunt de positie."
+],
+"odh_mmode_y": [
+"fef5b7b2b1",
+"Het verandert de vereenvoudigde liquidatieschatting."
+],
+"odh_mmr_e": [
+"4a9a37cf10",
+"0,5% van een positie van 10.000 is 50."
+],
+"odh_mmr_t": [
+"6ccd06f6ff",
+"Onderhoudsmarge (%)"
+],
+"odh_mmr_w": [
+"102720cee3",
+"De minimale marge die de exchange aanhoudt voor de positie. Daaronder begint liquidatie."
+],
+"odh_mmr_y": [
+"7bf4734885",
+"Alleen gebruikt voor de vereenvoudigde liquidatieschatting. Controleer de echte tier op je exchange."
+],
+"odh_more_e": [
+"78ebacc245",
+"0,01% elke 8 uur, 24 uur aangehouden, op een positie van 600 is ongeveer 0,18."
+],
+"odh_more_t": [
+"4bab2d8fe1",
+"Meer"
+],
+"odh_more_w": [
+"42278ba47e",
+"Funding voor perpetuals, en het resultaat bij elke prijs die je typt."
+],
+"odh_more_y": [
+"7b885c8e67",
+"Een perpetual aanhouden kan elke paar uur funding kosten of opleveren."
+],
+"odh_notional_e": [
+"300ce48960",
+"0,0064 × 60.974 is ongeveer 390."
+],
+"odh_notional_n": [
+"304a790b10",
+"Jouw: {notional}."
+],
+"odh_notional_t": [
+"629c8eb9ba",
+"Positiewaarde"
+],
+"odh_notional_w": [
+"9b6b8c5e1f",
+"Hoeveelheid × gemiddelde entry, in USDT."
+],
+"odh_notional_y": [
+"d6c958086a",
+"De exchange rekent kosten en marge over deze waarde."
+],
+"odh_qty_e": [
+"08a3a24441",
+"10 in risico ÷ (R 1.443 + kosten van ongeveer 121) is ongeveer 0,0064 BTC."
+],
+"odh_qty_n": [
+"e4723fbfba",
+"Jouw: {qty}."
+],
+"odh_qty_t": [
+"44f6af6945",
+"Hoeveelheid"
+],
+"odh_qty_w": [
+"8214deadd9",
+"De totale grootte in coins als elke entry wordt uitgevoerd."
+],
+"odh_qty_y": [
+"7cc786bbf8",
+"Het is zo berekend dat het verlies bij de stop gelijk is aan je risico."
+],
+"odh_risk_e": [
+"58a2bde113",
+"1% van 1.000 is 10. Als de stop ongeveer 1.000 onder de gemiddelde entry van een long ligt, komt de positie uit op ongeveer 0,01 BTC."
+],
+"odh_risk_n": [
+"524652bc5e",
+"Jouw plan: een stop-out kost {risk}, wat {rp}% is van {bal}."
+],
+"odh_risk_t": [
+"b031aee373",
+"Risico per trade (%)"
+],
+"odh_risk_w": [
+"e16cd1d147",
+"Het aandeel van je saldo dat je accepteert te verliezen als elke entry wordt uitgevoerd en vervolgens de stop wordt geraakt, inclusief kosten en slippage."
+],
+"odh_risk_y": [
+"2a1118ce86",
+"ODM werkt hier achteruit vanaf: het bepaalt de grootte van de positie zodat een stop-out precies dit bedrag kost, nooit meer."
+],
+"odh_side_e": [
+"025ebc9d4e",
+"Long BTC op 60.000 met de stop op 58.000. Een short op 60.000 heeft zijn stop erboven nodig, bijvoorbeeld 62.000."
+],
+"odh_side_t": [
+"26528381ea",
+"Zijde"
+],
+"odh_side_w": [
+"fd310748ba",
+"Long: je koopt en maakt winst als de prijs stijgt. Short: je verkoopt eerst en maakt winst als de prijs daalt."
+],
+"odh_side_y": [
+"f88bf6b76d",
+"Het bepaalt aan welke kant van je entries de stop moet staan, en welke kant als winst telt."
+],
+"odh_slip_e": [
+"13a80c38b2",
+"De stop van een long op 58.000 met slippage 20 wordt geteld als uitgevoerd op 57.980."
+],
+"odh_slip_t": [
+"9cc2898876",
+"Slippage (prijseenheden)"
+],
+"odh_slip_w": [
+"9210080f38",
+"Hoeveel slechter dan de stopprijs een stoporder kan worden uitgevoerd in een snelle markt, in prijs."
+],
+"odh_slip_y": [
+"4176d4998f",
+"Het wordt toegevoegd aan het verlies bij de stop, dus een slechte uitvoering zit al in je risico."
+],
+"odh_smode_e": [
+"d0f6baa41b",
+"ATR 600 × 2 plaatst de stop 1.200 onder de diepste entry van een long."
+],
+"odh_smode_t": [
+"58ec1c7c84",
+"Stopmethode"
+],
+"odh_smode_w": [
+"48702e26b7",
+"ATR: een veelvoud van de recente gemiddelde range voorbij je diepste entry. Percentage: een percentage voorbij de diepste entry. Prijs: een prijs die je typt."
+],
+"odh_smode_y": [
+"ed4407ed0d",
+"ATR volgt hoeveel de coin nu beweegt, dus de stop is niet te krap op een wilde dag."
+],
+"odh_stop_e": [
+"8926c096e7",
+"Gemiddelde 60.974 en stop 59.531: R = 1.443. Met 10 in risico houdt het plan ongeveer 0,0064 BTC aan."
+],
+"odh_stop_n": [
+"9c95f89f46",
+"Jouw stop: {sl}, dus R = {R}."
+],
+"odh_stop_t": [
+"ecfdc40665",
+"Stop loss"
+],
+"odh_stop_w": [
+"5522c198b4",
+"De prijs waar het idee onjuist is en elke uitgevoerde entry met verlies sluit."
+],
+"odh_stop_y": [
+"d7b6da198b",
+"Samen met je risico bepaalt het de grootte: een dichtere stop betekent een grotere positie voor hetzelfde risico."
+],
+"odh_stopat_e": [
+"2cb46a1ee6",
+"Met ATR × 2 en ATR 600, ligt deze 1.200 voorbij je diepste entry."
+],
+"odh_stopat_n": [
+"d05e23b4c8",
+"Jouw: {sl}."
+],
+"odh_stopat_t": [
+"9e253470c8",
+"Stop"
+],
+"odh_stopat_w": [
+"d16b105abf",
+"De stopprijs die dit plan gebruikt, op basis van de gekozen methode."
+],
+"odh_stopat_y": [
+"91a65418b9",
+"Elke uitgevoerde entry sluit hier als het idee faalt."
+],
+"odh_sval_e": [
+"0c941866f5",
+"2 met ATR, 1,5 met percentage, of 59.500 met prijs."
+],
+"odh_sval_t": [
+"0622db62de",
+"Stopwaarde"
+],
+"odh_sval_w": [
+"ba80c38465",
+"Het getal voor de methode: het ATR-veelvoud, het percentage, of de prijs."
+],
+"odh_sval_y": [
+"f976dd936f",
+"Verander dit om de stop te verplaatsen. De grootte wordt bijgewerkt zodat het risico gelijk blijft."
+],
+"odh_tact_e": [
+"2e0ede00f1",
+"Start na 1R: de trail schakelt in zodra de prijs 1R winst heeft."
+],
+"odh_tact_t": [
+"be92240002",
+"Trail start"
 ],
 "of_price": [
 "3e8248e32e",
