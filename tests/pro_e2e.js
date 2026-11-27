@@ -1402,7 +1402,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
     ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - (zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - (zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0, JSON.stringify({ Zn, zy }));
     const tint = await page.evaluate(([Z]) => {
-      const c = PRO.app.active(), cv = c.chart.takeScreenshot(), k = cv.width / c.box.getBoundingClientRect().width, g = cv.getContext('2d');
+      const c = PRO.app.active(), cv = c.chart.takeScreenshot(), k = window.devicePixelRatio || 1, g = cv.getContext('2d');
       const at = (x, y) => { const d = g.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data; return [d[0], d[1], d[2]]; };
       const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12;
       let gr = 0, rd = 0, n1 = 0, n2 = 0;
@@ -1531,11 +1531,11 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     /* inside the position box, away from any line: the position's own menu */
     {
       const zp = await page.evaluate(() => { const Z = PRO.odmZone(), L = PRO.odmLive(), c = PRO.app.active(), ys = L.levels.map(l => l.y).concat(PRO.alertLines(c.cfg.sym).map(a => c.main.priceToCoordinate(a.v))), hu = document.querySelector('.pm-odhud'), bt = c.box.getBoundingClientRect().top, hr = hu ? hu.getBoundingClientRect() : null;
-        let best = null, bd = -1; for (let y = Z.top + 4; y < Z.bot - 4; y += 3) { if (hr && y >= hr.top - bt - 8 && y <= hr.bottom - bt + 8) continue; const d = Math.min(...ys.filter(v => v != null).map(v => Math.abs(v - y))); if (d > bd) { bd = d; best = y; } }
+        let best = null, bd = -1; const bx = c.box.getBoundingClientRect().left + Z.x0 + (Z.x1 - Z.x0) * 0.75; for (let y = Z.top + 4; y < Z.bot - 4; y += 3) { if (hr && y >= hr.top - bt - 8 && y <= hr.bottom - bt + 8) continue; const el = document.elementFromPoint(bx, bt + y); if (!el || !el.closest('.pm-chart')) continue; const d = Math.min(...ys.filter(v => v != null).map(v => Math.abs(v - y))); if (d > bd) { bd = d; best = y; } }
         return best == null ? null : { x: c.box.getBoundingClientRect().left + Z.x0 + (Z.x1 - Z.x0) * 0.75, y: best, d: bd, side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort') }; });
       if (zp && zp.d > 8) {
         await rclick(zp.y, zp.x); M = await menuTxt();
-        ok(`[${tag}] right-click inside the position box offers Open ODM and Remove for the position`, M.heads[0] && M.heads[0].startsWith('ODM · ' + zp.side) && has(M, 'ctxOdmHide'), JSON.stringify(M.heads));
+        ok(`[${tag}] right-click inside the position box offers Open ODM and Remove for the position`, M.heads[0] && M.heads[0].startsWith('ODM · ' + zp.side) && has(M, 'ctxOdmHide'), JSON.stringify({ heads: M.heads, zp, under: M.heads.length ? '' : await under(zp.x, L0.box.t + zp.y) }));
         await page.keyboard.press('Escape'); await page.waitForTimeout(80);
       } else ok(`[${tag}] room inside the box to right-click`, false, JSON.stringify(zp));
     }
