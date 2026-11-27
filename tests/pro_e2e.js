@@ -1197,10 +1197,16 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     let g0 = await geo();
     ok(`[${tag}] a long position is placed, selected and its planner card opens`, g0 && g0.pts.length === 3 && g0.sel && g0.card, JSON.stringify(g0 && { n: g0.pts.length, sel: g0.sel, card: g0.card }));
     if (g0 && g0.tg) {
+      const cover = await page.evaluate(g => [g.entry, g.tg, g.sl].map(p => { const e = document.elementFromPoint(p.x, p.y); return e ? !!e.closest('.pm-plan') : null; }), g0);
+      ok(`[${tag}] the planner card covers none of the position's handles`, cover.every(x => x === false), JSON.stringify(cover));
+      if (vw < 600) {
+        const fo = await page.evaluate(() => { const c = document.querySelector('.pm-plan'); const a = c.classList.contains('pm-plmin'); c.querySelector('.pm-plh b').click(); const b = c.classList.contains('pm-plmin'); c.querySelector('.pm-plh b').click(); return { a, b, c: c.classList.contains('pm-plmin'), s: c.querySelector('.pm-pls').textContent }; });
+        ok(`[${tag}] on a phone the card starts folded with the loss and R:R in its header, and a tap opens and folds it`, fo.a && !fo.b && fo.c && /R/.test(fo.s), JSON.stringify(fo));
+      }
       const drag = async (p, dy) => { await page.mouse.move(p.x, p.y); await page.mouse.down(); await page.mouse.move(p.x, p.y + dy, { steps: 6 }); await page.mouse.up(); await page.waitForTimeout(250); };
       /* target alone */
-      await drag(g0.tg, -18); let g1 = await geo();
-      ok(`[${tag}] dragging the target moves only the target`, g1.pts[1].p > g0.pts[1].p && g1.pts[0].p === g0.pts[0].p && g1.pts[2].p === g0.pts[2].p, JSON.stringify([g0.pts.map(p => p.p), g1.pts.map(p => p.p)]));
+      await drag(g0.tg, -18); let g1 = await geo(); const hitT = await page.evaluate(p => { const c = PRO.app.active(), r = c.drawer.o.el.getBoundingClientRect(), h = c.drawer.hit(p.x - r.left, p.y - r.top), e = document.elementFromPoint(p.x, p.y); return { part: h && h.part, at: e ? e.tagName + '.' + String(e.className).slice(0, 40) : null, pane: c.drawer.pane() }; }, g1.tg);
+      ok(`[${tag}] dragging the target moves only the target`, g1.pts[1].p > g0.pts[1].p && g1.pts[0].p === g0.pts[0].p && g1.pts[2].p === g0.pts[2].p, JSON.stringify([g0.pts.map(p => p.p), g1.pts.map(p => p.p), hitT, g0.tg]));
       /* stop alone */
       await drag(g1.sl, 14); let g2 = await geo();
       ok(`[${tag}] dragging the stop moves only the stop`, g2.pts[2].p < g1.pts[2].p && g2.pts[0].p === g1.pts[0].p && g2.pts[1].p === g1.pts[1].p, JSON.stringify(g2.pts.map(p => p.p)));
@@ -1228,7 +1234,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       ok(`[${tag}] zoom and scroll change no price or time of the position`, JSON.stringify(before) === JSON.stringify(after));
       /* a click on empty chart deselects */
       await page.mouse.click(box.x + box.width * 0.1, box.y + box.height * 0.8); await page.waitForTimeout(200);
-      const ds = await page.evaluate(() => ({ sel: PRO.app.active().drawer.sel, card: !!document.querySelector('.pm-plan') }));
+      const ds = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y), c = PRO.app.active(); return { sel: c.drawer.sel, card: !!document.querySelector('.pm-plan'), at: e ? e.tagName + '.' + e.className : null, n: (PRO.app.DRAW()[c.cfg.sym] || []).length, tool: c.drawer.tool }; }, [box.x + box.width * 0.1, box.y + box.height * 0.8]);
       ok(`[${tag}] a click on empty chart deselects the position and closes the card`, !ds.sel && !ds.card, JSON.stringify(ds));
       /* a timeframe change keeps the levels */
       await page.evaluate(() => PRO.app.active().setTF ? PRO.app.active().setTF('4h') : null); await page.waitForTimeout(1200);

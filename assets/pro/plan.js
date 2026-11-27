@@ -99,7 +99,7 @@
   function tz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { return ''; } }
 
   var card = null, raf = 0, shown = null, sig = '';
-  function close() { if (card) card.remove(); card = null; shown = null; sig = ''; cancelAnimationFrame(raf); }
+  function close() { if (card) card.remove(); card = null; shown = null; sig = ''; cur = ''; cancelAnimationFrame(raf); }
   function inputs(d) {
     var s = d.s || {}, e = d.pts[0].p, R = Math.abs(e - d.pts[2].p), dir = d.k === 'long' ? 1 : -1, tg = [{ p: d.pts[1].p, q: isFinite(s.q1) ? +s.q1 : 100 }];
     if (+s.r2 > 0) tg.push({ p: e + dir * s.r2 * R, q: isFinite(s.q2) ? +s.q2 : 0 }); if (+s.r3 > 0) tg.push({ p: e + dir * s.r3 * R, q: isFinite(s.q3) ? +s.q3 : 0 });
@@ -111,6 +111,7 @@
     if (!card) return; var r = P.plan(inputs(d)), o = $('.pm-plo', card); o.innerHTML = '';
     var full = card.classList.contains('pm-plx');
     function row(a, b, cls, tip) { var x = h('<div class="pm-plr' + (cls ? ' ' + cls : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', x).textContent = a; $('b', x).textContent = b; if (tip) x.title = tip; o.appendChild(x); }
+    var su = $('.pm-pls', card); if (su) su.textContent = r.err ? '!' : sg(r.netStop) + (r.rr != null ? ' · ' + f(r.rr, 2) + 'R' : '');
     if (r.err) { var w = h('<div class="pm-cw2"></div>'); w.textContent = T('rcE_' + r.err); o.appendChild(w); return; }
     row(T('rcEntry'), px(d.pts[0].p)); row(T('rcStop'), px(d.pts[2].p), 'dn'); row(T('rcQty'), f(r.qty, 8)); row(T('rcNotional'), f(r.notional)); row(T('rcMargin'), f(r.margin));
     row(T('rcMaxLoss'), sg(r.netStop), 'dn', T('plTipLoss')); row(T('rcBE'), px(r.breakeven));
@@ -127,10 +128,23 @@
     var warn = !r.marginOk ? T('rcW_margin') : r.liqBeforeStop ? T('rcW_liq') : r.profit != null && r.profit <= 0 ? T('plW_fees') : '';
     if (warn) { var wn = h('<div class="pm-cw2"></div>'); wn.textContent = warn; o.appendChild(wn); }
   }
+  /* keep the card off the position: it sits on whichever side of the screen covers less of the position's box */
+  var cur = '';
+  function side(cell, nd) {
+    if (!card || card.classList.contains('pm-plmin')) { if (cur) { card.style.left = card.style.right = ''; cur = ''; } return; }
+    var q = nd._g && nd._g.pos, el = cell.drawer && cell.drawer.o.el; if (!q || !el) return;
+    var root = card.parentNode, R = root.getBoundingClientRect(), E = el.getBoundingClientRect(), cw = card.offsetWidth, m = 58;
+    var a = E.left + Math.min(q.x0, q.x1) - 12, b = E.left + Math.max(q.x0, q.x1) + 12;
+    function ov(l, r) { return Math.max(0, Math.min(b, r) - Math.max(a, l)); }
+    var oR = ov(R.right - m - cw, R.right - m), oL = ov(R.left + m, R.left + m + cw), def = A.RTL() ? 'L' : 'R';
+    var want = (def === 'R' ? oR : oL) <= (def === 'R' ? oL : oR) ? def : (def === 'R' ? 'L' : 'R');
+    if (want === cur || (!cur && want === def)) { cur = cur || def; return; }
+    cur = want; if (want === 'R') { card.style.right = m + 'px'; card.style.left = 'auto'; } else { card.style.left = m + 'px'; card.style.right = 'auto'; }
+  }
   function open(cell, d) {
     close(); if (!d || (d.k !== 'long' && d.k !== 'short')) return;
     var root = $('#pro'); if (!root) return;
-    card = h('<div class="pm-plan" dir="' + (A.RTL() ? 'rtl' : 'ltr') + '"><div class="pm-plh"><b></b><button type="button" class="pm-ib" data-m aria-label=""></button><button type="button" class="pm-ib" data-x aria-label="' + esc(T('close')) + '">' + A.ic('x') + '</button></div><div class="pm-plg"></div><div class="pm-plo"></div><div class="pm-row"><button type="button" class="pm-btn pri" data-save></button><button type="button" class="pm-btn" data-board></button></div><p class="pm-enote"></p></div>');
+    card = h('<div class="pm-plan" dir="' + (A.RTL() ? 'rtl' : 'ltr') + '"><div class="pm-plh"><b role="button" tabindex="0"></b><span class="pm-pls pm-num" dir="ltr"></span><button type="button" class="pm-ib" data-m aria-label=""></button><button type="button" class="pm-ib" data-x aria-label="' + esc(T('close')) + '">' + A.ic('x') + '</button></div><div class="pm-plg"></div><div class="pm-plo"></div><div class="pm-row"><button type="button" class="pm-btn pri" data-save></button><button type="button" class="pm-btn" data-board></button></div><p class="pm-enote"></p></div>');
     $('b', card).textContent = T('plTitle') + ' · ' + T(d.k === 'long' ? 'rcLong' : 'rcShort2'); $('[data-save]', card).textContent = T('plSave'); $('[data-board]', card).textContent = T('plBoard'); $('p', card).textContent = T('plNote');
     var mb = $('[data-m]', card); function mlab() { var x = card.classList.contains('pm-plx'); mb.textContent = x ? '−' : '+'; mb.title = mb.ariaLabel = T(x ? 'plCompact' : 'plExpand'); }
     if (ACC.planFull) card.classList.add('pm-plx'); mlab(); mb.onclick = function () { card.classList.toggle('pm-plx'); ACC.planFull = card.classList.contains('pm-plx') ? 1 : 0; saveAcc(); mlab(); sig = ''; };
@@ -143,6 +157,11 @@
     drwF('q1', 'plShare1', 100); drwF('r2', 'plR2', ''); drwF('q2', 'plShare2', ''); drwF('r3', 'plR3', ''); drwF('q3', 'plShare3', '');
     accF('slip', 'rcSlip', 0, 1); accS('contract', 'rcCt', ['linear', 'inverse', 'spot']); accS('marginMode', 'rcMode', ['isolated', 'cross']); accF('mmrPct', 'rcMmr', 0.5, 1);
     accF('fundingPct', 'plFundRate', 0, 1); accF('fundHrs', 'plFundIv', 8, 1); accF('hours', 'plHours', 0, 1);
+    /* on a phone the card starts folded to its header, so the chart and the position's handles stay free; a tap opens it */
+    var hb = $('.pm-plh b', card); function fold() { card.classList.toggle('pm-plmin'); hb.setAttribute('aria-expanded', card.classList.contains('pm-plmin') ? 'false' : 'true'); }
+    if (root.clientWidth < 600) card.classList.add('pm-plmin'); hb.setAttribute('aria-expanded', card.classList.contains('pm-plmin') ? 'false' : 'true');
+    hb.onclick = fold; hb.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fold(); } };
+    $('.pm-pls', card).onclick = fold;
     $('[data-x]', card).onclick = close;
     $('[data-board]', card).onclick = function () { P.riskBoard(); };
     $('[data-save]', card).onclick = function () {
@@ -158,6 +177,7 @@
       if (!nd) { close(); return; }
       var sgn = nd.pts[0].p + '|' + nd.pts[1].p + '|' + nd.pts[2].p + '|' + JSON.stringify(nd.s || {}) + '|' + JSON.stringify(ACC);
       if (sgn !== sig) { sig = sgn; paint(cell, nd); }
+      side(cell, nd);
       raf = requestAnimationFrame(loop);
     })();
   }
