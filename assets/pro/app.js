@@ -1902,9 +1902,9 @@
   setTimeout(headerGlobe, 0);
   function langDialog() {
     closeMenu();
-    var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note pm-kurd" translate="no"></p><p class="pm-note"></p></div>');
+    var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note pm-kurd" translate="no"></p></div>');
     var inp = $('input', box), list = $('.pm-lgl', box);
-    inp.placeholder = T('langSearch'); inp.setAttribute('aria-label', T('langSearch')); $('.pm-note:not(.pm-kurd)', box).textContent = T('langNote');
+    inp.placeholder = T('langSearch'); inp.setAttribute('aria-label', T('langSearch'));
     var kn = P.KURD_NOTE || {}, kp = $('.pm-kurd', box), kt = kn[LANG] || kn.en;
     if (kt) { kp.textContent = kt; kp.setAttribute('lang', (LROW[LANG] || [])[4] || LANG); } else kp.remove();
     function draw() {
