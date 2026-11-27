@@ -1406,12 +1406,15 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.55 + i * 0.04); for (const f of [0.3, 0.7]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg)) out.push([x, yg, 'g']); if (clear(yr)) out.push([x, yr, 'r']); } }
       return out;
     }, [Zn]);
-    const px = () => page.evaluate(([pts]) => { const c = PRO.app.active(), cv = c.chart.takeScreenshot(true), k = window.devicePixelRatio || 1, g = cv.getContext('2d'); return pts.map(([x, y]) => [...g.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data].slice(0, 3)); }, [pts]);
-    const on1 = await px(); await page.evaluate(() => PRO._odmZoneVis(false)); await page.waitForTimeout(150);
-    const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(150);
+    /* what the screen shows, with and without the box (the same moment, the same candles) */
+    const clip = { x: Math.round(L0.box.l + Zn.x0), y: Math.round(L0.box.t + Zn.top), width: Math.max(4, Math.round(Zn.x1 - Zn.x0)), height: Math.max(4, Math.round(Zn.bot - Zn.top)) };
+    const px = async () => { const b64 = (await page.screenshot({ clip })).toString('base64'); return page.evaluate(async ([b64, pts, clip, l, t]) => { const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode(); const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; const g = cv.getContext('2d'); g.drawImage(im, 0, 0); const k = im.width / clip.width;
+      return pts.map(([x, y]) => [...g.getImageData(Math.max(0, Math.min(im.width - 1, Math.round((l + x - clip.x) * k))), Math.max(0, Math.min(im.height - 1, Math.round((t + y - clip.y) * k))), 1, 1).data].slice(0, 3)); }, [b64, pts, clip, L0.box.l, L0.box.t]); };
+    const on1 = await px(); await page.evaluate(() => PRO._odmZoneVis(false)); await page.waitForTimeout(200);
+    const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(200);
     const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
     pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
-    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 6 && tint.n2 >= 6 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify(tint));
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 6 && tint.n2 >= 6 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
     /* the round handle on the entry line moves the start candle; Undo puts it back */
     {
       const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;

@@ -834,6 +834,8 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-odhm{margin:3px 0 5px;color:#b9b9b2;font-size:11.5px}.pm-odhm.dn{color:#ff8a80}
 .pm-odhb{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .pm-odhb .pm-btn.sm{margin:0;padding:4px 9px;min-height:28px}
+/* the panel lets a touch or a click on its text go through to the chart, so a line under it can still be grabbed or long-pressed */
+.pm-odhud{pointer-events:none}.pm-odhud button{pointer-events:auto}
 .pm-odhb [data-pk].on{background:#f7931a;color:#141414;border-color:#f7931a}
 .pm-odhb .pm-ib{width:28px;height:28px;border:1px solid rgba(255,255,255,.14)}
 .pm-odhb .pm-ib:disabled{opacity:.35;cursor:default}
