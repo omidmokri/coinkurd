@@ -21,6 +21,9 @@ ok(Q.VEN.byf.parse({ retCode: 10001, result: {} }) === null && Q.VEN.okx.parse({
 ok(Q.rows([['1', '2'], ['x', '1'], ['-1', '3'], ['2', '0'], ['3', 'NaN'], 'junk', ['4', '5']]).join('|') === '1,2|4,5', 'rows drop anything not a positive finite price and size');
 ok(Q.VEN.okx.url('BTCUSDT').endsWith('instId=BTC-USDT&sz=400') && Q.VEN.bnf.url('ETHUSDT').includes('symbol=ETHUSDT&limit=1000') && Q.VEN.bns.url('ETHUSDT').includes('limit=5000') && Q.VEN.byf.url('SOLUSDT').includes('category=linear&symbol=SOLUSDT&limit=500'), 'each venue is asked for its deepest free book');
 ok(Q.SYMOK.test('BTCUSDT') && !Q.SYMOK.test('BTC') && !Q.SYMOK.test('IR_USD') && !Q.SYMOK.test('btcusdt') && !Q.SYMOK.test('BTCUSDT/../x'), 'only coin/USDT symbols are asked for');
+{ const inst = (x) => x === 'BTC' || x === 'S' || x === 'USDT' ? { kind: 'usdt', base: x } : x === 'BTC_IRT' ? { kind: 'irt', base: 'BTC' } : x === 'BTC_EUR' ? { kind: 'fiat', base: 'BTC' } : x === 'IR_USD' ? { kind: 'ir', base: 'USD' } : null;
+  ok(Q.exOf('BTC', inst) === 'BTCUSDT' && Q.exOf('S', inst) === 'SUSDT', 'a chart of BTC (BTC/USDT) asks the exchanges for BTCUSDT, one-letter coins too');
+  ok([Q.exOf('BTC_IRT', inst), Q.exOf('BTC_EUR', inst), Q.exOf('IR_USD', inst), Q.exOf('USDT', inst), Q.exOf('NOPE', inst), Q.exOf('BTC', null)].every(v => v === null), 'toman, euro, Iran-market and unknown charts get no book: their prices are not in USDT'); }
 
 /* 2) price steps */
 ok(Q.niceStep(100000, 0.0005) === 50 && Q.niceStep(3000, 0.0005) === 2 && Q.niceStep(0.000012, 0.001) === 1e-8 && Q.niceStep(25, 0.001) === 0.025 && Q.niceStep(0, 0.001) === 0, 'step = 1, 2, 2.5 or 5 × 10ⁿ near the share asked', [Q.niceStep(3000, 0.0005), Q.niceStep(0.000012, 0.001), Q.niceStep(25, 0.001)]);

@@ -1547,7 +1547,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     /* switching the coin starts again; a symbol no exchange lists says so */
     await page.evaluate(() => PRO.app.active().setSym('IR_USD')); await page.waitForTimeout(600);
     ok(`[${tag}] on a market no exchange book covers it stops and says why`, await page.evaluate(() => !PRO.liqState()), '');
-    await page.evaluate(() => PRO.app.active().setSym('BTCUSDT')); await page.waitForTimeout(300);
+    await page.evaluate(() => PRO.app.active().setSym('BTC')); await page.waitForTimeout(300);
     ok(`[${tag}] no JS errors in the liquidity map checks`, errors.length === e0, errors.slice(e0).join(' || '));
     await page.evaluate(() => PRO.liqStop());
     await ctx.close();

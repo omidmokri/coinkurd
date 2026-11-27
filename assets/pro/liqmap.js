@@ -12,7 +12,9 @@
   'use strict';
   var P = window.PRO = window.PRO || {};
   var MAXL = 5000, POLL = 10000, KEEP = 360, MAXLIQ = 400;
-  var SYMOK = /^[A-Z0-9]{2,15}USDT$/;
+  var SYMOK = /^[A-Z0-9]{1,15}USDT$/;
+  /* the chart's own symbol (BTC = BTC/USDT on Binance) to the exchanges' one; only plain coin/USDT charts have a book in the chart's own price */
+  function exOf(sym, inst) { var i = inst ? inst(sym) : null; if (!i || i.kind !== 'usdt' || i.base === 'USDT') return null; var s = i.base + 'USDT'; return SYMOK.test(s) ? s : null; }
   function f(v) { v = +v; return isFinite(v) ? v : NaN; }
   /* [[price, qty, …], …] → [[p, q]] with both finite and positive, at most MAXL rows */
   function rows(a) {
@@ -91,7 +93,7 @@
     if (!a.length) return 0; a.sort(function (x, y) { return x - y; });
     return a[Math.min(a.length - 1, Math.floor(a.length * 0.95))];
   }
-  P.lq = { VEN: VEN, VK: VK, rows: rows, niceStep: niceStep, merge: merge, full: full, walls: walls, heldFor: heldFor, liqBinance: liqBinance, liqBybit: liqBybit, scale: scale, SYMOK: SYMOK };
+  P.lq = { VEN: VEN, VK: VK, rows: rows, niceStep: niceStep, merge: merge, full: full, walls: walls, heldFor: heldFor, liqBinance: liqBinance, liqBybit: liqBybit, scale: scale, SYMOK: SYMOK, exOf: exOf };
 
   /* ---------------------------------------------------------------- in the page */
   if (typeof document === 'undefined') return;
@@ -115,14 +117,14 @@
   function poll() {
     if (!L || !L.on) return;
     if (document.hidden) { L.timer = setTimeout(poll, POLL); return; }
-    var sym = L.sym, want = VK.filter(function (v) { return cfg.ven[v]; });
+    var sym = L.ex, want = VK.filter(function (v) { return cfg.ven[v]; });
     Promise.all(want.map(function (v) {
       return getJSON(VEN[v].url(sym)).then(function (j) {
         var b = VEN[v].parse(j); if (!b || !b.b.length || !b.a.length) throw new Error('empty');
         L && (L.stat[v] = { ok: true, t: Date.now(), n: b.b.length + b.a.length, lo: b.b[b.b.length - 1][0], hi: b.a[b.a.length - 1][0] }); return [v, b];
       }, function (e) { if (L) L.stat[v] = { ok: false, t: Date.now(), err: String(e && e.message || e).slice(0, 40) }; return [v, null]; });
     })).then(function (res) {
-      if (!L || L.sym !== sym || !L.on) return;
+      if (!L || L.ex !== sym || !L.on) return;
       var books = {}; res.forEach(function (r) { if (r[1]) books[r[0]] = r[1]; });
       var mid0 = L.m ? L.m.mid : NaN, any = Object.keys(books)[0];
       if (!L.step && any) { var b0 = books[any]; L.step = niceStep((b0.b[0][0] + b0.a[0][0]) / 2, cfg.pct / 100); }
@@ -136,22 +138,22 @@
         L.sc = scale(L.hist);
       }
       redraw(); paintPanel();
-    }).then(function () { if (L && L.on && L.sym === sym) L.timer = setTimeout(poll, POLL); });
+    }).then(function () { if (L && L.on && L.ex === sym) L.timer = setTimeout(poll, POLL); });
   }
   /* the liquidation streams: Binance futures (one per coin per second at most) and Bybit futures (all) */
   function openWS() {
     closeWS(); if (!L || !L.on || !cfg.liq) return;
-    var sym = L.sym;
+    var sym = L.ex;
     try {
       var b = new WebSocket('wss://fstream.binance.com/ws/' + sym.toLowerCase() + '@forceOrder');
-      b.onmessage = function (e) { try { var x = liqBinance(JSON.parse(e.data)); if (x && L && x.sym === L.sym) addLiq(x); } catch (er) { } };
+      b.onmessage = function (e) { try { var x = liqBinance(JSON.parse(e.data)); if (x && L && x.sym === L.ex) addLiq(x); } catch (er) { } };
       b.onopen = function () { if (L) L.wsOk.bnf = true; paintPanel(); }; b.onerror = function () { if (L) L.wsOk.bnf = false; paintPanel(); };
       L.ws.push(b);
     } catch (e) { }
     try {
       var y = new WebSocket('wss://stream.bybit.com/v5/public/linear'), ping = null;
       y.onopen = function () { y.send(JSON.stringify({ op: 'subscribe', args: ['allLiquidation.' + sym] })); ping = setInterval(function () { try { y.send('{"op":"ping"}'); } catch (e) { } }, 20000); if (L) L.wsOk.byf = true; paintPanel(); };
-      y.onmessage = function (e) { try { liqBybit(JSON.parse(e.data)).forEach(function (x) { if (L && x.sym === L.sym) addLiq(x); }); } catch (er) { } };
+      y.onmessage = function (e) { try { liqBybit(JSON.parse(e.data)).forEach(function (x) { if (L && x.sym === L.ex) addLiq(x); }); } catch (er) { } };
       y.onclose = function () { clearInterval(ping); }; y.onerror = function () { if (L) L.wsOk.byf = false; paintPanel(); };
       L.ws.push(y);
     } catch (e) { }
@@ -160,8 +162,8 @@
   function addLiq(x) { L.liq.push(x); if (L.liq.length > MAXLIQ) L.liq.shift(); redraw(); paintPanelSoon(); }
   function start(cell) {
     stop(); if (!cell) return;
-    var sym = cell.cfg.sym;
-    L = { cell: cell, sym: sym, on: SYMOK.test(sym), step: 0, books: {}, stat: {}, hist: [], m: null, liq: [], ws: [], wsOk: {}, timer: 0, since: Date.now() };
+    var sym = cell.cfg.sym, ex = exOf(sym, P.inst);
+    L = { cell: cell, sym: sym, ex: ex, on: !!ex, step: 0, books: {}, stat: {}, hist: [], m: null, liq: [], ws: [], wsOk: {}, timer: 0, since: Date.now() };
     if (!L.on) return;
     poll(); openWS();
   }
@@ -320,12 +322,12 @@
     paintPanel();
     A.modal(T('lqTitle') + ' · ' + (P.pair ? P.pair(cell.cfg.sym) : cell.cfg.sym), box, { wide: true, nofocus: true, onclose: function () { BOX = null; } });
   };
-  P.liqState = function () { return L ? { on: L.on, sym: L.sym, n: L.hist.length, m: !!L.m, liq: L.liq.slice(), step: L.step, stat: L.stat, lo: L.m && L.m.lo, hi: L.m && L.m.hi, mid: L.m && L.m.mid, w: L.m ? walls(L.m, 3) : null } : null; };   /* for the tests */
+  P.liqState = function () { return L ? { on: L.on, sym: L.sym, ex: L.ex, n: L.hist.length, m: !!L.m, liq: L.liq.slice(), step: L.step, stat: L.stat, lo: L.m && L.m.lo, hi: L.m && L.m.hi, mid: L.m && L.m.mid, w: L.m ? walls(L.m, 3) : null } : null; };   /* for the tests */
   P.liqStop = stop;
   /* the map follows its chart: a new coin or timeframe on it starts again; another chart's change leaves it alone */
   function hook() {
     if (!ready()) return;
-    A.on('sym', function (cell) { if (L && L.cell === cell) { if (SYMOK.test(cell.cfg.sym)) start(cell); else stop(); paintPanel(); } });
+    A.on('sym', function (cell) { if (L && L.cell === cell) { if (exOf(cell.cfg.sym, P.inst)) start(cell); else stop(); paintPanel(); } });
   }
   if (P.app) hook(); else document.addEventListener('DOMContentLoaded', hook);
   P.lqReady = true;
