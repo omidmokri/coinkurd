@@ -1544,6 +1544,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     });
     const green = px2.hits.some(h => h[0] === 'b' && h[2] > h[1] + 40 && h[4] > 0), red = px2.hits.some(h => h[0] === 'a' && h[1] > h[2] + 40 && h[4] > 0);
     ok(`[${tag}] the book is drawn at the chart's right edge: green at the bid wall, red at the ask wall`, green && red, JSON.stringify(px2));
+    const lx = await page.evaluate(() => { const c = PRO.app.active(), s = PRO.liqState(), x = s.liq[s.liq.length - 1], ts = c.chart.timeScale(), n = c.disp.length; return { X: PRO.lqX(x.t), last: ts.logicalToCoordinate(n - 1), next: ts.logicalToCoordinate(n), t: x.t, lastT: c.disp[n - 1].t, sec: c.tfSec() }; });
+    ok(`[${tag}] each liquidation is drawn at the time it happened: the newest one sits on the bar still open`, lx.X != null && lx.last != null && lx.X >= lx.last - 1 && lx.X <= lx.next + 1, JSON.stringify(lx));
     /* switching the coin starts again; a symbol no exchange lists says so */
     await page.evaluate(() => PRO.app.active().setSym('IR_USD')); await page.waitForTimeout(600);
     ok(`[${tag}] on a market no exchange book covers it stops and says why`, await page.evaluate(() => !PRO.liqState()), '');

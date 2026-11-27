@@ -175,6 +175,13 @@
   /* ---------------------------------------------------------------- drawing on the chart */
   function rgba(c, a) { return 'rgba(' + c + ',' + Math.max(0, Math.min(1, a)).toFixed(3) + ')'; }
   var CB = '52,211,153', CA = '255,90,77';
+  /* a time (ms) to x on this chart, through the bars the chart actually shows */
+  function xAt(cell, ts, tms) {
+    var D = cell.disp && cell.disp.length ? cell.disp : cell.bars, sec = cell.tfSec(); if (!D || !D.length || !sec) return null;
+    var lg = P.t2l ? P.t2l(D, tms / 1000, sec) : D.length - 1 + (tms / 1000 - D[D.length - 1].t) / sec;
+    return lg == null || !isFinite(lg) ? null : ts.logicalToCoordinate(lg);
+  }
+  P.lqX = function (tms) { return L && L.cell ? xAt(L.cell, L.cell.chart.timeScale(), tms) : null; };   /* for the tests */
   function paint(ctx, W, H, cell) {
     if (!L || L.cell !== cell || !L.on || L.sym !== cell.cfg.sym) return;
     var s = cell.main, ts = cell.chart.timeScale(), m = L.m, st = L.step;
@@ -182,8 +189,7 @@
     var yOf = function (p) { return s.priceToCoordinate(p); };
     /* heat map of the readings kept, at the time each was read */
     if (cfg.heat && L.hist.length && cell.bars.length) {
-      var bars = cell.bars, lastI = bars.length - 1, lastT = bars[lastI].t, sec = cell.tfSec(), sc = L.sc || 1;
-      var xOf = function (tms) { return ts.logicalToCoordinate(lastI + (tms / 1000 - lastT) / sec); };
+      var sc = L.sc || 1, xOf = function (tms) { return xAt(cell, ts, tms); };
       for (var i = 0; i < L.hist.length; i++) {
         var hh = L.hist[i], x0 = xOf(hh.t - POLL / 2), x1 = xOf(i < L.hist.length - 1 ? L.hist[i + 1].t - POLL / 2 : hh.t + POLL / 2);
         if (x0 == null || x1 == null || x1 < 0 || x0 > W) continue;
@@ -210,13 +216,15 @@
           for (var k in o) {
             var ya = yOf((+k + 1) * st), yb = yOf(+k * st); if (ya == null || yb == null || yb < 0 || ya > H) continue;
             var ok = full(m, +k), len = Math.min(PW, PW * o[k] / maxQ);
-            ctx.fillStyle = rgba(z[1], ok ? 0.55 : 0.14); ctx.fillRect(right - len, ya + 0.5, len, Math.max(1, yb - ya - 1));
+            ctx.fillStyle = rgba(z[1], ok ? 0.55 : 0.09); ctx.fillRect(right - len, ya + 0.5, len, Math.max(1, yb - ya - 1));
           }
         });
         /* the three biggest walls on each side, with their size in dollars */
         var wl = walls(m, 3); ctx.font = '600 10.5px Vazirmatn, Tahoma, sans-serif'; ctx.textBaseline = 'middle';
-        wl.bid.concat(wl.ask).forEach(function (x) {
+        var used = [];
+        wl.bid.concat(wl.ask).sort(function (a, b) { return b.usd - a.usd; }).forEach(function (x) {
           var y = yOf(x.p); if (y == null || y < 8 || y > H - 8) return;
+          if (used.some(function (u) { return Math.abs(u - y) < 15; })) return; used.push(y);
           var t = '$' + usd(x.usd), tw = ctx.measureText(t).width + 8;
           ctx.fillStyle = 'rgba(12,12,14,.78)'; ctx.fillRect(right - PW - tw - 4, y - 8, tw, 16);
           ctx.fillStyle = x.side === 'bid' ? '#34d399' : '#ff8a80'; ctx.fillText(t, right - PW - tw, y + 0.5);
@@ -225,10 +233,10 @@
     }
     /* liquidations: a bubble at the time and price, its area by size */
     if (cfg.liq && L.liq.length && cell.bars.length) {
-      var bars2 = cell.bars, li = bars2.length - 1, lt = bars2[li].t, sec2 = cell.tfSec(), mx = 0;
+      var mx = 0;
       L.liq.forEach(function (x) { if (x.usd > mx) mx = x.usd; });
       L.liq.forEach(function (x) {
-        var X = ts.logicalToCoordinate(li + (x.t / 1000 - lt) / sec2), Y = yOf(x.p); if (X == null || Y == null || X < -20 || X > W + 20 || Y < -20 || Y > H + 20) return;
+        var X = xAt(cell, ts, x.t), Y = yOf(x.p); if (X == null || Y == null || X < -20 || X > W + 20 || Y < -20 || Y > H + 20) return;
         var r = 3 + 13 * Math.sqrt(x.usd / (mx || 1));
         ctx.beginPath(); ctx.arc(X, Y, r, 0, Math.PI * 2);
         ctx.fillStyle = x.side === 'long' ? 'rgba(255,90,77,.38)' : 'rgba(52,211,153,.38)'; ctx.fill();
@@ -268,7 +276,8 @@
     var W = walls(m, 5), tb = h('<table class="pm-lqt"><thead><tr><th></th><th></th><th></th><th></th><th></th></tr></thead><tbody></tbody></table>'), th = $$('th', tb);
     th[0].textContent = T('lqWPrice'); th[1].textContent = T('lqWDist'); th[2].textContent = T('lqWSize'); th[3].textContent = T('lqWHeld'); th[4].textContent = T('lqWTop');
     var body = $('tbody', tb);
-    W.ask.slice().reverse().concat(W.bid).forEach(function (x) {
+    var byP = function (a, b) { return b.p - a.p; };
+    W.ask.slice().sort(byP).concat(W.bid.slice().sort(byP)).forEach(function (x) {
       var tr = h('<tr><td dir="ltr"></td><td dir="ltr"></td><td dir="ltr"></td><td></td><td></td></tr>'), td = $$('td', tr);
       tr.className = x.side === 'bid' ? 'up' : 'dn';
       td[0].textContent = fp(x.lo) + ' – ' + fp(x.hi); td[1].textContent = (x.dist >= 0 ? '+' : '') + x.dist.toFixed(2) + '%';
