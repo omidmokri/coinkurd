@@ -205,7 +205,7 @@
 
     var foot = wrap.querySelector('.ekw-foot');
     /* why Kurdish counts once: Sorani and Kurmanji are two dialects of one language (owner, 2026-11-27) */
-    var kl = ON ? CODE : (de.getAttribute('lang') || 'en'), kt = KURD[kl] || KURD.en;
+    var kl = de.getAttribute('lang') || CODE || 'en', kt = KURD[kl] || KURD.en;
     if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.setAttribute('translate', 'no'); kp.textContent = kt; foot.appendChild(kp); }
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     d.body.appendChild(wrap);
@@ -287,6 +287,7 @@
         g.addEventListener('click', function (e) {
           e.preventDefault(); e.stopPropagation();
           ls.set('ekw_seen', '1'); g.classList.remove('ekw-new');
+          g.setAttribute('title', words().t); g.setAttribute('aria-label', words().t);
           openPanel();
         });
         box.insertBefore(g, box.firstChild);          /* the same place /market/ keeps it */
