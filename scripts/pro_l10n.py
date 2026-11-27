@@ -270,8 +270,11 @@ VARIANT = {"kmr": " (Kurmanji, Northern Kurdish, in the Latin alphabet — not S
 
 def prompt_for(code, batch):
     r = pro_langs.BY[code]
-    return PROMPT.format(lang=r["english"], native=r["native"], variant=VARIANT.get(code, ""),
-                         keep=", ".join(KEEP), payload=json.dumps(batch, ensure_ascii=False, indent=0))
+    out = PROMPT.format(lang=r["english"], native=r["native"], variant=VARIANT.get(code, ""),
+                        keep=", ".join(KEEP), payload=json.dumps(batch, ensure_ascii=False, indent=0))
+    import i18n_glossary                          # the language's own trading words, only those in this batch
+    gl = i18n_glossary.lines(code, list(batch) + [str(v) for v in (batch.values() if isinstance(batch, dict) else [])])
+    return out.replace("\nInput:\n", "\n" + gl + "\nInput:\n", 1) if gl else out
 
 
 def batches(keys, src, size, chars=9000):

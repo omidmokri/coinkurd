@@ -47,6 +47,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import i18n_ar  # noqa: E402   (the reader: walk, Page, js_strings, variants, numkey, worth, page_key)
+import i18n_glossary  # noqa: E402   (each language's own trading words, data/i18n_glossary.json)
 import pro_l10n  # noqa: E402  (PRIORITY, the quota day, the script table)
 import pro_langs  # noqa: E402
 
@@ -224,7 +225,14 @@ def load_g(code):
     except (OSError, ValueError):
         return set()
     v = (d.get("g") if isinstance(d, dict) else None) or []
-    return {k for k in v if isinstance(k, str)}
+    out = {k for k in v if isinstance(k, str)}
+    # A cache written before this glossary: every string that carries one of its trading terms is re-done once by
+    # Gemini with the glossary in the prompt (the old text stays on the page until then). save() stamps the cache,
+    # so the strings already re-done are not asked again; the ones still waiting stay in "g".
+    ver = i18n_glossary.version()
+    if ver and isinstance(d, dict) and d.get("gv") != ver and isinstance(i18n_glossary.data().get(code), dict):
+        out |= {k for k in ((d.get("s") or {}) if isinstance(d.get("s"), dict) else {}) if i18n_glossary.found(k)}
+    return out
 
 
 def save(code, s, fails=None, g=None):
@@ -238,6 +246,8 @@ def save(code, s, fails=None, g=None):
             d["f"] = f_
         if g_:
             d["g"] = g_
+        if i18n_glossary.version():
+            d["gv"] = i18n_glossary.version()      # this cache's glossary strings are queued (or done) for this glossary
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
 
@@ -304,8 +314,12 @@ Input:
 
 def prompt_for(code, batch):
     r = pro_langs.BY[code]
-    return PROMPT.format(lang=r["english"], native=r["native"], variant=pro_l10n.VARIANT.get(code, ""),
-                         keep=", ".join(KEEP)) + json.dumps(batch, ensure_ascii=False)
+    head = PROMPT.format(lang=r["english"], native=r["native"], variant=pro_l10n.VARIANT.get(code, ""),
+                         keep=", ".join(KEEP))
+    gl = i18n_glossary.lines(code, batch)          # the language's own trading words, only those in this batch
+    if gl:
+        head = head.replace("\nInput:\n", "\n" + gl + "\nInput:\n", 1)
+    return head + json.dumps(batch, ensure_ascii=False)
 
 
 def translate_batch(code, batch, gen):
@@ -549,7 +563,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "16"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "17"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
