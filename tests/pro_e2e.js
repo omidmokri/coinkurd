@@ -1391,6 +1391,14 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const showT = await T('odShow');
     await page.evaluate(t => [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t).click(), showT);
     await page.waitForTimeout(400);
+    /* the plan's levels have to be on screen to be grabbed; how far the ATR stop and the ladder reach depends on the day's candles,
+       so zoom the chart out, as a user would, until every level is inside the price pane */
+    for (const n of [0, 250, 500, 1000, 2000]) {
+      const fits = await page.evaluate(n => { const c = PRO.app.active(), D = c.disp; if (n) c.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, D.length - n), to: D.length + 3 }); return true; }, n);
+      await page.waitForTimeout(n ? 350 : 0);
+      const ok2 = await page.evaluate(() => { const c = PRO.app.active(), ph = c.chart.panes()[0].getHeight(), L = PRO.odmLive(); return L && L.levels.every(l => l.y != null && l.y > 30 && l.y < ph - 60); });
+      if (fits && ok2) break;
+    }
     const live = () => page.evaluate(() => { const L = PRO.odmLive(); if (!L) return null; const c = PRO.app.active(), r = c.box.getBoundingClientRect(); return { plan: { err: L.plan.err || null, stop: L.plan.stop, avg: L.plan.avg, risk: L.plan.risk, qty: L.plan.qty, nx: L.plan.exits ? L.plan.exits.length : 0, nf: L.plan.fills ? L.plan.fills.length : 0 }, st: JSON.parse(JSON.stringify(L.st)), levels: L.levels, pick: L.pick, box: { l: r.left, t: r.top, w: r.width, h: r.height }, pl: c.main.priceLines().length, hud: (document.querySelector('.pm-odhud .pm-odhs') || {}).textContent || '', msg: (document.querySelector('.pm-odhud .pm-odhm') || {}).textContent || '', msgDn: !!document.querySelector('.pm-odhud .pm-odhm.dn'), range: JSON.stringify(c.chart.timeScale().getVisibleLogicalRange()) }; });
     let L0 = await live();
     const hb = await page.evaluate(() => { const h = document.querySelector('.pm-odhud'), c = PRO.app.active().box.getBoundingClientRect(); if (!h) return null; const r = h.getBoundingClientRect(); return { in: r.left >= c.left - 1 && r.right <= c.right + 1 && r.bottom <= c.bottom + 1 && r.top >= c.top, btn: h.querySelectorAll('[data-pk]').length, open: !!h.querySelector('[data-a="open"]'), undo: h.querySelector('[data-a="undo"]').disabled, dir: h.dir, h: r.height, w: r.width }; });
@@ -1450,18 +1458,6 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       }, [X, y0, dy]);
       await page.waitForTimeout(150);
     };
-    /* the stop has to be on screen to be grabbed: when the plan's ATR stop falls below the price pane (it depends on the day's
-       candles), put it in view first with the panel's own "Stop" button and a click on the chart, as a user would */
-    {
-      const ph = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight()), Lq = await live(), sl = Lq.levels.find(l => l.k === 'sl');
-      if (!sl || sl.y == null || sl.y > ph - 60 || sl.y < 30) {
-        const yS = await page.evaluate(ph => { const L = PRO.odmLive(), long = L.plan.stop < L.plan.avg, ye = L.levels.filter(l => /^e/.test(l.k) && l.y != null).map(l => l.y);
-          return long ? Math.min(ph - 70, Math.max(...ye) + 45) : Math.max(35, Math.min(...ye) - 45); }, ph);
-        await page.click('.pm-odhud [data-pk="s"]'); await page.waitForTimeout(80);
-        await page.mouse.click(await xFree(Lq.box.t + yS), Lq.box.t + yS); await page.waitForTimeout(200);
-        L0 = await live();
-      }
-    }
     /* down 40 px widens the stop; when the stop sits near the foot of the price pane, up 40 px narrows it instead (a line is grabbed where it can be seen) */
     const paneH = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight());
     const slY = yOf(L0, 'sl') - L0.box.t, dyS = slY + 40 > paneH - 30 ? -40 : 40;
@@ -1626,7 +1622,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     /* a point with no ODM line, handle, label or panel near it; inside the box when asked */
     const freePt = (S, inBox) => page.evaluate(([S, inBox]) => {
       const Z = S.Z, b = S.box, labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast,.pm-selbar')].map(e => e.getBoundingClientRect());
-      const okp = (x, y) => { const X = b.l + x, Y = b.t + y; if (labs.some(r => X >= r.left - 6 && X <= r.right + 6 && Y >= r.top - 6 && Y <= r.bottom + 6)) return false; if (S.ys.some(v => Math.abs(v - y) < 22)) return false; if (Z && (Math.abs(x - Z.x0) < 26 || Math.abs(x - Z.x1) < 26) && Math.abs(y - Z.ya) < 26) return false; const el = document.elementFromPoint(X, Y); return !!(el && el.closest('.pm-chart')); };
+      const okp = (x, y) => { const X = b.l + x, Y = b.t + y; if (labs.some(r => X >= r.left - 6 && X <= r.right + 6 && Y >= r.top - 6 && Y <= r.bottom + 6)) return false; if (S.ys.some(v => Math.abs(v - y) < 15)) return false; if (Z && (Math.abs(x - Z.x0) < 26 || Math.abs(x - Z.x1) < 26) && Math.abs(y - Z.ya) < 26) return false; const el = document.elementFromPoint(X, Y); return !!(el && el.closest('.pm-chart')); };
       const x0 = inBox ? Z.x0 + 8 : 20, x1 = inBox ? Z.x1 - 8 : b.w - 90, y0 = inBox ? Z.top + 6 : 30, y1 = inBox ? Z.bot - 6 : b.h - 60;
       for (let y = y0; y < y1; y += 5) for (let x = x0; x < x1; x += 7) { if (!inBox && Z && x >= Z.x0 - 10 && x <= Z.x1 + 10 && y >= Z.top - 10 && y <= Z.bot + 10) continue; if (okp(x, y)) return { x: b.l + x, y: b.t + y }; }
       return null; }, [S, inBox]);
@@ -1697,8 +1693,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const S = await st();
       const want = S.tf === '4h' ? '1h' : '4h';
       let clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('[data-tf="' + w + '"]')].find(e => e.offsetParent && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want);
-      if (!clicked) { await page.click('#pm-tfs .pm-tf.on').catch(() => { }); await page.waitForTimeout(300); clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('.pm-tfmenu .pm-tf, [data-tf="' + w + '"]')].find(e => (e.getAttribute('data-tf') === w || e.textContent.trim() === w) && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want); }
-      if (clicked) await page.mouse.click(clicked.x, clicked.y);
+      if (!clicked) { await page.click('#pm-tfs .pm-tf.on').catch(() => { }); await page.waitForTimeout(300); await page.fill('.pm-tfc input', want).catch(() => { }); await page.press('.pm-tfc input', 'Enter').catch(() => { }); clicked = 'typed'; }
+      if (clicked && clicked.x != null) await page.mouse.click(clicked.x, clicked.y);
       await page.waitForFunction(w => PRO.app.active().cfg.tf === w && PRO.app.active().disp.length > 100, want, { timeout: 10000 }).catch(() => { });
       await page.waitForTimeout(500);
       const S1 = await st();
