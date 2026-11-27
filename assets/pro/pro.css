@@ -894,14 +894,3 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-odhud [data-a="ext"].on{color:#f7931a;background:rgba(247,147,26,.14)}
 .pm-odhud .pm-odrm{margin-inline-start:6px}
 .pm-odhud .pm-odrm:hover{color:#ff5a4d}
-/* ODM: the visitor's panel place and fold, the colour pickers, the cautious card */
-.pm-cor.warn b{color:#f5b041}
-.pm-odhud .pm-odmv{cursor:grab;touch-action:none;font-size:15px}
-.pm-odhud.moving{opacity:.9;transition:none}.pm-odhud.moving .pm-odmv{cursor:grabbing}
-.pm-odhud.min .pm-odhm,.pm-odhud.min [data-pk],.pm-odhud.min [data-a="ext"],.pm-odhud.min [data-a="undo"]{display:none}
-.pm-odhud.min{padding:5px 7px}.pm-odhud.min .pm-odhs{margin-bottom:2px}
-.pm-odhud [data-a="min"][aria-pressed="true"]{color:#f7931a}
-@media (max-width:600px){.pm-odhud.moved{right:auto;max-width:calc(100% - 8px)}}
-.pm-odcr{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end}
-.pm-odci input[type=color]{width:58px;height:34px;padding:2px 3px;border:1px solid var(--line);border-radius:8px;background:transparent;cursor:pointer}
-.pm-oddist .pm-co{margin-bottom:8px}

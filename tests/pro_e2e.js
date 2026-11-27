@@ -1369,14 +1369,6 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const tr = await page.evaluate(() => { const r = document.querySelector('.pm-odres'); return r && { cards: r.querySelectorAll('.pm-cor').length, note: !!r.querySelector('.pm-odhint') }; });
     ok(`[${tag}] the history test runs and reports its ending, fills, result, bars and unclear bars`, tr && tr.cards >= 5 && tr.note, JSON.stringify(tr));
     await shot(page, `85_odm_test_${lang}_${vw}`);
-    /* the plan repeated over the history: trades, win rate, R, endings, Monte Carlo drawdowns and the in/out-of-sample split */
-    await page.waitForFunction(() => ![...document.querySelectorAll('.pm-odres .pm-odhint')].some(p => p.textContent === PRO.app.T('odChecking')), null, { timeout: 20000 }).catch(() => {});
-    const dr = await page.evaluate(() => { const d = document.querySelector('.pm-oddist'), T = PRO.app.T; if (!d) return null; const w = d.querySelector('.pm-cw2'); return { cards: d.querySelectorAll('.pm-cor').length, ends: d.querySelectorAll('.pm-odt tbody tr').length, mc: [...d.querySelectorAll('h4')].some(h => h.textContent.indexOf(T('odMcT')) === 0), split: [...d.querySelectorAll('.pm-cor small')].some(s => s.textContent === T('odOos')), none: !!(w && w.textContent === T('odDNone')), pend: [...document.querySelectorAll('.pm-odres .pm-odhint')].some(p => p.textContent === T('odChecking')) }; });
-    ok(`[${tag}] the plan repeated over the history shows trades, win rate, average and median R, how they ended, the Monte Carlo drawdowns and the in/out-of-sample split`, dr && !dr.none && !dr.pend && dr.cards >= 10 && dr.ends >= 1 && dr.mc && dr.split, JSON.stringify(dr));
-    await page.evaluate(() => { const d = document.querySelector('.pm-oddist'); if (d) d.scrollIntoView(); });
-    await shot(page, `85b_odm_dist_${lang}_${vw}`);
-    const col = await page.evaluate(() => { const d = document.querySelector('.pm-odcol'); if (!d) return null; d.open = true; const i = d.querySelectorAll('input[type=color]'); i[0].value = '#3366ff'; i[0].dispatchEvent(new Event('input')); return { n: i.length, saved: JSON.parse(localStorage.getItem('ek_pro_odmui') || '{}').tp }; });
-    ok(`[${tag}] the targets' colour can be picked and is kept`, col && col.n === 2 && col.saved === '#3366ff', JSON.stringify(col));
     /* alerts for each level */
     const nA0 = await page.evaluate(() => PRO._alerts().length);
     await btn('odAlerts'); await page.waitForTimeout(150);
@@ -1446,23 +1438,6 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const hb = await page.evaluate(() => { const h = document.querySelector('.pm-odhud'), c = PRO.app.active().box.getBoundingClientRect(); if (!h) return null; const r = h.getBoundingClientRect(); return { in: r.left >= c.left - 1 && r.right <= c.right + 1 && r.bottom <= c.bottom + 1 && r.top >= c.top, btn: h.querySelectorAll('[data-pk]').length, open: !!h.querySelector('[data-a="open"]'), undo: h.querySelector('[data-a="undo"]').disabled, dir: h.dir, h: r.height, w: r.width }; });
     ok(`[${tag}] "Show on chart" draws every level as a price line and opens the panel on the chart`, L0 && L0.levels.length >= 7 && L0.pl === L0.levels.length && hb && hb.in && hb.btn === 3 && hb.open && hb.undo && /SL/.test(L0.hud), JSON.stringify({ n: L0 && L0.levels.length, pl: L0 && L0.pl, hb }));
     await shot(page, `88_odm_drag_${lang}_${vw}`);
-    /* the visitor's colour on the target lines; the panel moved by its grip, folded, and put back */
-    await page.click('.pm-odhud [data-a="open"]'); await page.waitForTimeout(250);
-    await page.evaluate(() => { const d = document.querySelector('.pm-odcol'); d.open = true; const i = d.querySelector('input[type=color]'); i.value = '#3366ff'; i.dispatchEvent(new Event('input')); });
-    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
-    const pcl = await page.evaluate(() => PRO.app.active().main.priceLines().map(l => l.options()).filter(o => /^TP/.test(o.title)).map(o => o.color));
-    ok(`[${tag}] the targets are drawn in the colour the visitor picked`, pcl.length >= 1 && pcl.every(c => c === '#3366ff'), JSON.stringify(pcl));
-    const mvb = await page.evaluate(() => { const b = document.querySelector('.pm-odhud [data-a="mv"]').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
-    await page.mouse.move(mvb.x, mvb.y); await page.mouse.down(); await page.mouse.move(L0.box.l + L0.box.w * 0.4, L0.box.t + 50, { steps: 8 }); await page.mouse.up(); await page.waitForTimeout(120);
-    const mvd = await page.evaluate(() => { const h = document.querySelector('.pm-odhud'), r = h.getBoundingClientRect(), c = PRO.app.active().el.getBoundingClientRect(), u = JSON.parse(localStorage.getItem('ek_pro_odmui') || '{}'); return { top: Math.round(r.top - c.top), in: r.left >= c.left - 1 && r.right <= c.right + 1 && r.top >= c.top - 1 && r.bottom <= c.bottom + 1, x: u.x, y: u.y, moved: h.classList.contains('moved') }; });
-    ok(`[${tag}] the panel can be dragged by its grip to another place on the chart, stays inside it and keeps that place`, mvd.moved && mvd.in && mvd.top < 160 && mvd.y > 0 && mvd.y < 0.45, JSON.stringify(mvd));
-    await shot(page, `88b_odm_panel_moved_${lang}_${vw}`);
-    await page.click('.pm-odhud [data-a="min"]'); await page.waitForTimeout(80);
-    const fold = await page.evaluate(() => { const h = document.querySelector('.pm-odhud'); return { min: h.classList.contains('min'), msg: getComputedStyle(h.querySelector('.pm-odhm')).display, fig: getComputedStyle(h.querySelector('.pm-odhs')).display, saved: JSON.parse(localStorage.getItem('ek_pro_odmui') || '{}').min }; });
-    await page.click('.pm-odhud [data-a="min"]'); await page.waitForTimeout(60);
-    await page.dblclick('.pm-odhud [data-a="mv"]'); await page.waitForTimeout(120);
-    const bk = await page.evaluate(() => ({ moved: document.querySelector('.pm-odhud').classList.contains('moved'), x: JSON.parse(localStorage.getItem('ek_pro_odmui') || '{}').x, min: document.querySelector('.pm-odhud').classList.contains('min') }));
-    ok(`[${tag}] folding keeps only the figures; a double tap on the grip puts the panel back in its place`, fold.min && fold.msg === 'none' && fold.fig !== 'none' && fold.saved === true && !bk.moved && bk.x == null && !bk.min, JSON.stringify({ fold, bk }));
     /* the plan drawn as a position: green from the average entry to the last target, red to the stop, from a candle to the right edge */
     const zone = () => page.evaluate(() => PRO.odmZone());
     const Zn = await zone();
