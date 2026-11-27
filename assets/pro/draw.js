@@ -922,7 +922,8 @@
       else if (D.part === 'end') { var te = this.toData(q.x, q.y); if (te && te.t > d.pts[0].t) { d.pts[1].t = te.t; d.pts[2].t = te.t; } }
       else {
         var np = this.toData(q.x, q.y); if (!np) return;
-        if (d.k === 'long' || d.k === 'short') { var dp2 = np.p - D.orig[0].p, dt2 = np.t - D.orig[0].t; d.pts = D.orig.map(function (p) { return { t: p.t + dt2, p: p.p + dp2 }; }); }
+        /* a position's entry moves on its own: its target and its stop stay where they are (drag the box itself to move all three) */
+        if (d.k === 'long' || d.k === 'short') d.pts[0] = { t: Math.min(np.t, D.orig[1].t - sec), p: np.p };
         else d.pts[D.part] = np;
       }
       this.req(); return;

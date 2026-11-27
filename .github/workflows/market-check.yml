@@ -1,0 +1,62 @@
+name: market-check
+# Tests /market/ on a work branch before anything reaches main: the unit tests of the planner, risk board, matrix,
+# regime and data library, then the page itself in headless Chrome (Binance mocked). Publishes nothing.
+on:
+  push:
+    branches: ["market-*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # only to keep the screenshots on the side branch shots-market (never main)
+
+concurrency:
+  group: market-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Unit tests
+        run: |
+          set -e
+          for t in tests/test_pro_phasecd.js tests/test_pro_plan.js tests/test_pro_calc.js tests/test_pro_mtf.js tests/test_pro_datalib.js tests/test_pro_odm.js; do node "$t"; done
+          python3 tests/test_pro_i18n.py
+      - name: Install Playwright (uses the runner's own Chrome)
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm install --no-audit --no-fund playwright@1.63.0
+          /usr/bin/google-chrome --version
+      - name: Browser check, Phase C/D and data library
+        env:
+          PW: /tmp/pw/node_modules/playwright
+          ONLY: cd
+        run: node tests/pro_e2e.js /tmp/shots-cd
+      - name: Browser check, the whole page (older tour; it already stopped early on main before this branch)
+        if: always()
+        continue-on-error: true
+        env:
+          PW: /tmp/pw/node_modules/playwright
+        run: node tests/pro_e2e.js /tmp/shots-all
+      - name: Keep the Phase C/D screenshots on the side branch shots-market
+        if: always()
+        run: |
+          set -e
+          [ -d /tmp/shots-cd ] || exit 0
+          cd /tmp/shots-cd && git init -q && git checkout -q -b shots-market && git add -A
+          git -c user.name="market-check" -c user.email="actions@users.noreply.github.com" commit -q -m "screenshots of ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots-market
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: market-screenshots
+          path: |
+            /tmp/shots-cd
+            /tmp/shots-all
+          retention-days: 7
