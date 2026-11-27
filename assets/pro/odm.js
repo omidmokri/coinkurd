@@ -326,12 +326,17 @@
     if (k === 'e') { st.entries.push({ p: plain(p), q: '' }); var eq = equal(st.entries.length); st.entries.forEach(function (e, i) { e.q = eq[i]; }); }
     else if (k === 's') { st.stop.mode = 'price'; st.stop.v = plain(p); }
     else if (k === 'x') {
+      /* each target's price as the plan worked it out (a target in R or % has no price of its own), so the new one can go in its place */
+      var eff = new Map(), xi = usedX(st); if (Z.plan && !Z.plan.err) xi.forEach(function (ix, j) { if (Z.plan.exits[j]) eff.set(st.exits[ix], Z.plan.exits[j].p); });
       var used = 0; st.exits.forEach(function (x) { var q = num(x.q); if (q > 0) used += q; });
       st.exits.push({ mode: 'price', v: plain(p), q: used < 100 ? String(+(100 - used).toFixed(2)) : '' });
       if (used >= 100) { var ex = equal(st.exits.length); st.exits.forEach(function (x, i) { x.q = ex[i]; }); }
       /* targets stay in order from the entry outwards, as the plan needs */
       var dir = st.side === 'short' ? -1 : 1;
-      st.exits.sort(function (a, b) { var pa = a.mode === 'price' ? num(a.v) : NaN, pb = b.mode === 'price' ? num(b.v) : NaN; return isFinite(pa) && isFinite(pb) ? dir * (pa - pb) : 0; });
+      var nw = st.exits[st.exits.length - 1]; eff.set(nw, num(nw.v));
+      var pv = function (x) { return eff.has(x) ? eff.get(x) : x.mode === 'price' ? num(x.v) : NaN; };
+      var empty = st.exits.filter(function (x) { return !isFinite(pv(x)); }), full = st.exits.filter(function (x) { return isFinite(pv(x)); });
+      full.sort(function (a, b) { return dir * (pv(a) - pv(b)); }); st.exits = full.concat(empty);
     }
     Z.pick = null; if (Z.cell.el) Z.cell.el.classList.remove('pm-odpick');
     recalc(Z); saveSt(st); syncLines(Z);
@@ -414,7 +419,11 @@
     LN = Z; syncLines(Z); return Z.L.length;
   }
   A.on('sym', function (cell) { if (LN && LN.cell === cell) hideLines(); });
-  ['grid', 'lang'].forEach(function (n) { A.on(n, function () { if (LN && !LN.cell.el.isConnected) { LN.off(); LN = null; } }); });
+  ['grid', 'lang'].forEach(function (n) { A.on(n, function () {
+    if (LN && !LN.cell.el.isConnected) { LN.off(); LN = null; return; }
+    /* a new language: the panel is built again in it, with the same plan and its undo steps */
+    if (n === 'lang' && LN && !LN.plan.err) { var Z = LN, hs = Z.hist; showLines(Z.cell, Z.plan, Z.st, Z.atr); if (LN) { LN.hist = hs; hud(LN); } }
+  }); });
   P.odmHide = hideLines; P.odmLinesShown = function (cell) { return LN && (!cell || LN.cell === cell) ? LN.L.length : 0; };
   /* take the plan's lines off the chart, and with alerts true also the alerts ODM added for this coin; one Undo puts both back */
   function clearOdm(cell, alerts) {
