@@ -1445,7 +1445,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] the confirmation names the pair and the rule in words`, sv.toast.includes('BTC/USDT') && !sv.toast.includes('{') && sv.toast.includes(PRO_T(lang, 'saS_rsi')), sv.toast);
     ok(`[${tag}] the saved rule gives the same answer now as the builder showed`, (sv.test[1] === 1) === s4.now.includes('up'), JSON.stringify({ t: sv.test, now: s4.now }));
     const lt = sv.text;      /* the alerts panel is still open from the start of these checks */
-    ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saJ_or')) && !lt.includes('ta.rsi') && lt.includes('\u2068'), lt.slice(0, 300));
+    ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saTx_or')) && !lt.includes('ta.rsi') && lt.includes('\u2068'), lt.slice(0, 300));
     await shot(page, `89_sa_list_${lang}_${vw}`);
     /* the price alert dialog has a Smart tab that opens the builder */
     const tab = await page.evaluate(async () => {

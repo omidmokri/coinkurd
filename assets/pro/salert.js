@@ -139,10 +139,10 @@
     return sp.g.map(function (G) {
       var t = G.c.map(function (C) {
         var b = C.op === 'rise' || C.op === 'fall' ? T('saBars', { n: C.b.v }) : C.b.t === 's' ? srcName(C.b) : (isFinite(C.b.v) ? String(+C.b.v) : '?');
-        return (C.not ? T('saNot') + ' ' : '') + '\u2068' + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b + '\u2069';
-      }).join(' ' + T('saJ_' + G.j) + ' ');
-      return (G.not ? T('saNot') + ' ' : '') + (G.c.length > 1 || sp.g.length > 1 ? '(' + t + ')' : t);
-    }).join(' ' + T('saJ_' + sp.j) + ' ');
+        return (C.not ? T('saTx_not') + ' ' : '') + '\u2068' + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b + '\u2069';
+      }).join(' ' + T('saTx_' + G.j) + ' ');
+      return (G.not ? T('saTx_not') + ' ' : '') + (G.c.length > 1 || sp.g.length > 1 ? '(' + t + ')' : t);
+    }).join(' ' + T('saTx_' + sp.j) + ' ');
   };
 
   P.smartAlert = function (cell, start) {
