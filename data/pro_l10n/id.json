@@ -217,6 +217,14 @@
 "7949a2630a",
 "Persilangan EMA (cepat / lambat)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Hapus semua peringatan ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Hapus semua {n} peringatan pada setiap koin? Anda dapat membatalkannya segera setelahnya."
+],
 "alert": [
 "b969680a49",
 "Alert"
@@ -672,6 +680,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Mata uang (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Indeks & Saham AS"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1868,6 +1880,14 @@
 "g_vol": [
 "1b4620951d",
 "Berbasis volume"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Indeks dan saham AS di sini hanya penutupan harian: pilih 1D, 1W atau 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Penutupan harian disimpan di situs ini dari sumber publik gratis (Yahoo Finance sebagai yang utama, lainnya sebagai cadangan). Hanya hari penutupan: tanpa bar intraday dan tanpa harga langsung."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3826,8 +3846,8 @@
 "{l} pada {p} ({d}% dari harga terakhir)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Seret garis bertanda ↕ untuk memindahkannya, atau pegangan bulat untuk memindahkan candle awal. Rencana akan dihitung ulang saat Anda menyeretnya."
+"db78c3cdfe",
+"Seret garis yang ditandai ↕, lingkaran pada garis entry untuk memindahkan kotak, atau bar di tepi kanannya untuk mengubah ukurannya. Di tempat lain grafik akan bergerak seperti biasa."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -3984,6 +4004,22 @@
 "odExitHint": [
 "a9498bb911",
 "Hingga 8 langkah. Masing-masing menutup porsi pada suatu harga, pada persentase dari rata-rata entry, atau pada kelipatan R."
+],
+"odExt": [
+"a4b2498fcd",
+"Perpanjang ke tepi kanan"
+],
+"odExtClosed": [
+"f871770520",
+"Posisi memiliki tepi kanannya sendiri lagi. Seret untuk mengubah ukurannya."
+],
+"odExtOff": [
+"013864439f",
+"Tutup tepi kanan"
+],
+"odExtOn": [
+"cd67a03b67",
+"Posisi sekarang berjalan ke tepi kanan."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4173,6 +4209,10 @@
 "8544a47725",
 "Profit"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Hapus posisi dari grafik"
+],
 "odRestOpen": [
 "b957d211ac",
 "{p}% tersisa tanpa exit dan tanpa trailing: tetap terbuka hingga Anda menutupnya."
@@ -4180,6 +4220,10 @@
 "odRestTrail": [
 "be684d239e",
 "{p}% tersisa dan mengikuti trailing stop {d} di belakang harga terbaik, dimulai {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Level tersebut tidak sesuai dengan rencana, jadi kembali ke posisi semula:"
 ],
 "odRun": [
 "b1b392607d",
@@ -4196,6 +4240,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Simpan ke papan risiko"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Ketuk posisi untuk memilihnya, lalu seret garis yang ditandai ↕ atau pegangan. Di tempat lain grafik bergerak seperti biasa."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6908,6 +6956,54 @@
 "rng_week": [
 "7b72883e07",
 "Minggu ini"
+],
+"rsAl": [
+"689e627ada",
+"Semua peringatan, pada setiap koin"
+],
+"rsBack": [
+"5202b69570",
+"Mengembalikan apa yang dihapus oleh reset."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Halaman direset."
+],
+"rsDr": [
+"3e97d79b5a",
+"Semua gambar, pada setiap koin"
+],
+"rsGo": [
+"44c57abd88",
+"Reset"
+],
+"rsInd": [
+"76de28a75e",
+"Indikator pada grafik"
+],
+"rsLead": [
+"19aa2a9a77",
+"Bersihkan halaman sekaligus. Centang apa saja yang harus dihapus:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Riwayat peringatan"
+],
+"rsNote": [
+"58f9efc63c",
+"Tata letak, pengaturan, watchlist, dan portofolio tetap ada. Peringatan yang Anda kirim ke bot Telegram disimpan di bot: buka /alerts di sana untuk menghapusnya."
+],
+"rsOd": [
+"bbde1a818d",
+"Rencana ODM dan levelnya"
+],
+"rsTitle": [
+"6ce02ce159",
+"Reset halaman"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Batalkan reset terakhir"
 ],
 "runTest": [
 "2c7f471fce",

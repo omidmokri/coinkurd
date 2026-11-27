@@ -217,6 +217,14 @@
 "7949a2630a",
 "Croisement EMA (rapide / lente)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Supprimer toutes les alertes ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Supprimer les {n} alertes sur toutes les cryptos ? Vous pouvez annuler juste après."
+],
 "alert": [
 "b969680a49",
 "Alerte"
@@ -672,6 +680,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Devises (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Indices et actions US"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1864,6 +1876,14 @@
 "g_vol": [
 "1b4620951d",
 "Basé sur le volume"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Les indices et actions US ici affichent uniquement les clôtures journalières : choisissez 1D, 1W ou 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Clôtures journalières enregistrées sur ce site à partir de sources publiques gratuites (Yahoo Finance en premier, d'autres en secours). Jours de clôture uniquement : pas de barres intraday ni de prix en temps réel."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3874,8 +3894,8 @@
 "{l} à {p} ({d}% du dernier prix)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Faites glisser une ligne marquée ↕ pour la déplacer, ou la poignée ronde pour changer la bougie de départ. Le plan est recalculé pendant que vous faites glisser."
+"db78c3cdfe",
+"Faites glisser une ligne marquée ↕, le cercle sur la ligne d'entrée pour déplacer la boîte, ou la barre sur son bord droit pour redimensionner. Partout ailleurs, le graphique se déplace normalement."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -4032,6 +4052,22 @@
 "odExitHint": [
 "a9498bb911",
 "Jusqu'à 8 paliers. Chacun ferme une part à un prix, à un pourcentage de l'entrée moyenne, ou à un multiple de R."
+],
+"odExt": [
+"a4b2498fcd",
+"Prolonger jusqu'au bord droit"
+],
+"odExtClosed": [
+"f871770520",
+"La position a à nouveau son propre bord droit. Faites-la glisser pour redimensionner."
+],
+"odExtOff": [
+"013864439f",
+"Fermer le bord droit"
+],
+"odExtOn": [
+"cd67a03b67",
+"La position s'étend désormais jusqu'au bord droit."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4221,6 +4257,10 @@
 "8544a47725",
 "Profit"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Supprimer la position du graphique"
+],
 "odRestOpen": [
 "b957d211ac",
 "{p}% reste sans sortie ni stop suiveur : le trade reste ouvert jusqu'à ce que vous le fermiez."
@@ -4228,6 +4268,10 @@
 "odRestTrail": [
 "be684d239e",
 "{p}% reste et suit un stop suiveur {d} derrière le meilleur prix, en débutant à {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Ce niveau ne correspond pas au plan, il a donc été rétabli :"
 ],
 "odRun": [
 "b1b392607d",
@@ -4244,6 +4288,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Enregistrer dans le tableau de risque"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Touchez la position pour la sélectionner, puis faites glisser une ligne marquée ↕ ou une poignée. Partout ailleurs, le graphique se déplace normalement."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6956,6 +7004,54 @@
 "rng_week": [
 "7b72883e07",
 "Cette semaine"
+],
+"rsAl": [
+"689e627ada",
+"Toutes les alertes, sur toutes les cryptos"
+],
+"rsBack": [
+"5202b69570",
+"Rétablissement des éléments supprimés par la réinitialisation."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Page réinitialisée."
+],
+"rsDr": [
+"3e97d79b5a",
+"Tous les graphiques, sur toutes les cryptos"
+],
+"rsGo": [
+"44c57abd88",
+"Réinitialiser"
+],
+"rsInd": [
+"76de28a75e",
+"Indicateurs sur les graphiques"
+],
+"rsLead": [
+"19aa2a9a77",
+"Nettoyez la page en une seule fois. Cochez ce qui doit être supprimé :"
+],
+"rsLog": [
+"6f4be80e9d",
+"Historique des alertes"
+],
+"rsNote": [
+"58f9efc63c",
+"Les dispositions, les paramètres, la liste de surveillance et le portefeuille sont conservés. Les alertes envoyées au bot Telegram sont conservées dans le bot : ouvrez /alerts là-bas pour les supprimer."
+],
+"rsOd": [
+"bbde1a818d",
+"Plan ODM et ses niveaux"
+],
+"rsTitle": [
+"6ce02ce159",
+"Réinitialiser la page"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Annuler la dernière réinitialisation"
 ],
 "runTest": [
 "2c7f471fce",

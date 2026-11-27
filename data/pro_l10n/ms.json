@@ -37,6 +37,10 @@
 "7380ba50bf",
 "<b>50 bahasa dan mata wang anda sendiri:</b> ruang kerja dalam bahasa Kurdis, Parsi, Arab, Inggeris dan 46 bahasa lain, masing-masing pada alamatnya sendiri (/market/de/, /market/jp/ …); setiap syiling Binance dalam mata wang anda (euro, lira, rupee, yen dan kira-kira 150 lagi), dikira seperti toman daripada kadar rujukan harian, atau daripada kadar anda sendiri untuk satu tether atau satu dolar."
 ],
+"about.9481d12afe": [
+"9481d12afe",
+"Butang <b>ODM</b> merancang keseluruhan dagangan: kemasukan berperingkat, henti ATR, exit berperingkat mengikut harga, peratusan atau R, henti trailing untuk baki, setiap cara ia boleh berakhir, ujian pada candle lepas dan amaran untuk setiap tahap."
+],
 "about.9f16c628ea": [
 "9f16c628ea",
 "<b>70 indikator:</b> pelbagai jenis purata bergerak (HMA, ALMA, TEMA…), Bollinger, Ichimoku, Alligator, pivot points, ZigZag, SuperTrend, VWAP, RSI, MACD, Stochastic, ADX, Aroon, Fisher, CMF dan banyak lagi, dengan definisi TradingView."
@@ -84,6 +88,10 @@
 "about.fb578e06d6": [
 "fb578e06d6",
 "<b>Amaran harga, garisan dan petunjuk:</b> silangan, bersilang ke atas atau ke bawah, di atas atau di bawah, pergerakan %; garisan trend condong, sinar dan saluran; silangan RSI, purata bergerak dan EMA, MACD, Bollinger, SuperTrend, Stochastics dan lonjakan volum; amaran berita — dengan tarikh tamat, pemberitahuan penyemak imbas, bunyi, dan amaran harga yang dihantar ke bot Telegram."
+],
+"about.fca76d932c": [
+"fca76d932c",
+"Butang Sumber data (ikon muat turun di bar atas) menyenaraikan data sejarah percuma untuk kripto, forex, futures, saham dan makro, berserta lesen dan had setiap sumber."
 ],
 "ac_bb_gt": [
 "8edb588c2d",
@@ -208,6 +216,14 @@
 "ai_xma": [
 "7949a2630a",
 "Silangan EMA (pantas / perlahan)"
+],
+"alDelAll": [
+"fa338bee78",
+"Padam semua amaran ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Padam semua {n} amaran pada setiap coin? Anda boleh batalkan tindakan ini sejurus selepas itu."
 ],
 "alert": [
 "b969680a49",
@@ -665,6 +681,10 @@
 "31f0b75eca",
 "Mata wang (toman)"
 ],
+"cat_gm": [
+"398080fb89",
+"Indeks & saham AS"
+],
 "cat_gold": [
 "56d2a2fdcf",
 "Emas, syiling & perak"
@@ -785,6 +805,34 @@
 "bbfa773e5a",
 "Tutup"
 ],
+"cmMode": [
+"2c8ea521d1",
+"Warna candle"
+],
+"cmModeH": [
+"8404fd51e3",
+"Mengikut arah, atau mengikut peraturan yang dibaca daripada bar."
+],
+"cmMom": [
+"cc8d5297d7",
+"Momentum (ROC 10)"
+],
+"cmRsi": [
+"b76fb892f0",
+"RSI (14)"
+],
+"cmStd": [
+"303ed38987",
+"Arah (naik / turun)"
+],
+"cmTrend": [
+"7fe9e85b12",
+"Trend (EMA 50)"
+],
+"cmVol": [
+"76fe65a559",
+"Kekuatan volum"
+],
 "computed": [
 "fce79dfc7c",
 "dikira: Binance × kadar tether"
@@ -884,6 +932,10 @@
 "csDn": [
 "11f5ff3829",
 "Candle jatuh"
+],
+"csDraw": [
+"9de36050c7",
+"Lukisan"
 ],
 "csFont": [
 "b97c4d4cdd",
@@ -1037,13 +1089,61 @@
 "fe93409ef8",
 "{n} bar dimuat turun"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Semua amaran pada coin ini"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Padam amaran ini"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} amaran dipadamkan."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Tambah makluman di sini"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Semua lukisan ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Semua penunjuk ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Kembali"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Kosongkan keseluruhan carta"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Buang setiap lukisan dan penunjuk, berserta aras ODM berserta amaran mereka, daripada {s}? Amaran lain kekal. Anda boleh batalkan tindakan ini."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Carta dikosongkan."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Salin harga ini"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} lukisan dibuang."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Lukisan, yang terkini dahulu"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Satu lukisan…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1052,6 +1152,42 @@
 "ctxHline": [
 "588d2eb492",
 "Garisan mendatar di sini"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Satu penunjuk…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} penunjuk dibuang."
+],
+"ctxNothing": [
+"300e0e8374",
+"Tiada apa untuk dibuang"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Buang aras dan amaran ODM"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Aras ODM dan amaran mereka"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"Buka ODM"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Buang daripada carta"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} dibuang."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"Buang {x}"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -1141,6 +1277,226 @@
 "3954de7300",
 "Short sahaja"
 ],
+"dlAll": [
+"6a72085653",
+"Semua"
+],
+"dlBtn": [
+"dadd6ac5ba",
+"Sumber data"
+],
+"dlChecked": [
+"50f7b428c1",
+"Pautan dan terma disemak pada {d}. entekhab.net hanya pautkan ke tapak ini; ia tidak menyalin atau mengehos data mereka."
+],
+"dlLic": [
+"d3980b6cf5",
+"Lesen atau terma, seperti yang dinyatakan oleh penyedia"
+],
+"dlLicNone": [
+"be2ebfbb17",
+"Tiada lesen dinyatakan"
+],
+"dlLicOther": [
+"bff074f4cc",
+"Lesen tersuai"
+],
+"dlLicTerms": [
+"c66e6957e7",
+"Terma sendiri"
+],
+"dlLicVaries": [
+"00231f3b79",
+"Mengikut dataset"
+],
+"dlNone": [
+"0b16331ac1",
+"Tiada sumber sepadan."
+],
+"dlNote": [
+"8209efc853",
+"Tempat untuk mendapatkan data sejarah percuma untuk crypto, forex, futures, saham dan makro, serta alat percuma untuk membacanya. Setiap pautan telah dibuka dan peringkat percuma serta termanya telah dibaca. Terma boleh berubah, jadi bacanya sebelum anda guna atau kongsi data tersebut. Beberapa sumber membenarkan kegunaan bukan komersial sahaja."
+],
+"dlSearch": [
+"93386c6297",
+"Cari sumber"
+],
+"dlTip1": [
+"176e90a67b",
+"Tukar setiap masa kepada UTC sebelum anda gabungkan fail daripada sumber yang berbeza."
+],
+"dlTip2": [
+"85b8a5f7d4",
+"Kekalkan kolum dalam susunan ini: masa, open, high, low, close, volum."
+],
+"dlTip3": [
+"35478962a9",
+"Untuk sejarah tick atau 1 minit, Parquet adalah jauh lebih kecil dan lebih pantas daripada CSV."
+],
+"dlTip4": [
+"b8885df839",
+"Tanda jurang hujung minggu dan cuti dan bukannya mengisinya dengan bar buatan, atau backtest akan berdagang harga yang tidak pernah wujud."
+],
+"dlTips": [
+"8c402b7491",
+"Mengimport data dengan bersih"
+],
+"dlTitle": [
+"b5822318cc",
+"Data dan alat pasaran percuma"
+],
+"dl_av": [
+"4839dbddf4",
+"Saham, forex dan crypto melalui API dengan kunci percuma dan had permintaan harian yang kecil. Baca halaman harga untuk had semasa."
+],
+"dl_binv": [
+"a23b5a4769",
+"Fail ZIP bulanan dan harian untuk kline (1s hingga 1 bulan), dagangan dan aggTrades untuk spot Binance dan futures USD-M/COIN-M. Tiada akaun atau kunci. Kegunaan bukan komersial sahaja, tiada pengehosan semula, kreditkan Binance Vision."
+],
+"dl_ccd": [
+"66dee06dc3",
+"Skrip yang membuang candle daripada Binance, OKX dan Bybit ke dalam fail bersih, termasuk selang masa tersuai. Projek sangat baharu dengan sedikit pengguna."
+],
+"dl_cdd": [
+"e0fd7c2ef5",
+"Fail CSV harian, setiap jam dan seminit daripada beberapa pertukaran. Kegunaan bukan komersial sahaja dan tiada pengehosan semula."
+],
+"dl_duka": [
+"3a998ee29c",
+"Alat baris perintah yang memuat turun sejarah tick dan candle Dukascopy untuk forex, logam, indeks, tenaga dan beberapa crypto sebagai CSV atau JSON. Alat ini berlesen MIT; terma Dukascopy sendiri untuk data tersebut tidak diterbitkan."
+],
+"dl_evtl": [
+"19191f39b1",
+"Fail OHLCV sedia ada dengan bida dan tanya yang dibina daripada tick Dukascopy untuk emas, perak, pasangan forex utama, indeks, BTC dan ETH, M1 hingga D1. Kegunaan pendidikan dengan atribusi."
+],
+"dl_finnhub": [
+"cb53f627f4",
+"Saham, forex dan crypto melalui API dengan kunci percuma dan had permintaan seminit. Baca halaman harga untuk had semasa."
+],
+"dl_fred": [
+"0496b77aa2",
+"Ratusan ribu siri ekonomi AS dan dunia: kadar, inflasi, pekerjaan. Percuma, tetapi API memerlukan kunci, sumber mesti dipetik, dan termanya melarang caching data."
+],
+"dl_freech": [
+"41c5b5ac27",
+"Carta web yang berjalan pada kunci API percuma anda sendiri (contohnya Twelve Data atau Binance)."
+],
+"dl_fx1m": [
+"2d40c5dac8",
+"Skrip dan arkib sejarah forex 1 minit yang diambil dari HistData, berguna untuk memuat turunnya sekaligus."
+],
+"dl_hf": [
+"d6bf62a064",
+"Dataset 1 minit sedia ada untuk indeks utama AS, futures, VIX dan beberapa crypto serta komoditi. Lesen tersuai: baca pada halaman tersebut."
+],
+"dl_hfd": [
+"c687eb1e28",
+"Fail sampel percuma (10 saat dan 1 minit) untuk ES, NQ, emas, minyak mentah dan lain-lain, serta sejarah harian penuh dengan akaun percuma. Tiada lesen dinyatakan."
+],
+"dl_histdata": [
+"605a2236a9",
+"Fail ZIP bulanan percuma untuk data forex 1 minit dan tick, tiada pendaftaran. Tapak ini tidak menyatakan lesen."
+],
+"dl_kaggle": [
+"6c66534191",
+"Ribuan dataset CSV sedia ada; cari forex, crypto atau emas. Setiap dataset mempunyai lesennya sendiri, jadi semak sebelum guna."
+],
+"dl_lse": [
+"575c1953d1",
+"Arkib yang sangat besar untuk saham, forex, crypto, futures, opsyen dan siri makro. Kunci percuma membenarkan 10 muat turun sejam sebagai CSV atau Parquet; data berlesen pertukaran adalah berbayar."
+],
+"dl_lwc": [
+"4ab8089278",
+"Pustaka carta sumber terbuka tempat halaman ini dibina. Percuma, termasuk untuk kegunaan komersial, dengan atribusi."
+],
+"dl_mt5": [
+"4caae7d59c",
+"Terminal perdagangan yang pusat sejarahnya boleh mengeksport tahun-tahun candle forex, indeks dan komoditi ke CSV. Sejauh mana ia pergi bergantung pada broker."
+],
+"dl_okx": [
+"7021ebbbed",
+"Muat turun sejarah spot dan derivatif OKX: candle dari Julai 2023, kadar pembiayaan dari Mac 2022, dagangan dari September 2021."
+],
+"dl_openbb": [
+"b00e3cda10",
+"Platform Python sumber terbuka yang menarik banyak sumber percuma (Yahoo, FRED, pertukaran dan banyak lagi) ke satu tempat. Percuma untuk individu."
+],
+"dl_pricehub": [
+"65f9da264e",
+"Pustaka Python kecil yang mengambil candle OHLCV daripada 7 pertukaran dengan satu fungsi dan tiada kunci API."
+],
+"dl_prt": [
+"08174f29c9",
+"Platform carta dengan pelan web percuma: data hujung hari, dan data tertunda 15 minit untuk beberapa pasaran."
+],
+"dl_qdm": [
+"d0786b57ec",
+"Memuat turun dan membersihkan data tick dan candle daripada beberapa sumber dan mengeksportnya ke pelbagai format. Peringkat percuma dengan naik taraf berbayar."
+],
+"dl_sifting": [
+"b3525e5ca6",
+"Eksport CSV atau Excel untuk saham AS, forex, logam dan crypto. 24 jam terakhir (bar 5 minit hingga 1 jam) tidak memerlukan akaun; sejarah yang lebih lama memerlukan akaun dan kunci percuma. Harga tidak dipecah atau diselaraskan dividen."
+],
+"dl_stooq": [
+"3ca445487c",
+"Fail CSV harian percuma (dan beberapa intraday) untuk saham, indeks, forex dan komoditi. Muat turun pukal memerlukan CAPTCHA."
+],
+"dl_tickstory": [
+"b1a433f7bf",
+"Memuat turun data Dukascopy dan mengeksportnya untuk MetaTrader atau sebagai CSV, mengisi jurang. Peringkat percuma dengan naik taraf berbayar."
+],
+"dl_tickview": [
+"debabf5f0c",
+"Carta candle sumber terbuka dengan data Binance, Yahoo dan CFTC percuma, tiada pendaftaran. Projek kecil dan baharu."
+],
+"dl_truefx": [
+"8862a592ca",
+"Sejarah forex peringkat tick percuma selepas pendaftaran percuma."
+],
+"dl_tvcl": [
+"6475a0d996",
+"Pustaka carta TradingView untuk tapak dan data anda sendiri. Percuma untuk projek web awam atas permintaan; logo TradingView mesti kekal kelihatan."
+],
+"dl_twelve": [
+"be02a30e49",
+"Saham, ETF, forex dan crypto melalui API. Pelan Asas percuma adalah untuk kegunaan dalaman dan bukan paparan sahaja, jadi ia tidak boleh memperkasakan halaman awam."
+],
+"dl_yf": [
+"5437629d2b",
+"Pustaka Python yang membaca harga dari Yahoo Finance. Kodnya adalah Apache-2.0, tetapi data Yahoo adalah untuk kegunaan peribadi sahaja."
+],
+"dlc_api": [
+"ac6931afbb",
+"API dengan kunci percuma"
+],
+"dlc_crypto": [
+"e849494484",
+"Crypto"
+],
+"dlc_ds": [
+"e6c2f4e616",
+"Dataset sedia ada"
+],
+"dlc_fut": [
+"1c0dd9564d",
+"Futures dan komoditi"
+],
+"dlc_fx": [
+"faed5365ef",
+"Forex dan CFD"
+],
+"dlc_macro": [
+"1f8c0db097",
+"Makro dan ekonomi"
+],
+"dlc_stk": [
+"b179d8b69a",
+"Saham dan berbilang pasaran"
+],
+"dlc_tool": [
+"7869b0dbaa",
+"Alat dan platform"
+],
 "draft": [
 "23d33e22ac",
 "Draf"
@@ -1177,6 +1533,38 @@
 "d3bc9a378d",
 ","
 ],
+"ec_an": [
+"1780ecaa16",
+"Haiwan"
+],
+"ec_fl": [
+"5d728758ad",
+"Bendera"
+],
+"ec_hd": [
+"23d3f6704e",
+"Tangan dan hati"
+],
+"ec_mk": [
+"569bbd757e",
+"Pasaran"
+],
+"ec_ob": [
+"72a83add2c",
+"Objek"
+],
+"ec_rec": [
+"cc5bc923e8",
+"Baru digunakan"
+],
+"ec_sm": [
+"fdbb8fef19",
+"Muka"
+],
+"ec_sy": [
+"22ad664e9e",
+"Simbol"
+],
 "ecoCal": [
 "6d68264bb4",
 "Kalendar ekonomi"
@@ -1184,6 +1572,22 @@
 "editText": [
 "c3328c39b0",
 "Teks"
+],
+"emoEmojis": [
+"ac171aacfa",
+"Emoji"
+],
+"emoIcoNote": [
+"58a7f252e8",
+"Ikon mengikut warna dan saiz lukisan: ubahnya dalam tetapan."
+],
+"emoIcons": [
+"edb8f6c142",
+"Ikon"
+],
+"emoStickers": [
+"9dca595b1a",
+"Stiker"
 ],
 "emptyList": [
 "544648e49b",
@@ -1309,9 +1713,29 @@
 "7f980d6a5f",
 "Panjang perlahan mestilah lebih panjang daripada yang pantas."
 ],
+"favAdd": [
+"6b2ac06d56",
+"Tambah ke kegemaran"
+],
+"favDel": [
+"624f82c132",
+"Buang daripada kegemaran"
+],
+"favFull": [
+"3950f549f0",
+"Bar kegemaran sudah penuh (24 alat)."
+],
+"favMove": [
+"6b9c3927d7",
+"Seret untuk mengalihkan bar"
+],
 "favTf": [
 "ce59fda88d",
 "Semat ke bar alatan"
+],
+"favTools": [
+"4fa8cc860c",
+"Alat"
 ],
 "filled": [
 "f7b2d37425",
@@ -1457,6 +1881,14 @@
 "1b4620951d",
 "Berasaskan volum"
 ],
+"gmDaily": [
+"3b7d2bb675",
+"Indeks dan saham AS di sini adalah penutupan harian sahaja: pilih 1D, 1W atau 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Penutupan harian disimpan di tapak ini daripada sumber awam percuma (Yahoo Finance dahulu, yang lain sebagai sandaran). Hari ditutup sahaja: tiada bar intraday dan tiada harga langsung."
+],
 "go": [
 "2e0b45f2a4",
 "Pergi"
@@ -1524,6 +1956,42 @@
 "h_toman": [
 "329367a6b8",
 "Dolar, euro, emas, syiling, perak dan setiap kripto dalam toman, daripada kadar langsung tgju."
+],
+"hdCon": [
+"5add073ddb",
+"Kontras tinggi"
+],
+"hdMag": [
+"d7f87f222d",
+"Magnet"
+],
+"hdMagH": [
+"4c9991b205",
+"Melekapkan titik baharu pada candle yang terdekat."
+],
+"hdMin": [
+"a711cca9a4",
+"Minima"
+],
+"hdMode": [
+"e2144806a5",
+"Pemegang pemilihan"
+],
+"hdModeH": [
+"9263c148e4",
+"Memastikan candle di bawahnya boleh dibaca."
+],
+"hdNorm": [
+"d00635865c",
+"Enak"
+],
+"hdTr": [
+"a09334607d",
+"Lус telus"
+],
+"hdTrans": [
+"7b2ec8c047",
+"Ketelusan pemegang"
 ],
 "helpTab": [
 "c47ae15370",
@@ -2717,6 +3185,166 @@
 "11eda67f9b",
 "Long"
 ],
+"lqBooks": [
+"52aa248e2a",
+"Buku pesanan"
+],
+"lqBtn": [
+"76a3e625b1",
+"Likuidasi"
+],
+"lqL_bnf": [
+"2d42564524",
+"Likuidasi Binance"
+],
+"lqL_byf": [
+"738f6e941d",
+"Likuidasi Bybit"
+],
+"lqLay_heat": [
+"996b295aa4",
+"Peta haba mengikut masa"
+],
+"lqLay_liq": [
+"30d1693268",
+"Likuidasi"
+],
+"lqLay_prof": [
+"1b7f22ab6a",
+"Tempah sekarang (tepi kanan)"
+],
+"lqLayers": [
+"f055f18aea",
+"Lapisan"
+],
+"lqLiqSum": [
+"53dd3e4363",
+"{n} likuidasi dilihat dalam {since}: long ditutup {l}, short ditutup {s}."
+],
+"lqLiqT": [
+"2e7bee73ac",
+"Likuidasi semasa terbuka"
+],
+"lqLiveOk": [
+"98aadb3708",
+"langsung"
+],
+"lqLong": [
+"5159d6b96c",
+"Long dilikuidasi"
+],
+"lqMin": [
+"37e737d92c",
+"{n} min"
+],
+"lqNoSym": [
+"9eda810b3c",
+"Peta likuiditi berfungsi pada syiling yang didagangkan berbanding USDT di Binance, Bybit atau OKX. {s} bukan salah satu daripadanya."
+],
+"lqNow": [
+"1cf45f3e25",
+"{n} buku digabungkan. Setiap daripadanya merangkumi {lo} hingga {hi}, dalam langkah {step}. {k} bacaan disimpan sejak anda menghidupkannya ({since})."
+],
+"lqOff": [
+"1a01ac36a1",
+"Tutup. Tandakan kotak di atas untuk mula membaca buku pesanan."
+],
+"lqSec": [
+"55220b204c",
+"{n}s"
+],
+"lqShort": [
+"89d59d2f0a",
+"Short dilikuidasi"
+],
+"lqShow": [
+"051401a51e",
+"Tunjukkan pada carta"
+],
+"lqSrcT": [
+"be018e47a2",
+"Sumber dan tahap kekiniannya"
+],
+"lqStep": [
+"41b6a9dc1c",
+"Langkah harga"
+],
+"lqTitle": [
+"5163cb5fa5",
+"Peta likuiditi"
+],
+"lqVBad": [
+"1ad25e9e10",
+"tidak boleh dicapai dari sini buat masa ini"
+],
+"lqVOk": [
+"f9efa46205",
+"buku dari {lo} hingga {hi}, dibaca {t} lalu"
+],
+"lqV_bnf": [
+"ec2ef9ae21",
+"Futures Binance"
+],
+"lqV_bns": [
+"47849f1dfa",
+"Spot Binance"
+],
+"lqV_byf": [
+"d88c2ab7c7",
+"Futures Bybit"
+],
+"lqV_okx": [
+"71057c6407",
+"Spot OKX"
+],
+"lqWDist": [
+"54ecd0e57f",
+"Dari tengah"
+],
+"lqWHeld": [
+"87807a0b14",
+"Dipegang"
+],
+"lqWPrice": [
+"c20f7ce09a",
+"Julat harga"
+],
+"lqWSize": [
+"b7152342a2",
+"Saiz"
+],
+"lqWTop": [
+"06db06f316",
+"Bahagian terbesar"
+],
+"lqWait": [
+"e9c5b7b234",
+"menunggu jawapan pertama"
+],
+"lqWallNote": [
+"98ee1d2b6b",
+"\"Dipegang\" ialah tempoh dinding mengekalkan sekurang-kurangnya separuh daripada saiznya dalam bacaan yang disimpan di sini."
+],
+"lqWallsT": [
+"1ef7390586",
+"Dinding terbesar sekarang"
+],
+"lqWhy1": [
+"6325436ac2",
+"Hanya data yang diterbitkan oleh pertukaran: buku pesanan mereka, dibaca setiap 10 saat, dan suapan likuidasi mereka. Tiada apa yang dianggarkan, dan tiada \"tahap likuidasi\" ditekka daripada leverage."
+],
+"lqWhy2": [
+"67effe4128",
+"Hijau ialah pesanan beli yang menunggu, merah ialah pesanan jual yang menunggu. Bar di tepi kanan ialah buku sekarang; peta haba di sebalik candle ialah setiap bacaan yang disimpan semasa halaman ini dibuka. Tiada yang lebih lama boleh ditunjukkan, kerana tiada sumber percuma yang menyimpan buku pesanan lama."
+],
+"lqWhy3": [
+"f6d28bc855",
+"Pesanan boleh ditarik pada bila-bila masa, jadi dinding menunjukkan apa yang ada di situ, bukannya janji. Setiap buku hanya mencapai sebahagian daripada jarak dari harga: melepasi julat yang diliputi oleh setiap buku terpilih, jumlah akan kehilangan pesanan, jadi ia dimalapkan dan ditinggalkan daripada senarai. Binance menghantar paling banyak satu likuidasi sesyiling sesaat, jadi bilangannya adalah lantai; Bybit menghantar kesemuanya."
+],
+"lqWhyT": [
+"2d7735c077",
+"Apa yang ditunjukkan oleh peta ini, dan apa yang tidak"
+],
 "ly_live": [
 "c3d036c573",
 "Analisis langsung Kurdistani"
@@ -2797,9 +3425,65 @@
 "98d183e7cb",
 "Alih ke bahagian"
 ],
+"ms_confirmed": [
+"8cc7acb8f3",
+"Disahkan"
+],
+"ms_conflicting": [
+"41f18332f6",
+"Canggah"
+],
+"ms_developing": [
+"7903b5f5b9",
+"Membangun"
+],
+"ms_insufficient": [
+"0da1cb3c48",
+"Data tidak mencukupi"
+],
+"ms_neutral": [
+"4bd2913945",
+"Neutral"
+],
+"ms_tip_confirmed": [
+"d0f8fd73bd",
+"Trend, struktur dan kecenderungan semuanya menghala ke arah yang sama."
+],
+"ms_tip_conflicting": [
+"0161400e1f",
+"Trend EMA dan struktur swing, atau trend dan MACD, menghala ke arah yang bertentangan."
+],
+"ms_tip_developing": [
+"c7be2bde9d",
+"Kecenderungan menghala ke satu arah, tetapi trend atau struktur belum menyertainya lagi."
+],
+"ms_tip_insufficient": [
+"7f50d7c30d",
+"Kurang daripada 200 candle ditutup: EMA 200 dan persentil 200 bar tidak tersedia."
+],
+"ms_tip_neutral": [
+"0ae8ec4891",
+"Tiada kecenderungan ke mana-mana arah."
+],
+"mt_down": [
+"bf93e5ce8b",
+"Turun"
+],
+"mt_flat": [
+"79c9e13ab7",
+"Mendatar"
+],
 "mt_mine": [
 "1cf761ac34",
 "Skrip saya"
+],
+"mt_mixed": [
+"c0dcb865ad",
+"Bercampur"
+],
+"mt_na": [
+"1b93795b97",
+"—"
 ],
 "mt_opt": [
 "6bf5da9c08",
@@ -2820,6 +3504,66 @@
 "mt_strat": [
 "876f3e0202",
 "Strategi"
+],
+"mt_up": [
+"2038bdec92",
+"Naik"
+],
+"mtfBtn": [
+"58947ebc8f",
+"Matriks"
+],
+"mtfLean": [
+"551b5aa2a6",
+"Kecenderungan"
+],
+"mtfNoData": [
+"5e59eb443a",
+"Tiada data pada jangka masa ini"
+],
+"mtfNote": [
+"44b9187f41",
+"Setiap sel ialah peraturan yang dinyatakan pada candle tertutup jangka masa tersebut. Jangka masa adalah hirisan daripada satu siri harga, jadi persetujuan mereka bukanlah bukti bebas, dan tiada satu pun daripada ini meramalkan apa-apa."
+],
+"mtfRegime": [
+"0b655e2471",
+"Rejim"
+],
+"mtfShort": [
+"2567ff70d2",
+"Tidak cukup candle"
+],
+"mtfState": [
+"a725020675",
+"Keadaan"
+],
+"mtfStruct": [
+"9482c5d5bf",
+"Struktur"
+],
+"mtfSum": [
+"25609d2c57",
+"{u} daripada {n} jangka masa cenderung naik, {d} cenderung turun."
+],
+"mtfTf": [
+"f136a6c6e6",
+"TF"
+],
+"mtfTitle": [
+"80c7c684e0",
+"Matriks jangka masa"
+],
+"mtfTrend": [
+"dae07c6ee8",
+"Trend"
+],
+"mtfVol": [
+"3b18e8e332",
+"Volum"
+],
+"mtfVola": [
+"205bdd6065",
+"Kemeruapan"
 ],
 "multiAl": [
 "5bafcd2412",
@@ -3012,6 +3756,1190 @@
 "objects": [
 "d80a665c4b",
 "Lukisan"
+],
+"odA_none": [
+"efac6f456a",
+"Serta-merta"
+],
+"odA_pct": [
+"7724ed0a06",
+"Pada % daripada purata"
+],
+"odA_price": [
+"34cd6e6ad0",
+"Pada harga"
+],
+"odA_r": [
+"6e45e5e9e3",
+"Pada × R"
+],
+"odAcc": [
+"e6018a209f",
+"Akaun dan kontrak"
+],
+"odAddE": [
+"19172e9e47",
+"Entry"
+],
+"odAddX": [
+"f83b6fe3ae",
+"Exit"
+],
+"odAlAdd": [
+"f06c9cb834",
+"Tambah makluman yang ditanda"
+],
+"odAlBot": [
+"3629af8343",
+"Semua ditanda ke bot Telegram ({n})"
+],
+"odAlBotCut": [
+"2fcde082d6",
+"{n} daripada {m} tahap muat dalam satu pautan Telegram (stop dan exit dahulu). Tambah selebihnya dengan ✈ di sebelah setiap tahap."
+],
+"odAlDone": [
+"dcb0bb6e26",
+"{n} makluman ditambah, {d} sudah ada di situ."
+],
+"odAlNote": [
+"d01e0d0ed8",
+"Ia masuk ke dalam senarai makluman anda dan berdering dalam pelayar ini. Untuk bot Telegram, hantar semua tahap yang ditanda sekaligus dan ketik “Tambah semua” di situ, atau ketik ✈ di sebelah satu tahap."
+],
+"odAlT": [
+"c4db405f26",
+"Makluman untuk setiap tahap"
+],
+"odAlerts": [
+"4d34373477",
+"Makluman untuk setiap tahap"
+],
+"odAmb": [
+"7802cc464b",
+"Bar tidak jelas"
+],
+"odAmbTip": [
+"bb7b5e1048",
+"Bar di mana satu candle mencapai dua tahap. Candle tidak dapat menunjukkan yang mana sampai dahulu, jadi yang lebih teruk telah diambil."
+],
+"odAt": [
+"1030b5c14f",
+"Keputusan jika semua ditutup pada"
+],
+"odAtRes": [
+"ed6f422e42",
+"Keputusan pada {p}"
+],
+"odAtrIs": [
+"a6c0a4559a",
+"ATR({n}) pada {tf} = {v}, daripada {b} bar tertutup. Bar yang sedang terbentuk ditinggalkan."
+],
+"odAtrLen": [
+"0d1283ae88",
+"Panjang ATR"
+],
+"odAtrNone": [
+"b5b8e149bf",
+"ATR({n}) memerlukan lebih banyak bar tertutup pada carta ini."
+],
+"odAvg": [
+"195d5c2e94",
+"Purata entry (semua diisi)"
+],
+"odAvgAfter": [
+"6b5b19bc70",
+"Purata setakat ini"
+],
+"odAvgS": [
+"bf3c2aa634",
+"Purata setakat ini"
+],
+"odBE": [
+"c728685de9",
+"Stop kepada titik pulang modal"
+],
+"odBEAfter": [
+"a5351e110f",
+"Selepas exit {n}"
+],
+"odBENo": [
+"80c3052d33",
+"Tidak pernah"
+],
+"odBack": [
+"50e2c403dc",
+"Mulakan sebanyak ini bar ke belakang"
+],
+"odBars": [
+"b3c192ff2d",
+"Bar dilalui"
+],
+"odBest": [
+"802503cf21",
+"Semua exit diisi"
+],
+"odBtn": [
+"9cd499490a",
+"ODM"
+],
+"odClearedAl": [
+"10dc663b4f",
+"{m} makluman ODM dibuang."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} tahap dan {m} makluman ODM dibuang."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} pada {p} ({d}% daripada harga terakhir)"
+],
+"odDragHint": [
+"db78c3cdfe",
+"Seret garisan bertanda ↕, bulatan pada garisan entry untuk mengalihkan kotak, atau bar pada tepi kanannya untuk mengubah saiznya. Di mana-mana tempat lain carta bergerak seperti biasa."
+],
+"odEExit": [
+"3d85c7e08a",
+"Exit {n}, kemudian stop"
+],
+"odEExitBE": [
+"0ad2bfc2b3",
+"Exit {n}, kemudian titik pulang modal"
+],
+"odEOpen": [
+"5345d6a804",
+"Semua exit, {p}% masih terbuka"
+],
+"odEStop": [
+"86bdb5dd1a",
+"Disetop sebelum sebarang exit"
+],
+"odETrail": [
+"4a7ecb3fd6",
+"Semua exit, kemudian trail pada tahap terendahnya"
+],
+"odETrailStop": [
+"aa767f2da5",
+"Semua exit, kemudian trail tidak pernah bergerak (kes terburuk)"
+],
+"odE_act": [
+"62e5648dbd",
+"Permulaan trail mestilah pada sisi keuntungan purata entry."
+],
+"odE_atr": [
+"806d58c951",
+"ATR belum tersedia lagi: muatkan lebih banyak sejarah atau pilih jenis stop lain."
+],
+"odE_entryPct": [
+"82eb26283f",
+"Bahagian entry mesti berjumlah 100%."
+],
+"odE_gen": [
+"444ab6efd0",
+"Untuk tangga: harga pertama, 1–10 langkah dan jurang di bawah 50%."
+],
+"odE_inverse": [
+"ab5e9b4538",
+"Kontrak bermarginkan syiling tidak dimodelkan di sini: gunakan tetapan linear atau spot."
+],
+"odE_lev": [
+"19c0779ac0",
+"Leverage mestilah antara 1 dan 500."
+],
+"odE_many": [
+"f6b50a805f",
+"Terlalu banyak baris: paling banyak 10 entry dan 8 exit."
+],
+"odE_noEntry": [
+"919adac637",
+"Tambah sekurang-kurangnya satu harga entry."
+],
+"odE_num": [
+"86a4dc7d7f",
+"Semak nombor: setiap medan memerlukan nombor positif."
+],
+"odE_order": [
+"2119b7e150",
+"Exit {n} mestilah lebih jauh daripada exit sebelumnya."
+],
+"odE_pctOver": [
+"888f2ba05b",
+"Exit menutup lebih daripada 100%."
+],
+"odE_risk": [
+"4193f0db38",
+"Risiko tidak boleh melebihi 100%."
+],
+"odE_side": [
+"e208f5757c",
+"Stop mestilah melepasi setiap entry: di bawah untuk long, di atas untuk short."
+],
+"odE_spotShort": [
+"dff80cfcdf",
+"Spot tidak boleh di-short."
+],
+"odE_stop": [
+"6c5a7a58fe",
+"Stop memerlukan nilai yang sah."
+],
+"odE_tp": [
+"2f260004d9",
+"Exit {n} mesti berada di sebelah bahagian profit daripada purata entry."
+],
+"odE_trail": [
+"900ad94e6a",
+"Trail memerlukan jarak (peratus di bawah 50, atau gandaan ATR)."
+],
+"odEnd": [
+"d2df8e9351",
+"Berakhir oleh"
+],
+"odEnd_be": [
+"813161b07c",
+"Break-even"
+],
+"odEnd_exits": [
+"f80c25cfd5",
+"Semua exit"
+],
+"odEnd_flat": [
+"88d86b7721",
+"Ditutup"
+],
+"odEnd_none": [
+"822dfe195e",
+"Tiada entry dicapai"
+],
+"odEnd_open": [
+"3d679078a6",
+"Masih dibuka"
+],
+"odEnd_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEnd_trail": [
+"5b20595c1d",
+"Trailing stop"
+],
+"odEnt": [
+"f056d0d56a",
+"Entry"
+],
+"odEntHint": [
+"9f13728dde",
+"Sehingga 10 harga limit, setiap satu dengan bahagian posisinya. Bina tangga atau taip harga anda sendiri."
+],
+"odEv_be": [
+"813161b07c",
+"Break-even"
+],
+"odEv_entry": [
+"19172e9e47",
+"Entry"
+],
+"odEv_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEv_trail": [
+"4c9c67fc6d",
+"Trail"
+],
+"odExit": [
+"d71626cd31",
+"Exit"
+],
+"odExitHint": [
+"a9498bb911",
+"Sehingga 8 langkah. Setiap satu menutup bahagian pada harga tertentu, pada peratus dari purata entry, atau pada gandaan R."
+],
+"odExt": [
+"a4b2498fcd",
+"Lanjutkan ke tepi kanan"
+],
+"odExtClosed": [
+"f871770520",
+"Posisi mempunyai tepi kanannya semula. Seret untuk saiz semula."
+],
+"odExtOff": [
+"013864439f",
+"Tutup tepi kanan"
+],
+"odExtOn": [
+"cd67a03b67",
+"Posisi kini berjalan ke tepi kanan."
+],
+"odFillNote": [
+"c87b4a2a0a",
+"Purata setakat ini: purata entry anda sebaik sahaja langkah inifilled. Loss pada SL: apa yang anda rugi jika stop kena tepat selepas langkah inifilled, yuran dan slippage disertakan."
+],
+"odFilled": [
+"b9cade220e",
+"Entryfilled"
+],
+"odFromStart": [
+"fe112c8cee",
+"serta-merta"
+],
+"odFund": [
+"44fad8f1d2",
+"Pembiayaan (+ diterima, − dibayar)"
+],
+"odGBuild": [
+"e2a08aa341",
+"Bina tangga"
+],
+"odGFirst": [
+"de46c48c22",
+"Harga pertama"
+],
+"odGN": [
+"cdde4f20ba",
+"Langkah"
+],
+"odGSplit": [
+"fc8230b411",
+"Bahagikan"
+],
+"odGStep": [
+"56746816d8",
+"Jurang setiap langkah (%)"
+],
+"odGuide": [
+"8aa7d50c3e",
+"Bimbing saya, langkah demi langkah"
+],
+"odHEnds": [
+"5cbaf8a928",
+"Setiap cara ia berakhir (semua entryfilled)"
+],
+"odHExits": [
+"d71626cd31",
+"Exit"
+],
+"odHFills": [
+"f53f7d6784",
+"Entry,filled satu persatu"
+],
+"odHidden": [
+"f611e3a7c7",
+"Aras dibuang."
+],
+"odHide": [
+"e0eb5bd64c",
+"Sembunyikan daripada carta"
+],
+"odHow": [
+"c54859aa22",
+"Bagaimana ia berakhir"
+],
+"odHudE": [
+"19172e9e47",
+"Entry"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Buka ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Nyahbuat perubahan terakhir"
+],
+"odHudX": [
+"61ad50a9b9",
+"Sasaran"
+],
+"odLAvg": [
+"97e77871b5",
+"purata"
+],
+"odLLiq": [
+"4df0227844",
+"Likuidasi (anggar.)"
+],
+"odLTrail": [
+"bc39eaf623",
+"Permulaan trail"
+],
+"odLossIf": [
+"9f9abd5a30",
+"Loss jika dihentikan sekarang"
+],
+"odLossOf": [
+"11e7b83c1c",
+"{p}% daripada risk penuh anda ({r})"
+],
+"odLossS": [
+"8a983821d2",
+"Loss pada SL"
+],
+"odMore": [
+"e4cd862519",
+"Pembiayaan, dan hasil pada sebarang harga"
+],
+"odNoBars": [
+"512041531e",
+"Tiada bar tertutup yang mencukupi pada carta ini."
+],
+"odNote": [
+"757cb878a7",
+"Alat perancangan: ia tidak meletakkan sebarang order dan bukan nasihat. Harga adalah dalam unit carta. Likuidasi adalah anggaran ringkas."
+],
+"odO_atr": [
+"e3ea806c1a",
+"Gandaan ATR"
+],
+"odO_equal": [
+"a472ce8d19",
+"Sama"
+],
+"odO_grow": [
+"0721fea085",
+"Meningkat (lebih jauh di sana)"
+],
+"odO_long": [
+"11eda67f9b",
+"Long"
+],
+"odO_pct": [
+"ac556cf593",
+"Peratus"
+],
+"odO_price": [
+"3e8248e32e",
+"Harga"
+],
+"odO_short": [
+"0fe7d82f25",
+"Short"
+],
+"odOpenNow": [
+"309ae4fd1a",
+"Buka sekarang, pada penutupan terakhir"
+],
+"odP_one": [
+"337d2c100b",
+"Satu exit pada 2R"
+],
+"odP_pct": [
+"e3ae173380",
+"+5% · +10% · +20%"
+],
+"odP_r": [
+"c8cbacef3d",
+"1R · 2R · 3R"
+],
+"odPick_e": [
+"303f6de669",
+"Ketik carta di mana entry baharu diletakkan. Esc untuk membatalkan."
+],
+"odPick_s": [
+"39a71b4de2",
+"Ketik carta di mana stop diletakkan. Esc untuk membatalkan."
+],
+"odPick_x": [
+"fd10db7af2",
+"Ketik carta di mana sasaran baharu diletakkan. Esc untuk membatalkan."
+],
+"odPnl": [
+"5faa59d4bc",
+"Hasil"
+],
+"odPrice": [
+"3e8248e32e",
+"Harga"
+],
+"odProfit": [
+"8544a47725",
+"Profit"
+],
+"odRemove": [
+"d8b9bdb3bb",
+"Buang posisi daripada carta"
+],
+"odRestOpen": [
+"b957d211ac",
+"{p}% ditinggalkan tanpa exit dan tanpa trail: ia kekal terbuka sehingga anda menutupnya."
+],
+"odRestTrail": [
+"be684d239e",
+"{p}% ditinggalkan dan menaiki trailing stop {d} di belakang harga terbaik, bermula {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Aras itu tidak sepadan dengan pelan, jadi ia kembali:"
+],
+"odRun": [
+"b1b392607d",
+"Jalankan"
+],
+"odSMode": [
+"719a179bf8",
+"Stop mengikut"
+],
+"odSVal": [
+"e9733d1599",
+"Nilai (×ATR, % atau harga)"
+],
+"odSave": [
+"0eee2d3fa4",
+"Simpan ke papan risk"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Ketik posisi untuk memilihnya, kemudian seret garis bertanda ↕ atau pemegang. Di tempat lain carta bergerak seperti biasa."
+],
+"odShare": [
+"09ca55ca52",
+"Kongsi"
+],
+"odShow": [
+"a7555004a5",
+"Tunjuk pada carta"
+],
+"odShown": [
+"aeb3fca140",
+"{n} aras dilukis. Seret garis untuk menukar pelan, atau klik kanan carta untuk membuangnya."
+],
+"odStep": [
+"dc416e1088",
+"Langkah"
+],
+"odStop": [
+"5c87e73ae4",
+"Stop-loss"
+],
+"odStopAt": [
+"9e253470c8",
+"Stop"
+],
+"odStopHint": [
+"1520812bfa",
+"Diletakkan di luar entry paling dalam, supaya ia melindungi keseluruhan tangga."
+],
+"odSumE": [
+"c136a3bb46",
+"Entry dijumlahkan kepada {p}% (mestilah 100%)"
+],
+"odSumX": [
+"978c3654a2",
+"Exit menutup {p}% · {r}% ditinggalkan"
+],
+"odTAct": [
+"3dc83cd6e3",
+"Mulakan trail"
+],
+"odTActV": [
+"3ca6df8028",
+"Nilai permulaan"
+],
+"odTMode": [
+"2a9de72123",
+"Trail mengikut"
+],
+"odTOn": [
+"3579d12dce",
+"Trail baki"
+],
+"odTVal": [
+"a1a90e8896",
+"Jarak (×ATR atau %)"
+],
+"odTest": [
+"0f1d4cab39",
+"Uji pada carta ini"
+],
+"odTestNote": [
+"4c737bf973",
+"Harga anda adalah tetap, jadi ini bertanya apa yang order ini akan lakukan sekiranya ia berada pada carta dari bar itu. Fills adalah pada aras atau open yang lebih baik; stops pada aras atau open yang lebih teruk, tolak slippage. Trail bergerak pada bar tertutup sahaja."
+],
+"odTestT": [
+"235fcfbdf7",
+"Uji pada candle lepas carta ini"
+],
+"odTipRisk": [
+"13c945cd7c",
+"Loss jika setiap entryfilled dan stop kena, yuran dan slippage disertakan."
+],
+"odTitle": [
+"af27511d03",
+"ODM: rancang keseluruhan trade"
+],
+"odTopAvg": [
+"cdc93143c6",
+"Purata"
+],
+"odTopBest": [
+"f80c25cfd5",
+"Semua exit"
+],
+"odTopRisk": [
+"5a8f23f567",
+"Risk"
+],
+"odTourBack": [
+"b52b36b726",
+"Kembali"
+],
+"odTourDone": [
+"e9b450d14b",
+"Selesai"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Mulakan lawatan"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} daripada {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Seterusnya"
+],
+"odTourNo": [
+"e457149073",
+"Bukan sekarang"
+],
+"odTourOffer": [
+"d0012e3974",
+"Baharu kepada ODM? Lawatan satu minit menunjukkan apa yang dilakukan oleh setiap bahagian."
+],
+"odTourSkip": [
+"35b754350f",
+"Tutup lawatan"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Tetapkan baki anda, risk setiap trade dalam peratus, leverage dan yuran. Risk adalah jumlah maksimum yang anda rugi jika setiap entryfilled dan stop kena."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Akaun anda"
+],
+"odTr_act_b": [
+"7644c76432",
+"Tunjukkan pelan pada carta dan seret garisnya, ujikannya pada candle lepas, tambah amaran untuk setiap aras, atau simpan ke papan risk. Tiada apa-apa di sini meletakkan order."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Gunakannya"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Sehingga 10 harga limit, setiap satu dengan bahagiannya. Bina tangga dalam satu ketikan atau taip harga anda sendiri. Bahagian mesti dijumlahkan kepada 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Tempat anda masuk"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Sehingga 8 langkah, setiap satu pada harga, peratus dari purata entry, atau gandaan R, risk setiap coin anda."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Tempat anda take profit"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Setiap seksyen, medan dan hasil mempunyai ikonnya sendiri. Ia menerangkan bahagian tersebut, memberikan contoh dengan nombor anda, dan mempunyai kotak untuk soalan anda."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Buntu? Ketik ikon"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Jika stop kena selepas hanya sebahagian entryfilled, anda rugi lebih sedikit. Bar menunjukkan berapa banyak daripada risk penuh anda itu."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Loss pada setiap langkah"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Saiz, margin, anggaran likuidasi dan hasil untuk setiap cara trade boleh tamat, termasuk fi."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Gambaran keseluruhan"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Stop diletakkan di luar entry yang paling dalam. Tetapkannya mengikut harga, peratusan, atau gandaan ATR supaya ia mengikut turun naik pasaran."
+],
+"odTr_stop_t": [
+"f316187400",
+"Tempat anda salah"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risiko, purata entry, stop, R dan hasil terbaik, dikira semula semasa anda menaip."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Pelan sekilas pandang"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Bahagian yang tidak ditutup oleh exit boleh menggunakan trailing stop, dan stop boleh bergerak ke break-even sebaik sahaja exit selesai."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Baki yang tinggal"
+],
+"odTrail": [
+"f4d671693b",
+"Baki yang tinggal"
+],
+"odTrailHint": [
+"952ea83894",
+"Bahagian yang tidak ditutup oleh exit boleh menggunakan trailing stop. Stop juga boleh bergerak ke break-even selepas exit selesai."
+],
+"odUndone": [
+"d94a6ce055",
+"Perubahan terakhir telah dibatalkan."
+],
+"odW_inRange": [
+"44db20d843",
+"{l} berada dalam julat entry anda, jadi ia boleh diisi sebelum semua entry diisi."
+],
+"odWhat": [
+"97211a8888",
+"Apa"
+],
+"odWhen": [
+"6c82e6dd86",
+"Masa"
+],
+"odWhy1": [
+"fc2725ec34",
+"OCO mengikat satu entry kepada satu stop dan target tetap. ODM merancang keseluruhan kitaran hayat trade: tempat anda membina posisi, tempat anda salah, tempat anda take-profit langkah demi langkah, dan cara bahagian terakhir menunggang trend."
+],
+"odWhy2": [
+"287376870c",
+"Saiz datang daripada risiko, bukan sebaliknya. Jika semua entry diisi dan stop terkena, anda rugi tepat pada jumlah yang anda pilih, termasuk fi dan slippage. Jika hanya entry awal yang diisi, anda rugi lebih sedikit."
+],
+"odWhy3": [
+"367bb231ba",
+"Stop boleh mengikut julat pasaran sendiri: k × ATR di luar entry yang paling dalam, jadi pasaran yang tenang mendapat stop yang ketat dan pasaran yang liar mendapat stop yang longgar, tanpa angka tetap."
+],
+"odWhy4": [
+"239d155a16",
+"Exit dibuat secara berperingkat, setiap satu ditetapkan mengikut harga pilihan anda, peratusan daripada purata entry atau gandaan R. Baki yang tinggal boleh menunggang trailing stop, dari mula atau sebaik sahaja harga dicapai, dan stop boleh bergerak ke break-even selepas exit selesai."
+],
+"odWhy5": [
+"bad79e82f9",
+"Setiap cara pelan boleh tamat disenaraikan berserta pulangannya, dan anda boleh menyemaknya pada candle lepas carta ini. Tiada apa-apa di sini yang meletakkan order."
+],
+"odWhyT": [
+"18686fe183",
+"Apakah itu ODM, dan mengapa bukan OCO?"
+],
+"odXMode": [
+"c1a0d718e5",
+"Exit mengikut"
+],
+"odXVal": [
+"8dce170de2",
+"Nilai"
+],
+"odX_pct": [
+"5c3bc5c2f1",
+"% daripada purata"
+],
+"odX_price": [
+"3e8248e32e",
+"Harga"
+],
+"odX_r": [
+"78c72d9090",
+"× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Ganjaran"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risiko"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
+],
+"odhA0": [
+"d97012c5ea",
+"Kerana ODM berfungsi secara terbalik: ia membahagikan risiko anda dengan kerugian setiap unit dari entry ke stop, termasuk fi dan slippage. Jadi saiz sentiasa mengikut risiko yang anda pilih."
+],
+"odhA1": [
+"265c1585c3",
+"R ialah jarak dari purata entry anda ke stop. Dalam bentuk wang, 1R ialah risiko anda. Take-profit pada 2R menghasilkan dua kali ganda daripada risiko anda."
+],
+"odhA10": [
+"c493f48847",
+"Biasanya stop berada di sebelah yang salah pada entry, bahagian entry tidak berjumlah 100%, atau take-profit tidak berada di luar purata. Mesej akan memberitahu yang mana satu."
+],
+"odhA11": [
+"d35315306a",
+"'Tunjukkan pada carta' melukis setiap aras sebagai garisan. Butang isyarat menambah amaran untuk setiap aras, dan butang Telegram menghantar semua aras yang dipilih ke bot dalam satu pautan."
+],
+"odhA12": [
+"dd70fbb6c9",
+"Ya. Pilih Short: entry naik ke atas, stop berada di atasnya dan take-profit di bawah purata. Pasaran spot tidak boleh short."
+],
+"odhA13": [
+"49195572ea",
+"Tidak. ODM hanya melakukan pengiraan aritmetik untuk pelan yang anda masukkan. Keputusan dan risiko kekal di tangan anda."
+],
+"odhA2": [
+"07478cdb04",
+"Maka anda memegang posisi yang lebih kecil, dan kos jika terkena stop adalah lebih rendah. Jadual entry memaparkannya baris demi baris: kerugian jika stop terkena sejurus selepas setiap langkah."
+],
+"odhA3": [
+"f273ced333",
+"Tidak pada stop: itu datang daripada risiko anda. Leverage hanya mengubah margin yang anda letakkan dan mendekatkan harga likuidasi."
+],
+"odhA4": [
+"9ee9b51794",
+"Pada leverage rendah, margin menampung kejatuhan hingga sifar (untuk long), jadi model ringkas tidak menjumpai harga likuidasi. Tingkatkan leverage dan ia akan muncul."
+],
+"odhA5": [
+"380ac6b360",
+"Average True Range: saiz purata pergerakan candle, termasuk jurang (gap), ke atas N candle terakhir yang telah ditutup pada carta ini. Ia mengukur tahap pergerakan koin sekarang."
+],
+"odhA6": [
+"7450054b0a",
+"Pada kedua-dua belah, pada peratusan fi yang anda tetapkan: apabila setiap entry diisi dan apabila ia ditutup. Ia ditambah kepada kerugian pada stop dan ditolak daripada setiap keuntungan."
+],
+"odhA7": [
+"c6b248d165",
+"Harga di mana keseluruhan posisi ditutup pada sifar selepas membayar fi pembukaan dan fi penutupan."
+],
+"odhA8": [
+"edbc69746e",
+"Bahagian yang tidak ditutup oleh take-profit akan kekal terbuka. Dengan trailing stop diaktifkan, ia mengikut harga pada jarak yang anda tetapkan; tanpa ia, ia kekal terbuka sehingga anda menutupnya."
+],
+"odhA9": [
+"860be7dfde",
+"Yang dicapai oleh harga terlebih dahulu: untuk long, harga tertinggi (harga jatuh mengenainya), untuk short, harga terendah."
+],
+"odhAbout": [
+"2367c4d244",
+"Perihal {t}"
+],
+"odhAsk": [
+"225c298b36",
+"Masih tidak jelas? Tanya mengenainya"
+],
+"odhAskPh": [
+"a351c059a3",
+"Taip soalan anda…"
+],
+"odhClose": [
+"bbfa773e5a",
+"Tutup"
+],
+"odhCopied": [
+"a567d021f9",
+"Soalan anda telah disalin. Tampalkannya dalam chat Telegram yang dibuka."
+],
+"odhEx": [
+"0f01ed56a1",
+"Contoh"
+],
+"odhFound": [
+"cbee297612",
+"Daripada panduan perancang:"
+],
+"odhNone": [
+"0274ea469d",
+"Saya tidak dapat mencari ini dalam panduan perancang. Seseorang boleh menjawabnya:"
+],
+"odhNote": [
+"9e7107a148",
+"Jawapan daripada panduan perancang ini sendiri. Bukan nasihat kewangan."
+],
+"odhQ0": [
+"91c4311223",
+"Mengapa kerugian pada stop sentiasa tepat pada risiko saya?"
+],
+"odhQ1": [
+"82c35eab7c",
+"Apakah itu R?"
+],
+"odhQ10": [
+"2fc8193a42",
+"Mengapa pelan saya ditolak dengan mesej merah?"
+],
+"odhQ11": [
+"efc0159afc",
+"Bagaimana cara meletakkan pelan pada carta atau mendapatkan isyarat?"
+],
+"odhQ12": [
+"edfb87ec89",
+"Bolehkah saya merancang posisi short?"
+],
+"odhQ13": [
+"fca8edea2c",
+"Adakah ini nasihat kewangan?"
+],
+"odhQ2": [
+"d4bcbe2cdc",
+"Bagaimana jika hanya sebahagian entry saya yang diisi?"
+],
+"odhQ3": [
+"57fbd2a531",
+"Adakah leverage yang lebih tinggi meningkatkan kerugian saya?"
+],
+"odhQ4": [
+"f34abc6f0d",
+"Mengapa dikatakan tiada harga likuidasi?"
+],
+"odhQ5": [
+"45313c99d8",
+"Apakah itu ATR?"
+],
+"odhQ6": [
+"0372f9c582",
+"Bagaimanakah fi dikira?"
+],
+"odhQ7": [
+"3b70797699",
+"Apakah maksud break-even di sini?"
+],
+"odhQ8": [
+"095ce05679",
+"Apakah yang berlaku pada baki bahagian yang tinggal?"
+],
+"odhQ9": [
+"7c5ea886ee",
+"Entry yang manakah diisi dahulu?"
+],
+"odhSee": [
+"2d8243a2c0",
+"Lihat juga"
+],
+"odhSend": [
+"3562777bc6",
+"Tanya"
+],
+"odhTg": [
+"54f13b7555",
+"Tanya seseorang di Telegram"
+],
+"odhTgPre": [
+"9d35fd54bf",
+"Soalan mengenai ODM ({t}) di entekhab.net:"
+],
+"odhWhat": [
+"f8c94a3b4b",
+"Apa itu"
+],
+"odhWhy": [
+"25b83941ae",
+"Untuk apa ia digunakan"
+],
+"odhYours": [
+"62c9423b82",
+"Dengan nombor anda"
+],
+"odh_acc_e": [
+"a1e672ab9e",
+"Baki 1,000 dengan risiko 1%: keseluruhan pelan boleh rugi maksimum 10 jika stop terkena."
+],
+"odh_acc_t": [
+"e6018a209f",
+"Akaun dan kontrak"
+],
+"odh_acc_w": [
+"a976dbc237",
+"Wang dalam akaun anda dan jenis pasaran yang anda trade."
+],
+"odh_acc_y": [
+"6781776e66",
+"Segala-galanya di saizkan berdasarkan ini: kuantiti datang daripada baki anda dan risiko yang anda pilih, bukan dari tekaan."
+],
+"odh_at_e": [
+"285c2bf283",
+"Taip 64,000 untuk melihat hasil menutup semuanya pada 64,000."
+],
+"odh_at_t": [
+"935081b125",
+"Hasil pada harga"
+],
+"odh_at_w": [
+"fed458f278",
+"Taip sebarang harga untuk melihat untung atau rugi keseluruhan posisi dengan setiap entry diisi jika anda menutupnya di situ, termasuk fi."
+],
+"odh_at_y": [
+"cc9eda3c11",
+"Jawapan pantas kepada: bagaimana jika harga pergi ke X?"
+],
+"odh_atrlen_e": [
+"69e29d5c8e",
+"Pada carta 4 jam, 14 bermaksud 14 candle 4 jam terakhir yang telah ditutup."
+],
+"odh_atrlen_n": [
+"e014738faf",
+"Sekarang: ATR({atrn}) = {atr}."
+],
+"odh_atrlen_t": [
+"0d1283ae88",
+"Panjang ATR"
+],
+"odh_atrlen_w": [
+"ec7b66a7d1",
+"Berapa banyak candle yang telah ditutup pada carta ini yang digunakan oleh average true range, dari 2 hingga 200."
+],
+"odh_atrlen_y": [
+"0cb5efe861",
+"Lebih pendek bertindak balas dengan lebih cepat. 14 adalah pilihan biasa."
+],
+"odh_avg_e": [
+"261f462ba2",
+"61,590, 60,974 dan 60,358 pada satu pertiga setiap satu menghasilkan purata 60,974."
+],
+"odh_avg_n": [
+"00574db62b",
+"Anda: {avg}."
+],
+"odh_avg_t": [
+"195d5c2e94",
+"Purata entry (semua diisi)"
+],
+"odh_avg_w": [
+"7aa1dfcea6",
+"Purata wajaran entry anda, setiap satu mengikut bahagiannya."
+],
+"odh_avg_y": [
+"944a3a2604",
+"Keuntungan, R dan break-even semuanya diukur daripadanya."
+],
+"odh_avgso_e": [
+"3d6689c33b",
+"Selepas E1 dan E2 pada 61,590 dan 60,974 (bahagian yang sama), puratanya ialah 61,282."
+],
+"odh_avgso_t": [
+"6b5b19bc70",
+"Purata setakat ini"
+],
+"odh_avgso_w": [
+"640b763fe7",
+"Purata entry anda sebaik sahaja langkah ini dan langkah sebelumnya telah diisi."
+],
+"odh_avgso_y": [
+"5021e04d42",
+"Jika harga tidak pernah mencapai langkah seterusnya, inilah purata sebenar anda."
+],
+"odh_balance_e": [
+"f71c8aeb53",
+"Baki 2,000 dengan risiko 1%: kerugian maksimum trade ini ialah 20."
+],
+"odh_balance_n": [
+"0487b654ad",
+"Nombor anda: {bal} × {rp}% = {risk}."
+],
+"odh_balance_t": [
+"98dcb75a7c",
+"Baki akaun"
+],
+"odh_balance_w": [
+"de01d13238",
+"Wang yang anda gunakan untuk berdagang, dalam USDT."
+],
+"odh_balance_y": [
+"fd4b786043",
+"Risiko anda dalam bentuk wang ialah baki ini darab peratusan risiko."
+],
+"odh_be_e": [
+"a0382921f0",
+"Selepas TP1 stop bergerak dari 59,531 kepada kira-kira 61,096, iaitu break-even berserta fi."
+],
+"odh_be_t": [
+"c728685de9",
+"Stop ke break-even"
+],
+"odh_be_w": [
+"861ff47778",
+"Selepas take-profit pilihan anda diisi, stop bergerak ke harga di mana baki posisi ditutup pada sifar selepas fi."
+],
+"odh_be_y": [
+"32fa27561d",
+"Mulai saat itu trade tidak boleh bertukar menjadi kerugian, selain daripada slippage."
+],
+"odh_bep_e": [
+"c331f932ff",
+"Purata 60,974 dengan fi 0.1%: break-even adalah kira-kira 61,096 untuk long."
+],
+"odh_bep_n": [
+"6cd9e12493",
+"Anda: {be}."
+],
+"odh_bep_t": [
+"f05a5bace4",
+"Harga break-even"
+],
+"odh_bep_w": [
+"b8f351c832",
+"Tempat keseluruhan posisi ditutup pada sifar selepas membayar fi untuk kedua-dua arah."
+],
+"odh_bep_y": [
+"73228b98b2",
+"Stop bergerak ke sini apabila anda memilih 'stop ke break-even'."
+],
+"odh_best_e": [
+"9eb73103e3",
+"+13.21 (1.32R): take-profit digabungkan menghasilkan 1.32 kali ganda risiko anda."
+],
+"odh_best_t": [
+"802503cf21",
+"Semua exit diisi"
+],
+"odh_best_w": [
+"cf54412f22",
+"Keuntungan daripada take-profit sahaja, jika setiap satu daripadanya diisi, termasuk fi. Bahagian yang ditinggalkan untuk trailing stop tidak termasuk di sini."
+],
+"odh_best_y": [
+"6aec2ebfe9",
+"Menunjukkan nilai target pelan tersebut, dalam bentuk wang dan dalam R."
+],
+"odh_contract_e": [
+"09ce7c2386",
+"Pada pasaran spot, 0.01 BTC pada 60,000 kos penuh 600 USDT. Pada perpetual pada 5×, margin ialah 120."
+],
+"odh_contract_t": [
+"5a0ba3bb83",
+"Kontrak"
+],
+"odh_contract_w": [
+"4845fcd1eb",
+"Linear perpetual: kontrak futures USDT dengan leverage dan pembiayaan (funding). Spot: anda membeli koin itu sendiri, tanpa leverage dan tanpa likuidasi."
+],
+"odh_contract_y": [
+"eb0650f4a1",
+"Leverage, margin, likuidasi dan pembiayaan hanya terpakai untuk perpetual. Pasaran spot hanya boleh long."
+],
+"odh_ends_e": [
+"b409a750e1",
+"Stop sebelum sebarang take-profit: −10, iaitu −1R."
+],
+"odh_ends_t": [
+"f140ac6462",
+"Bagaimana ia boleh tamat"
+],
+"odh_ends_w": [
+"08b803b6d8",
+"Setiap cara pelan boleh selesai dengan semua entry diisi, setiap satu berserta hasilnya dalam wang dan dalam R."
 ],
 "of_price": [
 "3e8248e32e",
@@ -3533,6 +5461,334 @@
 "7b57e4d500",
 "Bar rawak"
 ],
+"rcE_pctOver": [
+"bfbad21ecc",
+"Jumlah sasaran melebihi 100%."
+],
+"rcE_risk": [
+"e1bdf14f74",
+"Risiko setiap trade tidak boleh melebihi 100%."
+],
+"rcE_side": [
+"3a9e32ddf9",
+"Stop loss berada di sebelah entry yang salah."
+],
+"rcE_spotShort": [
+"6bc1577913",
+"Posisi spot hanya boleh long."
+],
+"rcE_tp": [
+"a5526e2098",
+"Sasaran berada di sebelah entry yang salah."
+],
+"rcEntry": [
+"b30218aca8",
+"Harga entry"
+],
+"rcFee": [
+"6c58eac908",
+"Yuran setiap sisi (%)"
+],
+"rcFees": [
+"1176c1996f",
+"Yuran (masuk dan keluar)"
+],
+"rcFinal": [
+"7cc7e5e185",
+"Baki akhir"
+],
+"rcGain": [
+"96dd91cdcb",
+"Keuntungan"
+],
+"rcKfull": [
+"5548453c41",
+"Full Kelly"
+],
+"rcKhalf": [
+"4760b81601",
+"Half Kelly"
+],
+"rcKq": [
+"3fb42a0384",
+"Quarter Kelly"
+],
+"rcLev": [
+"040daa23f9",
+"Leverage (×)"
+],
+"rcLiq": [
+"c1dfe11a1a",
+"Likuidasi (anggaran)"
+],
+"rcLiqNote": [
+"f8ab7a2995",
+"Model ringkas: satu posisi isolated, margin penyelenggaraan seperti yang dimasukkan, yuran, pendanaan, harga tanda dan peringkat risiko pertukaran ditinggalkan. Angka pertukaran anda akan berbeza."
+],
+"rcLiqS": [
+"8ee1ead8ac",
+"Anggaran likuidasi ringkas"
+],
+"rcLiq_cross": [
+"237ba47eb9",
+"Tidak ditunjukkan: di bawah cross margin ia bergantung pada keseluruhan dompet anda"
+],
+"rcLiq_none": [
+"19941a78d7",
+"Tiada harga likuidasi pada leverage ini"
+],
+"rcLiq_spot": [
+"3d1d84e078",
+"Tiada pada spot"
+],
+"rcLong": [
+"11eda67f9b",
+"Long"
+],
+"rcLosses": [
+"921787fd24",
+"Kerugian berturut-turut"
+],
+"rcMargin": [
+"0d1a4bfb87",
+"Margin diperlukan"
+],
+"rcMaxLoss": [
+"c668b9dc04",
+"Kerugian pada stop loss"
+],
+"rcMedian": [
+"e8cb6b3af3",
+"Hasil median"
+],
+"rcMmr": [
+"6ccd06f6ff",
+"Margin penyelenggaraan (%)"
+],
+"rcMode": [
+"501f9eaddf",
+"Mod margin"
+],
+"rcNo": [
+"816c52fd2b",
+"Tidak"
+],
+"rcNote": [
+"064f1c622a",
+"Semuanya di sini adalah aritmetik dalam pelayar anda sendiri pada nombor yang anda taip. Tiada apa-apa yang dihantar ke mana-mana dan tiada order pernah diletakkan."
+],
+"rcNotional": [
+"629c8eb9ba",
+"Nilai posisi"
+],
+"rcO_all": [
+"00003802ba",
+"Setiap sasaran tercapai"
+],
+"rcO_cross": [
+"dbfe7362b2",
+"Cross"
+],
+"rcO_inverse": [
+"e753755269",
+"Perpetual songsang (syiling)"
+],
+"rcO_isolated": [
+"64a176e362",
+"Isolated"
+],
+"rcO_linear": [
+"6b962422e5",
+"Perpetual linear (USDT)"
+],
+"rcO_spot": [
+"c5c5ba59d0",
+"Spot"
+],
+"rcO_stop": [
+"94c0cf8f36",
+"Terkena stop loss sebelum sebarang sasaran"
+],
+"rcO_then": [
+"ed72cdc29b",
+"Sasaran {n}, kemudian stop loss pada baki"
+],
+"rcOcoPlan": [
+"30ee931cac",
+"Pelan atas kertas: sasaran yang tercapai membatalkan bahagian stop loss itu, stop loss membatalkan selebihnya. Tiada order dihantar."
+],
+"rcOdm": [
+"11dc53ab85",
+"Perancang ODM"
+],
+"rcOpt": [
+"48a7b8889e",
+"pilihan"
+],
+"rcPF": [
+"80e53e077c",
+"Faktor profit"
+],
+"rcPaid": [
+"299fdc9075",
+"Dibayar masuk"
+],
+"rcPeriods": [
+"d65472b09f",
+"Tempoh"
+],
+"rcProfit": [
+"d8496a6578",
+"Profit pada sasaran"
+],
+"rcQty": [
+"44f6af6945",
+"Kuantiti"
+],
+"rcRR": [
+"49da03e785",
+"Risiko : reward"
+],
+"rcRRin": [
+"4ed9b7f212",
+"Reward : risiko (R)"
+],
+"rcRate": [
+"71be9aab7d",
+"Pulangan setiap tempoh (%)"
+],
+"rcRecover": [
+"7bd0f65bea",
+"Keuntungan yang diperlukan untuk pulih"
+],
+"rcRisk": [
+"b031aee373",
+"Risiko setiap trade (%)"
+],
+"rcRiskMoney": [
+"6525cd02a3",
+"Wang yang berisiko"
+],
+"rcRuinP": [
+"c449c8e2c0",
+"Peluang drawdown tersebut"
+],
+"rcShare": [
+"10758b0e6c",
+"Bahagian ditutup (%)"
+],
+"rcShort": [
+"5a8f23f567",
+"Risiko"
+],
+"rcShort2": [
+"0fe7d82f25",
+"Short"
+],
+"rcSide": [
+"26528381ea",
+"Sisi"
+],
+"rcSim": [
+"687bd0f6b3",
+"Simulasi {n} jujukan rawak dari benih tetap, jadi input yang sama sentiasa memberikan jawapan yang sama. Ia adalah anggaran, bukan janji."
+],
+"rcSlip": [
+"9cc2898876",
+"Slippage (unit harga)"
+],
+"rcStart": [
+"7d5451bcf8",
+"Baki permulaan"
+],
+"rcStop": [
+"4d3419b202",
+"Harga stop loss"
+],
+"rcStreak": [
+"ffbdf88b78",
+"Hilang selepas siri kemenangan"
+],
+"rcStreakRec": [
+"907fc302d7",
+"Keuntungan yang diperlukan selepas itu"
+],
+"rcT_comp": [
+"0361ccdba9",
+"Pengkompaunan"
+],
+"rcT_dd": [
+"3359ab1caa",
+"Drawdown"
+],
+"rcT_ev": [
+"0958deddf2",
+"Jangkaan"
+],
+"rcT_kelly": [
+"15299a0c1f",
+"Kelly"
+],
+"rcT_oco": [
+"6839addb6b",
+"Pelan OCO"
+],
+"rcT_pos": [
+"d0f5a2cffb",
+"Saiz posisi"
+],
+"rcT_ruin": [
+"be867a992e",
+"Risiko kejatuhan"
+],
+"rcTarget": [
+"be343d04b2",
+"Harga take profit"
+],
+"rcTitle": [
+"ff474a8bf9",
+"Pusat risiko"
+],
+"rcTp1": [
+"5bb6465f67",
+"Sasaran 1"
+],
+"rcTp2": [
+"a9d287032d",
+"Sasaran 2"
+],
+"rcTp3": [
+"64e8a21cb6",
+"Sasaran 3"
+],
+"rcTrades": [
+"afcfcf0b8e",
+"Bilangan trade"
+],
+"rcW_kelly": [
+"43b0a6c5e7",
+"Full Kelly menganggap kadar menang diketahui tepat; ia sebenarnya tidak. Separuh atau suku adalah apa yang digunakan dalam praktiknya."
+],
+"rcW_liq": [
+"74b95e2b49",
+"Pada leverage ini posisi dilikuidasi sebelum stop loss dicapai."
+],
+"rcW_margin": [
+"33a819eb5c",
+"Margin yang diperlukan lebih besar daripada baki: kurangkan risiko atau tingkatkan leverage."
+],
+"rcW_noedge": [
+"abfe462fe4",
+"Tiada kelebihan dengan nombor ini: Kelly mengatakan jangan letak taruhan."
+],
+"rcWin": [
+"8ef4ec1075",
+"Kadar menang (%)"
+],
+"rcYes": [
+"5397e0583f",
+"Ya"
+],
 "redo": [
 "471b94d402",
 "Buat semula"
@@ -3601,17 +5857,153 @@
 "b3bd0b5a70",
 "Sambung"
 ],
+"rgAgree": [
+"f77278511d",
+"Peraturan dipersetujui"
+],
+"rgHeld": [
+"88f22bff61",
+"Bar ia bertahan"
+],
+"rgHist": [
+"6d17cf2890",
+"Rejim lalu (satu bar setiap candle)"
+],
+"rgInvBear": [
+"fdc48eb73b",
+"Apa yang akan menamatkannya: penutupan di atas EMA 50 ({p}), atau ADX jatuh di bawah 20."
+],
+"rgInvBull": [
+"40f59312f6",
+"Apa yang akan menamatkannya: penutupan di bawah EMA 50 ({p}), atau ADX jatuh di bawah 20."
+],
+"rgInvMixed": [
+"cf42406689",
+"Tiada keadaan yang jelas: harga dan purata tidak sehaluan. Ia selesai apabila penutupan dan EMA 50 berada pada sisi yang sama dengan EMA 200."
+],
+"rgInvRange": [
+"bcda5cad4b",
+"Apa yang akan menamatkannya: ADX meningkat kepada 20 atau lebih dengan penutupan pada satu sisi EMA 50."
+],
+"rgNeg": [
+"f39d173d91",
+"Menurun"
+],
+"rgPartial": [
+"e853bfc072",
+"Kurang daripada 200 candle: EMA 200 tidak tersedia, jadi trend menggunakan EMA 50 sahaja."
+],
+"rgPos": [
+"0bec14f205",
+"Meningkat"
+],
+"rgShort": [
+"d6843789bf",
+"Tidak cukup candle pada carta ini untuk rejim."
+],
+"rgSlope": [
+"4c5ef055f6",
+"Kecerunan EMA 50 (5 bar)"
+],
+"rgThAtr": [
+"00f7c0f452",
+"Pergerakan kejutan (× ATR)"
+],
+"rgThEx": [
+"5f90f25679",
+"Peluasan daripada persentil"
+],
+"rgThReset": [
+"0363e3d886",
+"Ambang lalai"
+],
+"rgThSq": [
+"e5114bf7a4",
+"Squeeze sehingga persentil"
+],
+"rgThVh": [
+"1e0e2d2f5f",
+"Volatiliti tinggi daripada persentil"
+],
+"rgThVl": [
+"a2a69335ec",
+"Volatiliti rendah sehingga persentil"
+],
+"rgThVol": [
+"a622f16336",
+"Volum kejutan (× purata)"
+],
+"rgTitle": [
+"2313be422a",
+"Rejim · {s} · {tf}"
+],
+"rgVolX": [
+"64c3ac6b3e",
+"Volum bar terakhir vs purata 20 bar"
+],
+"rgVolaPct": [
+"2002c38d60",
+"Persentil volatiliti"
+],
+"rgWhy": [
+"a7cdabf894",
+"Mengapa rejim ini? Peraturan, nombor dan ambang"
+],
+"rgWidthPct": [
+"00b60f938b",
+"Persentil lebar jalur"
+],
+"rg_bear": [
+"c2be37036c",
+"Trend bear"
+],
+"rg_bull": [
+"09d381cec9",
+"Trend bull"
+],
+"rg_expansion": [
+"5210fc6fc2",
+"Peluasan"
+],
 "rg_from": [
 "3f66052a10",
 "Dari"
+],
+"rg_mixed": [
+"c0dcb865ad",
+"Bercampur"
+],
+"rg_range": [
+"a16c5bbe4b",
+"Range"
+],
+"rg_selloff": [
+"6bcf189f4c",
+"Jualan panik merudum"
+],
+"rg_squeeze": [
+"92c9ea71c1",
+"Squeeze"
 ],
 "rg_step": [
 "dc416e1088",
 "Langkah"
 ],
+"rg_surge": [
+"9b02b303eb",
+"Lonjakan mendadak"
+],
 "rg_to": [
 "ae79ea1e9c",
 "Ke"
+],
+"rg_vhigh": [
+"6c69519a16",
+"Volatiliti tinggi"
+],
+"rg_vlow": [
+"02a5abe305",
+"Volatiliti rendah"
 ],
 "rk_dd": [
 "a15b45a44d",
@@ -3652,6 +6044,22 @@
 "rng_week": [
 "7b72883e07",
 "Minggu ini"
+],
+"rsAl": [
+"689e627ada",
+"Semua amaran, pada setiap syiling"
+],
+"rsBack": [
+"5202b69570",
+"Mengembalikan semula apa yang dipadamkan oleh set semula."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Halaman diset semula."
+],
+"rsDr": [
+"3e97d79b5a",
+"Semua lukisan, pada setiap syiling"
 ],
 "runTest": [
 "2c7f471fce",
@@ -5180,6 +7588,74 @@
 "why_trail": [
 "5b20595c1d",
 "Trailing stop"
+],
+"ws_day": [
+"e18786b077",
+"Pedagang Harian"
+],
+"ws_fib": [
+"98b88bcc26",
+"Fibonacci & ayunan"
+],
+"ws_flow": [
+"0ab6d9f077",
+"Aliran Pesanan"
+],
+"ws_heikin": [
+"adf0551bc1",
+"Trend Heikin Ashi"
+],
+"ws_ichi": [
+"b7d2edc2d0",
+"Ichimoku"
+],
+"ws_liq": [
+"69e277529c",
+"Pemburu Likuiditi"
+],
+"ws_mom": [
+"c29791e587",
+"Momentum"
+],
+"ws_mtf": [
+"ebabe1372a",
+"Pelbagai Jangka Masa ×4"
+],
+"ws_mtf6": [
+"800635fcd6",
+"Pelbagai Jangka Masa ×6"
+],
+"ws_position": [
+"5aef88cdad",
+"Pedagang Posisi"
+],
+"ws_retro": [
+"bede81c063",
+"Bar Retro"
+],
+"ws_risk": [
+"c5fdebe115",
+"Risiko & Hentian"
+],
+"ws_scalp": [
+"33fa65b17f",
+"Scalping Pro"
+],
+"ws_smc": [
+"c02e53dec4",
+"Konsep Wang Pintar"
+],
+"ws_swing": [
+"8b2bf46b25",
+"Pedagang Swing"
+],
+"ws_vola": [
+"42217464e8",
+"Picitan Volatiliti"
+],
+"ws_vprofile": [
+"46245d5d50",
+"Profil Volum"
 ],
 "yourRate": [
 "ca14282aa6",

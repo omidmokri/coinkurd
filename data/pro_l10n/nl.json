@@ -4905,6 +4905,58 @@
 "f140ac6462",
 "Hoe het kan eindigen"
 ],
+"odh_ends_w": [
+"08b803b6d8",
+"Elke manier waarop het plan kan eindigen met alle entries gevuld, elk met zijn resultaat in geld en in R."
+],
+"odh_ends_y": [
+"cd9ceb7f51",
+"Zodat je vooraf weet wat elke uitkomst voor jou betekent."
+],
+"odh_ent_e": [
+"923d4d405f",
+"Drie stappen op 61.590, 60.974 en 60.358, elk een derde: als ze allemaal vullen, is het gemiddelde 60.974."
+],
+"odh_ent_n": [
+"c513f01a94",
+"Jouw plan: {n} entries, gemiddeld {avg} als alles vult."
+],
+"odh_ent_t": [
+"f056d0d56a",
+"Entries"
+],
+"odh_ent_w": [
+"87ca65289e",
+"Maximaal 10 limit-prijzen, elk met een deel van de positie. Bouw automatisch een ladder of typ elke stap in."
+],
+"odh_ent_y": [
+"214c2ec1cc",
+"Kopen in stappen geeft een beter gemiddelde als de koers doorloopt voordat hij keert. Het risico blijft gelijk omdat de size wordt aangepast."
+],
+"odh_exit_e": [
+"1d12468fb8",
+"1R, 2R en 3R sluiten 30%, 30% en 20%: de laatste 20% blijft over voor de trailing stop."
+],
+"odh_exit_t": [
+"ca3fb50e5d",
+"Take profits"
+],
+"odh_exit_w": [
+"1a28527bfd",
+"Maximaal 8 exits, elk sluit een deel van de positie: op een prijs, op een percentage vanaf het gemiddelde, of op een veelvoud van R."
+],
+"odh_exit_y": [
+"abdcd61050",
+"Winst in delen nemen vergrendelt wat winst terwijl de rest kan doorlopen."
+],
+"odh_exits_e": [
+"471034ecca",
+"TP2 op 63.859 die 30% sluit geeft +5,30, wat 0,53R is."
+],
+"odh_exits_t": [
+"ca3fb50e5d",
+"Take profits"
+],
 "odh_exits_w": [
 "6583c3543e",
 "Elke take-profit met zijn prijs, aandeel, winst en R, inclusief kosten."
@@ -5385,6 +5437,94 @@
 "be92240002",
 "Trail start"
 ],
+"odh_tact_w": [
+"b6481374ec",
+"Wanneer de trailing stop begint: meteen, op een prijs, na een koersbeweging in procenten, of na een veelvoud van R aan winst."
+],
+"odh_tact_y": [
+"94c2f2ff7f",
+"Later starten voorkomt dat je vlak bij de entry wordt uitgeschud."
+],
+"odh_tactv_e": [
+"246eb9a7c3",
+"1 met R betekent één R aan winst."
+],
+"odh_tactv_t": [
+"3ca6df8028",
+"Startwaarde"
+],
+"odh_tactv_w": [
+"5f17cc79b4",
+"De prijs, het percentage of R voor de door jou gekozen start."
+],
+"odh_tactv_y": [
+"8969cc67da",
+"Dit stelt het punt in waarop de trailing stop inschakelt."
+],
+"odh_test_e": [
+"3fae7383cb",
+"Onduidelijke bars: een candle raakte zowel een stop als een target, dus de order daarbinnen is onbekend."
+],
+"odh_test_t": [
+"d5bb186d33",
+"Test op de historie van deze chart"
+],
+"odh_test_w": [
+"7991e3cd85",
+"Speelt het plan af over de historische gesloten candles van deze chart, één candle per keer."
+],
+"odh_test_y": [
+"521a6e46e0",
+"Een snelle controle van hoe het zou zijn gegaan. Dit is geen garantie voor de toekomst."
+],
+"odh_tmode_e": [
+"6463ceb3c4",
+"2 × ATR is 1.200 wanneer ATR 600 is."
+],
+"odh_tmode_t": [
+"77027c3731",
+"Trail-afstand op basis van"
+],
+"odh_tmode_w": [
+"a7c556973e",
+"ATR-veelvoud of percentage."
+],
+"odh_tmode_y": [
+"9ad06b6b07",
+"ATR houdt de afstand gelijk met hoeveel de coin beweegt."
+],
+"odh_trail_e": [
+"92baed577c",
+"20% overgebleven met een trailing stop 2 × ATR achter de beste prijs."
+],
+"odh_trail_t": [
+"f4d671693b",
+"Wat overblijft"
+],
+"odh_trail_w": [
+"49a5c00392",
+"Het aandeel dat geen enkele take profit sluit. Het kan de prijs volgen met een trailing stop, en de stop kan naar break-even verplaatsen na een take profit."
+],
+"odh_trail_y": [
+"d5d5131192",
+"Hierdoor kan een deel van de trade doorlopen zonder alles weer terug te geven."
+],
+"odh_tval_e": [
+"d9ca049b57",
+"Met 1.200 zet een high van 66.000 de stop van een long op 64.800."
+],
+"odh_tval_t": [
+"752ffa08b7",
+"Trail-afstand"
+],
+"odh_tval_w": [
+"cc8419ae79",
+"Hoe ver achter de beste prijs de trailing stop volgt."
+],
+"odh_tval_y": [
+"3fdb99c573",
+"Te krap sluit te vroeg. Te wijd geeft veel terug."
+],
 "of_price": [
 "3e8248e32e",
 "Prijs"
@@ -5801,6 +5941,26 @@
 "91acef5dac",
 "WMA-lengte"
 ],
+"palActions": [
+"c3cd636a58",
+"Acties"
+],
+"palHint": [
+"47ce327f45",
+"Typ een tool, een instelling, een timeframe…"
+],
+"palNone": [
+"9f85767365",
+"Niets komt overeen."
+],
+"palTf": [
+"85decb73d1",
+"Timeframe"
+],
+"palTitle": [
+"7b6b539e73",
+"Command palette"
+],
 "panels": [
 "8dfeed481e",
 "Panelen"
@@ -5869,6 +6029,262 @@
 "1e214a5fd6",
 "Klik op de grafiek waar de replay moet starten"
 ],
+"plActiveR": [
+"a2c4172ad6",
+"Actief risico"
+],
+"plAvgExit": [
+"a8ea629465",
+"Gemiddelde exit"
+],
+"plBoard": [
+"435bd708da",
+"Open-risicooverzicht"
+],
+"plBoardNote": [
+"5fec8e41f9",
+"Opgeslagen plannen en wat de plannen die als open zijn aangevinkt bij elkaar op optellen. De limiet is slechts een waarschuwing: niets hier kan een order plaatsen of sluiten."
+],
+"plBoardNote2": [
+"7f817b9c7c",
+"Geplande, actieve en gesloten plannen worden gescheiden gehouden; alleen actieve tellen als open risico. De daglimiet telt de gerealiseerde verliezen van vandaag (jouw klok: {tz}, reset om lokale middernacht) plus het actieve risico bij de stops. Het is slechts een waarschuwing: niets hier kan een order plaatsen of sluiten."
+],
+"plBoardT": [
+"435bd708da",
+"Open-risicooverzicht"
+],
+"plClosedToday": [
+"e720fa6ae4",
+"Vandaag gesloten (gerealiseerd)"
+],
+"plCompact": [
+"1df39aa58a",
+"Compact"
+],
+"plDayEq": [
+"6458e3671e",
+"Equity bij de start van de dag"
+],
+"plDayLimit": [
+"6e36e54b65",
+"Dagelijkse verlieslimiet (%)"
+],
+"plDup": [
+"fca49b8589",
+"Dit plan is al opgeslagen."
+],
+"plEx": [
+"5b13eac7ed",
+"Exchange"
+],
+"plExpand": [
+"ab2d96c48c",
+"Alles weergeven"
+],
+"plExport": [
+"f3e4fadb9e",
+"Exporteren"
+],
+"plFees": [
+"08894cb378",
+"Kosten in en uit"
+],
+"plFree": [
+"533c47e8a1",
+"Vrije margin"
+],
+"plFundIv": [
+"3bc01f9cf4",
+"Funding-interval (uren)"
+],
+"plFundRate": [
+"9336e2a882",
+"Funding per 8u (%)"
+],
+"plFunding": [
+"5f9a0c5144",
+"Funding (schatting)"
+],
+"plGross": [
+"927d131b21",
+"Brutowinst (vóór kosten)"
+],
+"plGrossX": [
+"bfdcc76198",
+"Bruto blootstelling"
+],
+"plHours": [
+"555b262e58",
+"Uur aangehouden"
+],
+"plImpBad": [
+"bd98edc00d",
+"Dat bestand bevat geen geldige plannen."
+],
+"plImpOk": [
+"1553f868cf",
+"{n} plannen geïmporteerd."
+],
+"plImport": [
+"d6fbc9d2bd",
+"Importeren"
+],
+"plKill": [
+"3ac6a66ed3",
+"Het open risico overschrijdt je dagelijkse verlieslimiet ({p}%). Dit is slechts een waarschuwing — sluit of verklein posities zelf als je het hiermee eens bent."
+],
+"plLeft": [
+"fe0bb373bb",
+"Resterende dagelijkse verliesruimte"
+],
+"plLimitUsed": [
+"541b181b79",
+"Gebruikte daglimiet"
+],
+"plLongX": [
+"b8780d83b2",
+"Long blootstelling"
+],
+"plNear": [
+"616c3c45eb",
+"Het open risico heeft {p}% van je dagelijkse verlieslimiet bereikt."
+],
+"plNet": [
+"4239208ec2",
+"Netto na funding"
+],
+"plNetX": [
+"9f10e7efdd",
+"Netto blootstelling"
+],
+"plNone": [
+"126e99fc3a",
+"Nog geen opgeslagen plan. Selecteer een long- of shortpositie op de chart en sla het plan op."
+],
+"plNote": [
+"d8538aa3ed",
+"Versleep de entry, de stop of het target op de chart: elk cijfer beweegt mee. Alleen een plan — er wordt geen order verzonden."
+],
+"plOpen": [
+"cf9b77061f",
+"Open"
+],
+"plOpenN": [
+"13ce0e526e",
+"Open plannen"
+],
+"plOpenRisk": [
+"cddec7cc84",
+"Risico bij de stops"
+],
+"plOver": [
+"a42b4a3d68",
+"Open risico is nu {p}% van je daglimiet."
+],
+"plPlannedR": [
+"160959aa01",
+"Gepland risico"
+],
+"plPnl": [
+"11cdb9ef40",
+"Gerealiseerde P&L"
+],
+"plPnlPh": [
+"37a5301a88",
+"resultaat"
+],
+"plR2": [
+"b3839316b2",
+"TP2 (× risico)"
+],
+"plR3": [
+"4cfedeb55f",
+"TP3 (× risico)"
+],
+"plS_active": [
+"a733b809d2",
+"Actief"
+],
+"plS_closed": [
+"88d86b7721",
+"Gesloten"
+],
+"plS_planned": [
+"9cbe42aaff",
+"Gepland"
+],
+"plSave": [
+"c3f10085f9",
+"Plan opslaan"
+],
+"plSaved": [
+"5ad336f045",
+"Plan opgeslagen."
+],
+"plScaled": [
+"71027ef6dd",
+"De percentages telden niet op tot 100%, dus zijn ze daaraan aangepast."
+],
+"plShare1": [
+"3d669b7968",
+"Deel bij TP1 (%)"
+],
+"plShare2": [
+"527587bedf",
+"Deel bij TP2 (%)"
+],
+"plShare3": [
+"1de10b521f",
+"Deel bij TP3 (%)"
+],
+"plShortX": [
+"e0e2e891e2",
+"Short blootstelling"
+],
+"plStatus": [
+"bae7d5be70",
+"Status"
+],
+"plTipActive": [
+"4e20f49ee8",
+"Plannen die je als actief hebt gemarkeerd (open of op paper): wat ze verliezen als elke stop wordt geraakt."
+],
+"plTipFund": [
+"0b6a70a096",
+"Een positief percentage wordt betaald door longs en ontvangen door shorts; een negatief percentage andersom."
+],
+"plTipLeft": [
+"6139c9c234",
+"limiet − gerealiseerd verlies van vandaag − actief risico bij de stops"
+],
+"plTipLoss": [
+"a238701251",
+"Wat de stop kost: het risicobedrag plus funding als dat kosten met zich meebrengt."
+],
+"plTipPlanned": [
+"4326a18e06",
+"Plannen die je alleen hebt ontworpen. Tellen niet mee voor de daglimiet."
+],
+"plTitle": [
+"6aa0fd12fe",
+"Tradepan"
+],
+"plTop": [
+"8a661b765f",
+"Grootste aandeel in het risico"
+],
+"plTotal": [
+"77ffec55dd",
+"Alle targets gevuld"
+],
+"plUnalloc": [
+"b92d412dc9",
+"Deel zonder target (nog open)"
+],
+"plW_fees": [
+"1ba96c9a8b",
+"Kosten slokken de gehele winst van deze targets op."
+],
 "place": [
 "6aea8612f3",
 "Plaats de order"
@@ -5904,6 +6320,402 @@
 "random": [
 "7b57e4d500",
 "Willekeurige candle"
+],
+"rcAdd": [
+"3b7e34f346",
+"Elke periode toegevoegd"
+],
+"rcBE": [
+"f05a5bace4",
+"Break-even prijs"
+],
+"rcBEafter": [
+"9efc4f3287",
+"Stop naar break-even na target 1"
+],
+"rcBEwin": [
+"5a7eb19d0d",
+"Winrate om break-even te draaien"
+],
+"rcBal": [
+"98dcb75a7c",
+"Accountsaldo"
+],
+"rcCt": [
+"5a0ba3bb83",
+"Contract"
+],
+"rcDD": [
+"db066ddc8a",
+"Drawdown (%)"
+],
+"rcDDlimit": [
+"38fe5b1885",
+"Drawdown die geldt als ruin (%)"
+],
+"rcEV": [
+"26effee29e",
+"Verwachte waarde per trade"
+],
+"rcE_dist": [
+"12390b8d52",
+"Entry en stop kunnen niet dezelfde prijs hebben."
+],
+"rcE_lev": [
+"e81f8b7d27",
+"Hefboom moet 1 of hoger zijn."
+],
+"rcE_num": [
+"e7dcd677d6",
+"Voer positieve getallen in."
+],
+"rcE_oco_num": [
+"bcb3e41b53",
+"Voer een entry en een stop in op verschillende prijzen."
+],
+"rcE_oco_order": [
+"26adf98964",
+"Targets moeten in volgorde van de entry af bewegen."
+],
+"rcE_oco_pct": [
+"4993270f9b",
+"De aandelen moeten opoptellen tot 100%."
+],
+"rcE_oco_tg": [
+"2cf289fad7",
+"Geef één tot drie targets op."
+],
+"rcE_oco_tp": [
+"319a13b9cc",
+"Een target staat aan de verkeerde kant van de entry, of het aandeel ontbreekt."
+],
+"rcE_pctOver": [
+"bfbad21ecc",
+"De target aandelen tellen op tot meer dan 100%."
+],
+"rcE_risk": [
+"e1bdf14f74",
+"Risico per trade kan niet hoger zijn dan 100%."
+],
+"rcE_side": [
+"3a9e32ddf9",
+"De stop staat aan de verkeerde kant van de entry."
+],
+"rcE_spotShort": [
+"6bc1577913",
+"Een spot positie kan alleen long zijn."
+],
+"rcE_tp": [
+"a5526e2098",
+"Het target staat aan de verkeerde kant van de entry."
+],
+"rcEntry": [
+"b30218aca8",
+"Entry prijs"
+],
+"rcFee": [
+"6c58eac908",
+"Fee per kant (%)"
+],
+"rcFees": [
+"1176c1996f",
+"Fees (in en uit)"
+],
+"rcFinal": [
+"7cc7e5e185",
+"Eindbalans"
+],
+"rcGain": [
+"96dd91cdcb",
+"Winst"
+],
+"rcKfull": [
+"5548453c41",
+"Volledige Kelly"
+],
+"rcKhalf": [
+"4760b81601",
+"Halve Kelly"
+],
+"rcKq": [
+"3fb42a0384",
+"Kwart Kelly"
+],
+"rcLev": [
+"040daa23f9",
+"Hefboom (×)"
+],
+"rcLiq": [
+"c1dfe11a1a",
+"Liquidatie (schatting)"
+],
+"rcLiqNote": [
+"f8ab7a2995",
+"Vereenvoudigd model: één geïsoleerde positie, onderhoudsmarge zoals ingevoerd, fees, funding, markprijs en de risicocategorieën van de exchange weggelaten. Het cijfer van uw exchange zal afwijken."
+],
+"rcLiqS": [
+"8ee1ead8ac",
+"Vereenvoudigde geschatte liquidatie"
+],
+"rcLiq_cross": [
+"237ba47eb9",
+"Niet getoond: bij cross margin hangt het af van uw gehele wallet"
+],
+"rcLiq_none": [
+"19941a78d7",
+"Geen liquidatieprijs bij deze hefboom"
+],
+"rcLiq_spot": [
+"3d1d84e078",
+"Geen op spot"
+],
+"rcLong": [
+"11eda67f9b",
+"Long"
+],
+"rcLosses": [
+"921787fd24",
+"Verliezen op rij"
+],
+"rcMargin": [
+"0d1a4bfb87",
+"Benodigde margin"
+],
+"rcMaxLoss": [
+"c668b9dc04",
+"Verlies bij de stop"
+],
+"rcMedian": [
+"e8cb6b3af3",
+"Mediane resultaat"
+],
+"rcMmr": [
+"6ccd06f6ff",
+"Onderhoudsmarge (%)"
+],
+"rcMode": [
+"501f9eaddf",
+"Margin modus"
+],
+"rcNo": [
+"816c52fd2b",
+"Nee"
+],
+"rcNote": [
+"064f1c622a",
+"Alles hier is rekenwerk in uw eigen browser op de getallen die u typt. Er wordt niets ergens naartoe gestuurd en er wordt nooit een order geplaatst."
+],
+"rcNotional": [
+"629c8eb9ba",
+"Positiewaarde"
+],
+"rcO_all": [
+"00003802ba",
+"Elk target geraakt"
+],
+"rcO_cross": [
+"dbfe7362b2",
+"Cross"
+],
+"rcO_inverse": [
+"e753755269",
+"Inverse perpetual (coin)"
+],
+"rcO_isolated": [
+"64a176e362",
+"Geïsoleerd"
+],
+"rcO_linear": [
+"6b962422e5",
+"Lineaire perpetual (USDT)"
+],
+"rcO_spot": [
+"c5c5ba59d0",
+"Spot"
+],
+"rcO_stop": [
+"94c0cf8f36",
+"Gestopt voor een target"
+],
+"rcO_then": [
+"ed72cdc29b",
+"Target {n}, daarna de stop op de rest"
+],
+"rcOcoPlan": [
+"30ee931cac",
+"Een plan op papier: een geraakt target annuleert dat deel van de stop, de stop annuleert wat over is. Er wordt geen order verzonden."
+],
+"rcOdm": [
+"11dc53ab85",
+"ODM planner"
+],
+"rcOpt": [
+"48a7b8889e",
+"optioneel"
+],
+"rcPF": [
+"80e53e077c",
+"Profit factor"
+],
+"rcPaid": [
+"299fdc9075",
+"Gestort"
+],
+"rcPeriods": [
+"d65472b09f",
+"Periodes"
+],
+"rcProfit": [
+"d8496a6578",
+"Winst bij het target"
+],
+"rcQty": [
+"44f6af6945",
+"Hoeveelheid"
+],
+"rcRR": [
+"49da03e785",
+"Risico : reward"
+],
+"rcRRin": [
+"4ed9b7f212",
+"Reward : risico (R)"
+],
+"rcRate": [
+"71be9aab7d",
+"Rendement per periode (%)"
+],
+"rcRecover": [
+"7bd0f65bea",
+"Benodigde winst om te herstellen"
+],
+"rcRisk": [
+"b031aee373",
+"Risico per trade (%)"
+],
+"rcRiskMoney": [
+"6525cd02a3",
+"Geld in risico"
+],
+"rcRuinP": [
+"c449c8e2c0",
+"Kans op die drawdown"
+],
+"rcShare": [
+"10758b0e6c",
+"Gesloten aandeel (%)"
+],
+"rcShort": [
+"5a8f23f567",
+"Risico"
+],
+"rcShort2": [
+"0fe7d82f25",
+"Short"
+],
+"rcSide": [
+"26528381ea",
+"Kant"
+],
+"rcSim": [
+"687bd0f6b3",
+"Een simulatie van {n} willekeurige reeksen vanuit een vaste seed, zodat dezelfde invoer altijd hetzelfde antwoord geeft. Het is een schatting, geen belofte."
+],
+"rcSlip": [
+"9cc2898876",
+"Slippage (prijs eenheden)"
+],
+"rcStart": [
+"7d5451bcf8",
+"Startbalans"
+],
+"rcStop": [
+"4d3419b202",
+"Stop-loss prijs"
+],
+"rcStreak": [
+"ffbdf88b78",
+"Verloren na de reeks"
+],
+"rcStreakRec": [
+"907fc302d7",
+"Benodigde winst daarna"
+],
+"rcT_comp": [
+"0361ccdba9",
+"Samengesteld"
+],
+"rcT_dd": [
+"3359ab1caa",
+"Drawdown"
+],
+"rcT_ev": [
+"0958deddf2",
+"Verwachtingswaarde"
+],
+"rcT_kelly": [
+"15299a0c1f",
+"Kelly"
+],
+"rcT_oco": [
+"6839addb6b",
+"OCO plan"
+],
+"rcT_pos": [
+"d0f5a2cffb",
+"Positiegrootte"
+],
+"rcT_ruin": [
+"be867a992e",
+"Kans op faillissement"
+],
+"rcTarget": [
+"be343d04b2",
+"Take-profit prijs"
+],
+"rcTitle": [
+"ff474a8bf9",
+"Risico centrum"
+],
+"rcTp1": [
+"5bb6465f67",
+"Target 1"
+],
+"rcTp2": [
+"a9d287032d",
+"Target 2"
+],
+"rcTp3": [
+"64e8a21cb6",
+"Target 3"
+],
+"rcTrades": [
+"afcfcf0b8e",
+"Aantal trades"
+],
+"rcW_kelly": [
+"43b0a6c5e7",
+"Volledige Kelly gaat ervan uit dat de winrate exact bekend is; dat is nooit zo. De helft of een kwart wordt in de praktijk gebruikt."
+],
+"rcW_liq": [
+"74b95e2b49",
+"Bij deze hefboom wordt de positie geliquideerd voordat de stop wordt bereikt."
+],
+"rcW_margin": [
+"33a819eb5c",
+"De benodigde margin is groter dan de balans: verlaag het risico of verhoog de hefboom."
+],
+"rcW_noedge": [
+"abfe462fe4",
+"Geen edge met deze getallen: Kelly zegt niet wedden."
+],
+"rcWin": [
+"8ef4ec1075",
+"Winrate (%)"
+],
+"rcYes": [
+"5397e0583f",
+"Ja"
 ],
 "redo": [
 "471b94d402",
@@ -5973,17 +6785,153 @@
 "b3bd0b5a70",
 "Hervatten"
 ],
+"rgAgree": [
+"f77278511d",
+"Overeenkomende regels"
+],
+"rgHeld": [
+"88f22bff61",
+"Bars dat het heeft vastgehouden"
+],
+"rgHist": [
+"6d17cf2890",
+"Eerdere regimes (één bar per candle)"
+],
+"rgInvBear": [
+"fdc48eb73b",
+"Wat dit zou beëindigen: een sluiting boven EMA 50 ({p}), of ADX die onder 20 zakt."
+],
+"rgInvBull": [
+"40f59312f6",
+"Wat dit zou beëindigen: een sluiting onder EMA 50 ({p}), of ADX die onder 20 zakt."
+],
+"rgInvMixed": [
+"cf42406689",
+"Geen duidelijke staat: prijs en de gemiddelden zijn het niet eens. Dit lost op wanneer de sluiting en EMA 50 aan dezelfde kant van EMA 200 staan."
+],
+"rgInvRange": [
+"bcda5cad4b",
+"Wat dit zou beëindigen: ADX die stijgt naar 20 of meer met de sluiting aan één kant van EMA 50."
+],
+"rgNeg": [
+"f39d173d91",
+"Dalend"
+],
+"rgPartial": [
+"e853bfc072",
+"Minder dan 200 candles: EMA 200 is niet beschikbaar, dus de trend gebruikt alleen EMA 50."
+],
+"rgPos": [
+"0bec14f205",
+"Stijgend"
+],
+"rgShort": [
+"d6843789bf",
+"Niet genoeg candles op deze grafiek voor een regime."
+],
+"rgSlope": [
+"4c5ef055f6",
+"EMA 50 helling (5 bars)"
+],
+"rgThAtr": [
+"00f7c0f452",
+"Schokbeweging (× ATR)"
+],
+"rgThEx": [
+"5f90f25679",
+"Expansie vanuit percentiel"
+],
+"rgThReset": [
+"0363e3d886",
+"Standaard drempels"
+],
+"rgThSq": [
+"e5114bf7a4",
+"Squeeze tot percentiel"
+],
+"rgThVh": [
+"1e0e2d2f5f",
+"Hoge volatiliteit vanuit percentiel"
+],
+"rgThVl": [
+"a2a69335ec",
+"Lage volatiliteit tot percentiel"
+],
+"rgThVol": [
+"a622f16336",
+"Schokvolume (× gemiddelde)"
+],
+"rgTitle": [
+"2313be422a",
+"Regime · {s} · {tf}"
+],
+"rgVolX": [
+"64c3ac6b3e",
+"Volume laatste bar vs 20-bar gemiddelde"
+],
+"rgVolaPct": [
+"2002c38d60",
+"Volatiliteit percentiel"
+],
+"rgWhy": [
+"a7cdabf894",
+"Waarom dit regime? Regels, getallen en drempels"
+],
+"rgWidthPct": [
+"00b60f938b",
+"Bandbreedte percentiel"
+],
+"rg_bear": [
+"c2be37036c",
+"Bear trend"
+],
+"rg_bull": [
+"09d381cec9",
+"Bull trend"
+],
+"rg_expansion": [
+"5210fc6fc2",
+"Expansie"
+],
 "rg_from": [
 "3f66052a10",
 "Van"
+],
+"rg_mixed": [
+"c0dcb865ad",
+"Gemengd"
+],
+"rg_range": [
+"a16c5bbe4b",
+"Range"
+],
+"rg_selloff": [
+"6bcf189f4c",
+"Scherpe sell-off"
+],
+"rg_squeeze": [
+"92c9ea71c1",
+"Squeeze"
 ],
 "rg_step": [
 "dc416e1088",
 "Stap"
 ],
+"rg_surge": [
+"9b02b303eb",
+"Scherpe rally"
+],
 "rg_to": [
 "ae79ea1e9c",
 "Tot"
+],
+"rg_vhigh": [
+"6c69519a16",
+"Hoge volatiliteit"
+],
+"rg_vlow": [
+"02a5abe305",
+"Lage volatiliteit"
 ],
 "rk_dd": [
 "a15b45a44d",
@@ -6024,6 +6972,18 @@
 "rng_week": [
 "7b72883e07",
 "Deze week"
+],
+"rsAl": [
+"689e627ada",
+"Alle waarschuwingen, op elke coin"
+],
+"rsBack": [
+"5202b69570",
+"Teruggehaald wat de reset had verwijderd."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Pagina gereset."
 ],
 "rsDr": [
 "3e97d79b5a",

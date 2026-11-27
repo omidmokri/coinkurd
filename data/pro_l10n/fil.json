@@ -2633,6 +2633,146 @@
 "11eda67f9b",
 "Long"
 ],
+"lqLay_liq": [
+"30d1693268",
+"Mga liquidation"
+],
+"lqLay_prof": [
+"1b7f22ab6a",
+"I-book ngayon (kanang gilid)"
+],
+"lqLayers": [
+"f055f18aea",
+"Mga layer"
+],
+"lqLiqSum": [
+"53dd3e4363",
+"{n} liquidation ang nakita sa {since}: mga long ang na-close {l}, mga short ang na-close {s}."
+],
+"lqLiqT": [
+"2e7bee73ac",
+"Mga liquidation habang bukas"
+],
+"lqLiveOk": [
+"98aadb3708",
+"live"
+],
+"lqLong": [
+"5159d6b96c",
+"Na-liquidate ang long"
+],
+"lqMin": [
+"37e737d92c",
+"{n} min"
+],
+"lqNoSym": [
+"9eda810b3c",
+"Gumagana ang liquidity map sa mga coin na tinatrade laban sa USDT sa Binance, Bybit o OKX. Ang {s} ay hindi isa sa mga iyon."
+],
+"lqNow": [
+"1cf45f3e25",
+"{n} order book ang sumali. Ang bawat isa ay sumasakop mula {lo} hanggang {hi}, sa mga hakbang na {step}. {k} na pagbasa ang itinago simula nang i-on mo ito ({since})."
+],
+"lqOff": [
+"1a01ac36a1",
+"Off. I-tick ang kahon sa itaas para simulan ang pagbasa ng mga order book."
+],
+"lqSec": [
+"55220b204c",
+"{n}s"
+],
+"lqShort": [
+"89d59d2f0a",
+"Na-liquidate ang short"
+],
+"lqShow": [
+"051401a51e",
+"Ipakita sa chart"
+],
+"lqSrcT": [
+"be018e47a2",
+"Mga pinagmulan at kung gaano kaaga ang mga ito"
+],
+"lqStep": [
+"41b6a9dc1c",
+"Hakbang sa presyo"
+],
+"lqTitle": [
+"5163cb5fa5",
+"Liquidity map"
+],
+"lqVBad": [
+"1ad25e9e10",
+"hindi maabot mula rito sa ngayon"
+],
+"lqVOk": [
+"f9efa46205",
+"order book mula {lo} hanggang {hi}, binasa {t} ang nakalipas"
+],
+"lqV_bnf": [
+"ec2ef9ae21",
+"Binance futures"
+],
+"lqV_bns": [
+"47849f1dfa",
+"Binance spot"
+],
+"lqV_byf": [
+"d88c2ab7c7",
+"Bybit futures"
+],
+"lqV_okx": [
+"71057c6407",
+"OKX spot"
+],
+"lqWDist": [
+"54ecd0e57f",
+"Mula sa gitna"
+],
+"lqWHeld": [
+"87807a0b14",
+"Hawak"
+],
+"lqWPrice": [
+"c20f7ce09a",
+"Saklaw ng presyo"
+],
+"lqWSize": [
+"b7152342a2",
+"Laki"
+],
+"lqWTop": [
+"06db06f316",
+"Pinakamalaking bahagi"
+],
+"lqWait": [
+"e9c5b7b234",
+"naghihintay para sa unang sagot"
+],
+"lqWallNote": [
+"98ee1d2b6b",
+"Ang \"Hawak\" ay kung gaano katagal pinanatili ng pader ang hindi bababa sa kalahati ng laki nito sa mga pagbasang nakatago rito."
+],
+"lqWallsT": [
+"1ef7390586",
+"Pinakamalaking pader ngayon"
+],
+"lqWhy1": [
+"6325436ac2",
+"Data lamang na inilalathala ng mga exchange: ang kanilang mga order book, binabasa bawat 10 segundo, at ang kanilang mga feed ng liquidation. Walang tinatantya, at walang nahuhulaang \"mga antas ng liquidation\" mula sa leverage."
+],
+"lqWhy2": [
+"67effe4128",
+"Ang berde ay naghihintay na mga buy order, ang pula ay naghihintay na mga sell order. Ang mga bar sa kanang gilid ay ang mga order book ngayon; ang heat map sa likod ng mga candle ay ang bawat pagbasang itinago habang bukas ang pahinang ito. Walang mas luma ang maipapakita, dahil walang libreng pinagmulan ang nagtatago ng mga lumang order book."
+],
+"lqWhy3": [
+"f6d28bc855",
+"Ang isang order ay maaaring bawiin anumang sandali, kaya ipinapakita ng isang pader kung ano ang nandoon, hindi isang pangako. Ang bawat order book ay umaabot lamang sa bahagi ng daan mula sa presyo: lampas sa saklaw na sinasakop ng bawat napiling order book, mawawala ang mga kabuuang order, kaya ang mga ito ay kumukupas at tinatanggal sa listahan. Nagpapadala ang Binance ng pinakamaramihang isang liquidation bawat coin bawat segundo, kaya ang bilang nito ay isang sahig; ipinadala ng Bybit ang lahat ng ito."
+],
+"lqWhyT": [
+"2d7735c077",
+"Ano ang ipinapakita ng map na ito, at kung ano ang hindi"
+],
 "ly_live": [
 "c3d036c573",
 "Live na pagsusuri ng Kurdistani"
@@ -2713,9 +2853,65 @@
 "98d183e7cb",
 "Ilipat sa seksyon"
 ],
+"ms_confirmed": [
+"8cc7acb8f3",
+"Kumpirmado"
+],
+"ms_conflicting": [
+"41f18332f6",
+"Magkakasalungat"
+],
+"ms_developing": [
+"7903b5f5b9",
+"Bumubuo"
+],
+"ms_insufficient": [
+"0da1cb3c48",
+"Kulang ang data"
+],
+"ms_neutral": [
+"4bd2913945",
+"Neutral"
+],
+"ms_tip_confirmed": [
+"d0f8fd73bd",
+"Ang trend, istruktura at direksyon ay parehong tumuturo sa iisang paraan."
+],
+"ms_tip_conflicting": [
+"0161400e1f",
+"Ang EMA trend at ang swing structure, o ang trend at MACD, ay tumuturo sa magkasalungat na direksyon."
+],
+"ms_tip_developing": [
+"c7be2bde9d",
+"Ang direksyon ay tumuturo sa isang paraan, ngunit ang trend o istruktura ay hindi pa sumasali."
+],
+"ms_tip_insufficient": [
+"7f50d7c30d",
+"Wala pang 200 na saradong candle: hindi available ang EMA 200 at ang 200-bar percentile."
+],
+"ms_tip_neutral": [
+"0ae8ec4891",
+"Walang direksyon sa alinmang panig."
+],
+"mt_down": [
+"bf93e5ce8b",
+"Pababa"
+],
+"mt_flat": [
+"79c9e13ab7",
+"Patag"
+],
 "mt_mine": [
 "1cf761ac34",
 "Aking mga script"
+],
+"mt_mixed": [
+"c0dcb865ad",
+"Magkahalo"
+],
+"mt_na": [
+"1b93795b97",
+"—"
 ],
 "mt_opt": [
 "6bf5da9c08",
@@ -2736,6 +2932,66 @@
 "mt_strat": [
 "876f3e0202",
 "Strategies"
+],
+"mt_up": [
+"2038bdec92",
+"Pataas"
+],
+"mtfBtn": [
+"58947ebc8f",
+"Matrix"
+],
+"mtfLean": [
+"551b5aa2a6",
+"Direksyon"
+],
+"mtfNoData": [
+"5e59eb443a",
+"Walang data sa timeframe na ito"
+],
+"mtfNote": [
+"44b9187f41",
+"Ang bawat cell ay isang itinakdang panuntunan sa mga saradong candle ng timeframe na iyon. Ang mga timeframe ay mga hati ng isang serye ng presyo, kaya ang kanilang pagkakasundo ay hindi independiyenteng ebidensya, at wala rito ang naghuhula ng anuman."
+],
+"mtfRegime": [
+"0b655e2471",
+"Regime"
+],
+"mtfShort": [
+"2567ff70d2",
+"Kulang ang mga candle"
+],
+"mtfState": [
+"a725020675",
+"Estado"
+],
+"mtfStruct": [
+"9482c5d5bf",
+"Istruktura"
+],
+"mtfSum": [
+"25609d2c57",
+"{u} sa {n} na timeframe ang pumapanig pataas, {d} ang pumapanig pababa."
+],
+"mtfTf": [
+"f136a6c6e6",
+"TF"
+],
+"mtfTitle": [
+"80c7c684e0",
+"Timeframe matrix"
+],
+"mtfTrend": [
+"dae07c6ee8",
+"Trend"
+],
+"mtfVol": [
+"3b18e8e332",
+"Volume"
+],
+"mtfVola": [
+"205bdd6065",
+"Volatility"
 ],
 "multiAl": [
 "5bafcd2412",
@@ -2928,6 +3184,1326 @@
 "objects": [
 "d80a665c4b",
 "Mga drawing"
+],
+"odA_none": [
+"efac6f456a",
+"Agad-agad"
+],
+"odA_pct": [
+"7724ed0a06",
+"Sa % mula sa avg"
+],
+"odA_price": [
+"34cd6e6ad0",
+"Sa isang presyo"
+],
+"odA_r": [
+"6e45e5e9e3",
+"Sa × R"
+],
+"odAcc": [
+"e6018a209f",
+"Account at kontrata"
+],
+"odAddE": [
+"19172e9e47",
+"Entry"
+],
+"odAddX": [
+"f83b6fe3ae",
+"Exit"
+],
+"odAlAdd": [
+"f06c9cb834",
+"Idagdag ang mga naka-tick na alerto"
+],
+"odAlBot": [
+"3629af8343",
+"Lahat ng naka-tick sa Telegram bot ({n})"
+],
+"odAlBotCut": [
+"2fcde082d6",
+"{n} sa {m} na antas ang magkakasya sa isang link ng Telegram (stop at mga exit muna). Idagdag ang natitira gamit ang ✈ sa tabi ng bawat antas."
+],
+"odAlDone": [
+"dcb0bb6e26",
+"Naidagdag ang {n} na alerto, {d} ay naroroon na."
+],
+"odAlNote": [
+"d01e0d0ed8",
+"Pupunta ang mga ito sa iyong listahan ng mga alerto at tutunog sa browser na ito. Para sa Telegram bot, ipadala nang sabay-sabay ang lahat ng naka-tick na antas at i-tap ang “Add all” doon, o i-tap ang ✈ sa tabi ng isang antas."
+],
+"odAlT": [
+"c4db405f26",
+"Isang alerto para sa bawat antas"
+],
+"odAlerts": [
+"4d34373477",
+"Mga alerto para sa bawat antas"
+],
+"odAmb": [
+"7802cc464b",
+"Hindi malinaw na mga bar"
+],
+"odAmbTip": [
+"bb7b5e1048",
+"Mga bar kung saan ang isang candle ay umabot sa dalawang antas. Hindi maipakita ng candle kung alin ang nauna, kaya ang mas malalang antas ang kinuha."
+],
+"odAt": [
+"1030b5c14f",
+"Resulta kung mag-close ang lahat sa"
+],
+"odAtRes": [
+"ed6f422e42",
+"Resulta sa {p}"
+],
+"odAtrIs": [
+"a6c0a4559a",
+"ATR({n}) sa {tf} = {v}, mula sa {b} na saradong bar. Ang nabubuong bar ay hindi kasama."
+],
+"odAtrLen": [
+"0d1283ae88",
+"Haba ng ATR"
+],
+"odAtrNone": [
+"b5b8e149bf",
+"Kailangan ng ATR({n}) ng mas maraming saradong bar sa chart na ito."
+],
+"odAvg": [
+"195d5c2e94",
+"Average na entry (lahat napuno)"
+],
+"odAvgAfter": [
+"6b5b19bc70",
+"Average sa ngayon"
+],
+"odAvgS": [
+"bf3c2aa634",
+"Avg sa ngayon"
+],
+"odBE": [
+"c728685de9",
+"I-stop sa break-even"
+],
+"odBEAfter": [
+"a5351e110f",
+"Pagkatapos ng exit {n}"
+],
+"odBENo": [
+"80c3052d33",
+"Huwag kailanman"
+],
+"odBack": [
+"50e2c403dc",
+"Simulan ang ganitong dami ng mga bar pabalik"
+],
+"odBars": [
+"b3c192ff2d",
+"Mga bar na nilakad"
+],
+"odBest": [
+"802503cf21",
+"Lahat ng exit ay napuno"
+],
+"odBtn": [
+"9cd499490a",
+"ODM"
+],
+"odClearedAl": [
+"10dc663b4f",
+"Nanggal na ang {m} na alerto ng ODM."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"Nanggal na ang {n} na antas at {m} na alerto ng ODM."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} sa {p} ({d}% mula sa huling presyo)"
+],
+"odDragHint": [
+"db78c3cdfe",
+"I-drag ang linyang may markang ↕, ang bilog sa linya ng entry para ilipat ang kahon, o ang bar sa kanang gilid nito para baguhin ang laki. Sa ibang lugar, gagalaw ang chart gaya ng dati."
+],
+"odEExit": [
+"3d85c7e08a",
+"Exit {n}, pagkatapos ay ang stop"
+],
+"odEExitBE": [
+"0ad2bfc2b3",
+"Exit {n}, pagkatapos ay break-even"
+],
+"odEOpen": [
+"5345d6a804",
+"Lahat ng exit, {p}% ay bukas pa rin"
+],
+"odEStop": [
+"86bdb5dd1a",
+"Na-stop bago ang anumang exit"
+],
+"odETrail": [
+"4a7ecb3fd6",
+"Lahat ng exit, pagkatapos ay ang trail sa pinakamababa nito"
+],
+"odETrailStop": [
+"aa767f2da5",
+"Lahat ng exit, pagkatapos ay ang trail ay hindi kailanman gagalaw (pinakamasamang kaso)"
+],
+"odE_act": [
+"62e5648dbd",
+"Ang pagsisimula ng trail ay dapat nasa panig ng tubo ng average na entry."
+],
+"odE_atr": [
+"806d58c951",
+"Hindi pa available ang ATR: mag-load ng higit pang kasaysayan o pumili ng ibang uri ng stop."
+],
+"odE_entryPct": [
+"82eb26283f",
+"Ang mga bahagi ng entry ay dapat umabot sa 100%."
+],
+"odE_gen": [
+"444ab6efd0",
+"Para sa ladder: unang presyo, 1–10 hakbang at agwat na wala pang 50%."
+],
+"odE_inverse": [
+"ab5e9b4538",
+"Ang mga kontratang naka-coin-margin ay hindi minodelo rito: gamitin ang setting na linear o spot."
+],
+"odE_lev": [
+"19c0779ac0",
+"Ang leverage ay dapat nasa pagitan ng 1 at 500."
+],
+"odE_many": [
+"f6b50a805f",
+"Napakaraming row: hanggang 10 entry at 8 exit lamang."
+],
+"odE_noEntry": [
+"919adac637",
+"Magdagdag ng kahit isang presyo ng entry."
+],
+"odE_num": [
+"86a4dc7d7f",
+"Suriin ang mga numero: ang bawat field ay nangangailangan ng positibong numero."
+],
+"odE_order": [
+"2119b7e150",
+"Ang exit {n} ay dapat mas malayo kaysa sa exit bago ito."
+],
+"odE_pctOver": [
+"888f2ba05b",
+"Ang mga exit ay nag-close ng higit sa 100%."
+],
+"odE_risk": [
+"4193f0db38",
+"Ang panganib ay hindi maaaring lumampas sa 100%."
+],
+"odE_side": [
+"e208f5757c",
+"Ang stop ay dapat lumampas sa bawat entry: sa ibaba para sa long, sa itaas para sa short."
+],
+"odE_spotShort": [
+"dff80cfcdf",
+"Hindi maaaring i-short ang spot."
+],
+"odE_stop": [
+"6c5a7a58fe",
+"Ang stop ay nangangailangan ng wastong halaga."
+],
+"odE_tp": [
+"2f260004d9",
+"Ang exit {n} ay dapat nasa panig ng tubo ng average entry."
+],
+"odE_trail": [
+"900ad94e6a",
+"Ang trail ay nangangailangan ng distansya (porsyento na mas mababa sa 50, o ATR multiple)."
+],
+"odEnd": [
+"d2df8e9351",
+"Nagtapos sa pamamagitan ng"
+],
+"odEnd_be": [
+"813161b07c",
+"Break-even"
+],
+"odEnd_exits": [
+"f80c25cfd5",
+"Lahat ng exits"
+],
+"odEnd_flat": [
+"88d86b7721",
+"Sarado"
+],
+"odEnd_none": [
+"822dfe195e",
+"Walang naabot na entry"
+],
+"odEnd_open": [
+"3d679078a6",
+"Bukas pa rin"
+],
+"odEnd_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEnd_trail": [
+"5b20595c1d",
+"Trailing stop"
+],
+"odEnt": [
+"f056d0d56a",
+"Mga entry"
+],
+"odEntHint": [
+"9f13728dde",
+"Hanggang 10 limit price, bawat isa ay may bahagi sa posisyon. Bumuo ng ladder o i-type ang sarili mong mga presyo."
+],
+"odEv_be": [
+"813161b07c",
+"Break-even"
+],
+"odEv_entry": [
+"19172e9e47",
+"Entry"
+],
+"odEv_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEv_trail": [
+"4c9c67fc6d",
+"Trail"
+],
+"odExit": [
+"d71626cd31",
+"Mga exit"
+],
+"odExitHint": [
+"a9498bb911",
+"Hanggang 8 hakbang. Ang bawat isa ay nagsasara ng bahagi sa isang presyo, sa porsyento mula sa average entry, o sa multiple ng R."
+],
+"odExt": [
+"a4b2498fcd",
+"I-extend sa kanang gilid"
+],
+"odExtClosed": [
+"f871770520",
+"Ang posisyon ay may sarili na namang kanang gilid. I-drag ito para baguhin ang laki."
+],
+"odExtOff": [
+"013864439f",
+"Isara ang kanang gilid"
+],
+"odExtOn": [
+"cd67a03b67",
+"Ang posisyon ngayon ay tumatakbo hanggang sa kanang gilid."
+],
+"odFillNote": [
+"c87b4a2a0a",
+"Avg sa ngayon: ang iyong average entry kapag napuno ang hakbang na ito. Pagkalugi sa SL: ang mawawala sa iyo kung tumama ang stop pagkatapos mapuno ang hakbang na ito, kasama ang mga fee at slippage."
+],
+"odFilled": [
+"b9cade220e",
+"Puno na ang mga entry"
+],
+"odFromStart": [
+"fe112c8cee",
+"agad-agad"
+],
+"odFund": [
+"44fad8f1d2",
+"Funding (+ natanggap, − binayaran)"
+],
+"odGBuild": [
+"e2a08aa341",
+"Bumuo ng ladder"
+],
+"odGFirst": [
+"de46c48c22",
+"Unang presyo"
+],
+"odGN": [
+"cdde4f20ba",
+"Mga hakbang"
+],
+"odGSplit": [
+"fc8230b411",
+"Hatiin"
+],
+"odGStep": [
+"56746816d8",
+"Gap bawat hakbang (%)"
+],
+"odGuide": [
+"8aa7d50c3e",
+"Gabayan ako, hakbang-hakbang"
+],
+"odHEnds": [
+"5cbaf8a928",
+"Bawat paraan ng pagtatapos nito (lahat ng entry ay puno)"
+],
+"odHExits": [
+"d71626cd31",
+"Mga exit"
+],
+"odHFills": [
+"f53f7d6784",
+"Mga entry, isa-isang napupuno"
+],
+"odHidden": [
+"f611e3a7c7",
+"Inalis ang mga level."
+],
+"odHide": [
+"e0eb5bd64c",
+"Itago mula sa chart"
+],
+"odHow": [
+"c54859aa22",
+"Paano ito nagtatapos"
+],
+"odHudE": [
+"19172e9e47",
+"Entry"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Buksan ang ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"I-undo ang huling pagbabago"
+],
+"odHudX": [
+"61ad50a9b9",
+"Target"
+],
+"odLAvg": [
+"97e77871b5",
+"avg"
+],
+"odLLiq": [
+"4df0227844",
+"Liq (tantiya)"
+],
+"odLTrail": [
+"bc39eaf623",
+"Simula ng trail"
+],
+"odLossIf": [
+"9f9abd5a30",
+"Pagkalugi kung ihihinto ngayon"
+],
+"odLossOf": [
+"11e7b83c1c",
+"{p}% ng iyong buong risk ({r})"
+],
+"odLossS": [
+"8a983821d2",
+"Pagkalugi sa SL"
+],
+"odMore": [
+"e4cd862519",
+"Funding, at ang resulta sa anumang presyo"
+],
+"odNoBars": [
+"512041531e",
+"Kulang ang mga saradong bar sa chart na ito."
+],
+"odNote": [
+"757cb878a7",
+"Isang tool sa pagpaplano: hindi ito naglalagay ng order at hindi payo. Ang mga presyo ay nasa unit ng chart. Ang liquidation ay isang pinasimpleng pagtatantiya."
+],
+"odO_atr": [
+"e3ea806c1a",
+"ATR multiple"
+],
+"odO_equal": [
+"a472ce8d19",
+"Pantay"
+],
+"odO_grow": [
+"0721fea085",
+"Lumalaki (mas marami sa malayo)"
+],
+"odO_long": [
+"11eda67f9b",
+"Long"
+],
+"odO_pct": [
+"ac556cf593",
+"Porsyento"
+],
+"odO_price": [
+"3e8248e32e",
+"Presyo"
+],
+"odO_short": [
+"0fe7d82f25",
+"Short"
+],
+"odOpenNow": [
+"309ae4fd1a",
+"Buksan ngayon, sa huling pagsara"
+],
+"odP_one": [
+"337d2c100b",
+"Isang exit sa 2R"
+],
+"odP_pct": [
+"e3ae173380",
+"+5% · +10% · +20%"
+],
+"odP_r": [
+"c8cbacef3d",
+"1R · 2R · 3R"
+],
+"odPick_e": [
+"303f6de669",
+"I-tap ang chart kung saan mapupunta ang bagong entry. Ang Esc ay nag-aalis."
+],
+"odPick_s": [
+"39a71b4de2",
+"I-tap ang chart kung saan mapupunta ang stop. Ang Esc ay nag-aalis."
+],
+"odPick_x": [
+"fd10db7af2",
+"I-tap ang chart kung saan mapupunta ang bagong target. Ang Esc ay nag-aalis."
+],
+"odPnl": [
+"5faa59d4bc",
+"Resulta"
+],
+"odPrice": [
+"3e8248e32e",
+"Presyo"
+],
+"odProfit": [
+"8544a47725",
+"Tubo"
+],
+"odRemove": [
+"d8b9bdb3bb",
+"Alisin ang posisyon mula sa chart"
+],
+"odRestOpen": [
+"b957d211ac",
+"{p}% ang natira na walang exit at walang trail: mananatili itong bukas hanggang sa isara mo ito."
+],
+"odRestTrail": [
+"be684d239e",
+"{p}% ang natira at sumasakay sa trailing stop na {d} sa likod ng pinakamahusay na presyo, simula sa {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Ang level na iyon ay hindi kasya sa plano, kaya bumalik ito:"
+],
+"odRun": [
+"b1b392607d",
+"Patakbuhin"
+],
+"odSMode": [
+"719a179bf8",
+"Ihinto sa pamamagitan ng"
+],
+"odSVal": [
+"e9733d1599",
+"Halaga (×ATR, % o presyo)"
+],
+"odSave": [
+"0eee2d3fa4",
+"I-save sa risk board"
+],
+"odSelHint": [
+"b5f9d58f07",
+"I-tap ang posisyon para piliin ito, pagkatapos ay i-drag ang linyang may markang ↕ o ang hawakan. Sa ibang lugar ay gumagalaw ang chart gaya ng dati."
+],
+"odShare": [
+"09ca55ca52",
+"Ibahagi"
+],
+"odShow": [
+"a7555004a5",
+"Ipakita sa chart"
+],
+"odShown": [
+"aeb3fca140",
+"{n} na level ang iginuhit. I-drag ang linya para baguhin ang plano, o i-right-click ang chart para alisin ang mga ito."
+],
+"odStep": [
+"dc416e1088",
+"Hakbang"
+],
+"odStop": [
+"5c87e73ae4",
+"Stop-loss"
+],
+"odStopAt": [
+"9e253470c8",
+"Stop"
+],
+"odStopHint": [
+"1520812bfa",
+"Inilagay lampas sa pinakamalalim na entry, kaya pinoprotektahan nito ang buong ladder."
+],
+"odSumE": [
+"c136a3bb46",
+"Ang mga entry ay umaabot sa {p}% (dapat 100%)"
+],
+"odSumX": [
+"978c3654a2",
+"Isinasara ng mga exit ang {p}% · {r}% ang natira"
+],
+"odTAct": [
+"3dc83cd6e3",
+"Simulan ang trail"
+],
+"odTActV": [
+"3ca6df8028",
+"Halaga ng simula"
+],
+"odTMode": [
+"2a9de72123",
+"I-trail sa pamamagitan ng"
+],
+"odTOn": [
+"3579d12dce",
+"I-trail ang natira"
+],
+"odTVal": [
+"a1a90e8896",
+"Distansya (×ATR o %)"
+],
+"odTest": [
+"0f1d4cab39",
+"Subukan sa chart na ito"
+],
+"odTestNote": [
+"4c737bf973",
+"Ang iyong mga presyo ay nakapirmi, kaya tinatanong nito kung ano ang magagawa ng mga oler na ito kung nakaupo sila sa chart mula sa bar na iyon. Ang mga fill ay nasa level o mas magandang bukas; ang mga stop ay nasa level o mas masamang bukas, bawas ang slippage. Ang trail ay gumagalaw lamang sa mga saradong bar."
+],
+"odTestT": [
+"235fcfbdf7",
+"Subukan sa mga nakaraang candle ng chart na ito"
+],
+"odTipRisk": [
+"13c945cd7c",
+"Ang pagkalugi kung mapupuno ang bawat entry at tatama ang stop, kasama ang mga fee at slippage."
+],
+"odTitle": [
+"af27511d03",
+"ODM: planuhin ang buong trade"
+],
+"odTopAvg": [
+"cdc93143c6",
+"Avg"
+],
+"odTopBest": [
+"f80c25cfd5",
+"Lahat ng exits"
+],
+"odTopRisk": [
+"5a8f23f567",
+"Risk"
+],
+"odTourBack": [
+"b52b36b726",
+"Bumalik"
+],
+"odTourDone": [
+"e9b450d14b",
+"Tapos na"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Simulan ang tour"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} ng {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Sunod"
+],
+"odTourNo": [
+"e457149073",
+"Huwag muna"
+],
+"odTourOffer": [
+"d0012e3974",
+"Bago sa ODM? Ang isang minutong tour ay nagpapakita kung ano ang ginagawa ng bawat bahagi."
+],
+"odTourSkip": [
+"35b754350f",
+"Isara ang tour"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Itakda ang iyong balanse, ang risk bawat trade sa porsyento, ang leverage at ang mga fee. Ang risk ang pinakamaraming mawawala sa iyo kung mapupuno ang bawat entry at tatama ang stop."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Ang iyong account"
+],
+"odTr_act_b": [
+"7644c76432",
+"Ipakita ang plano sa chart at i-drag ang mga linya nito, subukan ito sa mga nakaraang candle, magdagdag ng alerto para sa bawat level, o i-save ito sa risk board. Walang naglalagay ng order dito."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"I-trabaho ito"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Hanggang 10 limit price, bawat isa ay may bahagi. Bumuo ng ladder sa isang tap o i-type ang sarili mong mga presyo. Ang mga bahagi ay dapat umabot sa 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Kung saan ka papasok"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Hanggang 8 hakbang, bawat isa sa isang presyo, porsyento mula sa average entry, o multiple ng R, ang iyong risk bawat coin."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Kung saan ka kumukuha ng tubo"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Ang bawat seksyon, field, at resulta ay may sariling icon. Ipinaliwanag nito ang bahagi, nagbibigay ng halimbawa gamit ang iyong mga numero, at may kahon para sa iyong tanong."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Nahihirapan? I-tap ang isang icon"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Kung tatama ang stop pagkatapos mapuno ang ilang entry lamang, mas mababa ang mawawala sa iyo. Ipinapakita ng bar kung gaano karami sa iyong buong risk iyon."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Ang pagkalugi sa bawat hakbang"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Laki, margin, pagtatantiya ng liquidation, at ang resulta ng bawat posibleng pagtatapos ng trade, kasama ang mga bayarin."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Ang kabuuang larawan"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Nakatayo ang stop sa labas ng pinakamalalim na entry. Itakda ito sa pamamagitan ng presyo, porsyento, o bilang multiple ng ATR para sumunod sa pagiging volatile ng merkado."
+],
+"odTr_stop_t": [
+"f316187400",
+"Kung saan ka nagkakamali"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risk, average entry, stop, R, at ang pinakamagandang resulta, na muling kinakalkula habang nagta-type ka."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Ang plano sa isang tingin"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Ang bahagi na hindi isinasara ng exit ay maaaring sumakay sa trailing stop, at ang stop ay maaaring lumipat sa break-even kapag napuno ang isang exit."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Ang natitira"
+],
+"odTrail": [
+"f4d671693b",
+"Ang natitira"
+],
+"odTrailHint": [
+"952ea83894",
+"Ang bahagi na hindi isinasara ng exit ay maaaring sumakay sa trailing stop. Ang stop ay maaari ring lumipat sa break-even pagkatapos mapuno ang isang exit."
+],
+"odUndone": [
+"d94a6ce055",
+"Na-undo ang huling pagbabago."
+],
+"odW_inRange": [
+"44db20d843",
+"Nasa loob ng iyong entry range ang {l}, kaya maaari itong mapuno bago mapuno ang bawat entry."
+],
+"odWhat": [
+"97211a8888",
+"Ano"
+],
+"odWhen": [
+"6c82e6dd86",
+"Oras"
+],
+"odWhy1": [
+"fc2725ec34",
+"Ang OCO ay nag-uugnay ng isang entry sa isang stop at mga nakatakdang target. Plano ng ODM ang buong buhay ng isang trade: kung saan mo binuo ang posisyon, kung saan ka nagkakamali, kung saan ka nagte-take profit nang paunti-unti, at kung paano sinasakyan ng huling bahagi ang trend."
+],
+"odWhy2": [
+"287376870c",
+"Ang laki ay nagmumula sa risk, hindi sa kabaligtaran. Kung mapupuno ang bawat entry at tamaan ang stop, eksaktong matatalo ka sa halagang iyong pinili, kasama ang mga bayarin at slippage. Kung ang mga unang entry lang ang mapupuno, mas kaunti ang matatalo sa iyo."
+],
+"odWhy3": [
+"367bb231ba",
+"Ang stop ay maaaring sumunod sa sariling range ng merkado: k × ATR sa labas ng pinakamalalim na entry, kaya ang tahimik na merkado ay nakakakuha ng mahigpit na stop at ang volatile ay malawak, walang nakapirming numero."
+],
+"odWhy4": [
+"239d155a16",
+"Ang mga exit ay dumarating nang paunti-unti, bawat isa ay itinakda ng presyong pipiliin mo, porsyento mula sa average entry, o multiple ng R. Ang natitira ay maaaring sumakay sa trailing stop, mula sa simula o kapag naabot na ang isang presyo, at ang stop ay maaaring lumipat sa break-even pagkatapos mapuno ang isang exit."
+],
+"odWhy5": [
+"bad79e82f9",
+"Ang bawat paraan na maaaring magtapos ang plano ay nakalista kasama ang binabayaran nito, at maaari mo itong lakarin sa mga nakaraang candle ng chart na ito. Walang inilalagay na order dito."
+],
+"odWhyT": [
+"18686fe183",
+"Ano ang ODM, at bakit hindi OCO?"
+],
+"odXMode": [
+"c1a0d718e5",
+"Lumabas sa pamamagitan ng"
+],
+"odXVal": [
+"8dce170de2",
+"Halaga"
+],
+"odX_pct": [
+"5c3bc5c2f1",
+"% mula sa avg"
+],
+"odX_price": [
+"3e8248e32e",
+"Presyo"
+],
+"odX_r": [
+"78c72d9090",
+"× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Gantimpala"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risk"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
+],
+"odhA0": [
+"d97012c5ea",
+"Dahil ang ODM ay gumagana pabalik: hinahati nito ang iyong risk sa kung ano ang nawawala sa bawat unit mula sa entry nito hanggang sa stop, kasama ang mga bayarin at slippage. Kaya ang laki ay laging angkop sa risk na iyong pinili."
+],
+"odhA1": [
+"265c1585c3",
+"Ang R ay ang distansya mula sa iyong average entry hanggang sa stop. Sa pera, ang 1R ay ang iyong risk. Ang take profit sa 2R ay kumikita nang dalawang beses sa iyong in-risk."
+],
+"odhA10": [
+"c493f48847",
+"Karaniwan ang stop ay nasa maling bahagi ng mga entry, ang mga bahagi ng entry ay hindi umabot sa 100%, o ang take profit ay hindi lampas sa average. Sinasabi ng mensahe kung alin."
+],
+"odhA11": [
+"d35315306a",
+"Ang 'Ipakita sa chart' ay nag-a-update ng bawat antas bilang isang linya. Ang pindutan ng mga alerto ay nagdaragdag ng alerto para sa bawat antas, at ang pindutan ng Telegram ay nagpapadala ng lahat ng may tsek na antas sa bot sa isang link."
+],
+"odhA12": [
+"dd70fbb6c9",
+"Oo. Pumili ng Short: ang mga entry ay umaakyat sa hagdan, ang stop ay nakaupo sa itaas nila at ang mga take profit sa ibaba ng average. Ang spot ay hindi maaaring maging short."
+],
+"odhA13": [
+"49195572ea",
+"Hindi. Ginagawa lamang ng ODM ang aritmetika ng planong iyong inilagay. Ang desisyon at ang risk ay nananatili sa iyo."
+],
+"odhA2": [
+"07478cdb04",
+"Kung gayon ay mas kaunti ang hawak mo, at mas kaunti ang gastos ng stop-out. Ipinapakita ito ng talahanayan ng mga entry bawat hilera: ang pagkalugi kung ang stop ay tinamaan kaagad pagkatapos ng bawat hakbang."
+],
+"odhA3": [
+"f273ced333",
+"Hindi sa stop: nagmumula iyon sa iyong risk. Ang leverage ay nagbabago lamang ng margin na iyong inilaan at pinapalapit ang presyo ng liquidation."
+],
+"odhA4": [
+"9ee9b51794",
+"Sa mababang leverage, sinasaklaw ng margin ang pagbagsak hanggang zero (para sa long), kaya walang nakikitang presyo ng liquidation ang pinasimple na modelo. Itaas ang leverage at may lumilitaw."
+],
+"odhA5": [
+"380ac6b360",
+"Average True Range: ang average na laki ng galaw ng isang candle, kasama ang mga gap, sa nakalipas na N saradong candle ng chart na ito. Sinusukat nito kung gaano gumagalaw ang coin ngayon."
+],
+"odhA6": [
+"7450054b0a",
+"Sa magkabilang panig, sa porsyento ng bayarin na iyong itinakda: kapag napuno ang bawat entry at kapag nagsara ito. Idinaragdag ang mga ito sa pagkalugi sa stop at ibinabawas sa bawat kita."
+],
+"odhA7": [
+"c6b248d165",
+"Ang presyo kung saan isinasara ang buong posisyon para sa eksaktong zero pagkatapos bayaran ang bayarin sa pagbubukas at pagsasara."
+],
+"odhA8": [
+"edbc69746e",
+"Ang bahagi na hindi isinasara ng take profit ay nananatiling bukas. Kapag naka-on ang trailing stop, sinusundan nito ang presyo sa distansya na iyong itinakda; kung wala ito, nananatili itong bukas hanggang sa isara mo ito."
+],
+"odhA9": [
+"860be7dfde",
+"Ang naabot ng presyo nanguna: para sa long ang pinakamataas na presyo (bumabagsak ang presyo sa kanila), para sa short ang pinakamababa."
+],
+"odhAbout": [
+"2367c4d244",
+"Tungkol sa {t}"
+],
+"odhAsk": [
+"225c298b36",
+"Hindi pa rin malinaw? Magtanong tungkol dito"
+],
+"odhAskPh": [
+"a351c059a3",
+"I-type ang iyong tanong…"
+],
+"odhClose": [
+"bbfa773e5a",
+"Isara"
+],
+"odhCopied": [
+"a567d021f9",
+"Nakopya ang iyong tanong. I-paste ito sa chat sa Telegram na magbubukas."
+],
+"odhEx": [
+"0f01ed56a1",
+"Halimbawa"
+],
+"odhFound": [
+"cbee297612",
+"Mula sa gabay ng planner:"
+],
+"odhNone": [
+"0274ea469d",
+"Hindi ko mahanap ito sa gabay ng planner. Maaaring sagutin ito ng isang tao:"
+],
+"odhNote": [
+"9e7107a148",
+"Ang mga sagot ay nagmumula sa sariling gabay ng planner na ito. Hindi ito payong pinansyal."
+],
+"odhQ0": [
+"91c4311223",
+"Bakit ang pagkalugi sa stop ay palaging eksaktong aking risk?"
+],
+"odhQ1": [
+"82c35eab7c",
+"Ano ang R?"
+],
+"odhQ10": [
+"2fc8193a42",
+"Bakit tinatanggihan ang aking plano na may pulang mensahe?"
+],
+"odhQ11": [
+"efc0159afc",
+"Paano ko ilalagay ang plano sa chart o makakuha ng mga alerto?"
+],
+"odhQ12": [
+"edfb87ec89",
+"Maaari ba akong magplano ng short?"
+],
+"odhQ13": [
+"fca8edea2c",
+"Payong pinansyal ba ito?"
+],
+"odhQ2": [
+"d4bcbe2cdc",
+"Paano kung ang ilan lamang sa aking mga entry ang mapuno?"
+],
+"odhQ3": [
+"57fbd2a531",
+"Pinapataas ba ng mas maraming leverage ang aking pagkalugi?"
+],
+"odhQ4": [
+"f34abc6f0d",
+"Bakit sinasabing walang presyo ng liquidation?"
+],
+"odhQ5": [
+"45313c99d8",
+"Ano ang ATR?"
+],
+"odhQ6": [
+"0372f9c582",
+"Paano binibilang ang mga bayarin?"
+],
+"odhQ7": [
+"3b70797699",
+"Ano ang ibig sabihin ng break-even dito?"
+],
+"odhQ8": [
+"095ce05679",
+"Ano ang mangyayari sa natitirang bahagi?"
+],
+"odhQ9": [
+"7c5ea886ee",
+"Aling entry ang unang mapupuno?"
+],
+"odhSee": [
+"2d8243a2c0",
+"Tingnan din ang"
+],
+"odhSend": [
+"3562777bc6",
+"Magtanong"
+],
+"odhTg": [
+"54f13b7555",
+"Magtanong sa isang tao sa Telegram"
+],
+"odhTgPre": [
+"9d35fd54bf",
+"Isang tanong tungkol sa ODM ({t}) sa entekhab.net:"
+],
+"odhWhat": [
+"f8c94a3b4b",
+"Kung ano ito"
+],
+"odhWhy": [
+"25b83941ae",
+"Para saan ito"
+],
+"odhYours": [
+"62c9423b82",
+"Gamit ang iyong mga numero"
+],
+"odh_acc_e": [
+"a1e672ab9e",
+"Balanse 1,000 na may 1% risk: ang buong plano ay maaaring mawalan ng pinakamaraming 10 kung matatamaan ang stop."
+],
+"odh_acc_t": [
+"e6018a209f",
+"Account at kontrata"
+],
+"odh_acc_w": [
+"a976dbc237",
+"Ang pera sa iyong account at ang uri ng merkado na iyong tinitrade."
+],
+"odh_acc_y": [
+"6781776e66",
+"Ang lahat ng iba pa ay sinukat mula sa mga ito: ang dami ay nagmumula sa iyong balanse at sa risk na iyong pinili, hindi kailanman mula sa hula."
+],
+"odh_at_e": [
+"285c2bf283",
+"I-type ang 64,000 para makita ang resulta ng pagsasara ng lahat sa 64,000."
+],
+"odh_at_t": [
+"935081b125",
+"Resulta sa presyo"
+],
+"odh_at_w": [
+"fed458f278",
+"I-type ang anumang presyo para makita kung ano ang kikitain o lulubog ng buong posisyon, kasama ang bawat entry na napuno, kung isasara mo roon, kasama ang mga bayarin."
+],
+"odh_at_y": [
+"cc9eda3c11",
+"Isang mabilis na sagot sa: paano kung ang presyo ay pumunta sa X?"
+],
+"odh_atrlen_e": [
+"69e29d5c8e",
+"Sa 4 na oras na chart, ang ibig sabihin ng 14 ay ang huling 14 na saradong apat na oras na candle."
+],
+"odh_atrlen_n": [
+"e014738faf",
+"Ngayon: ATR({atrn}) = {atr}."
+],
+"odh_atrlen_t": [
+"0d1283ae88",
+"Haba ng ATR"
+],
+"odh_atrlen_w": [
+"ec7b66a7d1",
+"Gaano karaming saradong candle ng chart na ito ang ginagamit ng average true range, mula 2 hanggang 200."
+],
+"odh_atrlen_y": [
+"0cb5efe861",
+"Ang mas maikli ay mas mabilis tumugon. Ang 14 ang karaniwang pinipili."
+],
+"odh_avg_e": [
+"261f462ba2",
+"61,590, 60,974 at 60,358 sa tig-iisang ikatlo ay may average na 60,974."
+],
+"odh_avg_n": [
+"00574db62b",
+"Sa iyo: {avg}."
+],
+"odh_avg_t": [
+"195d5c2e94",
+"Average entry (puno lahat)"
+],
+"odh_avg_w": [
+"7aa1dfcea6",
+"Ang weighted average ng iyong mga entry, bawat isa ayon sa share nito."
+],
+"odh_avg_y": [
+"944a3a2604",
+"Ang kita, R, at break-even ay sinusukat lahat mula rito."
+],
+"odh_avgso_e": [
+"3d6689c33b",
+"Pagkatapos ng E1 at E2 sa 61,590 at 60,974 (pantay na share), ang average ay 61,282."
+],
+"odh_avgso_t": [
+"6b5b19bc70",
+"Average sa ngayon"
+],
+"odh_avgso_w": [
+"640b763fe7",
+"Ang iyong average entry kapag ang hakbang na ito at ang mga nauna rito ay napuno na."
+],
+"odh_avgso_y": [
+"5021e04d42",
+"Kung hindi na kailanman maaabot ng presyo ang mga susunod na hakbang, ito ang iyong tunay na average."
+],
+"odh_balance_e": [
+"f71c8aeb53",
+"Balanse 2,000 na may 1% risk: ang pinakamaraming pwedeng matalo sa trade na ito ay 20."
+],
+"odh_balance_n": [
+"0487b654ad",
+"Ang iyong mga numero: {bal} × {rp}% = {risk}."
+],
+"odh_balance_t": [
+"98dcb75a7c",
+"Balanse ng account"
+],
+"odh_balance_w": [
+"de01d13238",
+"Ang perang pinangangalakal mo, sa USDT."
+],
+"odh_balance_y": [
+"fd4b786043",
+"Ang iyong risk sa pera ay ang balanse na ito na pinarami ng porsyento ng risk."
+],
+"odh_be_e": [
+"a0382921f0",
+"Pagkatapos ng TP1, ang stop ay lilipat mula 59,531 patungo sa mga 61,096, ang break-even kasama ang mga bayarin."
+],
+"odh_be_t": [
+"c728685de9",
+"Stop sa break-even"
+],
+"odh_be_w": [
+"861ff47778",
+"Pagkatapos mapuno ang take profit na iyong pinili, ang stop ay lilipat sa presyo kung saan isinasara ang natitira para sa zero pagkatapos ng mga bayarin."
+],
+"odh_be_y": [
+"32fa27561d",
+"Mula noon ang trade ay hindi na pwedeng maging pagkalugi, maliban sa slippage."
+],
+"odh_bep_e": [
+"c331f932ff",
+"Average 60,974 na may 0.1% na bayarin: ang break-even ay mga 61,096 para sa long."
+],
+"odh_bep_n": [
+"6cd9e12493",
+"Sa iyo: {be}."
+],
+"odh_bep_t": [
+"f05a5bace4",
+"Presyo ng break-even"
+],
+"odh_bep_w": [
+"b8f351c832",
+"Kung saan isinasara ang buong posisyon para sa zero pagkatapos magbayad ng mga bayarin sa magkabilang panig."
+],
+"odh_bep_y": [
+"73228b98b2",
+"Lumilipat ang stop dito kapag pinili mo ang 'stop sa break-even'."
+],
+"odh_best_e": [
+"9eb73103e3",
+"+13.21 (1.32R): ang mga take profit nang magkasama ay kumikita ng 1.32 beses ng iyong risk."
+],
+"odh_best_t": [
+"802503cf21",
+"Lahat ng exit napuno"
+],
+"odh_best_w": [
+"cf54412f22",
+"Ang kita mula sa mga take profit lamang, kung ang bawat isa sa kanila ay mapupuno, kasama ang mga bayarin. Ang bahaging naiwan para sa trailing stop ay wala rito."
+],
+"odh_best_y": [
+"6aec2ebfe9",
+"Ipinapakita kung ano ang halaga ng mga target ng plano, sa pera at sa R."
+],
+"odh_contract_e": [
+"09ce7c2386",
+"Sa spot, ang 0.01 BTC sa 60,000 ay nagkakahalaga ng buong 600 USDT. Sa perpetual sa 5×, ang margin ay 120."
+],
+"odh_contract_t": [
+"5a0ba3bb83",
+"Kontrata"
+],
+"odh_contract_w": [
+"4845fcd1eb",
+"Linear perpetual: isang USDT futures contract na may leverage at funding. Spot: binibili mo mismo ang coin, na walang leverage at walang liquidation."
+],
+"odh_contract_y": [
+"eb0650f4a1",
+"Ang leverage, margin, liquidation, at funding ay nalalapat lamang sa perpetual. Ang spot ay maaari lamang maging long."
+],
+"odh_ends_e": [
+"b409a750e1",
+"Stop bago ang anumang take profit: −10, na -1R."
+],
+"odh_ends_t": [
+"f140ac6462",
+"Kung paano ito magtatapos"
+],
+"odh_ends_w": [
+"08b803b6d8",
+"Bawat paraan na maaaring matapos ang plano na puno ang lahat ng entry, bawat isa ay may resulta nito sa pera at sa R."
+],
+"odh_stop_y": [
+"d7b6da198b",
+"Kasama ang iyong risk, itinatakda nito ang size: ang mas malapit na stop ay nangangahulugang mas malaking size para sa parehong risk."
+],
+"odh_stopat_e": [
+"2cb46a1ee6",
+"Sa ATR × 2 at ATR 600, nakapwesto ito ng 1,200 sa kabila ng iyong pinakamalalim na entry."
+],
+"odh_stopat_n": [
+"d05e23b4c8",
+"Sa iyo: {sl}."
+],
+"odh_stopat_t": [
+"9e253470c8",
+"Stop"
+],
+"odh_stopat_w": [
+"d16b105abf",
+"Ang stop price na ginagamit ng planong ito, mula sa napili mong paraan."
+],
+"odh_stopat_y": [
+"91a65418b9",
+"Dito nagsasara ang bawat napunang entry kung mabigo ang ideya."
+],
+"odh_sval_e": [
+"0c941866f5",
+"2 na may ATR, 1.5 na may porsyento, o 59,500 na may presyo."
+],
+"odh_sval_t": [
+"0622db62de",
+"Stop value"
+],
+"odh_sval_w": [
+"ba80c38465",
+"Ang numero para sa paraan: ang ATR multiple, ang porsyento, o ang presyo."
+],
+"odh_sval_y": [
+"f976dd936f",
+"Palitan ito para ilipat ang stop. Nag-a-update ang size para manatiling pareho ang risk."
+],
+"odh_tact_e": [
+"2e0ede00f1",
+"Magsimula pagkatapos ng 1R: mag-a-activate ang trail sa sandaling ang presyo ay nasa isang R na tubo."
+],
+"odh_tact_t": [
+"be92240002",
+"Magsisimula ang trail"
+],
+"odh_tact_w": [
+"b6481374ec",
+"Kung kailan magsisimula ang trailing stop: agad, sa isang presyo, pagkatapos ng paggalaw ng porsyento, o pagkatapos ng multiple ng R na tubo."
+],
+"odh_tact_y": [
+"94c2f2ff7f",
+"Ang pag-umpisa nang mas huli ay nag-iwas na maalog palabas malapit sa entry."
+],
+"odh_tactv_e": [
+"246eb9a7c3",
+"Ang 1 na may R ay nangangahulugang isang R na tubo."
+],
+"odh_tactv_t": [
+"3ca6df8028",
+"Start value"
+],
+"odh_tactv_w": [
+"5f17cc79b4",
+"Ang presyo, porsyento o R para sa pinili mong pagsisimula."
+],
+"odh_tactv_y": [
+"8969cc67da",
+"Itinatakda nito ang punto kung saan nag-a-activate ang trailing stop."
+],
+"odh_test_e": [
+"3fae7383cb",
+"Hindi malinaw na mga candle: hinawakan ng isang candle ang parehong stop at target, kaya hindi alam ang order sa loob nito."
+],
+"odh_test_t": [
+"d5bb186d33",
+"Subukan sa kasaysayan ng chart na ito"
+],
+"odh_test_w": [
+"7991e3cd85",
+"Ipinapalabas ang plano sa mga nakaraang saradong candle ng chart na ito, isang candle sa bawat pagkakataon."
+],
+"odh_test_y": [
+"521a6e46e0",
+"Isang mabilis na pagsusuri kung paano sana ito naganap. Hindi ito pangako tungkol sa hinaharap."
+],
+"odh_tmode_e": [
+"6463ceb3c4",
+"Ang 2 × ATR ay 1,200 kapag ang ATR ay 600."
+],
+"odh_tmode_t": [
+"77027c3731",
+"Distansya ng trail sa pamamagitan ng"
+],
+"odh_tmode_w": [
+"a7c556973e",
+"ATR multiple o porsyento."
+],
+"odh_tmode_y": [
+"9ad06b6b07",
+"Pinapanatili ng ATR ang distansya na naaayon sa kung gaano kalaki ang galaw ng coin."
+],
+"odh_trail_e": [
+"92baed577c",
+"20% ang natira na may trailing stop na 2 × ATR sa likod ng pinakamahusay na presyo."
+],
+"odh_trail_t": [
+"f4d671693b",
+"Ang natira"
+],
+"odh_trail_w": [
+"49a5c00392",
+"Ang bahagi na hindi isinasara ng take profit. Maaari nitong sundan ang presyo gamit ang isang trailing stop, at ang stop ay maaaring lumipat sa break-even pagkatapos ng take profit."
+],
+"odh_trail_y": [
+"d5d5131192",
+"Hinahayaan nitong tumakbo ang bahagi ng trade nang hindi ibinibigay ang lahat pabalik."
+],
+"odh_tval_e": [
+"d9ca049b57",
+"Sa 1,200, ang mataas na 66,000 ay naglalagay ng stop ng long sa 64,800."
+],
+"odh_tval_t": [
+"752ffa08b7",
+"Distansya ng trail"
+],
+"odh_tval_w": [
+"cc8419ae79",
+"Kung gaano kalayo sa likod ng pinakamahusay na presyo sumusunod ang trailing stop."
+],
+"odh_tval_y": [
+"3fdb99c573",
+"Ang masyadong masikip ay maagang nagsasara. Ang masyadong maluwag ay nagbabalik ng malaki."
 ],
 "of_price": [
 "3e8248e32e",
@@ -3345,6 +4921,26 @@
 "91acef5dac",
 "Haba ng WMA"
 ],
+"palActions": [
+"c3cd636a58",
+"Mga aksyon"
+],
+"palHint": [
+"47ce327f45",
+"Mag-type ng tool, setting, timeframe…"
+],
+"palNone": [
+"9f85767365",
+"Walang tumutugma."
+],
+"palTf": [
+"85decb73d1",
+"Timeframe"
+],
+"palTitle": [
+"7b6b539e73",
+"Command palette"
+],
 "panels": [
 "8dfeed481e",
 "Mga panel"
@@ -3413,6 +5009,262 @@
 "1e214a5fd6",
 "I-click sa chart kung saan dapat magsimula ang replay"
 ],
+"plActiveR": [
+"a2c4172ad6",
+"Aktibong risk"
+],
+"plAvgExit": [
+"a8ea629465",
+"Average exit"
+],
+"plBoard": [
+"435bd708da",
+"Open-risk board"
+],
+"plBoardNote": [
+"5fec8e41f9",
+"Mga naka-save na plano, at kung ano ang kabuuan ng mga naka-tsek bilang open. Babala lamang ang limitasyon: walang anuman dito ang maaaring maglagay o magsara ng order."
+],
+"plBoardNote2": [
+"7f817b9c7c",
+"Magkakahiwalay ang panahong pinlano, aktibo, at saradong mga plano; ang mga aktibo lamang ang binibilang bilang open risk. Ang pang-araw-araw na limitasyon ay binibilang ang mga natamong lugi ngayong araw (orasan mo: {tz}, nire-reset sa hatinggabi ng lokal) kasama ang aktibong risk sa mga stop. Babala lamang ito: walang anuman dito ang maaaring maglagay o magsara ng order."
+],
+"plBoardT": [
+"435bd708da",
+"Open-risk board"
+],
+"plClosedToday": [
+"e720fa6ae4",
+"Sarado ngayon (na-realize)"
+],
+"plCompact": [
+"1df39aa58a",
+"Compact"
+],
+"plDayEq": [
+"6458e3671e",
+"Equity sa simula ng araw"
+],
+"plDayLimit": [
+"6e36e54b65",
+"Pang-araw-araw na limitasyon sa lugi (%)"
+],
+"plDup": [
+"fca49b8589",
+"Naka-save na ang planong ito."
+],
+"plEx": [
+"5b13eac7ed",
+"Exchange"
+],
+"plExpand": [
+"ab2d96c48c",
+"Ipakita ang lahat"
+],
+"plExport": [
+"f3e4fadb9e",
+"I-export"
+],
+"plFees": [
+"08894cb378",
+"Mga bayarin sa pagpasok at paglabas"
+],
+"plFree": [
+"533c47e8a1",
+"Free margin"
+],
+"plFundIv": [
+"3bc01f9cf4",
+"Interval ng funding (mga oras)"
+],
+"plFundRate": [
+"9336e2a882",
+"Funding kada 8h (%)"
+],
+"plFunding": [
+"5f9a0c5144",
+"Funding (pagtatantya)"
+],
+"plGross": [
+"927d131b21",
+"Gross profit (bago ang mga bayarin)"
+],
+"plGrossX": [
+"bfdcc76198",
+"Gross exposure"
+],
+"plHours": [
+"555b262e58",
+"Mga oras na hinawakan"
+],
+"plImpBad": [
+"bd98edc00d",
+"Walang wastong mga plano ang file na iyon."
+],
+"plImpOk": [
+"1553f868cf",
+"Na-import ang {n} mga plano."
+],
+"plImport": [
+"d6fbc9d2bd",
+"I-import"
+],
+"plKill": [
+"3ac6a66ed3",
+"Ang open risk ay lampas na sa iyong pang-araw-araw na limitasyon sa lugi ({p}%). Babala lamang ito — isara o paliitin ang mga posisyon nang mag-isa kung sumasang-ayon ka."
+],
+"plLeft": [
+"fe0bb373bb",
+"Natitirang allowance para sa pang-araw-araw na lugi"
+],
+"plLimitUsed": [
+"541b181b79",
+"Nagamit na pang-araw-araw na limitasyon"
+],
+"plLongX": [
+"b8780d83b2",
+"Long exposure"
+],
+"plNear": [
+"616c3c45eb",
+"Naabot na ng open risk ang {p}% ng iyong pang-araw-araw na limitasyon sa lugi."
+],
+"plNet": [
+"4239208ec2",
+"Net pagkatapos ng funding"
+],
+"plNetX": [
+"9f10e7efdd",
+"Net exposure"
+],
+"plNone": [
+"126e99fc3a",
+"Wala pang naka-save na plano. Pumili ng long o short na posisyon sa chart at i-save ang plano nito."
+],
+"plNote": [
+"d8538aa3ed",
+"I-drag ang entry, ang stop o ang target sa chart: sumusunod ang bawat pigura. Plano lamang — walang ipinadadalang order."
+],
+"plOpen": [
+"cf9b77061f",
+"Open"
+],
+"plOpenN": [
+"13ce0e526e",
+"Mga open na plano"
+],
+"plOpenRisk": [
+"cddec7cc84",
+"Risk sa mga stop"
+],
+"plOver": [
+"a42b4a3d68",
+"Ang open risk ngayon ay {p}% ng iyong pang-araw-araw na limitasyon."
+],
+"plPlannedR": [
+"160959aa01",
+"Planadong risk"
+],
+"plPnl": [
+"11cdb9ef40",
+"Na-realize na P&L"
+],
+"plPnlPh": [
+"37a5301a88",
+"resulta"
+],
+"plR2": [
+"b3839316b2",
+"TP2 (× risk)"
+],
+"plR3": [
+"4cfedeb55f",
+"TP3 (× risk)"
+],
+"plS_active": [
+"a733b809d2",
+"Aktibo"
+],
+"plS_closed": [
+"88d86b7721",
+"Sarado"
+],
+"plS_planned": [
+"9cbe42aaff",
+"Pinlano"
+],
+"plSave": [
+"c3f10085f9",
+"I-save ang plano"
+],
+"plSaved": [
+"5ad336f045",
+"Naka-save ang plano."
+],
+"plScaled": [
+"71027ef6dd",
+"Ang mga bahagi ay hindi umabot sa 100%, kaya inangkop ito rito."
+],
+"plShare1": [
+"3d669b7968",
+"Bahagi sa TP1 (%)"
+],
+"plShare2": [
+"527587bedf",
+"Bahagi sa TP2 (%)"
+],
+"plShare3": [
+"1de10b521f",
+"Bahagi sa TP3 (%)"
+],
+"plShortX": [
+"e0e2e891e2",
+"Short exposure"
+],
+"plStatus": [
+"bae7d5be70",
+"Katayuan"
+],
+"plTipActive": [
+"4e20f49ee8",
+"Mga planong minarkahan mong aktibo (open o sa papel): ang mawawala kung tatama ang bawat stop."
+],
+"plTipFund": [
+"0b6a70a096",
+"Ang positibong rate ay binabayaran ng mga long at tinatanggap ng mga short; ang negatibong rate ay sa kabilang paraan."
+],
+"plTipLeft": [
+"6139c9c234",
+"limitasyon − na-realize na lugi ngayon − aktibong risk sa mga stop"
+],
+"plTipLoss": [
+"a238701251",
+"Ang gastos ng stop: ang perang may risk, kasama ang funding kung ito ay gastos."
+],
+"plTipPlanned": [
+"4326a18e06",
+"Mga planong idinisenyo mo lamang. Hindi binibilang laban sa pang-araw-araw na limitasyon."
+],
+"plTitle": [
+"6aa0fd12fe",
+"Trade plan"
+],
+"plTop": [
+"8a661b765f",
+"Pinakamalaking bahagi ng risk"
+],
+"plTotal": [
+"77ffec55dd",
+"Lahat ng mga target ay napunan"
+],
+"plUnalloc": [
+"b92d412dc9",
+"Bahagi na walang target (bukas pa rin)"
+],
+"plW_fees": [
+"1ba96c9a8b",
+"Kinakain ng mga bayarin ang buong tubo ng mga target na ito."
+],
 "place": [
 "6aea8612f3",
 "Ilagay ang order"
@@ -3448,6 +5300,74 @@
 "random": [
 "7b57e4d500",
 "Random na bar"
+],
+"rcAdd": [
+"3b7e34f346",
+"Idinagdag sa bawat yugto"
+],
+"rcBE": [
+"f05a5bace4",
+"Break-even price"
+],
+"rcBEafter": [
+"9efc4f3287",
+"I-stop sa break-even pagkatapos ng target 1"
+],
+"rcBEwin": [
+"5a7eb19d0d",
+"Win rate para mag-break even"
+],
+"rcBal": [
+"98dcb75a7c",
+"Balanse ng account"
+],
+"rcCt": [
+"5a0ba3bb83",
+"Kontrata"
+],
+"rcDD": [
+"db066ddc8a",
+"Drawdown (%)"
+],
+"rcDDlimit": [
+"38fe5b1885",
+"Drawdown na ibinibilang bilang pagkasira (%)"
+],
+"rcEV": [
+"26effee29e",
+"Inaasahang halaga kada trade"
+],
+"rcE_dist": [
+"12390b8d52",
+"Hindi maaaring maging pareho ang presyo ng entry at stop."
+],
+"rcE_lev": [
+"e81f8b7d27",
+"Ang leverage ay dapat 1 o higit pa."
+],
+"rcE_num": [
+"e7dcd677d6",
+"Maglagay ng mga positibong numero."
+],
+"rcE_oco_num": [
+"bcb3e41b53",
+"Maglagay ng entry at stop sa magkaibang mga presyo."
+],
+"rcE_oco_order": [
+"26adf98964",
+"Ang mga target ay dapat lumayo mula sa entry sa tamang pagkakasunod-sunod."
+],
+"rcE_oco_pct": [
+"4993270f9b",
+"Ang mga bahagi ay dapat umabot sa kabuuang 100%."
+],
+"rcE_oco_tg": [
+"2cf289fad7",
+"Magbigay ng isa hanggang tatlong target."
+],
+"rcE_oco_tp": [
+"319a13b9cc",
+"Ang target ay nasa maling panig ng entry, o nawawala ang bahagi nito."
 ],
 "redo": [
 "471b94d402",
@@ -3569,9 +5489,381 @@
 "7b72883e07",
 "Ngayong linggo"
 ],
+"rsGo": [
+"44c57abd88",
+"I-reset"
+],
+"rsInd": [
+"76de28a75e",
+"Mga indicator sa mga chart"
+],
+"rsLead": [
+"19aa2a9a77",
+"I-clear ang pahina nang sabay-sabay. I-tsek ang dapat alisin:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Kasaysayan ng alerto"
+],
+"rsNote": [
+"58f9efc63c",
+"Mananatili ang mga layout, setting, watchlist, at portfolio. Ang mga alertong ipinadala mo sa Telegram bot ay nakatago sa bot: buksan ang /alerts doon para burahin ang mga ito."
+],
+"rsOd": [
+"bbde1a818d",
+"Planong ODM at mga antas nito"
+],
+"rsTitle": [
+"6ce02ce159",
+"I-reset ang pahina"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"I-undo ang huling pag-reset"
+],
 "runTest": [
 "2c7f471fce",
 "I-run ang test"
+],
+"saAddC": [
+"2f4979324e",
+"Kondisyon"
+],
+"saAddG": [
+"171a0606f7",
+"Grupo"
+],
+"saBN": [
+"b7baa1d40c",
+"Numero"
+],
+"saBS": [
+"3a43d0e663",
+"Indicator / presyo"
+],
+"saBars": [
+"76dcd41fff",
+"{n} na mga bar"
+],
+"saBarsN": [
+"bd019a756d",
+"Mga bar nang sunud-sunod"
+],
+"saCopy": [
+"af74f7c536",
+"Kopyahin"
+],
+"saDotNo": [
+"38a82961e6",
+"False sa huling saradong bar"
+],
+"saDotWait": [
+"2d596b20ba",
+"Kulang pa ang mga bar para sa indicator na ito"
+],
+"saDotYes": [
+"a0ff91462d",
+"True sa huling saradong bar"
+],
+"saE_empty": [
+"597d80feb5",
+"Magdagdag ng kahit isang kondisyon."
+],
+"saE_emptyG": [
+"70e1ad95bb",
+"Walang kondisyon ang grupo."
+],
+"saE_long": [
+"427b53e1e0",
+"Tiyak na masyadong mahaba ang panuntunan ({n} ng 600 na character): magalis ng kondisyon."
+],
+"saE_num": [
+"c249973a4b",
+"Kailangan ng numero ng kondisyon."
+],
+"saE_script": [
+"f60d6bd8a3",
+"Hindi nasuri ang panuntunan."
+],
+"saE_side": [
+"4651a22984",
+"Piliin kung ano ang bawat panig ng kondisyon."
+],
+"saExpT": [
+"7dcda53b12",
+"Ang panuntunan bilang Entekhab Script"
+],
+"saGNot": [
+"969e7d8dee",
+"HINDI"
+],
+"saGNotTip": [
+"1e1d749332",
+"Dapat false ang buong grupo"
+],
+"saGroup": [
+"ec98a63469",
+"Grupo {n}"
+],
+"saHist": [
+"5820fa4201",
+"Sa huling {b} na saradong {tf} na mga bar, nag-trigger sana ito nang {n} beses."
+],
+"saHistPct": [
+"24e303adf5",
+"True ang panuntunan sa {p}% ng mga bar na iyon."
+],
+"saJG_and": [
+"4ad42ed12b",
+"Lahat ng ito (AND)"
+],
+"saJG_or": [
+"834d918bfb",
+"Alinman sa mga ito (OR)"
+],
+"saJT_and": [
+"595d3df086",
+"Dapat true ang lahat ng grupo (AND)"
+],
+"saJT_or": [
+"2d2e690caf",
+"Sapat na ang alinmang grupo (OR)"
+],
+"saJ_and": [
+"c2f934cb8c",
+"AND"
+],
+"saJ_or": [
+"f579c52396",
+"OR"
+],
+"saLoading": [
+"ea358bfeb3",
+"Naglo-load ng mga bar…"
+],
+"saNever": [
+"6f89c4ce1a",
+"Hindi ito kailanman nag-trigger dito: suriin ang mga numero."
+],
+"saNoBars": [
+"f4f0ebd381",
+"Kulang pa ang mga saradong bar sa timeframe na ito."
+],
+"saNoisy": [
+"60ccc916b7",
+"Madalas itong mag-trigger, kaya maaaring maingay ang alerto."
+],
+"saNot": [
+"969e7d8dee",
+"HINDI"
+],
+"saNotTip": [
+"72a2de0282",
+"Dapat false ang kondisyong ito"
+],
+"saNote": [
+"0a4c1d2dc0",
+"Sinireserba sa device na ito habang bukas ang pahina ng merkado o ang app, kapag nagsara ang isang bar. Hindi ito naglalagay ng order at hindi payo."
+],
+"saNowNo": [
+"9de2f51a64",
+"Hindi true ngayon, sa huling saradong {tf} na bar"
+],
+"saNowT": [
+"1468db9a9e",
+"Ngayon, at sa kasaysayan ng chart na ito"
+],
+"saNowYes": [
+"e9ef398126",
+"True ngayon, sa huling saradong {tf} na bar"
+],
+"saO_fall": [
+"8cf0b8e1dd",
+"bumababa nang"
+],
+"saO_ge": [
+"dcec4f1daf",
+"≥"
+],
+"saO_gt": [
+"091385be99",
+">"
+],
+"saO_le": [
+"c8426723ce",
+"≤"
+],
+"saO_lt": [
+"c4dd3c8cdd",
+"<"
+],
+"saO_rise": [
+"22723b9834",
+"tumaas nang"
+],
+"saO_xdn": [
+"76b13b6946",
+"nag-cross sa ibaba"
+],
+"saO_xup": [
+"b0849ce10e",
+"nag-cross sa itaas"
+],
+"saP_brk": [
+"b05b2596c8",
+"20-bar breakout na may volume"
+],
+"saP_calm": [
+"23cc54ef55",
+"MACD cross sa mahinahong merkado"
+],
+"saP_cross": [
+"fe7e9ec902",
+"EMA 9/21 cross na may volume"
+],
+"saP_dip": [
+"7430b571e3",
+"Pagbaba sa uptrend"
+],
+"saP_ext": [
+"d5d8c4d9e0",
+"Sa labas ng Bollinger bands"
+],
+"saS_atrp": [
+"1f65ad77c8",
+"ATR bilang % ng presyo"
+],
+"saS_bbl": [
+"e23f4aec2d",
+"Bollinger lower (2σ)"
+],
+"saS_bbm": [
+"e0d19c8bad",
+"Bollinger middle"
+],
+"saS_bbu": [
+"2d5e3e5e77",
+"Bollinger upper (2σ)"
+],
+"saS_cci": [
+"2086539684",
+"CCI"
+],
+"saS_close": [
+"bbfa773e5a",
+"Close"
+],
+"saS_ema": [
+"67b9b8a57f",
+"EMA"
+],
+"saS_hh": [
+"6ca9f69f43",
+"Pinakamataas na high ng huling N na mga bar"
+],
+"saS_high": [
+"b1a5954a48",
+"High"
+],
+"saS_hma": [
+"78b8503f6b",
+"HMA"
+],
+"saS_ll": [
+"9c648f4c23",
+"Pinakamababang low ng huling N na mga bar"
+],
+"saS_low": [
+"a124947cbd",
+"Low"
+],
+"saS_macd": [
+"9a34c31ad5",
+"MACD line (12, 26)"
+],
+"saS_macdh": [
+"7a920aaf88",
+"MACD histogram"
+],
+"saS_macds": [
+"cfb2113118",
+"MACD signal (9)"
+],
+"saS_open": [
+"cf9b77061f",
+"Open"
+],
+"saS_roc": [
+"ad73d69b6c",
+"Pagbabago % sa loob ng N na mga bar"
+],
+"saS_rsi": [
+"2a00496640",
+"RSI"
+],
+"saS_sma": [
+"337f15d864",
+"SMA"
+],
+"saS_stoch": [
+"5183f479ec",
+"Stochastic %K"
+],
+"saS_volume": [
+"3b18e8e332",
+"Volume"
+],
+"saS_volx": [
+"da0afcae21",
+"Volume ÷ average nito"
+],
+"saS_vwma": [
+"2fdaec23f9",
+"VWMA"
+],
+"saS_wma": [
+"3b02c32b34",
+"WMA"
+],
+"saSave": [
+"895f538a76",
+"Gumawa ng alerto"
+],
+"saScript": [
+"a99f36583c",
+"I-edit bilang script"
+],
+"saTop": [
+"7c6b0e4270",
+"Pagsamahin ang mga grupo"
+],
+"saTx_and": [
+"c2f934cb8c",
+"AND"
+],
+"saTx_not": [
+"969e7d8dee",
+"NOT"
+],
+"saTx_or": [
+"f579c52396",
+"OR"
+],
+"saWhy1": [
+"6505c505e8",
+"Bumuo ng panuntunan mula sa mga kondisyon. Sa loob ng isang grupo, piliin kung dapat true ang lahat ng kondisyon (AND) o sapat na ang alinman (OR). Ganito rin ang pagsasama-sama ng mga grupo."
+],
+"saWhy2": [
+"16ee22ede7",
+"Binabaligtad ng NOT ang isang kondisyon o buong grupo: ang ibig sabihin ng “NOT ATR% > 3” ay mahinahon ang merkado. Ang NOT ay hindi kailanman true habang kulang pa sa bar ang indicator, kaya hindi ito pwedeng mag-trigger sa nawawalang data."
+],
+"saWhy3": [
+"c5be12a5c9",
+"Sinusuri ang panuntunan kapag nagsara ang isang bar ng napiling timeframe, hindi sa bumubuong bar, at nag-trigger ang alerto sa bar kung saan naging true ang panuntunan. Makikita sa ibaba ang bawat kondisyon ngayon at kung gaano kadalas nag-trigger ang panuntunan sa kasaysayan ng chart na ito."
+],
+"saWhyT": [
+"49224cea55",
+"Paano gumagana ang smart alert"
 ],
 "sameSide": [
 "180c1a1822",
@@ -3937,6 +6229,10 @@
 "c3de6d0cdd",
 "Mga signal ng Kurdistani (BTC)"
 ],
+"sg_flow": [
+"22b2e001a4",
+"Daloy at balita"
+],
 "sg_halft": [
 "a087f03711",
 "HalfTrend [everget]"
@@ -3949,6 +6245,10 @@
 "a9a165bc50",
 "KDJ cross"
 ],
+"sg_level": [
+"ed47f09811",
+"Mga antas"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD cross"
@@ -3956,6 +6256,10 @@
 "sg_macross": [
 "6677aad0c9",
 "EMA cross"
+],
+"sg_mind": [
+"7d7700531e",
+"Panganib at pag-iisip"
 ],
 "sg_psar": [
 "7bd7543cd4",
@@ -3973,9 +6277,17 @@
 "d890614a3f",
 "RSI reversal"
 ],
+"sg_setup": [
+"532fd3a54e",
+"Mga setup"
+],
 "sg_smacross": [
 "446d28671b",
 "Golden / death cross (SMA)"
+],
+"sg_smc": [
+"f5cbe85ce3",
+"Istraktura ng merkado"
 ],
 "sg_sqz": [
 "b42e6347a2",
@@ -4000,6 +6312,10 @@
 "sg_tdi": [
 "2af75b9512",
 "Traders Dynamic Index"
+],
+"sg_trade": [
+"b0811e470d",
+"Trade"
 ],
 "sg_ut": [
 "39cf5fa59f",
@@ -4693,9 +7009,41 @@
 "ad88cbfa09",
 "Pati sa Telegram (binabantayan ng bot kahit nakasara ang page na ito)"
 ],
+"thArc": [
+"c9522bad23",
+"Arctic Minimal"
+],
+"thAur": [
+"1f69f4962c",
+"Aurora Neon"
+],
+"thCri": [
+"e99d88a595",
+"Crimson Momentum"
+],
+"thCyb": [
+"c8e3feffa1",
+"Cyberpunk Flux"
+],
 "thDark": [
 "ae1ef01432",
 "Madilim"
+],
+"thEme": [
+"31ebcf2e2d",
+"Emerald Terminal"
+],
+"thGal": [
+"8b6134fdc2",
+"Purple Galaxy"
+],
+"thGla": [
+"45248800ea",
+"Quantum Glass"
+],
+"thGold": [
+"065d9160fa",
+"Solar Gold"
 ],
 "thLight": [
 "a36ef8aba2",
@@ -4709,9 +7057,21 @@
 "0229e960cf",
 "Navy"
 ],
+"thObs": [
+"16c2f31828",
+"Midnight Obsidian"
+],
+"thOce": [
+"0f120f1635",
+"Deep Ocean"
+],
 "thPaper": [
 "22d507f2ba",
 "Papel"
+],
+"thRet": [
+"cfcedff38b",
+"Retro Trading"
 ],
 "time": [
 "6c82e6dd86",
@@ -5045,6 +7405,38 @@
 "5b20595c1d",
 "Trailing stop"
 ],
+"wsApplied": [
+"7c1a4571c7",
+"Naka-on ang {n}. Ang nakaraang workspace mo ay nasa Aking mga layout."
+],
+"wsBackup": [
+"74fca79c74",
+"Bago ang preset"
+],
+"wsNote": [
+"691ff5b98a",
+"Isang click ang nagtatakda ng layout, mga timeframe, mga indicator, tema, at kulay ng candle para sa simbolong ginagamit mo. Naka-save muna ang iyong workspace sa ilalim ng “Aking mga layout”."
+],
+"wsTitle": [
+"a192b9968d",
+"Mga handa nang workspace"
+],
+"ws_candles": [
+"2fb856e4bb",
+"Mga Pattern ng Candle"
+],
+"ws_channel": [
+"5b107c3a4a",
+"Channel ng Coin_Kurd"
+],
+"ws_clean": [
+"ee819e288a",
+"Minimalist"
+],
+"ws_cycle": [
+"0b08f61f49",
+"Market Cycle"
+],
 "yourRate": [
 "ca14282aa6",
 "iyong rate"
@@ -5150,6 +7542,14 @@
 "ind_zlsma": [
 "814b9eebab",
 3
+],
+"saTab": [
+"50aeccb002",
+1
+],
+"saTitle": [
+"0082d082b6",
+1
 ],
 "sg_ichi": [
 "730fce5fe8",
