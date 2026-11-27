@@ -222,7 +222,7 @@
 
     var foot = wrap.querySelector('.ekw-foot');
     /* Kurdish counts once; the line under the lists says so in the owner's approved words (2026-11-27) */
-    var kl = de.getAttribute('lang') || CODE || 'en', kt = KURD[kl] || KURD.en;
+    var kl = de.classList.contains('ek-ar') ? 'ar' : (de.getAttribute('lang') || CODE || 'en'), kt = KURD[kl] || KURD.en;
     if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.setAttribute('translate', 'no'); kp.textContent = kt; if (stack(kl)) { kp.style.fontFamily = stack(kl); fontCss(FONTS[kl][1]); } foot.appendChild(kp); }
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     d.body.appendChild(wrap);

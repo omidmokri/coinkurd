@@ -1,0 +1,73 @@
+# Before/after sample of the trading-glossary redo, run on the i18n-glossary branch only.
+# It writes data/i18n_preview.json back to that branch; nothing reaches main or the site.
+name: Translation glossary preview
+
+on:
+  push:
+    branches: [i18n-glossary]
+    paths: ["scripts/i18n_preview.py", "scripts/i18n_glossary.py", "data/i18n_glossary.json", ".github/workflows/i18n-preview.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: i18n-preview
+  cancel-in-progress: true
+
+env:
+  PYTHONUNBUFFERED: "1"
+  I18N_SITE_MODELS: "gemini-3.1-flash-lite,gemini-3.5-flash-lite"
+  ALI_API_KEY: ${{ secrets.ALI_API_KEY }}
+  AZARI_API_KEY: ${{ secrets.AZARI_API_KEY }}
+  HAMA_ADI_KEY: ${{ secrets.HAMA_ADI_KEY }}
+  HANA_ADI_KEY: ${{ secrets.HANA_ADI_KEY }}
+  HANA2_ADI_KEY: ${{ secrets.HANA2_ADI_KEY }}
+  KURD_ADI_KEY: ${{ secrets.KURD_ADI_KEY }}
+  MOKRI_API_KEY: ${{ secrets.MOKRI_API_KEY }}
+  OMID_API_KEY: ${{ secrets.OMID_API_KEY }}
+  SALAH_API_KEY: ${{ secrets.SALAH_API_KEY }}
+  SARA_API_KEY: ${{ secrets.SARA_API_KEY }}
+  OMID01_ADI_KEY: ${{ secrets.OMID01_ADI_KEY }}
+  OMID02_ADI_KEY: ${{ secrets.OMID02_ADI_KEY }}
+  OMID03_ADI_KEY: ${{ secrets.OMID03_ADI_KEY }}
+  OMID04_ADI_KEY: ${{ secrets.OMID04_ADI_KEY }}
+  OMID05_ADI_KEY: ${{ secrets.OMID05_ADI_KEY }}
+  OMID06_ADI_KEY: ${{ secrets.OMID06_ADI_KEY }}
+  OMID07_ADI_KEY: ${{ secrets.OMID07_ADI_KEY }}
+  OMID08_ADI_KEY: ${{ secrets.OMID08_ADI_KEY }}
+  OMID09_ADI_KEY: ${{ secrets.OMID09_ADI_KEY }}
+  OMID10_ADI_KEY: ${{ secrets.OMID10_ADI_KEY }}
+  OMID11_ADI_KEY: ${{ secrets.OMID11_ADI_KEY }}
+  OMID12_ADI_KEY: ${{ secrets.OMID12_ADI_KEY }}
+  OMID13_ADI_KEY: ${{ secrets.OMID13_ADI_KEY }}
+  OMID14_ADI_KEY: ${{ secrets.OMID14_ADI_KEY }}
+  OMID15_ADI_KEY: ${{ secrets.OMID15_ADI_KEY }}
+  KEY01_API_KEY: ${{ secrets.KEY01_API_KEY }}
+  KEY02_API_KEY: ${{ secrets.KEY02_API_KEY }}
+  KEY03_API_KEY: ${{ secrets.KEY03_API_KEY }}
+  KEY04_API_KEY: ${{ secrets.KEY04_API_KEY }}
+  KEY05_API_KEY: ${{ secrets.KEY05_API_KEY }}
+  KEY06_API_KEY: ${{ secrets.KEY06_API_KEY }}
+  KEY07_API_KEY: ${{ secrets.KEY07_API_KEY }}
+  KEY08_API_KEY: ${{ secrets.KEY08_API_KEY }}
+  KEY09_API_KEY: ${{ secrets.KEY09_API_KEY }}
+  KEY10_API_KEY: ${{ secrets.KEY10_API_KEY }}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - run: python scripts/i18n_preview.py
+      - name: Commit the preview to this branch
+        run: |
+          git config user.name  "coinkurd-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/i18n_preview.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: translation glossary preview"
+          git push origin HEAD:i18n-glossary
