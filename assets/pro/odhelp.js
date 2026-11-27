@@ -124,7 +124,7 @@
 
   function close(back) {
     clearTimeout(HOVT); clearTimeout(LEAVT); clearInterval(WATCH);
-    if (POP) POP.remove();
+    if (POP) POP.remove(); document.body.classList.remove('pm-odsheet');
     if (OWNER) { OWNER.setAttribute('aria-expanded', 'false'); OWNER.classList.remove('on'); if (back && OWNER.isConnected) try { OWNER.focus(); } catch (e) { } }
     POP = null; OWNER = null; PIN = false;
   }
@@ -179,18 +179,32 @@
     var d = el('details', 'pm-odpf'), s = el('summary', '', S('odhQ' + i)); d.appendChild(s); var a = el('p', '', S('odhA' + i)); a.dir = 'auto'; d.appendChild(a); return d;
   }
 
-  /* beside the icon on a wide screen, kept inside the window; a sheet along the bottom on a narrow one */
+  /* the bottom edge nothing fixed covers: the site's own bar along the bottom of a phone screen sits above the planner */
+  function freeBottom() {
+    var y = innerHeight, x = innerWidth / 2, n = document.elementFromPoint ? document.elementFromPoint(x, innerHeight - 4) : null;
+    for (var k = 0; n && k < 12; k++, n = n.parentElement) {
+      if (n.id === 'pro' || n.classList && n.classList.contains('pm-modal')) break;
+      if (getComputedStyle(n).position === 'fixed') { y = Math.min(y, n.getBoundingClientRect().top); break; }
+    }
+    return y;
+  }
+  /* beside the icon on a wide screen, kept inside the planner window and the screen; a sheet along the bottom on a narrow one */
   function place(p, b, host) {
     var hr = host.getBoundingClientRect(), r = b.getBoundingClientRect(), vw = Math.min(innerWidth, hr.width || innerWidth);
-    if (vw < 600) { p.classList.add('sheet'); return; }
-    var w = Math.min(360, vw - 16), ph = p.offsetHeight, x, y;
-    p.style.width = w + 'px';
-    ph = p.offsetHeight;
-    x = A().RTL() ? r.right - w : r.left; x = Math.max(8, Math.min(x, hr.left + hr.width - w - 8)) - hr.left;
-    var below = (hr.top + hr.height) - r.bottom, above = r.top - hr.top;
-    if (below >= ph + 12 || below >= above) { y = r.bottom - hr.top + 6; p.style.maxHeight = Math.max(160, below - 14) + 'px'; }
-    else { y = Math.max(8, r.top - hr.top - 6 - Math.min(ph, above - 14)); p.style.maxHeight = Math.max(160, above - 14) + 'px'; }
-    p.style.left = x + 'px'; p.style.top = y + 'px';
+    if (vw < 600) {
+      var fb = Math.min(freeBottom(), hr.bottom), top = Math.max(hr.top, 0) + 40;
+      p.classList.add('sheet'); p.style.bottom = Math.max(0, hr.bottom - fb) + 'px'; p.style.maxHeight = Math.max(200, Math.min((fb - top), (fb - Math.max(hr.top, 0)) * 0.78)) + 'px';
+      document.body.classList.add('pm-odsheet'); return;
+    }
+    var mb = b.closest('.pm-mbox'), br = mb ? mb.getBoundingClientRect() : hr;
+    var lo = Math.max(br.top, 0, hr.top), hi = Math.min(br.bottom, innerHeight, hr.bottom, freeBottom());
+    var w = Math.min(360, vw - 16), ph, x, y;
+    p.style.width = w + 'px'; p.style.maxHeight = ''; ph = p.offsetHeight;
+    x = A().RTL() ? r.right - w : r.left; x = Math.max(br.left + 8, Math.min(x, br.right - w - 8)) - hr.left;
+    var below = hi - r.bottom - 8, above = r.top - lo - 8;
+    if (below >= Math.min(ph, 260) || below >= above) { var mh = Math.max(160, below); y = r.bottom + 6; if (ph > mh) ph = mh; p.style.maxHeight = mh + 'px'; }
+    else { var mh2 = Math.max(160, above); if (ph > mh2) ph = mh2; p.style.maxHeight = mh2 + 'px'; y = r.top - 6 - ph; }
+    p.style.left = x + 'px'; p.style.top = (y - hr.top) + 'px';
   }
 
   /* ---- the ask box: the guide's own text, matched on this device */
@@ -255,6 +269,8 @@
     var tg = el('button', 'pm-btn sm pm-odptg', '✈ ' + T('odhTg')); tg.type = 'button';
     tg.onclick = function () { H.toTelegram(q, cur); };
     res.appendChild(tg);
+    /* the answer comes into view inside the card */
+    try { (res.firstChild || res).scrollIntoView({ block: 'nearest' }); } catch (e) { }
   }
 
   /* hand the question to a person: copied with the item's name, then the site's Telegram support chat opens */

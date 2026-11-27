@@ -1387,12 +1387,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
     await page.waitForTimeout(300);
     const m = await page.evaluate(() => {
-      const one = (el) => { const r = document.createRange(); r.selectNodeContents(el); const ys = new Set([...r.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); return ys.size <= 1; };
+      const one = (el) => { const r = document.createRange(); if (el.r) r.selectNodeContents(el.r); else r.selectNodeContents(el); const ys = new Set([...r.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); return ys.size <= 1; };
       const T = PRO.app.T, box = document.querySelector('.pm-mbox'), body = document.querySelector('.pm-mbody');
       const tabs = [...document.querySelectorAll('.pm-odout .pm-odt')].map(t => {
         const w = t.parentElement, ths = [...t.querySelectorAll('th')], tds = [...t.querySelectorAll('td')];
-        const parts = (x) => x.querySelector('.pm-odpc2,.pm-odl') ? [...x.querySelectorAll('b,small')] : [x];
-        return { heads: ths.map(x => x.textContent), multi: ths.concat(tds).flatMap(parts).filter(x => !one(x)).map(x => x.textContent),
+        const txt = (x) => { const r = document.createRange(), t = [...x.childNodes].find(n => n.nodeType === 3); if (!t) return x; return { r: t }; };
+        const parts = (x) => x.querySelector('.pm-odpc2,.pm-odl') ? [...x.querySelectorAll('b,small')] : x.querySelector('.pm-odi') ? [txt(x)] : [x];
+        return { heads: ths.map(x => x.textContent), multi: ths.concat(tds).flatMap(parts).filter(x => !one(x)).map(x => x.r ? x.r.textContent : x.textContent),
           cut: tds.filter(x => x.scrollWidth > x.clientWidth + 1).map(x => x.textContent),
           fits: t.scrollWidth <= w.clientWidth + 1, scrolls: getComputedStyle(w).overflowX === 'auto' };
       });
