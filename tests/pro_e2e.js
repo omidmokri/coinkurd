@@ -77,6 +77,7 @@ async function mockNet(page, stats) {
   });
   await page.route(/data-api\.binance\.vision\/api\/v3\//, async r => {
     const u = new URL(r.request().url()), p = u.pathname.replace('/api/v3/', ''); stats.rest++;
+    if (p === 'ping') return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{}' });   /* data.js probes the host once before it uses it */
     if (p === 'klines') { const k = klines(u.searchParams); if (!k) return r.fulfill({ status: 400, body: '{"code":-1121,"msg":"Invalid symbol."}' }); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(k) }); }
     if (p === 'ticker/24hr') { const syms = JSON.parse(u.searchParams.get('symbols') || '[]'); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(syms.map(mini)) }); }
     if (p === 'ticker/price') { const logos = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/logos/index.json'), 'utf8')); return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(logos.concat(['PAXG']).map(s => ({ symbol: s + 'USDT', price: '1.0' }))) }); }
