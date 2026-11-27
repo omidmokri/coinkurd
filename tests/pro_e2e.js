@@ -1480,7 +1480,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const pk = await page.evaluate(() => ({ on: document.querySelector('.pm-odhud [data-pk="x"]').classList.contains('on'), cls: PRO.app.active().el.classList.contains('pm-odpick'), msg: document.querySelector('.pm-odhud .pm-odhm').textContent }));
     ok(`[${tag}] "+ Target" waits for a tap and says so`, pk.on && pk.cls && pk.msg === (await T('odPick_x')), JSON.stringify(pk));
     if (yT != null && yT > 10) {
-      await page.mouse.click(X, Lb.box.t + yT);
+      await page.mouse.click(await xFree(Lb.box.t + yT), Lb.box.t + yT);
       await page.waitForTimeout(150);
       const L5 = await live(), nx = L5.st.exits.filter(x => x.v !== '' && +x.q > 0);
       ok(`[${tag}] a tap on the chart adds the target at that price, in order, and the panel stops waiting`, L5.st.exits.length === Lb.st.exits.length + 1 && !L5.plan.err && L5.plan.nx === Lb.plan.nx + 1 && nx.some(x => x.mode === 'price' && Math.abs(+x.v / tapP.p - 1) < 0.002) && !L5.pick && Math.abs(nx.reduce((s, x) => s + +x.q, 0) - 100) < 0.01, JSON.stringify({ n0: Lb.st.exits.length, n1: L5.st.exits.length, err: L5.plan.err, ex: L5.st.exits, tapP }));
@@ -1489,7 +1489,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     /* tap "Stop" and then a price above the entries: the plan refuses it, says why, and the stop line stays to be dragged back */
     const yBad = await page.evaluate(() => { const L = PRO.odmLive(), e = Math.max(...L.levels.filter(l => /^e/.test(l.k)).map(l => l.p)), x = Math.min(...L.levels.filter(l => /^x/.test(l.k)).map(l => l.p)); return PRO.app.active().main.priceToCoordinate((e + x) / 2); });
     await page.click('.pm-odhud [data-pk="s"]'); await page.waitForTimeout(60);
-    await page.mouse.click(X, Lb.box.t + yBad);
+    await page.mouse.click(await xFree(Lb.box.t + yBad), Lb.box.t + yBad);
     await page.waitForTimeout(150);
     const L6 = await live();
     ok(`[${tag}] a stop on the wrong side is refused with the reason, and its line stays on the chart`, L6.plan.err === 'side' && L6.msgDn && L6.msg === (await T('odE_side')) && L6.levels.some(l => l.k === 'sl'), JSON.stringify({ err: L6.plan.err, msg: L6.msg, k: L6.levels.map(l => l.k) }));
@@ -2011,7 +2011,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     if (da) { await da.scrollIntoViewIfNeeded(); await da.click(); } await page.waitForTimeout(250);
     const asked = await page.evaluate(() => !!document.querySelector('.pm-modal [data-y]')) && (await count()).al === 4;
     ok(`[${tag}] Delete all asks first and deletes nothing yet`, asked, '');
-    await page.click('.pm-modal [data-y]'); await page.waitForTimeout(300);
+    if (asked) await page.click('.pm-modal [data-y]'); await page.waitForTimeout(300);
     ok(`[${tag}] yes deletes all 4 alerts`, (await count()).al === 0, '');
     await shot(page, `93_reset_alerts_${lang}_${vw}`);
     const ub3 = await page.$('.pm-toast .pm-tbtn'); if (ub3) await ub3.click(); await page.waitForTimeout(300);

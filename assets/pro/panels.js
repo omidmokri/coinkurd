@@ -695,7 +695,7 @@
     }).join('') + (AL.length > 1 ? '<button type="button" class="pm-link pm-aldel" data-a="delall">' + ic('trash') + ' ' + esc(T('alDelAll', { n: A.loc(AL.length) })) + '</button>' : '') : '<p class="pm-empty">' + esc(T('noAlerts')) + '</p>';
     var da = $('[data-a="delall"]', al);
     if (da) da.onclick = function () {
-      A.confirmBox(T('alDelAll', { n: A.loc(AL.length) }), T('alDelAllQ', { n: A.loc(AL.length) }), function () {
+      A.confirm(T('alDelAll', { n: A.loc(AL.length) }), T('alDelAllQ', { n: A.loc(AL.length) }), function () {
         var gone = P.delAlerts(function () { return true; });
         A.toast(T('ctxAlGone', { n: gone.length }), '', { label: T('undo'), act: function () { P.putAlerts(gone); } });
       }, T('remove'));
