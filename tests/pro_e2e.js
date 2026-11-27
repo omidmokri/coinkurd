@@ -1402,7 +1402,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
     ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - (zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - (zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0, JSON.stringify({ Zn, zy }));
     const tint = await page.evaluate(([Z]) => {
-      const c = PRO.app.active(), cv = c.chart.takeScreenshot(), k = window.devicePixelRatio || 1, g = cv.getContext('2d');
+      const c = PRO.app.active(), cv = c.chart.takeScreenshot(true), k = window.devicePixelRatio || 1, g = cv.getContext('2d');
       const at = (x, y) => { const d = g.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data; return [d[0], d[1], d[2]]; };
       const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12;
       let gr = 0, rd = 0, n1 = 0, n2 = 0;
@@ -1436,7 +1436,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const under = (x, y) => page.evaluate(([x, y]) => { const out = []; let el = document.elementFromPoint(x, y); for (let i = 0; el && i < 6; i++, el = el.parentElement) { const cs = getComputedStyle(el); out.push(el.tagName + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '') + '[' + cs.position + ',' + cs.zIndex + ']'); } return out.join(' < ') + ' @' + Math.round(x) + ',' + Math.round(y); }, [x, y]);
     const yOf = (L, k) => { const l = L.levels.find(z => z.k === k); return l ? L.box.t + l.y : null; };
     /* drag the stop down 40 px: wider stop, same risk, smaller size */
-    const xFree = (y) => page.evaluate(([y, X]) => { const c = PRO.app.active().box.getBoundingClientRect(); const xs = [X]; for (let x = c.left + c.width * 0.15; x < c.right - 70; x += 8) xs.push(x); for (const x of xs) { const el = document.elementFromPoint(x, y); if (el && !el.closest('.pm-odhud,.pm-leg,.pm-toast,.pm-menu')) return x; } return X; }, [y, X]);
+    const xFree = (y) => page.evaluate(([y, X]) => { const c = PRO.app.active().box.getBoundingClientRect(); const xs = [X]; for (let x = c.left + c.width * 0.15; x < c.right - 70; x += 8) xs.push(x); for (const x of xs) { const el = document.elementFromPoint(x, y); if (el && !el.closest('.pm-odhud,.pm-leg,.pm-toast,.pm-menu')) return x; } for (const x of xs) { const el = document.elementFromPoint(x, y); if (el && el.closest('.pm-odhud') && !el.closest('button')) return x; } return X; }, [y, X]);
     const drag = async (y0, dy, touch) => {
       const X = await xFree(y0);
       if (!touch) { await page.mouse.move(X, y0); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(X, y0 + dy * i / 6); await page.mouse.up(); }

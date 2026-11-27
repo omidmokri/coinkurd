@@ -494,7 +494,7 @@
     this.box = $('.pm-chart', this.el);
     var self0 = this;
     this.el.addEventListener('contextmenu', function (e) {       /* right click anywhere on the chart */
-      if (e.target.closest && e.target.closest('.pm-selbar, .pm-leg, .pm-macro, .pm-menu, .pm-odhud')) return;
+      if (e.target.closest && e.target.closest('.pm-selbar, .pm-leg, .pm-macro, .pm-menu, .pm-odhud button')) return;   /* the ODM panel's own buttons keep theirs; elsewhere on it, the line under it */
       e.preventDefault(); if (st.active !== self0.i) setActive(self0.i); cellMenu(self0, e);
     });
     this.el.addEventListener('pointerdown', function () { setActive(self.i); }, true);

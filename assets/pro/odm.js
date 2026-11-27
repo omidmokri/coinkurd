@@ -316,12 +316,10 @@
     });
     /* in the middle of each zone, the whole plan in one line when there is room */
     ctx.font = '700 12px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = rtl ? 'rtl' : 'ltr';
-    var cx = x0 + w / 2;
-    if (yt != null && Math.abs(yt - ya) >= 46 && r.best != null) {
-      ctx.fillStyle = light ? '#0b6b48' : '#7ff0c4';
-      ctx.fillText(T('odZRew') + ' ' + LRI + sg(pct(ex[ex.length - 1].p), 2) + '% · ' + sg(r.best) + ' · R:R 1:' + f(r.best / r.risk, 2) + PDI, cx, (ya + yt) / 2);
-    }
-    if (Math.abs(ys - ya) >= 46) { ctx.fillStyle = light ? '#a3271d' : '#ffb0a8'; ctx.fillText(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, cx, (ya + ys) / 2); }
+    /* centred on the box, kept on the chart, and only where no label of a level sits */
+    function mid(txt, y, col) { if (used.some(function (u) { return Math.abs(u - y) < 16; })) return; var tw = ctx.measureText(txt).width, cx = Math.max(tw / 2 + 4, Math.min(W - tw / 2 - 4, x0 + w / 2)); ctx.fillStyle = col; ctx.fillText(txt, cx, y); }
+    if (yt != null && Math.abs(yt - ya) >= 46 && r.best != null) mid(T('odZRew') + ' ' + LRI + sg(pct(ex[ex.length - 1].p), 2) + '% · ' + sg(r.best) + ' · R:R 1:' + f(r.best / r.risk, 2) + PDI, (ya + yt) / 2, light ? '#0b6b48' : '#7ff0c4');
+    if (Math.abs(ys - ya) >= 46) mid(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, (ya + ys) / 2, light ? '#a3271d' : '#ffb0a8');
     /* the handle that moves the start candle */
     ctx.beginPath(); ctx.arc(x0, ya, Z.drag && Z.drag.kind === 'anc' ? 7 : 5.5, 0, Math.PI * 2); ctx.fillStyle = light ? '#fff' : '#141416'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#f7931a'; ctx.stroke();
     ctx.restore();
