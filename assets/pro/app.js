@@ -1729,7 +1729,7 @@
     if (oh) {
       items.push({ head: 'ODM · ' + oh.t + ' · ' + fmtP(sym, oh.p) });
       items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
-      items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, false); } });
+      items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
       items.push({ sep: 1 });
     }
     /* an alert line under the cursor */
@@ -1796,16 +1796,15 @@
       it.push({ sep: 1 }, { label: T('ctxAllDraw', { n: (DRAW[sym] || []).length }), icon: 'trash', act: function () { var n = (DRAW[sym] || []).length; mutate(sym, function (L2) { L2.length = 0; }); cell.drawer.select(null); toast(T('ctxDrawGone', { n: n }), '', { label: T('undo'), act: doUndo }); } }, back());
       menu(cell.box, it, at);
     } });
-    if (nOdm) o.push({ label: T('ctxOdmLv'), icon: 'long', hint: String(nOdm), act: function () { P.odmClear(cell, false); } });
-    if (nOal) o.push({ label: T('ctxOdmAl'), icon: 'bell', hint: String(nOal), act: function () { delAlertsUndo(function (a) { return P.isOdmAlert(a, sym); }); } });
+    if (nOdm || nOal) o.push({ label: T('ctxOdmLv'), icon: 'long', act: function () { P.odmClear(cell, true); } });
     if (nAl) o.push({ label: T('ctxAlAll'), icon: 'bell', hint: String(nAl), act: function () { delAlertsUndo(function (a) { return a.on && a.k === 'price' && a.sym === sym; }); } });
-    var any = L.length + I0.length + nOdm;
-    if (any && (!!L.length + !!I0.length + !!nOdm) > 1) o.push({ label: T('ctxClearAll'), icon: 'trash', act: function () {
+    var any = L.length + I0.length + nOdm + nOal;
+    if (any && (!!L.length + !!I0.length + !!(nOdm || nOal)) > 1) o.push({ label: T('ctxClearAll'), icon: 'trash', act: function () {
       confirmBox(T('ctxClearAll'), T('ctxClearQ', { s: P.pair ? P.pair(sym) : sym }), function () {
         if ((DRAW[sym] || []).length) { mutate(sym, function (L2) { L2.length = 0; }); if (cell.drawer) cell.drawer.select(null); }
         var was = cell.cfg.inds.slice(); if (was.length) { cell.cfg.inds = []; cell.indsChanged(); }
-        if (P.odmLinesShown && P.odmLinesShown(cell)) P.odmHide();
-        toast(T('ctxCleared'), '', { label: T('undo'), act: function () { if (was.length) { cell.cfg.inds = was; cell.indsChanged(); } doUndo(); } });
+        var odg = P.delAlerts ? P.delAlerts(function (a) { return P.isOdmAlert(a, sym); }) : []; if (P.odmLinesShown && P.odmLinesShown(cell)) P.odmHide();
+        toast(T('ctxCleared'), '', { label: T('undo'), act: function () { if (was.length) { cell.cfg.inds = was; cell.indsChanged(); } if (odg.length) P.putAlerts(odg); doUndo(); } });
       }, T('remove'));
     } });
     if (!any && !nOal && !nAl) o.push({ label: T('ctxNothing'), disabled: true });

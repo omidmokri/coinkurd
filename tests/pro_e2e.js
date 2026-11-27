@@ -1397,6 +1397,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] "Show on chart" draws every level as a price line and opens the panel on the chart`, L0 && L0.levels.length >= 7 && L0.pl === L0.levels.length && hb && hb.in && hb.btn === 3 && hb.open && hb.undo && /SL/.test(L0.hud), JSON.stringify({ n: L0 && L0.levels.length, pl: L0 && L0.pl, hb }));
     await shot(page, `88_odm_drag_${lang}_${vw}`);
     const X = L0.box.l + L0.box.w * 0.42;
+    const under = (x, y) => page.evaluate(([x, y]) => { const out = []; let el = document.elementFromPoint(x, y); for (let i = 0; el && i < 6; i++, el = el.parentElement) { const cs = getComputedStyle(el); out.push(el.tagName + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '') + '[' + cs.position + ',' + cs.zIndex + ']'); } return out.join(' < ') + ' @' + Math.round(x) + ',' + Math.round(y); }, [x, y]);
     const yOf = (L, k) => { const l = L.levels.find(z => z.k === k); return l ? L.box.t + l.y : null; };
     /* drag the stop down 40 px: wider stop, same risk, smaller size */
     const drag = async (y0, dy, touch) => {
@@ -1412,7 +1413,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await drag(yOf(L0, 'sl'), 40, phone);
     let L1 = await live();
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_odm') || '{}').stop);
-    ok(`[${tag}] dragging the stop line moves the stop, keeps the risk and shrinks the size; it is saved as a price`, L1.plan.stop < L0.plan.stop && Math.abs(L1.plan.risk - L0.plan.risk) < 1e-6 && L1.plan.qty < L0.plan.qty && L1.st.stop.mode === 'price' && saved.mode === 'price' && Math.abs(+saved.v - L1.plan.stop) <= Math.abs(L1.plan.stop) * 1e-6 && L1.hud !== L0.hud, JSON.stringify({ s0: L0.plan.stop, s1: L1.plan.stop, r0: L0.plan.risk, r1: L1.plan.risk, q0: L0.plan.qty, q1: L1.plan.qty, saved }));
+    ok(`[${tag}] dragging the stop line moves the stop, keeps the risk and shrinks the size; it is saved as a price`, L1.plan.stop < L0.plan.stop && Math.abs(L1.plan.risk - L0.plan.risk) < 1e-6 && L1.plan.qty < L0.plan.qty && L1.st.stop.mode === 'price' && saved.mode === 'price' && Math.abs(+saved.v - L1.plan.stop) <= Math.abs(L1.plan.stop) * 1e-6 && L1.hud !== L0.hud, JSON.stringify({ s0: L0.plan.stop, s1: L1.plan.stop, r0: L0.plan.risk, r1: L1.plan.risk, q0: L0.plan.qty, q1: L1.plan.qty, saved, under: L1.plan.stop < L0.plan.stop ? '' : await under(X, yOf(L0, 'sl')), hud: await page.evaluate(() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const r = h.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height), h.className]; }), box: L0.box, ysl: yOf(L0, 'sl') }));
     ok(`[${tag}] the chart does not pan or zoom while a line is dragged`, L1.range === L0.range, L0.range + ' → ' + L1.range);
     /* drag the first entry up 20 px: the average follows */
     await drag(yOf(L1, 'e0'), -20, phone);
@@ -1467,30 +1468,28 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const menuTxt = () => page.evaluate(() => ({ heads: [...document.querySelectorAll('.pm-menu .pm-mh')].map(x => x.textContent), items: [...document.querySelectorAll('.pm-menu .pm-mi')].map(x => x.querySelector('span').textContent + '|' + ((x.querySelector('small') || {}).textContent || '') + '|' + x.disabled), fits: (() => { const m = document.querySelector('.pm-menu'); if (!m) return false; const r = m.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1; })() }));
     const pickMenu = t => page.evaluate(t => { const b = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => x.querySelector('span').textContent === t); if (!b) return false; b.click(); return true; }, t);
     const undoToast = () => page.evaluate(() => { const b = document.querySelector('.pm-toast .pm-tbtn'); if (!b) return false; b.click(); return true; });
-    const Tk = {}; for (const k of ['ctxRemoveH', 'ctxOdmLv', 'ctxOdmAl', 'ctxAlAll', 'ctxOdmHide', 'ctxOpenOdm', 'ctxAlDel', 'ctxIndOne', 'ctxDrwOne', 'ctxClearAll', 'undo', 'ctxBack']) Tk[k] = await T(k);
+    const Tk = {}; for (const k of ['ctxRemoveH', 'ctxOdmLv', 'ctxAlAll', 'ctxOdmHide', 'ctxOpenOdm', 'ctxAlDel', 'ctxIndOne', 'ctxDrwOne', 'ctxClearAll', 'undo', 'ctxBack']) Tk[k] = await T(k);
     let fy = await freeY(); await rclick(fy);
     let M = await menuTxt();
     const has = (M, k) => M.items.some(s => s.split('|')[0] === Tk[k]);
-    ok(`[${tag}] right-click shows "Remove from chart" with ODM levels, ODM alerts and this coin's alerts`, M.heads.includes(Tk.ctxRemoveH) && has(M, 'ctxOdmLv') && has(M, 'ctxOdmAl') && has(M, 'ctxAlAll') && M.fits && M.items.find(s => s.startsWith(Tk.ctxOdmAl + '|')).split('|')[1] === '2', JSON.stringify(M));
+    ok(`[${tag}] right-click shows "Remove from chart" with "ODM levels and their alerts" (one item) and this coin's alerts`, M.heads.includes(Tk.ctxRemoveH) && has(M, 'ctxOdmLv') && has(M, 'ctxAlAll') && M.fits && !M.items.some(s => /ODM/.test(s) && s.split('|')[0] !== Tk.ctxOdmLv), JSON.stringify(M));
     await shot(page, `88b_ctx_remove_${lang}_${vw}`);
     await pickMenu(Tk.ctxOdmLv); await page.waitForTimeout(120);
-    const g1 = await page.evaluate(() => ({ n: PRO.odmLinesShown(), pl: PRO.app.active().main.priceLines().length, hud: !!document.querySelector('.pm-odhud'), t: (document.querySelector('.pm-toast') || {}).textContent || '' }));
-    ok(`[${tag}] "ODM levels" takes every ODM line and the panel off the chart, and offers Undo`, g1.n === 0 && g1.pl === 0 && !g1.hud && g1.t.includes(Tk.undo), JSON.stringify(g1));
+    const odmAl = () => page.evaluate(() => ({ al: PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length, ov: PRO.alertLines(PRO.app.active().cfg.sym).filter(a => a.odm).length, n: PRO.odmLinesShown(), pl: PRO.app.active().main.priceLines().length, hud: !!document.querySelector('.pm-odhud'), t: (document.querySelector('.pm-toast') || {}).textContent || '' }));
+    const g1 = await odmAl();
+    ok(`[${tag}] "ODM levels and their alerts" takes every ODM line, the panel, the ODM alerts and their 🔔 lines off the chart in one go, and offers Undo`, g1.n === 0 && g1.pl === 0 && !g1.hud && g1.al === 0 && g1.ov === 0 && g1.t.includes(Tk.undo), JSON.stringify(g1));
     await undoToast(); await page.waitForTimeout(150);
-    ok(`[${tag}] Undo draws the ODM levels again`, (await page.evaluate(() => PRO.odmLinesShown())) >= 7, '');
+    const g1b = await odmAl();
+    ok(`[${tag}] Undo draws the ODM levels again and brings their alerts back`, g1b.n >= 7 && g1b.al === 2 && g1b.ov === 2, JSON.stringify(g1b));
     /* right-click on the stop line itself */
     const Ls = await live(); await rclick(Ls.levels.find(l => l.k === 'sl').y);
     M = await menuTxt();
     ok(`[${tag}] right-click on an ODM line names it and offers Open ODM and Remove`, M.heads[0] && M.heads[0].startsWith('ODM · SL') && has(M, 'ctxOpenOdm') && has(M, 'ctxOdmHide'), JSON.stringify(M.heads));
     await pickMenu(Tk.ctxOdmHide); await page.waitForTimeout(120);
-    ok(`[${tag}] "Remove ODM levels" from the line works`, (await page.evaluate(() => PRO.odmLinesShown())) === 0 && (await page.evaluate(() => PRO.app.active().main.priceLines().length)) === 0, '');
+    const g1c = await odmAl();
+    ok(`[${tag}] "Remove" on the line takes the ODM levels and their alerts off together`, g1c.n === 0 && g1c.pl === 0 && g1c.al === 0 && g1c.ov === 0, JSON.stringify(g1c));
     await undoToast(); await page.waitForTimeout(150);
-    /* ODM alerts: their lines are named, and they go (and come back) together */
-    fy = await freeY(); await rclick(fy); await pickMenu(Tk.ctxOdmAl); await page.waitForTimeout(120);
-    const a1 = await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length);
-    await undoToast(); await page.waitForTimeout(120);
-    const a2 = await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length);
-    ok(`[${tag}] "ODM alerts" deletes the alerts ODM made, and Undo brings them back`, a1 === 0 && a2 === 2, JSON.stringify({ a1, a2 }));
+    ok(`[${tag}] Undo brings both back`, (await odmAl()).al === 2 && (await odmAl()).n >= 7, '');
     /* a plain alert line under the cursor */
     fy = await freeY();
     await page.evaluate(y => { const c = PRO.app.active(); PRO.addPriceAlert(c.cfg.sym, c.main.coordinateToPrice(y), 'cross', ''); }, fy);
@@ -1499,14 +1498,14 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const nAl0 = await page.evaluate(() => PRO._alerts().length);
     await pickMenu(Tk.ctxAlDel); await page.waitForTimeout(120);
     ok(`[${tag}] "Delete this alert" deletes that one alert only`, (await page.evaluate(() => PRO._alerts().length)) === nAl0 - 1 && (await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length)) === 2, '');
-    /* the ODM window: Hide and "Delete ODM alerts (2)" side by side */
+    /* the ODM window: one "Hide from chart" button that takes the lines and their alerts away; no separate alerts button */
     await page.evaluate(() => document.querySelector('#pm-odm').click()); await page.waitForSelector('.pm-odm', { timeout: 5000 }); await page.waitForTimeout(200);
-    const dlT = await page.evaluate(() => PRO.app.T('odDelAl', { n: 2 }));
-    const dbtn = await page.evaluate(t => { const b = [...document.querySelectorAll('.pm-odact button')].map(x => ({ t: x.textContent.trim(), h: x.hidden })); return b; }, dlT);
-    ok(`[${tag}] the ODM window offers "Hide from chart" and "Delete ODM alerts (2)"`, dbtn.some(b => b.t === dlT && !b.h), JSON.stringify(dbtn));
-    await page.evaluate(t => [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t).click(), dlT); await page.waitForTimeout(150);
-    const g2 = await page.evaluate(() => ({ al: PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length, n: PRO.odmLinesShown(), pl: PRO.app.active().main.priceLines().length, ov: PRO.alertLines(PRO.app.active().cfg.sym).filter(a => a.odm).length }));
-    ok(`[${tag}] "Delete ODM alerts" clears the ODM lines and their 🔔 lines from the chart`, g2.al === 0 && g2.n === 0 && g2.pl === 0 && g2.ov === 0, JSON.stringify(g2));
+    const hdT = await T('odHide');
+    const dbtn = await page.evaluate(() => [...document.querySelectorAll('.pm-odact button')].map(x => ({ t: x.textContent.trim(), h: x.hidden })));
+    ok(`[${tag}] the ODM window shows "Hide from chart" and no separate alerts button`, dbtn.some(b => b.t === hdT && !b.h) && !dbtn.some(b => /ODM/.test(b.t) && b.t !== hdT), JSON.stringify(dbtn));
+    await page.evaluate(t => { const b = [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t); b.dispatchEvent(new MouseEvent('click', { bubbles: true })); }, hdT); await page.waitForTimeout(150);
+    const g2 = await odmAl();
+    ok(`[${tag}] "Hide from chart" clears the ODM lines, the ODM alerts and their 🔔 lines from the chart`, g2.al === 0 && g2.n === 0 && g2.pl === 0 && g2.ov === 0, JSON.stringify(g2));
     await page.keyboard.press('Escape'); await page.waitForTimeout(100);
     /* indicators and drawings, one at a time or all together */
     await page.evaluate(() => { document.querySelector('#pm-ind').click(); });
@@ -1560,7 +1559,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1) && br.top < Math.max(tr.top, visTop) + 40;
       const hd = document.getElementById('ekh'), hb = hd && /fixed|sticky/.test(getComputedStyle(hd).position) ? hd.getBoundingClientRect().bottom : 0;
       return { k: A.k, i: A.i, n: A.n, n1: b.querySelector('small').textContent, title: b.querySelector('b').textContent, text: b.querySelector('p').textContent, next: b.querySelector('[data-a="next"]').textContent, back: b.querySelector('[data-a="back"]').disabled,
-        hit: (() => { const n = b.querySelector('[data-a="next"]').getBoundingClientRect(), el = document.elementFromPoint(n.left + n.width / 2, n.top + n.height / 2); return el && el.closest('.pm-odtour') ? 'ok' : (el ? el.tagName + '.' + el.className + ' < ' + (el.parentElement ? el.parentElement.className : '') : 'none') + ' @' + Math.round(n.left) + ',' + Math.round(n.top); })(),
+        hit: (() => { const n = b.querySelector('[data-a="next"]').getBoundingClientRect(), el = document.elementFromPoint(n.left + n.width / 2, n.top + n.height / 2); if (el && el.closest('.pm-odtour')) return 'ok'; const out = []; let e = el; for (let i = 0; e && i < 7; i++, e = e.parentElement) { const cs = getComputedStyle(e); out.push(e.tagName + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/).join('.') : '') + '[' + cs.position + ',' + cs.zIndex + ']'); } const pr = document.getElementById('pro').getBoundingClientRect(), mr = document.querySelector('.pm-modal').getBoundingClientRect(); return out.join(' < ') + ' @' + Math.round(n.left) + ',' + Math.round(n.top) + ' pro=' + [pr.top, pr.bottom].map(Math.round) + ' modal=' + [mr.top, mr.bottom].map(Math.round); })(),
         br: [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)], tr: [Math.round(tr.left), Math.round(tr.top), Math.round(tr.width), Math.round(tr.height)], vw: [innerWidth, innerHeight, Math.round(scrollY)],
         sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= hb - 1 && br.bottom <= innerHeight + 1, hb, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
     });

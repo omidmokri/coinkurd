@@ -367,7 +367,7 @@
     var ub = $('[data-a="undo"]', hb); ub.innerHTML = A.ic('undo') || '↶'; ub.setAttribute('aria-label', T('odHudUndo')); ub.title = T('odHudUndo');
     ub.onclick = function (e) { e.stopPropagation(); undo(Z); };
     $('[data-a="open"]', hb).onclick = function (e) { e.stopPropagation(); if (P.odmDialog) P.odmDialog(); };
-    xb.onclick = function (e) { e.stopPropagation(); clearOdm(cell, false); };
+    xb.onclick = function (e) { e.stopPropagation(); clearOdm(cell, true); };
     ['pointerdown', 'mousedown', 'touchstart', 'wheel'].forEach(function (n) { hb.addEventListener(n, function (e) { e.stopPropagation(); }, { passive: true }); });
     cell.el.appendChild(hb); Z.hud = hb;
     /* the pointer on the chart: grab the line under it (a finger gets a wider band), or drop a picked level */
@@ -441,6 +441,7 @@
   /* take the plan's lines off the chart, and with alerts true also the alerts ODM added for this coin; one Undo puts both back */
   function clearOdm(cell, alerts) {
     var Z = LN && (!cell || LN.cell === cell) ? LN : null, sym = Z ? Z.sym : cell ? cell.cfg.sym : null, n = Z ? Z.L.length : 0, gone = [];
+    if (!Z && LN && cell && LN.sym === cell.cfg.sym) { Z = LN; n = Z.L.length; }
     if (Z) hideLines();
     if (alerts && sym && P.delAlerts) gone = P.delAlerts(function (a) { return P.isOdmAlert(a, sym); });
     if (!n && !gone.length) return 0;
@@ -627,10 +628,9 @@
     /* ---- actions */
     function act(k, fn, need, pri) { var b = h('<button type="button" class="pm-btn' + (pri ? ' pri' : '') + '"></button>'); b.textContent = T(k); b.onclick = fn; if (need) b.setAttribute('data-need', ''); ACT.appendChild(b); return b; }
     act('odShow', function () { save(); var n = showLines(cell, plan, st, atr); A.closeModal(); A.toast(T('odShown', { n: n })); }, 1, 1);
-    var hb = act('odHide', function () { clearOdm(null, false); hb.hidden = true; }); hb.hidden = !LN;
-    /* alerts made from this plan draw their own 🔔 lines; they stay until deleted, so ODM offers that next to Hide */
+    /* "Remove from chart" takes everything ODM put there: its lines and the alerts (with their 🔔 lines) made from the plan */
     var nal = P.odmAlertCount ? P.odmAlertCount(sym) : 0;
-    var ab2 = act('odDelAl', function () { clearOdm(cell, true); ab2.hidden = true; hb.hidden = true; }); ab2.textContent = T('odDelAl', { n: nal }); ab2.hidden = !nal;
+    var hb = act('odHide', function () { var Z = LN; clearOdm(Z ? Z.cell : cell, true); hb.hidden = true; }); hb.hidden = !LN && !nal;
     act('odTest', function () { test(); }, 1);
     act('odSave', function () {
       var r = plan; if (!r || r.err) return;
