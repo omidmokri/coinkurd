@@ -217,6 +217,14 @@
 "7949a2630a",
 "EMA-kruising (snel / traag)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Verwijder alle alerts ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Verwijder alle {n} alerts op elke coin? Je kunt dit direct daarna ongedaan maken."
+],
 "alert": [
 "b969680a49",
 "Alert"
@@ -668,6 +676,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Valuta's (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Indices & Amerikaanse aandelen"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1864,6 +1876,14 @@
 "g_vol": [
 "1b4620951d",
 "Volume-gebaseerd"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Indices en Amerikaanse aandelen zijn hier alleen dagelijkse slotkoersen: kies 1D, 1W of 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Dagelijkse slotkoersen opgeslagen op deze site van gratis openbare bronnen (Yahoo Finance eerst, anderen als fallback). Alleen gesloten dagen: geen intraday bars en geen live koers."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3842,8 +3862,8 @@
 "{l} op {p} ({d}% van de laatste prijs)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Sleep een lijn gemarkeerd met ↕ om deze te verplaatsen, of de ronde hendel om de start-candle te verplaatsen. Het plan wordt opnieuw berekend terwijl je sleept."
+"db78c3cdfe",
+"Sleep een lijn gemarkeerd met ↕, de cirkel op de entry-lijn om het vak te verplaatsen, of de balk aan de rechterkant om het formaat te wijzigen. Overal elders beweegt de grafiek zoals gebruikelijk."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -3948,6 +3968,942 @@
 "odEnd_exits": [
 "f80c25cfd5",
 "Alle exits"
+],
+"odEnd_flat": [
+"88d86b7721",
+"Gesloten"
+],
+"odEnd_none": [
+"822dfe195e",
+"Geen entry bereikt"
+],
+"odEnd_open": [
+"3d679078a6",
+"Nog open"
+],
+"odEnd_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEnd_trail": [
+"5b20595c1d",
+"Trailing stop"
+],
+"odEnt": [
+"f056d0d56a",
+"Entries"
+],
+"odEntHint": [
+"9f13728dde",
+"Tot 10 limietprijzen, elk met hun deel van de positie. Bouw een ladder of typ je eigen prijzen."
+],
+"odEv_be": [
+"813161b07c",
+"Break-even"
+],
+"odEv_entry": [
+"19172e9e47",
+"Entry"
+],
+"odEv_stop": [
+"9e253470c8",
+"Stop"
+],
+"odEv_trail": [
+"4c9c67fc6d",
+"Trail"
+],
+"odExit": [
+"d71626cd31",
+"Exits"
+],
+"odExitHint": [
+"a9498bb911",
+"Tot 8 stappen. Elke stap sluit een deel tegen een prijs, tegen een percentage van de gemiddelde entry, of tegen een veelvoud van R."
+],
+"odExt": [
+"a4b2498fcd",
+"Verleng tot de rechterkant"
+],
+"odExtClosed": [
+"f871770520",
+"De positie heeft weer zijn eigen rechterkant. Sleep deze om het formaat te wijzigen."
+],
+"odExtOff": [
+"013864439f",
+"Sluit de rechterkant"
+],
+"odExtOn": [
+"cd67a03b67",
+"De positie loopt nu tot de rechterkant."
+],
+"odFillNote": [
+"c87b4a2a0a",
+"Gem. tot nu toe: je gemiddelde entry zodra deze stap is gevuld. Verlies bij SL: wat je verliest als de stop wordt geraakt direct nadat deze stap is gevuld, inclusief kosten en slippage."
+],
+"odFilled": [
+"b9cade220e",
+"Entries gevuld"
+],
+"odFromStart": [
+"fe112c8cee",
+"direct"
+],
+"odFund": [
+"44fad8f1d2",
+"Funding (+ ontvangen, − betaald)"
+],
+"odGBuild": [
+"e2a08aa341",
+"Bouw ladder"
+],
+"odGFirst": [
+"de46c48c22",
+"Eerste prijs"
+],
+"odGN": [
+"cdde4f20ba",
+"Stappen"
+],
+"odGSplit": [
+"fc8230b411",
+"Splitsen"
+],
+"odGStep": [
+"56746816d8",
+"Gap per stap (%)"
+],
+"odGuide": [
+"8aa7d50c3e",
+"Begeleid me, stap voor stap"
+],
+"odHEnds": [
+"5cbaf8a928",
+"Elke uitkomst (alle entries gevuld)"
+],
+"odHExits": [
+"d71626cd31",
+"Exits"
+],
+"odHFills": [
+"f53f7d6784",
+"Entries, één voor één gevuld"
+],
+"odHidden": [
+"f611e3a7c7",
+"Niveaus verwijderd."
+],
+"odHide": [
+"e0eb5bd64c",
+"Verberg van grafiek"
+],
+"odHow": [
+"c54859aa22",
+"Hoe het eindigt"
+],
+"odHudE": [
+"19172e9e47",
+"Entry"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"Open ODM"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Maak de laatste wijziging ongedaan"
+],
+"odHudX": [
+"61ad50a9b9",
+"Target"
+],
+"odLAvg": [
+"97e77871b5",
+"gem."
+],
+"odLLiq": [
+"4df0227844",
+"Liq (schatting)"
+],
+"odLTrail": [
+"bc39eaf623",
+"Trail start"
+],
+"odLossIf": [
+"9f9abd5a30",
+"Verlies indien nu gestopt"
+],
+"odLossOf": [
+"11e7b83c1c",
+"{p}% van je volledige risico ({r})"
+],
+"odLossS": [
+"8a983821d2",
+"Verlies bij SL"
+],
+"odMore": [
+"e4cd862519",
+"Funding, en het resultaat bij elke prijs"
+],
+"odNoBars": [
+"512041531e",
+"Niet genoeg gesloten bars op deze grafiek."
+],
+"odNote": [
+"757cb878a7",
+"Een planningstool: het plaatst geen order en is geen advies. Prijzen zijn in de eenheden van de grafiek. Liquidatie is een vereenvoudigde schatting."
+],
+"odO_atr": [
+"e3ea806c1a",
+"ATR veelvoud"
+],
+"odO_equal": [
+"a472ce8d19",
+"Gelijk"
+],
+"odO_grow": [
+"0721fea085",
+"Groeiend (meer verder weg)"
+],
+"odO_long": [
+"11eda67f9b",
+"Long"
+],
+"odO_pct": [
+"ac556cf593",
+"Percentage"
+],
+"odO_price": [
+"3e8248e32e",
+"Prijs"
+],
+"odO_short": [
+"0fe7d82f25",
+"Short"
+],
+"odOpenNow": [
+"309ae4fd1a",
+"Open nu, tegen de laatste slotkoers"
+],
+"odP_one": [
+"337d2c100b",
+"Eén exit op 2R"
+],
+"odP_pct": [
+"e3ae173380",
+"+5% · +10% · +20%"
+],
+"odP_r": [
+"c8cbacef3d",
+"1R · 2R · 3R"
+],
+"odPick_e": [
+"303f6de669",
+"Tik op de grafiek waar de nieuwe entry komt. Esc annuleert."
+],
+"odPick_s": [
+"39a71b4de2",
+"Tik op de grafiek waar de stop komt. Esc annuleert."
+],
+"odPick_x": [
+"fd10db7af2",
+"Tik op de grafiek waar het nieuwe target komt. Esc annuleert."
+],
+"odPnl": [
+"5faa59d4bc",
+"Resultaat"
+],
+"odPrice": [
+"3e8248e32e",
+"Prijs"
+],
+"odProfit": [
+"8544a47725",
+"Winst"
+],
+"odRemove": [
+"d8b9bdb3bb",
+"Verwijder de positie van de grafiek"
+],
+"odRestOpen": [
+"b957d211ac",
+"{p}% blijft over zonder exit en zonder trail: het blijft open totdat je het sluit."
+],
+"odRestTrail": [
+"be684d239e",
+"{p}% blijft over en volgt een trailing stop {d} achter de beste prijs, beginnend {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Dat niveau past niet in het plan, dus het ging terug:"
+],
+"odRun": [
+"b1b392607d",
+"Run"
+],
+"odSMode": [
+"719a179bf8",
+"Stop op basis van"
+],
+"odSVal": [
+"e9733d1599",
+"Waarde (×ATR, % of prijs)"
+],
+"odSave": [
+"0eee2d3fa4",
+"Opslaan naar risicobord"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Tik op de positie om deze te selecteren, sleep vervolgens een lijn gemarkeerd met ↕ of een hendel. Overal elders beweegt de grafiek zoals gebruikelijk."
+],
+"odShare": [
+"09ca55ca52",
+"Delen"
+],
+"odShow": [
+"a7555004a5",
+"Toon op grafiek"
+],
+"odShown": [
+"aeb3fca140",
+"{n} niveaus getekend. Sleep een lijn om het plan te wijzigen, of klik met de rechtermuisknop op de grafiek om ze te verwijderen."
+],
+"odStep": [
+"dc416e1088",
+"Stap"
+],
+"odStop": [
+"5c87e73ae4",
+"Stop-loss"
+],
+"odStopAt": [
+"9e253470c8",
+"Stop"
+],
+"odStopHint": [
+"1520812bfa",
+"Geplaatst voorbij de diepste entry, zodat het de hele ladder beschermt."
+],
+"odSumE": [
+"c136a3bb46",
+"Entries tellen op tot {p}% (moet 100% zijn)"
+],
+"odSumX": [
+"978c3654a2",
+"Exits sluiten {p}% · {r}% blijft over"
+],
+"odTAct": [
+"3dc83cd6e3",
+"Start de trail"
+],
+"odTActV": [
+"3ca6df8028",
+"Startwaarde"
+],
+"odTMode": [
+"2a9de72123",
+"Trail op basis van"
+],
+"odTOn": [
+"3579d12dce",
+"Trail de rest"
+],
+"odTVal": [
+"a1a90e8896",
+"Afstand (×ATR of %)"
+],
+"odTest": [
+"0f1d4cab39",
+"Test op deze grafiek"
+],
+"odTestNote": [
+"4c737bf973",
+"Je prijzen staan vast, dus dit vraagt wat deze orders zouden hebben gedaan als ze vanaf die bar op de grafiek hadden gestaan. Fills zijn op het niveau of een betere open; stops op het niveau of een slechtere open, minus slippage. De trail beweegt alleen op gesloten bars."
+],
+"odTestT": [
+"235fcfbdf7",
+"Test op de historische candles van deze grafiek"
+],
+"odTipRisk": [
+"13c945cd7c",
+"Het verlies als elke entry wordt gevuld en de stop wordt geraakt, inclusief kosten en slippage."
+],
+"odTitle": [
+"af27511d03",
+"ODM: plan de hele trade"
+],
+"odTopAvg": [
+"cdc93143c6",
+"Gem."
+],
+"odTopBest": [
+"f80c25cfd5",
+"Alle exits"
+],
+"odTopRisk": [
+"5a8f23f567",
+"Risico"
+],
+"odTourBack": [
+"b52b36b726",
+"Terug"
+],
+"odTourDone": [
+"e9b450d14b",
+"Klaar"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Start de tour"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} van {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Volgende"
+],
+"odTourNo": [
+"e457149073",
+"Niet nu"
+],
+"odTourOffer": [
+"d0012e3974",
+"Nieuw bij ODM? Een tour van één minuut laat zien wat elk onderdeel doet."
+],
+"odTourSkip": [
+"35b754350f",
+"Sluit de tour"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Stel je saldo in, het risico per trade in procenten, de hefboom en de kosten. Het risico is het maximale dat je verliest als elke entry wordt gevuld en de stop wordt geraakt."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Je account"
+],
+"odTr_act_b": [
+"7644c76432",
+"Toon het plan op de grafiek en sleep de lijnen, test het op historische candles, voeg een alert toe voor elk niveau, of sla het op naar het risicobord. Niets hier plaatst een order."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Breng het in de praktijk"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Tot 10 limietprijzen, elk met hun deel. Bouw een ladder in één tik of typ je eigen prijzen. De delen moeten optellen tot 100%."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Waar je instapt"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Tot 8 stappen, elk tegen een prijs, een percentage van de gemiddelde entry, of een veelvoud van R, je risico per coin."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Waar je take profit neemt"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Elke sectie, elk veld en resultaat heeft zijn eigen icoon. Het legt het onderdeel uit, geeft een voorbeeld met jouw cijfers en heeft een vak voor je vraag."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Vastgelopen? Tik op een icoon"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Als de stop wordt geraakt nadat slechts enkele entries zijn gevuld, verlies je minder. De balk laat zien hoeveel van je volledige risico dat is."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Het verlies bij elke stap"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Grootte, margin, de liquidatie-schatting en het resultaat van elke manier waarop de trade kan eindigen, inclusief kosten."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Het volledige plaatje"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"De stop ligt voorbij de diepste entry. Stel deze in op prijs, op percentage, of als een veelvoud van ATR zodat deze de volatiliteit van de markt volgt."
+],
+"odTr_stop_t": [
+"f316187400",
+"Waar je ongelijk hebt"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Risico, gemiddelde entry, stop, R en het beste resultaat, opnieuw berekend terwijl je typt."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Het plan in één oogopslag"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Het deel dat geen exit sluit kan een trailing stop volgen, en de stop kan naar break-even verplaatsen zodra een exit is gevuld."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Wat overblijft"
+],
+"odTrail": [
+"f4d671693b",
+"Wat overblijft"
+],
+"odTrailHint": [
+"952ea83894",
+"Het deel dat geen exit sluit kan een trailing stop volgen. De stop kan ook naar break-even verplaatsen nadat een exit is gevuld."
+],
+"odUndone": [
+"d94a6ce055",
+"Laatste wijziging ongedaan gemaakt."
+],
+"odW_inRange": [
+"44db20d843",
+"{l} bevindt zich binnen je entry-bereik, dus deze kan gevuld worden voordat elke entry dat doet."
+],
+"odWhat": [
+"97211a8888",
+"Wat"
+],
+"odWhen": [
+"6c82e6dd86",
+"Tijd"
+],
+"odWhy1": [
+"fc2725ec34",
+"OCO koppelt één entry aan één stop en vaste targets. ODM plant de volledige levensduur van een trade: waar je de positie opbouwt, waar je ongelijk hebt, waar je stap voor stap take profit neemt, en hoe het laatste deel de trend volgt."
+],
+"odWhy2": [
+"287376870c",
+"De grootte komt voort uit het risico, niet andersom. Als elke entry wordt gevuld en de stop wordt geraakt, verlies je precies het bedrag dat je hebt gekozen, inclusief kosten en slippage. Als alleen de eerste entries worden gevuld, verlies je minder."
+],
+"odWhy3": [
+"367bb231ba",
+"De stop kan het eigen bereik van de markt volgen: k × ATR voorbij de diepste entry, zodat een rustige markt een krappe stop krijgt en een volatiele markt een ruime stop, zonder vast cijfer."
+],
+"odWhy4": [
+"239d155a16",
+"Exits komen in stappen, elk ingesteld op een prijs die je kiest, een percentage vanaf de gemiddelde entry of een veelvoud van R. Wat overblijft kan een trailing stop volgen, vanaf het begin of zodra een prijs is bereikt, en de stop kan naar break-even verplaatsen nadat een exit is gevuld."
+],
+"odWhy5": [
+"bad79e82f9",
+"Elke manier waarop het plan kan eindigen wordt vermeld met wat het oplevert, en je kunt dit doorlopen over de eerdere candles van deze grafiek. Niets hier plaatst een order."
+],
+"odWhyT": [
+"18686fe183",
+"Wat is ODM, en waarom niet OCO?"
+],
+"odXMode": [
+"c1a0d718e5",
+"Exit per"
+],
+"odXVal": [
+"8dce170de2",
+"Waarde"
+],
+"odX_pct": [
+"5c3bc5c2f1",
+"% vanaf gem."
+],
+"odX_price": [
+"3e8248e32e",
+"Prijs"
+],
+"odX_r": [
+"78c72d9090",
+"× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long"
+],
+"odZRew": [
+"c7d7652ec6",
+"Reward"
+],
+"odZRisk": [
+"5a8f23f567",
+"Risico"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short"
+],
+"odhA0": [
+"d97012c5ea",
+"Omdat ODM achterstevoren werkt: het deelt je risico door wat elke eenheid verliest vanaf de entry tot de stop, inclusief kosten en slippage. Dus de grootte past altijd bij het risico dat je hebt gekozen."
+],
+"odhA1": [
+"265c1585c3",
+"R is de afstand van je gemiddelde entry tot de stop. In geld is 1R je risico. Een take profit op 2R levert twee keer op wat je riskeerde."
+],
+"odhA10": [
+"c493f48847",
+"Meestal ligt de stop aan de verkeerde kant van de entries, tellen de entry-aandelen niet op tot 100%, of ligt een take profit niet voorbij het gemiddelde. Het bericht zegt welke."
+],
+"odhA11": [
+"d35315306a",
+"'Toon op de grafiek' tekent elk niveau als een lijn. De alerts-knop voegt een alert toe voor elk niveau, en de Telegram-knop stuurt alle aangevinkte niveaus naar de bot in één link."
+],
+"odhA12": [
+"dd70fbb6c9",
+"Ja. Kies Short: de entries gaan de ladder op, de stop ligt erboven en de take profits onder het gemiddelde. Spot kan niet short gaan."
+],
+"odhA13": [
+"49195572ea",
+"Nee. ODM doet alleen het rekenwerk van het plan dat je invoert. De beslissing en het risico blijven van jou."
+],
+"odhA2": [
+"07478cdb04",
+"Dan houd je minder aan, en kost een stop-out minder. De entries-tabel toont het rij voor rij: het verlies als de stop direct na elke stap wordt geraakt."
+],
+"odhA3": [
+"f273ced333",
+"Niet bij de stop: dat komt voort uit je risico. Hefboom verandert alleen de margin die je inlegt en brengt de liquidatieprijs dichterbij."
+],
+"odhA4": [
+"9ee9b51794",
+"Bij een lage hefboom dekt de margin een daling naar nul (voor een long), dus het vereenvoudigde model vindt geen liquidatieprijs. Verhoog de hefboom en er verschijnt er een."
+],
+"odhA5": [
+"380ac6b360",
+"Average True Range: de gemiddelde grootte van de beweging van een candle, inclusief gaps, over de laatste N gesloten candles van deze grafiek. Het meet hoeveel de coin nu beweegt."
+],
+"odhA6": [
+"7450054b0a",
+"Aan beide kanten, tegen het kostenpercentage dat je instelt: wanneer elke entry wordt gevuld en wanneer deze sluit. Ze worden opgeteld bij het verlies bij de stop en afgetrokken van elke winst."
+],
+"odhA7": [
+"c6b248d165",
+"De prijs waarbij de gehele positie sluit op precies nul na het betalen van de kosten om te openen en de kosten om te sluiten."
+],
+"odhA8": [
+"edbc69746e",
+"Het deel dat geen take profit sluit, blijft open. Met de trailing stop aan, volgt deze de prijs op de afstand die je instelt; zonder deze blijft het open totdat je het sluit."
+],
+"odhA9": [
+"860be7dfde",
+"Degene die de prijs als eerste bereikt: voor een long de hoogste prijs (de prijs valt erin), voor een short de laagste."
+],
+"odhAbout": [
+"2367c4d244",
+"Over {t}"
+],
+"odhAsk": [
+"225c298b36",
+"Nog steeds onduidelijk? Vraag erover"
+],
+"odhAskPh": [
+"a351c059a3",
+"Typ je vraag…"
+],
+"odhClose": [
+"bbfa773e5a",
+"Sluiten"
+],
+"odhCopied": [
+"a567d021f9",
+"Je vraag is gekopieerd. Plak deze in de Telegram-chat die opent."
+],
+"odhEx": [
+"0f01ed56a1",
+"Voorbeeld"
+],
+"odhFound": [
+"cbee297612",
+"Uit de handleiding van de planner:"
+],
+"odhNone": [
+"0274ea469d",
+"Ik kon dit niet vinden in de handleiding van de planner. Een persoon kan het beantwoorden:"
+],
+"odhNote": [
+"9e7107a148",
+"Antwoorden komen uit de eigen handleiding van deze planner. Geen financieel advies."
+],
+"odhQ0": [
+"91c4311223",
+"Waarom is het verlies bij de stop altijd precies mijn risico?"
+],
+"odhQ1": [
+"82c35eab7c",
+"Wat is R?"
+],
+"odhQ10": [
+"2fc8193a42",
+"Waarom wordt mijn plan geweigerd met een rood bericht?"
+],
+"odhQ11": [
+"efc0159afc",
+"Hoe zet ik het plan op de grafiek of krijg ik alerts?"
+],
+"odhQ12": [
+"edfb87ec89",
+"Kan ik een short plannen?"
+],
+"odhQ13": [
+"fca8edea2c",
+"Is dit financieel advies?"
+],
+"odhQ2": [
+"d4bcbe2cdc",
+"Wat als slechts enkele van mijn entries worden gevuld?"
+],
+"odhQ3": [
+"57fbd2a531",
+"Verhoogt meer hefboom mijn verlies?"
+],
+"odhQ4": [
+"f34abc6f0d",
+"Waarom staat er dat er geen liquidatieprijs is?"
+],
+"odhQ5": [
+"45313c99d8",
+"Wat is ATR?"
+],
+"odhQ6": [
+"0372f9c582",
+"Hoe worden kosten geteld?"
+],
+"odhQ7": [
+"3b70797699",
+"Wat betekent break-even hier?"
+],
+"odhQ8": [
+"095ce05679",
+"Wat gebeurt er met het deel dat overblijft?"
+],
+"odhQ9": [
+"7c5ea886ee",
+"Welke entry wordt als eerste gevuld?"
+],
+"odhSee": [
+"2d8243a2c0",
+"Zie ook"
+],
+"odhSend": [
+"3562777bc6",
+"Vragen"
+],
+"odhTg": [
+"54f13b7555",
+"Vraag het aan een persoon op Telegram"
+],
+"odhTgPre": [
+"9d35fd54bf",
+"Een vraag over ODM ({t}) op entekhab.net:"
+],
+"odhWhat": [
+"f8c94a3b4b",
+"Wat het is"
+],
+"odhWhy": [
+"25b83941ae",
+"Waar het voor is"
+],
+"odhYours": [
+"62c9423b82",
+"Met jouw cijfers"
+],
+"odh_acc_e": [
+"a1e672ab9e",
+"Saldo 1.000 met 1% risico: het hele plan kan maximaal 10 verliezen als de stop wordt geraakt."
+],
+"odh_acc_t": [
+"e6018a209f",
+"Account en contract"
+],
+"odh_acc_w": [
+"a976dbc237",
+"Het geld op je account en het soort markt waarin je handelt."
+],
+"odh_acc_y": [
+"6781776e66",
+"Al het andere wordt op basis hiervan berekend: de hoeveelheid komt voort uit je saldo en het risico dat je kiest, nooit uit een gok."
+],
+"odh_at_e": [
+"285c2bf283",
+"Typ 64.000 om het resultaat te zien van alles sluiten op 64.000."
+],
+"odh_at_t": [
+"935081b125",
+"Resultaat bij prijs"
+],
+"odh_at_w": [
+"fed458f278",
+"Typ een willekeurige prijs om te zien wat de hele positie, met elke entry gevuld, zou opleveren of verliezen als je daar zou sluiten, inclusief kosten."
+],
+"odh_at_y": [
+"cc9eda3c11",
+"Een snel antwoord op: wat als de prijs naar X gaat?"
+],
+"odh_atrlen_e": [
+"69e29d5c8e",
+"Op een 4-uurs grafiek betekent 14 de laatste 14 gesloten vier-uurs candles."
+],
+"odh_atrlen_n": [
+"e014738faf",
+"Nu: ATR({atrn}) = {atr}."
+],
+"odh_atrlen_t": [
+"0d1283ae88",
+"ATR-lengte"
+],
+"odh_atrlen_w": [
+"ec7b66a7d1",
+"Hoeveel gesloten candles van deze grafiek de average true range gebruikt, van 2 tot 200."
+],
+"odh_atrlen_y": [
+"0cb5efe861",
+"Korter reageert sneller. 14 is de gebruikelijke keuze."
+],
+"odh_avg_e": [
+"261f462ba2",
+"61.590, 60.974 en 60.358 voor een derde elk gemiddeld 60.974."
+],
+"odh_avg_n": [
+"00574db62b",
+"Jouw gemiddelde: {avg}."
+],
+"odh_avg_t": [
+"195d5c2e94",
+"Gemiddelde entry (alles gevuld)"
+],
+"odh_avg_w": [
+"7aa1dfcea6",
+"Het gewogen gemiddelde van je entries, elk naar aandeel."
+],
+"odh_avg_y": [
+"944a3a2604",
+"Winst, R en break-even worden allemaal vanaf hier gemeten."
+],
+"odh_avgso_e": [
+"3d6689c33b",
+"Na E1 en E2 op 61.590 en 60.974 (gelijke aandelen), is het gemiddelde 61.282."
+],
+"odh_avgso_t": [
+"6b5b19bc70",
+"Gemiddelde tot nu toe"
+],
+"odh_avgso_w": [
+"640b763fe7",
+"Je gemiddelde entry zodra deze stap en de voorgaande stappen zijn gevuld."
+],
+"odh_avgso_y": [
+"5021e04d42",
+"Als de prijs de volgende stappen nooit bereikt, is dit je werkelijke gemiddelde."
+],
+"odh_balance_e": [
+"f71c8aeb53",
+"Saldo 2.000 met 1% risico: het maximale verlies van deze trade is 20."
+],
+"odh_balance_n": [
+"0487b654ad",
+"Jouw cijfers: {bal} × {rp}% = {risk}."
+],
+"odh_balance_t": [
+"98dcb75a7c",
+"Accountsaldo"
+],
+"odh_balance_w": [
+"de01d13238",
+"Het geld waarmee je handelt, in USDT."
+],
+"odh_balance_y": [
+"fd4b786043",
+"Je risico in geld is dit saldo maal het risicopercentage."
+],
+"odh_be_e": [
+"a0382921f0",
+"Na TP1 verplaatst de stop van 59.531 naar ongeveer 61.096, de break-even met kosten."
+],
+"odh_be_t": [
+"c728685de9",
+"Stop naar break-even"
+],
+"odh_be_w": [
+"861ff47778",
+"Nadat de take profit die je kiest is gevuld, verplaatst de stop naar de prijs waar de rest sluit op nul na kosten."
+],
+"odh_be_y": [
+"32fa27561d",
+"Vanaf dat moment kan de trade niet meer in een verlies veranderen, afgezien van slippage."
+],
+"odh_bep_e": [
+"c331f932ff",
+"Gemiddelde 60.974 met 0,1% kosten: break-even is ongeveer 61.096 voor een long."
+],
+"odh_bep_n": [
+"6cd9e12493",
+"Jouw break-even: {be}."
+],
+"odh_bep_t": [
+"f05a5bace4",
+"Break-even prijs"
+],
+"odh_bep_w": [
+"b8f351c832",
+"Waar de hele positie sluit op nul na het betalen van kosten aan beide kanten."
+],
+"odh_bep_y": [
+"73228b98b2",
+"De stop verplaatst hierheen wanneer je 'stop naar break-even' kiest."
+],
+"odh_best_e": [
+"9eb73103e3",
+"+13.21 (1.32R): de take profits samen maken 1,32 keer je risico."
+],
+"odh_best_t": [
+"802503cf21",
+"Alle exits gevuld"
+],
+"odh_best_w": [
+"cf54412f22",
+"De winst uit alleen de take profits, als ze allemaal worden gevuld, inclusief kosten. Het deel dat overblijft voor de trailing stop zit hier niet in."
+],
+"odh_best_y": [
+"6aec2ebfe9",
+"Toont wat de targets van het plan waard zijn, in geld en in R."
+],
+"odh_contract_e": [
+"09ce7c2386",
+"Op spot kost 0,01 BTC op 60.000 de volledige 600 USDT. Op een perpetual met 5× is de margin 120."
+],
+"odh_contract_t": [
+"5a0ba3bb83",
+"Contract"
+],
+"odh_contract_w": [
+"4845fcd1eb",
+"Linear perpetual: een USDT futures contract met hefboom en funding. Spot: je koopt de coin zelf, zonder hefboom en zonder liquidatie."
+],
+"odh_contract_y": [
+"eb0650f4a1",
+"Hefboom, margin, liquidatie en funding zijn alleen van toepassing op de perpetual. Spot kan alleen long gaan."
+],
+"odh_ends_e": [
+"b409a750e1",
+"Stop voor enige take profit: −10, wat −1R is."
+],
+"odh_ends_t": [
+"f140ac6462",
+"Hoe het kan eindigen"
 ],
 "odh_exits_w": [
 "6583c3543e",
@@ -5069,9 +6025,393 @@
 "7b72883e07",
 "Deze week"
 ],
+"rsDr": [
+"3e97d79b5a",
+"Alle tekeningen, op elke coin"
+],
+"rsGo": [
+"44c57abd88",
+"Reset"
+],
+"rsInd": [
+"76de28a75e",
+"Indicators op de charts"
+],
+"rsLead": [
+"19aa2a9a77",
+"Maak de pagina in één keer leeg. Vink aan wat weg moet:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Alert geschiedenis"
+],
+"rsNote": [
+"58f9efc63c",
+"Layouts, instellingen, de watchlist en de portfolio blijven behouden. Alerts die je naar de Telegram bot hebt gestuurd, blijven in de bot staan: open /alerts daar om ze te verwijderen."
+],
+"rsOd": [
+"bbde1a818d",
+"ODM plan en zijn levels"
+],
+"rsTitle": [
+"6ce02ce159",
+"Reset de pagina"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Maak de laatste reset ongedaan"
+],
 "runTest": [
 "2c7f471fce",
 "Test uitvoeren"
+],
+"saAddC": [
+"2f4979324e",
+"Conditie"
+],
+"saAddG": [
+"171a0606f7",
+"Groep"
+],
+"saBN": [
+"b7baa1d40c",
+"Getal"
+],
+"saBS": [
+"3a43d0e663",
+"Indicator / prijs"
+],
+"saBars": [
+"76dcd41fff",
+"{n} bars"
+],
+"saBarsN": [
+"bd019a756d",
+"Bars op rij"
+],
+"saCopy": [
+"af74f7c536",
+"Kopiëren"
+],
+"saDotNo": [
+"38a82961e6",
+"Onwaar op de laatst gesloten bar"
+],
+"saDotWait": [
+"2d596b20ba",
+"Nog niet genoeg bars voor deze indicator"
+],
+"saDotYes": [
+"a0ff91462d",
+"Waar op de laatst gesloten bar"
+],
+"saE_empty": [
+"597d80feb5",
+"Voeg ten minste één conditie toe."
+],
+"saE_emptyG": [
+"70e1ad95bb",
+"Een groep heeft geen conditie."
+],
+"saE_long": [
+"427b53e1e0",
+"De regel is te lang ({n} van 600 tekens): verwijder een conditie."
+],
+"saE_num": [
+"c249973a4b",
+"Een conditie heeft een getal nodig."
+],
+"saE_script": [
+"f60d6bd8a3",
+"De regel kon niet worden gecontroleerd."
+],
+"saE_side": [
+"4651a22984",
+"Kies wat elke kant van de conditie is."
+],
+"saExpT": [
+"7dcda53b12",
+"De regel als Entekhab Script"
+],
+"saGNot": [
+"969e7d8dee",
+"NIET"
+],
+"saGNotTip": [
+"1e1d749332",
+"De hele groep moet onwaar zijn"
+],
+"saGroup": [
+"ec98a63469",
+"Groep {n}"
+],
+"saHist": [
+"5820fa4201",
+"Op de laatste {b} gesloten {tf} bars zou het {n} keer zijn afgegaan."
+],
+"saHistPct": [
+"24e303adf5",
+"De regel was waar op {p}% van die bars."
+],
+"saJG_and": [
+"4ad42ed12b",
+"Al deze (EN)"
+],
+"saJG_or": [
+"834d918bfb",
+"Eén van deze (OF)"
+],
+"saJT_and": [
+"595d3df086",
+"Alle groepen moeten waar zijn (EN)"
+],
+"saJT_or": [
+"2d2e690caf",
+"Eén groep is voldoende (OF)"
+],
+"saJ_and": [
+"c2f934cb8c",
+"EN"
+],
+"saJ_or": [
+"f579c52396",
+"OF"
+],
+"saLoading": [
+"ea358bfeb3",
+"Bars laden…"
+],
+"saNever": [
+"6f89c4ce1a",
+"Het is hier nooit afgegaan: controleer de getallen."
+],
+"saNoBars": [
+"f4f0ebd381",
+"Nog niet genoeg gesloten bars op deze timeframe."
+],
+"saNoisy": [
+"60ccc916b7",
+"Het gaat vaak af, dus de alert kan luidruchtig zijn."
+],
+"saNot": [
+"969e7d8dee",
+"NIET"
+],
+"saNotTip": [
+"72a2de0282",
+"Deze conditie moet onwaar zijn"
+],
+"saNote": [
+"0a4c1d2dc0",
+"Gecontroleerd op dit apparaat terwijl de marktpagina of de app open is, wanneer een bar sluit. Het plaatst geen order en is geen advies."
+],
+"saNowNo": [
+"9de2f51a64",
+"Nu niet waar, op de laatst gesloten {tf} bar"
+],
+"saNowT": [
+"1468db9a9e",
+"Nu, en op de geschiedenis van deze chart"
+],
+"saNowYes": [
+"e9ef398126",
+"Nu waar, op de laatst gesloten {tf} bar"
+],
+"saO_fall": [
+"8cf0b8e1dd",
+"dalend voor"
+],
+"saO_ge": [
+"dcec4f1daf",
+"≥"
+],
+"saO_gt": [
+"091385be99",
+">"
+],
+"saO_le": [
+"c8426723ce",
+"≤"
+],
+"saO_lt": [
+"c4dd3c8cdd",
+"<"
+],
+"saO_rise": [
+"22723b9834",
+"stijgend voor"
+],
+"saO_xdn": [
+"76b13b6946",
+"kruist onder"
+],
+"saO_xup": [
+"b0849ce10e",
+"kruist boven"
+],
+"saP_brk": [
+"b05b2596c8",
+"20-bar breakout met volume"
+],
+"saP_calm": [
+"23cc54ef55",
+"MACD kruising in een rustige markt"
+],
+"saP_cross": [
+"fe7e9ec902",
+"EMA 9/21 kruising met volume"
+],
+"saP_dip": [
+"7430b571e3",
+"Dip in een uptrend"
+],
+"saP_ext": [
+"d5d8c4d9e0",
+"Buiten de Bollinger bands"
+],
+"saS_atrp": [
+"1f65ad77c8",
+"ATR als % van prijs"
+],
+"saS_bbl": [
+"e23f4aec2d",
+"Bollinger onder (2σ)"
+],
+"saS_bbm": [
+"e0d19c8bad",
+"Bollinger midden"
+],
+"saS_bbu": [
+"2d5e3e5e77",
+"Bollinger boven (2σ)"
+],
+"saS_cci": [
+"2086539684",
+"CCI"
+],
+"saS_close": [
+"bbfa773e5a",
+"Sluiting"
+],
+"saS_ema": [
+"67b9b8a57f",
+"EMA"
+],
+"saS_hh": [
+"6ca9f69f43",
+"Hoogste high van de laatste N bars"
+],
+"saS_high": [
+"b1a5954a48",
+"High"
+],
+"saS_hma": [
+"78b8503f6b",
+"HMA"
+],
+"saS_ll": [
+"9c648f4c23",
+"Laagste low van de laatste N bars"
+],
+"saS_low": [
+"a124947cbd",
+"Low"
+],
+"saS_macd": [
+"9a34c31ad5",
+"MACD lijn (12, 26)"
+],
+"saS_macdh": [
+"7a920aaf88",
+"MACD histogram"
+],
+"saS_macds": [
+"cfb2113118",
+"MACD signaal (9)"
+],
+"saS_open": [
+"cf9b77061f",
+"Opening"
+],
+"saS_roc": [
+"ad73d69b6c",
+"Verandering % over N bars"
+],
+"saS_rsi": [
+"2a00496640",
+"RSI"
+],
+"saS_sma": [
+"337f15d864",
+"SMA"
+],
+"saS_stoch": [
+"5183f479ec",
+"Stochastic %K"
+],
+"saS_volume": [
+"3b18e8e332",
+"Volume"
+],
+"saS_volx": [
+"da0afcae21",
+"Volume ÷ zijn gemiddelde"
+],
+"saS_vwma": [
+"2fdaec23f9",
+"VWMA"
+],
+"saS_wma": [
+"3b02c32b34",
+"WMA"
+],
+"saSave": [
+"895f538a76",
+"Maak de alert aan"
+],
+"saScript": [
+"a99f36583c",
+"Bewerk als script"
+],
+"saTab": [
+"50aeccb002",
+"Slim (EN/OF/NIET)"
+],
+"saTitle": [
+"0082d082b6",
+"Slimme alert: EN / OF / NIET"
+],
+"saTop": [
+"7c6b0e4270",
+"Verbind de groepen"
+],
+"saTx_and": [
+"c2f934cb8c",
+"EN"
+],
+"saTx_not": [
+"969e7d8dee",
+"NIET"
+],
+"saTx_or": [
+"f579c52396",
+"OF"
+],
+"saWhy1": [
+"6505c505e8",
+"Bouw een regel uit condities. Kies binnen een groep of alle condities waar moeten zijn (EN) of dat één voldoende is (OF). Groepen worden op dezelfde manier verbonden."
+],
+"saWhy2": [
+"16ee22ede7",
+"NIET draait een conditie of een hele groep om: “NIET ATR% > 3” betekent dat de markt rustig is. Een NIET is nooit waar zolang een indicator nog bars mist, dus het kan niet afgaan op ontbrekende data."
+],
+"saWhy3": [
+"c5be12a5c9",
+"De regel wordt gecontroleerd wanneer een bar van de gekozen timeframe sluit, nooit op de vormende bar, en de alert gaat af op de bar waar de regel waar wordt. Hieronder zie je elke conditie nu en hoe vaak de regel zou zijn afgegaan op de geschiedenis van deze chart."
+],
+"saWhyT": [
+"49224cea55",
+"Hoe een slimme alert werkt"
 ],
 "sameSide": [
 "180c1a1822",
@@ -5437,6 +6777,10 @@
 "c3de6d0cdd",
 "Kurdistani signalen (BTC)"
 ],
+"sg_flow": [
+"22b2e001a4",
+"Flow en nieuws"
+],
 "sg_halft": [
 "a087f03711",
 "HalfTrend [everget]"
@@ -5453,6 +6797,10 @@
 "a9a165bc50",
 "KDJ kruising"
 ],
+"sg_level": [
+"ed47f09811",
+"Levels"
+],
 "sg_macd": [
 "db0453bd2b",
 "MACD cross"
@@ -5460,6 +6808,10 @@
 "sg_macross": [
 "6677aad0c9",
 "EMA cross"
+],
+"sg_mind": [
+"7d7700531e",
+"Risico en mindset"
 ],
 "sg_psar": [
 "7bd7543cd4",
@@ -5477,9 +6829,17 @@
 "d890614a3f",
 "RSI reversal"
 ],
+"sg_setup": [
+"532fd3a54e",
+"Setups"
+],
 "sg_smacross": [
 "446d28671b",
 "Golden / death cross (SMA)"
+],
+"sg_smc": [
+"f5cbe85ce3",
+"Marktstructuur"
 ],
 "sg_sqz": [
 "b42e6347a2",
@@ -5504,6 +6864,10 @@
 "sg_tdi": [
 "2af75b9512",
 "Traders Dynamic Index"
+],
+"sg_trade": [
+"b0811e470d",
+"Trade"
 ],
 "sg_ut": [
 "39cf5fa59f",
@@ -6225,9 +7589,41 @@
 "ad88cbfa09",
 "Ook in Telegram (de bot kijkt mee, zelfs als deze pagina gesloten is)"
 ],
+"thArc": [
+"c9522bad23",
+"Arctic Minimal"
+],
+"thAur": [
+"1f69f4962c",
+"Aurora Neon"
+],
+"thCri": [
+"e99d88a595",
+"Crimson Momentum"
+],
+"thCyb": [
+"c8e3feffa1",
+"Cyberpunk Flux"
+],
 "thDark": [
 "ae1ef01432",
 "Donker"
+],
+"thEme": [
+"31ebcf2e2d",
+"Emerald Terminal"
+],
+"thGal": [
+"8b6134fdc2",
+"Purple Galaxy"
+],
+"thGla": [
+"45248800ea",
+"Quantum Glass"
+],
+"thGold": [
+"065d9160fa",
+"Solar Gold"
 ],
 "thLight": [
 "a36ef8aba2",
@@ -6241,9 +7637,21 @@
 "0229e960cf",
 "Marineblauw"
 ],
+"thObs": [
+"16c2f31828",
+"Midnight Obsidian"
+],
+"thOce": [
+"0f120f1635",
+"Deep Ocean"
+],
 "thPaper": [
 "22d507f2ba",
 "Papier"
+],
+"thRet": [
+"cfcedff38b",
+"Retro Trading"
 ],
 "time": [
 "6c82e6dd86",
@@ -6576,6 +7984,106 @@
 "why_trail": [
 "5b20595c1d",
 "Trailing stop"
+],
+"wsApplied": [
+"7c1a4571c7",
+"{n} is actief. Je vorige workspace staat in Mijn layouts."
+],
+"wsBackup": [
+"74fca79c74",
+"Voor preset"
+],
+"wsNote": [
+"691ff5b98a",
+"Eén klik stelt de layout, timeframes, indicators, thema en candle kleuring in voor de symbool waar je op zit. Je workspace zoals die nu is, wordt eerst opgeslagen onder “Mijn layouts”."
+],
+"wsTitle": [
+"a192b9968d",
+"Kant-en-klare workspaces"
+],
+"ws_candles": [
+"2fb856e4bb",
+"Candle Patronen"
+],
+"ws_channel": [
+"5b107c3a4a",
+"Coin_Kurd kanaal"
+],
+"ws_clean": [
+"ee819e288a",
+"Minimalistisch"
+],
+"ws_cycle": [
+"0b08f61f49",
+"Marktcyclus"
+],
+"ws_day": [
+"e18786b077",
+"Day Trader"
+],
+"ws_fib": [
+"98b88bcc26",
+"Fibonacci & swings"
+],
+"ws_flow": [
+"0ab6d9f077",
+"Order Flow"
+],
+"ws_heikin": [
+"adf0551bc1",
+"Heikin Ashi trend"
+],
+"ws_ichi": [
+"b7d2edc2d0",
+"Ichimoku"
+],
+"ws_liq": [
+"69e277529c",
+"Liquidity Hunter"
+],
+"ws_mom": [
+"c29791e587",
+"Momentum"
+],
+"ws_mtf": [
+"ebabe1372a",
+"Multi-timeframe ×4"
+],
+"ws_mtf6": [
+"800635fcd6",
+"Multi-timeframe ×6"
+],
+"ws_position": [
+"5aef88cdad",
+"Position Trader"
+],
+"ws_retro": [
+"bede81c063",
+"Retro bars"
+],
+"ws_risk": [
+"c5fdebe115",
+"Risico & stops"
+],
+"ws_scalp": [
+"33fa65b17f",
+"Scalping Pro"
+],
+"ws_smc": [
+"c02e53dec4",
+"Smart Money Concepts"
+],
+"ws_swing": [
+"8b2bf46b25",
+"Swing Trader"
+],
+"ws_vola": [
+"42217464e8",
+"Volatility Squeeze"
+],
+"ws_vprofile": [
+"46245d5d50",
+"Volume Profile"
 ],
 "yourRate": [
 "ca14282aa6",

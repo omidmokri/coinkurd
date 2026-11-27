@@ -217,6 +217,14 @@
 "7949a2630a",
 "EMA kesişimi (hızlı / yavaş)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Tüm alarmları sil ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Her coin üzerindeki {n} alarmı silmek istiyor musunuz? Bunu hemen geri alabilirsiniz."
+],
 "alert": [
 "b969680a49",
 "Alarm"
@@ -672,6 +680,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Para Birimleri (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Endeksler ve ABD hisseleri"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1868,6 +1880,14 @@
 "g_vol": [
 "1b4620951d",
 "Hacim tabanlı"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Buradaki endeksler ve ABD hisseleri sadece günlük kapanışlardır: 1G, 1H veya 1A seçin."
+],
+"gmNote": [
+"f58ac90a7d",
+"Günlük kapanışlar bu sitede ücretsiz halka açık kaynaklardan (öncelikle Yahoo Finance, diğerleri yedek olarak) kaydedilmiştir. Sadece kapalı günler: gün içi barlar ve canlı fiyat yoktur."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3878,8 +3898,8 @@
 "{l}, {p} noktasında (son fiyattan %{d} uzaklıkta)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Taşımak için ↕ işaretli çizgiyi veya başlangıç mumunu hareket ettirmek için yuvarlak tutamacı sürükleyin. Siz sürükledikçe plan yeniden hesaplanır."
+"db78c3cdfe",
+"Kutuyu taşımak için ↕ ile işaretli çizgiyi veya giriş çizgisindeki daireyi, yeniden boyutlandırmak için sağ kenarındaki çubuğu sürükleyin. Diğer her yerde grafik her zamanki gibi hareket eder."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -4036,6 +4056,22 @@
 "odExitHint": [
 "a9498bb911",
 "En fazla 8 adım. Her biri ortalama girişten bir fiyatta, yüzde cinsinden veya R katı olarak bir payı kapatır."
+],
+"odExt": [
+"a4b2498fcd",
+"Sağ kenara uzat"
+],
+"odExtClosed": [
+"f871770520",
+"Pozisyonun tekrar kendi sağ kenarı var. Yeniden boyutlandırmak için sürükleyin."
+],
+"odExtOff": [
+"013864439f",
+"Sağ kenarı kapat"
+],
+"odExtOn": [
+"cd67a03b67",
+"Pozisyon artık sağ kenara kadar uzanıyor."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4225,6 +4261,10 @@
 "8544a47725",
 "Kâr"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Pozisyonu grafikten kaldır"
+],
 "odRestOpen": [
 "b957d211ac",
 "%{p} miktar için çıkış veya iz sürüm yok: siz kapatana kadar açık kalır."
@@ -4232,6 +4272,10 @@
 "odRestTrail": [
 "be684d239e",
 "{a} başlayarak, en iyi fiyatın {d} gerisinde bir iz süren stopu takip eden %{p} açık kalır."
+],
+"odRevert": [
+"8dca1dc79e",
+"O seviye plana uymuyor, bu yüzden geri alındı:"
 ],
 "odRun": [
 "b1b392607d",
@@ -4248,6 +4292,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Risk panosuna kaydet"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Pozisyonu seçmek için üzerine dokunun, ardından ↕ ile işaretli çizgiyi veya bir tutamacı sürükleyin. Diğer her yerde grafik her zamanki gibi hareket eder."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6960,6 +7008,54 @@
 "rng_week": [
 "7b72883e07",
 "Bu hafta"
+],
+"rsAl": [
+"689e627ada",
+"Tüm coinlerdeki tüm alarmlar"
+],
+"rsBack": [
+"5202b69570",
+"Sıfırlamanın kaldırdığı şeyler geri getirildi."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Sayfa sıfırlandı."
+],
+"rsDr": [
+"3e97d79b5a",
+"Tüm coinlerdeki tüm çizimler"
+],
+"rsGo": [
+"44c57abd88",
+"Sıfırla"
+],
+"rsInd": [
+"76de28a75e",
+"Grafiklerdeki göstergeler"
+],
+"rsLead": [
+"19aa2a9a77",
+"Sayfayı tek seferde temizleyin. Nelerin gitmesi gerektiğini işaretleyin:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Alarm geçmişi"
+],
+"rsNote": [
+"58f9efc63c",
+"Düzenler, ayarlar, izleme listesi ve portföy kalır. Telegram botuna gönderdiğiniz alarmlar botta tutulur: onları silmek için orada /alerts komutunu açın."
+],
+"rsOd": [
+"bbde1a818d",
+"ODM planı ve seviyeleri"
+],
+"rsTitle": [
+"6ce02ce159",
+"Sayfayı sıfırla"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Son sıfırlamayı geri al"
 ],
 "runTest": [
 "2c7f471fce",

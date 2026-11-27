@@ -217,6 +217,14 @@
 "7949a2630a",
 "EMA cắt nhau (nhanh / chậm)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Xóa tất cả cảnh báo ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Xóa tất cả {n} cảnh báo trên mọi coin? Bạn có thể hoàn tác ngay sau đó."
+],
 "alert": [
 "b969680a49",
 "Cảnh báo"
@@ -672,6 +680,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Tiền tệ (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Chỉ số & Cổ phiếu Mỹ"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1868,6 +1880,14 @@
 "g_vol": [
 "1b4620951d",
 "Dựa trên khối lượng"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Chỉ số và cổ phiếu Mỹ tại đây chỉ hiển thị giá đóng cửa hàng ngày: hãy chọn 1D, 1W hoặc 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Giá đóng cửa hàng ngày được lưu trên trang web này từ các nguồn công khai miễn phí (Yahoo Finance là ưu tiên, các nguồn khác là dự phòng). Chỉ có ngày đóng cửa: không có nến trong ngày và không có giá trực tiếp."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3862,8 +3882,8 @@
 "{l} tại {p} ({d}% so với giá gần nhất)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Kéo đường có dấu ↕ để di chuyển, hoặc kéo điểm tròn để thay đổi nến bắt đầu. Kế hoạch sẽ được tính toán lại khi bạn kéo."
+"db78c3cdfe",
+"Kéo đường kẻ có dấu ↕, vòng tròn trên đường điểm vào lệnh để di chuyển hộp, hoặc thanh ở cạnh phải để thay đổi kích thước. Bất kỳ vị trí nào khác biểu đồ sẽ di chuyển như bình thường."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -4020,6 +4040,22 @@
 "odExitHint": [
 "a9498bb911",
 "Tối đa 8 bước. Mỗi bước đóng một phần ở một mức giá, ở một tỷ lệ phần trăm từ giá vào trung bình, hoặc ở một bội số của R."
+],
+"odExt": [
+"a4b2498fcd",
+"Kéo dài đến cạnh phải"
+],
+"odExtClosed": [
+"f871770520",
+"Vị thế đã có cạnh phải riêng. Kéo nó để thay đổi kích thước."
+],
+"odExtOff": [
+"013864439f",
+"Đóng cạnh phải"
+],
+"odExtOn": [
+"cd67a03b67",
+"Vị thế hiện chạy đến cạnh phải."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4209,6 +4245,10 @@
 "8544a47725",
 "Lợi nhuận"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Xóa vị thế khỏi biểu đồ"
+],
 "odRestOpen": [
 "b957d211ac",
 "{p}% còn lại không có điểm thoát lệnh và không dời điểm dừng: sẽ mở cho đến khi bạn đóng thủ công."
@@ -4216,6 +4256,10 @@
 "odRestTrail": [
 "be684d239e",
 "{p}% còn lại áp dụng trailing stop cách giá tốt nhất {d}, bắt đầu từ {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Mức đó không khớp với kế hoạch, nên nó đã quay lại:"
 ],
 "odRun": [
 "b1b392607d",
@@ -4232,6 +4276,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Lưu vào bảng rủi ro"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Chạm vào vị thế để chọn, sau đó kéo đường kẻ có dấu ↕ hoặc tay cầm. Bất kỳ vị trí nào khác biểu đồ sẽ di chuyển như bình thường."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6944,6 +6992,54 @@
 "rng_week": [
 "7b72883e07",
 "Tuần này"
+],
+"rsAl": [
+"689e627ada",
+"Tất cả cảnh báo, trên mọi coin"
+],
+"rsBack": [
+"5202b69570",
+"Đã khôi phục những gì đã bị xóa khi đặt lại."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Đã đặt lại trang."
+],
+"rsDr": [
+"3e97d79b5a",
+"Tất cả hình vẽ, trên mọi coin"
+],
+"rsGo": [
+"44c57abd88",
+"Đặt lại"
+],
+"rsInd": [
+"76de28a75e",
+"Các chỉ báo trên biểu đồ"
+],
+"rsLead": [
+"19aa2a9a77",
+"Xóa sạch trang trong một lần. Đánh dấu những gì cần xóa:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Lịch sử cảnh báo"
+],
+"rsNote": [
+"58f9efc63c",
+"Bố cục, cài đặt, danh sách theo dõi và danh mục đầu tư vẫn được giữ nguyên. Các cảnh báo bạn đã gửi đến bot Telegram vẫn được giữ trong bot: hãy mở /alerts ở đó để xóa chúng."
+],
+"rsOd": [
+"bbde1a818d",
+"Kế hoạch ODM và các mức của nó"
+],
+"rsTitle": [
+"6ce02ce159",
+"Đặt lại trang"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Hoàn tác lần đặt lại cuối cùng"
 ],
 "runTest": [
 "2c7f471fce",
