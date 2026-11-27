@@ -139,7 +139,7 @@
     return sp.g.map(function (G) {
       var t = G.c.map(function (C) {
         var b = C.op === 'rise' || C.op === 'fall' ? T('saBars', { n: C.b.v }) : C.b.t === 's' ? srcName(C.b) : (isFinite(C.b.v) ? String(+C.b.v) : '?');
-        return (C.not ? T('saTx_not') + ' ' : '') + '\u2068' + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b + '\u2069';
+        return (C.not ? T('saTx_not') + ' ' : '') + '\u2068' + (srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b).replace(/ /g, '\u00a0') + '\u2069';      /* a condition never breaks across lines */
       }).join(' ' + T('saTx_' + G.j) + ' ');
       return (G.not ? T('saTx_not') + ' ' : '') + (G.c.length > 1 || sp.g.length > 1 ? '(' + t + ')' : t);
     }).join(' ' + T('saTx_' + sp.j) + ' ');
