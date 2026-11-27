@@ -131,17 +131,18 @@
   function ready() { A = P.app; if (!A) return false; T = A.T; h = A.h; $ = A.$; $$ = A.$$; esc = A.esc; return true; }
   function srcName(x) { var d = SRC[x.s]; return T('saS_' + x.s) + (d && d.d ? ' (' + int(x.l, 1, 500, d.d) + ')' : ''); }
   /* a short readable summary for the alert list (from the cleaned spec only: known names and numbers) */
-  /* left-to-right inside its own isolate, so symbols and brackets keep their order in a right-to-left page or notification */
+  /* each condition sits in its own isolate that takes the direction of its first letter, so a Latin name, a symbol and
+     a number keep their order inside a right-to-left page or notification, and the conditions still read right to left */
   P.saText = function (sp) {
     if (!ready()) return '';
     sp = clean(sp);
-    return '\u2066' + sp.g.map(function (G) {
+    return sp.g.map(function (G) {
       var t = G.c.map(function (C) {
         var b = C.op === 'rise' || C.op === 'fall' ? T('saBars', { n: C.b.v }) : C.b.t === 's' ? srcName(C.b) : (isFinite(C.b.v) ? String(+C.b.v) : '?');
-        return (C.not ? T('saNot') + ' ' : '') + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b;
+        return (C.not ? T('saNot') + ' ' : '') + '\u2068' + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b + '\u2069';
       }).join(' ' + T('saJ_' + G.j) + ' ');
       return (G.not ? T('saNot') + ' ' : '') + (G.c.length > 1 || sp.g.length > 1 ? '(' + t + ')' : t);
-    }).join(' ' + T('saJ_' + sp.j) + ' ') + '\u2069';
+    }).join(' ' + T('saJ_' + sp.j) + ' ');
   };
 
   P.smartAlert = function (cell, start) {
