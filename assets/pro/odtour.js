@@ -20,6 +20,18 @@
     ['act', function (m) { return m.querySelector('.pm-odact'); }]
   ];
   var CUR = null;
+  /* the top of the screen not covered by the site's own fixed bar */
+  function freeTop(m) {
+    var top = 0, xs = [0.5, 0.2, 0.8];
+    [2, 18, 40, 64].forEach(function (y) { xs.forEach(function (f) {
+      var e = document.elementFromPoint(innerWidth * f, y);
+      for (; e && e !== document.body; e = e.parentElement) {
+        if (m && m.contains(e)) break; var ps = getComputedStyle(e).position;
+        if (ps === 'fixed' || ps === 'sticky') { top = Math.max(top, e.getBoundingClientRect().bottom); break; }
+      }
+    }); });
+    return top;
+  }
   function seen() { try { return !!localStorage.getItem(SEEN); } catch (e) { return true; } }
   function mark() { try { localStorage.setItem(SEEN, '1'); } catch (e) { } }
 
@@ -99,7 +111,8 @@
     /* bring the part into view first: under the sheet on a phone it goes to the top, elsewhere to the middle */
     var phone = Math.min(innerWidth, c.modal.getBoundingClientRect().width || innerWidth) < 600;
     if (c.body) {
-      var br = c.body.getBoundingClientRect(), tr = t.getBoundingClientRect(), want = phone ? br.top + 12 : br.top + Math.max(12, (br.height - Math.min(tr.height, br.height * 0.6)) / 2 - 60);
+      var br = c.body.getBoundingClientRect(), tr = t.getBoundingClientRect(), vt = Math.max(br.top, freeTop(c.modal)), vh = Math.min(br.bottom, innerHeight) - vt;
+      var want = phone ? vt + 12 : vt + Math.max(12, Math.min(80, (vh - tr.height) / 2));
       c.body.scrollTop += tr.top - want;
     }
     place(c);
@@ -117,12 +130,18 @@
       return;
     }
     b.classList.remove('sheet'); b.style.bottom = '';
-    var r = t.getBoundingClientRect(), w = Math.min(340, br.width - 24), lo = Math.max(br.top, 0) + 8, hi = Math.min(br.bottom, innerHeight) - 8;
-    b.style.width = w + 'px'; var ph = b.offsetHeight, y;
+    var r = t.getBoundingClientRect(), w = Math.min(340, br.width - 24), lo = Math.max(br.top, freeTop(c.modal)) + 8, hi = Math.min(br.bottom, innerHeight) - 8;
+    b.style.width = w + 'px'; var ph = b.offsetHeight, y, x, rtl = A().RTL();
+    var sideR = br.right - 12 - r.right, sideL = r.left - (br.left + 12);
     if (hi - r.bottom - 10 >= ph) y = r.bottom + 10;
     else if (r.top - lo - 10 >= ph) y = r.top - 10 - ph;
-    else y = Math.max(lo, Math.min(hi - ph, r.top + 12));
-    var x = A().RTL() ? r.right - w : r.left; x = Math.max(br.left + 12, Math.min(x, br.right - w - 12));
+    else if (Math.max(sideR, sideL) >= w + 12) {
+      /* no room above or below: beside the part, on the side with room (the results column for a form section) */
+      x = sideR >= w + 12 && (!rtl || sideL < w + 12) ? r.right + 12 : r.left - 12 - w;
+      y = Math.max(lo, Math.min(hi - ph, Math.max(r.top, lo)));
+    }
+    else y = Math.max(lo, hi - ph);              /* last resort: low on the screen, so the part's heading stays clear */
+    if (x == null) { x = rtl ? r.right - w : r.left; x = Math.max(br.left + 12, Math.min(x, br.right - w - 12)); }
     b.style.left = (x - mr.left) + 'px'; b.style.top = (y - mr.top) + 'px';
   }
 })();

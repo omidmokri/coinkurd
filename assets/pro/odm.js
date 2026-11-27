@@ -284,7 +284,18 @@
       if (ex) { try { ex.applyOptions(o); } catch (e) { } } else { try { Z.map[l.k] = Z.cell.main.createPriceLine(o); } catch (e) { } }
     });
     Object.keys(Z.map).forEach(function (k) { if (!seen[k]) { try { Z.cell.main.removePriceLine(Z.map[k]); } catch (e) { } delete Z.map[k]; } });
-    Z.L = L; hud(Z);
+    Z.L = L; hud(Z); if (!Z.drag) placeHud(Z);
+  }
+  /* the panel sits low on the chart, or under the legend when a line it would cover is there (a line under it could not be grabbed) */
+  function placeHud(Z) {
+    var b = Z.hud; if (!b || !Z.cell.el.isConnected) return;
+    var c = Z.cell, cr = c.el.getBoundingClientRect(), br = c.box.getBoundingClientRect(), hh = b.offsetHeight; if (!hh) return;
+    var leg = $('.pm-leg', c.el), lb = leg ? Math.max(8, leg.getBoundingClientRect().bottom - cr.top + 6) : 8;
+    var bot = parseFloat(getComputedStyle(b).getPropertyValue('--odb')) || (innerWidth < 600 ? 30 : 34);
+    var bands = { low: [cr.bottom - bot - hh - br.top, cr.bottom - bot - br.top], top: [cr.top + lb - br.top, cr.top + lb + hh - br.top] };
+    function hits(r) { var n = 0; Z.L.forEach(function (l) { if (!l.drag) return; var y = null; try { y = c.main.priceToCoordinate(l.p); } catch (e) { } if (y != null && y >= r[0] - 10 && y <= r[1] + 10) n++; }); return n; }
+    var lo = hits(bands.low), tp = hits(bands.top), up = lo > 0 && tp < lo;
+    b.classList.toggle('top', up); b.style.top = up ? lb + 'px' : ''; b.style.bottom = up ? 'auto' : '';
   }
   function recalc(Z) { Z.plan = O.plan(inputs(Z.st, Z.atr)); return Z.plan; }
   /* the small panel on the chart */
@@ -370,7 +381,9 @@
     function eat(e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); }
     var downEv = function (e) {
       if (!LN || LN !== Z) return;
-      if (e.target.closest && e.target.closest('.pm-odhud,.pm-leg,.pm-selbar,.pm-menu,.pm-macro')) return;
+      /* the panel's own buttons stay buttons; anywhere else on it, a line just under it can still be grabbed */
+      if (e.target.closest && (e.target.closest('.pm-odhud button') || e.target.closest('.pm-leg,.pm-selbar,.pm-menu,.pm-macro'))) return;
+      if (e.target.closest && e.target.closest('.pm-odhud') && Z.pick) return;
       if (e.button != null && e.button !== 0) return;
       var q = loc(e); if (q.x < 0 || q.y < 0 || q.x > q.w || q.y > q.h) return;
       if (Z.pick) { var p = priceAt(Z, q.y); if (p) { eat(e); pickAt(Z, p); } return; }
@@ -405,13 +418,13 @@
       if (Z.drag) { var sn = Z.drag.snap; Z.drag = null; unlock(Z); cell.el.classList.remove('pm-oddrag'); box.style.cursor = ''; restore(Z, sn); e.stopPropagation(); e.preventDefault(); }
       else if (Z.pick) { Z.pick = null; cell.el.classList.remove('pm-odpick'); hud(Z); e.stopPropagation(); }
     };
-    box.addEventListener('pointerdown', downEv, true); box.addEventListener('pointermove', moveEv, true);
+    box.addEventListener('pointerdown', downEv, true); hb.addEventListener('pointerdown', downEv, true); window.addEventListener('pointermove', moveEv, true);
     window.addEventListener('pointerup', upEv, true); window.addEventListener('pointercancel', upEv, true); document.addEventListener('keydown', keyEv, true);
     /* lightweight-charts also listens to mouse and touch events: while a line is held they must not pan the chart */
     var swallow = function (e) { if (Z.drag) eat(e); };
     ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.addEventListener(n, swallow, { capture: true, passive: false }); });
     Z.off = function () {
-      box.removeEventListener('pointerdown', downEv, true); box.removeEventListener('pointermove', moveEv, true);
+      box.removeEventListener('pointerdown', downEv, true); hb.removeEventListener('pointerdown', downEv, true); window.removeEventListener('pointermove', moveEv, true);
       window.removeEventListener('pointerup', upEv, true); window.removeEventListener('pointercancel', upEv, true); document.removeEventListener('keydown', keyEv, true);
       ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.removeEventListener(n, swallow, { capture: true, passive: false }); });
       box.style.cursor = ''; cell.el.classList.remove('pm-oddrag');

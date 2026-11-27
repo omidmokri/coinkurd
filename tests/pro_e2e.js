@@ -1460,7 +1460,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.evaluate(() => { const c = PRO.app.active(), L = PRO.odmLive(); PRO.addPriceAlert(c.cfg.sym, L.plan.stop, 'down', 'ODM SL'); PRO.addPriceAlert(c.cfg.sym, L.plan.exits[0].p, 'up', 'ODM TP1'); });
     const freeY = async () => page.evaluate(() => {
       const c = PRO.app.active(), L = PRO.odmLive(), ys = (L ? L.levels.map(l => l.y) : []).concat(PRO.alertLines(c.cfg.sym).map(a => c.main.priceToCoordinate(a.v))).filter(y => y != null), h = c.box.getBoundingClientRect().height;
-      let best = 40, bd = -1; for (let y = 30; y < h - 60; y += 4) { const d = Math.min(...ys.map(z => Math.abs(z - y)), 999); if (d > bd) { bd = d; best = y; } } return best;
+      const hu = document.querySelector('.pm-odhud'), bt = c.box.getBoundingClientRect().top, hr = hu ? hu.getBoundingClientRect() : null;
+      let best = 40, bd = -1; for (let y = 30; y < h - 60; y += 4) { if (hr && y >= hr.top - bt - 8 && y <= hr.bottom - bt + 8) continue; const d = Math.min(...ys.map(z => Math.abs(z - y)), 999); if (d > bd) { bd = d; best = y; } } return best;
     });
     const rclick = async y => { await page.mouse.click(X, L0.box.t + y, { button: 'right' }); await page.waitForSelector('.pm-menu .pm-mi', { timeout: 3000 }).catch(() => { }); await page.waitForTimeout(80); };
     const menuTxt = () => page.evaluate(() => ({ heads: [...document.querySelectorAll('.pm-menu .pm-mh')].map(x => x.textContent), items: [...document.querySelectorAll('.pm-menu .pm-mi')].map(x => x.querySelector('span').textContent + '|' + ((x.querySelector('small') || {}).textContent || '') + '|' + x.disabled), fits: (() => { const m = document.querySelector('.pm-menu'); if (!m) return false; const r = m.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1; })() }));
@@ -1554,11 +1555,12 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const step = () => page.evaluate(() => {
       const b = document.querySelector('.pm-odtour'), t = document.querySelector('.pm-odtgt'), body = document.querySelector('.pm-mbody'); if (!b || !t) return { b: !!b, t: !!t };
       const br = b.getBoundingClientRect(), tr = t.getBoundingClientRect(), vr = body.getBoundingClientRect(), A = PRO.odTour.active();
-      const visTop = Math.max(vr.top, 0), visBot = Math.min(vr.bottom, innerHeight, b.classList.contains('sheet') ? br.top : 1e9);
+      const hd0 = document.getElementById('ekh'), hb0 = hd0 && /fixed|sticky/.test(getComputedStyle(hd0).position) ? hd0.getBoundingClientRect().bottom : 0, visTop = Math.max(vr.top, 0, hb0), visBot = Math.min(vr.bottom, innerHeight, b.classList.contains('sheet') ? br.top : 1e9);
       const shown = Math.min(tr.bottom, visBot) - Math.max(tr.top, visTop);
-      const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1);
+      const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1) && br.top < Math.max(tr.top, visTop) + 40;
+      const hd = document.getElementById('ekh'), hb = hd && /fixed|sticky/.test(getComputedStyle(hd).position) ? hd.getBoundingClientRect().bottom : 0;
       return { k: A.k, i: A.i, n: A.n, n1: b.querySelector('small').textContent, title: b.querySelector('b').textContent, text: b.querySelector('p').textContent, next: b.querySelector('[data-a="next"]').textContent, back: b.querySelector('[data-a="back"]').disabled,
-        sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= -1 && br.bottom <= innerHeight + 1, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
+        sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= hb - 1 && br.bottom <= innerHeight + 1, hb, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
     });
     let s = await step(); const seenK = [], bad = [];
     ok(`[${tag}] the tour starts at "Your account", step 1, with Back off and the account part lit`, s.k === 'acc' && s.i === 0 && s.back && s.title === (await page.evaluate(() => PRO.app.T('odTr_acc_t'))) && s.n >= 9 && (phone ? s.sheet : !s.sheet) && s.focus, JSON.stringify(s));
