@@ -290,6 +290,13 @@ jobs:
           MACRO_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python scripts/macro.py
 
+      - name: Gold, silver, indices, stocks and forex (data/markets, free sources with fallback, every 6 hours)
+        continue-on-error: true
+        timeout-minutes: 6
+        env:
+          MARKETS_FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+        run: python scripts/markets.py
+
       - name: Market Wrapped (weekly / monthly)
         continue-on-error: true
         timeout-minutes: 3
