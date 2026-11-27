@@ -1406,10 +1406,33 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     });
     ok(`[${tag}] the bot link follows the ticks (hidden with none, one level with one)`, ob2.hid && /^o_[A-Z0-9]+_e\d+(d\d+)?$/.test(ob2.one), JSON.stringify(ob2));
     await shot(page, `86_odm_alerts_${lang}_${vw}`);
+    /* the tools as ticks: all on, each enters the plan or the test; all off, nothing of theirs is left */
+    const tk = await page.evaluate(() => {
+      const cbs = [...document.querySelectorAll('.pm-odfeat input[data-f]')]; document.querySelector('.pm-odfeat').open = true;
+      cbs.forEach(c => { c.checked = true; c.dispatchEvent(new Event('change')); });
+      const T = PRO.app.T, out = document.querySelector('.pm-odout');
+      return { n: cbs.length, sum: document.querySelector('.pm-odfeat summary').textContent, fx: document.querySelectorAll('.pm-odfx input').length, edu: out.querySelectorAll('.pm-edu').length,
+        zone: out.textContent.includes(T('odZone', { k: '2' })), shock: out.textContent.includes(T('odShockDn', { x: '10' })), day: out.textContent.includes(T('odDayLeft')) };
+    });
+    ok(`[${tag}] 22 tool ticks; ticked, each shows its inputs and its figures, with a line on what each figure means`, tk.n === 22 && /22/.test(tk.sum) && tk.fx >= 7 && tk.edu >= 5 && tk.zone && tk.shock && tk.day, JSON.stringify(tk));
+    await btn('odTest'); await page.waitForTimeout(1200);
+    const tt = await page.evaluate(() => { const T = PRO.app.T, d = document.querySelector('.pm-oddist'); return d && { score: d.textContent.includes(T('odScore')), jr: d.textContent.includes(T('odJrT')), conf: d.textContent.includes(T('odConfT')), twin: d.textContent.includes(T('odTwinT')), stress: d.textContent.includes(T('odStressT')) }; });
+    ok(`[${tag}] with the ticks on, the test adds the score, the twin, the stress test, the journal and the confidence check`, tt && tt.score && tt.jr && tt.conf && tt.twin && tt.stress, JSON.stringify(tt));
+    await shot(page, `85c_odm_tools_${lang}_${vw}`);
+    const bud = await page.evaluate(() => {
+      const T = PRO.app.T, set = (k, v) => { const i = document.querySelector('.pm-odfx input[aria-label="' + T(k) + '"]'); i.value = v; i.dispatchEvent(new Event('input')); };
+      set('odDayCap', '1'); set('odDayLost', '10'); const hit = document.querySelector('.pm-odtop').classList.contains('dn') && !!document.querySelector('.pm-odout .pm-cw2.hard');
+      set('odDayLost', '5'); const cut = document.querySelector('.pm-odout').textContent.includes(T('odBudgetCut', { p: '0.5', q: '2' }).slice(0, 8)); set('odDayLost', ''); set('odDayCap', '3');
+      [...document.querySelectorAll('.pm-odfeat input[data-f]')].forEach(c => { c.checked = c.getAttribute('data-f') === 'journal'; c.dispatchEvent(new Event('change')); });
+      return { hit, cut, edu: document.querySelectorAll('.pm-odout .pm-edu').length, hard: document.querySelectorAll('.pm-odout .pm-cw2.hard').length, sum: document.querySelector('.pm-odfeat summary').textContent };
+    });
+    ok(`[${tag}] the daily budget stops the plan when used up and cuts the risk when partly used; unticked, nothing of the tools is left`, bud.hit && bud.cut && bud.edu === 0 && bud.hard === 0 && /1/.test(bud.sum), JSON.stringify(bud));
     /* save to the risk board as planned, with the full-fill risk */
     await btn('odSave'); await page.waitForTimeout(150);
     const sv = await page.evaluate(() => { const L = JSON.parse(localStorage.getItem('ek_pro_plans') || '[]'), p = L.find(x => x.kind === 'odm'); return p && { st: p.status, risk: p.risk, n: p.entries.length, t: p.targets.length }; });
     ok(`[${tag}] saving puts the plan on the risk board as planned, with its 4 entries, 3 exits and a risk of 20`, sv && sv.st === 'planned' && Math.abs(sv.risk - 20) < 1e-6 && sv.n === 4 && sv.t === 3, JSON.stringify(sv));
+    const jr = await page.evaluate(() => { const J = JSON.parse(localStorage.getItem('ek_pro_odmjr') || '[]'); return { n: J.length, img: !!(J[0] && /^data:image\/jpeg;base64,/.test(J[0].img || '')), sym: J[0] && J[0].sym }; });
+    ok(`[${tag}] with the journal ticked, saving keeps the plan with a chart picture in this browser`, jr.n === 1 && jr.img && !!jr.sym, JSON.stringify(jr));
     /* show on the chart */
     await btn('odShow'); await page.waitForTimeout(200);
     const ln = await page.evaluate(() => ({ n: PRO.odmLinesShown(), modal: !!document.querySelector('.pm-odm') }));
