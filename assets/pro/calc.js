@@ -14,20 +14,33 @@
      perUnit = |entry − stop| + fee·(entry + stop) + slip        what one unit loses when the stop is hit
      qty     = (balance · risk%) / perUnit */
   C.position = function (o) {
-    var bal = +o.balance, rp = +o.riskPct, e = +o.entry, s = +o.stop, tp = o.target === '' || o.target == null ? NaN : +o.target, lev = +o.leverage || 1, fee = (+o.feePct || 0) / 100, slip = +o.slip || 0;
+    var bal = +o.balance, rp = +o.riskPct, e = +o.entry, s = +o.stop, tp = o.target === '' || o.target == null ? NaN : +o.target, fee = (+o.feePct || 0) / 100, slip = +o.slip || 0;
+    var ct = o.contract === 'spot' || o.contract === 'inverse' ? o.contract : 'linear', mode = o.marginMode === 'cross' ? 'cross' : 'isolated', mmr = (+o.mmrPct || 0) / 100;
+    var lev = o.leverage === '' || o.leverage == null ? 1 : +o.leverage;
     if (!(bal > 0) || !(rp > 0) || !(e > 0) || !(s > 0)) return { err: 'num' };
     if (rp > 100) return { err: 'risk' };
     if (e === s) return { err: 'dist' };
     var long = o.side ? o.side === 'long' : s < e;
     if (long ? s >= e : s <= e) return { err: 'side' };
     if (isFinite(tp) && (long ? tp <= e : tp >= e)) return { err: 'tp' };
-    if (!(lev >= 1)) return { err: 'lev' };
+    if (ct === 'spot') { if (!long) return { err: 'spotShort' }; lev = 1; }
+    if (!(lev >= 1) || lev > 500) return { err: 'lev' };
+    if (!(slip >= 0) || !(mmr >= 0 && mmr < 0.5)) return { err: 'num' };
     var risk = bal * rp / 100, per = Math.abs(e - s) + fee * (e + s) + slip, qty = risk / per, notional = qty * e, margin = notional / lev;
     var r = { long: long, risk: risk, perUnit: per, qty: qty, notional: notional, margin: margin, marginOk: margin <= bal, fees: qty * fee * (e + s),
-      breakeven: long ? e * (1 + fee) / (1 - fee) : e * (1 - fee) / (1 + fee),
-      /* isolated margin, maintenance margin ignored: the real liquidation price is a little closer than this */
-      liq: lev > 1 ? (long ? e * (1 - 1 / lev) : e * (1 + 1 / lev)) : null };
-    if (r.liq != null) r.liqBeforeStop = long ? r.liq >= s : r.liq <= s;
+      contract: ct, marginMode: mode, mmrPct: mmr * 100,
+      breakeven: long ? e * (1 + fee) / (1 - fee) : e * (1 - fee) / (1 + fee), liq: null };
+    /* liquidation — a SIMPLIFIED ESTIMATE, never an exchange's figure: one position, isolated margin, margin = notional ÷
+       leverage, maintenance margin = mmr × notional at the liquidation price, fees, funding and the exchange's tiers and
+       mark price left out.  linear:  long  p = e(1 − 1/L)/(1 − mmr)    short  p = e(1 + 1/L)/(1 + mmr)
+       inverse (settled in the coin):  long  p = e(1 + mmr)/(1 + 1/L)    short  p = e(1 − mmr)/(1 − 1/L)
+       Spot has none. Cross margin has no single price: it depends on the whole wallet, so none is shown. */
+    if (ct === 'spot') r.liqWhy = 'spot';
+    else if (mode === 'cross') r.liqWhy = 'cross';
+    else {
+      var L = lev, p = ct === 'linear' ? (long ? e * (1 - 1 / L) / (1 - mmr) : e * (1 + 1 / L) / (1 + mmr)) : (long ? e * (1 + mmr) / (1 + 1 / L) : (L > 1 ? e * (1 - mmr) / (1 - 1 / L) : Infinity));
+      if (isFinite(p) && p > 0) { r.liq = p; r.liqModel = 'simplified'; r.liqBeforeStop = long ? p >= s : p <= s; } else r.liqWhy = 'none';
+    }
     if (isFinite(tp)) { var gain = Math.abs(tp - e) - fee * (e + tp); r.profit = qty * gain; r.rr = gain / per; }
     return r;
   };
@@ -123,6 +136,11 @@
       var w = h('<label class="pm-cf"><span></span><input class="pm-in" inputmode="decimal" dir="ltr" autocomplete="off"></label>'), i = $('input', w); $('span', w).textContent = T(lbl);
       i.value = MEM[k] != null ? MEM[k] : (def == null ? '' : def); if (opt) i.placeholder = T('rcOpt'); i._k = k; return w;
     }
+    function pick(k, lbl, opts) {
+      var w = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), sel = $('select', w); $('span', w).textContent = T(lbl);
+      opts.forEach(function (x) { var op = document.createElement('option'); op.value = x; op.textContent = T('rcO_' + x); sel.appendChild(op); });
+      sel.value = opts.indexOf(MEM[k]) >= 0 ? MEM[k] : opts[0]; sel._k = k; return w;
+    }
     function out(rows, formula, warn) {
       var o = h('<div class="pm-co"></div>');
       rows.forEach(function (r) { var d = h('<div class="pm-cor' + (r[2] ? ' ' + r[2] : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', d).textContent = r[0]; $('b', d).textContent = r[1]; o.appendChild(d); });
@@ -141,12 +159,12 @@
     var PAGES = {
       pos: function () {
         form([field('pos.balance', 'rcBal', 1000), field('pos.riskPct', 'rcRisk', 1), field('pos.entry', 'rcEntry', isFinite(last) ? px(last).replace(/,/g, '') : ''), field('pos.stop', 'rcStop', ''), field('pos.target', 'rcTarget', '', 1),
-          field('pos.leverage', 'rcLev', 1), field('pos.feePct', 'rcFee', 0.1), field('pos.slip', 'rcSlip', 0)], function (v) {
+          field('pos.leverage', 'rcLev', 1), field('pos.feePct', 'rcFee', 0.1), field('pos.slip', 'rcSlip', 0), pick('pos.contract', 'rcCt', ['linear', 'inverse', 'spot']), pick('pos.marginMode', 'rcMode', ['isolated', 'cross']), field('pos.mmrPct', 'rcMmr', 0.5)], function (v) {
           var r = C.position(v); if (r.err) return err(r.err);
           var rows = [[T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2')], [T('rcQty'), f(r.qty, 6)], [T('rcNotional'), f(r.notional)], [T('rcMargin'), f(r.margin)], [T('rcMaxLoss'), f(r.risk), 'dn'], [T('rcFees'), f(r.fees, 4)], [T('rcBE'), px(r.breakeven)]];
           if (r.profit != null) rows.push([T('rcProfit'), f(r.profit), 'up'], [T('rcRR'), '1 : ' + f(r.rr, 2)]);
-          if (r.liq != null) rows.push([T('rcLiq'), px(r.liq)]);
-          return out(rows, 'qty = balance × risk% ÷ ( |entry − stop| + fee × (entry + stop) + slippage )', !r.marginOk ? T('rcW_margin') : r.liqBeforeStop ? T('rcW_liq') : '');
+          if (r.liq != null) rows.push([T('rcLiqS'), px(r.liq)]); else if (r.liqWhy) rows.push([T('rcLiqS'), T('rcLiq_' + r.liqWhy)]);
+          return out(rows, 'qty = balance × risk% ÷ ( |entry − stop| + fee × (entry + stop) + slippage )', !r.marginOk ? T('rcW_margin') : r.liqBeforeStop ? T('rcW_liq') : r.liq != null ? T('rcLiqNote') : '');
         });
       },
       oco: function () {

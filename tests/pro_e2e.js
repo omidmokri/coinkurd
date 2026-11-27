@@ -1177,6 +1177,107 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     }
   }
 
+  /* ---------- Phase C/D: the position planner on the chart, the risk board, the matrix, the regime card, the data library */
+  if (!ONLY || ONLY === 'cd') for (const [vw, vh, lang] of [[1280, 860, 'en'], [390, 800, 'fa']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `cd ${lang} ${vw}`;
+    /* place a long position with the mouse */
+    const box = await page.locator('.pm-cell .pm-chart').first().boundingBox();
+    if (vw < 600) await page.evaluate(() => PRO.app.active().drawer.setTool('long'));
+    else await page.click('[data-tool="long"]');
+    await page.mouse.click(box.x + box.width * (vw < 600 ? 0.45 : 0.6), box.y + box.height * 0.45);
+    await page.waitForTimeout(500);
+    const geo = () => page.evaluate(() => {
+      const c = PRO.app.active(), L = PRO.app.DRAW()[c.cfg.sym] || [], d = L.filter(x => x.k === 'long').pop(); if (!d) return null;
+      const r = c.drawer.o.el.getBoundingClientRect(), g = d._g, q = g && g.pos, xr = q ? Math.max(q.x0, q.x1) : 0;
+      return { id: d.id, pts: JSON.parse(JSON.stringify(d.pts)), sel: c.drawer.sel === d.id, card: !!document.querySelector('.pm-plan'),
+        entry: q && { x: r.left + g.px[0].x, y: r.top + g.px[0].y }, tg: q && { x: r.left + xr, y: r.top + q.yt }, sl: q && { x: r.left + xr, y: r.top + q.ys },
+        mid: q && { x: r.left + (q.x0 + q.x1) / 2, y: r.top + (q.yt + q.ye) / 2 } };
+    });
+    let g0 = await geo();
+    ok(`[${tag}] a long position is placed, selected and its planner card opens`, g0 && g0.pts.length === 3 && g0.sel && g0.card, JSON.stringify(g0 && { n: g0.pts.length, sel: g0.sel, card: g0.card }));
+    if (g0 && g0.tg) {
+      const drag = async (p, dy) => { await page.mouse.move(p.x, p.y); await page.mouse.down(); await page.mouse.move(p.x, p.y + dy, { steps: 6 }); await page.mouse.up(); await page.waitForTimeout(250); };
+      /* target alone */
+      await drag(g0.tg, -18); let g1 = await geo();
+      ok(`[${tag}] dragging the target moves only the target`, g1.pts[1].p > g0.pts[1].p && g1.pts[0].p === g0.pts[0].p && g1.pts[2].p === g0.pts[2].p, JSON.stringify([g0.pts.map(p => p.p), g1.pts.map(p => p.p)]));
+      /* stop alone */
+      await drag(g1.sl, 14); let g2 = await geo();
+      ok(`[${tag}] dragging the stop moves only the stop`, g2.pts[2].p < g1.pts[2].p && g2.pts[0].p === g1.pts[0].p && g2.pts[1].p === g1.pts[1].p, JSON.stringify(g2.pts.map(p => p.p)));
+      /* entry alone */
+      await drag(g2.entry, -6); let g3 = await geo();
+      ok(`[${tag}] dragging the entry moves only the entry`, g3.pts[0].p !== g2.pts[0].p && g3.pts[1].p === g2.pts[1].p && g3.pts[2].p === g2.pts[2].p && g3.pts[1].t === g2.pts[1].t, JSON.stringify(g3.pts));
+      /* the body moves all three together, by the same price step */
+      await drag(g3.mid, 20); let g4 = await geo();
+      const dp = [0, 1, 2].map(i => +(g4.pts[i].p - g3.pts[i].p).toPrecision(8));
+      ok(`[${tag}] dragging the box moves the whole position, all three lines by the same amount`, dp[0] !== 0 && dp[0] === dp[1] && dp[1] === dp[2], JSON.stringify(dp));
+      /* undo walks back one step at a time */
+      await page.keyboard.press('Control+z'); await page.waitForTimeout(250); let gu = await geo();
+      ok(`[${tag}] Ctrl+Z undoes the last drag only`, JSON.stringify(gu.pts) === JSON.stringify(g3.pts), JSON.stringify(gu.pts));
+      /* the card's numbers follow the lines, and say the liquidation is a simplified estimate */
+      const cardT = await page.evaluate(() => (document.querySelector('.pm-plan') || {}).innerText || '');
+      const want = await page.evaluate(() => PRO.app.T('rcLiqS'));
+      ok(`[${tag}] the planner card labels the liquidation "${want}"`, cardT.indexOf(want) >= 0, cardT.slice(0, 200));
+      const same = await page.evaluate(() => { const c = PRO.app.active(), d = (PRO.app.DRAW()[c.cfg.sym] || []).filter(x => x.k === 'long').pop(), r = PRO.plan(PRO.planInputs(d)); return { qty: r.qty, txt: (document.querySelector('.pm-plan') || {}).innerText || '' }; });
+      ok(`[${tag}] the card shows the quantity of the lines as they are now`, same.qty > 0 && same.txt.indexOf(same.qty.toLocaleString('en-US', { maximumFractionDigits: 8 })) >= 0, String(same.qty));
+      /* zoom and scroll: the lines stay on their prices */
+      const before = (await geo()).pts;
+      await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.6); await page.mouse.wheel(0, -300); await page.waitForTimeout(300);
+      await page.evaluate(() => PRO.app.active().chart.timeScale().scrollToPosition(-20, false)); await page.waitForTimeout(300);
+      const after = (await geo()).pts;
+      ok(`[${tag}] zoom and scroll change no price or time of the position`, JSON.stringify(before) === JSON.stringify(after));
+      /* a click on empty chart deselects */
+      await page.mouse.click(box.x + box.width * 0.1, box.y + box.height * 0.8); await page.waitForTimeout(200);
+      const ds = await page.evaluate(() => ({ sel: PRO.app.active().drawer.sel, card: !!document.querySelector('.pm-plan') }));
+      ok(`[${tag}] a click on empty chart deselects the position and closes the card`, !ds.sel && !ds.card, JSON.stringify(ds));
+      /* a timeframe change keeps the levels */
+      await page.evaluate(() => PRO.app.active().setTF ? PRO.app.active().setTF('4h') : null); await page.waitForTimeout(1200);
+      const tfp = await page.evaluate(() => { const c = PRO.app.active(); return (PRO.app.DRAW()[c.cfg.sym] || []).filter(x => x.k === 'long').pop().pts; });
+      ok(`[${tag}] changing timeframe leaves the position's prices as they were`, tfp.map(p => p.p).join() === after.map(p => p.p).join(), JSON.stringify(tfp));
+      await shot(page, `80_cd_planner_${lang}_${vw}`);
+    }
+    /* the risk board: planned and active kept apart */
+    await page.evaluate(() => {
+      const now = Date.now();
+      localStorage.setItem('ek_pro_plans', JSON.stringify([
+        { id: 'a1', at: now, sym: 'BTC', tf: '1h', long: true, entry: 100, stop: 95, targets: [{ p: 110, share: 100 }], qty: 2, notional: 200, margin: 200, risk: 10, rr: 2, status: 'active', ex: 'Binance' },
+        { id: 'a2', at: now, sym: 'BTC', tf: '1h', long: false, entry: 100, stop: 104, targets: [{ p: 92, share: 100 }], qty: 1, notional: 100, margin: 100, risk: 4, rr: 2, status: 'active', ex: 'Bybit' },
+        { id: 'p1', at: now, sym: 'ETH', tf: '1h', long: true, entry: 50, stop: 48, targets: [{ p: 56, share: 100 }], qty: 3, notional: 150, margin: 150, risk: 6, rr: 3, status: 'planned', ex: '' }]));
+    });
+    await page.evaluate(() => PRO.riskBoard()); await page.waitForTimeout(400);
+    const bt = await page.evaluate(() => ({ t: (document.querySelector('.pm-modal') || {}).innerText || '', a: PRO.app.T('plActiveR'), p: PRO.app.T('plPlannedR'), rows: document.querySelectorAll('.pm-modal tbody tr').length }));
+    ok(`[${tag}] the risk board shows planned and active risk as two separate figures`, bt.t.indexOf(bt.a) >= 0 && bt.t.indexOf(bt.p) >= 0 && bt.rows >= 3, JSON.stringify({ rows: bt.rows }));
+    const ov = await page.evaluate(() => { const b = document.querySelector('.pm-mbox'); return b ? b.scrollWidth > b.clientWidth + 2 || document.documentElement.scrollWidth > innerWidth + 1 : true; });
+    ok(`[${tag}] the risk board fits the screen`, !ov);
+    await shot(page, `81_cd_board_${lang}_${vw}`);
+    await page.keyboard.press('Escape'); await page.evaluate(() => PRO.app.closeModal());
+    /* the matrix: every row has a state; the regime card explains itself */
+    await page.evaluate(() => PRO.mtf()); await page.waitForFunction(() => document.querySelectorAll('.pm-mtft tbody tr').length >= 3 && ![...document.querySelectorAll('.pm-mtft tbody tr')].some(r => /…|\.\.\./.test(r.innerText)), null, { timeout: 25000 }).catch(() => { });
+    const mx = await page.evaluate(() => {
+      const T = PRO.app.T, st = ['confirmed', 'developing', 'neutral', 'conflicting', 'insufficient'].map(k => T('ms_' + k));
+      const rows = [...document.querySelectorAll('.pm-mtft tbody tr')].map(r => r.innerText);
+      return { n: rows.length, ok: rows.filter(t => st.some(s => t.indexOf(s) >= 0)).length, why: !!document.querySelector('.pm-rgw, .pm-rgc details'), strip: !!document.querySelector('.pm-rgstrip, .pm-rgc svg') };
+    });
+    ok(`[${tag}] every matrix row carries one of the five states`, mx.n >= 3 && mx.ok === mx.n, JSON.stringify(mx));
+    ok(`[${tag}] the regime card has its explanation and its history strip`, mx.why && mx.strip, JSON.stringify(mx));
+    await shot(page, `82_cd_matrix_${lang}_${vw}`);
+    await page.evaluate(() => PRO.app.closeModal());
+    /* the data library */
+    await page.click('#pm-data'); await page.waitForTimeout(300);
+    const dl = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-dlr').length, all: PRO.DATALIB.length, safe: [...document.querySelectorAll('.pm-dlr a')].every(a => a.target === '_blank' && /noopener/.test(a.rel) && a.href.indexOf('https://') === 0) }));
+    ok(`[${tag}] the data library lists every source, each link opening safely in a new tab`, dl.n === dl.all && dl.n >= 25 && dl.safe, JSON.stringify(dl));
+    await page.fill('.pm-dl input', 'binance'); await page.waitForTimeout(150);
+    const f1 = await page.evaluate(() => document.querySelectorAll('.pm-dlr').length);
+    await page.fill('.pm-dl input', ''); await page.click('.pm-dlcats .pm-chip:nth-child(2)'); await page.waitForTimeout(150);
+    const f2 = await page.evaluate(() => ({ n: document.querySelectorAll('.pm-dlr').length, g: document.querySelectorAll('.pm-dlg').length }));
+    ok(`[${tag}] search and the category chips filter the list`, f1 >= 1 && f1 < dl.all && f2.g === 1 && f2.n < dl.all, JSON.stringify({ f1, f2 }));
+    const ov2 = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+    ok(`[${tag}] the data library fits the screen`, !ov2);
+    await page.click('.pm-dlcats .pm-chip:nth-child(1)'); await page.waitForTimeout(100);
+    await shot(page, `83_cd_datalib_${lang}_${vw}`);
+    await ctx.close();
+  }
+
   /* ---------- Binance unreachable: OKX blocked too, BTC falls back to the site snapshot */
   if (!ONLY) {
     const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 }, serviceWorkers: 'block' }); const page = await ctx.newPage();

@@ -2109,6 +2109,7 @@
         '<button type="button" class="pm-ib" id="pm-redo" title="' + esc(T('redo')) + '">' + ic('redo') + '</button>' +
         '<span class="pm-grow"></span>' +
         '<button type="button" class="pm-tb pm-ws" id="pm-ws"><span id="pm-name"></span><i id="pm-saved" class="pm-saved ok"></i>' + ic('chev', 'sm') + '</button>' +
+        '<button type="button" class="pm-ib" id="pm-data" title="' + esc(T('dlTitle')) + '" aria-label="' + esc(T('dlTitle')) + '">' + ic('down') + '</button>' +
         '<button type="button" class="pm-ib" id="pm-shot" title="' + esc(T('snapshot')) + '">' + ic('camera') + '</button>' +
         '<button type="button" class="pm-ib" id="pm-fs" title="' + esc(T('fullscreen')) + '">' + ic('full') + '</button>' +
         '<button type="button" class="pm-ib" id="pm-set" title="' + esc(T('settings')) + '">' + ic('gear') + '</button>' +
@@ -2141,6 +2142,7 @@
     $('#pm-pf').onclick = function () { if (P.portfolio) P.portfolio(); };
     $('#pm-risk').onclick = function () { if (P.riskCentre) P.riskCentre(); };
     $('#pm-mtf').onclick = function () { if (P.mtf) P.mtf(); };
+    $('#pm-data').onclick = function () { if (P.dataLib) P.dataLib(); };
     $('#pm-scr').onclick = function () { if (P.screener) P.screener(); };
     $('#pm-tpl').onclick = function (e) { tplMenu(e.currentTarget); };
     $('#pm-rep').onclick = function () { if (P.replayToggle) P.replayToggle(active()); };
@@ -2353,7 +2355,7 @@
     TGROUPS.forEach(function (G) { (G.rows || []).forEach(function (r) { r.forEach(function (t) { rows.push({ n: T('t_' + t), g: T('favTools'), i: ic(t), act: function () { setTool(t); } }); }); }); });
     [['csTitle', 'gear', function () { chartSettings('sym'); }], ['indicators', 'fx', function () { indDialog(); }], ['symbol', 'layers', function () { symbolSearch(''); }],
       ['ctxFit', 'fit', function () { var a = active(); if (a) a.chart.timeScale().fitContent(); }], ['fullscreen', 'expand', function () { fullscreen(); }],
-      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
+      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }], ['dlTitle', 'down', function () { if (P.dataLib) P.dataLib(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
     THEME_LIST.forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
     st.fav.forEach(function (tf) { rows.push({ n: tf, g: T('palTf'), i: ic('cal'), act: function () { applyTF(tf); } }); });
     var f = h('<div class="pm-pal"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-pall" role="listbox"></div></div>'), inp = $('input', f), list = $('.pm-pall', f), sel = 0, shown = [];
