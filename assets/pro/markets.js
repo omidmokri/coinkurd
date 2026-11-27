@@ -717,7 +717,7 @@
   function gmPrices() {
     if (!GMW.length) return;
     P.getJSON('/data/markets/index.json?v=' + Math.floor(Date.now() / 6e5), 15000).then(function (j) {
-      var it = j && j.items || {}; GMW.forEach(function (s) { var x = it[P.inst(s).base]; if (!x || !x.last || !(x.last[1] > 0)) return; var c = x.last[1], o = x.prev > 0 ? x.prev : c; P._tkPut(s, { c: c, o: o, h: Math.max(c, o), l: Math.min(c, o), q: 0, src: 'site' }); });
+      var it = {}, L = j && j.items || []; (Array.isArray(L) ? L : Object.keys(L).map(function (k) { var v = L[k]; v.id = v.id || k; return v; })).forEach(function (x) { if (x && x.id) it[x.id] = x; }); GMW.forEach(function (s) { var x = it[P.inst(s).base]; if (!x || !x.last || !(x.last[1] > 0)) return; var c = x.last[1], o = x.prev > 0 ? x.prev : c; P._tkPut(s, { c: c, o: o, h: Math.max(c, o), l: Math.min(c, o), q: 0, src: 'site' }); });
     }, function () { });
   }
   var watchUsdt = P.tickers.watch;

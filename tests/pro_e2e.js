@@ -1109,7 +1109,7 @@ async function mockNet(page, stats) {
     const bars = []; for (let i = 0; i < N; i++) { const t = D0 - (N - 1 - i) * 86400, c = cl(i), o = i ? cl(i - 1) : c; bars.push([t, o, Math.max(o, c) + 3, Math.min(o, c) - 3, c, 0]); }
     await page.route(/\/data\/markets\/[A-Za-z]+\.json/, r => {
       const id = new URL(r.request().url()).pathname.split('/').pop().replace('.json', '');
-      if (id === 'index') return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: { SPX: { status: 'ok', src: 'Yahoo Finance', last: [D0, cl(N - 1)], prev: cl(N - 2) } } }) });
+      if (id === 'index') return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [{ id: 'SPX', status: 'ok', src: 'Yahoo Finance', last: [D0, cl(N - 1)], prev: cl(N - 2) }] }) });
       if (id !== 'SPX') return r.fulfill({ status: 404, body: '' });
       r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 'SPX', status: 'ok', src: { id: 'yahoo', sym: '^GSPC', label: 'Yahoo Finance' }, bars }) });
     });
@@ -1129,6 +1129,9 @@ async function mockNet(page, stats) {
     await page.evaluate(() => PRO.app.active().setTF('1h')); await page.waitForTimeout(1200);
     const h1 = await page.evaluate(() => { const c = PRO.app.active(); return { tf: c.cfg.tf, n: c.bars.length, toast: [...document.querySelectorAll('.pm-toast')].map(x => x.textContent).join(' | ') }; });
     ok(`[${lang} ${vw}] asking for 1h stays on the daily chart, with a note why`, h1.tf === '1d' && h1.n === N && h1.toast.length > 0, JSON.stringify(h1));
+    await page.evaluate(() => PRO.tickers.watch(['GM_SPX'])); await page.waitForTimeout(1500);
+    const tk = await page.evaluate(() => { const x = PRO.tickers.d.GM_SPX; return x ? { c: x.c, o: x.o } : null; });
+    ok(`[${lang} ${vw}] watchlist price: the last close and the one before, from the site's index`, tk && tk.c === cl(N - 1) && tk.o === cl(N - 2), JSON.stringify(tk));
     await shot(page, `96_gm_${lang}_${vw}`);
     await ctx.close();
   }
