@@ -14,14 +14,14 @@
   function T(o) { var l = lang(); return (o && (o[l] || o.fa || o.en)) || ""; }
 
   var S = {
-    title: { fa: "پشتیبان انتخاب", ckb: "پشتگیری Entekhab", en: "Entekhab assistant" },
+    title: { fa: "نیما · پشتیبان انتخاب", ckb: "نیما · پشتگیری Entekhab", en: "Nima · Entekhab assistant" },
     sub: { fa: "جستجوی هوشمند در کل سایت", ckb: "گەڕانی زیرەک لە هەموو سایتدا", en: "Smart search across the site" },
     fab: { fa: "پشتیبانی", ckb: "پشتگیری", en: "Help" },
     ph: { fa: "سؤالتان را بنویسید…", ckb: "پرسیارەکەت بنووسە…", en: "Ask a question…" },
     hi: {
-      fa: "سلام 👋 من پشتیبان انتخابم. هر چیزی دربارهٔ سایت، ابزارها، آکادمی، دانشنامه یا قیمت‌های لحظه‌ای بپرسید — از محتوای خود سایت برایتان پیدا می‌کنم.",
-      ckb: "سڵاو 👋 من پشتگیری Entekhabم. هەر شتێک دەربارەی سایت، ئامرازەکان، ئەکادیمیا یان نرخی ئێستا بپرسە.",
-      en: "Hi 👋 I'm the Entekhab assistant. Ask me anything about the site, its tools, the academy, the encyclopedia or live prices — I'll find it in the site's own content."
+      fa: "سلام 👋 من نیمام، پشتیبان انتخاب. هر چیزی دربارهٔ سایت، ابزارها، آکادمی، دانشنامه یا قیمت‌های لحظه‌ای بپرسید — از محتوای خود سایت برایتان پیدا می‌کنم.",
+      ckb: "سڵاو 👋 من نیمام، پشتگیری Entekhab. هەر شتێک دەربارەی سایت، ئامرازەکان، ئەکادیمیا یان نرخی ئێستا بپرسە.",
+      en: "Hi 👋 I'm Nima, the Entekhab assistant. Ask me anything about the site, its tools, the academy, the encyclopedia or live prices — I'll find it in the site's own content."
     },
     none: {
       fa: "چیزی که دقیقاً به این بخورد پیدا نکردم. می‌توانید جور دیگری بپرسید، یا مستقیم با پشتیبان حرف بزنید:",
@@ -203,7 +203,8 @@
   }
 
   /* ---------- UI ---------- */
-  var panel, body, input, fab;
+  var panel, body, input, fab,
+    AV = "<span class='ask-av' aria-hidden='true'><img src='/assets/space/guide-2.webp' alt='' decoding='async' draggable='false'></span>";
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function add(cls, html) {
     var d = document.createElement("div");
@@ -266,13 +267,14 @@
   function build() {
     fab = document.createElement("button");
     fab.id = "ask-fab"; fab.type = "button"; fab.setAttribute("aria-label", "Entekhab assistant");
-    fab.innerHTML = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l2-5.2A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'/></svg><span class='ask-lbl'>" + esc(T(S.fab)) + "</span>";
+    /* Nima, the masked guide (owner, 2026-11-27: his own picture, the background removed): the assistant's face */
+    fab.innerHTML = AV + "<span class='ask-lbl'>" + esc(T(S.fab)) + "</span>";
     document.body.appendChild(fab);
 
     panel = document.createElement("div");
     panel.id = "ask-panel";
     panel.innerHTML =
-      "<div class='ask-hd'><span class='ask-dot'></span><div><b>" + esc(T(S.title)) + "</b><small>" + esc(T(S.sub)) + "</small></div>" +
+      "<div class='ask-hd'>" + AV + "<span class='ask-dot'></span><div><b>" + esc(T(S.title)) + "</b><small>" + esc(T(S.sub)) + "</small></div>" +
       "<button class='ask-x' type='button' aria-label='close'>×</button></div>" +
       "<div class='ask-body'></div>" +
       "<div class='ask-note'>" + esc(T(S.note)) + "</div>" +

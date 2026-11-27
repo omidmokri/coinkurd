@@ -940,7 +940,7 @@ def main():
                 "<h1>Crypto prices and analysis</h1><p class=txt>A profile for every asset with its live price, technical state, scanner opportunities, Entekhab score and related posts. The number next to each symbol is how many archive posts cover it. <a href=\"/methodology/\">Methodology and data sources</a></p>") + "<div class=coins>" + "".join(
         f'<a href="/coins/{c.lower()}/">{c} <small style="color:#9a9a94">{len(by_coin.get(c, []))}</small></a>' for c in order) + "</div>"
     urls.append((page("coins/", "قیمت و تحلیل ارزهای دیجیتال — پروفایل کوین‌ها", f"قیمت زنده و تحلیل تکنیکال {len(order)} ارز دیجیتال، از بیت‌کوین و اتریوم تا آلت‌کوین‌ها، با امتیاز شفاف و آرشیو مطالب", body), market.get("updated_at")))
-    for pth in ("market/", "heatmap/", "bubbles/", "money-flow/", "liquidity/", "etf/", *OBS_PATHS, "bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/", "bitcoin/", "calendar/", "swap/"):  # /me/ is personal → robots Disallow, so not in the sitemap
+    for pth in ("market/", "heatmap/", "bubbles/", "money-flow/", "liquidity/", "etf/", *OBS_PATHS, "bot/", "lab/", "dna/", "terminal/", "developers/", "status/", "weekly/", "battle/", "tools/", "safety/", "about/", "indicators/", "app/", "privacy/", "terms/", "methodology/", "bitcoin/", "calendar/", "swap/", "station/"):  # /me/ is personal → robots Disallow, so not in the sitemap
         urls.append((f"{SITE}/{pth}", market.get("updated_at")))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u, d in urls:

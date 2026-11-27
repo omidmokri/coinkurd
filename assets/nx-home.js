@@ -123,7 +123,8 @@
   if (main.firstElementChild !== nx) main.insertBefore(nx, main.firstChild);
   var mid = nx.querySelector('.nx-mid'), nxt = d.getElementById('next'); if (nxt) mid.appendChild(nxt);
   var R = d.createElement('div'); R.id = 'nxr'; R.setAttribute('role', 'navigation');   /* not <nav>: the homepage styles bare nav elements */
-  R.innerHTML = '<a class="nxr-home" href="#" data-home>' + HOME + tri('خانه', 'ماڵەوە', 'Home') + '</a>' + rail + '<i class="nxr-sep" aria-hidden="true"></i><a class="nxr-sat" href="/satoshi/">' + tri('ساتوشی', 'ساتۆشی', 'Satoshi') + '</a>';
+  R.innerHTML = '<a class="nxr-home" href="#" data-home>' + HOME + tri('خانه', 'ماڵەوە', 'Home') + '</a>' + rail + '<i class="nxr-sep" aria-hidden="true"></i><a class="nxr-sat" href="/satoshi/">' + tri('ساتوشی', 'ساتۆشی', 'Satoshi') + '</a>' +
+    '<a class="nxr-sat" href="/station/">' + tri('جهان انتخاب', 'جیهانی Entekhab', 'Entekhab world') + '</a>';   /* the game world (/station/), owner 2026-11-27 */
   d.body.appendChild(R);
   /* the same glass lens as the header, the footer and the menu: it rides the dock and rests on the section in view */
   (function lens(n) { if (w.ekGlass) w.ekGlass(R, { sel: 'a', on: 'a.on', r: 13, bead: 30 }); else if (n < 40) setTimeout(function () { lens(n + 1); }, 150); })(0);
@@ -144,6 +145,12 @@
     if (coin && cur) coin.pause(true);
   }
   function startCoin() {   /* after the page has loaded and is idle: the still coin is already on screen, the 3D one takes over */
+    /* the real Earth (owner, 2026-11-27) takes the coin's and the galaxy's place: assets/space/nx-earth.js, same interface */
+    if (w.nxEarth && de.classList.contains('ek-earth')) {
+      try { coin = w.nxEarth(nx, cbox, { onready: function () { if (cur && coin) coin.pause(true); } }); } catch (e) { coin = null; }
+      if (coin) return;
+      de.classList.remove('ek-earth');
+    }
     try {
       /* a machine without a graphics chip (nx-lite) gets the still coin set in motion straight away: on the one measured
          (2026-11-14) the WebGL coin fell to the watchdog after a second or two of stutter every time, and next to the galaxy
