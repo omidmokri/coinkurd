@@ -21,7 +21,7 @@
   var PATH = (window.EKLP && window.EKLP.src) || location.pathname, ENC = /^\/encyclopedia\//.test(PATH);
   var CODE = ls.get('ek_l') || '';
   var ON = !!CODE && !ENC && ls.get('ek_ar') !== '1';
-  var LANGS = null, ME = null, FLAGS = {};
+  var LANGS = null, ME = null, FLAGS = {}, KURD = {}, TOTAL = 0;
   /* The header's own language group, and nothing else. `.lsw` on /learn/, /glossary/, /library/ and /map/
      is those pages' own three-way switch for the lesson text (Kurdish, Persian, English); putting the globe
      there gave the reader two globes on one page and hid the Persian the switch exists to offer. */
@@ -89,6 +89,7 @@
     + '.ekw-list button.on{background:rgba(247,169,26,.22);border-color:rgba(247,169,26,.8)}'
     + '.ekw-list .n{font-size:14px}.ekw-list .e{font-size:11px;color:#a89770}'
     + '.ekw-foot{padding:10px 16px;border-top:1px solid rgba(247,169,26,.2);font-size:12px;color:#9b8a66;text-align:start}'
+    + '.ekw-kurd{margin:0 0 6px;color:#d8b46a;font-weight:600;line-height:1.6}.ekw-kurd:last-child{margin:0}'
     + '.ekw-foot button{background:transparent;border:0;color:#f7a91a;cursor:pointer;font:inherit;padding:0;text-decoration:underline}'
     + 'html.ek-tr-wait body{opacity:0!important}';
 
@@ -168,7 +169,9 @@
       + '</div>'
       + '<div class="ekw-foot"></div></div>';
     wrap.querySelector('.ekw-head b').textContent = W.t;
-    wrap.querySelector('.ekw-head span').textContent = count(d.querySelector(BAR)) + '';
+    /* the head shows how many are ready out of the languages the site is being carried to: 29 / 50 */
+    var nReady = count(d.querySelector(BAR));
+    wrap.querySelector('.ekw-head span').textContent = nReady + (TOTAL > nReady ? ' / ' + TOTAL : '');
     wrap.querySelector('.ekw-search').setAttribute('placeholder', W.s);
     wrap.querySelector('.ekw-sec1').textContent = W.o;
     wrap.querySelector('.ekw-sec2').textContent = W.m;
@@ -189,6 +192,9 @@
     LANGS.forEach(function (L) { L.el = card(L.code, L.native, L.english, L.code === CODE); moreList.appendChild(L.el); });
 
     var foot = wrap.querySelector('.ekw-foot');
+    /* why Kurdish counts once: Sorani and Kurmanji are two dialects of one language (owner, 2026-11-27) */
+    var kl = ON ? CODE : (de.getAttribute('lang') || 'en'), kt = KURD[kl] || KURD.en;
+    if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.textContent = kt; foot.appendChild(kp); }
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     d.body.appendChild(wrap);
     wrap.querySelector('.ekw-search').focus();
@@ -298,6 +304,7 @@
   fetch('/i18n/langs.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
     LANGS = (j && j.ready) || [];
     FLAGS = (j && j.flags) || {};
+    KURD = (j && j.kurd) || {}; TOTAL = +(j && j.total) || 0;
     for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === CODE) ME = LANGS[i];
     if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot); else boot();
     if (ON && ME) translate();

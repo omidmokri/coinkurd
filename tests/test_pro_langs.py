@@ -43,6 +43,11 @@ def main():
     ok("all 46 languages of the owner's list, with his paths", all(by_en.get(k) == v for k, v in OWNER.items()), {k: (by_en.get(k), v) for k, v in OWNER.items() if by_en.get(k) != v})
     ok("51 rows (the owner's 50 + Kurmanji), 47 of them new", len(PL.LANGS) == 51 and len(PL.NEW) == 47 and set(PL.SITE) == {"ckb", "fa", "ar", "en"})
     ok("50 languages, not 51: Sorani and Kurmanji are one", PL.LANG_COUNT == 50 and PL.SAME.get("kmr") == "ckb")
+    notes = {x[0]: PL.kurd_note(x[0]) for x in PL.LANGS}
+    ok("the Kurdish-dialects line is written in every language, with the count filled in",
+       set(PL.KURD_NOTE) == {x[0] for x in PL.LANGS} and all("{n}" not in v and v for v in notes.values()), [c for c, v in notes.items() if "{n}" in v])
+    ok("…in the language's own digits where it has them (۵۰, ٥٠, ৫০), 50 elsewhere",
+       "۵۰" in notes["fa"] and "٥٠" in notes["ckb"] and "٥٠" in notes["ar"] and "৫০" in notes["bn"] and "50" in notes["de"])
     ok("menu order: both Kurdish first — this site's own language", [x[0] for x in PL.LANGS[:2]] == ["ckb", "kmr"])
     rest = [x[2] for x in PL.LANGS[2:]]
     ok("…and every other language by English name, Persian and Arabic among them", rest == sorted(rest), rest[:6])

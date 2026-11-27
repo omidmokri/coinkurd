@@ -121,6 +121,75 @@ SITE = ("ckb", "fa", "ar", "en")            # the site's own languages: hand-wri
 SAME = {"kmr": "ckb"}                       # dialect -> the language it belongs to
 LANG_COUNT = len({SAME.get(r[0], r[0]) for r in LANGS})
 
+# The line under every language list that says why Kurdish counts once (owner, 2026-11-27: "Kurdish has two
+# dialects, so it is 50 languages, not 51"). Written by hand in every language, not left to machine translation,
+# because it is the first thing a reader asks about the number. {n} is LANG_COUNT, in the language's own digits.
+KURD_NOTE = {
+    "ckb": "کوردی یەک زمانە بە دوو شێوەزار، سۆرانی و کورمانجی، بۆیە یەک جار دەژمێردرێت: سەرجەم {n} زمان.",
+    "kmr": "Kurdî zimanek e bi du zaravayan, Soranî û Kurmancî, loma carekê tê hejmartin: bi giştî {n} ziman.",
+    "fa": "کوردی یک زبان با دو لهجه است، سورانی و کرمانجی؛ برای همین یک بار شمرده می‌شود: در مجموع {n} زبان.",
+    "ar": "الكردية لغة واحدة بلهجتين، السورانية والكرمانجية، لذلك تُحسب مرة واحدة: {n} لغة في المجموع.",
+    "en": "Kurdish is one language with two dialects, Sorani and Kurmanji, so it counts once: {n} languages in all.",
+    "bn": "কুর্দি একটি ভাষা, যার দুটি উপভাষা আছে: সোরানি ও কুরমানজি। তাই এটি একবারই গোনা হয়: মোট {n}টি ভাষা।",
+    "bg": "Кюрдският е един език с два диалекта, сорани и курманджи, затова се брои веднъж: общо {n} езика.",
+    "cat": "El kurd és una sola llengua amb dos dialectes, el sorani i el kurmanji, per això compta una sola vegada: {n} llengües en total.",
+    "cn": "库尔德语是一种语言，有索拉尼和库尔曼吉两种方言，因此只算一种：共 {n} 种语言。",
+    "tw": "庫德語是一種語言，有索拉尼和庫爾曼吉兩種方言，因此只算一種：共 {n} 種語言。",
+    "hr": "Kurdski je jedan jezik s dva dijalekta, soranijem i kurmandžijem, pa se broji jednom: ukupno {n} jezika.",
+    "cz": "Kurdština je jeden jazyk se dvěma dialekty, soránštinou a kurmándžštinou, proto se počítá jednou: celkem {n} jazyků.",
+    "da": "Kurdisk er ét sprog med to dialekter, sorani og kurmanji, så det tæller én gang: {n} sprog i alt.",
+    "nl": "Koerdisch is één taal met twee dialecten, Sorani en Kurmanji, en telt daarom één keer: {n} talen in totaal.",
+    "et": "Kurdi keel on üks keel kahe murdega, sorani ja kurmandži, seega loetakse seda üks kord: kokku {n} keelt.",
+    "fil": "Iisang wika ang Kurdish na may dalawang diyalekto, Sorani at Kurmanji, kaya isang beses lang itong binibilang: {n} wika lahat.",
+    "fi": "Kurdi on yksi kieli, jolla on kaksi murretta, sorani ja kurmandži, joten se lasketaan kerran: yhteensä {n} kieltä.",
+    "fr": "Le kurde est une seule langue avec deux dialectes, le sorani et le kurmandji ; il ne compte donc qu’une fois : {n} langues au total.",
+    "de": "Kurdisch ist eine Sprache mit zwei Dialekten, Sorani und Kurmandschi, und zählt daher einmal: insgesamt {n} Sprachen.",
+    "gr": "Τα κουρδικά είναι μία γλώσσα με δύο διαλέκτους, σορανί και κουρμαντζί, γι’ αυτό μετρούν μία φορά: συνολικά {n} γλώσσες.",
+    "iw": "כורדית היא שפה אחת עם שני ניבים, סוראני וכורמנג'י, ולכן היא נספרת פעם אחת: {n} שפות בסך הכול.",
+    "hi": "कुर्दी एक ही भाषा है जिसकी दो बोलियाँ हैं, सोरानी और कुरमांजी, इसलिए इसे एक बार गिना जाता है: कुल {n} भाषाएँ।",
+    "hu": "A kurd egyetlen nyelv két nyelvjárással, a szoránival és a kurmandzsival, ezért egyszer számít: összesen {n} nyelv.",
+    "id": "Bahasa Kurdi adalah satu bahasa dengan dua dialek, Sorani dan Kurmanji, sehingga dihitung satu kali: total {n} bahasa.",
+    "it": "Il curdo è una sola lingua con due dialetti, il sorani e il kurmanji, quindi conta una volta: {n} lingue in tutto.",
+    "jp": "クルド語はソラニー方言とクルマンジー方言をもつ一つの言語なので、一つと数えます：全部で{n}言語です。",
+    "kr": "쿠르드어는 소라니와 쿠르만지라는 두 방언을 가진 하나의 언어이므로 한 번만 셉니다: 모두 {n}개 언어입니다.",
+    "lv": "Kurdu valoda ir viena valoda ar diviem dialektiem, sorani un kurmandži, tāpēc to skaita vienreiz: kopā {n} valodas.",
+    "lt": "Kurdų kalba yra viena kalba su dviem tarmėmis, sorani ir kurmandži, todėl ji skaičiuojama vieną kartą: iš viso {n} kalbų.",
+    "ms": "Bahasa Kurdi ialah satu bahasa dengan dua dialek, Sorani dan Kurmanji, jadi ia dikira sekali: {n} bahasa kesemuanya.",
+    "mr": "कुर्दी ही सोरानी आणि कुरमांजी या दोन बोलींची एकच भाषा आहे, म्हणून ती एकदाच मोजली जाते: एकूण {n} भाषा.",
+    "no": "Kurdisk er ett språk med to dialekter, sorani og kurmanji, så det telles én gang: {n} språk i alt.",
+    "pl": "Kurdyjski to jeden język z dwoma dialektami, sorani i kurmandżi, dlatego liczy się go raz: łącznie {n} języków.",
+    "pt": "O curdo é uma só língua com dois dialetos, o sorani e o kurmanji, por isso conta uma vez: {n} línguas no total.",
+    "br": "O curdo é um único idioma com dois dialetos, sorani e kurmanji, por isso conta uma vez só: {n} idiomas no total.",
+    "pa": "ਕੁਰਦੀ ਇੱਕੋ ਭਾਸ਼ਾ ਹੈ ਜਿਸ ਦੀਆਂ ਦੋ ਉਪ-ਬੋਲੀਆਂ ਹਨ, ਸੋਰਾਨੀ ਅਤੇ ਕੁਰਮਾਂਜੀ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਇੱਕ ਵਾਰ ਗਿਣਿਆ ਜਾਂਦਾ ਹੈ: ਕੁੱਲ {n} ਭਾਸ਼ਾਵਾਂ।",
+    "ro": "Kurda este o singură limbă cu două dialecte, sorani și kurmanji, de aceea se numără o dată: {n} de limbi în total.",
+    "ru": "Курдский — один язык с двумя диалектами, сорани и курманджи, поэтому он считается один раз: всего {n} языков.",
+    "sr": "Курдски је један језик са два дијалекта, сорани и курманџи, па се рачуна једном: укупно {n} језика.",
+    "sk": "Kurdčina je jeden jazyk s dvoma nárečiami, soránčinou a kurmándžčinou, preto sa počíta raz: spolu {n} jazykov.",
+    "sl": "Kurdščina je en jezik z dvema narečjema, soranijem in kurmandžijem, zato šteje enkrat: skupaj {n} jezikov.",
+    "es": "El kurdo es una sola lengua con dos dialectos, el sorani y el kurmanji, por eso cuenta una vez: {n} idiomas en total.",
+    "sw": "Kikurdi ni lugha moja yenye lahaja mbili, Kisorani na Kikurmanji, kwa hiyo huhesabiwa mara moja: lugha {n} kwa jumla.",
+    "se": "Kurdiska är ett språk med två dialekter, sorani och kurmanji, så det räknas en gång: {n} språk totalt.",
+    "ta": "குர்திஷ் என்பது சொரானி, குர்மாஞ்சி என இரண்டு வட்டார வழக்குகளைக் கொண்ட ஒரே மொழி, எனவே ஒருமுறை மட்டுமே எண்ணப்படுகிறது: மொத்தம் {n} மொழிகள்.",
+    "te": "కుర్దిష్ సొరానీ, కుర్మాంజీ అనే రెండు మాండలికాలు ఉన్న ఒకే భాష, కాబట్టి దీన్ని ఒక్కసారే లెక్కిస్తారు: మొత్తం {n} భాషలు.",
+    "th": "ภาษาเคิร์ดเป็นภาษาเดียวที่มีสองสำเนียง คือโซรานีและคุรมันจี จึงนับเพียงครั้งเดียว: รวม {n} ภาษา",
+    "tr": "Kürtçe, Sorani ve Kurmanci olmak üzere iki lehçesi olan tek bir dildir; bu yüzden bir kez sayılır: toplam {n} dil.",
+    "uk": "Курдська — одна мова з двома діалектами, сорані та курманджі, тому вона рахується один раз: загалом {n} мов.",
+    "ur": "کردی ایک ہی زبان ہے جس کی دو بولیاں ہیں، سورانی اور کرمانجی، اس لیے اسے ایک بار گنا جاتا ہے: کل {n} زبانیں۔",
+    "vi": "Tiếng Kurd là một ngôn ngữ với hai phương ngữ, Sorani và Kurmanji, nên chỉ tính một lần: tổng cộng {n} ngôn ngữ.",
+}
+# a language whose own digits are not 0-9 shows the count in them
+DIGITS = {"ckb": "٠١٢٣٤٥٦٧٨٩", "ar": "٠١٢٣٤٥٦٧٨٩", "fa": "۰۱۲۳۴۵۶۷۸۹", "bn": "০১২৩৪৫৬৭৮৯"}
+
+
+def kurd_note(code):
+    """the line that says Kurdish counts once, in that language, with the count in its own digits"""
+    t = KURD_NOTE.get(code) or KURD_NOTE["en"]
+    n = str(LANG_COUNT)
+    dg = DIGITS.get(code)
+    if dg:
+        n = "".join(dg[int(c)] for c in n)
+    return t.replace("{n}", n)
+
 NEW = [r[0] for r in LANGS if r[0] not in SITE]
 BY = {r[0]: {"code": r[0], "native": r[1], "english": r[2], "bcp": r[3], "hreflang": r[4], "dir": r[5], "cur": r[6],
              "path": None if r[0] in SITE else r[0], "flag": FLAG.get(r[0])} for r in LANGS}
@@ -155,6 +224,9 @@ def js_text():
     body = ("(function () {\n  'use strict';\n  var P = window.PRO = window.PRO || {};\n"
             "  P.LANGS = " + json.dumps(langs, ensure_ascii=False, separators=(",", ":")) + ";\n"
             "  P.SITE_LANGS = " + json.dumps(list(SITE)) + ";\n"
+            "  P.SAME = " + json.dumps(SAME) + ";\n"
+            "  P.LANG_COUNT = " + str(LANG_COUNT) + ";\n"
+            "  P.KURD_NOTE = " + json.dumps({r[0]: kurd_note(r[0]) for r in LANGS}, ensure_ascii=False, separators=(",", ":")) + ";\n"
             "  P.FLAG = " + json.dumps(FLAG, separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.FLAG_DIR = " + json.dumps(FLAG_DIR) + ";\n"
             "  /* langFlag, not flag: panels.js already puts a chart helper on P.flag */\n"

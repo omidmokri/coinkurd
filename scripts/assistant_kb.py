@@ -261,17 +261,17 @@ FAQ = [
       "deutsch", "türkçe", "русский", "español"],
      L("بازار زنده به زبان‌ها و ارزهای دیگر هم هست؟", "بازاڕی زیندوو بە زمان و دراوەکانی تریش هەیە؟",
        "Is the live market in other languages and currencies too?"),
-     L("بله: میز «بازار زنده» به ۴۷ زبان است و هر زبان نشانی خودش را دارد (مثلاً entekhab.net/market/de/ یا /market/tr/)؛ "
+     L("بله: میز «بازار زنده» به ۵۰ زبان است و هر زبان نشانی خودش را دارد (مثلاً entekhab.net/market/de/ یا /market/tr/)؛ "
        "دکمهٔ کرهٔ زمین در نوار بالا فهرست زبان‌ها را باز می‌کند. دکمهٔ ارز کنار آن، قیمت همهٔ کوین‌های بایننس را به ارز کشور شما نشان "
        "می‌دهد (یورو، لیر، روپیه، ین و حدود ۱۵۰ ارز دیگر)، به همان روش تومان: قیمت بایننس × ارزش یک تتر به آن ارز در همان روز (نرخ "
        "مرجع روزانه). می‌توانید نرخ خودتان را هم برای یک تتر یا یک دلار وارد کنید تا همهٔ کندل‌ها و قیمت‌ها با آن حساب شوند. زبان‌های "
        "غیر از کوردی، فارسی، عربی و انگلیسی ترجمهٔ ماشینی دارند.",
-       "بەڵێ: مێزی «بازاڕی زیندوو» بە ٤٧ زمانە و هەر زمانێک ناونیشانی خۆی هەیە (بۆ نموونە entekhab.net/market/de/ یان /market/tr/)؛ "
+       "بەڵێ: مێزی «بازاڕی زیندوو» بە ٥٠ زمانە و هەر زمانێک ناونیشانی خۆی هەیە (بۆ نموونە entekhab.net/market/de/ یان /market/tr/)؛ "
        "دوگمەی گۆی زەوی لە شریتی سەرەوە لیستی زمانەکان دەکاتەوە. دوگمەی دراو لە تەنیشتیەوە نرخی هەموو کۆینەکانی بایننس بە دراوی "
        "وڵاتەکەت پیشان دەدات (یۆرۆ، لیرە، ڕووپیە، یەن و نزیکەی ١٥٠ دراوی تر)، بە هەمان ڕێگای تمەن: نرخی بایننس × بەهای یەک تەتەر "
        "بەو دراوە لەو ڕۆژەدا (نرخی سەرچاوەی ڕۆژانە). دەتوانیت نرخی خۆتیش بۆ یەک تەتەر یان یەک دۆلار بنووسیت تا هەموو مۆم و نرخەکان "
        "بەوە هەژمار بکرێن. زمانەکانی جگە لە کوردی، فارسی، عەرەبی و ئینگلیزی وەرگێڕانی ئامێرییان هەیە.",
-       "Yes: the Live market workspace is in 47 languages, each at its own address (e.g. entekhab.net/market/de/ or /market/tr/); the "
+       "Yes: the Live market workspace is in 50 languages, each at its own address (e.g. entekhab.net/market/de/ or /market/tr/); the "
        "globe button in the top bar opens the list. The currency button next to it shows every Binance coin in your country's currency "
        "(euro, lira, rupee, yen and about 150 more), worked out like the toman: the Binance price × what one tether is worth in that "
        "currency that day (a daily reference rate). You can also type your own rate for one tether or one dollar, and every candle and "

@@ -1888,22 +1888,25 @@
   function relocalize() { cells.forEach(function (c) { c.chart.applyOptions(locOpts()); c.legend(); }); clockTick(); emit('tz'); }
 
   /* ---- the language menu: every language of the workspace (the site's own first: Kurdish first, English last) */
-  /* the header's language group on market pages: a globe first (all 47), then the site's own four (owner, 2026-11-15) */
+  /* the header's language group on market pages: a globe first (all 50), then the site's own four (owner, 2026-11-15) */
   function headerGlobe() {
     var g = document.getElementById('langs');
     if (!g || g.querySelector('.pm-hglobe')) return;
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'pm-hglobe'; b.title = T('langTitle'); b.setAttribute('aria-label', T('langTitle'));
-    b.innerHTML = ic('globe') + '<b>' + ((P.LANGS || []).length || 47) + '</b>';
+    /* Sorani and Kurmanji are one language: the badge counts Kurdish once (50, not 51; owner 2026-11-27) */
+    b.innerHTML = ic('globe') + '<b>' + (P.LANG_COUNT || (P.LANGS || []).length || 50) + '</b>';
     b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); langDialog(); });
     g.insertBefore(b, g.firstChild);
   }
   setTimeout(headerGlobe, 0);
   function langDialog() {
     closeMenu();
-    var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note"></p></div>');
+    var box = h('<div class="pm-lgd"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-lgl" role="listbox"></div><p class="pm-note pm-kurd"></p><p class="pm-note"></p></div>');
     var inp = $('input', box), list = $('.pm-lgl', box);
-    inp.placeholder = T('langSearch'); inp.setAttribute('aria-label', T('langSearch')); $('.pm-note', box).textContent = T('langNote');
+    inp.placeholder = T('langSearch'); inp.setAttribute('aria-label', T('langSearch')); $('.pm-note:not(.pm-kurd)', box).textContent = T('langNote');
+    var kn = P.KURD_NOTE || {}, kp = $('.pm-kurd', box), kt = kn[LANG] || kn.en;
+    if (kt) { kp.textContent = kt; kp.setAttribute('lang', (LROW[LANG] || [])[4] || LANG); } else kp.remove();
     function draw() {
       var q = inp.value.trim().toLowerCase();
       var L = (P.LANGS || []).filter(function (r) { return !q || (r[1] + ' ' + r[2] + ' ' + r[0]).toLowerCase().indexOf(q) >= 0; });
@@ -2609,7 +2612,7 @@
     P.setSaver(st.saver == null ? P.saverAuto : st.saver);
     build(); buildGrid(); pageText(); readShare();
     de.style.setProperty('--pm-bg', st.look.bg); root.classList.toggle('pm-light', isLight()); cells.forEach(setWatermark);
-    /* /market/#lang and /market/#cur open the language or currency menu (the bot's «47 languages» button) */
+    /* /market/#lang and /market/#cur open the language or currency menu (the bot's «50 languages» button) */
     if (/^#(lang|cur)$/.test(location.hash)) { var mh = location.hash.slice(1); history.replaceState(null, '', location.pathname + location.search); setTimeout(mh === 'lang' ? langDialog : curDialog, 300); }
     /* a chart restored from storage, a file or a link on a coin the site has no logo for moves to BTC; drawings on such
        coins are not kept (the rule above, once the logo index is known) */

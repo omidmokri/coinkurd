@@ -502,7 +502,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "11"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "12"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
@@ -551,7 +551,11 @@ def write_langs(need):
     # every language's flag, the site's own four included, so the panel can show one beside each of them too
     flags = {r[0]: pro_langs.flag(r[0]) for r in pro_langs.LANGS if pro_langs.flag(r[0])}
     with open(os.path.join(OUT, "langs.json"), "w", encoding="utf-8") as f:
-        json.dump({"ready": out, "flags": flags, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
+        # total: every language the site is being carried to, Kurdish counted once (50); kurd: the line, in each
+        # language, that says why (Sorani and Kurmanji are two dialects of one language)
+        json.dump({"ready": out, "flags": flags, "total": pro_langs.LANG_COUNT,
+                   "kurd": {r[0]: pro_langs.kurd_note(r[0]) for r in pro_langs.LANGS},
+                   "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
                   f, ensure_ascii=False, separators=(",", ":"))
     return out
 

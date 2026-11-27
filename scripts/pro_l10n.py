@@ -98,7 +98,7 @@ SEO_EN = {
                  "indicators, bar replay, backtests, price alerts and the economic calendar."),
     "seo.ogt": "Entekhab live market — the crypto analysis desk",
     "seo.ogd": ("Every Binance coin in your own currency; up to 16 charts, 17 chart types, 70 indicators, replay, "
-                "backtests, alerts and the economic calendar — free, in 47 languages."),
+                "backtests, alerts and the economic calendar — free, in 50 languages."),
     "seo.app": "Entekhab live market",
     "seo.noscript": "This workspace needs JavaScript.",
 }
