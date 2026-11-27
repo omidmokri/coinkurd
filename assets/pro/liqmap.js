@@ -319,8 +319,8 @@
     $('.pm-lqon', box).onchange = function () { if (this.checked) start(A.active()); else stop(); paintPanel(); };
     BOX = box;
     if (!L || L.cell !== cell || L.sym !== cell.cfg.sym) start(cell);
-    paintPanel();
     A.modal(T('lqTitle') + ' · ' + (P.pair ? P.pair(cell.cfg.sym) : cell.cfg.sym), box, { wide: true, nofocus: true, onclose: function () { BOX = null; } });
+    paintPanel();   /* after the window is up: the panel is only painted while it is on the page */
   };
   P.liqState = function () { return L ? { on: L.on, sym: L.sym, ex: L.ex, n: L.hist.length, m: !!L.m, liq: L.liq.slice(), step: L.step, stat: L.stat, lo: L.m && L.m.lo, hi: L.m && L.m.hi, mid: L.m && L.m.mid, w: L.m ? walls(L.m, 3) : null } : null; };   /* for the tests */
   P.liqStop = stop;
