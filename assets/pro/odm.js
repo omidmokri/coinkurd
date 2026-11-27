@@ -527,6 +527,8 @@
     return n + gone.length;
   }
   P.odmClear = clearOdm;
+  /* for the page's Reset: the plan's lines as they are now, and a way to show them again */
+  P.odmSnap = function () { var Z = LN; return Z ? function () { if (Z.cell.el.isConnected && Z.cell.cfg.sym === Z.sym) showLines(Z.cell, Z.plan, Z.st, Z.atr); } : null; };
   /* the level of the plan under a point of the chart, for the right-click menu */
   P.odmHit = function (cell, y) {
     if (!LN || LN.cell !== cell) return null; var best = null, bd = 6;

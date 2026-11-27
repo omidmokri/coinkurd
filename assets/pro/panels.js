@@ -377,6 +377,9 @@
     AL = AL.filter(function (a) { return gone.indexOf(a) < 0; }); saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); }); return gone;
   };
   P.putAlerts = function (list) { (list || []).forEach(function (a) { if (AL.indexOf(a) < 0) AL.push(a); }); saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); }); };
+  P.alertsAll = function () { return AL.slice(); };
+  /* the alert history, for the page's Reset: taken away and put back as one list */
+  P.alertLog = function (list) { if (list) { LOG = list.slice(0, 100); saveAL(); } return LOG.slice(); };
   P.isOdmAlert = function (a, sym) { return !!(a && a.on && a.k === 'price' && a.sym === sym && /^ODM /.test(a.msg || '')); };
   P.odmAlertCount = function (sym) { return AL.filter(function (a) { return P.isOdmAlert(a, sym); }).length; };
   /* alerts on drawn lines: the line's price where it is now (a sloped line moves; a channel has two sides) */
@@ -689,13 +692,20 @@
         esc(T(a.mode === 'every' ? 'every' : 'once')) + (a.n ? ' · ' + esc(T('fired', { n: A.loc(a.n) })) : '') + (a.exp ? ' · ' + esc(a.expd || Date.now() > a.exp ? T('expired') : T('expUntil', { t: A.fmtD(Math.floor(a.exp / 1000)) })) : '') + (a.msg ? ' · ' + esc(a.msg) : '') + '</small></div>' +
         (a.k === 'price' && !PCT[a.c] && botArg(a) ? '<button type="button" class="pm-ib" data-a="tg" title="' + esc(T('tgAlso')) + '">✈</button>' : '') +
         '<button type="button" class="pm-ib" data-a="tog" title="' + esc(T(a.on ? 'pause' : 'resume')) + '">' + ic(a.on ? 'pause' : 'play') + '</button><button type="button" class="pm-ib" data-a="del" title="' + esc(T('remove')) + '">' + ic('trash') + '</button></div>';
-    }).join('') : '<p class="pm-empty">' + esc(T('noAlerts')) + '</p>';
+    }).join('') + (AL.length > 1 ? '<button type="button" class="pm-link pm-aldel" data-a="delall">' + ic('trash') + ' ' + esc(T('alDelAll', { n: A.loc(AL.length) })) + '</button>' : '') : '<p class="pm-empty">' + esc(T('noAlerts')) + '</p>';
+    var da = $('[data-a="delall"]', al);
+    if (da) da.onclick = function () {
+      A.confirmBox(T('alDelAll', { n: A.loc(AL.length) }), T('alDelAllQ', { n: A.loc(AL.length) }), function () {
+        var gone = P.delAlerts(function () { return true; });
+        A.toast(T('ctxAlGone', { n: gone.length }), '', { label: T('undo'), act: function () { P.putAlerts(gone); } });
+      }, T('remove'));
+    };
     $$('.pm-ar', al).forEach(function (r) {
       var a = AL.filter(function (z) { return z.id === r.getAttribute('data-id'); })[0]; if (!a) return;
       $$('button', r).forEach(function (b) {
         b.onclick = function () {
           var k = b.getAttribute('data-a');
-          if (k === 'del') AL = AL.filter(function (z) { return z !== a; });
+          if (k === 'del') { AL = AL.filter(function (z) { return z !== a; }); A.toast(T('ctxAlGone', { n: 1 }), '', { label: T('undo'), act: function () { P.putAlerts([a]); } }); }
           if (k === 'tog') { a.on = !a.on; if (a.on && (a.k === 'price' || a.k === 'draw')) a.px = (P.tickers.d[a.sym] || {}).c || null; if (a.on && a.exp && Date.now() > a.exp) { delete a.exp; delete a.expd; } }
           if (k === 'tg') { sendToBot(a); return; }
           saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); });

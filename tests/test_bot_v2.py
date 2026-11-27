@@ -200,6 +200,24 @@ n = len(SENT)
 R.handle_update(S, upd(100, CA))
 check("PEPE" in last_text(), "pasting a CA opens the card")
 
+print("2b) delete all alerts: asked first, then all gone")
+x = S["users"]["100"]
+x["alerts"] = []
+for c in ("/alert BTC +5%", "/alert ETH 3000", "/alert SOL 200"):
+    R.handle_update(S, upd(100, c))
+x["talerts"] = [{"s": "PEPE", "pct": 20}]
+R.handle_update(S, upd(100, data="m:alerts"))
+kb = [b for m, p in SENT if m in ("sendMessage", "editMessageText") for row in (p.get("reply_markup") or {}).get("inline_keyboard", []) for b in row]
+check(any(b.get("callback_data") == "aclr" and "(4)" in b.get("text", "") for b in kb[-40:]), "alerts list offers delete all (4)")
+R.handle_update(S, upd(100, data="aclr"))
+check(len(x["alerts"]) == 4 - 1 and len(x["talerts"]) == 1, "first tap only asks")
+check("4" in last_text(), "the question names how many")
+R.handle_update(S, upd(100, data="aclr!"))
+check(x["alerts"] == [] and x["talerts"] == [], "yes deletes all")
+check("4" in last_text(), "the note says how many went")
+R.handle_update(S, upd(100, data="aclr!"))
+check(x["alerts"] == [], "a second yes is harmless")
+
 print("3) % alerts fire, price alerts unaffected")
 x = S["users"]["100"]
 x["alerts"] = []

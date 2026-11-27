@@ -1938,6 +1938,88 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await ctx.close();
   }
 
+  /* ---------- Reset the page: every alert, the alert history, every drawing and the ODM plan go at once, with real clicks, and Undo brings them back */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'rst') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [390, 800, 'ar'], [390, 800, 'ckb']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `reset ${lang} ${vw}`, e0 = errors.length;
+    const seed = () => page.evaluate(() => {
+      const c = PRO.app.active(), px = c.bars[c.bars.length - 1].c, t = c.bars[c.bars.length - 5].t;
+      [['BTC', px * 1.1, 'up'], ['BTC', px * 0.9, 'down'], ['ETH', 5000, 'up'], ['SOL', 50, 'down']].forEach(a => PRO.addPriceAlert(a[0], a[1], a[2], a[0] === 'BTC' && a[2] === 'down' ? 'ODM S1' : ''));
+      PRO.alertLog([{ t: Date.now(), msg: 'test fired' }]);
+      PRO.app.mutate('BTC', L => { L.push({ id: 'r1', k: 'hline', pts: [{ t, p: px }], s: {} }); L.push({ id: 'r2', k: 'trend', pts: [{ t, p: px }, { t: c.bars[c.bars.length - 1].t, p: px * 1.01 }], s: {} }); });
+      PRO.app.mutate('ETH', L => { L.push({ id: 'r3', k: 'hline', pts: [{ t, p: 3000 }], s: {} }); });
+      localStorage.setItem('ek_pro_odm', JSON.stringify({ v: 1, sym: 'BTC', entries: [{ p: px * 0.98 }] }));
+    });
+    const count = () => page.evaluate(() => ({ al: PRO.alertsAll().length, log: PRO.alertLog().length, dr: Object.values(PRO.app.DRAW()).reduce((n, L) => n + L.length, 0), od: !!localStorage.getItem('ek_pro_odm'), ln: (PRO.alertLines('BTC') || []).length }));
+    await seed();
+    const c0 = await count();
+    ok(`[${tag}] seeded 4 alerts on 3 coins, 1 history line, 3 drawings on 2 coins and an ODM plan`, c0.al === 4 && c0.log === 1 && c0.dr === 3 && c0.od, JSON.stringify(c0));
+    /* the trash flyout on the tool rail holds Reset; a real click opens the dialog */
+    const fly = await page.$('#pm-tools [data-fly="clear"]');
+    if (fly) { await fly.scrollIntoViewIfNeeded(); await fly.click(); }
+    await page.waitForTimeout(250);
+    const it = await page.$$('.pm-fi');
+    let hit = null; for (const b of it) { const tx = await b.textContent(); if (tx.indexOf(await page.evaluate(() => PRO.app.T('rsTitle'))) >= 0) hit = b; }
+    ok(`[${tag}] the trash menu on the tool rail has Reset the page`, !!hit, String(it.length));
+    if (hit) await hit.click(); else await page.evaluate(() => PRO.resetPage());
+    await page.waitForSelector('.pm-rs', { timeout: 3000 }).catch(() => { });
+    const dlg = await page.evaluate(() => {
+      const f = document.querySelector('.pm-rs'); if (!f) return null;
+      const r = [...f.querySelectorAll('.pm-rsr')].map(l => ({ n: l.querySelector('input').name, on: l.querySelector('input').checked, dis: l.querySelector('input').disabled, v: l.querySelector('b').textContent }));
+      const b = document.querySelector('.pm-mbox').getBoundingClientRect(), body = document.querySelector('.pm-mbody');
+      return { r, fits: b.left >= -1 && b.right <= innerWidth + 1 && body.scrollWidth - body.clientWidth <= 1, h44: [...f.querySelectorAll('.pm-rsr')].every(l => l.getBoundingClientRect().height >= 40), title: document.querySelector('.pm-mhead b').textContent };
+    });
+    const R = k => (dlg && dlg.r.find(x => x.n === k)) || {};
+    ok(`[${tag}] the dialog lists alerts 4, history 1, drawings 3, ODM ✓ ticked, and indicators not ticked`, dlg && R('al').on && /4|٤|۴/.test(R('al').v) && R('log').on && R('dr').on && /3|٣|۳/.test(R('dr').v) && R('od').on && R('ind').on === false, JSON.stringify(dlg));
+    ok(`[${tag}] the dialog fits the screen and each row is big enough to tap`, dlg && dlg.fits && dlg.h44, JSON.stringify(dlg && { fits: dlg.fits, h44: dlg.h44 }));
+    await shot(page, `92_reset_dialog_${lang}_${vw}`);
+    /* untick nothing; a real click on Reset */
+    await page.click('.pm-rs .pm-rsgo'); await page.waitForTimeout(400);
+    const c1 = await count();
+    ok(`[${tag}] after Reset: no alerts on any coin, no history, no drawings, no ODM plan, no alert lines on the chart`, c1.al === 0 && c1.log === 0 && c1.dr === 0 && !c1.od && c1.ln === 0, JSON.stringify(c1));
+    const kept = await page.evaluate(() => ({ st: !!localStorage.getItem('ek_pro'), w: localStorage.getItem('ek_pro_watch') !== 'null' }));
+    ok(`[${tag}] the layout is kept`, kept.st, JSON.stringify(kept));
+    /* Undo in the note brings it all back */
+    const ub = await page.$('.pm-toast .pm-tbtn');
+    ok(`[${tag}] the note after Reset carries Undo`, !!ub, '');
+    if (ub) await ub.click(); await page.waitForTimeout(400);
+    const c2 = await count();
+    ok(`[${tag}] Undo brings back the 4 alerts, the history, the 3 drawings and the ODM plan`, c2.al === 4 && c2.log === 1 && c2.dr === 3 && c2.od && c2.ln >= 2, JSON.stringify(c2));
+    /* reset again, and undo later from the workspace menu (after the note is gone) */
+    await page.evaluate(() => PRO.resetPage()); await page.waitForSelector('.pm-rs');
+    await page.click('.pm-rs .pm-rsgo'); await page.waitForTimeout(300);
+    await page.evaluate(() => document.querySelectorAll('.pm-toast').forEach(x => x.remove()));
+    const ws = await page.$('#pm-ws');
+    if (ws && await ws.isVisible()) { await ws.click(); } else await page.evaluate(() => document.querySelector('#pm-ws').click());
+    await page.waitForTimeout(250);
+    const ul = await page.evaluate(() => { const L = PRO.app.T('rsUndoLast'); const b = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => x.textContent.indexOf(L) >= 0); if (b) { b.scrollIntoView({ block: 'nearest' }); b.setAttribute('data-test', 'ul'); } return !!b; });
+    ok(`[${tag}] the workspace menu offers Undo the last reset`, ul, '');
+    if (ul) await page.click('.pm-menu [data-test="ul"]'); await page.waitForTimeout(400);
+    const c3 = await count();
+    ok(`[${tag}] Undo the last reset brings everything back`, c3.al === 4 && c3.log === 1 && c3.dr === 3 && c3.od, JSON.stringify(c3));
+    /* the alerts panel: one alert deleted with a real click, Undo; then Delete all, asked first, then Undo */
+    await page.evaluate(() => PRO.app.setSide('alerts')); await page.waitForTimeout(400);
+    const del1 = await page.$('.pm-al .pm-ar [data-a="del"]');
+    ok(`[${tag}] the alerts panel shows each alert with its delete button`, !!del1 && (await page.$$('.pm-al .pm-ar')).length === 4, '');
+    if (del1) { await del1.scrollIntoViewIfNeeded(); await del1.click(); } await page.waitForTimeout(300);
+    const a1 = await count();
+    ok(`[${tag}] one tap on its bin deletes just that alert`, a1.al === 3, JSON.stringify(a1));
+    const ub2 = await page.$('.pm-toast .pm-tbtn'); if (ub2) await ub2.click(); await page.waitForTimeout(300);
+    ok(`[${tag}] and Undo puts it back`, (await count()).al === 4, '');
+    const da = await page.$('.pm-al [data-a="delall"]');
+    ok(`[${tag}] the panel has Delete all alerts (4)`, !!da && /4|٤|۴/.test(await da.textContent()), '');
+    if (da) { await da.scrollIntoViewIfNeeded(); await da.click(); } await page.waitForTimeout(250);
+    const asked = await page.evaluate(() => !!document.querySelector('.pm-modal [data-y]')) && (await count()).al === 4;
+    ok(`[${tag}] Delete all asks first and deletes nothing yet`, asked, '');
+    await page.click('.pm-modal [data-y]'); await page.waitForTimeout(300);
+    ok(`[${tag}] yes deletes all 4 alerts`, (await count()).al === 0, '');
+    await shot(page, `93_reset_alerts_${lang}_${vw}`);
+    const ub3 = await page.$('.pm-toast .pm-tbtn'); if (ub3) await ub3.click(); await page.waitForTimeout(300);
+    ok(`[${tag}] and Undo brings all 4 back`, (await count()).al === 4, '');
+    ok(`[${tag}] no JS errors in the Reset checks`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
   /* ---------- Binance unreachable: OKX blocked too, BTC falls back to the site snapshot */
   if (!ONLY) {
     const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 }, serviceWorkers: 'block' }); const page = await ctx.newPage();
