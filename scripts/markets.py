@@ -364,7 +364,7 @@ def main():
         b = o["bars"]
         items[key] = {"id": key, "name": o["name"], "unit": o["unit"], "group": o["group"], "status": o["status"],
                       "src": (o.get("src") or {}).get("label"), "n": len(b), "from": b[0][0] if b else None,
-                      "last": [b[-1][0], b[-1][4]] if b else None, "close_only": o.get("close_only", False),
+                      "last": [b[-1][0], b[-1][4]] if b else None, "prev": b[-2][4] if len(b) > 1 else None, "close_only": o.get("close_only", False),
                       "sources": len(spec[4]), "working": sum(1 for x in o["tried"] if x["ok"])}
         print("markets: %-7s %-11s %-12s rows=%-6d last=%s  tried=%s" % (
             key, o["status"], (o.get("src") or {}).get("id"), len(b),
