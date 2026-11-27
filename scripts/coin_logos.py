@@ -7,6 +7,11 @@ and sets it in a glossy 3D coin, so it sits naturally next to the 3D set:
     data/coinlogo/<TICKER>.png        200x200 transparent PNG
     data/coinlogo/index.json          {"coins": [...tickers with a logo...], "updated_at": ...}
 A ticker with no logo anywhere (e.g. a tokenised stock CoinGecko does not list) is simply left off the wall.
+
+The wall holds WALL coins. The channel's own coins come first, most written about first; the rest of the places go
+to the largest coins of the market by 24h volume (data/market.json), so the wall stays full even while the archive
+covers fewer coins than that. ALWAYS lists those extra tickers under "wall" in index.json, so the page shows the
+same set and in the same order as the logos generated here, and never a coin whose logo is missing.
 Run: python3 scripts/coin_logos.py
 """
 import io
@@ -133,12 +138,67 @@ def gecko_index():
     return out
 
 
+def _is_coin(sym):
+    try:
+        from album import NOT_CRYPTO, STOCK_SHORT                          # noqa: PLC0415
+    except Exception:                                                      # noqa: BLE001
+        NOT_CRYPTO, STOCK_SHORT = set(), set()
+    if sym in NOT_CRYPTO or sym in STOCK_SHORT:
+        return False
+    return not (len(sym) >= 4 and sym.endswith("B"))                       # NVDAB, MSTRB, SOXLB …: shares, not coins
+
+
+WALL = 33                       # how many coins the homepage wall shows
+ALWAYS = ["AAVE"]               # coins the wall must carry whatever the archive and the volume table say
+
+
+def wall_list(root):
+    """The coins of the wall, in the order the page shows them: the channel's own first (most posts first),
+    then the biggest of the market by 24h volume, with ALWAYS always in. Only tickers that can have a logo."""
+    meta = json.load(open(os.path.join(root, "data", "meta.json"), encoding="utf-8"))
+    by = meta.get("by_coin") or {}
+    mine = sorted(by, key=lambda c: (-by[c], c))
+    try:
+        mk = json.load(open(os.path.join(root, "data", "market.json"), encoding="utf-8")).get("coins", [])
+    except Exception:                                                      # noqa: BLE001
+        mk = []
+    vol = {c["coin"]: (c.get("qvol") or c.get("vol24") or 0) for c in mk if c.get("coin")}
+    # The places the archive does not fill go to coins, not to Binance's tokenised shares (NVDAB, SOXLB …) or to
+    # wrapped and stablecoin tickers: scripts/album.py already draws that line for «the crypto market», so the wall
+    # uses its rule rather than a second one of its own. A coin the channel itself writes about keeps its place
+    # whatever the rule says — USDT and XAUT are on the wall because the archive covers them.
+    rest = [c for c in sorted(vol, key=lambda c: (-vol[c], c)) if c not in by and _is_coin(c)]
+    # A coin that is already on the wall keeps its place while it is still traded: 24h volume moves every hour, and
+    # without this the tail of the wall — and the logo files in the repo — would churn on every run.
+    try:
+        held = json.load(open(os.path.join(root, "data", "coinlogo", "index.json"), encoding="utf-8")).get("wall") or []
+    except Exception:                                                      # noqa: BLE001
+        held = []
+    rest = [c for c in held if c in vol and c not in by and _is_coin(c)] + [c for c in rest if c not in held]
+    out = list(mine)
+    for c in ALWAYS:
+        if c not in out and (c in vol or os.path.exists(os.path.join(root, "data", "logos", c + ".png"))):
+            out.append(c)
+    for c in rest:
+        if len(out) >= WALL:
+            break
+        if c not in out:
+            out.append(c)
+    return out[:WALL]
+
+
 def main():
     os.makedirs(OUT, exist_ok=True)
-    meta = json.load(open(os.path.join(ROOT, "data", "meta.json"), encoding="utf-8"))
-    coins = list((meta.get("by_coin") or {}).keys())
+    coins = wall_list(ROOT)
     have3d = {f[:-4] for f in os.listdir(HAS3D) if f.endswith(".png")}
-    need = [k for k in coins if k not in have3d and not os.path.exists(os.path.join(OUT, k + ".png"))]
+    # A coin drawn from the site's own 50 px copy is listed under "fallback": that copy can carry a baked-in
+    # background where the official logo is transparent, so it is tried again whenever a network is at hand.
+    try:
+        was = json.load(open(os.path.join(OUT, "index.json"), encoding="utf-8")).get("fallback") or []
+    except Exception:                                                      # noqa: BLE001
+        was = []
+    fallback = [k for k in was if isinstance(k, str)]
+    need = [k for k in coins if k not in have3d and (k in fallback or not os.path.exists(os.path.join(OUT, k + ".png")))]
     if need:
         idx = gecko_index() if not os.environ.get("NO_NET") else {}
         for k in need:
@@ -155,14 +215,21 @@ def main():
                 else:
                     logo = Image.open(small).convert("RGBA")
                 coin_frame(logo, main_colour(logo)).save(os.path.join(OUT, k + ".png"), optimize=True)
-                print("coin_logos: saved", k)
+                if url:
+                    if k in fallback:
+                        fallback.remove(k)
+                elif k not in fallback:
+                    fallback.append(k)
+                print("coin_logos: saved", k, "(from the 50 px copy)" if not url else "")
             except Exception as ex:  # noqa: BLE001
                 print("coin_logos:", k, ex)
     have = sorted(f[:-4] for f in os.listdir(OUT) if f.endswith(".png"))
-    json.dump({"updated_at": datetime.now(timezone.utc).isoformat(), "coins": have},
+    wall = [k for k in coins if k in have3d or k in have]                  # a coin with no logo is left off, never a placeholder
+    json.dump({"updated_at": datetime.now(timezone.utc).isoformat(), "coins": have, "wall": wall,
+               "fallback": sorted(k for k in fallback if k in have)},
               open(os.path.join(OUT, "index.json"), "w"), indent=1)
     missing = [k for k in coins if k not in have3d and k not in have]
-    print(f"coin_logos: 3D {len(have3d)}, official {len(have)}, without a logo (kept off the wall): {missing}")
+    print(f"coin_logos: 3D {len(have3d)}, official {len(have)}, wall {len(wall)}/{WALL}, without a logo (kept off the wall): {missing}")
 
 
 if __name__ == "__main__":

@@ -292,7 +292,10 @@
     e = nx.querySelector('[data-c=hall]');
     if (e) { h = ''; [].slice.call(d.querySelectorAll('#hallGrid .tile b'), 0, 4).forEach(function (b) { h += '<span>' + esc(b.textContent) + '</span>'; }); if (h && e.innerHTML !== h) e.innerHTML = h; }
     e = nx.querySelector('[data-s=hall]'); if (e) e.innerHTML = cnt('#sCats', 'دسته', 'پۆل', 'categories');
-    e = nx.querySelector('[data-s=coinswall]'); if (e) e.innerHTML = cnt('#sCoins', 'کوین', 'دراو', 'coins');
+    /* the door says what the room holds: the wall carries the channel's own coins and the biggest of the market
+       after them, so it counts the wall itself and falls back to the archive's own figure before the wall is built */
+    e = nx.querySelector('[data-s=coinswall]');
+    if (e) { var nw = d.querySelectorAll('#wall button').length; e.innerHTML = nw ? nfmt(nw) + ' ' + pick('کوین', 'دراو', 'coins') : cnt('#sCoins', 'کوین', 'دراو', 'coins'); }
     e = nx.querySelector('[data-c=coinswall]');
     if (e && !e.firstChild) { h = ''; var seen = {}; [].forEach.call(d.querySelectorAll('#wall img'), function (im) { var s = im.getAttribute('src'); if (!s || seen[s] || Object.keys(seen).length >= 9) return; seen[s] = 1; h += '<img src="' + esc(s) + '" alt="" width="28" height="28" loading="lazy" decoding="async">'; }); e.innerHTML = h; }
     /* the visitor's day: the next release that moves the market, the whales' day, the newest headline */
