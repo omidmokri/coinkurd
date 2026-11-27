@@ -421,7 +421,13 @@
     var a = P[0]; if (!ok(a)) return; L(g, a.x, a.y, a.x, a.y - 26, { w: 2 }); PL(g, [[a.x, a.y - 26], [a.x + 16, a.y - 21], [a.x, a.y - 16]], { close: 1, fill: 0.95, w: 1 });
     if (s.x) LAB_(g, s.x, a.x + 4, a.y - 36, { align: 'left', fg: s.tc, fs: s.fs });
   };
-  GEO.emoji = function (D, d, g, P, W, H, s) { var a = P[0]; if (!ok(a)) return; g.ops.push({ t: 'txt', s: s.x || '⭐', x: a.x, y: a.y, fs: s.fs || 26, align: 'center', emo: 1 }); };
+  /* one tool, three kinds of mark (emoji.js): an emoji is text, "stk:<id>" a badge, "ico:<id>" a stroked path */
+  GEO.emoji = function (D, d, g, P, W, H, s) {
+    var a = P[0]; if (!ok(a)) return; var R = window.PRO, x = R.emoOk && R.emoOk(s.x) ? s.x : '⭐', fs = s.fs || 26;
+    if (x.slice(0, 4) === 'stk:') g.ops.push({ t: 'stk', id: x.slice(4), x: a.x, y: a.y, fs: fs });
+    else if (x.slice(0, 4) === 'ico:') g.ops.push({ t: 'ico', id: x.slice(4), x: a.x, y: a.y, fs: fs });
+    else g.ops.push({ t: 'txt', s: x, x: a.x, y: a.y, fs: fs, align: 'center', emo: 1 });
+  };
 
   /* ---- volume profiles as indicators: the visible range (at the right edge) and one per day */
   function profOf(sel, N, tpo) {
@@ -524,6 +530,25 @@
         var f2 = op.fs || 12; ctx.font = (op.emo ? '' : '700 ') + f2 + 'px ' + (op.emo ? '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif' : 'Vazirmatn, Tahoma, sans-serif');
         ctx.fillStyle = op.c || col; ctx.textAlign = op.align || 'left'; ctx.textBaseline = 'middle'; ctx.fillText(op.s, op.x, op.y);
         var tw = ctx.measureText(op.s).width; op.box = [op.align === 'center' ? op.x - tw / 2 : op.x, op.y - f2 / 2 - 2, tw, f2 + 4];
+      }
+      else if (op.t === 'stk') {
+        /* a sticker: the word on a rounded badge, a soft shadow under it and a light edge on top so it reads on any theme */
+        var K = P.STK[op.id]; if (K) {
+          var sf = Math.max(8, Math.round(op.fs * 0.5)); ctx.font = '800 ' + sf + 'px Vazirmatn, Tahoma, sans-serif';
+          var sw = ctx.measureText(K[0]).width + sf * 1.5, sh = sf * 1.9, sx = op.x - sw / 2, sy = op.y - sh / 2, rr2 = sh / 2;
+          ctx.setLineDash([]); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(sx, sy + 2, sw, sh, rr2); else ctx.rect(sx, sy + 2, sw, sh); ctx.fill();
+          ctx.fillStyle = K[1]; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(sx, sy, sw, sh, rr2); else ctx.rect(sx, sy, sw, sh); ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 1; ctx.stroke();
+          ctx.fillStyle = K[2]; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(K[0], op.x, op.y + 0.5);
+          op.box = [sx, sy, sw, sh + 2];
+        }
+      }
+      else if (op.t === 'ico') {
+        var IP = P.ICO[op.id]; if (IP && typeof Path2D === 'function') {
+          var isz = op.fs, k2 = isz / 24; ctx.save(); ctx.translate(op.x - isz / 2, op.y - isz / 2); ctx.scale(k2, k2);
+          ctx.setLineDash([]); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = col; ctx.stroke(new Path2D(IP)); ctx.restore();
+          op.box = [op.x - isz / 2, op.y - isz / 2, isz, isz];
+        }
       }
       ctx.restore();
     });
@@ -757,8 +782,23 @@
     }
     if (selected && k !== 'brush') {
       ctx.setLineDash([]);
-      g.px.forEach(function (p) { if (p.y == null && k !== 'vline') return; var yy = p.y == null ? H / 2 : p.y; ctx.fillStyle = '#0b0b0c'; ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.x, yy, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); });
-      if (g.pos) { var Q = g.pos, xr = Math.max(Q.x0, Q.x1); [[xr, Q.yt], [xr, Q.ys], [xr, Q.ye]].forEach(function (p) { ctx.fillStyle = '#0b0b0c'; ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }); }
+      /* the handles. They used to be solid discs, which sat exactly on the candle, wick or price the hand was aiming
+         for. Now the disc is see-through (90% by default, the visitor's own setting), its ring is thin, and the anchor
+         itself is a small dot in the middle — so what is under a handle stays readable while it is selected, and the
+         handle being dragged drops its fill altogether. P.handle = { mode, tr }: minimal · transparent · normal · contrast */
+      var HS = P.handle || {}, hm = HS.mode || 'transparent', htr = HS.tr == null ? 0.9 : Math.max(0, Math.min(1, +HS.tr)), self2 = this;
+      var hfa = hm === 'minimal' ? 0 : hm === 'normal' || hm === 'contrast' ? 1 : 1 - htr;
+      var hra = hm === 'contrast' ? 1 : hm === 'normal' ? 1 : hm === 'minimal' ? 0.5 : Math.max(0.45, 1 - htr * 0.5), hr = hm === 'contrast' ? 6 : hm === 'minimal' ? 4 : 5;
+      function knob(x, y, c, part) {
+        var dragging = self2.drag && self2.drag.d === d && self2.drag.part === part;
+        ctx.beginPath(); ctx.arc(x, y, hr, 0, Math.PI * 2);
+        if (hfa > 0 && !dragging) { ctx.globalAlpha = hfa; ctx.fillStyle = hm === 'contrast' ? '#ffffff' : '#0b0b0c'; ctx.fill(); }
+        ctx.globalAlpha = dragging ? 1 : hra; ctx.strokeStyle = c; ctx.lineWidth = hm === 'contrast' ? 2.5 : hm === 'normal' ? 2 : 1; ctx.stroke();
+        if (hm !== 'normal') { ctx.globalAlpha = 1; ctx.fillStyle = hm === 'contrast' ? '#0b0b0c' : c; ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill(); }
+        ctx.globalAlpha = 1;
+      }
+      g.px.forEach(function (p, pi) { if (p.y == null && k !== 'vline') return; knob(p.x, p.y == null ? H / 2 : p.y, col, pi); });
+      if (g.pos) { var Q = g.pos, xr = Math.max(Q.x0, Q.x1); [[xr, Q.yt], [xr, Q.ys], [xr, Q.ye]].forEach(function (p) { knob(p[0], p[1], '#e5e7eb', -9); }); }
     }
     d._g = g;
   };

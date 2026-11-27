@@ -206,7 +206,12 @@
     if ('magnet' in s) o.magnet = s.magnet === 2 ? 2 : s.magnet ? 1 : 0;
     if (['cursor', 'dot', 'arrowc'].indexOf(s.cm) >= 0) o.cm = s.cm;
     if (s.tg && typeof s.tg === 'object') { o.tg = {}; ['cur', 'lines', 'fib', 'pat', 'fc', 'shape', 'ann'].forEach(function (g) { if (typeof s.tg[g] === 'string' && /^[a-z0-9]{2,10}$/.test(s.tg[g])) o.tg[g] = s.tg[g]; }); }
-    if (typeof s.emoji === 'string' && s.emoji.length <= 4) o.emoji = s.emoji;
+    if (P.emoOk && P.emoOk(s.emoji)) o.emoji = s.emoji;
+    if (Array.isArray(s.emoR)) o.emoR = s.emoR.filter(function (x) { return P.emoOk && P.emoOk(x); }).slice(0, 24);
+    /* favourite tools: only names of real tools, and where the visitor left the floating bar */
+    if (Array.isArray(s.ftools)) o.ftools = s.ftools.filter(function (x, i, a) { return typeof x === 'string' && (P.TOOLS[x] || /^(cursor|dot|arrowc|eraser)$/.test(x)) && a.indexOf(x) === i; }).slice(0, 24);
+    if (s.fbar && isFinite(s.fbar.x) && isFinite(s.fbar.y)) o.fbar = { x: Math.max(0, Math.min(1, +s.fbar.x)), y: Math.max(0, Math.min(1, +s.fbar.y)) };
+    if (s.hnd && typeof s.hnd === 'object') o.hnd = { mode: ['minimal', 'transparent', 'normal', 'contrast'].indexOf(s.hnd.mode) >= 0 ? s.hnd.mode : 'transparent', tr: isFinite(s.hnd.tr) ? Math.max(0, Math.min(1, +s.hnd.tr)) : 0.9 };
     if (s.saver === true || s.saver === false) o.saver = s.saver;
     if (typeof s.name === 'string') o.name = s.name.slice(0, 40);
     o.look = saneLook(s.look);
@@ -255,6 +260,7 @@
   function upC() { return st.look.up; }
   function dnC() { return st.look.dn; }
   var st = sane(S.get('ek_pro', null));
+  P.handle = st.hnd || { mode: 'transparent', tr: 0.9 };
   var DRAW = S.get('ek_pro_draw', {}); if (!DRAW || typeof DRAW !== 'object' || Array.isArray(DRAW)) DRAW = {};
   var saveT = null, saved = true;
   function save() {
@@ -363,6 +369,7 @@
     } catch (e) { }
   }
   function applyLook(full) {
+    P.handle = st.hnd || { mode: 'transparent', tr: 0.9 };
     de.style.setProperty('--pm-bg', st.look.bg);
     root && root.classList.toggle('pm-light', isLight());
     cells.forEach(function (c) {
@@ -1633,7 +1640,7 @@
   /* ---- the chart's settings, TradingView's four tabs: symbol · scales · appearance · crosshair and mouse */
   function chartSettings(tab) {
     closeMenu();
-    var L = st.look, tabs = [['sym', 'csSym'], ['scale', 'csScale'], ['look', 'csLook'], ['cross', 'csCross']], panes = {};
+    var L = st.look, tabs = [['sym', 'csSym'], ['scale', 'csScale'], ['look', 'csLook'], ['cross', 'csCross'], ['draw', 'csDraw']], panes = {};
     var f = h('<form class="pm-dset pm-cs"><div class="pm-dtabs" role="tablist"></div><div class="pm-dpane"></div>' +
       '<div class="pm-row"><button class="pm-btn pri" type="submit"></button><button class="pm-btn" type="button" data-rst></button><button class="pm-btn" type="button" data-x></button></div></form>');
     var tb = $('.pm-dtabs', f), pane = $('.pm-dpane', f), live = {};
@@ -1718,6 +1725,18 @@
     P4.appendChild(row('csScroll', toggle('scroll'))); P4.appendChild(row('csZoom', toggle('zoom'), T('csZoomH')));
     P4.appendChild(row('csPinch', toggle('pinch'))); P4.appendChild(row('csKinetic', toggle('kinetic')));
     panes.cross = P4;
+    /* --- drawing handles */
+    var P5 = h('<div></div>'), HN = st.hnd = st.hnd || { mode: 'transparent', tr: 0.9 };
+    function hApply() { P.handle = st.hnd; cells.forEach(function (c) { c.drawer.update(); }); save(); }
+    var hmS = h('<select class="pm-in"></select>'); [['minimal', 'hdMin'], ['transparent', 'hdTr'], ['normal', 'hdNorm'], ['contrast', 'hdCon']].forEach(function (o) { var x = new Option(T(o[1]), o[0]); if (HN.mode === o[0]) x.selected = true; hmS.appendChild(x); });
+    var hw = h('<span class="pm-cw"><input type="range" class="pm-rng" min="0" max="100" step="5"><b class="pm-rv"></b></span>'), hi = $('input', hw), ho = $('.pm-rv', hw);
+    hi.value = Math.round(HN.tr * 100); ho.textContent = hi.value + '%'; hi.disabled = HN.mode !== 'transparent';
+    hmS.onchange = function () { HN.mode = hmS.value; hi.disabled = HN.mode !== 'transparent'; hApply(); };
+    hi.oninput = function () { HN.tr = +hi.value / 100; ho.textContent = hi.value + '%'; hApply(); };
+    P5.appendChild(row('hdMode', hmS, T('hdModeH'))); P5.appendChild(row('hdTrans', hw));
+    var mgS = h('<select class="pm-in"></select>'); [[0, 'magnetOff'], [1, 'magnetW'], [2, 'magnetS']].forEach(function (o) { var x = new Option(T(o[1]), o[0]); if ((st.magnet | 0) === o[0]) x.selected = true; mgS.appendChild(x); });
+    mgS.onchange = function () { setMagnet(+mgS.value); }; P5.appendChild(row('hdMag', mgS, T('hdMagH')));
+    panes.draw = P5;
     tab = panes[tab] ? tab : 'sym';
     tabs.forEach(function (t) {
       var b = h('<button type="button" role="tab" class="pm-dtab' + (t[0] === tab ? ' on' : '') + '"></button>'); b.textContent = T(t[1]);
@@ -1727,7 +1746,7 @@
     pane.appendChild(panes[tab]);
     $('[type=submit]', f).textContent = T('ok'); $('[data-rst]', f).textContent = T('stReset'); $('[data-x]', f).textContent = T('csClose');
     $('[data-x]', f).onclick = closeModal;
-    $('[data-rst]', f).onclick = function () { confirmBox(T('stReset'), T('csResetQ'), function () { st.look = Object.assign({}, LOOK0); applyLook(true); chartSettings(tab); }); };
+    $('[data-rst]', f).onclick = function () { confirmBox(T('stReset'), T('csResetQ'), function () { st.look = Object.assign({}, LOOK0); st.hnd = { mode: 'transparent', tr: 0.9 }; P.handle = st.hnd; cells.forEach(function (c) { c.drawer.update(); }); applyLook(true); chartSettings(tab); }); };
     f.onsubmit = function (e) { e.preventDefault(); save(); closeModal(); };
     modal(T('csTitle'), f, { nofocus: true });
   }
@@ -2086,7 +2105,7 @@
   function buildTools() {
     var tools = $('#pm-tools'), th = '';
     TGROUPS.forEach(function (G) {
-      var t = G.emoji ? 'emoji' : grpTool(G), icon = G.emoji ? '<span class="pm-emo">' + esc(st.emoji || EMOJI[0]) + '</span>' : ic(t);
+      var t = G.emoji ? 'emoji' : grpTool(G), icon = G.emoji ? emoBtnHtml(st.emoji || EMOJI[0]) : ic(t);
       th += '<div class="pm-tg" data-g="' + G.id + '"><button type="button" class="pm-tool" data-tool="' + t + '" title="' + esc(T(G.emoji ? 't_emoji' : 't_' + t)) + '" aria-label="' + esc(T(G.emoji ? 't_emoji' : 't_' + t)) + '">' + icon + '</button>' +
         '<button type="button" class="pm-tfly" data-fly="' + G.id + '" aria-label="' + esc(T('moreTools')) + '" aria-haspopup="menu"><i></i></button></div>';
     });
@@ -2104,14 +2123,132 @@
     $$('[data-tool]', tools).forEach(function (b) { b.onclick = function () { setTool(b.getAttribute('data-tool')); }; });
     $$('[data-fly]', tools).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); flyout(b, b.getAttribute('data-fly')); }; });
     $$('[data-opt]', tools).forEach(function (b) { b.onclick = function () { toolOpt(b.getAttribute('data-opt'), b); }; });
-    paintTools();
+    paintTools(); favBar();
   }
   function paintTools() {
     var on = curTool || (eraserOn ? 'eraser' : st.cm || 'cursor');
+    $$('#pm-favbar [data-ft]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-ft') === (curTool || (eraserOn ? 'eraser' : null))); });
     $$('#pm-tools [data-tool]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tool') === on); });
     $$('#pm-tools [data-opt="magnet"]').forEach(function (b) { b.classList.toggle('on', !!st.magnet); b.innerHTML = ic(st.magnet === 2 ? 'magnet2' : 'magnet'); b.title = T(st.magnet === 2 ? 'magnetS' : st.magnet ? 'magnetW' : 'magnet'); });
     if (root) { root.classList.toggle('pm-cm-dot', st.cm === 'dot' && !curTool && !eraserOn); root.classList.toggle('pm-cm-arrow', st.cm === 'arrowc' && !curTool && !eraserOn); root.classList.toggle('pm-cm-erase', eraserOn && !curTool); }
   }
+  /* ---- favourite tools: a star in every tool list, and a small bar floating over the chart that holds them.
+     The bar can be dragged anywhere inside the workspace (its place is kept as a fraction of the workspace, so it
+     survives a resize), its buttons can be dragged into another order, and it disappears when the last star is removed. */
+  function favTools() { return st.ftools || []; }
+  function toggleFav(t) {
+    var a = favTools().slice(), k = a.indexOf(t);
+    if (k >= 0) a.splice(k, 1); else { if (a.length >= 24) { toast(T('favFull')); return false; } a.push(t); }
+    st.ftools = a; save(); favBar(); return k < 0;
+  }
+  function favBar() {
+    var old = $('#pm-favbar'); if (old) old.remove();
+    var a = favTools(); if (!a.length || !root) return;
+    var bar = h('<div id="pm-favbar" class="pm-favbar" role="toolbar" aria-label="' + esc(T('favTools')) + '"><i class="pm-fgrip" title="' + esc(T('favMove')) + '"></i></div>');
+    var on = curTool || (eraserOn ? 'eraser' : null), dragT = null;
+    a.forEach(function (t) {
+      var b = h('<button type="button" class="pm-tool pm-ftool' + (t === on ? ' on' : '') + '" draggable="true" data-ft="' + t + '" title="' + esc(T('t_' + t)) + '" aria-label="' + esc(T('t_' + t)) + '">' + ic(t) + '</button>');
+      b.onclick = function () { setTool(curTool === t ? null : t); };
+      b.oncontextmenu = function (e) { e.preventDefault(); e.stopPropagation(); menu(b, [{ label: T('favDel'), icon: 'star', act: function () { toggleFav(t); } }]); };
+      b.ondragstart = function (e) { dragT = t; b.classList.add('drag'); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', t); } catch (x) { } };
+      b.ondragend = function () { dragT = null; b.classList.remove('drag'); };
+      b.ondragover = function (e) { if (dragT && dragT !== t) e.preventDefault(); };
+      b.ondrop = function (e) { e.preventDefault(); if (!dragT || dragT === t) return; var l = favTools().slice(), from = l.indexOf(dragT), to = l.indexOf(t); if (from < 0 || to < 0) return; l.splice(from, 1); l.splice(to, 0, dragT); st.ftools = l; save(); favBar(); };
+      bar.appendChild(b);
+    });
+    root.appendChild(bar);
+    function place() {
+      var R = root.getBoundingClientRect(), w = bar.offsetWidth, hh = bar.offsetHeight, fb = st.fbar || { x: 0.05, y: 0.14 };            /* first time: under the legend, clear of the selection bar */
+      bar.style.left = Math.round(Math.max(st.fbar ? 4 : 52, Math.min(R.width - w - 4, fb.x * (R.width - w)))) + 'px';
+      bar.style.top = Math.round(Math.max(4, Math.min(R.height - hh - 4, fb.y * (R.height - hh)))) + 'px';
+    }
+    place();
+    var grip = $('.pm-fgrip', bar);
+    grip.onpointerdown = function (e) {
+      e.preventDefault(); var R = root.getBoundingClientRect(), ox = e.clientX - bar.offsetLeft, oy = e.clientY - bar.offsetTop; grip.setPointerCapture && grip.setPointerCapture(e.pointerId);
+      grip.onpointermove = function (m) {
+        var w = bar.offsetWidth, hh = bar.offsetHeight, x = Math.max(4, Math.min(R.width - w - 4, m.clientX - ox)), y = Math.max(4, Math.min(R.height - hh - 4, m.clientY - oy));
+        bar.style.left = x + 'px'; bar.style.top = y + 'px'; st.fbar = { x: R.width > w ? x / (R.width - w) : 0, y: R.height > hh ? y / (R.height - hh) : 0 };
+      };
+      grip.onpointerup = grip.onpointercancel = function () { grip.onpointermove = null; save(); };
+    };
+  }
+  addEventListener('resize', function () { if ($('#pm-favbar')) favBar(); });
+
+  /* ---- the emoji / sticker / icon picker (emoji.js holds the three sets) */
+  var emoTab = 'emo', emoCat = 'mk';
+  function emoHtml(x) {
+    if (x && x.slice(0, 4) === 'stk:' && P.STK[x.slice(4)]) { var K = P.STK[x.slice(4)]; return '<span class="pm-stk" style="background:' + K[1] + ';color:' + K[2] + '">' + esc(K[0]) + '</span>'; }
+    if (x && x.slice(0, 4) === 'ico:' && P.ICO[x.slice(4)]) return '<svg class="pm-icoi" viewBox="0 0 24 24" aria-hidden="true"><path d="' + P.ICO[x.slice(4)] + '"/></svg>';
+    return '<span class="pm-emo">' + esc(x || EMOJI[0]) + '</span>';
+  }
+  function emoBtnHtml(x) { return x && x.slice(0, 4) === 'stk:' ? '<span class="pm-emo">🏷️</span>' : emoHtml(x); }
+  function pickEmo(x) {
+    if (!P.emoOk(x)) return;
+    st.emoji = x; st.emoR = [x].concat((st.emoR || []).filter(function (y) { return y !== x; })).slice(0, 24); save();
+    var tb = $('#pm-tools [data-g="emo"] [data-tool]'); if (tb) tb.innerHTML = emoBtnHtml(x);
+    closeFly(); setTool('emoji');
+  }
+  function emoPicker(f) {
+    var top = h('<div class="pm-ecats" role="tablist"></div>'), body = h('<div class="pm-ebody"></div>'), foot = h('<div class="pm-etabs" role="tablist"></div>');
+    f.appendChild(top); f.appendChild(body); f.appendChild(foot);
+    function cell(x, wide) { var b = h('<button type="button" class="pm-emob' + (wide ? ' wide' : '') + '">' + emoHtml(x) + '</button>'); b.onclick = function (e) { e.stopPropagation(); pickEmo(x); }; return b; }
+    function title(t) { var hd = h('<div class="pm-fh"></div>'); hd.textContent = t; body.appendChild(hd); }
+    function grid(list, wide) { var g = h('<div class="pm-emog' + (wide ? ' wide' : '') + '"></div>'); list.forEach(function (x) { g.appendChild(cell(x, wide)); }); body.appendChild(g); }
+    function paint() {
+      top.innerHTML = ''; body.innerHTML = ''; body.scrollTop = 0;
+      $$('button', foot).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-t') === emoTab); });
+      if (emoTab === 'emo') {
+        var cats = P.emoCats(), rec = (st.emoR || []).filter(function (x) { return x.slice(0, 4) !== 'stk:' && x.slice(0, 4) !== 'ico:'; });
+        if (emoCat === 'rec' && !rec.length) emoCat = 'mk';
+        [{ id: 'rec', tab: '🕘' }].concat(cats).forEach(function (c) {
+          if (c.id === 'rec' && !rec.length) return;
+          var b = h('<button type="button" role="tab" class="pm-ecat' + (c.id === emoCat ? ' on' : '') + '" title="' + esc(T('ec_' + c.id)) + '" aria-label="' + esc(T('ec_' + c.id)) + '"></button>'); b.textContent = c.tab;
+          b.onclick = function (e) { e.stopPropagation(); emoCat = c.id; paint(); }; top.appendChild(b);
+        });
+        var cur = cats.filter(function (c) { return c.id === emoCat; })[0];
+        title(T('ec_' + emoCat)); grid(emoCat === 'rec' ? rec : cur ? cur.list : []);
+      } else if (emoTab === 'stk') {
+        top.style.display = 'none';
+        P.STK_GROUPS.forEach(function (gr) { title(T('sg_' + gr)); grid(Object.keys(P.STK).filter(function (id) { return P.STK[id][3] === gr; }).map(function (id) { return 'stk:' + id; }), true); });
+      } else {
+        top.style.display = 'none'; title(T('emoIcons')); grid(Object.keys(P.ICO).map(function (id) { return 'ico:' + id; }));
+        var nt = h('<div class="pm-enote"></div>'); nt.textContent = T('emoIcoNote'); body.appendChild(nt);
+      }
+      if (emoTab === 'emo') top.style.display = '';
+    }
+    [['emo', 'emoEmojis'], ['stk', 'emoStickers'], ['ico', 'emoIcons']].forEach(function (t) {
+      var b = h('<button type="button" role="tab" data-t="' + t[0] + '"></button>'); b.textContent = T(t[1]);
+      b.onclick = function (e) { e.stopPropagation(); emoTab = t[0]; paint(); }; foot.appendChild(b);
+    });
+    paint();
+  }
+
+  /* ---- the command palette (Ctrl+K / Cmd+K): every tool and the main actions, found by typing */
+  function palette() {
+    closeMenu(); closeFly();
+    var rows = [];
+    TGROUPS.forEach(function (G) { (G.rows || []).forEach(function (r) { r.forEach(function (t) { rows.push({ n: T('t_' + t), g: T('favTools'), i: ic(t), act: function () { setTool(t); } }); }); }); });
+    [['csTitle', 'gear', function () { chartSettings('sym'); }], ['indicators', 'fx', function () { indDialog(); }], ['symbol', 'layers', function () { symbolSearch(''); }],
+      ['ctxFit', 'fit', function () { var a = active(); if (a) a.chart.timeScale().fitContent(); }], ['fullscreen', 'expand', function () { fullscreen(); }],
+      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
+    [['dark', 'thDark'], ['navy', 'thNavy'], ['midnight', 'thMid'], ['paper', 'thPaper'], ['light', 'thLight']].forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
+    st.fav.forEach(function (tf) { rows.push({ n: tf, g: T('palTf'), i: ic('cal'), act: function () { applyTF(tf); } }); });
+    var f = h('<div class="pm-pal"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-pall" role="listbox"></div></div>'), inp = $('input', f), list = $('.pm-pall', f), sel = 0, shown = [];
+    inp.placeholder = T('palHint');
+    function paint() {
+      var q = inp.value.trim().toLowerCase(); shown = rows.filter(function (r) { return !q || r.n.toLowerCase().indexOf(q) >= 0; }).slice(0, 60); sel = Math.min(sel, Math.max(0, shown.length - 1)); list.innerHTML = '';
+      shown.forEach(function (r, k) { var b = h('<button type="button" role="option" class="pm-palr' + (k === sel ? ' on' : '') + '">' + r.i + '<span></span><small></small></button>'); $('span', b).textContent = r.n; $('small', b).textContent = r.g; b.onclick = function () { closeModal(); r.act(); }; list.appendChild(b); });
+      if (!shown.length) { var e = h('<div class="pm-enote"></div>'); e.textContent = T('palNone'); list.appendChild(e); }
+    }
+    inp.oninput = function () { sel = 0; paint(); };
+    inp.onkeydown = function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!shown.length) return; sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length; paint(); var o = $('.pm-palr.on', list); if (o && o.scrollIntoView) o.scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (shown[sel]) { var r = shown[sel]; closeModal(); r.act(); } }
+    };
+    paint(); modal(T('palTitle'), f); setTimeout(function () { inp.focus(); }, 30);
+  }
+
   /* the group's list, TradingView style: headings, an icon and a name per tool */
   var openFly = null;
   function closeFly() { if (openFly) { openFly.remove(); openFly = null; } }
@@ -2119,20 +2256,24 @@
     if (openFly && openFly._g === gid) { closeFly(); return; }
     closeFly(); closeMenu();
     var f = h('<div class="pm-fly" role="menu" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + TAG() + '"></div>'); f._g = gid;
-    function item(key, label, icon, onA, act) {
+    function item(key, label, icon, onA, act, favable) {
       var b = h('<button type="button" role="menuitem" class="pm-fi' + (onA ? ' on' : '') + '">' + icon + '<span></span></button>'); $('span', b).textContent = label;
       b.onclick = function (e) { e.stopPropagation(); closeFly(); act(); }; f.appendChild(b);
+      if (favable) {                                       /* the star: one click keeps the tool on the favourites bar */
+        var isF = favTools().indexOf(key) >= 0, sb = h('<i class="pm-star' + (isF ? ' on' : '') + '" role="button" tabindex="0" aria-pressed="' + isF + '" title="' + esc(T(isF ? 'favDel' : 'favAdd')) + '">' + ic('star') + '</i>');
+        sb.onclick = function (e) { e.stopPropagation(); var on = toggleFav(key); sb.classList.toggle('on', on); sb.setAttribute('aria-pressed', on); sb.title = T(on ? 'favDel' : 'favAdd'); sb.classList.remove('pop'); void sb.offsetWidth; sb.classList.add('pop'); };
+        sb.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sb.onclick(e); } };
+        b.appendChild(sb);
+      }
     }
     function head(k) { var hd = h('<div class="pm-fh"></div>'); hd.textContent = T(k); f.appendChild(hd); }
     var G = TGROUPS.filter(function (x) { return x.id === gid; })[0];
     if (G && G.emoji) {
-      head('t_emoji'); var gridE = h('<div class="pm-emog"></div>');
-      EMOJI.forEach(function (em) { var b = h('<button type="button" class="pm-emob"></button>'); b.textContent = em; b.onclick = function (e) { e.stopPropagation(); closeFly(); st.emoji = em; save(); var tb = $('#pm-tools [data-g="emo"] [data-tool]'); if (tb) tb.innerHTML = '<span class="pm-emo">' + esc(em) + '</span>'; setTool('emoji'); }; gridE.appendChild(b); });
-      f.appendChild(gridE);
+      f.classList.add('pm-fly-emo'); emoPicker(f);
     } else if (G) {
       G.rows.forEach(function (row, i) {
         if (G.heads && G.heads[i]) head(G.heads[i]);
-        row.forEach(function (t) { item(t, T('t_' + t), ic(t), t === (curTool || (eraserOn ? 'eraser' : st.cm || 'cursor')), function () { st.tg = st.tg || {}; st.tg[G.id] = t; save(); var tb = $('#pm-tools [data-g="' + G.id + '"] [data-tool]'); if (tb) { tb.setAttribute('data-tool', t); tb.innerHTML = ic(t); tb.title = T('t_' + t); tb.setAttribute('aria-label', T('t_' + t)); } setTool(t); }); });
+        row.forEach(function (t) { item(t, T('t_' + t), ic(t), t === (curTool || (eraserOn ? 'eraser' : st.cm || 'cursor')), function () { st.tg = st.tg || {}; st.tg[G.id] = t; save(); var tb = $('#pm-tools [data-g="' + G.id + '"] [data-tool]'); if (tb) { tb.setAttribute('data-tool', t); tb.innerHTML = ic(t); tb.title = T('t_' + t); tb.setAttribute('aria-label', T('t_' + t)); } setTool(t); }, true); });
       });
     } else if (gid === 'magnet') {
       item('m0', T('magnetOff'), ic('magnet'), !st.magnet, function () { setMagnet(0); });
@@ -2209,7 +2350,7 @@
     var tx = null, fs = null, tcol = null;
     if (P.TEXTY[k] || k === 'emoji') {
       var P2 = h('<div></div>');
-      if (k === 'emoji') { tx = h('<select class="pm-in"></select>'); EMOJI.forEach(function (em) { var o = h('<option></option>'); o.value = em; o.textContent = em; if (s.x === em) o.selected = true; tx.appendChild(o); }); P2.appendChild(row('t_emoji', tx)); }
+      if (k === 'emoji' && /^(stk|ico):/.test(s.x || '')) { tx = null; } else if (k === 'emoji') { tx = h('<select class="pm-in"></select>'); [s.x].concat(st.emoR || [], EMOJI).filter(function (x, i2, a2) { return x && !/^(stk|ico):/.test(x) && a2.indexOf(x) === i2; }).forEach(function (em) { var o = h('<option></option>'); o.value = em; o.textContent = em; if (s.x === em) o.selected = true; tx.appendChild(o); }); P2.appendChild(row('t_emoji', tx)); }
       else { tx = h('<textarea class="pm-in" rows="3" maxlength="120"></textarea>'); tx.value = s.x || ''; P2.appendChild(row('stTextL', tx)); tcol = h('<input type="color" class="pm-in">'); tcol.value = /^#[0-9a-f]{6}$/i.test(s.tc || '') ? s.tc : (k === 'text' ? (s.c || '#f7931a') : '#0b0b0c'); if (k !== 'text') P2.appendChild(row('stTextC', tcol)); else tcol = null; }
       fs = h('<select class="pm-in"></select>'); [10, 11, 12, 14, 16, 20, 24, 28, 32, 40].forEach(function (n) { var o = h('<option></option>'); o.value = n; o.textContent = n; if ((s.fs || (k === 'emoji' ? 26 : k === 'text' ? 14 : 11)) === n) o.selected = true; fs.appendChild(o); });
       if (k === 'emoji' && [10, 11, 12, 14, 16, 20, 24, 28, 32, 40].indexOf(s.fs || 26) < 0) { var o26 = h('<option selected></option>'); o26.value = s.fs || 26; o26.textContent = s.fs || 26; fs.appendChild(o26); }
@@ -2244,7 +2385,7 @@
       if (exl) ns.l = exl.checked; if (exr) ns.r = exr.checked;
       if (lvIn) { var lv = lvIn.value.split(/[,\s،]+/).filter(Boolean).map(Number); if (!lv.length || lv.length > 24 || lv.some(function (v) { return !isFinite(v) || v < -10 || v > 100; })) { toast(T('stBadLv')); return; } ns.lv = lv; }
       if (dv) ns.dv = Math.max(0.5, Math.min(5, +dv.value || 2)); if (rows) ns.rows = Math.max(6, Math.min(80, Math.round(+rows.value || 24)));
-      if (tx) ns.x = String(tx.value).slice(0, 120); if (fs) ns.fs = Math.max(8, Math.min(48, +fs.value || 14)); if (tcol) ns.tc = tcol.value;
+      if (tx) ns.x = String(tx.value).slice(0, 120); if (k === 'emoji' && !P.emoOk(ns.x)) ns.x = '⭐'; if (fs) ns.fs = Math.max(8, Math.min(48, +fs.value || 14)); if (tcol) ns.tc = tcol.value;
       var hv = TFCATS.filter(function (c) { return !vis[c[0]].checked; }).map(function (c) { return c[0]; }); if (hv.length) ns.hv = hv;
       npts = dd.pts.map(function (p, i) {
         if (!cin[i]) return p;
@@ -2313,6 +2454,7 @@
     if ((e.key === 'Delete' || e.key === 'Backspace') && a.drawer.sel) { e.preventDefault(); removeDrawing(a, a.drawer.sel); return; }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) doRedo(); else doUndo(); return; }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); doRedo(); return; }
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!openModal) palette(); return; }
     if (e.altKey && !e.ctrlKey) { var map = { t: 'trend', h: 'hline', v: 'vline', f: 'fib', r: 'rect' }, k = map[e.key.toLowerCase()]; if (k) { e.preventDefault(); setTool(k); return; } }
     if (P.replayKey && P.replayKey(a, e)) return;
     if (!e.ctrlKey && !e.metaKey && !e.altKey && /^[a-zA-Z]$/.test(e.key) && !openModal) { e.preventDefault(); symbolSearch(e.key.toUpperCase()); }
