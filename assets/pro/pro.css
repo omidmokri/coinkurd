@@ -710,6 +710,9 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-odsum{font-size:11.5px;color:var(--mute)}
 .pm-odtg{display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
 .pm-odt td.up{color:#34d399}.pm-odt td.dn{color:#ff5a4d}
+/* planner tables: one line per header and per number; a table wider than its column scrolls inside its own box, nothing is cut */
+.pm-odt th,.pm-odt td{white-space:nowrap}.pm-odt th[title]{cursor:help;text-decoration:underline dotted;text-underline-offset:3px}
+.pm-mbox.wide:has(.pm-odm){width:min(960px,100%)}
 .pm-odact{flex-wrap:wrap;gap:6px}
 .pm-odal{display:flex;flex-direction:column;gap:4px}
 .pm-odalr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 2px;border-bottom:1px dashed rgba(255,255,255,.07);font-size:12.5px}

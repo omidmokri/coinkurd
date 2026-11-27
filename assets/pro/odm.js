@@ -364,7 +364,7 @@
     function card(o, a, v, cls, tip) { var x = h('<div class="pm-cor' + (cls ? ' ' + cls : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', x).textContent = a; $('b', x).textContent = v; if (tip) x.title = tip; o.appendChild(x); }
     function table(head, rows) {
       var w = h('<div class="pm-tw"><table class="pm-tbl pm-odt"><thead><tr></tr></thead><tbody></tbody></table></div>');
-      head.forEach(function (k) { var th = document.createElement('th'); th.textContent = k; $('tr', w).appendChild(th); });
+      head.forEach(function (k) { var th = document.createElement('th'); if (Array.isArray(k)) { th.textContent = k[0]; th.title = k[1]; } else th.textContent = k; $('tr', w).appendChild(th); });
       rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, j) { var td = document.createElement('td'); if (c && typeof c === 'object') { td.textContent = c.t; if (c.c) td.className = c.c; } else td.textContent = c; if (j) { td.className = (td.className ? td.className + ' ' : '') + 'pm-num'; td.dir = 'ltr'; } tr.appendChild(td); }); $('tbody', w).appendChild(tr); });
       return w;
     }
@@ -395,7 +395,8 @@
       var inr = r.exits.filter(function (x) { return x.inRange; }).map(function (x) { return 'TP' + x.n; }); if (inr.length) warn(o, T('odW_inRange', { l: inr.join(', ') }));
       var at = num(st.at); if (at > 0) { var z = O.pnlAt(r, at, num(st.feePct)); if (z) card(o, T('odAtRes', { p: px(at) }), sg(z.pnl) + '  ' + sg(z.r, 2) + 'R  ' + sg(z.pct, 2) + '%', z.pnl > 0 ? 'up' : z.pnl < 0 ? 'dn' : ''); }
       h4(OUT, 'odHFills');
-      OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('rcQty'), T('odAvgAfter'), T('odLossIf')], r.fills.map(function (x) { return ['E' + x.n, px(x.p), f(x.q, 2) + '%', f(x.qty, 6), px(x.avg), { t: '−' + f(x.loss), c: 'dn' }]; })));
+      OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('rcQty'), [T('odAvgS'), T('odAvgAfter')], [T('odLossS'), T('odLossIf')]], r.fills.map(function (x) { return ['E' + x.n, px(x.p), f(x.q, 2) + '%', f(x.qty, 6), px(x.avg), { t: '−' + f(x.loss), c: 'dn' }]; })));
+      var fn = h('<p class="pm-odhint pm-odfn"></p>'); fn.textContent = T('odFillNote'); OUT.appendChild(fn);
       if (r.exits.length) { h4(OUT, 'odHExits'); OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('odProfit'), 'R'], r.exits.map(function (x) { return ['TP' + x.n, px(x.p), f(x.q, 2) + '%', { t: sg(x.profit), c: x.profit > 0 ? 'up' : 'dn' }, f(x.r, 2)]; }))); }
       if (r.rest > 0) {
         var tl = r.trail ? T('odRestTrail', { p: f(r.rest, 2), d: r.trail.mode === 'atr' ? f(+st.trail.v, 2) + '×ATR = ' + px(r.trail.dist) : f(r.trail.v, 2) + '%', a: r.trail.act != null ? px(r.trail.act) : T('odFromStart') }) : T('odRestOpen', { p: f(r.rest, 2) });

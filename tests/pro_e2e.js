@@ -1379,6 +1379,41 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await ctx.close();
   }
 
+  /* ---------- ODM result tables: one line per header and per number in every language, nothing cut, at desktop, tablet and phone widths */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'odt') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [900, 800, 'ar'], [390, 800, 'ckb'], [390, 800, 'fa']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm tables ${lang} ${vw}`, e0 = errors.length;
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const m = await page.evaluate(() => {
+      const one = (el) => { const r = document.createRange(); r.selectNodeContents(el); const ys = new Set([...r.getClientRects()].filter(x => x.width > 0).map(x => Math.round(x.top))); return ys.size <= 1; };
+      const T = PRO.app.T, box = document.querySelector('.pm-mbox'), body = document.querySelector('.pm-mbody');
+      const tabs = [...document.querySelectorAll('.pm-odout .pm-odt')].map(t => {
+        const w = t.parentElement, ths = [...t.querySelectorAll('th')], tds = [...t.querySelectorAll('td')];
+        return { heads: ths.map(x => x.textContent), multi: ths.concat(tds).filter(x => !one(x)).map(x => x.textContent),
+          cut: tds.filter(x => x.scrollWidth > x.clientWidth + 1).map(x => x.textContent),
+          fits: t.scrollWidth <= w.clientWidth + 1, scrolls: getComputedStyle(w).overflowX === 'auto' };
+      });
+      const e = document.querySelector('.pm-odout .pm-odt'), ths = e ? [...e.querySelectorAll('th')] : [];
+      const loss = e ? [...e.querySelectorAll('tbody tr')].map(r => +r.lastElementChild.textContent.replace(/[−,\s]/g, '')) : [];
+      const card = (() => { const c = [...document.querySelectorAll('.pm-odout .pm-cor')].find(x => x.querySelector('small').textContent === T('rcMaxLoss')); return c ? +c.querySelector('b').textContent.replace(/[−,\s]/g, '') : null; })();
+      return { tabs, tip: ths.length ? [ths[4].title, ths[5].title] : [], want: [T('odAvgAfter'), T('odLossIf')], note: (document.querySelector('.pm-odfn') || {}).textContent || '',
+        loss, card, fits: box.getBoundingClientRect().right <= innerWidth + 1 && box.getBoundingClientRect().left >= -1 && body.scrollWidth - body.clientWidth <= 1, w: Math.round(box.getBoundingClientRect().width) };
+    });
+    ok(`[${tag}] every header and every number in the planner's tables stays on one line`, m.tabs.length >= 2 && m.tabs.every(t => t.multi.length === 0), JSON.stringify(m.tabs.map(t => t.multi)));
+    ok(`[${tag}] no number is cut off in any table cell`, m.tabs.every(t => t.cut.length === 0), JSON.stringify(m.tabs.map(t => t.cut)));
+    ok(`[${tag}] each table fits its column, or scrolls inside its own box (never clipped)`, m.tabs.every(t => t.fits || t.scrolls), JSON.stringify(m.tabs.map(t => [t.fits, t.scrolls])));
+    if (vw >= 900) ok(`[${tag}] on a wide screen the entries and exits tables fit with no scrolling`, m.tabs.slice(0, 2).every(t => t.fits), JSON.stringify({ w: m.w, fits: m.tabs.map(t => t.fits) }));
+    ok(`[${tag}] the short headers keep their full wording as a tooltip, explained under the table`, m.tip[0] === m.want[0] && m.tip[1] === m.want[1] && m.note.length > 30, JSON.stringify({ tip: m.tip, note: m.note }));
+    ok(`[${tag}] the loss at the stop grows step by step and its last row equals the loss card (risk)`, m.loss.length >= 2 && m.loss.every((v, i) => i === 0 || v > m.loss[i - 1]) && Math.abs(m.loss[m.loss.length - 1] - m.card) < 0.011, JSON.stringify({ loss: m.loss, card: m.card }));
+    ok(`[${tag}] the planner window fits the screen with no sideways scroll`, m.fits, JSON.stringify({ w: m.w }));
+    await page.evaluate(() => { const t = document.querySelector('.pm-odout .pm-odt'); if (t) t.scrollIntoView({ block: 'start' }); }); await page.waitForTimeout(200);
+    await shot(page, `84b_odm_table_${lang}_${vw}`);
+    ok(`[${tag}] no JS errors in the planner tables checks`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
   /* ---------- Smart alerts: several conditions joined with AND / OR / NOT, checked on the chart's closed bars */
   if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'sa') for (const [vw, vh, lang] of [[1280, 860, 'en'], [390, 800, 'fa']]) {
     const { page, ctx } = await newPage(vw, vh, lang);
