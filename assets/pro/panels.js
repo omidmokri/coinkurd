@@ -390,7 +390,7 @@
   P.alertLevels = levelsAt;           /* exposed for the tests */
   function condText(a) {
     if (a.k === 'price') return PCT[a.c] ? T('c_' + a.c) + ' ' + a.v + '% (' + targets(a).map(function (v) { return fmtP(a.sym, v); }).join(' / ') + ')' : T('c_' + a.c) + ' ' + fmtP(a.sym, a.v);
-    if (a.k === 'multi') return T('multiAl') + ': ' + a.expr + ' · ' + A.tfLabel(a.tf);
+    if (a.k === 'multi') return (a.spec && P.saText ? P.saText(a.spec) : T('multiAl') + ': ' + a.expr) + ' · ' + A.tfLabel(a.tf);
     if (a.k === 'draw') return T('dc_' + a.c) + ' · ' + T('t_' + a.dk) + (drawingOf(a) ? '' : ' (' + T('lineGone') + ')');
     var x = a.ind, nm = T('ai_' + x.id) + (x.len ? ' (' + x.len + (x.len2 ? '/' + x.len2 : '') + ')' : '');
     return nm + ' · ' + T('ac_' + x.id + '_' + a.c, { v: a.v }) + ' · ' + A.tfLabel(a.tf);
@@ -522,13 +522,14 @@
     A.modal(T('multiAl') + ' · ' + P.pair(sym), f, { nofocus: true });
   };
   P.want = want;
+  P.addAlert = function (a) { addAlert(a); };      /* for the smart alert builder (salert.js) */
   P.alertDialog = function (cell, preset) {
     preset = preset || {};
     var sym = cell.cfg.sym, last = cell.bars.length ? cell.bars[cell.bars.length - 1].c : (P.tickers.d[sym] || {}).c, dd = preset.draw || null;
     var kind = preset.kind || (dd ? 'draw' : 'price');
     var f = h('<form class="pm-af">' +
       '<div class="pm-afsym"><img src="' + esc(P.logo(sym)) + '" alt="" width="22" height="22"><b>' + esc(P.pair(sym)) + '</b>' + (last ? '<span class="pm-num">' + fmtP(sym, last) + '</span>' : '') + '</div>' +
-      '<div class="pm-seg" role="tablist"><button type="button" data-k="price"></button><button type="button" data-k="ind"></button>' + (dd ? '<button type="button" data-k="draw"></button>' : '') + '</div>' +
+      '<div class="pm-seg" role="tablist"><button type="button" data-k="price"></button><button type="button" data-k="ind"></button>' + (dd ? '<button type="button" data-k="draw"></button>' : '') + (P.smartAlert ? '<button type="button" data-k="smart"></button>' : '') + '</div>' +
       '<div class="pm-afp"><label class="pm-field"><span data-t="cond"></span><select class="pm-in" name="c"></select></label><label class="pm-field"><span class="pm-vl"></span><input class="pm-in" name="v" type="number" step="any" inputmode="decimal" required></label><p class="pm-note pm-tgt"></p></div>' +
       '<div class="pm-afd" hidden><label class="pm-field"><span data-t="cond"></span><select class="pm-in" name="dc"></select></label><p class="pm-note pm-dnow"></p><p class="pm-note" data-t="drawNote"></p></div>' +
       '<div class="pm-afi" hidden><label class="pm-field"><span data-t="indicator"></span><select class="pm-in" name="ind"></select></label><label class="pm-field pm-len"><span data-t="length"></span><input class="pm-in" name="len" type="number" min="2" max="400" value="14"></label>' +
@@ -577,6 +578,8 @@
       $('.pm-afp', f).hidden = k !== 'price'; $('.pm-afi', f).hidden = k !== 'ind'; $('.pm-afd', f).hidden = k !== 'draw'; V.required = k === 'price'; priceUI();
     }
     $$('.pm-seg button', f).forEach(function (b) { b.onclick = function () { setKind(b.getAttribute('data-k')); }; }); setKind(kind);
+    var sb = $('[data-k="smart"]', f);       /* several conditions joined with AND / OR / NOT: its own builder */
+    if (sb) { sb.textContent = T('saTab'); sb.onclick = function () { A.closeModal(); P.smartAlert(cell); }; }
     f.onsubmit = function (e) {
       e.preventDefault();
       var a = { id: P.uid(), sym: sym, k: kind, mode: M.value, on: true, at: Date.now(), msg: $('[name=msg]', f).value.trim().slice(0, 80) };
@@ -666,7 +669,7 @@
       '<label class="pm-field pm-nal"><span>📰 ' + esc(T('newsAl')) + '</span><select class="pm-in" name="na">' + ['off', 'watch', 'imp', 'all'].map(function (k) { return '<option value="' + k + '"' + (NA.m === k ? ' selected' : '') + '>' + esc(T('na_' + k)) + '</option>'; }).join('') + '</select><small>' + esc(T('newsAlNote')) + '</small></label>' +
       '<div class="pm-al"></div><h4 class="pm-h4">' + esc(T('alertLog')) + '</h4><div class="pm-alog"></div><p class="pm-note">' + esc(T('alertsHow')) + '</p>';
     $('[data-a="new"]', box).onclick = function () { P.alertDialog(A.active()); };
-    var mb = h('<button type="button" class="pm-btn wide"></button>'); mb.textContent = '\u2795 ' + T('multiAl'); mb.onclick = function () { P.multiAlert(A.active()); }; var nb0 = $('[data-a="new"]', box); nb0.parentNode.insertBefore(mb, nb0.nextSibling);
+    var mb = h('<button type="button" class="pm-btn wide"></button>'); mb.textContent = '\u2795 ' + T(P.smartAlert ? 'saTab' : 'multiAl'); mb.onclick = function () { (P.smartAlert || P.multiAlert)(A.active()); }; var nb0 = $('[data-a="new"]', box); nb0.parentNode.insertBefore(mb, nb0.nextSibling);
     $('[name="na"]', box).onchange = function () {
       NA = { m: this.value, since: Date.now() }; S.set('ek_pro_newsal', NA);
       if (NA.m !== 'off') { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); newsPoll(); }

@@ -256,7 +256,9 @@
     try {
       text = String(text || '').trim(); if (!text || text.length > 600 || /[\n\r]/.test(text)) throw E('write the condition on one line', 1);
       var tree = parse('plot(' + text + ')'); if (tree.length !== 1) throw E('one condition only', 1); run(tree, sample(), null);
-      return { ok: true, test: function (bars) { try { var o = run(tree, bars, null).out.p0, n = o.length; return [o[n - 2] > 0 ? 1 : 0, o[n - 1] > 0 ? 1 : 0]; } catch (e) { return [0, 0]; } } };
+      return { ok: true, test: function (bars) { try { var o = run(tree, bars, null).out.p0, n = o.length; return [o[n - 2] > 0 ? 1 : 0, o[n - 1] > 0 ? 1 : 0]; } catch (e) { return [0, 0]; } },
+        /* the raw value on every bar (1/0 for a condition, the number itself for a plain value, NaN while it warms up) */
+        series: function (bars) { try { return run(tree, bars, null).out.p0.slice(); } catch (e) { return []; } } };
     } catch (e) { return { ok: false, err: String(e && e.message || e).slice(0, 160) }; }
   }
   P.script = {
