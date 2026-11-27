@@ -179,7 +179,10 @@
   function xAt(cell, ts, tms) {
     var D = cell.disp && cell.disp.length ? cell.disp : cell.bars, sec = cell.tfSec(); if (!D || !D.length || !sec) return null;
     var lg = P.t2l ? P.t2l(D, tms / 1000, sec) : D.length - 1 + (tms / 1000 - D[D.length - 1].t) / sec;
-    return lg == null || !isFinite(lg) ? null : ts.logicalToCoordinate(lg);
+    if (lg == null || !isFinite(lg)) return null;
+    /* the chart only places whole bar positions (a fraction comes back as 0), so go between the two around it */
+    var i = Math.floor(lg), f = lg - i, x0 = ts.logicalToCoordinate(i); if (x0 == null) return null;
+    if (f < 1e-9) return x0; var x1 = ts.logicalToCoordinate(i + 1); return x1 == null ? null : x0 + f * (x1 - x0);
   }
   P.lqX = function (tms) { return L && L.cell ? xAt(L.cell, L.cell.chart.timeScale(), tms) : null; };   /* for the tests */
   function paint(ctx, W, H, cell) {
