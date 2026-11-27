@@ -104,17 +104,28 @@
     ar: { t: 'اللغة', s: 'ابحث عن لغة…', b: 'العودة إلى لغات الموقع', o: 'لغات الموقع', m: 'لغات أخرى' },
     en: { t: 'Language', s: 'Search a language…', b: 'Back to the site’s own languages', o: 'The site’s languages', m: 'More languages' }
   };
-  function words() { var l = de.getAttribute('lang') || ls.get('ck_lang') || 'en'; return T[l] || T.en; }
+  /* in one of the 46 more languages the panel's own labels come from the site's dictionary for it, word for word as
+     they stand in T.en (scripts/i18n_site.py puts them in the corpus); one with no entry yet stays in English */
+  var PTR = null;
+  function words() {
+    var l = de.getAttribute('lang') || ls.get('ck_lang') || 'en';
+    if (T[l]) return T[l];
+    if (!ON || !PTR) return T.en;
+    var o = {}; for (var k in T.en) { var r = PTR(T.en[k]); o[k] = (r && r !== T.en[k]) ? r : T.en[k]; } return o;
+  }
 
   function style() { if (d.getElementById('ek-i18n-s')) return; var s = d.createElement('style'); s.id = 'ek-i18n-s'; s.textContent = CSS; (d.head || de).appendChild(s); }
 
   /* The site's own languages come first in the panel, Persian and Arabic among them; picking one simply clicks the
      real button the header already has, so nothing about the site's own switching is reimplemented here. */
+  var OWN_NAME = { ckb: 'کوردی', fa: 'فارسی', ar: 'العربية', en: 'English' };
   function siteLangs() {
     var box = d.querySelector(BAR);
     if (!box) return [];
     return [].map.call(box.querySelectorAll('button[data-l]'), function (b) {
-      return { code: b.getAttribute('data-l'), native: (b.textContent || '').trim(), btn: b, on: b.classList.contains('on') };
+      /* each named in its own words, whatever the page translator has done to the header button's text */
+      var c = b.getAttribute('data-l');
+      return { code: c, native: OWN_NAME[c] || (b.textContent || '').trim(), btn: b, on: b.classList.contains('on') };
     }).filter(function (x) { return x.code && x.native; });
   }
 
@@ -177,7 +188,8 @@
     wrap.querySelector('.ekw-sec2').textContent = W.m;
 
     function card(code, native, english, active) {
-      var b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-code', code); b.setAttribute('lang', code);
+      /* translate="no" on the element that carries lang: the page translator stops there, so "English" stays English */
+      var b = d.createElement('button'); b.type = 'button'; b.setAttribute('data-code', code); b.setAttribute('lang', code); b.setAttribute('translate', 'no');
       if (active) b.className = 'on';
       b.innerHTML = '<img class="ekw-flag" alt="" loading="lazy" width="26" height="26">'
         + '<span class="ekw-txt"><span class="n"></span><span class="e"></span></span>';
@@ -194,7 +206,7 @@
     var foot = wrap.querySelector('.ekw-foot');
     /* why Kurdish counts once: Sorani and Kurmanji are two dialects of one language (owner, 2026-11-27) */
     var kl = ON ? CODE : (de.getAttribute('lang') || 'en'), kt = KURD[kl] || KURD.en;
-    if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.textContent = kt; foot.appendChild(kp); }
+    if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.setAttribute('translate', 'no'); kp.textContent = kt; foot.appendChild(kp); }
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     d.body.appendChild(wrap);
     wrap.querySelector('.ekw-search').focus();
@@ -429,6 +441,7 @@
 
     Promise.all(urls.map(function (u) { return fetch(u).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }); })).then(function (all) {
       all.forEach(add);
+      PTR = tr;
       function run() {
         walk(d.body); title(); fixdir(); globe(); de.classList.remove('ek-tr-wait');
         new MutationObserver(function (ms) {

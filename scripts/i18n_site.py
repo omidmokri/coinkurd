@@ -91,6 +91,17 @@ TAG = re.compile(r"<[^>]+>")
 
 
 # --------------------------------------------------------------------------------- the strings the site needs
+def panel_words():
+    """the language panel's own English labels, read from T.en in assets/i18n.js (that script is not in the corpus
+    itself: the rest of it is code and language names)"""
+    try:
+        js = open(os.path.join(ROOT, "assets", "i18n.js"), encoding="utf-8").read()
+    except OSError:
+        return set()
+    m = re.search(r"^\s*en:\s*\{(.*?)\}\s*$", js, re.M)
+    return set(re.findall(r"\w:\s*'([^']+)'", m.group(1))) if m else set()
+
+
 def corpus():
     """(pages, scripts, common, need) — read with i18n_ar's own reader, so both layers see the same strings"""
     pages, scripts = {}, {}
@@ -127,6 +138,7 @@ def corpus():
     from collections import Counter
     cnt = Counter(k for ks in pages.values() for k in ks)
     common = {k for k, c in cnt.items() if c >= max(3, len(pages) * 0.6)}
+    common |= panel_words()          # the language panel opens on every page, so its labels go with the menus
     need = set().union(*pages.values()) if pages else set()
     for v in scripts.values():
         need |= v
@@ -523,7 +535,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "13"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "14"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
