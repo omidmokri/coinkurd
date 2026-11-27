@@ -14,14 +14,14 @@
   function T(o) { var l = lang(); return (o && (o[l] || o.fa || o.en)) || ""; }
 
   var S = {
-    title: { fa: "نیما · پشتیبان انتخاب", ckb: "نیما · پشتگیری Entekhab", en: "Nima · Entekhab assistant" },
+    title: { fa: "ساتوشی ناکاموتو · راهنمای مجازی انتخاب", ckb: "ساتۆشی ناکامۆتۆ · ڕێنمای مەجازیی Entekhab", en: "Satoshi Nakamoto · Entekhab's virtual guide" },
     sub: { fa: "جستجوی هوشمند در کل سایت", ckb: "گەڕانی زیرەک لە هەموو سایتدا", en: "Smart search across the site" },
     fab: { fa: "پشتیبانی", ckb: "پشتگیری", en: "Help" },
     ph: { fa: "سؤالتان را بنویسید…", ckb: "پرسیارەکەت بنووسە…", en: "Ask a question…" },
     hi: {
-      fa: "سلام 👋 من نیمام، پشتیبان انتخاب. هر چیزی دربارهٔ سایت، ابزارها، آکادمی، دانشنامه یا قیمت‌های لحظه‌ای بپرسید — از محتوای خود سایت برایتان پیدا می‌کنم.",
-      ckb: "سڵاو 👋 من نیمام، پشتگیری Entekhab. هەر شتێک دەربارەی سایت، ئامرازەکان، ئەکادیمیا یان نرخی ئێستا بپرسە.",
-      en: "Hi 👋 I'm Nima, the Entekhab assistant. Ask me anything about the site, its tools, the academy, the encyclopedia or live prices — I'll find it in the site's own content."
+      fa: "سلام 👋 من ساتوشی ناکاموتو هستم، راهنمای مجازی انتخاب (یک شخصیت راهنما، نه خود ساتوشی). هر چیزی دربارهٔ سایت، ابزارها، آکادمی، دانشنامه یا قیمت‌های لحظه‌ای بپرسید — از محتوای خود سایت برایتان پیدا می‌کنم.",
+      ckb: "سڵاو 👋 من ساتۆشی ناکامۆتۆم، ڕێنمای مەجازیی Entekhab (کەسایەتییەکی ڕێنما، نەک خودی ساتۆشی). هەر شتێک دەربارەی سایت، ئامرازەکان، ئەکادیمیا یان نرخی ئێستا بپرسە.",
+      en: "Hi 👋 I'm Satoshi Nakamoto, Entekhab's virtual guide (a guide character, not the real Satoshi). Ask me anything about the site, its tools, the academy, the encyclopedia or live prices — I'll find it in the site's own content."
     },
     none: {
       fa: "چیزی که دقیقاً به این بخورد پیدا نکردم. می‌توانید جور دیگری بپرسید، یا مستقیم با پشتیبان حرف بزنید:",
@@ -267,7 +267,7 @@
   function build() {
     fab = document.createElement("button");
     fab.id = "ask-fab"; fab.type = "button"; fab.setAttribute("aria-label", "Entekhab assistant");
-    /* Nima, the masked guide (owner, 2026-11-27: his own picture, the background removed): the assistant's face */
+    /* Satoshi Nakamoto (renamed from Nima, owner 2026-11-27 11:23), the masked guide character (owner, 2026-11-27: his own picture, the background removed): the assistant's face */
     fab.innerHTML = AV + "<span class='ask-lbl'>" + esc(T(S.fab)) + "</span>";
     document.body.appendChild(fab);
 

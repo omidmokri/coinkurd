@@ -19,7 +19,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VER = "28"  # bump to bust caches of chrome.css / chrome.js
+VER = "29"  # bump to bust caches of chrome.css / chrome.js
 LANGS = ("fa", "ckb", "en")
 # Arabic is a layer over the English page (assets/ar.js, scripts/i18n_ar.py). Its «ع» switch shows once the owner
 # turns it on (the file data/ar_on), after the dictionaries are filled and checked.
@@ -485,7 +485,7 @@ def footer(lang="fa"):
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "11"
 NX_VER = "23"
-EARTH_VER = "1"   # assets/space/nx-earth.{js,css}: the homepage's real Earth in the place of the coin (owner, 2026-11-27)
+EARTH_VER = "1"   # assets/space/nx-earth.{js,css}: the homepage's real Earth in the place of the coin. Off since 2026-11-27 11:30: the owner asked for the old home back while he picks a new home concept; the files stay, unused
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides
 # with interface v3 only. DEEP_OFF lists the first path segment of the full-screen apps that keep their own stage; the
@@ -502,16 +502,16 @@ UI2_TAG = ('<script id="ek-ui">(function(){var v=\'3\',g=\'\',m=/[?&]ui=([123])(
            "addEventListener('pagereveal',function(e){var t=e.viewTransition;if(t)['ready','finished'].forEach(function(k){if(t[k]&&t[k].catch)t[k].catch(function(){})})});"
            "c.add('ek-v2');if(n){c.add('ek-v3');if(/^sw:/.test(g))c.add('nx-lite')}"
            f"var dp=n&&!h&&!/^\\/(?:{DEEP_OFF})(?:\\/|$)/.test(location.pathname);if(dp)c.add('ek-deep');"
-           "if(h){c.add('ek-deck');if(n)c.add('ek-earth');addEventListener('DOMContentLoaded',function(){setTimeout(function(){"
-           "if(!window.ekUI2)c.remove('ek-deck');if(n&&!window.ekNX)c.remove('ek-v3');if(!window.nxEarth)c.remove('ek-earth')},80)})}"
+           "if(h){c.add('ek-deck');addEventListener('DOMContentLoaded',function(){setTimeout(function(){"
+           "if(!window.ekUI2)c.remove('ek-deck');if(n&&!window.ekNX)c.remove('ek-v3')},80)})}"
            f"var s='<style>@view-transition{{navigation:auto}}</style><link rel=\"stylesheet\" href=\"/assets/ui2.css?v={UI2_VER}\">';"
            f"if(n)s+='<link rel=\"stylesheet\" href=\"/assets/nx.css?v={NX_VER}\">';"
            f"if(dp)s+='<link rel=\"stylesheet\" href=\"/assets/deep.css?v={DEEP_VER}\">';"
            f"s+='<script src=\"/assets/ui2.js?v={UI2_VER}\" defer><\\/script>';"
-           f"if(n){{if(h)s+='<link rel=\"stylesheet\" href=\"/assets/space/nx-earth.css?v={EARTH_VER}\"><link rel=\"preload\" as=\"image\" href=\"/assets/space/earth-still.webp\" media=\"(min-width:821px)\" fetchpriority=\"high\"><link rel=\"preload\" as=\"image\" href=\"/assets/space/earth-still-sm.webp\" media=\"(max-width:820px)\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
+           f"if(n){{if(h)s+='<link rel=\"preload\" as=\"image\" href=\"/assets/coin-front.webp\" fetchpriority=\"high\">';s+='<script src=\"/assets/nx.js?v={NX_VER}\" defer><\\/script>';"
            f"if(h)s+='<script src=\"/assets/nx-coin.js?v={NX_VER}\" defer><\\/script><script src=\"/assets/nx-chart.js?v={NX_VER}\" defer><\\/script>"
            f"<script src=\"/assets/nx-cosmos.js?v={NX_VER}\" defer><\\/script>"
-           f"<script src=\"/assets/space/nx-earth.js?v={EARTH_VER}\" defer><\\/script><script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
+           f"<script src=\"/assets/nx-home.js?v={NX_VER}\" defer><\\/script>'}}"
            f"if(dp)s+='<script src=\"/assets/deep.js?v={DEEP_VER}\" defer><\\/script>';"
            "document.write(s)}catch(e){}})()</script>")
 HEAD_TAGS = (f'<link rel="stylesheet" href="/assets/chrome.css?v={VER}">'
