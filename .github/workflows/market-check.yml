@@ -38,7 +38,7 @@ jobs:
       - name: Browser check, Phase C/D and data library
         env:
           PW: /tmp/pw/node_modules/playwright
-          ONLY: odm
+          ONLY: odp
         run: node tests/pro_e2e.js /tmp/shots-cd
       - name: Browser check, the whole page (older tour; it already stopped early on main before this branch)
         if: always()
