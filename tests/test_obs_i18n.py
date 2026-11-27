@@ -74,7 +74,7 @@ for path, s in JS.items():
 FAMILIES = {
     "r_": ["12h", "24h", "48h", "3d", "1w", "2w", "1m", "3m", "6m", "1y", "all"],
     "tab_": [m.group(1) for m in re.finditer(r"\{ k: '(\w+)', path:", JS[os.path.join(ROOT, "assets", "obs", "core.js")])],
-    "pal_": ["fire", "viridis", "ice", "mono"],
+    "pal_": ["aurora", "fire", "viridis", "ice", "mono"],
     "m": ["1", "2", "3", "1_d", "2_d", "3_d"],
     "ls_": ["bn_all", "by_all", "bn_top_acc", "bn_top_pos", "gt_all", "gt_top_acc", "gt_top_pos"],
     # stage 3 (chain.js, opt.js): measures, ranges, NUPL bands, the pages' notes, the options views and DVOL ranges

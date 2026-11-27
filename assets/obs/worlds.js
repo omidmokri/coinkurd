@@ -178,7 +178,7 @@
   var stEl = null, stTop = 0, stBot = 0, stAt = -9;
   function stage(C) {
     if (C.t - stAt > .6 || C.t < stAt) {
-      stAt = C.t; if (!stEl || !stEl.isConnected) stEl = d.querySelector('.ob-stage');
+      stAt = C.t; if (!stEl || !stEl.isConnected) stEl = d.querySelector('.ob-stage:not(#ob-stage)');   /* the decorative window, never a chart's own stage */
       if (stEl) { var r = stEl.getBoundingClientRect(), y0 = w.scrollY || 0; stTop = r.top + y0; stBot = r.bottom + y0; } else stTop = stBot = 0;
     }
   }

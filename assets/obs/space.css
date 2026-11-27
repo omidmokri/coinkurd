@@ -166,12 +166,16 @@ html.ek-still .ob-door{display:none}
 }
 @media print{.ob-door{display:none!important}}
 /* the window onto the world: an open strip under the title where the scene (its ground, its astronaut, its craft) is never covered */
-html.ob-space .ob-stage{position:relative;height:clamp(150px,22vh,230px);margin:0 0 .4rem;pointer-events:none}
+/* only the decorative window belongs to the scene. A chart page carries a second .ob-stage — the one holding its own
+   canvas, which liq.js builds as #ob-stage — and that one keeps the size and the hover of an ordinary chart: without
+   this it was squeezed to 194px (its canvas overflowing by 46px over the axis labels) and, worse, pointer-events:none
+   left the heatmap with no hover, no tooltip and no zoom at all. */
+html.ob-space .ob-stage:not(#ob-stage){position:relative;height:clamp(150px,22vh,230px);margin:0 0 .4rem;pointer-events:none}
 html.ob-space .ob-where{position:absolute;bottom:.55rem;inset-inline-start:.2rem;font-size:.72rem;letter-spacing:.04em;color:#e9ecff;opacity:.78;
   padding:.2rem .6rem .2rem .5rem;border-radius:99px;background:rgba(3,4,12,.42);border:1px solid color-mix(in srgb,var(--dc) 55%,transparent);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);white-space:nowrap}
 html.ob-space .ob-where::before{content:"";display:inline-block;width:.45rem;height:.45rem;border-radius:50%;background:var(--dc);margin-inline-end:.4rem;vertical-align:.05em;box-shadow:0 0 8px var(--dc)}
-@media (max-width:699px){html.ob-space .ob-stage{height:clamp(120px,18vh,170px)}}
+@media (max-width:699px){html.ob-space .ob-stage:not(#ob-stage){height:clamp(120px,18vh,170px)}}
 html.ob-space .ob-head h1{filter:drop-shadow(0 2px 10px rgba(2,3,10,.75))}
 html.ob-space .ob-head p{text-shadow:0 1px 8px rgba(2,3,10,.9),0 0 2px rgba(2,3,10,.8)}
 .ob-fxc{position:fixed;inset:0;width:100vw;height:100vh;z-index:30;pointer-events:none;display:none}
