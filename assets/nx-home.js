@@ -297,7 +297,12 @@
     e = nx.querySelector('[data-s=coinswall]');
     if (e) { var nw = d.querySelectorAll('#wall button').length; e.innerHTML = nw ? nfmt(nw) + ' ' + pick('کوین', 'دراو', 'coins') : cnt('#sCoins', 'کوین', 'دراو', 'coins'); }
     e = nx.querySelector('[data-c=coinswall]');
-    if (e && !e.firstChild) { h = ''; var seen = {}; [].forEach.call(d.querySelectorAll('#wall img'), function (im) { var s = im.getAttribute('src'); if (!s || seen[s] || Object.keys(seen).length >= 9) return; seen[s] = 1; h += '<img src="' + esc(s) + '" alt="" width="28" height="28" loading="lazy" decoding="async">'; }); e.innerHTML = h; }
+    /* every coin of the wall, not the first nine: the door shows what the room holds. They wrap into rows (nx.css) */
+    if (e && !e.firstChild) {
+      h = ''; var seen = {};
+      [].forEach.call(d.querySelectorAll('#wall img'), function (im) { var s = im.getAttribute('src'); if (!s || seen[s]) return; seen[s] = 1; h += '<img src="' + esc(s) + '" alt="" width="18" height="18" loading="lazy" decoding="async">'; });
+      e.innerHTML = h;
+    }
     /* the visitor's day: the next release that moves the market, the whales' day, the newest headline */
     try { e = nx.querySelector('[data-c=today]'); h = todayRows(); if (e && h && e.innerHTML !== h) e.innerHTML = h; } catch (x) { }
     /* dashboard: Fear & Greed and dominance, from the page's own market data when it has arrived, else the small ticker file */

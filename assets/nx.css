@@ -293,8 +293,8 @@ html[lang=en] .nx .ekd-t{font:700 .95rem/1.5 'Space Grotesk',var(--ek-font);lett
 .nx-fg svg{flex:0 0 auto;width:88px;height:50px;overflow:visible}
 .nx-fg b{display:block;font:700 1.3rem/1 'Space Grotesk',var(--ek-font)}
 .nx-fg span{font-size:.74rem;color:rgba(255,255,255,.6)}
-.nx-lg{display:flex;gap:5px;flex-wrap:nowrap;overflow:hidden;padding-block:2px}
-.nx-lg img{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#111;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+.nx-lg{display:flex;gap:3px;flex-wrap:wrap;overflow:hidden;padding-block:2px}
+.nx-lg img{flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:#111;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
 .nx-fl{margin:0;padding:0;list-style:none;display:grid;gap:5px}
 .nx-fl li{display:flex;gap:8px;align-items:baseline;min-width:0;font-size:.78rem;line-height:1.55;color:rgba(255,255,255,.86)}
 .nx-fl li span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -519,7 +519,7 @@ html.nx-lite #ekb{background:#08080a}
   .nx-fl li:nth-child(n+3){display:none}
   .nx-mk b{font-size:1.2rem}
   .nx-fg svg{width:70px;height:40px}.nx-fg b{font-size:1.1rem}
-  .nx-lg img{width:24px;height:24px}
+  .nx-lg img{width:16px;height:16px}
   #nxr{bottom:10px}#nxr a{height:32px}
 }
 @media (prefers-reduced-motion:reduce){
