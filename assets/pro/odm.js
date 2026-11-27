@@ -459,7 +459,7 @@
       var box2 = $('.pm-odal', w), ab = $('.pm-odbot', w), abn = $('.pm-odbotn', w);
       /* all ticked levels to the Telegram bot in one link (dollar coins only); the bot lists them and adds them on one tap */
       function botAll() {
-        var got = P.botOdmLink ? P.botOdmLink(sym, L.filter(function (lv) { return lv.cb.checked; }).map(function (lv) { return { k: lv.bk, v: +lv.p.toPrecision(10) }; })) : null;
+        var got = P.botOdmLink ? P.botOdmLink(sym, L.filter(function (lv) { return lv.cb.checked; }).map(function (lv) { return { k: lv.bk, v: rnd(lv.p) }; })) : null;
         ab.hidden = !got; abn.hidden = !got || got.n === got.total;
         if (!got) return;
         ab.href = got.url; ab.textContent = '✈ ' + T('odAlBot', { n: got.n });

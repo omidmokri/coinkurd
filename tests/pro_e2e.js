@@ -1352,7 +1352,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const arg = (a.getAttribute('href') || '').split('?start=')[1] || '';
       return { shown: !a.hidden, arg, text: a.textContent, rel: a.rel };
     });
-    ok(`[${tag}] one link sends every ticked level to the Telegram bot`, ob && ob.shown && /^o_[A-Z0-9]{1,12}_[estx]\d+(d\d+)?(-[estx]\d+(d\d+)?){0,7}$/.test(ob.arg) && ob.arg.length <= 63 && /-s\d/.test(ob.arg) && /noopener/.test(ob.rel), JSON.stringify(ob));
+    ok(`[${tag}] one link sends every ticked level to the Telegram bot`, ob && ob.shown && /^o_[A-Z0-9]{1,12}_[estx]\d+(d\d+)?(-[estx]\d+(d\d+)?){0,7}$/.test(ob.arg) && ob.arg.length <= 63 && /[_-]s\d/.test(ob.arg) && /noopener/.test(ob.rel), JSON.stringify(ob));
     const ob2 = await page.evaluate(() => {
       const boxes = [...document.querySelectorAll('.pm-odalr input[type=checkbox]')];
       boxes.forEach(b => { b.checked = false; b.dispatchEvent(new Event('change')); });
