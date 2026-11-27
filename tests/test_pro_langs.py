@@ -47,8 +47,9 @@ def main():
     notes = {x[0]: PL.kurd_note(x[0]) for x in PL.LANGS}
     ok("the Kurdish-dialects line is written in every language, with the count filled in",
        set(PL.KURD_NOTE) == {x[0] for x in PL.LANGS} and all("{n}" not in v and v for v in notes.values()), [c for c, v in notes.items() if "{n}" in v])
-    ok("…in the language's own digits where it has them (۵۰, ٥٠, ৫০), 50 elsewhere",
-       "۵۰" in notes["fa"] and "٥٠" in notes["ckb"] and "٥٠" in notes["ar"] and "৫০" in notes["bn"] and "50" in notes["de"])
+    ok("…in the owner's approved words: both dialects named (2026-11-27)",
+       "سورانی و کرمانجی" in notes["fa"] and "سۆرانی و کورمانجی" in notes["ckb"] and "Soranî û Kurmancî" in notes["kmr"]
+       and "Sorani and Kurmanji" in notes["en"] and "گویش‌های گوناگون" in notes["fa"])
     ok("menu order: both Kurdish first — this site's own language", [x[0] for x in PL.LANGS[:2]] == ["ckb", "kmr"])
     rest = [x[2] for x in PL.LANGS[2:]]
     ok("…and every other language by English name, Persian and Arabic among them", rest == sorted(rest), rest[:6])

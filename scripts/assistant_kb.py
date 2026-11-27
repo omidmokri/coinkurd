@@ -265,17 +265,17 @@ FAQ = [
        "دکمهٔ کرهٔ زمین در نوار بالا فهرست زبان‌ها را باز می‌کند. دکمهٔ ارز کنار آن، قیمت همهٔ کوین‌های بایننس را به ارز کشور شما نشان "
        "می‌دهد (یورو، لیر، روپیه، ین و حدود ۱۵۰ ارز دیگر)، به همان روش تومان: قیمت بایننس × ارزش یک تتر به آن ارز در همان روز (نرخ "
        "مرجع روزانه). می‌توانید نرخ خودتان را هم برای یک تتر یا یک دلار وارد کنید تا همهٔ کندل‌ها و قیمت‌ها با آن حساب شوند. زبان‌های "
-       "غیر از کوردی، فارسی، عربی و انگلیسی ترجمهٔ ماشینی دارند.",
+       "غیر از کوردی، فارسی، عربی و انگلیسی ترجمهٔ ماشینی دارند. زبان کردی زبانی کهن و غنی با گویش‌های گوناگون است. دو گویش اصلی آن، سورانی و کرمانجی، در این سایت در دسترس‌اند.",
        "بەڵێ: مێزی «بازاڕی زیندوو» بە ٥٠ زمانە و هەر زمانێک ناونیشانی خۆی هەیە (بۆ نموونە entekhab.net/market/de/ یان /market/tr/)؛ "
        "دوگمەی گۆی زەوی لە شریتی سەرەوە لیستی زمانەکان دەکاتەوە. دوگمەی دراو لە تەنیشتیەوە نرخی هەموو کۆینەکانی بایننس بە دراوی "
        "وڵاتەکەت پیشان دەدات (یۆرۆ، لیرە، ڕووپیە، یەن و نزیکەی ١٥٠ دراوی تر)، بە هەمان ڕێگای تمەن: نرخی بایننس × بەهای یەک تەتەر "
        "بەو دراوە لەو ڕۆژەدا (نرخی سەرچاوەی ڕۆژانە). دەتوانیت نرخی خۆتیش بۆ یەک تەتەر یان یەک دۆلار بنووسیت تا هەموو مۆم و نرخەکان "
-       "بەوە هەژمار بکرێن. زمانەکانی جگە لە کوردی، فارسی، عەرەبی و ئینگلیزی وەرگێڕانی ئامێرییان هەیە.",
+       "بەوە هەژمار بکرێن. زمانەکانی جگە لە کوردی، فارسی، عەرەبی و ئینگلیزی وەرگێڕانی ئامێرییان هەیە. کوردی زمانێکی کۆن و دەوڵەمەندە و چەندین شێوەزاری جۆراوجۆری هەیە. دوو شێوەزاری سەرەکیی، سۆرانی و کورمانجی، لەم ماڵپەڕەدا بەردەستن.",
        "Yes: the Live market workspace is in 50 languages, each at its own address (e.g. entekhab.net/market/de/ or /market/tr/); the "
        "globe button in the top bar opens the list. The currency button next to it shows every Binance coin in your country's currency "
        "(euro, lira, rupee, yen and about 150 more), worked out like the toman: the Binance price × what one tether is worth in that "
        "currency that day (a daily reference rate). You can also type your own rate for one tether or one dollar, and every candle and "
-       "price then uses it. Languages other than Kurdish, Persian, Arabic and English are machine-translated."),
+       "price then uses it. Languages other than Kurdish, Persian, Arabic and English are machine-translated. Kurdish is an ancient and rich language with many dialects. Its two main dialects, Sorani and Kurmanji, are available on this site."),
      "/market/"),
     (["بک تست", "بک‌تست", "بکتست", "backtest", "back test", "تستر استراتژی", "strategy tester", "بهینه سازی", "بهینه‌سازی", "optimizer",
       "حساب تمرینی", "practice account", "دیده بان بازار", "دیده‌بان بازار", "market watch", "screener", "اسکرینر", "هشدار خبر",
