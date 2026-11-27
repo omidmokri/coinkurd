@@ -176,6 +176,12 @@ html.ob-space .ob-where{position:absolute;bottom:.55rem;inset-inline-start:.2rem
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);white-space:nowrap}
 html.ob-space .ob-where::before{content:"";display:inline-block;width:.45rem;height:.45rem;border-radius:50%;background:var(--dc);margin-inline-end:.4rem;vertical-align:.05em;box-shadow:0 0 8px var(--dc)}
 @media (max-width:699px){html.ob-space .ob-stage:not(#ob-stage){height:clamp(120px,18vh,170px)}}
+/* owner 2026-11-27: on a page that carries its own chart the window was 194px of sky with nothing in it but the
+   name badge, pushing the chart itself down the screen. There it keeps only a band deep enough for the badge and a
+   glimpse of the world; the door pages, where the scene is the whole point, are untouched. The scene does not
+   shrink with it — worlds.js already holds its ground at 42% of the viewport whatever the window says. */
+html.ob-space:has(#ob-stage) .ob-stage:not(#ob-stage){height:clamp(64px,8vh,96px)}
+@media (max-width:699px){html.ob-space:has(#ob-stage) .ob-stage:not(#ob-stage){height:clamp(52px,7vh,74px)}}
 html.ob-space .ob-head h1{filter:drop-shadow(0 2px 10px rgba(2,3,10,.75))}
 html.ob-space .ob-head p{text-shadow:0 1px 8px rgba(2,3,10,.9),0 0 2px rgba(2,3,10,.8)}
 .ob-fxc{position:fixed;inset:0;width:100vw;height:100vh;z-index:30;pointer-events:none;display:none}
