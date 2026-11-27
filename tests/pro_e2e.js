@@ -1401,22 +1401,17 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const Zn = await zone();
     const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
     ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - (zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - (zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0, JSON.stringify({ Zn, zy }));
-    const tint = await page.evaluate(([Z]) => {
-      const c = PRO.app.active(), cv = c.chart.takeScreenshot(true), k = window.devicePixelRatio || 1, g = cv.getContext('2d');
-      const at = (x, y) => { const d = g.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data; return [d[0], d[1], d[2]]; };
-      const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12;
-      let gr = 0, rd = 0, n1 = 0, n2 = 0;
-      for (let i = 0; i < 9; i++) {
-        const x = Z.x0 + (Z.x1 - Z.x0) * (0.62 + i * 0.035);
-        for (const f of [0.3, 0.7]) {
-          const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f;
-          if (clear(yg)) { const p = at(x, yg); n1++; if (p[1] > p[0] + 8) gr++; }
-          if (clear(yr)) { const p = at(x, yr); n2++; if (p[0] > p[1] + 8) rd++; }
-        }
-      }
-      return { gr, rd, n1, n2 };
+    const pts = await page.evaluate(([Z]) => {
+      const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
+      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.55 + i * 0.04); for (const f of [0.3, 0.7]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg)) out.push([x, yg, 'g']); if (clear(yr)) out.push([x, yr, 'r']); } }
+      return out;
     }, [Zn]);
-    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 6 && tint.n2 >= 6 && tint.gr >= tint.n1 * 0.6 && tint.rd >= tint.n2 * 0.6, JSON.stringify(tint));
+    const px = () => page.evaluate(([pts]) => { const c = PRO.app.active(), cv = c.chart.takeScreenshot(true), k = window.devicePixelRatio || 1, g = cv.getContext('2d'); return pts.map(([x, y]) => [...g.getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data].slice(0, 3)); }, [pts]);
+    const on1 = await px(); await page.evaluate(() => PRO._odmZoneVis(false)); await page.waitForTimeout(150);
+    const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(150);
+    const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
+    pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 6 && tint.n2 >= 6 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify(tint));
     /* the round handle on the entry line moves the start candle; Undo puts it back */
     {
       const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;

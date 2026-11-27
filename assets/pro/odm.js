@@ -288,7 +288,7 @@
   }
   var LRI = '⁦', PDI = '⁩';
   function zonePaint(ctx, W, H, cell) {
-    var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null;
+    var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null; if (Z.noZone) return;
     var r = Z.plan; if (!r || r.err || !r.exits) return;
     var m = cell.main, ts = cell.chart.timeScale(), yv = function (p) { var y = null; try { y = m.priceToCoordinate(p); } catch (e) { } return y; };
     var ya = yv(r.avg), ys = yv(r.stop), ex = r.exits, yt = ex.length ? yv(ex[ex.length - 1].p) : null; if (ya == null || ys == null) return;
@@ -530,6 +530,7 @@
   };
   /* a point inside the position's box, for the right-click menu (after lines and alert lines) */
   P.odmZoneHit = function (cell, x, y) { var b = LN && LN.cell === cell ? LN.box : null; if (!b || x < b.x0 || x > b.x1 || y < b.top || y > b.bot) return null; return { t: T(b.long ? 'odZLong' : 'odZShort'), p: LN.plan.avg }; };
+  P._odmZoneVis = function (v) { if (LN) { LN.noZone = !v; repaint(LN); } };   /* for the browser checks: the chart with and without the box */
   P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, anchor: LN.st.anchor } : null; };
   /* for the browser checks: the panel's plan and the y of a level on the chart */
   P.odmLive = function () { return LN ? { plan: LN.plan, st: LN.st, levels: LN.L.map(function (l) { var y = null; try { y = LN.cell.main.priceToCoordinate(l.p); } catch (e) { } return { k: l.k, p: l.p, y: y, drag: !!l.drag }; }), pick: LN.pick } : null; };
