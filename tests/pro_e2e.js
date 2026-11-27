@@ -1441,8 +1441,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     });
     ok(`[${tag}] saving adds one smart alert with its rule, on the chart's timeframe`, sv.n === n0 + 1 && sv.k === 'multi' && sv.spec && sv.expr === s4.code && sv.on && !sv.modal, JSON.stringify(sv));
     ok(`[${tag}] the saved rule gives the same answer now as the builder showed`, (sv.test[1] === 1) === s4.now.includes('up'), JSON.stringify({ t: sv.test, now: s4.now }));
-    await page.evaluate(() => { const b = document.querySelector('.pm-stab[data-p="alerts"]'); if (b) b.click(); }); await page.waitForTimeout(300);
-    const lt = await page.evaluate(() => [...document.querySelectorAll('.pm-ar')].map(x => x.textContent).join(' | '));
+    const lt = sv.text;      /* the alerts panel is still open from the start of these checks */
     ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saJ_or')) && !lt.includes('ta.rsi'), lt.slice(0, 300));
     await shot(page, `89_sa_list_${lang}_${vw}`);
     /* the price alert dialog has a Smart tab that opens the builder */
