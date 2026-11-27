@@ -217,6 +217,14 @@
 "7949a2630a",
 "Derbaskirina EMA (lezgîn / hêdî)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Hemû hişyarî jê bibe ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Hemû {n} hişyariyên li ser her coinê jê bibî?"
+],
 "alert": [
 "b969680a49",
 "Hişyarî"
@@ -1077,13 +1085,61 @@
 "fe93409ef8",
 "{n} bar hatin daxistin"
 ],
+"ctxAlAll": [
+"ab83f89379",
+"Hemû hişyariyên li ser vê coinê"
+],
+"ctxAlDel": [
+"8fa84d6ac1",
+"Vê hişyariyê jê bibe"
+],
+"ctxAlGone": [
+"ad0540d3e5",
+"{n} hişyarî hatin jêbirin."
+],
 "ctxAlert": [
 "50bc7eabdd",
 "Li vir hişyariyekê zêde bike"
 ],
+"ctxAllDraw": [
+"5f091ac147",
+"Hemû xêzkirin ({n})"
+],
+"ctxAllInds": [
+"d5a9d26046",
+"Hemû nîşander ({n})"
+],
+"ctxBack": [
+"b52b36b726",
+"Vegere"
+],
+"ctxClearAll": [
+"01c08dc7ca",
+"Chartê bi tevahî paqij bike"
+],
+"ctxClearQ": [
+"79f0d2043e",
+"Hemû xêzkirin, nîşander û astên ODM bi hişyariyên wan ve ji {s} werin rakirin? Hişyariyên din dimînin. Tu dikarî vê yekê vegerînî."
+],
+"ctxCleared": [
+"c550fa21a8",
+"Chart hat paqijkirin."
+],
 "ctxCopyPrice": [
 "7166a5c8fe",
 "Vê bihayê kopî bike"
+],
+"ctxDrawGone": [
+"083f64337b",
+"{n} xêzkirin hatin rakirin."
+],
+"ctxDrwH": [
+"7789861bd3",
+"Xêzkirin, ya herî nû pêşî"
+],
+"ctxDrwOne": [
+"4c2acbd1f9",
+"Xêzkirinek…"
 ],
 "ctxFit": [
 "8c723d6ed2",
@@ -1092,6 +1148,42 @@
 "ctxHline": [
 "588d2eb492",
 "Li vir xêza asoyî"
+],
+"ctxIndOne": [
+"0f76b2cbe9",
+"Nîşanderek…"
+],
+"ctxIndsGone": [
+"a397bae276",
+"{n} nîşander hatin rakirin."
+],
+"ctxNothing": [
+"300e0e8374",
+"Tişt nîne ku were rakirin"
+],
+"ctxOdmHide": [
+"5d15f68c57",
+"Ast û hişyariyên ODM rake"
+],
+"ctxOdmLv": [
+"ed1c986088",
+"Astên ODM û hişyariyên wan"
+],
+"ctxOpenOdm": [
+"b7b747a7cf",
+"ODM veke"
+],
+"ctxRemoveH": [
+"99ce58e347",
+"Ji chartê rake"
+],
+"ctxRemoved": [
+"e9b9fe3088",
+"{x} hat rakirin."
+],
+"ctxRemoved1": [
+"4bbcf8c94c",
+"{x} rake"
 ],
 "ctxReset": [
 "242cb352c0",
@@ -3781,6 +3873,22 @@
 "9cd499490a",
 "ODM"
 ],
+"odClearedAl": [
+"10dc663b4f",
+"{m} hişyariyên ODM hatin rakirin."
+],
+"odClearedBoth": [
+"2e93b431cb",
+"{n} ast û {m} hişyariyên ODM hatin rakirin."
+],
+"odDragAt": [
+"6eb2b7cc85",
+"{l} li {p} ({d}% ji bihayê dawî)"
+],
+"odDragHint": [
+"57cbd020e7",
+"Rêçikeke bi nîşana ↕ bikişîne da ku wê biguherînî, an jî destika dor bikişîne da ku çira (mûme) destpêkê biguherînî. Plan gava tu dikişînî ji nû ve tê hesibandin."
+],
 "odEExit": [
 "3d85c7e08a",
 "Derketina {n}, paşê rawestgeh"
@@ -3973,6 +4081,10 @@
 "56746816d8",
 "Valahiya di navbera pêngavan de (%)"
 ],
+"odGuide": [
+"8aa7d50c3e",
+"Rêberiya min bike, gav bi gav"
+],
 "odHEnds": [
 "5cbaf8a928",
 "Her awayê ku diqede (hemû têketin dagirtî)"
@@ -3996,6 +4108,26 @@
 "odHow": [
 "c54859aa22",
 "Çawa diqede"
+],
+"odHudE": [
+"19172e9e47",
+"Ketinnav"
+],
+"odHudOpen": [
+"b7b747a7cf",
+"ODM veke"
+],
+"odHudS": [
+"9e253470c8",
+"Stop"
+],
+"odHudUndo": [
+"3d206179a5",
+"Guhertora dawî vegerîne"
+],
+"odHudX": [
+"61ad50a9b9",
+"Armanc"
 ],
 "odLAvg": [
 "97e77871b5",
@@ -4077,6 +4209,18 @@
 "c8cbacef3d",
 "1R · 2R · 3R"
 ],
+"odPick_e": [
+"303f6de669",
+"Li ser chartê li cihê ku ketina nû lê tê bixe. Bi bişkoja Esc vekişe."
+],
+"odPick_s": [
+"39a71b4de2",
+"Li ser chartê li cihê ku stop lê tê bixe. Bi bişkoja Esc vekişe."
+],
+"odPick_x": [
+"fd10db7af2",
+"Li ser chartê li cihê ku armanca nû lê tê bixe. Bi bişkoja Esc vekişe."
+],
 "odPnl": [
 "5faa59d4bc",
 "Encam"
@@ -4122,8 +4266,8 @@
 "Li ser grafîkê nîşan bide"
 ],
 "odShown": [
-"bbfafee1df",
-"{n} ast hatin xêzkirin. Ji bo veşartinê ODM dîsa veke."
+"aeb3fca140",
+"{n} ast hatin xêzkirin. Rêçikek bikişîne da ku planê biguherînî, an jî bi bişkoja rastê ya mişkê li chartê bixe da ku wan rakî."
 ],
 "odStep": [
 "dc416e1088",
@@ -4201,6 +4345,118 @@
 "5a8f23f567",
 "Rîsk"
 ],
+"odTourBack": [
+"b52b36b726",
+"Vegere"
+],
+"odTourDone": [
+"e9b450d14b",
+"Qediya"
+],
+"odTourGo": [
+"ea3d24ef7d",
+"Gerê bide destpêkirin"
+],
+"odTourN": [
+"a9f84daf43",
+"{i} ji {n}"
+],
+"odTourNext": [
+"bc981983e7",
+"Pêşve"
+],
+"odTourNo": [
+"e457149073",
+"Niha na"
+],
+"odTourOffer": [
+"d0012e3974",
+"Tu di ODM de nû yî? Gereke yek-deqîqeyî nîşan dide ku her beş çi dike."
+],
+"odTourSkip": [
+"35b754350f",
+"Gerê bigre"
+],
+"odTr_acc_b": [
+"c482cf77ba",
+"Balansa xwe, rîska her bazirganiyê bi ji sedî, leverage û komîsyonan diyar bike. Rîsk ew e ku tu herî zêde çi qasî winda bikî heke hemû ketin pêk bên û stop lê bikeve."
+],
+"odTr_acc_t": [
+"4ab2910209",
+"Hesabê te"
+],
+"odTr_act_b": [
+"7644c76432",
+"Planê li ser chartê nîşan bide û rêçikên wê bikişîne, li ser çirayên berê biceribîne, ji bo her astê hişyariyekê lê zêde bike, an jî li panoya rîskê tomar bike. Tiştek li vir fermanê nade."
+],
+"odTr_act_t": [
+"ecd61f3092",
+"Wê bixebitîne"
+],
+"odTr_ent_b": [
+"db25b961d4",
+"Heta 10 bihayên sînorî, her yek bi para xwe. Bi lêdanekê derpûyekî çêke an bihayên xwe binivîse. Pêdivî ye ku par ji sedî 100 bikin."
+],
+"odTr_ent_t": [
+"306c3af178",
+"Cihê ku tu têketinê dikî"
+],
+"odTr_exit_b": [
+"059ba6e9aa",
+"Heta 8 gavan, her yek bi bihayekî, ji sedî ji ketina navînî, an pirjimarên R, ku rîska te ya her coinê ye."
+],
+"odTr_exit_t": [
+"ed434a2eb8",
+"Cihê ku tu qezencê digrî"
+],
+"odTr_help_b": [
+"95daaa9148",
+"Her beş, qad û encam îkonekî xwe heye. Ew beşê şîrove dike, bi hejmarên te mînakekê dide, û qutiyeke wê ji bo pirsa te heye."
+],
+"odTr_help_t": [
+"3718e3c5ce",
+"Sekinî? Li îkonekî bixe"
+],
+"odTr_loss_b": [
+"d28c3b3cc5",
+"Heke stop piştî ku tenê çend ketin tijî bûn lê bikeve, tu kêmtir winda dikî. Dar nîşan dide ku ew çend ji rîska te ya tam e."
+],
+"odTr_loss_t": [
+"0ec5f5df23",
+"Windabûna li her gavekê"
+],
+"odTr_res_b": [
+"5ea4354bf6",
+"Mezinahî, margin, texmîna tasfiyekirinê û encama her awayê ku bazirganî dikare biqede, komîsyon tê de."
+],
+"odTr_res_t": [
+"7fb1d37c30",
+"Wêneyê tam"
+],
+"odTr_stop_b": [
+"acff1737e2",
+"Stop li pişt ketina herî kûr rûniştî ye. Wê bi biha, bi ji sedî, an wekî pirjimarên ATR diyar bike daku li gorî tevgera bazarê biguhere."
+],
+"odTr_stop_t": [
+"f316187400",
+"Cihê ku tu tê de şaş î"
+],
+"odTr_top_b": [
+"402ecb917b",
+"Rîsk, ketina navînî, stop, R û encama çêtirîn, gava tu dinivîsî ji nû ve tên hesibandin."
+],
+"odTr_top_t": [
+"71ea78684e",
+"Plan bi çavekî"
+],
+"odTr_trail_b": [
+"6bb6a99a4f",
+"Ew para ku tu derketin lê nagire dikare li ser stopekî şopîner (trailing stop) biçe, û dema ku derketinek tijî bibe stop dikare biçe xala serûbinî (break-even)."
+],
+"odTr_trail_t": [
+"f4d671693b",
+"Ya ku maye"
+],
 "odTrail": [
 "f4d671693b",
 "Ya ku maye"
@@ -4208,6 +4464,10 @@
 "odTrailHint": [
 "952ea83894",
 "Para ku tu derketin lê nagire dikare bi stopa şopandinê re biçe. Her wiha piştî ku derketinek tijî dibe, stop dikare biçe ser sifrê (break-even)."
+],
+"odUndone": [
+"d94a6ce055",
+"Guhertora dawî hat vegerandin."
 ],
 "odW_inRange": [
 "44db20d843",
@@ -4264,6 +4524,22 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odZLong": [
+"11eda67f9b",
+"Long (Kirîn)"
+],
+"odZRew": [
+"c7d7652ec6",
+"Xelat"
+],
+"odZRisk": [
+"5a8f23f567",
+"Rîsk"
+],
+"odZShort": [
+"0fe7d82f25",
+"Short (Firotin)"
 ],
 "odhA0": [
 "d97012c5ea",
@@ -6692,6 +6968,54 @@
 "rng_week": [
 "7b72883e07",
 "Vê heftiyê"
+],
+"rsAl": [
+"689e627ada",
+"Hemû hişyarî, li ser her coinê"
+],
+"rsBack": [
+"5202b69570",
+"Ya ku sifirkirinê rakiribû hat vegerandin."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Rûpel hat sifirkirin."
+],
+"rsDr": [
+"3e97d79b5a",
+"Hemû xêzkirin, li ser her coinê"
+],
+"rsGo": [
+"44c57abd88",
+"Sifir bike"
+],
+"rsInd": [
+"76de28a75e",
+"Nîşanderên li ser chartan"
+],
+"rsLead": [
+"19aa2a9a77",
+"Rûpelê di carekê de paqij bike. Ya ku divê biçe işaret bike:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Dîroka hişyariyan"
+],
+"rsNote": [
+"58f9efc63c",
+"Layout, mîheng, lîsteya şopandinê û portfoy dimînin. Hişyariyên ku te şandine bota Telegramê di botê de tên parastin: li wir /alerts veke daku wan jê bibî."
+],
+"rsOd": [
+"bbde1a818d",
+"Plana ODM û astên wê"
+],
+"rsTitle": [
+"6ce02ce159",
+"Rûpelê sifir bike"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Sifirkirina dawî vegerîne"
 ],
 "runTest": [
 "2c7f471fce",
