@@ -768,6 +768,14 @@
       label(ctx, T('target') + ' ' + iso(fmt(tg) + ' (' + (pct(en, tg) >= 0 ? '+' : '') + pct(en, tg).toFixed(2) + '%)'), x0 + w / 2, q.yt + (q.yt < q.ye ? -12 : 12), '#34d399', '#06281b', 'center');
       label(ctx, T('stop') + ' ' + iso(fmt(sl) + ' (' + (pct(en, sl) >= 0 ? '+' : '') + pct(en, sl).toFixed(2) + '%)'), x0 + w / 2, q.ys + (q.ys > q.ye ? 12 : -12), '#ff5a4d', '#2b0703', 'center');
       label(ctx, (k === 'long' ? T('long') : T('short')) + ' · ' + iso('R:R ' + rr.toFixed(2)), x0 + w / 2, q.ye, '#e5e7eb', '#111', 'center');
+      /* the trade planner's further targets (plan.js): kept as multiples of the risk, so they follow the entry and
+         the stop when either is dragged. Drawn only on the side the trade profits on, and only when they are numbers. */
+      var Rr = Math.abs(en - sl), dirp = k === 'long' ? 1 : -1, sv = d.s || {}, se2 = this.o.series;
+      [[sv.r2, 'TP2'], [sv.r3, 'TP3']].forEach(function (z) {
+        var r = +z[0]; if (!(r > 0) || r > 100 || !(Rr > 0)) return; var pp = en + dirp * r * Rr, yy = se2.priceToCoordinate(pp); if (yy == null) return;
+        ctx.strokeStyle = '#34d399'; ctx.lineWidth = 1; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + w, yy); ctx.stroke(); ctx.setLineDash([]);
+        label(ctx, z[1] + ' ' + iso(fmt(pp) + ' (' + r.toFixed(2) + 'R)'), x0 + w / 2, yy + (dirp > 0 ? -12 : 12), '#34d399', '#06281b', 'center');
+      });
     }
     if (k === 'text' && g.px[0].y != null) {
       var tx = s.x || T('textPh'), fs = s.fs || 14; ctx.setLineDash([]);
@@ -797,7 +805,7 @@
         if (hm !== 'normal') { ctx.globalAlpha = 1; ctx.fillStyle = hm === 'contrast' ? '#0b0b0c' : c; ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill(); }
         ctx.globalAlpha = 1;
       }
-      g.px.forEach(function (p, pi) { if (p.y == null && k !== 'vline') return; knob(p.x, p.y == null ? H / 2 : p.y, col, pi); });
+      g.px.forEach(function (p, pi) { if (pi && g.pos) return; if (p.y == null && k !== 'vline') return; knob(p.x, p.y == null ? H / 2 : p.y, col, pi); });
       if (g.pos) { var Q = g.pos, xr = Math.max(Q.x0, Q.x1); [[xr, Q.yt], [xr, Q.ys], [xr, Q.ye]].forEach(function (p) { knob(p[0], p[1], '#e5e7eb', -9); }); }
     }
     d._g = g;
@@ -822,7 +830,9 @@
     for (var i = L.length - 1; i >= 0; i--) {
       var d = L[i], g = d._g; if (d.hd || !g) continue;
       if (this.sel === d.id) {
-        for (var j = 0; j < g.px.length; j++) { var p = g.px[j]; if (p && Math.hypot(x - p.x, y - (p.y == null ? y : p.y)) <= tol + 3) return { d: d, part: j }; }
+        /* a position's target and stop sit exactly where its second and third anchors are; taking those as plain anchors
+           moved the whole position, so its target and its stop could never be dragged on their own. Only the entry is an anchor here. */
+        for (var j = 0; j < g.px.length; j++) { if (j && g.pos) break; var p = g.px[j]; if (p && Math.hypot(x - p.x, y - (p.y == null ? y : p.y)) <= tol + 3) return { d: d, part: j }; }
         if (g.pos) { var Q = g.pos, xr = Math.max(Q.x0, Q.x1); if (Math.hypot(x - xr, y - Q.yt) <= tol + 3) return { d: d, part: 'tg' }; if (Math.hypot(x - xr, y - Q.ys) <= tol + 3) return { d: d, part: 'sl' }; if (Math.hypot(x - xr, y - Q.ye) <= tol + 3) return { d: d, part: 'end' }; }
       }
       var near = false;

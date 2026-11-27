@@ -202,6 +202,7 @@
       tb.appendChild(b);
     });
     PAGES[tab]();
+    var bb = h('<button type="button" class="pm-btn"></button>'); bb.textContent = T('plBoardT'); bb.onclick = function () { if (P.riskBoard) P.riskBoard(); }; box.insertBefore(bb, box.lastChild);
     A.modal(T('rcTitle'), box, { wide: true, nofocus: true });
   };
 })();

@@ -637,3 +637,20 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-cfm{grid-column:1/-1;display:block;color:var(--mute);font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:normal;overflow-wrap:anywhere}
 .pm-cspark{grid-column:1/-1;width:100%;height:70px;color:var(--acc)}
 #pro.pm-light .pm-cor{background:#f6f6f3}#pro.pm-light .pm-cw2{color:#7a4a06}
+/* ---- trade plan card, open-risk board */
+.pm-plan{position:absolute;z-index:39;top:92px;inset-inline-end:58px;width:min(300px,calc(100% - 70px));max-height:calc(100% - 150px);overflow-y:auto;scrollbar-width:thin;background:rgba(19,19,21,.94);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px;box-shadow:0 14px 40px rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:8px}
+.pm-plh{display:flex;align-items:center;justify-content:space-between;gap:8px}.pm-plh b{font-size:13px}
+.pm-plg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pm-plg .pm-in{padding:5px 8px;font-size:12.5px}
+.pm-plo{display:flex;flex-direction:column;gap:1px}
+.pm-plr{display:flex;justify-content:space-between;gap:10px;padding:3px 2px;border-bottom:1px dashed rgba(255,255,255,.07);font-size:12px}
+.pm-plr small{color:var(--mute)}.pm-plr.up b{color:#34d399}.pm-plr.dn b{color:#ff5a4d}
+.pm-plan .pm-cw2{margin-top:6px}.pm-plan .pm-enote{padding:0;font-size:11px}
+#pro.pm-light .pm-plan{background:rgba(255,255,255,.96);border-color:#d6d6d2}
+/* ---- timeframe matrix and regime */
+.pm-mtf{display:flex;flex-direction:column;gap:10px}
+.pm-rgh{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}.pm-rgh small{color:var(--mute);font-size:11.5px}.pm-rgh b{font-size:18px}
+.pm-mtft td,.pm-mtft th{white-space:nowrap;text-align:start;padding:7px 8px}
+.pm-mt{display:inline-block;border-radius:6px;padding:2px 8px;font-size:12px;background:rgba(148,163,184,.14);color:#cbd5e1}
+.pm-mt-u{background:rgba(52,211,153,.16);color:#34d399}.pm-mt-d{background:rgba(255,90,77,.16);color:#ff7a6f}.pm-mt-h{background:rgba(247,147,26,.18);color:#f7b25a}
+.pm-mtfs{font-weight:700;font-size:13.5px}
+#pro.pm-light .pm-mt{color:#475569}#pro.pm-light .pm-mt-u{color:#047857}#pro.pm-light .pm-mt-d{color:#b91c1c}#pro.pm-light .pm-mt-h{color:#b45309}
