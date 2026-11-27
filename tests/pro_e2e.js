@@ -1450,6 +1450,18 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       }, [X, y0, dy]);
       await page.waitForTimeout(150);
     };
+    /* the stop has to be on screen to be grabbed: when the plan's ATR stop falls below the price pane (it depends on the day's
+       candles), put it in view first with the panel's own "Stop" button and a click on the chart, as a user would */
+    {
+      const ph = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight()), Lq = await live(), sl = Lq.levels.find(l => l.k === 'sl');
+      if (!sl || sl.y == null || sl.y > ph - 60 || sl.y < 30) {
+        const yS = await page.evaluate(ph => { const L = PRO.odmLive(), long = L.plan.stop < L.plan.avg, ye = L.levels.filter(l => /^e/.test(l.k) && l.y != null).map(l => l.y);
+          return long ? Math.min(ph - 70, Math.max(...ye) + 45) : Math.max(35, Math.min(...ye) - 45); }, ph);
+        await page.click('.pm-odhud [data-pk="s"]'); await page.waitForTimeout(80);
+        await page.mouse.click(await xFree(Lq.box.t + yS), Lq.box.t + yS); await page.waitForTimeout(200);
+        L0 = await live();
+      }
+    }
     /* down 40 px widens the stop; when the stop sits near the foot of the price pane, up 40 px narrows it instead (a line is grabbed where it can be seen) */
     const paneH = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight());
     const slY = yOf(L0, 'sl') - L0.box.t, dyS = slY + 40 > paneH - 30 ? -40 : 40;
@@ -1659,7 +1671,9 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     }
     /* the right edge: dragged to resize, extended to the chart's edge on demand and closed again; Undo after each */
     {
-      await page.evaluate(() => PRO.app.active().chart.timeScale().scrollToRealTime()); await page.waitForTimeout(300);
+      /* the whole box in view, with room on its right */
+      await page.evaluate(() => { const c = PRO.app.active(), Z = PRO.odmZone(), D = c.disp, sec = c.tfSec(), a = PRO.t2l(D, Z.anchor, sec), e = PRO.t2l(D, Z.zEnd, sec), w = Math.max(30, (e - a) * 4); c.chart.timeScale().setVisibleLogicalRange({ from: a - w * 0.3, to: e + w * 0.45 }); });
+      await page.waitForTimeout(300);
       let S = await st();
       const Z = S.Z, hx = S.box.l + Z.x1, hy = S.box.t + Z.ya, dx = Z.x1 + 80 < S.box.w - 10 ? 60 : -Math.min(60, (Z.x1 - Z.x0) / 2);
       if (phone) { await tap(S.box.l + (Z.x0 + Z.x1) / 2, S.box.t + (Z.top + Z.ya) / 2); await tdrag(hx, hy, dx, 0); } else await mdrag(hx, hy, dx, 0);
@@ -1683,7 +1697,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const S = await st();
       const want = S.tf === '4h' ? '1h' : '4h';
       let clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('[data-tf="' + w + '"]')].find(e => e.offsetParent && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want);
-      if (!clicked) { await page.click('#pm-tfs .pm-tf.on').catch(() => { }); await page.waitForTimeout(300); clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('[data-tf="' + w + '"]')].find(e => e.offsetParent && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want); }
+      if (!clicked) { await page.click('#pm-tfs .pm-tf.on').catch(() => { }); await page.waitForTimeout(300); clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('.pm-tfmenu .pm-tf, [data-tf="' + w + '"]')].find(e => (e.getAttribute('data-tf') === w || e.textContent.trim() === w) && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want); }
       if (clicked) await page.mouse.click(clicked.x, clicked.y);
       await page.waitForFunction(w => PRO.app.active().cfg.tf === w && PRO.app.active().disp.length > 100, want, { timeout: 10000 }).catch(() => { });
       await page.waitForTimeout(500);

@@ -274,8 +274,12 @@
   function zoneX(Z, ts) {
     var c = Z.cell, D = c.disp && c.disp.length ? c.disp : c.bars, sec = c.tfSec ? c.tfSec() : 0; if (!D || !D.length || !sec || !P.t2l) return null;
     if (!(+Z.st.anchor > 0)) {
+      /* a new position: about a quarter of the chart wide, its right edge a little in from the chart's right side, so both its
+         handles are in view on a phone as on a wide screen */
       var vr = null; try { vr = ts.getVisibleLogicalRange(); } catch (e) { }
-      var lg = vr ? Math.round(vr.to - (vr.to - vr.from) * 0.3) : D.length - 30; lg = Math.max(0, Math.min(D.length - 1, lg)); Z.st.anchor = D[lg].t;
+      var span = vr ? Math.max(8, Math.round((vr.to - vr.from) * 0.25)) : 20, end = vr ? vr.to - (vr.to - vr.from) * 0.1 : D.length + 5;
+      var lg = Math.max(0, Math.min(D.length - 1, Math.round(end - span))); Z.st.anchor = D[lg].t;
+      if (!(+Z.st.zEnd > Z.st.anchor) && P.l2t) Z.st.zEnd = P.l2t(D, lg + span, sec);
     }
     var l = P.t2l(D, +Z.st.anchor, sec); if (l == null || !isFinite(l)) return null;
     var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x;
@@ -287,7 +291,7 @@
     var la = P.t2l(D, +Z.st.anchor, sec); if (la == null || !isFinite(la)) return W;
     if (!(+Z.st.zEnd > +Z.st.anchor)) {
       var vr = null; try { vr = ts.getVisibleLogicalRange(); } catch (e) { }
-      var span = vr ? Math.max(12, Math.round((vr.to - vr.from) * 0.2)) : 20; Z.st.zEnd = P.l2t(D, Math.round(la) + span, sec);
+      var span = vr ? Math.max(8, Math.round((vr.to - vr.from) * 0.25)) : 20; Z.st.zEnd = P.l2t(D, Math.round(la) + span, sec);
     }
     var l = P.t2l(D, +Z.st.zEnd, sec); if (l == null || !isFinite(l)) return W;
     var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x == null ? W : x;
