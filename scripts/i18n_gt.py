@@ -176,7 +176,8 @@ def fill(langs, need, first, seconds, threads=6, tr_factory=None, log=print):
         s = S.load(code)
         g = S.load_g(code)
         bad = {k for k, n in S.load_fails(code).items() if n >= S.FAIL_MAX}
-        keys = [k for k in need if k not in s and k not in bad]
+        # a short trading label waits for Gemini: Google reads "Short setup" as "a brief setup" (S.trade_word)
+        keys = [k for k in need if k not in s and k not in bad and not S.trade_word(k)]
         keys.sort(key=lambda k: (k not in first, len(k), k))
         tr = tr_factory(code)
         errors, added, last = 0, 0, time.time()
@@ -240,6 +241,18 @@ def main():
     stats = fill(langs, need, common | home, a.seconds, a.threads)
     print(f"i18n_gt: {stats['strings']:,} strings in {stats['requests']} requests"
           + (" (Google turned this runner away; stopped)" if stats["stopped"] else ""))
+    # Google costs no Gemini calls, so while it is still filling languages the workflow starts the next run itself
+    # (GITHUB_OUTPUT more=1): the schedule alone ran three or four times a day and left 21 languages under the gate.
+    waiting = 0
+    for code in langs:
+        s = S.load(code)
+        waiting += sum(1 for k in need if k not in s)
+    more = stats["strings"] > 0 and not stats["stopped"] and waiting > 0
+    print(f"i18n_gt: {waiting:,} strings still untranslated -> {'another run next' if more else 'no chained run'}")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as f:
+            f.write(f"more={1 if more else 0}\n")
 
 
 if __name__ == "__main__":

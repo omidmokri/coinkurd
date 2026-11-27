@@ -133,6 +133,7 @@ jobs:
       # What Gemini has not reached yet gets Google Translate's version, so every language is readable now; those
       # strings are marked and Gemini replaces them as its calls allow (see scripts/i18n_gt.py). No Gemini calls.
       - name: Site languages, Google Translate for what Gemini has not reached
+        id: gt
         continue-on-error: true
         timeout-minutes: 12
         run: python scripts/i18n_gt.py --seconds 600 || echo "::warning::Google Translate step failed; Gemini carries on alone"
@@ -167,7 +168,7 @@ jobs:
       # still waiting and the day has calls left, the run starts the next one itself; i18n_site.more_after
       # decides, and the chain ends on its own when either runs out.
       - name: Start the next run while work and calls remain
-        if: steps.site.outputs.more == '1'
+        if: steps.site.outputs.more == '1' || steps.gt.outputs.more == '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run languages.yml --repo "${{ github.repository }}" --ref main || echo "::warning::could not start the next run; the schedule picks it up"

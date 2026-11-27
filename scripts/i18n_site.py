@@ -59,6 +59,18 @@ LANGS = pro_l10n.PRIORITY                       # the 43, most-read first
 DAILY = int(os.environ.get("I18N_SITE_DAILY", "60"))    # kept for --requests arithmetic and older call sites
 
 PH = re.compile(r"\{\d+\}")
+# Trading words that mean something else in everyday English, so a general translator gets them wrong: Google gave
+# "Spot of toekomst?" for "Spot or futures?" (Dutch: "the future"), "Krótka konfiguracja" for "Short setup" (Polish:
+# "a brief setup"), "Trendbeer" for "Trending bear" (a bear, the animal). In a short label they carry the whole meaning.
+TRADE = re.compile(r"\b(long|longs|short|shorts|spot|futures|perpetuals?|bull|bulls|bullish|bear|bears|bearish|support|"
+                   r"resistance|gas|staking|restaking|yield|halving|entry|exit|open interest|candles?|candlesticks?|"
+                   r"breakouts?|pullbacks?|pump|dump|whales?|margin|swing|scalp(ing)?|funding|liquidations?|exchanges?|"
+                   r"wicks?|bridge|mempool|hash ?rate|dominance|drawdown|take profit|stop loss|leverage)\b", re.I)
+
+
+def trade_word(en):
+    """a short string whose meaning hangs on a trading word: Gemini's, never Google's draft"""
+    return len(en.split()) <= 8 and bool(TRADE.search(en))
 KEEP = ["entekhab.net", "Coin_Kurd", "Coin Kurd", "Entekhab", "Telegram", "TradingView", "Binance", "mempool.space",
         "Bitcoin Core", "OKX", "Bybit", "Deribit", "Kurdistani", "Discord", "GitHub", "BTC", "ETH", "USDT", "USDC",
         "RSI", "MACD", "EMA", "SMA", "VWAP", "ATR", "ADX", "OHLC", "CSV", "PNG", "JSON", "QR", "UTC", "API",
@@ -248,6 +260,15 @@ Rules:
   names: {keep}.
 - Use the words traders and trading platforms use in {lang} (candles, timeframe, indicator, support, resistance,
   leverage, wallet, mining, block, transaction, fee, order book).
+- These are trading terms, never their everyday meaning: long/short = a buy/sell position (not "long"/"brief"); spot
+  = spot market and futures = futures contracts (not "the future"); bull/bear = rising/falling market (not animals);
+  support/resistance = price levels (not help); candle = price candle; gas = network fee; halving = Bitcoin's block
+  reward halving; entry/exit = opening/closing a trade; open interest = open futures positions (not interest rates);
+  funding = futures funding rate; exchange = crypto exchange (not currency exchange); staking, yield, liquidation,
+  breakout, pullback, whale, wick, dominance, mempool, hashrate as traders say them in {lang}. If {lang} traders
+  normally keep an English term (e.g. "long", "short", "spot"), keep it.
+- A string that starts with "English:" shows a term's English name: translate only the word "English" and keep the
+  English term after the colon exactly as written.
 - Short interface labels stay short: a button stays one or two words. Keep the tone neutral and clear.
 - Write numbers with Western digits (0-9). No explanations, no quotes around the whole answer, no notes.
 
@@ -318,7 +339,7 @@ def plan(langs, need, common, limit):
         # homepage and of the strings nearly every page has: those are what its readers see first, so they go with
         # the untranslated strings of the same kind
         shown = pct[code] >= READY
-        todo.sort(key=lambda k: (k in gt and not (shown and k in common), k not in common, len(k), k))
+        todo.sort(key=lambda k: (k in gt and not (shown and (k in common or trade_word(k))), k not in common, len(k), k))
         queues.append((code, list(batches(todo))))
     # A language already offered in the globe comes first and takes one batch a round: a language a reader can pick
     # today must not fall behind the pages written today. After them the whole of what is left goes to the one
