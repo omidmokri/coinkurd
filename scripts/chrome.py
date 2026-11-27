@@ -484,7 +484,7 @@ def footer(lang="fa"):
 # The page-transition opt-in (@view-transition) is written inline too: Chrome reads it reliably only when it is
 # already known while <head> is parsed, not when it arrives with the stylesheet.
 UI2_VER = "11"
-NX_VER = "23"
+NX_VER = "24"
 EARTH_VER = "1"   # assets/space/nx-earth.{js,css}: the homepage's real Earth in the place of the coin. Off since 2026-11-27 11:30: the owner asked for the old home back while he picks a new home concept; the files stay, unused
 # "Deep" — the depth layer of every page except the homepage (owner's request, 2026-11-13): a sky behind the page, surfaces
 # that catch the light, a reading-progress line, a rail of sections and search-as-you-type (assets/deep.{css,js}). It rides

@@ -365,84 +365,185 @@
     if (j.fng && !nx.querySelector('[data-fg] svg')) gauge(+j.fng.v, j.fng.k);
     if (j.g && j.g.btc_d != null && !nx.querySelector('[data-s=intel]').textContent) dom(j.g.btc_d);
   }
-  /* ------------------------------------------------------------------ under the stage: what matters most
-     owner 2026-11-26: "we have so many important articles on the site, put them first". Before the channel's newest
-     posts, the week's most-read deep analyses (real view counts from the channel, real pictures) and the guides that
-     stay true: the pages a first visitor should find before anything else. */
-  var ESS = [
-    ['/bitcoin/', '<path d="M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9"/>', ['درک بیت‌کوین', 'تێگەیشتن لە بیتکۆین', 'Understanding Bitcoin'], ['۲۱ میلیون، ۳۳ هاوینگ و فیلم آموزشی، از صفر', '٢١ ملیۆن، ٣٣ هاڵڤینگ و فیلمی فێرکاری، لە سفرەوە', '21 million, 33 halvings and a short film, from zero']],
-    ['/dossier/', '<rect x="3" y="4" width="15" height="16" rx="2"/><path d="M18 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2M7 8h7M7 12h7M7 16h4"/>', ['پرونده‌های تحلیلی', 'دۆسیە شیکارییەکان', 'Analysis dossiers'], ['تحلیل عمیق رویدادهای مهم روز', 'شیکاری قووڵی ڕووداوە گرنگەکان', "Deep dives on the day's key stories"]],
-    ['/track-record/', '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>', ['کارنامهٔ واقعی کانال', 'کارنامەی ڕاستەقینەی کەناڵ', "The channel's real record"], ['بعد از پست‌ها چه شد، بی‌سانسور و قابل‌بازبینی', 'دوای پۆستەکان چی ڕوویدا، بێ دەستکاری', 'What happened after the posts, open to check']],
-    ['/map/', '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"/>', ['نقشهٔ یادگیری', 'نەخشەی فێربوون', 'Learning map'], ['هر چیزی که باید بلد باشید، روی یک نقشه', 'هەر شتێک کە دەبێت بیزانیت، لەسەر یەک نەخشە', 'Everything there is to learn, on one map']],
-    ['/academy/', '<path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5M22 9v6"/>', ['آکادمی کریپتو', 'ئەکادیمیای کریپتۆ', 'Crypto Academy'], ['از صفر تا حرفه‌ای، با آزمون و شبیه‌ساز', 'لە سفرەوە تا پرۆفیشناڵ، بە تاقیکردنەوە', 'Zero to pro, with quizzes and a simulator']],
-    ['/encyclopedia/', '<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4ZM20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6Z"/>', ['دانشنامهٔ بازارهای مالی', 'زانستنامەی بازاڕە داراییەکان', 'Encyclopedia of markets'], ['۵۰۶ مدخل با فرمول و منبع', '٥٠٦ خاڵ بە فۆرموڵ و سەرچاوە', '506 entries with formulas and sources']]
-  ];
-  var imp = d.createElement('section'); imp.className = 'nxi'; imp.id = 'nxi'; imp.setAttribute('aria-labelledby', 'nxi-h');
-  imp.innerHTML = '<div class="nxi-top">' + tri('مهم‌ترین‌ها، پیش از هر چیز', 'گرنگترینەکان، پێش هەموو شتێک', 'What matters most, first', 'h2', 'nxi-h').replace('<h2 ', '<h2 id="nxi-h" ') +
-    tri('پرخواننده‌ترین تحلیل‌های این هفته و راهنماهایی که هر روز به کار می‌آیند.', 'خوێنراوترین شیکارییەکانی ئەم هەفتەیە و ڕێنماییەکان کە هەموو ڕۆژێک بەکار دێن.', "This week's most-read analyses, and the guides you will use every day.", 'p', 'nxi-l') + '</div>' +
-    '<div class="nxi-feat" data-feat></div>' +
-    '<div class="nxi-ess">' + ESS.map(function (E) {
-      return '<a class="nxi-e" href="' + E[0] + '"><i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + E[1] + '</svg></i>' +
-        '<span>' + tri(E[2][0], E[2][1], E[2][2], 'b') + tri(E[3][0], E[3][1], E[3][2], 'small') + '</span></a>';
-    }).join('') + '</div>';
-  nx.parentNode.insertBefore(imp, nx.nextSibling);
+  /* ------------------------------------------------------------------ under the stage: the reading floor
+     owner 2026-11-27: "from here down to the footer needs a fundamental rethink: the harmony has to come back, one
+     professional design that goes with the coloured header menu and the footer". Two things were wrong. The cards were
+     grey boxes with a gold tint while the header and the footer wear the site's aurora edge (.br in chrome.css), so the
+     middle of the page looked like another site. And six link tiles repeated names that already stand on the first
+     screen or in its dock (Understanding Bitcoin, Learning map, Academy, Encyclopedia, Track record), against the rule
+     written above BEST. So: no link tiles. What is here is what the first screen cannot hold, the reading.
+       1. the week's dossiers: the most-read deep analysis as a lead with its own three-second summary, the next four
+          as a numbered list. Ranked by the channel's real view counts, nothing else.
+       2. the channel, stream by stream: one frame, a bar with the archive's real figures, three streams side by side
+          (tabs on a phone, so the page stays short).
+     Both wear the same frame as the footer's boxes: the aurora edge and the drifting clouds, lit only while on screen. */
+  var HXA = '<svg class="hx-ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>';
+  var HXS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>';
+  var HXK = ['#5ef2d6', '#9b7bff', '#ff6fb5', '#ffcf6b', '#7cc8ff'];   /* the aurora of the header and the footer, one colour at a time */
+  var hxIO = 'IntersectionObserver' in w ? new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle('br-on', e.isIntersecting); }); }, { rootMargin: '60px' }) : null;
+  function breathe(root) {
+    var ok = false; try { ok = w.CSS && (CSS.supports('mask-composite', 'exclude') || CSS.supports('-webkit-mask-composite', 'xor')); } catch (e) { }
+    if (!ok) return;
+    [].forEach.call(root.querySelectorAll('.hx-fr'), function (el) {
+      if (el.classList.contains('br')) return;
+      el.style.setProperty('--br-d', (-Math.random() * 18).toFixed(2) + 's');
+      var s = d.createElement('span'); s.className = 'br-neb'; s.setAttribute('aria-hidden', 'true'); el.insertBefore(s, el.firstChild);
+      el.classList.add('br'); if (hxIO) hxIO.observe(el); else el.classList.add('br-on');
+    });
+  }
+  /* write a block only when what was built has changed. Comparing with innerHTML does not work: the browser hands the
+     markup back re-serialised (an escaped quote comes back as a quote), so every pass looked new and reloaded the pictures. */
+  function put(el, h) { if (el._h !== h) { el._h = h; el.innerHTML = h; } }
+  function hxTop(id, k, eye, h, l, act, under) {
+    return '<div class="hx-top' + (under ? ' hx-scene' : '') + '"><div class="hx-tt"><span class="hx-eye" style="--k:' + k + '"><i></i>' + tri(eye[0], eye[1], eye[2]) + '</span>' +
+      tri(h[0], h[1], h[2], 'h2', 'hx-h').replace('<h2 ', '<h2 id="' + id + '" ') + tri(l[0], l[1], l[2], 'p', 'hx-l') + (under || '') + '</div>' + (act || '') + '</div>';
+  }
+  /* a post's age in whole units a person would say: minutes, hours, then days ("۱۳۰ ساعت پیش" is nobody's sentence) */
+  function when(iso) {
+    var s = (Date.now() - Date.parse(iso)) / 1000; if (!isFinite(s)) return ''; if (s < 60) s = 60;
+    var m = Math.round(s / 60), h = Math.round(s / 3600), dd = Math.round(s / 86400);
+    return m < 60 ? pick(dg(m) + ' دقیقه پیش', dg(m) + ' خولەک لەمەوپێش', m + ' min ago')
+      : h < 36 ? pick(dg(h) + ' ساعت پیش', dg(h) + ' کاتژمێر لەمەوپێش', h + ' h ago')
+        : pick(dg(dd) + ' روز پیش', dg(dd) + ' ڕۆژ لەمەوپێش', dd + ' days ago');
+  }
+  /* a title as words: the channel opens many titles with a pictograph, which reads as noise in a list of headlines */
+  var HXL; try { HXL = new RegExp('^[^\\p{L}\\p{N}«"(\\[]+', 'u'); } catch (e) { HXL = /^[\s -⯿️‌-‏\uD83C-􏰀-\uDFFF]+/; }
+  function ttlOf(t) { return String(t.title || '').replace(HXL, '').replace(/\s+/g, ' ').trim(); }
+  /* the post's own short summary: the line the channel writes under "in 3 seconds"; else the body after the title */
+  function gist(t) {
+    var raw = String(t.text || ''), L = raw.split('\n').map(function (x) { return x.replace(/[─-╿_=~*]{2,}/g, '').trim(); }).filter(Boolean), i;
+    for (i = 0; i < L.length - 1; i++) if (L[i].indexOf('⚡') >= 0 && L[i].length < 40) return L[i + 1];
+    var ttl = String(t.title || '').trim(), body = L.join(' ').replace(/\s+/g, ' '); if (body.indexOf(ttl) === 0) body = body.slice(ttl.length).trim();
+    return body.replace(HXL, '');
+  }
+  function catChip(p) {
+    var cn = '', cc = ''; try { var co = catOf(p.category); cn = cname(co); cc = co.color || ''; } catch (e) { }
+    return { n: cn, c: /^#[0-9a-f]{3,8}$/i.test(cc) ? cc : '' };
+  }
+  function meta(p) { return '<time>' + esc(when(p.date)) + '</time>'; }   /* the order is the channel's view count; the count itself is not printed */
+
+  var imp = d.createElement('section'); imp.className = 'hx nxi'; imp.id = 'nxi'; imp.setAttribute('aria-labelledby', 'nxi-h');
+  imp.innerHTML = hxTop('nxi-h', HXK[3], ['پرونده‌های تحلیلی', 'دۆسیە شیکارییەکان', 'Analysis dossiers'],
+    ['این هفته چه خوانده شد', 'ئەم هەفتەیە چی خوێندرایەوە', 'What was read this week'],
+    ['پنج تحلیل عمیقِ هفته، به ترتیب بازدید در کانال. خلاصهٔ هر کدام همین‌جاست؛ متن کامل با یک لمس باز می‌شود.',
+      'پێنج شیکاریی قووڵی هەفتە، بەپێی ژمارەی بینین لە کەناڵ. پوختەی هەر یەکێکیان هەر لێرەیە؛ دەقی تەواو بە یەک دەستلێدان دەکرێتەوە.',
+      "The week's five deep analyses, ranked by views on the channel. Each summary is right here; one tap opens the full text."],
+    '<div class="hx-as" aria-hidden="true"><div class="hx-as-t"><img src="/assets/home/astro.webp" srcset="/assets/home/astro-s.webp 322w, /assets/home/astro.webp 470w" sizes="(max-width:820px) 130px, 270px" alt="" width="470" height="760" decoding="async"><i class="hx-gl a"></i><i class="hx-gl b"></i></div></div>',
+    '<a class="hx-act" href="/dossier/">' + tri('همهٔ پرونده‌ها', 'هەموو دۆسیەکان', 'All dossiers') + HXA + '</a>') +
+    '<div class="hx-wk"><div class="hx-fr hx-lead"><div class="hx-in" data-lead></div></div><div class="hx-fr hx-rank"><ol class="hx-in" data-rank></ol></div></div>';
+  /* owner 2026-11-27: "set the background to something like this [a neon nebula over an alien plain], and the
+     astronauts, without a background, watching the mouse move". The nebula is the sky of the whole reading floor: the
+     picture at the top, fading into deep space further down (nx.css). The two astronauts stand in the first band. They
+     are one flat picture, so "watching" is done the way a picture can do it: the pair turns in depth toward the pointer
+     and the light in each visor slides to the side the pointer is on. Nothing moves while the band is off screen, and
+     nothing at all under prefers-reduced-motion or when motion is switched off on this device (ek-still). */
+  var sky = d.createElement('div'); sky.className = 'hx-sky'; sky.id = 'hx-sky';
+  sky.innerHTML = '<div class="hx-neb" aria-hidden="true"></div>';
+  nx.parentNode.insertBefore(sky, nx.nextSibling); sky.appendChild(imp);
+  (function () {
+    var box = imp.querySelector('.hx-as'), t = box && box.firstChild; if (!t) return;
+    var gl = box.querySelectorAll('.hx-gl'), tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, on = !('IntersectionObserver' in w);
+    var calm = false; try { calm = w.matchMedia('(prefers-reduced-motion:reduce)').matches; } catch (e) { }
+    if (calm) return;
+    function frame() {
+      raf = 0; cx += (tx - cx) * 0.1; cy += (ty - cy) * 0.1;
+      t.style.transform = 'rotateY(' + (cx * 17).toFixed(2) + 'deg) rotateX(' + (-cy * 6).toFixed(2) + 'deg) translate3d(' + (cx * 8).toFixed(1) + 'px,0,0)';
+      for (var i = 0; i < gl.length; i++) gl[i].style.transform = 'translate3d(' + (cx * 46).toFixed(1) + '%,' + (cy * 34).toFixed(1) + '%,0)';
+      if (Math.abs(tx - cx) > 0.003 || Math.abs(ty - cy) > 0.003) raf = requestAnimationFrame(frame);
+    }
+    function aim(e) {
+      if (!on || de.classList.contains('ek-still')) return;
+      var r = box.getBoundingClientRect(), x = (e.clientX - (r.left + r.width / 2)) / (w.innerWidth * 0.5), y = (e.clientY - (r.top + r.height * 0.14)) / (w.innerHeight * 0.5);
+      tx = x < -1 ? -1 : x > 1 ? 1 : x; ty = y < -1 ? -1 : y > 1 ? 1 : y;
+      if (!raf) raf = requestAnimationFrame(frame);
+    }
+    w.addEventListener('pointermove', aim, { passive: true });
+    if ('IntersectionObserver' in w) new IntersectionObserver(function (es) { on = es[0].isIntersecting; box.classList.toggle('on', on); }, { rootMargin: '80px' }).observe(box);
+    else box.classList.add('on');
+  })();
+  function pic(p, wd, ht) {
+    var src = p.photos[0]; try { src = wp(src, true); } catch (e) { }
+    return '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" width="' + wd + '" height="' + ht + '" onerror="this.parentNode.classList.add(\'no\');this.remove()">';
+  }
   function featFill() {
-    var box = imp.querySelector('[data-feat]'); if (!box) return;
+    var lead = imp.querySelector('[data-lead]'), rank = imp.querySelector('[data-rank]'); if (!lead) return;
     var ps; try { ps = VP(); } catch (e) { return; }
     var lim = Date.now() - 7 * 864e5;
-    var cand = ps.filter(function (p) { return p.photos && p.photos[0] && /\/deepimg\//.test(p.photos[0]) && Date.parse(p.date) > lim && p.q !== 'low'; });
-    cand.sort(function (a, b) { return (+b.views || 0) - (+a.views || 0) || (a.date < b.date ? 1 : -1); });
-    var h = '';
-    cand.slice(0, 3).forEach(function (p, i) {
-      var t = {}; try { t = PT(p) || {}; } catch (e) { }
-      var ttl = String(t.title || '').trim(); if (!ttl) return;
-      var src = p.photos[0]; try { src = wp(src, true); } catch (e) { }
-      h += '<button type="button" class="nxi-f' + (i ? '' : ' big') + '" data-post="' + esc(p.id) + '"><span class="nxi-im"><img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" width="540" height="304" onerror="this.parentNode.classList.add(\'no\');this.remove()"></span>' +
-        '<span class="nxi-tx"><small>' + esc(when(p.date)) + (+p.views ? ' · ' + esc(nfmt(+p.views)) + ' ' + esc(pick('بازدید', 'بینین', 'views')) : '') + '</small><b dir="auto">' + esc(ttl) + '</b></span></button>';
+    var cand = ps.filter(function (p) { return p.photos && p.photos[0] && /\/deepimg\//.test(p.photos[0]) && Date.parse(p.date) > lim && p.q !== 'low'; })
+      .map(function (p) { var t = {}; try { t = PT(p) || {}; } catch (e) { } return { p: p, t: t, ttl: ttlOf(t) }; }).filter(function (x) { return x.ttl; });
+    cand.sort(function (a, b) { return (+b.p.views || 0) - (+a.p.views || 0) || (a.p.date < b.p.date ? 1 : -1); });
+    imp.hidden = cand.length < 3;                                               /* a ranking of one or two is not a ranking */
+    if (cand.length < 3) return;
+    var a = cand[0], c = catChip(a.p), g = gist(a.t);
+    var h = '<button type="button" class="hx-lb" data-post="' + esc(a.p.id) + '"><span class="hx-po">' + pic(a.p, 540, 675) + '</span>' +
+      '<span class="hx-bd"><span class="hx-hx"><span class="hx-r1"><span class="hx-no" aria-hidden="true">' + dg(1) + '</span>' + (c.n ? '<span class="hx-cat"' + (c.c ? ' style="--cc:' + c.c + '"' : '') + '>' + esc(c.n) + '</span>' : '') + meta(a.p) + '</span>' +
+      '<b dir="auto">' + esc(a.ttl) + '</b></span>' +
+      (g ? '<span class="hx-g"><em>' + esc(pick('در ۳ ثانیه', 'لە ٣ چرکەدا', 'In 3 seconds')) + '</em><span dir="auto">' + esc(g.slice(0, 300)) + '</span></span>' : '') +
+      '<span class="hx-cta">' + esc(pick('خواندن پرونده', 'خوێندنەوەی دۆسیە', 'Read the dossier')) + HXA + '</span></span></button>';
+    put(lead, h);
+    h = '';
+    cand.slice(1, 5).forEach(function (x, i) {
+      var cc = catChip(x.p);
+      h += '<li><button type="button" data-post="' + esc(x.p.id) + '" style="--k:' + HXK[(i + 1) % HXK.length] + '"><span class="hx-n" aria-hidden="true">' + dg(i + 2) + '</span>' +
+        '<span class="hx-rt"><span class="hx-m">' + (cc.n ? '<i' + (cc.c ? ' style="--cc:' + cc.c + '"' : '') + '>' + esc(cc.n) + '</i>' : '') + meta(x.p) + '</span><b dir="auto">' + esc(x.ttl) + '</b></span>' +
+        '<span class="hx-po sm">' + pic(x.p, 120, 150) + '</span></button></li>';
     });
-    if (h && box.innerHTML !== h) box.innerHTML = h;
+    put(rank, h);
   }
   imp.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-post]'); if (b) { try { openPost(b.getAttribute('data-post')); } catch (x) { } } });
 
-  /* ------------------------------------------------------------------ under the stage: the channel, as a wire
-     (replaces the photo strip and the two picture halves of the old page: titles you can read, not pictures of text) */
-  var wire = d.createElement('section'); wire.className = 'nxw'; wire.id = 'nxw'; wire.setAttribute('aria-labelledby', 'nxw-h');
-  wire.innerHTML = '<div class="nxw-top"><div>' + tri('از کانال، همین حالا', 'لە کەناڵەوە، هەر ئێستا', 'From the channel, right now', 'h2', 'nxw-h').replace('<h2 ', '<h2 id="nxw-h" ') +
-    tri('هر پستِ Coin_Kurd ظرف ۱۵ دقیقه این‌جاست: خوانده‌شده، دسته‌بندی‌شده بر اساس موضوع، کوین و زمان، و قابل جستجو.', 'هەر پۆستێکی Coin_Kurd لە ماوەی ١٥ خولەکدا لێرەیە: خوێنراوە، بەپێی بابەت، دراو و کات پۆلێنکراوە، و دەتوانیت بەدوایدا بگەڕێیت.', 'Every Coin_Kurd post is here within 15 minutes: read, sorted by topic, coin and time, and searchable.', 'p', 'nxw-l') +
-    '</div><ul class="nxw-k" data-wk></ul></div><div class="nxw-cols">' +
-    [['news,etf_institutional,regulation', 'خبر و نهادها', 'هەواڵ و دامەزراوەکان', 'News and institutions'], ['technical,onchain,signal', 'تحلیل و آن‌چین', 'شیکاری و ئۆن‌چەین', 'Analysis and on-chain'], ['education,security,products,community', 'آموزش و امنیت', 'فێرکاری و ئاسایش', 'Learning and security']].map(function (g) {
-      return '<div class="nxw-col" data-cat="' + g[0] + '"><div class="nxw-hd"><h3>' + tri(g[1], g[2], g[3]) + '</h3><span class="nxw-n" data-wn></span>' +
-        '<button type="button" class="nxw-all" data-wall="' + g[0].split(',')[0] + '">' + tri('همه', 'هەموو', 'All') + '</button></div><ol class="nxw-list" data-wl></ol></div>';
-    }).join('') + '</div>';
-  imp.parentNode.insertBefore(wire, imp.nextSibling);
-  function when(iso) { try { return String(ago(iso)).replace(/^[^\d\u06F0-\u06F9\u0660-\u0669A-Za-z]+/, ''); } catch (e) { return ''; } }   /* the page's own "ago" marks stale data with a warning sign; a post's age is not a warning */
+  var WG = [['news,etf_institutional,regulation', 'خبر و نهادها', 'هەواڵ و دامەزراوەکان', 'News and institutions'], ['technical,onchain,signal', 'تحلیل و آن‌چین', 'شیکاری و ئۆن‌چەین', 'Analysis and on-chain'], ['education,security,products,community', 'آموزش و امنیت', 'فێرکاری و ئاسایش', 'Learning and security']];
+  var wire = d.createElement('section'); wire.className = 'hx nxw'; wire.id = 'nxw'; wire.setAttribute('aria-labelledby', 'nxw-h');
+  wire.innerHTML = hxTop('nxw-h', HXK[0], ['کانال Coin_Kurd', 'کەناڵی Coin_Kurd', 'The Coin_Kurd channel'],
+    ['جریان کانال، دسته‌به‌دسته', 'ڕەوتی کەناڵ، پۆل بە پۆل', 'The channel, stream by stream'],
+    ['هر پست حداکثر ۱۵ دقیقه بعد از انتشار این‌جاست؛ با موضوع، کوین و زمانش، و قابل جستجو.',
+      'هەر پۆستێک لە ماوەی ١٥ خولەکدا دوای بڵاوبوونەوە لێرەیە؛ بە بابەت، دراو و کاتەکەیەوە، و دەتوانیت بەدوایدا بگەڕێیت.',
+      'Every post lands here within 15 minutes of being published, filed by topic, coin and time, and searchable.']) +
+    '<div class="hx-fr hx-wire"><div class="hx-in"><div class="hx-bar"><ul class="nxw-k" data-wk></ul>' +
+    '<button type="button" class="hx-act sm" data-wall="all">' + HXS + tri('جستجو در آرشیو', 'گەڕان لە ئەرشیف', 'Search the archive') + '</button></div>' +
+    '<div class="hx-tabs" role="tablist">' + WG.map(function (g, i) { return '<button type="button" role="tab" id="hx-t' + i + '" aria-controls="hx-c' + i + '" aria-selected="' + (i ? 'false' : 'true') + '" data-tab="' + i + '" style="--k:' + HXK[i] + '">' + tri(g[1], g[2], g[3]) + '</button>'; }).join('') + '</div>' +
+    '<div class="hx-cols">' + WG.map(function (g, i) {
+      return '<div class="hx-col' + (i ? '' : ' on') + '" id="hx-c' + i + '" role="tabpanel" aria-labelledby="hx-t' + i + '" data-cat="' + g[0] + '" style="--k:' + HXK[i] + '"><div class="hx-hd"><h3>' + tri(g[1], g[2], g[3]) + '</h3><span class="hx-cn" data-wn></span>' +
+        '<button type="button" class="hx-all" data-wall="' + g[0].split(',')[0] + '">' + tri('همه', 'هەموو', 'All') + HXA + '</button></div><ol class="hx-list" data-wl></ol></div>';
+    }).join('') + '</div></div></div>';
+  sky.appendChild(wire);
+  breathe(imp); breathe(wire);
+  var HXJ = /^(فارسی|کوردی|English|العربية|عربي)(\s|\(|$)/;                   /* a language label left over as a "title": not a headline */
   function wireFill() {
     var ps; try { ps = VP().slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }); } catch (e) { return; }
-    [].forEach.call(wire.querySelectorAll('.nxw-col'), function (col) {
-      var cats = col.getAttribute('data-cat').split(','), h = '';
-      ps.filter(function (p) { return cats.indexOf(p.category) >= 0; }).slice(0, 3).forEach(function (p) {
+    [].forEach.call(wire.querySelectorAll('.hx-col'), function (col) {
+      var cats = col.getAttribute('data-cat').split(','), h = '', k = 0;
+      ps.some(function (p) {
+        if (cats.indexOf(p.category) < 0) return false;
         var t = {}; try { t = PT(p) || {}; } catch (e) { }
-        var body = String(t.text || '').replace(/[\u2500-\u257F_=~*]{3,}/g, ' ').replace(/\s+/g, ' ').trim(), ttl = String(t.title || '').trim(); if (body.indexOf(ttl) === 0) body = body.slice(ttl.length).trim();
-        var coins = Array.isArray(p.coins) ? p.coins.slice(0, 3) : [], lg = '';
+        var ttl = ttlOf(t); if (ttl.length < 12 || HXJ.test(ttl)) return false;
+        var body = gist(t), coins = Array.isArray(p.coins) ? p.coins.slice(0, 3) : [], lg = '';
         coins.forEach(function (c) { if (/^[A-Z0-9]{2,10}$/.test(c)) lg += '<img src="/data/logos/' + c + '.png" alt="' + c + '" title="' + c + '" width="20" height="20" loading="lazy" decoding="async" onerror="this.remove()">'; });
-        var cn = '', cc = '', wh = when(p.date);
-        try { var co = catOf(p.category); cn = cname(co); cc = co.color || ''; } catch (e) { }
-        h += '<li><button type="button" data-post="' + esc(p.id) + '"' + (/^#[0-9a-f]{3,8}$/i.test(cc) ? ' style="--cc:' + cc + '"' : '') + '><span class="nxw-m">' + (cn ? '<i>' + esc(cn) + '</i>' : '') + '<time>' + esc(wh) + '</time>' + lg + '</span><b dir="auto">' + esc(ttl) + '</b>' + (body ? '<span class="nxw-x" dir="auto">' + esc(body.slice(0, 150)) + '</span>' : '') + '</button></li>';
+        var cc = catChip(p);
+        h += '<li><button type="button" data-post="' + esc(p.id) + '"' + (cc.c ? ' style="--cc:' + cc.c + '"' : '') + '><span class="hx-m">' + (cc.n ? '<i>' + esc(cc.n) + '</i>' : '') + '<time>' + esc(when(p.date)) + '</time>' + (lg ? '<span class="hx-lg">' + lg + '</span>' : '') + '</span><b dir="auto">' + esc(ttl) + '</b>' + (body ? '<span class="hx-x" dir="auto">' + esc(body.slice(0, 150)) + '</span>' : '') + '</button></li>';
+        return ++k >= 4;
       });
-      var ol = col.querySelector('[data-wl]'); if (h && ol.innerHTML !== h) ol.innerHTML = h;
+      var ol = col.querySelector('[data-wl]'); if (h) put(ol, h);
       var n = 0; try { cats.forEach(function (c) { n += S.meta.by_category[c] || 0; }); } catch (e) { }
       col.querySelector('[data-wn]').textContent = n ? nfmt(n) + ' ' + pick('پست', 'پۆست', 'posts') : '';
     });
     var k = wire.querySelector('[data-wk]'), kh = '';
     [['#sPosts', 'پست', 'پۆست', 'posts'], ['#sCats', 'دسته', 'پۆل', 'categories'], ['#sCoins', 'کوین', 'دراو', 'coins']].forEach(function (x) { var e = d.querySelector(x[0]), v = e && e.textContent.trim(); if (v) kh += '<li><b>' + esc(v) + '</b>' + pick(x[1], x[2], x[3]) + '</li>'; });
-    /* the three tiles above hold a bare number, so .nxw-k b lays them out left-to-right. This one holds a date,
+    /* the three figures above hold a bare number, so .nxw-k b lays them out left-to-right. This one holds a date,
        which is a number AND words: left-to-right would throw the day to the far end, printing "آذر ۱۴۰۵ ۱".
        nxw-dt gives it back the direction of the page it sits on. */
-    var up = d.querySelector('#sUpd'), uv = up && up.textContent.trim(); if (uv) kh += '<li><b class="nxw-dt">' + esc(uv.replace(/^\d{4}-\d{2}-\d{2}\s*/, '')) + '</b>' + pick('آخرین به‌روزرسانی', 'دوایین نوێکردنەوە', 'last update') + '</li>';
-    if (k.innerHTML !== kh) k.innerHTML = kh;
+    var up = d.querySelector('#sUpd'), uv = up && up.textContent.trim(); if (uv) kh += '<li><i class="hx-dot" aria-hidden="true"></i>' + pick('آخرین به‌روزرسانی', 'دوایین نوێکردنەوە', 'last update') + '<b class="nxw-dt">' + esc(uv.replace(/^\d{4}-\d{2}-\d{2}\s*/, '')) + '</b></li>';
+    put(k, kh);
   }
   wire.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-post]'); if (b) { try { openPost(b.getAttribute('data-post')); } catch (x) { } return; }
+    var tb = e.target.closest && e.target.closest('[data-tab]');
+    if (tb) {
+      var n = tb.getAttribute('data-tab');
+      [].forEach.call(wire.querySelectorAll('[data-tab]'), function (x) { x.setAttribute('aria-selected', x === tb ? 'true' : 'false'); });
+      [].forEach.call(wire.querySelectorAll('.hx-col'), function (x) { x.classList.toggle('on', x.id === 'hx-c' + n); });
+      return;
+    }
     var a = e.target.closest && e.target.closest('[data-wall]'); if (a) { open('feed'); }
   });
 
