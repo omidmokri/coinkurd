@@ -3749,6 +3749,10 @@
 "6b5b19bc70",
 "Şu ana kadarki ortalama"
 ],
+"odAvgS": [
+"bf3c2aa634",
+"Şu ana kadarki ortalama"
+],
 "odBE": [
 "c728685de9",
 "Stopu başa baş noktasına çek"
@@ -3933,6 +3937,10 @@
 "a9498bb911",
 "En fazla 8 adım. Her biri ortalama girişten bir fiyatta, yüzde cinsinden veya R katı olarak bir payı kapatır."
 ],
+"odFillNote": [
+"c87b4a2a0a",
+"Şu ana kadarki ortalama: bu adım gerçekleştiğinde giriş ortalamanız. SL'de zarar: bu adım gerçekleştiği anda stop tetiklenirse, komisyon ve kayma dahil ne kadar kaybedeceğiniz."
+],
 "odFilled": [
 "b9cade220e",
 "Gerçekleşen girişler"
@@ -4004,6 +4012,14 @@
 "odLossIf": [
 "9f9abd5a30",
 "Şimdi stop olunursa zarar"
+],
+"odLossOf": [
+"11e7b83c1c",
+"Tam riskinizin {p}%'i ({r})"
+],
+"odLossS": [
+"8a983821d2",
+"SL'de zarar"
 ],
 "odMore": [
 "e4cd862519",
@@ -4248,6 +4264,986 @@
 "odX_r": [
 "78c72d9090",
 "× R"
+],
+"odhA0": [
+"d97012c5ea",
+"ODM geriye doğru çalıştığı için: riskinizi, her bir birimin girişten stopa kadar kaybettiği miktara (komisyon ve kayma dahil) böler. Böylece pozisyon büyüklüğü her zaman seçtiğiniz riske uygun olur."
+],
+"odhA1": [
+"265c1585c3",
+"R, ortalama girişinizden stopa olan mesafedir. Para cinsinden 1R, riskinizdir. 2R'deki bir kâr al, riske attığınızın iki katını kazandırır."
+],
+"odhA10": [
+"c493f48847",
+"Genellikle stop girişlerin yanlış tarafındadır, giriş payları %100'ü bulmuyordur veya kâr al seviyesi ortalamanın ötesinde değildir. Mesaj hangisinin olduğunu belirtir."
+],
+"odhA11": [
+"d35315306a",
+"'Grafikte göster' her seviyeyi bir çizgi olarak çizer. Alarm butonu her seviye için bir alarm ekler ve Telegram butonu, işaretli tüm seviyeleri tek bir bağlantı ile bota gönderir."
+],
+"odhA12": [
+"dd70fbb6c9",
+"Evet. Short seçin: girişler merdiven şeklinde yukarı çıkar, stop bunların üzerinde ve kâr al seviyeleri ortalamanın altında yer alır. Spot piyasada short yapılamaz."
+],
+"odhA13": [
+"49195572ea",
+"Hayır. ODM sadece girdiğiniz planın aritmetiğini yapar. Karar ve risk size aittir."
+],
+"odhA2": [
+"07478cdb04",
+"O zaman daha az tutarsınız ve stop olmak daha az maliyetli olur. Giriş tablosu bunu satır satır gösterir: her adımdan hemen sonra stop tetiklenirse oluşacak zarar."
+],
+"odhA3": [
+"f273ced333",
+"Stopta değil: bu sizin riskinizden gelir. Kaldıraç sadece yatırdığınız teminatı değiştirir ve likidasyon fiyatını yaklaştırır."
+],
+"odhA4": [
+"9ee9b51794",
+"Düşük kaldıraçta teminat sıfıra düşüşü karşıladığı için (long için), basitleştirilmiş model likidasyon fiyatı bulamaz. Kaldıracı yükseltin, bir tane görünecektir."
+],
+"odhA5": [
+"380ac6b360",
+"Average True Range (Ortalama Gerçek Aralık): Bu grafiğin son N kapalı mumunda, boşluklar dahil, bir mumun hareketinin ortalama boyutu. Coin'in şu anda ne kadar hareket ettiğini ölçer."
+],
+"odhA6": [
+"7450054b0a",
+"Her iki tarafta, belirlediğiniz komisyon yüzdesinde: her giriş gerçekleştiğinde ve kapandığında. Bunlar stopta zarara eklenir ve her kârdan düşülür."
+],
+"odhA7": [
+"c6b248d165",
+"Açılış ve kapanış komisyonları ödendikten sonra tüm pozisyonun tam olarak sıfırla kapandığı fiyat."
+],
+"odhA8": [
+"edbc69746e",
+"Kâr al seviyesi olmayan pay açık kalır. Takip eden stop (trailing stop) açıksa, belirlediğiniz mesafede fiyatı takip eder; kapalıysa siz kapatana kadar açık kalır."
+],
+"odhA9": [
+"860be7dfde",
+"Fiyatın ilk ulaştığı: long için en yüksek fiyat (fiyat düşerek onlara ulaşır), short için en düşük fiyat."
+],
+"odhAbout": [
+"2367c4d244",
+"{t} Hakkında"
+],
+"odhAsk": [
+"225c298b36",
+"Hala net değil mi? Sorun"
+],
+"odhAskPh": [
+"a351c059a3",
+"Sorunuzu yazın…"
+],
+"odhClose": [
+"bbfa773e5a",
+"Kapat"
+],
+"odhCopied": [
+"a567d021f9",
+"Sorunuz kopyalandı. Açılan Telegram sohbetine yapıştırın."
+],
+"odhEx": [
+"0f01ed56a1",
+"Örnek"
+],
+"odhFound": [
+"cbee297612",
+"Planlayıcı kılavuzundan:"
+],
+"odhNone": [
+"0274ea469d",
+"Bunu planlayıcı kılavuzunda bulamadım. Bir kişi cevaplayabilir:"
+],
+"odhNote": [
+"9e7107a148",
+"Cevaplar bu planlayıcının kendi kılavuzundan gelir. Yatırım tavsiyesi değildir."
+],
+"odhQ0": [
+"91c4311223",
+"Stopta zarar neden her zaman tam olarak riskim kadardır?"
+],
+"odhQ1": [
+"82c35eab7c",
+"R nedir?"
+],
+"odhQ10": [
+"2fc8193a42",
+"Planım neden kırmızı bir mesajla reddediliyor?"
+],
+"odhQ11": [
+"efc0159afc",
+"Planı grafiğe nasıl koyarım veya nasıl alarm alırım?"
+],
+"odhQ12": [
+"edfb87ec89",
+"Short planlayabilir miyim?"
+],
+"odhQ13": [
+"fca8edea2c",
+"Bu bir yatırım tavsiyesi mi?"
+],
+"odhQ2": [
+"d4bcbe2cdc",
+"Girişlerimin sadece bir kısmı gerçekleşirse ne olur?"
+],
+"odhQ3": [
+"57fbd2a531",
+"Daha fazla kaldıraç zararımı artırır mı?"
+],
+"odhQ4": [
+"f34abc6f0d",
+"Neden likidasyon fiyatı olmadığını söylüyor?"
+],
+"odhQ5": [
+"45313c99d8",
+"ATR nedir?"
+],
+"odhQ6": [
+"0372f9c582",
+"Komisyonlar nasıl hesaplanır?"
+],
+"odhQ7": [
+"3b70797699",
+"Burada başa baş (break-even) ne anlama geliyor?"
+],
+"odhQ8": [
+"095ce05679",
+"Geriye kalan kısma ne olur?"
+],
+"odhQ9": [
+"7c5ea886ee",
+"Hangi giriş önce gerçekleşir?"
+],
+"odhSee": [
+"2d8243a2c0",
+"Ayrıca bakınız"
+],
+"odhSend": [
+"3562777bc6",
+"Sor"
+],
+"odhTg": [
+"54f13b7555",
+"Telegram'da birine sor"
+],
+"odhTgPre": [
+"9d35fd54bf",
+"entekhab.net üzerinde ODM ({t}) hakkında bir soru:"
+],
+"odhWhat": [
+"f8c94a3b4b",
+"Nedir"
+],
+"odhWhy": [
+"25b83941ae",
+"Ne işe yarar"
+],
+"odhYours": [
+"62c9423b82",
+"Sizin rakamlarınızla"
+],
+"odh_acc_e": [
+"a1e672ab9e",
+"%1 risk ile 1.000 bakiye: stop tetiklenirse tüm plan en fazla 10 kaybedebilir."
+],
+"odh_acc_t": [
+"e6018a209f",
+"Hesap ve sözleşme"
+],
+"odh_acc_w": [
+"a976dbc237",
+"Hesabınızdaki para ve işlem yaptığınız piyasa türü."
+],
+"odh_acc_y": [
+"6781776e66",
+"Diğer her şey bunlara göre boyutlandırılır: miktar, bakiyenizden ve seçtiğiniz riskten gelir, asla tahminden değil."
+],
+"odh_at_e": [
+"285c2bf283",
+"Her şeyi 64.000'de kapatmanın sonucunu görmek için 64.000 yazın."
+],
+"odh_at_t": [
+"935081b125",
+"Fiyattaki sonuç"
+],
+"odh_at_w": [
+"fed458f278",
+"Tüm girişler gerçekleşmiş haldeyken, tüm pozisyonun orada kapatılması durumunda komisyonlar dahil ne kadar kâr veya zarar edeceğinizi görmek için herhangi bir fiyat yazın."
+],
+"odh_at_y": [
+"cc9eda3c11",
+"Şuna hızlı bir cevap: fiyat X'e giderse ne olur?"
+],
+"odh_atrlen_e": [
+"69e29d5c8e",
+"4 saatlik grafikte 14, son 14 kapalı dört saatlik mum anlamına gelir."
+],
+"odh_atrlen_n": [
+"e014738faf",
+"Şu an: ATR({atrn}) = {atr}."
+],
+"odh_atrlen_t": [
+"0d1283ae88",
+"ATR uzunluğu"
+],
+"odh_atrlen_w": [
+"ec7b66a7d1",
+"Ortalama gerçek aralığın, 2 ile 200 arasında, bu grafiğin kaç kapalı mumunu kullandığı."
+],
+"odh_atrlen_y": [
+"0cb5efe861",
+"Daha kısa olan daha hızlı tepki verir. 14 yaygın tercihtir."
+],
+"odh_avg_e": [
+"261f462ba2",
+"Üçte birer payla 61.590, 60.974 ve 60.358'in ortalaması 60.974'tür."
+],
+"odh_avg_n": [
+"00574db62b",
+"Sizin: {avg}."
+],
+"odh_avg_t": [
+"195d5c2e94",
+"Ortalama giriş (hepsi gerçekleştiğinde)"
+],
+"odh_avg_w": [
+"7aa1dfcea6",
+"Girişlerinizin, her birinin payına göre ağırlıklı ortalaması."
+],
+"odh_avg_y": [
+"944a3a2604",
+"Kâr, R ve başa baş noktası bunun üzerinden ölçülür."
+],
+"odh_avgso_e": [
+"3d6689c33b",
+"61.590 ve 60.974'te (eşit paylarla) E1 ve E2'den sonra ortalama 61.282'dir."
+],
+"odh_avgso_t": [
+"6b5b19bc70",
+"Şu ana kadarki ortalama"
+],
+"odh_avgso_w": [
+"640b763fe7",
+"Bu adım ve öncekiler gerçekleştiğinde giriş ortalamanız."
+],
+"odh_avgso_y": [
+"5021e04d42",
+"Fiyat sonraki adımlara hiç ulaşmazsa, gerçek ortalamanız budur."
+],
+"odh_balance_e": [
+"f71c8aeb53",
+"%1 risk ile 2.000 bakiye: bu işlemin kaybedebileceği en fazla miktar 20'dir."
+],
+"odh_balance_n": [
+"0487b654ad",
+"Rakamlarınız: {bal} × {rp}% = {risk}."
+],
+"odh_balance_t": [
+"98dcb75a7c",
+"Hesap bakiyesi"
+],
+"odh_balance_w": [
+"de01d13238",
+"İşlem yaptığınız para, USDT cinsinden."
+],
+"odh_balance_y": [
+"fd4b786043",
+"Para cinsinden riskiniz, bu bakiye ile risk yüzdesinin çarpımıdır."
+],
+"odh_be_e": [
+"a0382921f0",
+"TP1'den sonra stop 59.531'den, komisyonlar dahil başa baş noktası olan yaklaşık 61.096'ya taşınır."
+],
+"odh_be_t": [
+"c728685de9",
+"Başa başa stop"
+],
+"odh_be_w": [
+"861ff47778",
+"Seçtiğiniz kâr al seviyesi gerçekleştiğinde, stop, geri kalan kısmın komisyonlar sonrası sıfırla kapandığı fiyata taşınır."
+],
+"odh_be_y": [
+"32fa27561d",
+"O andan itibaren, kayma hariç, işlem zarara dönemez."
+],
+"odh_bep_e": [
+"c331f932ff",
+"%0.1 komisyonla 60.974 ortalama: long için başa baş noktası yaklaşık 61.096'dır."
+],
+"odh_bep_n": [
+"6cd9e12493",
+"Sizin: {be}."
+],
+"odh_bep_t": [
+"f05a5bace4",
+"Başa baş fiyatı"
+],
+"odh_bep_w": [
+"b8f351c832",
+"Her iki tarafta komisyon ödendikten sonra tüm pozisyonun sıfırla kapandığı yer."
+],
+"odh_bep_y": [
+"73228b98b2",
+"'Başa başa stop' seçtiğinizde stop buraya taşınır."
+],
+"odh_best_e": [
+"9eb73103e3",
+"+13.21 (1.32R): kâr al seviyeleri toplamda riskinizin 1.32 katını kazandırır."
+],
+"odh_best_t": [
+"802503cf21",
+"Tüm çıkışlar gerçekleştiğinde"
+],
+"odh_best_w": [
+"cf54412f22",
+"Her biri gerçekleşirse, komisyonlar dahil sadece kâr al seviyelerinden elde edilen kâr. Takip eden stopa bırakılan kısım buna dahil değildir."
+],
+"odh_best_y": [
+"6aec2ebfe9",
+"Planın hedeflerinin para ve R cinsinden değerini gösterir."
+],
+"odh_contract_e": [
+"09ce7c2386",
+"Spot piyasada 60.000'de 0.01 BTC, 600 USDT'nin tamamına mal olur. 5x kaldıraçlı bir perpetual'da teminat 120'dir."
+],
+"odh_contract_t": [
+"5a0ba3bb83",
+"Sözleşme"
+],
+"odh_contract_w": [
+"4845fcd1eb",
+"Linear perpetual: kaldıraçlı ve fonlama ücretli bir USDT vadeli işlem sözleşmesi. Spot: kaldıracı ve likidasyonu olmayan, coin'in kendisini satın aldığınız piyasa."
+],
+"odh_contract_y": [
+"eb0650f4a1",
+"Kaldıraç, teminat, likidasyon ve fonlama sadece perpetual için geçerlidir. Spot sadece long olabilir."
+],
+"odh_ends_e": [
+"b409a750e1",
+"Herhangi bir kâr aldan önce stop: -10, yani -1R."
+],
+"odh_ends_t": [
+"f140ac6462",
+"Nasıl sonuçlanabilir"
+],
+"odh_ends_w": [
+"08b803b6d8",
+"Tüm girişler gerçekleşmişken planın sonuçlanabileceği her yol, para ve R cinsinden sonucuyla birlikte."
+],
+"odh_ends_y": [
+"cd9ceb7f51",
+"Böylece başlamadan önce her sonucun sizin için ne anlama geldiğini bilirsiniz."
+],
+"odh_ent_e": [
+"923d4d405f",
+"Üçte birer payla 61.590, 60.974 ve 60.358'de üç adım: hepsi gerçekleşirse ortalama 60.974 olur."
+],
+"odh_ent_n": [
+"c513f01a94",
+"Planınız: {n} giriş, hepsi gerçekleşirse ortalama {avg}."
+],
+"odh_ent_t": [
+"f056d0d56a",
+"Girişler"
+],
+"odh_ent_w": [
+"87ca65289e",
+"Pozisyonun kendi payına sahip, 10 adede kadar limit fiyat. Merdiveni otomatik oluşturun veya her adımı kendiniz yazın."
+],
+"odh_ent_y": [
+"214c2ec1cc",
+"Adım adım alım yapmak, fiyat dönmeden önce devam ederse daha iyi bir ortalama sağlar. Büyüklük uyacak şekilde kesildiği için risk aynı kalır."
+],
+"odh_exit_e": [
+"1d12468fb8",
+"%30, %30 ve %20 kapatan 1R, 2R ve 3R: son %20 takip eden stopa bırakılır."
+],
+"odh_exit_t": [
+"ca3fb50e5d",
+"Kâr al seviyeleri"
+],
+"odh_exit_w": [
+"1a28527bfd",
+"Pozisyonun kendi payını kapatan 8 adede kadar çıkış: bir fiyatta, ortalamadan bir yüzde ile veya R'nin bir katında."
+],
+"odh_exit_y": [
+"abdcd61050",
+"Kârı parçalar halinde almak, geri kalanı devam ederken bir kısmını garantiye alır."
+],
+"odh_exits_e": [
+"471034ecca",
+"%30 kapatan 63.859'daki TP2, +5.30 yani 0.53R kazandırır."
+],
+"odh_exits_t": [
+"ca3fb50e5d",
+"Kâr al seviyeleri"
+],
+"odh_exits_w": [
+"6583c3543e",
+"Fiyatı, payı, kârı ve R değeri ile her bir kâr al seviyesi, komisyonlar dahil."
+],
+"odh_exits_y": [
+"6ffd5d67c1",
+"R = kâr ÷ risk: 2R, riske attığınızın iki katı demektir."
+],
+"odh_fee_e": [
+"8921531f35",
+"600 USDT'yi %0.1 ile açıp kapatmak yaklaşık 0.60 + 0.60'a mal olur."
+],
+"odh_fee_t": [
+"6c58eac908",
+"Taraf başına komisyon (%)"
+],
+"odh_fee_w": [
+"6004b55350",
+"Borsanın her gerçekleşmede, açarken ve kapatırken aldığı ücret. 0.1, %0.1 anlamına gelir."
+],
+"odh_fee_y": [
+"642cdb8277",
+"Plan, komisyonları stopta zarara ekler ve her kârdan düşer, böylece rakamlar gerçekten elinizde kalanlardır."
+],
+"odh_fills_e": [
+"361360351c",
+"Sadece E1 gerçekleşir ve fiyat stopa dönerse 4.65 kaybedersiniz. E1 ve E2'den sonra 7.98. Üçünden sonra 10: tam riskiniz."
+],
+"odh_fills_t": [
+"f53f7d6784",
+"Girişler, birer birer gerçekleşen"
+],
+"odh_fills_w": [
+"99acb19630",
+"Her satır, fiyatın ulaştığı sırayla bir giriştir; ne kadar tuttuğunuzu ve o noktada stop olmanın maliyetini gösterir."
+],
+"odh_fills_y": [
+"5a0b9cae0f",
+"Ne kadarınız olduğunu ve fiyat orada dönerse ne kadar kaybedeceğinizi görürsünüz."
+],
+"odh_fiv_e": [
+"e7f856aebd",
+"8 saat aralıklarla 24 saat, 3 ödeme demektir."
+],
+"odh_fiv_t": [
+"c23c171d42",
+"Fonlama aralığı (s)"
+],
+"odh_fiv_w": [
+"44fdbaad78",
+"Fonlama ödemeleri arasındaki saat, genellikle 8, bazı coinlerde 4 veya 1."
+],
+"odh_fiv_y": [
+"94a10dd3eb",
+"Sadece tutma süreniz içindeki tam aralıklar sayılır."
+],
+"odh_frate_e": [
+"3f837807a7",
+"0.01, her aralıkta pozisyonun %0.01'i anlamına gelir."
+],
+"odh_frate_t": [
+"78ace74a36",
+"Fonlama oranı (%)"
+],
+"odh_frate_w": [
+"927ac8eeff",
+"Long ve short pozisyonlar arasında her aralıkta ödenen oran. Pozitif olması, longların shortlara ödeme yaptığı anlamına gelir."
+],
+"odh_frate_y": [
+"3d0ee675d0",
+"Tutma maliyetlerinin veya kazançlarının tahmin edilmesinde kullanılır."
+],
+"odh_funding_e": [
+"ee50b81e00",
+"600 üzerinde 3 ödeme ile %0.01 × 3, long için −0.18'dir."
+],
+"odh_funding_t": [
+"6ff171c667",
+"Fonlama"
+],
+"odh_funding_w": [
+"64133ff6df",
+"Pozisyonu tuttuğunuz süre boyunca tüm pozisyon üzerinden ödenen (−) veya alınan (+) tahmini fonlama tutarı."
+],
+"odh_funding_y": [
+"b030dbc350",
+"Perpetual (sürekli) vadeli işlemlerde uzun süreli tutmak sessizce para kaybettirebilir."
+],
+"odh_gfirst_e": [
+"3d995fe6b8",
+"1% adımla ilk 61,590: long için sonrakiler 60,974 ve 60,358'dir."
+],
+"odh_gfirst_t": [
+"de46c48c22",
+"İlk fiyat"
+],
+"odh_gfirst_w": [
+"cfd41aab02",
+"Kademeli alımın başladığı yer, genellikle mevcut fiyata yakındır."
+],
+"odh_gfirst_y": [
+"b3ad923426",
+"Diğer adımlar buradan itibaren bir adım boyu aralıklarla yerleştirilir."
+],
+"odh_gn_e": [
+"1239d66c32",
+"Her biri üçte birlik 3 adım veya 10, 20, 30 ve 40%'lık 4 artan adım."
+],
+"odh_gn_t": [
+"c4790c1a36",
+"Adım sayısı"
+],
+"odh_gn_w": [
+"1995ec85a3",
+"Kademeli alımın 1'den 10'a kadar kaç girişi olduğu."
+],
+"odh_gn_y": [
+"43cfb5c4b3",
+"Daha fazla adım girişinizi yayar. Daha az adım daha çabuk dolar."
+],
+"odh_gsplit_e": [
+"fc81f5201f",
+"4 artan adım: %10, %20, %30, %40."
+],
+"odh_gsplit_t": [
+"fc8230b411",
+"Dağılım"
+],
+"odh_gsplit_w": [
+"440061ba84",
+"Eşit: her adım aynı payı alır. Artan: daha derin adımlar daha fazla pay alır."
+],
+"odh_gsplit_y": [
+"64991c6f7a",
+"Artan dağılım, ortalamayı daha derin fiyatlara yaklaştırır."
+],
+"odh_gstep_e": [
+"b0de2aa211",
+"61,590'dan %1, 60,974'ü, ardından 60,358'i verir."
+],
+"odh_gstep_t": [
+"d1655c2e70",
+"Adım boyutu (%)"
+],
+"odh_gstep_w": [
+"9fe0fa2fbe",
+"Adımların bir önceki adıma göre yüzde olarak ne kadar uzakta olduğu."
+],
+"odh_gstep_y": [
+"9515786990",
+"Daha geniş adımlar daha derin düşüşlere ulaşır ancak dolmayabilir."
+],
+"odh_hours_e": [
+"d9e97301c7",
+"8 saatlik aralıklarla 48 saat, 6 ödeme demektir."
+],
+"odh_hours_t": [
+"4f7caed1a9",
+"Tutma süresi (s)"
+],
+"odh_hours_w": [
+"0f42a300fc",
+"Pozisyonu ne kadar süre açık tutmayı planladığınız."
+],
+"odh_hours_y": [
+"ba701b1861",
+"Fonlama oranını kullanarak fonlama maliyetini tahmin etmek için kullanılır."
+],
+"odh_lev_e": [
+"d39c72de29",
+"600 USDT'lik bir pozisyon 5× kaldıraçta 120, 10× kaldıraçta 60 teminat gerektirir."
+],
+"odh_lev_n": [
+"79cb13846f",
+"Planınız: {lev}× kaldıraçla {notional} pozisyon için {margin} teminat gerekir."
+],
+"odh_lev_t": [
+"040daa23f9",
+"Kaldıraç (×)"
+],
+"odh_lev_w": [
+"48f13cd159",
+"Pozisyonun teminatınızın kaç katı olduğu."
+],
+"odh_lev_y": [
+"3f58eb70f9",
+"Teminat miktarını ve likidasyon fiyatını değiştirir. Pozisyon büyüklüğünü veya stop noktasındaki kaybı değiştirmez: bunlar riskinizden gelir."
+],
+"odh_liq_e": [
+"643586810b",
+"1× kaldıraçta long pozisyonun genellikle likidasyon fiyatı olmaz."
+],
+"odh_liq_t": [
+"8ee1ead8ac",
+"Basitleştirilmiş tahmini likidasyon"
+],
+"odh_liq_w": [
+"7e48938681",
+"Sadece kaldıraç ve sürdürme teminatına dayalı olarak, borsanın teminat yetersizliği nedeniyle pozisyonu kapatacağı yaklaşık fiyat."
+],
+"odh_liq_y": [
+"b9fc181b96",
+"Eğer stop noktanızdan önceyse, borsa sizi planınızdan önce kapatır: kaldıracı düşürün. Gerçek borsalar kademeleri, işaret fiyatını ve komisyonları kullanır, bu yüzden bunu bir tahmin olarak değerlendirin."
+],
+"odh_lossat_e": [
+"67df41a297",
+"−4.65 ve %47: sadece E1'den sonra, bir stop-out 4.65'e mal olur, bu da riske attığınız 10'un %47'sidir."
+],
+"odh_lossat_t": [
+"b651bbbbf8",
+"Stop tetiklenirse kayıp"
+],
+"odh_lossat_w": [
+"ff737e28b3",
+"Bu adım dolduğunda ve fiyat dönüp stopu vurduğunda, komisyonlar ve kayma (slippage) dahil ne kadar kaybedeceğiniz. Çubuk, bunu toplam riskinizin bir payı olarak gösterir."
+],
+"odh_lossat_y": [
+"2dc8fd5f7a",
+"Her adımda riskinizin ne kadarının devrede olduğunu bir bakışta görürsünüz."
+],
+"odh_margin_e": [
+"6936a70109",
+"1×'de 390, 390 gerektirir; 5×'de 78."
+],
+"odh_margin_n": [
+"725dd35461",
+"Sizin: {lev}× kaldıraçla {margin}."
+],
+"odh_margin_t": [
+"0d1a4bfb87",
+"Gereken teminat"
+],
+"odh_margin_w": [
+"a1b8f1e64e",
+"Pozisyon değeri ÷ kaldıraç: borsanın bakiyenizden bloke ettiği tutar."
+],
+"odh_margin_y": [
+"e96ecfca33",
+"Bakiyenizden fazlaysa, plan mevcut haliyle açılamaz."
+],
+"odh_maxloss_e": [
+"7269d3f27d",
+"1,000'in %1'i: −10."
+],
+"odh_maxloss_n": [
+"64cbcec263",
+"Sizin: −{risk}."
+],
+"odh_maxloss_t": [
+"c668b9dc04",
+"Stop noktasındaki kayıp"
+],
+"odh_maxloss_w": [
+"2dffb76217",
+"Tüm girişler dolduğunda ve stop tetiklendiğinde, komisyonlar ve kayma dahil ne kadar kaybedeceğiniz."
+],
+"odh_maxloss_y": [
+"b3912a7024",
+"Büyüklük buna göre ayarlandığı için her zaman seçtiğiniz riske eşittir."
+],
+"odh_mmode_e": [
+"15606fde2c",
+"120 teminatla izole: en fazla o 120 likide edilebilir. Çapraz: bakiyenin geri kalanı da pozisyonu destekler."
+],
+"odh_mmode_t": [
+"501f9eaddf",
+"Teminat modu"
+],
+"odh_mmode_w": [
+"675627717c",
+"İzole: likidasyonda sadece bu pozisyonun teminatı kaybedilebilir. Çapraz: tüm bakiyeniz pozisyonu destekler."
+],
+"odh_mmode_y": [
+"fef5b7b2b1",
+"Basitleştirilmiş likidasyon tahminini değiştirir."
+],
+"odh_mmr_e": [
+"4a9a37cf10",
+"10,000'lik pozisyonun %0.5'i 50'dir."
+],
+"odh_mmr_t": [
+"6ccd06f6ff",
+"Sürdürme teminatı (%)"
+],
+"odh_mmr_w": [
+"102720cee3",
+"Borsanın pozisyon için tuttuğu minimum teminat. Bunun altına düşerse likidasyon başlar."
+],
+"odh_mmr_y": [
+"7bf4734885",
+"Sadece basitleştirilmiş likidasyon tahmini için kullanılır. Borsanızdaki gerçek kademeyi kontrol edin."
+],
+"odh_more_e": [
+"78ebacc245",
+"600'lük pozisyonda 24 saat tutulan, her 8 saatte bir %0.01, yaklaşık 0.18 eder."
+],
+"odh_more_t": [
+"4bab2d8fe1",
+"Daha fazla"
+],
+"odh_more_w": [
+"42278ba47e",
+"Perpetual işlemler için fonlama ve yazdığınız herhangi bir fiyattaki sonuç."
+],
+"odh_more_y": [
+"7b885c8e67",
+"Perpetual tutmak birkaç saatte bir fonlama ödemenize veya almanıza neden olabilir."
+],
+"odh_notional_e": [
+"300ce48960",
+"0.0064 × 60,974 yaklaşık 390 eder."
+],
+"odh_notional_n": [
+"304a790b10",
+"Sizin: {notional}."
+],
+"odh_notional_t": [
+"629c8eb9ba",
+"Pozisyon değeri"
+],
+"odh_notional_w": [
+"9b6b8c5e1f",
+"Miktar × ortalama giriş, USDT cinsinden."
+],
+"odh_notional_y": [
+"d6c958086a",
+"Borsa, komisyonları ve teminatı bu değer üzerinden hesaplar."
+],
+"odh_qty_e": [
+"08a3a24441",
+"10 risk ÷ (R 1,443 + yaklaşık 121 komisyon) yaklaşık 0.0064 BTC eder."
+],
+"odh_qty_n": [
+"e4723fbfba",
+"Sizin: {qty}."
+],
+"odh_qty_t": [
+"44f6af6945",
+"Miktar"
+],
+"odh_qty_w": [
+"8214deadd9",
+"Tüm girişler dolduğunda coin cinsinden toplam büyüklük."
+],
+"odh_qty_y": [
+"7cc786bbf8",
+"Stop noktasındaki kaybın tam olarak riskinize eşit olması için hesaplanır."
+],
+"odh_risk_e": [
+"58a2bde113",
+"1,000'in %1'i 10'dur. Stop, long giriş ortalamasının 1,000 altındaysa, pozisyon yaklaşık 0.01 BTC olur."
+],
+"odh_risk_n": [
+"524652bc5e",
+"Planınız: stop-out {risk} tutarına mal olur, bu da {bal} bakiyenizin {rp}%'sidir."
+],
+"odh_risk_t": [
+"b031aee373",
+"İşlem başına risk (%)"
+],
+"odh_risk_w": [
+"e16cd1d147",
+"Tüm girişler dolduğunda ve stop tetiklendiğinde, komisyonlar ve kayma dahil kaybetmeyi kabul ettiğiniz bakiye payı."
+],
+"odh_risk_y": [
+"2a1118ce86",
+"ODM buna göre geriye doğru çalışır: pozisyonu, stop-out tam olarak bu kadar tutara mal olacak şekilde boyutlandırır, asla daha fazla değil."
+],
+"odh_side_e": [
+"025ebc9d4e",
+"60,000'de stop 58,000'de olacak şekilde BTC long. 60,000'de short, stopun yukarıda olmasını gerektirir, örneğin 62,000."
+],
+"odh_side_t": [
+"26528381ea",
+"Yön"
+],
+"odh_side_w": [
+"fd310748ba",
+"Long: alım yaparsınız ve fiyat yükselirse kazanırsınız. Short: önce satış yaparsınız ve fiyat düşerse kazanırsınız."
+],
+"odh_side_y": [
+"f88bf6b76d",
+"Stopun girişlerinizin hangi tarafında olması gerektiğini ve hangi yönün kâr sayılacağını belirler."
+],
+"odh_slip_e": [
+"13a80c38b2",
+"20 kaymalı 58,000'deki long stopu, 57,980'de dolmuş sayılır."
+],
+"odh_slip_t": [
+"9cc2898876",
+"Kayma (fiyat birimi)"
+],
+"odh_slip_w": [
+"9210080f38",
+"Hızlı bir piyasada stop emrinin, stop fiyatından ne kadar daha kötü bir fiyattan dolabileceği."
+],
+"odh_slip_y": [
+"4176d4998f",
+"Stop noktasındaki kayba eklenir, böylece kötü bir dolum zaten riskinizin içindedir."
+],
+"odh_smode_e": [
+"d0f6baa41b",
+"ATR 600 × 2, stopu long'un en derin girişinin 1,200 altına koyar."
+],
+"odh_smode_t": [
+"58ec1c7c84",
+"Stop yöntemi"
+],
+"odh_smode_w": [
+"48702e26b7",
+"ATR: en derin girişinizin ötesinde son ortalama aralığın bir katı. Yüzde: en derin girişin ötesinde bir yüzde. Fiyat: yazdığınız bir fiyat."
+],
+"odh_smode_y": [
+"ed4407ed0d",
+"ATR, coinin o anki hareketini takip eder, böylece stop hareketli bir günde çok dar kalmaz."
+],
+"odh_stop_e": [
+"8926c096e7",
+"Ortalama 60,974 ve stop 59,531: R = 1,443. 10 riskle, plan yaklaşık 0.0064 BTC tutar."
+],
+"odh_stop_n": [
+"9c95f89f46",
+"Stopunuz: {sl}, yani R = {R}."
+],
+"odh_stop_t": [
+"ecfdc40665",
+"Stop loss"
+],
+"odh_stop_w": [
+"5522c198b4",
+"Fikrin yanlış olduğunun anlaşıldığı ve dolan tüm girişlerin zararla kapandığı fiyat."
+],
+"odh_stop_y": [
+"d7b6da198b",
+"Riskinizle birlikte büyüklüğü belirler: daha yakın bir stop, aynı risk için daha büyük bir pozisyon demektir."
+],
+"odh_stopat_e": [
+"2cb46a1ee6",
+"ATR × 2 ve ATR 600 ile, en derin girişinizin 1,200 ötesinde durur."
+],
+"odh_stopat_n": [
+"d05e23b4c8",
+"Sizin: {sl}."
+],
+"odh_stopat_t": [
+"9e253470c8",
+"Stop"
+],
+"odh_stopat_w": [
+"d16b105abf",
+"Bu planın kullandığı, seçtiğiniz yöntemden gelen stop fiyatı."
+],
+"odh_stopat_y": [
+"91a65418b9",
+"Fikir başarısız olursa dolan her giriş burada kapanır."
+],
+"odh_sval_e": [
+"0c941866f5",
+"ATR ile 2, yüzde ile 1.5 veya fiyat ile 59,500."
+],
+"odh_sval_t": [
+"0622db62de",
+"Stop değeri"
+],
+"odh_sval_w": [
+"ba80c38465",
+"Yöntem için sayı: ATR katı, yüzde veya fiyat."
+],
+"odh_sval_y": [
+"f976dd936f",
+"Stopu hareket ettirmek için değiştirin. Büyüklük, risk aynı kalacak şekilde güncellenir."
+],
+"odh_tact_e": [
+"2e0ede00f1",
+"1R'den sonra başla: takip eden stop, fiyat 1R kâra geçtiğinde devreye girer."
+],
+"odh_tact_t": [
+"be92240002",
+"Takip başlangıcı"
+],
+"odh_tact_w": [
+"b6481374ec",
+"Takip eden stopun ne zaman başlayacağı: hemen, bir fiyatta, yüzde hareketinden sonra veya kârda R'nin bir katından sonra."
+],
+"odh_tact_y": [
+"94c2f2ff7f",
+"Daha geç başlamak, giriş yakınında silkelenmekten kaçınmanızı sağlar."
+],
+"odh_tactv_e": [
+"246eb9a7c3",
+"R ile 1, kârda bir R demektir."
+],
+"odh_tactv_t": [
+"3ca6df8028",
+"Başlangıç değeri"
+],
+"odh_tactv_w": [
+"5f17cc79b4",
+"Seçtiğiniz başlangıç için fiyat, yüzde veya R."
+],
+"odh_tactv_y": [
+"8969cc67da",
+"Takip eden stopun devreye gireceği noktayı belirler."
+],
+"odh_test_e": [
+"3fae7383cb",
+"Belirsiz çubuklar: bir mum hem stopa hem de hedefe dokundu, bu yüzden içindeki emir bilinmiyor."
+],
+"odh_test_t": [
+"d5bb186d33",
+"Bu grafiğin geçmişinde test et"
+],
+"odh_test_w": [
+"7991e3cd85",
+"Planı, bu grafiğin geçmiş kapalı mumları üzerinde, her seferinde bir mum olacak şekilde oynatır."
+],
+"odh_test_y": [
+"521a6e46e0",
+"Nasıl gideceğine dair hızlı bir kontrol. Gelecek hakkında bir vaat değildir."
+],
+"odh_tmode_e": [
+"6463ceb3c4",
+"ATR 600 olduğunda 2 × ATR 1,200 eder."
+],
+"odh_tmode_t": [
+"77027c3731",
+"Takip mesafesi"
+],
+"odh_tmode_w": [
+"a7c556973e",
+"ATR katı veya yüzde."
+],
+"odh_tmode_y": [
+"9ad06b6b07",
+"ATR, coinin hareketine göre mesafeyi korur."
+],
+"odh_trail_e": [
+"92baed577c",
+"%20, en iyi fiyatın 2 × ATR gerisinde bir iz süren stop ile bırakılır."
+],
+"odh_trail_t": [
+"f4d671693b",
+"Kalan miktar"
+],
+"odh_trail_w": [
+"49a5c00392",
+"Kar al ile kapatılmayan paydır. Fiyatı iz süren stop ile takip edebilir ve kar al işleminden sonra stop başa baş noktasına taşınabilir."
+],
+"odh_trail_y": [
+"d5d5131192",
+"İşlemin bir kısmının, elde edilen kazancın tamamını geri vermeden devam etmesini sağlar."
+],
+"odh_tval_e": [
+"d9ca049b57",
+"1.200 ile, 66.000'lik bir zirve, long pozisyonun stopunu 64.800'e koyar."
+],
+"odh_tval_t": [
+"752ffa08b7",
+"İz sürme mesafesi"
+],
+"odh_tval_w": [
+"cc8419ae79",
+"İz süren stopun, en iyi fiyatın ne kadar gerisinden takip edeceğidir."
+],
+"odh_tval_y": [
+"3fdb99c573",
+"Çok dar olması erken kapatır. Çok geniş olması ise çok fazla kazanç geri verir."
 ],
 "of_price": [
 "3e8248e32e",
