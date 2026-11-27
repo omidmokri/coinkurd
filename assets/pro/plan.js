@@ -74,9 +74,11 @@
     if (!Array.isArray(L)) return [];
     return L.filter(function (p) { return p && typeof p === 'object' && (!symRe || symRe.test(p.sym || '')) && isFinite(p.entry) && isFinite(p.stop) && isFinite(p.risk) && p.risk >= 0; }).slice(0, 200).map(function (p) {
       var q = { id: String(p.id || '').slice(0, 40) || String(Math.random()).slice(2, 12), at: +p.at || 0, sym: String(p.sym), tf: String(p.tf || '').slice(0, 8), long: !!p.long, entry: +p.entry, stop: +p.stop,
-        targets: Array.isArray(p.targets) ? p.targets.slice(0, 3).filter(function (t) { return t && isFinite(t.p) && isFinite(t.share); }).map(function (t) { return { p: +t.p, share: +t.share }; }) : [],
+        targets: Array.isArray(p.targets) ? p.targets.slice(0, 8).filter(function (t) { return t && isFinite(t.p) && isFinite(t.share); }).map(function (t) { return { p: +t.p, share: +t.share }; }) : [],
         qty: +p.qty || 0, notional: +p.notional || 0, margin: +p.margin || 0, risk: +p.risk, rr: +p.rr || 0, status: P.planStatus(p),
         ex: /^[A-Za-z0-9 .-]{0,16}$/.test(p.ex || '') ? (p.ex || '') : '' };
+      /* an ODM plan also keeps its entry ladder (entry = the average of a full fill, risk = the loss if every entry fills) */
+      if (p.kind === 'odm') { q.kind = 'odm'; q.entries = Array.isArray(p.entries) ? p.entries.slice(0, 10).filter(function (e) { return e && isFinite(e.p) && isFinite(e.q); }).map(function (e) { return { p: +e.p, q: +e.q }; }) : []; }
       if (q.status === 'closed') { q.closedAt = +p.closedAt || 0; if (isFinite(p.pnl)) q.pnl = +p.pnl; }
       return q;
     });
@@ -95,6 +97,12 @@
   function saveAcc() { S.set('ek_pro_acct', ACC); }
   function plans() { return P.planClean(S.get('ek_pro_plans', []), A.SYM_RE); }
   function savePlans(L) { S.set('ek_pro_plans', L.slice(0, 200)); }
+  /* add a plan from elsewhere (ODM): 'dup' when the same open plan is already saved */
+  P.planAdd = function (np) {
+    var c = P.planClean([np], A.SYM_RE)[0]; if (!c) return 'bad';
+    var L = plans(), k = P.planKey(c); if (L.some(function (x) { return P.planKey(x) === k && x.status !== 'closed'; })) return 'dup';
+    L.unshift(c); savePlans(L); return 'ok';
+  };
   function dayStart() { var d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); }
   function tz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { return ''; } }
 

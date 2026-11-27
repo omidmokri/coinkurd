@@ -5,6 +5,8 @@
 const path = require('path'), fs = require('fs'), http = require('http');
 const { chromium } = require(process.env.PW || '/opt/npm-tools/node_modules/playwright');
 const ROOT = path.resolve(__dirname, '..'), OUT = process.argv[2] || '/tmp/pro_e2e';
+/* the site's own strings, read in a sandbox, so a check can compare what the page shows with the text it should show */
+const PRO_T = (() => { const vm = require('vm'), fs = require('fs'), sb = { window: {} }; vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'assets/pro/i18n.js'), 'utf8'), sb); const S = sb.window.PRO.STR; return (l, k) => (S[l] && S[l][k]) || S.en[k]; })();
 fs.mkdirSync(OUT, { recursive: true });
 
 /* ---------- a tiny static server for the repo */
@@ -1289,6 +1291,74 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] the data library fits the screen`, !ov2);
     await page.click('.pm-dlcats .pm-chip:nth-child(1)'); await page.waitForTimeout(100);
     await shot(page, `83_cd_datalib_${lang}_${vw}`);
+    await ctx.close();
+  }
+
+  /* ---------- ODM: the whole-trade planner (stepped entries, ATR stop, stepped exits, trail, test, alerts, board) */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm') for (const [vw, vh, lang] of [[1280, 860, 'en'], [390, 800, 'fa']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm ${lang} ${vw}`, e0 = errors.length;
+    const btn = k => page.evaluate(k => { const t = PRO.app.T(k), b = [...document.querySelectorAll('.pm-odact button, .pm-odsec button, .pm-odm button')].find(x => x.textContent.trim() === t || x.textContent.trim() === '+ ' + t); if (!b) return false; b.click(); return true; }, k);
+    const open = async () => { if (vw < 600) await page.evaluate(() => document.querySelector('#pm-odm').click()); else await page.click('#pm-odm'); await page.waitForSelector('.pm-odm', { timeout: 5000 }); await page.waitForTimeout(200); };
+    await open();
+    const st = () => page.evaluate(() => {
+      const m = document.querySelector('.pm-odm'), box = document.querySelector('.pm-mbox'), body = document.querySelector('.pm-mbody');
+      return { cards: m.querySelectorAll('.pm-odout .pm-cor').length, err: [...m.querySelectorAll('.pm-odout .pm-cw2')].map(x => x.textContent).join(' | '),
+        loss: (() => { const t = PRO.app.T('rcMaxLoss'); const c = [...m.querySelectorAll('.pm-odout .pm-cor')].find(x => x.querySelector('small').textContent === t); return c ? c.querySelector('b').textContent : null; })(),
+        liq: [...m.querySelectorAll('.pm-odout .pm-cor small')].some(x => x.textContent === PRO.app.T('rcLiqS')),
+        tables: [...m.querySelectorAll('.pm-odout table')].map(t => t.querySelectorAll('tbody tr').length), rowsE: m.querySelectorAll('.pm-odin .pm-odsec:nth-of-type(2) .pm-odrow').length,
+        rowsX: m.querySelectorAll('.pm-odrx').length, fits: box.getBoundingClientRect().right <= innerWidth + 1 && box.getBoundingClientRect().left >= -1, hscroll: body.scrollWidth - body.clientWidth, why: !!m.querySelector('.pm-odwhy summary'), top: (document.querySelector('.pm-odtop') || {}).textContent || '' };
+    });
+    let s0 = await st();
+    ok(`[${tag}] ODM opens with a three-step ladder, an ATR stop, three exits and a trail, and shows its results`, s0.cards >= 8 && s0.rowsE === 3 && s0.rowsX === 3 && s0.tables.length === 3 && s0.why, JSON.stringify(s0));
+    ok(`[${tag}] a one-line summary (risk, average, stop, all exits in R) sits on top of the planner`, /−10/.test(s0.top) && /SL/.test(s0.top) && /R\)/.test(s0.top), s0.top);
+    ok(`[${tag}] the loss at the stop is exactly the risk chosen (1% of 1000 = 10)`, s0.loss && /^[−-]10$/.test(s0.loss.replace(/\s/g, '')), s0.loss);
+    ok(`[${tag}] the planner fits the screen with no sideways scroll`, s0.fits && s0.hscroll <= 1, JSON.stringify(s0));
+    ok(`[${tag}] liquidation is labelled as a simplified estimate`, s0.liq, '');
+    /* risk 2% → loss 20; the engine's own figure matches the card */
+    await page.evaluate(() => { const t = PRO.app.T('rcRisk'), l = [...document.querySelectorAll('.pm-odm .pm-cf')].find(x => x.querySelector('span') && x.querySelector('span').textContent === t), i = l.querySelector('input'); i.value = '2'; i.dispatchEvent(new Event('input', { bubbles: true })); });
+    let s1 = await st();
+    ok(`[${tag}] raising the risk to 2% doubles the loss at the stop to 20`, s1.loss && /^[−-]20$/.test(s1.loss.replace(/\s/g, '')), s1.loss);
+    /* a four-step growing ladder */
+    await page.evaluate(() => { const T = PRO.app.T, f = (k, v) => { const l = [...document.querySelectorAll('.pm-odm .pm-cf')].find(x => x.querySelector('span') && x.querySelector('span').textContent === T(k)), i = l.querySelector('input,select'); i.value = v; i.dispatchEvent(new Event(i.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); }; f('odGN', '4'); f('odGSplit', 'grow'); });
+    await btn('odGBuild'); let s2 = await st();
+    const shares = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_odm') || '{}').entries);
+    ok(`[${tag}] building a four-step growing ladder gives 10/20/30/40%`, s2.rowsE === 4 && shares && shares.map(x => +x.q).join() === '10,20,30,40' && s2.tables[0] === 4, JSON.stringify(shares));
+    /* a stop on the wrong side is refused with a reason */
+    await page.evaluate(() => { const T = PRO.app.T, g = (k) => [...document.querySelectorAll('.pm-odm .pm-cf')].find(x => x.querySelector('span') && x.querySelector('span').textContent === T(k)); const m = g('odSMode').querySelector('select'); m.value = 'price'; m.dispatchEvent(new Event('change', { bubbles: true })); const v = g('odSVal').querySelector('input'); v.value = String(PRO.app.active().bars.slice(-1)[0].c * 2); v.dispatchEvent(new Event('input', { bubbles: true })); });
+    let s3 = await st();
+    ok(`[${tag}] a stop above a long's entries is refused with a plain reason, and the action buttons switch off`, s3.err === PRO_T(lang, 'odE_side') && await page.evaluate(() => [...document.querySelectorAll('.pm-odact button[data-need]')].every(b => b.disabled)), s3.err);
+    await page.evaluate(() => { const T = PRO.app.T, g = (k) => [...document.querySelectorAll('.pm-odm .pm-cf')].find(x => x.querySelector('span') && x.querySelector('span').textContent === T(k)); const m = g('odSMode').querySelector('select'); m.value = 'atr'; m.dispatchEvent(new Event('change', { bubbles: true })); const v = g('odSVal').querySelector('input'); v.value = '2'; v.dispatchEvent(new Event('input', { bubbles: true })); });
+    await btn('odP_pct'); let s4 = await st();
+    ok(`[${tag}] the +5/+10/+20% exit preset gives three exits and the plan is valid again`, s4.rowsX === 3 && !s4.err.includes(PRO_T(lang, 'odE_side')) && s4.tables[1] === 3, JSON.stringify(s4));
+    await shot(page, `84_odm_${lang}_${vw}`);
+    /* test on the chart's past candles */
+    await btn('odTest'); await page.waitForTimeout(250);
+    const tr = await page.evaluate(() => { const r = document.querySelector('.pm-odres'); return r && { cards: r.querySelectorAll('.pm-cor').length, note: !!r.querySelector('.pm-odhint') }; });
+    ok(`[${tag}] the history test runs and reports its ending, fills, result, bars and unclear bars`, tr && tr.cards >= 5 && tr.note, JSON.stringify(tr));
+    await shot(page, `85_odm_test_${lang}_${vw}`);
+    /* alerts for each level */
+    const nA0 = await page.evaluate(() => PRO._alerts().length);
+    await btn('odAlerts'); await page.waitForTimeout(150);
+    const al = await page.evaluate(() => document.querySelectorAll('.pm-odalr').length);
+    await btn('odAlAdd'); await page.waitForTimeout(150);
+    const nA1 = await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length);
+    ok(`[${tag}] one alert per level: 4 entries, the stop, 3 exits (and the trail start if set)`, al >= 8 && nA1 === al && nA1 - 0 >= 8 && (await page.evaluate(() => PRO._alerts().length)) - nA0 === al, JSON.stringify({ al, nA1, nA0 }));
+    await btn('odAlAdd'); await page.waitForTimeout(150);
+    ok(`[${tag}] adding the same alerts again makes no duplicates`, (await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length)) === nA1, '');
+    await shot(page, `86_odm_alerts_${lang}_${vw}`);
+    /* save to the risk board as planned, with the full-fill risk */
+    await btn('odSave'); await page.waitForTimeout(150);
+    const sv = await page.evaluate(() => { const L = JSON.parse(localStorage.getItem('ek_pro_plans') || '[]'), p = L.find(x => x.kind === 'odm'); return p && { st: p.status, risk: p.risk, n: p.entries.length, t: p.targets.length }; });
+    ok(`[${tag}] saving puts the plan on the risk board as planned, with its 4 entries, 3 exits and a risk of 20`, sv && sv.st === 'planned' && Math.abs(sv.risk - 20) < 1e-6 && sv.n === 4 && sv.t === 3, JSON.stringify(sv));
+    /* show on the chart */
+    await btn('odShow'); await page.waitForTimeout(200);
+    const ln = await page.evaluate(() => ({ n: PRO.odmLinesShown(), modal: !!document.querySelector('.pm-odm') }));
+    ok(`[${tag}] "Show on chart" closes the planner and draws every level`, ln.n >= 9 && !ln.modal, JSON.stringify(ln));
+    await shot(page, `87_odm_chart_${lang}_${vw}`);
+    await open(); await btn('odHide'); await page.waitForTimeout(100);
+    ok(`[${tag}] the levels can be hidden again`, (await page.evaluate(() => PRO.odmLinesShown())) === 0, '');
+    ok(`[${tag}] no JS errors in the ODM checks`, errors.length === e0, errors.slice(e0).join(' || '));
     await ctx.close();
   }
 
