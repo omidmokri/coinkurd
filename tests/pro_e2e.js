@@ -1660,7 +1660,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     }
     await page.evaluate(() => { const L = PRO.odmLive(); if (L) { L.st.anchor = 0; L.st.zEnd = 0; PRO.app.active().ovl.update(); } }); await page.waitForTimeout(250);
     const st = () => page.evaluate(() => { const c = PRO.app.active(), r = c.box.getBoundingClientRect(), vr = c.chart.timeScale().getVisibleLogicalRange(), o = c.chart.options(), Z = PRO.odmZone(), L = PRO.odmLive();
-      return { n: PRO.odmLinesShown(), pl: c.main.priceLines().length, Z, stop: L && L.plan.stop, avg: L && L.plan.avg, from: vr ? vr.from : null, to: vr ? vr.to : null, tf: c.cfg.tf, free: !!(o.handleScroll && o.handleScroll.pressedMouseMove && o.handleScale && o.handleScale.mouseWheel), box: { l: r.left, t: r.top, w: r.width, h: r.height }, ys: L ? L.levels.map(l => l.y).filter(y => y != null) : [], hud: (() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const q = h.getBoundingClientRect(); return { t: q.top, b: q.bottom }; })() }; });
+      return { n: PRO.odmLinesShown(), pl: c.main.priceLines().length, Z, stop: L && L.plan.stop, avg: L && L.plan.avg, from: vr ? vr.from : null, ft: vr && c.disp.length > 1 ? c.disp[0].t + vr.from * (c.disp[1].t - c.disp[0].t) : null, to: vr ? vr.to : null, tf: c.cfg.tf, free: !!(o.handleScroll && o.handleScroll.pressedMouseMove && o.handleScale && o.handleScale.mouseWheel), box: { l: r.left, t: r.top, w: r.width, h: r.height }, ys: L ? L.levels.map(l => l.y).filter(y => y != null) : [], hud: (() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const q = h.getBoundingClientRect(); return { t: q.top, b: q.bottom }; })() }; });
     /* a point with no ODM line, handle, label or panel near it; inside the box when asked */
     const freePt = (S, inBox) => page.evaluate(([S, inBox]) => {
       const Z = S.Z, b = S.box, labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast,.pm-selbar')].map(e => e.getBoundingClientRect());
@@ -1694,13 +1694,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       if (!p) { ok(`[${tag}] room ${where} the box to drag`, false, ''); continue; }
       await pan(p.x, p.y, phone ? 120 : 160, 0);
       const S2 = await st();
-      ok(`[${tag}] dragging the chart ${where === 'in' ? 'inside' : 'outside'} the position pans it back in time with ODM on`, S2.from != null && S2.from < S.from - 2 && S2.n === S.n && S2.free && S2.stop === S.stop, JSON.stringify({ from: S.from, to: S2.from, free: S2.free, n: S2.n }));
+      ok(`[${tag}] dragging the chart ${where === 'in' ? 'inside' : 'outside'} the position pans it back in time with ODM on`, S2.ft != null && S2.ft < S.ft - 2 && S2.n === S.n && S2.free && S2.stop === S.stop, JSON.stringify({ from: S.from, to: S2.from, free: S2.free, n: S2.n }));
     }
     if (phone) {
       const S = await st(), sl = await page.evaluate(() => PRO.odmLive().levels.find(l => l.k === 'sl')), x = S.box.l + S.box.w * 0.3;
       await page.evaluate(() => PRO.odmSelect(false)); await page.waitForTimeout(150);   /* let the position go first */
       const S1 = await st();
-      if (sl && sl.y > 20 && sl.y < S.box.h - 40) { await tdrag(x, S.box.t + sl.y, 110, 0); const S2 = await st(); ok(`[${tag}] a swipe that starts on an ODM line pans the chart when the position is not selected`, S2.from < S1.from - 2 && S2.stop === S1.stop && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from, s0: S1.stop, s1: S2.stop })); }
+      if (sl && sl.y > 20 && sl.y < S.box.h - 40) { await tdrag(x, S.box.t + sl.y, 110, 0); const S2 = await st(); ok(`[${tag}] a swipe that starts on an ODM line pans the chart when the position is not selected`, S2.ft < S1.ft - 2 && S2.stop === S1.stop && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from, s0: S1.stop, s1: S2.stop })); }
     } else {
       const S = await st(), p = await freePt(S, false);
       await page.mouse.move(p.x, p.y); for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, -240); await page.waitForTimeout(60); } await page.waitForTimeout(250);
@@ -1742,7 +1742,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const S1 = await st();
       ok(`[${tag}] after a real click on another timeframe the ODM lines and the box are still on the chart and the chart is free`, S1.tf === want && S1.n === S.n && S1.pl === S.pl && S1.Z && S1.free, JSON.stringify({ tf: S1.tf, want, n: S1.n, pl: S1.pl, Z: !!S1.Z, free: S1.free, clicked: !!clicked }));
       const p = (await freePt(S1, false)) || (await freePt(S1, true));   /* in a shorter timeframe the box can fill the view */
-      if (p) { await pan(p.x, p.y, phone ? 130 : 180, 0); const S2 = await st(); ok(`[${tag}] after the timeframe change the chart still pans back into history with ODM on`, S2.from < S1.from - 2 && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from })); }
+      if (p) { await pan(p.x, p.y, phone ? 130 : 180, 0); const S2 = await st(); ok(`[${tag}] after the timeframe change the chart still pans back into history with ODM on`, S2.ft < S1.ft - 2 && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from })); }
       else ok(`[${tag}] room to drag after the timeframe change`, false, '');
       const S2b = await st(), p2 = (await freePt(S2b, false)) || (await freePt(S2b, true));
       if (p2) { await pan(p2.x, p2.y, 0, phone ? 90 : 120); const S3 = await st(); ok(`[${tag}] dragging up and down with ODM on moves the chart, not the plan`, S3.stop === S1.stop && S3.avg === S1.avg && S3.n === S1.n && S3.free, JSON.stringify({ s: [S1.stop, S3.stop] })); }
