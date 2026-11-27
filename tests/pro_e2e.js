@@ -1651,6 +1651,14 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const showT = await T('odShow');
     await page.evaluate(t => [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t).click(), showT);
     await page.waitForTimeout(500);
+    /* how far the stop and the ladder reach depends on the day's candles: zoom out, as a user would, until every level sits
+       above the plan's panel, then place the box again for that view */
+    for (const n of [0, 250, 500, 1000, 2000]) {
+      if (n) { await page.evaluate(n => { const c = PRO.app.active(), D = c.disp; c.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, D.length - n), to: D.length + 3 }); }, n); await page.waitForTimeout(350); }
+      const fit = await page.evaluate(() => { const c = PRO.app.active(), r = c.box.getBoundingClientRect(), h = document.querySelector('.pm-odhud'), hb = h ? h.getBoundingClientRect().top - r.top : 1e9, L = PRO.odmLive(), lim = Math.min(c.chart.panes()[0].getHeight() - 60, hb - 50); return L && L.levels.every(l => l.y != null && l.y > 40 && l.y < lim); });
+      if (fit) break;
+    }
+    await page.evaluate(() => { const L = PRO.odmLive(); if (L) { L.st.anchor = 0; L.st.zEnd = 0; PRO.app.active().ovl.update(); } }); await page.waitForTimeout(250);
     const st = () => page.evaluate(() => { const c = PRO.app.active(), r = c.box.getBoundingClientRect(), vr = c.chart.timeScale().getVisibleLogicalRange(), o = c.chart.options(), Z = PRO.odmZone(), L = PRO.odmLive();
       return { n: PRO.odmLinesShown(), pl: c.main.priceLines().length, Z, stop: L && L.plan.stop, avg: L && L.plan.avg, from: vr ? vr.from : null, to: vr ? vr.to : null, tf: c.cfg.tf, free: !!(o.handleScroll && o.handleScroll.pressedMouseMove && o.handleScale && o.handleScale.mouseWheel), box: { l: r.left, t: r.top, w: r.width, h: r.height }, ys: L ? L.levels.map(l => l.y).filter(y => y != null) : [], hud: (() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const q = h.getBoundingClientRect(); return { t: q.top, b: q.bottom }; })() }; });
     /* a point with no ODM line, handle, label or panel near it; inside the box when asked */
@@ -1690,7 +1698,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     }
     if (phone) {
       const S = await st(), sl = await page.evaluate(() => PRO.odmLive().levels.find(l => l.k === 'sl')), x = S.box.l + S.box.w * 0.3;
-      await tap(S.box.l + 30, S.box.t + 40);   /* let the position go first */
+      await page.evaluate(() => PRO.odmSelect(false)); await page.waitForTimeout(150);   /* let the position go first */
       const S1 = await st();
       if (sl && sl.y > 20 && sl.y < S.box.h - 40) { await tdrag(x, S.box.t + sl.y, 110, 0); const S2 = await st(); ok(`[${tag}] a swipe that starts on an ODM line pans the chart when the position is not selected`, S2.from < S1.from - 2 && S2.stop === S1.stop && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from, s0: S1.stop, s1: S2.stop })); }
     } else {
