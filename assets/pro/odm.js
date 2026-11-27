@@ -450,20 +450,29 @@
     function alerts() {
       X.innerHTML = ''; var r = plan; if (!r || r.err) return;
       var dn = r.long ? 'down' : 'up', up = r.long ? 'up' : 'down', L = [];
-      r.fills.forEach(function (x) { L.push({ k: 'E' + x.n, p: x.p, c: dn }); });
-      L.push({ k: 'SL', p: r.stop, c: dn });
-      r.exits.forEach(function (x) { L.push({ k: 'TP' + x.n, p: x.p, c: up }); });
-      if (r.trail && r.trail.act != null) L.push({ k: T('odLTrail'), p: r.trail.act, c: up });
-      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-odal"></div><div class="pm-row"><button type="button" class="pm-btn pri sm"></button></div><p class="pm-odhint"></p></section>');
-      $('h4', w).textContent = T('odAlT'); $('button.pri', w).textContent = T('odAlAdd'); $('p', w).textContent = T('odAlNote');
-      var box2 = $('.pm-odal', w);
+      r.fills.forEach(function (x) { L.push({ k: 'E' + x.n, p: x.p, c: dn, bk: 'e' }); });
+      L.push({ k: 'SL', p: r.stop, c: dn, bk: 's' });
+      r.exits.forEach(function (x) { L.push({ k: 'TP' + x.n, p: x.p, c: up, bk: 'x' }); });
+      if (r.trail && r.trail.act != null) L.push({ k: T('odLTrail'), p: r.trail.act, c: up, bk: 't' });
+      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-odal"></div><div class="pm-row"><button type="button" class="pm-btn pri sm"></button><a class="pm-btn sm pm-odbot" target="_blank" rel="noopener noreferrer" hidden></a></div><p class="pm-odhint pm-odbotn" hidden></p><p class="pm-odhint"></p></section>');
+      $('h4', w).textContent = T('odAlT'); $('button.pri', w).textContent = T('odAlAdd'); $('p:last-child', w).textContent = T('odAlNote');
+      var box2 = $('.pm-odal', w), ab = $('.pm-odbot', w), abn = $('.pm-odbotn', w);
+      /* all ticked levels to the Telegram bot in one link (dollar coins only); the bot lists them and adds them on one tap */
+      function botAll() {
+        var got = P.botOdmLink ? P.botOdmLink(sym, L.filter(function (lv) { return lv.cb.checked; }).map(function (lv) { return { k: lv.bk, v: +lv.p.toPrecision(10) }; })) : null;
+        ab.hidden = !got; abn.hidden = !got || got.n === got.total;
+        if (!got) return;
+        ab.href = got.url; ab.textContent = '✈ ' + T('odAlBot', { n: got.n });
+        abn.textContent = T('odAlBotCut', { n: got.n, m: got.total });
+      }
       L.forEach(function (lv) {
         var r2 = h('<div class="pm-odalr"><label><input type="checkbox" checked> <b></b> <span class="pm-num" dir="ltr"></span></label></div>');
-        $('b', r2).textContent = lv.k; $('span', r2).textContent = px(lv.p); lv.cb = $('input', r2);
+        $('b', r2).textContent = lv.k; $('span', r2).textContent = px(lv.p); lv.cb = $('input', r2); lv.cb.onchange = botAll;
         var link = P.botLink ? P.botLink(sym, +lv.p.toPrecision(10)) : null;
         if (link) { var a = h('<a class="pm-ib" target="_blank" rel="noopener noreferrer">✈</a>'); a.href = link; a.title = a.ariaLabel = T('tgAlso'); r2.appendChild(a); }
         box2.appendChild(r2);
       });
+      botAll();
       $('button.pri', w).onclick = function () {
         var n = 0, d = 0;
         L.forEach(function (lv) { if (!lv.cb.checked) return; var res = P.addPriceAlert ? P.addPriceAlert(sym, +lv.p.toPrecision(10), lv.c, 'ODM ' + lv.k) : null; if (res === 'dup') d++; else if (res) n++; });

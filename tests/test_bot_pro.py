@@ -190,6 +190,40 @@ for i, lang in enumerate(LANGS):
     R.handle_update(S, upd(uid, "/alert ETH 2500", lang=lang))
     check(x["alerts"] and x["alerts"][-1].get("coin") == "ETH" and x["alerts"][-1].get("op") == ">", "/alert ETH 2500 still works")
 
+    # 8b) ODM: every level of one plan in one link, offered first, «add all» stores one alert per level, never twice
+    k = len(x["alerts"])
+    n = len(SENT)
+    link = "o_BTC_e76000-e75000d5-s71000-x80000-x82500-t81000"
+    R.handle_update(S, upd(uid, "/start " + link, lang=lang))
+    out = [q for q in msgs_since(n) if "po:BTC_e76000" in kb_json(q)]
+    check(len(out) == 1 and "$75,000.5" in out[0]["text"] and "$82,500" in out[0]["text"] and PRO.pick(PRO.O_KIND["s"], lang) in out[0]["text"],
+          "ODM link: one offer listing every level with its kind and exact price")
+    check(len(x["alerts"]) == k, "ODM link stores nothing before «add all»")
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="po:" + link[2:], lang=lang))
+    new = x["alerts"][k:]
+    check(len(new) == 6 and all(a.get("coin") == "BTC" and not a.get("iran") for a in new), "«add all» stores 6 dollar alerts for BTC")
+    ops = {a["price"]: a["op"] for a in new}
+    check(ops == {76000: "<", 75000.5: "<", 71000: "<", 80000: ">", 82500: ">", 81000: ">"}, f"each alert points the right way from $77,000: {ops}")
+    check(msgs_since(n) and PRO.L("o_done", lang, c="BTC", n=6, d="") in msgs_since(n)[-1]["text"], "confirmation: 6 added")
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="po:" + link[2:], lang=lang))
+    check(len(x["alerts"]) == k + 6, "a second tap adds nothing")
+    check(msgs_since(n) and PRO.L("o_dup", lang, n=6) in msgs_since(n)[-1]["text"], "…and says all 6 were already set")
+    for bad in ("/start o_BTC_e1-e1", "/start o_BTC_q76000", "/start o_btc_e1", "/start o_BTC_e0", "/start o_BTC_"):
+        n = len(SENT)
+        R.handle_update(S, upd(uid, bad, lang=lang))
+        out = msgs_since(n)
+        check(out and out[-1]["text"] == PRO.L("bad", lang) and "po:" not in kb_json(out[-1]), f"{bad!r} refused")
+    for bad in ("po:BTC_e1-e1", "po:BTC_x", "po:btc_e1", "po:BTC_e1;x"):
+        n = len(SENT)
+        R.handle_update(S, upd(uid, data=bad, lang=lang))
+        check(msgs_since(n) and msgs_since(n)[-1]["text"] == PRO.L("bad", lang), f"callback {bad!r} refused")
+    k = len(x["alerts"])
+    n = len(SENT)
+    R.handle_update(S, upd(uid, data="po:NOPE_e1-x2", lang=lang))
+    check(len(x["alerts"]) == k and msgs_since(n) and "NOPE" in msgs_since(n)[-1]["text"], "an unknown coin stores nothing and says so")
+
 # 9) the site encodes the link the way the bot reads it
 import subprocess  # noqa: E402
 
@@ -209,6 +243,36 @@ check(vals == ["72155.5", "0.0000006", "0.00000001234567", "0.3", "64250", "0.00
 for v, num in zip(vals, [72155.5, 0.0000006, 1.234567e-8, 0.3, 64250, 0.00001234]):
     got = PRO.parse_link("a_X1_" + v.replace(".", "d"))
     check(got and abs(got[1] - num) <= num * 1e-12, f"bot reads the site's {v} back exactly")
+
+# 9b) the site's ODM link (P.botOdmLink in panels.js) is one the bot reads, and keeps the stop and exits when it must cut
+js = r"""
+global.window = global; global.document = undefined;
+var src = require('fs').readFileSync('assets/pro/panels.js', 'utf8');
+eval(src.match(/function plainNum\(v\) \{[\s\S]*?\n  \}/)[0]);
+var BOT = 'test_bot', P = { inst: function (s) { return s === 'IRT' ? { kind: 'ir' } : { kind: 'usdt' }; } };
+eval(src.match(/P\.botOdmLink = function[\s\S]*?\n  \};/)[0]);
+var lv = function (a) { return a.map(function (z) { return { k: z[0], v: z[1] }; }); };
+console.log(JSON.stringify([
+  P.botOdmLink('BTC', lv([['e', 76000], ['e', 75000.5], ['s', 71000], ['x', 80000], ['x', 82500], ['t', 81000]])),
+  P.botOdmLink('PEPE', lv([['e', 0.0000121], ['e', 0.0000115], ['e', 0.0000109], ['e', 0.0000103], ['s', 0.0000097], ['x', 0.0000135], ['x', 0.0000150], ['x', 0.0000171], ['t', 0.0000160]])),
+  P.botOdmLink('IRT', lv([['e', 1]])), P.botOdmLink('btc', lv([['e', 1]])), P.botOdmLink('BTC', lv([['q', 1]]))
+]));
+"""
+res = subprocess.run(["node", "-e", js], capture_output=True, text=True, cwd=ROOT)
+try:
+    full, cut, *nones = json.loads(res.stdout.strip())
+except ValueError:
+    full, cut, nones = None, None, [1]
+pre = "https://t.me/test_bot?start="
+check(full and full["url"] == pre + "o_BTC_e76000-e75000d5-s71000-x80000-x82500-t81000" and full["n"] == 6 == full["total"], f"site's ODM link {full}")
+got = full and PRO.parse_olink(full["url"][len(pre):])
+check(got and [p for _, p, _ in got[1]] == [76000, 75000.5, 71000, 80000, 82500, 81000], "the bot reads every level of the site's ODM link")
+arg = cut["url"][len(pre):] if cut else ""
+got = PRO.parse_olink(arg)
+check(cut and cut["total"] == 9 and cut["n"] < 9 and len(arg) <= 63 and got, f"a long plan is cut to fit one link ({cut and cut['n']} of 9, {len(arg)} chars)")
+kinds = [k for k, _, _ in got[1]] if got else []
+check("s" in kinds and kinds.count("x") == 3, f"…keeping the stop and every exit first: {kinds}")
+check(nones == [None, None, None], "no ODM link for a toman symbol, a lower-case symbol or an unknown level kind")
 
 # 10) every toman asset the site can send is one the bot knows and can price
 import re  # noqa: E402
