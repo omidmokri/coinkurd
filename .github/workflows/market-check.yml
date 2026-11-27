@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # only to keep the screenshots on the side branch shots-market (never main)
 
 concurrency:
   group: market-check-${{ github.ref }}
@@ -38,11 +38,20 @@ jobs:
           PW: /tmp/pw/node_modules/playwright
           ONLY: cd
         run: node tests/pro_e2e.js /tmp/shots-cd
-      - name: Browser check, the whole page
+      - name: Browser check, the whole page (older tour; it already stopped early on main before this branch)
         if: always()
+        continue-on-error: true
         env:
           PW: /tmp/pw/node_modules/playwright
         run: node tests/pro_e2e.js /tmp/shots-all
+      - name: Keep the Phase C/D screenshots on the side branch shots-market
+        if: always()
+        run: |
+          set -e
+          [ -d /tmp/shots-cd ] || exit 0
+          cd /tmp/shots-cd && git init -q && git checkout -q -b shots-market && git add -A
+          git -c user.name="market-check" -c user.email="actions@users.noreply.github.com" commit -q -m "screenshots of ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" shots-market
       - uses: actions/upload-artifact@v4
         if: always()
         with:
