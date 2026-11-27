@@ -1,4 +1,4 @@
-; Entekhab for Windows (64-bit) — installer
+﻿; Entekhab for Windows (64-bit) — installer
 ; Built in CI:  makensis /DVERSION=1.0.0 /DSRC=<build output> /DOUT=<folder> installer.nsi
 ; Per-user install (no administrator prompt) into %LOCALAPPDATA%\Programs\Entekhab, Start-menu and desktop shortcuts,
 ; an uninstaller in "Apps & features". The site's own data (settings, alerts, progress) lives in %LOCALAPPDATA%\Entekhab
@@ -22,7 +22,7 @@ ManifestDPIAware true
 !endif
 !define UNINST "Software\Microsoft\Windows\CurrentVersion\Uninstall\Entekhab"
 
-Name "Entekhab — انتخاب"
+Name "Entekhab"
 OutFile "${OUT}\EntekhabSetup-x64-${VERSION}.exe"
 InstallDir "$LOCALAPPDATA\Programs\Entekhab"
 InstallDirRegKey HKCU "Software\Entekhab" "InstallDir"
@@ -97,10 +97,15 @@ Section "Entekhab" SecMain
   File /r "${SRC}\*.*"
   File "app.ico"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  CreateShortcut "$SMPROGRAMS\Entekhab - انتخاب.lnk" "$INSTDIR\Entekhab.exe" "" "$INSTDIR\Entekhab.exe" 0 SW_SHOWNORMAL "" "entekhab.net"
-  CreateShortcut "$DESKTOP\Entekhab - انتخاب.lnk" "$INSTDIR\Entekhab.exe" "" "$INSTDIR\Entekhab.exe" 0 SW_SHOWNORMAL "" "entekhab.net"
+  ; shortcuts from older builds (Persian name, and its mis-encoded form)
+  Delete "$SMPROGRAMS\Entekhab - انتخاب.lnk"
+  Delete "$DESKTOP\Entekhab - انتخاب.lnk"
+  Delete "$SMPROGRAMS\Entekhab - Ø§Ù†ØªØ®Ø§Ø¨.lnk"
+  Delete "$DESKTOP\Entekhab - Ø§Ù†ØªØ®Ø§Ø¨.lnk"
+  CreateShortcut "$SMPROGRAMS\Entekhab.lnk" "$INSTDIR\Entekhab.exe" "" "$INSTDIR\Entekhab.exe" 0 SW_SHOWNORMAL "" "entekhab.net"
+  CreateShortcut "$DESKTOP\Entekhab.lnk" "$INSTDIR\Entekhab.exe" "" "$INSTDIR\Entekhab.exe" 0 SW_SHOWNORMAL "" "entekhab.net"
   WriteRegStr HKCU "Software\Entekhab" "InstallDir" "$INSTDIR"
-  WriteRegStr HKCU "${UNINST}" "DisplayName" "Entekhab — انتخاب"
+  WriteRegStr HKCU "${UNINST}" "DisplayName" "Entekhab"
   WriteRegStr HKCU "${UNINST}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "${UNINST}" "Publisher" "entekhab.net"
   WriteRegStr HKCU "${UNINST}" "DisplayIcon" "$INSTDIR\Entekhab.exe"
@@ -121,8 +126,12 @@ FunctionEnd
 
 Section "Uninstall"
   !insertmacro WaitForAppClosed
+  Delete "$SMPROGRAMS\Entekhab.lnk"
+  Delete "$DESKTOP\Entekhab.lnk"
   Delete "$SMPROGRAMS\Entekhab - انتخاب.lnk"
   Delete "$DESKTOP\Entekhab - انتخاب.lnk"
+  Delete "$SMPROGRAMS\Entekhab - Ø§Ù†ØªØ®Ø§Ø¨.lnk"
+  Delete "$DESKTOP\Entekhab - Ø§Ù†ØªØ®Ø§Ø¨.lnk"
   RMDir /r "$INSTDIR"
   DeleteRegKey HKCU "${UNINST}"
   DeleteRegKey HKCU "Software\Entekhab"

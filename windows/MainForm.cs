@@ -46,7 +46,7 @@ namespace Entekhab
         {
             this.selftest = selftest;
             this.start = start;
-            Text = "انتخاب — entekhab.net";
+            Text = "Entekhab";
             try { Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath); } catch { }
             BackColor = Bg;
             MinimumSize = new Size(900, 600);
@@ -222,7 +222,7 @@ namespace Entekhab
             using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("logo.png"))
             using (var m = new MemoryStream()) { s.CopyTo(m); logo = Convert.ToBase64String(m.ToArray()); }
             html = html.Replace("{{LOGO}}", logo).Replace("{{TITLE}}", S.Get("offTitle")).Replace("{{RETRY}}", S.Get("retry"));
-            Text = "Entekhab — " + S.Get("offTitle");
+            Text = "Entekhab";
             web.CoreWebView2.NavigateToString(html);
         }
 
