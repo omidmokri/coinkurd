@@ -1221,6 +1221,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       await page.keyboard.press('Control+z'); await page.waitForTimeout(250); let gu = await geo();
       ok(`[${tag}] Ctrl+Z undoes the last drag only`, JSON.stringify(gu.pts) === JSON.stringify(g3.pts), JSON.stringify(gu.pts));
       /* the card's numbers follow the lines, and say the liquidation is a simplified estimate */
+      await page.evaluate(() => { const c = document.querySelector('.pm-plan'); if (c && c.classList.contains('pm-plmin')) c.querySelector('.pm-plh b').click(); });
       const cardT = await page.evaluate(() => (document.querySelector('.pm-plan') || {}).innerText || '');
       const want = await page.evaluate(() => PRO.app.T('rcLiqS'));
       ok(`[${tag}] the planner card labels the liquidation "${want}"`, cardT.indexOf(want) >= 0, cardT.slice(0, 200));
@@ -1233,8 +1234,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const after = (await geo()).pts;
       ok(`[${tag}] zoom and scroll change no price or time of the position`, JSON.stringify(before) === JSON.stringify(after));
       /* a click on empty chart deselects */
-      await page.mouse.click(box.x + box.width * 0.1, box.y + box.height * 0.8); await page.waitForTimeout(200);
-      const ds = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y), c = PRO.app.active(); return { sel: c.drawer.sel, card: !!document.querySelector('.pm-plan'), at: e ? e.tagName + '.' + e.className : null, n: (PRO.app.DRAW()[c.cfg.sym] || []).length, tool: c.drawer.tool }; }, [box.x + box.width * 0.1, box.y + box.height * 0.8]);
+      /* an empty spot: on the chart, off the card, off the position */
+      const spot = await page.evaluate(() => { const c = PRO.app.active(), r = c.drawer.o.el.getBoundingClientRect(), pn = c.drawer.pane();
+        for (const fy of [0.85, 0.15, 0.5]) for (const fx of [0.08, 0.2, 0.35, 0.5, 0.65, 0.8, 0.92]) { const x = r.left + pn.w * fx, y = r.top + pn.h * fy, e = document.elementFromPoint(x, y);
+          if (e && e.tagName === 'CANVAS' && !e.closest('.pm-plan') && c.drawer.o.el.contains(e) && !c.drawer.hit(x - r.left, y - r.top)) return [x, y]; }
+        return null; });
+      if (spot) await page.mouse.click(spot[0], spot[1]); await page.waitForTimeout(200);
+      const ds = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y), c = PRO.app.active(); return { sel: c.drawer.sel, card: !!document.querySelector('.pm-plan'), at: e ? e.tagName + '.' + e.className : null, n: (PRO.app.DRAW()[c.cfg.sym] || []).length, tool: c.drawer.tool }; }, spot || [0, 0]);
       ok(`[${tag}] a click on empty chart deselects the position and closes the card`, !ds.sel && !ds.card, JSON.stringify(ds));
       /* a timeframe change keeps the levels */
       await page.evaluate(() => PRO.app.active().setTF ? PRO.app.active().setTF('4h') : null); await page.waitForTimeout(1200);
