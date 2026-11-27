@@ -849,3 +849,26 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-toast.act{pointer-events:auto;display:flex;align-items:center;gap:12px}
 .pm-tbtn{background:none;border:0;color:var(--acc,#f7931a);font:inherit;font-weight:700;cursor:pointer;padding:4px 6px;border-radius:8px;white-space:nowrap}
 .pm-tbtn:hover,.pm-tbtn:focus-visible{background:rgba(247,147,26,.14)}
+/* ODM's guided tour */
+.pm-odgbar{display:flex;flex-direction:column;gap:8px}
+.pm-odgo{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin:0}
+.pm-odoffer{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:8px 12px}
+.pm-odoffer p{margin:0;flex:1 1 220px;font-size:13px;line-height:1.5}
+.pm-odoffer .pm-row{gap:6px;margin:0}.pm-odoffer .pm-btn.sm{margin:0}
+.pm-odtgt{outline:2px solid #f7931a!important;outline-offset:3px;border-radius:10px;box-shadow:0 0 0 7px rgba(247,147,26,.16);transition:outline-color .2s,box-shadow .2s;position:relative;z-index:1}
+.pm-odtour{position:absolute;z-index:46;background:#17171a;border:1px solid rgba(247,147,26,.55);border-radius:14px;padding:10px 12px 12px;box-shadow:0 16px 44px rgba(0,0,0,.6);color:#ececE6;font-size:13.5px;line-height:1.6}
+.pm-odth{display:flex;align-items:center;gap:8px}
+.pm-odth small{color:#f7931a;font-weight:700;white-space:nowrap}
+.pm-odth b{flex:1;font-size:14.5px}
+.pm-odth .pm-ib{width:30px;height:30px}
+.pm-odtour p{margin:6px 0 8px}
+.pm-odtd{display:flex;gap:4px;margin:0 0 10px}
+.pm-odtd i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.14)}
+.pm-odtd i.was{background:rgba(247,147,26,.45)}.pm-odtd i.on{background:#f7931a}
+.pm-odtour .pm-row{justify-content:flex-end;gap:8px;margin:0}
+.pm-odtour .pm-btn.sm{margin:0;min-width:84px;min-height:34px}
+.pm-odtour.sheet{left:0;right:0;width:auto!important;border-radius:16px 16px 0 0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:46%;overflow-y:auto}
+#pro.pm-light .pm-odtour{background:#fff;color:#20201e;box-shadow:0 14px 40px rgba(0,0,0,.18)}
+#pro.pm-light .pm-odtd i{background:rgba(0,0,0,.12)}
+#pro.pm-light .pm-odoffer{background:rgba(2,132,199,.07);border-color:rgba(2,132,199,.3)}
+@media (prefers-reduced-motion:reduce){.pm-odtgt{transition:none}}

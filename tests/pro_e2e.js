@@ -1431,8 +1431,11 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     }
     /* tap "+ Target", then the chart above the last target: a new exit at that price */
     let Lb = await live();
-    const topTP = Math.max(...Lb.levels.filter(l => /^x/.test(l.k)).map(l => l.p));
-    const yT = await page.evaluate(p => PRO.app.active().main.priceToCoordinate(p), topTP * 1.004);
+    /* a price between the average entry and the highest target that is on screen */
+    const tapP = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)).map(l => l.p), a = L.plan.avg, top = Math.max(...xs);
+      const yA = c.main.priceToCoordinate(a), yTop = Math.max(24, c.main.priceToCoordinate(top)); const ys = L.levels.map(l => l.y);
+      let best = null, bd = -1; for (let y = yTop; y < yA - 8; y += 3) { const d = Math.min(...ys.map(z => Math.abs(z - y))); if (d > bd) { bd = d; best = y; } } return best == null ? null : { y: best, p: c.main.coordinateToPrice(best) }; });
+    const yT = tapP ? tapP.y : null;
     await page.click('.pm-odhud [data-pk="x"]'); await page.waitForTimeout(80);
     const pk = await page.evaluate(() => ({ on: document.querySelector('.pm-odhud [data-pk="x"]').classList.contains('on'), cls: PRO.app.active().el.classList.contains('pm-odpick'), msg: document.querySelector('.pm-odhud .pm-odhm').textContent }));
     ok(`[${tag}] "+ Target" waits for a tap and says so`, pk.on && pk.cls && pk.msg === (await T('odPick_x')), JSON.stringify(pk));
@@ -1440,7 +1443,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       await page.mouse.click(X, Lb.box.t + yT);
       await page.waitForTimeout(150);
       const L5 = await live(), nx = L5.st.exits.filter(x => x.v !== '' && +x.q > 0);
-      ok(`[${tag}] a tap on the chart adds the target at that price, and the panel stops waiting`, L5.st.exits.length === Lb.st.exits.length + 1 && !L5.plan.err && L5.plan.nx === Lb.plan.nx + 1 && Math.abs(Math.max(...nx.map(x => +x.v)) / (topTP * 1.004) - 1) < 0.003 && !L5.pick, JSON.stringify({ n0: Lb.st.exits.length, n1: L5.st.exits.length, err: L5.plan.err, ex: L5.st.exits }));
+      ok(`[${tag}] a tap on the chart adds the target at that price, in order, and the panel stops waiting`, L5.st.exits.length === Lb.st.exits.length + 1 && !L5.plan.err && L5.plan.nx === Lb.plan.nx + 1 && nx.some(x => x.mode === 'price' && Math.abs(+x.v / tapP.p - 1) < 0.002) && !L5.pick && Math.abs(nx.reduce((s, x) => s + +x.q, 0) - 100) < 0.01, JSON.stringify({ n0: Lb.st.exits.length, n1: L5.st.exits.length, err: L5.plan.err, ex: L5.st.exits, tapP }));
       Lb = L5;
     } else ok(`[${tag}] room above the last target to tap`, false, String(yT));
     /* tap "Stop" and then a price above the entries: the plan refuses it, says why, and the stop line stays to be dragged back */
@@ -1510,7 +1513,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.evaluate(() => { document.querySelector('.pm-idi[data-id="bb"]').click(); });
     await page.evaluate(() => { const ch = document.querySelectorAll('.pm-idt .pm-chip')[1]; if (ch) ch.click(); });
     await page.waitForTimeout(100); await page.evaluate(() => { const r = document.querySelector('.pm-idi[data-id="rsi"]'); if (r) r.click(); });
-    await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+    await page.evaluate(() => PRO.app.closeModal()); await page.waitForTimeout(400);
     await page.evaluate(() => { const c = PRO.app.active(), s = c.cfg.sym, t = c.disp[c.disp.length - 30].t, p = c.disp[c.disp.length - 1].c; PRO.app.mutate(s, L => { L.push({ id: 'h1', k: 'hline', pts: [{ t, p: p * 0.97 }], s: { c: '#f7931a', w: 1, d: 0, x: '' } }); L.push({ id: 'h2', k: 'hline', pts: [{ t, p: p * 1.03 }], s: { c: '#f7931a', w: 1, d: 0, x: '' } }); }); });
     const i0 = await page.evaluate(() => PRO.app.active().cfg.inds.map(x => x.id));
     fy = await freeY(); await rclick(fy); M = await menuTxt();
@@ -1535,6 +1538,57 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const cl2 = await page.evaluate(() => ({ d: (PRO.app.DRAW()[PRO.app.active().cfg.sym] || []).length, i: PRO.app.active().cfg.inds.length }));
     ok(`[${tag}] "Clear the whole chart" asks first, clears drawings and indicators, and Undo brings both back`, cl.d === 0 && cl.i === 0 && cl2.d === 2 && cl2.i === i0.length, JSON.stringify({ cl, cl2 }));
     ok(`[${tag}] no JS errors on the chart or in the menu`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
+  /* ---------- ODM's guided tour: offered once, one step per part, the part lit and in view, Back/Next/Done, keys, Escape */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'otr') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [390, 800, 'ar'], [390, 800, 'ckb']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm tour ${lang} ${vw}`, e0 = errors.length, phone = vw < 600;
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); localStorage.removeItem('ek_pro_odtour'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const of = await page.evaluate(() => { const o = document.querySelector('.pm-odoffer'), g = document.querySelector('.pm-odgo'); return { offer: o ? o.querySelector('p').textContent : null, want: PRO.app.T('odTourOffer'), go: g ? g.textContent.trim() : null, wantGo: PRO.app.T('odGuide') }; });
+    ok(`[${tag}] the first time, ODM offers the tour and shows its "Guide me" button`, of.offer === of.want && of.go === of.wantGo, JSON.stringify(of));
+    await page.click('.pm-odoffer [data-a="go"]'); await page.waitForTimeout(250);
+    const step = () => page.evaluate(() => {
+      const b = document.querySelector('.pm-odtour'), t = document.querySelector('.pm-odtgt'), body = document.querySelector('.pm-mbody'); if (!b || !t) return { b: !!b, t: !!t };
+      const br = b.getBoundingClientRect(), tr = t.getBoundingClientRect(), vr = body.getBoundingClientRect(), A = PRO.odTour.active();
+      const visTop = Math.max(vr.top, 0), visBot = Math.min(vr.bottom, innerHeight, b.classList.contains('sheet') ? br.top : 1e9);
+      const shown = Math.min(tr.bottom, visBot) - Math.max(tr.top, visTop);
+      const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1);
+      return { k: A.k, i: A.i, n: A.n, n1: b.querySelector('small').textContent, title: b.querySelector('b').textContent, text: b.querySelector('p').textContent, next: b.querySelector('[data-a="next"]').textContent, back: b.querySelector('[data-a="back"]').disabled,
+        sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= -1 && br.bottom <= innerHeight + 1, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
+    });
+    let s = await step(); const seenK = [], bad = [];
+    ok(`[${tag}] the tour starts at "Your account", step 1, with Back off and the account part lit`, s.k === 'acc' && s.i === 0 && s.back && s.title === (await page.evaluate(() => PRO.app.T('odTr_acc_t'))) && s.n >= 9 && (phone ? s.sheet : !s.sheet) && s.focus, JSON.stringify(s));
+    await shot(page, `89_odm_tour_${lang}_${vw}`);
+    for (let i = 0; i < 12 && s && s.k; i++) {
+      seenK.push(s.k);
+      if (!s.title || !s.text || !s.inView || !s.seen || (s.overlap && !s.tall) || s.n1 !== (await page.evaluate(([i, n]) => PRO.app.T('odTourN', { i, n }), [s.i + 1, s.n]))) bad.push(s);
+      if (s.k === 'loss') await shot(page, `89b_odm_tour_loss_${lang}_${vw}`);
+      if (s.i === s.n - 1) break;
+      await page.click('.pm-odtour [data-a="next"]'); await page.waitForTimeout(200); s = await step();
+    }
+    ok(`[${tag}] every step names its part, keeps it in view and not under its note, and counts "i of n"`, bad.length === 0 && seenK.length === s.n && new Set(seenK).size === seenK.length && seenK.includes('loss') && seenK.includes('act'), JSON.stringify({ seenK, bad: bad.slice(0, 2) }));
+    ok(`[${tag}] the last step says Done`, s.next === (await page.evaluate(() => PRO.app.T('odTourDone'))), s.next);
+    await page.click('.pm-odtour [data-a="next"]'); await page.waitForTimeout(150);
+    const end = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), lit: document.querySelectorAll('.pm-odtgt').length, modal: !!document.querySelector('.pm-odm'), seen: localStorage.getItem('ek_pro_odtour') }));
+    ok(`[${tag}] Done closes the tour and leaves ODM open`, !end.tour && !end.lit && end.modal && end.seen === '1', JSON.stringify(end));
+    /* opened again: no offer, the button starts it; the arrow key moves on; Escape leaves the tour but not ODM */
+    await page.evaluate(() => { PRO.app.closeModal(); document.querySelector('#pm-odm').click(); }); await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { }); await page.waitForTimeout(250);
+    const again = await page.evaluate(() => ({ offer: !!document.querySelector('.pm-odoffer'), go: !!document.querySelector('.pm-odgo') }));
+    ok(`[${tag}] once seen, ODM no longer offers the tour but keeps the button`, !again.offer && again.go, JSON.stringify(again));
+    await page.click('.pm-odgo'); await page.waitForTimeout(200);
+    await page.keyboard.press(lang === 'en' ? 'ArrowRight' : 'ArrowLeft'); await page.waitForTimeout(150);
+    const k2 = await page.evaluate(() => PRO.odTour.active());
+    ok(`[${tag}] the arrow key in the reading direction moves to the next step`, k2 && k2.i === 1, JSON.stringify(k2));
+    await page.click('.pm-odtour [data-a="back"]'); await page.waitForTimeout(150);
+    ok(`[${tag}] Back goes to the step before`, (await page.evaluate(() => PRO.odTour.active().i)) === 0, '');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(150);
+    const esc = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), modal: !!document.querySelector('.pm-odm'), lit: document.querySelectorAll('.pm-odtgt').length }));
+    ok(`[${tag}] Escape leaves the tour, not ODM`, !esc.tour && esc.modal && !esc.lit, JSON.stringify(esc));
+    ok(`[${tag}] no JS errors in the tour`, errors.length === e0, errors.slice(e0).join(' || '));
     await ctx.close();
   }
 

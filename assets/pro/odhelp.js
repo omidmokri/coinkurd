@@ -195,6 +195,7 @@
     return y;
   }
   /* beside the icon on a wide screen, kept inside the planner window and the screen; a sheet along the bottom on a narrow one */
+  H.freeBottom = function () { return freeBottom(); };
   function place(p, b, host) {
     var hr = host.getBoundingClientRect(), r = b.getBoundingClientRect(), vw = Math.min(innerWidth, hr.width || innerWidth);
     if (vw < 600) {

@@ -461,7 +461,7 @@
     /* the help icon of a label key (odhelp.js), when that file has loaded */
     function tag(el, k) { return P.odh && P.odh.tag ? P.odh.tag(el, k) : null; }
     /* ---- small builders: every field writes its text into st and recalculates; rows re-render only when added or removed */
-    function sec(title, hint) { var s2 = h('<section class="pm-odsec"><h4></h4></section>'); $('h4', s2).textContent = T(title); tag($('h4', s2), title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
+    function sec(title, hint) { var s2 = h('<section class="pm-odsec" data-ods="' + title + '"><h4></h4></section>'); $('h4', s2).textContent = T(title); tag($('h4', s2), title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
     function inp(obj, k, lbl, cls) {
       var w = h('<label class="pm-cf' + (cls ? ' ' + cls : '') + '"><span></span><input class="pm-in" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="24"></label>'), i = $('input', w);
       $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove(); else tag($('span', w), lbl); i.value = obj[k] == null ? '' : obj[k];
@@ -680,6 +680,7 @@
 
     rowsE(); rowsX(); beOpts(); run(); save();
     A.modal(T('odTitle') + ' · ' + (P.pair ? P.pair(sym) : sym), box, { wide: true, nofocus: true });
+    if (P.odTour && P.odTour.mount) P.odTour.mount(box);
   };
   P.odmReady = true;
 })();
