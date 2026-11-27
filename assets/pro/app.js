@@ -405,11 +405,16 @@
   }
 
   /* ---------------------------------------------------------------- overlays: toast, modal, popover menu */
-  function toast(msg, kind) {
+  /* a short note at the bottom; with { label, act } it also carries one button, such as Undo */
+  function toast(msg, kind, btn) {
     $$('.pm-toast').forEach(function (x) { x.remove(); });
-    var t = h('<div class="pm-toast ' + (kind || '') + '" role="status"></div>'); t.textContent = msg; t.dir = RTL() ? 'rtl' : 'ltr';
+    var t = h('<div class="pm-toast ' + (kind || '') + '" role="status"><span></span></div>'); $('span', t).textContent = msg; t.dir = RTL() ? 'rtl' : 'ltr';
+    if (btn && btn.label) {
+      var bt = h('<button type="button" class="pm-tbtn"></button>'); bt.textContent = btn.label; t.classList.add('act');
+      bt.onclick = function (e) { e.stopPropagation(); t.remove(); try { btn.act(); } catch (er) { } }; t.appendChild(bt);
+    }
     ($('#pro') || d.body).appendChild(t); setTimeout(function () { t.classList.add('on'); }, 10);
-    setTimeout(function () { t.classList.remove('on'); setTimeout(function () { t.remove(); }, 400); }, kind === 'long' ? 9000 : 4200);
+    setTimeout(function () { t.classList.remove('on'); setTimeout(function () { t.remove(); }, 400); }, btn ? 8000 : kind === 'long' ? 9000 : 4200);
   }
   var openModal = null;
   function modal(title, body, opts) {
@@ -489,7 +494,7 @@
     this.box = $('.pm-chart', this.el);
     var self0 = this;
     this.el.addEventListener('contextmenu', function (e) {       /* right click anywhere on the chart */
-      if (e.target.closest && e.target.closest('.pm-selbar, .pm-leg, .pm-macro, .pm-menu')) return;
+      if (e.target.closest && e.target.closest('.pm-selbar, .pm-leg, .pm-macro, .pm-menu, .pm-odhud button')) return;   /* the ODM panel's own buttons keep theirs; elsewhere on it, the line under it */
       e.preventDefault(); if (st.active !== self0.i) setActive(self0.i); cellMenu(self0, e);
     });
     this.el.addEventListener('pointerdown', function () { setActive(self.i); }, true);
@@ -1122,7 +1127,7 @@
     (P.alertLines ? P.alertLines(cell.cfg.sym) : []).forEach(function (a) {
       var y = cell.main.priceToCoordinate(a.v); if (y == null || y < 0 || y > H) return;
       ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(247,147,26,.75)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); ctx.restore();
-      ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif'; var txt = '🔔 ' + cell.fmt(a.v), tw = ctx.measureText(txt).width + 10;
+      ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif'; var txt = '🔔 ' + (a.odm && a.t ? 'ODM ' + a.t + ' · ' : '') + cell.fmt(a.v), tw = ctx.measureText(txt).width + 10;
       ctx.fillStyle = 'rgba(247,147,26,.92)'; ctx.fillRect(W - tw - 4, y - 9, tw, 18); ctx.fillStyle = '#1a1207'; ctx.textBaseline = 'middle'; ctx.fillText(txt, W - tw + 1, y + 0.5);
     });
     /* replay cut line while choosing the start */
@@ -1719,6 +1724,30 @@
       items.push({ label: T('remove'), icon: 'trash', act: function () { removeDrawing(cell, dd.id); } });
       items.push({ sep: 1 });
     }
+    /* an ODM level under the cursor */
+    var oh = P.odmHit ? P.odmHit(cell, y) : null;
+    if (oh) {
+      items.push({ head: 'ODM · ' + oh.t + ' · ' + fmtP(sym, oh.p) });
+      items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
+      items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
+      items.push({ sep: 1 });
+    }
+    /* an alert line under the cursor */
+    var ah = null;
+    if (!oh && P.alertLines) P.alertLines(sym).forEach(function (a) { var yy = null; try { yy = cell.main.priceToCoordinate(a.v); } catch (e) { } if (yy != null && Math.abs(yy - y) <= 6 && (!ah || Math.abs(yy - y) < ah.d)) ah = { a: a, d: Math.abs(yy - y) }; });
+    if (ah) {
+      items.push({ head: '🔔 ' + fmtP(sym, ah.a.v) });
+      items.push({ label: T('ctxAlDel'), icon: 'trash', act: function () { delAlertsUndo(function (z) { return z.id === ah.a.id; }); } });
+      items.push({ sep: 1 });
+    }
+    /* inside the ODM position's box */
+    var oz = !oh && P.odmZoneHit ? P.odmZoneHit(cell, x, y) : null;
+    if (oz && !ah) {
+      items.push({ head: 'ODM · ' + oz.t + ' · ' + fmtP(sym, oz.p) });
+      items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
+      items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
+      items.push({ sep: 1 });
+    }
     if (price != null && isFinite(price)) {
       var pt = fmtP(sym, price);
       items.push({ head: pt });
@@ -1738,12 +1767,56 @@
     items.push({ label: T('ctxFit'), icon: 'fit', act: function () { try { cell.chart.timeScale().fitContent(); } catch (e) { } cell.cfg.scale.auto = 1; cell.applyPrec(); paintTop(); save(); } });
     items.push({ label: T('ctxReset'), icon: 'undo', act: function () { cell.resetView ? cell.resetView() : cell.chart.timeScale().resetTimeScale(); cell.cfg.scale.auto = 1; cell.applyPrec(); paintTop(); save(); } });
     items.push({ sep: 1 });
-    items.push({ label: T('clearDraw'), icon: 'pen', disabled: !L.length, act: function () { toolOpt('clear'); } });
-    items.push({ label: T('clearInds'), icon: 'fx', disabled: !cell.cfg.inds.length, act: function () { toolOpt('clearinds'); } });
+    items = items.concat(removeItems(cell, ev));
     items.push({ sep: 1 });
     items.push({ label: T('snapshot'), icon: 'camera', act: pngShot });
     items.push({ label: T(root.classList.contains('pm-fs') ? 'exitFull' : 'fullscreen'), icon: 'expand', act: fullscreen });
     menu(cell.box, items, { at: { x: ev.clientX, y: ev.clientY } });
+  }
+  /* the "Remove from chart" part of the right-click menu: each thing on this chart can go one by one or all together,
+     and each removal can be undone from the note that follows it */
+  function delAlertsUndo(fn) {
+    var gone = P.delAlerts ? P.delAlerts(fn) : []; if (!gone.length) return;
+    toast(T('ctxAlGone', { n: gone.length }), '', { label: T('undo'), act: function () { P.putAlerts(gone); } });
+  }
+  function removeInd(cell, list) {
+    var was = cell.cfg.inds.slice(), us = list.map(function (x) { return x.u; });
+    cell.cfg.inds = cell.cfg.inds.filter(function (z) { return us.indexOf(z.u) < 0; }); cell.indsChanged();
+    toast(list.length === 1 ? T('ctxRemoved', { x: indName(list[0]) }) : T('ctxIndsGone', { n: list.length }), '', { label: T('undo'), act: function () { cell.cfg.inds = was; cell.indsChanged(); } });
+  }
+  function drawLabel(sym, x) { var p0 = x.pts && x.pts[0]; return T('t_' + x.k) + (p0 && isFinite(p0.p) ? ' · ' + fmtP(sym, p0.p) : '') + (x.hd ? ' · ' + T('hide') : ''); }
+  function removeItems(cell, ev) {
+    var sym = cell.cfg.sym, L = DRAW[sym] || [], I0 = cell.cfg.inds, o = [], at = { at: { x: ev.clientX, y: ev.clientY } };
+    var nOdm = P.odmLinesShown ? P.odmLinesShown(cell) : 0, nOal = P.odmAlertCount ? P.odmAlertCount(sym) : 0, nAl = P.alertLines ? P.alertLines(sym).length : 0;
+    o.push({ head: T('ctxRemoveH') });
+    function back() { return { label: T('ctxBack'), icon: 'back', act: function () { cellMenu(cell, ev); } }; }
+    if (I0.length === 1) o.push({ label: T('ctxRemoved1', { x: indName(I0[0]) }), icon: 'fx', act: function () { removeInd(cell, I0.slice()); } });
+    else if (I0.length) o.push({ label: T('ctxIndOne'), icon: 'fx', hint: String(I0.length), act: function () {
+      var it = [{ head: T('indicators') }];
+      cell.cfg.inds.forEach(function (x) { it.push({ label: indName(x), icon: 'trash', act: function () { removeInd(cell, [x]); } }); });
+      it.push({ sep: 1 }, { label: T('ctxAllInds', { n: cell.cfg.inds.length }), icon: 'trash', act: function () { removeInd(cell, cell.cfg.inds.slice()); } }, back());
+      menu(cell.box, it, at);
+    } });
+    if (L.length === 1) o.push({ label: T('ctxRemoved1', { x: drawLabel(sym, L[0]) }), icon: 'pen', act: function () { removeDrawing(cell, L[0].id); toast(T('ctxRemoved', { x: drawLabel(sym, L[0]) }), '', { label: T('undo'), act: doUndo }); } });
+    else if (L.length) o.push({ label: T('ctxDrwOne'), icon: 'pen', hint: String(L.length), act: function () {
+      var it = [{ head: T('ctxDrwH') }];
+      (DRAW[sym] || []).slice(-40).reverse().forEach(function (x) { it.push({ label: drawLabel(sym, x), icon: 'trash', act: function () { removeDrawing(cell, x.id); toast(T('ctxRemoved', { x: drawLabel(sym, x) }), '', { label: T('undo'), act: doUndo }); } }); });
+      it.push({ sep: 1 }, { label: T('ctxAllDraw', { n: (DRAW[sym] || []).length }), icon: 'trash', act: function () { var n = (DRAW[sym] || []).length; mutate(sym, function (L2) { L2.length = 0; }); cell.drawer.select(null); toast(T('ctxDrawGone', { n: n }), '', { label: T('undo'), act: doUndo }); } }, back());
+      menu(cell.box, it, at);
+    } });
+    if (nOdm || nOal) o.push({ label: T('ctxOdmLv'), icon: 'long', act: function () { P.odmClear(cell, true); } });
+    if (nAl) o.push({ label: T('ctxAlAll'), icon: 'bell', hint: String(nAl), act: function () { delAlertsUndo(function (a) { return a.on && a.k === 'price' && a.sym === sym; }); } });
+    var any = L.length + I0.length + nOdm + nOal;
+    if (any && (!!L.length + !!I0.length + !!(nOdm || nOal)) > 1) o.push({ label: T('ctxClearAll'), icon: 'trash', act: function () {
+      confirmBox(T('ctxClearAll'), T('ctxClearQ', { s: P.pair ? P.pair(sym) : sym }), function () {
+        if ((DRAW[sym] || []).length) { mutate(sym, function (L2) { L2.length = 0; }); if (cell.drawer) cell.drawer.select(null); }
+        var was = cell.cfg.inds.slice(); if (was.length) { cell.cfg.inds = []; cell.indsChanged(); }
+        var odg = P.delAlerts ? P.delAlerts(function (a) { return P.isOdmAlert(a, sym); }) : []; if (P.odmLinesShown && P.odmLinesShown(cell)) P.odmHide();
+        toast(T('ctxCleared'), '', { label: T('undo'), act: function () { if (was.length) { cell.cfg.inds = was; cell.indsChanged(); } if (odg.length) P.putAlerts(odg); doUndo(); } });
+      }, T('remove'));
+    } });
+    if (!any && !nOal && !nAl) o.push({ label: T('ctxNothing'), disabled: true });
+    return o;
   }
   function cloneDrawing(cell, dd) {
     var sym = cell.cfg.sym, src = cell.drawer.find(dd.id) || dd, bars = cell.disp, step = bars.length > 1 ? (bars[bars.length - 1].t - bars[0].t) / Math.max(1, bars.length - 1) * 3 : 0;

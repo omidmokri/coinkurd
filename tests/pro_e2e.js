@@ -1379,6 +1379,272 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await ctx.close();
   }
 
+  /* ---------- ODM on the chart: drag a line and the plan is worked out again, tap to put a level, undo, Escape; and the
+     right-click menu removes ODM levels, alerts, one indicator or drawing, or everything, each with Undo */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'odc') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [390, 800, 'ar'], [390, 800, 'ckb']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm chart ${lang} ${vw}`, e0 = errors.length, phone = vw < 600;
+    const T = k => page.evaluate(k => PRO.app.T(k), k);
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const showT = await T('odShow');
+    await page.evaluate(t => [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t).click(), showT);
+    await page.waitForTimeout(400);
+    const live = () => page.evaluate(() => { const L = PRO.odmLive(); if (!L) return null; const c = PRO.app.active(), r = c.box.getBoundingClientRect(); return { plan: { err: L.plan.err || null, stop: L.plan.stop, avg: L.plan.avg, risk: L.plan.risk, qty: L.plan.qty, nx: L.plan.exits ? L.plan.exits.length : 0, nf: L.plan.fills ? L.plan.fills.length : 0 }, st: JSON.parse(JSON.stringify(L.st)), levels: L.levels, pick: L.pick, box: { l: r.left, t: r.top, w: r.width, h: r.height }, pl: c.main.priceLines().length, hud: (document.querySelector('.pm-odhud .pm-odhs') || {}).textContent || '', msg: (document.querySelector('.pm-odhud .pm-odhm') || {}).textContent || '', msgDn: !!document.querySelector('.pm-odhud .pm-odhm.dn'), range: JSON.stringify(c.chart.timeScale().getVisibleLogicalRange()) }; });
+    let L0 = await live();
+    const hb = await page.evaluate(() => { const h = document.querySelector('.pm-odhud'), c = PRO.app.active().box.getBoundingClientRect(); if (!h) return null; const r = h.getBoundingClientRect(); return { in: r.left >= c.left - 1 && r.right <= c.right + 1 && r.bottom <= c.bottom + 1 && r.top >= c.top, btn: h.querySelectorAll('[data-pk]').length, open: !!h.querySelector('[data-a="open"]'), undo: h.querySelector('[data-a="undo"]').disabled, dir: h.dir, h: r.height, w: r.width }; });
+    ok(`[${tag}] "Show on chart" draws every level as a price line and opens the panel on the chart`, L0 && L0.levels.length >= 7 && L0.pl === L0.levels.length && hb && hb.in && hb.btn === 3 && hb.open && hb.undo && /SL/.test(L0.hud), JSON.stringify({ n: L0 && L0.levels.length, pl: L0 && L0.pl, hb }));
+    await shot(page, `88_odm_drag_${lang}_${vw}`);
+    /* the plan drawn as a position: green from the average entry to the last target, red to the stop, from a candle to the right edge */
+    const zone = () => page.evaluate(() => PRO.odmZone());
+    const Zn = await zone();
+    const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort'), ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
+    ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - Math.min(Zn.H, zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - Math.max(0, zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0 && Zn.tags.some(t => t.startsWith(zy.long ? zy.side : zy.side)) && Zn.tags.some(t => /^TP\d/.test(t)), JSON.stringify({ Zn, zy }));
+    const pts = await page.evaluate(([Z]) => {
+      const L = PRO.odmLive(), ys = L.levels.map(l => l.y), bx = PRO.app.active().box.getBoundingClientRect(), labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast')].map(e => e.getBoundingClientRect()), off = (x, y) => labs.some(r => bx.left + x >= r.left - 3 && bx.left + x <= r.right + 3 && bx.top + y >= r.top - 3 && bx.top + y <= r.bottom + 3), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
+      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.1 + i * 0.1); for (const f of [0.15, 0.35, 0.55, 0.75]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg) && !off(x, yg)) out.push([x, yg, 'g']); if (clear(yr) && !off(x, yr)) out.push([x, yr, 'r']); } }
+      return out;
+    }, [Zn]);
+    /* what the screen shows, with and without the box (the same moment, the same candles) */
+    const clip = { x: Math.round(L0.box.l + Zn.x0), y: Math.round(L0.box.t + Zn.top), width: Math.max(4, Math.round(Zn.x1 - Zn.x0)), height: Math.max(4, Math.round(Zn.bot - Zn.top)) };
+    const px = async () => { const b64 = (await page.screenshot({ clip })).toString('base64'); return page.evaluate(async ([b64, pts, clip, l, t]) => { const im = new Image(); im.src = 'data:image/png;base64,' + b64; await im.decode(); const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; const g = cv.getContext('2d'); g.drawImage(im, 0, 0); const k = im.width / clip.width;
+      return pts.map(([x, y]) => [...g.getImageData(Math.max(0, Math.min(im.width - 1, Math.round((l + x - clip.x) * k))), Math.max(0, Math.min(im.height - 1, Math.round((t + y - clip.y) * k))), 1, 1).data].slice(0, 3)); }, [b64, pts, clip, L0.box.l, L0.box.t]); };
+    const on1 = await px(); await page.evaluate(() => PRO._odmZoneVis(false)); await page.waitForTimeout(200);
+    const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(200);
+    const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
+    pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (Math.abs(dr) + Math.abs(dg) < 6) return; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 + tint.n2 >= 6 && (tint.n1 >= 4 || tint.n2 >= 4) && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
+    /* the round handle on the entry line moves the start candle; Undo puts it back */
+    {
+      const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;
+      if (!phone) { await page.mouse.move(hx, hy); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(hx + dx * i / 6, hy); await page.mouse.up(); }
+      else await page.evaluate(([x, y, dx]) => {
+        const el = document.elementFromPoint(x, y), o = (x, t) => ({ bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 9, pointerType: 'touch', isPrimary: true, buttons: t ? 1 : 0, button: 0 });
+        el.dispatchEvent(new PointerEvent('pointerdown', o(x, 1))); for (let i = 1; i <= 6; i++) el.dispatchEvent(new PointerEvent('pointermove', o(x + dx * i / 6, 1))); el.dispatchEvent(new PointerEvent('pointerup', o(x + dx, 0)));
+      }, [hx, hy, dx]);
+      await page.waitForTimeout(150);
+      const Z2 = await zone(), L2b = await live();
+      ok(`[${tag}] dragging the round handle moves the box to another candle and leaves the levels as they were`, Z2 && Math.abs((Z2.x0 - Zn.x0) - dx) < 14 && (dx < 0 ? Z2.anchor < Zn.anchor : Z2.anchor > Zn.anchor) && L2b.plan.stop === L0.plan.stop && L2b.plan.avg === L0.plan.avg && L2b.range === L0.range, JSON.stringify({ x0: Zn.x0, x1: Z2 && Z2.x0, a0: Zn.anchor, a1: Z2 && Z2.anchor, dx }));
+      await page.click('.pm-odhud [data-a="undo"]'); await page.waitForTimeout(150);
+      const Z3 = await zone();
+      ok(`[${tag}] Undo puts the box back on its first candle`, Z3 && Z3.anchor === Zn.anchor && Math.abs(Z3.x0 - Zn.x0) < 1, JSON.stringify({ a: Z3 && Z3.anchor, want: Zn.anchor }));
+    }
+    const X = L0.box.l + L0.box.w * 0.42;
+    const under = (x, y) => page.evaluate(([x, y]) => { const out = []; let el = document.elementFromPoint(x, y); for (let i = 0; el && i < 6; i++, el = el.parentElement) { const cs = getComputedStyle(el); out.push(el.tagName + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '') + '[' + cs.position + ',' + cs.zIndex + ']'); } return out.join(' < ') + ' @' + Math.round(x) + ',' + Math.round(y); }, [x, y]);
+    const yOf = (L, k) => { const l = L.levels.find(z => z.k === k); return l ? L.box.t + l.y : null; };
+    /* drag the stop down 40 px: wider stop, same risk, smaller size */
+    const xFree = (y) => page.evaluate(([y, X]) => { const c = PRO.app.active().box.getBoundingClientRect(); const xs = [X]; for (let x = c.left + c.width * 0.15; x < c.right - 70; x += 8) xs.push(x); for (const x of xs) { const el = document.elementFromPoint(x, y); if (el && !el.closest('.pm-odhud,.pm-leg,.pm-toast,.pm-menu')) return x; } for (const x of xs) { const el = document.elementFromPoint(x, y); if (el && el.closest('.pm-odhud') && !el.closest('button')) return x; } return X; }, [y, X]);
+    const drag = async (y0, dy, touch) => {
+      const X = await xFree(y0);
+      if (!touch) { await page.mouse.move(X, y0); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(X, y0 + dy * i / 6); await page.mouse.up(); }
+      else await page.evaluate(([x, y0, dy]) => {
+        const box = PRO.app.active().box, el = document.elementFromPoint(x, y0) || box, o = (y, t) => ({ bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 7, pointerType: 'touch', isPrimary: true, buttons: t ? 1 : 0, button: 0 });
+        el.dispatchEvent(new PointerEvent('pointerdown', o(y0, 1)));
+        for (let i = 1; i <= 6; i++) el.dispatchEvent(new PointerEvent('pointermove', o(y0 + dy * i / 6, 1)));
+        el.dispatchEvent(new PointerEvent('pointerup', o(y0 + dy, 0)));
+      }, [X, y0, dy]);
+      await page.waitForTimeout(150);
+    };
+    /* down 40 px widens the stop; when the stop sits near the foot of the price pane, up 40 px narrows it instead (a line is grabbed where it can be seen) */
+    const paneH = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight());
+    const slY = yOf(L0, 'sl') - L0.box.t, dyS = slY + 40 > paneH - 30 ? -40 : 40;
+    await drag(yOf(L0, 'sl'), dyS, phone);
+    let L1 = await live();
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_odm') || '{}').stop);
+    ok(`[${tag}] dragging the stop line moves the stop, keeps the risk and changes the size to match; it is saved as a price`, (dyS > 0 ? L1.plan.stop < L0.plan.stop && L1.plan.qty < L0.plan.qty : L1.plan.stop > L0.plan.stop && L1.plan.qty > L0.plan.qty) && Math.abs(L1.plan.risk - L0.plan.risk) < 1e-6 && L1.st.stop.mode === 'price' && saved.mode === 'price' && Math.abs(+saved.v - L1.plan.stop) <= Math.abs(L1.plan.stop) * 1e-6 && L1.hud !== L0.hud, JSON.stringify({ s0: L0.plan.stop, s1: L1.plan.stop, r0: L0.plan.risk, r1: L1.plan.risk, q0: L0.plan.qty, q1: L1.plan.qty, saved, under: L1.plan.stop < L0.plan.stop ? '' : await under(X, yOf(L0, 'sl')), hud: await page.evaluate(() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const r = h.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height), h.className]; }), box: L0.box, ysl: yOf(L0, 'sl') }));
+    ok(`[${tag}] the chart does not pan or zoom while a line is dragged`, L1.range === L0.range, L0.range + ' → ' + L1.range);
+    /* drag the first entry up 20 px: the average follows */
+    await drag(yOf(L1, 'e0'), -20, phone);
+    const L2 = await live();
+    ok(`[${tag}] dragging an entry moves it and the average follows`, +L2.st.entries[0].p > +L1.st.entries[0].p && L2.plan.avg > L1.plan.avg && !L2.plan.err, JSON.stringify({ e1: L1.st.entries[0].p, e2: L2.st.entries[0].p, a1: L1.plan.avg, a2: L2.plan.avg, err: L2.plan.err }));
+    /* undo puts the entry back */
+    await page.click('.pm-odhud [data-a="undo"]'); await page.waitForTimeout(150);
+    const L3 = await live();
+    ok(`[${tag}] Undo on the panel puts the last change back`, L3.st.entries[0].p === L1.st.entries[0].p && Math.abs(L3.plan.avg - L1.plan.avg) < 1e-9, JSON.stringify({ e: L3.st.entries[0].p, want: L1.st.entries[0].p }));
+    /* Escape while a line is held puts it back */
+    if (!phone) {
+      const y = yOf(L3, 'sl'), X = await xFree(y), sgn = y - L0.box.t + 40 > paneH - 30 ? -1 : 1; await page.mouse.move(X, y); await page.mouse.down(); for (let i = 1; i <= 4; i++) await page.mouse.move(X, y + sgn * 10 * i);
+      const mid = await live(); await page.keyboard.press('Escape'); await page.mouse.up(); await page.waitForTimeout(150);
+      const L4 = await live();
+      ok(`[${tag}] Escape while dragging puts the line back where it was`, mid.plan.stop !== L3.plan.stop && Math.abs(L4.plan.stop - L3.plan.stop) < 1e-9 && L4.range === L3.range, JSON.stringify({ mid: mid.plan.stop, back: L4.plan.stop, want: L3.plan.stop }));
+    }
+    /* tap "+ Target", then the chart above the last target: a new exit at that price */
+    let Lb = await live();
+    /* a price between the average entry and the highest target that is on screen */
+    const tapP = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)).map(l => l.p), a = L.plan.avg, top = Math.max(...xs);
+      const yA = c.main.priceToCoordinate(a), yTop = Math.max(24, c.main.priceToCoordinate(top)); const ys = L.levels.map(l => l.y);
+      let best = null, bd = -1; for (let y = yTop; y < yA - 8; y += 3) { const d = Math.min(...ys.map(z => Math.abs(z - y))); if (d > bd) { bd = d; best = y; } } return best == null ? null : { y: best, p: c.main.coordinateToPrice(best) }; });
+    const yT = tapP ? tapP.y : null;
+    await page.click('.pm-odhud [data-pk="x"]'); await page.waitForTimeout(80);
+    const pk = await page.evaluate(() => ({ on: document.querySelector('.pm-odhud [data-pk="x"]').classList.contains('on'), cls: PRO.app.active().el.classList.contains('pm-odpick'), msg: document.querySelector('.pm-odhud .pm-odhm').textContent }));
+    ok(`[${tag}] "+ Target" waits for a tap and says so`, pk.on && pk.cls && pk.msg === (await T('odPick_x')), JSON.stringify(pk));
+    if (yT != null && yT > 10) {
+      await page.mouse.click(X, Lb.box.t + yT);
+      await page.waitForTimeout(150);
+      const L5 = await live(), nx = L5.st.exits.filter(x => x.v !== '' && +x.q > 0);
+      ok(`[${tag}] a tap on the chart adds the target at that price, in order, and the panel stops waiting`, L5.st.exits.length === Lb.st.exits.length + 1 && !L5.plan.err && L5.plan.nx === Lb.plan.nx + 1 && nx.some(x => x.mode === 'price' && Math.abs(+x.v / tapP.p - 1) < 0.002) && !L5.pick && Math.abs(nx.reduce((s, x) => s + +x.q, 0) - 100) < 0.01, JSON.stringify({ n0: Lb.st.exits.length, n1: L5.st.exits.length, err: L5.plan.err, ex: L5.st.exits, tapP }));
+      Lb = L5;
+    } else ok(`[${tag}] room above the last target to tap`, false, String(yT));
+    /* tap "Stop" and then a price above the entries: the plan refuses it, says why, and the stop line stays to be dragged back */
+    const yBad = await page.evaluate(() => { const L = PRO.odmLive(), e = Math.max(...L.levels.filter(l => /^e/.test(l.k)).map(l => l.p)), x = Math.min(...L.levels.filter(l => /^x/.test(l.k)).map(l => l.p)); return PRO.app.active().main.priceToCoordinate((e + x) / 2); });
+    await page.click('.pm-odhud [data-pk="s"]'); await page.waitForTimeout(60);
+    await page.mouse.click(X, Lb.box.t + yBad);
+    await page.waitForTimeout(150);
+    const L6 = await live();
+    ok(`[${tag}] a stop on the wrong side is refused with the reason, and its line stays on the chart`, L6.plan.err === 'side' && L6.msgDn && L6.msg === (await T('odE_side')) && L6.levels.some(l => l.k === 'sl'), JSON.stringify({ err: L6.plan.err, msg: L6.msg, k: L6.levels.map(l => l.k) }));
+    await page.click('.pm-odhud [data-a="undo"]'); await page.waitForTimeout(150);
+    ok(`[${tag}] Undo brings the working plan back`, !(await live()).plan.err, '');
+
+    /* the right-click menu */
+    await page.evaluate(() => { const c = PRO.app.active(), L = PRO.odmLive(); PRO.addPriceAlert(c.cfg.sym, L.plan.stop, 'down', 'ODM SL'); PRO.addPriceAlert(c.cfg.sym, L.plan.exits[0].p, 'up', 'ODM TP1'); });
+    const freeY = async () => page.evaluate(() => {
+      const c = PRO.app.active(), L = PRO.odmLive(), ys = (L ? L.levels.map(l => l.y) : []).concat(PRO.alertLines(c.cfg.sym).map(a => c.main.priceToCoordinate(a.v))).filter(y => y != null), h = c.box.getBoundingClientRect().height;
+      const hu = document.querySelector('.pm-odhud'), bt = c.box.getBoundingClientRect().top, hr = hu ? hu.getBoundingClientRect() : null;
+      let best = 40, bd = -1; for (let y = 30; y < h - 60; y += 4) { if (hr && y >= hr.top - bt - 8 && y <= hr.bottom - bt + 8) continue; const d = Math.min(...ys.map(z => Math.abs(z - y)), 999); if (d > bd) { bd = d; best = y; } } return best;
+    });
+    const rclick = async (y, x) => { await page.mouse.click(x || X, L0.box.t + y, { button: 'right' }); await page.waitForSelector('.pm-menu .pm-mi', { timeout: 3000 }).catch(() => { }); await page.waitForTimeout(80); };
+    const menuTxt = () => page.evaluate(() => ({ heads: [...document.querySelectorAll('.pm-menu .pm-mh')].map(x => x.textContent), items: [...document.querySelectorAll('.pm-menu .pm-mi')].map(x => x.querySelector('span').textContent + '|' + ((x.querySelector('small') || {}).textContent || '') + '|' + x.disabled), fits: (() => { const m = document.querySelector('.pm-menu'); if (!m) return false; const r = m.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 1 && r.top >= 0 && r.bottom <= innerHeight + 1; })() }));
+    const pickMenu = t => page.evaluate(t => { const b = [...document.querySelectorAll('.pm-menu .pm-mi')].find(x => x.querySelector('span').textContent === t); if (!b) return false; b.click(); return true; }, t);
+    const undoToast = () => page.evaluate(() => { const b = document.querySelector('.pm-toast .pm-tbtn'); if (!b) return false; b.click(); return true; });
+    const Tk = {}; for (const k of ['ctxRemoveH', 'ctxOdmLv', 'ctxAlAll', 'ctxOdmHide', 'ctxOpenOdm', 'ctxAlDel', 'ctxIndOne', 'ctxDrwOne', 'ctxClearAll', 'undo', 'ctxBack']) Tk[k] = await T(k);
+    let fy = await freeY(); await rclick(fy);
+    let M = await menuTxt();
+    const has = (M, k) => M.items.some(s => s.split('|')[0] === Tk[k]);
+    ok(`[${tag}] right-click shows "Remove from chart" with "ODM levels and their alerts" (one item) and this coin's alerts`, M.heads.includes(Tk.ctxRemoveH) && has(M, 'ctxOdmLv') && has(M, 'ctxAlAll') && M.fits && !M.items.some(s => /ODM/.test(s) && ![Tk.ctxOdmLv, Tk.ctxOpenOdm, Tk.ctxOdmHide].includes(s.split('|')[0])), JSON.stringify(M));
+    await shot(page, `88b_ctx_remove_${lang}_${vw}`);
+    await pickMenu(Tk.ctxOdmLv); await page.waitForTimeout(120);
+    const odmAl = () => page.evaluate(() => ({ al: PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length, ov: PRO.alertLines(PRO.app.active().cfg.sym).filter(a => a.odm).length, n: PRO.odmLinesShown(), pl: PRO.app.active().main.priceLines().length, hud: !!document.querySelector('.pm-odhud'), t: (document.querySelector('.pm-toast') || {}).textContent || '' }));
+    const g1 = await odmAl();
+    ok(`[${tag}] "ODM levels and their alerts" takes every ODM line, the panel, the ODM alerts and their 🔔 lines off the chart in one go, and offers Undo`, g1.n === 0 && g1.pl === 0 && !g1.hud && g1.al === 0 && g1.ov === 0 && g1.t.includes(Tk.undo), JSON.stringify(g1));
+    await undoToast(); await page.waitForTimeout(150);
+    const g1b = await odmAl();
+    ok(`[${tag}] Undo draws the ODM levels again and brings their alerts back`, g1b.n >= 7 && g1b.al === 2 && g1b.ov === 2, JSON.stringify(g1b));
+    /* right-click on the stop line itself */
+    const Ls = await live(), ySl = Ls.levels.find(l => l.k === 'sl').y; await rclick(ySl, await xFree(L0.box.t + ySl));
+    M = await menuTxt();
+    ok(`[${tag}] right-click on an ODM line names it and offers Open ODM and Remove`, M.heads[0] && M.heads[0].startsWith('ODM · SL') && has(M, 'ctxOpenOdm') && has(M, 'ctxOdmHide'), JSON.stringify(M.heads));
+    await pickMenu(Tk.ctxOdmHide); await page.waitForTimeout(120);
+    const g1c = await odmAl();
+    ok(`[${tag}] "Remove" on the line takes the ODM levels and their alerts off together`, g1c.n === 0 && g1c.pl === 0 && g1c.al === 0 && g1c.ov === 0, JSON.stringify(g1c));
+    await undoToast(); await page.waitForTimeout(150);
+    ok(`[${tag}] Undo brings both back`, (await odmAl()).al === 2 && (await odmAl()).n >= 7, '');
+    /* inside the position box, away from any line: the position's own menu */
+    {
+      const zp = await page.evaluate(() => { const Z = PRO.odmZone(), L = PRO.odmLive(), c = PRO.app.active(), ys = L.levels.map(l => l.y).concat(PRO.alertLines(c.cfg.sym).map(a => c.main.priceToCoordinate(a.v))), hu = document.querySelector('.pm-odhud'), bt = c.box.getBoundingClientRect().top, hr = hu ? hu.getBoundingClientRect() : null;
+        let best = null, bd = -1; const bx = c.box.getBoundingClientRect().left + Z.x0 + (Z.x1 - Z.x0) * 0.75; for (let y = Z.top + 4; y < Z.bot - 4; y += 3) { if (hr && y >= hr.top - bt - 8 && y <= hr.bottom - bt + 8) continue; const el = document.elementFromPoint(bx, bt + y); if (!el || !el.closest('.pm-chart')) continue; const d = Math.min(...ys.filter(v => v != null).map(v => Math.abs(v - y))); if (d > bd) { bd = d; best = y; } }
+        return best == null ? null : { x: c.box.getBoundingClientRect().left + Z.x0 + (Z.x1 - Z.x0) * 0.75, y: best, d: bd, side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort') }; });
+      if (zp && zp.d > 8) {
+        await rclick(zp.y, zp.x); M = await menuTxt();
+        ok(`[${tag}] right-click inside the position box offers Open ODM and Remove for the position`, M.heads[0] && M.heads[0].startsWith('ODM · ' + zp.side) && has(M, 'ctxOdmHide'), JSON.stringify({ heads: M.heads, zp, under: M.heads.length ? '' : await under(zp.x, L0.box.t + zp.y) }));
+        await page.keyboard.press('Escape'); await page.waitForTimeout(80);
+      } else ok(`[${tag}] room inside the box to right-click`, false, JSON.stringify(zp));
+    }
+    /* a plain alert line under the cursor */
+    fy = await freeY();
+    await page.evaluate(y => { const c = PRO.app.active(); PRO.addPriceAlert(c.cfg.sym, c.main.coordinateToPrice(y), 'cross', ''); }, fy);
+    await rclick(fy); M = await menuTxt();
+    ok(`[${tag}] right-click on an alert line offers to delete that alert`, M.heads[0] && M.heads[0].startsWith('🔔') && has(M, 'ctxAlDel'), JSON.stringify(M.heads));
+    const nAl0 = await page.evaluate(() => PRO._alerts().length);
+    await pickMenu(Tk.ctxAlDel); await page.waitForTimeout(120);
+    ok(`[${tag}] "Delete this alert" deletes that one alert only`, (await page.evaluate(() => PRO._alerts().length)) === nAl0 - 1 && (await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length)) === 2, '');
+    /* the ODM window: one "Hide from chart" button that takes the lines and their alerts away; no separate alerts button */
+    await page.evaluate(() => document.querySelector('#pm-odm').click()); await page.waitForSelector('.pm-odm', { timeout: 5000 }); await page.waitForTimeout(200);
+    const hdT = await T('odHide');
+    const dbtn = await page.evaluate(() => [...document.querySelectorAll('.pm-odact button')].map(x => ({ t: x.textContent.trim(), h: x.hidden })));
+    ok(`[${tag}] the ODM window shows "Hide from chart" and no separate alerts button`, dbtn.some(b => b.t === hdT && !b.h) && !dbtn.some(b => /ODM/.test(b.t) && b.t !== hdT), JSON.stringify(dbtn));
+    await page.evaluate(t => { const b = [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t); b.dispatchEvent(new MouseEvent('click', { bubbles: true })); }, hdT); await page.waitForTimeout(150);
+    const g2 = await odmAl();
+    ok(`[${tag}] "Hide from chart" clears the ODM lines, the ODM alerts and their 🔔 lines from the chart`, g2.al === 0 && g2.n === 0 && g2.pl === 0 && g2.ov === 0, JSON.stringify(g2));
+    await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+    /* indicators and drawings, one at a time or all together */
+    await page.evaluate(() => { document.querySelector('#pm-ind').click(); });
+    await page.waitForSelector('.pm-idi[data-id="bb"]', { timeout: 5000 }).catch(() => { });
+    await page.evaluate(() => { document.querySelector('.pm-idi[data-id="bb"]').click(); });
+    await page.evaluate(() => { const ch = document.querySelectorAll('.pm-idt .pm-chip')[1]; if (ch) ch.click(); });
+    await page.waitForTimeout(100); await page.evaluate(() => { const r = document.querySelector('.pm-idi[data-id="rsi"]'); if (r) r.click(); });
+    await page.evaluate(() => PRO.app.closeModal()); await page.waitForTimeout(400);
+    await page.evaluate(() => { const c = PRO.app.active(), s = c.cfg.sym, t = c.disp[c.disp.length - 30].t, p = c.disp[c.disp.length - 1].c; PRO.app.mutate(s, L => { L.push({ id: 'h1', k: 'hline', pts: [{ t, p: p * 0.97 }], s: { c: '#f7931a', w: 1, d: 0, x: '' } }); L.push({ id: 'h2', k: 'hline', pts: [{ t, p: p * 1.03 }], s: { c: '#f7931a', w: 1, d: 0, x: '' } }); }); });
+    const i0 = await page.evaluate(() => PRO.app.active().cfg.inds.map(x => x.id));
+    fy = await freeY(); await rclick(fy); M = await menuTxt();
+    ok(`[${tag}] right-click offers one indicator, one drawing, or clearing the whole chart`, has(M, 'ctxIndOne') && has(M, 'ctxDrwOne') && has(M, 'ctxClearAll'), JSON.stringify({ i0, M }));
+    await pickMenu(Tk.ctxIndOne); await page.waitForTimeout(100);
+    const sub = await menuTxt();
+    ok(`[${tag}] "An indicator…" lists each indicator with Back`, sub.items.length >= i0.length + 2 && sub.items.some(s => s.startsWith(Tk.ctxBack + '|')) && sub.fits, JSON.stringify(sub));
+    await page.evaluate(() => [...document.querySelectorAll('.pm-menu .pm-mi')][0].click()); await page.waitForTimeout(200);
+    const i1 = await page.evaluate(() => PRO.app.active().cfg.inds.map(x => x.id));
+    await undoToast(); await page.waitForTimeout(200);
+    const i2 = await page.evaluate(() => PRO.app.active().cfg.inds.map(x => x.id));
+    ok(`[${tag}] removing one indicator leaves the others, and Undo puts it back`, i0.length >= 2 && i1.length === i0.length - 1 && JSON.stringify(i2) === JSON.stringify(i0), JSON.stringify({ i0, i1, i2 }));
+    await rclick(await freeY()); await pickMenu(Tk.ctxDrwOne); await page.waitForTimeout(100);
+    await page.evaluate(() => [...document.querySelectorAll('.pm-menu .pm-mi')][0].click()); await page.waitForTimeout(200);
+    const d1 = await page.evaluate(() => (PRO.app.DRAW()[PRO.app.active().cfg.sym] || []).map(x => x.id));
+    ok(`[${tag}] removing one drawing from the list removes the newest one only`, JSON.stringify(d1) === '["h1"]', JSON.stringify(d1));
+    await undoToast(); await page.waitForTimeout(150);
+    await rclick(await freeY()); await pickMenu(Tk.ctxClearAll); await page.waitForTimeout(150);
+    await page.evaluate(() => document.querySelector('.pm-modal [data-y]').click()); await page.waitForTimeout(250);
+    const cl = await page.evaluate(() => ({ d: (PRO.app.DRAW()[PRO.app.active().cfg.sym] || []).length, i: PRO.app.active().cfg.inds.length }));
+    await undoToast(); await page.waitForTimeout(250);
+    const cl2 = await page.evaluate(() => ({ d: (PRO.app.DRAW()[PRO.app.active().cfg.sym] || []).length, i: PRO.app.active().cfg.inds.length }));
+    ok(`[${tag}] "Clear the whole chart" asks first, clears drawings and indicators, and Undo brings both back`, cl.d === 0 && cl.i === 0 && cl2.d === 2 && cl2.i === i0.length, JSON.stringify({ cl, cl2 }));
+    ok(`[${tag}] no JS errors on the chart or in the menu`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
+  /* ---------- ODM's guided tour: offered once, one step per part, the part lit and in view, Back/Next/Done, keys, Escape */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'otr') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [390, 800, 'ar'], [390, 800, 'ckb']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm tour ${lang} ${vw}`, e0 = errors.length, phone = vw < 600;
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); localStorage.removeItem('ek_pro_odtour'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const of = await page.evaluate(() => { const o = document.querySelector('.pm-odoffer'), g = document.querySelector('.pm-odgo'); return { offer: o ? o.querySelector('p').textContent : null, want: PRO.app.T('odTourOffer'), go: g ? g.textContent.trim() : null, wantGo: PRO.app.T('odGuide') }; });
+    ok(`[${tag}] the first time, ODM offers the tour and shows its "Guide me" button`, of.offer === of.want && of.go === of.wantGo, JSON.stringify(of));
+    await page.evaluate(() => document.querySelector('.pm-odoffer [data-a="go"]').click()); await page.waitForTimeout(250);
+    const step = () => page.evaluate(() => {
+      const b = document.querySelector('.pm-odtour'), t = document.querySelector('.pm-odtgt'), body = document.querySelector('.pm-mbody'); if (!b || !t) return { b: !!b, t: !!t };
+      const br = b.getBoundingClientRect(), tr = t.getBoundingClientRect(), vr = body.getBoundingClientRect(), A = PRO.odTour.active();
+      const hd0 = document.getElementById('ekh'), hb0 = hd0 && /fixed|sticky/.test(getComputedStyle(hd0).position) ? hd0.getBoundingClientRect().bottom : 0, visTop = Math.max(vr.top, 0, hb0), visBot = Math.min(vr.bottom, innerHeight, b.classList.contains('sheet') ? br.top : 1e9);
+      const shown = Math.min(tr.bottom, visBot) - Math.max(tr.top, visTop);
+      const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1) && br.top < Math.max(tr.top, visTop) + 40;
+      const hd = document.getElementById('ekh'), hb = hd && /fixed|sticky/.test(getComputedStyle(hd).position) ? hd.getBoundingClientRect().bottom : 0;
+      return { k: A.k, i: A.i, n: A.n, n1: b.querySelector('small').textContent, title: b.querySelector('b').textContent, text: b.querySelector('p').textContent, next: b.querySelector('[data-a="next"]').textContent, back: b.querySelector('[data-a="back"]').disabled,
+        hit: (() => { const n = b.querySelector('[data-a="next"]').getBoundingClientRect(), el = document.elementFromPoint(n.left + n.width / 2, n.top + n.height / 2); if (el && el.closest('.pm-odtour')) return 'ok'; const out = []; let e = el; for (let i = 0; e && i < 7; i++, e = e.parentElement) { const cs = getComputedStyle(e); out.push(e.tagName + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/).join('.') : '') + '[' + cs.position + ',' + cs.zIndex + ']'); } const pr = document.getElementById('pro').getBoundingClientRect(), mr = document.querySelector('.pm-modal').getBoundingClientRect(); return out.join(' < ') + ' @' + Math.round(n.left) + ',' + Math.round(n.top) + ' pro=' + [pr.top, pr.bottom].map(Math.round) + ' modal=' + [mr.top, mr.bottom].map(Math.round); })(),
+        br: [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)], tr: [Math.round(tr.left), Math.round(tr.top), Math.round(tr.width), Math.round(tr.height)], vw: [innerWidth, innerHeight, Math.round(scrollY)],
+        sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= hb - 1 && br.bottom <= innerHeight + 1, hb, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
+    });
+    let s = await step(); const seenK = [], bad = [];
+    ok(`[${tag}] the tour starts at "Your account", step 1, with Back off and the account part lit`, s.k === 'acc' && s.i === 0 && s.back && s.title === (await page.evaluate(() => PRO.app.T('odTr_acc_t'))) && s.n >= 9 && (phone ? s.sheet : !s.sheet) && s.focus, JSON.stringify(s));
+    await shot(page, `89_odm_tour_${lang}_${vw}`);
+    for (let i = 0; i < 12 && s && s.k; i++) {
+      seenK.push(s.k);
+      if (!s.title || !s.text || !s.inView || !s.seen || s.hit !== 'ok' || (s.overlap && !s.tall) || s.n1 !== (await page.evaluate(([i, n]) => PRO.app.T('odTourN', { i, n }), [s.i + 1, s.n]))) bad.push(s);
+      if (s.k === 'loss') await shot(page, `89b_odm_tour_loss_${lang}_${vw}`);
+      if (s.i === s.n - 1) break;
+      await page.evaluate(() => document.querySelector('.pm-odtour [data-a="next"]').click()); await page.waitForTimeout(200); s = await step();
+    }
+    ok(`[${tag}] every step names its part, keeps it in view and not under its note, and counts "i of n"`, bad.length === 0 && seenK.length === s.n && new Set(seenK).size === seenK.length && seenK.includes('loss') && seenK.includes('act'), JSON.stringify({ seenK, bad: bad.slice(0, 3).map(x => ({ k: x.k, hit: x.hit, br: x.br, tr: x.tr, vw: x.vw, inView: x.inView, seen: x.seen, overlap: x.overlap, sheet: x.sheet })) }));
+    ok(`[${tag}] the last step says Done`, s.next === (await page.evaluate(() => PRO.app.T('odTourDone'))), s.next);
+    await page.evaluate(() => document.querySelector('.pm-odtour [data-a="next"]').click()); await page.waitForTimeout(150);
+    const end = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), lit: document.querySelectorAll('.pm-odtgt').length, modal: !!document.querySelector('.pm-odm'), seen: localStorage.getItem('ek_pro_odtour') }));
+    ok(`[${tag}] Done closes the tour and leaves ODM open`, !end.tour && !end.lit && end.modal && end.seen === '1', JSON.stringify(end));
+    /* opened again: no offer, the button starts it; the arrow key moves on; Escape leaves the tour but not ODM */
+    await page.evaluate(() => { PRO.app.closeModal(); document.querySelector('#pm-odm').click(); }); await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { }); await page.waitForTimeout(250);
+    const again = await page.evaluate(() => ({ offer: !!document.querySelector('.pm-odoffer'), go: !!document.querySelector('.pm-odgo') }));
+    ok(`[${tag}] once seen, ODM no longer offers the tour but keeps the button`, !again.offer && again.go, JSON.stringify(again));
+    await page.evaluate(() => document.querySelector('.pm-odgo').click()); await page.waitForTimeout(200);
+    await page.keyboard.press(lang === 'en' ? 'ArrowRight' : 'ArrowLeft'); await page.waitForTimeout(150);
+    const k2 = await page.evaluate(() => PRO.odTour.active());
+    ok(`[${tag}] the arrow key in the reading direction moves to the next step`, k2 && k2.i === 1, JSON.stringify(k2));
+    await page.evaluate(() => document.querySelector('.pm-odtour [data-a="back"]').click()); await page.waitForTimeout(150);
+    ok(`[${tag}] Back goes to the step before`, (await page.evaluate(() => PRO.odTour.active().i)) === 0, '');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(150);
+    const esc = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), modal: !!document.querySelector('.pm-odm'), lit: document.querySelectorAll('.pm-odtgt').length }));
+    ok(`[${tag}] Escape leaves the tour, not ODM`, !esc.tour && esc.modal && !esc.lit, JSON.stringify(esc));
+    ok(`[${tag}] no JS errors in the tour`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
   /* ---------- ODM result tables: one line per header and per number in every language, nothing cut, at desktop, tablet and phone widths */
   if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'odt') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [900, 800, 'ar'], [390, 800, 'ckb'], [390, 800, 'fa']]) {
     const { page, ctx } = await newPage(vw, vh, lang);

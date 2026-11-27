@@ -86,7 +86,7 @@
 .pm-grid[data-l="16"]{grid-template:repeat(4,1fr)/repeat(4,1fr)}
 .pm-cell{position:relative;min-width:0;min-height:0;background:#0b0b0c;display:flex;flex-direction:column;overflow:hidden}
 .pm-grid.multi .pm-cell.on{box-shadow:inset 0 0 0 1px rgba(247,147,26,.6);z-index:1}
-.pm-chart{flex:1 1 auto;min-height:0;position:relative}
+.pm-chart{flex:1 1 auto;min-height:0;position:relative;isolation:isolate}
 .pm-picking .pm-chart{cursor:col-resize}
 .pm-msg{position:absolute;inset:40% 10% auto;z-index:4;text-align:center;color:var(--mute);background:rgba(11,11,12,.86);padding:10px 14px;border-radius:12px;border:1px solid var(--line)}
 
@@ -826,3 +826,63 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-lqsrc li.ok::marker{color:var(--up)}.pm-lqsrc li.bad{color:var(--dn)}.pm-lqsrc li.wait{color:var(--mute)}
 #pro.pm-light .pm-lqt td{border-bottom-color:rgba(0,0,0,.06)}
 @media (max-width:560px){.pm-lqt{font-size:11.5px}.pm-lqt td,.pm-lqt th{padding:4px 3px}}
+/* ODM on the chart: the panel, picking a price, dragging a line */
+.pm-odhud{position:absolute;left:8px;bottom:34px;z-index:7;max-width:min(460px,calc(100% - 96px));background:rgba(17,17,19,.92);border:1px solid rgba(247,147,26,.45);border-radius:12px;padding:7px 9px;box-shadow:0 8px 26px rgba(0,0,0,.45);font-size:12px;line-height:1.45;color:#e8e8e3;backdrop-filter:blur(6px)}
+.pm-odhs{display:flex;flex-wrap:wrap;gap:2px 10px;font-weight:600}
+.pm-odhs span{white-space:nowrap;color:#a9a9a3}.pm-odhs bdi{color:#f1f1ec}
+.pm-odhs .dn bdi{color:#ff6a5e}.pm-odhs .up bdi{color:#34d399}
+.pm-odhm{margin:3px 0 5px;color:#b9b9b2;font-size:11.5px}.pm-odhm.dn{color:#ff8a80}
+.pm-odhb{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.pm-odhb .pm-btn.sm{margin:0;padding:4px 9px;min-height:28px}
+/* the panel lets a touch or a click on its text go through to the chart, so a line under it can still be grabbed or long-pressed */
+.pm-odhud{pointer-events:none}.pm-odhud button{pointer-events:auto}
+/* the ODM position on the chart: labels of its levels, the plan in the middle of each zone, the handle that moves its start */
+.pm-odz{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+.pm-odzp{position:absolute;transform:translateY(-50%);font:600 11px/18px Vazirmatn,Tahoma,sans-serif;padding:0 7px;border-radius:5px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.35)}
+.pm-odzp.e{background:rgba(236,236,230,.94);color:#141416}.pm-odzp.s{background:rgba(255,90,77,.94);color:#fff}.pm-odzp.x{background:rgba(52,211,153,.94);color:#06281c}
+.pm-odzm{position:absolute;transform:translate(-50%,-50%);font:700 12px/1.4 Vazirmatn,Tahoma,sans-serif;white-space:nowrap;padding:3px 10px;border-radius:9px;background:rgba(11,11,12,.62);backdrop-filter:blur(2px)}
+.pm-odzm.x{color:#7ff0c4;border:1px solid rgba(52,211,153,.45)}.pm-odzm.s{color:#ffb0a8;border:1px solid rgba(255,90,77,.45)}
+.pm-odzh{position:absolute;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;background:#141416;border:2px solid #f7931a;box-shadow:0 0 0 4px rgba(247,147,26,.22)}
+.pm-odzh.on{transform:scale(1.25)}
+#pro.pm-light .pm-odzp.e{background:rgba(40,40,40,.9);color:#fff}#pro.pm-light .pm-odzp.x{background:rgba(16,150,100,.92);color:#fff}#pro.pm-light .pm-odzp.s{background:rgba(220,60,50,.92)}
+#pro.pm-light .pm-odzm{background:rgba(255,255,255,.75)}#pro.pm-light .pm-odzm.x{color:#0b6b48}#pro.pm-light .pm-odzm.s{color:#a3271d}#pro.pm-light .pm-odzh{background:#fff}
+@media (max-width:600px){.pm-odzp{font-size:10.5px;padding:0 5px}.pm-odzm{font-size:11px;padding:2px 7px}}
+.pm-odhb [data-pk].on{background:#f7931a;color:#141414;border-color:#f7931a}
+.pm-odhb .pm-ib{width:28px;height:28px;border:1px solid rgba(255,255,255,.14)}
+.pm-odhb .pm-ib:disabled{opacity:.35;cursor:default}
+.pm-odhb [data-a="hide"]{margin-inline-start:auto}
+.pm-odpick .pm-chart,.pm-odpick .pm-chart *{cursor:crosshair!important}
+.pm-oddrag .pm-chart,.pm-oddrag .pm-chart *{cursor:ns-resize!important}
+.pm-odpick .pm-odhud{border-color:#f7931a;box-shadow:0 0 0 2px rgba(247,147,26,.35),0 8px 26px rgba(0,0,0,.45)}
+#pro.pm-light .pm-odhud{background:rgba(255,255,255,.95);color:#20201e;border-color:rgba(247,147,26,.6);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+#pro.pm-light .pm-odhs span{color:#6d6d68}#pro.pm-light .pm-odhs bdi{color:#20201e}#pro.pm-light .pm-odhm{color:#5d5d58}
+#pro.pm-light .pm-odhb .pm-ib{border-color:rgba(0,0,0,.15)}
+@media (max-width:600px){.pm-odhud{left:4px;right:60px;max-width:none;bottom:30px;padding:6px 7px;font-size:11.5px}.pm-odhs{gap:1px 8px}.pm-odhb .pm-btn.sm{min-height:32px;padding:4px 8px}.pm-odhb .pm-ib{width:32px;height:32px}}
+/* a note with a button (Undo) can be pressed */
+.pm-toast.act{pointer-events:auto;display:flex;align-items:center;gap:12px}
+.pm-tbtn{background:none;border:0;color:var(--acc,#f7931a);font:inherit;font-weight:700;cursor:pointer;padding:4px 6px;border-radius:8px;white-space:nowrap}
+.pm-tbtn:hover,.pm-tbtn:focus-visible{background:rgba(247,147,26,.14)}
+/* ODM's guided tour */
+.pm-odgbar{display:flex;flex-direction:column;gap:8px}
+.pm-odgo{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin:0}
+.pm-odoffer{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:8px 12px}
+.pm-odoffer p{margin:0;flex:1 1 220px;font-size:13px;line-height:1.5}
+.pm-odoffer .pm-row{gap:6px;margin:0}.pm-odoffer .pm-btn.sm{margin:0}
+.pm-odtgt{outline:2px solid #f7931a!important;outline-offset:3px;border-radius:10px;box-shadow:0 0 0 7px rgba(247,147,26,.16);transition:outline-color .2s,box-shadow .2s;position:relative;z-index:1}
+.pm-odtour{position:absolute;z-index:46;background:#17171a;border:1px solid rgba(247,147,26,.55);border-radius:14px;padding:10px 12px 12px;box-shadow:0 16px 44px rgba(0,0,0,.6);color:#ececE6;font-size:13.5px;line-height:1.6}
+.pm-odth{display:flex;align-items:center;gap:8px}
+.pm-odth small{color:#f7931a;font-weight:700;white-space:nowrap}
+.pm-odth b{flex:1;font-size:14.5px}
+.pm-odth .pm-ib{width:30px;height:30px}
+.pm-odtour p{margin:6px 0 8px}
+.pm-odtd{display:flex;gap:4px;margin:0 0 10px}
+.pm-odtd i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.14)}
+.pm-odtd i.was{background:rgba(247,147,26,.45)}.pm-odtd i.on{background:#f7931a}
+.pm-odtour .pm-row{justify-content:flex-end;gap:8px;margin:0}
+.pm-odtour .pm-btn.sm{margin:0;min-width:84px;min-height:34px}
+.pm-odtour.sheet{left:0;right:0;width:auto!important;border-radius:16px 16px 0 0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));max-height:46%;overflow-y:auto}
+#pro.pm-light .pm-odtour{background:#fff;color:#20201e;box-shadow:0 14px 40px rgba(0,0,0,.18)}
+#pro.pm-light .pm-odtd i{background:rgba(0,0,0,.12)}
+#pro.pm-light .pm-odoffer{background:rgba(2,132,199,.07);border-color:rgba(2,132,199,.3)}
+@media (prefers-reduced-motion:reduce){.pm-odtgt{transition:none}}
+.pm-oddrag .pm-odhud{opacity:.45;pointer-events:none;transition:opacity .15s}
