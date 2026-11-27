@@ -18,8 +18,7 @@ Rules that keep the data honest:
   - one file holds one source: series from different sources are never stitched together. When the first source
     fails, the next one in the list is used for the whole series, and the file says which source it is.
   - every bar is checked (finite, positive, high/low around open/close, dates rising); a bad bar is dropped and counted.
-  - each run also reads the last close from the other sources and stores how far apart they are, so a source that
-    drifts shows up.
+  - backups are fetched only when the source before them fails, so a run stays short.
   - nothing works: the old file stays, marked stale with its age; no file at all: marked unavailable. Never invented.
 
 Runs at most every 6 hours (MARKETS_FORCE=1 to bypass). Never fails the workflow: errors are written into the files.
@@ -87,7 +86,7 @@ for _s, _n in [("AAPL", "Apple"), ("MSFT", "Microsoft"), ("NVDA", "Nvidia"), ("A
 def get(url, **kw):
     for i in range(3):                                     # a slow answer once is common; three tries, then give up
         try:
-            r = requests.get(url, headers=UA, timeout=45, **kw)
+            r = requests.get(url, headers=UA, timeout=25, **kw)
             if r.status_code in (429, 500, 502, 503, 504) and i < 2:
                 time.sleep(3 * (i + 1))
                 continue
@@ -309,8 +308,8 @@ def run_one(key, spec, old):
             if not fresh(bars):
                 raise ValueError("last bar %s is too old" % datetime.fromtimestamp(bars[-1][0], timezone.utc).date())
             tried.append({"src": kind, "ok": True, "rows": len(bars), "dropped": bad, "last": [bars[-1][0], bars[-1][4]]})
-            if got is None:                                   # the first that works is used; the rest only for the cross-check
-                got = (kind, sym, label, bars, bad)
+            got = (kind, sym, label, bars, bad)               # the first that works is used; backups are only fetched when it fails
+            break
         except Exception as e:
             tried.append({"src": kind, "ok": False, "err": str(e)[:160]})
     o = {"id": key, "name": name, "unit": unit, "group": group, "tf": "1d", "checked_at": NOW.isoformat(timespec="seconds"),
@@ -354,6 +353,13 @@ def main():
         except ValueError:
             pass
     items = {x["id"]: x for x in idx_old.get("items", []) if isinstance(x, dict) and "id" in x}
+    def save_index(done=False):                          # a run cut off half way keeps the old time, so the next run carries on
+        idx = {"updated_at": NOW.isoformat(timespec="seconds") if done else idx_old.get("updated_at"), "tf": "1d",
+               "note": "One source per file; never stitched. status: ok, stale (old file kept), unavailable.",
+               "items": [items[k] for k in INSTR if k in items]}
+        with open(idx_path, "w", encoding="utf-8") as f:
+            json.dump(idx, f, ensure_ascii=False, indent=0, separators=(",", ":"))
+
     for key, spec in INSTR.items():
         if only and key not in only:
             continue
@@ -370,11 +376,8 @@ def main():
             key, o["status"], (o.get("src") or {}).get("id"), len(b),
             datetime.fromtimestamp(b[-1][0], timezone.utc).date().isoformat() + " " + str(b[-1][4]) if b else "-",
             ",".join("%s:%s" % (x["src"], "ok" if x["ok"] else "fail(" + x.get("err", "")[:60] + ")") for x in o["tried"])))
-    idx = {"updated_at": NOW.isoformat(timespec="seconds"), "tf": "1d",
-           "note": "One source per file; never stitched. status: ok, stale (old file kept), unavailable.",
-           "items": [items[k] for k in INSTR if k in items]}
-    with open(idx_path, "w", encoding="utf-8") as f:
-        json.dump(idx, f, ensure_ascii=False, indent=0, separators=(",", ":"))
+        save_index()
+    save_index(True)
     return 0
 
 
