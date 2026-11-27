@@ -1447,6 +1447,9 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] "Show on chart" draws every level as a price line and opens the panel on the chart`, L0 && L0.levels.length >= 7 && L0.pl === L0.levels.length && hb && hb.in && hb.btn === 3 && hb.open && hb.undo && /SL/.test(L0.hud), JSON.stringify({ n: L0 && L0.levels.length, pl: L0 && L0.pl, hb }));
     await shot(page, `88_odm_drag_${lang}_${vw}`);
     /* the visitor's colour on the target lines; the panel moved by its grip, folded, and put back */
+    await page.click('.pm-odhud [data-a="open"]'); await page.waitForTimeout(250);
+    await page.evaluate(() => { const d = document.querySelector('.pm-odcol'); d.open = true; const i = d.querySelector('input[type=color]'); i.value = '#3366ff'; i.dispatchEvent(new Event('input')); });
+    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
     const pcl = await page.evaluate(() => PRO.app.active().main.priceLines().map(l => l.options()).filter(o => /^TP/.test(o.title)).map(o => o.color));
     ok(`[${tag}] the targets are drawn in the colour the visitor picked`, pcl.length >= 1 && pcl.every(c => c === '#3366ff'), JSON.stringify(pcl));
     const mvb = await page.evaluate(() => { const b = document.querySelector('.pm-odhud [data-a="mv"]').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
