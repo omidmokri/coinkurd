@@ -629,6 +629,29 @@
     addAlert(a); return a;
   };
   P.botLink = function (sym, v) { var arg = botArg({ sym: sym, v: v }); return arg ? 'https://t.me/' + BOT + '?start=' + arg : null; };
+  /* every level of one ODM plan in one link: o_<COIN>_<k><PRICE>-… (k: e entry, s stop, x exit, t trailing start).
+     A start parameter holds 64 characters (the bot takes 63, so its «add all» button fits too) and at most 8 levels:
+     when not all fit, the stop goes first, then the exits, the trailing start, and entries; shown in the plan's order.
+     Dollar coins only (the bot prices them); returns {url, n, total} or null. */
+  P.botOdmLink = function (sym, levels) {
+    var I = P.inst ? P.inst(sym) : null;
+    if (!I || I.kind !== 'usdt' || !/^[A-Z0-9]{1,12}$/.test(sym)) return null;
+    var pr = { s: 0, x: 1, t: 2, e: 3 }, seen = {}, L = [];
+    (levels || []).forEach(function (lv, i) {
+      var v = plainNum(lv.v);
+      if (!(lv.k in pr) || !/^\d{1,12}(\.\d{1,18})?$/.test(v)) return;
+      var tok = lv.k + v.replace('.', 'd');
+      if (seen[tok]) return; seen[tok] = 1; L.push({ i: i, tok: tok, p: pr[lv.k] });
+    });
+    if (!L.length) return null;
+    var head = 'o_' + sym + '_', pick = [], len = head.length - 1;
+    L.slice().sort(function (a, b) { return a.p - b.p || a.i - b.i; }).forEach(function (z) {
+      if (pick.length < 8 && len + 1 + z.tok.length <= 63) { pick.push(z); len += 1 + z.tok.length; }
+    });
+    if (!pick.length) return null;
+    pick.sort(function (a, b) { return a.i - b.i; });
+    return { url: 'https://t.me/' + BOT + '?start=' + head + pick.map(function (z) { return z.tok; }).join('-'), n: pick.length, total: L.length };
+  };
   function sendToBot(a) {
     var arg = botArg(a);
     if (!arg) { A.toast(T('badValue')); return; }

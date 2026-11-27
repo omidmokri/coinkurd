@@ -25,6 +25,7 @@ TXT = {
     "body": {
         "fa": ("میز تحلیل کامل سایت، با دادهٔ زندهٔ بایننس و بازار ایران:\n"
                "• همهٔ کوین‌های بایننس، و دلار، یورو، طلا، سکه و تتر به تومان؛ بیت‌کوین و هر کوین هم به تومان\n• قیمت و تاریخچه از پنج صرافی: بایننس، کوین‌بیس، بای‌بیت، اوکی‌ایکس و کراکن — انتخابی برای هر چارت\n• فارکس جهانی (EUR/USD، USD/JPY و ۳۰ جفت‌ارز) و انس طلا و نقره به دلار\n• ابزارهای محبوب با ستاره روی نوار شناور، پالت فرمان (Ctrl+K)، و ایموجی، استیکر و آیکن روی چارت\n• ۱۶ پوسته، رنگ‌آمیزی کندل با حجم/RSI/روند، ۲۱ فضای کار آماده، و مرکز ریسک (حجم پوزیشن، پلن OCO، کلی، ریسک نابودی)\n• پلن معامله روی خود چارت (با کشیدن ورود/استاپ/تارگت همهٔ عددها عوض می‌شود)، تابلوی ریسک باز با سقف ضرر روزانه، و ماتریس چند تایم‌فریم با تشخیص رژیم بازار\n• ۴۷ زبان و ارز هر کشور: همهٔ کوین‌ها به ارز شما (یورو، لیر، روپیه…) یا با نرخ خودتان برای یک تتر یا یک دلار\n"
+               "• ODM، برنامه‌ی کامل معامله: ورود و خروج پله‌ای، حد ضرر ATR و متحرک، امتحان روی کندل‌های گذشته و همه‌ی سطح‌ها یکجا به همین ربات\n"
                "• تا ۱۶ نمودار هم‌زمان با همگام‌سازی نماد، تایم‌فریم و اندیکاتورها\n• تایم‌فریم ثانیه‌ای و هر تایم‌فریم دلخواه\n"
                "• ۱۷ نوع نمودار، از جمله رنکو، کاگی، نقطه و رقم و شکست خط\n• ۷۰ اندیکاتور، فیبوناچی، گن و پوزیشن لانگ/شورت\n"
                "• بازپخش کندل‌ها روی چند چارت با حساب تمرینی: سفارش لیمیت و استاپ، حد ضرر و سود، اهرم و کارمزد\n"
@@ -35,7 +36,8 @@ TXT = {
                "• تقویم اقتصادی و اخبار روی چارت، با هشدار پیش از انتشار خبر\n• لینک و کد QR برای باز کردن همان فضای کار در دستگاه دیگر"),
         "ckb": ("مێزی تەواوی شیکاریی ماڵپەڕ، بە داتای زیندووی بایننس و بازاڕی ئێران:\n"
                 "• هەموو کۆینەکانی بایننس، و دۆلار، یۆرۆ، زێڕ، سکە و تەتەر بە تمەن؛ بیتکۆین و هەر کۆینێک بە تمەنیش\n• نرخ و ڕابردوو لە پێنج ئاڵوگۆڕخانە: بایننس، کۆینبەیس، بایبیت، ئۆکەیئێکس و کراکن — هەڵبژاردە بۆ هەر چارتێک\n• فۆرێکسی جیهانی (EUR/USD، USD/JPY و ٣٠ جووت دراو) و ئۆنسی زێڕ و زیو بە دۆلار\n• ئامرازە دڵخوازەکان بە ئەستێرە لەسەر هێڵی سەرئاو، پاڵێتی فەرمان (Ctrl+K)، و ئیمۆجی، ستیکەر و ئایکۆن لەسەر چارت\n• ١٦ ڕووکار، ڕەنگکردنی مۆم بە قەبارە/RSI/ڕەوت، ٢١ شوێنی کاری ئامادە، و ناوەندی مەترسی (قەبارەی پۆزیشن، پلانی OCO، کێلی، مەترسیی لەناوچوون)\n• پلانی مامەڵە لەسەر چارت (بە ڕاکێشانی چوونەژوورەوە/ستۆپ/ئامانج هەموو ژمارەکان دەگۆڕێن)، تابلۆی مەترسیی کراوە بە سنووری زیانی ڕۆژانە، و ماتریکسی چەند تایم‌فرەیم لەگەڵ ڕژێمی بازاڕ\n• ٤٧ زمان و دراوی هەر وڵاتێک: هەموو کۆینەکان بە دراوی تۆ (یۆرۆ، لیرە، ڕووپیە…) یان بە نرخی خۆت بۆ یەک تەتەر یان یەک دۆلار\n"
-                "• تا ١٦ چارت پێکەوە بە هاوکاتکردنی هێما، تایمفرەیم و ئیندیکاتۆرەکان\n• تایمفرەیمی چرکەیی و هەر تایمفرەیمێکی دڵخواز\n"
+                "• ODM، پلانی تەواوی مامەڵە: چوونەژوورەوە و دەرچوونی هەنگاو بە هەنگاو، حەدی زیانی ATR و جوڵاو، تاقیکردنەوە لەسەر مۆمە ڕابردووەکان و هەموو ئاستەکان پێکەوە بۆ ئەم بۆتە\n"
+               "• تا ١٦ چارت پێکەوە بە هاوکاتکردنی هێما، تایمفرەیم و ئیندیکاتۆرەکان\n• تایمفرەیمی چرکەیی و هەر تایمفرەیمێکی دڵخواز\n"
                 "• ١٧ جۆری چارت، لەوانە ڕێنکۆ، کاگی، خاڵ و ژمارە و شکانی هێڵ\n• ٧٠ ئیندیکاتۆر، فیبۆناچی، گان و پۆزیشنی لۆنگ/شۆرت\n"
                 "• دووبارە پەخشی مۆمەکان لەسەر چەند چارت بە هەژماری ڕاهێنان: ئۆردەری لیمیت و ستۆپ، سنووری زیان و قازانج، لیڤەرێج و کرێ\n"
                 "• فیوچەرزی وەرزیی بیتکۆین و ئیسیریۆم وەک چارتی بەردەوام لەگەڵ B-ADJ\n"
@@ -45,7 +47,8 @@ TXT = {
                 "• ڕۆژژمێری ئابووری و هەواڵ لەسەر چارت، بە ئاگادارکردنەوە پێش بڵاوبوونەوەی هەواڵ\n• بەستەر و کۆدی QR بۆ کردنەوەی هەمان شوێنی کار لە ئامێرێکی تر"),
         "kmr": ("Maseya analîzê ya temam a malperê, bi daneyên zindî yên Binance û bazara Îranê:\n"
                 "• Hemû coinên Binance, û dolar, euro, zêr, zêrê Îmamî û tether bi tûmanan; Bitcoin û her coin jî bi tûmanan\n• Biha û dîrok ji pênc borsayan: Binance, Coinbase, Bybit, OKX û Kraken — ji bo her grafîkê bijartî\n• Forexa cîhanî (EUR/USD, USD/JPY û 30 cot pere) û ûnsa zêr û zîv bi dolaran\n• Amûrên bijare bi stêrkê li ser şirîta herikbar, paleta fermanan (Ctrl+K), û emojî, stîker û îkon li ser grafîkê\n• 16 tema, rengkirina mûman bi hecm/RSI/trendê, 21 qadên kar ên amade, û navenda rîskê (mezinahiya pozîsyonê, plana OCO, Kelly, rîska têkçûnê)\n• Plana bazirganiyê li ser grafîkê (bi kişandina ketin/stop/armancê hemû hejmar diguherin), tabloya rîska vekirî bi sînorê zirara rojane, û matrîsa pir-demjimêr bi rejîma bazarê\n• 47 ziman û pereyê her welatî: hemû coin bi pereyê te (euro, lîre, rûpî…) an bi bihayê te ji bo yek tether an yek dolarî\n"
-                "• Heta 16 grafîk bi hev re, bi hevdemkirina sembol, dem û nîşanderan\n• Demên saniyeyî û her demeke xwestî\n"
+                "• ODM, plana temam a bazirganiyê: ketin û derketina gav bi gav, stopa ATR û şopîner, ceribandin li ser mûmên berê û hemû ast bi hev re ji vê botê re\n"
+               "• Heta 16 grafîk bi hev re, bi hevdemkirina sembol, dem û nîşanderan\n• Demên saniyeyî û her demeke xwestî\n"
                 "• 17 cureyên grafîkê, di nav de Renko, Kagi, Point & Figure û Line Break\n• 70 nîşander, Fibonacci, Gann û pozîsyonên long/short\n"
                 "• Dubarelîstina mûman li ser çend grafîkan bi hesabeke ceribandinê: fermanên limit û stop, stop-loss û take-profit, leverage û xerc\n"
                 "• Futuresên çaryekî yên Bitcoin û Ethereum wek grafîkeke berdewam bi B-ADJ\n"
@@ -55,6 +58,7 @@ TXT = {
                 "• Salnameya aborî û nûçe li ser grafîkê, bi hişyariyê berî weşana nûçeyê\n• Girêdan û koda QR ji bo vekirina heman cihê karê li amûreke din"),
         "ar": ("منصة التحليل الكاملة للموقع ببيانات Binance المباشرة والسوق الإيرانية:\n"
                "• كل عملات Binance، والدولار واليورو والذهب والمسكوكات والتيثر بالتومان؛ والبيتكوين وكل عملة بالتومان أيضًا\n• الأسعار والتاريخ من خمس منصات: Binance وCoinbase وBybit وOKX وKraken — بالاختيار لكل رسم\n• الفوركس العالمي (EUR/USD وUSD/JPY و٣٠ زوجًا) وأونصة الذهب والفضة بالدولار\n• الأدوات المفضلة بنجمة على شريط عائم، لوحة الأوامر (Ctrl+K)، وإيموجي وملصقات وأيقونات على الرسم\n• ١٦ مظهرًا، تلوين الشموع بالحجم/RSI/الاتجاه، ٢١ مساحة عمل جاهزة، ومركز المخاطرة (حجم المركز، خطة OCO، كيلي، خطر الإفلاس)\n• خطة الصفقة على الرسم نفسه (بسحب الدخول/الوقف/الهدف تتغير كل الأرقام)، لوحة المخاطرة المفتوحة مع حد الخسارة اليومي، ومصفوفة الإطارات الزمنية مع نظام السوق\n• ٤٧ لغة وعملة كل بلد: كل العملات الرقمية بعملتك (اليورو، الليرة، الروبية…) أو بسعرك أنت لتيثر واحد أو دولار واحد\n"
+               "• ODM، خطة الصفقة كاملة: دخول وخروج على مراحل، وقف خسارة ATR ومتحرك، اختبار على الشموع السابقة وكل المستويات دفعة واحدة إلى هذا البوت\n"
                "• حتى ١٦ رسمًا معًا مع مزامنة الرمز والإطار الزمني والمؤشرات\n• أطر زمنية بالثواني وأي إطار مخصّص\n"
                "• ١٧ نوعًا من الرسوم، منها رينكو وكاجي والنقطة والرقم وكسر الخط\n• ٧٠ مؤشرًا وفيبوناتشي وغان ومراكز الشراء والبيع\n"
                "• إعادة تشغيل الشموع على عدة رسوم بحساب تدريبي: أوامر محددة وإيقاف، وقف الخسارة وجني الربح، ورافعة ورسوم\n"
@@ -65,6 +69,7 @@ TXT = {
                "• التقويم الاقتصادي والأخبار على الرسم، مع تنبيه قبل صدور الخبر\n• رابط ورمز QR لفتح مساحة العمل نفسها على جهاز آخر"),
         "en": ("The site's full analysis desk, on live Binance and Iranian market data:\n"
                "• Every Binance coin, plus the dollar, euro, gold, gold coins and tether in toman; Bitcoin and any coin in toman too\n• Prices and history from five exchanges: Binance, Coinbase, Bybit, OKX and Kraken — chosen per chart\n• World forex (EUR/USD, USD/JPY and 30 pairs) and the gold and silver ounce in dollars\n• Favourite tools with a star on a floating bar, a command palette (Ctrl+K), and emojis, stickers and icons on the chart\n• 16 themes, candles coloured by volume/RSI/trend, 21 ready-made workspaces, and a risk centre (position size, OCO plan, Kelly, risk of ruin)\n• A trade plan on the chart itself (drag the entry, stop or target and every figure follows), an open-risk board with a daily loss limit, and a multi-timeframe matrix with the market regime\n• 47 languages and every country's currency: every coin in your currency (euro, lira, rupee…) or at your own rate for one tether or one dollar\n"
+               "• ODM, the whole-trade planner: stepped entries and exits, ATR and trailing stops, a test on past candles, and every level to this bot at once\n"
                "• Up to 16 charts at once, with symbol, timeframe and indicator sync\n• Seconds timeframes and any custom timeframe\n"
                "• 17 chart types, including Renko, Kagi, Point & Figure and Line Break\n• 70 indicators, Fibonacci, Gann, long/short positions\n"
                "• Bar replay on several charts with a practice account: limit and stop orders, stop-loss and take-profit, leverage and fees\n"
@@ -107,6 +112,26 @@ TXT["offer_t"] = {
     "ar": "🔔 تنبيه سعر من الموقع (السوق الإيرانية):\n<b>{c}</b> عندما يصل إلى <b>{p}</b>\n\nلن يُحفظ التنبيه حتى تضغط «إضافة».",
     "en": "🔔 Price alert from the site (Iran's market):\n<b>{c}</b> when it reaches <b>{p}</b>\n\nNothing is saved until you tap “Add”."}
 TXT["toman"] = {"fa": "تومان", "ckb": "تمەن", "kmr": "tûman", "ar": "تومان", "en": "toman"}
+# ODM (the site's whole-trade planner) sends every level of one plan at once:  o_<COIN>_<k><PRICE>-<k><PRICE>…
+# k: e entry, s stop, x exit (take profit), t trailing-stop start. Each level becomes an ordinary price alert on «add».
+TXT["offer_o"] = {
+    "fa": "🧭 <b>سطوح ODM از سایت</b> برای <b>{c}</b>:\n{rows}\n\nبا «افزودن همه» برای هر سطح یک هشدار قیمت ساخته می‌شود؛ تا آن را نزنید چیزی ذخیره نمی‌شود.",
+    "ckb": "🧭 <b>ئاستەکانی ODM لە ماڵپەڕەوە</b> بۆ <b>{c}</b>:\n{rows}\n\nبە «زیادکردنی هەموو» بۆ هەر ئاستێک ئاگادارکەرەوەیەکی نرخ دروست دەبێت؛ تا دانەگریت هیچ پاشەکەوت ناکرێت.",
+    "kmr": "🧭 <b>Astên ODM ji malperê</b> ji bo <b>{c}</b>:\n{rows}\n\nBi «Hemûyan lê zêde bike» ji bo her astê hişyariyek bihayê tê çêkirin; heta tu nekî tiştek nayê tomarkirin.",
+    "ar": "🧭 <b>مستويات ODM من الموقع</b> لـ <b>{c}</b>:\n{rows}\n\nبـ«إضافة الكل» يُنشأ تنبيه سعر لكل مستوى؛ لا يُحفظ شيء حتى تضغطه.",
+    "en": "🧭 <b>ODM levels from the site</b> for <b>{c}</b>:\n{rows}\n\n“Add all” makes one price alert per level; nothing is saved until you tap it."}
+TXT["b_add_all"] = {"fa": "✅ افزودن همه ({n})", "ckb": "✅ زیادکردنی هەموو ({n})", "kmr": "✅ Hemûyan lê zêde bike ({n})", "ar": "✅ إضافة الكل ({n})",
+                    "en": "✅ Add all ({n})"}
+TXT["o_done"] = {"fa": "🧭 ODM {c}: {n} هشدار اضافه شد{d}.", "ckb": "🧭 ODM {c}: {n} ئاگادارکەرەوە زیادکرا{d}.", "kmr": "🧭 ODM {c}: {n} hişyarî hatin zêdekirin{d}.",
+                 "ar": "🧭 ODM {c}: أُضيف {n} تنبيه{d}.", "en": "🧭 ODM {c}: {n} alerts added{d}."}
+TXT["o_dup"] = {"fa": "، {n} تا از قبل بود", "ckb": "، {n} دانە پێشتر هەبوو", "kmr": ", {n} jixwe hebûn", "ar": "، {n} موجود مسبقًا", "en": ", {n} already set"}
+O_KIND = {
+    "e": {"fa": "ورود", "ckb": "چوونەژوورەوە", "kmr": "Ketin", "ar": "دخول", "en": "Entry"},
+    "s": {"fa": "حد ضرر", "ckb": "سنووری زیان", "kmr": "Stop", "ar": "وقف الخسارة", "en": "Stop"},
+    "x": {"fa": "خروج", "ckb": "دەرچوون", "kmr": "Derketin", "ar": "خروج", "en": "Exit"},
+    "t": {"fa": "شروع حد ضرر متحرک", "ckb": "دەستپێکی ستۆپی جووڵاو", "kmr": "Destpêka stopa şopîner", "ar": "بدء الوقف المتحرك", "en": "Trailing stop starts"},
+}
+O_MAX = 8                  # levels in one link (a start parameter holds at most 64 characters anyway)
 # the toman assets the site may send: the keys of bot_iran.ASSETS (refbot.parse_alert resolves them)
 T_NAME = {
     "USD": {"fa": "دلار", "ckb": "دۆلار", "kmr": "Dolar", "ar": "الدولار", "en": "US dollar"},
@@ -207,6 +232,39 @@ def parse_tcallback(data):
     if not m or m.group(1) not in T_NAME or not (0 < float(m.group(2)) < 1e12):
         return None
     return m.group(1), m.group(2)
+
+
+def parse_olink(arg):
+    """'o_BTC_e67000-s59180d5-x70000' -> ('BTC', [('e', 67000.0, '67000'), ('s', 59180.5, '59180.5'), ('x', 70000.0, '70000')]) ;
+    None for anything malformed (an unknown kind, a bad price, no level, too many, or a level sent twice)"""
+    m = re.fullmatch(r"o_([A-Z0-9]{1,12})_([estx]\d{1,12}(?:d\d{1,18})?(?:-[estx]\d{1,12}(?:d\d{1,18})?){0,%d})" % (O_MAX - 1), str(arg or ""))
+    if not m or len(str(arg)) > 63:       # 63, so the «add all» button's "po:" + link stays within Telegram's 64 bytes
+        return None
+    out, seen = [], set()
+    for part in m.group(2).split("-"):
+        got = _num(part[1:])
+        if not got or (part[0], got[1]) in seen:
+            return None
+        seen.add((part[0], got[1]))
+        out.append((part[0], got[0], got[1]))
+    return m.group(1), out
+
+
+def offer_o(arg, lang):
+    """(text, inline rows) for an ODM link: every level listed, one «add all» button; None for a malformed link"""
+    got = parse_olink(arg)
+    if not got:
+        return None
+    coin, lv = got
+    rows = "\n".join(f"• {pick(O_KIND[k], lang)}: <b>{price_txt(txt)}</b>" for k, _, txt in lv)
+    return L("offer_o", lang, c=coin, rows=rows), [[{"text": L("b_add_all", lang, n=len(lv)), "callback_data": "po:" + arg[2:]},
+                                                    {"text": L("b_no", lang), "callback_data": "m:alerts"}]]
+
+
+def parse_ocallback(data):
+    """'po:BTC_e67000-x70000' -> ('BTC', ['67000', '70000']) : the prices for refbot.parse_alert; None otherwise"""
+    got = parse_olink("o_" + str(data or "")[3:]) if str(data or "").startswith("po:") else None
+    return (got[0], [txt for _, _, txt in got[1]]) if got else None
 
 
 def _next_event(load):
@@ -320,6 +378,39 @@ if __name__ == "__main__":
         bad += 1
     if parse_tcallback("pt:BTC:100") is not None or parse_tcallback("pa:USD:100") is not None or parse_tcallback("pt:USD:1e5") is not None:
         print("FAIL toman callback rejects")
+        bad += 1
+    # ODM: all levels of one plan in one link
+    for arg, want in [("o_BTC_e67000-e66000d5-s59180d5-x70000-t71000", ("BTC", [("e", 67000.0, "67000"), ("e", 66000.5, "66000.5"),
+                                                                              ("s", 59180.5, "59180.5"), ("x", 70000.0, "70000"), ("t", 71000.0, "71000")])),
+                      ("o_PEPE_s0d0000101", ("PEPE", [("s", 0.0000101, "0.0000101")])),
+                      ("o_BTC_", None), ("o_BTC_67000", None), ("o_BTC_q67000", None), ("o_btc_e1", None), ("o_BTC_e0", None),
+                      ("o_BTC_e1-e1", None), ("o_BTC_e1--x2", None), ("o_BTC_e1-x2;DROP", None), ("o_BTC_e1d2d3", None),
+                      ("o_BTC_" + "-".join("x%d" % i for i in range(1, 10)), None), ("o_ABCDEFGHIJKL_" + "-".join("x99999999d%d" % i for i in range(1, 6)), None)]:
+        got = parse_olink(arg)
+        if got != want:
+            print("FAIL odm parse", arg, got, want)
+            bad += 1
+    for lang in ("fa", "ckb", "kmr", "ar", "en"):
+        arg = "o_SOL_e143d25-e140-s131d5-x150-x160d75-t155"
+        o = offer_o(arg, lang)
+        cbd = o[1][0][0]["callback_data"] if o else ""
+        if not o or "143.25" not in o[0] or "$160.75" not in o[0] or pick(O_KIND["s"], lang) not in o[0] or len(cbd.encode()) > 64:
+            print("FAIL odm offer", lang, o)
+            bad += 1
+        if parse_ocallback(cbd) != ("SOL", ["143.25", "140", "131.5", "150", "160.75", "155"]):
+            print("FAIL odm callback", lang, parse_ocallback(cbd))
+            bad += 1
+    for n in range(2, 9):              # the longest link the bot accepts still makes a button within 64 bytes
+        cand = "o_ABCDEFGH_" + "-".join("x%dd5" % (1000000 + i) for i in range(n))
+        o = offer_o(cand, "en")
+        if o and len(o[1][0][0]["callback_data"].encode()) > 64:
+            print("FAIL odm button too long", cand)
+            bad += 1
+        if len(cand) <= 63 and not o:
+            print("FAIL odm should accept", cand)
+            bad += 1
+    if parse_ocallback("pa:BTC:1") is not None or parse_ocallback("po:BTC_e1-e1") is not None or parse_ocallback(None) is not None:
+        print("FAIL odm callback rejects")
         bad += 1
     print(f"bot_pro self-test: {bad} failures")
     raise SystemExit(1 if bad else 0)

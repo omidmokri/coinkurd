@@ -877,6 +877,25 @@ def parse_alert(args, s, uid, crypto=False):
     return t("alert_set", lang, coin=c["coin"], op="≥" if op == ">" else "≤", price=D.fp(price), now=D.fp(now))
 
 
+def add_odm_alerts(s, uid, coin, prices):
+    """the levels of one ODM plan from the site: each one through parse_alert (same checks as a typed /alert);
+    a level that already has a live dollar alert for this coin at the same price is skipped, not added twice"""
+    lang = lang_of(s, uid)
+    x = user(s, uid)
+    added = dup = 0
+    for txt in prices:
+        p = float(txt)
+        if any(a.get("coin") == coin and not a.get("iran") and abs(float(a.get("price") or 0) - p) <= p * 1e-9 for a in x["alerts"]):
+            dup += 1
+            continue
+        n0 = len(x["alerts"])
+        msg = parse_alert(f"{coin} {txt}", s, uid, crypto=True)
+        if len(x["alerts"]) == n0:            # unknown coin, no price right now or the alert cap: say why and stop
+            return msg
+        added += 1
+    return PRO.L("o_done", lang, c=coin, n=added, d=PRO.L("o_dup", lang, n=dup) if dup else "")
+
+
 def add_pct_alert(s, uid, sym, sign, pct):
     """'+5%' / '-5%' / '±5%' alert relative to the price right now"""
     lang = lang_of(s, uid)
@@ -1376,9 +1395,9 @@ def handle_private(s, msg):
                 log.exception("ec link failed")
         # the live market's ✈ button (t.me/<bot>?start=a_BTC_72155d5, or t_USD_95000 for Iran's market in toman):
         # the alert is only OFFERED; it is stored on «add»
-        if arg.startswith("a_") or arg.startswith("t_"):
+        if arg.startswith("a_") or arg.startswith("t_") or arg.startswith("o_"):   # o_: every level of an ODM plan
             try:
-                o = PRO.offer(arg, x["lang"])
+                o = PRO.offer_o(arg, x["lang"]) if arg.startswith("o_") else PRO.offer(arg, x["lang"])
                 if o:
                     return send(chat_id, o[0], {"inline_keyboard": o[1]})
                 return send(chat_id, PRO.L("bad", x["lang"]), rows_kb([[btn(t("b_back", x["lang"]), "m:main")]]))
@@ -1632,7 +1651,13 @@ def handle_callback(s, cb):
         if not got:
             return send(chat_id, PRO.L("bad", lang), kb_alerts(s, uid, lang))
         return send(chat_id, parse_alert(f"{got[0]} {got[1]}", s, uid), kb_alerts(s, uid, lang))
-    if data.startswith("pp:"):                       # paper trading: open / close / opt in / nickname / delete
+    if data.startswith("po:"):                       # «add all» under an ODM plan's levels: one price alert per level
+        got = PRO.parse_ocallback(data)
+        ans()
+        if not got:
+            return send(chat_id, PRO.L("bad", lang), kb_alerts(s, uid, lang))
+        return send(chat_id, add_odm_alerts(s, uid, *got), kb_alerts(s, uid, lang))
+    if data.startswith("pp:"):                      # paper trading: open / close / opt in / nickname / delete
         if cb["message"]["chat"].get("type") != "private":
             return ans()
         ans()

@@ -1346,6 +1346,23 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] one alert per level: 4 entries, the stop, 3 exits (and the trail start if set)`, al >= 8 && nA1 === al && nA1 - 0 >= 8 && (await page.evaluate(() => PRO._alerts().length)) - nA0 === al, JSON.stringify({ al, nA1, nA0 }));
     await btn('odAlAdd'); await page.waitForTimeout(150);
     ok(`[${tag}] adding the same alerts again makes no duplicates`, (await page.evaluate(() => PRO._alerts().filter(a => /^ODM /.test(a.msg || '')).length)) === nA1, '');
+    /* all ticked levels to the Telegram bot in one link, in the format the bot reads (o_<COIN>_<k><PRICE>-…, at most 63 characters) */
+    const ob = await page.evaluate(() => {
+      const a = document.querySelector('.pm-odbot'); if (!a) return null;
+      const arg = (a.getAttribute('href') || '').split('?start=')[1] || '';
+      return { shown: !a.hidden, arg, text: a.textContent, rel: a.rel };
+    });
+    ok(`[${tag}] one link sends every ticked level to the Telegram bot`, ob && ob.shown && /^o_[A-Z0-9]{1,12}_[estx]\d+(d\d+)?(-[estx]\d+(d\d+)?){0,7}$/.test(ob.arg) && ob.arg.length <= 63 && /[_-]s\d/.test(ob.arg) && /noopener/.test(ob.rel), JSON.stringify(ob));
+    const ob2 = await page.evaluate(() => {
+      const boxes = [...document.querySelectorAll('.pm-odalr input[type=checkbox]')];
+      boxes.forEach(b => { b.checked = false; b.dispatchEvent(new Event('change')); });
+      const hid = document.querySelector('.pm-odbot').hidden;
+      boxes[0].checked = true; boxes[0].dispatchEvent(new Event('change'));
+      const one = (document.querySelector('.pm-odbot').getAttribute('href') || '').split('?start=')[1] || '';
+      boxes.forEach(b => { b.checked = true; b.dispatchEvent(new Event('change')); });
+      return { hid, one };
+    });
+    ok(`[${tag}] the bot link follows the ticks (hidden with none, one level with one)`, ob2.hid && /^o_[A-Z0-9]+_e\d+(d\d+)?$/.test(ob2.one), JSON.stringify(ob2));
     await shot(page, `86_odm_alerts_${lang}_${vw}`);
     /* save to the risk board as planned, with the full-fill risk */
     await btn('odSave'); await page.waitForTimeout(150);
