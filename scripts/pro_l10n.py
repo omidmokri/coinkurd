@@ -62,7 +62,9 @@ TEMPLATE = os.path.join(ROOT, "market", "index.html")
 PRIORITY = ["kmr", "tr", "ru", "es", "br", "de", "fr", "hi", "id", "ur", "vi", "cn", "uk", "it", "pl", "nl", "jp",
             "kr", "tw", "th", "fil", "ms", "bn", "mr", "pa", "sw", "ta", "te", "iw", "gr", "ro", "cz", "hu", "se",
             "no", "da", "fi", "pt", "bg", "hr", "sr", "sk", "sl", "lt", "lv", "et", "cat"]
-assert sorted(PRIORITY) == sorted(pro_langs.NEW), "PRIORITY must list every new language once"
+# a language added later to pro_langs.LANGS (room is kept for 66) joins the end of the queue by itself
+PRIORITY = [c for c in PRIORITY if c in pro_langs.NEW] + [c for c in pro_langs.NEW if c not in PRIORITY]
+assert len(PRIORITY) == len(set(PRIORITY)) and sorted(PRIORITY) == sorted(pro_langs.NEW), "PRIORITY must list every new language once"
 
 # names and codes that stay exactly as written in every language
 KEEP = ["Binance", "OKX", "Bybit", "Deribit", "Gate", "tgju.org", "tgju", "TradingView", "Lightweight Charts", "Coin_Kurd",
@@ -86,6 +88,24 @@ SCRIPT = {
     "jp": r"[぀-ヿ一-鿿]", "kr": r"[가-힯ᄀ-ᇿ]", "cn": r"[一-鿿]",
     "tw": r"[一-鿿]",
 }
+# the same, by the language part of a BCP-47 code: a language added later gets its script check without a new line here
+SCRIPT_BCP = {
+    "ru": r"[Ѐ-ӿ]", "uk": r"[Ѐ-ӿ]", "bg": r"[Ѐ-ӿ]", "sr": r"[Ѐ-ӿ]", "mk": r"[Ѐ-ӿ]", "be": r"[Ѐ-ӿ]",
+    "kk": r"[Ѐ-ӿ]", "ky": r"[Ѐ-ӿ]", "tg": r"[Ѐ-ӿ]", "mn": r"[Ѐ-ӿ]",
+    "el": r"[Ͱ-Ͽ]", "he": r"[֐-׿]", "iw": r"[֐-׿]", "yi": r"[֐-׿]",
+    "ur": r"[؀-ۿ]", "ps": r"[؀-ۿ]", "sd": r"[؀-ۿ]", "ug": r"[؀-ۿ]",
+    "hi": r"[ऀ-ॿ]", "mr": r"[ऀ-ॿ]", "ne": r"[ऀ-ॿ]", "bn": r"[ঀ-৿]", "as": r"[ঀ-৿]", "pa": r"[਀-੿]",
+    "gu": r"[઀-૿]", "or": r"[଀-୿]", "ta": r"[஀-௿]", "te": r"[ఀ-౿]", "kn": r"[ಀ-೿]", "ml": r"[ഀ-ൿ]",
+    "si": r"[඀-෿]", "th": r"[฀-๿]", "lo": r"[຀-໿]", "my": r"[က-႟]", "km": r"[ក-៿]",
+    "ka": r"[Ⴀ-ჿ]", "hy": r"[԰-֏]", "am": r"[ሀ-፿]", "ti": r"[ሀ-፿]",
+    "ja": r"[぀-ヿ一-鿿]", "ko": r"[가-힯ᄀ-ᇿ]", "zh": r"[一-鿿]",
+}
+for _r in pro_langs.LANGS:
+    _b = _r[3].split("-")[0].lower()
+    if _r[0] not in SCRIPT and _b in SCRIPT_BCP and _r[0] in pro_langs.NEW:
+        SCRIPT[_r[0]] = SCRIPT_BCP[_b]
+# languages written in the Arabic script themselves: Arabic letters in their translations are right, not a slip
+ARABIC_OK = {r[0] for r in pro_langs.LANGS if r[3].split("-")[0].lower() in ("ar", "fa", "ckb", "ur", "ps", "sd", "ug", "ks", "prs")}
 ARABIC = re.compile(r"[؀-ۿ]")
 PH = re.compile(r"\{(\w+)\}")
 TAG = re.compile(r"<[^>]+>")
@@ -220,7 +240,7 @@ def check(code, en, tr):
     sc = SCRIPT.get(code)
     if sc and (len(words) >= 2 or any(len(w) >= 5 for w in words)) and not re.search(sc, TAG.sub("", tr)):
         return "wrong script"
-    if code not in ("ur",) and ARABIC.search(tr) and not ARABIC.search(en):
+    if code not in ARABIC_OK and ARABIC.search(tr) and not ARABIC.search(en):
         return "arabic letters"
     if not sc and len(words) >= 4 and tr == en.strip():
         return "untranslated"

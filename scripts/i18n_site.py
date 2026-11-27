@@ -240,9 +240,9 @@ def check(code, en, tr):
     sc = SCRIPT.get(code)
     if sc and (len(words) >= 2 or any(len(w) >= 5 for w in words)) and not re.search(sc, tr):
         return "wrong script"
-    if code not in ("ur",) and ARABIC.search(tr) and not ARABIC.search(en):
+    if code not in pro_l10n.ARABIC_OK and ARABIC.search(tr) and not ARABIC.search(en):
         return "arabic letters"
-    if code not in ("ur",) and PERSIAN.search(tr) and not PERSIAN.search(en):   # پ چ ژ گ are Urdu's own letters too
+    if code not in pro_l10n.ARABIC_OK and PERSIAN.search(tr) and not PERSIAN.search(en):   # پ چ ژ گ are Urdu's own letters too
         return "persian letters"
     if not sc and len(words) >= 4 and tr.lower() == en.strip().lower():
         return "untranslated"

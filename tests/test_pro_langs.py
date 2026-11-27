@@ -41,8 +41,9 @@ def main():
     ok("assets/pro/langs.js is what scripts/pro_langs.py makes", r.returncode == 0, r.stdout + r.stderr)
     by_en = {row[2]: row[0] for row in PL.LANGS}
     ok("all 46 languages of the owner's list, with his paths", all(by_en.get(k) == v for k, v in OWNER.items()), {k: (by_en.get(k), v) for k, v in OWNER.items() if by_en.get(k) != v})
-    ok("51 rows (the owner's 50 + Kurmanji), 47 of them new", len(PL.LANGS) == 51 and len(PL.NEW) == 47 and set(PL.SITE) == {"ckb", "fa", "ar", "en"})
-    ok("50 languages, not 51: Sorani and Kurmanji are one", PL.LANG_COUNT == 50 and PL.SAME.get("kmr") == "ckb")
+    ok("one row per language plus Kurmanji, all but the site's 4 new", len(PL.LANGS) == PL.LANG_COUNT + len(PL.SAME) and len(PL.NEW) == len(PL.LANGS) - 4 and set(PL.SITE) == {"ckb", "fa", "ar", "en"})
+    ok("at least the owner's 50, and room kept for 66", 50 <= PL.LANG_COUNT <= PL.LANG_MAX == 66)
+    ok("Sorani and Kurmanji are one language: counted once", PL.LANG_COUNT == len({PL.SAME.get(r[0], r[0]) for r in PL.LANGS}) == len(PL.LANGS) - 1 and PL.SAME.get("kmr") == "ckb")
     notes = {x[0]: PL.kurd_note(x[0]) for x in PL.LANGS}
     ok("the Kurdish-dialects line is written in every language, with the count filled in",
        set(PL.KURD_NOTE) == {x[0] for x in PL.LANGS} and all("{n}" not in v and v for v in notes.values()), [c for c, v in notes.items() if "{n}" in v])
@@ -52,7 +53,7 @@ def main():
     rest = [x[2] for x in PL.LANGS[2:]]
     ok("…and every other language by English name, Persian and Arabic among them", rest == sorted(rest), rest[:6])
     ok("right to left: Kurdish, Persian, Arabic, Hebrew, Urdu — and only those", sorted(x[0] for x in PL.LANGS if x[5] == "rtl") == ["ar", "ckb", "fa", "iw", "ur"])
-    ok("paths are URL-safe and unique", all(re.fullmatch(r"[a-z]{2,3}", x[0]) for x in PL.LANGS) and len({x[0] for x in PL.LANGS}) == 51)
+    ok("paths are URL-safe and unique", all(re.fullmatch(r"[a-z]{2,3}", x[0]) for x in PL.LANGS) and len({x[0] for x in PL.LANGS}) == len(PL.LANGS))
     js = subprocess.run(["node", "-e", "global.window=globalThis;require(process.argv[1]);process.stdout.write(JSON.stringify({L:PRO.LANGS.length,"
                          "teh:PRO.CCCUR[PRO.TZCC['Asia/Tehran']],sof:PRO.CCCUR[PRO.TZCC['Europe/Sofia']],kol:PRO.CCCUR[PRO.TZCC['Asia/Kolkata']],cal:PRO.CCCUR[PRO.TZCC['Asia/Calcutta']],"
                          "kyiv:PRO.CCCUR[PRO.TZCC['Europe/Kyiv']],kiev:PRO.CCCUR[PRO.TZCC['Europe/Kiev']],bag:PRO.CCCUR[PRO.TZCC['Asia/Baghdad']],utc:PRO.TZCC['UTC']||null,"

@@ -60,7 +60,7 @@ def main():
         cache = os.path.join(tmp, "cache")
         fake_cache(cache, src)
         r = B.build(tmp, cache_dir=cache)
-        ok("a page for each of the 47 languages", r["pages"] == 47 and all(os.path.exists(os.path.join(tmp, "market", c, "index.html")) for c in pro_langs.NEW))
+        ok("a page for each new language", r["pages"] == len(pro_langs.NEW) and all(os.path.exists(os.path.join(tmp, "market", c, "index.html")) for c in pro_langs.NEW))
         ok("ready for search engines: de and iw (page text in), not jp", sorted(r["ready"]) == ["de", "iw"], r["ready"])
         de = open(os.path.join(tmp, "market", "de", "index.html"), encoding="utf-8").read()
         iw = open(os.path.join(tmp, "market", "iw", "index.html"), encoding="utf-8").read()

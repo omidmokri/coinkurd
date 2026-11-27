@@ -158,7 +158,7 @@ def main():
     keys = ["x" * 100] * 200
     bs = list(S.batches(keys))
     ok("a batch holds at most 60 strings or 6000 characters", all(len(b) <= 60 and sum(len(k) for k in b) <= 6000 for b in bs), [len(b) for b in bs[:3]])
-    ok("the 47 languages are the ones /market/ uses", sorted(S.LANGS) == sorted(pro_langs.NEW) and len(S.LANGS) == 47)
+    ok("the new languages are the ones /market/ uses", sorted(S.LANGS) == sorted(pro_langs.NEW) and len(S.LANGS) == len(pro_langs.LANGS) - 4)
 
     # the real site
     pages, scripts, common, need = S.corpus()

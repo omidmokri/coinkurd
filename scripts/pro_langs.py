@@ -120,6 +120,11 @@ SITE = ("ckb", "fa", "ar", "en")            # the site's own languages: hand-wri
 # tells a reader how many there are counts them this way.
 SAME = {"kmr": "ckb"}                       # dialect -> the language it belongs to
 LANG_COUNT = len({SAME.get(r[0], r[0]) for r in LANGS})
+LANG_MAX = 66                               # the room the site, /market/, the app and the bot are built for
+# Adding a language up to LANG_MAX: one row in LANGS, its flag in FLAG (and the SVG in assets/pro/flags/), its line in
+# KURD_NOTE, then `python3 scripts/pro_langs.py`. Its place in the translation queue (pro_l10n.PRIORITY), its script
+# check and Google's code (i18n_gt.gcode) follow from the row; tests/test_pro_langs.py says what is still missing.
+assert LANG_COUNT <= LANG_MAX, "more languages than the room kept for them"
 
 # The line under every language list that says why Kurdish counts once (owner, 2026-11-27: "Kurdish has two
 # dialects, so it is 50 languages, not 51"). Written by hand in every language, not left to machine translation,
