@@ -240,6 +240,11 @@ def main():
     ok("the prompt names the language, its variant and what must stay as written",
        "Chinese (Traditional)" in p and "Traditional Chinese" in p and "Coin_Kurd" in p and '["Close"]' in p)
 
+    en = "The world's wealth is ${1} trillion (${2} at the end of {3}); about {4} kB"
+    tr = S.tidy(en, "La richesse est de ${1} billions (${2} à la fin de ${3}) ; environ {4} \u200b\u200bkB")
+    ok("machine slips are tidied: no zero-width spaces, a year keeps no dollar sign, a price keeps its own",
+       tr == "La richesse est de ${1} billions (${2} à la fin de {3}) ; environ {4} kB", tr)
+
     print(f"\n{len(FAILS)} failure(s)" if FAILS else "\nOK")
     sys.exit(1 if FAILS else 0)
 

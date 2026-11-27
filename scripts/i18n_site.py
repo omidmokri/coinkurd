@@ -157,9 +157,23 @@ def load(code):
     except (OSError, ValueError):
         return {}
     s = (d.get("s") if isinstance(d, dict) else None) or {}
-    s = {k: v for k, v in s.items() if isinstance(v, str) and v}
+    s = {k: tidy(k, v) for k, v in s.items() if isinstance(v, str) and v}
     s.update(fixes().get(code) or {})
     return s
+
+
+_DOLLAR = re.compile(r"\$\{(\d+)\}")
+
+
+def tidy(en, tr):
+    """two slips machine translation makes and no reader wants (audit, 2026-11-27)
+
+    Google Translate leaves zero-width spaces after a placeholder or before a word ("{1} \u200b\u200bkB"), and a year
+    or count written {3} in the English sometimes comes back as ${3}, so the page showed "$2025"."""
+    tr = tr.replace("\u200b", "").replace("\ufeff", "")
+    if "$" in tr:
+        tr = _DOLLAR.sub(lambda m: m.group(0) if ("${" + m.group(1) + "}") in en else "{" + m.group(1) + "}", tr)
+    return tr
 
 
 _fixes = None
