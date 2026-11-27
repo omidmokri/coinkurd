@@ -620,6 +620,15 @@
     return null;
   }
   P._botArg = botArg;
+  /* for ODM: one price alert per level, in the same list as every other alert; and the bot's deep link for a level */
+  P.addPriceAlert = function (sym, v, c, msg) {
+    if (!A.SYM_RE.test(sym) || !(v > 0) || ['up', 'down', 'cross'].indexOf(c) < 0) return null;
+    var dup = AL.some(function (x) { return x.on && x.k === 'price' && x.sym === sym && x.c === c && Math.abs(x.v - v) <= Math.abs(v) * 1e-9; });
+    if (dup) return 'dup';
+    var t = P.tickers.d[sym], a = { id: P.uid(), sym: sym, k: 'price', c: c, v: v, mode: 'once', on: true, at: Date.now(), msg: String(msg || '').slice(0, 80), px: t ? t.c : null };
+    addAlert(a); return a;
+  };
+  P.botLink = function (sym, v) { var arg = botArg({ sym: sym, v: v }); return arg ? 'https://t.me/' + BOT + '?start=' + arg : null; };
   function sendToBot(a) {
     var arg = botArg(a);
     if (!arg) { A.toast(T('badValue')); return; }

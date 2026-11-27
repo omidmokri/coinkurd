@@ -2101,6 +2101,7 @@
         '<button type="button" class="pm-tb" id="pm-scr" title="' + esc(T('screenerBtn')) + '">' + ic('scan') + '<span class="pm-hide-s">' + esc(T('screenerBtn')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-pf" title="' + esc(T('pfTitle')) + '">' + ic('wallet') + '<span class="pm-hide-s">' + esc(T('pfShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-mtf" title="' + esc(T('mtfTitle')) + '">' + ic('grid') + '<span class="pm-hide-s">' + esc(T('mtfBtn')) + '</span></button>' +
+        '<button type="button" class="pm-tb pm-odtb" id="pm-odm" title="' + esc(T('odTitle')) + '">' + ic('layers') + '<span>' + esc(T('odBtn')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-risk" title="' + esc(T('rcTitle')) + '">' + ic('scale') + '<span class="pm-hide-s">' + esc(T('rcShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-bt" title="' + esc(T('tester')) + '">' + ic('bt') + '<span class="pm-hide-s">' + esc(T('testerShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-alert">' + ic('bell') + '<span>' + esc(T('alert')) + '</span></button>' +
@@ -2141,6 +2142,7 @@
     $('#pm-code').onclick = function () { scriptEditor(null); };
     $('#pm-pf').onclick = function () { if (P.portfolio) P.portfolio(); };
     $('#pm-risk').onclick = function () { if (P.riskCentre) P.riskCentre(); };
+    $('#pm-odm').onclick = function () { if (P.odmDialog) P.odmDialog(); };
     $('#pm-mtf').onclick = function () { if (P.mtf) P.mtf(); };
     $('#pm-data').onclick = function () { if (P.dataLib) P.dataLib(); };
     $('#pm-scr').onclick = function () { if (P.screener) P.screener(); };
@@ -2355,7 +2357,7 @@
     TGROUPS.forEach(function (G) { (G.rows || []).forEach(function (r) { r.forEach(function (t) { rows.push({ n: T('t_' + t), g: T('favTools'), i: ic(t), act: function () { setTool(t); } }); }); }); });
     [['csTitle', 'gear', function () { chartSettings('sym'); }], ['indicators', 'fx', function () { indDialog(); }], ['symbol', 'layers', function () { symbolSearch(''); }],
       ['ctxFit', 'fit', function () { var a = active(); if (a) a.chart.timeScale().fitContent(); }], ['fullscreen', 'expand', function () { fullscreen(); }],
-      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }], ['dlTitle', 'down', function () { if (P.dataLib) P.dataLib(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
+      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }], ['odTitle', 'layers', function () { if (P.odmDialog) P.odmDialog(); }], ['dlTitle', 'down', function () { if (P.dataLib) P.dataLib(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
     THEME_LIST.forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
     st.fav.forEach(function (tf) { rows.push({ n: tf, g: T('palTf'), i: ic('cal'), act: function () { applyTF(tf); } }); });
     var f = h('<div class="pm-pal"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-pall" role="listbox"></div></div>'), inp = $('input', f), list = $('.pm-pall', f), sel = 0, shown = [];

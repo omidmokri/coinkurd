@@ -107,4 +107,12 @@ var sG = O.sim(pA, base, B([[105, 106, 101, 104]]), 1);
 ok(sG.end === 'none' && sG.filled === 0 && sG.pnl === 0, 'no entry reached: nothing happened');
 ok(O.sim({ err: 'x' }, base, [], 0).err === 'noPlan', 'no plan, no walk');
 
+/* inverse contracts are refused rather than mis-sized; the result at a price */
+ok(plan({ contract: 'inverse', entries: [{ p: 100, q: 100 }], stop: { mode: 'price', v: 90 } }).err === 'inverse', 'inverse contract: refused, not mis-sized');
+var pz = O.pnlAt(r, 110, 0);
+ok(near(pz.pnl, 100 / 15 * 15) && near(pz.r, 1) && near(pz.pct, 15 / 95 * 100), 'whole position closed at 110: +100, 1R, +15.79%', pz);
+var pz2 = O.pnlAt(r2, 95, 0.1);
+ok(near(pz2.pnl, -r2.qty * (5 + 0.001 * 195)), 'closed at the stop price with fees, no slippage', pz2);
+ok(O.pnlAt(r, -1) === null && O.pnlAt({ err: 'x' }, 100) === null, 'no result for a bad price or a bad plan');
+
 console.log('test_pro_odm.js: ' + n + ' checks, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

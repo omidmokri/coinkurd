@@ -49,6 +49,7 @@
     var lev = o.leverage === '' || o.leverage == null ? 1 : +o.leverage, ct = o.contract === 'spot' || o.contract === 'inverse' ? o.contract : 'linear';
     if (!(bal > 0) || !(rp > 0)) return { err: 'num' };
     if (rp > 100) return { err: 'risk' };
+    if (o.contract === 'inverse') return { err: 'inverse' };     /* coin-margined P&L is in the coin: not modelled here */
     if (ct === 'spot') { if (!long) return { err: 'spotShort' }; lev = 1; }
     if (!(lev >= 1) || lev > 500) return { err: 'lev' };
     if (!(slip >= 0) || !(fee >= 0 && fee < 0.05)) return { err: 'num' };
@@ -135,6 +136,13 @@
     return res;
   };
 
+  /* the result if the whole position (every entry filled) closes at price `at`, fees on both sides, no slippage */
+  O.pnlAt = function (plan, at, feePct) {
+    at = +at; if (!plan || plan.err || !(at > 0)) return null;
+    var fee = (+feePct || 0) / 100, g = (plan.long ? 1 : -1) * (at - plan.avg) - fee * (plan.avg + at), v = plan.qty * g;
+    return { pnl: v, r: v / plan.risk, pct: (plan.long ? 1 : -1) * (at - plan.avg) / plan.avg * 100 };
+  };
+
   /* the plan over closed candles B from bar `from` on. Orders: entries are limits (filled at the level, or at the open
      when the bar opens through it, which is better); the stop and the trail are stops (filled at the level or at a worse
      open, less the slippage); exits are limits. The trail moves on each CLOSED bar's extreme, so a bar never uses its own
@@ -198,5 +206,266 @@
 
   /* ================================================================ the dialog */
   var A = P.app; if (!A) return;
+  var T = A.T, esc = A.esc, h = A.h, $ = A.$, $$ = A.$$, S = P.store;
+  function num(v) { if (v == null) return ''; v = String(v).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 1632; }).replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 1776; }).replace(/[,٬\s]/g, ''); if (v === '') return ''; v = parseFloat(v); return isFinite(v) ? v : NaN; }
+  function f(v, dg) { return isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: dg == null ? 2 : dg }) : '—'; }
+  function px(v) { return isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: v >= 100 ? 2 : v >= 1 ? 4 : 8 }) : '—'; }
+  function sg(v, dg) { return isFinite(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v), dg) : '—'; }
+  function plain(v) { return isFinite(v) ? String(+v.toPrecision(10)) : ''; }
+  var KEY = 'ek_pro_odm';
+  function fresh(last) {
+    var p0 = last > 0 ? last : NaN, L = p0 > 0 ? O.ladder(p0, 3, 1, true, 'equal') : null;
+    return { side: 'long', contract: 'linear', balance: '1000', riskPct: '1', leverage: '1', feePct: '0.1', slip: '0', marginMode: 'isolated', mmrPct: '0.5',
+      gen: { first: plain(p0), n: '3', step: '1', split: 'equal' },
+      entries: L ? L.map(function (x) { return { p: plain(+x.p.toPrecision(8)), q: String(x.q) }; }) : [{ p: '', q: '100' }],
+      stop: { mode: 'atr', v: '2', len: '14' },
+      exits: [{ mode: 'r', v: '1', q: '30' }, { mode: 'r', v: '2', q: '30' }, { mode: 'r', v: '3', q: '20' }],
+      trail: { on: true, mode: 'atr', v: '2', act: 'none', av: '' }, beAfter: '1', fundingPct: '', fundHrs: '8', hours: '', at: '', back: '150' };
+  }
+  /* the chart's closed bars: the forming bar never feeds the ATR or the test */
+  function closed(cell) {
+    var B = cell && cell.bars || [], t = P.parseTF ? P.parseTF(cell.cfg.tf) : null;
+    if (!t || !P.mtfCalc) return B.slice(0, -1);
+    return P.mtfCalc.closedOnly(B, t.sec, Date.now() / 1000, false);
+  }
+  /* the inputs of P.odm.plan from the form's text */
+  function inputs(st, atr) {
+    return { side: st.side, contract: st.contract, balance: num(st.balance), riskPct: num(st.riskPct), leverage: num(st.leverage), feePct: num(st.feePct) || 0, slip: num(st.slip) || 0,
+      marginMode: st.marginMode, mmrPct: num(st.mmrPct), fundingPct: num(st.fundingPct), fundHrs: num(st.fundHrs), hours: num(st.hours),
+      entries: st.entries.map(function (e) { return { p: num(e.p), q: num(e.q) }; }),
+      stop: { mode: st.stop.mode, v: num(st.stop.v), atr: atr },
+      exits: st.exits.map(function (x) { return { mode: x.mode, v: num(x.v), q: num(x.q) }; }),
+      trail: { on: !!st.trail.on, mode: st.trail.mode, v: num(st.trail.v), atr: atr, act: { mode: st.trail.act, v: num(st.trail.av) } },
+      beAfter: num(st.beAfter) || 0 };
+  }
+  P.odmInputs = inputs; P.odmFresh = fresh;
+  /* the plan's levels as price lines on a chart, until hidden or the symbol changes */
+  var LN = null;
+  function hideLines() { if (!LN) return; LN.L.forEach(function (l) { try { LN.cell.main.removePriceLine(l); } catch (e) { } }); LN = null; }
+  function showLines(cell, r) {
+    hideLines(); if (!cell || !cell.main || !r || r.err) return 0;
+    var L = [], add = function (p, c, t, st) { if (!(p > 0)) return; try { L.push(cell.main.createPriceLine({ price: p, color: c, lineWidth: 1, lineStyle: st || 0, axisLabelVisible: true, title: t })); } catch (e) { } };
+    r.fills.forEach(function (x) { add(x.p, '#f7931a', 'E' + x.n, 2); });
+    if (r.fills.length > 1) add(r.avg, '#f7931a', T('odLAvg'), 0);
+    add(r.stop, '#ff5a4d', 'SL', 0);
+    r.exits.forEach(function (x) { add(x.p, '#34d399', 'TP' + x.n + ' ' + f(x.q, 0) + '%', 2); });
+    if (r.trail && r.trail.act != null) add(r.trail.act, '#a78bfa', T('odLTrail'), 1);
+    if (r.beAfter) add(r.be, '#9a9a94', 'BE', 1);
+    if (r.liq != null) add(r.liq, '#a855f7', T('odLLiq'), 3);
+    LN = { cell: cell, sym: cell.cfg.sym, L: L }; return L.length;
+  }
+  A.on('sym', function (cell) { if (LN && LN.cell === cell) hideLines(); });
+  P.odmHide = hideLines; P.odmLinesShown = function () { return LN ? LN.L.length : 0; };
+
+  P.odmDialog = function () {
+    var cell = A.active(); if (!cell) return;
+    var sym = cell.cfg.sym, B = closed(cell), last = cell.bars.length ? cell.bars[cell.bars.length - 1].c : NaN;
+    var st = S.get(KEY, null); if (!st || typeof st !== 'object' || st.v !== 1 || st.sym !== sym) { var keep = st && st.v === 1 ? st : null; st = fresh(last); if (keep) ['side', 'contract', 'balance', 'riskPct', 'leverage', 'feePct', 'slip', 'marginMode', 'mmrPct'].forEach(function (k) { if (typeof keep[k] === 'string') st[k] = keep[k]; }); }
+    st.v = 1; st.sym = sym;
+    function save() { try { S.set(KEY, st); } catch (e) { } }
+    var atr = null, plan = null;
+    function calcAtr() { var n = Math.round(num(st.stop.len)); if (!(n >= 2 && n <= 200)) n = 14; atr = O.atr(B, n); return n; }
+
+    var box = h('<div class="pm-odm">' +
+      '<details class="pm-odwhy"><summary></summary><div></div></details>' +
+      '<div class="pm-odcols"><div class="pm-odin"></div><div class="pm-odout" aria-live="polite"></div></div>' +
+      '<div class="pm-row pm-odact"></div><div class="pm-odx"></div><p class="pm-enote"></p></div>');
+    $('.pm-odwhy summary', box).textContent = T('odWhyT');
+    ['odWhy1', 'odWhy2', 'odWhy3', 'odWhy4', 'odWhy5'].forEach(function (k) { var pp = document.createElement('p'); pp.textContent = T(k); $('.pm-odwhy div', box).appendChild(pp); });
+    $('.pm-enote', box).textContent = T('odNote');
+    var IN = $('.pm-odin', box), OUT = $('.pm-odout', box), X = $('.pm-odx', box), ACT = $('.pm-odact', box);
+
+    /* ---- small builders: every field writes its text into st and recalculates; rows re-render only when added or removed */
+    function sec(title, hint) { var s2 = h('<section class="pm-odsec"><h4></h4></section>'); $('h4', s2).textContent = T(title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
+    function inp(obj, k, lbl, cls) {
+      var w = h('<label class="pm-cf' + (cls ? ' ' + cls : '') + '"><span></span><input class="pm-in" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="24"></label>'), i = $('input', w);
+      $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove(); i.value = obj[k] == null ? '' : obj[k];
+      if (lbl) i.setAttribute('aria-label', T(lbl));
+      i.oninput = function () { obj[k] = i.value.slice(0, 24); save(); run(); }; return w;
+    }
+    function sel(obj, k, lbl, opts, pre, after) {
+      var w = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), sl = $('select', w); $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove();
+      opts.forEach(function (x) { var op = document.createElement('option'); op.value = x; op.textContent = T((pre || 'odO_') + x); sl.appendChild(op); });
+      sl.value = opts.indexOf(obj[k]) >= 0 ? obj[k] : opts[0]; obj[k] = sl.value; if (lbl) sl.setAttribute('aria-label', T(lbl));
+      sl.onchange = function () { obj[k] = sl.value; save(); if (after) after(); run(); }; return w;
+    }
+    function grid(parent, items) { var g = h('<div class="pm-cg"></div>'); items.forEach(function (x) { g.appendChild(x); }); parent.appendChild(g); return g; }
+
+    /* 1. the account */
+    var s1 = sec('odAcc');
+    grid(s1, [sel(st, 'side', 'rcSide', ['long', 'short']), sel(st, 'contract', 'rcCt', ['linear', 'spot'], 'rcO_'), inp(st, 'balance', 'rcBal'), inp(st, 'riskPct', 'rcRisk'), inp(st, 'leverage', 'rcLev'), inp(st, 'feePct', 'rcFee'),
+      inp(st, 'slip', 'rcSlip'), sel(st, 'marginMode', 'rcMode', ['isolated', 'cross'], 'rcO_'), inp(st, 'mmrPct', 'rcMmr')]);
+
+    /* 2. the entries: a ladder builder and the rows themselves */
+    var s2 = sec('odEnt', 'odEntHint'), gen = grid(s2, [inp(st.gen, 'first', 'odGFirst'), inp(st.gen, 'n', 'odGN'), inp(st.gen, 'step', 'odGStep'), sel(st.gen, 'split', 'odGSplit', ['equal', 'grow'])]);
+    var gb = h('<button type="button" class="pm-btn sm"></button>'); gb.textContent = T('odGBuild'); gen.appendChild(gb);
+    var ER = h('<div class="pm-odrows"></div>'), es = h('<div class="pm-odsum pm-num"></div>'), ea = h('<button type="button" class="pm-btn sm"></button>'); ea.textContent = '+ ' + T('odAddE');
+    s2.appendChild(ER); s2.appendChild(ea); s2.appendChild(es);
+    gb.onclick = function () {
+      var L = O.ladder(num(st.gen.first), num(st.gen.n), num(st.gen.step), st.side !== 'short', st.gen.split);
+      if (!L) { A.toast(T('odE_gen')); return; }
+      st.entries = L.map(function (x) { return { p: plain(+x.p.toPrecision(8)), q: String(x.q) }; }); save(); rowsE(); run();
+    };
+    function rowsE() {
+      ER.innerHTML = '';
+      st.entries.forEach(function (e, i) {
+        var r = h('<div class="pm-odrow"><span class="pm-odn"></span></div>'); $('.pm-odn', r).textContent = 'E' + (i + 1);
+        r.appendChild(inp(e, 'p', null)); $$('input', r)[0].placeholder = T('odPrice'); $$('input', r)[0].setAttribute('aria-label', T('odPrice') + ' E' + (i + 1));
+        r.appendChild(inp(e, 'q', null)); $$('input', r)[1].placeholder = '%'; $$('input', r)[1].setAttribute('aria-label', T('odShare') + ' E' + (i + 1));
+        var x = h('<button type="button" class="pm-ib" aria-label="' + esc(T('remove')) + '">' + A.ic('x') + '</button>'); x.disabled = st.entries.length < 2;
+        x.onclick = function () { st.entries.splice(i, 1); save(); rowsE(); run(); }; r.appendChild(x); ER.appendChild(r);
+      });
+      ea.disabled = st.entries.length >= 10;
+    }
+    ea.onclick = function () { st.entries.push({ p: '', q: '' }); save(); rowsE(); run(); };
+
+    /* 3. the stop */
+    var s3 = sec('odStop', 'odStopHint'), atrNote = h('<p class="pm-odhint pm-num" dir="auto"></p>');
+    grid(s3, [sel(st.stop, 'mode', 'odSMode', ['atr', 'pct', 'price']), inp(st.stop, 'v', 'odSVal'), inp(st.stop, 'len', 'odAtrLen')]); s3.appendChild(atrNote);
+
+    /* 4. the exits */
+    var s4 = sec('odExit', 'odExitHint'), XR = h('<div class="pm-odrows"></div>'), xs = h('<div class="pm-odsum pm-num"></div>'), xb = h('<div class="pm-row"></div>');
+    var xa = h('<button type="button" class="pm-btn sm"></button>'); xa.textContent = '+ ' + T('odAddX'); xb.appendChild(xa);
+    [['odP_r', [['r', '1', '30'], ['r', '2', '30'], ['r', '3', '20']]], ['odP_pct', [['pct', '5', '25'], ['pct', '10', '25'], ['pct', '20', '25']]], ['odP_one', [['r', '2', '100']]]].forEach(function (pr) {
+      var b = h('<button type="button" class="pm-btn sm"></button>'); b.textContent = T(pr[0]);
+      b.onclick = function () { st.exits = pr[1].map(function (x) { return { mode: x[0], v: x[1], q: x[2] }; }); save(); rowsX(); run(); }; xb.appendChild(b);
+    });
+    s4.appendChild(XR); s4.appendChild(xb); s4.appendChild(xs);
+    function rowsX() {
+      XR.innerHTML = '';
+      st.exits.forEach(function (x, i) {
+        var r = h('<div class="pm-odrow pm-odrx"><span class="pm-odn"></span></div>'); $('.pm-odn', r).textContent = 'TP' + (i + 1);
+        r.appendChild(sel(x, 'mode', null, ['price', 'pct', 'r'], 'odX_')); $('select', r).setAttribute('aria-label', T('odXMode') + ' TP' + (i + 1));
+        r.appendChild(inp(x, 'v', null)); $$('input', r)[0].placeholder = T('odXVal'); $$('input', r)[0].setAttribute('aria-label', T('odXVal') + ' TP' + (i + 1));
+        r.appendChild(inp(x, 'q', null)); $$('input', r)[1].placeholder = '%'; $$('input', r)[1].setAttribute('aria-label', T('odShare') + ' TP' + (i + 1));
+        var b = h('<button type="button" class="pm-ib" aria-label="' + esc(T('remove')) + '">' + A.ic('x') + '</button>'); b.onclick = function () { st.exits.splice(i, 1); save(); rowsX(); beOpts(); run(); }; r.appendChild(b);
+        XR.appendChild(r);
+      });
+      xa.disabled = st.exits.length >= 8;
+    }
+    xa.onclick = function () { st.exits.push({ mode: 'r', v: '', q: '' }); save(); rowsX(); beOpts(); run(); };
+
+    /* 5. what is left: the trailing stop, and break-even */
+    var s5 = sec('odTrail', 'odTrailHint'), tg = h('<label class="pm-odtg"><input type="checkbox"> <span></span></label>');
+    $('span', tg).textContent = T('odTOn'); $('input', tg).checked = !!st.trail.on; $('input', tg).onchange = function () { st.trail.on = $('input', tg).checked; save(); run(); }; s5.appendChild(tg);
+    var beW = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), beS = $('select', beW); $('span', beW).textContent = T('odBE');
+    function beOpts() { beS.innerHTML = ''; var o0 = new Option(T('odBENo'), '0'); beS.appendChild(o0); st.exits.forEach(function (x, i) { beS.appendChild(new Option(T('odBEAfter', { n: i + 1 }), String(i + 1))); }); beS.value = +st.beAfter <= st.exits.length ? String(+st.beAfter || 0) : '0'; st.beAfter = beS.value; }
+    beS.onchange = function () { st.beAfter = beS.value; save(); run(); };
+    grid(s5, [sel(st.trail, 'mode', 'odTMode', ['atr', 'pct']), inp(st.trail, 'v', 'odTVal'), sel(st.trail, 'act', 'odTAct', ['none', 'price', 'pct', 'r'], 'odA_'), inp(st.trail, 'av', 'odTActV'), beW]);
+
+    /* 6. funding and the result at any price */
+    var s6 = h('<details class="pm-odsec pm-odmore"><summary></summary></details>'); $('summary', s6).textContent = T('odMore'); IN.appendChild(s6);
+    grid(s6, [inp(st, 'fundingPct', 'plFundRate'), inp(st, 'fundHrs', 'plFundIv'), inp(st, 'hours', 'plHours'), inp(st, 'at', 'odAt')]);
+
+    /* ---- the results */
+    function card(o, a, v, cls, tip) { var x = h('<div class="pm-cor' + (cls ? ' ' + cls : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', x).textContent = a; $('b', x).textContent = v; if (tip) x.title = tip; o.appendChild(x); }
+    function table(head, rows) {
+      var w = h('<div class="pm-tw"><table class="pm-tbl pm-odt"><thead><tr></tr></thead><tbody></tbody></table></div>');
+      head.forEach(function (k) { var th = document.createElement('th'); th.textContent = k; $('tr', w).appendChild(th); });
+      rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, j) { var td = document.createElement('td'); if (c && typeof c === 'object') { td.textContent = c.t; if (c.c) td.className = c.c; } else td.textContent = c; if (j) { td.className = (td.className ? td.className + ' ' : '') + 'pm-num'; td.dir = 'ltr'; } tr.appendChild(td); }); $('tbody', w).appendChild(tr); });
+      return w;
+    }
+    function warn(o, txt) { var wn = h('<div class="pm-cw2"></div>'); wn.textContent = txt; o.appendChild(wn); }
+    function h4(o, k) { var x = document.createElement('h4'); x.className = 'pm-odh'; x.textContent = T(k); o.appendChild(x); }
+    function run() {
+      var n = calcAtr();
+      atrNote.textContent = atr > 0 ? T('odAtrIs', { n: n, tf: A.tfLabel ? A.tfLabel(cell.cfg.tf) : cell.cfg.tf, v: px(atr), b: B.length }) : T('odAtrNone', { n: n });
+      var se = 0; st.entries.forEach(function (e) { var q = num(e.q); if (isFinite(q)) se += q; }); es.textContent = T('odSumE', { p: f(se, 2) }); es.classList.toggle('dn', Math.abs(se - 100) > 0.01);
+      var sx = 0; st.exits.forEach(function (e) { var q = num(e.q); if (isFinite(q)) sx += q; }); xs.textContent = T('odSumX', { p: f(sx, 2), r: f(Math.max(0, 100 - sx), 2) }); xs.classList.toggle('dn', sx > 100.01);
+      plan = O.plan(inputs(st, atr)); OUT.innerHTML = ''; X.innerHTML = '';
+      $$('button[data-need]', ACT).forEach(function (b) { b.disabled = !!plan.err; });
+      if (plan.err) { warn(OUT, T('odE_' + plan.err, { n: plan.at || '' })); return; }
+      var r = plan, o = h('<div class="pm-co"></div>'); OUT.appendChild(o);
+      card(o, T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2'));
+      card(o, T('rcQty'), f(r.qty, 6)); card(o, T('odAvg'), px(r.avg)); card(o, T('odStopAt'), px(r.stop), 'dn');
+      card(o, T('rcMaxLoss'), '−' + f(r.risk), 'dn', T('odTipRisk')); card(o, T('odBest'), r.best != null ? sg(r.best) + '  (' + f(r.best / r.risk, 2) + 'R)' : '—', r.best > 0 ? 'up' : '');
+      card(o, T('rcNotional'), f(r.notional)); card(o, T('rcMargin'), f(r.margin)); card(o, T('rcBE'), px(r.be));
+      if (r.liq != null) card(o, T('rcLiqS'), px(r.liq), '', T('rcLiqNote')); else if (r.liqWhy) card(o, T('rcLiqS'), T('rcLiq_' + r.liqWhy));
+      if (r.funding != null) card(o, T('odFund'), sg(-r.funding), r.funding > 0 ? 'dn' : 'up');
+      if (!r.marginOk) warn(o, T('rcW_margin')); else if (r.liqBeforeStop) warn(o, T('rcW_liq')); else if (r.liq != null) warn(o, T('rcLiqNote'));
+      var inr = r.exits.filter(function (x) { return x.inRange; }).map(function (x) { return 'TP' + x.n; }); if (inr.length) warn(o, T('odW_inRange', { l: inr.join(', ') }));
+      var at = num(st.at); if (at > 0) { var z = O.pnlAt(r, at, num(st.feePct)); if (z) card(o, T('odAtRes', { p: px(at) }), sg(z.pnl) + '  ' + sg(z.r, 2) + 'R  ' + sg(z.pct, 2) + '%', z.pnl > 0 ? 'up' : z.pnl < 0 ? 'dn' : ''); }
+      h4(OUT, 'odHFills');
+      OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('rcQty'), T('odAvgAfter'), T('odLossIf')], r.fills.map(function (x) { return ['E' + x.n, px(x.p), f(x.q, 2) + '%', f(x.qty, 6), px(x.avg), { t: '−' + f(x.loss), c: 'dn' }]; })));
+      if (r.exits.length) { h4(OUT, 'odHExits'); OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('odProfit'), 'R'], r.exits.map(function (x) { return ['TP' + x.n, px(x.p), f(x.q, 2) + '%', { t: sg(x.profit), c: x.profit > 0 ? 'up' : 'dn' }, f(x.r, 2)]; }))); }
+      if (r.rest > 0) {
+        var tl = r.trail ? T('odRestTrail', { p: f(r.rest, 2), d: r.trail.mode === 'atr' ? f(+st.trail.v, 2) + '×ATR = ' + px(r.trail.dist) : f(r.trail.v, 2) + '%', a: r.trail.act != null ? px(r.trail.act) : T('odFromStart') }) : T('odRestOpen', { p: f(r.rest, 2) });
+        var pr = h('<p class="pm-odhint"></p>'); pr.textContent = tl; OUT.appendChild(pr);
+      }
+      h4(OUT, 'odHEnds');
+      OUT.appendChild(table([T('odHow'), T('odPnl'), 'R'], r.rows.map(function (x) {
+        var lb = x.k === 'stop' ? T('odEStop') : x.k === 'exit' ? T(x.be ? 'odEExitBE' : 'odEExit', { n: x.n }) : x.k === 'trail' ? T('odETrail') : x.k === 'trailStop' ? T('odETrailStop') : T('odEOpen', { p: f(x.open, 2) });
+        return [lb, { t: sg(x.pnl), c: x.pnl > 0 ? 'up' : x.pnl < 0 ? 'dn' : '' }, sg(x.r, 2)];
+      })));
+      var fm = h('<code class="pm-cfm" dir="ltr"></code>'); fm.textContent = 'qty = risk ÷ Σ wᵢ × ( |entryᵢ − stop| + fee × (entryᵢ + stop) + slippage )   ·   avg = Σ wᵢ × entryᵢ   ·   R = |avg − stop|'; OUT.appendChild(fm);
+    }
+
+    /* ---- actions */
+    function act(k, fn, need, pri) { var b = h('<button type="button" class="pm-btn' + (pri ? ' pri' : '') + '"></button>'); b.textContent = T(k); b.onclick = fn; if (need) b.setAttribute('data-need', ''); ACT.appendChild(b); return b; }
+    act('odShow', function () { var n = showLines(cell, plan); A.closeModal(); A.toast(T('odShown', { n: n })); }, 1, 1);
+    var hb = act('odHide', function () { hideLines(); hb.hidden = true; A.toast(T('odHidden')); }); hb.hidden = !LN;
+    act('odTest', function () { test(); }, 1);
+    act('odSave', function () {
+      var r = plan; if (!r || r.err) return;
+      var np = { id: P.uid(), at: Date.now(), sym: sym, tf: cell.cfg.tf, long: r.long, entry: r.avg, stop: r.stop, targets: r.exits.map(function (x) { return { p: x.p, share: x.q }; }),
+        qty: r.qty, notional: r.notional, margin: r.margin, risk: r.risk, rr: r.best != null ? r.best / r.risk : 0, status: 'planned', ex: '', kind: 'odm', entries: r.fills.map(function (x) { return { p: x.p, q: x.q }; }) };
+      var res = P.planAdd ? P.planAdd(np) : 'bad'; A.toast(T(res === 'ok' ? 'plSaved' : res === 'dup' ? 'plDup' : 'odE_num'));
+    }, 1);
+    act('odAlerts', function () { alerts(); }, 1);
+    act('plBoardT', function () { if (P.riskBoard) P.riskBoard(); });
+
+    /* walk the plan over this chart's closed bars, from N bars back */
+    function test() {
+      X.innerHTML = ''; var r = plan; if (!r || r.err) return;
+      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-cg"></div><div class="pm-odres"></div></section>'); $('h4', w).textContent = T('odTestT'); X.appendChild(w);
+      var bk = inp(st, 'back', 'odBack'); $('.pm-cg', w).appendChild(bk); var go = h('<button type="button" class="pm-btn sm pri"></button>'); go.textContent = T('odRun'); $('.pm-cg', w).appendChild(go);
+      var res = $('.pm-odres', w);
+      function walk() {
+        res.innerHTML = ''; var k = Math.round(num(st.back)); if (!(k >= 2)) k = 150; k = Math.min(k, B.length - 1);
+        if (B.length < 3) { warn(res, T('odNoBars')); return; }
+        var sm = O.sim(r, inputs(st, atr), B, B.length - k); if (sm.err) { warn(res, T('odE_num')); return; }
+        var o = h('<div class="pm-co"></div>'); res.appendChild(o);
+        card(o, T('odEnd'), T('odEnd_' + sm.end), sm.end === 'stop' ? 'dn' : sm.end === 'exits' || sm.end === 'trail' ? 'up' : '');
+        card(o, T('odFilled'), sm.filled + ' / ' + r.fills.length); card(o, T('odPnl'), sg(sm.pnl) + '  (' + sg(sm.r, 2) + 'R)', sm.pnl > 0 ? 'up' : sm.pnl < 0 ? 'dn' : '');
+        if (sm.open) card(o, T('odOpenNow'), sg(sm.open.pnl) + ' @ ' + px(sm.open.mark), sm.open.pnl > 0 ? 'up' : sm.open.pnl < 0 ? 'dn' : '');
+        card(o, T('odBars'), f(sm.bars, 0)); card(o, T('odAmb'), f(sm.ambiguous, 0), sm.ambiguous ? 'dn' : '', T('odAmbTip'));
+        if (sm.events.length) res.appendChild(table([T('odWhen'), T('odWhat'), T('odPrice'), T('rcQty')], sm.events.map(function (e) {
+          var d = new Date(e.t * 1000), kk = /^exit/.test(e.k) ? 'TP' + e.k.slice(4) : T('odEv_' + e.k);
+          return [d.toLocaleString(A.LANG ? A.LANG() : undefined, { dateStyle: 'short', timeStyle: 'short' }), kk, px(e.p), f(e.q, 6)];
+        })));
+        var nt = h('<p class="pm-odhint"></p>'); nt.textContent = T('odTestNote'); res.appendChild(nt);
+      }
+      go.onclick = walk; walk(); w.scrollIntoView({ block: 'nearest' });
+    }
+    /* one alert per level: entries, the stop, each exit and the trail's start; each can also go to the Telegram bot */
+    function alerts() {
+      X.innerHTML = ''; var r = plan; if (!r || r.err) return;
+      var dn = r.long ? 'down' : 'up', up = r.long ? 'up' : 'down', L = [];
+      r.fills.forEach(function (x) { L.push({ k: 'E' + x.n, p: x.p, c: dn }); });
+      L.push({ k: 'SL', p: r.stop, c: dn });
+      r.exits.forEach(function (x) { L.push({ k: 'TP' + x.n, p: x.p, c: up }); });
+      if (r.trail && r.trail.act != null) L.push({ k: T('odLTrail'), p: r.trail.act, c: up });
+      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-odal"></div><div class="pm-row"><button type="button" class="pm-btn pri sm"></button></div><p class="pm-odhint"></p></section>');
+      $('h4', w).textContent = T('odAlT'); $('button.pri', w).textContent = T('odAlAdd'); $('p', w).textContent = T('odAlNote');
+      var box2 = $('.pm-odal', w);
+      L.forEach(function (lv) {
+        var r2 = h('<div class="pm-odalr"><label><input type="checkbox" checked> <b></b> <span class="pm-num" dir="ltr"></span></label></div>');
+        $('b', r2).textContent = lv.k; $('span', r2).textContent = px(lv.p); lv.cb = $('input', r2);
+        var link = P.botLink ? P.botLink(sym, +lv.p.toPrecision(10)) : null;
+        if (link) { var a = h('<a class="pm-ib" target="_blank" rel="noopener noreferrer">✈</a>'); a.href = link; a.title = a.ariaLabel = T('tgAlso'); r2.appendChild(a); }
+        box2.appendChild(r2);
+      });
+      $('button.pri', w).onclick = function () {
+        var n = 0, d = 0;
+        L.forEach(function (lv) { if (!lv.cb.checked) return; var res = P.addPriceAlert ? P.addPriceAlert(sym, +lv.p.toPrecision(10), lv.c, 'ODM ' + lv.k) : null; if (res === 'dup') d++; else if (res) n++; });
+        A.toast(T('odAlDone', { n: n, d: d }));
+        if (n && window.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { } }
+      };
+      X.appendChild(w); w.scrollIntoView({ block: 'nearest' });
+    }
+
+    rowsE(); rowsX(); beOpts(); run(); save();
+    A.modal(T('odTitle') + ' · ' + (P.pair ? P.pair(sym) : sym), box, { wide: true, nofocus: true });
+  };
   P.odmReady = true;
 })();
