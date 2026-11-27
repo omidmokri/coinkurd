@@ -918,3 +918,4 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-odthumbs figure{margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}.pm-odthumbs img{display:block;width:100%;height:auto}
 .pm-odthumbs figcaption{font-size:11px;padding:4px 6px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:600px){.pm-odfl{grid-template-columns:1fr 1fr}.pm-odfc{font-size:12px}}
+@media (max-width:600px){.pm-odhud .pm-odhm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pm-odhud.min .pm-odhm{display:none}}
