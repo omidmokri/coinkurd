@@ -1533,13 +1533,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] the panel lists 5 bid and 5 ask walls, each source with its state, and the liquidation totals`, pn.rows === 10 && pn.up === 5 && pn.src.length === 6 && pn.src.filter(c => c === 'ok').length === 5 && pn.src.includes('bad') && pn.sum.length > 10, JSON.stringify(pn));
     ok(`[${tag}] the panel fits the screen with no sideways scroll`, pn.fits, '');
     await shot(page, `90_lq_panel_${lang}_${vw}`);
-    /* on the chart: something is drawn at the right edge in green under the price and red over it */
+    /* on the chart: the book is drawn at the very right edge (clear of the liquidation bubbles on the open bar) in green under the price and red over it */
     await page.evaluate(() => PRO.app.closeModal()); await page.waitForTimeout(400);
     await shot(page, `91_lq_chart_${lang}_${vw}`);
     const px2 = await page.evaluate(() => {
       const c = PRO.app.active(), s = PRO.liqState(), cv = [...c.el.querySelectorAll('canvas')].filter(x => x.width > 50);
       const yB = c.main.priceToCoordinate(s.w.bid[0].p), yA = c.main.priceToCoordinate(s.w.ask[0].p), out = { yB, yA, hits: [] };
-      cv.forEach(x => { const g = x.getContext('2d'), r = x.getBoundingClientRect(), k = x.width / r.width; if (!g || r.width < 200) return; [['b', yB], ['a', yA]].forEach(([n, y]) => { if (y == null) return; const d = g.getImageData(Math.round((r.width - 30) * k), Math.round(y * k), 1, 1).data; out.hits.push([n, d[0], d[1], d[2], d[3]]); }); });
+      cv.forEach(x => { const g = x.getContext('2d'), r = x.getBoundingClientRect(), k = x.width / r.width; if (!g || r.width < 200) return; [['b', yB], ['a', yA]].forEach(([n, y]) => { if (y == null) return; const d = g.getImageData(Math.round((r.width - 6) * k), Math.round(y * k), 1, 1).data; out.hits.push([n, d[0], d[1], d[2], d[3]]); }); });
       return out;
     });
     const green = px2.hits.some(h => h[0] === 'b' && h[2] > h[1] + 40 && h[4] > 0), red = px2.hits.some(h => h[0] === 'a' && h[1] > h[2] + 40 && h[4] > 0);
