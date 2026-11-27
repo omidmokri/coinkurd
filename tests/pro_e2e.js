@@ -1425,6 +1425,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     let s2 = await st();
     ok(`[${tag}] a second group joined with OR`, s2.groups === 2 && / or \(close > ta\.sma\(close, 50\)\)\) and bar_index >= 199$/.test(s2.code) && s2.code.startsWith('(((not') && !s2.err, s2.code);
     await shot(page, `88_sa_${lang}_${vw}`);
+    await page.evaluate(() => document.querySelector('.pm-sasave').scrollIntoView({ block: 'end' })); await page.waitForTimeout(150); await shot(page, `88b_sa_now_${lang}_${vw}`);
+    await page.evaluate(() => document.querySelector('.pm-sa').scrollIntoView({ block: 'start' }));
     ok(`[${tag}] the builder fits the screen with no sideways scroll`, s2.fits && s2.hscroll <= 1, JSON.stringify({ fits: s2.fits, h: s2.hscroll }));
     /* an empty number is refused with a reason and Save switches off */
     await page.evaluate(() => { const v = [...document.querySelectorAll('.pm-sabv')].find(x => !x.hidden); v.value = ''; v.dispatchEvent(new Event('input')); }); await page.waitForTimeout(200);
@@ -1436,13 +1438,14 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.evaluate(() => document.querySelector('.pm-sasave').click()); await page.waitForTimeout(300);
     const sv = await page.evaluate(() => {
       const a = PRO._alerts().slice(-1)[0], c = PRO.app.active(), t = PRO.parseTF(a.tf), B = PRO.mtfCalc.closedOnly(c.bars, t.sec, Date.now() / 1000, false).slice(-1500);
-      return { k: a.k, spec: !!(a.spec && a.spec.g && a.spec.g.length === 2), expr: a.expr, on: a.on, tf: a.tf, test: PRO.script.cond(a.expr).test(B), modal: !!document.querySelector('.pm-sa'), n: PRO._alerts().length,
+      return { toast: (document.querySelector('.pm-toast') || {}).textContent || '', k: a.k, spec: !!(a.spec && a.spec.g && a.spec.g.length === 2), expr: a.expr, on: a.on, tf: a.tf, test: PRO.script.cond(a.expr).test(B), modal: !!document.querySelector('.pm-sa'), n: PRO._alerts().length,
         text: [...document.querySelectorAll('.pm-ar')].map(x => x.textContent).join(' | ') };
     });
     ok(`[${tag}] saving adds one smart alert with its rule, on the chart's timeframe`, sv.n === n0 + 1 && sv.k === 'multi' && sv.spec && sv.expr === s4.code && sv.on && !sv.modal, JSON.stringify(sv));
+    ok(`[${tag}] the confirmation names the pair and the rule in words`, sv.toast.includes('BTC/USDT') && !sv.toast.includes('{') && sv.toast.includes(PRO_T(lang, 'saS_rsi')), sv.toast);
     ok(`[${tag}] the saved rule gives the same answer now as the builder showed`, (sv.test[1] === 1) === s4.now.includes('up'), JSON.stringify({ t: sv.test, now: s4.now }));
     const lt = sv.text;      /* the alerts panel is still open from the start of these checks */
-    ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saJ_or')) && !lt.includes('ta.rsi'), lt.slice(0, 300));
+    ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saJ_or')) && !lt.includes('ta.rsi') && lt.includes('\u2066'), lt.slice(0, 300));
     await shot(page, `89_sa_list_${lang}_${vw}`);
     /* the price alert dialog has a Smart tab that opens the builder */
     const tab = await page.evaluate(async () => {

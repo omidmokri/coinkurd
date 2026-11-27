@@ -131,16 +131,17 @@
   function ready() { A = P.app; if (!A) return false; T = A.T; h = A.h; $ = A.$; $$ = A.$$; esc = A.esc; return true; }
   function srcName(x) { var d = SRC[x.s]; return T('saS_' + x.s) + (d && d.d ? ' (' + int(x.l, 1, 500, d.d) + ')' : ''); }
   /* a short readable summary for the alert list (from the cleaned spec only: known names and numbers) */
+  /* left-to-right inside its own isolate, so symbols and brackets keep their order in a right-to-left page or notification */
   P.saText = function (sp) {
     if (!ready()) return '';
     sp = clean(sp);
-    return sp.g.map(function (G) {
+    return '\u2066' + sp.g.map(function (G) {
       var t = G.c.map(function (C) {
         var b = C.op === 'rise' || C.op === 'fall' ? T('saBars', { n: C.b.v }) : C.b.t === 's' ? srcName(C.b) : (isFinite(C.b.v) ? String(+C.b.v) : '?');
         return (C.not ? T('saNot') + ' ' : '') + srcName(C.a) + ' ' + T('saO_' + C.op) + ' ' + b;
       }).join(' ' + T('saJ_' + G.j) + ' ');
       return (G.not ? T('saNot') + ' ' : '') + (G.c.length > 1 || sp.g.length > 1 ? '(' + t + ')' : t);
-    }).join(' ' + T('saJ_' + sp.j) + ' ');
+    }).join(' ' + T('saJ_' + sp.j) + ' ') + '\u2069';
   };
 
   P.smartAlert = function (cell, start) {
@@ -290,7 +291,7 @@
       var r = expr(sp); if (r.err) { run0(); return; }
       var c = P.script && P.script.cond(r.expr); if (!c || !c.ok) { ERR.hidden = false; ERR.textContent = T('saE_script'); return; }
       P.addAlert({ id: P.uid(), sym: sym, k: 'multi', expr: r.expr, spec: r.spec, tf: tf, mode: MODE.value === 'every' ? 'every' : 'once', on: true, at: Date.now(), msg: $('.pm-samsg input', box).value.trim().slice(0, 80) });
-      A.closeModal(); A.toast(T('alertSet'));
+      A.closeModal(); A.toast(T('alertSet', { c: (P.pair ? P.pair(sym) : sym) + ' · ' + P.saText(r.spec) }));
       if (window.Notification && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) { } }
     };
     $('.pm-samsg input', box).addEventListener('keydown', function (e) { e.stopPropagation(); });

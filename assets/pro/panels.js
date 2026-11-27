@@ -517,7 +517,7 @@
       e.preventDefault(); var txt = ex.value.replace(/\s+/g, ' ').trim(), c = P.script ? P.script.cond(txt) : { ok: false, err: '' };
       if (!c.ok) { er.className = 'pm-scerr bad'; er.textContent = c.err; return; }
       addAlert({ id: P.uid(), sym: sym, k: 'multi', expr: txt, tf: tf.value, mode: $('[name=mode]', f).value === 'every' ? 'every' : 'once', on: true, at: Date.now(), msg: $('[name=msg]', f).value.trim().slice(0, 80) });
-      A.closeModal(); A.toast(T('alertSet'));
+      A.closeModal(); A.toast(T('alertSet', { c: P.pair(sym) + ' · ' + txt }));
     };
     A.modal(T('multiAl') + ' · ' + P.pair(sym), f, { nofocus: true });
   };
