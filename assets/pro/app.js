@@ -226,7 +226,7 @@
     grid: '#ffffff', ga: 3.5, gv: 1, gh: 1,
     cross: 0, ccol: '#f7931a', cw: 1, cdash: 1, clab: 1,
     wm: 0, wmt: '', wmsize: 44, wmcol: '#ffffff', wma: 6,
-    last: 1, lastLab: 1, hilo: 0, pscale: 'right', border2: 1,
+    last: 1, lastLab: 1, hilo: 0, pscale: 'right', border2: 1, cmode: 'std',
     mtop: 8, mbot: 8, space: 7, roff: 8, sec: 0, tsBorder: 1,
     scroll: 1, zoom: 1, kinetic: 1, pinch: 1
   };
@@ -234,8 +234,26 @@
     dark: {}, midnight: { bg: '#0b1120', bg2: '#0d1830', text: '#c9d1d9', grid: '#8ea3b8', ga: 6 },
     navy: { bg: '#0c0e1b', bg2: '', text: '#b2b5be', up: '#2962ff', dn: '#f7256f', grid: '#4a5578', ga: 10, ccol: '#9598a1', wmcol: '#d1d4dc', line: '#2962ff' },
     paper: { bg: '#fbfaf7', bg2: '', text: '#3a3a36', grid: '#111111', ga: 7, up: '#089981', dn: '#f23645', ccol: '#6b7280', wmcol: '#111111' },
-    light: { bg: '#ffffff', bg2: '', text: '#2a2a28', grid: '#000000', ga: 8, up: '#089981', dn: '#f23645', ccol: '#9598a1', wmcol: '#000000' }
+    light: { bg: '#ffffff', bg2: '', text: '#2a2a28', grid: '#000000', ga: 8, up: '#089981', dn: '#f23645', ccol: '#9598a1', wmcol: '#000000' },
+    /* ten more, each a whole look: background (and its lower shade), text, the two candle colours, grid, crosshair,
+       line. Chosen for long sessions: no pure white on pure black, and the two candle colours stay apart for the
+       common forms of colour blindness wherever the theme allows it. */
+    obsidian: { bg: '#07080a', bg2: '#0e1014', text: '#a9adb6', up: '#26a69a', dn: '#ef5350', grid: '#9aa4b2', ga: 4, ccol: '#7d8590', line: '#26a69a' },
+    aurora: { bg: '#061018', bg2: '#0a1f2b', text: '#b7d1d8', up: '#3df5c5', dn: '#ff5fa2', grid: '#3df5c5', ga: 5, ccol: '#7bdff2', line: '#3df5c5' },
+    cyber: { bg: '#0a0614', bg2: '#170a2b', text: '#c8b6ff', up: '#00f0ff', dn: '#ff2bd6', grid: '#7a5cff', ga: 9, ccol: '#f5ee30', line: '#00f0ff' },
+    ocean: { bg: '#041423', bg2: '#062238', text: '#a9c4d9', up: '#38bdf8', dn: '#fb923c', grid: '#38bdf8', ga: 6, ccol: '#7dd3fc', line: '#38bdf8' },
+    emerald: { bg: '#03110b', bg2: '#062016', text: '#9fd8b7', up: '#22e58b', dn: '#e5484d', grid: '#22e58b', ga: 5, ccol: '#22e58b', line: '#22e58b' },
+    gold: { bg: '#100c05', bg2: '#1b1407', text: '#d8c9a3', up: '#f7c948', dn: '#b45309', grid: '#f7c948', ga: 5, ccol: '#f7c948', line: '#f7c948' },
+    arctic: { bg: '#f4f7fa', bg2: '#e9eef4', text: '#33414f', up: '#0e9f9a', dn: '#d9485f', grid: '#33414f', ga: 7, ccol: '#64748b', wmcol: '#33414f', line: '#2563eb' },
+    crimson: { bg: '#0f0709', bg2: '#1a0a0e', text: '#d6b8bd', up: '#e2e8f0', dn: '#e11d48', grid: '#e11d48', ga: 5, ccol: '#fb7185', line: '#e11d48' },
+    galaxy: { bg: '#0b0720', bg2: '#150d38', text: '#c4b5fd', up: '#a78bfa', dn: '#f472b6', grid: '#a78bfa', ga: 7, ccol: '#c4b5fd', line: '#a78bfa' },
+    retro: { bg: '#000000', bg2: '', text: '#33ff66', up: '#33ff66', dn: '#ff3b30', grid: '#33ff66', ga: 9, ccol: '#ffcc00', line: '#33ff66' },
+    glass: { bg: '#10141c', bg2: '#1b2230', text: '#c3cad6', up: '#7ee0c3', dn: '#f08aa0', grid: '#c3cad6', ga: 5, ccol: '#9fb0c8', line: '#8ab4ff' }
   };
+  var THEME_LIST = [['dark', 'thDark'], ['navy', 'thNavy'], ['midnight', 'thMid'], ['obsidian', 'thObs'], ['aurora', 'thAur'], ['cyber', 'thCyb'], ['ocean', 'thOce'], ['emerald', 'thEme'],
+    ['gold', 'thGold'], ['crimson', 'thCri'], ['galaxy', 'thGal'], ['retro', 'thRet'], ['glass', 'thGla'], ['arctic', 'thArc'], ['paper', 'thPaper'], ['light', 'thLight']];
+  /* how a candle gets its colour: by its own direction, or by a rule read from the bars (see cmBuild) */
+  var CMODES2 = ['std', 'vol', 'rsi', 'trend', 'mom'];
   function hex(v, d) { return /^#[0-9a-fA-F]{6}$/.test(v) ? v : d; }
   function rng(v, lo, hi, d) { v = +v; return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; }
   function saneLook(o) {
@@ -248,6 +266,7 @@
     L.cross = [0, 1, 2].indexOf(o.cross | 0) >= 0 ? o.cross | 0 : 0;
     L.cdash = [0, 1, 2, 3, 4].indexOf(o.cdash | 0) >= 0 ? o.cdash | 0 : 1;
     L.pscale = ['right', 'left', 'both', 'none'].indexOf(o.pscale) >= 0 ? o.pscale : 'right';
+    L.cmode = CMODES2.indexOf(o.cmode) >= 0 ? o.cmode : 'std';
     L.fsize = rng(o.fsize, 9, 20, 11) | 0; L.ga = rng(o.ga, 0, 40, 3.5); L.cw = rng(o.cw, 1, 4, 1) | 0;
     L.wmsize = rng(o.wmsize, 16, 140, 44) | 0; L.wma = rng(o.wma, 0, 60, 6);
     L.lw = rng(o.lw, 1, 6, 2) | 0; L.mtop = rng(o.mtop, 0, 40, 8); L.mbot = rng(o.mbot, 0, 40, 8);
@@ -647,8 +666,40 @@
     if (t === 'lbreak') return I.lbreak(bars, tp.lines || 3);
     return bars;
   };
-  Cell.prototype.point = function (b, prev) {
+  /* ---- the candle colour engine. Besides "green up, red down" a candle can be coloured by a rule read from the bars
+     themselves, so nothing is fetched and nothing is guessed:
+       vol    its own direction, the stronger the more it traded against the average of the 20 bars before it
+       rsi    Wilder's RSI(14): the down colour at 30 and under, the up colour at 70 and over, blended in between
+       trend  the side of the 50-bar EMA the close is on, whatever the candle itself did
+       mom    the 10-bar rate of change against its own typical size over the last 100 bars
+     cmBuild() gives one number per bar from -1 to 1 (0..1 for vol); mix() turns it into a colour between the theme's
+     two candle colours. Applies to candles, Heikin Ashi and bars. */
+  function mix(a, b, f) {
+    var x = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(a), y = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(b); if (!x || !y) return a;
+    f = Math.max(0, Math.min(1, f)); var o = '#';
+    for (var i = 1; i <= 3; i++) { var v = Math.round(parseInt(x[i], 16) * (1 - f) + parseInt(y[i], 16) * f).toString(16); o += v.length < 2 ? '0' + v : v; }
+    return o;
+  }
+  function cmBuild(D, mode) {
+    var n = D.length, out = new Array(n), i;
+    if (mode === 'vol') { var sum = 0; for (i = 0; i < n; i++) { var av = i ? sum / Math.min(i, 20) : 0; out[i] = av > 0 ? Math.max(0, Math.min(1, (D[i].v || 0) / av / 2)) : 0.5; sum += D[i].v || 0; if (i >= 20) sum -= D[i - 20].v || 0; } }
+    else if (mode === 'rsi') { var g = 0, l = 0; for (i = 0; i < n; i++) { if (!i) { out[i] = 0; continue; } var ch = D[i].c - D[i - 1].c, up = ch > 0 ? ch : 0, dn = ch < 0 ? -ch : 0; if (i <= 14) { g += up / 14; l += dn / 14; } else { g = (g * 13 + up) / 14; l = (l * 13 + dn) / 14; } var r = l === 0 ? (g === 0 ? 50 : 100) : 100 - 100 / (1 + g / l); out[i] = i < 14 ? 0 : Math.max(-1, Math.min(1, (r - 50) / 20)); } }
+    else if (mode === 'trend') { var e = n ? D[0].c : 0, k = 2 / 51; for (i = 0; i < n; i++) { e = i ? D[i].c * k + e * (1 - k) : e; out[i] = D[i].c >= e ? 1 : -1; } }
+    else if (mode === 'mom') { var abs = [], s2 = 0; for (i = 0; i < n; i++) { var rc = i >= 10 && D[i - 10].c ? (D[i].c - D[i - 10].c) / D[i - 10].c : 0, a = Math.abs(rc); abs.push(a); s2 += a; if (abs.length > 100) s2 -= abs[abs.length - 101]; var ty = s2 / Math.min(abs.length, 100); out[i] = ty > 0 ? Math.max(-1, Math.min(1, rc / (ty * 2))) : 0; } }
+    return out;
+  }
+  Cell.prototype.cmCol = function (i, b) {
+    var L = st.look, m = L.cmode, v = this._cm && this._cm[i]; if (v == null) return null;
+    if (m === 'vol') { var base = b.c >= b.o ? L.up : L.dn; return mix(L.bg, base, 0.3 + 0.7 * v); }
+    if (m === 'trend') return v > 0 ? L.up : L.dn;
+    var mid = mix(L.bg, L.text, 0.55); return v >= 0 ? mix(mid, L.up, v) : mix(mid, L.dn, -v);
+  };
+  Cell.prototype.point = function (b, prev, i) {
     var t = this.cfg.type, L = st.look, UP = L.up, DN = L.dn;
+    if (i != null && L.cmode !== 'std' && (t === 'candle' || t === 'heikin' || t === 'bars')) {
+      var cc = this.cmCol(i, b);
+      if (cc) { var q = { time: b.t, open: b.o, high: b.h, low: b.l, close: b.c, color: cc }; if (t !== 'bars') { q.color = L.hollow && b.c >= b.o ? 'rgba(0,0,0,0)' : cc; q.borderColor = cc; q.wickColor = cc; } return q; }
+    }
     if (t === 'line' || t === 'linemk' || t === 'step' || t === 'area' || t === 'baseline') return { time: b.t, value: b.c };
     if (t === 'columns') return { time: b.t, value: b.c, color: b.c >= (prev ? prev.c : b.o) ? rgba(UP, 0.75) : rgba(DN, 0.75) };
     if (t === 'highlow') return { time: b.t, open: b.h, high: b.h, low: b.l, close: b.l };
@@ -666,7 +717,8 @@
     var bars = upto != null ? this.bars.slice(0, upto + 1) : this.bars, self = this;
     this.disp = this.toDisp(bars);
     var D = this.disp, pts = new Array(D.length);
-    for (var i = 0; i < D.length; i++) pts[i] = this.point(D[i], i ? D[i - 1] : null);
+    this._cm = st.look.cmode !== 'std' ? cmBuild(D, st.look.cmode) : null;
+    for (var i = 0; i < D.length; i++) pts[i] = this.point(D[i], i ? D[i - 1] : null, i);
     this.main.setData(pts);
     if (this.cfg.type === 'baseline' && D.length) this.main.applyOptions({ baseValue: { type: 'price', price: D[Math.max(0, D.length - 150)].c } });
     this.renderInds(true);
@@ -688,7 +740,8 @@
       else { var po = n > 1 ? D[n - 2] : null, b = bars[n - 1], c = (b.o + b.h + b.l + b.c) / 4, o = po ? (po.o + po.c) / 2 : (b.o + b.c) / 2; D[n - 1] = { t: b.t, o: o, h: Math.max(b.h, o, c), l: Math.min(b.l, o, c), c: c, v: b.v }; }
     } else this.disp = this.bars;
     var L = this.disp.length; if (!L) return;
-    this.main.update(this.point(this.disp[L - 1], L > 1 ? this.disp[L - 2] : null));
+    if (st.look.cmode !== 'std') this._cm = cmBuild(this.disp, st.look.cmode);
+    this.main.update(this.point(this.disp[L - 1], L > 1 ? this.disp[L - 2] : null, L - 1));
     this.renderInds(false, isNew);
     if (isNew) { this.applyPrec(); this.drawer && this.drawer.update(); }
     this.legendLast();
@@ -1426,10 +1479,73 @@
     { n: 'tpl_scalp', inds: [['vwap', {}], ['ema', { len: 9 }], ['st', {}], ['vol', {}]] },
     { n: 'tpl_ek', inds: [['posts', {}], ['sigs', {}], ['live', {}], ['vol', {}]] }
   ];
+  /* ---- ready-made workspaces: a layout, a timeframe per chart, the indicators, a theme and a candle colouring, in one
+     click, on the symbol the visitor is looking at. Only what the workspace really has is used — every indicator id
+     below exists in ind.js, and apply() drops any that does not. The workspace as it was is saved first under "my
+     layouts", so a preset never costs the visitor their own work. [key, layout, timeframes, indicators, theme, colour, type] */
+  var WS_PRESETS = [
+    ['scalp', '2v', ['1m', '5m'], [['vwap'], ['ema', { len: 9 }], ['ema', { len: 21 }], ['st'], ['vol']], 'obsidian', 'vol'],
+    ['day', '2v', ['15m', '1h'], [['vwap'], ['ema', { len: 20 }], ['ema', { len: 50 }], ['rsi'], ['vol']], 'dark', 'std'],
+    ['swing', '2v', ['4h', '1d'], [['ema', { len: 50 }], ['ema', { len: 200 }], ['macd'], ['vol']], 'navy', 'std'],
+    ['position', '2v', ['1d', '1w'], [['sma', { len: 50 }], ['sma', { len: 200 }], ['rsi']], 'midnight', 'trend'],
+    ['smc', '2v', ['15m', '4h'], [['ms'], ['fvg'], ['ob'], ['eqhl']], 'glass', 'std'],
+    ['fib', '1', ['4h'], [['zz'], ['piv'], ['ema', { len: 200 }]], 'gold', 'std'],
+    ['vprofile', '1', ['1h'], [['vpvr'], ['vwap'], ['vol']], 'ocean', 'vol'],
+    ['flow', '2v', ['5m', '15m'], [['cvd'], ['vdelta'], ['fpbar'], ['vwap']], 'cyber', 'vol'],
+    ['liq', '1', ['1h'], [['eqhl'], ['fvg'], ['ob'], ['atr']], 'aurora', 'std'],
+    ['mom', '1', ['4h'], [['rsi'], ['macd'], ['stoch'], ['adx']], 'galaxy', 'mom'],
+    ['vola', '1', ['4h'], [['bb'], ['kc'], ['sqz'], ['atr']], 'crimson', 'std'],
+    ['ichi', '1', ['1d'], [['ichi'], ['vol']], 'emerald', 'std'],
+    ['cycle', '1', ['1w'], [['ksc'], ['kmacro'], ['sma', { len: 200 }]], 'gold', 'trend'],
+    ['mtf', '4', ['15m', '1h', '4h', '1d'], [['ema', { len: 50 }], ['ema', { len: 200 }], ['rsi']], 'dark', 'std'],
+    ['mtf6', '6', ['5m', '15m', '1h', '4h', '1d', '1w'], [['ema', { len: 50 }], ['vol']], 'obsidian', 'std'],
+    ['candles', '1', ['4h'], [['cp_all'], ['ema', { len: 50 }], ['vol']], 'paper', 'std'],
+    ['heikin', '1', ['4h'], [['st'], ['ema', { len: 50 }], ['rsi']], 'navy', 'std', 'heikin'],
+    ['risk', '1', ['1d'], [['atr'], ['atrts'], ['ce'], ['hv']], 'arctic', 'std'],
+    ['channel', '1', ['1d'], [['posts'], ['sigs'], ['live'], ['vol']], 'dark', 'std'],
+    ['retro', '1', ['1d'], [['sma', { len: 20 }], ['vol']], 'retro', 'std', 'bars'],
+    ['clean', '1', ['1d'], [], 'light', 'std']
+  ];
+  var lastPresetJ = '';
+  function applyPreset(W) {
+    var a = active(), sym = a ? a.cfg.sym : 'BTC', Ls = S.get('ek_pro_layouts', []); if (!Array.isArray(Ls)) Ls = [];
+    /* the visitor's own workspace is kept once: trying one preset after another does not pile up copies of presets,
+       and at most three such backups are kept (the oldest goes) */
+    var nowJ = JSON.stringify(st);
+    if (nowJ !== lastPresetJ) {
+      var bk = Ls.filter(function (x) { return x && x.bk; }); while (bk.length >= 3) { var old = bk.pop(); Ls.splice(Ls.indexOf(old), 1); }
+      Ls.unshift({ n: (T('wsBackup') + ' · ' + fmtD(Math.floor(Date.now() / 1000), 'date')).slice(0, 40), at: Date.now(), bk: 1, s: JSON.parse(nowJ) }); S.set('ek_pro_layouts', Ls.slice(0, 30));
+    }
+    var ns = JSON.parse(JSON.stringify(st));
+    ns.layout = W[1]; ns.active = 0; ns.name = ''; ns.sync = Object.assign({}, ns.sync, { tf: false, sym: true });
+    ns.charts = W[2].map(function (tf) {
+      return { sym: sym, tf: tf, type: W[6] || 'candle', scale: { mode: 0, auto: 1 },
+        inds: W[3].filter(function (z) { return I.DEF[z[0]] || LAYERS[z[0]]; }).map(function (z) { return { id: z[0], p: I.DEF[z[0]] ? I.params(z[0], z[1] || {}) : {}, u: P.uid() }; }) };
+    });
+    ns.look = Object.assign({}, LOOK0, THEMES[W[4]] || {}, { theme: W[4], cmode: W[5] || 'std' });
+    st = sane(ns); buildGrid(); applyLook(true); paintTop(); save(); lastPresetJ = JSON.stringify(st); toast(T('wsApplied', { n: T('ws_' + W[0]) }));
+  }
+  function presetDialog() {
+    var box = h('<div class="pm-wsd"><p class="pm-enote"></p><div class="pm-wsg"></div></div>'), g = $('.pm-wsg', box); $('p', box).textContent = T('wsNote');
+    WS_PRESETS.forEach(function (W) {
+      var th = Object.assign({}, LOOK0, THEMES[W[4]] || {}), n = LAYOUTS[W[1]] || 1;
+      var c = h('<button type="button" class="pm-wsc"><span class="pm-wsp"></span><b></b><small></small><em></em></button>'), pv = $('.pm-wsp', c);
+      pv.style.background = th.bg2 ? 'linear-gradient(' + th.bg + ',' + th.bg2 + ')' : th.bg; pv.style.gridTemplateColumns = 'repeat(' + (n >= 6 ? 3 : n >= 2 ? 2 : 1) + ',1fr)';
+      for (var k = 0; k < n; k++) {                         /* a few candles in the theme's own colours, one small pane per chart of the layout */
+        var pane = h('<i></i>'), hs = [38, 52, 44, 66, 58, 80, 70, 62, 86];
+        hs.slice(0, n > 2 ? 5 : 9).forEach(function (hh, j) { var up = (j * 7 + k * 3) % 3 !== 0, bar = h('<u></u>'); bar.style.height = hh + '%'; bar.style.background = up ? th.up : th.dn; pane.appendChild(bar); });
+        pv.appendChild(pane);
+      }
+      $('b', c).textContent = T('ws_' + W[0]); $('small', c).textContent = W[2].join(' · ') + (W[6] ? ' · ' + typeLabel(W[6]) : '');
+      $('em', c).textContent = W[3].map(function (z) { return LAYERS[z[0]] ? T('ly_' + z[0]) : T('in_' + z[0]); }).filter(function (x, i2, a2) { return a2.indexOf(x) === i2; }).join(' · ') || '—';
+      c.onclick = function () { closeModal(); applyPreset(W); }; g.appendChild(c);
+    });
+    modal(T('wsTitle'), box, { wide: true });
+  }
   function tplMenu(anchor) {
     var a = active(), mine = S.get('ek_pro_tpl', []); if (!Array.isArray(mine)) mine = [];
     function apply(list) { a.cfg.inds = list.filter(function (z) { return I.DEF[z[0]] || LAYERS[z[0]]; }).map(function (z) { return { id: z[0], p: I.DEF[z[0]] ? I.params(z[0], z[1]) : {}, u: P.uid() }; }); a.indsChanged(); }
-    var items = [{ head: T('tplBuilt') }];
+    var items = [{ label: T('wsTitle') + '…', icon: 'tpl', act: presetDialog }, { sep: true }, { head: T('tplBuilt') }];
     TPL_BUILTIN.forEach(function (t) { items.push({ label: T(t.n), act: function () { apply(t.inds); } }); });
     items.push({ head: T('tplMine') });
     if (!mine.length) items.push({ label: T('tplNone'), disabled: true });
@@ -1685,6 +1801,7 @@
     wcw.appendChild(wT); wcw.appendChild(wI); P1.appendChild(row('csWickC', wcw, T('csOneColour')));
     P1.appendChild(row('csLineC', colour('line', 1))); P1.appendChild(row('csLineW', slider('lw', 1, 6, 1, 1)));
     P1.appendChild(row('csLast', toggle('last'))); P1.appendChild(row('csLastLab', toggle('lastLab')));
+    P1.insertBefore(row('cmMode', pick('cmode', [['std', 'cmStd'], ['vol', 'cmVol'], ['rsi', 'cmRsi'], ['trend', 'cmTrend'], ['mom', 'cmMom']], 1), T('cmModeH')), P1.firstChild);
     panes.sym = P1;
     /* --- scales */
     var P2 = h('<div></div>'), a = active();
@@ -1700,7 +1817,7 @@
     panes.scale = P2;
     /* --- appearance */
     var P3 = h('<div></div>');
-    P3.appendChild(row('csTheme', pick('theme', [['dark', 'thDark'], ['navy', 'thNavy'], ['midnight', 'thMid'], ['paper', 'thPaper'], ['light', 'thLight']], 1)));
+    P3.appendChild(row('csTheme', pick('theme', THEME_LIST, 1)));
     P3.appendChild(row('csBg', colour('bg')));
     var g2 = h('<span class="pm-cw"></span>'), g2i = h('<input type="color" class="pm-in">'), g2t = h('<input type="checkbox">');
     g2t.checked = !!L.bg2; g2i.value = L.bg2 || L.bg; g2i.disabled = !L.bg2;
@@ -2231,8 +2348,8 @@
     TGROUPS.forEach(function (G) { (G.rows || []).forEach(function (r) { r.forEach(function (t) { rows.push({ n: T('t_' + t), g: T('favTools'), i: ic(t), act: function () { setTool(t); } }); }); }); });
     [['csTitle', 'gear', function () { chartSettings('sym'); }], ['indicators', 'fx', function () { indDialog(); }], ['symbol', 'layers', function () { symbolSearch(''); }],
       ['ctxFit', 'fit', function () { var a = active(); if (a) a.chart.timeScale().fitContent(); }], ['fullscreen', 'expand', function () { fullscreen(); }],
-      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
-    [['dark', 'thDark'], ['navy', 'thNavy'], ['midnight', 'thMid'], ['paper', 'thPaper'], ['light', 'thLight']].forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
+      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
+    THEME_LIST.forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
     st.fav.forEach(function (tf) { rows.push({ n: tf, g: T('palTf'), i: ic('cal'), act: function () { applyTF(tf); } }); });
     var f = h('<div class="pm-pal"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-pall" role="listbox"></div></div>'), inp = $('input', f), list = $('.pm-pall', f), sel = 0, shown = [];
     inp.placeholder = T('palHint');
@@ -2246,7 +2363,7 @@
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!shown.length) return; sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length; paint(); var o = $('.pm-palr.on', list); if (o && o.scrollIntoView) o.scrollIntoView({ block: 'nearest' }); }
       else if (e.key === 'Enter') { e.preventDefault(); if (shown[sel]) { var r = shown[sel]; closeModal(); r.act(); } }
     };
-    paint(); modal(T('palTitle'), f); setTimeout(function () { inp.focus(); }, 30);
+    paint(); modal(T('palTitle'), f, { nofocus: true }); setTimeout(function () { inp.focus(); }, 30);
   }
 
   /* the group's list, TradingView style: headings, an icon and a name per tool */

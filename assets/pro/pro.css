@@ -605,7 +605,7 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-etabs button:hover{color:#e5e7eb}.pm-etabs button.on{color:#5b8cff;border-top-color:#2962ff}
 .pm-enote{color:var(--mute);font-size:11.5px;line-height:1.6;padding:8px 10px}
 /* ---- command palette */
-.pm-pal{display:flex;flex-direction:column;gap:8px;min-width:min(440px,80vw)}
+.pm-pal{display:flex;flex-direction:column;gap:8px;min-width:0}
 .pm-pall{display:flex;flex-direction:column;max-height:46vh}
 .pm-palr{display:flex;align-items:center;gap:10px;border:0;background:none;color:#d6d6d0;font:inherit;font-size:13.5px;padding:8px 10px;border-radius:8px;cursor:pointer;text-align:start}
 .pm-palr span{flex:1 1 auto}.pm-palr small{color:var(--mute);font-size:11px}
@@ -614,3 +614,13 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 #pro.pm-light .pm-etabs{background:#f1f1ee}#pro.pm-light .pm-emob,#pro.pm-light .pm-palr{color:#20201e}
 #pro.pm-light .pm-star:hover{background:#e6e6e3;color:#20201e}
 @media (prefers-reduced-motion:reduce){.pm-star.pop{animation:none}}
+/* ---- ready-made workspaces */
+.pm-wsd{min-width:0}.pm-mbox.wide:has(.pm-wsd){width:min(860px,100%)}
+.pm-wsg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.pm-wsc{display:flex;flex-direction:column;gap:3px;text-align:start;background:#17171a;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;color:#d6d6d0;font:inherit;transition:transform .12s,border-color .12s}
+.pm-wsc:hover{border-color:var(--acc);transform:translateY(-2px)}
+.pm-wsp{display:grid;gap:3px;height:74px;border-radius:8px;padding:5px;border:1px solid rgba(128,128,128,.25);margin-bottom:4px;overflow:hidden}
+.pm-wsp i{display:flex;align-items:flex-end;gap:2px;min-height:0}.pm-wsp u{flex:1 1 0;border-radius:1px;min-width:2px;text-decoration:none}
+.pm-wsc b{font-size:13px}.pm-wsc small{color:var(--acc);font-size:11px;direction:ltr;text-align:start}.pm-wsc em{color:var(--mute);font-size:10.5px;font-style:normal;line-height:1.45}
+#pro.pm-light .pm-wsc{background:#f6f6f3;color:#20201e}
+@media (prefers-reduced-motion:reduce){.pm-wsc{transition:none}.pm-wsc:hover{transform:none}}
