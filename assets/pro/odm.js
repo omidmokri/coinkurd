@@ -280,15 +280,29 @@
     var l = P.t2l(D, +Z.st.anchor, sec); if (l == null || !isFinite(l)) return null;
     var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x;
   }
+  /* the box's right edge: a candle of its own (closed, as on TradingView), or the right edge of the chart when it is extended */
+  function zoneEnd(Z, ts, W) {
+    if (Z.st.zExt) return W;
+    var c = Z.cell, D = c.disp && c.disp.length ? c.disp : c.bars, sec = c.tfSec ? c.tfSec() : 0; if (!D || !D.length || !sec || !P.t2l || !P.l2t) return W;
+    var la = P.t2l(D, +Z.st.anchor, sec); if (la == null || !isFinite(la)) return W;
+    if (!(+Z.st.zEnd > +Z.st.anchor)) {
+      var vr = null; try { vr = ts.getVisibleLogicalRange(); } catch (e) { }
+      var span = vr ? Math.max(12, Math.round((vr.to - vr.from) * 0.2)) : 20; Z.st.zEnd = P.l2t(D, Math.round(la) + span, sec);
+    }
+    var l = P.t2l(D, +Z.st.zEnd, sec); if (l == null || !isFinite(l)) return W;
+    var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x == null ? W : x;
+  }
   var LRI = '⁦', PDI = '⁩';
   function zonePaint(ctx, W, H, cell) {
     var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null;
+    if (Z.main !== cell.main) { if (!Z.resync) Z.resync = setTimeout(function () { Z.resync = null; if (LN === Z) syncLines(Z); }, 0); return; }   /* the chart type changed: the lines go on the new series first */
     if (Z.noZone || !Z.plan || Z.plan.err) { if (Z.lay) { Z.lay.innerHTML = ''; Z.layHtml = ''; } if (Z.noZone) return; }
     var r = Z.plan; if (!r || r.err || !r.exits) return;
     var m = cell.main, ts = cell.chart.timeScale(), yv = function (p) { var y = null; try { y = m.priceToCoordinate(p); } catch (e) { } return y; };
     var ya = yv(r.avg), ys = yv(r.stop), ex = r.exits, yt = ex.length ? yv(ex[ex.length - 1].p) : null; if (ya == null || ys == null) return;
     var xa = zoneX(Z, ts); if (xa == null) xa = W * 0.7;
-    var x0 = Math.max(0, Math.min(W - 130, xa)), x1 = W, w = x1 - x0, rtl = A.RTL(), dir = r.long ? 1 : -1;
+    var xe = zoneEnd(Z, ts, W), ext = !!Z.st.zExt;
+    var x0 = Math.max(0, Math.min(W - 24, xa)), x1 = ext ? W : Math.max(x0 + 24, Math.min(W, xe)), w = x1 - x0, rtl = A.RTL(), dir = r.long ? 1 : -1;
     var light = !!(cell.el && cell.el.closest && cell.el.closest('.pm-light'));
     var G = light ? 'rgba(16,150,100,' : 'rgba(52,211,153,', Rd = light ? 'rgba(220,60,50,' : 'rgba(255,90,77,';
     function band(y1, y2, c) { var t = Math.min(y1, y2), b = Math.max(y1, y2); ctx.fillStyle = c + '0.14)'; ctx.fillRect(x0, t, w, b - t); ctx.fillStyle = c + '0.55)'; ctx.fillRect(x0, t, 1.5, b - t); }
@@ -300,6 +314,10 @@
     ex.forEach(function (x) { var y = yv(x.p); if (y == null) return; ctx.strokeStyle = G + '0.8)'; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); });
     ctx.setLineDash([]); ctx.strokeStyle = Rd + '0.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0, ys); ctx.lineTo(x1, ys); ctx.stroke();
     ctx.strokeStyle = light ? 'rgba(40,40,40,.85)' : 'rgba(236,236,230,.85)'; ctx.beginPath(); ctx.moveTo(x0, ya); ctx.lineTo(x1, ya); ctx.stroke();
+    if (Z.sel) {   /* selected: a thin frame round the whole position */
+      var ft = Math.min(ya, ys, yt != null ? yt : ya), fb = Math.max(ya, ys, yt != null ? yt : ya);
+      ctx.setLineDash([3, 3]); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(247,147,26,.9)'; ctx.strokeRect(x0 + 0.5, ft + 0.5, Math.max(1, w - 1), Math.max(1, fb - ft - 1)); ctx.setLineDash([]);
+    }
     ctx.restore();
     /* the labels, kept apart: the entry and the stop always, then the last target, then the others. They are page elements
        over the chart (not paint under the candles), so they stay readable and keep their words in the reading order */
@@ -325,11 +343,15 @@
     var s0 = Math.max(Math.min(ya, ys), 0), s1 = Math.min(Math.max(ya, ys), H); if (s1 - s0 >= 46) mid(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, (s0 + s1) / 2, 's');
     ctx.restore();
     /* the handle that moves the start candle */
-    if (ya >= 0 && ya <= H) html += '<span class="pm-odzh' + (Z.drag && Z.drag.kind === 'anc' ? ' on' : '') + '" style="left:' + Math.round(x0) + 'px;top:' + Math.round(ya) + 'px"></span>';
+    if (ya >= 0 && ya <= H) {
+      html += '<span class="pm-odzh' + (Z.sel ? ' sel' : '') + (Z.drag && Z.drag.kind === 'anc' ? ' on' : '') + '" style="left:' + Math.round(x0) + 'px;top:' + Math.round(ya) + 'px"></span>';
+      /* and the one that moves the right edge (none while the box runs to the edge of the chart) */
+      if (!ext && x1 < W - 2) html += '<span class="pm-odzh pm-odze' + (Z.sel ? ' sel' : '') + (Z.drag && Z.drag.kind === 'end' ? ' on' : '') + '" style="left:' + Math.round(x1) + 'px;top:' + Math.round(ya) + 'px"></span>';
+    }
     var lay = Z.lay; if (!lay || !lay.isConnected) { lay = Z.lay = document.createElement('div'); lay.className = 'pm-odz'; lay.setAttribute('aria-hidden', 'true'); cell.box.appendChild(lay); }
     if (Z.layHtml !== html) { lay.innerHTML = html; Z.layHtml = html; }
     var all = [ya, ys].concat(yt != null ? [yt] : []);
-    Z.box = { x0: x0, x1: x1, top: Math.max(0, Math.min.apply(null, all)), bot: Math.min(H, Math.max.apply(null, all)), ya: ya, long: r.long, H: H };
+    Z.box = { x0: x0, x1: x1, ext: ext, end: !ext && x1 < W - 2, top: Math.max(0, Math.min.apply(null, all)), bot: Math.min(H, Math.max.apply(null, all)), ya: ya, long: r.long, H: H };
   }
   (P.ovHooks = P.ovHooks || []).push(zonePaint);
   function repaint(Z) { try { if (Z.cell.ovl) Z.cell.ovl.update(); } catch (e) { } }
@@ -338,10 +360,13 @@
     Object.keys(Z.map).forEach(function (k) { try { c.main.removePriceLine(Z.map[k]); } catch (e) { } });
     Z.off(); if (Z.hud) Z.hud.remove(); unlock(Z); if (c.el) c.el.classList.remove('pm-odpick');
   }
-  function lock(Z) { if (Z.locked) return; try { var o = Z.cell.chart.options(); Z.locked = { s: o.handleScroll, z: o.handleScale }; Z.cell.chart.applyOptions({ handleScroll: false, handleScale: false }); } catch (e) { } }
-  function unlock(Z) { if (!Z.locked) return; try { Z.cell.chart.applyOptions({ handleScroll: Z.locked.s, handleScale: Z.locked.z }); } catch (e) { } Z.locked = null; }
+  /* a line held: the chart must not pan under it. Let go: the chart gets back its own settings from the page (not a copy taken when
+     the line was grabbed, which could itself be a locked chart and would then stay locked) */
+  function lock(Z) { if (Z.locked) return; Z.locked = 1; try { Z.cell.chart.applyOptions({ handleScroll: false, handleScale: false }); } catch (e) { } }
+  function unlock(Z) { if (!Z.locked) return; Z.locked = null; if (P.chartFree) P.chartFree(Z.cell.chart); else try { Z.cell.chart.applyOptions({ handleScroll: true, handleScale: true }); } catch (e) { } }
   /* draw (or move) every line of the plan; a line whose level is gone is removed */
   function syncLines(Z) {
+    if (Z.main !== Z.cell.main) { Z.map = {}; Z.main = Z.cell.main; }   /* a new series (another chart type): its lines are drawn again */
     var L = levels(Z.st, Z.plan), seen = {};
     L.forEach(function (l) {
       seen[l.k] = 1; var o = { price: l.p, color: l.c, lineWidth: l.w || (Z.drag && Z.drag.k === l.k ? 3 : 1), lineStyle: l.st, axisLabelVisible: true, title: l.t + (l.drag ? ' ↕' : '') };
@@ -376,12 +401,15 @@
       part(T('rcQty'), f(r.qty, 6));
       msg.className = 'pm-odhm';
       if (Z.drag) { var dl = Z.L.filter(function (l) { return l.k === Z.drag.k; })[0]; msg.textContent = dl ? T('odDragAt', { l: dl.t, p: px(dl.p), d: f((dl.p / Z.last - 1) * 100, 2) }) : ''; }
-      else msg.textContent = Z.pick ? T('odPick_' + Z.pick) : T('odDragHint');
+      else msg.textContent = Z.pick ? T('odPick_' + Z.pick) : T(Z.sel || !Z.touch ? 'odDragHint' : 'odSelHint');
     }
     $$('[data-pk]', b).forEach(function (x) { x.classList.toggle('on', Z.pick === x.getAttribute('data-pk')); x.setAttribute('aria-pressed', String(Z.pick === x.getAttribute('data-pk'))); });
     $('[data-pk="x"]', b).disabled = Z.st.exits.length >= 8; $('[data-pk="e"]', b).disabled = Z.st.entries.length >= 10;
     $('[data-a="undo"]', b).disabled = !Z.hist.length;
+    var eb = $('[data-a="ext"]', b); if (eb) { var on = !!Z.st.zExt; eb.classList.toggle('on', on); eb.setAttribute('aria-pressed', String(on)); eb.title = T(on ? 'odExtOff' : 'odExt'); eb.setAttribute('aria-label', eb.title); }
   }
+  /* the box to the right edge of the chart, or back to its own right edge */
+  function toggleExt(Z) { remember(Z); Z.st.zExt = !Z.st.zExt; saveSt(Z.st); hud(Z); repaint(Z); A.toast(T(Z.st.zExt ? 'odExtOn' : 'odExtClosed')); }
   function saveSt(st) { try { S.set(KEY, st); } catch (e) { } }
   /* undo: the plan as it was before each drag or tap on the chart */
   function remember(Z, snap) { Z.hist.push(snap || JSON.stringify(Z.st)); if (Z.hist.length > 40) Z.hist.shift(); }
@@ -421,14 +449,15 @@
   function showLines(cell, r, st, atr) {
     hideLines(); if (!cell || !cell.main || !r || r.err) return 0;
     st = st || S.get(KEY, null); if (!st || !st.entries) return 0;
-    var B = cell.bars || [], Z = { cell: cell, sym: cell.cfg.sym, st: st, atr: atr, plan: r, map: {}, L: [], last: B.length ? B[B.length - 1].c : r.avg, drag: null, pick: null, hist: [] };
+    var B = cell.bars || [], Z = { cell: cell, sym: cell.cfg.sym, st: st, atr: atr, plan: r, map: {}, L: [], last: B.length ? B[B.length - 1].c : r.avg, drag: null, pick: null, hist: [], sel: false, touch: !!(window.matchMedia && matchMedia('(pointer: coarse)').matches) };
     /* the panel: the plan's figures, and three buttons that put a level where you tap next */
     var hb = h('<div class="pm-odhud" role="group"><div class="pm-odhs pm-num" dir="ltr"></div><div class="pm-odhm"></div><div class="pm-odhb">' +
       '<button type="button" class="pm-btn sm" data-pk="e"></button><button type="button" class="pm-btn sm" data-pk="s"></button><button type="button" class="pm-btn sm" data-pk="x"></button>' +
-      '<button type="button" class="pm-ib" data-a="undo"></button><button type="button" class="pm-btn sm pri" data-a="open"></button><button type="button" class="pm-ib" data-a="hide"></button></div></div>');
+      '<button type="button" class="pm-ib" data-a="ext"></button><button type="button" class="pm-ib" data-a="undo"></button><button type="button" class="pm-btn sm pri" data-a="open"></button><button type="button" class="pm-ib pm-odrm" data-a="hide"></button></div></div>');
     hb.dir = A.RTL() ? 'rtl' : 'ltr'; hb.setAttribute('aria-label', T('odTitle'));
     $('[data-pk="e"]', hb).textContent = '+ ' + T('odHudE'); $('[data-pk="s"]', hb).textContent = T('odHudS'); $('[data-pk="x"]', hb).textContent = '+ ' + T('odHudX');
-    $('[data-a="open"]', hb).textContent = T('odHudOpen'); var xb = $('[data-a="hide"]', hb); xb.innerHTML = A.ic('x'); xb.setAttribute('aria-label', T('odHide')); xb.title = T('odHide');
+    $('[data-a="open"]', hb).textContent = T('odHudOpen'); var xb = $('[data-a="hide"]', hb); xb.innerHTML = A.ic('trash'); xb.setAttribute('aria-label', T('odRemove')); xb.title = T('odRemove');
+    var eb = $('[data-a="ext"]', hb); eb.innerHTML = A.ic('extr') || '⇥'; eb.onclick = function (e) { e.stopPropagation(); toggleExt(Z); };
     $$('[data-pk]', hb).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); var k = b.getAttribute('data-pk'); Z.pick = Z.pick === k ? null : k; cell.el.classList.toggle('pm-odpick', !!Z.pick); hud(Z); }; });
     var ub = $('[data-a="undo"]', hb); ub.innerHTML = A.ic('undo') || '↶'; ub.setAttribute('aria-label', T('odHudUndo')); ub.title = T('odHudUndo');
     ub.onclick = function (e) { e.stopPropagation(); undo(Z); };
@@ -440,12 +469,19 @@
     var box = cell.box;
     function loc(e) { var t = e.touches && e.touches[0] || e.changedTouches && e.changedTouches[0] || e, rc = box.getBoundingClientRect(); return { x: t.clientX - rc.left, y: t.clientY - rc.top, w: rc.width, h: rc.height }; }
     function near(q, touch) {
-      var best = null, bd = touch ? 16 : 7;
+      var best = null, bd = touch ? 12 : 5;
       Z.L.forEach(function (l) { if (!l.drag) return; var y = null; try { y = cell.main.priceToCoordinate(l.p); } catch (e) { } if (y == null) return; var d = Math.abs(y - q.y); if (d <= bd) { bd = d; best = l; } });
       return best;
     }
     function eat(e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); }
-    function onHandle(q, touch) { var b = Z.box, d = touch ? 18 : 9; return !!b && Math.abs(q.x - b.x0) <= d && Math.abs(q.y - b.ya) <= d; }
+    function onHandle(q, touch) {
+      var b = Z.box, d = touch ? 18 : 9; if (!b || Math.abs(q.y - b.ya) > d) return null;
+      if (b.end && Math.abs(q.x - b.x1) <= d) return 'end';
+      return Math.abs(q.x - b.x0) <= d ? 'anc' : null;
+    }
+    /* a tap inside the box or on one of its lines selects the position; anywhere else lets it go. Nothing is ever removed by a tap */
+    function inside(q, touch) { var b = Z.box, m = 4; return !!(b && q.x >= b.x0 - m && q.x <= b.x1 + m && q.y >= b.top - m && q.y <= b.bot + m) || !!onHandle(q, touch) || !!near(q, touch); }
+    function select(on) { on = !!on; if (Z.sel === on) return; Z.sel = on; cell.el.classList.toggle('pm-odsel', on); if (on && cell.drawer) try { cell.drawer.select(null); } catch (e) { } hud(Z); repaint(Z); }
     var downEv = function (e) {
       if (!LN || LN !== Z) return;
       /* the panel's own buttons stay buttons; anywhere else on it, a line just under it can still be grabbed */
@@ -454,9 +490,14 @@
       if (e.button != null && e.button !== 0) return;
       var q = loc(e); if (q.x < 0 || q.y < 0 || q.x > q.w || q.y > q.h) return;
       if (Z.pick) { var p = priceAt(Z, q.y); if (p) { eat(e); pickAt(Z, p); } return; }
-      if (onHandle(q, e.pointerType && e.pointerType !== 'mouse')) { eat(e); lock(Z); Z.drag = { k: 'anc', kind: 'anc', x0: q.x, moved: false, id: e.pointerId, snap: JSON.stringify(Z.st) }; cell.el.classList.add('pm-oddrag'); repaint(Z); return; }
-      var l = near(q, e.pointerType && e.pointerType !== 'mouse'); if (!l) return;
-      eat(e); lock(Z); Z.drag = { k: l.k, kind: l.drag, i: l.i, y0: q.y, moved: false, id: e.pointerId, snap: JSON.stringify(Z.st) };
+      var touch = !!(e.pointerType && e.pointerType !== 'mouse'); if (touch !== !!Z.touch) { Z.touch = touch; hud(Z); }
+      /* with a finger the position is tapped first, so a swipe anywhere moves the chart; with a mouse a line or a circle is grabbed
+         straight away, and everywhere else the chart pans and zooms as usual */
+      var can = !touch || Z.sel, hd = can ? onHandle(q, touch) : null;
+      if (hd) { eat(e); lock(Z); select(true); Z.drag = { k: hd, kind: hd, x0: q.x, moved: false, touch: touch, id: e.pointerId, snap: JSON.stringify(Z.st) }; cell.el.classList.add('pm-oddrag'); repaint(Z); return; }
+      var l = can ? near(q, touch) : null;
+      if (!l) { if (!(e.target.closest && e.target.closest('.pm-odhud'))) Z.tap = { x: q.x, y: q.y, id: e.pointerId, t: Date.now(), touch: touch }; return; }
+      eat(e); lock(Z); select(true); Z.drag = { k: l.k, kind: l.drag, i: l.i, y0: q.y, moved: false, touch: touch, id: e.pointerId, snap: JSON.stringify(Z.st) };
       cell.el.classList.add('pm-oddrag'); syncLines(Z);
     };
     var moveEv = function (e) {
@@ -467,50 +508,90 @@
         var l = q.x >= 0 && q.y >= 0 && q.x <= q.w && q.y <= q.h ? near(q, false) : null;
         box.style.cursor = Z.pick ? 'crosshair' : onHandle(q, false) ? 'ew-resize' : l ? 'ns-resize' : ''; return;
       }
-      if (Z.drag.kind === 'anc') {
-        eat(e); if (Math.abs(q.x - Z.drag.x0) > 2) Z.drag.moved = true;
-        var D = cell.disp && cell.disp.length ? cell.disp : cell.bars, lg = null; try { lg = cell.chart.timeScale().coordinateToLogical(Math.max(0, q.x)); } catch (e3) { }
-        if (lg != null && D.length && P.l2t) { lg = Math.max(0, Math.min(D.length - 1, Math.round(lg))); Z.st.anchor = D[lg].t; }
+      var slop = Z.drag.touch ? 6 : 3;
+      if (Z.drag.kind === 'anc' || Z.drag.kind === 'end') {
+        eat(e); if (!Z.drag.moved && Math.abs(q.x - Z.drag.x0) <= slop) return; Z.drag.moved = true;
+        var D = cell.disp && cell.disp.length ? cell.disp : cell.bars, sec = cell.tfSec ? cell.tfSec() : 0, lg = null; try { lg = cell.chart.timeScale().coordinateToLogical(Math.max(0, q.x)); } catch (e3) { }
+        if (lg != null && D.length && P.l2t && P.t2l && sec) {
+          lg = Math.round(lg);
+          var lA = Math.round(P.t2l(D, +Z.st.anchor, sec)), lE = +Z.st.zEnd > 0 ? Math.round(P.t2l(D, +Z.st.zEnd, sec)) : null;
+          /* the round handle on the entry line moves the whole box to another candle, keeping its width; the right one resizes it */
+          if (Z.drag.kind === 'anc') { lg = Math.max(0, Math.min(D.length - 1, lg)); Z.st.anchor = D[lg].t; if (lE != null) Z.st.zEnd = P.l2t(D, lE + (lg - lA), sec); }
+          else { lg = Math.max(lA + 1, lg); Z.st.zEnd = P.l2t(D, lg, sec); }
+        }
         repaint(Z); return;
       }
-      eat(e); var p = priceAt(Z, q.y); if (!p) return;
-      if (Math.abs(q.y - Z.drag.y0) > 2) Z.drag.moved = true;
+      eat(e); if (!Z.drag.moved && Math.abs(q.y - Z.drag.y0) <= slop) return;   /* a click on a line leaves it where it is */
+      var p = priceAt(Z, q.y); if (!p) return;
+      Z.drag.moved = true;
       setLevel(Z, Z.drag.kind, Z.drag.i, p); recalc(Z);
       /* the dragged line follows the pointer even while the plan refuses the level (the panel says why) */
       if (Z.plan.err) { var m = Z.map[Z.drag.k]; if (m) try { m.applyOptions({ price: p }); } catch (e2) { } Z.L.forEach(function (x) { if (x.k === Z.drag.k) x.p = p; }); hud(Z); }
       else syncLines(Z);
     };
     var upEv = function (e) {
-      if (!LN || LN !== Z || !Z.drag) return;
+      if (!LN || LN !== Z) return;
+      if (!Z.drag) {
+        var tp = Z.tap; Z.tap = null;
+        if (tp && e.type === 'pointerup' && (tp.id == null || e.pointerId == null || tp.id === e.pointerId)) {
+          var q = loc(e); if (Math.abs(q.x - tp.x) <= 6 && Math.abs(q.y - tp.y) <= 6 && Date.now() - tp.t < 700) select(inside(q, tp.touch));
+        }
+        if (Z.locked) unlock(Z);
+        return;
+      }
       eat(e); var moved = Z.drag.moved, snap = Z.drag.snap; Z.drag = null; unlock(Z); cell.el.classList.remove('pm-oddrag'); box.style.cursor = '';
+      if (moved && Z.plan && Z.plan.err) {
+        /* a level the plan can't take: it goes back where it was, and the reason is said once */
+        var why = T('odE_' + Z.plan.err, { n: Z.plan.at || '' }); restore(Z, snap); A.toast(T('odRevert') + ' ' + why); return;
+      }
       if (moved) { remember(Z, snap); saveSt(Z.st); }
       syncLines(Z);
     };
+    var blurEv = function () { if (!LN || LN !== Z) return; Z.tap = null; if (Z.drag) { var sn = Z.drag.snap; Z.drag = null; cell.el.classList.remove('pm-oddrag'); box.style.cursor = ''; restore(Z, sn); } unlock(Z); };
     var keyEv = function (e) {
-      if (e.key !== 'Escape' || !LN || LN !== Z) return;
-      /* Escape while a line is held puts it back where it was; Escape while picking stops picking */
+      if (!LN || LN !== Z) return;
+      var tg = e.target, typing = tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName || ''));
+      /* Delete with the position selected removes it, with Undo, like a drawing; nothing else removes it but its own buttons */
+      if ((e.key === 'Delete' || e.key === 'Backspace') && Z.sel && !Z.drag && !typing) { e.stopPropagation(); e.preventDefault(); clearOdm(cell, true); return; }
+      if (e.key !== 'Escape') return;
+      /* Escape while a line is held puts it back where it was; Escape while picking stops picking; otherwise it lets the position go */
       if (Z.drag) { var sn = Z.drag.snap; Z.drag = null; unlock(Z); cell.el.classList.remove('pm-oddrag'); box.style.cursor = ''; restore(Z, sn); e.stopPropagation(); e.preventDefault(); }
       else if (Z.pick) { Z.pick = null; cell.el.classList.remove('pm-odpick'); hud(Z); e.stopPropagation(); }
+      else if (Z.sel) { select(false); e.stopPropagation(); }
     };
     box.addEventListener('pointerdown', downEv, true); hb.addEventListener('pointerdown', downEv, true); window.addEventListener('pointermove', moveEv, true);
-    window.addEventListener('pointerup', upEv, true); window.addEventListener('pointercancel', upEv, true); document.addEventListener('keydown', keyEv, true);
+    window.addEventListener('pointerup', upEv, true); window.addEventListener('pointercancel', upEv, true); document.addEventListener('keydown', keyEv, true); window.addEventListener('blur', blurEv);
     /* lightweight-charts also listens to mouse and touch events: while a line is held they must not pan the chart */
     var swallow = function (e) { if (Z.drag) eat(e); };
     ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.addEventListener(n, swallow, { capture: true, passive: false }); });
     Z.off = function () {
       box.removeEventListener('pointerdown', downEv, true); hb.removeEventListener('pointerdown', downEv, true); window.removeEventListener('pointermove', moveEv, true);
-      window.removeEventListener('pointerup', upEv, true); window.removeEventListener('pointercancel', upEv, true); document.removeEventListener('keydown', keyEv, true);
+      window.removeEventListener('pointerup', upEv, true); window.removeEventListener('pointercancel', upEv, true); document.removeEventListener('keydown', keyEv, true); window.removeEventListener('blur', blurEv);
+      cell.el.classList.remove('pm-odsel');
       ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.removeEventListener(n, swallow, { capture: true, passive: false }); });
       box.style.cursor = ''; cell.el.classList.remove('pm-oddrag');
     };
-    LN = Z; syncLines(Z); return Z.L.length;
+    Z.select = select; LN = Z; syncLines(Z); return Z.L.length;
   }
   A.on('sym', function (cell) { if (LN && LN.cell === cell) hideLines(); });
+  /* another timeframe, or new history: the chart stays free to pan and zoom, a line half-dragged goes back, and the lines and the
+     box are drawn again on the candles now shown (the box keeps its times, so it sits on the same moment in any timeframe) */
+  function refresh(cell, tf) {
+    var Z = LN; if (!Z || Z.cell !== cell) return; Z.tap = null;
+    if (tf && Z.drag) { var sn = Z.drag.snap; Z.drag = null; cell.el.classList.remove('pm-oddrag'); restore(Z, sn); }
+    if (!Z.drag) unlock(Z);
+    syncLines(Z);
+  }
+  A.on('tf', function (cell) { refresh(cell, true); });
+  A.on('data', function (cell) { refresh(cell, false); });
   ['grid', 'lang'].forEach(function (n) { A.on(n, function () {
     if (LN && !LN.cell.el.isConnected) { LN.off(); LN = null; return; }
     /* a new language: the panel is built again in it, with the same plan and its undo steps */
     if (n === 'lang' && LN && !LN.plan.err) { var Z = LN, hs = Z.hist; showLines(Z.cell, Z.plan, Z.st, Z.atr); if (LN) { LN.hist = hs; hud(LN); } }
   }); });
+  P.odmExt = function (cell) { return LN && (!cell || LN.cell === cell) ? !!LN.st.zExt : null; };
+  P.odmToggleExt = function () { if (LN) toggleExt(LN); };
+  P.odmSelect = function (on) { if (LN && LN.select) LN.select(on); return LN ? !!LN.sel : null; };
   P.odmHide = hideLines; P.odmLinesShown = function (cell) { return LN && (!cell || LN.cell === cell) ? LN.L.length : 0; };
   /* take the plan's lines off the chart, and with alerts true also the alerts ODM added for this coin; one Undo puts both back */
   function clearOdm(cell, alerts) {
@@ -538,7 +619,7 @@
   /* a point inside the position's box, for the right-click menu (after lines and alert lines) */
   P.odmZoneHit = function (cell, x, y) { var b = LN && LN.cell === cell ? LN.box : null; if (!b || x < b.x0 || x > b.x1 || y < b.top || y > b.bot) return null; return { t: T(b.long ? 'odZLong' : 'odZShort'), p: LN.plan.avg }; };
   P._odmZoneVis = function (v) { if (LN) { LN.noZone = !v; repaint(LN); } };   /* for the browser checks: the chart with and without the box */
-  P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, H: LN.box.H, anchor: LN.st.anchor, tags: LN.lay ? [].map.call(LN.lay.querySelectorAll('.pm-odzp,.pm-odzm'), function (e) { return e.textContent; }) : [] } : null; };
+  P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, H: LN.box.H, anchor: LN.st.anchor, zEnd: LN.st.zEnd, ext: !!LN.st.zExt, end: LN.box.end, sel: !!LN.sel, locked: !!LN.locked, tags: LN.lay ? [].map.call(LN.lay.querySelectorAll('.pm-odzp,.pm-odzm'), function (e) { return e.textContent; }) : [] } : null; };
   /* for the browser checks: the panel's plan and the y of a level on the chart */
   P.odmLive = function () { return LN ? { plan: LN.plan, st: LN.st, levels: LN.L.map(function (l) { var y = null; try { y = LN.cell.main.priceToCoordinate(l.p); } catch (e) { } return { k: l.k, p: l.p, y: y, drag: !!l.drag }; }), pick: LN.pick } : null; };
 

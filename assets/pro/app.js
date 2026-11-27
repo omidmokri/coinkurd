@@ -61,6 +61,7 @@
     wallet: '<path d="M3 7h15a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z"/><path d="M3 7V6a2 2 0 0 1 2-2h11"/><path d="M16 13.5h2"/>',
     code: '<path d="m8 7-5 5 5 5"/><path d="m16 7 5 5-5 5"/><path d="m13.5 5-3 14"/>', scan: '<path d="M3 5h18"/><path d="M6 10h12"/><path d="M9 15h6"/><path d="M11 20h2"/>', edit: '<path d="M4 20l4-1 11-11-3-3L5 16z"/>',
     dot: '<circle cx="12" cy="12" r="2.6" fill="currentColor"/>',
+    extr: '<path d="M3 12h14"/><path d="m13 8 4 4-4 4"/><path d="M21 5v14"/>',
     arrowc: '<path d="M6 3v15l4-4 3 6 2-1-3-6h6z"/>',
     eraser: '<path d="M15 4l5 5-9 9H6l-3-3z"/><path d="M10 9l5 5"/><path d="M11 20h9"/>',
     info: '<path d="M4 19 20 5"/><circle cx="4" cy="19" r="1.6"/><circle cx="20" cy="5" r="1.6"/><rect x="12" y="14" width="9" height="6" rx="1"/>',
@@ -347,6 +348,8 @@
     if (st.tz !== 'local') { try { var p = new Intl.DateTimeFormat('en-US', { timeZone: st.tz, timeZoneName: 'shortOffset' }).formatToParts(new Date()).filter(function (x) { return x.type === 'timeZoneName'; })[0]; return p ? p.value.replace('GMT', 'UTC') : st.tz; } catch (e) { return st.tz; } }
     var sg = off >= 0 ? '+' : '-', a = Math.abs(off); return 'UTC' + sg + Math.floor(a / 60) + (a % 60 ? ':' + String(a % 60).padStart(2, '0') : '');
   }
+  /* a chart let go by a tool that held it (ODM, a drawing): it pans and zooms again exactly as the page's settings say */
+  P.chartFree = function (chart) { try { var o = lookOpts(); chart.applyOptions({ handleScroll: o.handleScroll, handleScale: o.handleScale }); } catch (e) { } };
   /* every chart option that the look decides */
   function lookOpts() {
     var L = st.look, dark = !isLight(), gc = rgba(L.grid, L.ga / 100), bd = rgba(L.text, 0.22);
@@ -442,7 +445,7 @@
   }
   var openMenu = null;
   function menu(anchor, items, opts) {
-    closeMenu(); opts = opts || {};
+    closeMenu(); opts = opts || {}; var born = Date.now();
     var m = h('<div class="pm-menu" role="menu" dir="' + (RTL() ? 'rtl' : 'ltr') + '" lang="' + TAG() + '"></div>');
     items.forEach(function (it) {
       if (!it) return;
@@ -452,7 +455,8 @@
       var b = h('<button type="button" role="menuitem" class="pm-mi' + (it.on ? ' on' : '') + '">' + (it.icon ? ic(it.icon) : '') + '<span></span>' + (it.hint ? '<small></small>' : '') + '</button>');
       $('span', b).textContent = it.label; if (it.hint) $('small', b).textContent = it.hint;
       if (it.disabled) b.disabled = true;
-      b.onclick = function (e) { e.stopPropagation(); if (!it.stay) closeMenu(); it.act && it.act(b); };
+      /* a menu opened by a long press: the finger lifting off is not a choice */
+      b.onclick = function (e) { e.stopPropagation(); if (opts.touch && Date.now() - born < 450) return; if (!it.stay) closeMenu(); it.act && it.act(b); };
       m.appendChild(b);
     });
     ($('#pro') || d.body).appendChild(m); openMenu = m;
@@ -1799,6 +1803,7 @@
     if (oh) {
       items.push({ head: 'ODM · ' + oh.t + ' · ' + fmtP(sym, oh.p) });
       items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
+      if (P.odmExt && P.odmExt(cell) != null) items.push({ label: T(P.odmExt(cell) ? 'odExtOff' : 'odExt'), icon: 'extr', act: function () { P.odmToggleExt(); } });
       items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
       items.push({ sep: 1 });
     }
@@ -1815,6 +1820,7 @@
     if (oz && !ah) {
       items.push({ head: 'ODM · ' + oz.t + ' · ' + fmtP(sym, oz.p) });
       items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
+      if (P.odmExt && P.odmExt(cell) != null) items.push({ label: T(P.odmExt(cell) ? 'odExtOff' : 'odExt'), icon: 'extr', act: function () { P.odmToggleExt(); } });
       items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
       items.push({ sep: 1 });
     }
@@ -1841,7 +1847,7 @@
     items.push({ sep: 1 });
     items.push({ label: T('snapshot'), icon: 'camera', act: pngShot });
     items.push({ label: T(root.classList.contains('pm-fs') ? 'exitFull' : 'fullscreen'), icon: 'expand', act: fullscreen });
-    menu(cell.box, items, { at: { x: ev.clientX, y: ev.clientY } });
+    menu(cell.box, items, { at: { x: ev.clientX, y: ev.clientY }, touch: ev.pointerType === 'touch' || !!(ev.sourceCapabilities && ev.sourceCapabilities.firesTouchEvents) });
   }
   /* the "Remove from chart" part of the right-click menu: each thing on this chart can go one by one or all together,
      and each removal can be undone from the note that follows it */

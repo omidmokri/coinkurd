@@ -856,7 +856,7 @@
   Drawer.prototype.inPane = function (q) { var pn = this.pane(); return q.x >= 0 && q.y >= 0 && q.x <= pn.w && q.y <= pn.h; };
   Drawer.prototype.select = function (id) { if (this.sel !== id) { this.sel = id; this.o.selected && this.o.selected(id ? this.find(id) : null); this.req(); } };
   Drawer.prototype.find = function (id) { var L = this.list(); for (var i = 0; i < L.length; i++) if (L[i].id === id) return L[i]; return null; };
-  Drawer.prototype.lockChart = function (on) { this.o.chart.applyOptions({ handleScroll: !on, handleScale: !on }); };
+  Drawer.prototype.lockChart = function (on) { if (!on && P.chartFree) return P.chartFree(this.o.chart); this.o.chart.applyOptions({ handleScroll: !on, handleScale: !on }); };
   Drawer.prototype.down = function (e, n) {
     if (this.o.blocked && this.o.blocked()) return;
     if (n !== 'pointerdown') { if (this._eat) stop(e); return; }

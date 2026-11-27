@@ -1400,7 +1400,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const zone = () => page.evaluate(() => PRO.odmZone());
     const Zn = await zone();
     const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort'), ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
-    ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - Math.min(Zn.H, zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - Math.max(0, zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0 && Zn.tags.some(t => t.startsWith(zy.long ? zy.side : zy.side)) && Zn.tags.some(t => /^TP\d/.test(t)), JSON.stringify({ Zn, zy }));
+    ok(`[${tag}] ODM draws the plan as a position box: from a candle to its own right edge (closed, not to the chart's edge), from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 40 && Zn.end && !Zn.ext && Zn.x1 < L0.box.w - 2 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - Math.min(Zn.H, zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - Math.max(0, zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0 && Zn.tags.some(t => t.startsWith(zy.long ? zy.side : zy.side)) && Zn.tags.some(t => /^TP\d/.test(t)), JSON.stringify({ Zn, zy }));
     const pts = await page.evaluate(([Z]) => {
       const L = PRO.odmLive(), ys = L.levels.map(l => l.y), bx = PRO.app.active().box.getBoundingClientRect(), labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast')].map(e => e.getBoundingClientRect()), off = (x, y) => labs.some(r => bx.left + x >= r.left - 3 && bx.left + x <= r.right + 3 && bx.top + y >= r.top - 3 && bx.top + y <= r.bottom + 3), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
       for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.1 + i * 0.1); for (const f of [0.15, 0.35, 0.55, 0.75]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg) && !off(x, yg)) out.push([x, yg, 'g']); if (clear(yr) && !off(x, yr)) out.push([x, yr, 'r']); } }
@@ -1422,6 +1422,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       if (!phone) { await page.mouse.move(hx, hy); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(hx + dx * i / 6, hy); await page.mouse.up(); }
       else await page.evaluate(([x, y, dx]) => {
         const el = document.elementFromPoint(x, y), o = (x, t) => ({ bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 9, pointerType: 'touch', isPrimary: true, buttons: t ? 1 : 0, button: 0 });
+        /* a finger taps the position first to select it, then drags the handle */
+        el.dispatchEvent(new PointerEvent('pointerdown', o(x, 1))); el.dispatchEvent(new PointerEvent('pointerup', o(x, 0)));
         el.dispatchEvent(new PointerEvent('pointerdown', o(x, 1))); for (let i = 1; i <= 6; i++) el.dispatchEvent(new PointerEvent('pointermove', o(x + dx * i / 6, 1))); el.dispatchEvent(new PointerEvent('pointerup', o(x + dx, 0)));
       }, [hx, hy, dx]);
       await page.waitForTimeout(150);
@@ -1441,6 +1443,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       if (!touch) { await page.mouse.move(X, y0); await page.mouse.down(); for (let i = 1; i <= 6; i++) await page.mouse.move(X, y0 + dy * i / 6); await page.mouse.up(); }
       else await page.evaluate(([x, y0, dy]) => {
         const box = PRO.app.active().box, el = document.elementFromPoint(x, y0) || box, o = (y, t) => ({ bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, pointerId: 7, pointerType: 'touch', isPrimary: true, buttons: t ? 1 : 0, button: 0 });
+        el.dispatchEvent(new PointerEvent('pointerdown', o(y0, 1))); el.dispatchEvent(new PointerEvent('pointerup', o(y0, 0)));   /* tap to select */
         el.dispatchEvent(new PointerEvent('pointerdown', o(y0, 1)));
         for (let i = 1; i <= 6; i++) el.dispatchEvent(new PointerEvent('pointermove', o(y0 + dy * i / 6, 1)));
         el.dispatchEvent(new PointerEvent('pointerup', o(y0 + dy, 0)));
@@ -1589,6 +1592,123 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const cl2 = await page.evaluate(() => ({ d: (PRO.app.DRAW()[PRO.app.active().cfg.sym] || []).length, i: PRO.app.active().cfg.inds.length }));
     ok(`[${tag}] "Clear the whole chart" asks first, clears drawings and indicators, and Undo brings both back`, cl.d === 0 && cl.i === 0 && cl2.d === 2 && cl2.i === i0.length, JSON.stringify({ cl, cl2 }));
     ok(`[${tag}] no JS errors on the chart or in the menu`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
+  /* ---------- ODM on the chart, as Omid asked on the call: the chart pans, zooms and changes timeframe with ODM on; a click selects
+     the position and never removes it; the box is closed by default with a right edge to drag, and can be extended on demand */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'odp') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [390, 800, 'ar'], [390, 800, 'ckb']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm pan ${lang} ${vw}`, e0 = errors.length, phone = vw < 600;
+    const T = k => page.evaluate(k => PRO.app.T(k), k);
+    const cdp = phone ? await ctx.newCDPSession(page) : null;
+    if (cdp) await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 2 });
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const showT = await T('odShow');
+    await page.evaluate(t => [...document.querySelectorAll('.pm-odact button')].find(b => b.textContent.trim() === t).click(), showT);
+    await page.waitForTimeout(500);
+    const st = () => page.evaluate(() => { const c = PRO.app.active(), r = c.box.getBoundingClientRect(), vr = c.chart.timeScale().getVisibleLogicalRange(), o = c.chart.options(), Z = PRO.odmZone(), L = PRO.odmLive();
+      return { n: PRO.odmLinesShown(), pl: c.main.priceLines().length, Z, stop: L && L.plan.stop, avg: L && L.plan.avg, from: vr ? vr.from : null, to: vr ? vr.to : null, tf: c.cfg.tf, free: !!(o.handleScroll && o.handleScroll.pressedMouseMove && o.handleScale && o.handleScale.mouseWheel), box: { l: r.left, t: r.top, w: r.width, h: r.height }, ys: L ? L.levels.map(l => l.y).filter(y => y != null) : [], hud: (() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const q = h.getBoundingClientRect(); return { t: q.top, b: q.bottom }; })() }; });
+    /* a point with no ODM line, handle, label or panel near it; inside the box when asked */
+    const freePt = (S, inBox) => page.evaluate(([S, inBox]) => {
+      const Z = S.Z, b = S.box, labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast,.pm-selbar')].map(e => e.getBoundingClientRect());
+      const okp = (x, y) => { const X = b.l + x, Y = b.t + y; if (labs.some(r => X >= r.left - 6 && X <= r.right + 6 && Y >= r.top - 6 && Y <= r.bottom + 6)) return false; if (S.ys.some(v => Math.abs(v - y) < 22)) return false; if (Z && (Math.abs(x - Z.x0) < 26 || Math.abs(x - Z.x1) < 26) && Math.abs(y - Z.ya) < 26) return false; const el = document.elementFromPoint(X, Y); return !!(el && el.closest('.pm-chart')); };
+      const x0 = inBox ? Z.x0 + 8 : 20, x1 = inBox ? Z.x1 - 8 : b.w - 90, y0 = inBox ? Z.top + 6 : 30, y1 = inBox ? Z.bot - 6 : b.h - 60;
+      for (let y = y0; y < y1; y += 5) for (let x = x0; x < x1; x += 7) { if (!inBox && Z && x >= Z.x0 - 10 && x <= Z.x1 + 10 && y >= Z.top - 10 && y <= Z.bot + 10) continue; if (okp(x, y)) return { x: b.l + x, y: b.t + y }; }
+      return null; }, [S, inBox]);
+    const mdrag = async (x, y, dx, dy) => { await page.mouse.move(x, y); await page.mouse.down(); for (let i = 1; i <= 8; i++) await page.mouse.move(x + dx * i / 8, y + dy * i / 8); await page.mouse.up(); await page.waitForTimeout(200); };
+    const tdrag = async (x, y, dx, dy) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] }); for (let i = 1; i <= 8; i++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x + dx * i / 8, y: y + dy * i / 8 }] }); await page.waitForTimeout(16); } await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await page.waitForTimeout(300); };
+    const tap = async (x, y) => { if (phone) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); } else await page.mouse.click(x, y); await page.waitForTimeout(200); };
+    const pan = (x, y, dx, dy) => phone ? tdrag(x, y, dx, dy) : mdrag(x, y, dx, dy);
+    let S0 = await st();
+    ok(`[${tag}] the position box is closed by default: it ends at its own candle, with a handle on its right edge`, S0.n >= 7 && S0.Z && S0.Z.end && !S0.Z.ext && S0.Z.x1 < S0.box.w - 2 && S0.Z.zEnd > S0.Z.anchor, JSON.stringify({ n: S0.n, Z: S0.Z && { x0: S0.Z.x0, x1: S0.Z.x1, end: S0.Z.end, ext: S0.Z.ext }, w: S0.box.w }));
+    await shot(page, `94_odm_closed_${lang}_${vw}`);
+    /* a click (a tap on a phone) inside the box: the position is selected, nothing is removed and no level moves */
+    let pin = await freePt(S0, true);
+    if (pin) {
+      await tap(pin.x, pin.y);
+      const S1 = await st();
+      ok(`[${tag}] a ${phone ? 'tap' : 'click'} inside the position selects it and removes nothing`, S1.n === S0.n && S1.pl === S0.pl && S1.Z && S1.Z.sel && S1.stop === S0.stop && S1.avg === S0.avg, JSON.stringify({ n0: S0.n, n1: S1.n, sel: S1.Z && S1.Z.sel }));
+      await shot(page, `94b_odm_selected_${lang}_${vw}`);
+    } else ok(`[${tag}] room inside the box to click`, false, JSON.stringify(S0.Z));
+    /* a click on a line itself: it stays where it was, and the position is still on the chart */
+    {
+      const S = await st(), L = await page.evaluate(() => PRO.odmLive().levels.find(l => l.k === 'sl')), X = S.box.l + (S.Z ? (S.Z.x0 + S.Z.x1) / 2 : S.box.w / 2);
+      if (L && L.y > 10 && L.y < S.box.h - 30) { await tap(X, S.box.t + L.y); const S2 = await st(); ok(`[${tag}] a ${phone ? 'tap' : 'click'} on the stop line leaves the stop and the position as they were`, S2.n === S.n && S2.stop === S.stop && S2.avg === S.avg, JSON.stringify({ s0: S.stop, s1: S2.stop, n: S2.n })); }
+    }
+    /* dragging the chart, inside the box and outside it, pans it; with a finger even across the lines */
+    for (const where of ['in', 'out']) {
+      const S = await st(), p = await freePt(S, where === 'in');
+      if (!p) { ok(`[${tag}] room ${where} the box to drag`, false, ''); continue; }
+      await pan(p.x, p.y, phone ? 120 : 160, 0);
+      const S2 = await st();
+      ok(`[${tag}] dragging the chart ${where === 'in' ? 'inside' : 'outside'} the position pans it back in time with ODM on`, S2.from != null && S2.from < S.from - 2 && S2.n === S.n && S2.free && S2.stop === S.stop, JSON.stringify({ from: S.from, to: S2.from, free: S2.free, n: S2.n }));
+    }
+    if (phone) {
+      const S = await st(), sl = await page.evaluate(() => PRO.odmLive().levels.find(l => l.k === 'sl')), x = S.box.l + S.box.w * 0.3;
+      await tap(S.box.l + 30, S.box.t + 40);   /* let the position go first */
+      const S1 = await st();
+      if (sl && sl.y > 20 && sl.y < S.box.h - 40) { await tdrag(x, S.box.t + sl.y, 110, 0); const S2 = await st(); ok(`[${tag}] a swipe that starts on an ODM line pans the chart when the position is not selected`, S2.from < S1.from - 2 && S2.stop === S1.stop && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from, s0: S1.stop, s1: S2.stop })); }
+    } else {
+      const S = await st(), p = await freePt(S, false);
+      await page.mouse.move(p.x, p.y); for (let i = 0; i < 4; i++) { await page.mouse.wheel(0, -240); await page.waitForTimeout(60); } await page.waitForTimeout(250);
+      const S2 = await st();
+      ok(`[${tag}] the mouse wheel zooms the chart with ODM on`, Math.abs((S2.to - S2.from) - (S.to - S.from)) > 1 && S2.n === S.n, JSON.stringify({ w0: S.to - S.from, w1: S2.to - S2.from }));
+    }
+    /* the right edge: dragged to resize, extended to the chart's edge on demand and closed again; Undo after each */
+    {
+      await page.evaluate(() => PRO.app.active().chart.timeScale().scrollToRealTime()); await page.waitForTimeout(300);
+      let S = await st();
+      const Z = S.Z, hx = S.box.l + Z.x1, hy = S.box.t + Z.ya, dx = Z.x1 + 80 < S.box.w - 10 ? 60 : -Math.min(60, (Z.x1 - Z.x0) / 2);
+      if (phone) { await tap(S.box.l + (Z.x0 + Z.x1) / 2, S.box.t + (Z.top + Z.ya) / 2); await tdrag(hx, hy, dx, 0); } else await mdrag(hx, hy, dx, 0);
+      const S2 = await st();
+      ok(`[${tag}] dragging the handle on the right edge resizes the box and leaves its start and the levels as they were`, S2.Z && Math.abs((S2.Z.x1 - Z.x1) - dx) < 16 && Math.abs(S2.Z.x0 - Z.x0) < 2 && S2.Z.anchor === Z.anchor && S2.stop === S.stop && Math.abs(S2.from - S.from) < 0.5, JSON.stringify({ x1: Z.x1, x1b: S2.Z && S2.Z.x1, dx, x0: Z.x0, x0b: S2.Z && S2.Z.x0, f: [S.from, S2.from] }));
+      const extT = await T('odExt');
+      const eb = await page.evaluate(() => { const b = document.querySelector('.pm-odhud [data-a="ext"]'); if (!b) return null; const r = b.getBoundingClientRect(); return { t: b.title, p: b.getAttribute('aria-pressed'), x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width }; });
+      ok(`[${tag}] the panel has an "extend to the right edge" button`, eb && eb.t === extT && eb.p === 'false' && eb.w >= (phone ? 28 : 22), JSON.stringify(eb));
+      if (eb) {
+        await page.mouse.click(eb.x, eb.y); await page.waitForTimeout(200);
+        const S3 = await st(), on = await page.evaluate(() => document.querySelector('.pm-odhud [data-a="ext"]').getAttribute('aria-pressed'));
+        ok(`[${tag}] "Extend" runs the box to the chart's right edge, and the button shows it is on`, S3.Z && S3.Z.ext && Math.abs(S3.Z.x1 - S3.box.w) < 80 && !S3.Z.end && on === 'true' && S3.n === S.n, JSON.stringify({ x1: S3.Z && S3.Z.x1, w: S3.box.w, on }));
+        await shot(page, `94c_odm_extended_${lang}_${vw}`);
+        await page.mouse.click(eb.x, eb.y); await page.waitForTimeout(200);
+        const S4 = await st();
+        ok(`[${tag}] pressing it again closes the box at its own right edge again`, S4.Z && !S4.Z.ext && S4.Z.end && Math.abs(S4.Z.x1 - S2.Z.x1) < 3, JSON.stringify({ x1: S4.Z && S4.Z.x1, want: S2.Z && S2.Z.x1 }));
+      }
+    }
+    /* another timeframe with ODM on: the chart is free, it pans back in time, and the lines and the box are still there */
+    {
+      const S = await st();
+      const want = S.tf === '4h' ? '1h' : '4h';
+      let clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('[data-tf="' + w + '"]')].find(e => e.offsetParent && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want);
+      if (!clicked) { await page.click('#pm-tfs .pm-tf.on').catch(() => { }); await page.waitForTimeout(300); clicked = await page.evaluate(w => { const b = [...document.querySelectorAll('[data-tf="' + w + '"]')].find(e => e.offsetParent && e.getBoundingClientRect().width > 0); if (!b) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, want); }
+      if (clicked) await page.mouse.click(clicked.x, clicked.y);
+      await page.waitForFunction(w => PRO.app.active().cfg.tf === w && PRO.app.active().disp.length > 100, want, { timeout: 10000 }).catch(() => { });
+      await page.waitForTimeout(500);
+      const S1 = await st();
+      ok(`[${tag}] after a real click on another timeframe the ODM lines and the box are still on the chart and the chart is free`, S1.tf === want && S1.n === S.n && S1.pl === S.pl && S1.Z && S1.free, JSON.stringify({ tf: S1.tf, want, n: S1.n, pl: S1.pl, Z: !!S1.Z, free: S1.free, clicked: !!clicked }));
+      const p = await freePt(S1, false);
+      if (p) { await pan(p.x, p.y, phone ? 130 : 180, 0); const S2 = await st(); ok(`[${tag}] after the timeframe change the chart still pans back into history with ODM on`, S2.from < S1.from - 2 && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from })); }
+      else ok(`[${tag}] room to drag after the timeframe change`, false, '');
+      const p2 = await freePt(await st(), false);
+      if (p2) { await pan(p2.x, p2.y, 0, phone ? 90 : 120); const S3 = await st(); ok(`[${tag}] dragging up and down with ODM on moves the chart, not the plan`, S3.stop === S1.stop && S3.avg === S1.avg && S3.n === S1.n && S3.free, JSON.stringify({ s: [S1.stop, S3.stop] })); }
+    }
+    /* only an explicit act removes the position: Delete on the selected position (desktop) or the panel's bin, both with Undo */
+    {
+      const S = await st(), p = await freePt(S, true);
+      if (!phone && p) {
+        await page.mouse.click(p.x, p.y); await page.waitForTimeout(150); await page.keyboard.press('Delete'); await page.waitForTimeout(200);
+        const S1 = await st(), tt = await page.evaluate(() => (document.querySelector('.pm-toast') || {}).textContent || '');
+        ok(`[${tag}] Delete on the selected position removes it and offers Undo`, S1.n === 0 && tt.includes(await T('undo')), JSON.stringify({ n: S1.n, tt }));
+        await page.evaluate(() => { const b = document.querySelector('.pm-toast .pm-tbtn'); if (b) b.click(); }); await page.waitForTimeout(250);
+        ok(`[${tag}] Undo brings the position back`, (await st()).n === S.n, '');
+      }
+      const rm = await page.evaluate(() => { const b = document.querySelector('.pm-odhud [data-a="hide"]'); return b ? { t: b.title, ic: !!b.querySelector('svg') } : null; });
+      ok(`[${tag}] the panel's remove button says what it does`, rm && rm.t === (await T('odRemove')), JSON.stringify(rm));
+    }
+    ok(`[${tag}] no JS errors while panning, zooming and changing timeframe with ODM on`, errors.length === e0, errors.slice(e0).join(' || '));
     await ctx.close();
   }
 
