@@ -1116,6 +1116,8 @@
   Overlay.prototype.paint = function (ctx, W, H) {
     var cell = this.cell, ts = cell.chart.timeScale(), D = cell.disp, sec = cell.tfSec(), self = this;
     this.flags = []; this.H = H;
+    /* layers other files draw under the alert lines (the liquidity map, liqmap.js) */
+    (P.ovHooks || []).forEach(function (fn) { try { fn(ctx, W, H, cell); } catch (e) { } });
     /* alert lines */
     (P.alertLines ? P.alertLines(cell.cfg.sym) : []).forEach(function (a) {
       var y = cell.main.priceToCoordinate(a.v); if (y == null || y < 0 || y > H) return;
@@ -2102,6 +2104,7 @@
         '<button type="button" class="pm-tb" id="pm-pf" title="' + esc(T('pfTitle')) + '">' + ic('wallet') + '<span class="pm-hide-s">' + esc(T('pfShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-mtf" title="' + esc(T('mtfTitle')) + '">' + ic('grid') + '<span class="pm-hide-s">' + esc(T('mtfBtn')) + '</span></button>' +
         '<button type="button" class="pm-tb pm-odtb" id="pm-odm" title="' + esc(T('odTitle')) + '">' + ic('layers') + '<span>' + esc(T('odBtn')) + '</span></button>' +
+        '<button type="button" class="pm-tb" id="pm-lq" title="' + esc(T('lqTitle')) + '">' + ic('vrp') + '<span class="pm-hide-s">' + esc(T('lqBtn')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-risk" title="' + esc(T('rcTitle')) + '">' + ic('scale') + '<span class="pm-hide-s">' + esc(T('rcShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-bt" title="' + esc(T('tester')) + '">' + ic('bt') + '<span class="pm-hide-s">' + esc(T('testerShort')) + '</span></button>' +
         '<button type="button" class="pm-tb" id="pm-alert">' + ic('bell') + '<span>' + esc(T('alert')) + '</span></button>' +
@@ -2143,6 +2146,7 @@
     $('#pm-pf').onclick = function () { if (P.portfolio) P.portfolio(); };
     $('#pm-risk').onclick = function () { if (P.riskCentre) P.riskCentre(); };
     $('#pm-odm').onclick = function () { if (P.odmDialog) P.odmDialog(); };
+    $('#pm-lq').onclick = function () { if (P.liqMap) P.liqMap(); };
     $('#pm-mtf').onclick = function () { if (P.mtf) P.mtf(); };
     $('#pm-data').onclick = function () { if (P.dataLib) P.dataLib(); };
     $('#pm-scr').onclick = function () { if (P.screener) P.screener(); };
