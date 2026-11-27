@@ -25,7 +25,7 @@ jobs:
       - name: Unit tests
         run: |
           set -e
-          for t in tests/test_pro_phasecd.js tests/test_pro_plan.js tests/test_pro_calc.js tests/test_pro_mtf.js tests/test_pro_datalib.js tests/test_pro_odm.js tests/test_pro_salert.js; do node "$t"; done
+          for t in tests/test_pro_phasecd.js tests/test_pro_plan.js tests/test_pro_calc.js tests/test_pro_mtf.js tests/test_pro_datalib.js tests/test_pro_odm.js tests/test_pro_salert.js tests/test_pro_liqmap.js; do node "$t"; done
           python3 tests/test_pro_i18n.py
           pip install -q requests beautifulsoup4 pillow arabic-reshaper python-bidi fonttools
           python3 scripts/bot_pro.py && python3 tests/test_bot_pro.py | tail -3

@@ -1468,6 +1468,93 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await ctx.close();
   }
 
+  /* ---------- Liquidity map: real order books (mocked in each exchange's own format) and real liquidation feeds */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'lq') for (const [vw, vh, lang] of [[1280, 860, 'en'], [390, 800, 'fa']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `liquidity ${lang} ${vw}`, e0 = errors.length, H = { 'access-control-allow-origin': '*' };
+    /* one fixed book per venue, built once around the price at the first request; the test sums it on its own below */
+    const BOOK = {}, mk = (v, mid, n, tick, wallB, wallA) => {
+      const b = [], a = [];
+      for (let i = 1; i <= n; i++) {
+        const pb = +(mid - i * tick).toFixed(2), pa = +(mid + i * tick).toFixed(2), qb = 0.2 + ((i * 7) % 11) / 10, qa = 0.2 + ((i * 5) % 13) / 10;
+        b.push([pb, +(qb + (wallB && Math.abs(pb - wallB) < tick / 2 ? 40 : 0)).toFixed(4)]); a.push([pa, +(qa + (wallA && Math.abs(pa - wallA) < tick / 2 ? 25 : 0)).toFixed(4)]);
+      }
+      return { b, a };
+    };
+    const book = (v) => {
+      if (BOOK[v]) return BOOK[v];
+      const mid = Math.round(px('BTCUSDT', Math.floor(Date.now() / 1000))), tick = 1;
+      const wb = mid - Math.round(mid * 0.004), wa = mid + Math.round(mid * 0.006);
+      BOOK[v] = v === 'bnf' ? mk(v, mid, 1000, tick, wb, 0) : v === 'bns' ? mk(v, mid, 5000, tick, 0, 0) : mk(v, mid, 500, tick, 0, wa);
+      BOOK[v].mid = mid; BOOK[v].wb = wb; BOOK[v].wa = wa; return BOOK[v];
+    };
+    const S = (x) => x.map(r => [String(r[0]), String(r[1])]);
+    await page.route(/fapi\.binance\.com\/fapi\/v1\/depth/, r => { const k = book('bnf'); r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify({ lastUpdateId: 1, E: Date.now(), T: Date.now(), bids: S(k.b), asks: S(k.a) }) }); });
+    await page.route(/data-api\.binance\.vision\/api\/v3\/depth/, r => { const k = book('bns'); r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify({ lastUpdateId: 1, bids: S(k.b), asks: S(k.a) }) }); });
+    await page.route(/api\.bybit\.com\/v5\/market\/orderbook/, r => { const k = book('byf'); r.fulfill({ status: 200, contentType: 'application/json', headers: H, body: JSON.stringify({ retCode: 0, retMsg: 'OK', result: { s: 'BTCUSDT', b: S(k.b), a: S(k.a), ts: Date.now(), u: 1 } }) }); });
+    /* liquidations: Binance one long every 2 s, Bybit a short on each subscribe answer and then every 3 s */
+    const LQS = [];
+    await page.routeWebSocket(/fstream\.binance\.com/, ws => {
+      const t = setInterval(() => { const p = px('BTCUSDT', Math.floor(Date.now() / 1000)), x = { e: 'forceOrder', E: Date.now(), o: { s: 'BTCUSDT', S: 'SELL', o: 'LIMIT', f: 'IOC', q: '0.5', p: String(p * 0.999), ap: p.toFixed(2), X: 'FILLED', l: '0.5', z: '0.5', T: Date.now() } }; LQS.push(['bnf', 'long', +p.toFixed(2) * 0.5]); ws.send(JSON.stringify(x)); }, 2000);
+      ws.onClose(() => clearInterval(t));
+    });
+    await page.routeWebSocket(/stream\.bybit\.com/, ws => {
+      let t = null;
+      ws.onMessage(m => {
+        let j; try { j = JSON.parse(m); } catch (e) { return; }
+        if (j.op === 'ping') return ws.send(JSON.stringify({ op: 'pong', success: true }));
+        if (j.op === 'subscribe' && /^allLiquidation\.BTCUSDT$/.test(j.args[0])) {
+          ws.send(JSON.stringify({ success: true, op: 'subscribe' }));
+          const send = () => { const p = px('BTCUSDT', Math.floor(Date.now() / 1000)); LQS.push(['byf', 'short', +p.toFixed(1) * 0.8]); ws.send(JSON.stringify({ topic: 'allLiquidation.BTCUSDT', type: 'snapshot', ts: Date.now(), data: [{ T: Date.now(), s: 'BTCUSDT', S: 'Sell', v: '0.8', p: p.toFixed(1) }] })); };
+          send(); t = setInterval(send, 3000);
+        }
+      });
+      ws.onClose(() => clearInterval(t));
+    });
+    await page.evaluate(() => { const b = document.querySelector('#pm-lq'); if (b) b.click(); else PRO.liqMap(); });
+    await page.waitForSelector('.pm-lq', { timeout: 5000 }).catch(() => { });
+    ok(`[${tag}] the toolbar opens the liquidity map and it switches on`, await page.evaluate(() => !!document.querySelector('.pm-lq') && document.querySelector('.pm-lqon').checked), '');
+    await page.waitForFunction(() => { const s = PRO.liqState(); return s && s.n >= 2 && s.liq.length >= 3; }, null, { timeout: 30000 }).catch(() => { });
+    const s1 = await page.evaluate(() => PRO.liqState());
+    ok(`[${tag}] two readings of the books kept, three venues answered and OKX (blocked here) is shown as unreachable`, s1 && s1.n >= 2 && s1.stat.bnf.ok && s1.stat.bns.ok && s1.stat.byf.ok && s1.stat.okx && !s1.stat.okx.ok, JSON.stringify(s1 && { n: s1.n, stat: s1.stat }));
+    /* the band every book reaches is Bybit's 500 levels: mid ± 500 */
+    const B0 = BOOK.byf;
+    ok(`[${tag}] the band every chosen book covers is the shallowest book's reach`, s1 && s1.lo === B0.mid - 500 && s1.hi === B0.mid + 500, JSON.stringify({ lo: s1 && s1.lo, hi: s1 && s1.hi, mid: B0.mid }));
+    /* the biggest bid and ask walls, summed here from the three books with nothing from liqmap.js */
+    const step = s1.step, sumAt = (side, price) => { const k = Math.floor(price / step + 1e-9); let q = 0; ['bnf', 'bns', 'byf'].forEach(v => BOOK[v][side].forEach(r => { if (Math.floor(r[0] / step + 1e-9) === k) q += r[1]; })); return { k, q }; };
+    const eb = sumAt('b', BOOK.bnf.wb), ea = sumAt('a', BOOK.byf.wa);
+    ok(`[${tag}] the biggest bid wall is the 40 BTC order 0.4% under the price, with its size summed across books`, s1.w && s1.w.bid[0].k === eb.k && Math.abs(s1.w.bid[0].q - eb.q) < 1e-6 && s1.w.bid[0].top === 'bnf', JSON.stringify({ got: s1.w && s1.w.bid[0], want: eb, step }));
+    ok(`[${tag}] the biggest ask wall is the 25 BTC order 0.6% over the price, mostly on Bybit`, s1.w && s1.w.ask[0].k === ea.k && Math.abs(s1.w.ask[0].q - ea.q) < 1e-6 && s1.w.ask[0].top === 'byf', JSON.stringify({ got: s1.w && s1.w.ask[0], want: ea }));
+    /* liquidations: what the page kept is exactly what the feeds sent, each on the right side */
+    const lq = s1.liq, nb = lq.filter(x => x.v === 'bnf'), ny = lq.filter(x => x.v === 'byf');
+    ok(`[${tag}] liquidations from both feeds: Binance SELL = long closed, Bybit Sell = short closed`, nb.length >= 1 && ny.length >= 1 && nb.every(x => x.side === 'long') && ny.every(x => x.side === 'short') && nb.every(x => Math.abs(x.q - 0.5) < 1e-9) && ny.every(x => Math.abs(x.q - 0.8) < 1e-9), JSON.stringify(lq.slice(0, 4)));
+    const pn = await page.evaluate(() => ({ rows: document.querySelectorAll('.pm-lqt tbody tr').length, up: document.querySelectorAll('.pm-lqt tr.up').length, src: [...document.querySelectorAll('.pm-lqsrc li')].map(x => x.className), sum: (document.querySelector('.pm-lqliq .pm-odhint') || {}).textContent || '', st: document.querySelector('.pm-lqst').textContent,
+      fits: (() => { const b = document.querySelector('.pm-mbox'), body = document.querySelector('.pm-mbody'); return b.getBoundingClientRect().right <= innerWidth + 1 && body.scrollWidth - body.clientWidth <= 1; })() }));
+    ok(`[${tag}] the panel lists 5 bid and 5 ask walls, each source with its state, and the liquidation totals`, pn.rows === 10 && pn.up === 5 && pn.src.length === 6 && pn.src.filter(c => c === 'ok').length === 5 && pn.src.includes('bad') && pn.sum.length > 10, JSON.stringify(pn));
+    ok(`[${tag}] the panel fits the screen with no sideways scroll`, pn.fits, '');
+    await shot(page, `90_lq_panel_${lang}_${vw}`);
+    /* on the chart: the book is drawn at the very right edge (clear of the liquidation bubbles on the open bar) in green under the price and red over it */
+    await page.evaluate(() => PRO.app.closeModal()); await page.waitForTimeout(400);
+    await shot(page, `91_lq_chart_${lang}_${vw}`);
+    const px2 = await page.evaluate(() => {
+      const c = PRO.app.active(), s = PRO.liqState(), cv = [...c.el.querySelectorAll('canvas')].filter(x => x.width > 50);
+      const yB = c.main.priceToCoordinate(s.w.bid[0].p), yA = c.main.priceToCoordinate(s.w.ask[0].p), out = { yB, yA, hits: [] };
+      cv.forEach(x => { const g = x.getContext('2d'), r = x.getBoundingClientRect(), k = x.width / r.width; if (!g || r.width < 200) return; [['b', yB], ['a', yA]].forEach(([n, y]) => { if (y == null) return; const d = g.getImageData(Math.round((r.width - 6) * k), Math.round(y * k), 1, 1).data; out.hits.push([n, d[0], d[1], d[2], d[3]]); }); });
+      return out;
+    });
+    const green = px2.hits.some(h => h[0] === 'b' && h[2] > h[1] + 40 && h[4] > 0), red = px2.hits.some(h => h[0] === 'a' && h[1] > h[2] + 40 && h[4] > 0);
+    ok(`[${tag}] the book is drawn at the chart's right edge: green at the bid wall, red at the ask wall`, green && red, JSON.stringify(px2));
+    const lx = await page.evaluate(() => { const c = PRO.app.active(), s = PRO.liqState(), x = s.liq[s.liq.length - 1], ts = c.chart.timeScale(), n = c.disp.length; return { X: PRO.lqX(x.t), last: ts.logicalToCoordinate(n - 1), next: ts.logicalToCoordinate(n), t: x.t, lastT: c.disp[n - 1].t, sec: c.tfSec() }; });
+    ok(`[${tag}] each liquidation is drawn at the time it happened: the newest one sits on the bar still open`, lx.X != null && lx.last != null && lx.X >= lx.last - 1 && lx.X <= lx.next + 1, JSON.stringify(lx));
+    /* switching the coin starts again; a symbol no exchange lists says so */
+    await page.evaluate(() => PRO.app.active().setSym('IR_USD')); await page.waitForTimeout(600);
+    ok(`[${tag}] on a market no exchange book covers it stops and says why`, await page.evaluate(() => !PRO.liqState()), '');
+    await page.evaluate(() => PRO.app.active().setSym('BTC')); await page.waitForTimeout(300);
+    ok(`[${tag}] no JS errors in the liquidity map checks`, errors.length === e0, errors.slice(e0).join(' || '));
+    await page.evaluate(() => PRO.liqStop());
+    await ctx.close();
+  }
+
   /* ---------- Binance unreachable: OKX blocked too, BTC falls back to the site snapshot */
   if (!ONLY) {
     const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 }, serviceWorkers: 'block' }); const page = await ctx.newPage();
