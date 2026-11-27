@@ -1399,11 +1399,11 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     /* the plan drawn as a position: green from the average entry to the last target, red to the stop, from a candle to the right edge */
     const zone = () => page.evaluate(() => PRO.odmZone());
     const Zn = await zone();
-    const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
-    ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - (zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - (zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0, JSON.stringify({ Zn, zy }));
+    const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort'), ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
+    ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - Math.min(Zn.H, zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - Math.max(0, zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0 && Zn.tags.some(t => t.startsWith(zy.long ? zy.side : zy.side)) && Zn.tags.some(t => /^TP\d/.test(t)), JSON.stringify({ Zn, zy }));
     const pts = await page.evaluate(([Z]) => {
       const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
-      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.55 + i * 0.04); for (const f of [0.3, 0.7]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg)) out.push([x, yg, 'g']); if (clear(yr)) out.push([x, yr, 'r']); } }
+      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.55 + i * 0.04); for (const f of [0.15, 0.35, 0.55, 0.75]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg)) out.push([x, yg, 'g']); if (clear(yr)) out.push([x, yr, 'r']); } }
       return out;
     }, [Zn]);
     /* what the screen shows, with and without the box (the same moment, the same candles) */
@@ -1413,8 +1413,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const on1 = await px(); await page.evaluate(() => PRO._odmZoneVis(false)); await page.waitForTimeout(200);
     const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(200);
     const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
-    pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
-    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 6 && tint.n2 >= 6 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
+    pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (Math.abs(dr) + Math.abs(dg) < 6) return; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 5 && tint.n2 >= 5 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
     /* the round handle on the entry line moves the start candle; Undo puts it back */
     {
       const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;

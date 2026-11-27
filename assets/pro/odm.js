@@ -280,15 +280,10 @@
     var l = P.t2l(D, +Z.st.anchor, sec); if (l == null || !isFinite(l)) return null;
     var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x;
   }
-  function pill(ctx, x, y, txt, bg, fg, rtl, W) {
-    ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif'; ctx.direction = rtl ? 'rtl' : 'ltr'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    var w = ctx.measureText(txt).width + 12; x = Math.max(2, Math.min(x, W - w - 2));
-    ctx.fillStyle = bg; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y - 9, w, 18, 5); else ctx.rect(x, y - 9, w, 18); ctx.fill();
-    ctx.fillStyle = fg; ctx.fillText(txt, x + 6, y + 0.5); return w;
-  }
   var LRI = '⁦', PDI = '⁩';
   function zonePaint(ctx, W, H, cell) {
-    var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null; if (Z.noZone) return;
+    var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null;
+    if (Z.noZone || !Z.plan || Z.plan.err) { if (Z.lay) { Z.lay.innerHTML = ''; Z.layHtml = ''; } if (Z.noZone) return; }
     var r = Z.plan; if (!r || r.err || !r.exits) return;
     var m = cell.main, ts = cell.chart.timeScale(), yv = function (p) { var y = null; try { y = m.priceToCoordinate(p); } catch (e) { } return y; };
     var ya = yv(r.avg), ys = yv(r.stop), ex = r.exits, yt = ex.length ? yv(ex[ex.length - 1].p) : null; if (ya == null || ys == null) return;
@@ -305,31 +300,41 @@
     ex.forEach(function (x) { var y = yv(x.p); if (y == null) return; ctx.strokeStyle = G + '0.8)'; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); });
     ctx.setLineDash([]); ctx.strokeStyle = Rd + '0.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0, ys); ctx.lineTo(x1, ys); ctx.stroke();
     ctx.strokeStyle = light ? 'rgba(40,40,40,.85)' : 'rgba(236,236,230,.85)'; ctx.beginPath(); ctx.moveTo(x0, ya); ctx.lineTo(x1, ya); ctx.stroke();
-    /* the labels, kept apart: the entry and the stop always, then the last target, then the others */
-    var pct = function (p) { return dir * (p / r.avg - 1) * 100; }, used = [], tags = [];
-    tags.push({ y: ya, t: T(r.long ? 'odZLong' : 'odZShort') + ' · ' + T('odTopAvg') + ' ' + LRI + px(r.avg) + PDI, bg: light ? 'rgba(40,40,40,.88)' : 'rgba(236,236,230,.92)', fg: light ? '#fff' : '#141416', pr: 0 });
-    tags.push({ y: ys, t: 'SL · ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, bg: Rd + '0.92)', fg: '#fff', pr: 1 });
-    ex.forEach(function (x, k) { var y = yv(x.p); if (y == null) return; tags.push({ y: y, t: 'TP' + x.n + ' · ' + LRI + f(x.q, 0) + '% · ' + sg(pct(x.p), 2) + '% · ' + sg(x.profit) + PDI, bg: G + '0.92)', fg: '#06281c', pr: k === ex.length - 1 ? 2 : 3 }); });
+    ctx.restore();
+    /* the labels, kept apart: the entry and the stop always, then the last target, then the others. They are page elements
+       over the chart (not paint under the candles), so they stay readable and keep their words in the reading order */
+    var pct = function (p) { return dir * (p / r.avg - 1) * 100; }, used = [], tags = [], html = '';
+    var tz = 'class="pm-odzp ', es = A.esc;
+    tags.push({ y: ya, t: T(r.long ? 'odZLong' : 'odZShort') + ' · ' + T('odTopAvg') + ' ' + LRI + px(r.avg) + PDI, c: 'e', pr: 0 });
+    tags.push({ y: ys, t: 'SL · ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, c: 's', pr: 1 });
+    ex.forEach(function (x, k) { var y = yv(x.p); if (y == null) return; tags.push({ y: y, t: 'TP' + x.n + ' · ' + LRI + f(x.q, 0) + '% · ' + sg(pct(x.p), 2) + '% · ' + sg(x.profit) + PDI, c: 'x', pr: k === ex.length - 1 ? 2 : 3 }); });
+    ctx.save(); ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif';
     tags.slice().sort(function (a, b) { return a.pr - b.pr; }).forEach(function (g) {
       if (g.y < 9 || g.y > H - 9) return; if (used.some(function (u) { return Math.abs(u - g.y) < 19; })) return; used.push(g.y);
-      pill(ctx, x0 + 8, g.y, g.t, g.bg, g.fg, rtl, W);
+      var tw = ctx.measureText(g.t).width + 14, lx = Math.max(2, Math.min(x0 + 10, W - tw - 2));
+      html += '<span ' + tz + g.c + '" dir="' + (rtl ? 'rtl' : 'ltr') + '" style="left:' + Math.round(lx) + 'px;top:' + Math.round(g.y) + 'px">' + es(g.t) + '</span>';
     });
-    /* in the middle of each zone, the whole plan in one line when there is room */
-    ctx.font = '700 12px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = rtl ? 'rtl' : 'ltr';
-    /* centred on the box, kept on the chart, and only where no label of a level sits */
-    function mid(txt, y, col) { if (used.some(function (u) { return Math.abs(u - y) < 16; })) return; var tw = ctx.measureText(txt).width, cx = Math.max(tw / 2 + 4, Math.min(W - tw / 2 - 4, x0 + w / 2)); ctx.fillStyle = col; ctx.fillText(txt, cx, y); }
-    if (yt != null && Math.abs(yt - ya) >= 46 && r.best != null) mid(T('odZRew') + ' ' + LRI + sg(pct(ex[ex.length - 1].p), 2) + '% · ' + sg(r.best) + ' · R:R 1:' + f(r.best / r.risk, 2) + PDI, (ya + yt) / 2, light ? '#0b6b48' : '#7ff0c4');
-    if (Math.abs(ys - ya) >= 46) mid(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, (ya + ys) / 2, light ? '#a3271d' : '#ffb0a8');
-    /* the handle that moves the start candle */
-    ctx.beginPath(); ctx.arc(x0, ya, Z.drag && Z.drag.kind === 'anc' ? 7 : 5.5, 0, Math.PI * 2); ctx.fillStyle = light ? '#fff' : '#141416'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#f7931a'; ctx.stroke();
+    /* in the middle of each zone, the whole plan in one line when there is room, kept on the chart and off the level labels */
+    ctx.font = '700 12px Vazirmatn, Tahoma, sans-serif';
+    function mid(txt, y, c) {
+      if (y < 12 || y > H - 12 || used.some(function (u) { return Math.abs(u - y) < 18; })) return;
+      var tw = ctx.measureText(txt).width + 18, cx = Math.max(tw / 2 + 4, Math.min(W - tw / 2 - 4, x0 + w / 2));
+      html += '<span class="pm-odzm ' + c + '" dir="' + (rtl ? 'rtl' : 'ltr') + '" style="left:' + Math.round(cx) + 'px;top:' + Math.round(y) + 'px">' + es(txt) + '</span>';
+    }
+    if (yt != null && r.best != null) { var g0 = Math.max(Math.min(ya, yt), 0), g1 = Math.min(Math.max(ya, yt), H); if (g1 - g0 >= 46) mid(T('odZRew') + ' ' + LRI + sg(pct(ex[ex.length - 1].p), 2) + '% · ' + sg(r.best) + ' · R:R 1:' + f(r.best / r.risk, 2) + PDI, (g0 + g1) / 2, 'x'); }
+    var s0 = Math.max(Math.min(ya, ys), 0), s1 = Math.min(Math.max(ya, ys), H); if (s1 - s0 >= 46) mid(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, (s0 + s1) / 2, 's');
     ctx.restore();
+    /* the handle that moves the start candle */
+    if (ya >= 0 && ya <= H) html += '<span class="pm-odzh' + (Z.drag && Z.drag.kind === 'anc' ? ' on' : '') + '" style="left:' + Math.round(x0) + 'px;top:' + Math.round(ya) + 'px"></span>';
+    var lay = Z.lay; if (!lay || !lay.isConnected) { lay = Z.lay = document.createElement('div'); lay.className = 'pm-odz'; lay.setAttribute('aria-hidden', 'true'); cell.box.appendChild(lay); }
+    if (Z.layHtml !== html) { lay.innerHTML = html; Z.layHtml = html; }
     var all = [ya, ys].concat(yt != null ? [yt] : []);
-    Z.box = { x0: x0, x1: x1, top: Math.min.apply(null, all), bot: Math.max.apply(null, all), ya: ya, long: r.long };
+    Z.box = { x0: x0, x1: x1, top: Math.max(0, Math.min.apply(null, all)), bot: Math.min(H, Math.max.apply(null, all)), ya: ya, long: r.long, H: H };
   }
   (P.ovHooks = P.ovHooks || []).push(zonePaint);
   function repaint(Z) { try { if (Z.cell.ovl) Z.cell.ovl.update(); } catch (e) { } }
   function hideLines() {
-    if (!LN) return; var c = LN.cell, Z = LN; LN = null; Z.box = null; repaint(Z);
+    if (!LN) return; var c = LN.cell, Z = LN; LN = null; Z.box = null; if (Z.lay) Z.lay.remove(); Z.lay = null; repaint(Z);
     Object.keys(Z.map).forEach(function (k) { try { c.main.removePriceLine(Z.map[k]); } catch (e) { } });
     Z.off(); if (Z.hud) Z.hud.remove(); unlock(Z); if (c.el) c.el.classList.remove('pm-odpick');
   }
@@ -531,7 +536,7 @@
   /* a point inside the position's box, for the right-click menu (after lines and alert lines) */
   P.odmZoneHit = function (cell, x, y) { var b = LN && LN.cell === cell ? LN.box : null; if (!b || x < b.x0 || x > b.x1 || y < b.top || y > b.bot) return null; return { t: T(b.long ? 'odZLong' : 'odZShort'), p: LN.plan.avg }; };
   P._odmZoneVis = function (v) { if (LN) { LN.noZone = !v; repaint(LN); } };   /* for the browser checks: the chart with and without the box */
-  P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, anchor: LN.st.anchor } : null; };
+  P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, H: LN.box.H, anchor: LN.st.anchor, tags: LN.lay ? [].map.call(LN.lay.querySelectorAll('.pm-odzp,.pm-odzm'), function (e) { return e.textContent; }) : [] } : null; };
   /* for the browser checks: the panel's plan and the y of a level on the chart */
   P.odmLive = function () { return LN ? { plan: LN.plan, st: LN.st, levels: LN.L.map(function (l) { var y = null; try { y = LN.cell.main.priceToCoordinate(l.p); } catch (e) { } return { k: l.k, p: l.p, y: y, drag: !!l.drag }; }), pick: LN.pick } : null; };
 
