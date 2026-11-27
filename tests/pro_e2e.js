@@ -1417,6 +1417,10 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
         zone: out.textContent.includes(T('odZone', { k: '2' })), shock: out.textContent.includes(T('odShockDn', { x: '10' })), day: out.textContent.includes(T('odDayLeft')) };
     });
     ok(`[${tag}] 22 tool ticks; ticked, each shows its inputs and its figures, with a line on what each figure means`, tk.n === 22 && /22/.test(tk.sum) && tk.fx >= 7 && tk.edu >= 5 && tk.zone && tk.shock && tk.day, JSON.stringify(tk));
+    await page.evaluate(() => document.querySelector('.pm-odfeat').scrollIntoView({ block: 'start' })); await page.waitForTimeout(150);
+    await shot(page, `85d_odm_ticks_${lang}_${vw}`);
+    await page.evaluate(() => document.querySelector('.pm-odout').scrollIntoView({ block: 'start' })); await page.waitForTimeout(150);
+    await shot(page, `85e_odm_plan_tools_${lang}_${vw}`);
     await btn('odTest'); await page.waitForTimeout(1200);
     const tt = await page.evaluate(() => { const T = PRO.app.T, d = document.querySelector('.pm-oddist'); return d && { score: d.textContent.includes(T('odScore')), jr: d.textContent.includes(T('odJrT')), conf: d.textContent.includes(T('odConfT')), twin: d.textContent.includes(T('odTwinT')), stress: d.textContent.includes(T('odStressT')) }; });
     ok(`[${tag}] with the ticks on, the test adds the score, the twin, the stress test, the journal and the confidence check`, tt && tt.score && tt.jr && tt.conf && tt.twin && tt.stress, JSON.stringify(tt));
