@@ -25,7 +25,7 @@ jobs:
       - name: Unit tests
         run: |
           set -e
-          for t in tests/test_pro_phasecd.js tests/test_pro_plan.js tests/test_pro_calc.js tests/test_pro_mtf.js tests/test_pro_datalib.js; do node "$t"; done
+          for t in tests/test_pro_phasecd.js tests/test_pro_plan.js tests/test_pro_calc.js tests/test_pro_mtf.js tests/test_pro_datalib.js tests/test_pro_odm.js; do node "$t"; done
           python3 tests/test_pro_i18n.py
       - name: Install Playwright (uses the runner's own Chrome)
         env:
