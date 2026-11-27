@@ -1551,7 +1551,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.waitForTimeout(300);
     const of = await page.evaluate(() => { const o = document.querySelector('.pm-odoffer'), g = document.querySelector('.pm-odgo'); return { offer: o ? o.querySelector('p').textContent : null, want: PRO.app.T('odTourOffer'), go: g ? g.textContent.trim() : null, wantGo: PRO.app.T('odGuide') }; });
     ok(`[${tag}] the first time, ODM offers the tour and shows its "Guide me" button`, of.offer === of.want && of.go === of.wantGo, JSON.stringify(of));
-    await page.click('.pm-odoffer [data-a="go"]'); await page.waitForTimeout(250);
+    await page.evaluate(() => document.querySelector('.pm-odoffer [data-a="go"]').click()); await page.waitForTimeout(250);
     const step = () => page.evaluate(() => {
       const b = document.querySelector('.pm-odtour'), t = document.querySelector('.pm-odtgt'), body = document.querySelector('.pm-mbody'); if (!b || !t) return { b: !!b, t: !!t };
       const br = b.getBoundingClientRect(), tr = t.getBoundingClientRect(), vr = body.getBoundingClientRect(), A = PRO.odTour.active();
@@ -1560,6 +1560,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const overlap = !b.classList.contains('sheet') && !(br.bottom <= tr.top + 1 || br.top >= tr.bottom - 1 || br.right <= tr.left + 1 || br.left >= tr.right - 1) && br.top < Math.max(tr.top, visTop) + 40;
       const hd = document.getElementById('ekh'), hb = hd && /fixed|sticky/.test(getComputedStyle(hd).position) ? hd.getBoundingClientRect().bottom : 0;
       return { k: A.k, i: A.i, n: A.n, n1: b.querySelector('small').textContent, title: b.querySelector('b').textContent, text: b.querySelector('p').textContent, next: b.querySelector('[data-a="next"]').textContent, back: b.querySelector('[data-a="back"]').disabled,
+        hit: (() => { const n = b.querySelector('[data-a="next"]').getBoundingClientRect(), el = document.elementFromPoint(n.left + n.width / 2, n.top + n.height / 2); return el && el.closest('.pm-odtour') ? 'ok' : (el ? el.tagName + '.' + el.className + ' < ' + (el.parentElement ? el.parentElement.className : '') : 'none') + ' @' + Math.round(n.left) + ',' + Math.round(n.top); })(),
+        br: [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)], tr: [Math.round(tr.left), Math.round(tr.top), Math.round(tr.width), Math.round(tr.height)], vw: [innerWidth, innerHeight, Math.round(scrollY)],
         sheet: b.classList.contains('sheet'), inView: br.left >= -1 && br.right <= innerWidth + 1 && br.top >= hb - 1 && br.bottom <= innerHeight + 1, hb, seen: shown >= Math.min(40, tr.height - 2), overlap, tall: tr.height > innerHeight * 0.45, dir: b.dir, focus: document.activeElement === b.querySelector('[data-a="next"]') };
     });
     let s = await step(); const seenK = [], bad = [];
@@ -1567,25 +1569,25 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await shot(page, `89_odm_tour_${lang}_${vw}`);
     for (let i = 0; i < 12 && s && s.k; i++) {
       seenK.push(s.k);
-      if (!s.title || !s.text || !s.inView || !s.seen || (s.overlap && !s.tall) || s.n1 !== (await page.evaluate(([i, n]) => PRO.app.T('odTourN', { i, n }), [s.i + 1, s.n]))) bad.push(s);
+      if (!s.title || !s.text || !s.inView || !s.seen || s.hit !== 'ok' || (s.overlap && !s.tall) || s.n1 !== (await page.evaluate(([i, n]) => PRO.app.T('odTourN', { i, n }), [s.i + 1, s.n]))) bad.push(s);
       if (s.k === 'loss') await shot(page, `89b_odm_tour_loss_${lang}_${vw}`);
       if (s.i === s.n - 1) break;
-      await page.click('.pm-odtour [data-a="next"]'); await page.waitForTimeout(200); s = await step();
+      await page.evaluate(() => document.querySelector('.pm-odtour [data-a="next"]').click()); await page.waitForTimeout(200); s = await step();
     }
-    ok(`[${tag}] every step names its part, keeps it in view and not under its note, and counts "i of n"`, bad.length === 0 && seenK.length === s.n && new Set(seenK).size === seenK.length && seenK.includes('loss') && seenK.includes('act'), JSON.stringify({ seenK, bad: bad.slice(0, 2) }));
+    ok(`[${tag}] every step names its part, keeps it in view and not under its note, and counts "i of n"`, bad.length === 0 && seenK.length === s.n && new Set(seenK).size === seenK.length && seenK.includes('loss') && seenK.includes('act'), JSON.stringify({ seenK, bad: bad.slice(0, 3).map(x => ({ k: x.k, hit: x.hit, br: x.br, tr: x.tr, vw: x.vw, inView: x.inView, seen: x.seen, overlap: x.overlap, sheet: x.sheet })) }));
     ok(`[${tag}] the last step says Done`, s.next === (await page.evaluate(() => PRO.app.T('odTourDone'))), s.next);
-    await page.click('.pm-odtour [data-a="next"]'); await page.waitForTimeout(150);
+    await page.evaluate(() => document.querySelector('.pm-odtour [data-a="next"]').click()); await page.waitForTimeout(150);
     const end = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), lit: document.querySelectorAll('.pm-odtgt').length, modal: !!document.querySelector('.pm-odm'), seen: localStorage.getItem('ek_pro_odtour') }));
     ok(`[${tag}] Done closes the tour and leaves ODM open`, !end.tour && !end.lit && end.modal && end.seen === '1', JSON.stringify(end));
     /* opened again: no offer, the button starts it; the arrow key moves on; Escape leaves the tour but not ODM */
     await page.evaluate(() => { PRO.app.closeModal(); document.querySelector('#pm-odm').click(); }); await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { }); await page.waitForTimeout(250);
     const again = await page.evaluate(() => ({ offer: !!document.querySelector('.pm-odoffer'), go: !!document.querySelector('.pm-odgo') }));
     ok(`[${tag}] once seen, ODM no longer offers the tour but keeps the button`, !again.offer && again.go, JSON.stringify(again));
-    await page.click('.pm-odgo'); await page.waitForTimeout(200);
+    await page.evaluate(() => document.querySelector('.pm-odgo').click()); await page.waitForTimeout(200);
     await page.keyboard.press(lang === 'en' ? 'ArrowRight' : 'ArrowLeft'); await page.waitForTimeout(150);
     const k2 = await page.evaluate(() => PRO.odTour.active());
     ok(`[${tag}] the arrow key in the reading direction moves to the next step`, k2 && k2.i === 1, JSON.stringify(k2));
-    await page.click('.pm-odtour [data-a="back"]'); await page.waitForTimeout(150);
+    await page.evaluate(() => document.querySelector('.pm-odtour [data-a="back"]').click()); await page.waitForTimeout(150);
     ok(`[${tag}] Back goes to the step before`, (await page.evaluate(() => PRO.odTour.active().i)) === 0, '');
     await page.keyboard.press('Escape'); await page.waitForTimeout(150);
     const esc = await page.evaluate(() => ({ tour: !!document.querySelector('.pm-odtour'), modal: !!document.querySelector('.pm-odm'), lit: document.querySelectorAll('.pm-odtgt').length }));
