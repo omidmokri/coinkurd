@@ -77,6 +77,17 @@ def main():
        "P.flag = " not in js)
     ok("every language has a flag, Kurmanji and Sorani both under the Kurdistan Region flag",
        all(PL.flag(r[0]) for r in PL.LANGS) and PL.flag("kmr") == PL.flag("ckb") and PL.flag("ckb").endswith("kurdistan.svg"))
+    # the font dictionary (2026-11-27, the owner's rule: every language, however many, has its researched font)
+    ok("every language has a font entry in the dictionary", all(r[0] in PL.FONT for r in PL.LANGS), [r[0] for r in PL.LANGS if r[0] not in PL.FONT])
+    ok("…and no entry is left over for a language that is gone", set(PL.FONT) <= {r[0] for r in PL.LANGS}, sorted(set(PL.FONT) - {r[0] for r in PL.LANGS}))
+    ok("Persian and Sorani use the site's own Vazirmatn (no second download)", PL.FONT["fa"]["family"] == PL.FONT["ckb"]["family"] == "Vazirmatn" and PL.font_css("fa") == "")
+    ok("Chinese, Japanese and Korean keep the visitor's system font (a web font there is megabytes)",
+       all(PL.FONT[c]["family"] is None and PL.font_css(c) == "" for c in ("cn", "tw", "jp", "kr")))
+    ok("the page is handed every language's font", "P.FONT = " in js and all('"' + r[0] + '"' in js.split("P.FONT = ", 1)[1].split("\n", 1)[0] for r in PL.LANGS))
+    css = [PL.font_css(r[0]) for r in PL.LANGS]
+    ok("every font file the dictionary points to is in the repo", all(os.path.exists(os.path.join(ROOT, c.lstrip("/"))) for c in css if c), [c for c in css if c and not os.path.exists(os.path.join(ROOT, c.lstrip("/")))])
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "build_lang_fonts.py"), "--check"], capture_output=True, text=True)
+    ok("the self-hosted font files match the dictionary (scripts/build_lang_fonts.py --check)", r.returncode == 0, r.stdout + r.stderr)
     print(f"\n{len(FAILS)} failure(s)" if FAILS else "\nOK")
     sys.exit(1 if FAILS else 0)
 

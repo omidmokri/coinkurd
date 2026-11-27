@@ -21,7 +21,7 @@
   var PATH = (window.EKLP && window.EKLP.src) || location.pathname, ENC = /^\/encyclopedia\//.test(PATH);
   var CODE = ls.get('ek_l') || '';
   var ON = !!CODE && !ENC && ls.get('ek_ar') !== '1';
-  var LANGS = null, ME = null, FLAGS = {}, KURD = {}, TOTAL = 0;
+  var LANGS = null, ME = null, FLAGS = {}, KURD = {}, TOTAL = 0, FONTS = {}, LABELS = '';
   /* The header's own language group, and nothing else. `.lsw` on /learn/, /glossary/, /library/ and /map/
      is those pages' own three-way switch for the lesson text (Kurdish, Persian, English); putting the globe
      there gave the reader two globes on one page and hid the Persian the switch exists to offer. */
@@ -46,7 +46,7 @@
     + '.ekw-spin{transform-origin:12px 12px;animation:ekw-turn 11s linear infinite}'
     + '@media (prefers-reduced-motion:reduce){.ekw-spin,.ekw-globe::after,.ekw-globe.ekw-new{animation:none}}'
     + '.ekw-wrap{position:fixed;inset:0;z-index:2147483000;background:rgba(6,5,2,.74);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px}'
-    + '.ekw-panel{width:min(580px,100%);max-height:min(76vh,640px);display:flex;flex-direction:column;border-radius:18px;overflow:hidden;'
+    + '.ekw-panel{width:min(780px,100%);max-height:min(80vh,680px);font-family:var(--ekw-ui,var(--ek-font,system-ui,sans-serif));display:flex;flex-direction:column;border-radius:18px;overflow:hidden;'
     + 'background:linear-gradient(160deg,#17120a,#0d0b07);border:1px solid rgba(247,169,26,.34);box-shadow:0 24px 70px rgba(0,0,0,.65);color:#f2ead9}'
     + '.ekw-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(247,169,26,.2)}'
     + '.ekw-head b{font-size:15px;font-weight:700;flex:1;text-align:start}'
@@ -78,7 +78,10 @@
     + '@keyframes ekw-arrive{from{opacity:.08;translate:0 18px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}'
     + '@supports (animation-timeline:view()){@media (prefers-reduced-motion:no-preference){'
     + '.ekw-list button{animation:ekw-arrive linear both;animation-timeline:view(block);animation-range:entry 0% entry 55%}}}'
-    + '.ekw-list{padding:4px 10px 14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:6px}'
+    + '.ekw-list{padding:4px 10px 14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}'
+    /* four to a row on a computer (owner, 2026-11-27), three on a tablet, two on a phone */
+    + '@media (max-width:700px){.ekw-list{grid-template-columns:repeat(3,minmax(0,1fr))}}'
+    + '@media (max-width:520px){.ekw-list{grid-template-columns:repeat(2,minmax(0,1fr))}}'
     + '.ekw-list button{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:11px;border:1px solid transparent;'
     + 'background:rgba(255,255,255,.04);color:#f2ead9;cursor:pointer;font:inherit;text-align:start;transition:background .15s,border-color .15s,transform .12s}'
     + '.ekw-list button:active{transform:scale(.97)}'
@@ -87,9 +90,11 @@
     + '.ekw-txt{display:flex;flex-direction:column;gap:1px;min-width:0}'
     + '.ekw-list button:hover{background:rgba(247,169,26,.16);border-color:rgba(247,169,26,.5)}'
     + '.ekw-list button.on{background:rgba(247,169,26,.22);border-color:rgba(247,169,26,.8)}'
-    + '.ekw-list .n{font-size:14px}.ekw-list .e{font-size:11px;color:#a89770}'
+    + '.ekw-list .n{font-size:14.5px;font-weight:500;line-height:1.35;overflow-wrap:anywhere}.ekw-list .e{font-size:11px;color:#a89770;font-family:Inter,system-ui,sans-serif}'
+    + '.ekw-list .n:lang(ur){line-height:2}'
+    + '.ekw-head span{direction:ltr;unicode-bidi:isolate}'
     + '.ekw-foot{padding:10px 16px;border-top:1px solid rgba(247,169,26,.2);font-size:12px;color:#9b8a66;text-align:start}'
-    + '.ekw-kurd{margin:0 0 6px;color:#d8b46a;font-weight:600;line-height:1.6}.ekw-kurd:last-child{margin:0}'
+    + '.ekw-kurd{margin:0 0 6px;color:#d8b46a;font-weight:500;line-height:1.75;font-size:13px}.ekw-kurd:last-child{margin:0}'
     + '.ekw-foot button{background:transparent;border:0;color:#f7a91a;cursor:pointer;font:inherit;padding:0;text-decoration:underline}'
     + 'html.ek-tr-wait body{opacity:0!important}';
 
@@ -114,6 +119,14 @@
     var o = {}; for (var k in T.en) { var r = PTR(T.en[k]); o[k] = (r && r !== T.en[k]) ? r : T.en[k]; } return o;
   }
 
+  /* each language in its own typeface (scripts/pro_langs.py FONT): the face's @font-face file is added once, and
+     the browser fetches only the slices the text on screen needs */
+  var FONT_DONE = {};
+  function fontCss(href) {
+    if (!href || FONT_DONE[href]) return; FONT_DONE[href] = 1;
+    var l = d.createElement('link'); l.rel = 'stylesheet'; l.href = href; (d.head || de).appendChild(l);
+  }
+  function stack(code) { var f = FONTS[code]; return f ? f[0] : ''; }
   function style() { if (d.getElementById('ek-i18n-s')) return; var s = d.createElement('style'); s.id = 'ek-i18n-s'; s.textContent = CSS; (d.head || de).appendChild(s); }
 
   /* The site's own languages come first in the panel, Persian and Arabic among them; picking one simply clicks the
@@ -182,7 +195,10 @@
     wrap.querySelector('.ekw-head b').textContent = W.t;
     /* the head shows how many are ready out of the languages the site is being carried to: 29 / 50 */
     var nReady = count(d.querySelector(BAR));
-    wrap.querySelector('.ekw-head span').textContent = nReady + (TOTAL > nReady ? ' / ' + TOTAL : '');
+    var cnt = wrap.querySelector('.ekw-head span'); cnt.setAttribute('dir', 'ltr');
+    cnt.textContent = nReady + (TOTAL > nReady ? ' / ' + TOTAL : '');
+    fontCss(LABELS);
+    var ui = de.getAttribute('lang') || 'en'; if (stack(ui)) { wrap.querySelector('.ekw-panel').style.setProperty('--ekw-ui', stack(ui)); fontCss(FONTS[ui][1]); }
     wrap.querySelector('.ekw-search').setAttribute('placeholder', W.s);
     wrap.querySelector('.ekw-sec1').textContent = W.o;
     wrap.querySelector('.ekw-sec2').textContent = W.m;
@@ -195,7 +211,8 @@
         + '<span class="ekw-txt"><span class="n"></span><span class="e"></span></span>';
       var f = FLAGS[code], img = b.querySelector('.ekw-flag');
       if (f) img.src = f; else img.remove();
-      b.querySelector('.n').textContent = native;
+      var n = b.querySelector('.n'); n.textContent = native;
+      var F = FONTS[code]; if (F) n.style.fontFamily = "'EKL " + F[2] + "'," + F[0];
       b.querySelector('.e').textContent = english || '';
       return b;
     }
@@ -204,9 +221,9 @@
     LANGS.forEach(function (L) { L.el = card(L.code, L.native, L.english, L.code === CODE); moreList.appendChild(L.el); });
 
     var foot = wrap.querySelector('.ekw-foot');
-    /* why Kurdish counts once: Sorani and Kurmanji are two dialects of one language (owner, 2026-11-27) */
+    /* Kurdish counts once; the line under the lists says so in the owner's approved words (2026-11-27) */
     var kl = de.getAttribute('lang') || CODE || 'en', kt = KURD[kl] || KURD.en;
-    if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.setAttribute('translate', 'no'); kp.textContent = kt; foot.appendChild(kp); }
+    if (kt) { var kp = d.createElement('p'); kp.className = 'ekw-kurd'; kp.setAttribute('lang', kl); kp.setAttribute('translate', 'no'); kp.textContent = kt; if (stack(kl)) { kp.style.fontFamily = stack(kl); fontCss(FONTS[kl][1]); } foot.appendChild(kp); }
     if (ON) { var back = d.createElement('button'); back.type = 'button'; back.textContent = W.b; back.setAttribute('data-back', '1'); foot.appendChild(back); }
     d.body.appendChild(wrap);
     wrap.querySelector('.ekw-search').focus();
@@ -319,6 +336,7 @@
     LANGS = (j && j.ready) || [];
     FLAGS = (j && j.flags) || {};
     KURD = (j && j.kurd) || {}; TOTAL = +(j && j.total) || 0;
+    FONTS = (j && j.fonts) || {}; LABELS = (j && j.labels) || '';
     for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === CODE) ME = LANGS[i];
     if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', boot); else boot();
     if (ON && ME) translate();
@@ -330,6 +348,8 @@
     /* the header's one language button names the language in its own words (ui2.js reads this) */
     if (ME.native) de.setAttribute('data-ek-lname', ME.native);
     de.setAttribute('lang', CODE); de.setAttribute('dir', ME.dir);
+    /* the whole page in the language's own face: the site's styles all read --ek-font */
+    if (stack(CODE)) { fontCss(FONTS[CODE][1]); de.style.setProperty('--ek-font', stack(CODE)); }
     function fixdir() { if (d.body && d.body.getAttribute('dir') && d.body.getAttribute('dir') !== ME.dir) d.body.setAttribute('dir', ME.dir); }
     var M = {}, TB = {}, memo = {}, nmemo = 0, DONE = {};
     function key(u) { u = u.replace(/^\/+|\/+$/g, '') || 'home'; return u.toLowerCase().replace(/[^a-z0-9_-]+/g, '_').slice(0, 120); }

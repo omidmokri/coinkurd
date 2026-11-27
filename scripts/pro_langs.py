@@ -28,6 +28,7 @@ CLI:
                                           system tz database (/usr/share/zoneinfo); review the diff before committing
 """
 import json
+import re
 import os
 import sys
 
@@ -112,6 +113,90 @@ def flag(code):
     """the address of a language's flag, or None"""
     f = FLAG.get(code)
     return (FLAG_DIR + f + ".svg") if f else None
+
+
+# ------------------------------------------------------------------------------------------- the font of each language
+# Every language is shown in a typeface made for its own script, the one quality sites in that language use (owner,
+# 2026-11-27: "for 50, 66, however many languages: each in its own font, accurate and beautiful"). A row in LANGS
+# with no entry here fails tests/test_pro_langs.py and stops this script.
+#   script   — the writing system (ISO 15924)
+#   family   — the typeface: free, SIL Open Font License, self-hosted under /assets/fonts/lang/ by
+#              scripts/build_lang_fonts.py, so nothing is fetched from Google while a visitor reads (Iranian
+#              connections reach Google Fonts badly). None = the reader's own system font, for Chinese, Japanese and
+#              Korean, whose web fonts run to megabytes; their best sites use the system font for the same reason.
+#   subsets  — the slices of the typeface the page needs (Google's names); a browser fetches a slice only when the
+#              page has a letter in it
+#   stack    — the fallback chain behind the family, best system font for the script first
+#   weights  — regular and bold; the site uses no others in running text
+#   note     — why this face (kept short; the research is in the commit that added it)
+_LATIN = ("Latn", "Inter", ("latin", "latin-ext"), "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif",
+          "the most used free interface face on quality sites; full Latin Extended incl. ê î û ş ő ł ț")
+_CYRL = ("Cyrl", "Inter", ("cyrillic", "cyrillic-ext", "latin"), "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif",
+         "Inter's Cyrillic is drawn with its Latin, so names like Binance sit in one face")
+_F = lambda script, family, subsets, stack, note: {"script": script, "family": family, "subsets": list(subsets),
+                                                  "stack": stack, "weights": [400, 700], "note": note}
+FONT = {c: _F(*_LATIN) for c in ("en", "kmr", "cat", "hr", "cz", "da", "nl", "et", "fil", "fi", "fr", "de", "hu", "id",
+                                 "it", "lv", "lt", "ms", "no", "pl", "pt", "br", "ro", "sk", "sl", "es", "sw", "se", "tr")}
+FONT.update({c: _F(*_CYRL) for c in ("ru", "uk", "bg", "sr")})
+FONT.update({
+    "ckb": _F("Arab", "Vazirmatn", ("arabic",), "'Noto Sans Arabic',Tahoma,sans-serif",
+              "the site's own face; full Sorani letters (ڕ ڵ ێ ۆ ە) and Kurdish digits"),
+    "fa":  _F("Arab", "Vazirmatn", ("arabic",), "'Noto Sans Arabic',Tahoma,sans-serif",
+              "the standard free Persian face on Iranian sites"),
+    "ar":  _F("Arab", "Cairo", ("arabic", "latin"), "'Noto Kufi Arabic','Segoe UI',Tahoma,sans-serif",
+              "the most used free Arabic face on the web (top Saudi sites, Google Fonts' most popular Arabic)"),
+    "ur":  _F("Arab", "Noto Nastaliq Urdu", ("arabic",), "'Jameel Noori Nastaleeq','Urdu Typesetting',serif",
+              "Urdu readers expect Nastaliq; Google's own Nastaliq, made for screens"),
+    "gr":  _F("Grek", "Inter", ("greek", "latin"), "system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif",
+              "Inter's Greek is drawn with its Latin"),
+    "iw":  _F("Hebr", "Heebo", ("hebrew", "latin"), "'Segoe UI',Arial,sans-serif",
+              "the everyday Hebrew face of Israeli sites (Roboto's Latin with Hebrew by Oded Ezer)"),
+    "hi":  _F("Deva", "Noto Sans Devanagari", ("devanagari", "latin"), "'Nirmala UI',Mangal,sans-serif",
+              "Google's UI Devanagari; clear conjuncts at small sizes"),
+    "mr":  _F("Deva", "Noto Sans Devanagari", ("devanagari", "latin"), "'Nirmala UI',Mangal,sans-serif",
+              "carries Marathi's own forms of ळ and श through lang=mr"),
+    "bn":  _F("Beng", "Hind Siliguri", ("bengali", "latin"), "'Nirmala UI',Vrinda,sans-serif",
+              "made for interfaces, widely used on Bangladeshi sites; 820 glyphs incl. the conjuncts"),
+    "pa":  _F("Guru", "Noto Sans Gurmukhi", ("gurmukhi", "latin"), "'Nirmala UI',Raavi,sans-serif",
+              "Google's Gurmukhi for screens"),
+    "ta":  _F("Taml", "Noto Sans Tamil", ("tamil", "latin"), "'Nirmala UI',Latha,sans-serif",
+              "Google's Tamil for screens"),
+    "te":  _F("Telu", "Noto Sans Telugu", ("telugu", "latin"), "'Nirmala UI',Gautami,sans-serif",
+              "Google's Telugu for screens"),
+    "th":  _F("Thai", "Sarabun", ("thai", "latin"), "'Leelawadee UI',Tahoma,sans-serif",
+              "Thailand's national standard face (TH Sarabun New), looped and easy to read in body text"),
+    "vi":  _F("Latn", "Be Vietnam Pro", ("vietnamese", "latin", "latin-ext"), "system-ui,'Segoe UI',Roboto,Arial,sans-serif",
+              "drawn in Vietnam for Vietnamese; stacked tone marks stay clear"),
+    "cn":  _F("Hans", None, (), "'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans SC','Source Han Sans SC',sans-serif",
+              "what Chinese sites use: the system face, no download"),
+    "tw":  _F("Hant", None, (), "'PingFang TC','Microsoft JhengHei','Noto Sans TC','Source Han Sans TC',sans-serif",
+              "what Taiwanese sites use: the system face, no download"),
+    "jp":  _F("Jpan", None, (), "'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic UI','Meiryo','Noto Sans JP',sans-serif",
+              "what Japanese sites use: the system face, no download"),
+    "kr":  _F("Kore", None, (), "'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif",
+              "what Korean sites use: the system face (Pretendard's Hangul is Noto Sans KR), no download"),
+})
+# The panel's language names are each set in their own face too. For a face with no download (None above) the panel
+# uses this one, cut to the few letters of that name, so 简体中文 does not wait on a system font that may be missing.
+LABEL_FACE = {"cn": "Noto Sans SC", "tw": "Noto Sans TC", "jp": "Noto Sans JP", "kr": "Noto Sans KR"}
+FONT_DIR = "/assets/fonts/lang/"
+SITE_FACES = {"Vazirmatn"}                  # already declared by every page of the site (assets/fonts/): no second copy
+
+
+def font_css(code):
+    """the self-hosted @font-face file a language needs, or "" when its face is the system's or the site's own"""
+    fam = FONT[code]["family"]
+    return "" if not fam or fam in SITE_FACES else FONT_DIR + font_slug(fam) + ".css"
+
+
+def font_slug(family):
+    return re.sub(r"[^a-z0-9]+", "-", family.lower()).strip("-")
+
+
+def font_stack(code):
+    """the CSS font-family for a language: its own face, then the fallbacks"""
+    f = FONT[code]
+    return (("'" + f["family"] + "'," if f["family"] else "") + f["stack"])
 
 
 SITE = ("ckb", "fa", "ar", "en")            # the site's own languages: hand-written strings, live at /market/
@@ -233,6 +318,7 @@ def js_text():
             "  P.SAME = " + json.dumps(SAME) + ";\n"
             "  P.LANG_COUNT = " + str(LANG_COUNT) + ";\n"
             "  P.KURD_NOTE = " + json.dumps({r[0]: kurd_note(r[0]) for r in LANGS}, ensure_ascii=False, separators=(",", ":")) + ";\n"
+            "  P.FONT = " + json.dumps({r[0]: [font_stack(r[0]), font_css(r[0])] for r in LANGS}, ensure_ascii=False, separators=(",", ":")) + ";\n"
             "  P.FLAG = " + json.dumps(FLAG, separators=(",", ":"), sort_keys=True) + ";\n"
             "  P.FLAG_DIR = " + json.dumps(FLAG_DIR) + ";\n"
             "  /* langFlag, not flag: panels.js already puts a chart helper on P.flag */\n"
@@ -287,6 +373,9 @@ def refresh_cldr():
 
 def main():
     args = sys.argv[1:]
+    gap = [r[0] for r in LANGS if r[0] not in FONT]
+    if gap:
+        sys.exit("no font for " + ", ".join(gap) + ": add each to FONT in scripts/pro_langs.py (script, face, fallbacks)")
     if "--cldr" in args:
         refresh_cldr()
     want = {OUT_JS: js_text()}

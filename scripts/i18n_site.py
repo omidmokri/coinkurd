@@ -549,7 +549,7 @@ READY = int(os.environ.get("I18N_SITE_READY", "70"))   # a language is offered o
 # languages, none of them ever arrived: each gained a few strings a day while the site itself grew. The eighth
 # language reaches readers only if one of them is carried over the line at a time.
 SOONEST = float(os.environ.get("I18N_SITE_SOONEST", "0.7"))
-VER = "15"      # bump when assets/i18n.js changes, so readers get the new one
+VER = "16"      # bump when assets/i18n.js changes, so readers get the new one
 
 # the globe and the chosen language live in assets/i18n.js; this snippet only keeps a reader who has chosen a
 # language from seeing the English for a moment while it loads (the same trick the Arabic layer uses)
@@ -602,6 +602,12 @@ def write_langs(need):
         # language, that says why (Sorani and Kurmanji are two dialects of one language)
         json.dump({"ready": out, "flags": flags, "total": pro_langs.LANG_COUNT,
                    "kurd": {r[0]: pro_langs.kurd_note(r[0]) for r in pro_langs.LANGS},
+                   # each language's own typeface (pro_langs.FONT): [CSS font-family, its self-hosted @font-face file
+                   # or "" for a system face, the face the panel sets its name in]
+                   "fonts": {r[0]: [pro_langs.font_stack(r[0]),
+                                    pro_langs.font_css(r[0]),
+                                    pro_langs.FONT[r[0]]["family"] or pro_langs.LABEL_FACE[r[0]]] for r in pro_langs.LANGS},
+                   "labels": pro_langs.FONT_DIR + "labels.css",
                    "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
                   f, ensure_ascii=False, separators=(",", ":"))
     return out
