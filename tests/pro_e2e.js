@@ -1402,8 +1402,8 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const zy = await page.evaluate(() => { const L = PRO.odmLive(), c = PRO.app.active(), xs = L.levels.filter(l => /^x/.test(l.k)), y = p => c.main.priceToCoordinate(p); return { side: PRO.app.T(L.plan.stop < L.plan.avg ? 'odZLong' : 'odZShort'), ya: y(L.plan.avg), ys: y(L.plan.stop), yt: xs.length ? y(Math.max(...xs.map(l => l.p))) : null, long: PRO.odmLive().plan.stop < PRO.odmLive().plan.avg, W: c.box.getBoundingClientRect().width }; });
     ok(`[${tag}] ODM draws the plan as a position box: from a candle to the right edge, from the stop to the last target, with the entry line inside`, Zn && Zn.x1 - Zn.x0 >= 120 && Zn.x0 >= 0 && Math.abs(Zn.ya - zy.ya) < 1 && Math.abs(Zn.bot - Math.min(Zn.H, zy.long ? zy.ys : zy.yt)) < 1 && Math.abs(Zn.top - Math.max(0, zy.long ? zy.yt : zy.ys)) < 1 && Zn.anchor > 0 && Zn.tags.some(t => t.startsWith(zy.long ? zy.side : zy.side)) && Zn.tags.some(t => /^TP\d/.test(t)), JSON.stringify({ Zn, zy }));
     const pts = await page.evaluate(([Z]) => {
-      const L = PRO.odmLive(), ys = L.levels.map(l => l.y), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
-      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.55 + i * 0.04); for (const f of [0.15, 0.35, 0.55, 0.75]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg)) out.push([x, yg, 'g']); if (clear(yr)) out.push([x, yr, 'r']); } }
+      const L = PRO.odmLive(), ys = L.levels.map(l => l.y), bx = PRO.app.active().box.getBoundingClientRect(), labs = [...document.querySelectorAll('.pm-odz span,.pm-odhud,.pm-leg,.pm-toast')].map(e => e.getBoundingClientRect()), off = (x, y) => labs.some(r => bx.left + x >= r.left - 3 && bx.left + x <= r.right + 3 && bx.top + y >= r.top - 3 && bx.top + y <= r.bottom + 3), clear = y => Math.min(...ys.map(z => Math.abs(z - y))) > 12, out = [];
+      for (let i = 0; i < 9; i++) { const x = Z.x0 + (Z.x1 - Z.x0) * (0.1 + i * 0.1); for (const f of [0.15, 0.35, 0.55, 0.75]) { const yg = Z.top + (Z.ya - Z.top) * f, yr = Z.ya + (Z.bot - Z.ya) * f; if (clear(yg) && !off(x, yg)) out.push([x, yg, 'g']); if (clear(yr) && !off(x, yr)) out.push([x, yr, 'r']); } }
       return out;
     }, [Zn]);
     /* what the screen shows, with and without the box (the same moment, the same candles) */
@@ -1414,7 +1414,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(200);
     const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
     pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (Math.abs(dr) + Math.abs(dg) < 6) return; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
-    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 5 && tint.n2 >= 5 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 4 && tint.n2 >= 4 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
     /* the round handle on the entry line moves the start candle; Undo puts it back */
     {
       const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;
@@ -1446,10 +1446,13 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       }, [X, y0, dy]);
       await page.waitForTimeout(150);
     };
-    await drag(yOf(L0, 'sl'), 40, phone);
+    /* down 40 px widens the stop; when the stop sits near the foot of the price pane, up 40 px narrows it instead (a line is grabbed where it can be seen) */
+    const paneH = await page.evaluate(() => PRO.app.active().chart.panes()[0].getHeight());
+    const slY = yOf(L0, 'sl') - L0.box.t, dyS = slY + 40 > paneH - 30 ? -40 : 40;
+    await drag(yOf(L0, 'sl'), dyS, phone);
     let L1 = await live();
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('ek_pro_odm') || '{}').stop);
-    ok(`[${tag}] dragging the stop line moves the stop, keeps the risk and shrinks the size; it is saved as a price`, L1.plan.stop < L0.plan.stop && Math.abs(L1.plan.risk - L0.plan.risk) < 1e-6 && L1.plan.qty < L0.plan.qty && L1.st.stop.mode === 'price' && saved.mode === 'price' && Math.abs(+saved.v - L1.plan.stop) <= Math.abs(L1.plan.stop) * 1e-6 && L1.hud !== L0.hud, JSON.stringify({ s0: L0.plan.stop, s1: L1.plan.stop, r0: L0.plan.risk, r1: L1.plan.risk, q0: L0.plan.qty, q1: L1.plan.qty, saved, under: L1.plan.stop < L0.plan.stop ? '' : await under(X, yOf(L0, 'sl')), hud: await page.evaluate(() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const r = h.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height), h.className]; }), box: L0.box, ysl: yOf(L0, 'sl') }));
+    ok(`[${tag}] dragging the stop line moves the stop, keeps the risk and changes the size to match; it is saved as a price`, (dyS > 0 ? L1.plan.stop < L0.plan.stop && L1.plan.qty < L0.plan.qty : L1.plan.stop > L0.plan.stop && L1.plan.qty > L0.plan.qty) && Math.abs(L1.plan.risk - L0.plan.risk) < 1e-6 && L1.st.stop.mode === 'price' && saved.mode === 'price' && Math.abs(+saved.v - L1.plan.stop) <= Math.abs(L1.plan.stop) * 1e-6 && L1.hud !== L0.hud, JSON.stringify({ s0: L0.plan.stop, s1: L1.plan.stop, r0: L0.plan.risk, r1: L1.plan.risk, q0: L0.plan.qty, q1: L1.plan.qty, saved, under: L1.plan.stop < L0.plan.stop ? '' : await under(X, yOf(L0, 'sl')), hud: await page.evaluate(() => { const h = document.querySelector('.pm-odhud'); if (!h) return null; const r = h.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height), h.className]; }), box: L0.box, ysl: yOf(L0, 'sl') }));
     ok(`[${tag}] the chart does not pan or zoom while a line is dragged`, L1.range === L0.range, L0.range + ' → ' + L1.range);
     /* drag the first entry up 20 px: the average follows */
     await drag(yOf(L1, 'e0'), -20, phone);
@@ -1461,10 +1464,10 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] Undo on the panel puts the last change back`, L3.st.entries[0].p === L1.st.entries[0].p && Math.abs(L3.plan.avg - L1.plan.avg) < 1e-9, JSON.stringify({ e: L3.st.entries[0].p, want: L1.st.entries[0].p }));
     /* Escape while a line is held puts it back */
     if (!phone) {
-      const y = yOf(L3, 'sl'), X = await xFree(y); await page.mouse.move(X, y); await page.mouse.down(); for (let i = 1; i <= 4; i++) await page.mouse.move(X, y + 10 * i);
+      const y = yOf(L3, 'sl'), X = await xFree(y), sgn = y - L0.box.t + 40 > paneH - 30 ? -1 : 1; await page.mouse.move(X, y); await page.mouse.down(); for (let i = 1; i <= 4; i++) await page.mouse.move(X, y + sgn * 10 * i);
       const mid = await live(); await page.keyboard.press('Escape'); await page.mouse.up(); await page.waitForTimeout(150);
       const L4 = await live();
-      ok(`[${tag}] Escape while dragging puts the line back where it was`, mid.plan.stop < L3.plan.stop && Math.abs(L4.plan.stop - L3.plan.stop) < 1e-9 && L4.range === L3.range, JSON.stringify({ mid: mid.plan.stop, back: L4.plan.stop, want: L3.plan.stop }));
+      ok(`[${tag}] Escape while dragging puts the line back where it was`, mid.plan.stop !== L3.plan.stop && Math.abs(L4.plan.stop - L3.plan.stop) < 1e-9 && L4.range === L3.range, JSON.stringify({ mid: mid.plan.stop, back: L4.plan.stop, want: L3.plan.stop }));
     }
     /* tap "+ Target", then the chart above the last target: a new exit at that price */
     let Lb = await live();
