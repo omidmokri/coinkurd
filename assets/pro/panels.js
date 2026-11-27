@@ -370,7 +370,15 @@
     var b = a.base; if (!PCT[a.c]) return [a.v]; if (!(b > 0)) return [];
     return a.c === 'pup' ? [b * (1 + a.v / 100)] : a.c === 'pdn' ? [b * (1 - a.v / 100)] : [b * (1 + a.v / 100), b * (1 - a.v / 100)];
   }
-  P.alertLines = function (sym) { var o = []; AL.forEach(function (a) { if (a.on && a.k === 'price' && a.sym === sym) targets(a).forEach(function (v) { o.push({ v: v }); }); }); return o; };
+  P.alertLines = function (sym) { var o = []; AL.forEach(function (a) { if (a.on && a.k === 'price' && a.sym === sym) targets(a).forEach(function (v) { var od = /^ODM /.test(a.msg || ''); o.push({ v: v, id: a.id, odm: od, t: od ? a.msg.slice(4, 24) : '' }); }); }); return o; };
+  /* take alerts off (the right-click menu and ODM use these); the ones taken off come back so they can be put back */
+  P.delAlerts = function (fn) {
+    var gone = AL.filter(fn); if (!gone.length) return gone;
+    AL = AL.filter(function (a) { return gone.indexOf(a) < 0; }); saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); }); return gone;
+  };
+  P.putAlerts = function (list) { (list || []).forEach(function (a) { if (AL.indexOf(a) < 0) AL.push(a); }); saveAL(); syncIndSubs(); A.cells().forEach(function (c) { c.ovl.update(); }); };
+  P.isOdmAlert = function (a, sym) { return !!(a && a.on && a.k === 'price' && a.sym === sym && /^ODM /.test(a.msg || '')); };
+  P.odmAlertCount = function (sym) { return AL.filter(function (a) { return P.isOdmAlert(a, sym); }).length; };
   /* alerts on drawn lines: the line's price where it is now (a sloped line moves; a channel has two sides) */
   function drawingOf(a) { var L = (A.DRAW()[a.sym] || []); for (var i = 0; i < L.length; i++) if (L[i].id === a.did) return L[i]; return null; }
   function lineAt(d, t) {

@@ -826,3 +826,26 @@ body.pm-odsheet #ask-fab{visibility:hidden}
 .pm-lqsrc li.ok::marker{color:var(--up)}.pm-lqsrc li.bad{color:var(--dn)}.pm-lqsrc li.wait{color:var(--mute)}
 #pro.pm-light .pm-lqt td{border-bottom-color:rgba(0,0,0,.06)}
 @media (max-width:560px){.pm-lqt{font-size:11.5px}.pm-lqt td,.pm-lqt th{padding:4px 3px}}
+/* ODM on the chart: the panel, picking a price, dragging a line */
+.pm-odhud{position:absolute;left:8px;bottom:34px;z-index:7;max-width:min(460px,calc(100% - 96px));background:rgba(17,17,19,.92);border:1px solid rgba(247,147,26,.45);border-radius:12px;padding:7px 9px;box-shadow:0 8px 26px rgba(0,0,0,.45);font-size:12px;line-height:1.45;color:#e8e8e3;backdrop-filter:blur(6px)}
+.pm-odhs{display:flex;flex-wrap:wrap;gap:2px 10px;font-weight:600}
+.pm-odhs span{white-space:nowrap;color:#a9a9a3}.pm-odhs bdi{color:#f1f1ec}
+.pm-odhs .dn bdi{color:#ff6a5e}.pm-odhs .up bdi{color:#34d399}
+.pm-odhm{margin:3px 0 5px;color:#b9b9b2;font-size:11.5px}.pm-odhm.dn{color:#ff8a80}
+.pm-odhb{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.pm-odhb .pm-btn.sm{margin:0;padding:4px 9px;min-height:28px}
+.pm-odhb [data-pk].on{background:#f7931a;color:#141414;border-color:#f7931a}
+.pm-odhb .pm-ib{width:28px;height:28px;border:1px solid rgba(255,255,255,.14)}
+.pm-odhb .pm-ib:disabled{opacity:.35;cursor:default}
+.pm-odhb [data-a="hide"]{margin-inline-start:auto}
+.pm-odpick .pm-chart,.pm-odpick .pm-chart *{cursor:crosshair!important}
+.pm-oddrag .pm-chart,.pm-oddrag .pm-chart *{cursor:ns-resize!important}
+.pm-odpick .pm-odhud{border-color:#f7931a;box-shadow:0 0 0 2px rgba(247,147,26,.35),0 8px 26px rgba(0,0,0,.45)}
+#pro.pm-light .pm-odhud{background:rgba(255,255,255,.95);color:#20201e;border-color:rgba(247,147,26,.6);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+#pro.pm-light .pm-odhs span{color:#6d6d68}#pro.pm-light .pm-odhs bdi{color:#20201e}#pro.pm-light .pm-odhm{color:#5d5d58}
+#pro.pm-light .pm-odhb .pm-ib{border-color:rgba(0,0,0,.15)}
+@media (max-width:600px){.pm-odhud{left:4px;right:60px;max-width:none;bottom:30px;padding:6px 7px;font-size:11.5px}.pm-odhs{gap:1px 8px}.pm-odhb .pm-btn.sm{min-height:32px;padding:4px 8px}.pm-odhb .pm-ib{width:32px;height:32px}}
+/* a note with a button (Undo) can be pressed */
+.pm-toast.act{pointer-events:auto;display:flex;align-items:center;gap:12px}
+.pm-tbtn{background:none;border:0;color:var(--acc,#f7931a);font:inherit;font-weight:700;cursor:pointer;padding:4px 6px;border-radius:8px;white-space:nowrap}
+.pm-tbtn:hover,.pm-tbtn:focus-visible{background:rgba(247,147,26,.14)}

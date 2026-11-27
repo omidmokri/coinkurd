@@ -241,23 +241,203 @@
       beAfter: num(st.beAfter) || 0 };
   }
   P.odmInputs = inputs; P.odmFresh = fresh;
-  /* the plan's levels as price lines on a chart, until hidden or the symbol changes */
+  /* ---- the plan on the chart: its levels as price lines you can drag. Dragging an entry, the stop or a target writes that
+     price into the plan, the plan is worked out again at once, every other line follows (an average, targets set in R, the
+     break-even) and a small panel on the chart shows the new risk, average, R and result. A tap on "+ Entry", "+ Target" or
+     "Stop" in that panel, then a tap on the chart, puts that level at the price tapped. Nothing here places an order. */
   var LN = null;
-  function hideLines() { if (!LN) return; LN.L.forEach(function (l) { try { LN.cell.main.removePriceLine(l); } catch (e) { } }); LN = null; }
-  function showLines(cell, r) {
+  var LCOL = { e: '#f7931a', avg: '#f7931a', sl: '#ff5a4d', x: '#34d399', tr: '#a78bfa', be: '#9a9a94', liq: '#a855f7' };
+  /* the entries and exits the plan uses, as indexes into the form's rows (empty rows are skipped by the plan too) */
+  function usedE(st) { var o = []; st.entries.forEach(function (e, i) { if (e && e.p !== '' && e.p != null) o.push(i); }); return o; }
+  function usedX(st) { var o = []; st.exits.forEach(function (x, i) { if (x && x.v !== '' && x.v != null && +num(x.q) > 0) o.push(i); }); return o; }
+  function levels(st, r) {
+    var L = [];
+    usedE(st).forEach(function (i, k) { L.push({ k: 'e' + i, p: num(st.entries[i].p), c: LCOL.e, t: 'E' + (k + 1), st: 2, drag: 'e', i: i }); });
+    if (r && !r.err) {
+      if (r.fills.length > 1) L.push({ k: 'avg', p: r.avg, c: LCOL.avg, t: T('odLAvg'), st: 0 });
+      L.push({ k: 'sl', p: r.stop, c: LCOL.sl, t: 'SL', st: 0, drag: 's', w: 2 });
+      var xi = usedX(st); r.exits.forEach(function (x, k) { L.push({ k: 'x' + xi[k], p: x.p, c: LCOL.x, t: 'TP' + x.n + ' ' + f(x.q, 0) + '%', st: 2, drag: 'x', i: xi[k] }); });
+      if (r.trail && r.trail.act != null) L.push({ k: 'tr', p: r.trail.act, c: LCOL.tr, t: T('odLTrail'), st: 1 });
+      if (r.beAfter) L.push({ k: 'be', p: r.be, c: LCOL.be, t: 'BE', st: 1 });
+      if (r.liq != null) L.push({ k: 'liq', p: r.liq, c: LCOL.liq, t: T('odLLiq'), st: 3 });
+    } else {
+      /* the plan refuses these numbers: the levels typed as prices stay on the chart, so they can be dragged back */
+      if (st.stop.mode === 'price' && num(st.stop.v) > 0) L.push({ k: 'sl', p: num(st.stop.v), c: LCOL.sl, t: 'SL', st: 0, drag: 's', w: 2 });
+      usedX(st).forEach(function (i, k) { var x = st.exits[i]; if (x.mode === 'price') L.push({ k: 'x' + i, p: num(x.v), c: LCOL.x, t: 'TP' + (k + 1) + ' ' + f(num(x.q), 0) + '%', st: 2, drag: 'x', i: i }); });
+    }
+    return L.filter(function (l) { return l.p > 0 && isFinite(l.p); });
+  }
+  function hideLines() {
+    if (!LN) return; var c = LN.cell, Z = LN; LN = null;
+    Object.keys(Z.map).forEach(function (k) { try { c.main.removePriceLine(Z.map[k]); } catch (e) { } });
+    Z.off(); if (Z.hud) Z.hud.remove(); unlock(Z); if (c.el) c.el.classList.remove('pm-odpick');
+  }
+  function lock(Z) { if (Z.locked) return; try { var o = Z.cell.chart.options(); Z.locked = { s: o.handleScroll, z: o.handleScale }; Z.cell.chart.applyOptions({ handleScroll: false, handleScale: false }); } catch (e) { } }
+  function unlock(Z) { if (!Z.locked) return; try { Z.cell.chart.applyOptions({ handleScroll: Z.locked.s, handleScale: Z.locked.z }); } catch (e) { } Z.locked = null; }
+  /* draw (or move) every line of the plan; a line whose level is gone is removed */
+  function syncLines(Z) {
+    var L = levels(Z.st, Z.plan), seen = {};
+    L.forEach(function (l) {
+      seen[l.k] = 1; var o = { price: l.p, color: l.c, lineWidth: l.w || (Z.drag && Z.drag.k === l.k ? 3 : 1), lineStyle: l.st, axisLabelVisible: true, title: l.t + (l.drag ? ' ↕' : '') };
+      if (Z.drag && Z.drag.k === l.k) o.lineWidth = 3;
+      var ex = Z.map[l.k];
+      if (ex) { try { ex.applyOptions(o); } catch (e) { } } else { try { Z.map[l.k] = Z.cell.main.createPriceLine(o); } catch (e) { } }
+    });
+    Object.keys(Z.map).forEach(function (k) { if (!seen[k]) { try { Z.cell.main.removePriceLine(Z.map[k]); } catch (e) { } delete Z.map[k]; } });
+    Z.L = L; hud(Z);
+  }
+  function recalc(Z) { Z.plan = O.plan(inputs(Z.st, Z.atr)); return Z.plan; }
+  /* the small panel on the chart */
+  function hud(Z) {
+    var b = Z.hud; if (!b) return;
+    var r = Z.plan, top = $('.pm-odhs', b), msg = $('.pm-odhm', b); top.innerHTML = '';
+    function part(lbl, val, cls) { var sp = document.createElement('span'); if (cls) sp.className = cls; sp.appendChild(document.createTextNode(lbl + ' ')); var bd = document.createElement('bdi'); bd.dir = 'ltr'; bd.className = 'pm-num'; bd.textContent = val; sp.appendChild(bd); top.appendChild(sp); }
+    if (!r || r.err) { msg.textContent = r ? T('odE_' + r.err, { n: r.at || '' }) : ''; msg.className = 'pm-odhm dn'; }
+    else {
+      part(T('odTopRisk'), '−' + f(r.risk), 'dn'); part(T('odTopAvg'), px(r.avg)); part('SL', px(r.stop)); part('R', px(Math.abs(r.avg - r.stop)));
+      if (r.best != null) part(T('odTopBest'), sg(r.best) + ' (' + f(r.best / r.risk, 2) + 'R)', 'up');
+      part(T('rcQty'), f(r.qty, 6));
+      msg.className = 'pm-odhm';
+      if (Z.drag) { var dl = Z.L.filter(function (l) { return l.k === Z.drag.k; })[0]; msg.textContent = dl ? T('odDragAt', { l: dl.t, p: px(dl.p), d: f((dl.p / Z.last - 1) * 100, 2) }) : ''; }
+      else msg.textContent = Z.pick ? T('odPick_' + Z.pick) : T('odDragHint');
+    }
+    $$('[data-pk]', b).forEach(function (x) { x.classList.toggle('on', Z.pick === x.getAttribute('data-pk')); x.setAttribute('aria-pressed', String(Z.pick === x.getAttribute('data-pk'))); });
+    $('[data-pk="x"]', b).disabled = Z.st.exits.length >= 8; $('[data-pk="e"]', b).disabled = Z.st.entries.length >= 10;
+    $('[data-a="undo"]', b).disabled = !Z.hist.length;
+  }
+  function saveSt(st) { try { S.set(KEY, st); } catch (e) { } }
+  /* undo: the plan as it was before each drag or tap on the chart */
+  function remember(Z, snap) { Z.hist.push(snap || JSON.stringify(Z.st)); if (Z.hist.length > 40) Z.hist.shift(); }
+  function restore(Z, snap) { var o = JSON.parse(snap); Object.keys(o).forEach(function (k) { Z.st[k] = o[k]; }); recalc(Z); saveSt(Z.st); syncLines(Z); }
+  function undo(Z) { if (!Z.hist.length) return; restore(Z, Z.hist.pop()); A.toast(T('odUndone')); }
+  /* a price from the chart, rounded the way the planner rounds what it writes */
+  function priceAt(Z, y) { var p = null; try { p = Z.cell.main.coordinateToPrice(y); } catch (e) { } return p > 0 ? +rnd(p) : null; }
+  /* equal shares that add up to exactly 100 */
+  function equal(n) { var a = [], b = Math.floor(10000 / n) / 100, s = 0; for (var i = 0; i < n; i++) { var v = i === n - 1 ? +(100 - s).toFixed(2) : b; s += v; a.push(String(v)); } return a; }
+  function setLevel(Z, kind, i, p) {
+    var st = Z.st, v = plain(p);
+    if (kind === 'e') st.entries[i].p = v;
+    else if (kind === 's') { st.stop.mode = 'price'; st.stop.v = v; }
+    else if (kind === 'x') { st.exits[i].mode = 'price'; st.exits[i].v = v; }
+  }
+  /* a tap on the chart while picking: a new entry, a new target, or the stop, at that price */
+  function pickAt(Z, p) {
+    var st = Z.st, k = Z.pick; remember(Z);
+    if (k === 'e') { st.entries.push({ p: plain(p), q: '' }); var eq = equal(st.entries.length); st.entries.forEach(function (e, i) { e.q = eq[i]; }); }
+    else if (k === 's') { st.stop.mode = 'price'; st.stop.v = plain(p); }
+    else if (k === 'x') {
+      var used = 0; st.exits.forEach(function (x) { var q = num(x.q); if (q > 0) used += q; });
+      st.exits.push({ mode: 'price', v: plain(p), q: used < 100 ? String(+(100 - used).toFixed(2)) : '' });
+      if (used >= 100) { var ex = equal(st.exits.length); st.exits.forEach(function (x, i) { x.q = ex[i]; }); }
+      /* targets stay in order from the entry outwards, as the plan needs */
+      var dir = st.side === 'short' ? -1 : 1;
+      st.exits.sort(function (a, b) { var pa = a.mode === 'price' ? num(a.v) : NaN, pb = b.mode === 'price' ? num(b.v) : NaN; return isFinite(pa) && isFinite(pb) ? dir * (pa - pb) : 0; });
+    }
+    Z.pick = null; if (Z.cell.el) Z.cell.el.classList.remove('pm-odpick');
+    recalc(Z); saveSt(st); syncLines(Z);
+  }
+  function showLines(cell, r, st, atr) {
     hideLines(); if (!cell || !cell.main || !r || r.err) return 0;
-    var L = [], add = function (p, c, t, st) { if (!(p > 0)) return; try { L.push(cell.main.createPriceLine({ price: p, color: c, lineWidth: 1, lineStyle: st || 0, axisLabelVisible: true, title: t })); } catch (e) { } };
-    r.fills.forEach(function (x) { add(x.p, '#f7931a', 'E' + x.n, 2); });
-    if (r.fills.length > 1) add(r.avg, '#f7931a', T('odLAvg'), 0);
-    add(r.stop, '#ff5a4d', 'SL', 0);
-    r.exits.forEach(function (x) { add(x.p, '#34d399', 'TP' + x.n + ' ' + f(x.q, 0) + '%', 2); });
-    if (r.trail && r.trail.act != null) add(r.trail.act, '#a78bfa', T('odLTrail'), 1);
-    if (r.beAfter) add(r.be, '#9a9a94', 'BE', 1);
-    if (r.liq != null) add(r.liq, '#a855f7', T('odLLiq'), 3);
-    LN = { cell: cell, sym: cell.cfg.sym, L: L }; return L.length;
+    st = st || S.get(KEY, null); if (!st || !st.entries) return 0;
+    var B = cell.bars || [], Z = { cell: cell, sym: cell.cfg.sym, st: st, atr: atr, plan: r, map: {}, L: [], last: B.length ? B[B.length - 1].c : r.avg, drag: null, pick: null, hist: [] };
+    /* the panel: the plan's figures, and three buttons that put a level where you tap next */
+    var hb = h('<div class="pm-odhud" role="group"><div class="pm-odhs pm-num" dir="ltr"></div><div class="pm-odhm"></div><div class="pm-odhb">' +
+      '<button type="button" class="pm-btn sm" data-pk="e"></button><button type="button" class="pm-btn sm" data-pk="s"></button><button type="button" class="pm-btn sm" data-pk="x"></button>' +
+      '<button type="button" class="pm-ib" data-a="undo"></button><button type="button" class="pm-btn sm pri" data-a="open"></button><button type="button" class="pm-ib" data-a="hide"></button></div></div>');
+    hb.dir = A.RTL() ? 'rtl' : 'ltr'; hb.setAttribute('aria-label', T('odTitle'));
+    $('[data-pk="e"]', hb).textContent = '+ ' + T('odHudE'); $('[data-pk="s"]', hb).textContent = T('odHudS'); $('[data-pk="x"]', hb).textContent = '+ ' + T('odHudX');
+    $('[data-a="open"]', hb).textContent = T('odHudOpen'); var xb = $('[data-a="hide"]', hb); xb.innerHTML = A.ic('x'); xb.setAttribute('aria-label', T('odHide')); xb.title = T('odHide');
+    $$('[data-pk]', hb).forEach(function (b) { b.onclick = function (e) { e.stopPropagation(); var k = b.getAttribute('data-pk'); Z.pick = Z.pick === k ? null : k; cell.el.classList.toggle('pm-odpick', !!Z.pick); hud(Z); }; });
+    var ub = $('[data-a="undo"]', hb); ub.innerHTML = A.ic('undo') || '↶'; ub.setAttribute('aria-label', T('odHudUndo')); ub.title = T('odHudUndo');
+    ub.onclick = function (e) { e.stopPropagation(); undo(Z); };
+    $('[data-a="open"]', hb).onclick = function (e) { e.stopPropagation(); if (P.odmDialog) P.odmDialog(); };
+    xb.onclick = function (e) { e.stopPropagation(); clearOdm(cell, false); };
+    ['pointerdown', 'mousedown', 'touchstart', 'wheel'].forEach(function (n) { hb.addEventListener(n, function (e) { e.stopPropagation(); }, { passive: true }); });
+    cell.el.appendChild(hb); Z.hud = hb;
+    /* the pointer on the chart: grab the line under it (a finger gets a wider band), or drop a picked level */
+    var box = cell.box;
+    function loc(e) { var t = e.touches && e.touches[0] || e.changedTouches && e.changedTouches[0] || e, rc = box.getBoundingClientRect(); return { x: t.clientX - rc.left, y: t.clientY - rc.top, w: rc.width, h: rc.height }; }
+    function near(q, touch) {
+      var best = null, bd = touch ? 16 : 7;
+      Z.L.forEach(function (l) { if (!l.drag) return; var y = null; try { y = cell.main.priceToCoordinate(l.p); } catch (e) { } if (y == null) return; var d = Math.abs(y - q.y); if (d <= bd) { bd = d; best = l; } });
+      return best;
+    }
+    function eat(e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); }
+    var downEv = function (e) {
+      if (!LN || LN !== Z) return;
+      if (e.target.closest && e.target.closest('.pm-odhud,.pm-leg,.pm-selbar,.pm-menu,.pm-macro')) return;
+      if (e.button != null && e.button !== 0) return;
+      var q = loc(e); if (q.x < 0 || q.y < 0 || q.x > q.w || q.y > q.h) return;
+      if (Z.pick) { var p = priceAt(Z, q.y); if (p) { eat(e); pickAt(Z, p); } return; }
+      var l = near(q, e.pointerType && e.pointerType !== 'mouse'); if (!l) return;
+      eat(e); lock(Z); Z.drag = { k: l.k, kind: l.drag, i: l.i, y0: q.y, moved: false, id: e.pointerId, snap: JSON.stringify(Z.st) };
+      cell.el.classList.add('pm-oddrag'); syncLines(Z);
+    };
+    var moveEv = function (e) {
+      if (!LN || LN !== Z) return;
+      var q = loc(e);
+      if (!Z.drag) {
+        if (e.buttons || e.pointerType !== 'mouse') return;
+        var l = q.x >= 0 && q.y >= 0 && q.x <= q.w && q.y <= q.h ? near(q, false) : null;
+        box.style.cursor = Z.pick ? 'crosshair' : l ? 'ns-resize' : ''; return;
+      }
+      eat(e); var p = priceAt(Z, q.y); if (!p) return;
+      if (Math.abs(q.y - Z.drag.y0) > 2) Z.drag.moved = true;
+      setLevel(Z, Z.drag.kind, Z.drag.i, p); recalc(Z);
+      /* the dragged line follows the pointer even while the plan refuses the level (the panel says why) */
+      if (Z.plan.err) { var m = Z.map[Z.drag.k]; if (m) try { m.applyOptions({ price: p }); } catch (e2) { } Z.L.forEach(function (x) { if (x.k === Z.drag.k) x.p = p; }); hud(Z); }
+      else syncLines(Z);
+    };
+    var upEv = function (e) {
+      if (!LN || LN !== Z || !Z.drag) return;
+      eat(e); var moved = Z.drag.moved, snap = Z.drag.snap; Z.drag = null; unlock(Z); cell.el.classList.remove('pm-oddrag'); box.style.cursor = '';
+      if (moved) { remember(Z, snap); saveSt(Z.st); }
+      syncLines(Z);
+    };
+    var keyEv = function (e) {
+      if (e.key !== 'Escape' || !LN || LN !== Z) return;
+      /* Escape while a line is held puts it back where it was; Escape while picking stops picking */
+      if (Z.drag) { var sn = Z.drag.snap; Z.drag = null; unlock(Z); cell.el.classList.remove('pm-oddrag'); box.style.cursor = ''; restore(Z, sn); e.stopPropagation(); e.preventDefault(); }
+      else if (Z.pick) { Z.pick = null; cell.el.classList.remove('pm-odpick'); hud(Z); e.stopPropagation(); }
+    };
+    box.addEventListener('pointerdown', downEv, true); box.addEventListener('pointermove', moveEv, true);
+    window.addEventListener('pointerup', upEv, true); window.addEventListener('pointercancel', upEv, true); document.addEventListener('keydown', keyEv, true);
+    /* lightweight-charts also listens to mouse and touch events: while a line is held they must not pan the chart */
+    var swallow = function (e) { if (Z.drag) eat(e); };
+    ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.addEventListener(n, swallow, { capture: true, passive: false }); });
+    Z.off = function () {
+      box.removeEventListener('pointerdown', downEv, true); box.removeEventListener('pointermove', moveEv, true);
+      window.removeEventListener('pointerup', upEv, true); window.removeEventListener('pointercancel', upEv, true); document.removeEventListener('keydown', keyEv, true);
+      ['mousedown', 'mousemove', 'touchstart', 'touchmove'].forEach(function (n) { box.removeEventListener(n, swallow, { capture: true, passive: false }); });
+      box.style.cursor = ''; cell.el.classList.remove('pm-oddrag');
+    };
+    LN = Z; syncLines(Z); return Z.L.length;
   }
   A.on('sym', function (cell) { if (LN && LN.cell === cell) hideLines(); });
-  P.odmHide = hideLines; P.odmLinesShown = function () { return LN ? LN.L.length : 0; };
+  ['grid', 'lang'].forEach(function (n) { A.on(n, function () { if (LN && !LN.cell.el.isConnected) { LN.off(); LN = null; } }); });
+  P.odmHide = hideLines; P.odmLinesShown = function (cell) { return LN && (!cell || LN.cell === cell) ? LN.L.length : 0; };
+  /* take the plan's lines off the chart, and with alerts true also the alerts ODM added for this coin; one Undo puts both back */
+  function clearOdm(cell, alerts) {
+    var Z = LN && (!cell || LN.cell === cell) ? LN : null, sym = Z ? Z.sym : cell ? cell.cfg.sym : null, n = Z ? Z.L.length : 0, gone = [];
+    if (Z) hideLines();
+    if (alerts && sym && P.delAlerts) gone = P.delAlerts(function (a) { return P.isOdmAlert(a, sym); });
+    if (!n && !gone.length) return 0;
+    var msg = n && gone.length ? T('odClearedBoth', { n: n, m: gone.length }) : n ? T('odHidden') : T('odClearedAl', { m: gone.length });
+    A.toast(msg, '', { label: T('undo'), act: function () {
+      if (Z && Z.cell.el.isConnected && Z.cell.cfg.sym === Z.sym) showLines(Z.cell, Z.plan, Z.st, Z.atr);
+      if (gone.length && P.putAlerts) P.putAlerts(gone);
+    } });
+    return n + gone.length;
+  }
+  P.odmClear = clearOdm;
+  /* the level of the plan under a point of the chart, for the right-click menu */
+  P.odmHit = function (cell, y) {
+    if (!LN || LN.cell !== cell) return null; var best = null, bd = 6;
+    LN.L.forEach(function (l) { var yy = null; try { yy = cell.main.priceToCoordinate(l.p); } catch (e) { } if (yy == null) return; var d = Math.abs(yy - y); if (d <= bd) { bd = d; best = l; } });
+    return best ? { k: best.k, t: best.t, p: best.p } : null;
+  };
+  /* for the browser checks: the panel's plan and the y of a level on the chart */
+  P.odmLive = function () { return LN ? { plan: LN.plan, st: LN.st, levels: LN.L.map(function (l) { var y = null; try { y = LN.cell.main.priceToCoordinate(l.p); } catch (e) { } return { k: l.k, p: l.p, y: y, drag: !!l.drag }; }), pick: LN.pick } : null; };
 
   P.odmDialog = function () {
     var cell = A.active(); if (!cell) return;
@@ -424,8 +604,11 @@
 
     /* ---- actions */
     function act(k, fn, need, pri) { var b = h('<button type="button" class="pm-btn' + (pri ? ' pri' : '') + '"></button>'); b.textContent = T(k); b.onclick = fn; if (need) b.setAttribute('data-need', ''); ACT.appendChild(b); return b; }
-    act('odShow', function () { var n = showLines(cell, plan); A.closeModal(); A.toast(T('odShown', { n: n })); }, 1, 1);
-    var hb = act('odHide', function () { hideLines(); hb.hidden = true; A.toast(T('odHidden')); }); hb.hidden = !LN;
+    act('odShow', function () { save(); var n = showLines(cell, plan, st, atr); A.closeModal(); A.toast(T('odShown', { n: n })); }, 1, 1);
+    var hb = act('odHide', function () { clearOdm(null, false); hb.hidden = true; }); hb.hidden = !LN;
+    /* alerts made from this plan draw their own 🔔 lines; they stay until deleted, so ODM offers that next to Hide */
+    var nal = P.odmAlertCount ? P.odmAlertCount(sym) : 0;
+    var ab2 = act('odDelAl', function () { clearOdm(cell, true); ab2.hidden = true; hb.hidden = true; }); ab2.textContent = T('odDelAl', { n: nal }); ab2.hidden = !nal;
     act('odTest', function () { test(); }, 1);
     act('odSave', function () {
       var r = plan; if (!r || r.err) return;
