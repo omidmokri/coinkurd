@@ -66,7 +66,10 @@ def main():
         both = [r[1] for r in rows] + after
         back = as_list(call(
             "Translate each string below from " + lang + " into plain Persian (Farsi), as literally as you can, so a "
-            "reader sees exactly what it says, including any wrong word choice. Return ONLY a JSON array of strings, "
+            "reader sees exactly what it says, including any wrong word choice. Where a string keeps an English trading word "
+            "or a transliteration of one, write it the way Persian traders do (open interest = اوپن اینترست, funding rate = "
+            "فاندینگ ریت, long = لانگ, short = شورت, drawdown = دراوداون), not a literal translation of the English. "
+            "Return ONLY a JSON array of strings, "
             "same length and order.\n" + json.dumps(both, ensure_ascii=False), keys, models), len(both)) or [""] * len(both)
         res["langs"][code] = [{"en": r[0], "google": r[2], "before": r[1], "after": a,
                                "before_fa": back[i], "after_fa": back[len(rows) + i],
