@@ -1701,10 +1701,10 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       await page.waitForTimeout(500);
       const S1 = await st();
       ok(`[${tag}] after a real click on another timeframe the ODM lines and the box are still on the chart and the chart is free`, S1.tf === want && S1.n === S.n && S1.pl === S.pl && S1.Z && S1.free, JSON.stringify({ tf: S1.tf, want, n: S1.n, pl: S1.pl, Z: !!S1.Z, free: S1.free, clicked: !!clicked }));
-      const p = await freePt(S1, false);
+      const p = (await freePt(S1, false)) || (await freePt(S1, true));   /* in a shorter timeframe the box can fill the view */
       if (p) { await pan(p.x, p.y, phone ? 130 : 180, 0); const S2 = await st(); ok(`[${tag}] after the timeframe change the chart still pans back into history with ODM on`, S2.from < S1.from - 2 && S2.n === S1.n, JSON.stringify({ f0: S1.from, f1: S2.from })); }
       else ok(`[${tag}] room to drag after the timeframe change`, false, '');
-      const p2 = await freePt(await st(), false);
+      const S2b = await st(), p2 = (await freePt(S2b, false)) || (await freePt(S2b, true));
       if (p2) { await pan(p2.x, p2.y, 0, phone ? 90 : 120); const S3 = await st(); ok(`[${tag}] dragging up and down with ODM on moves the chart, not the plan`, S3.stop === S1.stop && S3.avg === S1.avg && S3.n === S1.n && S3.free, JSON.stringify({ s: [S1.stop, S3.stop] })); }
     }
     /* only an explicit act removes the position: Delete on the selected position (desktop) or the panel's bin, both with Undo */
