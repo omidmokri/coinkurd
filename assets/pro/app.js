@@ -1567,6 +1567,73 @@
     menu(anchor, items);
   }
 
+  /* ---- Reset the page: every alert (all coins), the alert history, every drawing and the ODM plan go at once, and the
+     indicators too when ticked. One Undo brings it all back, and a copy is kept so the last reset can still be undone later
+     from the workspace menu. Settings, layouts, the watchlist and the portfolio are not touched. */
+  var RBK = 'ek_pro_resetbk';
+  function resetCounts() {
+    var nd = 0, ni = 0; Object.keys(DRAW).forEach(function (k) { nd += (DRAW[k] || []).length; });
+    cells.forEach(function (c) { ni += c.cfg.inds.length; });
+    var od = S.get('ek_pro_odm', null);
+    return { al: P.alertsAll ? P.alertsAll().length : 0, log: P.alertLog ? P.alertLog().length : 0, dr: nd,
+      od: (od && typeof od === 'object' ? 1 : 0) + (P.odmLinesShown ? P.odmLinesShown() : 0) ? 1 : 0, ind: ni };
+  }
+  function resetPage() {
+    closeMenu();
+    var c = resetCounts(), rows = [['al', 'rsAl', c.al, 1], ['log', 'rsLog', c.log, 1], ['dr', 'rsDr', c.dr, 1], ['od', 'rsOd', c.od, 1], ['ind', 'rsInd', c.ind, 0]];
+    var f = h('<form class="pm-rs"><p class="pm-p"></p><div class="pm-rsl"></div><p class="pm-note"></p><div class="pm-row"><button class="pm-btn pri pm-rsgo" type="submit"></button><button class="pm-btn" type="button" data-x></button></div></form>');
+    $('.pm-p', f).textContent = T('rsLead');
+    rows.forEach(function (r) {
+      var l = h('<label class="pm-rsr"><input type="checkbox"><span></span><b></b></label>'), i = $('input', l);
+      i.name = r[0]; i.checked = !!r[3] && r[2] > 0; i.disabled = !r[2]; $('span', l).textContent = T(r[1]); $('b', l).textContent = r[0] === 'od' ? (r[2] ? '✓' : '—') : loc(r[2]);
+      if (!r[2]) l.classList.add('off'); $('.pm-rsl', f).appendChild(l);
+    });
+    $('.pm-note', f).textContent = T('rsNote');
+    var go = $('.pm-rsgo', f); go.textContent = T('rsGo');
+    function any() { return $$('.pm-rsl input', f).some(function (i) { return i.checked; }); }
+    $$('.pm-rsl input', f).forEach(function (i) { i.onchange = function () { go.disabled = !any(); }; }); go.disabled = !any();
+    $('[data-x]', f).textContent = T('cancel'); $('[data-x]', f).onclick = closeModal;
+    f.onsubmit = function (e) {
+      e.preventDefault(); var pick = {}; $$('.pm-rsl input', f).forEach(function (i) { pick[i.name] = i.checked && !i.disabled; });
+      closeModal(); doReset(pick);
+    };
+    modal(T('rsTitle'), f);
+  }
+  function doReset(pick) {
+    var bk = { at: Date.now() }, lines = null;
+    if (pick.al && P.delAlerts) bk.al = P.delAlerts(function () { return true; });
+    if (pick.log && P.alertLog) { bk.log = P.alertLog(); P.alertLog([]); }
+    if (pick.od) {
+      lines = P.odmSnap ? P.odmSnap() : null; if (P.odmHide) P.odmHide();
+      bk.od = S.get('ek_pro_odm', null); try { localStorage.removeItem('ek_pro_odm'); } catch (e) { }
+    }
+    if (pick.dr) {
+      bk.dr = JSON.parse(JSON.stringify(DRAW)); Object.keys(DRAW).forEach(function (k) { delete DRAW[k]; });
+      undo = []; redo = []; cells.forEach(function (c) { if (c.drawer) { c.drawer.select(null); c.drawer.update(); } c.ovl.update(); });
+      save(); emit('draws', null); paintUndo();
+    }
+    if (pick.ind) {
+      bk.ind = cells.map(function (c) { return c.cfg.inds.slice(); });
+      cells.forEach(function (c) { if (c.cfg.inds.length) { c.cfg.inds = []; c.indsChanged(); } });
+    }
+    S.set(RBK, { at: bk.at, al: bk.al || null, log: bk.log || null, dr: bk.dr || null, od: bk.od === undefined ? undefined : bk.od, n: (bk.al || []).length });
+    toast(T('rsDone'), '', { label: T('undo'), act: function () { unReset(bk, lines); } });
+  }
+  /* put back what a Reset took; what was added after the reset is kept */
+  function unReset(bk, lines) {
+    if (!bk) return;
+    if (bk.al && bk.al.length && P.putAlerts) P.putAlerts(bk.al);
+    if (bk.log && P.alertLog) P.alertLog(bk.log.concat(P.alertLog()));
+    if (bk.od !== undefined && bk.od !== null && !S.get('ek_pro_odm', null)) S.set('ek_pro_odm', bk.od);
+    if (lines) lines();
+    if (bk.dr) {
+      Object.keys(bk.dr).forEach(function (k) { if (SYM_RE.test(k) && Array.isArray(bk.dr[k])) DRAW[k] = (DRAW[k] || []).concat(bk.dr[k].map(cleanDraw).filter(Boolean)); });
+      cells.forEach(function (c) { if (c.drawer) c.drawer.update(); c.ovl.update(); }); save(); emit('draws', null);
+    }
+    if (bk.ind) bk.ind.forEach(function (L, i) { var c = cells[i]; if (c && L.length && !c.cfg.inds.length) { c.cfg.inds = L; c.indsChanged(); } });
+    try { localStorage.removeItem(RBK); } catch (e) { }
+    toast(T('rsBack'));
+  }
   /* ---- workspace menu: named layouts, export/import, share link, CSV */
   function wsMenu(anchor) {
     var L = S.get('ek_pro_layouts', []); if (!Array.isArray(L)) L = [];
@@ -1581,7 +1648,10 @@
       { label: T('csv'), icon: 'down', act: csv },
       { label: T('csvAll'), icon: 'down', act: csvAll },
       { label: T('exportJson'), icon: 'down', act: exportAll },
-      { label: T('importJson'), icon: 'copy', act: importAll });
+      { label: T('importJson'), icon: 'copy', act: importAll },
+      { sep: true }, { label: T('rsTitle') + '…', icon: 'trash', act: resetPage });
+    var RB = S.get(RBK, null);
+    if (RB && RB.at) items.push({ label: T('rsUndoLast'), icon: 'undo', hint: fmtD(Math.floor(RB.at / 1000), 'date'), act: function () { unReset(RB, null); } });
     menu(anchor, items);
   }
   function b64u(buf) { var s = '', a = new Uint8Array(buf); for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
@@ -2437,7 +2507,7 @@
     TGROUPS.forEach(function (G) { (G.rows || []).forEach(function (r) { r.forEach(function (t) { rows.push({ n: T('t_' + t), g: T('favTools'), i: ic(t), act: function () { setTool(t); } }); }); }); });
     [['csTitle', 'gear', function () { chartSettings('sym'); }], ['indicators', 'fx', function () { indDialog(); }], ['symbol', 'layers', function () { symbolSearch(''); }],
       ['ctxFit', 'fit', function () { var a = active(); if (a) a.chart.timeScale().fitContent(); }], ['fullscreen', 'expand', function () { fullscreen(); }],
-      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }], ['odTitle', 'layers', function () { if (P.odmDialog) P.odmDialog(); }], ['dlTitle', 'down', function () { if (P.dataLib) P.dataLib(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
+      ['t_emoji', 'emoji', function () { var b = $('#pm-tools [data-fly="emo"]'); if (b) flyout(b, 'emo'); }], ['wsTitle', 'tpl', function () { presetDialog(); }], ['rcTitle', 'scale', function () { if (P.riskCentre) P.riskCentre(); }], ['mtfTitle', 'grid', function () { if (P.mtf) P.mtf(); }], ['plBoardT', 'wallet', function () { if (P.riskBoard) P.riskBoard(); }], ['odTitle', 'layers', function () { if (P.odmDialog) P.odmDialog(); }], ['dlTitle', 'down', function () { if (P.dataLib) P.dataLib(); }], ['rsTitle', 'trash', function () { resetPage(); }]].forEach(function (a) { rows.push({ n: T(a[0]), g: T('palActions'), i: ic(a[1]), act: a[2] }); });
     THEME_LIST.forEach(function (th) { rows.push({ n: T('csTheme') + ': ' + T(th[1]), g: T('palActions'), i: ic('gear'), act: function () { st.look = saneLook(Object.assign({}, LOOK0, THEMES[th[0]], { theme: th[0] })); applyLook(true); } }); });
     st.fav.forEach(function (tf) { rows.push({ n: tf, g: T('palTf'), i: ic('cal'), act: function () { applyTF(tf); } }); });
     var f = h('<div class="pm-pal"><input class="pm-in" type="search" autocomplete="off" spellcheck="false"><div class="pm-pall" role="listbox"></div></div>'), inp = $('input', f), list = $('.pm-pall', f), sel = 0, shown = [];
@@ -2493,6 +2563,7 @@
       item('cd', T('clearDraw'), ic('pen'), false, function () { toolOpt('clear'); });
       item('ci', T('clearInds'), ic('fx'), false, function () { toolOpt('clearinds'); });
       item('ca', T('clearBoth'), ic('trash'), false, function () { toolOpt('clearboth'); });
+      item('rs', T('rsTitle') + '…', ic('undo'), false, function () { closeFly(); resetPage(); });
     }
     (root || d.body).appendChild(f); openFly = f;
     var r = btn.getBoundingClientRect(), R = root.getBoundingClientRect(), fw = f.offsetWidth, fh = f.offsetHeight, rail = $('#pm-tools').getBoundingClientRect();
@@ -2670,6 +2741,7 @@
   function pageText() { $$('.pm-head [data-lang], section.pm-about[data-lang]').forEach(function (e) { e.hidden = e.getAttribute('data-lang') !== LANG; }); }
 
   /* ================================================================ public surface for panels.js and replay.js */
+  P.resetPage = resetPage;
   P.app = {
     T: T, LANG: function () { return LANG; }, RTL: RTL, loc: loc, esc: esc, h: h, $: $, $$: $$, ic: ic, toast: toast, modal: modal, closeModal: closeModal, ask: ask, confirm: confirmBox,
     menu: menu, closeMenu: closeMenu, on: on, emit: emit, st: function () { return st; }, save: save, cells: function () { return cells; }, active: active, setActive: setActive,

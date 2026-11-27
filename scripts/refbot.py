@@ -449,6 +449,8 @@ def kb_alerts(s, uid, lang, page=0):
         if page < pages - 1:
             nav.append(btn(fwd, f"ap:{page + 1}"))
         rows.append(nav)
+    if len(items) >= 2:                      # one tap (and a yes) instead of one tap per alert
+        rows.append([btn(t("b_al_clr", lang, n=len(items)), "aclr")])
     rows.append([btn(t("b_back", lang), "m:main")])
     return {"inline_keyboard": rows}
 
@@ -1809,6 +1811,14 @@ def handle_callback(s, cb):
         return edit(chat_id, mid, *render(s, uid, "alerts", int(val)))
     if data == "noop":
         return None
+    if data in ("aclr", "aclr!"):             # 🗑 delete all alerts: asked first, then done
+        n = len(x.get("alerts", [])) + len(x.get("talerts", []))
+        if data == "aclr" and n:
+            return edit(chat_id, mid, t("al_clr_q", lang, n=n),
+                        {"inline_keyboard": [[btn(t("b_al_clr_yes", lang, n=n), "aclr!")], [btn(t("b_al_clr_no", lang), "ap:0")]]})
+        x["alerts"], x["talerts"] = [], []
+        text, kb = render(s, uid, "alerts")
+        return edit(chat_id, mid, (t("al_clr_done", lang, n=n) + "\n\n" if n else "") + text, kb)
     if kind == "ad" and val.replace(".", "", 1).isdigit():
         n_, _, pg = val.partition(".")
         i = int(n_) - 1
