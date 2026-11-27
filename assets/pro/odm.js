@@ -267,8 +267,71 @@
     }
     return L.filter(function (l) { return l.p > 0 && isFinite(l.p); });
   }
+
+  /* the plan as a position on the candles, like a long/short position tool: from the chosen candle to the right edge, green from the
+     average entry to the last target, red from the average entry to the stop; every level named with its share, its % from the
+     average entry and its money; a round handle on the entry line moves the start candle */
+  function zoneX(Z, ts) {
+    var c = Z.cell, D = c.disp && c.disp.length ? c.disp : c.bars, sec = c.tfSec ? c.tfSec() : 0; if (!D || !D.length || !sec || !P.t2l) return null;
+    if (!(+Z.st.anchor > 0)) {
+      var vr = null; try { vr = ts.getVisibleLogicalRange(); } catch (e) { }
+      var lg = vr ? Math.round(vr.to - (vr.to - vr.from) * 0.3) : D.length - 30; lg = Math.max(0, Math.min(D.length - 1, lg)); Z.st.anchor = D[lg].t;
+    }
+    var l = P.t2l(D, +Z.st.anchor, sec); if (l == null || !isFinite(l)) return null;
+    var x = null; try { x = ts.logicalToCoordinate(Math.round(l)); } catch (e) { } return x;
+  }
+  function pill(ctx, x, y, txt, bg, fg, rtl, W) {
+    ctx.font = '600 11px Vazirmatn, Tahoma, sans-serif'; ctx.direction = rtl ? 'rtl' : 'ltr'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    var w = ctx.measureText(txt).width + 12; x = Math.max(2, Math.min(x, W - w - 2));
+    ctx.fillStyle = bg; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y - 9, w, 18, 5); else ctx.rect(x, y - 9, w, 18); ctx.fill();
+    ctx.fillStyle = fg; ctx.fillText(txt, x + 6, y + 0.5); return w;
+  }
+  var LRI = '⁦', PDI = '⁩';
+  function zonePaint(ctx, W, H, cell) {
+    var Z = LN; if (!Z || Z.cell !== cell) return; Z.box = null;
+    var r = Z.plan; if (!r || r.err || !r.exits) return;
+    var m = cell.main, ts = cell.chart.timeScale(), yv = function (p) { var y = null; try { y = m.priceToCoordinate(p); } catch (e) { } return y; };
+    var ya = yv(r.avg), ys = yv(r.stop), ex = r.exits, yt = ex.length ? yv(ex[ex.length - 1].p) : null; if (ya == null || ys == null) return;
+    var xa = zoneX(Z, ts); if (xa == null) xa = W * 0.7;
+    var x0 = Math.max(0, Math.min(W - 130, xa)), x1 = W, w = x1 - x0, rtl = A.RTL(), dir = r.long ? 1 : -1;
+    var light = !!(cell.el && cell.el.closest && cell.el.closest('.pm-light'));
+    var G = light ? 'rgba(16,150,100,' : 'rgba(52,211,153,', Rd = light ? 'rgba(220,60,50,' : 'rgba(255,90,77,';
+    function band(y1, y2, c) { var t = Math.min(y1, y2), b = Math.max(y1, y2); ctx.fillStyle = c + '0.14)'; ctx.fillRect(x0, t, w, b - t); ctx.fillStyle = c + '0.55)'; ctx.fillRect(x0, t, 1.5, b - t); }
+    ctx.save();
+    if (yt != null) band(ya, yt, G);
+    band(ya, ys, Rd);
+    /* each target and the stop: a thin line across the box */
+    ctx.setLineDash([4, 3]); ctx.lineWidth = 1;
+    ex.forEach(function (x) { var y = yv(x.p); if (y == null) return; ctx.strokeStyle = G + '0.8)'; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); });
+    ctx.setLineDash([]); ctx.strokeStyle = Rd + '0.9)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x0, ys); ctx.lineTo(x1, ys); ctx.stroke();
+    ctx.strokeStyle = light ? 'rgba(40,40,40,.85)' : 'rgba(236,236,230,.85)'; ctx.beginPath(); ctx.moveTo(x0, ya); ctx.lineTo(x1, ya); ctx.stroke();
+    /* the labels, kept apart: the entry and the stop always, then the last target, then the others */
+    var pct = function (p) { return dir * (p / r.avg - 1) * 100; }, used = [], tags = [];
+    tags.push({ y: ya, t: T(r.long ? 'odZLong' : 'odZShort') + ' · ' + T('odTopAvg') + ' ' + LRI + px(r.avg) + PDI, bg: light ? 'rgba(40,40,40,.88)' : 'rgba(236,236,230,.92)', fg: light ? '#fff' : '#141416', pr: 0 });
+    tags.push({ y: ys, t: 'SL · ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, bg: Rd + '0.92)', fg: '#fff', pr: 1 });
+    ex.forEach(function (x, k) { var y = yv(x.p); if (y == null) return; tags.push({ y: y, t: 'TP' + x.n + ' · ' + LRI + f(x.q, 0) + '% · ' + sg(pct(x.p), 2) + '% · ' + sg(x.profit) + PDI, bg: G + '0.92)', fg: '#06281c', pr: k === ex.length - 1 ? 2 : 3 }); });
+    tags.slice().sort(function (a, b) { return a.pr - b.pr; }).forEach(function (g) {
+      if (g.y < 9 || g.y > H - 9) return; if (used.some(function (u) { return Math.abs(u - g.y) < 19; })) return; used.push(g.y);
+      pill(ctx, x0 + 8, g.y, g.t, g.bg, g.fg, rtl, W);
+    });
+    /* in the middle of each zone, the whole plan in one line when there is room */
+    ctx.font = '700 12px Vazirmatn, Tahoma, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = rtl ? 'rtl' : 'ltr';
+    var cx = x0 + w / 2;
+    if (yt != null && Math.abs(yt - ya) >= 46 && r.best != null) {
+      ctx.fillStyle = light ? '#0b6b48' : '#7ff0c4';
+      ctx.fillText(T('odZRew') + ' ' + LRI + sg(pct(ex[ex.length - 1].p), 2) + '% · ' + sg(r.best) + ' · R:R 1:' + f(r.best / r.risk, 2) + PDI, cx, (ya + yt) / 2);
+    }
+    if (Math.abs(ys - ya) >= 46) { ctx.fillStyle = light ? '#a3271d' : '#ffb0a8'; ctx.fillText(T('odZRisk') + ' ' + LRI + sg(pct(r.stop), 2) + '% · −' + f(r.risk) + PDI, cx, (ya + ys) / 2); }
+    /* the handle that moves the start candle */
+    ctx.beginPath(); ctx.arc(x0, ya, Z.drag && Z.drag.kind === 'anc' ? 7 : 5.5, 0, Math.PI * 2); ctx.fillStyle = light ? '#fff' : '#141416'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#f7931a'; ctx.stroke();
+    ctx.restore();
+    var all = [ya, ys].concat(yt != null ? [yt] : []);
+    Z.box = { x0: x0, x1: x1, top: Math.min.apply(null, all), bot: Math.max.apply(null, all), ya: ya, long: r.long };
+  }
+  (P.ovHooks = P.ovHooks || []).push(zonePaint);
+  function repaint(Z) { try { if (Z.cell.ovl) Z.cell.ovl.update(); } catch (e) { } }
   function hideLines() {
-    if (!LN) return; var c = LN.cell, Z = LN; LN = null;
+    if (!LN) return; var c = LN.cell, Z = LN; LN = null; Z.box = null; repaint(Z);
     Object.keys(Z.map).forEach(function (k) { try { c.main.removePriceLine(Z.map[k]); } catch (e) { } });
     Z.off(); if (Z.hud) Z.hud.remove(); unlock(Z); if (c.el) c.el.classList.remove('pm-odpick');
   }
@@ -284,7 +347,7 @@
       if (ex) { try { ex.applyOptions(o); } catch (e) { } } else { try { Z.map[l.k] = Z.cell.main.createPriceLine(o); } catch (e) { } }
     });
     Object.keys(Z.map).forEach(function (k) { if (!seen[k]) { try { Z.cell.main.removePriceLine(Z.map[k]); } catch (e) { } delete Z.map[k]; } });
-    Z.L = L; hud(Z); if (!Z.drag) placeHud(Z);
+    Z.L = L; hud(Z); if (!Z.drag) placeHud(Z); repaint(Z);
   }
   /* the panel sits low on the chart, or under the legend when a line it would cover is there (a line under it could not be grabbed) */
   function placeHud(Z) {
@@ -379,6 +442,7 @@
       return best;
     }
     function eat(e) { e.stopPropagation(); if (e.cancelable) e.preventDefault(); }
+    function onHandle(q, touch) { var b = Z.box, d = touch ? 18 : 9; return !!b && Math.abs(q.x - b.x0) <= d && Math.abs(q.y - b.ya) <= d; }
     var downEv = function (e) {
       if (!LN || LN !== Z) return;
       /* the panel's own buttons stay buttons; anywhere else on it, a line just under it can still be grabbed */
@@ -387,6 +451,7 @@
       if (e.button != null && e.button !== 0) return;
       var q = loc(e); if (q.x < 0 || q.y < 0 || q.x > q.w || q.y > q.h) return;
       if (Z.pick) { var p = priceAt(Z, q.y); if (p) { eat(e); pickAt(Z, p); } return; }
+      if (onHandle(q, e.pointerType && e.pointerType !== 'mouse')) { eat(e); lock(Z); Z.drag = { k: 'anc', kind: 'anc', x0: q.x, moved: false, id: e.pointerId, snap: JSON.stringify(Z.st) }; cell.el.classList.add('pm-oddrag'); repaint(Z); return; }
       var l = near(q, e.pointerType && e.pointerType !== 'mouse'); if (!l) return;
       eat(e); lock(Z); Z.drag = { k: l.k, kind: l.drag, i: l.i, y0: q.y, moved: false, id: e.pointerId, snap: JSON.stringify(Z.st) };
       cell.el.classList.add('pm-oddrag'); syncLines(Z);
@@ -397,7 +462,13 @@
       if (!Z.drag) {
         if (e.buttons || e.pointerType !== 'mouse') return;
         var l = q.x >= 0 && q.y >= 0 && q.x <= q.w && q.y <= q.h ? near(q, false) : null;
-        box.style.cursor = Z.pick ? 'crosshair' : l ? 'ns-resize' : ''; return;
+        box.style.cursor = Z.pick ? 'crosshair' : onHandle(q, false) ? 'ew-resize' : l ? 'ns-resize' : ''; return;
+      }
+      if (Z.drag.kind === 'anc') {
+        eat(e); if (Math.abs(q.x - Z.drag.x0) > 2) Z.drag.moved = true;
+        var D = cell.disp && cell.disp.length ? cell.disp : cell.bars, lg = null; try { lg = cell.chart.timeScale().coordinateToLogical(Math.max(0, q.x)); } catch (e3) { }
+        if (lg != null && D.length && P.l2t) { lg = Math.max(0, Math.min(D.length - 1, Math.round(lg))); Z.st.anchor = D[lg].t; }
+        repaint(Z); return;
       }
       eat(e); var p = priceAt(Z, q.y); if (!p) return;
       if (Math.abs(q.y - Z.drag.y0) > 2) Z.drag.moved = true;
@@ -459,6 +530,9 @@
     LN.L.forEach(function (l) { var yy = null; try { yy = cell.main.priceToCoordinate(l.p); } catch (e) { } if (yy == null) return; var d = Math.abs(yy - y); if (d <= bd) { bd = d; best = l; } });
     return best ? { k: best.k, t: best.t, p: best.p } : null;
   };
+  /* a point inside the position's box, for the right-click menu (after lines and alert lines) */
+  P.odmZoneHit = function (cell, x, y) { var b = LN && LN.cell === cell ? LN.box : null; if (!b || x < b.x0 || x > b.x1 || y < b.top || y > b.bot) return null; return { t: T(b.long ? 'odZLong' : 'odZShort'), p: LN.plan.avg }; };
+  P.odmZone = function () { return LN && LN.box ? { x0: LN.box.x0, x1: LN.box.x1, top: LN.box.top, bot: LN.box.bot, ya: LN.box.ya, anchor: LN.st.anchor } : null; };
   /* for the browser checks: the panel's plan and the y of a level on the chart */
   P.odmLive = function () { return LN ? { plan: LN.plan, st: LN.st, levels: LN.L.map(function (l) { var y = null; try { y = LN.cell.main.priceToCoordinate(l.p); } catch (e) { } return { k: l.k, p: l.p, y: y, drag: !!l.drag }; }), pick: LN.pick } : null; };
 

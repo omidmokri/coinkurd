@@ -1740,6 +1740,14 @@
       items.push({ label: T('ctxAlDel'), icon: 'trash', act: function () { delAlertsUndo(function (z) { return z.id === ah.a.id; }); } });
       items.push({ sep: 1 });
     }
+    /* inside the ODM position's box */
+    var oz = !oh && P.odmZoneHit ? P.odmZoneHit(cell, x, y) : null;
+    if (oz && !ah) {
+      items.push({ head: 'ODM · ' + oz.t + ' · ' + fmtP(sym, oz.p) });
+      items.push({ label: T('ctxOpenOdm'), icon: 'long', act: function () { if (P.odmDialog) P.odmDialog(); } });
+      items.push({ label: T('ctxOdmHide'), icon: 'trash', act: function () { P.odmClear(cell, true); } });
+      items.push({ sep: 1 });
+    }
     if (price != null && isFinite(price)) {
       var pt = fmtP(sym, price);
       items.push({ head: pt });
