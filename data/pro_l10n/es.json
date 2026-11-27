@@ -37,6 +37,10 @@
 "7380ba50bf",
 "<b>50 idiomas y su propia moneda:</b> el espacio de trabajo en kurdo, persa, árabe, inglés y 46 idiomas más, cada uno en su propia dirección (/market/de/, /market/jp/ …); cada moneda de Binance en su moneda (euro, lira, rupia, yen y unas 150 más), calculada como el toman a partir de una tasa de referencia diaria, o a partir de su propia tasa para un tether o un dólar."
 ],
+"about.9481d12afe": [
+"9481d12afe",
+"El botón <b>ODM</b> planifica toda una operación: entradas escalonadas, un stop por ATR, salidas escalonadas por precio, porcentaje o R, un trailing stop para el resto, todas las formas en que puede terminar, una prueba en velas anteriores y una alerta para cada nivel."
+],
 "about.9f16c628ea": [
 "9f16c628ea",
 "<b>70 indicadores:</b> medias móviles de todo tipo (HMA, ALMA, TEMA…), Bollinger, Ichimoku, Alligator, puntos pivote, ZigZag, SuperTrend, VWAP, RSI, MACD, Estocástico, ADX, Aroon, Fisher, CMF y más, con las definiciones de TradingView."
@@ -84,6 +88,10 @@
 "about.fb578e06d6": [
 "fb578e06d6",
 "<b>Alertas de precio, línea e indicadores:</b> cruces, cruces al alza o a la baja, por encima o por debajo, movimientos en %; líneas de tendencia inclinadas, rayos y canales; cruces de RSI, media móvil y EMA, MACD, Bollinger, SuperTrend, estocástico y picos de volumen; alertas de noticias — con fecha de finalización, notificación en el navegador, sonido y alertas de precio enviadas al bot de Telegram."
+],
+"about.fca76d932c": [
+"fca76d932c",
+"El botón de Fuentes de datos (el icono de descarga en la barra superior) enumera datos históricos gratuitos para criptomonedas, forex, futuros, acciones y macroeconomía, con la licencia y los límites de cada fuente."
 ],
 "ac_bb_gt": [
 "8edb588c2d",
@@ -785,6 +793,34 @@
 "bbfa773e5a",
 "Cerrar"
 ],
+"cmMode": [
+"2c8ea521d1",
+"Color de velas"
+],
+"cmModeH": [
+"8404fd51e3",
+"Por dirección o por una regla leída de las barras."
+],
+"cmMom": [
+"cc8d5297d7",
+"Momentum (ROC 10)"
+],
+"cmRsi": [
+"b76fb892f0",
+"RSI (14)"
+],
+"cmStd": [
+"303ed38987",
+"Dirección (alcista / bajista)"
+],
+"cmTrend": [
+"7fe9e85b12",
+"Tendencia (EMA 50)"
+],
+"cmVol": [
+"76fe65a559",
+"Fuerza de volumen"
+],
 "computed": [
 "fce79dfc7c",
 "calculado: Binance × tasa de tether"
@@ -884,6 +920,10 @@
 "csDn": [
 "11f5ff3829",
 "Vela bajista"
+],
+"csDraw": [
+"9de36050c7",
+"Dibujo"
 ],
 "csFont": [
 "b97c4d4cdd",
@@ -1141,6 +1181,226 @@
 "3954de7300",
 "Solo short"
 ],
+"dlAll": [
+"6a72085653",
+"Todos"
+],
+"dlBtn": [
+"dadd6ac5ba",
+"Fuentes de datos"
+],
+"dlChecked": [
+"50f7b428c1",
+"Enlaces y términos verificados el {d}. entekhab.net solo enlaza a estos sitios; no copia ni aloja sus datos."
+],
+"dlLic": [
+"d3980b6cf5",
+"Licencia o términos, según los indica el proveedor"
+],
+"dlLicNone": [
+"be2ebfbb17",
+"Sin licencia especificada"
+],
+"dlLicOther": [
+"bff074f4cc",
+"Licencia personalizada"
+],
+"dlLicTerms": [
+"c66e6957e7",
+"Términos propios"
+],
+"dlLicVaries": [
+"00231f3b79",
+"Por conjunto de datos"
+],
+"dlNone": [
+"0b16331ac1",
+"Ninguna fuente coincide."
+],
+"dlNote": [
+"8209efc853",
+"Dónde obtener datos históricos gratuitos para criptomonedas, forex, futuros, acciones y macroeconomía, y herramientas gratuitas para leerlos. Cada enlace fue abierto y se leyeron sus planes gratuitos y términos. Los términos cambian, así que léelos antes de usar o compartir los datos. Varias fuentes permiten únicamente uso no comercial."
+],
+"dlSearch": [
+"93386c6297",
+"Buscar fuentes"
+],
+"dlTip1": [
+"176e90a67b",
+"Convierte cada hora a UTC antes de fusionar archivos de diferentes fuentes."
+],
+"dlTip2": [
+"85b8a5f7d4",
+"Mantén las columnas en este orden: tiempo, apertura, máximo, mínimo, cierre, volumen."
+],
+"dlTip3": [
+"35478962a9",
+"Para historiales de ticks o de 1 minuto, Parquet es mucho más pequeño y rápido que CSV."
+],
+"dlTip4": [
+"b8885df839",
+"Marca los huecos de fines de semana y festivos en lugar de rellenarlos con barras inventadas, o un backtest operará precios que nunca existieron."
+],
+"dlTips": [
+"8c402b7491",
+"Importación limpia de datos"
+],
+"dlTitle": [
+"b5822318cc",
+"Datos y herramientas de mercado gratuitos"
+],
+"dl_av": [
+"4839dbddf4",
+"Acciones, forex y criptomonedas por API con una clave gratuita y un pequeño límite diario de solicitudes. Lee la página de precios para conocer el límite actual."
+],
+"dl_binv": [
+"a23b5a4769",
+"Archivos ZIP mensuales y diarios de klines (de 1s a 1 mes), operaciones y aggTrades para spot de Binance y futuros USD-M/COIN-M. Sin cuenta ni clave. Solo para uso no comercial, sin rehosteo, acredita a Binance Vision."
+],
+"dl_ccd": [
+"66dee06dc3",
+"Un script que descarga velas de Binance, OKX y Bybit en archivos limpios, incluidos intervalos personalizados. Un proyecto muy nuevo con pocos usuarios."
+],
+"dl_cdd": [
+"e0fd7c2ef5",
+"Archivos CSV diarios, horarios y de un minuto de varios exchanges. Solo para uso no comercial y sin rehosteo."
+],
+"dl_duka": [
+"3a998ee29c",
+"Herramienta de línea de comandos que descarga historiales de ticks y velas de Dukascopy para forex, metales, índices, energía y algunas criptomonedas como CSV o JSON. La herramienta es MIT; los términos propios de Dukascopy para los datos no están publicados."
+],
+"dl_evtl": [
+"19191f39b1",
+"Archivos OHLCV listos con bid y ask construidos a partir de ticks de Dukascopy para oro, plata, principales pares de forex, índices, BTC y ETH, de M1 a D1. Uso educativo con atribución."
+],
+"dl_finnhub": [
+"cb53f627f4",
+"Acciones, forex y criptomonedas por API con una clave gratuita y un límite de solicitudes por minuto. Lee la página de precios para conocer el límite actual."
+],
+"dl_fred": [
+"0496b77aa2",
+"Cientos de miles de series económicas de EE. UU. y del mundo: tipos de interés, inflación, empleo. Gratis, pero la API necesita una clave, se debe citar la fuente y sus términos prohíben almacenar los datos en caché."
+],
+"dl_freech": [
+"41c5b5ac27",
+"Gráficos web que se ejecutan con tu propia clave de API gratuita (por ejemplo, Twelve Data o Binance)."
+],
+"dl_fx1m": [
+"2d40c5dac8",
+"Scripts y un archivo de historial de forex de 1 minuto obtenido de HistData, útil para descargarlo de una sola vez."
+],
+"dl_hf": [
+"d6bf62a064",
+"Conjuntos de datos de 1 minuto listos para los principales índices de EE. UU., futuros, VIX y algunas criptomonedas y materias primas. Licencia personalizada: léela en la página."
+],
+"dl_hfd": [
+"c687eb1e28",
+"Archivos de muestra gratuitos (de 10 segundos y 1 minuto) para ES, NQ, oro, petróleo crudo y otros, e historial diario completo con una cuenta gratuita. Sin licencia especificada."
+],
+"dl_histdata": [
+"605a2236a9",
+"Archivos ZIP mensuales gratuitos de datos de forex de 1 minuto y ticks, sin registro. El sitio no indica licencia."
+],
+"dl_kaggle": [
+"6c66534191",
+"Miles de conjuntos de datos CSV listos; busca forex, criptomonedas u oro. Cada conjunto de datos tiene su propia licencia, así que verifícala antes de usarlo."
+],
+"dl_lse": [
+"575c1953d1",
+"Un archivo muy grande de acciones, forex, criptomonedas, futuros, opciones y series macro. Una clave gratuita permite 10 descargas por hora como CSV o Parquet; los datos con licencia de exchange son de pago."
+],
+"dl_lwc": [
+"4ab8089278",
+"La biblioteca de gráficos de código abierto sobre la que se construye esta página. Gratis, incluso para uso comercial, con atribución."
+],
+"dl_mt5": [
+"4caae7d59c",
+"Terminal de trading cuyo centro de historial puede exportar años de velas de forex, índices y materias primas a CSV. Qué tan atrás llega depende del bróker."
+],
+"dl_okx": [
+"7021ebbbed",
+"Descargas de historiales de spot y derivados de OKX: velas desde julio de 2023, tasas de financiación desde marzo de 2022, operaciones desde septiembre de 2021."
+],
+"dl_openbb": [
+"b00e3cda10",
+"Plataforma de Python de código abierto que reúne muchas fuentes gratuitas (Yahoo, FRED, exchanges y más) en un solo lugar. Gratis para particulares."
+],
+"dl_pricehub": [
+"65f9da264e",
+"Una pequeña biblioteca de Python que obtiene velas OHLCV de 7 exchanges con una sola función y sin clave de API."
+],
+"dl_prt": [
+"08174f29c9",
+"Plataforma de gráficos con un plan web gratuito: datos de fin de día y datos con 15 minutos de retraso para algunos mercados."
+],
+"dl_qdm": [
+"d0786b57ec",
+"Descarga y limpia datos de ticks y velas de varias fuentes y los exporta a muchos formatos. Nivel gratuito con mejoras de pago."
+],
+"dl_sifting": [
+"b3525e5ca6",
+"Exportación a CSV o Excel de acciones de EE. UU., forex, metales y criptomonedas. Las últimas 24 horas (barras de 5 minutos a 1 hora) no requieren cuenta; un historial más largo requiere una cuenta y clave gratuitas. Los precios no están ajustados por divisiones ni dividendos."
+],
+"dl_stooq": [
+"3ca445487c",
+"Archivos CSV diarios gratuitos (y algunos intradía) para acciones, índices, forex y materias primas. Las descargas masivas solicitan un CAPTCHA."
+],
+"dl_tickstory": [
+"b1a433f7bf",
+"Descarga datos de Dukascopy y los exporta para MetaTrader o como CSV, rellenando huecos. Nivel gratuito con mejoras de pago."
+],
+"dl_tickview": [
+"debabf5f0c",
+"Gráficos de velas de código abierto con datos gratuitos de Binance, Yahoo y CFTC, sin registro. Un proyecto pequeño y joven."
+],
+"dl_truefx": [
+"8862a592ca",
+"Historial de forex a nivel de tick gratuito tras un registro gratuito."
+],
+"dl_tvcl": [
+"6475a0d996",
+"Biblioteca de gráficos de TradingView para tu propio sitio y datos. Gratis para proyectos web públicos bajo solicitud; el logotipo de TradingView debe permanecer visible."
+],
+"dl_twelve": [
+"be02a30e49",
+"Acciones, ETFs, forex y criptomonedas por API. El plan Basic gratuito es únicamente para uso interno y sin visualización, por lo que no puede alimentar una página pública."
+],
+"dl_yf": [
+"5437629d2b",
+"Biblioteca de Python que lee precios de Yahoo Finance. El código es Apache-2.0, pero los datos de Yahoo son solo para uso personal."
+],
+"dlc_api": [
+"ac6931afbb",
+"APIs con clave gratuita"
+],
+"dlc_crypto": [
+"e849494484",
+"Criptomonedas"
+],
+"dlc_ds": [
+"e6c2f4e616",
+"Conjuntos de datos listos"
+],
+"dlc_fut": [
+"1c0dd9564d",
+"Futuros y materias primas"
+],
+"dlc_fx": [
+"faed5365ef",
+"Forex y CFDs"
+],
+"dlc_macro": [
+"1f8c0db097",
+"Macroeconomía y economía"
+],
+"dlc_stk": [
+"b179d8b69a",
+"Acciones y multi-mercado"
+],
+"dlc_tool": [
+"7869b0dbaa",
+"Herramientas y plataformas"
+],
 "draft": [
 "23d33e22ac",
 "Borrador"
@@ -1177,6 +1437,38 @@
 "d3bc9a378d",
 ","
 ],
+"ec_an": [
+"1780ecaa16",
+"Animales"
+],
+"ec_fl": [
+"5d728758ad",
+"Banderas"
+],
+"ec_hd": [
+"23d3f6704e",
+"Manos y corazones"
+],
+"ec_mk": [
+"569bbd757e",
+"Mercado"
+],
+"ec_ob": [
+"72a83add2c",
+"Objetos"
+],
+"ec_rec": [
+"cc5bc923e8",
+"Usados recientemente"
+],
+"ec_sm": [
+"fdbb8fef19",
+"Caras"
+],
+"ec_sy": [
+"22ad664e9e",
+"Símbolos"
+],
 "ecoCal": [
 "6d68264bb4",
 "Calendario económico"
@@ -1184,6 +1476,22 @@
 "editText": [
 "c3328c39b0",
 "Texto"
+],
+"emoEmojis": [
+"ac171aacfa",
+"Emojis"
+],
+"emoIcoNote": [
+"58a7f252e8",
+"Los iconos toman el color y tamaño del dibujo: cámbialos en su configuración."
+],
+"emoIcons": [
+"edb8f6c142",
+"Iconos"
+],
+"emoStickers": [
+"9dca595b1a",
+"Pegatinas"
 ],
 "emptyList": [
 "544648e49b",
@@ -1309,9 +1617,29 @@
 "7f980d6a5f",
 "La longitud lenta debe ser mayor que la rápida."
 ],
+"favAdd": [
+"6b2ac06d56",
+"Añadir a favoritos"
+],
+"favDel": [
+"624f82c132",
+"Eliminar de favoritos"
+],
+"favFull": [
+"3950f549f0",
+"La barra de favoritos está llena (24 herramientas)."
+],
+"favMove": [
+"6b9c3927d7",
+"Arrastrar para mover la barra"
+],
 "favTf": [
 "ce59fda88d",
 "Fijar en la barra de herramientas"
+],
+"favTools": [
+"4fa8cc860c",
+"Herramientas"
 ],
 "filled": [
 "f7b2d37425",
@@ -1524,6 +1852,42 @@
 "h_toman": [
 "329367a6b8",
 "Dólar, euro, oro, monedas, plata y cada cripto en toman, desde la tasa en vivo de tgju."
+],
+"hdCon": [
+"5add073ddb",
+"Alto contraste"
+],
+"hdMag": [
+"d7f87f222d",
+"Imán"
+],
+"hdMagH": [
+"4c9991b205",
+"Ajusta un nuevo punto a la vela más cercana."
+],
+"hdMin": [
+"a711cca9a4",
+"Mínimo"
+],
+"hdMode": [
+"e2144806a5",
+"Controles de selección"
+],
+"hdModeH": [
+"9263c148e4",
+"Mantiene la vela debajo de ellos legible."
+],
+"hdNorm": [
+"d00635865c",
+"Sólido"
+],
+"hdTr": [
+"a09334607d",
+"Semitransparente"
+],
+"hdTrans": [
+"7b2ec8c047",
+"Transparencia del control"
 ],
 "helpTab": [
 "c47ae15370",
@@ -2717,6 +3081,130 @@
 "11eda67f9b",
 "Largo"
 ],
+"lqBooks": [
+"52aa248e2a",
+"Libros de órdenes"
+],
+"lqBtn": [
+"76a3e625b1",
+"Liquidez"
+],
+"lqL_bnf": [
+"2d42564524",
+"Liquidaciones de Binance"
+],
+"lqL_byf": [
+"738f6e941d",
+"Liquidaciones de Bybit"
+],
+"lqLay_heat": [
+"996b295aa4",
+"Mapa de calor a lo largo del tiempo"
+],
+"lqLay_liq": [
+"30d1693268",
+"Liquidaciones"
+],
+"lqLay_prof": [
+"1b7f22ab6a",
+"Libro actual (borde derecho)"
+],
+"lqLayers": [
+"f055f18aea",
+"Capas"
+],
+"lqLiqSum": [
+"53dd3e4363",
+"{n} liquidaciones vistas en {since}: longs cerrados {l}, shorts cerrados {s}."
+],
+"lqLiqT": [
+"2e7bee73ac",
+"Liquidaciones mientras está abierto"
+],
+"lqLiveOk": [
+"98aadb3708",
+"en vivo"
+],
+"lqLong": [
+"5159d6b96c",
+"Long liquidado"
+],
+"lqMin": [
+"37e737d92c",
+"{n} min"
+],
+"lqNoSym": [
+"9eda810b3c",
+"El mapa de liquidez funciona en criptomonedas cotizadas contra USDT en Binance, Bybit u OKX. {s} no es una de ellas."
+],
+"lqNow": [
+"1cf45f3e25",
+"{n} libros combinados. Cada uno de ellos cubre de {lo} a {hi}, en pasos de {step}. {k} lecturas guardadas desde que lo activaste ({since})."
+],
+"lqOff": [
+"1a01ac36a1",
+"Desactivado. Marca la casilla de arriba para empezar a leer los libros de órdenes."
+],
+"lqSec": [
+"55220b204c",
+"{n}s"
+],
+"lqShort": [
+"89d59d2f0a",
+"Short liquidado"
+],
+"lqShow": [
+"051401a51e",
+"Mostrar en el gráfico"
+],
+"lqSrcT": [
+"be018e47a2",
+"Fuentes y su frescura"
+],
+"lqStep": [
+"41b6a9dc1c",
+"Paso de precio"
+],
+"lqTitle": [
+"5163cb5fa5",
+"Mapa de liquidez"
+],
+"lqVBad": [
+"1ad25e9e10",
+"no accesible desde aquí en este momento"
+],
+"lqVOk": [
+"f9efa46205",
+"libro de {lo} a {hi}, leído hace {t}"
+],
+"lqV_bnf": [
+"ec2ef9ae21",
+"Futuros de Binance"
+],
+"lqV_bns": [
+"47849f1dfa",
+"Spot de Binance"
+],
+"lqV_byf": [
+"d88c2ab7c7",
+"Futuros de Bybit"
+],
+"lqV_okx": [
+"71057c6407",
+"Spot de OKX"
+],
+"lqWDist": [
+"54ecd0e57f",
+"Desde el medio"
+],
+"lqWHeld": [
+"87807a0b14",
+"Mantenido"
+],
+"lqWPrice": [
+"c20f7ce09a",
+"Rango de precios"
+],
 "ly_live": [
 "c3d036c573",
 "Análisis en vivo Kurdistani"
@@ -3497,6 +3985,66 @@
 "1e214a5fd6",
 "Haz clic en el gráfico donde debe comenzar la repetición"
 ],
+"plShare1": [
+"3d669b7968",
+"Porcentaje en TP1 (%)"
+],
+"plShare2": [
+"527587bedf",
+"Porcentaje en TP2 (%)"
+],
+"plShare3": [
+"1de10b521f",
+"Porcentaje en TP3 (%)"
+],
+"plShortX": [
+"e0e2e891e2",
+"Exposición corta"
+],
+"plStatus": [
+"bae7d5be70",
+"Estado"
+],
+"plTipActive": [
+"4e20f49ee8",
+"Planes marcados como activos (abiertos o simulados): lo que pierden si salta cada stop."
+],
+"plTipFund": [
+"0b6a70a096",
+"Una tasa positiva la pagan los longs y la reciben los shorts; una tasa negativa al revés."
+],
+"plTipLeft": [
+"6139c9c234",
+"límite − pérdida realizada de hoy − riesgo activo en los stops"
+],
+"plTipLoss": [
+"a238701251",
+"Lo que cuesta el stop: el dinero en riesgo, más la financiación si es un coste."
+],
+"plTipPlanned": [
+"4326a18e06",
+"Planes que solo has diseñado. No cuentan para el límite diario."
+],
+"plTitle": [
+"6aa0fd12fe",
+"Plan de trading"
+],
+"plTop": [
+"8a661b765f",
+"Mayor parte del riesgo"
+],
+"plTotal": [
+"77ffec55dd",
+"Todos los objetivos alcanzados"
+],
+"plUnalloc": [
+"b92d412dc9",
+"Parte sin objetivo (aún abierta)"
+],
+"plW_fees": [
+"1ba96c9a8b",
+"Las comisiones se comen todo el beneficio de estos objetivos."
+],
 "place": [
 "6aea8612f3",
 "Colocar la orden"
@@ -3532,6 +4080,402 @@
 "random": [
 "7b57e4d500",
 "Barra aleatoria"
+],
+"rcAdd": [
+"3b7e34f346",
+"Añadido cada periodo"
+],
+"rcBE": [
+"f05a5bace4",
+"Precio de equilibrio"
+],
+"rcBEafter": [
+"9efc4f3287",
+"Stop a equilibrio tras el objetivo 1"
+],
+"rcBEwin": [
+"5a7eb19d0d",
+"Tasa de aciertos para equilibrio"
+],
+"rcBal": [
+"98dcb75a7c",
+"Saldo de la cuenta"
+],
+"rcCt": [
+"5a0ba3bb83",
+"Contrato"
+],
+"rcDD": [
+"db066ddc8a",
+"Drawdown (%)"
+],
+"rcDDlimit": [
+"38fe5b1885",
+"Drawdown que cuenta como ruina (%)"
+],
+"rcEV": [
+"26effee29e",
+"Valor esperado por operación"
+],
+"rcE_dist": [
+"12390b8d52",
+"La entrada y el stop no pueden ser el mismo precio."
+],
+"rcE_lev": [
+"e81f8b7d27",
+"El apalancamiento debe ser 1 o más."
+],
+"rcE_num": [
+"e7dcd677d6",
+"Introduce números positivos."
+],
+"rcE_oco_num": [
+"bcb3e41b53",
+"Introduce una entrada y un stop a precios diferentes."
+],
+"rcE_oco_order": [
+"26adf98964",
+"Los objetivos deben alejarse de la entrada en orden."
+],
+"rcE_oco_pct": [
+"4993270f9b",
+"Los porcentajes deben sumar 100%."
+],
+"rcE_oco_tg": [
+"2cf289fad7",
+"Indica de uno a tres objetivos."
+],
+"rcE_oco_tp": [
+"319a13b9cc",
+"Un objetivo está en el lado incorrecto de la entrada, o falta su porcentaje."
+],
+"rcE_pctOver": [
+"bfbad21ecc",
+"Los porcentajes de los objetivos suman más de 100%."
+],
+"rcE_risk": [
+"e1bdf14f74",
+"El riesgo por operación no puede superar el 100%."
+],
+"rcE_side": [
+"3a9e32ddf9",
+"El stop está en el lado incorrecto de la entrada."
+],
+"rcE_spotShort": [
+"6bc1577913",
+"Una posición al contado solo puede ser long."
+],
+"rcE_tp": [
+"a5526e2098",
+"El objetivo está en el lado incorrecto de la entrada."
+],
+"rcEntry": [
+"b30218aca8",
+"Precio de entrada"
+],
+"rcFee": [
+"6c58eac908",
+"Comisión por lado (%)"
+],
+"rcFees": [
+"1176c1996f",
+"Comisiones (entrada y salida)"
+],
+"rcFinal": [
+"7cc7e5e185",
+"Saldo final"
+],
+"rcGain": [
+"96dd91cdcb",
+"Ganancia"
+],
+"rcKfull": [
+"5548453c41",
+"Kelly completo"
+],
+"rcKhalf": [
+"4760b81601",
+"Medio Kelly"
+],
+"rcKq": [
+"3fb42a0384",
+"Cuarto de Kelly"
+],
+"rcLev": [
+"040daa23f9",
+"Apalancamiento (×)"
+],
+"rcLiq": [
+"c1dfe11a1a",
+"Liquidación (estimación)"
+],
+"rcLiqNote": [
+"f8ab7a2995",
+"Modelo simplificado: una posición aislada, margen de mantenimiento introducido, comisiones, financiación, precio de marca y tramos de riesgo del exchange omitidos. La cifra de tu exchange será diferente."
+],
+"rcLiqS": [
+"8ee1ead8ac",
+"Liquidación estimada simplificada"
+],
+"rcLiq_cross": [
+"237ba47eb9",
+"No se muestra: en margen cruzado depende de toda tu cartera"
+],
+"rcLiq_none": [
+"19941a78d7",
+"Sin precio de liquidación a este apalancamiento"
+],
+"rcLiq_spot": [
+"3d1d84e078",
+"Ninguno al contado"
+],
+"rcLong": [
+"11eda67f9b",
+"Long"
+],
+"rcLosses": [
+"921787fd24",
+"Pérdidas seguidas"
+],
+"rcMargin": [
+"0d1a4bfb87",
+"Margen necesario"
+],
+"rcMaxLoss": [
+"c668b9dc04",
+"Pérdida en el stop"
+],
+"rcMedian": [
+"e8cb6b3af3",
+"Resultado mediano"
+],
+"rcMmr": [
+"6ccd06f6ff",
+"Margen de mantenimiento (%)"
+],
+"rcMode": [
+"501f9eaddf",
+"Modo de margen"
+],
+"rcNo": [
+"816c52fd2b",
+"No"
+],
+"rcNote": [
+"064f1c622a",
+"Todo aquí es aritmética en tu propio navegador con los números que escribes. No se envía nada a ninguna parte ni se ejecuta ninguna orden."
+],
+"rcNotional": [
+"629c8eb9ba",
+"Valor de la posición"
+],
+"rcO_all": [
+"00003802ba",
+"Todos los objetivos alcanzados"
+],
+"rcO_cross": [
+"dbfe7362b2",
+"Cruzado"
+],
+"rcO_inverse": [
+"e753755269",
+"Perpetuo inverso (moneda)"
+],
+"rcO_isolated": [
+"64a176e362",
+"Aislado"
+],
+"rcO_linear": [
+"6b962422e5",
+"Perpetuo lineal (USDT)"
+],
+"rcO_spot": [
+"c5c5ba59d0",
+"Contado"
+],
+"rcO_stop": [
+"94c0cf8f36",
+"Detenido antes de cualquier objetivo"
+],
+"rcO_then": [
+"ed72cdc29b",
+"Objetivo {n}, luego el stop en el resto"
+],
+"rcOcoPlan": [
+"30ee931cac",
+"Un plan en papel: un objetivo alcanzado cancela esa parte del stop, el stop cancela lo que queda. No se envía ninguna orden."
+],
+"rcOdm": [
+"11dc53ab85",
+"Planificador ODM"
+],
+"rcOpt": [
+"48a7b8889e",
+"opcional"
+],
+"rcPF": [
+"80e53e077c",
+"Factor de beneficio"
+],
+"rcPaid": [
+"299fdc9075",
+"Aportado"
+],
+"rcPeriods": [
+"d65472b09f",
+"Periodos"
+],
+"rcProfit": [
+"d8496a6578",
+"Beneficio en el objetivo"
+],
+"rcQty": [
+"44f6af6945",
+"Cantidad"
+],
+"rcRR": [
+"49da03e785",
+"Riesgo : beneficio"
+],
+"rcRRin": [
+"4ed9b7f212",
+"Beneficio : riesgo (R)"
+],
+"rcRate": [
+"71be9aab7d",
+"Retorno por periodo (%)"
+],
+"rcRecover": [
+"7bd0f65bea",
+"Ganancia necesaria para recuperar"
+],
+"rcRisk": [
+"b031aee373",
+"Riesgo por operación (%)"
+],
+"rcRiskMoney": [
+"6525cd02a3",
+"Dinero en riesgo"
+],
+"rcRuinP": [
+"c449c8e2c0",
+"Probabilidad de ese drawdown"
+],
+"rcShare": [
+"10758b0e6c",
+"Parte cerrada (%)"
+],
+"rcShort": [
+"5a8f23f567",
+"Riesgo"
+],
+"rcShort2": [
+"0fe7d82f25",
+"Short"
+],
+"rcSide": [
+"26528381ea",
+"Lado"
+],
+"rcSim": [
+"687bd0f6b3",
+"Una simulación de {n} secuencias aleatorias a partir de una semilla fija, por lo que las mismas entradas siempre dan el mismo resultado. Es una estimación, no una promesa."
+],
+"rcSlip": [
+"9cc2898876",
+"Deslizamiento (unidades de precio)"
+],
+"rcStart": [
+"7d5451bcf8",
+"Saldo inicial"
+],
+"rcStop": [
+"4d3419b202",
+"Precio de stop-loss"
+],
+"rcStreak": [
+"ffbdf88b78",
+"Pérdida tras la racha"
+],
+"rcStreakRec": [
+"907fc302d7",
+"Ganancia necesaria después"
+],
+"rcT_comp": [
+"0361ccdba9",
+"Interés compuesto"
+],
+"rcT_dd": [
+"3359ab1caa",
+"Drawdown"
+],
+"rcT_ev": [
+"0958deddf2",
+"Expectativa"
+],
+"rcT_kelly": [
+"15299a0c1f",
+"Kelly"
+],
+"rcT_oco": [
+"6839addb6b",
+"Plan OCO"
+],
+"rcT_pos": [
+"d0f5a2cffb",
+"Tamaño de posición"
+],
+"rcT_ruin": [
+"be867a992e",
+"Riesgo de ruina"
+],
+"rcTarget": [
+"be343d04b2",
+"Precio de take-profit"
+],
+"rcTitle": [
+"ff474a8bf9",
+"Centro de riesgo"
+],
+"rcTp1": [
+"5bb6465f67",
+"Objetivo 1"
+],
+"rcTp2": [
+"a9d287032d",
+"Objetivo 2"
+],
+"rcTp3": [
+"64e8a21cb6",
+"Objetivo 3"
+],
+"rcTrades": [
+"afcfcf0b8e",
+"Número de operaciones"
+],
+"rcW_kelly": [
+"43b0a6c5e7",
+"El Kelly completo asume que la tasa de aciertos se conoce exactamente, lo cual nunca ocurre. En la práctica se usa la mitad o un cuarto."
+],
+"rcW_liq": [
+"74b95e2b49",
+"A este apalancamiento la posición se liquida antes de alcanzar el stop."
+],
+"rcW_margin": [
+"33a819eb5c",
+"El margen necesario es mayor que el saldo: reduce el riesgo o aumenta el apalancamiento."
+],
+"rcW_noedge": [
+"abfe462fe4",
+"Sin ventaja con estos números: Kelly indica no apostar."
+],
+"rcWin": [
+"8ef4ec1075",
+"Tasa de aciertos (%)"
+],
+"rcYes": [
+"5397e0583f",
+"Sí"
 ],
 "redo": [
 "471b94d402",
@@ -3600,6 +4544,30 @@
 "resume": [
 "b3bd0b5a70",
 "Reanudar"
+],
+"rgAgree": [
+"f77278511d",
+"Reglas de acuerdo"
+],
+"rgHeld": [
+"88f22bff61",
+"Velas que se ha mantenido"
+],
+"rgHist": [
+"6d17cf2890",
+"Regímenes pasados (una barra por vela)"
+],
+"rgInvBear": [
+"fdc48eb73b",
+"Qué pondría fin a esto: un cierre por encima de la EMA 50 ({p}), o un ADX cayendo por debajo de 20."
+],
+"rgInvBull": [
+"40f59312f6",
+"Qué pondría fin a esto: un cierre por debajo de la EMA 50 ({p}), o un ADX cayendo por debajo de 20."
+],
+"rgInvMixed": [
+"cf42406689",
+"Sin estado claro: el precio y las medias no coinciden. Se resuelve cuando el cierre y la EMA 50 se sitúan en el mismo lado de la EMA 200."
 ],
 "rg_from": [
 "3f66052a10",
