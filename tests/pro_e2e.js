@@ -1227,6 +1227,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       ok(`[${tag}] the planner card labels the liquidation "${want}"`, cardT.indexOf(want) >= 0, cardT.slice(0, 200));
       const same = await page.evaluate(() => { const c = PRO.app.active(), d = (PRO.app.DRAW()[c.cfg.sym] || []).filter(x => x.k === 'long').pop(), r = PRO.plan(PRO.planInputs(d)); return { qty: r.qty, txt: (document.querySelector('.pm-plan') || {}).innerText || '' }; });
       ok(`[${tag}] the card shows the quantity of the lines as they are now`, same.qty > 0 && same.txt.indexOf(same.qty.toLocaleString('en-US', { maximumFractionDigits: 8 })) >= 0, String(same.qty));
+      if (vw < 600) await page.evaluate(() => { const c = document.querySelector('.pm-plan'); if (c && !c.classList.contains('pm-plmin')) c.querySelector('.pm-plh b').click(); });
       /* zoom and scroll: the lines stay on their prices */
       const before = (await geo()).pts;
       await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.6); await page.mouse.wheel(0, -300); await page.waitForTimeout(300);
