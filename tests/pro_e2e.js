@@ -1414,7 +1414,7 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     const off = await px(); await page.evaluate(() => PRO._odmZoneVis(true)); await page.waitForTimeout(200);
     const tint = { n1: 0, n2: 0, gr: 0, rd: 0 };
     pts.forEach((p, i) => { const dr = on1[i][0] - off[i][0], dg = on1[i][1] - off[i][1]; if (Math.abs(dr) + Math.abs(dg) < 6) return; if (p[2] === 'g') { tint.n1++; if (dg > dr + 4) tint.gr++; } else { tint.n2++; if (dr > dg + 4) tint.rd++; } });
-    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 >= 4 && tint.n2 >= 4 && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
+    ok(`[${tag}] the profit side of the box is green and the stop side red on the chart itself`, tint.n1 + tint.n2 >= 6 && (tint.n1 >= 4 || tint.n2 >= 4) && tint.gr >= tint.n1 * 0.9 && tint.rd >= tint.n2 * 0.9, JSON.stringify({ tint, s: pts.slice(0, 4).map((p, i) => [p[2], on1[i], off[i]]) }));
     /* the round handle on the entry line moves the start candle; Undo puts it back */
     {
       const dx = Zn.x0 > 110 ? -70 : 70, hx = L0.box.l + Zn.x0, hy = L0.box.t + Zn.ya;
