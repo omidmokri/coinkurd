@@ -115,4 +115,8 @@ var pz2 = O.pnlAt(r2, 95, 0.1);
 ok(near(pz2.pnl, -r2.qty * (5 + 0.001 * 195)), 'closed at the stop price with fees, no slippage', pz2);
 ok(O.pnlAt(r, -1) === null && O.pnlAt({ err: 'x' }, 100) === null, 'no result for a bad price or a bad plan');
 
+/* break-even after a partly filled ladder uses the average actually held, not the full plan's */
+var pH = plan({ entries: [{ p: 100, q: 50 }, { p: 90, q: 50 }], stop: { mode: 'price', v: 80 }, exits: [{ mode: 'price', v: 110, q: 25 }, { mode: 'price', v: 130, q: 75 }], beAfter: 1 });
+var sH = O.sim(pH, base, B([[101, 102, 100.5, 101], [101, 101, 99.5, 100.5], [105, 111, 104, 110], [108, 109, 99, 99.5]]), 1);
+ok(sH.end === 'be' && near(sH.events[sH.events.length - 1].p, 100) && near(sH.pnl, 100 / 15 * 0.25 * 10), 'half filled at 100, exit 1 at 110, then break-even at 100 (the held average), not 95', sH);
 console.log('test_pro_odm.js: ' + n + ' checks, ' + fail + ' failed'); process.exit(fail ? 1 : 0);

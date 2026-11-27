@@ -188,7 +188,8 @@
         if (long ? hi >= x.p : lo <= x.p) {
           var q = Math.min(x.qty, pos); if (q > EPS) close(q, long ? Math.max(op, x.p) : Math.min(op, x.p), 'exit' + x.n, b.t);
           hit = x.n; exits.splice(j, 1); j--;
-          if (plan.beAfter && hit >= plan.beAfter) stop = long ? Math.max(stop, plan.be) : Math.min(stop, plan.be);
+          /* break-even of what is actually held: a partly filled ladder has its own average, not the full plan's */
+          if (plan.beAfter && hit >= plan.beAfter && pos > EPS) { var a0 = avgP(), be0 = long ? a0 * (1 + fee) / (1 - fee) : a0 * (1 - fee) / (1 + fee); stop = long ? Math.max(stop, be0) : Math.min(stop, be0); }
         }
       }
       if (pos < EPS && !pend.length) { done = 'exits'; break; }
@@ -212,12 +213,13 @@
   function px(v) { return isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: v >= 100 ? 2 : v >= 1 ? 4 : 8 }) : '—'; }
   function sg(v, dg) { return isFinite(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v), dg) : '—'; }
   function plain(v) { return isFinite(v) ? String(+v.toPrecision(10)) : ''; }
+  function rnd(v) { return isFinite(v) && v > 0 ? plain(+v.toFixed(P.prec ? P.prec(v) : 8)) : ''; }
   var KEY = 'ek_pro_odm';
   function fresh(last) {
     var p0 = last > 0 ? last : NaN, L = p0 > 0 ? O.ladder(p0, 3, 1, true, 'equal') : null;
     return { side: 'long', contract: 'linear', balance: '1000', riskPct: '1', leverage: '1', feePct: '0.1', slip: '0', marginMode: 'isolated', mmrPct: '0.5',
-      gen: { first: plain(p0), n: '3', step: '1', split: 'equal' },
-      entries: L ? L.map(function (x) { return { p: plain(+x.p.toPrecision(8)), q: String(x.q) }; }) : [{ p: '', q: '100' }],
+      gen: { first: rnd(p0), n: '3', step: '1', split: 'equal' },
+      entries: L ? L.map(function (x) { return { p: rnd(x.p), q: String(x.q) }; }) : [{ p: '', q: '100' }],
       stop: { mode: 'atr', v: '2', len: '14' },
       exits: [{ mode: 'r', v: '1', q: '30' }, { mode: 'r', v: '2', q: '30' }, { mode: 'r', v: '3', q: '20' }],
       trail: { on: true, mode: 'atr', v: '2', act: 'none', av: '' }, beAfter: '1', fundingPct: '', fundHrs: '8', hours: '', at: '', back: '150' };
@@ -268,12 +270,13 @@
 
     var box = h('<div class="pm-odm">' +
       '<details class="pm-odwhy"><summary></summary><div></div></details>' +
+      '<div class="pm-odtop pm-num" dir="ltr" aria-live="polite"></div>' +
       '<div class="pm-odcols"><div class="pm-odin"></div><div class="pm-odout" aria-live="polite"></div></div>' +
       '<div class="pm-row pm-odact"></div><div class="pm-odx"></div><p class="pm-enote"></p></div>');
     $('.pm-odwhy summary', box).textContent = T('odWhyT');
     ['odWhy1', 'odWhy2', 'odWhy3', 'odWhy4', 'odWhy5'].forEach(function (k) { var pp = document.createElement('p'); pp.textContent = T(k); $('.pm-odwhy div', box).appendChild(pp); });
     $('.pm-enote', box).textContent = T('odNote');
-    var IN = $('.pm-odin', box), OUT = $('.pm-odout', box), X = $('.pm-odx', box), ACT = $('.pm-odact', box);
+    var IN = $('.pm-odin', box), OUT = $('.pm-odout', box), X = $('.pm-odx', box), ACT = $('.pm-odact', box), TOP = $('.pm-odtop', box);
 
     /* ---- small builders: every field writes its text into st and recalculates; rows re-render only when added or removed */
     function sec(title, hint) { var s2 = h('<section class="pm-odsec"><h4></h4></section>'); $('h4', s2).textContent = T(title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
@@ -304,7 +307,7 @@
     gb.onclick = function () {
       var L = O.ladder(num(st.gen.first), num(st.gen.n), num(st.gen.step), st.side !== 'short', st.gen.split);
       if (!L) { A.toast(T('odE_gen')); return; }
-      st.entries = L.map(function (x) { return { p: plain(+x.p.toPrecision(8)), q: String(x.q) }; }); save(); rowsE(); run();
+      st.entries = L.map(function (x) { return { p: rnd(x.p), q: String(x.q) }; }); save(); rowsE(); run();
     };
     function rowsE() {
       ER.innerHTML = '';
@@ -374,7 +377,12 @@
       var sx = 0; st.exits.forEach(function (e) { var q = num(e.q); if (isFinite(q)) sx += q; }); xs.textContent = T('odSumX', { p: f(sx, 2), r: f(Math.max(0, 100 - sx), 2) }); xs.classList.toggle('dn', sx > 100.01);
       plan = O.plan(inputs(st, atr)); OUT.innerHTML = ''; X.innerHTML = '';
       $$('button[data-need]', ACT).forEach(function (b) { b.disabled = !!plan.err; });
-      if (plan.err) { warn(OUT, T('odE_' + plan.err, { n: plan.at || '' })); return; }
+      if (plan.err) { warn(OUT, T('odE_' + plan.err, { n: plan.at || '' })); TOP.textContent = T('odE_' + plan.err, { n: plan.at || '' }); TOP.className = 'pm-odtop dn'; TOP.dir = 'auto'; return; }
+      /* one line that stays in view on a phone, where the results sit below the form */
+      TOP.className = 'pm-odtop pm-num'; TOP.dir = 'ltr';
+      TOP.innerHTML = '<span class="dn"></span><span></span><span class="up"></span>';
+      var tp = $$('span', TOP); tp[0].textContent = T('odTopRisk') + ' −' + f(plan.risk); tp[1].textContent = T('odTopAvg') + ' ' + px(plan.avg) + ' · SL ' + px(plan.stop);
+      tp[2].textContent = plan.best != null ? T('odTopBest') + ' ' + sg(plan.best) + ' (' + f(plan.best / plan.risk, 2) + 'R)' : '';
       var r = plan, o = h('<div class="pm-co"></div>'); OUT.appendChild(o);
       card(o, T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2'));
       card(o, T('rcQty'), f(r.qty, 6)); card(o, T('odAvg'), px(r.avg)); card(o, T('odStopAt'), px(r.stop), 'dn');

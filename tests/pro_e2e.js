@@ -1307,10 +1307,11 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
         loss: (() => { const t = PRO.app.T('rcMaxLoss'); const c = [...m.querySelectorAll('.pm-odout .pm-cor')].find(x => x.querySelector('small').textContent === t); return c ? c.querySelector('b').textContent : null; })(),
         liq: [...m.querySelectorAll('.pm-odout .pm-cor small')].some(x => x.textContent === PRO.app.T('rcLiqS')),
         tables: [...m.querySelectorAll('.pm-odout table')].map(t => t.querySelectorAll('tbody tr').length), rowsE: m.querySelectorAll('.pm-odin .pm-odsec:nth-of-type(2) .pm-odrow').length,
-        rowsX: m.querySelectorAll('.pm-odrx').length, fits: box.getBoundingClientRect().right <= innerWidth + 1 && box.getBoundingClientRect().left >= -1, hscroll: body.scrollWidth - body.clientWidth, why: !!m.querySelector('.pm-odwhy summary') };
+        rowsX: m.querySelectorAll('.pm-odrx').length, fits: box.getBoundingClientRect().right <= innerWidth + 1 && box.getBoundingClientRect().left >= -1, hscroll: body.scrollWidth - body.clientWidth, why: !!m.querySelector('.pm-odwhy summary'), top: (document.querySelector('.pm-odtop') || {}).textContent || '' };
     });
     let s0 = await st();
     ok(`[${tag}] ODM opens with a three-step ladder, an ATR stop, three exits and a trail, and shows its results`, s0.cards >= 8 && s0.rowsE === 3 && s0.rowsX === 3 && s0.tables.length === 3 && s0.why, JSON.stringify(s0));
+    ok(`[${tag}] a one-line summary (risk, average, stop, all exits in R) sits on top of the planner`, /−10/.test(s0.top) && /SL/.test(s0.top) && /R\)/.test(s0.top), s0.top);
     ok(`[${tag}] the loss at the stop is exactly the risk chosen (1% of 1000 = 10)`, s0.loss && /^[−-]10$/.test(s0.loss.replace(/\s/g, '')), s0.loss);
     ok(`[${tag}] the planner fits the screen with no sideways scroll`, s0.fits && s0.hscroll <= 1, JSON.stringify(s0));
     ok(`[${tag}] liquidation is labelled as a simplified estimate`, s0.liq, '');
