@@ -1391,14 +1391,17 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       const T = PRO.app.T, box = document.querySelector('.pm-mbox'), body = document.querySelector('.pm-mbody');
       const tabs = [...document.querySelectorAll('.pm-odout .pm-odt')].map(t => {
         const w = t.parentElement, ths = [...t.querySelectorAll('th')], tds = [...t.querySelectorAll('td')];
-        return { heads: ths.map(x => x.textContent), multi: ths.concat(tds).filter(x => !one(x)).map(x => x.textContent),
+        const parts = (x) => x.querySelector('.pm-odpc2,.pm-odl') ? [...x.querySelectorAll('b,small')] : [x];
+        return { heads: ths.map(x => x.textContent), multi: ths.concat(tds).flatMap(parts).filter(x => !one(x)).map(x => x.textContent),
           cut: tds.filter(x => x.scrollWidth > x.clientWidth + 1).map(x => x.textContent),
           fits: t.scrollWidth <= w.clientWidth + 1, scrolls: getComputedStyle(w).overflowX === 'auto' };
       });
       const e = document.querySelector('.pm-odout .pm-odt'), ths = e ? [...e.querySelectorAll('th')] : [];
-      const loss = e ? [...e.querySelectorAll('tbody tr')].map(r => +r.lastElementChild.textContent.replace(/[−,\s]/g, '')) : [];
+      const loss = e ? [...e.querySelectorAll('tbody tr')].map(r => +r.lastElementChild.querySelector('b').textContent.replace(/[−,\s]/g, '')) : [];
+      const bars = e ? [...e.querySelectorAll('.pm-odlb i')].map(i => i.getBoundingClientRect().width / i.parentElement.getBoundingClientRect().width) : [];
+      const pct = e ? [...e.querySelectorAll('.pm-odl small')].map(x => parseFloat(x.textContent)) : [];
       const card = (() => { const c = [...document.querySelectorAll('.pm-odout .pm-cor')].find(x => x.querySelector('small').textContent === T('rcMaxLoss')); return c ? +c.querySelector('b').textContent.replace(/[−,\s]/g, '') : null; })();
-      return { tabs, tip: ths.length ? [ths[4].title, ths[5].title] : [], want: [T('odAvgAfter'), T('odLossIf')], note: (document.querySelector('.pm-odfn') || {}).textContent || '',
+      return { tabs, bars, pct, tip: ths.length ? [ths[2].title, ths[3].title] : [], want: [T('odAvgAfter'), T('odLossIf')], note: (document.querySelector('.pm-odfn') || {}).textContent || '',
         loss, card, fits: box.getBoundingClientRect().right <= innerWidth + 1 && box.getBoundingClientRect().left >= -1 && body.scrollWidth - body.clientWidth <= 1, w: Math.round(box.getBoundingClientRect().width) };
     });
     ok(`[${tag}] every header and every number in the planner's tables stays on one line`, m.tabs.length >= 2 && m.tabs.every(t => t.multi.length === 0), JSON.stringify(m.tabs.map(t => t.multi)));
@@ -1407,10 +1410,87 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     if (vw >= 900) ok(`[${tag}] on a wide screen the entries and exits tables fit with no scrolling`, m.tabs.slice(0, 2).every(t => t.fits), JSON.stringify({ w: m.w, fits: m.tabs.map(t => t.fits) }));
     ok(`[${tag}] the short headers keep their full wording as a tooltip, explained under the table`, m.tip[0] === m.want[0] && m.tip[1] === m.want[1] && m.note.length > 30, JSON.stringify({ tip: m.tip, note: m.note }));
     ok(`[${tag}] the loss at the stop grows step by step and its last row equals the loss card (risk)`, m.loss.length >= 2 && m.loss.every((v, i) => i === 0 || v > m.loss[i - 1]) && Math.abs(m.loss[m.loss.length - 1] - m.card) < 0.011, JSON.stringify({ loss: m.loss, card: m.card }));
+    ok(`[${tag}] the loss column shows each step's share of the full risk as a growing red bar ending full, with its percent`, m.bars.length === m.loss.length && m.bars.every((v, i) => i === 0 || v > m.bars[i - 1]) && Math.abs(m.bars[m.bars.length - 1] - 1) < 0.02 && Math.abs(m.pct[m.pct.length - 1] - 100) < 0.5 && m.pct.every((v, i) => Math.abs(v - m.loss[i] / m.card * 100) < 0.6), JSON.stringify({ bars: m.bars, pct: m.pct, loss: m.loss }));
     ok(`[${tag}] the planner window fits the screen with no sideways scroll`, m.fits, JSON.stringify({ w: m.w }));
     await page.evaluate(() => { const t = document.querySelector('.pm-odout .pm-odt'); if (t) t.scrollIntoView({ block: 'start' }); }); await page.waitForTimeout(200);
     await shot(page, `84b_odm_table_${lang}_${vw}`);
     ok(`[${tag}] no JS errors in the planner tables checks`, errors.length === e0, errors.slice(e0).join(' || '));
+    await ctx.close();
+  }
+
+  /* ---------- ODM help: an icon of its own on every section, field and result; its card explains, gives an example and
+     the user's own numbers, answers questions from the guide, hands the rest to a person; in every language, phone and desktop */
+  if (!ONLY || ONLY === 'cd' || ONLY === 'odm' || ONLY === 'odh') for (const [vw, vh, lang] of [[1280, 860, 'en'], [1024, 768, 'fa'], [900, 800, 'ar'], [390, 800, 'ckb'], [390, 800, 'ar']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const tag = `odm help ${lang} ${vw}`, e0 = errors.length;
+    await page.evaluate(() => { localStorage.removeItem('ek_pro_odm'); document.querySelector('#pm-odm').click(); });
+    await page.waitForSelector('.pm-odm .pm-odt', { timeout: 8000 }).catch(() => { });
+    await page.waitForTimeout(300);
+    const ic = await page.evaluate(() => {
+      const B = [...document.querySelectorAll('.pm-odm .pm-odi')], by = {};
+      B.forEach(b => { const k = b.getAttribute('data-odh'); (by[k] = by[k] || []).push(b.innerHTML); });
+      const keys = Object.keys(by), glyphs = new Set(keys.map(k => by[k][0]));
+      return { n: B.length, keys: keys.length, same: keys.every(k => by[k].every(g => g === by[k][0])), unique: glyphs.size === keys.length,
+        named: B.every(b => (b.getAttribute('aria-label') || '').length > 6), want: ['acc', 'ent', 'stop', 'exit', 'trail', 'more', 'risk', 'lev', 'fee', 'qty', 'maxloss', 'fills', 'avgso', 'lossat', 'ends'].filter(k => !by[k]) };
+    });
+    ok(`[${tag}] every section, field and result of the planner has a help icon`, ic.n >= 40 && ic.keys >= 38 && ic.want.length === 0, JSON.stringify(ic));
+    ok(`[${tag}] each item's icon is its own picture, and every icon has a spoken name`, ic.unique && ic.same && ic.named, JSON.stringify(ic));
+    /* tap the risk field's icon: the card opens, the field itself does not take the tap */
+    await page.click('.pm-odin .pm-odi[data-odh="risk"]');
+    await page.waitForSelector('.pm-odpop', { timeout: 3000 }).catch(() => { });
+    const c1 = await page.evaluate(() => {
+      const T = PRO.app.T, p = document.querySelector('.pm-odpop'); if (!p) return null; const r = p.getBoundingClientRect();
+      return { title: p.querySelector('.pm-odph b').textContent, want: T('odh_risk_t'), ex: (p.querySelector('.pm-odpe span') || {}).textContent || '', exW: T('odh_risk_e'),
+        mine: (p.querySelector('.pm-odpy span') || {}).textContent || '', what: p.querySelectorAll('.pm-odpr').length, ask: !!p.querySelector('.pm-odpa input'),
+        sheet: p.classList.contains('sheet'), inView: r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1, focusInput: document.activeElement && document.activeElement.matches('.pm-odin input'),
+        dir: p.dir, risk: (PRO.odh.ctx || {}).risk };
+    });
+    ok(`[${tag}] tapping an icon opens its card: title, what it is, what it is for and an example`, c1 && c1.title === c1.want && c1.what === 2 && c1.ex === c1.exW && c1.ex.length > 10 && c1.ask, JSON.stringify(c1));
+    ok(`[${tag}] the card shows the user's own numbers, every placeholder filled`, c1 && c1.mine.length > 5 && !/\{\w+\}/.test(c1.mine) && c1.mine.indexOf(c1.risk) >= 0, JSON.stringify(c1 && { mine: c1.mine, risk: c1.risk }));
+    ok(`[${tag}] the card sits inside the screen (a sheet at the bottom on a phone), in the page's direction, and the field did not take the tap`, c1 && c1.inView && (vw < 600 ? c1.sheet : !c1.sheet) && c1.dir === (lang === 'en' ? 'ltr' : 'rtl') && !c1.focusInput, JSON.stringify(c1));
+    await shot(page, `85_odm_help_${lang}_${vw}`);
+    /* ask the guide one of its own questions, in this language */
+    const q1 = await page.evaluate(() => PRO.app.T('odhQ1'));
+    await page.fill('.pm-odpa input', q1); await page.click('.pm-odpa button[type=submit]'); await page.waitForTimeout(150);
+    const a1 = await page.evaluate(() => { const c = document.querySelector('.pm-odpres .pm-odpc'); return { first: c ? c.textContent : '', want: PRO.app.T('odhA1'), tg: !!document.querySelector('.pm-odptg') }; });
+    ok(`[${tag}] the ask box answers a question from the planner's guide, in this language`, a1.first.indexOf(a1.want) >= 0 && a1.tg, JSON.stringify(a1).slice(0, 300));
+    await shot(page, `85b_odm_ask_${lang}_${vw}`);
+    /* a question the guide cannot answer goes to a person: the question is copied and the support chat opens */
+    await page.fill('.pm-odpa input', 'zzqx wwvb'); await page.click('.pm-odpa button[type=submit]'); await page.waitForTimeout(100);
+    const a2 = await page.evaluate(() => {
+      const none = (document.querySelector('.pm-odpres .pm-odpm') || {}).textContent || '', want = PRO.app.T('odhNone'); let href = '';
+      const old = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { href = this.href; };
+      document.querySelector('.pm-odptg').click(); HTMLAnchorElement.prototype.click = old;
+      return { none: none === want, href, copy: PRO.odh.lastCopy || '' };
+    });
+    ok(`[${tag}] with no answer in the guide, "Ask a person" copies the question with the item's name and opens the Telegram support chat`, a2.none && a2.href === 'https://t.me/Kurdistan_Coin' && a2.copy.indexOf('zzqx wwvb') >= 0 && a2.copy.indexOf(await page.evaluate(() => PRO.app.T('odh_risk_t'))) >= 0, JSON.stringify(a2));
+    /* Escape closes the card, not the planner */
+    await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+    const esc1 = await page.evaluate(() => ({ pop: !!document.querySelector('.pm-odpop'), modal: !!document.querySelector('.pm-odm') }));
+    ok(`[${tag}] Escape closes the card and leaves the planner open`, !esc1.pop && esc1.modal, JSON.stringify(esc1));
+    /* a result card's icon and the loss column's own icon open their cards too */
+    await page.evaluate(() => { const b = document.querySelector('.pm-odout th .pm-odi[data-odh="lossat"]'); b.scrollIntoView({ block: 'center' }); });
+    await page.click('.pm-odout th .pm-odi[data-odh="lossat"]'); await page.waitForTimeout(150);
+    const c2 = await page.evaluate(() => { const p = document.querySelector('.pm-odpop'); return p ? { k: p.getAttribute('data-odh'), t: p.querySelector('.pm-odph b').textContent, want: PRO.app.T('odh_lossat_t'), faq: p.querySelectorAll('.pm-odpf').length } : null; });
+    ok(`[${tag}] the loss column's icon explains the column, with the guide's question about it`, c2 && c2.k === 'lossat' && c2.t === c2.want && c2.faq >= 1, JSON.stringify(c2));
+    await shot(page, `85c_odm_loss_help_${lang}_${vw}`);
+    await page.evaluate(() => PRO.odh.close());
+    if (vw >= 900) {
+      /* a mouse: hovering shows the card, leaving it closes it */
+      await page.hover('.pm-odin .pm-odi[data-odh="lev"]'); await page.waitForTimeout(450);
+      const hv = await page.evaluate(() => ({ k: (document.querySelector('.pm-odpop') || { getAttribute: () => '' }).getAttribute('data-odh') }));
+      await page.mouse.move(2, 2); await page.waitForTimeout(450);
+      const hv2 = await page.evaluate(() => !!document.querySelector('.pm-odpop'));
+      ok(`[${tag}] hovering an icon with the mouse shows its card, moving away hides it`, hv.k === 'lev' && !hv2, JSON.stringify({ hv, hv2 }));
+    } else {
+      /* a phone: press and hold opens it too */
+      const box = await page.evaluate(() => { const b = document.querySelector('.pm-odin .pm-odi[data-odh="lev"]'); b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+      await page.evaluate(({ x, y }) => { const b = document.elementFromPoint(x, y).closest('.pm-odi'); b.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true })); }, box);
+      await page.waitForTimeout(600);
+      const hd = await page.evaluate(() => (document.querySelector('.pm-odpop') || { getAttribute: () => '' }).getAttribute('data-odh'));
+      ok(`[${tag}] press and hold on an icon opens its card`, hd === 'lev', hd);
+    }
+    ok(`[${tag}] no JS errors in the planner help checks`, errors.length === e0, errors.slice(e0).join(' || '));
     await ctx.close();
   }
 

@@ -278,16 +278,18 @@
     $('.pm-enote', box).textContent = T('odNote');
     var IN = $('.pm-odin', box), OUT = $('.pm-odout', box), X = $('.pm-odx', box), ACT = $('.pm-odact', box), TOP = $('.pm-odtop', box);
 
+    /* the help icon of a label key (odhelp.js), when that file has loaded */
+    function tag(el, k) { return P.odh && P.odh.tag ? P.odh.tag(el, k) : null; }
     /* ---- small builders: every field writes its text into st and recalculates; rows re-render only when added or removed */
-    function sec(title, hint) { var s2 = h('<section class="pm-odsec"><h4></h4></section>'); $('h4', s2).textContent = T(title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
+    function sec(title, hint) { var s2 = h('<section class="pm-odsec"><h4></h4></section>'); $('h4', s2).textContent = T(title); tag($('h4', s2), title); if (hint) { var p2 = h('<p class="pm-odhint"></p>'); p2.textContent = T(hint); s2.appendChild(p2); } IN.appendChild(s2); return s2; }
     function inp(obj, k, lbl, cls) {
       var w = h('<label class="pm-cf' + (cls ? ' ' + cls : '') + '"><span></span><input class="pm-in" inputmode="decimal" dir="ltr" autocomplete="off" maxlength="24"></label>'), i = $('input', w);
-      $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove(); i.value = obj[k] == null ? '' : obj[k];
+      $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove(); else tag($('span', w), lbl); i.value = obj[k] == null ? '' : obj[k];
       if (lbl) i.setAttribute('aria-label', T(lbl));
       i.oninput = function () { obj[k] = i.value.slice(0, 24); save(); run(); }; return w;
     }
     function sel(obj, k, lbl, opts, pre, after) {
-      var w = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), sl = $('select', w); $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove();
+      var w = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), sl = $('select', w); $('span', w).textContent = lbl ? T(lbl) : ''; if (!lbl) $('span', w).remove(); else tag($('span', w), lbl);
       opts.forEach(function (x) { var op = document.createElement('option'); op.value = x; op.textContent = T((pre || 'odO_') + x); sl.appendChild(op); });
       sl.value = opts.indexOf(obj[k]) >= 0 ? obj[k] : opts[0]; obj[k] = sl.value; if (lbl) sl.setAttribute('aria-label', T(lbl));
       sl.onchange = function () { obj[k] = sl.value; save(); if (after) after(); run(); }; return w;
@@ -351,25 +353,25 @@
     /* 5. what is left: the trailing stop, and break-even */
     var s5 = sec('odTrail', 'odTrailHint'), tg = h('<label class="pm-odtg"><input type="checkbox"> <span></span></label>');
     $('span', tg).textContent = T('odTOn'); $('input', tg).checked = !!st.trail.on; $('input', tg).onchange = function () { st.trail.on = $('input', tg).checked; save(); run(); }; s5.appendChild(tg);
-    var beW = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), beS = $('select', beW); $('span', beW).textContent = T('odBE');
+    var beW = h('<label class="pm-cf"><span></span><select class="pm-in"></select></label>'), beS = $('select', beW); $('span', beW).textContent = T('odBE'); tag($('span', beW), 'odBE');
     function beOpts() { beS.innerHTML = ''; var o0 = new Option(T('odBENo'), '0'); beS.appendChild(o0); st.exits.forEach(function (x, i) { beS.appendChild(new Option(T('odBEAfter', { n: i + 1 }), String(i + 1))); }); beS.value = +st.beAfter <= st.exits.length ? String(+st.beAfter || 0) : '0'; st.beAfter = beS.value; }
     beS.onchange = function () { st.beAfter = beS.value; save(); run(); };
     grid(s5, [sel(st.trail, 'mode', 'odTMode', ['atr', 'pct']), inp(st.trail, 'v', 'odTVal'), sel(st.trail, 'act', 'odTAct', ['none', 'price', 'pct', 'r'], 'odA_'), inp(st.trail, 'av', 'odTActV'), beW]);
 
     /* 6. funding and the result at any price */
-    var s6 = h('<details class="pm-odsec pm-odmore"><summary></summary></details>'); $('summary', s6).textContent = T('odMore'); IN.appendChild(s6);
+    var s6 = h('<details class="pm-odsec pm-odmore"><summary></summary></details>'); $('summary', s6).textContent = T('odMore'); tag($('summary', s6), 'odMore'); IN.appendChild(s6);
     grid(s6, [inp(st, 'fundingPct', 'plFundRate'), inp(st, 'fundHrs', 'plFundIv'), inp(st, 'hours', 'plHours'), inp(st, 'at', 'odAt')]);
 
     /* ---- the results */
-    function card(o, a, v, cls, tip) { var x = h('<div class="pm-cor' + (cls ? ' ' + cls : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', x).textContent = a; $('b', x).textContent = v; if (tip) x.title = tip; o.appendChild(x); }
+    function card(o, a, v, cls, tip, key) { var x = h('<div class="pm-cor' + (cls ? ' ' + cls : '') + '"><small></small><b class="pm-num" dir="ltr"></b></div>'); $('small', x).textContent = a; if (key) tag($('small', x), key); $('b', x).textContent = v; if (tip) x.title = tip; o.appendChild(x); }
     function table(head, rows) {
       var w = h('<div class="pm-tw"><table class="pm-tbl pm-odt"><thead><tr></tr></thead><tbody></tbody></table></div>');
-      head.forEach(function (k) { var th = document.createElement('th'); if (Array.isArray(k)) { th.textContent = k[0]; th.title = k[1]; } else th.textContent = k; $('tr', w).appendChild(th); });
-      rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, j) { var td = document.createElement('td'); if (c && typeof c === 'object') { td.textContent = c.t; if (c.c) td.className = c.c; } else td.textContent = c; if (j) { td.className = (td.className ? td.className + ' ' : '') + 'pm-num'; td.dir = 'ltr'; } tr.appendChild(td); }); $('tbody', w).appendChild(tr); });
+      head.forEach(function (k) { var th = document.createElement('th'); if (Array.isArray(k)) { th.textContent = k[0]; if (k[1]) th.title = k[1]; if (k[2]) tag(th, k[2]); } else th.textContent = k; $('tr', w).appendChild(th); });
+      rows.forEach(function (r) { var tr = document.createElement('tr'); r.forEach(function (c, j) { var td = document.createElement('td'); if (c && c.nodeType) td.appendChild(c); else if (c && typeof c === 'object') { td.textContent = c.t; if (c.c) td.className = c.c; } else td.textContent = c; if (j) { td.className = (td.className ? td.className + ' ' : '') + 'pm-num'; td.dir = 'ltr'; } tr.appendChild(td); }); $('tbody', w).appendChild(tr); });
       return w;
     }
     function warn(o, txt) { var wn = h('<div class="pm-cw2"></div>'); wn.textContent = txt; o.appendChild(wn); }
-    function h4(o, k) { var x = document.createElement('h4'); x.className = 'pm-odh'; x.textContent = T(k); o.appendChild(x); }
+    function h4(o, k) { var x = document.createElement('h4'); x.className = 'pm-odh'; x.textContent = T(k); tag(x, k); o.appendChild(x); }
     function run() {
       var n = calcAtr();
       atrNote.textContent = atr > 0 ? T('odAtrIs', { n: n, tf: A.tfLabel ? A.tfLabel(cell.cfg.tf) : cell.cfg.tf, v: px(atr), b: B.length }) : T('odAtrNone', { n: n });
@@ -377,6 +379,7 @@
       var sx = 0; st.exits.forEach(function (e) { var q = num(e.q); if (isFinite(q)) sx += q; }); xs.textContent = T('odSumX', { p: f(sx, 2), r: f(Math.max(0, 100 - sx), 2) }); xs.classList.toggle('dn', sx > 100.01);
       plan = O.plan(inputs(st, atr)); OUT.innerHTML = ''; X.innerHTML = '';
       $$('button[data-need]', ACT).forEach(function (b) { b.disabled = !!plan.err; });
+      if (plan.err && P.odh) P.odh.ctx = null;
       if (plan.err) { warn(OUT, T('odE_' + plan.err, { n: plan.at || '' })); TOP.textContent = T('odE_' + plan.err, { n: plan.at || '' }); TOP.className = 'pm-odtop dn'; TOP.dir = 'auto'; return; }
       /* one line that stays in view on a phone, where the results sit below the form */
       TOP.className = 'pm-odtop'; TOP.dir = A.RTL() ? 'rtl' : 'ltr'; TOP.innerHTML = '';
@@ -385,17 +388,26 @@
       tpart(T('odTopRisk'), '−' + f(plan.risk), 'dn'); tpart(T('odTopAvg'), px(plan.avg)); tpart('SL', px(plan.stop));
       if (plan.best != null) tpart(T('odTopBest'), sg(plan.best) + ' (' + f(plan.best / plan.risk, 2) + 'R)', 'up');
       var r = plan, o = h('<div class="pm-co"></div>'); OUT.appendChild(o);
-      card(o, T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2'));
-      card(o, T('rcQty'), f(r.qty, 6)); card(o, T('odAvg'), px(r.avg)); card(o, T('odStopAt'), px(r.stop), 'dn');
-      card(o, T('rcMaxLoss'), '−' + f(r.risk), 'dn', T('odTipRisk')); card(o, T('odBest'), r.best != null ? sg(r.best) + '  (' + f(r.best / r.risk, 2) + 'R)' : '—', r.best > 0 ? 'up' : '');
-      card(o, T('rcNotional'), f(r.notional)); card(o, T('rcMargin'), f(r.margin)); card(o, T('rcBE'), px(r.be));
-      if (r.liq != null) card(o, T('rcLiqS'), px(r.liq), '', T('rcLiqNote')); else if (r.liqWhy) card(o, T('rcLiqS'), T('rcLiq_' + r.liqWhy));
-      if (r.funding != null) card(o, T('odFund'), sg(-r.funding), r.funding > 0 ? 'dn' : 'up');
+      if (P.odh) P.odh.ctx = { bal: f(num(st.balance)), rp: f(num(st.riskPct), 2), risk: f(r.risk), qty: f(r.qty, 6), avg: px(r.avg), sl: px(r.stop), R: px(Math.abs(r.avg - r.stop)), n: String(r.fills.length),
+        atr: atr > 0 ? px(atr) : '', atrn: String(n), lev: f(num(st.leverage), 2), margin: f(r.margin), notional: f(r.notional), be: px(r.be) };
+      card(o, T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2'), '', '', 'rcSide');
+      card(o, T('rcQty'), f(r.qty, 6), '', '', 'rcQty'); card(o, T('odAvg'), px(r.avg), '', '', 'odAvg'); card(o, T('odStopAt'), px(r.stop), 'dn', '', 'odStopAt');
+      card(o, T('rcMaxLoss'), '−' + f(r.risk), 'dn', T('odTipRisk'), 'rcMaxLoss'); card(o, T('odBest'), r.best != null ? sg(r.best) + '  (' + f(r.best / r.risk, 2) + 'R)' : '—', r.best > 0 ? 'up' : '', '', 'odBest');
+      card(o, T('rcNotional'), f(r.notional), '', '', 'rcNotional'); card(o, T('rcMargin'), f(r.margin), '', '', 'rcMargin'); card(o, T('rcBE'), px(r.be), '', '', 'rcBE');
+      if (r.liq != null) card(o, T('rcLiqS'), px(r.liq), '', T('rcLiqNote'), 'rcLiqS'); else if (r.liqWhy) card(o, T('rcLiqS'), T('rcLiq_' + r.liqWhy), '', '', 'rcLiqS');
+      if (r.funding != null) card(o, T('odFund'), sg(-r.funding), r.funding > 0 ? 'dn' : 'up', '', 'odFund');
       if (!r.marginOk) warn(o, T('rcW_margin')); else if (r.liqBeforeStop) warn(o, T('rcW_liq')); else if (r.liq != null) warn(o, T('rcLiqNote'));
       var inr = r.exits.filter(function (x) { return x.inRange; }).map(function (x) { return 'TP' + x.n; }); if (inr.length) warn(o, T('odW_inRange', { l: inr.join(', ') }));
       var at = num(st.at); if (at > 0) { var z = O.pnlAt(r, at, num(st.feePct)); if (z) card(o, T('odAtRes', { p: px(at) }), sg(z.pnl) + '  ' + sg(z.r, 2) + 'R  ' + sg(z.pct, 2) + '%', z.pnl > 0 ? 'up' : z.pnl < 0 ? 'dn' : ''); }
       h4(OUT, 'odHFills');
-      OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('rcQty'), [T('odAvgS'), T('odAvgAfter')], [T('odLossS'), T('odLossIf')]], r.fills.map(function (x) { return ['E' + x.n, px(x.p), f(x.q, 2) + '%', f(x.qty, 6), px(x.avg), { t: '−' + f(x.loss), c: 'dn' }]; })));
+      OUT.appendChild(table([T('odStep'), T('odPrice'), [T('odAvgS'), T('odAvgAfter'), 'odAvgS'], [T('odLossS'), T('odLossIf'), 'odLossS']], r.fills.map(function (x) {
+        var pc = h('<div class="pm-odpc2"><b></b><small></small></div>'); $('b', pc).textContent = px(x.p); $('small', pc).textContent = f(x.q, 2) + '% · ' + f(x.qty, 6);
+        /* the loss if the stop is hit once this step has filled: the money, and how much of the plan's full risk that is */
+        var sh = r.risk > 0 ? Math.max(0, Math.min(1, x.loss / r.risk)) : 0, lc = h('<div class="pm-odl"><b class="dn"></b><span class="pm-odlb" aria-hidden="true"><i></i></span><small></small></div>');
+        $('b', lc).textContent = '−' + f(x.loss); $('i', lc).style.width = (sh * 100).toFixed(1) + '%'; $('small', lc).textContent = f(sh * 100, 0) + '%';
+        $('.pm-odlb', lc).dir = A.RTL() ? 'rtl' : 'ltr'; lc.title = T('odLossOf', { p: f(sh * 100, 0), r: f(r.risk) });
+        return ['E' + x.n, pc, px(x.avg), lc];
+      })));
       var fn = h('<p class="pm-odhint pm-odfn"></p>'); fn.textContent = T('odFillNote'); OUT.appendChild(fn);
       if (r.exits.length) { h4(OUT, 'odHExits'); OUT.appendChild(table([T('odStep'), T('odPrice'), T('odShare'), T('odProfit'), 'R'], r.exits.map(function (x) { return ['TP' + x.n, px(x.p), f(x.q, 2) + '%', { t: sg(x.profit), c: x.profit > 0 ? 'up' : 'dn' }, f(x.r, 2)]; }))); }
       if (r.rest > 0) {
@@ -427,7 +439,7 @@
     /* walk the plan over this chart's closed bars, from N bars back */
     function test() {
       X.innerHTML = ''; var r = plan; if (!r || r.err) return;
-      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-cg"></div><div class="pm-odres"></div></section>'); $('h4', w).textContent = T('odTestT'); X.appendChild(w);
+      var w = h('<section class="pm-odsec"><h4></h4><div class="pm-cg"></div><div class="pm-odres"></div></section>'); $('h4', w).textContent = T('odTestT'); tag($('h4', w), 'odTestT'); X.appendChild(w);
       var bk = inp(st, 'back', 'odBack'); $('.pm-cg', w).appendChild(bk); var go = h('<button type="button" class="pm-btn sm pri"></button>'); go.textContent = T('odRun'); $('.pm-cg', w).appendChild(go);
       var res = $('.pm-odres', w);
       function walk() {
