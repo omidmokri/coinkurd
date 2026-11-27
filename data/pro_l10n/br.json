@@ -37,6 +37,10 @@
 "7380ba50bf",
 "<b>50 idiomas e sua própria moeda:</b> o workspace em curdo, persa, árabe, inglês e mais 46 idiomas, cada um em seu próprio endereço (/market/de/, /market/jp/ …); cada moeda da Binance em sua moeda (euro, lira, rupia, iene e cerca de 150 outras), calculada como o toman a partir de uma taxa de câmbio diária ou de sua própria taxa para um tether ou um dólar."
 ],
+"about.9481d12afe": [
+"9481d12afe",
+"O botão <b>ODM</b> planeja uma operação completa: entradas escalonadas, um stop de ATR, saídas escalonadas por preço, porcentagem ou R, um trailing stop para o restante, todas as formas possíveis de término, um teste em candles passados e um alerta para cada nível."
+],
 "about.9f16c628ea": [
 "9f16c628ea",
 "<b>70 indicadores:</b> médias móveis de todos os tipos (HMA, ALMA, TEMA…), Bollinger, Ichimoku, Alligator, pontos pivô, ZigZag, SuperTrend, VWAP, RSI, MACD, Estocástico, ADX, Aroon, Fisher, CMF e mais, com as definições do TradingView."
@@ -84,6 +88,10 @@
 "about.fb578e06d6": [
 "fb578e06d6",
 "<b>Alertas de preço, linha e indicadores:</b> cruzamento, cruzar para cima ou para baixo, acima ou abaixo, variações em %; linhas de tendência inclinadas, semirretas e canais; cruzamentos de RSI, média móvel e EMA, MACD, Bollinger, SuperTrend, Estocástico e picos de volume; alertas de notícias — com data de término, notificação no navegador, som e alertas de preço enviados para o bot do Telegram."
+],
+"about.fca76d932c": [
+"fca76d932c",
+"O botão Fontes de dados (o ícone de download na barra superior) lista dados históricos gratuitos para cripto, forex, futuros, ações e macro, com a licença e os limites de cada fonte."
 ],
 "ac_bb_gt": [
 "8edb588c2d",
@@ -4929,6 +4937,306 @@
 "501f9eaddf",
 "Modo de margem"
 ],
+"odh_mmode_w": [
+"675627717c",
+"Isolado: apenas a margem desta posição pode ser perdida na liquidação. Cruzada: todo o seu saldo dá suporte à posição."
+],
+"odh_mmode_y": [
+"fef5b7b2b1",
+"Isso altera a estimativa de liquidação simplificada."
+],
+"odh_mmr_e": [
+"4a9a37cf10",
+"0,5% de uma posição de 10.000 é 50."
+],
+"odh_mmr_t": [
+"6ccd06f6ff",
+"Margem de manutenção (%)"
+],
+"odh_mmr_w": [
+"102720cee3",
+"A margem mínima que a corretora mantém para a posição. Abaixo disso, a liquidação é iniciada."
+],
+"odh_mmr_y": [
+"7bf4734885",
+"Usado apenas para a estimativa de liquidação simplificada. Verifique o nível real na sua corretora."
+],
+"odh_more_e": [
+"78ebacc245",
+"0,01% a cada 8 horas, mantido por 24 horas, em uma posição de 600 é cerca de 0,18."
+],
+"odh_more_t": [
+"4bab2d8fe1",
+"Mais"
+],
+"odh_more_w": [
+"42278ba47e",
+"Taxa de financiamento para perpétuos e o resultado em qualquer preço digitado."
+],
+"odh_more_y": [
+"7b885c8e67",
+"Manter um contrato perpétuo aberto pode custar ou gerar financiamento a cada poucas horas."
+],
+"odh_notional_e": [
+"300ce48960",
+"0,0064 × 60.974 é cerca de 390."
+],
+"odh_notional_n": [
+"304a790b10",
+"Sua posição: {notional}."
+],
+"odh_notional_t": [
+"629c8eb9ba",
+"Valor da posição"
+],
+"odh_notional_w": [
+"9b6b8c5e1f",
+"Quantidade × entrada média, em USDT."
+],
+"odh_notional_y": [
+"d6c958086a",
+"A corretora cobra taxas e margem sobre este valor."
+],
+"odh_qty_e": [
+"08a3a24441",
+"10 em risco ÷ (R$ 1.443 + taxas de cerca de 121) é cerca de 0,0064 BTC."
+],
+"odh_qty_n": [
+"e4723fbfba",
+"Sua quantidade: {qty}."
+],
+"odh_qty_t": [
+"44f6af6945",
+"Quantidade"
+],
+"odh_qty_w": [
+"8214deadd9",
+"O tamanho total em moedas se todas as entradas forem preenchidas."
+],
+"odh_qty_y": [
+"7cc786bbf8",
+"É calculado para que a perda no stop seja igual ao seu risco."
+],
+"odh_risk_e": [
+"58a2bde113",
+"1% de 1.000 é 10. Se o stop estiver cerca de 1.000 abaixo da entrada média de uma compra, a posição fica próxima de 0,01 BTC."
+],
+"odh_risk_n": [
+"524652bc5e",
+"Seu plano: um stop-out custa {risk}, que é {rp}% de {bal}."
+],
+"odh_risk_t": [
+"b031aee373",
+"Risco por operação (%)"
+],
+"odh_risk_w": [
+"e16cd1d147",
+"A fatia do seu saldo que você aceita perder se todas as entradas forem preenchidas e o stop for atingido, incluindo taxas e derrapagem (slippage)."
+],
+"odh_risk_y": [
+"2a1118ce86",
+"O ODM funciona de trás para frente: ele dimensiona a posição para que um stop-out custe exatamente esse valor, nunca mais."
+],
+"odh_side_e": [
+"025ebc9d4e",
+"Comprar (Long) BTC a 60.000 com o stop em 58.000. Uma venda (Short) a 60.000 precisa de seu stop acima, por exemplo, 62.000."
+],
+"odh_side_t": [
+"26528381ea",
+"Lado"
+],
+"odh_side_w": [
+"fd310748ba",
+"Compra (Long): você compra e lucra se o preço subir. Venda (Short): você vende primeiro e lucra se o preço cair."
+],
+"odh_side_y": [
+"f88bf6b76d",
+"Define em qual lado das suas entradas o stop deve ficar e qual direção conta como lucro."
+],
+"odh_slip_e": [
+"13a80c38b2",
+"O stop de uma compra em 58.000 com derrapagem (slippage) de 20 é considerado como executado a 57.980."
+],
+"odh_slip_t": [
+"9cc2898876",
+"Derrapagem (unidades de preço)"
+],
+"odh_slip_w": [
+"9210080f38",
+"Quão pior do que o preço de stop uma ordem de stop pode ser executada em um mercado rápido, em termos de preço."
+],
+"odh_slip_y": [
+"4176d4998f",
+"Isso é adicionado à perda no stop, de modo que uma execução ruim já está contabilizada no seu risco."
+],
+"odh_smode_e": [
+"d0f6baa41b",
+"ATR 600 × 2 coloca o stop 1.200 abaixo da entrada mais profunda de uma compra."
+],
+"odh_smode_t": [
+"58ec1c7c84",
+"Método de stop"
+],
+"odh_smode_w": [
+"48702e26b7",
+"ATR: um múltiplo da faixa média recente além da sua entrada mais profunda. Porcentagem: uma porcentagem além da entrada mais profunda. Preço: um preço digitado por você."
+],
+"odh_smode_y": [
+"ed4407ed0d",
+"O ATR acompanha a volatilidade atual da moeda, para que o stop não fique muito justo em um dia volátil."
+],
+"odh_stop_e": [
+"8926c096e7",
+"Média de 60.974 e stop de 59.531: R = 1.443. Com 10 em risco, o plano mantém cerca de 0,0064 BTC."
+],
+"odh_stop_n": [
+"9c95f89f46",
+"Seu stop: {sl}, então R = {R}."
+],
+"odh_stop_t": [
+"ecfdc40665",
+"Stop-loss"
+],
+"odh_stop_w": [
+"5522c198b4",
+"O preço onde a ideia se torna incorreta e cada entrada preenchida é fechada com prejuízo."
+],
+"odh_stop_y": [
+"d7b6da198b",
+"Junto com seu risco, define o tamanho: um stop mais próximo significa um tamanho maior para o mesmo risco."
+],
+"odh_stopat_e": [
+"2cb46a1ee6",
+"Com ATR × 2 e ATR 600, ele fica 1.200 além da sua entrada mais profunda."
+],
+"odh_stopat_n": [
+"d05e23b4c8",
+"Seu stop: {sl}."
+],
+"odh_stopat_t": [
+"9e253470c8",
+"Stop"
+],
+"odh_stopat_w": [
+"d16b105abf",
+"O preço de stop que este plano usa, de acordo com o método escolhido."
+],
+"odh_stopat_y": [
+"91a65418b9",
+"Cada entrada preenchida é fechada aqui se a ideia falhar."
+],
+"odh_sval_e": [
+"0c941866f5",
+"2 com ATR, 1,5 com porcentagem ou 59.500 com preço."
+],
+"odh_sval_t": [
+"0622db62de",
+"Valor do stop"
+],
+"odh_sval_w": [
+"ba80c38465",
+"O número para o método: o múltiplo do ATR, a porcentagem ou o preço."
+],
+"odh_sval_y": [
+"f976dd936f",
+"Altere-o para mover o stop. O tamanho é atualizado para que o risco permaneça o mesmo."
+],
+"odh_tact_e": [
+"2e0ede00f1",
+"Iniciar após 1R: o rastreamento é ativado assim que o preço estiver com um R de lucro."
+],
+"odh_tact_t": [
+"be92240002",
+"Início do rastreamento"
+],
+"odh_tact_w": [
+"b6481374ec",
+"Quando o trailing stop começa: imediatamente, em um preço, após um movimento percentual ou após um múltiplo de R em lucro."
+],
+"odh_tact_y": [
+"94c2f2ff7f",
+"Começar mais tarde evita ser estopado logo perto da entrada."
+],
+"odh_tactv_e": [
+"246eb9a7c3",
+"1 com R significa um R de lucro."
+],
+"odh_tactv_t": [
+"3ca6df8028",
+"Valor inicial"
+],
+"odh_tactv_w": [
+"5f17cc79b4",
+"O preço, a porcentagem ou o R para o início escolhido."
+],
+"odh_tactv_y": [
+"8969cc67da",
+"Define o ponto em que o trailing stop é ativado."
+],
+"odh_test_e": [
+"3fae7383cb",
+"Candles ambíguos: um candle tocou tanto no stop quanto no alvo, portanto a ordem dentro dele é desconhecida."
+],
+"odh_test_t": [
+"d5bb186d33",
+"Testar no histórico deste gráfico"
+],
+"odh_test_w": [
+"7991e3cd85",
+"Simula o plano nos candles fechados anteriores deste gráfico, um candle por vez."
+],
+"odh_test_y": [
+"521a6e46e0",
+"Uma verificação rápida de como teria sido. Não é uma promessa sobre o futuro."
+],
+"odh_tmode_e": [
+"6463ceb3c4",
+"2 × ATR é 1.200 quando o ATR é 600."
+],
+"odh_tmode_t": [
+"77027c3731",
+"Distância do rastreamento por"
+],
+"odh_tmode_w": [
+"a7c556973e",
+"Múltiplo de ATR ou porcentagem."
+],
+"odh_tmode_y": [
+"9ad06b6b07",
+"O ATR mantém a distância em sincronia com a volatilidade da moeda."
+],
+"odh_trail_e": [
+"92baed577c",
+"20% restante com um trailing stop a 2 × ATR atrás do melhor preço."
+],
+"odh_trail_t": [
+"f4d671693b",
+"O que resta"
+],
+"odh_trail_w": [
+"49a5c00392",
+"A fatia que nenhum take-profit fecha. Ela pode seguir o preço com um trailing stop, e o stop pode se mover para o ponto de equilíbrio (breakeven) após um take-profit."
+],
+"odh_trail_y": [
+"d5d5131192",
+"Permite que parte da operação flua sem devolver tudo."
+],
+"odh_tval_e": [
+"d9ca049b57",
+"Com 1.200, uma máxima de 66.000 coloca o stop de uma compra em 64.800."
+],
+"odh_tval_t": [
+"752ffa08b7",
+"Distância do rastreamento"
+],
+"odh_tval_w": [
+"cc8419ae79",
+"A que distância do melhor preço o trailing stop acompanha."
+],
+"odh_tval_y": [
+"3fdb99c573",
+"Muito justo fecha cedo. Muito amplo devolve muito."
+],
 "of_price": [
 "3e8248e32e",
 "Preço"
@@ -5345,6 +5653,26 @@
 "91acef5dac",
 "Comprimento da WMA"
 ],
+"palActions": [
+"c3cd636a58",
+"Ações"
+],
+"palHint": [
+"47ce327f45",
+"Digite uma ferramenta, configuração, timeframe…"
+],
+"palNone": [
+"9f85767365",
+"Nenhum resultado encontrado."
+],
+"palTf": [
+"85decb73d1",
+"Timeframe"
+],
+"palTitle": [
+"7b6b539e73",
+"Paleta de comandos"
+],
 "panels": [
 "8dfeed481e",
 "Painéis"
@@ -5413,6 +5741,262 @@
 "1e214a5fd6",
 "Clique no gráfico onde o replay deve começar"
 ],
+"plActiveR": [
+"a2c4172ad6",
+"Risco ativo"
+],
+"plAvgExit": [
+"a8ea629465",
+"Saída média"
+],
+"plBoard": [
+"435bd708da",
+"Painel de risco aberto"
+],
+"plBoardNote": [
+"5fec8e41f9",
+"Planos salvos e a soma daqueles marcados como abertos. O limite é apenas um aviso: nada aqui pode abrir ou fechar uma ordem."
+],
+"plBoardNote2": [
+"7f817b9c7c",
+"Planos planejados, ativos e fechados são mantidos separados; apenas os ativos contam como risco aberto. O limite diário conta as perdas realizadas de hoje (seu fuso horário: {tz}, reinicia à meia-noite local) mais o risco ativo nos stops. É apenas um aviso: nada aqui pode abrir ou fechar ordens."
+],
+"plBoardT": [
+"435bd708da",
+"Painel de risco aberto"
+],
+"plClosedToday": [
+"e720fa6ae4",
+"Fechado hoje (realizado)"
+],
+"plCompact": [
+"1df39aa58a",
+"Compacto"
+],
+"plDayEq": [
+"6458e3671e",
+"Patrimônio no início do dia"
+],
+"plDayLimit": [
+"6e36e54b65",
+"Limite de perda diária (%)"
+],
+"plDup": [
+"fca49b8589",
+"Este plano já está salvo."
+],
+"plEx": [
+"5b13eac7ed",
+"Corretora"
+],
+"plExpand": [
+"ab2d96c48c",
+"Mostrar tudo"
+],
+"plExport": [
+"f3e4fadb9e",
+"Exportar"
+],
+"plFees": [
+"08894cb378",
+"Taxas de entrada e saída"
+],
+"plFree": [
+"533c47e8a1",
+"Margem livre"
+],
+"plFundIv": [
+"3bc01f9cf4",
+"Intervalo de financiamento (horas)"
+],
+"plFundRate": [
+"9336e2a882",
+"Financiamento por 8h (%)"
+],
+"plFunding": [
+"5f9a0c5144",
+"Financiamento (estimativa)"
+],
+"plGross": [
+"927d131b21",
+"Lucro bruto (antes das taxas)"
+],
+"plGrossX": [
+"bfdcc76198",
+"Exposição bruta"
+],
+"plHours": [
+"555b262e58",
+"Horas mantido"
+],
+"plImpBad": [
+"bd98edc00d",
+"Este arquivo não contém planos válidos."
+],
+"plImpOk": [
+"1553f868cf",
+"{n} planos importados."
+],
+"plImport": [
+"d6fbc9d2bd",
+"Importar"
+],
+"plKill": [
+"3ac6a66ed3",
+"O risco aberto ultrapassou seu limite de perda diária ({p}%). Isto é apenas um aviso — feche ou reduza as posições você mesmo se concordar."
+],
+"plLeft": [
+"fe0bb373bb",
+"Margem de perda diária restante"
+],
+"plLimitUsed": [
+"541b181b79",
+"Limite diário usado"
+],
+"plLongX": [
+"b8780d83b2",
+"Exposição comprada (Long)"
+],
+"plNear": [
+"616c3c45eb",
+"O risco aberto atingiu {p}% do seu limite de perda diária."
+],
+"plNet": [
+"4239208ec2",
+"Líquido após financiamento"
+],
+"plNetX": [
+"9f10e7efdd",
+"Exposição líquida"
+],
+"plNone": [
+"126e99fc3a",
+"Nenhum plano salvo ainda. Selecione uma posição comprada ou vendida no gráfico e salve seu plano."
+],
+"plNote": [
+"d8538aa3ed",
+"Arraste a entrada, o stop ou o alvo no gráfico: todos os valores são atualizados. Apenas um plano — nenhuma ordem é enviada."
+],
+"plOpen": [
+"cf9b77061f",
+"Aberto"
+],
+"plOpenN": [
+"13ce0e526e",
+"Planos abertos"
+],
+"plOpenRisk": [
+"cddec7cc84",
+"Risco nos stops"
+],
+"plOver": [
+"a42b4a3d68",
+"O risco aberto agora é de {p}% do seu limite diário."
+],
+"plPlannedR": [
+"160959aa01",
+"Risco planejado"
+],
+"plPnl": [
+"11cdb9ef40",
+"P&L realizado"
+],
+"plPnlPh": [
+"37a5301a88",
+"resultado"
+],
+"plR2": [
+"b3839316b2",
+"TP2 (× risco)"
+],
+"plR3": [
+"4cfedeb55f",
+"TP3 (× risco)"
+],
+"plS_active": [
+"a733b809d2",
+"Ativo"
+],
+"plS_closed": [
+"88d86b7721",
+"Fechado"
+],
+"plS_planned": [
+"9cbe42aaff",
+"Planejado"
+],
+"plSave": [
+"c3f10085f9",
+"Salvar o plano"
+],
+"plSaved": [
+"5ad336f045",
+"Plano salvo."
+],
+"plScaled": [
+"71027ef6dd",
+"As porcentagens não somavam 100%, então foram ajustadas proporcionalmente."
+],
+"plShare1": [
+"3d669b7968",
+"Fatia no TP1 (%)"
+],
+"plShare2": [
+"527587bedf",
+"Fatia no TP2 (%)"
+],
+"plShare3": [
+"1de10b521f",
+"Fatia no TP3 (%)"
+],
+"plShortX": [
+"e0e2e891e2",
+"Exposição vendida"
+],
+"plStatus": [
+"bae7d5be70",
+"Status"
+],
+"plTipActive": [
+"4e20f49ee8",
+"Planos marcados como ativos (abertos ou teóricos): o que perdem se todos os stops forem atingidos."
+],
+"plTipFund": [
+"0b6a70a096",
+"Uma taxa positiva é paga pelos longs e recebida pelos shorts; uma taxa negativa funciona ao contrário."
+],
+"plTipLeft": [
+"6139c9c234",
+"limite − prejuízo realizado hoje − risco ativo nos stops"
+],
+"plTipLoss": [
+"a238701251",
+"O custo do stop: o dinheiro em risco, mais o funding se houver custo."
+],
+"plTipPlanned": [
+"4326a18e06",
+"Planos apenas planejados. Não entram no cálculo do limite diário."
+],
+"plTitle": [
+"6aa0fd12fe",
+"Plano de trade"
+],
+"plTop": [
+"8a661b765f",
+"Maior parcela do risco"
+],
+"plTotal": [
+"77ffec55dd",
+"Todos os alvos atingidos"
+],
+"plUnalloc": [
+"b92d412dc9",
+"Fatia sem alvo (ainda aberta)"
+],
+"plW_fees": [
+"1ba96c9a8b",
+"As taxas consomem todo o lucro destes alvos."
+],
 "place": [
 "6aea8612f3",
 "Enviar ordem"
@@ -5448,6 +6032,402 @@
 "random": [
 "7b57e4d500",
 "Barra aleatória"
+],
+"rcAdd": [
+"3b7e34f346",
+"Adicionado a cada período"
+],
+"rcBE": [
+"f05a5bace4",
+"Preço de breakeven"
+],
+"rcBEafter": [
+"9efc4f3287",
+"Mover stop para o breakeven após o alvo 1"
+],
+"rcBEwin": [
+"5a7eb19d0d",
+"Taxa de acerto para breakeven"
+],
+"rcBal": [
+"98dcb75a7c",
+"Saldo da conta"
+],
+"rcCt": [
+"5a0ba3bb83",
+"Contrato"
+],
+"rcDD": [
+"db066ddc8a",
+"Rebaixamento (%)"
+],
+"rcDDlimit": [
+"38fe5b1885",
+"Rebaixamento considerado ruína (%)"
+],
+"rcEV": [
+"26effee29e",
+"Valor esperado por trade"
+],
+"rcE_dist": [
+"12390b8d52",
+"Entrada e stop não podem ter o mesmo preço."
+],
+"rcE_lev": [
+"e81f8b7d27",
+"A alavancagem deve ser 1 ou mais."
+],
+"rcE_num": [
+"e7dcd677d6",
+"Insira números positivos."
+],
+"rcE_oco_num": [
+"bcb3e41b53",
+"Insira uma entrada e um stop em preços diferentes."
+],
+"rcE_oco_order": [
+"26adf98964",
+"Os alvos devem se afastar da entrada em ordem."
+],
+"rcE_oco_pct": [
+"4993270f9b",
+"As porcentagens devem somar 100%."
+],
+"rcE_oco_tg": [
+"2cf289fad7",
+"Forneça de um a três alvos."
+],
+"rcE_oco_tp": [
+"319a13b9cc",
+"Um alvo está do lado errado da entrada, ou sua fatia está faltando."
+],
+"rcE_pctOver": [
+"bfbad21ecc",
+"As porcentagens dos alvos somam mais de 100%."
+],
+"rcE_risk": [
+"e1bdf14f74",
+"O risco por trade não pode exceder 100%."
+],
+"rcE_side": [
+"3a9e32ddf9",
+"O stop está do lado errado da entrada."
+],
+"rcE_spotShort": [
+"6bc1577913",
+"Uma posição à vista (spot) só pode ser comprada."
+],
+"rcE_tp": [
+"a5526e2098",
+"O alvo está do lado errado da entrada."
+],
+"rcEntry": [
+"b30218aca8",
+"Preço de entrada"
+],
+"rcFee": [
+"6c58eac908",
+"Taxa por lado (%)"
+],
+"rcFees": [
+"1176c1996f",
+"Taxas (entrada e saída)"
+],
+"rcFinal": [
+"7cc7e5e185",
+"Saldo final"
+],
+"rcGain": [
+"96dd91cdcb",
+"Ganho"
+],
+"rcKfull": [
+"5548453c41",
+"Kelly completo"
+],
+"rcKhalf": [
+"4760b81601",
+"Meio Kelly"
+],
+"rcKq": [
+"3fb42a0384",
+"Quarto de Kelly"
+],
+"rcLev": [
+"040daa23f9",
+"Alavancagem (×)"
+],
+"rcLiq": [
+"c1dfe11a1a",
+"Liquidação (estimativa)"
+],
+"rcLiqNote": [
+"f8ab7a2995",
+"Modelo simplificado: uma posição isolada, margem de manutenção informada, taxas, funding, preço de marca e camadas de risco da corretora omitidos. O valor da sua corretora será diferente."
+],
+"rcLiqS": [
+"8ee1ead8ac",
+"Liquidação estimada simplificada"
+],
+"rcLiq_cross": [
+"237ba47eb9",
+"Não exibido: no modo cruzado, depende de toda a sua carteira"
+],
+"rcLiq_none": [
+"19941a78d7",
+"Sem preço de liquidação nesta alavancagem"
+],
+"rcLiq_spot": [
+"3d1d84e078",
+"Nenhum no spot"
+],
+"rcLong": [
+"11eda67f9b",
+"Comprado"
+],
+"rcLosses": [
+"921787fd24",
+"Perdas consecutivas"
+],
+"rcMargin": [
+"0d1a4bfb87",
+"Margem necessária"
+],
+"rcMaxLoss": [
+"c668b9dc04",
+"Prejuízo no stop"
+],
+"rcMedian": [
+"e8cb6b3af3",
+"Resultado mediano"
+],
+"rcMmr": [
+"6ccd06f6ff",
+"Margem de manutenção (%)"
+],
+"rcMode": [
+"501f9eaddf",
+"Modo de margem"
+],
+"rcNo": [
+"816c52fd2b",
+"Não"
+],
+"rcNote": [
+"064f1c622a",
+"Tudo aqui é aritmética executada no seu próprio navegador com base nos números digitados. Nada é enviado para lugar nenhum e nenhuma ordem é executada."
+],
+"rcNotional": [
+"629c8eb9ba",
+"Valor da posição"
+],
+"rcO_all": [
+"00003802ba",
+"Todos os alvos atingidos"
+],
+"rcO_cross": [
+"dbfe7362b2",
+"Cruzada"
+],
+"rcO_inverse": [
+"e753755269",
+"Perpétuo inverso (cripto)"
+],
+"rcO_isolated": [
+"64a176e362",
+"Isolada"
+],
+"rcO_linear": [
+"6b962422e5",
+"Perpétuo linear (USDT)"
+],
+"rcO_spot": [
+"c5c5ba59d0",
+"Spot"
+],
+"rcO_stop": [
+"94c0cf8f36",
+"Stopado antes de qualquer alvo"
+],
+"rcO_then": [
+"ed72cdc29b",
+"Alvo {n}, depois o stop no restante"
+],
+"rcOcoPlan": [
+"30ee931cac",
+"Plano teórico: um alvo atingido cancela essa fatia do stop, e o stop cancela o restante. Nenhuma ordem é enviada."
+],
+"rcOdm": [
+"11dc53ab85",
+"Planejador ODM"
+],
+"rcOpt": [
+"48a7b8889e",
+"opcional"
+],
+"rcPF": [
+"80e53e077c",
+"Fator de lucro"
+],
+"rcPaid": [
+"299fdc9075",
+"Depositado"
+],
+"rcPeriods": [
+"d65472b09f",
+"Períodos"
+],
+"rcProfit": [
+"d8496a6578",
+"Lucro no alvo"
+],
+"rcQty": [
+"44f6af6945",
+"Quantidade"
+],
+"rcRR": [
+"49da03e785",
+"Risco : retorno"
+],
+"rcRRin": [
+"4ed9b7f212",
+"Retorno : risco (R)"
+],
+"rcRate": [
+"71be9aab7d",
+"Retorno por período (%)"
+],
+"rcRecover": [
+"7bd0f65bea",
+"Ganho necessário para recuperar"
+],
+"rcRisk": [
+"b031aee373",
+"Risco por trade (%)"
+],
+"rcRiskMoney": [
+"6525cd02a3",
+"Dinheiro em risco"
+],
+"rcRuinP": [
+"c449c8e2c0",
+"Chance desse rebaixamento"
+],
+"rcShare": [
+"10758b0e6c",
+"Fatia fechada (%)"
+],
+"rcShort": [
+"5a8f23f567",
+"Risco"
+],
+"rcShort2": [
+"0fe7d82f25",
+"Vendido"
+],
+"rcSide": [
+"26528381ea",
+"Lado"
+],
+"rcSim": [
+"687bd0f6b3",
+"Uma simulação de {n} sequências aleatórias a partir de uma semente fixa, garantindo que os mesmos inputs gerem sempre a mesma resposta. É uma estimativa, não uma promessa."
+],
+"rcSlip": [
+"9cc2898876",
+"Derrapagem (unidades de preço)"
+],
+"rcStart": [
+"7d5451bcf8",
+"Saldo inicial"
+],
+"rcStop": [
+"4d3419b202",
+"Preço de stop-loss"
+],
+"rcStreak": [
+"ffbdf88b78",
+"Perdas após a sequência"
+],
+"rcStreakRec": [
+"907fc302d7",
+"Ganho necessário após a sequência"
+],
+"rcT_comp": [
+"0361ccdba9",
+"Juros compostos"
+],
+"rcT_dd": [
+"3359ab1caa",
+"Rebaixamento"
+],
+"rcT_ev": [
+"0958deddf2",
+"Expectativa matemática"
+],
+"rcT_kelly": [
+"15299a0c1f",
+"Critério de Kelly"
+],
+"rcT_oco": [
+"6839addb6b",
+"Plano OCO"
+],
+"rcT_pos": [
+"d0f5a2cffb",
+"Tamanho da posição"
+],
+"rcT_ruin": [
+"be867a992e",
+"Risco de ruína"
+],
+"rcTarget": [
+"be343d04b2",
+"Preço de take-profit"
+],
+"rcTitle": [
+"ff474a8bf9",
+"Central de risco"
+],
+"rcTp1": [
+"5bb6465f67",
+"Alvo 1"
+],
+"rcTp2": [
+"a9d287032d",
+"Alvo 2"
+],
+"rcTp3": [
+"64e8a21cb6",
+"Alvo 3"
+],
+"rcTrades": [
+"afcfcf0b8e",
+"Número de trades"
+],
+"rcW_kelly": [
+"43b0a6c5e7",
+"O Kelly completo pressupõe que a taxa de acerto é conhecida com precisão exata, o que nunca ocorre. Na prática, usa-se metade ou um quarto."
+],
+"rcW_liq": [
+"74b95e2b49",
+"Nesta alavancagem, a posição é liquidada antes que o stop seja atingido."
+],
+"rcW_margin": [
+"33a819eb5c",
+"A margem necessária é superior ao saldo: reduza o risco ou aumente a alavancagem."
+],
+"rcW_noedge": [
+"abfe462fe4",
+"Sem vantagem com estes números: o Kelly diz para não apostar."
+],
+"rcWin": [
+"8ef4ec1075",
+"Taxa de acerto (%)"
+],
+"rcYes": [
+"5397e0583f",
+"Sim"
 ],
 "redo": [
 "471b94d402",
@@ -5517,17 +6497,153 @@
 "b3bd0b5a70",
 "Retomar"
 ],
+"rgAgree": [
+"f77278511d",
+"Regras em acordo"
+],
+"rgHeld": [
+"88f22bff61",
+"Barras em que se manteve"
+],
+"rgHist": [
+"6d17cf2890",
+"Regimes anteriores (uma barra por candle)"
+],
+"rgInvBear": [
+"fdc48eb73b",
+"O que encerraria: um fechamento acima da EMA 50 ({p}), ou ADX abaixo de 20."
+],
+"rgInvBull": [
+"40f59312f6",
+"O que encerraria: um fechamento abaixo da EMA 50 ({p}), ou ADX abaixo de 20."
+],
+"rgInvMixed": [
+"cf42406689",
+"Sem estado claro: o preço e as médias discordam. Resolve-se quando o fechamento e a EMA 50 estiverem no mesmo lado da EMA 200."
+],
+"rgInvRange": [
+"bcda5cad4b",
+"O que encerraria: ADX subindo para 20 ou mais com o fechamento em um dos lados da EMA 50."
+],
+"rgNeg": [
+"f39d173d91",
+"Em queda"
+],
+"rgPartial": [
+"e853bfc072",
+"Menos de 200 candles: a EMA 50 é usada sozinha para a tendência, pois a EMA 200 não está disponível."
+],
+"rgPos": [
+"0bec14f205",
+"Em alta"
+],
+"rgShort": [
+"d6843789bf",
+"Não há candles suficientes neste gráfico para determinar um regime."
+],
+"rgSlope": [
+"4c5ef055f6",
+"Inclinação da EMA 50 (5 barras)"
+],
+"rgThAtr": [
+"00f7c0f452",
+"Movimento de choque (× ATR)"
+],
+"rgThEx": [
+"5f90f25679",
+"Expansão a partir do percentil"
+],
+"rgThReset": [
+"0363e3d886",
+"Limiares padrão"
+],
+"rgThSq": [
+"e5114bf7a4",
+"Squeeze até o percentil"
+],
+"rgThVh": [
+"1e0e2d2f5f",
+"Alta volatilidade a partir do percentil"
+],
+"rgThVl": [
+"a2a69335ec",
+"Baixa volatilidade até o percentil"
+],
+"rgThVol": [
+"a622f16336",
+"Volume de choque (× média)"
+],
+"rgTitle": [
+"2313be422a",
+"Regime · {s} · {tf}"
+],
+"rgVolX": [
+"64c3ac6b3e",
+"Volume da última barra vs média de 20 barras"
+],
+"rgVolaPct": [
+"2002c38d60",
+"Percentil de volatilidade"
+],
+"rgWhy": [
+"a7cdabf894",
+"Por que este regime? Regras, números e limiares"
+],
+"rgWidthPct": [
+"00b60f938b",
+"Percentil de largura das bandas"
+],
+"rg_bear": [
+"c2be37036c",
+"Tendência de baixa"
+],
+"rg_bull": [
+"09d381cec9",
+"Tendência de alta"
+],
+"rg_expansion": [
+"5210fc6fc2",
+"Expansão"
+],
 "rg_from": [
 "3f66052a10",
 "De"
+],
+"rg_mixed": [
+"c0dcb865ad",
+"Misto"
+],
+"rg_range": [
+"a16c5bbe4b",
+"Lateralizado"
+],
+"rg_selloff": [
+"6bcf189f4c",
+"Forte venda (sell-off)"
+],
+"rg_squeeze": [
+"92c9ea71c1",
+"Squeeze"
 ],
 "rg_step": [
 "dc416e1088",
 "Passo"
 ],
+"rg_surge": [
+"9b02b303eb",
+"Forte alta (surge)"
+],
 "rg_to": [
 "ae79ea1e9c",
 "Até"
+],
+"rg_vhigh": [
+"6c69519a16",
+"Alta volatilidade"
+],
+"rg_vlow": [
+"02a5abe305",
+"Baixa volatilidade"
 ],
 "rk_dd": [
 "a15b45a44d",
@@ -5572,6 +6688,354 @@
 "runTest": [
 "2c7f471fce",
 "Executar o teste"
+],
+"saAddC": [
+"2f4979324e",
+"Condição"
+],
+"saAddG": [
+"171a0606f7",
+"Grupo"
+],
+"saBN": [
+"b7baa1d40c",
+"Número"
+],
+"saBS": [
+"3a43d0e663",
+"Indicador / preço"
+],
+"saBars": [
+"76dcd41fff",
+"{n} barras"
+],
+"saBarsN": [
+"bd019a756d",
+"Barras seguidas"
+],
+"saCopy": [
+"af74f7c536",
+"Copiar"
+],
+"saDotNo": [
+"38a82961e6",
+"Falso na última barra fechada"
+],
+"saDotWait": [
+"2d596b20ba",
+"Ainda não há barras suficientes para este indicador"
+],
+"saDotYes": [
+"a0ff91462d",
+"Verdadeiro na última barra fechada"
+],
+"saE_empty": [
+"597d80feb5",
+"Adicione pelo menos uma condição."
+],
+"saE_emptyG": [
+"70e1ad95bb",
+"Há um grupo sem condição."
+],
+"saE_long": [
+"427b53e1e0",
+"A regra é muito longa ({n} de 600 caracteres): remova uma condição."
+],
+"saE_num": [
+"c249973a4b",
+"Uma condição precisa de um número."
+],
+"saE_script": [
+"f60d6bd8a3",
+"Não foi possível verificar a regra."
+],
+"saE_side": [
+"4651a22984",
+"Escolha o que compõe cada lado da condição."
+],
+"saExpT": [
+"7dcda53b12",
+"A regra como Entekhab Script"
+],
+"saGNot": [
+"969e7d8dee",
+"NÃO"
+],
+"saGNotTip": [
+"1e1d749332",
+"O grupo inteiro deve ser falso"
+],
+"saGroup": [
+"ec98a63469",
+"Grupo {n}"
+],
+"saHist": [
+"5820fa4201",
+"Nas últimas {b} barras fechadas de {tf}, teria disparado {n} vezes."
+],
+"saHistPct": [
+"24e303adf5",
+"A regra foi verdadeira em {p}% dessas barras."
+],
+"saJG_and": [
+"4ad42ed12b",
+"Todas estas (E)"
+],
+"saJG_or": [
+"834d918bfb",
+"Qualquer uma destas (OU)"
+],
+"saJT_and": [
+"595d3df086",
+"Todos os grupos devem ser verdadeiros (E)"
+],
+"saJT_or": [
+"2d2e690caf",
+"Qualquer grupo é suficiente (OU)"
+],
+"saJ_and": [
+"c2f934cb8c",
+"E"
+],
+"saJ_or": [
+"f579c52396",
+"OU"
+],
+"saLoading": [
+"ea358bfeb3",
+"Carregando barras…"
+],
+"saNever": [
+"6f89c4ce1a",
+"Nunca disparou aqui: verifique os números."
+],
+"saNoBars": [
+"f4f0ebd381",
+"Ainda não há barras fechadas suficientes neste timeframe."
+],
+"saNoisy": [
+"60ccc916b7",
+"Dispara com frequência, então o alerta pode gerar muitos ruídos."
+],
+"saNot": [
+"969e7d8dee",
+"NÃO"
+],
+"saNotTip": [
+"72a2de0282",
+"Esta condição deve ser falsa"
+],
+"saNote": [
+"0a4c1d2dc0",
+"Verificado neste dispositivo enquanto a página do mercado ou o aplicativo estiver aberto, no fechamento de uma barra. Não envia ordens e não constitui recomendação de investimento."
+],
+"saNowNo": [
+"9de2f51a64",
+"Falso agora, na última barra fechada de {tf}"
+],
+"saNowT": [
+"1468db9a9e",
+"Agora e no histórico deste gráfico"
+],
+"saNowYes": [
+"e9ef398126",
+"Verdadeiro agora, na última barra fechada de {tf}"
+],
+"saO_fall": [
+"8cf0b8e1dd",
+"em queda por"
+],
+"saO_ge": [
+"dcec4f1daf",
+"≥"
+],
+"saO_gt": [
+"091385be99",
+">"
+],
+"saO_le": [
+"c8426723ce",
+"≤"
+],
+"saO_lt": [
+"c4dd3c8cdd",
+"<"
+],
+"saO_rise": [
+"22723b9834",
+"em alta por"
+],
+"saO_xdn": [
+"76b13b6946",
+"cruza abaixo de"
+],
+"saO_xup": [
+"b0849ce10e",
+"cruza acima de"
+],
+"saP_brk": [
+"b05b2596c8",
+"Rompimento de 20 barras com volume"
+],
+"saP_calm": [
+"23cc54ef55",
+"Cruzamento do MACD em mercado calmo"
+],
+"saP_cross": [
+"fe7e9ec902",
+"Cruzamento de EMA 9/21 com volume"
+],
+"saP_dip": [
+"7430b571e3",
+"Correção em tendência de alta"
+],
+"saP_ext": [
+"d5d8c4d9e0",
+"Fora das Bandas de Bollinger"
+],
+"saS_atrp": [
+"1f65ad77c8",
+"ATR como % do preço"
+],
+"saS_bbl": [
+"e23f4aec2d",
+"Bollinger inferior (2σ)"
+],
+"saS_bbm": [
+"e0d19c8bad",
+"Bollinger média"
+],
+"saS_bbu": [
+"2d5e3e5e77",
+"Bollinger superior (2σ)"
+],
+"saS_cci": [
+"2086539684",
+"CCI"
+],
+"saS_close": [
+"bbfa773e5a",
+"Fechamento"
+],
+"saS_ema": [
+"67b9b8a57f",
+"EMA"
+],
+"saS_hh": [
+"6ca9f69f43",
+"Máxima mais alta das últimas N barras"
+],
+"saS_high": [
+"b1a5954a48",
+"Máxima"
+],
+"saS_hma": [
+"78b8503f6b",
+"HMA"
+],
+"saS_ll": [
+"9c648f4c23",
+"Mínima mais baixa das últimas N barras"
+],
+"saS_low": [
+"a124947cbd",
+"Mínima"
+],
+"saS_macd": [
+"9a34c31ad5",
+"Linha MACD (12, 26)"
+],
+"saS_macdh": [
+"7a920aaf88",
+"Histograma MACD"
+],
+"saS_macds": [
+"cfb2113118",
+"Sinal MACD (9)"
+],
+"saS_open": [
+"cf9b77061f",
+"Abertura"
+],
+"saS_roc": [
+"ad73d69b6c",
+"Variação % em N barras"
+],
+"saS_rsi": [
+"2a00496640",
+"RSI"
+],
+"saS_sma": [
+"337f15d864",
+"SMA"
+],
+"saS_stoch": [
+"5183f479ec",
+"Estocástico %K"
+],
+"saS_volume": [
+"3b18e8e332",
+"Volume"
+],
+"saS_volx": [
+"da0afcae21",
+"Volume ÷ sua média"
+],
+"saS_vwma": [
+"2fdaec23f9",
+"VWMA"
+],
+"saS_wma": [
+"3b02c32b34",
+"WMA"
+],
+"saSave": [
+"895f538a76",
+"Criar o alerta"
+],
+"saScript": [
+"a99f36583c",
+"Editar como script"
+],
+"saTab": [
+"50aeccb002",
+"Inteligente (E/OU/NÃO)"
+],
+"saTitle": [
+"0082d082b6",
+"Alerta inteligente: E / OU / NÃO"
+],
+"saTop": [
+"7c6b0e4270",
+"Unir os grupos"
+],
+"saTx_and": [
+"c2f934cb8c",
+"E"
+],
+"saTx_not": [
+"969e7d8dee",
+"NÃO"
+],
+"saTx_or": [
+"f579c52396",
+"OU"
+],
+"saWhy1": [
+"6505c505e8",
+"Crie uma regra a partir de condições. Dentro de um grupo, escolha se todas as condições devem ser verdadeiras (AND) ou se apenas uma é suficiente (OR). Os grupos são unidos da mesma forma."
+],
+"saWhy2": [
+"16ee22ede7",
+"NOT inverte uma condição ou um grupo inteiro: “NOT ATR% > 3” significa que o mercado está calmo. Um NOT nunca é verdadeiro enquanto um indicador ainda não tiver barras suficientes, portanto ele não dispara com dados ausentes."
+],
+"saWhy3": [
+"c5be12a5c9",
+"A regra é verificada quando uma barra do timeframe escolhido fecha, nunca na barra em formação, e o alerta dispara na barra em que a regra se torna verdadeira. Abaixo você vê cada condição agora e com que frequência a regra teria disparado no histórico deste gráfico."
+],
+"saWhyT": [
+"49224cea55",
+"Como funciona um alerta inteligente"
 ],
 "sameSide": [
 "180c1a1822",
@@ -5937,6 +7401,10 @@
 "c3de6d0cdd",
 "Sinais Kurdistani (BTC)"
 ],
+"sg_flow": [
+"22b2e001a4",
+"Fluxo e notícias"
+],
 "sg_halft": [
 "a087f03711",
 "HalfTrend [everget]"
@@ -5953,6 +7421,10 @@
 "a9a165bc50",
 "Cruzamento KDJ"
 ],
+"sg_level": [
+"ed47f09811",
+"Níveis"
+],
 "sg_macd": [
 "db0453bd2b",
 "Cruzamento do MACD"
@@ -5960,6 +7432,10 @@
 "sg_macross": [
 "6677aad0c9",
 "Cruzamento de EMA"
+],
+"sg_mind": [
+"7d7700531e",
+"Risco e mentalidade"
 ],
 "sg_nwe": [
 "4e506ad872",
@@ -5981,9 +7457,17 @@
 "d890614a3f",
 "Reversão do RSI"
 ],
+"sg_setup": [
+"532fd3a54e",
+"Setups"
+],
 "sg_smacross": [
 "446d28671b",
 "Cruzamento dourado / da morte (SMA)"
+],
+"sg_smc": [
+"f5cbe85ce3",
+"Estrutura de mercado"
 ],
 "sg_sqz": [
 "b42e6347a2",
@@ -6008,6 +7492,10 @@
 "sg_tdi": [
 "2af75b9512",
 "Traders Dynamic Index"
+],
+"sg_trade": [
+"b0811e470d",
+"Trade"
 ],
 "sg_ut": [
 "39cf5fa59f",
@@ -6745,9 +8233,41 @@
 "ad88cbfa09",
 "Também no Telegram (o robô monitora mesmo com esta página fechada)"
 ],
+"thArc": [
+"c9522bad23",
+"Ártico Minimalista"
+],
+"thAur": [
+"1f69f4962c",
+"Aurora Neon"
+],
+"thCri": [
+"e99d88a595",
+"Momento Carmesim"
+],
+"thCyb": [
+"c8e3feffa1",
+"Fluxo Cyberpunk"
+],
 "thDark": [
 "ae1ef01432",
 "Escuro"
+],
+"thEme": [
+"31ebcf2e2d",
+"Terminal Esmeralda"
+],
+"thGal": [
+"8b6134fdc2",
+"Galáxia Roxa"
+],
+"thGla": [
+"45248800ea",
+"Vidro Quântico"
+],
+"thGold": [
+"065d9160fa",
+"Ouro Solar"
 ],
 "thLight": [
 "a36ef8aba2",
@@ -6761,9 +8281,21 @@
 "0229e960cf",
 "Azul-marinho"
 ],
+"thObs": [
+"16c2f31828",
+"Obsidiana da Meia-Noite"
+],
+"thOce": [
+"0f120f1635",
+"Oceano Profundo"
+],
 "thPaper": [
 "22d507f2ba",
 "Papel"
+],
+"thRet": [
+"cfcedff38b",
+"Trading Retrô"
 ],
 "time": [
 "6c82e6dd86",
@@ -7096,6 +8628,106 @@
 "why_trail": [
 "5b20595c1d",
 "Trailing stop"
+],
+"wsApplied": [
+"7c1a4571c7",
+"{n} está ativo. Seu workspace anterior está em Meus layouts."
+],
+"wsBackup": [
+"74fca79c74",
+"Antes do predefinição"
+],
+"wsNote": [
+"691ff5b98a",
+"Um clique define o layout, timeframes, indicadores, tema e coloração dos candles para o ativo em que você está. O seu workspace atual é salvo primeiro em \"Meus layouts\"."
+],
+"wsTitle": [
+"a192b9968d",
+"Workspaces prontos"
+],
+"ws_candles": [
+"2fb856e4bb",
+"Padrões de Candles"
+],
+"ws_channel": [
+"5b107c3a4a",
+"Canal Coin_Kurd"
+],
+"ws_clean": [
+"ee819e288a",
+"Minimalista"
+],
+"ws_cycle": [
+"0b08f61f49",
+"Ciclo de Mercado"
+],
+"ws_day": [
+"e18786b077",
+"Day Trader"
+],
+"ws_fib": [
+"98b88bcc26",
+"Fibonacci & Pivôs"
+],
+"ws_flow": [
+"0ab6d9f077",
+"Fluxo de Ordens"
+],
+"ws_heikin": [
+"adf0551bc1",
+"Tendência Heikin Ashi"
+],
+"ws_ichi": [
+"b7d2edc2d0",
+"Ichimoku"
+],
+"ws_liq": [
+"69e277529c",
+"Caçador de Liquidez"
+],
+"ws_mom": [
+"c29791e587",
+"Momentum"
+],
+"ws_mtf": [
+"ebabe1372a",
+"Multi-Timeframe ×4"
+],
+"ws_mtf6": [
+"800635fcd6",
+"Multi-Timeframe ×6"
+],
+"ws_position": [
+"5aef88cdad",
+"Position Trader"
+],
+"ws_retro": [
+"bede81c063",
+"Barras Retrô"
+],
+"ws_risk": [
+"c5fdebe115",
+"Risco & Stops"
+],
+"ws_scalp": [
+"33fa65b17f",
+"Scalping Pro"
+],
+"ws_smc": [
+"c02e53dec4",
+"Smart Money Concepts"
+],
+"ws_swing": [
+"8b2bf46b25",
+"Swing Trader"
+],
+"ws_vola": [
+"42217464e8",
+"Compressão de Volatilidade"
+],
+"ws_vprofile": [
+"46245d5d50",
+"Perfil de Volume"
 ],
 "yourRate": [
 "ca14282aa6",
