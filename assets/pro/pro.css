@@ -710,6 +710,9 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 .pm-odsum{font-size:11.5px;color:var(--mute)}
 .pm-odtg{display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
 .pm-odt td.up{color:#34d399}.pm-odt td.dn{color:#ff5a4d}
+/* planner tables: one line per header and per number; a table wider than its column scrolls inside its own box, nothing is cut */
+.pm-odt th,.pm-odt td{white-space:nowrap}.pm-odt th[title]{cursor:help;text-decoration:underline dotted;text-underline-offset:3px}
+.pm-mbox.wide:has(.pm-odm){width:min(960px,100%)}
 .pm-odact{flex-wrap:wrap;gap:6px}
 .pm-odal{display:flex;flex-direction:column;gap:4px}
 .pm-odalr{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 2px;border-bottom:1px dashed rgba(255,255,255,.07);font-size:12.5px}
@@ -723,6 +726,54 @@ a.pm-idi{color:inherit;text-decoration:none}a.pm-idi b{color:#ececE6}
 #pro.pm-light .pm-odtop{background:#efefea}
 .pm-odtop span{unicode-bidi:isolate;white-space:nowrap}
 .pm-odm .pm-co{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+/* ODM entries table: price with its share and size under it; the loss if the stop is hit, with a bar of the plan's full risk */
+.pm-odpc2,.pm-odl{display:flex;flex-direction:column;gap:1px;line-height:1.3}
+.pm-odpc2 small,.pm-odl small{font-size:10.5px;color:var(--mute);font-weight:500}
+.pm-odpc2 b,.pm-odl b{font-weight:600}.pm-odl b{color:var(--dn)}
+.pm-odl{display:grid;grid-template-columns:auto 44px auto;align-items:center;gap:2px 6px}
+.pm-odlb{display:block;height:6px;border-radius:3px;background:rgba(255,90,77,.16);overflow:hidden}
+.pm-odlb i{display:block;height:100%;background:linear-gradient(90deg,#ff8a7d,#ff5a4d);border-radius:3px}
+.pm-odlb[dir=rtl] i{margin-inline-start:0;background:linear-gradient(270deg,#ff8a7d,#ff5a4d)}
+.pm-odl small{min-width:30px;text-align:end}
+.pm-odt th:has(.pm-odi){text-decoration:none}
+/* ODM help icons (odhelp.js): small, each its own glyph; a bigger touch area than it looks */
+.pm-odi{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin:-3px 0;margin-inline-start:5px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--mute);cursor:help;vertical-align:middle;flex:none;opacity:.85}
+.pm-odi::after{content:"";position:absolute;inset:-6px}
+.pm-odi:hover,.pm-odi:focus-visible,.pm-odi.on{color:var(--acc);background:rgba(247,147,26,.12);opacity:1}
+.pm-odi:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.pm-odsec h4 .pm-odi,.pm-odmore summary .pm-odi{color:var(--acc);opacity:1}
+.pm-cf>span{display:flex;align-items:center;min-width:0}
+.pm-cor small{display:flex;align-items:center}
+/* the help card: beside its icon on a wide screen, a sheet from the bottom on a phone */
+.pm-odpop{position:absolute;z-index:60;width:360px;max-height:70vh;overflow:auto;background:#18181b;color:#ececea;border:1px solid rgba(247,147,26,.35);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.6);font-size:12.5px;line-height:1.65;overscroll-behavior:contain}
+.pm-odpop.sheet{left:0;right:0;bottom:0;top:auto;width:auto;max-height:74%;border-radius:16px 16px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+.pm-odph{position:sticky;top:0;display:flex;align-items:center;gap:8px;padding:10px 12px 8px;background:inherit;border-bottom:1px solid var(--line);z-index:1}
+.pm-odph b{flex:1;font-size:13.5px}
+.pm-odpi{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(247,147,26,.14);color:var(--acc);flex:none}
+.pm-odpi svg{width:16px;height:16px}.pm-odpi.sm{width:20px;height:20px;margin-inline-end:6px;vertical-align:middle}.pm-odpi.sm svg{width:12px;height:12px}
+.pm-odpb{padding:8px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.pm-odpr{margin:0}.pm-odpr strong,.pm-odpe strong,.pm-odpy strong,.pm-odpq>strong{color:var(--acc);font-weight:600}
+.pm-odpe,.pm-odpy{display:flex;flex-direction:column;gap:2px;padding:7px 9px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.pm-odpy{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.25)}.pm-odpy strong{color:var(--up)}
+.pm-odpq{display:flex;flex-direction:column;gap:4px}
+.pm-odpf summary{cursor:pointer;color:#dcdcd8}.pm-odpf p{margin:4px 0 2px;color:var(--mute)}
+.pm-odpa{display:flex;flex-direction:column;gap:6px;padding-top:8px;border-top:1px dashed var(--line)}
+.pm-odpal{display:flex;align-items:center;gap:6px;font-weight:600;color:#ececea}.pm-odpal svg{color:var(--acc)}
+.pm-odpar{display:flex;gap:6px}.pm-odpar .pm-in{flex:1;min-width:0}
+.pm-odpres{display:flex;flex-direction:column;gap:6px}.pm-odpres:empty{display:none}
+.pm-odpm{margin:0;color:var(--mute);font-size:11.5px}
+.pm-odpc{padding:7px 9px;border-radius:9px;background:rgba(247,147,26,.06);border:1px solid rgba(247,147,26,.2)}
+.pm-odpc.more{background:transparent;border-color:var(--line)}
+.pm-odpc b{display:block}.pm-odpc p{margin:3px 0 0}.pm-odpce{color:var(--mute)}
+.pm-odptg{align-self:flex-start}
+.pm-odpn{margin:0;font-size:10.5px;color:var(--mute)}
+#pro.pm-light .pm-odpop{background:#fff;color:#20201e;box-shadow:0 12px 34px rgba(0,0,0,.2)}
+#pro.pm-light .pm-odpal,#pro.pm-light .pm-odpf summary{color:#20201e}
+#pro.pm-light .pm-odpe{background:#f6f6f3}
+/* while the help sheet is up on a phone, the floating assistant button does not cover its ask box */
+body.pm-odsheet #ask-fab{visibility:hidden}
+/* a phone: the loss cell puts the money over its bar, so the four columns fit the screen */
+@media (max-width:600px){.pm-odl{grid-template-columns:36px auto}.pm-odl b{grid-column:1/-1}.pm-odl small{min-width:0}.pm-odt td,.pm-odt th{padding:4px 5px}}
 /* Smart alerts (salert.js) */
 .pm-sa{display:flex;flex-direction:column;gap:10px}
 .pm-sarow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end}
