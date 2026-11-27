@@ -1445,6 +1445,15 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     ok(`[${tag}] the confirmation names the pair and the rule in words`, sv.toast.includes('BTC/USDT') && !sv.toast.includes('{') && sv.toast.includes(PRO_T(lang, 'saS_rsi')), sv.toast);
     ok(`[${tag}] the saved rule gives the same answer now as the builder showed`, (sv.test[1] === 1) === s4.now.includes('up'), JSON.stringify({ t: sv.test, now: s4.now }));
     const lt = sv.text;      /* the alerts panel is still open from the start of these checks */
+    /* in a right-to-left page a Latin condition still reads left to right (RSI before 30), and in a narrow box no condition is split across lines */
+    const bd = await page.evaluate((rtl) => {
+      const d = document.createElement('div'); d.dir = rtl ? 'rtl' : 'ltr'; d.style.cssText = 'position:fixed;top:0;left:0;width:150px;font:14px sans-serif;background:#000;color:#fff;z-index:99999';
+      d.textContent = PRO.saText(PRO._alerts().slice(-1)[0].spec); document.body.appendChild(d);
+      const tn = d.firstChild, s = tn.data, rng = document.createRange(), box = (i) => { rng.setStart(tn, i); rng.setEnd(tn, i + 1); return rng.getBoundingClientRect(); };
+      const iR = s.indexOf('RSI'), i3 = s.indexOf('30', iR), r = box(iR), t = box(i3);
+      const out = { dir: getComputedStyle(d).direction, rsiX: Math.round(r.left), x30: Math.round(t.left), sameLine: Math.abs(r.top - t.top) < 4 }; d.remove(); return out;
+    }, ['fa', 'ar', 'ckb'].includes(lang));
+    ok(`[${tag}] "RSI (14) < 30" reads left to right and stays on one line, also in a right-to-left page`, bd.rsiX < bd.x30 && bd.sameLine, JSON.stringify(bd));
     ok(`[${tag}] the alert list shows the rule in words, not as script`, lt.includes(PRO_T(lang, 'saS_rsi')) && lt.includes(PRO_T(lang, 'saTx_or')) && !lt.includes('ta.rsi') && lt.includes('\u2068'), lt.slice(0, 300));
     await shot(page, `89_sa_list_${lang}_${vw}`);
     /* the price alert dialog has a Smart tab that opens the builder */
