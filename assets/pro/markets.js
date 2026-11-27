@@ -58,7 +58,18 @@
   var IR = {}; CAT.forEach(function (r) { IR[r[0]] = { key: r[0], g: r[1], grp: r[2], icon: r[3], div: r[4], daily: !!r[5], n: r[6] }; });
   var TMN = N('تومان', 'تمەن', 'تومان', 'IRT');
 
-  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_[A-Z]{3}|_F1)?|IR_[A-Z0-9]{2,12}|FX_[A-Z]{6})$/;      /* Binance has one-letter coins too: S, W, T, A… */
+  P.SYM_RE = /^(?:[A-Z0-9]{1,12}(?:_[A-Z]{3}|_F1)?|IR_[A-Z0-9]{2,12}|FX_[A-Z]{6}|GM_[A-Z]{2,6})$/;
+  /* world indices and US stocks: daily bars the site keeps itself (data/markets, scripts/markets.py: free sources, one source per
+     file, never stitched, and marked stale or unavailable honestly). Closed days only, no live price */
+  var GM = {
+    SPX: [N('اس‌اند‌پی ۵۰۰', 'ئێس ئەند پی ٥٠٠', 'إس آند بي 500', 'S&P 500'), 'index'], NDX: [N('نزدک ۱۰۰', 'نازداک ١٠٠', 'ناسداك 100', 'Nasdaq 100'), 'index'],
+    DJI: [N('داوجونز', 'داو جۆنز', 'داو جونز', 'Dow Jones'), 'index'], DXY: [N('شاخص دلار', 'پێوەری دۆلار', 'مؤشر الدولار', 'US dollar index'), 'index'],
+    AAPL: [N('اپل', 'ئەپڵ', 'آبل', 'Apple'), 'stock'], MSFT: [N('مایکروسافت', 'مایکرۆسۆفت', 'مايكروسوفت', 'Microsoft'), 'stock'],
+    NVDA: [N('انویدیا', 'ئێنڤیدیا', 'إنفيديا', 'Nvidia'), 'stock'], AMZN: [N('آمازون', 'ئەمازۆن', 'أمازون', 'Amazon'), 'stock'],
+    GOOGL: [N('آلفابت (گوگل)', 'ئەلفابێت (گووگڵ)', 'ألفابت (غوغل)', 'Alphabet (Google)'), 'stock'], META: [N('متا', 'مێتا', 'ميتا', 'Meta'), 'stock'],
+    TSLA: [N('تسلا', 'تێسلا', 'تسلا', 'Tesla'), 'stock']
+  };
+  P.gmList = function () { return Object.keys(GM).map(function (k) { return 'GM_' + k; }); };      /* Binance has one-letter coins too: S, W, T, A… */
   function lang() { var A = P.app; return A && A.LANG ? A.LANG() : 'fa'; }
   function iconUrl(ic) { var k = ic.slice(2); return ic[0] === 'f' ? '/assets/pro/flags/' + k + '.svg' : ic[0] === 'i' ? '/assets/pro/ic/' + k + '.svg' : '/data/logos/' + k + '.png'; }
 
@@ -70,6 +81,7 @@
       return { sym: sym, kind: 'ir', base: c.key, quote: c.div === 1 ? 'USD' : 'IRT', name: c.n, logo: iconUrl(c.icon), coin: c.icon[0] === 'c' ? c.icon.slice(2) : null,
         src: 'tgju', minSec: c.daily ? 86400 : 300, grade: c.g, div: c.div, grp: c.grp };
     }
+    if (sym.indexOf('GM_') === 0) { var gk = sym.slice(3), gm = GM[gk]; if (!gm) return null; return { sym: sym, kind: 'gm', base: gk, quote: 'USD', name: gm[0], logo: '/assets/pro/flags/us.svg', coin: null, src: 'site', minSec: 86400, grp: gm[1] }; }
     if (/_F1$/.test(sym)) { var fb = sym.slice(0, -3); if (!FUTC[fb]) return null; return { sym: sym, kind: 'fut', base: fb, quote: 'USD', name: FUTC[fb], logo: '/data/logos/' + fb + '.png', coin: fb, src: 'Bybit', minSec: 60 }; }
     if (/_IRT$/.test(sym)) { var b = sym.slice(0, -4); return { sym: sym, kind: 'irt', base: b, quote: 'IRT', logo: '/data/logos/' + b + '.png', coin: b, src: 'Binance × tgju', minSec: 1 }; }
     var xm = /^FX_([A-Z]{3})([A-Z]{3})$/.exec(sym);
@@ -87,6 +99,7 @@
   P.pair = function (sym, short) {
     var i = P.inst(sym), l = lang(); if (!i) return sym;
     if (i.kind === 'ir') return short ? i.base : i.name[l] || i.name.en;
+    if (i.kind === 'gm') return short ? i.base : (i.name[l] || i.name.en) + ' (' + i.base + ')';
     if (i.kind === 'fut') return i.base + '1!';
     if (i.kind === 'fiat' || i.kind === 'fxr' || i.kind === 'fx2') return i.base + '/' + i.quote;
     return i.base + '/' + (i.quote === 'IRT' ? (TMN[l] || TMN.en) : 'USDT');
@@ -252,6 +265,21 @@
     once(); this.poller = setInterval(once, P.saver ? 120000 : 20000);
   };
   IrFeed.prototype.stop = function () { this.dead = true; clearInterval(this.poller); clearTimeout(this.retryT); delete FEEDS[this.key]; };
+
+  /* ---------------------------------------------------------------- GM_<ID>: the site's own daily file */
+  function gmFile(id) { return P.getJSON('/data/markets/' + id + '.json?v=' + Math.floor(Date.now() / 6e5), 20000).then(function (j) {
+    var b = (j && j.bars || []).map(function (r) { return { t: r[0], o: r[1], h: r[2], l: r[3], c: r[4], v: r[5] || 0 }; }); if (!b.length) throw new Error('nodata'); return { j: j, b: b }; }); }
+  function GmFeed(sym, tf) { Base.call(this, sym, tf); this.inst = P.inst(sym); this.src = 'site'; }
+  GmFeed.prototype = Object.create(Base.prototype);
+  GmFeed.prototype.start = function () {
+    var self = this, tf = this.tf; this.state = 'load'; this.tell('state');
+    if (tf.sec < 86400) { this.state = 'error'; this.err = 'tf'; this.tell('state'); return; }
+    gmFile(this.inst.base).then(function (r) {
+      if (self.dead) return; self.meta = { status: r.j.status, src: r.j.src, last_ok: r.j.last_ok };
+      self.state = 'snap'; self.setBars(tf.u === 'M' || tf.u === 'w' ? roll(r.b, tf) : tf.sec === 86400 ? r.b : P.aggregate(r.b, tf)); self.tell('state');
+    }).catch(function () { if (self.dead) return; self.state = 'error'; self.err = 'nodata'; self.tell('state'); });
+  };
+  GmFeed.prototype.stop = function () { this.dead = true; delete FEEDS[this.key]; };
 
   /* ---------------------------------------------------------------- tether's toman rate: daily closes + today's live price */
   var RATE = { pts: null, live: null, ready: null, users: 0, poller: null, subs: [] };
@@ -593,7 +621,7 @@
     if (I.kind === 'usdt') return usdtFeed(sym, tfId, fn, ex);
     var tf = P.parseTF(tfId); if (!tf) return null;
     var adj = I.kind === 'fut' && !!BADJ[sym], key = sym + '|' + tf.id + (adj ? '|a' : ''), F = FEEDS[key];
-    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : I.kind === 'fx2' ? new Fx2Feed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
+    if (!F) { F = FEEDS[key] = I.kind === 'ir' ? new IrFeed(sym, tf) : I.kind === 'fut' ? new FutFeed(sym, tf, adj) : I.kind === 'fxr' ? new FxrFeed(sym, tf) : I.kind === 'fx2' ? new Fx2Feed(sym, tf) : I.kind === 'gm' ? new GmFeed(sym, tf) : new IrtFeed(sym, tf); F.start(); }
     clearTimeout(F.killT); F.subs.push(fn); F.refs++;
     if (F.bars.length) setTimeout(function () { if (F.subs.indexOf(fn) >= 0) fn('reset', F); }, 0);
     return { feed: F, off: function () {
@@ -619,6 +647,7 @@
     if (I.kind === 'irt' || I.kind === 'fiat') { var R = quoteRate(I.quote); return Promise.all([R.load(), histUsdt(I.base, tfId, startMs, endMs)]).then(function (r) { return r[1].map(function (b) { return conv(b, tf.sec, R); }).filter(Boolean); }); }
     if (I.kind === 'fxr') { var X = P.fx.rate(I.quote); return X.load().then(function () { return rateBars(X, tf).filter(function (b) { return b.t * 1000 >= startMs && b.t * 1000 <= endMs; }); }); }
     if (I.kind === 'fut') return futHist(I, tfId, startMs, endMs);
+    if (I.kind === 'gm') { if (tf.sec < 86400) return Promise.reject(new Error('tf')); return gmFile(I.base).then(function (r) { var b = r.b.filter(function (x) { return x.t * 1000 >= startMs && x.t * 1000 <= endMs; }); return tf.u === 'M' || tf.u === 'w' ? roll(b, tf) : tf.sec === 86400 ? b : P.aggregate(b, tf); }); }
     var nr = tgRes(tf); if (!nr) return Promise.reject(new Error('tf'));
     return tgHist(I.grade, nr[1]).then(function (j) {
       var base = []; for (var i = 0; i < j.t.length; i++) if (j.c[i] > 0 && j.t[i] * 1000 >= startMs && j.t[i] * 1000 <= endMs) base.push({ t: j.t[i], o: j.o[i] / I.div, h: j.h[i] / I.div, l: j.l[i] / I.div, c: j.c[i] / I.div, v: 0 });
@@ -683,10 +712,19 @@
       if (q !== 'IRT') P.fx.latest().then(function () { var f = LOCQ[q]; if (f) f(); }, function () { });
     });
   }
+  /* list prices of GM_ symbols: the last two closes in the site's index (a closed day, never a live price) */
+  var GMW = [];
+  function gmPrices() {
+    if (!GMW.length) return;
+    P.getJSON('/data/markets/index.json?v=' + Math.floor(Date.now() / 6e5), 15000).then(function (j) {
+      var it = {}, L = j && j.items || []; (Array.isArray(L) ? L : Object.keys(L).map(function (k) { var v = L[k]; v.id = v.id || k; return v; })).forEach(function (x) { if (x && x.id) it[x.id] = x; }); GMW.forEach(function (s) { var x = it[P.inst(s).base]; if (!x || !x.last || !(x.last[1] > 0)) return; var c = x.last[1], o = x.prev > 0 ? x.prev : c; P._tkPut(s, { c: c, o: o, h: Math.max(c, o), l: Math.min(c, o), q: 0, src: 'site' }); });
+    }, function () { });
+  }
   var watchUsdt = P.tickers.watch;
   P.tickers.watch = function (syms) {
-    var c = {}, ir = [], irt = [], fut = [];
-    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'ir') ir.push(s); else if (I.kind === 'fut') fut.push(s); else if (I.kind === 'fxr') irt.push(s); else { c[I.base] = 1; if (I.kind === 'irt' || I.kind === 'fiat') irt.push(s); } });
+    var c = {}, ir = [], irt = [], fut = [], gm = [];
+    syms.forEach(function (s) { var I = P.inst(s); if (!I) return; if (I.kind === 'gm') gm.push(s); else if (I.kind === 'ir') ir.push(s); else if (I.kind === 'fut') fut.push(s); else if (I.kind === 'fxr') irt.push(s); else { c[I.base] = 1; if (I.kind === 'irt' || I.kind === 'fiat') irt.push(s); } });
+    GMW = gm; if (gm.length) gmPrices();
     FUTW = fut; clearInterval(FUTP); FUTP = null; if (fut.length) { futPrices(); FUTP = setInterval(futPrices, P.saver ? 120000 : 15000); }
     watchUsdt(Object.keys(c));
     IRW = ir; IRTW = irt; locQuotes(irt);
@@ -699,7 +737,7 @@
   P.markets = function () {
     return Promise.all([P.universe(), P.logos()]).then(function (r) {
       var u = r[0] || [], q = P.fx ? P.fx.cur() : 'IRT', loc = q === 'IRT' || q === 'USD' ? [] : ['USDT_' + q].concat(u.map(function (s) { return s + '_' + q; }));
-      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }), loc: loc, cur: q, fx2: P.fxPairs() };
+      return { usdt: u, irt: u.map(function (s) { return s + '_IRT'; }), ir: P.irList(), fut: Object.keys(FUTC).map(function (b) { return b + '_F1'; }), loc: loc, cur: q, fx2: P.fxPairs(), gm: P.gmList() };
     });
   };
 })();
