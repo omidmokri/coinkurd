@@ -146,8 +146,8 @@
     x.onclick = function (e) { e.stopPropagation(); close(true); }; hd.appendChild(x); p.appendChild(hd);
     var bd = el('div', 'pm-odpb'); p.appendChild(bd);
     [['w', 'odhWhat'], ['y', 'odhWhy']].forEach(function (f) { var s = S('odh_' + k + '_' + f[0]); if (!s) return; var r = el('p', 'pm-odpr'); r.appendChild(el('strong', '', T(f[1]))); r.appendChild(document.createTextNode(' ' + s)); bd.appendChild(r); });
-    var ex = S('odh_' + k + '_e'); if (ex) { var e1 = el('div', 'pm-odpe'); e1.appendChild(el('strong', '', T('odhEx'))); e1.appendChild(el('span', '', ex)); e1.lastChild.dir = 'auto'; bd.appendChild(e1); }
-    var me = fill(S('odh_' + k + '_n'), H.ctx); if (me) { var e2 = el('div', 'pm-odpy'); e2.appendChild(el('strong', '', T('odhYours'))); e2.appendChild(el('span', '', me)); e2.lastChild.dir = 'auto'; bd.appendChild(e2); }
+    var ex = S('odh_' + k + '_e'); if (ex) { var e1 = el('div', 'pm-odpe'); e1.appendChild(el('strong', '', T('odhEx'))); e1.appendChild(el('span', '', ex)); bd.appendChild(e1); }
+    var me = fill(S('odh_' + k + '_n'), H.ctx); if (me) { var e2 = el('div', 'pm-odpy'); e2.appendChild(el('strong', '', T('odhYours'))); e2.appendChild(el('span', '', me)); bd.appendChild(e2); }
     /* the guide's questions about this item, opened in place */
     var qs = []; H.FAQ.forEach(function (fk, i) { if (fk === k) qs.push(i); });
     if (qs.length) {
@@ -176,16 +176,22 @@
   }
 
   function faqEl(i) {
-    var d = el('details', 'pm-odpf'), s = el('summary', '', S('odhQ' + i)); d.appendChild(s); var a = el('p', '', S('odhA' + i)); a.dir = 'auto'; d.appendChild(a); return d;
+    var d = el('details', 'pm-odpf'), s = el('summary', '', S('odhQ' + i)); d.appendChild(s); var a = el('p', '', S('odhA' + i)); d.appendChild(a); return d;
   }
 
   /* the bottom edge nothing fixed covers: the site's own bar along the bottom of a phone screen sits above the planner */
   function freeBottom() {
-    var y = innerHeight, x = innerWidth / 2, n = document.elementFromPoint ? document.elementFromPoint(x, innerHeight - 4) : null;
-    for (var k = 0; n && k < 12; k++, n = n.parentElement) {
-      if (n.id === 'pro' || n.classList && n.classList.contains('pm-modal')) break;
-      if (getComputedStyle(n).position === 'fixed') { y = Math.min(y, n.getBoundingClientRect().top); break; }
-    }
+    var y = innerHeight;
+    if (!document.elementFromPoint) return y;
+    [4, 16, 32, 56, 80].forEach(function (d) {
+      [0.5, 0.25, 0.75].forEach(function (fx) {
+        var n = document.elementFromPoint(innerWidth * fx, innerHeight - d);
+        for (var k = 0; n && k < 14; k++, n = n.parentElement) {
+          if (n.id === 'pro' || n.id === 'ask-fab' || n.classList && (n.classList.contains('pm-modal') || n.classList.contains('pm-odpop'))) break;
+          if (getComputedStyle(n).position === 'fixed') { var t = n.getBoundingClientRect().top; if (t > innerHeight * 0.6) y = Math.min(y, t); break; }
+        }
+      });
+    });
     return y;
   }
   /* beside the icon on a wide screen, kept inside the planner window and the screen; a sheet along the bottom on a narrow one */
@@ -256,11 +262,11 @@
       res.appendChild(el('p', 'pm-odpm', T('odhFound')));
       got.forEach(function (o, n) {
         var c = el('div', 'pm-odpc');
-        if (o.kind === 'q') { c.appendChild(el('b', '', S('odhQ' + o.i))); var a = el('p', '', S('odhA' + o.i)); a.dir = 'auto'; c.appendChild(a); }
+        if (o.kind === 'q') { c.appendChild(el('b', '', S('odhQ' + o.i))); var a = el('p', '', S('odhA' + o.i)); c.appendChild(a); }
         else {
           var hb = el('b', ''); var ii = el('span', 'pm-odpi sm'); ii.innerHTML = H.svg(o.k); hb.appendChild(ii); hb.appendChild(document.createTextNode(title(o.k))); c.appendChild(hb);
-          var w = el('p', '', S('odh_' + o.k + '_w')); w.dir = 'auto'; c.appendChild(w);
-          var e = S('odh_' + o.k + '_e'); if (e) { var ep = el('p', 'pm-odpce', T('odhEx') + ': ' + e); ep.dir = 'auto'; c.appendChild(ep); }
+          var w = el('p', '', S('odh_' + o.k + '_w')); c.appendChild(w);
+          var e = S('odh_' + o.k + '_e'); if (e) { var ep = el('p', 'pm-odpce', T('odhEx') + ': ' + e); c.appendChild(ep); }
         }
         if (n) c.classList.add('more');
         res.appendChild(c);

@@ -1444,11 +1444,12 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
       return { title: p.querySelector('.pm-odph b').textContent, want: T('odh_risk_t'), ex: (p.querySelector('.pm-odpe span') || {}).textContent || '', exW: T('odh_risk_e'),
         mine: (p.querySelector('.pm-odpy span') || {}).textContent || '', what: p.querySelectorAll('.pm-odpr').length, ask: !!p.querySelector('.pm-odpa input'),
         sheet: p.classList.contains('sheet'), inView: r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1, focusInput: document.activeElement && document.activeElement.matches('.pm-odin input'),
-        dir: p.dir, risk: (PRO.odh.ctx || {}).risk };
+        dir: p.dir, risk: (PRO.odh.ctx || {}).risk,
+        under: ['#ekb', '#nxr', '.bnav'].map(q => document.querySelector(q)).filter(n => n && getComputedStyle(n).display !== 'none' && getComputedStyle(n).visibility !== 'hidden' && n.getBoundingClientRect().height > 0).map(n => n.getBoundingClientRect().top).filter(t => t > innerHeight * 0.6 && t < r.bottom - 1) };
     });
     ok(`[${tag}] tapping an icon opens its card: title, what it is, what it is for and an example`, c1 && c1.title === c1.want && c1.what === 2 && c1.ex === c1.exW && c1.ex.length > 10 && c1.ask, JSON.stringify(c1));
     ok(`[${tag}] the card shows the user's own numbers, every placeholder filled`, c1 && c1.mine.length > 5 && !/\{\w+\}/.test(c1.mine) && c1.mine.indexOf(c1.risk) >= 0, JSON.stringify(c1 && { mine: c1.mine, risk: c1.risk }));
-    ok(`[${tag}] the card sits inside the screen (a sheet at the bottom on a phone), in the page's direction, and the field did not take the tap`, c1 && c1.inView && (vw < 600 ? c1.sheet : !c1.sheet) && c1.dir === (lang === 'en' ? 'ltr' : 'rtl') && !c1.focusInput, JSON.stringify(c1));
+    ok(`[${tag}] the card sits inside the screen (a sheet at the bottom on a phone, above the site's bottom bar), in the page's direction, and the field did not take the tap`, c1 && c1.inView && c1.under.length === 0 && (vw < 600 ? c1.sheet : !c1.sheet) && c1.dir === (lang === 'en' ? 'ltr' : 'rtl') && !c1.focusInput, JSON.stringify(c1));
     await shot(page, `85_odm_help_${lang}_${vw}`);
     /* ask the guide one of its own questions, in this language */
     const q1 = await page.evaluate(() => PRO.app.T('odhQ1'));
