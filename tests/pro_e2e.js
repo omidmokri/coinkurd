@@ -1103,6 +1103,35 @@ async function mockNet(page, stats) {
   }
 
   /* ---------- the 43 other languages: one page each (/market/<code>/), built here from a fake translation cache */
+  if (!ONLY || ONLY === 'gm') for (const [vw, vh, lang] of [[1280, 860, 'en'], [390, 800, 'fa']]) {
+    const { page, ctx } = await newPage(vw, vh, lang);
+    const D0 = Math.floor(Date.now() / 86400000) * 86400 - 86400, N = 400, cl = i => 5000 + i * 2 + (i % 7);
+    const bars = []; for (let i = 0; i < N; i++) { const t = D0 - (N - 1 - i) * 86400, c = cl(i), o = i ? cl(i - 1) : c; bars.push([t, o, Math.max(o, c) + 3, Math.min(o, c) - 3, c, 0]); }
+    await page.route(/\/data\/markets\/[A-Za-z]+\.json/, r => {
+      const id = new URL(r.request().url()).pathname.split('/').pop().replace('.json', '');
+      if (id === 'index') return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: { SPX: { status: 'ok', src: 'Yahoo Finance', last: [D0, cl(N - 1)], prev: cl(N - 2) } } }) });
+      if (id !== 'SPX') return r.fulfill({ status: 404, body: '' });
+      r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 'SPX', status: 'ok', src: { id: 'yahoo', sym: '^GSPC', label: 'Yahoo Finance' }, bars }) });
+    });
+    /* a real click: the search, the indices tab, the S&P 500 row */
+    await page.click(vw > 600 ? '#pm-sym' : '.pm-cell .pm-lsym'); await page.waitForTimeout(400);
+    const chips = await page.evaluate(() => [...document.querySelectorAll('.pm-sscat .pm-chip')].map(b => b.textContent));
+    const gi = chips.length; await page.click(`.pm-sscat .pm-chip:nth-child(${gi})`); await page.waitForTimeout(500);
+    const rows = await page.evaluate(() => [...document.querySelectorAll('.pm-ssl [data-s]')].map(b => b.getAttribute('data-s')));
+    ok(`[${lang} ${vw}] search: the last tab lists the indices, DXY and the US stocks`, rows.includes('GM_SPX') && rows.includes('GM_DXY') && rows.includes('GM_NVDA') && rows.length === 11, chips.slice(-1) + ' ' + rows.join(','));
+    await page.click('.pm-ssl [data-s="GM_SPX"]');
+    await page.evaluate(() => PRO.app.active().setTF('1d')); await waitSym(page, 'GM_SPX');
+    const d1 = await page.evaluate(() => { const c = PRO.app.active(), b = c.bars; return { n: b.length, c: b[b.length - 1].c, t: b[b.length - 1].t, st: c.feed.state, srcl: c.el.querySelector('.pm-src').textContent, pair: c.el.querySelector('.pm-lsym').textContent }; });
+    ok(`[${lang} ${vw}] S&P 500 daily: every bar from the site's file, last close exact, source named`, d1.n === N && d1.c === cl(N - 1) && d1.t === D0 && d1.st === 'snap' && /entekhab · Yahoo Finance/.test(d1.srcl) && /SPX/.test(d1.pair), JSON.stringify(d1));
+    await page.evaluate(() => PRO.app.active().setTF('1w')); await page.waitForTimeout(1200);
+    const w1 = await page.evaluate(() => { const b = PRO.app.active().bars; return { n: b.length, c: b[b.length - 1].c }; });
+    ok(`[${lang} ${vw}] weekly bars built from the days, last close kept`, w1.n >= 57 && w1.n <= 59 && w1.c === cl(N - 1), JSON.stringify(w1));
+    await page.evaluate(() => PRO.app.active().setTF('1h')); await page.waitForTimeout(1200);
+    const h1 = await page.evaluate(() => { const c = PRO.app.active(); return { tf: c.cfg.tf, n: c.bars.length, toast: [...document.querySelectorAll('.pm-toast')].map(x => x.textContent).join(' | ') }; });
+    ok(`[${lang} ${vw}] asking for 1h stays on the daily chart, with a note why`, h1.tf === '1d' && h1.n === N && h1.toast.length > 0, JSON.stringify(h1));
+    await shot(page, `96_gm_${lang}_${vw}`);
+    await ctx.close();
+  }
   if (!ONLY || ONLY === 'langs') {
     const { execFileSync } = require('child_process'), os = require('os');
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'l10n-')), tplPath = path.join(ROOT, 'market', 'index.html'), tplKeep = fs.readFileSync(tplPath, 'utf8');

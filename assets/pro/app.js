@@ -639,7 +639,7 @@
       var b = x.bar, n = this.bars.length;
       if (n && this.bars[n - 1].t === b.t) this.bars[n - 1] = b; else if (!n || b.t > this.bars[n - 1].t) this.bars.push(b); else return;
       this.tick(x.isNew); emit('tick', this, b, x.closed);
-    } else if (what === 'state') { this.legend(); if (F.state === 'error') this.msg(F.err === 'rate' ? T('noRate', { c: P.quoteOf ? P.quoteOf(this.cfg.sym) : '' }) : T('noData', { s: this.cfg.sym })); }
+    } else if (what === 'state') { this.legend(); if (F.state === 'error') this.msg(F.err === 'rate' ? T('noRate', { c: P.quoteOf ? P.quoteOf(this.cfg.sym) : '' }) : F.err === 'tf' ? T('gmDaily') : T('noData', { s: this.cfg.sym })); }
   };
   Cell.prototype.fit = function () {
     var n = this.disp.length; if (!n) return;
@@ -941,7 +941,7 @@
     var c = this.cfg, F = this.feed, self = this;
     var stc = this.replay ? 'rep' : !F ? 'load' : F.state === 'live' ? 'live' : F.state === 'poll' ? 'poll' : F.state === 'snap' ? 'snap' : F.state === 'error' ? 'err' : 'load';
     var rs = F && F.R && F.R.source ? F.R.source() : '', rsn = rs === 'own' ? T('yourRate') : rs, ref = F && F.R ? ({ ecb: 'ECB', xapi: 'exchange-api' })[F.R.src] || '' : '';
-    var src = F && F.src === 'fx2' ? (P.fx2Source ? P.fx2Source(c.sym) : 'fx') : F && F.src === 'coinbase' ? 'Coinbase' : F && F.src === 'kraken' ? 'Kraken' : F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' : F && F.src === 'tgju' ? 'tgju' : F && (F.src === 'irt' || F.src === 'fiat') ? 'Binance × ' + (rsn || '…') : F && F.src === 'fxr' ? ref : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
+    var src = F && F.src === 'fx2' ? (P.fx2Source ? P.fx2Source(c.sym) : 'fx') : F && F.src === 'coinbase' ? 'Coinbase' : F && F.src === 'kraken' ? 'Kraken' : F && F.src === 'okx' ? 'OKX' : F && F.src === 'site' ? 'entekhab' + (F.meta && F.meta.src && F.meta.src.label ? ' · ' + esc(F.meta.src.label) : '') : F && F.src === 'tgju' ? 'tgju' : F && (F.src === 'irt' || F.src === 'fiat') ? 'Binance × ' + (rsn || '…') : F && F.src === 'fxr' ? ref : F && F.src === 'bybit' ? 'Bybit' : 'Binance';
     var I0 = P.inst(c.sym) || {}, isFut = I0.kind === 'fut', adj = isFut && P.futAdj && P.futAdj(c.sym);
     var stTitle = (F && F.src === 'fxr' && F.state === 'snap' ? T('refDaily') : T('st_' + stc)) + (F && F.state === 'snap' && F.at && F.src !== 'fxr' ? ' · ' + fmtT(Math.floor(F.at / 1000)) : '');
     var leg = $('.pm-leg', this.el);
@@ -1355,7 +1355,7 @@
     /* markets: every Binance coin in USDT and in the visitor's currency; Iran's toman markets (currencies, gold, coins,
        silver, every coin in toman) where the toman is the currency or the reader is Persian or Kurdish */
     var Q = P.fx ? P.fx.cur() : 'IRT', LOCAL = Q !== 'IRT' && Q !== 'USD', IRC = Q === 'IRT' || LANG === 'fa' || LANG === 'ckb';
-    ['all', 'watch', 'usdt', 'forex', 'gm'].concat(LOCAL ? ['loc'] : [], IRC ? ['irt', 'fx'] : [], ['gold', 'fut']).forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = k === 'loc' ? T('cat_loc', { c: Q }) : T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
+    ['all', 'watch', 'usdt', 'forex'].concat(LOCAL ? ['loc'] : [], IRC ? ['irt', 'fx'] : [], ['gold', 'fut', 'gm']).forEach(function (k) { var b = h('<button type="button" class="pm-chip' + (k === 'all' ? ' on' : '') + '"></button>'); b.textContent = k === 'loc' ? T('cat_loc', { c: Q }) : T('cat_' + k); b.onclick = function () { cat = k; $$('.pm-chip', cats).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }; cats.appendChild(b); });
     function names(x) { var I = P.inst(x); return I && I.name ? [I.name.fa, I.name.ckb, I.name.ar, I.name.en].join(' ').toLowerCase() : ''; }
     function draw() {
       var raw = inp.value.trim(), s = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), low = raw.toLowerCase(), W = (P.watchSyms ? P.watchSyms() : []);
