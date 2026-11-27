@@ -1,0 +1,375 @@
+{
+"updated_at":"2026-11-27T17:45:39+00:00",
+"tf":"1d",
+"note":"One source per file; never stitched. status: ok, stale (old file kept), unavailable.",
+"items":[
+{
+"id":"GOLD",
+"name":{
+"fa":"طلا (انس)",
+"ckb":"زێڕ (ئۆنس)",
+"ar":"الذهب (أونصة)",
+"en":"Gold (ounce)"
+},
+"unit":"USD/oz",
+"group":"metal",
+"status":"ok",
+"src":"COMEX gold futures · Yahoo Finance",
+"n":6144,
+"from":967507200,
+"last":[
+1795564800,
+3535.8
+],
+"prev":3561.9,
+"close_only":false,
+"sources":3,
+"working":3
+},
+{
+"id":"SILVER",
+"name":{
+"fa":"نقره (انس)",
+"ckb":"زیو (ئۆنس)",
+"ar":"الفضة (أونصة)",
+"en":"Silver (ounce)"
+},
+"unit":"USD/oz",
+"group":"metal",
+"status":"ok",
+"src":"COMEX silver futures · Yahoo Finance",
+"n":6343,
+"from":967507200,
+"last":[
+1795564800,
+40.052
+],
+"prev":40.76,
+"close_only":false,
+"sources":2,
+"working":1
+},
+{
+"id":"SPX",
+"name":{
+"fa":"اس‌اند‌پی ۵۰۰",
+"ckb":"ئێس ئەند پی ٥٠٠",
+"ar":"إس آند بي 500",
+"en":"S&P 500"
+},
+"unit":"pts",
+"group":"index",
+"status":"ok",
+"src":"S&P 500 · Yahoo Finance",
+"n":14348,
+"from":86400,
+"last":[
+1795564800,
+7182.78
+],
+"prev":7201.09,
+"close_only":false,
+"sources":2,
+"working":2
+},
+{
+"id":"NDX",
+"name":{
+"fa":"نزدک ۱۰۰",
+"ckb":"نازداک ١٠٠",
+"ar":"ناسداك 100",
+"en":"Nasdaq 100"
+},
+"unit":"pts",
+"group":"index",
+"status":"ok",
+"src":"Nasdaq 100 · Yahoo Finance",
+"n":10369,
+"from":496972800,
+"last":[
+1795564800,
+26046.9
+],
+"prev":26214.17,
+"close_only":false,
+"sources":2,
+"working":2
+},
+{
+"id":"DJI",
+"name":{
+"fa":"داوجونز",
+"ckb":"داو جۆنز",
+"ar":"داو جونز",
+"en":"Dow Jones"
+},
+"unit":"pts",
+"group":"index",
+"status":"ok",
+"src":"Dow Jones · Yahoo Finance",
+"n":8788,
+"from":694310400,
+"last":[
+1795564800,
+50182.95
+],
+"prev":50018.7,
+"close_only":false,
+"sources":2,
+"working":2
+},
+{
+"id":"DXY",
+"name":{
+"fa":"شاخص دلار",
+"ckb":"پێوەری دۆلار",
+"ar":"مؤشر الدولار",
+"en":"US dollar index"
+},
+"unit":"pts",
+"group":"index",
+"status":"ok",
+"src":"US dollar index (ICE) · Yahoo Finance",
+"n":14194,
+"from":31795200,
+"last":[
+1795564800,
+103.67
+],
+"prev":103.81,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"EURUSD",
+"name":{
+"fa":"یورو / دلار",
+"ckb":"یۆرۆ / دۆلار",
+"ar":"اليورو / الدولار",
+"en":"EUR/USD"
+},
+"unit":"USD",
+"group":"fx",
+"status":"ok",
+"src":"ECB reference rate · Frankfurter (close only)",
+"n":7145,
+"from":915408000,
+"last":[
+1795651200,
+1.0975
+],
+"prev":1.0935,
+"close_only":true,
+"sources":3,
+"working":3
+},
+{
+"id":"GBPUSD",
+"name":{
+"fa":"پوند / دلار",
+"ckb":"پاوەند / دۆلار",
+"ar":"الجنيه / الدولار",
+"en":"GBP/USD"
+},
+"unit":"USD",
+"group":"fx",
+"status":"ok",
+"src":"ECB reference rate · Frankfurter (close only)",
+"n":7145,
+"from":915408000,
+"last":[
+1795651200,
+1.3104
+],
+"prev":1.306,
+"close_only":true,
+"sources":3,
+"working":3
+},
+{
+"id":"USDJPY",
+"name":{
+"fa":"دلار / ین",
+"ckb":"دۆلار / یەن",
+"ar":"الدولار / الين",
+"en":"USD/JPY"
+},
+"unit":"JPY",
+"group":"fx",
+"status":"ok",
+"src":"ECB reference rate · Frankfurter (close only)",
+"n":7145,
+"from":915408000,
+"last":[
+1795651200,
+159.262
+],
+"prev":159.323,
+"close_only":true,
+"sources":3,
+"working":3
+},
+{
+"id":"AAPL",
+"name":{
+"fa":"Apple",
+"ckb":"Apple",
+"ar":"Apple",
+"en":"Apple"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Apple · Yahoo Finance",
+"n":11582,
+"from":345427200,
+"last":[
+1795564800,
+355.58
+],
+"prev":354.07,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"MSFT",
+"name":{
+"fa":"Microsoft",
+"ckb":"Microsoft",
+"ar":"Microsoft",
+"en":"Microsoft"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Microsoft · Yahoo Finance",
+"n":10256,
+"from":511056000,
+"last":[
+1795564800,
+489.93
+],
+"prev":496.13,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"NVDA",
+"name":{
+"fa":"Nvidia",
+"ckb":"Nvidia",
+"ar":"Nvidia",
+"en":"Nvidia"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Nvidia · Yahoo Finance",
+"n":7005,
+"from":916963200,
+"last":[
+1795564800,
+149.3
+],
+"prev":155.38,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"AMZN",
+"name":{
+"fa":"Amazon",
+"ckb":"Amazon",
+"ar":"Amazon",
+"en":"Amazon"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Amazon · Yahoo Finance",
+"n":7430,
+"from":863654400,
+"last":[
+1795564800,
+244.43
+],
+"prev":252.29,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"GOOGL",
+"name":{
+"fa":"Alphabet",
+"ckb":"Alphabet",
+"ar":"Alphabet",
+"en":"Alphabet"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Alphabet · Yahoo Finance",
+"n":5604,
+"from":1092873600,
+"last":[
+1795564800,
+273.1
+],
+"prev":279.05,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"META",
+"name":{
+"fa":"Meta",
+"ckb":"Meta",
+"ar":"Meta",
+"en":"Meta"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Meta · Yahoo Finance",
+"n":3652,
+"from":1337299200,
+"last":[
+1795564800,
+609.89
+],
+"prev":589.82,
+"close_only":false,
+"sources":1,
+"working":1
+},
+{
+"id":"TSLA",
+"name":{
+"fa":"Tesla",
+"ckb":"Tesla",
+"ar":"Tesla",
+"en":"Tesla"
+},
+"unit":"USD",
+"group":"stock",
+"status":"ok",
+"src":"Tesla · Yahoo Finance",
+"n":4129,
+"from":1277769600,
+"last":[
+1795564800,
+380.14
+],
+"prev":384.68,
+"close_only":false,
+"sources":1,
+"working":1
+}
+]
+}
