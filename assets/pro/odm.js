@@ -379,10 +379,11 @@
       $$('button[data-need]', ACT).forEach(function (b) { b.disabled = !!plan.err; });
       if (plan.err) { warn(OUT, T('odE_' + plan.err, { n: plan.at || '' })); TOP.textContent = T('odE_' + plan.err, { n: plan.at || '' }); TOP.className = 'pm-odtop dn'; TOP.dir = 'auto'; return; }
       /* one line that stays in view on a phone, where the results sit below the form */
-      TOP.className = 'pm-odtop pm-num'; TOP.dir = 'ltr';
-      TOP.innerHTML = '<span class="dn"></span><span></span><span class="up"></span>';
-      var tp = $$('span', TOP); tp[0].textContent = T('odTopRisk') + ' −' + f(plan.risk); tp[1].textContent = T('odTopAvg') + ' ' + px(plan.avg) + ' · SL ' + px(plan.stop);
-      tp[2].textContent = plan.best != null ? T('odTopBest') + ' ' + sg(plan.best) + ' (' + f(plan.best / plan.risk, 2) + 'R)' : '';
+      TOP.className = 'pm-odtop'; TOP.dir = A.RTL() ? 'rtl' : 'ltr'; TOP.innerHTML = '';
+      /* each figure is isolated in its own left-to-right run, so a right-to-left label never reorders it */
+      function tpart(lbl, val, cls) { var sp = document.createElement('span'); if (cls) sp.className = cls; sp.appendChild(document.createTextNode(lbl + ' ')); var b = document.createElement('bdi'); b.dir = 'ltr'; b.className = 'pm-num'; b.textContent = val; sp.appendChild(b); TOP.appendChild(sp); }
+      tpart(T('odTopRisk'), '−' + f(plan.risk), 'dn'); tpart(T('odTopAvg'), px(plan.avg)); tpart('SL', px(plan.stop));
+      if (plan.best != null) tpart(T('odTopBest'), sg(plan.best) + ' (' + f(plan.best / plan.risk, 2) + 'R)', 'up');
       var r = plan, o = h('<div class="pm-co"></div>'); OUT.appendChild(o);
       card(o, T('rcSide'), T(r.long ? 'rcLong' : 'rcShort2'));
       card(o, T('rcQty'), f(r.qty, 6)); card(o, T('odAvg'), px(r.avg)); card(o, T('odStopAt'), px(r.stop), 'dn');
