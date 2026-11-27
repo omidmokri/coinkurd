@@ -25,7 +25,7 @@
   /* The header's own language group, and nothing else. `.lsw` on /learn/, /glossary/, /library/ and /map/
      is those pages' own three-way switch for the lesson text (Kurdish, Persian, English); putting the globe
      there gave the reader two globes on one page and hid the Persian the switch exists to offer. */
-  var BAR = '#langs,.ek-lang';
+  var BAR = '#langs,.ek-lang,.ekm-lang';   /* .ekm-lang: the language row of the site menu (assets/ui2.js) */
 
   /* ------------------------------------------------------------------ the globe and its panel */
   /* The pill is the one /market/ already uses (.pm-hglobe): same gradient, height, corner, weight and gap, so the
@@ -261,7 +261,8 @@
       if (!mk) [].forEach.call(box.querySelectorAll('.pm-hglobe'), function (p) {
         if (p.style.display !== 'none') p.style.display = 'none';
       });
-      INSIDE.forEach(function (l) {
+      /* the site menu's own row keeps all four of its names: the globe only joins it */
+      if (!box.classList.contains('ekm-lang')) INSIDE.forEach(function (l) {
         var b = box.querySelector('button[data-l="' + l + '"]');
         if (b && b.style.display !== 'none') b.style.display = 'none';
       });
