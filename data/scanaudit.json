@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-28T01:37:09.832411+00:00",
+ "updated_at": "2026-11-28T01:59:02.824904+00:00",
  "window": [
   "2026-09-27T20:00:00+00:00",
   "2026-11-27T01:00:00+00:00"
@@ -12,24 +12,24 @@
  "method": "signed 24h move after findings vs the same coins/directions shifted together by every k hours (exact circular-shift test)",
  "patterns": {
   "volume_spike": {
-   "n": 1549,
+   "n": 1548,
    "obs": -0.22,
    "win": 45.3,
    "mid": 0.13,
    "lo": -0.56,
    "hi": 0.83,
-   "p": 0.3283,
+   "p": 0.3247,
    "shifts": 1398,
    "verdict": "no_edge"
   },
   "_all": {
-   "n": 6249,
+   "n": 6245,
    "obs": 0.2,
    "win": 50.9,
    "mid": 0.0,
    "lo": -0.37,
    "hi": 0.3,
-   "p": 0.1838,
+   "p": 0.1817,
    "shifts": 1398,
    "verdict": "no_edge"
   },
@@ -89,13 +89,13 @@
    "verdict": "no_edge"
   },
   "bull_divergence": {
-   "n": 557,
-   "obs": 0.5,
-   "win": 55.7,
-   "mid": -0.72,
-   "lo": -2.14,
-   "hi": 0.47,
-   "p": 0.0601,
+   "n": 555,
+   "obs": 0.52,
+   "win": 55.9,
+   "mid": -0.71,
+   "lo": -2.16,
+   "hi": 0.46,
+   "p": 0.0558,
    "shifts": 1398,
    "verdict": "no_edge"
   },
@@ -111,13 +111,13 @@
    "verdict": "better"
   },
   "ema_death_cross": {
-   "n": 518,
-   "obs": 0.32,
-   "win": 53.7,
+   "n": 517,
+   "obs": 0.31,
+   "win": 53.6,
    "mid": 0.69,
    "lo": -0.83,
-   "hi": 1.84,
-   "p": 0.5672,
+   "hi": 1.85,
+   "p": 0.5572,
    "shifts": 1398,
    "verdict": "no_edge"
   }
