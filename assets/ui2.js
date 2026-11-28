@@ -296,7 +296,6 @@
     glass(F.querySelector('.ekf-apps'), { sel: '.ek-badge', r: 15, px: 3, py: 3 });
   }
   function menuGlass() {
-    glass(M.querySelector('.ekm-cats'), { sel: '.ekm-cat', on: '.ekm-cat.on', text: 1, px: 20, py: 1, bead: 58 });
     [].forEach.call(M.querySelectorAll('.ekm-pane>.ekm-pi'), function (p) { glass(p, { sel: '.ek-it,.ekm-sq', on: p.parentNode.id === 'ekm-res' ? 'a[href]' : '.ek-it.on', r: 17, px: 1, py: 1, bead: 52 }); });
     glass(M.querySelector('.ekm-lang'), { sel: 'button', on: 'button.on', r: 11 });
     glass(M.querySelector('.ekm-apps'), { sel: '.ek-badge', r: 15, px: 3, py: 3 });
@@ -306,20 +305,42 @@
   /* ================================================================== full-screen menu */
   var PH = { fa: 'نام ابزار، صفحه یا موضوع را بنویس…', ckb: 'ناوی ئامراز، پەڕە یان بابەت بنووسە…', en: 'Type a tool, page or topic…' };
   var index = [], cats = [], panes = {}, curK = null, hov = null;
+  /* the menu as an orbit (owner 2026-11-27: "an attractive menu in harmony with the site, original in every respect").
+     The sky is the homepage's nebula. The categories sit on one large ring, each at a node in its own aurora colour (the
+     header's and the footer's palette, one colour per category); the open one is at the ring's near point and the others
+     fall away along the curve, so moving through the list turns the ring. The pane takes the open category's colour.
+     Wide screens only: on a phone the same list is a plain accordion, where a curve would only cost width. */
+  var MK = ['#5ef2d6', '#7cc8ff', '#9b7bff', '#ff6fb5', '#ffcf6b'], ORB = 1300;
+  function wheel() {
+    if (!M) return;
+    var all = [].slice.call(M.querySelectorAll('.ekm-cat')), on = M.querySelector('.ekm-cat.on'), box = M.querySelector('.ekm-cats');
+    if (!DESK.matches || !on || M.classList.contains('q')) { all.forEach(function (c) { c.style.removeProperty('--x'); c.style.removeProperty('--ad'); }); M.classList.remove('orb'); return; }
+    var ay = on.offsetTop + on.offsetHeight / 2, a = all.indexOf(on);
+    all.forEach(function (c, i) {
+      var dy = c.offsetTop + c.offsetHeight / 2 - ay;
+      c.style.setProperty('--x', (ORB - Math.sqrt(Math.max(0, ORB * ORB - dy * dy))).toFixed(1) + 'px'); c.style.setProperty('--ad', Math.abs(i - a));
+    });
+    var r = box.getBoundingClientRect(), rtl = getComputedStyle(box).direction === 'rtl';
+    var pad = parseFloat(getComputedStyle(box).paddingInlineStart) || 0;
+    M.style.setProperty('--ox', ((rtl ? r.right - pad - 11 : r.left + pad + 11)).toFixed(1) + 'px'); M.style.setProperty('--oy', (r.top + ay).toFixed(1) + 'px');
+    M.style.setProperty('--ok', on.style.getPropertyValue('--k') || MK[0]); M.classList.add('orb');
+  }
   function buildMenu() {
     M = d.createElement('div'); M.id = 'ekm'; M.setAttribute('role', 'dialog'); M.setAttribute('aria-modal', 'true');
     var groups = [].slice.call(H.querySelectorAll('.ek-mi')), cl = '', pl = '', i = 0;
     groups.forEach(function (g) {
       var k = g.getAttribute('data-k'), t = g.querySelector('.ek-mt .ek-i'), its = g.querySelectorAll('.ek-it'), mg = g.querySelector('.ek-mg');
       if (!k || !t || !mg) return;
-      cl += '<button type="button" class="ekm-cat" data-k="' + esc(k) + '" aria-expanded="false" aria-controls="ekm-p-' + esc(k) + '" style="--i:' + (i++) + '">' +
-        tri(t.getAttribute('data-fa'), t.getAttribute('data-ckb'), t.getAttribute('data-en'), 'span', 'ekm-ct') + '<small data-n="' + its.length + '"></small></button>';
-      pl += '<div class="ekm-pane" id="ekm-p-' + esc(k) + '" data-k="' + esc(k) + '"><div class="ekm-pi' + (its.length > 9 ? ' many' : '') + '">' + mg.innerHTML + '</div></div>';
+      var kc = MK[i % MK.length], nm = tri(t.getAttribute('data-fa'), t.getAttribute('data-ckb'), t.getAttribute('data-en'), 'span', 'ekm-ct');
+      cl += '<button type="button" class="ekm-cat" data-k="' + esc(k) + '" aria-expanded="false" aria-controls="ekm-p-' + esc(k) + '" style="--i:' + (i++) + ';--k:' + kc + '">' +
+        '<i class="ekm-nd" aria-hidden="true"></i>' + nm + '<small data-n="' + its.length + '"></small></button>';
+      pl += '<div class="ekm-pane" id="ekm-p-' + esc(k) + '" data-k="' + esc(k) + '" style="--k:' + kc + '"><div class="ekm-hd" aria-hidden="true"><i></i>' + nm + '<small data-n="' + its.length + '" data-u="1"></small></div>' +
+        '<div class="ekm-pi' + (its.length > 9 ? ' many' : '') + '">' + mg.innerHTML + '</div></div>';
     });
     var hot = H.querySelector('.ek-ml.ek-hot');
-    if (hot) cl += '<a class="ekm-cat ekm-hot" href="' + esc(hot.getAttribute('href')) + '" style="--i:' + (i++) + '">' + hot.innerHTML + '</a>';
+    if (hot) cl += '<a class="ekm-cat ekm-hot" href="' + esc(hot.getAttribute('href')) + '" style="--i:' + (i++) + ';--k:#ffcf6b"><i class="ekm-nd" aria-hidden="true"></i>' + hot.innerHTML + '</a>';
     var brand = H.querySelector('.ek-brand'), apps = d.querySelector('#ekf .ekf-apps'), soc = d.querySelector('#ekf .ekf-soc');
-    M.innerHTML = '<div class="ekm-bg"></div><div class="ekm-in">' +
+    M.innerHTML = '<div class="ekm-bg"><i class="ekm-orb" aria-hidden="true"></i></div><div class="ekm-in">' +
       '<div class="ekm-top">' + (brand ? brand.outerHTML : '') +
       '<form class="ekm-q" role="search" action="/" method="get">' + IC.q + '<input type="search" name="q" autocomplete="off" enterkeyhint="search" maxlength="80" data-afa="جستجو در منو" data-ackb="گەڕان لە مێنیو" data-aen="Search the menu"></form>' +
       '<button type="button" class="ekm-x">' + tri('بستن', 'داخستن', 'Close') + IC.x + '</button></div>' +
@@ -373,7 +394,7 @@
       var v = (inp.value || '').trim().slice(0, 80); if (!v) return;
       var f = res.querySelector('a[href]'); if (f) go(f.href);
     });
-    function clearQ() { if (inp.value) inp.value = ''; M.classList.remove('q'); panes._r.classList.remove('on'); }
+    function clearQ() { if (inp.value) inp.value = ''; M.classList.remove('q'); panes._r.classList.remove('on'); wheel(); }
     function filter(v) {
       var qs = norm(v).split(/\s+/).filter(Boolean);
       if (!qs.length) { clearQ(); activate(curK || firstK()); return; }
@@ -383,7 +404,7 @@
       h += '<a class="ekm-sq" style="--i:' + hit.length + '" href="/?q=' + encodeURIComponent(qv) + '">' + IC.q + '<span>' +
         esc(pick('جستجوی «' + qv + '» در پست‌ها و کوین‌ها', 'گەڕان بۆ «' + qv + '» لە پۆست و دراوەکان', 'Search posts and coins for “' + qv + '”')) + '</span></a>';
       res.innerHTML = h;
-      M.classList.add('q');
+      M.classList.add('q'); wheel();
       for (var k in panes) panes[k].classList.toggle('on', k === '_r');
       cats.forEach(function (c) { c.classList.remove('on'); c.setAttribute('aria-expanded', 'false'); });
       roving();
@@ -393,6 +414,7 @@
     layout();
     menuGlass();
     if (DESK.addEventListener) DESK.addEventListener('change', layout); else if (DESK.addListener) DESK.addListener(layout);
+    var wr = 0; w.addEventListener('resize', function () { if (!M.classList.contains('open')) return; clearTimeout(wr); wr = setTimeout(wheel, 80); }, { passive: true });
     if (w.ekChrome && w.ekChrome.label) w.ekChrome.label(lang());
   }
   /* wide screens: categories beside one pane; narrow screens: each pane opens under its category */
@@ -400,14 +422,14 @@
     if (!M) return;
     var box = M.querySelector('.ekm-panes');
     cats.forEach(function (c) { var p = panes[c.getAttribute('data-k')]; if (!p) return; if (DESK.matches) box.insertBefore(p, panes._r); else c.parentNode.insertBefore(p, c.nextSibling); });
-    roving();
+    roving(); wheel();
   }
   function firstK() { var a = H.querySelector('.ek-mi.on'); return (a && a.getAttribute('data-k')) || (cats[0] && cats[0].getAttribute('data-k')); }
   function activate(k) {
     curK = k;
     cats.forEach(function (c) { var on = c.getAttribute('data-k') === k; c.classList.toggle('on', on); c.setAttribute('aria-expanded', on ? 'true' : 'false'); });
     for (var x in panes) panes[x].classList.toggle('on', x === k);
-    roving();
+    roving(); wheel();
   }
   /* wide screens: the category list is one Tab stop (the arrow keys move inside it), so Tab goes on into the open pane */
   function roving() {
@@ -427,7 +449,8 @@
     M.querySelector('.ekm-lang').setAttribute('aria-label', pick('زبان', 'زمان', 'Language'));
     [].forEach.call(M.querySelectorAll('.ekm-lang button'), function (b) { var on = b.getAttribute('data-l') === (ar ? 'ar' : l); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     var q = M.querySelector('.ekm-q input'); if (q) q.placeholder = PH[l];
-    [].forEach.call(M.querySelectorAll('.ekm-cat small[data-n]'), function (s) { s.textContent = dg(s.getAttribute('data-n')); });
+    [].forEach.call(M.querySelectorAll('.ekm-cat small[data-n],.ekm-hd small[data-n]'), function (s) { s.textContent = dg(s.getAttribute('data-n')) + (s.hasAttribute('data-u') ? ' ' + pick('صفحه', 'پەڕە', 'pages') : ''); });
+    wheel();
   }
   function openMenu(k, from, toLang) {
     if (!M) buildMenu();
