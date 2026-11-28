@@ -1,11 +1,16 @@
 {
- "updated_at": "2026-11-28T07:57:27.837802+00:00",
+ "updated_at": "2026-11-28T08:08:54.871314+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
+  "BTC": {
+   "n": 94,
+   "amount": 196222.36999999994,
+   "usd": 11753895923
+  },
   "ETH": {
    "n": 90,
    "amount": 284067.22,
@@ -20,17 +25,12 @@
    "n": 164,
    "amount": 7402264671,
    "usd": 7402264671
-  },
-  "BTC": {
-   "n": 94,
-   "amount": 196194.64999999994,
-   "usd": 11751597805
   }
  },
  "hourly": [
   {
    "h": "2026-11-27T17",
-   "usd": 611549089
+   "usd": 409266008
   },
   {
    "h": "2026-11-27T18",
@@ -87,9 +87,31 @@
   {
    "h": "2026-11-28T07",
    "usd": 563728583
+  },
+  {
+   "h": "2026-11-28T08",
+   "usd": 204581199
   }
  ],
  "events": [
+  {
+   "asset": "BTC",
+   "amount": 1539.55,
+   "usd": 92021364,
+   "tx": "0c938f9799da507516af4d7dfe308ba0dec2a91ce3ebc73cf9344614149c301e",
+   "to": "bc1q7glqatxk6063pc0lrr6v2nv69xzxkc4c42p356",
+   "from": "bc1q7glqatxk6063pc0lrr6v2nv69xzxkc4c42p356",
+   "at": "2026-11-28T08:03:07+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 1883.17,
+   "usd": 112559835,
+   "tx": "1ccbfbf21890eaea5a989591c3f3e8a3f1698812fd680446c299f35b2ab572b9",
+   "to": "bc1qrnn8ut8pjk6slsc9m6xqz2nukr8l2j32qv2gvd",
+   "from": "bc1qrnn8ut8pjk6slsc9m6xqz2nukr8l2j32qv2gvd",
+   "at": "2026-11-28T08:03:07+00:00"
+  },
   {
    "asset": "ETH",
    "amount": 1037.18,
@@ -815,24 +837,6 @@
    "to": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
    "from": "bc1psptt20t7g8u0sz629k4y27c8lqd3kh6zqds4937s2hxecl7d7afsrhteyx",
    "at": "2026-11-28T05:12:22+00:00"
-  },
-  {
-   "asset": "BTC",
-   "amount": 1883.18,
-   "usd": 112600770,
-   "tx": "9ce0d207213e65c759fbb4550311b5edba2ef80540acb07448db0670aaa489e9",
-   "to": "bc1qrnn8ut8pjk6slsc9m6xqz2nukr8l2j32qv2gvd",
-   "from": "bc1qrnn8ut8pjk6slsc9m6xqz2nukr8l2j32qv2gvd",
-   "at": "2026-11-28T05:12:22+00:00"
-  },
-  {
-   "asset": "USDC",
-   "amount": 159997881,
-   "usd": 159997881,
-   "tx": "0xf235b2366e18e824458baaa32620c71e2aba16cc60e847e3dc885d2c752501c4",
-   "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
-   "to": "0x0ea041260095b20feda41ef4fdbef7d801f4c438",
-   "at": "2026-11-28T05:09:22.916410+00:00"
   }
  ]
 }
