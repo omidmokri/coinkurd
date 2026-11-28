@@ -1373,6 +1373,10 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     await page.waitForFunction(() => ![...document.querySelectorAll('.pm-odres .pm-odhint')].some(p => p.textContent === PRO.app.T('odChecking')), null, { timeout: 20000 }).catch(() => {});
     const dr = await page.evaluate(() => { const d = document.querySelector('.pm-oddist'), T = PRO.app.T; if (!d) return null; const w = d.querySelector('.pm-cw2'); return { cards: d.querySelectorAll('.pm-cor').length, ends: d.querySelectorAll('.pm-odt tbody tr').length, mc: [...d.querySelectorAll('h4')].some(h => h.textContent.indexOf(T('odMcT')) === 0), split: [...d.querySelectorAll('.pm-cor small')].some(s => s.textContent === T('odOos')), none: !!(w && w.textContent === T('odDNone')), pend: [...document.querySelectorAll('.pm-odres .pm-odhint')].some(p => p.textContent === T('odChecking')) }; });
     ok(`[${tag}] the plan repeated over the history shows trades, win rate, average and median R, how they ended, the Monte Carlo drawdowns and the in/out-of-sample split`, dr && !dr.none && !dr.pend && dr.cards >= 10 && dr.ends >= 1 && dr.mc && dr.split, JSON.stringify(dr));
+    await page.evaluate(() => { const c = document.querySelector('.pm-odfeat input[data-f="kelly"]'); if (c && !c.checked) { c.checked = true; c.dispatchEvent(new Event('change')); } });   /* Kelly is a tick */
+    const fx = await page.evaluate(() => { const d = document.querySelector('.pm-oddist'), T = PRO.app.T; if (!d) return null; const hs = [...d.querySelectorAll('h4')], tb = h => { let e = h && h.nextElementSibling; while (e && !e.querySelector('table')) e = e.nextElementSibling; return e ? e.querySelectorAll('tbody tr').length : 0; }; const fH = hs.find(h => h.textContent.indexOf(T('odFiltT')) === 0), tH = hs.find(h => h.textContent.indexOf(T('odTrT')) === 0); return { filt: tb(fH), trail: tH ? tb(tH) : -1, kelly: [...d.querySelectorAll('.pm-cor small')].some(s => s.textContent === T('odKelly')), verdicts: [...d.querySelectorAll('td')].filter(td => ['helps', 'no', 'few', 'na'].some(v => td.textContent === T('odFiltV_' + v))).length }; });
+    ok(`[${tag}] the five filters are each judged with vs without on the same test, with a Kelly risk card and the trail rules compared`, fx && fx.filt === 5 && fx.verdicts === 5 && fx.kelly && fx.trail !== 0, JSON.stringify(fx));
+    await page.evaluate(() => { const c = document.querySelector('.pm-odfeat input[data-f="kelly"]'); if (c) { c.checked = false; c.dispatchEvent(new Event('change')); } });
     await page.evaluate(() => { const d = document.querySelector('.pm-oddist'); if (d) d.scrollIntoView(); });
     await shot(page, `85b_odm_dist_${lang}_${vw}`);
     const col = await page.evaluate(() => { const d = document.querySelector('.pm-odcol'); if (!d) return null; d.open = true; const i = d.querySelectorAll('input[type=color]'); i[0].value = '#3366ff'; i[0].dispatchEvent(new Event('input')); return { n: i.length, saved: JSON.parse(localStorage.getItem('ek_pro_odmui') || '{}').tp }; });
@@ -1404,10 +1408,37 @@ for code, mark, seo in (("de", "ᴰᴱ ", True), ("iw", "עב ", True), ("jp", "
     });
     ok(`[${tag}] the bot link follows the ticks (hidden with none, one level with one)`, ob2.hid && /^o_[A-Z0-9]+_e\d+(d\d+)?$/.test(ob2.one), JSON.stringify(ob2));
     await shot(page, `86_odm_alerts_${lang}_${vw}`);
+    /* the tools as ticks: all on, each enters the plan or the test; all off, nothing of theirs is left */
+    const tk = await page.evaluate(() => {
+      const cbs = [...document.querySelectorAll('.pm-odfeat input[data-f]')]; document.querySelector('.pm-odfeat').open = true;
+      cbs.forEach(c => { c.checked = true; c.dispatchEvent(new Event('change')); });
+      const T = PRO.app.T, out = document.querySelector('.pm-odout');
+      return { n: cbs.length, sum: document.querySelector('.pm-odfeat summary').textContent, fx: document.querySelectorAll('.pm-odfx input').length, edu: out.querySelectorAll('.pm-edu').length,
+        zone: out.textContent.includes(T('odZone', { k: '2' })), shock: out.textContent.includes(T('odShockDn', { x: '10' })), day: out.textContent.includes(T('odDayLeft')) };
+    });
+    ok(`[${tag}] 31 tool ticks; ticked, each shows its inputs and its figures, with a line on what each figure means`, tk.n === 31 && /31/.test(tk.sum) && tk.fx >= 7 && tk.edu >= 5 && tk.zone && tk.shock && tk.day, JSON.stringify(tk));
+    await page.evaluate(() => document.querySelector('.pm-odfeat').scrollIntoView({ block: 'start' })); await page.waitForTimeout(150);
+    await shot(page, `85d_odm_ticks_${lang}_${vw}`);
+    await page.evaluate(() => document.querySelector('.pm-odout').scrollIntoView({ block: 'start' })); await page.waitForTimeout(150);
+    await shot(page, `85e_odm_plan_tools_${lang}_${vw}`);
+    await btn('odTest'); await page.waitForTimeout(1200);
+    const tt = await page.evaluate(() => { const T = PRO.app.T, d = document.querySelector('.pm-oddist'); return d && { score: d.textContent.includes(T('odScore')), jr: d.textContent.includes(T('odJrT')), conf: d.textContent.includes(T('odConfT')), twin: d.textContent.includes(T('odTwinT')), stress: d.textContent.includes(T('odStressT')), regime: d.textContent.includes(T('odRegT')), split: d.textContent.includes(T('odSplitOT')), scale: d.textContent.includes(T('odScaleT')), regret: d.textContent.includes(T('odRegretT')) }; });
+    ok(`[${tag}] with the ticks on, the test adds the score, the twin, the stress test, the journal and the confidence check`, tt && tt.score && tt.jr && tt.conf && tt.twin && tt.stress && tt.regime && tt.split && tt.scale && tt.regret, JSON.stringify(tt));
+    await shot(page, `85c_odm_tools_${lang}_${vw}`);
+    const bud = await page.evaluate(() => {
+      const T = PRO.app.T, set = (k, v) => { const i = document.querySelector('.pm-odfx input[aria-label="' + T(k) + '"]'); i.value = v; i.dispatchEvent(new Event('input')); };
+      set('odDayCap', '1'); set('odDayLost', '10'); const hit = document.querySelector('.pm-odtop').classList.contains('dn') && !!document.querySelector('.pm-odout .pm-cw2.hard');
+      set('odDayLost', '5'); const cut = document.querySelector('.pm-odout').textContent.includes(T('odBudgetCut', { p: '0.5', q: '2' }).slice(0, 8)); set('odDayLost', ''); set('odDayCap', '3');
+      [...document.querySelectorAll('.pm-odfeat input[data-f]')].forEach(c => { c.checked = c.getAttribute('data-f') === 'journal'; c.dispatchEvent(new Event('change')); });
+      return { hit, cut, edu: document.querySelectorAll('.pm-odout .pm-edu').length, hard: document.querySelectorAll('.pm-odout .pm-cw2.hard').length, sum: document.querySelector('.pm-odfeat summary').textContent };
+    });
+    ok(`[${tag}] the daily budget stops the plan when used up and cuts the risk when partly used; unticked, nothing of the tools is left`, bud.hit && bud.cut && bud.edu === 0 && bud.hard === 0 && /1/.test(bud.sum), JSON.stringify(bud));
     /* save to the risk board as planned, with the full-fill risk */
     await btn('odSave'); await page.waitForTimeout(150);
     const sv = await page.evaluate(() => { const L = JSON.parse(localStorage.getItem('ek_pro_plans') || '[]'), p = L.find(x => x.kind === 'odm'); return p && { st: p.status, risk: p.risk, n: p.entries.length, t: p.targets.length }; });
     ok(`[${tag}] saving puts the plan on the risk board as planned, with its 4 entries, 3 exits and a risk of 20`, sv && sv.st === 'planned' && Math.abs(sv.risk - 20) < 1e-6 && sv.n === 4 && sv.t === 3, JSON.stringify(sv));
+    const jr = await page.evaluate(() => { const J = JSON.parse(localStorage.getItem('ek_pro_odmjr') || '[]'); return { n: J.length, img: !!(J[0] && /^data:image\/jpeg;base64,/.test(J[0].img || '')), sym: J[0] && J[0].sym }; });
+    ok(`[${tag}] with the journal ticked, saving keeps the plan with a chart picture in this browser`, jr.n === 1 && jr.img && !!jr.sym, JSON.stringify(jr));
     /* show on the chart */
     await btn('odShow'); await page.waitForTimeout(200);
     const ln = await page.evaluate(() => ({ n: PRO.odmLinesShown(), modal: !!document.querySelector('.pm-odm') }));
