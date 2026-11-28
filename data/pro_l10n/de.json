@@ -217,6 +217,14 @@
 "7949a2630a",
 "EMA-Kreuzung (schnell / langsam)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Alle Alarme löschen ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Alle {n} Alarme für jede Coin löschen? Sie können dies direkt danach rückgängig machen."
+],
 "alert": [
 "b969680a49",
 "Alarm"
@@ -672,6 +680,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Währungen (Toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Indizes & US-Aktien"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1868,6 +1880,14 @@
 "g_vol": [
 "1b4620951d",
 "Volumenbasiert"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Indizes und US-Aktien zeigen hier nur Tagesschlusskurse: Wählen Sie 1D, 1W oder 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Tagesschlusskurse werden auf dieser Website aus kostenlosen öffentlichen Quellen gespeichert (Yahoo Finance zuerst, andere als Fallback). Nur geschlossene Tage: Keine Intraday-Balken und kein Live-Preis."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3862,8 +3882,8 @@
 "{l} bei {p} ({d}% vom letzten Preis)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Ziehen Sie eine mit ↕ markierte Linie, um sie zu verschieben, oder den runden Griff, um die Start-Kerze zu ändern. Der Plan wird beim Ziehen neu berechnet."
+"db78c3cdfe",
+"Ziehen Sie eine mit ↕ markierte Linie, den Kreis auf der Einstiegslinie, um das Rechteck zu verschieben, oder den Balken am rechten Rand, um die Größe zu ändern. Überall sonst bewegt sich der Chart wie gewohnt."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -4020,6 +4040,22 @@
 "odExitHint": [
 "a9498bb911",
 "Bis zu 8 Schritte. Jeder schließt einen Anteil zu einem Preis, zu einem Prozentsatz vom durchschnittlichen Einstieg oder zu einem Vielfachen von R."
+],
+"odExt": [
+"a4b2498fcd",
+"Zum rechten Rand verlängern"
+],
+"odExtClosed": [
+"f871770520",
+"Die Position hat wieder ihren eigenen rechten Rand. Ziehen Sie daran, um die Größe zu ändern."
+],
+"odExtOff": [
+"013864439f",
+"Rechten Rand schließen"
+],
+"odExtOn": [
+"cd67a03b67",
+"Die Position erstreckt sich nun bis zum rechten Rand."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4209,6 +4245,10 @@
 "8544a47725",
 "Gewinn"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Position aus dem Chart entfernen"
+],
 "odRestOpen": [
 "b957d211ac",
 "{p}% verbleibt ohne Exit und Trailing: Es bleibt offen, bis Sie es schließen."
@@ -4216,6 +4256,10 @@
 "odRestTrail": [
 "be684d239e",
 "{p}% verbleibt und nutzt einen Trailing-Stop {d} hinter dem besten Preis, beginnend bei {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Dieses Level passt nicht zum Plan und wurde daher zurückgesetzt:"
 ],
 "odRun": [
 "b1b392607d",
@@ -4232,6 +4276,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Auf Risiko-Board speichern"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Tippen Sie auf die Position, um sie auszuwählen, und ziehen Sie dann eine mit ↕ markierte Linie oder einen Anfasser. Überall sonst bewegt sich der Chart wie gewohnt."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6944,6 +6992,54 @@
 "rng_week": [
 "7b72883e07",
 "Diese Woche"
+],
+"rsAl": [
+"689e627ada",
+"Alle Alarme, auf jeder Coin"
+],
+"rsBack": [
+"5202b69570",
+"Wiederhergestellt, was das Zurücksetzen entfernt hat."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Seite zurückgesetzt."
+],
+"rsDr": [
+"3e97d79b5a",
+"Alle Zeichnungen, auf jeder Coin"
+],
+"rsGo": [
+"44c57abd88",
+"Zurücksetzen"
+],
+"rsInd": [
+"76de28a75e",
+"Indikatoren auf den Charts"
+],
+"rsLead": [
+"19aa2a9a77",
+"Die Seite auf einmal bereinigen. Markieren Sie, was entfernt werden soll:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Alarmverlauf"
+],
+"rsNote": [
+"58f9efc63c",
+"Layouts, Einstellungen, die Watchlist und das Portfolio bleiben erhalten. Alarme, die Sie an den Telegram-Bot gesendet haben, verbleiben im Bot: Öffnen Sie dort /alerts, um sie zu löschen."
+],
+"rsOd": [
+"bbde1a818d",
+"ODM-Plan und dessen Level"
+],
+"rsTitle": [
+"6ce02ce159",
+"Seite zurücksetzen"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Letztes Zurücksetzen rückgängig machen"
 ],
 "runTest": [
 "2c7f471fce",

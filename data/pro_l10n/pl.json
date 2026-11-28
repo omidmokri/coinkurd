@@ -217,6 +217,14 @@
 "7949a2630a",
 "Przecięcie EMA (szybka / wolna)"
 ],
+"alDelAll": [
+"fa338bee78",
+"Usuń wszystkie alerty ({n})"
+],
+"alDelAllQ": [
+"3ece3d4acd",
+"Usunąć wszystkie {n} alerty na każdej monecie? Możesz to zaraz cofnąć."
+],
 "alert": [
 "b969680a49",
 "Alert"
@@ -668,6 +676,10 @@
 "cat_fx": [
 "31f0b75eca",
 "Waluty (toman)"
+],
+"cat_gm": [
+"398080fb89",
+"Indeksy i akcje USA"
 ],
 "cat_gold": [
 "56d2a2fdcf",
@@ -1860,6 +1872,14 @@
 "g_vol": [
 "1b4620951d",
 "Oparte na wolumenie"
+],
+"gmDaily": [
+"3b7d2bb675",
+"Indeksy i akcje USA mają tutaj tylko ceny zamknięcia: wybierz 1D, 1W lub 1M."
+],
+"gmNote": [
+"f58ac90a7d",
+"Ceny zamknięcia zapisane w tej witrynie z darmowych źródeł publicznych (najpierw Yahoo Finance, inne jako alternatywa). Tylko dni zamknięte: brak słupków intraday i ceny na żywo."
 ],
 "go": [
 "2e0b45f2a4",
@@ -3870,8 +3890,8 @@
 "{l} na {p} ({d}% od ostatniej ceny)"
 ],
 "odDragHint": [
-"57cbd020e7",
-"Przeciągnij linię oznaczoną ↕, aby ją przesunąć, lub okrągły uchwyt, aby zmienić świecę początkową. Plan jest przeliczany na bieżąco podczas przeciągania."
+"db78c3cdfe",
+"Przeciągnij linię oznaczoną ↕, kółko na linii wejścia, aby przesuwać prostokąt, lub pasek na jego prawym brzegu, aby zmienić jego rozmiar. W każdym innym miejscu wykres porusza się jak zwykle."
 ],
 "odEExit": [
 "3d85c7e08a",
@@ -4028,6 +4048,22 @@
 "odExitHint": [
 "a9498bb911",
 "Do 8 kroków. Każdy zamyka udział po określonej cenie, o określony procent od średniego wejścia lub jako wielokrotność R."
+],
+"odExt": [
+"a4b2498fcd",
+"Przedłuż do prawego brzegu"
+],
+"odExtClosed": [
+"f871770520",
+"Pozycja ma znów swój własny prawy brzeg. Przeciągnij go, aby zmienić rozmiar."
+],
+"odExtOff": [
+"013864439f",
+"Zamknij prawy brzeg"
+],
+"odExtOn": [
+"cd67a03b67",
+"Pozycja biegnie teraz do prawego brzegu."
 ],
 "odFillNote": [
 "c87b4a2a0a",
@@ -4217,6 +4253,10 @@
 "8544a47725",
 "Zysk"
 ],
+"odRemove": [
+"d8b9bdb3bb",
+"Usuń pozycję z wykresu"
+],
 "odRestOpen": [
 "b957d211ac",
 "{p}% pozostaje bez wyjścia i trailingu: pozostaje otwarte do zamknięcia."
@@ -4224,6 +4264,10 @@
 "odRestTrail": [
 "be684d239e",
 "{p}% pozostaje i podąża za trailing stopem {d} za najlepszą ceną, zaczynając od {a}."
+],
+"odRevert": [
+"8dca1dc79e",
+"Ten poziom nie pasuje do planu, więc wrócił:"
 ],
 "odRun": [
 "b1b392607d",
@@ -4240,6 +4284,10 @@
 "odSave": [
 "0eee2d3fa4",
 "Zapisz do tablicy ryzyka"
+],
+"odSelHint": [
+"b5f9d58f07",
+"Stuknij pozycję, aby ją zaznaczyć, a następnie przeciągnij linię oznaczoną ↕ lub uchwyt. W każdym innym miejscu wykres porusza się jak zwykle."
 ],
 "odShare": [
 "09ca55ca52",
@@ -6393,6 +6441,294 @@
 "6c58eac908",
 "Prowizja za stronę (%)"
 ],
+"rcFees": [
+"1176c1996f",
+"Prowizje (wejście i wyjście)"
+],
+"rcFinal": [
+"7cc7e5e185",
+"Saldo końcowe"
+],
+"rcGain": [
+"96dd91cdcb",
+"Zysk"
+],
+"rcKfull": [
+"5548453c41",
+"Pełny Kelly"
+],
+"rcKhalf": [
+"4760b81601",
+"Połowa Kelly"
+],
+"rcKq": [
+"3fb42a0384",
+"Jedna czwarta Kelly"
+],
+"rcLev": [
+"040daa23f9",
+"Dźwignia (×)"
+],
+"rcLiq": [
+"c1dfe11a1a",
+"Likwidacja (szacunek)"
+],
+"rcLiqNote": [
+"f8ab7a2995",
+"Uproszczony model: jedna pozycja izolowana, margin zabezpieczający zgodnie z wpisem, prowizje, funding, cena mark i pominięte poziomy ryzyka giełdy. Liczba z Twojej giełdy będzie się różnić."
+],
+"rcLiqS": [
+"8ee1ead8ac",
+"Uproszczona szacowana likwidacja"
+],
+"rcLiq_cross": [
+"237ba47eb9",
+"Nie pokazano: przy cross margin zależy to od całego portfela"
+],
+"rcLiq_none": [
+"19941a78d7",
+"Brak ceny likwidacji przy tej dźwigni"
+],
+"rcLiq_spot": [
+"3d1d84e078",
+"Brak na spot"
+],
+"rcLong": [
+"11eda67f9b",
+"Long"
+],
+"rcLosses": [
+"921787fd24",
+"Straty z rzędu"
+],
+"rcMargin": [
+"0d1a4bfb87",
+"Potrzebny margin"
+],
+"rcMaxLoss": [
+"c668b9dc04",
+"Strata na stop loss"
+],
+"rcMedian": [
+"e8cb6b3af3",
+"Wynik mediany"
+],
+"rcMmr": [
+"6ccd06f6ff",
+"Margin zabezpieczający (%)"
+],
+"rcMode": [
+"501f9eaddf",
+"Tryb margin"
+],
+"rcNo": [
+"816c52fd2b",
+"Nie"
+],
+"rcNote": [
+"064f1c622a",
+"Wszystko tutaj to arytmetyka w Twojej przeglądarce na wpisanych przez Ciebie liczbach. Nic nie jest wysyłane nigdzie i żadne zlecenie nie jest składane."
+],
+"rcNotional": [
+"629c8eb9ba",
+"Wartość pozycji"
+],
+"rcO_all": [
+"00003802ba",
+"Wypełniono wszystkie take profit"
+],
+"rcO_cross": [
+"dbfe7362b2",
+"Cross"
+],
+"rcO_inverse": [
+"e753755269",
+"Inverse perpetual (moneta)"
+],
+"rcO_isolated": [
+"64a176e362",
+"Izolowany"
+],
+"rcO_linear": [
+"6b962422e5",
+"Linear perpetual (USDT)"
+],
+"rcO_spot": [
+"c5c5ba59d0",
+"Spot"
+],
+"rcO_stop": [
+"94c0cf8f36",
+"Stop loss wybił przed jakimkolwiek take profit"
+],
+"rcO_then": [
+"ed72cdc29b",
+"Take profit {n}, a potem stop loss na reszcie"
+],
+"rcOcoPlan": [
+"30ee931cac",
+"Plan na papierze: wypełniony take profit anuluje tę część stop loss, stop loss anuluje to, co zostało. Żadne zlecenie nie jest wysyłane."
+],
+"rcOdm": [
+"11dc53ab85",
+"Planista ODM"
+],
+"rcOpt": [
+"48a7b8889e",
+"opcjonalnie"
+],
+"rcPF": [
+"80e53e077c",
+"Współczynnik zysku"
+],
+"rcPaid": [
+"299fdc9075",
+"Wpłacone"
+],
+"rcPeriods": [
+"d65472b09f",
+"Okresy"
+],
+"rcProfit": [
+"d8496a6578",
+"Zysk na take profit"
+],
+"rcQty": [
+"44f6af6945",
+"Ilość"
+],
+"rcRR": [
+"49da03e785",
+"Ryzyko : zysk"
+],
+"rcRRin": [
+"4ed9b7f212",
+"Zysk : ryzyko (R)"
+],
+"rcRate": [
+"71be9aab7d",
+"Zwrot na okres (%)"
+],
+"rcRecover": [
+"7bd0f65bea",
+"Zysk potrzebny do odzyskania"
+],
+"rcRisk": [
+"b031aee373",
+"Ryzyko na transakcję (%)"
+],
+"rcRiskMoney": [
+"6525cd02a3",
+"Kapitał w grupie ryzyka"
+],
+"rcRuinP": [
+"c449c8e2c0",
+"Szansa takiego obsunięcia kapitału"
+],
+"rcShare": [
+"10758b0e6c",
+"Zamknięty udział (%)"
+],
+"rcShort": [
+"5a8f23f567",
+"Ryzyko"
+],
+"rcShort2": [
+"0fe7d82f25",
+"Short"
+],
+"rcSide": [
+"26528381ea",
+"Strona"
+],
+"rcSim": [
+"687bd0f6b3",
+"Symulacja {n} losowych sekwencji z ustalonego ziarna, dzięki czemu te same dane wejściowe zawsze dają tę samą odpowiedź. To szacunek, a nie obietnica."
+],
+"rcSlip": [
+"9cc2898876",
+"Slippage (jednostki ceny)"
+],
+"rcStart": [
+"7d5451bcf8",
+"Saldo początkowe"
+],
+"rcStop": [
+"4d3419b202",
+"Cena stop loss"
+],
+"rcStreak": [
+"ffbdf88b78",
+"Strata po serii"
+],
+"rcStreakRec": [
+"907fc302d7",
+"Zysk potrzebny po niej"
+],
+"rcT_comp": [
+"0361ccdba9",
+"Procent składany"
+],
+"rcT_dd": [
+"3359ab1caa",
+"Obsunięcie kapitału"
+],
+"rcT_ev": [
+"0958deddf2",
+"Wartość oczekiwana"
+],
+"rcT_kelly": [
+"15299a0c1f",
+"Kelly"
+],
+"rcT_oco": [
+"6839addb6b",
+"Plan OCO"
+],
+"rcT_pos": [
+"d0f5a2cffb",
+"Wielkość pozycji"
+],
+"rcT_ruin": [
+"be867a992e",
+"Ryzyko bankructwa"
+],
+"rcTarget": [
+"be343d04b2",
+"Cena take profit"
+],
+"rcTitle": [
+"ff474a8bf9",
+"Centrum ryzyka"
+],
+"rcTp1": [
+"5bb6465f67",
+"Take profit 1"
+],
+"rcTp2": [
+"a9d287032d",
+"Take profit 2"
+],
+"rcTp3": [
+"64e8a21cb6",
+"Take profit 3"
+],
+"rcTrades": [
+"afcfcf0b8e",
+"Liczba transakcji"
+],
+"rcW_kelly": [
+"43b0a6c5e7",
+"Pełny Kelly zakłada, że wskaźnik wygranych jest znany dokładnie; nigdy nie jest. W praktyce stosuje się połowę lub jedną czwartą."
+],
+"rcW_liq": [
+"74b95e2b49",
+"Przy tej dźwigni pozycja zostaje zlikwidowana zanim zostanie osiągnięty stop loss."
+],
+"rcW_margin": [
+"33a819eb5c",
+"Potrzebny margin jest większy niż saldo: obniż ryzyko lub zwiększ dźwignię."
+],
 "rcW_noedge": [
 "abfe462fe4",
 "Brak przewagi przy tych liczbach: według Kelly'ego nie należy zawierać zakładu."
@@ -6660,6 +6996,54 @@
 "rng_week": [
 "7b72883e07",
 "W tym tygodniu"
+],
+"rsAl": [
+"689e627ada",
+"Wszystkie alerty, na każdej monecie"
+],
+"rsBack": [
+"5202b69570",
+"Przywrócono to, co usunął reset."
+],
+"rsDone": [
+"b8e80bb3ae",
+"Strona zresetowana."
+],
+"rsDr": [
+"3e97d79b5a",
+"Wszystkie rysunki, na każdej monecie"
+],
+"rsGo": [
+"44c57abd88",
+"Resetuj"
+],
+"rsInd": [
+"76de28a75e",
+"Wskaźniki na wykresach"
+],
+"rsLead": [
+"19aa2a9a77",
+"Wyczyść stronę za jednym zamachem. Zaznacz, co ma zniknąć:"
+],
+"rsLog": [
+"6f4be80e9d",
+"Historia alertów"
+],
+"rsNote": [
+"58f9efc63c",
+"Układy, ustawienia, lista obserwowanych i portfel pozostają. Alerty wysłane do bota Telegram są trzymane w bocie: otwórz tam /alerts, aby je usunąć."
+],
+"rsOd": [
+"bbde1a818d",
+"Plan ODM i jego poziomy"
+],
+"rsTitle": [
+"6ce02ce159",
+"Resetuj stronę"
+],
+"rsUndoLast": [
+"57ca70bcc1",
+"Cofnij ostatni reset"
 ],
 "runTest": [
 "2c7f471fce",
@@ -6996,6 +7380,22 @@
 "saTx_or": [
 "f579c52396",
 "OR"
+],
+"saWhy1": [
+"6505c505e8",
+"Zbuduj regułę z warunków. Wewnątrz grupy wybierz, czy wszystkie warunki muszą być prawdziwe (AND), czy wystarczy jeden (OR). Grupy łączy się w ten sam sposób."
+],
+"saWhy2": [
+"16ee22ede7",
+"NOT odwraca warunek lub całą grupę: „NOT ATR% > 3” oznacza, że rynek jest spokojny. NOT nigdy nie jest prawdziwy, gdy wskaźnikowi brakuje słupków, więc nie może wyzwolić się na brakujących danych."
+],
+"saWhy3": [
+"c5be12a5c9",
+"Reguła jest sprawdzana po zamknięciu słupka wybranego interwał, nigdy na tworzącym się słupku, a alert wyzwala się na słupku, na którym reguła staje się prawdziwa. Poniżej widzisz każdy warunek teraz i jak często reguła wyzwalałaby się w historii tego wykresu."
+],
+"saWhyT": [
+"49224cea55",
+"Jak działa inteligentny alert"
 ],
 "sameSide": [
 "180c1a1822",
@@ -7357,6 +7757,10 @@
 "c3de6d0cdd",
 "Sygnały Kurdistani (BTC)"
 ],
+"sg_flow": [
+"22b2e001a4",
+"Przepływ i wiadomości"
+],
 "sg_halft": [
 "a087f03711",
 "HalfTrend [everget]"
@@ -7373,6 +7777,10 @@
 "a9a165bc50",
 "Przecięcie KDJ"
 ],
+"sg_level": [
+"ed47f09811",
+"Poziomy"
+],
 "sg_macd": [
 "db0453bd2b",
 "Przecięcie MACD"
@@ -7380,6 +7788,10 @@
 "sg_macross": [
 "6677aad0c9",
 "Przecięcie EMA"
+],
+"sg_mind": [
+"7d7700531e",
+"Ryzyko i nastawienie"
 ],
 "sg_nwe": [
 "4e506ad872",
@@ -7401,9 +7813,17 @@
 "d890614a3f",
 "Odwrócenie RSI"
 ],
+"sg_setup": [
+"532fd3a54e",
+"Setupy"
+],
 "sg_smacross": [
 "446d28671b",
 "Złoty / krzyż śmierci (SMA)"
+],
+"sg_smc": [
+"f5cbe85ce3",
+"Struktura rynku"
 ],
 "sg_sqz": [
 "b42e6347a2",
@@ -7428,6 +7848,10 @@
 "sg_tdi": [
 "2af75b9512",
 "Traders Dynamic Index"
+],
+"sg_trade": [
+"b0811e470d",
+"Trade"
 ],
 "sg_ut": [
 "39cf5fa59f",
@@ -8161,9 +8585,41 @@
 "ad88cbfa09",
 "Również na Telegram (bot czuwa nawet po zamknięciu tej strony)"
 ],
+"thArc": [
+"c9522bad23",
+"Arctic Minimal"
+],
+"thAur": [
+"1f69f4962c",
+"Aurora Neon"
+],
+"thCri": [
+"e99d88a595",
+"Crimson Momentum"
+],
+"thCyb": [
+"c8e3feffa1",
+"Cyberpunk Flux"
+],
 "thDark": [
 "ae1ef01432",
 "Ciemny"
+],
+"thEme": [
+"31ebcf2e2d",
+"Emerald Terminal"
+],
+"thGal": [
+"8b6134fdc2",
+"Purple Galaxy"
+],
+"thGla": [
+"45248800ea",
+"Quantum Glass"
+],
+"thGold": [
+"065d9160fa",
+"Solar Gold"
 ],
 "thLight": [
 "a36ef8aba2",
@@ -8177,9 +8633,21 @@
 "0229e960cf",
 "Granatowy"
 ],
+"thObs": [
+"16c2f31828",
+"Midnight Obsidian"
+],
+"thOce": [
+"0f120f1635",
+"Deep Ocean"
+],
 "thPaper": [
 "22d507f2ba",
 "Papierowy"
+],
+"thRet": [
+"cfcedff38b",
+"Retro Trading"
 ],
 "time": [
 "6c82e6dd86",
@@ -8513,6 +8981,10 @@
 "5b20595c1d",
 "Trailing stop"
 ],
+"wsApplied": [
+"7c1a4571c7",
+"{n} jest włączony. Twój poprzedni workspace jest w Moje układy."
+],
 "wsBackup": [
 "74fca79c74",
 "Przed ustawieniem"
@@ -8637,7 +9109,7 @@
 ],
 "odhTg": [
 "54f13b7555",
-2
+3
 ],
 "sendBot": [
 "28b70e4ad7",
