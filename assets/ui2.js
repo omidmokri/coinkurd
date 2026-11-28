@@ -311,6 +311,7 @@
      fall away along the curve, so moving through the list turns the ring. The pane takes the open category's colour.
      Wide screens only: on a phone the same list is a plain accordion, where a curve would only cost width. */
   var MK = ['#5ef2d6', '#7cc8ff', '#9b7bff', '#ff6fb5', '#ffcf6b'], ORB = 1300;
+  var px = -1e4, py = -1e4;
   function wheel() {
     if (!M) return;
     var all = [].slice.call(M.querySelectorAll('.ekm-cat')), on = M.querySelector('.ekm-cat.on'), box = M.querySelector('.ekm-cats');
@@ -374,7 +375,15 @@
       if (a && plain(e) && a.target !== '_blank') { e.preventDefault(); go(a.href); }
     });
     if (FINE) cats.forEach(function (c) {
-      c.addEventListener('pointerenter', function () { if (!DESK.matches || M.classList.contains('q')) return; clearTimeout(hov); hov = setTimeout(function () { activate(c.getAttribute('data-k')); }, 70); });
+      /* only a pointer that actually moved may open a category. Without this, the row sliding under a still pointer
+         counts as entering it, and the two take turns: the row moves, the pointer "enters" the next one, that one
+         moves too. The guard is the pointer's own position: it must differ from where it was when the last category
+         opened. */
+      c.addEventListener('pointerenter', function (e) {
+        if (!DESK.matches || M.classList.contains('q')) return;
+        if (Math.abs(e.clientX - px) < 4 && Math.abs(e.clientY - py) < 4) return;
+        clearTimeout(hov); hov = setTimeout(function () { px = e.clientX; py = e.clientY; activate(c.getAttribute('data-k')); }, 90);
+      });
       c.addEventListener('pointerleave', function () { clearTimeout(hov); });
     });
     M.addEventListener('focusin', function (e) { var c = e.target.closest && e.target.closest('.ekm-cat[data-k]'); if (c && DESK.matches && !M.classList.contains('q')) activate(c.getAttribute('data-k')); });

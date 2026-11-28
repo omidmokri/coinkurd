@@ -652,12 +652,14 @@ html.ek-v3 #ekm .ekm-foot::before{content:"";position:absolute;top:0;inset-inlin
 @media (min-width:900px){
   html.ek-v3 #ekm .ekm-main{grid-template-columns:minmax(250px,27%) minmax(0,1fr);column-gap:clamp(40px,7vw,130px);align-items:center;margin-top:0}
   html.ek-v3 #ekm .ekm-cats{position:relative;display:flex;flex-direction:column;padding-inline-start:clamp(40px,5vw,78px)}
-  html.ek-v3 #ekm .ekm-cat{height:clamp(46px,7.4vh,64px);opacity:0;transform:translateX(calc((var(--x,0px) + 70px)*var(--sx,1)))}
+  html.ek-v3 #ekm .ekm-cat{height:clamp(46px,7.4vh,64px);transform:none}
+  html.ek-v3 #ekm .ekm-cat>*{opacity:0;transform:translateX(calc((var(--x,0px) + 70px)*var(--sx,1)))}
   html.ek-v3[dir=ltr] #ekm .ekm-cat{--sx:-1}
-  html.ek-v3 #ekm.open .ekm-cat{opacity:calc(1 - var(--ad,0)*.1);transform:translateX(calc(var(--x,0px)*var(--sx,1)));transition:transform .6s var(--u-e),opacity .45s linear,color .25s}
-  html.ek-v3 #ekm.open:not(.orb) .ekm-cat{opacity:1}
-  html.ek-v3 #ekm .ekm-cat .ekm-ct{transform:scale(calc(1 - var(--ad,0)*.035))}
-  html.ek-v3 #ekm .ekm-cat .ekm-ct{transition:transform .55s var(--u-e),font-size .45s var(--u-e),text-shadow .3s}
+  html.ek-v3 #ekm.open .ekm-cat{transition:color .25s}
+  html.ek-v3 #ekm.open .ekm-cat>*{opacity:calc(1 - var(--ad,0)*.1);transform:translateX(calc(var(--x,0px)*var(--sx,1)));transition:transform .6s var(--u-e),opacity .45s linear}
+  html.ek-v3 #ekm.open:not(.orb) .ekm-cat>*{opacity:1}
+  html.ek-v3 #ekm.open .ekm-cat .ekm-ct{transform:translateX(calc(var(--x,0px)*var(--sx,1))) scale(calc(1 - var(--ad,0)*.035))}
+  html.ek-v3 #ekm .ekm-cat .ekm-ct{transition:transform .6s var(--u-e),font-size .45s var(--u-e),text-shadow .3s,opacity .45s linear}
   html.ek-v3 #ekm .ekm-cat.on .ekm-ct{transform:none;font-size:2.25rem}
   /* the ring the nodes sit on: its near point is the open category's node; it glides when another one opens */
   html.ek-v3 #ekm.orb .ekm-orb{display:block;position:absolute;width:2600px;height:2600px;border-radius:50%;top:calc(var(--oy) - 1300px);left:calc(var(--ox) - 2600px);pointer-events:none;
@@ -695,3 +697,6 @@ html.ek-v3 #ekm .ekm-pi>.br-neb{position:absolute}
 html.ek-v3 #ekm .ekm-bg::after{inset:0;height:auto;background-repeat:repeat;background-position:0 0}
 html.ek-v3 #ekm .ekm-pi>.br-neb{opacity:.5}
 @media (max-width:899px){html.ek-v3 #ekm .ekm-x{width:48px;height:48px;padding:0}html.ek-v3 #ekm .ekm-x svg{width:20px;height:20px}}
+/* the names grow and shrink, so the row they sit in must not resize with them */
+html.ek-v3 #ekm .ekm-cat{align-items:center;overflow:visible}
+html.ek-v3 #ekm .ekm-cat .ekm-ct{display:block;white-space:nowrap;will-change:transform}
