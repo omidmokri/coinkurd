@@ -1,11 +1,16 @@
 {
- "updated_at": "2026-11-28T02:14:34.174757+00:00",
+ "updated_at": "2026-11-28T02:26:24.704815+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
+  "BTC": {
+   "n": 98,
+   "amount": 188084.58,
+   "usd": 11268399554
+  },
   "USDC": {
    "n": 133,
    "amount": 5037968780,
@@ -20,17 +25,12 @@
    "n": 109,
    "amount": 399218.86999999994,
    "usd": 666614520
-  },
-  "BTC": {
-   "n": 98,
-   "amount": 168042.13,
-   "usd": 10060896899
   }
  },
  "hourly": [
   {
    "h": "2026-11-27T15",
-   "usd": 662907276
+   "usd": 490124919
   },
   {
    "h": "2026-11-27T16",
@@ -74,10 +74,28 @@
   },
   {
    "h": "2026-11-28T02",
-   "usd": 105246187
+   "usd": 1485531199
   }
  ],
  "events": [
+  {
+   "asset": "BTC",
+   "amount": 1885.98,
+   "usd": 113607547,
+   "tx": "2a26afe57e67ab2c91f2f2349d48236e9c467a349f164e2d1f33a88fdbc09372",
+   "to": "bc1qprjge82e99yxm9z4jnlf4rayvk4kprcaj47aqa",
+   "from": "bc1qprjge82e99yxm9z4jnlf4rayvk4kprcaj47aqa",
+   "at": "2026-11-28T02:16:01+00:00"
+  },
+  {
+   "asset": "BTC",
+   "amount": 21027.88,
+   "usd": 1266677465,
+   "tx": "1ffc706878eed8e09f9f627a92e7a14bd9a3fee99cf8bb6c0e16c1f7028d13be",
+   "to": "bc1qx2x5cqhymfcnjtg902ky6u5t5htmt7fvqztdsm028hkrvxcl4t2sjtpd9l",
+   "from": "bc1qx2x5cqhymfcnjtg902ky6u5t5htmt7fvqztdsm028hkrvxcl4t2sjtpd9l",
+   "at": "2026-11-28T02:16:01+00:00"
+  },
   {
    "asset": "USDC",
    "amount": 10460819,
@@ -851,26 +869,6 @@
    "from_kind": "blocked",
    "to_name": "Circle",
    "to_kind": "entity"
-  },
-  {
-   "asset": "USDT",
-   "amount": 19864926,
-   "usd": 19864926,
-   "tx": "0x7c7df00fd512430c72862906c6e28f936a79246272b7cd59ce2b4593e1b31903",
-   "from": "0x559432e18b281731c054cd703d4b49872be4ed53",
-   "to": "0x3b98b9e9cb75c1cb1729aab8f09ced2936505e4f",
-   "at": "2026-11-27T22:38:48.533179+00:00"
-  },
-  {
-   "asset": "USDC",
-   "amount": 20184793,
-   "usd": 20184793,
-   "tx": "0xfe615c094a54c01df4bffefd76f6082ab65832b1e75e3765f4459c661c699cd4",
-   "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-   "to": "0x5435bca90789f10c4eb19dcb20d0612e60d9c58f",
-   "at": "2026-11-27T22:38:48.533115+00:00",
-   "from_name": "Coinbase 10",
-   "from_kind": "cex"
   }
  ]
 }
