@@ -1,20 +1,20 @@
 {
- "updated_at": "2026-11-28T03:39:10.532718+00:00",
+ "updated_at": "2026-11-28T03:54:25.862144+00:00",
  "min": {
   "BTC": 500,
   "ETH": 1000,
   "stable": 10000000
  },
  "totals24": {
+  "USDC": {
+   "n": 138,
+   "amount": 5571754328,
+   "usd": 5571754328
+  },
   "BTC": {
    "n": 98,
    "amount": 191965.23,
    "usd": 11500907966
-  },
-  "USDC": {
-   "n": 138,
-   "amount": 5536450313,
-   "usd": 5536450313
   },
   "ETH": {
    "n": 107,
@@ -30,7 +30,7 @@
  "hourly": [
   {
    "h": "2026-11-27T16",
-   "usd": 792760076
+   "usd": 778064091
   },
   {
    "h": "2026-11-27T17",
@@ -74,10 +74,19 @@
   },
   {
    "h": "2026-11-28T03",
-   "usd": 749476554
+   "usd": 799476554
   }
  ],
  "events": [
+  {
+   "asset": "USDC",
+   "amount": 50000000,
+   "usd": 50000000,
+   "tx": "0xde000e3645affcd901dd39b98f413b13aafcae0a6e334dfa75fe50454e04b85a",
+   "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+   "to": "0x0000000000be226afde21672a5e4adc45692e69d",
+   "at": "2026-11-28T03:53:45.860642+00:00"
+  },
   {
    "asset": "BTC",
    "amount": 2491.69,
@@ -850,15 +859,6 @@
    "from_kind": "cex",
    "to_name": "Crypto.com 2",
    "to_kind": "cex"
-  },
-  {
-   "asset": "USDC",
-   "amount": 28299900,
-   "usd": 28299900,
-   "tx": "0xe530df8f6ba1291d0353b0cb4fdfde14c36296ecead9c5bc5c2b5192f58c235c",
-   "from": "0xbd05d8e3097f9888cbd0a0b63d64df2648d12afe",
-   "to": "0xcd531ae9efcce479654c4926dec5f6209531ca7b",
-   "at": "2026-11-27T23:35:27.420579+00:00"
   }
  ]
 }
