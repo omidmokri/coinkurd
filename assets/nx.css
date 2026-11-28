@@ -666,9 +666,17 @@ html.ek-v3 #ekm .ekm-foot::before{content:"";position:absolute;top:0;inset-inlin
     background:conic-gradient(from 200deg,#5ef2d6,#7cc8ff,#9b7bff,#ff6fb5,#ffcf6b,#5ef2d6);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - 1.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - 1.5px));opacity:.55;transition:top .6s var(--u-e)}
   html.ek-v3[dir=rtl] #ekm.orb .ekm-orb{left:var(--ox)}
   html.ek-v3 #ekm.orb .ekm-orb::after{content:"";position:absolute;inset:-70px;border-radius:50%;border:1px dashed rgba(255,255,255,.5)}
-  html.ek-v3 #ekm .ekm-panes{align-content:center;padding-block:6px}
-  html.ek-v3 #ekm .ekm-pane.on{display:block;animation:ekm-pane .5s var(--u-e) both}
-  @keyframes ekm-pane{from{opacity:0;transform:translateX(calc(-26px*var(--sx,1)))}}
+  /* every pane sits in the same grid cell, so the block is always as tall as the tallest pane and its top never
+     moves. Before this, a pane was the only thing in the column and the column centred it: opening a short category
+     (Archive, four pages) after a tall one (Analysis, twenty) lifted the whole panel by ~180px, and the panel jumped
+     under the pointer. The ones at the end of the list are the shortest, so there it jumped most. */
+  html.ek-v3 #ekm .ekm-panes{align-content:center;padding-block:6px;grid-template-columns:minmax(0,1fr)}
+  /* on a short window the block is taller than the space: centred, it would be cut off at both ends and the head
+     would sit above the scroll area, out of reach. "safe" drops to top alignment exactly then. */
+  @supports (align-content:safe center){html.ek-v3 #ekm .ekm-panes{align-content:safe center}}
+  html.ek-v3 #ekm .ekm-pane{display:block;grid-area:1/1;align-self:start;visibility:hidden;opacity:0;pointer-events:none}
+  html.ek-v3 #ekm .ekm-pane.on{visibility:visible;opacity:1;pointer-events:auto;animation:ekm-pane .5s var(--u-e) both}
+  @keyframes ekm-pane{from{opacity:0;transform:translateX(calc(-26px*var(--sx,1)))}to{opacity:1;transform:none}}
   html.ek-v3 #ekm .ekm-hd{display:flex;align-items:center;gap:12px;margin:0 6px 12px;font:900 1.7rem/1.4 'Vazirmatn','Space Grotesk',sans-serif;color:#fff}
   html.ek-v3[lang=en] #ekm .ekm-hd{font-family:'Archivo Black','Space Grotesk',sans-serif;font-weight:400}
   html.ek-v3 #ekm .ekm-hd i{width:6px;height:26px;border-radius:3px;background:var(--k);box-shadow:0 0 18px var(--k)}
